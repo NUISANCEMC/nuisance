@@ -28,10 +28,11 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   plotTitles = "; q_{3} (GeV); E_{avail} (GeV); d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})";
   EnuMin = 2.;
   EnuMax = 6.;
+  hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
+  useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
+  normError = 0.107;
   default_types = "FIX/FULL";
   allowed_types = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
-  hadroncut = FitPar::Config().GetParI("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut") > 0;
-  normError = 0.107;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Binning for the 2D Histograms
@@ -58,7 +59,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   SetupDefaultHist();
  
   // Set Scale Factor
-  scaleFactor = (this->eventHist->Integral("width")*1E-42/(nevents+0.))/this->TotalIntegratedFlux(); 
+  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); 
 };
 
 
@@ -67,38 +68,32 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
 void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  Mode = event->Mode;
-
   // Set starting variables
-  Enu  = (event->PartInfo(0))->fP.E()/1000.0;
-  Eav  = 0.0; // Energy Avaiable
-  q3   = 0.0; // Three momentum transfer
-  q0   = 0.0; // True Energy Transfer
-  true_q3 = 0.0;
-  
-  // Cuts on muon and hadron found
-  muonfound   = false;
-  hadronfound = false;
-
-  // Counters for protons
-  nprotons = npions = npiz = npip = npim = ne = ngam = nneutrons = nother = 0;
-  nparticles = 0;
-
+  double Eav  = 0.0; // Energy Avaiable
+  double q3   = 0.0; // Three momentum transfer
+  double q0   = 0.0; // True Energy Transfer
+    
   // Individual particle variables
-  PID  = 0;
-  Q2   = 0.0;
-  q = TLorentzVector(); // reset vector
+  int PID  = 0;
+  double Q2   = 0.0;
+  TLorentzVector q = TLorentzVector(); // reset vector
+  double Mmu = 0.0;
+  double Emu = 0.0;
+  double pmu = 0.0;
+  double ThetaMu = 0.0;
 
   // Muon Variables -----------------
   // Muon should be in slot 2 or 3.
-  for (int j = 2; j < event->Npart(); j++){
+  for (UInt_t j = 2; j < event->Npart(); j++){
 
-    PID = event->PartInfo(j)->fPID;
+    // Skip dead particles
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fStatus != 0) continue;
     
-    if (PID == 13){
+    PID = event->PartInfo(j)->fPID;
 
-      // Found the muon
-      if (!muonfound) muonfound = true;
+    // MUON
+    if (PID == 13){
       
       // Set q from muon
       q = ((event->PartInfo(0))->fP - (event->PartInfo(j))->fP);
@@ -107,37 +102,33 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
       // Other muon variables
       ThetaMu = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
       pmu = ((event->PartInfo(j))->fP.Vect().Mag())/1000.0;
-    
-      Emu     = ((event->PartInfo(j))->fP.E())/1000.0;
-      
-      Enu_rec = Emu + q0;
+      Emu = ((event->PartInfo(j))->fP.E())/1000.0;
+      Mmu = ((event->PartInfo(j))->fP.Mag())/1000.0;  
 
+      Enu_rec = Emu + q0;
+      
       // Set Q2 from reconstruction method            
-      Q2 = 2*Enu_rec * (Emu - pmu * cos(ThetaMu)) - 0.1057*0.1057;
+      Q2 = 2*Enu_rec * (Emu - pmu * cos(ThetaMu)) - Mmu*Mmu;
       
       // merge together for q3        
-      q3 = sqrt( Q2 + q0*q0 );
-
+      q3 = q.Vect().Mag()/1000.0;
+      if (!useq3true) q3 = sqrt( Q2 + q0*q0 );
+      
       continue;
     }
   
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fStatus != 0) continue;
-
     // Eav Varible -----------------
-    // Proton and charged pions KE                                                                                                                                                              
+    // P and pi+- Kinetic Energy
     if (PID == 2212 or PID ==  211 or PID == -211){
-      if (!hadronfound) hadronfound = true;
+      Eav += FitUtils::T(event->PartInfo(j)->fP);
       
-      Eav += (event->PartInfo(j)->fP.E() - event->PartInfo(j)->fP.Mag())/1000.0;
-    }
-    // Not a neutron TE                                                                                                                                                                               
-    else if (PID != 2112 and PID < 999 and PID != 22 and PID != 14){
-      if (!hadronfound) hadronfound = true;
+    // Total Energy of non-neutrons
+    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14){
       Eav += (event->PartInfo(j)->fP.E())/1000.0;
     }
   }
-    
+
+  // Set Hist Variables
   this->X_VAR = q3;
   this->Y_VAR = Eav;
 
@@ -147,28 +138,5 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 bool MINERvA_CCinc_XSec_2DEavq3_nu::isSignal(FitEvent *event){
 //********************************************************************
-
-  // Need at least one muon
-  if (!muonfound) return false;
-
-  // Require Eav > 0.0
-  if (hadroncut and !hadronfound) return false;
-  
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Restrict true energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
-  
-  // Restrict reconstructed energy range
-  if (Enu_rec < this->EnuMin || Enu_rec > this->EnuMax) return false;
-  
-  // Cut on muon angle greated than 20deg
-  if (cos(ThetaMu) < 0.93969262078) return false;
-
-  // Cut on muon energy < 1.5 GeV
-  if (Emu < 1.5) return false;
-  
-  return true;
-};
-
+  return SignalDef::isCCincLowRecoil_MINERvA(event, EnuMin, EnuMax, hadroncut);
+}

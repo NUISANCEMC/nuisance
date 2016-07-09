@@ -66,7 +66,7 @@
 
 #include "TObject.h"
 #include "InputHandler.h"
-
+#include "SignalDef.h"
 
 /// InputHandler Class
 ///

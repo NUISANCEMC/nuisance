@@ -65,6 +65,12 @@ namespace SignalDef {
   bool isCCcoh_MINERvA    (FitEvent *event, double EnuMin, double EnuMax);
   bool isCCcohBar_MINERvA (FitEvent *event, double EnuMin, double EnuMax);
 
+
+  bool isCCQEnumu_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
+  bool isCCQEnumubar_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
+
+  bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool hadroncut);
+  
 };
 
 #endif

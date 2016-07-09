@@ -23,7 +23,7 @@
 MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 //******************************************************************** 
 
-  // Measurement Details                                                                                                           
+  // Setup Measurement Defaults
   measurementName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   isFluxFix      = name.find("_newflux") != std::string::npos;
@@ -31,12 +31,12 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   EnuMin = 1.5;
   EnuMax = 10.;
   normError = 0.110;
+  allowed_types = "FIX,FREE,SHAPE/DIAG,FULL/NORM";
+  default_types = "FIX/FULL";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
 
   // Setup the Data Plots
   std::string basedir = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/";
-  int nbins = 8;
   std::string datafilename  = "";
   std::string covarfilename = "";
 
@@ -83,26 +83,26 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*13./7./this->TotalIntegratedFlux(); // NEUT
+  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*13./7./this->TotalIntegratedFlux(); 
   
 };
 
 //********************************************************************
 void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
-  //********************************************************************
+//********************************************************************
 
+  double q2qe = -1.0;
+  double ThetaMu = 1.0;
+  
   // Get the relevant signal information
-  for (int j = 0; j < event->Npart(); ++j){
+  for (UInt_t j = 0; j < event->Npart(); ++j){
 
     if ((event->PartInfo(j))->fPID != -13) continue;
 
     ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-    
     q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 30.,  false);
-    Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 30., false);
-
+    
     break;
-
   }
 
   this->X_VAR = q2qe;
@@ -114,20 +114,5 @@ void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //********************************************************************
 bool MINERvA_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent *event){
 //*******************************************************************
-
-  // For now, define as the true mode being CCQE or npnh
-  if (event->Mode != -1 and event->Mode != -2) return false;
-
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != -14) return false;
-
-  // If Restricted phase space
-  if (!fullphasespace &&  ThetaMu > 0.34906585) return false;
-
-  // restrict energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
-  if (Enu_rec < this->EnuMin || Enu_rec > this->EnuMax) return false;
-
-  return true;
-};
-
+  return SignalDef::isCCQEnumubar_MINERvA(event, EnuMin, EnuMax, fullphasespace);
+}

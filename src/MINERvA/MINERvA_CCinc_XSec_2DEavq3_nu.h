@@ -59,32 +59,9 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
   
  protected:
   
-  // Event level variables
-  double Eav, q3,Enu_rec,q0;
-  bool muonfound, hadronfound;
-  int nparticles;
-  int PID;
-  TLorentzVector q;
-  double Q2;
-  double true_q3;
-  
-  // Measurement Variables
-  int signalevents;
-  double energyaverage;
-
   // Cuts
   bool hadroncut;
-
-  // additional histograms
-  TH2D* mcHist_content[9];
-  TH1D* evtsignalHist;
-  TH1D* fluxsignalHist;
-  TH1D *PDGHistogram;
-  TH1D *status;
-
-  double pmu, Emu, ThetaMu;
-  int nprotons, npions, npiz, npip, npim, ne, ngam, nneutrons, nother;
-  bool addMartini, addLFG, addNieves;
+  bool useq3true;
 };
   
 #endif

@@ -464,3 +464,120 @@ bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
 
   return true;
 };
+
+//********************************************************************
+bool SignalDef::isCCQEnumu_MINERvA(FitEvent* event, double EnuMin,
+				   double EnuMax, bool fullphasespace){
+//********************************************************************
+  
+  // For now, define as the true mode being CCQE or npnh
+  if (event->Mode != 1 and event->Mode != 2) return false;
+  
+  // Only look at numu events
+  if ((event->PartInfo(0))->fPID != 14) return false;
+
+  // Get Theta Variables
+  double ThetaMu = 999.9;
+  double Enu_rec = -1.0;
+  
+  for (UInt_t i = 2; i < event->Npart(); i++){
+    if (event->PartInfo(i)->fPID == 13){
+
+      ThetaMu = (event->PartInfo(0)->fP.Vect().Angle(event->PartInfo(i)->fP.Vect()));
+      Enu_rec = FitUtils::EnuQErec((event->PartInfo(i))->fP, cos(ThetaMu), 34.,true);
+      break;
+    }
+  }
+
+  // If Restricted phase space
+  if (!fullphasespace &&  ThetaMu > 0.34906585) return false;
+
+  // restrict energy range
+  if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) return false;
+  if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
+
+  return true;
+};
+
+//********************************************************************
+bool SignalDef::isCCQEnumubar_MINERvA (FitEvent* event, double EnuMin,
+				       double EnuMax, bool fullphasespace){
+//********************************************************************
+
+  // For now, define as the true mode being CCQE or npnh
+  if (event->Mode != -1 and event->Mode != -2) return false;
+
+  // Only look at numu events
+  if ((event->PartInfo(0))->fPID != -14) return false;
+
+  // Get Theta Variables
+  double ThetaMu = 999.9;
+  double Enu_rec = -1.0;
+
+  for (UInt_t i = 2; i < event->Npart(); i++){
+    if (event->PartInfo(i)->fPID == -13){
+
+      ThetaMu = (event->PartInfo(0)->fP.Vect().Angle(event->PartInfo(i)->fP.Vect()));
+      Enu_rec = FitUtils::EnuQErec((event->PartInfo(i))->fP, cos(ThetaMu), 30.,false);
+      break;
+    }
+  }
+
+  // If Restricted phase space
+  if (!fullphasespace &&  ThetaMu > 0.34906585) return false;
+  
+  // restrict energy range
+  if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) return false;
+  if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
+
+  return true;
+}
+
+//********************************************************************
+bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
+					 double EnuMax, bool hadroncut){
+//********************************************************************
+
+  // Only look at numu events
+  if ((event->PartInfo(0))->fPID != 14) return false;
+
+  // Restrict true energy range
+  if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) return false;
+  
+  // Loop Particles
+  int nhadrons = 0;
+  int nmuons = 0;
+  double Enu_rec = 0.0;
+  double ThetaMu = 0.0;
+  double Emu = 0.0;
+  
+  for (UInt_t i = 2; i < event->Npart(); i++){
+
+    if (!(event->PartInfo(i))->fIsAlive) continue;
+    if (event->PartInfo(i)->fStatus != 0) continue;
+    
+    int PID = event->PartInfo(i)->fPID;
+    if (PID == 13){
+      nmuons++;
+      ThetaMu = event->PartInfo(i)->fP.Vect().Angle(event->PartInfo(0)->fP.Vect());
+      Emu = event->PartInfo(i)->fP.E()/1000.0;
+    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14){
+      nhadrons++;
+    }
+  }
+
+  // Need at least one muon
+  if (nmuons < 1) return false;
+
+  // Require Eav > 0.0
+  if (hadroncut and nhadrons < 1) return false;
+
+  // Cut on muon angle greated than 20deg
+  if (cos(ThetaMu) < 0.93969262078) return false;
+
+  // Cut on muon energy < 1.5 GeV
+  if (Emu < 1.5) return false;
+
+  return true;
+}
+

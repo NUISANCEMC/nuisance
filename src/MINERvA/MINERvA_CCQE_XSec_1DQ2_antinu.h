@@ -34,7 +34,6 @@ public:
 
  private:
 
-  double Enu_rec, q2qe,ThetaMu;
   bool isFluxFix, fullphasespace;
   
 };
