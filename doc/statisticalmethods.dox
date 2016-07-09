@@ -1,0 +1,56 @@
+/*!
+\page statisticalmethods Statistical Methods
+
+
+Currently by default the fitter uses a Pearsons \chi^{2} minimization method to calculate the best fit model prediction and it's errors. At each stage in the fit the MC sample is updated given some parameter choice and a test statistic calculated. ROOT's Math Minimizer libraries are used to converge on the best choice of parameters that produce the minimum \chi^{2}. It is important to point out that this method can result in local minimums appearing to be the best fit prediction, more detail is given on this in the fit routines section.
+
+\section statisticalmethods_metrix Test Statistic
+
+The \chi^{2} definition varies from sample to sample given the fit options provided in the fit card file and the compatible fit types for that sample.
+
+Below are the calculations and code example from StatUtils that produces the \chi^{2} test statistic. The fitter translates 2D histograms into 1D histograms using provided bin mapping functions.
+
+- Uncorrelated \chi^{2} Calculation
+Uses just the uncorrelated bin errors from the bin errors.
+
+\code
+Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask);
+\endcode
+
+- Correlated chi2 Calculation
+Uses just the uncorrelated bin errors from the bin errors.
+Note: For the MiniBooNE datasets the uncorrelated bin errors give the shape-only error for th
+at bin.
+
+\code
+Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask);
+\endcode
+
+
+- Event rate Chi2 Calculation
+Uses histograms where bin contents are just event rate entries. Handles binmoial distribution.
+
+\code
+Double_t StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask);
+\endcode
+
+
+- There are a few placeholders in StatUtils that allow different likelihood calculations to be added if required.
+
+
+\section statisticalmethods_err Errors
+The errors are determined by variations in the parameters away from the best fit point that increase the test statistic by some error limit. The error limit is defined in FCN's UP command, which is set to 1.0 Default for \chi^{2} fits. We assume gaussian errors in the fit which results in symetric error bands, there is no support at the moment to use MINOS to determine assymetric errors as this increases the time taken to perform the fit.
+
+
+\section statisticalmethods_pull Pull Terms
+Results from other fits can be included in the 'chi2 calculation by adding penalty terms and allowing those parameteres to float. This assumes gaussian distributions of those parameters which is sometimes not ideal. For example the FSI parameters are non-gaussian so instead there is an option to include a chi2 response from pion nucleon fits by the FSI task force.
+
+
+\section statisticalmethods_pgof PGoF Calculations
+The purpose of PGoF Fits is to evaluate disagreements between datasets within the confines of the mdoel being tested.
+
+
+
+
+
+*/

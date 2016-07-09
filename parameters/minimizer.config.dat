@@ -1,0 +1,17 @@
+# Minimizer Routine Configurations
+
+config extfit.savenominal    0
+config extfit.saveprefit    0
+
+config minimizer.tolerance  0.01
+
+config minimizer.fixinputdial    0
+config minimizer.fitfunction    chi2
+config minimizer.fittype    Minuit2
+config minimizer.fitroutine    Migrad
+
+config minimizer.maxcalls    1000000
+config minimizer.maxiterations    1000000
+
+config error_throws 100
+config error_uniform 0

@@ -1,0 +1,4 @@
+# This folder is setup for anyone wanting to quickly add new samples into the build environment for the fitter.
+# The Tutorial classes contained here show how samples can be produced for 1D and 2D measurements, 
+# with the standard functions you would need to perform simple fits.
+# Development classes should be committed here, and will be moved to appropriate Experimental source folders when they have been validated.

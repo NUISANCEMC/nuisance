@@ -1,0 +1,16 @@
+# General todolist to track things that need to be added to make life easier for would be fitters.
+# If you have any suggestions that are not in this list and don't have time to add them yourself please add them to this list or email "p.stowell@sheffield.ac.uk".
+- Add licensing info to every page
+- Grep for swear words etc
+- Spline implementation
+- Event manager
+- More documentation
+- More flexible input formats (e.g., vectors of strings for all parameters in card file)
+- Make output format appropriate for input format (e.g., ability to throw errors according to covariance and parameters in an output file)
+- Basic validation checks for us to ensure everything works before making a public release
+- Long term need to think about more sophisticated validation, e.g. continuous validation tools.
+- Extend CINT libraries to all samples
+- Organise all the different data reading classes
+
+
+

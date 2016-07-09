@@ -1,0 +1,9 @@
+config sterile.dissappearance    0
+config sterile.freevalues    0
+config sterile.sin2theta    0.0
+config sterile.sin2theta_min   0.0
+config sterile.sin2theta_max    1.0
+
+config sterile.delmass2    10.0
+config sterile.delmass2_min    0.0
+config sterile.delmass2_max    100.0

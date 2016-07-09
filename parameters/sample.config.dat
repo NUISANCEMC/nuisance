@@ -1,0 +1,10 @@
+config MINERvA_XSec_CCinc_2DEavq3_nu.hadron_cut    0
+
+config ANL_CCQE_Evt_1DQ2_nu.mask        @DATABASE/ANL/ANL_CCQE_BinMask_PRD26_537.dat
+config ANL_CCQE_Evt_1DQ2_nu_PRL31.mask  @DATABASE/ANL/ANL_CCQE_BinMask_PRD26_537.dat
+config ANL_CCQE_Evt_1DQ2_nu_PRD16.mask  @DATABASE/ANL/ANL_CCQE_BinMask_PRD26_537.dat
+config ANL_CCQE_Evt_1DQ2_nu_PRD26.mask  @DATABASE/ANL/ANL_CCQE_BinMask_PRD26_537.dat
+
+
+config ANL_CCQE_Evt_1DQ2_nu.mask  @DATABASE/ANL/ANL_CCQE_BinMask_PRD26_537.dat
+

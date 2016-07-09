@@ -1,0 +1,36 @@
+#!/bin/sh
+if ! [[ ":$PATH:" == *":@CMAKE_INSTALL_PREFIX@/bin:"* ]]; then
+  export PATH=@CMAKE_INSTALL_PREFIX@/bin:$PATH
+fi
+
+if ! [[ ":$LD_LIBRARY_PATH:" == *":@CMAKE_INSTALL_PREFIX@/lib:"* ]]; then
+  export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/lib:$LD_LIBRARY_PATH
+fi
+
+if [[ ! "${ROOTSYS}" ]]; then
+  echo "[INFO]: Sourcing ROOT from: @CMAKE_ROOTSYS@"
+  source "@CMAKE_ROOTSYS@/bin/thisroot.sh"
+fi
+
+
+if [[ "@USE_NEUT@" != "0" ]]; then
+  echo "[INFO]: Adding NEUT library paths to the environment."
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/lib/@CMAKE_SYSTEM_NAME@:"* ]]; then
+    export LD_LIBRARY_PATH=@NUWRO@/lib/@CMAKE_SYSTEM_NAME@:$LD_LIBRARY_PATH
+  fi
+fi
+
+if [[ "@USE_NuWro@" != "0" ]]; then
+  echo "[INFO]: Adding NuWro library paths to the environment."
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
+    export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
+  fi
+fi
+
+if [[ "@USE_GENIE@" != "0" ]]; then
+  echo "[INFO]: Adding GENIE paths to the environment."
+fi
+
+if [[ "@USE_NIWG@" != "0" ]]; then
+  echo "[INFO]: Adding NIWG paths to the environment."
+fi

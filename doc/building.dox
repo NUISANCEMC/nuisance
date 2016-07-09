@@ -1,0 +1,122 @@
+/*!
+\page building Building the fitter
+
+
+The build structure is setup so that the fitter can be built against differeing combinations of the MC Generators and associated RW libraries.
+
+
+\section buildsteps Build Steps
+
+The following steps below should result in a successful build:
+
+1. Start in the external fitter top level directory. 
+   \code $ cd ~/t2krep/NIWG/externalDataFitter/ \endcode
+   
+2. Copy the environemnt setup script to current directory.
+   \code $ cp ./make/example_env.sh ./extfitter_env.sh \endcode
+2. Copy the configuratin script to top level directory
+   \code $ cp ./make/example_config.sh ./extfitter_config.sh \endcode
+3. Edit extfitter_config.sh to enable/disable the required custom build variables. If you don't want to build against a generator don't worry about setting up its variables or dependencies just leave them blank. The code below is an example of the NIWG and NEUT dependences.
+
+\code
+# Default builds just against NEUT + NIWG + T2KRW
+$EXT_FIT/configure \
+         --disable-t2kreweight \
+         --enable-neut \
+	 --with-cern=$CERN_ROOT \
+	 --enable-niwg \
+	 --disable-genie \
+	 --disable-nuwro \
+	 --disable-nuwro-reweight
+\endcode
+
+4. Edit "extfitter_env.sh" to include all dependencies that are required by the build options. If you don't want to build against a generator don't worry about setting up its variables or dependencies just leave them blank. The code below is an example of the NIWG and NEUT dependences.
+
+\code
+
+#--------------------
+# Fitter Requirements
+#--------------------
+
+# ROOT Dependency
+export ROOTSYS="/home/stowell/software/root/"
+
+# dependency on NIWG_DATA will eventually be removed
+export NIWG_DATA="/home/stowell/t2krep/NIWG/external_data/" #path to external data
+
+# -------------------------
+# Generator/RW requirements
+# -------------------------
+
+#GENIE
+export GENIE="" #/path/to/genie/
+
+# NUWRO
+export NUWRO="" # /path/to/nuwro
+
+# Neut
+export NEUT="/home/stowell/t2krep/NIWG/neut/branches/neut_5.3.4_v1r25/" #/path/to/neut
+
+# NIWG
+export NIWGREWEIGHT="/home/stowell/t2krep/GlobalAnalysisTools/NIWGReWeight/head/" #/path/to/niwgreweight
+
+# T2K RW Stuff
+export T2KREWEIGHT="" # path to t2krew  
+
+#-------------------
+# Other Dependencies
+#-------------------
+       
+# Cern LIB  (Required by NEUT and T2KREW)
+export CERN="/home/stowell/software/CERNLIB"
+export CERN_LEVEL=2005
+\endcode
+
+5. Run configure script
+\code $ source ./extfitter_config.sh \endcode
+
+6. If configure is successful and has the correct compile flags
+\code
+
+Your input configuration options were: --disable-t2kreweight --enable-neut --with-cern=/home/stowell/software/CERNLIB/2005
+     	   		 	       --enable-niwg --disable-genie --disable-nuwro --disable-nuwro-reweight
+
+The /home/stowell/t2krep/NIWG/externalDataFitter/head/make/Make.config file has been succesfully generated!
+The following config options were set:
+EXT_FIT_OPTION_ENABLE_T2KREWEIGHT=NO
+EXT_FIT_OPTION_ENABLE_GENIE=NO
+EXT_FIT_OPTION_ENABLE_NEUT=YES
+EXT_FIT_OPTION_ENABLE_NIWG=YES
+EXT_FIT_OPTION_ENABLE_OAANALYSIS=NO
+EXT_FIT_OPTION_WITH_OAANALYSIS_LIB=
+EXT_FIT_OPTION_WITH_PYTHIA6_LIB=
+EXT_FIT_OPTION_WITH_LHAPDF_INC=
+EXT_FIT_OPTION_WITH_LHAPDF_LIB=
+EXT_FIT_OPTION_WITH_LIBXML2_INC=
+EXT_FIT_OPTION_WITH_LIBXML2_LIB=
+EXT_FIT_OPTION_WITH_LOG4CPP_INC=
+EXT_FIT_OPTION_WITH_LOG4CPP_LIB=
+EXT_FIT_OPTION_WITH_CERN=/home/stowell/software/CERNLIB/2005
+EXT_FIT_OPTION_ENABLE_DYLIBVERSION=YES
+EXT_FIT_OPTION_WITH_CXX_DEBUG_FLAG=
+EXT_FIT_OPTION_WITH_CXX_OPTIMIZ_FLAG=-O2
+EXT_FIT_OPTION_WITH_NUWRO=NO
+EXT_FIT_OPTION_WITH_NUWRO_REWEIGHT=NO
+
+*** To continue building T2KReWeight type: gmake 
+\endcode
+Then you are good to finally build
+\code
+$ make clean && make all
+\endcode
+
+
+\section extrabuildnotes Extra build notes
+
+- The dependcies are especially awkward for GENIE so be carefful where each of them are pointing.
+- Building against GENIE currently makes the fitter "Fake" its memory useage when running on scheduling systems. I think this is because the large LHAPDF files are opened at the start and stored in the swapspace even though next to none of that memory is actually accessed by the RW functions. Building without genie if you don't need it resolves this. 
+- If building against T2KReWeight the configuration options provided for the fitter need to match what you used in T2KRW. e.g. If you build T2KRW with GENIE you must also do it here, otherwise the build will freak out.
+- If developing only a single module you can get away with building only in that submodule src folder to save time once the full compilation has been performed.
+
+
+*/

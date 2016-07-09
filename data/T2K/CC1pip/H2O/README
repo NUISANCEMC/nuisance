@@ -1,0 +1,27 @@
+#################################################################################################################
+#    This is the data release for the CC1pi+ cross-section analysis in the FGD2 water modules.                  #
+#    For more information on the analysis please refer to the latest version of TN-210 on t2k.org               #
+#    This is a preliminary data realease for the NIWG group.                                                    #
+#    For info contact: Linda Cremonesi l.cremonesi@qmul.ac.uk                                                   #
+#################################################################################################################
+
+The root file contains 6 directories with the differential cross-section results and the muon neutrino flux histogram for T2K Run I-IV.
+
+Summary of cross-section analysis:
+ - True signal is defined as true CC1pi+ (after FSI) in the true FV of the FGD2 water modules.
+ - Reconstructed signal sample is selected by requiring 1 muon and 1 positive pion reconstructed in the FGD2 X layer (please see TN for detailed definition of signal sample and sidebands).
+ - Phase-space restriction: (p_mu > 200 MeV) && (p_pi > 200 MeV) && (cos theta_mu > 0.3) && (cos theta_pi > 0.3) in both true and reconstructed variables.
+ - Production 5F, Data Run II-IV.
+
+The differential cross-section is given as a function of: 
+ - pion kinematics (PosPionMom, PosPionCos);
+ - muon kinematics (MuMom, MuCos);
+ - muon-pion angle (MuPiCos);
+ - reconstructed neutrino energy (*model dependent result*, as it has been unfolded to the NEUT prediction) using two formulae:
+   -- EnuRec_Delta (energy reconstructed by looking at muon kinematics and assuming Delta resonance);
+   -- EnuRec_MB  (energy reconstructed by looking at both muon and pion kinematics).
+
+Each roofile contains: 
+ - hResultStat, hResultSyst: histograms of extracted cross-section from Data Run II-IV with statistical or total uncertainties;
+ - hTotalCovariance: covariance matrix for all systematic uncertainties (NB: the first bin in all histogram is the under/overflow bin);
+ - All the other histograms are the fractional covariance matrices for each source (NB: the first bin in all histogram is the under/overflow bin).

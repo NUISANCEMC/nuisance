@@ -1,0 +1,5 @@
+Source of Background,nu_mu,nu_mu uncertainty,nu_mu_bar, nu_mu_bar uncertainty
+Charged Current Quasielastic,0.7,0.3,1,(fixed)
+Non-quasielastic W<1.4 GeV,0.6,0.3,0.7,0.1
+1.4<W<2.0 GeV,0.7,0.1,0.6,0.1
+W>2.0 GeV,1.1,0.1,1.9,0.3

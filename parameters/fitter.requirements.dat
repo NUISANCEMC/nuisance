@@ -1,0 +1,142 @@
+# Default Requirements file for the externalDataFitter Package
+# MAX Events : -1 is no cut
+config  MAXEVENTS -1
+config  MAX_CALLS    100000
+config  MAX_ITERATIONS   10000000
+config  statutils.addmcerror  0
+config LOWSTATEVENTS 25000
+config SERIAL_EVAL 1
+
+
+config fitname BestFit
+
+config linecolour 3
+config linestyle 1
+config fillstyle 0
+
+
+#config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP
+#config drawopts DATA/MC
+config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK
+
+# Event Directories
+config EVENT_DIR    /data2/stowell/NIWG/
+config NEUT_EVENT_DIR    /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
+config GENIE_EVENT_DIR    /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
+config NUWRO_EVENT_DIR    /data2/stowell/NIWG/nuwro/fit_samples/
+
+# 0 is quiet, 1 is verbose
+config VERBOSITY    4
+
+config error_throws 100
+config error_uniform 0
+
+# When reading a file in as dial input keep dials fixed?
+config FIX_INPUT_DIAL    0
+
+# Test Statistic
+config fit_type    CHI2
+config ADD_MC_ERROR    0
+
+# Which covariance matrix to throw in fits. FULL is the fixed norm covariance, SUB is the individual covariance that is being used for the fit.
+config thrown_covariance    FULL
+config throw_mc_stat    0.0
+config throw_diag_syst    0
+config throw_corr_syst    0
+config throw_mc_stat    0
+
+# Apply a shift to the muon momentum before calculation of Q2
+config muon_momentum_shift    0.0
+config muon_momentum_throw    0
+
+# include custom ratios in chi2 calculations (unphysical)
+config CUSTOM_RATIO_CHI2    0
+
+# Save standard sets of variables for each measurement
+config SAVE_LEPTON_MOM    0
+config SAVE_NUCLEON_MOM    0
+config save_standard_dist    0
+
+# Look at sterile induced biases in cross-section results
+config STERILE_ANALYSIS    0
+config STERILE_FREE    0
+
+# sin^{2}(2*theta)_{mumu}
+config STERILE_sin2theta    0.0
+config STERILE_MIN_sin2theta    0.0
+config STERILE_MAX_sin2theta    1.0
+
+# delta m^{2}_{24} [MeV]
+config STERILE_delmass2     10.0
+config STERILE_MIN_delmass2    0.0
+config STERILE_MAX_delmass2    10.0
+
+config SAVE_NOMINAL    0
+config SAVE_PREFIT    0
+config PARRALLEL_EVAL    0
+config TEMP_DIR    /home/stowell/temp_work/
+
+
+
+
+
+
+
+# ReNamed Parameters
+config verbosity    0
+config maxevents    -1
+config t2kreweight.verbosity    2
+
+config extfit.savenominal    0
+config extfit.saveprefit    0
+
+config minimizer.fixinputdial    0
+config minimizer.fitfunction    chi2
+config minimizer.fittype    Minuit2
+config minimizer.fitroutine    Migrad 
+
+config minimizer.maxcalls    1000000
+config minimizer.maxiterations    1000000
+
+config minimizerFCN.parralleleval >  = 0
+config minimizerFCN.parrallel_eval    0
+config minimizerFCN.cluster_submit    0
+config minimizerFCN.workdir    /scratch/stowell/
+
+config measurement.savetree    0
+config measurement.addmcerror    0
+
+config measurement.fakedata.throwncov    FULL
+config measurement.fakedata.throwmcstat    1
+config measurement.fakedata.throwdiagcov    0
+
+config measratio1D.customchi2    0
+
+config event.muonmomentumshift    0.0
+config event.muonmomentumthrow    0
+
+config sterile.dissappearance    0
+config sterile.freevalues    0
+config sterile.sin2theta    0.0
+config sterile.sin2theta_min   0.0
+config sterile.sin2theta_max    1.0
+
+config sterile.delmass2    10.0
+config sterile.delmass2_min    0.0
+config sterile.delmass2_max    100.0
+
+config MINERvA_XSec_CCinc_2DEavq3_nu.hadron_cut    0
+
+config custom_pars.ccqe_norm.dial    0.0
+config custom_pars.ccqe_norm.val    1.0
+
+config custom_pars.mec_q0q3cuts.dial    0
+config custom_pars.mec_q0q3cuts.switch    1
+config custom_pars.mec_q0q3cuts.const    0.34
+config custom_pars.mec_q0q3cuts.grad    0.0
+
+config custom_pars.mec_q0q3cuts.const.free    1
+config custom_pars.mec_q0q3cuts.grad.free    1
+
+config custom_pars.mec_norm.dial  0.0
+config custom_pars.mec_norm.val  1.0

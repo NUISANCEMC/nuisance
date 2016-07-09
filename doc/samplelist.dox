@@ -1,0 +1,25 @@
+/*!
+\page samplelist Full list of availble samples.
+
+ANL_CCQE_XSec_1DEnu_nu   ANL/ANL_CCQE_XSec_1DEnu_nu.h   ANL CCQE 1DEnu on Free Neutrons 
+ANL_CCQE_Evt_1DQ2_nu     ANL/ANL_CCQE_Evt_1DQ2_nu.h     ANL CCQE 1DQ2  on Free Neutrons
+
+
+<table>
+<tr><th> Sample Name (for card file)</th><th>Src Location</th><th>Brief</th></tr>
+<tr><th> ANL Measurements </th><th>----</th><th>----</th></tr>
+<tr><td> "ANL_CCQE_Evt_1DQ2_nu"   </td><td>  ANL/ANL_CCQE_Evt_1DQ2_nu.h     </td><td> See "ANL_CCQE_Evt_1DQ2_PRL31" </td></tr>
+<tr><td> "ANL_CCQE_Evt_1DQ2_PRL31"   </td><td>  ANL/ANL_CCQE_Evt_1DQ2_nu.h  </td><td> ANL CCQE 1DEnu on Free Neutrons (PRL.31.3404)</td></tr>
+<tr><td> "ANL_CCQE_Evt_1DQ2_PRD16"   </td><td>  ANL/ANL_CCQE_Evt_1DQ2_nu.h  </td><td> ANL CCQE 1DEnu on Free Neutrons (PRL.00.0000)</td></tr>
+<tr><td> "ANL_CCQE_Evt_1DQ2_PRD84"   </td><td>  ANL/ANL_CCQE_Evt_1DQ2_nu.h  </td><td> ANL CCQE 1DEnu on Free Neutrons (PRL.00.0000)</td></tr>
+<tr><th> BNL Measurements </th><th>----</th><th>----</th></tr>
+<tr><th> FNAL Measurements </th><th>----</th><th>----</th></tr>
+<tr><th> BEBC Measurements </th><th>----</th><th>----</th></tr>
+<tr><th> K2K Measurements </th><th>----</th><th>----</th></tr>
+<tr><th> T2K Measurements </th><th>----</th><th>----</th></tr>
+<tr><th> MINERvA Measurements </th><th>----</th><th>----</th></tr>
+<tr><td> "MINERvA_CCQE_XSec_1DQ2_nu"  </td><td> MINERvA/MINERvA_CCQE_XSec_1DQ2_nu.h  </td><td> CCQE Corrected Measurement on CH </td></tr>
+<tr><th> MiniBooNE Measurements </th><th>----</th><th>----</th></tr>
+</table>
+
+*/

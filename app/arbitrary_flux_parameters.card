@@ -1,0 +1,17 @@
+# Example card for using the reweightArbitraryFlux.exe tool
+
+# The flux for each sample is taken from the NEUT output file, so any number of samples can be included
+# simultaneously if desired. Note that the names must be different for multiple files
+
+# Include which parameters to reweight
+# USAGE: parameter PARAMETER_NAME START_VALUE MIN_VALUE MAX_VALUE TYPE
+# No minimization is actually performed by this tool, so only fixed parameters are included
+# The syntax is the same for ease of use and reusing cards from the fitter, but for this tool, 
+# only the START_VALUE an parameter name are important.
+
+parameter NXSec_MaCCQE   -1  -2   2  FIX
+
+# Samples to include
+sample  SAMPLE_NAME   NU_PDG  /FULL/PATH/TO/NEUT/OUTPUT/FILE.root
+
+# Here sample name just changes the naming of the output histograms, NU_PDG is used to define the signal

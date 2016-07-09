@@ -1,0 +1,18 @@
+This is supposedly the calculated BEBC flux, which is near impossible to find.
+
+It has both the muon and electron fluxes, for both neutrino and anti-neutrinos
+
+It is listed on the PhD thesis archives at CERN as: 
+
+"Neutrino and muon fluxes in the CERN 400 GeV proton beam dump experiments", H. Wachsmuth, CERN, Geneva, Switzerland
+CERN/EP 79-125, 18 October 1979
+
+Link (working in 2015): http://cds.cern.ch/record/1028107?ln=en
+
+Otherwise contact c.wret14@imperial.ac.uk or if we're far in the future clarence.wret@gmail.com
+
+These files live in ./Wachsmuth
+============================================
+However, this does not agree with the flux published in Sylvia Barlag's thesis (see ../theses) which was defintely correct for BEBC during the runs relevant to her thesis (Dfill and Hfill)
+
+These fluxes live in ./Barlag. For more info and links, please check ../theses and the README

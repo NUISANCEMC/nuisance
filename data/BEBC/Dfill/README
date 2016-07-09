@@ -1,0 +1,12 @@
+Dfill refers to when BEBC ran with Deuterium
+
+Sadly, only W and Q2 distributions had W < 1.4 GeV cuts
+All total cross-sections had W < 2.0 GeV, useless if you're tuning Deltas
+Includes angular distributions and spherical harmonics in W, and t distributions, and multipions!
+
+D. Allasia et. al., Nucl. Phys. B343 (1990) 285-309 North-Holland
+
+If you can't find it on Nucl. Phys. B don't worry; it's on inspireHEP!
+I think there was a change of journal name or something...
+
+There are Enu dists for all channels with W < 1.4 GeV cuts in Sylvia Barlag's thesis (check up directory)

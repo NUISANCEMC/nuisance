@@ -1,0 +1,149 @@
+/*!
+	\page tutorial_inputs Fitting Input Card
+
+
+To determine what samples need to be loaded and the location of the event files to be read the fitter parses a premade input fit card which contains everything piece of information for the fit.
+This tutorial details how to load a simple sample of events from each of the generators and compare them against each other.
+
+\section fitcards The Fit Card
+
+For this very simple case so all that is required in the fit card is a single line to read in which sample we want to plot. For a list of samples see \ref samplelist.
+We want a set of Monte Carlo events to make the data/MC comparison so first you will need to generate this in Neut and NuWro seperately. No explicit tutorial is given for this, but please see \ref generators for tips on what generator output format the events need to be in.
+
+Once we have a set of events create a fit card "fittertutorial1.card" in the current directory and include the "MiniBooNE_CCQE_XSec_1DQ2_nu" sample as follows.
+
+\code
+# Identifier - Sample Name ----------------- Type - Events File Name ------------------- Normalisation
+sample         MiniBooNE_CCQE_XSec_1DQ2_nu   FIX    /path/to/miniboone_ccqe_events.root  1.0
+\endcode
+
+- The "sample" argument lets the fitter know we want to include a new sample in this fit. Multiple samples can be included if required assuming they are uncorrelated by creating multiple sample lines in the fit card.
+
+- The Sample Name is a simple string identifier that lets the fitter know which dataset comparison should be performed, for a list of samples see \ref samplelist.
+
+- The sample Type is used to specify any other options required to describe how this sample is handled. Common examples are "FIX - fix this samples overall normalisation", "SHAPE - normalise MC to data before doing calculations", "DIAG - use only uncorrelated bin errors", "NORM - Add a normalisation penalty term to the fit". Some samples have extra possible fit types so it is worth checking the doxygen documentation for a sample before using it.
+
+- The events file name is just simply the directory to the MC events you want to use for this fit. In the case of joint datasets that require multiple input MC files, the path to each can be provided in this field by passing a semi-colon seperated list, e.g. "/path/to/miniboone_ccqe_events1.root;/path/to/miniboone_ccqe_events2.root".
+
+- The normalisation term is used to float the overall normalisation of this sample. The fitter will complain and scale the samples to 0.0 if you forget to include this!
+
+
+\section fittingrun Running a Fit
+Once we have a sample card produced it is possible to run a default Migrad fit by passing this fit card to the minimizer. 
+
+\code
+ExtFit_minimizer.exe -c fittertutorial1.card -o fittertutorial1_output.root
+\endcode
+
+Since we have not included any MC ReWeight dials to be minimized yet this should run relatively quickly, requiring only a single reconfigure.
+The final output should look as follows:
+\code
+[LOG Fitter]: Making the minimizerFCN
+[LOG Minmzr]: Initializing Samples
+[LOG Minmzr]: MINERvA_CCQE_XSec_1DQ2_nu
+[LOG Fitter]: Running Routine: Migrad
+[LOG Fitter]: Fixed Param: MINERvA_CCQE_XSec_1DQ2_nu_norm
+[LOG Fitter]: Setup Minimizer: 1(NDim) 0(NFree)
+[LOG Minmzr]: Reconfiguring all samples in series
+[LOG Minmzr]: Iteration = 1
+[LOG Minmzr]: Time taken for this reconfigure: 40
+[LOG Fitter]: Current Stat = 47.8123
+[LOG Fitter]: Minimizer State:
+[LOG Fitter]:   #  Parameter                      = Value      +- Error      Units    (Sigma Variation)
+[LOG Fitter]:  0 . MINERvA_CCQE_XSec_1DQ2_nu_norm = 1                       Frac.     (Fixed)
+
+[LOG Fitter]: Running Routine: FixAtLim
+[LOG Fitter]: Minimizer State:
+[LOG Fitter]:   #  Parameter                      = Value      +- Error      Units    (Sigma Variation)
+[LOG Fitter]:  0 . MINERvA_CCQE_XSec_1DQ2_nu_norm = 1                       Frac.     (Fixed)
+
+Error in <TDecompChol::Decompose()>: matrix not positive definite
+Error in <TDecompChol::Decompose()>: matrix not positive definite
+[LOG Fitter]: Saving current FCN predictions
+[LOG Minmzr]: Reconfiguring all samples in series
+[LOG Minmzr]: Iteration = 1
+[LOG Minmzr]: Time taken for this reconfigure: 39
+[LOG Minmzr]: Writing each of the data classes:
+-------------------------------------
+Minimizer Complete.
+-------------------------------------
+\endcode
+
+- Note: The error messages about TDecompChol correspond to problems where teh minimizer didn't actually produce a good covariance matrix. This can happen if the fit fails, but also if you are fitting with 1 or 0 free parameters. If that is the case don't worry too much about it.
+
+\section analysing Analysing the Output
+
+The root file produced then contains the results from the fit. To list the contents run:
+
+\code
+root -l fittertutorial1_output.root
+root[1]: _file0->ls();
+TFile**		fittertutorial1_output.root
+ TFile*		fittertutorial1_output.root
+   KEY: TTree	fit_result;1	fit_result
+   KEY: TH1D	fit_dials;1	fit_dials
+   KEY: TH1D	start_dials;1	start_dials
+   KEY: TH1D	min_dials;1	min_dials
+   KEY: TH1D	max_dials;1	max_dials
+   KEY: TH1D	fit_status;1	fit_status
+   KEY: TH2D	covariance;1	covariance
+   KEY: TH2D	correlation;1	correlation
+   KEY: TH2D	decomposition;1	decomposition
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_data;1	MINERvA_CCQE_XSec_1DQ2_nu_data
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_MC;1		47.812
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_MC_FINE;1	MINERvA_CCQE_XSec_1DQ2_nu_MC_FINE
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_FLUX;1	MINERvA_CCQE_XSec_1DQ2_nu
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_EVT;1		MINERvA_CCQE_XSec_1DQ2_nu_EVT
+   KEY: THStack	MINERvA_CCQE_XSec_1DQ2_nu_MC_PDG;1	MINERvA_CCQE_XSec_1DQ2_nu_MC_PDG
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_MC_RATIO;1	47.812
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_data_RATIO;1	MINERvA_CCQE_XSec_1DQ2_nu_data
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_MC_SHAPE;1	47.812
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_MC_SHAPE_RATIO;1	47.812
+   KEY: TH1D	MINERvA_CCQE_XSec_1DQ2_nu_data_SHAPE_RATIO;1	MINERvA_CCQE_XSec_1DQ2_nu_data
+   KEY: TH1D	sample_xsecs_MC;1				sample_xsecs_MC
+   KEY: TH1D	sample_xsecs_data;1				sample_xsecs_data
+
+root[2]: fit_result->Show(0);
+======> EVENT:0
+ parameter_names = (vector<string>*)0x1aa80e0
+ parameter_values = (vector<double>*)0x1aa93b0
+ parameter_errors = (vector<double>*)0x1aa9b40
+ parameter_min   = (vector<double>*)0x1aa9f30
+ parameter_max   = (vector<double>*)0x1aaa2f0
+ parameter_start = (vector<double>*)0x1aaa6b0
+ parameter_fix   = (vector<int>*)0x1aaacb0
+ parameter_startfix = (vector<int>*)0x1aab690
+ CHI2            = 47.8123
+ NDOF            = 8
+ NBINS           = 8
+ NDIM            = 1
+ NFREE           = 0
+\endcode
+
+Each of the following plots are added to every output file following a minimization fit.
+- fit_results -> A TTree containing each of the dial names, values, limits, etc. The best fit chi2 point and number of fit degrees of freedom is given in this tree.
+- fit_dials -> Best fit results and fit errors for each dial in units of 1-sigam variation. Dials with 0.0 bin errors are fixed. 
+- start_dials -> Nominal values for these fit parameters in units of 1-sigma variation.
+- min_dials -> Mnimium limit for each dial in units of 1-sigma variation. (If a dial is fit very close to the limit within fit error... worry)
+- max_dials -> Maximum limit for each dial in units of 1-sigma variation. (If a dial is fit very close to the limit within fit error... worry)
+- fit_status -> Plot of some variables from the fit, mostly unimportant.
+- covariance -> Fit result covariance that the ROOT minimizer gives out.
+- correlation -> Correlation matrix form the fit
+- decomposition -> Decomposed covariance matrix from the fit, useful for fake data studies and producing error bands for correlated parameters..
+
+The following plots are specific to a given fit depending on what samples where included. The structure is generally the same, and the sample identifier used in the fit card will correspond to which sample made these plots. By default the following distributions should be created, but whether they are saved is determined by the configuration option "drawOpts" given in the config file.
+
+- MiniBooNE_CCQE_XSec_1DQ2_data -> Data distribution for the sample that was loaded in the fit.
+- MiniBooNE_CCQE_XSec_1DQ2_MC -> Best fit MC distribution after the fit has been ran. Titles on these plots give the best fit Chi2 for that single sample which is useful when running joint fits. Error bands show the statistical errors only for the MC prediction.
+- MiniBooNE_CCQE_XSec_1DQ2_MC_Fine -> Finely binned MC distribution at best fit (Can sometimes disagree with coarse MC histogram because of scaling factors..)
+- MiniBooNE_CCQE_XSec_1DQ2_MC_Shape -> MC plot normalised to match the data normalisation
+- MiniBooNE_CCQE_XSec_1DQ2_data_Ratio -> Data/MC Ratio Plot
+- MiniBooNE_CCQE_XSec_1DQ2_MC_Ratio -> Baseline for Data/MC Ratio (Unity)
+- MiniBooNE_CCQE_XSec_1DQ2_data_Shape_Ratio -> Data/MC Ratio where the MC is normalised to match the dataset before the ratio is calculated.
+
+*/
+
+
+
+
+

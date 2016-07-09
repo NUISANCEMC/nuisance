@@ -1,0 +1,19 @@
+# Global Parameters
+config verbosity      2
+config err_verbosity  3
+config maxevents     -1
+
+config EVENT_DIR    /data2/stowell/NIWG/
+config NEUT_EVENT_DIR    /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
+config GENIE_EVENT_DIR    /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
+config NUWRO_EVENT_DIR    /data2/stowell/NIWG/nuwro/fit_samples/
+
+config drawopts RAW/DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INVCOV
+config database_dir default
+
+config  MAXEVENTS -1
+config  MAX_CALLS    100000
+config  MAX_ITERATIONS   10000000
+config  statutils.addmcerror  0
+config LOWSTATEVENTS 25000
+config SERIAL_EVAL 1

@@ -1,0 +1,101 @@
+/*!
+	\page addingsamples Adding New Data Samples
+
+\section addingsamples_newclass Defining a new class
+
+\section addingsamples_required Required Definitions
+
+\subsection addingsamples_initial Initial Setup (Constructor)
+
+\subsection addingsamples_fillevent Filling Event Variables
+
+\subsection addingsamples_signal Signal Definition
+
+
+\section addingsamples_optional Optional Extras
+
+There are a handful of default plots which are automatically saved by the base classes, but sometimes it is necessary to save extra plots or perform calculations differently for some measurements. Doing so can get a bit awkward because handful of additional function overrides need to be written. The template classes contain each of the functions that would need to be overriden if you want to save an extra plot which is updated at each stage in the fit.
+
+
+\subsection addingsamples_customplot Adding a custom plot
+An example of changes to a measurement to include an additional plot "mcHist_custom" are shown below.
+
+
+Header File
+\code
+class TemplateMeasurement {
+
+   public:
+	void IsSignal();
+	void FillEventVariables()
+	void Write();
+	void ScaleEvents();
+	void ApplyNormScale();
+	void FillHistograms();
+
+   private:
+	double custom_VAR;
+	TH1D* mcHist_custom;
+}
+#endif
+\endcode
+
+Source File
+\code
+TemplateMeasurement::TemplateMeasurement(std::string name, std::string type){
+
+	/*
+	Required Constructor part of the measurement goes here.
+	*/
+
+	// Define new MCHIST
+	mcHist_custom = new TH1D((this->measurementName+"_MC_CUSTOM").c_str(), (this->measurementName+"_MC_CUSTOM").c_str(), 20, 0.0, 100.0);
+};
+
+isSignal(){
+	return true;
+}
+
+FillEventVariables(){
+	X_VAR = Enu;
+
+	// Fill our custom variable however we want
+	custom_VAR = Enu*100.0;
+}
+
+FillHistograms(){
+	Measurement1D::ScaleEvents();
+
+	// Fill the weight and custom_VAR for this histogram
+	if (Signal){
+		mcHist_custom->Fill(custom_VAR, Weight);
+	}
+}
+
+ScaleEvents(){
+	Measurement1D::ScaleEvents();
+
+	// Scale Factor is used to scale from binned events to a cross-section
+	// See other classes and Measurement1D/2D for examples of this
+	mcHist_custom->Scale(this->scaleFactor, "width");
+}
+
+ApplyNormScale(double norm){
+	Measurement1D::ApplyNormScale(norm);
+
+	if (norm > 0.0)	mcHist_custom->Scale(1.0 / norm);
+	else mcHist_custom->Scale(0.0);
+}
+
+Write(std::string drawOpt){
+	Measurement1D::Write(drawOpt);
+
+	mcHist_custom->Write();
+}
+
+\endcode
+
+- Notice that apart from the already required definitions if you override any of the other functions you need to make sure you call the base classes as these are required during fit iterations to update mcHist. If you don't the fitter will die a sad death.
+- The GetChi2 functions can also be overriden if required if custom calculations are required or extra handling is needed before the plots are put into the chi2 calculation.
+
+*/

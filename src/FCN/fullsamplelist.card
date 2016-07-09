@@ -1,0 +1,65 @@
+
+# ANL SAMPLES
+
+sample ANL_CCQE_XSec_1DEnu_nu
+sample ANL_CCQE_XSec_1DQ2_nu
+
+# BNL Samples
+
+sample BNL_CCQE_XSec_1DEnu_nu
+sample BNL_CCQE_Evt_1DQ2_nu
+      
+# MiniBooNE Samples
+sample MiniBooNE_CCQE_XSec_1DQ2_nu
+sample MiniBooNE_CCQELike_XSec_1DQ2_nu
+sample MiniBooNE_CCQE_XSec_1DQ2_antinu
+sample MiniBooNE_CCQELike_XSec_1DQ2_antinu
+sample MiniBooNE_CCQE_XSec_2DTcos_nu
+sample MiniBooNE_CCQELike_XSec_2DTcos_nu
+sample MiniBooNE_CCQE_XSec_2DTcos_antinu
+sample MiniBooNE_CCQELike_XSec_2DTcos_antinu
+sample MiniBooNE_CCpip_XSec_1DQ2_nu
+sample MiniBooNE_CCpip_XSec_1DTpi_nu
+sample MiniBooNE_CCpi0_XSec_1DQ2_nu
+sample MiniBooNE_NCpi0_XSec_1Dppi0_nu
+sample MiniBooNE_NCEL_XSec_Treco_nu
+
+# MINERvA Samples
+sample MINERvA_CCQE_XSec_1DQ2_nu
+sample MINERvA_CCQE_XSec_1DQ2_nu_20deg
+sample MINERvA_CCQE_XSec_1DQ2_nu_newflux
+sample MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux
+sample MINERvA_CCQE_XSec_1DQ2_antinu
+sample MINERvA_CCQE_XSec_1DQ2_antinu_20deg
+sample MINERvA_CCQE_XSec_1DQ2_antinu_newflux
+sample MINERvA_CCQE_XSec_1DQ2_antinu_20deg_newflux
+sample MINERvA_CCQE_XSec_1DQ2_joint
+sample MINERvA_CCQE_XSec_1DQ2_joint_20deg
+sample MINERvA_CCQE_XSec_1DQ2_joint_20deg_newflux
+sample MINERvA_CC0pi_XSec_1DEe_nue
+sample MINERvA_CC0pi_XSec_1DQ2_nue
+sample MINERvA_CC0pi_XSec_1DThetae_nue
+sample MINERvA_CC0pi_XSec_1DQ2_nu_proton
+sample MINERvA_CCinc_XSec_2DEavq3_nu
+
+# T2K Samples
+sample T2K_CC0pi_XSec_2DPcos_nu
+
+# K2K Samples
+sample K2K_CC0pi_XSec_1DCosThetaMu_nu_1trk
+sample K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkQE
+sample K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkNonQE
+sample K2KI_CC0pi_XSec_1DQ2_nu_1trk
+sample K2KI_CC0pi_XSec_1DQ2_nu_2trkQE
+sample K2KIIa_CC0pi_XSec_1DQ2_nu_2trkNonQE
+sample K2KIIa_CC0pi_XSec_1DQ2_nu_1trk
+sample K2KIIa_CC0pi_XSec_1DQ2_nu_2trkQE
+sample K2KIIa_CC0pi_XSec_1DQ2_nu_2trkNonQE
+sample K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks
+sample K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks
+sample K2K_CC0pi_XSec_1DPmu_nu_Ntrks
+sample K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks
+
+# Stat Samples
+      
+sample parameter_pulls

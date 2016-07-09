@@ -1,0 +1,2 @@
+#All the functions in this folder are to unify the statistical methods for each of the different measurements under a single namespace so new ways to calculate test statistics can be added to all classes quickly.
+# Utils Methods

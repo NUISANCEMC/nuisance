@@ -1,0 +1,26 @@
+/*! \mainpage The NIWG External Cross-section Data Fitter 
+
+    The NIWG fitter framework is setup to allow easy comparison of cross-section MC predictions to published datasets made external to T2K. The tools are setup to allow free model parameters to be tuned to given datasets and converge on a reliable set of best fit cross-section results given a range of selected datasets.
+
+Currently the fitter supports inputs in the following forms (more detail is given in the relevant subsections listed below):
+	  - NEUT
+	  - NuWro
+	  - GENIE
+	  - Fixed Histograms
+	  - Event-by-event reweighting splines
+	  - Bin-by-bin reweighting splines
+
+Fitting requires a set of input files generated for the samples being fitter and a pre-made parameter card listing dials to be fitted. More information on this can be found in \ref runningfits
+
+The following related pages contain more detailed documentation:
+   - \ref building
+   - \ref tutorial
+   - \ref statisticalmethods
+   - \ref samplelist
+   - \ref inputconvertor
+   - \ref addingsamples
+   - \ref fakedatastudies
+   - \ref configoptions
+   - \ref validation
+*/
+

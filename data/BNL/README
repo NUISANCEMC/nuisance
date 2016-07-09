@@ -1,0 +1,17 @@
+Only CC1pi+ on proton with W < 1.4 GeV can be corrected with C. Wilkinson/P. Rodriguez method.
+This is because it's the only channel which is given as a ratio to CCQE in Enu. The other channels have W < 2.0 GeV.
+
+The corrected channel's raw data can be found in K.Furuno et al, cited further down under flux
+
+Remaining BNL papers from Kitagaki et al. Phys Rev D Vol 34, number 9, 1986, p 2554
+
+======
+Fluxes
+======
+BNL flux is a difficult one to evaluate properly; there are a few different fluxes floating about; most of them derived from CCQE data and a MA fit of ~1.1 GeV. The highest statistics for this was presented at NuInt02 by K. Furuno.
+
+Found at proceedings (if you can find them), or KEK Preprint 2003-48 Septermber 2003, RCNS-03-01
+
+There is also a general flux paper using the same beam configuration but a different detector which larger spatial extent. This should NOT be used because the radial dependence of the flux which the paper cites. It is here only for reference:
+
+L.A. Ahrens, Phys Rev D, Volume 34, Number 1, 1986, p75

@@ -1,0 +1,26 @@
+/*!
+\page tutorial Fitter Tutorials
+
+There are multiple ways to run the fitter depending on what outputs are needed. The following descriptions will guide you through relatively simple fits. Please feel free to email me if there is something undocumented here that you need to use the fitter for and I will try my best to add documentation.
+
+
+\section tutlist Tutorials
+
+
+- \ref tutorial_inputs
+- \ref tutorial_dialtuning
+- \ref tutorial_fitroutines
+- \ref tutorial_binsplines
+- \ref tutorial_eventsplines
+- \ref tutorial_comparisons
+- \ref tutorial_prevresults
+- \ref tutorial_configoptions
+- \ref tutorial_plottinglimits
+- \ref tutorial_pullterms
+- \ref tutorial_plottingerrors
+- \ref tutorial_pgof
+- \ref tutorial_binmasking
+- \ref tutorial_fakedatastudies
+- \ref tutorial_parrallel
+
+*/

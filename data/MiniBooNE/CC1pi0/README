@@ -1,0 +1,6 @@
+1 apr 2015
+using MINERvA Q2QE_numu (CCQE) as template -- includes covariances etc
+put in form:
+bin-low     total xsec      error (statistical)
+
+NOTE: HAVE CHANGED TO E-38 BECAUSE IT MAKES CODE MORE UNIFORM!

@@ -1,0 +1,5 @@
+# par Name Units Nominal FracErr ConvFunc
+MaCCQE      GeV   1.21*(1.0+x*0.16)  
+NIWGMEC_Norm_C12  %    100.0*(1.0+x)
+VecFFCCQE  MDLQE x
+CCQEFermiSurfMom MeV 217*(1.0+x*0.15)

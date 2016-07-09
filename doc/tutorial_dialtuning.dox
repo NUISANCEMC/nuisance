@@ -1,0 +1,108 @@
+/*!
+	\page tutorial_dialtuning Dial Tuning
+
+The main purpose of the fitter is to allow ReWeight dials to be quickly tuned to datasets. In this tutorial
+we go through how to include dials in a simple fit and define their state.
+
+\section tutorial_dialtuning_parcard Extending the Fit Card
+First, copy the fit card from the previous tutorial using the sample definition given there.
+
+Now we want to add in a NEUT ReWeight dials, so a quick grep of the NEUT systematics file will return what the dial names are.
+Below is a shortened output. Some dials (especially ones that are discontinous) cannot be used with the fitter so check what little
+notes there are inside the RW functions themselves when including new dials.
+
+\code
+$ grep case $NEUT_REWEIGHT/NSyst.h
+case ( kXSecTwkDial_NormNCEL         ) : return "NormNCEL";             break;
+//case ( kXSecTwkDial_NormNCELenu      ) : return "NormNCELenu";          break;
+case ( kXSecTwkDial_MaNCEL           ) : return "MaNCEL";               break;
+case ( kXSecTwkDial_MaNCELshape      ) : return "MaNCELshape";          break;
+case ( kXSecTwkDial_1overMaNCEL2      ) : return "1overMaNCEL2";          break;
+case ( kXSecTwkDial_AxlFFNCEL   ) : return "AxlFFNCEL";       break;
+case ( kXSecTwkDial_VecFFNCEL   ) : return "VecFFNCEL";       break;
+//case ( kXSecTwkDial_VecFFNCELshape   ) : return "VecFFNCELshape";       break;
+//case ( kXSecTwkDial_EtaNCEL          ) : return "EtaNCEL";              break;
+case ( kXSecTwkDial_NormCCQE         ) : return "NormCCQE";             break;
+//case ( kXSecTwkDial_NormCCQEenu      ) : return "NormCCQEenu";          break;
+case ( kXSecTwkDial_MaCCQE           ) : return "MaCCQE";               break;
+\endcode
+
+So lets say we want to include two modifications to the MC. Firstly, we want to scale down the CCQE normalisation by a fixed 10%. Then we want to vary the axial mass freely in the fit between 0.8 and 1.4 GeV and try to converge on a best fit for this dial. To figure out what values we need to include in the card file we must determine the 1-sigma uncertainty on these parameters.
+
+Again a grep will do the trick for the 1-sigma uncertainty:
+\code
+$ grep NormCCQE $NEUT_REWEIGHT/NSystUncertainty.cc
+  this->SetUncertainty( kXSecTwkDial_NormCCQE,       0.15, 0.15);
+  
+$ grep NormCCQE $NEUT_REWEIGHT/NSystUncertainty.cc
+  this->SetUncertainty( kXSecTwkDial_MaCCQE,         0.165289256, 0.165289256); 
+\endcode
+
+Unfortunately the default values for these parameters is a bit more akward to find. These are given in each of the RW objects in the NEUT_REWEIGHT folder. For the purpose of this excerices we just explicitly state them here.
+\code
+Nominal MaCCQE = 1.21 GeV/c^2
+Nominal NormCCQE = 1.0
+\endcode
+
+
+We must then convert the true values we have for the nominal and limits into 1-sigma dial values using the following equation.
+\code
+true.value = nominal.value * ( 1.0 + sig.err * dial.value)
+
+dial.value = ( (true.value / nominal.value) - 1.0 ) / sig.err
+\endcode
+
+To finally include these dials the following lines should be added to the fit card with the neut_parameter identifier.
+
+\code
+# ident --------- Parameter --- Nom.  ---- Low. ---- Upp. --- Stp. --- State ----
+neut_parameter    NormCCQE      -0.10      -1.00     1.00     1.0      FIX
+neut_parameter    MaCCQE         0.00      -2.11     0.98     1.0      FREE
+\endcode
+
+Alternative parameter types can be supplied for each of the different generators. These are:
+- neut_parameter -> NEUT
+- nuwro_parameter -> NuWro (Make sure you have built with NuWro AND NuWroReWeight)
+- genie_parameter -> GENIE
+- niwg_parameter -> NIWG
+- custom_parameter -> Custom dials that can be added to FitWeight if required. Currently a placeholder.
+
+
+The nominal value should always be within the lower and upper limits otherwise ROOT's minimizer libraries will complain. The step size seems to currently be ignored by most of the libraries but it is used by the PlotLimits and GridScan function so it is best to choose something reasonable just to be safe.
+
+\section tutorial_dialtuning_absolute Using absolute dial values
+
+There has recently been a modification to FitBase to allow dials to be shown in the fit card in terms of true values provided a conversion function is given in the card file contained in FitBase.
+If you want to use this method, you should also provide the state "ABS" in the card file. So for example the MaCCQE dial line would become.
+
+\code
+# ident --------- Parameter --- Nom.  ---- Low. ---- Upp. --- Stp. --- State ----
+neut_parameter    MaCCQE        0.0        0.8       1.4      0.4      FREE/ABS
+\endcode
+
+Alternative parameter types can be supplied for each of the different generators. These are:
+- neut_parameter -> NEUT
+- nuwro_parameter -> NuWro (Make sure you have built with NuWro AND NuWroReWeight)
+- genie_parameter -> GENIE
+- niwg_parameter -> NIWG
+- custom_parameter -> Custom dials that can be added to FitWeight if required. Currently a placeholder.
+
+
+\section tutorial_dialtuning_runfit Running the Fit
+Once you have written the fit card it should be as simple as running the minimizer again.
+
+\code
+ExtFit_minimizer.exe -c fittertutorial2.card -o fittertutorial2.root
+\endcode
+
+The finished fit should produce the following output table for each parameter involved.
+
+
+
+The specified output root file should also contain MC histograms for the best fit point.
+
+
+
+There are cases where strong parameter correlations and bumpy chi2 spaces will mean the fit has problems converging. As a general guide fitting 4 parameters will usually take around 400 reconfigures. If it takes significantly longer than this (3x) then you may be having trouble. Alternative fit routines are available to try and fix problems like this. See \ref tutorial_fitroutines for more information.
+
+*/

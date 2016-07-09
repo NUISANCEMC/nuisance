@@ -1,0 +1,17 @@
+# Fit Base Configuration paramters
+
+config  fitbase.test  1.0
+
+config measurement.savetree    0
+config measurement.addmcerror    0
+
+config measurement.fakedata.throwncov    FULL
+config measurement.fakedata.throwmcstat    1
+config measurement.fakedata.throwdiagcov    0
+
+
+
+
+
+
+config FitWeight.neut_rw_calc  xsec_ccqe,xsec_res,xsec_ccres,xsec_coh,xsec_dis,xsec_ncel,xsec_nc,xsec_ncres

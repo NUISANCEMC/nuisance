@@ -1,0 +1,14 @@
+# CONFIG
+config custom_pars.ccqe_norm.dial    0.0
+config custom_pars.ccqe_norm.val    1.0
+
+config custom_pars.mec_q0q3cuts.dial    0
+config custom_pars.mec_q0q3cuts.switch    1
+config custom_pars.mec_q0q3cuts.const    0.34
+config custom_pars.mec_q0q3cuts.grad    0.0
+
+config custom_pars.mec_q0q3cuts.const.free    1
+config custom_pars.mec_q0q3cuts.grad.free    1
+
+config custom_pars.mec_norm.dial  0.0
+config custom_pars.mec_norm.val  1.0
