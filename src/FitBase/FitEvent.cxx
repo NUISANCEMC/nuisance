@@ -101,7 +101,9 @@ int FitEvent::ND280_Mode (event * e)
 //*************************************************** 
 {
 
+  return 1;
 
+  
   Int_t proton_pdg, neutron_pdg, pion_pdg, pion_plus_pdg, pion_minus_pdg,
     lambda_pdg, eta_pdg, kaon_pdg, kaon_plus_pdg;
   proton_pdg = 2212;

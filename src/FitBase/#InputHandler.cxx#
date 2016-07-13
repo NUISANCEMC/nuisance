@@ -101,11 +101,6 @@ void InputHandler::SetupInputFiles(){
   int temp_type = -1;
   for (UInt_t i = 0; i < input_lines.size(); i++){
 
-    // Make function to get the input from the type
-    // Read in histograms for each file.
-
-
-
     // Create Temporary InputHandlers inside                                                                                                                                                                                               
     InputHandler* temp_input = new InputHandler(std::string(Form("temp_input_%i",i)),
                                                 input_lines.at(i));

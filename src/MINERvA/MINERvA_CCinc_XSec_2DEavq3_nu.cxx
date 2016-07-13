@@ -30,6 +30,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   EnuMax = 6.;
   hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
   useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
+  splitMEC_PN_NN = FitPar::Config().GetParB("Modes.split_PN_NN");
   normError = 0.107;
   default_types = "FIX/FULL";
   allowed_types = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
@@ -59,7 +60,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   SetupDefaultHist();
  
   // Set Scale Factor
-  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); 
+  scaleFactor = (this->eventHist->Integral("width")*1E-42/(nevents+0.))/this->TotalIntegratedFlux(); 
 };
 
 
@@ -82,14 +83,34 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
   double pmu = 0.0;
   double ThetaMu = 0.0;
 
+  // Seperate MEC
+  if (splitMEC_PN_NN){
+    int npr = 0;
+    int nne = 0;
+    
+    for (UInt_t j = 0; j < event->Npart(); j++){
+      if ((event->PartInfo(j))->fIsAlive) continue;
+
+      if (event->PartInfo(j)->fPID == 2212) npr++;
+      else if (event->PartInfo(j)->fPID == 2112) nne++;
+    }
+
+    if (event->Mode == 2 and npr == 1 and nne == 1){
+      event->Mode = 2;
+      Mode = 2;
+
+    } else if (event->Mode == 2 and npr == 0 and nne == 2){
+      event->Mode = 3;
+      Mode = 3;
+
+    }
+  }
+
   // Muon Variables -----------------
   // Muon should be in slot 2 or 3.
   for (UInt_t j = 2; j < event->Npart(); j++){
 
     // Skip dead particles
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fStatus != 0) continue;
-    
     PID = event->PartInfo(j)->fPID;
 
     // MUON
@@ -116,7 +137,10 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
       
       continue;
     }
-  
+
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fStatus != 0) continue;
+
     // Eav Varible -----------------
     // P and pi+- Kinetic Energy
     if (PID == 2212 or PID ==  211 or PID == -211){

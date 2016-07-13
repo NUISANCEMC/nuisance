@@ -40,6 +40,7 @@
 #include "Ntuple/NtpMCEventRecord.h" 
 using namespace genie;
 #endif 
+
 #include "TArrayD.h"
 #include "FitEventBase.h"
 

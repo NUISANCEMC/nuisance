@@ -115,9 +115,13 @@ class InputHandler : public TObject {
   NtpMCEventRecord * mcrec; //!< Pointer to GENIE NTuple Record                                                        
 #endif
 
-  std::vector<int> joint_index_low;
-  std::vector<int> joint_index_high;
-  std::vector<TH1D*> joint_index_hist;
+  std::vector< int >         input_startindex;
+  std::map< TUUID, double >  input_weights;
+  std::map< TUUID, int >     input_nMAXevents;
+  std::map< TUUID, TH1D*  >  input_flux;
+  std::map< TUUID, TH1D*  >  input_evtrt;
+  std::map< TUUID, TH1D*  >  input_xsec;
+  
   bool isJointInput;
   int cur_entry;
   

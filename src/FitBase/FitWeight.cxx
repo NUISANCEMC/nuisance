@@ -560,7 +560,7 @@ void FitWeight::SetupNuwroRW(){
   // Add the RW Calcs
   if (xsec_qel)  nuwro_rw->AdoptWghtCalc( "nuwro_QEL", new nuwro::rew::NuwroReWeight_QEL );
   if (xsec_flag) nuwro_rw->AdoptWghtCalc( "nuwro_FlagNorm", new nuwro::rew::NuwroReWeight_FlagNorm );
-  //  if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_MaRES_CA5 );  
+  //if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_MaRES_CA5 );  
 
   nuwro_rw->Reconfigure();
 }
