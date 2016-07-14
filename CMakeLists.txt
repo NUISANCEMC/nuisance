@@ -14,7 +14,7 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+#    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
@@ -73,16 +73,15 @@ include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 
 ################################################################################
 
+set(CORE
+    Utils
+    FitBase
+    MCStudies
+    )
+    
 set(MINCODE
   Minimizer
   FCN)
-
-set(CORE
-  MCStudies
-  FitBase
-  Utils
-  #Devel
-  )
 
 set(EXPERIMENTS
   ANL
@@ -96,6 +95,11 @@ set(EXPERIMENTS
   T2K)
 
 set(EXP_INCLUDE_DIRECTORIES)
+
+foreach(cdir ${CORE})
+  cmessage (STATUS "Configuring directory: src/${cdir}")
+  add_subdirectory(src/${cdir})
+endforeach()
 
 foreach(edir ${EXPERIMENTS})
   set(EXP_INCLUDE_DIRECTORIES ${EXP_INCLUDE_DIRECTORIES};${CMAKE_SOURCE_DIR}/src/${edir})
@@ -111,12 +115,6 @@ foreach(edir ${EXPERIMENTS})
   cmessage (STATUS "Configuring directory: src/${edir}")
   add_subdirectory(src/${edir})
 endforeach()
-
-foreach(cdir ${CORE})
-  cmessage (STATUS "Configuring directory: src/${cdir}")
-  add_subdirectory(src/${cdir})
-endforeach()
-
 
 cmessage(STATUS "Module targets:  ${MODULETargets}")
 

@@ -14,7 +14,7 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+#    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 if ( NOT DEFINED ENV{ROOTSYS} )
   cmessage (FATAL_ERROR "$ROOTSYS is not defined, please set up root first.")

@@ -14,21 +14,26 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+#    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
+set(HEADERFILES
+FitLogger.h
+FitParameters.h
+FitUtils.h
+PlotUtils.h
+StatUtils.h
+SignalDef.h
+)
+
 set(IMPLFILES
+FitLogger.cxx
+FitParameters.cxx
 FitUtils.cxx
 PlotUtils.cxx
 StatUtils.cxx
 SignalDef.cxx
 )
 
-set(HEADERFILES
-FitUtils.h
-PlotUtils.h
-StatUtils.h
-SignalDef.h
-)
 
 set(LIBNAME Utils)
 
@@ -39,11 +44,11 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
+
 set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
@@ -51,3 +56,6 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 #install(FILES ${HEADERFILES} DESTINATION include)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+
+
+

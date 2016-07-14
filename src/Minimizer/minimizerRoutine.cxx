@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "minimizerRoutine.h"
 
 /*
@@ -523,20 +504,17 @@ void minimizerRoutine::setupConfig(){
 void minimizerRoutine::setupRWEngine(){
 //*************************************
   
-  if (rw) delete rw;
-  rw = new FitWeight();
-
   for (UInt_t i = 0; i < params.size(); i++){
     std::string name = params[i];
     std::cout << "Adding parameter " << name << std::endl;
-    rw -> IncludeDial(name, params_type.at(name) );
+    FitBase::GetRW() -> IncludeDial(name, params_type.at(name) );
   }
 
   for (UInt_t i = 0; i < sampleDials.size(); i++){
     std::string name = sampleDials[i];
-    rw->IncludeDial(name, 6);
+    FitBase::GetRW()->IncludeDial(name, 6);
   }
-  rw->Reconfigure();
+  FitBase::GetRW()->Reconfigure();
 
   updateRWEngine(startVals, sampleNorms);
 
@@ -551,7 +529,7 @@ void minimizerRoutine::setupFCN(){
 
   LOG(FIT)<<"Making the minimizerFCN"<<std::endl;
   if (thisFCN) delete thisFCN;
-  thisFCN = new minimizerFCN(cardFile, fakeDataFile, outputFile, rw, 1, 1);
+  thisFCN = new minimizerFCN(cardFile, outputFile);
   thisFCN->SetOutName(outputFileName);
   setFakeData();
   callFCN = new ROOT::Math::Functor(*thisFCN,params.size() + sampleDials.size());
@@ -678,7 +656,7 @@ void minimizerRoutine::setFakeData(){
     LOG(FIT)<<"Setting fake data from MC starting prediction." <<std::endl;
     updateRWEngine(fakeVals, fakeNorms);
       
-    rw->Reconfigure();
+    FitBase::GetRW()->Reconfigure();
     thisFCN->ReconfigureAllEvents();
     thisFCN->SetFakeData("MC");
 
@@ -703,20 +681,20 @@ void minimizerRoutine::updateRWEngine(std::map<std::string,double>& updateVals, 
     std::string name = params[i];
 
     if (updateVals.find(name) == updateVals.end()) continue;
-    rw->SetDialValue(name,updateVals.at(name));
+    FitBase::GetRW()->SetDialValue(name,updateVals.at(name));
   }
 
   for (UInt_t i = 0; i < sampleDials.size(); i++){
     std::string name = sampleDials[i];
 
     if (updateNorms.find(name) == updateNorms.end()){
-      rw->SetDialValue(name, 1.0);
+      FitBase::GetRW()->SetDialValue(name, 1.0);
     } else {
-      rw->SetDialValue(name, updateNorms.at(name));
+      FitBase::GetRW()->SetDialValue(name, updateNorms.at(name));
     }
   }
 
-  rw->Reconfigure();
+  FitBase::GetRW()->Reconfigure();
   return;
 }
   
@@ -790,7 +768,9 @@ void minimizerRoutine::RunFitRoutine(std::string routine){
 	   //	   !routine.compare("GSLMulti") or
 	   !routine.compare("GSLSimAn")) {
 
+    std::cout<<"Starting routine "<<routine<<std::endl;
     minimizerObj->Minimize();
+    std::cout<<"Getting State"<<std::endl;
     getMinimizerState();
   }
 
@@ -1308,7 +1288,7 @@ void minimizerRoutine::saveCurrentState(std::string subdir){
   LOG(FIT)<<"Saving current FCN predictions" <<std::endl;
 
   outputFile->cd();
-  rw->Reconfigure();
+  FitBase::GetRW()->Reconfigure();
   thisFCN->ReconfigureAllEvents();
     
   if (!subdir.empty()){
@@ -1330,7 +1310,7 @@ void minimizerRoutine::saveNominal(){
   LOG(FIT)<<"Saving Neut Nominal Predictions (be cautious with this)" <<std::endl;
   
   //rw->ResetAll();
-  rw->Reconfigure();
+  FitBase::GetRW()->Reconfigure();
   saveCurrentState("nominal");
 };
 

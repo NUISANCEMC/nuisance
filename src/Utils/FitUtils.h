@@ -46,7 +46,6 @@
 #include "TGraph.h"
 
 // Fit  includes
-#include "FitEvent.h"
 #include "FitParameters.h"
 
 /*!

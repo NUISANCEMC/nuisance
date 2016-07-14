@@ -1,33 +1,11 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-################################################################################
-#    This file is part of NuFiX.
-#
-#    NuFiX is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    NuFiX is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
 set(IMPLFILES
 minimizerFCN.cxx
-nodeFCN.cxx
 SampleList.cxx
-splinesFCN.cxx
 )
 
 set(HEADERFILES
 minimizerFCN.h
-nodeFCN.h
 SampleList.h
-splinesFCN.h
 )
 
 set(LIBNAME FCN)
@@ -41,10 +19,20 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+
+include_directories(${CMAKE_SOURCE_DIR}/src/ANL)
+include_directories(${CMAKE_SOURCE_DIR}/src/BNL)
+include_directories(${CMAKE_SOURCE_DIR}/src/FNAL)
+include_directories(${CMAKE_SOURCE_DIR}/src/GGM)
+include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
+include_directories(${CMAKE_SOURCE_DIR}/src/MiniBooNE)
+include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
+
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
+include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
+
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")

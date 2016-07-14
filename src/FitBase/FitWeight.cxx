@@ -1,28 +1,23 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "FitWeight.h"
 
 //********************************************************************
 FitWeight::FitWeight(std::string name, std::string inputfile){
 //********************************************************************
   // To be completed...
+  this->rw_name = name;
+  this->norm_enum = 0;
+  this->dial_enums.clear();
+  this->dial_names.clear();
+  this->dial_values.clear();
+
+  this->using_neut = false;
+  this->using_niwg = false;
+  this->using_nuwro = false;
+  this->using_genie = false;
+  this->using_t2k   = false;
+
+  spline_head = NULL;
+
   this->rw_name = name;
 
   // If file is a root file read it
@@ -69,6 +64,7 @@ FitWeight::FitWeight(std::string name){
   spline_head = NULL;
 
   this->rw_name = name;
+  std::cout<<"Creating FitWeight norm enum = "<<this->norm_enum<<std::endl;
 }
 
 //******************************************************************** 
@@ -123,6 +119,7 @@ int FitWeight::GetDialEnum(std::string name, int type){
   }
 
   if (type == 6){
+    std::cout<<"NORM TYPE "<< norm_enum << " " << offset <<std::endl;
     this_enum = norm_enum + offset;
     norm_enum++;
   }
@@ -193,7 +190,7 @@ void FitWeight::IncludeDial(std::string name, int type, double startval){
     if (!using_neut) this->SetupNeutRW();
     this->neut_rw->Systematics().Init( static_cast<neut::rew::NSyst_t>(rw_enum) );
 #else
-    std::cerr<<"NEUT DIAL ERROR"<<std::endl;
+    LOG(FTL)<<"NEUT DIAL ERROR"<<std::endl;
 #endif
     
   } else if ( this_enum >= 1000 and this_enum < 2000 ){
@@ -201,31 +198,31 @@ void FitWeight::IncludeDial(std::string name, int type, double startval){
     if (!using_niwg) this->SetupNIWGRW();
     this->niwg_rw->Systematics().Init( static_cast<niwg::rew::NIWGSyst_t>(rw_enum) );    
 #else
-    std::cerr<"NIWG DIAL ERROR"<<std::endl;
+    LOG(FTL)<<"NIWG DIAL ERROR"<<std::endl;
 #endif    
   } else if ( this_enum >= 2000 and this_enum < 3000 ){
 #ifdef __NUWRO_REWEIGHT_ENABLED__
     if (!using_nuwro) this->SetupNuwroRW();
     this->nuwro_rw->Systematics().Add( static_cast<nuwro::rew::NuwroSyst_t>(rw_enum) );
 #else
-    std::cerr<<"Trying to Include NuWro Dial is unsupported!"<<std::endl;
-    std::cerr<<"Check your Build Config!"<<std::endl;
+    LOG(FTL)<<"Trying to Include NuWro Dial is unsupported!"<<std::endl;
+    LOG(FTL)<<"Check your Build Config!"<<std::endl;
 #endif
   } else if ( this_enum >= 3000 and this_enum < 4000 ){ 
 #ifdef __GENIE__ENABLED__
   if (!using_genie) this->SetupGenieRW();
   this->genie_rw->Systematics().Add( static_cast<genie::rew::GSyst_t>(rw_enum) );
 #else
-  std::cerr<<"Trying to Include GENIE Dial is unsupported!"<<std::endl;
-  std::cerr<<"Check your Build Config!"<<std::endl;
+  LOG(FTL)<<"Trying to Include GENIE Dial is unsupported!"<<std::endl;
+  LOG(FTL)<<"Check your Build Config!"<<std::endl;
 #endif
   } else if ( this_enum >= 4000 and this_enum < 5000 ){
 #ifdef __T2KREW__ENABLED__
     if (!using_t2k) this->SetupT2KRW();
     this->t2k_rw->Systematics().Add( static_cast<t2krew::T2KSyst_t>(rw_enum) );
 #else
-    std::cerr<<"Trying to Include T2K Dial is unsupported!"<<std::endl;
-    std::cerr<<"Check your Build Config!"<<std::endl;
+    LOG(FTL)<<"Trying to Include T2K Dial is unsupported!"<<std::endl;
+    LOG(FTL)<<"Check your Build Config!"<<std::endl;
 #endif
   }
   
@@ -266,35 +263,35 @@ void FitWeight::SetDialValue(int this_enum, double val){
     this->neut_rw -> Systematics().Set( static_cast<neut::rew::NSyst_t>(rw_enum), val );
     this->neut_changed = true;
 #else
-    std::cerr<<" NEUT DIAL ERROR " <<std::endl;
+    LOG(FTL)<<" NEUT DIAL ERROR " <<std::endl;
 #endif
   } else if ( this_enum >= 1000 and this_enum < 2000){
 #ifdef __NIWG_ENABLED__
     this->niwg_rw -> Systematics().Set( static_cast<niwg::rew::NIWGSyst_t>(rw_enum), val );
     this->niwg_changed = true;
 #else
-    std::cerr<<" NIWG DIAL ERROR "<<std::endl;
+    LOG(FTL)<<" NIWG DIAL ERROR "<<std::endl;
 #endif
   } else if ( this_enum >= 2000 and this_enum < 3000){
 #ifdef __NUWRO_REWEIGHT_ENABLED__
     nuwro_rw->Systematics().SetSystVal( static_cast<nuwro::rew::NuwroSyst_t>(rw_enum), val);
     this->nuwro_changed = true;
 #else
-    std::cerr<<" NUWRO DIAL ERROR "<<std::endl;
+    LOG(FTL)<<" NUWRO DIAL ERROR "<<std::endl;
 #endif
   } else if ( this_enum >= 3000 and this_enum < 4000){ // SHOULD NOT HARD CODE THESE LIMITS
 #ifdef __GENIE_ENABLED__
     genie_rw->Systematics().Set( static_cast<genie::rew::GSyst_t>(rw_enum), val);
     this->genie_changed = true;
 #else
-    std::cerr<<" GENIE DIAL ERROR "<<std::endl;
+    LOG(FTL)<<" GENIE DIAL ERROR "<<std::endl;
 #endif
   } else if ( this_enum >= 4000 and this_enum < 5000){ // SHOULD NOT HARD CODE THESE LIMITS        
 #ifdef __T2KREW_ENABLED__
     t2k_rw->Systematics().SetTwkDial( static_cast<t2krew::T2KSyst_t>(rw_enum), val);
     this->t2k_changed = true;
 #else
-    std::cerr<<" GENIE DIAL ERROR "<<std::endl;
+    LOG(FTL)<<" GENIE DIAL ERROR "<<std::endl;
 #endif
   }
 
@@ -305,7 +302,7 @@ void FitWeight::SetDialValue(int this_enum, double val){
 }
 
 //******************************************************************** 
-void FitWeight::Reconfigure(){
+void FitWeight::Reconfigure(bool silent){
 //********************************************************************  
 
   if ((using_neut or using_niwg) and using_t2k) {
@@ -316,7 +313,7 @@ void FitWeight::Reconfigure(){
 
   if (!dial_changed) return;
 
-  if (LOG_LEVEL(MIN)) this->PrintState();
+  //  if (LOG_LEVEL(MIN)) this->PrintState();
   
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK  
   if (neut_changed and using_neut)  neut_rw->Reconfigure();
@@ -398,7 +395,7 @@ std::string FitWeight::GetDialType(int this_enum){
 }
 
 //******************************************************************** 
-double FitWeight::CalcWeight(FitEvent* evt){
+double FitWeight::CalcWeight(BaseFitEvt* evt){
 //********************************************************************
   
   double rw_weight = 1.0;
@@ -415,16 +412,16 @@ double FitWeight::CalcWeight(FitEvent* evt){
   rw_weight = 1.0;
   
   if (using_neut){
-#ifdef __NEUT_ENABLED__ // --- NEUT BLOCK   
-    T2KNeutUtils::fill_neut_commons(evt->neut_event);
+#ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
+    GeneratorUtils::FillNeutCommons(evt->neut_event);
     rw_weight *= neut_rw->CalcWeight();
 #endif
   }
 
   if (using_niwg){
 #ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
-    niwg::rew::NIWGEvent* niwg_event = ((niwg::rew::NIWGEvent *)
-				       T2KNIWGUtils::GetNIWGEvent(evt->neut_event));
+    niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->neut_event);
+
     rw_weight *= niwg_rw->CalcWeight(*niwg_event);
     delete niwg_event; 
 #endif
@@ -560,7 +557,7 @@ void FitWeight::SetupNuwroRW(){
   // Add the RW Calcs
   if (xsec_qel)  nuwro_rw->AdoptWghtCalc( "nuwro_QEL", new nuwro::rew::NuwroReWeight_QEL );
   if (xsec_flag) nuwro_rw->AdoptWghtCalc( "nuwro_FlagNorm", new nuwro::rew::NuwroReWeight_FlagNorm );
-  //if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_MaRES_CA5 );  
+  //  if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_MaRES_CA5 );  
 
   nuwro_rw->Reconfigure();
 }
@@ -704,11 +701,14 @@ double FitWeight::GetSampleNorm(std::string samplename){
   
   if (!found_dial and !samplename.empty()) {
 
+    LOG(FIT) << " Late initialisation of norm: "<<norm_dial<<std::endl;
     this->IncludeDial( norm_dial, 6, 1.0);
+    LOG(FIT) << "RECONFIGURING"<<std::endl;
     this->Reconfigure();
     return 1.0;
 
   } else {
+    LOG(FIT) << " Getting sample norm "<< norm_dial<<std::endl;
     return this->GetDialValue( norm_dial );
   }
 }
@@ -733,17 +733,17 @@ std::vector<double> FitWeight::GetDialValues(){
 }
 
 //******************************************************************** 
-void FitWeight::SetupEventCoeff(FitEventBase* event){
+void FitWeight::SetupEventCoeff(BaseFitEvt* event){
 //******************************************************************** 
   if (!spline_head) spline_head = new FitSplineHead();
   spline_head->SetupEventWeights(event);
 }
 
 //******************************************************************** 
-void FitWeight::GenSplines(FitEventBase* event, bool save_graph){
+void FitWeight::GenSplines(BaseFitEvt* event, bool save_graph){
 //********************************************************************
   
-  double nom = this->CalcWeight(static_cast<FitEvent*>(event));
+  double nom = this->CalcWeight(event);
   event->dial_coeff->SetAt(nom,0);
 
   // Get Current Dial Values and save to reset
@@ -762,7 +762,7 @@ void FitWeight::GenSplines(FitEventBase* event, bool save_graph){
 }
 
 //******************************************************************** 
-void FitWeight::Fit2DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom, bool save_graph){
+void FitWeight::Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph){
 //********************************************************************
   
   int enum_x = spl->var_enums[0];
@@ -792,6 +792,7 @@ void FitWeight::Fit2DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom
     // X RW Value
     val_x = (*iter_x);
     this->SetDialValue(enum_x, val_x);
+    this->Reconfigure(true);
     
     for (std::vector<double>::iterator iter_y = knots_y.begin();
 	 iter_y != knots_y.end();iter_y++){
@@ -800,7 +801,7 @@ void FitWeight::Fit2DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom
       val_y = (*iter_y);
       this->SetDialValue(enum_y, val_y);
       
-      weightval = this->CalcWeight(static_cast<FitEvent*>(event))/nom;
+      weightval = this->CalcWeight(event)/nom;
       if (weightval != 1.0) hasresponse = true;
 
       gr_2D_scan.SetPoint(count, val_x, val_y, weightval);
@@ -827,7 +828,7 @@ void FitWeight::Fit2DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom
 }
 
 //******************************************************************** 
-void FitWeight::Fit1DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom, bool save_graph){
+void FitWeight::Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph){
 //********************************************************************
   
   int this_enum = spl->var_enums[0];
@@ -852,7 +853,9 @@ void FitWeight::Fit1DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom
     val = (*iter);
 
     this->SetDialValue(this_enum, val);
-    weightval = this->CalcWeight(static_cast<FitEvent*>(event))/nom;
+    this->Reconfigure(true);
+    
+    weightval = this->CalcWeight(event)/nom;
     if (weightval != 1.0) hasresponse = true;
 
     allweights[count] = weightval;
@@ -866,8 +869,6 @@ void FitWeight::Fit1DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom
   TF1* f1 = new TF1("f1", spl, -1.0 + knots[0], 1.0 + knots[knots.size()-1], npar);
 
   if (save_graph and hasresponse) f1->SetNpx(400);
-
-  //      for (int k = 0; k < gr->GetN(); k++) f1->FixParameter(k, allweights[k]);
 
   // Check for TSpline3
   if (spl->needs_fit){
@@ -960,19 +961,11 @@ void FitWeight::ResetSplines(){
 }
 
 //******************************************************************** 
-double FitWeight::CalcWeight(FitEventBase* evt){
-//******************************************************************** 
-  return this->CalcWeight( static_cast<FitEvent*>(evt) );
-}
-
-//******************************************************************** 
-double FitWeight::CalcSplineWeight(FitEvent* evt){
+double FitWeight::CalcSplineWeight(BaseFitEvt* evt){
 //******************************************************************** 
   double rw_weight =  spline_head->CalcWeight(evt->dial_coeff->GetArray());
   return rw_weight;
 }
-
-ClassImp(FitWeight);
 
 
 

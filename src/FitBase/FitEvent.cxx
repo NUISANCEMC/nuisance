@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "FitEvent.h"
 #include "TObjArray.h"
 
@@ -27,7 +8,7 @@
 #ifdef __NEUT_ENABLED__
 void FitEvent::SetEventAddress(NeutVect** tempevent){
 
-  this->fType = EvtNEUT;
+  this->fType = kNEUT;
   neut_event = *tempevent;
 
   return;
@@ -90,263 +71,11 @@ void FitEvent::NeutKinematics(){
 void FitEvent::SetEventAddress(event** tempevent){
 //***************************************************       
 
-  this->fType = EvtNUWRO;
+  this->fType = kNUWRO;
   nuwro_event = *(tempevent);
 
   return;
 }
-
-//*************************************************** 
-int FitEvent::ND280_Mode (event * e)
-//*************************************************** 
-{
-
-  return 1;
-
-  
-  Int_t proton_pdg, neutron_pdg, pion_pdg, pion_plus_pdg, pion_minus_pdg,
-    lambda_pdg, eta_pdg, kaon_pdg, kaon_plus_pdg;
-  proton_pdg = 2212;
-  eta_pdg = 221;
-  neutron_pdg = 2112;
-  pion_pdg = 111;
-  pion_plus_pdg = 211;
-  pion_minus_pdg = -211;
-  //O_16_pdg = 100069;   // oznacznie z Neuta
-  lambda_pdg = 3122;
-  kaon_pdg = 311;
-  kaon_plus_pdg = 321;
-
-
-  if (e->flag.qel)		// kwiazielastyczne oddziaływanie
-    {
-      if (e->flag.anty)		// jeśli jest to oddziaływanie z antyneutrinem
-	{
-	  if (e->flag.cc)
-	    return -1;
-	  else
-	    {
-	      if (e->nof (proton_pdg))
-		return -51;
-	      else if (e->nof (neutron_pdg))
-		return -52;	// sprawdzam dodatkowo ?
-	    }
-	}
-      else			// oddziaływanie z neutrinem
-	{
-	  if (e->flag.cc)
-	    return 1;
-	  else
-	    {
-	      if (e->nof (proton_pdg))
-		return 51;
-	      else if (e->nof (neutron_pdg))
-		return 52;
-	    }
-	}
-    }
-
-  if (e->flag.mec){
-    if (e->flag.anty) return -2;
-    else return 2;
-  }
-
-
-  if (e->flag.res)		//rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon, multipiony  
-    {
-
-      Int_t liczba_pionow, liczba_kaonow;
-
-      liczba_pionow =
-	e->nof (pion_pdg) + e->nof (pion_plus_pdg) + e->nof (pion_minus_pdg);
-      liczba_kaonow = e->nof (kaon_pdg) + e->nof (kaon_pdg);
-
-      if (liczba_pionow > 1 || liczba_pionow == 0)	// multipiony
-	{
-	  if (e->flag.anty)
-	    {
-	      if (e->flag.cc)
-		return -21;
-	      else
-		return -41;
-	    }
-	  else
-	    {
-	      if (e->flag.cc)
-		return 21;
-	      else
-		return 41;
-	    }
-	}
-
-      if (liczba_pionow == 1)
-	{
-	  if (e->flag.anty)	// jeśli jest to oddziaływanie z antyneutrinem
-	    {
-	      if (e->flag.cc)
-		{
-		  if (e->nof (neutron_pdg) && e->nof (pion_minus_pdg))
-		    return -11;
-		  if (e->nof (neutron_pdg) && e->nof (pion_pdg))
-		    return -12;
-		  if (e->nof (proton_pdg) && e->nof (pion_minus_pdg))
-		    return -13;
-		}
-	      else
-		{
-		  if (e->nof (proton_pdg))
-		    {
-		      if (e->nof (pion_minus_pdg))
-			return -33;
-		      else if (e->nof (pion_pdg))
-			return -32;
-		    }
-		  else if (e->nof (neutron_pdg))
-		    {
-		      if (e->nof (pion_plus_pdg))
-			return -34;
-		      else if (e->nof (pion_pdg))
-			return -31;
-		    }
-		}
-	    }
-	  else			// oddziaływanie z neutrinem
-	    {
-	      if (e->flag.cc)
-		{
-		  if (e->nof (proton_pdg) && e->nof (pion_plus_pdg))
-		    return 11;
-		  if (e->nof (proton_pdg) && e->nof (pion_pdg))
-		    return 12;
-		  if (e->nof (neutron_pdg) && e->nof (pion_plus_pdg))
-		    return 13;
-		}
-	      else
-		{
-		  if (e->nof (proton_pdg))
-		    {
-		      if (e->nof (pion_minus_pdg))
-			return 33;
-		      else if (e->nof (pion_pdg))
-			return 32;
-		    }
-		  else if (e->nof (neutron_pdg))
-		    {
-		      if (e->nof (pion_plus_pdg))
-			return 34;
-		      else if (e->nof (pion_pdg))
-			return 31;
-		    }
-		}
-	    }
-	}
-
-      if (e->nof (eta_pdg))	// produkcja rezonansowa ety
-	{
-	  if (e->flag.anty)	// jeśli jest to oddziaływanie z antyneutrinem
-	    {
-	      if (e->flag.cc)
-		return -22;
-	      else
-		{
-		  if (e->nof (neutron_pdg))
-		    return -42;
-		  else if (e->nof (proton_pdg))
-		    return -43;	// sprawdzam dodatkowo ?
-		}
-	    }
-	  else			// oddziaływanie z neutrinem
-	    {
-	      if (e->flag.cc)
-		return 22;
-	      else
-		{
-		  if (e->nof (neutron_pdg))
-		    return 42;
-		  else if (e->nof (proton_pdg))
-		    return 43;
-		}
-	    }
-	}
-
-      if (e->nof (lambda_pdg) == 1 && liczba_kaonow == 1)	// produkcja rezonansowa kaonu
-	{
-	  if (e->flag.anty)	// jeśli jest to oddziaływanie z antyneutrinem
-	    {
-	      if (e->flag.cc && e->nof (kaon_pdg))
-		return -23;
-	      else
-		{
-		  if (e->nof (kaon_pdg))
-		    return -44;
-		  else if (e->nof (kaon_plus_pdg))
-		    return -45;
-		}
-	    }
-	  else			// oddziaływanie z neutrinem
-	    {
-	      if (e->flag.cc && e->nof (kaon_plus_pdg))
-		return 23;
-	      else
-		{
-		  if (e->nof (kaon_pdg))
-		    return 44;
-		  else if (e->nof (kaon_plus_pdg))
-		    return 45;
-		}
-	    }
-
-
-	}
-
-    }
-
-  if (e->flag.coh)		// koherentne  oddziaływanie tylko na O(16) 
-    {
-      Int_t _target;
-      _target = e->par.nucleus_p + e->par.nucleus_n;	// liczba masowa  O(16) 
-
-      if (_target == 16)
-	{
-	  if (e->flag.anty)	// jeśli jest to oddziaływanie z antyneutrinem
-	    {
-	      if (e->flag.cc && e->nof (pion_minus_pdg))
-		return -16;
-	      else if (e->nof (pion_pdg))
-		return -36;
-	    }
-	  else			// oddziaływanie z neutrinem
-	    {
-	      if (e->flag.cc && e->nof (pion_plus_pdg))
-		return 16;
-	      else if (e->nof (pion_pdg))
-		return 36;
-	    }
-	}
-    }
-
-  // gleboko nieelastyczne rozpraszanie               
-  if (e->flag.dis)
-    {
-      if (e->flag.anty)
-	{
-	  if (e->flag.cc)
-	    return -26;
-	  else
-	    return -46;
-	}
-      else
-	{
-	  if (e->flag.cc)
-	    return 26;
-	  else
-	    return 46;
-	}
-    }
-
-  return 9999;
-}
-
 
 
 
@@ -358,7 +87,7 @@ void FitEvent::NuwroKinematics(){
 
   // Sort Mode
   this->TotCrs = nuwro_event->weight;
-  this->Mode = ND280_Mode(nuwro_event);
+  this->Mode = GeneratorUtils::ConvertNuwroMode(nuwro_event);
 
   // These need to be set somehow...                                                                                                                                                                                                       
   this->fEventNo = 0;
@@ -401,7 +130,7 @@ void FitEvent::NuwroKinematics(){
 void FitEvent::SetEventAddress(NtpMCEventRecord** tempevent){
 //***************************************************     
 
-  this->fType = EvtGENIE;
+  this->fType = kGENIE;
   genie_event = *tempevent;
 
 };
@@ -452,15 +181,15 @@ void FitEvent::CalcKinematics(){
 //***************************************************   
 
   #ifdef __NEUT_ENABLED__
-  if      ( fType == EvtNEUT  ) this->NeutKinematics();
+  if      ( fType == kNEUT  ) this->NeutKinematics();
   #endif
 
   #ifdef __NUWRO_ENABLED__
-  if ( fType == EvtNUWRO ) this->NuwroKinematics();
+  if ( fType == kNUWRO ) this->NuwroKinematics();
   #endif
 
   #ifdef __GENIE_ENABLED__
-  if ( fType == EvtGENIE ) this->GENIEKinematics();
+  if ( fType == kGENIE ) this->GENIEKinematics();
   #endif
 
   return;

@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #ifndef FIT_WEIGHT_2
 #define FIT_WEIGHT_2
 
@@ -35,6 +16,7 @@
 #include "FitBuild.h"
 #include "TObject.h"
 #include "FitEvent.h"
+#include "TF1.h"
 using namespace std;
 
 #ifdef __T2KREW_ENABLED__
@@ -122,6 +104,7 @@ using namespace genie::rew;
 #include "FitSplineHead.h"
 #include "TCanvas.h"
 #include "TGraph2D.h"
+#include "GeneratorUtils.h"
 
 enum RWDialType{
   kNeutDial=0,
@@ -134,7 +117,7 @@ enum RWDialType{
 
 
 //******************************************
-class FitWeight : public TObject {
+class FitWeight {
 //****************************************** 
 
  public:
@@ -171,12 +154,11 @@ class FitWeight : public TObject {
 
   double GetSampleNorm(std::string samplename);
 
-  double CalcWeight(FitEvent* evt);
-  double CalcWeight(FitEventBase* evt);
+  double CalcWeight(BaseFitEvt* evt);
   
   void PrintState();
   
-  void Reconfigure();
+  void Reconfigure(bool silent=false);
 
 
   // GENERATOR SPECIFIC RW OBJECTS
@@ -212,16 +194,16 @@ class FitWeight : public TObject {
 
   // SPLINE FUNCTIONS ------------
   FitSplineHead* GetSplineHeader(){ return spline_head; };
-  void SetupEventCoeff(FitEventBase* event);
+  void SetupEventCoeff(BaseFitEvt* event);
   void SetupSpline(std::string dialname, std::string splinename, std::string pointsdef);
-  double CalcSplineWeight(FitEvent* evt);
+  double CalcSplineWeight(BaseFitEvt* evt);
   void ReadSplineHead(FitSplineHead* splhead);
   void ResetSplines();
-  void GenSplines(FitEventBase* evt, bool save_graph=false);
+  void GenSplines(BaseFitEvt* evt, bool save_graph=false);
 
-  void Fit1DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom, bool save_graph);
-  void Fit2DSplineCoeff(FitEventBase* event, FitSpline* spl, double nom, bool save_graph);
-  void FitNDSplineCoeff(FitEventBase* event, FitSpline* spl, double norm, bool save_graph){
+  void Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph);
+  void Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph);
+  void FitNDSplineCoeff(BaseFitEvt* event, FitSpline* spl, double norm, bool save_graph){
     (void) event;
     (void) spl;
     (void) norm;
@@ -244,8 +226,7 @@ class FitWeight : public TObject {
   bool neut_changed, genie_changed, niwg_changed, nuwro_changed, t2k_changed;
   
   FitSplineHead* spline_head;
-
-  ClassDef(FitWeight, 1);
+  
 };
 
 // GLOBAL FUNCTIONS FOR PAR CONV ----
@@ -258,7 +239,7 @@ namespace FitBase{
   double RWSigmaToAbs(std::string type, std::string name, double val);
   double RWAbsToSigma(std::string type, std::string name, double val);
   double RWFracToSigma(std::string type, std::string name, double val);
-    
+
 }
 
 #endif

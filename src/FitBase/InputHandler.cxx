@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "InputHandler.h"
 
 //***********************************
@@ -32,15 +13,35 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
 
   // Setup a custom Event class
   this->cust_event = new FitEvent();
-  this->signal_event = new FitEventBase();
+  this->signal_event = new BaseFitEvt();
   this->inFile = infile_name;
   this->handleName = handle;
+  
+  // Parse Infile to allow enviornmental flags
+  this->inFile = this->ParseInputFile(this->inFile);
 
-  // Setup the inputs
-  this->SetupInputFiles();
-    
+  LOG(SAM) << " -> Type  = " << inType   << std::endl;
+  LOG(SAM) << " -> Input = " << inFile       << std::endl;
+
+  
   // Automatically check what sort of event file it is
-  this->inRootFile = new TFile(this->inFile.c_str(),"READ");
+  if (inType.compare("JOINT"))
+    this->inRootFile = new TFile(this->inFile.c_str(),"READ");
+
+  // Setup the handler for each type
+  if      (!inType.compare("NEUT"))   this->ReadNeutFile();
+  else if (!inType.compare("NUWRO"))  this->ReadNuWroFile();
+  else if (!inType.compare("GENIE"))  this->ReadGenieFile();
+  else if (!inType.compare("HIST"))   this->ReadHistogramFile();
+  else if (!inType.compare("BNSPLN")) this->ReadBinSplineFile();
+  else if (!inType.compare("EVSPLN")) this->ReadEventSplineFile();
+  
+  else if (!inType.compare("JOINT"))  this->ReadJointFile();
+  else {
+    LOG(FTL) << " -> ERROR: Invalid Event File Type" << std::endl;
+    inRootFile->ls();
+    exit(-1);
+  }
 
   // Setup MaxEvents After setup of ttree
   if (maxEvents > 1 and maxEvents < nEvents) {
@@ -48,101 +49,13 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
     nEvents = maxEvents;
   }
 
+  this->fluxList.push_back(this->fluxHist);
+  this->eventList.push_back(this->eventHist);
+  this->xsecList.push_back(this->xsecHist);
+
   LOG(SAM) << " -> Finished handler initialisation." << std::endl;
   return;
 };
-
-
-//******************************************************************** 
-void InputHandler::SetupInputFiles(){
-//******************************************************************** 
-
-  // READ input file
-  std::string line = inFile;
-  std::vector<std::string> input_lines;
-  TFile* inRootFile = new TFile(inFile.c_str(),"READ");
-
-  // IS ROOT FILE
-  if (!inRootFile->IsZombie()){
-
-    // Get Type and File
-    std::vector<std::string> spl = this->ParseInputString(line);
-    delete inRootFile;
-
-    input_type.push_back(spl[0]);
-    input_lines.push_back(spl[1]);
-    input_norms.push_back(1.0);
-    input_maxEvents.push_back(-1);
-
-    // ELSE IS JOINT
-  } else {
-   
-    LOG(SAM) << "InputFile was not a ROOT File. Checking for joint input.." << std::endl;
-
-    std::ifstream card(inFile.c_str(), ifstream::in);
-    std::vector<std::string> input_lines;
-    
-    while(std::getline(card, line, '\n')){
-      std::istringstream stream(line);
-         
-      std::vector<std::string> spl = this->ParseInputString(line);
-
-      input_types.push_back(spl[0]);
-      input_lines.push_back(spl[1]);
-      input_norms.push_back(1.0);
-      input_maxEvents.push_back(-1.0);
-    }
-    card.close();
-  }
-  
-  // Loop over input and get the flux files                                                                                                                                                                                                 
-  // Using a temporary input handler to do this, which is a bit dodge.                                                                                                                                                                      
-  int count_low = 0;
-  int temp_type = -1;
-  for (UInt_t i = 0; i < input_lines.size(); i++){
-
-    // Make function to get the input from the type
-    // Read in histograms for each file.
-
-
-
-    // Create Temporary InputHandlers inside                                                                                                                                                                                               
-    InputHandler* temp_input = new InputHandler(std::string(Form("temp_input_%i",i)),
-                                                input_lines.at(i));
-
-    if (temp_type != temp_input->GetType() and i > 0) {
-      ERR(FTL) << " Can't use joint events with mismatched trees yet!"<<std::endl;
-      ERR(FTL) << " Make them all the same type!"<<std::endl;
-      throw();
-    }
-
-    temp_type = temp_input->GetType();
-    TH1D* temp_flux = (TH1D*) temp_input->GetFluxHistogram();
-    TH1D* temp_evts = (TH1D*) temp_input->GetEventHistogram();
-    int temp_events = temp_input->GetNEvents();
-
-    this->joint_index_low.push_back(count_low);
-    this->joint_index_high.push_back(count_low + temp_events);
-    this->joint_index_hist.push_back( (TH1D*) temp_evts->Clone() );
-
-    count_low += temp_events;
-
-    if (i == 0){
-      this->fluxHist  = (TH1D*) temp_flux->Clone();
-      this->eventHist = (TH1D*) temp_evts->Clone();
-    } else {
-      this->fluxHist  ->Add( temp_flux );
-      this->eventHist ->Add( temp_evts );
-    }
-  }
-
-  
-
-
-
-}
-
-
 
 
 //********************************************************************
@@ -210,9 +123,18 @@ void InputHandler::ReadEventSplineFile(){
 
   // Assign nvect
   nEvents = tn->GetEntries();
-  signal_event = NULL;
-  tn->SetBranchAddress("splineEvent", &signal_event);
+  cust_event = NULL;
+  tn->SetBranchAddress("FitEvent", &cust_event);
 
+  // Load Dial Coeffs into vector
+  for (int i = 0; i < nEvents; i++){
+    tn->GetEntry(i);
+    tn->Show(i);
+    std::cout<<"EVENT PART = "<<cust_event->Npart()<<std::endl;
+    spline_list.push_back( *cust_event->dial_coeff );
+  }
+  sleep(5);
+  
   // Set MAXEVENTS CALC Here before we load in splines
   if (maxEvents > 1 and maxEvents < nEvents) {
     LOG(SAM) << " -> Reading only "<<maxEvents<<" events from total spline events."<<std::endl;
@@ -220,12 +142,12 @@ void InputHandler::ReadEventSplineFile(){
   }
 
   // Load all the splines into signal memory
-  for (int i = 0; i < nEvents; i++){
-    tn->GetEntry(i);
-    FitEventBase* base_event = (new FitEventBase(signal_event));
-    base_event->fType=6;
-    signal_events.push_back( base_event );
-  }
+  //  for (int i = 0; i < nEvents; i++){
+    //    tn->GetEntry(i);
+    //    BaseFitEvt* base_event = (new BaseFitEvt(cust_event));
+    //    base_event->fType=6;
+    //    signal_events.push_back( base_event );
+  //  }
   
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read SPLINE file"<<std::endl;
@@ -258,6 +180,9 @@ FitSplineHead* InputHandler::GetSplineHead(){
 void InputHandler::ReadJointFile(){
 //********************************************************************    
 
+  LOG(SAM) << " -> Reading list of inputs from file"<<std::endl;
+  isJointInput = true;
+
   // Parse Input File
   std::string line;
   std::ifstream card(inFile.c_str(), ifstream::in);
@@ -265,15 +190,16 @@ void InputHandler::ReadJointFile(){
 
   while(std::getline(card, line, '\n')){
     std::istringstream stream(line);
-
+    
     // Add normalisation option for second line
     input_lines.push_back(line);
-    
+
+
+    // Split to get normalisation
   }
+
   card.close();
   
-  if (input_lines.size() < 2) exit(-1);
-
   // Loop over input and get the flux files 
   // Using a temporary input handler to do this, which is a bit dodge.
   int count_low = 0;
@@ -287,18 +213,27 @@ void InputHandler::ReadJointFile(){
     if (temp_type != temp_input->GetType() and i > 0) {
       ERR(FTL) << " Can't use joint events with mismatched trees yet!"<<std::endl;
       ERR(FTL) << " Make them all the same type!"<<std::endl;
-      throw();
     }
 
     temp_type = temp_input->GetType();
-    TH1D* temp_flux = (TH1D*) temp_input->GetFluxHistogram();
-    TH1D* temp_evts = (TH1D*) temp_input->GetEventHistogram();
+  
+    TH1D* temp_flux = (TH1D*) temp_input->GetFluxHistogram()->Clone();
+    TH1D* temp_evts = (TH1D*) temp_input->GetEventHistogram()->Clone();
+    TH1D* temp_xsec = (TH1D*) temp_input->GetXSecHistogram()->Clone();
     int temp_events = temp_input->GetNEvents();
-    
-    this->joint_index_low.push_back(count_low);
-    this->joint_index_high.push_back(count_low + temp_events);    
-    this->joint_index_hist.push_back( (TH1D*) temp_evts->Clone() );
 
+    temp_flux->SetName( (this->handleName + "_" + temp_input->GetInputStateString() + "_FLUX").c_str() );
+    temp_evts->SetName( (this->handleName + "_" + temp_input->GetInputStateString() + "_EVT").c_str() );
+    temp_xsec->SetName( (this->handleName + "_" + temp_input->GetInputStateString() + "_XSEC").c_str() );
+
+    this->fluxList.push_back(temp_flux);
+    this->eventList.push_back(temp_evts);
+    this->xsecList.push_back(temp_xsec);
+
+    this->joint_index_low.push_back(count_low);
+    this->joint_index_high.push_back(count_low + temp_events);
+    this->joint_index_hist.push_back( (TH1D*) temp_evts->Clone() );
+    
     count_low += temp_events;
 
     if (i == 0){
@@ -308,6 +243,7 @@ void InputHandler::ReadJointFile(){
       this->fluxHist  ->Add( temp_flux );
       this->eventHist ->Add( temp_evts );
     }
+    std::cout<<"Added Input File "<< input_lines.at(i) <<std::endl<<" with "<<temp_events<<std::endl;
   }
 
   // Now have all correctly normalised histograms all we need to do is setup the TChains
@@ -318,27 +254,48 @@ void InputHandler::ReadJointFile(){
   else if (temp_type == 1) tree_name = "treeout";
 
   // Add up the TChains
+  tn = new TChain(tree_name.c_str());
   for (UInt_t i = 0; i < input_lines.size(); i++){
     
     // PARSE INPUT
+    std::cout<<"Adding new tchain "<<input_lines.at(i)<<std::endl;
     std::string temp_file = this->ParseInputFile(input_lines.at(i));
-    tn = new TChain(tree_name.c_str());
-    tn->AddFile(temp_file.c_str());
+    tn->Add(temp_file.c_str());
 
   }
 
-  // Normalise event histogram PDFS for weights        
-  for (UInt_t i = 0; i < input_lines.size(); i++){
+  // Setup Events
+  nEvents = tn->GetEntries();
+  if (temp_type == 0){
+#ifdef __NEUT_ENABLED__
+    eventType = 0;
+    neut_event = NULL;
+    tn->SetBranchAddress("vectorbranch", &neut_event);
+    this->cust_event->SetEventAddress(&neut_event);
+#endif
+  } else if (temp_type == 1){
+#ifdef __NUWRO_ENABLED__
+    eventType = 1;
+    nuwro_event = NULL;
+    tn->SetBranchAddress("e",&nuwro_event);
+    this->cust_event->SetEventAddress(&nuwro_event);
+#endif
+  }
 
+  // Normalise event histogram PDFS for weights                         
+  for (UInt_t i = 0; i < input_lines.size(); i++){
+    
     TH1D* temp_hist = (TH1D*)joint_index_hist.at(i)->Clone();
     joint_index_weight.push_back(  double(nEvents) / eventHist->Integral("width") *
-                                   joint_index_hist.at(i)->Integral("width") / double(joint_index_high.at(i) - joint_index_low.at(i) ));
+				   joint_index_hist.at(i)->Integral("width") / double(joint_index_high.at(i) - joint_index_low.at(i) ));
+
 
     temp_hist -> Scale( double(nEvents) / eventHist->Integral("width") );
     temp_hist -> Scale( joint_index_hist.at(i)->Integral("width") / double(joint_index_high.at(i)) );
-
+    
     this->joint_index_hist.at(i) = temp_hist;
   }
+
 
   this->eventHist->SetNameTitle( (this->handleName + "_EVT").c_str(), (this->handleName + "_EVT").c_str() );
   this->fluxHist->SetNameTitle( (this->handleName + "_FLUX").c_str(), (this->handleName + "_FLUX").c_str() );
@@ -347,32 +304,6 @@ void InputHandler::ReadJointFile(){
 }
 
 
-//********************************************************************
-void InputHandler::SetupEventAddress(){
-//********************************************************************
-
-  // If Histogram or Bin Splines event addresses are setup there.
-
-  // Setup Events                                                                                                                                                                                                                          
-  nEvents = tn->GetEntries();
-  if (temp_type == 0){
-#ifdef __NEUT_ENABLED__
-    neut_event = NULL;
-    tn->SetBranchAddress("vectorbranch", &neut_event);
-    this->cust_event->SetEventAddress(&neut_event);
-#endif
-  } else if (temp_type == 1){
-#ifdef __NUWRO_ENABLED__
-    nuwro_event = NULL;
-    tn->SetBranchAddress("e",&nuwro_event);
-    this->cust_event->SetEventAddress(&nuwro_event);
-#endif
-  }
-
-
-
-
-}
 
 //********************************************************************
 void InputHandler::ReadNeutFile(){
@@ -404,7 +335,7 @@ void InputHandler::ReadNeutFile(){
   nEvents = tn->GetEntries();
   neut_event = NULL;
   tn->SetBranchAddress("vectorbranch", &neut_event);
-  
+
   // Make the custom event read in nvect when calling CalcKinematics
   this->cust_event->SetEventAddress(&neut_event);
 
@@ -486,9 +417,12 @@ void InputHandler::ReadNuWroFile(){
       else break;
     }
 
+    
+    std::cout<<"Grabbing count "<<count<<std::endl;
     double nuwro_Elow  = contents[count];
     double nuwro_Ehigh = contents[count+1];
     int nuwro_NBins = contents.size() - 2 - count;
+    std::cout<<"CONTENTS VALS = "<<contents[0]<<" "<<contents[1]<<" "<<contents[2]<<" "<<contents[3]<<std::endl;
 
     std::cout<<"Nuwro Range = "<<nuwro_Elow<<"-"<<nuwro_Ehigh<<std::endl;
     // Create Empty Histograms
@@ -594,45 +528,54 @@ void InputHandler::ReadNuWroFile(){
   return;
 }
 
+
+
 //********************************************************************
-std::vector<TH1D*> InputHandler::ReadGenieFile(){
+void InputHandler::ReadGenieFile(){
 //********************************************************************
 
 #ifdef __GENIE_ENABLED__
   
+  // Event Type 1 NuWro
+  this->eventType = 5;
+
   // Open Root File
   LOG(SAM) << "Opening event file "<<this->inFile<<std::endl;
   TFile* rootFile = new TFile(this->inFile.c_str(),"READ");
 
   // Get flux histograms NEUT supplies
-  TH1D* tempfluxHist  = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  tempfluxHist->SetNameTitle((this->handleName+"_FLUX").c_str(), (this->handleName+"; E_{#nu} (GeV)").c_str());
+  this->fluxHist  = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
+  this->fluxHist->SetNameTitle((this->handleName+"_FLUX").c_str(), (this->handleName+"; E_{#nu} (GeV)").c_str());
 
-  TH1D* tempeventHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  tempeventHist->SetNameTitle((this->handleName+"_EVT").c_str(), (this->handleName+"; E_{#nu} (GeV); Event Rate").c_str());
+  this->eventHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
+  this->eventHist->SetNameTitle((this->handleName+"_EVT").c_str(), (this->handleName+"; E_{#nu} (GeV); Event Rate").c_str());
 
-  TH1D* tempxsecHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  tempxsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(), (this->handleName+"; E_{#nu} (GeV); Event Rate").c_str());
+  this->xsecHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
+  this->xsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(), (this->handleName+"; E_{#nu} (GeV); Event Rate").c_str());
 
   double average_xsec = 0.0;
   int total_events    = 0;
   
   // Setup the TChain for nuwro event tree
-  TChain* temp_tn = new TChain("gtree");
-  temp_tn->AddFile(this->inFile.c_str());
-  int nEvents = tn->GetEntries();
+  tn = new TChain("gtree");
+  tn->AddFile(this->inFile.c_str());
 
-  LOG(SAM) << "Number of GENIE Eevents "<<temp_tn->GetEntries()<<std::endl;
-
-  NtpMCEventRecord* mcrec = NULL;
+  nEvents = tn->GetEntries();
+  LOG(SAM) << "Number of GENIE Eevents "<<tn->GetEntries()<<std::endl;
+  genie_event = NULL;
+  mcrec = NULL;
+  //  NtpMCEventRecord * mcrec = 0; tree->SetBranchAddress(gmrec, &mcrec);
   tn->SetBranchAddress("gmcrec", &mcrec);
 
-  tempeventHist->Reset();
-  TH1D* tempEvt = (TH1D*)(tempeventHist)->Clone();
+  this->eventHist->Reset();
+  TH1D* tempEvt = (TH1D*)(this->eventHist)->Clone();
+
+  // Make the custom event read in nvect when calling CalcKinematics
+  this->cust_event->SetEventAddress(&mcrec);
 
   LOG(SAM) << "Processing GENIE flux events." <<std::endl;
   for (int i = 0; i < nEvents; i++){
-    temp_tn->GetEntry(i);
+    tn->GetEntry(i);
 
     EventRecord& event = *(mcrec->event);
     GHepParticle * neu = event.Probe();
@@ -644,20 +587,21 @@ std::vector<TH1D*> InputHandler::ReadGenieFile(){
     average_xsec += xsec;
     total_events += 1;
 
-    this->tempeventHist->Fill( neu->E() );
-    this->tempxsecHist->Fill( neu->E(), xsec );
+    this->eventHist->Fill( neu->E() );
+    this->xsecHist->Fill( neu->E(), xsec );
 
     mcrec->Clear();
   }
 
   // Sort xsec hist
-  tempxsecHist->Divide(this->tempeventHist);
+  this->xsecHist->Divide(this->eventHist);
 
-  // Sort tempeventHist as tempxsecHist * tempeventHist
-  tempeventHist = (TH1D*)this->tempfluxHist->Clone();
-  tempeventHist->Multiply(this->tempxsecHist);
-  tempeventHist->SetNameTitle((this->handleName+"_EVT").c_str(),(this->handleName+"_EVT;E_{#nu} (GeV); Events (1#times10^{-38})").c_str());
-  tempxsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(),(this->handleName+"_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})").c_str());
+  // Sort eventHist as xsecHist * eventHist
+  this->eventHist = (TH1D*)this->fluxHist->Clone();
+  this->eventHist->Multiply(this->xsecHist);
+
+  this->eventHist->SetNameTitle((this->handleName+"_EVT").c_str(),(this->handleName+"_EVT;E_{#nu} (GeV); Events (1#times10^{-38})").c_str());
+  this->xsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(),(this->handleName+"_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})").c_str());
   
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
@@ -666,12 +610,7 @@ std::vector<TH1D*> InputHandler::ReadGenieFile(){
   exit(-1);
 #endif
 
-  std::vector<TH1D*> histlist;
-  histlist.push_back( tempeventHist );
-  histlist.push_back( tempfluxHist  );
-  histlist.push_back( tempxsecHist  );
-
-  return histlist;
+  return;
 }
 
 //******************************************************************** 
@@ -724,32 +663,36 @@ void InputHandler::PrintStartInput(){
 
 }
 
+//********************************************************************     
+std::string InputHandler::GetInputStateString(){
+//********************************************************************
+  
+  std::ostringstream state;
+  state << "T"  << eventType << "_PDG" << cust_event->PartInfo(0)->fPID 
+	<< "_Z" << cust_event->TargetZ << "_A" << cust_event->TargetA;
+
+  return state.str();
+}
+
+
 //******************************************************************** 
 void InputHandler::ReadEvent(unsigned int i){
 //******************************************************************** 
 
-  bool using_events = (eventType == 0 or eventType==5 or eventType==1);
+  bool using_events = (eventType == 0 or eventType==5 or eventType==1 or eventType==kEVTSPLINE);
 
   if (using_events){
 
-    // Skip forwards events if required
-    int skip = 0;
-    if (i > nMaxEvents and nMaxEvents > -1){
-      while (i > nMaxEvents){
-	i -= nMaxEvents;
-	skip++;
-      }
-    }    
+    std::cout<<"Getting Entry"<<std::endl;
+    tn->GetEntry(i);
 
-    // Get the entry.
-    tn->GetEntry(i + input_startindex[i] );
-    cust_event->InputWeight = input_weights[tn->GetFile()->GetUID()];
-
-    // Setup the event
-    cust_event->CalcKinematics();
+    if (eventType != kEVTSPLINE)
+      cust_event->CalcKinematics();
+    
     cust_event->Index = i;
-    cur_entry =i;
-
+    cur_entry = i;
+    cust_event->InputWeight = GetInputWeight(i);
+    
   } else {
     this->GetTreeEntry(i);    
   }
@@ -759,49 +702,31 @@ void InputHandler::ReadEvent(unsigned int i){
 void InputHandler::GetTreeEntry(const Long64_t i){
 //********************************************************************
 
-  // If Using Splines Don't Get Entry
-  if (eventType != 6) tn->GetEntry(i);
-  this->cur_entry = i;
-
-  return;
-
+  if (eventType != kEVTSPLINE)
+    tn->GetEntry(i);
+  else
+    (*(cust_event->dial_coeff)) = spline_list.at(i);
+  
+  cur_entry = i;
+  cust_event->InputWeight = GetInputWeight(i);
+  
 }
 
 //********************************************************************   
 double InputHandler::GetInputWeight(const int entry){
 //********************************************************************   
 
-  double cur_Enu = -1.0;
+  if (!isJointInput) return 1.0;
   double weight = 1.0;
-
-  int tree_entry = entry;
-  if (tree_entry == -1) tree_entry = cur_entry;
-  if (tree_entry != cur_entry) tn->GetEntry(tree_entry);
   
-  // Use the generator inputs to grab Enu so its quicker
-  if (eventType == 0){
-#ifdef __NEUT_ENABLED__
-    cur_Enu = neut_event->PartInfo(0)->fP.E();
-#endif
-  } else if (eventType == 1){
-#ifdef __NUWRO_ENABLED__
-    cur_Enu = nuwro_event->E();
-#endif
-  } else if (eventType == 5){
-#ifdef __GENIE_ENABLED__
-    cur_Enu = (*(mcrec->event).Probe())->E()
-#endif
-  }
-
   // Find Histogram
   for (int j = 0; j < joint_index_low.size(); j++){
-    if (tree_entry >= joint_index_low.at(j) and tree_entry < joint_index_high.at(j)){
-      TH1D* curHistRat = joint_index_hist.at(j);
-      weight *= curHistRat->GetBinContent( curHistRat->FindBin(cur_Enu) );
+    if (entry >= joint_index_low.at(j) and entry < joint_index_high.at(j)){
+      weight *= joint_index_weight.at(j);
       break;
     }
   }
-  
+
   return weight;
 }
 

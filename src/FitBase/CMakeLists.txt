@@ -1,47 +1,23 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-################################################################################
-#    This file is part of NuFiX.
-#
-#    NuFiX is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    NuFiX is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
 set(IMPLFILES
-FitEvent.cxx
-FitLogger.cxx
-FitParameters.cxx
+BaseFitEvt.cxx
 FitParticle.cxx
 FitWeight.cxx
-InputHandler.cxx
-JointMeas1D.cxx
 Measurement1D.cxx
+EventManager.cxx
+FitSpline.cxx
+InputHandler.cxx
 Measurement2D.cxx
-parameter_pulls.cxx
+FitEvent.cxx
+FitSplineHead.cxx
+JointMeas1D.cxx
+MeasurementBase.cxx
+GeneratorUtils.cxx
 )
 
 set(HEADERFILES
-FitBuild.h
-FitEvent.h
-FitLogger.h
-FitParameters.h
-FitParticle.h
-FitWeight.h
-InputHandler.h
-JointMeas1D.h
-Measurement1D.h
-Measurement2D.h
-parameter_pulls.h
-MeasurementBase.h
+BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
+EventManager.h  FitParticle.h  FitWeight.h      LinkDef.h        MeasurementBase.h
+FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h
 )
 
 set(LIBNAME FitBase)
@@ -63,6 +39,6 @@ set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

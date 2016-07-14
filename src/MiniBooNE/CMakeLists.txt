@@ -14,7 +14,7 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+#    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
 MiniBooNE_CC1pi0_XSec_1Dcosmu_nu.cxx
@@ -28,7 +28,6 @@ MiniBooNE_CC1pip_XSec_2DTuEnu_nu.cxx
 MiniBooNE_CC1pi0_XSec_1DQ2_nu.cxx
 MiniBooNE_CCQE_XSec_1DQ2_antinu.cxx
 MiniBooNE_CC1pi0_XSec_1DTu_nu.cxx
-MiniBooNE_CCQE_XSec_1DQ2_Handler.cxx
 MiniBooNE_CC1pip_XSec_1DEnu_nu.cxx
 MiniBooNE_CCQE_XSec_1DQ2_nu.cxx
 MiniBooNE_CC1pip_XSec_1DQ2_nu.cxx
@@ -53,7 +52,6 @@ MiniBooNE_CC1pip_XSec_2DTuEnu_nu.h
 MiniBooNE_CC1pi0_XSec_1DQ2_nu.h
 MiniBooNE_CCQE_XSec_1DQ2_antinu.h
 MiniBooNE_CC1pi0_XSec_1DTu_nu.h
-MiniBooNE_CCQE_XSec_1DQ2_Handler.h
 MiniBooNE_CC1pip_XSec_1DEnu_nu.h
 MiniBooNE_CCQE_XSec_1DQ2_nu.h
 MiniBooNE_CC1pip_XSec_1DQ2_nu.h

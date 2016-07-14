@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #ifndef _MINIMIZER_FCN_H_
 #define _MINIMIZER_FCN_H_
 /*!                                                                                                                                                                                                   
@@ -51,6 +32,7 @@
 
 #include "Math/IFunction.h"
 #define GetCurrentDir getcwd
+#include "EventManager.h"
 
 using namespace FitUtils;
 
@@ -77,35 +59,12 @@ class minimizerFCN
   std::list<MeasurementBase*> fChain;
   
   void LoadSamples(std::string cardFile);
-  void LoadDrawOpts(std::string cardFile);
 
  public:
   
   
- minimizerFCN(std::string cardfile, std::string fakeDataFile, TFile *outfile, FitWeight *a_rw = NULL, bool save = 0, bool minimizing=0) : f_rw(a_rw)
-    {
-      out       = outfile;
-      FitPar::Config().out = outfile;
-      card      = cardfile;
-      fakeData  = fakeDataFile;
-      saveHists = save;
-      LoadParameters(card);
-      LoadSamples(card);
-      LoadDrawOpts(card);
-
-      useFullCovar = false; // default
-      this->current_iteration = 0;
-      filledMC = false;
-      randGen = new TRandom3();
-      randGen->SetSeed(time(NULL));
-    };
-  
-  ~minimizerFCN() {
-    for (std::list<MeasurementBase*>::iterator iter = fChain.begin(); iter != fChain.end(); iter++){
-      MeasurementBase* exp = *iter;
-      delete exp;
-    }
-  };
+  minimizerFCN(std::string cardfile, TFile *outfile);
+  ~minimizerFCN();
 
   void SetOutName(std::string name){this->outname = name;}
   void Write();
@@ -129,8 +88,6 @@ class minimizerFCN
   double Up() const { return 1.; }
   
   double DoEval(const double *x) const;
-  void LoadParameters(std::string cardfile);
-
   int GetNDOF();
   void ReconfigureAllEvents() const;
   void ReconfigureSamples(bool fullconfig = false) const;

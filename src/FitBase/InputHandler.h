@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #ifndef INPUT_HANDLER_H
 #define INPUT_HANDLER_H
 
@@ -59,7 +40,7 @@ class InputHandler : public TObject {
   double PredictedEventRate(double low, double high, std::string intOpt="width");
   double TotalIntegratedFlux(double low, double high, std::string intOpt="width");
   FitEvent* GetEventPointer(){ return cust_event; };
-  FitEventBase* GetSignalPointer(){ return signal_event; };
+  BaseFitEvt* GetSignalPointer(){ return signal_event; };
   
   int GetNEvents(){ return this->nEvents; };
   int GetGenEvents();
@@ -71,17 +52,22 @@ class InputHandler : public TObject {
   TH1D* GetEventHistogram(){return this->eventHist;};
   TH1D* GetXSecHistogram(){return this->xsecHist;};
 
+  std::vector<TH1*> GetFluxList(){ return this->fluxList;};
+  std::vector<TH1*> GetEventList(){ return this->eventList;};
+  std::vector<TH1*> GetXSecList(){ return this->xsecList;};
+
   int GetType(){return eventType;};
   bool CanIGoFast();
   void GetTreeEntry(const Long64_t entry);
-  
+  std::string GetInputStateString();
+
   int eventType;
   double GetInputWeight(const int entry=-1);
   
  protected:
 
   TChain* tn;
-  FitEventBase* signal_event;
+  BaseFitEvt* signal_event;
   FitEvent* cust_event;
   FitSplineHead* splhead;
   
@@ -97,9 +83,9 @@ class InputHandler : public TObject {
   // input root files
   TFile* inRootFile; //!< Input ROOT file (e.g NEUT MC)
   std::string inFile; ///!< Name of input ROOT file
-  std::string inType;
+  std::string inType; ///!< Input Type
   
-  std::vector<FitEventBase*> signal_events;
+  std::vector<BaseFitEvt*> all_events;
   std::string handleName;
   
 #ifdef __NEUT_ENABLED__
@@ -115,15 +101,18 @@ class InputHandler : public TObject {
   NtpMCEventRecord * mcrec; //!< Pointer to GENIE NTuple Record                                                        
 #endif
 
-  std::vector< int >         input_startindex;
-  std::map< TUUID, double >  input_weights;
-  std::map< TUUID, int >     input_nMAXevents;
-  std::map< TUUID, TH1D*  >  input_flux;
-  std::map< TUUID, TH1D*  >  input_evtrt;
-  std::map< TUUID, TH1D*  >  input_xsec;
-  
+  std::vector<int> joint_index_low;
+  std::vector<int> joint_index_high;
+  std::vector<TH1D*> joint_index_hist;
+  std::vector<double> joint_index_weight;
   bool isJointInput;
   int cur_entry;
+
+  std::vector<TH1*> xsecList;
+  std::vector<TH1*> eventList;
+  std::vector<TH1*> fluxList;
+
+  std::vector<TArrayD> spline_list;
   
   ClassDef(InputHandler, 1);
 };

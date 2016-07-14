@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #ifndef INPUTHANDLER_H_SEEN
 #define INPUTHANDLER_H_SEEN
 
@@ -66,7 +47,7 @@
 
 #include "TObject.h"
 #include "InputHandler.h"
-#include "SignalDef.h"
+#include "EventManager.h"
 
 /// InputHandler Class
 ///
@@ -170,7 +151,7 @@ class MeasurementBase {
   ///! Return XSec Lists as a vector
   virtual std::vector<TH1*> GetXSecList(){return std::vector<TH1*>(1,xsecHist);};
 
-  InputHandler* GetInput(){ return input; };
+  InputHandler* GetInput(){ return FitBase::GetInput(FitBase::GetInputID(inputfilename)); };
   std::string GetName(){ return measurementName; };
   double GetScaleFactor(){ return scaleFactor; };
 
@@ -179,7 +160,8 @@ class MeasurementBase {
   double GetZVar(){ return this->Z_VAR; };
   double GetMode(){ return this->Mode;  };
   double GetEnu(){ return this->Enu; };
-  
+
+  void SetupInputs(std::string inputfile);
   
 protected:
 
@@ -188,7 +170,7 @@ protected:
   double EnuMin; //!< Minimum incoming particle energy of events to include
   double EnuMax; //!< Maximum incoming particle energy of events to include
 
-  FitEventBase* signal_event;
+  BaseFitEvt* signal_event;
   FitEvent* cust_event;
   FitWeight* rw_engine; //!< Pointer to the rw engine
   InputHandler* input; //!< Instance of the input handler
@@ -216,7 +198,9 @@ protected:
   std::vector<double> Y_VAR_VECT;
   std::vector<double> Z_VAR_VECT;
   std::vector<int>    MODE_VECT;
-  std::vector<bool>   SIGNAL_VECT;
+  std::vector<UInt_t>   INDEX_VECT;
+
+  std::string inputfilename;
 };
 
 /*! @} */
