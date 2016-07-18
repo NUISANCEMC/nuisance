@@ -16,10 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 
-// The constructor
 ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   measurementName = "ANL_CC1npip_Evt_1Dppi_nu";
@@ -28,6 +26,8 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   EnuMax = 1.5;
   isDiag = true;
   isRawEvents = true;
+  allowed_types="SHAPE/DIAG/EVT";
+  default_types="SHAPE/DIAG/EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV

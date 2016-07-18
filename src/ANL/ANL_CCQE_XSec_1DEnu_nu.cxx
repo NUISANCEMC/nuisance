@@ -19,13 +19,7 @@
 
 #include "ANL_CCQE_XSec_1DEnu_nu.h"
 
-//******************************************************************** 
-/// @brief ANL CCQE Enu Measurement on Free Nucleons (Ref:PRD16 3103)            
-///        
-/// @details Enu Extracted assuming numu CCQE scattering of free nucleons.   
 ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-//******************************************************************** 
-
 
   // Measurement Details
   measurementName = name; 
@@ -41,16 +35,16 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
 
   // Setup Plots
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu_PRL31")){
-    this->SetDataFromDatabase("ANL/ANL_CCQE_Data_PRL31_844.root", "ANL_1DEnu_Data");
+    SetDataFromDatabase("ANL/ANL_CCQE_Data_PRL31_844.root", "ANL_1DEnu_Data");
     EnuMax = 3.0; // Move EnuMax down
   } else { 
-    this->SetDataFromDatabase("ANL/ANL_CCQE_Data_PRD16_3103.root", "ANL_1DEnu_fluxtuned_Data");
+    SetDataFromDatabase("ANL/ANL_CCQE_Data_PRD16_3103.root", "ANL_1DEnu_fluxtuned_Data");
   }
-  LOG(SAM) << "SETTING UP DEFAULT"<<std::endl;
-  this->SetupDefaultHist();
+
+  SetupDefaultHist();
 
   if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
   }
 
   // Setup Covariance
@@ -58,16 +52,13 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   covar     = StatUtils::GetInvert(fullcovar);
   
   // Different generators require slightly different rescaling factors.
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
+  scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
 
 };
 
 
-
-//******************************************************************** 
 /// @details Extract Enu and totcrs from event assuming quasi-elastic scattering
 void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
-//******************************************************************** 
   
   // Loop over the particle stack
   for (int j = 2; j < event->Npart(); ++j){
@@ -75,64 +66,55 @@ void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
     // Look for the outgoing muon
     if ((event->PartInfo(j))->fPID != 13) continue;
     
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
+    ThetaMu = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
 
-    Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    q2qe        = FitUtils::Q2QErec( (event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
+    Enu_rec = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
+    q2qe    = FitUtils::Q2QErec( (event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
 
     // Once lepton is found, don't continue the loop
     break;  
   }
   
-  this->X_VAR = Enu_rec;
-  this->Y_VAR = q2qe;
+  X_VAR = Enu_rec;
+
+  // We save q2 into Y_VAR incase correction is applied
+  Y_VAR = q2qe;
   return;
 };
 
-//******************************************************************** 
-/// @details Signal is true CCQE scattering
-///
-/// @details Cut 1: numu event
-/// @details Cut 2: Mode == 1
-/// @details Cut 3: EnuMin < Enu < EnuMax
+
+/// Signal is true CCQE scattering \n
+/// \item Cut 1: numu event
+/// \item Cut 2: Mode == 1
+/// \item Cut 3: EnuMin < Enu < EnuMax
 bool ANL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
-//******************************************************************** 
 
   // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  if ((event->PartInfo(0))->fPID != 14) 
+    return false;
 
-  if (event->Mode != 1) return false;
+  // Only CCQE
+  if (event->Mode != 1) 
+    return false;
   
   // Restrict energy range
-  if (event->Enu()/1000.0 < this->EnuMin || event->Enu()/1000.0 > this->EnuMax) return false;
+  if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) 
+    return false;
 
   return true;
 };
 
-//********************************************************************         
-/// @details Apply additional event weights for free nucleon measurements      
+
+//! If Q2 correction is applied the CorrectionHist is interpolated 
+//! using the Q2QE value saved in Y_VAR
 void ANL_CCQE_XSec_1DEnu_nu::FillHistograms(){
-//********************************************************************         
 
   if (applyQ2correction){
-    if (this->Y_VAR < this->CorrectionHist->GetXaxis()->GetXmin())
-      this->Weight *= this->CorrectionHist->Interpolate(this->Y_VAR);
+    if (Y_VAR < CorrectionHist->GetXaxis()->GetXmin())
+      Weight *= CorrectionHist->Interpolate(Y_VAR);
   }
 
   Measurement1D::FillHistograms();
-
 }
 
-//******************************************************************** 
-/// @details Perform flux unfolding
-void ANL_CCQE_XSec_1DEnu_nu::ScaleEvents(){
-//********************************************************************   
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
-
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
-
-  return;
-};
