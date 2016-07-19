@@ -59,6 +59,9 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
 
 /// @details Extract Enu and totcrs from event assuming quasi-elastic scattering
 void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
+
+  // Get Q2
+  double q2qe = 0.0;
   
   // Loop over the particle stack
   for (int j = 2; j < event->Npart(); ++j){

@@ -36,7 +36,7 @@ K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks(std::string i
 
 
   // Set the plot to be read in
-  this->SetDataFromFile(std::string(std::getenv("NIWG_DATA"))+"/K2K/K2K_Data_PRD74_052002.root", "Data_1DDelTheta_2tracks");
+  this->SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", "Data_1DDelTheta_2tracks");
 
   // Forced to be diag for now
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);

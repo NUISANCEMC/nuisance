@@ -73,7 +73,7 @@ K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(s
   case fK2K_2trackNONQE:      plotname = "Data_1DCosThetaMu_SmlAngle_2trackNONQE";     break;
   }
   
-  this->SetDataFromFile(std::string(std::getenv("NIWG_DATA"))+"/K2K/K2K_Data_PRD74_052002.root", plotname);
+  this->SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", plotname);
 
   // Setup MC Plots
   this->SetupDefaultHist();

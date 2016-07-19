@@ -35,7 +35,7 @@ K2K_CC0pi_XSec_1DPmu_nu_Ntrks::K2K_CC0pi_XSec_1DPmu_nu_Ntrks(std::string inputfi
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Set the plot to be read in  
-  SetDataFromFile(std::string(std::getenv("NIWG_DATA"))+"/K2K/K2K_Data_PRD74_052002.root", "Data_1DPmu_alltracks");
+  SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", "Data_1DPmu_alltracks");
 
   // Forced to be diag for now
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);

@@ -47,7 +47,7 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(std::string name, std
   this->subChain.push_back(DEN);
 
   // Setup the Data input                          
-  std::string basedir = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/CCinc/";
+  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string datafilename  = "CCinc_"+target+"_CH_ratio_x_data.csv";
   std::string covarfilename = "CCinc_"+target+"_CH_ratio_x_covar.csv";
 

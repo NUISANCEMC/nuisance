@@ -32,7 +32,7 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string input
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/totalxsec_edit.txt");
-  //this->SetCovarMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/cc1pi0/totalxsec_covar.txt", this->data_points-1);
+  //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/totalxsec_covar.txt", this->data_points-1);
   this->SetupDefaultHist();
 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);

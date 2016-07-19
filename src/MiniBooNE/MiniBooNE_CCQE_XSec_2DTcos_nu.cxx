@@ -46,11 +46,11 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
 
   // Setup Data Plots
   if (!ccqelike){
-    this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/aski_con.txt", 1E-41, 
-			std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/aski_err.txt", 1E-42);
+    this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_con.txt", 1E-41, 
+			FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_err.txt", 1E-42);
   } else {
-     this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/aski_like.txt", 1E-41, 
-			std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/aski_err.txt", 1E-42);
+     this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_like.txt", 1E-41, 
+			FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_err.txt", 1E-42);
   }
   this->SetupDefaultHist();
   

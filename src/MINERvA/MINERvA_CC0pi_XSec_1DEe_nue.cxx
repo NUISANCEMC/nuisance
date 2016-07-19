@@ -15,7 +15,7 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Data File
-  std::string datafile = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/MINERvA_CC0pi_nue_Data_ARX1509_05729.root";
+  std::string datafile = FitPar::GetDataBase()+"/MINERvA/MINERvA_CC0pi_nue_Data_ARX1509_05729.root";
   std::string dist_name = "";
   
   dist_name = "1DEe";

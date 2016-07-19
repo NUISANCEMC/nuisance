@@ -40,7 +40,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
   // Setup Plots
   this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/asqq_con.txt");
+  this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt");
   
   this->SetupDefaultHist();
 
@@ -48,7 +48,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   if (!this->isDiag) {
 
     /// Currently has a placeholder for the matrices as work fixing them is ongoing.                   
-    this->SetCovarMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/MiniBooNE_1DQ2_nu.root");
+    this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ccqe/MiniBooNE_1DQ2_nu.root");
     StatUtils::SetDataErrorFromCov(dataHist, fullcovar, 1E-38);
 
   } else {
@@ -63,7 +63,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
 
-    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ccqe/asqq_bkg.txt",
+    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt",
 						   (this->measurementName+"_data_CCQELIKE"), this->plotTitles);
     
     for (int i = 0; i < dataHist->GetNbinsX(); i++){

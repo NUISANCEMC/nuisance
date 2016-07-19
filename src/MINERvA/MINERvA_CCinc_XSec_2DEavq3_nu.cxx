@@ -45,9 +45,9 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   this->yBins = tempy;
   
   // Fill data and 1Dto2D Maps for covariance
-  SetDataValuesFromText(std::string(std::getenv("NIWG_DATA"))+"/MINERvA/CCEavQ3/data_2D.txt", 1E-42);
-  SetMapValuesFromText(std::string(std::getenv("NIWG_DATA"))+"/MINERvA/CCEavQ3/map_2D.txt");
-  SetCovarMatrixFromChol(std::string(std::getenv("NIWG_DATA"))+"/MINERvA/CCEavQ3/covar_2D.txt", 67);
+  SetDataValuesFromText(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/data_2D.txt", 1E-42);
+  SetMapValuesFromText(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/map_2D.txt");
+  SetCovarMatrixFromChol(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/covar_2D.txt", 67);
 
   // Data is in 1E-42 and so is the covariance, need to scale accordingly.
   (*this->fullcovar) *= 1E-16;

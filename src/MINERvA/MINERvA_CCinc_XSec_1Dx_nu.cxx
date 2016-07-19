@@ -39,7 +39,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
   // Setup the Data Plots
-  std::string basedir = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/CCinc/";
+  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string smearfilename  = "CCinc_"+target+"_x_smear.csv";
   int nbins = 6;
   double bins[7] = {0, 0.1, 0.3, 0.7, 0.9, 1.1, 1.5};

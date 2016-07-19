@@ -42,7 +42,7 @@ MINERvA_CC0pi_XSec_1DFill_nue::MINERvA_CC0pi_XSec_1DFill_nue(std::string inputfi
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Data File
-  std::string datafile = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/MINERvA_CC0pi_nue_Data_ARX1509_05729.root";
+  std::string datafile = FitPar::GetDataBase()+"/MINERvA/MINERvA_CC0pi_nue_Data_ARX1509_05729.root";
   std::string dist_name = "";
   
   if  (fillvar == 0) {

@@ -1,0 +1,54 @@
+# ALL SAMPLES VALID FOR PITTSBURGH FILES
+
+# MINERvA Samples
+sample  MINERvA_CC0pi_XSec_1DEe_nue        FIX   NEUT:
+sample  MINERvA_CC0pi_XSec_1DQ2_nue        FIX   NEUT:
+sample  MINERvA_CC0pi_XSec_1DQ2_nu_proton  FIX   NEUT:
+
+sample  MINERvA_CC0pi_XSec_1DThetae_nue    FIX   NEUT:
+
+sample  MINERvA_CC1pi0_XSec_1Dppi0_antinu  FIX   NEUT:
+sample  MINERvA_CC1pi0_XSec_1Dth_antinu    FIX   NEUT:
+
+sample  MINERvA_CC1pip_XSec_1Dth_20deg_nu  FIX	 NEUT: 
+sample  MINERvA_CC1pip_XSec_1Dth_nu        FIX	 NEUT:
+sample  MINERvA_CC1pip_XSec_1DTpi_20deg_nu FIX	 NEUT:
+sample  MINERvA_CC1pip_XSec_1DTpi_nu       FIX	 NEUT:
+
+sample  MINERvA_CCinc_XSec_2DEavq3_nu      FIX	 NEUT:
+
+sample  MINERvA_CCNpip_XSec_1Dth_20deg_nu  FIX	 NEUT:
+sample  MINERvA_CCNpip_XSec_1Dth_nu        FIX	 NEUT:
+sample  MINERvA_CCNpip_XSec_1DTpi_20deg_nu FIX	 NEUT:
+sample  MINERvA_CCNpip_XSec_1DTpi_nu       FIX	 NEUT: 
+
+sample  MINERvA_CCQE_XSec_1DQ2_antinu_20deg_newflux  FIX  NEUT:
+sample  MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux      FIX  NEUT:
+
+# MiniBooNE Samples
+sample  MiniBooNE_CC1pi0_XSec_1Dcosmu_nu   FIX	      NEUT:
+sample  MiniBooNE_CC1pi0_XSec_1Dcospi0_nu  FIX	      NEUT:
+sample  MiniBooNE_CC1pi0_XSec_1DEnu_nu     FIX	      NEUT:
+sample  MiniBooNE_CC1pi0_XSec_1Dppi0_nu    FIX	      NEUT:
+sample  MiniBooNE_CC1pi0_XSec_1DQ2_nu      FIX	      NEUT:
+sample  MiniBooNE_CC1pi0_XSec_1DTu_nu      FIX	      NEUT:
+
+sample  MiniBooNE_CC1pip_XSec_1DEnu_nu     FIX	      NEUT:
+sample  MiniBooNE_CC1pip_XSec_1DQ2_nu      FIX	      NEUT:
+sample  MiniBooNE_CC1pip_XSec_1DTpi_nu     FIX	      NEUT:
+sample  MiniBooNE_CC1pip_XSec_1DTu_nu      FIX	      NEUT:
+sample  MiniBooNE_CC1pip_XSec_2DQ2Enu_nu   FIX	      NEUT:
+sample  MiniBooNE_CC1pip_XSec_2DTpiCospi_nu FIX	       NEUT:
+sample  MiniBooNE_CC1pip_XSec_2DTpiEnu_nu FIX	        NEUT:
+sample  MiniBooNE_CC1pip_XSec_2DTuCosmu_nu FIX		 NEUT:
+sample  MiniBooNE_CC1pip_XSec_2DTuEnu_nu FIX		  NEUT:
+
+sample  MiniBooNE_CCQE_XSec_1DQ2_antinu FIX		   NEUT:
+sample  MiniBooNE_CCQE_XSec_1DQ2_nu FIX	 NEUT:
+sample  MiniBooNE_CCQE_XSec_2DTcos_antinu FIX	 NEUT:
+sample  MiniBooNE_CCQE_XSec_2DTcos_nu FIX  NEUT:
+
+sample  MiniBooNE_CCQELike_XSec_1DQ2_antinu	   FIX                NEUT:
+sample  MiniBooNE_CCQELike_XSec_1DQ2_nu FIX  NEUT:
+sample  MiniBooNE_CCQELike_XSec_2DTcos_antinu FIX    NEUT:
+sample  MiniBooNE_CCQELike_XSec_2DTcos_nu FIX  NEUT:
