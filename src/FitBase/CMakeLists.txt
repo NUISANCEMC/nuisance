@@ -34,7 +34,7 @@ GeneratorUtils.cxx
 
 set(HEADERFILES
 BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h  FitWeight.h      LinkDef.h        MeasurementBase.h
+EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
 FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h
 )
 

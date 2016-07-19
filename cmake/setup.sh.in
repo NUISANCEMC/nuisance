@@ -15,8 +15,8 @@ fi
 
 if [[ "@USE_NEUT@" != "0" ]]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/lib/@CMAKE_SYSTEM_NAME@:"* ]]; then
-    export LD_LIBRARY_PATH=@NUWRO@/lib/@CMAKE_SYSTEM_NAME@:$LD_LIBRARY_PATH
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
+    export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
   fi
 fi
 
