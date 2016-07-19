@@ -28,10 +28,17 @@ TH2D* FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int 
 //********************************************************
   
   // This function calculates the bins in the 2D distribution which should be excluded because > 50% of the events in that bin have q^2 < qCut
-
   TH2D *qCutHist = (TH2D*)data->Clone("qCutHist");
   qCutHist ->Reset();
-
+  
+  // DEPRECATED CODE
+  // - Needs to be updated to fit in with new InputHandler format
+  (void) inFile;
+  (void) qCut;
+  (void) nuPDG;
+  (void) eMin;
+  (void) eMax;
+  
   // This should instead use VEXperimentBase to allow multiple inputs.
   
   // TH2D *qEvts    = (TH2D*)data->Clone("qEvts");
@@ -94,7 +101,8 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi
 // Reconstruct the hadronic mass using all outgoing particles
 // Requires pion vector for reconstructing the neutrino energy
 // Could technically do E_nu = pnu.E() too, but this won't be reconstructed Enu; it's true Enu
-  
+  (void) ppi; // P.S: Never used, looking into this.
+
   double E_mu = pmu.E();
   double p_mu = pmu.Vect().Mag();
   double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);

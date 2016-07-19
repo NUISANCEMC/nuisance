@@ -547,7 +547,6 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
   // Loop Particles
   int nhadrons = 0;
   int nmuons = 0;
-  double Enu_rec = 0.0;
   double ThetaMu = 0.0;
   double Emu = 0.0;
   
