@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "MeasurementBase.h"
 
 /*
@@ -11,14 +30,14 @@ MeasurementBase::MeasurementBase() {
 
   scaleFactor = 1.0;
   filledMC = false;
-  
+
 };
 
 //********************************************************************
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
 MeasurementBase::~MeasurementBase() {
 //********************************************************************
-  
+
 };
 
 
@@ -76,7 +95,7 @@ double MeasurementBase::PredictedEventRate(std::string intOpt, double low, doubl
 };
 
 
-//********************************************************************   
+//********************************************************************
 void MeasurementBase::SetupInputs(std::string inputfile){
 //********************************************************************
 
@@ -94,18 +113,18 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 
   std::cout<<"Got input"<<std::endl;
   std::cout<<"nevents = "<<nevents<<std::endl;
-  
+
   inputfilename = inputfile;
-  
+
 }
 
-//*********************************************** 
+//***********************************************
 void MeasurementBase::Reconfigure(){
-//*********************************************** 
+//***********************************************
   LOG(REC) << " Reconfiguring sample "<<this->measurementName<<std::endl;
   int input_id = FitBase::GetInputID(inputfilename);
   InputHandler* input = FitBase::GetInput(input_id);
-  
+
   // Reset Histograms
   this->ResetAll();
 
@@ -113,7 +132,7 @@ void MeasurementBase::Reconfigure(){
   if (input->GetType() == kEVTSPLINE){
     FitBase::GetRW()->ReadSplineHead(input->GetSplineHead());
   }
-  
+
   FitEvent* cust_event = input->GetEventPointer();
   int nevents = input->GetNEvents();
   int countwidth = (nevents/20);
@@ -136,7 +155,7 @@ void MeasurementBase::Reconfigure(){
     std::cout<<"Custom Type "<<cust_event->fType<<std::endl;
 
     std::cout<<"NPART = "<<cust_event->Npart()<<std::endl;
-    
+
     // Initialize
     X_VAR = 0.0;
     Y_VAR = 0.0;
@@ -160,16 +179,16 @@ void MeasurementBase::Reconfigure(){
     // Fill Histogram Values
     this->FillHistograms();
     //    this->FillExtraHistograms();
-    
+
     // Print Out
     if (LOG_LEVEL(REC) and  i % countwidth == 0)
       LOG(REC) << "Reconfigured " << i <<" total events. [S,X,Y,Z,M,W] = ["
-	       << Signal << ", " 
+	       << Signal << ", "
 	       << X_VAR  << ", "<< Y_VAR <<  ", "
-	       << Z_VAR  << ", "<< Mode << ", " 
+	       << Z_VAR  << ", "<< Mode << ", "
 	       << Weight << "] "<< std::endl;
-    
-    
+
+
   }
 
   // Finalise Histograms
@@ -178,13 +197,13 @@ void MeasurementBase::Reconfigure(){
 }
 
 
-//*********************************************** 
+//***********************************************
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
 
   int input_id = FitBase::GetInputID(inputfilename);
   InputHandler* input = FitBase::GetInput(input_id);
-  
+
   // Check if we Can't Signal Reconfigure
   if (!filledMC){
     this->Reconfigure();
@@ -208,13 +227,13 @@ void MeasurementBase::ReconfigureFast(){
   std::vector<double>::iterator Z = Z_VAR_VECT.begin();
   std::vector<int>::iterator    M = MODE_VECT.begin();
   std::vector<UInt_t>::iterator I = INDEX_VECT.begin();
-  
+
   // SIGNAL LOOP
   for (int i = 0; I != INDEX_VECT.end(); I++, i++){
 
     // Just Update Weight
     Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
-      
+
     X_VAR = (*X);
     Y_VAR = (*Y);
     Z_VAR = (*Z);
@@ -235,7 +254,7 @@ void MeasurementBase::ReconfigureFast(){
       LOG(REC) << "Reconfigured " << i <<" signal events. [X,Y,Z,M,W] = ["
 	       << X_VAR  << ", " << Y_VAR << ", "
 	       << Z_VAR  << ", " << Mode  << ", "
-	       << Weight << "] " << std::endl;    
+	       << Weight << "] " << std::endl;
   }
 
   // Finalise histograms
@@ -243,7 +262,7 @@ void MeasurementBase::ReconfigureFast(){
   this->ConvertEventRates();
 }
 
-//*********************************************** 
+//***********************************************
 void MeasurementBase::ConvertEventRates(){
 //***********************************************
 
@@ -261,13 +280,13 @@ void MeasurementBase::Renormalise(){
   double new_norm = FitBase::GetRW()->GetDialValue( this->measurementName + "_norm" );
   double norm = 0.0;
   if (new_norm >= 0.0) norm = 1.0/new_norm;
-  
+
   if ((this->currentNorm == 0.0 and norm != 0.0) or not filledMC){
     this->ReconfigureFast();
     return;
   }
-  
-  if (this->currentNorm == norm) return;  
+
+  if (this->currentNorm == norm) return;
 
   this->ApplyNormScale( 1.0 / this->currentNorm );
   this->ApplyNormScale( norm );

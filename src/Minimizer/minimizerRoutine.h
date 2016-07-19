@@ -1,9 +1,28 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef MINIMIZER_ROUTINE_H
 #define MINIMIZER_ROUTINE_H
 
-/*!                                                                                                                                                                                                   
- *  \addtogroup Minimizer                                                                                                                                                                        
- *  @{                                                                                                                                                                                                
+/*!
+ *  \addtogroup Minimizer
+ *  @{
  */
 
 #include "TH1.h"
@@ -15,7 +34,7 @@
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
-#include "FitBuild.h"
+
 
 #include <vector>
 #include <string>
@@ -31,13 +50,12 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "FitLogger.h"
-#include "EventManager.h"
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
 class minimizerRoutine{
 //*************************************
-  
+
 public:
 
   /*
@@ -63,7 +81,7 @@ public:
 
   //! Loops through each line of the card file and passes it to other read functions
   void readCard();
-  
+
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters
   void readParameters(std::string parstring);
@@ -83,7 +101,7 @@ public:
   //! Read in a parameter pulls class as a covariance for the fit. Currently just used for throwing covariances but will change covariance pull
   //! terms to use this method soon so it is a bit clearer.
   void readCovariance(std::string covarString);
-  
+
   /*
     Setup Functions
   */
@@ -95,7 +113,7 @@ public:
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void setupRWEngine();
 
-  //! Setups up the minimizerFCN. 
+  //! Setups up the minimizerFCN.
   void setupFCN();
 
   //! Sets up the minimizerObj for ROOT. there are cases where this is called repeatedly, e.g. If you are using a brute force scan before using Migrad.
@@ -107,7 +125,7 @@ public:
   //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
   //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
   void SetupCovariance();
-  
+
   /*
     Fitting Functions
   */
@@ -165,14 +183,14 @@ public:
   void saveFitterOutput(std::string dir="");
 
   //! Save the sample plots for current MC
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile 
+  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
   void saveCurrentState(std::string subdir="");
 
   //! Save starting predictions into a seperate folder
   void saveNominal();
 
   //! Save predictions before the fit is ran into a seperate folder
-  void savePrefit();  
+  void savePrefit();
 
   /*
     MISC Functions
@@ -180,7 +198,7 @@ public:
 
   //! Get previous fit status from a file
   Int_t GetStatus();
-  
+
 protected:
 
   //! Our Custom ReWeight Object
@@ -271,7 +289,7 @@ protected:
   //! Vector of samples included in the fit
   std::vector<std::string> samples;
 
-  //! Vector of sample normalisation dial names (sample + "_norm") 
+  //! Vector of sample normalisation dial names (sample + "_norm")
   std::vector<std::string> sampleDials;
 
   //! Map of norm dial names and the starting value given in the fit card
@@ -310,18 +328,18 @@ protected:
   std::map<std::string,double> fakeNorms;
 
   //! Map of thrown parameter names and values (After ThrowCovariance)
-  std::map<std::string,double> thrownVals; 
+  std::map<std::string,double> thrownVals;
 
   //! Map of thrown parameter names and values (After ThrowCovariance)
   std::map<std::string,double> thrownNorms;
 
-  
+
   TH2D* covarHist; //!< Covariance matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* covarHist_Free; //!< Covariance matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.  
+  TH2D* covarHist_Free; //!< Covariance matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
   TH2D* correlHist; //!< Correlation matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* correlHist_Free; //!< Correlation matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.    
+  TH2D* correlHist_Free; //!< Correlation matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
   TH2D* decompHist; //!< Decomposition matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* decompHist_Free; //!< Decomposition matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.  
+  TH2D* decompHist_Free; //!< Decomposition matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
 
   std::vector<TH1D*> input_dials;  //!< Vector of histograms from parameter pull classes that give central values of the input pull terms
   std::vector<TH2D> input_covariances; //!< vector of histograms from parameter pull classes that give covariance of the input pull terms

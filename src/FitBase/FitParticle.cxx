@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "FitParticle.h"
 
 // NEUT Constructor
@@ -43,12 +62,12 @@ FitParticle::FitParticle(particle* nuwro_particle, Int_t state){
 // GENIE Constructor
 #ifdef __GENIE_ENABLED__
 FitParticle::FitParticle(genie::GHepParticle* genie_particle){
-  
+
   this->fP = TLorentzVector(genie_particle->Px()*1000.0,
 			    genie_particle->Py()*1000.0,
 			    genie_particle->Pz()*1000.0,
 			    genie_particle->E()*1000.0);
-  
+
   fPID = genie_particle->Pdg();
 
   switch(genie_particle->Status()){
@@ -57,7 +76,7 @@ FitParticle::FitParticle(genie::GHepParticle* genie_particle){
   case genie::kIStIntermediateState: fIsAlive = 0; fStatus = 2; break; // Intermediate State
   default: fIsAlive = -1; fStatus = 3; break;
   }
-  
+
   // Flag to remove nuclear part in genie
   if (fPID > 3000){
     fIsAlive = -1;
@@ -78,12 +97,9 @@ FitParticle::FitParticle(genie::GHepParticle* genie_particle){
 FitParticle::FitParticle(UInt_t* i){
 
   (void) i;
-  
+
   // A NULL event has been passed
   //  ERR(FTL)<<"NULL Event Passed to FitEvent.cxx"<<std::endl;
-  
+
   return;
 };
-
-  
-ClassImp(FitParticle);

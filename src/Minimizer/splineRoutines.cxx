@@ -1,11 +1,30 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "splineRoutines.h"
 
-//************************************* 
+//*************************************
 splineRoutines::splineRoutines(int argc, char* argv[]){
 //*************************************
 
   rw = NULL;
-  
+
   // Set Defaults
   parseArgs(argc, argv);
   readCard();
@@ -17,7 +36,7 @@ splineRoutines::splineRoutines(int argc, char* argv[]){
 //*************************************
 void splineRoutines::parseArgs(int argc, char* argv[]){
 //*************************************
-  
+
   // If No Arguments print commands
   for (int i = 1; i< argc; ++i){
     if (i+1 != argc){
@@ -32,7 +51,7 @@ void splineRoutines::parseArgs(int argc, char* argv[]){
 
   // Make output
   outRootFile = new TFile(outFile.c_str(),"RECREATE");
-  
+
   // Parse fit routine
   std::string token;
   std::istringstream stream(splineStrategy);
@@ -40,7 +59,7 @@ void splineRoutines::parseArgs(int argc, char* argv[]){
   LOG(FIT)<< "Splines Routine = " << splineStrategy <<std::endl;
   while(std::getline(stream, token, ',')) spline_routines.push_back(token);
   if (spline_routines.empty()) spline_routines.push_back("Generate");
-  
+
 
   return;
 };
@@ -63,7 +82,7 @@ void splineRoutines::readCard(){
     readSamples(line);
   }
   card.close();
-  
+
   return;
 };
 
@@ -196,7 +215,7 @@ void splineRoutines::readSamples(std::string sampleString){
     } else if (val == 2) { sampleTypes[samplename]    = token;
     } else if (val == 3) { sampleInFiles[samplename]  = token;
     } else if (val == 4) { sampleOutTypes[samplename] = token;
-    } else if (val == 5) { sampleOutFiles[samplename] = token; 
+    } else if (val == 5) { sampleOutFiles[samplename] = token;
     }
 
     val++;
@@ -287,7 +306,7 @@ void splineRoutines::updateRWEngine(std::map<std::string,double>& updateVals){
   return;
 }
 
-//*************************************  
+//*************************************
 void splineRoutines::GenerateSampleSplines(){
 //*************************************
 
@@ -297,38 +316,38 @@ void splineRoutines::GenerateSampleSplines(){
 
   // Set RW engine to central values
   this->updateRWEngine(currentVals);
-  
+
   // Add Splines to RW Engine
   for (UInt_t i = 0; i < splineNames.size(); i++){
     std::string name = splineNames.at(i);
     std::vector<std::string> pos_spline_types = PlotUtils::FillVectorSFromString(splineTypes[name],",");
     rw->SetupSpline( name, pos_spline_types[0], splinePoints[name] );
   }
-  
+
   // Make list of samples
   std::list<MeasurementBase*> sample_class_list;
   for (UInt_t i = 0; i < samples.size(); i++){
     std::string name = samples.at(i);
     SampleUtils::LoadSample(&sample_class_list,
 			    name, sampleInFiles[name], sampleTypes[name], "", rw);
-    
+
   }
 
   // Sort verbosity before
   int verbosity      = FitPar::Config().GetParI("VERBOSITY");
-  
+
   // Loop over list of samples
   std::list<MeasurementBase*>::iterator iter = sample_class_list.begin();
   int count = 0;
   for ( ; iter != sample_class_list.end(); iter++){
     std::string name = samples.at(count);
     std::string output_name = sampleOutFiles[name];
-    
-    
+
+
     bool onlySignal   = (sampleOutTypes[name].find("SIG") != std::string::npos); // Otherwise its ALL
     bool onlyBaseEvt  = (sampleOutTypes[name].find("BAS") != std::string::npos); // Otherwise its FUL
     LOG(FIT) <<"Generating for "<< name << " "
-	     << sampleTypes[name] << " " << sampleInFiles[name] << " " 
+	     << sampleTypes[name] << " " << sampleInFiles[name] << " "
 	     << sampleOutTypes[name] << " " << sampleOutFiles[name] << std::endl;
 
 
@@ -344,31 +363,31 @@ void splineRoutines::GenerateSampleSplines(){
 				  (name + "_splineEvents").c_str());
 
     cust_event = (input->GetEventPointer());
-    
+
     //    if (!onlyBaseEvt){
     rw->SetupEventCoeff(cust_event);
     eventTree->Branch("FitEvent","FitEvent",cust_event,8000,2);
-  
+
     bool signal;
     int nevents = input->GetNEvents();
     int countwidth = (nevents / 100);
-    
+
     for (int i = 0; i < nevents; i++){
 
       input->ReadEvent(i);
       exp->FillEventVariables(cust_event);
-    
+
       cust_event->Signal = false;
       cust_event->fType = kEVTSPLINE;
       signal = exp->isSignal(cust_event);
-      
+
       if (signal or !onlySignal){
 	rw->GenSplines(cust_event);
 	rw->CalcWeight(cust_event);
 
 	//	if (onlyBaseEvt)
 	//	  (*base_event) = static_cast<FitEvent*>(cust_event);
-	
+
 	eventTree->Fill();
       }
 
@@ -377,7 +396,7 @@ void splineRoutines::GenerateSampleSplines(){
       }
     }
     std::cout<<"Saving spline results to "<<output_name.c_str()<<std::endl;
-    
+
     // Save the tree and header to file
     //    rw->GetSplineHeader()->ngen_events = input->GetNEvents();
     std::cout<<"Writing head"<<std::endl;
@@ -403,9 +422,9 @@ void splineRoutines::GenerateSampleSplines(){
   delete rw;
 }
 
-//************************************* 
+//*************************************
 void splineRoutines::Run(){
-//************************************* 
+//*************************************
 
   for (UInt_t i = 0; i < spline_routines.size(); i++){
     std::string routine = spline_routines.at(i);
@@ -418,32 +437,32 @@ void splineRoutines::Run(){
   }
 }
 
-//************************************* 
+//*************************************
 void splineRoutines::CheckSplinePlots(){
-//************************************* 
+//*************************************
 
   outRootFile->cd();
   TDirectory* valDIR = (TDirectory*) outRootFile->mkdir( "check_plots" );
   valDIR->cd();
 
 
-  
-  
-  
+
+
+
 
 }
 
 
 
 
-//*************************************  
+//*************************************
 void splineRoutines::MakeSplinePlots(){
 //*************************************
 
   outRootFile->cd();
   TDirectory* valDIR = (TDirectory*) outRootFile->mkdir( "spline_plots" );
   valDIR->cd();
-  
+
   // Add Splines to RW Engine
   for (UInt_t i = 0; i < splineNames.size(); i++){
 
@@ -456,7 +475,7 @@ void splineRoutines::MakeSplinePlots(){
     std::string name = splineNames.at(i);
     TDirectory* splineDIR = (TDirectory*) valDIR->mkdir( name.c_str() );
     splineDIR->cd();
-    
+
     std::vector<std::string> pos_spline_types = PlotUtils::FillVectorSFromString(splineTypes[name],",");
     UInt_t n_pos_spline_types = pos_spline_types.size();
 
@@ -468,20 +487,20 @@ void splineRoutines::MakeSplinePlots(){
     // Loop over measurements and make plots
     for (UInt_t i = 0; i < samples.size(); i++){
       std::string name = samples.at(i);
-          
+
       InputHandler* input  = new InputHandler( name, sampleInFiles[name] );
 
       FitEvent* cust_event = static_cast<FitEvent*>(input->GetEventPointer());
       rw->SetupEventCoeff(cust_event);
-      
+
       int nevents = 1000; //input->GetNEvents();
-      
+
       splineDIR->cd();
       for (int i = 0; i < nevents; i++){
 	input->ReadEvent(i);
 	rw->GenSplines(static_cast<FitEvent*>(cust_event), true);
       }
-      
+
       delete input;
     }
   }
@@ -489,7 +508,7 @@ void splineRoutines::MakeSplinePlots(){
 }
 
 
-//*************************************  
+//*************************************
 void splineRoutines::ValidePlots(){
 //*************************************
 
@@ -520,7 +539,7 @@ void splineRoutines::ValidePlots(){
     // Create a loop that compares event weights
     int nevents = 1000; //input_splines->GetNEvents();
 
-    
+
     // 1D Scans
     for (int i = 0; i < nevents; i++){
 
@@ -542,7 +561,7 @@ void splineRoutines::ValidePlots(){
 	TGraph* gr_events  = new TGraph();
 
 	bool hasresponse = false;
-	
+
 	for (UInt_t k = 0; k < npoints+1; k++){
 
 	  double val = low + (k + 0.)*(high - low)/(npoints+0.);
@@ -558,10 +577,10 @@ void splineRoutines::ValidePlots(){
 	  std::cout<<"splines event val "<<rw_weight_splines<<" "<<rw_weight_events<<" "<<val<<std::endl;
 
 	  if (rw_weight_splines != 1.0 or rw_weight_events != 1.0) hasresponse = true;
-	  
+
 	  gr_splines->SetPoint( gr_splines->GetN(), val, rw_weight_splines );
 	  gr_events ->SetPoint( gr_events ->GetN(), val, rw_weight_events  );
-	  
+
 	}
 
 	// Save Graph
@@ -574,7 +593,7 @@ void splineRoutines::ValidePlots(){
 	// Reset RW Engine
 	rw->SetDialValue(rw->GetDialEnum(syst), cur);
 	rw->Reconfigure();
-	
+
       }
     }
   }
@@ -584,9 +603,9 @@ void splineRoutines::ValidePlots(){
 
 
 
-//*************************************  
+//*************************************
 void splineRoutines::ValidateSplineBinResponse(){
-//*************************************  
+//*************************************
 
   // Do same as below, but take the difference for all bins, aswell as a total integral, as well as a chi2 result.
   // Do same sorts of plots but with these values being filled.
@@ -605,11 +624,11 @@ void splineRoutines::ValidateSplineEventResponse(){
 
   // Set RW engine to central values
   this->updateRWEngine(currentVals);
-  
+
   double rw_weight_splines;
-  double rw_weight_events; 
+  double rw_weight_events;
   double rw_weight_dif;
-  
+
   // Loop over samples
   for (UInt_t i = 0; i < samples.size(); i++){
     std::string name = samples.at(i);
@@ -617,31 +636,31 @@ void splineRoutines::ValidateSplineEventResponse(){
     // Generate input handler using splines.
     InputHandler* input_splines = new InputHandler( name, "EVSPLN:" + sampleOutFiles[name] );
     FitEvent* cust_event_splines = static_cast<FitEvent*>(input_splines->GetSignalPointer());
-    
+
     // Generate input handler using events.
     InputHandler* input_events = new InputHandler( name, sampleInFiles[name] );
     FitEvent* cust_event_events = static_cast<FitEvent*>(input_events->GetEventPointer());
 
     // Create a loop that compares event weights
     int nevents = input_splines->GetNEvents();
-    
+
     // 1D Scans
     for (UInt_t j = 0; j < params.size(); j++){
-      
+
       std::string syst = params[j];
       if (fixVals[syst]) continue;
-      
+
       double low  = minVals[syst];
       double high = maxVals[syst];
       double step = stepVals[syst];
       int npoints = abs((high - low) / step);
-      
+
       TGraph* gr_1D = new TGraph();
       gr_1D->SetNameTitle((syst+"_avg_dif").c_str(),(syst+"_avg_dif").c_str());
 
       TGraph* gr_1D_total = new TGraph();
       gr_1D_total->SetNameTitle((syst+"_tot_dif").c_str(),(syst+"_tot_dif").c_str());
-      
+
       TGraph* gr_1D_event = new TGraph();
       gr_1D_event->SetNameTitle((syst+"_evt").c_str(),(syst+"_evt").c_str());
 
@@ -650,31 +669,31 @@ void splineRoutines::ValidateSplineEventResponse(){
 
       TGraph* gr_1D_max = new TGraph();
       gr_1D_max->SetNameTitle((syst+"_max_dif").c_str(),(syst+"_max_dif").c_str());
-      
+
       for (UInt_t k = 0; k < npoints+1; k++){
 
 	double val = low + (k + 0.)*(high - low)/(npoints+0.);
 	rw->SetDialValue(rw->GetDialEnum(syst), val);
 	rw->Reconfigure();
-	
+
 	double total = 0.0;
 	double total_splines = 0.0;
 	double total_events = 0.0;
 	double total_max = 0.0;
-	
+
 	int count = 0;
-	
+
 	rw->ReadSplineHead(input_splines->GetSplineHead());
 	rw->Reconfigure();
-	
+
 	for (int i = 0; i < nevents; i++){
-	  	  
+
 	  input_splines->GetTreeEntry(i);
 	  input_events->GetTreeEntry(i);
 
 	  rw_weight_splines = rw->CalcWeight(cust_event_splines);
 	  rw_weight_events  = rw->CalcWeight(cust_event_events);
-	  
+
 	  rw_weight_dif = fabs(rw_weight_splines - rw_weight_events);
 
 	  if (rw_weight_splines != 1.0 or rw_weight_events != 0.0){
@@ -685,7 +704,7 @@ void splineRoutines::ValidateSplineEventResponse(){
 	    count += 1;
 	  }
 	}
-	
+
 	gr_1D_spline->SetPoint(gr_1D_spline->GetN(), val, total_splines / (count + 0.));
 	gr_1D_event->SetPoint(gr_1D_event->GetN(),   val, total_events / (count + 0.));
 	gr_1D->SetPoint( gr_1D->GetN(), val, total / (count + 0.) );
@@ -699,5 +718,5 @@ void splineRoutines::ValidateSplineEventResponse(){
       gr_1D_total->Write();
       gr_1D_max->Write();
     }
-  }  
+  }
 }

@@ -48,9 +48,9 @@
 #include "FitParameters.h"
 #include "FitLogger.h"
 
-/*!      
- *  \addtogroup Utils      
- *  @{ 
+/*!
+ *  \addtogroup Utils
+ *  @{
  */
 
 //! Functions for handling statistics calculations
@@ -63,24 +63,24 @@ namespace StatUtils{
   //! Get Chi2 using diagonal bin errors from the histogram. Masking applied before calculation if mask provided.
   Double_t GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask=NULL);
 
-  //! Get Chi2 using diagonal bin errors from the histogram. 
+  //! Get Chi2 using diagonal bin errors from the histogram.
   //! Plots converted to 1D histograms before using 1D calculation.
   Double_t GetChi2FromDiag(TH2D* data, TH2D* mc, TH2I* map=NULL, TH2I* mask=NULL);
 
   //! Get Chi2 using an inverted covariance for the data
   Double_t GetChi2FromCov( TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask=NULL);
 
-  //! Get Chi2 using an inverted covariance for the data  
-  //! Plots converted to 1D histograms before using 1D calculation.    
+  //! Get Chi2 using an inverted covariance for the data
+  //! Plots converted to 1D histograms before using 1D calculation.
   Double_t GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map=NULL, TH2I* mask=NULL);
 
   //! Get Chi2 using an SVD method on the covariance before calculation.
-  //! Method suggested by Rex at MiniBooNE. Shown that it doesn't actually work. 
+  //! Method suggested by Rex at MiniBooNE. Shown that it doesn't actually work.
   Double_t GetChi2FromSVD( TH1D* data, TH1D* mc, TMatrixDSym* cov,    TH1I* mask=NULL);
 
   //! Get Chi2 using an SVD method on the covariance before calculation.
-  //! Method suggested by Rex at MiniBooNE. Shown that it doesn't actually work.    
-  //! Plots converted to 1D histograms before using 1D calculation.    
+  //! Method suggested by Rex at MiniBooNE. Shown that it doesn't actually work.
+  //! Plots converted to 1D histograms before using 1D calculation.
   Double_t GetChi2FromSVD( TH2D* data, TH2D* mc, TMatrixDSym* cov,    TH2I* map=NULL, TH2I* mask=NULL);
 
 
@@ -88,45 +88,45 @@ namespace StatUtils{
   Double_t GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask=NULL);
 
   //! Get Chi2 using only the raw event rates given in each bin using a -2LL method.
-  //! Plots converted to 1D histograms before using 1D calculation.    
+  //! Plots converted to 1D histograms before using 1D calculation.
   Double_t GetChi2FromEventRate(TH2D* data, TH2D* mc, TH2I* map=NULL, TH2I* mask=NULL);
 
   // Likelihood Functions
-  
+
   //! Placeholder for 1D binned likelihood method
   Double_t GetLikelihoodFromDiag(TH1D* data, TH1D* mc, TH1I* mask=NULL);
-  //! Placeholder for 2D binned likelihood method     
+  //! Placeholder for 2D binned likelihood method
   Double_t GetLikelihoodFromDiag(TH2D* data, TH2D* mc, TH2I* map=NULL, TH2I* mask=NULL);
 
-  //! Placeholder for 1D binned likelihood method     
+  //! Placeholder for 1D binned likelihood method
   Double_t GetLikelihoodFromCov( TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask=NULL);
-  //! Placeholder for 2D binned likelihood method     
+  //! Placeholder for 2D binned likelihood method
   Double_t GetLikelihoodFromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map=NULL, TH2I* mask=NULL);
 
-  //! Placeholder for 1D binned likelihood method     
+  //! Placeholder for 1D binned likelihood method
   Double_t GetLikelihoodFromSVD( TH1D* data, TH1D* mc, TMatrixDSym* cov,    TH1I* mask=NULL);
-  //! Placeholder for 2D binned likelihood method     
+  //! Placeholder for 2D binned likelihood method
   Double_t GetLikelihoodFromSVD( TH2D* data, TH2D* mc, TMatrixDSym* cov,    TH2I* map=NULL, TH2I* mask=NULL);
 
-  //! Placeholder for 1D binned likelihood method     
+  //! Placeholder for 1D binned likelihood method
   Double_t GetLikelihoodFromEventRate(TH1D* data, TH1D* mc, TH1I* mask=NULL);
-  //! Placeholder for 2D binned likelihood method     
+  //! Placeholder for 2D binned likelihood method
   Double_t GetLikelihoodFromEventRate(TH2D* data, TH2D* mc, TH2I* map=NULL, TH2I* mask=NULL);
 
-  /* 
+  /*
      NDOF Functions
   */
-  
+
   //! Return 1D Histogram NDOF considering masking and empty bins
   Int_t GetNDOF(TH1D* hist, TH1I* mask=NULL);
 
-  //! Return 2D Histogram NDOF considering masking and empty bins            
+  //! Return 2D Histogram NDOF considering masking and empty bins
   Int_t GetNDOF(TH2D* hist, TH2I* map=NULL, TH2I* mask=NULL);
 
   /*
     Fake Data Functions
   */
-  
+
   //! Given a full covariance for a 1D data set throw the decomposition to generate fake data.
   //! throwdiag determines whether diagonal statistical errors are thrown.
   //! If no covariance is provided only statistical errors are thrown.
@@ -136,7 +136,7 @@ namespace StatUtils{
   //! Plots are converted to 1D histograms and the 1D ThrowHistogram is used, before being converted back to 2D histograms.
   TH2D* ThrowHistogram(TH2D* hist, TMatrixDSym* cov, TH2I* map=NULL, bool throwdiag=true, TH2I* mask=NULL);
 
-  
+
   /*
     Masking Functions
   */
@@ -144,7 +144,7 @@ namespace StatUtils{
   //! Given a mask histogram, mask out any bins in hist with non zero entries in mask.
   TH1D* ApplyHistogramMasking(TH1D* hist, TH1I* mask);
 
-  //! Given a mask histogram, mask out any bins in hist with non zero entries in mask. 
+  //! Given a mask histogram, mask out any bins in hist with non zero entries in mask.
   TH2D* ApplyHistogramMasking(TH2D* hist, TH2I* mask);
 
   //! Given a mask histogram apply the masking procedure to each of the rows/columns in a covariance, before recalculating its inverse.
@@ -182,7 +182,7 @@ namespace StatUtils{
   //! Given a dataset generate an uncorrelated covariance matrix using the bin errors.
   TMatrixDSym* MakeDiagonalCovarMatrix(TH1D* data);
 
-  //! Given a dataset generate an uncorrelated covariance matrix using the bin errors.  
+  //! Given a dataset generate an uncorrelated covariance matrix using the bin errors.
   TMatrixDSym* MakeDiagonalCovarMatrix(TH2D* data, TH2I* map=NULL);
 
   //! Given a covariance set the errors in each bin on the data from the covariance diagonals.
@@ -190,12 +190,12 @@ namespace StatUtils{
 
   //! Given a covariance set the errors in each bin on the data from the covariance diagonals.
   void SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map=NULL, double scale=1.0);
-  
+
 
   /*
     Mapping Functions
   */
-  
+
   //! If no map is provided for the 2D histogram, generate one by counting up through the bins along x and y.
   TH2I* GenerateMap(TH2D* hist);
 

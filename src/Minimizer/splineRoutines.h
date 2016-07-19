@@ -1,9 +1,28 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef SPLINE_ROUTINE_H
 #define SPLINE_ROUTINE_H
 
-/*!                                                                                                                                                                                                   
- *  \addtogroup Minimizer                                                                                                                                                                        
- *  @{                                                                                                                                                                                                
+/*!
+ *  \addtogroup Minimizer
+ *  @{
  */
 
 #include "TH1.h"
@@ -15,7 +34,7 @@
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
-#include "FitBuild.h"
+
 
 #include <vector>
 #include <string>
@@ -36,11 +55,11 @@
 //! Collects all possible fit routines into a single class to avoid repeated code
 class splineRoutines{
 //*************************************
-  
+
 public:
 
-  /*                                                                                                                    
-    Constructor/Destructor                                                                                              
+  /*
+    Constructor/Destructor
   */
 
   //! Constructor reads in arguments given at the command line for the fit here.
@@ -49,8 +68,8 @@ public:
   //! Default destructor
   ~splineRoutines();
 
-  /*                                                                                                                    
-    Input Functions                                                                                                     
+  /*
+    Input Functions
   */
 
   //! Splits the arguments ready for initial setup
@@ -81,9 +100,9 @@ public:
 
   //! Given a new map change the values that the RW engine is currently set to
   void updateRWEngine(std::map<std::string,double>& updateVals);
-  
+
   // ROUTINES ----
-  
+
   //! Loop all input samples, generate a class and splines
   void GenerateSampleSplines();
 
@@ -103,18 +122,18 @@ public:
   void CheckSplinePlots();
   void ValidePlots();
   void Run();
-  
+
 protected:
-  //! Our Custom ReWeight Object       
+  //! Our Custom ReWeight Object
   FitWeight* rw;
-  
+
   //! Input cardfile containing fit samples and dials
   std::string cardFile;
 
   //! Output file for validation plots
   std::string outFile;
   TFile* outRootFile;
-  
+
   //! comma seperated list of fit routines to be run
   std::string splineStrategy;
 
@@ -123,7 +142,7 @@ protected:
 
   //! Command line overrides for pars file
   std::vector<std::string> configCmdFix;
-  
+
   //! Vector of dial names
   std::vector<std::string> params;
 
@@ -160,12 +179,12 @@ protected:
   //! Map of norm dial names and the files string input for those samples
   std::map<std::string, std::string> sampleInFiles;
 
-  //! Map of sample names and the files string output 
+  //! Map of sample names and the files string output
   std::map<std::string, std::string> sampleOutFiles;
-  
+
   //! Map of norm dial names and the type string for those samples
   std::map<std::string, std::string> sampleTypes;
-  
+
   std::map<std::string, std::string> sampleOutTypes;
 
   // Splines

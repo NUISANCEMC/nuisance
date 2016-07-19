@@ -1,9 +1,28 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef INPUTHANDLER_H_SEEN
 #define INPUTHANDLER_H_SEEN
 
-/*!                                                                                                                                                                                                   
- *  \addtogroup FitBase                                                                                                                                                                               
- *  @{                                                                                                                                                                                                
+/*!
+ *  \addtogroup FitBase
+ *  @{
  */
 
 // C Includes
@@ -36,7 +55,7 @@
 #include "PlotUtils.h"
 #include "StatUtils.h"
 #include "FitParameters.h"
-#include "FitBuild.h"
+
 #include "FitWeight.h"
 
 #include "TMultiDimFit.h"
@@ -101,7 +120,7 @@ class MeasurementBase {
 
 
 
-  
+
   /*
     Reconfigure LOOP
   */
@@ -112,15 +131,15 @@ class MeasurementBase {
   ///! Fill the event variables for this sample (Handled in each inherited sample)
   virtual void FillEventVariables(FitEvent* event){(void)event;};
 
-  ///! Check whether this event is signle (Handled in each inherited sample) 
+  ///! Check whether this event is signle (Handled in each inherited sample)
   virtual bool isSignal(FitEvent* event){ (void)event; return false;};
 
-  ///! Fill the histogram for this event using X_VAR and Y_VAR (Handled in each inherited sample) 
+  ///! Fill the histogram for this event using X_VAR and Y_VAR (Handled in each inherited sample)
   virtual void FillHistograms(){};
 
   ///! Convert event rates to whatever distributions you need.
   virtual void ConvertEventRates();
-  
+
   ///! Call scale events after the plots have been filled at the end of reconfigure.
   virtual void ScaleEvents(){};
 
@@ -129,7 +148,7 @@ class MeasurementBase {
 
   ///! Save Histograms
   virtual void Write(std::string drawOpt = "") = 0;
-    
+
   /*
     Histogram Access Functions
   */
@@ -141,7 +160,7 @@ class MeasurementBase {
   virtual std::vector<TH1*> GetMCList() = 0;
   virtual std::vector<TH1*>  GetFineList() = 0;
   virtual std::vector<TH1*> GetMaskList() = 0;
-  
+
   ///! Return Flux Lists as a vector
   virtual std::vector<TH1*> GetFluxList(){return std::vector<TH1*>(1,fluxHist);};
 
@@ -162,11 +181,11 @@ class MeasurementBase {
   double GetEnu(){ return this->Enu; };
 
   void SetupInputs(std::string inputfile);
-  
+
 protected:
 
   // Minimum and maximum energies
-  double Enu; //!< Neutrino Energy  
+  double Enu; //!< Neutrino Energy
   double EnuMin; //!< Minimum incoming particle energy of events to include
   double EnuMax; //!< Maximum incoming particle energy of events to include
 
@@ -176,7 +195,7 @@ protected:
   InputHandler* input; //!< Instance of the input handler
   std::string measurementName;
   int eventType;
-  
+
   // Input Event rate flux/event histograms
   TH1D* fluxHist;  //!< Flux Histogram
   TH1D* eventHist; //!< Event Histogram
@@ -186,7 +205,7 @@ protected:
   double scaleFactor; //!< scaleFactor applied to events to convert from eventrate to final distribution
   double currentNorm; //!< current normalisation factor applied if fit is "FREE"
   bool filledMC; //!< flag whether MC plots have been filled (For ApplyNormalisation)
-  
+
   // TEMP OBJECTS TO HANDLE MERGE
   double X_VAR,Y_VAR,Z_VAR,Mode,Weight;
   bool Signal;

@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef MEASUREMENT_1D_H_SEEN
 #define MEASUREMENT_1D_H_SEEN
 
@@ -96,7 +115,7 @@ class Measurement1D : public MeasurementBase {
   //! Set the bin mask from a text file
   virtual void SetBinMask(std::string maskFile);
 
-  
+
   /*
     XSec Functions
   */
@@ -120,7 +139,7 @@ class Measurement1D : public MeasurementBase {
 
   //! Fill histograms using X_VAR and Weight
   virtual void FillHistograms();
-  
+
 
   //! Apply histogram scaling after reconfigure
   virtual void ScaleEvents();
@@ -137,7 +156,7 @@ class Measurement1D : public MeasurementBase {
 
   //! Get the current Number of degrees of freedom accounting for bin masking.
   virtual int GetNDOF();
-  
+
   //! Get Likelihood of iteration
   virtual double GetLikelihood();
 
@@ -188,7 +207,7 @@ class Measurement1D : public MeasurementBase {
 
   //! Save the current state to the current TFile directory
   virtual void Write(std::string drawOpt);
-  
+
 
   //! array of histograms to handle mcHist for each interaction channel.
   TH1D* mcHist_PDG[61];
@@ -239,10 +258,10 @@ protected:
   bool isChi2SVD; //!< Flag: Use alternative Chi2 SVD Method (Do not use)
   bool addNormPenalty; //!< Flag: Add a normalisation penalty term to the chi2.
   bool isFix; //!< Flag for keeping norm fixed
-  bool isFull; //!< Flag for using full covariaince  
+  bool isFull; //!< Flag for using full covariaince
   bool isDifXSec; //!< Flag for creating a dif xsec
   bool isChi2; //!< Flag for using Chi2 over LL methods
-  
+
   std::string allowed_types; //!< Fit Types Possible
   std::string default_types; //!< Starting Default Fit Types
 

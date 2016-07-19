@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "Measurement2D.h"
 #include "TDecompChol.h"
 
@@ -17,7 +36,7 @@ Measurement2D::Measurement2D() {
     mcHist_Y = NULL;
     dataHist_X = NULL;
     dataHist_Y = NULL;
-    
+
     maskHist = NULL;
     mapHist = NULL;
     dataOrig = NULL;
@@ -40,7 +59,7 @@ Measurement2D::Measurement2D() {
     isRawEvents = false;
     isDifXSec = false;
     isEnu1D = false;
-    
+
 };
 
 //********************************************************************
@@ -53,9 +72,9 @@ Measurement2D:: ~Measurement2D() {
 */
 //********************************************************************
 void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, FitWeight *rw, std::string fkdt){
-//********************************************************************      
+//********************************************************************
 
-  // Reset everything to NULL                                                                                                                                                   
+  // Reset everything to NULL
   rw_engine = rw;
 
   this->input     = new InputHandler(this->measurementName, inputfile);
@@ -64,30 +83,30 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, Fi
   this->xsecHist  = input->GetXSecHistogram();
   this->nevents   = input->GetNEvents();
 
-  // Set Default Options                                                                                                                                                                     
+  // Set Default Options
   SetFitOptions( this->default_types );
 
-  // Set Passed Options                                                                                                                                                                      
+  // Set Passed Options
   SetFitOptions(type);
 
 }
 
-//********************************************************************  
+//********************************************************************
 void Measurement2D::SetupDefaultHist(){
-//********************************************************************  
+//********************************************************************
 
-  // Setup mcHist          
+  // Setup mcHist
   this->mcHist = (TH2D*) this->dataHist->Clone();
   this->mcHist->SetNameTitle( (this->measurementName + "_MC").c_str(), (this->measurementName + "_MC" + this->plotTitles).c_str() );
 
-  // Setup mcFine          
+  // Setup mcFine
   Int_t nBinsX = this->mcHist->GetNbinsX();
   Int_t nBinsY = this->mcHist->GetNbinsY();
   this->mcFine = new TH2D( (this->measurementName + "_MC_FINE").c_str(), (this->measurementName + "_MC_FINE" + this->plotTitles).c_str(),
-           nBinsX*3, this->mcHist->GetXaxis()->GetBinLowEdge(1), this->mcHist->GetXaxis()->GetBinLowEdge(nBinsX+1), 
+           nBinsX*3, this->mcHist->GetXaxis()->GetBinLowEdge(1), this->mcHist->GetXaxis()->GetBinLowEdge(nBinsX+1),
 			   nBinsY*3, this->mcHist->GetYaxis()->GetBinLowEdge(1), this->mcHist->GetYaxis()->GetBinLowEdge(nBinsY+1));
 
-  // Setup the NEUT Mode Array             
+  // Setup the NEUT Mode Array
   PlotUtils::CreateNeutModeArray(this->mcHist,(TH1**)this->mcHist_PDG);
 
   return;
@@ -133,7 +152,7 @@ void Measurement2D::SetFitOptions(std::string opt){
       exit(-1);
     }
   }
-  
+
 
   // Set TYPE
   this->fitType = opt;
@@ -172,15 +191,15 @@ void Measurement2D::SetFitOptions(std::string opt){
 
   this->isProjFitX      = (opt.find("FITPROJX") != std::string::npos);
   this->isProjFitY      = (opt.find("FITPROJY") != std::string::npos);
-  
+
   return;
 };
 
 
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
 //********************************************************************
-  
+
   if (dataFile.find(".root") == std::string::npos) {
 
     std::cerr << "Error! " << dataFile << " is not a .root file" << std::endl;
@@ -189,7 +208,7 @@ void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
     exit(-1);
 
   } else {
-    
+
     TFile *inFile = new TFile(dataFile.c_str(), "READ");
     dataHist = (TH2D*)(inFile->Get(TH2Dname.c_str())->Clone());
     dataHist->SetDirectory(0);
@@ -208,7 +227,7 @@ void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
 void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::string errorFile, double errorNorm) {
 //********************************************************************
 
-  // Make a counter to track the line number  
+  // Make a counter to track the line number
   int yBin = 0;
 
   std::string line;
@@ -223,7 +242,7 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::st
     double entry;
     int xBin = 0;
 
-    // Loop over entries and insert them into the histogram   
+    // Loop over entries and insert them into the histogram
     while(stream >> entry){
       this->dataHist->SetBinContent(xBin+1, yBin+1, entry*dataNorm);
       xBin++;
@@ -241,7 +260,7 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::st
     double entry;
     int xBin = 0;
 
-    // Loop over entries and insert them into the histogram   
+    // Loop over entries and insert them into the histogram
     while(stream >> entry){
       this->dataHist->SetBinError(xBin+1, yBin+1, entry*errorNorm);
       xBin++;
@@ -254,7 +273,7 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::st
 };
 
 
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::SetDataValuesFromText(std::string dataFile, double dataNorm) {
 //********************************************************************
 
@@ -263,7 +282,7 @@ void Measurement2D::SetDataValuesFromText(std::string dataFile, double dataNorm)
 
   LOG(SAM) <<"Reading data from: "<<dataFile<<std::endl;
   PlotUtils::Set2DHistFromText(dataFile, this->dataHist, dataNorm, true);
-  
+
   return;
 };
 
@@ -280,7 +299,7 @@ void Measurement2D::SetCovarMatrix(std::string covarFile){
   TH2D* decmpPlot = new TH2D();
   TH2D* covarInvPlot = new TH2D();
   TH2D* fullcovarPlot = new TH2D();
-  
+
   // Get covariance options for fake data studies
   std::string covName = "";
   std::string covOption = FitPar::Config().GetParS("throw_covariance");
@@ -292,14 +311,14 @@ void Measurement2D::SetCovarMatrix(std::string covarFile){
 
   covarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());
   covarInvPlot = (TH2D*) tempFile->Get((covName + "covinv").c_str());
-  
+
   // Throw either the sub matrix or the full matrix
-  if (!covOption.compare("SUB")) fullcovarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());      
+  if (!covOption.compare("SUB")) fullcovarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());
   else if (!covOption.compare("FULL"))   fullcovarPlot = (TH2D*) tempFile->Get("fullcov");
   else ERR(WRN)<<" Incorrect thrown_covariance option in parameters."<<std::endl;
 
   // Bin masking?
-  int dim = int(this->dataHist->GetNbinsX());//-this->masked->Integral()); 
+  int dim = int(this->dataHist->GetNbinsX());//-this->masked->Integral());
   int covdim = int(this->dataHist->GetNbinsX());
 
   // Make new covars
@@ -314,7 +333,7 @@ void Measurement2D::SetCovarMatrix(std::string covarFile){
   for (Int_t i = 0; i < covdim; i++){
 
     // masking can be dodgy
-    // if (this->masked->GetBinContent(i+1) > 0) continue;  
+    // if (this->masked->GetBinContent(i+1) > 0) continue;
     for (Int_t j = 0; j < covdim; j++){
 
       //   if (this->masked->GetBinContent(j+1) > 0) continue;
@@ -327,19 +346,19 @@ void Measurement2D::SetCovarMatrix(std::string covarFile){
     row++;
   }
 
-  // Set bin errors on data 
+  // Set bin errors on data
   if (!this->isDiag){
     for (Int_t i = 0; i < this->dataHist->GetNbinsX(); i++){
-      this->dataHist->SetBinError(i+1, sqrt((covarPlot->GetBinContent(i+1,i+1)))*1E-38);              
-    }     
-  }            
+      this->dataHist->SetBinError(i+1, sqrt((covarPlot->GetBinContent(i+1,i+1)))*1E-38);
+    }
+  }
 
   TDecompSVD LU = TDecompSVD(*this->covar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
 
   tempFile->Close();
   delete tempFile;
-  
+
   return;
 };
 
@@ -396,7 +415,7 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
   std::ifstream covarread(covarFile.c_str(),ifstream::in);
 
   TMatrixD* newcov = new TMatrixD(dim,dim);
-    
+
   if(covarread.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
   int column  = 0;
   while(std::getline(covarread, line, '\n')){
@@ -407,10 +426,10 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
     // Loop over entries and insert them into matrix
     // Multiply by the errors to get the covariance, rather than the correlation matrix
     while(stream >> entry){
-      
+
       double val = entry;
       (*newcov)(row, column) = val;
-      
+
       column++;
     }
 
@@ -424,13 +443,13 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
 
   (*trans) *= (*newcov);
   newcov = (TMatrixD*) trans->Clone();
-  
+
   this->covar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
   this->fullcovar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
 
   delete newcov;
   delete trans;
-  
+
   // Robust matrix inversion method
   TDecompChol LU = TDecompChol(*this->covar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
@@ -440,9 +459,9 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
 
 // virtual void SetMaskValuesFromText(std::string dataFile);
 
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::SetMapValuesFromText(std::string dataFile){
-//********************************************************************     
+//********************************************************************
 
   this->mapHist = new TH2I((this->measurementName+"_map").c_str(), (this->measurementName+this->plotTitles).c_str(),
 			   this->data_points_x-1, this->xBins, this->data_points_y-1, this->yBins);
@@ -454,23 +473,23 @@ void Measurement2D::SetMapValuesFromText(std::string dataFile){
 };
 
 
-//********************************************************************                                                 
+//********************************************************************
 void Measurement2D::SetBinMask(std::string maskFile){
 //********************************************************************
 
-// Create a mask histogram.                                                                                           
+// Create a mask histogram.
   int nbinsX = this->dataHist->GetNbinsX();
   int nbinsY = this->dataHist->GetNbinsY();
-  
+
   this->maskHist = new TH2I((this->measurementName+"_maskHist").c_str(),(this->measurementName+"_maskHist; Bin; Mask?")	\
 			    .c_str(),nbinsX,0,nbinsX,nbinsY,0,nbinsY);
   int row ,column= 0;
   std::string line;
   std::ifstream mask(maskFile.c_str(),ifstream::in);
-  
+
   if (mask.is_open()) LOG(SAM) <<"Reading bin mask from file: "<<maskFile <<std::endl;
   else std::cerr <<" Cannot find mask file."<<std::endl;
-  
+
   while(std::getline(mask, line, '\n')){
     std::istringstream stream(line);
     int column = 0;
@@ -485,10 +504,10 @@ void Measurement2D::SetBinMask(std::string maskFile){
     }
   this->maskHist->SetBinContent(binx,biny,value);
   }
-  
-  // Set masked data bins to zero                                                                                      
+
+  // Set masked data bins to zero
   PlotUtils::MaskBins(this->dataHist, this->maskHist);
-  
+
   return;
 }
 
@@ -500,9 +519,9 @@ void Measurement2D::SetBinMask(std::string maskFile){
 /*
     XSec Functions
 */
-//********************************************************************  
+//********************************************************************
 void Measurement2D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, double fluxNorm){
-//********************************************************************  
+//********************************************************************
 
   // Note this expects the flux bins to be given in terms of MeV
   // Used to read in the flux from a text file
@@ -520,12 +539,12 @@ void Measurement2D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
     this->fluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
 
   delete f;
-  
+
 };
 
-//********************************************************************  
+//********************************************************************
 double Measurement2D::TotalIntegratedFlux(std::string intOpt, double low, double high){
-//********************************************************************  
+//********************************************************************
 
   // Return the integrated flux between two energy values
   // If non passed return it between the experimental flux
@@ -554,11 +573,11 @@ void Measurement2D::ResetAll(){
 //********************************************************************
 
   // Simple function to reset the mc Histograms incase that is all that is needed.
-  
+
   // Clear histograms
   this->mcHist->Reset();
   this->mcFine->Reset();
-  
+
   return;
 };
 
@@ -570,7 +589,7 @@ void Measurement2D::FillHistograms(){
   if (Signal){
     this->mcHist->Fill(X_VAR,Y_VAR,Weight);
     this->mcFine->Fill(X_VAR,Y_VAR,Weight);
-    
+
     PlotUtils::FillNeutModeArray((TH2D**)this->mcHist_PDG, Mode, X_VAR, Y_VAR, Weight);
   }
 
@@ -604,13 +623,13 @@ void Measurement2D::ScaleEvents(){
     this->mcHist->GetSumw2();
     this->mcFine->GetSumw2();
 
-    // Final Scaling factors       
+    // Final Scaling factors
     this->mcHist->Scale(this->scaleFactor, "width");
     this->mcFine->Scale(this->scaleFactor, "width");
-    
+
     PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, this->scaleFactor, "width");
   }
- 
+
   return;
 };
 
@@ -634,13 +653,13 @@ void Measurement2D::ApplyNormScale(double norm){
 /*
   Statistic Functions - Outsources to StatUtils
 */
-//********************************************************************   
+//********************************************************************
 int Measurement2D::GetNDOF(){
-//********************************************************************   
+//********************************************************************
 
   // Just incase it has gone...
   if (!this->dataHist) return 0;
-  
+
   int nDOF = 0;
 
   // If datahist has no errors make sure we don't include those bins as they are not data points
@@ -658,7 +677,7 @@ int Measurement2D::GetNDOF(){
       for (int xBin = 0; xBin < this->maskHist->GetNbinsX()+1; ++xBin)
 	for (int yBin = 0; yBin < this->maskHist->GetNbinsY()+1; ++yBin)
 	  if (this->maskHist->GetBinContent(xBin, yBin) > 0.5) ++nMasked;
-  
+
   // Take away those masked DOF
   nDOF -= nMasked;
 
@@ -666,9 +685,9 @@ int Measurement2D::GetNDOF(){
 }
 
 
-//********************************************************************    
+//********************************************************************
 double Measurement2D::GetLikelihood(){
-//********************************************************************    
+//********************************************************************
 
 //  if (isProjFitX or isProjFitY) return GetProjectedChi2();
 
@@ -700,7 +719,7 @@ double Measurement2D::GetLikelihood(){
     }
   }
 
-  // Add a normal penalty term   
+  // Add a normal penalty term
   if (this->addNormPenalty){
     chi2 += (1- (this->currentNorm))*(1-(this->currentNorm))/(this->normError*this->normError);
     LOG(REC)<<"Norm penalty = "<<(1- (this->currentNorm ))*(1-(this->currentNorm))/(this->normError*this->normError)<<std::endl;
@@ -718,7 +737,7 @@ double Measurement2D::GetLikelihood(){
   return chi2;
 };
 
-// //********************************************************************   
+// //********************************************************************
 // double Measurement2D::GetProjectedChi2(){
 // //********************************************************************
 
@@ -745,18 +764,18 @@ double Measurement2D::GetLikelihood(){
 
 //   mcHist_X->SetTitle(Form("%d", chi2X));
 //   mcHist_Y->SetTitle(Form("%d", chi2Y));
-  
+
 //   return chi2;
 // }
 
 /*
   Fake Data
 */
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::SetFakeDataValues(std::string fakeOption) {
-//******************************************************************** 
+//********************************************************************
 
-  // This is the original data           
+  // This is the original data
   if (!(this->dataOrig)) this->dataOrig = (TH2D*)this->dataHist->Clone((this->measurementName+"_data_original").c_str());
   TH2D *tempData = (TH2D*)this->dataHist->Clone();
 
@@ -792,16 +811,16 @@ void Measurement2D::SetFakeDataValues(std::string fakeOption) {
 
   fake->Close();
   delete fake;
-  
+
   return;
 };
 
 // virtual void ResetFakeData();
 // virtual void ResetData();
 
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::ThrowCovariance(){
-//******************************************************************** 
+//********************************************************************
 
   return;
 };
@@ -810,9 +829,9 @@ void Measurement2D::ThrowCovariance(){
 /*
     Access Functions
 */
-//******************************************************************** 
+//********************************************************************
 std::vector<TH1*> Measurement2D::GetMCList(){
-//******************************************************************** 
+//********************************************************************
 
   // If this isn't a NULL pointer, make the plot pretty!
   if (!this->mcHist) return std::vector<TH1*> (1, this->mcHist);
@@ -847,14 +866,14 @@ std::vector<TH1*> Measurement2D::GetMCList(){
   return std::vector<TH1*> (1, this->mcHist);
 };
 
-//******************************************************************** 
+//********************************************************************
 std::vector<TH1*> Measurement2D::GetDataList(){
-//******************************************************************** 
+//********************************************************************
 
   // If this isn't a NULL pointer, make the plot pretty!
 
   if (!this->dataHist) return std::vector<TH1*> (1, this->dataHist);
-  
+
   this->dataHist->SetLineWidth(2);
   this->dataHist->SetLineColor(kBlue);
 
@@ -876,9 +895,9 @@ void Measurement2D:: GetBinContents(std::vector<double>& cont, std::vector<doubl
 };
 
 
-//********************************************************************     
+//********************************************************************
 std::vector<double> Measurement2D::GetXSec(std::string option){
-//********************************************************************      
+//********************************************************************
 
   std::vector<double> vals;
   vals.push_back(0.0);
@@ -891,10 +910,10 @@ std::vector<double> Measurement2D::GetXSec(std::string option){
     if (this->dataHist->GetBinContent(i+1) == 0.0 and this->dataHist->GetBinError(i+1) == 0.0) continue;
 
     if (getMC){
-      
+
       vals[0] += this->mcHist->GetBinContent(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1);
       vals[1] += this->mcHist->GetBinError(i+1) * this->mcHist->GetBinError(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1);
-    
+
     } else if (getDT){
 
       vals[0] += this->dataHist->GetBinContent(i+1) * this->dataHist->GetXaxis()->GetBinWidth(i+1);
@@ -926,9 +945,9 @@ std::vector<double> Measurement2D::GetXSec(std::string option){
   Write Functions
 */
 
-//******************************************************************** 
+//********************************************************************
 void Measurement2D::Write(std::string drawOpt){
-//******************************************************************** 
+//********************************************************************
 
   // If null pointer return
   if (!this->mcHist and !this->dataHist){
@@ -951,26 +970,26 @@ void Measurement2D::Write(std::string drawOpt){
   bool drawMask   = (drawOpt.find("MASK") != std::string::npos);
   bool drawMap    = (drawOpt.find("MAP")  != std::string::npos);
   bool drawProj   = (drawOpt.find("PROJ") != std::string::npos);
-  
+
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
   if (drawNormal)  this->GetMCList()  .at(0)->Write();
 
-  // Generate a simple map                                                                                 
+  // Generate a simple map
   if (!mapHist)
     mapHist = StatUtils::GenerateMap(dataHist);
 
-  // Convert to 1D Lists                                                                              
+  // Convert to 1D Lists
   TH1D* data_1D = StatUtils::MapToTH1D(dataHist, mapHist);
   TH1D* mc_1D   = StatUtils::MapToTH1D(mcHist,   mapHist);
   TH1I* mask_1D = StatUtils::MapToMask(maskHist, mapHist);
-  
+
   data_1D->Write();
   mc_1D->Write();
 
   if (mask_1D){
     mask_1D->Write();
-    
+
     TMatrixDSym* calc_cov  = StatUtils::ApplyInvertedMatrixMasking(covar, mask_1D);
     TH1D* calc_data = StatUtils::ApplyHistogramMasking(data_1D, mask_1D);
     TH1D* calc_mc   = StatUtils::ApplyHistogramMasking(mc_1D, mask_1D);
@@ -980,18 +999,18 @@ void Measurement2D::Write(std::string drawOpt){
     bin_cov->Write();
     calc_data->Write();
     calc_mc->Write();
-    
+
     delete mask_1D;
     delete calc_cov;
     delete calc_data;
     delete calc_mc;
     delete bin_cov;
-    
+
   }
 
   delete data_1D;
   delete mc_1D;
-  
+
 
    // Save only mc and data if splines
   if(this->eventType == 4 or this->eventType==3){ return; }
@@ -1010,7 +1029,7 @@ void Measurement2D::Write(std::string drawOpt){
   }
 
   // Save Matrix plots
-  if (drawMatrix and fullcovar and covar and decomp){ 
+  if (drawMatrix and fullcovar and covar and decomp){
 
     TH2D cov = TH2D((*this->fullcovar));
     cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
@@ -1025,9 +1044,9 @@ void Measurement2D::Write(std::string drawOpt){
     covdec.Write();
 
   }
-  
 
-  // Save ratio plots if required 
+
+  // Save ratio plots if required
   if (drawRatio){
 
     // Needed for error bars
@@ -1040,10 +1059,10 @@ void Measurement2D::Write(std::string drawOpt){
     // Create Ratio Histograms
     TH2D* dataRatio = (TH2D*) this->dataHist->Clone((this->measurementName + "_data_RATIO").c_str());
     TH2D* mcRatio   = (TH2D*) this->mcHist->Clone((this->measurementName + "_MC_RATIO").c_str());
-    
+
     mcRatio->Divide(this->mcHist);
     dataRatio->Divide(this->mcHist);
-    
+
     // Cancel bin errors on MC
     for(int i = 0; i < mcRatio->GetNbinsX()*mcRatio->GetNbinsY(); i++) {
       mcRatio->SetBinError(i+1,this->mcHist->GetBinError(i+1) / this->mcHist->GetBinContent(i+1));
@@ -1053,69 +1072,69 @@ void Measurement2D::Write(std::string drawOpt){
     mcRatio->SetMaximum(2);
     dataRatio->SetMinimum(0);
     dataRatio->SetMaximum(2);
-    
+
     mcRatio->Write();
     dataRatio->Write();
 
     delete mcRatio;
     delete dataRatio;
   }
-  
+
   // Save Shape Plots if required
   if (drawShape){
-    
+
     // Create Shape Histogram
     TH2D* mcShape = (TH2D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
-    
-    mcShape->Scale( this->dataHist->Integral("width") 
+
+    mcShape->Scale( this->dataHist->Integral("width")
 			  / this->mcHist->Integral("width"));
-    
+
     mcShape->SetLineWidth(3);
     mcShape->SetLineStyle(7); //dashes
-    
+
     mcShape->Write();
 
     // Save shape ratios
     if (drawRatio){
-    
+
       // Needed for error bars
       mcShape->GetSumw2();
-      
+
       // Create shape ratio histograms
       TH2D* mcShapeRatio   = (TH2D*)mcShape->Clone((this->measurementName + "_MC_SHAPE_RATIO").c_str());
       TH2D* dataShapeRatio = (TH2D*)dataHist->Clone((this->measurementName + "_data_SHAPE_RATIO").c_str());
-      
-      // Divide the histograms          
+
+      // Divide the histograms
       mcShapeRatio   ->Divide(mcShape);
       dataShapeRatio ->Divide(mcShape);
-    
-      // Colour the shape ratio plots    
+
+      // Colour the shape ratio plots
       mcShapeRatio ->SetLineWidth(3);
       mcShapeRatio ->SetLineStyle(7); // dashes
-      
+
       mcShapeRatio  ->Write();
       dataShapeRatio->Write();
 
       delete mcShapeRatio;
       delete dataShapeRatio;
     }
-    
+
     delete mcShape;
   }
 
   // Save residual calculations of what contributed to the chi2 values.
   if (residual){
   }
-  
+
   if (isProjFitX or isProjFitY or drawProj){
 
     // If not already made, make the projections
     if (!mcHist_X){
       PlotUtils::MatchEmptyBins(dataHist,mcHist);
-      
+
       mcHist_X = PlotUtils::GetProjectionX(mcHist, maskHist);
       mcHist_Y = PlotUtils::GetProjectionY(mcHist, maskHist);
-      
+
       dataHist_X = PlotUtils::GetProjectionX(dataHist, maskHist);
       dataHist_Y = PlotUtils::GetProjectionY(dataHist, maskHist);
 
@@ -1123,7 +1142,7 @@ void Measurement2D::Write(std::string drawOpt){
       double chi2Y = StatUtils::GetChi2FromDiag(dataHist_Y, mcHist_Y);
 
       mcHist_X->SetTitle(Form("%d", chi2X));
-      mcHist_Y->SetTitle(Form("%d", chi2Y));      
+      mcHist_Y->SetTitle(Form("%d", chi2Y));
     }
 
     // Save the histograms
@@ -1134,7 +1153,7 @@ void Measurement2D::Write(std::string drawOpt){
     mcHist_Y->Write();
   }
 
-  
+
   // Returning
   LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
   return;

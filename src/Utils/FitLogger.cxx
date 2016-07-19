@@ -19,11 +19,23 @@
 
 #include "FitLogger.h"
 
+namespace FitPar{
+  unsigned int log_verb = 0; //!< Current VERBOSITY
+  unsigned int err_verb = 0; //!< Current ERROR VERBOSITY
+  bool use_colors = true; //!< Use BASH Terminal Colors Flag
+  bool super_rainbow_mode = true; //!< For when fitting gets boring.
+  unsigned int super_rainbow_mode_colour = 0;
+}
+
+std::ostream* logStream(&std::cout);
+std::ostream* errStream(&std::cerr);
+std::ofstream nullStream;
+
 //******************************************
 void LOG_VERB(std::string verb){
 //******************************************
-  
-  if      (!verb.compare("DEB")) FitPar::log_verb=-1; 
+
+  if      (!verb.compare("DEB")) FitPar::log_verb=-1;
   else if (!verb.compare("QUIET")) FitPar::log_verb=0;
   else if (!verb.compare("FIT"))  FitPar::log_verb=1;
   else if (!verb.compare("MIN"))   FitPar::log_verb=2;
@@ -43,11 +55,11 @@ void LOG_VERB(std::string verb){
   return;
 }
 
-//****************************************** 
+//******************************************
 void ERR_VERB(std::string verb){
 //******************************************
-  
-  
+
+
   if    (!verb.compare("ERRQUIET")) FitPar::err_verb=0;
   else if (!verb.compare("FTL")) FitPar::err_verb=1;
   else if (!verb.compare("WRN")) FitPar::err_verb=2;
@@ -59,14 +71,14 @@ void ERR_VERB(std::string verb){
   return;
 }
 
-//****************************************** 
+//******************************************
 bool LOG_LEVEL(int level){
 //******************************************
-  
+
   if (FitPar::log_verb == (unsigned int) DEB){
     return true;
   }
-  
+
   if (FitPar::log_verb <  (unsigned int) level){
     return false;
   }
@@ -74,17 +86,17 @@ bool LOG_LEVEL(int level){
   return true;
 }
 
-//****************************************** 
+//******************************************
 std::ostream& LOG(int level)
-//****************************************** 
+//******************************************
 {
 
-  if (FitPar::log_verb == (unsigned int) DEB){
+  if (FitPar::log_verb == DEB){
     std::cout << BLUE << "[DEBUG]: " << RESET;
     return *logStream;
   }
 
-  if (FitPar::log_verb <  (unsigned int) level){
+  if (FitPar::log_verb < level){
     return nullStream;
   } else {
 
@@ -116,36 +128,36 @@ std::ostream& LOG(int level)
     switch(level){
     case FIT: std::cout << "[LOG Fitter]: "; break;
     case MIN: std::cout << "[LOG Minmzr]: "; break;
-    case SAM: std::cout << "[LOG Sample]: "; break;
-    case REC: std::cout << "[LOG Reconf]: "; break;
-    case SIG: std::cout << "[LOG Signal]: "; break;
-    case EVT: std::cout << "[LOG Event ]: "; break;
+    case SAM: std::cout << "[LOG Sample]: - "; break;
+    case REC: std::cout << "[LOG Reconf]: -- "; break;
+    case SIG: std::cout << "[LOG Signal]: --- "; break;
+    case EVT: std::cout << "[LOG Event ]: ---- "; break;
     default: std::cout << "Log : "; break;
     }
 
-    if (FitPar::use_colors or FitPar::super_rainbow_mode) std::cout << RESET; 
-          
+    if (FitPar::use_colors or FitPar::super_rainbow_mode) std::cout << RESET;
+
     return *logStream;
   }
 }
-//****************************************** 
+//******************************************
 std::ostream& ERR(int level)
 //******************************************
 {
 
-  if (FitPar::err_verb <=  (unsigned int) level){
+  if (FitPar::err_verb <= level){
     return nullStream;
   } else {
 
     if (FitPar::use_colors) std::cerr << RED;
-    
+
     switch(level){
     case FTL: std::cerr << "[ ERROR Fatal! ] :"; break;
     case WRN: std::cerr << "[ ERROR Warning ] :"; break;
-    }   
+    }
 
-    if (FitPar::use_colors) std::cerr << RESET; 
-    
+    if (FitPar::use_colors) std::cerr << RESET;
+
     return *errStream;
   }
 }

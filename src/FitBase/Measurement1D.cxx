@@ -1,11 +1,30 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "Measurement1D.h"
 
-/* 
+/*
    Constructor/destructor Functions
 */
-//********************************************************************  
+//********************************************************************
 Measurement1D::Measurement1D() {
-//********************************************************************  
+//********************************************************************
   this->currentNorm = 1.0;
   this->mcHist = NULL;
   this->dataHist = NULL;
@@ -30,7 +49,7 @@ Measurement1D::Measurement1D() {
 
   isDiag  = false;
   isFull  = false;
-  
+
   addNormPenalty = false;
   isMask = false;
   isChi2SVD = false;
@@ -41,30 +60,30 @@ Measurement1D::Measurement1D() {
 
 }
 
-//********************************************************************  
+//********************************************************************
 Measurement1D::~Measurement1D(){
-//********************************************************************  
+//********************************************************************
 }
 
-//********************************************************************  
+//********************************************************************
 void Measurement1D::Init(){
-//********************************************************************  
+//********************************************************************
 }
 
 
 /*
   Setup Functions
-  -- All these are used only at the start of the Measurement 
+  -- All these are used only at the start of the Measurement
 */
-//********************************************************************   
+//********************************************************************
 void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, FitWeight *rw, std::string fkdt){
-//********************************************************************   
+//********************************************************************
 
-  // Reset everything to NULL                                                                                                                          
+  // Reset everything to NULL
   Init();
 
-  // Check if name contains Evt, indicating that it is a raw number of events measurements                                       
-  // and should thus be treated as once                                                                                                                
+  // Check if name contains Evt, indicating that it is a raw number of events measurements
+  // and should thus be treated as once
   isRawEvents = false;
   if ((measurementName.find("Evt") != std::string::npos) && isRawEvents == false) {
     isRawEvents = true;
@@ -99,12 +118,12 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, Fi
   // Still adding support for flat flux inputs
   //  // Set Enu Flux Scaling
   //  if (isFlatFluxFolding) this->Input()->ApplyFluxFolding( this->defaultFluxHist );
-  
+
 }
 
-//******************************************************************** 
+//********************************************************************
 void Measurement1D::SetupDefaultHist(){
-//******************************************************************** 
+//********************************************************************
 
   // Setup mcHist
   this->mcHist = (TH1D*) this->dataHist->Clone();
@@ -118,7 +137,7 @@ void Measurement1D::SetupDefaultHist(){
 
   mcStat = (TH1D*) mcHist->Clone();
   mcStat->Reset();
-  
+
   this->mcHist->Reset();
   this->mcFine->Reset();
 
@@ -164,11 +183,11 @@ void Measurement1D::SetFitOptions(std::string opt){
       ERR(FTL) <<"ERROR: Fit Option '"<<fit_options_input.at(i)<<"' Provided is not allowed for this measurement."<<std::endl;
       ERR(FTL) <<"Fit Options should be provided as a '/' seperated list (e.g. FREE/DIAG/NORM)" << std::endl;
       ERR(FTL) <<"Available options for "<<measurementName<<" are '"<< allowed_types <<"'"<<std::endl;
-      
+
       exit(-1);
     }
   }
-  
+
   // Set TYPE
   this->fitType = opt;
 
@@ -182,7 +201,7 @@ void Measurement1D::SetFitOptions(std::string opt){
   } else if (opt.find("FREE") != std::string::npos){
     isFix = isShape = false;
     isFree = true;
-  }  
+  }
 
   // DIAG,FULL (or default to full)
   if (opt.find("DIAG") != std::string::npos){
@@ -196,8 +215,8 @@ void Measurement1D::SetFitOptions(std::string opt){
   // CHI2/LL (OTHERS?)
   if (opt.find("LOG") != std::string::npos) isChi2 = false;
   else isChi2 = true;
-    
-  // EXTRAS 
+
+  // EXTRAS
   if (opt.find("RAW")   != std::string::npos) isRawEvents = true;
   if (opt.find("DIF")   != std::string::npos) isDifXSec   = true;
   if (opt.find("ENU1D") != std::string::npos) isEnu1D     = true;
@@ -219,7 +238,7 @@ void Measurement1D::SetDataValues(std::string dataFile) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 void Measurement1D::SetDataFromDatabase(std::string inhistfile, std::string histname){
 //********************************************************************
 
@@ -246,7 +265,7 @@ void Measurement1D::SetDataFromFile(std::string inhistfile, std::string histname
 //********************************************************************
 void Measurement1D::SetCovarMatrix(std::string covarFile){
 //********************************************************************
-  
+
   // Covariance function, only really used when reading in the MB Covariances.
 
   TFile* tempFile = new TFile(covarFile.c_str(),"READ");
@@ -265,12 +284,12 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
   covarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());
   covarInvPlot = (TH2D*) tempFile->Get((covName + "covinv").c_str());
 
-  
-  if (!covOption.compare("SUB")) fullcovarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());      
+
+  if (!covOption.compare("SUB")) fullcovarPlot = (TH2D*) tempFile->Get((covName + "cov").c_str());
   else if (!covOption.compare("FULL"))   fullcovarPlot = (TH2D*) tempFile->Get("fullcov");
   else ERR(WRN) <<"Incorrect thrown_covariance option in parameters."<<std::endl;
 
-  int dim = int(this->dataHist->GetNbinsX());//-this->masked->Integral()); 
+  int dim = int(this->dataHist->GetNbinsX());//-this->masked->Integral());
   int covdim = int(this->dataHist->GetNbinsX());
 
   this->covar = new TMatrixDSym(dim);
@@ -282,11 +301,11 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
   column = 0;
   for (Int_t i = 0; i < covdim; i++){
 
-    // if (this->masked->GetBinContent(i+1) > 0) continue;  
+    // if (this->masked->GetBinContent(i+1) > 0) continue;
 
     for (Int_t j = 0; j < covdim; j++){
 
-      //   if (this->masked->GetBinContent(j+1) > 0) continue;                
+      //   if (this->masked->GetBinContent(j+1) > 0) continue;
 
       (*this->covar)(row, column)  = covarPlot->GetBinContent(i+1,j+1);
       (*this->fullcovar)(row, column) = fullcovarPlot->GetBinContent(i+1,j+1);
@@ -299,10 +318,10 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
   }
 
 
-  // Set bin errors on data              
+  // Set bin errors on data
   if (!this->isDiag){
     StatUtils::SetDataErrorFromCov(dataHist, fullcovar);
-  }            
+  }
 
   // Get Deteriminant and inverse matrix
   covDet = this->covar->Determinant();
@@ -324,7 +343,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
   std::string line;
   std::ifstream covar(covarFile.c_str(),ifstream::in);
-  
+
   this->covar = new TMatrixDSym(dim);
   this->fullcovar = new TMatrixDSym(dim);
   if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
@@ -349,7 +368,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
         column++;
       }
-    
+
       row++;
     }
 
@@ -391,7 +410,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 //********************************************************************
 void Measurement1D::SetSmearingMatrix(std::string smearFile, int true_dim, int reco_dim){
 //********************************************************************
-  
+
   // The smearing matrix describes the migration from true bins (rows) to reco bins (columns)
   // Counter over the true bins!
   int row = 0;
@@ -399,7 +418,7 @@ void Measurement1D::SetSmearingMatrix(std::string smearFile, int true_dim, int r
   std::string line;
   std::ifstream smear(smearFile.c_str(),ifstream::in);
 
-  // Note that the smearing matrix may be rectangular. 
+  // Note that the smearing matrix may be rectangular.
   this->smear = new TMatrixD(true_dim, reco_dim);
 
   if(smear.is_open()) LOG(SAM) << "Reading smearing matrix from file: " << smearFile << std::endl;
@@ -430,10 +449,10 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile, std::string covN
   TFile* tempFile = new TFile(covarFile.c_str(),"READ");
   TH2D* covPlot = (TH2D*) tempFile->Get(covName.c_str());
   covPlot->SetDirectory(0);
-  
+
   int dim = covPlot->GetNbinsX();
   this->fullcovar = new TMatrixDSym(dim);
-  
+
 
   for (int i = 0; i < dim; i++){
     for (int j = 0; j < dim; j++){
@@ -443,15 +462,15 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile, std::string covN
 
   this->covar = (TMatrixDSym*) this->fullcovar->Clone();
   this->decomp =(TMatrixDSym*) this->fullcovar->Clone();
-  
+
   TDecompSVD LU = TDecompSVD(*this->covar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-  
+
   TDecompChol LUChol = TDecompChol(*this->decomp);
   LUChol.Decompose();
   this->decomp = new TMatrixDSym(dim, LU .GetU().GetMatrixArray(), "");
 
-  return;  
+  return;
 };
 
 
@@ -459,7 +478,7 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile, std::string covN
 void Measurement1D::SetBinMask(std::string maskFile){
 //********************************************************************
 
-  // Create a mask histogram.    
+  // Create a mask histogram.
   int nbins = this->dataHist->GetNbinsX();
   this->maskHist = new TH1I((this->measurementName+"_maskHist").c_str(),(this->measurementName+"_maskHist; Bin; Mask?").c_str(),nbins,0,nbins);
   int row ,column= 0;
@@ -484,7 +503,7 @@ void Measurement1D::SetBinMask(std::string maskFile){
 
   // Set masked data bins to zero
   PlotUtils::MaskBins(this->dataHist, this->maskHist);
-  
+
   return;
 }
 
@@ -508,7 +527,7 @@ void Measurement1D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 
   for (int i = 0; i<fluxHist->GetNbinsX(); ++i)
     this->fluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
-  
+
 };
 
 //********************************************************************
@@ -518,7 +537,7 @@ double Measurement1D::TotalIntegratedFlux(std::string intOpt, double low, double
   // Set Energy Limits
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
-  
+
   int minBin = this->fluxHist->GetXaxis()->FindBin(low);
   int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
 
@@ -544,13 +563,13 @@ void Measurement1D::ResetAll(){
   this->mcHist->Reset();
   this->mcFine->Reset();
   this->mcStat->Reset();
-  
+
   PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_PDG);
-  
+
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 void Measurement1D::FillHistograms(){
 //********************************************************************
 
@@ -559,7 +578,7 @@ void Measurement1D::FillHistograms(){
     this->mcFine->Fill(X_VAR, Weight);
     this->mcStat->Fill(X_VAR, 1.0);
 
-    PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, X_VAR, Weight);    
+    PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, X_VAR, Weight);
   }
 
   return;
@@ -568,9 +587,9 @@ void Measurement1D::FillHistograms(){
 //********************************************************************
 void Measurement1D::ScaleEvents(){
 //********************************************************************
-  
+
   // Simple function to scale to xsec result if this is all that is needed.
-  // Scale bin errors correctly  
+  // Scale bin errors correctly
   TH1D* tempFine = (TH1D*) mcFine->Clone();
 
   // Should apply different scaling for:
@@ -611,7 +630,7 @@ void Measurement1D::ScaleEvents(){
   for(int i=0; i<tempFine->GetNbinsX();i++) {
     if (tempFine->GetBinContent(i+1) != 0) {
       this->mcFine->SetBinError(i+1, this->mcFine->GetBinContent(i+1) * tempFine->GetBinError(i+1) / tempFine->GetBinContent(i+1) );
-    } else { 
+    } else {
       this->mcFine->SetBinError(i+1, this->mcFine->Integral());
     }
   }
@@ -627,12 +646,12 @@ void Measurement1D::ApplyNormScale(double norm){
 //********************************************************************
 
   this->currentNorm = norm;
-  
+
   this->mcHist->Scale(1.0/norm);
   this->mcFine->Scale(1.0/norm);
 
   PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, 1.0/norm);
-  
+
   return;
 };
 
@@ -652,10 +671,10 @@ void Measurement1D::ApplySmearingMatrix(){
   // Loop over reconstructed bins
   // true = row; reco = column
   for (int rbin=0; rbin < this->smear->GetNcols(); ++rbin){
-    
+
     // Sum up the constributions from all true bins
     double rBinVal = 0;
-    
+
     // Loop over true bins
     for (int tbin=0; tbin < this->smear->GetNrows(); ++tbin){
       rBinVal += (*this->smear)(tbin,rbin)*unsmeared->GetBinContent(tbin+1);
@@ -663,7 +682,7 @@ void Measurement1D::ApplySmearingMatrix(){
     smeared->SetBinContent(rbin+1, rBinVal);
   }
   this->mcHist = (TH1D*)smeared->Clone();
-  
+
   return;
 }
 
@@ -689,7 +708,7 @@ double Measurement1D::GetLikelihood(){
       maskHist = NULL;
     }
   }
-  
+
   // Sort Initial Scaling
   double scaleF = this->dataHist->Integral(1,this->dataHist->GetNbinsX(),"width")/this->mcHist->Integral(1, this->mcHist->GetNbinsX(), "width");
 
@@ -701,20 +720,20 @@ double Measurement1D::GetLikelihood(){
   // Get Chi2
   if (isChi2){
     if (!isDiag){
-      
+
       if (!isChi2SVD) {
 	stat = StatUtils::GetChi2FromCov(dataHist, mcHist, covar, maskHist);
       } else {
 	stat = StatUtils::GetChi2FromSVD(dataHist,mcHist, fullcovar, maskHist);
       }
-      
+
     } else {
-      
+
       if (isRawEvents) {
 	stat = StatUtils::GetChi2FromEventRate(dataHist, mcHist, maskHist);
       } else {
 	stat = StatUtils::GetChi2FromDiag(dataHist, mcHist, maskHist);
-      } 
+      }
     }
   } else {
     if (!this->isDiag){
@@ -754,13 +773,13 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
   } else {
     usingfakedata = true;
   }
-  
+
   // Make a copy of the original data histogram.
   if (!(this->dataOrig)) this->dataOrig = (TH1D*)this->dataHist->Clone((this->measurementName+"_data_original").c_str());
-  
+
   TH1D *tempData = (TH1D*)this->dataHist->Clone();
   TFile *fake = new TFile();
-  
+
   if (fakeOption.compare("MC")==0){
     LOG(SAM) << "Setting fake data from MC "<<std::endl;
     this->dataHist = (TH1D*)this->mcHist->Clone((this->measurementName+"_MC").c_str());
@@ -768,18 +787,18 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
   }
   else {
     fake = new TFile(fakeOption.c_str());
-    this->dataHist = (TH1D*)fake->Get((this->measurementName+"_MC").c_str());    
+    this->dataHist = (TH1D*)fake->Get((this->measurementName+"_MC").c_str());
   }
 
   this->dataHist ->SetNameTitle((this->measurementName+"_FAKE").c_str(), (this->measurementName+this->plotTitles).c_str());
 
   this->dataTrue = (TH1D*)this->dataHist->Clone();
   this->dataTrue ->SetNameTitle((this->measurementName+"_FAKE_TRUE").c_str(), (this->measurementName+this->plotTitles).c_str());
-  
+
   int nbins = this->dataHist->GetNbinsX();
   double alpha_i = 0.0;
   double alpha_j = 0.0;
-  
+
   for (int i = 0; i < nbins; i++){
     for (int j = 0; j < nbins; j++){
 
@@ -788,7 +807,7 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
 
       (*this->covar)(i,j)     = (1.0/(alpha_i*alpha_j))*(*this->covar)(i,j);
       (*this->fullcovar)(i,j) = alpha_i*alpha_j*(*this->fullcovar)(i,j);
-      
+
     }
   }
 
@@ -803,7 +822,7 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
 //********************************************************************
 void Measurement1D::ResetFakeData(){
 //********************************************************************
-  
+
   if (usingfakedata)
     if (this->dataHist) delete dataHist;
     this->dataHist = (TH1D*) this->dataTrue->Clone((this->measurementName+"_FKDAT").c_str());
@@ -811,10 +830,10 @@ void Measurement1D::ResetFakeData(){
   return;
 }
 
-//********************************************************************    
+//********************************************************************
 void Measurement1D::ResetData(){
-//********************************************************************    
-  
+//********************************************************************
+
   if (usingfakedata)
     if (this->dataHist) delete dataHist;
     this->dataHist = (TH1D*) this->dataTrue->Clone((this->measurementName+"_Data").c_str());
@@ -831,7 +850,7 @@ void Measurement1D::ThrowCovariance(){
 
   // Take a decomposition and use it to throw the current dataset.
   // Requires dataTrue also be set incase used repeatedly.
-  
+
   delete dataHist;
   this->dataHist = StatUtils::ThrowHistogram(this->dataTrue, this->fullcovar);
 
@@ -847,10 +866,10 @@ void Measurement1D::ThrowCovariance(){
 //********************************************************************
 std::vector<TH1*> Measurement1D::GetMCList(){
   //********************************************************************
-  
+
   // If this isn't a NULL pointer, make the plot pretty!
   if (!this->mcHist) return std::vector<TH1*> (1, this->mcHist);
-  
+
   std::ostringstream chi2;
   chi2 << std::setprecision(5) << this->GetLikelihood();
 
@@ -887,7 +906,7 @@ std::vector<TH1*> Measurement1D::GetDataList(){
   // If this isn't a NULL pointer, make the plot pretty!
 
   if (!this->dataHist) return std::vector<TH1*> (1, this->dataHist);
-  
+
   this->dataHist->SetLineWidth(2);
   this->dataHist->SetMarkerStyle(8);
 
@@ -900,21 +919,21 @@ std::vector<TH1*> Measurement1D::GetDataList(){
 //********************************************************************
 void Measurement1D::GetBinContents(std::vector<double>& cont, std::vector<double>& err){
 //********************************************************************
-  
+
   // Return a vector of the main bin contents
   for (int i = 0; i < this->mcHist->GetNbinsX(); i++){
     cont.push_back(this->mcHist->GetBinContent(i+1));
     err.push_back(this->mcHist->GetBinError(i+1));
-    
+
   }
-  
+
   return;
 };
 
 
-//********************************************************************     
+//********************************************************************
 std::vector<double> Measurement1D::GetXSec(std::string option){
-//********************************************************************      
+//********************************************************************
 
   std::vector<double> vals;
   vals.push_back(0.0);
@@ -927,10 +946,10 @@ std::vector<double> Measurement1D::GetXSec(std::string option){
     if (this->dataHist->GetBinContent(i+1) == 0.0 and this->dataHist->GetBinError(i+1) == 0.0) continue;
 
     if (getMC){
-      
+
       vals[0] += this->mcHist->GetBinContent(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1);
       vals[1] += this->mcHist->GetBinError(i+1) * this->mcHist->GetBinError(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1) * this->mcHist->GetXaxis()->GetBinWidth(i+1);
-    
+
     } else if (getDT){
 
       vals[0] += this->dataHist->GetBinContent(i+1) * this->dataHist->GetXaxis()->GetBinWidth(i+1);
@@ -988,7 +1007,7 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawCov    = (drawOpt.find("COV")  != std::string::npos);
   bool drawInvCov = (drawOpt.find("INVCOV") != std::string::npos);
   bool drawDecomp = (drawOpt.find("DECOMP") != std::string::npos);
-  
+
   LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
@@ -1034,9 +1053,9 @@ void Measurement1D::Write(std::string drawOpt){
       covdec.Write();
     }
   }
-  
 
-  // Save ratio plots if required 
+
+  // Save ratio plots if required
   if (drawRatio){
 
     // Needed for error bars
@@ -1049,10 +1068,10 @@ void Measurement1D::Write(std::string drawOpt){
     // Create Ratio Histograms
     TH1D* dataRatio = (TH1D*) this->dataHist->Clone((this->measurementName + "_data_RATIO").c_str());
     TH1D* mcRatio   = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_RATIO").c_str());
-    
+
     mcRatio->Divide(this->mcHist);
     dataRatio->Divide(this->mcHist);
-    
+
     // Cancel bin errors on MC
     for(int i = 0; i < mcRatio->GetNbinsX(); i++)
       mcRatio->SetBinError(i+1,this->mcHist->GetBinError(i+1) / this->mcHist->GetBinContent(i+1));
@@ -1061,63 +1080,63 @@ void Measurement1D::Write(std::string drawOpt){
     mcRatio->SetMaximum(2);
     dataRatio->SetMinimum(0);
     dataRatio->SetMaximum(2);
-    
+
     mcRatio->Write();
     dataRatio->Write();
 
     delete mcRatio;
     delete dataRatio;
   }
-  
+
   // Save Shape Plots if required
   if (drawShape){
-    
+
     // Create Shape Histogram
     TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
-    
+
     double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
     mcShape->Scale(shapeScale);
 
     std::stringstream ss;
     ss << shapeScale;
     mcShape->SetTitle(ss.str().c_str());
-    
+
     mcShape->SetLineWidth(3);
     mcShape->SetLineStyle(7); //dashes
-    
+
     mcShape->Write();
 
     // Save shape ratios
     if (drawRatio) {
-    
+
       // Needed for error bars
       mcShape->GetSumw2();
-      
+
       // Create shape ratio histograms
       TH1D* mcShapeRatio   = (TH1D*)mcShape->Clone((this->measurementName + "_MC_SHAPE_RATIO").c_str());
       TH1D* dataShapeRatio = (TH1D*)dataHist->Clone((this->measurementName + "_data_SHAPE_RATIO").c_str());
-      
-      // Divide the histograms          
+
+      // Divide the histograms
       mcShapeRatio   ->Divide(mcShape);
       dataShapeRatio ->Divide(mcShape);
-    
-      // Colour the shape ratio plots    
+
+      // Colour the shape ratio plots
       mcShapeRatio ->SetLineWidth(3);
       mcShapeRatio ->SetLineStyle(7); // dashes
-      
+
       mcShapeRatio  ->Write();
       dataShapeRatio->Write();
 
       delete mcShapeRatio;
       delete dataShapeRatio;
     }
-    
+
     delete mcShape;
   }
 
   // Save residual calculations of what contributed to the chi2 values.
   if (residual){
-    
+
   }
 
   // Returning

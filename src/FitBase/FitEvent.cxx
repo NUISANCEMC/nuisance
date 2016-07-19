@@ -1,9 +1,26 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "FitEvent.h"
 #include "TObjArray.h"
 
-
-
-//***************************************************   
+//***************************************************
 // NEUT GENERATOR SPECIFIC
 #ifdef __NEUT_ENABLED__
 void FitEvent::SetEventAddress(NeutVect** tempevent){
@@ -15,7 +32,7 @@ void FitEvent::SetEventAddress(NeutVect** tempevent){
 }
 
 void FitEvent::NeutKinematics(){
-  
+
   /*
     header information that needs filling
 
@@ -28,14 +45,14 @@ void FitEvent::NeutKinematics(){
     UInt_t   TargetZ;
     UInt_t   TargetH;
     UInt_t   Ibound;
-    UInt_t fNParticles;  
-    UInt_t fNFSIParticles;              
-    UInt_t fNFinalParticles;  
+    UInt_t fNParticles;
+    UInt_t fNFSIParticles;
+    UInt_t fNFinalParticles;
   */
 
   // Reset number of particles etc for the event
   this->ResetEvent();
-  
+
   this->Mode     = neut_event->Mode;
   this->fEventNo = neut_event->EventNo;
   this->TotCrs   = neut_event->Totcrs;
@@ -61,15 +78,15 @@ void FitEvent::NeutKinematics(){
   return;
 };
 #endif
-//***************************************************   
+//***************************************************
 
-//***************************************************       
-// NUWRO GENERATOR SPECIFIC             
+//***************************************************
+// NUWRO GENERATOR SPECIFIC
 #ifdef __NUWRO_ENABLED__
 
-//***************************************************       
+//***************************************************
 void FitEvent::SetEventAddress(event** tempevent){
-//***************************************************       
+//***************************************************
 
   this->fType = kNUWRO;
   nuwro_event = *(tempevent);
@@ -79,9 +96,9 @@ void FitEvent::SetEventAddress(event** tempevent){
 
 
 
-//***************************************************       
+//***************************************************
 void FitEvent::NuwroKinematics(){
-//***************************************************       
+//***************************************************
 
   this->ResetEvent();
 
@@ -89,7 +106,7 @@ void FitEvent::NuwroKinematics(){
   this->TotCrs = nuwro_event->weight;
   this->Mode = GeneratorUtils::ConvertNuwroMode(nuwro_event);
 
-  // These need to be set somehow...                                                                                                                                                                                                       
+  // These need to be set somehow...
   this->fEventNo = 0;
   this->PFSurf = nuwro_event->par.nucleus_kf;
   this->PFMax  = nuwro_event->par.nucleus_kf;
@@ -104,7 +121,7 @@ void FitEvent::NuwroKinematics(){
   // Incoming particles state 0
   for (UInt_t i = 0; i < nuwro_event->in.size(); i++)
     all_particles.push_back( FitParticle(&nuwro_event->in[i], 0) );
-  
+
   // Intermediate Particles state 2
   for (UInt_t i = 0; i < nuwro_event->out.size(); i++)
     all_particles.push_back( FitParticle(&nuwro_event->out[i], 2) );
@@ -119,25 +136,25 @@ void FitEvent::NuwroKinematics(){
 
 };
 #endif //< NuWro ifdef
-//***************************************************       
+//***************************************************
 
 
-//***************************************************   
-// REQUIRED FUNCTIONS FOR GENIE 
+//***************************************************
+// REQUIRED FUNCTIONS FOR GENIE
 #ifdef __GENIE_ENABLED__
 
-//***************************************************   
+//***************************************************
 void FitEvent::SetEventAddress(NtpMCEventRecord** tempevent){
-//***************************************************     
+//***************************************************
 
   this->fType = kGENIE;
   genie_event = *tempevent;
 
 };
 
-//***************************************************   
+//***************************************************
 void FitEvent::GENIEKinematics(){
-//***************************************************   
+//***************************************************
 
   this->ResetEvent();
 
@@ -148,7 +165,7 @@ void FitEvent::GENIEKinematics(){
   this->TotCrs = genie_record->XSec();
 
   // These need to be set somehow...
-  this->fEventNo = 0;  
+  this->fEventNo = 0;
   this->PFSurf = 0;
   this->PFMax  = 0;
   this->TargetA = 0;
@@ -158,7 +175,7 @@ void FitEvent::GENIEKinematics(){
 
   this->fNParticles = genie_record->GetEntries();
 
-  // State defines where, 0 = ALL, 1 = Incoming, 2 = FSI, 3 = Final                                                                                                                                                                        
+  // State defines where, 0 = ALL, 1 = Incoming, 2 = FSI, 3 = Final
   int count = 0;
   GHepParticle * p = 0;
   TObjArrayIter iter(genie_record);
@@ -172,13 +189,13 @@ void FitEvent::GENIEKinematics(){
   return;
 };
 #endif  //< GENIE ifdef
-//***************************************************   
+//***************************************************
 
 
-//***************************************************   
-// Refill all the particle vectors etc for the event                                                                                   
+//***************************************************
+// Refill all the particle vectors etc for the event
 void FitEvent::CalcKinematics(){
-//***************************************************   
+//***************************************************
 
   #ifdef __NEUT_ENABLED__
   if      ( fType == kNEUT  ) this->NeutKinematics();
@@ -208,7 +225,7 @@ void FitEvent::ResetEvent(){
   this->TargetZ = 0.0;
   this->TargetH = 0.0;
   this->Ibound  = 0.0;
-  
+
   this->fNParticles      = 0;
   this->fNFSIParticles   = 0;
   this->fNFinalParticles = 0;
@@ -217,19 +234,17 @@ void FitEvent::ResetEvent(){
   return;
 }
 
-//***************************************************      
+//***************************************************
 FitParticle* FitEvent::PartInfo(UInt_t i){
-//***************************************************      
+//***************************************************
 
   if (i < all_particles.size()){
-    
+
     return &(all_particles.at(i));
-  
+
   } else {
-  
+
     return NULL;
-  
+
   }
 }
-
-ClassImp(FitEvent);

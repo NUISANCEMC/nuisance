@@ -1,12 +1,31 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "InputHandler.h"
 
 //***********************************
 InputHandler::InputHandler(std::string handle, std::string infile_name){
 //***********************************
-  
+
   LOG(SAM) << "Creating InputHandler for " << handle << "..." << std::endl;
   LOG(SAM) << " -> [" << infile_name << "]" << std::endl;
-  
+
   // Read in parameters for handler
   this->maxEvents = FitPar::Config().GetParI("MAXEVENTS");
   isJointInput = false;
@@ -16,13 +35,13 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
   this->signal_event = new BaseFitEvt();
   this->inFile = infile_name;
   this->handleName = handle;
-  
+
   // Parse Infile to allow enviornmental flags
   this->inFile = this->ParseInputFile(this->inFile);
 
   LOG(SAM) << " -> Type  = " << inType   << std::endl;
   LOG(SAM) << " -> Input = " << inFile       << std::endl;
-  
+
   // Automatically check what sort of event file it is
   if (inType.compare("JOINT"))
     this->inRootFile = new TFile(this->inFile.c_str(),"READ");
@@ -34,7 +53,7 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
   else if (!inType.compare("HIST"))   this->ReadHistogramFile();
   else if (!inType.compare("BNSPLN")) this->ReadBinSplineFile();
   else if (!inType.compare("EVSPLN")) this->ReadEventSplineFile();
-  
+
   else if (!inType.compare("JOINT"))  this->ReadJointFile();
   else {
     LOG(FTL) << " -> ERROR: Invalid Event File Type" << std::endl;
@@ -64,7 +83,7 @@ std::string InputHandler::ParseInputFile(std::string inputstring){
   // Parse out the input_type
   const int nfiletypes = 5;
   const std::string filetypes[nfiletypes] = {"NEUT","NUWRO","GENIE","EVSPLN","JOINT"};
-  
+
   for (int i = 0; i < nfiletypes; i++){
     std::string tempTypes = filetypes[i] + ":";
     if (inputstring.find(tempTypes) != std::string::npos){
@@ -83,15 +102,15 @@ std::string InputHandler::ParseInputFile(std::string inputstring){
     if (inputstring.find(tempDir) != std::string::npos){
       std::string event_folder = FitPar::Config().GetParS(filedir[i]);
       inputstring.replace(inputstring.find(tempDir), tempDir.size(), event_folder);
-      
+
       break;
     }
   }
-  
+
   return inputstring;
 }
 
-//******************************************************************** 
+//********************************************************************
 bool InputHandler::CanIGoFast(){
 //********************************************************************
 
@@ -101,12 +120,12 @@ bool InputHandler::CanIGoFast(){
   return false;
 }
 
-//******************************************************************** 
+//********************************************************************
 void InputHandler::ReadEventSplineFile(){
-//******************************************************************** 
+//********************************************************************
 
   LOG(SAM) << " -> Setting up SPLINE inputs"<<std::endl;
-  
+
   // Event Type 7 SPLINES
   this->eventType = 6;
 
@@ -114,7 +133,7 @@ void InputHandler::ReadEventSplineFile(){
   this->fluxHist  = (TH1D*)inRootFile->Get( (this->handleName + "_FLUX").c_str() );
   this->eventHist = (TH1D*)inRootFile->Get( (this->handleName + "_EVT").c_str()  );
   this->xsecHist  = (TH1D*)inRootFile->Get( (this->handleName + "_XSEC").c_str()  );
- 
+
   // Setup Spline Stuff
   this->splhead = (FitSplineHead*) inRootFile->Get( (this->handleName + "_splineHead").c_str() );
   tn = new TChain(Form("%s",(this->handleName + "_splineEvents").c_str()),"");
@@ -133,7 +152,7 @@ void InputHandler::ReadEventSplineFile(){
     spline_list.push_back( *cust_event->dial_coeff );
   }
   sleep(5);
-  
+
   // Set MAXEVENTS CALC Here before we load in splines
   if (maxEvents > 1 and maxEvents < nEvents) {
     LOG(SAM) << " -> Reading only "<<maxEvents<<" events from total spline events."<<std::endl;
@@ -147,7 +166,7 @@ void InputHandler::ReadEventSplineFile(){
     //    base_event->fType=6;
     //    signal_events.push_back( base_event );
   //  }
-  
+
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read SPLINE file"<<std::endl;
   if (LOG_LEVEL(SAM)) this->PrintStartInput();
@@ -156,7 +175,7 @@ void InputHandler::ReadEventSplineFile(){
   std::list<FitSpline*>::iterator spl_iter = this->splhead->SplineObjects.begin();
   for ( ; spl_iter != this->splhead->SplineObjects.end(); spl_iter++){
     FitSpline* spl = (*spl_iter);
-    
+
     LOG(SAM) << " -> Spline " << cnt << ". "
 	     << spl->id   << " "
 	     << spl->form << " "
@@ -165,19 +184,19 @@ void InputHandler::ReadEventSplineFile(){
 	     << "PTS("  << spl->points << ") "
 	     << std::endl;
     cnt++;
-  }  
+  }
 }
 
 
-//******************************************************************** 
+//********************************************************************
 FitSplineHead* InputHandler::GetSplineHead(){
-//******************************************************************** 
+//********************************************************************
   return this->splhead;
 }
 
-//********************************************************************    
+//********************************************************************
 void InputHandler::ReadJointFile(){
-//********************************************************************    
+//********************************************************************
 
   LOG(SAM) << " -> Reading list of inputs from file"<<std::endl;
   isJointInput = true;
@@ -189,7 +208,7 @@ void InputHandler::ReadJointFile(){
 
   while(std::getline(card, line, '\n')){
     std::istringstream stream(line);
-    
+
     // Add normalisation option for second line
     input_lines.push_back(line);
 
@@ -198,8 +217,8 @@ void InputHandler::ReadJointFile(){
   }
 
   card.close();
-  
-  // Loop over input and get the flux files 
+
+  // Loop over input and get the flux files
   // Using a temporary input handler to do this, which is a bit dodge.
   int count_low = 0;
   int temp_type = -1;
@@ -215,7 +234,7 @@ void InputHandler::ReadJointFile(){
     }
 
     temp_type = temp_input->GetType();
-  
+
     TH1D* temp_flux = (TH1D*) temp_input->GetFluxHistogram()->Clone();
     TH1D* temp_evts = (TH1D*) temp_input->GetEventHistogram()->Clone();
     TH1D* temp_xsec = (TH1D*) temp_input->GetXSecHistogram()->Clone();
@@ -232,7 +251,7 @@ void InputHandler::ReadJointFile(){
     this->joint_index_low.push_back(count_low);
     this->joint_index_high.push_back(count_low + temp_events);
     this->joint_index_hist.push_back( (TH1D*) temp_evts->Clone() );
-    
+
     count_low += temp_events;
 
     if (i == 0){
@@ -255,7 +274,7 @@ void InputHandler::ReadJointFile(){
   // Add up the TChains
   tn = new TChain(tree_name.c_str());
   for (UInt_t i = 0; i < input_lines.size(); i++){
-    
+
     // PARSE INPUT
     std::cout<<"Adding new tchain "<<input_lines.at(i)<<std::endl;
     std::string temp_file = this->ParseInputFile(input_lines.at(i));
@@ -281,9 +300,9 @@ void InputHandler::ReadJointFile(){
 #endif
   }
 
-  // Normalise event histogram PDFS for weights                         
+  // Normalise event histogram PDFS for weights
   for (UInt_t i = 0; i < input_lines.size(); i++){
-    
+
     TH1D* temp_hist = (TH1D*)joint_index_hist.at(i)->Clone();
     joint_index_weight.push_back(  double(nEvents) / eventHist->Integral("width") *
 				   joint_index_hist.at(i)->Integral("width") / double(joint_index_high.at(i) - joint_index_low.at(i) ));
@@ -291,7 +310,7 @@ void InputHandler::ReadJointFile(){
 
     temp_hist -> Scale( double(nEvents) / eventHist->Integral("width") );
     temp_hist -> Scale( joint_index_hist.at(i)->Integral("width") / double(joint_index_high.at(i)) );
-    
+
     this->joint_index_hist.at(i) = temp_hist;
   }
 
@@ -306,30 +325,30 @@ void InputHandler::ReadJointFile(){
 
 //********************************************************************
 void InputHandler::ReadNeutFile(){
-//********************************************************************  
+//********************************************************************
 
 #ifdef __NEUT_ENABLED__
-  
+
   LOG(SAM) << " -> Setting up NEUT inputs"<<std::endl;
-  
+
   // Event Type 0 Neut
   this->eventType = 0;
-  
+
   // Get flux histograms NEUT supplies
   this->fluxHist  = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "flux")).c_str());
   this->fluxHist->SetNameTitle((this->handleName+"_FLUX").c_str(), (this->handleName+"; E_{#nu} (GeV)").c_str());
-  
+
   this->eventHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "evtrt")).c_str());
   this->eventHist->SetNameTitle((this->handleName+"_EVT").c_str(), (this->handleName+"; E_{#nu} (GeV); Event Rate").c_str());
 
   this->xsecHist = (TH1D*) eventHist->Clone();
   this->xsecHist->Divide(this->fluxHist);
   this->xsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(),(this->handleName+"_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})").c_str());
-  
+
   // Read in the file once only
   tn = new TChain("neuttree","");
   tn->Add(Form("%s/neuttree",this->inFile.c_str()));
-  
+
   // Assign nvect
   nEvents = tn->GetEntries();
   neut_event = NULL;
@@ -341,18 +360,18 @@ void InputHandler::ReadNeutFile(){
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file"<<std::endl;
   if (LOG_LEVEL(SAM)) this->PrintStartInput();
-  
+
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
   ERR(FTL) << "NEUT Input Not Enabled." << std::endl;
   ERR(FTL) << "Rebuild with --enable-neut or check FitBuild.h!" << std::endl;
   exit(-1);
 #endif
-  
+
   return;
 }
 
-//********************************************************************    
+//********************************************************************
 void InputHandler::ReadNuWroFile(){
 //********************************************************************
 
@@ -385,7 +404,7 @@ void InputHandler::ReadNuWroFile(){
   if (fluxHist and eventHist and !regenFlux){
 
     this->xsecHist = (TH1D*)inRootFile->Get((PlotUtils::GetObjectWithName(inRootFile, "xsec")).c_str());
-    
+
     this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(), (this->handleName + "_FLUX").c_str());
     this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(), (this->handleName + "_EVT").c_str());
     this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(), (this->handleName + "_XSEC").c_str());
@@ -416,7 +435,7 @@ void InputHandler::ReadNuWroFile(){
       else break;
     }
 
-    
+
     std::cout<<"Grabbing count "<<count<<std::endl;
     double nuwro_Elow  = contents[count];
     double nuwro_Ehigh = contents[count+1];
@@ -430,7 +449,7 @@ void InputHandler::ReadNuWroFile(){
 
     this->eventHist = new TH1D("nuwro_evt", "nuwro_evt; E_{#nu} (GeV);Events [#times 10^{-38}]",
 			       nuwro_NBins, nuwro_Elow/1000.0, nuwro_Ehigh/1000.0);
-    
+
     this->xsecHist = new TH1D("nuwro_xsec", "nuwro_xsec; E_{#nu} (GeV);#sigma [#times 10^{-38}]",
 			      nuwro_NBins, nuwro_Elow/1000.0, nuwro_Ehigh/1000.0);
 
@@ -458,7 +477,7 @@ void InputHandler::ReadNuWroFile(){
       // Get Variables
       Enu = nuwro_event->in[0].E()/1000.0;
       TotXSec = nuwro_event->weight;
-      
+
       // Fill a flux and xsec histogram
       this->eventHist->Fill(Enu);
       this->xsecHist->Fill(Enu, TotXSec);
@@ -481,7 +500,7 @@ void InputHandler::ReadNuWroFile(){
 
     this->eventHist->Scale( 1.0 / eventHist->Integral() ); // Convert to PDF
     this->eventHist->Scale( this->fluxHist->Integral() * AvgXSec ); // Convert to Proper Event Rate
-    
+
     this->xsecHist->Add(eventHist); // Get Event Rate Plot
     this->xsecHist->Divide(this->fluxHist); // Make XSec Plot
 
@@ -500,23 +519,23 @@ void InputHandler::ReadNuWroFile(){
     TFile* temp_save_file = new TFile(this->inFile.c_str(), "UPDATE");
     temp_save_file->cd();
 
-    this->fluxHist->Write("nuwro_flux", kOverwrite);
-    this->eventHist->Write("nuwro_evtrt", kOverwrite);
-    this->xsecHist->Write("nuwro_xsec", kOverwrite);
+    this->fluxHist->Write("nuwro_flux", TObject::kOverwrite);
+    this->eventHist->Write("nuwro_evtrt", TObject::kOverwrite);
+    this->xsecHist->Write("nuwro_xsec", TObject::kOverwrite);
 
     temp_save_file->Close();
     delete temp_save_file;
-    
+
     this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(), (this->handleName + "_FLUX").c_str());
     this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(), (this->handleName + "_EVT").c_str());
     this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(), (this->handleName + "_XSEC").c_str());
-    
+
   }
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NUWRO file"<<std::endl;
   if (LOG_LEVEL(SAM)) this->PrintStartInput();
-  
+
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
   ERR(FTL) << "NuWro Input Not Enabled." << std::endl;
@@ -534,7 +553,7 @@ void InputHandler::ReadGenieFile(){
 //********************************************************************
 
 #ifdef __GENIE_ENABLED__
-  
+
   // Event Type 1 NuWro
   this->eventType = 5;
 
@@ -554,7 +573,7 @@ void InputHandler::ReadGenieFile(){
 
   double average_xsec = 0.0;
   int total_events    = 0;
-  
+
   // Setup the TChain for nuwro event tree
   tn = new TChain("gtree");
   tn->AddFile(this->inFile.c_str());
@@ -601,7 +620,7 @@ void InputHandler::ReadGenieFile(){
 
   this->eventHist->SetNameTitle((this->handleName+"_EVT").c_str(),(this->handleName+"_EVT;E_{#nu} (GeV); Events (1#times10^{-38})").c_str());
   this->xsecHist->SetNameTitle((this->handleName+"_XSEC").c_str(),(this->handleName+"_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})").c_str());
-  
+
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
   ERR(FTL) << "GENIE Input Not Enabled." << std::endl;
@@ -612,10 +631,10 @@ void InputHandler::ReadGenieFile(){
   return;
 }
 
-//******************************************************************** 
+//********************************************************************
 void ReadBinSplineFile(){
-//******************************************************************** 
-  
+//********************************************************************
+
   // Bin Splines are saved as one event for each histogram bin.
   // So just read in as normal event splines and it'll all get sorted easily.
 
@@ -624,9 +643,9 @@ void ReadBinSplineFile(){
 
 
 
-//********************************************************************  
+//********************************************************************
 void ReadHistogramFile(){
-//********************************************************************  
+//********************************************************************
 
   // Convert the raw histogram into a series of events with X variables
   // So we don't have to pass stuff upsteam
@@ -634,18 +653,18 @@ void ReadHistogramFile(){
 }
 
 
-//******************************************************************** 
+//********************************************************************
 void ReadNuanceFile(){
-//******************************************************************** 
-  
+//********************************************************************
+
 
 }
 
-  
+
 //********************************************************************
 void InputHandler::PrintStartInput(){
 //********************************************************************
-  
+
   LOG(SAM) << " -> Total events = " << nEvents<<std::endl;
   LOG(SAM) << " -> Energy Range = " << fluxHist->GetXaxis()->GetXmin()
 	   << "-" << fluxHist->GetXaxis()->GetXmax() <<" GeV" << std::endl;
@@ -659,7 +678,7 @@ void InputHandler::PrintStartInput(){
 	   << xsecHist->Integral(0, xsecHist->GetNbinsX(), "width") << std::endl;
 
   if (eventType == 6) return;
-  
+
   // Get First event info
   tn->GetEntry(0);
   cust_event->CalcKinematics();
@@ -669,21 +688,21 @@ void InputHandler::PrintStartInput(){
 
 }
 
-//********************************************************************     
+//********************************************************************
 std::string InputHandler::GetInputStateString(){
 //********************************************************************
-  
+
   std::ostringstream state;
-  state << "T"  << eventType << "_PDG" << cust_event->PartInfo(0)->fPID 
+  state << "T"  << eventType << "_PDG" << cust_event->PartInfo(0)->fPID
 	<< "_Z" << cust_event->TargetZ << "_A" << cust_event->TargetA;
 
   return state.str();
 }
 
 
-//******************************************************************** 
+//********************************************************************
 void InputHandler::ReadEvent(unsigned int i){
-//******************************************************************** 
+//********************************************************************
 
   bool using_events = (eventType == 0 or eventType==5 or eventType==1 or eventType==kEVTSPLINE);
 
@@ -694,17 +713,17 @@ void InputHandler::ReadEvent(unsigned int i){
 
     if (eventType != kEVTSPLINE)
       cust_event->CalcKinematics();
-    
+
     cust_event->Index = i;
     cur_entry = i;
     cust_event->InputWeight = GetInputWeight(i);
-    
+
   } else {
-    this->GetTreeEntry(i);    
+    this->GetTreeEntry(i);
   }
 }
 
-//********************************************************************   
+//********************************************************************
 void InputHandler::GetTreeEntry(const Long64_t i){
 //********************************************************************
 
@@ -712,19 +731,19 @@ void InputHandler::GetTreeEntry(const Long64_t i){
     tn->GetEntry(i);
   else
     (*(cust_event->dial_coeff)) = spline_list.at(i);
-  
+
   cur_entry = i;
   cust_event->InputWeight = GetInputWeight(i);
-  
+
 }
 
-//********************************************************************   
+//********************************************************************
 double InputHandler::GetInputWeight(const int entry){
-//********************************************************************   
+//********************************************************************
 
   if (!isJointInput) return 1.0;
   double weight = 1.0;
-  
+
   // Find Histogram
   for (UInt_t j = 0; j < joint_index_low.size(); j++){
     if (entry >= joint_index_low.at(j) and entry < joint_index_high.at(j)){
@@ -736,12 +755,12 @@ double InputHandler::GetInputWeight(const int entry){
   return weight;
 }
 
-//******************************************************************** 
+//********************************************************************
 int InputHandler::GetGenEvents(){
-//******************************************************************** 
+//********************************************************************
 
   if (eventType == 6)  return this->splhead->ngen_events;
-  else return this->GetNEvents(); 
+  else return this->GetNEvents();
 }
 
 
@@ -757,14 +776,12 @@ double InputHandler::TotalIntegratedFlux(double low, double high, std::string in
   return integral;
 };
 
-//********************************************************************  
+//********************************************************************
 double InputHandler::PredictedEventRate(double low, double high, std::string intOpt){
 //********************************************************************
 
   int minBin = this->fluxHist->GetXaxis()->FindBin(low);
   int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
-  
+
   return this->eventHist->Integral(minBin, maxBin+1, intOpt.c_str());
 }
-
-ClassImp(InputHandler);

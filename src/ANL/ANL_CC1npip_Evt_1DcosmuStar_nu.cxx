@@ -21,7 +21,7 @@
 
 // The constructor
 ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   measurementName = "ANL_CC1npip_Evt_1DcosmuStar_nu";
   plotTitles = "; cos(#theta*); Number of events";
   EnuMin = 0;
@@ -47,7 +47,7 @@ ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(std::string input
 
 
 void ANL_CC1npip_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
-  
+
   // set up the 4-vectors from NEUT
   TLorentzVector Pnu = event->PartInfo(0)->fP;
   TLorentzVector Pin = event->PartInfo(1)->fP;
@@ -55,7 +55,7 @@ void ANL_CC1npip_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip;
   TLorentzVector Pmu;
 
-  // Loop over the particle stack to find relevant particles 
+  // Loop over the particle stack to find relevant particles
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
   for (int j = 0; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
@@ -78,7 +78,7 @@ void ANL_CC1npip_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   Pmu.Boost(-CMS.BoostVector());
   // Boost the neutrino forwards
   Pnu.Boost(CMS.BoostVector());
-  
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) {
     // Find angle in CMS frame
@@ -96,9 +96,9 @@ bool ANL_CC1npip_Evt_1DcosmuStar_nu::isSignal(FitEvent *event) {
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false;
 
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false; 
+  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
   int pipCnt = 0;
   int lepCnt = 0;

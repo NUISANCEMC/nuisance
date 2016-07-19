@@ -45,24 +45,23 @@
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
-/*!                                                                                                                                                                                                   
- *  \addtogroup FitBase                                                                                                                                                                               
- *  @{                                                                                                                                                                                              
+/*!
+ *  \addtogroup FitBase
+ *  @{
  */
 
 namespace FitPar{
-  
-  unsigned int log_verb = 5; //!< Current VERBOSITY
-  unsigned int err_verb = 3; //!< Current ERROR VERBOSITY
-  bool use_colors = true;    //!< Use BASH Terminal Colors Flag
-  bool super_rainbow_mode = false; //!< For when fitting gets boring.
-  unsigned int super_rainbow_mode_colour = 0; 
+  extern unsigned int log_verb; //!< Current VERBOSITY
+  extern unsigned int err_verb; //!< Current ERROR VERBOSITY
+  extern bool use_colors; //!< Use BASH Terminal Colors Flag
+  extern bool super_rainbow_mode; //!< For when fitting gets boring.
+  extern unsigned int super_rainbow_mode_colour;
 }
 
 
-std::ostream* logStream(&std::cout);
-std::ostream* errStream(&std::cerr);
-std::ofstream nullStream;
+extern std::ostream* logStream;
+extern std::ostream* errStream;
+extern std::ofstream nullStream;
 
 /// Fitter VERBOSITY Enumerations
 /// These go through the different depths of the fitter.
@@ -74,7 +73,7 @@ std::ofstream nullStream;
 /// 4 REC - Output during each reconfigure. Percentage progress etc.
 /// 5 SIG - Output during every signal event that is found.
 /// 6 EVT - Output during every event.
-/// -1 DEB - Will print only debugging info wherever a LOG(DEB) statement was made   
+/// -1 DEB - Will print only debugging info wherever a LOG(DEB) statement was made
 enum log_levels { DEB=-1, QUIET, FIT, MIN, SAM, REC, SIG, EVT };
 
 /// Fitter ERROR VERBOSITY Enumerations
@@ -95,7 +94,7 @@ void ERR_VERB(std::string verb);
 /// Logging Function. Use as a string stream.  e.g. LOG(SAM) << "This sample is dope." << std::endl;
 std::ostream& LOG(int level);
 
-//! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;          
+//! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;
 std::ostream& ERR(int level);
 
 /*! @} */

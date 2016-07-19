@@ -36,6 +36,10 @@ MINERvA_CCQE_XSec_1DQ2_joint.cxx
 MINERvA_CC1pip_XSec_1Dth_nu.cxx
 MINERvA_CCQE_XSec_1DQ2_nu.cxx
 MINERvA_CC1pip_XSec_1DTpi_20deg_nu.cxx
+MINERvA_CCinc_XSec_1Dx_ratio.cxx
+MINERvA_CCinc_XSec_1DEnu_ratio.cxx
+MINERvA_CCinc_XSec_1Dx_nu.cxx
+MINERvA_CCinc_XSec_1DEnu_nu.cxx
 )
 
 set(HEADERFILES
@@ -58,6 +62,10 @@ MINERvA_CCQE_XSec_1DQ2_joint.h
 MINERvA_CC1pip_XSec_1Dth_nu.h
 MINERvA_CCQE_XSec_1DQ2_nu.h
 MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h
+MINERvA_CCinc_XSec_1Dx_ratio.h
+MINERvA_CCinc_XSec_1DEnu_ratio.h
+MINERvA_CCinc_XSec_1Dx_nu.h
+MINERvA_CCinc_XSec_1DEnu_nu.h
 )
 
 set(LIBNAME expMINERvA)

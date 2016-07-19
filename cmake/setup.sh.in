@@ -25,12 +25,37 @@ if [[ "@USE_NuWro@" != "0" ]]; then
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
     export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
   fi
+  export NUWRO="@NUWRO@"
+fi
+
+if [[ "@NEED_PYTHIA6@" != "0" ]]; then
+  echo "[INFO]: Adding PYTHIA6 library paths to the environment."
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@PYTHIA6@:"* ]]; then
+    export LD_LIBRARY_PATH=@PYTHIA6@:$LD_LIBRARY_PATH
+  fi
+  export PYTHIA6="@PYTHIA6@"
 fi
 
 if [[ "@USE_GENIE@" != "0" ]]; then
   echo "[INFO]: Adding GENIE paths to the environment."
+
+  export GENIE="@GENIE@"
+
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LHAPDF_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LHAPDF_LIB@:$LD_LIBRARY_PATH
+  fi
+
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LIBXML2_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LIBXML2_LIB@:$LD_LIBRARY_PATH
+  fi
+
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LOG4CPP_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LOG4CPP_LIB@:$LD_LIBRARY_PATH
+  fi
 fi
 
 if [[ "@USE_NIWG@" != "0" ]]; then
   echo "[INFO]: Adding NIWG paths to the environment."
 fi
+
+export EXT_FIT="@CMAKE_SOURCE_DIR@"

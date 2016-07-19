@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #include "GeneratorUtils.h"
 
 #ifdef __NEUT_ENABLED__
@@ -93,11 +112,11 @@ void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
 
   // neutroot fills a dummy object for events with no FSI to prevent memory leak when
   // reading the TTree, so check for it here
-    
+
   if ( (int)nvect->NfsiVert() == 1 ) { // An event with FSI must have at least two vertices
     //    if (nvect->NfsiPart()!=1 || nvect->Fsiprob!=-1)
       //      cout << "Warning: T2KNeutUtils::fill_neut_commons(TTree) NfsiPart!=1 or Fsiprob!=-1 when NfsiVert==1" << endl;
-      
+
     fsihist_.nvert = 0;
     fsihist_.nvcvert = 0;
     fsihist_.fsiprob = 1;
@@ -110,7 +129,7 @@ void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
       fsihist_.posvert[ivert][1] = (float)nvect->FsiVertInfo(ivert)->fPos.Y();
       fsihist_.posvert[ivert][2] = (float)nvect->FsiVertInfo(ivert)->fPos.Z();
     }
-      
+
     fsihist_.nvcvert = nvect->NfsiPart();
     for (int ip=0; ip<fsihist_.nvcvert; ip++) {
       fsihist_.abspvert[ip] = (float)nvect->FsiPartInfo(ip)->fMomLab;
@@ -130,18 +149,18 @@ void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
   neutcrscom_.crsz = nvect->Crsz;
   neutcrscom_.crsphi = nvect->Crsphi;
   neutcrscom_.crsq2 = nvect->Crsq2;
-    
+
   neuttarget_.numbndn = nvect->TargetA - nvect->TargetZ;
   neuttarget_.numbndp = nvect->TargetZ;
   neuttarget_.numfrep = nvect->TargetH;
   neuttarget_.numatom = nvect->TargetA;
   posinnuc_.ibound = nvect->Ibound;
-    
+
   // put empty nucleon FSI history (since it is not saved in the NeutVect format)
   //Comment out as NEUT does not have the necessary proton FSI information yet
   //  nucleonfsihist_.nfnvert = 0;
-  //  nucleonfsihist_.nfnstep = 0; 
-  
+  //  nucleonfsihist_.nfnstep = 0;
+
 
 }
 #endif
@@ -175,13 +194,13 @@ niwg::rew::NIWGEvent * GeneratorUtils::GetNIWGEvent(NeutVect* nvect)
 
   return fDummyNIWGEvent;
 }
-#endif // neut enabled     
+#endif // neut enabled
 
 
 #ifdef __NUWRO_ENABLED__
-//*************************************************** 
+//***************************************************
 int GeneratorUtils::ConvertNuwroMode (event * e)
-//*************************************************** 
+//***************************************************
 {
 
 
@@ -233,7 +252,7 @@ int GeneratorUtils::ConvertNuwroMode (event * e)
   }
 
 
-  if (e->flag.res)		//rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon, multipiony  
+  if (e->flag.res)		//rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon, multipiony
     {
 
       Int_t liczba_pionow, liczba_kaonow;
@@ -382,10 +401,10 @@ int GeneratorUtils::ConvertNuwroMode (event * e)
 
     }
 
-  if (e->flag.coh)		// koherentne  oddziaływanie tylko na O(16) 
+  if (e->flag.coh)		// koherentne  oddziaływanie tylko na O(16)
     {
       Int_t _target;
-      _target = e->par.nucleus_p + e->par.nucleus_n;	// liczba masowa  O(16) 
+      _target = e->par.nucleus_p + e->par.nucleus_n;	// liczba masowa  O(16)
 
       if (_target == 16)
 	{
@@ -406,7 +425,7 @@ int GeneratorUtils::ConvertNuwroMode (event * e)
 	}
     }
 
-  // gleboko nieelastyczne rozpraszanie               
+  // gleboko nieelastyczne rozpraszanie
   if (e->flag.dis)
     {
       if (e->flag.anty)

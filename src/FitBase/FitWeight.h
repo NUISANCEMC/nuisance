@@ -1,3 +1,22 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef FIT_WEIGHT_2
 #define FIT_WEIGHT_2
 
@@ -13,7 +32,7 @@
 #include <vector>
 #include <map>
 
-#include "FitBuild.h"
+
 #include "TObject.h"
 #include "FitEvent.h"
 #include "TF1.h"
@@ -106,23 +125,23 @@ using namespace genie::rew;
 #include "TGraph2D.h"
 #include "GeneratorUtils.h"
 
-enum RWDialType{
+enum RWDialType {
   kNeutDial=0,
   kNIWGDial,
   kNuWroDial,
   kGenieDial,
   kCustomDial,
   kNormDial
-} RWDialType_t;
+};
 
 
 //******************************************
 class FitWeight {
-//****************************************** 
+//******************************************
 
  public:
 
-  FitWeight(std::string rw_name, std::string inputfile); // Open a fit result file and grab the ttree and setup like that.  
+  FitWeight(std::string rw_name, std::string inputfile); // Open a fit result file and grab the ttree and setup like that.
   FitWeight(std::string rw_name="FitWeight");
   ~FitWeight(){};
 
@@ -130,7 +149,7 @@ class FitWeight {
   int GetRWEnum(int dial_enum);
 
   void IncludeDial(std::string name, int type, double startval=0.0);
-  
+
   void SetDialValue(std::string name, double val);
   void SetDialValue(int dial, double val);
 
@@ -155,9 +174,9 @@ class FitWeight {
   double GetSampleNorm(std::string samplename);
 
   double CalcWeight(BaseFitEvt* evt);
-  
+
   void PrintState();
-  
+
   void Reconfigure(bool silent=false);
 
 
@@ -173,7 +192,7 @@ class FitWeight {
   niwg::rew::NIWGReWeight* niwg_rw;
 #endif
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK     
+#ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK
   void SetupNuwroRW();
   nuwro::rew::NuwroReWeight* nuwro_rw;
 #endif
@@ -187,10 +206,10 @@ class FitWeight {
 
 #ifdef __GENIE_ENABLED__ // --- GENIE BLOCK
   void SetupGenieRW();
-  genie::rew::GReWeight  *genie_rw; //!< Genie RW Object   
+  genie::rew::GReWeight  *genie_rw; //!< Genie RW Object
 #endif
 
-  
+
 
   // SPLINE FUNCTIONS ------------
   FitSplineHead* GetSplineHeader(){ return spline_head; };
@@ -213,7 +232,7 @@ class FitWeight {
  private:
 
   int norm_enum;
-  
+
   vector<std::string> dial_names;
   vector<int> dial_enums;
   vector<double> dial_values;
@@ -224,9 +243,9 @@ class FitWeight {
   bool dial_changed;
   bool using_neut, using_genie, using_niwg, using_t2k, using_nuwro;
   bool neut_changed, genie_changed, niwg_changed, nuwro_changed, t2k_changed;
-  
+
   FitSplineHead* spline_head;
-  
+
 };
 
 // GLOBAL FUNCTIONS FOR PAR CONV ----

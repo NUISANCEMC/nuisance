@@ -1,7 +1,25 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NuFiX.
+*
+*    NuFiX is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NuFiX is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
 #ifndef FITEVENT_H_SEEN
 #define FITEVENT_H_SEEN
 
-#include "FitBuild.h"
 #include "TLorentzVector.h"
 #include "FitParticle.h"
 #include "TSpline.h"
@@ -15,19 +33,19 @@
 #include "event1.h"
 #endif
 
-#ifdef __GENIE_ENABLED__ 
-#include "EVGCore/EventRecord.h" 
-#include "GHEP/GHepRecord.h" 
-#include "Ntuple/NtpMCEventRecord.h" 
+#ifdef __GENIE_ENABLED__
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepRecord.h"
+#include "Ntuple/NtpMCEventRecord.h"
 using namespace genie;
-#endif 
+#endif
 #include "TArrayD.h"
 #include "BaseFitEvt.h"
 #include "GeneratorUtils.h"
 
-/*!      
- *  \addtogroup FitBase      
- *  @{   
+/*!
+ *  \addtogroup FitBase
+ *  @{
  */
 
 /*! FitEvent Class
@@ -36,7 +54,7 @@ using namespace genie;
 
 //! Converts NEUT/NuWro/GENIE events to a comman format straight from the tree
 class FitEvent : public BaseFitEvt {
-  
+
  public:
 
   //! Default Consstructors. Everything is set to NULL
@@ -47,7 +65,7 @@ class FitEvent : public BaseFitEvt {
   //! Default destructor
   ~FitEvent(){
   };
-  
+
   // Generator specific functions
   // Each event type needs a way to set the event address from the tree
   // Then Neut Kinematics sets up the overall information for the event (Mode, NParticles)
@@ -57,25 +75,25 @@ class FitEvent : public BaseFitEvt {
   */
 
 #ifdef __NEUT_ENABLED__
-  
+
   //! Constructor assigns event address to NeutVect memory.
   FitEvent(NeutVect* event){ this->SetEventAddress(&event); };
-  
+
   //! Set event address to NeutVect memory
   void SetEventAddress(NeutVect** tempevent);
-  
+
   //! Convert NeutVect to common format
   void NeutKinematics();
 #endif
-  
+
 
   /*
     NUWRO
   */
-  
+
 #ifdef __NUWRO_ENABLED__
 
-  //! Constructor assigns event address to NuWro event class memory. 
+  //! Constructor assigns event address to NuWro event class memory.
   FitEvent(event* tempEvent){ this->SetEventAddress(&tempEvent); };
 
   //! Set event address to NuWro event class memory
@@ -90,10 +108,10 @@ class FitEvent : public BaseFitEvt {
   /*
     GENIE
   */
-  
+
 #ifdef __GENIE_ENABLED__
 
-  //! Constructor assigns event address to GENIE event class memory.    
+  //! Constructor assigns event address to GENIE event class memory.
   FitEvent(NtpMCEventRecord* tempevent){this->SetEventAddress(&tempevent);};
 
   //! Set event address to GENIE event record memory
@@ -101,7 +119,7 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NtpMCEventRecord** tempevent);
 
   //! Convert GENIE event class to common format
-  void GENIEKinematics(); 
+  void GENIEKinematics();
 #endif
 
 
@@ -110,20 +128,20 @@ class FitEvent : public BaseFitEvt {
   */
 
   //! Run event convertor, calls relevent event generator kinematic functions.
-  void CalcKinematics(); 
+  void CalcKinematics();
 
   //! Reset the event to NULL
-  void ResetEvent();     
-  
+  void ResetEvent();
+
   // Access Functions
-  //! Return Any FitParticle from event   
+  //! Return Any FitParticle from event
   FitParticle* PartInfo(UInt_t i);
-  
-  //! Return total particle number             
+
+  //! Return total particle number
   UInt_t Npart(){return this->fNParticles;};
 
   //! Return final state particle count.
-  UInt_t NFinalpart(){return this->fNFinalParticles;};  
+  UInt_t NFinalpart(){return this->fNFinalParticles;};
 
   // Header Variables
   // protected: // To Make things easier everything is accessible. Not a great standard.
@@ -134,7 +152,7 @@ class FitEvent : public BaseFitEvt {
   UInt_t fNIncomingParticles; //!< Total Number of Starting particles
   UInt_t fNFinalParticles; //!< Total Number of Final Particles
   UInt_t fCurrPartIndex; //!< Current index of particle in iteration
-  
+
   FitParticle* fit_particle; //!< Pointer to the currently created fit_particle
   std::vector<FitParticle> all_particles; //!< vector of all fit particles
 
@@ -145,15 +163,15 @@ class FitEvent : public BaseFitEvt {
   UInt_t   TargetZ; //!< Target Nucleus Charge
   UInt_t   TargetH; //!< Target Free Protons
   UInt_t   Ibound;  //!< Is target bound
-  
+
   UInt_t Nparticles; //!< Number of particles
   UInt_t Nprimary; //!< Number of primary particles
-  
+
   Double_t weight; //!< event weight
   Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
 
   // True Generator events: Just Pointers that can be set.
-  
+
 
   // ACCESS FUNCTIONS
   double Enu(){ return this->PartInfo(0)->fP.E(); };
@@ -176,15 +194,12 @@ class FitEvent : public BaseFitEvt {
   /* double Tlep(); */
   /* double Plep(); */
   /* double PDGlep(); */
-  
+
   /* double Coslep(); */
   /* double Thetalep(); */
-  
+
   /* int Npions(); */
   /* int Npiplus(); */
-  
-
-  ClassDef(FitEvent, 1);
 };
 
 

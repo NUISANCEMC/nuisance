@@ -1,21 +1,3 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-################################################################################
-#    This file is part of NuFiX.
-#
-#    NuFiX is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    NuFiX is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
 if ( NOT DEFINED ENV{ROOTSYS} )
   cmessage (FATAL_ERROR "$ROOTSYS is not defined, please set up root first.")
 else()
@@ -34,9 +16,17 @@ else()
   # include(${CMAKE_SOURCE_DIR}/cmake/GenROOTDictionary.cmake)
 endif()
 
-execute_process (COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process (COMMAND root-config --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process (COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --evelibs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND root-config
+  --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
+  set(ROOT_LD_FLAGS "${ROOT_LD_FLAGS} -lEGPythia6 ")
+endif()
+
 cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 cmessage ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
 cmessage ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
