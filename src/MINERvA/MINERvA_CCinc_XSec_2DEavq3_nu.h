@@ -62,6 +62,7 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
   // Cuts
   bool hadroncut;
   bool useq3true;
+  bool splitMEC_PN_NN;
 };
   
 #endif

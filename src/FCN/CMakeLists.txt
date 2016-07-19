@@ -18,16 +18,12 @@
 ################################################################################
 set(IMPLFILES
 minimizerFCN.cxx
-nodeFCN.cxx
 SampleList.cxx
-splinesFCN.cxx
 )
 
 set(HEADERFILES
 minimizerFCN.h
-nodeFCN.h
 SampleList.h
-splinesFCN.h
 )
 
 set(LIBNAME FCN)
@@ -41,10 +37,20 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+
+include_directories(${CMAKE_SOURCE_DIR}/src/ANL)
+include_directories(${CMAKE_SOURCE_DIR}/src/BNL)
+include_directories(${CMAKE_SOURCE_DIR}/src/FNAL)
+include_directories(${CMAKE_SOURCE_DIR}/src/GGM)
+include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
+include_directories(${CMAKE_SOURCE_DIR}/src/MiniBooNE)
+include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
+
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
+include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
+
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")

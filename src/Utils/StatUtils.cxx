@@ -51,7 +51,8 @@ Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask){
   for (int i = 0; i < calc_data->GetNbinsX(); i++) {
     
     // Ignore bins with zero data or zero bin error
-    if (calc_data->GetBinError(i+1) <= 0.0 || calc_data->GetBinContent(i+1) == 0.0) continue;
+    if (calc_data->GetBinError(i+1) <= 0.0 || 
+	calc_data->GetBinContent(i+1) == 0.0) continue;
 
     // Take mc data difference
     double diff = calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1);
@@ -68,7 +69,8 @@ Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask){
 };
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc, TH2I* map, TH2I* mask){
+Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc, 
+				    TH2I* map, TH2I* mask){
 //*******************************************************************
 
   // Generate a simple map
@@ -91,7 +93,8 @@ Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc, TH2I* map, TH2I* mask)
 };
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask){
+Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, 
+				   TMatrixDSym* invcov, TH1I* mask){
 //*******************************************************************
 
   Double_t Chi2 = 0.0;
@@ -136,16 +139,30 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH
       
       if (calc_data->GetBinContent(i+1) != 0 || calc_mc->GetBinContent(i+1) != 0) {
 
-        LOG(DEB) << "i j = "<<i<<" "<<j<<std::endl;
-        LOG(DEB)<<"Calc_data mc i = "<<calc_data->GetBinContent(i+1)<<" "<<calc_mc->GetBinContent(i+1)<<"  Dif = "<<( calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1) )<<std::endl;
-        LOG(DEB)<<"Calc_data mc i = "<<calc_data->GetBinContent(j+1)<<" "<<calc_mc->GetBinContent(j+1)<<"  Dif = "<<( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) )<<std::endl;
+        LOG(DEB)<< "i j = "<<i<<" "<<j<<std::endl;
+        LOG(DEB)<<"Calc_data mc i = "<<calc_data->GetBinContent(i+1)
+		<<" "<<calc_mc->GetBinContent(i+1)
+		<<"  Dif = "
+		<<( calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1) )
+		<<std::endl;
+
+        LOG(DEB)<<"Calc_data mc i = "<<calc_data->GetBinContent(j+1)
+		<<" "<<calc_mc->GetBinContent(j+1)
+		<<"  Dif = "
+		<<( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) )
+		<<std::endl;
+
         LOG(DEB)<<"Covar = "<<    (*calc_cov)(i, j) <<std::endl;
         
-        LOG(DEB)<<"Cont chi2 = "<<( ( calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1) ) * (*calc_cov)(i, j) * 1E76 *   ( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) ) ) \
+        LOG(DEB)<<"Cont chi2 = " \
+		<<( ( calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1) ) \
+		    * (*calc_cov)(i, j) \
+		    * 1E76 \
+		    *   ( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) ) ) 
 	      <<" "<<Chi2<<std::endl;
 
         Chi2 += ( ( calc_data->GetBinContent(i+1) - calc_mc->GetBinContent(i+1) ) * \
-		(*calc_cov)(i, j) * 1E76                                        * \
+		(*calc_cov)(i, j) * 1E76        * \
 		( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) ) );
 
       } else {
@@ -170,7 +187,8 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH
 
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map, TH2I* mask){
+Double_t StatUtils::GetChi2FromCov( TH2D* data, TH2D* mc, 
+				    TMatrixDSym* invcov, TH2I* map, TH2I* mask){
 //*******************************************************************
 
   // Generate a simple map
@@ -183,7 +201,7 @@ Double_t StatUtils::GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, T
   TH1D* mc_1D   = MapToTH1D(mc,   map);
   TH1I* mask_1D = MapToMask(mask, map);
   
-  // Calculate 1D chi2 rfom 1D Plots
+  // Calculate 1D chi2 from 1D Plots
   Double_t Chi2 = StatUtils::GetChi2FromCov(data_1D, mc_1D,  invcov, mask_1D);
 
   // CleanUp
@@ -195,7 +213,8 @@ Double_t StatUtils::GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, T
 }
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromSVD( TH1D* data, TH1D* mc, TMatrixDSym* cov,    TH1I* mask){
+Double_t StatUtils::GetChi2FromSVD( TH1D* data, TH1D* mc, 
+				    TMatrixDSym* cov,  TH1I* mask){
 //*******************************************************************
 
   Double_t Chi2 = 0.0;
@@ -243,7 +262,8 @@ Double_t StatUtils::GetChi2FromSVD( TH1D* data, TH1D* mc, TMatrixDSym* cov,    T
 
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromSVD( TH2D* data, TH2D* mc, TMatrixDSym* cov,    TH2I* map, TH2I* mask){
+Double_t StatUtils::GetChi2FromSVD( TH2D* data, TH2D* mc, 
+				    TMatrixDSym* cov,    TH2I* map, TH2I* mask){
 //*******************************************************************
 
   // Generate a simple map
@@ -294,8 +314,11 @@ Double_t StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask){
 
     // Take mc data difference          
     Chi2 +=  2 * (mc - dt + ( (dt+0.) * log((dt+0.) / (mc+0.)) ));
-    //    Chi2 +=  (mc - dt)*(mc-dt)/(dt);
-    LOG(REC)<<"Evt Chi2 cont = "<<i<<" "<<mc<<" "<<dt<<" "<<2 * (mc - dt + (dt+0.) * log((dt+0.) / (mc+0.)))<<" "<<Chi2<<std::endl;
+
+    LOG(REC)<<"Evt Chi2 cont = "<<i<<" "
+	    <<mc<<" "<<dt<<" "
+	    <<2 * (mc - dt + (dt+0.) * log((dt+0.) / (mc+0.)))
+	    <<" "<<Chi2<<std::endl;
   }
 
   // cleanup
@@ -326,7 +349,7 @@ Double_t StatUtils::GetChi2FromEventRate(TH2D* data, TH2D* mc, TH2I* map, TH2I* 
   delete mc_1D;
   delete mask_1D;
 
-  return 0.0;
+  return Chi2;
 }
 
 
@@ -335,7 +358,10 @@ Double_t StatUtils::GetChi2FromEventRate(TH2D* data, TH2D* mc, TH2I* map, TH2I* 
 //*******************************************************************
 Double_t StatUtils::GetLikelihoodFromDiag(TH1D* data, TH1D* mc, TH1I* mask){
 //*******************************************************************
-
+  // Currently just a placeholder!
+  (void) data;
+  (void) mc;
+  (void) mask;
   return 0.0;
 };
 
@@ -343,19 +369,19 @@ Double_t StatUtils::GetLikelihoodFromDiag(TH1D* data, TH1D* mc, TH1I* mask){
 Double_t StatUtils::GetLikelihoodFromDiag(TH2D* data, TH2D* mc, TH2I* map, TH2I* mask){
 //*******************************************************************
 
-  // Generate a simple map                                                                                                                                                                                                                 
+  // Generate a simple map            
   if (!map)
     map = StatUtils::GenerateMap(data);
 
-  // Convert to 1D Histograms                                                                                                                                                                                                              
+  // Convert to 1D Histograms   
   TH1D* data_1D = MapToTH1D(data, map);
   TH1D* mc_1D   = MapToTH1D(mc,   map);
   TH1I* mask_1D = MapToMask(mask, map);
 
-  // Calculate from 1D                                                                                                                                                                                                                      
+  // Calculate from 1D      
   Double_t MLE = StatUtils::GetLikelihoodFromDiag(data_1D, mc_1D, mask_1D);
 
-  // CleanUp                                                                                                                                                                                                                               
+  // CleanUp               
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
@@ -367,9 +393,11 @@ Double_t StatUtils::GetLikelihoodFromDiag(TH2D* data, TH2D* mc, TH2I* map, TH2I*
 //*******************************************************************
 Double_t StatUtils::GetLikelihoodFromCov( TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask){
 //*******************************************************************
-  
-
-
+  // Currently just a placeholder !
+  (void) data;
+  (void) mc;
+  (void) invcov;
+  (void) mask;
 
   return 0.0;
 };
@@ -378,19 +406,19 @@ Double_t StatUtils::GetLikelihoodFromCov( TH1D* data, TH1D* mc, TMatrixDSym* inv
 Double_t StatUtils::GetLikelihoodFromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map, TH2I* mask){
 //*******************************************************************
 
-  // Generate a simple map                                                                                                                                                                                                                  
+  // Generate a simple map  
   if (!map)
     map = StatUtils::GenerateMap(data);
 
-  // Convert to 1D Histograms                                                                                                                                                                                                               
+  // Convert to 1D Histograms               
   TH1D* data_1D = MapToTH1D(data, map);
   TH1D* mc_1D   = MapToTH1D(mc,   map);
   TH1I* mask_1D = MapToMask(mask, map);
 
-  // Calculate from 1D                                                                                                                                                                                                                      
+  // Calculate from 1D      
   Double_t MLE = StatUtils::GetLikelihoodFromCov(data_1D, mc_1D, invcov, mask_1D);
 
-  // CleanUp                                                                                                                                                                                                                                
+  // CleanUp
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
@@ -401,6 +429,12 @@ Double_t StatUtils::GetLikelihoodFromCov( TH2D* data, TH2D* mc, TMatrixDSym* inv
 //*******************************************************************
 Double_t StatUtils::GetLikelihoodFromSVD( TH1D* data, TH1D* mc, TMatrixDSym* cov,    TH1I* mask){
 //*******************************************************************
+  // Currently just a placeholder!
+  (void) data;
+  (void) mc;
+  (void) cov;
+  (void) mask;
+
   return 0.0;
 };
 
@@ -425,17 +459,17 @@ Double_t StatUtils::GetLikelihoodFromSVD( TH2D* data, TH2D* mc, TMatrixDSym* cov
   delete mc_1D;
   delete mask_1D;
 
-  return 0.0;
+  return MLE;
 };
 
 //*******************************************************************
 Double_t StatUtils::GetLikelihoodFromEventRate(TH1D* data, TH1D* mc, TH1I* mask){
 //*******************************************************************
-
-  // Assume a Poisson-likelihood
-  
-  
-
+  // Currently just a placeholder!
+  (void) data;
+  (void) mc;
+  (void) mask;
+ 
   return 0.0;
 };
 
@@ -571,14 +605,21 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
 //******************************************************************* 
 TH2D* StatUtils::ThrowHistogram(TH2D* hist, TMatrixDSym* cov, TH2I* map, bool throwdiag, TH2I* mask){
 //******************************************************************* 
-
-
+  
+  // PLACEHOLDER!!!!!!!!!
+  // Currently no support for throwing 2D Histograms from a covariance
+  (void) hist;
+  (void) cov;
+  (void) map;
+  (void) throwdiag;
+  (void) mask;
+ 
+  // /todo
   // Sort maps if required
-
   // Throw the covariance for a 1D plot
-
   // Unmap back to 2D Histogram
 
+  return hist;
 }
 
 
@@ -690,7 +731,7 @@ TMatrixDSym* StatUtils::ApplyMatrixMasking(TMatrixDSym* mat, TH2D* data, TH2I* m
   TMatrixDSym* newmat = StatUtils::ApplyMatrixMasking(mat,  mask_1D);
   
   delete mask_1D;
-  return mat;
+  return newmat;
 }
 
 
@@ -722,7 +763,7 @@ TMatrixDSym* StatUtils::ApplyInvertedMatrixMasking(TMatrixDSym* mat, TH2D* data,
   TMatrixDSym* newmat = ApplyInvertedMatrixMasking(mat, mask_1D);
 
   delete mask_1D;
-  return mat;
+  return newmat;
 }
 
 

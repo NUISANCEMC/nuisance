@@ -39,8 +39,8 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
   // this->inFile = inputfile;
   // this->measurementName = "MB_NCpi0_XSec_numu_1Dppi0";
   // this->plotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
-  // this->SetCovarMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/nc1pi0/nuppi0xsecerrormatrix.txt", 11);
-  // this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/nc1pi0/nuppi0xsec_edit.txt");
+  // this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsecerrormatrix.txt", 11);
+  // this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsec_edit.txt");
   // this->normError=0.107;
 
   // if (isComb) {

@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "splineRoutines.h"
 
 //************************************* 
@@ -355,26 +336,18 @@ void splineRoutines::GenerateSampleSplines(){
     MeasurementBase* exp = (*iter);
 
     // Check that the experiment is not a joint measurement.
-
-    
     InputHandler* input = exp->GetInput();
-
     FitEvent* cust_event = NULL;
-    //    FitEventBase* base_event = NULL;
+
     TFile* splineFile = new TFile(output_name.c_str(), "RECREATE");
     TTree* eventTree = new TTree( (name + "_splineEvents").c_str(),
 				  (name + "_splineEvents").c_str());
-    
-    cust_event = static_cast<FitEvent*>(input->GetEventPointer());
-    //    base_event = static_cast<FitEventBase*>(input->GetSignalPointer());
+
+    cust_event = (input->GetEventPointer());
     
     //    if (!onlyBaseEvt){
     rw->SetupEventCoeff(cust_event);
-    eventTree->Branch("splineEvent",&cust_event);
-    //} else {
-    //      rw->SetupEventCoeff(static_cast<FitEvent*>(base_event));
-    //      eventTree->Branch("splineEvent",&base_event);
-    //    }
+    eventTree->Branch("FitEvent","FitEvent",cust_event,8000,2);
   
     bool signal;
     int nevents = input->GetNEvents();
@@ -386,14 +359,15 @@ void splineRoutines::GenerateSampleSplines(){
       exp->FillEventVariables(cust_event);
     
       cust_event->Signal = false;
+      cust_event->fType = kEVTSPLINE;
       signal = exp->isSignal(cust_event);
       
       if (signal or !onlySignal){
-	rw->GenSplines(static_cast<FitEventBase*>(cust_event));
+	rw->GenSplines(cust_event);
 	rw->CalcWeight(cust_event);
 
 	//	if (onlyBaseEvt)
-	//	  (*base_event) = static_cast<FitEventBase*>(cust_event);
+	//	  (*base_event) = static_cast<FitEvent*>(cust_event);
 	
 	eventTree->Fill();
       }
@@ -505,7 +479,7 @@ void splineRoutines::MakeSplinePlots(){
       splineDIR->cd();
       for (int i = 0; i < nevents; i++){
 	input->ReadEvent(i);
-	rw->GenSplines(static_cast<FitEventBase*>(cust_event), true);
+	rw->GenSplines(static_cast<FitEvent*>(cust_event), true);
       }
       
       delete input;

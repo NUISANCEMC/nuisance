@@ -44,7 +44,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   subChain.push_back(MIN_nu);
 
   // Setup the Data input                          
-  std::string basedir = std::string(std::getenv("NIWG_DATA"))+"/MINERvA/";
+  std::string basedir = FitPar::GetDataBase()+"/MINERvA/";
   std::string datafilename  = "";
   std::string covarfilename = "";
   std::string neutrinoclass = "";

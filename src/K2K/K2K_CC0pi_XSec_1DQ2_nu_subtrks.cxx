@@ -90,7 +90,7 @@ K2K_CC0pi_XSec_1DQ2_nu_subtrks::K2K_CC0pi_XSec_1DQ2_nu_subtrks(std::string name,
   case fK2KIIa_2trackNONQE: plotname = "Data_1DQ2_K2KIIa_2trackNONQE"; break;
   }
   
-  this->SetDataFromFile(std::string(std::getenv("NIWG_DATA"))+"/K2K/K2K_Data_PRD74_052002.root", plotname);
+  this->SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", plotname);
   
   // Setup Covariance;
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);

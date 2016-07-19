@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
 #include <string>
 #include <sstream>
@@ -27,8 +8,6 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   // Check if this is a shape only fit  
   this->SetFitOptions(type);
 
-
-
   // Define the energy region
   this->EnuMin = 0.0;
   this->EnuMax = 100.0;
@@ -38,18 +17,14 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
 
   //  this->isShape = false;
-  this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MINERvA/proton_Q2QE_nu_data.txt");
-  this->SetCovarMatrixFromText(std::string(std::getenv("NIWG_DATA"))+"/MINERvA/proton_Q2QE_nu_covar.txt", 7);
+  this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/proton_Q2QE_nu_data.txt");
+  this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/proton_Q2QE_nu_covar.txt", 7);
   
   // Setup whole shit load of histograms
   this->mcHist = new TH1D((this->measurementName+"_MC").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
   this->mcFine = new TH1D((this->measurementName+"_MC_FINE").c_str(), (this->measurementName+this->plotTitles).c_str(), 100, -2, 2);
 
-
-  // Different generators require slightly different rescaling factors.
-  if (eventType == 1) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))/this->fluxHist->Integral(); // NEUT
-  else if (this->eventType == 1) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*6.0/13.0/this->fluxHist->Integral(); // NUWRO
-    
+  this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))/this->fluxHist->Integral(); // NEUT    
 };
 
 
@@ -88,14 +63,11 @@ void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
 
 
    // Loop over the particle stack and find highest momentum FS proton
-  for (int j = 0; j < event->Npart(); ++j){
-    
+  for (int j = 0; j < event->Npart(); ++j){    
     if (!event->PartInfo(j)->fIsAlive) continue;
-    
     if (event->PartInfo(j)->fPID == 2112){
       Nn++;
     }
-    
     
     if (event->PartInfo(j)->fPID == 2212){
       Np++;

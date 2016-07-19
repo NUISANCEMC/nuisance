@@ -1,94 +1,53 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "minimizerFCN.h"
-#include "TThread.h"
 #include <stdio.h> 
 #include "FitUtils.h"
 
-void minimizerFCN::LoadParameters(std::string cardfile){
+minimizerFCN::minimizerFCN(std::string cardfile,  TFile *outfile){
+  
+  out       = outfile;
+  card      = cardfile;
+  
+  LoadSamples(card);
 
-  std::string line;
-  std::ifstream card(cardfile.c_str(), ifstream::in);
-
-  this->parameterNames  .clear();
-  this->parameterValues .clear();
-
-  while(std::getline(card, line, '\n')){
-    std::istringstream stream(line);
-
-    std::string token;
-    int val = 0;
-    std::string thisName;
-    double startVal = 0;
-
-    // check the type                                                                                                                                                                                  
-    while(std::getline(stream, token, ' ')){
-      // Strip any leading whitespace from the stream                                                                                                                                                  
-      stream >> std::ws;
-
-      // Ignore comments                                                                                                                                                                               
-      if (token.c_str()[0] == '#') continue;
-
-      std::istringstream stoken(token);
-
-      if (val == 0){
-        if (token.compare("parameter") !=0 ) {
-          break;
-        }
-      } else if (val == 1) {
-
-        this->parameterNames.push_back(token);
-        thisName = token;
-      } else if (val == 2) {
-        stoken >> startVal;
-
-        this->parameterValues.push_back(startVal);
-      } else break;
-
-      val++;
-    }
-  }
-  card.close();
-
-  return;
+  useFullCovar = false; // default                                                                                  
+  this->current_iteration = 0;
+  filledMC = false;
+  randGen = new TRandom3();
+  randGen->SetSeed(time(NULL));
 };
+
+minimizerFCN::~minimizerFCN() {
+  for (std::list<MeasurementBase*>::iterator iter = fChain.begin(); iter != fChain.end(); iter++){
+    MeasurementBase* exp = *iter;
+    delete exp;
+  }
+};
+
 
 double minimizerFCN::DoEval(const double *x) const {
 
   dialChanged = false;
-  SerialEval = FitPar::Config().GetParI("SERIAL_EVAL") > 0;
 
+  std::cout<<"Evaluating"<<std::endl;
   // WEIGHT ENGINE
-  f_rw->UpdateWeightEngine(x);
-  dialChanged = f_rw->HasDialChanged();
+  FitBase::GetRW()->UpdateWeightEngine(x);
+  dialChanged = FitBase::GetRW()->HasDialChanged();
+  FitBase::EvtManager().ResetWeightFlags();
   
+  std::cout<<"Reconfiguring samples"<<std::endl;
   // SORT SAMPLES
-  this->ReconfigureSamples();
+  ReconfigureSamples();
 
+
+  std::cout<<"Getting LIKE"<<std::endl;
   // GET TEST STAT
-  double teststat = GetLikelihood();
+  double likelihood = GetLikelihood();
 
   // PRINT PROGRESS
-  LOG(FIT) << "Current Stat (iter. "<< this->current_iteration << ") = "<<teststat<<std::endl;
-  return teststat;
+  LOG(FIT) << "Current Stat (iter. "<< this->current_iteration << ") = "<<likelihood<<std::endl;
+  return likelihood;
 }
+
 
 int minimizerFCN::GetNDOF() {
 
@@ -98,7 +57,7 @@ int minimizerFCN::GetNDOF() {
     MeasurementBase* exp = *iter;
     nDOF += exp->GetNDOF();
   }
-
+  
   return nDOF;
 }
 
@@ -158,7 +117,8 @@ double minimizerFCN::GetLikelihood() const {
 
 void minimizerFCN::CreateFullCovarMatrix(){
 
-  // Hack to get NBins for full covar
+
+  /*// Hack to get NBins for full covar
   int dim = 0;
 
   for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
@@ -201,6 +161,7 @@ void minimizerFCN::CreateFullCovarMatrix(){
     col = nbins + offset;
     offset += nbins;
   }
+  */
 
   return;
 
@@ -254,7 +215,7 @@ void minimizerFCN::LoadSamples(std::string cardFile)
   
     if (!FoundSample) continue;
 
-    bool LoadedSample = SampleUtils::LoadSample( &fChain, name, files, type, fakeData, f_rw );
+    bool LoadedSample = SampleUtils::LoadSample( &fChain, name, files, type, fakeData, FitBase::GetRW() );
 
     if (!LoadedSample) {
       ERR(FTL) << "Could not load sample provided: "<<name<<std::endl;
@@ -269,40 +230,6 @@ void minimizerFCN::LoadSamples(std::string cardFile)
   }
   card.close();
 
-};
-
-
-void minimizerFCN::LoadDrawOpts(std::string cardFile) 
-{
-  // Read the card file here and load objects
-  std::string line;
-  std::ifstream card(cardFile.c_str(), ifstream::in);
-  this->drawingOptions = "NDVP"; // Default Option
-
-  while(std::getline(card, line, '\n')){
-    std::istringstream stream(line);
-    std::string token;
-    int val = 0;
-
-    // check the type
-    while(std::getline(stream, token, ' ')){
-      // Strip any leading whitespace from the stream
-      stream >> std::ws;
-
-      // Ignore comments
-      if (token.c_str()[0] == '#') continue;
-
-      if (val == 0){
-	if (token.compare("drawOpt") !=0 ){
-	  break;
-	}
-      } else if (val == 1) {
-	this->drawingOptions = token;
-      } else break;
-      val++;
-    }
-  }
-  card.close();
 };
 
 
@@ -335,8 +262,7 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
 
 
 void minimizerFCN::SetFakeData(std::string fakeOpt){
-
-  // Now reconfigure all of the experiments with the new normalisation parameter                                                                                                                            
+                                                                                     
   for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
     exp->SetFakeDataValues(fakeOpt);
@@ -399,11 +325,11 @@ void minimizerFCN::ReconfigureSignal(){
   return;
 }
  
- void minimizerFCN::ReconfigureAllEvents() const{
-   this->ReconfigureSamples(true);
-   return;
- }
- 
+void minimizerFCN::ReconfigureAllEvents() const{
+  this->ReconfigureSamples(true);
+  return;
+}
+
 void minimizerFCN::Write(){
 
   // Loop over individual experiments and save relevant information                                                                                                                                

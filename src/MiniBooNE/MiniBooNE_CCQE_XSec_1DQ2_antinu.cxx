@@ -38,14 +38,14 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   this->ccqelike = name.find("CCQELike") != std::string::npos;
 
-  this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/anti-ccqe/asqq_con.txt");
+  this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
 
   this->SetupDefaultHist();
 
   // Setup Covariances                                                                                                                                                                                                                      
   /// Currently has a placeholder for the matrices as work fixing them is ongoing.                                                                                                                                                          
   /// Assume a diagonal shape-only error is default                                                                                                                                                                                         
-  if (!this->isDiag) this->SetCovarMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
+  if (!this->isDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
     fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
     covar     = StatUtils::GetInvert(fullcovar);
@@ -56,10 +56,10 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
 
-    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt", \
+    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt", \
 						   (this->measurementName+"_data_CCQELIKE"), this->plotTitles);
 
-    dataHist_CCPIM = PlotUtils::GetTH1DFromFile(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt", \
+    dataHist_CCPIM = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt", \
 						(this->measurementName+"_data_CCPIM"), this->plotTitles);
 
     // Make NON CCPIM

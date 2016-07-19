@@ -105,6 +105,7 @@ void PlotUtils::FillNeutModeArray(TH2D* hist[], int mode, double xval, double yv
 
 THStack PlotUtils::GetNeutModeStack(std::string title, TH1* ModeStack[], int option) {
   
+  (void) option;
   THStack allmodes = THStack(title.c_str(),title.c_str());
 
   for (int i = 0; i < 60; i++){
@@ -301,23 +302,6 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 };
 
 
-
-
-// Enu flux division per bin
-void PlotUtils::DivideByFlux(TH1D* mcHist, TH1D* fluxHist){
-
-  TH1D* rebinned_flux = (TH1D*) mcHist->Clone("temp");
-
-  for (int i = 0; i < rebinned_flux->GetNbinsX(); i++){
-    std::cout<<"Flux = "<<std::endl;
-  }
-
-
-
-};
-
-
-
 std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const char* del){
 
   std::istringstream stream(str);
@@ -355,8 +339,10 @@ std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char
 //********************************************************************
 void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
 //********************************************************************
-// Mostly copied from TH1D version below
-// Need to specify which axes (default is x-axis)
+ // Mostly copied from TH1D version below
+ // Need to specify which axes (default is x-axis)
+  (void) axis;
+  
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
   TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
@@ -587,45 +573,6 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, 
 }
 
 
-                                                                                                                                                                
-void PlotUtils::Set2PolyHistFromText(std::string dataFile, TH2Poly* hist, double norm, bool skipbins){
-  //********************************************************************                                                                                                                                                                                                                                                      
-  Double_t edges[] = {0, 0, 0, 0};
-
-  std::string line;
-  std::ifstream data(dataFile.c_str(),ifstream::in);
-
-  int yBin = 0;
-  while(std::getline(data, line, '\n')){
-    std::istringstream stream(line);
-    double val = 0;
-    double entry;
-    int xBin = 0;
-
-    edges[0] = 0;
-    edges[1] = 0;
-    edges[2] = 0;
-    edges[3] = 0;
-    
-    // Loop over entries and insert them into the histogram                                                                                                    
-    while(stream >> entry){
-
-      if (xBin == 0) val = entry;
-      else if (xBin > 0 and xBin < 5){
-	edges[xBin] = entry;
-      }
-      xBin++;
-    }
-    
-    if (xBin > 4){
-      hist->AddBin(edges[0],edges[1],edges[2],edges[3]);
-    }
-    yBin++;
-  }
-    
-  return;
-
-}
 
 
 TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::string plotTitles, std::string alt_name){

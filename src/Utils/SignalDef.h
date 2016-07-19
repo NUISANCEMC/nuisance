@@ -29,11 +29,7 @@
 
 // ExtFit includes
 #include "FitUtils.h"
-
-// NEUT includes
 #include "FitEvent.h"
-#include "FitUtils.h"
-
 
 // make it a namespace
 namespace SignalDef {

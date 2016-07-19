@@ -22,9 +22,15 @@
 
 #include "Measurement1D.h"
 
-//********************************************************************
+/*!
+  ANL Charged Current Quasi-elastic Measurement \n
+  1D Event Rate in Q2QE \n
+  Class supports multiple published datasets: \n
+  \item PRD.26.537  = ANL_CCQE_XSec_1DQ2_nu_PRD26, or ANL_CCQE_XSec_1DEnu_nu
+  \item PRD.16.3103 = ANL_CCQE_XSec_1DQ2_nu_PRD16
+  \item PRL.31.844  = ANL_CCQE_XSec_1DEQ2_nu_PRL31
+*/
 class ANL_CCQE_Evt_1DQ2_nu : public Measurement1D {
-//********************************************************************
 
 public:
 
@@ -34,11 +40,11 @@ public:
   void FillEventVariables(FitEvent *event);       
   bool isSignal(FitEvent *event);                 
   void FillHistograms();
-  void Write(std::string drawOpt);
   void ResetAll();
   void ScaleEvents();
-
+  void Write(std::string drawOpt);
  private:
+
   bool applyQ2correction; ///< Flag of whether deut correction applied
   TH1D* CorrectionHist; ///< Correction factor
   TH1D* mcHist_NoCorr; ///< Uncorrected mcHist

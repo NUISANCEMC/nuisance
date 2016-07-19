@@ -1,28 +1,9 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #ifndef FITEVENT_H_SEEN
 #define FITEVENT_H_SEEN
 
+#include "FitBuild.h"
 #include "TLorentzVector.h"
 #include "FitParticle.h"
-#include "FitBuild.h"
 #include "TSpline.h"
 
 #ifdef __NEUT_ENABLED__
@@ -41,7 +22,8 @@
 using namespace genie;
 #endif 
 #include "TArrayD.h"
-#include "FitEventBase.h"
+#include "BaseFitEvt.h"
+#include "GeneratorUtils.h"
 
 /*!      
  *  \addtogroup FitBase      
@@ -53,30 +35,17 @@ using namespace genie;
  */
 
 //! Converts NEUT/NuWro/GENIE events to a comman format straight from the tree
-class FitEvent : public FitEventBase {
+class FitEvent : public BaseFitEvt {
   
  public:
 
   //! Default Consstructors. Everything is set to NULL
   FitEvent(){
-    // Header Info
-    fType = EvtUNKNOWN;
-    Mode = -1;
-    
-    // Particles
-    fNParticles      = 0;
-    fNFSIParticles   = 0;
-    fNFinalParticles = 0;
 
-    fCurrPartIndex = 999;
-    fit_particle = NULL;
-    Weight = 1.0;
-        
   };
 
   //! Default destructor
   ~FitEvent(){
-    ResetEvent();
   };
   
   // Generator specific functions
@@ -115,8 +84,6 @@ class FitEvent : public FitEventBase {
   //! Convert NuWro event class to common format
   void NuwroKinematics();
 
-  //! Copy of the NuWro ND280_Mode function to convert NuWro modes to Neut Modes which we use as a default standard.
-  int ND280_Mode (event * e);
 #endif
 
 
@@ -217,9 +184,7 @@ class FitEvent : public FitEventBase {
   /* int Npiplus(); */
   
 
-
   ClassDef(FitEvent, 1);
-  
 };
 
 

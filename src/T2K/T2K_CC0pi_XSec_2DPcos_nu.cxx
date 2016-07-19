@@ -53,7 +53,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string inputfile, FitWei
   // this->dataHist = new TH2D((this->measurementName+"_data").c_str(),(this->measurementName+"_data"+this->plotTitles).c_str(),
   // 			    this->data_points_x-1, this->xBins, this->data_points_y-1, this->yBins);
 
-  // this->SetHistograms(std::string(std::getenv("NIWG_DATA"))+"/T2K/T2K_CC0PI_TN167_data.root");
+  // this->SetHistograms(FitPar::GetDataBase()+"/T2K/T2K_CC0PI_TN167_data.root");
 
   // // Diagonal covar setup
   // if (!this->isShape) this->addNormPenalty = true;

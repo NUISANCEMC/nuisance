@@ -51,9 +51,9 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // 		     398.8, 410.8, 422.7, 434.7, 446.7, 458.6, 470.6, 482.5, 494.5, 506.5, 518.4, 530.4, 542.4, 554.3, 566.3, 578.2,   
   // 		     590.2, 602.2, 614.1, 626.1, 638.0, 650.0};
 
-  // this->SetDataValues(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ncqe/input_data.txt");
-  // this->SetCovarMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ncqe/ErrorMatrix.tab", 51);
-  // this->SetResponseMatrix(std::string(std::getenv("NIWG_DATA"))+"/MiniBooNE/ncqe/response_mat.txt", 51);
+  // this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ncqe/input_data.txt");
+  // this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/ErrorMatrix.tab", 51);
+  // this->SetResponseMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/response_mat.txt", 51);
 
   // // Check if we're using fake data
   // if (!fakeDataFile.empty()) this->SetFakeDataValues(fakeDataFile);
