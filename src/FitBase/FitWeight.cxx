@@ -313,7 +313,7 @@ void FitWeight::Reconfigure(bool silent){
 
   if (!dial_changed) return;
 
-  //  if (LOG_LEVEL(MIN)) this->PrintState();
+  if (!silent and LOG_LEVEL(MIN)) this->PrintState();
   
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK  
   if (neut_changed and using_neut)  neut_rw->Reconfigure();

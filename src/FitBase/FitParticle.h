@@ -1,6 +1,7 @@
 #ifndef FITPARTICLE_H_SEEN
 #define FITPARTICLE_H_SEEN
 #include "TLorentzVector.h"
+#include "FitBuild.h"
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"

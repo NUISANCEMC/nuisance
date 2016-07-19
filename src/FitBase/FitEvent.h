@@ -1,6 +1,7 @@
 #ifndef FITEVENT_H_SEEN
 #define FITEVENT_H_SEEN
 
+#include "FitBuild.h"
 #include "TLorentzVector.h"
 #include "FitParticle.h"
 #include "TSpline.h"

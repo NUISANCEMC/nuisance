@@ -82,13 +82,6 @@ void EventManager::ResetWeightFlags(){
     frwneeded[id]= std::vector<bool>(finputs[id]->GetNEvents(),true);
   }
 }
-
-bool EventManager::GetRWFlag(int id){
-  return false;
-}
-
-void EventManager::SetRWFlag(int id, bool flag){
-}
   
 EventManager::EventManager(){
   fRW = new FitWeight("FitWeight");

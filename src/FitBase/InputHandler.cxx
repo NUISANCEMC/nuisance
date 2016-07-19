@@ -22,7 +22,6 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
 
   LOG(SAM) << " -> Type  = " << inType   << std::endl;
   LOG(SAM) << " -> Input = " << inFile       << std::endl;
-
   
   // Automatically check what sort of event file it is
   if (inType.compare("JOINT"))
@@ -412,7 +411,7 @@ void InputHandler::ReadNuWroFile(){
 
     // Parse the input string values
     int count = 0;
-    for (int i = 0; i < contents.size(); i++){
+    for (UInt_t i = 0; i < contents.size(); i++){
       if (contents.at(i) <= 0.0001 and contents.at(i) != 0.0 ) count++;
       else break;
     }
@@ -621,7 +620,7 @@ void ReadBinSplineFile(){
   // So just read in as normal event splines and it'll all get sorted easily.
 
 
-};
+}
 
 
 
@@ -632,8 +631,15 @@ void ReadHistogramFile(){
   // Convert the raw histogram into a series of events with X variables
   // So we don't have to pass stuff upsteam
 
-};
+}
 
+
+//******************************************************************** 
+void ReadNuanceFile(){
+//******************************************************************** 
+  
+
+}
 
   
 //********************************************************************
@@ -720,7 +726,7 @@ double InputHandler::GetInputWeight(const int entry){
   double weight = 1.0;
   
   // Find Histogram
-  for (int j = 0; j < joint_index_low.size(); j++){
+  for (UInt_t j = 0; j < joint_index_low.size(); j++){
     if (entry >= joint_index_low.at(j) and entry < joint_index_high.at(j)){
       weight *= joint_index_weight.at(j);
       break;

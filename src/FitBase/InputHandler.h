@@ -63,7 +63,8 @@ class InputHandler : public TObject {
 
   int eventType;
   double GetInputWeight(const int entry=-1);
-  
+  void ReadNuanceFile();
+
  protected:
 
   TChain* tn;

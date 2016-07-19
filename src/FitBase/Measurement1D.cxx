@@ -96,6 +96,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, Fi
   // Set Passed Options
   SetFitOptions(type);
 
+  // Still adding support for flat flux inputs
   //  // Set Enu Flux Scaling
   //  if (isFlatFluxFolding) this->Input()->ApplyFluxFolding( this->defaultFluxHist );
   
@@ -223,7 +224,6 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile, std::string hist
 //********************************************************************
 
   LOG(SAM) << "Filling histogram from "<< inhistfile << "->"<< histname <<std::endl;
-
   this->dataHist = PlotUtils::GetTH1DFromRootFile((std::string(std::getenv("EXT_FIT")) + "/data/" + inhistfile), histname);
   this->dataHist->SetNameTitle((this->measurementName+"_data").c_str(), (this->measurementName + "_data").c_str());
 
@@ -247,6 +247,8 @@ void Measurement1D::SetDataFromFile(std::string inhistfile, std::string histname
 void Measurement1D::SetCovarMatrix(std::string covarFile){
 //********************************************************************
   
+  // Covariance function, only really used when reading in the MB Covariances.
+
   TFile* tempFile = new TFile(covarFile.c_str(),"READ");
 
   TH2D* covarPlot = new TH2D();
@@ -315,7 +317,7 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
 void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 //********************************************************************
 
-  // WARNIGN this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
 
   // Make a counter to track the line number
   int row = 0;

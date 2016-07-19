@@ -14,8 +14,6 @@ class EventManager {
   double GetEventWeight(int id, int i);
   void AddInput(std::string handle, std::string infile);
   void ResetWeightFlags();
-  bool GetRWFlag(int id);
-  void SetRWFlag(int id, bool flag);
   int GetInputID(std::string infile);
   
  protected:

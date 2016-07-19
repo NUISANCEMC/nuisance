@@ -172,8 +172,6 @@ void MeasurementBase::Reconfigure(){
     
   }
 
-  FitBase::EvtManager().SetRWFlag(input_id, false);
-  
   // Finalise Histograms
   filledMC = true;
   this->ConvertEventRates();
@@ -240,8 +238,6 @@ void MeasurementBase::ReconfigureFast(){
 	       << Weight << "] " << std::endl;    
   }
 
-  FitBase::EvtManager().SetRWFlag(input_id, false);
-  
   // Finalise histograms
   filledMC = true;
   this->ConvertEventRates();

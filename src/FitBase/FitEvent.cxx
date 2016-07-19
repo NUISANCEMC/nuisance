@@ -102,15 +102,15 @@ void FitEvent::NuwroKinematics(){
   all_particles.clear();
 
   // Incoming particles state 0
-  for (int i = 0; i < nuwro_event->in.size(); i++)
+  for (UInt_t i = 0; i < nuwro_event->in.size(); i++)
     all_particles.push_back( FitParticle(&nuwro_event->in[i], 0) );
   
   // Intermediate Particles state 2
-  for (int i = 0; i < nuwro_event->out.size(); i++)
+  for (UInt_t i = 0; i < nuwro_event->out.size(); i++)
     all_particles.push_back( FitParticle(&nuwro_event->out[i], 2) );
 
   // Outgoing Particles State 1
-  for (int i = 0; i < nuwro_event->post.size(); i++)
+  for (UInt_t i = 0; i < nuwro_event->post.size(); i++)
     all_particles.push_back( FitParticle(&nuwro_event->post[i], 1) );
 
   this->fNParticles = this->all_particles.size();
