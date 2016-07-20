@@ -87,6 +87,7 @@ class FitParticle {
   int fStatus; //!< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
   double fMass; //!< Particle Mass
 
+  FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
 };
 
 /*! @} */

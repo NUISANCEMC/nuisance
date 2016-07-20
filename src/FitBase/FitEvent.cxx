@@ -209,6 +209,8 @@ void FitEvent::CalcKinematics(){
   if ( fType == kGENIE ) this->GENIEKinematics();
   #endif
 
+  if ( fType == kNUANCE ) this->NuanceKinematics();
+
   return;
 };
 
@@ -247,4 +249,66 @@ FitParticle* FitEvent::PartInfo(UInt_t i){
     return NULL;
 
   }
+}
+
+
+//***************************************************
+void FitEvent::NuanceKinematics(){
+//***************************************************
+
+  this->ResetEvent();
+  // Read From Nuance_event
+  
+  // Sort Mode
+  this->TotCrs = 1.0; // NEEDS SORTING
+  this->Mode = 1.0; // NEEDS SORTING 
+
+  // These need to be set somehow...
+  this->fEventNo = 0;
+  this->PFSurf = 0.0;
+  this->PFMax  = 0.0; 
+  this->TargetA = 0.0;
+  this->TargetZ = 0.0;
+  this->TargetH = 0;
+  this->Ibound  = 0.0;
+
+  // Setup particles
+  all_particles.clear();
+
+  // incoming neutrino
+  all_particles.push_back( FitParticle( nuance_event->p_neutrino[0],
+					nuance_event->p_neutrino[1],
+					nuance_event->p_neutrino[2],
+					nuance_event->p_neutrino[3], 
+					nuance_event->neutrino,
+					0 ) );
+
+  // incoming hadron
+  all_particles.push_back( FitParticle( nuance_event->p_targ[0],
+					nuance_event->p_targ[1],
+					nuance_event->p_targ[2],
+					nuance_event->p_targ[3], 
+					nuance_event->target,
+					0 ) );
+
+
+  // for outgoing leptons
+  for (int i = 0; i < nuance_event->n_leptons; i++){
+    all_particles.push_back( FitParticle( nuance_event->p_lepton[0][i],
+					  nuance_event->p_lepton[1][i],
+					  nuance_event->p_lepton[2][i],
+					  nuance_event->p_lepton[3][i], 
+					  nuance_event->lepton[i], 1 ) );
+  }
+
+  // for outgoing hadrons
+  for (int i = 0; i < nuance_event->n_hadrons; i++){
+    all_particles.push_back( FitParticle( nuance_event->p_hadron[0][i],
+					  nuance_event->p_hadron[1][i],
+					  nuance_event->p_hadron[2][i],
+					  nuance_event->p_hadron[3][i],
+					  nuance_event->hadron[i], 1 ) );
+  }
+
+  this->fNParticles = this->all_particles.size();
 }

@@ -81,8 +81,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring){
 //********************************************************************
 
   // Parse out the input_type
-  const int nfiletypes = 5;
-  const std::string filetypes[nfiletypes] = {"NEUT","NUWRO","GENIE","EVSPLN","JOINT"};
+  const int nfiletypes = 6;
+  const std::string filetypes[nfiletypes] = {"NEUT","NUWRO","GENIE","EVSPLN","JOINT","NUANCE"};
 
   for (int i = 0; i < nfiletypes; i++){
     std::string tempTypes = filetypes[i] + ":";
@@ -94,8 +94,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring){
   }
 
   // Parse out envir flags
-  const int nfiledir = 4;
-  const std::string filedir[nfiledir] = {"NEUT_DIR","NUWRO_DIR","GENIE_DIR","EVSPLN_DIR"};
+  const int nfiledir = 5;
+  const std::string filedir[nfiledir] = {"NEUT_DIR","NUWRO_DIR","GENIE_DIR","NUANCE_DIR","EVSPLN_DIR"};
 
   for (int i = 0; i < nfiledir; i++){
     std::string tempDir = "@" + filedir[i];
@@ -646,7 +646,7 @@ void InputHandler::ReadHistogramFile(){
 //********************************************************************
 
   // Convert the raw histogram into a series of events with X variables
-  // So we don't have to pass stuff upsteam
+  // So we don't have to pas stuff upsteam
 
 }
 
@@ -655,7 +655,50 @@ void InputHandler::ReadNuanceFile(){
 //******************************************************************** 
 
   // Read in Nuance output ROOT file (converted from hbook)
+  LOG(SAM) << " Reading NUANCE " << std::endl;
 
+  tn = new TChain("t3");
+  tn->AddFile(this->inFile.c_str());
+
+  // Get entries and nuwro_event
+  nEvents = tn->GetEntries();
+  nuance_event = new NuanceEvent();
+
+  // SetBranchAddress for Nuance
+  tn->SetBranchAddress("cc",&nuance_event->cc);
+  tn->SetBranchAddress("bound",&nuance_event->bound);
+  tn->SetBranchAddress("neutrino",&nuance_event->neutrino);
+  tn->SetBranchAddress("target",&nuance_event->target);
+  tn->SetBranchAddress("iniQ", &nuance_event->iniQ);
+  tn->SetBranchAddress("finQ", &nuance_event->finQ);
+  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);
+  tn->SetBranchAddress("polar", &nuance_event->polar);
+
+  int channel;
+  double qsq;
+  double w;
+  double x;
+  double y;
+
+  double p_neutrino[4];
+  double p_targ[5];
+  double vertex[4];
+  double start[4];
+  double depth;
+  double flux;
+
+  int n_leptons;
+  
+  double p_ltot[5];
+  int lepton[200];
+  double p_lepton[5][200];
+  
+  int n_hadrons;
+  double p_htot[5];
+  int hadron[200];
+  double p_hadron[5][200];
+
+  //  this->cust_event->SetEventAddress(&nuance_event);
   
 }
 

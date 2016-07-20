@@ -1,29 +1,28 @@
-Author: Callum Wilkinson,
+Author  Luke Pickering,
+	Patrick Stowell,
+	Callum Wilkinson,
 	Clarence Wret,
-	Patrick Stowell
 
 Package Manager: (p.stowell@sheffield.ac.uk)
 
-externalDataFitter Package v1r1
+NuFix Package v1r0
 
 README
-21/04/2016
+20/07/2016
 
 --- Compilation
 The following instructions should be used to build the fitter after checking out from scratch. 
 
-1. Copy example_env.sh to extfitter_env.sh "$ cp ./make/example_env.sh ./extfitter_env.sh"
-2. Copy example_config.sh to extfitter_config.sh "$ cp ./make/example_config.sh ./extfitter_config.sh"
-3. Edit extfitter_config.sh to enable/disable the required custom build flags.
-4. Edit "extfitter_env.sh" to include all dependencies that are required by the build options.
-   Leaving any dependencies as blank variables if they are not needed.
-5. Run configure script "$ source ./extfitter_config.sh"
-6. If configure is successful and has the correct compile flags, run make
-   "$ make clean && make all"
-
-Notes:
-	- "./setup.sh and ./extfitter_env.sh" are both used by some parrrallel processing functions inside FitBase and FCN modules so it is advised not to rename these.
-	- In theory if one only cares about a single generator, filling out just those dependencies and flags is all that is required.
+1. Make sure environmental variables required for the generators you wish to build against are set.
+2. In the top nufix directory make a new build directory: "$mkdir build && cd build"
+3. Run CMAKE with compiler flags for which generators are required
+   "$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=0 ../"
+4. Build the fitter
+   "$ make -j"
+5. Build documentation
+   "$ make docs"
+6. Install to build location
+   "$ make install"
 
 --- Adding Classes
     The fitter is designed to be easily extended by adding new measurement classes whilst keeping the input convertors and tuning functionality the same.

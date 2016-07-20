@@ -92,6 +92,7 @@ FitParticle::FitParticle(genie::GHepParticle* genie_particle){
   }
 
 };
+
 #endif
 
 FitParticle::FitParticle(UInt_t* i){
@@ -102,4 +103,25 @@ FitParticle::FitParticle(UInt_t* i){
   //  ERR(FTL)<<"NULL Event Passed to FitEvent.cxx"<<std::endl;
 
   return;
+};
+
+// NUANCE Particle
+FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t state){
+
+  // Set Momentum
+  this->fP = TLorentzVector(x,
+			    y,
+			    z,
+			    t);
+  fPID = pdg;
+
+  // Set status manually from switch
+  switch(state){
+  case 0:  fIsAlive= 0; fStatus=1; break; // Initial State
+  case 1:  fIsAlive= 1; fStatus=0; break; // Final State
+  case 2:  fIsAlive= 0; fStatus=2; break; // Intermediate State
+  default: fIsAlive=-1; fStatus=3; break; // Other?
+  }
+
+  fMass = fP.Mag();
 };

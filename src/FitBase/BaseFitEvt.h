@@ -41,6 +41,7 @@
 using namespace genie;
 #endif
 #include "TArrayD.h"
+#include "NuanceEvent.h"
 
 /*!
  *  \addtogroup FitBase
@@ -48,7 +49,7 @@ using namespace genie;
  */
 
 //! Global Enum to define generator type being read with FitEvent
-enum generator_event_type { kUNKNOWN=999, kNEUT=0, kNUWRO=2, kGENIE=5, kEVTSPLINE=6 };
+enum generator_event_type { kUNKNOWN=999, kNEUT=0, kNUWRO=2, kGENIE=5, kEVTSPLINE=6, kNUANCE=7 };
 
 //! Base Event Class used to store just the generator event pointers and flat variables
 class BaseFitEvt {
@@ -90,6 +91,12 @@ class BaseFitEvt {
   GHepRecord* genie_record; //!< Pointer to actually accessible Genie Record
 #endif
 
+  NuanceEvent* nuance_event;
+
   double GetWeight(){ return InputWeight * RWWeight * CustomWeight; };
 };
 #endif
+
+
+
+

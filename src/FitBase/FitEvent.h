@@ -171,7 +171,7 @@ class FitEvent : public BaseFitEvt {
   Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
 
   // True Generator events: Just Pointers that can be set.
-
+  void NuanceKinematics();
 
   // ACCESS FUNCTIONS
   double Enu(){ return this->PartInfo(0)->fP.E(); };

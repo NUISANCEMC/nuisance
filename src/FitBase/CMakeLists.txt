@@ -33,6 +33,7 @@ GeneratorUtils.cxx
 )
 
 set(HEADERFILES
+NuanceEvent.h
 BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
 FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h

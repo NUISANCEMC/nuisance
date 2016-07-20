@@ -10,7 +10,7 @@ minimizerFCN::minimizerFCN(std::string cardfile,  TFile *outfile){
   
   LoadSamples(card);
 
-  useFullCovar = false; // default                                                                                  
+  useFullCovar = false; // default          
   this->current_iteration = 0;
   filledMC = false;
   randGen = new TRandom3();
@@ -29,18 +29,14 @@ double minimizerFCN::DoEval(const double *x) const {
 
   dialChanged = false;
 
-  std::cout<<"Evaluating"<<std::endl;
   // WEIGHT ENGINE
   FitBase::GetRW()->UpdateWeightEngine(x);
   dialChanged = FitBase::GetRW()->HasDialChanged();
   FitBase::EvtManager().ResetWeightFlags();
   
-  std::cout<<"Reconfiguring samples"<<std::endl;
   // SORT SAMPLES
   ReconfigureSamples();
 
-
-  std::cout<<"Getting LIKE"<<std::endl;
   // GET TEST STAT
   double likelihood = GetLikelihood();
 
@@ -264,7 +260,7 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
 
 
 void minimizerFCN::SetFakeData(std::string fakeOpt){
-                                                                                     
+             
   for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
     exp->SetFakeDataValues(fakeOpt);
@@ -334,8 +330,8 @@ void minimizerFCN::ReconfigureAllEvents() const{
 
 void minimizerFCN::Write(){
 
-  // Loop over individual experiments and save relevant information                                                                                                                                
-  // Loop over all returned STL vectors (joint fits have more than one set of return values)                                                                                                       
+  // Loop over individual experiments and save relevant information  
+  // Loop over all returned STL vectors (joint fits have more than one set of return values)             
   LOG(MIN)<<"Writing each of the data classes:"<<std::endl;
   for (std::list<MeasurementBase*>::iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
@@ -343,7 +339,7 @@ void minimizerFCN::Write(){
   }
 
   return;
-  // Save data and MC cross-section plots                                                                                                                                                          
+  // Save data and MC cross-section plots          
   TH1D* tempMCXsec = GetXSecPlot("MC");
   tempMCXsec->Write();
 
@@ -353,7 +349,7 @@ void minimizerFCN::Write(){
   if (useFullCovar){
     TH2D* temp = new TH2D(*FullCovar);
 
-    // Make neater by removing empty bins                                                                                                                                                        
+    // Make neater by removing empty bins        
     int nbinsx = temp->GetNbinsX();
     int nbinsy = temp->GetNbinsY();
     TH2D* finalcov = new TH2D("cov","cov",nbinsx,0,nbinsx,nbinsy,0,nbinsy);
@@ -364,7 +360,7 @@ void minimizerFCN::Write(){
       }
     }
 
-    // Save the output                                                                                                                                                                             
+    // Save the output           
     finalcov->Write("FullChi2Covariance");
     delete temp;
     delete finalcov;
