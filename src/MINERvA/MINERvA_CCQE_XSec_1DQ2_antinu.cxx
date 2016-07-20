@@ -36,7 +36,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup the Data Plots
-  std::string basedir = FitPar::GetDataBase()+"/MINERvA/";
+  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCQE/";
   std::string datafilename  = "";
   std::string covarfilename = "";
 
