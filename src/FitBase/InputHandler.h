@@ -52,6 +52,7 @@ class InputHandler {
   void ReadNeutFile();
   void ReadNuanceFile();
   void ReadGenieFile();
+  void ReadGiBUUFile(bool IsNuBarDominant);
   void ReadNuWroFile();
   void ReadEventSplineFile();
   void ReadJointFile();

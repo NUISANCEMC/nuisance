@@ -19,7 +19,9 @@
 
 #ifndef FITPARTICLE_H_SEEN
 #define FITPARTICLE_H_SEEN
+
 #include "TLorentzVector.h"
+#include "TObject.h"
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
@@ -41,7 +43,7 @@
 #include "GHEP/GHepUtils.h"
 #endif
 
-#include "TObject.h"
+#include "StdHepEvt.h"
 
 /*!
  *  \addtogroup FitBase
@@ -76,6 +78,11 @@ class FitParticle {
 #ifdef __GENIE_ENABLED__
   //! GENIE Constructor
   FitParticle(genie::GHepParticle* genie_particle);
+#endif
+
+#ifdef __GiBUU_ENABLED__
+  //! GiBUU Constructor
+  FitParticle(GiBUUStdHepReader* GiRead, Int_t p_it);
 #endif
 
   //! NULL Constructor for when the generator screws up.

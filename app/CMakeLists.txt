@@ -35,5 +35,12 @@ include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
+add_executable(DumpGiBUUEvents DumpGiBUUEvents.cxx)
+target_link_libraries(DumpGiBUUEvents ${MODULETargets})
+target_link_libraries(DumpGiBUUEvents ${CMAKE_DEPENDLIB_FLAGS})
+include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(DumpGiBUUEvents PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
 
-install(TARGETS ExtFit_minimizer DESTINATION bin)
+install(TARGETS ExtFit_minimizer DumpGiBUUEvents DESTINATION bin)

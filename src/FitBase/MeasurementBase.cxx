@@ -64,6 +64,10 @@ void MeasurementBase::SetFluxHistogram(std::string fluxFile, int minE, int maxE,
 double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low, double high){
   //********************************************************************
 
+  if(GetInput()->GetType() == kGiBUU){
+    return 1.0;
+  }
+
   // Set Energy Limits
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
@@ -144,6 +148,8 @@ void MeasurementBase::Reconfigure(){
   this->MODE_VECT.clear();
   this->INDEX_VECT.clear();
 
+
+  size_t NSignal = 0;
   // MAIN EVENT LOOP
   for (int i = 0; i < nevents; i++){
 
@@ -151,16 +157,17 @@ void MeasurementBase::Reconfigure(){
     cust_event = FitBase::EvtManager().GetEvent(input_id, i);
     Weight = cust_event->Weight;
 
-    //    std::cout<<"Custom Event Mode = "<<cust_event->Mode<<std::endl;
-    //    std::cout<<"Custom Type "<<cust_event->fType<<std::endl;
-    //    std::cout<<"NPART = "<<cust_event->Npart()<<std::endl;
-
     // Initialize
     X_VAR = 0.0;
     Y_VAR = 0.0;
     Z_VAR = 0.0;
     Signal = false;
     Mode = cust_event->Mode;
+
+
+    if(GetInput()->GetType() == kGiBUU){
+      std::cout << WriteGiBUUEvent(*(cust_event->GiRead)) << std::endl;
+    }
 
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);
@@ -173,6 +180,7 @@ void MeasurementBase::Reconfigure(){
       this->Z_VAR_VECT .push_back(Z_VAR);
       this->MODE_VECT  .push_back(Mode);
       this->INDEX_VECT .push_back( (UInt_t)i);
+      NSignal++;
     }
 
     // Fill Histogram Values
@@ -189,6 +197,8 @@ void MeasurementBase::Reconfigure(){
 
 
   }
+
+  std::cout << "NSignal: " << NSignal << std::endl;
 
   // Finalise Histograms
   filledMC = true;

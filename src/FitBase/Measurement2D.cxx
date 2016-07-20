@@ -546,6 +546,10 @@ void Measurement2D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 double Measurement2D::TotalIntegratedFlux(std::string intOpt, double low, double high){
 //********************************************************************
 
+  if(GetInput()->GetType() == kGiBUU){
+    return 1.0;
+  }
+
   // Return the integrated flux between two energy values
   // If non passed return it between the experimental flux
   if (low == -9999.9)  low  = this->EnuMin;

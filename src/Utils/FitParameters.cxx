@@ -33,8 +33,6 @@ FitParameters& FitParameters::GetParams(void) {
 FitParameters::~FitParameters() { parameterMap_all.clear(); };
 
 FitParameters::FitParameters() {
-  // Check if NUWRO is installed in the config
-  this->nuwro_enabled = true;
   this->iteration = 0;
 
   std::string ext_fit_dir = std::string(std::getenv("EXT_FIT"));
@@ -297,13 +295,13 @@ void FitParameters::MakeParameterCard(std::string filename) {
 
 void FitParameters::Write(){
 
-  // Loop through parameters                                                                                                                                                                                                              
+  // Loop through parameters
   TTree* tr = new TTree("fit_header","fit_header");
   tr->Branch("par_name",  &parNames);
   tr->Branch("par_value", &parValues);
   tr->Branch("card_input", &cardLines);
   tr->Fill();
-  
+
   tr->Write();
   return;
 }

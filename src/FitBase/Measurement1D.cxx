@@ -534,6 +534,10 @@ void Measurement1D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 double Measurement1D::TotalIntegratedFlux(std::string intOpt, double low, double high){
 //********************************************************************
 
+  if(GetInput()->GetType() == kGiBUU){
+    return 1.0;
+  }
+
   // Set Energy Limits
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;

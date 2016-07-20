@@ -17,8 +17,11 @@
 *    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include <iostream>
+
 #include "FitEvent.h"
 #include "TObjArray.h"
+
 
 //***************************************************
 // NEUT GENERATOR SPECIFIC
@@ -191,6 +194,39 @@ void FitEvent::GENIEKinematics(){
 #endif  //< GENIE ifdef
 //***************************************************
 
+//***************************************************
+// REQUIRED FUNCTIONS FOR GENIE
+#ifdef __GiBUU_ENABLED__
+
+//***************************************************
+void FitEvent::SetEventAddress(GiBUUStdHepReader* tempevent){
+//***************************************************
+  fType = kGiBUU;
+  GiRead = tempevent;
+}
+
+//***************************************************
+void FitEvent::GiBUUKinematics(){
+//***************************************************
+
+  // std::cout << "Reading GiBUU Event: " << std::endl;
+  // std::cout << WriteGiBUUEvent(*GiRead) << std::endl;
+
+  this->ResetEvent();
+
+  this->Mode = GiRead->GiBUU2NeutCode;
+
+  this->fNParticles = GiRead->StdHepN;
+
+  this->InputWeight = GiRead->EvtWght;
+
+  for(Int_t p_it = 0; p_it < GiRead->StdHepN; ++p_it){
+    all_particles.push_back(FitParticle(GiRead,p_it));
+  }
+
+}
+#endif  //< GiBUU ifdef
+//************************
 
 //***************************************************
 // Refill all the particle vectors etc for the event
@@ -210,7 +246,11 @@ void FitEvent::CalcKinematics(){
   #endif
 
   if ( fType == kNUANCE ) this->NuanceKinematics();
-  //  std::cout<<"Calling Nuance Kineamtics? "<<fType<<std::endl;
+
+  #ifdef __GiBUU_ENABLED__
+  if ( fType == kGiBUU ) this->GiBUUKinematics();
+  #endif
+
 
   return;
 };
@@ -233,6 +273,8 @@ void FitEvent::ResetEvent(){
   this->fNFSIParticles   = 0;
   this->fNFinalParticles = 0;
   this->fCurrPartIndex = 999;
+
+  all_particles.clear();
 
   return;
 }
@@ -262,12 +304,12 @@ void FitEvent::NuanceKinematics(){
 
   // Sort Mode
   this->TotCrs = 1.0; // NEEDS SORTING
-  this->Mode = 1.0; // NEEDS SORTING 
+  this->Mode = 1.0; // NEEDS SORTING
 
   // These need to be set somehow...
   this->fEventNo = 0;
   this->PFSurf = 0.0;
-  this->PFMax  = 0.0; 
+  this->PFMax  = 0.0;
   this->TargetA = 0.0;
   this->TargetZ = 0.0;
   this->TargetH = 0;
@@ -288,7 +330,7 @@ void FitEvent::NuanceKinematics(){
   all_particles.push_back( FitParticle( nuance_event->p_neutrino[0],
 					nuance_event->p_neutrino[1],
 					nuance_event->p_neutrino[2],
-					nuance_event->p_neutrino[3], 
+					nuance_event->p_neutrino[3],
 					nuance_event->neutrino,
 					0 ) );
 
@@ -296,7 +338,7 @@ void FitEvent::NuanceKinematics(){
   all_particles.push_back( FitParticle( nuance_event->p_targ[0],
 					nuance_event->p_targ[1],
 					nuance_event->p_targ[2],
-					nuance_event->p_targ[3], 
+					nuance_event->p_targ[3],
 					nuance_event->target,
 					0 ) );
 
@@ -307,7 +349,7 @@ void FitEvent::NuanceKinematics(){
     all_particles.push_back( FitParticle( nuance_event->p_lepton[i][0],
 					  nuance_event->p_lepton[i][1],
 					  nuance_event->p_lepton[i][2],
-					  nuance_event->p_lepton[i][3], 
+					  nuance_event->p_lepton[i][3],
 					  nuance_event->lepton[i], 1 ) );
     /*
     std::cout<<"Outgoing Lepton = "

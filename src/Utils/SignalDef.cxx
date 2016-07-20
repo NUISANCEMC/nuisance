@@ -27,7 +27,7 @@ bool SignalDef::isCCQE(FitEvent *event, double EnuMin, double EnuMax, bool isRes
 
 // NO MESONS and ONE MUON
   int lepCnt = 0;
-  
+
   TLorentzVector pnu = (event->PartInfo(0))->fP;
   TLorentzVector pmu;
 
@@ -93,7 +93,7 @@ bool SignalDef::isCCQELike(FitEvent *event, double EnuMin, double EnuMax) {
   for (unsigned int j = 2; j < event->Npart(); j++) {
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 110 && abs(PID) <= 557) return false; 
+    if (abs(PID) >= 110 && abs(PID) <= 557) return false;
     //else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 && abs(PID) <= 5554)) return false;
     else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) lepCnt++;
   }
@@ -108,22 +108,22 @@ bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
   if ((event->PartInfo(0)->fP.E() < EnuMin*1000.) || (event->PartInfo(0)->fP.E() > EnuMax*1000.)) return false;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) 
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0)
       continue; // maybe need not 2212 2112?
     if ((event->PartInfo(j))->fPID != 22 &&   // photon OK
         (event->PartInfo(j))->fPID != 2212 && // neutron OK
         (event->PartInfo(j))->fPID != 2112 && // proton OK
-        (event->PartInfo(j))->fPID != -13)     // muon OK 
+        (event->PartInfo(j))->fPID != -13)     // muon OK
       return false;
     }
   return true;
 };
-  
+
 bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
 
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
@@ -140,7 +140,7 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
   for (unsigned int j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
-    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false; 
+    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false;
     //else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 && abs(PID) <= 5554)) return false; PHOTONS, NUCLEON, MULTINUCLEON OK
     else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) lepCnt++;
     else if (abs(PID) == 211) pipCnt++;
@@ -154,15 +154,15 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
 };
 
 bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false; 
+  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
 // MiniBooNE:
 // single mu-
-// single pi0 
+// single pi0
 // both exiting nucleus
 // any number of nucleon
 // no additional mesons or leptons
@@ -188,11 +188,11 @@ bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
 
 bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 
-  if ((event->PartInfo(0))->fPID != -14) return false; 
+  if ((event->PartInfo(0))->fPID != -14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
-  if (((event->PartInfo(2))->fPID != -13) && ((event->PartInfo(3))->fPID != -13)) return false; 
+  if (((event->PartInfo(2))->fPID != -13) && ((event->PartInfo(3))->fPID != -13)) return false;
 
   // MINERvA measurement
   // single pi0
@@ -220,11 +220,11 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin, double EnuMa
 };
 
 bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
-  if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false; 
+  if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false;
 
   int pi0Cnt = 0;
 
@@ -243,11 +243,11 @@ bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
 };
 
 bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != -14) return false; 
+  if ((event->PartInfo(0))->fPID != -14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
-  if (((event->PartInfo(2))->fPID != -14) && ((event->PartInfo(3))->fPID != -14)) return false; 
+  if (((event->PartInfo(2))->fPID != -14) && ((event->PartInfo(3))->fPID != -14)) return false;
 
   int pi0Cnt = 0;
 
@@ -266,8 +266,8 @@ bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin, double Enu
 };
 
 bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false; 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
   int pipCnt = 0; // counts number of pions
@@ -291,8 +291,8 @@ bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 
 bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 
-  if ((event->PartInfo(0))->fPID != -14) return false; 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if ((event->PartInfo(0))->fPID != -14) return false;
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
   if (((event->PartInfo(2))->fPID != -13) && ((event->PartInfo(3))->fPID != -13)) return false;
 
   int pipCnt = 0; // counts number of pions
@@ -317,9 +317,9 @@ bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin, double EnuMax
 // MINERvA has unfolded and not unfolded muon phase space
 bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted) {
 
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
@@ -355,7 +355,7 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, 
   }
 
   // only one pion-like track
-  if (pipCnt != 1) return false; 
+  if (pipCnt != 1) return false;
   // only one lepton
   if (lepCnt != 1) return false;
 
@@ -373,9 +373,9 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, 
 
 bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, double EnuMax, bool isRestricted) {
 
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
@@ -402,7 +402,7 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, do
   }
 
   // any number of pions greater than 0!
-  if (pipCnt == 0) return false; 
+  if (pipCnt == 0) return false;
   // only one lepton
   if (lepCnt != 1) return false;
 
@@ -420,9 +420,9 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, do
 
 // T2K not unfolded phase space restrictions
 bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
@@ -436,7 +436,7 @@ bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
   for (unsigned int j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
-    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false; 
+    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false;
     else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) {
       lepCnt++;
       Pmu = (event->PartInfo(j))->fP;
@@ -447,7 +447,7 @@ bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
     }
   }
 
-  if (pipCnt != 1) return false; 
+  if (pipCnt != 1) return false;
   if (lepCnt != 1) return false;
 
   // relatively generic CC1pi+ definition done
@@ -469,17 +469,17 @@ bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
 bool SignalDef::isCCQEnumu_MINERvA(FitEvent* event, double EnuMin,
 				   double EnuMax, bool fullphasespace){
 //********************************************************************
-  
+
   // For now, define as the true mode being CCQE or npnh
   if (event->Mode != 1 and event->Mode != 2) return false;
-  
+
   // Only look at numu events
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   // Get Theta Variables
   double ThetaMu = 999.9;
   double Enu_rec = -1.0;
-  
+
   for (UInt_t i = 2; i < event->Npart(); i++){
     if (event->PartInfo(i)->fPID == 13){
 
@@ -525,7 +525,7 @@ bool SignalDef::isCCQEnumubar_MINERvA (FitEvent* event, double EnuMin,
 
   // If Restricted phase space
   if (!fullphasespace &&  ThetaMu > 0.34906585) return false;
-  
+
   // restrict energy range
   if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) return false;
   if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
@@ -543,18 +543,18 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 
   // Restrict true energy range
   if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) return false;
-  
+
   // Loop Particles
   int nhadrons = 0;
   int nmuons = 0;
   double ThetaMu = 0.0;
   double Emu = 0.0;
-  
+
   for (UInt_t i = 2; i < event->Npart(); i++){
 
     if (!(event->PartInfo(i))->fIsAlive) continue;
     if (event->PartInfo(i)->fStatus != 0) continue;
-    
+
     int PID = event->PartInfo(i)->fPID;
     if (PID == 13){
       nmuons++;

@@ -20,7 +20,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
 if(NOT DEFINED USE_NEUT AND
   NOT DEFINED USE_NuWro AND
   NOT DEFINED USE_GENIE AND
-  NOT DEFINED USE_NIWG)
+  NOT DEFINED USE_NIWG AND
+  NOT DEFINED USE_GiBUU)
   cmessage(FATAL_ERROR "No reweight engines requested. Configure with at least "
     "one of -DUSE_{NEUT,NuWro,GENIE,NIWG}.")
 else()
@@ -75,6 +76,10 @@ include(${CMAKE_SOURCE_DIR}/cmake/docsSetup.cmake)
 
 if(DEFINED USE_EXP AND USE_EXP)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DINMEMORYEVENTCLASS")
+endif()
+
+if(DEFINED USE_GiBUU AND USE_GiBUU)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
 endif()
 
 ################################################################################

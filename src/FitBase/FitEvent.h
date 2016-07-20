@@ -122,6 +122,14 @@ class FitEvent : public BaseFitEvt {
   void GENIEKinematics();
 #endif
 
+#ifdef __GiBUU_ENABLED__
+
+  void SetEventAddress(GiBUUStdHepReader* tempevent);
+
+  //! Convert GiBUUStdHep event class to common format
+  void GiBUUKinematics();
+#endif
+
 
   void SetEventAddress(NuanceEvent** tempevent);
 

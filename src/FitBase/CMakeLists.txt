@@ -30,13 +30,14 @@ FitSplineHead.cxx
 JointMeas1D.cxx
 MeasurementBase.cxx
 GeneratorUtils.cxx
+StdHepEvt.cxx
 )
 
 set(HEADERFILES
 NuanceEvent.h
 BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
-FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h
+FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h
 )
 
 set(LIBNAME FitBase)
