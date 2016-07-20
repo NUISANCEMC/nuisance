@@ -34,7 +34,7 @@ FitParameters::~FitParameters() { parameterMap_all.clear(); };
 
 FitParameters::FitParameters() {
   // Check if NUWRO is installed in the config
-  this->nuwro_enabled = (!std::string(std::getenv("NIWG_DATA")).empty());
+  this->nuwro_enabled = true;
   this->iteration = 0;
 
   std::string ext_fit_dir = std::string(std::getenv("EXT_FIT"));
@@ -317,6 +317,4 @@ namespace FitPar {
 FitParameters& Config() { return FitParameters::GetParams(); };
 
   std::string GetDataBase(){ return std::string(std::getenv("EXT_FIT")) + "/data/"; };
-  std::string GetNIWGData(){ return std::string(std::getenv("NIWG_DATA")); };
-
 }

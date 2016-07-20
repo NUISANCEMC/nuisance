@@ -117,9 +117,6 @@ FitParameters& Config();
 
 //! Return Fitter DataBase
 std::string GetDataBase();
-
-//! Return NIWG Data Repo
-std::string GetNIWGData();
 }
 
 /*! @} */
