@@ -656,50 +656,57 @@ void InputHandler::ReadNuanceFile(){
 
   // Read in Nuance output ROOT file (converted from hbook)
   LOG(SAM) << " Reading NUANCE " << std::endl;
+  eventType = kNUANCE;
 
-  tn = new TChain("t3");
+  tn = new TChain("h3");
   tn->AddFile(this->inFile.c_str());
 
   // Get entries and nuwro_event
   nEvents = tn->GetEntries();
   nuance_event = new NuanceEvent();
 
+  tn->Show(0);
+
   // SetBranchAddress for Nuance
-  tn->SetBranchAddress("cc",&nuance_event->cc);
-  tn->SetBranchAddress("bound",&nuance_event->bound);
+  //  tn->SetBranchAddress("cc",&nuance_event->cc);
+  //  tn->SetBranchAddress("bound",&nuance_event->bound);
   tn->SetBranchAddress("neutrino",&nuance_event->neutrino);
   tn->SetBranchAddress("target",&nuance_event->target);
-  tn->SetBranchAddress("iniQ", &nuance_event->iniQ);
-  tn->SetBranchAddress("finQ", &nuance_event->finQ);
-  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);
-  tn->SetBranchAddress("polar", &nuance_event->polar);
+  //  tn->SetBranchAddress("iniQ", &nuance_event->iniQ);
+  //  tn->SetBranchAddress("finQ", &nuance_event->finQ);
+  //  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);
+  //  tn->SetBranchAddress("polar", &nuance_event->polar);
+  //  tn->SetBranchAddress("channel", &nuance_event->channel);
+  //  tn->SetBranchAddress("qsq", &nuance_event->qsq);
 
-  int channel;
-  double qsq;
-  double w;
-  double x;
-  double y;
-
-  double p_neutrino[4];
-  double p_targ[5];
-  double vertex[4];
-  double start[4];
-  double depth;
-  double flux;
-
-  int n_leptons;
+  //  tn->SetBranchAddress("w", &nuance_event->w);
+  //  tn->SetBranchAddress("x",&nuance_event->x);
+  //  tn->SetBranchAddress("y",&nuance_event->y);
   
-  double p_ltot[5];
-  int lepton[200];
-  double p_lepton[5][200];
-  
-  int n_hadrons;
-  double p_htot[5];
-  int hadron[200];
-  double p_hadron[5][200];
+  tn->SetBranchAddress("p_neutrino",&nuance_event->p_neutrino);
+  tn->SetBranchAddress("p_targ",&nuance_event->p_targ);
+  //  tn->SetBranchAddress("vertex", &nuance_event->vertex);
+  //  tn->SetBranchAddress("start",&nuance_event->start);
+  //  tn->SetBranchAddress("depth",&nuance_event->depth);
+  //  tn->SetBranchAddress("flux",&nuance_event->flux);
 
-  //  this->cust_event->SetEventAddress(&nuance_event);
+  tn->SetBranchAddress("n_leptons", &nuance_event->n_leptons);
+  tn->SetBranchAddress("p_ltot",&nuance_event->p_ltot);
+  tn->SetBranchAddress("lepton",&nuance_event->lepton);
+  tn->SetBranchAddress("p_lepton",&nuance_event->p_lepton);
+
+  tn->SetBranchAddress("n_hadrons", &nuance_event->n_hadrons);
+  tn->SetBranchAddress("p_htot",&nuance_event->p_htot);
+  tn->SetBranchAddress("hadron",&nuance_event->hadron);
+  tn->SetBranchAddress("p_hadron",&nuance_event->p_hadron);
+
+  this->cust_event->SetEventAddress(&nuance_event);  
+
+  this->fluxHist = new TH1D("nuance_temp_fluxhist","nuance_temp_fluxhist",1,0.0,1.0);
+  this->fluxHist->SetBinContent(1,1.0);
   
+  this->eventHist = new TH1D("nuance_temp_eventhist","nuance_temp_eventhist",1,0.0,1.0);
+  this->eventHist->SetBinContent(1,nEvents);
 }
 
 
@@ -746,7 +753,7 @@ std::string InputHandler::GetInputStateString(){
 void InputHandler::ReadEvent(unsigned int i){
 //********************************************************************
 
-  bool using_events = (eventType == 0 or eventType==5 or eventType==1 or eventType==kEVTSPLINE);
+  bool using_events = (eventType == 0 or eventType==5 or eventType==1 or eventType==kEVTSPLINE or eventType==kNUANCE);
 
   if (using_events){
 

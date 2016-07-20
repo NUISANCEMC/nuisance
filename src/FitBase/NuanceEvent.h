@@ -32,32 +32,32 @@ class NuanceEvent {
   bool bound;
   int neutrino;
   int target;
-  double iniQ;
-  double finQ;
+  float iniQ;
+  float finQ;
   int lepton0;
-  double polar;
+  float polar;
   int channel;
-  double qsq;
-  double w;
-  double x;
-  double y;
+  float qsq;
+  float w;
+  float x;
+  float y;
 
-  double p_neutrino[4];
-  double p_targ[5];
-  double vertex[4];
-  double start[4];
-  double depth;
-  double flux;
+  float p_neutrino[4];
+  float p_targ[5];
+  float vertex[4];
+  float start[4];
+  float depth;
+  float flux;
 
   int n_leptons;
   
-  double p_ltot[5];
+  float p_ltot[5];
   int lepton[200];
-  double p_lepton[5][200];
+  float p_lepton[5][200];
   
   int n_hadrons;
-  double p_htot[5];
+  float p_htot[5];
   int hadron[200];
-  double p_hadron[5][200];
+  float p_hadron[5][200];
 };
 #endif

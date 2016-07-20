@@ -123,6 +123,8 @@ class FitEvent : public BaseFitEvt {
 #endif
 
 
+  void SetEventAddress(NuanceEvent** tempevent);
+
   /*
     GENERAL Fit Event Functions
   */
