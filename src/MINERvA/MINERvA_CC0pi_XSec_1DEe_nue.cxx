@@ -28,7 +28,7 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   SetupDefaultHist();
 
   // Different generators require slightly different rescaling factors.
-  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); 
+  scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux(); 
 
 };
 
@@ -61,8 +61,7 @@ void MINERvA_CC0pi_XSec_1DEe_nue::FillEventVariables(FitEvent *event){
   }
   
   LOG(EVT)<<"X_VAR = "<<Ee<<std::endl;
-
-  this->X_VAR = Ee;
+  X_VAR = Ee;
   
   return;
 }
@@ -73,7 +72,7 @@ void MINERvA_CC0pi_XSec_1DEe_nue::FillEventVariables(FitEvent *event){
 bool MINERvA_CC0pi_XSec_1DEe_nue::isSignal(FitEvent *event){
 //*******************************************************************
 
-  // Only look at numu events
+  // Only look at nue events
   //if ( nue_flag and (event->PartInfo(0)->fPID) != 12) return false;
   //if (!nue_flag and (event->PartInfo(0)->fPID) != -12) return false;
 
@@ -86,6 +85,7 @@ bool MINERvA_CC0pi_XSec_1DEe_nue::isSignal(FitEvent *event){
   // restrict energy range
   if (event->Enu()/1000.0 < this->EnuMin || event->Enu()/1000.0 > this->EnuMax) return false;
 
+  // Electron Enrgy
   if (Ee < 0.5) return false;
   
   return true;

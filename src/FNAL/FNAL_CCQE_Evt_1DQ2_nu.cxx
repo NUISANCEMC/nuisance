@@ -23,7 +23,8 @@
 /// @brief FNAL CCQE Q2 Measurement on Free Nucleons (Ref: PRD16 3103)
 ///
 /// @details Q2 Extracted assuming numu CCQE scattering of free nucleons.
-FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
+					     std::string type, std::string fakeDataFile){
 //********************************************************************  
 
   // Measurement Details                        

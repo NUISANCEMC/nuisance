@@ -23,7 +23,9 @@
 /// @brief ANL CCQE Q2 Measurement on Free Nucleons (Ref: PRD16 3103)
 ///
 /// @details Q2 Extracted assuming numu CCQE scattering of free nucleons.
-ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfile,
+					   FitWeight *rw,    std::string type,
+					   std::string fakeDataFile){
 //********************************************************************  
 
   // Measurement Details                        
@@ -32,6 +34,8 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   EnuMax = 6.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   applyEnucorrection = type.find("ENUCORR") != std::string::npos;
+  default_types="SHAPE/DIAG";
+  allowed_types="SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   isDiag = true;

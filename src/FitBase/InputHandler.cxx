@@ -53,7 +53,7 @@ InputHandler::InputHandler(std::string handle, std::string infile_name){
   else if (!inType.compare("HIST"))   this->ReadHistogramFile();
   else if (!inType.compare("BNSPLN")) this->ReadBinSplineFile();
   else if (!inType.compare("EVSPLN")) this->ReadEventSplineFile();
-
+  else if (!inType.compare("NUANCE")) this->ReadNuanceFile();
   else if (!inType.compare("JOINT"))  this->ReadJointFile();
   else {
     LOG(FTL) << " -> ERROR: Invalid Event File Type" << std::endl;
@@ -632,7 +632,7 @@ void InputHandler::ReadGenieFile(){
 }
 
 //********************************************************************
-void ReadBinSplineFile(){
+void InputHandler::ReadBinSplineFile(){
 //********************************************************************
 
   // Bin Splines are saved as one event for each histogram bin.
@@ -644,7 +644,7 @@ void ReadBinSplineFile(){
 
 
 //********************************************************************
-void ReadHistogramFile(){
+void InputHandler::ReadHistogramFile(){
 //********************************************************************
 
   // Convert the raw histogram into a series of events with X variables
@@ -652,12 +652,13 @@ void ReadHistogramFile(){
 
 }
 
+//******************************************************************** 
+void InputHandler::ReadNuanceFile(){
+//******************************************************************** 
 
-//********************************************************************
-void ReadNuanceFile(){
-//********************************************************************
+  // Read in Nuance output ROOT file (converted from hbook)
 
-
+  
 }
 
 

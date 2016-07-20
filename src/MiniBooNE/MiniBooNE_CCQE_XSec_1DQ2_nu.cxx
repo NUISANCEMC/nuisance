@@ -19,14 +19,13 @@
 
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 
-//********************************************************************                                                                                                                               
-/// @brief MiniBooNE CCQE numu 1DQ2 Measurement on CH2 (Ref: - )                                                                                                                                       
-///   
 //******************************************************************** 
-MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile,
+							 FitWeight *rw, std::string type,
+							 std::string fakeDataFile){
 //******************************************************************** 
 
-  // Measurement Details                                                                                                                                                                                                               
+  // Measurement Details                                                                
   measurementName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
 
@@ -40,8 +39,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
   // Setup Plots
   this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt");
-  
+  this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt");  
   this->SetupDefaultHist();
 
   // Setup Covariance 
@@ -57,9 +55,6 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
     covar     = StatUtils::GetInvert(fullcovar);
   }
 
-
-
-  ///
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
 
@@ -75,8 +70,10 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
   }
 
-  /// Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*14.08/6.; // NEUT
+  // Get Scale Factor
+  scaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+		 * (14.08/6.0)
+		 / TotalIntegratedFlux());
 
 };
 
@@ -145,7 +142,8 @@ bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
   if ((event->PartInfo(0))->fP.E() < this->EnuMin*1000 || (event->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
 
   if (X_VAR <= 0.0) return false;
-  if (abs(Mode) >= 40) return false;
+  
+  if (abs(Mode) >= 30) return false;
 
   return true;
 };

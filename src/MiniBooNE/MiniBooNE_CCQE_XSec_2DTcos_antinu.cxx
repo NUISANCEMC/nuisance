@@ -30,27 +30,29 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   EnuMax = 3.;
   isDiag = true;
   normError = 0.130;
+  default_types="FIX/DIAG";
+  allowed_types="FIX,FREE,SHAPE/DIAG/NORM";
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  this->plotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
-  this->ccqelike = name.find("CCQELike") != std::string::npos;
+  plotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
+  ccqelike = name.find("CCQELike") != std::string::npos;
 
   // Define Bin Edges
-  this->data_points_x = 19;
-  this->data_points_y = 21;
+  data_points_x = 19;
+  data_points_y = 21;
   Double_t tempx[19] = { 0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0};
   Double_t tempy[21] = {-1.0, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-  this->xBins = tempx;
-  this->yBins = tempy;
+  xBins = tempx;
+  yBins = tempy;
 
   // Setup Data Plots
   if (!ccqelike){
-    this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_con.txt", 1E-41, 
-			FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
+    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_con.txt", 1E-41, 
+		  FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
   } else {
-     this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_like.txt", 1E-41, 
-			FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
+    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_like.txt", 1E-41, 
+		  FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
   }
   this->SetupDefaultHist();
   
@@ -59,11 +61,10 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   covar     = StatUtils::GetInvert(fullcovar);
   isDiag = true;
 
-   // Different generators require slightly different rescaling factors.
-  if      (this->eventType == 0) this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*14.08/8./this->TotalIntegratedFlux(); // NEUT
-  else if (this->eventType == 1) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08/8./this->fluxHist->Integral(); // NUWRO
-  else if (this->eventType == 5) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08/8./this->fluxHist->Integral(); // GENIE
-
+  // Set Scaling for Differential Cross-section
+  scaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+		 *(14.08/8.)
+		 /TotalIntegratedFlux());
 };
 
 //******************************************************************** 
@@ -99,8 +100,8 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
   }
 
   // Set X Variables
-  this->X_VAR = Ekmu;
-  this->Y_VAR = costheta;
+  X_VAR = Ekmu;
+  Y_VAR = costheta;
   
   return;
 };
@@ -119,7 +120,8 @@ bool MiniBooNE_CCQE_XSec_2DTcos_antinu::isSignal(FitEvent *event){
   if ((event->PartInfo(0))->fPID != -14) return false;
 
   // Restrict energy range
-  if ((event->PartInfo(0))->fP.E() < this->EnuMin*1000 || (event->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
+  if ((event->PartInfo(0))->fP.E() < this->EnuMin*1000 ||
+      (event->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
 
   return true;
 };

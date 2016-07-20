@@ -2,7 +2,6 @@ set(RWENGINE_INCLUDE_DIRECTORIES "")
 
 ##################################  NEUT  ######################################
 if(DEFINED USE_NEUT AND USE_NEUT)
-  cmessage(FATAL_ERROR "Unfortunately NEUT is not enabled for CMake build at the moment. Fix it yourself or check back later!")
   include(${CMAKE_SOURCE_DIR}/cmake/NEUTSetup.cmake)
   cmessage(STATUS "Using NEUT Reweight engine.")
 else()

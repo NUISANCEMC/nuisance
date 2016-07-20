@@ -47,9 +47,10 @@ class InputHandler {
   InputHandler(std::string handle, std::string infile_name);
   std::string ParseInputFile(std::string inputfile);
 
-  void ReadBinSplineFile(){};
-  void ReadHistogramFile(){};
+  void ReadBinSplineFile();
+  void ReadHistogramFile();
   void ReadNeutFile();
+  void ReadNuanceFile();
   void ReadGenieFile();
   void ReadNuWroFile();
   void ReadEventSplineFile();
@@ -82,7 +83,6 @@ class InputHandler {
 
   int eventType;
   double GetInputWeight(const int entry=-1);
-  void ReadNuanceFile();
 
  protected:
 

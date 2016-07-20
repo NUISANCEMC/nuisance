@@ -23,7 +23,9 @@
 /// @brief MiniBooNE CCQE antinumu 1DQ2 Measurement on CH2 (Ref: - )
 ///   
 //******************************************************************** 
-MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile,
+								 FitWeight *rw,    std::string type,
+								 std::string fakeDataFile){
 //******************************************************************** 
 
   // Measurement Details 
@@ -41,10 +43,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
 
   this->SetupDefaultHist();
-
-  // Setup Covariances                                                                                                                                                                                                                      
-  /// Currently has a placeholder for the matrices as work fixing them is ongoing.                                                                                                                                                          
-  /// Assume a diagonal shape-only error is default                                                                                                                                                                                         
+                                                    
   if (!this->isDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
     fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
@@ -83,8 +82,10 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 
   }
 
-  /// Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/8.0         
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*14.08/8.; // NEUT
+  // ScaleFactor
+  scaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+		 *14.08/8.
+		 / TotalIntegratedFlux()); 
 };
 
 //******************************************************************** 
