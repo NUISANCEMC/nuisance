@@ -19,13 +19,8 @@
 
 #include "GenericFlux_Tester.h"
 
-
-// NOTE STILL VERY EARLY CLASS
-// - DEFINITIONS of signal still need to be added
-// - Pion different calculations need to be added
-
 //******************************************************************** 
-/// @brief Class to perform CCQE Fake Data Studies on a custom measurement
+/// @brief Class to perform MC Studies on a custom measurement
 GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 //******************************************************************** 
   
@@ -51,62 +46,31 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  // Set TOPOLOGY DEFINITION
-  if (name.find("CCQE") != std::string::npos) filltype = kCCQEFill;
-  else if (name.find("MEC") != std::string::npos) filltype = kMECFill;
-  else if (name.find("CCQEMEC") != std::string::npos) filltype = kCCQEMECFill;
-  else if (name.find("CC0PI") != std::string::npos) filltype = kCC0PIFill;
-
-  // Setup other histograms
-  this->mcHist_1DQ2 = new TH1D( (measurementName + "_1DQ2").c_str(), 
-				(measurementName + "_1DQ2;Q^{2}_{QE} [GeV^{2}c^{-2}];d#sigma/dQ^{2}_{QE} [cm^{2}GeV^{-2}c^{2}]").c_str(),
-				30, 0.0, 3.0 );
-
-  this->mcHist_1DTmu = new TH1D((measurementName + "_1DTmu").c_str(),
-                                (measurementName + "_1DTmu;T_{#mu} [GeV];d#sigma/dT_{#mu} [cm^{2}GeV^{-1}]").c_str(),
-				30, 0.0, 30.0 );
-  
-  this->mcHist_1DCosTheta = new TH1D((measurementName + "_1DCosTheta").c_str(),
-				     (measurementName + "_1DCosTheta;cos#theta;d#sigma/dcos#theta [cm^{2}]").c_str(),
-				     30, -1.0, 1.0 );
-  
-  this->mcHist_1DEnu = new TH1D((measurementName + "_1DEnu").c_str(),
-				(measurementName + "_1DEnu;E_{#nu,true} [GeV];d#sigma/dE_{#nu} [cm^{2}GeV^{-1}]").c_str(),
-				30, 0.0, 20.0 );
-  
-  this->mcHist_1DErec = new TH1D((measurementName + "_1DErec").c_str(),
-				 (measurementName + "_1DErec;E_{#nu,rec.} [GeV];d#sigma/dE_{#nu} [cm^{2}GeV^{-1}]").c_str(),
-				 30, 0.0, 20.0 );
-  
-  this->mcHist_1DEdiff = new TH1D((measurementName + "_1DEdiff").c_str(),
-				  (measurementName + "_1DEdiff;E_{#nu,true} - E_{#nu,rec.} [GeV];d#sigma/dE_{#nu,diff} [cm^{2}GeV^{-1}]").c_str(),
-				  60, -2.0, 2.0 );
-  
-  this->mcHist_2DTmuCosTheta = new TH2D((measurementName + "_2DTmuCosTheta").c_str(),
-					(measurementName + "_2DTmuCosTheta;T_{#mu} [GeV];cos#theta;d^{2}#sigma/dT_{#mu}dcos#theta [cm^{2}GeV^{-1}]").c_str(),
-					30, 0.0, 3.0,
-					30, -1.0, 1.0);
-
-  // 3. The generator is organised in SetupMeasurement so it gives the cross-section in "per nucleon" units.
+  // 1. The generator is organised in SetupMeasurement so it gives the cross-section in "per nucleon" units.
   //    So some extra scaling for a specific measurement may be required. For Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and divide by the number of neutrons 6.
   this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))  /this->TotalIntegratedFlux();
+
+  FitPar::Config().out->cd();
+
+  // Setup the TTree to save everything
+  eventVariables = new TTree( (this->measurementName).c_str(), (this->measurementName).c_str() );
+  eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
+  eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
+  eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/D"   );
   
-  // Set ANTINU Flag
-  antinu = (measurementName.find("antinu") != std::string::npos);
+  eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
+  eventVariables->Branch("Q2_QE",    &Q2_QE,    "Q2_QE/D"   );
 
-  // Set Target Scalings and binding
-  if (measurementName.find("CH") != std::string::npos){ // < ---- CH
-    this->scaleFactor *= 13.0 / 6.0;
-    if (!antinu) binding_E = 34.0;
-    else binding_E = 30.0;
-  }
+  eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
+  eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
+  eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
+  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/D");
+  eventVariables->Branch("PPr",       &PPr,       "PPr/D"   );
+  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D" );
 
-  if (measurementName.find("H20") != std::string::npos){ // < ---- H2)
-    this->scaleFactor *= 18.0 / 8.0;
-    if (!antinu) binding_E = 36.0;
-    else binding_E = 32.0;
-  }
+  eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
+  eventVariables->Branch("Weight"    , &Weight,     "Weight/D"    );
 
 };
 
@@ -117,87 +81,111 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
 void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 
-  // Define empty variables
-  this->X_VAR = -1.0; // LEAVE AS EMPTY
+  // Function used to extract any variables of interest to the event
 
-  // Set Flags First ----------
-  Mode = event->Mode;
+  // Initialise everything to a bad value
+  PDGnu   = -999.9;
+  PDGLep  = -999.9;
 
-  isCCQE = (Mode == 1);
-  isCCQEMEC = (Mode == 1 or Mode == 2);
-  isMEC = (Mode == 2);
+  Enu_true = Enu_QE = Q2_true = Q2_QE = TLep = -999.9;
+  CosPr = CosLep = PPr = -999.9;
+  
+  double proton_highmom = 0.0;
 
-  isRES1PI = (Mode > 16 && Mode < 21);
-  isRESNPI = (Mode > 16 && Mode < 21);
+  // Get main event variables
+  TLorentzVector nu_4mom = event->PartInfo(0)->fP;
+  Enu_true = nu_4mom.E();
+  PDGnu    = event->PartInfo(0)->fPID;
 
-  isCC0PI   = true;
-  isCC1PI   = false;
-  isCCOTHER = false;
+  bool cc = (abs(event->Mode) < 30);
 
-  // Setup Variables to crap values
-  Q2 = -999.9;
-  CosTheta = -999.9;
-  Tmu = -999.9;
-  Enu = -999.9;
-  Erec = -999.9;
-  Ediff = -999.9;
+  // Start Particle Loop
+  int npart = event->Npart();
+  for (UInt_t i = 0; i < npart; i++){
 
-
-  // Get Neutrino Energy and PDG
-  Enu = event->PartInfo(0)->fP.E()/1000.0;
-  int NuPDG = event->PartInfo(0)->fPID;
-
-  // Loop over the particle stack and get lepton
-  for (int j = 2; j < event->Npart(); ++j){
+    // Skip particles that weren't in the final state
+    bool part_alive = event->PartInfo(i)->fIsAlive;
+    if (!part_alive) continue;
     
-    int partPDG = (event->PartInfo(j))->fPID;
+    int PDGpart = event->PartInfo(i)->fPID;
+    
+    // Find the charged lepton
+    if (cc){
 
-    // LEPTON Calculations
-    if (abs(partPDG) == abs(NuPDG) - 1){
-      
-      double ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-      CosTheta = cos(ThetaMu);
-      Tmu = FitUtils::T((event->PartInfo(j))->fP);
-      
-      // QE Calculations
-      if (isCCQEMEC){
-	Erec = FitUtils::EnuQErec((event->PartInfo(j))->fP, CosTheta, binding_E, !antinu);
-	Ediff = Erec - Enu;
-	
-	Q2   = FitUtils::Q2QErec( (event->PartInfo(j))->fP, CosTheta, binding_E, !antinu);
+      TLorentzVector part_4mom = event->PartInfo(i)->fP;
+
+      if (PDGpart == PDGnu - 1){
+	PDGLep = PDGpart;
+
+	TLep = FitUtils::T(part_4mom) * 1000.0;
+	PLep = (part_4mom.Vect().Mag());
+	ELep = (part_4mom.E());
+	MLep = (part_4mom.Mag());
+	CosLep = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
       }
     }
 
-    // isCC0PI FLAG
-    if (partPDG == 211 or partPDG == -211) isCC0PI = false;
+    // Find highest momentum proton
+    if (PDGpart == 2212){
+       TLorentzVector part_4mom = event->PartInfo(i)->fP;
+       
+       if (part_4mom.Vect().Mag() > proton_highmom){
+	 proton_highmom = part_4mom.Vect().Mag();
+
+	 PPr = (part_4mom.Vect().Mag());
+	 EPr = (part_4mom.E());
+	 MPr = (part_4mom.Mag());
+	 CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+
+       }
+    } 
   }
 
+
+
+  // Fill the eventVariables Tree
+  eventVariables->Fill();
   return;
 };
 
-//******************************************************************** 
-/// @details Signal is true CCQE scattering
-///
-/// Everything is classed as signal...
-bool GenericFlux_Tester::isSignal(FitEvent *event){
-//******************************************************************** 
+//********************************************************************      
+void GenericFlux_Tester::Write(std::string drawOpt){
+//********************************************************************     
 
+  // First save the TTree
+  eventVariables->Write();
+  
+  // Now save any default plots we want to draw
+  TH1D* Enu_hist = new TH1D("Enu_hist","Enu_hist;E;Events", 40, 0.0, 20.0*1.E3);
+  eventVariables->Draw("Enu_tree >> Enu_hist", "Weight");
+  Enu_hist->Write();
+
+  // Save Flux and Event Histograms too
+  GetInput()->GetFluxHistogram()->Write();
+  GetInput()->GetEventHistogram()->Write();
+
+  return;
+}
+
+
+
+// -------------------------------------------------------------------
+// Purely MC Plot
+// Following functions are just overrides to handle this
+// -------------------------------------------------------------------
+//********************************************************************      
+/// Everything is classed as signal...                  
+bool GenericFlux_Tester::isSignal(FitEvent *event){
+  //********************************************************************      
+  (void) event;
   return true;
 };
+
 
 //********************************************************************    
 void GenericFlux_Tester::ScaleEvents(){
 //********************************************************************    
-
-  this->mcHist_1DQ2       ->Scale( scaleFactor, "width" );
-  this->mcHist_1DTmu      ->Scale( scaleFactor, "width" );
-  this->mcHist_1DCosTheta ->Scale( scaleFactor, "width" );
-  //  this->mcHist_1DEnu      ->Scale( scaleFactor, "width" );
-  //  this->mcHist_1DErec     ->Scale( scaleFactor, "width" );
-  //  this->mcHist_1DEdiff    ->Scale( scaleFactor, "width" );
-
-  this->mcHist_2DTmuCosTheta ->Scale( scaleFactor, "width" );
-
+  // Saving everything to a TTree so no scaling required
   return;
 }
 
@@ -205,79 +193,29 @@ void GenericFlux_Tester::ScaleEvents(){
 void GenericFlux_Tester::ApplyNormScale(double norm){
 //********************************************************************  
 
-  double scaleF = 1.0;
-  if (norm > 0.0) scaleF = 1.0/norm;
-  else scaleF = 0.0;
-
-  this->mcHist_1DQ2       ->Scale( scaleF );
-  this->mcHist_1DTmu      ->Scale( scaleF );
-  this->mcHist_1DCosTheta ->Scale( scaleF );
-  this->mcHist_1DEnu      ->Scale( scaleF );
-  this->mcHist_1DErec     ->Scale( scaleF );
-  this->mcHist_1DEdiff    ->Scale( scaleF );
-
-  this->mcHist_2DTmuCosTheta ->Scale( scaleF );
-
+  // Saving everything to a TTree so no scaling required
+  this->currentNorm = norm;
   return;
 }
 
 //********************************************************************  
 void GenericFlux_Tester::FillHistograms(){
 //********************************************************************  
-
-  if ( (filltype == kCCQEFill and !isCCQE) or
-       (filltype == kCCQEMECFill and !isCCQEMEC) or
-       (filltype == kMECFill and !isMEC) )
-    return;
-
-  // Do FILLING
-  this->mcHist_1DQ2       ->Fill( Q2,       Weight );
-  this->mcHist_1DTmu      ->Fill( Tmu,      Weight );
-  this->mcHist_1DCosTheta ->Fill( CosTheta, Weight );
-  this->mcHist_1DEnu      ->Fill( Enu,      Weight );
-  this->mcHist_1DErec     ->Fill( Erec,     Weight );
-  this->mcHist_1DEdiff    ->Fill( Ediff,    Weight );
-
-  this->mcHist_2DTmuCosTheta ->Fill( Tmu, CosTheta, Weight);
-
+  // No Histograms need filling........
   return;
 }
 
 //******************************************************************** 
 void GenericFlux_Tester::ResetAll(){
 //******************************************************************** 
-
-  this->mcHist_1DQ2->Reset();
-  this->mcHist_1DTmu->Reset();
-  this->mcHist_1DCosTheta->Reset();
-  this->mcHist_1DEnu->Reset();
-  this->mcHist_1DErec->Reset();
-  this->mcHist_1DEdiff->Reset();
-  this->mcHist_2DTmuCosTheta->Reset();
-
-  return;
-}
-
-//********************************************************************  
-void GenericFlux_Tester::Write(std::string drawOpt){
-//********************************************************************  
-
-  this->mcHist_1DQ2->Write();
-  this->mcHist_1DTmu->Write();
-  this->mcHist_1DCosTheta->Write();
-  this->mcHist_1DEnu->Write();
-  this->mcHist_1DErec->Write();
-  this->mcHist_1DEdiff->Write();
-  this->mcHist_2DTmuCosTheta->Write();
-  this->fluxHist->Write();
-  this->eventHist->Write();
-  
+  eventVariables->Reset();
   return;
 }
 
 //********************************************************************  
 double GenericFlux_Tester::GetChi2(){
 //********************************************************************  
+  // No Likelihood to test, purely MC
   return 0.0;
 }
 

@@ -56,34 +56,31 @@ public:
 
  private:
 
-  // All Histograms
-  TH1D* mcHist_1DQ2;
-  TH1D* mcHist_1DTmu;
-  TH1D* mcHist_1DCosTheta;
-  TH1D* mcHist_1DEnu;
-  TH1D* mcHist_1DErec;
-  TH1D* mcHist_1DEdiff;
+  TTree* eventVariables;
 
-  TH2D* mcHist_2DTmuCosTheta;
+  // Saved Variables
+  double Enu_true;
+  double Enu_QE;
+  int PDGnu;
+
+  double Q2_true;
+  double Q2_QE;
   
-  double Q2, Tmu, CosTheta;
-  double Enu, Erec, Ediff;
+  int PDGLep;
+  double TLep;
+  double CosLep;
+  double ELep;
+  double PLep;
+  double MLep;
 
-  double binding_E;
+  double PPr;  //!< Highest Mom Proton
+  double CosPr; //!< Highest Mom Proton
+  double EPr;
+  double TPr;
+  double MPr;
 
-  bool isCCQE, isCC0PI, isCC1PI, isCCNPI, isCCOTHER;
-  bool isMEC, isCCQEMEC, isRES, isRES1PI, isRESNPI;
-  int filltype;
-  bool antinu;
-
-   enum GenericFillTypes{
-     kCCQEFill=0,
-     kCCQEMECFill,
-     kMECFill,
-     kRESFill,
-     kCC0PIFill
-   };
-
+  double FluxWeight; //!< For Flux Shape Unfolding
+  
 };
 
 #endif

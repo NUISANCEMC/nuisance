@@ -148,7 +148,6 @@ void InputHandler::ReadEventSplineFile(){
   for (int i = 0; i < nEvents; i++){
     tn->GetEntry(i);
     tn->Show(i);
-    std::cout<<"EVENT PART = "<<cust_event->Npart()<<std::endl;
     spline_list.push_back( *cust_event->dial_coeff );
   }
   sleep(5);
@@ -436,7 +435,6 @@ void InputHandler::ReadNuWroFile(){
     }
 
 
-    std::cout<<"Grabbing count "<<count<<std::endl;
     double nuwro_Elow  = contents[count];
     double nuwro_Ehigh = contents[count+1];
     int nuwro_NBins = contents.size() - 2 - count;
@@ -709,7 +707,6 @@ void InputHandler::ReadEvent(unsigned int i){
 
   if (using_events){
 
-    std::cout<<"Getting Entry"<<std::endl;
     tn->GetEntry(i);
 
     if (eventType != kEVTSPLINE)

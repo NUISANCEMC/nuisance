@@ -151,10 +151,9 @@ void MeasurementBase::Reconfigure(){
     cust_event = FitBase::EvtManager().GetEvent(input_id, i);
     Weight = cust_event->Weight;
 
-    std::cout<<"Custom Event Mode = "<<cust_event->Mode<<std::endl;
-    std::cout<<"Custom Type "<<cust_event->fType<<std::endl;
-
-    std::cout<<"NPART = "<<cust_event->Npart()<<std::endl;
+    //    std::cout<<"Custom Event Mode = "<<cust_event->Mode<<std::endl;
+    //    std::cout<<"Custom Type "<<cust_event->fType<<std::endl;
+    //    std::cout<<"NPART = "<<cust_event->Npart()<<std::endl;
 
     // Initialize
     X_VAR = 0.0;

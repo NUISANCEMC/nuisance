@@ -6,6 +6,7 @@ minimizerFCN::minimizerFCN(std::string cardfile,  TFile *outfile){
   
   out       = outfile;
   card      = cardfile;
+  FitPar::Config().out = out;
   
   LoadSamples(card);
 
@@ -215,6 +216,7 @@ void minimizerFCN::LoadSamples(std::string cardFile)
   
     if (!FoundSample) continue;
 
+    out->cd();
     bool LoadedSample = SampleUtils::LoadSample( &fChain, name, files, type, fakeData, FitBase::GetRW() );
 
     if (!LoadedSample) {

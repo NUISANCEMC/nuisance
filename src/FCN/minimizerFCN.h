@@ -120,6 +120,7 @@ class minimizerFCN
 
   mutable UInt_t current_iteration;
   mutable  bool filledMC;
+  TFile* outputfile;
 
 };
 
