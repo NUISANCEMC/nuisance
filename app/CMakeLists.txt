@@ -26,6 +26,9 @@ if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(ExtFit_minimizer PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
+
+
+
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/Minimizer)
@@ -43,4 +46,12 @@ if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(DumpGiBUUEvents PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
-install(TARGETS ExtFit_minimizer DumpGiBUUEvents DESTINATION bin)
+
+add_executable(ExtFit_comparison ExtFit_comparison.cxx)
+target_link_libraries(ExtFit_comparison ${MODULETargets})
+target_link_libraries(ExtFit_comparison ${CMAKE_DEPENDLIB_FLAGS})
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(ExtFit_comparison PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+
+install(TARGETS ExtFit_minimizer ExtFit_comparison DumpGiBUUEvents DESTINATION bin)

@@ -18,10 +18,12 @@
 ################################################################################
 set(IMPLFILES
 minimizerRoutine.cxx
+comparisonRoutines.cxx
 )
 
 set(HEADERFILES
 minimizerRoutine.h
+comparisonRoutines.h
 )
 
 set(LIBNAME Minimizer)
