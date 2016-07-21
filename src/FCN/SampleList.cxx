@@ -178,11 +178,13 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
       CCQE
     */
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
-             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu") ||
-             !name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
+             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")){
+    fChain->push_back(
+	new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
+  } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu")) {
     fChain->push_back(
-        new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
+        new MiniBooNE_CCQE_XSec_1DQ2_antinu(name, file, rw, type, fkdt));
 
   } else if (!name.compare("MiniBooNE_CCQE_XSec_2DTcos_nu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_2DTcos_nu")) {

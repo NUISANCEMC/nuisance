@@ -80,6 +80,7 @@
 
 // MiniBooNE CCQE
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
+#include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_nu.h"

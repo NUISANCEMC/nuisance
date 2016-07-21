@@ -618,6 +618,7 @@ void Measurement2D::ScaleEvents(){
     PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist, axis);
     PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist, axis);
 
+    LOG(SAM) << "Running 2D Flux Unfolded Scaling?" << endl;
     mcHist->Scale(scaleFactor);
     mcFine->Scale(scaleFactor);
 

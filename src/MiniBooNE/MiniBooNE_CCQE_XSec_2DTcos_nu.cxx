@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+/// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NuFiX.
@@ -73,9 +73,8 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
   // Init
-  bad_particle = false;
-  Ekmu = 0.0;
-  costheta = 0.0;
+  Ekmu = -999.9;
+  costheta = -999.9;
 
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
@@ -83,27 +82,20 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
     int PID = (event->PartInfo(j))->fPID;
 
     // Look for the outgoing muon
-    if (PID == 13){
+    if (PID == 13 or (ccqelike and PID == -13)){
     
       // Now find the kinematic values and fill the histogram
-      Ekmu     = (event->PartInfo(j))->fP.E()/1000 - 0.105658367;
+      Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - 0.105658367;
       costheta = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
 
-      if (!ccqelike) break;
-      continue;
-    }
-
-    // Check for bad particles;
-    if (PID != 2112 and PID != 22  and \
-	PID != 2212 and	PID != 13)      
-	bad_particle = true;
-      
+      break;
+    } 
   }
 
   // Set X and Y Variables
-  X_VAR = Ekmu;
-  Y_VAR = costheta;
-  
+  this->X_VAR = Ekmu;
+  this->Y_VAR = costheta;
+
   return;
 };
 
@@ -111,19 +103,14 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
 bool MiniBooNE_CCQE_XSec_2DTcos_nu::isSignal(FitEvent *event){
 //******************************************************************** 
 
-  // For now, define as the true mode being CCQE or npnh
-  if (!ccqelike && Mode != 1 && Mode != 2) return false;
+  bool signal = true;
+  // 2 Different Signal Definitions
+  if (ccqelike) signal = SignalDef::isMiniBooNE_CCQELike(event, EnuMin, EnuMax);
+  else signal =  SignalDef::isMiniBooNE_CCQE(event, EnuMin, EnuMax);
 
-  // If CCQELike Signal
-  if (ccqelike and bad_particle) return false;
-
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Restrict energy range
-  if ((event->PartInfo(0))->fP.E() < EnuMin*1000 ||
-      (event->PartInfo(0))->fP.E() > EnuMax*1000) return false;
-
-  return true;
+  
+  //if (signal) std::cout<<"Signal Values = "<<X_VAR<<" "<<Y_VAR<<std::endl;
+    
+  return signal;
 };
 

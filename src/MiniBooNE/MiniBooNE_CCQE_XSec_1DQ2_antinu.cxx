@@ -34,6 +34,8 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   EnuMin = 0.;
   EnuMax = 3.;
   normError = 0.130;
+  default_types="FIX/DIAG";
+  allowed_types="FIX,FREE,SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
@@ -41,7 +43,6 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   this->ccqelike = name.find("CCQELike") != std::string::npos;
 
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
-
   this->SetupDefaultHist();
                                                     
   if (!this->isDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
@@ -94,8 +95,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
   // Init
-  bad_particle = false;
-  q2qe = 0.0;
+  q2qe = -999.9;
 
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
@@ -103,28 +103,16 @@ void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
     int PID = fabs((event->PartInfo(j))->fPID);
 
     // Look for the outgoing muon
-    if (PID == 13){
+    if (PID == -13 or (ccqelike and PID == 13)){
     
       // Now find the Q2QE value and fill the histogram
       q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
 			       cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 30., false);
      
-      if (!ccqelike) break;
-      continue;
+      break;
     }
-
-    // Check alive                                                                                                                                                                                                                         
-    if (!event->PartInfo(j)->fIsAlive or event->PartInfo(j)->fStatus != 0) continue;
-
-    // Check for bad particles;
-    if (PID != 2112 and PID != 22  and \
-	PID != 2212 and	PID != 13)      
-	bad_particle = true;
-
-    
-    
   }
-
+ 
   // Set X Variables
   this->X_VAR = q2qe;
   
@@ -132,33 +120,12 @@ void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 };
 
 //******************************************************************** 
-/// @details Signal is CCQE/CCQELike numu on CH
-/// @details CCQE Cut 1 : Mode 1 or Mode 2
-/// @details CCQELike Cut 1: Only nucleons, muons, and photons
-/// @details Cut 2: Numu
-/// @details Cut 3: Correct Energy Range 0.0 to 3.0 GeV
 bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent *event){
 //******************************************************************** 
 
-  // For now, define as the true mode being CCQE or npnh
-  if (!ccqelike){
-    if (Mode != -1 && Mode != -2) return false;
-  }
-
-  // Don't include Numu CCQE in antineutrino?
-  if (Mode == 1 or Mode == 2) return false;
-
-  // If CCQELike Signal
-  if (ccqelike and bad_particle) return false;
-
-  // Only look at numu events
-  if (fabs((event->PartInfo(0))->fPID) != 14) return false;
-
-  // Restrict energy range
-  if ((event->PartInfo(0))->fP.E() < this->EnuMin*1000 || (event->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
-
-  if (X_VAR <= 0.0) return false;
-  if (abs(Mode) >= 40) return false;
+  // 2 Different Signal Definitions
+  if (ccqelike) return SignalDef::isMiniBooNE_CCQELike(event, EnuMin, EnuMax);
+  else return SignalDef::isMiniBooNE_CCQEBar(event, EnuMin, EnuMax);
 
   return true;
 };

@@ -119,6 +119,59 @@ bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 };
 
+bool SignalDef::isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax) {
+
+  if (abs(event->PartInfo(0)->fPID) != 14) return false;
+  if ((event->PartInfo(0)->fP.E() < EnuMin*1000.) || (event->PartInfo(0)->fP.E() > EnuMax*1000.)) return false;
+
+  int lepCnt = 0;
+
+  for (unsigned int j = 2; j < event->Npart(); j++) {
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0)
+      continue; // maybe need not 2212 2112?
+
+    int PID = event->PartInfo(j)->fPID;
+    if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) lepCnt++;
+
+    if ((event->PartInfo(j))->fPID != 22 &&   // photon OK
+        (event->PartInfo(j))->fPID != 2212 && // neutron OK
+        (event->PartInfo(j))->fPID != 2112 && // proton OK
+        abs((event->PartInfo(j))->fPID) != 13)     // muon OK
+      return false;
+  }
+  
+  if (lepCnt != 1) return false;
+
+  return true;
+};
+
+bool SignalDef::isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax) {
+
+  // Only NUMU
+  if (event->PartInfo(0)->fPID != 14) return false;
+
+  // E Within Range
+  if ((event->PartInfo(0)->fP.E() < EnuMin*1000.) || (event->PartInfo(0)->fP.E() > EnuMax*1000.)) return false;
+
+  // Mode == 1 or 2
+  if (event->Mode != 2 and event->Mode != 1) return false;
+
+  return true;
+}
+
+bool SignalDef::isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax) {
+
+  if (event->PartInfo(0)->fPID != -14) return false;
+
+  if ((event->PartInfo(0)->fP.E() < EnuMin*1000.) || (event->PartInfo(0)->fP.E() > EnuMax*1000.)) return false;
+
+  if (event->Mode != -2 and event->Mode != -1) return false;
+
+  return true;
+}
+
+
+
 bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
 
   if ((event->PartInfo(0))->fPID != 14) return false;

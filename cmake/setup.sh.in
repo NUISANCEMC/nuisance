@@ -58,4 +58,18 @@ if [[ "@USE_NIWG@" != "0" ]]; then
   echo "[INFO]: Adding NIWG paths to the environment."
 fi
 
+if [[ "@USE_NEUT@" != "0" ]]; then
+    echo "[INFO]: Adding NEUT paths to the environment."
+    export NEUT_ROOT="@NEUT_ROOT@"
+    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NEUT_ROOT@/lib:"* ]]; then
+	export LD_LIBRARY_PATH=@NEUT_ROOT@/lib:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=@NEUT_ROOT@/src/reweight:$LD_LIBRARY_PATH
+    fi
+
+    export CERN_ROOT="@CERN_ROOT@"
+    if ! [[ ":$LD_LIBRARY_PATH:" == *":@CERN_ROOT@/lib:"* ]]; then
+	export LD_LIBRARY_PATH=@CERN_ROOT@/lib:$LD_LIBRARY_PATH
+    fi
+fi
+
 export EXT_FIT="@CMAKE_SOURCE_DIR@"

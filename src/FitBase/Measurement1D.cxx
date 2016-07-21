@@ -602,8 +602,11 @@ void Measurement1D::ScaleEvents(){
 
   // Scaling for raw event rates
   if (isRawEvents) {
+
+    PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, (dataHist->Integral()/mcHist->Integral()), "width");
     this->mcHist->Scale(dataHist->Integral()/mcHist->Integral());
     this->mcFine->Scale(dataHist->Integral()/mcFine->Integral());
+
   // Scaling for XSec as function of Enu
   } else if (isEnu1D) {
     PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
@@ -615,6 +618,7 @@ void Measurement1D::ScaleEvents(){
   } else {
     this->mcHist->Scale(this->scaleFactor, "width");
     this->mcFine->Scale(this->scaleFactor, "width");
+    PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, this->scaleFactor, "width");
   }
 
 
@@ -637,9 +641,6 @@ void Measurement1D::ScaleEvents(){
       this->mcFine->SetBinError(i+1, this->mcFine->Integral());
     }
   }
-
-  // Scale NEUT Mode Array
-  PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, this->scaleFactor, "width");
 
   return;
 };

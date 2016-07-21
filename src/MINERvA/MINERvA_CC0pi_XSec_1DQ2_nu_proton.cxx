@@ -5,26 +5,21 @@
 // The constructor
 MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  // Check if this is a shape only fit  
-  this->SetFitOptions(type);
+  // Measurement Details
+  measurementName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
+  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
+  EnuMin = 0.;
+  EnuMax = 100.0;
+  normError = 0.100;
+  default_types = "FIX/FULL";
+  allowed_types = "FIX/FULL,DIAG";
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  // Define the energy region
-  this->EnuMin = 0.0;
-  this->EnuMax = 100.0;
-
-  // In future read most of these from a card file
-  this->measurementName = "MINERvA_numu_1D_proton";
-  this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
-
-  //  this->isShape = false;
   this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt");
-  this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/proton_Q2QE_nu_covar.txt", 7);
+  this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
+  this->SetupDefaultHist();
   
-  // Setup whole shit load of histograms
-  this->mcHist = new TH1D((this->measurementName+"_MC").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
-  this->mcFine = new TH1D((this->measurementName+"_MC_FINE").c_str(), (this->measurementName+this->plotTitles).c_str(), 100, -2, 2);
-
-  this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))/this->fluxHist->Integral(); // NEUT    
+  this->scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux();
 };
 
 
