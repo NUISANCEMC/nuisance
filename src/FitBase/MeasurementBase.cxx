@@ -104,11 +104,16 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 //********************************************************************
 
   // Add this infile to the global manager
-  FitBase::AddInput(measurementName, inputfile);
+  if (FitPar::Config().GetParB("EventManager")){
+    FitBase::AddInput(measurementName, inputfile);
 
-  // Get a pointer to the input so we can grab flux stuff
-  // Slightly Convoluted...
-  InputHandler* input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
+    // Get a pointer to the input so we can grab flux stuff
+    // Slightly Convoluted...
+    input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
+    
+  } else {
+    input = new InputHandler(inputfile);
+  }
 
   this->fluxHist      = input->GetFluxHistogram();
   this->eventHist     = input->GetEventHistogram();
@@ -126,9 +131,11 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 void MeasurementBase::Reconfigure(){
 //***********************************************
   LOG(REC) << " Reconfiguring sample "<<this->measurementName<<std::endl;
-  int input_id = FitBase::GetInputID(inputfilename);
-  InputHandler* input = FitBase::GetInput(input_id);
 
+  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  int input_id = -1;
+  if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
+ 
   // Reset Histograms
   this->ResetAll();
 
@@ -154,7 +161,17 @@ void MeasurementBase::Reconfigure(){
   for (int i = 0; i < nevents; i++){
 
     // Read in the TChain and Calc Kinematics
-    cust_event = FitBase::EvtManager().GetEvent(input_id, i);
+    if (using_evtmanager){
+      cust_event = FitBase::EvtManager().GetEvent(input_id, i);
+    } else {
+      input->ReadEvent(i);
+      
+      cust_event->RWWeight = FitBase::GetRW().CalcWeight(cust_event);
+      cust_event->Weight   = evtpt->RWWeight*evtpt->InputWeight;
+      
+      Weight = cust_event->Weight;
+    }
+      
     Weight = cust_event->Weight;
 
     // Initialize
@@ -211,9 +228,10 @@ void MeasurementBase::Reconfigure(){
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
 
-  int input_id = FitBase::GetInputID(inputfilename);
-  InputHandler* input = FitBase::GetInput(input_id);
-
+  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  int input_id = -1;
+  if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
+  
   // Check if we Can't Signal Reconfigure
   if (!filledMC){
     this->Reconfigure();
@@ -242,8 +260,15 @@ void MeasurementBase::ReconfigureFast(){
   for (int i = 0; I != INDEX_VECT.end(); I++, i++){
 
     // Just Update Weight
-    Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
+    if (using_evtmanager){
+      Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
+    } else {
 
+      input->GetTreeEntry(i);
+      Weight = cust_event->CalcWeight(cust_event) \
+         	* cust_event->InputWeight;
+    }
+    
     X_VAR = (*X);
     Y_VAR = (*Y);
     Z_VAR = (*Z);
