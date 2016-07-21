@@ -72,7 +72,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent* event){
   pi0Cnt = 0;
   bad_particle = false;
 
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     double KE = (event->PartInfo(j))->fP.E() - (event->PartInfo(j))->fMass;
@@ -91,7 +91,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent* event){
   double bind = 34.0;
   if (isComb) bind = 30.0;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu, Ppi0);
+  //double hadMass = FitUtils::Wrec(Pnu, Pmu, Ppi0);
   double ppi0 = Ppi0.Vect().Mag()/1000.0;
   this->X_VAR = ppi0;
 

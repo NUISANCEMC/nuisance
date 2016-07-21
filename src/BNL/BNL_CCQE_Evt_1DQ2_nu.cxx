@@ -93,7 +93,7 @@ void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   // Fill histogram with reconstructed Q2 Distribution
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     
     // Look for the outgoing muon
     if ((event->PartInfo(j))->fPID != 13) continue;

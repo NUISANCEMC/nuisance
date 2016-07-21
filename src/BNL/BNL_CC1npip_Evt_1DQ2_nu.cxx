@@ -56,7 +56,7 @@ void BNL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // Loop over the particle stack to find relevant particles 
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (int j = 2; j < event->Npart(); ++j) {
+  for (UInt_t j = 2; j < event->Npart(); ++j) {
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
@@ -68,7 +68,7 @@ void BNL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  double hadMass = FitUtils::MpPi(Pn, Ppip);
+  // double hadMass = FitUtils::MpPi(Pn, Ppip);
   // no hadronic mass constraint in BNL CC1n1pi+
   double q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
 
@@ -95,7 +95,7 @@ bool BNL_CC1npip_Evt_1DQ2_nu::isSignal(FitEvent *event) {
   TLorentzVector Ppip;
   TLorentzVector Pn; 
 
-  for (int j = 2; j < event->Npart(); j++) {
+  for (UInt_t j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {

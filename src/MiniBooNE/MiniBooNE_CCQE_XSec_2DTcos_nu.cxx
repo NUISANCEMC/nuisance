@@ -78,7 +78,7 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
   costheta = 0.0;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     
     int PID = (event->PartInfo(j))->fPID;
 

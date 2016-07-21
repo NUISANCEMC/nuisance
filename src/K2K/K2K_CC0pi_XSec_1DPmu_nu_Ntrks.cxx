@@ -78,7 +78,7 @@ void K2K_CC0pi_XSec_1DPmu_nu_Ntrks::FillEventVariables(FitEvent *event){
   TLorentzVector vecpne;
   
   // loop particles
-  for (int i = 0; i < event->Npart(); i++){
+  for (UInt_t i = 0; i < event->Npart(); i++){
 
     if (i < 2 and (event->PartInfo(i))->fPID == 2112){
       vecpne = (event->PartInfo(i))->fP;
@@ -111,7 +111,7 @@ void K2K_CC0pi_XSec_1DPmu_nu_Ntrks::FillEventVariables(FitEvent *event){
 	ncharged++;
     } else if ((event->PartInfo(i))->fPID != 22 and
 	       (event->PartInfo(i))->fPID != 2112){
-      bad_particle == true;
+      bad_particle = true;
     }
   }
 

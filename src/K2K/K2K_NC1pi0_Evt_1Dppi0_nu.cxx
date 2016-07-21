@@ -43,7 +43,7 @@ void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {
 
   TLorentzVector Ppi0;
 
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 111) {

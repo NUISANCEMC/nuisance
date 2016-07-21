@@ -111,7 +111,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   //   double t_true = 0.;
 
   //   // Loop over the particle stack
-  //   for (int j = 2; j < nvect->Npart(); ++j){
+  //   for (UInt_t j = 2; j < nvect->Npart(); ++j){
       
   //     // Add the kinetic energies of any nucleons
   //     if (abs((nvect->PartInfo(j))->fPID) == 2212)
@@ -212,7 +212,7 @@ double MiniBooNE_NCEL_XSec_Treco_nu::GetChi2(){
   // int nBins = this->dataHist->GetNbinsX();
 
   // for (int i = 0; i < nBins; ++i){
-  //   for (int j = 0; j < nBins; ++j){
+  //   for (UInt_t j = 0; j < nBins; ++j){
 
   //     double iDiff = this->dataHist->GetBinContent(i+1) - this->mcHist->GetBinContent(i+1);
   //     double jDiff = this->dataHist->GetBinContent(j+1) - this->mcHist->GetBinContent(j+1);

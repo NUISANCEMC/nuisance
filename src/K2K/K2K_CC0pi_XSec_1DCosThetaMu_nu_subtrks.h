@@ -49,7 +49,7 @@ public:
   
   unsigned int k2k_sample_type;
 
-  unsigned int ncharged_cut;
+  int ncharged_cut;
   double deltaphi_cut;
   double CosThetaMu;
   bool matchnorm;

@@ -99,7 +99,7 @@ void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
   q2qe = 0.0;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j =  2; j < event->Npart(); ++j){
     
     // Look for the outgoing muon
     if ((event->PartInfo(j))->fPID != 13) continue;
@@ -181,7 +181,7 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 
   if (applyEnucorrection){
     this->EnuvsQ2Plot->Scale(eventHist->Integral()/(nevents+0.));
-    for (int j = 0; j < EnuvsQ2Plot->GetNbinsY(); j++){
+    for (int j =  0; j < EnuvsQ2Plot->GetNbinsY(); j++){
       for (int i = 0; i < EnuvsQ2Plot->GetNbinsX(); i++){
 	this->EnuvsQ2Plot->SetBinContent(i+1,j+1, this->EnuvsQ2Plot->GetBinContent(i+1,j+1) * EnuFluxUnfoldPlot->GetBinContent(j+1));
       }

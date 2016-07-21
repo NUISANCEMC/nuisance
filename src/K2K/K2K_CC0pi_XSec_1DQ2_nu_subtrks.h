@@ -51,7 +51,7 @@ public:
   
   unsigned int k2k_sample_type;
   double ThetaMu;
-  unsigned int ncharged_cut;
+  int ncharged_cut;
   double deltaphi_cut;
   double deltaphi;
   double q2qe;

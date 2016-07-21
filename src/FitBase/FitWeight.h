@@ -91,6 +91,7 @@ using namespace t2krew;
 #include "NuwroReWeight.h"
 #include "NuwroReWeight_QEL.h"
 #include "NuwroReWeight_FlagNorm.h"
+#include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #endif
 

@@ -49,7 +49,7 @@ void BEBC_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
@@ -87,7 +87,7 @@ bool BEBC_CC1npip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   int lepCnt = 0;
   int neutronCnt = 0;
 
-  for (int j = 2; j < event->Npart(); j++) {
+  for (UInt_t j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {

@@ -503,7 +503,7 @@ void InputHandler::ReadNuWroFile() {
               << std::endl;
 
     // Fill Flux Histogram
-    for (UInt_t i = 0; i < nuwro_NBins; i++) {
+    for (int i = 0; i < nuwro_NBins; i++) {
       this->fluxHist->SetBinContent(i + 1, contents.at(i + 2 + count));
     }
 

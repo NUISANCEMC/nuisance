@@ -154,11 +154,11 @@ void Measurement1D::SetFitOptions(std::string opt){
 
   // CHECK Conflicting Fit Options
   std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(allowed_types, "/");
-  for (int i = 0; i < fit_option_allow.size(); i++){
+  for (UInt_t i = 0; i < fit_option_allow.size(); i++){
     std::vector<std::string> fit_option_section = PlotUtils::FillVectorSFromString(fit_option_allow.at(i), ",");
     bool found_option = false;
 
-    for (int j = 0; j < fit_option_section.size(); j++){
+    for (UInt_t j = 0; j < fit_option_section.size(); j++){
       std::string av_opt = fit_option_section.at(j);
 
       if (!found_option and opt.find(av_opt) != std::string::npos) {
@@ -177,7 +177,7 @@ void Measurement1D::SetFitOptions(std::string opt){
 
   // Check all options are allowed
   std::vector<std::string> fit_options_input = PlotUtils::FillVectorSFromString(opt,"/");
-  for (int i = 0; i < fit_options_input.size(); i++){
+  for (UInt_t i = 0; i < fit_options_input.size(); i++){
     if (allowed_types.find(fit_options_input.at(i)) == std::string::npos){
 
       ERR(FTL) <<"ERROR: Fit Option '"<<fit_options_input.at(i)<<"' Provided is not allowed for this measurement."<<std::endl;
@@ -271,7 +271,7 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
   TFile* tempFile = new TFile(covarFile.c_str(),"READ");
 
   TH2D* covarPlot = new TH2D();
-  TH2D* decmpPlot = new TH2D();
+  //  TH2D* decmpPlot = new TH2D();
   TH2D* covarInvPlot = new TH2D();
   TH2D* fullcovarPlot = new TH2D();
   std::string covName = "";
@@ -481,7 +481,6 @@ void Measurement1D::SetBinMask(std::string maskFile){
   // Create a mask histogram.
   int nbins = this->dataHist->GetNbinsX();
   this->maskHist = new TH1I((this->measurementName+"_maskHist").c_str(),(this->measurementName+"_maskHist; Bin; Mask?").c_str(),nbins,0,nbins);
-  int row ,column= 0;
   std::string line;
   std::ifstream mask(maskFile.c_str(),ifstream::in);
 
@@ -1004,8 +1003,8 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawModes  = (drawOpt.find("MODES") != std::string::npos);
   bool drawShape  = (drawOpt.find("SHAPE") != std::string::npos);
   bool residual   = (drawOpt.find("RESIDUAL") != std::string::npos);
-  bool drawMatrix = (drawOpt.find("MATRIX") != std::string::npos);
-  bool drawXSec   = (drawOpt.find("XSEC") != std::string::npos);
+  //  bool drawMatrix = (drawOpt.find("MATRIX") != std::string::npos);
+  //  bool drawXSec   = (drawOpt.find("XSEC") != std::string::npos);
   bool drawFlux   = (drawOpt.find("FLUX") != std::string::npos);
   bool drawMask   = (drawOpt.find("MASK") != std::string::npos);
   bool drawCov    = (drawOpt.find("COV")  != std::string::npos);

@@ -49,7 +49,7 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     TLorentzVector Ppi0;
 
     // Loop over the particle stack
-    for (int j = 2; j < event->Npart(); ++j){
+    for (UInt_t j = 2; j < event->Npart(); ++j){
       if (!(event->PartInfo(j))->fIsAlive || (event->PartInfo(j))->fStatus != 0) continue;
       int PID = (event->PartInfo(j))->fPID;
       if (PID == 111) {
@@ -61,7 +61,7 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
       }
     }
 
-    double hadMass = FitUtils::MpPi(Pp, Ppi0);
+    //double hadMass = FitUtils::MpPi(Pp, Ppi0);
 
     //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
     double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
@@ -85,7 +85,7 @@ bool BNL_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   int protonCnt = 0;
 
   // Look for final state particles
-  for (int j = 2; j < event->Npart(); j++) {
+  for (UInt_t j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) || (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {

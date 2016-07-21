@@ -100,7 +100,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
   bool cc = (abs(event->Mode) < 30);
 
   // Start Particle Loop
-  int npart = event->Npart();
+  UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++){
 
     // Skip particles that weren't in the final state

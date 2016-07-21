@@ -63,7 +63,7 @@ void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
   Enu  = (event->PartInfo(0))->fP.E()/1000.0;
 
   // Get the relevant signal information
-  for (int j = 0; j < event->Npart(); ++j){
+  for (UInt_t j = 0; j < event->Npart(); ++j){
 
     if ((event->PartInfo(j))->fPID != 13) continue;
 

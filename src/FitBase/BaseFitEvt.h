@@ -49,7 +49,7 @@ using namespace genie;
  */
 
 //! Global Enum to define generator type being read with FitEvent
-enum generator_event_type { kUNKNOWN=999, kNEUT=0, kNUWRO=2, kGENIE=5, kEVTSPLINE=6, kNUANCE=7 kGiBUU=8};
+enum generator_event_type { kUNKNOWN=999, kNEUT=0, kNUWRO=2, kGENIE=5, kEVTSPLINE=6, kNUANCE=7, kGiBUU=8};
 
 //! Base Event Class used to store just the generator event pointers and flat variables
 class BaseFitEvt {

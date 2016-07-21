@@ -63,7 +63,7 @@ void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
 
 
    // Loop over the particle stack and find highest momentum FS proton
-  for (int j = 0; j < event->Npart(); ++j){    
+  for (UInt_t j = 0; j < event->Npart(); ++j){    
     if (!event->PartInfo(j)->fIsAlive) continue;
     if (event->PartInfo(j)->fPID == 2112){
       Nn++;

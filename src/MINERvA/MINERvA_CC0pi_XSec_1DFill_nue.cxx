@@ -78,7 +78,7 @@ void MINERvA_CC0pi_XSec_1DFill_nue::FillEventVariables(FitEvent *event){
   bad_particle = false;
   
   // Get the relevant signal information
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
 
     int PID = (event->PartInfo(j))->fPID;
     

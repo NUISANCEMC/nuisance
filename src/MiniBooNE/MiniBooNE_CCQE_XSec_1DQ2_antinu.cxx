@@ -98,7 +98,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
   q2qe = 0.0;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     
     int PID = fabs((event->PartInfo(j))->fPID);
 

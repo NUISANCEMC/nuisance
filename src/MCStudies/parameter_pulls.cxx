@@ -44,7 +44,7 @@ void parameter_pulls::Reconfigure(double norm, bool fullconfig){
   std::vector<std::string> svec = this->rw_engine->GetDialNames();
 
   // Set Bin Values
-  for (int i = 0; i < svec.size(); i++){
+  for (UInt_t i = 0; i < svec.size(); i++){
     std::string systString = svec.at(i);
 
     for (int j = 0; j < mcHist->GetNbinsX(); j++){

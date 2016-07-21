@@ -56,7 +56,7 @@ void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // Loop over the particle stack to find relevant particles 
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 111) {
@@ -68,7 +68,7 @@ void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  double hadMass = FitUtils::MpPi(Pp, Ppi0);
+  //double hadMass = FitUtils::MpPi(Pp, Ppi0);
     
   // no W cut on BNL CC1pi0 
   double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
@@ -92,7 +92,7 @@ bool BNL_CC1pi0_Evt_1DQ2_nu::isSignal(FitEvent *event) {
   int lepCnt = 0;
   int protonCnt = 0;
 
-  for (int j = 2; j < event->Npart(); j++) {
+  for (UInt_t j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {

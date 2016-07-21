@@ -164,10 +164,11 @@ void MeasurementBase::Reconfigure(){
     Signal = false;
     Mode = cust_event->Mode;
 
-
+#ifdef __GiBUU_ENABLED__
     if(GetInput()->GetType() == kGiBUU){
       std::cout << WriteGiBUUEvent(*(cust_event->GiRead)) << std::endl;
     }
+#endif
 
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);

@@ -55,7 +55,7 @@ void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {

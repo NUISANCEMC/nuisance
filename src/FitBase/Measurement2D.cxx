@@ -119,11 +119,11 @@ void Measurement2D::SetFitOptions(std::string opt){
 
   // CHECK Conflicting Fit Options
   std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(allowed_types, "/");
-  for (int i = 0; i < fit_option_allow.size(); i++){
+  for (UInt_t i = 0; i < fit_option_allow.size(); i++){
     std::vector<std::string> fit_option_section = PlotUtils::FillVectorSFromString(fit_option_allow.at(i), ",");
     bool found_option = false;
 
-    for (int j = 0; j < fit_option_section.size(); j++){
+    for (UInt_t j = 0; j < fit_option_section.size(); j++){
       std::string av_opt = fit_option_section.at(j);
 
       if (!found_option and opt.find(av_opt) != std::string::npos) {
@@ -142,7 +142,7 @@ void Measurement2D::SetFitOptions(std::string opt){
 
   // Check all options are allowed
   std::vector<std::string> fit_options_input = PlotUtils::FillVectorSFromString(opt,"/");
-  for (int i = 0; i < fit_options_input.size(); i++){
+  for (UInt_t i = 0; i < fit_options_input.size(); i++){
     if (allowed_types.find(fit_options_input.at(i)) == std::string::npos){
 
       ERR(FTL) <<"ERROR: Fit Option '"<<fit_options_input.at(i)<<"' Provided is not allowed for this measurement."<<std::endl;
@@ -296,7 +296,7 @@ void Measurement2D::SetCovarMatrix(std::string covarFile){
 
   // Make plots that we want
   TH2D* covarPlot = new TH2D();
-  TH2D* decmpPlot = new TH2D();
+  //  TH2D* decmpPlot = new TH2D();
   TH2D* covarInvPlot = new TH2D();
   TH2D* fullcovarPlot = new TH2D();
 
@@ -483,7 +483,7 @@ void Measurement2D::SetBinMask(std::string maskFile){
 
   this->maskHist = new TH2I((this->measurementName+"_maskHist").c_str(),(this->measurementName+"_maskHist; Bin; Mask?")	\
 			    .c_str(),nbinsX,0,nbinsX,nbinsY,0,nbinsY);
-  int row ,column= 0;
+  //  int row ,column= 0;
   std::string line;
   std::ifstream mask(maskFile.c_str(),ifstream::in);
 
@@ -1145,8 +1145,8 @@ void Measurement2D::Write(std::string drawOpt){
       double chi2X = StatUtils::GetChi2FromDiag(dataHist_X, mcHist_X);
       double chi2Y = StatUtils::GetChi2FromDiag(dataHist_Y, mcHist_Y);
 
-      mcHist_X->SetTitle(Form("%d", chi2X));
-      mcHist_Y->SetTitle(Form("%d", chi2Y));
+      mcHist_X->SetTitle(Form("%f", chi2X));
+      mcHist_Y->SetTitle(Form("%f", chi2Y));
     }
 
     // Save the histograms

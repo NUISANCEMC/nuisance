@@ -125,7 +125,7 @@ void K2K_CC0pi_XSec_1DQ2_nu_subtrks::FillEventVariables(FitEvent *event){
   //  TLorentzVector ppr;
   
   // loop particles
-  for (int i = 2; i < event->Npart(); i++){
+  for (UInt_t i = 2; i < event->Npart(); i++){
 
     // skip bad ones
     if (!(event->PartInfo(i))->fIsAlive or (event->PartInfo(i))->fStatus != 0 ) continue;

@@ -60,7 +60,7 @@ void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
     
     // Look for the outgoing muon
     if ((event->PartInfo(j))->fPID != 13) continue;

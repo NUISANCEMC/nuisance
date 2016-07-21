@@ -402,7 +402,7 @@ TH1D* JointMeas1D::GetCombinedFlux(){
     }
 
     // Add all fluxes
-    for (int i = 0; i < fluxVect.size(); i++){
+    for (UInt_t i = 0; i < fluxVect.size(); i++){
       newflux->Add( (TH1D*) fluxVect.at(i) );
       sample++;
     }
@@ -431,7 +431,7 @@ TH1D* JointMeas1D::GetCombinedEventRate(){
     }
 
     // Add all fluxes
-    for (int i = 0; i < fluxVect.size(); i++){
+    for (UInt_t i = 0; i < fluxVect.size(); i++){
       newflux->Add( fluxVect.at(i) );
       sample++;
     }

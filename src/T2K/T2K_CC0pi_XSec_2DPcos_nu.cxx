@@ -22,7 +22,7 @@
 // The constructor
 T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  // NEEDS UPDATING
+  // NEEDS UPDATING (WILL DO BEFORE PITTSBURGH WORKSHOP)
 
   // // Get Fit Options
   // this->SetFitOptions(type);
@@ -94,7 +94,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
   numu_energy = ((event->PartInfo(0))->fP.E()/1000.0);
 
   // Loop over all particles
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j = 2; j < event->Npart(); ++j){
 
     // Muon section
     if ((event->PartInfo(j))->fPID == 13){
@@ -250,7 +250,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
   this->covar = new TMatrixDSym(nbins, LU .Invert().GetMatrixArray(), "");
 
   std::cout<<"Got dataHist "<<this->dataHist->GetTitle()<<std::endl;
-  int nBins = 67;
+  //  int nBins = 67;
 
 
   return;

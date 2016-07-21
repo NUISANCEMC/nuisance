@@ -48,7 +48,7 @@ void ANL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppi0;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (UInt_t j =  2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive || (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 111) Ppi0 = event->PartInfo(j)->fP;
@@ -84,7 +84,7 @@ bool ANL_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   int protonCnt = 0;
 
   // Look for final state particles
-  for (int j = 2; j < event->Npart(); j++) {
+  for (UInt_t j =  2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) || (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {
