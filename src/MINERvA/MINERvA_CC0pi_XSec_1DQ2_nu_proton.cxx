@@ -17,7 +17,7 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
 
   //  this->isShape = false;
-  this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/proton_Q2QE_nu_data.txt");
+  this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt");
   this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/proton_Q2QE_nu_covar.txt", 7);
   
   // Setup whole shit load of histograms

@@ -79,6 +79,9 @@ public:
   double TPr;
   double MPr;
 
+  double q0_true;
+  double q3_true;
+
   double FluxWeight; //!< For Flux Shape Unfolding
   
 };

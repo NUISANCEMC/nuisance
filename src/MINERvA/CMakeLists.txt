@@ -19,7 +19,6 @@
 set(IMPLFILES
 MINERvA_CC0pi_XSec_1DEe_nue.cxx
 MINERvA_CC1pip_XSec_1DTpi_nu.cxx
-MINERvA_CC0pi_XSec_1DFill_nue.cxx
 MINERvA_CCinc_XSec_2DEavq3_nu.cxx
 MINERvA_CC0pi_XSec_1DQ2_nue.cxx
 MINERvA_CCNpip_XSec_1Dth_20deg_nu.cxx
@@ -45,7 +44,6 @@ MINERvA_CCinc_XSec_1DEnu_nu.cxx
 set(HEADERFILES
 MINERvA_CC0pi_XSec_1DEe_nue.h
 MINERvA_CC1pip_XSec_1DTpi_nu.h
-MINERvA_CC0pi_XSec_1DFill_nue.h
 MINERvA_CCinc_XSec_2DEavq3_nu.h
 MINERvA_CC0pi_XSec_1DQ2_nue.h
 MINERvA_CCNpip_XSec_1Dth_20deg_nu.h

@@ -607,8 +607,7 @@ void InputHandler::ReadGenieFile() {
   this->eventType = 5;
 
   // Open Root File
-  LOG(SAM) << "Opening event file " << this->inFile << std::endl;
-  TFile* rootFile = new TFile(this->inFile.c_str(), "READ");
+  LOG(SAM) << "Reading event file " << this->inFile << std::endl;
 
   // Get flux histograms NEUT supplies
   this->fluxHist = (TH1D*)inRootFile->Get(
@@ -643,7 +642,6 @@ void InputHandler::ReadGenieFile() {
   tn->SetBranchAddress("gmcrec", &mcrec);
 
   this->eventHist->Reset();
-  TH1D* tempEvt = (TH1D*)(this->eventHist)->Clone();
 
   // Make the custom event read in nvect when calling CalcKinematics
   this->cust_event->SetEventAddress(&mcrec);

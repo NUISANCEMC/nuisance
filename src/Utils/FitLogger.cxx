@@ -91,12 +91,12 @@ std::ostream& LOG(int level)
 //******************************************
 {
 
-  if (FitPar::log_verb == DEB){
+  if (FitPar::log_verb == (unsigned int)DEB){
     std::cout << BLUE << "[DEBUG]: " << RESET;
     return *logStream;
   }
 
-  if (FitPar::log_verb < level){
+  if (FitPar::log_verb < (unsigned int)level){
     return nullStream;
   } else {
 
@@ -145,21 +145,16 @@ std::ostream& ERR(int level)
 //******************************************
 {
 
-  if (FitPar::err_verb <= level){
-    return nullStream;
-  } else {
-
-    if (FitPar::use_colors) std::cerr << RED;
-
-    switch(level){
-    case FTL: std::cerr << "[ ERROR Fatal! ] :"; break;
-    case WRN: std::cerr << "[ ERROR Warning ] :"; break;
-    }
-
-    if (FitPar::use_colors) std::cerr << RESET;
-
-    return *errStream;
+  if (FitPar::use_colors) std::cerr << RED;
+  
+  switch(level){
+  case FTL: std::cerr << "[ ERROR Fatal! ] :"; break;
+  case WRN: std::cerr << "[ ERROR Warning ] :"; break;
   }
+
+  if (FitPar::use_colors) std::cerr << RESET;
+  
+  return *errStream;
 }
 
 

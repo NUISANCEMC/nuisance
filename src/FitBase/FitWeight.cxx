@@ -626,23 +626,32 @@ void FitWeight::SetupGenieRW(){
   bool xsec_nnres   = rw_engine_list.find("xsec_nonresbkg") == std::string::npos;
   bool xsec_nudis   = rw_engine_list.find("nuclear_dis") == std::string::npos;
   bool xsec_resdec  = rw_engine_list.find("hadro_res_decay") == std::string::npos;
+  bool xsec_fzone   = rw_engine_list.find("hadro_intranuke") == std::string::npos;
+  bool xsec_intra   = rw_engine_list.find("hadro_fzone") == std::string::npos;
+  bool xsec_agky    = rw_engine_list.find("hadro_agky") == std::string::npos;
+  bool xsec_qevec   = rw_engine_list.find("xsec_ccqe_vec") == std::string::npos;
+  bool xsec_dis     = rw_engine_list.find("xsec_dis") == std::string::npos;
+  bool xsec_nc      = rw_engine_list.find("xsec_nc") == std::string::npos;
+  bool xsec_ccres   = rw_engine_list.find("xsec_ccres") == std::string::npos;
+  bool xsec_ncres   = rw_engine_list.find("xsec_ncres") == std::string::npos;
+  bool xsec_nucqe   = rw_engine_list.find("nuclear_qe") == std::string::npos;
 
   // Now actually add the RW Calcs
   if (xsec_ncel)   genie_rw->AdoptWghtCalc( "xsec_ncel",       new genie::rew::GReWeightNuXSecNCEL      );
   if (xsec_ccqe)   genie_rw->AdoptWghtCalc( "xsec_ccqe",       new genie::rew::GReWeightNuXSecCCQE      );
   if (xsec_coh)    genie_rw->AdoptWghtCalc( "xsec_coh",        new genie::rew::GReWeightNuXSecCOH       );
   if (xsec_nnres)  genie_rw->AdoptWghtCalc( "xsec_nonresbkg",  new genie::rew::GReWeightNonResonanceBkg );
-  if (xsec_resdec) genie_rw->AdoptWghtCalc( "nuclear_dis",     new genie::rew::GReWeightDISNuclMod      );
-  genie_rw->AdoptWghtCalc( "hadro_res_decay", new genie::rew::GReWeightResonanceDecay  );
-  genie_rw->AdoptWghtCalc( "hadro_fzone",     new genie::rew::GReWeightFZone           );
-  genie_rw->AdoptWghtCalc( "hadro_intranuke", new genie::rew::GReWeightINuke           );
-  genie_rw->AdoptWghtCalc( "hadro_agky",      new genie::rew::GReWeightAGKY            );
-  genie_rw->AdoptWghtCalc( "xsec_ccqe_vec",   new genie::rew::GReWeightNuXSecCCQEvec   );
-  genie_rw->AdoptWghtCalc( "xsec_dis",        new genie::rew::GReWeightNuXSecDIS       );
-  genie_rw->AdoptWghtCalc( "xsec_nc",         new genie::rew::GReWeightNuXSecNC        );
-  genie_rw->AdoptWghtCalc( "xsec_ccres",      new genie::rew::GReWeightNuXSecCCRES     );
-  genie_rw->AdoptWghtCalc( "xsec_ncres",      new genie::rew::GReWeightNuXSecNCRES     );
-  genie_rw->AdoptWghtCalc( "nuclear_qe",      new genie::rew::GReWeightFGM             );
+  if (xsec_nudis)  genie_rw->AdoptWghtCalc( "nuclear_dis",     new genie::rew::GReWeightDISNuclMod      );
+  if (xsec_resdec) genie_rw->AdoptWghtCalc( "hadro_res_decay", new genie::rew::GReWeightResonanceDecay  );
+  if (xsec_fzone)  genie_rw->AdoptWghtCalc( "hadro_fzone",     new genie::rew::GReWeightFZone           );
+  if (xsec_intra)  genie_rw->AdoptWghtCalc( "hadro_intranuke", new genie::rew::GReWeightINuke           );
+  if (xsec_agky)   genie_rw->AdoptWghtCalc( "hadro_agky",      new genie::rew::GReWeightAGKY            );
+  if (xsec_qevec)  genie_rw->AdoptWghtCalc( "xsec_ccqe_vec",   new genie::rew::GReWeightNuXSecCCQEvec   );
+  if (xsec_dis)    genie_rw->AdoptWghtCalc( "xsec_dis",        new genie::rew::GReWeightNuXSecDIS       );
+  if (xsec_nc)     genie_rw->AdoptWghtCalc( "xsec_nc",         new genie::rew::GReWeightNuXSecNC        );
+  if (xsec_ccres)  genie_rw->AdoptWghtCalc( "xsec_ccres",      new genie::rew::GReWeightNuXSecCCRES     );
+  if (xsec_ncres)  genie_rw->AdoptWghtCalc( "xsec_ncres",      new genie::rew::GReWeightNuXSecNCRES     );
+  if (xsec_nucqe)  genie_rw->AdoptWghtCalc( "nuclear_qe",      new genie::rew::GReWeightFGM             );
 
   genie_rw->Reconfigure();
 }

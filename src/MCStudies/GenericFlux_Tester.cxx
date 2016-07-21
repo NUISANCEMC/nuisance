@@ -55,12 +55,15 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
 
   // Setup the TTree to save everything
   eventVariables = new TTree( (this->measurementName).c_str(), (this->measurementName).c_str() );
+  eventVariables->Branch("Mode",      &Mode,     "Mode/I");
   eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
   eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
   eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/D"   );
   
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
   eventVariables->Branch("Q2_QE",    &Q2_QE,    "Q2_QE/D"   );
+  eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
+  eventVariables->Branch("q3_true",  &q3_true,  "q3_true/D"   );
 
   eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
   eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
@@ -82,6 +85,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 
   // Function used to extract any variables of interest to the event
+  Mode = event->Mode;
 
   // Initialise everything to a bad value
   PDGnu   = -999.9;
@@ -122,6 +126,17 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 	ELep = (part_4mom.E());
 	MLep = (part_4mom.Mag());
 	CosLep = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+	
+	Q2_true = (part_4mom - nu_4mom).Mag2();
+
+	double ThetaLep = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(i))->fP.Vect());    
+	
+	// Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
+	Q2_QE  = FitUtils::Q2QErec(  part_4mom,  cos(ThetaLep), 34., true) * 1000.0;
+	Enu_QE = FitUtils::EnuQErec( part_4mom,  cos(ThetaLep), 34., true) * 1000.0; 
+
+	q0_true = (part_4mom - nu_4mom).E();
+	q3_true = (part_4mom - nu_4mom).Vect().Mag();
       }
     }
 
@@ -141,7 +156,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
     } 
   }
 
-
+  // Flux Weights
+  FluxWeight = fluxHist->GetBinContent(fluxHist->FindBin(Enu))/fluxHist->Integral();
 
   // Fill the eventVariables Tree
   eventVariables->Fill();

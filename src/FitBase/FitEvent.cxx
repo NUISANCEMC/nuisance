@@ -179,11 +179,10 @@ void FitEvent::GENIEKinematics(){
   this->fNParticles = genie_record->GetEntries();
 
   // State defines where, 0 = ALL, 1 = Incoming, 2 = FSI, 3 = Final
-  int count = 0;
   GHepParticle * p = 0;
   TObjArrayIter iter(genie_record);
   all_particles.clear();
-  while(p = dynamic_cast<genie::GHepParticle*>(iter.Next())){
+  while((p) = (dynamic_cast<genie::GHepParticle*>( (iter).Next() )) ){
     if (!p) continue;
     all_particles.push_back(FitParticle(p));
   }
