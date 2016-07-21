@@ -1,9 +1,9 @@
 
 # Set Configuration
-export NEUT_ROOT=""
-export CERN_ROOT=""
-export GENIE=""
-export NUWRO=""
+#export NEUT_ROOT=""
+#export CERN_ROOT=""
+#export GENIE=""
+#export NUWRO=""
 
 rm -rf build
 mkdir build

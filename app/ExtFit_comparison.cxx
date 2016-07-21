@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting ExtFit_comparison.exe"<<std::endl;
 
   // Make minimizer class and run fit
-  comparisonRoutine* min = new comparisonRoutine(argc, argv);
+  comparisonRoutines* min = new comparisonRoutines(argc, argv);
   min->initialSetup();
   
   // Save Starting States
@@ -89,6 +89,7 @@ int main(int argc, char* argv[]){
 
   // Run the fit rotines
   min->SelfFit();
+  min->saveCurrentState();
 
   // Show Final Status
   std::cout<<"-------------------------------------"<<std::endl;

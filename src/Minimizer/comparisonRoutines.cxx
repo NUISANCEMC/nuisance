@@ -113,19 +113,6 @@ void comparisonRoutines::initialSetup(){
 
   SetupCovariance();
 
-  // Check if an input file is provided
-  if (!inputFileName.empty())  readInputFile();
-
-  // Check if fit continues
-  if (fitContinue){
-
-    // Open previous output file to continue
-    inputFileName = outputFileName;
-
-    if (!checkPreviousResult()) readInputFile();
-    else {return;}
-  }
-
   // output file open
   outputFile = new TFile(outputFileName.c_str(),"RECREATE");
   FitPar::Config().Write();
@@ -593,68 +580,10 @@ void comparisonRoutines::SelfFit(){
     if (NFREE == 0) break;
 
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
-    if (routine.find("LowStat") != std::string::npos) LowStatRoutine(routine);
-    else if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
+    if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    else RunFitRoutine(routine);
-
+    
   }
-
-  return;
-}
-
-//*************************************
-void comparisonRoutines::FixAtLimit(){
-//*************************************
-
-  for (UInt_t i = 0; i < params.size(); i++){
-    std::string systString = params.at(i);
-    double curVal = currentVals.at(systString);
-    double minVal = minVals.at(systString);
-    double maxVal = minVals.at(systString);
-
-    if ((curVal - minVal) < 0.0001){
-      currentVals.at(systString) = minVal;
-    }
-
-    if ((maxVal - curVal) < 0.0001){
-      currentVals.at(systString) = maxVal;
-    }
-  }
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    std::string sampString = sampleDials.at(i);
-    double curVal = currentNorms.at(sampString);
-    double minVal = 0.3;
-    double maxVal = 2.0;
-
-    if ((curVal - minVal) < 0.0001){
-      currentVals.at(sampString) = minVal;
-    }
-
-    if ((maxVal - curVal) < 0.0001){
-      currentVals.at(sampString) = maxVal;
-    }
-  }
-  return;
-}
-
-
-/*
-  Write Functions
-*/
-//*************************************
-void comparisonRoutines::saveFitterOutput(std::string dir){
-//*************************************
-
-  if (!dir.empty()){
-    TDirectory* nominalDIR =(TDirectory*) outputFile->mkdir(dir.c_str());
-    nominalDIR->cd();
-  }
-
-  saveCurrentState();
-
-  outputFile->cd();
 
   return;
 }

@@ -112,7 +112,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
     input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
     
   } else {
-    input = new InputHandler(inputfile);
+    input = new InputHandler(measurementName, inputfile);
   }
 
   this->fluxHist      = input->GetFluxHistogram();
@@ -166,8 +166,8 @@ void MeasurementBase::Reconfigure(){
     } else {
       input->ReadEvent(i);
       
-      cust_event->RWWeight = FitBase::GetRW().CalcWeight(cust_event);
-      cust_event->Weight   = evtpt->RWWeight*evtpt->InputWeight;
+      cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
+      cust_event->Weight   = cust_event->RWWeight*cust_event->InputWeight;
       
       Weight = cust_event->Weight;
     }
@@ -265,7 +265,7 @@ void MeasurementBase::ReconfigureFast(){
     } else {
 
       input->GetTreeEntry(i);
-      Weight = cust_event->CalcWeight(cust_event) \
+      Weight = FitBase::GetRW()->CalcWeight(cust_event)	\
          	* cust_event->InputWeight;
     }
     

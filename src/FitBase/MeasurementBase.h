@@ -170,7 +170,14 @@ class MeasurementBase {
   ///! Return XSec Lists as a vector
   virtual std::vector<TH1*> GetXSecList(){return std::vector<TH1*>(1,xsecHist);};
 
-  InputHandler* GetInput(){ return FitBase::GetInput(FitBase::GetInputID(inputfilename)); };
+  InputHandler* GetInput(){ 
+    if(FitPar::Config().GetParB("EventManager")){
+      FitBase::GetInput(FitBase::GetInputID(inputfilename)); 
+    } else {
+      return this->input;
+    }
+  };
+
   std::string GetName(){ return measurementName; };
   double GetScaleFactor(){ return scaleFactor; };
 

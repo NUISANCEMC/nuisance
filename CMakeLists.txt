@@ -137,3 +137,5 @@ configure_file(cmake/setup.sh.in
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
+
+

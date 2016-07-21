@@ -59,6 +59,7 @@ Measurement2D::Measurement2D() {
     isRawEvents = false;
     isDifXSec = false;
     isEnu1D = false;
+    isEnu = false;
 
 };
 
