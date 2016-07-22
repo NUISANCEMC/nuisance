@@ -790,9 +790,10 @@ void InputHandler::ReadNuanceFile() {
 
   // SetBranchAddress for Nuance
   //  tn->SetBranchAddress("cc",&nuance_event->cc);
-  //  tn->SetBranchAddress("bound",&nuance_event->bound);
+  tn->SetBranchAddress("bound",&nuance_event->bound);
   tn->SetBranchAddress("neutrino", &nuance_event->neutrino);
   tn->SetBranchAddress("target", &nuance_event->target);
+  tn->SetBranchAddress("channel", &nuance_event->channel);
   //  tn->SetBranchAddress("iniQ", &nuance_event->iniQ);
   //  tn->SetBranchAddress("finQ", &nuance_event->finQ);
   //  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);

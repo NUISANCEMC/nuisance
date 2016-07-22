@@ -52,7 +52,7 @@
 #include "event1.h"
 #endif
 
-
+#include "NuanceEvent.h"
 
 namespace GeneratorUtils {
 
@@ -68,5 +68,7 @@ namespace GeneratorUtils {
   int ConvertNuwroMode (event * e);
 #endif
 
+  int ConvertNuanceMode(NuanceEvent * evt);
+  
 };
 #endif

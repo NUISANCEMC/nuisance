@@ -449,3 +449,117 @@ int GeneratorUtils::ConvertNuwroMode (event * e)
 
 
 #endif
+
+
+int GeneratorUtils::ConvertNuanceMode(NuanceEvent * evt){
+  int ch = evt->channel;
+  int sg = 1;
+  if (evt->neutrino < 0) sg = -1;
+  
+  switch(ch){
+  case 1: return sg*1; // Nuance CCQE 1 = NEUT CCQE 1
+  case 2: return sg*16; // Nuance NCEL 2 = NEUT NCEL 16
+  case 3: return sg*3; //Nuance 3 == NEUT 3;
+  case 4: return sg*4; //Nuance 4 == NEUT 4;
+  case 5: return sg*5; //Nuance 5 == NEUT 5;
+  case 6: return sg*6; //Nuance 6 == NEUT 6;
+  case 7: return sg*7; //Nuance 7 == NEUT 7;
+  case 8: return sg*8; //Nuance 8 == NEUT 8;
+  case 9: return sg*9; //Nuance 9 == NEUT 9;
+  case 10: return sg*10; //Nuance 10 == NEUT 10;
+  case 11: return sg*11; //Nuance 11 == NEUT 11;
+  case 12: return sg*12; //Nuance 12 == NEUT 12;
+  case 13: return sg*13; //Nuance 13 == NEUT 13;
+  case 14: return sg*14; //Nuance 14 == NEUT 14;
+  case 15: return sg*15; //Nuance 15 == NEUT 15;
+  case 16: return sg*16; //Nuance 16 == NEUT 16;
+  case 17: return sg*17; //Nuance 17 == NEUT 17;
+  case 18: return sg*18; //Nuance 18 == NEUT 18;
+  case 19: return sg*19; //Nuance 19 == NEUT 19;
+  case 20: return sg*20; //Nuance 20 == NEUT 20;
+  case 21: return sg*21; //Nuance 21 == NEUT 21;
+  case 22: return sg*22; //Nuance 22 == NEUT 22;
+  case 23: return sg*23; //Nuance 23 == NEUT 23;
+  case 24: return sg*24; //Nuance 24 == NEUT 24;
+  case 25: return sg*25; //Nuance 25 == NEUT 25;
+  case 26: return sg*26; //Nuance 26 == NEUT 26;
+  case 27: return sg*27; //Nuance 27 == NEUT 27;
+  case 28: return sg*28; //Nuance 28 == NEUT 28;
+  case 29: return sg*29; //Nuance 29 == NEUT 29;
+  case 30: return sg*30; //Nuance 30 == NEUT 30;
+  case 31: return sg*31; //Nuance 31 == NEUT 31;
+  case 32: return sg*32; //Nuance 32 == NEUT 32;
+  case 33: return sg*33; //Nuance 33 == NEUT 33;
+  case 34: return sg*34; //Nuance 34 == NEUT 34;
+  case 35: return sg*35; //Nuance 35 == NEUT 35;
+  case 36: return sg*36; //Nuance 36 == NEUT 36;
+  case 37: return sg*37; //Nuance 37 == NEUT 37;
+  case 38: return sg*38; //Nuance 38 == NEUT 38;
+  case 39: return sg*39; //Nuance 39 == NEUT 39;
+  case 40: return sg*40; //Nuance 40 == NEUT 40;
+  case 41: return sg*41; //Nuance 41 == NEUT 41;
+  case 42: return sg*42; //Nuance 42 == NEUT 42;
+  case 43: return sg*43; //Nuance 43 == NEUT 43;
+  case 44: return sg*44; //Nuance 44 == NEUT 44;
+  case 45: return sg*45; //Nuance 45 == NEUT 45;
+  case 46: return sg*46; //Nuance 46 == NEUT 46;
+  case 47: return sg*47; //Nuance 47 == NEUT 47;
+  case 48: return sg*48; //Nuance 48 == NEUT 48;
+  case 49: return sg*49; //Nuance 49 == NEUT 49;
+  case 50: return sg*50; //Nuance 50 == NEUT 50;
+  case 51: return sg*51; //Nuance 51 == NEUT 51;
+  case 52: return sg*52; //Nuance 52 == NEUT 52;
+  case 53: return sg*53; //Nuance 53 == NEUT 53;
+  case 54: return sg*54; //Nuance 54 == NEUT 54;
+  case 55: return sg*55; //Nuance 55 == NEUT 55;
+  case 56: return sg*56; //Nuance 56 == NEUT 56;
+  case 57: return sg*57; //Nuance 57 == NEUT 57;
+  case 58: return sg*58; //Nuance 58 == NEUT 58;
+  case 59: return sg*59; //Nuance 59 == NEUT 59;
+  case 60: return sg*60; //Nuance 60 == NEUT 60;
+  case 61: return sg*61; //Nuance 61 == NEUT 61;
+  case 62: return sg*62; //Nuance 62 == NEUT 62;
+  case 63: return sg*63; //Nuance 63 == NEUT 63;
+  case 64: return sg*64; //Nuance 64 == NEUT 64;
+  case 65: return sg*65; //Nuance 65 == NEUT 65;
+  case 66: return sg*66; //Nuance 66 == NEUT 66;
+  case 67: return sg*67; //Nuance 67 == NEUT 67;
+  case 68: return sg*68; //Nuance 68 == NEUT 68;
+  case 69: return sg*69; //Nuance 69 == NEUT 69;
+  case 70: return sg*70; //Nuance 70 == NEUT 70;
+  case 71: return sg*71; //Nuance 71 == NEUT 71;
+  case 72: return sg*72; //Nuance 72 == NEUT 72;
+  case 73: return sg*73; //Nuance 73 == NEUT 73;
+  case 74: return sg*74; //Nuance 74 == NEUT 74;
+  case 75: return sg*75; //Nuance 75 == NEUT 75;
+  case 76: return sg*76; //Nuance 76 == NEUT 76;
+  case 77: return sg*77; //Nuance 77 == NEUT 77;
+  case 78: return sg*78; //Nuance 78 == NEUT 78;
+  case 79: return sg*79; //Nuance 79 == NEUT 79;
+  case 80: return sg*80; //Nuance 80 == NEUT 80;
+  case 81: return sg*81; //Nuance 81 == NEUT 81;
+  case 82: return sg*82; //Nuance 82 == NEUT 82;
+  case 83: return sg*83; //Nuance 83 == NEUT 83;
+  case 84: return sg*84; //Nuance 84 == NEUT 84;
+  case 85: return sg*85; //Nuance 85 == NEUT 85;
+  case 86: return sg*86; //Nuance 86 == NEUT 86;
+  case 87: return sg*87; //Nuance 87 == NEUT 87;
+  case 88: return sg*88; //Nuance 88 == NEUT 88;
+  case 89: return sg*89; //Nuance 89 == NEUT 89;
+  case 90: return sg*90; //Nuance 90 == NEUT 90;
+  case 91: return sg*91; //Nuance 91 == NEUT 91;
+  case 92: return sg*92; //Nuance 92 == NEUT 92;
+  case 93: return sg*93; //Nuance 93 == NEUT 93;
+  case 94: return sg*94; //Nuance 94 == NEUT 94;
+  case 95: return sg*95; //Nuance 95 == NEUT 95;
+  case 96: return sg*96; //Nuance 96 == NEUT 96;
+  case 97: return sg*97; //Nuance 97 == NEUT 97;
+  case 98: return sg*98; //Nuance 98 == NEUT 98;
+  case 99: return sg*99; //Nuance 99 == NEUT 99;
+  default:
+    std::cerr << "Unknown Nuance Channel ID = "<<ch<<endl;
+    throw("Exiting.");
+    return 0;
+  }
+  return 0;
+}

@@ -303,7 +303,7 @@ void FitEvent::NuanceKinematics(){
 
   // Sort Mode
   this->TotCrs = 1.0; // NEEDS SORTING
-  this->Mode = 1.0; // NEEDS SORTING
+  this->Mode = GeneratorUtils::ConvertNuanceMode(nuance_event);
 
   // These need to be set somehow...
   this->fEventNo = 0;
@@ -312,7 +312,7 @@ void FitEvent::NuanceKinematics(){
   this->TargetA = 0.0;
   this->TargetZ = 0.0;
   this->TargetH = 0;
-  this->Ibound  = 0.0;
+  this->Ibound  = nuance_event->bound;
 
   // Setup particles
   all_particles.clear();
