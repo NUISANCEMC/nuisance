@@ -68,7 +68,8 @@ namespace GeneratorUtils {
   int ConvertNuwroMode (event * e);
 #endif
 
+#ifdef __NUANCE_ENABLED__
   int ConvertNuanceMode(NuanceEvent * evt);
-  
+#endif
 };
 #endif

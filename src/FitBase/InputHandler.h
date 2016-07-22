@@ -122,8 +122,10 @@ class InputHandler {
   NtpMCEventRecord * mcrec; //!< Pointer to GENIE NTuple Record
 #endif
 
+#ifdef __NUANCE_ENABLED__
   NuanceEvent* nuance_event;
-
+#endif
+  
   std::vector<int> joint_index_low;
   std::vector<int> joint_index_high;
   std::vector<TH1D*> joint_index_hist;

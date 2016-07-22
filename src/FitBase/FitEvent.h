@@ -131,8 +131,12 @@ class FitEvent : public BaseFitEvt {
 #endif
 
 
+#ifdef __NUANCE_ENABLED__
   void SetEventAddress(NuanceEvent** tempevent);
 
+  //! Convert Nuance event class to common format
+  void NuanceKinematics();
+#endif
   /*
     GENERAL Fit Event Functions
   */
@@ -179,10 +183,7 @@ class FitEvent : public BaseFitEvt {
 
   Double_t weight; //!< event weight
   Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
-
-  // True Generator events: Just Pointers that can be set.
-  void NuanceKinematics();
-
+  
   // ACCESS FUNCTIONS
   double Enu(){ return this->PartInfo(0)->fP.E(); };
   double Tnu(){ return this->PartInfo(0)->fP.E(); };

@@ -1,9 +1,9 @@
 # Default Requirements file for the externalDataFitter Package
 # MAX Events : -1 is no cut
-config  MAXEVENTS -1
-config  MAX_CALLS    100000
-config  MAX_ITERATIONS   10000000
-config  statutils.addmcerror  0
+config MAXEVENTS -1
+config MAX_CALLS    100000
+config MAX_ITERATIONS   10000000
+config statutils.addmcerror  0
 config LOWSTATEVENTS 25000
 config SERIAL_EVAL 1
 config EventManager 0

@@ -20,6 +20,7 @@
 #ifndef NUANCE_H_SEEN
 #define NUANCE_H_SEEN
 
+#ifdef __NUANCE_ENABLED__
 /*!
  *  \addtogroup FitBase
  *  @{
@@ -60,4 +61,5 @@ class NuanceEvent {
   int hadron[200];
   float p_hadron[5][200];
 };
+#endif
 #endif

@@ -21,9 +21,10 @@
 #define FITEVENTBASE_H_SEEN
 
 #include "TLorentzVector.h"
-#include "FitParticle.h"
-
 #include "TSpline.h"
+#include "TArrayD.h"
+
+#include "FitParticle.h"
 
 #ifdef __NEUT_ENABLED__
 #include "neutvect.h"
@@ -40,8 +41,12 @@
 #include "Ntuple/NtpMCEventRecord.h"
 using namespace genie;
 #endif
-#include "TArrayD.h"
+
+#ifdef __NUANCE_ENABLED__
 #include "NuanceEvent.h"
+#endif
+
+#include "TArrayD.h"
 
 /*!
  *  \addtogroup FitBase
@@ -91,8 +96,12 @@ class BaseFitEvt {
   GHepRecord* genie_record; //!< Pointer to actually accessible Genie Record
 #endif
 
+  // NUANCE
+#ifdef __NUANCE_ENABLED__
   NuanceEvent* nuance_event;
+#endif
 
+  // GiBUU
 #ifdef __GiBUU_ENABLED__
   GiBUUStdHepReader* GiRead;
 #endif

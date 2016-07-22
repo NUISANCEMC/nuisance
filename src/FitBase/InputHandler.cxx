@@ -775,6 +775,7 @@ void InputHandler::ReadHistogramFile() {
 void InputHandler::ReadNuanceFile() {
   //********************************************************************
 
+#ifdef __NUANCE_ENABLED__
   // Read in Nuance output ROOT file (converted from hbook)
   LOG(SAM) << " Reading NUANCE " << std::endl;
   eventType = kNUANCE;
@@ -788,9 +789,10 @@ void InputHandler::ReadNuanceFile() {
 
   tn->Show(0);
 
+  cout << "Nuance handle = "<<handleName<<endl;
   // SetBranchAddress for Nuance
   //  tn->SetBranchAddress("cc",&nuance_event->cc);
-  tn->SetBranchAddress("bound",&nuance_event->bound);
+  //  tn->SetBranchAddress("bound",&nuance_event->bound);
   tn->SetBranchAddress("neutrino", &nuance_event->neutrino);
   tn->SetBranchAddress("target", &nuance_event->target);
   tn->SetBranchAddress("channel", &nuance_event->channel);
@@ -798,7 +800,6 @@ void InputHandler::ReadNuanceFile() {
   //  tn->SetBranchAddress("finQ", &nuance_event->finQ);
   //  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);
   //  tn->SetBranchAddress("polar", &nuance_event->polar);
-  //  tn->SetBranchAddress("channel", &nuance_event->channel);
   //  tn->SetBranchAddress("qsq", &nuance_event->qsq);
 
   //  tn->SetBranchAddress("w", &nuance_event->w);
@@ -810,7 +811,7 @@ void InputHandler::ReadNuanceFile() {
   //  tn->SetBranchAddress("vertex", &nuance_event->vertex);
   //  tn->SetBranchAddress("start",&nuance_event->start);
   //  tn->SetBranchAddress("depth",&nuance_event->depth);
-  //  tn->SetBranchAddress("flux",&nuance_event->flux);
+  //tn->SetBranchAddress("flux",&nuance_event->flux);
 
   tn->SetBranchAddress("n_leptons", &nuance_event->n_leptons);
   tn->SetBranchAddress("p_ltot", &nuance_event->p_ltot);
@@ -824,13 +825,25 @@ void InputHandler::ReadNuanceFile() {
 
   this->cust_event->SetEventAddress(&nuance_event);
 
-  this->fluxHist =
-      new TH1D("nuance_temp_fluxhist", "nuance_temp_fluxhist", 1, 0.0, 1.0);
+  cout<<"Now handleName = "<<handleName<<endl;
+  this->fluxHist = new TH1D( (this->handleName + "_FLUX").c_str(),
+			     (this->handleName + "_FLUX").c_str(),
+			     1, 0.0, 1.0);
+ 
   this->fluxHist->SetBinContent(1, 1.0);
 
-  this->eventHist =
-      new TH1D("nuance_temp_eventhist", "nuance_temp_eventhist", 1, 0.0, 1.0);
+  this->eventHist = new TH1D( (this->handleName + "_EVT").c_str(),
+			     (this->handleName + "_EVT").c_str(),
+			     1, 0.0, 1.0);
   this->eventHist->SetBinContent(1, nEvents);
+
+  cout<<"Final HandleName = "<<handleName<<endl;
+#else
+  ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
+  ERR(FTL) << "NUANCE Input Not Enabled." << std::endl;
+  ERR(FTL) << "Rebuild with -DUSE_NUANCE=1!" << std::endl;
+  exit(-1);
+#endif
 }
 
 //********************************************************************

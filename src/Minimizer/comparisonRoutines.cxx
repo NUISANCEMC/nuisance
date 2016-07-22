@@ -563,8 +563,6 @@ void comparisonRoutines::updateRWEngine(std::map<std::string,double>& updateVals
 void comparisonRoutines::SelfFit(){
 //*************
 
-
-
   for (UInt_t i = 0; i < fit_routines.size(); i++){
 
     std::string routine = fit_routines.at(i);
@@ -582,7 +580,9 @@ void comparisonRoutines::SelfFit(){
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
     if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    
+    else if (routine.find("Compare") != std::string::npos) {
+      thisFCN->ReconfigureAllEvents();
+    }
   }
 
   return;

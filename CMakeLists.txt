@@ -21,11 +21,18 @@ if(NOT DEFINED USE_NEUT AND
   NOT DEFINED USE_NuWro AND
   NOT DEFINED USE_GENIE AND
   NOT DEFINED USE_NIWG AND
-  NOT DEFINED USE_GiBUU)
+  NOT DEFINED USE_GiBUU AND
+  NOT DEFINED USE_NUANCE)
   cmessage(FATAL_ERROR "No reweight engines requested. Configure with at least "
     "one of -DUSE_{NEUT,NuWro,GENIE,NIWG}.")
 else()
-  cmessage(STATUS "Reweight engines: NEUT:${USE_NEUT},  NuWro:${USE_NuWro},  GENIE:${USE_GENIE},  NIWG:${USE_NIWG}")
+  cmessage(STATUS "Generator Input Support:
+  		  NEUT:${USE_NEUT},
+  		  NuWro:${USE_NuWro},
+		  GENIE:${USE_GENIE},
+		  NIWG:${USE_NIWG},
+  		  GiBUU:${USE_GiBUU},
+		  NUANCE:${USE_NUANCE}")
 endif()
 #Changes default install path to be a subdirectory of the build dir.
 #Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -81,6 +88,10 @@ endif()
 if(DEFINED USE_GiBUU AND USE_GiBUU)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
 endif()
+
+if(DEFINED USE_NUANCE AND USE_NUANCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
+endif()	      
 
 ################################################################################
 

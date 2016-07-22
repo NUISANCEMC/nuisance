@@ -244,8 +244,10 @@ void FitEvent::CalcKinematics(){
   if ( fType == kGENIE ) this->GENIEKinematics();
   #endif
 
+  #ifdef __NUANCE_ENABLED__
   if ( fType == kNUANCE ) this->NuanceKinematics();
-
+  #endif
+  
   #ifdef __GiBUU_ENABLED__
   if ( fType == kGiBUU ) this->GiBUUKinematics();
   #endif
@@ -293,7 +295,7 @@ FitParticle* FitEvent::PartInfo(UInt_t i){
   }
 }
 
-
+#ifdef __NUANCE_ENABLED__
 //***************************************************
 void FitEvent::NuanceKinematics(){
 //***************************************************
@@ -312,7 +314,7 @@ void FitEvent::NuanceKinematics(){
   this->TargetA = 0.0;
   this->TargetZ = 0.0;
   this->TargetH = 0;
-  this->Ibound  = nuance_event->bound;
+  this->Ibound  = 0.0; //nuance_event->bound;
 
   // Setup particles
   all_particles.clear();
@@ -378,6 +380,6 @@ void FitEvent::SetEventAddress(NuanceEvent** tempevent){
   nuance_event = *tempevent;
 
 }
-
+#endif
 
 

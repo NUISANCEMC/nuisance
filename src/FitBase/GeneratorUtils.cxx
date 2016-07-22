@@ -451,6 +451,7 @@ int GeneratorUtils::ConvertNuwroMode (event * e)
 #endif
 
 
+#ifdef __NUANCE_ENABLED__
 int GeneratorUtils::ConvertNuanceMode(NuanceEvent * evt){
   int ch = evt->channel;
   int sg = 1;
@@ -563,3 +564,4 @@ int GeneratorUtils::ConvertNuanceMode(NuanceEvent * evt){
   }
   return 0;
 }
+#endif
