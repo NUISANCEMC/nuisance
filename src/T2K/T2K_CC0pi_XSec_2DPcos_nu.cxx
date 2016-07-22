@@ -20,56 +20,43 @@
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
 // The constructor
-T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string inputfile,
+						   FitWeight *rw,
+						   std::string type,
+						   std::string fakeDataFile){
 
-  // NEEDS UPDATING (WILL DO BEFORE PITTSBURGH WORKSHOP)
-
-  // // Get Fit Options
-  // this->SetFitOptions(type);
-  // this->forwardgoing = (type.find("REST") != std::string::npos);
-
-  // // Set pointer to the reweighting engine
-  // rw_engine = rw;
-
-  // // Define the energy region
-  // this->EnuMin = 0;
-  // this->EnuMax = 10.0;
-
-  // this->exp_distance = 0.280;
-
-  // this->data_points_x = 12;
-  // this->data_points_y = 10;
-  // Double_t tempx[12] = {0.2, 0.35, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0};
-  // Double_t tempy[10] = {-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0};
-  // this->xBins = tempx;
-  // this->yBins = tempy;
-
-  // this->inFile = inputfile;
-  // this->measurementName = "T2K_CC0pi_XSec_2DPcos_nu";
-  // this->plotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
-
-
-  // // Fill just the map histogram first
-  // this->dataHist = new TH2D((this->measurementName+"_data").c_str(),(this->measurementName+"_data"+this->plotTitles).c_str(),
-  // 			    this->data_points_x-1, this->xBins, this->data_points_y-1, this->yBins);
-
-  // this->SetHistograms(FitPar::GetDataBase()+"/T2K/T2K_CC0PI_TN167_data.root");
-
-  // // Diagonal covar setup
-  // if (!this->isShape) this->addNormPenalty = true;
-  // this->normError = 0.08559;
-
-  // this->mcHist = (TH2D*) (this->dataHist)->Clone((this->measurementName+"_MC").c_str());
-  // this->mcFine = new TH2D((this->measurementName+"_data").c_str(),(this->measurementName+"_data"+this->plotTitles).c_str(),
-  // 			  25, 0.2, 5.0, 25, -1.0, 1.0);
-  // PlotUtils::CreateNeutModeArray(this->mcHist, (TH1**)this->mcHist_PDG);
-
-
-  // // Setup Neut Events from inFile
-  // this->ReadEventFile();
-
-  // // Different generators require slightly different rescaling factors.
-  // if    (this->eventType == 0) this->scaleFactor = (this->eventHist->Integral("width")/(nevents+0.))*13.0/6.0/this->TotalIntegratedFlux(); // NEUT
+  
+  forwardgoing = (type.find("REST") != std::string::npos);
+  EnuMin = 0;
+  EnuMax = 10.0;
+  exp_distance = 0.280;
+  default_types = "DIAG/FIX";
+  allowed_types = "DIAG/FIX";
+  data_points_x = 12;
+  data_points_y = 10;
+  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  
+  Double_t tempx[12] = {0.2, 0.35, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0};
+  Double_t tempy[10] = {-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0};
+  xBins = tempx;
+  yBins = tempy;
+  measurementName = "T2K_CC0pi_XSec_2DPcos_nu";
+  plotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
+  
+  dataHist = new TH2D((measurementName+"_data").c_str(),
+		      (measurementName+"_data"+plotTitles).c_str(),
+		      data_points_x-1, xBins,
+		      data_points_y-1, yBins);
+  
+  SetHistograms(FitPar::GetDataBase()+"/T2K/T2K_CC0PI_TN167_data.root");
+  SetupDefaultHist();
+  
+  // Diagonal covar setup
+  if (!isShape) addNormPenalty = true;
+  normError = 0.08559;
+  
+  // Get Scaling
+  scaleFactor = (eventHist->Integral("width")/(nevents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
 
 };
 

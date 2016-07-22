@@ -425,9 +425,9 @@ void InputHandler::ReadNuWroFile() {
 
   // Check if we have saved an xsec histogram before
   this->fluxHist = (TH1D*)inRootFile->Get(
-      (PlotUtils::GetObjectWithName(inRootFile, "flux")).c_str());
+      (PlotUtils::GetObjectWithName(inRootFile, "FluxHist")).c_str());
   this->eventHist = (TH1D*)inRootFile->Get(
-      (PlotUtils::GetObjectWithName(inRootFile, "evtrt")).c_str());
+      (PlotUtils::GetObjectWithName(inRootFile, "EvtHist")).c_str());
 
   // Check if we are forcing plot generation (takes time)
   bool regenFlux = FitPar::Config().GetParB("input.regen_nuwro_plots");
