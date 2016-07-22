@@ -326,9 +326,7 @@ void MeasurementBase::Renormalise(){
 
   // Called when the fitter has changed a measurements normalisation but not any reweight dials
   // Means we don't have to call the time consuming reconfigure when this happens.
-  double new_norm = FitBase::GetRW()->GetDialValue( this->measurementName + "_norm" );
-  double norm = 0.0;
-  if (new_norm >= 0.0) norm = 1.0/new_norm;
+  double norm = FitBase::GetRW()->GetDialValue( this->measurementName + "_norm" );
 
   if ((this->currentNorm == 0.0 and norm != 0.0) or not filledMC){
     this->ReconfigureFast();

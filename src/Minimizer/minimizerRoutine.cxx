@@ -1063,30 +1063,34 @@ void minimizerRoutine::FixAtLimit(){
 
   for (UInt_t i = 0; i < params.size(); i++){
     std::string systString = params.at(i);
+    if (fixVals[systString]) continue;
+    
     double curVal = currentVals.at(systString);
     double minVal = minVals.at(systString);
     double maxVal = minVals.at(systString);
 
-    if ((curVal - minVal) < 0.0001){
+    if (fabs(curVal - minVal) < 0.0001){
       currentVals.at(systString) = minVal;
     }
 
-    if ((maxVal - curVal) < 0.0001){
+    if (fabs(maxVal - curVal) < 0.0001){
       currentVals.at(systString) = maxVal;
     }
   }
 
   for (UInt_t i = 0; i < sampleDials.size(); i++){
     std::string sampString = sampleDials.at(i);
+    if (fixNorms[sampString]) continue;
+    
     double curVal = currentNorms.at(sampString);
     double minVal = 0.3;
     double maxVal = 2.0;
 
-    if ((curVal - minVal) < 0.0001){
+    if (fabs(curVal - minVal) < 0.0001){
       currentVals.at(sampString) = minVal;
     }
 
-    if ((maxVal - curVal) < 0.0001){
+    if (fabs(maxVal - curVal) < 0.0001){
       currentVals.at(sampString) = maxVal;
     }
   }
@@ -1108,7 +1112,6 @@ void minimizerRoutine::saveFitterOutput(std::string dir){
 
   if (minimizerObj){
     saveMinimizerState();
-    saveCurrentState();
   }
 
   saveCurrentState();
