@@ -135,7 +135,8 @@ void MeasurementBase::Reconfigure(){
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
- 
+  cust_event = input->GetEventPointer();
+  
   // Reset Histograms
   this->ResetAll();
 
@@ -231,6 +232,7 @@ void MeasurementBase::ReconfigureFast(){
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
+  cust_event = input->GetEventPointer();
   
   // Check if we Can't Signal Reconfigure
   if (!filledMC){
@@ -305,6 +307,18 @@ void MeasurementBase::ConvertEventRates(){
   this->ApplyNormScale( FitBase::GetRW()->GetSampleNorm( this->measurementName ) ) ;
 
 }
+
+//*********************************************** 
+InputHandler* MeasurementBase::GetInput(){
+//***********************************************
+  
+  if(FitPar::Config().GetParB("EventManager")){
+    return FitBase::GetInput(FitBase::GetInputID(inputfilename));
+  } else {
+    return this->input;
+  }
+  return NULL;
+};
 
 //***********************************************
 void MeasurementBase::Renormalise(){

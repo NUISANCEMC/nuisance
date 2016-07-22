@@ -162,7 +162,7 @@ class FitWeight {
 
   std::string GetDialType(int this_enum);
 
-  bool HasDialChanged(){ return dial_changed;};
+  bool HasDialChanged();
 
   void UpdateWeightEngine(const double* x);
   void SetAllDials(const double* x, int npt);

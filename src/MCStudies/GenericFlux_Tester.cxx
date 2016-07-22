@@ -54,7 +54,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
   FitPar::Config().out->cd();
 
   // Setup the TTree to save everything
-  eventVariables = new TTree( (this->measurementName).c_str(), (this->measurementName).c_str() );
+  eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
   eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
   eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
@@ -75,6 +75,47 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
   eventVariables->Branch("Weight"    , &Weight,     "Weight/D"    );
 
+  
+
+  // Signal Definitions from SignalDef.cxx
+  eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");
+  eventVariables->Branch("flagCCQE_rest", &flagCCQE_rest, "flagCCQE_rest/O");
+  eventVariables->Branch("flagCCQEBar_full", &flagCCQEBar_full, "flagCCQEBar_full/O");
+  eventVariables->Branch("flagCCQEBar_rest", &flagCCQEBar_rest, "flagCCQEBar_rest/O");
+
+  eventVariables->Branch("flagCC1pip_MiniBooNE", &flagCC1pip_MiniBooNE, "flagCC1pip_MiniBooNE/O");
+
+  eventVariables->Branch("flagCC1pip_MINERvA_full", &flagCC1pip_MINERvA_full, "flagCC1pip_MINERvA_full/O");
+  eventVariables->Branch("flagCC1pip_MINERvA_rest", &flagCC1pip_MINERvA_rest, "flagCC1pip_MINERvA_rest/O");
+  eventVariables->Branch("flagCCNpip_MINERvA_full", &flagCCNpip_MINERvA_full, "flagCCNpip_MINERvA_full/O");
+  eventVariables->Branch("flagCCNpip_MINERva_rest", &flagCCNpip_MINERva_rest, "flagCCNpip_MINERva_rest/O");
+
+  eventVariables->Branch("flagCC1pip_T2K", &flagCC1pip_T2K, "flagCC1pip_T2K/O");
+
+  eventVariables->Branch("flagCC1pi0_MiniBooNE", &flagCC1pi0_MiniBooNE, "flagCC1pi0_MiniBooNE/O");
+
+  eventVariables->Branch("flagCC1pi0Bar_MINERvA", &flagCC1pi0Bar_MINERvA, "flagCC1pi0Bar_MINERvA/O");
+
+  eventVariables->Branch("flagNC1pi0_MiniBooNE", &flagNC1pi0_MiniBooNE, "flagNC1pi0_MiniBooNE/O");
+  eventVariables->Branch("flagNC1pi0Bar_MiniBooNE", &flagNC1pi0Bar_MiniBooNE, "flagNC1pi0Bar_MiniBooNE/O");
+
+  eventVariables->Branch("flagCCcoh_MINERvA", &flagCCcoh_MINERvA, "flagCCcoh_MINERvA/O");
+  eventVariables->Branch("flagCCcohBar_MINERvA", &flagCCcohBar_MINERvA, "flagCCcohBar_MINERvA/O");
+
+  eventVariables->Branch("flagCCQEnumu_MINERvA_full", &flagCCQEnumu_MINERvA_full, "flagCCQEnumu_MINERvA_full/O");
+  eventVariables->Branch("flagCCQEnumubar_MINERvA_full", &flagCCQEnumubar_MINERvA_full, "flagCCQEnumubar_MINERvA_full/O");
+  eventVariables->Branch("flagCCQEnumu_MINERvA_rest", &flagCCQEnumu_MINERvA_rest, "flagCCQEnumu_MINERvA_rest/O");
+  eventVariables->Branch("flagCCQEnumubar_MINERvA_rest", &flagCCQEnumubar_MINERvA_rest, "flagCCQEnumubar_MINERvA_rest/O");
+  
+  eventVariables->Branch("flagCCincLowRecoil_MINERvA",
+			 &flagCCincLowRecoil_MINERvA, "flagCCincLowRecoil_MINERvA/O");
+  eventVariables->Branch("flagCCincLowRecoil_MINERvA_reqhad",
+			 &flagCCincLowRecoil_MINERvA_reqhad, "flagCCincLowRecoil_MINERvA_reqhad/O");
+  
+  eventVariables->Branch("flagCCQELike_MiniBooNE", &flagCCQELike_MiniBooNE, "flagCCQELike_MiniBooNE/O");
+  eventVariables->Branch("flagCCQE_MiniBooNE", &flagCCQE_MiniBooNE, "flagCCQE_MiniBooNE/O");
+  eventVariables->Branch("flagCCQEBar_MiniBooNE", &flagCCQEBar_MiniBooNE, "flagCCQEBar_MiniBooNE/O");
+  
 };
 
 
@@ -84,6 +125,9 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
 void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 
+  // Fill Signal Variables
+  FillSignalFlags(event);
+  
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
 
@@ -132,7 +176,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 	double ThetaLep = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(i))->fP.Vect());    
 	
 	// Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
-	Q2_QE  = FitUtils::Q2QErec(  part_4mom,  cos(ThetaLep), 34., true) * 1000.0;
+	Q2_QE  = FitUtils::Q2QErec(  part_4mom,   cos(ThetaLep),  34.,  true) * 1000000.0;
 	Enu_QE = FitUtils::EnuQErec( part_4mom,  cos(ThetaLep), 34., true) * 1000.0; 
 
 	q0_true = (part_4mom - nu_4mom).E();
@@ -153,7 +197,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 	 CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
 
        }
-    } 
+    }    
   }
 
   // Flux Weights
@@ -173,14 +217,57 @@ void GenericFlux_Tester::Write(std::string drawOpt){
   
   // Now save any default plots we want to draw
   TH1D* Enu_hist = new TH1D("Enu_hist","Enu_hist;E;Events", 40, 0.0, 20.0*1.E3);
-  eventVariables->Draw("Enu_tree >> Enu_hist", "Weight");
+  eventVariables->Draw("Enu_true >> Enu_hist", "Weight");
   Enu_hist->Write();
 
+  // Q2 Diff XSec per nucleon
+  TH1D* Q2_hist = new TH1D("Q2_hist","Q2_hist;Q2;d#sigma/dQ^{2}", 40, 0.0, 2.0);
+  eventVariables->Draw("Q2_true/1E6 >> Q2_hist", "Weight");
+  Q2_hist->Scale(scaleFactor,"width"); // DiffXSec Scaling
+  Q2_hist->Write();
+  
+  
   // Save Flux and Event Histograms too
   GetInput()->GetFluxHistogram()->Write();
   GetInput()->GetEventHistogram()->Write();
 
   return;
+}
+
+//********************************************************************   
+void GenericFlux_Tester::FillSignalFlags(FitEvent *event){
+//********************************************************************
+
+  
+  flagCCQE_full = SignalDef::isCCQE(event, EnuMin, EnuMax, false); 
+  flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
+  flagCCQEBar_full = SignalDef::isCCQEBar(event, EnuMin, EnuMax, false);
+  flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
+  flagCC1pip_MiniBooNE = false;
+  flagCC1pip_MINERvA_full = false;
+  flagCC1pip_MINERvA_rest = false;
+  flagCCNpip_MINERvA_full = false;
+  flagCCNpip_MINERva_rest = false;
+  flagCC1pip_T2K = false;
+  flagCC1pi0_MiniBooNE = false;
+  flagCC1pi0Bar_MINERvA = false;
+  flagNC1pi0_MiniBooNE = false;
+  flagNC1pi0Bar_MiniBooNE = false;
+  flagCCcoh_MINERvA = false;
+  flagCCcohBar_MINERvA = false;
+
+  flagCCQEnumu_MINERvA_full    = SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, true);
+  flagCCQEnumubar_MINERvA_full = SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, true);
+  flagCCQEnumu_MINERvA_rest    = SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, false);
+  flagCCQEnumubar_MINERvA_rest = SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, false);
+
+  flagCCincLowRecoil_MINERvA = SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, false);
+  flagCCincLowRecoil_MINERvA_reqhad = SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, true);
+  
+  flagCCQELike_MiniBooNE = SignalDef::isMiniBooNE_CCQELike(event, 0.0, 3.0);
+  flagCCQE_MiniBooNE     = SignalDef::isMiniBooNE_CCQE(event, 0.0, 3.0);
+  flagCCQEBar_MiniBooNE  = SignalDef::isMiniBooNE_CCQEBar(event, 0.0, 3.0);
+
 }
 
 

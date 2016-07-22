@@ -685,7 +685,7 @@ double FitWeight::GetDialValue(int this_enum){
 void FitWeight::UpdateWeightEngine(const double* x){
 //********************************************************************
   this->SetAllDials(x, dial_enums.size());
-  this->Reconfigure();
+  return;
 }
 
 //********************************************************************
@@ -995,7 +995,11 @@ double FitWeight::CalcSplineWeight(BaseFitEvt* evt){
   return rw_weight;
 }
 
-
+//********************************************************************  
+bool FitWeight::HasDialChanged(){
+//********************************************************************  
+  return dial_changed;
+};
 
 
 // Global Conversion Functions

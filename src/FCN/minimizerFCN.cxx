@@ -31,7 +31,10 @@ double minimizerFCN::DoEval(const double *x) const {
 
   // WEIGHT ENGINE
   FitBase::GetRW()->UpdateWeightEngine(x);
+
   dialChanged = FitBase::GetRW()->HasDialChanged();
+  if (dialChanged) FitBase::GetRW()->Reconfigure();
+  
   FitBase::EvtManager().ResetWeightFlags();
   
   // SORT SAMPLES
@@ -245,7 +248,7 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
     MeasurementBase* exp = (*iterSam);
     
     // If only norm has changed...
-    if (!dialChanged and !fullconfig and !filledMC){
+    if (!dialChanged and !fullconfig and filledMC){
       exp->Renormalise();
       continue;
     }
