@@ -6,7 +6,7 @@ config  MAX_ITERATIONS   10000000
 config  statutils.addmcerror  0
 config LOWSTATEVENTS 25000
 config SERIAL_EVAL 1
-
+config EventManager 0
 
 config fitname BestFit
 

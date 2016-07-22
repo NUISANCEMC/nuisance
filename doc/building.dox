@@ -1,6 +1,6 @@
 /*!
 \page building Building the fitter
-
+DEPRECATED. WE USE CMAKE NOW!
 
 The build structure is setup so that the fitter can be built against differeing combinations of the MC Generators and associated RW libraries.
 

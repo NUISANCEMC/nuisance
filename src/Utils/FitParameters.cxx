@@ -36,7 +36,7 @@ FitParameters::FitParameters() {
   this->iteration = 0;
 
   std::string ext_fit_dir = std::string(std::getenv("EXT_FIT"));
-  this->ReadParamFile( ext_fit_dir + "/parameters/fitter.requirements.dat" );
+  this->ReadParamFile( ext_fit_dir + "/parameters/fitter.config.dat" );
 };
 
 void FitParameters::SetParamFile(std::string fileName) {
