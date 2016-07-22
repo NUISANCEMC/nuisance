@@ -52,6 +52,14 @@ target_link_libraries(ExtFit_comparison ${MODULETargets})
 target_link_libraries(ExtFit_comparison ${CMAKE_DEPENDLIB_FLAGS})
 if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(ExtFit_comparison PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-  endif()
+endif()
 
-install(TARGETS ExtFit_minimizer ExtFit_comparison DumpGiBUUEvents DESTINATION bin)
+
+add_executable(ExtFit_PrepareNuwro ExtFit_PrepareNuwro.cxx)
+target_link_libraries(ExtFit_PrepareNuwro ${MODULETargets})
+target_link_libraries(ExtFit_PrepareNuwro ${CMAKE_DEPENDLIB_FLAGS})
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(ExtFit_PrepareNuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
+
+install(TARGETS ExtFit_minimizer ExtFit_PrepareNuwro ExtFit_comparison DumpGiBUUEvents DESTINATION bin)

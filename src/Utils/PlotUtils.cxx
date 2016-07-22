@@ -309,7 +309,7 @@ std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const
   std::vector<string> vals;
 
   while (std::getline(stream, temp_string, *del)) {
-
+    if (temp_string.empty()) continue;
     vals.push_back(temp_string);
 
   }
@@ -324,7 +324,7 @@ std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char
   std::vector<double> vals;
 
   while (std::getline(stream, temp_string, *del)) {
-    
+    if (temp_string.empty()) continue;
     std::istringstream stream(temp_string);
     double entry;
     stream >> entry;
