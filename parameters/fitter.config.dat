@@ -6,7 +6,6 @@ config MAX_ITERATIONS   10000000
 config statutils.addmcerror  0
 config LOWSTATEVENTS 25000
 config SERIAL_EVAL 1
-config EventManager 0
 
 config fitname BestFit
 
@@ -140,3 +139,7 @@ config custom_pars.mec_q0q3cuts.grad.free    1
 
 config custom_pars.mec_norm.dial  0.0
 config custom_pars.mec_norm.val  1.0
+
+
+config minimizer.tolerance  0.001
+config EventManager 1

@@ -97,50 +97,72 @@ int FitWeight::GetDialEnum(std::string name, int type){
   int offset = type * 1000;
   int this_enum = -1;
 
-  if (type == 0){
+  // NEUT DIAL TYPE
+  if (type == kNEUT){
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
     int neut_enum = (int) neut::rew::NSyst::FromString(name);
     this_enum = neut_enum + offset;
+#else
+    ERR(FTL) << "NEUT RW Not Enabled!" << endl;
+    throw;
 #endif
-  }
 
-  if (type == 1){
+    // NIWG DIAL TYPE
+  } else if (type == kNIWG){
 #ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
     int niwg_enum = (int) niwg::rew::NIWGSyst::FromString(name);
     this_enum = niwg_enum + offset;
+#else
+    ERR(FTL) << "NIWG RW Not Enabled!" << endl;
+    throw;
 #endif
-  }
 
-  if (type == 2){
+  // NUWRO DIAL TYPE
+  } else if (type == kNUWRO){
 #ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK
     int nuwro_enum = (int) nuwro::rew::NuwroSyst::FromString(name);
     this_enum = nuwro_enum + offset;
+#else
+    ERR(FTL) << "NUWRO RW Not Enabled!" << endl;
+    throw;
 #endif
-  }
-
-  if (type == 3){
+  
+    // GENIE DIAL TYPE
+  } else if (type == kGENIE){
 #ifdef __GENIE_ENABLED__
     int genie_enum = (int) genie::rew::GSyst::FromString(name);
     this_enum = genie_enum + offset;
+#else
+    ERR(FTL) << "GENIE RW Not Enabled!" << endl;
+    throw;
 #endif
-  }
+  
 
-  if (type == 4){
+    // CUSTOM DIAL TYPE
+  } else if (type == kCUSTOM){
     int custom_enum = 0; // PLACEHOLDER
     this_enum = custom_enum + offset;
-  }
 
-  if (type == 5){
+    // T2K DIAL TYPE
+  } else if (type == kT2K){
 #ifdef __T2KREW_ENABLED__
     int t2k_enum = (int) t2krew::T2KSyst::FromString(name);
     this_enum = t2k_enum + offset;
+#else
+    ERR(FTL) << "T2K RW Not Enabled!" << endl;
+    throw;
 #endif
-  }
-
-  if (type == 6){
-    std::cout<<"NORM TYPE "<< norm_enum << " " << offset <<std::endl;
+  
+  
+  // NORM DIAL TYPE
+  } else if (type == kNORM){
     this_enum = norm_enum + offset;
     norm_enum++;
+
+  // UNKOWN DIAL TYPE
+  } else {
+    ERR(FTL) << " Uknown dial type found = "<<type<<endl;
+    //throw; // Don't throw so fitter puts out its name
   }
 
   return this_enum;
@@ -204,45 +226,74 @@ void FitWeight::IncludeDial(std::string name, int type, double startval){
 	   << type << ", " << rw_enum << ", "<< this_enum << "] "
 	   << std::endl;
 
-  if ( this_enum >= 0 and this_enum < 1000){
-#ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
+
+  int id = int(this_enum-(this_enum%1000))/1000;
+  switch( id ){
+
+  // NEUT RW INCLUDE DIAL
+  case kNEUT:
+#ifdef __NEUT_ENABLED__
     if (!using_neut) this->SetupNeutRW();
     this->neut_rw->Systematics().Init( static_cast<neut::rew::NSyst_t>(rw_enum) );
+    break;
 #else
-    LOG(FTL)<<"NEUT DIAL ERROR"<<std::endl;
+    ERR(FTL) << "NEUT RW Not Enabled!" << endl;
+    throw;
 #endif
 
-  } else if ( this_enum >= 1000 and this_enum < 2000 ){
+  // NIWG RW INCLUDE DIAL
+  case kNIWG:
 #ifdef __NIWG_ENABLED__
     if (!using_niwg) this->SetupNIWGRW();
     this->niwg_rw->Systematics().Init( static_cast<niwg::rew::NIWGSyst_t>(rw_enum) );
+    break;
 #else
-    LOG(FTL)<<"NIWG DIAL ERROR"<<std::endl;
+    ERR(FTL) << "NIWG RW Not Enabled!" << endl;
+    throw;
 #endif
-  } else if ( this_enum >= 2000 and this_enum < 3000 ){
+
+  // NUWRO RW INCLUDE DIAL
+  case kNUWRO:
 #ifdef __NUWRO_REWEIGHT_ENABLED__
     if (!using_nuwro) this->SetupNuwroRW();
     this->nuwro_rw->Systematics().Add( static_cast<nuwro::rew::NuwroSyst_t>(rw_enum) );
+    break;
 #else
     LOG(FTL)<<"Trying to Include NuWro Dial is unsupported!"<<std::endl;
-    LOG(FTL)<<"Check your Build Config!"<<std::endl;
+    throw;
 #endif
-  } else if ( this_enum >= 3000 and this_enum < 4000 ){
+
+    // GENIE RW INCLUDE DIAL
+  case kGENIE:
 #ifdef __GENIE__ENABLED__
-  if (!using_genie) this->SetupGenieRW();
-  this->genie_rw->Systematics().Add( static_cast<genie::rew::GSyst_t>(rw_enum) );
+    if (!using_genie) this->SetupGenieRW();
+    this->genie_rw->Systematics().Add( static_cast<genie::rew::GSyst_t>(rw_enum) );
+    break;
 #else
-  LOG(FTL)<<"Trying to Include GENIE Dial is unsupported!"<<std::endl;
-  LOG(FTL)<<"Check your Build Config!"<<std::endl;
+    ERR(FTL)<<"Trying to Include GENIE Dial is unsupported!"<<std::endl;
+    throw;
 #endif
-  } else if ( this_enum >= 4000 and this_enum < 5000 ){
+
+  // T2K RW INCLUDE DIAL
+  case kT2K:
 #ifdef __T2KREW__ENABLED__
     if (!using_t2k) this->SetupT2KRW();
     this->t2k_rw->Systematics().Add( static_cast<t2krew::T2KSyst_t>(rw_enum) );
+    break;
 #else
-    LOG(FTL)<<"Trying to Include T2K Dial is unsupported!"<<std::endl;
-    LOG(FTL)<<"Check your Build Config!"<<std::endl;
+    ERR(FTL)<<"Trying to Include T2K Dial is unsupported!"<<std::endl;
+    throw;
 #endif
+
+    // SAMPLE NORM DIAL
+  case kNORM:
+    break;
+
+    
+  default:
+    ERR(FTL) << " Trying to include dial of unkown type " << name
+	     << " == " << type << endl;
+    break;
   }
 
   // Setup ENUMS
@@ -276,36 +327,41 @@ void FitWeight::SetDialValue(int this_enum, double val){
   LOG(DEB) <<"Setting dial value "<<this_enum<<" to "<<val<<std::endl;
 
   // -- DIAL BLOCKS
-
-  if ( this_enum >= 0 and this_enum < 1000){
+  int id = int(this_enum-(this_enum%1000))/1000;
+  
+  
+  if ( id == kNEUT ){
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
     this->neut_rw -> Systematics().Set( static_cast<neut::rew::NSyst_t>(rw_enum), val );
     this->neut_changed = true;
+    cout << " Dial Changed = "<< val << endl;
 #else
     LOG(FTL)<<" NEUT DIAL ERROR " <<std::endl;
 #endif
-  } else if ( this_enum >= 1000 and this_enum < 2000){
+    
+  } else if ( id == kNIWG ){
 #ifdef __NIWG_ENABLED__
     this->niwg_rw -> Systematics().Set( static_cast<niwg::rew::NIWGSyst_t>(rw_enum), val );
     this->niwg_changed = true;
 #else
     LOG(FTL)<<" NIWG DIAL ERROR "<<std::endl;
 #endif
-  } else if ( this_enum >= 2000 and this_enum < 3000){
+    
+  } else if ( id == kNUWRO ){
 #ifdef __NUWRO_REWEIGHT_ENABLED__
     nuwro_rw->Systematics().SetSystVal( static_cast<nuwro::rew::NuwroSyst_t>(rw_enum), val);
     this->nuwro_changed = true;
 #else
     LOG(FTL)<<" NUWRO DIAL ERROR "<<std::endl;
 #endif
-  } else if ( this_enum >= 3000 and this_enum < 4000){ // SHOULD NOT HARD CODE THESE LIMITS
+  } else if ( id == kGENIE ){
 #ifdef __GENIE_ENABLED__
     genie_rw->Systematics().Set( static_cast<genie::rew::GSyst_t>(rw_enum), val);
     this->genie_changed = true;
 #else
     LOG(FTL)<<" GENIE DIAL ERROR "<<std::endl;
 #endif
-  } else if ( this_enum >= 4000 and this_enum < 5000){ // SHOULD NOT HARD CODE THESE LIMITS
+  } else if ( id == kT2K ){
 #ifdef __T2KREW_ENABLED__
     t2k_rw->Systematics().SetTwkDial( static_cast<t2krew::T2KSyst_t>(rw_enum), val);
     this->t2k_changed = true;
@@ -335,7 +391,10 @@ void FitWeight::Reconfigure(bool silent){
   if (!silent and LOG_LEVEL(MIN)) this->PrintState();
 
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
-  if (neut_changed and using_neut)  neut_rw->Reconfigure();
+  if (neut_changed and using_neut)  {
+    LOG(FIT) << "Reconfiguring NEUT"<<endl;
+    neut_rw->Reconfigure();
+  }
 #endif
 
 #ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
@@ -356,7 +415,11 @@ void FitWeight::Reconfigure(bool silent){
 
   dial_changed = false;
   neut_changed  = false;
-
+  niwg_changed = false;
+  nuwro_changed = false;
+  genie_changed = false;
+  t2k_changed = false;
+  
   return;
 }
 
@@ -402,15 +465,16 @@ void FitWeight::PrintState(){
 std::string FitWeight::GetDialType(int this_enum){
 //********************************************************************
 
-  if (this_enum >= 0 and this_enum < 1000) return "neut";
-  else if (this_enum >= 1000 and this_enum < 2000) return "niwg";
-  else if (this_enum >= 2000 and this_enum < 3000) return "nuwro";
-  else if (this_enum >= 3000 and this_enum < 4000) return "genie";
-  else if (this_enum >= 4000 and this_enum < 5000) return "t2k";
-  else if (this_enum >= 5000 and this_enum < 6000) return "custom";
-  else if (this_enum >= 6000 and this_enum <= 7000) return "norm";
-
-  return "unknown";
+  int id = int(this_enum-(this_enum%1000))/1000;
+  switch(id){
+  case kNEUT:   { return "neut";   }
+  case kNIWG:   { return "niwg";   }
+  case kGENIE:  { return "genie";  }
+  case kT2K:    { return "t2k";    }
+  case kCUSTOM: { return "custom"; }
+  case kNORM:   { return "norm";   }
+  default: { return "unknown"; }
+  }
 }
 
 //********************************************************************
@@ -420,7 +484,7 @@ double FitWeight::CalcWeight(BaseFitEvt* evt){
   double rw_weight = 1.0;
 
   // SPLINE WEIGHTS
-  if (evt->fType == 6){
+  if (evt->fType == kEVTSPLINE){
     rw_weight = this->CalcSplineWeight(evt);
     evt->Weight = rw_weight;
     return rw_weight;
@@ -430,14 +494,14 @@ double FitWeight::CalcWeight(BaseFitEvt* evt){
   if (dial_changed) this->Reconfigure();
   rw_weight = 1.0;
 
-  if (using_neut){
+  if (using_neut and evt->fType == kNEUT){
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
     GeneratorUtils::FillNeutCommons(evt->neut_event);
     rw_weight *= neut_rw->CalcWeight();
 #endif
   }
 
-  if (using_niwg){
+  if (using_niwg and evt->fType == kNEUT){
 #ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
     niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->neut_event);
 
@@ -446,19 +510,19 @@ double FitWeight::CalcWeight(BaseFitEvt* evt){
 #endif
   }
 
-  if (using_nuwro){
+  if (using_nuwro and evt->fType == kNUWRO){
 #ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK
     rw_weight *= nuwro_rw->CalcWeight(evt->nuwro_event);
 #endif
   }
 
-  if (using_genie){
+  if (using_genie and evt->fType == kGENIE){
 #ifdef __GENIE_ENABLED__
     rw_weight *= genie_rw->CalcWeight(*(evt->genie_event->event));
 #endif
   }
 
-  if (using_t2k){
+  if (using_t2k and evt->fType == kNEUT){
 #ifdef __T2KREW_ENABLED__
     rw_weight *= t2k_rw->CalcWeight(evt->neut_event);
 #endif
@@ -576,7 +640,7 @@ void FitWeight::SetupNuwroRW(){
   // Add the RW Calcs
   if (xsec_qel)  nuwro_rw->AdoptWghtCalc( "nuwro_QEL", new nuwro::rew::NuwroReWeight_QEL );
   if (xsec_flag) nuwro_rw->AdoptWghtCalc( "nuwro_FlagNorm", new nuwro::rew::NuwroReWeight_FlagNorm );
-  if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_SPP );
+  //if (xsec_res)  nuwro_rw->AdoptWghtCalc( "nuwro_RES",  new nuwro::rew::NuwroReWeight_SPP );
 
   nuwro_rw->Reconfigure();
 }

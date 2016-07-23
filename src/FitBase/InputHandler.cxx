@@ -861,11 +861,12 @@ void InputHandler::PrintStartInput() {
            << eventHist->Integral(0, eventHist->GetNbinsX(), "width")
            << std::endl;
 
-  LOG(SAM) << " -> Integrated XSec Hist = "
-           << xsecHist->Integral(0, xsecHist->GetNbinsX(), "width")
+  LOG(SAM) << " -> Integrated Inclusive XSec = "
+	   << (eventHist->Integral(0, eventHist->GetNbinsX(), "width") /
+	       fluxHist->Integral(0, fluxHist->GetNbinsX(), "width")) * 1E-38
            << std::endl;
 
-  if (eventType == 6) return;
+  if (eventType == kEVTSPLINE) return;
 
   // Get First event info
   tn->GetEntry(0);

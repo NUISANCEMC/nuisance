@@ -246,15 +246,21 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
   for ( ; iterSam != fChain.end(); iterSam++){
 
     MeasurementBase* exp = (*iterSam);
+    //    dialChanged = true;
     
-    // If only norm has changed...
-    if (!dialChanged and !fullconfig and filledMC){
-      exp->Renormalise();
-      continue;
-    }
-
-    if (!fullconfig) exp->ReconfigureFast();
-    else             exp->Reconfigure();
+    // BUG HERE NEEDS FIXING
+    // ReconfigureFast gives different results...
+    
+    //    dialChanged = true;
+    //    if (dialChanged or !filledMC){
+    //      cout<<"Reconfiguring properly."<<endl;
+    if (!fullconfig and filledMC) exp->ReconfigureFast();
+    else                          exp->Reconfigure();
+    
+      
+    //    } else {      
+    //      exp->Renormalise();
+    //    }    
   }
   filledMC = true;
   LOG(MIN) << "-> Time Taken "<< time(NULL) - starttime << "s"<<std::endl;

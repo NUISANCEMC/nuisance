@@ -198,12 +198,12 @@ void minimizerRoutine::readParameters(std::string parstring){
     } else if (val == 0){
       partype_str = token;
 
-      if (!token.compare("neut_parameter")) partype = 0;
-      else if (!token.compare("niwg_parameter")) partype = 1;
-      else if (!token.compare("genie_parameter")) partype = 3;
-      else if (!token.compare("nuwro_parameter")) partype = 2;
-      else if (!token.compare("custom_parameter")) partype = 4;
-      else if (!token.compare("t2k_parameter")) partype = 5;
+      if (!token.compare("neut_parameter")) partype = kNEUT;
+      else if (!token.compare("niwg_parameter")) partype = kNIWG;
+      else if (!token.compare("genie_parameter")) partype = kGENIE;
+      else if (!token.compare("nuwro_parameter")) partype = kNUWRO;
+      else if (!token.compare("custom_parameter")) partype = kCUSTOM;
+      else if (!token.compare("t2k_parameter")) partype = kT2K;
 
     } else if (val == 1) {
       params.push_back(token);
@@ -377,7 +377,6 @@ void minimizerRoutine::readFakeDataPars(std::string parstring){
       parname = token;
     } else if (val == 2){
 
-      std::cout<<"Set fake parameter "<<parname<<"  = "<<entry<<std::endl;
       fakeVals[parname] = entry;
 
     } else {
@@ -415,7 +414,6 @@ void minimizerRoutine::readSamples(std::string sampleString){
   double entry;
 
   if (sampleString.c_str()[0] == '#') return;
-
 
   while(std::getline(stream, token, ' ')){
     stream >> std::ws;    // strip whitespace
@@ -459,7 +457,6 @@ void minimizerRoutine::readSamples(std::string sampleString){
 
     val++;
   }
-  std::cout<<"added sample "<<samplename<<" with norm "<<sampleNorms[samplename]<<" "<<currentNorms[samplename]<<std::endl;
   return;
 }
 
@@ -531,7 +528,7 @@ void minimizerRoutine::setupRWEngine(){
 
   for (UInt_t i = 0; i < sampleDials.size(); i++){
     std::string name = sampleDials[i];
-    FitBase::GetRW()->IncludeDial(name, 6);
+    FitBase::GetRW()->IncludeDial(name, kNORM);
   }
   FitBase::GetRW()->Reconfigure();
 

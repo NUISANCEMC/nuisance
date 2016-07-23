@@ -228,7 +228,7 @@ void MeasurementBase::Reconfigure(){
 //***********************************************
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
-
+  
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
@@ -257,7 +257,7 @@ void MeasurementBase::ReconfigureFast(){
   std::vector<double>::iterator Z = Z_VAR_VECT.begin();
   std::vector<int>::iterator    M = MODE_VECT.begin();
   std::vector<UInt_t>::iterator I = INDEX_VECT.begin();
-
+  
   // SIGNAL LOOP
   for (int i = 0; I != INDEX_VECT.end(); I++, i++){
 
