@@ -365,8 +365,10 @@ MINERvA Samples
 T2K Samples
     */
 
-  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu")) {
-    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
+	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
+	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type, fkdt));
 
     /*
 K2K Samples

@@ -633,3 +633,48 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
   return true;
 }
 
+bool SignalDef::isT2K_CC0pi(FitEvent* event, double EnuMin,
+			    double EnuMax, bool forwardgoing){
+
+  // Only Numu
+  if (!event->PartInfo(0)->fPID == 14) return false;
+
+  // Cut on Energy
+  if (event->Enu()/1000.0 < EnuMin ||
+      event->Enu()/1000.0 > EnuMax) return false;
+
+  // Particle Checks
+  bool only_allowed_particles = true;
+  bool muon_found = false;
+  double CosThetaMu = -9999.9;
+
+  // Loop over all particles
+  for (UInt_t j = 2; j < event->Npart(); ++j){
+
+    // Get only final state
+    if (!(event->PartInfo(j))->fIsAlive or (event->PartInfo(j))->fStatus != 0) continue;
+
+    // Get PDG
+    int particle_pdg = (event->PartInfo(j))->fPID;
+    
+    // Muon section
+    if (particle_pdg == 13){
+      CosThetaMu = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
+      muon_found = true;
+    } else if (particle_pdg != 22 &&
+	       particle_pdg != 2212 &&
+	       particle_pdg != 2112 &&
+	       particle_pdg != 13){
+      only_allowed_particles = false;
+    }
+  }
+
+  // CC0PI Cut
+  if (!only_allowed_particles or !muon_found) return false;
+  
+  // restricted phase space
+  if (forwardgoing and
+      CosThetaMu < 0.0 and
+      CosThetaMu != -9999.9)
+    return false;
+}

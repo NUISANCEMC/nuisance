@@ -78,12 +78,9 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, Fi
   // Reset everything to NULL
   rw_engine = rw;
 
-  this->input     = new InputHandler(this->measurementName, inputfile);
-  this->fluxHist  = input->GetFluxHistogram();
-  this->eventHist = input->GetEventHistogram();
-  this->xsecHist  = input->GetXSecHistogram();
-  this->nevents   = input->GetNEvents();
-
+  // Setting up 2D Inputs
+  this->SetupInputs(inputfile);
+  
   // Set Default Options
   SetFitOptions( this->default_types );
 
@@ -976,7 +973,10 @@ void Measurement2D::Write(std::string drawOpt){
   bool drawMask   = (drawOpt.find("MASK") != std::string::npos);
   bool drawMap    = (drawOpt.find("MAP")  != std::string::npos);
   bool drawProj   = (drawOpt.find("PROJ") != std::string::npos);
-
+  bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
+  
+  bool drawSliceCanvYMC = (drawOpt.find("CANVYMC") != std::string::npos);
+  
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
   if (drawNormal)  this->GetMCList()  .at(0)->Write();
@@ -1159,7 +1159,46 @@ void Measurement2D::Write(std::string drawOpt){
     mcHist_Y->Write();
   }
 
+  if (drawSliceCanvYMC or true){
+    TCanvas* c1 = new TCanvas((this->measurementName + "_MC_CANV_Y").c_str(),
+			      (this->measurementName + "_MC_CANV_Y").c_str(),
+			      800,600);
 
+    c1->Divide( int(sqrt(dataHist->GetNbinsY()+1)), int(sqrt(dataHist->GetNbinsY()+1)) );
+    TH2D* mcShape = (TH2D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
+    double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
+    mcShape->Scale(shapeScale);
+    mcShape->SetLineStyle(7);
+
+    c1->cd(1);
+    TLegend* leg = new TLegend(0.6,0.6,0.9,0.9);
+    leg->AddEntry(dataHist, (this->measurementName + " Data").c_str(), "ep");
+    leg->AddEntry(mcHist,   (this->measurementName + " MC").c_str(), "l");
+    leg->AddEntry(mcShape,  (this->measurementName + " Shape").c_str(), "l");
+    leg->Draw("SAME");
+
+    /*
+    // Make Y slices
+    for (int i = 0; i < dataHist->GetNbinY(); i++){
+      
+      c1->cd(i+2);
+      TH1D* dataHist_SliceY = PlotUtils::GetSliceY(dataHist, i);
+      dataHist_SliceY->Draw("E1");
+
+      TH1D* mcHist_SliceY = PlotUtils::GetSliceY(mcHist, i);
+      mcHist_SliceY->Draw("SAME HIST C");
+
+      TH1D* mcShape_SliceY = PlotUtils::GetSliceY(mcShape, i);
+      mcShape_SliceY->Draw("SAME HIST C");
+    }
+    */
+    c1->Write();
+  }
+  
+
+
+
+  
   // Returning
   LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
   return;

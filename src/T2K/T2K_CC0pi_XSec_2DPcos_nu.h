@@ -26,14 +26,13 @@
 class T2K_CC0pi_XSec_2DPcos_nu : public Measurement2D {
 public:
 
-  T2K_CC0pi_XSec_2DPcos_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  T2K_CC0pi_XSec_2DPcos_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
   virtual ~T2K_CC0pi_XSec_2DPcos_nu() {};
   int GetNDOF(){return 67;};  
   bool isSignal(FitEvent *nvect);
   void SetHistograms(std::string infile);
   void FillEventVariables(FitEvent* customEvent);
-
-  void Reconfigure(double norm, bool fullconfig);
+  void ConvertEventRates();
 
  private:
 
@@ -43,6 +42,7 @@ public:
   double numu_energy;
   int particle_pdg;
   double pmu, CosThetaMu;
+  int analysis;
 };
   
 #endif
