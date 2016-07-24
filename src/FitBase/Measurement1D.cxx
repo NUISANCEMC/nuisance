@@ -1011,7 +1011,9 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawCov    = (drawOpt.find("COV")  != std::string::npos);
   bool drawInvCov = (drawOpt.find("INVCOV") != std::string::npos);
   bool drawDecomp = (drawOpt.find("DECOMP") != std::string::npos);
-
+  bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
+  bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
+  
   LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
@@ -1143,6 +1145,44 @@ void Measurement1D::Write(std::string drawOpt){
 
   }
 
+  // Make a pretty PDG Canvas
+  if (drawCanvPDG or true){
+    TCanvas* c1 = new TCanvas((this->measurementName + "_PDG_CANV").c_str(),
+			      (this->measurementName + "_PDG_CANV").c_str(),
+			      800,600);
+    dataHist->Draw("E1");
+    mcHist->Draw("HIST SAME");
+    
+    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(),
+    							   (TH1**)this->mcHist_PDG, 0);
+    combo_mcHist_PDG.Draw("HIST SAME");
+    TLegend leg = PlotUtils::GenerateStackLegend(combo_mcHist_PDG, 0.6,0.6,0.9,0.9);
+    //leg.Draw("SAME");
+    c1->Write();
+  }
+
+
+  if (drawCanvMC or true){
+    TCanvas* c1 = new TCanvas((this->measurementName + "_MC_CANV").c_str(),
+			      (this->measurementName + "_MC_CANV").c_str(),
+			      800,600);
+    c1->cd();
+    dataHist->Draw("E1");
+    mcHist->Draw("SAME HIST C");
+    
+    TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
+    double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
+    mcShape->Scale(shapeScale);
+    mcShape->SetLineStyle(7);
+
+    mcShape->Draw("SAME HIST C");
+
+    TLegend* leg = new TLegend(0.6,0.6,0.9,0.9);
+    leg->AddEntry(dataHist, (this->measurementName + " Data").c_str(), "ep");
+    leg->AddEntry(mcHist,   (this->measurementName + " MC").c_str(), "l");
+    leg->AddEntry(mcShape,  (this->measurementName + " Shape").c_str(), "l");
+  }
+  
   // Returning
   LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
   return;

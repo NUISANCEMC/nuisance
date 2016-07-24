@@ -780,6 +780,7 @@ void InputHandler::ReadNuanceFile() {
   LOG(SAM) << " Reading NUANCE " << std::endl;
   eventType = kNUANCE;
 
+  // Read in NUANCE Tree
   tn = new TChain("h3");
   tn->AddFile(this->inFile.c_str());
 
@@ -787,9 +788,6 @@ void InputHandler::ReadNuanceFile() {
   nEvents = tn->GetEntries();
   nuance_event = new NuanceEvent();
 
-  tn->Show(0);
-
-  cout << "Nuance handle = "<<handleName<<endl;
   // SetBranchAddress for Nuance
   //  tn->SetBranchAddress("cc",&nuance_event->cc);
   //  tn->SetBranchAddress("bound",&nuance_event->bound);
@@ -825,7 +823,6 @@ void InputHandler::ReadNuanceFile() {
 
   this->cust_event->SetEventAddress(&nuance_event);
 
-  cout<<"Now handleName = "<<handleName<<endl;
   this->fluxHist = new TH1D( (this->handleName + "_FLUX").c_str(),
 			     (this->handleName + "_FLUX").c_str(),
 			     1, 0.0, 1.0);
@@ -837,7 +834,6 @@ void InputHandler::ReadNuanceFile() {
 			     1, 0.0, 1.0);
   this->eventHist->SetBinContent(1, nEvents);
 
-  cout<<"Final HandleName = "<<handleName<<endl;
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
   ERR(FTL) << "NUANCE Input Not Enabled." << std::endl;
@@ -978,7 +974,7 @@ double InputHandler::TotalIntegratedFlux(double low, double high,
 //********************************************************************
 double InputHandler::PredictedEventRate(double low, double high,
                                         std::string intOpt) {
-  //********************************************************************
+//********************************************************************
 
   int minBin = this->fluxHist->GetXaxis()->FindBin(low);
   int maxBin = this->fluxHist->GetXaxis()->FindBin(high);

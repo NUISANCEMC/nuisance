@@ -161,7 +161,7 @@ int FitWeight::GetDialEnum(std::string name, int type){
 
   // UNKOWN DIAL TYPE
   } else {
-    ERR(FTL) << " Uknown dial type found = "<<type<<endl;
+    ERR(FTL) << " Uknown dial type found = "<<type<<" "<<kNORM<<endl;
     //throw; // Don't throw so fitter puts out its name
   }
 
@@ -494,40 +494,50 @@ double FitWeight::CalcWeight(BaseFitEvt* evt){
   if (dial_changed) this->Reconfigure();
   rw_weight = 1.0;
 
-  if (using_neut and evt->fType == kNEUT){
+  switch(evt->fType){
+    
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
-    GeneratorUtils::FillNeutCommons(evt->neut_event);
-    rw_weight *= neut_rw->CalcWeight();
-#endif
-  }
-
-  if (using_niwg and evt->fType == kNEUT){
+  case kNEUT:
+    if (using_neut){
+      GeneratorUtils::FillNeutCommons(evt->neut_event);
+      rw_weight *= neut_rw->CalcWeight();
+    }
+    
 #ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
-    niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->neut_event);
-
-    rw_weight *= niwg_rw->CalcWeight(*niwg_event);
-    delete niwg_event;
+    if (using_niwg){
+      niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->neut_event); 
+      rw_weight *= niwg_rw->CalcWeight(*niwg_event);
+      delete niwg_event;
+    }
 #endif
-  }
 
-  if (using_nuwro and evt->fType == kNUWRO){
-#ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK
-    rw_weight *= nuwro_rw->CalcWeight(evt->nuwro_event);
-#endif
-  }
-
-  if (using_genie and evt->fType == kGENIE){
-#ifdef __GENIE_ENABLED__
-    rw_weight *= genie_rw->CalcWeight(*(evt->genie_event->event));
-#endif
-  }
-
-  if (using_t2k and evt->fType == kNEUT){
 #ifdef __T2KREW_ENABLED__
-    rw_weight *= t2k_rw->CalcWeight(evt->neut_event);
+    if (using_t2k){
+      rw_weight *= t2k_rw->CalcWeight(evt->neut_event);
+    }
 #endif
-  }
+    
+    break;
+#endif
+    
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+  case kNUWRO:
+    if (using_nuwro){
+      rw_weight *= nuwro_rw->CalcWeight(evt->nuwro_event);
+    }
+    break;
+#endif
+    
+#ifdef __GENIE_ENABLED__
+  case kGENIE:
+    if (using_genie){
+      rw_weight *= genie_rw->CalcWeight(*(evt->genie_event->event));
+    }
+#endif
 
+  default: break;
+  }
+  
   evt->Weight = rw_weight;
   return rw_weight;
 }
@@ -794,7 +804,7 @@ double FitWeight::GetSampleNorm(std::string samplename){
   if (!found_dial and !samplename.empty()) {
 
     LOG(FIT) << " Late initialisation of norm: "<<norm_dial<<std::endl;
-    this->IncludeDial( norm_dial, 6, 1.0);
+    this->IncludeDial( norm_dial, kNORM, 1.0);
     LOG(FIT) << "RECONFIGURING"<<std::endl;
     this->Reconfigure();
     return 1.0;
