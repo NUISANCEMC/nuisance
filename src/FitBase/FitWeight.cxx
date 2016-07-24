@@ -321,20 +321,18 @@ void FitWeight::SetDialValue(std::string name, double val){
 void FitWeight::SetDialValue(int this_enum, double val){
 //*********************************************************************
 
-  this->dial_changed = true;
+  dial_changed = true;
   int rw_enum = GetRWEnum(this_enum);
   unsigned int pos = GetDialPos(this_enum);
   LOG(DEB) <<"Setting dial value "<<this_enum<<" to "<<val<<std::endl;
 
   // -- DIAL BLOCKS
   int id = int(this_enum-(this_enum%1000))/1000;
-  
-  
+    
   if ( id == kNEUT ){
 #ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
     this->neut_rw -> Systematics().Set( static_cast<neut::rew::NSyst_t>(rw_enum), val );
     this->neut_changed = true;
-    cout << " Dial Changed = "<< val << endl;
 #else
     LOG(FTL)<<" NEUT DIAL ERROR " <<std::endl;
 #endif
@@ -370,7 +368,11 @@ void FitWeight::SetDialValue(int this_enum, double val){
 #endif
   }
 
-
+  /*
+  if ( id == kNORM ){
+    std::cout << "Changing Norm Value = "<<val<<std::endl;
+  }
+  */
 
   dial_values[pos] = val;
   return;
@@ -763,14 +765,29 @@ void FitWeight::UpdateWeightEngine(const double* x){
 }
 
 //********************************************************************
+bool FitWeight::HasRWDialChanged(const double* x){
+//********************************************************************
+  
+  for (int i = 0; i < dial_values.size(); i++){
+
+    int rw_enum = dial_enums.at(i);
+    int id = int(rw_enum-(rw_enum%1000))/1000;
+
+    if (id == kNORM) continue;
+    
+    if (x[i] != dial_values.at(i)) return true;
+  }
+  
+  return false;
+}
+
+//********************************************************************
 void FitWeight::SetAllDials(const double* x, int npt){
 //********************************************************************
   for (int i = 0; i < npt; i++){
     int this_enum = dial_enums.at(i);
     this->SetDialValue(this_enum, x[i]);
   }
-  this->Reconfigure();
-
   return;
 };
 

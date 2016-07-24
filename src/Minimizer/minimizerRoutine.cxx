@@ -1280,6 +1280,7 @@ void minimizerRoutine::saveMinimizerState(){
 	freey++;
 
       }
+      freex++;
     }
   }
 
@@ -1389,7 +1390,12 @@ void minimizerRoutine::SetupCovariance(){
   if (NDIM == 0) return;
 
   covarHist = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);
-  if (NFREE > 0) covarHist_Free = new TH2D("covariance_free","covariance_free",NFREE,0,NFREE,NFREE,0,NFREE);
+  if (NFREE > 0){
+    covarHist_Free = new TH2D("covariance_free",
+			      "covariance_free",
+			      NFREE,0,NFREE,
+			      NFREE,0,NFREE);
+  }
 
   // Set Bin Labels
   int countall = 0;

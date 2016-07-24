@@ -27,15 +27,19 @@ minimizerFCN::~minimizerFCN() {
 
 double minimizerFCN::DoEval(const double *x) const {
 
-  dialChanged = false;
-
   // WEIGHT ENGINE
+  dialChanged = FitBase::GetRW()->HasRWDialChanged(x);
   FitBase::GetRW()->UpdateWeightEngine(x);
+  if (dialChanged) {
+    FitBase::GetRW()->Reconfigure();
+    FitBase::EvtManager().ResetWeightFlags();
+  }
+  //else {
+  //    std::cout<<"DIALS HAVENT CHANGED"<<std::endl;
+  //    sleep(2);
+  //}
 
-  dialChanged = FitBase::GetRW()->HasDialChanged();
-  if (dialChanged) FitBase::GetRW()->Reconfigure();
-  
-  FitBase::EvtManager().ResetWeightFlags();
+
   
   // SORT SAMPLES
   ReconfigureSamples();
@@ -246,21 +250,20 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
   for ( ; iterSam != fChain.end(); iterSam++){
 
     MeasurementBase* exp = (*iterSam);
-    //    dialChanged = true;
-    
-    // BUG HERE NEEDS FIXING
-    // ReconfigureFast gives different results...
-    
-    //    dialChanged = true;
-    //    if (dialChanged or !filledMC){
-    //      cout<<"Reconfiguring properly."<<endl;
-    if (!fullconfig and filledMC) exp->ReconfigureFast();
-    else                          exp->Reconfigure();
-    
-      
-    //    } else {      
-    //      exp->Renormalise();
-    //    }    
+
+    /*
+    std::cout<<"dialChanged = "<<dialChanged<<std::endl;
+    std::cout<<"filledMC = "<<filledMC<<std::endl;
+    std::cout<<"fullconfig = "<<fullconfig<<std::endl;
+    */    
+
+    if (dialChanged or !filledMC or fullconfig){
+      if (!fullconfig and filledMC) exp->ReconfigureFast();
+      else                          exp->Reconfigure();
+    // If RW Not needed just do normalisation
+    } else {      
+      exp->Renormalise();
+    }    
   }
   filledMC = true;
   LOG(MIN) << "-> Time Taken "<< time(NULL) - starttime << "s"<<std::endl;

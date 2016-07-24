@@ -120,11 +120,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
   this->xsecHist      = input->GetXSecHistogram();
   this->nevents       = input->GetNEvents();
 
-  std::cout<<"Got input"<<std::endl;
-  std::cout<<"nevents = "<<nevents<<std::endl;
-
   inputfilename = inputfile;
-
 }
 
 //***********************************************
@@ -155,7 +151,6 @@ void MeasurementBase::Reconfigure(){
   this->Z_VAR_VECT.clear();
   this->MODE_VECT.clear();
   this->INDEX_VECT.clear();
-
 
   size_t NSignal = 0;
   // MAIN EVENT LOOP
@@ -217,8 +212,6 @@ void MeasurementBase::Reconfigure(){
 
   }
 
-  std::cout << "NSignal: " << NSignal << std::endl;
-
   // Finalise Histograms
   filledMC = true;
   this->ConvertEventRates();
@@ -228,11 +221,14 @@ void MeasurementBase::Reconfigure(){
 //***********************************************
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
-  
+  LOG(REC) << " Reconfiguring signal "<<this->measurementName<<std::endl;
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
-  if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
-  cust_event = input->GetEventPointer();
+  if (using_evtmanager){
+    input_id = FitBase::GetInputID(inputfilename);
+  } else {
+    cust_event = input->GetEventPointer();
+  }
   
   // Check if we Can't Signal Reconfigure
   if (!filledMC){
@@ -265,8 +261,7 @@ void MeasurementBase::ReconfigureFast(){
     if (using_evtmanager){
       Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
     } else {
-
-      input->GetTreeEntry(i);
+      input->GetTreeEntry((*I));
       Weight = FitBase::GetRW()->CalcWeight(cust_event)	\
          	* cust_event->InputWeight;
     }

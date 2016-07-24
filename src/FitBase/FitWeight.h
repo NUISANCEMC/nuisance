@@ -230,6 +230,8 @@ class FitWeight {
     (void) save_graph;
   };
 
+  bool HasRWDialChanged(const double* x);
+  
  private:
 
   int norm_enum;
