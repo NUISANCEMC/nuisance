@@ -25,6 +25,11 @@ if(NOT DEFINED USE_MINIMIZER)
   endif()
 endif()
 
+if("${ROOT_FEATURES}" MATCHES "opengl")
+  cmessage(STATUS "ROOT built with OpenGL support")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lRGL")
+else()
+
 if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
   set(ROOT_LD_FLAGS "${ROOT_LD_FLAGS} -lEGPythia6 ")
 endif()
@@ -33,4 +38,4 @@ cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 cmessage ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
 cmessage ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS} -lRGL")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
