@@ -28,7 +28,7 @@ endif()
 if("${ROOT_FEATURES}" MATCHES "opengl")
   cmessage(STATUS "ROOT built with OpenGL support")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lRGL")
-else()
+endif()
 
 if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
   set(ROOT_LD_FLAGS "${ROOT_LD_FLAGS} -lEGPythia6 ")
