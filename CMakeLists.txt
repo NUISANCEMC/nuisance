@@ -24,7 +24,7 @@ if(NOT DEFINED USE_NEUT AND
   NOT DEFINED USE_GiBUU AND
   NOT DEFINED USE_NUANCE)
   cmessage(FATAL_ERROR "No reweight engines requested. Configure with at least "
-    "one of -DUSE_{NEUT,NuWro,GENIE,NIWG}.")
+    "one of -DUSE_{NEUT,NuWro,GENIE,NIWG,GiBUU,NUANCE}.")
 else()
   cmessage(STATUS "Generator Input Support:
   		  NEUT:${USE_NEUT},
@@ -91,7 +91,7 @@ endif()
 
 if(DEFINED USE_NUANCE AND USE_NUANCE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
-endif()	      
+endif()
 
 ################################################################################
 
