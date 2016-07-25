@@ -41,6 +41,10 @@ if [[ "@USE_GENIE@" != "0" ]]; then
 
   export GENIE="@GENIE@"
 
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE@/lib:"* ]]; then
+    export LD_LIBRARY_PATH=@GENIE@/lib:$LD_LIBRARY_PATH
+  fi
+
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@LHAPDF_LIB@:"* ]]; then
     export LD_LIBRARY_PATH=@LHAPDF_LIB@:$LD_LIBRARY_PATH
   fi
