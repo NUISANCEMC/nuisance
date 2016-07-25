@@ -17,6 +17,8 @@
 *    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "StatusMessage.h"
+
 #include "minimizerRoutine.h"
 
 /*
@@ -784,8 +786,8 @@ void minimizerRoutine::RunFitRoutine(std::string routine){
 	   //	   !routine.compare("GSLMulti") or
 	   !routine.compare("GSLSimAn")) {
 
-    std::cout<<"Starting routine "<<routine<<std::endl;
-    minimizerObj->Minimize();
+    std::cout<<"Starting routine " << routine << std::endl;
+    std::cout << StatusMessage(minimizerObj->Minimize()) << std::endl;
     std::cout<<"Getting State"<<std::endl;
     getMinimizerState();
   }
@@ -1061,7 +1063,7 @@ void minimizerRoutine::FixAtLimit(){
   for (UInt_t i = 0; i < params.size(); i++){
     std::string systString = params.at(i);
     if (fixVals[systString]) continue;
-    
+
     double curVal = currentVals.at(systString);
     double minVal = minVals.at(systString);
     double maxVal = minVals.at(systString);
@@ -1078,7 +1080,7 @@ void minimizerRoutine::FixAtLimit(){
   for (UInt_t i = 0; i < sampleDials.size(); i++){
     std::string sampString = sampleDials.at(i);
     if (fixNorms[sampString]) continue;
-    
+
     double curVal = currentNorms.at(sampString);
     double minVal = 0.3;
     double maxVal = 2.0;

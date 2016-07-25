@@ -110,7 +110,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
     // Get a pointer to the input so we can grab flux stuff
     // Slightly Convoluted...
     input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
-    
+
   } else {
     input = new InputHandler(measurementName, inputfile);
   }
@@ -123,7 +123,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
   inputfilename = inputfile;
 }
 
-//***********************************************  
+//***********************************************
 int MeasurementBase::GetInputID(){
 //***********************************************
   return FitBase::GetInputID(inputfilename);
@@ -138,7 +138,7 @@ void MeasurementBase::Reconfigure(){
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
   cust_event = input->GetEventPointer();
-  
+
   // Reset Histograms
   this->ResetAll();
 
@@ -167,13 +167,13 @@ void MeasurementBase::Reconfigure(){
       cust_event = FitBase::EvtManager().GetEvent(input_id, i);
     } else {
       input->ReadEvent(i);
-      
+
       cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
       cust_event->Weight   = cust_event->RWWeight*cust_event->InputWeight;
-      
+
       Weight = cust_event->Weight;
     }
-      
+
     Weight = cust_event->Weight;
 
     // Initialize
@@ -182,12 +182,6 @@ void MeasurementBase::Reconfigure(){
     Z_VAR = 0.0;
     Signal = false;
     Mode = cust_event->Mode;
-
-#ifdef __GiBUU_ENABLED__
-    if(GetInput()->GetType() == kGiBUU){
-      std::cout << WriteGiBUUEvent(*(cust_event->GiRead)) << std::endl;
-    }
-#endif
 
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);
@@ -235,7 +229,7 @@ void MeasurementBase::ReconfigureFast(){
   } else {
     cust_event = input->GetEventPointer();
   }
-  
+
   // Check if we Can't Signal Reconfigure
   if (!filledMC){
     this->Reconfigure();
@@ -259,7 +253,7 @@ void MeasurementBase::ReconfigureFast(){
   std::vector<double>::iterator Z = Z_VAR_VECT.begin();
   std::vector<int>::iterator    M = MODE_VECT.begin();
   std::vector<UInt_t>::iterator I = INDEX_VECT.begin();
-  
+
   // SIGNAL LOOP
   for (int i = 0; I != INDEX_VECT.end(); I++, i++){
 
@@ -271,7 +265,7 @@ void MeasurementBase::ReconfigureFast(){
       Weight = FitBase::GetRW()->CalcWeight(cust_event)	\
          	* cust_event->InputWeight;
     }
-    
+
     X_VAR = (*X);
     Y_VAR = (*Y);
     Z_VAR = (*Z);
@@ -309,10 +303,10 @@ void MeasurementBase::ConvertEventRates(){
 
 }
 
-//*********************************************** 
+//***********************************************
 InputHandler* MeasurementBase::GetInput(){
 //***********************************************
-  
+
   if(FitPar::Config().GetParB("EventManager")){
     return FitBase::GetInput(FitBase::GetInputID(inputfilename));
   } else {
@@ -343,26 +337,26 @@ void MeasurementBase::Renormalise(){
 };
 
 
-//***********************************************  
+//***********************************************
 void MeasurementBase::SetSignal(bool sig){
-//***********************************************  
+//***********************************************
   Signal = sig;
 }
 
-//***********************************************  
+//***********************************************
 void MeasurementBase::SetSignal(FitEvent* evt){
-//***********************************************  
+//***********************************************
   Signal = this->isSignal(evt);
 }
-  
+
 //***********************************************
 void MeasurementBase::SetWeight(double wght){
 //***********************************************
   Weight = wght;
 }
 
-//***********************************************   
+//***********************************************
 void MeasurementBase::SetMode(int md){
-//***********************************************   
+//***********************************************
   Mode = md;
 }

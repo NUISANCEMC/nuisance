@@ -41,7 +41,7 @@ namespace SignalDef {
 
   bool isCCQEBar_res(FitEvent *event, double EnuMin, double EnuMax);
   bool isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax);
-  
+
   // MiniBooNE CC1pi+ differs from MINERvA CC1pi+ differs from T2K CC1pi+!
   bool isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
 
@@ -67,12 +67,12 @@ namespace SignalDef {
 
   bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool hadroncut);
   bool isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax);
-  
+
   bool isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax);
   bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
-  
+
 };
 
 

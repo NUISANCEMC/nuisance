@@ -115,7 +115,7 @@ namespace FitUtils{
 
   //! returns reconstructed Enu assumming resonance interaction where intermediate resonance was a Delta
   double EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu);
-  
+
   //! returns reconstructed Q^2 a la MiniBooNE CCpi+
   double Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip);
 

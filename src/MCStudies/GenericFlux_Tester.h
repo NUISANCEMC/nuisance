@@ -21,21 +21,21 @@
 #define GenericFlux_Tester_H_SEEN
 #include "Measurement1D.h"
 
-//******************************************************************** 
+//********************************************************************
 class GenericFlux_Tester : public Measurement1D {
-//******************************************************************** 
+//********************************************************************
 
 public:
 
   GenericFlux_Tester(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
   virtual ~GenericFlux_Tester() {};
-  
-  //! Grab info from event 
+
+  //! Grab info from event
   void FillEventVariables(FitEvent *event);
 
   //! Fill Custom Histograms
   void FillHistograms();
-  
+
   //! ResetAll
   void ResetAll();
 
@@ -45,7 +45,7 @@ public:
   //! Norm
   void ApplyNormScale(double norm);
 
-  //! Define this samples signal 
+  //! Define this samples signal
   bool isSignal(FitEvent *nvect);
 
   //! Write Files
@@ -56,7 +56,7 @@ public:
 
   //! Fill all signal flags we currently have
   void FillSignalFlags(FitEvent *event);
-  
+
  private:
 
   TTree* eventVariables;
@@ -71,7 +71,7 @@ public:
 
   int Nprotons;
   int Nneutrons;
-  
+
   int PDGLep;
   double TLep;
   double CosLep;
@@ -98,8 +98,7 @@ public:
   double Erecoil_true;
   double Erecoil_charged;
   double Erecoil_minerva;
-  
-  
+
   bool flagCCQE_full;
   bool flagCCQE_rest;
   bool flagCCQEBar_full;
@@ -116,18 +115,18 @@ public:
   bool flagNC1pi0Bar_MiniBooNE;
   bool flagCCcoh_MINERvA;
   bool flagCCcohBar_MINERvA;
-  
+
   bool flagCCQEnumu_MINERvA_full;
   bool flagCCQEnumubar_MINERvA_full;
   bool flagCCQEnumu_MINERvA_rest;
   bool flagCCQEnumubar_MINERvA_rest;
-  
+
   bool flagCCincLowRecoil_MINERvA;
   bool flagCCincLowRecoil_MINERvA_reqhad;
   bool flagCCQELike_MiniBooNE;
   bool flagCCQE_MiniBooNE;
   bool flagCCQEBar_MiniBooNE;
- 
+
 };
 
 #endif
