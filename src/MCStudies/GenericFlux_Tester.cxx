@@ -53,13 +53,23 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
 
   FitPar::Config().out->cd();
 
+  Mode = 0;
+  Nprotons = 0;
+  Nneutrons = 0;
+  Nneutron_ratio = 0.0;
+  Nproton_ratio = 0.0;
+  
   // Setup the TTree to save everything
   eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
   eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
   eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
   eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/D"   );
-  
+  eventVariables->Branch("Nprotons",  &this->Nprotons,  "Nprotons/I");
+  eventVariables->Branch("Nneutrons", &this->Nneutrons, "Nneutrons/I");
+  eventVariables->Branch("Nproton_ratio",  &this->Nproton_ratio,  "Nproton_ratio/D");
+  eventVariables->Branch("Nneutron_ratio", &this->Nneutron_ratio, "Nneutron_ratio/D");
+      
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
   eventVariables->Branch("Q2_QE",    &Q2_QE,    "Q2_QE/D"   );
   eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
@@ -75,7 +85,9 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile, 
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
   eventVariables->Branch("Weight"    , &Weight,     "Weight/D"    );
 
-  
+  eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/D");
+  eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/D");
+  eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/D");
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");
@@ -130,7 +142,10 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
   
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
-
+  this->Nprotons = 0;
+  this->Nneutrons = 0;
+  this->Nparticles = 0;
+  
   // Initialise everything to a bad value
   PDGnu   = -999.9;
   PDGLep  = -999.9;
@@ -156,6 +171,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
     if (!part_alive) continue;
     
     int PDGpart = event->PartInfo(i)->fPID;
+    this->Nparticles++;
     
     // Find the charged lepton
     if (cc){
@@ -187,7 +203,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
     // Find highest momentum proton
     if (PDGpart == 2212){
        TLorentzVector part_4mom = event->PartInfo(i)->fP;
-       
+       this->Nprotons++;
        if (part_4mom.Vect().Mag() > proton_highmom){
 	 proton_highmom = part_4mom.Vect().Mag();
 
@@ -197,9 +213,18 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event){
 	 CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
 
        }
-    }    
+    } else if (PDGpart == 2112){
+      this->Nneutrons++;
+    }
   }
 
+  Erecoil_true      = FitUtils::GetErecoil_TRUE(event);
+  Erecoil_charged   = FitUtils::GetErecoil_CHARGED(event);
+  Erecoil_minerva   = FitUtils::GetErecoil_MINERvA_LowRecoil(event);
+
+  this->Nneutron_ratio = double(this->Nneutrons)/double(this->Nparticles);
+  this->Nproton_ratio = double(this->Nprotons)/double(this->Nparticles);
+  
   // Flux Weights
   FluxWeight = fluxHist->GetBinContent(fluxHist->FindBin(Enu))/fluxHist->Integral();
 
@@ -227,6 +252,10 @@ void GenericFlux_Tester::Write(std::string drawOpt){
   eventVariables->Draw("Q2_true/1E6 >> Q2_hist", "Weight");
   Q2_hist->Scale(scaleFactor,"width"); // DiffXSec Scaling
   Q2_hist->Write();
+
+
+  
+  
   
   
   // Save Flux and Event Histograms too

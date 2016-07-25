@@ -1157,6 +1157,8 @@ void Measurement1D::Write(std::string drawOpt){
     							   (TH1**)this->mcHist_PDG, 0);
     combo_mcHist_PDG.Draw("HIST SAME");
     TLegend leg = PlotUtils::GenerateStackLegend(combo_mcHist_PDG, 0.6,0.6,0.9,0.9);
+    dataHist->Draw("E1 SAME");
+    
     //leg.Draw("SAME");
     c1->Write();
   }

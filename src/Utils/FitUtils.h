@@ -44,6 +44,7 @@
 #include <TRandom3.h>
 #include "TH2Poly.h"
 #include "TGraph.h"
+#include "FitEvent.h"
 
 // Fit  includes
 #include "FitParameters.h"
@@ -123,6 +124,13 @@ namespace FitUtils{
   */
   double MpPi(TLorentzVector pp, TLorentzVector ppi);
 
+
+  /*
+    E Recoil Calculations
+   */
+  double GetErecoil_TRUE(FitEvent* event);
+  double GetErecoil_CHARGED(FitEvent* event);
+  double GetErecoil_MINERvA_LowRecoil(FitEvent* event);  
 }
 
 /*! @} */

@@ -336,3 +336,81 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVec
   return q2;
 };
 
+
+/*
+  E Recoil
+*/
+double FitUtils::GetErecoil_TRUE(FitEvent* event){
+
+  // Get total energy of hadronic system.
+  double Erecoil;
+  for (int i = 0; i < event->Npart(); i++){
+
+    // Only final state
+    if (!event->PartInfo(i)->fIsAlive) continue;
+
+    // Skip Lepton
+    if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID)+1) continue;
+
+    // Add up Erecoil
+    Erecoil += event->PartInfo(i)->fP.E();
+  }
+  
+  return Erecoil;
+}
+
+
+double FitUtils::GetErecoil_CHARGED(FitEvent* event){
+
+  // Get total energy of hadronic system.
+  double Erecoil;
+  for (int i = 0; i < event->Npart(); i++){
+
+    // Only final state
+    if (!event->PartInfo(i)->fIsAlive) continue;
+
+    // Skip Lepton
+    if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID)+1) continue;
+
+    // Skip Neutral particles
+    if (event->PartInfo(i)->fPID == 2112 ||
+	event->PartInfo(i)->fPID == 111 ||
+	event->PartInfo(i)->fPID == 22 ) continue;
+    
+    // Add up Erecoil
+    Erecoil += event->PartInfo(i)->fP.E();
+  }
+  
+  return Erecoil;
+}
+
+
+double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent* event){
+
+  // Get total energy of hadronic system.
+  double Erecoil;
+  for (int i = 0; i < event->Npart(); i++){
+
+    // Only final state
+    if (!event->PartInfo(i)->fIsAlive) continue;
+
+    // Skip Lepton
+    if (abs(event->PartInfo(i)->fPID) == 14) continue;
+
+    // Skip Neutrons particles
+    if (event->PartInfo(i)->fPID == 2112) continue;
+
+    int PID = event->PartInfo(i)->fPID;
+
+    // KE of Protons and charged pions
+    if (PID == 2212 or PID ==  211 or PID == -211){
+      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
+
+    // Total Energy of non-neutrons
+    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14){
+      Erecoil += (event->PartInfo(i)->fP.E())/1000.0;
+    }    
+  }
+  
+  return Erecoil;
+}

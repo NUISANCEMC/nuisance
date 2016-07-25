@@ -68,6 +68,9 @@ public:
 
   double Q2_true;
   double Q2_QE;
+
+  int Nprotons;
+  int Nneutrons;
   
   int PDGLep;
   double TLep;
@@ -87,6 +90,15 @@ public:
 
   double FluxWeight; //!< For Flux Shape Unfolding
 
+  int Nparticles;
+  double Nneutron_ratio;
+  double Nproton_ratio;
+
+
+  double Erecoil_true;
+  double Erecoil_charged;
+  double Erecoil_minerva;
+  
   
   bool flagCCQE_full;
   bool flagCCQE_rest;
