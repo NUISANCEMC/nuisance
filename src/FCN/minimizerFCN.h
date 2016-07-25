@@ -98,6 +98,8 @@ class minimizerFCN
   void SetFakeData(std::string fakeOpt);
   TH1D* GetXSecPlot(std::string type);
   void ThrowSamples();
+
+  std::list<MeasurementBase*> GetSampleList();
   
   std::string outname;
   std::vector<std::string> sampleNames;

@@ -77,6 +77,11 @@ double EventManager::GetEventWeight(int infile, int i){
   return Weight;
 }
 
+
+std::map< int, InputHandler* > EventManager::GetInputs(){
+  return finputs;
+}
+
 void EventManager::AddInput(std::string handle, std::string infile){
 
   if (finputs.find(GetInputID(infile)) != finputs.end()){

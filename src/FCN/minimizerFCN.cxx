@@ -281,6 +281,9 @@ void minimizerFCN::SetFakeData(std::string fakeOpt){
 };
 
 
+std::list<MeasurementBase*> minimizerFCN::GetSampleList(){
+  return fChain;
+}
 
 TH1D* minimizerFCN::GetXSecPlot(std::string type){
 

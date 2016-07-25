@@ -216,12 +216,14 @@ void GenericFlux_Tester::Write(std::string drawOpt){
   eventVariables->Write();
   
   // Now save any default plots we want to draw
-  TH1D* Enu_hist = new TH1D("Enu_hist","Enu_hist;E;Events", 40, 0.0, 20.0*1.E3);
+  TH1D* Enu_hist = new TH1D((this->measurementName + "Enu_hist").c_str(),
+			    "Enu_hist;E;Events", 40, 0.0, 20.0*1.E3);
   eventVariables->Draw("Enu_true >> Enu_hist", "Weight");
   Enu_hist->Write();
 
   // Q2 Diff XSec per nucleon
-  TH1D* Q2_hist = new TH1D("Q2_hist","Q2_hist;Q2;d#sigma/dQ^{2}", 40, 0.0, 2.0);
+  TH1D* Q2_hist = new TH1D((this->measurementName + "Q2_hist").c_str(),
+			   "Q2_hist;Q2;d#sigma/dQ^{2}", 40, 0.0, 2.0);
   eventVariables->Draw("Q2_true/1E6 >> Q2_hist", "Weight");
   Q2_hist->Scale(scaleFactor,"width"); // DiffXSec Scaling
   Q2_hist->Write();
@@ -238,11 +240,13 @@ void GenericFlux_Tester::Write(std::string drawOpt){
 void GenericFlux_Tester::FillSignalFlags(FitEvent *event){
 //********************************************************************
 
-  
+  // Some example flags are given from SignalDef.
+  // See src/Utils/SignalDef.cxx for more.
   flagCCQE_full = SignalDef::isCCQE(event, EnuMin, EnuMax, false); 
   flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
   flagCCQEBar_full = SignalDef::isCCQEBar(event, EnuMin, EnuMax, false);
   flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
+
   flagCC1pip_MiniBooNE = false;
   flagCC1pip_MINERvA_full = false;
   flagCC1pip_MINERvA_rest = false;

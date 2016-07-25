@@ -117,6 +117,8 @@ public:
   //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
   void SetupCovariance();
 
+  void ReconfigureAllEvents();
+  
   /*
     Fitting Functions
   */

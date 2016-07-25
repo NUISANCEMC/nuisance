@@ -277,7 +277,7 @@ void comparisonRoutines::PlotLimits(){
   nomfolder->cd();
 
   updateRWEngine(currentVals, currentNorms);
-  thisFCN->ReconfigureAllEvents();
+  this->ReconfigureAllEvents();
   thisFCN->Write();
 
   limfolder->cd();
@@ -305,7 +305,7 @@ void comparisonRoutines::PlotLimits(){
       allfolders.push_back(curvalstring);
 
       updateRWEngine(currentVals, currentNorms);
-      thisFCN->ReconfigureAllEvents();
+      this->ReconfigureAllEvents();
 
       thisFCN->Write();
     }
@@ -329,7 +329,7 @@ void comparisonRoutines::PlotLimits(){
 
 
       updateRWEngine(currentVals, currentNorms);
-      thisFCN->ReconfigureAllEvents();
+      this->ReconfigureAllEvents();
 
       thisFCN->Write();
     }
@@ -518,7 +518,7 @@ void comparisonRoutines::setFakeData(){
     updateRWEngine(fakeVals, fakeNorms);
 
     FitBase::GetRW()->Reconfigure();
-    thisFCN->ReconfigureAllEvents();
+    this->ReconfigureAllEvents();
     thisFCN->SetFakeData("MC");
 
     updateRWEngine(currentVals, currentNorms);
@@ -581,8 +581,82 @@ void comparisonRoutines::SelfFit(){
     if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
     else if (routine.find("Compare") != std::string::npos) {
-      thisFCN->ReconfigureAllEvents();
+      this->ReconfigureAllEvents();
     }
+  }
+
+  return;
+}
+
+//*************************************
+void comparisonRoutines::ReconfigureAllEvents(){
+//*************************************
+
+  // Main Event Loop from event Manager
+  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+
+  if (using_evtmanager){
+
+    std::list<MeasurementBase*> fChain = thisFCN->GetSampleList();
+    std::list<MeasurementBase*>::const_iterator iterSam = fChain.begin();
+
+    std::map< int, InputHandler* > fInputs = FitBase::EvtManager().GetInputs();
+    std::map< int, InputHandler* >::const_iterator iterInp = fInputs.begin();
+
+    int timestart = time(NULL);
+     
+    for ( ; iterInp != fInputs.end(); iterInp++){
+
+      int input_id = (iterInp->first);
+      InputHandler* cur_input = (iterInp->second);
+      FitEvent* cust_event = cur_input->GetEventPointer();
+      int nevents = cur_input->GetNEvents();
+      int countwidth = (nevents/200);
+      size_t NSignal = 0;
+
+      // MAIN EVENT LOOP
+      for (int i = 0; i < nevents; i++){
+
+	cust_event = FitBase::EvtManager().GetEvent(input_id, i);
+	double Weight = cust_event->Weight;
+	if (fabs(cust_event->Mode) > 60 ||
+	    cust_event->Mode == 0 ||
+	    Weight > 200.0 ||
+	    Weight < 0.0) continue;
+
+	iterSam = fChain.begin();
+	for ( ; iterSam != fChain.end(); iterSam++){
+	  MeasurementBase* exp = (*iterSam);
+	  if (exp->GetInputID() != input_id) continue;
+
+	  LOG(EVT)<<" FILLING EVENT MANAGER LOOP"<<std::endl;
+	  exp->FillEventVariables(cust_event);
+	  exp->SetMode(cust_event->Mode);
+	  exp->SetSignal(cust_event);
+	  exp->SetWeight(Weight);
+	  exp->FillHistograms();
+	}
+	  
+	// Print Out
+	if (LOG_LEVEL(REC) and  i % countwidth == 0)
+	  LOG(REC) << "Reconfigured " << i <<" total events. W="
+		   << Weight << std::endl;
+	
+      }
+    }
+
+    iterSam = fChain.begin();
+    for ( ; iterSam != fChain.end(); iterSam++){
+      MeasurementBase* exp = (*iterSam);
+      std::cout<<"Finalising sample "<<exp<<std::endl;
+      exp->ConvertEventRates();
+    }
+    
+    std::cout<<" Time Taken = "<<time(NULL) - timestart<<std::endl;
+    std::cout<<"Finished reconfiguring all events"<<std::endl;
+    
+  } else {
+    thisFCN->ReconfigureAllEvents();
   }
 
   return;
@@ -597,7 +671,7 @@ void comparisonRoutines::saveCurrentState(std::string subdir){
 
   outputFile->cd();
   FitBase::GetRW()->Reconfigure();
-  thisFCN->ReconfigureAllEvents();
+  this->ReconfigureAllEvents();
 
   if (!subdir.empty()){
     TDirectory* nominalDIR =(TDirectory*) outputFile->mkdir("nominal");
@@ -905,7 +979,7 @@ void comparisonRoutines::GenerateErrorBands(){
   int nthrows = FitPar::Config().GetParI("error_throws");
 
   updateRWEngine(currentVals, currentNorms);
-  thisFCN->ReconfigureAllEvents();
+  this->ReconfigureAllEvents();
 
   TDirectory* nominal = (TDirectory*) tempfile->mkdir("nominal");
   nominal->cd();
@@ -937,7 +1011,7 @@ void comparisonRoutines::GenerateErrorBands(){
 
     ThrowCovariance(uniformly);
     updateRWEngine(thrownVals, thrownNorms);
-    thisFCN->ReconfigureAllEvents();
+    this->ReconfigureAllEvents();
     thisFCN->Write();
     chi2 = thisFCN->GetLikelihood();
 

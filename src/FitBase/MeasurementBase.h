@@ -183,7 +183,12 @@ class MeasurementBase {
   double GetEnu(){ return this->Enu; };
 
   void SetupInputs(std::string inputfile);
-
+  int GetInputID();
+  void SetSignal(bool sig);
+  void SetSignal(FitEvent* evt);
+  void SetWeight(double wght);
+  void SetMode(int md);
+  
 protected:
 
   // Minimum and maximum energies

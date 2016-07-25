@@ -123,6 +123,12 @@ void MeasurementBase::SetupInputs(std::string inputfile){
   inputfilename = inputfile;
 }
 
+//***********************************************  
+int MeasurementBase::GetInputID(){
+//***********************************************
+  return FitBase::GetInputID(inputfilename);
+}
+
 //***********************************************
 void MeasurementBase::Reconfigure(){
 //***********************************************
@@ -143,7 +149,7 @@ void MeasurementBase::Reconfigure(){
 
   FitEvent* cust_event = input->GetEventPointer();
   int nevents = input->GetNEvents();
-  int countwidth = (nevents/20);
+  int countwidth = (nevents/200);
 
   // Reset Signal Vectors
   this->X_VAR_VECT.clear();
@@ -336,3 +342,27 @@ void MeasurementBase::Renormalise(){
   return;
 };
 
+
+//***********************************************  
+void MeasurementBase::SetSignal(bool sig){
+//***********************************************  
+  Signal = sig;
+}
+
+//***********************************************  
+void MeasurementBase::SetSignal(FitEvent* evt){
+//***********************************************  
+  Signal = this->isSignal(evt);
+}
+  
+//***********************************************
+void MeasurementBase::SetWeight(double wght){
+//***********************************************
+  Weight = wght;
+}
+
+//***********************************************   
+void MeasurementBase::SetMode(int md){
+//***********************************************   
+  Mode = md;
+}

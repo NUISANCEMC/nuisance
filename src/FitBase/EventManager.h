@@ -35,6 +35,8 @@ class EventManager {
   void ResetWeightFlags();
   int GetInputID(std::string infile);
 
+  std::map< int, InputHandler* > GetInputs();
+  
  protected:
   EventManager();
   ~EventManager();
@@ -47,6 +49,8 @@ class EventManager {
   std::map< int, std::vector< bool > > frwneeded;
   std::map< int, std::vector< double > > calc_rw;
 
+  
+  
 };
 
 
