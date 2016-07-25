@@ -42,9 +42,7 @@ comparisonRoutines::comparisonRoutines(int argc, char* argv[]){
   fitStrategy = "Compare";
   fakeDataFile = "";
 
-  minimizerObj = NULL;
   thisFCN = NULL;
-  callFCN = NULL;
 
   parseArgs(argc, argv);
 
@@ -501,7 +499,6 @@ void comparisonRoutines::setupFCN(){
   thisFCN = new minimizerFCN(cardFile, outputFile);
   thisFCN->SetOutName(outputFileName);
   setFakeData();
-  callFCN = new ROOT::Math::Functor(*thisFCN,params.size() + sampleDials.size());
 
   return;
 }
@@ -730,17 +727,12 @@ void comparisonRoutines::SetupCovariance(){
   int NDIM = 0;
 
   // Get NFREE from min or from vals (for cases when doing throws)
-  if (minimizerObj){
-    NFREE = minimizerObj->NFree();
-    NDIM  = minimizerObj->NDim();
-  } else {
-    NDIM = params.size() + sampleDials.size();
-    for (UInt_t i = 0; i < params.size(); i++){
-      if (!fixVals[params[i]]) NFREE++;
-    }
-    for (UInt_t i = 0; i < sampleDials.size(); i++){
-      if (!fixNorms[sampleDials[i]]) NFREE++;
-    }
+  NDIM = params.size() + sampleDials.size();
+  for (UInt_t i = 0; i < params.size(); i++){
+    if (!fixVals[params[i]]) NFREE++;
+  }
+  for (UInt_t i = 0; i < sampleDials.size(); i++){
+    if (!fixNorms[sampleDials[i]]) NFREE++;
   }
 
   if (NDIM == 0) return;

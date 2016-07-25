@@ -29,8 +29,6 @@
 #include "TF1.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
@@ -46,9 +44,6 @@
 #include "minimizerFCN.h"
 #include "FitParameters.h"
 
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
 #include "FitLogger.h"
 
 //*************************************
@@ -181,15 +176,8 @@ protected:
   //! Flag for whether the fit should be continued if an output file is already found.
   bool fitContinue;
 
-  //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* minimizerObj;
-
   //! The actual chi2 Function from FCN module
   minimizerFCN* thisFCN;
-
-  //! A functor that root requires to pass to minimizerObj.
-  //! Basically just a wrapper for thisFCN
-  ROOT::Math::Functor* callFCN;
 
   //! Current number of free parameters. callFCN requires this when being setup.
   int nfreepars;

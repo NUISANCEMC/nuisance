@@ -19,18 +19,13 @@
 #include <TVectorD.h>
 #include <TMath.h>
 
-// Minuit headers
 #include "FitUtils.h"
-#include "TVirtualFitter.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 
 // External fitter headers
 #include "MeasurementBase.h"
 #include "parameter_pulls.h"
 #include "SampleList.h"
 
-#include "Math/IFunction.h"
 #define GetCurrentDir getcwd
 #include "EventManager.h"
 
