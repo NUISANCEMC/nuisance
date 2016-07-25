@@ -14,7 +14,7 @@ execute_process (COMMAND root-config
 execute_process (COMMAND root-config
   --features OUTPUT_VARIABLE ROOT_FEATURES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(DEFINED USE_GENIE)
+if(USE_GENIE)
   cmessage(STATUS "GENIE requires eve generation libraries")
   execute_process (COMMAND root-config
   --evelibs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
