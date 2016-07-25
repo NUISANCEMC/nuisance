@@ -106,6 +106,13 @@ set(CORE
   #Devel
   )
 
+
+###############
+# Allow compilation against single experiment folder
+# Add later..
+##############
+
+
 set(EXPERIMENTS
   ANL
   BEBC

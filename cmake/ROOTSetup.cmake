@@ -31,4 +31,4 @@ cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 cmessage ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
 cmessage ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS} -lRGL")

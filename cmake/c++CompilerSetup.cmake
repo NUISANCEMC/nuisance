@@ -23,6 +23,13 @@ if(NOT ${RWENGINE_LINKER_FLAGS} STREQUAL "")
   set(CMAKE_DEPENDLIB_FLAGS "${CMAKE_DEPENDLIB_FLAGS} ${RWENGINE_LINKER_FLAGS}")
 endif()
 
+if (DEFINED USE_MYPERFTOOLS AND USE_MYPERFTOOLS)
+#  add_dependencies(gperftools libunwind)
+  set(CMAKE_CXX_FLAGS "-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free ${CMAKE_CXX_FLAGS}")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -ltcmalloc_and_profiler")
+  cmessage(STATUS "Using google performance libraries")
+endif()
+
 if(DEFINED USE_EXP AND USE_EXP)
   set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fopenmp")
 endif()
