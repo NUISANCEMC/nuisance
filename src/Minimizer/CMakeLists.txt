@@ -17,14 +17,20 @@
 #    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-minimizerRoutine.cxx
 comparisonRoutines.cxx
 )
 
+if(USE_MINIMIZER)
+  set(IMPLFILES ${IMPLFILES};minimizerRoutine.cxx)
+endif()
+
 set(HEADERFILES
-minimizerRoutine.h
 comparisonRoutines.h
 )
+
+if(USE_MINIMIZER)
+  set(HEADERFILES ${HEADERFILES};minimizerRoutine.h)
+endif()
 
 set(LIBNAME Minimizer)
 

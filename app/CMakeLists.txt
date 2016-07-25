@@ -16,16 +16,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-add_executable(ExtFit_minimizer ExtFit_minimizer.cxx)
 
-target_link_libraries(ExtFit_minimizer ${MODULETargets})
+set(TARGETS_TO_BUILD)
 
-target_link_libraries(ExtFit_minimizer ${CMAKE_DEPENDLIB_FLAGS})
+if(USE_MINIMIZER)
+  add_executable(ExtFit_minimizer ExtFit_minimizer.cxx)
 
-if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-  set_target_properties(ExtFit_minimizer PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_minimizer)
+
+  target_link_libraries(ExtFit_minimizer ${MODULETargets})
+
+  target_link_libraries(ExtFit_minimizer ${CMAKE_DEPENDLIB_FLAGS})
+
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(ExtFit_minimizer PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
 endif()
-
 
 
 
@@ -39,6 +45,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
 add_executable(DumpGiBUUEvents DumpGiBUUEvents.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};DumpGiBUUEvents)
 target_link_libraries(DumpGiBUUEvents ${MODULETargets})
 target_link_libraries(DumpGiBUUEvents ${CMAKE_DEPENDLIB_FLAGS})
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
@@ -48,18 +55,21 @@ endif()
 
 
 add_executable(ExtFit_comparison ExtFit_comparison.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_comparison)
 target_link_libraries(ExtFit_comparison ${MODULETargets})
 target_link_libraries(ExtFit_comparison ${CMAKE_DEPENDLIB_FLAGS})
 if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(ExtFit_comparison PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
-
-add_executable(ExtFit_PrepareNuwro ExtFit_PrepareNuwro.cxx)
-target_link_libraries(ExtFit_PrepareNuwro ${MODULETargets})
-target_link_libraries(ExtFit_PrepareNuwro ${CMAKE_DEPENDLIB_FLAGS})
-if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-  set_target_properties(ExtFit_PrepareNuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+if(USE_NuWro)
+  add_executable(ExtFit_PrepareNuwro ExtFit_PrepareNuwro.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_PrepareNuwro)
+  target_link_libraries(ExtFit_PrepareNuwro ${MODULETargets})
+  target_link_libraries(ExtFit_PrepareNuwro ${CMAKE_DEPENDLIB_FLAGS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(ExtFit_PrepareNuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
 endif()
 
-install(TARGETS ExtFit_minimizer ExtFit_PrepareNuwro ExtFit_comparison DumpGiBUUEvents DESTINATION bin)
+install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
