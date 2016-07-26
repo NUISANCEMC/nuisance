@@ -16,7 +16,7 @@ execute_process (COMMAND root-config
 
 set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
 
-set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;EGPythia6;Geom;Pythia6)
+set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;Geom)
 
 if(USE_GENIE)
   cmessage(STATUS "GENIE requires eve generation libraries")
@@ -39,7 +39,7 @@ if("${ROOT_FEATURES}" MATCHES "opengl")
 endif()
 
 if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
-  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6)
+  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6;Pythia6)
 endif()
 
 cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
