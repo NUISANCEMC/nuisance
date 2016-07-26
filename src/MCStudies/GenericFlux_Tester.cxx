@@ -323,7 +323,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       MLep = (part_4mom.Mag());
       CosLep = cos(part_4mom.Vect().Angle(nu_4mom.Vect()));
 
-      Q2_true = (part_4mom - nu_4mom).Mag2();
+      Q2_true = -1*(part_4mom - nu_4mom).Mag2();
 
       double ThetaLep = (event->PartInfo(0))
 	->fP.Vect().Angle((event->PartInfo(i))->fP.Vect());
