@@ -108,6 +108,12 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("EPiN",       &EPiN,       "EPiN/D"  );
   eventVariables->Branch("TPiN",       &TPiN,       "TPiN/D"  );
   eventVariables->Branch("CosPiN",     &CosPiN,     "CosPiN/D");
+
+  eventVariables->Branch("Npi0",       &Npi0,       "Npi0/I");
+  eventVariables->Branch("MPi0",       &MPiN,       "MPiN/D"  );
+  eventVariables->Branch("EPi0",       &EPiN,       "EPiN/D"  );
+  eventVariables->Branch("TPi0",       &TPiN,       "TPiN/D"  );
+  eventVariables->Branch("CosPi0",     &CosPiN,     "CosPiN/D");
   
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
   eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
@@ -242,6 +248,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   double neutron_highmom = 0.0;
   double piplus_highmom = 0.0;
   double pineg_highmom = 0.0;
+  double pi0_highmom = 0.0;
   
   // Get main event variables
   TLorentzVector nu_4mom = event->PartInfo(0)->fP;
@@ -330,24 +337,34 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     } else if (PDGpart == 211){
       Npiplus++;
       if (part_4mom.Vect().Mag() > piplus_highmom){
-	neutron_highmom = part_4mom.Vect().Mag();
+	piplus_highmom = part_4mom.Vect().Mag();
 
 	PPiP   = (part_4mom.Vect().Mag());
 	EPiP   = (part_4mom.E());
 	MPiP   = (part_4mom.Mag());
 	CosPiP = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
       }
-    } else if (PDGpart == 111){
+    } else if (PDGpart == -211){
       Npineg++;
       if (part_4mom.Vect().Mag() > pineg_highmom){
-	neutron_highmom = part_4mom.Vect().Mag();
+	pineg_highmom = part_4mom.Vect().Mag();
 
 	PPiN   = (part_4mom.Vect().Mag());
 	EPiN   = (part_4mom.E());
 	MPiN   = (part_4mom.Mag());
 	CosPiN = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
       }
-    } 
+    } else if (PDGpart == 111) {
+      Npi0++;
+      if (part_4mom.Vect().Mag() > pi0_highmom){
+	pi0_highmom = part_4mom.Vect().Mag();
+
+	PPi0   = (part_4mom.Vect().Mag());
+	EPi0   = (part_4mom.E());
+	MPi0   = (part_4mom.Mag());
+	CosPi0 = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+      }
+    }
   }
 
   // Get Recoil Definitions ------

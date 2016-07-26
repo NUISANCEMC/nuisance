@@ -76,6 +76,7 @@ public:
   int Nneutrons;
   int Npiplus;
   int Npineg;
+  int Npi0;
   
   int PDGLep;
   double TLep;
@@ -108,6 +109,12 @@ public:
   double EPiN;
   double TPiN;
   double MPiN;
+
+  double PPi0;
+  double CosPi0;
+  double EPi0;
+  double TPi0;
+  double MPi0;
   
   double q0_true;
   double q3_true;
