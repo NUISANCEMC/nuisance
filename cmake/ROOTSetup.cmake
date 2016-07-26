@@ -8,16 +8,19 @@ endif()
 execute_process (COMMAND root-config
   --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND root-config
-  --libs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND root-config
   --version OUTPUT_VARIABLE ROOT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND root-config
   --features OUTPUT_VARIABLE ROOT_FEATURES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
+
+set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;EGPythia6;Geom;Pythia6)
+
 if(USE_GENIE)
   cmessage(STATUS "GENIE requires eve generation libraries")
-  execute_process (COMMAND root-config
-  --evelibs OUTPUT_VARIABLE ROOT_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(ROOT_LIBS Eve;EG;TreePlayer;Geom;Ged;Gui;${ROOT_LIBS})
 endif()
 
 if(NOT DEFINED USE_MINIMIZER)
@@ -32,11 +35,11 @@ endif()
 
 if("${ROOT_FEATURES}" MATCHES "opengl")
   cmessage(STATUS "ROOT built with OpenGL support")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lRGL")
+  set(ROOT_LIBS ${ROOT_LIBS};RGL)
 endif()
 
 if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
-  set(ROOT_LD_FLAGS "${ROOT_LD_FLAGS} -lEGPythia6 ")
+  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6)
 endif()
 
 cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
