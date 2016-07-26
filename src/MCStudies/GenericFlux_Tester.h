@@ -71,6 +71,11 @@ public:
 
   double Q2_true;
   double Q2_QE;
+  double W_nuc_rest;
+  double bjorken_x;
+  double bjorken_y;
+
+  int Mode;
 
   int Nprotons;
   int Nneutrons;
@@ -116,6 +121,22 @@ public:
   double TPi0;
   double MPi0;
   
+  double CosPmuPpip;
+  double CosPmuPpim;
+  double CosPmuPpi0;
+  double CosPmuPprot;
+  double CosPmuPneut;
+  double CosPpipPprot;
+  double CosPpipPneut;
+  double CosPpipPpim;
+  double CosPpipPpi0;
+  double CosPpimPprot;
+  double CosPpimPneut;
+  double CosPpimPpi0;
+  double CosPi0Pprot;
+  double CosPi0Pneut;
+  double CosPprotPneut;
+
   double q0_true;
   double q3_true;
 

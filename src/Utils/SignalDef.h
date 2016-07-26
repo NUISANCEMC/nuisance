@@ -50,7 +50,8 @@ namespace SignalDef {
   bool isCCNpip_MINERvA (FitEvent *event, int &nPions, double EnuMin, double EnuMax, bool isRestricted = false);
 
   // T2K not unfolded phase space restrictions
-  bool isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax, bool Michel);
 
   bool isCC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
   bool isCC1pi0Bar_MINERvA  (FitEvent *event, double EnuMin, double EnuMax);

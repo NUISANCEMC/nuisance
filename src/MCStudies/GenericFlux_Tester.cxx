@@ -76,7 +76,7 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
   
-  eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/D"   );
+  eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/I"   );
   eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
   
   eventVariables->Branch("Nleptons",  &Nleptons,  "Nleptons/I");
@@ -84,12 +84,18 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
   eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
   eventVariables->Branch("CosLep",    &CosLep,    "CosLep/D");
+  eventVariables->Branch("CosPmuPpip",&CosPmuPpip, "CosPmuPpip/D");
+  eventVariables->Branch("CosPmuPpim",&CosPmuPpim, "CosPmuPpim/D");
+  eventVariables->Branch("CosPmuPpi0",&CosPmuPpi0, "CosPmuPpi0/D");
+  eventVariables->Branch("CosPmuPprot",&CosPmuPprot, "CosPmuPprot/D");
+  eventVariables->Branch("CosPmuPneut",&CosPmuPneut, "CosPmuPneut/D");
   
   eventVariables->Branch("Nprotons",  &Nprotons,  "Nprotons/I");
   eventVariables->Branch("MPr",       &MPr,       "MPr/D"  );
   eventVariables->Branch("EPr",       &EPr,       "EPr/D"  );
   eventVariables->Branch("TPr",       &TPr,       "TPr/D"  );
   eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D");
+  eventVariables->Branch("CosPprotPneut", &CosPprotPneut, "CosPprotPneut/D");
 
   eventVariables->Branch("Nneutrons",  &Nneutrons,  "Nneutrons/I");
   eventVariables->Branch("MNe",        &MNe,        "MNe/D"  );
@@ -102,18 +108,27 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("EPiP",       &EPiP,       "EPiP/D"  );
   eventVariables->Branch("TPiP",       &TPiP,       "TPiP/D"  );
   eventVariables->Branch("CosPiP",     &CosPiP,     "CosPiP/D");
+  eventVariables->Branch("CosPpipPprot",  &CosPpipPprot,  "CosPpipProt/D");
+  eventVariables->Branch("CosPpipPneut",  &CosPpipPneut,  "CosPpipPneut/D");
+  eventVariables->Branch("CosPpipPpim",   &CosPpipPpim,   "CosPpipPpim/D");
+  eventVariables->Branch("CosPpipPpi0",   &CosPpipPpi0,   "CosPpipPpi0/D");
 
   eventVariables->Branch("Npineg",     &Npineg,    "Npineg/I");
   eventVariables->Branch("MPiN",       &MPiN,       "MPiN/D"  );
   eventVariables->Branch("EPiN",       &EPiN,       "EPiN/D"  );
   eventVariables->Branch("TPiN",       &TPiN,       "TPiN/D"  );
   eventVariables->Branch("CosPiN",     &CosPiN,     "CosPiN/D");
+  eventVariables->Branch("CosPpimPprot",  &CosPpimPprot, "CosPpimPprot/D");
+  eventVariables->Branch("CosPpimPneut",  &CosPpimPneut, "CosPpimPneut/D");
+  eventVariables->Branch("CosPpimPpi0",   &CosPpimPpi0,  "CosPpimPpi0/D");
 
   eventVariables->Branch("Npi0",       &Npi0,       "Npi0/I");
-  eventVariables->Branch("MPi0",       &MPiN,       "MPiN/D"  );
-  eventVariables->Branch("EPi0",       &EPiN,       "EPiN/D"  );
-  eventVariables->Branch("TPi0",       &TPiN,       "TPiN/D"  );
-  eventVariables->Branch("CosPi0",     &CosPiN,     "CosPiN/D");
+  eventVariables->Branch("MPi0",       &MPi0,       "MPi0/D"  );
+  eventVariables->Branch("EPi0",       &EPi0,       "EPi0/D"  );
+  eventVariables->Branch("TPi0",       &TPi0,       "TPi0/D"  );
+  eventVariables->Branch("CosPi0",     &CosPi0,     "CosPi0/D");
+  eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/D");
+  eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/D");
   
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
   eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
@@ -121,6 +136,10 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
 
   eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
   eventVariables->Branch("Q2_QE",     &Q2_QE,    "Q2_QE/D"   );
+
+  eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/D");
+  eventVariables->Branch("bjorken_x", &bjorken_x, "bjorken_x/D");
+  eventVariables->Branch("bjorken_y", &bjorken_y, "bjorken_y/D");
   
   eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
   eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
@@ -132,6 +151,8 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/D");
   eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/D");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/D");
+
+
   
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/D");
@@ -227,31 +248,44 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   Mode = event->Mode;
   Nleptons   = 0;
   Nparticles = 0;
-  PDGnu  = -999.9;
-  PDGLep = -999.9;
+  PDGnu  = 0;
+  PDGLep = 0;
 
-  Enu_true = Enu_QE = Q2_true = Q2_QE = TLep = -999.9;
+  Enu_true = Enu_QE = Q2_true = Q2_QE = TLep = TPr = TNe = TPiP = TPiN = TPi0= -999.9;
 
-  Nprotons  = 0.0;
+  Nprotons  = 0;
   PPr  = EPr  = MPr  = CosPr  = -999.9;
 
-  Nneutrons = 0.0;
+  Nneutrons = 0;
   PNe  = ENe  = MNe  = CosNe  = -999.9;
   
-  Npiplus   = 0.0;
+  Npiplus   = 0;
   PPiP = EPiP = MPiP = CosPiP = -999.9;
   
-  Npineg    = 0.0;
-  PPiN = EPiN = MPiN = CosPiN = 0.0;
+  Npineg    = 0;
+  PPiN = EPiN = MPiN = CosPiN = -999.9;
+
+  Npi0      = 0;
+  PPi0 = EPi0 = MPi0 = CosPi0 = -999.9;
+
+  // All of the angles Clarence added
+  CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut = CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot = CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut = CosPprotPneut = -999.9;
   
-  double proton_highmom = 0.0;
-  double neutron_highmom = 0.0;
-  double piplus_highmom = 0.0;
-  double pineg_highmom = 0.0;
-  double pi0_highmom = 0.0;
+  double proton_highmom   = -999.9;
+  double neutron_highmom  = -999.9;
+  double piplus_highmom   = -999.9;
+  double pineg_highmom    = -999.9;
+  double pi0_highmom      = -999.9;
   
   // Get main event variables
   TLorentzVector nu_4mom = event->PartInfo(0)->fP;
+  TLorentzVector pmu;
+  TLorentzVector ppip;
+  TLorentzVector ppim;
+  TLorentzVector ppi0;
+  TLorentzVector pprot;
+  TLorentzVector pneut;
+
   Enu_true = nu_4mom.E();
   PDGnu = event->PartInfo(0)->fPID;
 
@@ -296,8 +330,17 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
       q0_true = (part_4mom - nu_4mom).E();
       q3_true = (part_4mom - nu_4mom).Vect().Mag();
-      
-      
+
+      // Get W_true with assumption of initial state nucleon at rest
+      double m_n = 938.27208;
+      W_nuc_rest =  sqrt(-Q2_true + 2*m_n*(Enu_true - ELep) + m_n*m_n);
+
+      // Get the Bjorken x and y variables
+      // Assume that E_had = Enu - Emu as in MINERvA
+      bjorken_x = Q2_true/(2*m_n*(Enu_true - ELep));
+      bjorken_y = 1-ELep/Enu_true;
+
+
       // Quasi-elastic ----------------------
       // ------------------------------------
       
@@ -312,8 +355,6 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       // --------------------------------------
 
       
-
-      
     } else if (PDGpart == 2212){
       Nprotons++;
       if (part_4mom.Vect().Mag() > proton_highmom){
@@ -321,8 +362,10 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 	PPr = (part_4mom.Vect().Mag());
 	EPr = (part_4mom.E());
+        TPr   = FitUtils::T(part_4mom)*1000.;
 	MPr = (part_4mom.Mag());
 	CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+        pprot = part_4mom;
       }
     } else if (PDGpart == 2112){
       Nneutrons++;
@@ -331,8 +374,10 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 	PNe   = (part_4mom.Vect().Mag());
 	ENe   = (part_4mom.E());
+        TNe   = FitUtils::T(part_4mom)*1000.;
 	MNe   = (part_4mom.Mag());
 	CosNe = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+        pneut = part_4mom;
       }
     } else if (PDGpart == 211){
       Npiplus++;
@@ -341,6 +386,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 	PPiP   = (part_4mom.Vect().Mag());
 	EPiP   = (part_4mom.E());
+        TPiP   = FitUtils::T(part_4mom)*1000.;
 	MPiP   = (part_4mom.Mag());
 	CosPiP = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
       }
@@ -351,8 +397,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 	PPiN   = (part_4mom.Vect().Mag());
 	EPiN   = (part_4mom.E());
+        TPiN   = FitUtils::T(part_4mom)*1000.;
 	MPiN   = (part_4mom.Mag());
 	CosPiN = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+
+        ppim = part_4mom;
       }
     } else if (PDGpart == 111) {
       Npi0++;
@@ -361,8 +410,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 	PPi0   = (part_4mom.Vect().Mag());
 	EPi0   = (part_4mom.E());
+        TPi0   = FitUtils::T(part_4mom)*1000.;
 	MPi0   = (part_4mom.Mag());
 	CosPi0 = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+
+        ppi0 = part_4mom;
       }
     }
   }
@@ -373,7 +425,43 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   Erecoil_charged   = FitUtils::GetErecoil_CHARGED(event);
   Erecoil_minerva   = FitUtils::GetErecoil_MINERvA_LowRecoil(event);
 
+  // Do the angles between final state particles
+  if (Nleptons > 0 && Npiplus > 0)
+    CosPmuPpip  = cos(pmu.Vect().Angle(ppip.Vect()));
+  if (Nleptons > 0 && Npineg > 0)
+    CosPmuPpim  = cos(pmu.Vect().Angle(ppim.Vect()));
+  if (Nleptons > 0 && Npi0 > 0)
+    CosPmuPpi0  = cos(pmu.Vect().Angle(ppi0.Vect()));
+  if (Nleptons > 0 && Nprotons > 0)
+    CosPmuPprot = cos(pmu.Vect().Angle(pprot.Vect()));
+  if (Nleptons > 0 && Nneutrons > 0)
+    CosPmuPneut = cos(pmu.Vect().Angle(pneut.Vect()));
+
+  if (Npiplus > 0 && Nprotons > 0)
+    CosPpipPprot  = cos(ppip.Vect().Angle(pprot.Vect()));
+  if (Npiplus > 0 && Nneutrons > 0)
+    CosPpipPneut  = cos(ppip.Vect().Angle(pneut.Vect()));
+  if (Npiplus > 0 && Npineg > 0)
+    CosPpipPpim   = cos(ppip.Vect().Angle(ppim.Vect()));
+  if (Npiplus > 0 && Npi0 > 0)
+    CosPpipPpi0   = cos(ppip.Vect().Angle(ppi0.Vect()));
+
+  if (Npineg > 0 && Nprotons > 0)
+    CosPpimPprot  = cos(ppim.Vect().Angle(pprot.Vect()));
+  if (Npineg > 0 && Nneutrons > 0)
+    CosPpimPneut  = cos(ppim.Vect().Angle(pneut.Vect()));
+  if (Npineg > 0 && Npi0 > 0)
+    CosPpimPpi0   = cos(ppim.Vect().Angle(ppi0.Vect()));
+
+  if (Npi0 > 0 && Nprotons > 0)
+    CosPi0Pprot = cos(ppi0.Vect().Angle(pprot.Vect()));
+  if (Npi0 > 0 && Nneutrons > 0)
+    CosPi0Pneut = cos(ppi0.Vect().Angle(pneut.Vect()));
+
+  if (Nprotons > 0 && Nneutrons > 0)
+    CosPprotPneut = cos(pprot.Vect().Angle(pneut.Vect()));
   
+
   // Event Weights ----
   // ------------------
   Weight = event->RWWeight * event->InputWeight;
@@ -423,7 +511,8 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
   flagCCNpip_MINERva_rest =
       SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, true);
 
-  flagCC1pip_T2K = SignalDef::isCC1pip_T2K(event, EnuMin, EnuMax);
+  // Include Michel e sample so no phase space cuts on pion, only angle
+  flagCC1pip_T2K = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
 
   flagCC1pi0_MiniBooNE = SignalDef::isCC1pi0_MiniBooNE(event, EnuMin, EnuMax);
   flagCC1pi0Bar_MINERvA = SignalDef::isCC1pi0Bar_MINERvA(event, EnuMin, EnuMax);

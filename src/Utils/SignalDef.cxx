@@ -171,67 +171,111 @@ bool SignalDef::isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMa
 }
 
 
-
+// *********************************************
+// MiniBooNE CC1pi+ signal definition
+// Warning: This one is a little scary because there's a W = 1.35 GeV cut for signal in the selection
+//          Although this is unfolded over and is filled up with NUANCE
+//          So there is actually no W cut applied, but everything above W = 1.35 GeV is NUANCE...
+// 
+// The signal definition is:
+//                            Exactly one negative muon
+//                            Exactly one positive pion
+//                            No other mesons
+//                            No requirements on photons, nucleons and multi-nucleons
+//                            Doesn't mention other leptons
+//
+// Additionally, it asks for 2 Michel e- from decay of muon and pion
+// So there is good purity and we can be fairly sure that the positive pion is a positive pion
 bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
+// *********************************************
 
+  // Do some initial checks on the incoming neutrino
+  // Make sure it's a muon neutrino
   if ((event->PartInfo(0))->fPID != 14) return false;
 
+  // Make sure the muon neutrino is within the E_nu defined at the experiment
   if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
+  // Make sure the outgoing lepton is a muon
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
-  // MiniBooNE definition is:
-  // 1 and only 1 muon
-  // 1 and only 1 positive pion
-  // any protons or neutrons (inc. 0)
-  // any multi-nucleon states (inc. 0)
-  // any number of photons
-
-  int pipCnt = 0; // counts number of pions
-  int lepCnt = 0;
+  int pipCnt = 0; // Counts number of pions
+  int lepCnt = 0; // Counts number of muons
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
+
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; // Move on if NOT ALIVE and NOT NORMAL
+
     int PID = (event->PartInfo(j))->fPID;
-    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false;
-    //else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 && abs(PID) <= 5554)) return false; PHOTONS, NUCLEON, MULTINUCLEON OK
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) lepCnt++;
-    else if (abs(PID) == 211) pipCnt++;
+
+    // Reject other mesons than pi+
+    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) {
+      return false;
+    // Reject other leptons
+    } else if (abs(PID) == 11 || PID == -13 || abs(PID) == 15 || abs(PID) == 17) {
+      return false;
+    // Count the number of muons
+    } else if (PID == 13) {
+      lepCnt++;
+    // Count the number of pions
+    } else if (abs(PID) == 211) {
+      pipCnt++;
     }
+  }
 
-  if (pipCnt != 1) return false; //seems like any number of pions is OK; W mass cut ensures only one pion! i.e. should change this to pipCnt == 0 return false
-  //maybe do pipCnt + lepCnt == 2? pi+ and mu- sometimes get confused
-  if (lepCnt != 1) return false;
+  // Make sure there's only one pion
+  if (pipCnt != 1) {
+    return false;
+  }
+  // Make sure there's only one muon
+  if (lepCnt != 1) {
+    return false;
+  }
 
+  // If it's passed all of the above we're good and have passed the selection
   return true;
 };
 
+// **************************************************
+// MiniBooNE CC1pi0 signal definition
+//
+// The signal definition is:
+//                          Exactly one negative muon
+//                          Exactly one pi0 
+//                          No additional mesons
+//                          Any number of nucleons
+//
+// Does a few clever cuts on the likelihood to reduce CCQE contamination by looking at "fuzziness" of the ring; CCQE events are sharp, CC1pi0 are fuzzy (because of the pi0->2 gamma collinearity)
 bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax) {
+// **************************************************
+
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
-
-// MiniBooNE:
-// single mu-
-// single pi0
-// both exiting nucleus
-// any number of nucleon
-// no additional mesons or leptons
-// not corrected for nuclear  effects or intra-nuclear
 
   int pi0Cnt = 0;
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
+
     int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 113 && abs(PID) <= 557) return false;
-    //else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 && abs(PID) <= 5554)) return false; any number of NUCLEONS MULTINUCLEONS (PHOTONS?)
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) lepCnt++;
-    else if (PID == 111) pi0Cnt++;
+    // Reject if any other mesons
+    if (abs(PID) >= 113 && abs(PID) <= 557) {
+      return false;
+    // Reject other leptons
+    } else if (abs(PID) == 11 || PID == -13 || abs(PID) == 15) {
+      return false;
+    // Count number of leptons
+    } else if (PID == 13) {
+      lepCnt++;
+    // Count number of pi0
+    } else if (PID == 111) {
+      pi0Cnt++;
     }
+  }
 
   if (pi0Cnt != 1) return false;
   if (lepCnt != 1) return false;
@@ -239,7 +283,25 @@ bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
   return true;
 };
 
+// **************************************
+// MINERvA CC1pi0 in anti-neutrino mode
+// Unfortunately there's no information on the neutrino component which is subtracted off
+//
+// 2014 analysis:   
+//                Exactly one positive muon
+//                Exactly one observed pi0
+//                No pi+/pi allowed
+//                No information on what is done with mesons, oops?
+//                No information on what is done with nucleons, oops?
+//
+// 2016 analysis:
+//                Exactly one positive muon
+//                Exactly one observed pi0
+//                No other mesons
+//                No restriction on number of nucleons
+//
 bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
+// **************************************
 
   if ((event->PartInfo(0))->fPID != -14) return false;
 
@@ -247,19 +309,19 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin, double EnuMa
 
   if (((event->PartInfo(2))->fPID != -13) && ((event->PartInfo(3))->fPID != -13)) return false;
 
-  // MINERvA measurement
-  // single pi0
-  // no pi+/0 escaping
-
   int pi0Cnt = 0;
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
+
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; // Move to next particle if NOT ALIVE and NOT NORMAL
+
     int PID = (event->PartInfo(j))->fPID;
+
+    // No other mesons
     if (abs(PID) >= 113 && abs(PID) <= 557) {
       return false;
-    } else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) {
+    } else if (PID == -13) {
       lepCnt++;
     } else if (PID == 111) {
       pi0Cnt++;
@@ -367,8 +429,29 @@ bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin, double EnuMax
   return true;
 };
 
-// MINERvA has unfolded and not unfolded muon phase space
+// *********************************
+// MINERvA CC1pi+/- signal definition (2015 release)
+// Note:  There is a 2016 release which is different to this (listed below), but it is CCNpi+ and has a different W cut
+// Note2: The W cut is implemented in the class implementation in MINERvA/ rather than here so we can draw events that don't pass the W cut (W cut is 1.4 GeV)
+//        Could possibly be changed for slight speed increase since less events would be used
+//
+// MINERvA signal is slightly different to MiniBooNE
+//
+// Exactly one negative muon
+// Exactly one charged pion (both + and -); however, there is a Michel e- requirement but UNCLEAR IF UNFOLDED OR NOT (so don't know if should be applied)
+// Exactly 1 charged pion exits (so + and - charge), however, has Michel electron requirement, so look for + only here?
+// No restriction on neutral pions or other mesons
+// MINERvA has unfolded and not unfolded muon phase space for 2015
+//
+// Possible problems:
+// 1) Should there be a pi+ only cut implemented due to Michel requirement, or is pi- events filled from MC?
+// 2) There is a T_pi < 350 MeV cut coming from requiring a stopping pion so the Michel e is seen, this is also unclear if it's unfolded so any pion is OK
+//
+// Nice things:
+// Much data given: with and without muon angle cuts and with and without shape only data + covariance
+//
 bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted) {
+// *********************************
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
@@ -376,14 +459,8 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, 
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
-// MINERvA is slightly different to MiniBooNE
-// nu_mu interaction
-// Exactly 1 charged pion exits (so + and - charge), however, has Michel electron requirement, so look for + only
-// Needs 350 MeV pion maximum
-// No restriction on neutral pions or other mesons
-
-  int pipCnt = 0; // counts number of pions
-  int lepCnt = 0;
+  int pipCnt = 0; // Counts number of pi+
+  int lepCnt = 0; // Counts number of leptons
 
   TLorentzVector pnu = (event->PartInfo(0))->fP;
   TLorentzVector pmu;
@@ -391,27 +468,31 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, 
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
 
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; // Move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
 
-    if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) {
+    if (PID == 13) {
       lepCnt++;
       // if restricted we need the muon to find it's angle and if it's visible in MINOS
       if (isRestricted) {
         pmu = (event->PartInfo(j))->fP;
       }
-    }
-    else if (PID == 211) {
+
+    // Signal is both pi+ and pi-
+    // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
+    } else if (abs(PID) == 211) {
+
       ppi = event->PartInfo(j)->fP;
-      pipCnt++; // technically also allows for a pi- to be ID as pi+ but there's Michel e criteria which sets this pretty much to zero
+      pipCnt++;
     }
   }
 
-  // only one pion-like track
+  // Only one pion-like track
   if (pipCnt != 1) return false;
   // only one lepton
   if (lepCnt != 1) return false;
 
+  // Pion kinetic energy requirement for Michel tag, leave commented for now
   //if (FitUtils::T(ppi)*1000. > 350 || FitUtils::T(ppi)*1000. < 35) return false; // Need to have a 35 to 350 MeV pion kinetic energy requirement
 
   // MINERvA released another CC1pi+ xsec without muon unfolding!
@@ -424,7 +505,21 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, 
   return true;
 };
 
+// *********************************
+// MINERvA CCNpi+/- signal definition from 2016 publication
+// Different to CC1pi+/- listed above; additional has W < 1.8 GeV
+//
+// Still asks for a Michel e and still unclear if this is unfolded or not
+// Says stuff like "requirement that a Michel e isolates a subsample that is more nearly a pi+ prodution", yet the signal definition is both pi+ and pi-?
+//
+// One negative muon 
+// At least one charged pion
+// 1.5 < Enu < 10
+// No restrictions on pi0 or other mesons or baryons
+//
+// Also writes number of pions (nPions) if studies on this want to be done...
 bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, double EnuMax, bool isRestricted) {
+// *********************************
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
@@ -432,37 +527,38 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, do
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
 
-// MINERvA signal definiton for Npi:
-// nu_mu interaction, outgoing muon
-// at least one charged pion exits (both - and + charge)
-// however, has Michel electron requirement, so look for + only
-// no restriction on neutral pions or other mesons
-
-  int pipCnt = 0; // counts number of pions
-  int lepCnt = 0;
+  int pipCnt = 0; // Counts number of pions
+  int lepCnt = 0; // Counts number of leptons
 
   TLorentzVector pnu = (event->PartInfo(0))->fP;
   TLorentzVector pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; // Move on if NOT ALIVE and NOT NORMAL
+
     int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17) {
+    if (PID == 13) {
       lepCnt++;
-      if (isRestricted) pmu = (event->PartInfo(j))->fP;
+      if (isRestricted) {
+        pmu = (event->PartInfo(j))->fP;
+      }
+
+    } else if (abs(PID) == 211) {
+      pipCnt++; // technically also allows for a pi- to be ID as pi+, but there's Michel electron criteria too which eliminates this
     }
-    else if (PID == 211) pipCnt++; // technically also allows for a pi- to be ID as pi+, but there's Michel electron criteria too which eliminates this
+    // Has no restrictions on mesons, neutral pions or baryons
   }
 
-  // any number of pions greater than 0!
+  // Any number of pions greater than 0
   if (pipCnt == 0) return false;
-  // only one lepton
+  // Only one lepton
   if (lepCnt != 1) return false;
 
+  // Just write the number of pions so the experiment class can use it
   nPions = pipCnt;
 
   // MINERvA released another CC1pi+ xsec without muon unfolding!
-  // here the muon angle is < 20 degrees (seen in MINOS)
+  // Here the muon angle is < 20 degrees (seen in MINOS)
   if (isRestricted) {
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180./M_PI;
     if (th_nu_mu >= 20) return false;
@@ -471,8 +567,8 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin, do
   return true;
 };
 
-// T2K not unfolded phase space restrictions
-bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
+// T2K H2O signal definition
+bool SignalDef::isCC1pip_T2K_H2O(FitEvent *event, double EnuMin, double EnuMax) {
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false;
@@ -516,6 +612,93 @@ bool SignalDef::isCC1pip_T2K(FitEvent *event, double EnuMin, double EnuMax) {
 
 
   return true;
+};
+
+// ******************************************************
+// T2K CC1pi+ CH analysis (Raquel's thesis)
+// Has different phase space cuts depending on if using Michel tag or not
+//
+// Essentially consists of two samples: one sample which has Michel e (which we can't get pion direction from); this covers backwards angles quite well. Measurements including this sample does not have include pion kinematics cuts
+//                                      one sample which has PID in FGD and TPC and no Michel e. These are mostly forward-going so require a pion kinematics cut
+//
+//  Essentially, cuts are:
+//                          1 negative muon
+//                          1 positive pion
+//                          Any number of nucleons
+//                          No other particles in the final state
+//
+bool SignalDef::isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax, bool MichelElectron) {
+// ******************************************************
+
+  if ((event->PartInfo(0))->fPID != 14) return false; 
+
+  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
+
+  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
+
+  int pipCnt = 0; // Counts number of positive pions
+  int lepCnt = 0; // Counts number of muons
+
+  TLorentzVector Pnu = (event->PartInfo(0))->fP;
+  TLorentzVector Ppip;
+  TLorentzVector Pmu;
+
+  for (unsigned int j = 2; j < event->Npart(); j++) {
+
+    if (!(event->PartInfo(j)->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; // Move on if NOT ALIVE and NOT NORMAL
+    int PID = (event->PartInfo(j))->fPID;
+
+    // No additional mesons in the final state
+    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false; 
+    // Count leptons
+    else if (PID == 13) {
+      lepCnt++;
+      Pmu = (event->PartInfo(j))->fP;
+    // Count the pi+
+    } else if (PID == 211) {
+      pipCnt++;
+      Ppip = (event->PartInfo(j))->fP;
+    }
+  }
+
+  // Make the cuts on the final state particles
+  if (pipCnt != 1) return false; 
+  if (lepCnt != 1) return false;
+
+  // Done with relatively generic CC1pi+ definition
+
+  // If this event passes the criteria on particle counting, enforce the T2K ND280 phase space constraints
+  // Will be different if Michel tag sample is included or not
+  // Essentially, if there's a Michel tag we don't cut on the pion variables
+
+  double p_mu = FitUtils::p(Pmu)*1000;
+  double p_pi = FitUtils::p(Ppip)*1000;
+  double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
+  double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
+
+  // If we're using Michel e- requirement we only care about the muon restricted phase space and use full pion phase space
+  if (MichelElectron) {
+
+    // Make the cuts on the muon variables
+    if (p_mu <= 200 || cos_th_mu <= 0.2) {
+      return false;
+    } else {
+      return true;
+    }
+
+ // If we aren't using Michel e- (i.e. we use directional information from pion) we need to impose the phase space cuts on the muon AND the pion)
+  } else {
+
+    // Make the cuts on muon and pion variables
+    if (p_mu <= 200 || p_pi <= 200 || cos_th_mu <= 0.2 || cos_th_pi <= 0.2) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Default to false; should never fire
+  return false;
 };
 
 //********************************************************************
