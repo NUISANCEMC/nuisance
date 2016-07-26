@@ -77,87 +77,87 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
   
   eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/I"   );
-  eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
+  eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/F");
   
   eventVariables->Branch("Nleptons",  &Nleptons,  "Nleptons/I");
-  eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
-  eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
-  eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
-  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/D");
-  eventVariables->Branch("CosPmuPpip",&CosPmuPpip, "CosPmuPpip/D");
-  eventVariables->Branch("CosPmuPpim",&CosPmuPpim, "CosPmuPpim/D");
-  eventVariables->Branch("CosPmuPpi0",&CosPmuPpi0, "CosPmuPpi0/D");
-  eventVariables->Branch("CosPmuPprot",&CosPmuPprot, "CosPmuPprot/D");
-  eventVariables->Branch("CosPmuPneut",&CosPmuPneut, "CosPmuPneut/D");
+  eventVariables->Branch("MLep",      &MLep,      "MLep/F"  );
+  eventVariables->Branch("ELep",      &ELep,      "ELep/F"  );
+  eventVariables->Branch("TLep",      &TLep,      "TLep/F"  );
+  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/F");
+  eventVariables->Branch("CosPmuPpip",&CosPmuPpip, "CosPmuPpip/F");
+  eventVariables->Branch("CosPmuPpim",&CosPmuPpim, "CosPmuPpim/F");
+  eventVariables->Branch("CosPmuPpi0",&CosPmuPpi0, "CosPmuPpi0/F");
+  eventVariables->Branch("CosPmuPprot",&CosPmuPprot, "CosPmuPprot/F");
+  eventVariables->Branch("CosPmuPneut",&CosPmuPneut, "CosPmuPneut/F");
   
   eventVariables->Branch("Nprotons",  &Nprotons,  "Nprotons/I");
-  eventVariables->Branch("MPr",       &MPr,       "MPr/D"  );
-  eventVariables->Branch("EPr",       &EPr,       "EPr/D"  );
-  eventVariables->Branch("TPr",       &TPr,       "TPr/D"  );
-  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D");
-  eventVariables->Branch("CosPprotPneut", &CosPprotPneut, "CosPprotPneut/D");
+  eventVariables->Branch("MPr",       &MPr,       "MPr/F"  );
+  eventVariables->Branch("EPr",       &EPr,       "EPr/F"  );
+  eventVariables->Branch("TPr",       &TPr,       "TPr/F"  );
+  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/F");
+  eventVariables->Branch("CosPprotPneut", &CosPprotPneut, "CosPprotPneut/F");
 
   eventVariables->Branch("Nneutrons",  &Nneutrons,  "Nneutrons/I");
-  eventVariables->Branch("MNe",        &MNe,        "MNe/D"  );
-  eventVariables->Branch("ENe",        &ENe,        "ENe/D"  );
-  eventVariables->Branch("TNe",        &TNe,        "TNe/D"  );
-  eventVariables->Branch("CosNe",      &CosNe,      "CosNe/D");
+  eventVariables->Branch("MNe",        &MNe,        "MNe/F"  );
+  eventVariables->Branch("ENe",        &ENe,        "ENe/F"  );
+  eventVariables->Branch("TNe",        &TNe,        "TNe/F"  );
+  eventVariables->Branch("CosNe",      &CosNe,      "CosNe/F");
   
   eventVariables->Branch("Npiplus",    &Npiplus,    "Npiplus/I");
-  eventVariables->Branch("MPiP",       &MPiP,       "MPiP/D"  );
-  eventVariables->Branch("EPiP",       &EPiP,       "EPiP/D"  );
-  eventVariables->Branch("TPiP",       &TPiP,       "TPiP/D"  );
-  eventVariables->Branch("CosPiP",     &CosPiP,     "CosPiP/D");
-  eventVariables->Branch("CosPpipPprot",  &CosPpipPprot,  "CosPpipProt/D");
-  eventVariables->Branch("CosPpipPneut",  &CosPpipPneut,  "CosPpipPneut/D");
-  eventVariables->Branch("CosPpipPpim",   &CosPpipPpim,   "CosPpipPpim/D");
-  eventVariables->Branch("CosPpipPpi0",   &CosPpipPpi0,   "CosPpipPpi0/D");
+  eventVariables->Branch("MPiP",       &MPiP,       "MPiP/F"  );
+  eventVariables->Branch("EPiP",       &EPiP,       "EPiP/F"  );
+  eventVariables->Branch("TPiP",       &TPiP,       "TPiP/F"  );
+  eventVariables->Branch("CosPiP",     &CosPiP,     "CosPiP/F");
+  eventVariables->Branch("CosPpipPprot",  &CosPpipPprot,  "CosPpipProt/F");
+  eventVariables->Branch("CosPpipPneut",  &CosPpipPneut,  "CosPpipPneut/F");
+  eventVariables->Branch("CosPpipPpim",   &CosPpipPpim,   "CosPpipPpim/F");
+  eventVariables->Branch("CosPpipPpi0",   &CosPpipPpi0,   "CosPpipPpi0/F");
 
   eventVariables->Branch("Npineg",     &Npineg,    "Npineg/I");
-  eventVariables->Branch("MPiN",       &MPiN,       "MPiN/D"  );
-  eventVariables->Branch("EPiN",       &EPiN,       "EPiN/D"  );
-  eventVariables->Branch("TPiN",       &TPiN,       "TPiN/D"  );
-  eventVariables->Branch("CosPiN",     &CosPiN,     "CosPiN/D");
-  eventVariables->Branch("CosPpimPprot",  &CosPpimPprot, "CosPpimPprot/D");
-  eventVariables->Branch("CosPpimPneut",  &CosPpimPneut, "CosPpimPneut/D");
-  eventVariables->Branch("CosPpimPpi0",   &CosPpimPpi0,  "CosPpimPpi0/D");
+  eventVariables->Branch("MPiN",       &MPiN,       "MPiN/F"  );
+  eventVariables->Branch("EPiN",       &EPiN,       "EPiN/F"  );
+  eventVariables->Branch("TPiN",       &TPiN,       "TPiN/F"  );
+  eventVariables->Branch("CosPiN",     &CosPiN,     "CosPiN/F");
+  eventVariables->Branch("CosPpimPprot",  &CosPpimPprot, "CosPpimPprot/F");
+  eventVariables->Branch("CosPpimPneut",  &CosPpimPneut, "CosPpimPneut/F");
+  eventVariables->Branch("CosPpimPpi0",   &CosPpimPpi0,  "CosPpimPpi0/F");
 
   eventVariables->Branch("Npi0",       &Npi0,       "Npi0/I");
-  eventVariables->Branch("MPi0",       &MPi0,       "MPi0/D"  );
-  eventVariables->Branch("EPi0",       &EPi0,       "EPi0/D"  );
-  eventVariables->Branch("TPi0",       &TPi0,       "TPi0/D"  );
-  eventVariables->Branch("CosPi0",     &CosPi0,     "CosPi0/D");
-  eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/D");
-  eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/D");
+  eventVariables->Branch("MPi0",       &MPi0,       "MPi0/F"  );
+  eventVariables->Branch("EPi0",       &EPi0,       "EPi0/F"  );
+  eventVariables->Branch("TPi0",       &TPi0,       "TPi0/F"  );
+  eventVariables->Branch("CosPi0",     &CosPi0,     "CosPi0/F");
+  eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/F");
+  eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/F");
   
-  eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
-  eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
-  eventVariables->Branch("q3_true",  &q3_true,  "q3_true/D"   );
+  eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/F" );
+  eventVariables->Branch("q0_true",  &q0_true,  "q0_true/F"   );
+  eventVariables->Branch("q3_true",  &q3_true,  "q3_true/F"   );
 
-  eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
-  eventVariables->Branch("Q2_QE",     &Q2_QE,    "Q2_QE/D"   );
+  eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/F"  );
+  eventVariables->Branch("Q2_QE",     &Q2_QE,    "Q2_QE/F"   );
 
-  eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/D");
-  eventVariables->Branch("bjorken_x", &bjorken_x, "bjorken_x/D");
-  eventVariables->Branch("bjorken_y", &bjorken_y, "bjorken_y/D");
+  eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/F");
+  eventVariables->Branch("bjorken_x", &bjorken_x, "bjorken_x/F");
+  eventVariables->Branch("bjorken_y", &bjorken_y, "bjorken_y/F");
   
-  eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
-  eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
-  eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
-  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/D");
-  eventVariables->Branch("PPr",       &PPr,       "PPr/D"   );
-  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D" );
+  eventVariables->Branch("MLep",      &MLep,      "MLep/F"  );
+  eventVariables->Branch("ELep",      &ELep,      "ELep/F"  );
+  eventVariables->Branch("TLep",      &TLep,      "TLep/F"  );
+  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/F");
+  eventVariables->Branch("PPr",       &PPr,       "PPr/F"   );
+  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/F" );
 
-  eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/D");
-  eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/D");
-  eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/D");
+  eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/F");
+  eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/F");
+  eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/F");
 
   
   // Event Scaling Information
-  eventVariables->Branch("Weight", &Weight, "Weight/D");
-  eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/D");
-  eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
-  eventVariables->Branch("scaleFactor", &scaleFactor, "scaleFactor/D");
+  eventVariables->Branch("Weight", &Weight, "Weight/F");
+  eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
+  eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
+  eventVariables->Branch("scaleFactor", &scaleFactor, "scaleFactor/F");
   
   return;
 }
@@ -271,11 +271,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   // All of the angles Clarence added
   CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut = CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot = CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut = CosPprotPneut = -999.9;
   
-  double proton_highmom   = -999.9;
-  double neutron_highmom  = -999.9;
-  double piplus_highmom   = -999.9;
-  double pineg_highmom    = -999.9;
-  double pi0_highmom      = -999.9;
+  float proton_highmom   = -999.9;
+  float neutron_highmom  = -999.9;
+  float piplus_highmom   = -999.9;
+  float pineg_highmom    = -999.9;
+  float pi0_highmom      = -999.9;
   
   // Get main event variables
   TLorentzVector nu_4mom = event->PartInfo(0)->fP;
@@ -325,14 +325,14 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
       Q2_true = -1*(part_4mom - nu_4mom).Mag2();
 
-      double ThetaLep = (event->PartInfo(0))
+      float ThetaLep = (event->PartInfo(0))
 	->fP.Vect().Angle((event->PartInfo(i))->fP.Vect());
 
       q0_true = (part_4mom - nu_4mom).E();
       q3_true = (part_4mom - nu_4mom).Vect().Mag();
 
       // Get W_true with assumption of initial state nucleon at rest
-      double m_n = 938.27208;
+      float m_n = 938.27208;
       W_nuc_rest =  sqrt(-Q2_true + 2*m_n*(Enu_true - ELep) + m_n*m_n);
 
       // Get the Bjorken x and y variables
@@ -565,7 +565,7 @@ void GenericFlux_Tester::ScaleEvents() {
 }
 
 //********************************************************************
-void GenericFlux_Tester::ApplyNormScale(double norm) {
+void GenericFlux_Tester::ApplyNormScale(float norm) {
   //********************************************************************
 
   // Saving everything to a TTree so no scaling required
@@ -588,7 +588,7 @@ void GenericFlux_Tester::ResetAll() {
 }
 
 //********************************************************************
-double GenericFlux_Tester::GetChi2() {
+float GenericFlux_Tester::GetChi2() {
   //********************************************************************
   // No Likelihood to test, purely MC
   return 0.0;

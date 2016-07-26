@@ -43,7 +43,7 @@ public:
   void ScaleEvents();
 
   //! Norm
-  void ApplyNormScale(double norm);
+  void ApplyNormScale(float norm);
 
   //! Define this samples signal
   bool isSignal(FitEvent *nvect);
@@ -52,7 +52,7 @@ public:
   void Write(std::string drawOpt);
 
   //! Get Chi2
-  double GetChi2();
+  float GetChi2();
 
   //! Fill all signal flags we currently have
   void FillSignalFlags(FitEvent *event);
@@ -65,15 +65,15 @@ public:
   TTree* eventVariables;
 
   // Saved Variables
-  double Enu_true;
-  double Enu_QE;
+  float Enu_true;
+  float Enu_QE;
   int PDGnu;
 
-  double Q2_true;
-  double Q2_QE;
-  double W_nuc_rest;
-  double bjorken_x;
-  double bjorken_y;
+  float Q2_true;
+  float Q2_QE;
+  float W_nuc_rest;
+  float bjorken_x;
+  float bjorken_y;
 
   int Mode;
 
@@ -84,73 +84,73 @@ public:
   int Npi0;
   
   int PDGLep;
-  double TLep;
-  double CosLep;
-  double ELep;
-  double PLep;
-  double MLep;
+  float TLep;
+  float CosLep;
+  float ELep;
+  float PLep;
+  float MLep;
 
-  double PPr;  //!< Highest Mom Proton
-  double CosPr; //!< Highest Mom Proton
-  double EPr;
-  double TPr;
-  double MPr;
+  float PPr;  //!< Highest Mom Proton
+  float CosPr; //!< Highest Mom Proton
+  float EPr;
+  float TPr;
+  float MPr;
 
   
-  double PNe;
-  double CosNe;
-  double ENe;
-  double TNe;
-  double MNe;
+  float PNe;
+  float CosNe;
+  float ENe;
+  float TNe;
+  float MNe;
 
-  double PPiP;
-  double CosPiP;
-  double EPiP;
-  double TPiP;
-  double MPiP;
+  float PPiP;
+  float CosPiP;
+  float EPiP;
+  float TPiP;
+  float MPiP;
 
-  double PPiN;
-  double CosPiN;
-  double EPiN;
-  double TPiN;
-  double MPiN;
+  float PPiN;
+  float CosPiN;
+  float EPiN;
+  float TPiN;
+  float MPiN;
 
-  double PPi0;
-  double CosPi0;
-  double EPi0;
-  double TPi0;
-  double MPi0;
+  float PPi0;
+  float CosPi0;
+  float EPi0;
+  float TPi0;
+  float MPi0;
   
-  double CosPmuPpip;
-  double CosPmuPpim;
-  double CosPmuPpi0;
-  double CosPmuPprot;
-  double CosPmuPneut;
-  double CosPpipPprot;
-  double CosPpipPneut;
-  double CosPpipPpim;
-  double CosPpipPpi0;
-  double CosPpimPprot;
-  double CosPpimPneut;
-  double CosPpimPpi0;
-  double CosPi0Pprot;
-  double CosPi0Pneut;
-  double CosPprotPneut;
+  float CosPmuPpip;
+  float CosPmuPpim;
+  float CosPmuPpi0;
+  float CosPmuPprot;
+  float CosPmuPneut;
+  float CosPpipPprot;
+  float CosPpipPneut;
+  float CosPpipPpim;
+  float CosPpipPpi0;
+  float CosPpimPprot;
+  float CosPpimPneut;
+  float CosPpimPpi0;
+  float CosPi0Pprot;
+  float CosPi0Pneut;
+  float CosPprotPneut;
 
-  double q0_true;
-  double q3_true;
+  float q0_true;
+  float q3_true;
 
   int Nparticles;
   int Nleptons;
 
-  double Erecoil_true;
-  double Erecoil_charged;
-  double Erecoil_minerva;
+  float Erecoil_true;
+  float Erecoil_charged;
+  float Erecoil_minerva;
 
-  double Weight;
-  double RWWeight;
-  double InputWeight;
-  double FluxWeight;
+  float Weight;
+  float RWWeight;
+  float InputWeight;
+  float FluxWeight;
   
   bool flagCCQE_full;
   bool flagCCQE_rest;
