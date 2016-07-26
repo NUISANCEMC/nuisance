@@ -59,30 +59,63 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   this->scaleFactor = (this->eventHist->Integral() * 1E-38 / (nevents + 0.)) /
                       this->TotalIntegratedFlux();
 
-  FitPar::Config().out->cd();
+  // Setup our TTrees
+  this->AddEventVariablesToTree();
+  this->AddSignalFlagsToTree();
 
-  Mode = 0;
-  Nprotons = 0;
-  Nneutrons = 0;
-  Nneutron_ratio = 0.0;
-  Nproton_ratio = 0.0;
+}
 
+
+void GenericFlux_Tester::AddEventVariablesToTree(){
+  
   // Setup the TTree to save everything
-  eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
+  if (!eventVariables){
+    FitPar::Config().out->cd();
+    eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
+  }
+  
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
-  eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
-  eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
+  
   eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/D"   );
-  eventVariables->Branch("Nprotons",  &this->Nprotons,  "Nprotons/I");
-  eventVariables->Branch("Nneutrons", &this->Nneutrons, "Nneutrons/I");
-  eventVariables->Branch("Nproton_ratio",  &this->Nproton_ratio,  "Nproton_ratio/D");
-  eventVariables->Branch("Nneutron_ratio", &this->Nneutron_ratio, "Nneutron_ratio/D");
+  eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/D");
+  
+  eventVariables->Branch("Nleptons",  &Nleptons,  "Nleptons/I");
+  eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
+  eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
+  eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
+  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/D");
+  
+  eventVariables->Branch("Nprotons",  &Nprotons,  "Nprotons/I");
+  eventVariables->Branch("MPr",       &MPr,       "MPr/D"  );
+  eventVariables->Branch("EPr",       &EPr,       "EPr/D"  );
+  eventVariables->Branch("TPr",       &TPr,       "TPr/D"  );
+  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D");
 
+  eventVariables->Branch("Nneutrons",  &Nneutrons,  "Nneutrons/I");
+  eventVariables->Branch("MNe",        &MNe,        "MNe/D"  );
+  eventVariables->Branch("ENe",        &ENe,        "ENe/D"  );
+  eventVariables->Branch("TNe",        &TNe,        "TNe/D"  );
+  eventVariables->Branch("CosNe",      &CosNe,      "CosNe/D");
+  
+  eventVariables->Branch("Npiplus",    &Npiplus,    "Npiplus/I");
+  eventVariables->Branch("MPiP",       &MPiP,       "MPiP/D"  );
+  eventVariables->Branch("EPiP",       &EPiP,       "EPiP/D"  );
+  eventVariables->Branch("TPiP",       &TPiP,       "TPiP/D"  );
+  eventVariables->Branch("CosPiP",     &CosPiP,     "CosPiP/D");
+
+  eventVariables->Branch("Npineg",     &Npineg,    "Npineg/I");
+  eventVariables->Branch("MPiN",       &MPiN,       "MPiN/D"  );
+  eventVariables->Branch("EPiN",       &EPiN,       "EPiN/D"  );
+  eventVariables->Branch("TPiN",       &TPiN,       "TPiN/D"  );
+  eventVariables->Branch("CosPiN",     &CosPiN,     "CosPiN/D");
+  
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/D" );
-  eventVariables->Branch("Q2_QE",    &Q2_QE,    "Q2_QE/D"   );
   eventVariables->Branch("q0_true",  &q0_true,  "q0_true/D"   );
   eventVariables->Branch("q3_true",  &q3_true,  "q3_true/D"   );
 
+  eventVariables->Branch("Enu_QE",    &Enu_QE,   "Enu_QE/D"  );
+  eventVariables->Branch("Q2_QE",     &Q2_QE,    "Q2_QE/D"   );
+  
   eventVariables->Branch("MLep",      &MLep,      "MLep/D"  );
   eventVariables->Branch("ELep",      &ELep,      "ELep/D"  );
   eventVariables->Branch("TLep",      &TLep,      "TLep/D"  );
@@ -90,13 +123,27 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   eventVariables->Branch("PPr",       &PPr,       "PPr/D"   );
   eventVariables->Branch("CosPr",     &CosPr,     "CosPr/D" );
 
-  eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
-  eventVariables->Branch("Weight"    , &Weight,     "Weight/D"    );
-
   eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/D");
   eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/D");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/D");
+  
+  // Event Scaling Information
+  eventVariables->Branch("Weight", &Weight, "Weight/D");
+  eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/D");
+  eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/D");
+  eventVariables->Branch("scaleFactor", &scaleFactor, "scaleFactor/D");
+  
+  return;
+}
 
+
+void GenericFlux_Tester::AddSignalFlagsToTree(){
+
+  if (!eventVariables){
+    FitPar::Config().out->cd();
+    eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
+  }
+  
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");
   eventVariables->Branch("flagCCQE_rest", &flagCCQE_rest, "flagCCQE_rest/O");
@@ -164,28 +211,38 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 };
 
 //********************************************************************
-/// @details Extract Enu and totcrs from event assuming quasi-elastic scattering
 void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
-  //********************************************************************
+//********************************************************************
 
   // Fill Signal Variables
   FillSignalFlags(event);
 
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
-  this->Nprotons = 0;
-  this->Nneutrons = 0;
-  this->Nparticles = 0;
-
-  // Initialise everything to a bad value
-  PDGnu = -999.9;
+  Nleptons   = 0;
+  Nparticles = 0;
+  PDGnu  = -999.9;
   PDGLep = -999.9;
 
   Enu_true = Enu_QE = Q2_true = Q2_QE = TLep = -999.9;
-  CosPr = CosLep = PPr = -999.9;
 
+  Nprotons  = 0.0;
+  PPr  = EPr  = MPr  = CosPr  = -999.9;
+
+  Nneutrons = 0.0;
+  PNe  = ENe  = MNe  = CosNe  = -999.9;
+  
+  Npiplus   = 0.0;
+  PPiP = EPiP = MPiP = CosPiP = -999.9;
+  
+  Npineg    = 0.0;
+  PPiN = EPiN = MPiN = CosPiN = 0.0;
+  
   double proton_highmom = 0.0;
-
+  double neutron_highmom = 0.0;
+  double piplus_highmom = 0.0;
+  double pineg_highmom = 0.0;
+  
   // Get main event variables
   TLorentzVector nu_4mom = event->PartInfo(0)->fP;
   Enu_true = nu_4mom.E();
@@ -193,74 +250,120 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   bool cc = (abs(event->Mode) < 30);
 
+  // Add all pion distributions for the event.
+
+  // Add classifier for CC0pi or CC1pi or CCOther
+  // Save Modes Properly
+  // Save low recoil measurements
+  
   // Start Particle Loop
   UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++) {
+
     // Skip particles that weren't in the final state
     bool part_alive = event->PartInfo(i)->fIsAlive;
     if (!part_alive) continue;
 
+    // PDG Particle
     int PDGpart = event->PartInfo(i)->fPID;
-    this->Nparticles++;
+    TLorentzVector part_4mom = event->PartInfo(i)->fP;
+    
+    Nparticles++;
+    
+    // Get Charged Lepton
+    if (abs(PDGpart) == abs(PDGnu) - 1){
+      Nleptons++;
+      
+      PDGLep = PDGpart;
 
-    // Find the charged lepton
-    if (cc) {
-      TLorentzVector part_4mom = event->PartInfo(i)->fP;
+      TLep = FitUtils::T(part_4mom) * 1000.0;
+      PLep = (part_4mom.Vect().Mag());
+      ELep = (part_4mom.E());
+      MLep = (part_4mom.Mag());
+      CosLep = cos(part_4mom.Vect().Angle(nu_4mom.Vect()));
 
-      if (PDGpart == (PDGnu - 1)) {
-        PDGLep = PDGpart;
+      Q2_true = (part_4mom - nu_4mom).Mag2();
 
-        TLep = FitUtils::T(part_4mom) * 1000.0;
-        PLep = (part_4mom.Vect().Mag());
-        ELep = (part_4mom.E());
-        MLep = (part_4mom.Mag());
-        CosLep = cos(part_4mom.Vect().Angle(nu_4mom.Vect()));
+      double ThetaLep = (event->PartInfo(0))
+	->fP.Vect().Angle((event->PartInfo(i))->fP.Vect());
 
-        Q2_true = (part_4mom - nu_4mom).Mag2();
+      q0_true = (part_4mom - nu_4mom).E();
+      q3_true = (part_4mom - nu_4mom).Vect().Mag();
+      
+      
+      // Quasi-elastic ----------------------
+      // ------------------------------------
+      
+      // Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
+      Q2_QE =
+	FitUtils::Q2QErec(part_4mom, cos(ThetaLep), 34., true) * 1000000.0;
+      Enu_QE =
+	FitUtils::EnuQErec(part_4mom, cos(ThetaLep), 34., true) * 1000.0;
+      
+      
+      // Pion Production ----------------------
+      // --------------------------------------
 
-        double ThetaLep = (event->PartInfo(0))
-                              ->fP.Vect()
-                              .Angle((event->PartInfo(i))->fP.Vect());
+      
 
-        // Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
-        Q2_QE =
-            FitUtils::Q2QErec(part_4mom, cos(ThetaLep), 34., true) * 1000000.0;
-        Enu_QE =
-            FitUtils::EnuQErec(part_4mom, cos(ThetaLep), 34., true) * 1000.0;
+      
+    } else if (PDGpart == 2212){
+      Nprotons++;
+      if (part_4mom.Vect().Mag() > proton_highmom){
+	proton_highmom = part_4mom.Vect().Mag();
 
-        q0_true = (part_4mom - nu_4mom).E();
-        q3_true = (part_4mom - nu_4mom).Vect().Mag();
+	PPr = (part_4mom.Vect().Mag());
+	EPr = (part_4mom.E());
+	MPr = (part_4mom.Mag());
+	CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
       }
-    }
-
-    // Find highest momentum proton
-    if (PDGpart == 2212){
-       TLorentzVector part_4mom = event->PartInfo(i)->fP;
-       this->Nprotons++;
-       if (part_4mom.Vect().Mag() > proton_highmom){
-	 proton_highmom = part_4mom.Vect().Mag();
-
-	 PPr = (part_4mom.Vect().Mag());
-	 EPr = (part_4mom.E());
-	 MPr = (part_4mom.Mag());
-	 CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
-
-       }
     } else if (PDGpart == 2112){
-      this->Nneutrons++;
-    }
+      Nneutrons++;
+      if (part_4mom.Vect().Mag() > neutron_highmom){
+	neutron_highmom = part_4mom.Vect().Mag();
+
+	PNe   = (part_4mom.Vect().Mag());
+	ENe   = (part_4mom.E());
+	MNe   = (part_4mom.Mag());
+	CosNe = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+      }
+    } else if (PDGpart == 211){
+      Npiplus++;
+      if (part_4mom.Vect().Mag() > piplus_highmom){
+	neutron_highmom = part_4mom.Vect().Mag();
+
+	PPiP   = (part_4mom.Vect().Mag());
+	EPiP   = (part_4mom.E());
+	MPiP   = (part_4mom.Mag());
+	CosPiP = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+      }
+    } else if (PDGpart == 111){
+      Npineg++;
+      if (part_4mom.Vect().Mag() > pineg_highmom){
+	neutron_highmom = part_4mom.Vect().Mag();
+
+	PPiN   = (part_4mom.Vect().Mag());
+	EPiN   = (part_4mom.E());
+	MPiN   = (part_4mom.Mag());
+	CosPiN = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+      }
+    } 
   }
 
+  // Get Recoil Definitions ------
+  // -----------------------------
   Erecoil_true      = FitUtils::GetErecoil_TRUE(event);
   Erecoil_charged   = FitUtils::GetErecoil_CHARGED(event);
   Erecoil_minerva   = FitUtils::GetErecoil_MINERvA_LowRecoil(event);
 
-  this->Nneutron_ratio = double(this->Nneutrons)/double(this->Nparticles);
-  this->Nproton_ratio = double(this->Nprotons)/double(this->Nparticles);
-
-  // Flux Weights
+  
+  // Event Weights ----
+  // ------------------
+  Weight = event->RWWeight * event->InputWeight;
+  RWWeight = event->RWWeight;
+  InputWeight = event->InputWeight;
   FluxWeight =
-      fluxHist->GetBinContent(fluxHist->FindBin(Enu)) / fluxHist->Integral();
+    fluxHist->GetBinContent(fluxHist->FindBin(Enu)) / fluxHist->Integral();
 
   // Fill the eventVariables Tree
   eventVariables->Fill();
@@ -269,23 +372,10 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 //********************************************************************
 void GenericFlux_Tester::Write(std::string drawOpt) {
-  //********************************************************************
+//********************************************************************
 
   // First save the TTree
   eventVariables->Write();
-
-  // Now save any default plots we want to draw
-  TH1D *Enu_hist = new TH1D((this->measurementName + "Enu_hist").c_str(),
-                            "Enu_hist;E;Events", 40, 0.0, 20.0 * 1.E3);
-  eventVariables->Draw("Enu_true >> Enu_hist", "Weight");
-  Enu_hist->Write();
-
-  // Q2 Diff XSec per nucleon
-  TH1D *Q2_hist = new TH1D((this->measurementName + "Q2_hist").c_str(),
-                           "Q2_hist;Q2;d#sigma/dQ^{2}", 40, 0.0, 2.0);
-  eventVariables->Draw("Q2_true/1E6 >> Q2_hist", "Weight");
-  Q2_hist->Scale(scaleFactor, "width");  // DiffXSec Scaling
-  Q2_hist->Write();
 
   // Save Flux and Event Histograms too
   GetInput()->GetFluxHistogram()->Write();

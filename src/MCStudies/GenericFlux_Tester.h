@@ -57,6 +57,9 @@ public:
   //! Fill all signal flags we currently have
   void FillSignalFlags(FitEvent *event);
 
+  void AddEventVariablesToTree();
+  void AddSignalFlagsToTree();
+  
  private:
 
   TTree* eventVariables;
@@ -71,7 +74,9 @@ public:
 
   int Nprotons;
   int Nneutrons;
-
+  int Npiplus;
+  int Npineg;
+  
   int PDGLep;
   double TLep;
   double CosLep;
@@ -85,20 +90,40 @@ public:
   double TPr;
   double MPr;
 
+  
+  double PNe;
+  double CosNe;
+  double ENe;
+  double TNe;
+  double MNe;
+
+  double PPiP;
+  double CosPiP;
+  double EPiP;
+  double TPiP;
+  double MPiP;
+
+  double PPiN;
+  double CosPiN;
+  double EPiN;
+  double TPiN;
+  double MPiN;
+  
   double q0_true;
   double q3_true;
 
-  double FluxWeight; //!< For Flux Shape Unfolding
-
   int Nparticles;
-  double Nneutron_ratio;
-  double Nproton_ratio;
-
+  int Nleptons;
 
   double Erecoil_true;
   double Erecoil_charged;
   double Erecoil_minerva;
 
+  double Weight;
+  double RWWeight;
+  double InputWeight;
+  double FluxWeight;
+  
   bool flagCCQE_full;
   bool flagCCQE_rest;
   bool flagCCQEBar_full;
