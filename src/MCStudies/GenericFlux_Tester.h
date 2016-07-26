@@ -156,16 +156,21 @@ public:
   bool flagCCQE_rest;
   bool flagCCQEBar_full;
   bool flagCCQEBar_rest;
+
   bool flagCC1pip_MiniBooNE;
   bool flagCC1pip_MINERvA_full;
   bool flagCC1pip_MINERvA_rest;
   bool flagCCNpip_MINERvA_full;
   bool flagCCNpip_MINERva_rest;
+  bool flagCC1pip_T2K_Michel;
   bool flagCC1pip_T2K;
+
   bool flagCC1pi0_MiniBooNE;
   bool flagCC1pi0Bar_MINERvA;
+
   bool flagNC1pi0_MiniBooNE;
   bool flagNC1pi0Bar_MiniBooNE;
+
   bool flagCCcoh_MINERvA;
   bool flagCCcohBar_MINERvA;
 

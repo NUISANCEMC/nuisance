@@ -152,7 +152,6 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/D");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/D");
 
-
   
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/D");
@@ -191,6 +190,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree(){
   eventVariables->Branch("flagCCNpip_MINERva_rest", &flagCCNpip_MINERva_rest,
                          "flagCCNpip_MINERva_rest/O");
 
+  eventVariables->Branch("flagCC1pip_T2K_Michel", &flagCC1pip_T2K_Michel, "flagCC1pip_T2K_Michel/O");
   eventVariables->Branch("flagCC1pip_T2K", &flagCC1pip_T2K, "flagCC1pip_T2K/O");
 
   eventVariables->Branch("flagCC1pi0_MiniBooNE", &flagCC1pi0_MiniBooNE,
@@ -512,7 +512,8 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
       SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, true);
 
   // Include Michel e sample so no phase space cuts on pion, only angle
-  flagCC1pip_T2K = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
+  flagCC1pip_T2K_Michel = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
+  flagCC1pip_T2K = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
 
   flagCC1pi0_MiniBooNE = SignalDef::isCC1pi0_MiniBooNE(event, EnuMin, EnuMax);
   flagCC1pi0Bar_MINERvA = SignalDef::isCC1pi0Bar_MINERvA(event, EnuMin, EnuMax);
