@@ -456,56 +456,68 @@ void InputHandler::ReadNuWroFile() {
 
     // Can grab flux histogram from the pars
     tn->GetEntry(0);
-    std::string fluxstring = nuwro_event->par.beam_energy;
 
-    LOG(SAM) << "Nuwro Input Flux = " << fluxstring << std::endl;
-    std::vector<double> contents =
-        PlotUtils::FillVectorDFromString(fluxstring, " ");
+    int beamtype = nuwro_event->par.beam_type;
 
-    if (fluxstring.empty() or contents.empty()) {
-      ERR(WRN) << "Incorrect NuWro flux type " << std::endl;
-      ERR(WRN) << "Need to provide as a beam_energy list" << std::endl;
-      ERR(WRN) << "e.g. beam_energy = Low High Contents_i" << std::endl;
-      exit(-1);
+    if (beamtype == 0){
+      std::string fluxstring = nuwro_event->par.beam_energy;
+      std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxstring, " ");
+      int pdg = nuwro_event->par.beam_particle;
+      double Elow  = double(fluxvals[0])/1000.0;
+      double Ehigh = double(fluxvals[1])/1000.0;
+      
+      std::cout << " - Adding new nuwro flux "
+		<< "pdg: " << pdg
+		<< "Elow: " << Elow
+		<< "Ehigh: " << Ehigh
+		<< std::endl;
+      
+      TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
+      for (int j = 2; j < fluxvals.size(); j++){
+	cout << j <<" "<<fluxvals[j]<<endl;
+	fluxplot->SetBinContent(j-1, fluxvals[j]);
+      }
+    } else if (beamtype == 1){
+
+      std::string fluxstring = nuwro_event->par.beam_content;
+      
+      std::vector<std::string> fluxlines = PlotUtils::FillVectorSFromString(fluxstring, "\n");
+      for (int  i = 0; i < fluxlines.size(); i++){
+	
+	std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxlines[i], " ");
+	
+	int pdg = int(fluxvals[0]);
+	double pctg = double(fluxvals[1])/100.0;
+	double Elow  = double(fluxvals[2])/1000.0;
+	double Ehigh = double(fluxvals[3])/1000.0;
+	
+	std::cout << " - Adding new nuwro flux "
+		  << "pdg: " << pdg
+		  << "pctg: " << pctg
+		  << "Elow: " << Elow
+		  << "Ehigh: " << Ehigh
+		  << std::endl;
+	
+	TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
+	for (int j = 4; j < fluxvals.size(); j++){
+	  fluxplot->SetBinContent(j+1, fluxvals[j]);
+	}
+	
+	if (this->fluxHist) fluxHist->Add(fluxplot);
+	else this->fluxHist = (TH1D*) fluxplot->Clone();
+	
+      }
     }
 
-    // Parse the input string values
-    int count = 0;
-    for (UInt_t i = 0; i < contents.size(); i++) {
-      if (contents.at(i) <= 0.0001 and contents.at(i) != 0.0)
-        count++;
-      else
-        break;
-    }
+    this->fluxHist->SetNameTitle("nuwro_flux","nuwro_flux;E_{#nu} (GeV); Flux");
+    
+    this->eventHist = (TH1D*) this->fluxHist->Clone();
+    this->eventHist->Reset();
+    this->eventHist->SetNameTitle("nuwro_evt","nuwro_evt");
 
-    double nuwro_Elow = contents[count];
-    double nuwro_Ehigh = contents[count + 1];
-    int nuwro_NBins = contents.size() - 2 - count;
-    std::cout << "CONTENTS VALS = " << contents[0] << " " << contents[1] << " "
-              << contents[2] << " " << contents[3] << std::endl;
-
-    std::cout << "Nuwro Range = " << nuwro_Elow << "-" << nuwro_Ehigh
-              << std::endl;
-    // Create Empty Histograms
-    this->fluxHist =
-        new TH1D("nuwro_flux", "nuwro_flux; E_{#nu} (GeV);#nu", nuwro_NBins,
-                 nuwro_Elow / 1000.0, nuwro_Ehigh / 1000.0);
-
-    this->eventHist = new TH1D(
-        "nuwro_evt", "nuwro_evt; E_{#nu} (GeV);Events [#times 10^{-38}]",
-        nuwro_NBins, nuwro_Elow / 1000.0, nuwro_Ehigh / 1000.0);
-
-    this->xsecHist = new TH1D(
-        "nuwro_xsec", "nuwro_xsec; E_{#nu} (GeV);#sigma [#times 10^{-38}]",
-        nuwro_NBins, nuwro_Elow / 1000.0, nuwro_Ehigh / 1000.0);
-
-    std::cout << "Flux Edges = " << nuwro_Elow << " " << nuwro_Ehigh
-              << std::endl;
-
-    // Fill Flux Histogram
-    for (int i = 0; i < nuwro_NBins; i++) {
-      this->fluxHist->SetBinContent(i + 1, contents.at(i + 2 + count));
-    }
+    this->xsecHist = (TH1D*) this->fluxHist->Clone();
+    this->xsecHist->Reset();
+    this->xsecHist->SetNameTitle("nuwro_xsec","nuwro_xsec");
 
     // Start Processing
     LOG(SAM) << " -> Processing NuWro Input Flux for " << nEvents
@@ -516,10 +528,12 @@ void InputHandler::ReadNuWroFile() {
     double totaleventmode = 0.0;
     double totalevents = 0.0;
 
+    
     // --- loop
     for (int i = 0; i < nEvents; i++) {
       tn->GetEntry(i);
 
+      if ( i % 100000 == 0) cout <<" i "<<i<<std::endl;
       // Get Variables
       Enu = nuwro_event->in[0].E() / 1000.0;
       TotXSec = nuwro_event->weight;
