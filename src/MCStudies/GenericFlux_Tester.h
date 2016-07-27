@@ -59,10 +59,19 @@ public:
 
   void AddEventVariablesToTree();
   void AddSignalFlagsToTree();
-  
+
  private:
 
   TTree* eventVariables;
+
+
+  TLorentzVector *nu_4mom;
+  TLorentzVector *pmu;
+  TLorentzVector *ppip;
+  TLorentzVector *ppim;
+  TLorentzVector *ppi0;
+  TLorentzVector *pprot;
+  TLorentzVector *pneut;
 
   // Saved Variables
   float Enu_true;
@@ -82,7 +91,7 @@ public:
   int Npiplus;
   int Npineg;
   int Npi0;
-  
+
   int PDGLep;
   float TLep;
   float CosLep;
@@ -96,7 +105,7 @@ public:
   float TPr;
   float MPr;
 
-  
+
   float PNe;
   float CosNe;
   float ENe;
@@ -120,7 +129,7 @@ public:
   float EPi0;
   float TPi0;
   float MPi0;
-  
+
   float CosPmuPpip;
   float CosPmuPpim;
   float CosPmuPpi0;
@@ -151,7 +160,7 @@ public:
   float RWWeight;
   float InputWeight;
   float FluxWeight;
-  
+
   bool flagCCQE_full;
   bool flagCCQE_rest;
   bool flagCCQEBar_full;
