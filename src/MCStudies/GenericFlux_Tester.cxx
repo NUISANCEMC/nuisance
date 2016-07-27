@@ -239,7 +239,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-
+  //  std::cout<<"Filling signal"<<std::endl;
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
   Nleptons   = 0;
@@ -318,7 +318,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       ELep = (part_4mom.E());
       MLep = (part_4mom.Mag());
       CosLep = cos(part_4mom.Vect().Angle(nu_4mom.Vect()));
-
+      pmu = part_4mom;
+      
       Q2_true = -1*(part_4mom - nu_4mom).Mag2();
 
       float ThetaLep = (event->PartInfo(0))
@@ -361,6 +362,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
         TPr   = FitUtils::T(part_4mom)*1000.;
 	MPr = (part_4mom.Mag());
 	CosPr = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+	
         pprot = part_4mom;
       }
     } else if (PDGpart == 2112){
@@ -373,6 +375,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
         TNe   = FitUtils::T(part_4mom)*1000.;
 	MNe   = (part_4mom.Mag());
 	CosNe = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+	
         pneut = part_4mom;
       }
     } else if (PDGpart == 211){
@@ -385,6 +388,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
         TPiP   = FitUtils::T(part_4mom)*1000.;
 	MPiP   = (part_4mom.Mag());
 	CosPiP = cos(part_4mom.Vect().Angle( nu_4mom.Vect() ));
+	
+	ppip   = part_4mom;
       }
     } else if (PDGpart == -211){
       Npineg++;
