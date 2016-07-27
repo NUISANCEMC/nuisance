@@ -28,6 +28,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   // Measurement Details
   measurementName = name;
+  eventVariables = NULL;
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
@@ -69,18 +70,18 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
 
 void GenericFlux_Tester::AddEventVariablesToTree(){
-  
+
   // Setup the TTree to save everything
   if (!eventVariables){
     FitPar::Config().out->cd();
     eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
   }
-  
+
   eventVariables->Branch("Mode",      &Mode,     "Mode/I");
-  
+
   eventVariables->Branch("PDGnu",     &PDGnu,    "PDGnu/I"   );
   eventVariables->Branch("Enu_true",  &Enu_true, "Enu_true/F");
-  
+
   eventVariables->Branch("Nleptons",  &Nleptons,  "Nleptons/I");
   eventVariables->Branch("MLep",      &MLep,      "MLep/F"  );
   eventVariables->Branch("ELep",      &ELep,      "ELep/F"  );
@@ -91,7 +92,7 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("CosPmuPpi0",&CosPmuPpi0, "CosPmuPpi0/F");
   eventVariables->Branch("CosPmuPprot",&CosPmuPprot, "CosPmuPprot/F");
   eventVariables->Branch("CosPmuPneut",&CosPmuPneut, "CosPmuPneut/F");
-  
+
   eventVariables->Branch("Nprotons",  &Nprotons,  "Nprotons/I");
   eventVariables->Branch("MPr",       &MPr,       "MPr/F"  );
   eventVariables->Branch("EPr",       &EPr,       "EPr/F"  );
@@ -104,7 +105,7 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("ENe",        &ENe,        "ENe/F"  );
   eventVariables->Branch("TNe",        &TNe,        "TNe/F"  );
   eventVariables->Branch("CosNe",      &CosNe,      "CosNe/F");
-  
+
   eventVariables->Branch("Npiplus",    &Npiplus,    "Npiplus/I");
   eventVariables->Branch("MPiP",       &MPiP,       "MPiP/F"  );
   eventVariables->Branch("EPiP",       &EPiP,       "EPiP/F"  );
@@ -131,7 +132,7 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("CosPi0",     &CosPi0,     "CosPi0/F");
   eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/F");
   eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/F");
-  
+
   eventVariables->Branch("Q2_true",  &Q2_true,  "Q2_true/F" );
   eventVariables->Branch("q0_true",  &q0_true,  "q0_true/F"   );
   eventVariables->Branch("q3_true",  &q3_true,  "q3_true/F"   );
@@ -142,18 +143,18 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/F");
   eventVariables->Branch("bjorken_x", &bjorken_x, "bjorken_x/F");
   eventVariables->Branch("bjorken_y", &bjorken_y, "bjorken_y/F");
-  
+
   eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/F");
   eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/F");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/F");
 
-  
+
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
   eventVariables->Branch("scaleFactor", &scaleFactor, "scaleFactor/F");
-  
+
   return;
 }
 
@@ -164,7 +165,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree(){
     FitPar::Config().out->cd();
     eventVariables = new TTree( (this->measurementName+"_VARS").c_str(), (this->measurementName+"_VARS").c_str() );
   }
-  
+
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");
   eventVariables->Branch("flagCCQE_rest", &flagCCQE_rest, "flagCCQE_rest/O");
@@ -253,10 +254,10 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   Nneutrons = 0;
   PNe  = ENe  = MNe  = CosNe  = -999.9;
-  
+
   Npiplus   = 0;
   PPiP = EPiP = MPiP = CosPiP = -999.9;
-  
+
   Npineg    = 0;
   PPiN = EPiN = MPiN = CosPiN = -999.9;
 
@@ -265,13 +266,13 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // All of the angles Clarence added
   CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut = CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot = CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut = CosPprotPneut = -999.9;
-  
+
   float proton_highmom   = -999.9;
   float neutron_highmom  = -999.9;
   float piplus_highmom   = -999.9;
   float pineg_highmom    = -999.9;
   float pi0_highmom      = -999.9;
-  
+
   // Get main event variables
   TLorentzVector nu_4mom = event->PartInfo(0)->fP;
   TLorentzVector pmu;
@@ -291,7 +292,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   // Add classifier for CC0pi or CC1pi or CCOther
   // Save Modes Properly
   // Save low recoil measurements
-  
+
   // Start Particle Loop
   UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++) {
@@ -303,13 +304,13 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     // PDG Particle
     int PDGpart = event->PartInfo(i)->fPID;
     TLorentzVector part_4mom = event->PartInfo(i)->fP;
-    
+
     Nparticles++;
-    
+
     // Get Charged Lepton
     if (abs(PDGpart) == abs(PDGnu) - 1){
       Nleptons++;
-      
+
       PDGLep = PDGpart;
 
       TLep = FitUtils::T(part_4mom) * 1000.0;
@@ -338,18 +339,18 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
       // Quasi-elastic ----------------------
       // ------------------------------------
-      
+
       // Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
       Q2_QE =
 	FitUtils::Q2QErec(part_4mom, cos(ThetaLep), 34., true) * 1000000.0;
       Enu_QE =
 	FitUtils::EnuQErec(part_4mom, cos(ThetaLep), 34., true) * 1000.0;
-      
-      
+
+
       // Pion Production ----------------------
       // --------------------------------------
 
-      
+
     } else if (PDGpart == 2212){
       Nprotons++;
       if (part_4mom.Vect().Mag() > proton_highmom){
@@ -455,7 +456,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   if (Nprotons > 0 && Nneutrons > 0)
     CosPprotPneut = cos(pprot.Vect().Angle(pneut.Vect()));
-  
+
 
   // Event Weights ----
   // ------------------
