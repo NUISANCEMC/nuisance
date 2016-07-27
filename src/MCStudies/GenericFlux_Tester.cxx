@@ -44,6 +44,8 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   // this will do.
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
+  eventVariables = NULL;
+
   // Setup dataHist as a placeholder
   this->dataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
   this->SetupDefaultHist();
@@ -141,13 +143,6 @@ void GenericFlux_Tester::AddEventVariablesToTree(){
   eventVariables->Branch("bjorken_x", &bjorken_x, "bjorken_x/F");
   eventVariables->Branch("bjorken_y", &bjorken_y, "bjorken_y/F");
   
-  eventVariables->Branch("MLep",      &MLep,      "MLep/F"  );
-  eventVariables->Branch("ELep",      &ELep,      "ELep/F"  );
-  eventVariables->Branch("TLep",      &TLep,      "TLep/F"  );
-  eventVariables->Branch("CosLep",    &CosLep,    "CosLep/F");
-  eventVariables->Branch("PPr",       &PPr,       "PPr/F"   );
-  eventVariables->Branch("CosPr",     &CosPr,     "CosPr/F" );
-
   eventVariables->Branch("Erecoil_true", &Erecoil_true, "Erecoil_true/F");
   eventVariables->Branch("Erecoil_charged", &Erecoil_charged, "Erecoil_charged/F");
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva, "Erecoil_minerva/F");
@@ -187,8 +182,8 @@ void GenericFlux_Tester::AddSignalFlagsToTree(){
                          "flagCC1pip_MINERvA_rest/O");
   eventVariables->Branch("flagCCNpip_MINERvA_full", &flagCCNpip_MINERvA_full,
                          "flagCCNpip_MINERvA_full/O");
-  eventVariables->Branch("flagCCNpip_MINERva_rest", &flagCCNpip_MINERva_rest,
-                         "flagCCNpip_MINERva_rest/O");
+  eventVariables->Branch("flagCCNpip_MINERvA_rest", &flagCCNpip_MINERvA_rest,
+                         "flagCCNpip_MINERvA_rest/O");
 
   eventVariables->Branch("flagCC1pip_T2K_Michel", &flagCC1pip_T2K_Michel, "flagCC1pip_T2K_Michel/O");
   eventVariables->Branch("flagCC1pip_T2K", &flagCC1pip_T2K, "flagCC1pip_T2K/O");
@@ -508,7 +503,7 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
   int dummy;
   flagCCNpip_MINERvA_full =
       SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax);
-  flagCCNpip_MINERva_rest =
+  flagCCNpip_MINERvA_rest =
       SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, true);
 
   // Include Michel e sample so no phase space cuts on pion, only angle

@@ -161,7 +161,7 @@ public:
   bool flagCC1pip_MINERvA_full;
   bool flagCC1pip_MINERvA_rest;
   bool flagCCNpip_MINERvA_full;
-  bool flagCCNpip_MINERva_rest;
+  bool flagCCNpip_MINERvA_rest;
   bool flagCC1pip_T2K_Michel;
   bool flagCC1pip_T2K;
 
