@@ -459,65 +459,64 @@ void InputHandler::ReadNuWroFile() {
 
     int beamtype = nuwro_event->par.beam_type;
 
-    if (beamtype == 0){
+    if (beamtype == 0) {
       std::string fluxstring = nuwro_event->par.beam_energy;
-      std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxstring, " ");
+      std::vector<double> fluxvals =
+          PlotUtils::FillVectorDFromString(fluxstring, " ");
       int pdg = nuwro_event->par.beam_particle;
-      double Elow  = double(fluxvals[0])/1000.0;
-      double Ehigh = double(fluxvals[1])/1000.0;
-      
-      std::cout << " - Adding new nuwro flux "
-		<< "pdg: " << pdg
-		<< "Elow: " << Elow
-		<< "Ehigh: " << Ehigh
-		<< std::endl;
-      
-      TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
-      for (int j = 2; j < fluxvals.size(); j++){
-	cout << j <<" "<<fluxvals[j]<<endl;
-	fluxplot->SetBinContent(j-1, fluxvals[j]);
-      }
-    } else if (beamtype == 1){
+      double Elow = double(fluxvals[0]) / 1000.0;
+      double Ehigh = double(fluxvals[1]) / 1000.0;
 
+      std::cout << " - Adding new nuwro flux "
+                << "pdg: " << pdg << "Elow: " << Elow << "Ehigh: " << Ehigh
+                << std::endl;
+
+      fluxHist = new TH1D("fluxplot", "fluxplot", fluxvals.size() - 2, Elow, Ehigh);
+      for (int j = 2; j < fluxvals.size(); j++) {
+        cout << j << " " << fluxvals[j] << endl;
+        fluxHist->SetBinContent(j - 1, fluxvals[j]);
+      }
+    } else if (beamtype == 1) {
       std::string fluxstring = nuwro_event->par.beam_content;
-      
-      std::vector<std::string> fluxlines = PlotUtils::FillVectorSFromString(fluxstring, "\n");
-      for (int  i = 0; i < fluxlines.size(); i++){
-	
-	std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxlines[i], " ");
-	
-	int pdg = int(fluxvals[0]);
-	double pctg = double(fluxvals[1])/100.0;
-	double Elow  = double(fluxvals[2])/1000.0;
-	double Ehigh = double(fluxvals[3])/1000.0;
-	
-	std::cout << " - Adding new nuwro flux "
-		  << "pdg: " << pdg
-		  << "pctg: " << pctg
-		  << "Elow: " << Elow
-		  << "Ehigh: " << Ehigh
-		  << std::endl;
-	
-	TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
-	for (int j = 4; j < fluxvals.size(); j++){
-	  fluxplot->SetBinContent(j+1, fluxvals[j]);
-	}
-	
-	if (this->fluxHist) fluxHist->Add(fluxplot);
-	else this->fluxHist = (TH1D*) fluxplot->Clone();
-	
+
+      std::vector<std::string> fluxlines =
+          PlotUtils::FillVectorSFromString(fluxstring, "\n");
+      for (int i = 0; i < fluxlines.size(); i++) {
+        std::vector<double> fluxvals =
+            PlotUtils::FillVectorDFromString(fluxlines[i], " ");
+
+        int pdg = int(fluxvals[0]);
+        double pctg = double(fluxvals[1]) / 100.0;
+        double Elow = double(fluxvals[2]) / 1000.0;
+        double Ehigh = double(fluxvals[3]) / 1000.0;
+
+        std::cout << " - Adding new nuwro flux "
+                  << "pdg: " << pdg << "pctg: " << pctg << "Elow: " << Elow
+                  << "Ehigh: " << Ehigh << std::endl;
+
+        TH1D* fluxplot =
+            new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
+        for (int j = 4; j < fluxvals.size(); j++) {
+          fluxplot->SetBinContent(j + 1, fluxvals[j]);
+        }
+
+        if (this->fluxHist)
+          fluxHist->Add(fluxplot);
+        else
+          this->fluxHist = (TH1D*)fluxplot->Clone();
       }
     }
 
-    this->fluxHist->SetNameTitle("nuwro_flux","nuwro_flux;E_{#nu} (GeV); Flux");
-    
-    this->eventHist = (TH1D*) this->fluxHist->Clone();
-    this->eventHist->Reset();
-    this->eventHist->SetNameTitle("nuwro_evt","nuwro_evt");
+    this->fluxHist->SetNameTitle("nuwro_flux",
+                                 "nuwro_flux;E_{#nu} (GeV); Flux");
 
-    this->xsecHist = (TH1D*) this->fluxHist->Clone();
+    this->eventHist = (TH1D*)this->fluxHist->Clone();
+    this->eventHist->Reset();
+    this->eventHist->SetNameTitle("nuwro_evt", "nuwro_evt");
+
+    this->xsecHist = (TH1D*)this->fluxHist->Clone();
     this->xsecHist->Reset();
-    this->xsecHist->SetNameTitle("nuwro_xsec","nuwro_xsec");
+    this->xsecHist->SetNameTitle("nuwro_xsec", "nuwro_xsec");
 
     // Start Processing
     LOG(SAM) << " -> Processing NuWro Input Flux for " << nEvents
@@ -528,12 +527,11 @@ void InputHandler::ReadNuWroFile() {
     double totaleventmode = 0.0;
     double totalevents = 0.0;
 
-    
     // --- loop
     for (int i = 0; i < nEvents; i++) {
       tn->GetEntry(i);
 
-      if ( i % 100000 == 0) cout <<" i "<<i<<std::endl;
+      if (i % 100000 == 0) cout << " i " << i << std::endl;
       // Get Variables
       Enu = nuwro_event->in[0].E() / 1000.0;
       TotXSec = nuwro_event->weight;
@@ -787,7 +785,7 @@ void InputHandler::ReadHistogramFile() {
 
 //********************************************************************
 void InputHandler::ReadNuanceFile() {
-  //********************************************************************
+//********************************************************************
 
 #ifdef __NUANCE_ENABLED__
   // Read in Nuance output ROOT file (converted from hbook)
@@ -823,7 +821,7 @@ void InputHandler::ReadNuanceFile() {
   //  tn->SetBranchAddress("vertex", &nuance_event->vertex);
   //  tn->SetBranchAddress("start",&nuance_event->start);
   //  tn->SetBranchAddress("depth",&nuance_event->depth);
-  //tn->SetBranchAddress("flux",&nuance_event->flux);
+  // tn->SetBranchAddress("flux",&nuance_event->flux);
 
   tn->SetBranchAddress("n_leptons", &nuance_event->n_leptons);
   tn->SetBranchAddress("p_ltot", &nuance_event->p_ltot);
@@ -837,15 +835,13 @@ void InputHandler::ReadNuanceFile() {
 
   this->cust_event->SetEventAddress(&nuance_event);
 
-  this->fluxHist = new TH1D( (this->handleName + "_FLUX").c_str(),
-			     (this->handleName + "_FLUX").c_str(),
-			     1, 0.0, 1.0);
- 
+  this->fluxHist = new TH1D((this->handleName + "_FLUX").c_str(),
+                            (this->handleName + "_FLUX").c_str(), 1, 0.0, 1.0);
+
   this->fluxHist->SetBinContent(1, 1.0);
 
-  this->eventHist = new TH1D( (this->handleName + "_EVT").c_str(),
-			     (this->handleName + "_EVT").c_str(),
-			     1, 0.0, 1.0);
+  this->eventHist = new TH1D((this->handleName + "_EVT").c_str(),
+                             (this->handleName + "_EVT").c_str(), 1, 0.0, 1.0);
   this->eventHist->SetBinContent(1, nEvents);
 
 #else
@@ -872,8 +868,9 @@ void InputHandler::PrintStartInput() {
            << std::endl;
 
   LOG(SAM) << " -> Integrated Inclusive XSec = "
-	   << (eventHist->Integral(0, eventHist->GetNbinsX(), "width") /
-	       fluxHist->Integral(0, fluxHist->GetNbinsX(), "width")) * 1E-38
+           << (eventHist->Integral(0, eventHist->GetNbinsX(), "width") /
+               fluxHist->Integral(0, fluxHist->GetNbinsX(), "width")) *
+                  1E-38
            << std::endl;
 
   if (eventType == kEVTSPLINE) return;
@@ -988,7 +985,7 @@ double InputHandler::TotalIntegratedFlux(double low, double high,
 //********************************************************************
 double InputHandler::PredictedEventRate(double low, double high,
                                         std::string intOpt) {
-//********************************************************************
+  //********************************************************************
 
   int minBin = this->fluxHist->GetXaxis()->FindBin(low);
   int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
