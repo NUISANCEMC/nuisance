@@ -37,6 +37,9 @@ if [[ "@USE_NEUT@" != "0" ]]; then
   if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
     export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
   fi
+  export NEUT_ROOT=@NEUT_ROOT@
+  export CERN=@CERN@
+  export CERN_LEVEL=@CERN_LEVEL@
 fi
 
 if [[ "@USE_NuWro@" != "0" ]]; then
@@ -59,6 +62,15 @@ if [[ "@USE_GENIE@" != "0" ]]; then
   echo "[INFO]: Adding GENIE paths to the environment."
 
   export GENIE="@GENIE@"
+
+  export LHAPDF_LIB="@LHAPDF_LIB@"
+  export LHAPDF_INC="@LHAPDF_INC@"
+
+  export LIBXML2_LIB="@LIBXML2_LIB@"
+  export LIBXML2_INC="@LIBXML2_INC@"
+
+  export LOG4CPP_LIB="@LOG4CPP_LIB@"
+  export LOG4CPP_INC="@LOG4CPP_INC@"
 
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE@/lib:"* ]]; then
     export LD_LIBRARY_PATH=@GENIE@/lib:$LD_LIBRARY_PATH
