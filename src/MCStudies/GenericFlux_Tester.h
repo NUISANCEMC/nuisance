@@ -194,6 +194,8 @@ public:
   bool flagCCQE_MiniBooNE;
   bool flagCCQEBar_MiniBooNE;
 
+  float xsecScaling;
+
 };
 
 #endif

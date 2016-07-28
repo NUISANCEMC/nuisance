@@ -583,6 +583,8 @@ void InputHandler::ReadNuWroFile() {
     this->fluxHist->Write("nuwro_flux", TObject::kOverwrite);
     this->eventHist->Write("nuwro_evtrt", TObject::kOverwrite);
     this->xsecHist->Write("nuwro_xsec", TObject::kOverwrite);
+    temp_save_file->ls();
+
 
     temp_save_file->Close();
     delete temp_save_file;
