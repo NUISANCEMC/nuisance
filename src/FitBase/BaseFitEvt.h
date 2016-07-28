@@ -20,15 +20,15 @@
 #ifndef FITEVENTBASE_H_SEEN
 #define FITEVENTBASE_H_SEEN
 
+#include "TArrayD.h"
 #include "TLorentzVector.h"
 #include "TSpline.h"
-#include "TArrayD.h"
 
 #include "FitParticle.h"
 
 #ifdef __NEUT_ENABLED__
-#include "neutvect.h"
 #include "neutpart.h"
+#include "neutvect.h"
 #endif
 
 #ifdef __NUWRO_ENABLED__
@@ -55,12 +55,68 @@ using namespace genie;
 
 //! Global Enum to define generator type being read with FitEvent
 // Have to define kNORM as if its a generator for the time being.
-enum generator_event_type { kUNKNOWN=999, kNEUT=0, kNIWG=1, kNUWRO=2, kT2K=3, kCUSTOM=4, kGENIE=5, kEVTSPLINE=6, kNUANCE=7, kGiBUU=8, kNORM=9};
+enum generator_event_type {
+  kUNKNOWN = 999,
+  kNEUT = 0,
+  kNIWG = 1,
+  kNUWRO = 2,
+  kT2K = 3,
+  kCUSTOM = 4,
+  kGENIE = 5,
+  kEVTSPLINE = 6,
+  kNUANCE = 7,
+  kGiBUU = 8,
+  kNORM = 9,
+  kMODENORM = 10
+};
 
-//! Base Event Class used to store just the generator event pointers and flat variables
+inline std::ostream& operator<<(std::ostream& os,
+                                generator_event_type const& gs) {
+  switch (gs) {
+    case kUNKNOWN: {
+      return os << "kUNKNOWN";
+    }
+    case kNEUT: {
+      return os << "kNEUT";
+    }
+    case kNIWG: {
+      return os << "kNIWG";
+    }
+    case kNUWRO: {
+      return os << "kNUWRO";
+    }
+    case kT2K: {
+      return os << "kT2K";
+    }
+    case kCUSTOM: {
+      return os << "kCUSTOM";
+    }
+    case kGENIE: {
+      return os << "kGENIE";
+    }
+    case kEVTSPLINE: {
+      return os << "kEVTSPLINE";
+    }
+    case kNUANCE: {
+      return os << "kNUANCE";
+    }
+    case kGiBUU: {
+      return os << "kGiBUU";
+    }
+    case kNORM: {
+      return os << "kNORM";
+    }
+    case kMODENORM: {
+      return os << "kMODENORM";
+    }
+    default: { return os << "kUNKNOWN"; }
+  }
+}
+
+//! Base Event Class used to store just the generator event pointers and flat
+//! variables
 class BaseFitEvt {
  public:
-
   BaseFitEvt();
   ~BaseFitEvt();
   BaseFitEvt(const BaseFitEvt* obj);
@@ -68,49 +124,45 @@ class BaseFitEvt {
   double X_VAR;
   double Y_VAR;
   double Z_VAR;
-  int    Mode;
+  int Mode;
   double E;
   double Weight;
   double InputWeight;
   double RWWeight;
   double CustomWeight;
-  bool   Signal;
+  bool Signal;
   UInt_t Index;
   UInt_t BinIndex;
   UInt_t fType;
 
-  TArrayD*  dial_coeff; // Depedendent on dials (needs header file provided)
+  TArrayD* dial_coeff;  // Depedendent on dials (needs header file provided)
 
-  // NEUT : Default
+// NEUT : Default
 #ifdef __NEUT_ENABLED__
-  NeutVect* neut_event; //!< Pointer to Neut Vector
+  NeutVect* neut_event;  //!< Pointer to Neut Vector
 #endif
 
-  // NUWRO
+// NUWRO
 #ifdef __NUWRO_ENABLED__
-  event* nuwro_event; //!< Pointer to Nuwro event
+  event* nuwro_event;  //!< Pointer to Nuwro event
 #endif
 
-  // GENIE
+// GENIE
 #ifdef __GENIE_ENABLED__
-  NtpMCEventRecord* genie_event; //!< Pointer to NTuple Genie Event
-  GHepRecord* genie_record; //!< Pointer to actually accessible Genie Record
+  NtpMCEventRecord* genie_event;  //!< Pointer to NTuple Genie Event
+  GHepRecord* genie_record;  //!< Pointer to actually accessible Genie Record
 #endif
 
-  // NUANCE
+// NUANCE
 #ifdef __NUANCE_ENABLED__
   NuanceEvent* nuance_event;
 #endif
 
-  // GiBUU
+// GiBUU
 #ifdef __GiBUU_ENABLED__
   GiBUUStdHepReader* GiRead;
 #endif
 
-  double GetWeight(){ return InputWeight * RWWeight * CustomWeight; };
+  double GetWeight() { return InputWeight * RWWeight * CustomWeight; };
 };
 #endif
-
-
-
-

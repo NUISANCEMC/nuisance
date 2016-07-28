@@ -46,7 +46,6 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   ppi0 = 0;
   pprot = 0;
   pneut = 0;
-  xsecScaling = 0.0;
 
   // This function will sort out the input files automatically and parse all the
   // inputs,flags,etc.
@@ -62,10 +61,6 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  // Setup our TTrees                                                                                         
-  this->AddEventVariablesToTree();
-  this->AddSignalFlagsToTree();
-
   // 1. The generator is organised in SetupMeasurement so it gives the
   // cross-section in "per nucleon" units.
   //    So some extra scaling for a specific measurement may be required. For
@@ -74,7 +69,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    divide by the number of neutrons 6.
   this->scaleFactor = (this->eventHist->Integral() * 1E-38 / (nevents + 0.)) /
                       this->TotalIntegratedFlux();
-  xsecScaling = this->scaleFactor;
+
+  // Setup our TTrees
+  this->AddEventVariablesToTree();
+  this->AddSignalFlagsToTree();
 }
 
 void GenericFlux_Tester::AddEventVariablesToTree() {
@@ -158,19 +156,19 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva,
                          "Erecoil_minerva/F");
 
-  eventVariables->Branch("nu_4mom", "TLorentzVector", &nu_4mom);
-  eventVariables->Branch("pmu_4mom","TLorentzVector",  &pmu);
-  eventVariables->Branch("hm_ppip_4mom", "TLorentzVector", &ppip);
-  eventVariables->Branch("hm_ppim_4mom", "TLorentzVector", &ppim);
-  eventVariables->Branch("hm_ppi0_4mom", "TLorentzVector", &ppi0);
-  eventVariables->Branch("hm_pprot_4mom", "TLorentzVector", &pprot);
-  eventVariables->Branch("hm_pneut_4mom", "TLorentzVector", &pneut);
+  eventVariables->Branch("nu_4mom", &nu_4mom);
+  eventVariables->Branch("pmu_4mom", &pmu);
+  eventVariables->Branch("hm_ppip_4mom", &ppip);
+  eventVariables->Branch("hm_ppim_4mom", &ppim);
+  eventVariables->Branch("hm_ppi0_4mom", &ppi0);
+  eventVariables->Branch("hm_pprot_4mom", &pprot);
+  eventVariables->Branch("hm_pneut_4mom", &pneut);
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
-  eventVariables->Branch("scaleFactor", &xsecScaling, "scaleFactor/F");
+  eventVariables->Branch("scaleFactor", &scaleFactor, "scaleFactor/F");
 
   return;
 }
@@ -254,9 +252,6 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
 void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   //********************************************************************
 
-  xsecScaling = this->scaleFactor;
-
-
   // Fill Signal Variables
   FillSignalFlags(event);
   //  std::cout<<"Filling signal"<<std::endl;
@@ -309,6 +304,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   PDGnu = event->PartInfo(0)->fPID;
 
   bool cc = (abs(event->Mode) < 30);
+  (void)cc;
 
   // Add all pion distributions for the event.
 

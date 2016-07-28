@@ -17,70 +17,69 @@
 *    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef FIT_WEIGHT_2
-#define FIT_WEIGHT_2
+#ifndef __FIT_WEIGHT_H_SEEN__
+#define __FIT_WEIGHT_H_SEEN__
 
-#include <stdlib.h>
-#include <numeric>
 #include <math.h>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <deque>
+#include <stdlib.h>
 #include <time.h>
-#include <vector>
+#include <deque>
+#include <iomanip>
+#include <iostream>
 #include <map>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
 
-
-#include "TObject.h"
 #include "FitEvent.h"
 #include "TF1.h"
+#include "TObject.h"
 using namespace std;
 
 #ifdef __T2KREW_ENABLED__
-#include "T2KReWeight.h"
-#include "T2KNeutReWeight.h"
-#include "T2KNIWGReWeight.h"
 #include "T2KGenieReWeight.h"
-#include "T2KNeutUtils.h"
+#include "T2KNIWGReWeight.h"
 #include "T2KNIWGUtils.h"
+#include "T2KNeutReWeight.h"
+#include "T2KNeutUtils.h"
+#include "T2KReWeight.h"
 using namespace t2krew;
 #endif
 
 #ifdef __NIWG_ENABLED__
-#include "NIWGSyst.h"
 #include "NIWGReWeight.h"
-#include "NIWGReWeight2012a.h"
-#include "NIWGReWeightDeltaMass.h"
 #include "NIWGReWeight1piAngle.h"
-#include "NIWGReWeightSplineEnu.h"
 #include "NIWGReWeight2010a.h"
-#include "NIWGReWeightPiMult.h"
-#include "NIWGReWeightSpectralFunc.h"
-#include "NIWGReWeightMEC.h"
-#include "NIWGReWeightRPA.h"
-#include "NIWGReWeightEffectiveRPA.h"
+#include "NIWGReWeight2012a.h"
 #include "NIWGReWeight2014a.h"
-#include "NIWGReWeightProtonFSIbug.h"
+#include "NIWGReWeightDeltaMass.h"
+#include "NIWGReWeightEffectiveRPA.h"
 #include "NIWGReWeightHadronMultSwitch.h"
+#include "NIWGReWeightMEC.h"
+#include "NIWGReWeightPiMult.h"
+#include "NIWGReWeightProtonFSIbug.h"
+#include "NIWGReWeightRPA.h"
+#include "NIWGReWeightSpectralFunc.h"
+#include "NIWGReWeightSplineEnu.h"
+#include "NIWGSyst.h"
 #endif
 
 #ifdef __NEUT_ENABLED__
-#include "NSyst.h"
 #include "NReWeight.h"
+#include "NReWeightCasc.h"
 #include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecRES.h"
 #include "NReWeightNuXSecCCRES.h"
 #include "NReWeightNuXSecCOH.h"
 #include "NReWeightNuXSecDIS.h"
-#include "NReWeightNuXSecNCEL.h"
 #include "NReWeightNuXSecNC.h"
+#include "NReWeightNuXSecNCEL.h"
 #include "NReWeightNuXSecNCRES.h"
-#include "NReWeightCasc.h"
+#include "NReWeightNuXSecRES.h"
 #include "NReWeightNuclPiless.h"
-#include "neutvect.h"
+#include "NSyst.h"
 #include "neutpart.h"
+#include "neutvect.h"
 #endif
 
 #ifdef __NUWRO_ENABLED__
@@ -89,72 +88,64 @@ using namespace t2krew;
 
 #ifdef __NUWRO_REWEIGHT_ENABLED__
 #include "NuwroReWeight.h"
-#include "NuwroReWeight_QEL.h"
 #include "NuwroReWeight_FlagNorm.h"
+#include "NuwroReWeight_QEL.h"
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #endif
 
 #ifdef __GENIE_ENABLED__
-#include "GSyst.h"
+#include "EVGCore/EventRecord.h"
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
+#include "GSyst.h"
 #include "Ntuple/NtpMCEventRecord.h"
 #include "ReWeight/GReWeight.h"
-#include "EVGCore/EventRecord.h"
-#include "ReWeight/GReWeightNuXSecNCEL.h"
-#include "ReWeight/GReWeightNuXSecCCQE.h"
-#include "ReWeight/GReWeightNuXSecCCRES.h"
-#include "ReWeight/GReWeightNuXSecCOH.h"
-#include "ReWeight/GReWeightNonResonanceBkg.h"
-#include "ReWeight/GReWeightFGM.h"
+#include "ReWeight/GReWeightAGKY.h"
 #include "ReWeight/GReWeightDISNuclMod.h"
-#include "ReWeight/GReWeightResonanceDecay.h"
+#include "ReWeight/GReWeightFGM.h"
 #include "ReWeight/GReWeightFZone.h"
 #include "ReWeight/GReWeightINuke.h"
-#include "ReWeight/GReWeightAGKY.h"
+#include "ReWeight/GReWeightNonResonanceBkg.h"
+#include "ReWeight/GReWeightNuXSecCCQE.h"
 #include "ReWeight/GReWeightNuXSecCCQEvec.h"
-#include "ReWeight/GReWeightNuXSecNCRES.h"
+#include "ReWeight/GReWeightNuXSecCCRES.h"
+#include "ReWeight/GReWeightNuXSecCOH.h"
 #include "ReWeight/GReWeightNuXSecDIS.h"
 #include "ReWeight/GReWeightNuXSecNC.h"
+#include "ReWeight/GReWeightNuXSecNCEL.h"
+#include "ReWeight/GReWeightNuXSecNCRES.h"
+#include "ReWeight/GReWeightResonanceDecay.h"
 using namespace genie;
 using namespace genie::rew;
 #endif
 
 #include "FitSplineHead.h"
+#include "GeneratorUtils.h"
 #include "TCanvas.h"
 #include "TGraph2D.h"
-#include "GeneratorUtils.h"
-
-enum RWDialType {
-  kNeutDial=0,
-  kNIWGDial,
-  kNuWroDial,
-  kGenieDial,
-  kCustomDial,
-  kNormDial
-};
-
 
 //******************************************
 class FitWeight {
-//******************************************
+  //******************************************
 
  public:
-
-  FitWeight(std::string rw_name, std::string inputfile); // Open a fit result file and grab the ttree and setup like that.
-  FitWeight(std::string rw_name="FitWeight");
+  FitWeight(std::string rw_name, std::string inputfile);  // Open a fit result
+                                                          // file and grab the
+                                                          // ttree and setup
+                                                          // like that.
+  FitWeight(std::string rw_name = "FitWeight");
   ~FitWeight(){};
 
   int GetDialEnum(std::string name, int type = -1);
   int GetRWEnum(int dial_enum);
 
-  void IncludeDial(std::string name, int type, double startval=0.0);
+  void IncludeDial(std::string name, int type, double startval = 0.0);
 
   void SetDialValue(std::string name, double val);
   void SetDialValue(int dial, double val);
 
-  double GetDialValue(std::string name, std::string option="");
+  double GetDialValue(std::string name, std::string option = "");
   double GetDialValue(int dial);
 
   unsigned int GetDialPos(std::string name);
@@ -178,62 +169,62 @@ class FitWeight {
 
   void PrintState();
 
-  void Reconfigure(bool silent=false);
+  void Reconfigure(bool silent = false);
 
+// GENERATOR SPECIFIC RW OBJECTS
 
-  // GENERATOR SPECIFIC RW OBJECTS
-
-#ifdef __NEUT_ENABLED__ // --- NEUT BLOCK
+#ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
   void SetupNeutRW();
   neut::rew::NReWeight* neut_rw;
 #endif
 
-#ifdef __NIWG_ENABLED__ // --- NIWG BLOCK
+#ifdef __NIWG_ENABLED__  // --- NIWG BLOCK
   void SetupNIWGRW();
   niwg::rew::NIWGReWeight* niwg_rw;
 #endif
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__ // --- NUWRO BLOCK
+#ifdef __NUWRO_REWEIGHT_ENABLED__  // --- NUWRO BLOCK
   void SetupNuwroRW();
   nuwro::rew::NuwroReWeight* nuwro_rw;
 #endif
 
-#ifdef __T2KREW_ENABLED__ // --- T2KRW BLOCK
+#ifdef __T2KREW_ENABLED__  // --- T2KRW BLOCK
   void SetupT2KRW();
-  t2krew::T2KReWeight  *t2k_rw; //!< T2K RW Object
+  t2krew::T2KReWeight* t2k_rw;  //!< T2K RW Object
   t2krew::T2KNeutReWeight* t2k_neutrw;
   t2krew::T2KNIWGReWeight* t2k_niwgrw;
 #endif
 
-#ifdef __GENIE_ENABLED__ // --- GENIE BLOCK
+#ifdef __GENIE_ENABLED__  // --- GENIE BLOCK
   void SetupGenieRW();
-  genie::rew::GReWeight  *genie_rw; //!< Genie RW Object
+  genie::rew::GReWeight* genie_rw;  //!< Genie RW Object
 #endif
 
-
-
   // SPLINE FUNCTIONS ------------
-  FitSplineHead* GetSplineHeader(){ return spline_head; };
+  FitSplineHead* GetSplineHeader() { return spline_head; };
   void SetupEventCoeff(BaseFitEvt* event);
-  void SetupSpline(std::string dialname, std::string splinename, std::string pointsdef);
+  void SetupSpline(std::string dialname, std::string splinename,
+                   std::string pointsdef);
   double CalcSplineWeight(BaseFitEvt* evt);
   void ReadSplineHead(FitSplineHead* splhead);
   void ResetSplines();
-  void GenSplines(BaseFitEvt* evt, bool save_graph=false);
+  void GenSplines(BaseFitEvt* evt, bool save_graph = false);
 
-  void Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph);
-  void Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom, bool save_graph);
-  void FitNDSplineCoeff(BaseFitEvt* event, FitSpline* spl, double norm, bool save_graph){
-    (void) event;
-    (void) spl;
-    (void) norm;
-    (void) save_graph;
+  void Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
+                        bool save_graph);
+  void Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
+                        bool save_graph);
+  void FitNDSplineCoeff(BaseFitEvt* event, FitSpline* spl, double norm,
+                        bool save_graph) {
+    (void)event;
+    (void)spl;
+    (void)norm;
+    (void)save_graph;
   };
 
   bool HasRWDialChanged(const double* x);
-  
- private:
 
+ private:
   int norm_enum;
 
   vector<std::string> dial_names;
@@ -244,24 +235,22 @@ class FitWeight {
 
   std::string rw_name;
   bool dial_changed;
-  bool using_neut, using_genie, using_niwg, using_t2k, using_nuwro;
+  bool using_neut, using_genie, using_niwg, using_t2k, using_nuwro, IncludedModeNorm;
   bool neut_changed, genie_changed, niwg_changed, nuwro_changed, t2k_changed;
 
   FitSplineHead* spline_head;
-
 };
 
 // GLOBAL FUNCTIONS FOR PAR CONV ----
-namespace FitBase{
+namespace FitBase {
 
-  TF1 GetRWConvFunction(std::string type, std::string name);
-  std::string GetRWUnits(std::string type, std::string name);
+TF1 GetRWConvFunction(std::string type, std::string name);
+std::string GetRWUnits(std::string type, std::string name);
 
-  double RWSigmaToFrac(std::string type, std::string name, double val);
-  double RWSigmaToAbs(std::string type, std::string name, double val);
-  double RWAbsToSigma(std::string type, std::string name, double val);
-  double RWFracToSigma(std::string type, std::string name, double val);
-
+double RWSigmaToFrac(std::string type, std::string name, double val);
+double RWSigmaToAbs(std::string type, std::string name, double val);
+double RWAbsToSigma(std::string type, std::string name, double val);
+double RWFracToSigma(std::string type, std::string name, double val);
 }
 
 #endif

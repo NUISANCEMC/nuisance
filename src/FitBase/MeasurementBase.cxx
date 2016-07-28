@@ -202,7 +202,7 @@ void MeasurementBase::Reconfigure(){
     //    this->FillExtraHistograms();
 
     // Print Out
-    if (LOG_LEVEL(REC) and  i % countwidth == 0)
+    if (LOG_LEVEL(REC) and countwidth and !(i % countwidth))
       LOG(REC) << "Reconfigured " << i <<" total events. [S,X,Y,Z,M,W] = ["
 	       << Signal << ", "
 	       << X_VAR  << ", "<< Y_VAR <<  ", "
