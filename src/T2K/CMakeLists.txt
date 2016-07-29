@@ -18,10 +18,26 @@
 ################################################################################
 set(IMPLFILES
 T2K_CC0pi_XSec_2DPcos_nu.cxx
+T2K_CC1pip_CH_XSec_1DQ2_nu.cxx
+T2K_CC1pip_CH_XSec_1DWrec_nu.cxx
+T2K_CC1pip_CH_XSec_1Dpmu_nu.cxx
+T2K_CC1pip_CH_XSec_1Dppi_nu.cxx
+T2K_CC1pip_CH_XSec_1Dq3_nu.cxx
+T2K_CC1pip_CH_XSec_1Dthmupi_nu.cxx
+T2K_CC1pip_CH_XSec_1Dthpi_nu.cxx
+T2K_CC1pip_CH_XSec_1Dthq3pi_nu.cxx
 )
 
 set(HEADERFILES
 T2K_CC0pi_XSec_2DPcos_nu.h
+T2K_CC1pip_CH_XSec_1DQ2_nu.h
+T2K_CC1pip_CH_XSec_1DWrec_nu.h
+T2K_CC1pip_CH_XSec_1Dpmu_nu.h
+T2K_CC1pip_CH_XSec_1Dppi_nu.h
+T2K_CC1pip_CH_XSec_1Dq3_nu.h
+T2K_CC1pip_CH_XSec_1Dthmupi_nu.h
+T2K_CC1pip_CH_XSec_1Dthpi_nu.h
+T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h
 )
 
 set(LIBNAME expT2K)

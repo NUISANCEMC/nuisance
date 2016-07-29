@@ -37,7 +37,7 @@ void MINERvA_CC1pi0_XSec_1Dthmu_antinu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppi0;
 
   // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
+  for (unsigned int j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 111) {

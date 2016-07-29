@@ -139,7 +139,7 @@ bool T2K_CC1pip_CH_XSec_1Dppi_nu::isSignal(FitEvent *event) {
     // does the event pass the pion angle cut? 
     // we already know there's just one muon in the event if it passes muonPass so don't need to make an event loop rejection
     // Need the neutrino four-vector to get the angle between pion and neutrino
-    TLorentzVector Pnu = nvect->PartInfo(0)->fP;
+    TLorentzVector Pnu = event->PartInfo(0)->fP;
     TLorentzVector Ppip;
     for (unsigned int j = 2; j < event->Npart(); j++) {
       if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
