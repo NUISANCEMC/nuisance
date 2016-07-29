@@ -308,7 +308,9 @@ double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVec
   double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu); // lepton mass  
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
-  double rEnu = EnuCC1pi0rec(pnu, pmu, ppi0); //reconstructed neutrino energy         
+  //double rEnu = EnuCC1pi0rec(pnu, pmu, ppi0); //reconstructed neutrino energy
+  // Use true neutrino energy
+  double rEnu = pnu.E()/1000.;
   double q2 = -m_mu*m_mu + 2.*rEnu*(E_mu - p_mu*cos(th_nu_mu));
 
   return q2;
