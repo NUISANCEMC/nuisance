@@ -78,7 +78,7 @@ namespace FitUtils{
   double th(TLorentzVector part, TLorentzVector part2);
 
   //! Hadronic mass reconstruction
-  double Wrec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
+  double Wrec(TLorentzVector pnu, TLorentzVector pmu);
 
 
   /*
@@ -98,26 +98,36 @@ namespace FitUtils{
   double ProtonQ2QErec(double pE, double binding);
 
   /*
-    CCpi0 MiniBooNE
+    CC1pi0 MiniBooNE
   */
    //! Reconstruct Enu from CCpi0 vectors and binding energy
-  double EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0);
+  double EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0=0);
 
   //! Reconstruct Q2 from CCpi0 vectors and binding energy
-  double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0);
+  double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0=0);
 
   /*
-    CCpi+ MiniBooNE
+    CC1pi+ MiniBooNE
   */
 
   //! returns reconstructed Enu a la MiniBooNE CCpi+
-  double EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip);
+  //! returns reconstructed Enu a la MiniBooNE CCpi+
+  // Also for when not having pion info (so when we have a Michel tag in T2K)
+  double EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip, bool pionInfo = true);
 
   //! returns reconstructed Enu assumming resonance interaction where intermediate resonance was a Delta
   double EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu);
 
-  //! returns reconstructed Q^2 a la MiniBooNE CCpi+
-  double Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip);
+  //! returns reconstructed in a variety of flavours
+  double Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip, int enuType = 0, bool pionInfo = true);
+
+  /*
+    T2K CC1pi+ on CH
+  */
+  double thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
+  double q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
+  double WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip);
+  double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
 
   /*
     nucleon single pion

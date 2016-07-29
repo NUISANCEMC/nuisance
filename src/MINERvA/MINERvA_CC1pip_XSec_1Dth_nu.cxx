@@ -65,7 +65,7 @@ void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu, Ppip);
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double th;
 
   if (hadMass > 100 && hadMass < 1400) {

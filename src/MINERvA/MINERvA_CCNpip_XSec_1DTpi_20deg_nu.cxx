@@ -67,7 +67,7 @@ void MINERvA_CCNpip_XSec_1DTpi_20deg_nu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu, Ppip);
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double Tpi;
 
   if (hadMass > 100 && hadMass < 1800) {

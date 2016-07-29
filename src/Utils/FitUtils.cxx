@@ -95,39 +95,11 @@ TH2D* FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int 
 /*
   MISC Event
 */
-//********************************************************
-double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi) {
-//********************************************************
-// Reconstruct the hadronic mass using all outgoing particles
-// Requires pion vector for reconstructing the neutrino energy
-// Could technically do E_nu = pnu.E() too, but this won't be reconstructed Enu; it's true Enu
-  (void) ppi; // P.S: Never used, looking into this.
 
-  double E_mu = pmu.E();
-  double p_mu = pmu.Vect().Mag();
-  double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
-  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
-
-  
-  const double m_p = 938.27203;
-  
-  // Warning: returned value is in GeV, need to multiply by 1000
-  //double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
-  double E_nu = pnu.E();
-
-
-  // Old stuff, kept for booking
-  //double q2 = 2*E_nu*(E_mu - p_mu * cos(th_nu_mu)) - m_mu*m_mu;
-  //double w_rec = sqrt(m_p*m_p - q2 + 2*m_p*EHad);
-
-  double w_rec = sqrt(m_p*m_p + m_mu*m_mu - 2*m_p*E_mu + 2*E_nu*(m_p - E_mu + p_mu * cos(th_nu_mu)));
-
-  return w_rec;
-
-};
-
-// Kinematic stuff
+//********************************************************************
+// Returns the kinetic energy of a particle in GeV
 double FitUtils::T(TLorentzVector part) {
+//********************************************************************
   double E_part = part.E()/1000.;
   double p_part = part.Vect().Mag()/1000.;
   double m_part = sqrt(E_part*E_part - p_part*p_part);
@@ -136,17 +108,89 @@ double FitUtils::T(TLorentzVector part) {
   return KE_part;
 };
 
+//********************************************************************
+// Returns the momentum of a particle in GeV
 double FitUtils::p(TLorentzVector part) {
+//********************************************************************
   double p_part = part.Vect().Mag()/1000.;
   return p_part;
 };
 
-//returns theta of two vectors (radians)
+//********************************************************************
+// Returns the angle between two particles in radians
 double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
+//********************************************************************
   double th = part1.Vect().Angle(part2.Vect());
   return th;
 };
 
+// T2K CC1pi+ helper functions
+//
+//********************************************************************
+// Returns the angle between q3 and the pion defined in Raquel's CC1pi+ on CH paper
+// Uses "MiniBooNE formula" for Enu, here called EnuCC1pip_T2K_MB
+//********************************************************************
+double FitUtils::thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi) {
+
+  // Want this in GeV
+  TVector3 p_mu = pmu.Vect()*(1./1000.);
+
+  // Get the reconstructed Enu
+  // We are not using Michel e sample, so we have pion kinematic information
+  double Enu    = EnuCC1piprec(pnu, pmu, ppi, true);
+
+  // Get neutrino unit direction, multiply by reconstructed Enu
+  TVector3 p_nu  = pnu.Vect()*(1./(pnu.Vect().Mag()))*Enu;
+  TVector3 p_pi = ppi.Vect()*(1./1000.);
+
+  // This is now in GeV
+  TVector3 q3 = (p_nu - p_mu);
+  // Want this in GeV
+
+  double th_q3_pi = q3.Angle(p_pi);
+
+  return th_q3_pi;
+}
+
+//********************************************************************
+// Returns the q3 defined in Raquel's CC1pi+ on CH paper
+// Uses "MiniBooNE formula" for Enu
+//********************************************************************
+double FitUtils::q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi) {
+
+  // Can't use the true Enu here; need to reconstruct it
+  // We do have Michel e- here so reconstruct Enu by "MiniBooNE formula" without pion kinematics
+  // The bool false refers to that we don't have pion kinematics
+  // Last bool refers to if we have pion kinematic information or not
+  double Enu        = EnuCC1piprec(pnu, pmu, ppi, false);
+
+  TVector3 p_mu     = pmu.Vect()*(1./1000.);
+  TVector3 p_nu     = pnu.Vect()*(1./pnu.Vect().Mag())*Enu;
+
+  double q3 = (p_nu - p_mu).Mag();
+
+  return q3;
+}
+
+//********************************************************************
+// Returns the W reconstruction from Raquel CC1pi+ CH thesis
+// Uses the MiniBooNE formula Enu
+//********************************************************************
+double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi) {
+
+  double E_mu = pmu.E()/1000.;
+  double p_mu = pmu.Vect().Mag()/1000.;
+  double E_nu = EnuCC1piprec(pnu, pmu, ppi, false);
+
+  const double m_n = 0.93956536;      // neutron/proton mass
+
+  double a1 = (E_nu + m_n) - E_mu;
+  double a2 = E_nu - p_mu;
+
+  double wrec = sqrt(a1*a1 - a2*a2);
+
+  return wrec;
+}
 
 //********************************************************
 double FitUtils::ProtonQ2QErec(double pE, double binding){
@@ -164,7 +208,9 @@ double FitUtils::ProtonQ2QErec(double pE, double binding){
 };
 
 
+//********************************************************************
 double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding, bool neutrino){
+//********************************************************************
 
   double momshift = 0.0;
    double temp = FitPar::Config().GetParD("muon_momentum_shift");
@@ -226,7 +272,11 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool 
   return q2;
 };
 
+//********************************************************************
+// Reconstructs Enu for CC1pi0
+// Very similar for CC1pi+ reconstruction
 double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0){
+//********************************************************************
 
   double E_mu = pmu.E()/1000;
   double p_mu = pmu.Vect().Mag()/1000;
@@ -242,13 +292,16 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVe
   const double m_p = 0.93827203;       // proton mass        
   double th_pi0_mu = ppi0.Vect().Angle(pmu.Vect());
 
-  double rEnu = (m_mu*m_mu + m_pi0*m_pi0 + m_n*m_n - m_p*m_p - 2*m_n*(E_pi0 + E_mu) + 2*E_pi0*E_mu - 2*p_pi0*p_mu*cos(th_pi0_mu))/(2*(E_pi0 + E_mu - p_pi0*cos(th_nu_pi0) - p_mu*cos(th_nu_mu) \
-																		  - m_n));
+  double rEnu = (m_mu*m_mu + m_pi0*m_pi0 + m_n*m_n - m_p*m_p - 2*m_n*(E_pi0 + E_mu) + 2*E_pi0*E_mu - 2*p_pi0*p_mu*cos(th_pi0_mu)) / (2*(E_pi0 + E_mu - p_pi0*cos(th_nu_pi0) - p_mu*cos(th_nu_mu) - m_n));
 
   return rEnu;
 };
 
+//********************************************************************
+// Reconstruct Q2 for CC1pi0 
+// Beware: uses true Enu, not reconstructed Enu
 double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0) {
+//********************************************************************
 
   double E_mu = pmu.E()/1000.;// energy of lepton in GeV     
   double p_mu = pmu.Vect().Mag()/1000.; // momentum of lepton
@@ -261,32 +314,53 @@ double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVec
   return q2;
 };
 
-double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip){
-// Reconstruct neutrino energy from outgoing particles; will differ from the actual neutrino energy
+//********************************************************************
+// Reconstruct Enu for CC1pi+
+// pionInfo reflects if we're using pion kinematics or not
+// In T2K CC1pi+ CH the Michel tag is used for pion in which pion kinematic info is lost and Enu is reconstructed without pion kinematics
+double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi, bool pionInfo){
+//********************************************************************
 
-  double E_mu = pmu.E()/1000;
-  double p_mu = pmu.Vect().Mag()/1000;
+  double E_mu = pmu.E()/1000.;
+  double p_mu = pmu.Vect().Mag()/1000.;
   double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
-  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
-  double E_pip = ppip.E()/1000;
-  double p_pip = ppip.Vect().Mag()/1000;
-  double m_pip = sqrt(E_pip*E_pip - p_pip*p_pip);
-  double th_nu_pip = pnu.Vect().Angle(ppip.Vect());
+  double E_pi = ppi.E()/1000.;
+  double p_pi = ppi.Vect().Mag()/1000.;
+  double m_pi = sqrt(E_pi*E_pi - p_pi*p_pi);
 
   const double m_n = 0.93956536;      // neutron/proton mass
                                       // should really take proton mass for proton interaction, neutron for neutron interaction. However, difference is pretty much negligable here!
 
-  // need this angle too      
-  double th_pip_mu = ppip.Vect().Angle(pmu.Vect());
+  // need this angle too
+  double th_nu_pi = pnu.Vect().Angle(ppi.Vect());
+  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
+  double th_pi_mu = ppi.Vect().Angle(pmu.Vect());
 
-  double rEnu = (m_mu*m_mu + m_pip*m_pip - 2*m_n*(E_pip + E_mu) + 2*E_pip*E_mu - 2*p_pip*p_mu*cos(th_pip_mu))/(2*(E_pip + E_mu - p_pip*cos(th_nu_pip) - p_mu*cos(th_nu_mu) - m_n));
+  double rEnu = -999;
+  // If experiment doesn't have pion kinematic information (T2K CC1pi+ CH example of this; Michel e sample has no directional information on pion)
+  // We'll need to modify the reconstruction variables
+  if (!pionInfo) {
+    // Assumes that pion angle contribution contributes net zero
+    // Also assumes the momentum of reconstructed pions when using Michel electrons is 130 MeV
+    // So need to redefine E_pi and p_pi
+    // It's a little unclear what happens to the pmu . ppi term (4-vector); do we include the angular contribution?
+    // This below doesn't
+    th_nu_pi = M_PI/2.;
+    p_pi = 0.130;
+    E_pi = sqrt(p_pi*p_pi + m_pi*m_pi);
+    //rEnu = (m_mu*m_mu + m_pi*m_pi - 2*m_n*(E_mu + E_pi) + 2*E_mu*E_pi - 2*p_mu*p_pi) / (2*(E_mu + E_pi - p_mu*cos(th_nu_mu) - m_n));
+  }
+
+  rEnu = (m_mu*m_mu + m_pi*m_pi - 2*m_n*(E_pi + E_mu) + 2*E_pi*E_mu - 2*p_pi*p_mu*cos(th_pi_mu))/(2*(E_pi + E_mu - p_pi*cos(th_nu_pi) - p_mu*cos(th_nu_mu) - m_n));
 
   return rEnu;
 };
 
-double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
+//********************************************************************
 // Reconstruct neutrino energy from outgoing particles; will differ from the actual neutrino energy. Here we use assumption of a Delta resonance
+double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
+//********************************************************************
 
   const double m_Delta = 1.232; // PDG value for Delta mass in GeV
   const double m_n = 0.93956536;      // neutron/proton mass
@@ -302,8 +376,91 @@ double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
   return rEnu;
 };
 
+//********************************************************************
+// Reconstruct Enu using "extended MiniBooNE" as defined in Raquel's T2K TN
+//
+// Supposedly includes pion direction and binding energy of target nucleon
+// I'm not convinced (yet), maybe
+double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi) {
+//********************************************************************
 
+  // Unit vector for neutrino momentum
+  TVector3 p_nu_vect_unit = pnu.Vect()*(1./pnu.E());
 
+  double E_mu = pmu.E()/1000.;
+  //double p_mu = pmu.Vect().Mag()/1000.;
+  TVector3 p_mu_vect = pmu.Vect()*(1./1000.);
+  //double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
+
+  double E_pi = ppi.E()/1000.;
+  //double p_pi = ppi.Vect().Mag()/1000.;
+  TVector3 p_pi_vect = ppi.Vect()*(1./1000.);
+  //double m_pi = sqrt(E_pi*E_pi - p_pi*p_pi);
+
+  double E_bind = 27./1000.; // This should be roughly correct for CH; but not clear!
+  double m_p = 0.939;
+
+  // Makes life a little easier, gonna square this one
+  double a1 = m_p - E_bind - E_mu - E_pi;
+  // Just gets the magnitude square of the muon and pion momentum vectors
+  double a2 = (p_mu_vect + p_pi_vect).Mag2();
+  // Gets the somewhat complicated scalar product between neutrino and (p_mu+p_pi), scaled to Enu
+  double a3 = p_nu_vect_unit*(p_mu_vect + p_pi_vect);
+
+  double rEnu = (m_p*m_p - a1*a1 + a2) / (2*(m_p - E_bind - E_mu - E_pi + a3));
+
+  return rEnu;
+}
+
+//********************************************************************
+// Reconstructed Q2 for CC1pi+
+//
+// enuType describes how the neutrino energy is reconstructed
+// 0 uses true neutrino energy; case for MINERvA and MiniBooNE
+// 1 uses "extended MiniBooNE" reconstructed (T2K CH)
+// 2 uses "MiniBooNE" reconstructed (EnuCC1piprec with pionInfo = true) (T2K CH)
+//        "MiniBooNE" reconstructed (EnuCC1piprec with pionInfo = false, the case for T2K when using Michel tag) (T2K CH)
+// 3 uses Delta for reconstruction (T2K CH)
+double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi, int enuType, bool pionInfo) {
+//********************************************************************
+
+  double E_mu = pmu.E()/1000.;// energy of lepton in GeV     
+  double p_mu = pmu.Vect().Mag()/1000.; // momentum of lepton
+  double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu); // lepton mass  
+  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
+
+  // Different ways of reconstructing the neutrino energy; default is just to use the truth (case 0)
+  double rEnu = -999;
+
+  switch (enuType) {
+
+    case 0: // True neutrino energy, default; this is the case for when Q2 defined as Q2 true (MiniBooNE, MINERvA)
+      rEnu = pnu.E()/1000.;
+      break;
+    case 1: // Extended MiniBooNE reconstructed, as defined by Raquel's CC1pi+ CH T2K analysis
+            // Definitely uses pion info :)
+      rEnu = EnuCC1piprec_T2K_eMB(pnu, pmu, ppi);
+      break;
+    case 2: // MiniBooNE reconstructed, as defined by MiniBooNE and Raquel's CC1pi+ CH T2K analysis and Linda's CC1pi+ H2O
+            // Can have this with and without pion info, depending on if Michel tag used (Raquel)
+      rEnu = EnuCC1piprec(pnu, pmu, ppi, pionInfo);
+      break;
+    case 3:
+      rEnu = EnuCC1piprecDelta(pnu, pmu);
+      break;
+  } // No need for default here since default value of enuType = 0, defined in header
+      
+
+  double q2 = -m_mu*m_mu + 2.*rEnu*(E_mu - p_mu*cos(th_nu_mu));
+
+  return q2;
+};
+
+//********************************************************************
+// Returns the reconstructed W from a nucleon and an outgoing pion
+//
+// Could do this a lot more clever (pp + ppi).Mag() would do the job, but this would be less instructive
+//********************************************************************
 double FitUtils::MpPi(TLorentzVector pp, TLorentzVector ppi) {
   double E_p = pp.E();
   double p_p = pp.Vect().Mag();
@@ -321,21 +478,37 @@ double FitUtils::MpPi(TLorentzVector pp, TLorentzVector ppi) {
   return invMass;
 };
 
-// the modified Q2 (only modified because different reconstructed energy
-// calculation)  
-double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip) {
+//********************************************************
+// Reconstruct the hadronic mass using all outgoing particles
+// Requires pion vector for reconstructing the neutrino energy
+// Could technically do E_nu = EnuCC1pipRec(pnu,pmu,ppi) too, but this wwill be reconstructed Enu; so gives reconstructed Wrec which most of the time isn't used!
+//
+// Only MINERvA uses this so far; and the Enu is Enu_true
 
-  double E_mu = pmu.E()/1000.;// energy of lepton in GeV     
-  double p_mu = pmu.Vect().Mag()/1000.; // momentum of lepton
-  double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu); // lepton mass  
+// Return value is in MeV!!!
+double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
+//********************************************************
+// Reconstruct the hadronic mass using all outgoing particles
+// Requires pion vector for reconstructing the neutrino energy
+// Could technically do E_nu = pnu.E() too, but this won't be reconstructed Enu; it's true Enu
+
+  double E_mu = pmu.E();
+  double p_mu = pmu.Vect().Mag();
+  double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
-  double rEnu = EnuCC1piprec(pnu, pmu, ppip); //reconstructed neutrino energy
-  double q2 = -m_mu*m_mu + 2.*rEnu*(E_mu - p_mu*cos(th_nu_mu));
+  
+  const double m_p = 938.27203;
+  
+  // MINERvA cut on W_exp which is tuned to W_true; so use true Enu from generators
+  double E_nu = pnu.E();
+  //double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
-  return q2;
+  double w_rec = sqrt(m_p*m_p + m_mu*m_mu - 2*m_p*E_mu + 2*E_nu*(m_p - E_mu + p_mu * cos(th_nu_mu)));
+
+  return w_rec;
+
 };
-
 
 /*
   E Recoil

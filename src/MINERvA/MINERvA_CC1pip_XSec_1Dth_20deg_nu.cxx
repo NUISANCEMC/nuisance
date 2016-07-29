@@ -65,7 +65,7 @@ void MINERvA_CC1pip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  hadMass = FitUtils::Wrec(Pnu, Pmu, Ppip);
+  hadMass = FitUtils::Wrec(Pnu, Pmu);
   hadMassHist->Fill(hadMass);
   double th;
 
