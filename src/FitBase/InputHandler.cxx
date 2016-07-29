@@ -891,7 +891,9 @@ void InputHandler::PrintStartInput() {
 //********************************************************************
 std::string InputHandler::GetInputStateString() {
   //********************************************************************
-
+  
+  tn->GetEntry(0);
+  cust_event->CalcKinematics();
   std::ostringstream state;
   state << "T" << eventType << "_PDG" << cust_event->PartInfo(0)->fPID << "_Z"
         << cust_event->TargetZ << "_A" << cust_event->TargetA;
