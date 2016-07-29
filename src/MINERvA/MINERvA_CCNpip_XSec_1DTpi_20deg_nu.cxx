@@ -1,22 +1,3 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NuFiX.
-*
-*    NuFiX is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NuFiX is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 #include "MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h"
 
 // The constructor
@@ -55,13 +36,11 @@ void MINERvA_CCNpip_XSec_1DTpi_20deg_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu;
 
   // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
+  for (int j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) == 211) {
-      if (event->PartInfo(j)->fP.Vect().Mag() > Ppip.Vect().Mag()) {
+    if (PID == 211 && event->PartInfo(j)->fP.E() > Ppip.E()) {
         Ppip = event->PartInfo(j)->fP;
-      }
     } else if (PID == 13) {
       Pmu = (event->PartInfo(j))->fP;  
     }

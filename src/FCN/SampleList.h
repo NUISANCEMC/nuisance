@@ -119,19 +119,29 @@
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_nue.h"
 #include "MINERvA_CC0pi_XSec_1DThetae_nue.h"
+
 // MINERvA CC1pi+
 #include "MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 // MINERvA CCNpi+
-#include "MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h"
-#include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
-#include "MINERvA_CCNpip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
+#include "MINERvA_CCNpip_XSec_1Dth_20deg_nu.h"
+#include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
+#include "MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h"
+#include "MINERvA_CCNpip_XSec_1Dpmu_nu.h"
+#include "MINERvA_CCNpip_XSec_1Dthmu_nu.h"
+#include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
+#include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
 // MINERvA CC1pi0
-#include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dthmu_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DQ2_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DEnu_antinu.h"
+
 // MINERvA CCINC
 #include "MINERvA_CCinc_XSec_2DEavq3_nu.h"
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
