@@ -218,7 +218,7 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax
     } else if (PID == 13) {
       lepCnt++;
     // Count the number of pions
-    } else if (abs(PID) == 211) {
+    } else if (PID == 211) {
       pipCnt++;
     }
   }

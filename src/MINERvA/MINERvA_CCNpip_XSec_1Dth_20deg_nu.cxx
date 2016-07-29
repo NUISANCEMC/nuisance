@@ -58,7 +58,7 @@ void MINERvA_CCNpip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {
   for (UInt_t j = 2; j < event->Npart(); ++j){
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
+    if (abs(PID) == 211) {
       if (event->PartInfo(j)->fP.Vect().Mag() > Ppip.Vect().Mag()) {
         Ppip = event->PartInfo(j)->fP;
       }
