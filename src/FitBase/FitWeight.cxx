@@ -291,9 +291,9 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
 
     // T2K RW INCLUDE DIAL
     case kT2K:
-#ifdef __T2KREW__ENABLED__
+#ifdef __T2KREW_ENABLED__
       if (!using_t2k) this->SetupT2KRW();
-      this->t2k_rw->Systematics().Add(static_cast<t2krew::T2KSyst_t>(rw_enum));
+      this->t2k_rw->Systematics().Include(static_cast<t2krew::T2KSyst_t>(rw_enum));
       break;
 #else
       ERR(FTL) << "Trying to Include T2K Dial is unsupported!" << std::endl;

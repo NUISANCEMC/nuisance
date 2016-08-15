@@ -42,11 +42,17 @@ else()
 endif()
 ##################################  NIWG  ######################################
 if(DEFINED USE_NIWG AND USE_NIWG)
-  cmessage(FATAL_ERROR "Unfortunately NIWG is not enabled for CMake build at the moment. Fix it yourself or check back later!")
   include(${CMAKE_SOURCE_DIR}/cmake/NIWGSetup.cmake)
   cmessage(STATUS "Using NIWG Reweight engine.")
 else()
   set(USE_NIWG 0)
+endif()
+##################################  T2K   ######################################
+if(DEFINED USE_T2K AND USE_T2K)
+  include(${CMAKE_SOURCE_DIR}/cmake/T2KSetup.cmake)
+  cmessage(STATUS "Using T2K Reweight engine.")
+else()
+  set(USE_T2K 0)
 endif()
 
 cmessage(STATUS "Reweight engine include directories: ${RWENGINE_INCLUDE_DIRECTORIES}")

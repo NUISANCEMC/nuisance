@@ -31,6 +31,7 @@ else()
   		  NuWro:${USE_NuWro},
 		  GENIE:${USE_GENIE},
 		  NIWG:${USE_NIWG},
+		  T2K:${USE_T2K},
   		  GiBUU:${USE_GiBUU},
 		  NUANCE:${USE_NUANCE}")
 endif()

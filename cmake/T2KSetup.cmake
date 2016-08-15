@@ -17,17 +17,17 @@
 #    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(NOT DEFINED ENV{NIWG} OR $ENV{NIWG} STREQUAL "")
+if(NOT DEFINED ENV{T2KREWEIGHT} OR $ENV{T2KREWEIGHT} STREQUAL "")
 
-    cmessage(FATAL_ERROR "Environment variable NIWG is not defined. "
-    "This must be set to point to a prebuilt NIWGReWeight instance.")
+    cmessage(FATAL_ERROR "Environment variable T2KREWEIGHT is not defined. "
+    "This must be set to point to a prebuilt T2KReWeight instance.")
 
 endif()
 
-set(NIWG $ENV{NIWG})
+set(T2KREWEIGHT $ENV{T2KREWEIGHT})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NIWG_ENABLED__ ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__T2KREW_ENABLED__ ")
 
-set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES} ${NIWG})
+set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES} ${T2KREWEIGHT}/src/)
 
-set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} -L${NIWG} -lNIWGReWeight")
+set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} -L${T2KREWEIGHT}/lib -lT2KReWeight")
