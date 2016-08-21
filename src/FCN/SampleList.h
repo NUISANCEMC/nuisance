@@ -31,6 +31,11 @@
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 
+#include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dthetamu_nu.h"
+
 // BNL CCQE
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
 #include "BNL_CCQE_XSec_1DEnu_nu.h"

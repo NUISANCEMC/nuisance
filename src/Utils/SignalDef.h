@@ -1,20 +1,20 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
+*    This file is part of NuFiX.
 *
-*    NUISANCE is free software: you can redistribute it and/or modify
+*    NuFiX is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
 *    the Free Software Foundation, either version 3 of the License, or
 *    (at your option) any later version.
 *
-*    NUISANCE is distributed in the hope that it will be useful,
+*    NuFiX is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 *
 *    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 // contains signal definitions for various interactions
@@ -28,7 +28,6 @@
 #include <TLorentzVector.h>
 
 // ExtFit includes
-#include "FitUtils.h"
 #include "FitEvent.h"
 
 // make it a namespace
@@ -74,8 +73,8 @@ namespace SignalDef {
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
 
-};
+  bool isCCInc_ArgoNeuT(FitEvent* event, bool IsAnti=false);
 
-
+}
 
 #endif

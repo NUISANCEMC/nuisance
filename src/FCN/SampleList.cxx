@@ -66,6 +66,17 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
   } else if (!name.compare("ANL_NC1npip_Evt_1Dppi_nu")) {
     fChain->push_back(new ANL_NC1npip_Evt_1Dppi_nu(file, rw, type, fkdt));
 
+  } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
+    fChain->push_back(
+        new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
+    fChain->push_back(new ArgoNeuT_CCInc_XSec_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_antinu")) {
+    fChain->push_back(
+        new ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_nu")) {
+    fChain->push_back(
+        new ArgoNeuT_CCInc_XSec_1Dthetamu_nu(file, rw, type, fkdt));
     /*
       BNL Samples
     */
@@ -178,9 +189,9 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
       CCQE
     */
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
-             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")){
+             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")) {
     fChain->push_back(
-	new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
+        new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu")) {
     fChain->push_back(
@@ -261,9 +272,12 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
       MiniBooNE NCEL
     */
   } else if (!name.compare("MiniBooNE_NCEL_XSec_Treco_nu")) {
-    std::cerr << "MiniBooNE_NCEL_XSec_Treco_nu not implemented in current interface." << std::endl;
+    std::cerr
+        << "MiniBooNE_NCEL_XSec_Treco_nu not implemented in current interface."
+        << std::endl;
     throw 5;
-    // fChain->push_back(new MiniBooNE_NCEL_XSec_Treco_nu(file, rw, type, fkdt));
+    // fChain->push_back(new MiniBooNE_NCEL_XSec_Treco_nu(file, rw, type,
+    // fkdt));
 
     /*
 MINERvA Samples
@@ -323,101 +337,111 @@ MINERvA Samples
     /*
       CCNpi+
     */
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1Dth_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1Dth_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_20deg_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1Dth_20deg_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_20deg_nu")) {
+    fChain->push_back(
+        new MINERvA_CCNpip_XSec_1Dth_20deg_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1DTpi_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1DTpi_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_20deg_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1DTpi_20deg_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_20deg_nu")) {
+    fChain->push_back(
+        new MINERvA_CCNpip_XSec_1DTpi_20deg_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1Dthmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1Dthmu_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1Dpmu_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dpmu_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1Dpmu_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1DQ2_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1DQ2_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1DQ2_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1DQ2_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CCNpip_XSec_1DEnu_nu")) {
-      fChain  ->push_back(new MINERvA_CCNpip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1DEnu_nu")) {
+    fChain->push_back(new MINERvA_CCNpip_XSec_1DEnu_nu(file, rw, type, fkdt));
 
     /*
       CC1pi0
     */
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1Dth_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1Dth_antinu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1Dppi0_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1Dppi0_antinu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1DQ2_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1DQ2_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1DQ2_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1DQ2_antinu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dthmu_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1Dthmu_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dthmu_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1Dthmu_antinu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dpmu_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1Dpmu_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dpmu_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1Dpmu_antinu(file, rw, type, fkdt));
 
-    } else if (!name.compare("MINERvA_CC1pi0_XSec_1DEnu_antinu")) {
-      fChain  ->push_back(new MINERvA_CC1pi0_XSec_1DEnu_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1DEnu_antinu")) {
+    fChain->push_back(
+        new MINERvA_CC1pi0_XSec_1DEnu_antinu(file, rw, type, fkdt));
 
     /*
       CCINC
-    */    
+    */
   } else if (!name.compare("MINERvA_CCinc_XSec_2DEavq3_nu")) {
     fChain->push_back(new MINERvA_CCinc_XSec_2DEavq3_nu(file, rw, type, fkdt));
 
-  } else if (!name.compare("MINERvA_CCinc_XSec_1Dx_ratio_C12_CH")    ||
-	     !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH")   ||
-	     !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
-    fChain  ->push_back(new MINERvA_CCinc_XSec_1Dx_ratio(name, file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCinc_XSec_1Dx_ratio_C12_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
+    fChain->push_back(
+        new MINERvA_CCinc_XSec_1Dx_ratio(name, file, rw, type, fkdt));
 
-  } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH")    ||
-	     !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH")   ||
-	     !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
-    fChain  ->push_back(new MINERvA_CCinc_XSec_1DEnu_ratio(name, file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
+    fChain->push_back(
+        new MINERvA_CCinc_XSec_1DEnu_ratio(name, file, rw, type, fkdt));
 
     /*
 T2K Samples
     */
 
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
-	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
-	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
+             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
     fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type, fkdt));
-    /* 
+    /*
       T2K CC1pi+ CH samples
     */
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dpmu_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dpmu_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dpmu_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dppi_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dppi_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dppi_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dppi_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1DQ2_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1DQ2_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dq3_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dq3_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthmupi_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dthmupi_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthmupi_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dthmupi_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dthpi_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dthpi_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthq3pi_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthq3pi_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DWrec_nu")) {
-      fChain  ->push_back(new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1DWrec_nu")) {
+    fChain->push_back(new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
 
     /*
 K2K Samples

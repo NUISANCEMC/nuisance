@@ -1,50 +1,50 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
+*    This file is part of NuFiX.
 *
-*    NUISANCE is free software: you can redistribute it and/or modify
+*    NuFiX is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
 *    the Free Software Foundation, either version 3 of the License, or
 *    (at your option) any later version.
 *
-*    NUISANCE is distributed in the hope that it will be useful,
+*    NuFiX is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 *
 *    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 #ifndef FITUTILS_H_SEEN
 #define FITUTILS_H_SEEN
 
 // C Includes
-#include <stdlib.h>
-#include <numeric>
 #include <math.h>
-#include <iostream>
+#include <stdlib.h>
 #include <unistd.h>
 #include <ctime>
+#include <iostream>
+#include <numeric>
 
 // ROOT includes
-#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
 #include <TH1D.h>
 #include <TH2D.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TLorentzVector.h>
-#include <TList.h>
-#include <TKey.h>
 #include <THStack.h>
+#include <TKey.h>
 #include <TLegend.h>
+#include <TList.h>
+#include <TLorentzVector.h>
 #include <TObjArray.h>
+#include <TROOT.h>
 #include <TRandom3.h>
-#include "TH2Poly.h"
-#include "TGraph.h"
+#include <TTree.h>
 #include "FitEvent.h"
+#include "TGraph.h"
+#include "TH2Poly.h"
 
 // Fit  includes
 #include "FitParameters.h"
@@ -55,92 +55,137 @@
  */
 
 //! Functions needed by individual samples for calculating kinematic quantities.
-namespace FitUtils{
+namespace FitUtils {
 
-  /*
-    MISC
-  */
+/*
+  MISC
+*/
 
-  //! Function to produce a histogram indicating the fraction of events which have q3 < qCut
-  TH2D* CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int nuPDG, double eMin, double eMax);
+//! Function to produce a histogram indicating the fraction of events which have
+//! q3 < qCut
+TH2D* CalculateQ3Cut(std::string inFile, TH2D* data, double qCut, int nuPDG,
+                     double eMin, double eMax);
 
-  /*
-    MISC Event
-  */
+/*
+  MISC Event
+*/
 
-  //! Returns kinetic energy of particle
-  double T(TLorentzVector part);
+//! Returns kinetic energy of particle
+double T(TLorentzVector part);
 
-  //! Returns momentum of particle
-  double p(TLorentzVector part);
+//! Returns momentum of particle
+double p(TLorentzVector part);
 
-  //! Returns angle between particles (_NOT_ cosine!)
-  double th(TLorentzVector part, TLorentzVector part2);
+//! Returns angle between particles (_NOT_ cosine!)
+double th(TLorentzVector part, TLorentzVector part2);
 
-  //! Hadronic mass reconstruction
-  double Wrec(TLorentzVector pnu, TLorentzVector pmu);
+//! Hadronic mass reconstruction
+double Wrec(TLorentzVector pnu, TLorentzVector pmu);
 
+/*
+  CCQE MiniBooNE/MINERvA
+*/
+//! Function to calculate the reconstructed Q^{2}_{QE}
+double Q2QErec(TLorentzVector pmu, double costh, double binding,
+               bool neutrino = true);
 
-  /*
-    CCQE MiniBooNE/MINERvA
-  */
-  //! Function to calculate the reconstructed Q^{2}_{QE}
-  double Q2QErec(TLorentzVector pmu, double costh, double binding, bool neutrino = true);
+//! Function returns the reconstructed E_{nu} values
+double EnuQErec(TLorentzVector pmu, double costh, double binding,
+                bool neutrino = true);
 
-  //! Function returns the reconstructed E_{nu} values
-  double EnuQErec(TLorentzVector pmu, double costh, double binding, bool neutrino = true);
+/*
+  CCQE1p MINERvA
+*/
+//! Reconstruct Q2QE given just the maximum energy proton.
+double ProtonQ2QErec(double pE, double binding);
 
+/*
+  CC1pi0 MiniBooNE
+*/
+//! Reconstruct Enu from CCpi0 vectors and binding energy
+double EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
+                    TLorentzVector ppi0 = TLorentzVector(0, 0, 0, 0));
 
-  /*
-    CCQE1p MINERvA
-  */
-  //! Reconstruct Q2QE given just the maximum energy proton.
-  double ProtonQ2QErec(double pE, double binding);
+//! Reconstruct Q2 from CCpi0 vectors and binding energy
+double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
+                   TLorentzVector ppi0 = TLorentzVector(0, 0, 0, 0));
 
-  /*
-    CC1pi0 MiniBooNE
-  */
-   //! Reconstruct Enu from CCpi0 vectors and binding energy
-  double EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0=TLorentzVector(0,0,0,0));
+/*
+  CC1pi+ MiniBooNE
+*/
 
-  //! Reconstruct Q2 from CCpi0 vectors and binding energy
-  double Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi0=TLorentzVector(0,0,0,0));
+//! returns reconstructed Enu a la MiniBooNE CCpi+
+//! returns reconstructed Enu a la MiniBooNE CCpi+
+// Also for when not having pion info (so when we have a Michel tag in T2K)
+double EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip,
+                    bool pionInfo = true);
 
-  /*
-    CC1pi+ MiniBooNE
-  */
+//! returns reconstructed Enu assumming resonance interaction where intermediate
+//! resonance was a Delta
+double EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu);
 
-  //! returns reconstructed Enu a la MiniBooNE CCpi+
-  //! returns reconstructed Enu a la MiniBooNE CCpi+
-  // Also for when not having pion info (so when we have a Michel tag in T2K)
-  double EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip, bool pionInfo = true);
+//! returns reconstructed in a variety of flavours
+double Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip,
+                   int enuType = 0, bool pionInfo = true);
 
-  //! returns reconstructed Enu assumming resonance interaction where intermediate resonance was a Delta
-  double EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu);
+/*
+  T2K CC1pi+ on CH
+*/
+double thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
+                         TLorentzVector ppi);
+double q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
+                     TLorentzVector ppi);
+double WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
+                         TLorentzVector ppip);
+double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
+                            TLorentzVector ppi);
 
-  //! returns reconstructed in a variety of flavours
-  double Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip, int enuType = 0, bool pionInfo = true);
+/*
+  nucleon single pion
+*/
+double MpPi(TLorentzVector pp, TLorentzVector ppi);
 
-  /*
-    T2K CC1pi+ on CH
-  */
-  double thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
-  double q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
-  double WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppip);
-  double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector ppi);
+/*
+  E Recoil Calculations
+ */
+double GetErecoil_TRUE(FitEvent* event);
+double GetErecoil_CHARGED(FitEvent* event);
+double GetErecoil_MINERvA_LowRecoil(FitEvent* event);
 
-  /*
-    nucleon single pion
-  */
-  double MpPi(TLorentzVector pp, TLorentzVector ppi);
+/// Gets the 4 mom of the highest momentum alive particle with a PDG
+/// contained within pdgs.
+template <size_t N>
+std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdgs)[N],
+                                             FitEvent *event) {
+  TLorentzVector CHM(0, 0, 0, 0);
+  int HMPDG = 0;
 
+  for (int i = 0; i < event->Npart(); i++) {
+    // Only final state
+    if (!event->PartInfo(i)->fIsAlive) continue;
 
-  /*
-    E Recoil Calculations
-   */
-  double GetErecoil_TRUE(FitEvent* event);
-  double GetErecoil_CHARGED(FitEvent* event);
-  double GetErecoil_MINERvA_LowRecoil(FitEvent* event);  
+    bool found = false;
+
+    for (size_t it = 0; it < N; ++it) {
+      if (event->PartInfo(i)->fPID != pdgs[it]) continue;
+      found = true;
+      break;
+    }
+
+    if (!found) continue;
+
+    if (event->PartInfo(i)->fP.Vect().Mag2() > CHM.Vect().Mag2()) {
+      CHM = event->PartInfo(i)->fP;
+      HMPDG = event->PartInfo(i)->fPID;
+    }
+  }
+  return std::make_pair(CHM, HMPDG);
+}
+
+/// Gets the 4 mom of the highest momentum alive particle with a PDG
+/// contained equal to pdg.
+TLorentzVector GetHMPDG_4Mom(int pdg, FitEvent *event);
+
 }
 
 /*! @} */
