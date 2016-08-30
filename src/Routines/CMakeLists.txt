@@ -32,7 +32,7 @@ if(USE_MINIMIZER)
   set(HEADERFILES ${HEADERFILES};minimizerRoutine.h)
 endif()
 
-set(LIBNAME Minimizer)
+set(LIBNAME Routines)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(${LIBNAME} STATIC ${IMPLFILES})

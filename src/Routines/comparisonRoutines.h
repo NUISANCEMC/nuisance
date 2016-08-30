@@ -87,10 +87,6 @@ public:
   //! Read in the samples so we can set up the free normalisation dials if required
   void readSamples(std::string sampleString);
 
-  //! Read in a parameter pulls class as a covariance for the fit. Currently just used for throwing covariances but will change covariance pull
-  //! terms to use this method soon so it is a bit clearer.
-  void readCovariance(std::string covarString);
-
   /*
     Setup Functions
   */
@@ -108,10 +104,6 @@ public:
   //! Set the current data histograms in each sample to the fake data.
   void setFakeData();
 
-  //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
-  //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
-  void SetupCovariance();
-
   void ReconfigureAllEvents();
   
   /*
@@ -127,20 +119,6 @@ public:
   //! Given a single routine (see tutorial for options) run that fit routine now.
   void RunFitRoutine(std::string routine);
 
-  //! Throw the current covariance of dial values we have, and fill the thrownVals and thrownNorms maps.
-  //! If uniformly is true parameters will be thrown uniformly between their upper and lower limits.
-  void ThrowCovariance(bool uniformly);
-
-  //! Step through each parameter one by one and create folders containing the MC predictions at each step.
-  //! Doesn't handle correlated parameters well
-  void PlotLimits();
-
-  //! Given the covariance we currently have generate error bands by throwing the covariance.
-  //! The FitPar config "error_uniform" defines whether to throw using the covariance or uniformly.
-  //! The FitPar config "error_throws" defines how many throws are needed.
-  //! Currently only supports TH1D plots.
-  void GenerateErrorBands();
-
   /*
     Write Functions
   */
@@ -151,11 +129,6 @@ public:
 
   //! Save starting predictions into a seperate folder
   void saveNominal();
-
-  //! Save predictions before the fit is ran into a seperate folder
-  void savePrefit();
-
-
 
 protected:
 
