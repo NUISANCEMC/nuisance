@@ -142,13 +142,21 @@ void comparisonRoutines::readCard() {
 
   std::string line;
   std::ifstream card(this->cardFile.c_str(), ifstream::in);
-
+  int linecount = 0;
+  
   while (std::getline(card, line, '\n')) {
     std::istringstream stream(line);
-
+    linecount += 1;
+    
     FitPar::Config().cardLines.push_back(line);
 
-    readParameters(line);
+    int readstatus = readParameters(line);
+    if (readstatus != 0){
+      ERR(FTL) << "Bad parameter read! " << endl;
+      ERR(FTL) << "Line " << linecount << " : " << line << endl;
+
+    }
+    
     readFakeDataPars(line);
     readSamples(line);
   }
@@ -157,7 +165,7 @@ void comparisonRoutines::readCard() {
 };
 
 //*****************************************
-void comparisonRoutines::readParameters(std::string parstring) {
+int comparisonRoutines::readParameters(std::string parstring) {
   //******************************************
 
   std::string token, parname;
@@ -168,7 +176,7 @@ void comparisonRoutines::readParameters(std::string parstring) {
   std::string curparstate = "";
   std::string partype_str = "";
 
-  if (parstring.c_str()[0] == '#') return;
+  if (parstring.c_str()[0] == '#') return 0;
 
   while (std::getline(stream, token, ' ')) {
     stream >> std::ws;
@@ -187,7 +195,7 @@ void comparisonRoutines::readParameters(std::string parstring) {
         token.compare("neut_parameter") && token.compare("genie_parameter") &&
         token.compare("nuwro_parameter") && token.compare("custom_parameter") &&
         token.compare("t2k_parameter") && token.compare("modenorm_parameter")) {
-      return;
+      return 0;
 
     } else if (val == 0) {
       partype_str = token;
@@ -284,7 +292,7 @@ void comparisonRoutines::readParameters(std::string parstring) {
     LOG(MIN) << " -> " << startVals[parname] << std::endl;
   }
 
-  return;
+  return 0;
 }
 
 

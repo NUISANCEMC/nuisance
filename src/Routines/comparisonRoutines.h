@@ -79,7 +79,7 @@ public:
 
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters
-  void readParameters(std::string parstring);
+  int readParameters(std::string parstring);
 
   //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
   void readFakeDataPars(std::string parstring);
