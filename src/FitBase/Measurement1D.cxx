@@ -152,6 +152,9 @@ void Measurement1D::SetupDefaultHist(){
 void Measurement1D::SetFitOptions(std::string opt){
 //********************************************************************
 
+  // Do nothing if default given
+  if (opt == "DEFAULT") return;
+  
   // CHECK Conflicting Fit Options
   std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(allowed_types, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++){

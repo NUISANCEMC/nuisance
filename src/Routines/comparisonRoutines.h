@@ -85,7 +85,7 @@ public:
   void readFakeDataPars(std::string parstring);
 
   //! Read in the samples so we can set up the free normalisation dials if required
-  void readSamples(std::string sampleString);
+  int readSamples(std::string sampleString);
 
   /*
     Setup Functions

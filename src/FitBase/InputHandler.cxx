@@ -46,6 +46,12 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   if (inType.compare("JOINT"))
     this->inRootFile = new TFile(this->inFile.c_str(), "READ");
 
+  // Check file exists
+  if (this->inRootFile->IsZombie()){
+    ERR(FTL) << "Cannot find InputFile!" << endl;
+    throw;
+  }
+  
   // Setup the handler for each type
   if (!inType.compare("NEUT"))
     this->ReadNeutFile();
@@ -107,6 +113,13 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     }
   }
 
+  // If no input type ERROR!
+  if (inType.empty()){
+    ERR(FTL) << "No input type supplied for InputHandler!" << endl;
+    ERR(FTL) << "Problematic Input: " << inputstring << endl;
+    throw;
+  }
+  
   // Parse out envir flags
   const int nfiledir = 5;
   const std::string filedir[nfiledir] = {"NEUT_DIR", "NUWRO_DIR", "GENIE_DIR",

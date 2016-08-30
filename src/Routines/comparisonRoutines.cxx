@@ -138,8 +138,9 @@ void comparisonRoutines::initialSetup() {
 
 //*************************************
 void comparisonRoutines::readCard() {
-  //*************************************
-
+//*************************************
+  cout << "Parsing input card..." << endl;
+  
   std::string line;
   std::ifstream card(this->cardFile.c_str(), ifstream::in);
   int linecount = 0;
@@ -147,18 +148,54 @@ void comparisonRoutines::readCard() {
   while (std::getline(card, line, '\n')) {
     std::istringstream stream(line);
     linecount += 1;
-    
+
+    // Skip comment lines
+    if (line.empty()) continue;
+    if (line.c_str()[0] == '#') continue;
+
+    // Save card to params
     FitPar::Config().cardLines.push_back(line);
 
+    // Read in RW Parameters
     int readstatus = readParameters(line);
     if (readstatus != 0){
       ERR(FTL) << "Bad parameter read! " << endl;
-      ERR(FTL) << "Line " << linecount << " : " << line << endl;
-
+      ERR(FTL) << "Line " << linecount << " : '" << line << "'" << endl;
+      ERR(FTL) << "Correct Formats: " << endl;
+      cout << "neut_parameter     PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "niwg_parameter     PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "genie_parameter    PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "nuwro_parameter    PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "t2k_parameter      PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "custom_parameter   PARAM_NAME   PARAM_VALUE" << endl;
+      cout << "modenorm_parameter PARAM_NAME   PARAM_VALUE" << endl;
+      throw;
     }
-    
+
+    // Read in FAKE MC Parameters
     readFakeDataPars(line);
-    readSamples(line);
+
+    // Read in Sample Config
+    readstatus += readSamples(line);
+    if (readstatus != 0){
+      ERR(FTL) << "Bad sample read! " << endl;
+      ERR(FTL) << "Line " << linecount << " : '" << line << "'" << endl;
+      ERR(FTL) << "Correct Format [OPTIONAL]: " << endl;
+      cout << "'sample   SAMPLE_ID  TYPE:INPUT_FILE  [STATE   NORM]'" << endl;
+      ERR(FTL) << "SAMPLE_ID : Sample Name. Look in src/SampleList.cxx" << endl;
+      ERR(FTL) << "TYPE : Specify file type "
+	       << "(NEUT,GENIE,GST,NUWRO,GIBUU,NUANCE) " << endl;
+      ERR(FTL) << "INPUT_FILE : full path to input file " << endl;
+      ERR(FTL) << "STATE : Sample options, "
+	       << "see source code, or put DEFAULT" << endl;
+      ERR(FTL) << "NORM : Scaling term to normalise MC to 1/chosen value"
+	       << endl;
+      ERR(FTL) << "e.g. MiniBooNE CCQE Data comparison with "
+	       << "NEUT xsec scaled to 1.25 nominal value:" << endl;
+      cout     << "sample  MiniBooNE_CCQE_XSec_1DQ2_nu "
+	       << "NEUT:/path/to/neutvect.root DEFAULT 0.8" << endl;
+      throw;
+    }
   }
   card.close();
   return;
@@ -166,91 +203,79 @@ void comparisonRoutines::readCard() {
 
 //*****************************************
 int comparisonRoutines::readParameters(std::string parstring) {
-  //******************************************
+//******************************************
 
-  std::string token, parname;
-  std::istringstream stream(parstring);
-  int val = 0;
-  double entry;
+  // Parse line
+  // *_parameter    parname    nom  [low  high step state]
+  std::vector<std::string> parvect = PlotUtils::FillVectorSFromString(parstring," ");
+
+  // Check line is long enough
+  if (parvect.empty()) return 0;
+
+  // Check for parameter
+  if (parvect[0].find("parameter") == std::string::npos) return 0;
+
+  // Check for missing entries
+  if (parvect.size() < 2){
+    ERR(FTL) << parvect[1] << " specified with no parameter id!" << endl;
+    return -1;
+  }
+
+  if (parvect.size() < 3){
+    ERR(WRN) << parvect[0] << " " << parvect[1]
+	     << " specified with out a value!" << endl;
+    ERR(WRN) << "Assuming a value of 0.0 sigma!" << endl;
+    sleep(1);
+  }
+
+  // Parse the string also into doubles
+  std::vector<double> pardoub = PlotUtils::FillVectorDFromString(parstring, " ");
+
+  // Set parameter type
+  std::string partype_str = parvect[0];
   int partype;
-  std::string curparstate = "";
-  std::string partype_str = "";
+  if (!partype_str.compare("neut_parameter"))
+    partype = kNEUT;
+  else if (!partype_str.compare("niwg_parameter"))
+    partype = kNIWG;
+  else if (!partype_str.compare("genie_parameter"))
+    partype = kGENIE;
+  else if (!partype_str.compare("nuwro_parameter"))
+    partype = kNUWRO;
+  else if (!partype_str.compare("custom_parameter"))
+    partype = kCUSTOM;
+  else if (!partype_str.compare("t2k_parameter"))
+    partype = kT2K;
+  else if (!partype_str.compare("modenorm_parameter"))
+    partype = kMODENORM;
+  else {
+    ERR(FTL) << "Unknown parameter type! : "
+	     << partype_str << endl;
+  }
 
-  if (parstring.c_str()[0] == '#') return 0;
+  // Set Parameter Name and Default
+  std::string parname = parvect[1];
+  params.push_back(parname);
 
-  while (std::getline(stream, token, ' ')) {
-    stream >> std::ws;
+  // Setup type map
+  params_type[parname] = partype;
 
-    std::istringstream stoken(token);
-    if (val > 1 and val < 6) stoken >> entry;
+  // Set Default parameters for dial
+  currentVals[parname] = 0.0;
 
-    // Allow (parameter name val FIX)
-    if (val > 2 and val < 6 and token.find("FIX") != std::string::npos) {
-      startFixVals[parname] = true;
-      fixVals[parname] = true;
-      break;
-    }
+  // Set Parameter Nominal
+  double curval = 0.0;
+  if (parvect.size() > 2){
 
-    if (val == 0 && token.compare("niwg_parameter") &&
-        token.compare("neut_parameter") && token.compare("genie_parameter") &&
-        token.compare("nuwro_parameter") && token.compare("custom_parameter") &&
-        token.compare("t2k_parameter") && token.compare("modenorm_parameter")) {
-      return 0;
+    curval = pardoub[2];
+    currentVals[parname] = curval;
 
-    } else if (val == 0) {
-      partype_str = token;
+  }
 
-      if (!token.compare("neut_parameter"))
-        partype = kNEUT;
-      else if (!token.compare("niwg_parameter"))
-        partype = kNIWG;
-      else if (!token.compare("genie_parameter"))
-        partype = kGENIE;
-      else if (!token.compare("nuwro_parameter"))
-        partype = kNUWRO;
-      else if (!token.compare("custom_parameter"))
-        partype = kCUSTOM;
-      else if (!token.compare("t2k_parameter"))
-        partype = kT2K;
-      else if (!token.compare("modenorm_parameter"))
-        partype = kMODENORM;
-
-    } else if (val == 1) {
-      params.push_back(token);
-      parname = token;
-
-      // Set Type
-      params_type[parname] = partype;
-
-      // Defaults
-      startVals[parname] = 0.0;
-      currentVals[parname] = 0.0;
-      errorVals[parname] = 0.0;
-
-      minVals[parname] = -1.0;
-      maxVals[parname] = 1.0;
-      stepVals[parname] = 0.5;
-
-    } else if (val == 2) {  // Nominal
-      startVals[parname] = entry;
-      currentVals[parname] = entry;
-      errorVals[parname] = 0.0;
-    } else if (val == 3) {
-      minVals[parname] = entry;  // min
-    } else if (val == 4) {
-      maxVals[parname] = entry;  // max
-    } else if (val == 5) {
-      stepVals[parname] = entry;  // step
-    } else if (val == 6) {        // type
-      startFixVals[parname] = (token.find("FIX") != std::string::npos);
-      fixVals[parname] = (token.find("FIX") != std::string::npos);
-
-      curparstate = token;
-
-    } else
-      break;
-
-    val++;
+  // Set limits if stated
+  std::string curparstate = "FIX";
+  if (parvect.size() > 3){
+    curparstate = parvect[3];
   }
 
   // Run Dial Conversions
@@ -258,43 +283,24 @@ int comparisonRoutines::readParameters(std::string parstring) {
   // ABSOLUTE CONVERSION
   if (curparstate.find("ABS") != std::string::npos) {
     LOG(MIN) << "Converting abs dial " << parname << " : "
-             << startVals[parname];
-    startVals[parname] =
-        FitBase::RWAbsToSigma(partype_str, parname, startVals[parname]);
-    currentVals[parname] =
-        FitBase::RWAbsToSigma(partype_str, parname, currentVals[parname]);
-    minVals[parname] =
-        FitBase::RWAbsToSigma(partype_str, parname, minVals[parname]);
-    maxVals[parname] =
-        FitBase::RWAbsToSigma(partype_str, parname, maxVals[parname]);
-    stepVals[parname] =
-        fabs((FitBase::RWAbsToSigma(partype_str, parname,
-                                    startVals[parname] + stepVals[parname]) -
-              FitBase::RWAbsToSigma(partype_str, parname, startVals[parname])));
+	     << currentVals[parname];
+        currentVals[parname] =
+	  FitBase::RWAbsToSigma(partype_str, parname, currentVals[parname]);
 
-    LOG(MIN) << " -> " << startVals[parname] << std::endl;
-
-    // FRACTION CONVERSION
+	// FRACTION CONVERSION
   } else if (curparstate.find("FRAC") != std::string::npos) {
     LOG(FIT) << "Converting frac dial " << parname << " : "
-             << startVals[parname];
-    startVals[parname] =
-        FitBase::RWFracToSigma(partype_str, parname, startVals[parname]);
-    currentVals[parname] =
-        FitBase::RWFracToSigma(partype_str, parname, currentVals[parname]);
-    minVals[parname] =
-        FitBase::RWFracToSigma(partype_str, parname, minVals[parname]);
-    maxVals[parname] =
-        FitBase::RWFracToSigma(partype_str, parname, maxVals[parname]);
-    stepVals[parname] =
-        (FitBase::RWFracToSigma(partype_str, parname, stepVals[parname]));
-
-    LOG(MIN) << " -> " << startVals[parname] << std::endl;
+	     << currentVals[parname];
+        currentVals[parname] =
+	  FitBase::RWFracToSigma(partype_str, parname, currentVals[parname]);
   }
+
+  std::cout << "Read parameter: "<<partype_str << "  "
+	    << parname << " = " << curval << "("
+	    << curparstate << ")" << endl;
 
   return 0;
 }
-
 
 //*******************************************
 void comparisonRoutines::readFakeDataPars(std::string parstring) {
@@ -350,62 +356,57 @@ void comparisonRoutines::readFakeDataPars(std::string parstring) {
 }
 
 //******************************************
-void comparisonRoutines::readSamples(std::string sampleString) {
+int comparisonRoutines::readSamples(std::string sampleString) {
 //******************************************
 
-  std::string token, samplename;
-  std::istringstream stream(sampleString);
-  int val = 0;
-  double entry;
+// Parse String
+  // Input is: sample  sample_id  FILE  [STATE]  [NORM]
+  std::vector<std::string> samplevect = PlotUtils::FillVectorSFromString(sampleString," ");
 
-  if (sampleString.c_str()[0] == '#') return;
+  // Skip line if not sample
+  if (samplevect[0].compare("sample")) return 0;
 
-  while (std::getline(stream, token, ' ')) {
-    stream >> std::ws;  // strip whitespace
-    std::istringstream stoken(token);
-    stoken >> entry;
-
-    if (val == 0) {
-      if (token.compare("sample") != 0) {
-        return;
-      }
-    } else if (val == 1) {
-      samplename = token + "_norm";
-      samples.push_back(token);
-      sampleDials.push_back(samplename);
-
-      sampleNorms[samplename] = 1.0;
-      currentNorms[samplename] = 1.0;
-      errorNorms[samplename] = 1.0;
-
-    } else if (val == 2) {
-      sampleTypes[samplename] = token;
-      bool fixed = (token.find("FREE") == std::string::npos);
-
-      fixNorms[samplename] = fixed;       // fixed;
-      startFixNorms[samplename] = fixed;  // fixed;
-
-      // defaults
-      sampleNorms[samplename] = 1.0;
-      currentNorms[samplename] = 1.0;
-      errorNorms[samplename] = 0.0;
-
-    } else if (val == 3) {
-      sampleFiles[samplename] = token;
-    } else if (val == 4) {
-      if (entry > 0.3 and entry < 1.7) {
-        sampleNorms[samplename] = entry;
-        currentNorms[samplename] = entry;
-        errorNorms[samplename] = entry;
-      }
-    }
-
-    val++;
+  // Check sample line is long enough
+  if (samplevect.size() < 2){
+    ERR(FTL) << "'sample' with no sample ID specified!" << endl;
+    return -1;
   }
-  std::cout << "added sample " << samplename << " with norm "
-            << sampleNorms[samplename] << " " << currentNorms[samplename]
-            << std::endl;
-  return;
+
+  if (samplevect.size() < 3){
+    ERR(FTL) << "No input specified for sample '"
+	     << samplevect[1]
+	     << "'" << endl;
+    return -1;
+  }
+
+  // Get Sample Name
+  samples.push_back(samplevect[1]);
+  std::string samplename = samplevect[1] + "_norm";
+
+  sampleDials.push_back(samplename);
+
+  // Set Default Norm to 1.0
+  sampleNorms[samplename]  = 1.0;
+
+  // Get File Name
+  sampleFiles[samplename] = samplevect[2];
+
+  // Get Sample State (if blank = DEFAULT)
+  std::string state = "DEFAULT";
+  if (samplevect.size() > 3) state = samplevect[3];
+  sampleTypes[samplename] = state;
+
+  // Get Sample Normalisation (if blank = 1.0)
+  double norm = 1.0;
+  if (samplevect.size() > 4){
+    std::istringstream stoken(samplevect[4]);
+    stoken >> norm;
+  }
+
+  sampleNorms[samplename]  = norm;
+
+  std::cout << "Read sample: " << samplename << " >> " << sampleFiles[samplename] << std::endl;
+  return 0;
 }
 
 /*

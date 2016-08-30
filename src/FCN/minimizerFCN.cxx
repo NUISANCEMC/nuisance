@@ -183,48 +183,45 @@ void minimizerFCN::LoadSamples(std::string cardFile)
 
   while(std::getline(card, line, '\n')){
     std::istringstream stream(line);
-    std::string token;
-    int val = 0;
-    std::string name;
-    std::string type;
-    std::string files;
-    double norm;
-    bool FoundSample = false;
 
-    // check the type
-    while(std::getline(stream, token, ' ')){
-      // Strip any leading whitespace from the stream
-      stream >> std::ws;
+    // Skip Empties
+    stream >> std::ws;
+    if (line.c_str()[0] == '#') continue;
+    if (line.empty()) continue;
 
-      // Ignore comments
-      if (token.c_str()[0] == '#') continue;
+    // Parse line
+    std::vector<std::string> samplevect = PlotUtils::FillVectorSFromString(line," ");
 
-      if (val == 0){
-	if (token.compare("sample") !=0 ){
-	  break;
-	}
-	FoundSample = true;
-      } else if (val == 1) {
-	name = token;
-      } else if (val == 2) {
-	type = token;
-      } else if (val == 3) {
-	files = token;
-      } else if (val == 4) {
-	std::istringstream stemp(token);
-	stemp >> norm;
-      } else break;
-      val++;
+    // Skip non sample lines
+    if (samplevect[0].compare("sample")) continue;
+
+    // Get Name
+    std::string name  = samplevect[1];
+
+    // Get Input
+    std::string files = samplevect[2];
+
+    // Get Type [ if blank = DEFAULT ]
+    std::string type = "DEFAULT";
+    if (samplevect.size() > 3)
+      type  = samplevect[3];
+
+    // Get Norm [ if blank = 1.0 ]
+    double norm = 1.0;
+    if (samplevect.size() > 4){
+      std::istringstream stemp(samplevect[4]);
+      stemp >> norm;
     }
-  
-    if (!FoundSample) continue;
 
+    // Create Sample Class
     out->cd();
+    LOG(MIN) << "Loading up sample: "<<name<<" << " <<files << " ("<<type<<")"<<std::endl;
     bool LoadedSample = SampleUtils::LoadSample( &fChain, name, files, type, fakeData, FitBase::GetRW() );
 
     if (!LoadedSample) {
       ERR(FTL) << "Could not load sample provided: "<<name<<std::endl;
-      continue;
+      ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx" << endl;
+      throw;
     }
     
     sampleNames.push_back(name);
@@ -234,7 +231,7 @@ void minimizerFCN::LoadSamples(std::string cardFile)
 
   }
   card.close();
-
+  
 };
 
 
