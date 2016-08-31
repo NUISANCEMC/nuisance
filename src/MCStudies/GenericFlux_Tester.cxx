@@ -70,6 +70,8 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   this->scaleFactor = (this->eventHist->Integral("width") * 1E-38 / (nevents + 0.)) /
                       this->TotalIntegratedFlux();
 
+  LOG(SAM) << " Generic Flux Scaling Factor = "<< scaleFactor << endl;
+
   // Setup our TTrees
   this->AddEventVariablesToTree();
   this->AddSignalFlagsToTree();
