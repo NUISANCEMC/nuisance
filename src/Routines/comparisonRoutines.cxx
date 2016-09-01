@@ -445,7 +445,7 @@ void comparisonRoutines::setupRWEngine() {
   }
   FitBase::GetRW()->Reconfigure();
 
-  updateRWEngine(startVals, sampleNorms);
+  updateRWEngine(currentVals, sampleNorms);
 
   return;
 }
