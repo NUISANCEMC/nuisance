@@ -65,6 +65,15 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
     */
   } else if (!name.compare("ANL_NC1npip_Evt_1Dppi_nu")) {
     fChain->push_back(new ANL_NC1npip_Evt_1Dppi_nu(file, rw, type, fkdt));
+    /*
+      ANL CC2pi sample
+    */
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
+    fChain->push_back(new ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_XSec_1DEnu_nu")) {
+    fChain->push_back(new ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu")) {
+    fChain->push_back(new ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
 
     /*
       BNL Samples

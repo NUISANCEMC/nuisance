@@ -30,6 +30,10 @@
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
+// ANL CC2pi 1pim1pip (mm, even more exotic!)
+#include "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.h"
+#include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
+#include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 
 // BNL CCQE
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
