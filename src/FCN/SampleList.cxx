@@ -76,11 +76,37 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
       ANL CC2pi sample
     */
   } else if (!name.compare("ANL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
-    fChain->push_back(new ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppip_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppim_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dppim_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu(file, rw, type, fkdt));
+
   } else if (!name.compare("ANL_CC2pi_1pip1pip_XSec_1DEnu_nu")) {
-    fChain->push_back(new ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu(file, rw, type, fkdt));
+
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu")) {
-    fChain->push_back(new ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(file, rw, type, fkdt));
 
     /*
       BNL Samples
