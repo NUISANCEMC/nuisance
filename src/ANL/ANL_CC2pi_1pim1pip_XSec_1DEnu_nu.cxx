@@ -36,11 +36,14 @@ ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(std::string i
   isEnu1D = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip1p.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip1p_xsec.csv");
   this->SetupDefaultHist();
 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
   covar     = StatUtils::GetInvert(fullcovar);
+
+  // Need to multiply the data by a factor because of the way the data is scanned (e.g. 1E-38)
+  dataHist->Scale(1.E-41);
 
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
 };

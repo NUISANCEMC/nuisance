@@ -40,6 +40,9 @@ ANL_CC1ppip_Evt_1Dphi_nu.cxx
 
 ANL_NC1npip_Evt_1Dppi_nu.cxx
 
+ANL_NC1ppim_XSec_1DEnu_nu.cxx
+ANL_NC1ppim_Evt_1DcosmuStar_nu.cxx
+
 ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
 ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.cxx
 ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.cxx
@@ -68,6 +71,9 @@ ANL_CC1ppip_Evt_1DcosthAdler_nu.h
 ANL_CC1ppip_Evt_1Dphi_nu.h
 
 ANL_NC1npip_Evt_1Dppi_nu.h
+
+ANL_NC1ppim_XSec_1DEnu_nu.cxx
+ANL_NC1ppim_Evt_1DcosmuStar_nu.cxx
 
 ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
 ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.cxx

@@ -16,74 +16,78 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#include "ANL_NC1npip_Evt_1Dppi_nu.h"
+#include "ANL_NC1ppim_Evt_1DcosmuStar_nu.h"
 
 /** 
-  * M. Derrick et al., "Study of single-pion production by weak neutral currents in low-energy \nu d interactions", Physical Review D, Volume 23, Number 3, 569, 1 February 1981
+  * M. Derrick et al., "Study of the reaction \nu n \rightarrow \nu p \pi^-", Physics Letters, Volume 92B, Number 3,4, 363, 19 May 1980
 */
 
-ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_NC1npip_Evt_1Dppi_nu";
-  plotTitles = "; p_{#pi} (MeV); Number of events";
-  EnuMin = 0;
+  measurementName = "ANL_NC1ppim_Evt_1DcosmuStar_nu";
+  plotTitles = "; cos*_{#mu}; Number of events";
+  EnuMin = 0.3;
   EnuMax = 1.5;
   isDiag = true;
   isRawEvents = true;
+  isEnu1D = false;
   default_types="EVT/SHAPE/DIAG";
   allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  // There are two different measurements here; _weight and _unweight
-  // See publication for information
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
-  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv");
   this->SetupDefaultHist();
-
-  // set Poisson errors on dataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
-  }
 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
+  // Set Poisson errors on data points (number of events weighted)
+  for (int i = 0; i < dataHist->GetNbinsX()+1; ++i) {
+    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  }
+
   this->scaleFactor = this->eventHist->Integral("width")/((nevents+0.)*fluxHist->Integral("width"))*(16./8.);
 };
 
-void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
+void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   
-  TLorentzVector Pn;
-  TLorentzVector Ppip;
+  TLorentzVector Pnu = event->PartInfo(0)->fP;
+  TLorentzVector Pin = event->PartInfo(1)->fP;
+  TLorentzVector Pp;
+  TLorentzVector Ppim;
+  TLorentzVector PnuOut;
 
   // Loop over the particle stack to find relevant particles 
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
   for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
+
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0 && (event->PartInfo(j)->fStatus != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211)
-      Ppip = event->PartInfo(j)->fP;
-    else if (PID == 2112)
-      Pn = event->PartInfo(j)->fP;
+
+    if (PID == -211) {
+      Ppim = event->PartInfo(j)->fP;
+    } else if (PID == 2212) {
+      Pp = event->PartInfo(j)->fP;
+    } else if (PID == 14) {
+      PnuOut = event->PartInfo(j)->fP;
+    }
   }
 
-  double hadMass = FitUtils::MpPi(Pn, Ppip);
-  double ppip;
-  
-  // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) {
-    ppip = FitUtils::p(Ppip)*1000.;
-  } else {
-    ppip = -1.0;
-  }
+  // Boost into centre of mass frame
+  TLorentzVector CMS = Pnu + Pin;
+  // Boost outgoing neutrino backwards CMS
+  PnuOut.Boost(-CMS.BoostVector());
+  // Boost incoming neutrino forwards by CMS
+  Pnu.Boost(CMS.BoostVector());
 
-  this->X_VAR = ppip;
+  double cosmuStar = cos(FitUtils::th(PnuOut, Pnu));
+
+  this->X_VAR = cosmuStar;
 
   return;
 };
 
-bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
+bool ANL_NC1ppim_Evt_1DcosmuStar_nu::isSignal(FitEvent *event) {
 
   // Incoming particle should be a neutrino
   if ((event->PartInfo(0))->fPID != 14) return false;
@@ -93,16 +97,16 @@ bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
   // Outgoing particle should be a neutrino
   if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false; 
 
-  int pipCnt = 0;
-  int neutronCnt = 0;
+  int pimCnt = 0;
+  int protonCnt = 0;
 
   for (UInt_t j =  2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      pipCnt++;
-    } else if (PID == 2112) {
-      neutronCnt++;
+    if (PID == -211) {
+      pimCnt++;
+    } else if (PID == 2212) {
+      protonCnt++;
     } else {
       return false; // require only three prong events! (allow photons?)
     }
@@ -111,8 +115,8 @@ bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
   // don't think there's away of implementing spectator proton cuts in NEUT?
   // 100 MeV or larger protons
 
-  if (pipCnt != 1) return false;
-  if (neutronCnt != 1) return false;
+  if (pimCnt != 1) return false;
+  if (protonCnt != 1) return false;
 
   return true;
 }
