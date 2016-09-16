@@ -32,7 +32,7 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(std::string inputfile, FitWei
   allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_ppi_CC1ppip.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_ppi.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on dataHist (scanned does not have this)

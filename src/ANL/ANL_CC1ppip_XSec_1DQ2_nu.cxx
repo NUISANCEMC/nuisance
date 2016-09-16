@@ -30,7 +30,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWei
   normError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14.txt");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt");
   this->SetupDefaultHist();
 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
