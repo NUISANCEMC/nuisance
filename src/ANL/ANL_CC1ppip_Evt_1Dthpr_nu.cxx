@@ -18,6 +18,7 @@
 *******************************************************************************/
 
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
+//Derrick et al, Phys Rev D V23 N3, p572 fig 3
 
 // The constructor
 ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
@@ -25,9 +26,11 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   measurementName = "ANL_CC1ppip_Evt_1Dthpr_nu";
   plotTitles = "; cos #theta_{p}; Number of events";
   EnuMin = 0;
-  EnuMax = 1.5; // Different EnuMax for cos(thpr), see Derrick et al, Phys Rev D V23 N3, p572 fig 3
+  EnuMax = 1.5;
   isDiag = true;
   isRawEvents = true;
+  default_types="EVT/SHAPE/DIAG";
+  allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV

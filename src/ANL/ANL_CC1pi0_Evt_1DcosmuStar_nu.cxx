@@ -28,6 +28,8 @@ ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfi
   EnuMax = 1.5;
   isDiag = true;
   isRawEvents = true;
+  default_types="EVT/SHAPE/DIAG";
+  allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_cosmuStar.csv");

@@ -30,6 +30,8 @@ ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   EnuMax = 1.5;
   isDiag = true;
   isRawEvents = true;
+  default_types="EVT/SHAPE/DIAG";
+  allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/ANL_CC1pip_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");

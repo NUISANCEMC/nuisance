@@ -28,6 +28,8 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
   EnuMax = 6.0;
   isDiag = true;
   isRawEvents = true;
+  default_types="EVT/SHAPE/DIAG";
+  allowed_types="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1ppip_phi.csv");

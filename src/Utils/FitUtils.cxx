@@ -451,7 +451,7 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVec
       rEnu = EnuCC1piprecDelta(pnu, pmu);
       break;
   } // No need for default here since default value of enuType = 0, defined in header
-      
+
 
   double q2 = -m_mu*m_mu + 2.*rEnu*(E_mu - p_mu*cos(th_nu_mu));
 
