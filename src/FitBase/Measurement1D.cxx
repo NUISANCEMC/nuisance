@@ -351,7 +351,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
   // MINERvA CC1pip needs slightly different method
   // Only half the covariance matrix is given and I'm too lazy to write the full one so let the code do it instead
-  if (measurementName.find("MINERvA_CC1pip") == std::string::npos && measurementName.find("MINERvA_CCNpip") == std::string::npos) {
+  if (measurementName.find("MINERvA_CC1pip") == std::string::npos) {
     while(std::getline(covar, line, '\n')){
       std::istringstream stream(line);
       double entry;
@@ -891,8 +891,6 @@ std::vector<TH1*> Measurement1D::GetMCList(){
   if (FitPar::Config().GetParI("fillstyle") > 0){
     plotfillstyle = FitPar::Config().GetParI("fillstyle");
   }
-
-  std::cout << measurementName << " chi2 = " << GetLikelihood() << std::endl;
 
   this->mcHist->SetTitle(chi2.str().c_str());
   this->mcHist->SetLineWidth(3);

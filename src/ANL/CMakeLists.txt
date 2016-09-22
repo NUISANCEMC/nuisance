@@ -44,8 +44,22 @@ ANL_NC1ppim_XSec_1DEnu_nu.cxx
 ANL_NC1ppim_Evt_1DcosmuStar_nu.cxx
 
 ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
+ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu.cxx
+ANL_CC2pi_1pim1pip_Evt_1Dppim_nu.cxx
+ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.cxx
+ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu.cxx
+
 ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.cxx
+ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu.cxx
+ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.cxx
+ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.cxx
+ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.cxx
+
 ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.cxx
+ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.cxx
+ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.cxx
+ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.cxx
+ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.cxx
 )
 
 set(HEADERFILES
@@ -72,12 +86,26 @@ ANL_CC1ppip_Evt_1Dphi_nu.h
 
 ANL_NC1npip_Evt_1Dppi_nu.h
 
-ANL_NC1ppim_XSec_1DEnu_nu.cxx
-ANL_NC1ppim_Evt_1DcosmuStar_nu.cxx
+ANL_NC1ppim_XSec_1DEnu_nu.h
+ANL_NC1ppim_Evt_1DcosmuStar_nu.h
 
-ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
-ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.cxx
-ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.cxx
+ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.h
+ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu.h
+ANL_CC2pi_1pim1pip_Evt_1Dppim_nu.h
+ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.h
+ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu.h
+
+ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h
+ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu.h
+ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.h
+ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.h
+ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.h
+
+ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h
+ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.h
+ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.h
+ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.h
+ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h
 )
 
 set(LIBNAME expANL)

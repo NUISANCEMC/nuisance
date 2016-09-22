@@ -91,20 +91,18 @@ fi
 
 if [[ "@USE_NIWG@" != "0" ]]; then
   echo "[INFO]: Adding NIWG paths to the environment."
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG@:"* ]]; then
+    export LD_LIBRARY_PATH=${NIWG}:${LD_LIBRARY_PATH}
+  fi
+  export NIWG=@NIWG@
 fi
 
-if [[ "@USE_NEUT@" != "0" ]]; then
-    echo "[INFO]: Adding NEUT paths to the environment."
-    export NEUT_ROOT="@NEUT_ROOT@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NEUT_ROOT@/lib:"* ]]; then
-	export LD_LIBRARY_PATH=@NEUT_ROOT@/lib:$LD_LIBRARY_PATH
-	export LD_LIBRARY_PATH=@NEUT_ROOT@/src/reweight:$LD_LIBRARY_PATH
-    fi
-
-    export CERN_ROOT="@CERN_ROOT@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@CERN_ROOT@/lib:"* ]]; then
-	export LD_LIBRARY_PATH=@CERN_ROOT@/lib:$LD_LIBRARY_PATH
-    fi
+if [[ "@USE_T2K@" != "0" ]]; then
+  echo "[INFO]: Adding T2K paths to the environment."
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG@:"* ]]; then
+    export LD_LIBRARY_PATH=${T2KREWEIGHT}:${LD_LIBRARY_PATH}
+  fi
+  export T2KREWEIGHT=@T2KREWEIGHT@
 fi
 
 export EXT_FIT="@CMAKE_SOURCE_DIR@"

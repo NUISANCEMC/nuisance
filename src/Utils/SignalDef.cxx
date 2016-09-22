@@ -858,6 +858,10 @@ bool SignalDef::isT2K_CC0pi(FitEvent* event, double EnuMin,
   // restricted phase space
   if (forwardgoing and
       CosThetaMu < 0.0 and
-      CosThetaMu != -9999.9)
+      CosThetaMu != -9999.9) {
     return false;
+  }
+
+  return true;
+
 }
