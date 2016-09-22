@@ -8,7 +8,10 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
+  allowed_types += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_enu.txt");
 
@@ -26,6 +29,7 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
   this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_enu_corr.txt", dataHist->GetNbinsX());
 
   this->SetupDefaultHist();
+
 
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents);
 };

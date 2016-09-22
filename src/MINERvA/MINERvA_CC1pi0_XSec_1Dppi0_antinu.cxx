@@ -5,6 +5,8 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
 
   EnuMin = 1.5;
   EnuMax = 10;
+  allowed_types += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if (type.find("NEW") != std::string::npos) {

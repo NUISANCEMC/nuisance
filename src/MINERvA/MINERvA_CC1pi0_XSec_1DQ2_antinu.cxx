@@ -8,6 +8,8 @@ MINERvA_CC1pi0_XSec_1DQ2_antinu::MINERvA_CC1pi0_XSec_1DQ2_antinu(std::string inp
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
+  allowed_types += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_q2.txt");

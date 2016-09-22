@@ -8,6 +8,8 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
+  allowed_types += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
@@ -51,8 +53,6 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
   }
 
   this->SetupDefaultHist();
-
-  hnPions = new TH1I((measurementName+"_hNpions").c_str(), (measurementName+"_hNions; Number of pions; Counts").c_str(), 11, -1, 10);
 
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
@@ -127,7 +127,6 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
       PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, thVect.at(k), Weight);
     }
 
-    hnPions->Fill(nPions);
   }
 
   return;
@@ -137,7 +136,6 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
 //******************************************************************** 
   Measurement1D::Write(drawOpts);
-  hnPions->Write();
 
   return;
 }

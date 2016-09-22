@@ -8,6 +8,8 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
+  allowed_types += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
@@ -54,6 +56,12 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   }
 
   this->SetupDefaultHist();
+
+  hnPions = new TH1I((measurementName+"_Npions").c_str(), (measurementName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
+  onePions = new TH1D((measurementName+"_1pions").c_str(), (measurementName+"_1pions"+plotTitles).c_str(), mcHist->GetNbinsX(), mcHist->GetBinLowEdge(1), mcHist->GetBinLowEdge(mcHist->GetNbinsX()+1));
+  twoPions = new TH1D((measurementName+"_2pions").c_str(), (measurementName+"_2pions;"+plotTitles).c_str(), mcHist->GetNbinsX(), mcHist->GetBinLowEdge(1), mcHist->GetBinLowEdge(mcHist->GetNbinsX()+1));
+  threePions = new TH1D((measurementName+"_3pions").c_str(), (measurementName+"_3pions"+plotTitles).c_str(), mcHist->GetNbinsX(), mcHist->GetBinLowEdge(1), mcHist->GetBinLowEdge(mcHist->GetNbinsX()+1));
+  morePions = new TH1D((measurementName+"_4pions").c_str(), (measurementName+"_4pions"+plotTitles).c_str(),  mcHist->GetNbinsX(), mcHist->GetBinLowEdge(1), mcHist->GetBinLowEdge(mcHist->GetNbinsX()+1));
 
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
@@ -113,13 +121,25 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
   if (Signal){
 
     // Need to loop over all the pions in the sample
-    for (size_t k = 0; k < TpiVect.size(); ++k) {
-      this->mcHist->Fill(TpiVect.at(k), Weight);
-      this->mcFine->Fill(TpiVect.at(k), Weight);
-      this->mcStat->Fill(TpiVect.at(k), 1.0);
+    for (int k = 0; k < nPions; ++k) {
+      double tpi = TpiVect.at(k);
+      this->mcHist->Fill(tpi, Weight);
+      this->mcFine->Fill(tpi, Weight);
+      this->mcStat->Fill(tpi, 1.0);
+
+      if (nPions == 1) {
+        onePions->Fill(tpi, Weight);
+      } else if (nPions == 2) {
+        twoPions->Fill(tpi, Weight);
+      } else if (nPions == 3) { 
+        threePions->Fill(tpi, Weight);
+      } else if (nPions > 3) {
+        morePions->Fill(tpi, Weight);
+      }
 
       PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, TpiVect.at(k), Weight);
     }
+    hnPions->Fill(nPions);
   }
 
 }
@@ -129,4 +149,53 @@ bool MINERvA_CCNpip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
 //******************************************************************** 
   // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
   return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, false);
+}
+
+//******************************************************************** 
+void MINERvA_CCNpip_XSec_1DTpi_nu::ScaleEvents() {
+//******************************************************************** 
+  Measurement1D::ScaleEvents();
+
+  onePions->Scale(this->scaleFactor, "width");
+  twoPions->Scale(this->scaleFactor, "width");
+  threePions->Scale(this->scaleFactor, "width");
+  morePions->Scale(this->scaleFactor, "width");
+
+  return;
+}
+
+//******************************************************************** 
+void MINERvA_CCNpip_XSec_1DTpi_nu::Write(std::string drawOpts) {
+//******************************************************************** 
+  Measurement1D::Write(drawOpts);
+
+  // Draw the npions stack
+  onePions->SetTitle("1#pi");
+  onePions->SetLineColor(kBlack);
+  twoPions->SetTitle("2#pi");
+  twoPions->SetLineColor(kRed);
+  threePions->SetTitle("3#pi");
+  threePions->SetLineColor(kGreen);
+  morePions->SetTitle(">3#pi");
+  morePions->SetLineColor(kBlue);
+
+  THStack pionStack = THStack((measurementName+"_pionStack").c_str(), (measurementName+"_pionStack").c_str());
+
+  onePions->SetTitle("1#pi");
+  onePions->SetLineColor(kBlack);
+  twoPions->SetTitle("2#pi");
+  twoPions->SetLineColor(kRed);
+  threePions->SetTitle("3#pi");
+  threePions->SetLineColor(kGreen);
+  morePions->SetTitle(">3#pi");
+  morePions->SetLineColor(kBlue);
+
+  pionStack.Add(onePions);
+  pionStack.Add(twoPions);
+  pionStack.Add(threePions);
+  pionStack.Add(morePions);
+
+  pionStack.Write();
+
+  return;
 }
