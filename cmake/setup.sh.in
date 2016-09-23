@@ -37,6 +37,9 @@ if [[ "@USE_NEUT@" != "0" ]]; then
   if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
     export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
   fi
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/src/reweight:"* ]]; then
+    export LD_LIBRARY_PATH=${NEUT_ROOT}/src/reweight:$LD_LIBRARY_PATH
+  fi
   export NEUT_ROOT=@NEUT_ROOT@
   export CERN=@CERN@
   export CERN_LEVEL=@CERN_LEVEL@

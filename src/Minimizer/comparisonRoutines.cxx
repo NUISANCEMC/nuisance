@@ -682,12 +682,12 @@ void comparisonRoutines::ReconfigureAllEvents() {
     iterSam = fChain.begin();
     for (; iterSam != fChain.end(); iterSam++) {
       MeasurementBase* exp = (*iterSam);
-      std::cout << "Finalising sample " << exp << std::endl;
+      LOG(FIT) << "Finalising sample " << exp->GetName() << std::endl;
       exp->ConvertEventRates();
     }
 
-    std::cout << " Time Taken = " << time(NULL) - timestart << std::endl;
-    std::cout << "Finished reconfiguring all events" << std::endl;
+    LOG(FIT) << " Time Taken = " << time(NULL) - timestart << " seconds" << std::endl;
+    LOG(FIT) << "Finished reconfiguring all events" << std::endl;
 
   } else {
     thisFCN->ReconfigureAllEvents();

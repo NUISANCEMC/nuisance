@@ -57,6 +57,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
+  // Make some auxillary helper plots
   hnPions = new TH1I((measurementName+"_Npions").c_str(), (measurementName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
   onePions  = (TH1D*)(dataHist->Clone());
   twoPions  = (TH1D*)(dataHist->Clone());
@@ -100,11 +101,11 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   double Tpi;
 
   // If hadronic mass passes signal, loop over the pions
-  if (hadMass > 100 && hadMass < 1800) {
+  if (hadMass > 100 && hadMass < 1800 && piIndex.size() > 0) {
 
     // Loop over surviving pions and pick up their kinetic energy
     for (size_t k = 0; k < piIndex.size(); ++k) {
-      TLorentzVector Ppip = event->PartInfo(piIndex.at(k))->fP;
+      TLorentzVector Ppip = event->PartInfo(piIndex[k])->fP;
       Tpi = FitUtils::T(Ppip)*1000.;
       TpiVect.push_back(Tpi);
     }
@@ -165,6 +166,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::ScaleEvents() {
   twoPions->Scale(this->scaleFactor, "width");
   threePions->Scale(this->scaleFactor, "width");
   morePions->Scale(this->scaleFactor, "width");
+  hnPions->Scale(this->scaleFactor, "width");
 
   return;
 }
@@ -173,6 +175,8 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::ScaleEvents() {
 void MINERvA_CCNpip_XSec_1DTpi_nu::Write(std::string drawOpts) {
 //******************************************************************** 
   Measurement1D::Write(drawOpts);
+
+  hnPions->Write();
 
   // Draw the npions stack
   onePions->SetTitle("1#pi");

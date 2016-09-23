@@ -1200,7 +1200,7 @@ void Measurement2D::Write(std::string drawOpt){
 
   
   // Returning
-  LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
+  LOG(SAM) << "Wrote histograms for: "<<this->measurementName<<std::endl;
   return;
 };
 

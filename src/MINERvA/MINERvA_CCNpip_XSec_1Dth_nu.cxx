@@ -54,6 +54,18 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
 
   this->SetupDefaultHist();
 
+  // Make some auxillary helper plots
+  hnPions = new TH1I((measurementName+"_Npions").c_str(), (measurementName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
+  onePions  = (TH1D*)(dataHist->Clone());
+  twoPions  = (TH1D*)(dataHist->Clone());
+  threePions = (TH1D*)(dataHist->Clone());
+  morePions = (TH1D*)(dataHist->Clone());
+
+  onePions->SetNameTitle((measurementName+"_1pions").c_str(), (measurementName+"_1pions"+plotTitles).c_str());
+  twoPions->SetNameTitle((measurementName+"_2pions").c_str(), (measurementName+"_2pions;"+plotTitles).c_str());
+  threePions->SetNameTitle((measurementName+"_3pions").c_str(), (measurementName+"_3pions"+plotTitles).c_str());
+  morePions->SetNameTitle((measurementName+"_4pions").c_str(), (measurementName+"_4pions"+plotTitles).c_str());
+
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
 
@@ -90,11 +102,11 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 
     // Loop over surviving pions and pick up their kinetic energy
     for (unsigned int k = 0; k < piIndex.size(); ++k) {
-      Ppip = (event->PartInfo(piIndex.at(k)))->fP;
+      Ppip = (event->PartInfo(piIndex[k]))->fP;
       th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
       thVect.push_back(th);
-
     }
+
   } else {
     th = -999;
   }
@@ -112,6 +124,20 @@ bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 }
 
 //******************************************************************** 
+void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
+//******************************************************************** 
+  Measurement1D::ScaleEvents();
+
+  onePions->Scale(this->scaleFactor, "width");
+  twoPions->Scale(this->scaleFactor, "width");
+  threePions->Scale(this->scaleFactor, "width");
+  morePions->Scale(this->scaleFactor, "width");
+  hnPions->Scale(this->scaleFactor, "width");
+
+  return;
+}
+
+//******************************************************************** 
 // Need to override FillHistograms() here because we fill the histogram N_pion times
 void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 //******************************************************************** 
@@ -120,22 +146,66 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
     // Need to loop over all the pions in the sample
     for (size_t k = 0; k < thVect.size(); ++k) {
-      this->mcHist->Fill(thVect.at(k), Weight);
-      this->mcFine->Fill(thVect.at(k), Weight);
-      this->mcStat->Fill(thVect.at(k), 1.0);
+      double th = thVect[k];
+      this->mcHist->Fill(th, Weight);
+      this->mcFine->Fill(th, Weight);
+      this->mcStat->Fill(th, 1.0);
 
-      PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, thVect.at(k), Weight);
+      if (nPions == 1) {
+        onePions->Fill(th, Weight);
+      } else if (nPions == 2) {
+        twoPions->Fill(th, Weight);
+      } else if (nPions == 3) { 
+        threePions->Fill(th, Weight);
+      } else if (nPions > 3) {
+        morePions->Fill(th, Weight);
+      }
+
+      PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, th, Weight);
     }
-
+    hnPions->Fill(nPions);
   }
 
   return;
 }
 
+
 //******************************************************************** 
 void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
 //******************************************************************** 
   Measurement1D::Write(drawOpts);
+
+  hnPions->Write();
+
+  // Draw the npions stack
+  onePions->SetTitle("1#pi");
+  onePions->SetLineColor(kBlack);
+  //onePions->SetFillStyle(0);
+  onePions->SetFillColor(onePions->GetLineColor());
+
+  twoPions->SetTitle("2#pi");
+  twoPions->SetLineColor(kRed);
+  //twoPions->SetFillStyle(0);
+  twoPions->SetFillColor(twoPions->GetLineColor());
+
+  threePions->SetTitle("3#pi");
+  threePions->SetLineColor(kGreen);
+  //threePions->SetFillStyle(0);
+  threePions->SetFillColor(threePions->GetLineColor());
+
+  morePions->SetTitle(">3#pi");
+  morePions->SetLineColor(kBlue);
+  //morePions->SetFillStyle(0);
+  morePions->SetFillColor(morePions->GetLineColor());
+
+  THStack pionStack = THStack((measurementName+"_pionStack").c_str(), (measurementName+"_pionStack").c_str());
+
+  pionStack.Add(onePions);
+  pionStack.Add(twoPions);
+  pionStack.Add(threePions);
+  pionStack.Add(morePions);
+
+  pionStack.Write();
 
   return;
 }

@@ -336,7 +336,12 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
 void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 //********************************************************************
 
+////////////////////////////////////////////////////////////
   // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+////////////////////////////////////////////////////////////
 
   // Make a counter to track the line number
   int row = 0;
@@ -351,7 +356,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
   // MINERvA CC1pip needs slightly different method
   // Only half the covariance matrix is given and I'm too lazy to write the full one so let the code do it instead
-  if (measurementName.find("MINERvA_CC1pip") == std::string::npos) {
+  if (measurementName.find("MINERvA_CC1pip") == std::string::npos || (measurementName.find("MINERvA_CCNpip") && measurementName.find("2016"))) {
     while(std::getline(covar, line, '\n')){
       std::istringstream stream(line);
       double entry;
@@ -1184,7 +1189,7 @@ void Measurement1D::Write(std::string drawOpt){
   }
   
   // Returning
-  LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
+  LOG(SAM) << "Wrote histograms for: "<<this->measurementName<<std::endl;
   return;
 };
 
