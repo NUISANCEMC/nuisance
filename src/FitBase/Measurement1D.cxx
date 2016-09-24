@@ -83,19 +83,15 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, Fi
   Init();
 
   // Check if name contains Evt, indicating that it is a raw number of events measurements
-  // and should thus be treated as once
-  isRawEvents = false;
   if ((measurementName.find("Evt") != std::string::npos) && isRawEvents == false) {
     isRawEvents = true;
-    LOG(SAM) << "Found event rate measurement but isRawEvents == false!" << std::endl;
-    LOG(SAM) << "Overriding this and setting isRawEvents == true!" << std::endl;
+    LOG(SAM) << "Found event rate measurement " << measurementName << ", setting isRawEvents = true" << std::endl;
   }
 
-  isEnu1D = false;
-  if (measurementName.find("XSec_1DEnu") != std::string::npos) {
+  // Identify cross-section measurements which need flux unfolding
+  if (measurementName.find("XSec_1DEnu") != std::string::npos && isEnu1D == false) {
     isEnu1D = true;
-    LOG(SAM) << "::" << measurementName << "::" << std::endl;
-    LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, not flux averaged!" << std::endl;
+    LOG(SAM) << "Found XSec Enu measurement " << measurementName << ", applying flux integrated scaling, not flux averaged (isEnu1D = true)" << std::endl;
   }
 
   if (isEnu1D && isRawEvents) {
@@ -596,6 +592,8 @@ void Measurement1D::FillHistograms(){
 void Measurement1D::ScaleEvents(){
 //********************************************************************
 
+  LOG(REC) << std::setw(20) << " " << mcHist->Integral() << "/" << nevents << " events passed selection" << std::endl;
+
   // Simple function to scale to xsec result if this is all that is needed.
   // Scale bin errors correctly
   TH1D* tempFine = (TH1D*) mcFine->Clone();
@@ -706,7 +704,7 @@ int Measurement1D::GetNDOF(){
 }
 
 //********************************************************************
-double Measurement1D::GetLikelihood(){
+double Measurement1D::GetLikelihood() {
 //********************************************************************
 
   double stat = 0.0;
@@ -719,7 +717,7 @@ double Measurement1D::GetLikelihood(){
   }
 
   // Sort Initial Scaling
-  double scaleF = this->dataHist->Integral(1,this->dataHist->GetNbinsX(),"width")/this->mcHist->Integral(1, this->mcHist->GetNbinsX(), "width");
+  double scaleF = this->dataHist->Integral(1, this->dataHist->GetNbinsX(),"width")/this->mcHist->Integral(1, this->mcHist->GetNbinsX(), "width");
 
   if (isShape){
     this->mcHist->Scale(scaleF);
@@ -755,12 +753,12 @@ double Measurement1D::GetLikelihood(){
   }
 
   // Sort Penalty Terms
-  if (this->addNormPenalty){
+  if (this->addNormPenalty) {
     double penalty = (1. - this->currentNorm)*(1. - this->currentNorm)/(this->normError*this->normError);
     stat += penalty;
   }
 
-  LOG(REC) << this->measurementName<<": Sample Chi^2 = " << stat <<std::endl;
+  LOG(REC) << std::left << setw(45) << this->measurementName+" chi2" << " = " << std::setprecision(4) << stat <<std::endl;
 
   // Return to normal scaling
   if (this->isShape){
@@ -777,7 +775,7 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
 //********************************************************************
 
   // Reset things
-  if (usingfakedata){
+  if (usingfakedata) {
     this->ResetFakeData();
   } else {
     usingfakedata = true;
@@ -992,7 +990,7 @@ void Measurement1D::Write(std::string drawOpt){
 //********************************************************************
 
   // If null pointer return
-  if (!this->mcHist and !this->dataHist){
+  if (!this->mcHist || !this->dataHist){
     LOG(SAM) << this->measurementName <<"Incomplete histogram set!"<<std::endl;
     return;
   }
@@ -1017,7 +1015,7 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
   
-  LOG(SAM)<<"Writing Normal Plots" <<std::endl;
+  //LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
   if (drawNormal)  this->GetMCList()  .at(0)->Write();
@@ -1026,37 +1024,49 @@ void Measurement1D::Write(std::string drawOpt){
   if(this->eventType == 4 or this->eventType==3){ return; }
 
   // Draw Extra plots
-  LOG(SAM)<<"Writing Fine List"<<std::endl;
-  if (drawFine)    this->GetFineList().at(0)->Write();
-  LOG(SAM)<<"Writing events"<<std::endl;
-  if (drawFlux)    this->fluxHist->Write();
-  LOG(SAM)<<"Writing true events"<<std::endl;
+  //LOG(SAM)<<"Writing Fine List"<<std::endl;
+  if (drawFine) {
+    this->GetFineList().at(0)->Write();
+  }
+
+  //LOG(SAM)<<"Writing events"<<std::endl;
+  if (drawFlux) {
+    this->fluxHist->Write();
+  }
+
+  //LOG(SAM)<<"Writing true events"<<std::endl;
   //  if (drawXSec)    this->xsecHist->Write();
-  if (drawEvents)  this->eventHist->Write();
-  if (isMask and drawMask) this->maskHist->Write( (this->measurementName + "_MSK").c_str() ); //< save mask
+  if (drawEvents){
+    this->eventHist->Write();
+  }
+
+  if (isMask && drawMask) {
+    this->maskHist->Write( (this->measurementName + "_MSK").c_str() ); //< save mask
+  }
+
 
   // Save neut stack
   if (drawModes){
-    LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
+    //LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
     THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
     combo_mcHist_PDG.Write();
   }
 
   // Save Matrix plots
-  if (!isRawEvents and !isDiag){
-    if (drawCov and fullcovar){
+  if (!isRawEvents && !isDiag){
+    if (drawCov && fullcovar){
       TH2D cov = TH2D((*this->fullcovar));
       cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
       cov.Write();
     }
 
-    if (drawInvCov and covar){
+    if (drawInvCov && covar){
       TH2D covinv = TH2D((*this->covar));
       covinv.SetNameTitle((this->measurementName+"_covinv").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
       covinv.Write();
     }
 
-    if (drawDecomp and decomp){
+    if (drawDecomp && decomp){
       TH2D covdec = TH2D((*this->decomp));
       covdec.SetNameTitle((this->measurementName+"_covdec").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
       covdec.Write();
@@ -1068,8 +1078,9 @@ void Measurement1D::Write(std::string drawOpt){
   if (drawRatio){
 
     // Needed for error bars
-    for(int i = 0; i < this->mcHist->GetNbinsX()*this->mcHist->GetNbinsY(); i++)
+    for(int i = 0; i < this->mcHist->GetNbinsX()*this->mcHist->GetNbinsY(); i++) {
       this->mcHist->SetBinError(i+1,0.0);
+    }
 
     this->dataHist->GetSumw2();
     this->mcHist->GetSumw2();
@@ -1082,8 +1093,9 @@ void Measurement1D::Write(std::string drawOpt){
     dataRatio->Divide(this->mcHist);
 
     // Cancel bin errors on MC
-    for(int i = 0; i < mcRatio->GetNbinsX(); i++)
+    for(int i = 0; i < mcRatio->GetNbinsX(); i++) {
       mcRatio->SetBinError(i+1,this->mcHist->GetBinError(i+1) / this->mcHist->GetBinContent(i+1));
+    }
 
     mcRatio->SetMinimum(0);
     mcRatio->SetMaximum(2);
@@ -1149,7 +1161,7 @@ void Measurement1D::Write(std::string drawOpt){
   }
 
   // Make a pretty PDG Canvas
-  if (drawCanvPDG or true){
+  if (drawCanvPDG) {
     TCanvas* c1 = new TCanvas((this->measurementName + "_PDG_CANV").c_str(),
 			      (this->measurementName + "_PDG_CANV").c_str(),
 			      800,600);
@@ -1164,10 +1176,11 @@ void Measurement1D::Write(std::string drawOpt){
     
     //leg.Draw("SAME");
     c1->Write();
+    delete c1;
   }
 
 
-  if (drawCanvMC or true){
+  if (drawCanvMC) {
     TCanvas* c1 = new TCanvas((this->measurementName + "_MC_CANV").c_str(),
 			      (this->measurementName + "_MC_CANV").c_str(),
 			      800,600);
@@ -1186,17 +1199,23 @@ void Measurement1D::Write(std::string drawOpt){
     leg->AddEntry(dataHist, (this->measurementName + " Data").c_str(), "ep");
     leg->AddEntry(mcHist,   (this->measurementName + " MC").c_str(), "l");
     leg->AddEntry(mcShape,  (this->measurementName + " Shape").c_str(), "l");
+
+    c1->Write();
+    delete c1;
+    delete leg;
   }
   
   // Returning
-  LOG(SAM) << "Wrote histograms for: "<<this->measurementName<<std::endl;
+  //LOG(SAM) << "Wrote histograms for: " << this->measurementName << std::endl;
   return;
 };
 
 
 
-
+// ********************************************
+// Returns the NEUT mode stack
 THStack Measurement1D::GetModeStack(){
+// ********************************************
   THStack combo_hist = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
   return combo_hist;
 }

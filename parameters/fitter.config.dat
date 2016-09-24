@@ -14,21 +14,25 @@ config linestyle 1
 config fillstyle 0
 
 
-#config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP
-#config drawopts DATA/MC
-config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK
+# Here's the full list of drawing options
+# See src/FitBase/Measurement1D::Write for more info
+#config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/FLUX/MASK/COV/INVCOV/DECOMP/CANVPDG/CANVMC
+config drawopts DATA/MC/FINE/RATIO/MODES/SHAPE/CANVPDG/CANVMC
 
 # Event Directories
-config EVENT_DIR    /data2/stowell/NIWG/
-config NEUT_EVENT_DIR    /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
-config GENIE_EVENT_DIR    /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
-config NUWRO_EVENT_DIR    /data2/stowell/NIWG/nuwro/fit_samples/
+config EVENT_DIR        /data2/stowell/NIWG/
+config NEUT_EVENT_DIR   /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
+config GENIE_EVENT_DIR  /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
+config NUWRO_EVENT_DIR  /data2/stowell/NIWG/nuwro/fit_samples/
 
 # 0 is quiet, 1 is verbose
 config VERBOSITY    4
 
-config error_throws 100
-config error_uniform 0
+# For -f ErrorBands: 
+# How many throws do we want
+config error_throws 200
+# Are we throwing uniform or according to Gaussian?
+config error_uniform 1
 
 # When reading a file in as dial input keep dials fixed?
 config FIX_INPUT_DIAL    0

@@ -169,6 +169,7 @@ class FitEvent : public BaseFitEvt {
 
   FitParticle* fit_particle; //!< Pointer to the currently created fit_particle
   std::vector<FitParticle> all_particles; //!< vector of all fit particles
+  std::vector<FitParticle> fsi_particles; //!< vector of all fit particles
 
   Double_t TotCrs; //!< Total Cross-section (Gives per event in NEUT, Total Integrated in NuWro)
   Double_t PFSurf; //!< Fermi Surface Momentum
@@ -178,19 +179,16 @@ class FitEvent : public BaseFitEvt {
   UInt_t   TargetH; //!< Target Free Protons
   UInt_t   Ibound;  //!< Is target bound
 
-  UInt_t Nparticles; //!< Number of particles
-  UInt_t Nprimary; //!< Number of primary particles
-
   Double_t weight; //!< event weight
   Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
   
   // ACCESS FUNCTIONS
-  double Enu(){ return this->PartInfo(0)->fP.E(); };
-  double Tnu(){ return this->PartInfo(0)->fP.E(); };
-  double Pnu(){ return this->PartInfo(0)->fP.E(); };
-  int PDGnu(){  return this->PartInfo(0)->fPID; };
+  inline double Enu(){ return this->PartInfo(0)->fP.E(); };
+  inline double Tnu(){ return this->PartInfo(0)->fP.E(); };
+  inline double Pnu(){ return this->PartInfo(0)->fP.E(); };
+  inline int PDGnu(){  return this->PartInfo(0)->fPID; };
 
-  int Ilep(){
+  inline int Ilep(){
     for (UInt_t i = 2; i < this->Npart(); i++){
       if (this->PartInfo(i)->fPID == this->PDGnu() - int(this->Mode < 30))
 	return i;
@@ -198,8 +196,12 @@ class FitEvent : public BaseFitEvt {
     return 0;
   };
 
-  double q0(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).E(); };
-  double q3(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).Vect().Mag(); };
+  inline double q0() {
+    return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).E();
+  };
+  inline double q3( ){
+    return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).Vect().Mag();
+   };
 
   /* double Elep(); */
   /* double Tlep(); */
@@ -212,12 +214,6 @@ class FitEvent : public BaseFitEvt {
   /* int Npions(); */
   /* int Npiplus(); */
 };
-
-
-
-
-
-
 
 
 

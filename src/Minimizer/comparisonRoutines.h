@@ -32,6 +32,8 @@
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
+#include "TRandom3.h"
+#include "TStopwatch.h"
 
 
 #include <vector>
@@ -158,6 +160,8 @@ public:
 
 
 protected:
+
+  TRandom3 *randomNo;
 
   //! Our Custom ReWeight Object
   FitWeight* rw;

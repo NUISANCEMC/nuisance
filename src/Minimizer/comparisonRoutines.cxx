@@ -24,23 +24,26 @@
 */
 //************************
 comparisonRoutines::comparisonRoutines(int argc, char* argv[]) {
-  //************************
+//************************
+
+  // Make a TRandom3
+  randomNo = new TRandom3(0);
 
   // Set Defaults
   inputFileName = "";
   outputFileName = "";
 
-  covarHist = NULL;
-  covarHist_Free = NULL;
-  correlHist = NULL;
+  covarHist       = NULL;
+  covarHist_Free  = NULL;
+  correlHist      = NULL;
   correlHist_Free = NULL;
-  decompHist = NULL;
+  decompHist      = NULL;
   decompHist_Free = NULL;
 
-  inputFile = NULL;
-  outputFile = NULL;
-  fitStrategy = "Compare";
-  fakeDataFile = "";
+  inputFile     = NULL;
+  outputFile    = NULL;
+  fitStrategy   = "Compare";
+  fakeDataFile  = "";
 
   thisFCN = NULL;
 
@@ -49,7 +52,7 @@ comparisonRoutines::comparisonRoutines(int argc, char* argv[]) {
 
 //*************************************
 comparisonRoutines::~comparisonRoutines(){
-    //*************************************
+//*************************************
 };
 
 /*
@@ -57,7 +60,7 @@ comparisonRoutines::~comparisonRoutines(){
 */
 //*************************************
 void comparisonRoutines::parseArgs(int argc, char* argv[]) {
-  //*************************************
+//*************************************
 
   std::string maxevents_flag = "";
   int verbosity_flag = 0;
@@ -108,12 +111,15 @@ void comparisonRoutines::parseArgs(int argc, char* argv[]) {
   std::string token;
   std::istringstream stream(fitStrategy);
 
+  // Get the fit routine
   LOG(FIT) << "Fit Routine = " << fitStrategy << std::endl;
   while (std::getline(stream, token, ',')) {
     fit_routines.push_back(token);
   }
 
+  // Read card specified file (-c option)
   readCard();
+  // Read the parameters specified in parameters/fitter.config.dat
   setupConfig();
 
   if (!maxevents_flag.empty())
@@ -604,22 +610,35 @@ void comparisonRoutines::SelfFit() {
   for (UInt_t i = 0; i < fit_routines.size(); i++) {
     std::string routine = fit_routines.at(i);
 
-    // Stop fit if all pars are constant
     int NFREE = 0;
+    // Loop over parameters to find free settings
     for (UInt_t i = 0; i < params.size(); i++) {
-      if (!fixVals[params[i]]) NFREE++;
+      if (!fixVals[params[i]]) {
+        NFREE++;
+      }
     }
+
+    // Loop over normalisations to find free settings
     for (UInt_t i = 0; i < sampleDials.size(); i++) {
-      if (!fixNorms[sampleDials[i]]) NFREE++;
+      if (!fixNorms[sampleDials[i]]) {
+        NFREE++;
+      }
     }
-    if (NFREE == 0) break;
+
+    // Stop fit if all pars are constant
+    if (NFREE == 0) {
+      break;
+    }
 
     LOG(FIT) << "Running Routine: " << routine << std::endl;
-    if (routine.find("PlotLimits") != std::string::npos)
+
+    // Now run the different routines
+    // This is where we find the beef!
+    if (routine.find("PlotLimits") != std::string::npos) {
       PlotLimits();
-    else if (routine.find("ErrorBands") != std::string::npos)
+    } else if (routine.find("ErrorBands") != std::string::npos) {
       GenerateErrorBands();
-    else if (routine.find("Compare") != std::string::npos) {
+    } else if (routine.find("Compare") != std::string::npos) {
       this->ReconfigureAllEvents();
     }
   }
@@ -634,35 +653,50 @@ void comparisonRoutines::ReconfigureAllEvents() {
   // Main Event Loop from event Manager
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
 
+  // If we're using the event manager
+  // Event manager means we only need to loop events once for multiple distributions which use the same ROOT file
+  // e.g. MiniBooNE CCQE 1DQ2 and CC1pip 1Dpmu has same flux so only need to reconfigure and loop monte-carlo once!
   if (using_evtmanager) {
+
     std::list<MeasurementBase*> fChain = thisFCN->GetSampleList();
     std::list<MeasurementBase*>::const_iterator iterSam = fChain.begin();
 
     std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
     std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
 
-    int timestart = time(NULL);
+    // Get the stopwatch out!
+    TStopwatch clock;
+    clock.Start();
+
+    unsigned int NSignal = 0;
 
     for (; iterInp != fInputs.end(); iterInp++) {
+
       int input_id = (iterInp->first);
       InputHandler* cur_input = (iterInp->second);
       FitEvent* cust_event = cur_input->GetEventPointer();
       int nevents = cur_input->GetNEvents();
-      int countwidth = (nevents / 200);
-      size_t NSignal = 0;
+      int countwidth = (nevents / 5);
 
       // MAIN EVENT LOOP
       for (int i = 0; i < nevents; i++) {
+
         cust_event = FitBase::EvtManager().GetEvent(input_id, i);
         double Weight = cust_event->Weight;
-        if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 ||
-            Weight > 200.0 || Weight < 0.0)
-          continue;
 
+        if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 || Weight > 200.0 || Weight < 0.0) {
+          LOG(REC) << "Something strange happened at event " << i << "/" << nevents << std::endl;
+          continue;
+        }
+
+        // Loop over the chain of experiments which share the same event manager
         iterSam = fChain.begin();
         for (; iterSam != fChain.end(); iterSam++) {
           MeasurementBase* exp = (*iterSam);
-          if (exp->GetInputID() != input_id) continue;
+          // Check that the experiment shares input_id with current InputHandler
+          if (exp->GetInputID() != input_id) {
+            continue;
+          }
 
           LOG(EVT) << " FILLING EVENT MANAGER LOOP" << std::endl;
           exp->FillEventVariables(cust_event);
@@ -673,24 +707,41 @@ void comparisonRoutines::ReconfigureAllEvents() {
         }
 
         // Print Out
-        if (LOG_LEVEL(REC) and i % countwidth == 0)
-          LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
-                   << std::endl;
-      }
-    }
+        if (LOG_LEVEL(REC) && (i % countwidth == 0)) {
+          LOG(REC) << "Reconfigured " << std::setw(6) << i << "/" << nevents << " total events. W = " << Weight << std::endl;
+        }
+      } // End the for nevents loop
+    } // End the input handler loop
 
+    // Should ResetWeightFlags at the end of each successful event loop
+    FitBase::EvtManager().ResetWeightFlags();
+
+    // Now loop over the experiments and finish them up into proper measurements
     iterSam = fChain.begin();
     for (; iterSam != fChain.end(); iterSam++) {
       MeasurementBase* exp = (*iterSam);
-      LOG(FIT) << "Finalising sample " << exp->GetName() << std::endl;
+      LOG(REC) << "Finalising sample " << exp->GetName() << ": " << std::endl;
       exp->ConvertEventRates();
     }
 
-    LOG(FIT) << " Time Taken = " << time(NULL) - timestart << " seconds" << std::endl;
-    LOG(FIT) << "Finished reconfiguring all events" << std::endl;
+    clock.Stop();
+    LOG(REC) << "Reconfigure took = " << clock.RealTime() << " seconds" << std::endl;
+    LOG(REC) << "Finished reconfiguring all events" << std::endl;
 
   } else {
+
+    // Get the stopwatch out!
+    TStopwatch clock;
+    clock.Start();
+
+    // Choose to reconfigure all events
     thisFCN->ReconfigureAllEvents();
+    // Choose to reconfigure only the signal events
+    //thisFCN->ReconfigureSignal();
+    clock.Stop();
+    LOG(REC) << "Reconfigure took = " << clock.RealTime() << " seconds" << std::endl;
+    LOG(REC) << "Finished reconfiguring all events" << std::endl;
+
   }
 
   return;
@@ -750,12 +801,24 @@ void comparisonRoutines::SetupCovariance() {
   //*************************************
 
   // Remove covares if they exist
-  if (covarHist) delete covarHist;
-  if (covarHist_Free) delete covarHist_Free;
-  if (correlHist) delete correlHist;
-  if (correlHist_Free) delete correlHist_Free;
-  if (decompHist) delete decompHist;
-  if (decompHist_Free) delete decompHist_Free;
+  if (covarHist) {
+    delete covarHist;
+  }
+  if (covarHist_Free) {
+    delete covarHist_Free;
+  }
+  if (correlHist) {
+    delete correlHist;
+  }
+  if (correlHist_Free) {
+    delete correlHist_Free;
+  }
+  if (decompHist) {
+    delete decompHist;
+  }
+  if (decompHist_Free) {
+    delete decompHist_Free;
+  }
 
   int NFREE = 0;
   int NDIM = 0;
@@ -769,17 +832,21 @@ void comparisonRoutines::SetupCovariance() {
     if (!fixNorms[sampleDials[i]]) NFREE++;
   }
 
-  if (NDIM == 0) return;
+  if (NDIM == 0) {
+    LOG(MIN) << "Found no free parameters, returning now" << std::endl;
+    return;
+  }
 
-  covarHist =
-      new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
-  if (NFREE > 0)
-    covarHist_Free = new TH2D("covariance_free", "covariance_free", NFREE, 0,
-                              NFREE, NFREE, 0, NFREE);
+  covarHist = new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
+
+  if (NFREE > 0) {
+    covarHist_Free = new TH2D("covariance_free", "covariance_free", NFREE, 0, NFREE, NFREE, 0, NFREE);
+  }
 
   // Set Bin Labels
   int countall = 0;
   int countfree = 0;
+
   for (UInt_t i = 0; i < params.size(); i++) {
     covarHist->GetXaxis()->SetBinLabel(countall + 1, params[i].c_str());
     covarHist->GetYaxis()->SetBinLabel(countall + 1, params[i].c_str());
@@ -798,10 +865,8 @@ void comparisonRoutines::SetupCovariance() {
     countall++;
 
     if (!fixNorms[sampleDials[i]] and NFREE > 0) {
-      covarHist_Free->GetXaxis()->SetBinLabel(countfree + 1,
-                                              sampleDials[i].c_str());
-      covarHist_Free->GetYaxis()->SetBinLabel(countfree + 1,
-                                              sampleDials[i].c_str());
+      covarHist_Free->GetXaxis()->SetBinLabel(countfree + 1, sampleDials[i].c_str());
+      covarHist_Free->GetYaxis()->SetBinLabel(countfree + 1, sampleDials[i].c_str());
       countfree++;
     }
   }
@@ -817,7 +882,7 @@ void comparisonRoutines::SetupCovariance() {
 
         for (Int_t k = 0; k < covarHist->GetNbinsX(); k++) {
           for (Int_t l = 0; l < covarHist->GetNbinsY(); l++) {
-            if (!parx.compare(covarHist->GetXaxis()->GetBinLabel(k + 1)) and
+            if (!parx.compare(covarHist->GetXaxis()->GetBinLabel(k + 1)) &&
                 !pary.compare(covarHist->GetYaxis()->GetBinLabel(l + 1)))
 
               covarHist->SetBinContent(k + 1, l + 1,
@@ -829,7 +894,7 @@ void comparisonRoutines::SetupCovariance() {
         for (Int_t k = 0; k < covarHist_Free->GetNbinsX(); k++) {
           for (Int_t l = 0; l < covarHist_Free->GetNbinsY(); l++) {
             if (!parx.compare(
-                    covarHist_Free->GetXaxis()->GetBinLabel(k + 1)) and
+                    covarHist_Free->GetXaxis()->GetBinLabel(k + 1)) &&
                 !pary.compare(covarHist_Free->GetYaxis()->GetBinLabel(l + 1))) {
               covarHist_Free->SetBinContent(
                   k + 1, l + 1, covarHist_Free->GetBinContent(k + 1, l + 1) +
@@ -848,10 +913,11 @@ void comparisonRoutines::SetupCovariance() {
     for (Int_t j = 0; j < plot->GetNbinsX(); j++) {
       std::string parname = std::string(plot->GetXaxis()->GetBinLabel(j + 1));
 
-      if (currentVals.find(parname) != currentVals.end())
+      if (currentVals.find(parname) != currentVals.end()) {
         currentVals[parname] = plot->GetBinContent(j + 1);
-      else if (currentNorms.find(parname) != currentNorms.end())
+      } else if (currentNorms.find(parname) != currentNorms.end()) {
         currentNorms[parname] = plot->GetBinContent(j + 1);
+      }
     }
   }
 
@@ -861,15 +927,16 @@ void comparisonRoutines::SetupCovariance() {
   for (UInt_t i = 0; i < params.size(); i++) {
     double stepsq = stepVals[params[i]] * stepVals[params[i]];
 
-    if (!fixVals[params[i]] and
-        covarHist->GetBinContent(countall + 1, countall + 1) == 0.0)
+    if (!fixVals[params[i]] && covarHist->GetBinContent(countall + 1, countall + 1) == 0.0) {
       covarHist->SetBinContent(countall + 1, countall + 1, stepsq);
+    }
 
     countall++;
 
-    if (!fixVals[params[i]] and NFREE > 0) {
-      if (covarHist_Free->GetBinContent(countfree + 1, countfree + 1) == 0.0)
+    if (!fixVals[params[i]] && NFREE > 0) {
+      if (covarHist_Free->GetBinContent(countfree + 1, countfree + 1) == 0.0) {
         covarHist_Free->SetBinContent(countfree + 1, countfree + 1, stepsq);
+      }
       countfree++;
     }
   }
@@ -877,15 +944,16 @@ void comparisonRoutines::SetupCovariance() {
   for (UInt_t i = 0; i < sampleDials.size(); i++) {
     double stepsq = 0.1 * 0.1;
 
-    if (!fixNorms[sampleDials[i]] and
-        covarHist->GetBinContent(countall + 1, countall + 1) == 0.0)
+    if (!fixNorms[sampleDials[i]] && covarHist->GetBinContent(countall + 1, countall + 1) == 0.0) {
       covarHist->SetBinContent(countall + 1, countall + 1, stepsq);
+    }
 
     countall++;
 
-    if (!fixNorms[sampleDials[i]] and NFREE > 0) {
-      if (covarHist_Free->GetBinContent(countfree + 1, countfree + 1) == 0.0)
+    if (!fixNorms[sampleDials[i]] && NFREE > 0) {
+      if (covarHist_Free->GetBinContent(countfree + 1, countfree + 1) == 0.0) {
         covarHist_Free->SetBinContent(countfree + 1, countfree + 1, stepsq);
+      }
 
       countfree++;
     }
@@ -894,12 +962,12 @@ void comparisonRoutines::SetupCovariance() {
   correlHist = PlotUtils::GetCorrelationPlot(covarHist, "correlation");
   decompHist = PlotUtils::GetDecompPlot(covarHist, "decomposition");
 
-  if (NFREE > 0)
-    correlHist_Free =
-        PlotUtils::GetCorrelationPlot(covarHist_Free, "correlation_free");
-  if (NFREE > 0)
-    decompHist_Free =
-        PlotUtils::GetDecompPlot(covarHist_Free, "decomposition_free");
+  if (NFREE > 0) {
+    correlHist_Free = PlotUtils::GetCorrelationPlot(covarHist_Free, "correlation_free");
+  }
+  if (NFREE > 0) {
+    decompHist_Free = PlotUtils::GetDecompPlot(covarHist_Free, "decomposition_free");
+  }
 
   return;
 };
@@ -948,16 +1016,19 @@ void comparisonRoutines::ThrowCovariance(bool uniformly) {
 
   if (!decompHist_Free) {
     ERR(WRN) << "Trying to throw 0 free parameters" << std::endl;
-    return;
+    ERR(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
+    exit(-1);
   }
 
+  // Push back a few random numbers
   for (Int_t i = 0; i < decompHist_Free->GetNbinsX(); i++) {
-    rands.push_back(gRandom->Gaus(0.0, 1.0));
+    rands.push_back(randomNo->Gaus(0.0, 1.0));
   }
 
   for (UInt_t i = 0; i < params.size(); i++) {
     thrownVals[params[i]] = currentVals[params[i]];
   }
+
   for (UInt_t i = 0; i < sampleDials.size(); i++) {
     thrownNorms[sampleDials[i]] = currentNorms[sampleDials[i]];
   }
@@ -973,75 +1044,107 @@ void comparisonRoutines::ThrowCovariance(bool uniformly) {
       }
     }
 
+    // Running over cross-section parameters
     if (currentVals.find(parname) != currentVals.end()) {
-      if (uniformly)
+      // Case when we're throwing uniformly
+      if (uniformly) {
         thrownVals[parname] =
-            gRandom->Uniform(minVals[parname], maxVals[parname]);
-      else {
+            randomNo->Uniform(minVals[parname], maxVals[parname]);
+      // Not uniform throws (throwing with covariance)
+      } else {
         thrownVals[parname] = currentVals[parname] + mod;
       }
 
+    // Running over normalisation parameters
     } else if (currentNorms.find(parname) != currentNorms.end()) {
-      if (uniformly)
-        thrownNorms[parname] = gRandom->Uniform(1.0, 0.7);
-      else
+      if (uniformly) {
+        thrownNorms[parname] = randomNo->Uniform(1.0, 0.7);
+      } else {
         thrownNorms[parname] = currentNorms[parname] + mod;
+      }
     }
   }
 
+  // Check that we are still within bounds of parameters for xsec
   for (UInt_t i = 0; i < params.size(); i++) {
-    if (thrownVals[params[i]] < minVals[params[i]])
+
+    if (thrownVals[params[i]] < minVals[params[i]]) {
       thrownVals[params[i]] = minVals[params[i]];
-    if (thrownVals[params[i]] > maxVals[params[i]])
+    }
+    
+    if (thrownVals[params[i]] > maxVals[params[i]]) {
       thrownVals[params[i]] = maxVals[params[i]];
+    }
+
   }
 
+  // Check that we are still within bounds of parameters for norms
   for (UInt_t i = 0; i < sampleDials.size(); i++) {
-    if (thrownNorms[sampleDials[i]] < 0.3) thrownNorms[sampleDials[i]] = 0.3;
-    if (thrownNorms[sampleDials[i]] > 1.7) thrownNorms[sampleDials[i]] = 1.7;
+    if (thrownNorms[sampleDials[i]] < 0.3) {
+      thrownNorms[sampleDials[i]] = 0.3;
+    }
+
+    if (thrownNorms[sampleDials[i]] > 1.7) {
+      thrownNorms[sampleDials[i]] = 1.7;
+    }
   }
 
   return;
 };
 
 //*************************************
+// Generate error bands (DUH)
 void comparisonRoutines::GenerateErrorBands() {
-  //*************************************
+//*************************************
 
-  TDirectory* errorDIR = (TDirectory*)outputFile->mkdir("error_bands");
-  errorDIR->cd();
 
-  TFile* tempfile =
-      new TFile((outputFileName + ".throws.root").c_str(), "RECREATE");
+  // Make a file which stores details about the throws
+  TFile* tempfile = new TFile((outputFileName + ".throws.root").c_str(), "RECREATE");
   tempfile->cd();
+  // Read the number of throws from a parameters file
   int nthrows = FitPar::Config().GetParI("error_throws");
 
+  // Update the reweight engine with the current variations
+  // This is just so we can set a nominal setting
   updateRWEngine(currentVals, currentNorms);
   this->ReconfigureAllEvents();
 
+  // The nominal plot in tempfile
   TDirectory* nominal = (TDirectory*)tempfile->mkdir("nominal");
   nominal->cd();
   thisFCN->Write();
 
-  TDirectory* outnominal = (TDirectory*)outputFile->mkdir("nominal_throw");
+  // The nominal plot in tempfile
+  TDirectory* outnominal = (TDirectory*)outputFile->mkdir("nominal");
   outnominal->cd();
   thisFCN->Write();
 
-  errorDIR->cd();
+  TDirectory* errorDIR = (TDirectory*)outputFile->mkdir("error_bands");
+
+  // Make a TTree with the thrown values and the parameters
   TTree* parameterTree = new TTree("throws", "throws");
-  double chi2;
-  for (UInt_t i = 0; i < params.size(); i++)
-    parameterTree->Branch(params[i].c_str(), &thrownVals[params[i]],
-                          (params[i] + "/D").c_str());
-  for (UInt_t i = 0; i < sampleDials.size(); i++)
-    parameterTree->Branch(sampleDials[i].c_str(), &thrownNorms[sampleDials[i]],
-                          (sampleDials[i] + "/D").c_str());
+  double chi2 = 0.0;
+
+  // Loop over cross-section systematics parameters
+  for (UInt_t i = 0; i < params.size(); i++) {
+    parameterTree->Branch(params[i].c_str(), &thrownVals[params[i]], (params[i] + "/D").c_str());
+  }
+
+  // Loop over normalisation of data parameters
+  for (UInt_t i = 0; i < sampleDials.size(); i++) {
+    parameterTree->Branch(sampleDials[i].c_str(), &thrownNorms[sampleDials[i]], (sampleDials[i] + "/D").c_str());
+  }
+
+  // Save the chi2 branch
   parameterTree->Branch("chi2", &chi2, "chi2/D");
 
+  // Are we throwing uniformly?
   bool uniformly = FitPar::Config().GetParB("error_uniform");
 
   // Run Throws and save
   for (Int_t i = 0; i < nthrows; i++) {
+
+  // Save the throws folder in the temp file
     TDirectory* throwfolder = (TDirectory*)tempfile->mkdir(Form("throw_%i", i));
     throwfolder->cd();
 
@@ -1051,8 +1154,10 @@ void comparisonRoutines::GenerateErrorBands() {
     thisFCN->Write();
     chi2 = thisFCN->GetLikelihood();
 
+    // Fill the parameter tree
     parameterTree->Fill();
-  }
+
+  } // Finish the throwing
 
   errorDIR->cd();
   decompHist_Free->Write();
@@ -1065,84 +1170,89 @@ void comparisonRoutines::GenerateErrorBands() {
 
   delete parameterTree;
 
-  // Now go through the keys in the temporary file and look for TH1D, and TH2D
-  // plots
+  // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
+  // We essentially want to create the TProfile now!
   TIter next(nominal->GetListOfKeys());
   TKey* key;
-  while ((key = (TKey*)next())) {
+
+  while ( (key = (TKey*)next()) ) {
+
     TClass* cl = gROOT->GetClass(key->GetClassName());
-    if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
-    TH1D* baseplot = (TH1D*)key->ReadObj();
+    if (!cl->InheritsFrom("TH1D") && !cl->InheritsFrom("TH2D")) {
+      continue;
+    }
+
+    TH1D* baseplot = dynamic_cast<TH1D*>(nominal->Get(key->GetName()));
     std::string plotname = std::string(baseplot->GetName());
 
     int nbins = baseplot->GetNbinsX() * baseplot->GetNbinsY();
 
     // Setup TProfile with RMS option
-    TProfile* tprof =
-        new TProfile((plotname + "_prof").c_str(), (plotname + "_prof").c_str(),
-                     nbins, 0, nbins, "S");
+    TProfile* tprof = new TProfile((plotname+"_prof").c_str(), (plotname+"_prof").c_str(), nbins, 0, nbins, "s");
 
-    // Setup The TTREE
-    double* bincontents;
-    bincontents = new double[nbins];
+    // Setup the bin contents
+    double* bincontents = new double[nbins];
 
-    double* binlowest;
-    binlowest = new double[nbins];
+    // Setup the bin lowest
+    double* binlowest = new double[nbins];
 
-    double* binhighest;
-    binhighest = new double[nbins];
+    // Setup the bin highest
+    double* binhighest = new double[nbins];
 
-    errorDIR->cd();
-    TTree* bintree =
-        new TTree((plotname + "_tree").c_str(), (plotname + "_tree").c_str());
+    //TTree* bintree = new TTree((plotname + "_tree").c_str(), (plotname + "_tree").c_str());
+
     for (Int_t i = 0; i < nbins; i++) {
       bincontents[i] = 0.0;
       binhighest[i] = 0.0;
       binlowest[i] = 0.0;
-      bintree->Branch(Form("content_%i", i), &bincontents[i],
-                      Form("content_%i/D", i));
+      //bintree->Branch(Form("content_%i", i), &bincontents[i], Form("content_%i/D", i));
     }
 
     for (Int_t i = 0; i < nthrows; i++) {
-      TH1* newplot =
-          (TH1*)tempfile->Get(Form(("throw_%i/" + plotname).c_str(), i));
+      TH1* newplot = (TH1*)tempfile->Get(Form(("throw_%i/" + plotname).c_str(), i));
 
       for (Int_t j = 0; j < nbins; j++) {
         tprof->Fill(j + 0.5, newplot->GetBinContent(j + 1));
         bincontents[j] = newplot->GetBinContent(j + 1);
 
-        if (bincontents[j] < binlowest[j] or i == 0)
+        if (bincontents[j] < binlowest[j] || i == 0) {
           binlowest[j] = bincontents[j];
-        if (bincontents[j] > binhighest[j] or i == 0)
+        }
+        if (bincontents[j] >= binhighest[j] || i == 0) {
           binhighest[j] = bincontents[j];
+        }
       }
 
-      errorDIR->cd();
-      bintree->Fill();
+      //errorDIR->cd();
+      //bintree->Fill();
 
       delete newplot;
     }
 
     errorDIR->cd();
 
+    // Loop over the bins and write the baseplot
     for (Int_t j = 0; j < nbins; j++) {
       if (!uniformly) {
         baseplot->SetBinError(j + 1, tprof->GetBinError(j + 1));
 
       } else {
+
+        // Sets the error on the base plot to the average between the two bins, is this really correct?!
         baseplot->SetBinContent(j + 1, (binlowest[j] + binhighest[j]) / 2.0);
         baseplot->SetBinError(j + 1, (binhighest[j] - binlowest[j]) / 2.0);
+
       }
     }
 
     errorDIR->cd();
     baseplot->Write();
-    tprof->Write();
-    bintree->Write();
+    //tprof->Write();
+    //bintree->Write();
 
     delete baseplot;
     delete tprof;
-    delete bintree;
+    //delete bintree;
     delete[] bincontents;
   }
 

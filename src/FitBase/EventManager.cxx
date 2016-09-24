@@ -44,10 +44,12 @@ FitEvent* EventManager::GetEvent(int infile, int i){
   finputs[infile]->ReadEvent(i);
   FitEvent* evtpt = finputs[infile]->GetEventPointer();
 
+  // If we don't need a full reweight
   if (!frwneeded[infile][i]){
 
     evtpt->Weight = calc_rw[infile][i];
 
+  // if we do need a full reweight
   } else {
 
     evtpt->RWWeight = fRW->CalcWeight(evtpt);
@@ -98,11 +100,17 @@ void EventManager::AddInput(std::string handle, std::string infile){
   calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(),0.0);
 }
 
+// Reset the weight flags 
+// Should be called for every succesful event loop
 void EventManager::ResetWeightFlags(){
+
+  // Loop over the inpts
   for (std::map<int, InputHandler*>::iterator iter = finputs.begin();
        iter != finputs.end(); iter++){
+
     int id = iter->first;
     frwneeded[id].clear();
+    // Reset so that all events need the reweight
     frwneeded[id]= std::vector<bool>(finputs[id]->GetNEvents(),true);
   }
 }

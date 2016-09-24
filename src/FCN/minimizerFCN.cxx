@@ -239,14 +239,15 @@ void minimizerFCN::LoadSamples(std::string cardFile)
 
 
 // Used to override signal skipping functions
-void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
+void minimizerFCN::ReconfigureSamples(bool fullconfig) const {
 
-  int starttime = time(NULL);
-  this->current_iteration = this->current_iteration + 1;  
-  LOG(MIN) << "Starting Reconfigure iter. "<<this->current_iteration<<std::endl;
+  this->current_iteration = this->current_iteration + 1;
+
+  LOG(REC) << "Reconfigure iteration " << std::setw(4) << this->current_iteration << ": " << std::endl;
 
   // Loop over all Measurement Classes
   std::list<MeasurementBase*>::const_iterator iterSam = fChain.begin();
+
   for ( ; iterSam != fChain.end(); iterSam++){
 
     MeasurementBase* exp = (*iterSam);
@@ -257,17 +258,22 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
     std::cout<<"fullconfig = "<<fullconfig<<std::endl;
     */    
 
-    if (dialChanged or !filledMC or fullconfig){
-      if (!fullconfig and filledMC) exp->ReconfigureFast();
-      else                          exp->Reconfigure();
+    if (dialChanged || !filledMC || fullconfig) {
+
+      if (!fullconfig && filledMC) {
+        exp->ReconfigureFast();
+      } else {
+        exp->Reconfigure();
+      }
+
     // If RW Not needed just do normalisation
     } else {      
       exp->Renormalise();
     }    
   }
+
+  // Have we filled the MC once?
   filledMC = true;
-  LOG(MIN) << "-> Time Taken "<< time(NULL) - starttime << "s"<<std::endl;
-  
 }
 
 
@@ -332,13 +338,18 @@ void minimizerFCN::ThrowSamples(){
   }
 }
 
-
+// ******************************************
+// Reconfigure only signal
 void minimizerFCN::ReconfigureSignal(){
+// ******************************************
   this->ReconfigureSamples(false);
   return;
 }
  
+// ******************************************
+// Reconfigure all events in the given samples (called from Minimizer/comparisonRoutines or Minimizer/fitRoutines)
 void minimizerFCN::ReconfigureAllEvents() const{
+// ******************************************
   this->ReconfigureSamples(true);
   return;
 }
@@ -347,13 +358,14 @@ void minimizerFCN::Write(){
 
   // Loop over individual experiments and save relevant information  
   // Loop over all returned STL vectors (joint fits have more than one set of return values)             
-  LOG(MIN)<<"Writing each of the data classes:"<<std::endl;
+  LOG(MIN) << "Writing each of the data classes:" << std::endl;
   for (std::list<MeasurementBase*>::iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
     exp->Write();
   }
 
-  return;
+// redundant code
+/*
   // Save data and MC cross-section plots          
   TH1D* tempMCXsec = GetXSecPlot("MC");
   tempMCXsec->Write();
@@ -380,5 +392,8 @@ void minimizerFCN::Write(){
     delete temp;
     delete finalcov;
   }
+*/
+  return;
+
 };
 

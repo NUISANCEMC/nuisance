@@ -469,24 +469,26 @@ void FitWeight::PrintState() {
   LOG(MIN) << "-----------------------" << std::endl;
   LOG(MIN) << this->rw_name << " Cur. State:" << std::endl;
 
+  // Loop over the Dials and print some info
   for (unsigned int i = 0; i < dial_names.size(); i++) {
+
     std::string name = dial_names.at(i);
     int this_enum = dial_enums.at(i);
     double val = dial_values.at(i);
     std::string type = GetDialType(this_enum);
 
-    if (FitPar::Config().GetParB("convert_dials") or true) {
+    if (FitPar::Config().GetParB("convert_dials")) {
       double val = dial_func.at(i).Eval(dial_values.at(i));
 
-      LOG(MIN) << "-> " << i << ". " << type + "_par. "
-               << " " << dial_names.at(i) << " = " << val << " "
-               << dial_units.at(i) << std::endl;
+      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
+      std::cout << std::setw(40) << dial_names.at(i) << std::setw(5) << " = " << val << " " << dial_units.at(i) << std::endl;
 
     } else {
       (void)val;
-      LOG(MIN) << "-> " << i << ". " << type + "_par. "
-               << " " << dial_names.at(i) << " = " << dial_values.at(i) << " "
-               << dial_units.at(i) << std::endl;
+
+      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
+      std::cout << std::setw(40) << std::left << dial_names.at(i) << std::setw(5) << " = " << dial_values.at(i) << " " << dial_units.at(i) << std::endl;
+
     }
   }
 
@@ -875,7 +877,7 @@ void FitWeight::UpdateWeightEngine(const double* x) {
 bool FitWeight::HasRWDialChanged(const double* x) {
   //********************************************************************
 
-  for (int i = 0; i < dial_values.size(); i++) {
+  for (unsigned int i = 0; i < dial_values.size(); i++) {
     int rw_enum = dial_enums.at(i);
     int id = int(rw_enum - (rw_enum % 1000)) / 1000;
 
@@ -924,7 +926,7 @@ double FitWeight::GetSampleNorm(std::string samplename) {
     }
   }
 
-  if (!found_dial and !samplename.empty()) {
+  if (!found_dial && !samplename.empty()) {
     LOG(FIT) << " Late initialisation of norm: " << norm_dial << std::endl;
     this->IncludeDial(norm_dial, kNORM, 1.0);
     LOG(FIT) << "RECONFIGURING" << std::endl;
@@ -932,8 +934,6 @@ double FitWeight::GetSampleNorm(std::string samplename) {
     return 1.0;
 
   } else {
-    LOG(FIT) << " Getting sample norm " << norm_dial << " = "
-             << this->GetDialValue(norm_dial) << std::endl;
     return this->GetDialValue(norm_dial);
   }
 }
@@ -1261,12 +1261,12 @@ std::string FitBase::GetRWUnits(std::string type, std::string name) {
   std::string unit = "sig.";
   std::string parType = type;
 
-  if (parType.find("parameter") == std::string::npos) parType += "_parameter";
+  if (parType.find("parameter") == std::string::npos) {
+    parType += "_parameter";
+  }
 
-  string line;
-  ifstream card(
-      (string(getenv("EXT_FIT")) + "/parameters/dial_conversion.card").c_str(),
-      ifstream::in);
+  std::string line;
+  ifstream card((string(getenv("EXT_FIT")) + "/parameters/dial_conversion.card").c_str(), ifstream::in);
 
   while (getline(card, line, '\n')) {
     istringstream stream(line);

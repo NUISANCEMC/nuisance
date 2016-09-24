@@ -28,6 +28,7 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   EnuMax = 3.;
   isDiag = true;
   isRawEvents = true;
+  allowed_types += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_firstQ2gone.txt");

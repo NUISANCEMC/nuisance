@@ -28,6 +28,7 @@ BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
   EnuMax = 6.0;
   isDiag = true;
   isRawEvents = true;
+  allowed_types += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1ppip_W14_cosThAdler.csv");

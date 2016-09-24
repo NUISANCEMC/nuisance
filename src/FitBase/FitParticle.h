@@ -25,6 +25,7 @@
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
+#include "neutfsipart.h"
 #endif
 
 #ifdef __NUWRO_ENABLED__
@@ -66,6 +67,8 @@ class FitParticle {
 #ifdef __NEUT_ENABLED__
   //! NEUT Constructor
   FitParticle(NeutPart* part);
+  //! NEUT FSI particles constructor
+  FitParticle(NeutFsiPart* part);
 #endif
 
 

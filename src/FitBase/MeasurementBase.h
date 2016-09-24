@@ -118,8 +118,14 @@ class MeasurementBase {
   virtual double PredictedEventRate(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
 
 
+  int GetPassed() {
+    int signalSize = X_VAR_VECT.size();
+    return signalSize;
+  }
 
-
+  int GetTotal() {
+    return nevents;
+  }
 
   /*
     Reconfigure LOOP
