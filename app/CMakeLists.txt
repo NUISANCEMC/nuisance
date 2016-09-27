@@ -63,6 +63,15 @@ if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(nuiscomp PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
+add_executable(nuissyst nuissyst.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissyst)
+target_link_libraries(nuissyst ${MODULETargets})
+target_link_libraries(nuissyst ${CMAKE_DEPENDLIB_FLAGS})
+target_link_libraries(nuissyst ${ROOT_LIBS})
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(nuissyst PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
+
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
 #if(USE_NuWro)

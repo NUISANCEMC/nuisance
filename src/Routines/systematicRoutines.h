@@ -17,8 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINIMIZER_ROUTINE_H
-#define MINIMIZER_ROUTINE_H
+#ifndef SYSTEMATIC_ROUTINES_H
+#define SYSTEMATIC_ROUTINES_H
 
 /*!
  *  \addtogroup Minimizer
@@ -43,7 +43,7 @@
 #include <cstring>
 
 #include "FitEvent.h"
-#include "minimizerFCN.h"
+#include "jointFCN.h"
 #include "FitParameters.h"
 
 #include "Math/Minimizer.h"
@@ -53,7 +53,7 @@
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
-class minimizerRoutine{
+class systematicRoutines{
 //*************************************
 
 public:
@@ -63,10 +63,10 @@ public:
   */
 
   //! Constructor reads in arguments given at the command line for the fit here.
-  minimizerRoutine(int argc, char* argv[]);
+  systematicRoutines(int argc, char* argv[]);
 
   //! Default destructor
-  ~minimizerRoutine();
+  ~systematicRoutines();
 
   /*
     Input Functions
@@ -92,12 +92,6 @@ public:
   //! Read in the samples so we can set up the free normalisation dials if required
   void readSamples(std::string sampleString);
 
-  //! If a previous input file is provided, eg to take the starting dial values, it is done here. NEEDS TESTING.
-  void readInputFile();
-
-  //! Check if previous result wasn't actually the final minimum incase we want to use fit continue functions. NEEDS TESTING
-  bool checkPreviousResult();
-
   //! Read in a parameter pulls class as a covariance for the fit. Currently just used for throwing covariances but will change covariance pull
   //! terms to use this method soon so it is a bit clearer.
   void readCovariance(std::string covarString);
@@ -113,11 +107,8 @@ public:
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void setupRWEngine();
 
-  //! Setups up the minimizerFCN.
+  //! Setups up the jointFCN.
   void setupFCN();
-
-  //! Sets up the minimizerObj for ROOT. there are cases where this is called repeatedly, e.g. If you are using a brute force scan before using Migrad.
-  void setupFitter(std::string routine);
 
   //! Set the current data histograms in each sample to the fake data.
   void setFakeData();
@@ -125,6 +116,9 @@ public:
   //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
   //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
   void SetupCovariance();
+
+  //! Check all dials have been added to the input card so we can grab the limits
+  void checkCovarianceDials(bool printdials);
 
   /*
     Fitting Functions
@@ -138,24 +132,6 @@ public:
 
   //! Given a single routine (see tutorial for options) run that fit routine now.
   void RunFitRoutine(std::string routine);
-
-  //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
-  void getMinimizerState();
-
-  //! Performs a fit routine where the MAXEVENTS is set to a much lower value to try and move closer to the best fit minimum.
-  void LowStatRoutine(std::string routine);
-
-  //! Perform a chi2 scan in 1D around the current point
-  void Create1DScans();
-
-  //! Perform a chi2 scan in 2D around the current point
-  void Chi2Scan2D();
-
-  //! Currently a placeholder NEEDS UPDATING
-  void CreateContours();
-
-  //! If any currentVals are close to the limits set them to the limit and fix them
-  void FixAtLimit();
 
   //! Throw the current covariance of dial values we have, and fill the thrownVals and thrownNorms maps.
   //! If uniformly is true parameters will be thrown uniformly between their upper and lower limits.
@@ -177,10 +153,6 @@ public:
 
   //! Write plots and TTrees listing the minimizerObj result of the fit to file
   void saveMinimizerState();
-
-  //! Save the output of the fitter including sample plots.
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void saveFitterOutput(std::string dir="");
 
   //! Save the sample plots for current MC
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
@@ -218,15 +190,8 @@ protected:
   //! Flag for whether the fit should be continued if an output file is already found.
   bool fitContinue;
 
-  //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* minimizerObj;
-
   //! The actual chi2 Function from FCN module
-  minimizerFCN* thisFCN;
-
-  //! A functor that root requires to pass to minimizerObj.
-  //! Basically just a wrapper for thisFCN
-  ROOT::Math::Functor* callFCN;
+  jointFCN* thisFCN;
 
   //! Current number of free parameters. callFCN requires this when being setup.
   int nfreepars;

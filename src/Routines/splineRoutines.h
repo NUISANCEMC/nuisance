@@ -43,7 +43,7 @@
 #include <cstring>
 
 #include "FitEvent.h"
-#include "minimizerFCN.h"
+#include "jointFCN.h"
 #include "FitParameters.h"
 
 #include "Math/Minimizer.h"

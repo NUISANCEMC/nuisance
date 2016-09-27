@@ -454,9 +454,9 @@ void comparisonRoutines::setupRWEngine() {
 void comparisonRoutines::setupFCN() {
   //*************************************
 
-  LOG(FIT) << "Making the minimizerFCN" << std::endl;
+  LOG(FIT) << "Making the jointFCN" << std::endl;
   if (thisFCN) delete thisFCN;
-  thisFCN = new minimizerFCN(cardFile, outputFile);
+  thisFCN = new jointFCN(cardFile, outputFile);
   thisFCN->SetOutName(outputFileName);
   setFakeData();
 

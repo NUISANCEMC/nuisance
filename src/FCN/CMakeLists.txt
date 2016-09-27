@@ -17,12 +17,12 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-minimizerFCN.cxx
+jointFCN.cxx
 SampleList.cxx
 )
 
 set(HEADERFILES
-minimizerFCN.h
+jointFCN.h
 SampleList.h
 )
 

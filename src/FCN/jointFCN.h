@@ -1,5 +1,5 @@
-#ifndef _MINIMIZER_FCN_H_
-#define _MINIMIZER_FCN_H_
+#ifndef _JOINT_FCN_H_
+#define _JOINT_FCN_H_
 /*!                                                                                                                                                                                                   
  *  \addtogroup FCN                                                                                                                                                                                 
  *  @{                                                                                                                                                                                                
@@ -31,8 +31,8 @@
 
 using namespace FitUtils;
 
-//! Main FCN Class which ROOT's minimizer function needs to evaulate the chi2 at each stage of the fit.
-class minimizerFCN  
+//! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
+class jointFCN  
 {
   
  private: 
@@ -58,8 +58,8 @@ class minimizerFCN
  public:
   
   
-  minimizerFCN(std::string cardfile, TFile *outfile);
-  ~minimizerFCN();
+  jointFCN(std::string cardfile, TFile *outfile);
+  ~jointFCN();
 
   void SetOutName(std::string name){this->outname = name;}
   void Write();
@@ -75,7 +75,10 @@ class minimizerFCN
     return this->DoEval(x);
   };
   
-
+  void CreateIterationTree(std::string name, FitWeight* rw);
+  void WriteIterationTree();
+  void DestroyIterationTree();
+  void FillIterationTree(FitWeight* rw) const;
   unsigned int NDim() {return this->GetNDOF();};
   
   
@@ -119,6 +122,10 @@ class minimizerFCN
   mutable  bool filledMC;
   TFile* outputfile;
 
+  mutable int ndials;
+  mutable double* dialvals;
+  mutable TTree* iteration_tree;
+  mutable double likelihood;
 };
 
 /*! @} */

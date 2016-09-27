@@ -26,7 +26,7 @@
    where:   
 */
 
-#include "minimizerRoutine.h"
+#include "minimizerRoutines.h"
 
 //*******************************
 void printInputCommands(){
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting ExtFit_minimizer.exe"<<std::endl;
 
   // Make minimizer class and run fit
-  minimizerRoutine* min = new minimizerRoutine(argc, argv);
+  minimizerRoutines* min = new minimizerRoutines(argc, argv);
   min->initialSetup();
   
   // Save Starting States

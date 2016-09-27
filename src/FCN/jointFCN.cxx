@@ -1,8 +1,8 @@
-#include "minimizerFCN.h"
+#include "jointFCN.h"
 #include <stdio.h> 
 #include "FitUtils.h"
 
-minimizerFCN::minimizerFCN(std::string cardfile,  TFile *outfile){
+jointFCN::jointFCN(std::string cardfile,  TFile *outfile){
   
   out       = outfile;
   card      = cardfile;
@@ -15,18 +15,70 @@ minimizerFCN::minimizerFCN(std::string cardfile,  TFile *outfile){
   filledMC = false;
   randGen = new TRandom3();
   randGen->SetSeed(time(NULL));
+
+  out->cd();
+  iteration_tree = NULL;
+  dialvals = NULL;
+  ndials = 0;
+  
 };
 
-minimizerFCN::~minimizerFCN() {
+jointFCN::~jointFCN() {
   for (std::list<MeasurementBase*>::iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
     delete exp;
   }
+  DestroyIterationTree();
+  if (dialvals) delete dialvals;
 };
 
 
-double minimizerFCN::DoEval(const double *x) const {
+void jointFCN::CreateIterationTree(std::string name, FitWeight* rw){
 
+  if (iteration_tree) delete iteration_tree;
+  iteration_tree = new TTree(name.c_str(), name.c_str());
+  iteration_tree->Branch("likelihood",&likelihood,"likelihood/D");
+  
+  std::vector<std::string> dials = rw->GetDialNames();
+  ndials = dials.size();
+  dialvals = new double[ndials];
+  
+  for (int i = 0; i < ndials; i++){
+    iteration_tree->Branch( dials[i].c_str(), &dialvals[i],
+			    (dials[i] + "/D").c_str() );
+  }
+}
+
+void jointFCN::DestroyIterationTree(){
+  if (!iteration_tree){
+    delete iteration_tree;
+  }
+}
+
+void jointFCN::WriteIterationTree(){
+  if (!iteration_tree){
+    ERR(FTL) << "Can't save empty iteration tree!" << endl;
+    throw;
+  }
+  iteration_tree->Write();
+}
+
+void jointFCN::FillIterationTree(FitWeight* rw) const{
+
+  if (!iteration_tree){
+    ERR(FTL) << "Trying to fill iteration_tree when it is NULL!" << endl;
+    throw;
+  }
+  
+  rw->GetAllDials( dialvals, ndials );
+  iteration_tree->Fill();
+}
+
+
+
+
+double jointFCN::DoEval(const double *x) const {
+ 
   // WEIGHT ENGINE
   dialChanged = FitBase::GetRW()->HasRWDialChanged(x);
   FitBase::GetRW()->UpdateWeightEngine(x);
@@ -39,21 +91,22 @@ double minimizerFCN::DoEval(const double *x) const {
   //    sleep(2);
   //}
 
-
-  
   // SORT SAMPLES
   ReconfigureSamples();
 
   // GET TEST STAT
-  double likelihood = GetLikelihood();
+  likelihood = GetLikelihood();
 
   // PRINT PROGRESS
   LOG(FIT) << "Current Stat (iter. "<< this->current_iteration << ") = "<<likelihood<<std::endl;
+
+  
+  if (iteration_tree) FillIterationTree(FitBase::GetRW());
   return likelihood;
 }
 
 
-int minimizerFCN::GetNDOF() {
+int jointFCN::GetNDOF() {
 
   int nDOF = 0;
 
@@ -65,7 +118,7 @@ int minimizerFCN::GetNDOF() {
   return nDOF;
 }
 
-double minimizerFCN::GetLikelihood() const {
+double jointFCN::GetLikelihood() const {
 
   double chi2 = 0.0;
 
@@ -119,7 +172,7 @@ double minimizerFCN::GetLikelihood() const {
   return chi2;
 };
 
-void minimizerFCN::CreateFullCovarMatrix(){
+void jointFCN::CreateFullCovarMatrix(){
 
 
   /*// Hack to get NBins for full covar
@@ -173,7 +226,7 @@ void minimizerFCN::CreateFullCovarMatrix(){
   
 
 
-void minimizerFCN::LoadSamples(std::string cardFile) 
+void jointFCN::LoadSamples(std::string cardFile) 
 {
   LOG(MIN)<<"Initializing Samples"<<std::endl;
 
@@ -236,7 +289,7 @@ void minimizerFCN::LoadSamples(std::string cardFile)
 
 
 // Used to override signal skipping functions
-void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
+void jointFCN::ReconfigureSamples(bool fullconfig) const{
 
   int starttime = time(NULL);
   this->current_iteration = this->current_iteration + 1;  
@@ -268,7 +321,7 @@ void minimizerFCN::ReconfigureSamples(bool fullconfig) const{
 }
 
 
-void minimizerFCN::SetFakeData(std::string fakeOpt){
+void jointFCN::SetFakeData(std::string fakeOpt){
              
   for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
     MeasurementBase* exp = *iter;
@@ -278,11 +331,11 @@ void minimizerFCN::SetFakeData(std::string fakeOpt){
 };
 
 
-std::list<MeasurementBase*> minimizerFCN::GetSampleList(){
+std::list<MeasurementBase*> jointFCN::GetSampleList(){
   return fChain;
 }
 
-TH1D* minimizerFCN::GetXSecPlot(std::string type){
+TH1D* jointFCN::GetXSecPlot(std::string type){
 
   bool data = true;
   if (!type.compare("MC")) data = false;
@@ -320,7 +373,7 @@ TH1D* minimizerFCN::GetXSecPlot(std::string type){
 }
 
 
-void minimizerFCN::ThrowSamples(){
+void jointFCN::ThrowSamples(){
 
   std::list<MeasurementBase*>::const_iterator iter = fChain.begin();
   for ( ; iter != fChain.end(); iter++){
@@ -330,17 +383,17 @@ void minimizerFCN::ThrowSamples(){
 }
 
 
-void minimizerFCN::ReconfigureSignal(){
+void jointFCN::ReconfigureSignal(){
   this->ReconfigureSamples(false);
   return;
 }
  
-void minimizerFCN::ReconfigureAllEvents() const{
+void jointFCN::ReconfigureAllEvents() const{
   this->ReconfigureSamples(true);
   return;
 }
 
-void minimizerFCN::Write(){
+void jointFCN::Write(){
 
   // Loop over individual experiments and save relevant information  
   // Loop over all returned STL vectors (joint fits have more than one set of return values)             
