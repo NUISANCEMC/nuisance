@@ -142,4 +142,4 @@ config custom_pars.mec_norm.val  1.0
 
 
 config minimizer.tolerance  0.001
-config EventManager 1
+config EventManager 0
