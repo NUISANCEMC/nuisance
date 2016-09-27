@@ -98,7 +98,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
   // Hadronic mass cut in true
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double Tpi;
+  double Tpi = -999;
 
   // If hadronic mass passes signal, loop over the pions
   if (hadMass > 100 && hadMass < 1800 && piIndex.size() > 0) {
