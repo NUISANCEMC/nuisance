@@ -682,7 +682,8 @@ void InputHandler::ReadGenieFile() {
 
     GHepRecord genie_record = static_cast<GHepRecord>(event);
 
-    double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+    //    double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+    double xsec = (1E+38/genie::units::cm2) * (1.0/2.0) * genie_record.XSec();
 
     average_xsec += xsec;
     total_events += 1;
@@ -693,21 +694,19 @@ void InputHandler::ReadGenieFile() {
     mcrec->Clear();
   }
 
-  // Sort xsec hist
-  this->xsecHist->Divide(this->eventHist);
+  average_xsec = average_xsec / (total_events + 0.);
+  this->eventHist->Scale( average_xsec * this->fluxHist->Integral("width") / total_events, "width" );
+  this->xsecHist = (TH1D*)this->eventHist->Clone();
+  this->xsecHist->Divide(this->fluxHist);
 
-  // Sort eventHist as xsecHist * eventHist
-  this->eventHist = (TH1D*)this->fluxHist->Clone();
-  this->eventHist->Multiply(this->xsecHist);
-
-  this->eventHist->SetNameTitle(
-      (this->handleName + "_EVT").c_str(),
-      (this->handleName + "_EVT;E_{#nu} (GeV); Events (1#times10^{-38})")
-          .c_str());
-  this->xsecHist->SetNameTitle(
-      (this->handleName + "_XSEC").c_str(),
-      (this->handleName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
-          .c_str());
+  // Set Titles
+  this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
+				(this->handleName + "_EVT;E_{#nu} (GeV); Events (1#times10^{-38})")
+				.c_str());
+  
+  this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
+			       (this->handleName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
+			       .c_str());
 
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
@@ -791,7 +790,7 @@ void InputHandler::ReadBinSplineFile() {
 
 //********************************************************************
 void InputHandler::ReadHistogramFile() {
-  //********************************************************************
+//********************************************************************
 
   // Convert the raw histogram into a series of events with X variables
 

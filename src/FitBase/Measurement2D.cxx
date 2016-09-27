@@ -107,6 +107,16 @@ void Measurement2D::SetupDefaultHist(){
   // Setup the NEUT Mode Array
   PlotUtils::CreateNeutModeArray(this->mcHist,(TH1**)this->mcHist_PDG);
 
+  // Setup bin masks using sample name
+  if (isMask){
+    std::string maskloc = FitPar::Config().GetParDIR( this->measurementName + ".mask");
+    if (maskloc.empty()){
+      maskloc = FitPar::GetDataBase() + "/masks/" + measurementName + ".mask";
+    }
+
+    SetBinMask(maskloc);
+  }
+  
   return;
 }
 
@@ -695,7 +705,18 @@ int Measurement2D::GetNDOF(){
 double Measurement2D::GetLikelihood(){
 //********************************************************************
 
-//  if (isProjFitX or isProjFitY) return GetProjectedChi2();
+  // Fix weird masking bug
+  if (!isMask){
+    if (maskHist){
+      maskHist = NULL;
+    }
+  } else {
+    if (maskHist){
+      PlotUtils::MaskBins(this->mcHist, this->maskHist);
+    }
+  }
+  
+  //  if (isProjFitX or isProjFitY) return GetProjectedChi2();
 
   // Scale up the results to match each other (Not using width might be inconsistent with Meas1D)
   double scaleF = this->dataHist->Integral()/this->mcHist->Integral();
@@ -707,6 +728,7 @@ double Measurement2D::GetLikelihood(){
   if (!mapHist){
     mapHist = StatUtils::GenerateMap(dataHist);
   }
+  
 
   // Get the chi2 from either covar or diagonals
   double chi2;

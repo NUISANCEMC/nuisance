@@ -145,6 +145,16 @@ void Measurement1D::SetupDefaultHist(){
   PlotUtils::CreateNeutModeArray((TH1D*)this->mcHist,(TH1**)this->mcHist_PDG);
   PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_PDG);
 
+  // Setup bin masks using sample name
+  if (isMask){
+    std::string maskloc = FitPar::Config().GetParDIR( this->measurementName + ".mask");
+    if (maskloc.empty()){
+      maskloc = FitPar::GetDataBase() + "/masks/" + measurementName + ".mask";
+    }
+
+    SetBinMask(maskloc);
+  }
+  
   return;
 }
 
@@ -713,6 +723,10 @@ double Measurement1D::GetLikelihood(){
   if (!isMask){
     if (maskHist){
       maskHist = NULL;
+    }
+  } else {
+    if (maskHist){
+      PlotUtils::MaskBins(this->mcHist, this->maskHist);
     }
   }
 

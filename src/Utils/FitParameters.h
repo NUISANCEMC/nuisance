@@ -74,8 +74,10 @@ class FitParameters {
 
   double GetParD(std::string parName);
 
-  std::string GetParS(std::string parName);
+  std::string GetParS(std::string parName, bool quiet=false);
 
+  std::string GetParDIR(std::string parName);
+  
   // Variables
   std::string parFileName;
   std::map<std::string, std::string> parameterMap_all;

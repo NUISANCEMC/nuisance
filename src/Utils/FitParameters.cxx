@@ -244,16 +244,42 @@ double FitParameters::GetParD(std::string parName) {
   }
 };
 
-std::string FitParameters::GetParS(std::string parName) {
+std::string FitParameters::GetParS(std::string parName, bool quiet) {
   // Check if it is saved in int map
   if (parameterMap_all.find(parName) != parameterMap_all.end()) {
     return parameterMap_all[parName];
 
   } else {
-    std::cout << "Error: Parameter - " << parName
-              << " - not found in requirements file." << std::endl;
-    return "NULL PARAMETER";
+    if (!quiet){
+      std::cout << "Error: Parameter - " << parName
+		<< " - not found in requirements file." << std::endl;
+    }
+    
+    return "";
   }
+};
+
+
+std::string FitParameters::GetParDIR(std::string parName){
+
+  std::string outstr = this->GetParS(parName, true);
+
+  // Make replacements in the string
+  const int nfiletypes = 2;
+  const std::string filetypes[nfiletypes] = {"@data","@nuisance"};
+  std::string filerepl[nfiletypes] = { FitPar::GetDataBase(),
+				       FitPar::GetDataBase() + "/../" };
+
+  for (int i = 0; i < nfiletypes; i++) {
+    std::string findstring = filetypes[i];
+    std::string replstring = filerepl[i];
+    if (outstr.find(findstring) != std::string::npos) {
+      outstr.replace(outstr.find(findstring), findstring.size(), filerepl[i]);
+      break;
+    }
+  }
+
+  return outstr;
 };
 
 
