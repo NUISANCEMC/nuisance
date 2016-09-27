@@ -126,6 +126,7 @@ class jointFCN
   mutable double* dialvals;
   mutable TTree* iteration_tree;
   mutable double likelihood;
+  mutable double* samplelikes;
 };
 
 class helperFunc{

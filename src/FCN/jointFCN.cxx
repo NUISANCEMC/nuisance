@@ -37,8 +37,23 @@ void jointFCN::CreateIterationTree(std::string name, FitWeight* rw){
 
   if (iteration_tree) delete iteration_tree;
   iteration_tree = new TTree(name.c_str(), name.c_str());
-  iteration_tree->Branch("likelihood",&likelihood,"likelihood/D");
+  iteration_tree->Branch("total_likelihood",&likelihood,"total_likelihood/D");
+
+  // Sample Likelihoods
+  int nsamples = fChain.size();
+  samplelikes = new double[nsamples];
+  int count = 0;
   
+  for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
+    MeasurementBase* exp = *iter;
+    std::string name = exp->GetName();
+    std::string tag = name + "_likelihood";
+
+    iteration_tree->Branch(tag.c_str(), &samplelikes[count], (tag + "/D").c_str());
+    count++;
+  }
+  
+  // Dials
   std::vector<std::string> dials = rw->GetDialNames();
   ndials = dials.size();
   dialvals = new double[ndials];
@@ -123,10 +138,13 @@ double jointFCN::GetLikelihood() const {
   double chi2 = 0.0;
 
   if (!FitPar::Config().GetParB("JOINT_COVARIANCE")) {
+    int count = 0;
     for (std::list<MeasurementBase*>::const_iterator iter = fChain.begin(); iter != fChain.end(); iter++){
-
       MeasurementBase* exp = *iter;
-      chi2 += exp->GetLikelihood();
+      double newlike = exp->GetLikelihood();
+      samplelikes[count] = newlike;
+      chi2 += newlike;
+      count++;
     }
 
   } else {
