@@ -28,11 +28,12 @@
 
 #define GetCurrentDir getcwd
 #include "EventManager.h"
+#include "Math/Functor.h"
 
 using namespace FitUtils;
 
 //! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
-class jointFCN  
+class jointFCN 
 {
   
  private: 
@@ -54,7 +55,6 @@ class jointFCN
   std::list<MeasurementBase*> fChain;
   
   void LoadSamples(std::string cardFile);
-
  public:
   
   
@@ -126,6 +126,30 @@ class jointFCN
   mutable double* dialvals;
   mutable TTree* iteration_tree;
   mutable double likelihood;
+};
+
+class helperFunc{
+ public:
+  jointFCN* fFCN;
+  
+  helperFunc(jointFCN* f){fFCN = f;};
+  ~helperFunc(){};
+
+  double Up() const { return 1.; }
+  double DoEval(const double *x) const {
+    return fFCN->DoEval(x);
+  };
+
+  double operator() (const std::vector<double> & x) const{
+    double* x_array = new double[x.size()];
+    return this->DoEval(x_array);
+  };
+
+  double operator() (const double *x) const{
+    return this->DoEval(x);
+  };
+  
+  
 };
 
 /*! @} */

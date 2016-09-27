@@ -558,11 +558,12 @@ void minimizerRoutines::setupFCN(){
   LOG(FIT)<<"Making the jointFCN"<<std::endl;
   if (thisFCN) delete thisFCN;
   thisFCN = new jointFCN(cardFile, outputFile);
-  thisFCN->CreateIterationTree("fit_iterations",FitBase::GetRW());
   thisFCN->SetOutName(outputFileName);
+  thisFCN->CreateIterationTree("minimizer_iterations",FitBase::GetRW());
   setFakeData();
-  callFCN = new ROOT::Math::Functor(*thisFCN,params.size() + sampleDials.size());
-
+  helperFunc* helperFCN = new helperFunc(thisFCN);
+  callFCN = new ROOT::Math::Functor( *helperFCN, params.size() + sampleDials.size());
+  
   return;
 }
 
@@ -1115,10 +1116,7 @@ void minimizerRoutines::saveMinimizerState(){
 
   if (!minimizerObj) return;
 
-  // Save fit iterations
-  if (thisFCN){
-    thisFCN->WriteIterationTree();
-  }
+  thisFCN->WriteIterationTree();
   
   // Get Values and Errors
   getMinimizerState();
