@@ -99,10 +99,6 @@ public:
   //! Check if previous result wasn't actually the final minimum incase we want to use fit continue functions. NEEDS TESTING
   bool checkPreviousResult();
 
-  //! Read in a parameter pulls class as a covariance for the fit. Currently just used for throwing covariances but will change covariance pull
-  //! terms to use this method soon so it is a bit clearer.
-  void readCovariance(std::string covarString);
-
   /*
     Setup Functions
   */

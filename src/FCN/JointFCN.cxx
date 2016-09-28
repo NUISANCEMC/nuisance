@@ -295,14 +295,22 @@ void JointFCN::LoadSamples(std::string cardinput)
     }
 
     // Sample Inputs
-    if (!samplevect[0].compare("covar")){;
+    if (!samplevect[0].compare("covar") ||
+	!samplevect[0].compare("pulls") ||
+	!samplevect[0].compare("throws")) {
 
       // Get all inputs
       std::string name  = samplevect[1];
       std::string files = samplevect[2];
       std::string type = "DEFAULT";
-      if (samplevect.size() > 3)
+      
+      if (samplevect.size() > 3){
 	type  = samplevect[3];
+      } else if (!samplevect[0].compare("pull")){
+	type = "GAUSPULL";
+      } else if (!samplevect[0].compare("throws")){
+	type = "GAUSTHROWS";
+      }
 
       // Create Pull Class
       LOG(MIN) << "Loading up pull term: "<<name<<" << " <<files << " ("<<type<<")"<<std::endl;

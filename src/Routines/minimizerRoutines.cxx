@@ -154,9 +154,9 @@ void minimizerRoutines::readCard(){
     readParameters(line);
     readFakeDataPars(line);
     readSamples(line);
-    readCovariance(line);
   }
   card.close();
+ 
   return;
 };
 
@@ -1520,40 +1520,6 @@ void minimizerRoutines::SetupCovariance(){
 
   return;
 };
-
-//*************************************
-void minimizerRoutines::readCovariance(std::string covarString){
-//*************************************
-
-  std::string token, covarname, covartype;
-  std::istringstream stream(covarString);   int val = 0;
-
-  if (covarString.c_str()[0] == '#') return;
-
-  while(std::getline(stream, token, ' ')){
-    stream >> std::ws;    // strip whitespace
-    std::istringstream stoken(token);
-
-
-    if (val == 0 && token.compare("covar") != 0){ return; }
-    else if (val == 1){ covarname = token; }
-    else if (val == 2) { covartype = token; }
-    else if (val == 3) {
-
-      parameter_pulls* temp_pulls = new parameter_pulls(covarname, token, rw, covartype, "");
-      this->input_covariances.push_back(temp_pulls->GetFullCovarMatrix());
-      this->input_dials.push_back((TH1D*)temp_pulls->GetDataList().at(0)->Clone());
-
-      delete temp_pulls;
-    }
-
-    val++;
-  }
-
-  return;
-};
-
-
 
 //*************************************
 void minimizerRoutines::ThrowCovariance(bool uniformly){
