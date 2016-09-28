@@ -107,10 +107,6 @@ class MeasurementBase {
   virtual void SetFakeDataValues(std::string fkdt) = 0;
 
 
-
-  //! Set the flux histogram from file
-  virtual void SetFluxHistogram(std::string fluxFile, int minE, int maxE, double fluxNorm);
-
   //! Get the total integrated flux between this samples energy range
   virtual double TotalIntegratedFlux(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
 
@@ -195,19 +191,18 @@ protected:
   BaseFitEvt* signal_event;
   FitEvent* cust_event;
   FitWeight* rw_engine; //!< Pointer to the rw engine
-  InputHandler* input; //!< Instance of the input handler
+  InputHandler* fInput; //!< Instance of the input handler
   std::string fName;
   int eventType;
 
-  // Input Event rate flux/event histograms
-  TH1D* fluxHist;  //!< Flux Histogram
-  TH1D* eventHist; //!< Event Histogram
-  TH1D* xsecHist;  //!< XSec Histogram
+  TH1D* fEventHist;
+  TH1D* fXSecHist;
+  TH1D* fFluxHist;
 
   double exp_distance; //!< Incoming Particle flight distance (for oscillation analysis)
   double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
   double currentNorm; //!< current normalisation factor applied if fit is "FREE"
-  bool filledMC; //!< flag whether MC plots have been filled (For ApplyNormalisation)
+  bool fMCFilled; //!< flag whether MC plots have been filled (For ApplyNormalisation)
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar,fYVar,fZVar,Mode,Weight;

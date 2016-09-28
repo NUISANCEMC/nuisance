@@ -422,32 +422,6 @@ T2K Samples
     /*
 K2K Samples
     */
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_1trk") ||
-             !name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkQE") ||
-             !name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkNonQE")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(name, file, rw, type, fkdt));
-
-  } else if (!name.compare("K2KI_CC0pi_XSec_1DQ2_nu_1trk") ||
-             !name.compare("K2KI_CC0pi_XSec_1DQ2_nu_2trkQE") ||
-             !name.compare("K2KI_CC0pi_XSec_1DQ2_nu_2trkNonQE") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_1trk") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_2trkQE") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_2trkNonQE")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DQ2_nu_subtrks(name, file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks(file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DPmu_nu_Ntrks")) {
-    fChain->push_back(new K2K_CC0pi_XSec_1DPmu_nu_Ntrks(file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks(file, rw, type, fkdt));
     /*
       NC1pi0
     */

@@ -54,7 +54,7 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
 
   hnPions = new TH1I((fName+"_hNpions").c_str(), (fName+"_hNions; Number of pions; Counts").c_str(), 11, -1, 10);
 
-  fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {

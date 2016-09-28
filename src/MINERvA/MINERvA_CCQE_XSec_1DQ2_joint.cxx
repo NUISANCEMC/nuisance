@@ -108,8 +108,8 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   this->subChain.push_back(MIN_anu);
   this->subChain.push_back(MIN_nu);
 
-  this->fluxHist = GetCombinedFlux();
-  this->eventHist = GetCombinedEventRate();
+  this->fFluxHist = GetCombinedFlux();
+  this->fEventHist = GetCombinedEventRate();
 
   // Setup Default MC Hists
   SetupDefaultHist();

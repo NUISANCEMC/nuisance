@@ -320,7 +320,7 @@ std::vector<TH1*> JointMeas1D::GetFluxList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> fluxHist );
+  tempVect.push_back( this-> fFluxHist );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
@@ -342,7 +342,7 @@ std::vector<TH1*> JointMeas1D::GetEventRateList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> eventHist );
+  tempVect.push_back( this-> fEventHist );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
@@ -365,7 +365,7 @@ std::vector<TH1*> JointMeas1D::GetXSecList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> xsecHist );
+  tempVect.push_back( this-> fXSecHist );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){

@@ -67,11 +67,11 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
 
   // // Read in the histograms from the NEUT file that are required for normalisation
   // TFile *in = new TFile(this->inFile.c_str());
-  // this->fluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
-  // this->fluxHist->SetNameTitle((this->fName+"_FLUX").c_str(), (this->fName+";E_{#nu} (GeV)").c_str());
+  // this->fFluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
+  // this->fFluxHist->SetNameTitle((this->fName+"_FLUX").c_str(), (this->fName+";E_{#nu} (GeV)").c_str());
 
-  // this->eventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
-  // this->eventHist->SetNameTitle((this->fName+"_EVT").c_str(), (this->fName+";E_{#nu} (GeV); Event Rate").c_str());
+  // this->fEventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
+  // this->fEventHist->SetNameTitle((this->fName+"_EVT").c_str(), (this->fName+";E_{#nu} (GeV); Event Rate").c_str());
 
   // // Read in the file once only
   // tn = new TChain("neuttree", "");
@@ -83,7 +83,7 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // // The scale factor is quite complicated because MB didn't divide by number of targets.
   // // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
   // double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
-  // this->fScaleFactor = (this->eventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
+  // this->fScaleFactor = (this->fEventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
 };
 
 

@@ -16,7 +16,7 @@ T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
-  this->fScaleFactor = (this->eventHist->Integral("width")*1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now

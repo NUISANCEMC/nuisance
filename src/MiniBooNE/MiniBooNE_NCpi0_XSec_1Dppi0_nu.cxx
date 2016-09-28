@@ -56,9 +56,9 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
   // this->ReadEventFile();
 
   //  // Different generators require slightly different rescaling factors.
-  // if      (this->eventType == 0) this->fScaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
-  // else if (this->eventType == 1) this->fScaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fluxHist->Integral(); // NUWRO
-  // else if (this->eventType == 5) this->fScaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fluxHist->Integral(); // GENIE
+  // if      (this->eventType == 0) this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(nevents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
+  // else if (this->eventType == 1) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // NUWRO
+  // else if (this->eventType == 5) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // GENIE
 
 };
 

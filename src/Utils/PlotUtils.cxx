@@ -337,7 +337,7 @@ std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char
 }
 
 //********************************************************************
-void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fluxHist, int axis){
+void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, int axis){
 //********************************************************************
  // Mostly copied from TH1D version below
  // Need to specify which axes (default is x-axis)
@@ -345,16 +345,16 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fluxHist, int axis){
   
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
+  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
-  for (int i = 0; i < fluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fluxHist->GetXaxis()->GetBinCenter(i+1), fluxHist->GetBinContent(i+1));
+  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
   }
 
   // Resolution for the interpolation used for the flux
   int resolution = 10000;
   // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
+  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
@@ -400,7 +400,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fluxHist, int axis){
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxLow = " << fluxLow << std::endl;
       std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
@@ -418,7 +418,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fluxHist, int axis){
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxHigh = " << fluxHigh << std::endl;
       std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }
@@ -458,20 +458,20 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fluxHist, int axis){
 
 // This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
 //******************************************************************** 
-void PlotUtils::FluxUnfoldedScaling(TH1D* fMCHist, TH1D* fluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH1D* fMCHist, TH1D* fFluxHist) {
 //******************************************************************** 
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
+  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
-  for (int i = 0; i < fluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fluxHist->GetXaxis()->GetBinCenter(i+1), fluxHist->GetBinContent(i+1));
+  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
   }
 
   // Resolution for the interpolation used for the flux
   int resolution = 500;
   // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
+  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
@@ -505,7 +505,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* fMCHist, TH1D* fluxHist) {
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxLow = " << fluxLow << std::endl;
       std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
@@ -523,7 +523,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* fMCHist, TH1D* fluxHist) {
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxHigh = " << fluxHigh << std::endl;
       std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }

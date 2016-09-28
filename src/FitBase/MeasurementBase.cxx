@@ -29,7 +29,8 @@ MeasurementBase::MeasurementBase() {
 //********************************************************************
 
   fScaleFactor = 1.0;
-  filledMC = false;
+  fMCFilled = false;
+
 
 };
 
@@ -37,26 +38,6 @@ MeasurementBase::MeasurementBase() {
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
 MeasurementBase::~MeasurementBase() {
 //********************************************************************
-
-};
-
-
-//********************************************************************
-void MeasurementBase::SetFluxHistogram(std::string fluxFile, int minE, int maxE, double fluxNorm){
-  //********************************************************************
-
-  // Note this expects the flux bins to be given in terms of MeV
-  LOG(SAM) << "Reading flux from file: " << fluxFile << std::endl;
-
-  TGraph f(fluxFile.c_str(),"%lg %lg");
-
-  this->fluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+"; E_{#nu} (GeV)").c_str(),\
-			    f.GetN()-1, minE, maxE);
-
-  Double_t *yVal = f.GetY();
-
-  for (int i = 0; i<fluxHist->GetNbinsX(); ++i)
-    this->fluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
 
 };
 
@@ -94,17 +75,17 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 
     // Get a pointer to the input so we can grab flux stuff
     // Slightly Convoluted...
-    input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
+    fInput  = FitBase::GetInput( FitBase::GetInputID(inputfile) );
 
   } else {
-    input = new InputHandler(fName, inputfile);
+    fInput = new InputHandler(fName, inputfile);
   }
 
-  this->fluxHist      = input->GetFluxHistogram();
-  this->eventHist     = input->GetEventHistogram();
-  this->xsecHist      = input->GetXSecHistogram();
-  this->nevents       = input->GetNEvents();
-
+  fFluxHist      = fInput->GetFluxHistogram();
+  fEventHist     = fInput->GetEventHistogram();
+  fXSecHist      = fInput->GetXSecHistogram();
+  nevents       = fInput->GetNEvents();
+ 
   inputfilename = inputfile;
 }
 
@@ -122,18 +103,18 @@ void MeasurementBase::Reconfigure(){
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
-  cust_event = input->GetEventPointer();
+  cust_event = fInput->GetEventPointer();
 
   // Reset Histograms
   this->ResetAll();
 
   // READ in spline head for this input
-  if (input->GetType() == kEVTSPLINE){
-    FitBase::GetRW()->ReadSplineHead(input->GetSplineHead());
+  if (fInput->GetType() == kEVTSPLINE){
+    FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
   }
 
-  FitEvent* cust_event = input->GetEventPointer();
-  int nevents = input->GetNEvents();
+  FitEvent* cust_event = fInput->GetEventPointer();
+  int nevents = fInput->GetNEvents();
   int countwidth = (nevents/20);
 
   // Reset Signal Vectors
@@ -151,7 +132,7 @@ void MeasurementBase::Reconfigure(){
     if (using_evtmanager){
       cust_event = FitBase::EvtManager().GetEvent(input_id, i);
     } else {
-      input->ReadEvent(i);
+      fInput->ReadEvent(i);
 
       cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
       cust_event->Weight   = cust_event->RWWeight*cust_event->InputWeight;
@@ -198,7 +179,7 @@ void MeasurementBase::Reconfigure(){
   }
 
   // Finalise Histograms
-  filledMC = true;
+  fMCFilled = true;
   this->ConvertEventRates();
 }
 
@@ -212,11 +193,11 @@ void MeasurementBase::ReconfigureFast(){
   if (using_evtmanager){
     input_id = FitBase::GetInputID(inputfilename);
   } else {
-    cust_event = input->GetEventPointer();
+    cust_event = fInput->GetEventPointer();
   }
 
   // Check if we Can't Signal Reconfigure
-  if (!filledMC){
+  if (!fMCFilled){
     this->Reconfigure();
     return;
   }
@@ -225,8 +206,8 @@ void MeasurementBase::ReconfigureFast(){
   this->ResetAll();
 
   // READ in spline head for this input
-  if (input->GetType() == kEVTSPLINE){
-    FitBase::GetRW()->ReadSplineHead(input->GetSplineHead());
+  if (fInput->GetType() == kEVTSPLINE){
+    FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
   }
 
   // Get Pointer To Base Event (Just Generator Formats)
@@ -246,7 +227,7 @@ void MeasurementBase::ReconfigureFast(){
     if (using_evtmanager){
       Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
     } else {
-      input->GetTreeEntry((*I));
+      fInput->GetTreeEntry((*I));
       Weight = FitBase::GetRW()->CalcWeight(cust_event)	\
          	* cust_event->InputWeight;
     }
@@ -275,7 +256,7 @@ void MeasurementBase::ReconfigureFast(){
   }
 
   // Finalise histograms
-  filledMC = true;
+  fMCFilled = true;
   this->ConvertEventRates();
 }
 
@@ -295,7 +276,7 @@ InputHandler* MeasurementBase::GetInput(){
   if(FitPar::Config().GetParB("EventManager")){
     return FitBase::GetInput(FitBase::GetInputID(inputfilename));
   } else {
-    return this->input;
+    return this->fInput;
   }
   return NULL;
 };
@@ -308,7 +289,7 @@ void MeasurementBase::Renormalise(){
   // Means we don't have to call the time consuming reconfigure when this happens.
   double norm = FitBase::GetRW()->GetDialValue( this->fName + "_norm" );
 
-  if ((this->currentNorm == 0.0 and norm != 0.0) or not filledMC){
+  if ((this->currentNorm == 0.0 and norm != 0.0) or not fMCFilled){
     this->ReconfigureFast();
     return;
   }

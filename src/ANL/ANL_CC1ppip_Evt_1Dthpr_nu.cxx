@@ -43,7 +43,7 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")/((nevents+0.))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((nevents+0.))*(16./8.);
 };
 
 void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {

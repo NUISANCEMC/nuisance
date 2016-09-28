@@ -60,7 +60,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   cout << " Inputs = "<<this->GetInput()<<std::endl;
   
   // Get Scaling
-  fScaleFactor = (eventHist->Integral("width")/(nevents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
+  fScaleFactor = (fEventHist->Integral("width")/(nevents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
 
 };
 

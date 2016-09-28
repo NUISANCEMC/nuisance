@@ -42,7 +42,7 @@ ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfi
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(nevents+0.)*16./8.;
 };
 
 

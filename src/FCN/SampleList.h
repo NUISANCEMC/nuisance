@@ -159,12 +159,6 @@
 #include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
 
-// K2K CC0pi
-#include "K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks.h"
-#include "K2K_CC0pi_XSec_1DPmu_nu_Ntrks.h"
-#include "K2K_CC0pi_XSec_1DQ2_nu_subtrks.h"
-#include "K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks.h"
-#include "K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks.h"
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 

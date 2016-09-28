@@ -44,7 +44,7 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
 
   TRandom3 rand;
 
-  this->fScaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(nevents+0.)*16./8.;
 };
 
 
@@ -180,8 +180,8 @@ void ANL_CC1ppip_Evt_1Dphi_nu::FillHistograms() {
 
 void ANL_CC1ppip_Evt_1Dphi_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

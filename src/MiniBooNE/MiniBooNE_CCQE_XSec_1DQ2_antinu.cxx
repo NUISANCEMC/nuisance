@@ -84,7 +84,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   }
 
   // ScaleFactor
-  fScaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(nevents+0.))
 		 *14.08/8.
 		 / TotalIntegratedFlux()); 
 };

@@ -27,7 +27,7 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
 
   this->SetupDefaultHist();
 
-  fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents);
+  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents);
 };
 
 void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {

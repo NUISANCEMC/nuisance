@@ -61,7 +61,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   isDiag    = true;
 
   // Set Scaling for Differential Cross-section
-  fScaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(nevents+0.))
 		 *(14.08/8.)
 		 /TotalIntegratedFlux());
 };

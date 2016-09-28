@@ -117,7 +117,7 @@ namespace PlotUtils{
   TH2D* SetMaskHist(std::string type, TH2D* data);
 
   //! Divide by the flux histogram for Enu Histograms
-  void DivideByFlux(TH1D* fMCHist, TH1D* fluxHist);
+  void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
 
   //! Flux unfolded scaling, like DivideByFlux but uses interpolation.
   void FluxUnfoldedScaling(TH1D* plot, TH1D* flux);

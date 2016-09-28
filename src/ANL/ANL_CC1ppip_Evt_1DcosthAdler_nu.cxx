@@ -42,7 +42,7 @@ ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(nevents+0.)*16./8.;
 };
 
 
@@ -150,8 +150,8 @@ void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
 
 void ANL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

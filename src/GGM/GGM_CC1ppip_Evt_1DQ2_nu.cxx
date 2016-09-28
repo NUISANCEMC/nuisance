@@ -43,7 +43,7 @@ GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents+0.)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents+0.)*(16./8.);
 };
 
 

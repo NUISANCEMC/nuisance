@@ -42,7 +42,7 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(nevents+0.)*16./8.;
 };
 
 

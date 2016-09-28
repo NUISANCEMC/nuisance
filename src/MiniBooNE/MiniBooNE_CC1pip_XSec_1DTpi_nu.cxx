@@ -38,7 +38,7 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
   covar = StatUtils::GetInvert(fullcovar);
   //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->normError);
 
-  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 

@@ -36,7 +36,7 @@ BEBC_CC1ppim_XSec_1DEnu_antinu::BEBC_CC1ppim_XSec_1DEnu_antinu(std::string input
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
   //this->fScaleFactor = double(1.0E-38)/double(nevents)*(16./8.);
 };
 

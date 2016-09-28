@@ -36,7 +36,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
 };
 
 
@@ -125,8 +125,8 @@ void ANL_CC1ppip_XSec_1DEnu_nu::FillHistograms() {
 
 void ANL_CC1ppip_XSec_1DEnu_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

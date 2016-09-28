@@ -36,9 +36,9 @@ Measurement1D::Measurement1D() {
   this->decomp = NULL;
 
   this->fakeDataFile = "";
-  this->fluxHist  = NULL;
-  this->eventHist = NULL;
-  this->xsecHist  = NULL;
+  this->fFluxHist  = NULL;
+  this->fEventHist = NULL;
+  this->fXSecHist  = NULL;
 
   default_types = "FIX/FULL/CHI2";
   allowed_types = "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/MASK";
@@ -533,12 +533,12 @@ void Measurement1D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 
   TGraph f(fluxFile.c_str(),"%lg %lg");
 
-  this->fluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+"; E_{#nu} (GeV)").c_str(), f.GetN()-1, minE, maxE);
+  this->fFluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+"; E_{#nu} (GeV)").c_str(), f.GetN()-1, minE, maxE);
 
   Double_t *yVal = f.GetY();
 
-  for (int i = 0; i<fluxHist->GetNbinsX(); ++i)
-    this->fluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
+  for (int i = 0; i<fFluxHist->GetNbinsX(); ++i)
+    this->fFluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
 
 };
 
@@ -554,11 +554,11 @@ double Measurement1D::TotalIntegratedFlux(std::string intOpt, double low, double
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
 
-  int minBin = this->fluxHist->GetXaxis()->FindBin(low);
-  int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
+  int minBin = this->fFluxHist->GetXaxis()->FindBin(low);
+  int maxBin = this->fFluxHist->GetXaxis()->FindBin(high);
 
   // Get integral over custom range
-  double integral = this->fluxHist->Integral(minBin, maxBin+1, intOpt.c_str());
+  double integral = this->fFluxHist->Integral(minBin, maxBin+1, intOpt.c_str());
 
   return integral;
 };
@@ -622,8 +622,8 @@ void Measurement1D::ScaleEvents(){
 
   // Scaling for XSec as function of Enu
   } else if (isEnu1D) {
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
     fMCHist->Scale(fScaleFactor);
     fMCFine->Scale(fScaleFactor);
@@ -1043,10 +1043,10 @@ void Measurement1D::Write(std::string drawOpt){
   LOG(SAM)<<"Writing Fine List"<<std::endl;
   if (drawFine)    this->GetFineList().at(0)->Write();
   LOG(SAM)<<"Writing events"<<std::endl;
-  if (drawFlux)    this->fluxHist->Write();
+  if (drawFlux)    this->fFluxHist->Write();
   LOG(SAM)<<"Writing true events"<<std::endl;
-  //  if (drawXSec)    this->xsecHist->Write();
-  if (drawEvents)  this->eventHist->Write();
+  //  if (drawXSec)    this->fXSecHist->Write();
+  if (drawEvents)  this->fEventHist->Write();
   if (isMask and drawMask) this->maskHist->Write( (this->fName + "_MSK").c_str() ); //< save mask
 
   // Save neut stack

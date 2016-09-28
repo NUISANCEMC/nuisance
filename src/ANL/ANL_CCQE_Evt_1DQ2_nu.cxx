@@ -74,14 +74,14 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 
     this->EnuFluxUnfoldPlot = (TH1D*)this->EnuRatePlot->Clone();
     for (int i = 0; i < this->EnuFluxUnfoldPlot->GetNbinsX(); i++) this->EnuFluxUnfoldPlot->SetBinContent(i+1,1.0);
-    PlotUtils::FluxUnfoldedScaling(EnuFluxUnfoldPlot, fluxHist);
+    PlotUtils::FluxUnfoldedScaling(EnuFluxUnfoldPlot, fFluxHist);
   }
   
   // Setup Covariance
   //  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   //  covar     = StatUtils::GetInvert(fullcovar);
 
-  //  this->eventHist->Scale(fDataHist->Integral()/eventHist->Integral());
+  //  this->fEventHist->Scale(fDataHist->Integral()/fEventHist->Integral());
   this->fScaleFactor = (this->fDataHist->Integral("width")/(nevents+0.)); 
 
   // Set starting scale factor
@@ -180,7 +180,7 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
   if (applyEnucorrection){
-    this->EnuvsQ2Plot->Scale(eventHist->Integral()/(nevents+0.));
+    this->EnuvsQ2Plot->Scale(fEventHist->Integral()/(nevents+0.));
     for (int j =  0; j < EnuvsQ2Plot->GetNbinsY(); j++){
       for (int i = 0; i < EnuvsQ2Plot->GetNbinsX(); i++){
 	this->EnuvsQ2Plot->SetBinContent(i+1,j+1, this->EnuvsQ2Plot->GetBinContent(i+1,j+1) * EnuFluxUnfoldPlot->GetBinContent(j+1));

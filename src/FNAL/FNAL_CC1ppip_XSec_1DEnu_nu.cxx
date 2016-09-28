@@ -36,7 +36,7 @@ FNAL_CC1ppip_XSec_1DEnu_nu::FNAL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
 };
 
 void FNAL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

@@ -540,14 +540,14 @@ void Measurement2D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 
   TGraph *f = new TGraph(fluxFile.c_str(),"%lg %lg");
 
-  this->fluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+";E_{#nu} (GeV)").c_str(), f->GetN()-1, minE, maxE);
+  this->fFluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+";E_{#nu} (GeV)").c_str(), f->GetN()-1, minE, maxE);
 
   // Get graph points
   Double_t *yVal = f->GetY();
 
   // Fill flux histogram from graph
-  for (int i = 0; i<fluxHist->GetNbinsX(); ++i)
-    this->fluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
+  for (int i = 0; i<fFluxHist->GetNbinsX(); ++i)
+    this->fFluxHist->SetBinContent(i+1, yVal[i]*fluxNorm);
 
   delete f;
 
@@ -567,11 +567,11 @@ double Measurement2D::TotalIntegratedFlux(std::string intOpt, double low, double
   if (high == -9999.9) high = this->EnuMax;
 
   // Get bin integers
-  int minBin = this->fluxHist->GetXaxis()->FindBin(low);
-  int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
+  int minBin = this->fFluxHist->GetXaxis()->FindBin(low);
+  int maxBin = this->fFluxHist->GetXaxis()->FindBin(high);
 
   // Find integral
-  double integral = this->fluxHist->Integral(minBin, maxBin+1, intOpt.c_str());
+  double integral = this->fFluxHist->Integral(minBin, maxBin+1, intOpt.c_str());
 
   return integral;
 
@@ -626,8 +626,8 @@ void Measurement2D::ScaleEvents(){
       axis = 1;
     }
 
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist, axis);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist, axis);
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist, axis);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist, axis);
 
     LOG(SAM) << "Running 2D Flux Unfolded Scaling?" << endl;
     fMCHist->Scale(fScaleFactor);
@@ -1048,8 +1048,8 @@ void Measurement2D::Write(std::string drawOpt){
 
   // Draw Extra plots
   if (drawFine)    this->GetFineList().at(0)->Write();
-  if (drawFlux)    this->fluxHist->Write();
-  if (drawEvents)  this->eventHist->Write();
+  if (drawFlux)    this->fFluxHist->Write();
+  if (drawEvents)  this->fEventHist->Write();
   if (isMask and drawMask) this->maskHist->Write( (this->fName + "_MSK").c_str() ); //< save mask
   if (drawMap) this->mapHist->Write( (this->fName + "_MAP").c_str() ); //< save map
 

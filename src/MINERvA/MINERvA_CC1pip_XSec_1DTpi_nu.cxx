@@ -43,7 +43,7 @@ MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string inputfile
     fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
   }
 
-  fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
