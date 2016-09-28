@@ -82,28 +82,28 @@ class MeasurementBase {
     Constructor/Destructors
   */
   //! Default Constructor. Set everything to NULL
-  MeasurementBase();
+  MeasurementBase(void);
 
   //! Default virtual destructor
-  virtual ~MeasurementBase();
+  virtual ~MeasurementBase(void);
 
   /*
     Reconfigure Functions
   */
 
   //! Function called if MC tuning dials haven't been changed and all we want to do is update the normalisation.
-  virtual void Renormalise();
+  virtual void Renormalise(void);
 
   //! Call reconfigure only looping over signal events to save time.
-  virtual void ReconfigureFast();
+  virtual void ReconfigureFast(void);
 
   //! Call reconfigure looping over all MC events including background
-  virtual void Reconfigure();
+  virtual void Reconfigure(void);
 
-  virtual TH2D GetCovarMatrix() = 0;
-  virtual double GetLikelihood(){return 0.0;};
-  virtual int GetNDOF(){return 0;};
-  virtual void ThrowCovariance() = 0;
+  virtual TH2D GetCovarMatrix(void) = 0;
+  virtual double GetLikelihood(void){return 0.0;};
+  virtual int GetNDOF(void){return 0;};
+  virtual void ThrowCovariance(void) = 0;
   virtual void SetFakeDataValues(std::string fkdt) = 0;
 
 
@@ -126,7 +126,7 @@ class MeasurementBase {
   */
   // All these should be virtual
   ///! Reset Histograms (Handled at Measurement Stage)
-  virtual void ResetAll() = 0;
+  virtual void ResetAll(void) = 0;
 
   ///! Fill the event variables for this sample (Handled in each inherited sample)
   virtual void FillEventVariables(FitEvent* event){(void)event;};
@@ -135,13 +135,13 @@ class MeasurementBase {
   virtual bool isSignal(FitEvent* event){ (void)event; return false;};
 
   ///! Fill the histogram for this event using X_VAR and Y_VAR (Handled in each inherited sample)
-  virtual void FillHistograms(){};
+  virtual void FillHistograms(void){};
 
   ///! Convert event rates to whatever distributions you need.
-  virtual void ConvertEventRates();
+  virtual void ConvertEventRates(void);
 
   ///! Call scale events after the plots have been filled at the end of reconfigure.
-  virtual void ScaleEvents(){};
+  virtual void ScaleEvents(void){};
 
   ///! Apply the scale factor at the end of reconfigure.
   virtual void ApplyNormScale(double norm){(void) norm;};
@@ -154,36 +154,32 @@ class MeasurementBase {
   */
 
   ///! Virtual function to get data histogram
-  virtual std::vector<TH1*> GetDataList() = 0;
+  virtual std::vector<TH1*> GetDataList(void) = 0;
 
   ///! Virtual function to get MC histogram
-  virtual std::vector<TH1*> GetMCList() = 0;
-  virtual std::vector<TH1*>  GetFineList() = 0;
-  virtual std::vector<TH1*> GetMaskList() = 0;
+  virtual std::vector<TH1*> GetMCList   (void) = 0;
+  virtual std::vector<TH1*> GetFineList (void) = 0;
+  virtual std::vector<TH1*> GetMaskList (void) = 0;
 
-  ///! Return Flux Lists as a vector
-  virtual std::vector<TH1*> GetFluxList(){return std::vector<TH1*>(1,fluxHist);};
-
-  ///! Return Event Rate Lists as a vector
-  virtual std::vector<TH1*> GetEventRateList(){return std::vector<TH1*>(1,eventHist);};
-
-  ///! Return XSec Lists as a vector
-  virtual std::vector<TH1*> GetXSecList(){return std::vector<TH1*>(1,xsecHist);};
+  ///! Return flux histograms in a vector
+  virtual std::vector<TH1*> GetFluxList      (void);
+  virtual std::vector<TH1*> GetEventRateList (void);
+  virtual std::vector<TH1*> GetXSecList      (void);
 
   ///! Return input for this sample
-  InputHandler* GetInput();
+  InputHandler* GetInput (void);
 
-  std::string GetName(){ return measurementName; };
-  double GetScaleFactor(){ return scaleFactor; };
+  std::string GetName (void){ return fName; };
+  double GetScaleFactor(void){ return scaleFactor; };
 
-  double GetXVar(){ return this->X_VAR; };
-  double GetYVar(){ return this->Y_VAR; };
-  double GetZVar(){ return this->Z_VAR; };
-  double GetMode(){ return this->Mode;  };
-  double GetEnu(){ return this->Enu; };
+  double GetXVar(void){ return this->X_VAR; };
+  double GetYVar(void){ return this->Y_VAR; };
+  double GetZVar(void){ return this->Z_VAR; };
+  double GetMode(void){ return this->Mode;  };
+  double GetEnu(void){ return this->Enu; };
 
   void SetupInputs(std::string inputfile);
-  int GetInputID();
+  int GetInputID(void);
   void SetSignal(bool sig);
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
@@ -200,7 +196,7 @@ protected:
   FitEvent* cust_event;
   FitWeight* rw_engine; //!< Pointer to the rw engine
   InputHandler* input; //!< Instance of the input handler
-  std::string measurementName;
+  std::string fName;
   int eventType;
 
   // Input Event rate flux/event histograms

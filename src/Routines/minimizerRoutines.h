@@ -74,50 +74,43 @@ public:
   */
 
   //! Splits the arguments ready for initial setup
-  void parseArgs(int argc, char* argv[]);
+  void ParseArgs(int argc, char* argv[]);
 
   //! Sorts out configuration and verbosity right at the very start.
   //! Calls readCard to set everything else up.
-  void initialSetup();
+  void InitialSetup();
 
   //! Loops through each line of the card file and passes it to other read functions
-  void readCard();
+  void ReadCard();
 
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters
-  void readParameters(std::string parstring);
+  void ReadParameters(std::string parstring);
 
   //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
-  void readFakeDataPars(std::string parstring);
+  void ReadFakeDataPars(std::string parstring);
 
   //! Read in the samples so we can set up the free normalisation dials if required
-  void readSamples(std::string sampleString);
-
-  //! If a previous input file is provided, eg to take the starting dial values, it is done here. NEEDS TESTING.
-  void readInputFile();
-
-  //! Check if previous result wasn't actually the final minimum incase we want to use fit continue functions. NEEDS TESTING
-  bool checkPreviousResult();
+  void ReadSamples(std::string sampleString);
 
   /*
     Setup Functions
   */
 
-
   //! Setup the configuration given the arguments passed at the commandline and card file
-  void setupConfig();
+  void SetupConfig();
 
   //! Setups up our custom RW engine with all the parameters passed in the card file
-  void setupRWEngine();
+  void SetupRWEngine();
 
   //! Setups up the jointFCN.
-  void setupFCN();
+  void SetupFCN();
 
   //! Sets up the minimizerObj for ROOT. there are cases where this is called repeatedly, e.g. If you are using a brute force scan before using Migrad.
-  void setupFitter(std::string routine);
+  void SetupFitter(std::string routine);
 
   //! Set the current data histograms in each sample to the fake data.
-  void setFakeData();
+  void SetFakeData();
 
   //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
   //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
@@ -128,16 +121,16 @@ public:
   */
 
   //! Main function to actually start iterating over the different required fit routines
-  void SelfFit();
+  void Run();
 
   //! Given a new map change the values that the RW engine is currently set to
-  void updateRWEngine(std::map<std::string,double>& updateVals, std::map<std::string,double>& updateNorms);
+  void UpdateRWEngine(std::map<std::string,double>& updateVals);
 
   //! Given a single routine (see tutorial for options) run that fit routine now.
   void RunFitRoutine(std::string routine);
 
   //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
-  void getMinimizerState();
+  void GetMinimizerState();
 
   //! Performs a fit routine where the MAXEVENTS is set to a much lower value to try and move closer to the best fit minimum.
   void LowStatRoutine(std::string routine);
@@ -173,21 +166,21 @@ public:
   */
 
   //! Write plots and TTrees listing the minimizerObj result of the fit to file
-  void saveMinimizerState();
+  void SaveMinimizerState();
 
   //! Save the output of the fitter including sample plots.
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void saveFitterOutput(std::string dir="");
+  void SaveFitterOutput(std::string dir="");
 
   //! Save the sample plots for current MC
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void saveCurrentState(std::string subdir="");
+  void SaveCurrentState(std::string subdir="");
 
   //! Save starting predictions into a seperate folder
-  void saveNominal();
+  void SaveNominal();
 
   //! Save predictions before the fit is ran into a seperate folder
-  void savePrefit();
+  void SavePrefit();
 
   /*
     MISC Functions
@@ -201,143 +194,59 @@ protected:
   //! Our Custom ReWeight Object
   FitWeight* rw;
 
-  // I/O
+  std::string fOutputFile;
+  std::string fInputFile;
 
-  std::string outputFileName;
-  std::string inputFileName;
-
-  //! Input file from previous fit
-  TFile* inputFile;
-
-  //! Output file where the results are saved
-  TFile* outputFile;
+  TFile* fInputRootFile;
+  TFile* fOutputRootFile;
 
   //! Flag for whether the fit should be continued if an output file is already found.
   bool fitContinue;
 
   //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* minimizerObj;
+  ROOT::Math::Minimizer* fMinimizer;
 
-  //! The actual chi2 Function from FCN module
-  JointFCN* thisFCN;
-  MinimizerFCN* MinFCN;
-  
-  //! A functor that root requires to pass to minimizerObj.
-  //! Basically just a wrapper for thisFCN
-  ROOT::Math::Functor* callFCN;
+  JointFCN* fSampleFCN;
+  MinimizerFCN* fMinimizerFCN;
+  ROOT::Math::Functor* fCallFunctor;
 
-  //! Current number of free parameters. callFCN requires this when being setup.
   int nfreepars;
 
-  // Fit Options
+  std::string fCardFile;
 
-  //! Input cardfile containing fit samples and dials
-  std::string cardFile;
+  std::string fStrategy;
+  std::vector<std::string> fRoutines;
 
-  //! comma seperated list of fit routines to be run
-  std::string fitStrategy;
+  std::string fFakeDataInput;
 
-  //! fitStrategy is parsed into this vector of fit routines. Each one is run in sequence and current values updated.
-  std::vector<std::string> fit_routines;
-
-  //! Directory of a fake data MC file to use for this fit. If "MC" is provided the starting nominal MC and provided fake_parameters are used as fake data.
-  std::string fakeDataFile;
-
-  //! Current fit type.
-  int type;
-
-  // Parameter Configs
-  //! vector command line config overrides
   std::vector<std::string> configCmdFix;
 
-  // Input Dial Values
+  // Input Dial Vals
   //! Vector of dial names
-  std::vector<std::string> params;
-
-  //! Map of dial names and dial types. 0 NEUT 1 NIWG 2 GENIE 3 NUWRO 4 CUSTOM
-  std::map<std::string,int> params_type;
-
-  //! Map of dial names and starting values given in the fit card
-  std::map<std::string, double> startVals;
-
-  //! Map of dial names and current values at this stage in the overall fitting routine
-  std::map<std::string, double> currentVals;
-
-  //! Map of dial names and current errors at this stage
-  std::map<std::string, double> errorVals;
-
-  //! Map of dial names and the minimum limits provided in the fit card
-  std::map<std::string, double> minVals;
-
-  //! Map of dial names and the maximum limits provided in the fit card
-  std::map<std::string, double> maxVals;
-
-  //! Map of dial names and the step values for this dial provided in the fit card.
-  //! Minuit seems to ignore this anyway, but it is used in the PlotLimits routine.
-  std::map<std::string, double> stepVals;
-
-  //! Map of dial names and flags for whether the parmaeter is currently fixed.
-  std::map<std::string, bool>   fixVals;
-
-  //! Map of dial names and flags for whether the parameter started fixed.
-  std::map<std::string, bool>   startFixVals;
-
-  // Input Samples
-
-  //! Vector of samples included in the fit
-  std::vector<std::string> samples;
-
-  //! Vector of sample normalisation dial names (sample + "_norm")
-  std::vector<std::string> sampleDials;
-
-  //! Map of norm dial names and the starting value given in the fit card
-  std::map<std::string, double> sampleNorms;
-
-  //! Map of norm dial names and the current value in the fit
-  std::map<std::string, double> currentNorms;
-
-  //! Map of norm dial names and the current error in the fit
-  std::map<std::string, double> errorNorms;
-
-  //! Map of norm dial names and whether it is currently fixed in the fit
-  std::map<std::string, bool> fixNorms;
-
-  //! Map of norm dial names and whether it started fixed
-  std::map<std::string, bool> startFixNorms;
-
-  //! Map of norm dial names and the files string input for those samples
-  std::map<std::string, std::string> sampleFiles;
-
-  //! Map of norm dial names and the type string for those samples
-  std::map<std::string, std::string> sampleTypes;
-
-  // Input Fake Data Sets
+  std::vector<std::string> fParams;
+  std::map<std::string, double> fStartVals;
+  std::map<std::string, double> fCurVals;
+  std::map<std::string, double> fErrorVals;
+  std::map<std::string, double> fMinVals;
+  std::map<std::string, double> fMaxVals;
+  std::map<std::string, double> fStepVals;
+  std::map<std::string, int>    fTypeVals;
+  std::map<std::string, bool>   fFixVals;
+  std::map<std::string, bool>   fStartFixVals;
 
   //! Vector of fake parameter names
-  std::vector<std::string> fakeParams;
-
-  //! Vector of fake parameter sample norms
-  std::vector<std::string> fakeSamples;
-
-  //! Map of fake dial names and their values
-  std::map<std::string,double> fakeVals;
-
-  //! Map of fake sample norm names and their values
-  std::map<std::string,double> fakeNorms;
+  std::map<std::string,double> fFakeVals;
 
   //! Map of thrown parameter names and values (After ThrowCovariance)
-  std::map<std::string,double> thrownVals;
+  std::map<std::string,double> fThrownVals;
 
-  //! Map of thrown parameter names and values (After ThrowCovariance)
-  std::map<std::string,double> thrownNorms;
-
-
-  TH2D* covarHist; //!< Covariance matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* covarHist_Free; //!< Covariance matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* correlHist; //!< Correlation matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* correlHist_Free; //!< Correlation matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* decompHist; //!< Decomposition matrix for the fit. At the start this is uncorrelated unless input covars are provided.
-  TH2D* decompHist_Free; //!< Decomposition matrix for the free parameters fit. At the start this is uncorrelated unless input covars are provided.
+  TH2D* fCorrel;
+  TH2D* fDecomp;
+  TH2D* fCovar;
+  
+  TH2D* fCorrelFree;
+  TH2D* fDecompFree;
+  TH2D* fCovarFree;
 
   std::vector<TH1D*> input_dials;  //!< Vector of histograms from parameter pull classes that give central values of the input pull terms
   std::vector<TH2D> input_covariances; //!< vector of histograms from parameter pull classes that give covariance of the input pull terms

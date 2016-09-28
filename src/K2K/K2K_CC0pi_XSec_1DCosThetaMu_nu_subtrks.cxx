@@ -25,7 +25,7 @@ K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(s
 //******************************************************************** 
 
   // Define the Measurement
-  measurementName = name;
+  fName = name;
   plotTitles = "; cos(#theta_{#mu}); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
@@ -58,7 +58,7 @@ K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(s
     break;
     
   default:
-    LOG(SAM) << this->measurementName  << "Incorrect K2K sample type included: " << name << std::endl;
+    LOG(SAM) << this->fName  << "Incorrect K2K sample type included: " << name << std::endl;
     ncharged_cut = 0;
     deltaphi_cut = 0;
     break;
@@ -131,7 +131,7 @@ void K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::FillEventVariables(FitEvent *event)
 
   this->X_VAR = CosThetaMu;
 
-  LOG(EVT) << "Event variables for "<<this->measurementName<<std::endl;
+  LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
   LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;

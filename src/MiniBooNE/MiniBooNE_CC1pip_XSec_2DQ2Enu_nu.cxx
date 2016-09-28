@@ -23,7 +23,7 @@
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 //******************************************************************** 
   
-  measurementName = "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu";
+  fName = "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu";
   plotTitles = "; E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4}); d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.0;

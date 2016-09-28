@@ -27,8 +27,8 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
 						   std::string fakeDataFile){
 
 
-  measurementName = name;
-  analysis = measurementName.find("_II") != std::string::npos ? 2 : 1;
+  fName = name;
+  analysis = fName.find("_II") != std::string::npos ? 2 : 1;
   forwardgoing = (type.find("REST") != std::string::npos);
   EnuMin = 0;
   EnuMax = 10.0;
@@ -45,8 +45,8 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   yBins = tempy;
   plotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   
-  dataHist = new TH2D((measurementName+"_data").c_str(),
-		      (measurementName+"_data"+plotTitles).c_str(),
+  dataHist = new TH2D((fName+"_data").c_str(),
+		      (fName+"_data"+plotTitles).c_str(),
 		      data_points_x-1, xBins,
 		      data_points_y-1, yBins);
   
@@ -208,8 +208,8 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
 
     rootfile->ls();
     
-    this->dataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->measurementName+"_data").c_str());
-    this->mapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->measurementName+"_MAP").c_str());
+    this->dataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->fName+"_data").c_str());
+    this->mapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->fName+"_MAP").c_str());
 
     TMatrixDSym* covmat_stat = (TMatrixDSym*) rootfile->Get("analysis2_statcov");
     TMatrixDSym* covmat_flux = (TMatrixDSym*) rootfile->Get("analysis2_fluxcov");

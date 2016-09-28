@@ -4,7 +4,7 @@
 // The constructor
 T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "T2K_CC1pip_CH_XSec_1Dq3_nu";
+  fName = "T2K_CC1pip_CH_XSec_1Dq3_nu";
   plotTitles = "; q_{3} (GeV/c); d#sigma/dq_{3} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
@@ -22,7 +22,7 @@ T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, Fi
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
@@ -41,7 +41,7 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
   }
 */
 
-  dataHist = new TH1D((measurementName+"_data").c_str(), (measurementName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
+  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
 
   for (int i = 0; i < dataHist->GetNbinsX(); i++) {
     dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+2)*1E-38);
@@ -50,7 +50,7 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
   }
 
   dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
+  dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
 
 
   dataFile->Close();

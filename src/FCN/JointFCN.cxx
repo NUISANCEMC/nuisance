@@ -32,6 +32,12 @@ JointFCN::~JointFCN() {
     delete exp;
   }
 
+  for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++){
+    ParamPull* pull = *iter;
+    delete pull;
+  }
+  
+  
   // Sort Tree
   if (fIterationTree) DestroyIterationTree();
   if (fDialVals) delete fDialVals;

@@ -22,7 +22,7 @@
 ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   // Measurement Details
-  measurementName = name; 
+  fName = name; 
   EnuMin = 0.;
   EnuMax = 6.;
   isDiag = true;

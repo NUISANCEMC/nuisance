@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1ppip_Evt_1DcosmuStar_nu::ANL_CC1ppip_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1ppip_Evt_1DcosmuStar_nu";
+  fName = "ANL_CC1ppip_Evt_1DcosmuStar_nu";
   plotTitles = "; cos(#theta*); Number of events";
   EnuMin = 0;
   EnuMax = 6.0;

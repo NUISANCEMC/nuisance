@@ -53,11 +53,10 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting nuissyst"<<std::endl;
 
   // Make systematic class and run fit
-  //systematicRoutines* min = new systematicRoutines(argc, argv);
-  //  min->initialSetup();
+  systematicRoutines* min = new systematicRoutines(argc, argv);
+  min->InitialSetup();
 
-
-
+  min->SelfFit();
   
   // Show Final Status
   std::cout<<"-------------------------------------"<<std::endl;

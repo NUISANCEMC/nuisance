@@ -46,8 +46,7 @@ systematicRoutines::systematicRoutines(int argc, char* argv[]){
 
   thisFCN = NULL;
 
-  parseArgs(argc, argv);
-
+  ParseArgs(argc, argv);
 };
 
 //*************************************
@@ -59,7 +58,7 @@ systematicRoutines::~systematicRoutines(){
   Input Functions
 */
 //*************************************
-void systematicRoutines::parseArgs(int argc, char* argv[]){
+void systematicRoutines::ParseArgs(int argc, char* argv[]){
 //*************************************
 
   std::string maxevents_flag = "";
@@ -99,21 +98,18 @@ void systematicRoutines::parseArgs(int argc, char* argv[]){
   cout << "SETUP" << endl;
   setupConfig();
   
-  readCard();
+  ReadCard();
   
   if (!maxevents_flag.empty()) FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
   if (verbosity_flag != 0) FitPar::Config().SetParI("VERBOSITY", FitPar::Config().GetParI("VERBOSITY") + verbosity_flag);
   if (error_flag != 0) FitPar::Config().SetParI("ERROR", FitPar::Config().GetParI("ERROR") + error_flag);
 
-
   return;
 };
 
 //*************************************
-void systematicRoutines::initialSetup(){
+void systematicRoutines::InitialSetup(){
 //*************************************
-
-  SetupCovariance();
 
   // output file open
   outputFile = new TFile(outputFileName.c_str(),"RECREATE");
@@ -122,12 +118,14 @@ void systematicRoutines::initialSetup(){
   // setup RW and FCN
   setupRWEngine();
   setupFCN();
-
+  GetCovarFromFCN();
+  SetupCovariance();
+  
   return;
 }
 
 //*************************************
-void systematicRoutines::readCard(){
+void systematicRoutines::ReadCard(){
 //*************************************
 
   std::string line;
@@ -141,61 +139,27 @@ void systematicRoutines::readCard(){
     readParameters(line);
     readFakeDataPars(line);
     readSamples(line);
-    readCovariance(line);
   }
   card.close();
-
-  checkCovarianceDials(false);
 
   return;
 };
 
 //***************************************** 
-void systematicRoutines::checkCovarianceDials(bool printdials){
+void systematicRoutines::GetCovarFromFCN(){
 //***************************************** 
 
-  bool baddial = false;
-
-  cout << "N INputs = " << input_dials.size() << endl;
-  // Loop over all input dials
-  for (UInt_t i = 0; i < input_dials.size(); i++){
-
-    for (UInt_t j = 0; j < input_dials.at(i)->GetNbinsX(); j++){
-      std::string dialname = input_dials.at(i)->GetXaxis()->GetBinLabel(j+1);
-
-      cout << dialname << " TICK? " << endl;
-      
-      // Check if we have input for this dial
-      if (std::find(params.begin(), params.end(), dialname) != params.end()
-	  and !printdials){
-	continue;
-      }
-
-      // Warn and add comment to card
-      std::cerr << "No parameter type/limits specified for dial "
-	       << dialname << endl;
-      std::cerr << "NUISANCE needs these to make sure throws are sensible!"
-	       << endl;
-      std::cerr << "Added example lines to the card, please fill these in." << endl;
-
-      // Add new line to card
-      std::ofstream outtemp;
-      outtemp.open(cardFile.c_str(), std::ios_base::app);
-
-      outtemp << "[TYPE]_parameter " << dialname
-	      << input_dials.at(i)->GetBinContent(j+1) << " "
-	      << " -100.0  100.0  1.0  FREE " << endl;
-      outtemp.close();
-
-      baddial = true;
-    }
+  // Get Covariance Objects from FCN
+  std::list<ParamPull*> inputpulls = thisFCN->GetPullList();
+  for (PullListConstIter iter = inputpulls.begin();
+       iter != inputpulls.end(); iter++){
+    
+    ParamPull* pull = (*iter);
+    fInputCovar.push_back(pull->GetFullCovarMatrix());
+    fInputDials.push_back(pull->GetDataHist());
+    
   }
-  
-  if (baddial){
-    sleep(10);
-    exit(-1);
-  }
-  
+
   return;
 }
 
@@ -327,14 +291,11 @@ void systematicRoutines::PlotLimits(){
   for (UInt_t i = 0; i < params.size(); i++){
     currentVals[params[i]] = startVals[params[i]];
   }
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    currentNorms[sampleDials[i]] = sampleNorms[sampleDials[i]];
-  }
 
   TDirectory* nomfolder = (TDirectory*) limfolder->mkdir("nominal");
   nomfolder->cd();
 
-  updateRWEngine(currentVals, currentNorms);
+  updateRWEngine(currentVals);
   thisFCN->ReconfigureAllEvents();
   thisFCN->Write();
 
@@ -362,7 +323,7 @@ void systematicRoutines::PlotLimits(){
 
       allfolders.push_back(curvalstring);
 
-      updateRWEngine(currentVals, currentNorms);
+      updateRWEngine(currentVals);
       thisFCN->ReconfigureAllEvents();
 
       thisFCN->Write();
@@ -386,14 +347,14 @@ void systematicRoutines::PlotLimits(){
       allfolders.push_back(curvalstring);
 
 
-      updateRWEngine(currentVals, currentNorms);
+      updateRWEngine(currentVals);
       thisFCN->ReconfigureAllEvents();
 
       thisFCN->Write();
     }
 
     currentVals[params[i]] = startVals[params[i]];
-    updateRWEngine(currentVals, currentNorms);
+    updateRWEngine(currentVals);
   }
 
 }
@@ -441,7 +402,7 @@ void systematicRoutines::readFakeDataPars(std::string parstring){
     if (val == 1){
       fakeSamples.push_back(token);
       parname = token;
-    } else if (val == 2) fakeNorms[parname] = entry;
+    } else if (val == 2) fakeVals[parname] = entry;
 
     val++;
   }
@@ -472,31 +433,33 @@ void systematicRoutines::readSamples(std::string sampleString){
 
       samplename = token + "_norm";
       samples.push_back(token);
-      sampleDials.push_back(samplename);
+      params.push_back(samplename);
+      
+      params_type[samplename] = kNORM;
 
-      sampleNorms[samplename]  = 1.0;
-      currentNorms[samplename] = 1.0;
-      errorNorms[samplename]   = 1.0;
+      startVals[samplename]  = 1.0;
+      currentVals[samplename] = 1.0;
+      errorVals[samplename]   = 1.0;
 
     } else if (val == 3) {
 
       sampleTypes[samplename]  = token;
       bool fixed = (token.find("FREE") == std::string::npos);
 
-      fixNorms[samplename]      = fixed; //fixed;
-      startFixNorms[samplename] = fixed; //fixed;
+      fixVals[samplename]      = fixed; //fixed;
+      startFixVals[samplename] = fixed; //fixed;
 
       // defaults
-      sampleNorms[samplename]  = 1.0;
-      currentNorms[samplename] = 1.0;
-      errorNorms[samplename]   = 0.0;
+      startVals[samplename]  = 1.0;
+      currentVals[samplename] = 1.0;
+      errorVals[samplename]   = 0.0;
 
     } else if (val == 2) { sampleFiles[samplename] = token;
     } else if (val == 4){
       if (entry > 0.3 and entry < 1.7) {
-	sampleNorms[samplename]  = entry;
-	currentNorms[samplename] = entry;
-	errorNorms[samplename]   = entry;
+	startVals[samplename]  = entry;
+	currentVals[samplename] = entry;
+	errorVals[samplename]   = entry;
       }
     }
 
@@ -540,14 +503,9 @@ void systematicRoutines::setupRWEngine(){
     std::cout << "Adding parameter " << name << std::endl;
     FitBase::GetRW() -> IncludeDial(name, params_type.at(name) );
   }
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    std::string name = sampleDials[i];
-    FitBase::GetRW()->IncludeDial(name, kNORM);
-  }
   FitBase::GetRW()->Reconfigure();
 
-  updateRWEngine(startVals, sampleNorms);
+  updateRWEngine(startVals);
 
   std::cout<<"RW Engines updated"<<std::endl;
 
@@ -575,13 +533,13 @@ void systematicRoutines::setFakeData(){
   if (fakeDataFile.compare("MC") == 0){
 
     LOG(FIT)<<"Setting fake data from MC starting prediction." <<std::endl;
-    updateRWEngine(fakeVals, fakeNorms);
+    updateRWEngine(fakeVals);
 
     FitBase::GetRW()->Reconfigure();
     thisFCN->ReconfigureAllEvents();
     //    thisFCN->SetFakeData("MC");
 
-    updateRWEngine(currentVals, currentNorms);
+    updateRWEngine(currentVals);
 
     LOG(FIT)<<"Set all data to fake MC predictions."<<std::endl;
   } else {
@@ -595,8 +553,7 @@ void systematicRoutines::setFakeData(){
   Fitting Functions
 */
 //*************************************
-void systematicRoutines::updateRWEngine(std::map<std::string,double>& updateVals,
-				       std::map<std::string,double>& updateNorms){
+void systematicRoutines::updateRWEngine(std::map<std::string,double>& updateVals){
 //*************************************
 
   for (UInt_t i = 0; i < params.size(); i++){
@@ -606,16 +563,6 @@ void systematicRoutines::updateRWEngine(std::map<std::string,double>& updateVals
       continue;
     }
     FitBase::GetRW()->SetDialValue(name,updateVals.at(name));
-  }
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    std::string name = sampleDials[i];
-
-    if (updateNorms.find(name) == updateNorms.end()){
-      FitBase::GetRW()->SetDialValue(name, 1.0);
-    } else {
-      FitBase::GetRW()->SetDialValue(name, updateNorms.at(name));
-    }
   }
 
   FitBase::GetRW()->Reconfigure();
@@ -682,9 +629,9 @@ void systematicRoutines::savePrefit(){
 
   LOG(FIT)<<"Saving Prefit Predictions"<<std::endl;
 
-  updateRWEngine(startVals, sampleNorms);
+  updateRWEngine(startVals);
   saveCurrentState("prefit");
-  updateRWEngine(currentVals, currentNorms);
+  updateRWEngine(currentVals);
 
 };
 
@@ -703,24 +650,24 @@ int systematicRoutines::GetStatus(){
 void systematicRoutines::SetupCovariance(){
 //*************************************
 
-  // Remove covares if they exist
-  if (covarHist) delete covarHist;
-  if (covarHist_Free) delete covarHist_Free;
-  if (correlHist) delete correlHist;
-  if (correlHist_Free) delete correlHist_Free;
-  if (decompHist) delete decompHist;
-  if (decompHist_Free) delete decompHist_Free;
+  // Clear Histograms
+  if (fCovar)  delete fCovar;
+  if (fCorrel) delete fCorrel;
+  if (fDecomp) delete fDecomp;
+  
+  if (fCovarFree)  delete fCovarFree;
+  if (fCorrelFree) delete fCorrelFree;
+  if (fDecompFree) delete fDecompFree;
 
+  
+  
   int NFREE = 0;
   int NDIM = 0;
 
   // Get NFREE from min or from vals (for cases when doing throws)
-  NDIM = params.size() + sampleDials.size();
+  NDIM = params.size();
   for (UInt_t i = 0; i < params.size(); i++){
     if (!fixVals[params[i]]) NFREE++;
-  }
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    if (!fixNorms[sampleDials[i]]) NFREE++;
   }
 
   if (NDIM == 0) return;
@@ -748,20 +695,6 @@ void systematicRoutines::SetupCovariance(){
       countfree++;
     }
   }
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-
-    covarHist->GetXaxis()->SetBinLabel(countall+1,sampleDials[i].c_str());
-    covarHist->GetYaxis()->SetBinLabel(countall+1,sampleDials[i].c_str());
-    countall++;
-
-    if (!fixNorms[sampleDials[i]] and NFREE > 0){
-      covarHist_Free->GetXaxis()->SetBinLabel(countfree+1,sampleDials[i].c_str());
-      covarHist_Free->GetYaxis()->SetBinLabel(countfree+1,sampleDials[i].c_str());
-      countfree++;
-    }
-  }
-
 
 
   // Fill Input Covariances
@@ -807,7 +740,6 @@ void systematicRoutines::SetupCovariance(){
       std::string parname = std::string(plot->GetXaxis()->GetBinLabel(j+1));
 
       if (currentVals.find(parname) != currentVals.end()) currentVals[parname] = plot->GetBinContent(j+1);
-      else if (currentNorms.find(parname) != currentNorms.end()) currentNorms[parname] = plot->GetBinContent(j+1);
 
     }
   }
@@ -831,25 +763,6 @@ void systematicRoutines::SetupCovariance(){
     }
   }
 
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-
-    double stepsq = 0.1*0.1;
-
-    if (!fixNorms[sampleDials[i]] and covarHist->GetBinContent(countall+1,countall+1) == 0.0)
-      covarHist->SetBinContent(countall+1,countall+1,stepsq);
-
-    countall++;
-
-    if (!fixNorms[sampleDials[i]] and NFREE > 0){
-
-      if (covarHist_Free->GetBinContent(countfree+1,countfree+1) == 0.0)
-	covarHist_Free->SetBinContent(countfree+1,countfree+1,stepsq);
-
-      countfree++;
-    }
-  }
-
   correlHist = PlotUtils::GetCorrelationPlot(covarHist,"correlation");
   decompHist = PlotUtils::GetDecompPlot(covarHist,"decomposition");
 
@@ -859,37 +772,6 @@ void systematicRoutines::SetupCovariance(){
   return;
 };
 
-//*************************************
-void systematicRoutines::readCovariance(std::string covarString){
-//*************************************
-
-  std::string token, covarname, covartype;
-  std::istringstream stream(covarString);   int val = 0;
-
-  if (covarString.c_str()[0] == '#') return;
-  
-  while(std::getline(stream, token, ' ')){
-    stream >> std::ws;    // strip whitespace
-    std::istringstream stoken(token);
-
-
-    if (val == 0 && token.compare("covar") != 0){ return; }
-    else if (val == 1){ covarname = token; }
-    else if (val == 2) { covartype = token; }
-    else if (val == 3) {
-
-      parameter_pulls* temp_pulls = new parameter_pulls(covarname, token, rw, covartype, "");
-      this->input_covariances.push_back(temp_pulls->GetFullCovarMatrix());
-      this->input_dials.push_back((TH1D*)temp_pulls->GetDataList().at(0)->Clone());
-
-      delete temp_pulls;
-    }
-
-    val++;
-  }
-
-  return;
-};
 
 
 
@@ -911,9 +793,6 @@ void systematicRoutines::ThrowCovariance(bool uniformly){
   for (UInt_t i = 0; i < params.size(); i++){
     thrownVals[params[i]] = currentVals[params[i]];
   }
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    thrownNorms[sampleDials[i]] = currentNorms[sampleDials[i]];
-  }
 
   for (Int_t i = 0; i < decompHist_Free->GetNbinsX(); i++){
 
@@ -932,25 +811,13 @@ void systematicRoutines::ThrowCovariance(bool uniformly){
       if (uniformly) thrownVals[parname] = gRandom->Uniform(minVals[parname],maxVals[parname]);
       else {  thrownVals[parname] = 	  currentVals[parname] + mod; }
 
-    } else if (currentNorms.find(parname) != currentNorms.end()){
-      if (fixNorms.at(parname)) continue;
-      
-      if (uniformly) thrownNorms[parname] = gRandom->Uniform(1.0, 0.7);
-      else thrownNorms[parname] = currentNorms[parname]+ mod;
-
     }
   }
-
+  
   for (UInt_t i = 0; i < params.size(); i++){
     if (fixVals.at(params[i])) continue;
     if (thrownVals[params[i]] < minVals[params[i]]) thrownVals[params[i]] = minVals[params[i]];
     if (thrownVals[params[i]] > maxVals[params[i]]) thrownVals[params[i]] = maxVals[params[i]];
-  }
-
-  for (UInt_t i = 0; i < sampleDials.size(); i++){
-    if (thrownNorms.at(sampleDials[i])) continue;
-    if (thrownNorms[sampleDials[i]] < 0.3) thrownNorms[sampleDials[i]] = 0.3;
-    if (thrownNorms[sampleDials[i]] > 1.7) thrownNorms[sampleDials[i]] = 1.7;
   }
 
   return;
@@ -967,7 +834,7 @@ void systematicRoutines::GenerateErrorBands(){
   tempfile->cd();
   int nthrows = FitPar::Config().GetParI("error_throws");
 
-  updateRWEngine(currentVals, currentNorms);
+  updateRWEngine(currentVals);
   thisFCN->ReconfigureAllEvents();
 
   TDirectory* nominal = (TDirectory*) tempfile->mkdir("nominal");
@@ -985,8 +852,6 @@ void systematicRoutines::GenerateErrorBands(){
   double chi2;
   for (UInt_t i = 0; i < params.size(); i++)
     parameterTree->Branch(params[i].c_str(), &thrownVals[params[i]], (params[i] + "/D").c_str());
-  for (UInt_t i = 0; i < sampleDials.size(); i++)
-    parameterTree->Branch(sampleDials[i].c_str(), &thrownNorms[sampleDials[i]], (sampleDials[i] + "/D").c_str());
   parameterTree->Branch("chi2",&chi2,"chi2/D");
 
 
@@ -999,12 +864,8 @@ void systematicRoutines::GenerateErrorBands(){
     throwfolder->cd();
 
     ThrowCovariance(uniformly);  
-
-    cout << " Throwing " <<i << endl;
-    //    updateRWEngine(currentVals, currentNorms);
-    //    thisFCN->ReconfigureAllEvents();
     
-    updateRWEngine(thrownVals, thrownNorms);    
+    updateRWEngine(thrownVals);    
     thisFCN->ReconfigureAllEvents();
 	
     thisFCN->Write();

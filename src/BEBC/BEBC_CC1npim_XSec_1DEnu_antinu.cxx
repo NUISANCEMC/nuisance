@@ -22,7 +22,7 @@
 // The constructor
 BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BEBC_CC1npim_XSec_1DEnu_antinu";
+  fName = "BEBC_CC1npim_XSec_1DEnu_antinu";
   plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 5.;
   EnuMax = 200.;

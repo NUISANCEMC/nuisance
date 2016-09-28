@@ -24,7 +24,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
 //********************************************************************
 
   // Measurement Details
-  measurementName = "MINERvA_CCinc_XSec_2DEavq3_nu";
+  fName = "MINERvA_CCinc_XSec_2DEavq3_nu";
   plotTitles = "; q_{3} (GeV); E_{avail} (GeV); d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})";
   EnuMin = 2.;
   EnuMax = 6.;

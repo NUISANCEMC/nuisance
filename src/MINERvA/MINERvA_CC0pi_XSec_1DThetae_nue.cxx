@@ -5,7 +5,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
 //******************************************************************** 
 
   // Define Measurement
-  measurementName = "MINERvA_CC0pi_XSec_1DThetae_nue";
+  fName = "MINERvA_CC0pi_XSec_1DThetae_nue";
   plotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
   EnuMin = 0.0;
   EnuMax = 10.0;

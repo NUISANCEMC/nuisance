@@ -28,7 +28,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 //********************************************************************  
 
   // Measurement Details
-  measurementName = "BNL_CCQE_Evt_1DQ2_nu";
+  fName = "BNL_CCQE_Evt_1DQ2_nu";
   EnuMin = 0.;
   EnuMax = 10.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
@@ -50,7 +50,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 
     LOG(SAM) << "Creating mcHist NoCORR"<<std::endl;
     this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->measurementName + "_NOCORR").c_str(),(this->measurementName + "_NOCORR").c_str());
+    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   

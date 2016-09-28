@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1npip_Evt_1Dppi_nu";
+  fName = "ANL_CC1npip_Evt_1Dppi_nu";
   plotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
   // whaaa, check this

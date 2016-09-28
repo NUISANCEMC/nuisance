@@ -25,7 +25,7 @@ K2K_CC0pi_XSec_1DQ2_nu_subtrks::K2K_CC0pi_XSec_1DQ2_nu_subtrks(std::string name,
 //******************************************************************** 
 
   // Define the Measurement
-  measurementName = name;
+  fName = name;
   plotTitles = "; Q^{2}_{QE} (GeV/c^{2}); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
@@ -70,7 +70,7 @@ K2K_CC0pi_XSec_1DQ2_nu_subtrks::K2K_CC0pi_XSec_1DQ2_nu_subtrks(std::string name,
     break;
     
   default:
-    LOG(SAM) << this->measurementName  << "Incorrect K2K sample type included: " << name << std::endl;
+    LOG(SAM) << this->fName  << "Incorrect K2K sample type included: " << name << std::endl;
     ncharged_cut = 0;
     deltaphi_cut = 0;
     deltaphi_type = false;
@@ -118,7 +118,7 @@ void K2K_CC0pi_XSec_1DQ2_nu_subtrks::FillEventVariables(FitEvent *event){
   q2qe = -1.0;
   deltaphi = 0.0;
   
-  LOG(EVT) << "Filling event variables for K2K" << this->measurementName<<std::endl;
+  LOG(EVT) << "Filling event variables for K2K" << this->fName<<std::endl;
 
   //  TLorentzVector pnu = (event->PartInfo(0))->fP;
   //  TLorentzVector pmu;
@@ -168,7 +168,7 @@ void K2K_CC0pi_XSec_1DQ2_nu_subtrks::FillEventVariables(FitEvent *event){
   
   this->X_VAR = q2qe;
 
-  LOG(EVT) << "Event variables for "<<this->measurementName<<std::endl;
+  LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
   LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;
@@ -206,7 +206,7 @@ void K2K_CC0pi_XSec_1DQ2_nu_subtrks::ScaleEvents(){
   this->mcFine->Scale(this->scaleFactor);
 
   //  double scaleF = 5933.0/this->mcHist->Integral();
-  //  LOG(SAM) << this->measurementName  <<"ScaleF = "<<scaleF<<std::endl;
+  //  LOG(SAM) << this->fName  <<"ScaleF = "<<scaleF<<std::endl;
 
   //  this->mcHist->Scale(scaleF);
   //  this->mcFine->Scale(scaleF);

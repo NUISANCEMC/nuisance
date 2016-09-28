@@ -26,7 +26,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 //******************************************************************** 
 
   // Measurement Details                                                                
-  measurementName = name;
+  fName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
 
   /// Using the sample name "MiniBooNE_CCQE_XSec_1DQ2_nu_CCQELike" will allow
@@ -59,7 +59,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   if (ccqelike){
 
     dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt",
-						   (this->measurementName+"_data_CCQELIKE"), this->plotTitles);
+						   (this->fName+"_data_CCQELIKE"), this->plotTitles);
     
     for (int i = 0; i < dataHist->GetNbinsX(); i++){
       this->dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1) + dataHist_CCQELIKE->GetBinContent(i+1));
@@ -142,7 +142,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
   if (ccqelike){
     dataHist_CCQELIKE->Write();
     
-    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
+    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
     combo_mcHist_CCQELIKE.Write();
   }
 

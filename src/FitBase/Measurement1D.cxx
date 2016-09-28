@@ -85,22 +85,22 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, Fi
   // Check if name contains Evt, indicating that it is a raw number of events measurements
   // and should thus be treated as once
   isRawEvents = false;
-  if ((measurementName.find("Evt") != std::string::npos) && isRawEvents == false) {
+  if ((fName.find("Evt") != std::string::npos) && isRawEvents == false) {
     isRawEvents = true;
     LOG(SAM) << "Found event rate measurement but isRawEvents == false!" << std::endl;
     LOG(SAM) << "Overriding this and setting isRawEvents == true!" << std::endl;
   }
 
   isEnu1D = false;
-  if (measurementName.find("XSec_1DEnu") != std::string::npos) {
+  if (fName.find("XSec_1DEnu") != std::string::npos) {
     isEnu1D = true;
-    LOG(SAM) << "::" << measurementName << "::" << std::endl;
+    LOG(SAM) << "::" << fName << "::" << std::endl;
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, not flux averaged!" << std::endl;
   }
 
   if (isEnu1D && isRawEvents) {
     LOG(SAM) << "Found 1D Enu XSec distribution AND isRawEvents, is this really correct?!" << std::endl;
-    LOG(SAM) << "Check experiment constructor for " << measurementName << " and correct this!" << std::endl;
+    LOG(SAM) << "Check experiment constructor for " << fName << " and correct this!" << std::endl;
     LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
@@ -127,11 +127,11 @@ void Measurement1D::SetupDefaultHist(){
 
   // Setup mcHist
   this->mcHist = (TH1D*) this->dataHist->Clone();
-  this->mcHist->SetNameTitle( (this->measurementName + "_MC").c_str(), (this->measurementName + "_MC" + this->plotTitles).c_str() );
+  this->mcHist->SetNameTitle( (this->fName + "_MC").c_str(), (this->fName + "_MC" + this->plotTitles).c_str() );
 
   // Setup mcFine
   Int_t nBins = this->mcHist->GetNbinsX();
-  this->mcFine = new TH1D( (this->measurementName + "_MC_FINE").c_str(), (this->measurementName + "_MC_FINE" + this->plotTitles).c_str(),
+  this->mcFine = new TH1D( (this->fName + "_MC_FINE").c_str(), (this->fName + "_MC_FINE" + this->plotTitles).c_str(),
 			   nBins*6, this->mcHist->GetBinLowEdge(1), this->mcHist->GetBinLowEdge(nBins+1) );
 
 
@@ -147,9 +147,9 @@ void Measurement1D::SetupDefaultHist(){
 
   // Setup bin masks using sample name
   if (isMask){
-    std::string maskloc = FitPar::Config().GetParDIR( this->measurementName + ".mask");
+    std::string maskloc = FitPar::Config().GetParDIR( this->fName + ".mask");
     if (maskloc.empty()){
-      maskloc = FitPar::GetDataBase() + "/masks/" + measurementName + ".mask";
+      maskloc = FitPar::GetDataBase() + "/masks/" + fName + ".mask";
     }
 
     SetBinMask(maskloc);
@@ -195,7 +195,7 @@ void Measurement1D::SetFitOptions(std::string opt){
 
       ERR(FTL) <<"ERROR: Fit Option '"<<fit_options_input.at(i)<<"' Provided is not allowed for this measurement."<<std::endl;
       ERR(FTL) <<"Fit Options should be provided as a '/' seperated list (e.g. FREE/DIAG/NORM)" << std::endl;
-      ERR(FTL) <<"Available options for "<<measurementName<<" are '"<< allowed_types <<"'"<<std::endl;
+      ERR(FTL) <<"Available options for "<<fName<<" are '"<< allowed_types <<"'"<<std::endl;
 
       exit(-1);
     }
@@ -245,7 +245,7 @@ void Measurement1D::SetDataValues(std::string dataFile) {
 
   // Override this function if the input file isn't in a suitable format
   LOG(SAM) << "Reading data from: " << dataFile.c_str() << std::endl;
-  this->dataHist = PlotUtils::GetTH1DFromFile(dataFile, (this->measurementName+"_data"), this->plotTitles);
+  this->dataHist = PlotUtils::GetTH1DFromFile(dataFile, (this->fName+"_data"), this->plotTitles);
   this->dataTrue = (TH1D*)this->dataHist->Clone();
 
   return;
@@ -257,7 +257,7 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile, std::string hist
 
   LOG(SAM) << "Filling histogram from "<< inhistfile << "->"<< histname <<std::endl;
   this->dataHist = PlotUtils::GetTH1DFromRootFile((std::string(std::getenv("EXT_FIT")) + "/data/" + inhistfile), histname);
-  this->dataHist->SetNameTitle((this->measurementName+"_data").c_str(), (this->measurementName + "_data").c_str());
+  this->dataHist->SetNameTitle((this->fName+"_data").c_str(), (this->fName + "_data").c_str());
 
   return;
 };
@@ -364,7 +364,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
   // MINERvA CC1pip needs slightly different method
   // Only half the covariance matrix is given and I'm too lazy to write the full one so let the code do it instead
-  if (measurementName.find("MINERvA_CC1pip") == std::string::npos && measurementName.find("MINERvA_CCNpip") == std::string::npos) {
+  if (fName.find("MINERvA_CC1pip") == std::string::npos && fName.find("MINERvA_CCNpip") == std::string::npos) {
     while(std::getline(covar, line, '\n')){
       std::istringstream stream(line);
       double entry;
@@ -493,7 +493,7 @@ void Measurement1D::SetBinMask(std::string maskFile){
 
   // Create a mask histogram.
   int nbins = this->dataHist->GetNbinsX();
-  this->maskHist = new TH1I((this->measurementName+"_maskHist").c_str(),(this->measurementName+"_maskHist; Bin; Mask?").c_str(),nbins,0,nbins);
+  this->maskHist = new TH1I((this->fName+"_maskHist").c_str(),(this->fName+"_maskHist; Bin; Mask?").c_str(),nbins,0,nbins);
   std::string line;
   std::ifstream mask(maskFile.c_str(),ifstream::in);
 
@@ -533,7 +533,7 @@ void Measurement1D::SetFluxHistogram(std::string fluxFile, int minE, int maxE, d
 
   TGraph f(fluxFile.c_str(),"%lg %lg");
 
-  this->fluxHist = new TH1D((this->measurementName+"_flux").c_str(), (this->measurementName+"; E_{#nu} (GeV)").c_str(), f.GetN()-1, minE, maxE);
+  this->fluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+"; E_{#nu} (GeV)").c_str(), f.GetN()-1, minE, maxE);
 
   Double_t *yVal = f.GetY();
 
@@ -677,7 +677,7 @@ void Measurement1D::ApplySmearingMatrix(){
 //********************************************************************
 
   if (!this->smear){
-    ERR(WRN) << this->measurementName <<": attempted to apply smearing matrix, but none was set"<<std::endl;
+    ERR(WRN) << this->fName <<": attempted to apply smearing matrix, but none was set"<<std::endl;
     return;
   }
 
@@ -772,7 +772,7 @@ double Measurement1D::GetLikelihood(){
     stat += penalty;
   }
 
-  LOG(REC) << this->measurementName<<": Sample Chi^2 = " << stat <<std::endl;
+  LOG(REC) << this->fName<<": Sample Chi^2 = " << stat <<std::endl;
 
   // Return to normal scaling
   if (this->isShape){
@@ -796,25 +796,25 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
   }
 
   // Make a copy of the original data histogram.
-  if (!(this->dataOrig)) this->dataOrig = (TH1D*)this->dataHist->Clone((this->measurementName+"_data_original").c_str());
+  if (!(this->dataOrig)) this->dataOrig = (TH1D*)this->dataHist->Clone((this->fName+"_data_original").c_str());
 
   TH1D *tempData = (TH1D*)this->dataHist->Clone();
   TFile *fake = new TFile();
 
   if (fakeOption.compare("MC")==0){
     LOG(SAM) << "Setting fake data from MC "<<std::endl;
-    this->dataHist = (TH1D*)this->mcHist->Clone((this->measurementName+"_MC").c_str());
-    if (this->mcHist->Integral() == 0.0) ERR(WRN) << this->measurementName <<": Invalid histogram"<<std::endl;
+    this->dataHist = (TH1D*)this->mcHist->Clone((this->fName+"_MC").c_str());
+    if (this->mcHist->Integral() == 0.0) ERR(WRN) << this->fName <<": Invalid histogram"<<std::endl;
   }
   else {
     fake = new TFile(fakeOption.c_str());
-    this->dataHist = (TH1D*)fake->Get((this->measurementName+"_MC").c_str());
+    this->dataHist = (TH1D*)fake->Get((this->fName+"_MC").c_str());
   }
 
-  this->dataHist ->SetNameTitle((this->measurementName+"_FAKE").c_str(), (this->measurementName+this->plotTitles).c_str());
+  this->dataHist ->SetNameTitle((this->fName+"_FAKE").c_str(), (this->fName+this->plotTitles).c_str());
 
   this->dataTrue = (TH1D*)this->dataHist->Clone();
-  this->dataTrue ->SetNameTitle((this->measurementName+"_FAKE_TRUE").c_str(), (this->measurementName+this->plotTitles).c_str());
+  this->dataTrue ->SetNameTitle((this->fName+"_FAKE_TRUE").c_str(), (this->fName+this->plotTitles).c_str());
 
   int nbins = this->dataHist->GetNbinsX();
   double alpha_i = 0.0;
@@ -846,7 +846,7 @@ void Measurement1D::ResetFakeData(){
 
   if (usingfakedata)
     if (this->dataHist) delete dataHist;
-    this->dataHist = (TH1D*) this->dataTrue->Clone((this->measurementName+"_FKDAT").c_str());
+    this->dataHist = (TH1D*) this->dataTrue->Clone((this->fName+"_FKDAT").c_str());
 
   return;
 }
@@ -857,7 +857,7 @@ void Measurement1D::ResetData(){
 
   if (usingfakedata)
     if (this->dataHist) delete dataHist;
-    this->dataHist = (TH1D*) this->dataTrue->Clone((this->measurementName+"_Data").c_str());
+    this->dataHist = (TH1D*) this->dataTrue->Clone((this->fName+"_Data").c_str());
 
   usingfakedata = false;
 
@@ -909,7 +909,7 @@ std::vector<TH1*> Measurement1D::GetMCList(){
     plotfillstyle = FitPar::Config().GetParI("fillstyle");
   }
 
-  std::cout << measurementName << " chi2 = " << GetLikelihood() << std::endl;
+  std::cout << fName << " chi2 = " << GetLikelihood() << std::endl;
 
   this->mcHist->SetTitle(chi2.str().c_str());
   this->mcHist->SetLineWidth(3);
@@ -1007,7 +1007,7 @@ void Measurement1D::Write(std::string drawOpt){
 
   // If null pointer return
   if (!this->mcHist and !this->dataHist){
-    LOG(SAM) << this->measurementName <<"Incomplete histogram set!"<<std::endl;
+    LOG(SAM) << this->fName <<"Incomplete histogram set!"<<std::endl;
     return;
   }
 
@@ -1047,12 +1047,12 @@ void Measurement1D::Write(std::string drawOpt){
   LOG(SAM)<<"Writing true events"<<std::endl;
   //  if (drawXSec)    this->xsecHist->Write();
   if (drawEvents)  this->eventHist->Write();
-  if (isMask and drawMask) this->maskHist->Write( (this->measurementName + "_MSK").c_str() ); //< save mask
+  if (isMask and drawMask) this->maskHist->Write( (this->fName + "_MSK").c_str() ); //< save mask
 
   // Save neut stack
   if (drawModes){
     LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
-    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
+    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->fName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
     combo_mcHist_PDG.Write();
   }
 
@@ -1060,19 +1060,19 @@ void Measurement1D::Write(std::string drawOpt){
   if (!isRawEvents and !isDiag){
     if (drawCov and fullcovar){
       TH2D cov = TH2D((*this->fullcovar));
-      cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
+      cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
       cov.Write();
     }
 
     if (drawInvCov and covar){
       TH2D covinv = TH2D((*this->covar));
-      covinv.SetNameTitle((this->measurementName+"_covinv").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
+      covinv.SetNameTitle((this->fName+"_covinv").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
       covinv.Write();
     }
 
     if (drawDecomp and decomp){
       TH2D covdec = TH2D((*this->decomp));
-      covdec.SetNameTitle((this->measurementName+"_covdec").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
+      covdec.SetNameTitle((this->fName+"_covdec").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
       covdec.Write();
     }
   }
@@ -1089,8 +1089,8 @@ void Measurement1D::Write(std::string drawOpt){
     this->mcHist->GetSumw2();
 
     // Create Ratio Histograms
-    TH1D* dataRatio = (TH1D*) this->dataHist->Clone((this->measurementName + "_data_RATIO").c_str());
-    TH1D* mcRatio   = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_RATIO").c_str());
+    TH1D* dataRatio = (TH1D*) this->dataHist->Clone((this->fName + "_data_RATIO").c_str());
+    TH1D* mcRatio   = (TH1D*) this->mcHist->Clone((this->fName + "_MC_RATIO").c_str());
 
     mcRatio->Divide(this->mcHist);
     dataRatio->Divide(this->mcHist);
@@ -1115,7 +1115,7 @@ void Measurement1D::Write(std::string drawOpt){
   if (drawShape){
 
     // Create Shape Histogram
-    TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
+    TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->fName + "_MC_SHAPE").c_str());
 
     double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
     mcShape->Scale(shapeScale);
@@ -1136,8 +1136,8 @@ void Measurement1D::Write(std::string drawOpt){
       mcShape->GetSumw2();
 
       // Create shape ratio histograms
-      TH1D* mcShapeRatio   = (TH1D*)mcShape->Clone((this->measurementName + "_MC_SHAPE_RATIO").c_str());
-      TH1D* dataShapeRatio = (TH1D*)dataHist->Clone((this->measurementName + "_data_SHAPE_RATIO").c_str());
+      TH1D* mcShapeRatio   = (TH1D*)mcShape->Clone((this->fName + "_MC_SHAPE_RATIO").c_str());
+      TH1D* dataShapeRatio = (TH1D*)dataHist->Clone((this->fName + "_data_SHAPE_RATIO").c_str());
 
       // Divide the histograms
       mcShapeRatio   ->Divide(mcShape);
@@ -1164,13 +1164,13 @@ void Measurement1D::Write(std::string drawOpt){
 
   // Make a pretty PDG Canvas
   if (drawCanvPDG or true){
-    TCanvas* c1 = new TCanvas((this->measurementName + "_PDG_CANV").c_str(),
-			      (this->measurementName + "_PDG_CANV").c_str(),
+    TCanvas* c1 = new TCanvas((this->fName + "_PDG_CANV").c_str(),
+			      (this->fName + "_PDG_CANV").c_str(),
 			      800,600);
     dataHist->Draw("E1");
     mcHist->Draw("HIST SAME");
     
-    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(),
+    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->fName + "_MC_PDG").c_str(),
     							   (TH1**)this->mcHist_PDG, 0);
     combo_mcHist_PDG.Draw("HIST SAME");
     TLegend leg = PlotUtils::GenerateStackLegend(combo_mcHist_PDG, 0.6,0.6,0.9,0.9);
@@ -1182,14 +1182,14 @@ void Measurement1D::Write(std::string drawOpt){
 
 
   if (drawCanvMC or true){
-    TCanvas* c1 = new TCanvas((this->measurementName + "_MC_CANV").c_str(),
-			      (this->measurementName + "_MC_CANV").c_str(),
+    TCanvas* c1 = new TCanvas((this->fName + "_MC_CANV").c_str(),
+			      (this->fName + "_MC_CANV").c_str(),
 			      800,600);
     c1->cd();
     dataHist->Draw("E1");
     mcHist->Draw("SAME HIST C");
     
-    TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
+    TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->fName + "_MC_SHAPE").c_str());
     double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
     mcShape->Scale(shapeScale);
     mcShape->SetLineStyle(7);
@@ -1197,13 +1197,13 @@ void Measurement1D::Write(std::string drawOpt){
     mcShape->Draw("SAME HIST C");
 
     TLegend* leg = new TLegend(0.6,0.6,0.9,0.9);
-    leg->AddEntry(dataHist, (this->measurementName + " Data").c_str(), "ep");
-    leg->AddEntry(mcHist,   (this->measurementName + " MC").c_str(), "l");
-    leg->AddEntry(mcShape,  (this->measurementName + " Shape").c_str(), "l");
+    leg->AddEntry(dataHist, (this->fName + " Data").c_str(), "ep");
+    leg->AddEntry(mcHist,   (this->fName + " MC").c_str(), "l");
+    leg->AddEntry(mcShape,  (this->fName + " Shape").c_str(), "l");
   }
   
   // Returning
-  LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
+  LOG(SAM) << this->fName  << "Written Histograms: "<<this->fName<<std::endl;
   return;
 };
 
@@ -1211,6 +1211,6 @@ void Measurement1D::Write(std::string drawOpt){
 
 
 THStack Measurement1D::GetModeStack(){
-  THStack combo_hist = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
+  THStack combo_hist = PlotUtils::GetNeutModeStack((this->fName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
   return combo_hist;
 }

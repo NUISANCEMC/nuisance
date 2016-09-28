@@ -23,7 +23,7 @@
 MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::MiniBooNE_CC1pip_XSec_2DTpiEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 //******************************************************************** 
   
-  measurementName = "MiniBooNE_CC1pip_XSec_2DTpiEnu_nu";
+  fName = "MiniBooNE_CC1pip_XSec_2DTpiEnu_nu";
   plotTitles = "; E_{#nu} (MeV); T_{#pi} (MeV); d#sigma(E_{#nu})/dT_{#pi} (cm^{2}/MeV)";
   EnuMin = 0.5;
   EnuMax = 2.0;
@@ -45,7 +45,7 @@ MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::MiniBooNE_CC1pip_XSec_2DTpiEnu_nu(std::string
 
 /*
 void MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   dataHist = (TH2D*)(dataFile->Get("PIKEVENUXSec")->Clone());

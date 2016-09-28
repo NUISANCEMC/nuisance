@@ -28,7 +28,7 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
 //********************************************************************  
 
   // Measurement Details                        
-  measurementName = "FNAL_CCQE_Evt_1DQ2_nu";
+  fName = "FNAL_CCQE_Evt_1DQ2_nu";
   EnuMin = 0.;
   EnuMax = 200.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
@@ -44,7 +44,7 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   if (applyQ2correction){
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
     this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->measurementName + "_NOCORR").c_str(),(this->measurementName + "_NOCORR").c_str());
+    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   // Mask out the first bin if required

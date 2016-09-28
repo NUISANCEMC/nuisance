@@ -24,7 +24,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
 //********************************************************************  
 
   // Setup The Measurement
-  measurementName = name;
+  fName = name;
   nBins = 16;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   isFluxFix      = name.find("_newflux") != std::string::npos;

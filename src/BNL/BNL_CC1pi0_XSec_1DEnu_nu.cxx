@@ -22,7 +22,7 @@
 // The constructor
 BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BNL_CC1pi0_XSec_1DEnu_nu";
+  fName = "BNL_CC1pi0_XSec_1DEnu_nu";
   plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 0.;
   EnuMax = 6.0;

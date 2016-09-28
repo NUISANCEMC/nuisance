@@ -24,7 +24,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
 //******************************************************************** 
 
   // Setup Measurement Defaults
-  measurementName = name;
+  fName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   isFluxFix      = name.find("_newflux") != std::string::npos;
   fullphasespace = name.find("_20deg")   == std::string::npos;

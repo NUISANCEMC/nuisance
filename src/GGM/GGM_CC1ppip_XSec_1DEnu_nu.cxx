@@ -22,7 +22,7 @@
 // The constructor
 GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "GGM_CC1ppip_XSec_1DEnu_nu";
+  fName = "GGM_CC1ppip_XSec_1DEnu_nu";
   plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 1.;
   EnuMax = 10.0;

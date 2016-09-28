@@ -24,7 +24,7 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
 //********************************************************************  
 
   // Setup The Measurement
-  measurementName = name;
+  fName = name;
   nBins = 8;
   plotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
   isRatio = true;
@@ -158,13 +158,13 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::Write(std::string drawOpt){
 
   if (this->fullcovar){
     TH2D cov = TH2D((*this->fullcovar));
-    cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
+    cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
     cov.Write();
   }
   
   if (this->covar){
     TH2D covinv = TH2D((*this->covar));
-    covinv.SetNameTitle((this->measurementName+"_covinv").c_str(),(this->measurementName+"_covinv;Bins; Bins;").c_str());
+    covinv.SetNameTitle((this->fName+"_covinv").c_str(),(this->fName+"_covinv;Bins; Bins;").c_str());
     covinv.Write();
   }
 

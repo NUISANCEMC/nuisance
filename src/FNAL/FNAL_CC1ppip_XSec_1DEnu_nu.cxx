@@ -22,7 +22,7 @@
 // The constructor
 FNAL_CC1ppip_XSec_1DEnu_nu::FNAL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "FNAL_CC1ppip_XSec_1DEnu_nu";
+  fName = "FNAL_CC1ppip_XSec_1DEnu_nu";
   plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 10.0;
   EnuMax = 100.0;

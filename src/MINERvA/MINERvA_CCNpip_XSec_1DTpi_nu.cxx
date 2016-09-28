@@ -3,7 +3,7 @@
 // The constructor
 MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "MINERvA_CCNpip_XSec_1DTpi_nu";
+  fName = "MINERvA_CCNpip_XSec_1DTpi_nu";
   plotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
@@ -15,7 +15,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   TpiVect.reserve(3);
 
   if (type.find("NEW") != std::string::npos) {
-    measurementName += "_2016";
+    fName += "_2016";
     isNew = true;
 
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_tpi.txt");

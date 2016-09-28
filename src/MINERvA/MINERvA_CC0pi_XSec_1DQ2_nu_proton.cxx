@@ -6,7 +6,7 @@
 MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   // Measurement Details
-  measurementName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
+  fName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 100.0;

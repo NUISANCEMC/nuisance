@@ -41,60 +41,63 @@
 class InputHandler {
 
  public:
-  InputHandler(){};
-  ~InputHandler(){};
+  InputHandler (void) {};
+  ~InputHandler (void) {};
 
   InputHandler(std::string handle, std::string infile_name);
   std::string ParseInputFile(std::string inputfile);
 
-  void ReadBinSplineFile();
-  void ReadHistogramFile();
-  void ReadNeutFile();
-  void ReadNuanceFile();
-  void ReadGenieFile();
+  void ReadBinSplineFile   (void);
+  void ReadHistogramFile   (void);
+  void ReadNeutFile        (void);
+  void ReadNuanceFile      (void);
+  void ReadGenieFile       (void);
+  void ReadNuWroFile       (void);
+  void ReadEventSplineFile (void);
+  void ReadJointFile       (void);
   void ReadGiBUUFile(bool IsNuBarDominant);
-  void ReadNuWroFile();
-  void ReadEventSplineFile();
-  void ReadJointFile();
-  FitSplineHead* GetSplineHead();
 
-  double PredictedEventRate(double low, double high, std::string intOpt="width");
-  double TotalIntegratedFlux(double low, double high, std::string intOpt="width");
-  FitEvent* GetEventPointer(){ return fEvent; };
-  BaseFitEvt* GetSignalPointer(){ return fSignalEvent; };
+  FitSplineHead* GetSplineHead (void);
 
-  int GetNEvents(){ return this->nEvents; };
-  int GetGenEvents();
+  double PredictedEventRate  (double low, double high, std::string intOpt="width");
+  double TotalIntegratedFlux (double low, double high, std::string intOpt="width");
+  
+  inline FitEvent*   GetEventPointer  (void) { return &fEvent;       };
+  inline BaseFitEvt* GetSignalPointer (void) { return &fSignalEvent; };
 
-  void PrintStartInput();
+  inline int GetNEvents (void)  const { return fNEvents; };
+  int GetGenEvents (void);
+
+  void PrintStartInput (void);
   void ReadEvent(unsigned int i);
 
-  inline TH1D* GetFluxHistogram()  { return fFluxHist;   };
-  inline TH1D* GetEventHistogram() { return fEventHist;  };
-  inline TH1D* GetXSecHistogram()  { return fXSecHist;   };
+  inline TH1D* GetFluxHistogram (void)   { return fFluxHist;  };
+  inline TH1D* GetEventHistogram (void)  { return fEventHist; };
+  inline TH1D* GetXSecHistogram (void)   { return fXSecHist;  };
+  
+  std::vector<TH1*> GetFluxList  (void) { return this->fluxList;  };
+  std::vector<TH1*> GetEventList (void) { return this->eventList; };
+  std::vector<TH1*> GetXSecList  (void) { return this->xsecList;  };
 
-  std::vector<TH1*> GetFluxList(){ return this->fluxList;};
-  std::vector<TH1*> GetEventList(){ return this->eventList;};
-  std::vector<TH1*> GetXSecList(){ return this->xsecList;};
-
-  int GetType(){return eventType;};
-  bool CanIGoFast();
+  inline int GetType(void) const { return fEventType; };
+  bool CanIGoFast (void);
   void GetTreeEntry(const Long64_t entry);
-  std::string GetInputStateString();
+  std::string GetInputStateString (void);
 
   int eventType;
   double GetInputWeight(const int entry=-1);
 
  protected:
 
-  FitEvent* fEvent;
-  BaseFitEvt* fSignalEvent;
+  FitEvent fEvent;
+  int fEventType;
+  BaseFitEvt fSignalEvent;
   
   FitSplineHead* fSplineHead;
 
   int fMaxEvents;
   int fNEvents;
-  int fCurEvt;
+  int fEventIndex;
 
   TH1D* fFluxHist;
   TH1D* fEventHist;
@@ -102,15 +105,15 @@ class InputHandler {
 
   std::string fName;
   std::string fInput;
-  std::string fInputFile;
   std::string fInputType;
+  std::string fInputFile;
   TFile* fInputRootFile;
 
   std::vector<BaseFitEvt*> fAllBaseEvents;
 
   std::vector<int> fJointIndexLow;
   std::vector<int> fJointIndexHigh;
-  std::vector<TH1D*> fJointIndexFlux;
+  std::vector<TH1D*> fJointIndexHist;
   std::vector<double> fJointIndexScale;
   bool fIsJointInput;
 
@@ -140,16 +143,6 @@ class InputHandler {
   
   
   TChain* tn;
-  FitSplineHead* splhead;
-
-  int maxEvents;
-  int nEvents;
-  int curevt_i;
-
-  // Input Event rate flux/event histograms
-  TH1D* fluxHist;  //!< Flux Histogram
-  TH1D* eventHist; //!< Event Histogram
-  TH1D* xsecHist;  //!< XSec Histogram
 
   // input root files
   TFile* inRootFile; //!< Input ROOT file (e.g NEUT MC)
@@ -180,7 +173,6 @@ class InputHandler {
   std::vector<int> joint_index_high;
   std::vector<TH1D*> joint_index_hist;
   std::vector<double> joint_index_weight;
-  bool isJointInput;
   int cur_entry;
 
   std::vector<TH1*> xsecList;

@@ -22,7 +22,7 @@
 // The constructor
 MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "MINERvA_CC1pip_XSec_1Dth_nu";
+  fName = "MINERvA_CC1pip_XSec_1Dth_nu";
   plotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;

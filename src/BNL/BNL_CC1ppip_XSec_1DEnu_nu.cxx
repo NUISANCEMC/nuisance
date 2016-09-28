@@ -22,7 +22,7 @@
 // The constructor
 BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BNL_CC1ppip_XSec_1DEnu_nu";
+  fName = "BNL_CC1ppip_XSec_1DEnu_nu";
   plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 0.;
   EnuMax = 3.0;
@@ -43,7 +43,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
 // Need this if we're reading a root file!
 /*
 void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH1D *copy = (TH1D*)(dataFile->Get("BNL_reanalysis"));
@@ -64,7 +64,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
   this->data_values = dataVals;
   this->data_errors = dataErr;
 
-  this->dataHist = new TH1D((this->measurementName+"_data").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
+  this->dataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
 
   for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
     this->dataHist->SetBinContent(i+1, this->data_values[i]);

@@ -22,7 +22,7 @@
 // The constructor
 MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  measurementName = "MINERvA_CC1pip_XSec_1DTpi_nu";
+  fName = "MINERvA_CC1pip_XSec_1DTpi_nu";
   plotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;

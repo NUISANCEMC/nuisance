@@ -147,7 +147,7 @@ void JointMeas1D::Reconfigure(){
   MakePlots();
 
   // Do Final Normalisation
-  ApplyNormScale( rw_engine->GetSampleNorm( this->measurementName ) );
+  ApplyNormScale( rw_engine->GetSampleNorm( this->fName ) );
 
   return;
 }
@@ -168,7 +168,7 @@ void JointMeas1D::ReconfigureFast(){
   MakePlots();
 
   // Do Final Normalisation
-  ApplyNormScale( rw_engine->GetSampleNorm( this->measurementName ) );
+  ApplyNormScale( rw_engine->GetSampleNorm( this->fName ) );
 
   return;
 }

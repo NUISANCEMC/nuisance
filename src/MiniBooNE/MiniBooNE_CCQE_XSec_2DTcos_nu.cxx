@@ -26,7 +26,7 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
 //******************************************************************** 
 
   // Measurement Details
-  measurementName = name;
+  fName = name;
   EnuMin = 0.;
   EnuMax = 3.;
   isDiag = true;

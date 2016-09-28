@@ -9,7 +9,7 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
 
   if (type.find("NEW") != std::string::npos) {
     // NEW measurement is actually Tpi, not ppi
-    measurementName = "MINERvA_CC1pi0_XSec_1DTpi_nubar_2016";
+    fName = "MINERvA_CC1pi0_XSec_1DTpi_nubar_2016";
     plotTitles = "; T_{#pi} (GeV); d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)";
     isNew = true;
     hadMassCut = 1800;
@@ -30,7 +30,7 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
     this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_tpi_corr.txt", dataHist->GetNbinsX());
 
   } else {
-    measurementName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
+    fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
     plotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
     // Although the covariance is given for MINERvA CC1pi0 nubar from 2015, it doesn't Cholesky decompose, hinting at something bad
     // I've tried adding small numbers to the diagonal but it still didn't work and the chi2s are crazy

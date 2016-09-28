@@ -4,7 +4,7 @@
 // The constructor
 T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "T2K_CC1pip_CH_XSec_1Dppi_nu";
+  fName = "T2K_CC1pip_CH_XSec_1Dppi_nu";
   plotTitles = "; p_{#pi} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
@@ -13,12 +13,12 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, 
 
   if (type.find("Michel") != std::string::npos) {
     useMichel = true;
-    measurementName += "_Michel";
+    fName += "_Michel";
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi.root");
   } else {
     useMichel = false;
-    measurementName += "_kin";
+    fName += "_kin";
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi_noME.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi_noME.root");
   }
@@ -31,7 +31,7 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, 
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
@@ -44,7 +44,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
   }
   binEdges[dataCopy->GetNbinsX()-1] = dataCopy->GetBinLowEdge(dataCopy->GetNbinsX());
 
-  dataHist = new TH1D((measurementName+"_data").c_str(), (measurementName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
+  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
 
   for (int i = 0; i < dataHist->GetNbinsX(); i++) {
     dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
@@ -53,7 +53,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
   }
 
   dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
+  dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
 
 
   dataFile->Close();

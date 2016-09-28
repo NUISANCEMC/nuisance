@@ -3,7 +3,7 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "MINERvA_CC1pi0_XSec_1Dpmu_nubar_2016";
+  fName = "MINERvA_CC1pi0_XSec_1Dpmu_nubar_2016";
   plotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;

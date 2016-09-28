@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1ppip_Evt_1DQ2_nu";
+  fName = "ANL_CC1ppip_Evt_1DQ2_nu";
   plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
   EnuMax = 6.0;

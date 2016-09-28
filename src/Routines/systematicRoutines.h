@@ -35,7 +35,6 @@
 #include "TFile.h"
 #include "TProfile.h"
 
-
 #include <vector>
 #include <string>
 #include <iostream>
@@ -45,6 +44,7 @@
 #include "FitEvent.h"
 #include "JointFCN.h"
 #include "FitParameters.h"
+#include "ParamPull.h"
 
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
@@ -73,15 +73,17 @@ public:
   */
 
   //! Splits the arguments ready for initial setup
-  void parseArgs(int argc, char* argv[]);
+  void ParseArgs(int argc, char* argv[]);
 
   //! Sorts out configuration and verbosity right at the very start.
   //! Calls readCard to set everything else up.
-  void initialSetup();
+  void InitialSetup();
 
   //! Loops through each line of the card file and passes it to other read functions
-  void readCard();
+  void ReadCard();
 
+  void GetCovarFromFCN();
+  
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters
   void readParameters(std::string parstring);
@@ -128,7 +130,7 @@ public:
   void SelfFit();
 
   //! Given a new map change the values that the RW engine is currently set to
-  void updateRWEngine(std::map<std::string,double>& updateVals, std::map<std::string,double>& updateNorms);
+  void updateRWEngine(std::map<std::string,double>& updateVals);
 
   //! Given a single routine (see tutorial for options) run that fit routine now.
   void RunFitRoutine(std::string routine);
@@ -177,7 +179,6 @@ protected:
   FitWeight* rw;
 
   // I/O
-
   std::string outputFileName;
   std::string inputFileName;
 
@@ -308,6 +309,18 @@ protected:
 
   std::vector<TH1D*> input_dials;  //!< Vector of histograms from parameter pull classes that give central values of the input pull terms
   std::vector<TH2D> input_covariances; //!< vector of histograms from parameter pull classes that give covariance of the input pull terms
+
+  std::vector <TH1D>        fInputDials; //!< Vector of Input Histograms
+  std::vector <TMatrixDSym> fInputCovar; //!< Vector of Input Covariances
+
+  TH2D* fCovar;
+  TH2D* fCorrel;
+  TH2D* fDecomp;
+
+  TH2D* fCovarFree;
+  TH2D* fCorrelFree;
+  TH2D* fDecompFree;
+  
 };
 
 /*! @} */

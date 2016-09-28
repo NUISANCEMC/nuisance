@@ -22,7 +22,7 @@
 // The constructor
 MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::MiniBooNE_CC1pip_XSec_2DTpiCospi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "MiniBooNE_CC1pip_XSec_2DTpiCospi_nu";
+  fName = "MiniBooNE_CC1pip_XSec_2DTpiCospi_nu";
   plotTitles = "; T_{#pi} (MeV); cos#theta_{#pi}; d^{2}#sigma/dT_{#pi}dcos#theta_{#pi} (cm^{2}/MeV)";
   EnuMin = 0.5;
   EnuMax = 2.0;
@@ -43,7 +43,7 @@ MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::MiniBooNE_CC1pip_XSec_2DTpiCospi_nu(std::st
 
 /*
 void MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   dataHist = (TH2D*)(dataFile->Get("PICTVKEXSec")->Clone());

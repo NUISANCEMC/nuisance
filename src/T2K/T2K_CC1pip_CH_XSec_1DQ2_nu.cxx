@@ -11,20 +11,20 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
   // Here we can give either MB (kMB), extended MB (keMB) or Delta (kDelta)
   if (type.find("eMB") != std::string::npos) {
     fitType = keMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
+    fName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
     plotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("MB") != std::string::npos) {
     fitType = kMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
+    fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
     plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("Delta") != std::string::npos) {
     fitType = kDelta;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
+    fName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
     plotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
   } else {
     std::cout << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
     fitType = kMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
+    fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
     plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   }
 
@@ -43,7 +43,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
   } else {
-    std::cerr << "No data type set for " << measurementName << std::endl;
+    std::cerr << "No data type set for " << fName << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
@@ -56,7 +56,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
@@ -73,7 +73,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
     std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((measurementName+"_data").c_str(), (measurementName+"_data"+plotTitles).c_str(), nPoints, binEdges);
+  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), nPoints, binEdges);
 
   for (int i = 0; i < dataHist->GetNbinsX(); i++) {
     dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
@@ -82,7 +82,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
   }
 
   dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
+  dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
 
   dataFile->Close();
 

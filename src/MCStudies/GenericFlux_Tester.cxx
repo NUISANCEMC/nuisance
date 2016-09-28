@@ -27,7 +27,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //********************************************************************
 
   // Measurement Details
-  measurementName = name;
+  fName = name;
   eventVariables = NULL;
 
   // Define our energy range for flux calcs
@@ -81,8 +81,8 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   // Setup the TTree to save everything
   if (!eventVariables) {
     FitPar::Config().out->cd();
-    eventVariables = new TTree((this->measurementName + "_VARS").c_str(),
-                               (this->measurementName + "_VARS").c_str());
+    eventVariables = new TTree((this->fName + "_VARS").c_str(),
+                               (this->fName + "_VARS").c_str());
   }
 
   eventVariables->Branch("Mode", &Mode, "Mode/I");
@@ -179,8 +179,8 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
 void GenericFlux_Tester::AddSignalFlagsToTree() {
   if (!eventVariables) {
     FitPar::Config().out->cd();
-    eventVariables = new TTree((this->measurementName + "_VARS").c_str(),
-                               (this->measurementName + "_VARS").c_str());
+    eventVariables = new TTree((this->fName + "_VARS").c_str(),
+                               (this->fName + "_VARS").c_str());
   }
 
   // Signal Definitions from SignalDef.cxx

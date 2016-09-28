@@ -22,7 +22,7 @@
 // The constructor
 BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "BNL_CC1ppip_Evt_1Dphi_nu";
+  fName = "BNL_CC1ppip_Evt_1Dphi_nu";
   plotTitles = "; #phi_{Adler}; Number of events";
   EnuMin = 0;
   EnuMax = 6.0;

@@ -28,7 +28,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
 //******************************************************************** 
 
   // Measurement Details
-  measurementName = "BNL_CCQE_XSec_1DEnu_nu";
+  fName = "BNL_CCQE_XSec_1DEnu_nu";
   EnuMin = 0.;
   EnuMax = 6.;
   isDiag = true;

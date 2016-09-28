@@ -27,7 +27,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
 //********************************************************************  
 
   // Measurement Details                        
-  measurementName = name;
+  fName = name;
   EnuMin = 0.;
   EnuMax = 200.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
@@ -43,7 +43,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
   if (applyQ2correction){
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_XSec_1DQ2_Correction");
     this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->measurementName + "_NOCORR").c_str(),(this->measurementName + "_NOCORR").c_str());
+    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   

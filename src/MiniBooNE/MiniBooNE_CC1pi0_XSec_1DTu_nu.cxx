@@ -22,7 +22,7 @@
 // The constructor
 MiniBooNE_CC1pi0_XSec_1DTu_nu::MiniBooNE_CC1pi0_XSec_1DTu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "MiniBooNE_CC1pi0_XSec_1DTu_nu";
+  fName = "MiniBooNE_CC1pi0_XSec_1DTu_nu";
   plotTitles = "; T_{#mu} (GeV); d#sigma/dE_{#mu} (cm^{2}/GeV^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;

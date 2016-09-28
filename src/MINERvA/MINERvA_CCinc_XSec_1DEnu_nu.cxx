@@ -25,7 +25,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
 //******************************************************************** 
 
   // Measurement Details                                                                                                           
-  measurementName = name;
+  fName = name;
   plotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
   EnuMin = 2.;
   EnuMax = 20.;

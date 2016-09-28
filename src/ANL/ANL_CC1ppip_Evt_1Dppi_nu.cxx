@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  measurementName = "ANL_CC1ppip_Evt_1Dppi_nu";
+  fName = "ANL_CC1ppip_Evt_1Dppi_nu";
   plotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
   EnuMax = 1.5; // Different EnuMax here, see M. Derrick et al, Phys Rev D, V23 N3, p572, Fig 2

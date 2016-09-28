@@ -23,7 +23,7 @@
 parameter_pulls::parameter_pulls(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   this->inFile = inputfile;
-  this->measurementName = name;
+  this->fName = name;
   this->plotTitles = "; Dials; Reweight Values";
   this->rw_engine = rw;
 
@@ -33,7 +33,7 @@ parameter_pulls::parameter_pulls(std::string name, std::string inputfile, FitWei
   this->SetDataValues(this->inFile); // Set the matrix and parameters from a text file.;
   this->mcHist = (TH1D*) this->dataHist->Clone();
   this->mcHist->Reset();
-  this->mcHist->SetNameTitle((this->measurementName+"_FitVals").c_str(), (this->measurementName+this->plotTitles).c_str());
+  this->mcHist->SetNameTitle((this->fName+"_FitVals").c_str(), (this->fName+this->plotTitles).c_str());
     
 };
 
@@ -147,7 +147,7 @@ void parameter_pulls::SetDataValues(std::string dataFile){
     int dim = covarplot->GetNbinsX();
     this->data_points = dim+1;
     
-    this->dataHist = new TH1D((this->measurementName + "_CentralVals").c_str(),(this->measurementName + "_centralvals").c_str(),dim,0,dim);
+    this->dataHist = new TH1D((this->fName + "_CentralVals").c_str(),(this->fName + "_centralvals").c_str(),dim,0,dim);
 
     for (int i = 0; i < dim; i++){
       this->dataHist->GetXaxis()->SetBinLabel(i+1,covarplot->GetXaxis()->GetBinLabel(i+1));
@@ -187,8 +187,8 @@ void parameter_pulls::Write(std::string drawOpt){
  
   TH2D* temp = new TH2D(*this->covar);
   
-  temp->SetName((this->measurementName + "_INVCOVAR").c_str());
-  temp->SetTitle((this->measurementName + "_INVCOVAR; Dials; Dials; Covariance").c_str());
+  temp->SetName((this->fName + "_INVCOVAR").c_str());
+  temp->SetTitle((this->fName + "_INVCOVAR; Dials; Dials; Covariance").c_str());
 
   for(std::map<std::string,int>::iterator binIter = this->binMap.begin(); binIter != this->binMap.end(); binIter++){
     

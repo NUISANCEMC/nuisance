@@ -23,7 +23,7 @@
 ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   // Measurement Details
-  measurementName = "ANL_CC1npip_XSec_1DEnu_nu";
+  fName = "ANL_CC1npip_XSec_1DEnu_nu";
   plotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 1.5;

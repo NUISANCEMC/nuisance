@@ -25,7 +25,7 @@ K2K_CC0pi_XSec_1DPmu_nu_Ntrks::K2K_CC0pi_XSec_1DPmu_nu_Ntrks(std::string inputfi
 //******************************************************************** 
 
   // Define Measurement
-  measurementName = "K2K_CC0pi_XSec_1DPmu_nu_Ntrks";
+  fName = "K2K_CC0pi_XSec_1DPmu_nu_Ntrks";
   plotTitles = "; P_#mu (GeV/c^{2}); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
@@ -122,7 +122,7 @@ void K2K_CC0pi_XSec_1DPmu_nu_Ntrks::FillEventVariables(FitEvent *event){
   
   this->X_VAR = Pmu;
 
-  LOG(EVT) << "Event variables for "<<this->measurementName<<std::endl;
+  LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
   LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;

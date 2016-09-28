@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1ppip_Evt_1Dthpr_nu";
+  fName = "ANL_CC1ppip_Evt_1Dthpr_nu";
   plotTitles = "; cos #theta_{p}; Number of events";
   EnuMin = 0;
   EnuMax = 1.5; // Different EnuMax for cos(thpr), see Derrick et al, Phys Rev D V23 N3, p572 fig 3

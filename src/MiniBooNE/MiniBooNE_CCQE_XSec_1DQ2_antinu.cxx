@@ -29,7 +29,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 //******************************************************************** 
 
   // Measurement Details 
-  measurementName = name;
+  fName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 3.;
@@ -57,14 +57,14 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   if (ccqelike){
 
     dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt", \
-						   (this->measurementName+"_data_CCQELIKE"), this->plotTitles);
+						   (this->fName+"_data_CCQELIKE"), this->plotTitles);
 
     dataHist_CCPIM = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt", \
-						(this->measurementName+"_data_CCPIM"), this->plotTitles);
+						(this->fName+"_data_CCPIM"), this->plotTitles);
 
     // Make NON CCPIM
     dataHist_NONCCPIM = (TH1D*) dataHist_CCQELIKE->Clone();
-    dataHist_NONCCPIM->SetNameTitle((this->measurementName+"_data_NONCCPIM").c_str(), (this->measurementName+"_data_NONCCPIM").c_str());
+    dataHist_NONCCPIM->SetNameTitle((this->fName+"_data_NONCCPIM").c_str(), (this->fName+"_data_NONCCPIM").c_str());
 
     // Perform dataHist Sums
     for (int i = 0; i < dataHist->GetNbinsX(); i++){
@@ -161,17 +161,17 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::Write(std::string drawOpt){
   if (ccqelike){
     dataHist_CCQELIKE->Write();
 
-    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
+    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
     combo_mcHist_CCQELIKE.Write();
 
     dataHist_CCPIM->Write();
 
-    THStack combo_mcHist_CCPIM = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_CCPIM").c_str(), (TH1**)this->mcHist_CCPIM, 0);
+    THStack combo_mcHist_CCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCPIM").c_str(), (TH1**)this->mcHist_CCPIM, 0);
     combo_mcHist_CCPIM.Write();
 
     dataHist_NONCCPIM->Write();
 
-    THStack combo_mcHist_NONCCPIM = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_NONCCPIM").c_str(), (TH1**)this->mcHist_NONCCPIM, 0);
+    THStack combo_mcHist_NONCCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_NONCCPIM").c_str(), (TH1**)this->mcHist_NONCCPIM, 0);
     combo_mcHist_NONCCPIM.Write();
 
 

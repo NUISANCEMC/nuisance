@@ -22,7 +22,7 @@
 // The constructor
 MINERvA_CC1pip_XSec_1Dth_20deg_nu::MINERvA_CC1pip_XSec_1Dth_20deg_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "MINERvA_CC1pip_XSec_1Dth_20deg_nu";
+  fName = "MINERvA_CC1pip_XSec_1Dth_20deg_nu";
   plotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
@@ -44,7 +44,7 @@ MINERvA_CC1pip_XSec_1Dth_20deg_nu::MINERvA_CC1pip_XSec_1Dth_20deg_nu(std::string
     dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1.11);
   }
 
-  hadMassHist = new TH1D((measurementName+"_hadMass").c_str(), (measurementName+"_hadMass").c_str(), 100, 1000, 2000);
+  hadMassHist = new TH1D((fName+"_hadMass").c_str(), (fName+"_hadMass").c_str(), 100, 1000, 2000);
 
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };

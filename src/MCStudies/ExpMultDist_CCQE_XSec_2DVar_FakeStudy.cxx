@@ -25,7 +25,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
 //******************************************************************** 
   
   // Measurement Details
-  measurementName = name;
+  fName = name;
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
@@ -60,7 +60,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
   }
   
   // Setup the datahist as empty, we will use fake data to fill it.
-  this->dataHist = new TH2D((measurementName + "_data").c_str(), (measurementName + "_data" + plotTitles).c_str(), nbinsx, binlowx, binhighx, nbinsy, binlowy, binhighy);
+  this->dataHist = new TH2D((fName + "_data").c_str(), (fName + "_data" + plotTitles).c_str(), nbinsx, binlowx, binhighx, nbinsy, binlowy, binhighy);
   
   // Once dataHist is setup this function will automatically generate matching MC histograms
   this->SetupDefaultHist();

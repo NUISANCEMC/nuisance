@@ -24,7 +24,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
 //******************************************************************** 
 
   // Measurement Details
-  measurementName = name;
+  fName = name;
   plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 3.;

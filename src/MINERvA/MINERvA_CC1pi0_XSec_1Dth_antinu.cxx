@@ -3,14 +3,14 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  measurementName = "MINERvA_CC1pi0_XSec_1Dth_nubar";
+  fName = "MINERvA_CC1pi0_XSec_1Dth_nubar";
   plotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if (type.find("NEW") != std::string::npos) {
-    measurementName += "_2016";
+    fName += "_2016";
     isNew = true;
     hadMassCut = 1800;
     isDiag = false;

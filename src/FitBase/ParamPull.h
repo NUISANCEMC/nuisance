@@ -18,7 +18,7 @@
 *******************************************************************************/
 
 #ifndef PARAM_PULL_H_SEEN
-#define PARAM_PULl_H_SEEN
+#define PARAM_PULL_H_SEEN
 
 /*!                                                                                                                                                                                                   
  *  \addtogroup FitBase                                                                                                                                                                               
@@ -65,14 +65,13 @@ enum FitThrowTypes {
   
 //! Used to produce gaussian penalty terms in the fit.
 class ParamPull {
-    
  public:
 
   //! Default Constructor
   ParamPull(std::string name, std::string inputfile, std::string type);    
   
   //! Default destructor
-  virtual ~ParamPull() {};
+  virtual ~ParamPull(void) {};
 
   // Set dial types (DEFAULT,ABS,FRAC)
   void SetType(std::string type);
@@ -93,51 +92,49 @@ class ParamPull {
   void ReadDialInput(std::string input);
   
   //! Reconfigure function reads in current RW engine dials and sets their value to MC
-  void Reconfigure();
+  void Reconfigure(void);
 
   //! Get likelihood given the current values
-  double GetLikelihood();
+  double GetLikelihood(void);
 
   //! Get NDOF if used in likelihoods
-  int GetNDOF();
+  int GetNDOF(void);
   
-  //! Return the inverted covariance matrix
-  TH2D GetCovar();
-  inline TMatrixDSym* GetCovarMatrix(){ return fInvCovar; };
-    
-  //! Get the covariance matrix
-  TH2D GetFullCovar();
-  inline TMatrixDSym* GetFullCovarMatrix(){ return fCovar; };
+  // Get Covariance Matrices as plots
+  TH2D GetCovar(void);
+  TH2D GetFullCovar(void);
+  TH2D GetDecompCovar(void);
 
-  //! Get the decomp covar
-  TH2D GetDecompCovar();
-  inline TMatrixDSym* GetDecompCovarMatrix(){ return fDecomp; };
+  // Get Covariance Matrices
+  inline TMatrixDSym GetCovarMatrix       (void) const { return *fInvCovar; };
+  inline TMatrixDSym GetFullCovarMatrix   (void) const { return *fCovar;    };
+  inline TMatrixDSym GetDecompCovarMatrix (void) const { return *fDecomp;   };
 
   //! Save the histograms
   void Write(std::string writeopt="");
 
   //! Throw the dial values using the current covariance. Useful for parameter throws.
-  void ThrowCovariance();
+  void ThrowCovariance(void);
 
   //! Compare dials to RW
-  bool CheckDialsValid();
+  bool CheckDialsValid(void);
 
   //! Reset toy data back to original data
-  inline void ResetToy(){ fDataHist = fDataTrue; };
+  inline void ResetToy(void){ fDataHist = fDataTrue; };
 
   // Get Functions
-  inline std::string GetName() const  { return fName; };
-  inline std::string GetInput()      { return fInput; };
-  inline std::string GetType()       { return fType;  };
-  inline std::string GetFileType()   { return fFileType; };
-  inline std::string GetDialOptions(){ return fDialOptions; };
+  inline std::string GetName        (void) const { return fName;        };
+  inline std::string GetInput       (void) const { return fInput;       };
+  inline std::string GetType        (void) const { return fType;        };
+  inline std::string GetFileType    (void) const { return fFileType;    };
+  inline std::string GetDialOptions (void) const { return fDialOptions; };
 
-  inline TH1D GetDataHist()  const { return *fDataHist;  };
-  inline TH1D GetDataTrue()  const { return *fDataTrue;  };
-  inline TH1D GetMCHist()    const { return *fMCHist;    };
-  inline TH1D GetMaxHist()   const { return *fMaxHist;   };
-  inline TH1D GetMinHist()   const { return *fMinHist;   };
-  inline TH1I GetDialTypes() const { return *fDialTypes; };
+  inline TH1D GetDataHist  (void) const { return *fDataHist;  };
+  inline TH1D GetDataTrue  (void) const { return *fDataTrue;  };
+  inline TH1D GetMCHist    (void) const { return *fMCHist;    };
+  inline TH1D GetMaxHist   (void) const { return *fMaxHist;   };
+  inline TH1D GetMinHist   (void) const { return *fMinHist;   };
+  inline TH1I GetDialTypes (void) const { return *fDialTypes; };
     
  private:
 

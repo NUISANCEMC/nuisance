@@ -3,7 +3,7 @@
 // The constructor
 MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "MINERvA_CCNpip_XSec_1DQ2_nu_2016";
+  fName = "MINERvA_CCNpip_XSec_1DQ2_nu_2016";
   plotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;

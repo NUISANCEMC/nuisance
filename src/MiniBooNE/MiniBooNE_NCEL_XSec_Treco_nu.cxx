@@ -42,7 +42,7 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
 
   // // In future read most of these from a card file
   // this->inFile = inputfile;
-  // this->measurementName = "MB_NCEL_XSec_Treco_nu";
+  // this->fName = "MB_NCEL_XSec_Treco_nu";
   // this->plotTitles = "; T_{reco} (MeV); Events/(12 MeV)";
 
   // // Because the binning is in Treco is fairly esoteric, hardcode here
@@ -59,19 +59,19 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // if (!fakeDataFile.empty()) this->SetFakeDataValues(fakeDataFile);
 
   // // This will be the final data histogram
-  // this->mcHist = new TH1D((this->measurementName+"_MC").c_str(), (this->measurementName+this->plotTitles).c_str(), 51, this->arr_treco);
+  // this->mcHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->plotTitles).c_str(), 51, this->arr_treco);
  
   // // Usually, the mcFine histogram is a finer binned version of mcHist. But as NCEL requires a Ttrue histogram, co-opt mcFine for this purpose. 
   // // Should probably change the naming to reflect the possible other use of this histogram.
-  // this->mcFine = new TH1D((this->measurementName+"_Ttrue").c_str(), (this->measurementName+this->plotTitles).c_str(), 50, 0, 900);
+  // this->mcFine = new TH1D((this->fName+"_Ttrue").c_str(), (this->fName+this->plotTitles).c_str(), 50, 0, 900);
 
   // // Read in the histograms from the NEUT file that are required for normalisation
   // TFile *in = new TFile(this->inFile.c_str());
   // this->fluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
-  // this->fluxHist->SetNameTitle((this->measurementName+"_FLUX").c_str(), (this->measurementName+";E_{#nu} (GeV)").c_str());
+  // this->fluxHist->SetNameTitle((this->fName+"_FLUX").c_str(), (this->fName+";E_{#nu} (GeV)").c_str());
 
   // this->eventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
-  // this->eventHist->SetNameTitle((this->measurementName+"_EVT").c_str(), (this->measurementName+";E_{#nu} (GeV); Event Rate").c_str());
+  // this->eventHist->SetNameTitle((this->fName+"_EVT").c_str(), (this->fName+";E_{#nu} (GeV); Event Rate").c_str());
 
   // // Read in the file once only
   // tn = new TChain("neuttree", "");
@@ -232,8 +232,8 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetFakeDataValues(std::string fakeDataFile) {
   // TFile *fake    = new TFile(fakeDataFile.c_str());
 
   // // This is the fake data
-  // this->dataHist = (TH1D*)fake->Get((this->measurementName+"_MC").c_str());
-  // this->dataHist ->SetNameTitle((this->measurementName+"_FAKE").c_str(), (this->measurementName+this->plotTitles).c_str());
+  // this->dataHist = (TH1D*)fake->Get((this->fName+"_MC").c_str());
+  // this->dataHist ->SetNameTitle((this->fName+"_FAKE").c_str(), (this->fName+this->plotTitles).c_str());
 
   // for (int xBin = 0; xBin < this->dataHist->GetNbinsX(); ++xBin){
 
@@ -262,11 +262,11 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
 
   // if(input.is_open()) std::cout << "Reading data from file: " << inputFile << std::endl;
   
-  // this->dataHist   = new TH1D((this->measurementName+"_data").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->dataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->plotTitles).c_str(), 
   // 			      51, this->arr_treco);
-  // this->BKGD_other = new TH1D((this->measurementName+"_BKGD_other").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->plotTitles).c_str(), 
   // 			      51, arr_treco);
-  // this->BKGD_irrid = new TH1D((this->measurementName+"_BKGD_irrid").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->plotTitles).c_str(), 
   // 			      51, arr_treco);
   // // To get the nDOF correct...
   // this->data_points= 52;
@@ -313,7 +313,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
   // std::ifstream response(responseFile.c_str(),ifstream::in);
   
   // // Response matrix: x axis is Ttrue, y axis is Treco
-  // this->response_mat = new TH2D((this->measurementName+"_RESPONSE_MATRIX").c_str(), (this->measurementName+this->plotTitles).c_str(),
+  // this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->plotTitles).c_str(),
   // 				50, 0, 900, 51, this->arr_treco);
 
   // if(response.is_open()) std::cout << "Reading in the response matrix from file: " << responseFile << std::endl;

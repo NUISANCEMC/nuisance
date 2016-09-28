@@ -22,7 +22,7 @@
 // The constructor
 MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
-  measurementName = "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu";
+  fName = "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu";
   plotTitles = "; cos#theta_{#pi^{0}}; d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;

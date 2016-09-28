@@ -22,7 +22,7 @@
 // The constructor
 ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
-  measurementName = "ANL_CC1ppip_XSec_1DQ2_nu";
+  fName = "ANL_CC1ppip_XSec_1DQ2_nu";
   plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 0;
   EnuMax = 6;

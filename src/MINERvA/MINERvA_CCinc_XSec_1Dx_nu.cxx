@@ -25,7 +25,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
 //******************************************************************** 
 
   // Measurement Details                                                                                                           
-  measurementName = name;
+  fName = name;
   plotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
   EnuMin = 2.;
   EnuMax = 20.;
@@ -110,7 +110,7 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
 //********************************************************************
   
   this->dataHist = (TH1D*)this->GetMCList().at(0)->Clone();
-  this->dataHist->SetNameTitle((this->measurementName+"_unsmear").c_str(), (this->measurementName+"_unsmear"+this->plotTitles).c_str());
+  this->dataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->plotTitles).c_str());
   this->ApplySmearingMatrix();
 
   // Get rid of this because it causes odd behaviour

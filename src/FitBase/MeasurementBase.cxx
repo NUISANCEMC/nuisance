@@ -50,7 +50,7 @@ void MeasurementBase::SetFluxHistogram(std::string fluxFile, int minE, int maxE,
 
   TGraph f(fluxFile.c_str(),"%lg %lg");
 
-  this->fluxHist = new TH1D((this->measurementName+"_flux").c_str(), (this->measurementName+"; E_{#nu} (GeV)").c_str(),\
+  this->fluxHist = new TH1D((this->fName+"_flux").c_str(), (this->fName+"; E_{#nu} (GeV)").c_str(),\
 			    f.GetN()-1, minE, maxE);
 
   Double_t *yVal = f.GetY();
@@ -62,23 +62,13 @@ void MeasurementBase::SetFluxHistogram(std::string fluxFile, int minE, int maxE,
 
 //********************************************************************
 double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low, double high){
-  //********************************************************************
-
-  if(GetInput()->GetType() == kGiBUU){
-    return 1.0;
-  }
+//********************************************************************
 
   // Set Energy Limits
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
 
-  int minBin = this->fluxHist->GetXaxis()->FindBin(low);
-  int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
-
-  // Get integral over custom range
-  double integral = this->fluxHist->Integral(minBin, maxBin+1, intOpt.c_str());
-
-  return integral;
+  return GetInput()->TotalIntegratedFlux(low, high, intOpt);
 };
 
 //********************************************************************
@@ -89,13 +79,8 @@ double MeasurementBase::PredictedEventRate(std::string intOpt, double low, doubl
   if (low == -9999.9)  low  = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
 
-  int minBin = this->eventHist->GetXaxis()->FindBin(low);
-  int maxBin = this->eventHist->GetXaxis()->FindBin(high);
+  return GetInput()->PredictedEventRate(low, high, intOpt) * 1E-38;
 
-  // Get integral over custom range
-  double integral = this->eventHist->Integral(minBin, maxBin+1, intOpt.c_str());
-
-  return integral * 1E-38;
 };
 
 
@@ -105,14 +90,14 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 
   // Add this infile to the global manager
   if (FitPar::Config().GetParB("EventManager")){
-    FitBase::AddInput(measurementName, inputfile);
+    FitBase::AddInput(fName, inputfile);
 
     // Get a pointer to the input so we can grab flux stuff
     // Slightly Convoluted...
     input = FitBase::GetInput( FitBase::GetInputID(inputfile) );
 
   } else {
-    input = new InputHandler(measurementName, inputfile);
+    input = new InputHandler(fName, inputfile);
   }
 
   this->fluxHist      = input->GetFluxHistogram();
@@ -132,7 +117,7 @@ int MeasurementBase::GetInputID(){
 //***********************************************
 void MeasurementBase::Reconfigure(){
 //***********************************************
-  LOG(REC) << " Reconfiguring sample "<<this->measurementName<<std::endl;
+  LOG(REC) << " Reconfiguring sample "<<this->fName<<std::endl;
 
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
@@ -221,7 +206,7 @@ void MeasurementBase::Reconfigure(){
 //***********************************************
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
-  LOG(REC) << " Reconfiguring signal "<<this->measurementName<<std::endl;
+  LOG(REC) << " Reconfiguring signal "<<this->fName<<std::endl;
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
   if (using_evtmanager){
@@ -299,7 +284,7 @@ void MeasurementBase::ConvertEventRates(){
 //***********************************************
 
   this->ScaleEvents();
-  this->ApplyNormScale( FitBase::GetRW()->GetSampleNorm( this->measurementName ) ) ;
+  this->ApplyNormScale( FitBase::GetRW()->GetSampleNorm( this->fName ) ) ;
 
 }
 
@@ -321,7 +306,7 @@ void MeasurementBase::Renormalise(){
 
   // Called when the fitter has changed a measurements normalisation but not any reweight dials
   // Means we don't have to call the time consuming reconfigure when this happens.
-  double norm = FitBase::GetRW()->GetDialValue( this->measurementName + "_norm" );
+  double norm = FitBase::GetRW()->GetDialValue( this->fName + "_norm" );
 
   if ((this->currentNorm == 0.0 and norm != 0.0) or not filledMC){
     this->ReconfigureFast();
@@ -359,4 +344,22 @@ void MeasurementBase::SetWeight(double wght){
 void MeasurementBase::SetMode(int md){
 //***********************************************
   Mode = md;
+}
+
+//***********************************************  
+std::vector<TH1*> MeasurementBase::GetFluxList(){
+//***********************************************  
+  return GetInput()->GetFluxList();
+}
+
+//***********************************************
+std::vector<TH1*> MeasurementBase::GetEventRateList(){
+//***********************************************
+  return GetInput()->GetEventList();
+}
+
+//***********************************************
+std::vector<TH1*> MeasurementBase::GetXSecList(){
+//***********************************************
+  return GetInput()->GetXSecList();
 }

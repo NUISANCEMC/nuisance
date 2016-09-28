@@ -22,8 +22,8 @@
 // The constructor
 GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "GGM_CC1ppip_Evt_1DQ2_nu";
-  // could replace with measurementName = std::string(__FILE__).substr(0, std::string(__FILE__).find_last_of("."))
+  fName = "GGM_CC1ppip_Evt_1DQ2_nu";
+  // could replace with fName = std::string(__FILE__).substr(0, std::string(__FILE__).find_last_of("."))
   plotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
   EnuMin = 1;
   EnuMax = 10;

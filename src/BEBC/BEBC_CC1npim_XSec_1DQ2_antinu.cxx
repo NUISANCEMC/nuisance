@@ -22,7 +22,7 @@
 // The constructor
 BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BEBC_CC1npim_XSec_1DQ2_antinu";
+  fName = "BEBC_CC1npim_XSec_1DQ2_antinu";
   plotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/neutron)";
   EnuMin = 5.;
   EnuMax = 200.;
@@ -36,8 +36,8 @@ BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(std::string inputfi
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  hadMassHist = new TH1D((measurementName+"_Wrec").c_str(),(measurementName+"_Wrec").c_str(), 100, 1000, 2000);
-  hadMassHist->SetTitle((measurementName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
+  hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
+  hadMassHist->SetTitle((fName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
 
   this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
 };
