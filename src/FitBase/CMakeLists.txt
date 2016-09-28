@@ -17,6 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
+ParamPull.cxx
 BaseFitEvt.cxx
 FitParticle.cxx
 FitWeight.cxx
@@ -34,6 +35,7 @@ StdHepEvt.cxx
 )
 
 set(HEADERFILES
+ParamPull.h
 NuanceEvent.h
 BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h

@@ -149,7 +149,7 @@ void MeasurementBase::Reconfigure(){
 
   FitEvent* cust_event = input->GetEventPointer();
   int nevents = input->GetNEvents();
-  int countwidth = (nevents/200);
+  int countwidth = (nevents/20);
 
   // Reset Signal Vectors
   this->X_VAR_VECT.clear();
@@ -245,7 +245,7 @@ void MeasurementBase::ReconfigureFast(){
   }
 
   // Get Pointer To Base Event (Just Generator Formats)
-  int countwidth = (nevents / 20);
+  int countwidth = (nevents / 10);
 
   // Setup Iterators
   std::vector<double>::iterator X = X_VAR_VECT.begin();

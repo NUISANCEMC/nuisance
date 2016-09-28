@@ -229,5 +229,11 @@ protected:
   std::string inputfilename;
 };
 
+// Class TypeDefs
+typedef std::list<MeasurementBase*>::const_iterator MeasListConstIter;
+typedef std::list<MeasurementBase*>::iterator MeasListIter;
+typedef std::vector<MeasurementBase*>::const_iterator MeasVectConstIter;
+typedef std::vector<MeasurementBase*>::iterator MeasVectIter;
+
 /*! @} */
 #endif

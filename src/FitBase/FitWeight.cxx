@@ -216,9 +216,26 @@ unsigned int FitWeight::GetDialPos(int this_enum) {
   return -1;
 }
 
+//******************************************************************** 
+bool FitWeight::DialIncluded(std::string name){
+//********************************************************************
+
+  std::vector<std::string>::iterator naIter = dial_names.begin();
+  bool found = false;
+  
+  for (; naIter != dial_names.end(); naIter++) {
+    if (((std::string)(*naIter)) == name) {
+      found = true;
+      break;
+    }
+  }
+
+  return found;
+}
+
 //********************************************************************
 unsigned int FitWeight::GetDialPos(std::string name) {
-  //********************************************************************
+//********************************************************************
 
   std::vector<std::string>::iterator naIter = dial_names.begin();
   unsigned int count = 0;

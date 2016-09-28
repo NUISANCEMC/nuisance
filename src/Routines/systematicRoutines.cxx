@@ -560,8 +560,7 @@ void systematicRoutines::setupFCN(){
 
   LOG(FIT)<<"Making the jointFCN"<<std::endl;
   if (thisFCN) delete thisFCN;
-  thisFCN = new jointFCN(cardFile, outputFile);
-  thisFCN->SetOutName(outputFileName);
+  thisFCN = new JointFCN(cardFile, outputFile);
   setFakeData();
 
   return;
@@ -580,13 +579,13 @@ void systematicRoutines::setFakeData(){
 
     FitBase::GetRW()->Reconfigure();
     thisFCN->ReconfigureAllEvents();
-    thisFCN->SetFakeData("MC");
+    //    thisFCN->SetFakeData("MC");
 
     updateRWEngine(currentVals, currentNorms);
 
     LOG(FIT)<<"Set all data to fake MC predictions."<<std::endl;
   } else {
-    thisFCN->SetFakeData(fakeDataFile);
+    //    thisFCN->SetFakeData(fakeDataFile);
   }
 
   return;

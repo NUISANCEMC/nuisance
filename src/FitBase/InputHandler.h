@@ -60,8 +60,8 @@ class InputHandler {
 
   double PredictedEventRate(double low, double high, std::string intOpt="width");
   double TotalIntegratedFlux(double low, double high, std::string intOpt="width");
-  FitEvent* GetEventPointer(){ return cust_event; };
-  BaseFitEvt* GetSignalPointer(){ return signal_event; };
+  FitEvent* GetEventPointer(){ return fEvent; };
+  BaseFitEvt* GetSignalPointer(){ return fSignalEvent; };
 
   int GetNEvents(){ return this->nEvents; };
   int GetGenEvents();
@@ -69,9 +69,9 @@ class InputHandler {
   void PrintStartInput();
   void ReadEvent(unsigned int i);
 
-  TH1D* GetFluxHistogram(){return this->fluxHist;};
-  TH1D* GetEventHistogram(){return this->eventHist;};
-  TH1D* GetXSecHistogram(){return this->xsecHist;};
+  inline TH1D* GetFluxHistogram()  { return fFluxHist;   };
+  inline TH1D* GetEventHistogram() { return fEventHist;  };
+  inline TH1D* GetXSecHistogram()  { return fXSecHist;   };
 
   std::vector<TH1*> GetFluxList(){ return this->fluxList;};
   std::vector<TH1*> GetEventList(){ return this->eventList;};
@@ -87,9 +87,59 @@ class InputHandler {
 
  protected:
 
+  FitEvent* fEvent;
+  BaseFitEvt* fSignalEvent;
+  
+  FitSplineHead* fSplineHead;
+
+  int fMaxEvents;
+  int fNEvents;
+  int fCurEvt;
+
+  TH1D* fFluxHist;
+  TH1D* fEventHist;
+  TH1D* fXSecHist;
+
+  std::string fName;
+  std::string fInput;
+  std::string fInputFile;
+  std::string fInputType;
+  TFile* fInputRootFile;
+
+  std::vector<BaseFitEvt*> fAllBaseEvents;
+
+  std::vector<int> fJointIndexLow;
+  std::vector<int> fJointIndexHigh;
+  std::vector<TH1D*> fJointIndexFlux;
+  std::vector<double> fJointIndexScale;
+  bool fIsJointInput;
+
+  std::vector<TH1*> fXSecList;
+  std::vector<TH1*> fEventList;
+  std::vector<TH1*> fFluxList;
+
+  std::vector<TArrayD> fAllSplines;
+  
+  // Event Objects
+#ifdef __NEUT_ENABLED__
+  NeutVect *fNeutVect; //!< Pointer to NEUT Events
+#endif
+  
+#ifdef __NUWRO_ENABLED__
+  event* fNuwroEvent; //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
+#endif
+  
+#ifdef __GENIE_ENABLED__
+  GHepRecord* fGenieGHep;
+  NtpMCEventRecord * fGenieNtpl; 
+#endif
+  
+#ifdef __NUANCE_ENABLED__
+  NuanceEvent* fNuanceEvt;
+#endif
+  
+  
   TChain* tn;
-  BaseFitEvt* signal_event;
-  FitEvent* cust_event;
   FitSplineHead* splhead;
 
   int maxEvents;

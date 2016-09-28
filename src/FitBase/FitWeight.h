@@ -158,7 +158,8 @@ class FitWeight {
   void UpdateWeightEngine(const double* x);
   void SetAllDials(const double* x, int npt);
   void GetAllDials(double* x, int npt);
-
+  bool DialIncluded(std::string name);
+    
   std::vector<std::string> GetDialNames();
   std::vector<int> GetDialEnums();
   std::vector<double> GetDialValues();

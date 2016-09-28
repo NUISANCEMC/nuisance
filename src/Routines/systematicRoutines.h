@@ -43,7 +43,7 @@
 #include <cstring>
 
 #include "FitEvent.h"
-#include "jointFCN.h"
+#include "JointFCN.h"
 #include "FitParameters.h"
 
 #include "Math/Minimizer.h"
@@ -191,7 +191,7 @@ protected:
   bool fitContinue;
 
   //! The actual chi2 Function from FCN module
-  jointFCN* thisFCN;
+  JointFCN* thisFCN;
 
   //! Current number of free parameters. callFCN requires this when being setup.
   int nfreepars;

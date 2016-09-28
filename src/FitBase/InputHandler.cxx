@@ -19,6 +19,7 @@
 
 #include "InputHandler.h"
 
+
 //***********************************
 InputHandler::InputHandler(std::string handle, std::string infile_name) {
   //***********************************
@@ -31,8 +32,8 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   isJointInput = false;
 
   // Setup a custom Event class
-  this->cust_event = new FitEvent();
-  this->signal_event = new BaseFitEvt();
+  this->fEvent = new FitEvent();
+  this->fSignalEvent = new BaseFitEvt();
   this->inFile = infile_name;
   this->handleName = handle;
 
@@ -86,9 +87,9 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     nEvents = maxEvents;
   }
 
-  this->fluxList.push_back(this->fluxHist);
-  this->eventList.push_back(this->eventHist);
-  this->xsecList.push_back(this->xsecHist);
+  this->fluxList.push_back(this->fFluxHist);
+  this->eventList.push_back(this->fEventHist);
+  this->xsecList.push_back(this->fXSecHist);
 
   LOG(SAM) << " -> Finished handler initialisation." << std::endl;
   return;
@@ -159,9 +160,9 @@ void InputHandler::ReadEventSplineFile() {
   this->eventType = 6;
 
   // Get flux histograms NEUT supplies
-  this->fluxHist = (TH1D*)inRootFile->Get((this->handleName + "_FLUX").c_str());
-  this->eventHist = (TH1D*)inRootFile->Get((this->handleName + "_EVT").c_str());
-  this->xsecHist = (TH1D*)inRootFile->Get((this->handleName + "_XSEC").c_str());
+  this->fFluxHist = (TH1D*)inRootFile->Get((this->handleName + "_FLUX").c_str());
+  this->fEventHist = (TH1D*)inRootFile->Get((this->handleName + "_EVT").c_str());
+  this->fXSecHist = (TH1D*)inRootFile->Get((this->handleName + "_XSEC").c_str());
 
   // Setup Spline Stuff
   this->splhead = (FitSplineHead*)inRootFile->Get(
@@ -172,14 +173,14 @@ void InputHandler::ReadEventSplineFile() {
 
   // Assign nvect
   nEvents = tn->GetEntries();
-  cust_event = NULL;
-  tn->SetBranchAddress("FitEvent", &cust_event);
+  fEvent = NULL;
+  tn->SetBranchAddress("FitEvent", &fEvent);
 
   // Load Dial Coeffs into vector
   for (int i = 0; i < nEvents; i++) {
     tn->GetEntry(i);
     tn->Show(i);
-    spline_list.push_back(*cust_event->dial_coeff);
+    spline_list.push_back(*fEvent->dial_coeff);
   }
   sleep(5);
 
@@ -193,9 +194,9 @@ void InputHandler::ReadEventSplineFile() {
   // Load all the splines into signal memory
   //  for (int i = 0; i < nEvents; i++){
   //    tn->GetEntry(i);
-  //    BaseFitEvt* base_event = (new BaseFitEvt(cust_event));
+  //    BaseFitEvt* base_event = (new BaseFitEvt(fEvent));
   //    base_event->fType=6;
-  //    signal_events.push_back( base_event );
+  //    fSignalEvents.push_back( base_event );
   //  }
 
   // Print out what was read in
@@ -289,11 +290,11 @@ void InputHandler::ReadJointFile() {
     count_low += temp_events;
 
     if (i == 0) {
-      this->fluxHist = (TH1D*)temp_flux->Clone();
-      this->eventHist = (TH1D*)temp_evts->Clone();
+      this->fFluxHist = (TH1D*)temp_flux->Clone();
+      this->fEventHist = (TH1D*)temp_evts->Clone();
     } else {
-      this->fluxHist->Add(temp_flux);
-      this->eventHist->Add(temp_evts);
+      this->fFluxHist->Add(temp_flux);
+      this->fEventHist->Add(temp_evts);
     }
     std::cout << "Added Input File " << input_lines.at(i) << std::endl
               << " with " << temp_events << std::endl;
@@ -325,14 +326,14 @@ void InputHandler::ReadJointFile() {
     eventType = 0;
     neut_event = NULL;
     tn->SetBranchAddress("vectorbranch", &neut_event);
-    this->cust_event->SetEventAddress(&neut_event);
+    this->fEvent->SetEventAddress(&neut_event);
 #endif
   } else if (temp_type == 1) {
 #ifdef __NUWRO_ENABLED__
     eventType = 1;
     nuwro_event = NULL;
     tn->SetBranchAddress("e", &nuwro_event);
-    this->cust_event->SetEventAddress(&nuwro_event);
+    this->fEvent->SetEventAddress(&nuwro_event);
 #endif
   }
 
@@ -340,20 +341,20 @@ void InputHandler::ReadJointFile() {
   for (UInt_t i = 0; i < input_lines.size(); i++) {
     TH1D* temp_hist = (TH1D*)joint_index_hist.at(i)->Clone();
     joint_index_weight.push_back(
-        double(nEvents) / eventHist->Integral("width") *
+        double(nEvents) / fEventHist->Integral("width") *
         joint_index_hist.at(i)->Integral("width") /
         double(joint_index_high.at(i) - joint_index_low.at(i)));
 
-    temp_hist->Scale(double(nEvents) / eventHist->Integral("width"));
+    temp_hist->Scale(double(nEvents) / fEventHist->Integral("width"));
     temp_hist->Scale(joint_index_hist.at(i)->Integral("width") /
                      double(joint_index_high.at(i)));
 
     this->joint_index_hist.at(i) = temp_hist;
   }
 
-  this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
+  this->fEventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
                                 (this->handleName + "_EVT").c_str());
-  this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
+  this->fFluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
                                (this->handleName + "_FLUX").c_str());
 
   return;
@@ -371,20 +372,20 @@ void InputHandler::ReadNeutFile() {
   this->eventType = 0;
 
   // Get flux histograms NEUT supplies
-  this->fluxHist = (TH1D*)inRootFile->Get(
+  this->fFluxHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "flux")).c_str());
-  this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
+  this->fFluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
                                (this->handleName + "; E_{#nu} (GeV)").c_str());
 
-  this->eventHist = (TH1D*)inRootFile->Get(
+  this->fEventHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "evtrt")).c_str());
-  this->eventHist->SetNameTitle(
+  this->fEventHist->SetNameTitle(
       (this->handleName + "_EVT").c_str(),
       (this->handleName + "; E_{#nu} (GeV); Event Rate").c_str());
 
-  this->xsecHist = (TH1D*)eventHist->Clone();
-  this->xsecHist->Divide(this->fluxHist);
-  this->xsecHist->SetNameTitle(
+  this->fXSecHist = (TH1D*)fEventHist->Clone();
+  this->fXSecHist->Divide(this->fFluxHist);
+  this->fXSecHist->SetNameTitle(
       (this->handleName + "_XSEC").c_str(),
       (this->handleName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
           .c_str());
@@ -399,7 +400,7 @@ void InputHandler::ReadNeutFile() {
   tn->SetBranchAddress("vectorbranch", &neut_event);
 
   // Make the custom event read in nvect when calling CalcKinematics
-  this->cust_event->SetEventAddress(&neut_event);
+  this->fEvent->SetEventAddress(&neut_event);
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file" << std::endl;
@@ -434,12 +435,12 @@ void InputHandler::ReadNuWroFile() {
   nEvents = tn->GetEntries();
   nuwro_event = NULL;
   tn->SetBranchAddress("e", &nuwro_event);
-  this->cust_event->SetEventAddress(&nuwro_event);
+  this->fEvent->SetEventAddress(&nuwro_event);
 
   // Check if we have saved an xsec histogram before
-  this->fluxHist = (TH1D*)inRootFile->Get(
+  this->fFluxHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "FluxHist")).c_str());
-  this->eventHist = (TH1D*)inRootFile->Get(
+  this->fEventHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "EvtHist")).c_str());
 
   // Check if we are forcing plot generation (takes time)
@@ -450,15 +451,15 @@ void InputHandler::ReadNuWroFile() {
         << std::endl;
 
   // Already generated flux and event histograms
-  if (fluxHist and eventHist and !regenFlux) {
-    this->xsecHist = (TH1D*)inRootFile->Get(
+  if (fFluxHist and fEventHist and !regenFlux) {
+    this->fXSecHist = (TH1D*)inRootFile->Get(
         (PlotUtils::GetObjectWithName(inRootFile, "xsec")).c_str());
 
-    this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
+    this->fFluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
                                  (this->handleName + "_FLUX").c_str());
-    this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
+    this->fEventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
                                   (this->handleName + "_EVT").c_str());
-    this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
+    this->fXSecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
                                  (this->handleName + "_XSEC").c_str());
 
     // Need to regenerate if not found
@@ -484,10 +485,10 @@ void InputHandler::ReadNuWroFile() {
                 << "pdg: " << pdg << "Elow: " << Elow << "Ehigh: " << Ehigh
                 << std::endl;
 
-      fluxHist = new TH1D("fluxplot", "fluxplot", fluxvals.size() - 2, Elow, Ehigh);
+      fFluxHist = new TH1D("fluxplot", "fluxplot", fluxvals.size() - 2, Elow, Ehigh);
       for (int j = 2; j < fluxvals.size(); j++) {
         cout << j << " " << fluxvals[j] << endl;
-        fluxHist->SetBinContent(j - 1, fluxvals[j]);
+        fFluxHist->SetBinContent(j - 1, fluxvals[j]);
       }
     } else if (beamtype == 1) {
       std::string fluxstring = nuwro_event->par.beam_content;
@@ -513,23 +514,23 @@ void InputHandler::ReadNuWroFile() {
           fluxplot->SetBinContent(j + 1, fluxvals[j]);
         }
 
-        if (this->fluxHist)
-          fluxHist->Add(fluxplot);
+        if (this->fFluxHist)
+          fFluxHist->Add(fluxplot);
         else
-          this->fluxHist = (TH1D*)fluxplot->Clone();
+          this->fFluxHist = (TH1D*)fluxplot->Clone();
       }
     }
 
-    this->fluxHist->SetNameTitle("nuwro_flux",
+    this->fFluxHist->SetNameTitle("nuwro_flux",
                                  "nuwro_flux;E_{#nu} (GeV); Flux");
 
-    this->eventHist = (TH1D*)this->fluxHist->Clone();
-    this->eventHist->Reset();
-    this->eventHist->SetNameTitle("nuwro_evt", "nuwro_evt");
+    this->fEventHist = (TH1D*)this->fFluxHist->Clone();
+    this->fEventHist->Reset();
+    this->fEventHist->SetNameTitle("nuwro_evt", "nuwro_evt");
 
-    this->xsecHist = (TH1D*)this->fluxHist->Clone();
-    this->xsecHist->Reset();
-    this->xsecHist->SetNameTitle("nuwro_xsec", "nuwro_xsec");
+    this->fXSecHist = (TH1D*)this->fFluxHist->Clone();
+    this->fXSecHist->Reset();
+    this->fXSecHist->SetNameTitle("nuwro_xsec", "nuwro_xsec");
 
     // Start Processing
     LOG(SAM) << " -> Processing NuWro Input Flux for " << nEvents
@@ -550,8 +551,8 @@ void InputHandler::ReadNuWroFile() {
       TotXSec = nuwro_event->weight;
 
       // Fill a flux and xsec histogram
-      this->eventHist->Fill(Enu);
-      this->xsecHist->Fill(Enu, TotXSec);
+      this->fEventHist->Fill(Enu);
+      this->fXSecHist->Fill(Enu, TotXSec);
 
       // Keep Tally
       totaleventmode += TotXSec;
@@ -560,7 +561,7 @@ void InputHandler::ReadNuWroFile() {
 
     LOG(SAM) << " -> Flux Processing Loop Finished." << std::endl;
 
-    if (this->eventHist->Integral() == 0.0) {
+    if (this->fEventHist->Integral() == 0.0) {
       std::cout << "ERROR NO EVENTS FOUND IN RANGE! " << std::endl;
       exit(-1);
     }
@@ -569,22 +570,22 @@ void InputHandler::ReadNuWroFile() {
     double AvgXSec = (totaleventmode * 1.0E38 / (totalevents + 0.));
     LOG(SAM) << " -> Average XSec = " << AvgXSec << std::endl;
 
-    this->eventHist->Scale(1.0 / eventHist->Integral());  // Convert to PDF
-    this->eventHist->Scale(this->fluxHist->Integral() *
+    this->fEventHist->Scale(1.0 / fEventHist->Integral());  // Convert to PDF
+    this->fEventHist->Scale(this->fFluxHist->Integral() *
                            AvgXSec);  // Convert to Proper Event Rate
 
-    this->xsecHist->Add(eventHist);          // Get Event Rate Plot
-    this->xsecHist->Divide(this->fluxHist);  // Make XSec Plot
+    this->fXSecHist->Add(fEventHist);          // Get Event Rate Plot
+    this->fXSecHist->Divide(this->fFluxHist);  // Make XSec Plot
 
-    // this->eventHist = (TH1D*)this->fluxHist->Clone();
-    // this->eventHist->Multiply(this->xsecHist);
+    // this->fEventHist = (TH1D*)this->fFluxHist->Clone();
+    // this->fEventHist->Multiply(this->fXSecHist);
 
     // Clear over/underflows incase they mess with integrals later.
-    this->fluxHist->SetBinContent(0, 0.0);
-    this->fluxHist->SetBinContent(this->fluxHist->GetNbinsX() + 2, 0.0);
+    this->fFluxHist->SetBinContent(0, 0.0);
+    this->fFluxHist->SetBinContent(this->fFluxHist->GetNbinsX() + 2, 0.0);
 
-    this->eventHist->SetBinContent(0, 0.0);
-    this->eventHist->SetBinContent(this->eventHist->GetNbinsX() + 2, 0.0);
+    this->fEventHist->SetBinContent(0, 0.0);
+    this->fEventHist->SetBinContent(this->fEventHist->GetNbinsX() + 2, 0.0);
 
     LOG(SAM)
         << " -> Finished making NuWro event plots. Saving them for next time..."
@@ -593,20 +594,20 @@ void InputHandler::ReadNuWroFile() {
     TFile* temp_save_file = new TFile(this->inFile.c_str(), "UPDATE");
     temp_save_file->cd();
 
-    this->fluxHist->Write("nuwro_flux", TObject::kOverwrite);
-    this->eventHist->Write("nuwro_evtrt", TObject::kOverwrite);
-    this->xsecHist->Write("nuwro_xsec", TObject::kOverwrite);
+    this->fFluxHist->Write("nuwro_flux", TObject::kOverwrite);
+    this->fEventHist->Write("nuwro_evtrt", TObject::kOverwrite);
+    this->fXSecHist->Write("nuwro_xsec", TObject::kOverwrite);
     temp_save_file->ls();
 
 
     temp_save_file->Close();
     delete temp_save_file;
 
-    this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
+    this->fFluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
                                  (this->handleName + "_FLUX").c_str());
-    this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
+    this->fEventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
                                   (this->handleName + "_EVT").c_str());
-    this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
+    this->fXSecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
                                  (this->handleName + "_XSEC").c_str());
   }
 
@@ -637,20 +638,20 @@ void InputHandler::ReadGenieFile() {
   LOG(SAM) << "Reading event file " << this->inFile << std::endl;
 
   // Get flux histograms NEUT supplies
-  this->fluxHist = (TH1D*)inRootFile->Get(
+  this->fFluxHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
+  this->fFluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(),
                                (this->handleName + "; E_{#nu} (GeV)").c_str());
 
-  this->eventHist = (TH1D*)inRootFile->Get(
+  this->fEventHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  this->eventHist->SetNameTitle(
+  this->fEventHist->SetNameTitle(
       (this->handleName + "_EVT").c_str(),
       (this->handleName + "; E_{#nu} (GeV); Event Rate").c_str());
 
-  this->xsecHist = (TH1D*)inRootFile->Get(
+  this->fXSecHist = (TH1D*)inRootFile->Get(
       (PlotUtils::GetObjectWithName(inRootFile, "spectrum")).c_str());
-  this->xsecHist->SetNameTitle(
+  this->fXSecHist->SetNameTitle(
       (this->handleName + "_XSEC").c_str(),
       (this->handleName + "; E_{#nu} (GeV); Event Rate").c_str());
 
@@ -668,10 +669,10 @@ void InputHandler::ReadGenieFile() {
   //  NtpMCEventRecord * mcrec = 0; tree->SetBranchAddress(gmrec, &mcrec);
   tn->SetBranchAddress("gmcrec", &mcrec);
 
-  this->eventHist->Reset();
+  this->fEventHist->Reset();
 
   // Make the custom event read in nvect when calling CalcKinematics
-  this->cust_event->SetEventAddress(&mcrec);
+  this->fEvent->SetEventAddress(&mcrec);
 
   LOG(SAM) << "Processing GENIE flux events." << std::endl;
   for (int i = 0; i < nEvents; i++) {
@@ -688,23 +689,23 @@ void InputHandler::ReadGenieFile() {
     average_xsec += xsec;
     total_events += 1;
 
-    this->eventHist->Fill(neu->E());
-    this->xsecHist->Fill(neu->E(), xsec);
+    this->fEventHist->Fill(neu->E());
+    this->fXSecHist->Fill(neu->E(), xsec);
 
     mcrec->Clear();
   }
 
   average_xsec = average_xsec / (total_events + 0.);
-  this->eventHist->Scale( average_xsec * this->fluxHist->Integral("width") / total_events, "width" );
-  this->xsecHist = (TH1D*)this->eventHist->Clone();
-  this->xsecHist->Divide(this->fluxHist);
+  this->fEventHist->Scale( average_xsec * this->fFluxHist->Integral("width") / total_events, "width" );
+  this->fXSecHist = (TH1D*)this->fEventHist->Clone();
+  this->fXSecHist->Divide(this->fFluxHist);
 
   // Set Titles
-  this->eventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
+  this->fEventHist->SetNameTitle((this->handleName + "_EVT").c_str(),
 				(this->handleName + "_EVT;E_{#nu} (GeV); Events (1#times10^{-38})")
 				.c_str());
   
-  this->xsecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
+  this->fXSecHist->SetNameTitle((this->handleName + "_XSEC").c_str(),
 			       (this->handleName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
 			       .c_str());
 
@@ -751,15 +752,15 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
   rootFile->Close();
 
   // Set flux hist to the dominant mode
-  fluxHist = IsNuBarDominant ? numubFlux : numuFlux;
+  fFluxHist = IsNuBarDominant ? numubFlux : numuFlux;
 
-  if (!fluxHist) {
+  if (!fFluxHist) {
     ERR(FTL) << "Couldn't find: "
              << (IsNuBarDominant ? "numub_flux" : "numu_flux")
              << " in input file: " << inRootFile->GetName() << std::endl;
     exit(1);
   }
-  fluxHist->SetNameTitle(
+  fFluxHist->SetNameTitle(
       (this->handleName + "_FLUX").c_str(),
       (this->handleName + "; E_{#nu} (GeV);" +
        (IsNuBarDominant ? "#Phi_{#bar{#nu}} (A.U.)" : "#Phi_{#nu} (A.U.)"))
@@ -767,16 +768,16 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
   tn = new TChain("giRooTracker");
   tn->AddFile(this->inFile.c_str());
 
-  eventHist =
-      static_cast<TH1D*>(fluxHist->Clone((this->handleName + "_EVT").c_str()));
-  eventHist->Reset();
+  fEventHist =
+      static_cast<TH1D*>(fFluxHist->Clone((this->handleName + "_EVT").c_str()));
+  fEventHist->Reset();
   nEvents = tn->GetEntries();
-  eventHist->SetBinContent(
-      1, double(nEvents) / eventHist->GetXaxis()->GetBinWidth(1));
+  fEventHist->SetBinContent(
+      1, double(nEvents) / fEventHist->GetXaxis()->GetBinWidth(1));
 
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
-  cust_event->SetEventAddress(giRead);
+  fEvent->SetEventAddress(giRead);
 #endif
 }
 
@@ -847,16 +848,16 @@ void InputHandler::ReadNuanceFile() {
   tn->SetBranchAddress("hadron", &nuance_event->hadron);
   tn->SetBranchAddress("p_hadron", &nuance_event->p_hadron);
 
-  this->cust_event->SetEventAddress(&nuance_event);
+  this->fEvent->SetEventAddress(&nuance_event);
 
-  this->fluxHist = new TH1D((this->handleName + "_FLUX").c_str(),
+  this->fFluxHist = new TH1D((this->handleName + "_FLUX").c_str(),
                             (this->handleName + "_FLUX").c_str(), 1, 0.0, 1.0);
 
-  this->fluxHist->SetBinContent(1, 1.0);
+  this->fFluxHist->SetBinContent(1, 1.0);
 
-  this->eventHist = new TH1D((this->handleName + "_EVT").c_str(),
+  this->fEventHist = new TH1D((this->handleName + "_EVT").c_str(),
                              (this->handleName + "_EVT").c_str(), 1, 0.0, 1.0);
-  this->eventHist->SetBinContent(1, nEvents);
+  this->fEventHist->SetBinContent(1, nEvents);
 
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
@@ -871,19 +872,19 @@ void InputHandler::PrintStartInput() {
   //********************************************************************
 
   LOG(SAM) << " -> Total events = " << nEvents << std::endl;
-  LOG(SAM) << " -> Energy Range = " << fluxHist->GetXaxis()->GetXmin() << "-"
-           << fluxHist->GetXaxis()->GetXmax() << " GeV" << std::endl;
+  LOG(SAM) << " -> Energy Range = " << fFluxHist->GetXaxis()->GetXmin() << "-"
+           << fFluxHist->GetXaxis()->GetXmax() << " GeV" << std::endl;
   LOG(SAM) << " -> Integrated Flux Hist = "
-           << fluxHist->Integral(0, fluxHist->GetNbinsX(), "width")
+           << fFluxHist->Integral(0, fFluxHist->GetNbinsX(), "width")
            << std::endl;
 
   LOG(SAM) << " -> Integrated Event Hist = "
-           << eventHist->Integral(0, eventHist->GetNbinsX(), "width")
+           << fEventHist->Integral(0, fEventHist->GetNbinsX(), "width")
            << std::endl;
 
   LOG(SAM) << " -> Integrated Inclusive XSec = "
-           << (eventHist->Integral(0, eventHist->GetNbinsX(), "width") /
-               fluxHist->Integral(0, fluxHist->GetNbinsX(), "width")) *
+           << (fEventHist->Integral(0, fEventHist->GetNbinsX(), "width") /
+               fFluxHist->Integral(0, fFluxHist->GetNbinsX(), "width")) *
                   1E-38
            << std::endl;
 
@@ -891,12 +892,12 @@ void InputHandler::PrintStartInput() {
 
   // Get First event info
   tn->GetEntry(0);
-  cust_event->CalcKinematics();
-  LOG(SAM) << " -> Event 0. Neutrino PDG = " << cust_event->PartInfo(0)->fPID
+  fEvent->CalcKinematics();
+  LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent->PartInfo(0)->fPID
            << std::endl;
-  LOG(SAM) << "             Target A     = " << cust_event->TargetA
+  LOG(SAM) << "             Target A     = " << fEvent->TargetA
            << std::endl;
-  LOG(SAM) << "             Target Z     = " << cust_event->TargetZ
+  LOG(SAM) << "             Target Z     = " << fEvent->TargetZ
            << std::endl;
 }
 
@@ -905,10 +906,10 @@ std::string InputHandler::GetInputStateString() {
   //********************************************************************
   
   tn->GetEntry(0);
-  cust_event->CalcKinematics();
+  fEvent->CalcKinematics();
   std::ostringstream state;
-  state << "T" << eventType << "_PDG" << cust_event->PartInfo(0)->fPID << "_Z"
-        << cust_event->TargetZ << "_A" << cust_event->TargetA;
+  state << "T" << eventType << "_PDG" << fEvent->PartInfo(0)->fPID << "_Z"
+        << fEvent->TargetZ << "_A" << fEvent->TargetA;
 
   return state.str();
 }
@@ -924,11 +925,11 @@ void InputHandler::ReadEvent(unsigned int i) {
   if (using_events) {
     tn->GetEntry(i);
 
-    if (eventType != kEVTSPLINE) cust_event->CalcKinematics();
+    if (eventType != kEVTSPLINE) fEvent->CalcKinematics();
 
-    cust_event->Index = i;
+    fEvent->Index = i;
     cur_entry = i;
-    cust_event->InputWeight = GetInputWeight(i);
+    fEvent->InputWeight = GetInputWeight(i);
 
   } else {
     this->GetTreeEntry(i);
@@ -942,10 +943,10 @@ void InputHandler::GetTreeEntry(const Long64_t i) {
   if (eventType != kEVTSPLINE)
     tn->GetEntry(i);
   else
-    (*(cust_event->dial_coeff)) = spline_list.at(i);
+    (*(fEvent->dial_coeff)) = spline_list.at(i);
 
   cur_entry = i;
-  cust_event->InputWeight = GetInputWeight(i);
+  fEvent->InputWeight = GetInputWeight(i);
 }
 
 //********************************************************************
@@ -953,7 +954,7 @@ double InputHandler::GetInputWeight(const int entry) {
   //********************************************************************
 
   if (eventType == kGiBUU) {
-    return cust_event->InputWeight;
+    return fEvent->InputWeight;
   }
 
   if (!isJointInput) {
@@ -989,11 +990,11 @@ double InputHandler::TotalIntegratedFlux(double low, double high,
 
   throw;
 
-  int minBin = this->fluxHist->GetXaxis()->FindBin(low);
-  int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
+  int minBin = this->fFluxHist->GetXaxis()->FindBin(low);
+  int maxBin = this->fFluxHist->GetXaxis()->FindBin(high);
 
   double integral =
-      this->fluxHist->Integral(minBin, maxBin + 1, intOpt.c_str());
+      this->fFluxHist->Integral(minBin, maxBin + 1, intOpt.c_str());
 
   return integral;
 };
@@ -1003,8 +1004,8 @@ double InputHandler::PredictedEventRate(double low, double high,
                                         std::string intOpt) {
   //********************************************************************
 
-  int minBin = this->fluxHist->GetXaxis()->FindBin(low);
-  int maxBin = this->fluxHist->GetXaxis()->FindBin(high);
+  int minBin = this->fFluxHist->GetXaxis()->FindBin(low);
+  int maxBin = this->fFluxHist->GetXaxis()->FindBin(high);
 
-  return this->eventHist->Integral(minBin, maxBin + 1, intOpt.c_str());
+  return this->fEventHist->Integral(minBin, maxBin + 1, intOpt.c_str());
 }

@@ -557,12 +557,13 @@ void minimizerRoutines::setupFCN(){
 
   LOG(FIT)<<"Making the jointFCN"<<std::endl;
   if (thisFCN) delete thisFCN;
-  thisFCN = new jointFCN(cardFile, outputFile);
-  thisFCN->SetOutName(outputFileName);
-  thisFCN->CreateIterationTree("minimizer_iterations",FitBase::GetRW());
+  thisFCN = new JointFCN(cardFile, outputFile);
   setFakeData();
-  helperFunc* helperFCN = new helperFunc(thisFCN);
-  callFCN = new ROOT::Math::Functor( *helperFCN, params.size() + sampleDials.size());
+  
+  MinFCN = new MinimizerFCN(thisFCN);
+  callFCN = new ROOT::Math::Functor( *MinFCN, params.size() + sampleDials.size() );
+
+  thisFCN->CreateIterationTree("fit_iterations",FitBase::GetRW());
   
   return;
 }
@@ -688,13 +689,13 @@ void minimizerRoutines::setFakeData(){
 
     FitBase::GetRW()->Reconfigure();
     thisFCN->ReconfigureAllEvents();
-    thisFCN->SetFakeData("MC");
+    //    thisFCN->SetFakeData("MC");
 
     updateRWEngine(currentVals, currentNorms);
 
     LOG(FIT)<<"Set all data to fake MC predictions."<<std::endl;
   } else {
-    thisFCN->SetFakeData(fakeDataFile);
+    //    thisFCN->SetFakeData(fakeDataFile);
   }
 
   return;

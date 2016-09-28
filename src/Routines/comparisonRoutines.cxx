@@ -456,8 +456,7 @@ void comparisonRoutines::setupFCN() {
 
   LOG(FIT) << "Making the jointFCN" << std::endl;
   if (thisFCN) delete thisFCN;
-  thisFCN = new jointFCN(cardFile, outputFile);
-  thisFCN->SetOutName(outputFileName);
+  thisFCN = new JointFCN(cardFile, outputFile);
   setFakeData();
 
   return;
@@ -475,13 +474,13 @@ void comparisonRoutines::setFakeData() {
 
     FitBase::GetRW()->Reconfigure();
     this->ReconfigureAllEvents();
-    thisFCN->SetFakeData("MC");
+    //    thisFCN->SetFakeData("MC");
 
     updateRWEngine(currentVals, currentNorms);
 
     LOG(FIT) << "Set all data to fake MC predictions." << std::endl;
   } else {
-    thisFCN->SetFakeData(fakeDataFile);
+    //    thisFCN->SetFakeData(fakeDataFile);
   }
 
   return;
@@ -553,6 +552,7 @@ void comparisonRoutines::ReconfigureAllEvents() {
   // Main Event Loop from event Manager
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
 
+  /*
   if (using_evtmanager) {
     std::list<MeasurementBase*> fChain = thisFCN->GetSampleList();
     std::list<MeasurementBase*>::const_iterator iterSam = fChain.begin();
@@ -609,8 +609,9 @@ void comparisonRoutines::ReconfigureAllEvents() {
     std::cout << "Finished reconfiguring all events" << std::endl;
 
   } else {
-    thisFCN->ReconfigureAllEvents();
-  }
+  */
+  thisFCN->ReconfigureAllEvents();
+  
 
   return;
 }

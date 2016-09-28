@@ -43,7 +43,8 @@
 #include <cstring>
 
 #include "FitEvent.h"
-#include "jointFCN.h"
+#include "JointFCN.h"
+#include "MinimizerFCN.h"
 #include "FitParameters.h"
 
 #include "Math/Minimizer.h"
@@ -222,8 +223,9 @@ protected:
   ROOT::Math::Minimizer* minimizerObj;
 
   //! The actual chi2 Function from FCN module
-  jointFCN* thisFCN;
-
+  JointFCN* thisFCN;
+  MinimizerFCN* MinFCN;
+  
   //! A functor that root requires to pass to minimizerObj.
   //! Basically just a wrapper for thisFCN
   ROOT::Math::Functor* callFCN;
