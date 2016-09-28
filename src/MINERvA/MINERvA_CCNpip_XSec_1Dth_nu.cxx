@@ -4,7 +4,7 @@
 MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   fName = "MINERvA_CCNpip_XSec_1Dth_nu";
-  plotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
@@ -21,32 +21,32 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
 
     // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-    double binOneWidth = dataHist->GetBinWidth(1);
-    for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-      double binNWidth = dataHist->GetBinWidth(i+1);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1E-40);
-      dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*dataHist->GetBinError(i+1)/100.);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
-      dataHist->SetBinError(i+1, dataHist->GetBinError(i+1)*binOneWidth/binNWidth);
+    double binOneWidth = fDataHist->GetBinWidth(1);
+    for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+      double binNWidth = fDataHist->GetBinWidth(i+1);
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1E-40);
+      fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
+      fDataHist->SetBinError(i+1, fDataHist->GetBinError(i+1)*binOneWidth/binNWidth);
     }
     // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi_corr.txt", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi_corr.txt", fDataHist->GetNbinsX());
 
   } else {
     isNew = false;
 
     if (isShape) {
       this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_shape.txt");
-      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_shape_cov.txt", dataHist->GetNbinsX());
+      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
     } else {
       this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th.txt");
-      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_cov.txt", dataHist->GetNbinsX());
+      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
     }
 
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
     // Please change when MINERvA releases new data!
-    for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1.11);
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
     }
   }
 
@@ -99,7 +99,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
     th = -999;
   }
 
-  this->X_VAR = th;
+  fXVar = th;
 
   return;
 };
@@ -120,11 +120,11 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
     // Need to loop over all the pions in the sample
     for (size_t k = 0; k < thVect.size(); ++k) {
-      this->mcHist->Fill(thVect.at(k), Weight);
-      this->mcFine->Fill(thVect.at(k), Weight);
+      this->fMCHist->Fill(thVect.at(k), Weight);
+      this->fMCFine->Fill(thVect.at(k), Weight);
       this->mcStat->Fill(thVect.at(k), 1.0);
 
-      PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, thVect.at(k), Weight);
+      PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, thVect.at(k), Weight);
     }
 
     hnPions->Fill(nPions);

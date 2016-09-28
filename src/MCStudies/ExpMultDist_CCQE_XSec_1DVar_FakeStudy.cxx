@@ -46,26 +46,26 @@ ExpMultDist_CCQE_XSec_1DVar_FakeStudy::ExpMultDist_CCQE_XSec_1DVar_FakeStudy(std
   double binlow, binhigh;
 
   if (name.find("1DQ2") != std::string::npos){
-    plottype = 1; plotTitles = "";
+    plottype = 1; fPlotTitles = "";
     nbins = 30;  binlow = 0.0;  binhigh = 2.0;
   } else if (name.find("1DTmu") != std::string::npos){
-    plottype = 2; plotTitles = "";
+    plottype = 2; fPlotTitles = "";
     nbins = 20;  binlow = 0.0;  binhigh = 3.0;
   } else if (name.find("1DCos") != std::string::npos){
-    plottype = 3;  plotTitles = "";
+    plottype = 3;  fPlotTitles = "";
     nbins = 10;  binlow = -1.0; binhigh = 1.0; 
   }
   
   // Setup the datahist as empty, we will use fake data to fill it.
-  this->dataHist = new TH1D((fName + "_data").c_str(), (fName + "_data" + plotTitles).c_str(), nbins, binlow, binhigh);
+  this->fDataHist = new TH1D((fName + "_data").c_str(), (fName + "_data" + fPlotTitles).c_str(), nbins, binlow, binhigh);
   
-  // Once dataHist is setup this function will automatically generate matching MC histograms
+  // Once fDataHist is setup this function will automatically generate matching MC histograms
   this->SetupDefaultHist();
 
   
   // Setup Covariance assuming a diagonal covar.
   // If you want a full covariance to be used examples are given in the MINERvA 1D classes
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
   
 
@@ -86,10 +86,10 @@ void ExpMultDist_CCQE_XSec_1DVar_FakeStudy::FillEventVariables(FitEvent *event){
   // MUST be defined for each new sample.
   // This function reads in the FitEvent format and lets you grab any information you need
   // from the event. This function is only called during the first and last iteration of each fit so that
-  // a vector of X_VAR variables can be filled for the signal events.
+  // a vector of fXVar variables can be filled for the signal events.
 
   // Define empty variables
-  this->X_VAR = -1.0;
+  fXVar = -1.0;
   double q2qe = 0.0;
   double CosThetaMu = -2.0;
   double TMu = 0.0;
@@ -113,9 +113,9 @@ void ExpMultDist_CCQE_XSec_1DVar_FakeStudy::FillEventVariables(FitEvent *event){
     break;  
   }
 
-  if (this->plottype == 1) this->X_VAR = q2qe;
-  else if (this->plottype == 2) this->X_VAR = TMu;
-  else if (this->plottype == 3) this->X_VAR = CosThetaMu;
+  if (this->plottype == 1) fXVar = q2qe;
+  else if (this->plottype == 2) fXVar = TMu;
+  else if (this->plottype == 3) fXVar = CosThetaMu;
   
   return;
 };

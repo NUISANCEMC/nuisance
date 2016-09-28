@@ -26,7 +26,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
 
   // Measurement Details                                                                                                           
   fName = name;
-  plotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
+  fPlotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
   EnuMin = 2.;
   EnuMax = 20.;
   target = "";
@@ -45,7 +45,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   double bins[7] = {0, 0.1, 0.3, 0.7, 0.9, 1.1, 1.5};
 
   // Note that only the ratio is given, so I can't do this->SetDataValues or this->SetCovarMatrix
-  this->dataHist = new TH1D(name.c_str(),(name+plotTitles).c_str(),nbins,bins);
+  this->fDataHist = new TH1D(name.c_str(),(name+fPlotTitles).c_str(),nbins,bins);
 
   // Setup Default MC Histograms
   this->SetupDefaultHist();
@@ -79,7 +79,7 @@ void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
     break;
   }
 
-  this->X_VAR   = bjork_x;
+  fXVar   = bjork_x;
   return;
 }
 
@@ -109,21 +109,21 @@ bool MINERvA_CCinc_XSec_1Dx_nu::isSignal(FitEvent *event){
 void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
 //********************************************************************
   
-  this->dataHist = (TH1D*)this->GetMCList().at(0)->Clone();
-  this->dataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->plotTitles).c_str());
+  this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
+  this->fDataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->fPlotTitles).c_str());
   this->ApplySmearingMatrix();
 
   // Get rid of this because it causes odd behaviour
   //Measurement1D::ScaleEvents();
 
-  this->mcHist->Scale(this->scaleFactor, "width");
+  this->fMCHist->Scale(this->scaleFactor, "width");
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
   for(int i=0; i<this->mcStat->GetNbinsX();i++) {
     
     if (this->mcStat->GetBinContent(i+1) != 0)
-      this->mcHist->SetBinError(i+1, this->mcHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
-    else this->mcHist->SetBinError(i+1, this->mcHist->Integral());
+      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
+    else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
   }
 
 }

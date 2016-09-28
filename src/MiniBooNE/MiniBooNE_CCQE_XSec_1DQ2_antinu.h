@@ -38,17 +38,17 @@ public:
   void ScaleEvents();
   void ApplyNormScale(double norm);
   void ResetAll();
-  TH1D* mcHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background   
-  TH1D* mcHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background          
-  TH1D* mcHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background
+  TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background   
+  TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background          
+  TH1D* fMCHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background
 
  private:
   double q2qe; ///< X_Variable
   bool bad_particle; ///< Used in CCQELike mode to tag events without nucleons, muons or photons.
   bool ccqelike; ///< Flag for running in CCQELike mode
-  TH1D* dataHist_CCQELIKE; ///< CCQELike data contribution   
-  TH1D* dataHist_CCPIM; ///< CCPIM data contribution         
-  TH1D* dataHist_NONCCPIM; ///< NONCCPIM data contribution    
+  TH1D* fDataHist_CCQELIKE; ///< CCQELike data contribution   
+  TH1D* fDataHist_CCPIM; ///< CCPIM data contribution         
+  TH1D* fDataHist_NONCCPIM; ///< NONCCPIM data contribution    
 
   bool isCCQELIKE_evt;  ///< Explicit Event flag for CCQELIKE
   bool isCCPIM_evt; ///< Explicit Event flag for CCPIM

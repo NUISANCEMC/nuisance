@@ -64,13 +64,13 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 
   if (applyQ2correction){
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
-    this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
+    this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
+    this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   if (applyEnucorrection){
     this->EnuRatePlot = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_Data_PRD26_537.root","ANL_1DEnu_Rate");
-    this->EnuvsQ2Plot = PlotUtils::MergeIntoTH2D(dataHist, EnuRatePlot, "Events");
+    this->EnuvsQ2Plot = PlotUtils::MergeIntoTH2D(fDataHist, EnuRatePlot, "Events");
 
     this->EnuFluxUnfoldPlot = (TH1D*)this->EnuRatePlot->Clone();
     for (int i = 0; i < this->EnuFluxUnfoldPlot->GetNbinsX(); i++) this->EnuFluxUnfoldPlot->SetBinContent(i+1,1.0);
@@ -78,11 +78,11 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   }
   
   // Setup Covariance
-  //  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  //  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   //  covar     = StatUtils::GetInvert(fullcovar);
 
-  //  this->eventHist->Scale(dataHist->Integral()/eventHist->Integral());
-  this->scaleFactor = (this->dataHist->Integral("width")/(nevents+0.)); 
+  //  this->eventHist->Scale(fDataHist->Integral()/eventHist->Integral());
+  this->scaleFactor = (this->fDataHist->Integral("width")/(nevents+0.)); 
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -111,7 +111,7 @@ void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
     break;  
   }
   
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   return;
 };
 
@@ -145,13 +145,13 @@ void ANL_CCQE_Evt_1DQ2_nu::ResetAll(){
 //********************************************************************
 
   Measurement1D::ResetAll();
-  this->mcHist->Reset();
+  this->fMCHist->Reset();
 
   if (applyEnucorrection)
     this->EnuvsQ2Plot->Reset();
 
   if (applyQ2correction)
-    this->mcHist_NoCorr->Reset();
+    this->fMCHist_NoCorr->Reset();
 
 
 }
@@ -162,13 +162,13 @@ void ANL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 //******************************************************************** 
 
   if (applyEnucorrection)
-    this->EnuvsQ2Plot->Fill(X_VAR, Enu, Weight);
+    this->EnuvsQ2Plot->Fill(fXVar, Enu, Weight);
   
   if (applyQ2correction){
-    this->mcHist_NoCorr->Fill(X_VAR, Weight);
+    this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
-    if (X_VAR < 0.225)
-      this->Weight *= this->CorrectionHist->Interpolate(X_VAR);
+    if (fXVar < 0.225)
+      this->Weight *= this->CorrectionHist->Interpolate(fXVar);
   }
 
   Measurement1D::FillHistograms();
@@ -189,20 +189,20 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
   }
 
 
-  this->mcHist->Scale(scaleFactor);
-  this->mcFine->Scale(scaleFactor);
-  if (applyQ2correction) this->mcHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(scaleFactor);
+  this->fMCFine->Scale(scaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleFactor);
 
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);
 
-  this->mcHist->Scale(scaleF);
-  this->mcFine->Scale(scaleF);
+  this->fMCHist->Scale(scaleF);
+  this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist_NoCorr, maskHist);
-    this->mcHist_NoCorr->Scale(scaleF);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, maskHist);
+    this->fMCHist_NoCorr->Scale(scaleF);
   }
   
 
@@ -220,7 +220,7 @@ void ANL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
 
   if (applyQ2correction){
     this->CorrectionHist->Write();
-    this->mcHist_NoCorr->Write();
+    this->fMCHist_NoCorr->Write();
   }
 
   if (applyEnucorrection){

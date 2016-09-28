@@ -134,7 +134,7 @@ class MeasurementBase {
   ///! Check whether this event is signle (Handled in each inherited sample)
   virtual bool isSignal(FitEvent* event){ (void)event; return false;};
 
-  ///! Fill the histogram for this event using X_VAR and Y_VAR (Handled in each inherited sample)
+  ///! Fill the histogram for this event using fXVar and fYVar (Handled in each inherited sample)
   virtual void FillHistograms(void){};
 
   ///! Convert event rates to whatever distributions you need.
@@ -172,9 +172,9 @@ class MeasurementBase {
   std::string GetName (void){ return fName; };
   double GetScaleFactor(void){ return scaleFactor; };
 
-  double GetXVar(void){ return this->X_VAR; };
-  double GetYVar(void){ return this->Y_VAR; };
-  double GetZVar(void){ return this->Z_VAR; };
+  double GetXVar(void){ return fXVar; };
+  double GetYVar(void){ return fYVar; };
+  double GetZVar(void){ return fZVar; };
   double GetMode(void){ return this->Mode;  };
   double GetEnu(void){ return this->Enu; };
 
@@ -210,15 +210,15 @@ protected:
   bool filledMC; //!< flag whether MC plots have been filled (For ApplyNormalisation)
 
   // TEMP OBJECTS TO HANDLE MERGE
-  double X_VAR,Y_VAR,Z_VAR,Mode,Weight;
+  double fXVar,fYVar,fZVar,Mode,Weight;
   bool Signal;
   int ievt;
   int nevents;
   double Enu_rec, ThetaMu, CosThetaMu;
 
-  std::vector<double> X_VAR_VECT;
-  std::vector<double> Y_VAR_VECT;
-  std::vector<double> Z_VAR_VECT;
+  std::vector<double> fXVar_VECT;
+  std::vector<double> fYVar_VECT;
+  std::vector<double> fZVar_VECT;
   std::vector<int>    MODE_VECT;
   std::vector<UInt_t>   INDEX_VECT;
 

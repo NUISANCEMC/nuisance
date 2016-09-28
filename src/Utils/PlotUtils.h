@@ -117,7 +117,7 @@ namespace PlotUtils{
   TH2D* SetMaskHist(std::string type, TH2D* data);
 
   //! Divide by the flux histogram for Enu Histograms
-  void DivideByFlux(TH1D* mcHist, TH1D* fluxHist);
+  void DivideByFlux(TH1D* fMCHist, TH1D* fluxHist);
 
   //! Flux unfolded scaling, like DivideByFlux but uses interpolation.
   void FluxUnfoldedScaling(TH1D* plot, TH1D* flux);
@@ -132,7 +132,7 @@ namespace PlotUtils{
   void Set2PolyHistFromText(std::string dataFile, TH2Poly* hist, double norm, bool skipbins=false);
 
   //! Fill a 1D Histogram from a text file
-  TH1D* GetTH1DFromFile(std::string dataFile, std::string title, std::string plotTitles="", std::string alt_name="");
+  TH1D* GetTH1DFromFile(std::string dataFile, std::string title, std::string fPlotTitles="", std::string alt_name="");
 
   //! Grab a 1D Histrogram from a ROOT File
   TH1D* GetTH1DFromRootFile(std::string file, std::string name);

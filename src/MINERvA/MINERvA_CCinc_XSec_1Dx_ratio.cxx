@@ -26,7 +26,7 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(std::string name, std
   // Setup The Measurement
   fName = name;
   nBins = 6;
-  plotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
+  fPlotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
   isRatio = true;
   isDiag  = false; 
   target  = "";
@@ -97,8 +97,8 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots(){
       binErr = binVal*sqrt(fractErrNUM*fractErrNUM + fractErrDEN*fractErrDEN);
     }
 
-    this->mcHist->SetBinContent(i+1, binVal);
-    this->mcHist->SetBinError(i+1, binErr);
+    this->fMCHist->SetBinContent(i+1, binVal);
+    this->fMCHist->SetBinError(i+1, binErr);
   }
 
   return;
@@ -130,7 +130,7 @@ void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile,
     // Multiply by the errors to get the covariance, rather than the correlation matrix
     while(stream >> entry){
 
-      double val = entry * this->dataHist->GetBinError(row+1)*this->dataHist->GetBinError(column+1);
+      double val = entry * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
 
       (*this->covar)(row, column) = val;
       (*this->fullcovar)(row, column) = val;

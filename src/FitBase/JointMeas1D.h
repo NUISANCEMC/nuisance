@@ -113,7 +113,7 @@ class JointMeas1D : public Measurement1D {
   virtual void Reconfigure();
   virtual void ReconfigureFast();
 
-  /// Stitch the sub sample plots together to make a final mcHist after reconfigure has been called
+  /// Stitch the sub sample plots together to make a final fMCHist after reconfigure has been called
   virtual void MakePlots();
 
   /*

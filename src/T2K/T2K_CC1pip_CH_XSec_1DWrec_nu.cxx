@@ -5,7 +5,7 @@
 T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   fName = "T2K_CC1pip_CH_XSec_1DWrec_nu";
-  plotTitles = "; W_{rec} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c^{2})/nucleon)";
+  fPlotTitles = "; W_{rec} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c^{2})/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
   isDiag = false;
@@ -40,17 +40,17 @@ void T2K_CC1pip_CH_XSec_1DWrec_nu::SetDataValues(std::string fileLocation) {
     std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), dataPoints, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataPoints, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+2)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+2)*1E-38);
-    std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+2)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+2)*1E-38);
+    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  //dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
+  //fDataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+fPlotTitles).c_str());
 
 
   dataFile->Close();
@@ -70,7 +70,7 @@ void T2K_CC1pip_CH_XSec_1DWrec_nu::SetCovarMatrix(std::string fileLocation) {
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
   std::cout << nBinsX << std::endl;
-  std::cout << dataHist->GetNbinsX() << std::endl;
+  std::cout << fDataHist->GetNbinsX() << std::endl;
   this->covar = new TMatrixDSym(nBinsX-3);
   this->fullcovar = new TMatrixDSym(nBinsX-3);
 
@@ -108,7 +108,7 @@ void T2K_CC1pip_CH_XSec_1DWrec_nu::FillEventVariables(FitEvent *event) {
 
   double Wrec = FitUtils::WrecCC1pip_T2K_MB(Pnu, Pmu, Ppip);
 
-  this->X_VAR = Wrec;
+  fXVar = Wrec;
 
   return;
 };

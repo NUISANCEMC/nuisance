@@ -26,7 +26,7 @@ K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks(std::string i
 
    // Define Measurement
   fName = "K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks";
-  plotTitles = "; #Delta#Phi (Deg.); Events";
+  fPlotTitles = "; #Delta#Phi (Deg.); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
   isDiag = true;
@@ -39,14 +39,14 @@ K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks(std::string i
   this->SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", "Data_1DDelTheta_2tracks");
 
   // Forced to be diag for now
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar= StatUtils::GetInvert(fullcovar);
 
 
   // Setup MC Hists
   SetupDefaultHist();
-  this->K2KI_holder   = (TH1D*) this->mcHist->Clone("K2KI_holder");
-  this->K2KIIa_holder = (TH1D*) this->mcHist->Clone("K2KIIa_holder");
+  this->K2KI_holder   = (TH1D*) this->fMCHist->Clone("K2KI_holder");
+  this->K2KIIa_holder = (TH1D*) this->fMCHist->Clone("K2KIIa_holder");
   
   //  double POT = 0.922E20;
   //  double cm2 = 1.0E12 * 130000;
@@ -130,10 +130,10 @@ void K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::FillEventVariables(FitEvent *event){
 
   }
   
-  this->X_VAR = DelPhi;
+  fXVar = DelPhi;
 
   LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
-  LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
+  LOG(EVT)<<"fXVar = "<<fXVar<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;
   
@@ -174,10 +174,10 @@ void K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::FillHistograms(){
   if (Signal){
  
     if (ievt < (8144.0 * (nevents + 0.)/(this->dataSignalEvt+0.)))
-      this->K2KI_holder->Fill(this->X_VAR, Weight);
+      this->K2KI_holder->Fill(fXVar, Weight);
     else if (ievt >= (8144.0 * (nevents + 0.)/(this->dataSignalEvt+0.)))
       if (Pmu > 0.675)
-	this->K2KIIa_holder->Fill(this->X_VAR, Weight);
+	this->K2KIIa_holder->Fill(fXVar, Weight);
     
   }
   
@@ -195,17 +195,17 @@ void K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks::ScaleEvents(){
     finished_fit = true;
     if (matchnorm){
       //     this->scaleFactor = (dataSignalEvt + 0.) / (mcSignalEvt + 0.);
-      this->scaleFactor = (this->dataHist->Integral() + 0.) /(this->mcHist->Integral());
+      this->scaleFactor = (this->fDataHist->Integral() + 0.) /(this->fMCHist->Integral());
     }
   }
   
-  this->mcHist->Scale(this->scaleFactor);
-  this->mcFine->Scale(this->scaleFactor);
+  this->fMCHist->Scale(this->scaleFactor);
+  this->fMCFine->Scale(this->scaleFactor);
 
   this->K2KI_holder->Scale(this->scaleFactor);
   this->K2KIIa_holder->Scale(this->scaleFactor);
 
-  PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, this->scaleFactor, "");
+  PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->scaleFactor, "");
   
   return;
 }

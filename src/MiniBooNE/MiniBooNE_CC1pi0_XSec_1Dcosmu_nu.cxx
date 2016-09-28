@@ -23,7 +23,7 @@
 MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
   fName = "MiniBooNE_CC1pi0_XSec_1Dcosmu_nu";
-  plotTitles = "; cos#theta_{#mu}; d#sigma/dcos#theta_{#mu} (cm^{2}/CH_{2})";
+  fPlotTitles = "; cos#theta_{#mu}; d#sigma/dcos#theta_{#mu} (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
@@ -34,7 +34,7 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string i
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdcosmu_covar.txt", this->data_points - 1);
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
@@ -61,7 +61,7 @@ void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
 // No W cut on MiniBooNE CC1pi+ 
   double CosMu = cos(FitUtils::th(Pnu, Pmu));
 
-  this->X_VAR = CosMu;
+  fXVar = CosMu;
 
   return;
 };

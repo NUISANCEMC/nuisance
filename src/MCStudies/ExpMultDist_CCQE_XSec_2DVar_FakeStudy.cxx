@@ -46,32 +46,32 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
   double binlowy, binhighy;
 
   if (name.find("Q2vsTmu") != std::string::npos){
-    plottype = 1; plotTitles = "";
+    plottype = 1; fPlotTitles = "";
     nbinsx = 30; binlowx = 0.0; binhighx = 2.0;
     nbinsy = 20; binlowy = 0.0; binhighy = 3.0;
   } else if (name.find("Q2vsCos") != std::string::npos){
-    plottype = 2; plotTitles = "";
+    plottype = 2; fPlotTitles = "";
     nbinsx = 30; binlowx = 0.0;binhighx = 2.0;
     nbinsy = 10;  binlowy = -1.0; binhighy = 1.0;
   } else if (name.find("TmuvsCos") != std::string::npos){
-    plottype = 3; plotTitles = "";
+    plottype = 3; fPlotTitles = "";
     nbinsx = 20; binlowx = 0.0; binhighx = 3.0;
     nbinsy = 10;  binlowy = -1.0; binhighy = 1.0;
   }
   
   // Setup the datahist as empty, we will use fake data to fill it.
-  this->dataHist = new TH2D((fName + "_data").c_str(), (fName + "_data" + plotTitles).c_str(), nbinsx, binlowx, binhighx, nbinsy, binlowy, binhighy);
+  this->fDataHist = new TH2D((fName + "_data").c_str(), (fName + "_data" + fPlotTitles).c_str(), nbinsx, binlowx, binhighx, nbinsy, binlowy, binhighy);
   
-  // Once dataHist is setup this function will automatically generate matching MC histograms
+  // Once fDataHist is setup this function will automatically generate matching MC histograms
   this->SetupDefaultHist();
 
   double threshold = 10.0;
-  for (int i = 0; i < this->dataHist->GetNbinsX(); i++){
-    for (int j = 0; j < this->dataHist->GetNbinsY(); j++){
+  for (int i = 0; i < this->fDataHist->GetNbinsX(); i++){
+    for (int j = 0; j < this->fDataHist->GetNbinsY(); j++){
 
-      if (dataHist->GetBinContent(i+1,j+1) <= threshold){
-	dataHist->SetBinError(i+1,j+1, 0.0);
-	dataHist->SetBinContent(i+1,j+1, 0.0);
+      if (fDataHist->GetBinContent(i+1,j+1) <= threshold){
+	fDataHist->SetBinError(i+1,j+1, 0.0);
+	fDataHist->SetBinContent(i+1,j+1, 0.0);
       }
     }
   }
@@ -79,7 +79,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
   
   // Setup Covariance assuming a diagonal covar.
   // If you want a full covariance to be used examples are given in the MINERvA 2D classes
-  //fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  //fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   //  covar     = StatUtils::GetInvert(fullcovar);
   
 
@@ -100,11 +100,11 @@ void ExpMultDist_CCQE_XSec_2DVar_FakeStudy::FillEventVariables(FitEvent *event){
   // MUST be defined for each new sample.
   // This function reads in the FitEvent format and lets you grab any information you need
   // from the event. This function is only called during the first and last iteration of each fit so that
-  // a vector of X_VAR variables can be filled for the signal events.
+  // a vector of fXVar variables can be filled for the signal events.
 
   // Define empty variables
-  this->X_VAR = -1.0;
-  this->Y_VAR = -1.0;
+  fXVar = -1.0;
+  fYVar = -1.0;
   
   double q2qe = 0.0;
   double CosThetaMu = -2.0;
@@ -129,9 +129,9 @@ void ExpMultDist_CCQE_XSec_2DVar_FakeStudy::FillEventVariables(FitEvent *event){
     break;  
   }
 
-  if (this->plottype == 1) {this->X_VAR = q2qe; this->Y_VAR = TMu;}
-  else if (this->plottype == 2) {this->X_VAR = q2qe; this->X_VAR = CosThetaMu;}
-  else if (this->plottype == 3) {this->X_VAR = TMu; this->Y_VAR = CosThetaMu;}
+  if (this->plottype == 1) {fXVar = q2qe; fYVar = TMu;}
+  else if (this->plottype == 2) {fXVar = q2qe; fXVar = CosThetaMu;}
+  else if (this->plottype == 3) {fXVar = TMu; fYVar = CosThetaMu;}
   
   return;
 };

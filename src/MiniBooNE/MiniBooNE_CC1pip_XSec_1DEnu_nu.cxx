@@ -24,7 +24,7 @@
 MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "MiniBooNE_CC1pip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (MeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
+  fPlotTitles = "; E_{#nu} (MeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
@@ -35,9 +35,9 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string input
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_enu.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
-  //StatUtils::ForceNormIntoCovar(this->covar, this->dataHist, this->normError);
+  //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->normError);
 
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08);
 };
@@ -70,7 +70,7 @@ void MiniBooNE_CC1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent* event) {
   double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
   //  if (isRat) Enu = Enu/1000.; //CCpi+/CCQE ratio paper puts in GeV, CCpi+ paper in MeV
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };

@@ -27,7 +27,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
   // Measurement Details                                                                
   fName = name;
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
 
   /// Using the sample name "MiniBooNE_CCQE_XSec_1DQ2_nu_CCQELike" will allow
   /// the CCQELike sample without background subtraction to be fitted.
@@ -38,7 +38,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt");  
   this->SetupDefaultHist();
 
@@ -47,26 +47,26 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
     /// Currently has a placeholder for the matrices as work fixing them is ongoing.                   
     this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ccqe/MiniBooNE_1DQ2_nu.root");
-    StatUtils::SetDataErrorFromCov(dataHist, fullcovar, 1E-38);
+    StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, 1E-38);
 
   } else {
     /// Assume a diagonal shape-only error is default                                                                                                                  
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
     covar     = StatUtils::GetInvert(fullcovar);
   }
 
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
 
-    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt",
-						   (this->fName+"_data_CCQELIKE"), this->plotTitles);
+    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt",
+						   (this->fName+"_data_CCQELIKE"), this->fPlotTitles);
     
-    for (int i = 0; i < dataHist->GetNbinsX(); i++){
-      this->dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1) + dataHist_CCQELIKE->GetBinContent(i+1));
+    for (int i = 0; i < fDataHist->GetNbinsX(); i++){
+      this->fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1) + fDataHist_CCQELIKE->GetBinContent(i+1));
     }
     
-    PlotUtils::CreateNeutModeArray((TH1D*)this->mcHist,(TH1**)this->mcHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_CCQELIKE);
+    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_CCQELIKE);
+    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
 
   }
 
@@ -78,7 +78,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 };
 
 //******************************************************************** 
-/// @details Extract q2qe(X_VAR) from the event
+/// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
@@ -103,7 +103,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   }
 
   // Set X Variables
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   
   return;
 };
@@ -127,7 +127,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::FillHistograms(){
   Measurement1D::FillHistograms();
 
   if (Mode != 1 and Mode != 2 and ccqelike and Signal){
-    PlotUtils::FillNeutModeArray(mcHist_CCQELIKE, Mode, X_VAR, Weight);
+    PlotUtils::FillNeutModeArray(fMCHist_CCQELIKE, Mode, fXVar, Weight);
   }
 }
 
@@ -140,10 +140,10 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
   Measurement1D::Write(drawOpt);
   
   if (ccqelike){
-    dataHist_CCQELIKE->Write();
+    fDataHist_CCQELIKE->Write();
     
-    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
-    combo_mcHist_CCQELIKE.Write();
+    THStack combo_fMCHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->fMCHist_CCQELIKE, 0);
+    combo_fMCHist_CCQELIKE.Write();
   }
 
 }
@@ -155,7 +155,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::ResetAll(){
 //******************************************************************** 
   
   if (ccqelike)
-    PlotUtils::ResetNeutModeArray((TH1**)mcHist_CCQELIKE);
+    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCQELIKE);
   
 }
 
@@ -166,7 +166,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::ScaleEvents(){
 
   Measurement1D::ScaleEvents();
   if (ccqelike)
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCQELIKE, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, scaleFactor,"width");
 
 }
 
@@ -177,5 +177,5 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::ApplyNormScale(double norm){
 //********************************************************************   
   Measurement1D::ApplyNormScale(norm);
   if (ccqelike)
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCQELIKE, 1.0/norm, "");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0/norm, "");
 }

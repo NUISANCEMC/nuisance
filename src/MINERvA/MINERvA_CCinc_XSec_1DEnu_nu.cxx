@@ -26,7 +26,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
 
   // Measurement Details                                                                                                           
   fName = name;
-  plotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
+  fPlotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
   EnuMin = 2.;
   EnuMax = 20.;
   target = "";
@@ -45,8 +45,8 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   int nbins = 8;
   double bins[9] = {2, 3, 4, 5, 6, 8, 10, 15, 20};
 
-  // Make a dummy dataHist so it is used to construct other histograms...
-  this->dataHist = new TH1D(name.c_str(),(name+plotTitles).c_str(),nbins,bins);
+  // Make a dummy fDataHist so it is used to construct other histograms...
+  this->fDataHist = new TH1D(name.c_str(),(name+fPlotTitles).c_str(),nbins,bins);
 
   // Setup Default MC Histograms
   this->SetupDefaultHist();
@@ -71,7 +71,7 @@ void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
     break;
   }
 
-  this->X_VAR   = Enu;
+  fXVar   = Enu;
   return;
 }
 
@@ -103,14 +103,14 @@ void MINERvA_CCinc_XSec_1DEnu_nu::ScaleEvents(){
   // Get rid of this because it causes odd behaviour
   //Measurement1D::ScaleEvents();
 
-  this->mcHist->Scale(this->scaleFactor, "width");
+  this->fMCHist->Scale(this->scaleFactor, "width");
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
   for(int i=0; i<this->mcStat->GetNbinsX();i++) {
     
     if (this->mcStat->GetBinContent(i+1) != 0)
-      this->mcHist->SetBinError(i+1, this->mcHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
-    else this->mcHist->SetBinError(i+1, this->mcHist->Integral());
+      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
+    else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
   }
 
 }

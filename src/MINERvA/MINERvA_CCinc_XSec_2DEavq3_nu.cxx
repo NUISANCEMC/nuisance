@@ -25,7 +25,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
 
   // Measurement Details
   fName = "MINERvA_CCinc_XSec_2DEavq3_nu";
-  plotTitles = "; q_{3} (GeV); E_{avail} (GeV); d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; q_{3} (GeV); E_{avail} (GeV); d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})";
   EnuMin = 2.;
   EnuMax = 6.;
   hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
@@ -54,7 +54,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   (*this->covar) *= 1E16;
   
   // Set data errors from covariance matrix
-  StatUtils::SetDataErrorFromCov(dataHist, fullcovar, mapHist, 1E-38);
+  StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, mapHist, 1E-38);
     
   // Setup mc Histograms
   SetupDefaultHist();
@@ -153,8 +153,8 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
   }
 
   // Set Hist Variables
-  this->X_VAR = q3;
-  this->Y_VAR = Eav;
+  fXVar = q3;
+  fYVar = Eav;
 
   return;
 }

@@ -23,7 +23,7 @@
 BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   fName = "BNL_CC1pi0_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 0.;
   EnuMax = 6.0;
   isDiag = true;
@@ -34,7 +34,7 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_1986.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/(nevents+0.)*16./8.;
@@ -66,7 +66,7 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
     double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
 
-    this->X_VAR = Enu;
+    fXVar = Enu;
 
     return;
   }
@@ -127,11 +127,11 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillHistograms() {
 
 void BNL_CC1pi0_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

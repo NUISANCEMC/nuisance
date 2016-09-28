@@ -23,7 +23,7 @@
 MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   fName = "MINERvA_CC1pip_XSec_1Dth_nu";
-  plotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   isDiag = false;
@@ -31,18 +31,18 @@ MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, 
 
   if (isShape) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_shape.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", fDataHist->GetNbinsX());
   } else {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", fDataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();
 
   // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
   // Please change when MINERvA releases new data!
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1.11);
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
   }
 
   scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
@@ -74,7 +74,7 @@ void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
     th = -999;
   }
 
-  this->X_VAR = th;
+  fXVar = th;
 
   return;
 };

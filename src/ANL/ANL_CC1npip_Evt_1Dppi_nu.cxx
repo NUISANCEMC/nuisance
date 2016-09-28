@@ -23,7 +23,7 @@
 ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "ANL_CC1npip_Evt_1Dppi_nu";
-  plotTitles = "; p_{#pi} (MeV); Number of events";
+  fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
   // whaaa, check this
   EnuMax = 1.5;
@@ -35,13 +35,13 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = this->eventHist->Integral("width")/double(nevents)*(16./8.);
@@ -79,7 +79,7 @@ void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
     ppip = -1.0;
   }
 
-  this->X_VAR = ppip;
+  fXVar = ppip;
 
   return;
 }

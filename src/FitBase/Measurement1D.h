@@ -85,7 +85,7 @@ class Measurement1D : public MeasurementBase {
   //! Setup the measurement with input values. This automatically handles parsing the fit type and data.
   virtual void SetupMeasurement(std::string input, std::string type, FitWeight *rw, std::string fkdt);
 
-  //! Setup the default MC histograms from the currently set dataHist.
+  //! Setup the default MC histograms from the currently set fDataHist.
   virtual void SetupDefaultHist();
 
   //! Set fit options by parsing type
@@ -137,7 +137,7 @@ class Measurement1D : public MeasurementBase {
   //! Reset histograms to zero
   virtual void ResetAll();
 
-  //! Fill histograms using X_VAR and Weight
+  //! Fill histograms using fXVar and Weight
   virtual void FillHistograms();
 
 
@@ -147,7 +147,7 @@ class Measurement1D : public MeasurementBase {
   //! Apply normalisation scale after reconfigure
   virtual void ApplyNormScale(double norm);
 
-  //! Apply smearing matrix to mcHist
+  //! Apply smearing matrix to fMCHist
   virtual void ApplySmearingMatrix();
 
   /*
@@ -165,7 +165,7 @@ class Measurement1D : public MeasurementBase {
   */
 
   //! Set the fake data values from either a file, or MC using fakeOption="MC"
-  virtual void SetFakeDataValues(std::string fakeOption); // Set dataHist from file
+  virtual void SetFakeDataValues(std::string fakeOption); // Set fDataHist from file
 
   //! Reset the fake data back to original fake data (Reset to before ThrowCovariance was called)
   virtual void ResetFakeData();
@@ -173,7 +173,7 @@ class Measurement1D : public MeasurementBase {
   //! Reset the fake data back to the true original dataset for this sample
   virtual void ResetData();
 
-  //! Generate fake data by throwing the current dataHist using the covariance.
+  //! Generate fake data by throwing the current fDataHist using the covariance.
   //! Can be used on fake MC data or just the original dataset.
   virtual void ThrowCovariance();
 
@@ -184,15 +184,15 @@ class Measurement1D : public MeasurementBase {
     Access Functions
   */
 
-  TH1D* GetMCHistogram(){return mcHist;};
-  TH1D* GetDataHistogram(){ return dataHist;};
+  TH1D* GetMCHistogram(){return fMCHist;};
+  TH1D* GetDataHistogram(){ return fDataHist;};
   virtual std::vector<TH1*> GetMCList();
   virtual std::vector<TH1*> GetDataList();
   virtual std::vector<TH1*> GetMaskList(){return std::vector<TH1*> (1, maskHist);};
-  virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, mcFine);};
+  virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, fMCFine);};
 
 
-  //! Get the bin contents and errors from mcHist
+  //! Get the bin contents and errors from fMCHist
   virtual void GetBinContents(std::vector<double>& cont, std::vector<double>& err);
 
   //! Get the covariance matrix as a pretty plot
@@ -209,13 +209,13 @@ class Measurement1D : public MeasurementBase {
   virtual void Write(std::string drawOpt);
 
 
-  //! array of histograms to handle mcHist for each interaction channel.
-  TH1D* mcHist_PDG[61];
+  //! array of histograms to handle fMCHist for each interaction channel.
+  TH1D* fMCHist_PDG[61];
 
 protected:
 
   // data histograms
-  TH1D* dataHist; //!< default data histogram
+  TH1D* fDataHist; //!< default data histogram
   TH1D* dataOrig; //!< histogram to store original data before throws.
   TH1D* dataTrue; //!< histogram to store true dataset
 
@@ -224,13 +224,13 @@ protected:
   std::string fakeDataFile; //!< Input fake data file
 
   // The histogram into which the measurement will be filled
-  TH1D* mcHist; //!< default MC Histogram used in the chi2 fits
-  TH1D* mcFine; //!< finely binned MC histogram
+  TH1D* fMCHist; //!< default MC Histogram used in the chi2 fits
+  TH1D* fMCFine; //!< finely binned MC histogram
   TH1D* mcStat; //!< histogram with unweighted events to properly calculate statistical error on MC
 
   TH1I* maskHist; //!< Mask histogram for neglecting specific bins
 
-  std::string plotTitles; //!< Plot title x and y for the histograms
+  std::string fPlotTitles; //!< Plot title x and y for the histograms
 
   // The covariance matrix and its decomposition
   TMatrixDSym *covar;      //!< Inverted Covariance

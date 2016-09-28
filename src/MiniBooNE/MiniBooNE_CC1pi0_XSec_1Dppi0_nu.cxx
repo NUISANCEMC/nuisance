@@ -23,7 +23,7 @@
 MiniBooNE_CC1pi0_XSec_1Dppi0_nu::MiniBooNE_CC1pi0_XSec_1Dppi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
   fName = "MiniBooNE_CC1pi0_XSec_1Dppi0_nu";
-  plotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/GeV/CH_{2})";
+  fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/GeV/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
@@ -34,7 +34,7 @@ MiniBooNE_CC1pi0_XSec_1Dppi0_nu::MiniBooNE_CC1pi0_XSec_1Dppi0_nu(std::string inp
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdppi_covar.txt", this->data_points-1);
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
@@ -60,7 +60,7 @@ void MiniBooNE_CC1pi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent *event) {
   
   double p_pi0 = FitUtils::p(Ppi0); 
 
-  this->X_VAR = p_pi0;
+  fXVar = p_pi0;
 
   return;
 };

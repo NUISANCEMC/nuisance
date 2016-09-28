@@ -55,10 +55,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   eventVariables = NULL;
 
-  // Setup dataHist as a placeholder
-  this->dataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
+  // Setup fDataHist as a placeholder
+  this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
   this->SetupDefaultHist();
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   // 1. The generator is organised in SetupMeasurement so it gives the

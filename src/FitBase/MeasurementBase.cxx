@@ -137,9 +137,9 @@ void MeasurementBase::Reconfigure(){
   int countwidth = (nevents/20);
 
   // Reset Signal Vectors
-  this->X_VAR_VECT.clear();
-  this->Y_VAR_VECT.clear();
-  this->Z_VAR_VECT.clear();
+  fXVar_VECT.clear();
+  fYVar_VECT.clear();
+  fZVar_VECT.clear();
   this->MODE_VECT.clear();
   this->INDEX_VECT.clear();
 
@@ -162,9 +162,9 @@ void MeasurementBase::Reconfigure(){
     Weight = cust_event->Weight;
 
     // Initialize
-    X_VAR = 0.0;
-    Y_VAR = 0.0;
-    Z_VAR = 0.0;
+    fXVar = 0.0;
+    fYVar = 0.0;
+    fZVar = 0.0;
     Signal = false;
     Mode = cust_event->Mode;
 
@@ -174,9 +174,9 @@ void MeasurementBase::Reconfigure(){
 
     // Push Back Signal
     if (Signal){
-      this->X_VAR_VECT .push_back(X_VAR);
-      this->Y_VAR_VECT .push_back(Y_VAR);
-      this->Z_VAR_VECT .push_back(Z_VAR);
+      fXVar_VECT .push_back(fXVar);
+      fYVar_VECT .push_back(fYVar);
+      fZVar_VECT .push_back(fZVar);
       this->MODE_VECT  .push_back(Mode);
       this->INDEX_VECT .push_back( (UInt_t)i);
       NSignal++;
@@ -190,8 +190,8 @@ void MeasurementBase::Reconfigure(){
     if (LOG_LEVEL(REC) and countwidth and !(i % countwidth))
       LOG(REC) << "Reconfigured " << i <<" total events. [S,X,Y,Z,M,W] = ["
 	       << Signal << ", "
-	       << X_VAR  << ", "<< Y_VAR <<  ", "
-	       << Z_VAR  << ", "<< Mode << ", "
+	       << fXVar  << ", "<< fYVar <<  ", "
+	       << fZVar  << ", "<< Mode << ", "
 	       << Weight << "] "<< std::endl;
 
 
@@ -233,9 +233,9 @@ void MeasurementBase::ReconfigureFast(){
   int countwidth = (nevents / 10);
 
   // Setup Iterators
-  std::vector<double>::iterator X = X_VAR_VECT.begin();
-  std::vector<double>::iterator Y = Y_VAR_VECT.begin();
-  std::vector<double>::iterator Z = Z_VAR_VECT.begin();
+  std::vector<double>::iterator X = fXVar_VECT.begin();
+  std::vector<double>::iterator Y = fYVar_VECT.begin();
+  std::vector<double>::iterator Z = fZVar_VECT.begin();
   std::vector<int>::iterator    M = MODE_VECT.begin();
   std::vector<UInt_t>::iterator I = INDEX_VECT.begin();
 
@@ -251,9 +251,9 @@ void MeasurementBase::ReconfigureFast(){
          	* cust_event->InputWeight;
     }
 
-    X_VAR = (*X);
-    Y_VAR = (*Y);
-    Z_VAR = (*Z);
+    fXVar = (*X);
+    fYVar = (*Y);
+    fZVar = (*Z);
     Mode  = (*M);
     Signal = true;
 
@@ -269,8 +269,8 @@ void MeasurementBase::ReconfigureFast(){
     // Print Out
     if (LOG_LEVEL(REC) && (i) % countwidth == 0)
       LOG(REC) << "Reconfigured " << i <<" signal events. [X,Y,Z,M,W] = ["
-	       << X_VAR  << ", " << Y_VAR << ", "
-	       << Z_VAR  << ", " << Mode  << ", "
+	       << fXVar  << ", " << fYVar << ", "
+	       << fZVar  << ", " << Mode  << ", "
 	       << Weight << "] " << std::endl;
   }
 

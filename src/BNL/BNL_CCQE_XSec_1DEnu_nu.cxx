@@ -45,7 +45,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Different generators require slightly different rescaling factors.
@@ -74,7 +74,7 @@ void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
     break;  
   }
   
-  this->X_VAR = Enu_rec;
+  fXVar = Enu_rec;
   return;
 };
 
@@ -117,11 +117,11 @@ void BNL_CCQE_XSec_1DEnu_nu::FillHistograms(){
 void BNL_CCQE_XSec_1DEnu_nu::ScaleEvents(){
 //******************************************************************** 
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
   
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 

@@ -48,19 +48,19 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
     LOG(SAM) <<"Retrieving Q2 Correction"<<std::endl;
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
 
-    LOG(SAM) << "Creating mcHist NoCORR"<<std::endl;
-    this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
+    LOG(SAM) << "Creating fMCHist NoCORR"<<std::endl;
+    this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
+    this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   LOG(SAM)<<"Setting up scaling"<<std::endl;
   // Setup Scaling
-  this->eventHist->Scale(this->dataHist->Integral()/this->eventHist->Integral());
+  this->eventHist->Scale(this->fDataHist->Integral()/this->eventHist->Integral());
   
   // Different generators require slightly different rescaling factors.
   this->scaleFactor = (this->eventHist->Integral()/(nevents+0.)); 
@@ -72,12 +72,12 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
 //********************************************************************                                                                                                                                                                       
   Measurement1D::ResetAll();
-  this->mcHist->Reset();
-  this->mcFine->Reset();
+  this->fMCHist->Reset();
+  this->fMCFine->Reset();
   EnuVsQ2->Reset();
 
   if (applyQ2correction)
-    this->mcHist_NoCorr->Reset();
+    this->fMCHist_NoCorr->Reset();
 
 }
 
@@ -89,7 +89,7 @@ void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************   
 
   q2qe = -0.1;
-  X_VAR = q2qe;
+  fXVar = q2qe;
 
   // Fill histogram with reconstructed Q2 Distribution
   // Loop over the particle stack
@@ -107,7 +107,7 @@ void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
   }
   
 
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   return;
 };
 
@@ -147,41 +147,41 @@ void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 
   if (Signal){
     if (applyQ2correction){
-      this->mcHist_NoCorr->Fill(X_VAR,Weight);
+      this->fMCHist_NoCorr->Fill(fXVar,Weight);
 
 
-      if (X_VAR < 0.225)
-	this->Weight *= this->CorrectionHist->Interpolate(X_VAR);
+      if (fXVar < 0.225)
+	this->Weight *= this->CorrectionHist->Interpolate(fXVar);
     }
     
-    EnuVsQ2->Fill(Enu,X_VAR, Weight);
+    EnuVsQ2->Fill(Enu,fXVar, Weight);
   }
   if (Signal)
     Measurement1D::FillHistograms();
 
-  //  std::cout<<"X_VAR = "<<X_VAR<<" "<<Weight<<std::endl;
+  //  std::cout<<"fXVar = "<<fXVar<<" "<<Weight<<std::endl;
   return;
 }
 
 
 
 //********************************************************************                                                                                                                                                                      
-/// @details Apply scaling to uncorrected mcHist_NoCorr and scale to match data
+/// @details Apply scaling to uncorrected fMCHist_NoCorr and scale to match data
 void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
   //********************************************************************                                                                                                                                                                   
-  this->mcHist->Scale(scaleFactor);
-  this->mcFine->Scale(scaleFactor);
-  if (applyQ2correction) this->mcHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(scaleFactor);
+  this->fMCFine->Scale(scaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleFactor);
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);
   
-  this->mcHist->Scale(scaleF);
-  this->mcFine->Scale(scaleF);
+  this->fMCHist->Scale(scaleF);
+  this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist_NoCorr, maskHist);
-    this->mcHist_NoCorr->Scale(scaleF);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, maskHist);
+    this->fMCHist_NoCorr->Scale(scaleF);
   }
   
   return;
@@ -199,7 +199,7 @@ void BNL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
 
   if (applyQ2correction){
     this->CorrectionHist->Write();
-    this->mcHist_NoCorr->Write();
+    this->fMCHist_NoCorr->Write();
   }
 
 

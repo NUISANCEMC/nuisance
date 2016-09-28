@@ -133,9 +133,9 @@ BaseFitEvt::BaseFitEvt() {
   genie_event = NULL;
 #endif
 
-  X_VAR = 0.0;
-  Y_VAR = 0.0;
-  Z_VAR = 0.0;
+  fXVar = 0.0;
+  fYVar = 0.0;
+  fZVar = 0.0;
   Mode = 0;
   E = 0.0;
   Weight = 0.0;
@@ -149,9 +149,9 @@ BaseFitEvt::BaseFitEvt() {
 BaseFitEvt::~BaseFitEvt(){};
 
 BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
-  this->X_VAR = obj->X_VAR;
-  this->Y_VAR = obj->Y_VAR;
-  this->Z_VAR = obj->Z_VAR;
+  fXVar = obj->fXVar;
+  fYVar = obj->fYVar;
+  fZVar = obj->fZVar;
   this->Mode = obj->Mode;
   this->E = obj->E;
   this->Weight = obj->Weight;

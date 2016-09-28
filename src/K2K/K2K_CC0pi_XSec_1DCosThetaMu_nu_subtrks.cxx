@@ -26,7 +26,7 @@ K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(s
 
   // Define the Measurement
   fName = name;
-  plotTitles = "; cos(#theta_{#mu}); Events";
+  fPlotTitles = "; cos(#theta_{#mu}); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
   isDiag = true;
@@ -79,7 +79,7 @@ K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(s
   this->SetupDefaultHist();
 
   // Forced to be diag for now
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
   
   // Different generators require slightly different rescaling factors.
@@ -129,10 +129,10 @@ void K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::FillEventVariables(FitEvent *event)
     }  
   }
 
-  this->X_VAR = CosThetaMu;
+  fXVar = CosThetaMu;
 
   LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
-  LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
+  LOG(EVT)<<"fXVar = "<<fXVar<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;
   
@@ -161,8 +161,8 @@ bool K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::isSignal(FitEvent *event){
 void K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks::ScaleEvents(){
 //********************************************************************  
 
-  this->mcHist->Scale(this->scaleFactor);
-  this->mcFine->Scale(this->scaleFactor);
+  this->fMCHist->Scale(this->scaleFactor);
+  this->fMCFine->Scale(this->scaleFactor);
   
   return;
 }

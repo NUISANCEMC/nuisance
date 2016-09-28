@@ -6,7 +6,7 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
 
   // Define Measurement
   fName = "MINERvA_CC0pi_XSec_1DQ2_nue";
-  plotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
+  fPlotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
   EnuMin = 0.0;
   EnuMax = 10.0;
   normError = 0.101;
@@ -19,7 +19,7 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
   std::string dist_name = "";
   
   dist_name = "1DQ2";
-  plotTitles = "; Q_{QE}^{2} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q_{QE}^{2} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
@@ -60,8 +60,8 @@ void MINERvA_CC0pi_XSec_1DQ2_nue::FillEventVariables(FitEvent *event){
     }
   }
   
-  this->X_VAR = Q2QEe;
-  LOG(EVT) << "X_VAR = "<<X_VAR<<std::endl;
+  fXVar = Q2QEe;
+  LOG(EVT) << "fXVar = "<<fXVar<<std::endl;
   return;
 }
 

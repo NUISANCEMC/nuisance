@@ -30,7 +30,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 
   // Measurement Details 
   fName = name;
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 3.;
   normError = 0.130;
@@ -39,7 +39,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  this->plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   this->ccqelike = name.find("CCQELike") != std::string::npos;
 
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
@@ -47,7 +47,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
                                                     
   if (!this->isDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
     covar     = StatUtils::GetInvert(fullcovar);
   }
 
@@ -56,30 +56,30 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
 
-    dataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt", \
-						   (this->fName+"_data_CCQELIKE"), this->plotTitles);
+    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt", \
+						   (this->fName+"_data_CCQELIKE"), this->fPlotTitles);
 
-    dataHist_CCPIM = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt", \
-						(this->fName+"_data_CCPIM"), this->plotTitles);
+    fDataHist_CCPIM = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt", \
+						(this->fName+"_data_CCPIM"), this->fPlotTitles);
 
     // Make NON CCPIM
-    dataHist_NONCCPIM = (TH1D*) dataHist_CCQELIKE->Clone();
-    dataHist_NONCCPIM->SetNameTitle((this->fName+"_data_NONCCPIM").c_str(), (this->fName+"_data_NONCCPIM").c_str());
+    fDataHist_NONCCPIM = (TH1D*) fDataHist_CCQELIKE->Clone();
+    fDataHist_NONCCPIM->SetNameTitle((this->fName+"_data_NONCCPIM").c_str(), (this->fName+"_data_NONCCPIM").c_str());
 
-    // Perform dataHist Sums
-    for (int i = 0; i < dataHist->GetNbinsX(); i++){
-      dataHist_NONCCPIM->SetBinContent(i+1, dataHist_CCQELIKE->GetBinContent(i+1) - dataHist_CCPIM->GetBinContent(i+1));
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1) + dataHist_CCQELIKE->GetBinContent(i+1));
+    // Perform fDataHist Sums
+    for (int i = 0; i < fDataHist->GetNbinsX(); i++){
+      fDataHist_NONCCPIM->SetBinContent(i+1, fDataHist_CCQELIKE->GetBinContent(i+1) - fDataHist_CCPIM->GetBinContent(i+1));
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1) + fDataHist_CCQELIKE->GetBinContent(i+1));
     }
 
-    PlotUtils::CreateNeutModeArray((TH1D*)this->mcHist,(TH1**)this->mcHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_CCQELIKE);
+    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_CCQELIKE);
+    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
 
-    PlotUtils::CreateNeutModeArray((TH1D*)this->mcHist,(TH1**)this->mcHist_NONCCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_NONCCPIM);
+    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_NONCCPIM);
+    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_NONCCPIM);
 
-    PlotUtils::CreateNeutModeArray((TH1D*)this->mcHist,(TH1**)this->mcHist_CCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)this->mcHist_CCPIM);
+    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_CCPIM);
+    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCPIM);
 
   }
 
@@ -90,7 +90,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 };
 
 //******************************************************************** 
-/// @details Extract q2qe(X_VAR) from the event
+/// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
@@ -114,7 +114,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
   }
  
   // Set X Variables
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   
   return;
 };
@@ -142,10 +142,10 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillHistograms(){
 
   if (Mode != -1 && Mode != -2 and ccqelike and Signal){
 
-    if (fabs(Mode) == 11 or fabs(Mode) == 13)  PlotUtils::FillNeutModeArray(mcHist_CCPIM, Mode, X_VAR, Weight);
-    else PlotUtils::FillNeutModeArray(mcHist_NONCCPIM, Mode, X_VAR, Weight);
+    if (fabs(Mode) == 11 or fabs(Mode) == 13)  PlotUtils::FillNeutModeArray(fMCHist_CCPIM, Mode, fXVar, Weight);
+    else PlotUtils::FillNeutModeArray(fMCHist_NONCCPIM, Mode, fXVar, Weight);
 
-    PlotUtils::FillNeutModeArray(mcHist_CCQELIKE, Mode, X_VAR, Weight);
+    PlotUtils::FillNeutModeArray(fMCHist_CCQELIKE, Mode, fXVar, Weight);
   }
 
 }
@@ -159,20 +159,20 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::Write(std::string drawOpt){
   Measurement1D::Write(drawOpt);
 
   if (ccqelike){
-    dataHist_CCQELIKE->Write();
+    fDataHist_CCQELIKE->Write();
 
-    THStack combo_mcHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->mcHist_CCQELIKE, 0);
-    combo_mcHist_CCQELIKE.Write();
+    THStack combo_fMCHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->fMCHist_CCQELIKE, 0);
+    combo_fMCHist_CCQELIKE.Write();
 
-    dataHist_CCPIM->Write();
+    fDataHist_CCPIM->Write();
 
-    THStack combo_mcHist_CCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCPIM").c_str(), (TH1**)this->mcHist_CCPIM, 0);
-    combo_mcHist_CCPIM.Write();
+    THStack combo_fMCHist_CCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCPIM").c_str(), (TH1**)this->fMCHist_CCPIM, 0);
+    combo_fMCHist_CCPIM.Write();
 
-    dataHist_NONCCPIM->Write();
+    fDataHist_NONCCPIM->Write();
 
-    THStack combo_mcHist_NONCCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_NONCCPIM").c_str(), (TH1**)this->mcHist_NONCCPIM, 0);
-    combo_mcHist_NONCCPIM.Write();
+    THStack combo_fMCHist_NONCCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_NONCCPIM").c_str(), (TH1**)this->fMCHist_NONCCPIM, 0);
+    combo_fMCHist_NONCCPIM.Write();
 
 
   }
@@ -188,9 +188,9 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ScaleEvents(){
   Measurement1D::ScaleEvents();
 
   if (ccqelike){
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCQELIKE, scaleFactor,"width");
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCPIM, scaleFactor,"width");
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_NONCCPIM, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, scaleFactor,"width");
   }
 }
 
@@ -203,9 +203,9 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ApplyNormScale(double norm){
   Measurement1D::ApplyNormScale(norm);
   
   if (ccqelike){
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCQELIKE, 1.0/norm, "");
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_CCPIM, 1.0/norm, "");
-    PlotUtils::ScaleNeutModeArray((TH1**)mcHist_NONCCPIM, 1.0/norm, "");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0/norm, "");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, 1.0/norm, "");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, 1.0/norm, "");
   }
 }
 
@@ -215,9 +215,9 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ApplyNormScale(double norm){
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::ResetAll(){
   //********************************************************************                                                                                                                                                                      
   if (ccqelike){
-    PlotUtils::ResetNeutModeArray((TH1**)mcHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)mcHist_CCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)mcHist_NONCCPIM);
+    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCQELIKE);
+    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCPIM);
+    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_NONCCPIM);
   }
 
 }

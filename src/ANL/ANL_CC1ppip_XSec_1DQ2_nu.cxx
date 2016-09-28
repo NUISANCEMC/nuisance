@@ -23,7 +23,7 @@
 ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
   fName = "ANL_CC1ppip_XSec_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 0;
   EnuMax = 6;
   isDiag = true;
@@ -33,7 +33,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.)*TotalIntegratedFlux("width"))*16./8.;
@@ -73,7 +73,7 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

@@ -43,10 +43,10 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   Double_t tempy[10] = {-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0};
   xBins = tempx;
   yBins = tempy;
-  plotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
+  fPlotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   
-  dataHist = new TH2D((fName+"_data").c_str(),
-		      (fName+"_data"+plotTitles).c_str(),
+  fDataHist = new TH2D((fName+"_data").c_str(),
+		      (fName+"_data"+fPlotTitles).c_str(),
 		      data_points_x-1, xBins,
 		      data_points_y-1, yBins);
   
@@ -88,8 +88,8 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
     }
   }
   
-  this->X_VAR = pmu;
-  this->Y_VAR = CosThetaMu;
+  fXVar = pmu;
+  fYVar = CosThetaMu;
 
   return;
 };
@@ -107,90 +107,90 @@ void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
   if (analysis == 1){
   
     // Following code handles weird ND280 Binning
-    int nbins = this->mcHist->GetNbinsX() + 1;
+    int nbins = this->fMCHist->GetNbinsX() + 1;
     double total = 0.0;
 
     // Y = 1
     total = 0.0;
     for (int i = 3; i < nbins; i++){
 
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(1);
-      total += this->mcHist->GetBinContent(i, 1) * width;
-      this->mcHist->SetBinContent(i,1,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(1);
+      total += this->fMCHist->GetBinContent(i, 1) * width;
+      this->fMCHist->SetBinContent(i,1,0);
     }
-    this->mcHist->SetBinContent(3, 1, total / (1.0 * 29.6));
+    this->fMCHist->SetBinContent(3, 1, total / (1.0 * 29.6));
 
     // Y = 2
     total = 0.0;
     for (int i = 5; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(2);
-      total += this->mcHist->GetBinContent(i, 2)* width;
-      this->mcHist->SetBinContent(i,2,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(2);
+      total += this->fMCHist->GetBinContent(i, 2)* width;
+      this->fMCHist->SetBinContent(i,2,0);
     }
-    this->mcHist->SetBinContent(5, 2, total / (0.6 *29.4));
+    this->fMCHist->SetBinContent(5, 2, total / (0.6 *29.4));
 
     // Y = 3
     total = 0.0;
     for (int i = 7; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(3);
-      total += this->mcHist->GetBinContent(i, 3)* width;
-      this->mcHist->SetBinContent(i, 3,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(3);
+      total += this->fMCHist->GetBinContent(i, 3)* width;
+      this->fMCHist->SetBinContent(i, 3,0);
     }
-    this->mcHist->SetBinContent(7, 3, total/ (0.1 * 29.2));
+    this->fMCHist->SetBinContent(7, 3, total/ (0.1 * 29.2));
 
     // Y = 4
     total = 0.0;
     for (int i = 7; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(4);
-      total += this->mcHist->GetBinContent(i, 4)* width;
-      this->mcHist->SetBinContent(i, 4,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(4);
+      total += this->fMCHist->GetBinContent(i, 4)* width;
+      this->fMCHist->SetBinContent(i, 4,0);
     }
-    this->mcHist->SetBinContent(7, 4, total / (0.1 * 29.2));
+    this->fMCHist->SetBinContent(7, 4, total / (0.1 * 29.2));
 
     // Y = 5
     total = 0.0;
     for (int i = 8; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(5);
-      total += this->mcHist->GetBinContent(i, 5)* width;
-      this->mcHist->SetBinContent(i,5,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(5);
+      total += this->fMCHist->GetBinContent(i, 5)* width;
+      this->fMCHist->SetBinContent(i,5,0);
     }
-    this->mcHist->SetBinContent(8, 5, total / (0.05 * 29.0));
+    this->fMCHist->SetBinContent(8, 5, total / (0.05 * 29.0));
 
     // Y = 6
     total = 0.0;
     for (int i = 9; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(6);
-      total += this->mcHist->GetBinContent(i, 6)* width;
-      this->mcHist->SetBinContent(i, 6,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(6);
+      total += this->fMCHist->GetBinContent(i, 6)* width;
+      this->fMCHist->SetBinContent(i, 6,0);
     }
-    this->mcHist->SetBinContent(9, 6, total / (0.05 * 28.5));
+    this->fMCHist->SetBinContent(9, 6, total / (0.05 * 28.5));
 
     // Y = 7
     total = 0.0;
     for (int i = 8; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(7);
-      total += this->mcHist->GetBinContent(i, 7)* width;
-      this->mcHist->SetBinContent(i, 7,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(7);
+      total += this->fMCHist->GetBinContent(i, 7)* width;
+      this->fMCHist->SetBinContent(i, 7,0);
     }
-    this->mcHist->SetBinContent(8, 7, total/ (0.04 * 28.0));
+    this->fMCHist->SetBinContent(8, 7, total/ (0.04 * 28.0));
 
     // Y = 8
     total = 0.0;
     for (int i = 11; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(8);
-      total += this->mcHist->GetBinContent(i, 8)* width;
-      this->mcHist->SetBinContent(i, 8,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(8);
+      total += this->fMCHist->GetBinContent(i, 8)* width;
+      this->fMCHist->SetBinContent(i, 8,0);
     }
-    this->mcHist->SetBinContent(11, 8, total / (0.4 * 27.0));
+    this->fMCHist->SetBinContent(11, 8, total / (0.4 * 27.0));
 
     // Y = 9
     total = 0.0;
     for (int i = 9; i < nbins; i++){
-      double width = this->mcHist->GetXaxis()->GetBinWidth(i) * this->mcHist->GetYaxis()->GetBinWidth(9);
-      total += this->mcHist->GetBinContent(i, 9)* width;
-      this->mcHist->SetBinContent(i,9,0);
+      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(9);
+      total += this->fMCHist->GetBinContent(i, 9)* width;
+      this->fMCHist->SetBinContent(i,9,0);
     }
-    this->mcHist->SetBinContent(9, 9, total / (0.02 * 25.0));
+    this->fMCHist->SetBinContent(9, 9, total / (0.02 * 25.0));
   }
   
   return;
@@ -208,7 +208,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
 
     rootfile->ls();
     
-    this->dataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->fName+"_data").c_str());
+    this->fDataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->fName+"_data").c_str());
     this->mapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->fName+"_MAP").c_str());
 
     TMatrixDSym* covmat_stat = (TMatrixDSym*) rootfile->Get("analysis2_statcov");

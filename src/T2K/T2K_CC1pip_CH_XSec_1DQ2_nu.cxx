@@ -12,20 +12,20 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
   if (type.find("eMB") != std::string::npos) {
     fitType = keMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
-    plotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
+    fPlotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("MB") != std::string::npos) {
     fitType = kMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
-    plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
+    fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("Delta") != std::string::npos) {
     fitType = kDelta;
     fName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
-    plotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
+    fPlotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
   } else {
     std::cout << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
     fitType = kMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
-    plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
+    fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -73,16 +73,16 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
     std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), nPoints, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), nPoints, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
+    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
+  fDataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+fPlotTitles).c_str());
 
   dataFile->Close();
 
@@ -100,7 +100,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
   int nBinsY = covarMatrix->GetYaxis()->GetNbins();
 
   std::cout << nBinsX << std::endl;
-  std::cout << dataHist->GetNbinsX() << std::endl;
+  std::cout << fDataHist->GetNbinsX() << std::endl;
 
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
@@ -173,7 +173,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   }
 
 
-  this->X_VAR = q2;
+  fXVar = q2;
 
   return;
 };

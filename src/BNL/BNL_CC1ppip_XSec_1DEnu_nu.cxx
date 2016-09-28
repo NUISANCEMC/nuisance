@@ -23,7 +23,7 @@
 BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   fName = "BNL_CC1ppip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 0.;
   EnuMax = 3.0;
   isDiag = true;
@@ -33,7 +33,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.))*16./8.;
@@ -64,14 +64,14 @@ void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
   this->data_values = dataVals;
   this->data_errors = dataErr;
 
-  this->dataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
+  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->data_points-1, this->xBins);
 
-  for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-    this->dataHist->SetBinContent(i+1, this->data_values[i]);
-    this->dataHist->SetBinError(i+1, this->data_errors[i]);
+  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+    this->fDataHist->SetBinContent(i+1, this->data_values[i]);
+    this->fDataHist->SetBinError(i+1, this->data_errors[i]);
   }
 
-  dataHist->SetDirectory(0);
+  fDataHist->SetDirectory(0);
 
   dataFile->Close();
 };
@@ -108,7 +108,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
@@ -163,11 +163,11 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillHistograms() {
 
 void BNL_CC1ppip_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

@@ -23,7 +23,7 @@
 FNAL_CC1ppip_XSec_1DQ2_nu::FNAL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "FNAL_CC1ppip_XSec_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)";
+  fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 10;
   EnuMax = 100;
   isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
@@ -33,7 +33,7 @@ FNAL_CC1ppip_XSec_1DQ2_nu::FNAL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/FNAL/CC1pip_on_p/FNAL_cc1ppip_dsigdQ2_W14_edit.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = (this->eventHist->Integral("width")/TotalIntegratedFlux("width"))*double(1E-38)/double(nevents)*(16./8.);
@@ -72,7 +72,7 @@ void FNAL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

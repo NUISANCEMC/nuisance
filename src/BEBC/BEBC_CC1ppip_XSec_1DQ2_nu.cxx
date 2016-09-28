@@ -23,7 +23,7 @@
 BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "BEBC_CC1ppip_XSec_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 5;
   EnuMax = 200;
   isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
@@ -33,7 +33,7 @@ BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi+_on_p_W14_edit.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
@@ -74,7 +74,7 @@ void BEBC_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

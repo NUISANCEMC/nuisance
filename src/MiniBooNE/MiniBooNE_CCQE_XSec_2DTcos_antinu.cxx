@@ -25,7 +25,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
 
   // Measurement Details
   fName = name;
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 3.;
   normError = 0.130;
@@ -34,7 +34,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  plotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
+  fPlotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   ccqelike = name.find("CCQELike") != std::string::npos;
 
   // Define Bin Edges
@@ -56,7 +56,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   this->SetupDefaultHist();
   
   // Setup Covariances
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
   isDiag    = true;
 
@@ -91,8 +91,8 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
   }
 
   // Set X Variables
-  this->X_VAR = Ekmu;
-  this->Y_VAR = costheta;
+  fXVar = Ekmu;
+  fYVar = costheta;
   
   return;
 };

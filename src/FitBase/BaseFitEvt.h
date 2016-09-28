@@ -121,9 +121,9 @@ class BaseFitEvt {
   ~BaseFitEvt();
   BaseFitEvt(const BaseFitEvt* obj);
 
-  double X_VAR;
-  double Y_VAR;
-  double Z_VAR;
+  double fXVar;
+  double fYVar;
+  double fZVar;
   int Mode;
   double E;
   double Weight;

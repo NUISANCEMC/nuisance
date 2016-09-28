@@ -48,7 +48,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
   
   // Different generators require slightly different rescaling factors.
@@ -78,10 +78,10 @@ void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
     break;  
   }
   
-  X_VAR = Enu_rec;
+  fXVar = Enu_rec;
 
-  // We save q2 into Y_VAR incase correction is applied
-  Y_VAR = q2qe;
+  // We save q2 into fYVar incase correction is applied
+  fYVar = q2qe;
   return;
 };
 
@@ -109,12 +109,12 @@ bool ANL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
 
 
 //! If Q2 correction is applied the CorrectionHist is interpolated 
-//! using the Q2QE value saved in Y_VAR
+//! using the Q2QE value saved in fYVar
 void ANL_CCQE_XSec_1DEnu_nu::FillHistograms(){
 
   if (applyQ2correction){
-    if (Y_VAR < CorrectionHist->GetXaxis()->GetXmin())
-      Weight *= CorrectionHist->Interpolate(Y_VAR);
+    if (fYVar < CorrectionHist->GetXaxis()->GetXmin())
+      Weight *= CorrectionHist->Interpolate(fYVar);
   }
 
   Measurement1D::FillHistograms();

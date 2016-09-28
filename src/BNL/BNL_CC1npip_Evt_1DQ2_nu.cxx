@@ -23,7 +23,7 @@
 BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "BNL_CC1npip_Evt_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0.;
   EnuMax = 3.;
   isDiag = true;
@@ -33,13 +33,13 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_firstQ2gone.txt");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
@@ -72,7 +72,7 @@ void BNL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   // no hadronic mass constraint in BNL CC1n1pi+
   double q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };
@@ -141,11 +141,11 @@ void BNL_CC1npip_Evt_1DQ2_nu::FillHistograms() {
 
 void BNL_CC1npip_Evt_1DQ2_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

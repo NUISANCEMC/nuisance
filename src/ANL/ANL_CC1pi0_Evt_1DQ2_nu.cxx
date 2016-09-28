@@ -23,7 +23,7 @@
 ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "ANL_CC1pi0_Evt_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
   EnuMax = 1.5;
   isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
@@ -33,13 +33,13 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
@@ -78,7 +78,7 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpi0 = -1.0;
   }
 
-  this->X_VAR = q2CCpi0;
+  fXVar = q2CCpi0;
 
   return;
 };
@@ -131,11 +131,11 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillHistograms() {
 
 void ANL_CC1pi0_Evt_1DQ2_nu::ScaleEvents() {
   
- // PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  //PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+ // PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  //PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

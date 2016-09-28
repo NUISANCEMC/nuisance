@@ -5,7 +5,7 @@
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu::T2K_CC1pip_CH_XSec_1Dthq3pi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   fName = "T2K_CC1pip_CH_XSec_1Dthq3pi_nu";
-  plotTitles = "; #theta_{q_{3},#pi} (radians); d#sigma/d#theta_{q_{3},#pi} (cm^{2}/(radian)/nucleon)";
+  fPlotTitles = "; #theta_{q_{3},#pi} (radians); d#sigma/d#theta_{q_{3},#pi} (cm^{2}/(radian)/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
   isDiag = false;
@@ -39,16 +39,16 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetDataValues(std::string fileLocation) {
     std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-1, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataCopy->GetNbinsX()-1, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
+    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+plotTitles).c_str());
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
+  fDataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+fPlotTitles).c_str());
 
 
   dataFile->Close();
@@ -108,7 +108,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::FillEventVariables(FitEvent *event) {
 
   double th_q3_pi = FitUtils::thq3pi_CC1pip_T2K(Pnu, Pmu, Ppip);
 
-  this->X_VAR = th_q3_pi;
+  fXVar = th_q3_pi;
 
   return;
 };

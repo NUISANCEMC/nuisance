@@ -23,7 +23,7 @@
 MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
   fName = "MiniBooNE_CC1pip_XSec_2DTuEnu_nu";
-  plotTitles = "; E_{#nu} (MeV); T_{#mu} (MeV); d#sigma(E_{#nu})/dT_{#mu} (cm^{2}/MeV)";
+  fPlotTitles = "; E_{#nu} (MeV); T_{#mu} (MeV); d#sigma(E_{#nu})/dT_{#mu} (cm^{2}/MeV)";
   EnuMin = 0.5;
   EnuMax = 2.0;
   isDiag = true;
@@ -33,7 +33,7 @@ MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(std::string i
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("MUKEVENUXSec"));//data comes in .root file, yes!
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
@@ -46,9 +46,9 @@ void MiniBooNE_CC1pip_XSec_2DTuEnu_nu::SetDataValues(std::string fileLocation) {
   std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
-  dataHist = (TH2D*)(dataFile->Get("MUKEVENUXSec")->Clone());
+  fDataHist = (TH2D*)(dataFile->Get("MUKEVENUXSec")->Clone());
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
 
   dataFile->Close();
   delete dataFile;
@@ -75,8 +75,8 @@ void MiniBooNE_CC1pip_XSec_2DTuEnu_nu::FillEventVariables(FitEvent *event) {
   double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip)*1000.;
   double Tmu = FitUtils::T(Pmu)*1000.;
 
-  this->X_VAR = Enu;
-  this->Y_VAR = Tmu;
+  fXVar = Enu;
+  fYVar = Tmu;
 
   return;
 };

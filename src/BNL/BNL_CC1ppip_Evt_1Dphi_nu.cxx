@@ -23,7 +23,7 @@
 BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
   fName = "BNL_CC1ppip_Evt_1Dphi_nu";
-  plotTitles = "; #phi_{Adler}; Number of events";
+  fPlotTitles = "; #phi_{Adler}; Number of events";
   EnuMin = 0;
   EnuMax = 6.0;
   isDiag = true;
@@ -33,13 +33,13 @@ BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1ppip_W14_phiAdler.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
   TRandom3 rand;
@@ -124,7 +124,7 @@ void BNL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
     phi = -999;
   }
 
-  this->X_VAR = phi;
+  fXVar = phi;
 
   return;
 };
@@ -179,11 +179,11 @@ void BNL_CC1ppip_Evt_1Dphi_nu::FillHistograms() {
 
 void BNL_CC1ppip_Evt_1Dphi_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

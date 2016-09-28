@@ -23,7 +23,7 @@
 ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   fName = "ANL_CC1pi0_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 0.;
   EnuMax = 1.5;
   isDiag = true;
@@ -33,7 +33,7 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/anl82corr-numu-n-to-mu-p-pi0-lowW_edges.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents+0.)*(16./8.);
@@ -65,7 +65,7 @@ void ANL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
@@ -127,11 +127,11 @@ void ANL_CC1pi0_XSec_1DEnu_nu::FillHistograms() {
 
 void ANL_CC1pi0_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

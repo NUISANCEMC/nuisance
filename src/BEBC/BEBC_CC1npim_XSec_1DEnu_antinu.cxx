@@ -23,7 +23,7 @@
 BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   fName = "BEBC_CC1npim_XSec_1DEnu_antinu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 5.;
   EnuMax = 200.;
   isDiag = true;
@@ -33,7 +33,7 @@ BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string input
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/theses/BEBC_theses_ANU_CC1pi-_nFin_W14.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
@@ -69,7 +69,7 @@ void BEBC_CC1npim_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };

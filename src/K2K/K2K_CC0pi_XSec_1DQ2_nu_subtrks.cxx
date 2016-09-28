@@ -26,7 +26,7 @@ K2K_CC0pi_XSec_1DQ2_nu_subtrks::K2K_CC0pi_XSec_1DQ2_nu_subtrks(std::string name,
 
   // Define the Measurement
   fName = name;
-  plotTitles = "; Q^{2}_{QE} (GeV/c^{2}); Events";
+  fPlotTitles = "; Q^{2}_{QE} (GeV/c^{2}); Events";
   EnuMin = 0.3;
   EnuMax = 5.;
   isDiag = true;
@@ -93,7 +93,7 @@ K2K_CC0pi_XSec_1DQ2_nu_subtrks::K2K_CC0pi_XSec_1DQ2_nu_subtrks(std::string name,
   this->SetDataFromFile(FitPar::GetDataBase()+"/K2K/K2K_Data_PRD74_052002.root", plotname);
   
   // Setup Covariance;
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar= StatUtils::GetInvert(fullcovar);
   
   // setup mc histograms
@@ -166,10 +166,10 @@ void K2K_CC0pi_XSec_1DQ2_nu_subtrks::FillEventVariables(FitEvent *event){
     
   // }
   
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
 
   LOG(EVT) << "Event variables for "<<this->fName<<std::endl;
-  LOG(EVT)<<"X_VAR = "<<this->X_VAR<<std::endl;
+  LOG(EVT)<<"fXVar = "<<fXVar<<std::endl;
   LOG(EVT)<<"ncharged = "<<ncharged<<std::endl;
   LOG(EVT)<<"bad_particle = "<<bad_particle<<std::endl;
   LOG(EVT)<<"Delta_phi = "<<deltaphi<<std::endl;
@@ -202,19 +202,19 @@ bool K2K_CC0pi_XSec_1DQ2_nu_subtrks::isSignal(FitEvent *event){
 void K2K_CC0pi_XSec_1DQ2_nu_subtrks::ScaleEvents(){
 //********************************************************************  
 
-  this->mcHist->Scale(this->scaleFactor);
-  this->mcFine->Scale(this->scaleFactor);
+  this->fMCHist->Scale(this->scaleFactor);
+  this->fMCFine->Scale(this->scaleFactor);
 
-  //  double scaleF = 5933.0/this->mcHist->Integral();
+  //  double scaleF = 5933.0/this->fMCHist->Integral();
   //  LOG(SAM) << this->fName  <<"ScaleF = "<<scaleF<<std::endl;
 
-  //  this->mcHist->Scale(scaleF);
-  //  this->mcFine->Scale(scaleF);
+  //  this->fMCHist->Scale(scaleF);
+  //  this->fMCFine->Scale(scaleF);
   
-  // this->mcHist->Scale(
-  // this->mcFine->Scale(this->dataHist->Integral() / this->mcHist->Integral());
+  // this->fMCHist->Scale(
+  // this->fMCFine->Scale(this->fDataHist->Integral() / this->fMCHist->Integral());
 
-  // PlotUtils::ScaleNeutModeArray((TH1**)this->mcHist_PDG, this->dataHist->Integral() / this->mcHist->Integral(), "");
+  // PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->fDataHist->Integral() / this->fMCHist->Integral(), "");
   
   return;
 }

@@ -42,13 +42,13 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
 
   if (applyQ2correction){
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_XSec_1DQ2_Correction");
-    this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
+    this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
+    this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Generate events on H2 to get the normalisation right.
@@ -81,7 +81,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
     break;  
   }
   
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   return;
 };
 
@@ -111,10 +111,10 @@ void BEBC_CCQE_XSec_1DQ2_nu::ResetAll(){
 //********************************************************************
 
   Measurement1D::ResetAll();
-  this->mcHist->Reset();
+  this->fMCHist->Reset();
 
   if (applyQ2correction)
-    this->mcHist_NoCorr->Reset();
+    this->fMCHist_NoCorr->Reset();
 
 
 }
@@ -126,10 +126,10 @@ void BEBC_CCQE_XSec_1DQ2_nu::FillHistograms(){
 
   
   if (applyQ2correction){
-    this->mcHist_NoCorr->Fill(X_VAR, Weight);
+    this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
-    if (this->X_VAR < 0.225)
-      this->Weight *= this->CorrectionHist->Interpolate(this->X_VAR);
+    if (fXVar < 0.225)
+      this->Weight *= this->CorrectionHist->Interpolate(fXVar);
   }
 
   Measurement1D::FillHistograms();
@@ -141,7 +141,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
   Measurement1D::ScaleEvents();
-  if (applyQ2correction) this->mcHist_NoCorr->Scale(this->scaleFactor, "width");
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(this->scaleFactor, "width");
 
   return;
 }
@@ -154,7 +154,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::ApplyNormScale(double norm){
   if (norm == 0.0) scaleF = 0.0;
   else scaleF = 1.0/norm;
   
-  if (applyQ2correction) this->mcHist_NoCorr->Scale(scaleF);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleF);
 
   return;
 }
@@ -168,7 +168,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
 
   if (applyQ2correction){
     this->CorrectionHist->Write();
-    this->mcHist_NoCorr->Write();
+    this->fMCHist_NoCorr->Write();
   }
     
 

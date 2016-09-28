@@ -24,7 +24,7 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
   
 
   fName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
-  plotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
+  fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
@@ -34,9 +34,9 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_KEpi.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
-  //StatUtils::ForceNormIntoCovar(this->covar, this->dataHist, this->normError);
+  //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->normError);
 
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08)/TotalIntegratedFlux("width");
 };
@@ -68,7 +68,7 @@ void MiniBooNE_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
   double Tpi = FitUtils::T(Ppip)*1000.;
 
-  this->X_VAR = Tpi;
+  fXVar = Tpi;
 
   return;
 };

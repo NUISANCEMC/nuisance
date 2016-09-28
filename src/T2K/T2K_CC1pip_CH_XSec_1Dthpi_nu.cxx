@@ -5,7 +5,7 @@
 T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   fName = "T2K_CC1pip_CH_XSec_1Dthpi_nu";
-  plotTitles = "; #theta_{#pi} (radians); d#sigma/d#theta_{#pi} (cm^{2}/nucleon)";
+  fPlotTitles = "; #theta_{#pi} (radians); d#sigma/d#theta_{#pi} (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
   isDiag = false;
@@ -39,15 +39,15 @@ void T2K_CC1pip_CH_XSec_1Dthpi_nu::SetDataValues(std::string fileLocation) {
     //std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-4, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataCopy->GetNbinsX()-4, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    //std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
+    //std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
 
   dataFile->Close();
 };
@@ -104,7 +104,7 @@ void T2K_CC1pip_CH_XSec_1Dthpi_nu::FillEventVariables(FitEvent *event) {
 
   double thpi = FitUtils::th(Pnu, Ppip);
 
-  this->X_VAR = thpi;
+  fXVar = thpi;
 
   return;
 };

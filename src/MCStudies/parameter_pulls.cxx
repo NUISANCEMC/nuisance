@@ -24,16 +24,16 @@ parameter_pulls::parameter_pulls(std::string name, std::string inputfile, FitWei
 
   this->inFile = inputfile;
   this->fName = name;
-  this->plotTitles = "; Dials; Reweight Values";
+  this->fPlotTitles = "; Dials; Reweight Values";
   this->rw_engine = rw;
 
   if (type.find("FRAC") != std::string::npos) dialoption = "FRAC";
   else if (type.find("ABS") != std::string::npos) dialoption = "ABS";
 
   this->SetDataValues(this->inFile); // Set the matrix and parameters from a text file.;
-  this->mcHist = (TH1D*) this->dataHist->Clone();
-  this->mcHist->Reset();
-  this->mcHist->SetNameTitle((this->fName+"_FitVals").c_str(), (this->fName+this->plotTitles).c_str());
+  this->fMCHist = (TH1D*) this->fDataHist->Clone();
+  this->fMCHist->Reset();
+  this->fMCHist->SetNameTitle((this->fName+"_FitVals").c_str(), (this->fName+this->fPlotTitles).c_str());
     
 };
 
@@ -47,11 +47,11 @@ void parameter_pulls::Reconfigure(double norm, bool fullconfig){
   for (UInt_t i = 0; i < svec.size(); i++){
     std::string systString = svec.at(i);
 
-    for (int j = 0; j < mcHist->GetNbinsX(); j++){
+    for (int j = 0; j < fMCHist->GetNbinsX(); j++){
 
-      if (systString.compare( mcHist->GetXaxis()->GetBinLabel(j+1) ) == 0){
+      if (systString.compare( fMCHist->GetXaxis()->GetBinLabel(j+1) ) == 0){
 	double curVal =  this->rw_engine->GetDialValue(systString, dialoption);
-	this->mcHist->SetBinContent(j+1,curVal);
+	this->fMCHist->SetBinContent(j+1,curVal);
       }
       
     }
@@ -68,14 +68,14 @@ void parameter_pulls::Renormalise(double norm){
 
 double parameter_pulls::GetChi2(){
 
-  int nbins = this->dataHist->GetNbinsX();
+  int nbins = this->fDataHist->GetNbinsX();
   double chi2 = 0.0;
 
   for (int i = 0; i < nbins; i++){
     for (int j = 0; j < nbins; j++){
       
-      double idif = this->dataHist->GetBinContent(i+1) - this->mcHist->GetBinContent(i+1);
-      double jdif = this->dataHist->GetBinContent(j+1) - this->mcHist->GetBinContent(j+1);
+      double idif = this->fDataHist->GetBinContent(i+1) - this->fMCHist->GetBinContent(i+1);
+      double jdif = this->fDataHist->GetBinContent(j+1) - this->fMCHist->GetBinContent(j+1);
 
       chi2 += idif*jdif *(*this->covar)(i, j);
     }
@@ -88,23 +88,23 @@ double parameter_pulls::GetChi2(){
 void parameter_pulls::ThrowCovariance(){
 
   std::vector<double> randvals;
-  for (int i = 0; i < this->dataHist->GetNbinsX(); i++){
+  for (int i = 0; i < this->fDataHist->GetNbinsX(); i++){
     randvals.push_back(gRandom->Gaus(0.0,1.0));
   }
 
-  for (int i = 0; i < this->dataHist->GetNbinsX(); i++){
+  for (int i = 0; i < this->fDataHist->GetNbinsX(); i++){
     
     double binmod  = 0.0;
 
-    for (int j = 0; j < this->dataHist->GetNbinsX(); j++){
+    for (int j = 0; j < this->fDataHist->GetNbinsX(); j++){
       
       binmod += (*this->decomp)(j,i) * randvals.at(j);
 
     }
 
-    this->dataHist->SetBinContent(i+1,this->dataTrue->GetBinContent(i+1) + binmod);
+    this->fDataHist->SetBinContent(i+1,this->dataTrue->GetBinContent(i+1) + binmod);
 
-    LOG(REC)<<"New value for "<<this->dataHist->GetXaxis()->GetBinLabel(i+1)<< " = "<<this->dataHist->GetBinContent(i+1)<<std::endl;
+    LOG(REC)<<"New value for "<<this->fDataHist->GetXaxis()->GetBinLabel(i+1)<< " = "<<this->fDataHist->GetBinContent(i+1)<<std::endl;
   }
 
   return;
@@ -147,11 +147,11 @@ void parameter_pulls::SetDataValues(std::string dataFile){
     int dim = covarplot->GetNbinsX();
     this->data_points = dim+1;
     
-    this->dataHist = new TH1D((this->fName + "_CentralVals").c_str(),(this->fName + "_centralvals").c_str(),dim,0,dim);
+    this->fDataHist = new TH1D((this->fName + "_CentralVals").c_str(),(this->fName + "_centralvals").c_str(),dim,0,dim);
 
     for (int i = 0; i < dim; i++){
-      this->dataHist->GetXaxis()->SetBinLabel(i+1,covarplot->GetXaxis()->GetBinLabel(i+1));
-      this->dataHist->SetBinError(i+1,sqrt(covarplot->GetBinContent(i+1,i+1)));
+      this->fDataHist->GetXaxis()->SetBinLabel(i+1,covarplot->GetXaxis()->GetBinLabel(i+1));
+      this->fDataHist->SetBinError(i+1,sqrt(covarplot->GetBinContent(i+1,i+1)));
     }
 
     // Fill Central Values
@@ -160,8 +160,8 @@ void parameter_pulls::SetDataValues(std::string dataFile){
 
 	std::string parname = std::string(fitplot->GetXaxis()->GetBinLabel(j+1));
 
-	if (!parname.compare(dataHist->GetXaxis()->GetBinLabel(i+1)))
-	  dataHist->SetBinContent(i+1, fitplot->GetBinContent(j+1));
+	if (!parname.compare(fDataHist->GetXaxis()->GetBinLabel(i+1)))
+	  fDataHist->SetBinContent(i+1, fitplot->GetBinContent(j+1));
       }
     }
 
@@ -192,16 +192,16 @@ void parameter_pulls::Write(std::string drawOpt){
 
   for(std::map<std::string,int>::iterator binIter = this->binMap.begin(); binIter != this->binMap.end(); binIter++){
     
-    this->mcHist->GetXaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
-    this->dataHist->GetXaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
+    this->fMCHist->GetXaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
+    this->fDataHist->GetXaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
 
     temp->GetXaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
     temp->GetYaxis()->SetBinLabel(binIter->second, binIter->first.c_str());
 
   }
   
-  this->mcHist->Write();
-  this->dataHist->Write();  
+  this->fMCHist->Write();
+  this->fDataHist->Write();  
   temp->Write();
 
 
@@ -214,8 +214,8 @@ TH2D parameter_pulls::GetFullCovarMatrix(){
 
   TH2D tempCov = TH2D(*fullcovar);
   for (int i = 0; i < tempCov.GetNbinsX(); i++){
-    tempCov.GetXaxis()->SetBinLabel(i+1,dataHist->GetXaxis()->GetBinLabel(i+1));
-    tempCov.GetYaxis()->SetBinLabel(i+1,dataHist->GetXaxis()->GetBinLabel(i+1));
+    tempCov.GetXaxis()->SetBinLabel(i+1,fDataHist->GetXaxis()->GetBinLabel(i+1));
+    tempCov.GetYaxis()->SetBinLabel(i+1,fDataHist->GetXaxis()->GetBinLabel(i+1));
   }
 
   return tempCov;

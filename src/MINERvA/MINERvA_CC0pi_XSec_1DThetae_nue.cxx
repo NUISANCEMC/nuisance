@@ -6,7 +6,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
 
   // Define Measurement
   fName = "MINERvA_CC0pi_XSec_1DThetae_nue";
-  plotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
+  fPlotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
   EnuMin = 0.0;
   EnuMax = 10.0;
   normError = 0.101;
@@ -19,7 +19,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
   std::string dist_name = "";
   
   dist_name = "1DThetae";
-  plotTitles = "; Q_{QE}^{2} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q_{QE}^{2} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
@@ -60,8 +60,8 @@ void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
     }
   }
   
-  this->X_VAR = Thetae;
-  LOG(EVT) << "X_VAR = "<<X_VAR<<std::endl;
+  fXVar = Thetae;
+  LOG(EVT) << "fXVar = "<<fXVar<<std::endl;
   return;
 }
 

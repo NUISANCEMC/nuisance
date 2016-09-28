@@ -24,7 +24,7 @@ MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(std::string i
 //******************************************************************** 
   
   fName = "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu";
-  plotTitles = "; E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4}); d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})";
+  fPlotTitles = "; E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4}); d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.0;
   isDiag = true;
@@ -34,7 +34,7 @@ MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(std::string i
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("QSQVENUXSec"));//data comes in .root file, yes!
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
@@ -62,8 +62,8 @@ void MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::FillEventVariables(FitEvent *event) {
   double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip)*1000.;
   double Q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip)*1E6;
 
-  this->X_VAR = Enu;
-  this->Y_VAR = Q2;
+  fXVar = Enu;
+  fYVar = Q2;
 
   return;
 };

@@ -24,7 +24,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   // Measurement Details
   fName = "ANL_CC1npip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
+  fPlotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 1.5;
   isDiag = true;
@@ -36,7 +36,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   this->SetupDefaultHist();
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
   
   this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
@@ -71,7 +71,7 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
@@ -127,11 +127,11 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillHistograms() {
 
 void ANL_CC1npip_XSec_1DEnu_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(scaleFactor);
+  fMCFine->Scale(scaleFactor);
 
   return;
 }

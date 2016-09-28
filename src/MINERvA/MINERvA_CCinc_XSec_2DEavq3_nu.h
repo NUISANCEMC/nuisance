@@ -36,7 +36,7 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
 
     // Remove all the content histograms
     //    for (int i = 0; i < 9; i++)  
-      // delete this->mcHist_content[i];   
+      // delete this->fMCHist_content[i];   
 
     // delete everything
     /* delete difHist; */
@@ -48,7 +48,7 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
     
     /* // Delete MODE histograms */
     /* for (int i = 0; i < 60; i++) */
-    /*   delete mcHist_PDG[i]; */
+    /*   delete fMCHist_PDG[i]; */
 
     return;
   };

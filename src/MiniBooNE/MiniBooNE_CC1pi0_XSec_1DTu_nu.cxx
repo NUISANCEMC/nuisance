@@ -23,7 +23,7 @@
 MiniBooNE_CC1pi0_XSec_1DTu_nu::MiniBooNE_CC1pi0_XSec_1DTu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   fName = "MiniBooNE_CC1pi0_XSec_1DTu_nu";
-  plotTitles = "; T_{#mu} (GeV); d#sigma/dE_{#mu} (cm^{2}/GeV^{2}/CH_{2})";
+  fPlotTitles = "; T_{#mu} (GeV); d#sigma/dE_{#mu} (cm^{2}/GeV^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
@@ -34,7 +34,7 @@ MiniBooNE_CC1pi0_XSec_1DTu_nu::MiniBooNE_CC1pi0_XSec_1DTu_nu(std::string inputfi
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdemu_covar.txt", this->data_points-1);
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
+  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
@@ -60,7 +60,7 @@ void MiniBooNE_CC1pi0_XSec_1DTu_nu::FillEventVariables(FitEvent *event) {
   
   double TuCCpi0 = FitUtils::T(Pmu); 
 
-  this->X_VAR = TuCCpi0;
+  fXVar = TuCCpi0;
   
   return;
 };

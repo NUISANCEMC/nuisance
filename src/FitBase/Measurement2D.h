@@ -128,7 +128,7 @@ class Measurement2D : public MeasurementBase {
   //! Reset the MC Histograms to zero
   virtual void ResetAll();
 
-  //! Fill the histograms given X_VAR, Y_VAR, and Weight for this event
+  //! Fill the histograms given fXVar, fYVar, and Weight for this event
   virtual void FillHistograms();
 
   //! Apply event scaling to XSec values after reconfigure has been called
@@ -157,7 +157,7 @@ class Measurement2D : public MeasurementBase {
   // virtual void ResetFakeData();
   // virtual void ResetData();
 
-  //! Use the covariance to throw fake data from the current dataHist
+  //! Use the covariance to throw fake data from the current fDataHist
   virtual void ThrowCovariance();
 
   virtual THStack GetModeStack();
@@ -166,15 +166,15 @@ class Measurement2D : public MeasurementBase {
     Access Functions
   */
 
-  TH2D* GetMCHistogram(){ return mcHist; };
-  TH2D* GetDataHistogram(){ return dataHist; };
+  TH2D* GetMCHistogram(){ return fMCHist; };
+  TH2D* GetDataHistogram(){ return fDataHist; };
 
   virtual std::vector<TH1*> GetMCList();
   virtual std::vector<TH1*> GetDataList();
   virtual std::vector<TH1*> GetMaskList(){return std::vector<TH1*> (1, maskHist);};
-  virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, mcFine);};
+  virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, fMCFine);};
 
-  //! Get bin contents and errors from mcHist and fill a vector with them
+  //! Get bin contents and errors from fMCHist and fill a vector with them
   virtual void GetBinContents(std::vector<double>& cont,std::vector<double>& err);
 
   //! Get covariance matrix as a pretty plot
@@ -193,20 +193,20 @@ class Measurement2D : public MeasurementBase {
 protected:
 
   // The data histograms
-  TH2D* dataHist; //!< default data histogram (use in chi2 calculations)
+  TH2D* fDataHist; //!< default data histogram (use in chi2 calculations)
   TH2D* dataOrig; //!< histogram to store original data before throws.
   TH2D* dataTrue; //!< histogram to store true dataset
 
-  TH1D* dataHist_X; //!< Projections onto X of the dataHist
-  TH1D* dataHist_Y; //!< Projections onto Y of the dataHist
+  TH1D* fDataHist_X; //!< Projections onto X of the fDataHist
+  TH1D* fDataHist_Y; //!< Projections onto Y of the fDataHist
 
   // The MC histograms
-  TH2D* mcHist;  //!< MC Histogram (used in chi2 calculations)
-  TH2D* mcFine;  //!< Finely binned MC Histogram
-  TH2D* mcHist_PDG[61]; //!< MC Histograms for each interaction mode
+  TH2D* fMCHist;  //!< MC Histogram (used in chi2 calculations)
+  TH2D* fMCFine;  //!< Finely binned MC Histogram
+  TH2D* fMCHist_PDG[61]; //!< MC Histograms for each interaction mode
 
-  TH1D* mcHist_X; //!< Projections onto X of the mcHist
-  TH1D* mcHist_Y; //!< Projections onto Y of the mcHist
+  TH1D* fMCHist_X; //!< Projections onto X of the fMCHist
+  TH1D* fMCHist_Y; //!< Projections onto Y of the fMCHist
 
   // Fake Data Flag
   std::string fitType;
@@ -218,7 +218,7 @@ protected:
   TH2I* mapHist; //!< map histogram used to convert 2D to 1D distributions
 
   // Plot Titles for X Y and Z
-  std::string plotTitles; //!< X and Y plot titles.
+  std::string fPlotTitles; //!< X and Y plot titles.
 
   // The covariance matrix and its decomposition
   TMatrixDSym *covar;  //!< inverted covariance matrix

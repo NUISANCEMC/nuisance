@@ -102,7 +102,7 @@ public:
   std::string dialoption;
 
   std::string inFile;   //!< input file for the covariance
-  std::map<std::string,int> binMap; //!< map between dial values and bins in dataHist
+  std::map<std::string,int> binMap; //!< map between dial values and bins in fDataHist
   TVectorD centralValues; //!< Vector of central values
 };
 

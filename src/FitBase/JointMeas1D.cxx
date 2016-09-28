@@ -186,8 +186,8 @@ void JointMeas1D::MakePlots(){
     for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
       MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
 
-      this->mcHist->Add( exp->GetMCList().at(0)   );
-      this->mcFine->Add( exp->GetFineList().at(0) );
+      this->fMCHist->Add( exp->GetMCList().at(0)   );
+      this->fMCFine->Add( exp->GetFineList().at(0) );
 
     }
 
@@ -203,13 +203,13 @@ void JointMeas1D::MakePlots(){
 
       if (sample == 0){
 
-	this->mcHist->Add( exp->GetMCList().at(0)    );
-	this->mcFine->Add( exp->GetFineList().at(0)  );
+	this->fMCHist->Add( exp->GetMCList().at(0)    );
+	this->fMCFine->Add( exp->GetFineList().at(0)  );
 
       } else if (sample == 1){
 
-	this->mcHist->Divide( exp->GetMCList().at(0)   );
-	this->mcFine->Divide( exp->GetFineList().at(0) );
+	this->fMCHist->Divide( exp->GetMCList().at(0)   );
+	this->fMCFine->Divide( exp->GetFineList().at(0) );
 
       } else break;
 
@@ -232,7 +232,7 @@ std::vector<TH1*> JointMeas1D::GetMCList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> mcHist );
+  tempVect.push_back( this-> fMCHist );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
@@ -254,7 +254,7 @@ std::vector<TH1*> JointMeas1D::GetDataList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> dataHist );
+  tempVect.push_back( this-> fDataHist );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
@@ -276,7 +276,7 @@ std::vector<TH1*> JointMeas1D::GetFineList(){
 
   // Make Default Vector
   std::vector<TH1*> tempVect;
-  tempVect.push_back( this-> mcFine );
+  tempVect.push_back( this-> fMCFine );
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
