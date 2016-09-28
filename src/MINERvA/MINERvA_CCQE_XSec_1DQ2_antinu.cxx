@@ -83,7 +83,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*13./7./this->TotalIntegratedFlux(); 
+  fScaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*13./7./this->TotalIntegratedFlux(); 
   
 };
 

@@ -52,7 +52,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Generate events on H2 to get the normalisation right.
-  this->scaleFactor = (this->eventHist->Integral("width")/(nevents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
+  this->fScaleFactor = (this->eventHist->Integral("width")/(nevents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -141,7 +141,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
   Measurement1D::ScaleEvents();
-  if (applyQ2correction) this->fMCHist_NoCorr->Scale(this->scaleFactor, "width");
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(this->fScaleFactor, "width");
 
   return;
 }

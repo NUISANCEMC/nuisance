@@ -630,8 +630,8 @@ void Measurement2D::ScaleEvents(){
     PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist, axis);
 
     LOG(SAM) << "Running 2D Flux Unfolded Scaling?" << endl;
-    fMCHist->Scale(scaleFactor);
-    fMCFine->Scale(scaleFactor);
+    fMCHist->Scale(fScaleFactor);
+    fMCFine->Scale(fScaleFactor);
 
   } else { // Else we just do normal scaling
 
@@ -640,10 +640,10 @@ void Measurement2D::ScaleEvents(){
     this->fMCFine->GetSumw2();
 
     // Final Scaling factors
-    this->fMCHist->Scale(this->scaleFactor, "width");
-    this->fMCFine->Scale(this->scaleFactor, "width");
+    this->fMCHist->Scale(this->fScaleFactor, "width");
+    this->fMCFine->Scale(this->fScaleFactor, "width");
 
-    PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->scaleFactor, "width");
+    PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->fScaleFactor, "width");
   }
 
   return;

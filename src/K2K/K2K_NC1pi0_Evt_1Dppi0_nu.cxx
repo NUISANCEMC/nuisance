@@ -36,7 +36,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWei
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->scaleFactor = 1; // No need to care about scaling factors for shape measurements
+  this->fScaleFactor = 1; // No need to care about scaling factors for shape measurements
 };
 
 void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {

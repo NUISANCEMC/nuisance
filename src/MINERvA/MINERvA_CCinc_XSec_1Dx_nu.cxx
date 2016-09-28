@@ -54,7 +54,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   this->SetSmearingMatrix(basedir + smearfilename, nbins, nbins+1);
 
   // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); // NEUT
+  this->fScaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); // NEUT
   
 };
 
@@ -116,7 +116,7 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
   // Get rid of this because it causes odd behaviour
   //Measurement1D::ScaleEvents();
 
-  this->fMCHist->Scale(this->scaleFactor, "width");
+  this->fMCHist->Scale(this->fScaleFactor, "width");
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
   for(int i=0; i<this->mcStat->GetNbinsX();i++) {

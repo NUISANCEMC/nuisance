@@ -28,7 +28,7 @@
 MeasurementBase::MeasurementBase() {
 //********************************************************************
 
-  scaleFactor = 1.0;
+  fScaleFactor = 1.0;
   filledMC = false;
 
 };

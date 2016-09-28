@@ -26,7 +26,7 @@ MINERvA_CCNpip_XSec_1Dth_20deg_nu::MINERvA_CCNpip_XSec_1Dth_20deg_nu(std::string
     fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
   }
 
-  scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CCNpip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {

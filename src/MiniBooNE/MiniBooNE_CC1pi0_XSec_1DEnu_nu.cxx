@@ -39,7 +39,7 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string input
   covar = StatUtils::GetInvert(fullcovar);
   //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->normError);
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08);
+  this->fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08);
 };
 
 void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

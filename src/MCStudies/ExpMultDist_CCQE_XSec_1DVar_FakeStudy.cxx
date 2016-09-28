@@ -72,7 +72,7 @@ ExpMultDist_CCQE_XSec_1DVar_FakeStudy::ExpMultDist_CCQE_XSec_1DVar_FakeStudy(std
   // 3. The generator is organised in SetupMeasurement so it gives the cross-section in "per nucleon" units.
   //    So some extra scaling for a specific measurement may be required. For Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and divide by the number of neutrons 6.
-  this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))  * (12.0 / 6.0)  /this->TotalIntegratedFlux();
+  this->fScaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))  * (12.0 / 6.0)  /this->TotalIntegratedFlux();
 
 };
 

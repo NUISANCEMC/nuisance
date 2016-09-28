@@ -63,7 +63,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   this->eventHist->Scale(this->fDataHist->Integral()/this->eventHist->Integral());
   
   // Different generators require slightly different rescaling factors.
-  this->scaleFactor = (this->eventHist->Integral()/(nevents+0.)); 
+  this->fScaleFactor = (this->eventHist->Integral()/(nevents+0.)); 
   scaleF = -1.0;
 };
 
@@ -169,9 +169,9 @@ void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 /// @details Apply scaling to uncorrected fMCHist_NoCorr and scale to match data
 void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
   //********************************************************************                                                                                                                                                                   
-  this->fMCHist->Scale(scaleFactor);
-  this->fMCFine->Scale(scaleFactor);
-  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(fScaleFactor);
+  this->fMCFine->Scale(fScaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
 
   // Scale to match data
   scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);

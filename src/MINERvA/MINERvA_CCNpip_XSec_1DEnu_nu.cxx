@@ -27,7 +27,7 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
-  scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents);
+  fScaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents);
 };
 
 void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

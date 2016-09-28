@@ -71,7 +71,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   }
 
   // Get Scale Factor
-  scaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
 		 * (14.08/6.0)
 		 / TotalIntegratedFlux());
 
@@ -166,7 +166,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::ScaleEvents(){
 
   Measurement1D::ScaleEvents();
   if (ccqelike)
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, fScaleFactor,"width");
 
 }
 

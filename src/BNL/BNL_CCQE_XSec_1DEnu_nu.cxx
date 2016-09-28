@@ -49,7 +49,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Different generators require slightly different rescaling factors.
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
+  this->fScaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
     
 };
 
@@ -120,8 +120,8 @@ void BNL_CCQE_XSec_1DEnu_nu::ScaleEvents(){
   PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
   PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
   
-  fMCHist->Scale(scaleFactor);
-  fMCFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 

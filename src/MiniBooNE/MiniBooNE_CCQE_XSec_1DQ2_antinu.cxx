@@ -84,7 +84,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   }
 
   // ScaleFactor
-  scaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((eventHist->Integral("width")*1E-38/(nevents+0.))
 		 *14.08/8.
 		 / TotalIntegratedFlux()); 
 };
@@ -188,9 +188,9 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ScaleEvents(){
   Measurement1D::ScaleEvents();
 
   if (ccqelike){
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, scaleFactor,"width");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, scaleFactor,"width");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, scaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, fScaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, fScaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, fScaleFactor,"width");
   }
 }
 

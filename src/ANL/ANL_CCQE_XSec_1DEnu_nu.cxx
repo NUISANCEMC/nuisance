@@ -52,7 +52,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   covar     = StatUtils::GetInvert(fullcovar);
   
   // Different generators require slightly different rescaling factors.
-  scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
+  fScaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
 
 };
 

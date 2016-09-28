@@ -55,7 +55,7 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Different generators require slightly different rescaling factors.
-  this->scaleFactor = (this->eventHist->Integral()/(nevents+0.)); // NEUT
+  this->fScaleFactor = (this->eventHist->Integral()/(nevents+0.)); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -146,8 +146,8 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
-  this->fMCHist->Scale(scaleFactor);
-  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(fScaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
 
 
   // Scale to match data

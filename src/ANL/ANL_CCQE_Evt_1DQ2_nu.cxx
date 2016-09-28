@@ -82,7 +82,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   //  covar     = StatUtils::GetInvert(fullcovar);
 
   //  this->eventHist->Scale(fDataHist->Integral()/eventHist->Integral());
-  this->scaleFactor = (this->fDataHist->Integral("width")/(nevents+0.)); 
+  this->fScaleFactor = (this->fDataHist->Integral("width")/(nevents+0.)); 
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -189,9 +189,9 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
   }
 
 
-  this->fMCHist->Scale(scaleFactor);
-  this->fMCFine->Scale(scaleFactor);
-  if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(fScaleFactor);
+  this->fMCFine->Scale(fScaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
 
 
   // Scale to match data

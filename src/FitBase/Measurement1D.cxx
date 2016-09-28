@@ -625,13 +625,13 @@ void Measurement1D::ScaleEvents(){
     PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
     PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-    fMCHist->Scale(scaleFactor);
-    fMCFine->Scale(scaleFactor);
+    fMCHist->Scale(fScaleFactor);
+    fMCFine->Scale(fScaleFactor);
   // Any other differential scaling
   } else {
-    this->fMCHist->Scale(this->scaleFactor, "width");
-    this->fMCFine->Scale(this->scaleFactor, "width");
-    PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->scaleFactor, "width");
+    this->fMCHist->Scale(this->fScaleFactor, "width");
+    this->fMCFine->Scale(this->fScaleFactor, "width");
+    PlotUtils::ScaleNeutModeArray((TH1**)this->fMCHist_PDG, this->fScaleFactor, "width");
   }
 
 

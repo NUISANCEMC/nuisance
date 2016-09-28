@@ -42,7 +42,7 @@ BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
 };
 
 
@@ -153,8 +153,8 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
   PlotUtils::FluxUnfoldedScaling(fMCHist, fluxHist);
   PlotUtils::FluxUnfoldedScaling(fMCFine, fluxHist);
 
-  fMCHist->Scale(scaleFactor);
-  fMCFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 }

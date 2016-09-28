@@ -19,7 +19,7 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
   this->SetupDefaultHist();
   
-  this->scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux();
+  this->fScaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux();
 };
 
 

@@ -83,7 +83,7 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // // The scale factor is quite complicated because MB didn't divide by number of targets.
   // // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
   // double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
-  // this->scaleFactor = (this->eventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
+  // this->fScaleFactor = (this->eventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
 };
 
 
@@ -133,8 +133,8 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   // }
 
   // // Scale
-  // this->fMCHist->Scale(this->scaleFactor, "width");
-  // this->fMCFine->Scale(this->scaleFactor, "width");
+  // this->fMCHist->Scale(this->fScaleFactor, "width");
+  // this->fMCFine->Scale(this->fScaleFactor, "width");
 
   // // Add in the backgrounds...
   // for (int treco = 0; treco < 51; ++treco){

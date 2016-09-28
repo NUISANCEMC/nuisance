@@ -170,7 +170,7 @@ class MeasurementBase {
   InputHandler* GetInput (void);
 
   std::string GetName (void){ return fName; };
-  double GetScaleFactor(void){ return scaleFactor; };
+  double GetScaleFactor(void){ return fScaleFactor; };
 
   double GetXVar(void){ return fXVar; };
   double GetYVar(void){ return fYVar; };
@@ -205,7 +205,7 @@ protected:
   TH1D* xsecHist;  //!< XSec Histogram
 
   double exp_distance; //!< Incoming Particle flight distance (for oscillation analysis)
-  double scaleFactor; //!< scaleFactor applied to events to convert from eventrate to final distribution
+  double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
   double currentNorm; //!< current normalisation factor applied if fit is "FREE"
   bool filledMC; //!< flag whether MC plots have been filled (For ApplyNormalisation)
 
