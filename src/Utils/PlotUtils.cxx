@@ -352,7 +352,8 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
   }
 
   // Resolution for the interpolation used for the flux
-  int resolution = 10000;
+  // Set to 100 times fines than flux histogram, should be enough buy may need tweaking!
+  int resolution = 100*fluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
   TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
 
@@ -464,18 +465,25 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
   TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
 
-  for (int i = 0; i < fluxHist->GetNbinsX(); i++){
+  for (int i = 0; i < fluxHist->GetNbinsX()+1; i++){
     fluxGraph->SetPoint(i, fluxHist->GetXaxis()->GetBinCenter(i+1), fluxHist->GetBinContent(i+1));
   }
 
   // Resolution for the interpolation used for the flux
-  int resolution = 500;
+  // Make 100 times finer than flux histogram, COULD BE TWEAKED
+  int resolution = 100.*fluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
   TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
+    // The start and end of the flux histogram might go to zero
+    // So we really need to take care with these bins; here I just set it flat
+    if (fluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
+      fineFlux->SetBinContent(i+1, fluxHist->GetBinContent(1));
+    } else {
     fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+    }
   }
 
   for (int i = 1; i < mcHist->GetNbinsX()+1; i++) {
@@ -532,13 +540,13 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
     double fluxInt = fineFlux->Integral(fluxLow, fluxHigh - 1, "width");
 
     // Scale the bin content in bin i by the flux integral in that bin
+    if (fluxInt == 0) continue;
     mcHist->SetBinContent(i, mcHist->GetBinContent(i)/fluxInt);
     mcHist->SetBinError(i, mcHist->GetBinError(i)/fluxInt);
   }
 
   delete fineFlux;
   delete fluxGraph;
-
 
   return;
 };
