@@ -310,6 +310,7 @@ protected:
   std::vector<TH1D*> input_dials;  //!< Vector of histograms from parameter pull classes that give central values of the input pull terms
   std::vector<TH2D> input_covariances; //!< vector of histograms from parameter pull classes that give covariance of the input pull terms
 
+  std::list   <ParamPull*>  fInputThrows; //!< Pointers to pull terms
   std::vector <TH1D>        fInputDials; //!< Vector of Input Histograms
   std::vector <TMatrixDSym> fInputCovar; //!< Vector of Input Covariances
 

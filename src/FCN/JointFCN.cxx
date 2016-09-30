@@ -209,6 +209,9 @@ int JointFCN::GetNDOF() {
     totaldof += dof;
     count++;
   }
+
+  // Set Data Variable
+  fNDOF = totaldof;
   
   return totaldof;
 }
@@ -216,7 +219,8 @@ int JointFCN::GetNDOF() {
 //*************************************************** 
 double JointFCN::GetLikelihood()  {
 //***************************************************
-
+  LOG(MIN) << "Getting likelihoods..." << endl;
+  
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
   int count = 0;
@@ -230,6 +234,8 @@ double JointFCN::GetLikelihood()  {
       fSampleLikes[count] = newlike;
     }
 
+    LOG(MIN) << "-> " << exp->GetName() << " : " << newlike << endl;
+    
     // Add to total
     like += newlike;
     count++;
@@ -249,6 +255,10 @@ double JointFCN::GetLikelihood()  {
     like += newlike;
     count++;
   }
+
+  // Set Data Variable
+  LOG(MIN) << "Total Likelihood = " << like << endl;
+  fLikelihood = like;
 
   return like;
 };
@@ -323,7 +333,6 @@ void JointFCN::LoadSamples(std::string cardinput)
       std::string fakeData = "";
       fOutputDir->cd();
       fPulls.push_back( new ParamPull( name, files, type ) );
-
     }
   }
   card.close();

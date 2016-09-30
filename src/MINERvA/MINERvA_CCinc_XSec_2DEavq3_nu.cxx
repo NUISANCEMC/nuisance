@@ -31,7 +31,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
   useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
   splitMEC_PN_NN = FitPar::Config().GetParB("Modes.split_PN_NN");
-  normError = 0.107;
+  fNormError = 0.107;
   default_types = "FIX/FULL";
   allowed_types = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

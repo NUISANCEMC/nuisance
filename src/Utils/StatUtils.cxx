@@ -774,7 +774,7 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
 //*******************************************************************
 
   TMatrixDSym* new_mat = (TMatrixDSym*)mat->Clone();
-
+  
   // Check for diagonal
   bool non_diagonal = false;
   for (int i = 0; i < new_mat->GetNrows(); i++){
@@ -789,7 +789,7 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
   }
 
   // If diag, just flip the diag
-  if (!non_diagonal){
+  if (!non_diagonal or new_mat->GetNrows() == 1){
     for(int i = 0; i < new_mat->GetNrows(); i++){
       (*new_mat)(i,i) = 1.0/(*new_mat)(i,i);
     }
@@ -808,12 +808,36 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
 TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
 //*******************************************************************
 
-  TMatrixDSym* decomp = (TMatrixDSym*) mat->Clone();
-  TDecompChol LU = TDecompChol(*decomp);
-  LU.Decompose();
-  decomp = new TMatrixDSym(decomp->GetNrows(), LU.GetU().GetMatrixArray(), "");
+  TMatrixDSym* new_mat = (TMatrixDSym*)mat->Clone();
+  
+  // Check for diagonal
+  bool non_diagonal = false;
+  for (int i = 0; i < new_mat->GetNrows(); i++){
+    for (int j = 0; j < new_mat->GetNrows(); j++){
+      if (i == j) continue;
 
-  return decomp;
+      if ((*new_mat)(i,j) != 0.0) {
+	non_diagonal=true;
+	break;
+      }
+    }
+  }
+
+  // If diag, just flip the diag
+  if (!non_diagonal or new_mat->GetNrows() == 1){
+    for(int i = 0; i < new_mat->GetNrows(); i++){
+      cout << " Setting sqrt value " << (*new_mat)(i,i) <<" " <<sqrt((*new_mat)(i,i))<<endl;
+      (*new_mat)(i,i) = sqrt((*new_mat)(i,i));
+    }
+    return new_mat;
+  }
+  
+  TDecompChol LU = TDecompChol(*new_mat);
+  LU.Decompose();
+  new_mat = new TMatrixDSym(new_mat->GetNrows(), LU.GetU().GetMatrixArray(), "");
+
+  sleep(2);
+  return new_mat;
 }
 
 
@@ -861,13 +885,13 @@ void StatUtils::ForceNormIntoCovar(TMatrixDSym* mat, TH2D* data, double norm, TH
 }
 
 //*******************************************************************
-TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data){
+TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data, double scaleF){
 //*******************************************************************
 
   TMatrixDSym* newmat = new TMatrixDSym(data->GetNbinsX());
   
   for (int i = 0; i < data->GetNbinsX(); i++){
-    (*newmat)(i,i) = data->GetBinError(i+1) * data->GetBinError(i+1) * 1E38 * 1E38;
+    (*newmat)(i,i) = data->GetBinError(i+1) * data->GetBinError(i+1) * scaleF * scaleF;
   }
   
   return newmat;
@@ -876,21 +900,13 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data){
 
 
 //*******************************************************************     
-TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map){
+TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map, double scaleF){
 //*******************************************************************     
 
   if (!map) map = StatUtils::GenerateMap(data);
-
   TH1D* data_1D = MapToTH1D(data, map);
-  Int_t NBins = data_1D->GetNbinsX();
-  TMatrixDSym* mat = new TMatrixDSym(NBins);
- 
-  for (int i = 0; i < NBins; i++)
-    (*mat)(i, i) = pow(data_1D->GetBinError(i+1) * 1E-38, 2);
- 
-  delete data_1D;
-  
-  return mat;
+
+  return StatUtils::MakeDiagonalCovarMatrix(data_1D, scaleF);
 };
 
 

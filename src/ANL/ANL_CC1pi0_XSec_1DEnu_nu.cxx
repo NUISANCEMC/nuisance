@@ -27,7 +27,7 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   EnuMin = 0.;
   EnuMax = 1.5;
   isDiag = true;
-  normError = 0.20;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/anl82corr-numu-n-to-mu-p-pi0-lowW_edges.txt");

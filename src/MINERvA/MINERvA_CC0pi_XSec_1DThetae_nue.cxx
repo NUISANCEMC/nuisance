@@ -9,7 +9,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
   fPlotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
   EnuMin = 0.0;
   EnuMax = 10.0;
-  normError = 0.101;
+  fNormError = 0.101;
   default_types = "FIX/FULL";
   allowed_types = "FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

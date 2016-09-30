@@ -28,7 +28,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMin = 0.;
   EnuMax = 1.5;
   isDiag = true;
-  normError = 0.20;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
   
   // Setup Plots

@@ -27,7 +27,7 @@ BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   EnuMin = 5;
   EnuMax = 200;
   isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  normError = 0.20; // normalisation error on ANL BNL flux
+  fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi+_on_p_W14_edit.txt");

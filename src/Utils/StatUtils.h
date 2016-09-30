@@ -180,10 +180,10 @@ namespace StatUtils{
   void ForceNormIntoCovar(TMatrixDSym* mat, TH2D* data, double norm, TH2I* map=NULL);
 
   //! Given a dataset generate an uncorrelated covariance matrix using the bin errors.
-  TMatrixDSym* MakeDiagonalCovarMatrix(TH1D* data);
+  TMatrixDSym* MakeDiagonalCovarMatrix(TH1D* data, double scaleF=1E38);
 
   //! Given a dataset generate an uncorrelated covariance matrix using the bin errors.
-  TMatrixDSym* MakeDiagonalCovarMatrix(TH2D* data, TH2I* map=NULL);
+  TMatrixDSym* MakeDiagonalCovarMatrix(TH2D* data, TH2I* map=NULL, double scaleF=1E38);
 
   //! Given a covariance set the errors in each bin on the data from the covariance diagonals.
   void SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale=1.0);

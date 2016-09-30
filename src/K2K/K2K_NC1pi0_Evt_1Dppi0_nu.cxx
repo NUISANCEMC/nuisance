@@ -27,7 +27,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWei
   EnuMin = 0.;
   EnuMax = 5.;
   isDiag = true;
-  normError = 0.15;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/K2K/ncpi0/ppi0.csv");

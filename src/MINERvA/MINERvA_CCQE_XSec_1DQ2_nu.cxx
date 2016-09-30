@@ -30,7 +30,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
   fullphasespace = name.find("_20deg")   == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10.;
-  normError = 0.101;
+  fNormError = 0.101;
   allowed_types = "FIX,FREE,SHAPE/DIAG,FULL/NORM";
   default_types = "FIX/FULL";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

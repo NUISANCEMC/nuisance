@@ -34,7 +34,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   ccqelike = name.find("CCQELike") != std::string::npos;
   EnuMin = 0.;
   EnuMax = 3.;
-  normError = 0.107;
+  fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots

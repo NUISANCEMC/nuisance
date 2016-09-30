@@ -41,7 +41,7 @@ systematicRoutines::systematicRoutines(int argc, char* argv[]){
 
   inputFile = NULL;
   outputFile = NULL;
-  fitStrategy = "Migrad,FixAtLim";
+  fitStrategy = "ErrorBands";
   fakeDataFile = "";
 
   thisFCN = NULL;
@@ -151,14 +151,55 @@ void systematicRoutines::GetCovarFromFCN(){
 
   // Get Covariance Objects from FCN
   std::list<ParamPull*> inputpulls = thisFCN->GetPullList();
+  cout << "Reading pulls " << endl;
   for (PullListConstIter iter = inputpulls.begin();
        iter != inputpulls.end(); iter++){
     
     ParamPull* pull = (*iter);
-    fInputCovar.push_back(pull->GetFullCovarMatrix());
-    fInputDials.push_back(pull->GetDataHist());
+
+    cout << "Read Pull " << pull->GetName() << endl;
+    if (pull->GetType().find("THROW")){
+      cout << "Added throw of Type = " << pull->GetType() << endl;
+      fInputThrows.push_back(pull);
+      fInputCovar.push_back(pull->GetFullCovarMatrix());
+      fInputDials.push_back(pull->GetDataHist());
+    }
+
+
+    TH1D dialhist = pull->GetDataHist();
+    //    TH1D minhist  = pull->GetMinHist();
+    //    TH1D maxhist  = pull->GetMaxHist();
+    //    TH1D typehist = pull->GetTypeHist();
     
+    for (int i = 0; i < dialhist.GetNbinsX(); i++){
+      std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
+
+      if (currentVals.find(name) == currentVals.end()){
+	cout << name << " Dial not found in throws, so adding that. " << endl;
+
+
+	params.push_back(name);
+	currentVals[name] =  dialhist.GetBinContent(i+1);
+	startVals[name]   =  dialhist.GetBinContent(i+1);
+
+	minVals[name]      = -10.0;
+	maxVals[name]      = +10.0;
+	stepVals[name]     = 1.0;
+	errorVals[name]    = 0.0;
+	fixVals[name]      = false;
+	startFixVals[name] = false;
+	params_type[name]  = kNEUT;
+	  
+	FitBase::GetRW()->IncludeDial(name, params_type[name], startVals[name]);
+
+	
+      }
+    }
   }
+
+
+  
+  sleep(5);
 
   return;
 }
@@ -441,6 +482,9 @@ void systematicRoutines::readSamples(std::string sampleString){
       currentVals[samplename] = 1.0;
       errorVals[samplename]   = 1.0;
 
+      fixVals[samplename]      = true; //fixed;
+      startFixVals[samplename] = true; //fixed; 
+      
     } else if (val == 3) {
 
       sampleTypes[samplename]  = token;
@@ -562,6 +606,7 @@ void systematicRoutines::updateRWEngine(std::map<std::string,double>& updateVals
     if (updateVals.find(name) == updateVals.end()){
       continue;
     }
+    cout << "Setting Update Vals " << name << " " << updateVals.at(name) << endl;
     FitBase::GetRW()->SetDialValue(name,updateVals.at(name));
   }
 
@@ -696,10 +741,9 @@ void systematicRoutines::SetupCovariance(){
     }
   }
 
-
   // Fill Input Covariances
-  for (UInt_t i = 0; i < input_covariances.size(); i++){
-    TH2D covplot = input_covariances.at(i);
+  for (UInt_t i = 0; i < fInputCovar.size(); i++){
+    TH2D covplot = fInputCovar.at(i);
 
     for(Int_t i = 0; i < covplot.GetNbinsX(); i++){
       for (Int_t j = 0; j < covplot.GetNbinsY(); j++){
@@ -718,28 +762,31 @@ void systematicRoutines::SetupCovariance(){
 	  }
 	}
 
-	for (Int_t k = 0; k < covarHist_Free->GetNbinsX(); k++){
-          for (Int_t l = 0; l < covarHist_Free->GetNbinsY(); l++){
-
-            if (!parx.compare(covarHist_Free->GetXaxis()->GetBinLabel(k+1)) and
-                !pary.compare(covarHist_Free->GetYaxis()->GetBinLabel(l+1))){
-
-	      covarHist_Free->SetBinContent(k+1,l+1, covarHist_Free->GetBinContent(k+1,l+1) + covplot.GetBinContent(i+1,j+1));
+	if (NFREE > 0){
+	  for (Int_t k = 0; k < covarHist_Free->GetNbinsX(); k++){
+	    for (Int_t l = 0; l < covarHist_Free->GetNbinsY(); l++){
+	      
+	      if (!parx.compare(covarHist_Free->GetXaxis()->GetBinLabel(k+1)) and
+		  !pary.compare(covarHist_Free->GetYaxis()->GetBinLabel(l+1))){
+		
+		covarHist_Free->SetBinContent(k+1,l+1, covarHist_Free->GetBinContent(k+1,l+1) + covplot.GetBinContent(i+1,j+1));
+	      }
 	    }
-          }
-        }
+	  }
+	}
       }
     }
   }
+  cout << "Set COVAR " << endl;
 
   // Setup Current Vals due to covariance inputs now as well
-  for (UInt_t i = 0; i < input_dials.size(); i++){
-    TH1D* plot = input_dials.at(i);
+  for (UInt_t i = 0; i < fInputDials.size(); i++){
+    TH1D plot = fInputDials.at(i);
 
-    for (Int_t j = 0; j < plot->GetNbinsX(); j++){
-      std::string parname = std::string(plot->GetXaxis()->GetBinLabel(j+1));
+    for (Int_t j = 0; j < plot.GetNbinsX(); j++){
+      std::string parname = std::string(plot.GetXaxis()->GetBinLabel(j+1));
 
-      if (currentVals.find(parname) != currentVals.end()) currentVals[parname] = plot->GetBinContent(j+1);
+      if (currentVals.find(parname) != currentVals.end()) currentVals[parname] = plot.GetBinContent(j+1);
 
     }
   }
@@ -779,46 +826,45 @@ void systematicRoutines::SetupCovariance(){
 void systematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
 
-  std::vector<double> rands;
-
-  if (!decompHist_Free) {
-    ERR(WRN) << "Trying to throw 0 free parameters"<<std::endl;
-    return;
+  // Set thrownVals to all values in currentVals
+  for (int i = 0; i < params.size(); i++){
+    std::string name = params.at(i);
+    thrownVals[name] = currentVals[name];
   }
+  
+  for (PullListConstIter iter = fInputThrows.begin();
+       iter != fInputThrows.end(); iter++){
+    ParamPull* pull = *iter;
+    
+    pull->ThrowCovariance();
+    TH1D dialhist = pull->GetDataHist();
 
-  for (Int_t i = 0; i < decompHist_Free->GetNbinsX(); i++){
-    rands.push_back(gRandom->Gaus(0.0,1.0));
-  }
+    for (int i = 0; i < dialhist.GetNbinsX(); i++){
+      std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
 
-  for (UInt_t i = 0; i < params.size(); i++){
-    thrownVals[params[i]] = currentVals[params[i]];
-  }
-
-  for (Int_t i = 0; i < decompHist_Free->GetNbinsX(); i++){
-
-    std::string parname = std::string(decompHist_Free->GetXaxis()->GetBinLabel(i+1));
-    double mod = 0.0;
-
-    if (!uniformly){
-      for (Int_t j = 0; j < decompHist_Free->GetNbinsY(); j++){
-	mod += rands[j] * decompHist_Free->GetBinContent(j+1,i+1);
+      cout << "Thrown BinX = " << name << endl;
+      if (currentVals.find(name) != currentVals.end()){
+	thrownVals[name] = dialhist.GetBinContent(i+1);
+	cout << "ThrownVals = " << name << " " << thrownVals[name] << endl;
+	sleep(1);
       }
     }
 
-    if (currentVals.find(parname) != currentVals.end()) {
-      if (fixVals.at(parname)) continue;
-      
-      if (uniformly) thrownVals[parname] = gRandom->Uniform(minVals[parname],maxVals[parname]);
-      else {  thrownVals[parname] = 	  currentVals[parname] + mod; }
-
-    }
+    // Reset throw incase pulls are calculated.
+    pull->ResetToy();
+    
   }
+
   
+  
+  /*
+  This will be for extra checks
   for (UInt_t i = 0; i < params.size(); i++){
     if (fixVals.at(params[i])) continue;
     if (thrownVals[params[i]] < minVals[params[i]]) thrownVals[params[i]] = minVals[params[i]];
     if (thrownVals[params[i]] > maxVals[params[i]]) thrownVals[params[i]] = maxVals[params[i]];
   }
+  */
 
   return;
 };
@@ -827,6 +873,9 @@ void systematicRoutines::ThrowCovariance(bool uniformly){
 void systematicRoutines::GenerateErrorBands(){
 //*************************************
 
+  outputFile->cd();
+  thisFCN->CreateIterationTree("syst_throws",FitBase::GetRW());
+  
   TDirectory* errorDIR = (TDirectory*) outputFile->mkdir("error_bands");
   errorDIR->cd();
 
@@ -841,20 +890,19 @@ void systematicRoutines::GenerateErrorBands(){
   nominal->cd();
   thisFCN->Write();
 
-
   TDirectory* outnominal = (TDirectory*) outputFile->mkdir("nominal_throw");
   outnominal->cd();
   thisFCN->Write();
 
-
   errorDIR->cd();
+  /*
   TTree* parameterTree = new TTree("throws","throws");
   double chi2;
   for (UInt_t i = 0; i < params.size(); i++)
     parameterTree->Branch(params[i].c_str(), &thrownVals[params[i]], (params[i] + "/D").c_str());
   parameterTree->Branch("chi2",&chi2,"chi2/D");
-
-
+  */
+  
   bool uniformly = FitPar::Config().GetParB("error_uniform");
 
   // Run Throws and save
@@ -863,32 +911,37 @@ void systematicRoutines::GenerateErrorBands(){
     TDirectory* throwfolder = (TDirectory*)tempfile->mkdir(Form("throw_%i",i));
     throwfolder->cd();
 
+    // Create Throw
     ThrowCovariance(uniformly);  
-    
-    updateRWEngine(thrownVals);    
-    thisFCN->ReconfigureAllEvents();
-	
+
+    // Run Evaluation
+    double* vals = FitUtils::GetArrayFromMap( params, thrownVals );
+    thisFCN->DoEval( vals );
+    delete vals;
+
+    // Save ALL plots
     thisFCN->Write();
-    chi2 = thisFCN->GetLikelihood();
-
-    parameterTree->Fill();
   }
+  cout << "Finished throws" << endl;
 
+  outputFile->cd();
+  thisFCN->WriteIterationTree();
+  
   errorDIR->cd();
-  decompHist_Free->Write();
-  covarHist_Free->Write();
-  parameterTree->Write();
+  //  decompHist_Free->Write();
+  //  covarHist_Free->Write();
+  //  parameterTree->Write();
 
-  for (UInt_t i = 0; i < input_covariances.size(); i++){
-    input_covariances.at(i).Write();
-  }
-
-  delete parameterTree;
+  //  for (UInt_t i = 0; i < fInputCovar.size(); i++){
+  //    fInputCovar.at(i).Write();
+  //  }
   
   // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
+  nominal->ls();
   TIter next(nominal->GetListOfKeys());
   TKey *key;
   while ((key = (TKey*)next())) {
+    cout << "Getting Keys" << key->GetName() << endl;
     TClass *cl = gROOT->GetClass(key->GetClassName());
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
     TH1D *baseplot = (TH1D*)key->ReadObj();
@@ -966,5 +1019,6 @@ void systematicRoutines::GenerateErrorBands(){
     delete [] bincontents;
   }
 
+  cout << " Returning" << endl;
   return;
 };

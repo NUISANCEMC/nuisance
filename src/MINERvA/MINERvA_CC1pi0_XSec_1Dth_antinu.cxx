@@ -34,7 +34,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inp
     // Although the covariance is given for MINERvA CC1pi0 nubar from 2015, it doesn't Cholesky decompose, hinting at something bad
     // I've tried adding small numbers to the diagonal but it still didn't work and the chi2s are crazy
     isDiag = true;
-    normError = 0.15;
+    fNormError = 0.15;
     // No hadronic mass cut on old publication
     hadMassCut = 99999;
 

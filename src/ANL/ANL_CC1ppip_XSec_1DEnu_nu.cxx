@@ -27,7 +27,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMin = 0.;
   EnuMax = 6.0;
   isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  normError = 0.20; // normalisation error on ANL BNL flux
+  fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/anl82corr-numu-p-to-mu-p-piplus-lowW_edges.txt");

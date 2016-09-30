@@ -47,6 +47,7 @@
 #include "FitWeight.h"
 #include "FitLogger.h"
 #include "EventManager.h"
+#include "TVector.h"
 
 using namespace std;
 
@@ -86,7 +87,7 @@ class ParamPull {
   void ReadRootFile(std::string input);
 
   // Read Text file
-  void ReadTextFile(std::string input);
+  void ReadVectFile(std::string input);
   
   // Read a single dial central value and error
   void ReadDialInput(std::string input);
@@ -120,8 +121,14 @@ class ParamPull {
   bool CheckDialsValid(void);
 
   //! Reset toy data back to original data
-  inline void ResetToy(void){ fDataHist = fDataTrue; };
+  void ResetToy(void);
 
+  //! Read fake data from MC
+  void SetFakeData(std::string fakeinput);
+
+  //! Reset fake data back to original data (before fake data or throws)
+  void RemoveFakeData();
+  
   // Get Functions
   inline std::string GetName        (void) const { return fName;        };
   inline std::string GetInput       (void) const { return fInput;       };
@@ -129,12 +136,15 @@ class ParamPull {
   inline std::string GetFileType    (void) const { return fFileType;    };
   inline std::string GetDialOptions (void) const { return fDialOptions; };
 
-  inline TH1D GetDataHist  (void) const { return *fDataHist;  };
-  inline TH1D GetDataTrue  (void) const { return *fDataTrue;  };
-  inline TH1D GetMCHist    (void) const { return *fMCHist;    };
-  inline TH1D GetMaxHist   (void) const { return *fMaxHist;   };
-  inline TH1D GetMinHist   (void) const { return *fMinHist;   };
-  inline TH1I GetDialTypes (void) const { return *fDialTypes; };
+  std::map<std::string, int> GetAllDials();
+  
+  inline TH1D GetDataHist  (void) const { return *fDataHist; };
+  inline TH1D GetDataTrue  (void) const { return *fDataTrue; };
+  inline TH1D GetDataOrig  (void) const { return *fDataOrig; };
+  inline TH1D GetMCHist    (void) const { return *fMCHist;   };
+  inline TH1D GetMaxHist   (void) const { return *fMaxHist;  };
+  inline TH1D GetMinHist   (void) const { return *fMinHist;  };
+  inline TH1I GetDialTypes (void) const { return *fTypeHist; };
     
  private:
 
@@ -148,9 +158,10 @@ class ParamPull {
   TH1D* fMCHist;    //!< Current MC Histogram
   TH1D* fDataHist;  //!< Current data Histogram
   TH1D* fDataTrue;  //!< True Data (before histogram throws)
+  TH1D* fDataOrig;  //!< Orig Data (without toys or fake data)
   TH1D* fMaxHist;   //!< Maximum limit on MC/Data
   TH1D* fMinHist;   //!< Maximum limit on MC/Data
-  TH1I* fDialTypes; //!< Dial Types
+  TH1I* fTypeHist; //!< Dial Types
   
   int fCalcType;   //!< Method to calculate likelihood
   int fThrowType;  //!< Method to calculate throws

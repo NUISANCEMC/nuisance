@@ -69,7 +69,7 @@ void ParamPull::SetType(std::string type){
   else fCalcType = kNoPull;
 
   if (type.find("GAUSTHROW") != std::string::npos) fThrowType = kGausThrow;
-  else fCalcType = kNoThrow;
+  else fThrowType = kNoThrow;
 
   // Extra check to see if throws or pulls are turned off
   if (type.find("NOPULL") != std::string::npos)  fCalcType = kNoPull;
@@ -98,7 +98,7 @@ void ParamPull::SetupHistograms(std::string input){
   // Read Files
   if      (!fFileType.compare("FIT")) ReadFitFile(input);
   else if (!fFileType.compare("ROOT")) ReadRootFile(input);
-  else if (!fFileType.compare("TXT")) ReadTextFile(input);
+  else if (!fFileType.compare("VECT")) ReadVectFile(input);
   else if (!fFileType.compare("DIAL")) ReadDialInput(input);
   else {
     ERR(FTL) << "Unknown ParamPull Type: " << input << endl;
@@ -113,9 +113,24 @@ void ParamPull::SetupHistograms(std::string input){
   fMCHist->SetNameTitle( (fName + "_MC").c_str(),
 			 (fName + " MC" + fPlotTitles).c_str() );
 
+  // If no Covar input make an uncorrelated one
+  if (!fCovar){
+    fCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist, 1.0);
+  }
+  
   // Sort Covariances
   fInvCovar = StatUtils::GetInvert(fCovar);
   fDecomp   = StatUtils::GetDecomp(fCovar);
+
+  // Create DataTrue for Throws
+  fDataTrue = (TH1D*) fDataHist->Clone();
+  fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
+			   (fName + " truedata" + fPlotTitles).c_str() );
+
+  fDataOrig = (TH1D*) fDataHist->Clone();
+  fDataOrig->SetNameTitle( (fName + "_origdata").c_str(),
+			   (fName + " origdata" + fPlotTitles).c_str() );
+  
 }
 
 //******************************************************************************* 
@@ -125,7 +140,7 @@ void ParamPull::ReadFitFile(std::string input){
   TFile* tempfile = new TFile(input.c_str(),"READ");
 
   // Read Data
-  fDataHist = (TH1D*) tempfile->Get("fit_dials");
+  fDataHist = (TH1D*) tempfile->Get("fit_dials_free");
   if (!fDataHist){
     ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << endl;
     ERR(FTL) << "File Entries:" << endl;
@@ -168,22 +183,25 @@ void ParamPull::ReadRootFile(std::string input){
   std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
 
   // Check all given
-  if (inputlist.size() < 3){
+  if (inputlist.size() < 2){
     ERR(FTL) << "Covar supplied in 'ROOT' format should have 3 semi-colon seperated entries!" << endl
-	     << "ROOT:filename;histname;covarname" << endl;
+	     << "ROOT:filename;histname[;covarname]" << endl;
     ERR(FTL) << "histname = TH1D, covarname = TH2D" << endl;
     throw;
   }
 
   // Get Entries
   std::string filename  = inputlist[0];
+  cout << filename << endl;
   std::string histname  = inputlist[1];
-  std::string covarname = inputlist[2];
+  cout << histname << endl;
+  cout << input<< endl;
 
   // Read File
   TFile* tempfile = new TFile(filename.c_str(),"READ");
   if (tempfile->IsZombie()){
-    ERR(FTL) << "Can't find covar file in " << fName << endl;
+    ERR(FTL) << "Can't find file in " << fName << endl;
+    ERR(FTL) << "location = " << filename << endl;
     throw;
   }
 
@@ -199,35 +217,95 @@ void ParamPull::ReadRootFile(std::string input){
   fDataHist->SetDirectory(0);
   fDataHist->SetNameTitle( (fName + "_data").c_str(),
 			   (fName + " data" + fPlotTitles).c_str() );
-  
+
+  cout << "READING COVAR" << endl;
   // Read Covar
-  TH2D* tempcov = (TH2D*) tempfile->Get(covarname.c_str());
-  if (!tempcov){
-    ERR(FTL) << "Can't find TH2D covar " << covarname << " in " << fName << endl;
-    ERR(FTL) << "File Entries:" << endl;
-    tempfile->ls();
-
-    throw;
-  }
-
-  // Setup Covar
-  int nbins = fDataHist->GetNbinsX();
-  fCovar = new TMatrixDSym( nbins );
-
-  for (int i = 0; i < nbins; i++){
-    for (int j = 0; j < nbins; j++){
-      (*fCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
+  if (inputlist.size() > 2){
+    std::string covarname = inputlist[2];
+    cout << "COVARNAME = " <<covarname << endl;
+    
+    TH2D* tempcov = (TH2D*) tempfile->Get(covarname.c_str());
+    if (!tempcov){
+      ERR(FTL) << "Can't find TH2D covar " << covarname << " in " << fName << endl;
+      ERR(FTL) << "File Entries:" << endl;
+      tempfile->ls();
+      
+      throw;
     }
+    
+    // Setup Covar
+    int nbins = fDataHist->GetNbinsX();
+    fCovar = new TMatrixDSym( nbins );
+    
+    for (int i = 0; i < nbins; i++){
+      for (int j = 0; j < nbins; j++){
+	(*fCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
+      }
+    }
+    
+  // Uncorrelated
+  } else {
+    LOG(SAM) <<"No Covar provided so using diagonal errors for "
+	     << fName << endl;
+    fCovar = NULL;
   }
-  
 }
 
 //*******************************************************************************  
-void ParamPull::ReadTextFile(std::string input){
+void ParamPull::ReadVectFile(std::string input){
 //*******************************************************************************
 
-  ERR(FTL) << " TEXT Files not yet supported in ParamPull! " << endl;
-  throw;
+  std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
+  if (inputlist.size() < 4){
+    ERR(FTL) << "Need 3 inputs for vector input in " << fName << endl;
+    ERR(FTL) << "Inputs: " << input << endl;
+    throw;
+  }
+
+  // Open File
+  std::string rootname   = inputlist[0];
+  TFile* tempfile = new TFile(rootname.c_str(),"READ");
+  if (tempfile->IsZombie()){
+    ERR(FTL) << "Can't find file in " << fName << endl;
+    ERR(FTL) << "location = " << rootname << endl;
+    throw;
+  }
+
+  // Get Name
+  std::string tagname = inputlist[1];
+  //  TVector<std::string> dialtags = tempfile->Get(tagname.c_str());
+  //  if (!dialtags){
+  //    ERR(FTL) << "Can't find list of dial names!" << endl;
+  //  }
+  
+  // Get Values 
+  std::string valuename  = inputlist[2];
+  TVectorD* dialvals = (TVectorD*)tempfile->Get(valuename.c_str());
+  if (!dialvals){
+    ERR(FTL) << "Can't find dial values" << endl;
+  }
+
+  // Get Matrix 
+  std::string matrixname = inputlist[3];
+  TMatrixD* matrixvals = (TMatrixD*)tempfile->Get(matrixname.c_str());
+  if (!matrixvals){
+    ERR(FTL) << "Can't find matirx values" << endl;
+  }
+ 
+  // Get Types
+  if (inputlist.size() > 4){
+    std::string typesname  = inputlist[3];
+  }
+
+  // Get Minimum
+  if (inputlist.size() > 5){
+    std::string minname = inputlist[4];
+  }
+
+  // Get Maximum
+  if (inputlist.size() > 6){
+    std::string maxname = inputlist[5];
+  }
   
 }
 
@@ -237,11 +315,43 @@ void ParamPull::ReadDialInput(std::string input){
 
   std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
   if (inputlist.size() < 3){
-    ERR(FTL) << "" << endl;
+    ERR(FTL) << "Need 3 inputs for dial input in " << fName << endl;
+    ERR(FTL) << "Inputs: " << input << endl;
+    throw;
   }
 
-  ERR(FTL) << " DIAL Files not yet supported in ParamPull! " << endl;
+  std::vector<double> inputvals = PlotUtils::FillVectorDFromString(input,";");
+  std::string dialname = inputlist[0];
+  double val = inputvals[1];
+  double err = inputvals[2];
+
+  cout << "Reading " << val << " " << err << endl;
   
+  fDataHist = new TH1D( (fName + "_data").c_str(),
+			(fName + "_data" + fPlotTitles).c_str(), 1, 0, 1);
+  fDataHist->SetBinContent(1, val);
+  fDataHist->SetBinError(1, err);
+  fDataHist->GetXaxis()->SetBinLabel(1, dialname.c_str());
+
+  fCovar = NULL;
+}
+
+//*******************************************************************************   
+std::map<std::string, int> ParamPull::GetAllDials(){
+//*******************************************************************************   
+
+  std::map<std::string, int> dialtypemap;
+  
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++){
+
+    std::string name = fDataHist->GetXaxis()->GetBinLabel(i+1);
+    int type = fTypeHist->GetBinContent(i+1);
+    
+    dialtypemap[name] = type;
+    
+  }
+
+  return dialtypemap;
 }
 
 
@@ -249,6 +359,7 @@ void ParamPull::ReadDialInput(std::string input){
 bool ParamPull::CheckDialsValid(){
 //*******************************************************************************
 
+  return true;
   std::string helpstring = "";
   
   for (int i = 0; i < fDataHist->GetNbinsX(); i++){
@@ -290,6 +401,7 @@ bool ParamPull::CheckDialsValid(){
   } else {
     return true;
   }
+  
 }
 
     
@@ -312,7 +424,7 @@ void ParamPull::Reconfigure(){
     for (int j = 0; j < fMCHist->GetNbinsX(); j++){
 
       // If Match set value
-      if (!syst.compare( fMCHist->GetXaxis()->GetBinLabel(j+1))){
+      if (!syst.compare( fMCHist->GetXaxis()->GetBinLabel(j+1) )){
 	
 	double curval = rw->GetDialValue(syst, fDialOptions);
 	fMCHist->SetBinContent(j+1, curval);
@@ -321,9 +433,72 @@ void ParamPull::Reconfigure(){
   }
 
   return;
-
 };
 
+//*******************************************************************************  
+void ParamPull::ResetToy(void){
+//*******************************************************************************  
+
+  if (fDataHist) delete fDataHist;
+
+  cout << "Resetting toy" << endl;
+  cout << fDataTrue << endl;
+  fDataHist = (TH1D*)fDataTrue->Clone();
+  cout << "Setting name" << endl;
+  fDataHist->SetNameTitle( (fName + "_data").c_str(),
+			   (fName + " data" + fPlotTitles).c_str() );
+  
+}
+
+
+    
+//******************************************************************************* 
+void ParamPull::SetFakeData(std::string fakeinput){
+//******************************************************************************* 
+
+  // Set from MC Setting
+  if (!fakeinput.compare("MC")){
+
+    // Copy MC into data
+    if (fDataHist) delete fDataHist;
+    fDataHist = (TH1D*)fMCHist->Clone();
+    fDataHist->SetNameTitle( (fName + "_data").c_str(),
+			     (fName + " fakedata" + fPlotTitles).c_str() );
+
+    // Copy original data errors
+    for (int i = 0; i < fDataOrig->GetNbinsX(); i++){
+      fDataHist->SetBinError(i+1, fDataOrig->GetBinError(i+1) );
+    }
+
+    // Make True Toy Central Value Hist
+    fDataTrue = (TH1D*) fDataHist->Clone();
+    fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
+			     (fName + " truedata" + fPlotTitles).c_str() );
+    
+  } else {
+
+    ERR(FTL) << "Trying to set fake data for ParamPulls not from MC!" << endl;
+    ERR(FTL) << "Not currently implemented.." << endl;
+    throw;
+    
+  }
+}
+
+//*******************************************************************************  
+void ParamPull::RemoveFakeData(){
+//*******************************************************************************
+
+  delete fDataHist;
+  fDataHist = (TH1D*)fDataOrig->Clone();
+  fDataHist->SetNameTitle( (fName + "_data").c_str(),
+			   (fName + " data" + fPlotTitles).c_str() );
+  
+  fDataTrue = (TH1D*) fDataHist->Clone();
+  fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
+			   (fName + " truedata" + fPlotTitles).c_str() );
+
+}
+  
 //******************************************************************************* 
 double ParamPull::GetLikelihood(){
 //*******************************************************************************
@@ -334,7 +509,8 @@ double ParamPull::GetLikelihood(){
 
   // Gaussian Calculation with correlations
   case kGausPull:
-    like = StatUtils::GetLikelihoodFromCov(fDataHist, fMCHist, fInvCovar, NULL);
+    like = StatUtils::GetChi2FromCov(fDataHist, fMCHist, fInvCovar, NULL);
+    like *= 1E-76;
     break;
 
   // Default says this has no pull
@@ -343,7 +519,10 @@ double ParamPull::GetLikelihood(){
     like = 0.0;
     break;
   }
-  
+
+
+  cout << "Likelihood = " << like << " " << fCalcType << endl;
+  sleep(1);
   return like;
   
 };
@@ -368,6 +547,7 @@ void ParamPull::ThrowCovariance(){
 
   // Reset toy for throw
   ResetToy();
+  cout << "Toy Reset " << endl;
   
   // Generate random Gaussian throws
   std::vector<double> randthrows;
@@ -407,6 +587,10 @@ void ParamPull::ThrowCovariance(){
     fDataHist->SetBinContent(i+1,fDataHist->GetBinContent(i+1) + binmod);
   }
 
+  // Rename
+  fDataHist->SetNameTitle( (fName + "_data").c_str(),
+			   (fName + " toydata" + fPlotTitles).c_str() );
+  
   // Print Status
   LOG(REC) << "Created new toy histogram. Total Fractional Dif = "
 	   << totalres << endl;

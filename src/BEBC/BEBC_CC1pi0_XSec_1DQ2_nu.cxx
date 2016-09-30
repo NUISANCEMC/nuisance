@@ -27,7 +27,7 @@ BEBC_CC1pi0_XSec_1DQ2_nu::BEBC_CC1pi0_XSec_1DQ2_nu(std::string inputfile, FitWei
   EnuMin = 5.;
   EnuMax = 200.;
   isDiag = true;
-  normError = 0.20;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi0_on_n_W14_edit.txt");

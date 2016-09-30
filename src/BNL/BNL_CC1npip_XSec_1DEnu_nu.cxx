@@ -27,7 +27,7 @@ BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMin = 0.;
   EnuMax = 3.0;
   isDiag = true;
-  normError = 0.15;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_1986.txt");

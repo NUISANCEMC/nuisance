@@ -27,7 +27,7 @@ FNAL_CC1ppip_XSec_1DEnu_nu::FNAL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
   EnuMin = 10.0;
   EnuMax = 100.0;
   isDiag = true;
-  normError = 0.20;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/FNAL/CC1pip_on_p/fnal78-numu-p-to-mu-p-piplus-lowW_edges.txt");

@@ -239,7 +239,7 @@ protected:
   TMatrixDSym *correl;     //!< Correlation Matrix
   TMatrixD *smear;         //!< Smearing matrix (note, this is not symmetric, and also in general not square)
   double covDet;     //!< Determinant of the covariance
-  double normError;  //!< Sample norm error
+  double fNormError;  //!< Sample norm error
   std::string fitType;
 
   // Arrays for data entries

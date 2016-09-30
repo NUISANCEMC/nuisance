@@ -226,7 +226,7 @@ protected:
   TMatrixDSym *decomp; //!< decomposed covariance matrix
   TMatrixDSym *correl; //!< correlation matrix
   double covDet;  //!< covariance deteriminant
-  double normError; //!< Normalisation on the error on the data
+  double fNormError; //!< Normalisation on the error on the data
 
   // Arrays for data entires
   Double_t* xBins; //!< X Bin Edges

@@ -30,7 +30,7 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
   EnuMin = 0.;
   EnuMax = 3.;
   isDiag = true;
-  normError = 0.107;
+  fNormError = 0.107;
   default_types = "FIX/DIAG";
   allowed_types = "FIX,FREE,SHAPE/DIAG/NORM";
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

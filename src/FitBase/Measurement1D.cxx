@@ -768,11 +768,9 @@ double Measurement1D::GetLikelihood(){
 
   // Sort Penalty Terms
   if (this->addNormPenalty){
-    double penalty = (1. - this->currentNorm)*(1. - this->currentNorm)/(this->normError*this->normError);
+    double penalty = (1. - this->currentNorm)*(1. - this->currentNorm)/(this->fNormError*this->fNormError);
     stat += penalty;
   }
-
-  LOG(REC) << this->fName<<": Sample Chi^2 = " << stat <<std::endl;
 
   // Return to normal scaling
   if (this->isShape){

@@ -27,7 +27,7 @@ MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(std::string inputfi
   EnuMin = 0.5;
   EnuMax = 2.;
   isDiag = true;
-  normError = 0.107;
+  fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/dxsecdq2_edit.txt");

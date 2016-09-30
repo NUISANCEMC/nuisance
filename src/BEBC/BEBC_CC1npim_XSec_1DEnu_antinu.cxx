@@ -27,7 +27,7 @@ BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string input
   EnuMin = 5.;
   EnuMax = 200.;
   isDiag = true;
-  normError = 0.20;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/theses/BEBC_theses_ANU_CC1pi-_nFin_W14.txt");

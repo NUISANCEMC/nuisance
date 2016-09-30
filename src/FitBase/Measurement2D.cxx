@@ -749,8 +749,8 @@ double Measurement2D::GetLikelihood(){
 
   // Add a normal penalty term
   if (this->addNormPenalty){
-    chi2 += (1- (this->currentNorm))*(1-(this->currentNorm))/(this->normError*this->normError);
-    LOG(REC)<<"Norm penalty = "<<(1- (this->currentNorm ))*(1-(this->currentNorm))/(this->normError*this->normError)<<std::endl;
+    chi2 += (1- (this->currentNorm))*(1-(this->currentNorm))/(this->fNormError*this->fNormError);
+    LOG(REC)<<"Norm penalty = "<<(1- (this->currentNorm ))*(1-(this->currentNorm))/(this->fNormError*this->fNormError)<<std::endl;
   }
 
 

@@ -55,7 +55,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   
   // Diagonal covar setup
   if (!isShape) addNormPenalty = true;
-  normError = 0.089; // Set from covar mat instead...
+  fNormError = 0.089; // Set from covar mat instead...
 
   cout << " Inputs = "<<this->GetInput()<<std::endl;
   

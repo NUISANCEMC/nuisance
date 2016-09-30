@@ -33,7 +33,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 3.;
-  normError = 0.130;
+  fNormError = 0.130;
   default_types="FIX/DIAG";
   allowed_types="FIX,FREE,SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

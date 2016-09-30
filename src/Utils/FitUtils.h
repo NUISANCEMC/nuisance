@@ -64,6 +64,9 @@ namespace FitUtils{
   //! Function to produce a histogram indicating the fraction of events which have q3 < qCut
   TH2D* CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int nuPDG, double eMin, double eMax);
 
+  //! Return a vector of all values saved in map
+  double* GetArrayFromMap(std::vector<std::string> invals, std::map<std::string, double> inmap);
+  
   /*
     MISC Event
   */

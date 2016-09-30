@@ -27,7 +27,7 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   EnuMin = 0.;
   EnuMax = 6.0;
   isDiag = true;
-  normError = 0.15;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
   // THIS IS DEFINITELY DODGY WITH THE "CORRECTION"; EnuMax for BNL definitely stops at 3GeV because of flux uncertainties, although correction goes to 6!
 

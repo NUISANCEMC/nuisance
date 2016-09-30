@@ -1025,6 +1025,13 @@ void minimizerRoutines::SaveMinimizerState(){
   TH1D minvar   = TH1D("min_dials","min_dials",NPARS,0,NPARS);
   TH1D maxvar   = TH1D("max_dials","max_dials",NPARS,0,NPARS);
 
+  TH1D dialvarfree = TH1D("fit_dials_free","fit_dials_free",NFREE,0,NFREE);
+  TH1D startvarfree = TH1D("start_dials_free","start_dials_free",NFREE,0,NFREE);
+  TH1D minvarfree   = TH1D("min_dials_free","min_dials_free",NFREE,0,NFREE);
+  TH1D maxvarfree   = TH1D("max_dials_free","max_dials_free",NFREE,0,NFREE);
+
+  int freecount = 0;
+  
   for (UInt_t i = 0; i < nameVect.size(); i++){
     std::string name = nameVect.at(i);
 
@@ -1040,6 +1047,24 @@ void minimizerRoutines::SaveMinimizerState(){
 
     maxvar.SetBinContent(i+1,   maxVect.at(i));
     maxvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
+
+    if (!startfixVect.at(i)){
+      freecount++;
+
+      dialvarfree.SetBinContent(freecount, valVect.at(i));
+      dialvarfree.SetBinError(freecount, errVect.at(i));
+      dialvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+
+      startvarfree.SetBinContent(freecount, startVect.at(i));
+      startvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+
+      minvarfree.SetBinContent(freecount,   minVect.at(i));
+      minvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+
+      maxvarfree.SetBinContent(freecount,   maxVect.at(i));
+      maxvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+      
+    }
   }
 
   // Save Dial Plots
@@ -1048,6 +1073,11 @@ void minimizerRoutines::SaveMinimizerState(){
   minvar.Write();
   maxvar.Write();
 
+  dialvarfree.Write();
+  startvarfree.Write();
+  minvarfree.Write();
+  maxvarfree.Write();
+  
   // Save TString for fCardFile
 
   // Save fit_status plot

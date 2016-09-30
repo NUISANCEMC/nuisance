@@ -92,6 +92,19 @@ TH2D* FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int 
   return qCutHist;
 };
 
+//********************************************************************
+double* FitUtils::GetArrayFromMap(std::vector<std::string> invals, std::map<std::string, double> inmap){
+//********************************************************************
+
+  double* outarr = new double[invals.size()];
+  int count = 0;
+
+  for (int i = 0; i < invals.size(); i++){
+    outarr[count++] = inmap[invals.at(i)];
+  }
+  
+  return outarr;
+}
 /*
   MISC Event
 */
