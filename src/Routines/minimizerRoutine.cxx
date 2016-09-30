@@ -435,7 +435,7 @@ void minimizerRoutine::readSamples(std::string sampleString){
       currentNorms[samplename] = 1.0;
       errorNorms[samplename]   = 1.0;
 
-    } else if (val == 2) {
+    } else if (val == 3) {
 
       sampleTypes[samplename]  = token;
       bool fixed = (token.find("FREE") == std::string::npos);
@@ -448,7 +448,7 @@ void minimizerRoutine::readSamples(std::string sampleString){
       currentNorms[samplename] = 1.0;
       errorNorms[samplename]   = 0.0;
 
-    } else if (val == 3) { sampleFiles[samplename] = token;
+    } else if (val == 2) { sampleFiles[samplename] = token;
     } else if (val == 4){
       if (entry > 0.3 and entry < 1.7) {
 	sampleNorms[samplename]  = entry;

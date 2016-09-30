@@ -23,7 +23,9 @@ The following instructions should be used to build the fitter after checking out
    "$ make docs"
 6. Install to build location
    "$ make install"
-
+7. Source the setup script
+   "$ source Linux/setup.sh"
+   
 --- Adding Classes
     The fitter is designed to be easily extended by adding new measurement classes whilst keeping the input convertors and tuning functionality the same.
     The Devel module folder is setup with some examples of how to add new classes into the framework. Feel free to email me if there are difficulties adding new measurements.

@@ -38,7 +38,7 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
-include_directories(${CMAKE_SOURCE_DIR}/src/Minimizer)
+include_directories(${CMAKE_SOURCE_DIR}/src/Routines)
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)

@@ -120,6 +120,14 @@ int FitWeight::GetDialEnum(std::string name, int type) {
     case kNUWRO: {
 #ifdef __NUWRO_REWEIGHT_ENABLED__  // --- NUWRO BLOCK
       int nuwro_enum = (int)nuwro::rew::NuwroSyst::FromString(name);
+      if (nuwro_enum <= 0){
+	ERR(FTL) << "Uknown NuWro RW Parameter!" << endl;
+	ERR(FTL) << "Check '"
+		 << name
+		 << "' matches that in NuWroSyst.h"
+		 << endl;
+	throw;
+      }
       this_enum = nuwro_enum + offset;
 #else
       ERR(FTL) << "NUWRO RW Not Enabled!" << endl;

@@ -90,7 +90,11 @@ if [[ "@USE_GENIE@" != "0" ]]; then
 fi
 
 if [[ "@USE_NIWG@" != "0" ]]; then
-  echo "[INFO]: Adding NIWG paths to the environment."
+    echo "[INFO]: Adding NIWG paths to the environment."
+    export NIWG="@NIWG@"
+    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG@/:"* ]]; then
+	export LD_LIBRARY_PATH=@NIWG@/:$LD_LIBRARY_PATH
+    fi
 fi
 
 if [[ "@USE_NEUT@" != "0" ]]; then
