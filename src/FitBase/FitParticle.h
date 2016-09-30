@@ -50,6 +50,13 @@
  *  @{
  */
 
+enum particle_state{
+  kUndefinedState = -1,
+  kInitialState   = 0,
+  kFSIState       = 1,
+  kFinalState     = 2
+};
+
 //! Condensed FitParticle class which acts a common format between the generators
 class FitParticle {
 

@@ -30,8 +30,8 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   // Initial Setup
   fMaxEvents    = FitPar::Config().GetParI("MAXEVENTS");
   fIsJointInput = false;
-  fEvent        = FitEvent();
-  fSignalEvent  = BaseFitEvt();
+  fEvent        = new FitEvent();
+  fSignalEvent  = new BaseFitEvt();
   fInput        = infile_name;
   fName         = handle;
 
@@ -174,7 +174,7 @@ void InputHandler::ReadEventSplineFile() {
   for (int i = 0; i < fNEvents; i++) {
     tn->GetEntry(i);
     tn->Show(i);
-    fAllSplines.push_back(*fEvent.dial_coeff);
+    fAllSplines.push_back(*fEvent->dial_coeff);
   }
 
   // Set MAXEVENTS CALC Here before we load in splines
@@ -320,14 +320,14 @@ void InputHandler::ReadJointFile() {
     fEventType = 0;
     fNeutVect = NULL;
     tn->SetBranchAddress("vectorbranch", &fNeutVect);
-    fEvent.SetEventAddress(&fNeutVect);
+    fEvent->SetEventAddress(&fNeutVect);
 #endif
   } else if (temp_type == 1) {
 #ifdef __NUWRO_ENABLED__
     fEventType = 1;
     fNuwroEvent = NULL;
     tn->SetBranchAddress("e", &fNuwroEvent);
-    fEvent.SetEventAddress(&fNuwroEvent);
+    fEvent->SetEventAddress(&fNuwroEvent);
 #endif
   }
 
@@ -394,7 +394,7 @@ void InputHandler::ReadNeutFile() {
   tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent.SetEventAddress(&fNeutVect);
+  fEvent->SetEventAddress(&fNeutVect);
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file" << std::endl;
@@ -429,7 +429,7 @@ void InputHandler::ReadNuWroFile() {
   fNEvents = tn->GetEntries();
   fNuwroEvent = NULL;
   tn->SetBranchAddress("e", &fNuwroEvent);
-  fEvent.SetEventAddress(&fNuwroEvent);
+  fEvent->SetEventAddress(&fNuwroEvent);
 
   // Check if we have saved an xsec histogram before
   fFluxHist = (TH1D*)fInputRootFile->Get(
@@ -588,9 +588,9 @@ void InputHandler::ReadNuWroFile() {
     TFile* temp_save_file = new TFile(fInputFile.c_str(), "UPDATE");
     temp_save_file->cd();
 
-    fFluxHist->Write("nuwro_flux", TObject::kOverwrite);
-    fEventHist->Write("nuwro_evtrt", TObject::kOverwrite);
-    fXSecHist->Write("nuwro_xsec", TObject::kOverwrite);
+    fFluxHist->Write("FluxHist", TObject::kOverwrite);
+    fEventHist->Write("EventHist", TObject::kOverwrite);
+    fXSecHist->Write("XSecHist", TObject::kOverwrite);
     temp_save_file->ls();
 
 
@@ -666,7 +666,7 @@ void InputHandler::ReadGenieFile() {
   fEventHist->Reset();
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent.SetEventAddress(&fGenieNtpl);
+  fEvent->SetEventAddress(&fGenieNtpl);
 
   LOG(SAM) << "Processing GENIE flux events." << std::endl;
   for (int i = 0; i < fNEvents; i++) {
@@ -771,7 +771,7 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
 
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
-  fEvent.SetEventAddress(giRead);
+  fEvent->SetEventAddress(giRead);
 #endif
 }
 
@@ -842,7 +842,7 @@ void InputHandler::ReadNuanceFile() {
   tn->SetBranchAddress("hadron", &fNuanceEvt->hadron);
   tn->SetBranchAddress("p_hadron", &fNuanceEvt->p_hadron);
   
-  fEvent.SetEventAddress(&fNuanceEvt);
+  fEvent->SetEventAddress(&fNuanceEvt);
 
   fFluxHist = new TH1D((fName + "_FLUX").c_str(),
 			     (fName + "_FLUX").c_str(), 1, 0.0, 1.0);
@@ -886,12 +886,12 @@ void InputHandler::PrintStartInput() {
 
   // Get First event info
   tn->GetEntry(0);
-  fEvent.CalcKinematics();
-  LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent.PartInfo(0)->fPID
+  fEvent->CalcKinematics();
+  LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent->PartInfo(0)->fPID
            << std::endl;
-  LOG(SAM) << "             Target A     = " << fEvent.TargetA
+  LOG(SAM) << "             Target A     = " << fEvent->GetTargetA()
            << std::endl;
-  LOG(SAM) << "             Target Z     = " << fEvent.TargetZ
+  LOG(SAM) << "             Target Z     = " << fEvent->GetTargetZ()
            << std::endl;
 }
 
@@ -900,10 +900,10 @@ std::string InputHandler::GetInputStateString() {
 //********************************************************************
   
   tn->GetEntry(0);
-  fEvent.CalcKinematics();
+  fEvent->CalcKinematics();
   std::ostringstream state;
-  state << "T" << fEventType << "_PDG" << fEvent.PartInfo(0)->fPID << "_Z"
-        << fEvent.TargetZ << "_A" << fEvent.TargetA;
+  state << "T" << fEventType << "_PDG" << fEvent->PartInfo(0)->fPID << "_Z"
+        << fEvent->GetTargetZ() << "_A" << fEvent->GetTargetA();
 
   return state.str();
 }
@@ -923,11 +923,11 @@ void InputHandler::ReadEvent(unsigned int i) {
   if (using_events) {
     tn->GetEntry(i);
 
-    if (fEventType != kEVTSPLINE) fEvent.CalcKinematics();
+    if (fEventType != kEVTSPLINE) fEvent->CalcKinematics();
 
-    fEvent.Index = i;
+    fEvent->Index = i;
     fEventIndex  = i;
-    fEvent.InputWeight = GetInputWeight(i);
+    fEvent->InputWeight = GetInputWeight(i);
 
   } else {
     GetTreeEntry(i);
@@ -941,10 +941,10 @@ void InputHandler::GetTreeEntry(const Long64_t i) {
   if (fEventType != kEVTSPLINE)
     tn->GetEntry(i);
   else
-    (*(fEvent.dial_coeff)) = fAllSplines.at(i);
+    (*(fEvent->dial_coeff)) = fAllSplines.at(i);
 
   fEventIndex = i;
-  fEvent.InputWeight = GetInputWeight(i);
+  fEvent->InputWeight = GetInputWeight(i);
 }
 
 //********************************************************************
@@ -952,7 +952,7 @@ double InputHandler::GetInputWeight(const int entry) {
 //********************************************************************
 
   if (fEventType == kGiBUU) {
-    return fEvent.InputWeight;
+    return fEvent->InputWeight;
   }
 
   if (!fIsJointInput) {

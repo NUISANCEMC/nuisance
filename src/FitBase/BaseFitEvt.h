@@ -139,12 +139,12 @@ class BaseFitEvt {
 
 // NEUT : Default
 #ifdef __NEUT_ENABLED__
-  NeutVect* neut_event;  //!< Pointer to Neut Vector
+  NeutVect* fNeutVect;  //!< Pointer to Neut Vector
 #endif
 
 // NUWRO
 #ifdef __NUWRO_ENABLED__
-  event* nuwro_event;  //!< Pointer to Nuwro event
+  event* fNuwroEvent;  //!< Pointer to Nuwro event
 #endif
 
 // GENIE

@@ -570,14 +570,14 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 #ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
     case kNEUT:
       if (fIsUsingNeut) {
-        GeneratorUtils::FillNeutCommons(evt->neut_event);
+        GeneratorUtils::FillNeutCommons(evt->fNeutVect);
         rw_weight *= fNeutRW->CalcWeight();
       }
 
 #ifdef __NIWG_ENABLED__  // --- NIWG BLOCK
       if (fIsUsingNIWG) {
         niwg::rew::NIWGEvent* niwg_event =
-            GeneratorUtils::GetNIWGEvent(evt->neut_event);
+            GeneratorUtils::GetNIWGEvent(evt->fNeutVect);
         rw_weight *= fNIWGRW->CalcWeight(*niwg_event);
         delete niwg_event;
       }
@@ -585,7 +585,7 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 
 #ifdef __T2KREW_ENABLED__
       if (fIsUsingT2K) {
-        rw_weight *= fT2KRW->CalcWeight(evt->neut_event);
+        rw_weight *= fT2KRW->CalcWeight(evt->fNeutVect);
       }
 #endif
 
@@ -595,7 +595,7 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
     case kNUWRO:
       if (fIsUsingNuwro) {
-        rw_weight *= fNuwroRW->CalcWeight(evt->nuwro_event);
+        rw_weight *= fNuwroRW->CalcWeight(evt->fNuwroEvent);
       }
       break;
 #endif

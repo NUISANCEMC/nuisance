@@ -79,136 +79,129 @@ class Measurement1D : public MeasurementBase {
   //! Initialise values to NULL
   void Init(void);
 
-  /*
-    Setup Functions
-  */
+
   //! Setup the measurement with input values. This automatically handles parsing the fit type and data.
-  virtual void SetupMeasurement(std::string input, std::string type, FitWeight *rw, std::string fkdt);
+  virtual void SetupMeasurement(std::string input, std::string type,
+				FitWeight *rw, std::string fkdt);
 
   //! Setup the default MC histograms from the currently set fDataHist.
-  virtual void SetupDefaultHist(void);
+  virtual void SetupDefaultHist (void);
 
   //! Set fit options by parsing type
-  virtual void SetFitOptions(std::string opt);
+  virtual void SetFitOptions (std::string opt);
 
   //! Setup the data values from a text file
-  virtual void SetDataValues(std::string dataFile);
+  virtual void SetDataValues (std::string dataFile);
 
   //! Setup the data values by reading in a histogram from a TFile
-  virtual void SetDataFromFile(std::string inhistfile, std::string histname);
+  virtual void SetDataFromFile (std::string inhistfile,
+				std::string histname);
 
   //! Setup the data by reading in a histogram from the database.
-  virtual void SetDataFromDatabase(std::string inhistfile, std::string histname);
+  virtual void SetDataFromDatabase (std::string inhistfile,
+				    std::string histname);
 
   //! Read the covariance matrix from a root file (automatically grabs plot "covar")
-  virtual void SetCovarMatrix(std::string covarFile);
+  virtual void SetCovarMatrix (std::string covarFile);
 
   //! Read the covariance matrix from a text file given the covar size
-  virtual void SetCovarMatrixFromText(std::string covarFile, int dim);
+  virtual void SetCovarMatrixFromText (std::string covarFile, int dim);
 
   //! Set the covariance from a custom root file
-  virtual void SetCovarFromDataFile(std::string covarFile, std::string covName);
+  virtual void SetCovarFromDataFile (std::string covarFile,
+				     std::string covName);
 
   //! Set the smearing matrix from a text file given the size of the matrix
-  virtual void SetSmearingMatrix(std::string smearfile, int truedim, int recodim);
+  virtual void SetSmearingMatrix (std::string smearfile,
+				  int truedim, int recodim);
 
   //! Set the bin mask from a text file
-  virtual void SetBinMask(std::string maskFile);
+  virtual void SetBinMask (std::string maskFile);
 
-
-  /*
-    XSec Functions
-  */
-  //! Set the flux histogram from file
-  virtual void SetFluxHistogram(std::string fluxFile, int minE, int maxE, double fluxNorm);
+  //! Set the flux histogram from a ROOT file
+  virtual void SetFluxHistogram (std::string fluxFile,
+				int minE, int maxE, double fluxNorm);
 
   //! Get the total integrated flux between this samples energy range
-  virtual double TotalIntegratedFlux(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
+  virtual double TotalIntegratedFlux (std::string intOpt="width",
+				      double low=-9999.9, double high=-9999.9);
 
-  /*
-    Reconfigure Functions
-  */
-  //! Produce an MC prediction given the currently loaded bin splines
-
-  /*
-    Reconfigure LOOP
-  */
-
-  //! Reset histograms to zero
-  virtual void ResetAll(void);
-
-  //! Fill histograms using fXVar and Weight
-  virtual void FillHistograms(void);
-
-
-  //! Apply histogram scaling after reconfigure
-  virtual void ScaleEvents(void);
+  
+  //! Reset histograms to zero    
+  virtual void ResetAll       (void);
+  
+  //! Fill histograms using fXVar,Weight    
+  virtual void FillHistograms (void); 
+  
+  //! Scale to XSec Prediction  
+  virtual void ScaleEvents    (void); 
 
   //! Apply normalisation scale after reconfigure
-  virtual void ApplyNormScale(double norm);
+  virtual void ApplyNormScale (double norm);
 
   //! Apply smearing matrix to fMCHist
-  virtual void ApplySmearingMatrix(void);
+  virtual void ApplySmearingMatrix (void);
 
-  /*
-    Statistic Functions - Outsources to StatUtils
-  */
 
   //! Get the current Number of degrees of freedom accounting for bin masking.
-  virtual int GetNDOF(void);
+  virtual int GetNDOF (void);
 
   //! Get Likelihood of iteration
-  virtual double GetLikelihood(void);
+  virtual double GetLikelihood (void);
 
-  /*
-    Fake Data Functions
-  */
-
+  
   //! Set the fake data values from either a file, or MC using fakeOption="MC"
-  virtual void SetFakeDataValues(std::string fakeOption); // Set fDataHist from file
+  virtual void SetFakeDataValues (std::string fakeOption); 
 
   //! Reset the fake data back to original fake data (Reset to before ThrowCovariance was called)
-  virtual void ResetFakeData(void);
+  virtual void ResetFakeData (void);
 
   //! Reset the fake data back to the true original dataset for this sample
-  virtual void ResetData(void);
+  virtual void ResetData (void);
 
   //! Generate fake data by throwing the current fDataHist using the covariance.
   //! Can be used on fake MC data or just the original dataset.
-  virtual void ThrowCovariance(void);
+  virtual void ThrowCovariance (void);
 
   // Get MC Histogram Stack
-  virtual THStack GetModeStack(void);
+  virtual THStack GetModeStack (void);
 
-  /*
-    Access Functions
-  */
 
-  TH1D* GetMCHistogram   (void) { return fMCHist;   };
-  TH1D* GetDataHistogram (void) { return fDataHist; };
+
+  /// Get Histogram Functions
+  inline TH1D* GetMCHistogram   (void) { return fMCHist;   };
+  inline TH1D* GetDataHistogram (void) { return fDataHist; };
+
   virtual std::vector<TH1*> GetMCList   (void);
   virtual std::vector<TH1*> GetDataList (void);
-  virtual std::vector<TH1*> GetMaskList (void) { return std::vector<TH1*> (1, fMaskHist); };
-  virtual std::vector<TH1*> GetFineList (void) { return std::vector<TH1*> (1, fMCFine);   };
+
+  inline virtual std::vector<TH1*> GetMaskList (void) {
+    return std::vector<TH1*> (1, fMaskHist);
+  };
+
+  inline virtual std::vector<TH1*> GetFineList (void) {
+    return std::vector<TH1*> (1, fMCFine);
+  };
 
   //! Get the bin contents and errors from fMCHist
-  virtual void GetBinContents(std::vector<double>& cont, std::vector<double>& err);
+  virtual void GetBinContents(std::vector<double>& cont,
+			      std::vector<double>& err);
 
   //! Get the covariance matrix as a pretty plot
-  virtual TH2D GetCovarMatrix(void){ return TH2D(*covar);};
+  inline virtual TH2D GetCovarMatrix (void) {
+    return TH2D(*covar);
+  };
 
   //! Return the integrated XSec for this sample, options define whether data or MC is returned.
   virtual std::vector<double> GetXSec(std::string opt);
 
-  /*
-    Write Functions
-  */
 
+  
   //! Save the current state to the current TFile directory
   virtual void Write(std::string drawOpt);
 
-
   //! array of histograms to handle fMCHist for each interaction channel.
+  //TODO (P.Stowell) Figure out why I put mcHist as unprotected! :S
   TH1D* fMCHist_PDG[61];
 
 protected:

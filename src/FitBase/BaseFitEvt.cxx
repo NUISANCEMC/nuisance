@@ -122,11 +122,11 @@ __attribute__((constructor)) void nuisance_init(void) {
 
 BaseFitEvt::BaseFitEvt() {
 #ifdef __NEUT_ENABLED__
-  neut_event = NULL;
+  fNeutVect = NULL;
 #endif
 
 #ifdef __NUWRO_ENABLED__
-  nuwro_event = NULL;
+  fNuwroEvent = NULL;
 #endif
 
 #ifdef __GENIE_ENABLED__
@@ -160,11 +160,11 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
   this->BinIndex = obj->Index;
 
 #ifdef __NEUT_ENABLED__
-  neut_event = obj->neut_event;
+  fNeutVect = obj->fNeutVect;
 #endif
 
 #ifdef __NUWRO_ENABLED__
-  nuwro_event = obj->nuwro_event;
+  fNuwroEvent = obj->fNuwroEvent;
 #endif
 
 #ifdef __GENIE_ENABLED__

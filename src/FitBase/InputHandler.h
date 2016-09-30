@@ -62,8 +62,8 @@ class InputHandler {
   double PredictedEventRate  (double low, double high, std::string intOpt="width");
   double TotalIntegratedFlux (double low, double high, std::string intOpt="width");
   
-  inline FitEvent*   GetEventPointer  (void) { return &fEvent;       };
-  inline BaseFitEvt* GetSignalPointer (void) { return &fSignalEvent; };
+  inline FitEvent*   GetEventPointer  (void) { return fEvent;       };
+  inline BaseFitEvt* GetSignalPointer (void) { return fSignalEvent; };
 
   inline int GetNEvents (void) const { return fNEvents; };
   int GetGenEvents (void);
@@ -88,9 +88,9 @@ class InputHandler {
 
  protected:
 
-  FitEvent fEvent;
+  FitEvent* fEvent;
   int fEventType;
-  BaseFitEvt fSignalEvent;
+  BaseFitEvt* fSignalEvent;
   
   FitSplineHead* fSplineHead;
 

@@ -89,17 +89,17 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   for (UInt_t j = 2; j < event->Npart(); ++j){
     
     int PID = abs((event->PartInfo(j))->fPID);
-
-    // Look for the outgoing muon
-    if (PID == 13 or (ccqelike and PID == -13)){
+    if (!event->PartInfo(j)->fIsAlive) continue;
+    
+    if (PID != 13 and !ccqelike)     continue;
+    if (abs(PID) != 13 and ccqelike) continue;
     
       // Now find the Q2QE value and fill the histogram
-      q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
-			       cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 
-			       34., true);
-     
-      break;
-    }
+    q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
+			     cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 
+			     34., true);
+    
+    break; 
   }
 
   // Set X Variables
