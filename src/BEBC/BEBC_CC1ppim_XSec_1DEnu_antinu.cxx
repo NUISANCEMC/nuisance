@@ -26,7 +26,7 @@ BEBC_CC1ppim_XSec_1DEnu_antinu::BEBC_CC1ppim_XSec_1DEnu_antinu(std::string input
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 5.;
   EnuMax = 200.;
-  isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
+  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
   fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
@@ -36,8 +36,8 @@ BEBC_CC1ppim_XSec_1DEnu_antinu::BEBC_CC1ppim_XSec_1DEnu_antinu(std::string input
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
-  //this->fScaleFactor = double(1.0E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  //this->fScaleFactor = double(1.0E-38)/double(fNEvents)*(16./8.);
 };
 
 void BEBC_CC1ppim_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {

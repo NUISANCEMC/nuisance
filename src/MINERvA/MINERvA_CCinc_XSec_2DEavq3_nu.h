@@ -42,7 +42,7 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
     /* delete difHist; */
     /* delete evtsignalHist; */
     /* delete fluxsignalHist; */
-    /* delete mapHist; */
+    /* delete fMapHist; */
     /* delete status; */
     /* delete PDGHistogram; */
     

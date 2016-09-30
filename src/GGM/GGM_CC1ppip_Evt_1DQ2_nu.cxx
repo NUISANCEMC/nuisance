@@ -27,8 +27,8 @@ GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
   EnuMin = 1;
   EnuMax = 10;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/GGM/CC1pip_on_p/GGM_CC1ppip_Q2_events_bin_edit.txt");
@@ -43,7 +43,7 @@ GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents+0.)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
 };
 
 

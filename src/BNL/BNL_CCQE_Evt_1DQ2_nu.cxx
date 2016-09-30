@@ -35,8 +35,8 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
   
   // override input options
-  isDiag = true;
-  isRawEvents =true;
+  fIsDiag = true;
+  fIsRawEvents =true;
   EnuVsQ2 = new TH2D("EnuVsQ2","EnuVsQ2",25,0.0,10.0,60,0.0,3.0);
 
   //Setup Plots
@@ -63,7 +63,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   this->fEventHist->Scale(this->fDataHist->Integral()/this->fEventHist->Integral());
   
   // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral()/(nevents+0.)); 
+  this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); 
   scaleF = -1.0;
 };
 
@@ -174,13 +174,13 @@ void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
   if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
   
   this->fMCHist->Scale(scaleF);
   this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, maskHist);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
     this->fMCHist_NoCorr->Scale(scaleF);
   }
   

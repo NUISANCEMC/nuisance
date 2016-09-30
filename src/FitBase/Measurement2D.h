@@ -98,7 +98,7 @@ class Measurement2D : public MeasurementBase {
   //! Set the covariance matrix from a text file
   virtual void SetCovarMatrixFromText(std::string covarFile, int dim);
 
-  //! Set the covariance matrix from a text file containing the cholesky decomposition
+  //! Set the covariance matrix from a text file containing the cholesky fDecomposition
   virtual void SetCovarMatrixFromChol(std::string covarFile, int dim);
 
   // virtual void SetMaskValuesFromText(std::string dataFile);
@@ -171,7 +171,7 @@ class Measurement2D : public MeasurementBase {
 
   virtual std::vector<TH1*> GetMCList();
   virtual std::vector<TH1*> GetDataList();
-  virtual std::vector<TH1*> GetMaskList(){return std::vector<TH1*> (1, maskHist);};
+  virtual std::vector<TH1*> GetMaskList(){return std::vector<TH1*> (1, fMaskHist);};
   virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, fMCFine);};
 
   //! Get bin contents and errors from fMCHist and fill a vector with them
@@ -194,9 +194,8 @@ protected:
 
   // The data histograms
   TH2D* fDataHist; //!< default data histogram (use in chi2 calculations)
-  TH2D* dataOrig; //!< histogram to store original data before throws.
-  TH2D* dataTrue; //!< histogram to store true dataset
-
+  TH2D* fDataOrig; //!< histogram to store original data before throws.
+  TH2D* fDataTrue; //!< histogram to store true dataset
   TH1D* fDataHist_X; //!< Projections onto X of the fDataHist
   TH1D* fDataHist_Y; //!< Projections onto Y of the fDataHist
 
@@ -204,55 +203,49 @@ protected:
   TH2D* fMCHist;  //!< MC Histogram (used in chi2 calculations)
   TH2D* fMCFine;  //!< Finely binned MC Histogram
   TH2D* fMCHist_PDG[61]; //!< MC Histograms for each interaction mode
-
   TH1D* fMCHist_X; //!< Projections onto X of the fMCHist
   TH1D* fMCHist_Y; //!< Projections onto Y of the fMCHist
 
-  // Fake Data Flag
-  std::string fitType;
-  bool usingfakedata;  //!< is current data actually fake
+  TH2I* fMaskHist; //!< mask histogram for the data
+  TH2I* fMapHist; //!< map histogram used to convert 2D to 1D distributions     
+ 
+  bool fIsFakeData;  //!< is current data actually fake
   std::string fakeDataFile; //!< MC fake data input file
 
-  // Mask Histogram
-  TH2I* maskHist; //!< mask histogram for the data
-  TH2I* mapHist; //!< map histogram used to convert 2D to 1D distributions
-
-  // Plot Titles for X Y and Z
   std::string fPlotTitles; //!< X and Y plot titles.
+  std::string fFitType;
+  std::string fDefaultTypes; //!< Default Fit Options
+  std::string fAllowedTypes; //!< Any allowed Fit Options  
+  
 
-  // The covariance matrix and its decomposition
   TMatrixDSym *covar;  //!< inverted covariance matrix
   TMatrixDSym *fullcovar;  //!< covariance matrix
-  TMatrixDSym *decomp; //!< decomposed covariance matrix
-  TMatrixDSym *correl; //!< correlation matrix
-  double covDet;  //!< covariance deteriminant
+  TMatrixDSym *fDecomp; //!< fDecomposed covariance matrix
+  TMatrixDSym *fCorrel; //!< correlation matrix
+  double fCovDet;  //!< covariance deteriminant
   double fNormError; //!< Normalisation on the error on the data
-
-  // Arrays for data entires
-  Double_t* xBins; //!< X Bin Edges
-  Double_t* yBins; //!< Y Bin Edges
-  Int_t data_points_x;  //!< Number of X data points
-  Int_t data_points_y;  //!< NUmber of Y data points
+  
+  Double_t* fXBins; //!< X Bin Edges
+  Double_t* fYBins; //!< Y Bin Edges
+  Int_t fNDataPointsX;  //!< Number of X data points
+  Int_t fNDataPointsY;  //!< NUmber of Y data points
 
   // Fit specific flags
-  bool isShape;   //!< Flag: Perform shape-only fit
-  bool isFree;    //!< Flag: Perform normalisation free fit
-  bool isDiag;    //!< Flag: Only use diagonal bin errors in stats
-  bool isMask;    //!< Flag: Apply bin masking
-  bool isRawEvents;   //!< Flag: Only event rates in histograms
-  bool isEnu;
-  bool isChi2SVD;   //!< Flag: Chi2 SVD Method (DO NOT USE)
-  bool addNormPenalty; //!< Flag: Add normalisation penalty to fi
-  bool isProjFitX; //!< Flag: Use 1D projections onto X and Y to calculate the Chi2 Method. If flagged X will be used to set the rate.
-  bool isProjFitY; //!< Flag: Use 1D projections onto X and Y to calculate the Chi2 Method. If flagged Y will be used to set the rate.
-  bool isFix;   //!< Flag: Fixed Histogram Norm
-  bool isFull;  //!< Flag; Use Full Covar
-  bool isDifXSec; //!< Flag: Differential XSec
-  bool isEnu1D;  //!< Flag: Flux Unfolded XSec
-  bool isChi2;  //!< Flag; Use Chi2 over LL
-
-  std::string default_types; //!< Default Fit Options
-  std::string allowed_types; //!< Any allowed Fit Options
+  bool fIsShape;   //!< Flag: Perform shape-only fit
+  bool fIsFree;    //!< Flag: Perform normalisation free fit
+  bool fIsDiag;    //!< Flag: Only use diagonal bin errors in stats
+  bool fIsMask;    //!< Flag: Apply bin masking
+  bool fIsRawEvents;   //!< Flag: Only event rates in histograms
+  bool fIsEnu;   //!< Needs Enu Unfolding
+  bool fIsChi2SVD;   //!< Flag: Chi2 SVD Method (DO NOT USE)
+  bool fAddNormPen; //!< Flag: Add normalisation penalty to fi
+  bool fIsProjFitX; //!< Flag: Use 1D projections onto X and Y to calculate the Chi2 Method. If flagged X will be used to set the rate.
+  bool fIsProjFitY; //!< Flag: Use 1D projections onto X and Y to calculate the Chi2 Method. If flagged Y will be used to set the rate.
+  bool fIsFix;   //!< Flag: Fixed Histogram Norm
+  bool fIsFull;  //!< Flag; Use Full Covar
+  bool fIsDifXSec; //!< Flag: Differential XSec
+  bool fIsEnu1D;  //!< Flag: Flux Unfolded XSec
+  bool fIsChi2;  //!< Flag; Use Chi2 over LL
 
 };
 

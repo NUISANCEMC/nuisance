@@ -566,12 +566,12 @@ void comparisonRoutines::ReconfigureAllEvents() {
       int input_id = (iterInp->first);
       InputHandler* cur_input = (iterInp->second);
       FitEvent* cust_event = cur_input->GetEventPointer();
-      int nevents = cur_input->GetNEvents();
-      int countwidth = (nevents / 200);
+      int fNEvents = cur_input->GetNEvents();
+      int countwidth = (fNEvents / 200);
       size_t NSignal = 0;
 
       // MAIN EVENT LOOP
-      for (int i = 0; i < nevents; i++) {
+      for (int i = 0; i < fNEvents; i++) {
         cust_event = FitBase::EvtManager().GetEvent(input_id, i);
         double Weight = cust_event->Weight;
         if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 ||

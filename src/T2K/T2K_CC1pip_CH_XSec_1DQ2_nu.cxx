@@ -6,24 +6,24 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
 
   EnuMin = 0.;
   EnuMax = 10.;
-  isDiag = false;
+  fIsDiag = false;
 
   // Here we can give either MB (kMB), extended MB (keMB) or Delta (kDelta)
   if (type.find("eMB") != std::string::npos) {
-    fitType = keMB;
+    fT2KSampleType = keMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
     fPlotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("MB") != std::string::npos) {
-    fitType = kMB;
+    fT2KSampleType = kMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
     fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("Delta") != std::string::npos) {
-    fitType = kDelta;
+    fT2KSampleType = kDelta;
     fName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
     fPlotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
   } else {
     std::cout << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
-    fitType = kMB;
+    fT2KSampleType = kMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
     fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   }
@@ -33,13 +33,13 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
   //type = keMB;
   //type = kDelta;
 
-  if (fitType == kMB) {
+  if (fT2KSampleType == kMB) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
-  } else if (fitType == keMB) {
+  } else if (fT2KSampleType == keMB) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
-  } else if (fitType == kDelta) {
+  } else if (fT2KSampleType == kDelta) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
   } else {
@@ -50,7 +50,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     
   this->SetupDefaultHist();
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now
@@ -144,7 +144,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   double q2 = -999;
 
-  switch(fitType) {
+  switch(fT2KSampleType) {
 
     // First int refers to how we reconstruct Enu
     // 0 uses true neutrino energy (not used here but common for other analyses when they unfold to true Enu from reconstructed Enu)
@@ -184,7 +184,7 @@ bool T2K_CC1pip_CH_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 // Warning: The CH analysis has different signal definition to the H2O analysis!
 //          Often to do with the Michel tag
 
-  switch(fitType) {
+  switch(fT2KSampleType) {
     // Using MiniBooNE formula for Enu reconstruction on the Q2 variable
     // Does have Michel e tag, set bool to true!
     case kMB:

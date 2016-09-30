@@ -26,8 +26,8 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
   EnuMax = 1.5; // Different EnuMax here, see M. Derrick et al, Phys Rev D, V23 N3, p572, Fig 2
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_ppi_CC1ppip.csv");
@@ -42,7 +42,7 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(nevents+0.)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*(16./8.);
 };
 
 void ANL_CC1ppip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {

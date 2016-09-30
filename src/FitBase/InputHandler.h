@@ -55,7 +55,7 @@ class InputHandler {
   void ReadNuWroFile       (void);
   void ReadEventSplineFile (void);
   void ReadJointFile       (void);
-  void ReadGiBUUFile(bool IsNuBarDominant);
+  void ReadGiBUUFile (bool IsNuBarDominant);
 
   FitSplineHead* GetSplineHead (void);
 
@@ -65,26 +65,25 @@ class InputHandler {
   inline FitEvent*   GetEventPointer  (void) { return &fEvent;       };
   inline BaseFitEvt* GetSignalPointer (void) { return &fSignalEvent; };
 
-  inline int GetNEvents (void)  const { return fNEvents; };
+  inline int GetNEvents (void) const { return fNEvents; };
   int GetGenEvents (void);
 
   void PrintStartInput (void);
-  void ReadEvent(unsigned int i);
+  void ReadEvent (unsigned int i);
 
-  inline TH1D* GetFluxHistogram (void)   { return fFluxHist;  };
-  inline TH1D* GetEventHistogram (void)  { return fEventHist; };
-  inline TH1D* GetXSecHistogram (void)   { return fXSecHist;  };
+  inline TH1D* GetFluxHistogram  (void) { return fFluxHist;  };
+  inline TH1D* GetEventHistogram (void) { return fEventHist; };
+  inline TH1D* GetXSecHistogram  (void) { return fXSecHist;  };
   
-  std::vector<TH1*> GetFluxList  (void) { return this->fluxList;  };
-  std::vector<TH1*> GetEventList (void) { return this->eventList; };
-  std::vector<TH1*> GetXSecList  (void) { return this->xsecList;  };
+  std::vector<TH1*> GetFluxList  (void) { return fFluxList;  };
+  std::vector<TH1*> GetEventList (void) { return fEventList; };
+  std::vector<TH1*> GetXSecList  (void) { return fXSecList;  };
 
   inline int GetType(void) const { return fEventType; };
+  
   bool CanIGoFast (void);
   void GetTreeEntry(const Long64_t entry);
   std::string GetInputStateString (void);
-
-  int eventType;
   double GetInputWeight(const int entry=-1);
 
  protected:
@@ -123,62 +122,22 @@ class InputHandler {
 
   std::vector<TArrayD> fAllSplines;
   
-  // Event Objects
+  // Horribly Wrapped Event Objects!
+  // Have to add this hear incase one generator isn't supported.
 #ifdef __NEUT_ENABLED__
   NeutVect *fNeutVect; //!< Pointer to NEUT Events
 #endif
-  
 #ifdef __NUWRO_ENABLED__
   event* fNuwroEvent; //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
 #endif
-  
 #ifdef __GENIE_ENABLED__
   GHepRecord* fGenieGHep;
   NtpMCEventRecord * fGenieNtpl; 
 #endif
-  
 #ifdef __NUANCE_ENABLED__
   NuanceEvent* fNuanceEvt;
 #endif
-  
-  
+    
   TChain* tn;
-
-  // input root files
-  TFile* inRootFile; //!< Input ROOT file (e.g NEUT MC)
-  std::string inFile; ///!< Name of input ROOT file
-  std::string inType; ///!< Input Type
-
-  std::vector<BaseFitEvt*> all_events;
-  std::string handleName;
-
-#ifdef __NEUT_ENABLED__
-  NeutVect *neut_event; //!< Pointer to NEUT Events
-#endif
-
-#ifdef __NUWRO_ENABLED__
-  event* nuwro_event; //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
-#endif
-
-#ifdef __GENIE_ENABLED__
-  GHepRecord* genie_event;  //!< Pointer to GENIE GHepRecord
-  NtpMCEventRecord * mcrec; //!< Pointer to GENIE NTuple Record
-#endif
-
-#ifdef __NUANCE_ENABLED__
-  NuanceEvent* nuance_event;
-#endif
-  
-  std::vector<int> joint_index_low;
-  std::vector<int> joint_index_high;
-  std::vector<TH1D*> joint_index_hist;
-  std::vector<double> joint_index_weight;
-  int cur_entry;
-
-  std::vector<TH1*> xsecList;
-  std::vector<TH1*> eventList;
-  std::vector<TH1*> fluxList;
-
-  std::vector<TArrayD> spline_list;
 };
 #endif

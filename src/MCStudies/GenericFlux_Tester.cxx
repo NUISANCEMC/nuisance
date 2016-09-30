@@ -35,9 +35,9 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   EnuMax = 100000.;  // Arbritrarily high energy limit
 
   // Set default fitter flags
-  isDiag = true;
-  isShape = false;
-  isRawEvents = false;
+  fIsDiag = true;
+  fIsShape = false;
+  fIsRawEvents = false;
 
   nu_4mom = 0;
   pmu = 0;
@@ -67,7 +67,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (nevents + 0.)) /
+  this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
                       this->TotalIntegratedFlux();
 
   LOG(SAM) << " Generic Flux Scaling Factor = "<< fScaleFactor << endl;
@@ -586,7 +586,7 @@ void GenericFlux_Tester::ApplyNormScale(float norm) {
   //********************************************************************
 
   // Saving everything to a TTree so no scaling required
-  this->currentNorm = norm;
+  this->fCurrentNorm = norm;
   return;
 }
 

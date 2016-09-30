@@ -32,17 +32,17 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
   splitMEC_PN_NN = FitPar::Config().GetParB("Modes.split_PN_NN");
   fNormError = 0.107;
-  default_types = "FIX/FULL";
-  allowed_types = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
+  fDefaultTypes = "FIX/FULL";
+  fAllowedTypes = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Binning for the 2D Histograms
-  this->data_points_x = 7;
-  this->data_points_y = 17;
+  this->fNDataPointsX = 7;
+  this->fNDataPointsY = 17;
   Double_t tempx[7] = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
   Double_t tempy[17] = {0.0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50, 0.60, 0.80};
-  this->xBins = tempx;
-  this->yBins = tempy;
+  this->fXBins = tempx;
+  this->fYBins = tempy;
   
   // Fill data and 1Dto2D Maps for covariance
   SetDataValuesFromText(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/data_2D.txt", 1E-42);
@@ -54,13 +54,13 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   (*this->covar) *= 1E16;
   
   // Set data errors from covariance matrix
-  StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, mapHist, 1E-38);
+  StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, fMapHist, 1E-38);
     
   // Setup mc Histograms
   SetupDefaultHist();
  
   // Set Scale Factor
-  fScaleFactor = (this->fEventHist->Integral("width")*1E-42/(nevents+0.))/this->TotalIntegratedFlux(); 
+  fScaleFactor = (this->fEventHist->Integral("width")*1E-42/(fNEvents+0.))/this->TotalIntegratedFlux(); 
 };
 
 

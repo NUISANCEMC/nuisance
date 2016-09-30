@@ -34,12 +34,12 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   EnuMax = 6.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   applyEnucorrection = type.find("ENUCORR") != std::string::npos;
-  default_types="SHAPE/DIAG";
-  allowed_types="SHAPE/DIAG";
+  fDefaultTypes="SHAPE/DIAG";
+  fAllowedTypes="SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
 
   // In future read most of these from a card file
   if (!name.compare("ANL_CCQE_Evt_1DQ2_nu_PRL31")){
@@ -82,7 +82,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   //  covar     = StatUtils::GetInvert(fullcovar);
 
   //  this->fEventHist->Scale(fDataHist->Integral()/fEventHist->Integral());
-  this->fScaleFactor = (this->fDataHist->Integral("width")/(nevents+0.)); 
+  this->fScaleFactor = (this->fDataHist->Integral("width")/(fNEvents+0.)); 
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -180,7 +180,7 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
   if (applyEnucorrection){
-    this->EnuvsQ2Plot->Scale(fEventHist->Integral()/(nevents+0.));
+    this->EnuvsQ2Plot->Scale(fEventHist->Integral()/(fNEvents+0.));
     for (int j =  0; j < EnuvsQ2Plot->GetNbinsY(); j++){
       for (int i = 0; i < EnuvsQ2Plot->GetNbinsX(); i++){
 	this->EnuvsQ2Plot->SetBinContent(i+1,j+1, this->EnuvsQ2Plot->GetBinContent(i+1,j+1) * EnuFluxUnfoldPlot->GetBinContent(j+1));
@@ -195,13 +195,13 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
 
   this->fMCHist->Scale(scaleF);
   this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, maskHist);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
     this->fMCHist_NoCorr->Scale(scaleF);
   }
   

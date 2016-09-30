@@ -24,10 +24,10 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
-  allowed_types="SHAPE/DIAG/EVT";
-  default_types="SHAPE/DIAG/EVT";
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fAllowedTypes="SHAPE/DIAG/EVT";
+  fDefaultTypes="SHAPE/DIAG/EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
@@ -43,7 +43,7 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((nevents+0.)*fFluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {

@@ -429,12 +429,6 @@ K2K Samples
     fChain->push_back(new K2K_NC1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
 
     /*
-Stat Samples (Pulls etc)
-    */
-  } else if (name.find("parameter_pulls") != std::string::npos) {
-    fChain->push_back(new parameter_pulls(name, file, rw, type, fkdt));
-
-    /*
 Fake Studies
     */
 

@@ -25,25 +25,25 @@
 // This function is intended to be modified to enforce a consistent masking for all models.
 TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data){
   
-  TH2D *maskHist = (TH2D*)data->Clone("maskHist");  
+  TH2D *fMaskHist = (TH2D*)data->Clone("fMaskHist");  
 
-  for (int xBin = 0; xBin < maskHist->GetNbinsX(); ++xBin){
-    for (int yBin = 0; yBin < maskHist->GetNbinsY(); ++yBin){
-      if (data->GetBinContent(xBin+1, yBin+1) == 0) maskHist->SetBinContent(xBin+1, yBin+1, 0);
-      else maskHist->SetBinContent(xBin+1, yBin+1, 0.5);
+  for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin){
+    for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin){
+      if (data->GetBinContent(xBin+1, yBin+1) == 0) fMaskHist->SetBinContent(xBin+1, yBin+1, 0);
+      else fMaskHist->SetBinContent(xBin+1, yBin+1, 0.5);
 
       if (!type.compare("MB_numu_2D")){
-	if (yBin == 19 && xBin < 8) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+	if (yBin == 19 && xBin < 8) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
       } else {
-	if (yBin == 19 && xBin < 11) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+	if (yBin == 19 && xBin < 11) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
       }
-      if (yBin == 18 && xBin < 3) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
-      if (yBin == 17 && xBin < 2) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
-      if (yBin == 16 && xBin < 1) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 18 && xBin < 3) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 17 && xBin < 2) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 16 && xBin < 1) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
     }
   }
 
-  return maskHist;
+  return fMaskHist;
 };
 
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring){

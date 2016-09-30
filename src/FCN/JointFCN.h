@@ -23,7 +23,6 @@
 
 // External fitter headers
 #include "MeasurementBase.h"
-#include "parameter_pulls.h"
 #include "SampleList.h"
 
 #define GetCurrentDir getcwd

@@ -7,7 +7,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
-  isDiag = false;
+  fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
@@ -39,7 +39,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   } else {
     isNew = false;
 
-    if (isShape) {
+    if (fIsShape) {
       this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_Tpi_shape.txt");
       this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_Tpi_shape_cov.txt", fDataHist->GetNbinsX());
     } else {
@@ -55,7 +55,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
-  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
@@ -116,7 +116,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
     for (size_t k = 0; k < TpiVect.size(); ++k) {
       this->fMCHist->Fill(TpiVect.at(k), Weight);
       this->fMCFine->Fill(TpiVect.at(k), Weight);
-      this->mcStat->Fill(TpiVect.at(k), 1.0);
+      this->fMCStat->Fill(TpiVect.at(k), 1.0);
 
       PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, TpiVect.at(k), Weight);
     }

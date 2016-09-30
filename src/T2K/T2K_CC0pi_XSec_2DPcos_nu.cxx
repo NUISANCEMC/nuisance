@@ -32,35 +32,35 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   forwardgoing = (type.find("REST") != std::string::npos);
   EnuMin = 0;
   EnuMax = 10.0;
-  exp_distance = 0.280;
-  default_types = "DIAG/FIX";
-  allowed_types = "DIAG/FIX";
-  data_points_x = 12;
-  data_points_y = 10;
+  fBeamDistance = 0.280;
+  fDefaultTypes = "DIAG/FIX";
+  fAllowedTypes = "DIAG/FIX";
+  fNDataPointsX = 12;
+  fNDataPointsY = 10;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
   
   Double_t tempx[12] = {0.2, 0.35, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0};
   Double_t tempy[10] = {-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0};
-  xBins = tempx;
-  yBins = tempy;
+  fXBins = tempx;
+  fYBins = tempy;
   fPlotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   
   fDataHist = new TH2D((fName+"_data").c_str(),
 		      (fName+"_data"+fPlotTitles).c_str(),
-		      data_points_x-1, xBins,
-		      data_points_y-1, yBins);
+		      fNDataPointsX-1, fXBins,
+		      fNDataPointsY-1, fYBins);
   
   SetHistograms(FitPar::GetDataBase()+"/T2K/CC0pi/data_release.root");
   SetupDefaultHist();
   
   // Diagonal covar setup
-  if (!isShape) addNormPenalty = true;
+  if (!fIsShape) fAddNormPen = true;
   fNormError = 0.089; // Set from covar mat instead...
 
   cout << " Inputs = "<<this->GetInput()<<std::endl;
   
   // Get Scaling
-  fScaleFactor = (fEventHist->Integral("width")/(nevents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
+  fScaleFactor = (fEventHist->Integral("width")/(fNEvents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
 
 };
 
@@ -209,7 +209,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
     rootfile->ls();
     
     this->fDataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->fName+"_data").c_str());
-    this->mapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->fName+"_MAP").c_str());
+    this->fMapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->fName+"_MAP").c_str());
 
     TMatrixDSym* covmat_stat = (TMatrixDSym*) rootfile->Get("analysis2_statcov");
     TMatrixDSym* covmat_flux = (TMatrixDSym*) rootfile->Get("analysis2_fluxcov");
@@ -227,7 +227,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
     }
     
     this->covar = StatUtils::GetInvert(fullcovar);
-    this->decomp = StatUtils::GetDecomp(covar);
+    this->fDecomp = StatUtils::GetDecomp(covar);
   }
   
   return;

@@ -71,13 +71,13 @@ class Measurement1D : public MeasurementBase {
   */
 
   //! Default Constructor
-  Measurement1D();
+  Measurement1D(void);
 
   //! Default destructor
-  virtual ~Measurement1D();
+  virtual ~Measurement1D(void);
 
   //! Initialise values to NULL
-  void Init();
+  void Init(void);
 
   /*
     Setup Functions
@@ -86,7 +86,7 @@ class Measurement1D : public MeasurementBase {
   virtual void SetupMeasurement(std::string input, std::string type, FitWeight *rw, std::string fkdt);
 
   //! Setup the default MC histograms from the currently set fDataHist.
-  virtual void SetupDefaultHist();
+  virtual void SetupDefaultHist(void);
 
   //! Set fit options by parsing type
   virtual void SetFitOptions(std::string opt);
@@ -110,7 +110,7 @@ class Measurement1D : public MeasurementBase {
   virtual void SetCovarFromDataFile(std::string covarFile, std::string covName);
 
   //! Set the smearing matrix from a text file given the size of the matrix
-  virtual void SetSmearingMatrix(std::string smearFile, int true_dim, int reco_dim);
+  virtual void SetSmearingMatrix(std::string smearfile, int truedim, int recodim);
 
   //! Set the bin mask from a text file
   virtual void SetBinMask(std::string maskFile);
@@ -135,30 +135,30 @@ class Measurement1D : public MeasurementBase {
   */
 
   //! Reset histograms to zero
-  virtual void ResetAll();
+  virtual void ResetAll(void);
 
   //! Fill histograms using fXVar and Weight
-  virtual void FillHistograms();
+  virtual void FillHistograms(void);
 
 
   //! Apply histogram scaling after reconfigure
-  virtual void ScaleEvents();
+  virtual void ScaleEvents(void);
 
   //! Apply normalisation scale after reconfigure
   virtual void ApplyNormScale(double norm);
 
   //! Apply smearing matrix to fMCHist
-  virtual void ApplySmearingMatrix();
+  virtual void ApplySmearingMatrix(void);
 
   /*
     Statistic Functions - Outsources to StatUtils
   */
 
   //! Get the current Number of degrees of freedom accounting for bin masking.
-  virtual int GetNDOF();
+  virtual int GetNDOF(void);
 
   //! Get Likelihood of iteration
-  virtual double GetLikelihood();
+  virtual double GetLikelihood(void);
 
   /*
     Fake Data Functions
@@ -168,35 +168,34 @@ class Measurement1D : public MeasurementBase {
   virtual void SetFakeDataValues(std::string fakeOption); // Set fDataHist from file
 
   //! Reset the fake data back to original fake data (Reset to before ThrowCovariance was called)
-  virtual void ResetFakeData();
+  virtual void ResetFakeData(void);
 
   //! Reset the fake data back to the true original dataset for this sample
-  virtual void ResetData();
+  virtual void ResetData(void);
 
   //! Generate fake data by throwing the current fDataHist using the covariance.
   //! Can be used on fake MC data or just the original dataset.
-  virtual void ThrowCovariance();
+  virtual void ThrowCovariance(void);
 
   // Get MC Histogram Stack
-  virtual THStack GetModeStack();
+  virtual THStack GetModeStack(void);
 
   /*
     Access Functions
   */
 
-  TH1D* GetMCHistogram(){return fMCHist;};
-  TH1D* GetDataHistogram(){ return fDataHist;};
-  virtual std::vector<TH1*> GetMCList();
-  virtual std::vector<TH1*> GetDataList();
-  virtual std::vector<TH1*> GetMaskList(){return std::vector<TH1*> (1, maskHist);};
-  virtual std::vector<TH1*> GetFineList(){return std::vector<TH1*> (1, fMCFine);};
-
+  TH1D* GetMCHistogram   (void) { return fMCHist;   };
+  TH1D* GetDataHistogram (void) { return fDataHist; };
+  virtual std::vector<TH1*> GetMCList   (void);
+  virtual std::vector<TH1*> GetDataList (void);
+  virtual std::vector<TH1*> GetMaskList (void) { return std::vector<TH1*> (1, fMaskHist); };
+  virtual std::vector<TH1*> GetFineList (void) { return std::vector<TH1*> (1, fMCFine);   };
 
   //! Get the bin contents and errors from fMCHist
   virtual void GetBinContents(std::vector<double>& cont, std::vector<double>& err);
 
   //! Get the covariance matrix as a pretty plot
-  virtual TH2D GetCovarMatrix(){ return TH2D(*covar);};
+  virtual TH2D GetCovarMatrix(void){ return TH2D(*covar);};
 
   //! Return the integrated XSec for this sample, options define whether data or MC is returned.
   virtual std::vector<double> GetXSec(std::string opt);
@@ -216,54 +215,54 @@ protected:
 
   // data histograms
   TH1D* fDataHist; //!< default data histogram
-  TH1D* dataOrig; //!< histogram to store original data before throws.
-  TH1D* dataTrue; //!< histogram to store true dataset
+  TH1D* fDataOrig; //!< histogram to store original data before throws.
+  TH1D* fDataTrue; //!< histogram to store true dataset
 
   // Fake Data Flag
-  bool usingfakedata; //!< Flag: whether the current data is actually fake from MC
+  bool fIsFakeData; //!< Flag: whether the current data is actually fake from MC
   std::string fakeDataFile; //!< Input fake data file
 
   // The histogram into which the measurement will be filled
   TH1D* fMCHist; //!< default MC Histogram used in the chi2 fits
   TH1D* fMCFine; //!< finely binned MC histogram
-  TH1D* mcStat; //!< histogram with unweighted events to properly calculate statistical error on MC
+  TH1D* fMCStat; //!< histogram with unweighted events to properly calculate statistical error on MC
 
-  TH1I* maskHist; //!< Mask histogram for neglecting specific bins
+  TH1I* fMaskHist; //!< Mask histogram for neglecting specific bins
 
   std::string fPlotTitles; //!< Plot title x and y for the histograms
 
-  // The covariance matrix and its decomposition
+  // The covariance matrix and its fDecomposition
   TMatrixDSym *covar;      //!< Inverted Covariance
   TMatrixDSym *fullcovar;  //!< Full Covariance
-  TMatrixDSym *decomp;     //!< Decomposed Covariance
-  TMatrixDSym *correl;     //!< Correlation Matrix
-  TMatrixD *smear;         //!< Smearing matrix (note, this is not symmetric, and also in general not square)
-  double covDet;     //!< Determinant of the covariance
+  TMatrixDSym *fDecomp;     //!< Decomposed Covariance
+  TMatrixDSym *fCorrel;     //!< Correlation Matrix
+  TMatrixD *fSmearMatrix; //!< Smearing matrix (note, this is not symmetric, and also in general not square)
+  double fCovDet;     //!< Determinant of the covariance
   double fNormError;  //!< Sample norm error
-  std::string fitType;
+  std::string fFitType;
 
   // Arrays for data entries
-  Double_t* xBins;  //!< xBin edges
-  Double_t* data_values; //!< data bin contents
-  Double_t* data_errors; //!< data bin errors
-  Int_t data_points; //!< number of data points
+  Double_t* fXBins;  //!< xBin edges
+  Double_t* fDataValues; //!< data bin contents
+  Double_t* fDataErrors; //!< data bin errors
+  Int_t fNDataPointsX; //!< number of data points
 
   // Fit specific flags
-  bool isShape; //!< Flag: Perform Shape-only fit
-  bool isFree; //!< Flag: Perform normalisation free fit
-  bool isDiag; //!< Flag: only include uncorrelated diagonal errors
-  bool isMask; //!< Flag: Apply bin masking
-  bool isRawEvents; //!< Flag: Are bin contents just event rates
-  bool isEnu1D; //!< Flag: Perform Flux Unfolded Scaling
-  bool isChi2SVD; //!< Flag: Use alternative Chi2 SVD Method (Do not use)
-  bool addNormPenalty; //!< Flag: Add a normalisation penalty term to the chi2.
-  bool isFix; //!< Flag for keeping norm fixed
-  bool isFull; //!< Flag for using full covariaince
-  bool isDifXSec; //!< Flag for creating a dif xsec
-  bool isChi2; //!< Flag for using Chi2 over LL methods
+  bool fIsShape; //!< Flag: Perform Shape-only fit
+  bool fIsFree; //!< Flag: Perform normalisation free fit
+  bool fIsDiag; //!< Flag: only include uncorrelated diagonal errors
+  bool fIsMask; //!< Flag: Apply bin masking
+  bool fIsRawEvents; //!< Flag: Are bin contents just event rates
+  bool fIsEnu1D; //!< Flag: Perform Flux Unfolded Scaling
+  bool fIsChi2SVD; //!< Flag: Use alternative Chi2 SVD Method (Do not use)
+  bool fAddNormPen; //!< Flag: Add a normalisation penalty term to the chi2.
+  bool fIsFix; //!< Flag for keeping norm fixed
+  bool fIsFull; //!< Flag for using full covariaince
+  bool fIsDifXSec; //!< Flag for creating a dif xsec
+  bool fIsChi2; //!< Flag for using Chi2 over LL methods
 
-  std::string allowed_types; //!< Fit Types Possible
-  std::string default_types; //!< Starting Default Fit Types
+  std::string fAllowedTypes; //!< Fit Types Possible
+  std::string fDefaultTypes; //!< Starting Default Fit Types
 
 };
 

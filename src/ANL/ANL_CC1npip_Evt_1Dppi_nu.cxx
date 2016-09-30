@@ -27,8 +27,8 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   EnuMin = 0;
   // whaaa, check this
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
@@ -44,7 +44,7 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/double(fNEvents)*(16./8.);
 };
 
 void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {

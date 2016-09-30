@@ -26,7 +26,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 0.;
   EnuMax = 3.0;
-  isDiag = true;
+  fIsDiag = true;
   fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
@@ -36,7 +36,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((nevents+0.))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
   // D2 = 1 proton, 1 neutron
 };
 
@@ -48,27 +48,27 @@ void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
 
   TH1D *copy = (TH1D*)(dataFile->Get("BNL_reanalysis"));
 
-  this->data_points = copy->GetNbinsX()-1;
+  this->fNDataPointsX = copy->GetNbinsX()-1;
 
-  xBinBounds = new double[this->data_points];
-  dataVals = new double[this->data_points];
-  dataErr = new double[this->data_points];
+  xBinBounds = new double[this->fNDataPointsX];
+  dataVals = new double[this->fNDataPointsX];
+  dataErr = new double[this->fNDataPointsX];
 
-  for (int i = 0; i < data_points; i++) {
+  for (int i = 0; i < fNDataPointsX; i++) {
     xBinBounds[i] = copy->GetBinLowEdge(i+3);
     dataVals[i] = copy->GetBinContent(i+3)*1E-38;
     dataErr[i] = copy->GetBinError(i+3)*1E-38;
   }
 
-  this->xBins = xBinBounds;
-  this->data_values = dataVals;
-  this->data_errors = dataErr;
+  this->fXBins = xBinBounds;
+  this->fDataValues = dataVals;
+  this->fDataErrors = dataErr;
 
-  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->data_points-1, this->xBins);
+  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
 
   for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-    this->fDataHist->SetBinContent(i+1, this->data_values[i]);
-    this->fDataHist->SetBinError(i+1, this->data_errors[i]);
+    this->fDataHist->SetBinContent(i+1, this->fDataValues[i]);
+    this->fDataHist->SetBinError(i+1, this->fDataErrors[i]);
   }
 
   fDataHist->SetDirectory(0);

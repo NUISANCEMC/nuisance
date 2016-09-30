@@ -54,7 +54,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   this->SetSmearingMatrix(basedir + smearfilename, nbins, nbins+1);
 
   // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
   
 };
 
@@ -119,10 +119,10 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
   this->fMCHist->Scale(this->fScaleFactor, "width");
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
-  for(int i=0; i<this->mcStat->GetNbinsX();i++) {
+  for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
     
-    if (this->mcStat->GetBinContent(i+1) != 0)
-      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
+    if (this->fMCStat->GetBinContent(i+1) != 0)
+      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
     else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
   }
 

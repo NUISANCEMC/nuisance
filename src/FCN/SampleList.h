@@ -168,7 +168,6 @@
 #include "GenericFlux_Tester.h"
 
 #include "FitWeight.h"
-#include "parameter_pulls.h"
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {

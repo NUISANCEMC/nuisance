@@ -27,8 +27,8 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   fName = name;
   nBins = 8;
   fPlotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
-  isRatio = true;
-  isDiag  = false; 
+  fIsRatio = true;
+  fIsDiag  = false; 
   target  = "";
   SetupMeasurement(inputfiles, type, rw, fakeDataFile);
 
@@ -38,13 +38,13 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   else ERR(WRN) << "target " << target << " was not found!" << std::endl;
   
   // Get parsed input files
-  if (subInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR"<<std::endl;
-  std::string inFileNUM = subInFiles.at(0);
-  std::string inFileDEN = subInFiles.at(1);
+  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR"<<std::endl;
+  std::string inFileNUM = fSubInFiles.at(0);
+  std::string inFileDEN = fSubInFiles.at(1);
     
   // Push classes back into list for processing loop
-  this->subChain.push_back(NUM);
-  this->subChain.push_back(DEN);
+  this->fSubChain.push_back(NUM);
+  this->fSubChain.push_back(DEN);
 
   // Setup the Data input                          
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
@@ -59,9 +59,9 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   DEN  = new MINERvA_CCinc_XSec_1DEnu_nu("MINERvA_CCinc_XSec_1DEnu_"+target+"_CH_DEN", inFileDEN, rw, type, fakeDataFile);
 
   // Add to chain for processing
-  this->subChain.clear();
-  this->subChain.push_back(NUM);
-  this->subChain.push_back(DEN);
+  this->fSubChain.clear();
+  this->fSubChain.push_back(NUM);
+  this->fSubChain.push_back(DEN);
 
   // Setup Default MC Hists
   this->SetupDefaultHist();
@@ -73,7 +73,7 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::MakePlots(){
 //********************************************************************  
 
   UInt_t sample = 0;
-  for (std::vector<MeasurementBase*>::const_iterator expIter = this->subChain.begin(); expIter != this->subChain.end(); expIter++){
+  for (std::vector<MeasurementBase*>::const_iterator expIter = this->fSubChain.begin(); expIter != this->fSubChain.end(); expIter++){
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
  
     if      (sample == 0) this->NUM = static_cast<MINERvA_CCinc_XSec_1DEnu_nu*>(exp);

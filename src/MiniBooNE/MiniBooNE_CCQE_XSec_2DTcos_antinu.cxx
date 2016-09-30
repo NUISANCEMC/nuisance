@@ -29,8 +29,8 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   EnuMin = 0.;
   EnuMax = 3.;
   fNormError = 0.130;
-  default_types="FIX/DIAG";
-  allowed_types="FIX,FREE,SHAPE/DIAG/NORM";
+  fDefaultTypes="FIX/DIAG";
+  fAllowedTypes="FIX,FREE,SHAPE/DIAG/NORM";
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
@@ -38,12 +38,12 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   ccqelike = name.find("CCQELike") != std::string::npos;
 
   // Define Bin Edges
-  data_points_x = 19;
-  data_points_y = 21;
+  fNDataPointsX = 19;
+  fNDataPointsY = 21;
   Double_t tempx[19] = { 0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0};
   Double_t tempy[21] = {-1.0, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-  xBins = tempx;
-  yBins = tempy;
+  fXBins = tempx;
+  fYBins = tempy;
 
   // Setup Data Plots
   if (!ccqelike){
@@ -58,10 +58,10 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   // Setup Covariances
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fullcovar);
-  isDiag    = true;
+  fIsDiag    = true;
 
   // Set Scaling for Differential Cross-section
-  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(fNEvents+0.))
 		 *(14.08/8.)
 		 /TotalIntegratedFlux());
 };

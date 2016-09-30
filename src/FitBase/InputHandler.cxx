@@ -141,7 +141,7 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
 bool InputHandler::CanIGoFast() {
 //********************************************************************
 
-  if (eventType == 6) {
+  if (fEventType == 6) {
     return true;
   }
   return false;
@@ -318,16 +318,16 @@ void InputHandler::ReadJointFile() {
   if (temp_type == 0) {
 #ifdef __NEUT_ENABLED__
     fEventType = 0;
-    neut_event = NULL;
-    tn->SetBranchAddress("vectorbranch", &neut_event);
-    fEvent.SetEventAddress(&neut_event);
+    fNeutVect = NULL;
+    tn->SetBranchAddress("vectorbranch", &fNeutVect);
+    fEvent.SetEventAddress(&fNeutVect);
 #endif
   } else if (temp_type == 1) {
 #ifdef __NUWRO_ENABLED__
     fEventType = 1;
-    nuwro_event = NULL;
-    tn->SetBranchAddress("e", &nuwro_event);
-    fEvent.SetEventAddress(&nuwro_event);
+    fNuwroEvent = NULL;
+    tn->SetBranchAddress("e", &fNuwroEvent);
+    fEvent.SetEventAddress(&fNuwroEvent);
 #endif
   }
 
@@ -390,11 +390,11 @@ void InputHandler::ReadNeutFile() {
 
   // Assign nvect
   fNEvents = tn->GetEntries();
-  neut_event = NULL;
-  tn->SetBranchAddress("vectorbranch", &neut_event);
+  fNeutVect = NULL;
+  tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent.SetEventAddress(&neut_event);
+  fEvent.SetEventAddress(&fNeutVect);
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file" << std::endl;
@@ -425,11 +425,11 @@ void InputHandler::ReadNuWroFile() {
   tn = new TChain("treeout");
   tn->AddFile(fInputFile.c_str());
 
-  // Get entries and nuwro_event
+  // Get entries and fNuwroEvent
   fNEvents = tn->GetEntries();
-  nuwro_event = NULL;
-  tn->SetBranchAddress("e", &nuwro_event);
-  fEvent.SetEventAddress(&nuwro_event);
+  fNuwroEvent = NULL;
+  tn->SetBranchAddress("e", &fNuwroEvent);
+  fEvent.SetEventAddress(&fNuwroEvent);
 
   // Check if we have saved an xsec histogram before
   fFluxHist = (TH1D*)fInputRootFile->Get(
@@ -465,13 +465,13 @@ void InputHandler::ReadNuWroFile() {
     // Can grab flux histogram from the pars
     tn->GetEntry(0);
 
-    int beamtype = nuwro_event->par.beam_type;
+    int beamtype = fNuwroEvent->par.beam_type;
 
     if (beamtype == 0) {
-      std::string fluxstring = nuwro_event->par.beam_energy;
+      std::string fluxstring = fNuwroEvent->par.beam_energy;
       std::vector<double> fluxvals =
           PlotUtils::FillVectorDFromString(fluxstring, " ");
-      int pdg = nuwro_event->par.beam_particle;
+      int pdg = fNuwroEvent->par.beam_particle;
       double Elow = double(fluxvals[0]) / 1000.0;
       double Ehigh = double(fluxvals[1]) / 1000.0;
 
@@ -485,7 +485,7 @@ void InputHandler::ReadNuWroFile() {
         fFluxHist->SetBinContent(j - 1, fluxvals[j]);
       }
     } else if (beamtype == 1) {
-      std::string fluxstring = nuwro_event->par.beam_content;
+      std::string fluxstring = fNuwroEvent->par.beam_content;
 
       std::vector<std::string> fluxlines =
           PlotUtils::FillVectorSFromString(fluxstring, "\n");
@@ -541,8 +541,8 @@ void InputHandler::ReadNuWroFile() {
 
       if (i % 100000 == 0) cout << " i " << i << std::endl;
       // Get Variables
-      Enu = nuwro_event->in[0].E() / 1000.0;
-      TotXSec = nuwro_event->weight;
+      Enu = fNuwroEvent->in[0].E() / 1000.0;
+      TotXSec = fNuwroEvent->weight;
 
       // Fill a flux and xsec histogram
       fEventHist->Fill(Enu);
@@ -658,21 +658,21 @@ void InputHandler::ReadGenieFile() {
 
   fNEvents = tn->GetEntries();
   LOG(SAM) << "Number of GENIE Eevents " << tn->GetEntries() << std::endl;
-  genie_event = NULL;
-  mcrec = NULL;
-  //  NtpMCEventRecord * mcrec = 0; tree->SetBranchAddress(gmrec, &mcrec);
-  tn->SetBranchAddress("gmcrec", &mcrec);
+  fGenieGHep = NULL;
+  fGenieNtpl = NULL;
+  //  NtpMCEventRecord * fGenieNtpl = 0; tree->SetBranchAddress(gmrec, &fGenieNtpl);
+  tn->SetBranchAddress("gmcrec", &fGenieNtpl);
 
   fEventHist->Reset();
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent.SetEventAddress(&mcrec);
+  fEvent.SetEventAddress(&fGenieNtpl);
 
   LOG(SAM) << "Processing GENIE flux events." << std::endl;
   for (int i = 0; i < fNEvents; i++) {
     tn->GetEntry(i);
 
-    EventRecord& event = *(mcrec->event);
+    EventRecord& event = *(fGenieNtpl->event);
     GHepParticle* neu = event.Probe();
 
     GHepRecord genie_record = static_cast<GHepRecord>(event);
@@ -686,7 +686,7 @@ void InputHandler::ReadGenieFile() {
     fEventHist->Fill(neu->E());
     fXSecHist->Fill(neu->E(), xsec);
 
-    mcrec->Clear();
+    fGenieNtpl->Clear();
   }
 
   average_xsec = average_xsec / (total_events + 0.);
@@ -805,44 +805,44 @@ void InputHandler::ReadNuanceFile() {
   tn = new TChain("h3");
   tn->AddFile(fInputFile.c_str());
 
-  // Get entries and nuwro_event
+  // Get entries and fNuwroEvent
   fNEvents = tn->GetEntries();
-  nuance_event = new NuanceEvent();
+  fNuanceEvt = new NuanceEvent();
 
   // SetBranchAddress for Nuance
-  //  tn->SetBranchAddress("cc",&nuance_event->cc);
-  //  tn->SetBranchAddress("bound",&nuance_event->bound);
-  tn->SetBranchAddress("neutrino", &nuance_event->neutrino);
-  tn->SetBranchAddress("target", &nuance_event->target);
-  tn->SetBranchAddress("channel", &nuance_event->channel);
-  //  tn->SetBranchAddress("iniQ", &nuance_event->iniQ);
-  //  tn->SetBranchAddress("finQ", &nuance_event->finQ);
-  //  tn->SetBranchAddress("lepton0", &nuance_event->lepton0);
-  //  tn->SetBranchAddress("polar", &nuance_event->polar);
-  //  tn->SetBranchAddress("qsq", &nuance_event->qsq);
+  //  tn->SetBranchAddress("cc",&fNuanceEvt->cc);
+  //  tn->SetBranchAddress("bound",&fNuanceEvt->bound);
+  tn->SetBranchAddress("neutrino", &fNuanceEvt->neutrino);
+  tn->SetBranchAddress("target", &fNuanceEvt->target);
+  tn->SetBranchAddress("channel", &fNuanceEvt->channel);
+  //  tn->SetBranchAddress("iniQ", &fNuanceEvt->iniQ);
+  //  tn->SetBranchAddress("finQ", &fNuanceEvt->finQ);
+  //  tn->SetBranchAddress("lepton0", &fNuanceEvt->lepton0);
+  //  tn->SetBranchAddress("polar", &fNuanceEvt->polar);
+  //  tn->SetBranchAddress("qsq", &fNuanceEvt->qsq);
 
-  //  tn->SetBranchAddress("w", &nuance_event->w);
-  //  tn->SetBranchAddress("x",&nuance_event->x);
-  //  tn->SetBranchAddress("y",&nuance_event->y);
+  //  tn->SetBranchAddress("w", &fNuanceEvt->w);
+  //  tn->SetBranchAddress("x",&fNuanceEvt->x);
+  //  tn->SetBranchAddress("y",&fNuanceEvt->y);
 
-  tn->SetBranchAddress("p_neutrino", &nuance_event->p_neutrino);
-  tn->SetBranchAddress("p_targ", &nuance_event->p_targ);
-  //  tn->SetBranchAddress("vertex", &nuance_event->vertex);
-  //  tn->SetBranchAddress("start",&nuance_event->start);
-  //  tn->SetBranchAddress("depth",&nuance_event->depth);
-  // tn->SetBranchAddress("flux",&nuance_event->flux);
+  tn->SetBranchAddress("p_neutrino", &fNuanceEvt->p_neutrino);
+  tn->SetBranchAddress("p_targ", &fNuanceEvt->p_targ);
+  //  tn->SetBranchAddress("vertex", &fNuanceEvt->vertex);
+  //  tn->SetBranchAddress("start",&fNuanceEvt->start);
+  //  tn->SetBranchAddress("depth",&fNuanceEvt->depth);
+  // tn->SetBranchAddress("flux",&fNuanceEvt->flux);
 
-  tn->SetBranchAddress("n_leptons", &nuance_event->n_leptons);
-  tn->SetBranchAddress("p_ltot", &nuance_event->p_ltot);
-  tn->SetBranchAddress("lepton", &nuance_event->lepton);
-  tn->SetBranchAddress("p_lepton", &nuance_event->p_lepton);
+  tn->SetBranchAddress("n_leptons", &fNuanceEvt->n_leptons);
+  tn->SetBranchAddress("p_ltot", &fNuanceEvt->p_ltot);
+  tn->SetBranchAddress("lepton", &fNuanceEvt->lepton);
+  tn->SetBranchAddress("p_lepton", &fNuanceEvt->p_lepton);
 
-  tn->SetBranchAddress("n_hadrons", &nuance_event->n_hadrons);
-  tn->SetBranchAddress("p_htot", &nuance_event->p_htot);
-  tn->SetBranchAddress("hadron", &nuance_event->hadron);
-  tn->SetBranchAddress("p_hadron", &nuance_event->p_hadron);
+  tn->SetBranchAddress("n_hadrons", &fNuanceEvt->n_hadrons);
+  tn->SetBranchAddress("p_htot", &fNuanceEvt->p_htot);
+  tn->SetBranchAddress("hadron", &fNuanceEvt->hadron);
+  tn->SetBranchAddress("p_hadron", &fNuanceEvt->p_hadron);
   
-  fEvent.SetEventAddress(&nuance_event);
+  fEvent.SetEventAddress(&fNuanceEvt);
 
   fFluxHist = new TH1D((fName + "_FLUX").c_str(),
 			     (fName + "_FLUX").c_str(), 1, 0.0, 1.0);

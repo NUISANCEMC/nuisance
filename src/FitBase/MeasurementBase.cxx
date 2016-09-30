@@ -84,7 +84,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
   fFluxHist      = fInput->GetFluxHistogram();
   fEventHist     = fInput->GetEventHistogram();
   fXSecHist      = fInput->GetXSecHistogram();
-  nevents       = fInput->GetNEvents();
+  fNEvents       = fInput->GetNEvents();
  
   inputfilename = inputfile;
 }
@@ -114,19 +114,19 @@ void MeasurementBase::Reconfigure(){
   }
 
   FitEvent* cust_event = fInput->GetEventPointer();
-  int nevents = fInput->GetNEvents();
-  int countwidth = (nevents/20);
+  int fNEvents = fInput->GetNEvents();
+  int countwidth = (fNEvents/20);
 
   // Reset Signal Vectors
   fXVar_VECT.clear();
   fYVar_VECT.clear();
   fZVar_VECT.clear();
-  this->MODE_VECT.clear();
-  this->INDEX_VECT.clear();
+  this->fMode_VECT.clear();
+  this->fIndex_VECT.clear();
 
   size_t NSignal = 0;
   // MAIN EVENT LOOP
-  for (int i = 0; i < nevents; i++){
+  for (int i = 0; i < fNEvents; i++){
 
     // Read in the TChain and Calc Kinematics
     if (using_evtmanager){
@@ -158,8 +158,8 @@ void MeasurementBase::Reconfigure(){
       fXVar_VECT .push_back(fXVar);
       fYVar_VECT .push_back(fYVar);
       fZVar_VECT .push_back(fZVar);
-      this->MODE_VECT  .push_back(Mode);
-      this->INDEX_VECT .push_back( (UInt_t)i);
+      this->fMode_VECT  .push_back(Mode);
+      this->fIndex_VECT .push_back( (UInt_t)i);
       NSignal++;
     }
 
@@ -211,17 +211,17 @@ void MeasurementBase::ReconfigureFast(){
   }
 
   // Get Pointer To Base Event (Just Generator Formats)
-  int countwidth = (nevents / 10);
+  int countwidth = (fNEvents / 10);
 
   // Setup Iterators
   std::vector<double>::iterator X = fXVar_VECT.begin();
   std::vector<double>::iterator Y = fYVar_VECT.begin();
   std::vector<double>::iterator Z = fZVar_VECT.begin();
-  std::vector<int>::iterator    M = MODE_VECT.begin();
-  std::vector<UInt_t>::iterator I = INDEX_VECT.begin();
+  std::vector<int>::iterator    M = fMode_VECT.begin();
+  std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
 
   // SIGNAL LOOP
-  for (int i = 0; I != INDEX_VECT.end(); I++, i++){
+  for (int i = 0; I != fIndex_VECT.end(); I++, i++){
 
     // Just Update Weight
     if (using_evtmanager){
@@ -289,14 +289,14 @@ void MeasurementBase::Renormalise(){
   // Means we don't have to call the time consuming reconfigure when this happens.
   double norm = FitBase::GetRW()->GetDialValue( this->fName + "_norm" );
 
-  if ((this->currentNorm == 0.0 and norm != 0.0) or not fMCFilled){
+  if ((this->fCurrentNorm == 0.0 and norm != 0.0) or not fMCFilled){
     this->ReconfigureFast();
     return;
   }
 
-  if (this->currentNorm == norm) return;
+  if (this->fCurrentNorm == norm) return;
 
-  this->ApplyNormScale( 1.0 / this->currentNorm );
+  this->ApplyNormScale( 1.0 / this->fCurrentNorm );
   this->ApplyNormScale( norm );
 
   return;

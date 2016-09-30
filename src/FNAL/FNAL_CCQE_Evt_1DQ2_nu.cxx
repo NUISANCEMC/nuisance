@@ -34,8 +34,8 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
 
   this->SetDataFromDatabase("FNAL/FNAL_CCQE_Data_PRD29_436.root", "FNAL_CCQE_Data_1DQ2");
 
@@ -55,7 +55,7 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral()/(nevents+0.)); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -151,13 +151,13 @@ void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
   
   this->fMCHist->Scale(scaleF);
   this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, maskHist);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
     this->fMCHist_NoCorr->Scale(scaleF);
   }
 

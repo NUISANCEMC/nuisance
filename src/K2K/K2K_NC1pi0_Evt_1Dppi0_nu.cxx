@@ -26,7 +26,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWei
   fPlotTitles = "; p_{#pi^{0}} (MeV/c); Number of events";
   EnuMin = 0.;
   EnuMax = 5.;
-  isDiag = true;
+  fIsDiag = true;
   fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

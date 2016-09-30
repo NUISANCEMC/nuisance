@@ -25,10 +25,10 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   fName = name; 
   EnuMin = 0.;
   EnuMax = 6.;
-  isDiag = true;
+  fIsDiag = true;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
-  default_types = "FIX/DIAG";
-  allowed_types = "FIX,FREE,SHAPE/DIAG/Q2CORR/ENUCORR";
+  fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/Q2CORR/ENUCORR";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
 
   LOG(SAM) << "SETTING DATA"<<std::endl;
@@ -52,7 +52,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   covar     = StatUtils::GetInvert(fullcovar);
   
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
+  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.)); // NEUT
 
 };
 

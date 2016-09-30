@@ -193,29 +193,29 @@ protected:
   FitWeight* rw_engine; //!< Pointer to the rw engine
   InputHandler* fInput; //!< Instance of the input handler
   std::string fName;
-  int eventType;
+  int fEventType;
 
   TH1D* fEventHist;
   TH1D* fXSecHist;
   TH1D* fFluxHist;
 
-  double exp_distance; //!< Incoming Particle flight distance (for oscillation analysis)
+  double fBeamDistance; //!< Incoming Particle flight distance (for oscillation analysis)
   double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
-  double currentNorm; //!< current normalisation factor applied if fit is "FREE"
+  double fCurrentNorm; //!< current normalisation factor applied if fit is "FREE"
   bool fMCFilled; //!< flag whether MC plots have been filled (For ApplyNormalisation)
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar,fYVar,fZVar,Mode,Weight;
   bool Signal;
   int ievt;
-  int nevents;
+  int fNEvents;
   double Enu_rec, ThetaMu, CosThetaMu;
 
   std::vector<double> fXVar_VECT;
   std::vector<double> fYVar_VECT;
   std::vector<double> fZVar_VECT;
-  std::vector<int>    MODE_VECT;
-  std::vector<UInt_t>   INDEX_VECT;
+  std::vector<int>    fMode_VECT;
+  std::vector<UInt_t> fIndex_VECT;
 
   std::string inputfilename;
 };

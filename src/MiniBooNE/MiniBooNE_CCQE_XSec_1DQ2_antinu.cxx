@@ -34,8 +34,8 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   EnuMin = 0.;
   EnuMax = 3.;
   fNormError = 0.130;
-  default_types="FIX/DIAG";
-  allowed_types="FIX,FREE,SHAPE/DIAG";
+  fDefaultTypes="FIX/DIAG";
+  fAllowedTypes="FIX,FREE,SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
@@ -45,7 +45,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
   this->SetupDefaultHist();
                                                     
-  if (!this->isDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
+  if (!this->fIsDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
     fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
     covar     = StatUtils::GetInvert(fullcovar);
@@ -84,7 +84,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   }
 
   // ScaleFactor
-  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(nevents+0.))
+  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(fNEvents+0.))
 		 *14.08/8.
 		 / TotalIntegratedFlux()); 
 };

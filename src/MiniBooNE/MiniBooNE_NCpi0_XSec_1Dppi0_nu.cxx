@@ -29,7 +29,7 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
 
   // // Set pointer to the reweighting engine
   // rw_engine = rw;
-  // this->exp_distance = 0.541;
+  // this->fBeamDistance = 0.541;
 
   // // Define the energy region
   // this->EnuMin = 0.;
@@ -45,20 +45,20 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
 
   // if (isComb) {
   //   fName += "_comb";
-  //   this->data_points = 11;
-  //   this->xBins = anuBins;
+  //   this->fNDataPointsX = 11;
+  //   this->fXBins = anuBins;
   // }
 
-  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->fPlotTitles).c_str(), this->data_points-1, this->xBins);
-  // this->fMCFine = new TH1D((this->fName+"_MC_FINE").c_str(), (this->fName+this->fPlotTitles).c_str(), (this->data_points - 1)*10, this->xBins[0], this->xBins[this->data_points -1]);
+  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
+  // this->fMCFine = new TH1D((this->fName+"_MC_FINE").c_str(), (this->fName+this->fPlotTitles).c_str(), (this->fNDataPointsX - 1)*10, this->fXBins[0], this->fXBins[this->fNDataPointsX -1]);
 
 
   // this->ReadEventFile();
 
   //  // Different generators require slightly different rescaling factors.
-  // if      (this->eventType == 0) this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(nevents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
-  // else if (this->eventType == 1) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // NUWRO
-  // else if (this->eventType == 5) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // GENIE
+  // if      (this->fEventType == 0) this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
+  // else if (this->fEventType == 1) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // NUWRO
+  // else if (this->fEventType == 5) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // GENIE
 
 };
 
@@ -122,22 +122,22 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetDataValues(std::string dataFile) {
   LOG(SAM) << this->fName  << "Reading error from covariance" << std::endl;
 
   TGraph *gr = new TGraph(dataFile.c_str());
-  this->xBins       = gr->GetX();
-  this->data_values = gr->GetY();
-  this->data_points = gr->GetN();
+  this->fXBins       = gr->GetX();
+  this->fDataValues = gr->GetY();
+  this->fNDataPointsX = gr->GetN();
 
   // get the diagonal elements
   int rows = (this->tempCovar)->GetNrows();
   Double_t errors[rows+1];
   for (int i = 0; i < rows; i++) errors[i] = sqrt( (*this->tempCovar)(i,i)*1E-81);
   errors[rows] = 0.;
-  this->data_errors = errors;
+  this->fDataErrors = errors;
 
-  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->data_points-1, this->xBins);
+  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
 
-  for (int i=0; i < this->data_points; ++i) {
-    this->fDataHist->SetBinContent(i+1, this->data_values[i]);
-    this->fDataHist->SetBinError(i+1, this->data_errors[i]);
+  for (int i=0; i < this->fNDataPointsX; ++i) {
+    this->fDataHist->SetBinContent(i+1, this->fDataValues[i]);
+    this->fDataHist->SetBinError(i+1, this->fDataErrors[i]);
   }
   return;
 }

@@ -369,10 +369,10 @@ void splineRoutines::GenerateSampleSplines(){
     eventTree->Branch("FitEvent","FitEvent",cust_event,8000,2);
 
     bool signal;
-    int nevents = input->GetNEvents();
-    int countwidth = (nevents / 100);
+    int fNEvents = input->GetNEvents();
+    int countwidth = (fNEvents / 100);
 
-    for (int i = 0; i < nevents; i++){
+    for (int i = 0; i < fNEvents; i++){
 
       input->ReadEvent(i);
       exp->FillEventVariables(cust_event);
@@ -493,10 +493,10 @@ void splineRoutines::MakeSplinePlots(){
       FitEvent* cust_event = static_cast<FitEvent*>(input->GetEventPointer());
       rw->SetupEventCoeff(cust_event);
 
-      int nevents = 1000; //input->GetNEvents();
+      int fNEvents = 1000; //input->GetNEvents();
 
       splineDIR->cd();
-      for (int i = 0; i < nevents; i++){
+      for (int i = 0; i < fNEvents; i++){
 	input->ReadEvent(i);
 	rw->GenSplines(static_cast<FitEvent*>(cust_event), true);
       }
@@ -537,11 +537,11 @@ void splineRoutines::ValidePlots(){
     FitEvent* cust_event_events = static_cast<FitEvent*>(input_events->GetEventPointer());
 
     // Create a loop that compares event weights
-    int nevents = 1000; //input_splines->GetNEvents();
+    int fNEvents = 1000; //input_splines->GetNEvents();
 
 
     // 1D Scans
-    for (int i = 0; i < nevents; i++){
+    for (int i = 0; i < fNEvents; i++){
 
       input_splines->GetTreeEntry(i);
       input_events->GetTreeEntry(i);
@@ -642,7 +642,7 @@ void splineRoutines::ValidateSplineEventResponse(){
     FitEvent* cust_event_events = static_cast<FitEvent*>(input_events->GetEventPointer());
 
     // Create a loop that compares event weights
-    int nevents = input_splines->GetNEvents();
+    int fNEvents = input_splines->GetNEvents();
 
     // 1D Scans
     for (UInt_t j = 0; j < params.size(); j++){
@@ -686,7 +686,7 @@ void splineRoutines::ValidateSplineEventResponse(){
 	rw->ReadSplineHead(input_splines->GetSplineHead());
 	rw->Reconfigure();
 
-	for (int i = 0; i < nevents; i++){
+	for (int i = 0; i < fNEvents; i++){
 
 	  input_splines->GetTreeEntry(i);
 	  input_events->GetTreeEntry(i);

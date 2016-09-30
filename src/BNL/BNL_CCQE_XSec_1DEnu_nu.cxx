@@ -31,7 +31,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   fName = "BNL_CCQE_XSec_1DEnu_nu";
   EnuMin = 0.;
   EnuMax = 6.;
-  isDiag = true;
+  fIsDiag = true;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   SetupMeasurement(inputfile, type, rw, fakeDataFile);
   
@@ -49,7 +49,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(nevents+0.)); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.)); // NEUT
     
 };
 

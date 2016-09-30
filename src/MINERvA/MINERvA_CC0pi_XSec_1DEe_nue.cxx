@@ -10,8 +10,8 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   EnuMin = 0.0;
   EnuMax = 10.0;
   fNormError = 0.101;
-  default_types = "FIX/FULL";
-  allowed_types = "FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK";
+  fDefaultTypes = "FIX/FULL";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Data File
@@ -28,7 +28,7 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   SetupDefaultHist();
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux(); 
+  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux(); 
 
 };
 

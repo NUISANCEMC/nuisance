@@ -53,10 +53,10 @@ TH2D* FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int 
   // // Now iterate through the events and plot the qCut                                                                                                
   // TChain *tn = new TChain("neuttree", "");
   // tn->Add(Form("%s/neuttree", inFile.c_str()));
-  // Int_t nevents = tn->GetEntries();
+  // Int_t fNEvents = tn->GetEntries();
   // NeutVect *nvect = NULL;
   // tn->SetBranchAddress("vectorbranch", &nvect);
-  // for (int i = 0; i < nevents; ++i){
+  // for (int i = 0; i < fNEvents; ++i){
   //   tn->GetEntry(i);
 
   //   if (!isSignal(nvect, nuPDG, eMin, eMax, false, 0)) continue;

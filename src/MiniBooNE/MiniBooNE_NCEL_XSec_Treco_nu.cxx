@@ -76,14 +76,14 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // // Read in the file once only
   // tn = new TChain("neuttree", "");
   // tn->Add(Form("%s/neuttree", this->inFile.c_str()));
-  // nevents = tn->GetEntries();
+  // fNEvents = tn->GetEntries();
   // nvect = NULL;
   // tn->SetBranchAddress("vectorbranch", &nvect);
 
   // // The scale factor is quite complicated because MB didn't divide by number of targets.
   // // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
   // double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
-  // this->fScaleFactor = (this->fEventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
+  // this->fScaleFactor = (this->fEventHist->Integral()*1E-38*14.08/(fNEvents+0.))*nMolMB*0.646165;
 };
 
 
@@ -92,10 +92,10 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   // // Clear the current histogram before repopulating
   // this->fMCHist->Reset();
   // this->fMCFine->Reset();
-  // this->currentNorm = norm;
+  // this->fCurrentNorm = norm;
 
   // // Loop over all events at each iteration of the fit
-  // for (int i = 0; i < nevents; ++i){
+  // for (int i = 0; i < fNEvents; ++i){
   //   tn->GetEntry(i);
 
   //   if (!isSignal(nvect)) continue;
@@ -269,7 +269,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, arr_treco);
   // // To get the nDOF correct...
-  // this->data_points= 52;
+  // this->fNDataPointsX= 52;
 
   // double entry = 0;
   // int xBin     = 0;

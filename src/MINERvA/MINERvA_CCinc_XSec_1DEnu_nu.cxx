@@ -30,7 +30,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   EnuMin = 2.;
   EnuMax = 20.;
   target = "";
-  isRawEvents = false;
+  fIsRawEvents = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if      (name.find("C12")   != std::string::npos) target =   "C12";
@@ -52,7 +52,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(nevents+0.))/this->TotalIntegratedFlux(); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
   
 };
 
@@ -106,10 +106,10 @@ void MINERvA_CCinc_XSec_1DEnu_nu::ScaleEvents(){
   this->fMCHist->Scale(this->fScaleFactor, "width");
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
-  for(int i=0; i<this->mcStat->GetNbinsX();i++) {
+  for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
     
-    if (this->mcStat->GetBinContent(i+1) != 0)
-      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->mcStat->GetBinError(i+1) / this->mcStat->GetBinContent(i+1) );
+    if (this->fMCStat->GetBinContent(i+1) != 0)
+      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
     else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
   }
 

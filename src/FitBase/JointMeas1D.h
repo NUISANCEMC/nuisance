@@ -63,7 +63,7 @@
 /// Joint Measurement 1D Class
 ///
 /// Base class used to setup measurements that require multiple distributions to then be merged.
-/// The "subChain" object is used to keep track of each of the individual experiments which are then
+/// The "fSubChain" object is used to keep track of each of the individual experiments which are then
 /// automatically reconfigured, written, etc.
 
 //********************************************************************
@@ -140,18 +140,14 @@ class JointMeas1D : public Measurement1D {
   //! Write the current status of the plots to the current directory
   virtual void Write(std::string drawOpt);
 
-
-  // vector of pointers to sub experiments and their input files
-  std::vector<MeasurementBase*> subChain; //!< Vector of experimental classes that are the sub measurements
-  std::vector<std::string> subInFiles; //!< vector of input files for each of the sub measurements.
-
+  std::vector<MeasurementBase*> fSubChain; //!< Vector of experimental classes that are the sub measurements
+  std::vector<std::string>      fSubInFiles; //!< vector of input files for each of the sub measurements.
 
 protected:
 
-  // Flags for Joint Measurements
-  bool isRatio; //!< Flag: is this sample a hist1/hist2 ratio sample
-  bool isSummed; //!< Flag: is this sample a combination hist1 + hist2
-  bool saveSubMeas; //!< Flag: Save each of the histograms from the sub samples as well as this joint samples plots
+  bool fIsRatio; //!< Flag: is this sample a hist1/hist2 ratio sample
+  bool fIsSummed; //!< Flag: is this sample a combination hist1 + hist2
+  bool fSaveSubMeas; //!< Flag: Save each of the histograms from the sub samples as well as this joint samples plots
 
 };
 

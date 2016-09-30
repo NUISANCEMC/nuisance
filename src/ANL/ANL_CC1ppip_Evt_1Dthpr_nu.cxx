@@ -26,8 +26,8 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   fPlotTitles = "; cos #theta_{p}; Number of events";
   EnuMin = 0;
   EnuMax = 1.5; // Different EnuMax for cos(thpr), see Derrick et al, Phys Rev D V23 N3, p572 fig 3
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
@@ -43,7 +43,7 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fullcovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((nevents+0.))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.))*(16./8.);
 };
 
 void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {

@@ -31,8 +31,8 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
   EnuMin = 0.;
   EnuMax = 200.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
-  isDiag = true;
-  isRawEvents = false;
+  fIsDiag = true;
+  fIsRawEvents = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
 
@@ -52,7 +52,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
   covar     = StatUtils::GetInvert(fullcovar);
 
   // Generate events on H2 to get the normalisation right.
-  this->fScaleFactor = (this->fEventHist->Integral("width")/(nevents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral("width")/(fNEvents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
