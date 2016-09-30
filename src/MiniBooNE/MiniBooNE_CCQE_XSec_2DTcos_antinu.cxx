@@ -56,8 +56,8 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
   this->SetupDefaultHist();
   
   // Setup Covariances
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
   fIsDiag    = true;
 
   // Set Scaling for Differential Cross-section

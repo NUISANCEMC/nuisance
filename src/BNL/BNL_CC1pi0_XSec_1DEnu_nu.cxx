@@ -34,8 +34,8 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_1986.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/(fNEvents+0.)*16./8.;
 };

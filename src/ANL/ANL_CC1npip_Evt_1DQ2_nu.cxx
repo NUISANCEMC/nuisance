@@ -42,8 +42,8 @@ ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = (this->fEventHist->Integral()/double(fNEvents))*(16./8.); // NEUT
 };

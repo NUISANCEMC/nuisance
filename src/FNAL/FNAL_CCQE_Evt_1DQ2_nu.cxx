@@ -51,8 +51,8 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   this->SetBinMask(std::string(std::getenv("EXT_FIT")) + "/data/FNAL/FNAL_CCQE_BinMask_PRD29_436.dat");
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Different generators require slightly different rescaling factors.
   this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); // NEUT

@@ -33,8 +33,8 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/anl82corr-numu-n-to-mu-p-pi0-lowW_edges.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
 };

@@ -34,8 +34,8 @@ MiniBooNE_CC1pi0_XSec_1Dppi0_nu::MiniBooNE_CC1pi0_XSec_1Dppi0_nu(std::string inp
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdppi_covar.txt", this->fNDataPointsX-1);
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");

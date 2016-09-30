@@ -33,8 +33,8 @@ BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi+_on_p_W14_edit.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
   hadMassHist->SetTitle((fName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());

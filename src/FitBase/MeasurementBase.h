@@ -190,7 +190,7 @@ protected:
 
   BaseFitEvt* signal_event;
   FitEvent* cust_event;
-  FitWeight* rw_engine; //!< Pointer to the rw engine
+  FitWeight* fRW; //!< Pointer to the rw engine
   InputHandler* fInput; //!< Instance of the input handler
   std::string fName;
   int fEventType;

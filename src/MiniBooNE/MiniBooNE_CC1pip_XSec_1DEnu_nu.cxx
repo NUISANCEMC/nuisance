@@ -35,8 +35,8 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string input
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_enu.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
   //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);

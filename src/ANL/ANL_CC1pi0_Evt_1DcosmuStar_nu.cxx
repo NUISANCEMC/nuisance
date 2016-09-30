@@ -39,8 +39,8 @@ ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfi
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
 };

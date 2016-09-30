@@ -47,8 +47,8 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
       fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
     }
 
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fullcovar);
+    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+    covar     = StatUtils::GetInvert(fFullCovar);
 
   }
 

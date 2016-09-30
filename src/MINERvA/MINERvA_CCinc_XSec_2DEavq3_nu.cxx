@@ -50,11 +50,11 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   SetCovarMatrixFromChol(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/covar_2D.txt", 67);
 
   // Data is in 1E-42 and so is the covariance, need to scale accordingly.
-  (*this->fullcovar) *= 1E-16;
+  (*this->fFullCovar) *= 1E-16;
   (*this->covar) *= 1E16;
   
   // Set data errors from covariance matrix
-  StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, fMapHist, 1E-38);
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
     
   // Setup mc Histograms
   SetupDefaultHist();

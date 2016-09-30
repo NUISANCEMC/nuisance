@@ -39,8 +39,8 @@ BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   TRandom3 rand;
 

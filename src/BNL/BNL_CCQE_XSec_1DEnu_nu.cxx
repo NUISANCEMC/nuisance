@@ -45,8 +45,8 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Different generators require slightly different rescaling factors.
   this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.)); // NEUT

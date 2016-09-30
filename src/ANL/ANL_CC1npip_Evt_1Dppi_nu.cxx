@@ -41,8 +41,8 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")/double(fNEvents)*(16./8.);
 };

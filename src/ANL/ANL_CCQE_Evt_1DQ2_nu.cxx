@@ -78,8 +78,8 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   }
   
   // Setup Covariance
-  //  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  //  covar     = StatUtils::GetInvert(fullcovar);
+  //  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  //  covar     = StatUtils::GetInvert(fFullCovar);
 
   //  this->fEventHist->Scale(fDataHist->Integral()/fEventHist->Integral());
   this->fScaleFactor = (this->fDataHist->Integral("width")/(fNEvents+0.)); 

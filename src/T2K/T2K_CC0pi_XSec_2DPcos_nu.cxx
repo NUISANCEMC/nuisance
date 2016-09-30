@@ -216,17 +216,17 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
     TMatrixDSym* covmat_syst = (TMatrixDSym*) rootfile->Get("analysis2_systcov");
 
     // Get flags
-    this->fullcovar = new TMatrixDSym(67);
+    this->fFullCovar = new TMatrixDSym(67);
 
     for (int i = 0; i < 67; i++){
       for (int j = 0; j < 67; j++){
-	(*fullcovar)(i,j) = (*fullcovar)(i,j) + (*covmat_stat)(i,j);
-	(*fullcovar)(i,j) = (*fullcovar)(i,j) + (*covmat_flux)(i,j);
-	(*fullcovar)(i,j) = (*fullcovar)(i,j) + (*covmat_syst)(i,j);
+	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_stat)(i,j);
+	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_flux)(i,j);
+	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_syst)(i,j);
       }
     }
     
-    this->covar = StatUtils::GetInvert(fullcovar);
+    this->covar = StatUtils::GetInvert(fFullCovar);
     this->fDecomp = StatUtils::GetDecomp(covar);
   }
   

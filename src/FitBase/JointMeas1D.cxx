@@ -89,7 +89,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type, FitWeigh
   }
 
   // Set Engine and Fake Data
-  rw_engine = rw;
+  fRW = rw;
   fakeDataFile = fkdt;
 
   // Set Fit Options
@@ -147,7 +147,7 @@ void JointMeas1D::Reconfigure(){
   MakePlots();
 
   // Do Final Normalisation
-  ApplyNormScale( rw_engine->GetSampleNorm( this->fName ) );
+  ApplyNormScale( fRW->GetSampleNorm( this->fName ) );
 
   return;
 }
@@ -168,7 +168,7 @@ void JointMeas1D::ReconfigureFast(){
   MakePlots();
 
   // Do Final Normalisation
-  ApplyNormScale( rw_engine->GetSampleNorm( this->fName ) );
+  ApplyNormScale( fRW->GetSampleNorm( this->fName ) );
 
   return;
 }

@@ -34,8 +34,8 @@ MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::MiniBooNE_CC1pip_XSec_2DTpiEnu_nu(std::string
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("PIKEVENUXSec"));//data comes in .root file, yes!
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);

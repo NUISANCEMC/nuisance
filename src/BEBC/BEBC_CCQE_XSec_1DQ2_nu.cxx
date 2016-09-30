@@ -48,8 +48,8 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
 
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Generate events on H2 to get the normalisation right.
   this->fScaleFactor = (this->fEventHist->Integral("width")/(fNEvents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT

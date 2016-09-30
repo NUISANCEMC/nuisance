@@ -58,12 +58,12 @@ class FitEvent : public BaseFitEvt {
  public:
 
   //! Default Consstructors. Everything is set to NULL
-  FitEvent(){
+  FitEvent(void){
 
   };
 
   //! Default destructor
-  ~FitEvent(){
+  ~FitEvent(void){
   };
 
   // Generator specific functions
@@ -83,7 +83,7 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NeutVect** tempevent);
 
   //! Convert NeutVect to common format
-  void NeutKinematics();
+  void NeutKinematics(void);
 #endif
 
 
@@ -100,7 +100,7 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(event** tempevent);
 
   //! Convert NuWro event class to common format
-  void NuwroKinematics();
+  void NuwroKinematics(void);
 
 #endif
 
@@ -119,7 +119,7 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NtpMCEventRecord** tempevent);
 
   //! Convert GENIE event class to common format
-  void GENIEKinematics();
+  void GENIEKinematics(void);
 #endif
 
 #ifdef __GiBUU_ENABLED__
@@ -127,7 +127,7 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(GiBUUStdHepReader* tempevent);
 
   //! Convert GiBUUStdHep event class to common format
-  void GiBUUKinematics();
+  void GiBUUKinematics(void);
 #endif
 
 
@@ -135,27 +135,27 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NuanceEvent** tempevent);
 
   //! Convert Nuance event class to common format
-  void NuanceKinematics();
+  void NuanceKinematics(void);
 #endif
   /*
     GENERAL Fit Event Functions
   */
 
   //! Run event convertor, calls relevent event generator kinematic functions.
-  void CalcKinematics();
+  void CalcKinematics(void);
 
   //! Reset the event to NULL
-  void ResetEvent();
+  void ResetEvent(void);
 
   // Access Functions
   //! Return Any FitParticle from event
   FitParticle* PartInfo(UInt_t i);
 
   //! Return total particle number
-  UInt_t Npart(){return this->fNParticles;};
+  UInt_t Npart(void) const {return this->fNParticles;};
 
   //! Return final state particle count.
-  UInt_t NFinalpart(){return this->fNFinalParticles;};
+  UInt_t NFinalpart(void) const {return this->fNFinalParticles;};
 
   // Header Variables
   // protected: // To Make things easier everything is accessible. Not a great standard.
@@ -185,12 +185,12 @@ class FitEvent : public BaseFitEvt {
   Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
   
   // ACCESS FUNCTIONS
-  double Enu(){ return this->PartInfo(0)->fP.E(); };
-  double Tnu(){ return this->PartInfo(0)->fP.E(); };
-  double Pnu(){ return this->PartInfo(0)->fP.E(); };
-  int PDGnu(){  return this->PartInfo(0)->fPID; };
+  double Enu(void){ return this->PartInfo(0)->fP.E(); };
+  double Tnu(void){ return this->PartInfo(0)->fP.E(); };
+  double Pnu(void){ return this->PartInfo(0)->fP.E(); };
+  int PDGnu(void){  return this->PartInfo(0)->fPID; };
 
-  int Ilep(){
+  int Ilep(void){
     for (UInt_t i = 2; i < this->Npart(); i++){
       if (this->PartInfo(i)->fPID == this->PDGnu() - int(this->Mode < 30))
 	return i;
@@ -198,8 +198,8 @@ class FitEvent : public BaseFitEvt {
     return 0;
   };
 
-  double q0(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).E(); };
-  double q3(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).Vect().Mag(); };
+  double q0(void){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).E(); };
+  double q3(void){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).Vect().Mag(); };
 
   /* double Elep(); */
   /* double Tlep(); */

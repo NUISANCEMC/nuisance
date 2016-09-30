@@ -130,11 +130,11 @@ class FitWeight {
   //******************************************
 
  public:
-  FitWeight(std::string rw_name, std::string inputfile);  // Open a fit result
+  FitWeight(std::string name, std::string inputfile);  // Open a fit result
                                                           // file and grab the
                                                           // ttree and setup
                                                           // like that.
-  FitWeight(std::string rw_name = "FitWeight");
+  FitWeight(std::string name = "FitWeight");
   ~FitWeight(){};
 
   int GetDialEnum(std::string name, int type = -1);
@@ -176,33 +176,33 @@ class FitWeight {
 
 #ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
   void SetupNeutRW();
-  neut::rew::NReWeight* neut_rw;
+  neut::rew::NReWeight* fNeutRW;
 #endif
 
 #ifdef __NIWG_ENABLED__  // --- NIWG BLOCK
   void SetupNIWGRW();
-  niwg::rew::NIWGReWeight* niwg_rw;
+  niwg::rew::NIWGReWeight* fNIWGRW;
 #endif
 
 #ifdef __NUWRO_REWEIGHT_ENABLED__  // --- NUWRO BLOCK
   void SetupNuwroRW();
-  nuwro::rew::NuwroReWeight* nuwro_rw;
+  nuwro::rew::NuwroReWeight* fNuwroRW;
 #endif
 
 #ifdef __T2KREW_ENABLED__  // --- T2KRW BLOCK
   void SetupT2KRW();
-  t2krew::T2KReWeight* t2k_rw;  //!< T2K RW Object
-  t2krew::T2KNeutReWeight* t2k_neutrw;
-  t2krew::T2KNIWGReWeight* t2k_niwgrw;
+  t2krew::T2KReWeight* fT2KRW;  //!< T2K RW Object
+  t2krew::T2KNeutReWeight* fT2KNeutRW;
+  t2krew::T2KNIWGReWeight* fT2KNIWGRW;
 #endif
 
 #ifdef __GENIE_ENABLED__  // --- GENIE BLOCK
   void SetupGenieRW();
-  genie::rew::GReWeight* genie_rw;  //!< Genie RW Object
+  genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
 #endif
 
   // SPLINE FUNCTIONS ------------
-  FitSplineHead* GetSplineHeader() { return spline_head; };
+  inline FitSplineHead* GetSplineHeader() { return fSplineHead; };
   void SetupEventCoeff(BaseFitEvt* event);
   void SetupSpline(std::string dialname, std::string splinename,
                    std::string pointsdef);
@@ -226,20 +226,31 @@ class FitWeight {
   bool HasRWDialChanged(const double* x);
 
  private:
-  int norm_enum;
+  int fNormEnum;
 
-  vector<std::string> dial_names;
-  vector<int> dial_enums;
-  vector<double> dial_values;
-  vector<TF1> dial_func;
-  vector<std::string> dial_units;
+  vector<std::string> fDialNames;
+  vector<int>  fDialEnums;
+  vector<double> fDialValues;
+  vector<TF1> fDialFuncs;
+  vector<std::string> fDialUnits;
 
-  std::string rw_name;
-  bool dial_changed;
-  bool using_neut, using_genie, using_niwg, using_t2k, using_nuwro, IncludedModeNorm;
-  bool neut_changed, genie_changed, niwg_changed, nuwro_changed, t2k_changed;
+  std::string fName;
 
-  FitSplineHead* spline_head;
+  bool fIsUsingNeut;
+  bool fIsUsingGenie;
+  bool fIsUsingNIWG;
+  bool fIsUsingT2K;
+  bool fIsUsingNuwro;
+  bool fIsUsingModeNorm;
+
+  bool fIsDialChanged;
+  bool fIsNeutChanged;
+  bool fIsGenieChanged;
+  bool fIsNIWGChanged;
+  bool fIsNuwroChanged;
+  bool fIsT2KChanged;
+
+  FitSplineHead* fSplineHead;
 };
 
 // GLOBAL FUNCTIONS FOR PAR CONV ----

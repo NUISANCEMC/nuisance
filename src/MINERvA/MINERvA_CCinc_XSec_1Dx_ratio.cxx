@@ -117,7 +117,7 @@ void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile,
   std::ifstream covar(covarFile.c_str(),ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
-  this->fullcovar = new TMatrixDSym(dim);
+  this->fFullCovar = new TMatrixDSym(dim);
   if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
   else ERR(FTL) <<"Covariance matrix provided is incorrect: "<<covarFile<<std::endl;
 
@@ -133,7 +133,7 @@ void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile,
       double val = entry * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
 
       (*this->covar)(row, column) = val;
-      (*this->fullcovar)(row, column) = val;
+      (*this->fFullCovar)(row, column) = val;
       column++;
     }
     row++;
@@ -156,8 +156,8 @@ void MINERvA_CCinc_XSec_1Dx_ratio::Write(std::string drawOpt){
   this->GetDataList().at(0)->Write();
   this->GetMCList()  .at(0)->Write();
 
-  if (this->fullcovar){
-    TH2D cov = TH2D((*this->fullcovar));
+  if (this->fFullCovar){
+    TH2D cov = TH2D((*this->fFullCovar));
     cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
     cov.Write();
   }

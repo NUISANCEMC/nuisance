@@ -33,8 +33,8 @@ FNAL_CC1ppip_XSec_1DQ2_nu::FNAL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/FNAL/CC1pip_on_p/FNAL_cc1ppip_dsigdQ2_W14_edit.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = (this->fEventHist->Integral("width")/TotalIntegratedFlux("width"))*double(1E-38)/double(fNEvents)*(16./8.);
 };

@@ -73,7 +73,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-2);
-  this->fullcovar = new TMatrixDSym(nBinsX-2);
+  this->fFullCovar = new TMatrixDSym(nBinsX-2);
 
   // First two entries are BS
   // Last entry is BS
@@ -81,7 +81,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
     for (int j = 1; j < nBinsY-1; j++) {
       //std::cout << "(" << i << ", " << j << ") = " << covarMatrix->GetBinContent(i+1,j+1) << std::endl;
       (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
-      (*this->fullcovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
+      (*this->fFullCovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
     }
   } //should now have set covariance, I hope
 

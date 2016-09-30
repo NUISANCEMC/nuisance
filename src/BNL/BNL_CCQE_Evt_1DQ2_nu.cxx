@@ -55,8 +55,8 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   LOG(SAM)<<"Setting up scaling"<<std::endl;
   // Setup Scaling

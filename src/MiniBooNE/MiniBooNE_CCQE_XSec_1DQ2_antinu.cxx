@@ -47,8 +47,8 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
                                                     
   if (!this->fIsDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fullcovar);
+    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+    covar     = StatUtils::GetInvert(fFullCovar);
   }
 
   

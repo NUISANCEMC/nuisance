@@ -47,12 +47,12 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
     /// Currently has a placeholder for the matrices as work fixing them is ongoing.                   
     this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ccqe/MiniBooNE_1DQ2_nu.root");
-    StatUtils::SetDataErrorFromCov(fDataHist, fullcovar, 1E-38);
+    StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   } else {
     /// Assume a diagonal shape-only error is default                                                                                                                  
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fullcovar);
+    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+    covar     = StatUtils::GetInvert(fFullCovar);
   }
 
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved

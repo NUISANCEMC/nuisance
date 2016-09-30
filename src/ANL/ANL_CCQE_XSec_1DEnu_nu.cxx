@@ -48,8 +48,8 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
   
   // Different generators require slightly different rescaling factors.
   fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.)); // NEUT

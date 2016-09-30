@@ -33,8 +33,8 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWei
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/K2K/ncpi0/ppi0.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = 1; // No need to care about scaling factors for shape measurements
 };

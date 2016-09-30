@@ -39,8 +39,8 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
 };

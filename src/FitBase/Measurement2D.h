@@ -219,7 +219,7 @@ protected:
   
 
   TMatrixDSym *covar;  //!< inverted covariance matrix
-  TMatrixDSym *fullcovar;  //!< covariance matrix
+  TMatrixDSym *fFullCovar;  //!< covariance matrix
   TMatrixDSym *fDecomp; //!< fDecomposed covariance matrix
   TMatrixDSym *fCorrel; //!< correlation matrix
   double fCovDet;  //!< covariance deteriminant

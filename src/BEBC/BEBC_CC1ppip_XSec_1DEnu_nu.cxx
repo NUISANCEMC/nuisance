@@ -33,8 +33,8 @@ BEBC_CC1ppip_XSec_1DEnu_nu::BEBC_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/theses/BEBC_theses_CC1pip_on_p_W14.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
   //this->fScaleFactor = double(1.0E-38)/double(fNEvents)*(16./8.);

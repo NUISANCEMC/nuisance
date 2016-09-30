@@ -72,7 +72,7 @@ void T2K_CC1pip_CH_XSec_1DWrec_nu::SetCovarMatrix(std::string fileLocation) {
   std::cout << nBinsX << std::endl;
   std::cout << fDataHist->GetNbinsX() << std::endl;
   this->covar = new TMatrixDSym(nBinsX-3);
-  this->fullcovar = new TMatrixDSym(nBinsX-3);
+  this->fFullCovar = new TMatrixDSym(nBinsX-3);
 
   for (int i = 0; i < nBinsX-3; i++) {
     for (int j = 0; j < nBinsY-3; j++) {

@@ -58,8 +58,8 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
   SetupDefaultHist();
   
   // Setup Covariances
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
   fIsDiag = true;
 
    // Different generators require slightly different rescaling factors.

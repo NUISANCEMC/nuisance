@@ -66,12 +66,12 @@ void T2K_CC1pip_CH_XSec_1Dthmupi_nu::SetCovarMatrix(std::string fileLocation) {
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-1);
-  this->fullcovar = new TMatrixDSym(nBinsX-1);
+  this->fFullCovar = new TMatrixDSym(nBinsX-1);
 
   for (int i = 1; i < nBinsX; i++) {
     for (int j = 1; j < nBinsY; j++) {
       (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
-      (*this->fullcovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
+      (*this->fFullCovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
       std::cout << "covar(" << i-1 << ", " << j-1 << ") = " << (*this->covar)(i-1,j-1) << std::endl;
     }
   } //should now have set covariance, I hope

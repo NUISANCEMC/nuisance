@@ -233,7 +233,7 @@ protected:
 
   // The covariance matrix and its fDecomposition
   TMatrixDSym *covar;      //!< Inverted Covariance
-  TMatrixDSym *fullcovar;  //!< Full Covariance
+  TMatrixDSym *fFullCovar;  //!< Full Covariance
   TMatrixDSym *fDecomp;     //!< Decomposed Covariance
   TMatrixDSym *fCorrel;     //!< Correlation Matrix
   TMatrixD *fSmearMatrix; //!< Smearing matrix (note, this is not symmetric, and also in general not square)

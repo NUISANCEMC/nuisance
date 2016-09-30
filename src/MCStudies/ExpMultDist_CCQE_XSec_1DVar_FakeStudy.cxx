@@ -65,8 +65,8 @@ ExpMultDist_CCQE_XSec_1DVar_FakeStudy::ExpMultDist_CCQE_XSec_1DVar_FakeStudy(std
   
   // Setup Covariance assuming a diagonal covar.
   // If you want a full covariance to be used examples are given in the MINERvA 1D classes
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
   
 
   // 3. The generator is organised in SetupMeasurement so it gives the cross-section in "per nucleon" units.

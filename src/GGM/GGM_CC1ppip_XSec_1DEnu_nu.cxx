@@ -33,8 +33,8 @@ GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/GGM/CC1pip_on_p/Gargamelle78-numu-p-to-mu-p-piplus-lowW_EDGES.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };

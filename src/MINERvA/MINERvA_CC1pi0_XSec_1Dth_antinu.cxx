@@ -47,8 +47,8 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inp
       fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
     }
 
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fullcovar);
+    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+    covar     = StatUtils::GetInvert(fFullCovar);
   } // end special treatment depending on release year
 
   this->SetupDefaultHist();

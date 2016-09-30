@@ -58,8 +58,8 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
   this->SetupDefaultHist();
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   // 1. The generator is organised in SetupMeasurement so it gives the
   // cross-section in "per nucleon" units.
