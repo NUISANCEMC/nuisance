@@ -18,20 +18,20 @@
 ################################################################################
 set(IMPLFILES
 ComparisonRoutines.cxx
-systematicRoutines.cxx
+SystematicRoutines.cxx
 )
 
 if(USE_MINIMIZER)
-  set(IMPLFILES ${IMPLFILES};minimizerRoutines.cxx)
+  set(IMPLFILES ${IMPLFILES};MinimizerRoutines.cxx)
 endif()
 
 set(HEADERFILES
 ComparisonRoutines.h
-systematicRoutines.h
+SystematicRoutines.h
 )
 
 if(USE_MINIMIZER)
-  set(HEADERFILES ${HEADERFILES};minimizerRoutines.h)
+  set(HEADERFILES ${HEADERFILES};MinimizerRoutines.h)
 endif()
 
 set(LIBNAME Routines)

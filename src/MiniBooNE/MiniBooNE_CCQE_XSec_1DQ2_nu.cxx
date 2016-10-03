@@ -35,6 +35,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   EnuMin = 0.;
   EnuMax = 3.;
   fNormError = 0.107;
+  fDefaultTypes = "FIX/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots

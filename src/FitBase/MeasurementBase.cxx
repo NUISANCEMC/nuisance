@@ -215,7 +215,7 @@ void MeasurementBase::ReconfigureFast(){
   }
 
   // Get Pointer To Base Event (Just Generator Formats)
-  int countwidth = (fNEvents / 10);
+  int countwidth = (fIndex_VECT.size() / 10);
 
   // Setup Iterators
   std::vector<double>::iterator X = fXVar_VECT.begin();

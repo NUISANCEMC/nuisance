@@ -523,7 +523,6 @@ void ComparisonRoutines::GenerateComparison(){
       FitEvent* cust_event = cur_input->GetEventPointer();  
       int fNEvents = cur_input->GetNEvents();               
       int countwidth = (fNEvents / 10);                    
-      size_t NSignal = 0;       
       
       // MAIN EVENT LOOP        
       for (int i = 0; i < fNEvents; i++) {                  

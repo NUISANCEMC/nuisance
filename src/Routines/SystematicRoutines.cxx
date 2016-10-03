@@ -18,14 +18,13 @@
 *******************************************************************************/
 
 #include "StatusMessage.h"
-
-#include "minimizerRoutines.h"
+#include "SystematicRoutines.h"
 
 /*
   Constructor/Destructor
 */
 //************************
-void minimizerRoutines::Init(){
+void SystematicRoutines::Init(){
 //************************
 
   fInputFile = "";
@@ -38,7 +37,7 @@ void minimizerRoutines::Init(){
   fCorrel = fCorrelFree = NULL;
   fDecomp = fDecompFree = NULL;
   
-  fStrategy = "Migrad,FixAtLimBreak,Migrad";
+  fStrategy = "ErrorBands";
   fRoutines.clear();
 
   fCardFile = "";
@@ -47,19 +46,12 @@ void minimizerRoutines::Init(){
 
   fSampleFCN    = NULL;
   
-  fMinimizer    = NULL;
-  fMinimizerFCN = NULL;
-  fCallFunctor  = NULL;
+  fAllowedRoutines = ("ErrorBands,PlotLimits");
 
-  fAllowedRoutines = ("Migrad,Simplex,Combined,"
-		      "Brute,Fumili,ConjugateFR,"
-		      "ConjugatePR,BFGS,BFGS2,"
-		      "SteepDesc,GSLSimAn,FixAtLim,FixAtLimBreak"
-		      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands");
 };
 
 //*************************************
-minimizerRoutines::~minimizerRoutines(){
+SystematicRoutines::~SystematicRoutines(){
 //*************************************
 };
 
@@ -67,7 +59,7 @@ minimizerRoutines::~minimizerRoutines(){
   Input Functions
 */
 //*************************************
-minimizerRoutines::minimizerRoutines(int argc, char* argv[]){
+SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
 //*************************************
 
   // Set everything to defaults
@@ -163,14 +155,15 @@ minimizerRoutines::minimizerRoutines(int argc, char* argv[]){
   // Starting Setup
   // --------------------------- 
   SetupCovariance();
-  SetupRWEngine();
   SetupFCN();
+  GetCovarFromFCN();
+  SetupRWEngine();
   
   return;
 };
 
 //*************************************
-void minimizerRoutines::ReadCard(std::string cardfile){
+void SystematicRoutines::ReadCard(std::string cardfile){
 //*************************************
 
   // Read cardlines into vector
@@ -229,7 +222,7 @@ void minimizerRoutines::ReadCard(std::string cardfile){
 };
 
 //*****************************************
-int minimizerRoutines::ReadParameters(std::string parstring){
+int SystematicRoutines::ReadParameters(std::string parstring){
 //******************************************
 
   std::string inputspec = "RW Dial Inputs Syntax \n" 
@@ -356,7 +349,7 @@ int minimizerRoutines::ReadParameters(std::string parstring){
 }
 
 //*******************************************
-int minimizerRoutines::ReadFakeDataPars(std::string parstring){
+int SystematicRoutines::ReadFakeDataPars(std::string parstring){
 //******************************************
 
   std::string inputspec = "Fake Data Dial Inputs Syntax \n"
@@ -399,7 +392,7 @@ int minimizerRoutines::ReadFakeDataPars(std::string parstring){
 }
 
 //******************************************
-int minimizerRoutines::ReadSamples(std::string samstring){
+int SystematicRoutines::ReadSamples(std::string samstring){
 //******************************************
   std::string inputspec = "";
   
@@ -477,7 +470,7 @@ int minimizerRoutines::ReadSamples(std::string samstring){
   Setup Functions
 */
 //*************************************
-void minimizerRoutines::SetupRWEngine(){
+void SystematicRoutines::SetupRWEngine(){
 //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++){
@@ -490,105 +483,20 @@ void minimizerRoutines::SetupRWEngine(){
 }
 
 //*************************************
-void minimizerRoutines::SetupFCN(){
+void SystematicRoutines::SetupFCN(){
 //*************************************
 
   LOG(FIT)<<"Making the jointFCN"<<std::endl;
   if (fSampleFCN) delete fSampleFCN;
   fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
   SetFakeData();
-  
-  fMinimizerFCN = new MinimizerFCN( fSampleFCN );
-  fCallFunctor  = new ROOT::Math::Functor( *fMinimizerFCN, fParams.size() );
-
-  fSampleFCN->CreateIterationTree( "fit_iterations", FitBase::GetRW() );
-  
+    
   return;
 }
 
-
-//******************************************
-void minimizerRoutines::SetupFitter(std::string routine){
-//******************************************
-
-  // Make the fitter
-  std::string fitclass = "";
-  std::string fittype  = "";
-
-  // Get correct types
-  if      (!routine.compare("Migrad"))      { fitclass = "Minuit2"; fittype = "Migrad";
-  } else if (!routine.compare("Simplex"))     { fitclass = "Minuit2"; fittype = "Simplex";
-  } else if (!routine.compare("Combined"))    { fitclass = "Minuit2"; fittype = "Combined";
-  } else if (!routine.compare("Brute"))       { fitclass = "Minuit2"; fittype = "Scan";
-  } else if (!routine.compare("Fumili"))      { fitclass = "Minuit2"; fittype = "Fumili";
-  } else if (!routine.compare("ConjugateFR")) { fitclass = "GSLMultiMin"; fittype = "ConjugateFR";
-  } else if (!routine.compare("ConjugatePR")) { fitclass = "GSLMultiMin"; fittype = "ConjugatePR";
-  } else if (!routine.compare("BFGS"))        { fitclass = "GSLMultiMin"; fittype = "BFGS";
-  } else if (!routine.compare("BFGS2"))       { fitclass = "GSLMultiMin"; fittype = "BFGS2";
-  } else if (!routine.compare("SteepDesc"))   { fitclass = "GSLMultiMin"; fittype = "SteepestDescent";
-    //  } else if (!routine.compare("GSLMulti"))    { fitclass = "GSLMultiFit"; fittype = "";         // Doesn't work out of the box
-  } else if (!routine.compare("GSLSimAn"))    { fitclass = "GSLSimAn"; fittype = "";   }
-
-  // make minimizer
-  if (fMinimizer) delete fMinimizer;
-  fMinimizer = ROOT::Math::Factory::CreateMinimizer(fitclass, fittype);
-
-  fMinimizer->SetMaxFunctionCalls(FitPar::Config().GetParI("minimizer.maxcalls"));
-
-  if (!routine.compare("Brute")){
-    fMinimizer->SetMaxFunctionCalls(fParams.size() * fParams.size()*4);
-    fMinimizer->SetMaxIterations(fParams.size() * fParams.size()*4);
-  }
-
-  fMinimizer->SetMaxIterations(FitPar::Config().GetParI("minimizer.maxiterations"));
-  fMinimizer->SetTolerance(FitPar::Config().GetParD("minimizer.tolerance"));
-  fMinimizer->SetStrategy(FitPar::Config().GetParI("minimizer.strategy"));
-  fMinimizer->SetFunction(*fCallFunctor);
-
-  int ipar = 0;
-  //Add Fit Parameters
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string syst = fParams.at(i);
-
-    bool fixed = true;
-    double vstart, vstep, vlow, vhigh;
-    vstart = vstep = vlow = vhigh = 0.0;
-
-    if (fCurVals.find(syst) != fCurVals.end()  ) vstart = fCurVals.at(syst);
-    if (fMinVals.find(syst)  != fMinVals.end() ) vlow   = fMinVals.at(syst);
-    if (fMaxVals.find(syst)  != fMaxVals.end() ) vhigh  = fMaxVals.at(syst);
-    if (fStepVals.find(syst) != fStepVals.end()) vstep  = fStepVals.at(syst);
-    if (fFixVals.find(syst)  != fFixVals.end() ) fixed  = fFixVals.at(syst);
-
-    // fix for errors
-    if (vhigh == vlow) vhigh += 1.0;
-
-    fMinimizer->SetVariable(ipar, syst, vstart, vstep);
-    fMinimizer->SetVariableLimits(ipar,vlow,vhigh);
-
-    if (fixed) {
-
-      fMinimizer->FixVariable(ipar);
-      LOG(FIT) << "Fixed Param: "<<syst<<std::endl;
-
-    } else {
-      
-      LOG(FIT) << "Free  Param: "<<syst
-	       <<" Start:"<<vstart
-	       <<" Range:"<<vlow<<" to "<<vhigh
-	       <<" Step:"<<vstep<<std::endl;
-    }
-
-    ipar++;
-  }
-
-  LOG(FIT) << "Setup Minimizer: "<<fMinimizer->NDim()<<"(NDim) "<<fMinimizer->NFree()<<"(NFree)"<<std::endl;
-
-  return;
-}
 
 //*************************************
-void minimizerRoutines::SetFakeData(){
+void SystematicRoutines::SetFakeData(){
 //*************************************
 
   if (fFakeDataInput.empty()) return;
@@ -612,11 +520,133 @@ void minimizerRoutines::SetFakeData(){
   return;
 }
 
+//*****************************************
+void SystematicRoutines::GetCovarFromFCN(){
+//*****************************************
+  LOG(FIT) << "Loading ParamPull objects from FCN to build covar" << endl;
+
+  // Make helperstring
+  std::ostringstream helperstr;
+
+  // Keep track of what is being thrown
+  std::map<std::string, std::string> dialthrowhandle;
+  
+  // Get Covariance Objects from FCN
+  std::list<ParamPull*> inputpulls = fSampleFCN->GetPullList();
+  for (PullListConstIter iter = inputpulls.begin();
+       iter != inputpulls.end(); iter++){
+
+    ParamPull* pull = (*iter);
+
+    if (pull->GetType().find("THROW")){
+      fInputThrows.push_back(pull);
+      fInputCovar.push_back(pull->GetFullCovarMatrix());
+      fInputDials.push_back(pull->GetDataHist());
+
+      LOG(FIT) << "Read ParamPull: " << pull->GetName() << " " << pull->GetType() << endl;
+    }
+
+    TH1D dialhist = pull->GetDataHist();
+    TH1D minhist  = pull->GetMinHist();
+    TH1D maxhist  = pull->GetMaxHist();
+    TH1I typehist = pull->GetDialTypes();
+
+    for (int i = 0; i < dialhist.GetNbinsX(); i++){
+      std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
+      dialthrowhandle[name] = pull->GetName();
+	
+      if (fCurVals.find(name) == fCurVals.end()){
+	ERR(WRN) << name << " Dial not found in throws, so adding that. " << endl;
+
+	// Add to Containers
+	fParams.push_back(name);
+	fCurVals[name]      = dialhist.GetBinContent(i+1);
+	fStartVals[name]    = dialhist.GetBinContent(i+1);
+	fMinVals[name]      = minhist.GetBinContent(i+1);
+	fMaxVals[name]      = maxhist.GetBinContent(i+1);
+	fStepVals[name]     = 1.0;
+	fFixVals[name]      = false;
+	fStartFixVals[name] = false;
+	fTypeVals[name]     = typehist.GetBinContent(i+1);
+	fStateVals[name]    = "FREE" + pull->GetType();
+
+	// Maker Helper
+	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
+		  << name << " " << fMinVals[name] << " "
+		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] << endl;
+      }
+    }
+  }
+
+  // Check if no throws given
+  if (fInputThrows.empty()){
+    
+    ERR(WRN) << "No covariances given to nuissyst" << endl;
+    ERR(WRN) << "Pushing back an uncorrelated gaussian throw error for each free parameter using step size" << endl;
+
+    for (UInt_t i = 0; i < fParams.size(); i++){
+      std::string syst     = fParams[i];
+      if (fFixVals[syst]) continue;
+
+      // Make Terms
+      std::string name     = syst + "_pull";
+      
+      std::ostringstream pullterm;
+      pullterm << "DIAL:" << syst << ";"
+	       << fStartVals[syst] << ";"
+	       << fStepVals[syst];
+
+      std::string type = fTypeVals[syst] + "/GAUSTHROW";
+
+      // Push Back Pulls
+      ParamPull* pull = new ParamPull( name, pullterm.str(), type );
+      fInputThrows.push_back(pull);
+      fInputCovar.push_back(pull->GetFullCovarMatrix());
+      fInputDials.push_back(pull->GetDataHist());
+
+      // Print Whats added
+      ERR(WRN) << "Added ParamPull : " << name << " " << pullterm.str() << " " << type << endl;
+
+      // Add helper string for future fits
+      helperstr << "covar " << name << " " << pullterm.str() << " " << type << endl;
+
+      // Keep Track of Throws
+      dialthrowhandle[syst] = pull->GetName();
+    }
+  }
+
+  // Print Helper String
+  if (!helperstr.str().empty()){
+    ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << endl;
+    cout << endl << helperstr.str() << endl;
+    sleep(2);
+  }
+
+  
+  
+  // Print Throw State
+  for (int i = 0; i < fParams.size(); i++){
+    std::string syst = fParams[i];
+    if (dialthrowhandle.find(syst) != dialthrowhandle.end()){
+      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = THROWING with " << dialthrowhandle[syst] << endl;
+    } else {
+      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = FIXED" << endl;
+    }
+  }
+  
+  // Pause anyway
+  sleep(1);
+  return;
+}
+
+
+  
+
 /*
   Fitting Functions
 */
 //*************************************
-void minimizerRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals){
+void SystematicRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals){
 //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++){
@@ -631,7 +661,7 @@ void minimizerRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals)
 }
 
 //************************************* 
-void minimizerRoutines::Run(){
+void SystematicRoutines::Run(){
 //************************************* 
 
   for (UInt_t i = 0; i < fRoutines.size(); i++){
@@ -640,15 +670,9 @@ void minimizerRoutines::Run(){
     int fitstate = kFitUnfinished;
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
 
-    // Try Routines
-    if (routine.find("LowStat") != std::string::npos) LowStatRoutine(routine);
-    else if (routine == "FixAtLim")  FixAtLimit();
-    else if (routine == "FixAtLimBreak") fitstate = FixAtLimit();
+    if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    else if (!routine.compare("Chi2Scan1D")) Create1DScans();
-    else if (!routine.compare("Chi2Scan2D")) Chi2Scan2D();
-    else fitstate = RunFitRoutine(routine);
-
+    
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange){
       LOG(FIT) << "Ending fit routines loop." << endl;
@@ -659,45 +683,8 @@ void minimizerRoutines::Run(){
   return;
 }
 
-//*************************************
-int minimizerRoutines::RunFitRoutine(std::string routine){
-//*************************************
-  int endfits = kFitUnfinished;
-    
-  // set fitter at the current start values
-  fOutputRootFile->cd();
-  SetupFitter(routine);
-  
-  // choose what to do with the minimizer depending on routine.
-  if      (!routine.compare("Migrad") or
-	   !routine.compare("Simplex") or
-	   !routine.compare("Combined") or
-	   !routine.compare("Brute") or
-	   !routine.compare("Fumili") or
-	   !routine.compare("ConjugateFR") or
-	   !routine.compare("ConjugatePR") or
-	   !routine.compare("BFGS") or
-	   !routine.compare("BFGS2") or
-	   !routine.compare("SteepDesc") or
-	   //	   !routine.compare("GSLMulti") or
-	   !routine.compare("GSLSimAn")) {
-
-    if (fMinimizer->NFree() > 0){
-      std::cout << StatusMessage(fMinimizer->Minimize()) << std::endl;
-      GetMinimizerState();
-    }
-  }
-
-  // other otptions
-  else if (!routine.compare("Contour")) {
-    CreateContours();
-  }
-
-  return endfits;
-}
-
 //************************************* 
-void minimizerRoutines::PrintState(){
+void SystematicRoutines::PrintState(){
 //************************************* 
   LOG(FIT)<<"------------"<<std::endl;
   
@@ -765,460 +752,23 @@ void minimizerRoutines::PrintState(){
   LOG(FIT)<<"------------"<<std::endl;
 }
 
-//*************************************
-void minimizerRoutines::GetMinimizerState(){
-//*************************************
-
-  LOG(FIT) << "Minimizer State: "<<std::endl;
-  // Get X and Err
-  const double *values = fMinimizer->X();
-  const double *errors = fMinimizer->Errors();
-  int ipar = 0;
-
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string syst = fParams.at(i);
-
-    fCurVals[syst]   = values[i];
-    fErrorVals[syst] = errors[i];
-  }
-  
-  PrintState();
-
-  // Covar
-  SetupCovariance();
-  if (fMinimizer->CovMatrixStatus() > 0){
-
-    // Fill Full Covar
-    for (int i = 0; i < fCovar->GetNbinsX(); i++){
-      for (int j = 0; j < fCovar->GetNbinsY(); j++){
-	fCovar->SetBinContent(i+1,j+1, fMinimizer->CovMatrix(i,j));
-      }
-    }
-
-    int freex = 0;
-    int freey = 0;
-    for (int i = 0; i < fCovar->GetNbinsX(); i++){
-      if (fMinimizer->IsFixedVariable(i)) continue;
-      freey = 0;
-      
-      for (int j = 0; j < fCovar->GetNbinsY(); j++){
-	if (fMinimizer->IsFixedVariable(j)) continue;
-
-	fCovarFree->SetBinContent(freex+1,freey+1, fMinimizer->CovMatrix(i,j));
-	freey++;
-      }
-      freex++;
-    }
- 
-    fCorrel     = PlotUtils::GetCorrelationPlot(fCovar,"correlation");
-    fDecomp     = PlotUtils::GetDecompPlot(fCovar,"decomposition");
-    fCorrelFree = PlotUtils::GetCorrelationPlot(fCovarFree,"correlation_free");
-    fDecompFree = PlotUtils::GetDecompPlot(fCovarFree,"decomposition_free");
-  }
-
-  
-  return;
-};
-
-//*************************************
-void minimizerRoutines::LowStatRoutine(std::string routine){
-//*************************************
-
-  LOG(FIT) << "Running Low Statistics Routine: "<<routine<<std::endl;
-  int lowstatsevents = FitPar::Config().GetParI("LOWSTATEVENTS");
-  int maxevents      = FitPar::Config().GetParI("MAXEVENTS");
-  int verbosity      = FitPar::Config().GetParI("VERBOSITY");
-
-  std::string trueroutine = routine;
-  std::string substring = "LowStat";
-  trueroutine.erase( trueroutine.find(substring),
-		     substring.length() );
-
-  // Set MAX EVENTS=1000
-  FitPar::Config().SetParI("MAXEVENTS",lowstatsevents);
-  FitPar::Config().SetParI("VERBOSITY",3);
-  SetupFCN();
-
-  RunFitRoutine(trueroutine);
-
-  FitPar::Config().SetParI("MAXEVENTS",maxevents);
-  SetupFCN();
-
-  FitPar::Config().SetParI("VERBOSITY",verbosity);
-  return;
-}
-
-//*************************************
-void minimizerRoutines::Create1DScans(){
-//*************************************
-
-  // 1D Scan Routine
-  // Steps through all free parameters about nominal using the step size
-  // Creates a graph for each free parameter
-  
-  // At the current point create a 1D Scan for all parametes (Uncorrelated)
-  for (UInt_t i = 0; i < fParams.size(); i++){
-
-    if (fFixVals[fParams[i]]) continue;
-
-    LOG(FIT) << "Running 1D Scan for " << fParams[i] << endl;
-    fSampleFCN->CreateIterationTree(fParams[i] +
-				    "_scan1D_iterations",
-				    FitBase::GetRW());
-    
-    double scanmiddlepoint = fCurVals[fParams[i]];
-
-    // Determine N points needed
-    double limlow  = fMinVals[fParams[i]];
-    double limhigh = fMaxVals[fParams[i]];
-    double step    = fStepVals[fParams[i]];
-
-    int npoints = int( fabs(limhigh - limlow)/(step+0.) );
-
-    TH1D* contour = new TH1D(("Chi2Scan1D_" + fParams[i]).c_str(),
-			     ("Chi2Scan1D_" + fParams[i] +
-			      ";" + fParams[i]).c_str(),
-			     npoints, limlow, limhigh);
-    
-    // Fill bins
-    for (int x = 0; x < contour->GetNbinsX(); x++){
-
-      // Set X Val
-      fCurVals[fParams[i]] = contour->GetXaxis()->GetBinCenter(x+1);
-
-      // Run Eval
-      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-      double  chi2 = fSampleFCN->DoEval( vals );
-      delete vals;
-      
-      // Fill Contour
-      contour->SetBinContent(x+1, chi2);
-    }
-
-    // Save contour
-    contour->Write();
-    
-    // Reset Parameter
-    fCurVals[fParams[i]] = scanmiddlepoint;
-
-    // Save TTree
-    fSampleFCN->WriteIterationTree();
-  }
-
-  return;
-}
-
-//*************************************
-void minimizerRoutines::Chi2Scan2D(){
-//*************************************
-
-  // Chi2 Scan 2D
-  // Creates a 2D chi2 scan by stepping through all free parameters
-  // Works for all pairwise combos of free parameters
-  
-  // Scan I
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    if (fFixVals[fParams[i]]) continue;
-
-    // Scan J
-    for (UInt_t j = 0; j < i; j++){
-      if (fFixVals[fParams[j]]) continue;
-
-      fSampleFCN->CreateIterationTree( fParams[i] + "_" +
-					fParams[j] + "_" +
-					"scan2D_iterations",
-					FitBase::GetRW() );
-
-      double scanmid_i = fCurVals[fParams[i]];
-      double scanmid_j = fCurVals[fParams[j]];
-
-      double limlow_i  = fMinVals[fParams[i]];
-      double limhigh_i = fMaxVals[fParams[i]];
-      double step_i    = fStepVals[fParams[i]];
-
-      double limlow_j  = fMinVals[fParams[j]];
-      double limhigh_j = fMaxVals[fParams[j]];
-      double step_j    = fStepVals[fParams[j]];
-
-      int npoints_i = int( fabs(limhigh_i - limlow_i)/(step_i+0.) ) + 1;
-      int npoints_j = int( fabs(limhigh_j - limlow_j)/(step_j+0.) ) + 1;
-      
-      TH2D* contour = new TH2D(("Chi2Scan2D_" + fParams[i] + "_" + fParams[j]).c_str(),
-			       ("Chi2Scan2D_" + fParams[i] + "_" + fParams[j] +
-				";" + fParams[i] + ";" + fParams[j]).c_str(),
-			       npoints_i, limlow_i, limhigh_i,
-			       npoints_j, limlow_j, limhigh_j );
-
-      // Begin Scan
-      LOG(FIT)<<"Running scan for "<<fParams[i]<<" "<<fParams[j]<<endl;
-
-      // Fill bins
-      for (int x = 0; x < contour->GetNbinsX(); x++){
-
-        // Set X Val
-        fCurVals[fParams[i]] = contour->GetXaxis()->GetBinCenter(x+1);
-
-        // Loop Y
-        for (int y = 0; y < contour->GetNbinsY(); y++){
-
-          // Set Y Val
-          fCurVals[fParams[j]] = contour->GetYaxis()->GetBinCenter(y+1);
-
-	  // Run Eval
-	  double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-	  double  chi2 = fSampleFCN->DoEval( vals );
-	  delete vals;
-	  
-          // Fill Contour
-          contour->SetBinContent(x+1,y+1, chi2);
-
-          fCurVals[fParams[j]] = scanmid_j;
-        }
-
-        fCurVals[fParams[i]] = scanmid_i;
-        fCurVals[fParams[j]] = scanmid_j;
-      }
-
-      // Save contour
-      contour->Write();
-      
-      // Save Iterations
-      fSampleFCN->WriteIterationTree();
-      
-    }
-  }
-
-  return;
-}
-
-//*************************************
-void minimizerRoutines::CreateContours(){
-//*************************************
-
-  // Use MINUIT for this if possible
-  ERR(FTL) << " Contours not yet implemented as it is really slow!" << endl;
-  throw;
-
-  return;
-}
-
-//*************************************
-int minimizerRoutines::FixAtLimit(){
-//*************************************
-
-  bool fixedparam = false;
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string syst = fParams.at(i);
-    if (fFixVals[syst]) continue;
-
-    double curVal = fCurVals.at(syst);
-    double minVal = fMinVals.at(syst);
-    double maxVal = fMinVals.at(syst);
-
-    if (fabs(curVal - minVal) < 0.0001){
-      fCurVals[syst] = minVal;
-      fFixVals[syst] = true;
-      fixedparam = true;
-    }
-
-    if (fabs(maxVal - curVal) < 0.0001){
-      fCurVals[syst] = maxVal;
-      fFixVals[syst] = true;
-      fixedparam = true;
-    }
-  }
-
-  if (!fixedparam){
-    LOG(FIT) << "No dials needed fixing!" << endl;
-    return kNoChange; 
-  }else return kStateChange;
-}
 
 
 /*
   Write Functions
 */
 //************************************* 
-void minimizerRoutines::SaveResults(){
+void SystematicRoutines::SaveResults(){
 //*************************************
 
   fOutputRootFile->cd();
-
-  if (fMinimizer){
-    SaveMinimizerState();
-  }
 
   SaveCurrentState();
 
 }
 
 //*************************************
-void minimizerRoutines::SaveMinimizerState(){
-//*************************************
-
-  if (!fMinimizer){
-    ERR(FTL) << "Can't save minimizer state without min object" << endl;
-    throw;
-  }
-
-  // Save main fit tree
-  fSampleFCN->WriteIterationTree();
-  
-  // Get Vals and Errors
-  GetMinimizerState();
-
-  // Save tree with fit status
-  std::vector<std::string> nameVect;
-  std::vector<double>      valVect;
-  std::vector<double>      errVect;
-  std::vector<double>      minVect;
-  std::vector<double>      maxVect;
-  std::vector<double>      startVect;
-  std::vector<int>      endfixVect;
-  std::vector<int>      startfixVect;
-
-  //  int NFREEPARS = fMinimizer->NFree();
-  int NPARS = fMinimizer->NDim();
-
-  int ipar = 0;
-  // Dial Vals
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string name = fParams.at(i);
-
-    nameVect    .push_back( name );
-
-    valVect     .push_back( fCurVals.at(name)   );
-    errVect     .push_back( fErrorVals.at(name) );
-    minVect     .push_back( fMinVals.at(name)   );
-    maxVect     .push_back( fMaxVals.at(name)   );
-
-    startVect   .push_back( fStartVals.at(name) );
-    endfixVect  .push_back( fFixVals.at(name)      );
-    startfixVect.push_back( fStartFixVals.at(name) );
-
-    ipar++;
-  }
-
-  int NFREE = fMinimizer->NFree();
-  int NDIM  = fMinimizer->NDim();
-
-  double CHI2 = fSampleFCN->GetLikelihood();
-  int NBINS = fSampleFCN->GetNDOF();
-  int NDOF = NBINS - NFREE;
-
-  // Write fit results
-  TTree* fit_tree = new TTree("fit_result","fit_result");
-  fit_tree->Branch("parameter_names",&nameVect);
-  fit_tree->Branch("parameter_values",&valVect);
-  fit_tree->Branch("parameter_errors",&errVect);
-  fit_tree->Branch("parameter_min",&minVect);
-  fit_tree->Branch("parameter_max",&maxVect);
-  fit_tree->Branch("parameter_start",&startVect);
-  fit_tree->Branch("parameter_fix",&endfixVect);
-  fit_tree->Branch("parameter_startfix",&startfixVect);
-  fit_tree->Branch("CHI2",&CHI2,"CHI2/D");
-  fit_tree->Branch("NDOF",&NDOF,"NDOF/I");
-  fit_tree->Branch("NBINS",&NBINS,"NBINS/I");
-  fit_tree->Branch("NDIM",&NDIM,"NDIM/I");
-  fit_tree->Branch("NFREE",&NFREE,"NFREE/I");
-  fit_tree->Fill();
-  fit_tree->Write();
-
-  // Make dial variables
-  TH1D dialvar  = TH1D("fit_dials","fit_dials",NPARS,0,NPARS);
-  TH1D startvar = TH1D("start_dials","start_dials",NPARS,0,NPARS);
-  TH1D minvar   = TH1D("min_dials","min_dials",NPARS,0,NPARS);
-  TH1D maxvar   = TH1D("max_dials","max_dials",NPARS,0,NPARS);
-
-  TH1D dialvarfree  = TH1D("fit_dials_free","fit_dials_free",NFREE,0,NFREE);
-  TH1D startvarfree = TH1D("start_dials_free","start_dials_free",NFREE,0,NFREE);
-  TH1D minvarfree   = TH1D("min_dials_free","min_dials_free",NFREE,0,NFREE);
-  TH1D maxvarfree   = TH1D("max_dials_free","max_dials_free",NFREE,0,NFREE);
-
-  int freecount = 0;
-  
-  for (UInt_t i = 0; i < nameVect.size(); i++){
-    std::string name = nameVect.at(i);
-
-    dialvar.SetBinContent(i+1, valVect.at(i));
-    dialvar.SetBinError(i+1, errVect.at(i));
-    dialvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
-
-    startvar.SetBinContent(i+1, startVect.at(i));
-    startvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
-
-    minvar.SetBinContent(i+1,   minVect.at(i));
-    minvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
-
-    maxvar.SetBinContent(i+1,   maxVect.at(i));
-    maxvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
-
-    if (!startfixVect.at(i)){
-      freecount++;
-
-      dialvarfree.SetBinContent(freecount, valVect.at(i));
-      dialvarfree.SetBinError(freecount, errVect.at(i));
-      dialvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-
-      startvarfree.SetBinContent(freecount, startVect.at(i));
-      startvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-
-      minvarfree.SetBinContent(freecount,   minVect.at(i));
-      minvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-      
-      maxvarfree.SetBinContent(freecount,   maxVect.at(i));
-      maxvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-      
-    }
-  }
-
-  // Save Dial Plots
-  dialvar.Write();
-  startvar.Write();
-  minvar.Write();
-  maxvar.Write();
-
-  dialvarfree.Write();
-  startvarfree.Write();
-  minvarfree.Write();
-  maxvarfree.Write();
-  
-  // Save fit_status plot
-  TH1D statusplot = TH1D("fit_status","fit_status",8,0,8);
-  std::string fit_labels[8] = {"status", "cov_status",  \
-			       "maxiter", "maxfunc",	\
-			       "iter",    "func",	\
-			       "precision", "tolerance"};
-  double fit_vals[8];
-  fit_vals[0] = fMinimizer->Status() + 0.;
-  fit_vals[1] = fMinimizer->CovMatrixStatus() + 0.;
-  fit_vals[2] = fMinimizer->MaxIterations() + 0.;
-  fit_vals[3] = fMinimizer->MaxFunctionCalls()+ 0.;
-  fit_vals[4] = fMinimizer->NIterations() + 0.;
-  fit_vals[5] = fMinimizer->NCalls() + 0.;
-  fit_vals[6] = fMinimizer->Precision() + 0.;
-  fit_vals[7] = fMinimizer->Tolerance() + 0.;
-
-  for (int i = 0; i < 8; i++){
-    statusplot.SetBinContent(i+1, fit_vals[i]);
-    statusplot.GetXaxis()->SetBinLabel(i+1, fit_labels[i].c_str());
-  }
-
-  statusplot.Write();
-
-  // Save Covars
-  if (fCovar) fCovar->Write();
-  if (fCovarFree) fCovarFree->Write();
-  if (fCorrel) fCorrel->Write();
-  if (fCorrelFree) fCorrelFree->Write();
-  if (fDecomp) fDecomp->Write();
-  if (fDecompFree) fDecompFree->Write();
-  
-  return;
-}
-
-//*************************************
-void minimizerRoutines::SaveCurrentState(std::string subdir){
+void SystematicRoutines::SaveCurrentState(std::string subdir){
 //*************************************
   
   LOG(FIT)<<"Saving current full FCN predictions" <<std::endl;
@@ -1241,7 +791,7 @@ void minimizerRoutines::SaveCurrentState(std::string subdir){
 }
 
 //*************************************
-void minimizerRoutines::SaveNominal(){
+void SystematicRoutines::SaveNominal(){
 //*************************************
 
   fOutputRootFile->cd();
@@ -1253,7 +803,7 @@ void minimizerRoutines::SaveNominal(){
 };
 
 //*************************************
-void minimizerRoutines::SavePrefit(){
+void SystematicRoutines::SavePrefit(){
 //*************************************
 
   fOutputRootFile->cd();
@@ -1270,14 +820,14 @@ void minimizerRoutines::SavePrefit(){
   MISC Functions
 */
 //*************************************
-int minimizerRoutines::GetStatus(){
+int SystematicRoutines::GetStatus(){
 //*************************************
 
   return 0;
 }
 
 //*************************************
-void minimizerRoutines::SetupCovariance(){
+void SystematicRoutines::SetupCovariance(){
 //*************************************
 
   // Remove covares if they exist
@@ -1338,58 +888,43 @@ void minimizerRoutines::SetupCovariance(){
 };
 
 //*************************************
-void minimizerRoutines::ThrowCovariance(bool uniformly){
+void SystematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
-  std::vector<double> rands;
-
-  if (!fDecompFree) {
-    ERR(WRN) << "Trying to throw 0 free parameters"<<std::endl;
-    return;
+  
+  // Set fThrownVals to all values in currentVals
+  for (int i = 0; i < fParams.size(); i++){
+    std::string name = fParams.at(i);
+    fThrownVals[name] = fCurVals[name];
   }
 
-  // Generate Random Gaussians
-  for (Int_t i = 0; i < fDecompFree->GetNbinsX(); i++){
-    rands.push_back(gRandom->Gaus(0.0,1.0));
-  }
+  for (PullListConstIter iter = fInputThrows.begin();
+       iter != fInputThrows.end(); iter++){
+    ParamPull* pull = *iter;
 
-  // Reset Thrown Values
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    fThrownVals[fParams[i]] = fCurVals[fParams[i]];
-  }
+    pull->ThrowCovariance();
+    TH1D dialhist = pull->GetDataHist();
 
-  // Loop and get decomp
-  for (Int_t i = 0; i < fDecompFree->GetNbinsX(); i++){
+    for (int i = 0; i < dialhist.GetNbinsX(); i++){
+      std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
 
-    std::string parname = std::string(fDecompFree->GetXaxis()->GetBinLabel(i+1));
-    double mod = 0.0;
-
-    if (!uniformly){
-      for (Int_t j = 0; j < fDecompFree->GetNbinsY(); j++){
-	mod += rands[j] * fDecompFree->GetBinContent(j+1,i+1);
+      cout << "Thrown BinX = " << name << endl;
+      if (fCurVals.find(name) != fCurVals.end()){
+	fThrownVals[name] = dialhist.GetBinContent(i+1);
+	cout << "ThrownVals = " << name << " " << fThrownVals[name] << endl;
+	sleep(1);
       }
     }
 
-    if (fCurVals.find(parname) != fCurVals.end()) {
+    // Reset throw incase pulls are calculated.
+    pull->ResetToy();
 
-      if (uniformly) fThrownVals[parname] = gRandom->Uniform(fMinVals[parname],fMaxVals[parname]);
-      else {  fThrownVals[parname] = 	  fCurVals[parname] + mod; }
-
-    }
   }
-
-  // Check Limits
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string syst = fParams[i];
-    if (fFixVals[syst]) continue;
-    if (fThrownVals[syst] < fMinVals[syst]) fThrownVals[syst] = fMinVals[syst];
-    if (fThrownVals[syst] > fMaxVals[syst]) fThrownVals[syst] = fMaxVals[syst];
-  }
-
+    
   return;
 };
 
 //*************************************
-void minimizerRoutines::GenerateErrorBands(){
+void SystematicRoutines::GenerateErrorBands(){
 //*************************************
 
   TDirectory* errorDIR = (TDirectory*) fOutputRootFile->mkdir("error_bands");
@@ -1433,7 +968,7 @@ void minimizerRoutines::GenerateErrorBands(){
     
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
-    double  chi2 = fSampleFCN->DoEval( vals );
+    chi2 = fSampleFCN->DoEval( vals );
     delete vals;
 
     // Save the FCN
@@ -1446,10 +981,6 @@ void minimizerRoutines::GenerateErrorBands(){
   fDecompFree->Write();
   fCovarFree->Write();
   parameterTree->Write();
-
-  for (UInt_t i = 0; i < input_covariances.size(); i++){
-    input_covariances.at(i).Write();
-  }
 
   delete parameterTree;
 
@@ -1529,3 +1060,99 @@ void minimizerRoutines::GenerateErrorBands(){
 
   return;
 };
+
+//*************************************   
+void SystematicRoutines::PlotLimits(){
+//*************************************
+  
+  TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
+  limfolder->cd();
+
+  // Set all parameters at their starting values
+  for (UInt_t i = 0; i < fParams.size(); i++){
+    fCurVals[fParams[i]] = fStartVals[fParams[i]];
+  }
+
+  TDirectory* nomfolder = (TDirectory*) limfolder->mkdir("nominal");
+  nomfolder->cd();
+
+  UpdateRWEngine(fCurVals);
+  fSampleFCN->ReconfigureAllEvents();
+  fSampleFCN->Write();
+
+  limfolder->cd();
+  std::vector<std::string> allfolders;
+
+
+  // Loop through each parameter
+  for (UInt_t i = 0; i < fParams.size(); i++){
+    std::string syst = fParams[i];
+    if (fFixVals[syst]) continue;
+
+    // Loop Downwards
+    while (fCurVals[syst] > fMinVals[syst]){
+      fCurVals[syst] = fCurVals[syst] - fStepVals[syst];
+
+      // Check Limit
+      if (fCurVals[syst] < fMinVals[syst])
+	fCurVals[syst] = fMinVals[syst];
+
+      // Check folder exists
+      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
+	break;
+
+      // Make new folder for variation
+      TDirectory* minfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      minfolder->cd();
+
+      allfolders.push_back(curvalstring);
+
+      // Update Iterations
+      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
+      double chi2 = fSampleFCN->DoEval( vals );
+      delete vals;
+
+      // Save to folder
+      fSampleFCN->Write();
+    }
+
+    // Reset before next loop
+    fCurVals[syst] = fStartVals[syst];
+
+    // Loop Upwards now
+    while (fCurVals[syst] < fMaxVals[syst]){
+      fCurVals[syst] = fCurVals[syst] + fStepVals[syst];
+
+      // Check Limit
+      if (fCurVals[syst] > fMaxVals[syst])
+	fCurVals[syst] = fMaxVals[syst];
+
+      // Check folder exists
+      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
+	break;
+
+      // Make new folder
+      TDirectory* maxfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      maxfolder->cd();
+      
+      allfolders.push_back(curvalstring);
+      
+      // Update Iterations
+      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
+      double chi2 = fSampleFCN->DoEval( vals );
+      delete vals;
+
+      // Save to file
+      fSampleFCN->Write();
+    }
+
+    // Reset before leaving
+    fCurVals[syst] = fStartVals[syst];
+    UpdateRWEngine(fCurVals);
+  }
+
+  return;
+}
+

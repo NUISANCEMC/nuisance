@@ -23,7 +23,7 @@
    where:   
 */
 
-#include "systematicRoutines.h"
+#include "SystematicRoutines.h"
 
 //*******************************
 void printInputCommands(){
@@ -53,10 +53,9 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting nuissyst"<<std::endl;
 
   // Make systematic class and run fit
-  systematicRoutines* min = new systematicRoutines(argc, argv);
-  min->InitialSetup();
-
-  min->SelfFit();
+  SystematicRoutines* min = new SystematicRoutines(argc, argv);
+  min->Run();
+  
   
   // Show Final Status
   std::cout<<"-------------------------------------"<<std::endl;

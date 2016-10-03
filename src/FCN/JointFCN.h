@@ -104,6 +104,12 @@ class JointFCN
 
   //! Set Fake data from file/MC
   void SetFakeData(std::string fakeinput);
+
+  //! Reconfigure looping over duplicate inputs
+  void ReconfigureUsingManager();
+
+  //! Reconfigure Fast looping over duplicate inputs
+  void ReconfigureFastUsingManager();
   
  private: 
 
@@ -128,6 +134,9 @@ class JointFCN
   double  fNDOF;           //!< Total NDOF
   double* fSampleLikes;    //!< Likelihoods for each individual measurement in list
   int *   fSampleNDOF;     //!< NDOF for each individual measurement in list
+
+  bool fUsingEventManager; //!< Flag for doing joint comparisons
+  
 };
 
 /*! @} */

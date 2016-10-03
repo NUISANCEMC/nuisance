@@ -19,7 +19,8 @@ JointFCN::JointFCN(std::string cardfile,  TFile *outfile){
   fIterationTree = NULL;
   fDialVals = NULL;
   fNDials = 0;
-  
+
+  fUsingEventManager = FitPar::Config().GetParB("EventManager");
 };
 
 //*************************************************** 
@@ -345,19 +346,30 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   int starttime = time(NULL);
   LOG(MIN) << "Starting Reconfigure iter. "<<this->fCurIter<<endl;
 
-  // Loop over all Measurement Classes
-  for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end(); iter++){
-    MeasurementBase* exp = *iter;
 
-    // If RW Either do signal or full reconfigure.
-    if (fDialChanged or !fMCFilled or fullconfig){
-      if (!fullconfig and fMCFilled) exp->ReconfigureFast();
-      else                           exp->Reconfigure();
+  // Event Manager Reconf
+  if (fUsingEventManager){
+    
+    if (!fullconfig and fMCFilled) ReconfigureFastUsingManager();
+    else ReconfigureUsingManager();
+    
+  } else {
+  
+    // Loop over all Measurement Classes
+    for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end(); iter++){
+      MeasurementBase* exp = *iter;
       
-    // If RW Not needed just do normalisation
-    } else {      
-      exp->Renormalise();
-    }    
+      
+      // If RW Either do signal or full reconfigure.
+      if (fDialChanged or !fMCFilled or fullconfig){	
+	if (!fullconfig and fMCFilled) exp->ReconfigureFast();
+	else	  exp->Reconfigure();
+      
+	// If RW Not needed just do normalisation
+      } else {      
+	exp->Renormalise();
+      }    
+    }
   }
 
   // Loop over pulls and update
@@ -385,6 +397,101 @@ void JointFCN::ReconfigureAllEvents() {
   FitBase::GetRW()->Reconfigure();
   FitBase::EvtManager().ResetWeightFlags();
   this->ReconfigureSamples(true);
+}
+
+
+//*************************************************** 
+void JointFCN::ReconfigureUsingManager() {
+//***************************************************
+  LOG(MIN) << "Using manager." << endl;
+  FitBase::EvtManager().ResetWeightFlags();
+  
+  // Get list of inputs
+  std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
+  std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
+  
+  // Start looping over inputs
+  for (; iterInp != fInputs.end(); iterInp++) {
+    
+    int input_id = (iterInp->first);
+    InputHandler* cur_input = (iterInp->second);
+    
+    FitEvent* cevent = cur_input->GetEventPointer();
+    int fNEvents = cur_input->GetNEvents();
+    int countwidth = (fNEvents / 10);
+    
+    // MAIN EVENT LOOP
+    for (int i = 0; i < fNEvents; i++) {
+      
+      // Get Event from input list
+      cevent = FitBase::EvtManager().GetEvent(input_id, i);
+
+      // Get Weight
+      double Weight = (FitBase::GetRW()->CalcWeight(cevent)	\
+		       * cevent->InputWeight);
+
+      // Skip if dodgy event
+      if (fabs(cevent->Mode) > 60 || cevent->Mode == 0)
+	continue;
+
+      // Remove bad weights
+      if (Weight > 200.0 || Weight <= 0.0)
+	Weight = 0.0;
+      
+      // Loop over samples and fill histograms
+      bool foundsignal = false;
+      int j = 0;
+      for (MeasListConstIter iterSam = fSamples.begin();
+	   iterSam != fSamples.end(); iterSam++, j++){
+	
+	MeasurementBase* exp = (*iterSam);
+	int exp_id = exp->GetInputID();
+	if (exp_id != input_id) continue;
+
+	// Reset State of event by event vars
+	exp->SetXVar(-999.9);
+	exp->SetYVar(-999.9);
+	exp->SetZVar(-999.9);
+	exp->SetMode(-999);
+	exp->SetSignal(false);
+	
+	// Fill exp
+	exp->SetMode(cevent->Mode);
+	exp->FillEventVariables(cevent);
+	bool signal = exp->isSignal(cevent);
+	if (signal) foundsignal = true;
+	exp->SetSignal(signal);
+	
+	exp->SetWeight(Weight);
+	exp->FillHistograms();
+      }
+
+      // Print Out
+      if (LOG_LEVEL(REC) and i % countwidth == 0)
+	LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
+		 << std::endl;
+    }
+  }
+
+  // Convert Binned events
+  MeasListConstIter iterSam = fSamples.begin();
+  for (; iterSam != fSamples.end(); iterSam++) {
+    MeasurementBase* exp = (*iterSam);
+    exp->ConvertEventRates();
+  }
+
+  return;
+}
+  
+//*************************************************** 
+void JointFCN::ReconfigureFastUsingManager() {
+//***************************************************
+
+  // Using normal event manager for now until this is developed further.
+  ReconfigureUsingManager();
+  return;
+  
+  return;
 }
 
 //*************************************************** 

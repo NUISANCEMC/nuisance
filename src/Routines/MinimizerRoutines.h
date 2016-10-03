@@ -64,7 +64,7 @@ enum minstate {
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
-class minimizerRoutines{
+class MinimizerRoutines{
 //*************************************
 
 public:
@@ -74,10 +74,10 @@ public:
   */
 
   //! Constructor reads in arguments given at the command line for the fit here.
-  minimizerRoutines(int argc, char* argv[]);
+  MinimizerRoutines(int argc, char* argv[]);
     
   //! Default destructor
-  ~minimizerRoutines();
+  ~MinimizerRoutines();
 
   //! Reset everything to default/NULL
   void Init();
@@ -256,9 +256,6 @@ protected:
   TH2D* fCorrelFree;
   TH2D* fDecompFree;
   TH2D* fCovarFree;
-
-  std::vector<TH1D*> input_dials;  //!< Vector of histograms from parameter pull classes that give central values of the input pull terms
-  std::vector<TH2D> input_covariances; //!< vector of histograms from parameter pull classes that give covariance of the input pull terms
 };
 
 /*! @} */

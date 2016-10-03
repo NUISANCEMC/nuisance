@@ -173,13 +173,18 @@ class MeasurementBase {
   double GetZVar(void){ return fZVar; };
   double GetMode(void){ return this->Mode;  };
   double GetEnu(void){ return this->Enu; };
-
+  
   void SetupInputs(std::string inputfile);
   int GetInputID(void);
   void SetSignal(bool sig);
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
   void SetMode(int md);
+
+  inline void SetXVar(double xvar){ fXVar = xvar; };
+  inline void SetYVar(double yvar){ fYVar = yvar; };
+  inline void SetZVar(double zvar){ fZVar = zvar; };
+  
   
 protected:
 

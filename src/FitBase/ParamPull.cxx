@@ -19,9 +19,14 @@
 #include "ParamPull.h"
 
 //*******************************************************************************
-ParamPull::ParamPull(std::string name, std::string inputfile, std::string type){
+ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, std::string dials){
 //*******************************************************************************
 
+  fMinHist = NULL;
+  fMaxHist = NULL;
+  fTypeHist = NULL;
+  fDialSelection = dials;
+  
   fName  = name;
   fInput = inputfile;
   fType  = type;
@@ -102,11 +107,12 @@ void ParamPull::SetupHistograms(std::string input){
   else if (!fFileType.compare("DIAL")) ReadDialInput(input);
   else {
     ERR(FTL) << "Unknown ParamPull Type: " << input << endl;
+    throw;
   }
-
+  
   // Check Dials are all good
   CheckDialsValid();
-  
+
   // Setup MC Histogram
   fMCHist = (TH1D*) fDataHist->Clone();
   fMCHist->Reset();
@@ -117,6 +123,47 @@ void ParamPull::SetupHistograms(std::string input){
   if (!fCovar){
     fCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist, 1.0);
   }
+
+  // If no types or limits are provided give them a default option
+  if (!fMinHist){
+    fMinHist = (TH1D*) fDataHist->Clone();
+    fMinHist->SetNameTitle( (fName + "_min").c_str(),
+			    (fName + " min" + fPlotTitles).c_str() );
+    for (int i = 0; i < fMinHist->GetNbinsX(); i++){
+      // TODO (P.Stowell) Change this to a NULL system where limits are actually free!    
+      fMinHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1) - 1E6); 
+    }
+  }
+
+  if (!fMaxHist){
+    fMaxHist = (TH1D*) fDataHist->Clone();
+    fMaxHist->SetNameTitle( (fName + "_min").c_str(),
+			    (fName + " min" + fPlotTitles).c_str() );
+    for(int i = 0; i < fMaxHist->GetNbinsX(); i++){
+      fMaxHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1) - 1E6);
+    }
+  }
+
+  // Set types from state, or to unknown
+  if (!fTypeHist){
+
+    int deftype = -1;
+    if (fType.find("T2K")        != std::string::npos){ deftype = kT2K;   }
+    else if (fType.find("NEUT")  != std::string::npos){ deftype = kNEUT;  }
+    else if (fType.find("NIWG")  != std::string::npos){ deftype = kNIWG;  }
+    else if (fType.find("GENIE") != std::string::npos){ deftype = kGENIE; }
+    else if (fType.find("NORM")  != std::string::npos){ deftype = kNORM;  }
+    else if (fType.find("NUWRO") != std::string::npos){ deftype = kNUWRO; }
+    
+    fTypeHist = new TH1I( (fName + "_type").c_str(),
+			  (fName + " type" + fPlotTitles).c_str(),
+			  fDataHist->GetNbinsX(), 0, fDataHist->GetNbinsX() );
+    
+    for(int i = 0; i < fTypeHist->GetNbinsX(); i++){
+      fTypeHist->SetBinContent(i+1, deftype );
+    }
+  }
+  
   
   // Sort Covariances
   fInvCovar = StatUtils::GetInvert(fCovar);
@@ -130,7 +177,87 @@ void ParamPull::SetupHistograms(std::string input){
   fDataOrig = (TH1D*) fDataHist->Clone();
   fDataOrig->SetNameTitle( (fName + "_origdata").c_str(),
 			   (fName + " origdata" + fPlotTitles).c_str() );
+
+  // Select only dials we want
+  if (!fDialSelection.empty()){
+    (*fDataHist) = RemoveBinsNotInString(*fDataHist, fDialSelection);
+    
+
+    
+  }
   
+}
+
+//******************************************************************************* 
+TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr){
+//******************************************************************************* 
+
+  // Make list of allowed bins
+  std::vector<std::string> allowedbins;
+  for (int i = 0; i < hist.GetNbinsX(); i++){
+    std::string syst = std::string(hist.GetXaxis()->GetBinLabel(i+1));
+    
+    if (mystr.find(syst) != std::string::npos){
+      allowedbins.push_back(syst);
+    }
+  }
+
+  // Make new histogram
+  UInt_t nbins = allowedbins.size();
+  TH1D newhist = TH1D( hist.GetName(), hist.GetTitle(),
+		       (Int_t)nbins, 0.0, (Double_t)nbins);
+
+  // Setup bins
+  for (UInt_t i = 0; i < nbins; i++){
+    // Set Labels
+    newhist.GetXaxis()->SetBinLabel(i+1, allowedbins[i].c_str());
+
+    // Copy Values
+    for (UInt_t j = 0; j < hist.GetNbinsX(); j++){
+      if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j+1))){
+	newhist.SetBinContent(i+1, hist.GetBinContent(j+1) );
+	newhist.SetBinError(i+1, hist.GetBinError(j+1) );
+      }
+    }
+  }
+
+  return newhist;
+}
+
+//*******************************************************************************
+TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr){
+//*******************************************************************************
+
+  // Make list of allowed bins
+  std::vector<std::string> allowedbins;
+  for (int i = 0; i < hist.GetNbinsX(); i++){
+    std::string syst = std::string(hist.GetXaxis()->GetBinLabel(i+1));
+
+    if (mystr.find(syst) != std::string::npos){
+      allowedbins.push_back(syst);
+    }
+  }
+
+  // Make new histogram
+  UInt_t nbins = allowedbins.size();
+  TH1I newhist = TH1I( hist.GetName(), hist.GetTitle(),
+		       (Int_t)nbins, 0.0, (Int_t)nbins);
+
+  // Setup bins
+  for (UInt_t i = 0; i < nbins; i++){
+    // Set Labels
+    newhist.GetXaxis()->SetBinLabel(i+1, allowedbins[i].c_str());
+
+    // Copy Values
+    for (UInt_t j = 0; j < hist.GetNbinsX(); j++){
+      if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j+1))){
+	newhist.SetBinContent(i+1, hist.GetBinContent(j+1) );
+	newhist.SetBinError(i+1, hist.GetBinError(j+1) );
+      }
+    }
+  }
+
+  return newhist;
 }
 
 //******************************************************************************* 
@@ -324,8 +451,6 @@ void ParamPull::ReadDialInput(std::string input){
   std::string dialname = inputlist[0];
   double val = inputvals[1];
   double err = inputvals[2];
-
-  cout << "Reading " << val << " " << err << endl;
   
   fDataHist = new TH1D( (fName + "_data").c_str(),
 			(fName + "_data" + fPlotTitles).c_str(), 1, 0, 1);
@@ -421,6 +546,8 @@ void ParamPull::Reconfigure(){
 
     // Loop over bins and check name matches
     std::string syst = namevec.at(i);
+
+    // Proper Reconf using RW
     for (int j = 0; j < fMCHist->GetNbinsX(); j++){
 
       // If Match set value
@@ -552,21 +679,20 @@ void ParamPull::ThrowCovariance(){
   // Generate random Gaussian throws
   std::vector<double> randthrows;
   for (int i = 0; i < fDataHist->GetNbinsX(); i++){
-
     double randtemp = 0.0;
-    
-    switch(fThrowType){
 
-    // Gaussian Throws
+    switch(fThrowType){
+      
+      // Gaussian Throws
     case kGausThrow:
       randtemp = gRandom->Gaus(0.0,1.0);
       break;
-
-    // No Throws (DEFAULT)
+      
+      // No Throws (DEFAULT)
     default:
       break;
     }
-
+    
     randthrows.push_back(randtemp);
   }
 

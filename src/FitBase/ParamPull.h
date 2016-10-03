@@ -69,7 +69,7 @@ class ParamPull {
  public:
 
   //! Default Constructor
-  ParamPull(std::string name, std::string inputfile, std::string type);    
+  ParamPull(std::string name, std::string inputfile, std::string type, std::string dials="");    
   
   //! Default destructor
   virtual ~ParamPull(void) {};
@@ -145,15 +145,19 @@ class ParamPull {
   inline TH1D GetMaxHist   (void) const { return *fMaxHist;  };
   inline TH1D GetMinHist   (void) const { return *fMinHist;  };
   inline TH1I GetDialTypes (void) const { return *fTypeHist; };
-    
+
  private:
 
+  TH1D RemoveBinsNotInString(TH1D hist, std::string mystr);
+  TH1I RemoveBinsNotInString(TH1I hist, std::string mystr);
+  
   std::string fName;        //!< Pull Name
   std::string fInput;       //!< Pull input string
   std::string fType;        //!< Pull options type
   std::string fFileType;    //!< Pull input file types
   std::string fPlotTitles;  //! Axis format
   std::string fDialOptions; //!< Dial handling options
+  std::string fDialSelection; //!< Dial Selection
   
   TH1D* fMCHist;    //!< Current MC Histogram
   TH1D* fDataHist;  //!< Current data Histogram
