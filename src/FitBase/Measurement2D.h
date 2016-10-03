@@ -205,7 +205,8 @@ protected:
   TH2D* fMCHist_PDG[61]; //!< MC Histograms for each interaction mode
   TH1D* fMCHist_X; //!< Projections onto X of the fMCHist
   TH1D* fMCHist_Y; //!< Projections onto Y of the fMCHist
-
+  TH2D* fMCWeighted; //!< Raw Event Weights
+  
   TH2I* fMaskHist; //!< mask histogram for the data
   TH2I* fMapHist; //!< map histogram used to convert 2D to 1D distributions     
  

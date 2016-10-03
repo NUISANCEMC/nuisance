@@ -129,9 +129,9 @@ void Measurement2D::SetFitOptions(std::string opt){
   if (opt == "DEFAULT") return;
   
   // CHECK Conflicting Fit Options
-  std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(fAllowedTypes, "/");
+  std::vector<std::string> fit_option_allow = PlotUtils::ParseToStr(fAllowedTypes, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++){
-    std::vector<std::string> fit_option_section = PlotUtils::FillVectorSFromString(fit_option_allow.at(i), ",");
+    std::vector<std::string> fit_option_section = PlotUtils::ParseToStr(fit_option_allow.at(i), ",");
     bool found_option = false;
 
     for (UInt_t j = 0; j < fit_option_section.size(); j++){
@@ -152,7 +152,7 @@ void Measurement2D::SetFitOptions(std::string opt){
   }
 
   // Check all options are allowed
-  std::vector<std::string> fit_options_input = PlotUtils::FillVectorSFromString(opt,"/");
+  std::vector<std::string> fit_options_input = PlotUtils::ParseToStr(opt,"/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++){
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos){
 
@@ -615,6 +615,12 @@ void Measurement2D::FillHistograms(){
 void Measurement2D::ScaleEvents(){
 //********************************************************************
 
+  if (fMCWeighted) delete fMCWeighted;
+  fMCWeighted = (TH2D*) fMCHist->Clone();
+  fMCWeighted->SetNameTitle( (fName + "_MC_WGHTS").c_str(),
+			     (fName + "_MC_WGHTS" + fPlotTitles).c_str() );
+  fMCWeighted->GetYaxis()->SetTitle("Weighted Events");
+  
   if (fIsEnu) { // If we have Enu we need to do flux integration bin by bin
 
     int axis = 0;
@@ -1001,6 +1007,7 @@ void Measurement2D::Write(std::string drawOpt){
   bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   
   bool drawSliceCanvYMC = (drawOpt.find("CANVYMC") != std::string::npos);
+  bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
   
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
@@ -1220,9 +1227,9 @@ void Measurement2D::Write(std::string drawOpt){
     c1->Write();
   }
   
-
-
-
+  if (drawWeighted){
+    fMCWeighted->Write();
+  }
   
   // Returning
   LOG(SAM) << fName  << "Written Histograms: "<<fName<<std::endl;

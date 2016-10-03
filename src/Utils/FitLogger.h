@@ -87,9 +87,11 @@ bool LOG_LEVEL(int level);
 
 //! Set LOG VERBOSITY from a string
 void LOG_VERB(std::string verb);
+inline void LOG_VERB(int verb){ FitPar::log_verb = verb; };
 
 //! Set ERROR VERBOSITY from a string
 void ERR_VERB(std::string verb);
+inline void ERR_VERB(int verb){ FitPar::err_verb = verb; };
 
 /// Logging Function. Use as a string stream.  e.g. LOG(SAM) << "This sample is dope." << std::endl;
 std::ostream& LOG(int level);

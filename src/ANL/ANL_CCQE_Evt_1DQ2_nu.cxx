@@ -35,7 +35,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   applyEnucorrection = type.find("ENUCORR") != std::string::npos;
   fDefaultTypes="SHAPE/DIAG";
-  fAllowedTypes="SHAPE/DIAG";
+  fAllowedTypes="SHAPE/DIAG/Q2CORR/MASK";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   fIsDiag = true;

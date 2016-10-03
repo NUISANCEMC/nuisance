@@ -105,6 +105,10 @@ void MeasurementBase::Reconfigure(){
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
   cust_event = fInput->GetEventPointer();
 
+  if (FitPar::Config().GetParI("cachesize") > 0){
+    fInput->SetupCache();
+  }
+  
   // Reset Histograms
   this->ResetAll();
 
@@ -117,7 +121,6 @@ void MeasurementBase::Reconfigure(){
   int fNEvents = fInput->GetNEvents();
   int countwidth = (fNEvents/20);
 
-  cout << "NEvents = " << fNEvents << endl;
   // Reset Signal Vectors
   fXVar_VECT.clear();
   fYVar_VECT.clear();
@@ -220,8 +223,6 @@ void MeasurementBase::ReconfigureFast(){
   std::vector<double>::iterator Z = fZVar_VECT.begin();
   std::vector<int>::iterator    M = fMode_VECT.begin();
   std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
-
-  cout << "NEvents = " << fIndex_VECT.size() << endl;
   
   // SIGNAL LOOP
   for (int i = 0; I != fIndex_VECT.end(); I++, i++){

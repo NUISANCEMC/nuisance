@@ -52,6 +52,16 @@
 #include "Math/Functor.h"
 #include "FitLogger.h"
 
+enum minstate {
+  kErrorStatus = -1,
+  kGoodStatus,
+  kFitError,
+  kNoChange,
+  kFitFinished,
+  kFitUnfinished,
+  kStateChange,
+};
+
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
 class minimizerRoutines{
@@ -65,10 +75,13 @@ public:
 
   //! Constructor reads in arguments given at the command line for the fit here.
   minimizerRoutines(int argc, char* argv[]);
-
+    
   //! Default destructor
   ~minimizerRoutines();
 
+  //! Reset everything to default/NULL
+  void Init();
+  
   /*
     Input Functions
   */
@@ -81,17 +94,17 @@ public:
   void InitialSetup();
 
   //! Loops through each line of the card file and passes it to other read functions
-  void ReadCard();
+  void ReadCard(std::string cardfile);
 
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters
-  void ReadParameters(std::string parstring);
+  int ReadParameters(std::string parstring);
 
   //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
-  void ReadFakeDataPars(std::string parstring);
+  int ReadFakeDataPars(std::string parstring);
 
   //! Read in the samples so we can set up the free normalisation dials if required
-  void ReadSamples(std::string sampleString);
+  int ReadSamples(std::string sampleString);
 
   /*
     Setup Functions
@@ -127,11 +140,14 @@ public:
   void UpdateRWEngine(std::map<std::string,double>& updateVals);
 
   //! Given a single routine (see tutorial for options) run that fit routine now.
-  void RunFitRoutine(std::string routine);
+  int RunFitRoutine(std::string routine);
 
   //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
   void GetMinimizerState();
 
+  //! Print current value
+  void PrintState();
+  
   //! Performs a fit routine where the MAXEVENTS is set to a much lower value to try and move closer to the best fit minimum.
   void LowStatRoutine(std::string routine);
 
@@ -145,15 +161,11 @@ public:
   void CreateContours();
 
   //! If any currentVals are close to the limits set them to the limit and fix them
-  void FixAtLimit();
+  int FixAtLimit();
 
   //! Throw the current covariance of dial values we have, and fill the thrownVals and thrownNorms maps.
   //! If uniformly is true parameters will be thrown uniformly between their upper and lower limits.
   void ThrowCovariance(bool uniformly);
-
-  //! Step through each parameter one by one and create folders containing the MC predictions at each step.
-  //! Doesn't handle correlated parameters well
-  void PlotLimits();
 
   //! Given the covariance we currently have generate error bands by throwing the covariance.
   //! The FitPar config "error_uniform" defines whether to throw using the covariance or uniformly.
@@ -168,10 +180,6 @@ public:
   //! Write plots and TTrees listing the minimizerObj result of the fit to file
   void SaveMinimizerState();
 
-  //! Save the output of the fitter including sample plots.
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void SaveFitterOutput(std::string dir="");
-
   //! Save the sample plots for current MC
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
@@ -182,6 +190,7 @@ public:
   //! Save predictions before the fit is ran into a seperate folder
   void SavePrefit();
 
+  void SaveResults();
   /*
     MISC Functions
   */
@@ -216,23 +225,23 @@ protected:
 
   std::string fStrategy;
   std::vector<std::string> fRoutines;
-
+  std::string fAllowedRoutines;
+  
   std::string fFakeDataInput;
-
-  std::vector<std::string> configCmdFix;
 
   // Input Dial Vals
   //! Vector of dial names
   std::vector<std::string> fParams;
-  std::map<std::string, double> fStartVals;
-  std::map<std::string, double> fCurVals;
-  std::map<std::string, double> fErrorVals;
-  std::map<std::string, double> fMinVals;
-  std::map<std::string, double> fMaxVals;
-  std::map<std::string, double> fStepVals;
-  std::map<std::string, int>    fTypeVals;
-  std::map<std::string, bool>   fFixVals;
-  std::map<std::string, bool>   fStartFixVals;
+  std::map<std::string, std::string> fStateVals;
+  std::map<std::string, double>      fStartVals;
+  std::map<std::string, double>      fCurVals;
+  std::map<std::string, double>      fErrorVals;
+  std::map<std::string, double>      fMinVals;
+  std::map<std::string, double>      fMaxVals;
+  std::map<std::string, double>      fStepVals;
+  std::map<std::string, int>         fTypeVals;
+  std::map<std::string, bool>        fFixVals;
+  std::map<std::string, bool>        fStartFixVals;
 
   //! Vector of fake parameter names
   std::map<std::string,double> fFakeVals;

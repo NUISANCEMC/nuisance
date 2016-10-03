@@ -263,6 +263,11 @@ double RWSigmaToFrac(std::string type, std::string name, double val);
 double RWSigmaToAbs(std::string type, std::string name, double val);
 double RWAbsToSigma(std::string type, std::string name, double val);
 double RWFracToSigma(std::string type, std::string name, double val);
+
+ int ConvDialType(std::string type);
+ std::string ConvDialType(int type);
+ int GetDialEnum(std::string type, std::string name);
+ int GetDialEnum(int type, std::string name);
 }
 
 #endif

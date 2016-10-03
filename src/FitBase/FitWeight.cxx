@@ -98,7 +98,9 @@ int FitWeight::GetDialEnum(std::string name, int type) {
     case kNEUT: {
 #ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
       int neut_enum = (int)neut::rew::NSyst::FromString(name);
-      this_enum = neut_enum + offset;
+      if (neut_enum != 0){
+	this_enum = neut_enum + offset;
+      }
 #else
       ERR(FTL) << "NEUT RW Not Enabled!" << endl;
       throw;
@@ -455,10 +457,7 @@ void FitWeight::Reconfigure(bool silent) {
   if (!silent and LOG_LEVEL(MIN)) this->PrintState();
 
 #ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
-  if (fIsNeutChanged and fIsUsingNeut) {
-    LOG(FIT) << "Reconfiguring NEUT" << endl;
-    fNeutRW->Reconfigure();
-  }
+  if (fIsNeutChanged and fIsUsingNeut){ fNeutRW->Reconfigure(); }
 #endif
 
 #ifdef __NIWG_ENABLED__  // --- NIWG BLOCK
@@ -957,7 +956,7 @@ double FitWeight::GetSampleNorm(std::string samplename) {
     return 1.0;
 
   } else {
-    LOG(FIT) << " Getting sample norm " << norm_dial << " = "
+    LOG(REC) << " Getting sample norm " << norm_dial << " = "
              << this->GetDialValue(norm_dial) << std::endl;
     return this->GetDialValue(norm_dial);
   }
@@ -1064,7 +1063,7 @@ void FitWeight::Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
     gr_2D_scan.SetName(
         Form("SplineFit_%s_%s", spl->id.c_str(), spl->form.c_str()));
     std::vector<std::string> titles =
-        PlotUtils::FillVectorSFromString(spl->id, ",");
+        PlotUtils::ParseToStr(spl->id, ",");
     gr_2D_scan.SetTitle(Form("SplineFit_%s_%s;%s;%s;Weight Response",
                              spl->id.c_str(), spl->form.c_str(),
                              titles[0].c_str(), titles[1].c_str()));
@@ -1188,7 +1187,7 @@ void FitWeight::SetupSpline(std::string dialname, std::string splinename,
 
   // Parse Enum Mapping
   std::vector<std::string> parsed_dials =
-      PlotUtils::FillVectorSFromString(dialname, ",");
+      PlotUtils::ParseToStr(dialname, ",");
   std::vector<int> list_enums;
   for (UInt_t i = 0; i < parsed_dials.size(); i++) {
     list_enums.push_back(this->GetDialEnum(parsed_dials.at(i)));
@@ -1225,13 +1224,12 @@ bool FitWeight::HasDialChanged() {
 // ---------------------------
 //********************************************************************
 TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
-  //********************************************************************
+//********************************************************************
 
   std::string dialfunc = "x";
   std::string parType = type;
-  double low = -10.0;
-  double high = 10.0;
-
+  double low = -10000.0;
+  double high = 10000.0;
   if (parType.find("parameter") == std::string::npos) parType += "_parameter";
 
   string line;
@@ -1274,7 +1272,7 @@ TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
       val++;
     }
   }
-
+  
   TF1 convfunc = TF1((name + "_convfunc").c_str(), dialfunc.c_str(), low, high);
   return convfunc;
 }
@@ -1361,4 +1359,92 @@ double FitBase::RWSigmaToFrac(std::string type, std::string name, double val) {
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.Eval(val) / f1.Eval(0.0);
   return conv_val;
+}
+
+
+
+int FitBase::ConvDialType(std::string type){
+
+  if      (!type.compare("neut_parameter")) return kNEUT;
+  else if (!type.compare("niwg_parameter")) return kNIWG;
+  else if (!type.compare("nuwro_parameter")) return kNUWRO;
+  else if (!type.compare("t2k_parameter")) return kT2K;
+  else if (!type.compare("genie_parameter")) return kGENIE;
+  else if (!type.compare("norm_parameter")) return kNORM;
+  else return kUNKNOWN;
+  
+}
+
+std::string FitBase::ConvDialType(int type){
+
+  switch(type){
+  case kNEUT:  { return "neut_parameter";  }
+  case kNIWG:  { return "niwg_parameter";  }
+  case kNUWRO: { return "nuwro_parameter"; }
+  case kT2K:   { return "t2k_parameter";   }
+  case kGENIE: { return "genie_parameter"; }
+  case kNORM:  { return "norm_parameter";  }
+  default: return "unknown_parameter"; 
+  }
+  
+}
+
+int FitBase::GetDialEnum(std::string type, std::string name){
+  return FitBase::GetDialEnum( FitBase::ConvDialType(type), name );
+}
+
+int FitBase::GetDialEnum(int type, std::string name){
+
+  int offset = type * 1000;
+  int this_enum = -1; //Not Found
+
+  // Select Types
+  switch (type) {
+    
+  // NEUT DIAL TYPE
+  case kNEUT: {
+#ifdef __NEUT_ENABLED__  
+    int neut_enum = (int)neut::rew::NSyst::FromString(name);
+    if (neut_enum != 0){ this_enum = neut_enum + offset; }
+#else
+    this_enum = -2; //Not enabled
+#endif
+    break;
+  }
+    
+  // NIWG DIAL TYPE
+  case kNIWG: {
+#ifdef __NIWG_ENABLED__  
+    int niwg_enum = (int)niwg::rew::NIWGSyst::FromString(name);
+    if (niwg_enum != 0){ this_enum = niwg_enum + offset; }
+#else
+    this_enum = -2;
+#endif
+    break;
+  }
+
+  // NUWRO DIAL TYPE
+  case kNUWRO: {
+#ifdef __NUWRO_REWEIGHT_ENABLED__  
+    int nuwro_enum = (int)nuwro::rew::NuwroSyst::FromString(name);
+    if (nuwro_enum > 0){ this_enum = nuwro_enum + offset; }
+#else
+    this_enum = -2;
+#endif
+  }
+    
+  }
+
+  // If Not Enabled
+  if (this_enum == -2){
+    ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type) << endl;
+    ERR(FTL) << "Check dial " << name << endl;
+  }
+
+  // If Not Found
+  if (this_enum == -1){
+    ERR(FTL) << "Dial " << name << " not found." << endl;
+  }
+
+  return this_enum;
 }

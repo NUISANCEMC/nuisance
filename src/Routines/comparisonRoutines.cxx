@@ -207,7 +207,7 @@ int comparisonRoutines::readParameters(std::string parstring) {
 
   // Parse line
   // *_parameter    parname    nom  [low  high step state]
-  std::vector<std::string> parvect = PlotUtils::FillVectorSFromString(parstring," ");
+  std::vector<std::string> parvect = PlotUtils::ParseToStr(parstring," ");
 
   // Check line is long enough
   if (parvect.empty()) return 0;
@@ -229,7 +229,7 @@ int comparisonRoutines::readParameters(std::string parstring) {
   }
 
   // Parse the string also into doubles
-  std::vector<double> pardoub = PlotUtils::FillVectorDFromString(parstring, " ");
+  std::vector<double> pardoub = PlotUtils::ParseToDbl(parstring, " ");
 
   // Set parameter type
   std::string partype_str = parvect[0];
@@ -361,7 +361,7 @@ int comparisonRoutines::readSamples(std::string sampleString) {
 
 // Parse String
   // Input is: sample  sample_id  FILE  [STATE]  [NORM]
-  std::vector<std::string> samplevect = PlotUtils::FillVectorSFromString(sampleString," ");
+  std::vector<std::string> samplevect = PlotUtils::ParseToStr(sampleString," ");
 
   // Skip line if not sample
   if (samplevect[0].compare("sample")) return 0;

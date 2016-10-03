@@ -791,7 +791,10 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
   // If diag, just flip the diag
   if (!non_diagonal or new_mat->GetNrows() == 1){
     for(int i = 0; i < new_mat->GetNrows(); i++){
-      (*new_mat)(i,i) = 1.0/(*new_mat)(i,i);
+      if ((*new_mat)(i,i) != 0.0)
+	(*new_mat)(i,i) = 1.0/(*new_mat)(i,i);
+      else
+	(*new_mat)(i,i) = 0.0;
     }
     return new_mat;
   }
@@ -826,8 +829,10 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
   // If diag, just flip the diag
   if (!non_diagonal or new_mat->GetNrows() == 1){
     for(int i = 0; i < new_mat->GetNrows(); i++){
-      cout << " Setting sqrt value " << (*new_mat)(i,i) <<" " <<sqrt((*new_mat)(i,i))<<endl;
-      (*new_mat)(i,i) = sqrt((*new_mat)(i,i));
+      if ((*new_mat)(i,i) > 0.0)
+	(*new_mat)(i,i) = sqrt((*new_mat)(i,i));
+      else
+	(*new_mat)(i,i) = 0.0;
     }
     return new_mat;
   }

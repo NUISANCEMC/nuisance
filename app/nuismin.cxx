@@ -82,17 +82,16 @@ int main(int argc, char* argv[]){
 
   // Make minimizer class and run fit
   minimizerRoutines* min = new minimizerRoutines(argc, argv);
-  min->InitialSetup();
   
   // Save Starting States
   if (FitPar::Config().GetParB("savenominal")) min->SaveNominal();
-  if (FitPar::Config().GetParB("saveprefit")) min->SavePrefit();
+  if (FitPar::Config().GetParB("saveprefit"))  min->SavePrefit();
 
   // Run the fit rotines
   min->Run();
 
   // Save by default
-  min->SaveFitterOutput();
+  min->SaveResults();
 
   // Get Status
   status = min->GetStatus();

@@ -180,7 +180,7 @@ void ParamPull::ReadFitFile(std::string input){
 void ParamPull::ReadRootFile(std::string input){
 //******************************************************************************* 
 
-  std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
+  std::vector<std::string> inputlist = PlotUtils::ParseToStr(input,";");
 
   // Check all given
   if (inputlist.size() < 2){
@@ -255,7 +255,7 @@ void ParamPull::ReadRootFile(std::string input){
 void ParamPull::ReadVectFile(std::string input){
 //*******************************************************************************
 
-  std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
+  std::vector<std::string> inputlist = PlotUtils::ParseToStr(input,";");
   if (inputlist.size() < 4){
     ERR(FTL) << "Need 3 inputs for vector input in " << fName << endl;
     ERR(FTL) << "Inputs: " << input << endl;
@@ -313,14 +313,14 @@ void ParamPull::ReadVectFile(std::string input){
 void ParamPull::ReadDialInput(std::string input){
 //*******************************************************************************  
 
-  std::vector<std::string> inputlist = PlotUtils::FillVectorSFromString(input,";");
+  std::vector<std::string> inputlist = PlotUtils::ParseToStr(input,";");
   if (inputlist.size() < 3){
     ERR(FTL) << "Need 3 inputs for dial input in " << fName << endl;
     ERR(FTL) << "Inputs: " << input << endl;
     throw;
   }
 
-  std::vector<double> inputvals = PlotUtils::FillVectorDFromString(input,";");
+  std::vector<double> inputvals = PlotUtils::ParseToDbl(input,";");
   std::string dialname = inputlist[0];
   double val = inputvals[1];
   double err = inputvals[2];

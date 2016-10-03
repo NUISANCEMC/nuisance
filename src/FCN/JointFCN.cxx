@@ -182,7 +182,6 @@ int JointFCN::GetNDOF() {
   // Total number of Free bins in each MC prediction
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end(); iter++){
     MeasurementBase* exp = *iter;
-    cout << exp << endl;
     int dof = exp->GetNDOF();
 
     // Save Seperate DOF
@@ -285,7 +284,7 @@ void JointFCN::LoadSamples(std::string cardinput)
     if (line.empty()) continue;
 
     // Parse line
-    std::vector<std::string> samplevect = PlotUtils::FillVectorSFromString(line," ");
+    std::vector<std::string> samplevect = PlotUtils::ParseToStr(line," ");
 
     // Sample Inputs
     if (!samplevect[0].compare("sample")){;
@@ -405,8 +404,19 @@ void JointFCN::Write(){
     pull->Write();
   }
   
-  // Save Iteration Tree
-  if (fIterationTree) fIterationTree->Write();
-
 };
 
+//*************************************************** 
+void JointFCN::SetFakeData(std::string fakeinput){
+//*************************************************** 
+
+  LOG(MIN) << "Setting fake data from " << fakeinput << endl;
+  for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end(); iter++){
+
+    MeasurementBase* exp = *iter;
+    exp->SetFakeDataValues(fakeinput);
+
+  }
+
+  return;
+}

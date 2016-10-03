@@ -219,7 +219,8 @@ protected:
   TH1D* fMCHist; //!< default MC Histogram used in the chi2 fits
   TH1D* fMCFine; //!< finely binned MC histogram
   TH1D* fMCStat; //!< histogram with unweighted events to properly calculate statistical error on MC
-
+  TH1D* fMCWeighted; //!< Weighted histogram before xsec scaling
+  
   TH1I* fMaskHist; //!< Mask histogram for neglecting specific bins
 
   std::string fPlotTitles; //!< Plot title x and y for the histograms

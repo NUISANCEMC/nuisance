@@ -218,8 +218,16 @@ FitSplineHead* InputHandler::GetSplineHead() {
 }
 
 //********************************************************************
+void InputHandler::SetupCache(){
+//********************************************************************
+  tn->SetCacheSize( FitPar::Config().GetParI("cachesize") );
+  tn->AddBranchToCache("*",kTRUE);
+  tn->StopCacheLearningPhase();
+}
+
+//********************************************************************
 void InputHandler::ReadJointFile() {
-  //********************************************************************
+//********************************************************************
 
   LOG(SAM) << " -> Reading list of inputs from file" << std::endl;
   
@@ -470,7 +478,7 @@ void InputHandler::ReadNuWroFile() {
     if (beamtype == 0) {
       std::string fluxstring = fNuwroEvent->par.beam_energy;
       std::vector<double> fluxvals =
-          PlotUtils::FillVectorDFromString(fluxstring, " ");
+          PlotUtils::ParseToDbl(fluxstring, " ");
       int pdg = fNuwroEvent->par.beam_particle;
       double Elow = double(fluxvals[0]) / 1000.0;
       double Ehigh = double(fluxvals[1]) / 1000.0;
@@ -488,10 +496,10 @@ void InputHandler::ReadNuWroFile() {
       std::string fluxstring = fNuwroEvent->par.beam_content;
 
       std::vector<std::string> fluxlines =
-          PlotUtils::FillVectorSFromString(fluxstring, "\n");
+          PlotUtils::ParseToStr(fluxstring, "\n");
       for (int i = 0; i < fluxlines.size(); i++) {
         std::vector<double> fluxvals =
-            PlotUtils::FillVectorDFromString(fluxlines[i], " ");
+            PlotUtils::ParseToDbl(fluxlines[i], " ");
 
         int pdg = int(fluxvals[0]);
         double pctg = double(fluxvals[1]) / 100.0;
@@ -921,6 +929,7 @@ void InputHandler::ReadEvent(unsigned int i) {
        fEventType == kGiBUU);
 
   if (using_events) {
+    tn->LoadTree(i);
     tn->GetEntry(i);
 
     if (fEventType != kEVTSPLINE) fEvent->CalcKinematics();

@@ -86,6 +86,8 @@ class InputHandler {
   std::string GetInputStateString (void);
   double GetInputWeight(const int entry=-1);
 
+  void SetupCache();
+  
  protected:
 
   FitEvent* fEvent;

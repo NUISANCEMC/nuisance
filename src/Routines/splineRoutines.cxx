@@ -320,7 +320,7 @@ void splineRoutines::GenerateSampleSplines(){
   // Add Splines to RW Engine
   for (UInt_t i = 0; i < splineNames.size(); i++){
     std::string name = splineNames.at(i);
-    std::vector<std::string> pos_spline_types = PlotUtils::FillVectorSFromString(splineTypes[name],",");
+    std::vector<std::string> pos_spline_types = PlotUtils::ParseToStr(splineTypes[name],",");
     rw->SetupSpline( name, pos_spline_types[0], splinePoints[name] );
   }
 
@@ -476,7 +476,7 @@ void splineRoutines::MakeSplinePlots(){
     TDirectory* splineDIR = (TDirectory*) valDIR->mkdir( name.c_str() );
     splineDIR->cd();
 
-    std::vector<std::string> pos_spline_types = PlotUtils::FillVectorSFromString(splineTypes[name],",");
+    std::vector<std::string> pos_spline_types = PlotUtils::ParseToStr(splineTypes[name],",");
     UInt_t n_pos_spline_types = pos_spline_types.size();
 
     rw->ResetSplines();

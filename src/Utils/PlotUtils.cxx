@@ -302,7 +302,7 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 };
 
 
-std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const char* del){
+std::vector<std::string> PlotUtils::ParseToStr(std::string str, const char* del){
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -317,7 +317,7 @@ std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const
   return vals;
 
 }
-std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char* del){
+std::vector<double> PlotUtils::ParseToDbl(std::string str, const char* del){
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -334,6 +334,30 @@ std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char
   }
   
   return vals;
+}
+
+//******************************************************************** 
+std::vector<std::string> PlotUtils::ParseFileToStr(std::string str, const char* del){
+//********************************************************************
+  
+  std::vector<std::string> linevect;
+  std::string line;
+  
+  ifstream read;
+  read.open(str.c_str());
+  
+  if (!read.is_open()){
+    std::cerr << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
+    throw;
+  }
+  
+  while( std::getline(read, line, *del) ){
+    linevect.push_back(line);
+  }
+
+  read.close();
+  
+  return linevect;
 }
 
 //********************************************************************

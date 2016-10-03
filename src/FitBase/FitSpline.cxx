@@ -51,15 +51,15 @@ FitSpline::FitSpline(std::string ident, std::string dist,
 
   // Point DEF is given as TYPEA:1,2,3;TYPEB:1,2,3
   // ETC
-  std::vector<std::string> parsed_points = PlotUtils::FillVectorSFromString(points_def,";");
+  std::vector<std::string> parsed_points = PlotUtils::ParseToStr(points_def,";");
   for (UInt_t i = 0; i < parsed_points.size(); i++){
     std::string temp = parsed_points.at(i);
-    std::vector<std::string> split_temp = PlotUtils::FillVectorSFromString(temp, ":");
+    std::vector<std::string> split_temp = PlotUtils::ParseToStr(temp, ":");
 
     std::string choose_type   = split_temp.at(0);
     std::string choose_points = split_temp.at(1);
 
-    std::vector<double> points_temp = PlotUtils::FillVectorDFromString(choose_points, ",");
+    std::vector<double> points_temp = PlotUtils::ParseToDbl(choose_points, ",");
     std::vector<double> points_final;
 
     if      (!choose_type.compare("PNTS")) points_final = points_temp;

@@ -20,12 +20,34 @@
 #ifndef PLOTUTILS_H_SEEN
 #define PLOTUTILS_H_SEEN
 
+
+#include "TH1.h"
+#include "TF1.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "TSystem.h"
+#include "TFile.h"
+#include "TProfile.h"
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+#include "FitParameters.h"
+
+
 // C Includes
 #include <stdlib.h>
 #include <numeric>
 #include <math.h>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
 
 // ROOT includes
 #include <TROOT.h>
@@ -72,11 +94,14 @@ namespace PlotUtils{
   std::string GetObjectWithName(TFile *inFile, std::string substring);
 
   //! Parse a string into a vector of doubles given a delimiter "del"
-  std::vector<double> FillVectorDFromString(std::string str, const char* del);
+  std::vector<double> ParseToDbl(std::string str, const char* del);
 
   //! Parse a string into a vector of strings given a delimiter "del"  
-  std::vector<std::string> FillVectorSFromString(std::string str, const char* del);
+  std::vector<std::string> ParseToStr(std::string str, const char* del);
 
+  //! Parse text file into a vector of strings
+  std::vector<std::string> ParseFileToStr(std::string str, const char* del);
+  
   /*!
     Interaction Mode Histogram Handling
   */

@@ -1,0 +1,5 @@
+# par Name Units Nominal FracErr ConvFunc
+neut_parameter   MaCCQE             GeV     1.21*(1.0+x*0.16)  
+niwg_parameter   NIWGMEC_Norm_C12   %       100.0*(1.0+x)
+niwg_parameter   VecFFCCQE          MDLQE   x
+niwg_parameter   CCQEFermiSurfMom   MeV     217*(1.0+x*0.15)

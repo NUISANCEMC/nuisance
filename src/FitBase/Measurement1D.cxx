@@ -29,7 +29,7 @@ Measurement1D::Measurement1D() {
   fMCHist    = NULL;
   fDataHist  = NULL;
   fMCFine    = NULL;
-
+  fMCWeighted = NULL;
   fMaskHist   = NULL;
   this->covar = NULL;
   fFullCovar  = NULL;
@@ -133,7 +133,7 @@ void Measurement1D::SetupDefaultHist(){
 
   fMCStat = (TH1D*) fMCHist->Clone();
   fMCStat->Reset();
-
+  
   fMCHist->Reset();
   fMCFine->Reset();
 
@@ -162,9 +162,9 @@ void Measurement1D::SetFitOptions(std::string opt){
   if (opt == "DEFAULT") return;
   
   // CHECK Conflicting Fit Options
-  std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(fAllowedTypes, "/");
+  std::vector<std::string> fit_option_allow = PlotUtils::ParseToStr(fAllowedTypes, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++){
-    std::vector<std::string> fit_option_section = PlotUtils::FillVectorSFromString(fit_option_allow.at(i), ",");
+    std::vector<std::string> fit_option_section = PlotUtils::ParseToStr(fit_option_allow.at(i), ",");
     bool found_option = false;
 
     for (UInt_t j = 0; j < fit_option_section.size(); j++){
@@ -185,7 +185,7 @@ void Measurement1D::SetFitOptions(std::string opt){
   }
 
   // Check all options are allowed
-  std::vector<std::string> fit_options_input = PlotUtils::FillVectorSFromString(opt,"/");
+  std::vector<std::string> fit_options_input = PlotUtils::ParseToStr(opt,"/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++){
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos){
 
@@ -604,6 +604,13 @@ void Measurement1D::ScaleEvents(){
   // Scale bin errors correctly
   TH1D* tempFine = (TH1D*) fMCFine->Clone();
 
+  // Create Weighted Histogram
+  if (fMCWeighted) delete fMCWeighted;
+  fMCWeighted = (TH1D*) fMCHist->Clone();
+  fMCWeighted->SetNameTitle( (fName + "_MC_WGHTS").c_str(),
+			     (fName + "_MC_WGHTS" + fPlotTitles).c_str() );
+  fMCWeighted->GetYaxis()->SetTitle("Weighted Events");
+  
   // Should apply different scaling for:
   // 1D Enu distributions -- need bin by bin flux unfolding (bin by bin flux integration)
   // 1D count distributions -- need shape scaling to data
@@ -903,8 +910,6 @@ std::vector<TH1*> Measurement1D::GetMCList(){
     plotfillstyle = FitPar::Config().GetParI("fillstyle");
   }
 
-  std::cout << fName << " chi2 = " << GetLikelihood() << std::endl;
-
   fMCHist->SetTitle(chi2.str().c_str());
   fMCHist->SetLineWidth(3);
   fMCHist->SetLineColor(plotcolor);
@@ -1024,6 +1029,7 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawDecomp = (drawOpt.find("DECOMP") != std::string::npos);
   bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
+  bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
   
   LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
@@ -1170,30 +1176,41 @@ void Measurement1D::Write(std::string drawOpt){
     TLegend leg = PlotUtils::GenerateStackLegend(combo_fMCHist_PDG, 0.6,0.6,0.9,0.9);
     fDataHist->Draw("E1 SAME");
     
-    //leg.Draw("SAME");
+    //    leg.Draw("SAME");
     c1->Write();
+
+    delete c1;
   }
 
 
-  if (drawCanvMC or true){
+  if (drawCanvMC){
     TCanvas* c1 = new TCanvas((fName + "_MC_CANV").c_str(),
 			      (fName + "_MC_CANV").c_str(),
 			      800,600);
     c1->cd();
     fDataHist->Draw("E1");
-    fMCHist->Draw("SAME HIST C");
+    fMCHist->Draw("SAME HIST");
     
     TH1D* mcShape = (TH1D*) fMCHist->Clone((fName + "_MC_SHAPE").c_str());
     double shapeScale = fDataHist->Integral("width")/fMCHist->Integral("width");
     mcShape->Scale(shapeScale);
     mcShape->SetLineStyle(7);
 
-    mcShape->Draw("SAME HIST C");
+    mcShape->Draw("SAME HIST");
 
     TLegend* leg = new TLegend(0.6,0.6,0.9,0.9);
     leg->AddEntry(fDataHist, (fName + " Data").c_str(), "ep");
     leg->AddEntry(fMCHist,   (fName + " MC").c_str(), "l");
     leg->AddEntry(mcShape,   (fName + " Shape").c_str(), "l");
+
+    leg->Draw("SAME");
+
+    c1->Write();
+    delete c1;
+  }
+
+  if (drawWeighted){
+    fMCWeighted->Write();
   }
   
   // Returning

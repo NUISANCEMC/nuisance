@@ -101,6 +101,9 @@ class JointFCN
   
   //! Write all samples to output DIR
   void Write();
+
+  //! Set Fake data from file/MC
+  void SetFakeData(std::string fakeinput);
   
  private: 
 

@@ -70,8 +70,8 @@ config STERILE_delmass2     10.0
 config STERILE_MIN_delmass2    0.0
 config STERILE_MAX_delmass2    10.0
 
-config SAVE_NOMINAL    0
-config SAVE_PREFIT    0
+config SAVE_NOMINAL    1
+config SAVE_PREFIT    1
 config PARRALLEL_EVAL    0
 config TEMP_DIR    /home/stowell/temp_work/
 
@@ -86,8 +86,8 @@ config verbosity    0
 config maxevents    -1
 config t2kreweight.verbosity    2
 
-config extfit.savenominal    0
-config extfit.saveprefit    0
+config extfit.savenominal   1
+config extfit.saveprefit    1
 
 config minimizer.fixinputdial    0
 config minimizer.fitfunction    chi2
@@ -143,3 +143,7 @@ config custom_pars.mec_norm.val  1.0
 
 config minimizer.tolerance  0.001
 config EventManager 0
+
+config cachesize 0
+config savenominal 1
+config saveprefit 1
