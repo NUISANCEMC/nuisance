@@ -381,7 +381,9 @@ void JointFCN::ReconfigureSignal(){
 
 //*************************************************** 
 void JointFCN::ReconfigureAllEvents() {
-//*************************************************** 
+//***************************************************
+  FitBase::GetRW()->Reconfigure();
+  FitBase::EvtManager().ResetWeightFlags();
   this->ReconfigureSamples(true);
 }
 

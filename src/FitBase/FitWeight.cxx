@@ -257,8 +257,8 @@ unsigned int FitWeight::GetDialPos(std::string name) {
 
 //********************************************************************
 void FitWeight::IncludeDial(std::string name, int type, double startval) {
-  //********************************************************************
-
+//********************************************************************
+  
   int this_enum = this->GetDialEnum(name, type);
   int rw_enum = this->GetRWEnum(this_enum);
 
@@ -267,6 +267,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
            << "] " << std::endl;
 
   int id = int(this_enum - (this_enum % 1000)) / 1000;
+  if (id == kNORM) startval = 1.0;
+  
   switch (id) {
     // NEUT RW INCLUDE DIAL
     case kNEUT:
@@ -951,7 +953,6 @@ double FitWeight::GetSampleNorm(std::string samplename) {
   if (!found_dial and !samplename.empty()) {
     LOG(FIT) << " Late initialisation of norm: " << norm_dial << std::endl;
     this->IncludeDial(norm_dial, kNORM, 1.0);
-    LOG(FIT) << "RECONFIGURING" << std::endl;
     this->Reconfigure();
     return 1.0;
 

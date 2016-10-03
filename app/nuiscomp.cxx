@@ -26,7 +26,7 @@
    where:   
 */
 
-#include "comparisonRoutines.cxx"
+#include "ComparisonRoutines.h"
 
 //*******************************
 void printInputCommands(){
@@ -81,15 +81,14 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting ExtFit_comparison.exe"<<std::endl;
 
   // Make minimizer class and run fit
-  comparisonRoutines* min = new comparisonRoutines(argc, argv);
-  min->initialSetup();
+  ComparisonRoutines* min = new ComparisonRoutines(argc, argv);
   
   // Save Starting States
-  if (FitPar::Config().GetParB("savenominal")) min->saveNominal();
+  if (FitPar::Config().GetParB("savenominal")) min->SaveNominal();
 
   // Run the fit rotines
-  min->SelfFit();
-  min->saveCurrentState();
+  min->Run();
+  min->SaveCurrentState();
 
   // Show Final Status
   std::cout<<"-------------------------------------"<<std::endl;

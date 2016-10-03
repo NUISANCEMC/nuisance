@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-comparisonRoutines.cxx
+ComparisonRoutines.cxx
 systematicRoutines.cxx
 )
 
@@ -26,7 +26,7 @@ if(USE_MINIMIZER)
 endif()
 
 set(HEADERFILES
-comparisonRoutines.h
+ComparisonRoutines.h
 systematicRoutines.h
 )
 
