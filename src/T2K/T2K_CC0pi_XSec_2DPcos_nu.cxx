@@ -234,7 +234,12 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     
     // SARAS ANALYSIS
   } else if (fAnalysis == 1){
-    cout << "HELP AWKWARD BINNING";
+
+    //TODO (P.Stowell) Add a TH2Poly Measurement class
+    ERR(FTL) << " Analysis 1 is not yet available due to its awkward binning!" << endl;
+    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << endl;
+    throw;
+    
   }
 
 
@@ -244,7 +249,8 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
   for (int i = 0; i < nbins; i++){
     for (int j = 0; j < nbins; j++){
-      
+
+      cout << "Filling row " << i << " " << j << " " << nbins <<endl;
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
       
     }
