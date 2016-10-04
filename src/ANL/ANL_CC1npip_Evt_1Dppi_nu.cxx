@@ -25,10 +25,11 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fName = "ANL_CC1npip_Evt_1Dppi_nu";
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
-  // whaaa, check this
   EnuMax = 1.5;
   fIsDiag = true;
   fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV

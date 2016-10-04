@@ -98,7 +98,7 @@ int MeasurementBase::GetInputID(){
 //***********************************************
 void MeasurementBase::Reconfigure(){
 //***********************************************
-  LOG(REC) << " Reconfiguring sample "<<this->fName<<std::endl;
+  LOG(REC) << " Reconfiguring sample "<<fName<<std::endl;
 
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
@@ -119,7 +119,7 @@ void MeasurementBase::Reconfigure(){
 
   FitEvent* cust_event = fInput->GetEventPointer();
   int fNEvents = fInput->GetNEvents();
-  int countwidth = (fNEvents/20);
+  int countwidth = (fNEvents/5);
 
   // Reset Signal Vectors
   fXVar_VECT.clear();
@@ -169,17 +169,27 @@ void MeasurementBase::Reconfigure(){
 
     // Fill Histogram Values
     this->FillHistograms();
-    //    this->FillExtraHistograms();
+    // this->FillExtraHistograms();
 
     // Print Out
-    if (LOG_LEVEL(REC) and countwidth and !(i % countwidth))
-      LOG(REC) << "Reconfigured " << i <<" total events. [S,X,Y,Z,M,W] = ["
-	       << Signal << ", "
-	       << fXVar  << ", "<< fYVar <<  ", "
-	       << fZVar  << ", "<< Mode << ", "
-	       << Weight << "] "<< std::endl;
+    if (LOG_LEVEL(REC) && countwidth && !(i % countwidth))
+      LOG(REC).unsetf(ios_base::fixed);
+    std::cout << std::setw(7) << std::right << i << "/" << nevents
+	      << " events (" << std::setw(2) << double(i)/double(nevents)*100.
+	      << std::left << std::setw(5) << "%) "
+	      << "[S,X,Y,Z,M,W] = ["
+	      << std::fixed << std::setprecision(2) << std::right
+	      << Signal << ", "
+	      << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
+	      << std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
+	      << std::setw(5) << Weight << "] "<< std::endl;
+    
+  }
 
-
+  int npassed = X_VAR_VECT.size();
+  LOG(REC) << npassed << "/" << nevents << " passed selection " << std::endl;
+  if (npassed == 0) {
+    LOG(REC) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
   }
 
   // Finalise Histograms
@@ -192,8 +202,10 @@ void MeasurementBase::Reconfigure(){
 void MeasurementBase::ReconfigureFast(){
 //***********************************************
   LOG(REC) << " Reconfiguring signal "<<this->fName<<std::endl;
+
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
+
   if (using_evtmanager){
     input_id = FitBase::GetInputID(inputfilename);
   } else {
@@ -215,7 +227,7 @@ void MeasurementBase::ReconfigureFast(){
   }
 
   // Get Pointer To Base Event (Just Generator Formats)
-  int countwidth = (fIndex_VECT.size() / 10);
+  int countwidth = (fIndex_VECT.size() / 5);
 
   // Setup Iterators
   std::vector<double>::iterator X = fXVar_VECT.begin();
@@ -232,14 +244,15 @@ void MeasurementBase::ReconfigureFast(){
       Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
     } else {
       fInput->GetTreeEntry((*I));
-      Weight = FitBase::GetRW()->CalcWeight(cust_event)	\
-         	* cust_event->InputWeight;
+      Weight = FitBase::GetRW()->CalcWeight(cust_event)	* cust_event->InputWeight;
     }
 
     fXVar = (*X);
     fYVar = (*Y);
     fZVar = (*Z);
     Mode  = (*M);
+
+    // Set signal to true because here every event looped is true signal
     Signal = true;
 
     // Sort Histograms

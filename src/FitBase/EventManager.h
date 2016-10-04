@@ -23,6 +23,7 @@
 #include "InputHandler.h"
 #include "FitWeight.h"
 
+// This class is menat to manage one input file for many distributions 
 class EventManager {
  public:
   static EventManager& Get(void);

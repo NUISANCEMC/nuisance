@@ -28,9 +28,11 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
   EnuMax = 6.0;
   fIsDiag = true;
   fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1ppip_phi.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_phiAdler_1982.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

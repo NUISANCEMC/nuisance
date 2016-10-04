@@ -289,45 +289,47 @@ Double_t StatUtils::GetChi2FromSVD( TH2D* data, TH2D* mc,
 }
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask){
+double StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask) {
 //*******************************************************************
 
   // If just an event rate, for chi2 just use Poission Likelihood to calculate the chi2 component
-  Double_t Chi2 = 0.0;
+  double chi2 = 0.0;
   TH1D* calc_data = (TH1D*)data->Clone();
   TH1D* calc_mc   = (TH1D*)mc->Clone();
 
-  // Apply masking if required          
-  if (mask){
+  // Apply masking if required
+  if (mask) {
     calc_data = ApplyHistogramMasking(data, mask);
     calc_mc   = ApplyHistogramMasking(mc, mask);
   }
 
-  // Iterate over bins in X             
-  for (int i = 0; i < calc_data->GetNbinsX(); i++){
-
-    //    int dt = (int)calc_data->GetBinContent(i+1);
-    //    int mc = (int)calc_mc->GetBinContent(i+1);
+  // Iterate over bins in X
+  for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
     double dt = calc_data->GetBinContent(i+1);
     double mc = calc_mc->GetBinContent(i+1);
 
-    if (dt == 0 or mc == 0) continue;
+    if (dt == 0 or mc == 0) {
+      LOG(REC) << "Found no MC in bin " << i << " for " << calc_data->GetName() << " (" << calc_data->GetBinLowEdge(i) << " - " << calc_data->GetBinLowEdge(i+1) << ")" << std::endl;
+      continue;
+    }
 
-    // Take mc data difference          
-    Chi2 +=  2 * (mc - dt + ( (dt+0.) * log((dt+0.) / (mc+0.)) ));
+    // Do the chi2 for Poisson distributions
+    chi2 +=  2 * (mc - dt + (dt*log(dt/mc)));
 
+/*
     LOG(REC)<<"Evt Chi2 cont = "<<i<<" "
 	    <<mc<<" "<<dt<<" "
 	    <<2 * (mc - dt + (dt+0.) * log((dt+0.) / (mc+0.)))
 	    <<" "<<Chi2<<std::endl;
+*/
   }
 
   // cleanup
   delete calc_data;
   delete calc_mc;
 
-  return Chi2;
+  return chi2;
 }
 
 //*******************************************************************

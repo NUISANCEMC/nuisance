@@ -22,6 +22,7 @@
 // NEUT Constructor
 #ifdef __NEUT_ENABLED__
 FitParticle::FitParticle(NeutPart* part) {
+
   // Set Momentum
   fP = TLorentzVector(part->fP.X(), part->fP.Y(), part->fP.Z(), part->fP.T());
 
@@ -29,6 +30,19 @@ FitParticle::FitParticle(NeutPart* part) {
   fIsAlive = part->fIsAlive;
   fStatus = part->fStatus;
   fMass = part->fMass;
+};
+
+// NEUT FSI defined in neutclass/neutfsipart
+FitParticle::FitParticle(NeutFsiPart* part) {
+
+  // Set Momentum
+  fP = TLorentzVector(part->fDir.X(), part->fDir.Y(), part->fDir.Z(), part->fDir.T());
+
+  fPID = part->fPID;
+  // Set these to zero because they don't make sense in NEUT
+  fIsAlive = 0;
+  fStatus = 0;
+  fMass = fP.Mag();
 };
 #endif
 

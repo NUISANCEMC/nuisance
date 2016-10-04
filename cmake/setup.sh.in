@@ -34,28 +34,31 @@ fi
 
 if [[ "@USE_NEUT@" != "0" ]]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
-    export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
-  fi
   export NEUT_ROOT=@NEUT_ROOT@
   export CERN=@CERN@
   export CERN_LEVEL=@CERN_LEVEL@
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
+    export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
+  fi
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/src/reweight:"* ]]; then
+    export LD_LIBRARY_PATH=${NEUT_ROOT}/src/reweight:$LD_LIBRARY_PATH
+  fi
 fi
 
 if [[ "@USE_NuWro@" != "0" ]]; then
   echo "[INFO]: Adding NuWro library paths to the environment."
+  export NUWRO="@NUWRO@"
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
     export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
   fi
-  export NUWRO="@NUWRO@"
 fi
 
 if [[ "@NEED_PYTHIA6@" != "0" ]]; then
   echo "[INFO]: Adding PYTHIA6 library paths to the environment."
+  export PYTHIA6="@PYTHIA6@"
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@PYTHIA6@:"* ]]; then
     export LD_LIBRARY_PATH=@PYTHIA6@:$LD_LIBRARY_PATH
   fi
-  export PYTHIA6="@PYTHIA6@"
 fi
 
 if [[ "@USE_GENIE@" != "0" ]]; then
@@ -90,25 +93,21 @@ if [[ "@USE_GENIE@" != "0" ]]; then
 fi
 
 if [[ "@USE_NIWG@" != "0" ]]; then
-    echo "[INFO]: Adding NIWG paths to the environment."
-    export NIWG="@NIWG@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG@/:"* ]]; then
-	export LD_LIBRARY_PATH=@NIWG@/:$LD_LIBRARY_PATH
-    fi
+  echo "[INFO]: Adding NIWG paths to the environment."
+  export NIWG=@NIWG@
+  export NIWGREWEIGHT_INPUTS=@NIWG@/inputs
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG@:"* ]]; then
+    export LD_LIBRARY_PATH=${NIWG}:${LD_LIBRARY_PATH}
+  fi
+
 fi
 
-if [[ "@USE_NEUT@" != "0" ]]; then
-    echo "[INFO]: Adding NEUT paths to the environment."
-    export NEUT_ROOT="@NEUT_ROOT@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NEUT_ROOT@/lib:"* ]]; then
-	export LD_LIBRARY_PATH=@NEUT_ROOT@/lib:$LD_LIBRARY_PATH
-	export LD_LIBRARY_PATH=@NEUT_ROOT@/src/reweight:$LD_LIBRARY_PATH
-    fi
-
-    export CERN_ROOT="@CERN_ROOT@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@CERN_ROOT@/lib:"* ]]; then
-	export LD_LIBRARY_PATH=@CERN_ROOT@/lib:$LD_LIBRARY_PATH
-    fi
+if [[ "@USE_T2K@" != "0" ]]; then
+  echo "[INFO]: Adding T2K paths to the environment."
+  export T2KREWEIGHT=@T2KREWEIGHT@
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@T2KREWEIGHT@/lib:"* ]]; then
+    export LD_LIBRARY_PATH=${T2KREWEIGHT}/lib:${LD_LIBRARY_PATH}
+  fi
 fi
 
 export EXT_FIT="@CMAKE_SOURCE_DIR@"

@@ -464,7 +464,7 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu, TLorentzVec
       rEnu = EnuCC1piprecDelta(pnu, pmu);
       break;
   } // No need for default here since default value of enuType = 0, defined in header
-      
+
 
   double q2 = -m_mu*m_mu + 2.*rEnu*(E_mu - p_mu*cos(th_nu_mu));
 
@@ -494,18 +494,15 @@ double FitUtils::MpPi(TLorentzVector pp, TLorentzVector ppi) {
 };
 
 //********************************************************
-// Reconstruct the hadronic mass using all outgoing particles
-// Requires pion vector for reconstructing the neutrino energy
+// Reconstruct the hadronic mass using neutrino and muon
 // Could technically do E_nu = EnuCC1pipRec(pnu,pmu,ppi) too, but this wwill be reconstructed Enu; so gives reconstructed Wrec which most of the time isn't used!
 //
 // Only MINERvA uses this so far; and the Enu is Enu_true
+// If we want W_true need to take initial state nucleon motion into account
 
 // Return value is in MeV!!!
 double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
 //********************************************************
-// Reconstruct the hadronic mass using all outgoing particles
-// Requires pion vector for reconstructing the neutrino energy
-// Could technically do E_nu = pnu.E() too, but this won't be reconstructed Enu; it's true Enu
 
   double E_mu = pmu.E();
   double p_mu = pmu.Vect().Mag();
@@ -520,6 +517,39 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
   //double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
   double w_rec = sqrt(m_p*m_p + m_mu*m_mu - 2*m_p*E_mu + 2*E_nu*(m_p - E_mu + p_mu * cos(th_nu_mu)));
+
+  return w_rec;
+
+};
+
+//********************************************************
+// Reconstruct the true hadronic mass using the initial state and muon
+// Could technically do E_nu = EnuCC1pipRec(pnu,pmu,ppi) too, but this wwill be reconstructed Enu; so gives reconstructed Wrec which most of the time isn't used!
+//
+// No one seems to use this because it's fairly MC dependent!
+
+// Return value is in MeV!!!
+double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector pnuc) {
+//********************************************************
+
+// Could simply do the TLorentzVector operators here but this is more instructive?
+// ... and prone to errors ...
+
+  double E_mu = pmu.E();
+  double p_mu = pmu.Vect().Mag();
+  double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
+  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
+
+  double E_nuc = pnuc.E();
+  double p_nuc = pnuc.Vect().Mag();
+  double m_nuc = sqrt(E_nuc*E_nuc - p_nuc*p_nuc);
+  double th_nuc_mu = pmu.Vect().Angle(pnuc.Vect());
+  double th_nu_nuc = pnu.Vect().Angle(pnuc.Vect());
+  
+  double E_nu = pnu.E();
+  //double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
+
+  double w_rec = sqrt(m_nuc*m_nuc + m_mu*m_mu - 2*E_nu*E_mu + 2*E_nu*p_mu*cos(th_nu_mu) - 2*E_nuc*E_mu + 2*p_nuc*p_mu*cos(th_nuc_mu) + 2*E_nu*E_nuc - 2*E_nu*p_nuc*cos(th_nu_nuc));
 
   return w_rec;
 

@@ -80,6 +80,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type, Fi
   Init();
 
   // Check if name contains Evt, indicating that it is a raw number of events measurements
+
   // and should thus be treated as once
   fIsRawEvents = false;
   if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
@@ -345,7 +346,12 @@ void Measurement1D::SetCovarMatrix(std::string covarFile){
 void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 //********************************************************************
 
+////////////////////////////////////////////////////////////
   // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+  // WARNING this reads in the data CORRELATIONS
+////////////////////////////////////////////////////////////
 
   // Make a counter to track the line number
   int row = 0;
@@ -360,21 +366,23 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
 
   // MINERvA CC1pip needs slightly different method
   // Only half the covariance matrix is given and I'm too lazy to write the full one so let the code do it instead
-  if (fName.find("MINERvA_CC1pip") == std::string::npos && fName.find("MINERvA_CCNpip") == std::string::npos) {
+  if (fName.find("MINERvA_CC1pip") == std::string::npos ||
+      (fName.find("MINERvA_CCNpip") && fName.find("2016"))) {
+
     while(std::getline(covar, line, '\n')){
       std::istringstream stream(line);
       double entry;
       int column = 0;
-
+      
       // Loop over entries and insert them into matrix
       // Multiply by the errors to get the covariance, rather than the correlation matrix
       while(stream >> entry){
-
+	
         double val = entry * fDataHist->GetBinError(row+1)*1E38*fDataHist->GetBinError(column+1)*1E38;
-
-        (*this->covar)(row, column) = val;
+	
+        (*covar)(row, column) = val;
         (*fFullCovar)(row, column) = val;
-
+	
         column++;
       }
 
@@ -600,6 +608,8 @@ void Measurement1D::FillHistograms(){
 void Measurement1D::ScaleEvents(){
 //********************************************************************
 
+  LOG(REC) << std::setw(20) << " " << mcHist->Integral() << "/" << nevents << " events passed selection" << std::endl;
+
   // Simple function to scale to xsec result if this is all that is needed.
   // Scale bin errors correctly
   TH1D* tempFine = (TH1D*) fMCFine->Clone();
@@ -717,7 +727,7 @@ int Measurement1D::GetNDOF(){
 }
 
 //********************************************************************
-double Measurement1D::GetLikelihood(){
+double Measurement1D::GetLikelihood() {
 //********************************************************************
 
   double stat = 0.0;
@@ -734,7 +744,10 @@ double Measurement1D::GetLikelihood(){
   }
 
   // Sort Initial Scaling
-  double scaleF = fDataHist->Integral(1,fDataHist->GetNbinsX(),"width")/fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
+  double scaleF = 0.0;
+  if (fMCHist->Integral(1, fMCHist->GetNbinsX(), "width")){
+    scaleF = fDataHist->Integral(1,fDataHist->GetNbinsX(),"width")/fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
+  }
 
   if (fIsShape){
     fMCHist->Scale(scaleF);
@@ -771,6 +784,12 @@ double Measurement1D::GetLikelihood(){
 
   // Sort Penalty Terms
   if (fAddNormPen){
+
+    if (fNormError <= 0.0){
+      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << endl;
+      ERR(WRN) << "Skipping norm penalty." << endl;
+    }
+    
     double penalty = (1. - fCurrentNorm)*(1. - fCurrentNorm)/(fNormError*fNormError);
     stat += penalty;
   }
@@ -944,7 +963,6 @@ void Measurement1D::GetBinContents(std::vector<double>& cont, std::vector<double
   for (int i = 0; i < fMCHist->GetNbinsX(); i++){
     cont.push_back(fMCHist->GetBinContent(i+1));
     err.push_back(fMCHist->GetBinError(i+1));
-
   }
 
   return;
@@ -1031,7 +1049,6 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
   bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
   
-  LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
   if (drawNormal)  this->GetMCList()  .at(0)->Write();
@@ -1040,14 +1057,17 @@ void Measurement1D::Write(std::string drawOpt){
   if(fEventType == 4 or fEventType==3){ return; }
 
   // Draw Extra plots
-  LOG(SAM)<<"Writing Fine List"<<std::endl;
   if (drawFine)    this->GetFineList().at(0)->Write();
-  LOG(SAM)<<"Writing events"<<std::endl;
+
+  if (fIsMask and drawMask) fMaskHist->Write( (fName + "_MSK").c_str() ); //< save mask  
+  
   if (drawFlux)    fFluxHist->Write();
-  LOG(SAM)<<"Writing true events"<<std::endl;
-  //  if (drawXSec)    fXSecHist->Write();
+  if (drawXSec)    fXSecHist->Write();
   if (drawEvents)  fEventHist->Write();
-  if (fIsMask and drawMask) fMaskHist->Write( (fName + "_MSK").c_str() ); //< save mask
+
+  if (fIsMask and drawMask and fMaskHist){
+    fMaskHist->Write( (fName + "_MSK").c_str() ); //< save mask
+  }
 
   // Save neut stack
   if (drawModes){
@@ -1061,10 +1081,28 @@ void Measurement1D::Write(std::string drawOpt){
     if (drawCov and fFullCovar){
       TH2D cov = TH2D((*fFullCovar));
       cov.SetNameTitle((fName+"_cov").c_str(),(fName+"_cov;Bins; Bins;").c_str());
+
+  if (isMask && drawMask) {
+    this->maskHist->Write( (this->measurementName + "_MSK").c_str() ); //< save mask
+  }
+
+
+  // Save neut stack
+  if (drawModes){
+    //LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
+    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
+    combo_mcHist_PDG.Write();
+  }
+
+  // Save Matrix plots
+  if (!isRawEvents && !isDiag && fFullCovar){
+    if (drawCov && fullcovar){
+      TH2D cov = TH2D((*this->fullcovar));
+      cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
       cov.Write();
     }
 
-    if (drawInvCov and covar){
+    if (drawInvCov && covar){
       TH2D covinv = TH2D((*this->covar));
       covinv.SetNameTitle((fName+"_covinv").c_str(),(fName+"_cov;Bins; Bins;").c_str());
       covinv.Write();
@@ -1163,7 +1201,7 @@ void Measurement1D::Write(std::string drawOpt){
   }
 
   // Make a pretty PDG Canvas
-  if (drawCanvPDG or true){
+  if (drawCanvPDG){
     TCanvas* c1 = new TCanvas((fName + "_PDG_CANV").c_str(),
 			      (fName + "_PDG_CANV").c_str(),
 			      800,600);
@@ -1178,7 +1216,6 @@ void Measurement1D::Write(std::string drawOpt){
     
     //    leg.Draw("SAME");
     c1->Write();
-
     delete c1;
   }
 
@@ -1220,8 +1257,10 @@ void Measurement1D::Write(std::string drawOpt){
 
 
 
-
+// ********************************************
+// Returns the NEUT mode stack
 THStack Measurement1D::GetModeStack(){
+// ********************************************  
   THStack combo_hist = PlotUtils::GetNeutModeStack((fName + "_MC_PDG").c_str(), (TH1**)fMCHist_PDG, 0);
   return combo_hist;
 }

@@ -83,6 +83,9 @@ namespace FitUtils{
   //! Hadronic mass reconstruction
   double Wrec(TLorentzVector pnu, TLorentzVector pmu);
 
+  //! Hadronic mass true from initial state particles and muon; useful if the full FSI vectors aren't not saved and we for some reasons need W_true
+  double Wtrue(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector pnuc);
+
 
   /*
     CCQE MiniBooNE/MINERvA

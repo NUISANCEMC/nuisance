@@ -125,9 +125,6 @@ class FitEvent : public BaseFitEvt {
   //! Convert Nuance event class to common format
   void NuanceKinematics(void);
 #endif
-
-
-
   
   /* Standard Event Functions */
   

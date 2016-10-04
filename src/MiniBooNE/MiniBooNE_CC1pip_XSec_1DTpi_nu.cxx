@@ -21,7 +21,6 @@
 
 // The constructor
 MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
 
   fName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
   fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
@@ -53,13 +52,16 @@ void MiniBooNE_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   
   // Loop over the particle stack
   for (unsigned int j = 2; j < event->Npart(); ++j){
+
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
       Pmu = (event->PartInfo(j))->fP;
     }
+
   }
 
   // No W cut on MiniBooNE data from publication

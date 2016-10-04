@@ -8,6 +8,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
+  fAllowedTypes += "NEW";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
@@ -55,7 +56,23 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
+<<<<<<< HEAD
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+=======
+  // Make some auxillary helper plots
+  hnPions = new TH1I((measurementName+"_Npions").c_str(), (measurementName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
+  onePions  = (TH1D*)(dataHist->Clone());
+  twoPions  = (TH1D*)(dataHist->Clone());
+  threePions = (TH1D*)(dataHist->Clone());
+  morePions = (TH1D*)(dataHist->Clone());
+
+  onePions->SetNameTitle((measurementName+"_1pions").c_str(), (measurementName+"_1pions"+plotTitles).c_str());
+  twoPions->SetNameTitle((measurementName+"_2pions").c_str(), (measurementName+"_2pions;"+plotTitles).c_str());
+  threePions->SetNameTitle((measurementName+"_3pions").c_str(), (measurementName+"_3pions"+plotTitles).c_str());
+  morePions->SetNameTitle((measurementName+"_4pions").c_str(), (measurementName+"_4pions"+plotTitles).c_str());
+
+  scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+>>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
 };
 
 void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
@@ -84,14 +101,14 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
   // Hadronic mass cut in true
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double Tpi;
+  double Tpi = -999;
 
   // If hadronic mass passes signal, loop over the pions
-  if (hadMass > 100 && hadMass < 1800) {
+  if (hadMass > 100 && hadMass < 1800 && piIndex.size() > 0) {
 
     // Loop over surviving pions and pick up their kinetic energy
     for (size_t k = 0; k < piIndex.size(); ++k) {
-      TLorentzVector Ppip = event->PartInfo(piIndex.at(k))->fP;
+      TLorentzVector Ppip = event->PartInfo(piIndex[k])->fP;
       Tpi = FitUtils::T(Ppip)*1000.;
       TpiVect.push_back(Tpi);
     }
@@ -113,13 +130,34 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
   if (Signal){
 
     // Need to loop over all the pions in the sample
+<<<<<<< HEAD
     for (size_t k = 0; k < TpiVect.size(); ++k) {
       this->fMCHist->Fill(TpiVect.at(k), Weight);
       this->fMCFine->Fill(TpiVect.at(k), Weight);
       this->fMCStat->Fill(TpiVect.at(k), 1.0);
 
       PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, TpiVect.at(k), Weight);
+=======
+    for (int k = 0; k < nPions; ++k) {
+      double tpi = TpiVect[k];
+      this->mcHist->Fill(tpi, Weight);
+      this->mcFine->Fill(tpi, Weight);
+      this->mcStat->Fill(tpi, 1.0);
+
+      if (nPions == 1) {
+        onePions->Fill(tpi, Weight);
+      } else if (nPions == 2) {
+        twoPions->Fill(tpi, Weight);
+      } else if (nPions == 3) { 
+        threePions->Fill(tpi, Weight);
+      } else if (nPions > 3) {
+        morePions->Fill(tpi, Weight);
+      }
+
+      PlotUtils::FillNeutModeArray(mcHist_PDG, Mode, TpiVect[k], Weight);
+>>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
     }
+    hnPions->Fill(nPions);
   }
 
 }
@@ -129,4 +167,58 @@ bool MINERvA_CCNpip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
 //******************************************************************** 
   // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
   return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, false);
+}
+
+//******************************************************************** 
+void MINERvA_CCNpip_XSec_1DTpi_nu::ScaleEvents() {
+//******************************************************************** 
+  Measurement1D::ScaleEvents();
+
+  onePions->Scale(this->scaleFactor, "width");
+  twoPions->Scale(this->scaleFactor, "width");
+  threePions->Scale(this->scaleFactor, "width");
+  morePions->Scale(this->scaleFactor, "width");
+  hnPions->Scale(this->scaleFactor, "width");
+
+  return;
+}
+
+//******************************************************************** 
+void MINERvA_CCNpip_XSec_1DTpi_nu::Write(std::string drawOpts) {
+//******************************************************************** 
+  Measurement1D::Write(drawOpts);
+
+  hnPions->Write();
+
+  // Draw the npions stack
+  onePions->SetTitle("1#pi");
+  onePions->SetLineColor(kBlack);
+  //onePions->SetFillStyle(0);
+  onePions->SetFillColor(onePions->GetLineColor());
+
+  twoPions->SetTitle("2#pi");
+  twoPions->SetLineColor(kRed);
+  //twoPions->SetFillStyle(0);
+  twoPions->SetFillColor(twoPions->GetLineColor());
+
+  threePions->SetTitle("3#pi");
+  threePions->SetLineColor(kGreen);
+  //threePions->SetFillStyle(0);
+  threePions->SetFillColor(threePions->GetLineColor());
+
+  morePions->SetTitle(">3#pi");
+  morePions->SetLineColor(kBlue);
+  //morePions->SetFillStyle(0);
+  morePions->SetFillColor(morePions->GetLineColor());
+
+  THStack pionStack = THStack((measurementName+"_pionStack").c_str(), (measurementName+"_pionStack").c_str());
+
+  pionStack.Add(onePions);
+  pionStack.Add(twoPions);
+  pionStack.Add(threePions);
+  pionStack.Add(morePions);
+
+  pionStack.Write();
+
+  return;
 }

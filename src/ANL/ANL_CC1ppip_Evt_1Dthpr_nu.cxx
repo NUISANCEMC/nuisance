@@ -18,6 +18,7 @@
 *******************************************************************************/
 
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
+//Derrick et al, Phys Rev D V23 N3, p572 fig 3
 
 // The constructor
 ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
@@ -28,10 +29,12 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   EnuMax = 1.5; // Different EnuMax for cos(thpr), see Derrick et al, Phys Rev D V23 N3, p572 fig 3
   fIsDiag = true;
   fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_thprot_CC1ppip.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_thProt.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

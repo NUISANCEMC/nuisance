@@ -28,6 +28,8 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   EnuMax = 1.5;
   fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
   fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");

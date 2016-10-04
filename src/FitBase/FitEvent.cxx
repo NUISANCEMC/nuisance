@@ -145,6 +145,19 @@ void FitEvent::NeutKinematics(){
     fNParticles++;
   }
 
+  /*
+    From MERGE -> Change to own loop
+  
+  // FSI Vertex Counting Should go here.
+  this->fNFSIParticles = neut_event->NfsiPart();
+  fsi_particles.clear();
+  for (UInt_t i = 0; i < this->fNFSIParticles; i++) {
+    this->fsi_particles.push_back(FitParticle(neut_event->FsiPartInfo(i)));
+  }
+
+>>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
+  */
+  
   return;
 };
 #endif

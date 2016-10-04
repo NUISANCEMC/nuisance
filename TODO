@@ -15,3 +15,4 @@
 CWRET ADDED:
 - Validate setting constraints from previous fit (i.e. the covar option in card file; say I want to do a nuclear fit constrained by a previous nucleon fit.)
   Previously had problems with negative chi2 when this was used; I think the _FREE covariances in the output .root files were wrong?
+- Document fluxes properly now
