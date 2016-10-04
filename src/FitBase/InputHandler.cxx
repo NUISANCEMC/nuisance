@@ -51,7 +51,6 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   }
   
   // Setup the handler for each type
-<<<<<<< HEAD
   if (!fInputType.compare("NEUT"))
     ReadNeutFile();
   else if (!fInputType.compare("NUWRO"))
@@ -85,38 +84,6 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     LOG(SAM) << " -> Reading only "   << fMaxEvents
 	     << " events from total." << std::endl;
     fNEvents = fMaxEvents;
-=======
-  if (!inType.compare("NEUT")) {
-    this->ReadNeutFile();
-  } else if (!inType.compare("NUWRO")) {
-    this->ReadNuWroFile();
-  } else if (!inType.compare("GENIE")) {
-    this->ReadGenieFile();
-  } else if (!inType.compare("GiBUU_nu")) {
-    this->ReadGiBUUFile(false);
-  } else if (!inType.compare("GiBUU_nub")) {
-    this->ReadGiBUUFile(true);
-  } else if (!inType.compare("HIST")) {
-    this->ReadHistogramFile();
-  } else if (!inType.compare("BNSPLN")) {
-    this->ReadBinSplineFile();
-  } else if (!inType.compare("EVSPLN")) {
-    this->ReadEventSplineFile();
-  } else if (!inType.compare("NUANCE")) {
-    this->ReadNuanceFile();
-  } else if (!inType.compare("JOINT")) {
-    this->ReadJointFile();
-  } else {
-    LOG(FTL) << " -> ERROR: Invalid input file type: " << inType << std::endl;
-    inRootFile->ls();
-    exit(-1);
-  }
-
-  // Setup MaxEvents After setup of ttree
-  if (maxEvents > 1 && maxEvents < nEvents) {
-    LOG(SAM) << " -> Reading only " << maxEvents << " events from total." << std::endl;
-    nEvents = maxEvents;
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
   }
 
   fFluxList.push_back(fFluxHist);
@@ -133,16 +100,11 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
 //********************************************************************
 
   // Parse out the input_type
-<<<<<<< HEAD
   const int nfiletypes = 9;
+  // The hard-coded list of supported input generators  
   const std::string filetypes[nfiletypes] = {"NEUT",     "NUWRO",    "GENIE",
                                              "EVSPLN",   "JOINT",    "NUANCE",
                                              "GiBUU_nu", "GiBUU_nub", "EMPTY"};
-=======
-  const int nfiletypes = 8;
-  // The hard-coded list of supported input generators
-  const std::string filetypes[nfiletypes] = {"NEUT",     "NUWRO",    "GENIE", "EVSPLN",   "JOINT",    "NUANCE", "GiBUU_nu", "GiBUU_nub"};
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
 
   for (int i = 0; i < nfiletypes; i++) {
     std::string temptypes = filetypes[i] + ":";
@@ -153,7 +115,6 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     }
   }
 
-<<<<<<< HEAD
   // If no input type ERROR!
   if (fInputType.empty()){
     ERR(FTL) << "No input type supplied for InputHandler!" << endl;
@@ -161,11 +122,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     throw;
   }
   
-  // Parse out envir flags
-=======
   // Parse the "environement" flags in the fitter config
   // Can specify NEUT_DIR = "" and others in parameters/fitter.config.dat
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
   const int nfiledir = 5;
   const std::string filedir[nfiledir] = {"NEUT_DIR", "NUWRO_DIR", "GENIE_DIR", "NUANCE_DIR", "EVSPLN_DIR"};
 
@@ -173,13 +131,7 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     std::string tempdir = "@" + filedir[i];
     if (inputstring.find(tempdir) != std::string::npos) {
       std::string event_folder = FitPar::Config().GetParS(filedir[i]);
-<<<<<<< HEAD
-      inputstring.replace(inputstring.find(tempdir), tempdir.size(),
-                          event_folder);
-=======
-      inputstring.replace(inputstring.find(tempDir), tempDir.size(), event_folder);
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
-
+      inputstring.replace(inputstring.find(tempdir), tempdir.size(), event_folder);
       break;
     }
   }
@@ -190,12 +142,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
 //********************************************************************
 bool InputHandler::CanIGoFast() {
 //********************************************************************
-<<<<<<< HEAD
 
   if (fEventType == 6) {
-=======
-  if (eventType == 6) {
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
     return true;
   }
   return false;
@@ -233,10 +181,7 @@ void InputHandler::ReadEmptyEvents(){
 //********************************************************************
 void InputHandler::ReadEventSplineFile() {
 //********************************************************************
-<<<<<<< HEAD
-=======
 
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
   LOG(SAM) << " -> Setting up SPLINE inputs" << std::endl;
 
   // Event Type 7 SPLINES
@@ -461,36 +406,21 @@ void InputHandler::ReadNeutFile() {
   fEventType = kNEUT;
 
   // Get flux histograms NEUT supplies
-<<<<<<< HEAD
   fFluxHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "flux")).c_str());
   fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
-                               (fName + "; E_{#nu} (GeV)").c_str());
+			  (fName + "; E_{#nu} (GeV)").c_str());
 
   fEventHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "evtrt")).c_str());
-  fEventHist->SetNameTitle(
-      (fName + "_EVT").c_str(),
-      (fName + "; E_{#nu} (GeV); Event Rate").c_str());
+  fEventHist->SetNameTitle( (fName + "_EVT").c_str(),
+			    (fName + "; E_{#nu} (GeV); Event Rate").c_str());
 
   fXSecHist = (TH1D*)fEventHist->Clone();
   fXSecHist->Divide(fFluxHist);
-  fXSecHist->SetNameTitle(
-      (fName + "_XSEC").c_str(),
-      (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
-          .c_str());
-=======
-  this->fluxHist = (TH1D*)inRootFile->Get( (PlotUtils::GetObjectWithName(inRootFile, "flux")).c_str());
-  this->fluxHist->SetNameTitle((this->handleName + "_FLUX").c_str(), (this->handleName + "; E_{#nu} (GeV)").c_str());
-
-  // Get the event histograms from NEUT
-  this->eventHist = (TH1D*)inRootFile->Get( (PlotUtils::GetObjectWithName(inRootFile, "evtrt")).c_str());
-  this->eventHist->SetNameTitle( (this->handleName + "_EVT").c_str(), (this->handleName + "; E_{#nu} (GeV); Event Rate").c_str());
-
-  this->xsecHist = (TH1D*)eventHist->Clone();
-  this->xsecHist->Divide(this->fluxHist);
-  this->xsecHist->SetNameTitle( (this->handleName + "_XSEC").c_str(), (this->handleName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})") .c_str());
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
+  fXSecHist->SetNameTitle( (fName + "_XSEC").c_str(),
+			   (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
+			   .c_str());
 
   // Read in the file once only
   tn = new TChain("neuttree", "");
@@ -506,13 +436,9 @@ void InputHandler::ReadNeutFile() {
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file" << std::endl;
-<<<<<<< HEAD
-  if (LOG_LEVEL(SAM)) PrintStartInput();
-=======
-  if (LOG_LEVEL(SAM)) {
-    this->PrintStartInput();
+  if (LOG_LEVEL(SAM)){
+    PrintStartInput();
   }
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
 
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
@@ -1053,20 +979,12 @@ void InputHandler::ReadEvent(unsigned int i) {
 void InputHandler::GetTreeEntry(const Long64_t i) {
 //********************************************************************
 
-<<<<<<< HEAD
+  // If we're just reading from the input root file   
   if (fEventType != kEVTSPLINE)
     tn->GetEntry(i);
+  // If we've got splines enabled
   else
     (*(fEvent->dial_coeff)) = fAllSplines.at(i);
-=======
-  // If we're just reading from the input root file
-  if (eventType != kEVTSPLINE) {
-    tn->GetEntry(i);
-  // If we've got splines enabled
-  } else {
-    (*(cust_event->dial_coeff)) = spline_list.at(i);
-  }
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
 
   fEventIndex = i;
   fEvent->InputWeight = GetInputWeight(i);

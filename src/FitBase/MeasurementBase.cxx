@@ -172,22 +172,23 @@ void MeasurementBase::Reconfigure(){
     // this->FillExtraHistograms();
 
     // Print Out
-    if (LOG_LEVEL(REC) && countwidth && !(i % countwidth))
+    if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
       LOG(REC).unsetf(ios_base::fixed);
-    std::cout << std::setw(7) << std::right << i << "/" << nevents
-	      << " events (" << std::setw(2) << double(i)/double(nevents)*100.
-	      << std::left << std::setw(5) << "%) "
-	      << "[S,X,Y,Z,M,W] = ["
-	      << std::fixed << std::setprecision(2) << std::right
-	      << Signal << ", "
-	      << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
-	      << std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
-	      << std::setw(5) << Weight << "] "<< std::endl;
-    
+      std::cout << std::setw(7) << std::right << i << "/" << fNEvents
+		<< " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
+		<< std::left << std::setw(5) << "%) "
+		<< "[S,X,Y,Z,M,W] = ["
+		<< std::fixed << std::setprecision(2) << std::right
+		<< Signal << ", "
+		<< std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
+		<< std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
+		<< std::setw(5) << Weight << "] "<< std::endl;
+    }
+      
   }
 
-  int npassed = X_VAR_VECT.size();
-  LOG(REC) << npassed << "/" << nevents << " passed selection " << std::endl;
+  int npassed = fXVar_VECT.size();
+  LOG(REC) << npassed << "/" << fNEvents << " passed selection " << std::endl;
   if (npassed == 0) {
     LOG(REC) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
   }

@@ -24,25 +24,25 @@
 
 ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_NC1ppim_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu};#sigma(E_{#nu}) (cm^{2}/nucleon)";
+  fName = "ANL_NC1ppim_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu};#sigma(E_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 0.3;
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = false;
-  isEnu1D = true;
+  fIsDiag = true;
+  fIsRawEvents = false;
+  fIsEnu1D = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1ppim/ANL_NC1ppim_Enu_xsec.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   // Scale to cross-section
-  dataHist->Scale(1.E-41);
+  fDataHist->Scale(1.E-41);
 
-  this->scaleFactor = this->eventHist->Integral("width")/((nevents+0.)*fluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -50,7 +50,7 @@ void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   // Very simple here!
   double Enu = ((event->PartInfo(0))->fP).E()/1000.;
 
-  this->X_VAR = Enu;
+  this->fXVar = Enu;
 
   return;
 };

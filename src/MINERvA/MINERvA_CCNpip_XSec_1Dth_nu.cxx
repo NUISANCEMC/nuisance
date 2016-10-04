@@ -55,15 +55,15 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
 
   // Make some auxillary helper plots
   hnPions = new TH1I((fName+"_Npions").c_str(), (fName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
-  onePions  = (TH1D*)(dataHist->Clone());
-  twoPions  = (TH1D*)(dataHist->Clone());
-  threePions = (TH1D*)(dataHist->Clone());
-  morePions = (TH1D*)(dataHist->Clone());
+  onePions  = (TH1D*)(fDataHist->Clone());
+  twoPions  = (TH1D*)(fDataHist->Clone());
+  threePions = (TH1D*)(fDataHist->Clone());
+  morePions = (TH1D*)(fDataHist->Clone());
 
-  onePions->SetNameTitle((fName+"_1pions").c_str(), (fName+"_1pions"+plotTitles).c_str());
-  twoPions->SetNameTitle((fName+"_2pions").c_str(), (fName+"_2pions;"+plotTitles).c_str());
-  threePions->SetNameTitle((fName+"_3pions").c_str(), (fName+"_3pions"+plotTitles).c_str());
-  morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+plotTitles).c_str());
+  onePions->SetNameTitle((fName+"_1pions").c_str(), (fName+"_1pions"+fPlotTitles).c_str());
+  twoPions->SetNameTitle((fName+"_2pions").c_str(), (fName+"_2pions;"+fPlotTitles).c_str());
+  threePions->SetNameTitle((fName+"_3pions").c_str(), (fName+"_3pions"+fPlotTitles).c_str());
+  morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+fPlotTitles).c_str());
 
 
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
@@ -128,11 +128,11 @@ void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
 //******************************************************************** 
   Measurement1D::ScaleEvents();
 
-  onePions->Scale(this->scaleFactor, "width");
-  twoPions->Scale(this->scaleFactor, "width");
-  threePions->Scale(this->scaleFactor, "width");
-  morePions->Scale(this->scaleFactor, "width");
-  hnPions->Scale(this->scaleFactor, "width");
+  onePions->Scale(this->fScaleFactor, "width");
+  twoPions->Scale(this->fScaleFactor, "width");
+  threePions->Scale(this->fScaleFactor, "width");
+  morePions->Scale(this->fScaleFactor, "width");
+  hnPions->Scale(this->fScaleFactor, "width");
 
   return;
 }

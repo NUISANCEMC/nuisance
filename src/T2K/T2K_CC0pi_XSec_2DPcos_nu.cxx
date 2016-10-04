@@ -56,13 +56,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
 };
 
 
-int T2K_CC0pi_XSec_2DPcos_nu::GetNDOF(){
-  if (fAnalysis == 1){ return 67; }
-  else return 90;
-}
-
 bool T2K_CC0pi_XSec_2DPcos_nu::isSignal(FitEvent *event){
-  bool sig = SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, forwardgoing);
   return SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, forwardgoing);
 };
 

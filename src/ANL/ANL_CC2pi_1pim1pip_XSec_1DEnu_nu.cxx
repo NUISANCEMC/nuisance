@@ -27,25 +27,25 @@
 // The constructor
 ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/nucleon)";
+  fName = "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 6.0;
-  isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  normError = 0.20; // normalisation error on ANL BNL flux
-  isEnu1D = true;
+  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
+  fNormError = 0.20; // normalisation error on ANL BNL flux
+  fIsEnu1D = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip1p_xsec.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Need to multiply the data by a factor because of the way the data is scanned (e.g. 1E-38)
-  dataHist->Scale(1.E-41);
+  fDataHist->Scale(1.E-41);
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 
@@ -57,7 +57,7 @@ void ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   // No hadronic mass cut or similar here so very simple FillEventVariables
 
-  this->X_VAR = Enu;
+  this->fXVar = Enu;
 
   return;
 }
@@ -115,11 +115,11 @@ void ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::FillHistograms() {
 
 void ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(mcHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(mcFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  mcHist->Scale(fScaleFactor);
+  mcFine->Scale(fScaleFactor);
 
   return;
 }

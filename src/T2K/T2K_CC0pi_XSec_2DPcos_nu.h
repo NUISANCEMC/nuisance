@@ -35,10 +35,6 @@ public:
   /// Virtual Destructor
   ~T2K_CC0pi_XSec_2DPcos_nu() {};
 
-  /// Return NDOF
-  /// /brief Have to override default because binning is awful
-  int GetNDOF();
-
   /// Numu CC0PI Signal Definition
   ///
   /// /item 

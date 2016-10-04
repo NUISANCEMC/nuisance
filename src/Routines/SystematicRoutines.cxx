@@ -625,7 +625,7 @@ void SystematicRoutines::GetCovarFromFCN(){
   
   
   // Print Throw State
-  for (int i = 0; i < fParams.size(); i++){
+  for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams[i];
     if (dialthrowhandle.find(syst) != dialthrowhandle.end()){
       LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = THROWING with " << dialthrowhandle[syst] << endl;
@@ -892,7 +892,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
   
   // Set fThrownVals to all values in currentVals
-  for (int i = 0; i < fParams.size(); i++){
+  for (UInt_t i = 0; i < fParams.size(); i++){
     std::string name = fParams.at(i);
     fThrownVals[name] = fCurVals[name];
   }
@@ -1110,7 +1110,7 @@ void SystematicRoutines::PlotLimits(){
 
       // Update Iterations
       double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-      double chi2 = fSampleFCN->DoEval( vals );
+      fSampleFCN->DoEval( vals );
       delete vals;
 
       // Save to folder
@@ -1141,7 +1141,7 @@ void SystematicRoutines::PlotLimits(){
       
       // Update Iterations
       double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-      double chi2 = fSampleFCN->DoEval( vals );
+      fSampleFCN->DoEval( vals );
       delete vals;
 
       // Save to file

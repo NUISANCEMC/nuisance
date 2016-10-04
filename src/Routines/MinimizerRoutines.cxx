@@ -776,7 +776,7 @@ void MinimizerRoutines::GetMinimizerState(){
   // Get X and Err
   const double *values = fMinimizer->X();
   const double *errors = fMinimizer->Errors();
-  int ipar = 0;
+  //  int ipar = 0;
 
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams.at(i);
@@ -1440,7 +1440,7 @@ void MinimizerRoutines::GenerateErrorBands(){
     
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
-    double  chi2 = fSampleFCN->DoEval( vals );
+    chi2 = fSampleFCN->DoEval( vals );
     delete vals;
 
     // Save the FCN

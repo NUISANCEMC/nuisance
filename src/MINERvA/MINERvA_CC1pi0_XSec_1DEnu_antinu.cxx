@@ -15,9 +15,9 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_enu.txt");
 
   // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-  double binOneWidth = fDataHist->GetBinWidth(1);
+  //  double binOneWidth = fDataHist->GetBinWidth(1);
   for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-    double binNWidth = fDataHist->GetBinWidth(i+1);
+    //double binNWidth = fDataHist->GetBinWidth(i+1);
     fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1E-40);
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
     //fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*binOneWidth/binNWidth);

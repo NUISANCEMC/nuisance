@@ -487,7 +487,7 @@ void ComparisonRoutines::Run(){
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
     std::string routine = fRoutines.at(i);
-    int fitstate = kFitUnfinished;
+    //int fitstate = kFitUnfinished;
 
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
     if (routine == "Compare"){

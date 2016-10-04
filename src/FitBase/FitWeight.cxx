@@ -960,11 +960,6 @@ double FitWeight::GetSampleNorm(std::string samplename) {
     return 1.0;
 
   } else {
-<<<<<<< HEAD
-    LOG(REC) << " Getting sample norm " << norm_dial << " = "
-             << this->GetDialValue(norm_dial) << std::endl;
-=======
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
     return this->GetDialValue(norm_dial);
   }
 }

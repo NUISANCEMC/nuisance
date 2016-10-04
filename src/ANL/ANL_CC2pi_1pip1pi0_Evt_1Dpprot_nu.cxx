@@ -27,13 +27,13 @@
 // The constructor
 ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu";
-  plotTitles = "; p_{prot} (GeV); Number of events (area norm.)";
+  fName = "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu";
+  fPlotTitles = "; p_{prot} (GeV); Number of events (area norm.)";
   EnuMin = 0.;
   EnuMax = 6.0;
-  isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  isRawEvents = true;
-  normError = 0.20; // normalisation error on ANL BNL flux
+  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
+  fIsRawEvents = true;
+  fNormError = 0.20; // normalisation error on ANL BNL flux
   fDefaultTypes="EVT/SHAPE/DIAG";
   fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -42,14 +42,14 @@ ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(std::string
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pip1pi0/CC2pi_1pip1pi0_pProt_weight.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  for (int i = 0; i < dataHist->GetNbinsX()+1; ++i) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX()+1; ++i) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 
@@ -70,7 +70,7 @@ void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::FillEventVariables(FitEvent *event) {
 
   double pprot = FitUtils::p(Pp);
 
-  this->X_VAR = pprot;
+  this->fXVar = pprot;
 
   return;
 }
@@ -128,11 +128,11 @@ void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::FillHistograms() {
 
 void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(mcHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(mcFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  mcHist->Scale(fScaleFactor);
+  mcFine->Scale(fScaleFactor);
 
   return;
 }

@@ -357,11 +357,11 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(),ifstream::in);
+  std::ifstream covarread(covarFile.c_str(),ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
-  if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
+  if(covarread.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
   else ERR(FTL) <<"Covariance matrix provided is incorrect: "<<covarFile<<std::endl;
 
   // MINERvA CC1pip needs slightly different method
@@ -369,7 +369,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
   if (fName.find("MINERvA_CC1pip") == std::string::npos ||
       (fName.find("MINERvA_CCNpip") && fName.find("2016"))) {
 
-    while(std::getline(covar, line, '\n')){
+    while(std::getline(covarread, line, '\n')){
       std::istringstream stream(line);
       double entry;
       int column = 0;
@@ -394,7 +394,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim){
     this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
 
   } else { // Here's the MINERvA CC1pip method; very similar
-    while(std::getline(covar, line, '\n')){
+    while(std::getline(covarread, line, '\n')){
       std::istringstream stream(line);
       double entry;
       int column = 0;
@@ -608,7 +608,7 @@ void Measurement1D::FillHistograms(){
 void Measurement1D::ScaleEvents(){
 //********************************************************************
 
-  LOG(REC) << std::setw(20) << " " << mcHist->Integral() << "/" << nevents << " events passed selection" << std::endl;
+  LOG(REC) << std::setw(20) << " " << fMCHist->Integral() << "/" << fNEvents << " events passed selection" << std::endl;
 
   // Simple function to scale to xsec result if this is all that is needed.
   // Scale bin errors correctly
@@ -1039,7 +1039,7 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawShape  = (drawOpt.find("SHAPE") != std::string::npos);
   bool residual   = (drawOpt.find("RESIDUAL") != std::string::npos);
   //  bool drawMatrix = (drawOpt.find("MATRIX") != std::string::npos);
-  //  bool drawXSec   = (drawOpt.find("XSEC") != std::string::npos);
+  bool drawXSec   = (drawOpt.find("XSEC") != std::string::npos);
   bool drawFlux   = (drawOpt.find("FLUX") != std::string::npos);
   bool drawMask   = (drawOpt.find("MASK") != std::string::npos);
   bool drawCov    = (drawOpt.find("COV")  != std::string::npos);
@@ -1081,24 +1081,26 @@ void Measurement1D::Write(std::string drawOpt){
     if (drawCov and fFullCovar){
       TH2D cov = TH2D((*fFullCovar));
       cov.SetNameTitle((fName+"_cov").c_str(),(fName+"_cov;Bins; Bins;").c_str());
-
-  if (isMask && drawMask) {
-    this->maskHist->Write( (this->measurementName + "_MSK").c_str() ); //< save mask
+      cov.Write();
+    }
   }
-
+  
+  if (fIsMask && drawMask && fMaskHist) {
+    fMaskHist->Write( (this->fName + "_MSK").c_str() ); //< save mask
+  }
 
   // Save neut stack
   if (drawModes){
     //LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
-    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(), (TH1**)this->mcHist_PDG, 0);
+    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->fName + "_MC_PDG").c_str(), (TH1**)this->fMCHist_PDG, 0);
     combo_mcHist_PDG.Write();
   }
 
   // Save Matrix plots
-  if (!isRawEvents && !isDiag && fFullCovar){
-    if (drawCov && fullcovar){
-      TH2D cov = TH2D((*this->fullcovar));
-      cov.SetNameTitle((this->measurementName+"_cov").c_str(),(this->measurementName+"_cov;Bins; Bins;").c_str());
+  if (!fIsRawEvents && !fIsDiag && fFullCovar){
+    if (drawCov && fFullCovar){
+      TH2D cov = TH2D((*this->fFullCovar));
+      cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
       cov.Write();
     }
 
@@ -1193,11 +1195,6 @@ void Measurement1D::Write(std::string drawOpt){
     }
 
     delete mcShape;
-  }
-
-  // Save residual calculations of what contributed to the chi2 values.
-  if (residual){
-
   }
 
   // Make a pretty PDG Canvas

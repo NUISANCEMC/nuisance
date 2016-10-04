@@ -24,13 +24,13 @@
 
 ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_NC1ppim_Evt_1DcosmuStar_nu";
-  plotTitles = "; cos*_{#mu}; Number of events";
+  fName = "ANL_NC1ppim_Evt_1DcosmuStar_nu";
+  fPlotTitles = "; cos*_{#mu}; Number of events";
   EnuMin = 0.3;
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
-  isEnu1D = false;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fIsEnu1D = false;
   fDefaultTypes="EVT/SHAPE/DIAG";
   fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -38,15 +38,15 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string input
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
   // Set Poisson errors on data points (number of events weighted)
-  for (int i = 0; i < dataHist->GetNbinsX()+1; ++i) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX()+1; ++i) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  this->scaleFactor = this->eventHist->Integral("width")/((nevents+0.)*fluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
@@ -82,7 +82,7 @@ void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
 
   double cosmuStar = cos(FitUtils::th(PnuOut, Pnu));
 
-  this->X_VAR = cosmuStar;
+  this->fXVar = cosmuStar;
 
   return;
 };
