@@ -19,53 +19,50 @@
 
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
-// The constructor
 T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
 						   std::string inputfile,
 						   FitWeight *rw,
-						   std::string type,
-						   std::string fakeDataFile){
-
-
+						   std::string type){
+  
   fName = name;
-  analysis = fName.find("_II") != std::string::npos ? 2 : 1;
+  if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
+  else fAnalysis = 2;
+
   forwardgoing = (type.find("REST") != std::string::npos);
   EnuMin = 0;
   EnuMax = 10.0;
   fBeamDistance = 0.280;
-  fDefaultTypes = "DIAG/FIX";
-  fAllowedTypes = "DIAG/FIX";
+  fDefaultTypes = "FIX";
+  fAllowedTypes = "DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV";
   fNDataPointsX = 12;
   fNDataPointsY = 10;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  fIsSystCov = type.find("SYSTCOV") != std::string::npos;
+  fIsStatCov = type.find("STATCOV") != std::string::npos;
+  fIsNormCov = type.find("NORMCOV") != std::string::npos;
   
-  Double_t tempx[12] = {0.2, 0.35, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0};
-  Double_t tempy[10] = {-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0};
-  fXBins = tempx;
-  fYBins = tempy;
   fPlotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
-  
-  fDataHist = new TH2D((fName+"_data").c_str(),
-		      (fName+"_data"+fPlotTitles).c_str(),
-		      fNDataPointsX-1, fXBins,
-		      fNDataPointsY-1, fYBins);
-  
-  SetHistograms(FitPar::GetDataBase()+"/T2K/CC0pi/data_release.root");
+  SetHistograms();
   SetupDefaultHist();
   
   // Diagonal covar setup
   if (!fIsShape) fAddNormPen = true;
   fNormError = 0.089; // Set from covar mat instead...
-
-  cout << " Inputs = "<<this->GetInput()<<std::endl;
   
   // Get Scaling
-  fScaleFactor = (fEventHist->Integral("width")/(fNEvents+0.))*13.0/6.0/TotalIntegratedFlux(); // NEUT
+  fScaleFactor = ((fEventHist->Integral("width")/(fNEvents+0.)) * 1E-38 /
+		  (TotalIntegratedFlux()));
 
 };
 
 
+int T2K_CC0pi_XSec_2DPcos_nu::GetNDOF(){
+  if (fAnalysis == 1){ return 67; }
+  else return 90;
+}
+
 bool T2K_CC0pi_XSec_2DPcos_nu::isSignal(FitEvent *event){
+  bool sig = SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, forwardgoing);
   return SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, forwardgoing);
 };
 
@@ -96,20 +93,17 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
 
 // Modification is needed after the full reconfigure to move bins around
 // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
-
-
-
 void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
 
   // Do standard conversion.
   Measurement2D::ConvertEventRates();
 
-  if (analysis == 1){
+  if (fAnalysis == 1){
   
     // Following code handles weird ND280 Binning
     int nbins = this->fMCHist->GetNbinsX() + 1;
     double total = 0.0;
-
+    
     // Y = 1
     total = 0.0;
     for (int i = 3; i < nbins; i++){
@@ -197,38 +191,71 @@ void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
 }
 
 
-void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(std::string infile){
+void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
-  LOG(SAM)<<"Reading data from "<<infile<<std::endl;
-  TFile* rootfile = new TFile(infile.c_str(),"READ");
+  // Open file
+  std::string infile = FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root";
+  TFile* rootfile = new TFile(infile.c_str(), "READ");
+  TH2D* tempcov;
+  
+  // ANALYSIS 2
+  if (fAnalysis == 2){
 
-  if (analysis == 1){
+    // Get Data
+    fDataHist = (TH2D*) rootfile->Get("analysis2_data");
+    fDataHist->SetDirectory(0);
+    fDataHist->SetNameTitle((fName + "_data").c_str(),
+			    (fName + "_data" + fPlotTitles).c_str());
 
-  } else {
+    // Get Map
+    fMapHist = (TH2I*) rootfile->Get("analysis2_map");
+    fMapHist->SetDirectory(0);
+    fMapHist->SetNameTitle((fName + "_map").c_str(),
+			    (fName + "_map" + fPlotTitles).c_str());
 
-    rootfile->ls();
+    // Get Syst/Stat Covar
+    TH2D* tempsyst = (TH2D*) rootfile->Get("analysis2_systcov");
+    TH2D* tempstat = (TH2D*) rootfile->Get("analysis2_statcov");
+    TH2D* tempnorm = (TH2D*) rootfile->Get("analysis2_normcov");
     
-    this->fDataHist = (TH2D*) rootfile->Get("data_analysis2")->Clone((this->fName+"_data").c_str());
-    this->fMapHist = (TH2I*) rootfile->Get("map_analysis2")->Clone((this->fName+"_MAP").c_str());
+    // Create covar [Default is both]
+    tempcov = (TH2D*) tempsyst->Clone();
+    tempcov->Reset();
 
-    TMatrixDSym* covmat_stat = (TMatrixDSym*) rootfile->Get("analysis2_statcov");
-    TMatrixDSym* covmat_flux = (TMatrixDSym*) rootfile->Get("analysis2_fluxcov");
-    TMatrixDSym* covmat_syst = (TMatrixDSym*) rootfile->Get("analysis2_systcov");
+    if (fIsSystCov) tempcov->Add(tempsyst);
+    if (fIsStatCov) tempcov->Add(tempstat);
+    if (fIsNormCov) tempcov->Add(tempnorm);
 
-    // Get flags
-    this->fFullCovar = new TMatrixDSym(67);
-
-    for (int i = 0; i < 67; i++){
-      for (int j = 0; j < 67; j++){
-	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_stat)(i,j);
-	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_flux)(i,j);
-	(*fFullCovar)(i,j) = (*fFullCovar)(i,j) + (*covmat_syst)(i,j);
-      }
+    if (!fIsSystCov && !fIsStatCov && !fIsNormCov){
+      tempcov->Add(tempsyst);
+      tempcov->Add(tempstat);
+      tempcov->Add(tempnorm);
     }
     
-    this->covar = StatUtils::GetInvert(fFullCovar);
-    this->fDecomp = StatUtils::GetDecomp(covar);
+    // SARAS ANALYSIS
+  } else if (fAnalysis == 1){
+    cout << "HELP AWKWARD BINNING";
   }
+
+
+  // Setup Covar
+  int nbins = tempcov->GetNbinsX();
+  fFullCovar = new TMatrixDSym(nbins);
+
+  for (int i = 0; i < nbins; i++){
+    for (int j = 0; j < nbins; j++){
+      
+      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
+      
+    }
+  }
+  covar = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(covar);
+
+  // Set Data Errors
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
   
+  // Remove root file
+  rootfile->Close();
   return;
 };

@@ -860,4 +860,7 @@ bool SignalDef::isT2K_CC0pi(FitEvent* event, double EnuMin,
       CosThetaMu < 0.0 and
       CosThetaMu != -9999.9)
     return false;
+
+  // Return its all good
+  return true;
 }

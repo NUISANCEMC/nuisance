@@ -16,7 +16,7 @@ config fillstyle 0
 
 #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP
 #config drawopts DATA/MC
-config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK
+config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV
 
 # Event Directories
 config EVENT_DIR    /data2/stowell/NIWG/

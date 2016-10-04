@@ -67,7 +67,8 @@ enum generator_event_type {
   kNUANCE = 7,
   kGiBUU = 8,
   kNORM = 9,
-  kMODENORM = 10
+  kMODENORM = 10,
+  kEMPTY = 11
 };
 
 inline std::ostream& operator<<(std::ostream& os,

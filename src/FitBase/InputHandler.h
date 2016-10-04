@@ -56,7 +56,7 @@ class InputHandler {
   void ReadEventSplineFile (void);
   void ReadJointFile       (void);
   void ReadGiBUUFile (bool IsNuBarDominant);
-
+  void ReadEmptyEvents     (void); // For Validations
   FitSplineHead* GetSplineHead (void);
 
   double PredictedEventRate  (double low, double high, std::string intOpt="width");

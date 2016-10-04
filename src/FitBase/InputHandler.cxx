@@ -71,6 +71,8 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     ReadNuanceFile();
   else if (!fInputType.compare("JOINT"))
     ReadJointFile();
+  else if (!fInputType.compare("EMPTY"))
+    ReadEmptyEvents(); // For Validation
   else {
     LOG(FTL) << " -> ERROR: Invalid Event File Type" << std::endl;
     fInputRootFile->ls();
@@ -97,10 +99,10 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
   //********************************************************************
 
   // Parse out the input_type
-  const int nfiletypes = 8;
+  const int nfiletypes = 9;
   const std::string filetypes[nfiletypes] = {"NEUT",     "NUWRO",    "GENIE",
                                              "EVSPLN",   "JOINT",    "NUANCE",
-                                             "GiBUU_nu", "GiBUU_nub"};
+                                             "GiBUU_nu", "GiBUU_nub", "EMPTY"};
 
   for (int i = 0; i < nfiletypes; i++) {
     std::string temptypes = filetypes[i] + ":";
@@ -145,6 +147,35 @@ bool InputHandler::CanIGoFast() {
     return true;
   }
   return false;
+}
+
+//******************************************************************** 
+void InputHandler::ReadEmptyEvents(){
+//******************************************************************** 
+
+  fEventType = kEMPTY;
+  
+  // Set flux histograms to empty
+  fFluxHist = new TH1D( (fName + "_FLUX").c_str(),
+			(fName + "_FLUX;E_{#nu};Flux").c_str(),
+			1,0.0,1.0);
+  fFluxHist->SetBinContent(1,1);
+
+  // Set Event Hist to empty
+  fEventHist = new TH1D((fName + "_EVT").c_str(),
+		       (fName + "_EVT;E_{#nu};Flux").c_str(),
+		       1,0.0,1.0);
+  fEventHist->SetBinContent(1,1);
+
+  // Set XSec hist to empty
+  fXSecHist = new TH1D((fName + "_XSEC").c_str(),
+			(fName + "_XSEC;E_{#nu};XSec").c_str(),
+			1,0.0,1.0);
+  fXSecHist->SetBinContent(1,1);
+  
+  fNEvents = 0;
+
+  
 }
 
 //********************************************************************

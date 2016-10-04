@@ -391,7 +391,7 @@ T2K Samples
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
 	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
 	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
-    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type, fkdt));
+    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type));
     /* 
       T2K CC1pi+ CH samples
     */

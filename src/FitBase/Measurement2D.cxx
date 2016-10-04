@@ -41,7 +41,8 @@ Measurement2D::Measurement2D() {
   fMapHist = NULL;
   fDataOrig = NULL;
   fDataTrue = NULL;
-
+  fMCWeighted = NULL;
+  
   fDefaultTypes = "FIX/FULL/CHI2";
   fAllowedTypes = "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/FITPROJX/FITPROJY";
 
@@ -1005,7 +1006,7 @@ void Measurement2D::Write(std::string drawOpt){
   bool drawMap    = (drawOpt.find("MAP")  != std::string::npos);
   bool drawProj   = (drawOpt.find("PROJ") != std::string::npos);
   bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
-  
+  bool drawCov    = (drawOpt.find("COV") != std::string::npos);
   bool drawSliceCanvYMC = (drawOpt.find("CANVYMC") != std::string::npos);
   bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
   
@@ -1013,6 +1014,14 @@ void Measurement2D::Write(std::string drawOpt){
   if (drawData)    this->GetDataList().at(0)->Write();
   if (drawNormal)  this->GetMCList()  .at(0)->Write();
 
+  if (drawCov){
+    TH2D(*fFullCovar).Write( (fName + "_COV").c_str() );
+  }
+  
+  if (drawOpt.find("INVCOV") != std::string::npos){
+    TH2D(*covar).Write( (fName + "_INVCOV").c_str() );
+  }
+  
   // Generate a simple map
   if (!fMapHist)
     fMapHist = StatUtils::GenerateMap(fDataHist);
