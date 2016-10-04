@@ -35,11 +35,11 @@ void MinimizerRoutines::Init(){
   fOutputRootFile = NULL;
 
   fCovar      = NULL;
-  fCovarFree  = NULL;
+  fCovFree  = NULL;
   fCorrel     = NULL;
-  fCorrelFree = NULL;
+  fCorFree = NULL;
   fDecomp     = NULL;
-  fDecompFree = NULL;
+  fDecFree = NULL;
   
   fStrategy = "Migrad,FixAtLimBreak,Migrad";
   fRoutines.clear();
@@ -807,7 +807,7 @@ void MinimizerRoutines::GetMinimizerState(){
       for (int j = 0; j < fCovar->GetNbinsY(); j++){
 	if (fMinimizer->IsFixedVariable(j)) continue;
 
-	fCovarFree->SetBinContent(freex+1,freey+1, fMinimizer->CovMatrix(i,j));
+	fCovFree->SetBinContent(freex+1,freey+1, fMinimizer->CovMatrix(i,j));
 	freey++;
       }
       freex++;
@@ -816,8 +816,8 @@ void MinimizerRoutines::GetMinimizerState(){
     fCorrel     = PlotUtils::GetCorrelationPlot(fCovar,"correlation");
     fDecomp     = PlotUtils::GetDecompPlot(fCovar,"decomposition");
     if (fMinimizer->NFree() > 0){
-      fCorrelFree = PlotUtils::GetCorrelationPlot(fCovarFree,"correlation_free");
-      fDecompFree = PlotUtils::GetDecompPlot(fCovarFree,"decomposition_free");
+      fCorFree = PlotUtils::GetCorrelationPlot(fCovFree,"correlation_free");
+      fDecFree = PlotUtils::GetDecompPlot(fCovFree,"decomposition_free");
     }
   }
 
@@ -1159,22 +1159,24 @@ void MinimizerRoutines::SaveMinimizerState(){
     maxvar.SetBinContent(i+1,   maxVect.at(i));
     maxvar.GetXaxis()->SetBinLabel(i+1, name.c_str());
 
-    if (!startfixVect.at(i)){
-      freecount++;
-
-      dialvarfree.SetBinContent(freecount, valVect.at(i));
-      dialvarfree.SetBinError(freecount, errVect.at(i));
-      dialvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-
-      startvarfree.SetBinContent(freecount, startVect.at(i));
-      startvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-
-      minvarfree.SetBinContent(freecount,   minVect.at(i));
-      minvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+    if (NFREE > 0){
+      if (!startfixVect.at(i)){
+	freecount++;
+	
+	dialvarfree.SetBinContent(freecount, valVect.at(i));
+	dialvarfree.SetBinError(freecount, errVect.at(i));
+	dialvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+	
+	startvarfree.SetBinContent(freecount, startVect.at(i));
+	startvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+	
+	minvarfree.SetBinContent(freecount,   minVect.at(i));
+	minvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
       
-      maxvarfree.SetBinContent(freecount,   maxVect.at(i));
-      maxvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
-      
+	maxvarfree.SetBinContent(freecount,   maxVect.at(i));
+	maxvarfree.GetXaxis()->SetBinLabel(freecount, name.c_str());
+	
+      }
     }
   }
 
@@ -1184,10 +1186,12 @@ void MinimizerRoutines::SaveMinimizerState(){
   minvar.Write();
   maxvar.Write();
 
-  dialvarfree.Write();
-  startvarfree.Write();
-  minvarfree.Write();
-  maxvarfree.Write();
+  if (NFREE > 0){
+    dialvarfree.Write();
+    startvarfree.Write();
+    minvarfree.Write();
+    maxvarfree.Write();
+  }
   
   // Save fit_status plot
   TH1D statusplot = TH1D("fit_status","fit_status",8,0,8);
@@ -1214,11 +1218,11 @@ void MinimizerRoutines::SaveMinimizerState(){
 
   // Save Covars
   if (fCovar) fCovar->Write();
-  if (fCovarFree) fCovarFree->Write();
+  if (fCovFree) fCovFree->Write();
   if (fCorrel) fCorrel->Write();
-  if (fCorrelFree) fCorrelFree->Write();
+  if (fCorFree) fCorFree->Write();
   if (fDecomp) fDecomp->Write();
-  if (fDecompFree) fDecompFree->Write();
+  if (fDecFree) fDecFree->Write();
   
   return;
 }
@@ -1288,11 +1292,13 @@ void MinimizerRoutines::SetupCovariance(){
   
   // Remove covares if they exist
   if (fCovar) delete fCovar;
-  if (fCovarFree) delete fCovarFree;
+  if (fCovFree) delete fCovFree;
   if (fCorrel) delete fCorrel;
-  if (fCorrelFree) delete fCorrelFree;
+  if (fCorFree) delete fCorFree;
   if (fDecomp) delete fDecomp;
-  if (fDecompFree) delete fDecompFree;
+  if (fDecFree) delete fDecFree;
+
+  LOG(FIT) << "Building covariance matrix.." << endl;
   
   int NFREE = 0;
   int NDIM = 0;
@@ -1313,10 +1319,12 @@ void MinimizerRoutines::SetupCovariance(){
   cout << "NFREE == " << NFREE << endl;
   fCovar = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);
   if (NFREE > 0){
-    fCovarFree = new TH2D("covariance_free",
+    fCovFree = new TH2D("covariance_free",
 			  "covariance_free",
 			  NFREE,0,NFREE,
 			  NFREE,0,NFREE);
+  } else {
+    fCovFree = NULL;
   }
 
   // Set Bin Labels
@@ -1329,8 +1337,8 @@ void MinimizerRoutines::SetupCovariance(){
     countall++;
 
     if (!fFixVals[fParams[i]] and NFREE > 0){
-      fCovarFree->GetXaxis()->SetBinLabel(countfree+1,fParams[i].c_str());
-      fCovarFree->GetYaxis()->SetBinLabel(countfree+1,fParams[i].c_str());
+      fCovFree->GetXaxis()->SetBinLabel(countfree+1,fParams[i].c_str());
+      fCovFree->GetYaxis()->SetBinLabel(countfree+1,fParams[i].c_str());
       countfree++;
     }
   }
@@ -1338,8 +1346,13 @@ void MinimizerRoutines::SetupCovariance(){
   fCorrel = PlotUtils::GetCorrelationPlot(fCovar,"correlation");
   fDecomp = PlotUtils::GetDecompPlot(fCovar,"decomposition");
 
-  if (NFREE > 0) fCorrelFree = PlotUtils::GetCorrelationPlot(fCovarFree, "correlation_free");
-  if (NFREE > 0) fDecompFree = PlotUtils::GetDecompPlot(fCovarFree,"decomposition_free");
+  if (NFREE > 0) {
+    fCorFree = PlotUtils::GetCorrelationPlot(fCovFree, "correlation_free");
+    fDecFree = PlotUtils::GetDecompPlot(fCovFree,"decomposition_free");
+  } else {
+    fCorFree = NULL;
+    fDecFree = NULL;
+  }
   
   return;
 };
@@ -1349,13 +1362,13 @@ void MinimizerRoutines::ThrowCovariance(bool uniformly){
 //*************************************
   std::vector<double> rands;
 
-  if (!fDecompFree) {
+  if (!fDecFree) {
     ERR(WRN) << "Trying to throw 0 free parameters"<<std::endl;
     return;
   }
 
   // Generate Random Gaussians
-  for (Int_t i = 0; i < fDecompFree->GetNbinsX(); i++){
+  for (Int_t i = 0; i < fDecFree->GetNbinsX(); i++){
     rands.push_back(gRandom->Gaus(0.0,1.0));
   }
 
@@ -1365,14 +1378,14 @@ void MinimizerRoutines::ThrowCovariance(bool uniformly){
   }
 
   // Loop and get decomp
-  for (Int_t i = 0; i < fDecompFree->GetNbinsX(); i++){
+  for (Int_t i = 0; i < fDecFree->GetNbinsX(); i++){
 
-    std::string parname = std::string(fDecompFree->GetXaxis()->GetBinLabel(i+1));
+    std::string parname = std::string(fDecFree->GetXaxis()->GetBinLabel(i+1));
     double mod = 0.0;
 
     if (!uniformly){
-      for (Int_t j = 0; j < fDecompFree->GetNbinsY(); j++){
-	mod += rands[j] * fDecompFree->GetBinContent(j+1,i+1);
+      for (Int_t j = 0; j < fDecFree->GetNbinsY(); j++){
+	mod += rands[j] * fDecFree->GetBinContent(j+1,i+1);
       }
     }
 
@@ -1450,8 +1463,8 @@ void MinimizerRoutines::GenerateErrorBands(){
   }
 
   errorDIR->cd();
-  fDecompFree->Write();
-  fCovarFree->Write();
+  fDecFree->Write();
+  fCovFree->Write();
   parameterTree->Write();
 
   delete parameterTree;

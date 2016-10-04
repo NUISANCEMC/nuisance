@@ -253,9 +253,9 @@ protected:
   TH2D* fDecomp;
   TH2D* fCovar;
   
-  TH2D* fCorrelFree;
-  TH2D* fDecompFree;
-  TH2D* fCovarFree;
+  TH2D* fCorFree;
+  TH2D* fDecFree;
+  TH2D* fCovFree;
 };
 
 /*! @} */
