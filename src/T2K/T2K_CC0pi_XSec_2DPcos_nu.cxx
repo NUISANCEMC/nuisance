@@ -244,7 +244,6 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   for (int i = 0; i < nbins; i++){
     for (int j = 0; j < nbins; j++){
 
-      cout << "Filling row " << i << " " << j << " " << nbins <<endl;
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
       
     }
