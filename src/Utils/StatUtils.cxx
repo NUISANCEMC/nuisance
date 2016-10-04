@@ -816,23 +816,24 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
 //*******************************************************************
 
   TMatrixDSym* new_mat = (TMatrixDSym*)mat->Clone();
+  int nrows = new_mat->GetNrows();
   
   // Check for diagonal
-  bool non_diagonal = false;
-  for (int i = 0; i < new_mat->GetNrows(); i++){
-    for (int j = 0; j < new_mat->GetNrows(); j++){
+  bool diagonal = true;
+  for (int i = 0; i < nrows; i++){
+    for (int j = 0; j < nrows; j++){
       if (i == j) continue;
 
       if ((*new_mat)(i,j) != 0.0) {
-	non_diagonal=true;
+	diagonal=false;
 	break;
       }
     }
   }
 
   // If diag, just flip the diag
-  if (!non_diagonal or new_mat->GetNrows() == 1){
-    for(int i = 0; i < new_mat->GetNrows(); i++){
+  if (diagonal or nrows == 1){
+    for(int i = 0; i < nrows; i++){
       if ((*new_mat)(i,i) > 0.0)
 	(*new_mat)(i,i) = sqrt((*new_mat)(i,i));
       else
@@ -843,7 +844,7 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
   
   TDecompChol LU = TDecompChol(*new_mat);
   LU.Decompose();
-  new_mat = new TMatrixDSym(new_mat->GetNrows(), LU.GetU().GetMatrixArray(), "");
+  new_mat = new TMatrixDSym(nrows, LU.GetU().GetMatrixArray(), "");
 
   sleep(2);
   return new_mat;
@@ -923,13 +924,14 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map, double sc
 void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale){
 //*******************************************************************     
 
+  // Check
+  if (cov->GetNrows() != data->GetNbinsX()){
+    ERR(WRN) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << endl;
+  }
+  
   // Set bin errors form cov diag
   for (int i = 0; i < data->GetNbinsX(); i++){
-
-    if (data->GetBinContent(i+1) == 0.0) continue;
-    
     data->SetBinError(i+1, sqrt((*cov)(i,i)) * scale );
-
   }
 
   return;

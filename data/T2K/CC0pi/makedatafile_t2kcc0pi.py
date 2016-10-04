@@ -8,6 +8,20 @@ def GetMiddle(mystr):
 
     return val
 
+def GetLowEdge(mystr):
+
+    lims = mystr.strip().split(" - ")
+    val = (float(lims[0]) + 0.00001)
+    
+    return val
+
+def GetHighEdge(mystr):
+    
+    lims = mystr.strip().split(" - ")
+    val = (float(lims[1]) - 0.00001)
+           
+    return val
+           
 def GetIndex(mystr):
 
     lims = mystr.split("-")
@@ -18,7 +32,18 @@ outfile = TFile("T2K_CC0PI_2DPmuCosmu_Data.root","RECREATE")
 
 # ANALYSIS I
 #______________________________
+xedge   =  [0.0, 0.3, 0.4, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0, 30.0]
+yedge   =  [-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0]
 
+datahist = TH2D("analysis1_data","analysis1_data",
+                len(xedge)-1, array('f',xedge),
+                len(yedge)-1, array('f',yedge))
+           
+maphist = datahist.Clone("analysis1_map")
+maphist.SetTitle("analysis1_map")
+           
+counthist = datahist.Clone("analysis1_entrycount")
+           
 with open("cross-section_analysisI.txt") as f:
     count = 0
     for line in f:
@@ -28,18 +53,35 @@ with open("cross-section_analysisI.txt") as f:
         data = line.strip().split("|")
         if (len(data) < 1): continue
 
-        ibin = int(   data[0]  )
-        xval = GetMiddle( data[2] )
-        yval = GetMiddle( data[1] )
+        ibin = int(   data[0]  ) + 1
+        
+        xval = GetLowEdge( data[2] )
+        yval = GetLowEdge( data[1] )
+        xhig = GetHighEdge( data[2] )
+        yhig = GetHighEdge( data[1] )
+        
         xsec = float( data[3]  ) * 1E-38
-        
-        print ibin, xval, yval, xsec
 
-        
+        datahist.Fill(xval, yval, xsec)
+        counthist.Fill(xval, yval, 1.0)
+
+        for i in range(maphist.GetNbinsX()):
+            for j in range(maphist.GetNbinsY()):
+                xcent = maphist.GetXaxis().GetBinCenter(i+1)
+                ycent = maphist.GetYaxis().GetBinCenter(j+1)
+
+                if (xcent > xval and xcent < xhig and
+                    ycent > yval and ycent < yhig):
+                    maphist.SetBinContent(i+1,j+1, ibin)
+
+outfile.cd()
+datahist.Write()
+counthist.Write()
+maphist.Write()
+
 
 # ANALYSIS II
 #______________________________
-
 xedge   =  [0.2, 0.35, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.5, 2.0, 3.0, 5.0, 30.0]
 yedge   =  [0.6, 0.7, 0.8, 0.85, 0.9, 0.925, 0.95, 0.975, 1.0]
 
@@ -63,22 +105,18 @@ with open("rps_crossSection_analysis2.txt") as f:
         data = line.strip().split("|")
         if (len(data) < 1): continue
 
-        ibin = int(   data[0]  )
+        ibin = int(   data[0]  ) + 1
         xval = GetMiddle( data[2] )
         yval = GetMiddle( data[1] )
         xsec = float( data[3]  ) * 1E-38
 
-        entries.append( [ibin, xval, yval, xsec] )
+        datahist.Fill(xval, yval, xsec)
+        maphist.Fill(xval, yval, ibin)
+           
+        counthist.Fill(xval, yval, 1.0)
 
-# Fill data hist
-for vals in entries:
-    ibin, xval, yval, xsec = vals
-
-    datahist.Fill(xval, yval, xsec)
-    maphist.Fill(xval, yval, ibin)
-
-    counthist.Fill(xval, yval, 1.0)
-
+        print ibin, "Map Value"
+        
 # Get N Bins
 nbins = int(maphist.GetMaximum())
 print "NBins I = ", nbins
