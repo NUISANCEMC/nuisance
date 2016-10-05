@@ -26,7 +26,7 @@
    where:   
 */
 
-#include "splineRoutines.h"
+#include "SplineRoutines.h"
 
 //*******************************
 void printInputCommands(){
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
   std::cout<<"Starting ExtFit_splines.exe"<<std::endl;
 
   // Make minimizer class and run fit
-  splineRoutines* splRt = new splineRoutines(argc, argv);
+  SplineRoutines* splRt = new SplineRoutines(argc, argv);
   splRt->Run();
 
   // Show Final Status

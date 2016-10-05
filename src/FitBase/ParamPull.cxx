@@ -520,7 +520,6 @@ bool ParamPull::CheckDialsValid(){
              <<"Include the following lines into your card:" << endl;
 
     std::cout << helpstring << endl;
-    sleep(10);
     throw;
     return false;
   } else {
@@ -649,7 +648,6 @@ double ParamPull::GetLikelihood(){
 
 
   cout << "Likelihood = " << like << " " << fCalcType << endl;
-  sleep(1);
   return like;
   
 };

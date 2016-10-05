@@ -73,6 +73,8 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     ReadJointFile();
   else if (!fInputType.compare("EMPTY"))
     ReadEmptyEvents(); // For Validation
+  else if (!fInputType.compare("FEVENT"))
+    ReadFitEvents();
   else {
     LOG(FTL) << " -> ERROR: Invalid Event File Type" << std::endl;
     fInputRootFile->ls();
@@ -100,11 +102,12 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
 //********************************************************************
 
   // Parse out the input_type
-  const int nfiletypes = 9;
+  const int nfiletypes = 10;
   // The hard-coded list of supported input generators  
   const std::string filetypes[nfiletypes] = {"NEUT",     "NUWRO",    "GENIE",
                                              "EVSPLN",   "JOINT",    "NUANCE",
-                                             "GiBUU_nu", "GiBUU_nub", "EMPTY"};
+                                             "GiBUU_nu", "GiBUU_nub", "EMPTY",
+					     "FEVENT"};
 
   for (int i = 0; i < nfiletypes; i++) {
     std::string temptypes = filetypes[i] + ":";
@@ -149,6 +152,39 @@ bool InputHandler::CanIGoFast() {
   return false;
 }
 
+//********************************************************************
+void InputHandler::ReadFitEvents(){
+//********************************************************************
+
+  fEventType = kINPUTFITEVENT;
+  
+  fFluxHist  = (TH1D*)fInputRootFile->Get("FitFluxHist");
+  fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
+			  (fName + "; E_{#nu} (GeV)").c_str());
+  
+  fEventHist = (TH1D*)fInputRootFile->Get("FitEventHist");
+  fEventHist->SetNameTitle( (fName + "_EVT").c_str(),
+			    (fName + "; E_{#nu} (GeV); Event Rate").c_str());
+  
+  fXSecHist = (TH1D*)fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+  fXSecHist->SetNameTitle( (fName + "_XSEC").c_str(),
+			   (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
+			   .c_str());
+
+  tn = new TChain("FitEvents", "");
+  tn->Add(Form("%s/FitEvents", fInputFile.c_str()));
+  
+  // Assign nvect
+  fNEvents = tn->GetEntries();
+  fEvent->SetBranchAddress(tn);
+  
+  // Print out what was read in
+  LOG(SAM) << " -> Successfully Read FEvent file" << std::endl;
+    
+  return;
+}
+
 //******************************************************************** 
 void InputHandler::ReadEmptyEvents(){
 //******************************************************************** 
@@ -187,27 +223,50 @@ void InputHandler::ReadEventSplineFile() {
   // Event Type 7 SPLINES
   fEventType = 6;
 
-  // Get flux histograms NEUT supplies
-  fFluxHist  = (TH1D*) fInputRootFile->Get((fName + "_FLUX").c_str());
-  fEventHist = (TH1D*) fInputRootFile->Get((fName + "_EVT" ).c_str());
-  fXSecHist  = (TH1D*) fInputRootFile->Get((fName + "_XSEC").c_str());
+  fFluxHist  = (TH1D*)fInputRootFile->Get("FitFluxHist");
+  fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
+			  (fName + "; E_{#nu} (GeV)").c_str());
 
-  // Setup Spline Stuff
-  fSplineHead = (FitSplineHead*)fInputRootFile->Get((fName + "_splineHead").c_str());
+  fEventHist = (TH1D*)fInputRootFile->Get("FitEventHist");
+  fEventHist->SetNameTitle( (fName + "_EVT").c_str(),
+			    (fName + "; E_{#nu} (GeV); Event Rate").c_str());
+
+  fXSecHist = (TH1D*)fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+  fXSecHist->SetNameTitle( (fName + "_XSEC").c_str(),
+			   (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
+			   .c_str());
+
+  tn = new TChain("FitEvents", "");
+  tn->Add(Form("%s/FitEvents", fInputFile.c_str()));
   
-  tn = new TChain(Form("%s", (fName + "_splineEvents").c_str()), "");
-  tn->Add(Form("%s/%s", fInputFile.c_str(),(fName + "_splineEvents").c_str()));
-
+  // Setup Spline Stuff
+  fSplineHead = new FitSplineHead( fInputRootFile, "FitSplineHead" );
+  
   // Assign nvect
   fNEvents = tn->GetEntries();
-  tn->SetBranchAddress("FitEvent", &fEvent);
-
+  fEvent->SetBranchAddress(tn);
+  fEvent->SetSplineCoeffAddress(tn);
+  fEvent->SetType(kEVTSPLINE);
+  
+  // Print out what was read in
+  LOG(SAM) << " -> Successfully Read FEvent file" << std::endl;
+  
   // Load Dial Coeffs into vector
+  tn->GetEntry(0);
+  int ncoeff = fEvent->GetNCoeff();
+  fSplineArray = new double*[fNEvents];
   for (int i = 0; i < fNEvents; i++) {
     tn->GetEntry(i);
-    tn->Show(i);
-    fAllSplines.push_back(*fEvent->dial_coeff);
+
+    // Copy Splines over
+    fSplineArray[i] = new double[ncoeff];
+    for (int j = 0; j < fEvent->GetNCoeff(); j++){
+      fSplineArray[i][j] = fEvent->GetCoeff(j);
+    }
   }
+  
+  cout << "Loaded all spline coeffs" << endl;
 
   // Set MAXEVENTS CALC Here before we load in splines
   if (fMaxEvents > 1 and fMaxEvents < fNEvents) {
@@ -215,15 +274,7 @@ void InputHandler::ReadEventSplineFile() {
              << " events from total spline events." << std::endl;
     fNEvents = fMaxEvents;
   }
-
-  // Load all the splines into signal memory
-  //  for (int i = 0; i < fNEvents; i++){
-  //    tn->GetEntry(i);
-  //    BaseFitEvt* base_event = (new BaseFitEvt(fEvent));
-  //    base_event->fType=6;
-  //    fSignalEvents.push_back( base_event );
-  //  }
-
+  
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read SPLINE file" << std::endl;
   if (LOG_LEVEL(SAM)) PrintStartInput();
@@ -241,6 +292,7 @@ void InputHandler::ReadEventSplineFile() {
              << "PTS(" << spl->points << ") " << std::endl;
     cnt++;
   }
+  sleep(2);
 }
 
 //********************************************************************
@@ -963,13 +1015,10 @@ void InputHandler::ReadEvent(unsigned int i) {
   if (using_events) {
     tn->LoadTree(i);
     tn->GetEntry(i);
-
-    if (fEventType != kEVTSPLINE) fEvent->CalcKinematics();
-
+    fEvent->CalcKinematics();
     fEvent->Index = i;
     fEventIndex  = i;
     fEvent->InputWeight = GetInputWeight(i);
-
   } else {
     GetTreeEntry(i);
   }
@@ -980,12 +1029,12 @@ void InputHandler::GetTreeEntry(const Long64_t i) {
 //********************************************************************
 
   // If we're just reading from the input root file   
-  if (fEventType != kEVTSPLINE)
+  if (fEventType != kEVTSPLINE){
     tn->GetEntry(i);
-  // If we've got splines enabled
-  else
-    (*(fEvent->dial_coeff)) = fAllSplines.at(i);
-
+  } else {
+    fEvent->FillCoeff(fSplineArray[i]);
+  }
+  
   fEventIndex = i;
   fEvent->InputWeight = GetInputWeight(i);
 }

@@ -171,9 +171,61 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
   genie_event = obj->genie_event;
 #endif
 
-  if (obj->dial_coeff) {
-    if (obj->dial_coeff->GetSize() > 0) {
-      dial_coeff = new TArrayD(*obj->dial_coeff);
+  // Delete own elements
+  if (this->ndial_coeff > 0){
+    this->ndial_coeff = 0;
+    delete this->dial_coeff;
+  }
+  
+  if (obj->ndial_coeff > 0){
+    ndial_coeff = obj->ndial_coeff;
+    dial_coeff = new double[ndial_coeff];
+
+    for (int i = 0; i < ndial_coeff; i++){
+      this->dial_coeff[i] = obj->dial_coeff[i];
     }
   }
 };
+
+void BaseFitEvt::ResetDialCoeff(){
+  if (this->ndial_coeff > 0){
+    this->ndial_coeff = 0;
+    delete this->dial_coeff;
+  }
+}
+void BaseFitEvt::CreateDialCoeff(int n){
+  ResetDialCoeff();
+
+  ndial_coeff = n;
+  dial_coeff = new double[ndial_coeff];
+}
+
+void BaseFitEvt::AddSplineCoeffToTree(TTree* tn){
+  tn->Branch("NCoeff",&ndial_coeff,"NCoeff/I");
+  tn->Branch("DialCoeff", dial_coeff, "DialCoeff[NCoeff]/D");
+}
+
+void BaseFitEvt::SetSplineCoeffAddress(TTree* tn){
+
+  tn->SetBranchAddress("NCoeff",&ndial_coeff);
+
+  tn->GetEntry(0);
+  CreateDialCoeff(ndial_coeff);
+  
+  tn->SetBranchAddress("DialCoeff",dial_coeff);
+  
+}
+
+void BaseFitEvt::FillCoeff(double* vals){
+  for (int i = 0; i < ndial_coeff; i++){
+    dial_coeff[i] = vals[i];
+  }
+}
+
+int BaseFitEvt::GetNCoeff(){
+  return ndial_coeff;
+}
+
+double BaseFitEvt::GetCoeff(int i){
+  return dial_coeff[i];
+}

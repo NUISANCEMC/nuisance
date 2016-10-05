@@ -21,17 +21,23 @@ set(TARGETS_TO_BUILD)
 
 if(USE_MINIMIZER)
   add_executable(nuismin nuismin.cxx)
-
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuismin)
-
   target_link_libraries(nuismin ${MODULETargets})
-
   target_link_libraries(nuismin ${CMAKE_DEPENDLIB_FLAGS})
   target_link_libraries(nuismin ${ROOT_LIBS})
-
   if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
     set_target_properties(nuismin PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
   endif()
+
+  add_executable(nuissplines nuissplines.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissplines)
+  target_link_libraries(nuissplines ${MODULETargets})
+  target_link_libraries(nuissplines ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(nuissplines ${ROOT_LIBS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(nuissplines PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+
 endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})

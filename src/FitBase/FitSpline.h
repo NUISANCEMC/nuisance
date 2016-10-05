@@ -49,6 +49,11 @@ class FitSpline{
   void SetType(int t, int p, int d, bool f=true);
   void SetOffset(int i){ offset = i; };
 
+  inline std::string GetIdent(){return id;};
+  inline std::string GetDist(){return form;};
+  inline std::string GetPoints(){return points;};
+  inline std::vector<int> GetEnums(){return var_enums;};
+  
   std::vector<double> GetSplineCoeff(double* weights);
 
   // Public Access Spline Variables

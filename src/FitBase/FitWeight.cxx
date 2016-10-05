@@ -555,7 +555,7 @@ std::string FitWeight::GetDialType(int this_enum) {
 
 //********************************************************************
 double FitWeight::CalcWeight(BaseFitEvt* evt) {
-  //********************************************************************
+//********************************************************************
 
   double rw_weight = 1.0;
 
@@ -984,7 +984,7 @@ std::vector<double> FitWeight::GetDialValues() {
 
 //********************************************************************
 void FitWeight::SetupEventCoeff(BaseFitEvt* event) {
-  //********************************************************************
+//********************************************************************
   if (!fSplineHead) fSplineHead = new FitSplineHead();
   fSplineHead->SetupEventWeights(event);
 }
@@ -994,7 +994,7 @@ void FitWeight::GenSplines(BaseFitEvt* event, bool save_graph) {
   //********************************************************************
 
   double nom = this->CalcWeight(event);
-  event->dial_coeff->SetAt(nom, 0);
+  event->dial_coeff[0] = (nom);
 
   // Get Current Dial Values and save to reset
   std::list<FitSpline*>::iterator spl_iter = fSplineHead->SplineObjects.begin();
@@ -1010,6 +1010,7 @@ void FitWeight::GenSplines(BaseFitEvt* event, bool save_graph) {
     else if (dim >= 3)
       this->FitNDSplineCoeff(event, spl, nom, save_graph);
   }
+  
   return;
 }
 
@@ -1073,8 +1074,8 @@ void FitWeight::Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
     gr_2D_scan.Write();
   }
 
-  this->SetDialValue(enum_x, cur_x);
-  this->SetDialValue(enum_y, cur_y);
+  SetDialValue(enum_x, cur_x);
+  SetDialValue(enum_y, cur_y);
 
   return;
 }
@@ -1105,40 +1106,49 @@ void FitWeight::Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
        iter++) {
     val = (*iter);
 
-    this->SetDialValue(this_enum, val);
-    this->Reconfigure(true);
-
+    SetDialValue(this_enum, val);
+    Reconfigure(true);
+    
     weightval = this->CalcWeight(event) / nom;
     if (weightval != 1.0) hasresponse = true;
-
+    
     allweights[count] = weightval;
     allvals[count++] = val;
   }
+  
   if (!hasresponse) {
-    event->dial_coeff->SetAt(-999.9, 1);
+    event->dial_coeff[1] = -999.9;
   }
 
   TGraph* gr = new TGraph(n_knots, &knots[0], allweights);
-  TF1* f1 =
-      new TF1("f1", spl, -1.0 + knots[0], 1.0 + knots[knots.size() - 1], npar);
 
-  if (save_graph and hasresponse) f1->SetNpx(400);
-
-  // Check for TSpline3
-  if (spl->needs_fit) {
-    gr->Fit(f1, "WQM");
-    for (int i = 0; i < npar; i++) {
-      event->dial_coeff->SetAt(f1->GetParameter(i), i + spl->offset);
-    }
-  } else {
-    std::vector<double> dial_coeff = spl->GetSplineCoeff(allweights);
-    for (int i = 0; i < npar; i++) {
-      event->dial_coeff->SetAt(dial_coeff[i], i + spl->offset);
-      f1->FixParameter(i, dial_coeff[i]);
-    }
-    gr->Fit(f1, "WQM");
+  TF1* f1 = NULL;
+  if (hasresponse){
+    f1 =  new TF1("f1", spl, -1.0 + knots[0], 1.0 + knots[knots.size() - 1], npar);
+    if (save_graph) f1->SetNpx(400);
   }
 
+  // Check for TSpline3
+  if (hasresponse){
+    if (spl->needs_fit) {
+      gr->Fit(f1, "WQM");
+      for (int i = 0; i < npar; i++) {
+	event->dial_coeff[i + spl->offset] = (f1->GetParameter(i));
+      }
+    } else {
+      std::vector<double> dialcoeff = spl->GetSplineCoeff(allweights);
+      for (int i = 0; i < npar; i++) {
+	event->dial_coeff[i + spl->offset] = (dialcoeff[i]);
+	f1->FixParameter(i, dialcoeff[i]);
+      }
+      //gr->Fit(f1, "WQM");
+    }
+  } else {
+    for (int i = 0; i < npar; i++) {
+      event->dial_coeff[i + spl->offset] = -999.99;
+    }
+  }
+    
   if (save_graph and hasresponse) {
     TSpline3* spl3 =
         new TSpline3(Form("Spline3_dial%i_%s_%s;%s;Weight Response", this_enum,
@@ -1157,7 +1167,7 @@ void FitWeight::Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
     gr->Write();
 
     gr->Draw("SAME P");
-    f1->Draw("SAME C");
+    if (f1) f1->Draw("SAME C");
     c3->Update();
     c3->Write(Form("Spline3_dial%i_%s_%s;%s;Weight Response", this_enum,
                    spl->id.c_str(), spl->form.c_str(), spl->id.c_str()));
@@ -1169,7 +1179,9 @@ void FitWeight::Fit1DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
   delete f1;
   delete allweights;
 
-  this->SetDialValue(this_enum, current);
+
+  SetDialValue(this_enum, current);
+  Reconfigure(true);
 }
 
 //********************************************************************
@@ -1182,8 +1194,9 @@ void FitWeight::ReadSplineHead(FitSplineHead* splhead) {
 //********************************************************************
 void FitWeight::SetupSpline(std::string dialname, std::string splinename,
                             std::string points_def) {
-  //********************************************************************
+//********************************************************************
 
+  cout << "Setting up spline " << fSplineHead << endl;
   // Create spline head if none setup
   if (!fSplineHead) fSplineHead = new FitSplineHead();
 
@@ -1196,6 +1209,7 @@ void FitWeight::SetupSpline(std::string dialname, std::string splinename,
   }
 
   // Add new spline
+  cout << "Added spline" << endl;
   FitSpline* spl = new FitSpline(dialname, splinename, list_enums, points_def);
   fSplineHead->AddSpline(spl);
 
@@ -1212,7 +1226,7 @@ void FitWeight::ResetSplines() {
 //********************************************************************
 double FitWeight::CalcSplineWeight(BaseFitEvt* evt) {
   //********************************************************************
-  double rw_weight = fSplineHead->CalcWeight(evt->dial_coeff->GetArray());
+  double rw_weight = fSplineHead->CalcWeight(evt->dial_coeff);
   return rw_weight;
 }
 

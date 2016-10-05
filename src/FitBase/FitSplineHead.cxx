@@ -19,6 +19,11 @@
 
 #include "FitSplineHead.h"
 
+FitSplineHead::FitSplineHead(TFile* infile, std::string name){
+  current_offset = 1;
+  Read((TTree*) infile->Get(name.c_str()));
+}
+
 double FitSplineHead::CalcWeight(const Double_t* incoeff){
   double weight = incoeff[0];
   double nom = weight;
@@ -45,9 +50,8 @@ void FitSplineHead::SetupEventWeights(BaseFitEvt* event){
     ncoeff += (*iter)->npar;
   }
 
-  if (event->dial_coeff) delete event->dial_coeff;
-  event->dial_coeff = new TArrayD(ncoeff);
-
+  event->ResetDialCoeff();
+  event->CreateDialCoeff(ncoeff);
 }
 
 void FitSplineHead::AddSpline(FitSpline* spl){
@@ -65,3 +69,67 @@ int FitSplineHead::GetCurrentOffset(){
   return ncoeff;
 }
 
+
+void FitSplineHead::Write(std::string inname){
+
+  TTree* headtree = new TTree(inname.c_str(),inname.c_str());
+
+  std::string ident = "";
+  std::string dist  = "";
+  int nenums = 0;
+  int enumlist[1000];
+  std::string points = "";
+
+  headtree->Branch("ident",&ident);
+  headtree->Branch("dist",&dist);
+  headtree->Branch("nenums",&nenums,"nenums/I");
+  headtree->Branch("enums",&enumlist,"enums[nenums]/I");
+  headtree->Branch("points",&points);
+
+  for (std::list<FitSpline*>::iterator iter = SplineObjects.begin();
+       iter != SplineObjects.end(); iter++){
+    FitSpline* spl = (*iter);
+    
+    ident  = spl->GetIdent();
+    dist   = spl->GetDist();
+    points = spl->GetPoints();
+ 
+    std::vector<int> tempenums = spl->GetEnums();
+    nenums = tempenums.size();
+    for (int j = 0; j < nenums; j++){
+      enumlist[j] = tempenums[j];
+    }
+
+    headtree->Fill();
+  }
+
+  headtree->Write();
+}
+
+
+void FitSplineHead::Read(TTree* tn){
+
+  std::string* ident = new std::string();
+  std::string* dist  = new std::string();
+  int nenums = 0;
+  int enumlist[1000];
+  std::string* points = new std::string();
+
+  tn->SetBranchAddress("ident",  &ident);
+  tn->SetBranchAddress("dist",   &dist);
+  tn->SetBranchAddress("nenums", &nenums);
+  tn->SetBranchAddress("enums",  &enumlist);
+  tn->SetBranchAddress("points", &points);
+
+  for (int i = 0; i < tn->GetEntries(); i++){
+    tn->GetEntry(i);
+
+    std::vector<int> enumvect;
+    for (int j = 0; j < nenums; j++){
+      enumvect.push_back(enumlist[j]);
+    }
+    
+    FitSpline* spl = new FitSpline(*ident, *dist, enumvect, *points);
+    AddSpline(spl);
+  }
+}

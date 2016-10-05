@@ -41,6 +41,11 @@ class FitSplineHead {
   void Reconfigure(std::vector<int> dial_enums, std::vector<double> dial_values);
   void SetupEventWeights(BaseFitEvt* event);
   void AddSpline(FitSpline* spl);
+
+  void Write(std::string name="FitSplineHead");
+  FitSplineHead(TFile* infile, std::string name);
+  void Read(TTree* tn);
+  
   int GetCurrentOffset();
 
   int ngen_events; // Number of events in the tree these were generated with (needed for scaling)

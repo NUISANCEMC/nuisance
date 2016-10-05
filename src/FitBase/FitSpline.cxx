@@ -39,6 +39,7 @@ FitSpline::FitSpline(std::string ident, std::string dist,
 //*************************************************
 
   this->id   = ident;
+
   this->form = dist;
   this->var_enums = list_enums;
 
@@ -188,11 +189,15 @@ double FitSpline::DoEval(const double* x, const double* par, const bool use_offs
   // Get Offset in array
   int off = 0;
   if (use_offset) off = this->offset;
+  if (par[0+off] <= -998){
+    return 1.0;
+  }
+  
   switch( this->spline ){
 
     // N Polynomial sets without constant
   case (k1DPol1): {
-    std::cout<<"Calcing pol1 with "<<y[0]<<" "<<par[0+off]<<std::endl;
+    //    std::cout<<"Calcing pol1 with "<<y[0]<<" "<<par[0+off]<<std::endl;
     return ( 1.0 + par[0+off] * y[0] ); }
 
   case (k1DPol2): { return ( 1.0 + par[0+off] * y[0] +
@@ -213,12 +218,21 @@ double FitSpline::DoEval(const double* x, const double* par, const bool use_offs
 			     par[3+off] * pow(y[0],4) +
 			     par[4+off] * pow(y[0],5) );  }
 
-  case (k1DPol6): { return ( 1.0 + par[0+off] * y[0] +
+  case (k1DPol6): {
+
+    //    cout << "Calcing 1Dpol6 with " << y[0] << endl;
+    //    cout << "Par 0 " << par[0+off] << endl;
+    //    cout << "Par 1 " << par[1+off] << endl;
+    //    cout << "Par 2 " << par[2+off] << endl;
+
+    double val = ( 1.0 + par[0+off] * y[0] +
 			     par[1+off] * y[0] * y[0] +
 			     par[2+off] * y[0] * y[0] * y[0] +
 			     par[3+off] * pow(y[0],4) +
 			     par[4+off] * pow(y[0],5) +
-			     par[5+off] * pow(y[0],6) );  }
+			     par[5+off] * pow(y[0],6) );
+    //    cout << "VAL = " << val << endl;
+    return val;}
 
     // N Polynomial sets (with constant)
   case (k1DPol1C): { return ( par[0+off] +

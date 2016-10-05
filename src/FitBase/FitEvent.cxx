@@ -542,11 +542,45 @@ void FitEvent::NuanceKinematics(){
 /* Read/Write own event class */
 void FitEvent::SetBranchAddress(TChain* tn){
 
+  fType = kINPUTFITEVENT;
+  
+  tn->SetBranchAddress("Mode",    &fMode);
+  tn->SetBranchAddress("Mode",    &Mode);
+  tn->SetBranchAddress("EventNo", &fEventNo);
+  tn->SetBranchAddress("TotCrs",  &fTotCrs);
+  tn->SetBranchAddress("TargetA", &fTargetA);
+  tn->SetBranchAddress("TargetH", &fTargetH);
+  tn->SetBranchAddress("Bound",   &fBound);
+
+  tn->SetBranchAddress("InputWeight", &InputWeight);
+
+  tn->SetBranchAddress("NParticles",    &fNParticles);
+  tn->SetBranchAddress("ParticleState", fParticleState);
+  tn->SetBranchAddress("ParticlePDG",   fParticlePDG);
+  tn->SetBranchAddress("ParticleMom",   fParticleMom);
+  
 }
 
 
 void FitEvent::AddBranchesToTree(TTree* tn){
 
+  tn->Branch("Mode",    &fMode,    "Mode/I");
+  tn->Branch("EventNo", &fEventNo, "EventNo/i");
+  tn->Branch("TotCrs",  &fTotCrs,  "TotCrs/D");
+  tn->Branch("TargetA", &fTargetA, "TargetA/I");
+  tn->Branch("TargetH", &fTargetH, "TargetH/I");
+  tn->Branch("Bound",   &fBound,   "Bound/O");
+
+  tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
+  
+  tn->Branch("NParticles",    &fNParticles,   "NParticles/I");
+  tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
+  tn->Branch("ParticlePDG",   fParticlePDG,   "ParticlePDG[NParticles]/I");
+  tn->Branch("ParticleMom",   fParticleMom,   "ParticleMom[NParticles][4]/D");
+
+  tn->SetAlias("Enu","ParticleMom[0][4]");
+  
+  
 }
 
 

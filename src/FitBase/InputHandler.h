@@ -57,6 +57,7 @@ class InputHandler {
   void ReadJointFile       (void);
   void ReadGiBUUFile (bool IsNuBarDominant);
   void ReadEmptyEvents     (void); // For Validations
+  void ReadFitEvents       (void);
   FitSplineHead* GetSplineHead (void);
 
   double PredictedEventRate  (double low, double high, std::string intOpt="width");
@@ -122,7 +123,8 @@ class InputHandler {
   std::vector<TH1*> fEventList;
   std::vector<TH1*> fFluxList;
 
-  std::vector<TArrayD> fAllSplines;
+  double** fSplineArray;
+  //  std::vector<double*> fAllSplines;
   
   // Horribly Wrapped Event Objects!
   // Have to add this hear incase one generator isn't supported.

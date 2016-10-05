@@ -846,7 +846,6 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
   LU.Decompose();
   new_mat = new TMatrixDSym(nrows, LU.GetU().GetMatrixArray(), "");
 
-  sleep(2);
   return new_mat;
 }
 

@@ -51,6 +51,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "FitLogger.h"
+#include "BaseFitEvt.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -64,7 +65,7 @@ enum minstate {
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
-class MinimizerRoutines{
+class SplineRoutines{
 //*************************************
 
 public:
@@ -74,10 +75,10 @@ public:
   */
 
   //! Constructor reads in arguments given at the command line for the fit here.
-  MinimizerRoutines(int argc, char* argv[]);
+  SplineRoutines(int argc, char* argv[]);
     
   //! Default destructor
-  ~MinimizerRoutines();
+  ~SplineRoutines();
 
   //! Reset everything to default/NULL
   void Init();
@@ -100,12 +101,18 @@ public:
   //! Fills maps for each of the parameters
   int ReadParameters(std::string parstring);
 
-  //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
-  int ReadFakeDataPars(std::string parstring);
-
   //! Read in the samples so we can set up the free normalisation dials if required
   int ReadSamples(std::string sampleString);
 
+  //! Read Generic Inputs
+  int ReadGenericInputs(std::string sampleString);
+
+  //! Read Event Splines
+  int ReadEventSplines(std::string splstring);
+
+  //! Read Bin Splines
+  int ReadBinSplines(std::string binstring){ return kGoodStatus; };
+  
   /*
     Setup Functions
   */
@@ -116,19 +123,16 @@ public:
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void SetupRWEngine();
 
-  //! Setups up the jointFCN.
-  void SetupFCN();
+  //! Setups up the jointFCN and uses it to grab samples.
+  void SetupSamples();
 
-  //! Sets up the minimizerObj for ROOT. there are cases where this is called repeatedly, e.g. If you are using a brute force scan before using Migrad.
-  void SetupFitter(std::string routine);
+  void SetupGenericInputs();
 
-  //! Set the current data histograms in each sample to the fake data.
-  void SetFakeData();
+  void SaveEvents();
 
-  //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
-  //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
-  void SetupCovariance();
+  void SaveEventSplines();
 
+  void TestEventSplines();
   /*
     Fitting Functions
   */
@@ -139,58 +143,6 @@ public:
   //! Given a new map change the values that the RW engine is currently set to
   void UpdateRWEngine(std::map<std::string,double>& updateVals);
 
-  //! Given a single routine (see tutorial for options) run that fit routine now.
-  int RunFitRoutine(std::string routine);
-
-  //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
-  void GetMinimizerState();
-
-  //! Print current value
-  void PrintState();
-  
-  //! Performs a fit routine where the MAXEVENTS is set to a much lower value to try and move closer to the best fit minimum.
-  void LowStatRoutine(std::string routine);
-
-  //! Perform a chi2 scan in 1D around the current point
-  void Create1DScans();
-
-  //! Perform a chi2 scan in 2D around the current point
-  void Chi2Scan2D();
-
-  //! Currently a placeholder NEEDS UPDATING
-  void CreateContours();
-
-  //! If any currentVals are close to the limits set them to the limit and fix them
-  int FixAtLimit();
-
-  //! Throw the current covariance of dial values we have, and fill the thrownVals and thrownNorms maps.
-  //! If uniformly is true parameters will be thrown uniformly between their upper and lower limits.
-  void ThrowCovariance(bool uniformly);
-
-  //! Given the covariance we currently have generate error bands by throwing the covariance.
-  //! The FitPar config "error_uniform" defines whether to throw using the covariance or uniformly.
-  //! The FitPar config "error_throws" defines how many throws are needed.
-  //! Currently only supports TH1D plots.
-  void GenerateErrorBands();
-
-  /*
-    Write Functions
-  */
-
-  //! Write plots and TTrees listing the minimizerObj result of the fit to file
-  void SaveMinimizerState();
-
-  //! Save the sample plots for current MC
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void SaveCurrentState(std::string subdir="");
-
-  //! Save starting predictions into a seperate folder
-  void SaveNominal();
-
-  //! Save predictions before the fit is ran into a seperate folder
-  void SavePrefit();
-
-  void SaveResults();
   /*
     MISC Functions
   */
@@ -202,33 +154,23 @@ protected:
 
   //! Our Custom ReWeight Object
   FitWeight* rw;
-
+  FitWeight* fRW;
+  
   std::string fOutputFile;
   std::string fInputFile;
 
   TFile* fInputRootFile;
   TFile* fOutputRootFile;
-
-  //! Flag for whether the fit should be continued if an output file is already found.
-  bool fitContinue;
-
-  //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* fMinimizer;
-
+  
   JointFCN* fSampleFCN;
-  MinimizerFCN* fMinimizerFCN;
-  ROOT::Math::Functor* fCallFunctor;
-
-  int nfreepars;
-
+  std::list<MeasurementBase*> fSamples;
+  
   std::string fCardFile;
 
   std::string fStrategy;
   std::vector<std::string> fRoutines;
   std::string fAllowedRoutines;
   
-  std::string fFakeDataInput;
-
   // Input Dial Vals
   //! Vector of dial names
   std::vector<std::string> fParams;
@@ -243,19 +185,18 @@ protected:
   std::map<std::string, bool>        fFixVals;
   std::map<std::string, bool>        fStartFixVals;
 
-  //! Vector of fake parameter names
-  std::map<std::string,double> fFakeVals;
+  std::vector<std::string> fGenericInputNames;
+  std::map<std::string, std::string> fGenericInputFiles;
+  std::map<std::string, std::string> fGenericOutputFiles;
+  std::map<std::string, std::string> fGenericOutputTypes;
+  std::map<std::string, InputHandler*> fGenericInputs;
 
-  //! Map of thrown parameter names and values (After ThrowCovariance)
-  std::map<std::string,double> fThrownVals;
 
-  TH2D* fCorrel;
-  TH2D* fDecomp;
-  TH2D* fCovar;
+  std::vector<std::string> fSplineNames;
+  std::map<std::string, std::string> fSplineTypes;
+  std::map<std::string, std::string> fSplinePoints;
   
-  TH2D* fCorrelFree;
-  TH2D* fDecompFree;
-  TH2D* fCovarFree;
+  
 };
 
 /*! @} */
