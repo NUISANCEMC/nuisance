@@ -668,6 +668,8 @@ void Measurement2D::ApplyNormScale(double norm){
   fMCHist->Scale(scale);
   fMCFine->Scale(scale);
 
+  PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scale);
+
   return;
 
 };
@@ -730,6 +732,7 @@ double Measurement2D::GetLikelihood(){
   if (fIsShape){
     fMCHist->Scale(scaleF);
     fMCFine->Scale(scaleF);
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
   }
 
   if (!fMapHist){
@@ -761,10 +764,11 @@ double Measurement2D::GetLikelihood(){
   }
 
 
-  // Adjust the shape back to where it was.
-  if (fIsShape){
+  // Adjust the shape back to where it was. 
+  if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")){
     fMCHist->Scale(1./scaleF);
     fMCFine->Scale(1./scaleF);
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, 1.0/scaleF);
   }
 
   LOG(REC)<<fName+" Chi2 = "<<chi2<<" \n";

@@ -272,8 +272,6 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool 
     }
   }
     
-  //  std::cout<<"Current Q2QE Momentum Shift = "<<momshift<<std::endl;
-
   double el = pmu.E()/1000.;
   double pl = (pmu.Vect().Mag())/1000.; // momentum of lepton
   double ml = sqrt(el*el - pl*pl); // lepton mass

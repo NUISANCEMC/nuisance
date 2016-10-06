@@ -28,7 +28,7 @@
 void SplineRoutines::Init(){
 //************************
   
-  fStrategy = "Migrad,FixAtLimBreak,Migrad";
+  fStrategy = "SaveEvents";
   fRoutines.clear();
 
   fCardFile = "";
@@ -36,11 +36,8 @@ void SplineRoutines::Init(){
   fSampleFCN    = NULL;
   fRW = NULL;
   
-  fAllowedRoutines = ("Migrad,Simplex,Combined,"
-		      "Brute,Fumili,ConjugateFR,"
-		      "ConjugatePR,BFGS,BFGS2,"
-		      "SteepDesc,GSLSimAn,FixAtLim,FixAtLimBreak"
-		      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands");
+  fAllowedRoutines = ("SaveEvents,SaveSplineEvents");
+
 };
 
 //*************************************
@@ -551,10 +548,6 @@ void SplineRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals){
 //************************************* 
 void SplineRoutines::Run(){
 //************************************* 
-
-  SaveEventSplines();
-
-  return;
   
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
@@ -563,7 +556,8 @@ void SplineRoutines::Run(){
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
 
     // Try Routines
-    SaveEventSplines();
+    if (!routine.compare("SaveSplineEvents")) SaveEventSplines();
+    else if (!routine.compare("SaveEvents")) SaveEvents();
     
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange){
@@ -575,36 +569,81 @@ void SplineRoutines::Run(){
   return;
 }
 
-
-
 //*************************************
 void SplineRoutines::SaveEvents(){
 //*************************************
 
-  std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
-  std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
+  // Make a new RWm Engine
+  if (fRW) delete fRW;
+  SetupRWEngine();
 
-  for (MeasListConstIter iter = fSamples.begin();
-       iter != fSamples.end(); iter++){
+  // Set RW engine to central values
+  UpdateRWEngine(fCurVals);
+
+  // iterate over generic events
+  std::map<std::string, InputHandler*>::const_iterator iter = fGenericInputs.begin();
   
-    InputHandler* cur_input = (*iter)->GetInput();
-    FitEvent* cust_event = cur_input->GetEventPointer();
-    int fNEvents = cur_input->GetNEvents();
+  // Iterate over all inputs
+  for( ; iter != fGenericInputs.end(); iter++){
 
+    std::string name = (iter->first);
+
+    LOG(FIT) << "Creating new nuisance event set in:" << endl;
+    LOG(FIT) << "Name = " << name << endl;
+    LOG(FIT) << "InputFile = " << fGenericInputFiles[name] << endl;
+    LOG(FIT) << "OutputFile = " << fGenericOutputFiles[name] << endl;
+    LOG(FIT) << "Type = " << fGenericOutputTypes[name] << endl;
+    
+    // Create a new TFile
+    TFile* eventfile = new TFile( fGenericOutputFiles[name].c_str(), "RECREATE" );
+    eventfile->cd();
+
+    // Get Input
+    InputHandler* curinput = (iter->second);
+    int nevents = curinput->GetNEvents();    
+
+    // Setup Event
+    FitEvent* custevent = curinput->GetEventPointer();
+
+    // Setup TTree
+    eventfile->cd();
     TTree* evttree = new TTree("FitEvents","FitEvents");
-    cust_event->AddBranchesToTree(evttree);
+    custevent->AddBranchesToTree(evttree);
 
-    for (int i = 0; i < fNEvents; i++){
-      cur_input->ReadEvent(i);
-      cust_event->CalcKinematics();
+    int countwidth = (nevents/50);
+    
+    // Run Loop and Fill Event Tree
+    for (int i = 0; i < nevents; i++){
+
+      // Grab new event
+      curinput->ReadEvent(i);
+
+      // Fill event info
+      custevent->CalcKinematics();
+
+      // Fill Spline/Weight Info
+      fRW->CalcWeight(custevent);
+     
+      // Save everything
       evttree->Fill();
+
+      if (i % countwidth == 0){
+	LOG(REC) << "Filled " << i << "/" << nevents << " nuisance events." << endl;
+      }
+
     }
 
+    // Save TTree alongside flux info
+    eventfile->cd();
     evttree->Write();
-    (*iter)->GetFluxList().at(0)->Write("FitFluxHist");
-    (*iter)->GetEventRateList().at(0)->Write("FitEventHist");
+    curinput->GetFluxHistogram()->Write("FitFluxHist");
+    curinput->GetEventHistogram()->Write("FitEventHist");
+
+    // Close file
+    eventfile->Close();
   }
 }
+
 
 //************************************* 
 void SplineRoutines::TestEventSplines(){

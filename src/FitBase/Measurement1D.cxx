@@ -752,6 +752,7 @@ double Measurement1D::GetLikelihood() {
   if (fIsShape){
     fMCHist->Scale(scaleF);
     fMCFine->Scale(scaleF);
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
   }
 
   // Get Chi2
@@ -795,9 +796,10 @@ double Measurement1D::GetLikelihood() {
   }
 
   // Return to normal scaling
-  if (fIsShape){
+  if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")){
     fMCHist->Scale(1./scaleF);
     fMCFine->Scale(1./scaleF);
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, 1.0/scaleF);
   }
 
   return stat;

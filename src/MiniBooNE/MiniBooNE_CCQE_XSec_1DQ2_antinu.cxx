@@ -213,7 +213,8 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ApplyNormScale(double norm){
 
 //********************************************************************                                                                                                                                                                     /// @details Extra scale command for CCQELIKE PDG Hist                                                                                                                                                                                     
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::ResetAll(){
-  //********************************************************************                                                                                                                                                                      
+  //********************************************************************                                                                                                                                                                   
+  Measurement1D::ResetAll();   
   if (ccqelike){
     PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCQELIKE);
     PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCPIM);

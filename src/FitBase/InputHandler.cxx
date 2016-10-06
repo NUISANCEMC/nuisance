@@ -321,8 +321,12 @@ void InputHandler::ReadJointFile() {
   std::ifstream card(fInputFile.c_str(), ifstream::in);
   std::vector<std::string> input_lines;
 
+  LOG(FIT) << "Parsing input card '" << line <<"'"<< endl;
   while (std::getline(card, line, '\n')) {
     std::istringstream stream(line);
+    if (line.empty()) continue;
+
+    cout << "line: " << line << endl;
 
     // Add normalisation option for second line
     input_lines.push_back(line);
@@ -337,6 +341,8 @@ void InputHandler::ReadJointFile() {
   int count_low = 0;
   int temp_type = -1;
   for (UInt_t i = 0; i < input_lines.size(); i++) {
+    LOG(SAM) << "Creating new sample inputhandler temperariliy" << endl;
+    
     // Create Temporary InputHandlers inside
     InputHandler* temp_input = new InputHandler(
         std::string(Form("temp_input_%i", i)), input_lines.at(i));
@@ -347,6 +353,7 @@ void InputHandler::ReadJointFile() {
       ERR(FTL) << " Make them all the same type!" << std::endl;
     }
 
+    LOG(FIT) << "Getting objects from " << temp_input << endl;
     temp_type = temp_input->GetType();
 
     TH1D* temp_flux = (TH1D*)temp_input->GetFluxHistogram()->Clone();
@@ -373,6 +380,7 @@ void InputHandler::ReadJointFile() {
     fJointIndexHist.push_back((TH1D*)temp_evts->Clone());
 
     count_low += temp_events;
+    LOG(FIT) << "Temp input has " << temp_events <<" events." << endl;
 
     if (i == 0) {
       fFluxHist = (TH1D*)temp_flux->Clone();
@@ -441,6 +449,12 @@ void InputHandler::ReadJointFile() {
                                 (fName + "_EVT").c_str());
   fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
                                (fName + "_FLUX").c_str());
+
+  fXSecHist = (TH1D*) fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+  fXSecHist->SetNameTitle((fName + "_XSEC").c_str(),
+			  (fName + "_XSEC").c_str());
+
 
   return;
 }
@@ -794,6 +808,11 @@ void InputHandler::ReadGenieFile() {
 			       (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
 			       .c_str());
 
+  // Print out what was read in                                                                                                                                                                                                            
+  LOG(SAM) << " -> Successfully Read GENIE file" << std::endl;
+  if (LOG_LEVEL(SAM)) PrintStartInput();
+
+
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
   ERR(FTL) << "GENIE Input Not Enabled." << std::endl;
@@ -937,12 +956,19 @@ void InputHandler::ReadNuanceFile() {
 
   fFluxHist = new TH1D((fName + "_FLUX").c_str(),
 			     (fName + "_FLUX").c_str(), 1, 0.0, 1.0);
-
   fFluxHist->SetBinContent(1, 1.0);
 
   fEventHist = new TH1D((fName + "_EVT").c_str(),
 			      (fName + "_EVT").c_str(), 1, 0.0, 1.0);
   fEventHist->SetBinContent(1, fNEvents);
+
+  fXSecHist = (TH1D*) fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+  
+  // Print out what was read in                                                                                                                                                                                                             
+  LOG(SAM) << " -> Successfully Read NUANCE file" << std::endl;
+  if (LOG_LEVEL(SAM)) PrintStartInput();
+
 
 #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;

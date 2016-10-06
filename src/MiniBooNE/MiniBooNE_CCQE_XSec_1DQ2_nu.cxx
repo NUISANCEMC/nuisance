@@ -90,8 +90,8 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   for (UInt_t j = 2; j < event->Npart(); ++j){
     
     int PID = abs((event->PartInfo(j))->fPID);
+
     if (!event->PartInfo(j)->fIsAlive) continue;
-    
     if (PID != 13 and !ccqelike)     continue;
     if (abs(PID) != 13 and ccqelike) continue;
     
@@ -99,7 +99,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
     q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
 			     cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 
 			     34., true);
-    
+   
     break; 
   }
 
@@ -112,12 +112,9 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
 //******************************************************************** 
-
   // 2 Different Signal Definitions
   if (ccqelike) return SignalDef::isMiniBooNE_CCQELike(event, EnuMin, EnuMax);
   else return SignalDef::isMiniBooNE_CCQE(event, EnuMin, EnuMax);
-
-  return true;
 };
 
 //******************************************************************** 

@@ -124,12 +124,12 @@ void FitEvent::NeutKinematics(){
     }
    
     // Remove Undefined
-    if (kRemoveUndefParticles &&
-	state == kUndefinedState) continue;
+    //    if (kRemoveUndefParticles &&
+    //	state == kUndefinedState) continue;
     
     // Remove FSI
-    if (kRemoveFSIParticles &&
-	state == kFSIState) continue;
+    //    if (kRemoveFSIParticles &&
+    //	state == kFSIState) continue;
 
     fParticleState[fNParticles] = state;
     
@@ -329,7 +329,7 @@ void FitEvent::GENIEKinematics(){
 
     // Remove Undefined
     if (kRemoveUndefParticles &&
-	state = kUndefinedState) continue;
+	state == kUndefinedState) continue;
 
     // Remove FSI
     if (kRemoveFSIParticles &&
@@ -460,81 +460,73 @@ void FitEvent::SetEventAddress(NuanceEvent** tempevent){
 //***************************************************
 void FitEvent::NuanceKinematics(){
 //***************************************************
-
-  /*
   ResetEvent();
-  //  std::cout<<"Calling Nuance Kinematics"<<endl;
 
-  // Sort Mode
-  TotCrs = 1.0; // NEEDS SORTING
-  Mode = GeneratorUtils::ConvertNuanceMode(nuance_event);
+  fMode    = GeneratorUtils::ConvertNuanceMode(nuance_event);
+  Mode     = fMode;
+  fEventNo = 0.0;
+  fTotCrs  = 1.0;
+  fTargetA = 0.0;
+  fTargetZ = 0.0;
+  fTargetH = 0;
+  fBound   = 0.0;
 
-  // These need to be set somehow...
-  fEventNo = 0;
-  PFSurf = 0.0;
-  PFMax  = 0.0;
-  TargetA = 0.0;
-  TargetZ = 0.0;
-  TargetH = 0;
-  Ibound  = 0.0; //nuance_event->bound;
+  // Fill particle Stack
+  fNParticles = 0;
+  fCurParticleIndex = -1;
 
-  // Setup particles
-  all_particles.clear();
+  // Check Particle Stack   
+  UInt_t npart  = 2 + nuance_event->n_leptons + nuance_event->n_hadrons;
 
-  
-  std::cout<<"Incoming Neutrino = "
-	   <<  nuance_event->p_neutrino[0] << " "
-	   <<  nuance_event->p_neutrino[1] << " "
-	   <<  nuance_event->p_neutrino[2] << " "
-	   <<  nuance_event->p_neutrino[3] << std::endl;
-  
+  if (npart > kMaxParticles){
+    ERR(FTL) << "NUANCE has too many particles" << endl;
+    ERR(FTL) << "npart="<<npart<<" kMax="
+             << kMaxParticles << endl;
+    throw;
+  }
 
-  // incoming neutrino
-  all_particles.push_back( FitParticle( nuance_event->p_neutrino[0],
-					nuance_event->p_neutrino[1],
-					nuance_event->p_neutrino[2],
-					nuance_event->p_neutrino[3],
-					nuance_event->neutrino,
-					0 ) );
+  // Fill Neutrino
+  fParticleState[0]  = kInitialState;                 
+  fParticleMom[0][0] = nuance_event->p_neutrino[0];
+  fParticleMom[0][1] = nuance_event->p_neutrino[1];
+  fParticleMom[0][2] = nuance_event->p_neutrino[2];
+  fParticleMom[0][3] = nuance_event->p_neutrino[3];    
+  fParticlePDG[0]    = nuance_event->neutrino;
 
-  // incoming hadron
-  all_particles.push_back( FitParticle( nuance_event->p_targ[0],
-					nuance_event->p_targ[1],
-					nuance_event->p_targ[2],
-					nuance_event->p_targ[3],
-					nuance_event->target,
-					0 ) );
+  // Fill Target Nucleon
+  fParticleState[1]  = kInitialState;
+  fParticleMom[1][0] = nuance_event->p_targ[0];
+  fParticleMom[1][1] = nuance_event->p_targ[1];
+  fParticleMom[1][2] = nuance_event->p_targ[2];
+  fParticleMom[1][3] = nuance_event->p_targ[3];
+  fParticlePDG[1]    = nuance_event->target;
+  fNParticles = 2;
 
-
-  // for outgoing leptons
-  //  std::cout<<"n Leptons = "<<nuance_event->n_leptons<<std::endl;
+  // Fill Outgoing Leptons
   for (int i = 0; i < nuance_event->n_leptons; i++){
-    all_particles.push_back( FitParticle( nuance_event->p_lepton[i][0],
-					  nuance_event->p_lepton[i][1],
-					  nuance_event->p_lepton[i][2],
-					  nuance_event->p_lepton[i][3],
-					  nuance_event->lepton[i], 1 ) );
-    
-    std::cout<<"Outgoing Lepton = "
-	     <<  nuance_event->p_lepton[i][0] << " "
-	     <<  nuance_event->p_lepton[i][1] << " "
-	     <<  nuance_event->p_lepton[i][2] << " "
-	     <<  nuance_event->p_lepton[i][3] << " "
-	     <<  nuance_event->lepton[i] << std::endl;
+
+    fParticleState[fNParticles]  = kFinalState;
+    fParticleMom[fNParticles][0] = nuance_event->p_lepton[i][0];
+    fParticleMom[fNParticles][1] = nuance_event->p_lepton[i][1];
+    fParticleMom[fNParticles][2] = nuance_event->p_lepton[i][2];
+    fParticleMom[fNParticles][3] = nuance_event->p_lepton[i][3];
+    fParticlePDG[fNParticles]    = nuance_event->lepton[i];
+    fNParticles++;
     
   }
-
-  // for outgoing hadrons
+    
+  // Fill Outgoing Hadrons
   for (int i = 0; i < nuance_event->n_hadrons; i++){
-    all_particles.push_back( FitParticle( nuance_event->p_hadron[i][0],
-					  nuance_event->p_hadron[i][1],
-					  nuance_event->p_hadron[i][2],
-					  nuance_event->p_hadron[i][3],
-					  nuance_event->hadron[i], 1 ) );
-  }
 
-  fNParticles = all_particles.size();
-  */
+    fParticleState[fNParticles]  = kFinalState;
+    fParticleMom[fNParticles][0] = nuance_event->p_hadron[i][0];
+    fParticleMom[fNParticles][1] = nuance_event->p_hadron[i][1];
+    fParticleMom[fNParticles][2] = nuance_event->p_hadron[i][2];
+    fParticleMom[fNParticles][3] = nuance_event->p_hadron[i][3];
+    fParticlePDG[fNParticles]    = nuance_event->hadron[i];
+    fNParticles++;
+
+  }
 }
 #endif
 
