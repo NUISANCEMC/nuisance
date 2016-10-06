@@ -271,7 +271,14 @@ void FitEvent::GENIEKinematics(){
   ResetEvent();
   genie_record = static_cast<GHepRecord*>(genie_event->event);
   
-  fMode    = utils::ghep::NeutReactionCode(genie_record); 
+  // Extra Check for MEC
+  if (genie_record->Summary()->ProcInfo().IsMEC()){
+    if      (pdg::IsNeutrino       (genie_record->Summary()->InitState().ProbePdg())){ fMode = 2;  }
+    else if (pdg::IsAntiNeutrino   (genie_record->Summary()->InitState().ProbePdg())){ fMode = -2; }
+  } else {
+    fMode = utils::ghep::NeutReactionCode(genie_record);
+  }
+
   Mode     = fMode;
   fEventNo = 0.0;
   fTotCrs  = genie_record->XSec();
