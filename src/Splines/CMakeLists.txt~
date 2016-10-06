@@ -17,32 +17,16 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-BNL_CC1npip_Evt_1DQ2_nu.cxx
-BNL_CC1npip_XSec_1DEnu_nu.cxx
-BNL_CC1pi0_Evt_1DQ2_nu.cxx
-BNL_CC1pi0_XSec_1DEnu_nu.cxx
-BNL_CC1ppip_Evt_1DQ2_nu.cxx
-BNL_CC1ppip_XSec_1DEnu_nu.cxx
-BNL_CCQE_Evt_1DQ2_nu.cxx
-BNL_CCQE_XSec_1DEnu_nu.cxx
-BNL_CC1ppip_Evt_1DcosthAdler_nu.cxx
-BNL_CC1ppip_Evt_1Dphi_nu.cxx
+FitSpline.cxx
+FitSplineHead.cxx
 )
 
 set(HEADERFILES
-BNL_CC1npip_Evt_1DQ2_nu.h
-BNL_CC1npip_XSec_1DEnu_nu.h
-BNL_CC1pi0_Evt_1DQ2_nu.h
-BNL_CC1pi0_XSec_1DEnu_nu.h
-BNL_CC1ppip_Evt_1DQ2_nu.h
-BNL_CC1ppip_XSec_1DEnu_nu.h
-BNL_CCQE_Evt_1DQ2_nu.h
-BNL_CCQE_XSec_1DEnu_nu.h
-BNL_CC1ppip_Evt_1DcosthAdler_nu.h
-BNL_CC1ppip_Evt_1Dphi_nu.h
+FitSpline.h
+FitSplineHead.h
 )
 
-set(LIBNAME expBNL)
+set(LIBNAME Splines)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(${LIBNAME} STATIC ${IMPLFILES})
@@ -51,10 +35,9 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
@@ -62,6 +45,6 @@ set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

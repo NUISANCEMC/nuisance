@@ -105,6 +105,7 @@ set(MINCODE
 set(CORE
   MCStudies
   FitBase
+  Splines   
   Utils
   #Devel
   )

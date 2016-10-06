@@ -800,7 +800,7 @@ void SplineRoutines::SaveEventSplines(){
     custevent->AddBranchesToTree(evttree);
     custevent->AddSplineCoeffToTree(evttree);  
     LOG(REC) << "Added events+splines to TTree" << endl;
-    int countwidth = (nevents/10);
+    int countwidth = (nevents/400);
 
     // Make folder for graphs
     TDirectory* graphdir = splinefile->mkdir("gengraphs");

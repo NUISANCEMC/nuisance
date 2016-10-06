@@ -23,11 +23,9 @@ FitParticle.cxx
 FitWeight.cxx
 Measurement1D.cxx
 EventManager.cxx
-FitSpline.cxx
 InputHandler.cxx
 Measurement2D.cxx
 FitEvent.cxx
-FitSplineHead.cxx
 JointMeas1D.cxx
 MeasurementBase.cxx
 GeneratorUtils.cxx
@@ -37,9 +35,9 @@ StdHepEvt.cxx
 set(HEADERFILES
 ParamPull.h
 NuanceEvent.h
-BaseFitEvt.h    FitEvent.h     FitSplineHead.h  JointMeas1D.h    Measurement2D.h
+BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
-FitSpline.h    InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h
+InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h
 )
 
 set(LIBNAME FitBase)
@@ -52,6 +50,7 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

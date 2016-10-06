@@ -292,7 +292,6 @@ void InputHandler::ReadEventSplineFile() {
              << "PTS(" << spl->points << ") " << std::endl;
     cnt++;
   }
-  sleep(2);
 }
 
 //********************************************************************
