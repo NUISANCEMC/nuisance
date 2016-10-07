@@ -29,8 +29,6 @@
 #include "TF1.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
@@ -44,13 +42,7 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-#include "MinimizerFCN.h"
 #include "FitParameters.h"
-
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
-#include "FitLogger.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -143,9 +135,6 @@ public:
   //! Given a single routine (see tutorial for options) run that fit routine now.
   int RunFitRoutine(std::string routine);
 
-  //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
-  void GetMinimizerState();
-
   //! Print current value
   void PrintState();
   
@@ -182,9 +171,6 @@ public:
     Write Functions
   */
 
-  //! Write plots and TTrees listing the minimizerObj result of the fit to file
-  void SaveMinimizerState();
-
   //! Save the sample plots for current MC
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
@@ -219,11 +205,7 @@ protected:
   bool fitContinue;
 
   //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* fMinimizer;
-
   JointFCN* fSampleFCN;
-  MinimizerFCN* fMinimizerFCN;
-  ROOT::Math::Functor* fCallFunctor;
 
   int nfreepars;
 
