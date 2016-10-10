@@ -41,6 +41,7 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION

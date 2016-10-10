@@ -106,7 +106,7 @@ double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
   double *outarr = new double[invals.size()];
   int count = 0;
 
-  for (int i = 0; i < invals.size(); i++) {
+  for (size_t i = 0; i < invals.size(); i++) {
     outarr[count++] = inmap[invals.at(i)];
   }
 
@@ -287,6 +287,9 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
   pl += momshift / 1000.;
+
+  double rEnu = EnuQErec(pmu, costh, binding, neutrino);
+  double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);
 
   return q2;
 };

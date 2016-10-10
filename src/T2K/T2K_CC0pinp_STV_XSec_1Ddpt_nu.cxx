@@ -25,31 +25,31 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(
     std::string fakeDataFile)
 //********************************************************************
 {
-  measurementName = "T2K_CC0pinp_STV_XSec_1Ddpt_nu";
-  default_types = "FIX/DIAG/CHI2";
-  plotTitles =
+  fName = "T2K_CC0pinp_STV_XSec_1Ddpt_nu";
+  fDefaultTypes = "FIX/DIAG/CHI2";
+  fPlotTitles =
       "; #delta#it{p}_{T} (GeV c^{-1}); #frac{d#sigma}{d#delta#it{p}_{T}} "
       "(cm^{2} neutron^{-1} GeV^{-1} c)";
   EnuMin = 0;
   EnuMax = 50;
-  isDiag = true;
+  fIsDiag = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   SetDataValues(std::string(std::getenv("EXT_FIT")) +
                 "/data/T2K/T2K_CC0pinp_STV_XSec_1Ddpt_nu.dat");
 
-  dataHist->Scale(1E-38);
-  dataTrue->Scale(1E-38);
+  fDataHist->Scale(1E-38);
+  fDataTrue->Scale(1E-38);
 
   SetupDefaultHist();
 
-  scaleFactor = eventHist->Integral("width") * double(1E-38) *
+  fScaleFactor = fEventHist->Integral("width") * double(1E-38) *
                 (13.0 / 6.0 /*Data is /neutron */) /
-                (double(nevents) * TotalIntegratedFlux("width"));
+                (double(fNEvents) * TotalIntegratedFlux("width"));
 };
 
 void T2K_CC0pinp_STV_XSec_1Ddpt_nu::FillEventVariables(FitEvent *event) {
-  X_VAR = FitUtils::Get_STV_dpt(event, true) / 1000.0;
+  fXVar = FitUtils::Get_STV_dpt(event, true) / 1000.0;
   return;
 };
 

@@ -91,6 +91,12 @@ double Wrec(TLorentzVector pnu, TLorentzVector pmu);
 double Wtrue(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector pnuc);
 
 /*
+  E Recoil
+*/
+double GetErecoil_TRUE(FitEvent *event);
+double GetErecoil_CHARGED(FitEvent *event);
+
+/*
   CCQE MiniBooNE/MINERvA
 */
 //! Function to calculate the reconstructed Q^{2}_{QE}
@@ -106,6 +112,11 @@ double EnuQErec(TLorentzVector pmu, double costh, double binding,
 */
 //! Reconstruct Q2QE given just the maximum energy proton.
 double ProtonQ2QErec(double pE, double binding);
+
+/*
+  E Recoil MINERvA
+*/
+double GetErecoil_MINERvA_LowRecoil(FitEvent *event);
 
 /*
   CC1pi0 MiniBooNE
@@ -152,6 +163,31 @@ double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   nucleon single pion
 */
 double MpPi(TLorentzVector pp, TLorentzVector ppi);
+
+template <size_t N>
+std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdg)[N],
+                                             FitEvent *event,
+                                             bool InitalState = false) {
+  TLorentzVector HM(0, 0, 0, 0);
+  int OPDG = 0;
+  UInt_t const &np = event->NPart();
+  for (size_t p_it = 0; p_it < np; ++p_it) {
+    FitParticle const &part = *event->PartInfo(p_it);
+    if ((InitalState && (part.fStatus != kInitialState)) ||
+        (!InitalState && (part.fStatus != kFinalState))) {
+      continue;
+    }
+
+    for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
+      if ((part.fPID == pdg[pdg_it]) &&
+          (part.fP.Vect().Mag2() > HM.Vect().Mag2())) {
+        OPDG = part.fPID;
+        HM = part.fP;
+      }
+    }
+  }
+  return std::make_pair(HM, OPDG);
+}
 
 /// Gets the 4 mom of the highest momentum alive particle with a PDG
 /// contained equal to pdg.

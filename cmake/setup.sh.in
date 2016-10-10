@@ -110,4 +110,9 @@ if [[ "@USE_T2K@" != "0" ]]; then
   fi
 fi
 
+if [[ "@BUILD_GiBUU@" != "0" ]]; then
+  echo "[INFO]: Sourcing GiBUU tools."
+  source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
+fi
+
 export EXT_FIT="@CMAKE_SOURCE_DIR@"

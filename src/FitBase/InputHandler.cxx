@@ -883,7 +883,7 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
 
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
-  cust_event->SetEventAddress(giRead);
+  fEvent->SetEventAddress(giRead);
 
   #else
   ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;

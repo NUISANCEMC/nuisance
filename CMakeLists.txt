@@ -89,6 +89,7 @@ endif()
 
 if(DEFINED USE_GiBUU AND USE_GiBUU)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
+  include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
 endif()
 
 if(DEFINED USE_NUANCE AND USE_NUANCE)
@@ -104,7 +105,7 @@ set(MINCODE
 set(CORE
   MCStudies
   FitBase
-  Splines   
+  Splines
   Utils
   #Devel
   )

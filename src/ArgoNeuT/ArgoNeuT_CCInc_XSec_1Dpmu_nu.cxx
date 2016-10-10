@@ -24,31 +24,31 @@ ArgoNeuT_CCInc_XSec_1Dpmu_nu::ArgoNeuT_CCInc_XSec_1Dpmu_nu(
     std::string fakeDataFile)
 //********************************************************************
 {
-  measurementName = "ArgoNeuT_CCInc_XSec_1Dpmu_nu";
-  default_types = "FIX/DIAG/CHI2";
-  plotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2} Ar^{-1} GeV^{-1})";
+  fName = "ArgoNeuT_CCInc_XSec_1Dpmu_nu";
+  fDefaultTypes = "FIX/DIAG/CHI2";
+  fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2} Ar^{-1} GeV^{-1})";
   EnuMin = 0;
   EnuMax = 50;
-  isDiag = true;
+  fIsDiag = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   SetDataValues(std::string(std::getenv("EXT_FIT")) +
                 "/data/ArgoNeuT/CCInc_dsig_dmumom_nu.dat");
 
-  dataHist->Scale(1E-38);
-  dataTrue->Scale(1E-38);
+  fDataHist->Scale(1E-38);
+  fDataTrue->Scale(1E-38);
 
   SetupDefaultHist();
 
-  scaleFactor = eventHist->Integral("width") * double(1E-38) / double(nevents) *
+  fScaleFactor = fEventHist->Integral("width") * double(1E-38) / double(fNEvents) *
                 (40.0 /*Data is /Ar */) / TotalIntegratedFlux("width");
 
-  std::cout << "SF: " << eventHist->Integral("width") << " " << nevents << " "
+  std::cout << "SF: " << fEventHist->Integral("width") << " " << fNEvents << " "
             << TotalIntegratedFlux("width") << std::endl;
 };
 
 void ArgoNeuT_CCInc_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
-  X_VAR = FitUtils::GetHMPDG_4Mom(13, event).first.Vect().Mag() / 1000.0;
+  fXVar = FitUtils::GetHMPDG_4Mom(13, event).first.Vect().Mag() / 1000.0;
   return;
 };
 
