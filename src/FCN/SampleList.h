@@ -163,6 +163,8 @@
 #include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
+// T2K STV CC0pi
+#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
 // K2K CC0pi
 #include "K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks.h"

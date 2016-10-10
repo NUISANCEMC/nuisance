@@ -154,7 +154,7 @@ void Measurement1D::SetFitOptions(std::string opt){
 
   // Do nothing if default given
   if (opt == "DEFAULT") return;
-  
+
   // CHECK Conflicting Fit Options
   std::vector<std::string> fit_option_allow = PlotUtils::FillVectorSFromString(allowed_types, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++){
@@ -1016,7 +1016,7 @@ void Measurement1D::Write(std::string drawOpt){
   bool drawDecomp = (drawOpt.find("DECOMP") != std::string::npos);
   bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
-  
+
   LOG(SAM)<<"Writing Normal Plots" <<std::endl;
   // Save standard plots
   if (drawData)    this->GetDataList().at(0)->Write();
@@ -1155,13 +1155,13 @@ void Measurement1D::Write(std::string drawOpt){
 			      800,600);
     dataHist->Draw("E1");
     mcHist->Draw("HIST SAME");
-    
+
     THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack((this->measurementName + "_MC_PDG").c_str(),
     							   (TH1**)this->mcHist_PDG, 0);
     combo_mcHist_PDG.Draw("HIST SAME");
     TLegend leg = PlotUtils::GenerateStackLegend(combo_mcHist_PDG, 0.6,0.6,0.9,0.9);
     dataHist->Draw("E1 SAME");
-    
+
     //leg.Draw("SAME");
     c1->Write();
   }
@@ -1174,7 +1174,7 @@ void Measurement1D::Write(std::string drawOpt){
     c1->cd();
     dataHist->Draw("E1");
     mcHist->Draw("SAME HIST C");
-    
+
     TH1D* mcShape = (TH1D*) this->mcHist->Clone((this->measurementName + "_MC_SHAPE").c_str());
     double shapeScale = dataHist->Integral("width")/mcHist->Integral("width");
     mcShape->Scale(shapeScale);
@@ -1187,7 +1187,7 @@ void Measurement1D::Write(std::string drawOpt){
     leg->AddEntry(mcHist,   (this->measurementName + " MC").c_str(), "l");
     leg->AddEntry(mcShape,  (this->measurementName + " Shape").c_str(), "l");
   }
-  
+
   // Returning
   LOG(SAM) << this->measurementName  << "Written Histograms: "<<this->measurementName<<std::endl;
   return;

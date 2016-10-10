@@ -444,6 +444,12 @@ T2K Samples
     fChain->push_back(new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
 
     /*
+      T2K CC0pi + np CH samples
+    */
+  } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
+    fChain->push_back(new T2K_CC0pinp_STV_XSec_1Ddpt_nu(file, rw, type, fkdt));
+
+    /*
 K2K Samples
     */
 

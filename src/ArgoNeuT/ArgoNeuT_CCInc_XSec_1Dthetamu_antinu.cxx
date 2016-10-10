@@ -8,7 +8,9 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(
 {
   measurementName = "ArgoNeuT_CCInc_XSec_1Dthetamu_antinu";
   default_types = "FIX/DIAG/CHI2";
-  plotTitles = "; theta_{#mu} (degrees); d#sigma/d#theta_{#mu} (cm^{2} Ar^{-1} degrees^{-1})";
+  plotTitles =
+      "; theta_{#mu} (degrees); d#sigma/d#theta_{#mu} (cm^{2} Ar^{-1} "
+      "degrees^{-1})";
   EnuMin = 0;
   EnuMax = 50;
   isDiag = true;
@@ -24,7 +26,9 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(
 };
 
 void ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::FillEventVariables(FitEvent *event) {
-  X_VAR = (FitUtils::GetHMPDG_4Mom(-13, event).Vect().Theta()/TMath::Pi())*180.;
+  X_VAR =
+      (FitUtils::GetHMPDG_4Mom(-13, event).first.Vect().Theta() / TMath::Pi()) *
+      180.;
   return;
 };
 
@@ -34,4 +38,3 @@ bool ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::isSignal(FitEvent *event)
 {
   return SignalDef::isCCInc_ArgoNeuT(event, true);
 }
-

@@ -989,9 +989,34 @@ bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   if (forwardgoing and CosThetaMu < 0.0 and CosThetaMu != -9999.9) return false;
 }
 
+bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
+  std::pair<TLorentzVector, int> ppi = FitUtils::GetHMFSPion_4Mom(event);
+  if (ppi.second) {  // 0 pi
+    return false;
+  }
+
+  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
+  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
+
+  if (!pmu.second || !pp.second) {  // need mu and p
+    return false;
+  }
+
+  // mu phase space
+  if ((pmu.first.Vect().Mag() < 250) || (pmu.first.Vect().CosTheta() < -0.6)) {
+    return false;
+  }
+  // p phase space
+  if ((pp.first.Vect().Mag() < 250) || (pp.first.Vect().Mag() > 1E3) ||
+      (pp.first.Vect().CosTheta() < 0.4)) {
+    return false;
+  }
+  return true;
+}
+
 bool SignalDef::isCCInc_ArgoNeuT(FitEvent *event, bool IsAnti) {
-  TLorentzVector pmu = FitUtils::GetHMPDG_4Mom(IsAnti ? -13 : 13, event);
-  //std::cout << pmu.Vect().Theta()*18  << std::endl;
+  TLorentzVector pmu = FitUtils::GetHMPDG_4Mom(IsAnti ? -13 : 13, event).first;
+  // std::cout << pmu.Vect().Theta()*18  << std::endl;
   return (pmu.Vect().Mag2() > 0) && (pmu.E() < 25E3) &&
-         ((pmu.Vect().Theta()*180./TMath::Pi()) < 36);
+         ((pmu.Vect().Theta() * 180. / TMath::Pi()) < 36);
 }

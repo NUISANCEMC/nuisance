@@ -51,7 +51,7 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     ERR(FTL) << "Cannot find InputFile!" << endl;
     throw;
   }
-  
+
   // Setup the handler for each type
   if (!inType.compare("NEUT"))
     this->ReadNeutFile();
@@ -119,7 +119,7 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     ERR(FTL) << "Problematic Input: " << inputstring << endl;
     throw;
   }
-  
+
   // Parse out envir flags
   const int nfiledir = 5;
   const std::string filedir[nfiledir] = {"NEUT_DIR", "NUWRO_DIR", "GENIE_DIR",
@@ -778,6 +778,11 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
   cust_event->SetEventAddress(giRead);
+  #else
+  ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
+  ERR(FTL) << "GiBUU Input Not Enabled." << std::endl;
+  ERR(FTL) << "Rebuild with -DUSE_GiBUU=1." << std::endl;
+  exit(-1);
 #endif
 }
 
@@ -904,7 +909,7 @@ void InputHandler::PrintStartInput() {
 //********************************************************************
 std::string InputHandler::GetInputStateString() {
   //********************************************************************
-  
+
   tn->GetEntry(0);
   cust_event->CalcKinematics();
   std::ostringstream state;

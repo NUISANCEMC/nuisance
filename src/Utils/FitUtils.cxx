@@ -24,13 +24,13 @@
 */
 
 //********************************************************
-TH2D* FitUtils::CalculateQ3Cut(std::string inFile, TH2D* data, double qCut,
+TH2D *FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut,
                                int nuPDG, double eMin, double eMax) {
   //********************************************************
 
   // This function calculates the bins in the 2D distribution which should be
   // excluded because > 50% of the events in that bin have q^2 < qCut
-  TH2D* qCutHist = (TH2D*)data->Clone("qCutHist");
+  TH2D *qCutHist = (TH2D *)data->Clone("qCutHist");
   qCutHist->Reset();
 
   // DEPRECATED CODE
@@ -559,10 +559,10 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
 /*
   E Recoil
 */
-double FitUtils::GetErecoil_TRUE(FitEvent* event) {
+double FitUtils::GetErecoil_TRUE(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil;
-  for (int i = 0; i < event->Npart(); i++) {
+  for (unsigned int i = 0; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
 
@@ -577,10 +577,10 @@ double FitUtils::GetErecoil_TRUE(FitEvent* event) {
   return Erecoil;
 }
 
-double FitUtils::GetErecoil_CHARGED(FitEvent* event) {
+double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil;
-  for (int i = 0; i < event->Npart(); i++) {
+  for (unsigned int i = 0; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
 
@@ -600,10 +600,10 @@ double FitUtils::GetErecoil_CHARGED(FitEvent* event) {
   return Erecoil;
 }
 
-double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent* event) {
+double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil;
-  for (int i = 0; i < event->Npart(); i++) {
+  for (unsigned int i = 0; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
 
@@ -628,7 +628,147 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent* event) {
   return Erecoil;
 }
 
-TLorentzVector FitUtils::GetHMPDG_4Mom(int pdg, FitEvent *event) {
+std::pair<TLorentzVector, int> FitUtils::GetHMPDG_4Mom(int pdg,
+                                                       FitEvent *event) {
   int pdgs[] = {pdg};
-  return GetHMPDG_4Mom(pdgs, event).first;
+  return GetHMPDG_4Mom(pdgs, event);
+}
+
+std::pair<TLorentzVector, int> FitUtils::GetHMFSCLepton_4Mom(FitEvent *event) {
+  int pdgs[] = {11, 13, 15, -11, -13, -15};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMFSMuon_4Mom(FitEvent *event) {
+  int pdgs[] = {13};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMFSAnitMuon_4Mom(FitEvent *event) {
+  int pdgs[] = {-13};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMISNLepton_4Mom(FitEvent *event) {
+  int pdgs[] = {12, 14, 16, -12, -14, -16};
+  return GetHMPDG_4Mom(pdgs, event, true);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMISMuonNeutrino_4Mom(
+    FitEvent *event) {
+  int pdgs[] = {14};
+  return GetHMPDG_4Mom(pdgs, event, true);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMISAntiMuonNeutrino_4Mom(
+    FitEvent *event) {
+  int pdgs[] = {-14};
+  return GetHMPDG_4Mom(pdgs, event, true);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMFSProton_4Mom(FitEvent *event) {
+  int pdgs[] = {2212};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMFSCPion_4Mom(FitEvent *event) {
+  int pdgs[] = {211, -211};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+std::pair<TLorentzVector, int> FitUtils::GetHMFSPion_4Mom(FitEvent *event) {
+  int pdgs[] = {211, -211, 111};
+  return GetHMPDG_4Mom(pdgs, event);
+}
+
+TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal) {
+  TVector3 pnUnit = planarNormal.Unit();
+  double inpProjectPN = inp.Dot(pnUnit);
+
+  TVector3 InPlanarInput = inp - (inpProjectPN * pnUnit);
+  return InPlanarInput;
+}
+
+TVector3 GetUnitVectorInTPlane(const TVector3 &inp,
+                               const TVector3 &planarNormal) {
+  return GetVectorInTPlane(inp, planarNormal).Unit();
+}
+
+Double_t GetDeltaPhiT(TVector3 const &V_lepton, TVector3 const &V_other,
+                      TVector3 const &Normal, bool PiMinus = false) {
+  TVector3 V_lepton_T = GetUnitVectorInTPlane(V_lepton, Normal);
+
+  TVector3 V_other_T = GetUnitVectorInTPlane(V_other, Normal);
+
+  return PiMinus ? acos(V_lepton_T.Dot(V_other_T))
+                 : (M_PI - acos(V_lepton_T.Dot(V_other_T)));
+}
+
+TVector3 GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
+                    TVector3 const &Normal) {
+  TVector3 V_lepton_T = GetVectorInTPlane(V_lepton, Normal);
+
+  TVector3 V_other_T = GetVectorInTPlane(V_other, Normal);
+
+  return V_lepton_T + V_other_T;
+}
+
+Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
+                        TVector3 const &Normal, bool PiMinus = false) {
+  TVector3 DeltaPT = GetDeltaPT(V_lepton, V_other, Normal);
+
+  return GetDeltaPhiT(V_lepton, DeltaPT, Normal, PiMinus);
+}
+
+double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
+  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
+  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
+  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
+  if (!pnu.second) {
+    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    throw;
+  }
+  if (!pnu.second || !pp.second) {
+    return 0;
+  }
+  TVector3 const &NuP = pnu.first.Vect();
+  TVector3 const &LeptonP = pmu.first.Vect();
+  TVector3 HadronP = pp.first.Vect();
+  if (!Is0pi) {
+    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
+    HadronP += pp.first.Vect();
+  }
+  return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
+}
+double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
+  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
+  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
+  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
+  if (!pnu.second) {
+    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    throw;
+  }
+  if (!pnu.second || !pp.second) {
+    return 0;
+  }
+  TVector3 const &NuP = pnu.first.Vect();
+  TVector3 const &LeptonP = pmu.first.Vect();
+  TVector3 HadronP = pp.first.Vect();
+  if (!Is0pi) {
+    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
+    HadronP += pp.first.Vect();
+  }
+  return GetDeltaPhiT(LeptonP, HadronP, NuP);
+}
+double FitUtils::Get_STV_dalphat(FitEvent *event, bool Is0pi) {
+  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
+  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
+  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
+  if (!pnu.second) {
+    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    throw;
+  }
+  if (!pnu.second || !pp.second) {
+    return 0;
+  }
+  TVector3 const &NuP = pnu.first.Vect();
+  TVector3 const &LeptonP = pmu.first.Vect();
+  TVector3 HadronP = pp.first.Vect();
+  if (!Is0pi) {
+    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
+    HadronP += pp.first.Vect();
+  }
+  return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }

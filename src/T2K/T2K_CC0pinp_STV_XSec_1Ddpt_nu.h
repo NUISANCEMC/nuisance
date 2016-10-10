@@ -17,15 +17,15 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef ArgoNeuT_CCInc_XSec_1Dpmu_nu_H_SEEN
-#define ArgoNeuT_CCInc_XSec_1Dpmu_nu_H_SEEN
+#ifndef T2K_CC0pinp_STV_XSec_1Ddpt_nu_H_SEEN
+#define T2K_CC0pinp_STV_XSec_1Ddpt_nu_H_SEEN
 
 #include "Measurement1D.h"
 
-class ArgoNeuT_CCInc_XSec_1Dpmu_nu : public Measurement1D {
+class T2K_CC0pinp_STV_XSec_1Ddpt_nu : public Measurement1D {
 public:
-  ArgoNeuT_CCInc_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  virtual ~ArgoNeuT_CCInc_XSec_1Dpmu_nu() {};
+  T2K_CC0pinp_STV_XSec_1Ddpt_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  virtual ~T2K_CC0pinp_STV_XSec_1Ddpt_nu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);

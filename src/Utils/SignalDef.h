@@ -72,6 +72,7 @@ namespace SignalDef {
   bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
+  bool isT2K_CC0pi_STV(FitEvent* event, double EnuMin, double EnuMax);
 
   bool isCCInc_ArgoNeuT(FitEvent* event, bool IsAnti=false);
 
