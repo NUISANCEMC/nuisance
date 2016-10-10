@@ -65,6 +65,48 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
     */
   } else if (!name.compare("ANL_NC1npip_Evt_1Dppi_nu")) {
     fChain->push_back(new ANL_NC1npip_Evt_1Dppi_nu(file, rw, type, fkdt));
+    /*
+      ANL NC1ppim sample
+    */
+  } else if (!name.compare("ANL_NC1ppim_XSec_1DEnu_nu")) {
+    fChain->push_back(new ANL_NC1ppim_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_NC1ppim_Evt_1DcosmuStar_nu")) {
+    fChain->push_back(new ANL_NC1ppim_Evt_1DcosmuStar_nu(file, rw, type, fkdt));
+    /*
+      ANL CC2pi sample
+    */
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppip_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppim_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dppim_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu(file, rw, type, fkdt));
+
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_XSec_1DEnu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu(file, rw, type, fkdt));
+
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu")) {
+    fChain->push_back(new   ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
     fChain->push_back(
@@ -413,10 +455,11 @@ T2K Samples
     */
 
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
-             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
-             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
-    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type, fkdt));
+	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
+	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type));
     /*
+
       T2K CC1pi+ CH samples
     */
   } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dpmu_nu")) {
@@ -452,43 +495,11 @@ T2K Samples
     /*
 K2K Samples
     */
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_1trk") ||
-             !name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkQE") ||
-             !name.compare("K2K_CC0pi_XSec_1DCosThetaMu_nu_2trkNonQE")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks(name, file, rw, type, fkdt));
-
-  } else if (!name.compare("K2KI_CC0pi_XSec_1DQ2_nu_1trk") ||
-             !name.compare("K2KI_CC0pi_XSec_1DQ2_nu_2trkQE") ||
-             !name.compare("K2KI_CC0pi_XSec_1DQ2_nu_2trkNonQE") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_1trk") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_2trkQE") ||
-             !name.compare("K2KIIa_CC0pi_XSec_1DQ2_nu_2trkNonQE")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DQ2_nu_subtrks(name, file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks(file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DPmu_nu_Ntrks")) {
-    fChain->push_back(new K2K_CC0pi_XSec_1DPmu_nu_Ntrks(file, rw, type, fkdt));
-
-  } else if (!name.compare("K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks")) {
-    fChain->push_back(
-        new K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks(file, rw, type, fkdt));
     /*
       NC1pi0
     */
   } else if (!name.compare("K2K_NC1pi0_Evt_1Dppi0_nu")) {
     fChain->push_back(new K2K_NC1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
-
-    /*
-Stat Samples (Pulls etc)
-    */
-  } else if (name.find("parameter_pulls") != std::string::npos) {
-    fChain->push_back(new parameter_pulls(name, file, rw, type, fkdt));
 
     /*
 Fake Studies

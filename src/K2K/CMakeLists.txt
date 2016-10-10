@@ -17,20 +17,10 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks.cxx
-K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks.cxx
-K2K_CC0pi_XSec_1DPmu_nu_Ntrks.cxx
-K2K_CC0pi_XSec_1DQ2_nu_subtrks.cxx
-K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks.cxx
 K2K_NC1pi0_Evt_1Dppi0_nu.cxx
 )
 
 set(HEADERFILES
-K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks.h
-K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks.h
-K2K_CC0pi_XSec_1DPmu_nu_Ntrks.h
-K2K_CC0pi_XSec_1DQ2_nu_subtrks.h
-K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks.h
 K2K_NC1pi0_Evt_1Dppi0_nu.h
 )
 
@@ -46,6 +36,7 @@ include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")

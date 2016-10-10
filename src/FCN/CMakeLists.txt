@@ -17,12 +17,13 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-minimizerFCN.cxx
+JointFCN.cxx
 SampleList.cxx
 )
 
 set(HEADERFILES
-minimizerFCN.h
+JointFCN.h
+MinimizerFCN.h
 SampleList.h
 )
 
@@ -37,6 +38,7 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 

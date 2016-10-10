@@ -47,8 +47,8 @@ public:
 
   bool applyQ2correction; ///< Flag of whether deut correction applied
   TH1D* CorrectionHist; ///< Correction factor
-  TH1D* mcHist_NoCorr; ///< Uncorrected mcHist
-  double q2qe;       ///< X_VAR
+  TH1D* fMCHist_NoCorr; ///< Uncorrected fMCHist
+  double q2qe;       ///< fXVar
   double scaleF; ///< Nominal Scale Factor
   bool applyEnucorrection;
   TH2D* EnuvsQ2Plot; // For Scaling

@@ -22,21 +22,21 @@
 // The constructor
 ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
-  measurementName = "ANL_CC1ppip_XSec_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
+  fName = "ANL_CC1ppip_XSec_1DQ2_nu";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 0;
   EnuMax = 6;
-  isDiag = true;
-  normError = 0.20;
+  fIsDiag = true;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14.txt");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.)*TotalIntegratedFlux("width"))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
 };
 
 
@@ -73,7 +73,7 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

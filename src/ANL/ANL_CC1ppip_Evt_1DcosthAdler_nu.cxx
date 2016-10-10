@@ -22,27 +22,29 @@
 // The constructor
 ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1ppip_Evt_1DcosthAdler_nu";
-  plotTitles = "; cos#theta_{Adler}; Number of events";
+  fName = "ANL_CC1ppip_Evt_1DcosthAdler_nu";
+  fPlotTitles = "; cos#theta_{Adler}; Number of events";
   EnuMin = 0;
   EnuMax = 6.0;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1ppip_cosTh.csv");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_costhAdler_1982.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -95,7 +97,7 @@ void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
     cosThAdler = -999;
   }
 
-  this->X_VAR = cosThAdler;
+  fXVar = cosThAdler;
 
   return;
 };
@@ -150,11 +152,11 @@ void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
 
 void ANL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 }

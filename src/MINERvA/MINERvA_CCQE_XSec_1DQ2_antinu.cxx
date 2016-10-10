@@ -24,15 +24,15 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
 //******************************************************************** 
 
   // Setup Measurement Defaults
-  measurementName = name;
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fName = name;
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   isFluxFix      = name.find("_newflux") != std::string::npos;
   fullphasespace = name.find("_20deg")   == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10.;
-  normError = 0.110;
-  allowed_types = "FIX,FREE,SHAPE/DIAG,FULL/NORM";
-  default_types = "FIX/FULL";
+  fNormError = 0.110;
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG,FULL/NORM";
+  fDefaultTypes = "FIX/FULL";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup the Data Plots
@@ -44,12 +44,12 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   if (fullphasespace){
 
     if (isFluxFix){
-      if (isShape) isShape = false;
+      if (fIsShape) fIsShape = false;
       datafilename  = "Q2QE_numubar_data_fluxfix.txt";
       covarfilename = "Q2QE_numubar_covar_fluxfix.txt";
 
     } else {
-      if (isShape){
+      if (fIsShape){
 	datafilename  = "Q2QE_numubar_data_SHAPE-extracted.txt";
 	covarfilename = "Q2QE_numubar_covar_SHAPE-extracted.txt";
       } else {
@@ -61,12 +61,12 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   // Restricted Phase Space
   } else {
     if (isFluxFix){
-      if (isShape) isShape = false;
+      if (fIsShape) fIsShape = false;
       datafilename  = "20deg_Q2QE_numubar_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_numubar_covar_fluxfix.txt";
 
     } else {
-      if (isShape){
+      if (fIsShape){
 	datafilename  = "20deg_Q2QE_numubar_data_SHAPE-extracted.txt";
 	covarfilename = "20deg_Q2QE_numubar_covar_SHAPE-extracted.txt";
       } else {
@@ -83,7 +83,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*13./7./this->TotalIntegratedFlux(); 
+  fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*13./7./this->TotalIntegratedFlux(); 
   
 };
 
@@ -105,7 +105,7 @@ void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
     break;
   }
 
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   return;
 }
 

@@ -30,6 +30,27 @@
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
+// ANL NC1ppim (mm, exotic!)
+#include "ANL_NC1ppim_XSec_1DEnu_nu.h"
+#include "ANL_NC1ppim_Evt_1DcosmuStar_nu.h"
+// ANL CC2pi 1pim1pip (mm, even more exotic!)
+#include "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.h"
+#include "ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu.h"
+#include "ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.h"
+#include "ANL_CC2pi_1pim1pip_Evt_1Dppim_nu.h"
+#include "ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu.h"
+
+#include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
+#include "ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.h"
+#include "ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.h"
+#include "ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.h"
+#include "ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h"
+
+#include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
+#include "ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu.h"
+#include "ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.h"
+#include "ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.h"
+#include "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.h"
 
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
@@ -166,12 +187,6 @@
 // T2K STV CC0pi
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
-// K2K CC0pi
-#include "K2K_CC0pi_XSec_1DDelPhi_nu_Ntrks.h"
-#include "K2K_CC0pi_XSec_1DPmu_nu_Ntrks.h"
-#include "K2K_CC0pi_XSec_1DQ2_nu_subtrks.h"
-#include "K2K_CC0pi_XSec_1DCosThetaMu_nu_subtrks.h"
-#include "K2K_CC0pi_XSec_1DThetaMu_nu_Ntrks.h"
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 
@@ -181,7 +196,6 @@
 #include "GenericFlux_Tester.h"
 
 #include "FitWeight.h"
-#include "parameter_pulls.h"
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {

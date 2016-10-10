@@ -25,6 +25,7 @@
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
+#include "neutfsipart.h"
 #endif
 
 #ifdef __NUWRO_ENABLED__
@@ -50,6 +51,13 @@
  *  @{
  */
 
+enum particle_state{
+  kUndefinedState = -1,
+  kInitialState   = 0,
+  kFSIState       = 1,
+  kFinalState     = 2
+};
+
 //! Condensed FitParticle class which acts a common format between the generators
 class FitParticle {
 
@@ -66,6 +74,8 @@ class FitParticle {
 #ifdef __NEUT_ENABLED__
   //! NEUT Constructor
   FitParticle(NeutPart* part);
+  //! NEUT FSI particles constructor
+  FitParticle(NeutFsiPart* part);
 #endif
 
 

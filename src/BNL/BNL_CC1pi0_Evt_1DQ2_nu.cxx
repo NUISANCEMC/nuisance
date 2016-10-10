@@ -22,27 +22,28 @@
 // The constructor
 BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "BNL_CC1pi0_Evt_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
+  fName = "BNL_CC1pi0_Evt_1DQ2_nu";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
   EnuMax = 6.0;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fAllowedTypes += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_bin_firstQ2gone.txt");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -73,7 +74,7 @@ void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   // no W cut on BNL CC1pi0 
   double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
 
-  this->X_VAR = q2CCpi0;
+  fXVar = q2CCpi0;
 
   return;
 };

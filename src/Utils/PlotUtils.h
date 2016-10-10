@@ -20,12 +20,34 @@
 #ifndef PLOTUTILS_H_SEEN
 #define PLOTUTILS_H_SEEN
 
+
+#include "TH1.h"
+#include "TF1.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "TSystem.h"
+#include "TFile.h"
+#include "TProfile.h"
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+#include "FitParameters.h"
+
+
 // C Includes
 #include <stdlib.h>
 #include <numeric>
 #include <math.h>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
 
 // ROOT includes
 #include <TROOT.h>
@@ -72,11 +94,14 @@ namespace PlotUtils{
   std::string GetObjectWithName(TFile *inFile, std::string substring);
 
   //! Parse a string into a vector of doubles given a delimiter "del"
-  std::vector<double> FillVectorDFromString(std::string str, const char* del);
+  std::vector<double> ParseToDbl(std::string str, const char* del);
 
   //! Parse a string into a vector of strings given a delimiter "del"  
-  std::vector<std::string> FillVectorSFromString(std::string str, const char* del);
+  std::vector<std::string> ParseToStr(std::string str, const char* del);
 
+  //! Parse text file into a vector of strings
+  std::vector<std::string> ParseFileToStr(std::string str, const char* del);
+  
   /*!
     Interaction Mode Histogram Handling
   */
@@ -117,7 +142,7 @@ namespace PlotUtils{
   TH2D* SetMaskHist(std::string type, TH2D* data);
 
   //! Divide by the flux histogram for Enu Histograms
-  void DivideByFlux(TH1D* mcHist, TH1D* fluxHist);
+  void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
 
   //! Flux unfolded scaling, like DivideByFlux but uses interpolation.
   void FluxUnfoldedScaling(TH1D* plot, TH1D* flux);
@@ -132,7 +157,7 @@ namespace PlotUtils{
   void Set2PolyHistFromText(std::string dataFile, TH2Poly* hist, double norm, bool skipbins=false);
 
   //! Fill a 1D Histogram from a text file
-  TH1D* GetTH1DFromFile(std::string dataFile, std::string title, std::string plotTitles="", std::string alt_name="");
+  TH1D* GetTH1DFromFile(std::string dataFile, std::string title, std::string fPlotTitles="", std::string alt_name="");
 
   //! Grab a 1D Histrogram from a ROOT File
   TH1D* GetTH1DFromRootFile(std::string file, std::string name);

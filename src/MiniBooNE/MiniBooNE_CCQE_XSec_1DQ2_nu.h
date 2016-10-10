@@ -39,13 +39,13 @@ public:
   void ApplyNormScale(double norm);
   void ResetAll();
 
-  TH1D* mcHist_CCQELIKE[61]; ///<! Plots in CCQELike mode to tag PDG of the background
+  TH1D* fMCHist_CCQELIKE[61]; ///<! Plots in CCQELike mode to tag PDG of the background
 
  private:
   double q2qe; ///<! X_Variable
   bool bad_particle; ///<! Used in CCQELike mode to tag events without nucleons, muons or photons.
   bool ccqelike; ///<! Flag for running in CCQELike mode
-  TH1D* dataHist_CCQELIKE; ///<! CCQELike data contribution
+  TH1D* fDataHist_CCQELIKE; ///<! CCQELike data contribution
 };
   
 #endif

@@ -6,26 +6,26 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
 
   EnuMin = 0.;
   EnuMax = 10.;
-  isDiag = false;
+  fIsDiag = false;
 
   // Here we can give either MB (kMB), extended MB (keMB) or Delta (kDelta)
   if (type.find("eMB") != std::string::npos) {
-    fitType = keMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
-    plotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
+    fT2KSampleType = keMB;
+    fName = "T2K_CC1pip_CH_XSec_1DQ2eMB_nu";
+    fPlotTitles = "; Q^{2}_{eMB} (GeV^{2}); d#sigma/dQ^{2}_{eMB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("MB") != std::string::npos) {
-    fitType = kMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
-    plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
+    fT2KSampleType = kMB;
+    fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
+    fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   } else if (type.find("Delta") != std::string::npos) {
-    fitType = kDelta;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
-    plotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
+    fT2KSampleType = kDelta;
+    fName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
+    fPlotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
   } else {
     std::cout << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
-    fitType = kMB;
-    measurementName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
-    plotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
+    fT2KSampleType = kMB;
+    fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
+    fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -33,30 +33,30 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
   //type = keMB;
   //type = kDelta;
 
-  if (fitType == kMB) {
+  if (fT2KSampleType == kMB) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
-  } else if (fitType == keMB) {
+  } else if (fT2KSampleType == keMB) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
-  } else if (fitType == kDelta) {
+  } else if (fT2KSampleType == kDelta) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
     this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
   } else {
-    std::cerr << "No data type set for " << measurementName << std::endl;
+    std::cerr << "No data type set for " << fName << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
     
   this->SetupDefaultHist();
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
@@ -73,16 +73,16 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
     std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
-  dataHist = new TH1D((measurementName+"_data").c_str(), (measurementName+"_data"+plotTitles).c_str(), nPoints, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), nPoints, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
+    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
+  fDataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+fPlotTitles).c_str());
 
   dataFile->Close();
 
@@ -100,19 +100,19 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
   int nBinsY = covarMatrix->GetYaxis()->GetNbins();
 
   std::cout << nBinsX << std::endl;
-  std::cout << dataHist->GetNbinsX() << std::endl;
+  std::cout << fDataHist->GetNbinsX() << std::endl;
 
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-7);
-  this->fullcovar = new TMatrixDSym(nBinsX-7);
+  this->fFullCovar = new TMatrixDSym(nBinsX-7);
 
   // First two entries are BS
   // Last entry is BS
   for (int i = 0; i < nBinsX-7; i++) {
     for (int j = 0; j < nBinsY-7; j++) {
       (*this->covar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
-      (*this->fullcovar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
+      (*this->fFullCovar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
       std::cout << "covar(" << i << ", " << j << ") = " << (*this->covar)(i,j) << std::endl;
     }
   } //should now have set covariance, I hope
@@ -144,7 +144,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   double q2 = -999;
 
-  switch(fitType) {
+  switch(fT2KSampleType) {
 
     // First int refers to how we reconstruct Enu
     // 0 uses true neutrino energy (not used here but common for other analyses when they unfold to true Enu from reconstructed Enu)
@@ -173,7 +173,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   }
 
 
-  this->X_VAR = q2;
+  fXVar = q2;
 
   return;
 };
@@ -184,7 +184,7 @@ bool T2K_CC1pip_CH_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 // Warning: The CH analysis has different signal definition to the H2O analysis!
 //          Often to do with the Michel tag
 
-  switch(fitType) {
+  switch(fT2KSampleType) {
     // Using MiniBooNE formula for Enu reconstruction on the Q2 variable
     // Does have Michel e tag, set bool to true!
     case kMB:

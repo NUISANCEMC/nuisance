@@ -22,29 +22,30 @@
 // The constructor
 ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1npip_Evt_1Dppi_nu";
-  plotTitles = "; p_{#pi} (MeV); Number of events";
+  fName = "ANL_CC1npip_Evt_1Dppi_nu";
+  fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
-  // whaaa, check this
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/double(fNEvents)*(16./8.);
 };
 
 void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
@@ -79,7 +80,7 @@ void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
     ppip = -1.0;
   }
 
-  this->X_VAR = ppip;
+  fXVar = ppip;
 
   return;
 }

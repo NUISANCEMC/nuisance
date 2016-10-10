@@ -28,14 +28,14 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
 //********************************************************************  
 
   // Measurement Details                        
-  measurementName = "FNAL_CCQE_Evt_1DQ2_nu";
+  fName = "FNAL_CCQE_Evt_1DQ2_nu";
   EnuMin = 0.;
   EnuMax = 200.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
 
   this->SetDataFromDatabase("FNAL/FNAL_CCQE_Data_PRD29_436.root", "FNAL_CCQE_Data_1DQ2");
 
@@ -43,19 +43,19 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
 
   if (applyQ2correction){
     this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
-    this->mcHist_NoCorr = (TH1D*) this->mcHist->Clone();
-    this->mcHist_NoCorr->SetNameTitle( (this->measurementName + "_NOCORR").c_str(),(this->measurementName + "_NOCORR").c_str());
+    this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
+    this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   // Mask out the first bin if required
   this->SetBinMask(std::string(std::getenv("EXT_FIT")) + "/data/FNAL/FNAL_CCQE_BinMask_PRD29_436.dat");
   
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Different generators require slightly different rescaling factors.
-  this->scaleFactor = (this->eventHist->Integral()/(nevents+0.)); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
@@ -84,7 +84,7 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
     break;  
   }
   
-  this->X_VAR = q2qe;
+  fXVar = q2qe;
   return;
 };
 
@@ -117,10 +117,10 @@ void FNAL_CCQE_Evt_1DQ2_nu::ResetAll(){
 //********************************************************************
 
   Measurement1D::ResetAll();
-  this->mcHist->Reset();
+  this->fMCHist->Reset();
 
   if (applyQ2correction)
-    this->mcHist_NoCorr->Reset();
+    this->fMCHist_NoCorr->Reset();
 
 
 }
@@ -132,10 +132,10 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 
   
   if (applyQ2correction){
-    this->mcHist_NoCorr->Fill(X_VAR, Weight);
+    this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
-    if (X_VAR < 0.225)
-      this->Weight *= this->CorrectionHist->Interpolate(X_VAR);
+    if (fXVar < 0.225)
+      this->Weight *= this->CorrectionHist->Interpolate(fXVar);
   }
 
   Measurement1D::FillHistograms();
@@ -146,19 +146,19 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 //******************************************************************** 
 
-  this->mcHist->Scale(scaleFactor);
-  if (applyQ2correction) this->mcHist_NoCorr->Scale(scaleFactor);
+  this->fMCHist->Scale(fScaleFactor);
+  if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
 
 
   // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist, maskHist);
+  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
   
-  this->mcHist->Scale(scaleF);
-  this->mcFine->Scale(scaleF);
+  this->fMCHist->Scale(scaleF);
+  this->fMCFine->Scale(scaleF);
 
   if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(dataHist, mcHist_NoCorr, maskHist);
-    this->mcHist_NoCorr->Scale(scaleF);
+    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
+    this->fMCHist_NoCorr->Scale(scaleF);
   }
 
 }
@@ -173,7 +173,7 @@ void FNAL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
 
   if (applyQ2correction){
     this->CorrectionHist->Write();
-    this->mcHist_NoCorr->Write();
+    this->fMCHist_NoCorr->Write();
   }
     
 

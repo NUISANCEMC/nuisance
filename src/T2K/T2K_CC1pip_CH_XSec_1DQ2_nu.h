@@ -18,7 +18,7 @@ public:
   bool isSignal(FitEvent *event);
 
   private:
-  T2K_CC1pip_type fitType;
+  T2K_CC1pip_type fT2KSampleType;
 
 };
 

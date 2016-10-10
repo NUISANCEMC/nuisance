@@ -23,22 +23,22 @@
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 //******************************************************************** 
   
-  measurementName = "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu";
-  plotTitles = "; E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4}); d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})";
+  fName = "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu";
+  fPlotTitles = "; E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4}); d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.0;
-  isDiag = true;
-  normError = 0.107;
+  fIsDiag = true;
+  fNormError = 0.107;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("QSQVENUXSec"));//data comes in .root file, yes!
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
 
 };
 
@@ -62,8 +62,8 @@ void MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::FillEventVariables(FitEvent *event) {
   double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip)*1000.;
   double Q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip)*1E6;
 
-  this->X_VAR = Enu;
-  this->Y_VAR = Q2;
+  fXVar = Enu;
+  fYVar = Q2;
 
   return;
 };

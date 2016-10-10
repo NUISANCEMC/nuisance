@@ -22,24 +22,24 @@
 // The constructor
 MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
   
-  measurementName = "MiniBooNE_CC1pi0_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
+  fName = "MiniBooNE_CC1pi0_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
-  isDiag = true;
-  isEnu1D = true;
-  normError = 0.107;
+  fIsDiag = true;
+  fIsEnu1D = true;
+  fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/totalxsec_edit.txt");
-  //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/totalxsec_covar.txt", this->data_points-1);
+  //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/totalxsec_covar.txt", this->fNDataPointsX-1);
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
-  //StatUtils::ForceNormIntoCovar(this->covar, this->dataHist, this->normError);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
+  //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
 };
 
 void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -62,7 +62,7 @@ void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   
   double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };

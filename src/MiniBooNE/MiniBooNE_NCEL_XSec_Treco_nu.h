@@ -50,7 +50,7 @@ public:
 
   std::string inFile;
   TChain *tn;
-  Int_t nevents;
+  Int_t fNEvents;
 #ifdef __NEUT_ENABLED__
   NeutVect *nvect;
 #endif

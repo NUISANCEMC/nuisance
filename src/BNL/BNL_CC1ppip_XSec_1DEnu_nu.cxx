@@ -22,56 +22,56 @@
 // The constructor
 BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BNL_CC1ppip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
+  fName = "BNL_CC1ppip_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 0.;
   EnuMax = 3.0;
-  isDiag = true;
-  normError = 0.15;
+  fIsDiag = true;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
   // D2 = 1 proton, 1 neutron
 };
 
 // Need this if we're reading a root file!
 /*
 void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH1D *copy = (TH1D*)(dataFile->Get("BNL_reanalysis"));
 
-  this->data_points = copy->GetNbinsX()-1;
+  this->fNDataPointsX = copy->GetNbinsX()-1;
 
-  xBinBounds = new double[this->data_points];
-  dataVals = new double[this->data_points];
-  dataErr = new double[this->data_points];
+  xBinBounds = new double[this->fNDataPointsX];
+  dataVals = new double[this->fNDataPointsX];
+  dataErr = new double[this->fNDataPointsX];
 
-  for (int i = 0; i < data_points; i++) {
+  for (int i = 0; i < fNDataPointsX; i++) {
     xBinBounds[i] = copy->GetBinLowEdge(i+3);
     dataVals[i] = copy->GetBinContent(i+3)*1E-38;
     dataErr[i] = copy->GetBinError(i+3)*1E-38;
   }
 
-  this->xBins = xBinBounds;
-  this->data_values = dataVals;
-  this->data_errors = dataErr;
+  this->fXBins = xBinBounds;
+  this->fDataValues = dataVals;
+  this->fDataErrors = dataErr;
 
-  this->dataHist = new TH1D((this->measurementName+"_data").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
+  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
 
-  for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-    this->dataHist->SetBinContent(i+1, this->data_values[i]);
-    this->dataHist->SetBinError(i+1, this->data_errors[i]);
+  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+    this->fDataHist->SetBinContent(i+1, this->fDataValues[i]);
+    this->fDataHist->SetBinError(i+1, this->fDataErrors[i]);
   }
 
-  dataHist->SetDirectory(0);
+  fDataHist->SetDirectory(0);
 
   dataFile->Close();
 };
@@ -108,7 +108,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
@@ -163,11 +163,11 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillHistograms() {
 
 void BNL_CC1ppip_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 }

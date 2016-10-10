@@ -24,28 +24,30 @@
 ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 //********************************************************************  
  
-  measurementName = "ANL_CC1npip_Evt_1DQ2_nu";
-  plotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
+  fName = "ANL_CC1npip_Evt_1DQ2_nu";
+  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
   EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/ANL_CC1pip_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
   // Setup Covariance
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = (this->eventHist->Integral()/double(nevents))*(16./8.); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral()/double(fNEvents))*(16./8.); // NEUT
 };
 
 
@@ -83,7 +85,7 @@ void ANL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

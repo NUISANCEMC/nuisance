@@ -20,27 +20,31 @@
 set(TARGETS_TO_BUILD)
 
 if(USE_MINIMIZER)
-  add_executable(ExtFit_minimizer ExtFit_minimizer.cxx)
-
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_minimizer)
-
-  target_link_libraries(ExtFit_minimizer ${MODULETargets})
-
-  target_link_libraries(ExtFit_minimizer ${CMAKE_DEPENDLIB_FLAGS})
-  target_link_libraries(ExtFit_minimizer ${ROOT_LIBS})
-
+  add_executable(nuismin nuismin.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuismin)
+  target_link_libraries(nuismin ${MODULETargets})
+  target_link_libraries(nuismin ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(nuismin ${ROOT_LIBS})
   if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-    set_target_properties(ExtFit_minimizer PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+    set_target_properties(nuismin PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
   endif()
+
+  add_executable(nuissplines nuissplines.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissplines)
+  target_link_libraries(nuissplines ${MODULETargets})
+  target_link_libraries(nuissplines ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(nuissplines ${ROOT_LIBS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(nuissplines PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+
 endif()
 
-
-
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
 include_directories(${CMAKE_SOURCE_DIR}/src/Routines)
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
@@ -56,25 +60,34 @@ if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
 endif()
 
 
-add_executable(ExtFit_comparison ExtFit_comparison.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_comparison)
-target_link_libraries(ExtFit_comparison ${MODULETargets})
-target_link_libraries(ExtFit_comparison ${CMAKE_DEPENDLIB_FLAGS})
-target_link_libraries(ExtFit_comparison ${ROOT_LIBS})
+add_executable(nuiscomp nuiscomp.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuiscomp)
+target_link_libraries(nuiscomp ${MODULETargets})
+target_link_libraries(nuiscomp ${CMAKE_DEPENDLIB_FLAGS})
+target_link_libraries(nuiscomp ${ROOT_LIBS})
 if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-  set_target_properties(ExtFit_comparison PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  set_target_properties(nuiscomp PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
+
+add_executable(nuissyst nuissyst.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissyst)
+target_link_libraries(nuissyst ${MODULETargets})
+target_link_libraries(nuissyst ${CMAKE_DEPENDLIB_FLAGS})
+target_link_libraries(nuissyst ${ROOT_LIBS})
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(nuissyst PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
 #if(USE_NuWro)
-#  add_executable(ExtFit_PrepareNuwro ExtFit_PrepareNuwro.cxx)
-#  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};ExtFit_PrepareNuwro)
-#  target_link_libraries(ExtFit_PrepareNuwro ${MODULETargets})
-#  target_link_libraries(ExtFit_PrepareNuwro ${CMAKE_DEPENDLIB_FLAGS})
-#  target_link_libraries(ExtFit_PrepareNuwro ${ROOT_LIBS})
+#  add_executable(PrepareNuwro PrepareNuwro.cxx)
+#  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNuwro)
+#  target_link_libraries(PrepareNuwro ${MODULETargets})
+#  target_link_libraries(PrepareNuwro ${CMAKE_DEPENDLIB_FLAGS})
+#  target_link_libraries(PrepareNuwro ${ROOT_LIBS})
 #  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-#    set_target_properties(ExtFit_PrepareNuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+#    set_target_properties(PrepareNuwro PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 #  endif()
 #endif()
 

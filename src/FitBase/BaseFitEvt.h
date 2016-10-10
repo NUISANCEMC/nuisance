@@ -67,7 +67,9 @@ enum generator_event_type {
   kNUANCE = 7,
   kGiBUU = 8,
   kNORM = 9,
-  kMODENORM = 10
+  kMODENORM = 10,
+  kEMPTY = 11,
+  kINPUTFITEVENT = 12
 };
 
 inline std::ostream& operator<<(std::ostream& os,
@@ -121,9 +123,11 @@ class BaseFitEvt {
   ~BaseFitEvt();
   BaseFitEvt(const BaseFitEvt* obj);
 
-  double X_VAR;
-  double Y_VAR;
-  double Z_VAR;
+  inline void SetType(int type){fType = type;};
+  
+  double fXVar;
+  double fYVar;
+  double fZVar;
   int Mode;
   double E;
   double Weight;
@@ -135,16 +139,23 @@ class BaseFitEvt {
   UInt_t BinIndex;
   UInt_t fType;
 
-  TArrayD* dial_coeff;  // Depedendent on dials (needs header file provided)
+  double* dial_coeff;
+  int ndial_coeff;
 
+  void ResetDialCoeff();
+  void CreateDialCoeff(int n);
+  void FillCoeff(double* vals);
+  int GetNCoeff();
+  double GetCoeff(int i);
+  
 // NEUT : Default
 #ifdef __NEUT_ENABLED__
-  NeutVect* neut_event;  //!< Pointer to Neut Vector
+  NeutVect* fNeutVect;  //!< Pointer to Neut Vector
 #endif
 
 // NUWRO
 #ifdef __NUWRO_ENABLED__
-  event* nuwro_event;  //!< Pointer to Nuwro event
+  event* fNuwroEvent;  //!< Pointer to Nuwro event
 #endif
 
 // GENIE
@@ -163,6 +174,9 @@ class BaseFitEvt {
   GiBUUStdHepReader* GiRead;
 #endif
 
+  void AddSplineCoeffToTree(TTree* tn);
+  void SetSplineCoeffAddress(TTree* tn);
+  
   double GetWeight() { return InputWeight * RWWeight * CustomWeight; };
 };
 #endif

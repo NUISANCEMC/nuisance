@@ -22,22 +22,22 @@
 // The constructor
 BEBC_CC1ppip_XSec_1DEnu_nu::BEBC_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BEBC_CC1ppip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
+  fName = "BEBC_CC1ppip_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
   EnuMin = 5.;
   EnuMax = 200.;
-  isDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  normError = 0.20; // normalisation error on ANL BNL flux
+  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
+  fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/theses/BEBC_theses_CC1pip_on_p_W14.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(16./8.);
-  //this->scaleFactor = double(1.0E-38)/double(nevents)*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  //this->fScaleFactor = double(1.0E-38)/double(fNEvents)*(16./8.);
 };
 
 
@@ -73,7 +73,7 @@ void BEBC_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     Enu = -1.0;
   }
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };

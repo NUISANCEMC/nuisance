@@ -22,24 +22,24 @@
 // The constructor
 BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  measurementName = "BEBC_CC1npim_XSec_1DQ2_antinu";
-  plotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/neutron)";
+  fName = "BEBC_CC1npim_XSec_1DQ2_antinu";
+  fPlotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/neutron)";
   EnuMin = 5.;
   EnuMax = 200.;
-  isDiag = true;
-  normError = 0.20;
+  fIsDiag = true;
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi-_on_n_W14_edit.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  hadMassHist = new TH1D((measurementName+"_Wrec").c_str(),(measurementName+"_Wrec").c_str(), 100, 1000, 2000);
-  hadMassHist->SetTitle((measurementName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
+  hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
+  hadMassHist->SetTitle((fName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
 };
 
 
@@ -73,7 +73,7 @@ void BEBC_CC1npim_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
     q2CCpip = -1.0;
   }
 
-  this->X_VAR = q2CCpip;
+  fXVar = q2CCpip;
 
   return;
 };

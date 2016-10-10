@@ -22,27 +22,28 @@
 // The constructor
 BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "BNL_CC1ppip_Evt_1DcosthAdler_nu";
-  plotTitles = "; cos#theta_{Adler}; Number of events";
+  fName = "BNL_CC1ppip_Evt_1DcosthAdler_nu";
+  fPlotTitles = "; cos#theta_{Adler}; Number of events";
   EnuMin = 0;
   EnuMax = 6.0;
-  isDiag = true;
-  isRawEvents = true;
+  fIsDiag = true;
+  fIsRawEvents = true;
+  fAllowedTypes += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1ppip_W14_cosThAdler.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/(nevents+0.)*16./8.;
+  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -95,7 +96,7 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
     cosThAdler = -999;
   }
 
-  this->X_VAR = cosThAdler;
+  fXVar = cosThAdler;
 
   return;
 };
@@ -150,11 +151,11 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
 
 void BNL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
   
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 }

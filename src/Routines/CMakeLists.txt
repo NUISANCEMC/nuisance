@@ -17,19 +17,23 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-comparisonRoutines.cxx
+ComparisonRoutines.cxx
+SystematicRoutines.cxx
+SplineRoutines.cxx
 )
 
 if(USE_MINIMIZER)
-  set(IMPLFILES ${IMPLFILES};minimizerRoutine.cxx)
+  set(IMPLFILES ${IMPLFILES};MinimizerRoutines.cxx)
 endif()
 
 set(HEADERFILES
-comparisonRoutines.h
+ComparisonRoutines.h
+SystematicRoutines.h
+SplineRoutines.h
 )
 
 if(USE_MINIMIZER)
-  set(HEADERFILES ${HEADERFILES};minimizerRoutine.h)
+  set(HEADERFILES ${HEADERFILES};MinimizerRoutines.h)
 endif()
 
 set(LIBNAME Routines)
@@ -46,6 +50,7 @@ include_directories(${EXP_INCLUDE_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION

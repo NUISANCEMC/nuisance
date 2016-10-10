@@ -22,6 +22,7 @@
 // NEUT Constructor
 #ifdef __NEUT_ENABLED__
 FitParticle::FitParticle(NeutPart* part) {
+
   // Set Momentum
   fP = TLorentzVector(part->fP.X(), part->fP.Y(), part->fP.Z(), part->fP.T());
 
@@ -29,6 +30,19 @@ FitParticle::FitParticle(NeutPart* part) {
   fIsAlive = part->fIsAlive;
   fStatus = part->fStatus;
   fMass = part->fMass;
+};
+
+// NEUT FSI defined in neutclass/neutfsipart
+FitParticle::FitParticle(NeutFsiPart* part) {
+
+  // Set Momentum
+  fP = TLorentzVector(part->fDir.X(), part->fDir.Y(), part->fDir.Z(), part->fDir.T());
+
+  fPID = part->fPID;
+  // Set these to zero because they don't make sense in NEUT
+  fIsAlive = 0;
+  fStatus = 0;
+  fMass = fP.Mag();
 };
 #endif
 
@@ -166,9 +180,9 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
 
   // Set status manually from switch
   switch(state){
-  case 0:  fIsAlive= 0; fStatus=1; break; // Initial State
-  case 1:  fIsAlive= 1; fStatus=0; break; // Final State
-  case 2:  fIsAlive= 0; fStatus=2; break; // Intermediate State
+  case kInitialState: fIsAlive= 0; fStatus=1; break; // Initial State
+  case kFinalState:   fIsAlive= 1; fStatus=0; break; // Final State
+  case kFSIState:     fIsAlive= 0; fStatus=2; break; // Intermediate State
   default: fIsAlive=-1; fStatus=3; break; // Other?
   }
 

@@ -82,34 +82,30 @@ class MeasurementBase {
     Constructor/Destructors
   */
   //! Default Constructor. Set everything to NULL
-  MeasurementBase();
+  MeasurementBase(void);
 
   //! Default virtual destructor
-  virtual ~MeasurementBase();
+  virtual ~MeasurementBase(void);
 
   /*
     Reconfigure Functions
   */
 
   //! Function called if MC tuning dials haven't been changed and all we want to do is update the normalisation.
-  virtual void Renormalise();
+  virtual void Renormalise(void);
 
   //! Call reconfigure only looping over signal events to save time.
-  virtual void ReconfigureFast();
+  virtual void ReconfigureFast(void);
 
   //! Call reconfigure looping over all MC events including background
-  virtual void Reconfigure();
+  virtual void Reconfigure(void);
 
-  virtual TH2D GetCovarMatrix() = 0;
-  virtual double GetLikelihood(){return 0.0;};
-  virtual int GetNDOF(){return 0;};
-  virtual void ThrowCovariance() = 0;
+  virtual TH2D GetCovarMatrix(void) = 0;
+  virtual double GetLikelihood(void){return 0.0;};
+  virtual int GetNDOF(void){return 0;};
+  virtual void ThrowCovariance(void) = 0;
   virtual void SetFakeDataValues(std::string fkdt) = 0;
 
-
-
-  //! Set the flux histogram from file
-  virtual void SetFluxHistogram(std::string fluxFile, int minE, int maxE, double fluxNorm);
 
   //! Get the total integrated flux between this samples energy range
   virtual double TotalIntegratedFlux(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
@@ -118,15 +114,21 @@ class MeasurementBase {
   virtual double PredictedEventRate(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
 
 
+  int GetPassed() {
+    int signalSize = fXVar_VECT.size();
+    return signalSize;
+  }
 
-
+  int GetTotal() {
+    return fNEvents;
+  }
 
   /*
     Reconfigure LOOP
   */
   // All these should be virtual
   ///! Reset Histograms (Handled at Measurement Stage)
-  virtual void ResetAll() = 0;
+  virtual void ResetAll(void) = 0;
 
   ///! Fill the event variables for this sample (Handled in each inherited sample)
   virtual void FillEventVariables(FitEvent* event){(void)event;};
@@ -134,14 +136,14 @@ class MeasurementBase {
   ///! Check whether this event is signle (Handled in each inherited sample)
   virtual bool isSignal(FitEvent* event){ (void)event; return false;};
 
-  ///! Fill the histogram for this event using X_VAR and Y_VAR (Handled in each inherited sample)
-  virtual void FillHistograms(){};
+  ///! Fill the histogram for this event using fXVar and fYVar (Handled in each inherited sample)
+  virtual void FillHistograms(void){};
 
   ///! Convert event rates to whatever distributions you need.
-  virtual void ConvertEventRates();
+  virtual void ConvertEventRates(void);
 
   ///! Call scale events after the plots have been filled at the end of reconfigure.
-  virtual void ScaleEvents(){};
+  virtual void ScaleEvents(void){};
 
   ///! Apply the scale factor at the end of reconfigure.
   virtual void ApplyNormScale(double norm){(void) norm;};
@@ -154,40 +156,41 @@ class MeasurementBase {
   */
 
   ///! Virtual function to get data histogram
-  virtual std::vector<TH1*> GetDataList() = 0;
+  virtual std::vector<TH1*> GetDataList(void) = 0;
 
   ///! Virtual function to get MC histogram
-  virtual std::vector<TH1*> GetMCList() = 0;
-  virtual std::vector<TH1*>  GetFineList() = 0;
-  virtual std::vector<TH1*> GetMaskList() = 0;
+  virtual std::vector<TH1*> GetMCList   (void) = 0;
+  virtual std::vector<TH1*> GetFineList (void) = 0;
+  virtual std::vector<TH1*> GetMaskList (void) = 0;
 
-  ///! Return Flux Lists as a vector
-  virtual std::vector<TH1*> GetFluxList(){return std::vector<TH1*>(1,fluxHist);};
-
-  ///! Return Event Rate Lists as a vector
-  virtual std::vector<TH1*> GetEventRateList(){return std::vector<TH1*>(1,eventHist);};
-
-  ///! Return XSec Lists as a vector
-  virtual std::vector<TH1*> GetXSecList(){return std::vector<TH1*>(1,xsecHist);};
+  ///! Return flux histograms in a vector
+  virtual std::vector<TH1*> GetFluxList      (void);
+  virtual std::vector<TH1*> GetEventRateList (void);
+  virtual std::vector<TH1*> GetXSecList      (void);
 
   ///! Return input for this sample
-  InputHandler* GetInput();
+  InputHandler* GetInput (void);
 
-  std::string GetName(){ return measurementName; };
-  double GetScaleFactor(){ return scaleFactor; };
+  std::string GetName (void){ return fName; };
+  double GetScaleFactor(void){ return fScaleFactor; };
 
-  double GetXVar(){ return this->X_VAR; };
-  double GetYVar(){ return this->Y_VAR; };
-  double GetZVar(){ return this->Z_VAR; };
-  double GetMode(){ return this->Mode;  };
-  double GetEnu(){ return this->Enu; };
-
+  double GetXVar(void){ return fXVar; };
+  double GetYVar(void){ return fYVar; };
+  double GetZVar(void){ return fZVar; };
+  double GetMode(void){ return this->Mode;  };
+  double GetEnu(void){ return this->Enu; };
+  
   void SetupInputs(std::string inputfile);
-  int GetInputID();
+  int GetInputID(void);
   void SetSignal(bool sig);
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
   void SetMode(int md);
+
+  inline void SetXVar(double xvar){ fXVar = xvar; };
+  inline void SetYVar(double yvar){ fYVar = yvar; };
+  inline void SetZVar(double zvar){ fZVar = zvar; };
+  
   
 protected:
 
@@ -198,36 +201,41 @@ protected:
 
   BaseFitEvt* signal_event;
   FitEvent* cust_event;
-  FitWeight* rw_engine; //!< Pointer to the rw engine
-  InputHandler* input; //!< Instance of the input handler
-  std::string measurementName;
-  int eventType;
+  FitWeight* fRW; //!< Pointer to the rw engine
+  InputHandler* fInput; //!< Instance of the input handler
+  std::string fName;
+  int fEventType;
 
-  // Input Event rate flux/event histograms
-  TH1D* fluxHist;  //!< Flux Histogram
-  TH1D* eventHist; //!< Event Histogram
-  TH1D* xsecHist;  //!< XSec Histogram
+  TH1D* fEventHist;
+  TH1D* fXSecHist;
+  TH1D* fFluxHist;
 
-  double exp_distance; //!< Incoming Particle flight distance (for oscillation analysis)
-  double scaleFactor; //!< scaleFactor applied to events to convert from eventrate to final distribution
-  double currentNorm; //!< current normalisation factor applied if fit is "FREE"
-  bool filledMC; //!< flag whether MC plots have been filled (For ApplyNormalisation)
+  double fBeamDistance; //!< Incoming Particle flight distance (for oscillation analysis)
+  double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
+  double fCurrentNorm; //!< current normalisation factor applied if fit is "FREE"
+  bool fMCFilled; //!< flag whether MC plots have been filled (For ApplyNormalisation)
 
   // TEMP OBJECTS TO HANDLE MERGE
-  double X_VAR,Y_VAR,Z_VAR,Mode,Weight;
+  double fXVar,fYVar,fZVar,Mode,Weight;
   bool Signal;
   int ievt;
-  int nevents;
+  int fNEvents;
   double Enu_rec, ThetaMu, CosThetaMu;
 
-  std::vector<double> X_VAR_VECT;
-  std::vector<double> Y_VAR_VECT;
-  std::vector<double> Z_VAR_VECT;
-  std::vector<int>    MODE_VECT;
-  std::vector<UInt_t>   INDEX_VECT;
+  std::vector<double> fXVar_VECT;
+  std::vector<double> fYVar_VECT;
+  std::vector<double> fZVar_VECT;
+  std::vector<int>    fMode_VECT;
+  std::vector<UInt_t> fIndex_VECT;
 
   std::string inputfilename;
 };
+
+// Class TypeDefs
+typedef std::list<MeasurementBase*>::const_iterator MeasListConstIter;
+typedef std::list<MeasurementBase*>::iterator MeasListIter;
+typedef std::vector<MeasurementBase*>::const_iterator MeasVectConstIter;
+typedef std::vector<MeasurementBase*>::iterator MeasVectIter;
 
 /*! @} */
 #endif

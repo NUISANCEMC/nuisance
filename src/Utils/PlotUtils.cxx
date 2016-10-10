@@ -25,25 +25,25 @@
 // This function is intended to be modified to enforce a consistent masking for all models.
 TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data){
   
-  TH2D *maskHist = (TH2D*)data->Clone("maskHist");  
+  TH2D *fMaskHist = (TH2D*)data->Clone("fMaskHist");  
 
-  for (int xBin = 0; xBin < maskHist->GetNbinsX(); ++xBin){
-    for (int yBin = 0; yBin < maskHist->GetNbinsY(); ++yBin){
-      if (data->GetBinContent(xBin+1, yBin+1) == 0) maskHist->SetBinContent(xBin+1, yBin+1, 0);
-      else maskHist->SetBinContent(xBin+1, yBin+1, 0.5);
+  for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin){
+    for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin){
+      if (data->GetBinContent(xBin+1, yBin+1) == 0) fMaskHist->SetBinContent(xBin+1, yBin+1, 0);
+      else fMaskHist->SetBinContent(xBin+1, yBin+1, 0.5);
 
       if (!type.compare("MB_numu_2D")){
-	if (yBin == 19 && xBin < 8) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+	if (yBin == 19 && xBin < 8) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
       } else {
-	if (yBin == 19 && xBin < 11) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+	if (yBin == 19 && xBin < 11) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
       }
-      if (yBin == 18 && xBin < 3) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
-      if (yBin == 17 && xBin < 2) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
-      if (yBin == 16 && xBin < 1) maskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 18 && xBin < 3) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 17 && xBin < 2) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
+      if (yBin == 16 && xBin < 1) fMaskHist->SetBinContent(xBin+1, yBin+1, 1.0);
     }
   }
 
-  return maskHist;
+  return fMaskHist;
 };
 
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring){
@@ -302,7 +302,7 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 };
 
 
-std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const char* del){
+std::vector<std::string> PlotUtils::ParseToStr(std::string str, const char* del){
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -317,7 +317,7 @@ std::vector<std::string> PlotUtils::FillVectorSFromString(std::string str, const
   return vals;
 
 }
-std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char* del){
+std::vector<double> PlotUtils::ParseToDbl(std::string str, const char* del){
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -336,8 +336,32 @@ std::vector<double> PlotUtils::FillVectorDFromString(std::string str, const char
   return vals;
 }
 
+//******************************************************************** 
+std::vector<std::string> PlotUtils::ParseFileToStr(std::string str, const char* del){
 //********************************************************************
-void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
+  
+  std::vector<std::string> linevect;
+  std::string line;
+  
+  ifstream read;
+  read.open(str.c_str());
+  
+  if (!read.is_open()){
+    std::cerr << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
+    throw;
+  }
+  
+  while( std::getline(read, line, *del) ){
+    linevect.push_back(line);
+  }
+
+  read.close();
+  
+  return linevect;
+}
+
+//********************************************************************
+void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, int axis){
 //********************************************************************
  // Mostly copied from TH1D version below
  // Need to specify which axes (default is x-axis)
@@ -345,16 +369,17 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
   
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
+  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
-  for (int i = 0; i < fluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fluxHist->GetXaxis()->GetBinCenter(i+1), fluxHist->GetBinContent(i+1));
+  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
   }
 
   // Resolution for the interpolation used for the flux
-  int resolution = 10000;
+  // Set to 100 times fines than flux histogram, should be enough buy may need tweaking!
+  int resolution = 100*fFluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
+  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
@@ -367,17 +392,17 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
 
   // if Enu is on x-axis
   if (axis == 0) {
-    EnuHist = (TH1D*)mcHist->ProjectionY();
+    EnuHist = (TH1D*)fMCHist->ProjectionY();
   } else if (axis == 1) {
-    EnuHist = (TH1D*)mcHist->ProjectionX();
+    EnuHist = (TH1D*)fMCHist->ProjectionX();
   }
 */
 
-  for (int i = 1; i < mcHist->GetNbinsX()+1; i++) {
+  for (int i = 1; i < fMCHist->GetNbinsX()+1; i++) {
     // Get the low edge of the ith bin
-    Double_t binLowEdge = mcHist->GetXaxis()->GetBinLowEdge(i)/1000.;
+    Double_t binLowEdge = fMCHist->GetXaxis()->GetBinLowEdge(i)/1000.;
     // Get the high edge of the ith bin
-    Double_t binHighEdge = mcHist->GetXaxis()->GetBinLowEdge(i+1)/1000.;
+    Double_t binHighEdge = fMCHist->GetXaxis()->GetBinLowEdge(i+1)/1000.;
 
     // Find the correpsonding bin in the interpolated flux histogram
     // Start by finding the low edge of the bin
@@ -400,7 +425,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxLow = " << fluxLow << std::endl;
       std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
@@ -418,7 +443,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
       std::cout << "fluxHigh = " << fluxHigh << std::endl;
       std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }
@@ -428,16 +453,16 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
 
     // Scale every projected bin by the flux integration
     //if (axis == 0) {
-      for (int j = 1; j < mcHist->GetYaxis()->GetNbins()+1; j++) {
-        double binWidth = mcHist->GetYaxis()->GetBinWidth(j);
-        mcHist->SetBinContent(i, j, mcHist->GetBinContent(i,j)/(fluxInt*binWidth));
-        mcHist->SetBinError(i, j, mcHist->GetBinError(i,j)/(fluxInt*binWidth));
+      for (int j = 1; j < fMCHist->GetYaxis()->GetNbins()+1; j++) {
+        double binWidth = fMCHist->GetYaxis()->GetBinWidth(j);
+        fMCHist->SetBinContent(i, j, fMCHist->GetBinContent(i,j)/(fluxInt*binWidth));
+        fMCHist->SetBinError(i, j, fMCHist->GetBinError(i,j)/(fluxInt*binWidth));
       }
     /*
     } else if (axis == 1) { 
-      for (int j = 1; j < mcHist->GetXaxis()->GetNbins()+1; j++) {
-        mcHist->SetBinContent(j, i, mcHist->GetBinContent(j,i)/fluxInt);
-        mcHist->SetBinError(j, i, mcHist->GetBinError(j,i)/fluxInt);
+      for (int j = 1; j < fMCHist->GetXaxis()->GetNbins()+1; j++) {
+        fMCHist->SetBinContent(j, i, fMCHist->GetBinContent(j,i)/fluxInt);
+        fMCHist->SetBinError(j, i, fMCHist->GetBinError(j,i)/fluxInt);
       }
     }
     */
@@ -458,24 +483,31 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* mcHist, TH1D* fluxHist, int axis){
 
 // This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
 //******************************************************************** 
-void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 //******************************************************************** 
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fluxHist->GetNbinsX());
+  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
-  for (int i = 0; i < fluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fluxHist->GetXaxis()->GetBinCenter(i+1), fluxHist->GetBinContent(i+1));
+  for (int i = 0; i < fFluxHist->GetNbinsX()+1; i++){
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
   }
 
   // Resolution for the interpolation used for the flux
-  int resolution = 500;
+  // Make 100 times finer than flux histogram, COULD BE TWEAKED
+  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fluxHist->GetXaxis()->GetBinLowEdge(1), fluxHist->GetXaxis()->GetBinLowEdge(fluxHist->GetNbinsX()+1));
+  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
+    // The start and end of the flux histogram might go to zero
+    // So we really need to take care with these bins; here I just set it flat
+    if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
+      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
+    } else {
     fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+    }
   }
 
   for (int i = 1; i < mcHist->GetNbinsX()+1; i++) {
@@ -505,7 +537,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
       std::cout << "fluxLow = " << fluxLow << std::endl;
       std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
@@ -523,7 +555,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
       std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
       std::cout << "fluxHigh = " << fluxHigh << std::endl;
       std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }
@@ -532,13 +564,13 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fluxHist) {
     double fluxInt = fineFlux->Integral(fluxLow, fluxHigh - 1, "width");
 
     // Scale the bin content in bin i by the flux integral in that bin
+    if (fluxInt == 0) continue;
     mcHist->SetBinContent(i, mcHist->GetBinContent(i)/fluxInt);
     mcHist->SetBinError(i, mcHist->GetBinError(i)/fluxInt);
   }
 
   delete fineFlux;
   delete fluxGraph;
-
 
   return;
 };
@@ -575,7 +607,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, 
 
 
 
-TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::string plotTitles, std::string alt_name){
+TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::string fPlotTitles, std::string alt_name){
   
   TH1D* tempPlot;
 
@@ -621,8 +653,8 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::s
   }
 
   // Allow alternate axis titles
-  if (!plotTitles.empty()){
-    tempPlot->SetNameTitle( tempPlot->GetName(), (std::string(tempPlot->GetTitle()) + plotTitles).c_str() );
+  if (!fPlotTitles.empty()){
+    tempPlot->SetNameTitle( tempPlot->GetName(), (std::string(tempPlot->GetTitle()) + fPlotTitles).c_str() );
   }
   
   return tempPlot;

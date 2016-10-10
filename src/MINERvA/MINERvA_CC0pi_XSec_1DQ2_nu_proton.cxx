@@ -6,20 +6,20 @@
 MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   // Measurement Details
-  measurementName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
+  fName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
   EnuMax = 100.0;
-  normError = 0.100;
-  default_types = "FIX/FULL";
-  allowed_types = "FIX/FULL,DIAG";
+  fNormError = 0.100;
+  fDefaultTypes = "FIX/FULL";
+  fAllowedTypes = "FIX/FULL,DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt");
   this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
   this->SetupDefaultHist();
   
-  this->scaleFactor = (eventHist->Integral("width")*1E-38/(nevents+0.))/TotalIntegratedFlux();
+  this->fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
 };
 
 

@@ -18,32 +18,34 @@
 *******************************************************************************/
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 
+/** 
+  * M. Derrick et al., "Study of single-pion production by weak neutral currents in low-energy \nu d interactions", Physical Review D, Volume 23, Number 3, 569, 1 February 1981
+*/
+
 ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "ANL_CC1npip_Evt_1Dppi_nu";
-  plotTitles = "; p_{#pi} (MeV); Number of events";
-  EnuMin = 0;
-  EnuMax = 1.5;
-  isDiag = true;
-  isRawEvents = true;
-  allowed_types="SHAPE/DIAG/EVT";
-  default_types="SHAPE/DIAG/EVT";
+  fName = "ANL_CC1npip_Evt_1Dppi_nu";
+  fPlotTitles = "; p_{#pi} (MeV); Number of events";
+  fDefaultTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
+  // There are two different measurements here; _weight and _unweight
+  // See publication for information
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
+  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
   this->SetupDefaultHist();
 
-  // set Poisson errors on dataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
-  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-    dataHist->SetBinError(i+1, sqrt(dataHist->GetBinContent(i+1)));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = this->eventHist->Integral("width")/((nevents+0.)*fluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
@@ -72,17 +74,19 @@ void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
     ppip = -1.0;
   }
 
-  this->X_VAR = ppip;
+  fXVar = ppip;
 
   return;
 };
 
 bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
 
+  // Incoming particle should be a neutrino
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false; 
 
+  // Outgoing particle should be a neutrino
   if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false; 
 
   int pipCnt = 0;
@@ -91,12 +95,13 @@ bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
   for (UInt_t j =  2; j < event->Npart(); j++) {
     if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211)
+    if (PID == 211) {
       pipCnt++;
-    else if (PID == 2112)
+    } else if (PID == 2112) {
       neutronCnt++;
-    else
+    } else {
       return false; // require only three prong events! (allow photons?)
+    }
   }
 
   // don't think there's away of implementing spectator proton cuts in NEUT?

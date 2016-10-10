@@ -16,22 +16,38 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #ifndef T2K_CC0PI_2DPCOS_NU_H_SEEN
 #define T2K_CC0PI_2DPCOS_NU_H_SEEN
 
-// Fit Includes
 #include "Measurement2D.h"
 
 class T2K_CC0pi_XSec_2DPcos_nu : public Measurement2D {
 public:
 
-  T2K_CC0pi_XSec_2DPcos_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~T2K_CC0pi_XSec_2DPcos_nu() {};
-  int GetNDOF(){return 67;};  
+  /// Basic Constructor.
+  /// /brief Parses two different measurements.
+  ///
+  /// T2K_CC0pi_XSec_2DPcos_nu    -> T2K CC0PI Analysis 2
+  /// T2K_CC0pi_XSec_2DPcos_nu_I  -> T2K CC0PI Analysis 1
+  /// T2K_CC0pi_XSec_2DPcos_nu_II -> T2K CC0PI Analysis 2
+  T2K_CC0pi_XSec_2DPcos_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type);
+
+  /// Virtual Destructor
+  ~T2K_CC0pi_XSec_2DPcos_nu() {};
+
+  /// Numu CC0PI Signal Definition
+  ///
+  /// /item 
   bool isSignal(FitEvent *nvect);
-  void SetHistograms(std::string infile);
+
+  /// Read histograms in a special way because format is different.
+  /// Read from FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root"
+  void SetHistograms();
+
+  /// Bin Tmu CosThetaMu
   void FillEventVariables(FitEvent* customEvent);
+
+  /// Have to do a weird event scaling for analysis 1
   void ConvertEventRates();
 
  private:
@@ -42,7 +58,10 @@ public:
   double numu_energy;
   int particle_pdg;
   double pmu, CosThetaMu;
-  int analysis;
+  int fAnalysis;
+
+  bool fIsSystCov, fIsStatCov, fIsNormCov;
+  
 };
   
 #endif

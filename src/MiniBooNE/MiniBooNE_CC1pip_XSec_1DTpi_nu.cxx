@@ -21,24 +21,23 @@
 
 // The constructor
 MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
 
-  measurementName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
-  plotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
+  fName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
+  fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
-  isDiag = true;
-  normError = 0.107;
+  fIsDiag = true;
+  fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
   
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_KEpi.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar = StatUtils::GetInvert(fullcovar);
-  //StatUtils::ForceNormIntoCovar(this->covar, this->dataHist, this->normError);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar = StatUtils::GetInvert(fFullCovar);
+  //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 
@@ -53,13 +52,16 @@ void MiniBooNE_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   
   // Loop over the particle stack
   for (unsigned int j = 2; j < event->Npart(); ++j){
+
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
       Pmu = (event->PartInfo(j))->fP;
     }
+
   }
 
   // No W cut on MiniBooNE data from publication
@@ -68,7 +70,7 @@ void MiniBooNE_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
   double Tpi = FitUtils::T(Ppip)*1000.;
 
-  this->X_VAR = Tpi;
+  fXVar = Tpi;
 
   return;
 };

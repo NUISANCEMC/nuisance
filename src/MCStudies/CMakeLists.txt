@@ -20,14 +20,12 @@ set(IMPLFILES
 ExpMultDist_CCQE_XSec_1DVar_FakeStudy.cxx
 ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
 GenericFlux_Tester.cxx
-parameter_pulls.cxx
 )
 
 set(HEADERFILES
 ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h
 ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
 GenericFlux_Tester.h
-parameter_pulls.h
 )
 
 set(LIBNAME MCStudies)
@@ -41,6 +39,7 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")

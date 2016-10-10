@@ -1,20 +1,20 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NuFiX.
+*    This file is part of NUISANCE.
 *
-*    NuFiX is free software: you can redistribute it and/or modify
+*    NUISANCE is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
 *    the Free Software Foundation, either version 3 of the License, or
 *    (at your option) any later version.
 *
-*    NuFiX is distributed in the hope that it will be useful,
+*    NUISANCE is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 *
 *    You should have received a copy of the GNU General Public License
-*    along with NuFiX.  If not, see <http://www.gnu.org/licenses/>.
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 #include "FitUtils.h"
@@ -55,10 +55,10 @@ TH2D *FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut,
   // // Now iterate through the events and plot the qCut
   // TChain *tn = new TChain("neuttree", "");
   // tn->Add(Form("%s/neuttree", inFile.c_str()));
-  // Int_t nevents = tn->GetEntries();
+  // Int_t fNEvents = tn->GetEntries();
   // NeutVect *nvect = NULL;
   // tn->SetBranchAddress("vectorbranch", &nvect);
-  // for (int i = 0; i < nevents; ++i){
+  // for (int i = 0; i < fNEvents; ++i){
   //   tn->GetEntry(i);
 
   //   if (!isSignal(nvect, nuPDG, eMin, eMax, false, 0)) continue;
@@ -98,6 +98,20 @@ TH2D *FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut,
   return qCutHist;
 };
 
+//********************************************************************
+double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
+                                  std::map<std::string, double> inmap) {
+  //********************************************************************
+
+  double *outarr = new double[invals.size()];
+  int count = 0;
+
+  for (int i = 0; i < invals.size(); i++) {
+    outarr[count++] = inmap[invals.at(i)];
+  }
+
+  return outarr;
+}
 /*
   MISC Event
 */
@@ -269,15 +283,10 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
     }
   }
 
-  //  std::cout<<"Current Q2QE Momentum Shift = "<<momshift<<std::endl;
-
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
   pl += momshift / 1000.;
-
-  double rEnu = EnuQErec(pmu, costh, binding, neutrino);
-  double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);
 
   return q2;
 };
@@ -489,6 +498,7 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu,
     case 3:
       rEnu = EnuCC1piprecDelta(pnu, pmu);
       break;
+
   }  // No need for default here since default value of enuType = 0, defined in
      // header
 
@@ -522,21 +532,17 @@ double FitUtils::MpPi(TLorentzVector pp, TLorentzVector ppi) {
 };
 
 //********************************************************
-// Reconstruct the hadronic mass using all outgoing particles
-// Requires pion vector for reconstructing the neutrino energy
+
+// Reconstruct the hadronic mass using neutrino and muon
 // Could technically do E_nu = EnuCC1pipRec(pnu,pmu,ppi) too, but this wwill be
 // reconstructed Enu; so gives reconstructed Wrec which most of the time isn't
 // used!
 //
 // Only MINERvA uses this so far; and the Enu is Enu_true
-
+// If we want W_true need to take initial state nucleon motion into account
 // Return value is in MeV!!!
 double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
   //********************************************************
-  // Reconstruct the hadronic mass using all outgoing particles
-  // Requires pion vector for reconstructing the neutrino energy
-  // Could technically do E_nu = pnu.E() too, but this won't be reconstructed
-  // Enu; it's true Enu
 
   double E_mu = pmu.E();
   double p_mu = pmu.Vect().Mag();
@@ -552,6 +558,44 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
 
   double w_rec = sqrt(m_p * m_p + m_mu * m_mu - 2 * m_p * E_mu +
                       2 * E_nu * (m_p - E_mu + p_mu * cos(th_nu_mu)));
+
+  return w_rec;
+};
+
+//********************************************************
+// Reconstruct the true hadronic mass using the initial state and muon
+// Could technically do E_nu = EnuCC1pipRec(pnu,pmu,ppi) too, but this wwill be
+// reconstructed Enu; so gives reconstructed Wrec which most of the time isn't
+// used!
+//
+// No one seems to use this because it's fairly MC dependent!
+// Return value is in MeV!!!
+double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu,
+                       TLorentzVector pnuc) {
+  //********************************************************
+
+  // Could simply do the TLorentzVector operators here but this is more
+  // instructive?
+  // ... and prone to errors ...
+
+  double E_mu = pmu.E();
+  double p_mu = pmu.Vect().Mag();
+  double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu);
+  double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
+
+  double E_nuc = pnuc.E();
+  double p_nuc = pnuc.Vect().Mag();
+  double m_nuc = sqrt(E_nuc * E_nuc - p_nuc * p_nuc);
+  double th_nuc_mu = pmu.Vect().Angle(pnuc.Vect());
+  double th_nu_nuc = pnu.Vect().Angle(pnuc.Vect());
+
+  double E_nu = pnu.E();
+  // double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
+
+  double w_rec = sqrt(m_nuc * m_nuc + m_mu * m_mu - 2 * E_nu * E_mu +
+                      2 * E_nu * p_mu * cos(th_nu_mu) - 2 * E_nuc * E_mu +
+                      2 * p_nuc * p_mu * cos(th_nuc_mu) + 2 * E_nu * E_nuc -
+                      2 * E_nu * p_nuc * cos(th_nu_nuc));
 
   return w_rec;
 };

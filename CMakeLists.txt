@@ -20,11 +20,12 @@ include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
 if(NOT DEFINED USE_NEUT AND
   NOT DEFINED USE_NuWro AND
   NOT DEFINED USE_GENIE AND
+  NOT DEFINED USE_T2K AND
   NOT DEFINED USE_NIWG AND
   NOT DEFINED USE_GiBUU AND
   NOT DEFINED USE_NUANCE)
   cmessage(FATAL_ERROR "No reweight engines requested. Configure with at least "
-    "one of -DUSE_{NEUT,NuWro,GENIE,NIWG,GiBUU,NUANCE}.")
+    "one of -DUSE_{NEUT,NuWro,GENIE,NIWG,T2K,GiBUU,NUANCE}.")
 else()
   cmessage(STATUS "Generator Input Support:
   		  NEUT:${USE_NEUT},
@@ -34,6 +35,7 @@ else()
   		  GiBUU:${USE_GiBUU},
 		  NUANCE:${USE_NUANCE}")
 endif()
+
 #Changes default install path to be a subdirectory of the build dir.
 #Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
 if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
@@ -102,6 +104,7 @@ set(MINCODE
 set(CORE
   MCStudies
   FitBase
+  Splines   
   Utils
   #Devel
   )

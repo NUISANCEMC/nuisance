@@ -22,21 +22,21 @@
 // The constructor
 K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  measurementName = "K2K_NC1pi0_Evt_1Dppi0_nu";
-  plotTitles = "; p_{#pi^{0}} (MeV/c); Number of events";
+  fName = "K2K_NC1pi0_Evt_1Dppi0_nu";
+  fPlotTitles = "; p_{#pi^{0}} (MeV/c); Number of events";
   EnuMin = 0.;
   EnuMax = 5.;
-  isDiag = true;
-  normError = 0.15;
+  fIsDiag = true;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/K2K/ncpi0/ppi0.csv");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = 1; // No need to care about scaling factors for shape measurements
+  this->fScaleFactor = 1; // No need to care about scaling factors for shape measurements
 };
 
 void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {
@@ -53,7 +53,7 @@ void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {
 
   double ppi0 = FitUtils::p(Ppi0)*1000.;
 
-  this->X_VAR = ppi0;
+  fXVar = ppi0;
 
   return;
 };

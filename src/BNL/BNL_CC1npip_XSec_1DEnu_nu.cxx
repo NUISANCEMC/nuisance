@@ -22,21 +22,21 @@
 // The constructor
 BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "BNL_CC1npip_XSec_1DEnu_nu";
-  plotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
+  fName = "BNL_CC1npip_XSec_1DEnu_nu";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 0.;
   EnuMax = 3.0;
-  isDiag = true;
-  normError = 0.15;
+  fIsDiag = true;
+  fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_1986.txt");
   this->SetupDefaultHist();
 
-  fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-  covar     = StatUtils::GetInvert(fullcovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/((nevents+0.))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
 };
 
 
@@ -64,7 +64,7 @@ void BNL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   // No W cut for BNL CC1pi+ on neutron (I'm happy if you can find it!!!)
   double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
@@ -133,11 +133,11 @@ void BNL_CC1npip_XSec_1DEnu_nu::FillHistograms() {
 
 void BNL_CC1npip_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-  mcHist->Scale(scaleFactor);
-  mcFine->Scale(scaleFactor);
+  fMCHist->Scale(fScaleFactor);
+  fMCFine->Scale(fScaleFactor);
 
   return;
 }

@@ -167,10 +167,12 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
 
       } else {
 
+	/*
         std::cerr << "Error on bin (i,j) = (" << i << "," << j << ")" << std::endl;
         std::cerr << "data->GetBinContent(i+1) = " << calc_data->GetBinContent(i+1) << std::endl;
         std::cerr << "mc->GetBinContent(i+1) = " << calc_mc->GetBinContent(i+1) << std::endl;
         std::cerr << "Adding zero to chi2 instead of dying horrifically " << std::endl;
+	*/
         Chi2 += 0.;
       }
 
@@ -287,45 +289,47 @@ Double_t StatUtils::GetChi2FromSVD( TH2D* data, TH2D* mc,
 }
 
 //*******************************************************************
-Double_t StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask){
+double StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask) {
 //*******************************************************************
 
   // If just an event rate, for chi2 just use Poission Likelihood to calculate the chi2 component
-  Double_t Chi2 = 0.0;
+  double chi2 = 0.0;
   TH1D* calc_data = (TH1D*)data->Clone();
   TH1D* calc_mc   = (TH1D*)mc->Clone();
 
-  // Apply masking if required          
-  if (mask){
+  // Apply masking if required
+  if (mask) {
     calc_data = ApplyHistogramMasking(data, mask);
     calc_mc   = ApplyHistogramMasking(mc, mask);
   }
 
-  // Iterate over bins in X             
-  for (int i = 0; i < calc_data->GetNbinsX(); i++){
-
-    //    int dt = (int)calc_data->GetBinContent(i+1);
-    //    int mc = (int)calc_mc->GetBinContent(i+1);
+  // Iterate over bins in X
+  for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
     double dt = calc_data->GetBinContent(i+1);
     double mc = calc_mc->GetBinContent(i+1);
 
-    if (dt == 0 or mc == 0) continue;
+    if (dt == 0 or mc == 0) {
+      LOG(REC) << "Found no MC in bin " << i << " for " << calc_data->GetName() << " (" << calc_data->GetBinLowEdge(i) << " - " << calc_data->GetBinLowEdge(i+1) << ")" << std::endl;
+      continue;
+    }
 
-    // Take mc data difference          
-    Chi2 +=  2 * (mc - dt + ( (dt+0.) * log((dt+0.) / (mc+0.)) ));
+    // Do the chi2 for Poisson distributions
+    chi2 +=  2 * (mc - dt + (dt*log(dt/mc)));
 
+/*
     LOG(REC)<<"Evt Chi2 cont = "<<i<<" "
 	    <<mc<<" "<<dt<<" "
 	    <<2 * (mc - dt + (dt+0.) * log((dt+0.) / (mc+0.)))
 	    <<" "<<Chi2<<std::endl;
+*/
   }
 
   // cleanup
   delete calc_data;
   delete calc_mc;
 
-  return Chi2;
+  return chi2;
 }
 
 //*******************************************************************
@@ -774,7 +778,7 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
 //*******************************************************************
 
   TMatrixDSym* new_mat = (TMatrixDSym*)mat->Clone();
-
+  
   // Check for diagonal
   bool non_diagonal = false;
   for (int i = 0; i < new_mat->GetNrows(); i++){
@@ -789,9 +793,12 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
   }
 
   // If diag, just flip the diag
-  if (!non_diagonal){
+  if (!non_diagonal or new_mat->GetNrows() == 1){
     for(int i = 0; i < new_mat->GetNrows(); i++){
-      (*new_mat)(i,i) = 1.0/(*new_mat)(i,i);
+      if ((*new_mat)(i,i) != 0.0)
+	(*new_mat)(i,i) = 1.0/(*new_mat)(i,i);
+      else
+	(*new_mat)(i,i) = 0.0;
     }
     return new_mat;
   }
@@ -808,12 +815,38 @@ TMatrixDSym* StatUtils::GetInvert(TMatrixDSym* mat){
 TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
 //*******************************************************************
 
-  TMatrixDSym* decomp = (TMatrixDSym*) mat->Clone();
-  TDecompChol LU = TDecompChol(*decomp);
-  LU.Decompose();
-  decomp = new TMatrixDSym(decomp->GetNrows(), LU.GetU().GetMatrixArray(), "");
+  TMatrixDSym* new_mat = (TMatrixDSym*)mat->Clone();
+  int nrows = new_mat->GetNrows();
+  
+  // Check for diagonal
+  bool diagonal = true;
+  for (int i = 0; i < nrows; i++){
+    for (int j = 0; j < nrows; j++){
+      if (i == j) continue;
 
-  return decomp;
+      if ((*new_mat)(i,j) != 0.0) {
+	diagonal=false;
+	break;
+      }
+    }
+  }
+
+  // If diag, just flip the diag
+  if (diagonal or nrows == 1){
+    for(int i = 0; i < nrows; i++){
+      if ((*new_mat)(i,i) > 0.0)
+	(*new_mat)(i,i) = sqrt((*new_mat)(i,i));
+      else
+	(*new_mat)(i,i) = 0.0;
+    }
+    return new_mat;
+  }
+  
+  TDecompChol LU = TDecompChol(*new_mat);
+  LU.Decompose();
+  new_mat = new TMatrixDSym(nrows, LU.GetU().GetMatrixArray(), "");
+
+  return new_mat;
 }
 
 
@@ -861,13 +894,13 @@ void StatUtils::ForceNormIntoCovar(TMatrixDSym* mat, TH2D* data, double norm, TH
 }
 
 //*******************************************************************
-TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data){
+TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data, double scaleF){
 //*******************************************************************
 
   TMatrixDSym* newmat = new TMatrixDSym(data->GetNbinsX());
   
   for (int i = 0; i < data->GetNbinsX(); i++){
-    (*newmat)(i,i) = data->GetBinError(i+1) * data->GetBinError(i+1) * 1E38 * 1E38;
+    (*newmat)(i,i) = data->GetBinError(i+1) * data->GetBinError(i+1) * scaleF * scaleF;
   }
   
   return newmat;
@@ -876,21 +909,13 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH1D* data){
 
 
 //*******************************************************************     
-TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map){
+TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map, double scaleF){
 //*******************************************************************     
 
   if (!map) map = StatUtils::GenerateMap(data);
-
   TH1D* data_1D = MapToTH1D(data, map);
-  Int_t NBins = data_1D->GetNbinsX();
-  TMatrixDSym* mat = new TMatrixDSym(NBins);
- 
-  for (int i = 0; i < NBins; i++)
-    (*mat)(i, i) = pow(data_1D->GetBinError(i+1) * 1E-38, 2);
- 
-  delete data_1D;
-  
-  return mat;
+
+  return StatUtils::MakeDiagonalCovarMatrix(data_1D, scaleF);
 };
 
 
@@ -898,13 +923,14 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map){
 void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale){
 //*******************************************************************     
 
+  // Check
+  if (cov->GetNrows() != data->GetNbinsX()){
+    ERR(WRN) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << endl;
+  }
+  
   // Set bin errors form cov diag
   for (int i = 0; i < data->GetNbinsX(); i++){
-
-    if (data->GetBinContent(i+1) == 0.0) continue;
-    
     data->SetBinError(i+1, sqrt((*cov)(i,i)) * scale );
-
   }
 
   return;

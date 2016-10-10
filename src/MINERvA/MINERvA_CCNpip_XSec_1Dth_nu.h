@@ -11,12 +11,19 @@ public:
   void FillEventVariables(FitEvent *event);
   void FillHistograms();
   bool isSignal(FitEvent *event);
+  void ScaleEvents();
   void Write(std::string drawOpt);
 
 private:
   bool isNew;
   int nPions;
+
   TH1I *hnPions;
+  TH1D *onePions;
+  TH1D *twoPions;
+  TH1D *threePions;
+  TH1D *morePions;
+
   std::vector<unsigned int> piIndex;
   std::vector<double> thVect;
 };

@@ -29,7 +29,7 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
 
   // // Set pointer to the reweighting engine
   // rw_engine = rw;
-  // this->exp_distance = 0.541;
+  // this->fBeamDistance = 0.541;
 
   // // Define the energy region
   // this->EnuMin = 0.;
@@ -37,28 +37,28 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
 
   // // In future read most of these from a card file
   // this->inFile = inputfile;
-  // this->measurementName = "MB_NCpi0_XSec_numu_1Dppi0";
-  // this->plotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
+  // this->fName = "MB_NCpi0_XSec_numu_1Dppi0";
+  // this->fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
   // this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsecerrormatrix.txt", 11);
   // this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsec_edit.txt");
-  // this->normError=0.107;
+  // this->fNormError=0.107;
 
   // if (isComb) {
-  //   measurementName += "_comb";
-  //   this->data_points = 11;
-  //   this->xBins = anuBins;
+  //   fName += "_comb";
+  //   this->fNDataPointsX = 11;
+  //   this->fXBins = anuBins;
   // }
 
-  // this->mcHist = new TH1D((this->measurementName+"_MC").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
-  // this->mcFine = new TH1D((this->measurementName+"_MC_FINE").c_str(), (this->measurementName+this->plotTitles).c_str(), (this->data_points - 1)*10, this->xBins[0], this->xBins[this->data_points -1]);
+  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
+  // this->fMCFine = new TH1D((this->fName+"_MC_FINE").c_str(), (this->fName+this->fPlotTitles).c_str(), (this->fNDataPointsX - 1)*10, this->fXBins[0], this->fXBins[this->fNDataPointsX -1]);
 
 
   // this->ReadEventFile();
 
   //  // Different generators require slightly different rescaling factors.
-  // if      (this->eventType == 0) this->scaleFactor = (this->eventHist->Integral("width")*1E-38/(nevents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
-  // else if (this->eventType == 1) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fluxHist->Integral(); // NUWRO
-  // else if (this->eventType == 5) this->scaleFactor = (this->eventHist->Integral()*1E-38/(nevents+0.))*14.08*6.0/14./this->fluxHist->Integral(); // GENIE
+  // if      (this->fEventType == 0) this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
+  // else if (this->fEventType == 1) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // NUWRO
+  // else if (this->fEventType == 5) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // GENIE
 
 };
 
@@ -93,7 +93,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent* event){
 
   //double hadMass = FitUtils::Wrec(Pnu, Pmu, Ppi0);
   double ppi0 = Ppi0.Vect().Mag()/1000.0;
-  this->X_VAR = ppi0;
+  fXVar = ppi0;
 
   return;
 
@@ -117,35 +117,35 @@ bool MiniBooNE_NCpi0_XSec_1Dppi0_nu::isSignal(FitEvent* event){
 
 
 void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetDataValues(std::string dataFile) {
-  LOG(SAM) << this->measurementName  << "Setting data for " << this->measurementName << std::endl;
-  LOG(SAM) << this->measurementName  << "From: " << dataFile << std::endl;
-  LOG(SAM) << this->measurementName  << "Reading error from covariance" << std::endl;
+  LOG(SAM) << this->fName  << "Setting data for " << this->fName << std::endl;
+  LOG(SAM) << this->fName  << "From: " << dataFile << std::endl;
+  LOG(SAM) << this->fName  << "Reading error from covariance" << std::endl;
 
   TGraph *gr = new TGraph(dataFile.c_str());
-  this->xBins       = gr->GetX();
-  this->data_values = gr->GetY();
-  this->data_points = gr->GetN();
+  this->fXBins       = gr->GetX();
+  this->fDataValues = gr->GetY();
+  this->fNDataPointsX = gr->GetN();
 
   // get the diagonal elements
   int rows = (this->tempCovar)->GetNrows();
   Double_t errors[rows+1];
   for (int i = 0; i < rows; i++) errors[i] = sqrt( (*this->tempCovar)(i,i)*1E-81);
   errors[rows] = 0.;
-  this->data_errors = errors;
+  this->fDataErrors = errors;
 
-  this->dataHist = new TH1D((this->measurementName+"_data").c_str(), (this->measurementName+this->plotTitles).c_str(), this->data_points-1, this->xBins);
+  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
 
-  for (int i=0; i < this->data_points; ++i) {
-    this->dataHist->SetBinContent(i+1, this->data_values[i]);
-    this->dataHist->SetBinError(i+1, this->data_errors[i]);
+  for (int i=0; i < this->fNDataPointsX; ++i) {
+    this->fDataHist->SetBinContent(i+1, this->fDataValues[i]);
+    this->fDataHist->SetBinError(i+1, this->fDataErrors[i]);
   }
   return;
 }
 
 void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetCovarMatrix(std::string covarFile, int dim) {
-  LOG(SAM) << this->measurementName  << "===============" << std::endl;
-  LOG(SAM) << this->measurementName  << "Reading covariance: " << this->measurementName << std::endl;
-  LOG(SAM) << this->measurementName  << "From: " << covarFile << std::endl;
+  LOG(SAM) << this->fName  << "===============" << std::endl;
+  LOG(SAM) << this->fName  << "Reading covariance: " << this->fName << std::endl;
+  LOG(SAM) << this->fName  << "From: " << covarFile << std::endl;
   // tracks line number
   int row = 0;
 

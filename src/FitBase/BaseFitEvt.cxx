@@ -122,20 +122,20 @@ __attribute__((constructor)) void nuisance_init(void) {
 
 BaseFitEvt::BaseFitEvt() {
 #ifdef __NEUT_ENABLED__
-  neut_event = NULL;
+  fNeutVect = NULL;
 #endif
 
 #ifdef __NUWRO_ENABLED__
-  nuwro_event = NULL;
+  fNuwroEvent = NULL;
 #endif
 
 #ifdef __GENIE_ENABLED__
   genie_event = NULL;
 #endif
 
-  X_VAR = 0.0;
-  Y_VAR = 0.0;
-  Z_VAR = 0.0;
+  fXVar = 0.0;
+  fYVar = 0.0;
+  fZVar = 0.0;
   Mode = 0;
   E = 0.0;
   Weight = 0.0;
@@ -149,9 +149,9 @@ BaseFitEvt::BaseFitEvt() {
 BaseFitEvt::~BaseFitEvt(){};
 
 BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
-  this->X_VAR = obj->X_VAR;
-  this->Y_VAR = obj->Y_VAR;
-  this->Z_VAR = obj->Z_VAR;
+  fXVar = obj->fXVar;
+  fYVar = obj->fYVar;
+  fZVar = obj->fZVar;
   this->Mode = obj->Mode;
   this->E = obj->E;
   this->Weight = obj->Weight;
@@ -160,20 +160,72 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
   this->BinIndex = obj->Index;
 
 #ifdef __NEUT_ENABLED__
-  neut_event = obj->neut_event;
+  fNeutVect = obj->fNeutVect;
 #endif
 
 #ifdef __NUWRO_ENABLED__
-  nuwro_event = obj->nuwro_event;
+  fNuwroEvent = obj->fNuwroEvent;
 #endif
 
 #ifdef __GENIE_ENABLED__
   genie_event = obj->genie_event;
 #endif
 
-  if (obj->dial_coeff) {
-    if (obj->dial_coeff->GetSize() > 0) {
-      dial_coeff = new TArrayD(*obj->dial_coeff);
+  // Delete own elements
+  if (this->ndial_coeff > 0){
+    this->ndial_coeff = 0;
+    delete this->dial_coeff;
+  }
+  
+  if (obj->ndial_coeff > 0){
+    ndial_coeff = obj->ndial_coeff;
+    dial_coeff = new double[ndial_coeff];
+
+    for (int i = 0; i < ndial_coeff; i++){
+      this->dial_coeff[i] = obj->dial_coeff[i];
     }
   }
 };
+
+void BaseFitEvt::ResetDialCoeff(){
+  if (this->ndial_coeff > 0){
+    this->ndial_coeff = 0;
+    delete this->dial_coeff;
+  }
+}
+void BaseFitEvt::CreateDialCoeff(int n){
+  ResetDialCoeff();
+
+  ndial_coeff = n;
+  dial_coeff = new double[ndial_coeff];
+}
+
+void BaseFitEvt::AddSplineCoeffToTree(TTree* tn){
+  tn->Branch("NCoeff",&ndial_coeff,"NCoeff/I");
+  tn->Branch("DialCoeff", dial_coeff, "DialCoeff[NCoeff]/D");
+}
+
+void BaseFitEvt::SetSplineCoeffAddress(TTree* tn){
+
+  tn->SetBranchAddress("NCoeff",&ndial_coeff);
+
+  tn->GetEntry(0);
+  CreateDialCoeff(ndial_coeff);
+  
+  tn->SetBranchAddress("DialCoeff",dial_coeff);
+  
+}
+
+void BaseFitEvt::FillCoeff(double* vals){
+  for (int i = 0; i < ndial_coeff; i++){
+    dial_coeff[i] = vals[i];
+  }
+}
+
+int BaseFitEvt::GetNCoeff(){
+  return ndial_coeff;
+}
+
+double BaseFitEvt::GetCoeff(int i){
+  return dial_coeff[i];
+}

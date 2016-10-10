@@ -42,8 +42,8 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
 
   // // In future read most of these from a card file
   // this->inFile = inputfile;
-  // this->measurementName = "MB_NCEL_XSec_Treco_nu";
-  // this->plotTitles = "; T_{reco} (MeV); Events/(12 MeV)";
+  // this->fName = "MB_NCEL_XSec_Treco_nu";
+  // this->fPlotTitles = "; T_{reco} (MeV); Events/(12 MeV)";
 
   // // Because the binning is in Treco is fairly esoteric, hardcode here
   // this->arr_treco = {40.0, 52.0, 63.9, 75.9, 87.8, 99.8, 111.8, 123.7, 135.7, 147.6, 159.6, 171.6, 183.5, 195.5,   
@@ -59,43 +59,43 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
   // if (!fakeDataFile.empty()) this->SetFakeDataValues(fakeDataFile);
 
   // // This will be the final data histogram
-  // this->mcHist = new TH1D((this->measurementName+"_MC").c_str(), (this->measurementName+this->plotTitles).c_str(), 51, this->arr_treco);
+  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->fPlotTitles).c_str(), 51, this->arr_treco);
  
-  // // Usually, the mcFine histogram is a finer binned version of mcHist. But as NCEL requires a Ttrue histogram, co-opt mcFine for this purpose. 
+  // // Usually, the fMCFine histogram is a finer binned version of fMCHist. But as NCEL requires a Ttrue histogram, co-opt fMCFine for this purpose. 
   // // Should probably change the naming to reflect the possible other use of this histogram.
-  // this->mcFine = new TH1D((this->measurementName+"_Ttrue").c_str(), (this->measurementName+this->plotTitles).c_str(), 50, 0, 900);
+  // this->fMCFine = new TH1D((this->fName+"_Ttrue").c_str(), (this->fName+this->fPlotTitles).c_str(), 50, 0, 900);
 
   // // Read in the histograms from the NEUT file that are required for normalisation
   // TFile *in = new TFile(this->inFile.c_str());
-  // this->fluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
-  // this->fluxHist->SetNameTitle((this->measurementName+"_FLUX").c_str(), (this->measurementName+";E_{#nu} (GeV)").c_str());
+  // this->fFluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
+  // this->fFluxHist->SetNameTitle((this->fName+"_FLUX").c_str(), (this->fName+";E_{#nu} (GeV)").c_str());
 
-  // this->eventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
-  // this->eventHist->SetNameTitle((this->measurementName+"_EVT").c_str(), (this->measurementName+";E_{#nu} (GeV); Event Rate").c_str());
+  // this->fEventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
+  // this->fEventHist->SetNameTitle((this->fName+"_EVT").c_str(), (this->fName+";E_{#nu} (GeV); Event Rate").c_str());
 
   // // Read in the file once only
   // tn = new TChain("neuttree", "");
   // tn->Add(Form("%s/neuttree", this->inFile.c_str()));
-  // nevents = tn->GetEntries();
+  // fNEvents = tn->GetEntries();
   // nvect = NULL;
   // tn->SetBranchAddress("vectorbranch", &nvect);
 
   // // The scale factor is quite complicated because MB didn't divide by number of targets.
   // // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
   // double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
-  // this->scaleFactor = (this->eventHist->Integral()*1E-38*14.08/(nevents+0.))*nMolMB*0.646165;
+  // this->fScaleFactor = (this->fEventHist->Integral()*1E-38*14.08/(fNEvents+0.))*nMolMB*0.646165;
 };
 
 
 void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   
   // // Clear the current histogram before repopulating
-  // this->mcHist->Reset();
-  // this->mcFine->Reset();
-  // this->currentNorm = norm;
+  // this->fMCHist->Reset();
+  // this->fMCFine->Reset();
+  // this->fCurrentNorm = norm;
 
   // // Loop over all events at each iteration of the fit
-  // for (int i = 0; i < nevents; ++i){
+  // for (int i = 0; i < fNEvents; ++i){
   //   tn->GetEntry(i);
 
   //   if (!isSignal(nvect)) continue;
@@ -122,31 +122,31 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   //   }
     
   //   // Now fill the Ttrue histogram
-  //   this->mcFine->Fill(t_true*1000., rw_weight);
+  //   this->fMCFine->Fill(t_true*1000., rw_weight);
   // }
 
   // // Now convert Ttrue to Treco...
   // for (int treco = 0; treco < 51; ++treco){
   //   double total = 0.;
-  //   for (int ttrue = 0; ttrue < 50; ++ttrue) total += mcFine->GetBinContent(ttrue+1)*this->response_mat->GetBinContent(ttrue+1, treco+1);
-  //   this->mcHist->SetBinContent(treco+1, total);
+  //   for (int ttrue = 0; ttrue < 50; ++ttrue) total += fMCFine->GetBinContent(ttrue+1)*this->response_mat->GetBinContent(ttrue+1, treco+1);
+  //   this->fMCHist->SetBinContent(treco+1, total);
   // }
 
   // // Scale
-  // this->mcHist->Scale(this->scaleFactor, "width");
-  // this->mcFine->Scale(this->scaleFactor, "width");
+  // this->fMCHist->Scale(this->fScaleFactor, "width");
+  // this->fMCFine->Scale(this->fScaleFactor, "width");
 
   // // Add in the backgrounds...
   // for (int treco = 0; treco < 51; ++treco){
-  //   double total = this->mcHist->GetBinContent(treco+1) + this->BKGD_other->GetBinContent(treco+1) + this->BKGD_irrid->GetBinContent(treco+1);
-  //   this->mcHist->SetBinContent(treco+1, total);
+  //   double total = this->fMCHist->GetBinContent(treco+1) + this->BKGD_other->GetBinContent(treco+1) + this->BKGD_irrid->GetBinContent(treco+1);
+  //   this->fMCHist->SetBinContent(treco+1, total);
   // }
 
   // // Normalisation factor if one has been provided.
   // if (norm){
-  //   this->mcHist->Scale(1.0/norm);
+  //   this->fMCHist->Scale(1.0/norm);
   // } else {
-  //   this->mcHist->Scale(0);
+  //   this->fMCHist->Scale(0);
   // }
   
   // return;
@@ -190,7 +190,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   //   // Multiply by the errors to get the covariance, rather than the correlation matrix
   //   while(stream >> entry){
   //     (*this->covar)(row, column) = entry;
-  //     if (row == column) this->dataHist->SetBinError(row+1, sqrt(entry));
+  //     if (row == column) this->fDataHist->SetBinError(row+1, sqrt(entry));
   //     column++;
   //   }    
   //   row++;
@@ -209,13 +209,13 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
 double MiniBooNE_NCEL_XSec_Treco_nu::GetChi2(){
   // double chi2 = 0;
   
-  // int nBins = this->dataHist->GetNbinsX();
+  // int nBins = this->fDataHist->GetNbinsX();
 
   // for (int i = 0; i < nBins; ++i){
   //   for (UInt_t j = 0; j < nBins; ++j){
 
-  //     double iDiff = this->dataHist->GetBinContent(i+1) - this->mcHist->GetBinContent(i+1);
-  //     double jDiff = this->dataHist->GetBinContent(j+1) - this->mcHist->GetBinContent(j+1);
+  //     double iDiff = this->fDataHist->GetBinContent(i+1) - this->fMCHist->GetBinContent(i+1);
+  //     double jDiff = this->fDataHist->GetBinContent(j+1) - this->fMCHist->GetBinContent(j+1);
   //     chi2 += iDiff*(*this->covar)(i, j)*jDiff;
   //   }
   // }
@@ -228,24 +228,24 @@ double MiniBooNE_NCEL_XSec_Treco_nu::GetChi2(){
 void MiniBooNE_NCEL_XSec_Treco_nu::SetFakeDataValues(std::string fakeDataFile) {
 
   // // This is the published data
-  // TH1D *tempData = (TH1D*)this->dataHist->Clone();
+  // TH1D *tempData = (TH1D*)this->fDataHist->Clone();
   // TFile *fake    = new TFile(fakeDataFile.c_str());
 
   // // This is the fake data
-  // this->dataHist = (TH1D*)fake->Get((this->measurementName+"_MC").c_str());
-  // this->dataHist ->SetNameTitle((this->measurementName+"_FAKE").c_str(), (this->measurementName+this->plotTitles).c_str());
+  // this->fDataHist = (TH1D*)fake->Get((this->fName+"_MC").c_str());
+  // this->fDataHist ->SetNameTitle((this->fName+"_FAKE").c_str(), (this->fName+this->fPlotTitles).c_str());
 
-  // for (int xBin = 0; xBin < this->dataHist->GetNbinsX(); ++xBin){
+  // for (int xBin = 0; xBin < this->fDataHist->GetNbinsX(); ++xBin){
 
   //   // If the fake data or real didn't didn't fill the bin, can't assign an error
-  //   if (!this->dataHist->GetBinContent(xBin+1) || !tempData->GetBinContent(xBin+1)){
-  //     this->dataHist->SetBinError(xBin+1, 0);
+  //   if (!this->fDataHist->GetBinContent(xBin+1) || !tempData->GetBinContent(xBin+1)){
+  //     this->fDataHist->SetBinError(xBin+1, 0);
   //     continue;
   //   }
 
   //   double err = tempData->GetBinError(xBin+1)*
-  //     this->dataHist->GetBinContent(xBin+1)/(tempData->GetBinContent(xBin+1)+0.);
-  //   this->dataHist->SetBinError(xBin+1, err);
+  //     this->fDataHist->GetBinContent(xBin+1)/(tempData->GetBinContent(xBin+1)+0.);
+  //   this->fDataHist->SetBinError(xBin+1, err);
   // }
 
   // delete tempData;
@@ -262,14 +262,14 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
 
   // if(input.is_open()) std::cout << "Reading data from file: " << inputFile << std::endl;
   
-  // this->dataHist   = new TH1D((this->measurementName+"_data").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, this->arr_treco);
-  // this->BKGD_other = new TH1D((this->measurementName+"_BKGD_other").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, arr_treco);
-  // this->BKGD_irrid = new TH1D((this->measurementName+"_BKGD_irrid").c_str(), (this->measurementName+this->plotTitles).c_str(), 
+  // this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, arr_treco);
   // // To get the nDOF correct...
-  // this->data_points= 52;
+  // this->fNDataPointsX= 52;
 
   // double entry = 0;
   // int xBin     = 0;
@@ -279,7 +279,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // std::istringstream stream1(line);
   
   // while(stream1 >> entry){
-  //   this->dataHist->SetBinContent(xBin+1, entry);
+  //   this->fDataHist->SetBinContent(xBin+1, entry);
   //   xBin++;
   // }
  
@@ -313,7 +313,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
   // std::ifstream response(responseFile.c_str(),ifstream::in);
   
   // // Response matrix: x axis is Ttrue, y axis is Treco
-  // this->response_mat = new TH2D((this->measurementName+"_RESPONSE_MATRIX").c_str(), (this->measurementName+this->plotTitles).c_str(),
+  // this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->fPlotTitles).c_str(),
   // 				50, 0, 900, 51, this->arr_treco);
 
   // if(response.is_open()) std::cout << "Reading in the response matrix from file: " << responseFile << std::endl;

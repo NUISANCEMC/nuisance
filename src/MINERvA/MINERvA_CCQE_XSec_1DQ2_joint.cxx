@@ -24,24 +24,24 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
 //********************************************************************  
 
   // Setup The Measurement
-  measurementName = name;
+  fName = name;
   nBins = 16;
-  plotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   isFluxFix      = name.find("_newflux") != std::string::npos;
   fullphasespace = name.find("_20deg")   == std::string::npos;
-  isRatio = false;
-  isSummed = false;
-  saveSubMeas = true;
+  fIsRatio = false;
+  fIsSummed = false;
+  fSaveSubMeas = true;
   SetupMeasurement(inputfiles, type, rw, fakeDataFile);
 
   // Get parsed input files
-  if (subInFiles.size() != 2) ERR(FTL) << "MINERvA Joint requires input files in format: antinu;nu"<<std::endl;
-  std::string inFileAntineutrino = subInFiles.at(0);
-  std::string inFileNeutrino     = subInFiles.at(1);
+  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA Joint requires input files in format: antinu;nu"<<std::endl;
+  std::string inFileAntineutrino = fSubInFiles.at(0);
+  std::string inFileNeutrino     = fSubInFiles.at(1);
     
   // Push classes back into list for processing loop
-  subChain.push_back(MIN_anu);
-  subChain.push_back(MIN_nu);
+  fSubChain.push_back(MIN_anu);
+  fSubChain.push_back(MIN_nu);
 
   // Setup the Data input                          
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCQE/";
@@ -54,14 +54,14 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   if (fullphasespace){
 
     if (isFluxFix){
-      if (isShape) isShape = false;
+      if (fIsShape) fIsShape = false;
       datafilename  = "Q2QE_joint_data_fluxfix.txt";
       covarfilename = "Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_newflux";
       antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_newflux";
       
     } else {
-      if (isShape){
+      if (fIsShape){
         datafilename  = "Q2QE_joint_dataa_SHAPE-extracted.txt";
         covarfilename = "Q2QE_joint_covara_SHAPE-extracted.txt";
       } else {
@@ -76,14 +76,14 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   } else {
 
     if (isFluxFix){
-      if (isShape) isShape = false;
+      if (fIsShape) fIsShape = false;
       datafilename  = "20deg_Q2QE_joint_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux";
       antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_20deg_newflux";
 
     } else {
-      if (isShape){
+      if (fIsShape){
         datafilename  = "20deg_Q2QE_joint_dataa_SHAPE-extracted.txt";
         covarfilename = "20deg_Q2QE_joint_covara_SHAPE-extracted.txt";
       } else {
@@ -104,12 +104,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   MIN_nu  = new MINERvA_CCQE_XSec_1DQ2_nu    (neutrinoclass,     inFileNeutrino,     rw, type, fakeDataFile);
  
   // Add to chain for processing
-  this->subChain.clear();
-  this->subChain.push_back(MIN_anu);
-  this->subChain.push_back(MIN_nu);
+  this->fSubChain.clear();
+  this->fSubChain.push_back(MIN_anu);
+  this->fSubChain.push_back(MIN_nu);
 
-  this->fluxHist = GetCombinedFlux();
-  this->eventHist = GetCombinedEventRate();
+  this->fFluxHist = GetCombinedFlux();
+  this->fEventHist = GetCombinedEventRate();
 
   // Setup Default MC Hists
   SetupDefaultHist();
@@ -122,7 +122,7 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
 //********************************************************************  
 
   UInt_t sample = 0;
-  for (std::vector<MeasurementBase*>::const_iterator expIter = subChain.begin(); expIter != subChain.end(); expIter++){
+  for (std::vector<MeasurementBase*>::const_iterator expIter = fSubChain.begin(); expIter != fSubChain.end(); expIter++){
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
     
     if (sample == 0){
@@ -130,15 +130,15 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
       MIN_anu = static_cast<MINERvA_CCQE_XSec_1DQ2_antinu*>(exp);
       TH1D* MIN_anu_mc = (TH1D*) MIN_anu->GetMCList().at(0);
       for (int i = 0; i < 8; i++){
-	mcHist->SetBinContent(i+1, MIN_anu_mc->GetBinContent(i+1));
-	mcHist->SetBinError(i+1, MIN_anu_mc->GetBinError(i+1));
+	fMCHist->SetBinContent(i+1, MIN_anu_mc->GetBinContent(i+1));
+	fMCHist->SetBinError(i+1, MIN_anu_mc->GetBinError(i+1));
       }
     } else if (sample == 1){
 
       MIN_nu = static_cast<MINERvA_CCQE_XSec_1DQ2_nu*>(exp);
       TH1D* MIN_nu_mc = (TH1D*) MIN_nu->GetMCList().at(0);
       for (int i = 0; i < 8; i++){
-	mcHist->SetBinContent(i+1+8, MIN_nu_mc->GetBinContent(i+1));
+	fMCHist->SetBinContent(i+1+8, MIN_nu_mc->GetBinContent(i+1));
       }
 
     } else break;

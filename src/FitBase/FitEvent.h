@@ -17,8 +17,13 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef FITEVENT_H_SEEN
-#define FITEVENT_H_SEEN
+#ifndef FITEVENT2_H_SEEN
+#define FITEVENT2_H_SEEN
+/*!            
+ *  \addtogroup FitBase     
+ *  @{         
+ */
+
 
 #include "TLorentzVector.h"
 #include "FitParticle.h"
@@ -42,40 +47,30 @@ using namespace genie;
 #include "TArrayD.h"
 #include "BaseFitEvt.h"
 #include "GeneratorUtils.h"
-
-/*!
- *  \addtogroup FitBase
- *  @{
- */
-
-/*! FitEvent Class
-  Used to convert NEUT/NuWro/GENIE events into a common format that can be read by the fitter.
- */
+#include "FitLogger.h"
 
 //! Converts NEUT/NuWro/GENIE events to a comman format straight from the tree
 class FitEvent : public BaseFitEvt {
-
  public:
 
-  //! Default Consstructors. Everything is set to NULL
-  FitEvent(){
+  // Config Options for this class
+  static const bool kRemoveFSIParticles   = true;
+  static const bool kRemoveUndefParticles = true;
+  
+  FitEvent(){}; 
+  ~FitEvent(){};
 
-  };
+  //! Run event convertor, calls relevent event generator kinematic functions.
+  void CalcKinematics (void);
 
-  //! Default destructor
-  ~FitEvent(){
-  };
+  //! Reset the event variables
+  void ResetEvent (void);
 
-  // Generator specific functions
-  // Each event type needs a way to set the event address from the tree
-  // Then Neut Kinematics sets up the overall information for the event (Mode, NParticles)
 
-  /*
-    NEUT
-  */
 
+  
+  /* Event Convertors */
 #ifdef __NEUT_ENABLED__
-
   //! Constructor assigns event address to NeutVect memory.
   FitEvent(NeutVect* event){ this->SetEventAddress(&event); };
 
@@ -83,16 +78,10 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NeutVect** tempevent);
 
   //! Convert NeutVect to common format
-  void NeutKinematics();
+  void NeutKinematics(void);
 #endif
 
-
-  /*
-    NUWRO
-  */
-
 #ifdef __NUWRO_ENABLED__
-
   //! Constructor assigns event address to NuWro event class memory.
   FitEvent(event* tempEvent){ this->SetEventAddress(&tempEvent); };
 
@@ -100,17 +89,10 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(event** tempevent);
 
   //! Convert NuWro event class to common format
-  void NuwroKinematics();
-
+  void NuwroKinematics(void);
 #endif
 
-
-  /*
-    GENIE
-  */
-
 #ifdef __GENIE_ENABLED__
-
   //! Constructor assigns event address to GENIE event class memory.
   FitEvent(NtpMCEventRecord* tempevent){this->SetEventAddress(&tempevent);};
 
@@ -119,109 +101,88 @@ class FitEvent : public BaseFitEvt {
   void SetEventAddress(NtpMCEventRecord** tempevent);
 
   //! Convert GENIE event class to common format
-  void GENIEKinematics();
+  void GENIEKinematics(void);
+
+  //! Flag to remove nuclear components in GENIE
+  static const bool kRemoveGenieNuclear = true;
 #endif
 
 #ifdef __GiBUU_ENABLED__
-
+  //! Constructor assisgns event address to a GiBUU reader
   void SetEventAddress(GiBUUStdHepReader* tempevent);
 
   //! Convert GiBUUStdHep event class to common format
-  void GiBUUKinematics();
+  void GiBUUKinematics(void);
+
+  //! Flag to remove nuclear components in GiBUU
+  static const bool kRemoveGiBUUNuclear = true;
 #endif
 
-
 #ifdef __NUANCE_ENABLED__
+  //! Constructor assigns event address to a Nuance reader
   void SetEventAddress(NuanceEvent** tempevent);
 
   //! Convert Nuance event class to common format
-  void NuanceKinematics();
+  void NuanceKinematics(void);
 #endif
-  /*
-    GENERAL Fit Event Functions
-  */
-
-  //! Run event convertor, calls relevent event generator kinematic functions.
-  void CalcKinematics();
-
-  //! Reset the event to NULL
-  void ResetEvent();
-
-  // Access Functions
+  
+  /* Standard Event Functions */
+  
   //! Return Any FitParticle from event
   FitParticle* PartInfo(UInt_t i);
-
-  //! Return total particle number
-  UInt_t Npart(){return this->fNParticles;};
-
-  //! Return final state particle count.
-  UInt_t NFinalpart(){return this->fNFinalParticles;};
-
-  // Header Variables
-  // protected: // To Make things easier everything is accessible. Not a great standard.
-  UInt_t fEventNo; //!< Event No in MC
-
-  UInt_t fNParticles; //!< Total Number of Particles
-  UInt_t fNFSIParticles; //!< Total Number of Particles involved in FSI
-  UInt_t fNIncomingParticles; //!< Total Number of Starting particles
-  UInt_t fNFinalParticles; //!< Total Number of Final Particles
-  UInt_t fCurrPartIndex; //!< Current index of particle in iteration
-
-  FitParticle* fit_particle; //!< Pointer to the currently created fit_particle
-  std::vector<FitParticle> all_particles; //!< vector of all fit particles
-
-  Double_t TotCrs; //!< Total Cross-section (Gives per event in NEUT, Total Integrated in NuWro)
-  Double_t PFSurf; //!< Fermi Surface Momentum
-  Double_t PFMax;  //!< Max Fermi Momentum
-  UInt_t   TargetA; //!< Target Atomic Number
-  UInt_t   TargetZ; //!< Target Nucleus Charge
-  UInt_t   TargetH; //!< Target Free Protons
-  UInt_t   Ibound;  //!< Is target bound
-
-  UInt_t Nparticles; //!< Number of particles
-  UInt_t Nprimary; //!< Number of primary particles
-
-  Double_t weight; //!< event weight
-  Double_t FlightDistance; //!< flight distance of neutrino, used for oscillation analysis
+  inline UInt_t Npart(void) const { return NPart(); };
+  inline UInt_t NPart(void) const { return fNParticles; };
   
-  // ACCESS FUNCTIONS
-  double Enu(){ return this->PartInfo(0)->fP.E(); };
-  double Tnu(){ return this->PartInfo(0)->fP.E(); };
-  double Pnu(){ return this->PartInfo(0)->fP.E(); };
-  int PDGnu(){  return this->PartInfo(0)->fPID; };
+  int    Mode; // Public access needed 
 
-  int Ilep(){
-    for (UInt_t i = 2; i < this->Npart(); i++){
-      if (this->PartInfo(i)->fPID == this->PDGnu() - int(this->Mode < 30))
-	return i;
-    }
-    return 0;
-  };
+  inline int GetBeamPartPos (void) const { return 0; };
+  int GetNeutrinoInPos      (void) const;
+  int GetLeptonOutPos       (void) const;
 
-  double q0(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).E(); };
-  double q3(){ return (this->PartInfo(0)->fP - this->PartInfo(this->Ilep())->fP).Vect().Mag(); };
+  FitParticle* GetBeamPart   (void);
+  FitParticle* GetNeutrinoIn (void);
+  FitParticle* GetLeptonOut  (void);
+  
+  inline int GetMode (void) { return fMode; };
+  inline double Enu  (void) { return PartInfo(0)->fP.E(); };
+  inline int PDGnu   (void) { return PartInfo(0)->fPID; };
 
-  /* double Elep(); */
-  /* double Tlep(); */
-  /* double Plep(); */
-  /* double PDGlep(); */
+  inline int GetTargetA (void) { return fTargetA; };
+  inline int GetTargetZ (void) { return fTargetZ; };
+  inline int GetTotCrs  (void) { return fTotCrs;  };
+  
+  double weight; // need for silly reason
+ 
+  /* Read/Write FitEvent Functions */
+  void SetBranchAddress(TChain* tn); 
+  void AddBranchesToTree(TTree* tn);
+  
+ private:
 
-  /* double Coslep(); */
-  /* double Thetalep(); */
+  // Event Information
+  int    fMode;
+  UInt_t fEventNo;
+  double fTotCrs;
+  int    fTargetA;
+  int    fTargetZ;
+  int    fTargetH;
+  bool   fBound;
+  int    fDistance;
 
-  /* int Npions(); */
-  /* int Npiplus(); */
+  // Reduced Particle Stack
+  const static UInt_t  kMaxParticles = 200;
+  int     fNParticles;
+  //  double  fParticlePos[kMaxParticles][4]; // not needed at the moment
+  double  fParticleMom[kMaxParticles][4];
+  UInt_t  fParticleState[kMaxParticles];
+  int     fParticlePDG[kMaxParticles];
+
+  // Current read particle
+  int         fCurParticleIndex;
+  FitParticle fCurParticle;
+
+  
 };
-
-
-
-
-
-
-
-
-
-
 
 /*! @} */
 #endif

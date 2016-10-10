@@ -4,11 +4,11 @@
 // The constructor
 T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  measurementName = "T2K_CC1pip_CH_XSec_1Dq3_nu";
-  plotTitles = "; q_{3} (GeV/c); d#sigma/dq_{3} (cm^{2}/(GeV/c)/nucleon)";
+  fName = "T2K_CC1pip_CH_XSec_1Dq3_nu";
+  fPlotTitles = "; q_{3} (GeV/c); d#sigma/dq_{3} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
-  isDiag = false;
+  fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q3.root");
@@ -16,13 +16,13 @@ T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, Fi
 
   this->SetupDefaultHist();
 
-  this->scaleFactor = (this->eventHist->Integral("width")*1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
+  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
@@ -41,16 +41,16 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
   }
 */
 
-  dataHist = new TH1D((measurementName+"_data").c_str(), (measurementName+"_data"+plotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
+  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataCopy->GetNbinsX()-2, binEdges);
 
-  for (int i = 0; i < dataHist->GetNbinsX(); i++) {
-    dataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+2)*1E-38);
-    dataHist->SetBinError(i+1, dataCopy->GetBinError(i+2)*1E-38);
-    std::cout << dataHist->GetBinLowEdge(i+1) << " " << dataHist->GetBinContent(i+1) << " " << dataHist->GetBinError(i+1) << std::endl;
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+2)*1E-38);
+    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+2)*1E-38);
+    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
+  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
+  fDataHist->SetNameTitle((fName+"_data").c_str(), (fName+"_MC"+fPlotTitles).c_str());
 
 
   dataFile->Close();
@@ -70,14 +70,14 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetCovarMatrix(std::string fileLocation) {
   if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-2);
-  this->fullcovar = new TMatrixDSym(nBinsX-2);
+  this->fFullCovar = new TMatrixDSym(nBinsX-2);
 
   // First two entries are BS
   // Last entry is BS
   for (int i = 2; i < nBinsX-1; i++) {
     for (int j = 2; j < nBinsY-1; j++) {
       (*this->covar)(i-2, j-2) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
-      (*this->fullcovar)(i-2, j-2) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
+      (*this->fFullCovar)(i-2, j-2) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
       std::cout << "covar(" << i-2 << ", " << j-2 << ") = " << (*this->covar)(i-2,j-2) << std::endl;
     }
   } //should now have set covariance, I hope
@@ -109,7 +109,7 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::FillEventVariables(FitEvent *event) {
 
   double q3 = FitUtils::q3_CC1pip_T2K(Pnu, Pmu, Ppip);
 
-  this->X_VAR = q3;
+  fXVar = q3;
 
   return;
 };

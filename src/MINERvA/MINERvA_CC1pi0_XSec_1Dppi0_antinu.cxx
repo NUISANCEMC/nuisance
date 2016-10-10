@@ -5,37 +5,39 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
 
   EnuMin = 1.5;
   EnuMax = 10;
+  fAllowedTypes += "NEW";
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if (type.find("NEW") != std::string::npos) {
     // NEW measurement is actually Tpi, not ppi
-    measurementName = "MINERvA_CC1pi0_XSec_1DTpi_nubar_2016";
-    plotTitles = "; T_{#pi} (GeV); d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)";
+    fName = "MINERvA_CC1pi0_XSec_1DTpi_nubar_2016";
+    fPlotTitles = "; T_{#pi} (GeV); d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)";
     isNew = true;
     hadMassCut = 1800;
-    isDiag = false;
+    fIsDiag = false;
 
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_tpi.txt");
 
     // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-    double binOneWidth = dataHist->GetBinWidth(1);
-    for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-      double binNWidth = dataHist->GetBinWidth(i+1);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1E-40);
-      dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*dataHist->GetBinError(i+1)/100.);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
-      dataHist->SetBinError(i+1, dataHist->GetBinError(i+1)*binOneWidth/binNWidth);
+    double binOneWidth = fDataHist->GetBinWidth(1);
+    for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+      double binNWidth = fDataHist->GetBinWidth(i+1);
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1E-40);
+      fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
+      fDataHist->SetBinError(i+1, fDataHist->GetBinError(i+1)*binOneWidth/binNWidth);
     }
 
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_tpi_corr.txt", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016_upd/cc1pi0_tpi_corr.txt", fDataHist->GetNbinsX());
 
   } else {
-    measurementName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
-    plotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
+    fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
+    fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
     // Although the covariance is given for MINERvA CC1pi0 nubar from 2015, it doesn't Cholesky decompose, hinting at something bad
     // I've tried adding small numbers to the diagonal but it still didn't work and the chi2s are crazy
-    isDiag = true;
-    normError = 0.15;
+    fIsDiag = true;
+    fNormError = 0.15;
     // No hadronic mass cut on old publication
     hadMassCut = 99999;
 
@@ -43,18 +45,18 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
 
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
     // Please change when MINERvA releases new data!
-    for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1.11);
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
     }
 
-    fullcovar = StatUtils::MakeDiagonalCovarMatrix(dataHist);
-    covar     = StatUtils::GetInvert(fullcovar);
+    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+    covar     = StatUtils::GetInvert(fFullCovar);
 
   }
 
   this->SetupDefaultHist();
 
-  this->scaleFactor = this->eventHist->Integral("width")*double(1E-38)/double(nevents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {
@@ -87,7 +89,7 @@ void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {
     }
   }
 
-  this->X_VAR = ppi0;
+  fXVar = ppi0;
 
   return;
 };

@@ -40,10 +40,10 @@ public:
 
  private:
 
-  double q2qe; ///< X_VAR
+  double q2qe; ///< fXVar
   bool applyQ2correction; ///< Deuterium-Nucleon Correction Flag
   TH1D* CorrectionHist; ///< Deuterium-Nucleon Correction plot
-  TH1D* mcHist_NoCorr; ///< Q2 mcHist without Deut correction
+  TH1D* fMCHist_NoCorr; ///< Q2 fMCHist without Deut correction
   double scaleF; ///< data/mc scaling value
   TH2D* EnuVsQ2;
 
