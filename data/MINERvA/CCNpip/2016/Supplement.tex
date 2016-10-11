@@ -1,0 +1,1251 @@
+\documentclass[aps, prd, reprint,showpacs,  preprintnumbers,amsmath,amssymb,superscriptaddress, nofootinbib]{revtex4-1}
+%%  \RequirePackage{lineno} 
+%%  \documentclass[aps,prl,preprint,showpacs,superscriptaddress,nofootinbib,floatfix,linenumbers]{revtex4-1}
+\usepackage{amssymb, amsmath, braket, nicefrac, graphicx} 
+%\usepackage[tight]{subfigure}
+\usepackage{relsize}
+\usepackage{lineno}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{multicol}
+\setlength{\columnsep}{20pt}
+
+\usepackage{setspace}
+%\doublespacing
+
+\widowpenalty=500
+\clubpenalty=500
+
+\usepackage{ esint }
+\usepackage{chngpage}
+%\usepackage{feynmf}%%%{feynmp}
+\usepackage{epsfig}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{appendix}
+\usepackage{ amstext }
+\usepackage{ gensymb }
+\usepackage{ textcomp }
+\usepackage{ wasysym }
+\usepackage{pstricks}
+
+\usepackage[caption=false,labelformat=parens]{subfig}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+\usepackage{units}
+%\nofiles
+%\input{authors_inputs_new}
+\newcommand{\flux}{\ensuremath{\Phi^{\nu(\bar{\nu})}(E)}}
+\newcommand{\ncc}{\ensuremath{N_\mathrm{CC}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\gcc}{\ensuremath{\Gamma_\mathrm{CC}^{\nu(\bar{\nu})}(E)}}
+%\newcommand{\acc}{\ensuremath{Acc{}_{MC}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\acc}{\ensuremath{A_\mathrm{CC}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\bcc}{\ensuremath{B_\mathrm{CC}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\fsam}{\ensuremath{F^{\nu(\bar{\nu})}(E)}}
+\newcommand{\aflux}{\ensuremath{A_{\Phi}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\bflux}{\ensuremath{B_{\Phi}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\nucor}{\ensuremath{S^{\nu(\bar{\nu})}(E)}}
+\newcommand{\hecor}{\ensuremath{H^{\nu}}}
+\newcommand{\xsec}{\ensuremath{\sigma_{CC}^{\nu(\bar{\nu})}(E)}}
+\newcommand{\nub}{\ensuremath{\overline{\nu}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\etapi}{\mbox{$\eta_{\small{\pi}}$}}
+\newcommand{\enu}{\mbox{$E_\nu$}}
+\newcommand{\anutau}{\ensuremath{\overline{\nu}_\tau } }                 % nu_tau 
+\newcommand{\uppar}[1]{\ensuremath{\overset{    \text{\relsize{-1}(}\raisebox{-1.5pt}{\textendash}\text{\relsize{-1})}  }{#1}  }}
+\newcommand{\upparr}[1]{\ensuremath{\overset{  \raisebox{-1.0pt}{  \text{\relsize{-1}(}\raisebox{-1.5pt}{\textendash}\text{\relsize{-1})} }  }{#1}  }}
+   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\neut}{\mbox{$\nu$}}                                     % nu
+\newcommand{\numu}{\mbox{$\nu_{\mu}$}}                   % nu_mu 
+\newcommand{\nue}{\mbox{$\nu_{e}$}}                      % nu_e
+\newcommand{\nus}{\mbox{$\nu_{s}$}}                      % nu_s 
+\newcommand{\nutau}{\mbox{$\nu_{\tau}$}}                 % nu_tau 
+
+
+\newcommand{\CCne}{\mbox{CC-$\nu_{e}$}}                              %CC-ne
+\newcommand{\CCnm}{\mbox{CC-$\nu_{\mu}$}}                            %CC-nm
+
+\newcommand{\anu}{\ensuremath{\bar{\nu}}}
+
+
+\newcommand{\anue}{\mbox{$\overline{\nu}_{e}$}}                      % anu_e
+
+\newcommand{\anumu}{\ensuremath{\bar{\nu}_{\mu}}}
+
+\newcommand{\pn}{\mbox{$\pi$}}            % pion
+\newcommand{\pip}{\mbox{$\pi^{+}$}}       % pi plus
+\newcommand{\pim}{\mbox{$\pi^{-}$}}       % pi minus
+\newcommand{\piz}{\mbox{$\pi^{0}$}} % pi zero
+\newcommand{\spip}{\mbox{$\scriptscriptstyle\pi^{+}$}}   % pi plus small
+\newcommand{\spim}{\mbox{$\scriptscriptstyle\pi^{-}$}}   % pi minus small
+\newcommand{\m}{$\mu$}              % muon
+\newcommand{\mup}{\mbox{$\mu^{+}$}}               % mu plus
+\newcommand{\mum}{\mbox{$\mu^{-}$}}               % mu minus
+\newcommand{\del}{\delta} % delta
+\newcommand{\g}{\mbox{$\gamma$}}    % gamma
+\newcommand{\simgt}{\,\hbox{\lower0.6ex\hbox{$\sim$}\llap{\raise0.6ex\hbox{$>$}}}\,}
+\newcommand{\simlt}{\,\hbox{\lower0.6ex\hbox{$\sim$}\llap{\raise0.6ex\hbox{$<$}}}\,}
+
+\newcommand{\gibuu}{GiBUU~}
+\newcommand{\minerva}{MINERvA~}
+\newcommand{\minos}{MINOS~}
+\newcommand{\miniboone}{MiniBooNE~}
+\newcommand{\nova}{NOvA~}
+\newcommand{\numi}{NuMI~}
+\newcommand{\numubar}{\ensuremath{\bar{\nu}_{\mu}}~}
+\newcommand{\dsdq}{\ensuremath{d\sigma/dQ^2}~}
+\newcommand{\cconepiplus}{CC1\ensuremath{\pi^{+}}~}
+\newcommand{\cconepi}{CC1\ensuremath{\pi^{\pm}}~}
+\newcommand{\ccpi}{CCN\ensuremath{\pi^{\pm}}~}
+\newcommand{\Tpi}{\ensuremath{T_{\pi}}~}
+\newcommand{\thetapi}{\ensuremath{\theta_{\nu\pi}}~}
+
+\newcommand{\footnoteremember}[2]{\footnote{#2}\newcounter{#1}\setcounter{#1}{\value{footnote}}}
+\newcommand{\footnoterecall}[1]{\footnotemark[\value{#1}]}
+
+\definecolor{maroon}{RGB}{162,10,10}
+
+\usepackage{hyperref}
+\usepackage[all]{hypcap}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\makeatletter
+\renewenvironment{table}
+  {\def\@captype{table}}
+  {}
+
+\renewenvironment{figure}
+  {\def\@captype{figure}}
+  {}
+\makeatother
+%\linenumbers
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+   
+% Set the beginning of a LaTeX document
+\begin{document}
+%\linenumbers
+%\pagewiselinenumbers
+
+
+
+\title{SUPPLEMENTAL MATERIALS\\ {\it Cross sections for $\numu$ and $\anumu$ induced pion production on hydrocarbon\\ 
+in the few-GeV region using \minerva}}    
+
+\smallskip
+\vspace{10pt}   
+
+\begin{abstract}
+\end{abstract}
+
+%\date{\today}
+
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%
+This Supplement provides data tables that may facilitate phenomenological investigations.
+
+%\vspace{1cm}
+%\begin{itemize}
+%\item  
+\smallskip
+\noindent
+{\it Cross-section measurements:}  The data points are given in Tables~\ref{tb:pipEnu}\,-\,\ref{tb:pip_theta} 
+for the $\numu$-CC($\pi^{+}$) sample, and in
+Tables \ref{tb:pi0Enu}\,-\,\ref{tb:pi0_theta}
+for the $\anumu$-CC($\pi^{0}$) sample.     
+
+%\smallskip
+%\item
+\smallskip
+\noindent
+{\it Systematic error estimates}:  Summaries are given in Tables~\ref{tb:pip_Enu_err}\,-\,\ref{tb:pip_theta_err}
+for the $\numu$-CC($\pi^{+}$) sample, and in Tables \ref{tb:pi0_Enu_err}\,-\,\ref{tb:pi0_theta_err}
+for the $\anumu$-CC($\pi^{0}$) sample.
+
+%\smallskip
+%\item
+\smallskip
+\noindent
+{\it Fluxes for the $\numu$ and $\anumu$ exposures}:  Table~\ref{flux-table} gives the flux spectra used in this work.
+
+
+%\item
+\smallskip
+\noindent
+{\it Correlation matrices}: Correlations within the cross-section measurements of the $\numu$-CC($\pi^{+}$) and
+the $\anumu$-CC($\pi^{0}$) channels are presented in 
+Tables \ref{tb:pip_Enu_cov} through \ref{tb:pip_theta_cov}, and in \ref{tb:pi0_Enu_cov} through \ref{tb:pi0_theta_cov}, respectively.
+
+%\end{itemize}
+\section{Cross-Section Tables}
+
+
+%%%%%%%%%%%%%% from carrie 16feb %%%%%%%%%%%%%
+\subsection{Cross sections of the $\numu$-CC($\pi^{+}$) channel}
+%\vspace{1cm}
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$E_{\nu}$ (GeV) &~~~ $\sigma (E_\nu)$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.0 -  1.5 &   0.00 &    0 &    0 &    0 \\
+ 1.5 -  2.0 &  42.06 &   30 &   37 &   47 \\
+ 2.0 -  3.0 &  59.16 &    5 &   16 &   17 \\
+ 3.0 -  3.5 &  70.60 &    4 &   14 &   15 \\
+ 3.5 -  4.0 &  77.91 &    4 &   13 &   14 \\
+ 4.0 -  5.0 &  73.93 &    4 &   15 &   16 \\
+ 5.0 -  6.0 &  68.00 &    6 &   13 &   15 \\
+ 6.0 -  8.0 &  77.84 &    5 &   13 &   14 \\
+ 8.0 - 10.0 &  75.33 &    7 &   15 &   17 \\
+\hline\hline
+\end{tabular}
+\caption{ Total cross section in neutrino energy $E_\nu$, $\sigma (E_\nu)(10^{-40}\text{cm}^2/\text{nucleon})$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pipEnu}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\vspace{1cm}
+\vskip 10pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$p_{\mu}$ (GeV/c) &~~~ $d\sigma/dp_{\mu}$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.0 -  1.0 &   7.61 &  100 &   21 &  103 \\
+ 1.0 -  2.0 &  18.00 &    6 &   18 &   19 \\
+ 2.0 -  2.5 &  21.30 &    5 &   14 &   14 \\
+ 2.5 -  3.0 &  19.48 &    4 &   12 &   13 \\
+ 3.0 -  3.5 &  12.01 &    5 &   12 &   13 \\
+ 3.5 -  4.0 &   6.70 &    6 &   14 &   15 \\
+ 4.0 -  5.0 &   3.22 &    6 &   12 &   13 \\
+ 5.0 -  7.0 &   1.91 &    5 &   12 &   13 \\
+ 7.0 - 10.0 &   0.73 &    7 &   17 &   19 \\
+\hline\hline
+
+\end{tabular}
+\caption{ Flux-averaged differential cross section in muon momentum 
+$p_\mu$, $d\sigma/dp_{\mu}(10^{-40}\text{cm}^2/\text{nucleon}/(\text{GeV/c}))$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pipmup}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\vspace{1cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$\theta_{\mu}$ (degree) &~~~ $d\sigma/d\theta_{\mu}$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0 -  2 &   0.51 &    9 &   11 &   14 \\
+ 2 -  4 &   1.39 &    5 &   10 &   12 \\
+ 4 -  6 &   2.25 &    5 &   10 &   11 \\
+ 6 -  8 &   2.62 &    4 &   11 &   11 \\
+ 8 - 10 &   2.83 &    5 &   11 &   12 \\
+10 - 12 &   2.64 &    5 &   12 &   13 \\
+12 - 16 &   2.18 &    5 &   12 &   13 \\
+16 - 20 &   2.06 &    7 &   13 &   15 \\
+20 - 25 &   1.67 &   13 &   17 &   22 \\
+\hline\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in muon angle 
+$\theta_\mu$, $d\sigma/d\theta_{\mu}(10^{-40}\text{cm}^2/\text{nucleon}/\text{degree})$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pipmuth}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vskip 10pt
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$Q^2$ $\text{(GeV/c)}^2$ &~~~ $d\sigma/dQ^2$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.00 -  0.10 &  58.31 &    4 &   10 &   11 \\
+ 0.10 -  0.25 &  65.02 &    4 &   11 &   11 \\
+ 0.25 -  0.40 &  52.07 &    4 &   11 &   12 \\
+ 0.40 -  0.60 &  45.56 &    5 &   12 &   13 \\
+ 0.60 -  0.85 &  37.89 &    5 &   14 &   15 \\
+ 0.85 -  1.15 &  26.50 &    6 &   16 &   17 \\
+ 1.15 -  1.55 &  15.94 &    8 &   20 &   21 \\
+ 1.55 -  2.00 &  11.12 &   11 &   23 &   25 \\
+\hline\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $Q^2$, 
+$d\sigma/dQ^2 (10^{-40}\text{cm}^2/\text{nucleon}/(\text{GeV/c})^2)$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pipQ2}
+\end{table}
+
+\vskip 10pt
+%\vspace{1cm}
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$T_\pi$ $\text{(MeV)}$ &~~~ $d\sigma/dT_\pi$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+35 - 55 &   0.25 &   13 &   19 &   22 \\
+55 - 75 &   0.24 &    7 &   16 &   17 \\
+75 - 100 &   0.22 &    5 &   14 &   15 \\
+100 - 125 &   0.20 &    5 &   11 &   12 \\
+125 - 150 &   0.18 &    5 &   11 &   12 \\
+150 - 200 &   0.14 &    4 &   12 &   12 \\
+200 - 350 &   0.09 &    4 &   14 &   15 \\
+\hline\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $T_\pi$, 
+$d\sigma/dT_{\pi} (10^{-40}\text{cm}^2/\text{nucleon}/\text{MeV})$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pip_kinetic}
+\end{table}
+
+\vspace{1cm}
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$\theta_\pi$ $\text{(degree)}$ &~~~ $d\sigma/\theta_\pi$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0 - 15 &   0.50 &    6 &   16 &   17 \\
+15 - 22 &   0.96 &    6 &   14 &   16 \\
+22 - 29 &   0.99 &    5 &   14 &   15 \\
+29 - 36 &   1.11 &    5 &   14 &   15 \\
+36 - 43 &   0.97 &    5 &   13 &   14 \\
+43 - 50 &   0.76 &    6 &   13 &   15 \\
+50 - 57 &   0.67 &    6 &   14 &   15 \\
+57 - 72 &   0.55 &    7 &   13 &   15 \\
+72 - 108 &   0.34 &    5 &   12 &   13 \\
+108 - 130 &   0.18 &    9 &   12 &   14 \\
+130 - 140 &   0.14 &    8 &   11 &   14 \\
+140 - 150 &   0.12 &    8 &   12 &   14 \\
+150 - 165 &   0.07 &   11 &   11 &   15 \\
+165 - 180 &   0.03 &   14 &   14 &   20 \\
+\hline\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $\theta_\pi$, 
+$d\sigma/d\theta_{\pi} (10^{-40}\text{cm}^2/\text{nucleon}/\text{degree})$, 
+for N$\pi^+$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pip_theta}
+\end{table}
+
+\subsection{Cross sections of the $\anumu$-CC($\pi^{0}$) channel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$E_{\nu}$ (GeV) &~~~ $\sigma (E_\nu)$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.0 -  1.5 &   0.00 & 0 & 0 & 0 \\ 
+ 1.5 -  2.0 &   1.98 & 103 & 24 & 106 \\ 
+ 2.0 -  3.0 &   9.62 & 12 & 16 & 20 \\ 
+ 3.0 -  3.5 &  10.67 & 10 & 15 & 18 \\ 
+ 3.5 -  4.0 &  11.13 & 10 & 15 & 19 \\ 
+ 4.0 -  5.0 &  12.81 & 12 & 18 & 21 \\ 
+ 5.0 -  6.0 &  17.72 & 17 & 16 & 23 \\ 
+ 6.0 -  8.0 &  18.54 & 18 & 15 & 24 \\ 
+ 8.0 - 10.0 &  22.85 & 22 & 16 & 28 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{ Total cross section in neutrino energy $E_\nu$, $\sigma (E_\nu)(10^{-40}\text{cm}^2/\text{nucleon})$, 
+for 1$\pi^0$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pi0Enu}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$p_{\mu}$ (GeV/c) &~~~ $d\sigma/dp_{\mu}$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.0 -  1.0 &  0.31  & 104 & 23 & 107 \\ 
+ 1.0 -  2.0 &  2.56  & 20 & 19 & 28 \\ 
+ 2.0 -  2.6 &  4.41  & 11 & 14 & 18 \\ 
+ 2.6 -  3.3 &  2.70  & 11 & 14 & 18 \\ 
+ 3.3 -  4.0 &  1.59  & 13 & 13 & 19 \\ 
+ 4.0 -  5.0 &  0.90  & 15 & 13 & 20 \\ 
+ 5.0 -  6.0 &  0.42  & 22 & 13 & 26 \\ 
+ 6.0 -  8.0 &  0.25  & 22 & 14 & 26 \\ 
+ 8.0 - 10.0 &  0.14  & 34 & 15 & 37 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in muon momentum 
+$p_\mu$, $d\sigma/dp_{\mu}(10^{-40}\text{cm}^2/\text{nucleon}/(\text{GeV/c}))$, 
+for 1$\pi^0$ production with statistical (stat), systematic (syst), and total (tot) uncertainties.}
+\label{tb:pi0mup}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\vspace{1cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$\theta_{\mu}$ (degree) &~~~ $d\sigma/d\theta_{\mu}$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0 - 2  &   6.05   & 39 & 23 & 45 \\ 
+ 2 - 4  &  26.44   & 18 & 17 & 25 \\ 
+ 4 - 6  &  55.43   & 13 & 13 & 19 \\ 
+ 6 - 8  &  69.49   & 12 & 13 & 18 \\ 
+ 8 - 10 &  69.59   & 13 & 12 & 18 \\ 
+10 - 12 &  66.56   & 14 & 12 & 19 \\ 
+12 - 15 &  44.56   & 17 & 13 & 22 \\ 
+15 - 19 &  34.30   & 24 & 13 & 27 \\ 
+19 - 25 &  13.57   & 65 & 25 & 70 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in muon angle 
+$\theta_\mu$, $d\sigma/d\theta_{\mu}(10^{-42}\text{cm}^2/\text{nucleon}/\text{degree})$, 
+for 1$\pi^0$ production with statistical, systematic, and total uncertainties.}
+\label{tb:pi0muth}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vskip 2pt
+%\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$Q^2$ $\text{(GeV/c)}^2$ &~~~ $d\sigma/dQ^2$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.00 -  0.10 & 11.38  & 13 & 16 & 20 \\ 
+ 0.10 -  0.25 & 15.79  & 10 & 13 & 16 \\ 
+ 0.25 -  0.40 & 13.06  & 11 & 13 & 17 \\ 
+ 0.40 -  0.60 &  9.00  & 13 & 12 & 18 \\ 
+ 0.60 -  0.85 &  5.20  & 17 & 15 & 23 \\ 
+ 0.85 -  1.15 &  3.23  & 21 & 15 & 26 \\ 
+ 1.15 -  1.55 &  2.52  & 26 & 17 & 31 \\ 
+ 1.55 -  2.00 &  1.55  & 36 & 18 & 41 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $Q^2$, 
+$d\sigma/dQ^2 (10^{-40}\text{cm}^2/\text{nucleon}/(\text{GeV/c})^2)$, 
+for 1$\pi^0$ production with statistical, systematic, and total uncertainties.}
+\label{tb:pi0Q2}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vskip 2pt
+%\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$T_\pi$ $\text{(GeV)}$ &~~~ $d\sigma/dT_\pi$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0.00 -  0.05 &  26.13 & 15 & 18 & 23 \\ 
+ 0.05 -  0.15 &  32.39 & 9  & 16 & 19 \\ 
+ 0.15 -  0.25 &  18.22 & 10 & 15 & 18 \\ 
+ 0.25 -  0.40 &  12.01 & 10 & 14 & 18 \\ 
+ 0.40 -  0.55 &   6.82 & 12 & 13 & 18 \\ 
+ 0.55 -  0.75 &   4.71 & 12 & 13 & 19 \\ 
+ 0.75 -  1.00 &   2.61 & 17 & 16 & 23 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $T_\pi$, 
+$d\sigma/dT_{\pi} (10^{-40}\text{cm}^2/\text{nucleon}/\text{GeV})$, 
+for 1$\pi^0$ production with statistical, systematic, and total uncertainties.}
+\label{tb:pi0_kinetic}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vskip 2pt
+%\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$\theta_\pi$ $\text{(degree)}$ &~~~ $d\sigma/\theta_\pi$ &~ stat(\%) &~ syst(\%) &~ tot(\%)  \\
+\hline
+ 0 - 10 &   2.68   & 40 & 21 & 46 \\ 
+10 - 20 &   9.60   & 19 & 13 & 23 \\ 
+20 - 30 &   9.94   & 16 & 13 & 21 \\ 
+30 - 40 &  12.64   & 13 & 13 & 19 \\ 
+40 - 50 &  12.59   & 13 & 13 & 18 \\ 
+50 - 60 &  10.71   & 15 & 13 & 20 \\ 
+60 - 70 &   8.30   & 18 & 15 & 24 \\ 
+70 - 80 &   9.19   & 18 & 15 & 24 \\ 
+80 - 90 &   5.59   & 22 & 20 & 30 \\ 
+90 - 120 &  5.33   & 17 & 17 & 24 \\ 
+120 - 180 & 1.64   & 23 & 22 & 32 \\ 
+\hline\hline
+\end{tabular}
+\caption{ Flux-averaged differential cross section in $\theta_\pi$, 
+$d\sigma/d\theta_{\pi} (10^{-42}\text{cm}^2/\text{nucleon}/\text{degree})$, 
+for 1$\pi^0$ production with statistical, systematic, and total uncertainties.}
+\label{tb:pi0_theta}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\clearpage
+\onecolumngrid
+%\newpage
+\section{Tables of Systematic Uncertainties}
+%\textbf{Systematic Uncertainty Tables: CC($\pi^+$) channel}
+
+%%%%%%%%%%%%%%%% from carrie 16feb %%%%%%%%%%%%%%%%%
+
+\subsection{Systematic uncertainties of the $\numu$-CC($\pi^{+}$) channel}
+
+Breakdown of systematic uncertainty on Tables \ref{tb:pip_Enu_err}\,-\,\ref{tb:pip_theta_err}: detector response (I), neutrino cross section model (II), nuclear effects including FSI (III), flux (IV), 
+and other sources (V). %The absolute uncertainties are followed by shape uncertainties in parentheses.
+
+\vspace{0.5cm}
+
+
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$E_{\nu}$ (GeV) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.0 -  1.5 &   0.0  &  0.0 &  0.0  &  0.0  &  0.0  &  0.0 \\
+ 1.5 -  2.0 &  32.0  & 14.4 &  8.1  &  8.3  &  1.4  & 37.0 \\
+ 2.0 -  3.0 &  10.0  &  9.4 &  4.0  &  7.6  &  0.4  & 16.2 \\
+ 3.0 -  3.5 &   8.3  &  7.6 &  4.0  &  7.1  &  0.7  & 13.9 \\
+ 3.5 -  4.0 &   8.2  &  6.5 &  2.7  &  7.8  &  0.9  & 13.3 \\
+ 4.0 -  5.0 &   9.4  &  5.3 &  2.1  & 10.8  &  0.9  & 15.5 \\
+ 5.0 -  6.0 &   8.5  &  2.4 &  1.7  &  9.4  &  1.6  & 13.2 \\
+ 6.0 -  8.0 &   9.0  &  1.6 &  2.0  &  9.5  &  1.7  & 13.4 \\
+ 8.0 - 10.0 &  10.8  &  3.7 &  2.5  &  9.5  &  3.0  & 15.3 \\
+\hline\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $\sigma(E_\nu)$.}
+\label{tb:pip_Enu_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$p_{\mu}$ (GeV/c) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline (
+ 0.0 -  1.0 &  13.7 & 11.6  &  4.3  & 10.6  &  1.3  & 21.3 \\
+ 1.0 -  2.0 &  12.6 &  9.1  &  3.3  &  7.5  &  1.2  & 17.6 \\
+ 2.0 -  2.5 &   8.1 &  7.2  &  2.9  &  7.5  &  0.8  & 13.5 \\
+ 2.5 -  3.0 &   7.4 &  5.2  &  2.4  &  7.4  &  0.7  & 12.0 \\
+ 3.0 -  3.5 &   8.9 &  4.1  &  1.8  &  7.3  &  0.6  & 12.4 \\
+ 3.5 -  4.0 &  11.0 &  3.5  &  2.0  &  7.4  &  0.8  & 13.9 \\
+ 4.0 -  5.0 &   8.8 &  2.3  &  1.4  &  7.5  &  1.3  & 11.9 \\
+ 5.0 -  7.0 &   8.5 &  1.7  &  1.6  &  7.5  &  1.5  & 11.7 \\
+ 7.0 - 10.0 &  11.6 &  5.8  &  5.2  &  7.4  &  6.8  & 17.2 \\
+\hline\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dp_\mu$.}
+\label{tb:pip_mup_err}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$\theta_{\mu}$ (degree) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0 -  2 &   6.6  &  0.6  &  3.1  &  7.5  &  1.8  & 10.6  \\
+ 2 -  4 &   6.5  &  0.8  &  2.2  &  7.4  &  1.5  & 10.3  \\
+ 4 -  6 &   6.7  &  0.6  &  2.1  &  7.5  &  0.8  & 10.3  \\
+ 6 -  8 &   7.1  &  0.8  &  1.9  &  7.5  &  1.0  & 10.6  \\
+ 8 - 10 &   7.5  &  1.8  &  2.1  &  7.5  &  1.0  & 11.0  \\
+10 - 12 &   8.1  &  1.5  &  2.6  &  7.5  &  1.1  & 11.5  \\
+12 - 16 &   9.0  &  2.6  &  2.7  &  7.6  &  1.7  & 12.5  \\
+16 - 20 &   8.8  &  4.6  &  3.5  &  7.7  &  3.1  & 13.4  \\
+20 - 25 &  10.3  &  5.6  &  5.7  &  7.8  &  7.2  & 16.8  \\
+\hline\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/d\theta_\mu$.}
+\label{tb:pip_muth_err}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$Q^{2}$ (GeV$^{2}$) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.00 -  0.10 &   6.7  &  0.7  &  2.4  &  7.5  &  0.4  & 10.4  \\
+ 0.10 -  0.25 &   6.9  &  0.9  &  2.2  &  7.6  &  0.8  & 10.6  \\
+ 0.25 -  0.40 &   7.6  &  1.1  &  2.8  &  7.8  &  1.2  & 11.3  \\
+ 0.40 -  0.60 &   8.4  &  1.1  &  2.4  &  8.0  &  1.0  & 11.9  \\
+ 0.60 -  0.85 &   9.8  &  3.3  &  2.9  &  8.2  &  1.7  & 13.6  \\
+ 0.85 -  1.15 &  12.2  &  4.7  &  3.2  &  8.5  &  2.6  & 16.2  \\
+ 1.15 -  1.55 &  14.9  &  7.3  &  4.6  &  8.6  &  4.9  & 19.9  \\
+ 1.55 -  2.00 &  16.7  &  8.6  &  5.8  &  8.8  &  6.8  & 22.6  \\
+\hline\hline
+
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dQ^2$.}
+\label{tb:pip_Q2_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$T_{\pi}$ (MeV) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+35 - 55 &    14.0  &  4.6  &  7.2  &  7.7  &  3.8  & 18.5  \\
+55 - 75 &    11.3  &  5.0  &  6.2  &  7.7  &  2.8  & 16.0  \\
+75 - 100 &   10.3  &  4.3  &  3.1  &  7.7  &  2.0  & 14.1  \\
+100 - 125 &   6.6  &  2.8  &  1.3  &  7.8  &  1.3  & 10.7  \\
+125 - 150 &   6.3  &  2.9  &  1.6  &  7.8  &  1.6  & 10.7  \\
+150 - 200 &   7.9  &  2.5  &  2.7  &  7.8  &  1.4  & 11.8  \\
+200 - 350 &  10.8  &  2.9  &  3.9  &  7.8  &  1.9  & 14.4  \\
+\hline\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dT_\pi$.}
+\label{tb:pip_kinetic_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$\theta_{\pi}$ (degree) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0 - 15 &     9.6  &  4.6  &  8.9  &  7.9  &  2.4  & 16.1  \\
+15 - 22 &     8.9  &  4.4  &  6.4  &  7.8  &  1.7  & 14.3  \\
+22 - 29 &     9.4  &  4.3  &  5.6  &  7.8  &  2.1  & 14.3  \\
+29 - 36 &     9.3  &  3.8  &  4.8  &  7.8  &  1.9  & 13.7  \\
+36 - 43 &     9.3  &  3.8  &  3.8  &  7.8  &  1.9  & 13.4  \\
+43 - 50 &     9.2  &  3.8  &  3.9  &  7.8  &  2.0  & 13.4  \\
+50 - 57 &     8.7  &  4.3  &  5.0  &  7.7  &  2.1  & 13.6  \\
+57 - 72 &     7.5  &  5.2  &  5.3  &  7.7  &  1.7  & 13.2  \\
+72 - 108 &    7.1  &  3.9  &  3.1  &  7.8  &  2.3  & 11.9  \\
+108 - 130 &   6.7  &  3.9  &  3.3  &  7.7  &  1.5  & 11.6  \\
+130 - 140 &   5.8  &  4.5  &  3.0  &  7.7  &  1.5  & 11.2  \\
+140 - 150 &   5.8  &  4.4  &  4.4  &  7.7  &  1.5  & 11.6  \\
+150 - 165 &   6.3  &  2.6  &  3.4  &  7.8  &  2.8  & 11.3  \\
+165 - 180 &   8.0  &  2.2  &  7.0  &  7.6  &  4.6  & 14.0  \\
+\hline\hline
+
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/d\theta_\pi$.}
+\label{tb:pip_theta_err}
+\end{table}
+
+%\clearpage
+%\newpage
+
+
+
+%\onecolumngrid
+
+%\textbf{Systematic Uncertainty Tables: CC($\pi^0$) channel}
+\subsection{Systematic uncertainties of the $\anumu$-CC($\pi^{0}$) channel}
+
+Breakdown of systematic uncertainty on Tables \ref{tb:pi0_Enu_err}\,-\,\ref{tb:pi0_theta_err}: detector response (I), 
+neutrino cross section model (II), nuclear effects including FSI (III), flux (IV), 
+and other sources (V).  %The absolute uncertainties are followed by shape uncertainties in parentheses.
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$E_{\nu}$ (GeV) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.0 -  1.5  & 0.0   & 0.0   & 0.0   & 0.0   & 0.0   & 0.0  \\
+ 1.5 -  2.0  &13.4   &10.5   &13.6   & 8.5   & 8.0   &24.8  \\
+ 2.0 -  3.0  & 5.5   & 8.8   & 5.2   & 7.7   & 8.0   &16.1  \\
+ 3.0 -  3.5  & 5.7   & 7.7   & 4.7   & 6.8   & 8.0   &15.0  \\
+ 3.5 -  4.0  & 5.5   & 6.8   & 5.7   & 8.6   & 8.0   &15.7  \\
+ 4.0 -  5.0  & 5.5   & 5.9   & 5.3   &12.9   & 8.0   &18.0  \\
+ 5.0 -  6.0  & 4.4   & 3.7   & 4.0   &12.1   & 8.0   &16.1  \\
+ 6.0 -  8.0  & 3.7   & 2.1   & 5.0   &11.1   & 8.0   &15.2  \\
+ 8.0 - 10.0  & 4.7   & 4.2   & 5.6   &11.6   & 8.0   &16.4  \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $\sigma(E_\nu)$.}
+\label{tb:pi0_Enu_err}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$p_{\mu}$ (GeV/c) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.0 -  1.0  & 6.8   &13.9   &10.0   &12.8   & 8.0   &23.9 \\
+ 1.0 -  2.0  & 6.1   &12.5   & 7.4   & 7.4   & 8.0   &19.2 \\
+ 2.0 -  2.6  & 5.1   & 7.1   & 3.9   & 7.1   & 8.0   &14.4 \\
+ 2.6 -  3.3  & 6.3   & 4.5   & 5.5   & 7.4   & 8.0   &14.4 \\
+ 3.3 -  4.0  & 5.7   & 3.0   & 3.7   & 8.3   & 8.0   &13.7 \\
+ 4.0 -  5.0  & 4.3   & 3.7   & 4.3   & 8.3   & 8.0   &13.6 \\
+ 5.0 -  6.0  & 4.3   & 2.2   & 6.3   & 8.1   & 8.0   &13.9 \\
+ 6.0 -  8.0  & 4.2   & 3.1   & 5.8   & 8.6   & 8.0   &14.1 \\
+ 8.0 - 10.0  & 3.7   & 7.0   & 7.6   & 8.0   & 8.0   &15.7 \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dp_{\mu}$.}
+\label{tb:pi0_mup_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$\theta_{\mu}$ (degree) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0 -  2  &15.8   &10.9  & 7.6   & 7.3   & 8.0   &23.3 \\
+ 2 -  4  & 8.8   & 7.0  & 6.6   & 7.4   & 8.0   &17.0 \\
+ 4 -  6  & 5.6   & 4.0  & 4.2   & 7.4   & 8.0   &13.6 \\
+ 6 -  8  & 5.6   & 2.6  & 4.7   & 7.4   & 8.0   &13.4 \\
+ 8 - 10  & 4.4   & 1.8  & 4.9   & 7.5   & 8.0   &12.9 \\
+10 - 12  & 4.9   & 2.4  & 4.0   & 7.5   & 8.0   &12.9 \\
+12 - 15  & 4.7   & 4.7  & 4.8   & 7.5   & 8.0   &13.7 \\
+15 - 19  & 3.6   & 5.7  & 5.1   & 7.4   & 8.0   &13.8 \\
+19 - 25  & 4.5   &18.4  &14.0   & 7.3   & 8.0   &25.9 \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/d\theta_\mu$.}
+\label{tb:pi0_muth_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+~$Q^2$ ($\text{GeV}^2$) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.0 -  0.1  & 8.8   & 7.1   & 3.3   & 7.3   & 8.0   &16.0 \\
+ 0.1 -  0.2  & 5.2   & 3.0   & 5.1   & 7.5   & 8.0   &13.5 \\
+ 0.2 -  0.4  & 4.8   & 2.2   & 4.6   & 7.7   & 8.0   &13.1 \\
+ 0.4 -  0.6  & 4.6   & 2.7   & 3.3   & 7.8   & 8.0   &12.8 \\
+ 0.6 -  0.8  & 4.7   & 5.3   & 7.4   & 8.4   & 8.0   &15.5 \\
+ 0.8 -  1.1  & 4.1   & 7.1   & 5.7   & 8.9   & 8.0   &15.6 \\
+ 1.1 -  1.6  & 3.2   &11.3   & 4.1   & 9.0   & 8.0   &17.3 \\
+ 1.6 -  2.0  & 9.0   & 8.8   & 7.4   & 8.5   & 8.0   &18.7 \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dQ^2$.}
+\label{tb:pi0_Q2_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$T_{\pi}$ (\text{GeV}) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0.0 -  0.1  & 9.0   & 6.5   & 9.3   & 7.3   & 8.0   &18.1  \\
+ 0.1 -  0.1  & 9.2   & 5.4   & 6.8   & 7.4   & 8.0   &16.7  \\
+ 0.1 -  0.2  & 7.8   & 5.6   & 5.3   & 7.5   & 8.0   &15.5  \\
+ 0.2 -  0.4  & 6.2   & 5.1   & 5.8   & 7.6   & 8.0   &14.8  \\
+ 0.4 -  0.6  & 3.9   & 5.3   & 4.3   & 7.8   & 8.0   &13.6  \\
+ 0.6 -  0.8  & 3.5   & 6.6   & 3.2   & 7.9   & 8.0   &13.9  \\
+ 0.8 -  1.0  & 3.6   &10.3   & 2.7   & 8.2   & 8.0   &16.0  \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/dT_\pi$.}
+\label{tb:pi0_pike_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{ccccccc}
+\hline
+$\theta_{\pi}$ (degree) & (I) & (II) & (III) & (IV) & (V) & Total \\
+\hline
+ 0 - 10  & 5.4   &15.0   & 9.3   & 7.5   & 8.0   &21.5 \\
+10 - 20  & 3.5   & 6.6   & 3.6   & 7.6   & 8.0   &13.8 \\
+20 - 30  & 3.5   & 6.9   & 2.9   & 7.8   & 8.0   &13.9 \\
+30 - 40  & 4.1   & 5.7   & 3.4   & 7.6   & 8.0   &13.5 \\
+40 - 50  & 4.5   & 3.9   & 3.3   & 7.6   & 8.0   &13.0 \\
+50 - 60  & 4.9   & 4.2   & 4.5   & 7.7   & 8.0   &13.6 \\
+60 - 70  & 6.2   & 4.7   & 6.8   & 7.6   & 8.0   &15.2 \\
+70 - 80  & 7.2   & 4.9   & 7.1   & 7.7   & 8.0   &15.8 \\
+80 - 90  & 9.2   & 5.4   &13.2   & 7.5   & 8.0   &20.2 \\
+90 - 120  & 9.1  & 6.0   & 8.9   & 7.4   & 8.0   &17.8 \\
+120 - 180  &12.9 & 5.9   &13.1   & 7.3   & 8.0   &22.1 \\
+\hline
+\hline
+\end{tabular}
+\caption{Fractional systematic uncertainties (in percent) on $d\sigma/d\theta_\pi$.}
+\label{tb:pi0_theta_err}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Neutrino and Antineutrino Fluxes}
+
+
+\begin{table}
+\centering
+\begin{tabular}{crccccc}
+\hline
+$E_\nu$ (GeV) & ~~~$\nu_\mu$ flux ($\nu_\mu$/$m^2$/GeV/POT) & ~~~$\bar{\nu}_\mu$ flux ($\bar{\nu}_\mu$/$m^2$/GeV/POT)\\
+\hline
+  0.0 -   0.5 &  5.14e-06~~~~~~~ &  4.66e-06 \\ 
+  0.5 -   1.0 &  1.30e-05~~~~~~~ &  1.25e-05 \\ 
+  1.0 -   1.5 &  3.38e-05~~~~~~~ &  3.19e-05 \\ 
+  1.5 -   2.0 &  5.00e-05~~~~~~~ &  4.58e-05 \\ 
+  2.0 -   2.5 &  6.57e-05~~~~~~~ &  5.97e-05 \\ 
+  2.5 -   3.0 &  8.05e-05~~~~~~~ &  7.22e-05 \\ 
+  3.0 -   3.5 &  8.50e-05~~~~~~~ &  7.30e-05 \\ 
+  3.5 -   4.0 &  6.76e-05~~~~~~~ &  5.64e-05 \\ 
+  4.0 -   4.5 &  4.07e-05~~~~~~~ &  3.25e-05 \\ 
+  4.5 -   5.0 &  2.21e-05~~~~~~~ &  1.68e-05 \\ 
+  5.0 -   5.5 &  1.35e-05~~~~~~~ &  9.90e-06 \\ 
+  5.5 -   6.0 &  9.76e-06~~~~~~~ &  6.84e-06 \\ 
+  6.0 -   6.5 &  7.92e-06~~~~~~~ &  5.17e-06 \\ 
+  6.5 -   7.0 &  6.71e-06~~~~~~~ &  4.22e-06 \\ 
+  7.0 -   7.5 &  5.86e-06~~~~~~~ &  3.53e-06 \\ 
+  7.5 -   8.0 &  5.13e-06~~~~~~~ &  2.96e-06 \\ 
+  8.0 -   8.5 &  4.62e-06~~~~~~~ &  2.50e-06 \\ 
+  8.5 -   9.0 &  4.14e-06~~~~~~~ &  2.19e-06 \\ 
+  9.0 -   9.5 &  3.75e-06~~~~~~~ &  1.97e-06 \\ 
+  9.5 -  10.0 &  3.44e-06~~~~~~~ &  1.78e-06 \\ 
+\hline
+\end{tabular}
+\caption{The neutrino and antineutrino fluxes that are used for the cross-section calculations.
+These fluxes are also used by the GENIE, NEUT, and NuWro event generators to produce the model predictions
+shown in the paper.}
+\label{flux-table}
+\end{table}
+
+
+
+\section{Correlation matrices of the $\numu$-CC($\pi^{+}$) channel}
+
+\vspace{0.3cm}
+
+
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (GeV) & 0 - 1.5 & 1.5 - 2 & 2 - 3 & 3 - 3.5 & 3.5 - 4 & 4 - 5 & 5 - 6 & 6 - 8 & 8 - 10 \\ 
+\hline
+0.0 - 1.5 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\ 
+1.5 - 2.0 & 0.0000 & 1.0000 & 0.5578 & 0.4056 & 0.1335 & -0.0183 & -0.0230 & 0.0117 & -0.0181 \\ 
+2.0 - 3.0 & 0.0000 & 0.5578 & 1.0000 & 0.8717 & 0.6504 & 0.4121 & 0.3751 & 0.4255 & 0.2868 \\ 
+3.0 - 3.5 & 0.0000 & 0.4056 & 0.8717 & 1.0000 & 0.7983 & 0.5981 & 0.5206 & 0.5282 & 0.3758 \\ 
+3.5 - 4.0 & 0.0000 & 0.1335 & 0.6504 & 0.7983 & 1.0000 & 0.8510 & 0.6992 & 0.6072 & 0.4321 \\ 
+4.0 - 5.0 & 0.0000 & -0.0183 & 0.4121 & 0.5981 & 0.8510 & 1.0000 & 0.7616 & 0.5885 & 0.4309 \\ 
+5.0 - 6.0 & 0.0000 & -0.0230 & 0.3751 & 0.5206 & 0.6992 & 0.7616 & 1.0000 & 0.7492 & 0.6468 \\ 
+6.0 - 8.0 & 0.0000 & 0.0117 & 0.4255 & 0.5282 & 0.6072 & 0.5885 & 0.7492 & 1.0000 & 0.7890 \\ 
+8.0 - 10.0 & 0.0000 & -0.0181 & 0.2868 & 0.3758 & 0.4321 & 0.4309 & 0.6468 & 0.7890 & 1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $\sigma(E_\nu)$.}
+\label{tb:pip_Enu_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (GeV/c) & 0 - 1 & 1 - 2 & 2 - 2.5 & 2.5 - 3 & 3 - 3.5 & 3.5 - 4 & 4 - 5 & 5 - 7 & 7 - 10 \\ 
+\hline
+0.0 - 1.0 & 1.0000 & 0.1822 & 0.1567 & 0.1250 & 0.0702 & 0.0381 & 0.0466 & 0.0554 & 0.0301 \\ 
+1.0 - 2.0 & 0.1822 & 1.0000 & 0.7808 & 0.6267 & 0.3646 & 0.2044 & 0.2601 & 0.3164 & 0.1731 \\ 
+2.0 - 2.5 & 0.1567 & 0.7808 & 1.0000 & 0.8464 & 0.6837 & 0.5356 & 0.5418 & 0.5799 & 0.3384 \\ 
+2.5 - 3.0 & 0.1250 & 0.6267 & 0.8464 & 1.0000 & 0.8148 & 0.7073 & 0.6922 & 0.7099 & 0.4470 \\ 
+3.0 - 3.5 & 0.0702 & 0.3646 & 0.6837 & 0.8148 & 1.0000 & 0.8333 & 0.7802 & 0.7566 & 0.4817 \\ 
+3.5 - 4.0 & 0.0381 & 0.2044 & 0.5356 & 0.7073 & 0.8333 & 1.0000 & 0.7953 & 0.7644 & 0.5270 \\ 
+4.0 - 5.0 & 0.0466 & 0.2601 & 0.5418 & 0.6922 & 0.7802 & 0.7953 & 1.0000 & 0.7941 & 0.6009 \\ 
+5.0 - 7.0 & 0.0554 & 0.3164 & 0.5799 & 0.7099 & 0.7566 & 0.7644 & 0.7941 & 1.0000 & 0.6571 \\ 
+7.0 - 10.0 & 0.0301 & 0.1731 & 0.3384 & 0.4470 & 0.4817 & 0.5270 & 0.6009 & 0.6571 & 1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dp_\mu$.}
+\label{tb:pip_mup_cov}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (deg) & 0 - 2 & 2 - 4 & 4 - 6 & 6 - 8 & 8 - 10 & 10 - 12 & 12 - 16 & 16 - 20 & 20 - 25 \\ 
+\hline
+0 - 2 & 1.0000 & 0.6473 & 0.6439 & 0.6222 & 0.6044 & 0.5626 & 0.5413 & 0.4658 & 0.3521 \\ 
+2 - 4 & 0.6473 & 1.0000 & 0.7892 & 0.7816 & 0.7574 & 0.7206 & 0.6997 & 0.5881 & 0.4480 \\ 
+4 - 6 & 0.6439 & 0.7892 & 1.0000 & 0.8263 & 0.8173 & 0.7878 & 0.7691 & 0.6543 & 0.4922 \\ 
+6 - 8 & 0.6222 & 0.7816 & 0.8263 & 1.0000 & 0.8389 & 0.8179 & 0.8179 & 0.7063 & 0.5530 \\ 
+8 - 10 & 0.6044 & 0.7574 & 0.8173 & 0.8389 & 1.0000 & 0.8335 & 0.8381 & 0.7472 & 0.5873 \\ 
+10 - 12 & 0.5626 & 0.7206 & 0.7878 & 0.8179 & 0.8335 & 1.0000 & 0.8373 & 0.7489 & 0.6007 \\ 
+12 - 16 & 0.5413 & 0.6997 & 0.7691 & 0.8179 & 0.8381 & 0.8373 & 1.0000 & 0.7920 & 0.6509 \\ 
+16 - 20 & 0.4658 & 0.5881 & 0.6543 & 0.7063 & 0.7472 & 0.7489 & 0.7920 & 1.0000 & 0.6466 \\ 
+20 - 25 & 0.3521 & 0.4480 & 0.4922 & 0.5530 & 0.5873 & 0.6007 & 0.6509 & 0.6466 & 1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/d\theta_\mu$.}
+\label{tb:pip_muth_cov}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccccc}
+\hline
+Bins (GeV$^{2}$) & 0 - 0.1 & 0.1 - 0.25 & 0.25 - 0.4 & 0.4 - 0.6 & 0.6 - 0.85 & 0.85 - 1.15 & 1.15 - 1.55 & 1.55 - 2 \\ 
+\hline
+0.00 - 0.10 & 1.0000 & 0.8383 & 0.7890 & 0.7255 & 0.5693 & 0.4415 & 0.3245 & 0.2465 \\ 
+0.10 - 0.25 & 0.8383 & 1.0000 & 0.8516 & 0.8346 & 0.7347 & 0.6236 & 0.5162 & 0.4451 \\ 
+0.25 - 0.40 & 0.7890 & 0.8516 & 1.0000 & 0.8382 & 0.7429 & 0.6608 & 0.5565 & 0.4759 \\ 
+0.40 - 0.60 & 0.7255 & 0.8346 & 0.8382 & 1.0000 & 0.8231 & 0.7497 & 0.6568 & 0.5743 \\ 
+0.60 - 0.85 & 0.5693 & 0.7347 & 0.7429 & 0.8231 & 1.0000 & 0.8346 & 0.7638 & 0.6928 \\ 
+0.85 - 1.15 & 0.4415 & 0.6236 & 0.6608 & 0.7497 & 0.8346 & 1.0000 & 0.8233 & 0.7662 \\ 
+1.15 - 1.55 & 0.3245 & 0.5162 & 0.5565 & 0.6568 & 0.7638 & 0.8233 & 1.0000 & 0.8147 \\ 
+1.55 - 2.00 & 0.2465 & 0.4451 & 0.4759 & 0.5743 & 0.6928 & 0.7662 & 0.8147 & 1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dQ^2$.}
+\label{tb:pip_Q2_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+Bins (MeV) & 35 - 55 & 55 - 75 & 75 - 100 & 100 - 125 & 125 - 150 & 150 - 200 & 200 - 350 \\ 
+\hline
+35 - 55 & 1.0000 & 0.6945 & 0.6385 & 0.5453 & 0.4760 & 0.4513 & 0.4146 \\ 
+55 - 75 & 0.6945 & 1.0000 & 0.8287 & 0.6718 & 0.6091 & 0.5780 & 0.5480 \\ 
+75 - 100 & 0.6385 & 0.8287 & 1.0000 & 0.7533 & 0.6939 & 0.6522 & 0.6014 \\ 
+100 - 125 & 0.5453 & 0.6718 & 0.7533 & 1.0000 & 0.8112 & 0.7582 & 0.6697 \\ 
+125 - 150 & 0.4760 & 0.6091 & 0.6939 & 0.8112 & 1.0000 & 0.8025 & 0.7256 \\ 
+150 - 200 & 0.4513 & 0.5780 & 0.6522 & 0.7582 & 0.8025 & 1.0000 & 0.8736 \\ 
+200 - 350 & 0.4146 & 0.5480 & 0.6014 & 0.6697 & 0.7256 & 0.8736 & 1.0000 \\ 
+\hline
+
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dT_\pi$.}
+\label{tb:pip_kinetic_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{table}
+\centering
+\begin{tabular}{ccccccccccccccc}
+\hline
+Bins (deg) & 0-15 & 15-22 & 22-29 & 29-36 & 36-43 & 43-50 & 50-57 & 57-72 & 72-108 & 108-130 & 130-140 & 140-150 & 150-165 & 165-180 \\ 
+\hline
+0 - 15 & 1.0000 & 0.8372 & 0.8249 & 0.8055 & 0.6853 & 0.6371 & 0.5334 & 0.4012 & 0.6883 & 0.5614 & 0.5580 & 0.5622 & 0.4933 & 0.3738 \\ 
+15 - 22 & 0.8372 & 1.0000 & 0.8341 & 0.8200 & 0.7346 & 0.6975 & 0.6113 & 0.4909 & 0.7363 & 0.6069 & 0.5979 & 0.5951 & 0.5282 & 0.4021 \\ 
+22 - 29 & 0.8249 & 0.8341 & 1.0000 & 0.8596 & 0.7907 & 0.7656 & 0.6807 & 0.5620 & 0.7710 & 0.6223 & 0.6196 & 0.6155 & 0.5505 & 0.3955 \\ 
+29 - 36 & 0.8055 & 0.8200 & 0.8596 & 1.0000 & 0.8321 & 0.8022 & 0.7303 & 0.6113 & 0.7681 & 0.6086 & 0.6267 & 0.6151 & 0.5430 & 0.4086 \\ 
+36 - 43 & 0.6853 & 0.7346 & 0.7907 & 0.8321 & 1.0000 & 0.8500 & 0.7986 & 0.6840 & 0.7355 & 0.5624 & 0.5734 & 0.5522 & 0.5104 & 0.3959 \\ 
+43 - 50 & 0.6371 & 0.6975 & 0.7656 & 0.8022 & 0.8500 & 1.0000 & 0.8079 & 0.7072 & 0.7386 & 0.5661 & 0.5704 & 0.5503 & 0.5125 & 0.3889 \\ 
+50 - 57 & 0.5334 & 0.6113 & 0.6807 & 0.7303 & 0.7986 & 0.8079 & 1.0000 & 0.7604 & 0.7109 & 0.5691 & 0.5655 & 0.5294 & 0.4897 & 0.3773 \\ 
+57 - 72 & 0.4012 & 0.4909 & 0.5620 & 0.6113 & 0.6840 & 0.7072 & 0.7604 & 1.0000 & 0.6728 & 0.5665 & 0.5900 & 0.5369 & 0.4804 & 0.3891 \\ 
+72 - 108 & 0.6883 & 0.7363 & 0.7710 & 0.7681 & 0.7355 & 0.7386 & 0.7109 & 0.6728 & 1.0000 & 0.6924 & 0.7053 & 0.6958 & 0.6181 & 0.4660 \\ 
+108 - 130 & 0.5614 & 0.6069 & 0.6223 & 0.6086 & 0.5624 & 0.5661 & 0.5691 & 0.5665 & 0.6924 & 1.0000 & 0.6177 & 0.5979 & 0.5225 & 0.3776 \\ 
+130 - 140 & 0.5580 & 0.5979 & 0.6196 & 0.6267 & 0.5734 & 0.5704 & 0.5655 & 0.5900 & 0.7053 & 0.6177 & 1.0000 & 0.6628 & 0.5612 & 0.4341 \\ 
+140 - 150 & 0.5622 & 0.5951 & 0.6155 & 0.6151 & 0.5522 & 0.5503 & 0.5294 & 0.5369 & 0.6958 & 0.5979 & 0.6628 & 1.0000 & 0.5703 & 0.4253 \\ 
+150 - 165 & 0.4933 & 0.5282 & 0.5505 & 0.5430 & 0.5104 & 0.5125 & 0.4897 & 0.4804 & 0.6181 & 0.5225 & 0.5612 & 0.5703 & 1.0000 & 0.4293 \\ 
+165 - 180 & 0.3738 & 0.4021 & 0.3955 & 0.4086 & 0.3959 & 0.3889 & 0.3773 & 0.3891 & 0.4660 & 0.3776 & 0.4341 & 0.4253 & 0.4293 & 1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/d\theta_\pi$.}
+\label{tb:pip_theta_cov}
+\end{table}
+
+
+%\newpage
+\section{Correlation matrices of the $\numu$-CC($\pi^{0}$) channel}
+
+\vspace{0.3cm}
+
+
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (GeV) & 0 - 1.5 & 1.5 - 2 & 2 - 3 & 3 - 3.5 & 3.5 - 4 & 4 - 5 & 5 - 6 & 6 - 8 & 8 - 10 \\ 
+\hline
+  0.0 -  1.5    &     0  &     0  &     0  &     0  &     0  &     0  &     0  &     0  &     0   \\ 
+  1.5 -  2.0    &     0  &     1.0000  &     0.1541  &     0.1634  &     0.1545  &     0.1297  &     0.1050  &     0.0937  &     0.0870   \\ 
+  2.0 -  3.0    &     0  &     0.1541  &     1.0000  &     0.6198  &     0.5418  &     0.4242  &     0.3485  &     0.3371  &     0.3336   \\ 
+  3.0 -  3.5    &     0  &     0.1634  &     0.6198  &     1.0000  &     0.6289  &     0.5328  &     0.4202  &     0.3532  &     0.3329   \\ 
+  3.5 -  4.0    &     0  &     0.1545  &     0.5418  &     0.6289  &     1.0000  &     0.6493  &     0.4952  &     0.3407  &     0.3030   \\ 
+  4.0 -  5.0    &     0  &     0.1297  &     0.4242  &     0.5328  &     0.6493  &     1.0000  &     0.5340  &     0.3132  &     0.2539   \\ 
+  5.0 -  6.0    &     0  &     0.1050  &     0.3485  &     0.4202  &     0.4952  &     0.5340  &     1.0000  &     0.3388  &     0.2695   \\ 
+  6.0 -  8.0    &     0  &     0.0937  &     0.3371  &     0.3532  &     0.3407  &     0.3132  &     0.3388  &     1.0000  &     0.3423   \\ 
+  8.0 - 10.0    &     0  &     0.0870  &     0.3336  &     0.3329  &     0.3030  &     0.2539  &     0.2695  &     0.3423  &     1.0000   \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $\sigma(E_\nu)$.}
+\label{tb:pi0_Enu_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (GeV/c) & 0 - 1 & 1 - 2 & 2 - 2.5 & 2.5 - 3 & 3 - 3.5 & 3.5 - 4 & 4 - 5 & 5 - 7 & 7 - 10 \\ 
+\hline
+  0.0 -  1.0    &     1.0000  &     0.1088  &     0.1273  &     0.1253  &     0.1105  &     0.1128  &     0.0762  &     0.0660  &     0.0494   \\ 
+  1.0 -  2.0    &     0.1088  &     1.0000  &     0.4995  &     0.4646  &     0.3522  &     0.3495  &     0.2562  &     0.2640  &     0.2115   \\ 
+  2.0 -  2.6    &     0.1273  &     0.4995  &     1.0000  &     0.5950  &     0.5021  &     0.4654  &     0.3467  &     0.3431  &     0.2670   \\ 
+  2.6 -  3.3    &     0.1253  &     0.4646  &     0.5950  &     1.0000  &     0.5422  &     0.4961  &     0.3745  &     0.3523  &     0.2718   \\ 
+  3.3 -  4.0    &     0.1105  &     0.3522  &     0.5021  &     0.5422  &     1.0000  &     0.4470  &     0.3429  &     0.3120  &     0.2325   \\ 
+  4.0 -  5.0    &     0.1128  &     0.3495  &     0.4654  &     0.4961  &     0.4470  &     1.0000  &     0.3116  &     0.2916  &     0.2224   \\ 
+  5.0 -  6.0    &     0.0762  &     0.2562  &     0.3467  &     0.3745  &     0.3429  &     0.3116  &     1.0000  &     0.2574  &     0.1886   \\ 
+  6.0 -  8.0    &     0.0660  &     0.2640  &     0.3431  &     0.3523  &     0.3120  &     0.2916  &     0.2574  &     1.0000  &     0.1894   \\ 
+  8.0 - 10.0    &     0.0494  &     0.2115  &     0.2670  &     0.2718  &     0.2325  &     0.2224  &     0.1886  &     0.1894  &     1.0000   \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dp_\mu$.}
+\label{tb:pi0_mup_cov}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{cccccccccc}
+\hline
+Bins (deg) & 0 - 2 & 2 - 4 & 4 - 6 & 6 - 8 & 8 - 10 & 10 - 12 & 12 - 16 & 16 - 20 & 20 - 25 \\ 
+\hline
+  0 -  2    &     1.0000  &     0.3314  &     0.3082  &     0.2952  &     0.2582  &     0.2582  &     0.2318  &     0.1780  &     0.1392   \\ 
+  2 -  4    &     0.3314  &     1.0000  &     0.4416  &     0.4315  &     0.3925  &     0.3903  &     0.3524  &     0.2754  &     0.1955   \\ 
+  4 -  6    &     0.3082  &     0.4416  &     1.0000  &     0.5036  &     0.4599  &     0.4535  &     0.4036  &     0.3155  &     0.1859   \\ 
+  6 -  8    &     0.2952  &     0.4315  &     0.5036  &     1.0000  &     0.4946  &     0.4805  &     0.4269  &     0.3319  &     0.1752   \\ 
+  8 - 10    &     0.2582  &     0.3925  &     0.4599  &     0.4946  &     1.0000  &     0.4429  &     0.3920  &     0.3112  &     0.1528   \\ 
+ 10 - 12    &     0.2582  &     0.3903  &     0.4535  &     0.4805  &     0.4429  &     1.0000  &     0.3923  &     0.3015  &     0.1625   \\ 
+ 12 - 15    &     0.2318  &     0.3524  &     0.4036  &     0.4269  &     0.3920  &     0.3923  &     1.0000  &     0.2940  &     0.1727   \\ 
+ 15 - 19    &     0.1780  &     0.2754  &     0.3155  &     0.3319  &     0.3112  &     0.3015  &     0.2940  &     1.0000  &     0.1401   \\ 
+ 19 - 25    &     0.1392  &     0.1955  &     0.1859  &     0.1752  &     0.1528  &     0.1625  &     0.1727  &     0.1401  &     1.0000   \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/d\theta_\mu$.}
+\label{tb:pi0_muth_cov}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{0.7cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{ccccccccc}
+\hline
+Bins (GeV$^{2}$) & 0 - 0.1 & 0.1 - 0.25 & 0.25 - 0.4 & 0.4 - 0.6 & 0.6 - 0.85 & 0.85 - 1.15 & 1.15 - 1.55 & 1.55 - 2 \\ 
+\hline
+  0.00 -   0.10    &     1.0000  &     0.5617  &     0.4868  &     0.4620  &     0.4182  &     0.3429  &     0.2533  &     0.2621   \\ 
+  0.10 -   0.25    &     0.5617  &     1.0000  &     0.5825  &     0.5400  &     0.4954  &     0.4123  &     0.3104  &     0.2935  \\ 
+  0.25 -   0.40    &     0.4868  &     0.5825  &     1.0000  &     0.5068  &     0.4354  &     0.3729  &     0.2893  &     0.2609  \\ 
+  0.40 -   0.60    &     0.4620  &     0.5400  &     0.5068  &     1.0000  &     0.4215  &     0.3663  &     0.2870  &     0.2588  \\ 
+  0.60 -   0.85    &     0.4182  &     0.4954  &     0.4354  &     0.4215  &     1.0000  &     0.3596  &     0.2762  &     0.2479  \\ 
+  0.85 -   1.15    &     0.3429  &     0.4123  &     0.3729  &     0.3663  &     0.3596  &     1.0000  &     0.2922  &     0.2393  \\ 
+  1.15 -   1.55    &     0.2533  &     0.3104  &     0.2893  &     0.2870  &     0.2762  &     0.2922  &     1.0000  &     0.1909  \\ 
+  1.55 -   2.00    &     0.2621  &     0.2935  &     0.2609  &     0.2588  &     0.2479  &     0.2393  &     0.1909  &     1.0000  \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dQ^2$.}
+\label{tb:pi0_Q2_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+Bins (GeV) & 0 - 0.05 & 0.05 - 0.15 & 0.15 - 0.25 & 0.25 - 0.40 & 0.40 - 0.55 & 0.55 - 0.75 & 0.75 - 1.00 \\ 
+\hline
+  0.00 -   0.05    &    1.0000   &    0.6323   &    0.5679   &    0.5484   &    0.4716   &    0.4267   &    0.3765    \\
+  0.05 -   0.15    &    0.6323   &    1.0000   &    0.6836   &    0.6447   &    0.5440   &    0.4898   &    0.4173    \\
+  0.15 -   0.25    &    0.5679   &    0.6836   &    1.0000   &    0.6629   &    0.5579   &    0.5126   &    0.4332    \\
+  0.25 -   0.40    &    0.5484   &    0.6447   &    0.6629   &    1.0000   &    0.5726   &    0.5296   &    0.4498    \\
+  0.40 -   0.55    &    0.4716   &    0.5440   &    0.5579   &    0.5726   &    1.0000   &    0.5288   &    0.4507    \\
+  0.55 -   0.75    &    0.4267   &    0.4898   &    0.5126   &    0.5296   &    0.5288   &    1.0000   &    0.4678    \\
+  0.75 -   1.00    &    0.3765   &    0.4173   &    0.4332   &    0.4498   &    0.4507   &    0.4678   &    1.0000    \\
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/dT_\pi$.}
+\label{tb:pi0_kinetic_cov}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{table}
+\centering
+\begin{tabular}{cccccccccccc}
+\hline
+Bins (deg) & 0 - 10 & 10 - 20 & 20 - 30 & 30 - 40 & 40 - 50 & 50 - 60 & 60 - 70 & 70 - 80 & 80 - 90 & 90 - 120 & 120 - 180  \\ 
+\hline
+  0 -  10    &     1.0000  &     0.2417  &     0.2604  &     0.2705  &     0.2538  &     0.2564  &     0.2464  &     0.2572  &     0.2584  &     0.2821  &     0.2437 \\ 
+ 10 -  20    &     0.2417  &     1.0000  &     0.3693  &     0.3958  &     0.3801  &     0.3642  &     0.3290  &     0.3333  &     0.2991  &     0.3529  &     0.2823 \\ 
+ 20 -  30    &     0.2604  &     0.3693  &     1.0000  &     0.4444  &     0.4199  &     0.3962  &     0.3494  &     0.3505  &     0.3046  &     0.3704  &     0.2888 \\ 
+ 30 -  40    &     0.2705  &     0.3958  &     0.4444  &     1.0000  &     0.4642  &     0.4335  &     0.3801  &     0.3779  &     0.3304  &     0.4032  &     0.3074 \\ 
+ 40 -  50    &     0.2538  &     0.3801  &     0.4199  &     0.4642  &     1.0000  &     0.4367  &     0.3880  &     0.3849  &     0.3404  &     0.4005  &     0.3077 \\ 
+ 50 -  60    &     0.2564  &     0.3642  &     0.3962  &     0.4335  &     0.4367  &     1.0000  &     0.3950  &     0.4021  &     0.3749  &     0.4299  &     0.3557 \\ 
+ 60 -  70    &     0.2464  &     0.3290  &     0.3494  &     0.3801  &     0.3880  &     0.3950  &     1.0000  &     0.4021  &     0.3933  &     0.4319  &     0.3704 \\ 
+ 70 -  80    &     0.2572  &     0.3333  &     0.3505  &     0.3779  &     0.3849  &     0.4021  &     0.4021  &     1.0000  &     0.4211  &     0.4609  &     0.4109 \\ 
+ 80 -  90    &     0.2584  &     0.2991  &     0.3046  &     0.3304  &     0.3404  &     0.3749  &     0.3933  &     0.4211  &     1.0000  &     0.4656  &     0.4334 \\ 
+ 90 - 120    &     0.2821  &     0.3529  &     0.3704  &     0.4032  &     0.4005  &     0.4299  &     0.4319  &     0.4609  &     0.4656  &     1.0000  &     0.4700 \\ 
+120 - 180    &     0.2437  &     0.2823  &     0.2888  &     0.3074  &     0.3077  &     0.3557  &     0.3704  &     0.4109  &     0.4334  &     0.4700  &     1.0000 \\ 
+\hline
+\hline
+\end{tabular}
+\caption{Correlation matrix for bins of $d\sigma/d\theta_\pi$.}
+\label{tb:pi0_theta_cov}
+\end{table}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+
+
+
+
+
+

@@ -12,20 +12,18 @@ MINERvA_CCNpip_XSec_1Dthmu_nu::MINERvA_CCNpip_XSec_1Dthmu_nu(std::string inputfi
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thmu.txt");
+  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thmu.txt");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-muon-theta.csv");
 
-  // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-  double binOneWidth = dataHist->GetBinWidth(1);
+  // MINERvA has the error quoted as a percentage of the cross-section
+  // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
   for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-    double binNWidth = dataHist->GetBinWidth(i+1);
-    dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1E-40);
-    dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*dataHist->GetBinError(i+1)/100.);
-    dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
-    dataHist->SetBinError(i+1, dataHist->GetBinError(i+1)*binOneWidth/binNWidth);
+    dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*(dataHist->GetBinError(i+1)/100.));
   }
 
+  //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thmu_corr.txt", dataHist->GetNbinsX());
   // This is a correlation matrix
-  this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thmu_corr.txt", dataHist->GetNbinsX());
+  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-muon-angle.csv", dataHist->GetNbinsX());
 
   this->SetupDefaultHist();
 

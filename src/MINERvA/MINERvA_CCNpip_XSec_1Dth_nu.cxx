@@ -13,6 +13,7 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
+  // We fill once per pion found in the event, so can fill multiple times for one event
   piIndex.reserve(3);
   thVect.reserve(3);
 
@@ -20,29 +21,27 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
     measurementName += "_2016";
     isNew = true;
 
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
+    //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
+    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
 
-    // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-    double binOneWidth = dataHist->GetBinWidth(1);
+    // MINERvA has the error quoted as a percentage of the cross-section
+    // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
     for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-      double binNWidth = dataHist->GetBinWidth(i+1);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1E-40);
-      dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*dataHist->GetBinError(i+1)/100.);
-      dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
-      dataHist->SetBinError(i+1, dataHist->GetBinError(i+1)*binOneWidth/binNWidth);
+      dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*(dataHist->GetBinError(i+1)/100.));
     }
+
     // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi_corr.txt", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", dataHist->GetNbinsX());
 
   } else {
     isNew = false;
 
     if (isShape) {
-      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_shape.txt");
-      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_shape_cov.txt", dataHist->GetNbinsX());
+      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
+      this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", dataHist->GetNbinsX());
     } else {
-      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th.txt");
-      this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/MINERvA_CCNpi_th_cov.txt", dataHist->GetNbinsX());
+      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
+      this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", dataHist->GetNbinsX());
     }
 
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data

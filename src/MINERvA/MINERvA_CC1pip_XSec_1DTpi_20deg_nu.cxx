@@ -31,10 +31,10 @@ MINERvA_CC1pip_XSec_1DTpi_20deg_nu::MINERvA_CC1pip_XSec_1DTpi_20deg_nu(std::stri
 
   if (this->isShape) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20_shape.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov_shape.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov_shape.csv", dataHist->GetNbinsX());
   } else {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov.csv", dataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();
