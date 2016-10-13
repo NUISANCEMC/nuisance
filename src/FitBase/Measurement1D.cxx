@@ -366,15 +366,9 @@ void Measurement1D::SetCovarMatrix(std::string covarFile) {
 };
 
 //********************************************************************
+// Sets the covariance matrix from a provided file in a text format
 void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim) {
-  //********************************************************************
-
-  ////////////////////////////////////////////////////////////
-  // WARNING this reads in the data CORRELATIONS
-  // WARNING this reads in the data CORRELATIONS
-  // WARNING this reads in the data CORRELATIONS
-  // WARNING this reads in the data CORRELATIONS
-  ////////////////////////////////////////////////////////////
+//********************************************************************
 
   // Make a counter to track the line number
   int row = 0;
@@ -391,11 +385,60 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim) {
     ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile
              << std::endl;
 
-  // MINERvA CC1pip needs slightly different method
-  // Only half the covariance matrix is given and I'm too lazy to write the full
-  // one so let the code do it instead
-  if (fName.find("MINERvA_CC1pip") == std::string::npos ||
-      (fName.find("MINERvA_CCNpip") && fName.find("2016"))) {
+  // Loop over the lines in the file
+  while (std::getline(covarread, line, '\n')) {
+    std::istringstream stream(line);
+    double entry;
+    int column = 0;
+
+    // Loop over entries and insert them into matrix
+    while (stream >> entry) {
+
+      double val = entry;
+
+      (*covar)(row, column) = val;
+      (*fFullCovar)(row, column) = val;
+
+      column++;
+    }
+
+    row++;
+  }
+
+  // Robust matrix inversion method
+  TDecompSVD LU = TDecompSVD(*this->covar);
+  this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
+
+  return;
+};
+
+//********************************************************************
+// Sets the covariance matrix from a correlation matrix provided in a text format
+void Measurement1D::SetCovarMatrixFromCorrText(std::string covarFile, int dim) {
+//********************************************************************
+
+  // Make a counter to track the line number
+  int row = 0;
+
+  std::string line;
+  std::ifstream covarread(covarFile.c_str(), ifstream::in);
+
+  this->covar = new TMatrixDSym(dim);
+  fFullCovar = new TMatrixDSym(dim);
+  if (covarread.is_open())
+    LOG(SAM) << "Reading covariance matrix from file: " << covarFile
+             << std::endl;
+  else
+    ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile
+             << std::endl;
+
+  // MINERvA CC1pi+ and CCNpi+ from 2015 needs slightly different method
+  // Only half the covariance matrix is given so need to fill other half
+
+  // Here's the usual method, if we can't find MINERvA CC1pi+ or MINERvA_CCNpip*2016
+  if (fName.find("MINERvA_CC1pip") == std::string::npos &&
+      (fName.find("MINERvA_CCNpip") == std::string::npos && fName.find("2016") == std::string::npos)) {
+
     while (std::getline(covarread, line, '\n')) {
       std::istringstream stream(line);
       double entry;
@@ -421,7 +464,9 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim) {
     TDecompSVD LU = TDecompSVD(*this->covar);
     this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
 
-  } else {  // Here's the MINERvA CC1pip method; very similar
+  // Here's the MINERvA special method; only add the while(column < dim)
+  } else {
+
     while (std::getline(covarread, line, '\n')) {
       std::istringstream stream(line);
       double entry;
