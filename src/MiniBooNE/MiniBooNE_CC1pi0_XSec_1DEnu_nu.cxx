@@ -26,12 +26,13 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string input
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
-  fIsDiag = true;
+  fIsDiag = false;
   fIsEnu1D = true;
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/totalxsec_edit.txt");
+  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/totalxsec_covar.txt", this->fNDataPointsX);
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/totalxsec_covar.txt", this->fNDataPointsX-1);
   this->SetupDefaultHist();
 

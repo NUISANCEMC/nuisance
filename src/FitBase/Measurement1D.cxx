@@ -265,6 +265,9 @@ void Measurement1D::SetDataValues(std::string dataFile) {
       PlotUtils::GetTH1DFromFile(dataFile, (fName + "_data"), fPlotTitles);
   fDataTrue = (TH1D*)fDataHist->Clone();
 
+  // Number of data points is number of bins
+  fNDataPointsX = fDataHist->GetXaxis()->GetNbins();
+
   return;
 };
 
@@ -425,12 +428,14 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string covarFile, int dim) {
 
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
-  if (covarread.is_open())
+  if (covarread.is_open()) {
     LOG(SAM) << "Reading covariance matrix from file: " << covarFile
              << std::endl;
-  else
+
+  } else {
     ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile
              << std::endl;
+  }
 
   // MINERvA CC1pi+ and CCNpi+ from 2015 needs slightly different method
   // Only half the covariance matrix is given so need to fill other half
@@ -695,7 +700,7 @@ void Measurement1D::ScaleEvents() {
   //********************************************************************
 
   LOG(REC) << std::setw(20) << " " << fMCHist->Integral() << "/" << fNEvents
-           << " events passed selection" << std::endl;
+           << " events passed selection + binning after reweight" << std::endl;
 
   // Simple function to scale to xsec result if this is all that is needed.
   // Scale bin errors correctly
