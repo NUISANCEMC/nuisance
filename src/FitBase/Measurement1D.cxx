@@ -370,7 +370,8 @@ void Measurement1D::SetCovarMatrix(std::string covarFile) {
 
 //********************************************************************
 // Sets the covariance matrix from a provided file in a text format
-void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim) {
+// scale is a multiplicative pre-factor to apply in the case where the covariance is given in some unit (e.g. 1E-38)
+void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, double scale) {
 //********************************************************************
 
   // Make a counter to track the line number
@@ -408,9 +409,17 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim) {
     row++;
   }
 
+  // Scale the actualy covariance matrix by some multiplicative factor
+  fFullCovar *= scale;
+
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
+  // THIS IS ACTUALLY THE INVERSE COVARIANCE MATRIXA AAAAARGH
   this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
+
+  // Now need to multiply by the scaling factor
+  // If the covariance
+  (*this->covar) *= 1./(scale);
 
   return;
 };
@@ -465,8 +474,10 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string covarFile, int dim) {
       row++;
     }
 
+
     // Robust matrix inversion method
     TDecompSVD LU = TDecompSVD(*this->covar);
+    // COVAR IS ACTUALLY THE INVERSE COVARIANCE MATRIX!!!!!!!
     this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
 
   // Here's the MINERvA special method; only add the while(column < dim)
