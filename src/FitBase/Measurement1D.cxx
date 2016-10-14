@@ -410,7 +410,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
   }
 
   // Scale the actualy covariance matrix by some multiplicative factor
-  fFullCovar *= scale;
+  (*fFullCovar) *= scale;
 
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
