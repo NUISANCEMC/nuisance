@@ -22,12 +22,12 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inp
 
     // Error is given as percentage of cross-section
     // Need to scale the bin error properly before we do correlation -> covariance conversion
-    for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-      dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*dataHist->GetBinError(i+1)/100.);
+    for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+      fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
     }
 
-    //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/cc1pi0_thpi_corr.txt", dataHist->GetNbinsX());
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv", dataHist->GetNbinsX());
+    //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/cc1pi0_thpi_corr.txt", fDataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv", fDataHist->GetNbinsX());
 
   } else {
 

@@ -31,10 +31,10 @@ MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, 
 
   if (fIsShape) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_shape.csv");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", fDataHist->GetNbinsX());
   } else {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta.csv");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", dataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", fDataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();

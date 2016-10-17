@@ -17,13 +17,13 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
 
   // MINERvA has the error quoted as a percentage of the cross-section
   // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
-  for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
-    dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*(dataHist->GetBinError(i+1)/100.));
+  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+    fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
   }
 
   // We're given a correlation matrix, so need to convert it to a covariance matrix
-  //this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/ccnpip_enu_corr.txt", dataHist->GetNbinsX());
-  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-enu.csv", dataHist->GetNbinsX());
+  //this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/ccnpip_enu_corr.txt", fDataHist->GetNbinsX());
+  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-enu.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();
 

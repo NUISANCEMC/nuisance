@@ -425,97 +425,6 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
 };
 
 //********************************************************************
-// Sets the covariance matrix from a correlation matrix provided in a text format
-void Measurement1D::SetCovarMatrixFromCorrText(std::string covarFile, int dim) {
-//********************************************************************
-
-  // Make a counter to track the line number
-  int row = 0;
-
-  std::string line;
-  std::ifstream covarread(covarFile.c_str(), ifstream::in);
-
-  this->covar = new TMatrixDSym(dim);
-  fFullCovar = new TMatrixDSym(dim);
-  if (covarread.is_open()) {
-    LOG(SAM) << "Reading covariance matrix from file: " << covarFile
-             << std::endl;
-
-  } else {
-    ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile
-             << std::endl;
-  }
-
-  // MINERvA CC1pi+ and CCNpi+ from 2015 needs slightly different method
-  // Only half the covariance matrix is given so need to fill other half
-
-  // Here's the usual method, if we can't find MINERvA CC1pi+ or MINERvA_CCNpip*2016
-  if (fName.find("MINERvA_CC1pip") == std::string::npos &&
-      (fName.find("MINERvA_CCNpip") == std::string::npos && fName.find("2016") == std::string::npos)) {
-
-    while (std::getline(covarread, line, '\n')) {
-      std::istringstream stream(line);
-      double entry;
-      int column = 0;
-
-      // Loop over entries and insert them into matrix
-      // Multiply by the errors to get the covariance, rather than the
-      // correlation matrix
-      while (stream >> entry) {
-        double val = entry * fDataHist->GetBinError(row + 1) * 1E38 *
-                     fDataHist->GetBinError(column + 1) * 1E38;
-
-        (*covar)(row, column) = val;
-        (*fFullCovar)(row, column) = val;
-
-        column++;
-      }
-
-      row++;
-    }
-
-
-    // Robust matrix inversion method
-    TDecompSVD LU = TDecompSVD(*this->covar);
-    // COVAR IS ACTUALLY THE INVERSE COVARIANCE MATRIX!!!!!!!
-    this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
-
-  // Here's the MINERvA special method; only add the while(column < dim)
-  } else {
-
-    while (std::getline(covarread, line, '\n')) {
-      std::istringstream stream(line);
-      double entry;
-      int column = 0;
-      while (column < dim) {
-        if (column < row) {
-          (*this->covar)(row, column) = (*this->covar)(column, row);
-          column++;
-        } else {
-          while (stream >> entry) {
-            double val = entry * (fDataHist->GetBinError(row + 1) * 1E38 *
-                                  fDataHist->GetBinError(column + 1) *
-                                  1E38);  // need in these units to do Cholesky
-            (*this->covar)(row, column) = val;
-            (*fFullCovar)(row, column) = val;
-
-            column++;
-          }
-        }
-      }
-      row++;
-    }
-
-    // Robust matrix inversion method
-    TDecompChol a = TDecompChol(*this->covar);
-    this->covar = new TMatrixDSym(dim, a.Invert().GetMatrixArray(), "");
-
-  }  // end special treatment for MINERvA CC1pi+
-
-  return;
-};
-
-//********************************************************************
 void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 //********************************************************************
 
@@ -526,7 +435,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
   std::ifstream corr(corrFile.c_str(),ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
-  this->fullcovar = new TMatrixDSym(dim);
+  this->fFullCovar = new TMatrixDSym(dim);
   if(corr.is_open()) LOG(SAM) << "Reading and converting correlation matrix from file: " << corrFile << std::endl;
   else {
     ERR(FTL) <<"Correlation matrix provided is incorrect: "<<corrFile<<std::endl;
@@ -535,7 +444,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 
   // MINERvA CC1pip needs slightly different method
   // Only half the covariance matrix is given, so fill up the other half
-  if (measurementName.find("MINERvA_CC1pip") != std::string::npos || (measurementName.find("MINERvA_CCNpip") != std::string::npos && measurementName.find("2016") == std::string::npos)) {
+  if (fName.find("MINERvA_CC1pip") != std::string::npos || (fName.find("MINERvA_CCNpip") != std::string::npos && fName.find("2016") == std::string::npos)) {
 
     std::cout << "Treating MINERvA CC1pi+ differently" << std::endl;
 
@@ -556,13 +465,13 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 
           while(stream >> entry) {
 
-            double val = entry*(this->dataHist->GetBinError(row+1)*1E38*this->dataHist->GetBinError(column+1)*1E38); // need in these units to do Cholesky
+            double val = entry*(this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38); // need in these units to do Cholesky
             if (val == 0) {
               ERR(FTL) << "Found a zero value in the covariance matrix, assuming this is an error!" << std::endl;
               exit(-1);
             }
             (*this->covar)(row, column) = val;
-            (*this->fullcovar)(row, column) = val;
+            (*this->fFullCovar)(row, column) = val;
             column++;
 
           }
@@ -588,14 +497,14 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
       // Multiply by the errors to get the covariance, rather than the correlation matrix
       while(stream >> entry){
 
-        double val = entry * this->dataHist->GetBinError(row+1)*1E38*this->dataHist->GetBinError(column+1)*1E38;
+        double val = entry * this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38;
         if (val == 0) {
           ERR(FTL) << "Found a zero value in the covariance matrix, assuming this is an error!" << std::endl;
           exit(-1);
         }
 
         (*this->covar)(row, column) = val;
-        (*this->fullcovar)(row, column) = val;
+        (*this->fFullCovar)(row, column) = val;
 
         column++;
       }
@@ -613,7 +522,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 };
 
 //********************************************************************
-void Measurement1D::SetSmearingMatrix(std::string smearFile, int true_dim, int reco_dim){
+void Measurement1D::SetSmearingMatrix(std::string smearfile, int truedim, int recodim){
 //********************************************************************
 
   // The smearing matrix describes the migration from true bins (rows) to reco

@@ -341,10 +341,6 @@ void FitEvent::GENIEKinematics() {
     // State
     int state = kUndefinedState;
     switch (p->Status()) {
-      case genie::kIStInitialState:
-        state = kInitialState;
-        break;
-
     case genie::kIStNucleonTarget:
     case genie::kIStInitialState:
     case genie::kIStCorrelatedNucleon:
@@ -483,6 +479,7 @@ void FitEvent::GiBUUKinematics() {
     if (GiRead->StdHepPdg[i] > 1000000) {
       if (state == kInitialState) state = kNuclearInitial;
       else if (state == kFinalState) state = kNuclearRemnant;
+      continue;
     }
 
     // Remove Nuclear States
@@ -584,9 +581,8 @@ void FitEvent::OrderStack(){
   }
   return;
 }
-#endif  //< GiBUU ifdef
 
->>>>>>> c9d6d4d0da0cb485779658d375107892e6ab6648
+
 // REQUIRED FUNCTIONS FOR NUANCE
 #ifdef __NUANCE_ENABLED__
 //***************************************************
