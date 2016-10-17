@@ -5,9 +5,8 @@
 #export GENIE=""
 #export NUWRO=""
 
-rm -rf build
 mkdir build
-cd build
-cmake -DUSE_NuWro=1 -DUSE_NIWG=1 -DUSE_NEUT=1 -DUSE_GENIE=0 -DUSE_GiBUU=1 ../
+cd ./build
+cmake -DUSE_NuWro=1 -DUSE_NIWG=1 -DUSE_NEUT=1 -DUSE_GENIE=1 -DUSE_GiBUU=1 -DUSE_NUANCE=1 ../
 make 
 cd -
