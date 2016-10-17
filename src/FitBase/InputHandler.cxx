@@ -127,8 +127,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
   
   // Parse the "environement" flags in the fitter config
   // Can specify NEUT_DIR = "" and others in parameters/fitter.config.dat
-  const int nfiledir = 5;
-  const std::string filedir[nfiledir] = {"NEUT_DIR", "NUWRO_DIR", "GENIE_DIR", "NUANCE_DIR", "EVSPLN_DIR"};
+  const int nfiledir = 6;
+  const std::string filedir[nfiledir] = {"NEUT_DIR", "NUWRO_DIR", "GENIE_DIR", "NUANCE_DIR", "EVSPLN_DIR", "GIBUU_DIR"};
 
   for (int i = 0; i < nfiledir; i++) {
     std::string tempdir = "@" + filedir[i];
@@ -730,8 +730,8 @@ void InputHandler::ReadGenieFile() {
 
 #ifdef __GENIE_ENABLED__
 
-  // Event Type 1 NuWro
-  fEventType = 5;
+  // Event Type 5 GENIE
+  fEventType = kGENIE;
 
   // Open Root File
   LOG(SAM) << "Reading event file " << fInputFile << std::endl;
@@ -773,6 +773,10 @@ void InputHandler::ReadGenieFile() {
   // Make the custom event read in nvect when calling CalcKinematics
   fEvent->SetEventAddress(&fGenieNtpl);
 
+  std::vector<int> targetnucl;
+  int totalnucl = 0;
+  int avgtarg = 0;
+
   LOG(SAM) << "Processing GENIE flux events." << std::endl;
   for (int i = 0; i < fNEvents; i++) {
     tn->GetEntry(i);
@@ -781,9 +785,21 @@ void InputHandler::ReadGenieFile() {
     GHepParticle* neu = event.Probe();
 
     GHepRecord genie_record = static_cast<GHepRecord>(event);
+    double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+    //double xsec = (1E+38/genie::units::cm2) * (1.0/2.0) * genie_record.XSec();
 
-    //    double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
-    double xsec = (1E+38/genie::units::cm2) * (1.0/2.0) * genie_record.XSec();
+    //    xsec /= double(genie_record.Summary()->InitState().Tgt().A());
+    //    cout << "Nucl = " << genie_record.Summary()->InitState().Tgt().A() << " Xsec/nucl = " << xsec << endl;
+
+    int targ = genie_record.Summary()->InitState().Tgt().A();
+    if (std::find(targetnucl.begin(), targetnucl.end(), targ) == targetnucl.end()){
+      targetnucl.push_back(targ);
+      totalnucl += targ;
+    }
+
+    //    xsec /= double(targ);
+    //    xsec /= double(targ);
+    avgtarg += targ;
 
     average_xsec += xsec;
     total_events += 1;
@@ -794,11 +810,71 @@ void InputHandler::ReadGenieFile() {
     fGenieNtpl->Clear();
   }
 
-  average_xsec = average_xsec / (total_events + 0.);
-  fEventHist->Scale( average_xsec * fFluxHist->Integral("width") / total_events, "width" );
-  fXSecHist = (TH1D*)fEventHist->Clone();
-  fXSecHist->Divide(fFluxHist);
+  // 
+  
+  
+  cout << "FreeNucl Avg = " << double(avgtarg) / double(total_events) << endl;
 
+  double totxsec = average_xsec / double(total_events) / totalnucl;
+  fEventHist->Scale( totxsec * fFluxHist->Integral() / fEventHist->Integral(), "width" );
+
+  // CWorking Method
+  // ---------------------------------
+  //fXSecHist->Scale(1.0, "width");
+  //fXSecHist->Scale(1.0, "width");
+  //fXSecHist->Divide(fEventHist);
+
+  //fEventHist->Reset();
+  //fEventHist->Add(fFluxHist);
+  //fEventHist->Multiply(fXSecHist);
+  //-----------------------------------
+
+
+
+
+
+
+  //  double totxsec = average_xsec / double(total_events);// / double(totalnucl);
+  //  totxsec /= double(totalnucl);
+
+  //  cout << "TotXSec Calc = " << totxsec << endl;
+
+  //  fXSecHist->Scale( 1.0 / double(fNEvents) ,"width"  );
+  //  fXSecHist->Scale( 1.0 / double(totalnucl) );
+  
+  //fXSecHist->Divide(fEventHist);
+  //fXSecHist->Scale( totxsec / fXSecHist->Integral(), "width");
+  // fXSecHist->Scale( 1.0 / double(totalnucl) );
+
+  //  fEventHist->Scale( 1.0 / fEventHist->Integral(), "width");
+  //  fEventHist->Scale( totxsec * fFluxHist->Integral("width") );
+
+  //  fEventHist = (TH1D*) fFluxHist->Clone();
+  //  fEventHist->Multiply(fXSecHist);
+
+  //fXSecHist->Divide(fEventHist);
+  //fEventHist = (TH1D*) this->fFluxHist->Clone();
+  //fEventHist->Multiply(fXSecHist);
+  //fEventHist->Scale(1.0/3.0);
+  //  average_xsec = average_xsec / (total_events + 0.);
+  //  cout << "Total Targ = " << totalnucl << endl;
+
+  //  average_xsec /= double(totalnucl);
+  //  cout << "Total GENIE XSec " << average_xsec << endl;
+
+  //  fEventHist->Scale( average_xsec * fFluxHist->Integral("width") / total_events, "width" );
+  //  fXSecHist = (TH1D*)fEventHist->Clone();
+  //  fXSecHist->Divide(fFluxHist);
+
+  //  fEventHist ->Scale( 1.0 / fEventHist->Integral(),        "width");
+  //  fFluxHist  ->Scale( 1.0 / fFluxHist->Integral(),  "width");
+
+  //  fEventHist->Scale(fNEvents);
+
+  //  cout << "Integrals "<<fEventHist->Integral("width") << " " << fFluxHist->Integral("width") << endl;
+
+
+  
   // Set Titles
   fEventHist->SetNameTitle((fName + "_EVT").c_str(),
 				(fName + "_EVT;E_{#nu} (GeV); Events (1#times10^{-38})")
@@ -879,6 +955,12 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
   fEventHist->SetBinContent(
       1, double(fNEvents) / fEventHist->GetXaxis()->GetBinWidth(1));
 
+  fXSecHist = (TH1D*)fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+
+  fXSecHist->SetNameTitle((fName + "_XSEC").c_str(),
+			  (fName + "; E_{#nu} (GeV);XSec").c_str());
+
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
   fEvent->SetEventAddress(giRead);
@@ -953,14 +1035,22 @@ void InputHandler::ReadNuanceFile() {
   tn->SetBranchAddress("p_hadron", &fNuanceEvt->p_hadron);
   
   fEvent->SetEventAddress(&fNuanceEvt);
+  double EnuMin = 0.0; //tn->GetMinimum("p_neutrino[3]");
+  double EnuMax = 1000.0; //tn->GetMaximum("p_neutrino[3]");
 
   fFluxHist = new TH1D((fName + "_FLUX").c_str(),
-			     (fName + "_FLUX").c_str(), 1, 0.0, 1.0);
-  fFluxHist->SetBinContent(1, 1.0);
+			     (fName + "_FLUX").c_str(), 100, EnuMin, EnuMax);  
+  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
+    fFluxHist->SetBinContent(i+1, 1.0);
+  }
+  fFluxHist->Scale(1.0 / fFluxHist->Integral());
 
   fEventHist = new TH1D((fName + "_EVT").c_str(),
-			      (fName + "_EVT").c_str(), 1, 0.0, 1.0);
-  fEventHist->SetBinContent(1, fNEvents);
+			      (fName + "_EVT").c_str(), 100, EnuMin, EnuMax);
+  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
+    fEventHist->SetBinContent(i+1, 1.0);
+  }
+  fEventHist->Scale(1.0 / fEventHist->Integral());
 
   fXSecHist = (TH1D*) fEventHist->Clone();
   fXSecHist->Divide(fFluxHist);
@@ -998,6 +1088,8 @@ void InputHandler::PrintStartInput() {
                fFluxHist->Integral(0, fFluxHist->GetNbinsX(), "width")) *
                   1E-38
            << std::endl;
+  LOG(SAM) << " -> Integrated XSec Hist = " 
+	   << fXSecHist->Integral("width") << endl;
 
   if (fEventType == kEVTSPLINE) return;
 
@@ -1031,7 +1123,7 @@ void InputHandler::ReadEvent(unsigned int i) {
 
   bool using_events =
       (fEventType == kNEUT ||
-       fEventType == 5 ||
+       fEventType == kGENIE ||
        fEventType == kNUWRO ||
        fEventType == kEVTSPLINE ||
        fEventType == kNUANCE ||
@@ -1068,9 +1160,13 @@ void InputHandler::GetTreeEntry(const Long64_t i) {
 double InputHandler::GetInputWeight(const int entry) {
 //********************************************************************
 
-  if (fEventType == kGiBUU) {
+  if (fEventType == kGiBUU){
     return fEvent->InputWeight;
   }
+    
+  //  if (fEventType == kGENIE) {
+    //    return fEvent->InputWeight;
+    //  }
 
   if (!fIsJointInput) {
     return 1.0;

@@ -52,10 +52,12 @@
  */
 
 enum particle_state{
-  kUndefinedState = -1,
+  kUndefinedState = 5,
   kInitialState   = 0,
   kFSIState       = 1,
-  kFinalState     = 2
+  kFinalState     = 2,
+  kNuclearInitial = 3,
+  kNuclearRemnant = 4
 };
 
 //! Condensed FitParticle class which acts a common format between the generators

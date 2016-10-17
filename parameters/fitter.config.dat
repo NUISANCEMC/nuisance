@@ -154,5 +154,5 @@ config custom_pars.mec_norm.val  1.0
 config minimizer.tolerance  0.001
 
 config cachesize 0
-config savenominal 1
-config saveprefit 1
+config savenominal 0
+config saveprefit 0

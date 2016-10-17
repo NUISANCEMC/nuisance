@@ -127,6 +127,8 @@ class FitEvent : public BaseFitEvt {
 #endif
   
   /* Standard Event Functions */
+
+  void OrderStack();
   
   //! Return Any FitParticle from event
   FitParticle* PartInfo(UInt_t i);

@@ -1387,6 +1387,7 @@ int FitBase::ConvDialType(std::string type){
   else if (!type.compare("t2k_parameter")) return kT2K;
   else if (!type.compare("genie_parameter")) return kGENIE;
   else if (!type.compare("norm_parameter")) return kNORM;
+  else if (!type.compare("modenorm_parameter")) return kMODENORM;
   else return kUNKNOWN;
   
 }
@@ -1400,6 +1401,7 @@ std::string FitBase::ConvDialType(int type){
   case kT2K:   { return "t2k_parameter";   }
   case kGENIE: { return "genie_parameter"; }
   case kNORM:  { return "norm_parameter";  }
+  case kMODENORM: { return "modenorm_parameter"; }
   default: return "unknown_parameter"; 
   }
   
@@ -1448,7 +1450,28 @@ int FitBase::GetDialEnum(int type, std::string name){
     this_enum = -2;
 #endif
   }
-    
+
+  case kNORM: {
+    this_enum = offset + 1;
+    break;
+  }
+
+  case kMODENORM: {
+    size_t us_pos = name.find_first_of('_');
+    std::string numstr = name.substr(us_pos + 1);
+    int mode_num = std::atoi(numstr.c_str());
+    LOG(FTL) << "Getting mode num " << mode_num << endl;
+    if (!mode_num) {
+      ERR(FTL) << "Attempting to parse dial name: \"" << name
+	       << "\" as a mode norm dial but failed." << endl;
+      throw;
+    }
+    this_enum = 60 + mode_num + offset;
+    break;
+  }
+   
+
+ 
   }
 
   // If Not Enabled

@@ -180,9 +180,9 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
 
   // Set status manually from switch
   switch(state){
-  case kInitialState: fIsAlive= 0; fStatus=1; break; // Initial State
-  case kFinalState:   fIsAlive= 1; fStatus=0; break; // Final State
-  case kFSIState:     fIsAlive= 0; fStatus=2; break; // Intermediate State
+  case     kInitialState: fIsAlive= 0; fStatus=1; break; // Initial State
+  case     kFinalState:   fIsAlive= 1; fStatus=0; break; // Final State
+  case     kFSIState:     fIsAlive= 0; fStatus=2; break; // Intermediate State
   default: fIsAlive=-1; fStatus=3; break; // Other?
   }
 

@@ -621,10 +621,15 @@ void Measurement1D::ScaleEvents(){
 			     (fName + "_MC_WGHTS" + fPlotTitles).c_str() );
   fMCWeighted->GetYaxis()->SetTitle("Weighted Events");
   
+  //fMCHist->Scale(1.0 / fMCStat->Integral());
+
   // Should apply different scaling for:
   // 1D Enu distributions -- need bin by bin flux unfolding (bin by bin flux integration)
   // 1D count distributions -- need shape scaling to data
   // anything else -- flux averages
+
+  cout << "Scaling Factor = " << fScaleFactor << endl;
+  cout << "MC Hist = " << fMCHist->Integral() << endl;
 
   // Scaling for raw event rates
   if (fIsRawEvents) {
