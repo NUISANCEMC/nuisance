@@ -31,16 +31,17 @@ MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string inputfile
 
   if (fIsShape) {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", dataHist->GetNbinsX());
   } else {
     this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
-    this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", dataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();
 
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+  // Scale the MINERvA data to account for the flux difference
+  for (int i = 0; i < dataHist->GetNbinsX() + 1; i++) {
+    dataHist->SetBinContent(i+1, dataHist->GetBinContent(i+1)*1.11);
   }
 
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");

@@ -13,20 +13,18 @@ MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_pmu.txt");
+  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_pmu.txt");
+  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-muon-momentum.csv");
 
-  // MINERvA mucked up the scaling in the data-release where everything was bin-width normalised to the first bin, not the nth bin
-  double binOneWidth = fDataHist->GetBinWidth(1);
-  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-    double binNWidth = fDataHist->GetBinWidth(i+1);
-    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1E-40);
-    fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
-    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*binOneWidth/binNWidth);
-    fDataHist->SetBinError(i+1, fDataHist->GetBinError(i+1)*binOneWidth/binNWidth);
+  // MINERvA has the error quoted as a percentage of the cross-section
+  // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
+  for (int i = 0; i < dataHist->GetNbinsX()+1; i++) {
+    dataHist->SetBinError(i+1, dataHist->GetBinContent(i+1)*(dataHist->GetBinError(i+1)/100.));
   }
 
-  // This is a correlation matrix, FIX IT
-  this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_pmu_corr.txt", fDataHist->GetNbinsX());
+  //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_pmu_corr.txt", dataHist->GetNbinsX());
+  // Correlation matrix is given
+  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-muon-momentum.csv", dataHist->GetNbinsX());
 
   this->SetupDefaultHist();
 

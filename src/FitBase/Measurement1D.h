@@ -103,10 +103,10 @@ class Measurement1D : public MeasurementBase {
   //! "covar")
   virtual void SetCovarMatrix(std::string covarFile);
 
-  //! Read the covariance matrix from a text file given the covar size
-  virtual void SetCovarMatrixFromText(std::string covarFile, int dim, double scale = 1.0);
-
   //! Read the correlation matrix from a text file given the covar size and convert to covariance matrix
+  virtual void SetCovarMatrixFromText(std::string covarFile, int dim, double scale = 1.0);
+  //
+  //! Read the covariance matrix from a text file given the covar size
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
 
   //! Set the covariance from a custom root file
