@@ -26,20 +26,19 @@ MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string
   fPlotTitles = "; cos#theta_{#pi^{0}}; d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/CH_{2})";
   EnuMin = 0.5;
   EnuMax = 2.;
-  fIsDiag = true;
+  fIsDiag = false;
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/dxsecdcospi_edit.txt");
+  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/dxsecdcospi_covar.txt", this->fNDataPointsX);
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdcospi_covar.txt", this->fNDataPointsX -1 );
   this->SetupDefaultHist();
-
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
+
 
 void MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::FillEventVariables(FitEvent *event) {
   

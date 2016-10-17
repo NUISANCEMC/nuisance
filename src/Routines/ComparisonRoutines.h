@@ -17,8 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef COMMINIMIZER_ROUTINES_H
-#define COMMINIMIZER_ROUTINES_H
+#ifndef COMPARISON_ROUTINES_H
+#define COMPARISON_ROUTINES_H
 
 /*!
  *  \addtogroup Minimizer
@@ -29,12 +29,9 @@
 #include "TF1.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
-
 
 #include <vector>
 #include <string>
@@ -44,12 +41,8 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-#include "MinimizerFCN.h"
 #include "FitParameters.h"
 
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
 #include "FitLogger.h"
 
 enum minstate {

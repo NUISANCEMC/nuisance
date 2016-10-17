@@ -487,7 +487,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       fFluxHist->GetBinContent(fFluxHist->FindBin(Enu)) / fFluxHist->Integral();
 
   xsecScaling = fScaleFactor;
-  
+
   // Fill the eventVariables Tree
   eventVariables->Fill();
   return;

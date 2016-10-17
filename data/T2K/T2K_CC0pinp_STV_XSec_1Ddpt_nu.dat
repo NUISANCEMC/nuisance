@@ -1,0 +1,13 @@
+# Bin (GeV/c), dsig/ddpt (10^-38 cm^2 /GeV /neutron /c), Error
+# PRELIMINARY Fake NuWro data in proposed binning
+# Binning taken from: https://arxiv.org/pdf/1605.00179v1.pdf Fig.3
+0.0 0.746 0.1
+0.08 1.09 0.35
+0.12 0.975 0.35
+0.155 0.754 0.3
+0.2 0.396 0.125
+0.26 0.161 0.1
+0.36 0.114 0.075
+0.51 0.021 0.005
+1.1 0 0
+

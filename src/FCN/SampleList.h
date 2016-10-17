@@ -52,6 +52,11 @@
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.h"
 
+#include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h"
+#include "ArgoNeuT_CCInc_XSec_1Dthetamu_nu.h"
+
 // BNL CCQE
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
 #include "BNL_CCQE_XSec_1DEnu_nu.h"
@@ -179,6 +184,8 @@
 #include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
+// T2K STV CC0pi
+#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"

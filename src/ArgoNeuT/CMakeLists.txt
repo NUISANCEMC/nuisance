@@ -17,31 +17,20 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-ParamPull.cxx
-BaseFitEvt.cxx
-FitParticle.cxx
-FitWeight.cxx
-Measurement1D.cxx
-EventManager.cxx
-InputHandler.cxx
-Measurement2D.cxx
-FitEvent.cxx
-JointMeas1D.cxx
-MeasurementBase.cxx
-GeneratorUtils.cxx
-StdHepEvt.cxx
-TemplateMeas1D.cxx
+ArgoNeuT_CCInc_XSec_1Dpmu_antinu.cxx
+ArgoNeuT_CCInc_XSec_1Dpmu_nu.cxx
+ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.cxx
+ArgoNeuT_CCInc_XSec_1Dthetamu_nu.cxx
 )
 
 set(HEADERFILES
-ParamPull.h
-NuanceEvent.h
-BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
-InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
+ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h
+ArgoNeuT_CCInc_XSec_1Dpmu_nu.h
+ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h
+ArgoNeuT_CCInc_XSec_1Dthetamu_nu.h
 )
 
-set(LIBNAME FitBase)
+set(LIBNAME expArgoNeuT)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(${LIBNAME} STATIC ${IMPLFILES})
@@ -51,9 +40,9 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
@@ -61,6 +50,6 @@ set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include)
+#install(FILES ${HEADERFILES} DESTINATION include)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

@@ -167,7 +167,8 @@ class FitWeight {
   double GetSampleNorm(std::string samplename);
 
   double CalcWeight(BaseFitEvt* evt);
-
+  double GetSampleLikelihoodWeight(std::string samplename);
+  
   void PrintState();
 
   void Reconfigure(bool silent = false);

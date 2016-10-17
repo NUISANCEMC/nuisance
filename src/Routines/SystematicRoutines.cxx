@@ -842,16 +842,11 @@ void SystematicRoutines::SetupCovariance(){
   int NDIM = 0;
 
   // Get NFREE from min or from vals (for cases when doing throws)
-  if (fMinimizer){
-    NFREE = fMinimizer->NFree();
-    NDIM  = fMinimizer->NDim();
-  } else {
-    NDIM = fParams.size();
-    for (UInt_t i = 0; i < fParams.size(); i++){
-      if (!fFixVals[fParams[i]]) NFREE++;
-    }
+  NDIM = fParams.size();
+  for (UInt_t i = 0; i < fParams.size(); i++){
+    if (!fFixVals[fParams[i]]) NFREE++;
   }
-
+  
   if (NDIM == 0) return;
 
   fCovar = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);

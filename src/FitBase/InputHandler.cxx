@@ -23,7 +23,7 @@
 //****************************************************************************
 InputHandler::InputHandler(std::string handle, std::string infile_name) {
 //****************************************************************************
-  
+
   LOG(SAM) << "Creating InputHandler for " << handle << "..." << std::endl;
   LOG(SAM) << " -> [" << infile_name << "]" << std::endl;
 
@@ -43,13 +43,13 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   // Automatically check what sort of event file it is
   if (fInputType.compare("JOINT")){
     fInputRootFile = new TFile(fInputFile.c_str(), "READ");
-    
+
     if (!fInputRootFile || fInputRootFile->IsZombie()){
       ERR(FTL) << "Cannot find InputFile!" << endl;
       throw;
     }
   }
-  
+
   // Setup the handler for each type
   if (!fInputType.compare("NEUT"))
     ReadNeutFile();
@@ -103,7 +103,7 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
 
   // Parse out the input_type
   const int nfiletypes = 10;
-  // The hard-coded list of supported input generators  
+  // The hard-coded list of supported input generators
   const std::string filetypes[nfiletypes] = {"NEUT",     "NUWRO",    "GENIE",
                                              "EVSPLN",   "JOINT",    "NUANCE",
                                              "GiBUU_nu", "GiBUU_nub", "EMPTY",
@@ -124,7 +124,8 @@ std::string InputHandler::ParseInputFile(std::string inputstring) {
     ERR(FTL) << "Problematic Input: " << inputstring << endl;
     throw;
   }
-  
+
+
   // Parse the "environement" flags in the fitter config
   // Can specify NEUT_DIR = "" and others in parameters/fitter.config.dat
   const int nfiledir = 6;
@@ -157,15 +158,15 @@ void InputHandler::ReadFitEvents(){
 //********************************************************************
 
   fEventType = kINPUTFITEVENT;
-  
+
   fFluxHist  = (TH1D*)fInputRootFile->Get("FitFluxHist");
   fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
 			  (fName + "; E_{#nu} (GeV)").c_str());
-  
+
   fEventHist = (TH1D*)fInputRootFile->Get("FitEventHist");
   fEventHist->SetNameTitle( (fName + "_EVT").c_str(),
 			    (fName + "; E_{#nu} (GeV); Event Rate").c_str());
-  
+
   fXSecHist = (TH1D*)fEventHist->Clone();
   fXSecHist->Divide(fFluxHist);
   fXSecHist->SetNameTitle( (fName + "_XSEC").c_str(),
@@ -174,23 +175,23 @@ void InputHandler::ReadFitEvents(){
 
   tn = new TChain("FitEvents", "");
   tn->Add(Form("%s/FitEvents", fInputFile.c_str()));
-  
+
   // Assign nvect
   fNEvents = tn->GetEntries();
   fEvent->SetBranchAddress(tn);
-  
+
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read FEvent file" << std::endl;
-    
+
   return;
 }
 
-//******************************************************************** 
+//********************************************************************
 void InputHandler::ReadEmptyEvents(){
-//******************************************************************** 
+//********************************************************************
 
   fEventType = kEMPTY;
-  
+
   // Set flux histograms to empty
   fFluxHist = new TH1D( (fName + "_FLUX").c_str(),
 			(fName + "_FLUX;E_{#nu};Flux").c_str(),
@@ -208,10 +209,10 @@ void InputHandler::ReadEmptyEvents(){
 			(fName + "_XSEC;E_{#nu};XSec").c_str(),
 			1,0.0,1.0);
   fXSecHist->SetBinContent(1,1);
-  
+
   fNEvents = 0;
 
-  
+
 }
 
 //********************************************************************
@@ -239,19 +240,19 @@ void InputHandler::ReadEventSplineFile() {
 
   tn = new TChain("FitEvents", "");
   tn->Add(Form("%s/FitEvents", fInputFile.c_str()));
-  
+
   // Setup Spline Stuff
   fSplineHead = new FitSplineHead( fInputRootFile, "FitSplineHead" );
-  
+
   // Assign nvect
   fNEvents = tn->GetEntries();
   fEvent->SetBranchAddress(tn);
   fEvent->SetSplineCoeffAddress(tn);
   fEvent->SetType(kEVTSPLINE);
-  
+
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read FEvent file" << std::endl;
-  
+
   // Load Dial Coeffs into vector
   tn->GetEntry(0);
   int ncoeff = fEvent->GetNCoeff();
@@ -265,7 +266,7 @@ void InputHandler::ReadEventSplineFile() {
       fSplineArray[i][j] = fEvent->GetCoeff(j);
     }
   }
-  
+
   cout << "Loaded all spline coeffs" << endl;
 
   // Set MAXEVENTS CALC Here before we load in splines
@@ -274,7 +275,7 @@ void InputHandler::ReadEventSplineFile() {
              << " events from total spline events." << std::endl;
     fNEvents = fMaxEvents;
   }
-  
+
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read SPLINE file" << std::endl;
   if (LOG_LEVEL(SAM)) PrintStartInput();
@@ -313,7 +314,7 @@ void InputHandler::ReadJointFile() {
 //********************************************************************
 
   LOG(SAM) << " -> Reading list of inputs from file" << std::endl;
-  
+
   fIsJointInput = true;
 
   // Parse Input File
@@ -342,7 +343,7 @@ void InputHandler::ReadJointFile() {
   int temp_type = -1;
   for (UInt_t i = 0; i < input_lines.size(); i++) {
     LOG(SAM) << "Creating new sample inputhandler temperariliy" << endl;
-    
+
     // Create Temporary InputHandlers inside
     InputHandler* temp_input = new InputHandler(
         std::string(Form("temp_input_%i", i)), input_lines.at(i));
@@ -879,12 +880,12 @@ void InputHandler::ReadGenieFile() {
   fEventHist->SetNameTitle((fName + "_EVT").c_str(),
 				(fName + "_EVT;E_{#nu} (GeV); Events (1#times10^{-38})")
 				.c_str());
-  
+
   fXSecHist->SetNameTitle((fName + "_XSEC").c_str(),
 			       (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
 			       .c_str());
 
-  // Print out what was read in                                                                                                                                                                                                            
+  // Print out what was read in
   LOG(SAM) << " -> Successfully Read GENIE file" << std::endl;
   if (LOG_LEVEL(SAM)) PrintStartInput();
 
@@ -964,6 +965,12 @@ void InputHandler::ReadGiBUUFile(bool IsNuBarDominant) {
   GiBUUStdHepReader* giRead = new GiBUUStdHepReader();
   giRead->SetBranchAddresses(tn);
   fEvent->SetEventAddress(giRead);
+
+  #else
+  ERR(FTL) << "ERROR: Invalid Event File Provided" << std::endl;
+  ERR(FTL) << "GiBUU Input Not Enabled." << std::endl;
+  ERR(FTL) << "Rebuild with -DUSE_GiBUU=1." << std::endl;
+  exit(-1);
 #endif
 }
 
@@ -1033,7 +1040,7 @@ void InputHandler::ReadNuanceFile() {
   tn->SetBranchAddress("p_htot", &fNuanceEvt->p_htot);
   tn->SetBranchAddress("hadron", &fNuanceEvt->hadron);
   tn->SetBranchAddress("p_hadron", &fNuanceEvt->p_hadron);
-  
+
   fEvent->SetEventAddress(&fNuanceEvt);
   double EnuMin = 0.0; //tn->GetMinimum("p_neutrino[3]");
   double EnuMax = 1000.0; //tn->GetMaximum("p_neutrino[3]");
@@ -1054,8 +1061,8 @@ void InputHandler::ReadNuanceFile() {
 
   fXSecHist = (TH1D*) fEventHist->Clone();
   fXSecHist->Divide(fFluxHist);
-  
-  // Print out what was read in                                                                                                                                                                                                             
+
+  // Print out what was read in
   LOG(SAM) << " -> Successfully Read NUANCE file" << std::endl;
   if (LOG_LEVEL(SAM)) PrintStartInput();
 
@@ -1107,7 +1114,7 @@ void InputHandler::PrintStartInput() {
 //********************************************************************
 std::string InputHandler::GetInputStateString() {
 //********************************************************************
-  
+
   tn->GetEntry(0);
   fEvent->CalcKinematics();
   std::ostringstream state;
@@ -1145,13 +1152,13 @@ void InputHandler::ReadEvent(unsigned int i) {
 void InputHandler::GetTreeEntry(const Long64_t i) {
 //********************************************************************
 
-  // If we're just reading from the input root file   
+  // If we're just reading from the input root file
   if (fEventType != kEVTSPLINE){
     tn->GetEntry(i);
   } else {
     fEvent->FillCoeff(fSplineArray[i]);
   }
-  
+
   fEventIndex = i;
   fEvent->InputWeight = GetInputWeight(i);
 }
@@ -1202,7 +1209,7 @@ double InputHandler::TotalIntegratedFlux(double low, double high,
   if( fEventType == kGiBUU){
     return 1.0;
   }
-  
+
   int minBin = fFluxHist->GetXaxis()->FindBin(low);
   int maxBin = fFluxHist->GetXaxis()->FindBin(high);
 

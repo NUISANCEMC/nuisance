@@ -965,6 +965,28 @@ double FitWeight::GetSampleNorm(std::string samplename) {
 }
 
 //********************************************************************
+double FitWeight::GetSampleLikelihoodWeight(std::string samplename) {
+//********************************************************************
+  std::string norm_dial = samplename + "_weight";
+
+  // Loop through and see if we have one
+  std::vector<std::string>::iterator naIter = fDialNames.begin();
+  bool found_dial = false;
+  for (; naIter != fDialNames.end(); naIter++) {
+    if (((std::string)(*naIter)) == norm_dial) {
+      found_dial = true;
+      break;
+    }
+  }
+
+  if (!found_dial && !samplename.empty()) {
+    return 1.0;
+  } else {
+    return this->GetDialValue(norm_dial);
+  }  
+}
+
+//********************************************************************
 std::vector<std::string> FitWeight::GetDialNames() {
   //********************************************************************
   return fDialNames;
