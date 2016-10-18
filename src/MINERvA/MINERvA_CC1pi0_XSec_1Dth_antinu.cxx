@@ -38,7 +38,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inp
     // No hadronic mass cut on old publication
     hadMassCut = 99999;
 
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/ccpi0_th.csv");
+    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2015/ccpi0_th.csv");
     this->SetupDefaultHist();
  
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data

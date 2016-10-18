@@ -314,6 +314,7 @@ void FitWeight::SetDialValue(int this_enum, double val) {
                                   val);
       fGenieRW->Reconfigure();
       fGenieRW->Print();
+      sleep(10);
       this->fIsGenieChanged = true;
 #else
       LOG(FTL) << " GENIE DIAL ERROR " << std::endl;

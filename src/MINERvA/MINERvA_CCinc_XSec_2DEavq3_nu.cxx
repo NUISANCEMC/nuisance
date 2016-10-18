@@ -45,13 +45,13 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   this->fYBins = tempy;
   
   // Fill data and 1Dto2D Maps for covariance
-  SetDataValuesFromText(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/data_2D.txt", 1E-42);
-  SetMapValuesFromText(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/map_2D.txt");
-  SetCovarMatrixFromChol(FitPar::GetDataBase()+"/MINERvA/CCEavQ3/covar_2D.txt", 67);
+  SetDataValuesFromText(   FitPar::GetDataBase()+"/MINERvA/CCEavq3/data_2D.txt", 1E-42);
+  SetMapValuesFromText(    FitPar::GetDataBase()+"/MINERvA/CCEavq3/map_2D.txt");
+  SetCovarMatrixFromChol(  FitPar::GetDataBase()+"/MINERvA/CCEavq3/covar_2D.txt", 67);
 
   // Data is in 1E-42 and so is the covariance, need to scale accordingly.
   (*this->fFullCovar) *= 1E-16;
-  (*this->covar) *= 1E16;
+  (*this->covar)      *= 1E16;
   
   // Set data errors from covariance matrix
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
