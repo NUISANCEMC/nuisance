@@ -87,7 +87,7 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, Fi
   }
 
   fIsEnu = false;
-  if (fName.find("XSec") != std::string::npos && fName.find("Enu")) {
+  if (fName.find("XSec") != std::string::npos && fName.find("Enu") != std::string::npos) {
     fIsEnu = true;
     LOG(SAM) << "::" << fName << "::" << std::endl;
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
