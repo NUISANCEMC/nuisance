@@ -304,7 +304,7 @@ void FitEvent::GENIEKinematics() {
   InputWeight = (1E+38/genie::units::cm2) * genie_record->XSec();
 
   // Get N Particle Stack
-  int npart = genie_record->GetEntries();
+  unsigned int npart = genie_record->GetEntries();
   if (npart > kMaxParticles) {
     ERR(FTL) << "GENIE has too many particles" << std::endl;
     ERR(FTL) << "npart=" << npart << " kMax=" << kMaxParticles << std::endl;
@@ -335,7 +335,7 @@ void FitEvent::GENIEKinematics() {
   */
 
   // Loop over all particles
-  while ((p) = (dynamic_cast<genie::GHepParticle*>((iter).Next()))) {
+  while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
     if (!p) continue;
 
     // State
@@ -703,13 +703,13 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
 
 FitParticle* FitEvent::PartInfo(UInt_t i) {
   // Check its not just a repeated read.
-  if (i != fCurParticleIndex) {
+  if (i != (UInt_t)fCurParticleIndex) {
     // Check Valid
-    if (i > fNParticles or i < 0) {
+    if (i > (UInt_t)fNParticles or i < 0) {
       ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
       ERR(FTL) << "i = " << i << " N = " << fNParticles
-	       << " currindex = " << fCurParticleIndex << endl;
-      ERR(FTL) << "Mode = " << fMode << endl;
+	       << " currindex = " << fCurParticleIndex << std::endl;
+      ERR(FTL) << "Mode = " << fMode << std::endl;
 
       throw;
     }
