@@ -312,9 +312,6 @@ void FitWeight::SetDialValue(int this_enum, double val) {
 #ifdef __GENIE_ENABLED__
       fGenieRW->Systematics().Set(static_cast<genie::rew::GSyst_t>(rw_enum),
                                   val);
-      fGenieRW->Reconfigure();
-      fGenieRW->Print();
-      sleep(10);
       this->fIsGenieChanged = true;
 #else
       LOG(FTL) << " GENIE DIAL ERROR " << std::endl;
@@ -514,8 +511,6 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
       if (fIsUsingGenie) {
 	double gw =  fGenieRW->CalcWeight(*(evt->genie_event->event));
         rw_weight *= fGenieRW->CalcWeight(*(evt->genie_event->event));
-	cout << "GENIE WEIGHT = " <<  fGenieRW->CalcWeight(*(evt->genie_event->event)) << endl;
-	if (gw != 1.0) sleep(1);
       }
 #endif
 
@@ -773,6 +768,33 @@ void FitWeight::SetupGenieRW() {
     fGenieRW->AdoptWghtCalc("xsec_ncres", new genie::rew::GReWeightNuXSecNCRES);
   if (xsec_nucqe)
     fGenieRW->AdoptWghtCalc("nuclear_qe", new genie::rew::GReWeightFGM);
+
+
+  GReWeightNuXSecCCQE * rwccqe =
+    dynamic_cast<GReWeightNuXSecCCQE *> (fGenieRW->WghtCalc("xsec_ccqe"));
+  rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
+  
+  // Default to include shape and normalization changes for CCRES (can be changed downstream if desired)                                                                                                                                    
+  GReWeightNuXSecCCRES * rwccres =
+    dynamic_cast<GReWeightNuXSecCCRES *> (fGenieRW->WghtCalc("xsec_ccres"));
+  rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
+  
+  // Default to include shape and normalization changes for NCRES (can be changed downstream if desired)                                                                                                                                    
+  GReWeightNuXSecNCRES * rwncres =
+    dynamic_cast<GReWeightNuXSecNCRES *> (fGenieRW->WghtCalc("xsec_ncres"));
+  rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
+  
+  // Default to include shape and normalization changes for DIS (can be changed downstream if desired)                                                                                                                                      
+  GReWeightNuXSecDIS * rwdis =
+    dynamic_cast<GReWeightNuXSecDIS *> (fGenieRW->WghtCalc("xsec_dis"));
+  rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
+
+
+
+
+
+
+
 
   fGenieRW->Reconfigure();
 }

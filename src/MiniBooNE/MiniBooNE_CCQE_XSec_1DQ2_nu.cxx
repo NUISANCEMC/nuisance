@@ -89,11 +89,10 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
     
-    int PID = abs((event->PartInfo(j))->fPID);
+    int PID = ((event->PartInfo(j))->fPID);
 
-    if (!event->PartInfo(j)->fIsAlive) continue;
-    if (PID != 13 and !ccqelike)     continue;
-    if (abs(PID) != 13 and ccqelike) continue;
+    if (PID != 13 and !ccqelike)       continue;
+    if (abs(PID) != 13 and ccqelike)   continue;
     
       // Now find the Q2QE value and fill the histogram
     q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 

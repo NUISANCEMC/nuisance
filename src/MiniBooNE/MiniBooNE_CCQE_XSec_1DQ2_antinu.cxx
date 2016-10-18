@@ -47,8 +47,9 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
                                                     
   if (!this->fIsDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
+    LOG(SAM) << "Making diagonal covar" << endl;
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fFullCovar);
+    covar      = StatUtils::GetInvert(fFullCovar);
   }
 
   
@@ -93,26 +94,24 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 /// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
-  
+ 
   // Init
   q2qe = -999.9;
 
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
     
-    int PID = fabs((event->PartInfo(j))->fPID);
+    int PID = ((event->PartInfo(j))->fPID);
 
-    // Look for the outgoing muon
-    if (PID == -13 or (ccqelike and PID == 13)){
+    if (PID != -13 and !ccqelike)       continue;
+    if (abs(PID) != 13 and ccqelike)   continue;
     
-      // Now find the Q2QE value and fill the histogram
-      q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
-			       cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 30., false);
-     
-      break;
-    }
+    // Now find the Q2QE value and fill the histogram
+    q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
+			     cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 30., false);
+    break;
   }
- 
+  
   // Set X Variables
   fXVar = q2qe;
   

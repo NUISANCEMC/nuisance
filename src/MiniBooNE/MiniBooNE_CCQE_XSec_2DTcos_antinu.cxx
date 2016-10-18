@@ -76,20 +76,19 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
 
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
+
+    int PID = ((event->PartInfo(j))->fPID);
+
+    if (PID != -13 and !ccqelike)       continue;
+    if (abs(PID) != 13 and ccqelike)   continue;
+
+    // Now find the kinematic values and fill the histogram
+    Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - 0.105658367;
+    costheta = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
     
-    int PID = (event->PartInfo(j))->fPID;
-
-    // Look for the outgoing muon
-    if (PID == -13 or (ccqelike and PID == 13)){
-    
-      // Now find the kinematic values and fill the histogram
-      Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - 0.105658367;
-      costheta = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
-
-      break;
-    }      
-  }
-
+    break;
+  }      
+  
   // Set X Variables
   fXVar = Ekmu;
   fYVar = costheta;
