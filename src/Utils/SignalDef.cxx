@@ -1023,3 +1023,51 @@ bool SignalDef::isCCInc_ArgoNeuT(FitEvent *event, bool IsAnti) {
   return (pmu.Vect().Mag2() > 0) && (pmu.E() < 25E3) &&
          ((pmu.Vect().Theta() * 180. / TMath::Pi()) < 36);
 }
+
+
+
+
+
+
+bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax){
+  
+  bool signal = (event->IsCC()  && 
+		 event->IsFS0Pi() &&
+		 SignalDef::HasProtonKEAboveThreshold(event, 110.0) &&
+		 SignalDef::IsEnuInRange(event, enumin, enumax));
+  
+  std::cout << event->IsCC() << " " << event->IsFS0Pi() << " " << SignalDef::HasProtonKEAboveThreshold(event, 110.0) << " " << SignalDef::IsEnuInRange(event, enumin, enumax) << std::endl;
+
+
+  return signal;
+}
+
+
+bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
+  
+  double pe = -1.0;
+  if (event->HasFSProton()) pe = FitUtils::T(event->GetHMFSProton()->fP);
+
+  return pe > threshold;
+
+}
+
+bool SignalDef::IsRestrictedMuonAngle(FitEvent* event, double angle){
+  
+  // If not CCnumu return
+  if (!event->HasISNuMuon() || !event->HasFSMuon()) return false;
+
+  // Get Mom
+  TVector3 pnu = event->GetHMISNuMuon()->fP.Vect();
+  TVector3 pmu = event->GetHMFSMuon()->fP.Vect();
+
+  double thetamu = pnu.Angle(pmu) * 180. / TMath::Pi();
+
+  return (thetamu < angle);
+}
+
+bool SignalDef::IsEnuInRange(FitEvent* event, double emin, double emax){
+  return (event->PartInfo(0)->fP.E() > emin && 
+	  event->PartInfo(0)->fP.E() < emax);
+}
+

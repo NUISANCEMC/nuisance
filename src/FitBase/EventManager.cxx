@@ -95,6 +95,7 @@ void EventManager::AddInput(std::string handle, std::string infile){
 
   int id = GetInputID(infile);
 
+  fid[infile] = id;
   finputs[id] = new InputHandler(handle, infile);
   frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(),true);
   calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(),0.0);

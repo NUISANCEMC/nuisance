@@ -411,10 +411,26 @@ void JointFCN::ReconfigureUsingManager() {
   
   // Get list of inputs
   std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
-  std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
+  std::map<int, InputHandler*>::const_iterator iterInp;
   
+  // Check Matchup
+  for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
+    int input_id = (iterInp->first);
+    LOG(REC) << "Input " << input_id << "Valid for : " << endl;
+
+    for (MeasListConstIter iterSam = fSamples.begin();
+	 iterSam != fSamples.end(); iterSam++){
+      
+      MeasurementBase* exp = (*iterSam);
+      int exp_id = exp->GetInputID();
+      if (exp_id != input_id) continue;
+      
+      LOG(REC) << " ---> " << exp->GetName() << endl;
+    }
+  }
+
   // Start looping over inputs
-  for (; iterInp != fInputs.end(); iterInp++) {
+  for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
     
     int input_id = (iterInp->first);
     InputHandler* cur_input = (iterInp->second);
@@ -472,6 +488,7 @@ void JointFCN::ReconfigureUsingManager() {
       // Print Out
       if (LOG_LEVEL(REC) and i % countwidth == 0)
 	LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
+		 << " for input " << input_id 
 		 << std::endl;
     }
   }

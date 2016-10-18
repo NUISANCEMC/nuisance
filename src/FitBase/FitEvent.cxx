@@ -67,7 +67,13 @@ void FitEvent::ResetEvent() {
   fTargetH = -1;
   fBound = false;
   fNParticles = 0;
-  fCurParticleIndex = -1;
+  
+  for (int i = 0; i < kMaxParticles; i++){
+    FitParticle* fp = fParticleList[i];
+    if (fp) delete fp;
+    fParticleList[i] = NULL;
+  }
+
 }
 
 // NEUT GENERATOR SPECIFIC
@@ -104,7 +110,6 @@ void FitEvent::NeutKinematics() {
 
   // Fill Particle Stack
   fNParticles = 0;
-  fCurParticleIndex = -1;
 
   for (UInt_t i = 0; i < npart; i++) {
     NeutPart* part = fNeutVect->PartInfo(i);
@@ -216,7 +221,6 @@ void FitEvent::NuwroKinematics() {
 
   // Incoming Particles
   fNParticles = 0;
-  fCurParticleIndex = -1;
 
   for (UInt_t i = 0; i < npart_in; i++) {
     particle* part = &fNuwroEvent->in[i];
@@ -317,7 +321,6 @@ void FitEvent::GENIEKinematics() {
   TObjArrayIter iter(genie_record);
 
   fNParticles = 0;
-  fCurParticleIndex = -1;
 
   /*
     kIStUndefined                  = -1,
@@ -455,7 +458,6 @@ void FitEvent::GiBUUKinematics() {
 
   // Create Stack
   fNParticles = 0;
-  fCurParticleIndex = -1;
   for (int i = 0; i < npart; i++) {
     // State
     int state = kUndefinedState;
@@ -608,7 +610,6 @@ void FitEvent::NuanceKinematics() {
 
   // Fill particle Stack
   fNParticles = 0;
-  fCurParticleIndex = -1;
 
   // Check Particle Stack
   UInt_t npart = 2 + nuance_event->n_leptons + nuance_event->n_hadrons;
@@ -702,39 +703,23 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
 //***************************************************
 
 FitParticle* FitEvent::PartInfo(UInt_t i) {
-  // Check its not just a repeated read.
-  if (i != fCurParticleIndex) {
-    // Check Valid
-    if (i > fNParticles or i < 0) {
-      ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
-      ERR(FTL) << "i = " << i << " N = " << fNParticles
-	       << " currindex = " << fCurParticleIndex << endl;
-      ERR(FTL) << "Mode = " << fMode << endl;
 
-      throw;
-    }
-
-    /*
-    cout << "Getting particle " << i << std::endl;
-    cout << fParticleMom[i][0] << " "
-         << fParticleMom[i][1] << " "
-         << fParticleMom[i][2] << " "
-         << fParticleMom[i][3] << " "
-         << fParticlePDG[i] << " "
-         << fParticleState[i] << std::endl;
-    */
-
-    // Create new particle for reading
-    fCurParticleIndex = i;
-    fCurParticle =
-        FitParticle(fParticleMom[i][0], fParticleMom[i][1], fParticleMom[i][2],
-                    fParticleMom[i][3], fParticlePDG[i], fParticleState[i]);
-
-    return &fCurParticle;
+  // Check Valid
+  if (i > fNParticles or i < 0) {
+    ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
+    ERR(FTL) << "i = " << i << " N = " << fNParticles << endl;
+    ERR(FTL) << "Mode = " << fMode << endl;
+    
+    throw;
   }
 
-  // Return Created Particle
-  return &fCurParticle;
+  // Check particle has been formed
+  if (!fParticleList[i]){
+    fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1], fParticleMom[i][2],
+				       fParticleMom[i][3], fParticlePDG[i], fParticleState[i]);
+  }
+
+  return fParticleList[i];
 }
 
 int FitEvent::GetNeutrinoInPos(void) const {
@@ -770,3 +755,53 @@ FitParticle* FitEvent::GetNeutrinoIn(void) {
 FitParticle* FitEvent::GetLeptonOut(void) {
   return PartInfo(GetLeptonOutPos());
 }
+
+
+bool FitEvent::HasParticle(int pdg, int state){
+  
+  bool found = false;
+  for (int i = 0; i < fNParticles; i++){
+
+    if (state != -1 and fParticleState[i] != state) continue;
+    if (pdg == 0 or fParticlePDG[i] == pdg) found = true;
+
+  }
+  return found;
+}
+
+bool FitEvent::IsFS0Pi(){
+  
+  for (int i = 0; i < fNParticles; i++){
+    if (fParticleState[i] != kFinalState) continue;
+    if (fParticlePDG[i] == 211  ||
+	fParticlePDG[i] == -211 ||
+	fParticlePDG[i] == 111) return false;
+  }
+  return true;
+}
+
+FitParticle* FitEvent::GetHMParticle(int pdg, int state){
+  
+  double maxmom = 0.0;
+  int maxind    = -1;
+
+  for (int i = 0; i < fNParticles; i++){
+
+    if (state != -1 and fParticleState[i] != state) continue;
+    if (pdg == 0 or fParticlePDG[i] == pdg){
+
+      // Update Max Mom
+      double mom = sqrt(fParticleMom[i][0]*fParticleMom[i][0] +
+			fParticleMom[i][1]*fParticleMom[i][1] +
+			fParticleMom[i][2]*fParticleMom[i][2]);
+      if (fabs(mom) > maxmom){
+	maxmom = fabs(mom); 
+	maxind = i;
+      }
+    }
+  }
+
+  return (maxind != -1)? PartInfo(maxind) : NULL;
+}
+
+

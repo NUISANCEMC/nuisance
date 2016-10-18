@@ -326,29 +326,28 @@ MINERvA Samples
     */
   } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_nu") ||
              !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_20deg") ||
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_newflux") ||
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux")) {
+             !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_oldflux") ||
+             !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux")) {
     fChain->push_back(
         new MINERvA_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
 
   } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MINERvA_CCQE_XSec_1DQ2_antinu_20deg") ||
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_antinu_newflux") ||
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_antinu_20deg_newflux")) {
+             !name.compare("MINERvA_CCQE_XSec_1DQ2_antinu_oldflux") ||
+             !name.compare("MINERvA_CCQE_XSec_1DQ2_antinu_20deg_oldflux")) {
     fChain->push_back(
         new MINERvA_CCQE_XSec_1DQ2_antinu(name, file, rw, type, fkdt));
 
-  } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_joint") ||
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg") ||
-             //   !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_newflux")     ||
-             //   //< Not Current Supported/Stable
-             !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg_newflux")) {
-    fChain->push_back(
-        new MINERvA_CCQE_XSec_1DQ2_joint(name, file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_joint_oldflux") ||
+             !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux") ||
+	     //	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint") || // Currently unstable
+	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg")){
+    
+    fChain->push_back(new MINERvA_CCQE_XSec_1DQ2_joint(name, file, rw, type, fkdt));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DEe_nue")) {
     fChain->push_back(new MINERvA_CC0pi_XSec_1DEe_nue(file, rw, type, fkdt));
-
+    
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nue")) {
     fChain->push_back(new MINERvA_CC0pi_XSec_1DQ2_nue(file, rw, type, fkdt));
 

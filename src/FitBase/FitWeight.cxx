@@ -90,105 +90,7 @@ int FitWeight::GetDialEnum(std::string name, int type) {
     return fDialEnums[this->GetDialPos(name)];
   }
 
-  int offset = type * 1000;
-  int this_enum = -1;
-
-  switch (type) {
-    // NEUT DIAL TYPE
-    case kNEUT: {
-#ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
-      int neut_enum = (int)neut::rew::NSyst::FromString(name);
-      if (neut_enum != 0){
-	this_enum = neut_enum + offset;
-      }
-#else
-      ERR(FTL) << "NEUT RW Not Enabled!" << endl;
-      throw;
-#endif
-      break;
-    }
-    // NIWG DIAL TYPE
-    case kNIWG: {
-#ifdef __NIWG_ENABLED__  // --- NIWG BLOCK
-      int niwg_enum = (int)niwg::rew::NIWGSyst::FromString(name);
-      this_enum = niwg_enum + offset;
-#else
-      ERR(FTL) << "NIWG RW Not Enabled!" << endl;
-      throw;
-#endif
-      break;
-    }
-    // NUWRO DIAL TYPE
-    case kNUWRO: {
-#ifdef __NUWRO_REWEIGHT_ENABLED__  // --- NUWRO BLOCK
-      int nuwro_enum = (int)nuwro::rew::NuwroSyst::FromString(name);
-      if (nuwro_enum <= 0){
-	ERR(FTL) << "Uknown NuWro RW Parameter!" << endl;
-	ERR(FTL) << "Check '"
-		 << name
-		 << "' matches that in NuWroSyst.h"
-		 << endl;
-	throw;
-      }
-      this_enum = nuwro_enum + offset;
-#else
-      ERR(FTL) << "NUWRO RW Not Enabled!" << endl;
-      throw;
-#endif
-      break;
-    }
-    // GENIE DIAL TYPE
-    case kGENIE: {
-#ifdef __GENIE_ENABLED__
-      int genie_enum = (int)genie::rew::GSyst::FromString(name);
-      this_enum = genie_enum + offset;
-#else
-      ERR(FTL) << "GENIE RW Not Enabled!" << endl;
-      throw;
-#endif
-      break;
-    }
-    case kCUSTOM: {
-      int custom_enum = 0;  // PLACEHOLDER
-      this_enum = custom_enum + offset;
-      break;
-    }
-    // T2K DIAL TYPE
-    case kT2K: {
-#ifdef __T2KREW_ENABLED__
-      int t2k_enum = (int)t2krew::T2KSyst::FromString(name);
-      this_enum = t2k_enum + offset;
-#else
-      ERR(FTL) << "T2K RW Not Enabled!" << endl;
-      throw;
-#endif
-      break;
-    }
-    // NORM DIAL TYPE
-    case kNORM: {
-      this_enum = fNormEnum + offset;
-      fNormEnum++;
-      break;
-    }
-    case kMODENORM: {
-      size_t us_pos = name.find_first_of('_');
-      std::string numstr = name.substr(us_pos + 1);
-      int mode_num = std::atoi(numstr.c_str());
-      if (!mode_num) {
-        ERR(FTL) << "Attempting to parse dial name: \"" << name
-                 << "\" as a mode norm dial but failed." << endl;
-        throw;
-      }
-      this_enum = 60 + mode_num + offset;
-      break;
-    }
-    // UNKOWN DIAL TYPE
-    default: {
-      ERR(FTL) << " Uknown dial type found = " << type << " " << kNORM << endl;
-      // throw; // Don't throw so fitter puts out its name
-    }
-  }
-
+  int this_enum = FitBase::GetDialEnum(type, name);
   return this_enum;
 }
 
@@ -308,9 +210,9 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
 
     // GENIE RW INCLUDE DIAL
     case kGENIE:
-#ifdef __GENIE__ENABLED__
+#ifdef __GENIE_ENABLED__
       if (!fIsUsingGenie) this->SetupGenieRW();
-      this->fGenieRW->Systematics().Add(
+      this->fGenieRW->Systematics().Init(
           static_cast<genie::rew::GSyst_t>(rw_enum));
       break;
 #else
@@ -410,6 +312,8 @@ void FitWeight::SetDialValue(int this_enum, double val) {
 #ifdef __GENIE_ENABLED__
       fGenieRW->Systematics().Set(static_cast<genie::rew::GSyst_t>(rw_enum),
                                   val);
+      fGenieRW->Reconfigure();
+      fGenieRW->Print();
       this->fIsGenieChanged = true;
 #else
       LOG(FTL) << " GENIE DIAL ERROR " << std::endl;
@@ -607,7 +511,10 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 #ifdef __GENIE_ENABLED__
     case kGENIE:
       if (fIsUsingGenie) {
+	double gw =  fGenieRW->CalcWeight(*(evt->genie_event->event));
         rw_weight *= fGenieRW->CalcWeight(*(evt->genie_event->event));
+	cout << "GENIE WEIGHT = " <<  fGenieRW->CalcWeight(*(evt->genie_event->event)) << endl;
+	if (gw != 1.0) sleep(1);
       }
 #endif
 
@@ -1473,6 +1380,34 @@ int FitBase::GetDialEnum(int type, std::string name){
 #endif
   }
 
+  // GENIE DIAL TYPE
+    case kGENIE: {
+#ifdef __GENIE_ENABLED__
+      int genie_enum = (int)genie::rew::GSyst::FromString(name);
+      if (genie_enum > 0){ this_enum = genie_enum + offset; }
+#else
+      this_enum = -2;
+#endif
+      break;
+    }
+
+    case kCUSTOM: {
+      int custom_enum = 0;  // PLACEHOLDER
+      this_enum = custom_enum + offset;
+      break;
+    }
+      
+      // T2K DIAL TYPE
+  case kT2K: {
+#ifdef __T2KREW_ENABLED__
+    int t2k_enum = (int)t2krew::T2KSyst::FromString(name);
+    if (t2k_enum > 0){ this_enum = t2k_enum + offset; }
+#else
+    this_enum = -2;
+#endif  
+    break;
+  }
+ 
   case kNORM: {
     this_enum = offset + 1;
     break;

@@ -68,6 +68,16 @@
 #include "InputHandler.h"
 #include "EventManager.h"
 
+/// Enumerations to help with extra plot functions
+enum extraplotflags {
+  kExtraPlotError   = 0,
+  kExtraPlotReset   = 1,
+  kExtraPlotFill    = 2,
+  kExtraPlotConvert = 3,
+  kExtraPlotWrite   = 4
+};
+
+
 /// InputHandler Class
 ///
 /// Inherits from Measurement base to handle whatever input is throwna t the fitter automatically.

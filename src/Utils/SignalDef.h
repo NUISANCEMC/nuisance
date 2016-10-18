@@ -76,6 +76,17 @@ namespace SignalDef {
 
   bool isCCInc_ArgoNeuT(FitEvent* event, bool IsAnti=false);
 
+
+  // Generic Signal Functions
+  bool isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax);
+
+  bool HasProtonKEAboveThreshold(FitEvent* event, double threshold);
+  
+  bool IsRestrictedMuonAngle(FitEvent* event, double angle);
+
+  bool IsEnuInRange(FitEvent* event, double emin, double emax);
+
+
 }
 
 #endif

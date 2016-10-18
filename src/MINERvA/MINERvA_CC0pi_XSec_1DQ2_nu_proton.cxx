@@ -1,130 +1,113 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret                 
+
+/*******************************************************************************           
+*    This file is part of NUISANCE.                           
+*   
+*    NUISANCE is free software: you can redistribute it and/or modify                      
+*    it under the terms of the GNU General Public License as published by                  
+*    the Free Software Foundation, either version 3 of the License, or                     
+*    (at your option) any later version.                      
+*   
+*    NUISANCE is distributed in the hope that it will be useful,                           
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of                        
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                         
+*    GNU General Public License for more details.             
+*   
+*    You should have received a copy of the GNU General Public License                     
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.                     
+*******************************************************************************/
+
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
 #include <string>
 #include <sstream>
 
-// The constructor
 MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  // Measurement Details
-  fName = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
-  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
-  EnuMin = 0.;
-  EnuMax = 100.0;
-  fNormError = 0.100;
+  // Setup Measurement
+  fName         = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
+  fPlotTitles   = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
   fDefaultTypes = "FIX/FULL";
   fAllowedTypes = "FIX/FULL,DIAG";
+  fNormError    = 0.100;
+  EnuMin        = 0.;
+  EnuMax        = 100.0;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt");
-  this->SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
-  this->SetupDefaultHist();
-  
-  this->fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
+  // Setup Data
+  SetDataValues( FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt" );
+  SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
+  SetupDefaultHist();
+
+  // Setup Coplanar Hist
+  fCoplanarMCHist   = NULL;
+  fCoplanarDataHist = NULL;
+
+  // Setup a scaling factor for evt->xsec
+  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
 };
 
 
 void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
 
-  double pE_highest;
-  double weight = event->weight;
-  // Reset Fill Variables
-  Enu  = -999.9;
-  CosThetaMu  = -999.0;
-  Emu  = -999.0;
-  Tmu  = -999.0;
-  Q2mu  = -999.0;
-  q3  = -999.0;
-  Q2true  = -999.0;
-  Tp  = -999.0;
-  Ep  = -999.0;
-  Q2p  = -999.0;
-  Np   = 0;
-  Nn   = 0;
-  FSI  = 0;
-  bad_particle = false;
+  // Has NuMuCC1p
+  if (event->HasISNuMuon() && 
+      event->HasFSMuon() && 
+      event->HasFSProton()){
 
-  pT = 0.0;
-  pE_highest = -999.9; // Very highland-esque way of doing things
-  double pE_muon = -999.0;
-  double pE_total = 0.0;
-  muon_found = false;
-  proton_found = false;
-  int protonid = 0;
-  int muonid = 0;
+    TLorentzVector pnu    = event->GetHMISNuMuon()->fP;
+    TLorentzVector pprot  = event->GetHMFSProton()->fP;      
+    TLorentzVector pmu    = event->GetHMFSMuon()->fP;
 
-  Enu = event->PartInfo(0)->fP.E()/1000.0;
-  this->Weight = weight;
-  Mode = event->Mode;
-
-
-   // Loop over the particle stack and find highest momentum FS proton
-  for (UInt_t j = 0; j < event->Npart(); ++j){    
-    if (!event->PartInfo(j)->fIsAlive) continue;
-    if (event->PartInfo(j)->fPID == 2112){
-      Nn++;
-    }
     
-    if (event->PartInfo(j)->fPID == 2212){
-      Np++;
-      
-      // if momentum is higher than saved
-      if (event->PartInfo(j)->fP.E() > pE_highest or pE_highest == -999.9) {
-	pE_highest = event->PartInfo(j)->fP.E();
-	Tp = event->PartInfo(j)->fP.E() - 938;
-	Ep = event->PartInfo(j)->fP.E();
-	protonid = j;
-      }
-      pE_total += event->PartInfo(j)->fP.E();
-      
-    } else if (event->PartInfo(j)->fPID == 13){
-      
-      pE_muon = FitUtils::Q2QErec((event->PartInfo(j))->fP,
-				  cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 34.);
-      
-
-      CosThetaMu = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
-      ThetaMu = ((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()));
-      Emu = (event->PartInfo(j))->fP.E();
-      Tmu = (event->PartInfo(j))->fP.E() - 104;
-      Q2mu = pE_muon;
-      q3 = ((event->PartInfo(0))->fP.Vect() - (event->PartInfo(j))->fP.Vect()).Mag();
-      Q2true = (((event->PartInfo(0))->fP) - ((event->PartInfo(j))->fP)).Mag()/1000.0;
-      muonid = j;
-    } else if (event->PartInfo(j)->fPID != 13 and
-	       event->PartInfo(j)->fPID != 22 and
-	       event->PartInfo(j)->fPID != 2112 and
-	       event->PartInfo(j)->fPID != 2212){
-      bad_particle = true;
-    }
+    // Q2QE rec from leading proton assuming 34 MeV Eb
+    double protmax = pprot.E();
+    double q2qe    = FitUtils::ProtonQ2QErec(protmax, 34.); 
+    
+    // Coplanar is angle between muon and proton plane
+    TVector3 plnprotnu = pprot.Vect().Cross(pnu.Vect());
+    TVector3 plnmunu   = pmu.Vect().Cross(pnu.Vect());
+    double copl        = plnprotnu.Angle(plnmunu);
+    
+    // Fill X Variables
+    fXVar = q2qe;
+    
+    // Save Coplanar into spare y variable
+    fYVar = copl;
   }
-
-  pT = pE_highest -  0.93827203;
-  if (pE_highest > 0.110) proton_found = true;
-  if (ThetaMu < 1.22173) muon_found = false;
-
-  double q2qe    = (FitUtils::ProtonQ2QErec(pE_highest,34.));  
-  if (muon_found and proton_found ) 
-    Q2p = q2qe;
-  else 
-    Q2p = -999.0;
-  Pmuon = pE_muon;
-  
-  Coplanar = (event->PartInfo(protonid))->fP.Vect().Angle(((event->PartInfo(muonid))->fP.Vect()));
 
   return;
 };
 
 
 bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::isSignal(FitEvent *event){
-
-  // Look for the outgoing proton in the final state.
-  if (bad_particle) return false;
-
-  if (!proton_found or !muon_found) return false;
-
-  // Restrict energy range
-  if ((event->PartInfo(0))->fP.E() < this->EnuMin*1000 || (event->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
-
-  return true;
+  return SignalDef::isCC0pi1p_MINERvA(event, EnuMin*1.E3, EnuMax*1.E3);
 };
 
+
+bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::SortExtraPlots(int state){
+
+  switch(state){
+
+  // Reset Histograms at start of event loop
+  case kExtraPlotReset:
+    fCoplanarMCHist->Reset();    
+    break;
+
+  // Fill calls for extra histograms on each event
+  case kExtraPlotFill:
+    fCoplanarMCHist->Fill(fYVar, Weight);
+    break;
+
+  // Extra handling for histograms after event loop
+  case kExtraPlotConvert:
+    fCoplanarMCHist->Scale( fCoplanarDataHist->Integral() / fCoplanarMCHist->Integral() );
+    break;
+
+  // Save the extra histograms
+  case kExtraPlotWrite:
+    fCoplanarMCHist->Write();
+    break;
+  }
+  
+  return true;
+}

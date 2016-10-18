@@ -508,7 +508,9 @@ void ComparisonRoutines::GenerateComparison(){
   // Main Event Loop from event Manager
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
 
-  if (using_evtmanager) {       
+  if (using_evtmanager and false) {     
+    LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
+
     std::list<MeasurementBase*> samchain = fSampleFCN->GetSampleList();                      
     std::list<MeasurementBase*>::const_iterator iterSam = samchain.begin();               
     
