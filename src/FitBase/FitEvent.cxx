@@ -68,7 +68,7 @@ void FitEvent::ResetEvent() {
   fBound = false;
   fNParticles = 0;
   
-  for (int i = 0; i < kMaxParticles; i++){
+  for (uint i = 0; i < kMaxParticles; i++){
     FitParticle* fp = fParticleList[i];
     if (fp) delete fp;
     fParticleList[i] = NULL;
@@ -705,10 +705,10 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
 FitParticle* FitEvent::PartInfo(UInt_t i) {
 
   // Check Valid
-  if (i > fNParticles or i < 0) {
+  if (i > (UInt_t)fNParticles or i < 0) {
     ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
-    ERR(FTL) << "i = " << i << " N = " << fNParticles << endl;
-    ERR(FTL) << "Mode = " << fMode << endl;
+    ERR(FTL) << "i = " << i << " N = " << fNParticles << std::endl;
+    ERR(FTL) << "Mode = " << fMode << std::endl;
     
     throw;
   }
@@ -762,7 +762,7 @@ bool FitEvent::HasParticle(int pdg, int state){
   bool found = false;
   for (int i = 0; i < fNParticles; i++){
 
-    if (state != -1 and fParticleState[i] != state) continue;
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
     if (pdg == 0 or fParticlePDG[i] == pdg) found = true;
 
   }
@@ -787,7 +787,7 @@ FitParticle* FitEvent::GetHMParticle(int pdg, int state){
 
   for (int i = 0; i < fNParticles; i++){
 
-    if (state != -1 and fParticleState[i] != state) continue;
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
     if (pdg == 0 or fParticlePDG[i] == pdg){
 
       // Update Max Mom
