@@ -308,7 +308,7 @@ void FitEvent::GENIEKinematics() {
   InputWeight = (1E+38/genie::units::cm2) * genie_record->XSec();
 
   // Get N Particle Stack
-  int npart = genie_record->GetEntries();
+  unsigned int npart = genie_record->GetEntries();
   if (npart > kMaxParticles) {
     ERR(FTL) << "GENIE has too many particles" << std::endl;
     ERR(FTL) << "npart=" << npart << " kMax=" << kMaxParticles << std::endl;
@@ -338,7 +338,7 @@ void FitEvent::GENIEKinematics() {
   */
 
   // Loop over all particles
-  while ((p) = (dynamic_cast<genie::GHepParticle*>((iter).Next()))) {
+  while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
     if (!p) continue;
 
     // State

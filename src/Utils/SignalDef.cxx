@@ -950,7 +950,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
                             bool forwardgoing) {
   // Only Numu
-  if (!event->PartInfo(0)->fPID == 14) return false;
+  if (event->PartInfo(0)->fPID != 14) return false;
 
   // Cut on Energy
   if (event->Enu() / 1000.0 < EnuMin || event->Enu() / 1000.0 > EnuMax)
@@ -1035,10 +1035,7 @@ bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax)
 		 event->IsFS0Pi() &&
 		 SignalDef::HasProtonKEAboveThreshold(event, 110.0) &&
 		 SignalDef::IsEnuInRange(event, enumin, enumax));
-  
-  std::cout << event->IsCC() << " " << event->IsFS0Pi() << " " << SignalDef::HasProtonKEAboveThreshold(event, 110.0) << " " << SignalDef::IsEnuInRange(event, enumin, enumax) << std::endl;
-
-
+ 
   return signal;
 }
 
@@ -1048,7 +1045,7 @@ bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
   double pe = -1.0;
   if (event->HasFSProton()) pe = FitUtils::T(event->GetHMFSProton()->fP);
 
-  return pe > threshold;
+  return pe > threshold / 1000.0;
 
 }
 
