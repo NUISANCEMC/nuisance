@@ -504,7 +504,7 @@ void SplineRoutines::SetupGenericInputs(){
 //*************************************
   
   fGenericInputs.clear();
-  for (int i = 0; i < fGenericInputNames.size(); i++){
+  for (unsigned int i = 0; i < fGenericInputNames.size(); i++){
     std::string name = fGenericInputNames[i];
     std::string file = fGenericInputFiles[name];
     fGenericInputs[name] = ( new InputHandler( name, file ) );
@@ -707,7 +707,7 @@ void SplineRoutines::TestEventSplines(){
       splinput->ReadEvent(i);
 
       // Start Loop for each parameter //TODO Make it test ND splines
-      for (int j = 0; j < fParams.size(); j++){
+      for (unsigned int j = 0; j < fParams.size(); j++){
 	std::string name = fParams.at(j);
 	if (fFixVals[name]) continue;
 	
