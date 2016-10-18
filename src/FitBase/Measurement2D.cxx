@@ -87,7 +87,8 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, Fi
   }
 
   fIsEnu = false;
-  if (fName.find("XSec") != std::string::npos && fName.find("Enu") != std::string::npos) {
+  if ((fName.find("XSec") != std::string::npos) && (fName.find("Enu") != std::string::npos)) {
+
     fIsEnu = true;
     LOG(SAM) << "::" << fName << "::" << std::endl;
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
@@ -646,6 +647,7 @@ void Measurement2D::ScaleEvents(){
 //********************************************************************
 
   if (fMCWeighted) delete fMCWeighted;
+
   fMCWeighted = (TH2D*) fMCHist->Clone();
   fMCWeighted->SetNameTitle( (fName + "_MC_WGHTS").c_str(),
 			     (fName + "_MC_WGHTS" + fPlotTitles).c_str() );
