@@ -448,7 +448,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
 
     // Now scale every y axis bin for every x axis by the flux
     for (int j = 1; j < fMCHist->GetYaxis()->GetNbins()+1; j++) {
-      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(i+1) - fMCHist->GetYaxis()->GetBinLowEdge(i);
+      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j+1) - fMCHist->GetYaxis()->GetBinLowEdge(j);
       fMCHist->SetBinContent(i, j, fMCHist->GetBinContent(i,j)/(fluxInt*binWidth));
       fMCHist->SetBinError(i, j, fMCHist->GetBinError(i,j)/(fluxInt*binWidth));
     }
