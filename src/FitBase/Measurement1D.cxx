@@ -80,9 +80,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   Init();
 
   // Check if name contains Evt, indicating that it is a raw number of events
-  // measurements
-
-  // and should thus be treated as once
+  // measurements and should thus be treated as once
   fIsRawEvents = false;
   if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
     fIsRawEvents = true;

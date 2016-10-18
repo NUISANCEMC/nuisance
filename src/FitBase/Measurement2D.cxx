@@ -59,7 +59,6 @@ Measurement2D::Measurement2D() {
 
   fIsRawEvents = false;
   fIsDifXSec = false;
-  fIsEnu1D = false;
   fIsEnu = false;
 
 };
@@ -75,6 +74,36 @@ Measurement2D:: ~Measurement2D() {
 //********************************************************************
 void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, FitWeight *rw, std::string fkdt){
 //********************************************************************
+
+  // Check if name contains Evt, indicating that it is a raw number of events
+  // measurements and should thus be treated as once
+  fIsRawEvents = false;
+  if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
+    fIsRawEvents = true;
+    LOG(SAM) << "Found event rate measurement but fIsRawEvents == false!"
+             << std::endl;
+    LOG(SAM) << "Overriding this and setting fIsRawEvents == true!"
+             << std::endl;
+  }
+
+  fIsEnu = false;
+  if (fName.find("XSec") != std::string::npos && fName.find("Enu")) {
+    fIsEnu = true;
+    LOG(SAM) << "::" << fName << "::" << std::endl;
+    LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
+                "not flux averaged!"
+             << std::endl;
+  }
+
+  if (fIsEnu && fIsRawEvents) {
+    LOG(SAM) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+                "really correct?!"
+             << std::endl;
+    LOG(SAM) << "Check experiment constructor for " << fName
+             << " and correct this!" << std::endl;
+    LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
+    exit(-1);
+  }
 
   // Reset everything to NULL
   fRW = rw;
@@ -197,8 +226,8 @@ void Measurement2D::SetFitOptions(std::string opt){
   // EXTRAS
   if (opt.find("RAW")   != std::string::npos) fIsRawEvents = true;
   if (opt.find("DIF")   != std::string::npos) fIsDifXSec   = true;
-  if (opt.find("ENU1D") != std::string::npos) fIsEnu1D     = true;
-  if (opt.find("NORM")  != std::string::npos) fAddNormPen = true;
+  if (opt.find("ENU1D") != std::string::npos) fIsEnu       = true;
+  if (opt.find("NORM")  != std::string::npos) fAddNormPen  = true;
   if (opt.find("MASK")  != std::string::npos) fIsMask      = true;
 
   fIsProjFitX      = (opt.find("FITPROJX") != std::string::npos);
@@ -624,19 +653,11 @@ void Measurement2D::ScaleEvents(){
   
   if (fIsEnu) { // If we have Enu we need to do flux integration bin by bin
 
-    int axis = 0;
-    // If name is 2DEnu, means Enu is the x-axis
-    // Convention is 2DXVARYVAR
-    if (fName.find("2DEnu") != std::string::npos) {
-      axis = 0;
-    } else {
-      axis = 1;
-    }
+    // This assumes we have the Enu on the x-axis
+    // fairly trivial to make the change but only MiniBooNE 2D CC1pi+ has Enu in a 2D
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist, axis);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist, axis);
-
-    LOG(SAM) << "Running 2D Flux Unfolded Scaling?" << endl;
     fMCHist->Scale(fScaleFactor);
     fMCFine->Scale(fScaleFactor);
 

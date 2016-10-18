@@ -361,12 +361,9 @@ std::vector<std::string> PlotUtils::ParseFileToStr(std::string str, const char* 
 }
 
 //********************************************************************
-void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, int axis){
+// This assumes the Enu axis is the x axis, as is the case for MiniBooNE 2D distributions
+void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
 //********************************************************************
- // Mostly copied from TH1D version below
- // Need to specify which axes (default is x-axis)
-  (void) axis;
-  
 
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
   TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
@@ -377,28 +374,25 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, int axis){
 
   // Resolution for the interpolation used for the flux
   // Set to 100 times fines than flux histogram, should be enough buy may need tweaking!
-  int resolution = 100*fFluxHist->GetXaxis()->GetNbins();
+  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
   TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
-    fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+    // The start and end of the flux histogram might go to zero
+    // So we really need to take care with these bins for the interpolation; here I just set it flat
+    if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
+      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
+    } else {
+      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+    }
   }
-
-/*
-  // The histogram which contains the Enu projection of the TH2D
-  TH1D* EnuHist = NULL;
-
-  // if Enu is on x-axis
-  if (axis == 0) {
-    EnuHist = (TH1D*)fMCHist->ProjectionY();
-  } else if (axis == 1) {
-    EnuHist = (TH1D*)fMCHist->ProjectionX();
-  }
-*/
 
   for (int i = 1; i < fMCHist->GetNbinsX()+1; i++) {
+
+    // WARNING SCALING BY 1000 HERE BECAUSE MINIBOONE 2D IS ONLY DIST THAT HAS ENU ON IT!
+    //
     // Get the low edge of the ith bin
     Double_t binLowEdge = fMCHist->GetXaxis()->GetBinLowEdge(i)/1000.;
     // Get the high edge of the ith bin
@@ -450,39 +444,25 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, int axis){
 
     // fluxHigh - 1 because Integral takes the binLowEdge into account, and fluxHigh is our high edge
     double fluxInt = fineFlux->Integral(fluxLow, fluxHigh - 1, "width");
+    if (fluxInt == 0) continue;
 
-    // Scale every projected bin by the flux integration
-    //if (axis == 0) {
-      for (int j = 1; j < fMCHist->GetYaxis()->GetNbins()+1; j++) {
-        double binWidth = fMCHist->GetYaxis()->GetBinWidth(j);
-        fMCHist->SetBinContent(i, j, fMCHist->GetBinContent(i,j)/(fluxInt*binWidth));
-        fMCHist->SetBinError(i, j, fMCHist->GetBinError(i,j)/(fluxInt*binWidth));
-      }
-    /*
-    } else if (axis == 1) { 
-      for (int j = 1; j < fMCHist->GetXaxis()->GetNbins()+1; j++) {
-        fMCHist->SetBinContent(j, i, fMCHist->GetBinContent(j,i)/fluxInt);
-        fMCHist->SetBinError(j, i, fMCHist->GetBinError(j,i)/fluxInt);
-      }
+    // Now scale every y axis bin for every x axis by the flux
+    for (int j = 1; j < fMCHist->GetYaxis()->GetNbins()+1; j++) {
+      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(i+1) - fMCHist->GetYaxis()->GetBinLowEdge(i);
+      fMCHist->SetBinContent(i, j, fMCHist->GetBinContent(i,j)/(fluxInt*binWidth));
+      fMCHist->SetBinError(i, j, fMCHist->GetBinError(i,j)/(fluxInt*binWidth));
     }
-    */
   }
 
   delete fineFlux;
   delete fluxGraph;
-  //delete EnuHist;
-
 
   return;
 };
 
 
-
-  
-
-
-// This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
 //******************************************************************** 
+// This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
 void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 //******************************************************************** 
 
@@ -506,7 +486,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
     if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
       fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
     } else {
-    fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
     }
   }
 
@@ -565,6 +545,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 
     // Scale the bin content in bin i by the flux integral in that bin
     if (fluxInt == 0) continue;
+
     mcHist->SetBinContent(i, mcHist->GetBinContent(i)/fluxInt);
     mcHist->SetBinError(i, mcHist->GetBinError(i)/fluxInt);
   }
