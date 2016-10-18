@@ -950,7 +950,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
                             bool forwardgoing) {
   // Only Numu
-  if (!event->PartInfo(0)->fPID == 14) return false;
+  if (event->PartInfo(0)->fPID != 14) return false;
 
   // Cut on Energy
   if (event->Enu() / 1000.0 < EnuMin || event->Enu() / 1000.0 > EnuMax)
