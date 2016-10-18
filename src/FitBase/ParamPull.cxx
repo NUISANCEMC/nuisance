@@ -213,7 +213,7 @@ TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr){
     newhist.GetXaxis()->SetBinLabel(i+1, allowedbins[i].c_str());
 
     // Copy Values
-    for (UInt_t j = 0; j < hist.GetNbinsX(); j++){
+    for (Int_t j = 0; j < hist.GetNbinsX(); j++){
       if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j+1))){
 	newhist.SetBinContent(i+1, hist.GetBinContent(j+1) );
 	newhist.SetBinError(i+1, hist.GetBinError(j+1) );
@@ -249,7 +249,7 @@ TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr){
     newhist.GetXaxis()->SetBinLabel(i+1, allowedbins[i].c_str());
 
     // Copy Values
-    for (UInt_t j = 0; j < hist.GetNbinsX(); j++){
+    for (Int_t j = 0; j < hist.GetNbinsX(); j++){
       if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j+1))){
 	newhist.SetBinContent(i+1, hist.GetBinContent(j+1) );
 	newhist.SetBinError(i+1, hist.GetBinError(j+1) );
