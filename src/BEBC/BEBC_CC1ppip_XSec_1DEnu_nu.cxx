@@ -52,7 +52,7 @@ void BEBC_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
@@ -91,7 +91,7 @@ bool BEBC_CC1ppip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   int protonCnt = 0;
 
   for (UInt_t j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13) {
       lepCnt++;

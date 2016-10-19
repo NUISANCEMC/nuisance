@@ -230,6 +230,8 @@ class FitEvent : public BaseFitEvt {
   /* Read/Write FitEvent Functions */
   void SetBranchAddress(TChain* tn); 
   void AddBranchesToTree(TTree* tn);
+
+  void Print();
   
  private:
 

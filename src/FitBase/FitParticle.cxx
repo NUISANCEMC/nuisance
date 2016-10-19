@@ -28,7 +28,7 @@ FitParticle::FitParticle(NeutPart* part) {
 
   fPID = part->fPID;
   fIsAlive = part->fIsAlive;
-  fStatus = part->fStatus;
+  fNEUTStatusCode = part->fStatus;
   fMass = part->fMass;
 };
 
@@ -41,7 +41,7 @@ FitParticle::FitParticle(NeutFsiPart* part) {
   fPID = part->fPID;
   // Set these to zero because they don't make sense in NEUT
   fIsAlive = 0;
-  fStatus = 0;
+  fNEUTStatusCode = 0;
   fMass = fP.Mag();
 };
 #endif
@@ -58,19 +58,19 @@ FitParticle::FitParticle(particle* nuwro_particle, Int_t state) {
   switch (state) {
     case 0:
       fIsAlive = 0;
-      fStatus = 1;
+      fNEUTStatusCode = 1;
       break;  // Initial State
     case 1:
       fIsAlive = 1;
-      fStatus = 0;
+      fNEUTStatusCode = 0;
       break;  // Final State
     case 2:
       fIsAlive = 0;
-      fStatus = 2;
+      fNEUTStatusCode = 2;
       break;  // Intermediate State
     default:
       fIsAlive = -1;
-      fStatus = 3;
+      fNEUTStatusCode = 3;
       break;  // Other?
   }
 
@@ -90,26 +90,26 @@ FitParticle::FitParticle(genie::GHepParticle* genie_particle) {
   switch (genie_particle->Status()) {
     case genie::kIStInitialState:
       fIsAlive = 0;
-      fStatus = 1;
+      fNEUTStatusCode = 1;
       break;  // Initial State
     case genie::kIStStableFinalState:
       fIsAlive = 1;
-      fStatus = 0;
+      fNEUTStatusCode = 0;
       break;  // Final State
     case genie::kIStIntermediateState:
       fIsAlive = 0;
-      fStatus = 2;
+      fNEUTStatusCode = 2;
       break;  // Intermediate State
     default:
       fIsAlive = -1;
-      fStatus = 3;
+      fNEUTStatusCode = 3;
       break;
   }
 
   // Flag to remove nuclear part in genie
   if (fPID > 3000) {
     fIsAlive = -1;
-    fStatus = 2;
+    fNEUTStatusCode = 2;
   }
 
   fMass = genie_particle->Mass() * 1000.0;
@@ -117,7 +117,7 @@ FitParticle::FitParticle(genie::GHepParticle* genie_particle) {
   // Additional flag to remove off shell particles
   if (fabs(fMass - fP.Mag()) > 0.001) {
     fIsAlive = -1;
-    fStatus = 2;
+    fNEUTStatusCode = 2;
   }
 };
 
@@ -136,23 +136,23 @@ FitParticle::FitParticle(GiBUUStdHepReader* GiRead, Int_t p_it) {
   // Flag to remove nuclear part
   if (fPID > 100000) {
     fIsAlive = -1;
-    fStatus = 2;
+    fNEUTStatusCode = 2;
   }
 
   switch (GiRead->StdHepStatus[p_it]) {
     case 0: {  // incoming
       fIsAlive = 0;
-      fStatus = 1;
+      fNEUTStatusCode = 1;
       break;
     }
     case 1: {  // good final state
       fIsAlive = 1;
-      fStatus = 0;
+      fNEUTStatusCode = 0;
       break;
     }
     case 11: {  // struck nucleon
       fIsAlive = 0;
-      fStatus = 1;
+      fNEUTStatusCode = 1;
       break;
     }
   }
@@ -177,13 +177,14 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
 			    z,
 			    t);
   fPID = pdg;
+  fStatus = state;
 
   // Set status manually from switch
   switch(state){
-  case     kInitialState: fIsAlive= 0; fStatus=1; break; // Initial State
-  case     kFinalState:   fIsAlive= 1; fStatus=0; break; // Final State
-  case     kFSIState:     fIsAlive= 0; fStatus=2; break; // Intermediate State
-  default: fIsAlive=-1; fStatus=3; break; // Other?
+  case     kInitialState: fIsAlive= 0; fNEUTStatusCode=1; break; // Initial State
+  case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
+  case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
+  default: fIsAlive=-1; fNEUTStatusCode=3; break; // Other?
   }
 
   fMass = fP.Mag();

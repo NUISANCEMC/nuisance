@@ -56,7 +56,7 @@ void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   // Loop over the particle stack to find relevant particles 
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
   for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue; //move on if NOT ALIVE and NOT NORMAL
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211)
       Ppip = event->PartInfo(j)->fP;
@@ -93,7 +93,7 @@ bool ANL_NC1npip_Evt_1Dppi_nu::isSignal(FitEvent *event) {
   int neutronCnt = 0;
 
   for (UInt_t j =  2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 211) {
       pipCnt++;

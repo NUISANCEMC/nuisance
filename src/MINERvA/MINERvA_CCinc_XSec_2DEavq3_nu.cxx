@@ -139,7 +139,7 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
     }
 
     if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fStatus != 0) continue;
+    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
 
     // Eav Varible -----------------
     // P and pi+- Kinetic Energy

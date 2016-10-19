@@ -103,10 +103,21 @@ class FitParticle {
   TLorentzVector fP; //!< Particle 4 Momentum
   int fPID; //!< Particle PDG Code
   int fIsAlive; //!< Whether the particle is alive at the end of the event (Yes 1, No 0, Other? -1)
-  int fStatus; //!< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
+  int fNEUTStatusCode; //!< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
   double fMass; //!< Particle Mass
 
   FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
+
+  inline int  Status (void) const { return fStatus; };
+  inline int  PDG    (void) const { return fPID;    };
+  inline bool IsFinalState   (void) const { return (fStatus == kFinalState);   };
+  inline bool IsFSIState     (void) const { return (fStatus == kFSIState);     };
+  inline bool IsInitialState (void) const { return (fStatus == kInitialState); };
+  
+ private:
+  int fStatus;
+
+
 };
 
 /*! @} */

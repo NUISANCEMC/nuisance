@@ -80,7 +80,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   for (unsigned int j = 2; j < event->Npart(); ++j) {
 
     // Only include alive particles
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
 
     int PID = (event->PartInfo(j))->fPID;
     // Select highest momentum (energy) charged pion

@@ -36,7 +36,7 @@ void MINERvA_CC1pi0_XSec_1Dthmu_antinu::FillEventVariables(FitEvent *event) {
 
   // Loop over the particle stack
   for (unsigned int j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 111) {
       Ppi0 = event->PartInfo(j)->fP;
