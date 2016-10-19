@@ -80,9 +80,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   Init();
 
   // Check if name contains Evt, indicating that it is a raw number of events
-  // measurements
-
-  // and should thus be treated as once
+  // measurements and should thus be treated as once
   fIsRawEvents = false;
   if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
     fIsRawEvents = true;
@@ -293,6 +291,7 @@ void Measurement1D::SetDataFromFile(std::string inhistfile,
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
            << std::endl;
   fDataHist = PlotUtils::GetTH1DFromRootFile((inhistfile), histname);
+  fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
   return;
 };
@@ -1173,6 +1172,12 @@ void Measurement1D::Write(std::string drawOpt) {
 
   bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
 
+  if (FitPar::Config().GetParB("EventManager")){
+    drawFlux = false;
+    drawXSec = false;
+    drawEvents = false;
+  }
+
   // Save standard plots
   if (drawData) this->GetDataList().at(0)->Write();
   if (drawNormal) this->GetMCList().at(0)->Write();
@@ -1198,7 +1203,7 @@ void Measurement1D::Write(std::string drawOpt) {
 
   // Save neut stack
   if (drawModes) {
-    LOG(SAM) << "Writing MC Hist PDG" << std::endl;
+    //    LOG(SAM) << "Writing MC Hist PDG" << std::endl;
     THStack combo_fMCHist_PDG = PlotUtils::GetNeutModeStack(
         (fName + "_MC_PDG").c_str(), (TH1**)fMCHist_PDG, 0);
     combo_fMCHist_PDG.Write();
@@ -1383,7 +1388,7 @@ void Measurement1D::Write(std::string drawOpt) {
   }
 
   // Returning
-  LOG(SAM) << fName << "Written Histograms: " << fName << std::endl;
+  LOG(SAM) << "Written Histograms: " << fName << std::endl;
   return;
 };
 

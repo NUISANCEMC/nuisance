@@ -901,12 +901,8 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 
     for (int i = 0; i < dialhist.GetNbinsX(); i++){
       std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
-
-      cout << "Thrown BinX = " << name << endl;
       if (fCurVals.find(name) != fCurVals.end()){
 	fThrownVals[name] = dialhist.GetBinContent(i+1);
-	cout << "ThrownVals = " << name << " " << fThrownVals[name] << endl;
-	sleep(1);
       }
     }
 
@@ -936,19 +932,18 @@ void SystematicRoutines::GenerateErrorBands(){
   nominal->cd();
   fSampleFCN->Write();
 
-
   TDirectory* outnominal = (TDirectory*) fOutputRootFile->mkdir("nominal_throw");
   outnominal->cd();
   fSampleFCN->Write();
 
 
-  errorDIR->cd();
+  fOutputRootFile->cd();
   TTree* parameterTree = new TTree("throws","throws");
   double chi2;
   for (UInt_t i = 0; i < fParams.size(); i++)
     parameterTree->Branch(fParams[i].c_str(), &fThrownVals[fParams[i]], (fParams[i] + "/D").c_str());
   parameterTree->Branch("chi2",&chi2,"chi2/D");
-
+  fSampleFCN->CreateIterationTree("error_iterations", FitBase::GetRW());
 
   bool uniformly = FitPar::Config().GetParB("error_uniform");
 
@@ -972,12 +967,15 @@ void SystematicRoutines::GenerateErrorBands(){
     parameterTree->Fill();
   }
 
-  errorDIR->cd();
-  fDecompFree->Write();
-  fCovarFree->Write();
-  parameterTree->Write();
+  fOutputRootFile->cd();
+  parameterTree->Write();  
+  fSampleFCN->WriteIterationTree();
 
-  delete parameterTree;
+  //  fDecompFree->Write();
+  //  fCovarFree->Write();
+  //  parameterTree->Write();
+
+  //  delete parameterTree;
 
   // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
   TIter next(nominal->GetListOfKeys());
@@ -987,6 +985,7 @@ void SystematicRoutines::GenerateErrorBands(){
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
     TH1D *baseplot = (TH1D*)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
+    LOG(FIT) << "Creating error bands for " << plotname << std::endl;
 
     int nbins = baseplot->GetNbinsX()*baseplot->GetNbinsY();
 

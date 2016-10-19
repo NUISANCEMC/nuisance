@@ -8,7 +8,7 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
   fName = "MINERvA_CC0pi_XSec_1DQ2_nue";
   fPlotTitles = "; E_{e} (GeV); d#sigma/dE_{e} (cm^{2}/GeV)";
   EnuMin = 0.0;
-  EnuMax = 10.0;
+  EnuMax = 15.0;
   fNormError = 0.101;
   fDefaultTypes = "FIX/FULL";
   fAllowedTypes = "FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK";
@@ -28,16 +28,15 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
   SetupDefaultHist();
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); 
+  fScaleFactor = (this->fEventHist->Integral("width")*100.0*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); 
 
 };
 
 //********************************************************************
 void MINERvA_CC0pi_XSec_1DQ2_nue::FillEventVariables(FitEvent *event){
-  //********************************************************************
+//********************************************************************
 
   Enu_rec = 0.0;
-  bad_particle = false;
   
   // Get the relevant signal information
   for (UInt_t j = 2; j < event->Npart(); ++j){
@@ -47,16 +46,13 @@ void MINERvA_CC0pi_XSec_1DQ2_nue::FillEventVariables(FitEvent *event){
 
     if (abs(PID) == 11){
 
-      Thetae     = fabs((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()));
+      Thetae = ((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()));
       Ee = (event->PartInfo(j))->fP.E()/1000.0;
 
-      Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 34.,true);
+      Enu_rec = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
       Q2QEe   = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
-     
-    } else if (PID != 2212 and
-	       PID != 2112 and
-	       PID != 22){
-      bad_particle = true;
+
+      break;
     }
   }
   
@@ -71,19 +67,16 @@ void MINERvA_CC0pi_XSec_1DQ2_nue::FillEventVariables(FitEvent *event){
 bool MINERvA_CC0pi_XSec_1DQ2_nue::isSignal(FitEvent *event){
 //*******************************************************************
 
-  // Only look at numu events
-  //if ( nue_flag and (event->PartInfo(0)->fPID) != 12) return false;
-  //if (!nue_flag and (event->PartInfo(0)->fPID) != -12) return false;
-
   // Get Nue/NueBar events
   if (fabs(event->PDGnu()) != 12)  return false;
-
-  // ONLY CC0PI
-  if (bad_particle) return false;
+  
+  // CC0Pi
+  if (!event->IsFS0Pi() || !event->IsCC()) return false;
       
   // restrict energy range
   if (event->Enu()/1000.0 < this->EnuMin || event->Enu()/1000.0 > this->EnuMax) return false;
 
+  // Restrct Ee
   if (Ee < 0.5) return false;
   
   return true;
