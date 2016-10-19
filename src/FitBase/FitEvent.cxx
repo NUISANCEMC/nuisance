@@ -806,3 +806,21 @@ FitParticle* FitEvent::GetHMParticle(int pdg, int state){
 }
 
 
+void FitEvent::Print(){
+  std::cout << "FitEvent " << std::endl;
+
+  std::cout << " -> Particle Stack " << std::endl;
+  for (int i = 0; i < fNParticles; i++){
+    std::cout << " -> -> " << i << ". " 
+	      << fParticlePDG[i]   << " "
+	      << fParticleState[i] << " " 
+	      << "  Mom(" 
+	      << fParticleMom[i][0] << ", "
+	      << fParticleMom[i][1] << ", "
+	      << fParticleMom[i][2] << ", "
+	      << fParticleMom[i][3] << ")." << std::endl;
+
+
+  }
+  return;
+}

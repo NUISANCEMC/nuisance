@@ -36,7 +36,7 @@ bool SignalDef::isCCQE(FitEvent *event, double EnuMin, double EnuMax,
   TLorentzVector pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (abs(PID) >= 111 && abs(PID) <= 557)
@@ -74,7 +74,7 @@ bool SignalDef::isCCQEBar(FitEvent *event, double EnuMin, double EnuMax,
   TLorentzVector pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (abs(PID) >= 111 && abs(PID) <= 557)
@@ -107,7 +107,7 @@ bool SignalDef::isCCQELike(FitEvent *event, double EnuMin, double EnuMax) {
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0)
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;
     int PID = (event->PartInfo(j))->fPID;
     if (abs(PID) >= 110 && abs(PID) <= 557) return false;
@@ -130,7 +130,7 @@ bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
     return false;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0)
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;                                // maybe need not 2212 2112?
     if ((event->PartInfo(j))->fPID != 22 &&    // photon OK
         (event->PartInfo(j))->fPID != 2212 &&  // neutron OK
@@ -151,7 +151,7 @@ bool SignalDef::isMiniBooNE_CCQELike(FitEvent *event, double EnuMin,
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0)
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // maybe need not 2212 2112?
 
     int PID = event->PartInfo(j)->fPID;
@@ -239,7 +239,7 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin,
   int lepCnt = 0;  // Counts number of muons
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // Move on if NOT ALIVE and NOT NORMAL
 
     int PID = (event->PartInfo(j))->fPID;
@@ -303,7 +303,7 @@ bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move to next particle if NOT ALIVE and NOT NORMAL
 
     int PID = (event->PartInfo(j))->fPID;
@@ -364,7 +364,7 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin,
   int lepCnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // Move to next particle if NOT ALIVE and NOT NORMAL
 
     int PID = (event->PartInfo(j))->fPID;
@@ -399,7 +399,7 @@ bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
   int pi0Cnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (abs(PID) >= 113 && abs(PID) <= 557) return false;
@@ -432,7 +432,7 @@ bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
   int pi0Cnt = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (abs(PID) >= 113 && abs(PID) <= 557) return false;
@@ -464,7 +464,7 @@ bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
   // double vertexE = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == 13)
@@ -497,7 +497,7 @@ bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin,
   // double vertexE = 0;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == -13)
@@ -566,7 +566,7 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   TLorentzVector ppi;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // Move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
 
@@ -639,7 +639,7 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
   TLorentzVector pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // Move on if NOT ALIVE and NOT NORMAL
 
     int PID = (event->PartInfo(j))->fPID;
@@ -694,7 +694,7 @@ bool SignalDef::isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
   TLorentzVector Pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if ((abs(PID) >= 111 && abs(PID) <= 210) ||
@@ -767,7 +767,7 @@ bool SignalDef::isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax,
   TLorentzVector Pmu;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j)->fIsAlive) && (event->PartInfo(j))->fStatus != 0)
+    if (!(event->PartInfo(j)->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;  // Move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
 
@@ -919,7 +919,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 
   for (UInt_t i = 2; i < event->Npart(); i++) {
     if (!(event->PartInfo(i))->fIsAlive) continue;
-    if (event->PartInfo(i)->fStatus != 0) continue;
+    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
 
     int PID = event->PartInfo(i)->fPID;
     if (PID == 13) {
@@ -964,7 +964,7 @@ bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   // Loop over all particles
   for (UInt_t j = 2; j < event->Npart(); ++j) {
     // Get only final state
-    if (!(event->PartInfo(j))->fIsAlive or (event->PartInfo(j))->fStatus != 0)
+    if (!(event->PartInfo(j))->fIsAlive or (event->PartInfo(j))->fNEUTStatusCode != 0)
       continue;
 
     // Get PDG

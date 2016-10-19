@@ -61,7 +61,7 @@ void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   // start at 2 because 0=nu, 1=nucleon, by NEUT default
   for (UInt_t j =  2; j < event->Npart(); ++j){
 
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0 && (event->PartInfo(j)->fStatus != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0 && (event->PartInfo(j)->fNEUTStatusCode != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
 
     if (PID == -211) {
@@ -101,7 +101,7 @@ bool ANL_NC1ppim_Evt_1DcosmuStar_nu::isSignal(FitEvent *event) {
   int protonCnt = 0;
 
   for (UInt_t j =  2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
     int PID = (event->PartInfo(j))->fPID;
     if (PID == -211) {
       pimCnt++;

@@ -968,7 +968,6 @@ void SystematicRoutines::GenerateErrorBands(){
   }
 
   fOutputRootFile->cd();
-  parameterTree->Write();  
   fSampleFCN->WriteIterationTree();
 
   //  fDecompFree->Write();

@@ -73,7 +73,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent* event){
   bad_particle = false;
 
   for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fStatus != 0) continue;
+    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
     int PID = (event->PartInfo(j))->fPID;
     double KE = (event->PartInfo(j))->fP.E() - (event->PartInfo(j))->fMass;
     if (PID == 111) {

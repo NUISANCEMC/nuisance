@@ -173,8 +173,8 @@ std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdg)[N],
   UInt_t const &np = event->NPart();
   for (size_t p_it = 0; p_it < np; ++p_it) {
     FitParticle const &part = *event->PartInfo(p_it);
-    if ((InitalState && (part.fStatus != kInitialState)) ||
-        (!InitalState && (part.fStatus != kFinalState))) {
+    if ((InitalState && (part.Status() != kInitialState)) ||
+        (!InitalState && (part.Status() != kFinalState))) {
       continue;
     }
 

@@ -79,7 +79,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   for (unsigned int j = 2; j < event->Npart(); ++j) {
 
     // Only include alive particles
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
+    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
 
     int PID = (event->PartInfo(j))->fPID;
     // Pick up the charged pions
