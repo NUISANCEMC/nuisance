@@ -532,6 +532,21 @@ void JointFCN::Write(){
     ParamPull* pull = *iter;
     pull->Write();
   }
+
+  if (FitPar::Config().GetParB("EventManager")){
+
+    // Get list of inputs 
+    std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
+    std::map<int, InputHandler*>::const_iterator iterInp;
+
+    for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
+      InputHandler* input = (iterInp->second);
+
+      input->GetFluxHistogram()->Write();
+      input->GetXSecHistogram()->Write();
+      input->GetEventHistogram()->Write();
+    }
+  }
   
 };
 

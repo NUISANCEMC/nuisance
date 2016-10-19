@@ -68,7 +68,7 @@ void FitEvent::ResetEvent() {
   fBound = false;
   fNParticles = 0;
   
-  for (uint i = 0; i < kMaxParticles; i++){
+  for (unsigned int i = 0; i < kMaxParticles; i++){
     FitParticle* fp = fParticleList[i];
     if (fp) delete fp;
     fParticleList[i] = NULL;
@@ -706,6 +706,7 @@ FitParticle* FitEvent::PartInfo(UInt_t i) {
 
   // Check Valid
   if (i > (UInt_t)fNParticles or i < 0) {
+
     ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
     ERR(FTL) << "i = " << i << " N = " << fNParticles << std::endl;
     ERR(FTL) << "Mode = " << fMode << std::endl;
