@@ -43,12 +43,11 @@ ArgoNeuT_CCInc_XSec_1Dpmu_nu::ArgoNeuT_CCInc_XSec_1Dpmu_nu(
   fScaleFactor = fEventHist->Integral("width") * double(1E-38) / double(fNEvents) *
                 (40.0 /*Data is /Ar */) / TotalIntegratedFlux("width");
 
-  std::cout << "SF: " << fEventHist->Integral("width") << " " << fNEvents << " "
-            << TotalIntegratedFlux("width") << std::endl;
 };
 
 void ArgoNeuT_CCInc_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
-  fXVar = FitUtils::GetHMPDG_4Mom(13, event).first.Vect().Mag() / 1000.0;
+  FitParticle* pmu = event->GetHMFSParticle(13);
+  if (pmu) fXVar = pmu->fP.Vect().Mag()/1000.0;
   return;
 };
 
