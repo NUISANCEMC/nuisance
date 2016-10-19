@@ -26,9 +26,8 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_nu::ArgoNeuT_CCInc_XSec_1Dthetamu_nu(
 };
 
 void ArgoNeuT_CCInc_XSec_1Dthetamu_nu::FillEventVariables(FitEvent *event) {
-  fXVar =
-      (FitUtils::GetHMPDG_4Mom(13, event).first.Vect().Theta() / TMath::Pi()) *
-      180.;
+  FitParticle* pmu = event->GetHMFSParticle(13);
+  if (pmu) fXVar = 180.*pmu->fP.Vect().Theta()/TMath::Pi();
   return;
 };
 
@@ -36,5 +35,5 @@ void ArgoNeuT_CCInc_XSec_1Dthetamu_nu::FillEventVariables(FitEvent *event) {
 bool ArgoNeuT_CCInc_XSec_1Dthetamu_nu::isSignal(FitEvent *event)
 //********************************************************************
 {
-  return SignalDef::isCCInc_ArgoNeuT(event, true);
+  return SignalDef::isCCInc_ArgoNeuT(event);
 }

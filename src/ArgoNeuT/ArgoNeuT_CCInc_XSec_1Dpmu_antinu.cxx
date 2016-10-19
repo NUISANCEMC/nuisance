@@ -24,7 +24,8 @@ ArgoNeuT_CCInc_XSec_1Dpmu_antinu::ArgoNeuT_CCInc_XSec_1Dpmu_antinu(
 };
 
 void ArgoNeuT_CCInc_XSec_1Dpmu_antinu::FillEventVariables(FitEvent *event) {
-  fXVar = FitUtils::GetHMPDG_4Mom(-13, event).first.Vect().Mag();
+  FitParticle* pmu = event->GetHMFSParticle(-13);
+  if (pmu) fXVar = pmu->fP.Vect().Mag()/1000.0;
   return;
 };
 
