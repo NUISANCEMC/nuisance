@@ -1018,10 +1018,13 @@ bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
 }
 
 bool SignalDef::isCCInc_ArgoNeuT(FitEvent *event, bool IsAnti) {
-  TLorentzVector pmu = FitUtils::GetHMPDG_4Mom(IsAnti ? -13 : 13, event).first;
-  // std::cout << pmu.Vect().Theta()*18  << std::endl;
-  return (pmu.Vect().Mag2() > 0) && (pmu.E() < 25E3) &&
-         ((pmu.Vect().Theta() * 180. / TMath::Pi()) < 36);
+  FitParticle* pmu = event->GetHMFSParticle(IsAnti ? -13 : 13);
+  
+  // Check we have something
+  if (!pmu) return false;
+  
+  return (pmu->fP.Vect().Mag2() > 0) && (pmu->fP.E() < 25E3) &&
+         ((pmu->fP.Vect().Theta() * 180. / TMath::Pi()) < 36);
 }
 
 
