@@ -197,7 +197,7 @@ std::pair<TLorentzVector, int> GetHMFSCLepton_4Mom(FitEvent *event);
 /// Gets the 4 mom of the highest momentum final state muon.
 std::pair<TLorentzVector, int> GetHMFSMuon_4Mom(FitEvent *event);
 /// Gets the 4 mom of the highest momentum final state anti-muon.
-std::pair<TLorentzVector, int> GetHMFSAnitMuon_4Mom(FitEvent *event);
+std::pair<TLorentzVector, int> GetHMFSAntiMuon_4Mom(FitEvent *event);
 /// Gets the 4 mom of the highest momentum initial state neutral lepton.
 std::pair<TLorentzVector, int> GetHMISNLepton_4Mom(FitEvent *event);
 /// Gets the 4 mom of the highest momentum initial state muon neutrino.
