@@ -689,7 +689,7 @@ std::pair<TLorentzVector, int> FitUtils::GetHMFSMuon_4Mom(FitEvent *event) {
   int pdgs[] = {13};
   return GetHMPDG_4Mom(pdgs, event);
 }
-std::pair<TLorentzVector, int> FitUtils::GetHMFSAnitMuon_4Mom(FitEvent *event) {
+std::pair<TLorentzVector, int> FitUtils::GetHMFSAntiMuon_4Mom(FitEvent *event) {
   int pdgs[] = {-13};
   return GetHMPDG_4Mom(pdgs, event);
 }

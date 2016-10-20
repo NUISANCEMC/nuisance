@@ -26,9 +26,8 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(
 };
 
 void ArgoNeuT_CCInc_XSec_1Dthetamu_antinu::FillEventVariables(FitEvent *event) {
-  fXVar =
-      (FitUtils::GetHMPDG_4Mom(-13, event).first.Vect().Theta() / TMath::Pi()) *
-      180.;
+  FitParticle* pmu = event->GetHMFSParticle(-13);
+  if (pmu) fXVar = 180.*pmu->fP.Vect().Theta()/TMath::Pi();
   return;
 };
 
