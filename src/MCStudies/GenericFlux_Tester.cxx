@@ -85,6 +85,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
+  LOG(SAM) << "Adding Event Variables" << endl;
   eventVariables->Branch("Mode", &Mode, "Mode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
@@ -182,6 +183,8 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }
+
+  LOG(SAM) << "Adding Samples" << endl;
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");

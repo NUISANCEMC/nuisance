@@ -7,6 +7,8 @@ JointFCN::JointFCN(std::string cardfile,  TFile *outfile){
 //***************************************************
   
   fOutputDir   = gDirectory;
+  FitPar::Config().out = outfile;
+
   fCardFile = cardfile;
   
   LoadSamples(fCardFile);
@@ -416,7 +418,7 @@ void JointFCN::ReconfigureUsingManager() {
   // Check Matchup
   for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
     int input_id = (iterInp->first);
-    LOG(REC) << "Input " << input_id << "Valid for : " << endl;
+    LOG(REC) << "Input " << input_id << " Valid for : " << endl;
 
     for (MeasListConstIter iterSam = fSamples.begin();
 	 iterSam != fSamples.end(); iterSam++){

@@ -289,8 +289,7 @@ void FitEvent::GENIEKinematics() {
   if (genie_record->Summary()->ProcInfo().IsMEC()) {
     if (pdg::IsNeutrino(genie_record->Summary()->InitState().ProbePdg())) {
       fMode = 2;
-    } else if (pdg::IsAntiNeutrino(
-                   genie_record->Summary()->InitState().ProbePdg())) {
+    } else if (pdg::IsAntiNeutrino(genie_record->Summary()->InitState().ProbePdg())) {
       fMode = -2;
     }
   } else {

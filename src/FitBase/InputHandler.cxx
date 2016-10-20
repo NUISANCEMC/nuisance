@@ -778,6 +778,12 @@ void InputHandler::ReadGenieFile() {
   int totalnucl = 0;
   int avgtarg = 0;
 
+  std::map<std::string, TH1D*> modexsecmap;
+  std::map<std::string, TH1D*> modecountmap;
+  std::vector<std::string> targetgenieid;
+  std::vector<std::string> intergenieid;
+  std::vector<std::string> genieids;
+
   LOG(SAM) << "Processing GENIE flux events." << std::endl;
   for (int i = 0; i < fNEvents; i++) {
     tn->GetEntry(i);
@@ -787,10 +793,6 @@ void InputHandler::ReadGenieFile() {
 
     GHepRecord genie_record = static_cast<GHepRecord>(event);
     double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
-    //double xsec = (1E+38/genie::units::cm2) * (1.0/2.0) * genie_record.XSec();
-
-    //    xsec /= double(genie_record.Summary()->InitState().Tgt().A());
-    //    cout << "Nucl = " << genie_record.Summary()->InitState().Tgt().A() << " Xsec/nucl = " << xsec << endl;
 
     int targ = genie_record.Summary()->InitState().Tgt().A();
     if (std::find(targetnucl.begin(), targetnucl.end(), targ) == targetnucl.end()){
@@ -798,9 +800,43 @@ void InputHandler::ReadGenieFile() {
       totalnucl += targ;
     }
 
-    //    xsec /= double(targ);
-    //    xsec /= double(targ);
+    xsec /= double(targ);
     avgtarg += targ;
+
+
+    std::string mode = genie_record.Summary()->AsString();
+
+    std::vector<std::string> modevec = PlotUtils::ParseToStr(mode,";");
+    std::string unitarget = ( modevec[0] + ";" + modevec[1] );
+    std::string uniinter  = "";
+    for (int i = 2; i < modevec.size(); i++){
+      uniinter += ";" + modevec[i];
+    }
+
+    if (std::find(targetgenieid.begin(), targetgenieid.end(), unitarget) == targetgenieid.end()){
+      targetgenieid.push_back(unitarget);
+    }
+
+    if (std::find(intergenieid.begin(), intergenieid.end(), uniinter) == intergenieid.end()){
+      intergenieid.push_back(uniinter);
+    }
+    
+    genieids.push_back(mode);
+
+
+    //    int mode = utils::ghep::NeutReactionCode(&genie_record);
+    if (modexsecmap.find(mode) == modexsecmap.end()){
+      modexsecmap[mode] = (TH1D*)fFluxHist->Clone();
+      modexsecmap[mode]->Reset();
+
+      modecountmap[mode] = (TH1D*)fFluxHist->Clone();
+      modecountmap[mode]->Reset();
+      std::cout << "GENIE MODE = " << mode << " TARGET = " << unitarget << " INTER = " << uniinter << std::endl;
+    }
+    
+    modexsecmap[mode]->Fill(neu->E(), xsec);
+    modecountmap[mode]->Fill(neu->E());
+
 
     average_xsec += xsec;
     total_events += 1;
@@ -811,13 +847,188 @@ void InputHandler::ReadGenieFile() {
     fGenieNtpl->Clear();
   }
 
-  // 
-  
-  
-  cout << "FreeNucl Avg = " << double(avgtarg) / double(total_events) << endl;
 
-  double totxsec = average_xsec / double(total_events) / totalnucl;
-  fEventHist->Scale( totxsec * fFluxHist->Integral() / fEventHist->Integral(), "width" );
+  // Now we have the totals sum up the average xsec for each mode and save
+  TDirectory* geniesplinedir = (TDirectory*) FitPar::Config().out->mkdir( (fName + "_GSPLINES").c_str() );
+  
+  // INDIVIDIUAL SPLINES
+  LOG(SAM) << "Saving individual splines..." << std::endl;
+  TDirectory* indivdir = (TDirectory*) geniesplinedir->mkdir( ("individual") );
+  double totxsec = 1.0;
+  for(std::map<std::string,TH1D*>::iterator iter = modexsecmap.begin(); iter != modexsecmap.end(); iter++){
+    std::string mode = iter->first;
+    TH1D* sumxsec = (TH1D*) iter->second->Clone();
+    TH1D* sumevt  = (TH1D*) modecountmap[mode]->Clone();
+
+    indivdir->cd();
+    //    sumxsec ->Write((mode + "_sumxsec").c_str());
+    //    sumevt  ->Write((mode + "_sumevt").c_str());
+    
+    sumxsec ->Divide(sumevt);
+    sumxsec->Write((mode + "_avgxsec").c_str());
+  }
+
+  // SUMMED INTERACTIONS FOR DIFFERENT TARGETS
+  LOG(SAM) << "Saving interactions summed over targets.." << std::endl;
+
+  TDirectory* reacdir = (TDirectory*) geniesplinedir->mkdir( ("reacsummedovertargets") );
+  reacdir->cd();
+  //  double totxsec = 1.0;
+
+  TH1D* xsectotal = NULL;
+
+  // Loop Interactions
+  for (int i = 0; i < intergenieid.size(); i++){
+
+    std::string inter = intergenieid[i];
+    TH1D* xsechist = NULL;
+    TH1D* evthist  = NULL;
+
+    LOG(SAM) << "Interaction : " << inter << "   Relevant Targets : ";
+    // For Each Interaction Sum Targets
+    for (int j = 0; j < targetgenieid.size(); j++){
+      std::string targ = targetgenieid[j];
+
+      // Find matching mode
+      std::string reacstring = "";
+      for (int k = 0; k < genieids.size(); k++){
+        if (genieids[k].find(targ)  != std::string::npos &&
+            genieids[k].find(inter) != std::string::npos){
+          reacstring = genieids[k];
+          break;
+        }
+      }
+      if (modecountmap.find(reacstring) == modecountmap.end()) continue;
+
+      // Relevent target so add to xsechist
+      std::cout << reacstring << " ";
+      if (!xsechist){
+	xsechist = (TH1D*)modexsecmap[reacstring]->Clone();
+	xsechist->Reset();
+      }
+      if (!evthist){
+	evthist  = (TH1D*)modecountmap[reacstring]->Clone();
+	evthist->Reset(); 
+      }
+
+      xsechist->Add(modexsecmap[reacstring]);
+      evthist->Add(modecountmap[reacstring]);
+
+      TH1D* temphist = (TH1D*) modexsecmap[reacstring]->Clone();
+      temphist->Divide(modecountmap[reacstring]);
+      temphist->Write( (inter + "_interaction_avgxsec_cont_" + targ).c_str() );
+      delete temphist;
+
+    }
+    std::cout << std::endl;
+    
+    // Save totals for this interaction
+    if (xsechist && evthist){
+
+      //      xsechist->Write( (inter + "_interaction_sumxsec").c_str());
+      //      evthist->Write(  (inter + "_interaction_sumevt").c_str());
+      
+      xsechist->Divide(evthist);
+      xsechist->Write((inter + "_interaction_avgxsec").c_str());
+
+      // Also add to total
+      if (!xsectotal){
+	xsectotal = (TH1D*) xsechist->Clone();
+      }
+      xsectotal->Add(xsechist);
+
+      // Cleanup
+      delete xsechist;
+      delete evthist;
+
+    } else {
+      ERR(WRN) << "Spline mismatch found!" << std::endl;
+      sleep(2);
+    }
+  }
+
+  // Save total splines
+  LOG(SAM) << "Saving total XSec Histogram" << std::endl;
+  geniesplinedir->cd();
+  xsectotal->Write("TotalXSecHist");
+
+
+  // Also save the total for each target
+  TDirectory* targetdir = (TDirectory*) geniesplinedir->mkdir( ("targetsummedoverreacs") );
+  targetdir->cd();
+
+  // Loop over targets
+  for (int j = 0; j < targetgenieid.size(); j++){
+    std::string target = targetgenieid[j];
+    TH1D* xsechist = NULL;
+    TH1D* evthist  = NULL;
+
+    // Loop over interactions
+    for (int i = 0; i < intergenieid.size(); i++){
+      std::string inter = intergenieid[i];
+
+      // Get Reactions for this target
+      std::string reacstring = "";
+      for (int k = 0; k < genieids.size(); k++){
+	if (genieids[k].find(target) != std::string::npos &&
+	    genieids[k].find(inter) != std::string::npos){
+	  reacstring = genieids[k];
+	  break;
+	}
+      }
+      if (modecountmap.find(reacstring) == modecountmap.end()) continue;
+
+      // Add up if valid
+      if (!xsechist){
+        xsechist = (TH1D*)modexsecmap[reacstring]->Clone();
+	xsechist->Reset();
+      }
+      if (!evthist){
+        evthist  = (TH1D*)modecountmap[reacstring]->Clone();
+        evthist->Reset();
+      }
+
+      // Make cont plot
+      TH1D* temphist = (TH1D*) modexsecmap[reacstring]->Clone();
+      temphist->Divide(modecountmap[reacstring]);
+      temphist->Write( (target + "_total_avgxsec_cont_" + inter).c_str() );
+      delete temphist;
+
+      xsechist->Add(modexsecmap[reacstring]);
+      evthist->Add(modecountmap[reacstring]);
+    }
+
+    // Write to disk
+    if (xsechist && evthist){
+      //      xsechist->Write((target + "_total_sumxsec").c_str());
+      //      evthist->Write((target + "_total_sumevt").c_str());
+
+      xsechist->Divide(evthist);
+      xsechist->Write((target + "_total_avgxsec").c_str());
+
+      delete xsechist;
+      delete evthist;
+    } else {
+      std::cout <<" NO INPUTS FOUND" << std::endl;
+    }    
+
+  }
+    
+  FitPar::Config().out->cd();
+
+  
+  // Now Get Event Hist
+  //xsectotal->Scale(1.0,"width");
+  fEventHist = (TH1D*) fFluxHist->Clone();
+  fEventHist->Multiply(xsectotal);
+
+  
+  // 
+  cout << "Totaled XSec = " << totxsec << endl;
+  //  double totxsec = 1.0;
+  //double totxsec = average_xsec / double(total_events);
+  //  fEventHist->Scale(1.0, "width");
+  //  fEventHist->Scale( totxsec * fFluxHist->Integral("width") / fEventHist->Integral());
 
   // CWorking Method
   // ---------------------------------
@@ -831,8 +1042,8 @@ void InputHandler::ReadGenieFile() {
   //-----------------------------------
 
 
-
-
+  cout << "Inlcusive XSec = " << fEventHist->Integral("width") * 1E-38 / fFluxHist->Integral("width") << std::endl;
+  sleep(10);
 
 
   //  double totxsec = average_xsec / double(total_events);// / double(totalnucl);
