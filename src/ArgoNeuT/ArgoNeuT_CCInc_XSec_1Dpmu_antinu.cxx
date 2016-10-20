@@ -17,6 +17,9 @@ ArgoNeuT_CCInc_XSec_1Dpmu_antinu::ArgoNeuT_CCInc_XSec_1Dpmu_antinu(
   SetDataValues(std::string(std::getenv("EXT_FIT")) +
                 "/data/ArgoNeuT/CCInc_dsig_dmumom_nubar.dat");
 
+  fDataHist->Scale(1E-38);
+  fDataTrue->Scale(1E-38);
+
   SetupDefaultHist();
 
   fScaleFactor = fEventHist->Integral("width") * double(1E-38) / double(fNEvents) *

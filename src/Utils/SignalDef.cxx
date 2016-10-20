@@ -1023,14 +1023,18 @@ bool SignalDef::isCCInc_ArgoNeuT(FitEvent *event, bool IsAnti) {
   // Check we have something
   if (!pmu) return false;
   
-  return (pmu->fP.Vect().Mag2() > 0) && (pmu->fP.E() < 25E3) &&
-         ((pmu->fP.Vect().Theta() * 180. / TMath::Pi()) < 36);
+  return true;
 }
 
+bool SignalDef::isCCInc_ArgoNeuT_limitPS(FitEvent *event, bool IsAnti) {
+  FitParticle* pmu = event->GetHMFSParticle(IsAnti ? -13 : 13);
 
+  // Check we have something                                                                                                                                                   
+  if (!pmu) return false;
 
-
-
+  return (pmu->fP.Vect().Mag2() > 0) && (pmu->fP.E() < 25E3) &&
+    ((pmu->fP.Vect().Theta() * 180. / TMath::Pi()) < 36);
+}
 
 bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax){
   
