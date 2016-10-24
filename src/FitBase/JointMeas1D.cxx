@@ -84,7 +84,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type, FitWeigh
   std::istringstream stream(input);
   std::string temp_string;
 
-  while (std::getline(stream, temp_string, ';')) {
+  while (std::getline(stream >> std::ws, temp_string, ';')) {
     fSubInFiles.push_back(temp_string);
   }
 

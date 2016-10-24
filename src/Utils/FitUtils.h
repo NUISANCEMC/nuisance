@@ -48,6 +48,7 @@
 
 // Fit  includes
 #include "FitParameters.h"
+#include "FitLogger.h"
 
 /*!
  *  \addtogroup Utils
@@ -168,6 +169,8 @@ template <size_t N>
 std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdg)[N],
                                              FitEvent *event,
                                              bool InitalState = false) {
+  ERR(WRN) << "Template Fitutils::GetHMPDG_4Mom() function is broken! Use FitWeight functions instead!" << std::endl;
+
   TLorentzVector HM(0, 0, 0, 0);
   int OPDG = 0;
   UInt_t const &np = event->NPart();

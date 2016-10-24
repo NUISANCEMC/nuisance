@@ -323,11 +323,9 @@ void InputHandler::ReadJointFile() {
   std::vector<std::string> input_lines;
 
   LOG(FIT) << "Parsing input card '" << line <<"'"<< endl;
-  while (std::getline(card, line, '\n')) {
-    std::istringstream stream(line);
-    if (line.empty()) continue;
+  while (std::getline(card >> std::ws, line, '\n')) {
 
-    cout << "line: " << line << endl;
+    if (line.empty()) continue;
 
     // Add normalisation option for second line
     input_lines.push_back(line);
@@ -576,7 +574,7 @@ void InputHandler::ReadNuWroFile() {
     if (beamtype == 0) {
       std::string fluxstring = fNuwroEvent->par.beam_energy;
       std::vector<double> fluxvals =
-          PlotUtils::ParseToDbl(fluxstring, " ");
+          GeneralUtils::ParseToDbl(fluxstring, " ");
       int pdg = fNuwroEvent->par.beam_particle;
       double Elow = double(fluxvals[0]) / 1000.0;
       double Ehigh = double(fluxvals[1]) / 1000.0;
@@ -594,10 +592,10 @@ void InputHandler::ReadNuWroFile() {
       std::string fluxstring = fNuwroEvent->par.beam_content;
 
       std::vector<std::string> fluxlines =
-          PlotUtils::ParseToStr(fluxstring, "\n");
+          GeneralUtils::ParseToStr(fluxstring, "\n");
       for (int i = 0; i < fluxlines.size(); i++) {
         std::vector<double> fluxvals =
-            PlotUtils::ParseToDbl(fluxlines[i], " ");
+            GeneralUtils::ParseToDbl(fluxlines[i], " ");
 
         int pdg = int(fluxvals[0]);
         double pctg = double(fluxvals[1]) / 100.0;
@@ -806,7 +804,7 @@ void InputHandler::ReadGenieFile() {
 
     std::string mode = genie_record.Summary()->AsString();
 
-    std::vector<std::string> modevec = PlotUtils::ParseToStr(mode,";");
+    std::vector<std::string> modevec = GeneralUtils::ParseToStr(mode,";");
     std::string unitarget = ( modevec[0] + ";" + modevec[1] );
     std::string uniinter  = "";
     for (int i = 2; i < modevec.size(); i++){
@@ -1042,7 +1040,7 @@ void InputHandler::ReadGenieFile() {
   //-----------------------------------
 
 
-  cout << "Inlcusive XSec = " << fEventHist->Integral("width") * 1E-38 / fFluxHist->Integral("width") << std::endl;
+  cout << "Inlcusive XSec = " << fEventHist->Integral() * 1E-38 / fFluxHist->Integral() << std::endl;
   sleep(10);
 
 
