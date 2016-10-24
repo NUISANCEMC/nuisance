@@ -30,7 +30,7 @@ GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/GGM/CC1pip_on_p/Gargamelle78-numu-p-to-mu-p-piplus-lowW_EDGES.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/GGM/CC1pip_on_p/Gargamelle78-numu-p-to-mu-p-piplus-lowW_EDGES.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

@@ -35,7 +35,7 @@ ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(std::string i
   fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pip1pi0/CC2pi_1pip1pi01p_xsec.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC2pi/1pip1pi0/CC2pi_1pip1pi01p_xsec.csv");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

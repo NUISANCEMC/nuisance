@@ -30,7 +30,7 @@ FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWei
   fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/FNAL/CC1pip_on_p/FNAL_cc1ppip_nEvent_Q2_w14_bin_edit.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/FNAL/CC1pip_on_p/FNAL_cc1ppip_nEvent_Q2_w14_bin_edit.txt");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

@@ -12,7 +12,7 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-enu.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-enu.csv");
 
   // Error is given as percentage of cross-section
   // Need to scale the bin error properly before we do correlation -> covariance conversion
@@ -21,8 +21,8 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
   }
 
   // This is a correlation matrix, changed to covariance in SetCovarMatrixFromText
-  //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/cc1pi0_enu_corr.txt", fDataHist->GetNbinsX());
-  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-enu.csv", fDataHist->GetNbinsX());
+  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_enu_corr.txt", fDataHist->GetNbinsX());
+  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-enu.csv", fDataHist->GetNbinsX());
   this->SetupDefaultHist();
 
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents);

@@ -42,13 +42,13 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
   this->SetupDefaultHist();
 
   if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
     this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
     this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   // Mask out the first bin if required
-  this->SetBinMask(std::string(std::getenv("EXT_FIT")) + "/data/FNAL/FNAL_CCQE_BinMask_PRD29_436.dat");
+  this->SetBinMask(GeneralUtils::GetTopLevelDir() + "/data/FNAL/FNAL_CCQE_BinMask_PRD29_436.dat");
   
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

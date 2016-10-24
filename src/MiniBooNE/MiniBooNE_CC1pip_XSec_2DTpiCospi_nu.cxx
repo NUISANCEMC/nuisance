@@ -30,7 +30,7 @@ MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::MiniBooNE_CC1pip_XSec_2DTpiCospi_nu(std::st
   fNormError = 0.107;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("PICTVKEXSec"));//data comes in .root file, yes!
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("PICTVKEXSec"));//data comes in .root file, yes!
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

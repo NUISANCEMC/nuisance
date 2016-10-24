@@ -12,8 +12,8 @@ MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
 
-  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_q2.txt");
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-q2.csv");
+  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_q2.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-q2.csv");
 
   // MINERvA has the error quoted as a percentage of the cross-section
   // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
@@ -21,9 +21,9 @@ MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, 
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
   }
 
-  //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_q2_corr.txt", fDataHist->GetNbinsX());
+  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_q2_corr.txt", fDataHist->GetNbinsX());
   // This is a correlation matrix
-  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-q2.csv", fDataHist->GetNbinsX());
+  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-q2.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();
 

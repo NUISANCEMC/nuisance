@@ -181,7 +181,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
 
   // if(covar.is_open()) std::cout << "Reading covariance matrix from file: " << covarFile << std::endl;
 
-  // while(std::getline(covar, line, '\n')){
+  // while(std::getline(covar >> std::ws, line, '\n')){
   //   std::istringstream stream(line);
   //   double entry;    
   //   int column = 0;
@@ -275,7 +275,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // int xBin     = 0;
 
   // // First line is the MB data
-  // std::getline(input, line, '\n');
+  // std::getline(input >> std::ws, line, '\n');
   // std::istringstream stream1(line);
   
   // while(stream1 >> entry){
@@ -284,7 +284,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // }
  
   // // Second line is "other" backgrounds
-  // std::getline(input, line, '\n');
+  // std::getline(input >> std::ws, line, '\n');
   // std::istringstream stream2(line);
   // entry = 0;
   // xBin  = 0;  
@@ -294,7 +294,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // } 
 
   // // Third line is the irreducible background
-  // std::getline(input, line, '\n');
+  // std::getline(input >> std::ws, line, '\n');
   // std::istringstream stream3(line);
   // entry = 0;
   // xBin  = 0;  

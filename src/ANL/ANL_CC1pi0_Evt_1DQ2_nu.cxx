@@ -32,7 +32,7 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_14GeV_bin_firstQ2gone.txt");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

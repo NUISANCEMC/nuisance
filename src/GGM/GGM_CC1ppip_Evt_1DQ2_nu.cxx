@@ -31,7 +31,7 @@ GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fIsRawEvents = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/GGM/CC1pip_on_p/GGM_CC1ppip_Q2_events_bin_edit.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/GGM/CC1pip_on_p/GGM_CC1ppip_Q2_events_bin_edit.txt");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

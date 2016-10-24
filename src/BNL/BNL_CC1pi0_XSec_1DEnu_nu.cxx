@@ -31,7 +31,7 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
   // THIS IS DEFINITELY DODGY WITH THE "CORRECTION"; EnuMax for BNL definitely stops at 3GeV because of flux uncertainties, although correction goes to 6!
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_1986.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_1986.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

@@ -46,7 +46,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   // Get correction hist
   if (applyQ2correction){
     LOG(SAM) <<"Retrieving Q2 Correction"<<std::endl;
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
 
     LOG(SAM) << "Creating fMCHist NoCORR"<<std::endl;
     this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();

@@ -30,7 +30,7 @@ BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(std::string inputfi
   fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi-_on_n_W14_edit.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi-_on_n_W14_edit.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

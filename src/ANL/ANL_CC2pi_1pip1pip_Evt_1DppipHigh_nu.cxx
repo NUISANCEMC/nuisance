@@ -39,7 +39,7 @@ ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(std::
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // there's also _unweight rather than weight data file
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_pHigh_weight.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_pHigh_weight.csv");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

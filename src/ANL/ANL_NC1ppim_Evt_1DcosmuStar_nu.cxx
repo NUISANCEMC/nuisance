@@ -35,7 +35,7 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string input
   fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

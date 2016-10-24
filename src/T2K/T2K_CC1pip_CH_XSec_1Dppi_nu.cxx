@@ -14,13 +14,13 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, 
   if (type.find("Michel") != std::string::npos) {
     useMichel = true;
     fName += "_Michel";
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi.root");
-    this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi.root");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Ppi.root");
+    this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Ppi.root");
   } else {
     useMichel = false;
     fName += "_kin";
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi_noME.root");
-    this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Ppi_noME.root");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Ppi_noME.root");
+    this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Ppi_noME.root");
   }
 
   this->SetupDefaultHist();
