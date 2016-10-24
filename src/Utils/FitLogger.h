@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "GeneralUtils.h"
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */

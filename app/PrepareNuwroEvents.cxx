@@ -119,7 +119,7 @@ void CreateRateHistograms(std::string inputs, bool force_out){
 
     std::string fluxstring = evt->par.beam_content;
     
-    std::vector<std::string> fluxlines = PlotUtils::ParseToStr(fluxstring, "\n");
+    std::vector<std::string> fluxlines = GeneralUtils::ParseToStr(fluxstring, "\n");
     for (int  i = 0; i < fluxlines.size(); i++){
       
       std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxlines[i], " ");

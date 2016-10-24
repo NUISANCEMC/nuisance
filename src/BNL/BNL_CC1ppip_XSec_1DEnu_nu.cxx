@@ -30,7 +30,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fNormError = 0.15;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

@@ -20,8 +20,8 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
     fName += "_2016";
     isNew = true;
 
-    //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
+    //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
 
     // MINERvA has the error quoted as a percentage of the cross-section
     // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
@@ -30,16 +30,16 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
     }
 
     // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
 
   } else {
     isNew = false;
     if (fIsShape) {
-      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
-      this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
     } else {
-      this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
-      this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
     }
 
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data

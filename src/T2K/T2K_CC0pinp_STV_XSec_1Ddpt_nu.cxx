@@ -35,7 +35,7 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(
   fIsDiag = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  SetDataValues(std::string(std::getenv("EXT_FIT")) +
+  SetDataValues(GeneralUtils::GetTopLevelDir() +
                 "/data/T2K/T2K_CC0pinp_STV_XSec_1Ddpt_nu.dat");
 
   fDataHist->Scale(1E-38);

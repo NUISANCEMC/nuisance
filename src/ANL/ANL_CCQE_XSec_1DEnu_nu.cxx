@@ -44,7 +44,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   SetupDefaultHist();
 
   if (applyQ2correction){
-    CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
   }
 
   // Setup Covariance

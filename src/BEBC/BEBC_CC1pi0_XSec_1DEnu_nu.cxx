@@ -30,7 +30,7 @@ BEBC_CC1pi0_XSec_1DEnu_nu::BEBC_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitW
   fNormError = 0.20; // normalisation error on ANL BNL flux
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/BEBC/theses/BEBC_theses_CC1pi0_W14.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BEBC/theses/BEBC_theses_CC1pi0_W14.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

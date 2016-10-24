@@ -32,8 +32,8 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
 
   // There are two different measurements here; _weight and _unweight
   // See publication for information
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
-  //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
+  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

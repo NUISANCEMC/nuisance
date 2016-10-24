@@ -30,11 +30,11 @@ MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string inputfile
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if (fIsShape) {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
   } else {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();

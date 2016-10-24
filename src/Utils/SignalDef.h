@@ -77,6 +77,7 @@ namespace SignalDef {
   bool isCCInc_ArgoNeuT(FitEvent* event, bool IsAnti=false);
   bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, bool IsAnti=false);
 
+
   // Generic Signal Functions
   bool isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax);
 

@@ -34,8 +34,6 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
-#include "FitParameters.h"
-
 
 // C Includes
 #include <stdlib.h>
@@ -73,7 +71,7 @@
 #include "FitParameters.h"
 #include "FitLogger.h"
 #include "StatUtils.h"
-
+#include "GeneralUtils.h"
 
 /*!
  *  \addtogroup Utils
@@ -93,15 +91,6 @@ namespace PlotUtils{
   //! Get object in a TFile that has  a matching substring in its name
   std::string GetObjectWithName(TFile *inFile, std::string substring);
 
-  //! Parse a string into a vector of doubles given a delimiter "del"
-  std::vector<double> ParseToDbl(std::string str, const char* del);
-
-  //! Parse a string into a vector of strings given a delimiter "del"  
-  std::vector<std::string> ParseToStr(std::string str, const char* del);
-
-  //! Parse text file into a vector of strings
-  std::vector<std::string> ParseFileToStr(std::string str, const char* del);
-  
   /*!
     Interaction Mode Histogram Handling
   */

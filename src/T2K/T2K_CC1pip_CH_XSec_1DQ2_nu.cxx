@@ -34,14 +34,14 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
   //type = kDelta;
 
   if (fT2KSampleType == kMB) {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
-    this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_MB.root");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_MB.root");
+    this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_MB.root");
   } else if (fT2KSampleType == keMB) {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
-    this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
+    this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_extendedMB.root");
   } else if (fT2KSampleType == kDelta) {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
-    this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/Q2_Delta.root");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_Delta.root");
+    this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_Delta.root");
   } else {
     std::cerr << "No data type set for " << fName << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;

@@ -43,15 +43,8 @@ void LOG_VERB(std::string verb){
   else if (!verb.compare("REC"))   FitPar::log_verb=4;
   else if (!verb.compare("SIG"))   FitPar::log_verb=5;
   else if (!verb.compare("EVT"))   FitPar::log_verb=6;
-  else {
-
-    std::istringstream  stoken(verb);
-    int temp;
-    stoken >> temp;
-    FitPar::log_verb = temp;
-
-  }
-
+  else FitPar::log_verb = GeneralUtils::StrToInt(verb);
+  
   return;
 }
 
@@ -63,10 +56,7 @@ void ERR_VERB(std::string verb){
   if    (!verb.compare("ERRQUIET")) FitPar::err_verb=0;
   else if (!verb.compare("FTL")) FitPar::err_verb=1;
   else if (!verb.compare("WRN")) FitPar::err_verb=2;
-  else {
-                                                                                                                                                                                                          std::istringstream stoken(verb);
-    stoken >> FitPar::log_verb;
-  }
+  else FitPar::log_verb = GeneralUtils::StrToInt(verb);
 
   return;
 }

@@ -35,7 +35,7 @@ FitParameters::~FitParameters() { parameterMap_all.clear(); };
 FitParameters::FitParameters() {
   this->iteration = 0;
 
-  std::string ext_fit_dir = std::string(std::getenv("EXT_FIT"));
+  std::string ext_fit_dir = GeneralUtils::GetTopLevelDir();
   this->ReadParamFile( ext_fit_dir + "/parameters/fitter.config.dat" );
 };
 
@@ -49,42 +49,27 @@ void FitParameters::ReadParamFile(std::string fileName) {
   std::string line;
   std::ifstream card(fileName.c_str(), ifstream::in);
 
-  while (std::getline(card, line, '\n')) {
-    std::istringstream stream(line);
+  while (std::getline(card >> std::ws, line, '\n')) {
 
-    std::string token;
-    std::string parName;
-    std::string parEntry;
-    int val = 0;
-    // check the type
-    while (std::getline(stream, token, ' ')) {
-      // Strip any leading whitespace from the stream
-      stream >> std::ws;
+    std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
 
-      // Ignore comments
-      if (token.c_str()[0] == '#') continue;
+    // Check the line length
+    if (inputlist.size() < 3) continue;
 
-      std::istringstream stoken(token);
+    // Check whether this is a comment
+    if (inputlist[0].c_str()[0] == '#') continue;
 
-      if (val == 0) {
-        if (token.compare("config") != 0) {
-          break;
-        }
-      } else if (val == 1) {
-        parName = token;
-      } else if (val == 2) {
-        parEntry = token;
-        if (parameterMap_all.find(parName) == parameterMap_all.end())
-          parameterMap_all.insert(
-              map<std::string, std::string>::value_type(parName, parEntry));
-        else
-          parameterMap_all[parName] = parEntry;
+    // Check whether this is a relevant line
+    if (inputlist[0].compare("config") != 0) continue;
 
-      } else {
-        break;
-      }
-      val++;
-    }
+    std::string parName  = inputlist[1];
+    std::string parEntry = inputlist[2];
+    if (parameterMap_all.find(parName) == parameterMap_all.end())
+      parameterMap_all.insert(
+			      map<std::string, std::string>::value_type(parName, parEntry));
+    else
+      parameterMap_all[parName] = parEntry;
+
   }
   card.close();
   return;
@@ -164,10 +149,8 @@ int FitParameters::GetParI(std::string parName) {
         tempVal = 5;
       else if (!verb.compare("EVT"))
         tempVal = 6;
-      else {
-        std::istringstream stoken(parameterMap_all[parName]);
-        stoken >> tempVal;
-      }
+      else
+	tempVal = GeneralUtils::StrToInt(parameterMap_all[parName]);
 
       // Convert.
       parameterMap_int.insert(
@@ -184,9 +167,7 @@ int FitParameters::GetParI(std::string parName) {
 
     // Check if it is in the entire map
   } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    int tempVal = 0;
-    std::istringstream stoken(parameterMap_all[parName]);
-    stoken >> tempVal;
+    int tempVal = GeneralUtils::StrToInt(parameterMap_all[parName]);
 
     parameterMap_int.insert(
         map<std::string, int>::value_type(parName, tempVal));
@@ -207,9 +188,8 @@ bool FitParameters::GetParB(std::string parName) {
 
     // Check if it is in the entire map
   } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    bool tempVal = 0;
-    std::istringstream stoken(parameterMap_all[parName]);
-    stoken >> tempVal;
+
+    bool tempVal = GeneralUtils::StrToBool(parameterMap_all[parName]);
 
     parameterMap_bool.insert(
         map<std::string, bool>::value_type(parName, tempVal));
@@ -229,9 +209,7 @@ double FitParameters::GetParD(std::string parName) {
 
     // Check if it is in the entire map
   } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    double tempVal = 0.0;
-    std::istringstream stoken(parameterMap_all[parName]);
-    stoken >> tempVal;
+    double tempVal = GeneralUtils::StrToDbl(parameterMap_all[parName]);
 
     parameterMap_double.insert(
         map<std::string, double>::value_type(parName, tempVal));
@@ -340,5 +318,5 @@ namespace FitPar {
 //! e.g. FitPar::Config().GetParI("MAXEVENTS")
 FitParameters& Config() { return FitParameters::GetParams(); };
 
-  std::string GetDataBase(){ return std::string(std::getenv("EXT_FIT")) + "/data/"; };
+  std::string GetDataBase(){ return GeneralUtils::GetTopLevelDir() + "/data/"; };
 }

@@ -11,8 +11,8 @@ T2K_CC1pip_CH_XSec_1Dthq3pi_nu::T2K_CC1pip_CH_XSec_1Dthq3pi_nu(std::string input
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/ThetaQ3Pi.root");
-  this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/ThetaQ3Pi.root");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/ThetaQ3Pi.root");
+  this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/ThetaQ3Pi.root");
 
   this->SetupDefaultHist();
 

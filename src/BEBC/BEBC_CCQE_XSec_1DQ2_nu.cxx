@@ -41,7 +41,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
   this->SetupDefaultHist();
 
   if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_XSec_1DQ2_Correction");
+    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_XSec_1DQ2_Correction");
     this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
     this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }

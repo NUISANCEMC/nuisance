@@ -41,7 +41,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
 
   // Get Correction Hist
   if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
   }
 
   // Setup Covariance

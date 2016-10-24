@@ -32,7 +32,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
   
   // Setup Plots
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/anl82corr-numu-n-to-mu-n-piplus-lowW_edges.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/anl82corr-numu-n-to-mu-n-piplus-lowW_edges.txt");
   this->SetupDefaultHist();
   
   // Setup Covariance

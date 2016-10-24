@@ -32,7 +32,7 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string input
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_enu.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSec_enu.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

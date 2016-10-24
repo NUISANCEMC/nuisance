@@ -155,7 +155,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetCovarMatrix(std::string covarFile, int d
   this->tempCovar = new TMatrixDSym(dim);
 
   // while we're on a line in covar
-  while(std::getline(covar, line, '\n')) {
+  while(std::getline(covar >> std::ws, line, '\n')) {
     std::istringstream stream(line);
     // this is the netry we're reading!
     double entry;

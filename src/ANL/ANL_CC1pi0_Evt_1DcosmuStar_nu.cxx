@@ -32,7 +32,7 @@ ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfi
   fAllowedTypes="EVT/SHAPE/DIAG";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_cosmuStar.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pi0_on_n/ANL_CC1pi0_cosmuStar.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

@@ -172,10 +172,10 @@ void Measurement1D::SetFitOptions(std::string opt) {
 
   // CHECK Conflicting Fit Options
   std::vector<std::string> fit_option_allow =
-      PlotUtils::ParseToStr(fAllowedTypes, "/");
+      GeneralUtils::ParseToStr(fAllowedTypes, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++) {
     std::vector<std::string> fit_option_section =
-        PlotUtils::ParseToStr(fit_option_allow.at(i), ",");
+        GeneralUtils::ParseToStr(fit_option_allow.at(i), ",");
     bool found_option = false;
 
     for (UInt_t j = 0; j < fit_option_section.size(); j++) {
@@ -197,7 +197,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
   }
 
   // Check all options are allowed
-  std::vector<std::string> fit_options_input = PlotUtils::ParseToStr(opt, "/");
+  std::vector<std::string> fit_options_input = GeneralUtils::ParseToStr(opt, "/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++) {
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos) {
       ERR(FTL) << "ERROR: Fit Option '" << fit_options_input.at(i)
@@ -277,7 +277,7 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile,
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
            << std::endl;
   fDataHist = PlotUtils::GetTH1DFromRootFile(
-      (std::string(std::getenv("EXT_FIT")) + "/data/" + inhistfile), histname);
+      (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
   return;
@@ -389,18 +389,16 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
              << std::endl;
 
   // Loop over the lines in the file
-  while (std::getline(covarread, line, '\n')) {
-    std::istringstream stream(line);
-    double entry;
+  while (std::getline(covarread >> std::ws, line, '\n')) {
     int column = 0;
 
     // Loop over entries and insert them into matrix
-    while (stream >> entry) {
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+	 iter != entries.end(); iter++){
 
-      double val = entry;
-
-      (*covar)(row, column) = val;
-      (*fFullCovar)(row, column) = val;
+      (*covar)(row, column) = *iter;
+      (*fFullCovar)(row, column) = *iter;
 
       column++;
     }
@@ -448,9 +446,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
     std::cout << "Treating MINERvA CC1pi+ differently" << std::endl;
 
     // Get a new line from the covariance
-    while (std::getline(corr, line, '\n')) {
-      std::istringstream stream(line);
-      double entry = 0.;
+    while (std::getline(corr >> std::ws, line, '\n')) {
       int column = 0;
 
       while (column < dim) {
@@ -462,9 +458,11 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 
         } else {
 
-          while(stream >> entry) {
+	  std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+	  for (std::vector<double>::iterator iter = entries.begin();
+	       iter != entries.end(); iter++){
 
-            double val = entry*(this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38); // need in these units to do Cholesky
+            double val = (*iter)*(this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38); // need in these units to do Cholesky
             if (val == 0) {
               ERR(FTL) << "Found a zero value in the covariance matrix, assuming this is an error!" << std::endl;
               exit(-1);
@@ -487,16 +485,16 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 // Now do the general case where we have the full matrix
   } else {
 
-    while (std::getline(corr, line, '\n')) {
-      std::istringstream stream(line);
-      double entry;
+    while (std::getline(corr >> std::ws, line, '\n')) {
       int column = 0;
 
       // Loop over entries and insert them into matrix
       // Multiply by the errors to get the covariance, rather than the correlation matrix
-      while(stream >> entry){
+      std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+      for (std::vector<double>::iterator iter = entries.begin();
+	   iter != entries.end(); iter++){
 
-        double val = entry * this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38;
+        double val = (*iter) * this->fDataHist->GetBinError(row+1)*1E38*this->fDataHist->GetBinError(column+1)*1E38;
         if (val == 0) {
           ERR(FTL) << "Found a zero value in the covariance matrix, assuming this is an error!" << std::endl;
           exit(-1);
@@ -541,14 +539,13 @@ void Measurement1D::SetSmearingMatrix(std::string smearfile, int truedim, int re
     ERR(FTL) << "Smearing matrix provided is incorrect: " << smearfile
              << std::endl;
 
-  while (std::getline(smear, line, '\n')) {
-    std::istringstream stream(line);
-    double entry;
+  while (std::getline(smear >> std::ws, line, '\n')) {
     int column = 0;
 
-    while (stream >> entry) {
-      double val = entry;
-      (*fSmearMatrix)(row, column) = val / 100.;  // Convert to fraction from
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+	 iter != entries.end(); iter++){
+      (*fSmearMatrix)(row, column) = (*iter) / 100.;  // Convert to fraction from
                                                   // percentage (this may not be
                                                   // general enough)
       column++;
@@ -607,21 +604,22 @@ void Measurement1D::SetBinMask(std::string maskFile) {
   if (mask.is_open())
     LOG(SAM) << "Reading bin mask from file: " << maskFile << std::endl;
   else
-    std::cerr << " Cannot find mask file." << std::endl;
+    LOG(FTL) << " Cannot find mask file." << std::endl;
 
-  while (std::getline(mask, line, '\n')) {
-    std::istringstream stream(line);
-    int column = 0;
-    double entry;
-    int bin;
-    while (stream >> entry) {
-      if (column == 0) bin = int(entry);
-      if (column > 1) break;
-      column++;
+  while (std::getline(mask >> std::ws, line, '\n')) {
+
+    std::vector<int> entries = GeneralUtils::ParseToInt(line, " ");
+
+    // Skip lines with poorly formatted lines
+    if (entries.size() < 2) {
+      LOG(WRN) << "Measurement1D::SetBinMask(), couldn't parse line: " << line << std::endl;
+      continue;
     }
-    fMaskHist->SetBinContent(bin, entry);
-  }
 
+    // The first index should be the bin number, the second should be the mask value.
+    fMaskHist->SetBinContent(entries[0], entries[1]);
+  }
+  
   // Set masked data bins to zero
   PlotUtils::MaskBins(fDataHist, fMaskHist);
 

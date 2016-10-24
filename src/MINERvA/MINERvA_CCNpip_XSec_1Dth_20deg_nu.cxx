@@ -11,11 +11,11 @@ MINERvA_CCNpip_XSec_1Dth_20deg_nu::MINERvA_CCNpip_XSec_1Dth_20deg_nu(std::string
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   if (fIsShape) {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape.txt");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape_cov.txt", fDataHist->GetNbinsX());
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape.txt");
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape_cov.txt", fDataHist->GetNbinsX());
   } else {
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg.txt");
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_cov.txt", fDataHist->GetNbinsX());
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg.txt");
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_cov.txt", fDataHist->GetNbinsX());
   }
 
   this->SetupDefaultHist();

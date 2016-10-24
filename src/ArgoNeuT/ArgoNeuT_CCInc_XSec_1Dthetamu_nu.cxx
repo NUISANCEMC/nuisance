@@ -16,7 +16,7 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_nu::ArgoNeuT_CCInc_XSec_1Dthetamu_nu(
   fIsDiag = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  SetDataValues(std::string(std::getenv("EXT_FIT")) +
+  SetDataValues(GeneralUtils::GetTopLevelDir() +
                 "/data/ArgoNeuT/CCInc_dsig_dthetamu_nu.dat");
 
   fDataHist->Scale(1E-38);

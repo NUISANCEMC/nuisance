@@ -36,7 +36,7 @@ ANL_CC2pi_1pim1pip_XSec_1DEnu_nu::ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(std::string i
   fIsEnu1D = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip1p_xsec.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip1p_xsec.csv");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

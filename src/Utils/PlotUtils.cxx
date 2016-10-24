@@ -302,64 +302,6 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 };
 
 
-std::vector<std::string> PlotUtils::ParseToStr(std::string str, const char* del){
-
-  std::istringstream stream(str);
-  std::string temp_string;
-  std::vector<string> vals;
-
-  while (std::getline(stream, temp_string, *del)) {
-    if (temp_string.empty()) continue;
-    vals.push_back(temp_string);
-
-  }
-
-  return vals;
-
-}
-std::vector<double> PlotUtils::ParseToDbl(std::string str, const char* del){
-
-  std::istringstream stream(str);
-  std::string temp_string;
-  std::vector<double> vals;
-
-  while (std::getline(stream, temp_string, *del)) {
-    if (temp_string.empty()) continue;
-    std::istringstream stream(temp_string);
-    double entry;
-    stream >> entry;
-
-    vals.push_back(entry);
-
-  }
-  
-  return vals;
-}
-
-//******************************************************************** 
-std::vector<std::string> PlotUtils::ParseFileToStr(std::string str, const char* del){
-//********************************************************************
-  
-  std::vector<std::string> linevect;
-  std::string line;
-  
-  ifstream read;
-  read.open(str.c_str());
-  
-  if (!read.is_open()){
-    std::cerr << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
-    throw;
-  }
-  
-  while( std::getline(read, line, *del) ){
-    linevect.push_back(line);
-  }
-
-  read.close();
-  
-  return linevect;
-}
-
 //********************************************************************
 // This assumes the Enu axis is the x axis, as is the case for MiniBooNE 2D distributions
 void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
@@ -559,24 +501,21 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 
 //********************************************************************                                                                                                
 void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, bool skipbins){
-//********************************************************************                                                                                                                                 
+//********************************************************************
+
   std::string line;
   std::ifstream data(dataFile.c_str(),ifstream::in);
 
   int yBin = 0;
-  while(std::getline(data, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
-    int xBin = 0;
+  while(std::getline(data >> std::ws, line, '\n')){
+    
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
 
-    // Loop over entries and insert them into the histogram                                                                                                                             
-    while(stream >> entry){
-
-      if (!skipbins or entry != -1.0){
-	hist->SetBinContent(xBin+1, yBin+1, entry*norm);
-      }
-
-      xBin++;
+    // Loop over entries and insert them into the histogram
+    for (int xBin = 0; xBin < entries.size(); xBin++){
+    
+      if (!skipbins or entries[xBin] != -1.0)
+	hist->SetBinContent(xBin+1, yBin+1, entries[xBin]*norm);
     }
     yBin++;
   }

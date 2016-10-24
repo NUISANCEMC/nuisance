@@ -29,7 +29,7 @@ MiniBooNE_CC1pip_XSec_1DTu_nu::MiniBooNE_CC1pip_XSec_1DTu_nu(std::string inputfi
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pip/ccpipXSec_KEmu.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSec_KEmu.txt");
   this->SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);

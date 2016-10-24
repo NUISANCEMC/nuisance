@@ -121,20 +121,20 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::SetCovarMatrixFromText(std::string covarFil
   if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
   else ERR(FTL) <<"Covariance matrix provided is incorrect: "<<covarFile<<std::endl;
 
-  while(std::getline(covar, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
+  while(std::getline(covar >> std::ws, line, '\n')){
     int column = 0;
 
     // Loop over entries and insert them into matrix
     // Multiply by the errors to get the covariance, rather than the correlation matrix
-    while(stream >> entry){
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+         iter != entries.end(); iter++){
 
-      double val = entry * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
-
-      (*this->covar)(row, column) = val;
-      (*this->fFullCovar)(row, column) = val;
-      column++;
+	double val = (*iter) * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
+	
+	(*this->covar)(row, column) = val;
+	(*this->fFullCovar)(row, column) = val;
+	column++;
     }
     row++;
   }

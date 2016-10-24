@@ -17,8 +17,8 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
     hadMassCut = 1800;
     fIsDiag = false;
 
-    //this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi.txt");
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-kinetic-energy.csv");
+    //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi.txt");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-kinetic-energy.csv");
 
     // Error is given as percentage of cross-section
     // Need to scale the bin error properly before we do correlation -> covariance conversion
@@ -26,8 +26,8 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
       fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
     }
 
-    //this->SetCovarMatrixFromText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi_corr.txt", fDataHist->GetNbinsX());
-    this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-kinetic-energy.csv", fDataHist->GetNbinsX());
+    //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi_corr.txt", fDataHist->GetNbinsX());
+    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-kinetic-energy.csv", fDataHist->GetNbinsX());
 
   } else {
     fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
@@ -39,7 +39,7 @@ MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string
     // No hadronic mass cut on old publication
     hadMassCut = 99999;
 
-    this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
+    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
 
     // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
     // Please change when MINERvA releases new data!

@@ -33,7 +33,7 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv");
   this->SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

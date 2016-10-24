@@ -30,8 +30,8 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string i
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/dxsecdcosmu_edit.txt");
-  this->SetCovarMatrixFromCorrText(std::string(std::getenv("EXT_FIT"))+"/data/MiniBooNE/CC1pi0/dxsecdcosmu_covar.txt", this->fNDataPointsX);
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pi0/dxsecdcosmu_edit.txt");
+  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pi0/dxsecdcosmu_covar.txt", this->fNDataPointsX);
   this->SetupDefaultHist();
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0

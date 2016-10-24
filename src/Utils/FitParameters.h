@@ -36,6 +36,8 @@
 #include "TFile.h"
 #include "TGraph.h"
 
+#include "GeneralUtils.h"
+
 using namespace std;
 
 /*!

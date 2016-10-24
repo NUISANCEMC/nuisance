@@ -14,7 +14,7 @@ ArgoNeuT_CCInc_XSec_1Dpmu_antinu::ArgoNeuT_CCInc_XSec_1Dpmu_antinu(
   fIsDiag = true;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  SetDataValues(std::string(std::getenv("EXT_FIT")) +
+  SetDataValues(GeneralUtils::GetTopLevelDir() +
                 "/data/ArgoNeuT/CCInc_dsig_dmumom_nubar.dat");
 
   fDataHist->Scale(1E-38);

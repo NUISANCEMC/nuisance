@@ -11,8 +11,8 @@ T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/W.root");
-  this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/CH/W.root");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/W.root");
+  this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/W.root");
 
   this->SetupDefaultHist();
 

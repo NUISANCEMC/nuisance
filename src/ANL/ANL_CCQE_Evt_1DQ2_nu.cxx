@@ -63,13 +63,13 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
   this->SetupDefaultHist();
 
   if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
+    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
     this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
     this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
   if (applyEnucorrection){
-    this->EnuRatePlot = PlotUtils::GetTH1DFromFile(std::string(std::getenv("EXT_FIT")) + "/data/ANL/ANL_Data_PRD26_537.root","ANL_1DEnu_Rate");
+    this->EnuRatePlot = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_Data_PRD26_537.root","ANL_1DEnu_Rate");
     this->EnuvsQ2Plot = PlotUtils::MergeIntoTH2D(fDataHist, EnuRatePlot, "Events");
 
     this->EnuFluxUnfoldPlot = (TH1D*)this->EnuRatePlot->Clone();
