@@ -81,12 +81,11 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type, FitWeigh
   // Parse this list and save it for later, and set up the types etc.
 
   fSubInFiles.clear();
-  std::istringstream stream(input);
-  std::string temp_string;
 
-  while (std::getline(stream >> std::ws, temp_string, ';')) {
-    fSubInFiles.push_back(temp_string);
-  }
+  std::vector<std::string> entries = GeneralUtils::ParseToStr(line, ";");
+  for (std::vector<string>::iterator iter = entries.begin();
+       iter != entries.end(); iter++)    
+    fSubInFiles.push_back(*iter);
 
   // Set Engine and Fake Data
   fRW = rw;
