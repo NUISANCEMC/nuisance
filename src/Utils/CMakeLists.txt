@@ -20,6 +20,7 @@ set(HEADERFILES
 FitLogger.h
 FitParameters.h
 FitUtils.h
+GeneralUtils.h
 PlotUtils.h
 StatUtils.h
 SignalDef.h
@@ -29,6 +30,7 @@ set(IMPLFILES
 FitLogger.cxx
 FitParameters.cxx
 FitUtils.cxx
+GeneralUtils.cxx
 PlotUtils.cxx
 StatUtils.cxx
 SignalDef.cxx
