@@ -50,7 +50,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   tn->SetBranchAddress("gmcrec",&genientpl);
 
   // Get Flux Hist
-  std::vector<std::string> fluxvect = PlotUtils::ParseToStr(flux,",");
+  std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux,",");
   TH1D* fluxhist = NULL;
   if (fluxvect.size() > 1){
     TFile* fluxfile = new TFile(fluxvect[0].c_str(),"READ");
@@ -88,7 +88,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
     // Parse Interaction String
     std::string mode = genie_record.Summary()->AsString();
-    std::vector<std::string> modevec = PlotUtils::ParseToStr(mode,";");
+    std::vector<std::string> modevec = GeneralUtils::ParseToStr(mode,";");
     std::string targ  = ( modevec[0] + ";" + modevec[1] );
     std::string inter = mode;
 
@@ -186,7 +186,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   std::cout << "Getting total splines" << std::endl;
   // Now we have each of the targets we need to create a total cross-section.
   int totalnucl = 0;
-  std::vector<std::string> targprs = PlotUtils::ParseToStr(target,",");
+  std::vector<std::string> targprs = GeneralUtils::ParseToStr(target,",");
   TH1D* totalxsec = (TH1D*) xsechist->Clone();
   
   for (int i = 0; i < targprs.size(); i++){
@@ -237,24 +237,25 @@ void PrintOptions(){
 
   std::cout << "PrepareGENIEEvents NUISANCE app. "  << std::endl
 	    << "Takes GHep Outputs and prepares events for NUISANCE." << std::endl << std::endl
-	    << "PrepareGENIEEvents  [-h,-help,--h,--help]  [-m] [-i inputfile1.root,inputfile2.root,inputfile3.root,...] " 
-	    << "[-o outputfile.root] [-f flux_root_file.root,flux_hist_name] [-t target1[frac1],target2[frac2],...]" 
+	    << "PrepareGENIEEvents  [-h,-help,--h,--help] [-i inputfile1.root,inputfile2.root,inputfile3.root,...] " 
+	    << "[-f flux_root_file.root,flux_hist_name] [-t target1[frac1],target2[frac2],...]" 
 	    << std::endl << std::endl;
 
   std::cout << "Prepare Mode [Default] : Takes a single GHep file, reconstructs the original GENIE splines, " 
 	    << " and creates a duplicate file that also contains the flux, event rate, and xsec predictions that NUISANCE needs. " << std::endl;
   std::cout << "Following options are required for Prepare Mode:" << std::endl;
   std::cout << " [ -i inputfile.root  ] : Reads in a single GHep input file that needs the xsec calculation ran on it. " <<std::endl;
-  std::cout << " [ -o outputfile.root ] : Destination of output file" << std::endl;
   std::cout << " [ -f flux_file.root,hist_name ] : Path to root file containing the flux histogram the GHep records were generated with." 
 	    << " A simple method is to point this to the flux histogram genie generatrs '-f /path/to/events/input-flux.root,spectrum'. " << std::endl;
-  std::cout << " [ -t target ] : Target that GHepRecords were generated with. Should match the string used in gevgen. " << std::endl;
+  std::cout << " [ -t target ] : Target that GHepRecords were generated with. Comma seperated list. E.g. for CH2 target=1000060120,1000010010,1000010010" << std::endl;
 
+  /*
   std::cout << "Merger Mode [activate with -m] : Takes the list of input files assuming 'Prepare Mode' has already been ran on them and merges them " 
 	    << "into a single file with associated Friend Tree to help with conserving ratios of events (e.g. adding nue and nueb beams together into a single file" << std::endl;
   std::cout << "Following optoins are required for Merger Mode:" << std::endl;
   std::cout << " [ -i inputfile1.root,inputfile2.root ] : Comma Seperated list of files to be merged. " << std::endl;
   std::cout << " [ -o outputfile.root ] : Output file for merger." << std::endl;
+  */
 
 }
 
@@ -264,7 +265,7 @@ void ParseOptions(int argc, char* argv[]){
   // If No Arguments print commands                                                                                                                                                                                                        
   for (int i = 1; i< argc; ++i){
     if (!std::strcmp(argv[i], "-h"))   { flagopt  = true; break; }
-    if (!std::strcmp(argv[i], "-m"))   { gFlagMerge = true; break; }
+    //    if (!std::strcmp(argv[i], "-m"))   { gFlagMerge = true; break; }
     if (i+1 != argc){
 
       // Cardfile                                                                                                                                                                                                                          

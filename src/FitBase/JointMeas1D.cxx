@@ -82,7 +82,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type, FitWeigh
 
   fSubInFiles.clear();
 
-  std::vector<std::string> entries = GeneralUtils::ParseToStr(line, ";");
+  std::vector<std::string> entries = GeneralUtils::ParseToStr(input, ";");
   for (std::vector<string>::iterator iter = entries.begin();
        iter != entries.end(); iter++)    
     fSubInFiles.push_back(*iter);
