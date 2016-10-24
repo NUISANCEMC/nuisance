@@ -160,9 +160,9 @@ void Measurement2D::SetFitOptions(std::string opt){
   if (opt == "DEFAULT") return;
   
   // CHECK Conflicting Fit Options
-  std::vector<std::string> fit_option_allow = PlotUtils::ParseToStr(fAllowedTypes, "/");
+  std::vector<std::string> fit_option_allow = GeneralUtils::ParseToStr(fAllowedTypes, "/");
   for (UInt_t i = 0; i < fit_option_allow.size(); i++){
-    std::vector<std::string> fit_option_section = PlotUtils::ParseToStr(fit_option_allow.at(i), ",");
+    std::vector<std::string> fit_option_section = GeneralUtils::ParseToStr(fit_option_allow.at(i), ",");
     bool found_option = false;
 
     for (UInt_t j = 0; j < fit_option_section.size(); j++){
@@ -183,7 +183,7 @@ void Measurement2D::SetFitOptions(std::string opt){
   }
 
   // Check all options are allowed
-  std::vector<std::string> fit_options_input = PlotUtils::ParseToStr(opt,"/");
+  std::vector<std::string> fit_options_input = GeneralUtils::ParseToStr(opt,"/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++){
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos){
 
@@ -279,14 +279,15 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::st
 
   if(data.is_open()) LOG(SAM) << "Reading data from: " << dataFile.c_str() << std::endl;
 
-  while(std::getline(data, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
+  while(std::getline(data >> std::ws, line, '\n')){
     int xBin = 0;
 
     // Loop over entries and insert them into the histogram
-    while(stream >> entry){
-      fDataHist->SetBinContent(xBin+1, yBin+1, entry*dataNorm);
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+         iter != entries.end(); iter++){
+
+      fDataHist->SetBinContent(xBin+1, yBin+1, (*iter)*dataNorm);
       xBin++;
     }
     yBin++;
@@ -297,14 +298,14 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm, std::st
 
   if(error.is_open()) LOG(SAM) << "Reading errors from: " << errorFile.c_str() << std::endl;
 
-  while(std::getline(error, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
+  while(std::getline(error >> std::ws, line, '\n')){
     int xBin = 0;
 
     // Loop over entries and insert them into the histogram
-    while(stream >> entry){
-      fDataHist->SetBinError(xBin+1, yBin+1, entry*errorNorm);
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+         iter != entries.end(); iter++){
+      fDataHist->SetBinError(xBin+1, yBin+1, (*iter)*errorNorm);
       xBin++;
     }
     yBin++;
@@ -419,16 +420,16 @@ void Measurement2D::SetCovarMatrixFromText(std::string covarFile, int dim){
   fFullCovar = new TMatrixDSym(dim);
   if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
 
-  while(std::getline(covar, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
+  while(std::getline(covar >> std::ws, line, '\n')){
     int column = 0;
 
     // Loop over entries and insert them into matrix
     // Multiply by the errors to get the covariance, rather than the correlation matrix
-    while(stream >> entry){
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+         iter != entries.end(); iter++){
 
-      double val = entry*fDataHist->GetBinError(row+1)*1E38*fDataHist->GetBinError(column+1)*1E38;
+      double val = (*iter)*fDataHist->GetBinError(row+1)*1E38*fDataHist->GetBinError(column+1)*1E38;
       (*this->covar)(row, column) = val;
       (*fFullCovar)(row, column) = val;
 
@@ -459,19 +460,16 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
   TMatrixD* newcov = new TMatrixD(dim,dim);
 
   if(covarread.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
-  int column  = 0;
-  while(std::getline(covarread, line, '\n')){
-    std::istringstream stream(line);
-    double entry;
-    column = 0;
+  while(std::getline(covarread >> std::ws, line, '\n')){
+    int column = 0;
 
     // Loop over entries and insert them into matrix
     // Multiply by the errors to get the covariance, rather than the correlation matrix
-    while(stream >> entry){
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    for (std::vector<double>::iterator iter = entries.begin();
+         iter != entries.end(); iter++){
 
-      double val = entry;
-      (*newcov)(row, column) = val;
-
+      (*newcov)(row, column) = *iter;
       column++;
     }
 
@@ -532,19 +530,18 @@ void Measurement2D::SetBinMask(std::string maskFile){
   if (mask.is_open()) LOG(SAM) <<"Reading bin mask from file: "<<maskFile <<std::endl;
   else std::cerr <<" Cannot find mask file."<<std::endl;
 
-  while(std::getline(mask, line, '\n')){
-    std::istringstream stream(line);
-    int column = 0;
-    double entry;
-    int binx,biny,value;
-    while (stream >> entry){
-      if (column == 0) binx = int(entry);
-      if (column == 1) biny = int(entry);
-      if (column == 2) value = int(entry);
-      if (column > 2) break;
-      column++;
+  while(std::getline(mask >> std::ws, line, '\n')){
+    
+    std::vector<int> entries = GeneralUtils::ParseToInt(line, " ");
+
+    // Skip lines with poorly formatted lines
+    if (entries.size() < 3) {
+      LOG(WRN) << "Measurement2D::SetBinMask(), couldn't parse line: " << line << std::endl;
+      continue;
     }
-  fMaskHist->SetBinContent(binx,biny,value);
+
+    // The indices should be x, y, value
+    fMaskHist->SetBinContent(entries[0], entries[1], entries[2]);
   }
 
   // Set masked data bins to zero

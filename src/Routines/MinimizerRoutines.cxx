@@ -115,7 +115,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
   }
   
   // Fill fit routines and check they are good
-  fRoutines = PlotUtils::ParseToStr(fStrategy,",");
+  fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
   for (UInt_t i = 0; i < fRoutines.size(); i++){
     if (fAllowedRoutines.find(fRoutines[i]) == std::string::npos){
       ERR(FTL) << "Unknown fit routine given! "
@@ -127,7 +127,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
   
   // CONFIG
   // ---------------------------
-  std::string par_dir =  std::string(std::getenv("EXT_FIT"))+"/parameters/";
+  std::string par_dir =  GeneralUtils::GetTopLevelDir()+"/parameters/";
   FitPar::Config().ReadParamFile( par_dir + "config.list.dat" );
   FitPar::Config().ReadParamFile( fCardFile );
 
@@ -177,7 +177,7 @@ void MinimizerRoutines::ReadCard(std::string cardfile){
 //*************************************
 
   // Read cardlines into vector
-  std::vector<std::string> cardlines = PlotUtils::ParseFileToStr(cardfile,"\n");
+  std::vector<std::string> cardlines = GeneralUtils::ParseFileToStr(cardfile,"\n");
   FitPar::Config().cardLines = cardlines;
 
   // Read Samples first (norm params can be overridden)
@@ -247,8 +247,7 @@ int MinimizerRoutines::ReadParameters(std::string parstring){
   if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
   
   // Parse inputs
-  std::vector<std::string> strvct = PlotUtils::ParseToStr(parstring, " ");
-  std::vector<double> dblvct = PlotUtils::ParseToDbl(parstring, " ");
+  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
 
   // Skip if comment or parameter somewhere later in line
   if (strvct[0].c_str()[0] == '#' ||
@@ -266,7 +265,7 @@ int MinimizerRoutines::ReadParameters(std::string parstring){
   // Setup default inputs
   std::string partype = strvct[0];
   std::string parname = strvct[1];
-  double parval  = dblvct[2];
+  double parval  = GeneralUtils::StrToDbl(strvct[2]);
   double minval  = parval - 1.0;
   double maxval  = parval + 1.0;
   double stepval = 1.0;
@@ -300,9 +299,9 @@ int MinimizerRoutines::ReadParameters(std::string parstring){
   
   // Option Extra (With limits and steps)
   if (strvct.size() >= 6){
-    minval  = dblvct[3];
-    maxval  = dblvct[4];
-    stepval = dblvct[5];
+    minval  = GeneralUtils::StrToDbl(strvct[3]);
+    maxval  = GeneralUtils::StrToDbl(strvct[4]);
+    stepval = GeneralUtils::StrToDbl(strvct[5]);
   }
 
   // Option Extra (dial state after limits)
@@ -371,8 +370,7 @@ int MinimizerRoutines::ReadFakeDataPars(std::string parstring){
     return kGoodStatus;
 
   // Parse inputs
-  std::vector<std::string> strvct = PlotUtils::ParseToStr(parstring, " ");
-  std::vector<double> dblvct = PlotUtils::ParseToDbl(parstring, " ");
+  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
 
   // Skip if comment or parameter somewhere later in line
   if (strvct[0].c_str()[0] == '#' ||
@@ -389,7 +387,7 @@ int MinimizerRoutines::ReadFakeDataPars(std::string parstring){
 
   // Read Inputs
   std::string parname = strvct[1];
-  double      parval  = dblvct[2];
+  double      parval  = GeneralUtils::StrToDbl(strvct[2]);
 
   // Setup Container
   fFakeVals[parname] = parval;
@@ -411,8 +409,7 @@ int MinimizerRoutines::ReadSamples(std::string samstring){
     return kGoodStatus;
 
   // Parse inputs
-  std::vector<std::string> strvct = PlotUtils::ParseToStr(samstring, " ");
-  std::vector<double> dblvct = PlotUtils::ParseToDbl(samstring, " ");
+  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
 
   // Skip if comment or parameter somewhere later in line
   if (strvct[0].c_str()[0] == '#' ||
@@ -439,9 +436,7 @@ int MinimizerRoutines::ReadSamples(std::string samstring){
   }
 
   // Optional Norm
-  if (strvct.size() > 4){
-    samnorm = dblvct[4];
-  }
+  if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
 
   // Add Sample Names as Norm Dials
   std::string normname = samname + "_norm";

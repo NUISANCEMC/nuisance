@@ -12,7 +12,7 @@ JointFCN::JointFCN(std::string cardfile,  TFile *outfile){
   fCardFile = cardfile;
   
   LoadSamples(fCardFile);
-
+  
   fCurIter = 0;
   fMCFilled = false;
 
@@ -281,16 +281,14 @@ void JointFCN::LoadSamples(std::string cardinput)
   // Make sure they are created in correct working DIR
   fOutputDir->cd();
   
-  while(std::getline(card, line, '\n')){
-    std::istringstream stream(line);
+  while(std::getline(card >> std::ws, line, '\n')){
 
     // Skip Empties
-    stream >> std::ws;
     if (line.c_str()[0] == '#') continue;
     if (line.empty()) continue;
 
     // Parse line
-    std::vector<std::string> samplevect = PlotUtils::ParseToStr(line," ");
+    std::vector<std::string> samplevect = GeneralUtils::ParseToStr(line," ");
 
     // Sample Inputs
     if (!samplevect[0].compare("sample")){;

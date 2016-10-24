@@ -1018,7 +1018,7 @@ void FitWeight::Fit2DSplineCoeff(BaseFitEvt* event, FitSpline* spl, double nom,
     gr_2D_scan.SetName(
         Form("SplineFit_%s_%s", spl->id.c_str(), spl->form.c_str()));
     std::vector<std::string> titles =
-        PlotUtils::ParseToStr(spl->id, ",");
+        GeneralUtils::ParseToStr(spl->id, ",");
     gr_2D_scan.SetTitle(Form("SplineFit_%s_%s;%s;%s;Weight Response",
                              spl->id.c_str(), spl->form.c_str(),
                              titles[0].c_str(), titles[1].c_str()));
@@ -1154,7 +1154,7 @@ void FitWeight::SetupSpline(std::string dialname, std::string splinename,
 
   // Parse Enum Mapping
   std::vector<std::string> parsed_dials =
-      PlotUtils::ParseToStr(dialname, ",");
+      GeneralUtils::ParseToStr(dialname, ",");
   std::vector<int> list_enums;
   for (UInt_t i = 0; i < parsed_dials.size(); i++) {
     list_enums.push_back(this->GetDialEnum(parsed_dials.at(i)));
@@ -1202,43 +1202,33 @@ TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
 
   string line;
   ifstream card(
-      (string(getenv("EXT_FIT")) + "/parameters/dial_conversion.card").c_str(),
+      (GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card").c_str(),
       ifstream::in);
 
-  while (getline(card, line, '\n')) {
-    istringstream stream(line);
-    string token, parname;
-    int val = 0;
-    double entry;
+  while (std::getline(card >> std::ws, line, '\n')) {
+    
+    std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
 
-    if (line.c_str()[0] == '#') continue;
-    while (getline(stream, token, ' ')) {
-      stream >> ws;
+    // Check the line length
+    if (inputlist.size() < 4) continue;
 
-      istringstream stoken(token);
-      stoken >> entry;
+    // Check whether this is a comment
+    if (inputlist[0].c_str()[0] == '#') continue;
+    
+    // Check whether this is the correct parameter type
+    if (inputlist[0].compare(parType) != 0) continue;
+    
+    // Check the parameter name
+    if (inputlist[1].compare(name) != 0) continue;
+       
+    // inputlist[2] should be the units... ignore for now
 
-      if (val == 0) {
-        if (token.compare(parType) != 0) {
-          break;
-        }
-      } else if (val == 1) {
-        if (token.compare(name) != 0) {
-          break;
-        }
-      } else if (val == 2) {
-      } else if (val == 3) {
-        dialfunc = token;
-      } else if (val == 3) {
-      } else if (val == 4) {
-        low = entry;
-      } else if (val == 5) {
-        high = entry;
-      } else
-        break;
+    dialfunc = inputlist[3];
+    
+    // High and low are optional, check whether they exist
+    if (inputlist.size() > 4) low  = GeneralUtils::StrToDbl(inputlist[4]);
+    if (inputlist.size() > 5) high = GeneralUtils::StrToDbl(inputlist[5]);
 
-      val++;
-    }
   }
   
   TF1 convfunc = TF1((name + "_convfunc").c_str(), dialfunc.c_str(), low, high);
@@ -1257,39 +1247,26 @@ std::string FitBase::GetRWUnits(std::string type, std::string name) {
   }
 
   std::string line;
-  ifstream card((string(getenv("EXT_FIT")) + "/parameters/dial_conversion.card").c_str(), ifstream::in);
+  std::ifstream card((GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card").c_str(), ifstream::in);
 
-  while (getline(card, line, '\n')) {
-    istringstream stream(line);
-    string token, parname;
-    int val = 0;
-    double entry;
+  while (std::getline(card >> std::ws, line, '\n')) {
 
-    if (line.c_str()[0] == '#') continue;
-    while (getline(stream, token, ' ')) {
-      stream >> ws;
+    std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
 
-      istringstream stoken(token);
-      stoken >> entry;
+    // Check the line length
+    if (inputlist.size() < 3) continue;
+    
+    // Check whether this is a comment
+    if (inputlist[0].c_str()[0] == '#') continue;
 
-      if (val == 0) {
-        if (token.compare(parType) != 0) {
-          break;
-        }
-      } else if (val == 1) {
-        if (token.compare(name) != 0) {
-          break;
-        }
-      } else if (val == 2) {
-        unit = token;
-      } else if (val == 3) {
-      } else if (val == 4) {
-      } else if (val == 5) {
-      } else
-        break;
+    // Check whether this is the correct parameter type
+    if (inputlist[0].compare(parType) != 0) continue;
 
-      val++;
-    }
+    // Check the parameter name
+    if (inputlist[1].compare(name) != 0) continue;
+
+    unit = inputlist[2];
+    break;
   }
 
   return unit;
