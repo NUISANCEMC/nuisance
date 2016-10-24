@@ -78,6 +78,17 @@ if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
   set_target_properties(nuissyst PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 endif()
 
+if(USE_GENIE)
+  add_executable(PrepareGENIE PrepareGENIE.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGENIE)
+  target_link_libraries(PrepareGENIE ${MODULETargets})
+  target_link_libraries(PrepareGENIE ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(PrepareGENIE ${ROOT_LIBS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+     set_target_properties(PrepareGENIE PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+endif()
+
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
 #if(USE_NuWro)
