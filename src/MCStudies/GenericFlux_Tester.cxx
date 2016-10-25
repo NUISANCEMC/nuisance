@@ -32,7 +32,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
-  EnuMax = 100000.;  // Arbritrarily high energy limit
+  EnuMax = 100.;  // Arbritrarily high energy limit
 
   // Set default fitter flags
   fIsDiag = true;
@@ -68,9 +68,14 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
   this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
-                      this->TotalIntegratedFlux();
+    this->TotalIntegratedFlux();
 
   LOG(SAM) << " Generic Flux Scaling Factor = "<< fScaleFactor << endl;
+
+  if (fScaleFactor <= 0.0){
+    std::cout << "SCALE FACTOR TO LOW " << std::endl;
+    sleep(20);
+  }
 
   // Setup our TTrees
   this->AddEventVariablesToTree();
@@ -172,7 +177,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
   eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/F");
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
-  eventVariables->Branch("fScaleFactor", &xsecScaling, "fScaleFactor/F");
+  eventVariables->Branch("fScaleFactor", &fScaleFactor, "fScaleFactor/D");
 
   return;
 }
@@ -490,6 +495,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       fFluxHist->GetBinContent(fFluxHist->FindBin(Enu)) / fFluxHist->Integral();
 
   xsecScaling = fScaleFactor;
+
+  if (fScaleFactor <= 0.0){
+    std::cout << "SCALE FACTOR TO LOW " << std::endl;
+    sleep(20);
+  }
 
   // Fill the eventVariables Tree
   eventVariables->Fill();

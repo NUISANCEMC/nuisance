@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "event1.h"
-#include "params_all.h"
-#include "params.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TTree.h"
@@ -283,10 +280,12 @@ void ParseOptions(int argc, char* argv[]){
     }
   }
 
+  /*
   if (gOutputFile == "" && !flagopt){ 
     std::cerr << "No output file specificed!" << std::endl; 
     flagopt = true;
   }
+  */
 
   if (gInputFiles == "" && !flagopt){
     std::cerr << "No input file(s) specified!" << std::endl;

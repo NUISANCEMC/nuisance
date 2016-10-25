@@ -292,6 +292,8 @@ void FitEvent::GENIEKinematics() {
     } else if (pdg::IsAntiNeutrino(genie_record->Summary()->InitState().ProbePdg())) {
       fMode = -2;
     }
+    //    std::cout<<"Found MEC Event in Sample"<<std::endl;
+    //    sleep(10);
   } else {
     fMode = utils::ghep::NeutReactionCode(genie_record);
   }
@@ -346,6 +348,7 @@ void FitEvent::GENIEKinematics() {
     case genie::kIStNucleonTarget:
     case genie::kIStInitialState:
     case genie::kIStCorrelatedNucleon:
+    case genie::kIStNucleonClusterTarget:
       state = kInitialState;
       break;
 
@@ -353,10 +356,13 @@ void FitEvent::GENIEKinematics() {
       state = kFinalState;
       break;
 
-    case genie::kIStPreDecayResonantState:
     case genie::kIStHadronInTheNucleus:
+      if (abs(fMode) == 2) state = kInitialState;
+      else  state = kFSIState;
+      break;
+
+    case genie::kIStPreDecayResonantState:
     case genie::kIStDISPreFragmHadronicState:
-    case genie::kIStNucleonClusterTarget:
     case genie::kIStIntermediateState:
       state = kFSIState;
       break;
@@ -367,7 +373,7 @@ void FitEvent::GENIEKinematics() {
     default:
       break;
     }
-
+    
     // Flag to remove nuclear part in genie
     if (p->Pdg() > 1000000){  
       if (state == kInitialState) state = kNuclearInitial;
@@ -763,9 +769,9 @@ bool FitEvent::HasParticle(int pdg, int state){
   for (int i = 0; i < fNParticles; i++){
 
     if (state != -1 and fParticleState[i] != (uint)state) continue;
-    if (pdg == 0 or fParticlePDG[i] == pdg) found = true;
-
+    if (fParticlePDG[i] == pdg) found = true;
   }
+
   return found;
 }
 
@@ -782,7 +788,7 @@ bool FitEvent::IsFS0Pi(){
 
 FitParticle* FitEvent::GetHMParticle(int pdg, int state){
   
-  double maxmom = 0.0;
+  double maxmom = -9999999.9;
   int maxind    = -1;
 
   for (int i = 0; i < fNParticles; i++){
@@ -801,7 +807,10 @@ FitParticle* FitEvent::GetHMParticle(int pdg, int state){
     }
   }
 
-  return (maxind != -1)? PartInfo(maxind) : NULL;
+  if (maxind == -1){
+    return NULL;
+  }
+  return PartInfo(maxind);
 }
 
 

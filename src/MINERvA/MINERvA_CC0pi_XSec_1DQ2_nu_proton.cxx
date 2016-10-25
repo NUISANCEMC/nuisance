@@ -57,7 +57,6 @@ void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
     TLorentzVector pnu    = event->GetHMISNuMuon()->fP;
     TLorentzVector pprot  = event->GetHMFSProton()->fP;      
     TLorentzVector pmu    = event->GetHMFSMuon()->fP;
-
     
     // Q2QE rec from leading proton assuming 34 MeV Eb
     double protmax = pprot.E();
