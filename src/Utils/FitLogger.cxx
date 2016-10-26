@@ -25,6 +25,10 @@ namespace FitPar{
   bool use_colors = true; //!< Use BASH Terminal Colors Flag
   bool super_rainbow_mode = true; //!< For when fitting gets boring.
   unsigned int super_rainbow_mode_colour = 0;
+
+  std::streambuf *default_cout = std::cout.rdbuf();
+  std::streambuf *default_cerr = std::cerr.rdbuf();
+  std::ofstream redirect_stream("/dev/null");
 }
 
 std::ostream* logStream(&std::cout);
@@ -147,4 +151,17 @@ std::ostream& ERR(int level)
   return *errStream;
 }
 
+
+void StopTalking(){
+
+  // Only redirect if we're not debugging
+  if (FitPar::log_verb == (unsigned int)DEB) return;
+  std::cout.rdbuf(FitPar::redirect_stream.rdbuf());
+  std::cerr.rdbuf(FitPar::redirect_stream.rdbuf());
+}
+
+void StartTalking(){
+  std::cout.rdbuf(FitPar::default_cout);
+  std::cerr.rdbuf(FitPar::default_cerr);
+}
 

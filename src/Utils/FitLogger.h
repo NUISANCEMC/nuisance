@@ -57,6 +57,10 @@ namespace FitPar{
   extern bool use_colors; //!< Use BASH Terminal Colors Flag
   extern bool super_rainbow_mode; //!< For when fitting gets boring.
   extern unsigned int super_rainbow_mode_colour;
+
+  extern std::streambuf *default_cout; //!< Where the STDOUT stream is currently directed
+  extern std::streambuf *default_cerr; //!< Where the STDERR stream is currently directed
+  extern std::ofstream  redirect_stream; //!< Where should unwanted messages be thrown
 }
 
 
@@ -99,6 +103,10 @@ std::ostream& LOG(int level);
 
 //! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;
 std::ostream& ERR(int level);
+
+void StopTalking();
+
+void StartTalking();
 
 /*! @} */
 #endif // FILELOGGER_HPP
