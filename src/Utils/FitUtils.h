@@ -62,11 +62,6 @@ namespace FitUtils {
   MISC
 */
 
-//! Function to produce a histogram indicating the fraction of events which have
-//! q3 < qCut
-TH2D *CalculateQ3Cut(std::string inFile, TH2D *data, double qCut, int nuPDG,
-                     double eMin, double eMax);
-
 //! Return a vector of all values saved in map
 double *GetArrayFromMap(std::vector<std::string> invals,
                         std::map<std::string, double> inmap);
@@ -169,7 +164,7 @@ template <size_t N>
 std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdg)[N],
                                              FitEvent *event,
                                              bool InitalState = false) {
-  ERR(WRN) << "Template Fitutils::GetHMPDG_4Mom() function is broken! Use FitWeight functions instead!" << std::endl;
+  ERR(WRN) << "Template Fitutils::GetHMPDG_4Mom() function is broken! Use FitEvent functions instead!" << std::endl;
 
   TLorentzVector HM(0, 0, 0, 0);
   int OPDG = 0;
