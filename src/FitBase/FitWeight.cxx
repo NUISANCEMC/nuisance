@@ -210,8 +210,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingNuwro) this->SetupNuwroRW();
       this->fNuwroRW->Systematics().Add(
           static_cast<nuwro::rew::NuwroSyst_t>(rw_enum));
-      if (this->fSetAbsTwk) NuwroSystUncertainty::Instance()->SetUncertainty(
-	  static_cast<nuwro::rew::NuwroSyst_t>(rw_enum), 1.0, 1.0);
+      if (this->fSetAbsTwk) nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty(
+      	  static_cast<nuwro::rew::NuwroSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
       LOG(FTL) << "Trying to Include NuWro Dial is unsupported!" << std::endl;
