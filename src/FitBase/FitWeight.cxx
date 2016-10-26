@@ -35,6 +35,8 @@ FitWeight::FitWeight(std::string name, std::string inputfile) {
   this->fIsUsingGenie = false;
   this->fIsUsingT2K = false;
 
+  this->fSetAbsTwk = FitPar::Config().GetParB("params.setabstwk");
+
   fSplineHead = NULL;
 
   this->fName = name;
@@ -75,6 +77,8 @@ FitWeight::FitWeight(std::string name) {
   this->fIsUsingT2K = false;
   fIsUsingModeNorm = false;
 
+  this->fSetAbsTwk = true;
+
   fSplineHead = NULL;
 
   this->fName = name;
@@ -114,7 +118,7 @@ unsigned int FitWeight::GetDialPos(int this_enum) {
     count++;
   }
 
-  std::cerr << "No Value saved for ENUM " << this_enum << std::endl;
+  LOG(FTL) << "No Value saved for ENUM " << this_enum << std::endl;
   exit(-1);
 
   return -1;
@@ -151,7 +155,7 @@ unsigned int FitWeight::GetDialPos(std::string name) {
     count++;
   }
 
-  std::cerr << "No Value saved for Dial Name " << name << std::endl;
+  LOG(FTL) << "No Value saved for Dial Name " << name << std::endl;
   exit(-1);
 
   return -1;
@@ -178,6 +182,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingNeut) this->SetupNeutRW();
       this->fNeutRW->Systematics().Init(
           static_cast<neut::rew::NSyst_t>(rw_enum));
+      if (this->fSetAbsTwk) NSystUncertainty::Instance()->SetUncertainty(
+	  static_cast<neut::rew::NSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
       ERR(FTL) << "NEUT RW Not Enabled!" << endl;
@@ -190,6 +196,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingNIWG) this->SetupNIWGRW();
       this->fNIWGRW->Systematics().Init(
           static_cast<niwg::rew::NIWGSyst_t>(rw_enum));
+      if (this->fSetAbsTwk) NIWGSystUncertainty::Instance()->SetUncertainty(
+	  static_cast<niwg::rew::NIWGSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
       ERR(FTL) << "NIWG RW Not Enabled!" << endl;
@@ -202,6 +210,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingNuwro) this->SetupNuwroRW();
       this->fNuwroRW->Systematics().Add(
           static_cast<nuwro::rew::NuwroSyst_t>(rw_enum));
+      if (this->fSetAbsTwk) NuwroSystUncertainty::Instance()->SetUncertainty(
+	  static_cast<nuwro::rew::NuwroSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
       LOG(FTL) << "Trying to Include NuWro Dial is unsupported!" << std::endl;
@@ -214,6 +224,8 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingGenie) this->SetupGenieRW();
       this->fGenieRW->Systematics().Init(
           static_cast<genie::rew::GSyst_t>(rw_enum));
+      if (this->fSetAbsTwk) GSystUncertainty::Instance()->SetUncertainty(
+	  static_cast<genie::rew::GSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
       ERR(FTL) << "Trying to Include GENIE Dial is unsupported!" << std::endl;
@@ -225,6 +237,7 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
 #ifdef __T2KREW_ENABLED__
       if (!fIsUsingT2K) this->SetupT2KRW();
       this->fT2KRW->Systematics().Include(static_cast<t2krew::T2KSyst_t>(rw_enum));
+      this->fT2KRW->Systematics().SetAbsTwk(static_cast<t2krew::T2KSyst_t>(rw_enum));
       break;
 #else
       ERR(FTL) << "Trying to Include T2K Dial is unsupported!" << std::endl;
@@ -250,7 +263,10 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
   fDialValues.push_back(startval);
 
   fDialFuncs.push_back(FitBase::GetRWConvFunction(GetDialType(this_enum), name));
-  fDialUnits.push_back(FitBase::GetRWUnits(GetDialType(this_enum), name));
+  
+  // Don't use the dial conversion if using absolute tweaks
+  if (this->fSetAbsTwk) fDialUnits.push_back("frac.");
+  else fDialUnits.push_back(FitBase::GetRWUnits(GetDialType(this_enum), name));
 
   // Set Values
   this->SetDialValue(this_enum, startval);
@@ -1245,7 +1261,7 @@ std::string FitBase::GetRWUnits(std::string type, std::string name) {
   if (parType.find("parameter") == std::string::npos) {
     parType += "_parameter";
   }
-
+  
   std::string line;
   std::ifstream card((GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card").c_str(), ifstream::in);
 

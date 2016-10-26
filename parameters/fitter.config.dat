@@ -43,7 +43,6 @@ config error_throws 200
 # Are we throwing uniform or according to Gaussian?
 config error_uniform 1
 
-
 # When reading a file in as dial input keep dials fixed?
 config FIX_INPUT_DIAL    0
 
@@ -99,6 +98,8 @@ config t2kreweight.verbosity    2
 config extfit.savenominal    0
 # Are we saving pre-fit?
 config extfit.saveprefit    0
+
+config params.setabstwk 1
 
 config minimizer.fixinputdial    0
 config minimizer.fitfunction    chi2
