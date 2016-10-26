@@ -207,7 +207,7 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
     // NUWRO RW INCLUDE DIAL
     case kNUWRO:
 #ifdef __NUWRO_REWEIGHT_ENABLED__
-      if (!fIsUsingNuwro) this->SetupNuwroRW();
+      if (!fIsUsingNuwro) this->SetupNuwroRW();      
       this->fNuwroRW->Systematics().Add(
           static_cast<nuwro::rew::NuwroSyst_t>(rw_enum));
       if (this->fSetAbsTwk) nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty(
@@ -376,6 +376,7 @@ void FitWeight::Reconfigure(bool silent) {
 
   if (!silent and LOG_LEVEL(MIN)) this->PrintState();
 
+  StopTalking();
 #ifdef __NEUT_ENABLED__  // --- NEUT BLOCK
   if (fIsNeutChanged and fIsUsingNeut){ fNeutRW->Reconfigure(); }
 #endif
@@ -395,6 +396,7 @@ void FitWeight::Reconfigure(bool silent) {
 #ifdef __T2KREW_ENABLED__
   if (fIsT2KChanged and fIsUsingT2K) fT2KRW->Reconfigure();
 #endif
+  StartTalking();
 
   fIsDialChanged = false;
   fIsNeutChanged = false;
@@ -672,7 +674,11 @@ void FitWeight::SetupNuwroRW() {
   fIsNuwroChanged = true;
 
   // Create Engine
+  std::cout << "FitWeight::SetupNuwroRW()" << std::endl;
+
+  StopTalking();
   fNuwroRW = new nuwro::rew::NuwroReWeight();
+  StartTalking();
 
   // Get List of Veto Calcs (For Debugging)
   std::string rw_engine_list =
@@ -728,6 +734,7 @@ void FitWeight::SetupGenieRW() {
 
   // Create Engine
   GHepRecord::SetPrintLevel(-2);
+  StopTalking(); // Really stop it from talking to me
   fGenieRW = new genie::rew::GReWeight();
 
   // Get List of Vetos (Just for debugging)
@@ -790,29 +797,24 @@ void FitWeight::SetupGenieRW() {
     dynamic_cast<GReWeightNuXSecCCQE *> (fGenieRW->WghtCalc("xsec_ccqe"));
   rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
   
-  // Default to include shape and normalization changes for CCRES (can be changed downstream if desired)                                                                                                                                    
+  // Default to include shape and normalization changes for CCRES (can be changed downstream if desired)      
   GReWeightNuXSecCCRES * rwccres =
     dynamic_cast<GReWeightNuXSecCCRES *> (fGenieRW->WghtCalc("xsec_ccres"));
   rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
   
-  // Default to include shape and normalization changes for NCRES (can be changed downstream if desired)                                                                                                                                    
+  // Default to include shape and normalization changes for NCRES (can be changed downstream if desired)      
   GReWeightNuXSecNCRES * rwncres =
     dynamic_cast<GReWeightNuXSecNCRES *> (fGenieRW->WghtCalc("xsec_ncres"));
   rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
   
-  // Default to include shape and normalization changes for DIS (can be changed downstream if desired)                                                                                                                                      
+  // Default to include shape and normalization changes for DIS (can be changed downstream if desired)        
   GReWeightNuXSecDIS * rwdis =
     dynamic_cast<GReWeightNuXSecDIS *> (fGenieRW->WghtCalc("xsec_dis"));
   rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
 
-
-
-
-
-
-
-
   fGenieRW->Reconfigure();
+  StopTalking(); // Talk again
+
 }
 #endif
 

@@ -763,12 +763,13 @@ void InputHandler::ReadGenieFile() {
   double average_xsec = 0.0;
   int total_events = 0;
 
-  // Setup the TChain for nuwro event tree
+  // Setup the TChain for GENIE event tree
   tn = new TChain("gtree");
   tn->AddFile(fInputFile.c_str());
 
   fNEvents = tn->GetEntries();
-  LOG(SAM) << "Number of GENIE Eevents " << tn->GetEntries() << std::endl;
+  LOG(SAM) << "Number of GENIE Events " << tn->GetEntries() << std::endl;
+  StopTalking();
   fGenieGHep = NULL;
   fGenieNtpl = NULL;
   //  NtpMCEventRecord * fGenieNtpl = 0; tree->SetBranchAddress(gmrec, &fGenieNtpl);
@@ -785,7 +786,7 @@ void InputHandler::ReadGenieFile() {
   fXSecHist->SetNameTitle((fName + "_XSEC").c_str(),
 			       (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
 			       .c_str());
-
+  StartTalking();
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read GENIE file" << std::endl;
   if (LOG_LEVEL(SAM)) PrintStartInput();
