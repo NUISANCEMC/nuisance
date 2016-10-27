@@ -21,7 +21,7 @@
 #include "FitEvent.h"
 #include "FitParameters.h"
 
-
+// MOVE TO MB UTILS!
 // This function is intended to be modified to enforce a consistent masking for all models.
 TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data){
   
@@ -46,6 +46,7 @@ TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data){
   return fMaskHist;
 };
 
+// MOVE TO GENERAL UTILS?
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring){
 
   TIter nextkey(inFile->GetListOfKeys());
@@ -58,7 +59,7 @@ bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring){
   return false;
 };
 
-
+// MOVE TO GENERAL UTILS?
 std::string PlotUtils::GetObjectWithName(TFile *inFile, std::string substring){
 
   TIter nextkey(inFile->GetListOfKeys());
@@ -360,10 +361,10 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
 
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
-      std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
-      std::cout << "fluxLow = " << fluxLow << std::endl;
-      std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
+      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
+      LOG(WRN) << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      LOG(SAM) << "fluxLow = " << fluxLow << std::endl;
+      LOG(SAM) << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
 
     diff = 999;
@@ -378,10 +379,10 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
 
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
-      std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
-      std::cout << "fluxHigh = " << fluxHigh << std::endl;
-      std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
+      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
+      LOG(WRN) << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
+      LOG(SAM) << "fluxHigh = " << fluxHigh << std::endl;
+      LOG(SAM) << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }
 
     // fluxHigh - 1 because Integral takes the binLowEdge into account, and fluxHigh is our high edge
@@ -458,10 +459,10 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 
     if (diff > 0.5) {
       // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
-      std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
-      std::cout << "fluxLow = " << fluxLow << std::endl;
-      std::cout << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
+      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
+      LOG(WRN) << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      LOG(SAM) << "fluxLow = " << fluxLow << std::endl;
+      LOG(SAM) << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
     }
 
     diff = 999;
@@ -476,10 +477,10 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 
     if (diff > 0.5) {
       // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
-      std::cerr << "Warning " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
-      std::cout << "fluxHigh = " << fluxHigh << std::endl;
-      std::cout << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
+      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
+      LOG(WRN) << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
+      LOG(SAM) << "fluxHigh = " << fluxHigh << std::endl;
+      LOG(SAM) << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
     }
 
     // fluxHigh - 1 because Integral takes the binLowEdge into account, and fluxHigh is our high edge
@@ -499,6 +500,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
 };
 
 
+// MOVE TO GENERAL UTILS
 //********************************************************************                                                                                                
 void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, bool skipbins){
 //********************************************************************
@@ -526,7 +528,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, 
 
 
 
-
+// MOVE TO GENERAL UTILS
 TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::string fPlotTitles, std::string alt_name){
   
   TH1D* tempPlot;
@@ -822,11 +824,9 @@ TH2D* PlotUtils::MergeIntoTH2D(TH1D* xhist, TH1D* yhist, std::string zname){
   std::vector<double> xedges, yedges;
   for (int i = 0; i < xhist->GetNbinsX()+2; i++) {
     xedges.push_back(xhist->GetXaxis()->GetBinLowEdge(i+1));
-    //    std::cout<<"Xedge "<<i<<" "<<xhist->GetXaxis()->GetBinLowEdge(i+1)<<std::endl;
   }
   for (int i = 0; i < yhist->GetNbinsX()+2; i++) {
     yedges.push_back(yhist->GetXaxis()->GetBinLowEdge(i+1));
-    //    std::cout<<"Yedge "<<i<<" "<<yhist->GetXaxis()->GetBinLowEdge(i+1)<<std::endl;
   }
 
   int nbinsx = xhist->GetNbinsX();

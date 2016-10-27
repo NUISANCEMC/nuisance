@@ -23,6 +23,7 @@
   MISC Functions
 */
 
+// MOVE TO GENERALUTILS! CW
 //********************************************************************
 double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
                                   std::map<std::string, double> inmap) {
@@ -70,6 +71,7 @@ double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
 };
 
 // T2K CC1pi+ helper functions
+// MOVE TO T2KUtils! CW
 //
 //********************************************************************
 // Returns the angle between q3 and the pion defined in Raquel's CC1pi+ on CH
@@ -98,6 +100,7 @@ double FitUtils::thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return th_q3_pi;
 }
 
+// MOVE TO T2KUtils! CW                                                                                                                                                       
 //********************************************************************
 // Returns the q3 defined in Raquel's CC1pi+ on CH paper
 // Uses "MiniBooNE formula" for Enu
@@ -119,6 +122,7 @@ double FitUtils::q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return q3;
 }
 
+// MOVE TO T2KUtils! CW
 //********************************************************************
 // Returns the W reconstruction from Raquel CC1pi+ CH thesis
 // Uses the MiniBooNE formula Enu
@@ -139,9 +143,10 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
   return wrec;
 }
 
+// MOVE TO MINERvA Utils! CW
 //********************************************************
 double FitUtils::ProtonQ2QErec(double pE, double binding) {
-  //********************************************************
+//********************************************************
 
   const double V = binding / 1000.;  // binding potential
   const double mn = 0.93956536;      // neutron mass
@@ -168,7 +173,6 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
       momshift = gRandom->Gaus(0.0, 1.0) * temp;
     }
   }
-  //  std::cout<<"Current Momentum Shift = "<<momshift<<std::endl;
 
   // Convert all values to GeV
   const double V = binding / 1000.;  // binding potential
@@ -192,7 +196,6 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
       (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
       (2 * (mN_eff - el + pl * costh));
 
-  //  std::cout<<"Enu = "<<rEnu<<std::endl;
   return rEnu;
 };
 
@@ -326,7 +329,7 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
 // Reconstruct neutrino energy from outgoing particles; will differ from the
 // actual neutrino energy. Here we use assumption of a Delta resonance
 double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
-  //********************************************************************
+//********************************************************************
 
   const double m_Delta = 1.232;   // PDG value for Delta mass in GeV
   const double m_n = 0.93956536;  // neutron/proton mass
@@ -344,6 +347,7 @@ double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
   return rEnu;
 };
 
+// MOVE TO T2K UTILS!
 //********************************************************************
 // Reconstruct Enu using "extended MiniBooNE" as defined in Raquel's T2K TN
 //
@@ -357,14 +361,10 @@ double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   TVector3 p_nu_vect_unit = pnu.Vect() * (1. / pnu.E());
 
   double E_mu = pmu.E() / 1000.;
-  // double p_mu = pmu.Vect().Mag()/1000.;
   TVector3 p_mu_vect = pmu.Vect() * (1. / 1000.);
-  // double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
 
   double E_pi = ppi.E() / 1000.;
-  // double p_pi = ppi.Vect().Mag()/1000.;
   TVector3 p_pi_vect = ppi.Vect() * (1. / 1000.);
-  // double m_pi = sqrt(E_pi*E_pi - p_pi*p_pi);
 
   double E_bind =
       27. / 1000.;  // This should be roughly correct for CH; but not clear!
@@ -482,7 +482,6 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
   // MINERvA cut on W_exp which is tuned to W_true; so use true Enu from
   // generators
   double E_nu = pnu.E();
-  // double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
   double w_rec = sqrt(m_p * m_p + m_mu * m_mu - 2 * m_p * E_mu +
                       2 * E_nu * (m_p - E_mu + p_mu * cos(th_nu_mu)));
@@ -518,7 +517,6 @@ double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu,
   double th_nu_nuc = pnu.Vect().Angle(pnuc.Vect());
 
   double E_nu = pnu.E();
-  // double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
   double w_rec = sqrt(m_nuc * m_nuc + m_mu * m_mu - 2 * E_nu * E_mu +
                       2 * E_nu * p_mu * cos(th_nu_mu) - 2 * E_nuc * E_mu +
@@ -585,6 +583,7 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   return Erecoil * 1000.0;
 }
 
+// MOVE TO MINERVA Utils!
 double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil;
@@ -613,6 +612,8 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 
   return Erecoil * 1000.0;
 }
+
+
 
 std::pair<TLorentzVector, int> FitUtils::GetHMPDG_4Mom(int pdg,
                                                        FitEvent *event) {
@@ -703,7 +704,7 @@ double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
   std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
   std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
   if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
   if (!pnu.second || !pp.second) {
@@ -718,12 +719,13 @@ double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
   }
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
+
 double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
   std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
   std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
   std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
   if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
   if (!pnu.second || !pp.second) {
@@ -743,7 +745,7 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, bool Is0pi) {
   std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
   std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
   if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
   if (!pnu.second || !pp.second) {
