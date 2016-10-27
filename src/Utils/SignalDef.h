@@ -74,8 +74,8 @@ namespace SignalDef {
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
   bool isT2K_CC0pi_STV(FitEvent* event, double EnuMin, double EnuMax);
 
-  bool isCCINC(FitEvent* event, bool IsAnti=false);
-  bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, bool IsAnti=false);
+  bool isCCINC(FitEvent* event, int nuPDG);
+  bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG);
 
 
   // Generic Signal Functions

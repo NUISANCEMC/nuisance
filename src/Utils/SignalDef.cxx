@@ -26,7 +26,7 @@ bool SignalDef::isCCQE(FitEvent *event, double EnuMin, double EnuMax,
   if (event->Mode != 1 && event->Mode != 2) return false;
   if (event->PartInfo(0)->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // NO MESONS and ONE MUON
   int lepCnt = 0;
@@ -62,7 +62,7 @@ bool SignalDef::isCCQEBar(FitEvent *event, double EnuMin, double EnuMax,
   // checks mode is correct
   if (event->Mode != -1 && event->Mode != -2) return false;
   if (event->PartInfo(0)->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // checks that we have NO mesons and ONE muon
   int lepCnt = 0;
@@ -96,7 +96,7 @@ bool SignalDef::isCCQEBar(FitEvent *event, double EnuMin, double EnuMax,
 bool SignalDef::isCCQELike(FitEvent *event, double EnuMin, double EnuMax) {
   if (event->PartInfo(0)->fPID != 14) return false;
   if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-  if (!FitEvent::HasFSParticle(13)) return false;
+  if (!event->HasFSParticle(13)) return false;
 
   int lepCnt = 0;
 
@@ -117,7 +117,7 @@ bool SignalDef::isCCQELike(FitEvent *event, double EnuMin, double EnuMax) {
 
 bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
   if (event->PartInfo(0)->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   for (unsigned int j = 2; j < event->Npart(); j++) {
     if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
@@ -135,7 +135,7 @@ bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
 bool SignalDef::isMiniBooNE_CCQELike(FitEvent *event, double EnuMin,
                                      double EnuMax) {
   if (abs(event->PartInfo(0)->fPID) != 14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   int lepCnt = 0;
 
@@ -166,7 +166,7 @@ bool SignalDef::isMiniBooNE_CCQE(FitEvent *event, double EnuMin,
   if (event->PartInfo(0)->fPID != 14) return false;
 
   // E Within Range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // Mode == 1 or 2
   if (event->Mode != 2 and event->Mode != 1) return false;
@@ -179,7 +179,7 @@ bool SignalDef::isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin,
                                     double EnuMax) {
   if (event->PartInfo(0)->fPID != -14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (event->Mode != -2 and event->Mode != -1) return false;
 
@@ -215,7 +215,7 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin,
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   // Make sure the muon neutrino is within the E_nu defined at the experiment
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // Make sure the outgoing lepton is a muon
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
@@ -279,7 +279,7 @@ bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -338,7 +338,7 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin,
 
   if ((event->PartInfo(0))->fPID != -14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != -13) &&
       ((event->PartInfo(3))->fPID != -13))
@@ -374,7 +374,7 @@ bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
                                    double EnuMax) {
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14))
     return false;
@@ -405,7 +405,7 @@ bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
                                       double EnuMax) {
   if ((event->PartInfo(0))->fPID != -14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != -14) &&
       ((event->PartInfo(3))->fPID != -14))
@@ -435,7 +435,7 @@ bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
 // MOVE MINERVA
 bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
   if ((event->PartInfo(0))->fPID != 14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -467,7 +467,7 @@ bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
 bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin,
                                    double EnuMax) {
   if ((event->PartInfo(0))->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
   if (((event->PartInfo(2))->fPID != -13) &&
       ((event->PartInfo(3))->fPID != -13))
     return false;
@@ -533,7 +533,7 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -606,7 +606,7 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -659,7 +659,7 @@ bool SignalDef::isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
                                  double EnuMax) {
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -731,7 +731,7 @@ bool SignalDef::isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax,
 
   if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
     return false;
@@ -834,7 +834,7 @@ bool SignalDef::isCCQEnumu_MINERvA(FitEvent *event, double EnuMin,
   if (!fullphasespace && ThetaMu > 0.34906585) return false;
 
   // restrict energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
   if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
 
   return true;
@@ -870,7 +870,7 @@ bool SignalDef::isCCQEnumubar_MINERvA(FitEvent *event, double EnuMin,
   if (!fullphasespace && ThetaMu > 0.34906585) return false;
 
   // restrict energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
   if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
 
   return true;
@@ -886,7 +886,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   // Restrict true energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // Loop Particles
   int nhadrons = 0;
@@ -931,7 +931,7 @@ bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   if (event->PartInfo(0)->fPID != 14) return false;
 
   // Cut on Energy
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000) return false;
+  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
 
   // Particle Checks
   bool only_allowed_particles = true;
