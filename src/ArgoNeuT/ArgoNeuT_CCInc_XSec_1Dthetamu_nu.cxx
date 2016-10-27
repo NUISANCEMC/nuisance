@@ -38,5 +38,5 @@ void ArgoNeuT_CCInc_XSec_1Dthetamu_nu::FillEventVariables(FitEvent *event) {
 bool ArgoNeuT_CCInc_XSec_1Dthetamu_nu::isSignal(FitEvent *event)
 //********************************************************************
 {
-  return SignalDef::isCCInc_ArgoNeuT(event);
+  return SignalDef::isCCINC(event, 14);
 }
