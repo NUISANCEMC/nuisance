@@ -775,6 +775,19 @@ bool FitEvent::HasParticle(int pdg, int state){
   return found;
 }
 
+int FitEvent::NumParticle(int pdg, int state){
+
+  int nfound = false;
+  for (int i = 0; i < fNParticles; i++){
+
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (fParticlePDG[i] == pdg) nfound += 1;
+  }
+
+  return nfound;
+}
+
+
 bool FitEvent::IsFS0Pi(){
   
   for (int i = 0; i < fNParticles; i++){
@@ -811,6 +824,33 @@ FitParticle* FitEvent::GetHMParticle(int pdg, int state){
     return NULL;
   }
   return PartInfo(maxind);
+}
+
+FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state){
+
+double maxmom = -9999999.9;
+int maxind    = -1;
+
+for (int i = 0; i < fNParticles; i++){
+
+  if (state != -1 and fParticleState[i] != (uint)state) continue;
+  if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()){
+
+    // Update Max Mom                                                                                                                                                        
+    double mom = sqrt(fParticleMom[i][0]*fParticleMom[i][0] +
+		      fParticleMom[i][1]*fParticleMom[i][1] +
+		      fParticleMom[i][2]*fParticleMom[i][2]);
+    if (fabs(mom) > maxmom){
+      maxmom = fabs(mom);
+      maxind = i;
+    }
+  }
+ }
+
+if (maxind == -1){
+  return NULL;
+ }
+return PartInfo(maxind);
 }
 
 
