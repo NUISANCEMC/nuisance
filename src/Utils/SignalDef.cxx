@@ -38,6 +38,20 @@ bool SignalDef::isCCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   return true;
 }
 
+bool SignalDef::isNCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax) {
+
+  // Check for the desired PDG code before and after the interaction
+  if (!event->HasISParticle(nuPDG) ||
+      !event->HasFSParticle(nuPDG)) return false;
+
+  // Check that it's within the allowed range if set
+  if (EnuMin != EnuMax)
+    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000))
+      return false;
+
+  return true;
+}
+
 
 bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
@@ -45,14 +59,10 @@ bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
   // Veto event with mesons
-  if (!event->IsFS0Pi()) return false;
-
-  int nLeptons = event->NumFSParticle(-11) + event->NumFSParticle(11)
-    + event->NumFSParticle(-13) + event->NumFSParticle(13)
-    + event->NumFSParticle(-15) + event->NumFSParticle(15);
-
+  if (event->NumFSMesons() != 0) return false;
+  
   // Veto events which don't have exactly 1 outgoing charged lepton
-  if (nLeptons != 1) return false;
+  if (event->NumFSLeptons() != 1) return false;
 
   return true;
 }
@@ -79,7 +89,26 @@ bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double Enu
   return true;
 }
 
+// Require one meson, one lepton.
+bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG, 
+			double EnuMin, double EnuMax){
+  
+  // First, make sure it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
+  int nMesons  = event->NumFSMesons();
+  int nLeptons = event->NumFSLeptons();
+  int nPion    = event->NumFSParticle(211);
+
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1 && nMesons != 1) return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
+
+  // If it's passed all of the above we're good and have passed the selection
+  return true;
+}
 
 // OLD!
 
@@ -107,51 +136,18 @@ bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin,
                                    double EnuMax) {
   // *********************************************
 
-  // Do some initial checks on the incoming neutrino
-  // Make sure it's a muon neutrino
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  // Check that this is a numu CCINC event
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
-  // Make sure the muon neutrino is within the E_nu defined at the experiment
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+  int nMesons  = event->NumFSMesons();
+  int nLeptons = event->NumFSLeptons();
+  int nPion    = event->NumFSParticle(211);
 
-  // Make sure the outgoing lepton is a muon
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
-
-  int pipCnt = 0;  // Counts number of pions
-  int lepCnt = 0;  // Counts number of muons
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // Move on if NOT ALIVE and NOT NORMAL
-
-    int PID = (event->PartInfo(j))->fPID;
-
-    // Reject other mesons than pi+
-    if ((abs(PID) >= 111 && abs(PID) <= 210) ||
-        (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) {
-      return false;
-      // Reject other leptons
-    } else if (abs(PID) == 11 || PID == -13 || abs(PID) == 15 ||
-               abs(PID) == 17) {
-      return false;
-      // Count the number of muons
-    } else if (PID == 13) {
-      lepCnt++;
-      // Count the number of pions
-    } else if (PID == 211) {
-      pipCnt++;
-    }
-  }
-
-  // Make sure there's only one pion
-  if (pipCnt != 1) {
-    return false;
-  }
-  // Make sure there's only one muon
-  if (lepCnt != 1) {
-    return false;
-  }
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1 && nMesons != 1) return false;
+  
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
 
   // If it's passed all of the above we're good and have passed the selection
   return true;
@@ -174,13 +170,9 @@ bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
                                    double EnuMax) {
   // **************************************************
 
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
-
+  // Check that this is a numu CCINC event
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+  
   int pi0Cnt = 0;
   int lepCnt = 0;
 
@@ -233,13 +225,8 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin,
                                     double EnuMax) {
   // **************************************
 
-  if ((event->PartInfo(0))->fPID != -14) return false;
-
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != -13) &&
-      ((event->PartInfo(3))->fPID != -13))
-    return false;
+  // Check that this is a numu CCINC event
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
   int pi0Cnt = 0;
   int lepCnt = 0;
@@ -269,12 +256,9 @@ bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin,
 // MOVE MB 
 bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
                                    double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14))
-    return false;
+  // Check that this is a numu NCINC event
+  if (!SignalDef::isNCINC(event, 14, EnuMin, EnuMax)) return false;
 
   int pi0Cnt = 0;
 
@@ -300,13 +284,9 @@ bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
 // MOVE MB
 bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
                                       double EnuMax) {
-  if ((event->PartInfo(0))->fPID != -14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != -14) &&
-      ((event->PartInfo(3))->fPID != -14))
-    return false;
+  // Check that this is a numu NCINC event
+  if (!SignalDef::isNCINC(event, -14, EnuMin, EnuMax)) return false;
 
   int pi0Cnt = 0;
 
@@ -329,68 +309,19 @@ bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
   return true;
 };
 
-// MOVE MINERVA
-bool SignalDef::isCCcoh_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
+  
+  // Check this is a CCINC event
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
-
-  int pipCnt = 0;  // counts number of pions
-  int lepCnt = 0;
-
-  // double vertexE = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 13)
-      lepCnt++;
-    else if (PID == 211)
-      pipCnt++;
-    else
-      return false;  // CCcoh definition is only 1 pi, only 1 lep
-  }
-
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-
+  int nLepton = event->NumFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1);
+  int nPion   = event->NumFSParticle(piPDG);
+  int nFS     = event->NumFSParticle();
+  
+  if (nLepton != 1 || nPion != 1) return false;
+  if (nFS != 2) return false;
   return true;
-};
-
-// MOVE MINERvA
-bool SignalDef::isCCcohBar_MINERvA(FitEvent *event, double EnuMin,
-                                   double EnuMax) {
-  if ((event->PartInfo(0))->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-  if (((event->PartInfo(2))->fPID != -13) &&
-      ((event->PartInfo(3))->fPID != -13))
-    return false;
-
-  int pipCnt = 0;  // counts number of pions
-  int lepCnt = 0;
-
-  // double vertexE = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == -13)
-      lepCnt++;
-    else if (PID == -211)
-      pipCnt++;
-    else
-      return false;  // CCcoh definition is only 1 pi, only 1 lep
-  }
-
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-
-  return true;
-};
+}
 
 // *********************************
 // MINERvA CC1pi+/- signal definition (2015 release)
@@ -750,43 +681,21 @@ bool SignalDef::isCCQEnumubar_MINERvA(FitEvent *event, double EnuMin,
 // MOVE MINERVA
 //********************************************************************
 bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
-                                         double EnuMax, bool hadroncut) {
+                                         double EnuMax) {
   //********************************************************************
 
   if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
-  // Loop Particles
-  int nhadrons = 0;
-  int nmuons = 0;
-  double ThetaMu = 0.0;
-  double Emu = 0.0;
-
-  for (UInt_t i = 2; i < event->Npart(); i++) {
-    if (!(event->PartInfo(i))->fIsAlive) continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
-
-    int PID = event->PartInfo(i)->fPID;
-    if (PID == 13) {
-      nmuons++;
-      ThetaMu =
-          event->PartInfo(i)->fP.Vect().Angle(event->PartInfo(0)->fP.Vect());
-      Emu = event->PartInfo(i)->fP.E() / 1000.0;
-    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14) {
-      nhadrons++;
-    }
-  }
-
-  // Need at least one muon
-  if (nmuons < 1) return false;
-
-  // Require Eav > 0.0
-  if (hadroncut and nhadrons < 1) return false;
+  // Need at least one muon 
+  if (event->NumFSParticle(13) < 1) return false; 
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector pnu = event->GetHMFSParticle(14)->fP;
 
   // Cut on muon angle greated than 20deg
-  if (cos(ThetaMu) < 0.93969262078) return false;
+  if (pnu.Vect().Angle(pmu.Vect()) < 0.93969262078) return false;
 
   // Cut on muon energy < 1.5 GeV
-  if (Emu < 1.5) return false;
+  if (pmu.E() < 1.5) return false;
 
   return true;
 }
@@ -807,6 +716,7 @@ bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   if (forwardgoing and CosThetaMu < 0.0) return false;
   return true;
 }
+
 
 // MOVE T2K
 bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
@@ -832,18 +742,6 @@ bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
   }
   return true;
 }
-
-// MOVE ARGONEUT
-bool SignalDef::isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG) {
-  FitParticle* plep = event->GetHMISParticle(nuPDG);
-  // This is all wrong.
-  // Check we have something
-  if (!plep) return false;
-
-  return (plep->fP.Vect().Mag2() > 0) && (plep->fP.E() < 25E3) &&
-    ((plep->fP.Vect().Theta() * 180. / TMath::Pi()) < 36);
-}
-
 
 // MOVE MINERVA
 bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax){

@@ -45,9 +45,14 @@ namespace SignalDef {
 
   // NEW!
   bool isCCINC(FitEvent* event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isNCINC(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
   bool isCC0pi(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
   bool isCCQELike(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
   bool isCCQE(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
+
+  bool isCC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
+  
 
   // OLD!
 
@@ -68,20 +73,13 @@ namespace SignalDef {
   bool isNC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
   bool isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
 
-  bool isCCcoh_MINERvA    (FitEvent *event, double EnuMin, double EnuMax);
-  bool isCCcohBar_MINERvA (FitEvent *event, double EnuMin, double EnuMax);
-
-
   bool isCCQEnumu_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
   bool isCCQEnumubar_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
 
-  bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool hadroncut);
+  bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
   bool isT2K_CC0pi_STV(FitEvent* event, double EnuMin, double EnuMax);
-
-  bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG);
-
 
   // Generic Signal Functions
   bool isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax);
