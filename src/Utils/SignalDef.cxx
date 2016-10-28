@@ -179,45 +179,15 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
                                  bool isRestricted) {
   // *********************************
 
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
+  // Signal is both pi+ and pi-
+  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG 
+  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax) &&
+      !SignalDef::isCC1pi(event, -14, 211, EnuMin, EnuMax)) 
     return false;
 
-  int pipCnt = 0;  // Counts number of pi+
-  int lepCnt = 0;  // Counts number of leptons
-
-  TLorentzVector pnu = (event->PartInfo(0))->fP;
-  TLorentzVector pmu;
-  TLorentzVector ppi;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // Move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-
-    if (PID == 13) {
-      lepCnt++;
-      // if restricted we need the muon to find it's angle and if it's visible
-      // in MINOS
-      if (isRestricted) {
-        pmu = (event->PartInfo(j))->fP;
-      }
-
-      // Signal is both pi+ and pi-
-      // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
-    } else if (abs(PID) == 211) {
-      ppi = event->PartInfo(j)->fP;
-      pipCnt++;
-    }
-  }
-
-  // Only one pion-like track
-  if (pipCnt != 1) return false;
-  // only one lepton
-  if (lepCnt != 1) return false;
+  int pdgs[] = {-211, 211};
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
   // Pion kinetic energy requirement for Michel tag, leave commented for now
   // if (FitUtils::T(ppi)*1000. > 350 || FitUtils::T(ppi)*1000. < 35) return
@@ -252,44 +222,25 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
                                  double EnuMax, bool isRestricted) {
   // *********************************
 
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  // First, make sure it's CCINC
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+  int nLeptons = event->NumFSLeptons();
 
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
+  // Write the number of pions to the measurement class...
+  // Maybe better to just do that inside the class?
+  int pdgs[] = {-211, 211};
+  nPions     = event->NumFSParticle(GeneralUtils::makeVector(pdgs));
 
-  int pipCnt = 0;  // Counts number of pions
-  int lepCnt = 0;  // Counts number of leptons
+  // Check that there is a pion!
+  if (nPions == 0) return false;
 
-  TLorentzVector pnu = (event->PartInfo(0))->fP;
-  TLorentzVector pmu;
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
 
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // Move on if NOT ALIVE and NOT NORMAL
 
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 13) {
-      lepCnt++;
-      if (isRestricted) {
-        pmu = (event->PartInfo(j))->fP;
-      }
-
-    } else if (abs(PID) == 211) {
-      pipCnt++;  // technically also allows for a pi- to be ID as pi+, but
-                 // there's Michel electron criteria too which eliminates this
-    }
-    // Has no restrictions on mesons, neutral pions or baryons
-  }
-
-  // Any number of pions greater than 0
-  if (pipCnt == 0) return false;
-  // Only one lepton
-  if (lepCnt != 1) return false;
-
-  // Just write the number of pions so the experiment class can use it
-  nPions = pipCnt;
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
   // MINERvA released another CC1pi+ xsec without muon unfolding!
   // Here the muon angle is < 20 degrees (seen in MINOS)
@@ -349,8 +300,8 @@ bool SignalDef::isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax,
   if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
 
   TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector Pmu = event->GetHMISParticle(13)->fP;
-  TLorentzVector Ppip = event->GetHMISParticle(211)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
 
   // If this event passes the criteria on particle counting, enforce the T2K
   // ND280 phase space constraints
@@ -444,7 +395,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
   // Need at least one muon 
   if (event->NumFSParticle(13) < 1) return false; 
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pnu = event->GetHMFSParticle(14)->fP;
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
 
   // Cut on muon angle greated than 20deg
   if (pnu.Vect().Angle(pmu.Vect()) < 0.93969262078) return false;
@@ -537,4 +488,3 @@ bool SignalDef::IsEnuInRange(FitEvent* event, double emin, double emax){
   return (event->PartInfo(0)->fP.E() > emin && 
 	  event->PartInfo(0)->fP.E() < emax);
 }
-
