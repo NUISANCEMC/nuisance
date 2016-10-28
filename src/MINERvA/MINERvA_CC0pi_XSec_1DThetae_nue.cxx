@@ -66,14 +66,8 @@ void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
 bool MINERvA_CC0pi_XSec_1DThetae_nue::isSignal(FitEvent *event){
 //*******************************************************************
 
-  // Get Nue/NueBar events
-  if (fabs(event->PDGnu()) != 12)  return false;
-
-  // ONLY CC0PI
-  if (!event->IsFS0Pi() || !event->IsCC()) return false;
-      
-  // restrict energy range
-  if (event->Enu()/1000.0 < this->EnuMin || event->Enu()/1000.0 > this->EnuMax) return false;
+  // Check this is a nue CC0pi event
+  if (!SignalDef::isCC0pi(event, 12, EnuMin, EnuMax)) return false;
 
   // Restrict EE
   if (Ee < 0.5) return false;
