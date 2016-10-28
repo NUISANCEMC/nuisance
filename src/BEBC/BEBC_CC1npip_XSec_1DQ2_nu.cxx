@@ -80,51 +80,7 @@ void BEBC_CC1npip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool BEBC_CC1npip_XSec_1DQ2_nu::isSignal(FitEvent *event) {
-
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false; 
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false; 
-
-  int pipCnt = 0;
-  int lepCnt = 0;
-  int neutronCnt = 0;
-
-  for (UInt_t j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 13) 
-      lepCnt++;
-    else if (PID == 211) 
-      pipCnt++;
-    else if (PID == 2112) 
-      neutronCnt++;
-    else 
-      return false; // require only three prong events! (allow photons?)
-  }
-
-  // don't think there's away of implementing spectator proton cuts in NEUT?
-  // 100 MeV or larger protons
-
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-  if (neutronCnt != 1) return false;
-
-  // This is corrected for
-  // this channel requires theta_(neutron, nu) > 10 deg
-  // theta_(mu, pi) < 150 deg
-  // p_neutron / p_neutrino < 0.9
-  /*
-  double th_neutron_neutrino = FitUtils::th(Pn, Pnu)*180/M_PI;
-  double th_mu_pi = FitUtils::th(Pmu, Ppip)*180/M_PI;
-  double p_neutron = FitUtils::p(Pn);
-  double p_neutrino = FitUtils::p(Pnu);
-
-  if (th_neutron_neutrino < 10 || th_mu_pi > 150 || p_neutron/p_neutrino > 0.9) return false;
-  */
-
-  return true;
+  return SignalDef::isCC1pi3Prong(event, 14, 211, 2112, EnuMin, EnuMax);
 }
 
 void BEBC_CC1npip_XSec_1DQ2_nu::FillHistograms() {

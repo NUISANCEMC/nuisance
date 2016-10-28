@@ -129,6 +129,41 @@ bool SignalDef::isNC1pi(FitEvent *event, int nuPDG, int piPDG,
   return true;
 }
 
+// Require one meson, one charged lepton, AND specify the only other final state particle
+// This is only suitable for bubble chambers. Types specified in the arguments
+bool SignalDef::isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+			      int thirdPDG, double EnuMin, double EnuMax){
+
+  // First, make sure it's CC1pi
+  if (!SignalDef::isCC1pi(event, nuPDG, piPDG, EnuMin, EnuMax)) return false;
+
+  // Check we have the third prong
+  if (event->NumFSParticle(thirdPDG) == 0) return false;
+
+  // Check that there are only three FS particles
+  if (event->NumFSParticle() != 3) return false;
+  
+  return true;
+}
+
+// Require one meson, one neutrino, AND specify the only other final state particle
+// This is only suitable for bubble chambers. Types specified in the arguments
+bool SignalDef::isNC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+                              int thirdPDG, double EnuMin, double EnuMax){
+
+  // First, make sure it's NC1pi
+  if (!SignalDef::isNC1pi(event, nuPDG, piPDG, EnuMin, EnuMax)) return false;
+
+  // Check we have the third prong
+  if (event->NumFSParticle(thirdPDG) == 0) return false;
+
+  // Check that there are only three FS particles
+  if (event->NumFSParticle() != 3) return false;
+
+  return true;
+}
+
+
 bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
   
   // Check this is a CCINC event

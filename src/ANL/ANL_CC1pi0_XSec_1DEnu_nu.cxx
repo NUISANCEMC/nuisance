@@ -72,43 +72,7 @@ void ANL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
 
 bool ANL_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false;
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
-
-  int pi0Cnt = 0;
-  int lepCnt = 0;
-  int protonCnt = 0;
-
-  // Look for final state particles
-  for (UInt_t j =  2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) || (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 13) {
-      lepCnt++;
-    } else if (PID == 111) {
-      pi0Cnt++;
-    } else if (PID == 2212) {
-      protonCnt++;
-    } else {
-      return false; // require only three prong events! (allow photons?)
-    }
-  }
-
-  // don't think there's away of implementing spectator proton cuts in NEUT?
-  // 100 MeV or larger protons
-
-  if (pi0Cnt != 1)
-    return false;
-  if (lepCnt != 1)
-    return false;
-  if (protonCnt != 1)
-    return false;
-
-  return true;
+  return SignalDef::isCC1pi3Prong(event, 14, 111, 2212, EnuMin, EnuMax);
 }
 
 

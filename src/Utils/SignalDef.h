@@ -44,6 +44,11 @@ namespace SignalDef {
   bool isCC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
   bool isNC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
 
+  bool isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+		     int thirdPDG, double EnuMin=0, double EnuMax=0);
+  bool isNC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+                     int thirdPDG, double EnuMin=0, double EnuMax=0);
+
   // MINERvA has unfolded and not unfolded muon phase space
   bool isCC1pip_MINERvA (FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
   bool isCCNpip_MINERvA (FitEvent *event, int &nPions, double EnuMin, double EnuMax, bool isRestricted = false);
