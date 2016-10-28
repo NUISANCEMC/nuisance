@@ -33,16 +33,6 @@
 // make it a namespace
 namespace SignalDef {
 
-  // Removed!
-  //bool isCCQE(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  //bool isCCQELike(FitEvent *event, double EnuMin, double EnuMax);
-  //bool isCCQEBar(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  //bool isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax);  
-  //bool isCCQEBar_res(FitEvent *event, double EnuMin, double EnuMax);
-  //bool isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax);
-  //bool isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax);
-  //bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
-
   // NEW!
   bool isCCINC(FitEvent* event, int nuPDG, double EnuMin=0, double EnuMax=0);
   bool isNCINC(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
@@ -52,12 +42,7 @@ namespace SignalDef {
   bool isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
 
   bool isCC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
-  
-
-  // OLD!
-
-  // MiniBooNE CC1pi+ differs from MINERvA CC1pi+ differs from T2K CC1pi+!
-  bool isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
+  bool isNC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
 
   // MINERvA has unfolded and not unfolded muon phase space
   bool isCC1pip_MINERvA (FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
@@ -66,12 +51,6 @@ namespace SignalDef {
   // T2K not unfolded phase space restrictions
   bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin, double EnuMax);
   bool isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax, bool Michel);
-
-  bool isCC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
-  bool isCC1pi0Bar_MINERvA  (FitEvent *event, double EnuMin, double EnuMax);
-
-  bool isNC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
-  bool isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isCCQEnumu_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
   bool isCCQEnumubar_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);

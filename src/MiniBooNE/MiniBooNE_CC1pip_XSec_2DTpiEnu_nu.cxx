@@ -89,5 +89,5 @@ void MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::FillEventVariables(FitEvent *event) {
 //******************************************************************** 
 bool MiniBooNE_CC1pip_XSec_2DTpiEnu_nu::isSignal(FitEvent *event) {
 //******************************************************************** 
-  return SignalDef::isCC1pip_MiniBooNE(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax);
 }

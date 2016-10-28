@@ -89,7 +89,7 @@ bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double Enu
   return true;
 }
 
-// Require one meson, one lepton.
+// Require one meson, one charged lepton. types specified in the arguments
 bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG, 
 			double EnuMin, double EnuMax){
   
@@ -98,7 +98,7 @@ bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG,
 
   int nMesons  = event->NumFSMesons();
   int nLeptons = event->NumFSLeptons();
-  int nPion    = event->NumFSParticle(211);
+  int nPion    = event->NumFSParticle(piPDG);
 
   // Check that the desired pion exists and is the only meson
   if (nPion != 1 && nMesons != 1) return false;
@@ -106,208 +106,28 @@ bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG,
   // Check that there is only one final state lepton
   if (nLeptons != 1) return false;
 
-  // If it's passed all of the above we're good and have passed the selection
   return true;
 }
 
-// OLD!
+// Require one meson, one neutrino. Types specified as arguments
+bool SignalDef::isNC1pi(FitEvent *event, int nuPDG, int piPDG,
+                        double EnuMin, double EnuMax){
 
-// *********************************************
-// MiniBooNE CC1pi+ signal definition
-// Warning: This one is a little scary because there's a W = 1.35 GeV cut for
-// signal in the selection
-//          Although this is unfolded over and is filled up with NUANCE
-//          So there is actually no W cut applied, but everything above W = 1.35
-//          GeV is NUANCE...
-//
-// The signal definition is:
-//                            Exactly one negative muon
-//                            Exactly one positive pion
-//                            No other mesons
-//                            No requirements on photons, nucleons and
-//                            multi-nucleons
-//                            Doesn't mention other leptons
-//
-// Additionally, it asks for 2 Michel e- from decay of muon and pion
-// So there is good purity and we can be fairly sure that the positive pion is a
-// positive pion
-// MOVE MB UTILS
-bool SignalDef::isCC1pip_MiniBooNE(FitEvent *event, double EnuMin,
-                                   double EnuMax) {
-  // *********************************************
-
-  // Check that this is a numu CCINC event
-  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+  // First, make sure it's NCINC
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
   int nMesons  = event->NumFSMesons();
   int nLeptons = event->NumFSLeptons();
-  int nPion    = event->NumFSParticle(211);
+  int nPion    = event->NumFSParticle(piPDG);
 
   // Check that the desired pion exists and is the only meson
   if (nPion != 1 && nMesons != 1) return false;
-  
-  // Check that there is only one final state lepton
-  if (nLeptons != 1) return false;
 
-  // If it's passed all of the above we're good and have passed the selection
-  return true;
-};
-
-// **************************************************
-// MiniBooNE CC1pi0 signal definition
-//
-// The signal definition is:
-//                          Exactly one negative muon
-//                          Exactly one pi0
-//                          No additional mesons
-//                          Any number of nucleons
-//
-// Does a few clever cuts on the likelihood to reduce CCQE contamination by
-// looking at "fuzziness" of the ring; CCQE events are sharp, CC1pi0 are fuzzy
-// (because of the pi0->2 gamma collinearity)
-// MOVE MB UTILS
-bool SignalDef::isCC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
-                                   double EnuMax) {
-  // **************************************************
-
-  // Check that this is a numu CCINC event
-  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
-  
-  int pi0Cnt = 0;
-  int lepCnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move to next particle if NOT ALIVE and NOT NORMAL
-
-    int PID = (event->PartInfo(j))->fPID;
-    // Reject if any other mesons
-    if (abs(PID) >= 113 && abs(PID) <= 557) {
-      return false;
-      // Reject other leptons
-    } else if (abs(PID) == 11 || PID == -13 || abs(PID) == 15) {
-      return false;
-      // Count number of leptons
-    } else if (PID == 13) {
-      lepCnt++;
-      // Count number of pi0
-    } else if (PID == 111) {
-      pi0Cnt++;
-    }
-  }
-
-  if (pi0Cnt != 1) return false;
-  if (lepCnt != 1) return false;
+  // Check that there are no charged leptons
+  if (nLeptons != 0) return false;
 
   return true;
-};
-
-// **************************************
-// MINERvA CC1pi0 in anti-neutrino mode
-// Unfortunately there's no information on the neutrino component which is
-// subtracted off
-//
-// 2014 analysis:
-//                Exactly one positive muon
-//                Exactly one observed pi0
-//                No pi+/pi allowed
-//                No information on what is done with mesons, oops?
-//                No information on what is done with nucleons, oops?
-//
-// 2016 analysis:
-//                Exactly one positive muon
-//                Exactly one observed pi0
-//                No other mesons
-//                No restriction on number of nucleons
-//
-// MOVE MINERvA
-bool SignalDef::isCC1pi0Bar_MINERvA(FitEvent *event, double EnuMin,
-                                    double EnuMax) {
-  // **************************************
-
-  // Check that this is a numu CCINC event
-  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
-
-  int pi0Cnt = 0;
-  int lepCnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // Move to next particle if NOT ALIVE and NOT NORMAL
-
-    int PID = (event->PartInfo(j))->fPID;
-
-    // No other mesons
-    if (abs(PID) >= 113 && abs(PID) <= 557) {
-      return false;
-    } else if (PID == -13) {
-      lepCnt++;
-    } else if (PID == 111) {
-      pi0Cnt++;
-    }
-  }
-
-  if (pi0Cnt != 1) return false;
-  if (lepCnt != 1) return false;
-
-  return true;
-};
-
-// MOVE MB 
-bool SignalDef::isNC1pi0_MiniBooNE(FitEvent *event, double EnuMin,
-                                   double EnuMax) {
-
-  // Check that this is a numu NCINC event
-  if (!SignalDef::isNCINC(event, 14, EnuMin, EnuMax)) return false;
-
-  int pi0Cnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 113 && abs(PID) <= 557) return false;
-    // else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 &&
-    // abs(PID) <= 5554)) return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17)
-      return false;
-    else if (PID == 111)
-      pi0Cnt++;
-  }
-
-  if (pi0Cnt != 1) return false;
-
-  return true;
-};
-
-// MOVE MB
-bool SignalDef::isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin,
-                                      double EnuMax) {
-
-  // Check that this is a numu NCINC event
-  if (!SignalDef::isNCINC(event, -14, EnuMin, EnuMax)) return false;
-
-  int pi0Cnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 113 && abs(PID) <= 557) return false;
-    // else if (abs(PID) == 1114 || abs(PID) == 2114 || (abs(PID) >= 2214 &&
-    // abs(PID) <= 5554)) return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17)
-      return false;
-    else if (PID == 111)
-      pi0Cnt++;
-  }
-
-  if (pi0Cnt != 1) return false;
-
-  return true;
-};
+}
 
 bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
   
@@ -485,43 +305,12 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
 // T2K H2O signal definition
 bool SignalDef::isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
                                  double EnuMax) {
-  if ((event->PartInfo(0))->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
 
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
-
-  int pipCnt = 0;  // counts number of pions
-  int lepCnt = 0;
-
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if ((abs(PID) >= 111 && abs(PID) <= 210) ||
-        (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211)
-      return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17) {
-      lepCnt++;
-      Pmu = (event->PartInfo(j))->fP;
-    } else if (PID == 211) {
-      pipCnt++;
-      Ppip = (event->PartInfo(j))->fP;
-    }
-  }
-
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-
-  // relatively generic CC1pi+ definition done
-  // now measurement specific (p_mu > 200 MeV, p_pi > 200 MeV, cos th_mu > 0.3,
-  // cos th_pi > 0.3 in TRUE AND RECONSTRUCTED!
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMISParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMISParticle(211)->fP;
 
   double p_mu = FitUtils::p(Pmu) * 1000;
   double p_pi = FitUtils::p(Ppip) * 1000;
@@ -557,45 +346,11 @@ bool SignalDef::isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax,
                                 bool MichelElectron) {
   // ******************************************************
 
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13))
-    return false;
-
-  int pipCnt = 0;  // Counts number of positive pions
-  int lepCnt = 0;  // Counts number of muons
-
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j)->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // Move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-
-    // No additional mesons in the final state
-    if ((abs(PID) >= 111 && abs(PID) <= 210) ||
-        (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211)
-      return false;
-    // Count leptons
-    else if (PID == 13) {
-      lepCnt++;
-      Pmu = (event->PartInfo(j))->fP;
-      // Count the pi+
-    } else if (PID == 211) {
-      pipCnt++;
-      Ppip = (event->PartInfo(j))->fP;
-    }
-  }
-
-  // Make the cuts on the final state particles
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-
-  // Done with relatively generic CC1pi+ definition
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMISParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMISParticle(211)->fP;
 
   // If this event passes the criteria on particle counting, enforce the T2K
   // ND280 phase space constraints

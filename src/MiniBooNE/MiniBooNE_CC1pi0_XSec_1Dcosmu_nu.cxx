@@ -66,5 +66,5 @@ void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
 //******************************************************************** 
 bool MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::isSignal(FitEvent *event) {
 //******************************************************************** 
-  return SignalDef::isCC1pi0_MiniBooNE(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }
