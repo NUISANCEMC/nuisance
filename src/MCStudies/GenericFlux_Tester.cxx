@@ -553,8 +553,8 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
   flagNC1pi0Bar_MiniBooNE =
       SignalDef::isNC1pi0Bar_MiniBooNE(event, EnuMin, EnuMax);
 
-  flagCCcoh_MINERvA = SignalDef::isCCcoh_MINERvA(event, EnuMin, EnuMax);
-  flagCCcohBar_MINERvA = SignalDef::isCCcohBar_MINERvA(event, EnuMin, EnuMax);
+  flagCCcoh_MINERvA = SignalDef::isCCCOH(event, 14, 211, EnuMin, EnuMax);
+  flagCCcohBar_MINERvA = SignalDef::isCCCOH(event, 14, -211, EnuMin, EnuMax);
 
   flagCCQEnumu_MINERvA_full =
       SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, true);
@@ -566,9 +566,9 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
       SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, false);
 
   flagCCincLowRecoil_MINERvA =
-      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, false);
-  flagCCincLowRecoil_MINERvA_reqhad =
-      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, true);
+      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
+  //flagCCincLowRecoil_MINERvA_reqhad =
+  //    SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
 
   flagCCQELike_MiniBooNE = SignalDef::isCC0pi(event, 14, 0.0, 3.0);
   flagCCQE_MiniBooNE = SignalDef::isCCQELike(event, 14, 0.0, 3.0);
