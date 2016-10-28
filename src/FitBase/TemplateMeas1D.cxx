@@ -154,8 +154,8 @@ bool TemplateMeas1D::isSignal(FitEvent *event){
 //******************************************************************** 
 
   // 2 Different Signal Definitions
-  //if (ccqelike) return SignalDef::isMiniBooNE_CCQELike(event, EnuMin, EnuMax);
-  //  else return SignalDef::isMiniBooNE_CCQE(event, EnuMin, EnuMax);
+  //if (ccqelike) return SignalDef::isCCQELike(event, 14, EnuMin, EnuMax);
+  //  else return SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
 
   return true;
 };

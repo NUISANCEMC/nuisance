@@ -526,10 +526,10 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
 
   // Some example flags are given from SignalDef.
   // See src/Utils/SignalDef.cxx for more.
-  flagCCQE_full = SignalDef::isCCQE(event, EnuMin, EnuMax, false);
-  flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
-  flagCCQEBar_full = SignalDef::isCCQEBar(event, EnuMin, EnuMax, false);
-  flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
+  flagCCQE_full = SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
+  //flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
+  flagCCQEBar_full = SignalDef::isCCQE(event, -14, EnuMin, EnuMax);
+  //flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
 
   flagCC1pip_MiniBooNE = SignalDef::isCC1pip_MiniBooNE(event, EnuMin, EnuMax);
   flagCC1pip_MINERvA_full = SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax);
@@ -570,9 +570,9 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
   flagCCincLowRecoil_MINERvA_reqhad =
       SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, true);
 
-  flagCCQELike_MiniBooNE = SignalDef::isMiniBooNE_CCQELike(event, 0.0, 3.0);
-  flagCCQE_MiniBooNE = SignalDef::isMiniBooNE_CCQE(event, 0.0, 3.0);
-  flagCCQEBar_MiniBooNE = SignalDef::isMiniBooNE_CCQEBar(event, 0.0, 3.0);
+  flagCCQELike_MiniBooNE = SignalDef::isCC0pi(event, 14, 0.0, 3.0);
+  flagCCQE_MiniBooNE = SignalDef::isCCQELike(event, 14, 0.0, 3.0);
+  flagCCQEBar_MiniBooNE = SignalDef::isCCQELike(event, -14, 0.0, 3.0);
 }
 
 // -------------------------------------------------------------------
