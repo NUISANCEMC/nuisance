@@ -68,6 +68,13 @@ namespace GeneralUtils{
   //! Return the top level environmental variable for the fitter
   std::string GetTopLevelDir();
 
+  //! A utility function to return a std::vector from an array
+  template< typename T, size_t N >
+    std::vector<T> makeVector( const T (&data)[N] )
+  {
+    return std::vector<T>(data, data+N);
+  }
+
 }
 
 /*! @} */
