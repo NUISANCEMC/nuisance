@@ -156,13 +156,17 @@ class FitEvent : public BaseFitEvt {
   inline bool IsCC(){ return (abs(fMode) <= 30); };
   inline bool IsNC(){ return (abs(fMode) >  30); };
 
-  bool IsFS0Pi();
+  // Utility functions to return number of a certain class of particles
+  int  NumFSLeptons();
+  int  NumFSMesons();
 
   bool HasParticle(int pdg = 0, int state = -1);
   int  NumParticle(int pdg = 0, int state = -1);
+  int  NumParticle(std::vector<int> pdg, int state = -1);
 
   inline bool HasISParticle (int pdg) { return HasParticle(pdg, kInitialState); };
-  inline int  NumISParticle (int pdg) { return NumParticle(pdg, kInitialState); };
+  inline int  NumISParticle (int pdg=0) { return NumParticle(pdg, kInitialState); };
+  inline int  NumISParticle (std::vector<int> pdg) { return NumParticle(pdg, kInitialState); };
   inline bool HasISNuElectron  (void) { return HasISParticle(12);   };
   inline bool HasISNuMuon      (void) { return HasISParticle(14);   };
   inline bool HasISNuTau       (void) { return HasISParticle(16);   };
@@ -177,7 +181,8 @@ class FitEvent : public BaseFitEvt {
   inline bool HasISPhoton      (void) { return HasISParticle(22);   };
 
   inline bool HasFSParticle (int pdg) { return HasParticle(pdg, kFinalState); };
-  inline int  NumFSParticle (int pdg) { return NumParticle(pdg, kFinalState); };
+  inline int  NumFSParticle (int pdg=0) { return NumParticle(pdg, kFinalState); };
+  inline int  NumFSParticle (std::vector<int> pdg) { return NumParticle(pdg, kFinalState); };
   inline bool HasFSNuElectron  (void) { return HasFSParticle(12);   };
   inline bool HasFSNuMuon      (void) { return HasFSParticle(14);   };
   inline bool HasFSNuTau       (void) { return HasFSParticle(16);   };

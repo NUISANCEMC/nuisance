@@ -777,26 +777,54 @@ bool FitEvent::HasParticle(int pdg, int state){
 
 int FitEvent::NumParticle(int pdg, int state){
 
-  int nfound = false;
+  int nfound = 0;
   for (int i = 0; i < fNParticles; i++){
 
     if (state != -1 and fParticleState[i] != (uint)state) continue;
-    if (fParticlePDG[i] == pdg) nfound += 1;
+    if (pdg == 0 or fParticlePDG[i] == pdg) nfound += 1;
   }
 
   return nfound;
 }
 
+int  FitEvent::NumParticle(std::vector<int> pdg, int state){
+  int nfound = 0;
+  for (int i = 0; i < fNParticles; i++){
 
-bool FitEvent::IsFS0Pi(){
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()) nfound += 1;
+  }
+
+  return nfound;
+}
+
+int FitEvent::NumFSLeptons(){
+
+  int nLeptons = 0;
   
   for (int i = 0; i < fNParticles; i++){
     if (fParticleState[i] != kFinalState) continue;
-    if (fParticlePDG[i] == 211  ||
-	fParticlePDG[i] == -211 ||
-	fParticlePDG[i] == 111) return false;
+    if (abs(fParticlePDG[i]) == 11 ||
+        abs(fParticlePDG[i]) == 13 ||
+	abs(fParticlePDG[i]) == 15) 
+      nLeptons += 1;
   }
-  return true;
+  
+  return nLeptons;
+}
+
+int FitEvent::NumFSMesons(){
+
+  int nMesons = 0;
+
+  for (int i = 0; i < fNParticles; i++){
+    if (fParticleState[i] != kFinalState) continue;
+    if (abs(fParticlePDG[i]) >= 111 &&
+        abs(fParticlePDG[i]) <= 557)
+      nMesons += 1;
+  }
+
+  return nMesons;
 }
 
 FitParticle* FitEvent::GetHMParticle(int pdg, int state){
