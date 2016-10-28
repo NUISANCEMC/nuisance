@@ -33,13 +33,23 @@
 // make it a namespace
 namespace SignalDef {
 
-  // These are all the interaction modes for neutrinos
-  bool isCCQE(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  bool isCCQEBar(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  bool isCCQELike(FitEvent *event, double EnuMin, double EnuMax);
+  // Removed!
+  //bool isCCQE(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
+  //bool isCCQELike(FitEvent *event, double EnuMin, double EnuMax);
+  //bool isCCQEBar(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
+  //bool isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax);  
+  //bool isCCQEBar_res(FitEvent *event, double EnuMin, double EnuMax);
+  //bool isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax);
+  //bool isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax);
+  //bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
 
-  bool isCCQEBar_res(FitEvent *event, double EnuMin, double EnuMax);
-  bool isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax);
+  // NEW!
+  bool isCCINC(FitEvent* event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCC0pi(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCQELike(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCQE(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+
+  // OLD!
 
   // MiniBooNE CC1pi+ differs from MINERvA CC1pi+ differs from T2K CC1pi+!
   bool isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
@@ -66,15 +76,10 @@ namespace SignalDef {
   bool isCCQEnumubar_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
 
   bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool hadroncut);
-  bool isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax);
-
-  bool isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax);
-  bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
   bool isT2K_CC0pi_STV(FitEvent* event, double EnuMin, double EnuMax);
 
-  bool isCCINC(FitEvent* event, int nuPDG);
   bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG);
 
 
@@ -83,7 +88,7 @@ namespace SignalDef {
 
   bool HasProtonKEAboveThreshold(FitEvent* event, double threshold);
   
-  bool IsRestrictedMuonAngle(FitEvent* event, double angle);
+  bool IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, double angle);
 
   bool IsEnuInRange(FitEvent* event, double emin, double emax);
 

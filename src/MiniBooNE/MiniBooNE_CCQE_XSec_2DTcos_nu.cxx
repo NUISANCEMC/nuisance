@@ -101,14 +101,17 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
 bool MiniBooNE_CCQE_XSec_2DTcos_nu::isSignal(FitEvent *event){
 //******************************************************************** 
 
-  bool signal = true;
-  // 2 Different Signal Definitions
-  if (ccqelike) signal = SignalDef::isMiniBooNE_CCQELike(event, EnuMin, EnuMax);
-  else signal =  SignalDef::isMiniBooNE_CCQE(event, EnuMin, EnuMax);
+  // If CC0pi, include both charges
+  if (ccqelike) {
+    if (SignalDef::isCC0pi(event, 14, EnuMin, EnuMax) ||
+        SignalDef::isCC0pi(event, -14, EnuMin, EnuMax))
+      return true;
+  } else {
+    if (SignalDef::isCCQELike(event, 14, EnuMin, EnuMax))
+      return true;
+  }
 
-  
-  //if (signal) std::cout<<"Signal Values = "<<fXVar<<" "<<fYVar<<std::endl;
-    
-  return signal;
+  return false;
+
 };
 

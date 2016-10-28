@@ -21,170 +21,67 @@
 
 #include "SignalDef.h"
 
-bool SignalDef::isCCQE(FitEvent *event, double EnuMin, double EnuMax,
-                       bool isRestricted) {
-  if (event->Mode != 1 && event->Mode != 2) return false;
-  if (event->PartInfo(0)->fPID != 14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+bool SignalDef::isCCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax) {
 
-  // NO MESONS and ONE MUON
-  int lepCnt = 0;
+  // Check for the desired PDG code
+  if (!event->HasISParticle(nuPDG)) return false;
 
-  TLorentzVector pnu = (event->PartInfo(0))->fP;
-  TLorentzVector pmu;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 111 && abs(PID) <= 557)
+  // Check that it's within the allowed range if set
+  if (EnuMin != EnuMax)
+    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) 
       return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17) {
-      lepCnt++;
-      if (isRestricted) pmu = (event->PartInfo(j))->fP;
-    }
-  }
 
-  if (lepCnt != 1) return false;
-
-  if (isRestricted) {
-    double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
-    if (th_nu_mu >= 20) return false;
-  }
-
-  return true;
-};
-
-bool SignalDef::isCCQEBar(FitEvent *event, double EnuMin, double EnuMax,
-                          bool isRestricted) {
-  // checks mode is correct
-  if (event->Mode != -1 && event->Mode != -2) return false;
-  if (event->PartInfo(0)->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  // checks that we have NO mesons and ONE muon
-  int lepCnt = 0;
-
-  TLorentzVector pnu = (event->PartInfo(0))->fP;
-  TLorentzVector pmu;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 111 && abs(PID) <= 557)
-      return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17) {
-      lepCnt++;
-      if (isRestricted) pmu = (event->PartInfo(j))->fP;
-    }
-  }
-
-  if (lepCnt != 1) return false;
-
-  if (isRestricted) {
-    double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
-    if (th_nu_mu >= 20) return false;
-  }
-
-  return true;
-};
-
-bool SignalDef::isCCQELike(FitEvent *event, double EnuMin, double EnuMax) {
-  if (event->PartInfo(0)->fPID != 14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-  if (!event->HasFSParticle(13)) return false;
-
-  int lepCnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) >= 110 && abs(PID) <= 557) return false;
-    else if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 ||
-             abs(PID) == 17)
-      lepCnt++;
-  }
-
-  if (lepCnt != 1) return false;
-
-  return true;
-};
-
-bool SignalDef::isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax) {
-  if (event->PartInfo(0)->fPID != -14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;                                // maybe need not 2212 2112?
-    if ((event->PartInfo(j))->fPID != 22 &&    // photon OK
-        (event->PartInfo(j))->fPID != 2212 &&  // neutron OK
-        (event->PartInfo(j))->fPID != 2112 &&  // proton OK
-        (event->PartInfo(j))->fPID != -13)     // muon OK
-      return false;
-  }
-  return true;
-};
-
-// MOVE TO MB UTILS
-bool SignalDef::isMiniBooNE_CCQELike(FitEvent *event, double EnuMin,
-                                     double EnuMax) {
-  if (abs(event->PartInfo(0)->fPID) != 14) return false;
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  int lepCnt = 0;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;  // maybe need not 2212 2112?
-
-    int PID = event->PartInfo(j)->fPID;
-    if (abs(PID) == 11 || abs(PID) == 13 || abs(PID) == 15 || abs(PID) == 17)
-      lepCnt++;
-
-    if ((event->PartInfo(j))->fPID != 22 &&     // photon OK
-        (event->PartInfo(j))->fPID != 2212 &&   // neutron OK
-        (event->PartInfo(j))->fPID != 2112 &&   // proton OK
-        abs((event->PartInfo(j))->fPID) != 13)  // muon OK
-      return false;
-  }
-
-  if (lepCnt != 1) return false;
-
-  return true;
-};
-
-// MOVE MB UTILS
-bool SignalDef::isMiniBooNE_CCQE(FitEvent *event, double EnuMin,
-                                 double EnuMax) {
-  // Only NUMU
-  if (event->PartInfo(0)->fPID != 14) return false;
-
-  // E Within Range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
-
-  // Mode == 1 or 2
-  if (event->Mode != 2 and event->Mode != 1) return false;
+  // Check that the charged lepton we expect has been produced
+  if (!event->HasFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1)) return false;
 
   return true;
 }
 
-// MOVE MB UTILS
-bool SignalDef::isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin,
-                                    double EnuMax) {
-  if (event->PartInfo(0)->fPID != -14) return false;
 
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
-  if (event->Mode != -2 and event->Mode != -1) return false;
+  // Check it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Veto event with mesons
+  if (!event->IsFS0Pi()) return false;
+
+  int nLeptons = event->NumFSParticle(-11) + event->NumFSParticle(11)
+    + event->NumFSParticle(-13) + event->NumFSParticle(13)
+    + event->NumFSParticle(-15) + event->NumFSParticle(15);
+
+  // Veto events which don't have exactly 1 outgoing charged lepton
+  if (nLeptons != 1) return false;
 
   return true;
 }
+
+bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check if it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+  
+  // Require modes 1 (CCQE)
+  if (abs(event->Mode) != 1) return false;
+
+  return true;
+}
+
+bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check if it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Require modes 1/2 (CCQE and MEC)                                                                                                                                         
+  if (abs(event->Mode) != 1 && abs(event->Mode) != 2) return false;
+
+  return true;
+}
+
+
+
+// OLD!
 
 // *********************************************
 // MiniBooNE CC1pi+ signal definition
@@ -810,31 +707,18 @@ bool SignalDef::isCCQEnumu_MINERvA(FitEvent *event, double EnuMin,
                                    double EnuMax, bool fullphasespace) {
   //********************************************************************
 
-  // For now, define as the true mode being CCQE or npnh
-  if (event->Mode != 1 and event->Mode != 2) return false;
+  if (!SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) return false;
 
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Get Theta Variables
-  double ThetaMu = 999.9;
-  double Enu_rec = -1.0;
-
-  for (UInt_t i = 2; i < event->Npart(); i++) {
-    if (event->PartInfo(i)->fPID == 13) {
-      ThetaMu =
-          (event->PartInfo(0)->fP.Vect().Angle(event->PartInfo(i)->fP.Vect()));
-      Enu_rec =
-          FitUtils::EnuQErec((event->PartInfo(i))->fP, cos(ThetaMu), 34., true);
-      break;
-    }
-  }
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  
+  double ThetaMu = pnu.Vect().Angle(pmu.Vect());
+  double Enu_rec = FitUtils::EnuQErec(pmu, cos(ThetaMu), 34., true);
 
   // If Restricted phase space
   if (!fullphasespace && ThetaMu > 0.34906585) return false;
 
   // restrict energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
   if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
 
   return true;
@@ -846,31 +730,18 @@ bool SignalDef::isCCQEnumubar_MINERvA(FitEvent *event, double EnuMin,
                                       double EnuMax, bool fullphasespace) {
   //********************************************************************
 
-  // For now, define as the true mode being CCQE or npnh
-  if (event->Mode != -1 and event->Mode != -2) return false;
+  if (!SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) return false;
 
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != -14) return false;
+  TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
 
-  // Get Theta Variables
-  double ThetaMu = 999.9;
-  double Enu_rec = -1.0;
-
-  for (UInt_t i = 2; i < event->Npart(); i++) {
-    if (event->PartInfo(i)->fPID == -13) {
-      ThetaMu =
-          (event->PartInfo(0)->fP.Vect().Angle(event->PartInfo(i)->fP.Vect()));
-      Enu_rec = FitUtils::EnuQErec((event->PartInfo(i))->fP, cos(ThetaMu), 30.,
-                                   false);
-      break;
-    }
-  }
+  double ThetaMu = pnu.Vect().Angle(pmu.Vect());
+  double Enu_rec = FitUtils::EnuQErec(pmu, cos(ThetaMu), 30., true);
 
   // If Restricted phase space
   if (!fullphasespace && ThetaMu > 0.34906585) return false;
 
   // restrict energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
   if (Enu_rec < EnuMin || Enu_rec > EnuMax) return false;
 
   return true;
@@ -882,11 +753,7 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
                                          double EnuMax, bool hadroncut) {
   //********************************************************************
 
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Restrict true energy range
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
   // Loop Particles
   int nhadrons = 0;
@@ -927,87 +794,49 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 // MOVE T2K
 bool SignalDef::isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
                             bool forwardgoing) {
-  // Only Numu
-  if (event->PartInfo(0)->fPID != 14) return false;
 
-  // Cut on Energy
-  if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) return false;
+  // Require a numu CC0pi event
+  if (!SignalDef::isCC0pi(event, 14, EnuMin, EnuMax)) return false;
 
-  // Particle Checks
-  bool only_allowed_particles = true;
-  bool muon_found = false;
-  double CosThetaMu = -9999.9;
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
-  // Loop over all particles
-  for (UInt_t j = 2; j < event->Npart(); ++j) {
-    // Get only final state
-    if (!(event->PartInfo(j))->fIsAlive or (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;
-
-    // Get PDG
-    int particle_pdg = (event->PartInfo(j))->fPID;
-
-    // Muon section
-    if (particle_pdg == 13) {
-      CosThetaMu = cos(((event->PartInfo(0))
-                            ->fP.Vect()
-                            .Angle((event->PartInfo(j))->fP.Vect())));
-      muon_found = true;
-    } else if (particle_pdg != 22 && particle_pdg != 2212 &&
-               particle_pdg != 2112 && particle_pdg != 13) {
-      only_allowed_particles = false;
-    }
-  }
-
-  // CC0PI Cut
-  if (!only_allowed_particles or !muon_found) return false;
+  double CosThetaMu = pnu.Vect().Angle(pmu.Vect());
 
   // restricted phase space
-  if (forwardgoing and CosThetaMu < 0.0 and CosThetaMu != -9999.9) {
-    return false;
-  }
+  if (forwardgoing and CosThetaMu < 0.0) return false;
   return true;
 }
 
 // MOVE T2K
 bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
-  std::pair<TLorentzVector, int> ppi = FitUtils::GetHMFSPion_4Mom(event);
-  if (ppi.second) {  // 0 pi
-    return false;
-  }
 
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-
-  if (!pmu.second || !pp.second) {  // need mu and p
-    return false;
-  }
-
-  // mu phase space
-  if ((pmu.first.Vect().Mag() < 250) || (pmu.first.Vect().CosTheta() < -0.6)) {
-    return false;
-  }
-  // p phase space
-  if ((pp.first.Vect().Mag() < 250) || (pp.first.Vect().Mag() > 1E3) ||
-      (pp.first.Vect().CosTheta() < 0.4)) {
-    return false;
-  }
-  return true;
-}
-
-bool SignalDef::isCCINC(FitEvent *event, int nuPDG) {
-
-  FitParticle* plep = event->GetHMISParticle(nuPDG);
+  // Require a numu CC0pi event
+  if (!SignalDef::isCC0pi(event, 14, EnuMin, EnuMax)) return false;
   
-  // Check we have something
-  if (!plep) return false;  
+  // Require at least one FS proton
+  if (event->NumFSParticle(2212) == 0) return false;
+
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+  
+  // mu phase space
+  if ((pmu.Vect().Mag() < 250) || (pnu.Vect().Angle(pmu.Vect()) < -0.6))
+    return false;
+
+  // p phase space
+  if ((pp.Vect().Mag() < 250) || (pp.Vect().Mag() > 1E3) ||
+      (pnu.Vect().Angle(pp.Vect()) < 0.4)) {
+    return false;
+  }
   return true;
 }
 
 // MOVE ARGONEUT
 bool SignalDef::isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG) {
   FitParticle* plep = event->GetHMISParticle(nuPDG);
-
+  // This is all wrong.
   // Check we have something
   if (!plep) return false;
 
@@ -1015,13 +844,13 @@ bool SignalDef::isCCInc_ArgoNeuT_limitPS(FitEvent *event, int nuPDG) {
     ((plep->fP.Vect().Theta() * 180. / TMath::Pi()) < 36);
 }
 
+
 // MOVE MINERVA
 bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax){
   
-  bool signal = (event->IsCC()  && 
-		 event->IsFS0Pi() &&
-		 SignalDef::HasProtonKEAboveThreshold(event, 110.0) &&
-		 SignalDef::IsEnuInRange(event, enumin, enumax));
+  // Require numu CC0pi event with a proton above threshold
+  bool signal = (SignalDef::isCC0pi(event, 14, enumin, enumax) &&
+		 SignalDef::HasProtonKEAboveThreshold(event, 110.0));
  
   return signal;
 }
@@ -1036,18 +865,19 @@ bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 
 }
 
-bool SignalDef::IsRestrictedMuonAngle(FitEvent* event, double angle){
+// Calculate the angle between the neutrino and an outgoing particle, apply a cut
+bool SignalDef::IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, double angle){
   
-  // If not CCnumu return
-  if (!event->HasISNuMuon() || !event->HasFSMuon()) return false;
+  // If the particles don't exist, return false
+  if (!event->HasISParticle(nuPDG) || !event->HasFSParticle(otherPDG)) return false;
 
   // Get Mom
-  TVector3 pnu = event->GetHMISNuMuon()->fP.Vect();
-  TVector3 pmu = event->GetHMFSMuon()->fP.Vect();
+  TVector3 pnu = event->GetHMISParticle(nuPDG)->fP.Vect();
+  TVector3 p2  = event->GetHMFSParticle(otherPDG)->fP.Vect();
 
-  double thetamu = pnu.Angle(pmu) * 180. / TMath::Pi();
+  double theta = pnu.Angle(p2) * 180. / TMath::Pi();
 
-  return (thetamu < angle);
+  return (theta < angle);
 }
 
 bool SignalDef::IsEnuInRange(FitEvent* event, double emin, double emax){
