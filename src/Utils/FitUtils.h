@@ -160,55 +160,6 @@ double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
 */
 double MpPi(TLorentzVector pp, TLorentzVector ppi);
 
-template <size_t N>
-std::pair<TLorentzVector, int> GetHMPDG_4Mom(int const (&pdg)[N],
-                                             FitEvent *event,
-                                             bool InitalState = false) {
-  ERR(WRN) << "Template Fitutils::GetHMPDG_4Mom() function is broken! Use FitEvent functions instead!" << std::endl;
-
-  TLorentzVector HM(0, 0, 0, 0);
-  int OPDG = 0;
-  UInt_t const &np = event->NPart();
-  for (size_t p_it = 0; p_it < np; ++p_it) {
-    FitParticle const &part = *event->PartInfo(p_it);
-    if ((InitalState && (part.Status() != kInitialState)) ||
-        (!InitalState && (part.Status() != kFinalState))) {
-      continue;
-    }
-
-    for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
-      if ((part.fPID == pdg[pdg_it]) &&
-          (part.fP.Vect().Mag2() > HM.Vect().Mag2())) {
-        OPDG = part.fPID;
-        HM = part.fP;
-      }
-    }
-  }
-  return std::make_pair(HM, OPDG);
-}
-
-/// Gets the 4 mom of the highest momentum alive particle with a PDG
-/// contained equal to pdg.
-std::pair<TLorentzVector, int> GetHMPDG_4Mom(int pdg, FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state charged lepton.
-std::pair<TLorentzVector, int> GetHMFSCLepton_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state muon.
-std::pair<TLorentzVector, int> GetHMFSMuon_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state anti-muon.
-std::pair<TLorentzVector, int> GetHMFSAntiMuon_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum initial state neutral lepton.
-std::pair<TLorentzVector, int> GetHMISNLepton_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum initial state muon neutrino.
-std::pair<TLorentzVector, int> GetHMISMuonNeutrino_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum initial state anti-muon neutrino.
-std::pair<TLorentzVector, int> GetHMISAntiMuonNeutrino_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state proton.
-std::pair<TLorentzVector, int> GetHMFSProton_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state charged pion.
-std::pair<TLorentzVector, int> GetHMFSCPion_4Mom(FitEvent *event);
-/// Gets the 4 mom of the highest momentum final state pion.
-std::pair<TLorentzVector, int> GetHMFSPion_4Mom(FitEvent *event);
-
 /// Gets delta p T as defined in Phys.Rev. C94 (2016) no.1, 015503
 double Get_STV_dpt(FitEvent *event, bool Is0pi);
 /// Gets delta phi T as defined in Phys.Rev. C94 (2016) no.1, 015503

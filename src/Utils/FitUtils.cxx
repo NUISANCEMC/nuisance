@@ -613,53 +613,6 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   return Erecoil * 1000.0;
 }
 
-
-
-std::pair<TLorentzVector, int> FitUtils::GetHMPDG_4Mom(int pdg,
-                                                       FitEvent *event) {
-  int pdgs[] = {pdg};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-
-std::pair<TLorentzVector, int> FitUtils::GetHMFSCLepton_4Mom(FitEvent *event) {
-  int pdgs[] = {11, 13, 15, -11, -13, -15};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSMuon_4Mom(FitEvent *event) {
-  int pdgs[] = {13};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSAntiMuon_4Mom(FitEvent *event) {
-  int pdgs[] = {-13};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISNLepton_4Mom(FitEvent *event) {
-  int pdgs[] = {12, 14, 16, -12, -14, -16};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISMuonNeutrino_4Mom(
-    FitEvent *event) {
-  int pdgs[] = {14};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISAntiMuonNeutrino_4Mom(
-    FitEvent *event) {
-  int pdgs[] = {-14};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSProton_4Mom(FitEvent *event) {
-  int pdgs[] = {2212};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSCPion_4Mom(FitEvent *event) {
-  int pdgs[] = {211, -211};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSPion_4Mom(FitEvent *event) {
-  int pdgs[] = {211, -211, 111};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-
 TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal) {
   TVector3 pnUnit = planarNormal.Unit();
   double inpProjectPN = inp.Dot(pnUnit);
@@ -700,63 +653,75 @@ Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
 }
 
 double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
     LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+  
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
 
 double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
+  
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
     LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
 }
 double FitUtils::Get_STV_dalphat(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
     LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }
