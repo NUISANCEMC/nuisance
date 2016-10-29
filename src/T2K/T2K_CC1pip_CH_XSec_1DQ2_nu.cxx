@@ -1,5 +1,8 @@
-#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
 #include <iomanip>
+
+#include "T2K_SignalDef.h"
+
+#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
 
 // The constructor
 T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
@@ -47,7 +50,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     ERR(FTL) << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
-    
+
   this->SetupDefaultHist();
 
   this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
@@ -138,7 +141,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
+      Pmu = (event->PartInfo(j))->fP;
     }
   }
 
@@ -178,9 +181,9 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1DQ2_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // Warning: The CH analysis has different signal definition to the H2O analysis!
 //          Often to do with the Michel tag
 

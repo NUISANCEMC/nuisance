@@ -17,11 +17,13 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCQE_XSec_1DQ2_joint.h"
 
-//********************************************************************  
+//********************************************************************
 MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
   // Setup The Measurement
   fName = name;
@@ -38,19 +40,19 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA Joint requires input files in format: antinu;nu"<<std::endl;
   std::string inFileAntineutrino = fSubInFiles.at(0);
   std::string inFileNeutrino     = fSubInFiles.at(1);
-    
+
   // Push classes back into list for processing loop
   fSubChain.push_back(MIN_anu);
   fSubChain.push_back(MIN_nu);
 
-  // Setup the Data input                          
+  // Setup the Data input
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCQE/";
   std::string datafilename  = "";
   std::string covarfilename = "";
   std::string neutrinoclass = "";
   std::string antineutrinoclass = "";
 
-  // Full Phase Space                       
+  // Full Phase Space
   if (fullphasespace){
 
     if (isFluxFix){
@@ -59,7 +61,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
       covarfilename = "Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_newflux";
       antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_newflux";
-      
+
     } else {
       if (fIsShape){
         datafilename  = "Q2QE_joint_dataa_SHAPE-extracted.txt";
@@ -72,7 +74,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
       antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu";
     }
 
-  // Restricted Phase Space                                            
+  // Restricted Phase Space
   } else {
 
     if (isFluxFix){
@@ -102,7 +104,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   // Setup Experiments
   MIN_anu = new MINERvA_CCQE_XSec_1DQ2_antinu(antineutrinoclass, inFileAntineutrino, rw, type, fakeDataFile);
   MIN_nu  = new MINERvA_CCQE_XSec_1DQ2_nu    (neutrinoclass,     inFileNeutrino,     rw, type, fakeDataFile);
- 
+
   // Add to chain for processing
   this->fSubChain.clear();
   this->fSubChain.push_back(MIN_anu);
@@ -117,14 +119,14 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
 
 };
 
-//********************************************************************  
+//********************************************************************
 void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
-//********************************************************************  
+//********************************************************************
 
   UInt_t sample = 0;
   for (std::vector<MeasurementBase*>::const_iterator expIter = fSubChain.begin(); expIter != fSubChain.end(); expIter++){
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
-    
+
     if (sample == 0){
 
       MIN_anu = static_cast<MINERvA_CCQE_XSec_1DQ2_antinu*>(exp);

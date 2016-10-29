@@ -1,5 +1,8 @@
-#include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
 #include <iomanip>
+
+#include "T2K_SignalDef.h"
+
+#include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
 
 // The constructor
 T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
@@ -106,7 +109,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::FillEventVariables(FitEvent *event) {
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
+      Pmu = (event->PartInfo(j))->fP;
     }
   }
 
@@ -117,9 +120,9 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dppi_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // This distribution uses a somewhat different signal definition so might as well implement it separately here
 
   // If we use Michel tag sample we don't cut into the pion phase space, only the muon phase space
@@ -136,7 +139,7 @@ bool T2K_CC1pip_CH_XSec_1Dppi_nu::isSignal(FitEvent *event) {
       return false;
     }
 
-    // does the event pass the pion angle cut? 
+    // does the event pass the pion angle cut?
     // we already know there's just one muon in the event if it passes muonPass so don't need to make an event loop rejection
     // Need the neutrino four-vector to get the angle between pion and neutrino
     TLorentzVector Pnu = event->PartInfo(0)->fP;

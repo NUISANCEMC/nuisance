@@ -17,13 +17,15 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "T2K_SignalDef.h"
+
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
 T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
 						   std::string inputfile,
 						   FitWeight *rw,
 						   std::string type){
-  
+
   fName = name;
   if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
   else fAnalysis = 2;
@@ -40,15 +42,15 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   fIsSystCov = type.find("SYSTCOV") != std::string::npos;
   fIsStatCov = type.find("STATCOV") != std::string::npos;
   fIsNormCov = type.find("NORMCOV") != std::string::npos;
-  
+
   fPlotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   SetHistograms();
   SetupDefaultHist();
-  
+
   // Diagonal covar setup
   if (!fIsShape) fAddNormPen = true;
   fNormError = 0.089; // Set from covar mat instead...
-  
+
   // Get Scaling
   fScaleFactor = ((fEventHist->Integral("width")/(fNEvents+0.)) * 1E-38 /
 		  (TotalIntegratedFlux()));
@@ -64,7 +66,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
 
   double pmu = -999.9;
   double CosThetaMu = -999.9;
-  
+
   // Loop over all particles
   for (UInt_t j = 2; j < event->Npart(); ++j){
 
@@ -78,7 +80,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
       continue;
     }
   }
-  
+
   fXVar = pmu;
   fYVar = CosThetaMu;
 
@@ -93,11 +95,11 @@ void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
   Measurement2D::ConvertEventRates();
 
   if (fAnalysis == 1){
-  
+
     // Following code handles weird ND280 Binning
     int nbins = this->fMCHist->GetNbinsX() + 1;
     double total = 0.0;
-    
+
     // Y = 1
     total = 0.0;
     for (int i = 3; i < nbins; i++){
@@ -180,7 +182,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
     }
     this->fMCHist->SetBinContent(9, 9, total / (0.02 * 25.0));
   }
-  
+
   return;
 }
 
@@ -191,7 +193,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   std::string infile = FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root";
   TFile* rootfile = new TFile(infile.c_str(), "READ");
   TH2D* tempcov;
-  
+
   // ANALYSIS 2
   if (fAnalysis == 2){
 
@@ -211,7 +213,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     TH2D* tempsyst = (TH2D*) rootfile->Get("analysis2_systcov");
     TH2D* tempstat = (TH2D*) rootfile->Get("analysis2_statcov");
     TH2D* tempnorm = (TH2D*) rootfile->Get("analysis2_normcov");
-    
+
     // Create covar [Default is both]
     tempcov = (TH2D*) tempsyst->Clone();
     tempcov->Reset();
@@ -225,7 +227,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
       tempcov->Add(tempstat);
       tempcov->Add(tempnorm);
     }
-    
+
     // SARAS ANALYSIS
   } else if (fAnalysis == 1){
 
@@ -233,7 +235,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     ERR(FTL) << " Analysis 1 is not yet available due to its awkward binning!" << endl;
     ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << endl;
     throw;
-    
+
   }
 
 
@@ -245,7 +247,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     for (int j = 0; j < nbins; j++){
 
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
-      
+
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
@@ -253,7 +255,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
   // Set Data Errors
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
-  
+
   // Remove root file
   rootfile->Close();
   return;

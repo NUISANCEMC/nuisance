@@ -17,14 +17,16 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCinc_XSec_1Dx_nu.h"
 
-//******************************************************************** 
-MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, 
+//********************************************************************
+MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type,
 						     std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
-  // Measurement Details                                                                                                           
+  // Measurement Details
   fName = name;
   fPlotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
   EnuMin = 2.;
@@ -55,13 +57,13 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
 
   // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
   this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
-  
+
 };
 
 //********************************************************************
 void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
-  
+
   Enu  = (event->PartInfo(0))->fP.E()/1000.0;
 
   // Get the relevant signal information
@@ -108,7 +110,7 @@ bool MINERvA_CCinc_XSec_1Dx_nu::isSignal(FitEvent *event){
 //********************************************************************
 void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
 //********************************************************************
-  
+
   this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
   this->fDataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->fPlotTitles).c_str());
   this->ApplySmearingMatrix();
@@ -120,7 +122,7 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
   for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
-    
+
     if (this->fMCStat->GetBinContent(i+1) != 0)
       this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
     else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());

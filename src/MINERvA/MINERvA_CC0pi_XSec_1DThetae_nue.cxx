@@ -1,8 +1,29 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NUISANCE.
+*
+*    NUISANCE is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NUISANCE is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CC0pi_XSec_1DThetae_nue.h"
 
-//******************************************************************** 
+//********************************************************************
 MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   // Define Measurement
   fName = "MINERvA_CC0pi_XSec_1DThetae_nue";
@@ -17,10 +38,10 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
   // Setup Data File
   std::string datafile = FitPar::GetDataBase()+"/MINERvA/CC0pi/MINERvA_CC0pi_nue_Data_ARX1509_05729.root";
   std::string dist_name = "";
-  
+
   dist_name = "1DThetae";
   fPlotTitles = "; Q_{QE}^{2} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  
+
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
 
@@ -28,7 +49,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
   SetupDefaultHist();
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (this->fEventHist->Integral("width")*100.0*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); 
+  fScaleFactor = (this->fEventHist->Integral("width")*100.0*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
 
 };
 
@@ -37,7 +58,7 @@ void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
   //********************************************************************
 
   Enu_rec = 0.0;
-  
+
   // Get the relevant signal information
   for (UInt_t j = 2; j < event->Npart(); ++j){
 
@@ -48,13 +69,13 @@ void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
 
       Thetae = fabs((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())) * 180. / TMath::Pi();
       Ee = (event->PartInfo(j))->fP.E()/1000.0;
-     
+
       // Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 34.,true);
       //      Q2QEe   = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
       break;
     }
   }
-  
+
   fXVar = Thetae;
   LOG(EVT) << "fXVar = "<<fXVar<<std::endl;
   return;
@@ -71,7 +92,7 @@ bool MINERvA_CC0pi_XSec_1DThetae_nue::isSignal(FitEvent *event){
 
   // Restrict EE
   if (Ee < 0.5) return false;
-  
+
   return true;
 };
 

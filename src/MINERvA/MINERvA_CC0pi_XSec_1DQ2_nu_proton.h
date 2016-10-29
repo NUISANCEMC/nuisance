@@ -1,20 +1,20 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret                     
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
-/*******************************************************************************               
-*    This file is part of NUISANCE.             
+/*******************************************************************************
+*    This file is part of NUISANCE.
 *
-*    NUISANCE is free software: you can redistribute it and/or modify                          
-*    it under the terms of the GNU General Public License as published by                      
-*    the Free Software Foundation, either version 3 of the License, or                         
-*    (at your option) any later version.        
+*    NUISANCE is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
 *
-*    NUISANCE is distributed in the hope that it will be useful,                               
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of                            
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                             
-*    GNU General Public License for more details.                                              
+*    NUISANCE is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
 *
-*    You should have received a copy of the GNU General Public License                         
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.                         
+*    You should have received a copy of the GNU General Public License
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 #ifndef MINERVA_1DQ2_nu_proton_H_SEEN
@@ -23,8 +23,8 @@
 
 ///\brief MINERvA CC0pi1p Analysis : Q2 Distribution
 ///
-///\n Ref: Phys. Rev. D 91, 071301 (2015) [arXiv:1409.4497] 
-///\n Input: CH events generated with all interaction modes with flux given in Ref. 
+///\n Ref: Phys. Rev. D 91, 071301 (2015) [arXiv:1409.4497]
+///\n Input: CH events generated with all interaction modes with flux given in Ref.
 class MINERvA_CC0pi_XSec_1DQ2_nu_proton : public Measurement1D {
 public:
 
@@ -39,7 +39,7 @@ public:
 
   ///\brief Signal is CC0pi1p
   ///
-  ///\n 1. CC0pi Selection 
+  ///\n 1. CC0pi Selection
   ///\n 2. Proton above 110 MeV
   ///\n 3. Muon Angle < 20deg
   ///\n 4. 1.5 < Enu < 100.0
@@ -50,7 +50,7 @@ public:
 
   ///\brief Calculate Extra Weight (Not necessary)
   inline double CalcSampleWeight(FitEvent* event){ return 1.0; }
-  
+
   ///\brief Handling setup for extra histograms
   bool SortExtraPlots(int state);
 

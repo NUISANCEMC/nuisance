@@ -19,10 +19,12 @@
 
 #ifndef MINERVA_1DEnu_nu_H_SEEN
 #define MINERVA_1DEnu_nu_H_SEEN
-#include"Measurement1D.h"
-//********************************************************************  
+
+#include "Measurement1D.h"
+
+//********************************************************************
 class MINERvA_CCinc_XSec_1DEnu_nu : public Measurement1D {
-//********************************************************************  
+//********************************************************************
 
 public:
 
@@ -37,11 +39,11 @@ public:
   void ScaleEvents();
 
   double GetChi2(){return 0.0;};
-  
+
  private:
 
   double Enu, ThetaMu;
   std::string target;
 };
-  
+
 #endif

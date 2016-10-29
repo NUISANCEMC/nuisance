@@ -19,6 +19,9 @@
 
 #include "GenericFlux_Tester.h"
 
+#include "T2K_SignalDef.h"
+#include "MINERvA_SignalDef.h"
+
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,

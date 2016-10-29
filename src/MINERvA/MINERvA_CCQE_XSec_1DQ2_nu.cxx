@@ -17,11 +17,13 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCQE_XSec_1DQ2_nu.h"
 
-//******************************************************************** 
+//********************************************************************
 MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   // Measurement Defaults
   fName = name;
@@ -83,8 +85,8 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  fScaleFactor = (this->fEventHist->Integral("width")*1E-38*13.0/6.0/(fNEvents+0.))/this->TotalIntegratedFlux(); 
-  
+  fScaleFactor = (this->fEventHist->Integral("width")*1E-38*13.0/6.0/(fNEvents+0.))/this->TotalIntegratedFlux();
+
 };
 
 //********************************************************************
@@ -93,13 +95,13 @@ void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   double q2qe = -1.0;
   double ThetaMu = -1.0;
-  
+
   // Get the relevant signal information
   for (UInt_t j = 0; j < event->Npart(); ++j){
 
     if ((event->PartInfo(j))->fPID != 13) continue;
 
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());    
+    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
     q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 34.,true);
 
     break;
@@ -118,4 +120,4 @@ bool MINERvA_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
 //*******************************************************************
   return SignalDef::isCCQEnumu_MINERvA(event, EnuMin, EnuMax, fullphasespace);
 }
- 
+

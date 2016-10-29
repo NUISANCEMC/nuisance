@@ -17,6 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h"
 
 // The constructor
@@ -78,9 +80,9 @@ void MINERvA_CC1pip_XSec_1DTpi_20deg_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MINERvA_CC1pip_XSec_1DTpi_20deg_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   // Last true refers to that this is the restricted MINERvA phase space, in which only forward-going muons are accepted
   return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, true);
 }

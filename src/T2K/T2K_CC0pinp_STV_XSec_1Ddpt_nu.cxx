@@ -17,6 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "T2K_SignalDef.h"
+
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
 //********************************************************************

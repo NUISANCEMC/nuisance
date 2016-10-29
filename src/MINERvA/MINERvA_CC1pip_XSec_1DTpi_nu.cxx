@@ -17,6 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 
 // The constructor
@@ -78,8 +80,8 @@ void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MINERvA_CC1pip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, false);
 }

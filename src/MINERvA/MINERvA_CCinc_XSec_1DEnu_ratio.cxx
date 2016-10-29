@@ -17,18 +17,20 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
 
-//********************************************************************  
+//********************************************************************
 MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
   // Setup The Measurement
   fName = name;
   nBins = 8;
   fPlotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
   fIsRatio = true;
-  fIsDiag  = false; 
+  fIsDiag  = false;
   target  = "";
   SetupMeasurement(inputfiles, type, rw, fakeDataFile);
 
@@ -36,17 +38,17 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   else if (name.find("Fe56")  != std::string::npos) target =  "Fe56";
   else if (name.find("Pb208") != std::string::npos) target = "Pb208";
   else ERR(WRN) << "target " << target << " was not found!" << std::endl;
-  
+
   // Get parsed input files
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR"<<std::endl;
   std::string inFileNUM = fSubInFiles.at(0);
   std::string inFileDEN = fSubInFiles.at(1);
-    
+
   // Push classes back into list for processing loop
   this->fSubChain.push_back(NUM);
   this->fSubChain.push_back(DEN);
 
-  // Setup the Data input                          
+  // Setup the Data input
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string datafilename  = "CCinc_"+target+"_CH_ratio_Enu_data.csv";
   std::string covarfilename = "CCinc_"+target+"_CH_ratio_Enu_covar.csv";
@@ -68,14 +70,14 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
 
 };
 
-//********************************************************************  
+//********************************************************************
 void MINERvA_CCinc_XSec_1DEnu_ratio::MakePlots(){
-//********************************************************************  
+//********************************************************************
 
   UInt_t sample = 0;
   for (std::vector<MeasurementBase*>::const_iterator expIter = this->fSubChain.begin(); expIter != this->fSubChain.end(); expIter++){
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
- 
+
     if      (sample == 0) this->NUM = static_cast<MINERvA_CCinc_XSec_1DEnu_nu*>(exp);
     else if (sample == 1) this->DEN = static_cast<MINERvA_CCinc_XSec_1DEnu_nu*>(exp);
     else break;
@@ -131,7 +133,7 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::SetCovarMatrixFromText(std::string covarFil
          iter != entries.end(); iter++){
 
 	double val = (*iter) * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
-	
+
 	(*this->covar)(row, column) = val;
 	(*this->fFullCovar)(row, column) = val;
 	column++;
@@ -161,7 +163,7 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::Write(std::string drawOpt){
     cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
     cov.Write();
   }
-  
+
   if (this->covar){
     TH2D covinv = TH2D((*this->covar));
     covinv.SetNameTitle((this->fName+"_covinv").c_str(),(this->fName+"_covinv;Bins; Bins;").c_str());

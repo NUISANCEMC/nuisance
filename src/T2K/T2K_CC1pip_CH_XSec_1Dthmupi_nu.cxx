@@ -1,5 +1,8 @@
-#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
 #include <iomanip>
+
+#include "T2K_SignalDef.h"
+
+#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
 
 // The constructor
 T2K_CC1pip_CH_XSec_1Dthmupi_nu::T2K_CC1pip_CH_XSec_1Dthmupi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
@@ -97,7 +100,7 @@ void T2K_CC1pip_CH_XSec_1Dthmupi_nu::FillEventVariables(FitEvent *event) {
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
+      Pmu = (event->PartInfo(j))->fP;
     }
   }
 
@@ -108,9 +111,9 @@ void T2K_CC1pip_CH_XSec_1Dthmupi_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dthmupi_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // This sample requires directional information on the pion so can't use Michel tag sample
   return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
 }
