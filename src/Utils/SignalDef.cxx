@@ -217,10 +217,9 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   // Signal is both pi+ and pi-
   // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG 
   if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax) &&
-      !SignalDef::isCC1pi(event, -14, 211, EnuMin, EnuMax)) 
+      !SignalDef::isCC1pi(event, 14, -211, EnuMin, EnuMax)) 
     return false;
 
-  int pdgs[] = {-211, 211};
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
