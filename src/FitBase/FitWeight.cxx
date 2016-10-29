@@ -196,7 +196,7 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
       if (!fIsUsingNIWG) this->SetupNIWGRW();
       this->fNIWGRW->Systematics().Init(
           static_cast<niwg::rew::NIWGSyst_t>(rw_enum));
-      if (this->fSetAbsTwk) NIWGSystUncertainty::Instance()->SetUncertainty(
+      if (this->fSetAbsTwk) niwg::rew::NIWGSystUncertainty::Instance()->SetUncertainty(
 	  static_cast<niwg::rew::NIWGSyst_t>(rw_enum), 1.0, 1.0);
       break;
 #else
