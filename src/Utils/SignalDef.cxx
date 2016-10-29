@@ -29,7 +29,7 @@ bool SignalDef::isCCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
 
   // Check that it's within the allowed range if set
   if (EnuMin != EnuMax)
-    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) 
+    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000))
       return false;
 
   // Check that the charged lepton we expect has been produced
@@ -60,7 +60,7 @@ bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
 
   // Veto event with mesons
   if (event->NumFSMesons() != 0) return false;
-  
+
   // Veto events which don't have exactly 1 outgoing charged lepton
   if (event->NumFSLeptons() != 1) return false;
 
@@ -71,7 +71,7 @@ bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax)
 
   // Check if it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
-  
+
   // Require modes 1 (CCQE)
   if (abs(event->Mode) != 1) return false;
 
@@ -83,16 +83,16 @@ bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double Enu
   // Check if it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
-  // Require modes 1/2 (CCQE and MEC)                                                                                                                                         
+  // Require modes 1/2 (CCQE and MEC)
   if (abs(event->Mode) != 1 && abs(event->Mode) != 2) return false;
 
   return true;
 }
 
 // Require one meson, one charged lepton. types specified in the arguments
-bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG, 
+bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG,
 			double EnuMin, double EnuMax){
-  
+
   // First, make sure it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
@@ -136,17 +136,17 @@ bool SignalDef::isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
 
   // Check it's CCINC
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
-  
+
   // Remove events where the number of final state particles
   // do not match the number specified in the signal definition
   if ((int)pdgs.size() != event->NumFSParticle()) return false;
 
   // For every particle in the list, check the number in the FS
-  for (std::vector<int>::iterator it = pdgs.begin(); 
+  for (std::vector<int>::iterator it = pdgs.begin();
        it != pdgs.end(); ++it){
     // Check how many times this pdg is in the vector
     int nEntries = std::count (pdgs.begin(), pdgs.end(), *it);
-    if (event->NumFSParticle(*it) != nEntries) 
+    if (event->NumFSParticle(*it) != nEntries)
       return false;
   }
   return true;
@@ -165,7 +165,7 @@ bool SignalDef::isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
 
   // Check that there are only three FS particles
   if (event->NumFSParticle() != 3) return false;
-  
+
   return true;
 }
 
@@ -188,14 +188,14 @@ bool SignalDef::isNC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
 
 
 bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
-  
+
   // Check this is a CCINC event
   if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
 
   int nLepton = event->NumFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1);
   int nPion   = event->NumFSParticle(piPDG);
   int nFS     = event->NumFSParticle();
-  
+
   if (nLepton != 1 || nPion != 1) return false;
   if (nFS != 2) return false;
   return true;
@@ -238,15 +238,15 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   // *********************************
 
   // Signal is both pi+ and pi-
-  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG 
+  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
   // First, make sure it's CCINC
   if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
-  
+
   // Allow pi+/pi-
   int piPDG[]  = {211, -211};
   int nLeptons = event->NumFSLeptons();
-  int nPion    = event->NumFSParticle(GeneralUtils::makeVector(piPDG));
-  
+  int nPion    = event->NumFSParticle(piPDG);
+
   // Check that the desired pion exists and is the only meson
   if (nPion != 1) return false;
 
@@ -297,7 +297,7 @@ bool SignalDef::isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
   // Write the number of pions to the measurement class...
   // Maybe better to just do that inside the class?
   int pdgs[] = {-211, 211};
-  nPions     = event->NumFSParticle(GeneralUtils::makeVector(pdgs));
+  nPions     = event->NumFSParticle(pdgs);
 
   // Check that there is a pion!
   if (nPions == 0) return false;
@@ -415,7 +415,7 @@ bool SignalDef::isCCQEnumu_MINERvA(FitEvent *event, double EnuMin,
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  
+
   double ThetaMu = pnu.Vect().Angle(pmu.Vect());
   double Enu_rec = FitUtils::EnuQErec(pmu, cos(ThetaMu), 34., true);
 
@@ -459,8 +459,8 @@ bool SignalDef::isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin,
 
   if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
-  // Need at least one muon 
-  if (event->NumFSParticle(13) < 1) return false; 
+  // Need at least one muon
+  if (event->NumFSParticle(13) < 1) return false;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
 
@@ -496,14 +496,14 @@ bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
   if (!SignalDef::isCC0pi(event, 14, EnuMin, EnuMax)) return false;
-  
+
   // Require at least one FS proton
   if (event->NumFSParticle(2212) == 0) return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
-  
+
   // mu phase space
   if ((pmu.Vect().Mag() < 250) || (pnu.Vect().Angle(pmu.Vect()) < -0.6))
     return false;
@@ -518,17 +518,17 @@ bool SignalDef::isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
 
 // MOVE MINERVA
 bool SignalDef::isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax){
-  
+
   // Require numu CC0pi event with a proton above threshold
   bool signal = (SignalDef::isCC0pi(event, 14, enumin, enumax) &&
 		 SignalDef::HasProtonKEAboveThreshold(event, 110.0));
- 
+
   return signal;
 }
 
 
 bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
-  
+
   double pe = -1.0;
   if (event->HasFSProton()) pe = FitUtils::T(event->GetHMFSProton()->fP);
 
@@ -538,7 +538,7 @@ bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 
 // Calculate the angle between the neutrino and an outgoing particle, apply a cut
 bool SignalDef::IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, double angle){
-  
+
   // If the particles don't exist, return false
   if (!event->HasISParticle(nuPDG) || !event->HasFSParticle(otherPDG)) return false;
 
@@ -552,6 +552,6 @@ bool SignalDef::IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, doub
 }
 
 bool SignalDef::IsEnuInRange(FitEvent* event, double emin, double emax){
-  return (event->PartInfo(0)->fP.E() > emin && 
+  return (event->PartInfo(0)->fP.E() > emin &&
 	  event->PartInfo(0)->fP.E() < emax);
 }

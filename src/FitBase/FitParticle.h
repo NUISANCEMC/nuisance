@@ -113,7 +113,7 @@ class FitParticle {
   inline bool IsFinalState   (void) const { return (fStatus == kFinalState);   };
   inline bool IsFSIState     (void) const { return (fStatus == kFSIState);     };
   inline bool IsInitialState (void) const { return (fStatus == kInitialState); };
-  
+
  private:
   int fStatus;
 
