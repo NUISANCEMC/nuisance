@@ -125,57 +125,15 @@ bool T2K_CC1pip_CH_XSec_1Dpmu_nu::isSignal(FitEvent *event) {
 // Also no muon momentum reduction applied
 //
 // This uses a slightly custom signal definition where a cut is only placed on the muon angle, not the momentum
-//
-// Pretty much a copy/paste of SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true), excluding the muon momentum requirement
 
-  if ((event->PartInfo(0))->fPID != 14) return false; 
+  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
 
-  if (((event->PartInfo(0))->fP.E() < EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > EnuMax*1000.)) return false; 
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false;
-
-  int pipCnt = 0; // counts number of pions
-  int lepCnt = 0;
-
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  for (unsigned int j = 2; j < event->Npart(); j++) {
-
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-
-    // Ignore any non pi+ mesons
-    if ((abs(PID) >= 111 && abs(PID) <= 210) || (abs(PID) >= 212 && abs(PID) <= 557) || PID == -211) return false; 
-    // Count leptons
-    else if (abs(PID) == 13) {
-      lepCnt++;
-      Pmu = (event->PartInfo(j))->fP;
-    }
-    else if (PID == 211) {
-      pipCnt++;
-      Ppip = (event->PartInfo(j))->fP;
-    }
-  }
-
-  if (pipCnt != 1) return false; 
-  if (lepCnt != 1) return false;
-
-  // relatively generic CC1pi+ definition done
-  //
-  // now measurement specific depending on if we have Michel e- tag or not in measurement
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
   double cos_th_mu = cos(FitUtils::th(Pnu,Pmu));
 
-  if (cos_th_mu <= 0.2) {
-    return false;
-  } else {
-    return true;
-  }
-
-  // Unnecssary default to false
+  if (cos_th_mu >= 0.2) return true;
   return false;
-
-}
+};
 
