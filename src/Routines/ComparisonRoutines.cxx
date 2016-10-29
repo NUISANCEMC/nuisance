@@ -30,7 +30,7 @@ void ComparisonRoutines::Init(){
 
   fInputFile = "";
   fInputRootFile = NULL;
-  
+
   fOutputFile = "";
   fOutputRootFile = NULL;
 
@@ -38,11 +38,11 @@ void ComparisonRoutines::Init(){
   fRoutines.clear();
 
   fCardFile = "";
-  
+
   fFakeDataInput = "";
 
   fSampleFCN    = NULL;
-  
+
   fAllowedRoutines = ("Compare");
 
 };
@@ -93,13 +93,19 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
     ERR(FTL) << "Run with '-h' to see options." << std::endl;
     throw;
   }
-  
+
   if (fOutputFile.empty()){
     ERR(FTL) << "WARNING: output file not specified." << std::endl;
     ERR(FTL) << "Using cardfile.root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
-  
+
+  if(fCardFile == fOutputFile){
+    ERR(FTL) <<  "WARNING: output file and card file are the same file, "
+      "writing: " << fCardFile << ".root" << std::endl;
+    fOutputFile = fCardFile + ".root";
+  }
+
   // Fill fit routines and check they are good
   fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
   for (UInt_t i = 0; i < fRoutines.size(); i++){
@@ -110,7 +116,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
       throw;
     }
   }
-  
+
   // CONFIG
   // ---------------------------
   std::string par_dir =  GeneralUtils::GetTopLevelDir()+"/parameters/";
@@ -124,12 +130,12 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
   if (!maxevents_flag.empty()){
     FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
   }
-  
+
   if (verbosity_flag != 0){
     int curverb = FitPar::Config().GetParI("VERBOSITY");
     FitPar::Config().SetParI("VERBOSITY", curverb + verbosity_flag);
   }
-  
+
   if (error_flag != 0){
     int curwarn = FitPar::Config().GetParI("ERROR");
     FitPar::Config().SetParI("ERROR", curwarn + error_flag);
@@ -139,7 +145,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
   ERR_VERB(FitPar::Config().GetParI("ERROR"));
 
   // CARD
-  // --------------------------- 
+  // ---------------------------
   // Parse Card Options
   ReadCard(fCardFile);
 
@@ -150,10 +156,10 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
   FitPar::Config().Write();
 
   // Starting Setup
-  // --------------------------- 
+  // ---------------------------
   SetupRWEngine();
   SetupFCN();
-  
+
   return;
 };
 
@@ -171,7 +177,7 @@ void ComparisonRoutines::ReadCard(std::string cardfile){
        iter != cardlines.end(); iter++){
     std::string line = (*iter);
     linecount++;
-    
+
     // Skip Comments
     if (line.empty()) continue;
     if (line.c_str()[0] == '#') continue;
@@ -187,18 +193,18 @@ void ComparisonRoutines::ReadCard(std::string cardfile){
       throw;
     }
   }
-  
+
   // Read Parameters second
   linecount = 0;
   for (std::vector<std::string>::iterator iter = cardlines.begin();
        iter != cardlines.end(); iter++){
     std::string line = (*iter);
     linecount++;
-    
+
     // Skip Comments
     if (line.empty()) continue;
     if (line.c_str()[0] == '#') continue;
-        
+
     // Try Parameter Reads
     int parstatus = ReadParameters(line);
     int fakstatus = ReadFakeDataPars(line);
@@ -212,7 +218,7 @@ void ComparisonRoutines::ReadCard(std::string cardfile){
       throw;
     }
   }
- 
+
   return;
 };
 
@@ -220,17 +226,17 @@ void ComparisonRoutines::ReadCard(std::string cardfile){
 int ComparisonRoutines::ReadParameters(std::string parstring){
 //******************************************
 
-  std::string inputspec = "RW Dial Inputs Syntax \n" 
+  std::string inputspec = "RW Dial Inputs Syntax \n"
     "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
     "fix  input: TYPE  NAME  VALUE  [STATE] \n"
     "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-    "Allowed Types: \n" 
-    "neut_parameter,niwg_parameter,t2k_parameter," 
+    "Allowed Types: \n"
+    "neut_parameter,niwg_parameter,t2k_parameter,"
     "nuwro_parameter,gibuu_parameter";
-    
+
   // Check sample input
   if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-  
+
   // Parse inputs
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
 
@@ -239,7 +245,7 @@ int ComparisonRoutines::ReadParameters(std::string parstring){
       strvct[0].find("parameter") == std::string::npos){
     return kGoodStatus;
   }
-  
+
   // Check length
   if (strvct.size() < 3){
     ERR(FTL) << "Input rw dials need to provide at least 3 inputs." << std::endl;
@@ -252,7 +258,7 @@ int ComparisonRoutines::ReadParameters(std::string parstring){
   std::string parname = strvct[1];
   double parval  = GeneralUtils::StrToDbl(strvct[2]);
   std::string state = "FIX"; //[DEFAULT]
-  
+
   // Check Type
   if (FitBase::ConvDialType(partype) == kUNKNOWN){
     ERR(FTL) << "Unknown parameter type! " << partype << endl;
@@ -266,7 +272,7 @@ int ComparisonRoutines::ReadParameters(std::string parstring){
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
-  
+
   // Option Extra (No Limits)
   if (strvct.size() == 4){
     state = strvct[3];
@@ -284,14 +290,14 @@ int ComparisonRoutines::ReadParameters(std::string parstring){
     ERR(FTL) << "Duplicate parameter names given for " << parname << endl;
     throw;
   }
-  
+
   // Setup Containers
   fParams.push_back(parname);
 
   fTypeVals[parname]  = FitBase::ConvDialType(partype);
   fCurVals[parname]   = parval;
   fStateVals[parname] = state;
-  
+
   // Print the parameter
   LOG(MIN) << "Read Parameter " << parname << " " << parval << " "
 	   << state << std::endl;
@@ -307,7 +313,7 @@ int ComparisonRoutines::ReadFakeDataPars(std::string parstring){
   std::string inputspec = "Fake Data Dial Inputs Syntax \n"
     "fake value: fake_parameter  NAME  VALUE  \n"
     "Name should match dialnames given in actual dial specification.";
-  
+
   // Check sample input
   if (parstring.find("fake_parameter") == std::string::npos)
     return kGoodStatus;
@@ -338,7 +344,7 @@ int ComparisonRoutines::ReadFakeDataPars(std::string parstring){
   // Print the fake parameter
   LOG(MIN) << "Read Fake Parameter " << parname << " " << parval << std::endl;
 
-  // Tell reader its all good  
+  // Tell reader its all good
   return kGoodStatus;
 }
 
@@ -346,7 +352,7 @@ int ComparisonRoutines::ReadFakeDataPars(std::string parstring){
 int ComparisonRoutines::ReadSamples(std::string samstring){
 //******************************************
   std::string inputspec = "";
-  
+
   // Check sample input
   if (samstring.find("sample") == std::string::npos)
     return kGoodStatus;
@@ -389,9 +395,9 @@ int ComparisonRoutines::ReadSamples(std::string samstring){
     ERR(FTL) << "Duplicate samples given for " << samname << endl;
     throw;
   }
-  
+
   fParams.push_back(normname);
-  
+
   fTypeVals[normname]  = kNORM;
   fStateVals[normname] = samtype;
   fCurVals[normname]   = samnorm;
@@ -416,7 +422,7 @@ void ComparisonRoutines::SetupRWEngine(){
     std::string name = fParams[i];
     FitBase::GetRW() -> IncludeDial(name, fTypeVals.at(name) );
   }
-  
+
   return;
 }
 
@@ -428,7 +434,7 @@ void ComparisonRoutines::SetupFCN(){
   if (fSampleFCN) delete fSampleFCN;
   fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
   SetFakeData();
-  
+
   return;
 }
 
@@ -475,9 +481,9 @@ void ComparisonRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals
   return;
 }
 
-//************************************* 
+//*************************************
 void ComparisonRoutines::Run(){
-//************************************* 
+//*************************************
 
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
@@ -490,79 +496,79 @@ void ComparisonRoutines::Run(){
       GenerateComparison();
       PrintState();
     }
-    
+
   }
 
   return;
 }
 
-//************************************* 
+//*************************************
 void ComparisonRoutines::GenerateComparison(){
 //*************************************
-  
+
   // Main Event Loop from event Manager
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
 
-  if (using_evtmanager and false) {     
+  if (using_evtmanager and false) {
     LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
 
-    std::list<MeasurementBase*> samchain = fSampleFCN->GetSampleList();                      
-    std::list<MeasurementBase*>::const_iterator iterSam = samchain.begin();               
-    
-    std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();           
-    std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();             
-    
-    int timestart = time(NULL); 
-    
-    for (; iterInp != fInputs.end(); iterInp++) {           
-      int input_id = (iterInp->first);                      
-      InputHandler* cur_input = (iterInp->second);          
-      FitEvent* cust_event = cur_input->GetEventPointer();  
-      int fNEvents = cur_input->GetNEvents();               
-      int countwidth = (fNEvents / 10);                    
-      
-      // MAIN EVENT LOOP        
-      for (int i = 0; i < fNEvents; i++) {                  
+    std::list<MeasurementBase*> samchain = fSampleFCN->GetSampleList();
+    std::list<MeasurementBase*>::const_iterator iterSam = samchain.begin();
+
+    std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
+    std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
+
+    int timestart = time(NULL);
+
+    for (; iterInp != fInputs.end(); iterInp++) {
+      int input_id = (iterInp->first);
+      InputHandler* cur_input = (iterInp->second);
+      FitEvent* cust_event = cur_input->GetEventPointer();
+      int fNEvents = cur_input->GetNEvents();
+      int countwidth = (fNEvents / 10);
+
+      // MAIN EVENT LOOP
+      for (int i = 0; i < fNEvents; i++) {
 
 	// Get Event from input list
-	cust_event = FitBase::EvtManager().GetEvent(input_id, i);                       
+	cust_event = FitBase::EvtManager().GetEvent(input_id, i);
 
 	// Get Weight
 	double Weight = (FitBase::GetRW()->CalcWeight(cust_event)	\
 			 * cust_event->InputWeight);
 
 	// Skip if dodgy weight
-        if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 ||                     
-            Weight > 200.0 || Weight <= 0.0)                 
-          continue;             
+        if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 ||
+            Weight > 200.0 || Weight <= 0.0)
+          continue;
 
 	// Loop over samples and fill histograms
-        iterSam = samchain.begin();                           
-        for (; iterSam != samchain.end(); iterSam++) {        
-          MeasurementBase* exp = (*iterSam);                
-          if (exp->GetInputID() != input_id) continue;      
-	  
-          exp->FillEventVariables(cust_event);              
-          exp->SetMode(cust_event->Mode);                   
-          exp->SetSignal(cust_event);                       
-          exp->SetWeight(Weight);                           
+        iterSam = samchain.begin();
+        for (; iterSam != samchain.end(); iterSam++) {
+          MeasurementBase* exp = (*iterSam);
+          if (exp->GetInputID() != input_id) continue;
+
+          exp->FillEventVariables(cust_event);
+          exp->SetMode(cust_event->Mode);
+          exp->SetSignal(cust_event);
+          exp->SetWeight(Weight);
           exp->FillHistograms();
-        }                       
-	
-        // Print Out            
-        if (LOG_LEVEL(REC) and i % countwidth == 0)         
-	  LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight             
+        }
+
+        // Print Out
+        if (LOG_LEVEL(REC) and i % countwidth == 0)
+	  LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
 		   << std::endl;
-      }                         
-    }           
-                       
+      }
+    }
+
     // Convert Binned events
-    iterSam = samchain.begin();   
-    for (; iterSam != samchain.end(); iterSam++) {            
-      MeasurementBase* exp = (*iterSam);                    
-      exp->ConvertEventRates(); 
-    }                           
-    
+    iterSam = samchain.begin();
+    for (; iterSam != samchain.end(); iterSam++) {
+      MeasurementBase* exp = (*iterSam);
+      exp->ConvertEventRates();
+    }
+
     LOG(FIT) << "Time Taken = " << time(NULL) - timestart << std::endl;
     LOG(FIT) << "Finished reconfiguring all events" << std::endl;
   } else {
@@ -570,17 +576,17 @@ void ComparisonRoutines::GenerateComparison(){
   }
 }
 
-//************************************* 
+//*************************************
 void ComparisonRoutines::PrintState(){
-//************************************* 
+//*************************************
   LOG(FIT)<<"------------"<<std::endl;
-  
+
   // Count max size
   int maxcount = 0;
   for (UInt_t i = 0; i < fParams.size(); i++){
     maxcount = max(int(fParams[i].size()), maxcount);
   }
-  
+
   // Header
   LOG(FIT) << " #    " << left << setw(maxcount) << "Parameter "
 	   << " = "
@@ -599,7 +605,7 @@ void ComparisonRoutines::PrintState(){
     std::string curunits = "(sig.)";
     double      curval   = fCurVals[syst];
     double      curerr   = 0.0;
-    
+
     if (fStateVals[syst].find("ABS") != std::string::npos){
       curval = FitBase::RWSigmaToAbs(typestr, syst, curval);
       curerr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
@@ -616,9 +622,9 @@ void ComparisonRoutines::PrintState(){
     double      convval   = FitBase::RWSigmaToAbs(typestr, syst, curval);
     double      converr   = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
 			     FitBase::RWSigmaToAbs(typestr, syst, 0.0));
-    
+
     std::ostringstream curparstring;
-    
+
     curparstring << " " << setw(3) << left
 		 << i << ". "
 		 << setw(maxcount) << syst << " = "
@@ -628,7 +634,7 @@ void ComparisonRoutines::PrintState(){
                  << setw(10) << convval    << " +- "
                  << setw(10) << converr    << " "
                  << setw(8)  << convunits;
-      
+
 
     LOG(FIT) << curparstring.str() << endl;
   }
@@ -645,7 +651,7 @@ void ComparisonRoutines::PrintState(){
 //*************************************
 void ComparisonRoutines::SaveCurrentState(std::string subdir){
 //*************************************
-  
+
   LOG(FIT)<<"Saving current full FCN predictions" <<std::endl;
 
   // Setup DIRS
@@ -654,12 +660,12 @@ void ComparisonRoutines::SaveCurrentState(std::string subdir){
     TDirectory* newdir =(TDirectory*) gDirectory->mkdir(subdir.c_str());
     newdir->cd();
   }
-  
+
   fSampleFCN->Write();
 
   // Change back to current DIR
   curdir->cd();
-  
+
   return;
 }
 
@@ -668,12 +674,12 @@ void ComparisonRoutines::SaveNominal(){
 //*************************************
 
   fOutputRootFile->cd();
-  
+
   LOG(FIT)<<"Saving Nominal Predictions (be cautious with this)" <<std::endl;
   FitBase::GetRW()->Reconfigure();
   GenerateComparison();
   SaveCurrentState("nominal");
-  
+
 };
 
 /*
