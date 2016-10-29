@@ -129,6 +129,29 @@ bool SignalDef::isNC1pi(FitEvent *event, int nuPDG, int piPDG,
   return true;
 }
 
+// A slightly ugly function to replace the BC 2pi channels.
+// All particles which are allowed in the final state are specified
+bool SignalDef::isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
+			   double EnuMin, double EnuMax){
+
+  // Check it's CCINC
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+  
+  // Remove events where the number of final state particles
+  // do not match the number specified in the signal definition
+  if ((int)pdgs.size() != event->NumFSParticle()) return false;
+
+  // For every particle in the list, check the number in the FS
+  for (std::vector<int>::iterator it = pdgs.begin(); 
+       it != pdgs.end(); ++it){
+    // Check how many times this pdg is in the vector
+    int nEntries = std::count (pdgs.begin(), pdgs.end(), *it);
+    if (event->NumFSParticle(*it) != nEntries) 
+      return false;
+  }
+  return true;
+}
+
 // Require one meson, one charged lepton, AND specify the only other final state particle
 // This is only suitable for bubble chambers. Types specified in the arguments
 bool SignalDef::isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,

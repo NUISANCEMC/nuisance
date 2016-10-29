@@ -75,38 +75,11 @@ void ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu::FillEventVariables(FitEvent *event) {
   return;
 }
 
-// Signal asks for 1pi-, 1pi+, 1mu-, 1p
+// Signal asks for 2pi+, 1mu-, 1n
 bool ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu::isSignal(FitEvent *event) {
-
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false; 
-
-  if (((event->PartInfo(2))->fPID != 13) && ((event->PartInfo(3))->fPID != 13)) return false; 
-
-  int pipCnt = 0;
-  int lepCnt = 0;
-  int neutronCnt = 0;
-
-  for (UInt_t j =  2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 13) {
-      lepCnt++;
-    } else if (PID == 211) {
-      pipCnt++;
-    } else if (PID == 2112) {
-      neutronCnt++;
-    } else {
-      return false;
-    }
-  }
-
-  if (pipCnt != 1) return false;
-  if (lepCnt != 1) return false;
-  if (neutronCnt != 1) return false;
-
-  return true;
+  int pdgs[] = {13, 211, 211, 2112};
+  return SignalDef::isCCWithFS(event, 14, GeneralUtils::makeVector(pdgs),
+			       EnuMin, EnuMax);
 }
 
 

@@ -48,6 +48,8 @@ namespace SignalDef {
 		     int thirdPDG, double EnuMin=0, double EnuMax=0);
   bool isNC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
                      int thirdPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
+		  double EnuMin=0, double EnuMax=0);
 
   // MINERvA has unfolded and not unfolded muon phase space
   bool isCC1pip_MINERvA (FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
