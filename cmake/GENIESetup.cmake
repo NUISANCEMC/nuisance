@@ -42,7 +42,22 @@ endif()
 
 execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(GENIE_LD_FLAGS "${GENIE_LD_FLAGS} ${GENIE_LD_FLAGS}")
+
+execute_process (COMMAND genie-config
+  --libdir OUTPUT_VARIABLE GENIE_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(${GENIE_LIBDIR} MATCHES .*2_10_.*)
+  message(STATUS "Replacing \"ReinSeghal\" with \"ReinSehgal\" due to known bug with version 2.10 of genie-config.")
+  set(OLD_GENIE_LD_LFLAGS ${GENIE_LD_FLAGS})
+  STRING(REPLACE "ReinSeghal" "ReinSehgal" GENIE_FIX_LD_FLAGS ${GENIE_LD_FLAGS})
+  message(STATUS "${OLD_GENIE_LD_LFLAGS} => ${GENIE_FIX_LD_FLAGS}")
+  set(GENIE_LD_FLAGS ${GENIE_FIX_LD_FLAGS})
+endif()
+
+
+set(GENIE_LD_FLAGS "${GENIE_LD_FLAGS} -lGReWeight ${GENIE_LD_FLAGS}")
+
+
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
