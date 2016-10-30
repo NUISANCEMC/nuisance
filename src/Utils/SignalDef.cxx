@@ -239,9 +239,19 @@ bool SignalDef::isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 
   // Signal is both pi+ and pi-
   // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG 
-  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax) &&
-      !SignalDef::isCC1pi(event, 14, -211, EnuMin, EnuMax)) 
-    return false;
+  // First, make sure it's CCINC
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
+  
+  // Allow pi+/pi-
+  int piPDG[]  = {211, -211};
+  int nLeptons = event->NumFSLeptons();
+  int nPion    = event->NumFSParticle(GeneralUtils::makeVector(piPDG));
+  
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1) return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
