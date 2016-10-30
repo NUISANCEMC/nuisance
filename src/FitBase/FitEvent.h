@@ -165,9 +165,9 @@ class FitEvent : public BaseFitEvt {
   inline int NumISParticle(int pdg = 0) {
     return NumParticle(pdg, kInitialState);
   };
-  inline int NumISParticle(std::vector<int> pdg) {
-    return NumParticle(pdg, kInitialState);
-  };
+  // inline int NumISParticle(std::vector<int> pdg) {
+  //   return NumParticle(pdg, kInitialState);
+  // };
   inline bool HasISNuElectron(void) { return HasISParticle(12); };
   inline bool HasISNuMuon(void) { return HasISParticle(14); };
   inline bool HasISNuTau(void) { return HasISParticle(16); };
@@ -186,16 +186,16 @@ class FitEvent : public BaseFitEvt {
     return NumParticle(pdg, kFinalState);
   };
   template <size_t N>
-  inline int NumFSParticle(int (&pdgs)[N]) {
+  inline int NumFSParticle(int const (&pdgs)[N]) {
     int rtn = 0;
     for (size_t i = 0; i < N; ++i) {
       rtn += NumParticle(pdgs[i], kFinalState);
     }
     return rtn;
   };
-  inline int NumFSParticle(std::vector<int> pdg) {
-    return NumParticle(pdg, kFinalState);
-  };
+  // inline int NumFSParticle(std::vector<int> pdg) {
+  //   return NumParticle(pdg, kFinalState);
+  // };
   inline bool HasFSNuElectron(void) { return HasFSParticle(12); };
   inline bool HasFSNuMuon(void) { return HasFSParticle(14); };
   inline bool HasFSNuTau(void) { return HasFSParticle(16); };
@@ -216,7 +216,7 @@ class FitEvent : public BaseFitEvt {
     return GetHMParticle(pdg, kInitialState);
   };
     template <size_t N>
-  inline FitParticle* GetHMISParticle(int (&pdgs)[N]) {
+  inline FitParticle* GetHMISParticle(int const (&pdgs)[N]) {
     FitParticle* rtn = NULL;
     for (size_t i = 0; i < N; ++i) {
       FitParticle* p = GetHMParticle(pdgs[i], kInitialState);
@@ -233,9 +233,9 @@ class FitEvent : public BaseFitEvt {
     }
     return rtn;
   };
-  inline FitParticle* GetHMISParticle(std::vector<int> pdg) {
-    return GetHMParticle(pdg, kInitialState);
-  };
+  // inline FitParticle* GetHMISParticle(std::vector<int> pdg) {
+  //   return GetHMParticle(pdg, kInitialState);
+  // };
   inline FitParticle* GetHMISNuElectron(void) { return GetHMISParticle(12); };
   inline FitParticle* GetHMISNuMuon(void) { return GetHMISParticle(14); };
   inline FitParticle* GetHMISNuTau(void) { return GetHMISParticle(16); };
@@ -253,7 +253,7 @@ class FitEvent : public BaseFitEvt {
     return GetHMParticle(pdg, kFinalState);
   };
   template <size_t N>
-  inline FitParticle* GetHMFSParticle(int (&pdgs)[N]) {
+  inline FitParticle* GetHMFSParticle(int const (&pdgs)[N]) {
     FitParticle* rtn = NULL;
     for (size_t i = 0; i < N; ++i) {
       FitParticle* p = GetHMParticle(pdgs[i], kFinalState);
@@ -270,9 +270,9 @@ class FitEvent : public BaseFitEvt {
     }
     return rtn;
   };
-  inline FitParticle* GetHMFSParticle(std::vector<int> pdg) {
-    return GetHMParticle(pdg, kFinalState);
-  };
+  // inline FitParticle* GetHMFSParticle(std::vector<int> pdg) {
+  //   return GetHMParticle(pdg, kFinalState);
+  // };
   inline FitParticle* GetHMFSNuElectron(void) { return GetHMFSParticle(12); };
   inline FitParticle* GetHMFSNuMuon(void) { return GetHMFSParticle(14); };
   inline FitParticle* GetHMFSNuTau(void) { return GetHMFSParticle(16); };

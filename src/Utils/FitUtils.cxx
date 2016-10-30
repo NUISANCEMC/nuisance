@@ -100,7 +100,7 @@ double FitUtils::thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return th_q3_pi;
 }
 
-// MOVE TO T2KUtils! CW                                                                                                                                                       
+// MOVE TO T2KUtils! CW
 //********************************************************************
 // Returns the q3 defined in Raquel's CC1pi+ on CH paper
 // Uses "MiniBooNE formula" for Enu
@@ -245,7 +245,7 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
                  2 * m_n * (E_pi0 + E_mu) + 2 * E_pi0 * E_mu -
                  2 * p_pi0 * p_mu * cos(th_pi0_mu)) /
                 (2 * (E_pi0 + E_mu - p_pi0 * cos(th_nu_pi0) -
-                      p_mu * cos(th_nu_mu) - m_n)); 
+                      p_mu * cos(th_nu_mu) - m_n));
 
 
   return rEnu;
@@ -542,8 +542,8 @@ double FitUtils::GetErecoil_TRUE(FitEvent *event) {
     if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID) - 1)
       continue;
 
-    // Add Up KE of protons and TE of everything else                                     
-    if (event->PartInfo(i)->fPID == 2212 || 
+    // Add Up KE of protons and TE of everything else
+    if (event->PartInfo(i)->fPID == 2212 ||
 	event->PartInfo(i)->fPID == 2112){
       Erecoil += fabs(event->PartInfo(i)->fP.E()) - fabs(event->PartInfo(i)->fP.Mag());
     } else {
@@ -605,12 +605,12 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
     if (PID == 2212 or PID == 211 or PID == -211) {
       //      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
       Erecoil += fabs(event->PartInfo(i)->fP.E()) - fabs(event->PartInfo(i)->fP.Mag());
-      
+
       // Total Energy of non-neutrons
       //    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14) {
     } else if (PID == 111 ||
 	       PID == 11 ||
-	       PID == -11 || 
+	       PID == -11 ||
 	       PID == 22){
       Erecoil += (event->PartInfo(i)->fP.E());
     }
@@ -669,22 +669,21 @@ double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(13)   == 0)
     return 0;
-  
+
   // Now get the TVector3s for each particle
   TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
   TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
   TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
 
   if (!Is0pi) {
-    int pdgs[] = {221, -211, 111};
-    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
     HadronP += pp.Vect();
   }
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
 
 double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
-  
+
   // Check that the neutrino exists
   if (event->NumISParticle(14)   == 0){
     LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
@@ -700,11 +699,8 @@ double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
   TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
   TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
 
-// Can I has edit?
-
   if (!Is0pi) {
-    int pdgs[] = {221, -211, 111};
-    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
     HadronP += pp.Vect();
   }
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
@@ -727,8 +723,7 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, bool Is0pi) {
   TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
 
   if (!Is0pi) {
-    int pdgs[] = {221, -211, 111};
-    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
     HadronP += pp.Vect();
   }
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);

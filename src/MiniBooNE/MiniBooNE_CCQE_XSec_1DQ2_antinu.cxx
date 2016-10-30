@@ -21,14 +21,14 @@
 
 //********************************************************************
 /// @brief MiniBooNE CCQE antinumu 1DQ2 Measurement on CH2 (Ref: - )
-///   
-//******************************************************************** 
+///
+//********************************************************************
 MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile,
 								 FitWeight *rw,    std::string type,
 								 std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
-  // Measurement Details 
+  // Measurement Details
   fName = name;
   fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   EnuMin = 0.;
@@ -44,7 +44,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 
   this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/asqq_con.txt");
   this->SetupDefaultHist();
-                                                    
+
   if (!this->fIsDiag) this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
   else {
     LOG(SAM) << "Making diagonal covar" << endl;
@@ -52,7 +52,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
     covar      = StatUtils::GetInvert(fFullCovar);
   }
 
-  
+
   ///
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
   if (ccqelike){
@@ -87,36 +87,36 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
   // ScaleFactor
   fScaleFactor = ((fEventHist->Integral("width")*1E-38/(fNEvents+0.))
 		 *14.08/8.
-		 / TotalIntegratedFlux()); 
+		 / TotalIntegratedFlux());
 };
-  
-//******************************************************************** 
+
+//********************************************************************
 /// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
-//******************************************************************** 
- 
+//********************************************************************
+
   if (event->NumFSParticle(13) == 0 &&
       event->NumFSParticle(-13) == 0)
     return;
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
-  // The highest momentum mu+/mu-. The isSignal definition should make sure we only 
+  // The highest momentum mu+/mu-. The isSignal definition should make sure we only
   // accept events we want, so no need to do an additional check here.
   int pdgs[] = {13, -13};
-  TLorentzVector Pmu = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
-  
+  TLorentzVector Pmu = event->GetHMFSParticle(pdgs)->fP;
+
   q2qe = FitUtils::Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 30., false);
-  
+
   // Set X Variables
   fXVar = q2qe;
-  
+
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
 
   // If CC0pi, include both charges
   if (ccqelike) {
@@ -179,10 +179,10 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::Write(std::string drawOpt){
 }
 
 
-//******************************************************************** 
-/// @details Extra scale command for CCQELIKE/CCPIM PDG Hist      
+//********************************************************************
+/// @details Extra scale command for CCQELIKE/CCPIM PDG Hist
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::ScaleEvents(){
-//******************************************************************** 
+//********************************************************************
 
   Measurement1D::ScaleEvents();
 
@@ -194,13 +194,13 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ScaleEvents(){
 }
 
 
-//******************************************************************** 
-/// @details Apply norm scaling to CCQELIKE/CCPIM PDG Hist        
+//********************************************************************
+/// @details Apply norm scaling to CCQELIKE/CCPIM PDG Hist
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::ApplyNormScale(double norm){
-//******************************************************************** 
+//********************************************************************
 
   Measurement1D::ApplyNormScale(norm);
-  
+
   if (ccqelike){
     PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0/norm, "");
     PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, 1.0/norm, "");
@@ -210,10 +210,10 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ApplyNormScale(double norm){
 
 
 
-//********************************************************************                                                                                                                                                                     /// @details Extra scale command for CCQELIKE PDG Hist                                                                                                                                                                                     
+//********************************************************************                                                                                                                                                                     /// @details Extra scale command for CCQELIKE PDG Hist
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::ResetAll(){
-  //********************************************************************                                                                                                                                                                   
-  Measurement1D::ResetAll();   
+  //********************************************************************
+  Measurement1D::ResetAll();
   if (ccqelike){
     PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCQELIKE);
     PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCPIM);

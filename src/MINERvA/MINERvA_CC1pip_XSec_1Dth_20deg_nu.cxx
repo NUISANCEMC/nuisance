@@ -53,12 +53,12 @@ MINERvA_CC1pip_XSec_1Dth_20deg_nu::MINERvA_CC1pip_XSec_1Dth_20deg_nu(std::string
 
 void MINERvA_CC1pip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(211) == 0 ||
+  if (event->NumFSParticle(PhysConst::pdg_charged_pions) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   hadMass = FitUtils::Wrec(Pnu, Pmu);

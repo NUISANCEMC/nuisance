@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * D.Day et al, "Study of \nud charged-current two-pion production in the threshold region", Physical Review D, Volume 28, Number 11, 1 December 1983 \n
  * Derrick, Musgrave, Ammar, Day, Kafka and Mann, "Two- and three-pion productin by \nu\mud recations nears threshold: The implication for nucleon-decay experiments", Physical Review D, Vol 30, Number 7, 1 October 1984
 */
@@ -70,7 +70,7 @@ void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::FillEventVariables(FitEvent *event) {
 // Signal asks for 2pi+, 1mu-, 1n
 bool ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::isSignal(FitEvent *event) {
   int pdgs[] = {13, 211, 211, 2112};
-  return SignalDef::isCCWithFS(event, 14, GeneralUtils::makeVector(pdgs),
+  return SignalDef::isCCWithFS(event, 14, pdgs,
                                EnuMin, EnuMax);
 }
 
@@ -88,7 +88,7 @@ void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::FillHistograms() {
 
 
 void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ScaleEvents() {
-  
+
   PlotUtils::FluxUnfoldedScaling(mcHist, fFluxHist);
   PlotUtils::FluxUnfoldedScaling(mcFine, fFluxHist);
 
