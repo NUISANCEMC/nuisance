@@ -608,7 +608,7 @@ double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu,
 */
 double FitUtils::GetErecoil_TRUE(FitEvent *event) {
   // Get total energy of hadronic system.
-  double Erecoil;
+  double Erecoil = 0.0;
   for (unsigned int i = 2; i < event->Npart(); i++) {
 
     // Only final state
@@ -622,18 +622,18 @@ double FitUtils::GetErecoil_TRUE(FitEvent *event) {
     // Add Up KE of protons and TE of everything else                                     
     if (event->PartInfo(i)->fPID == 2212 || 
 	event->PartInfo(i)->fPID == 2112){
-      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
+      Erecoil += fabs(event->PartInfo(i)->fP.E()) - fabs(event->PartInfo(i)->fP.Mag());
     } else {
-      Erecoil += event->PartInfo(i)->fP.E() / 1000.0;
+      Erecoil += event->PartInfo(i)->fP.E();
     }
   }
 
-  return Erecoil * 1000.0;
+  return Erecoil;
 }
 
 double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   // Get total energy of hadronic system.
-  double Erecoil;
+  double Erecoil = 0.0;
   for (unsigned int i = 2; i < event->Npart(); i++) {
 
     // Only final state
@@ -651,18 +651,19 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
 
     // Add Up KE of protons and TE of everything else
     if (event->PartInfo(i)->fPID == 2212){
-      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
+      Erecoil += fabs(event->PartInfo(i)->fP.E()) - fabs(event->PartInfo(i)->fP.Mag());
     } else {
-      Erecoil += event->PartInfo(i)->fP.E() / 1000.0;
+      Erecoil += event->PartInfo(i)->fP.E();
     }
   }
 
-  return Erecoil * 1000.0;
+  return Erecoil;
 }
 
 double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.
-  double Erecoil;
+  double Erecoil = 0.0;
+  //  std::cout << "New Event" << std::endl;
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
@@ -678,15 +679,22 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 
     // KE of Protons and charged pions
     if (PID == 2212 or PID == 211 or PID == -211) {
-      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
-
+      //      Erecoil += FitUtils::T(event->PartInfo(i)->fP);
+      Erecoil += fabs(event->PartInfo(i)->fP.E()) - fabs(event->PartInfo(i)->fP.Mag());
+      
       // Total Energy of non-neutrons
-    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14) {
-      Erecoil += (event->PartInfo(i)->fP.E()) / 1000.0;
+      //    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14) {
+    } else if (PID == 111 ||
+	       PID == 11 ||
+	       PID == -11 || 
+	       PID == 22){
+      Erecoil += (event->PartInfo(i)->fP.E());
     }
+
+    //std::cout << "Added " << PID << " to low recoil " << Erecoil << " " << event->PartInfo(i)->fP.E() << std::endl;
   }
 
-  return Erecoil * 1000.0;
+  return Erecoil;
 }
 
 std::pair<TLorentzVector, int> FitUtils::GetHMPDG_4Mom(int pdg,
