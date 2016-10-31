@@ -75,7 +75,7 @@ void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
     double Emu  = ((event->PartInfo(j))->fP.E())/1000.0;
     Enu_rec     = Emu + q0;
     double Q2   = 4*Enu_rec*Emu*sin(ThetaMu/2)*sin(ThetaMu/2);
-    bjork_x     = Q2/2./q0/0.938918; // Average nucleon mass is 0.938918 GeV
+    bjork_x     = Q2/2./q0/((PhysConst::mass_proton+PhysConst::mass_neutron)/2.); // Average nucleon masses
     break;
   }
 

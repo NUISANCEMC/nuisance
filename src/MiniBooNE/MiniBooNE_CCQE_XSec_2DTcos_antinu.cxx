@@ -83,7 +83,7 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
     if (abs(PID) != 13 and ccqelike)   continue;
 
     // Now find the kinematic values and fill the histogram
-    Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - 0.105658367;
+    Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - PhysConst::mass_muon;
     costheta = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
     
     break;

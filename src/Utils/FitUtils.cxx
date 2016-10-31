@@ -133,9 +133,7 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
   double p_mu = pmu.Vect().Mag() / 1000.;
   double E_nu = EnuCC1piprec(pnu, pmu, ppi, false);
 
-  const double m_n = 0.93956536;  // neutron/proton mass
-
-  double a1 = (E_nu + m_n) - E_mu;
+  double a1 = (E_nu + PhysConst::mass_neutron) - E_mu;
   double a2 = E_nu - p_mu;
 
   double wrec = sqrt(a1 * a1 - a2 * a2);
@@ -149,8 +147,8 @@ double FitUtils::ProtonQ2QErec(double pE, double binding) {
 //********************************************************
 
   const double V = binding / 1000.;  // binding potential
-  const double mn = 0.93956536;      // neutron mass
-  const double mp = 0.93827203;      // proton mass
+  const double mn = PhysConst::mass_neutron;      // neutron mass
+  const double mp = PhysConst::mass_proton;      // proton mass
   const double mn_eff = mn - V;      // effective proton mass
   const double pki = (pE / 1000.0) - mp;
 
@@ -176,8 +174,8 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
 
   // Convert all values to GeV
   const double V = binding / 1000.;  // binding potential
-  const double mn = 0.93956536;      // neutron mass
-  const double mp = 0.93827203;      // proton mass
+  const double mn = PhysConst::mass_neutron;    // neutron mass
+  const double mp = PhysConst::mass_proton;     // proton mass
 
   double mN_eff = mn - V;
   double mN_oth = mp;
@@ -239,8 +237,8 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
   double m_pi0 = sqrt(E_pi0 * E_pi0 - p_pi0 * p_pi0);
   double th_nu_pi0 = pnu.Vect().Angle(ppi0.Vect());
 
-  const double m_n = 0.93956536;  // neutron mass
-  const double m_p = 0.93827203;  // proton mass
+  const double m_n = PhysConst::mass_neutron;  // neutron mass
+  const double m_p = PhysConst::mass_proton;  // proton mass
   double th_pi0_mu = ppi0.Vect().Angle(pmu.Vect());
 
   double rEnu = (m_mu * m_mu + m_pi0 * m_pi0 + m_n * m_n - m_p * m_p -
@@ -289,7 +287,7 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
   double p_pi = ppi.Vect().Mag() / 1000.;
   double m_pi = sqrt(E_pi * E_pi - p_pi * p_pi);
 
-  const double m_n = 0.93956536;  // neutron/proton mass
+  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -331,8 +329,8 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
 double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
 //********************************************************************
 
-  const double m_Delta = 1.232;   // PDG value for Delta mass in GeV
-  const double m_n = 0.93956536;  // neutron/proton mass
+  const double m_Delta = PhysConst::mass_delta;   // PDG value for Delta mass in GeV
+  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -368,7 +366,7 @@ double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
 
   double E_bind =
       27. / 1000.;  // This should be roughly correct for CH; but not clear!
-  double m_p = 0.939;
+  double m_p = PhysConst::mass_proton;
 
   // Makes life a little easier, gonna square this one
   double a1 = m_p - E_bind - E_mu - E_pi;
@@ -477,7 +475,8 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
   double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu);
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
-  const double m_p = 938.27203;
+  // The factor of 1000 is necessary for downstream functions
+  const double m_p = PhysConst::mass_proton*1000;
 
   // MINERvA cut on W_exp which is tuned to W_true; so use true Enu from
   // generators
