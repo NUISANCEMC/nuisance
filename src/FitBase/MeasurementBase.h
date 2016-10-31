@@ -55,6 +55,7 @@
 #include "PlotUtils.h"
 #include "StatUtils.h"
 #include "FitParameters.h"
+#include "GeneralUtils.h"
 
 #include "FitWeight.h"
 

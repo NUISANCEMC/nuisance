@@ -359,7 +359,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       q3_true = (part_4mom - (*nu_4mom)).Vect().Mag();
 
       // Get W_true with assumption of initial state nucleon at rest
-      float m_n = 938.27208;
+      float m_n = (float)PhysConst::mass_proton*1000.;
       W_nuc_rest = sqrt(-Q2_true + 2 * m_n * (Enu_true - ELep) + m_n * m_n);
 
       // Get the Bjorken x and y variables
