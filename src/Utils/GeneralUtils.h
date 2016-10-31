@@ -77,5 +77,13 @@ namespace GeneralUtils{
 
 }
 
+namespace PhysConst{
+  const double mass_proton  = 0.93827203; // Proton mass in GeV
+  const double mass_neutron = 0.93956536; // Neutron mass in GeV
+  const double mass_delta   = 1.232;      // Delta mass in GeV
+  const double mass_muon    = 0.10565837; // Muon mass in GeV
+}
+
+
 /*! @} */
 #endif
