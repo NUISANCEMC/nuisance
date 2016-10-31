@@ -401,6 +401,8 @@ void InputHandler::ReadJointFile() {
     tree_name = "neuttree";
   else if (temp_type == 1)
     tree_name = "treeout";
+  else if (temp_type == kGENIE)
+    tree_name = "gtree";
 
   // Add up the TChains
   tn = new TChain(tree_name.c_str());
@@ -426,6 +428,14 @@ void InputHandler::ReadJointFile() {
     fNuwroEvent = NULL;
     tn->SetBranchAddress("e", &fNuwroEvent);
     fEvent->SetEventAddress(&fNuwroEvent);
+#endif
+  } else if (temp_type == kGENIE) {
+#ifdef __GENIE_ENABLED__
+    fEventType = kGENIE;
+    fGenieGHep = NULL;
+    fGenieNtpl = NULL;   
+    tn->SetBranchAddress("gmcrec", &fGenieNtpl);
+    fEvent->SetEventAddress(&fGenieNtpl);
 #endif
   }
 
