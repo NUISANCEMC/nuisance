@@ -1014,6 +1014,8 @@ void Measurement2D::Write(std::string drawOpt){
     return;
   }
 
+  FitPar::Config().out->cd();
+
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
   bool drawData   = (drawOpt.find("DATA") != std::string::npos);

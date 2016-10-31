@@ -101,7 +101,7 @@ bool SignalDef::isCC1pi(FitEvent *event, int nuPDG, int piPDG,
   int nPion    = event->NumFSParticle(piPDG);
 
   // Check that the desired pion exists and is the only meson
-  if (nPion != 1 && nMesons != 1) return false;
+  if (nPion != 1 || nMesons != 1) return false;
 
   // Check that there is only one final state lepton
   if (nLeptons != 1) return false;
@@ -434,7 +434,7 @@ bool SignalDef::isCCQEnumubar_MINERvA(FitEvent *event, double EnuMin,
                                       double EnuMax, bool fullphasespace) {
   //********************************************************************
 
-  if (!SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) return false;
+  if (!SignalDef::isCCQELike(event, -14, EnuMin, EnuMax)) return false;
 
   TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
