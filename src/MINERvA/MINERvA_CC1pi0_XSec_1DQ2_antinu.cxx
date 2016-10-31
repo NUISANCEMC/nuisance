@@ -63,5 +63,5 @@ void MINERvA_CC1pi0_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
 //******************************************************************** 
 bool MINERvA_CC1pi0_XSec_1DQ2_antinu::isSignal(FitEvent *event) {
 //******************************************************************** 
-  return SignalDef::isCC1pi0Bar_MINERvA(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
 }

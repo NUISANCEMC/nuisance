@@ -101,18 +101,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent* event){
 
 
 bool MiniBooNE_NCpi0_XSec_1Dppi0_nu::isSignal(FitEvent* event){
-
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false;
-
-  if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false;
-
-  if (bad_particle) return false;
-
-  if (pi0Cnt != 1) return false;
-
-  return true;
+  return SignalDef::isNC1pi(event, 14, 111, EnuMin, EnuMax);
 };
 
 

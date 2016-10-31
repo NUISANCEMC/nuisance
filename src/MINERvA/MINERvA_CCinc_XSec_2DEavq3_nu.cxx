@@ -162,5 +162,5 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 bool MINERvA_CCinc_XSec_2DEavq3_nu::isSignal(FitEvent *event){
 //********************************************************************
-  return SignalDef::isCCincLowRecoil_MINERvA(event, EnuMin, EnuMax, hadroncut);
+  return SignalDef::isCCincLowRecoil_MINERvA(event, EnuMin, EnuMax);
 }

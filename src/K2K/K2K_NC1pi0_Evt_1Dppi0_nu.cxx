@@ -59,6 +59,5 @@ void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool K2K_NC1pi0_Evt_1Dppi0_nu::isSignal(FitEvent *event) {
-  return SignalDef::isNC1pi0_MiniBooNE(event, EnuMin, EnuMax); // Check this signal definition
-  // Fairly sure K2K and MiniBooNE had same definition...
+  return SignalDef::isNC1pi(event, 14, 111, EnuMin, EnuMax); // Check this signal definition
 }

@@ -65,6 +65,18 @@ void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
+// **************************************************                                  
+// MiniBooNE CC1pi0 signal definition      
+//                                         
+// The signal definition is:
+//                          Exactly one negative muon
+//                          Exactly one pi0       
+//                          No additional mesons  
+//                          Any number of nucleons
+//                                         
+// Does a few clever cuts on the likelihood to reduce CCQE contamination by
+// looking at "fuzziness" of the ring; CCQE events are sharp, CC1pi0 are fuzzy
+// (because of the pi0->2 gamma collinearity)
 bool MiniBooNE_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-  return SignalDef::isCC1pi0_MiniBooNE(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }

@@ -63,6 +63,7 @@ using namespace t2krew;
 #include "NIWGReWeightSpectralFunc.h"
 #include "NIWGReWeightSplineEnu.h"
 #include "NIWGSyst.h"
+#include "NIWGSystUncertainty.h"
 #endif
 
 #ifdef __NEUT_ENABLED__
@@ -78,6 +79,7 @@ using namespace t2krew;
 #include "NReWeightNuXSecRES.h"
 #include "NReWeightNuclPiless.h"
 #include "NSyst.h"
+#include "NSystUncertainty.h"
 #include "neutpart.h"
 #include "neutvect.h"
 #endif
@@ -92,6 +94,7 @@ using namespace t2krew;
 #include "NuwroReWeight_QEL.h"
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
+#include "NuwroSystUncertainty.h"
 #endif
 
 #ifdef __GENIE_ENABLED__
@@ -99,6 +102,7 @@ using namespace t2krew;
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "GSyst.h"
+#include "GSystUncertainty.h"
 #include "Ntuple/NtpMCEventRecord.h"
 #include "ReWeight/GReWeight.h"
 #include "ReWeight/GReWeightAGKY.h"
@@ -250,6 +254,8 @@ class FitWeight {
   bool fIsNIWGChanged;
   bool fIsNuwroChanged;
   bool fIsT2KChanged;
+
+  bool fSetAbsTwk;
 
   FitSplineHead* fSplineHead;
 };

@@ -68,7 +68,22 @@ namespace GeneralUtils{
   //! Return the top level environmental variable for the fitter
   std::string GetTopLevelDir();
 
+  //! A utility function to return a std::vector from an array
+  template< typename T, size_t N >
+    std::vector<T> makeVector( const T (&data)[N] )
+  {
+    return std::vector<T>(data, data+N);
+  }
+
 }
+
+namespace PhysConst{
+  const double mass_proton  = 0.93827203; // Proton mass in GeV
+  const double mass_neutron = 0.93956536; // Neutron mass in GeV
+  const double mass_delta   = 1.232;      // Delta mass in GeV
+  const double mass_muon    = 0.10565837; // Muon mass in GeV
+}
+
 
 /*! @} */
 #endif

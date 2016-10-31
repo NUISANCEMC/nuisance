@@ -66,7 +66,7 @@ void FitParameters::ReadParamFile(std::string fileName) {
     std::string parEntry = inputlist[2];
     if (parameterMap_all.find(parName) == parameterMap_all.end())
       parameterMap_all.insert(
-			      map<std::string, std::string>::value_type(parName, parEntry));
+			      std::map<std::string, std::string>::value_type(parName, parEntry));
     else
       parameterMap_all[parName] = parEntry;
 
@@ -81,14 +81,14 @@ void FitParameters::ForceParam(std::string parOption) {
   std::string parName = parOption.substr(0, first);
   std::string parEntry = parOption.substr(first + 1, parOption.size());
 
-  std::cout << "Read in Parameter Override : " << parName << " = " << parEntry
+  LOG(REC) << "Read in Parameter Override : " << parName << " = " << parEntry
             << std::endl;
 
   parameterMap_all.insert(
-      map<std::string, std::string>::value_type(parName, parEntry));
+      std::map<std::string, std::string>::value_type(parName, parEntry));
   if (parameterMap_all.find(parName) == parameterMap_all.end())
     parameterMap_all.insert(
-        map<std::string, std::string>::value_type(parName, parEntry));
+      std::map<std::string, std::string>::value_type(parName, parEntry));
   else
     parameterMap_all[parName] = parEntry;
 
@@ -99,7 +99,7 @@ void FitParameters::SetParB(std::string parName, bool val) {
   if (parameterMap_bool.find(parName) != parameterMap_bool.end()) {
     parameterMap_bool[parName] = val;
   } else {
-    parameterMap_bool.insert(map<std::string, bool>::value_type(parName, val));
+    parameterMap_bool.insert(std::map<std::string, bool>::value_type(parName, val));
   }
 
   return;
@@ -111,7 +111,7 @@ void FitParameters::SetParD(std::string parName, double val) {
     parameterMap_double[parName] = val;
   } else {
     parameterMap_double.insert(
-        map<std::string, double>::value_type(parName, val));
+       std::map<std::string, double>::value_type(parName, val));
   }
   return;
 }
@@ -121,7 +121,7 @@ void FitParameters::SetParI(std::string parName, int val) {
   if (parameterMap_int.find(parName) != parameterMap_int.end()) {
     parameterMap_int[parName] = val;
   } else {
-    parameterMap_int.insert(map<std::string, int>::value_type(parName, val));
+    parameterMap_int.insert(std::map<std::string, int>::value_type(parName, val));
   }
   return;
 }
@@ -154,7 +154,7 @@ int FitParameters::GetParI(std::string parName) {
 
       // Convert.
       parameterMap_int.insert(
-          map<std::string, int>::value_type(parName, tempVal));
+	std::map<std::string, int>::value_type(parName, tempVal));
 
     } else {
       return 1;  // If no parameter set for verbosity assume FIT
@@ -170,12 +170,11 @@ int FitParameters::GetParI(std::string parName) {
     int tempVal = GeneralUtils::StrToInt(parameterMap_all[parName]);
 
     parameterMap_int.insert(
-        map<std::string, int>::value_type(parName, tempVal));
+	std::map<std::string, int>::value_type(parName, tempVal));
     return tempVal;
 
   } else {
-    //  std::cout<<"Error: Parameter - "<<parName<<" - not found in requirements
-    //  file."<<std::endl;
+    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
     return -999;
   }
 };
@@ -192,12 +191,13 @@ bool FitParameters::GetParB(std::string parName) {
     bool tempVal = GeneralUtils::StrToBool(parameterMap_all[parName]);
 
     parameterMap_bool.insert(
-        map<std::string, bool>::value_type(parName, tempVal));
+        std::map<std::string, bool>::value_type(parName, tempVal));
     return tempVal;
 
   } else {
+    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
     parameterMap_bool.insert(
-        map<std::string, bool>::value_type(parName, false));
+	std::map<std::string, bool>::value_type(parName, false));
     return false;
   }
 };
@@ -212,27 +212,22 @@ double FitParameters::GetParD(std::string parName) {
     double tempVal = GeneralUtils::StrToDbl(parameterMap_all[parName]);
 
     parameterMap_double.insert(
-        map<std::string, double>::value_type(parName, tempVal));
+        std::map<std::string, double>::value_type(parName, tempVal));
     return tempVal;
 
   } else {
-    //      std::cout<<"Error: Parameter - "<<parName<<" - not found in
-    //      requirements file."<<std::endl;
+    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
     return -999.9;
   }
 };
 
-std::string FitParameters::GetParS(std::string parName, bool quiet) {
+std::string FitParameters::GetParS(std::string parName) {
   // Check if it is saved in int map
   if (parameterMap_all.find(parName) != parameterMap_all.end()) {
     return parameterMap_all[parName];
 
   } else {
-    if (!quiet){
-      std::cout << "Error: Parameter - " << parName
-		<< " - not found in requirements file." << std::endl;
-    }
-    
+    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
     return "";
   }
 };
@@ -240,7 +235,7 @@ std::string FitParameters::GetParS(std::string parName, bool quiet) {
 
 std::string FitParameters::GetParDIR(std::string parName){
 
-  std::string outstr = this->GetParS(parName, true);
+  std::string outstr = this->GetParS(parName);
 
   // Make replacements in the string
   const int nfiletypes = 2;
@@ -274,7 +269,7 @@ std::string FitParameters::GetAllParametersArg() {
 
 void FitParameters::MakeParameterCard(std::string filename) {
   ofstream parcard;
-  parcard.open((filename).c_str(), ios::out);
+  parcard.open((filename).c_str(), std::ios::out);
   std::map<std::string, std::string>::iterator mystr = parameterMap_all.begin();
 
   for (; mystr != parameterMap_all.end(); mystr++) {

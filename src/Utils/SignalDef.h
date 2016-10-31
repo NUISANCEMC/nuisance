@@ -33,16 +33,23 @@
 // make it a namespace
 namespace SignalDef {
 
-  // These are all the interaction modes for neutrinos
-  bool isCCQE(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  bool isCCQEBar(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
-  bool isCCQELike(FitEvent *event, double EnuMin, double EnuMax);
+  // NEW!
+  bool isCCINC(FitEvent* event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isNCINC(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCC0pi(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCQELike(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCQE(FitEvent *event, int nuPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
 
-  bool isCCQEBar_res(FitEvent *event, double EnuMin, double EnuMax);
-  bool isCCQELikeBar(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
+  bool isNC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin=0, double EnuMax=0);
 
-  // MiniBooNE CC1pi+ differs from MINERvA CC1pi+ differs from T2K CC1pi+!
-  bool isCC1pip_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+		     int thirdPDG, double EnuMin=0, double EnuMax=0);
+  bool isNC1pi3Prong(FitEvent *event, int nuPDG, int piPDG,
+                     int thirdPDG, double EnuMin=0, double EnuMax=0);
+  bool isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
+		  double EnuMin=0, double EnuMax=0);
 
   // MINERvA has unfolded and not unfolded muon phase space
   bool isCC1pip_MINERvA (FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
@@ -52,38 +59,20 @@ namespace SignalDef {
   bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin, double EnuMax);
   bool isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax, bool Michel);
 
-  bool isCC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
-  bool isCC1pi0Bar_MINERvA  (FitEvent *event, double EnuMin, double EnuMax);
-
-  bool isNC1pi0_MiniBooNE   (FitEvent *event, double EnuMin, double EnuMax);
-  bool isNC1pi0Bar_MiniBooNE(FitEvent *event, double EnuMin, double EnuMax);
-
-  bool isCCcoh_MINERvA    (FitEvent *event, double EnuMin, double EnuMax);
-  bool isCCcohBar_MINERvA (FitEvent *event, double EnuMin, double EnuMax);
-
-
   bool isCCQEnumu_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
   bool isCCQEnumubar_MINERvA(FitEvent* event, double EnuMin, double EnuMax, bool fullphasespace=true);
 
-  bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool hadroncut);
-  bool isMiniBooNE_CCQELike(FitEvent *event, double EnuMin, double EnuMax);
-
-  bool isMiniBooNE_CCQE(FitEvent *event, double EnuMin, double EnuMax);
-  bool isMiniBooNE_CCQEBar(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isT2K_CC0pi(FitEvent* event, double EnuMin, double EnuMax, bool forwardgoing);
   bool isT2K_CC0pi_STV(FitEvent* event, double EnuMin, double EnuMax);
-
-  bool isCCInc_ArgoNeuT(FitEvent* event, bool IsAnti=false);
-  bool isCCInc_ArgoNeuT_limitPS(FitEvent *event, bool IsAnti=false);
-
 
   // Generic Signal Functions
   bool isCC0pi1p_MINERvA(FitEvent* event, double enumin, double enumax);
 
   bool HasProtonKEAboveThreshold(FitEvent* event, double threshold);
   
-  bool IsRestrictedMuonAngle(FitEvent* event, double angle);
+  bool IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, double angle);
 
   bool IsEnuInRange(FitEvent* event, double emin, double emax);
 

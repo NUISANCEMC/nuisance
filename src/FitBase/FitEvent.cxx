@@ -775,15 +775,56 @@ bool FitEvent::HasParticle(int pdg, int state){
   return found;
 }
 
-bool FitEvent::IsFS0Pi(){
+int FitEvent::NumParticle(int pdg, int state){
+
+  int nfound = 0;
+  for (int i = 0; i < fNParticles; i++){
+
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (pdg == 0 or fParticlePDG[i] == pdg) nfound += 1;
+  }
+
+  return nfound;
+}
+
+int  FitEvent::NumParticle(std::vector<int> pdg, int state){
+  int nfound = 0;
+  for (int i = 0; i < fNParticles; i++){
+
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()) nfound += 1;
+  }
+
+  return nfound;
+}
+
+int FitEvent::NumFSLeptons(){
+
+  int nLeptons = 0;
   
   for (int i = 0; i < fNParticles; i++){
     if (fParticleState[i] != kFinalState) continue;
-    if (fParticlePDG[i] == 211  ||
-	fParticlePDG[i] == -211 ||
-	fParticlePDG[i] == 111) return false;
+    if (abs(fParticlePDG[i]) == 11 ||
+        abs(fParticlePDG[i]) == 13 ||
+	abs(fParticlePDG[i]) == 15) 
+      nLeptons += 1;
   }
-  return true;
+  
+  return nLeptons;
+}
+
+int FitEvent::NumFSMesons(){
+
+  int nMesons = 0;
+
+  for (int i = 0; i < fNParticles; i++){
+    if (fParticleState[i] != kFinalState) continue;
+    if (abs(fParticlePDG[i]) >= 111 &&
+        abs(fParticlePDG[i]) <= 557)
+      nMesons += 1;
+  }
+
+  return nMesons;
 }
 
 FitParticle* FitEvent::GetHMParticle(int pdg, int state){
@@ -811,6 +852,33 @@ FitParticle* FitEvent::GetHMParticle(int pdg, int state){
     return NULL;
   }
   return PartInfo(maxind);
+}
+
+FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state){
+
+double maxmom = -9999999.9;
+int maxind    = -1;
+
+for (int i = 0; i < fNParticles; i++){
+
+  if (state != -1 and fParticleState[i] != (uint)state) continue;
+  if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()){
+
+    // Update Max Mom                                                                                                                                                        
+    double mom = sqrt(fParticleMom[i][0]*fParticleMom[i][0] +
+		      fParticleMom[i][1]*fParticleMom[i][1] +
+		      fParticleMom[i][2]*fParticleMom[i][2]);
+    if (fabs(mom) > maxmom){
+      maxmom = fabs(mom);
+      maxind = i;
+    }
+  }
+ }
+
+if (maxind == -1){
+  return NULL;
+ }
+return PartInfo(maxind);
 }
 
 

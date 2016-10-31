@@ -359,7 +359,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       q3_true = (part_4mom - (*nu_4mom)).Vect().Mag();
 
       // Get W_true with assumption of initial state nucleon at rest
-      float m_n = 938.27208;
+      float m_n = (float)PhysConst::mass_proton*1000.;
       W_nuc_rest = sqrt(-Q2_true + 2 * m_n * (Enu_true - ELep) + m_n * m_n);
 
       // Get the Bjorken x and y variables
@@ -526,12 +526,12 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
 
   // Some example flags are given from SignalDef.
   // See src/Utils/SignalDef.cxx for more.
-  flagCCQE_full = SignalDef::isCCQE(event, EnuMin, EnuMax, false);
-  flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
-  flagCCQEBar_full = SignalDef::isCCQEBar(event, EnuMin, EnuMax, false);
-  flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
+  flagCCQE_full = SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
+  //flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
+  flagCCQEBar_full = SignalDef::isCCQE(event, -14, EnuMin, EnuMax);
+  //flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
 
-  flagCC1pip_MiniBooNE = SignalDef::isCC1pip_MiniBooNE(event, EnuMin, EnuMax);
+  flagCC1pip_MiniBooNE = SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax);
   flagCC1pip_MINERvA_full = SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax);
   flagCC1pip_MINERvA_rest =
       SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, true);
@@ -547,14 +547,14 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
       SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
   flagCC1pip_T2K = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
 
-  flagCC1pi0_MiniBooNE = SignalDef::isCC1pi0_MiniBooNE(event, EnuMin, EnuMax);
-  flagCC1pi0Bar_MINERvA = SignalDef::isCC1pi0Bar_MINERvA(event, EnuMin, EnuMax);
-  flagNC1pi0_MiniBooNE = SignalDef::isNC1pi0_MiniBooNE(event, EnuMin, EnuMax);
+  flagCC1pi0_MiniBooNE = SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
+  flagCC1pi0Bar_MINERvA = SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
+  flagNC1pi0_MiniBooNE = SignalDef::isNC1pi(event, 14, 111, EnuMin, EnuMax);
   flagNC1pi0Bar_MiniBooNE =
-      SignalDef::isNC1pi0Bar_MiniBooNE(event, EnuMin, EnuMax);
+    SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax);
 
-  flagCCcoh_MINERvA = SignalDef::isCCcoh_MINERvA(event, EnuMin, EnuMax);
-  flagCCcohBar_MINERvA = SignalDef::isCCcohBar_MINERvA(event, EnuMin, EnuMax);
+  flagCCcoh_MINERvA = SignalDef::isCCCOH(event, 14, 211, EnuMin, EnuMax);
+  flagCCcohBar_MINERvA = SignalDef::isCCCOH(event, 14, -211, EnuMin, EnuMax);
 
   flagCCQEnumu_MINERvA_full =
       SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, true);
@@ -566,13 +566,13 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
       SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, false);
 
   flagCCincLowRecoil_MINERvA =
-      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, false);
-  flagCCincLowRecoil_MINERvA_reqhad =
-      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0, true);
+      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
+  //flagCCincLowRecoil_MINERvA_reqhad =
+  //    SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
 
-  flagCCQELike_MiniBooNE = SignalDef::isMiniBooNE_CCQELike(event, 0.0, 3.0);
-  flagCCQE_MiniBooNE = SignalDef::isMiniBooNE_CCQE(event, 0.0, 3.0);
-  flagCCQEBar_MiniBooNE = SignalDef::isMiniBooNE_CCQEBar(event, 0.0, 3.0);
+  flagCCQELike_MiniBooNE = SignalDef::isCC0pi(event, 14, 0.0, 3.0);
+  flagCCQE_MiniBooNE = SignalDef::isCCQELike(event, 14, 0.0, 3.0);
+  flagCCQEBar_MiniBooNE = SignalDef::isCCQELike(event, -14, 0.0, 3.0);
 }
 
 // -------------------------------------------------------------------

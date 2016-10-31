@@ -92,16 +92,8 @@ void BEBC_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 /// @details cut 3: Q2 non-zero
 bool BEBC_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
 //********************************************************************
-
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Restrict energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
-
-  // Q2 cut
+  if (!SignalDef::isCCQE(event, 14, EnuMin, EnuMax)) return false;
   if (q2qe <= 0) return false;
-
   return true;
 };
 

@@ -115,9 +115,9 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
       
   //     // Add the kinetic energies of any nucleons
   //     if (abs((nvect->PartInfo(j))->fPID) == 2212)
-  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - 0.93956536;
+  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - PhysConst::mass_proton;
   //     else if (abs((nvect->PartInfo(j))->fPID) == 2112)
-  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - 0.93827203;
+  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - PhysConst::mass_neutron;
 
   //   }
     

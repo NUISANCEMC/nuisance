@@ -37,8 +37,9 @@
 #include "TGraph.h"
 
 #include "GeneralUtils.h"
+#include "FitLogger.h"
 
-using namespace std;
+//using namespace std;
 
 /*!
  *  \addtogroup FitBase
@@ -76,16 +77,13 @@ class FitParameters {
 
   double GetParD(std::string parName);
 
-  std::string GetParS(std::string parName, bool quiet=false);
+  std::string GetParS(std::string parName);
 
   std::string GetParDIR(std::string parName);
   
   // Variables
   std::string parFileName;
   std::map<std::string, std::string> parameterMap_all;
-
-  int variables;
-  bool nuwro_enabled;
 
   std::string GetAllParametersArg();
 

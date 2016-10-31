@@ -25,6 +25,10 @@ namespace FitPar{
   bool use_colors = true; //!< Use BASH Terminal Colors Flag
   bool super_rainbow_mode = true; //!< For when fitting gets boring.
   unsigned int super_rainbow_mode_colour = 0;
+
+  std::streambuf *default_cout = std::cout.rdbuf();
+  std::streambuf *default_cerr = std::cerr.rdbuf();
+  std::ofstream redirect_stream("/dev/null");
 }
 
 std::ostream* logStream(&std::cout);
@@ -81,12 +85,8 @@ std::ostream& LOG(int level)
 //******************************************
 {
 
-  if (FitPar::log_verb == (unsigned int)DEB){
-    std::cout << BLUE << "[DEBUG]: " << RESET;
-    return *logStream;
-  }
-
-  if (FitPar::log_verb < (unsigned int)level){
+  if (FitPar::log_verb < (unsigned int)level && 
+      FitPar::log_verb != (unsigned int)DEB){
     return nullStream;
   } else {
 
@@ -111,6 +111,7 @@ std::ostream& LOG(int level)
       case SAM: std::cout << MAGENTA;   break;
       case REC: std::cout << BLUE;      break;
       case SIG: std::cout << GREEN;     break;
+      case DEB: std::cout << CYAN;      break;
       default: break;
       }
     }
@@ -122,6 +123,7 @@ std::ostream& LOG(int level)
     case REC: std::cout << "[LOG Reconf]: -- "; break;
     case SIG: std::cout << "[LOG Signal]: --- "; break;
     case EVT: std::cout << "[LOG Event ]: ---- "; break;
+    case DEB: std::cout << "[LOG DEBUG ]: "; break;
     default: std::cout << "Log : "; break;
     }
 
@@ -138,8 +140,8 @@ std::ostream& ERR(int level)
   if (FitPar::use_colors) std::cerr << RED;
   
   switch(level){
-  case FTL: std::cerr << "[ ERROR Fatal! ] :"; break;
-  case WRN: std::cerr << "[ ERROR Warning ] :"; break;
+  case FTL: std::cerr << "[ERR FATAL ]: "; break;
+  case WRN: std::cerr << "[ERR WARN  ] : "; break;
   }
 
   if (FitPar::use_colors) std::cerr << RESET;
@@ -147,4 +149,16 @@ std::ostream& ERR(int level)
   return *errStream;
 }
 
+
+void StopTalking(){
+  // Only redirect if we're not debugging
+  if (FitPar::log_verb == (unsigned int)DEB) return;
+  std::cout.rdbuf(FitPar::redirect_stream.rdbuf());
+  std::cerr.rdbuf(FitPar::redirect_stream.rdbuf());
+}
+
+void StartTalking(){
+  std::cout.rdbuf(FitPar::default_cout);
+  std::cerr.rdbuf(FitPar::default_cerr);
+}
 

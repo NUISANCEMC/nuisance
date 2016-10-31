@@ -60,8 +60,26 @@ void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
   return;
 };
 
+// ************************************** 
+// MINERvA CC1pi0 in anti-neutrino mode   
+// Unfortunately there's no information on the neutrino component which is      
+// subtracted off      
+//  
+// 2014 analysis:      
+//                Exactly one positive muon                  
+//                Exactly one observed pi0                   
+//                No pi+/pi allowed       
+//                No information on what is done with mesons, oops?             
+//                No information on what is done with nucleons, oops?           
+//  
+// 2016 analysis:      
+//                Exactly one positive muon                  
+//                Exactly one observed pi0                   
+//                No other mesons         
+//                No restriction on number of nucleons       
+//  
 //******************************************************************** 
 bool MINERvA_CC1pi0_XSec_1DEnu_antinu::isSignal(FitEvent *event) {
 //******************************************************************** 
-  return SignalDef::isCC1pi0Bar_MINERvA(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
 }

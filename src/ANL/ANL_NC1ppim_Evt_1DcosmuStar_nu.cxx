@@ -88,36 +88,6 @@ void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool ANL_NC1ppim_Evt_1DcosmuStar_nu::isSignal(FitEvent *event) {
-
-  // Incoming particle should be a neutrino
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  if (((event->PartInfo(0))->fP.E() < this->EnuMin*1000.) || ((event->PartInfo(0))->fP.E() > this->EnuMax*1000.)) return false; 
-
-  // Outgoing particle should be a neutrino
-  if (((event->PartInfo(2))->fPID != 14) && ((event->PartInfo(3))->fPID != 14)) return false; 
-
-  int pimCnt = 0;
-  int protonCnt = 0;
-
-  for (UInt_t j =  2; j < event->Npart(); j++) {
-    if (!((event->PartInfo(j))->fIsAlive) && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move to next particle if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == -211) {
-      pimCnt++;
-    } else if (PID == 2212) {
-      protonCnt++;
-    } else {
-      return false; // require only three prong events! (allow photons?)
-    }
-  }
-
-  // don't think there's away of implementing spectator proton cuts in NEUT?
-  // 100 MeV or larger protons
-
-  if (pimCnt != 1) return false;
-  if (protonCnt != 1) return false;
-
-  return true;
+  return SignalDef::isNC1pi3Prong(event, 14, -211, 2212, EnuMin, EnuMax);
 }
 

@@ -925,7 +925,7 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale){
 
   // Check
   if (cov->GetNrows() != data->GetNbinsX()){
-    ERR(WRN) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << endl;
+    ERR(WRN) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
   }
   
   // Set bin errors form cov diag

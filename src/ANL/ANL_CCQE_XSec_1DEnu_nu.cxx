@@ -92,19 +92,7 @@ void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 /// \item Cut 3: EnuMin < Enu < EnuMax
 bool ANL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
 
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) 
-    return false;
-
-  // Only CCQE
-  if (event->Mode != 1) 
-    return false;
-  
-  // Restrict energy range
-  if (event->Enu()/1000.0 < EnuMin || event->Enu()/1000.0 > EnuMax) 
-    return false;
-
-  return true;
+  return SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
 };
 
 

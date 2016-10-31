@@ -23,81 +23,7 @@
   MISC Functions
 */
 
-//********************************************************
-TH2D *FitUtils::CalculateQ3Cut(std::string inFile, TH2D *data, double qCut,
-                               int nuPDG, double eMin, double eMax) {
-  //********************************************************
-
-  // This function calculates the bins in the 2D distribution which should be
-  // excluded because > 50% of the events in that bin have q^2 < qCut
-  TH2D *qCutHist = (TH2D *)data->Clone("qCutHist");
-  qCutHist->Reset();
-
-  // DEPRECATED CODE
-  // - Needs to be updated to fit in with new InputHandler format
-  (void)inFile;
-  (void)qCut;
-  (void)nuPDG;
-  (void)eMin;
-  (void)eMax;
-
-  // This should instead use VEXperimentBase to allow multiple inputs.
-
-  // TH2D *qEvts    = (TH2D*)data->Clone("qEvts");
-  // qEvts   ->Reset();
-  // TH2D *qAll     = (TH2D*)data->Clone("qAll");
-  // qAll    ->Reset();
-
-  // int muPDG = 0;
-  // if (nuPDG == 14) muPDG = 13;
-  // else if (nuPDG == -14) muPDG = -13;
-
-  // // Now iterate through the events and plot the qCut
-  // TChain *tn = new TChain("neuttree", "");
-  // tn->Add(Form("%s/neuttree", inFile.c_str()));
-  // Int_t fNEvents = tn->GetEntries();
-  // NeutVect *nvect = NULL;
-  // tn->SetBranchAddress("vectorbranch", &nvect);
-  // for (int i = 0; i < fNEvents; ++i){
-  //   tn->GetEntry(i);
-
-  //   if (!isSignal(nvect, nuPDG, eMin, eMax, false, 0)) continue;
-
-  //   // Now calculate the 3-momentum transfer
-  //   // Loop over the particle stack
-  //   for (int j = 2; j < nvect->Npart(); ++j){
-
-  //     // Look for the outgoing muon
-  //     if ((nvect->PartInfo(j))->fPID != muPDG) continue;
-
-  //     double q3 = sqrt(((nvect->PartInfo(j))->fP -
-  //     (nvect->PartInfo(0))->fP).Vect().Mag2());
-
-  //     // Now find the kinematic values and fill the histogram
-  //     double Ekmu     = (nvect->PartInfo(j))->fP.E()/1000 - 0.105658367;
-  //     double costheta =
-  //     cos(((nvect->PartInfo(0))->fP.Vect().Angle((nvect->PartInfo(j))->fP.Vect())));
-
-  //     qAll->Fill(Ekmu, costheta);
-
-  //     if (q3 <  qCut) qEvts ->Fill(Ekmu, costheta);
-
-  //   }
-
-  // }
-
-  // for (int xBin = 1; xBin < qCutHist->GetNbinsX()+1; ++xBin){
-  //   for (int yBin = 1; yBin < qCutHist->GetNbinsY()+1; ++yBin){
-  //     double fract = 0;
-  //     if (qAll->GetBinContent(xBin, yBin) != 0) fract =
-  //     qEvts->GetBinContent(xBin, yBin)/(qAll->GetBinContent(xBin, yBin) +
-  //     0.);
-  //     qCutHist->SetBinContent(xBin, yBin, fract);
-  //   }
-  // }
-  return qCutHist;
-};
-
+// MOVE TO GENERALUTILS! CW
 //********************************************************************
 double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
                                   std::map<std::string, double> inmap) {
@@ -145,6 +71,7 @@ double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
 };
 
 // T2K CC1pi+ helper functions
+// MOVE TO T2KUtils! CW
 //
 //********************************************************************
 // Returns the angle between q3 and the pion defined in Raquel's CC1pi+ on CH
@@ -173,6 +100,7 @@ double FitUtils::thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return th_q3_pi;
 }
 
+// MOVE TO T2KUtils! CW                                                                                                                                                       
 //********************************************************************
 // Returns the q3 defined in Raquel's CC1pi+ on CH paper
 // Uses "MiniBooNE formula" for Enu
@@ -194,6 +122,7 @@ double FitUtils::q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return q3;
 }
 
+// MOVE TO T2KUtils! CW
 //********************************************************************
 // Returns the W reconstruction from Raquel CC1pi+ CH thesis
 // Uses the MiniBooNE formula Enu
@@ -204,9 +133,7 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
   double p_mu = pmu.Vect().Mag() / 1000.;
   double E_nu = EnuCC1piprec(pnu, pmu, ppi, false);
 
-  const double m_n = 0.93956536;  // neutron/proton mass
-
-  double a1 = (E_nu + m_n) - E_mu;
+  double a1 = (E_nu + PhysConst::mass_neutron) - E_mu;
   double a2 = E_nu - p_mu;
 
   double wrec = sqrt(a1 * a1 - a2 * a2);
@@ -214,13 +141,14 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
   return wrec;
 }
 
+// MOVE TO MINERvA Utils! CW
 //********************************************************
 double FitUtils::ProtonQ2QErec(double pE, double binding) {
-  //********************************************************
+//********************************************************
 
   const double V = binding / 1000.;  // binding potential
-  const double mn = 0.93956536;      // neutron mass
-  const double mp = 0.93827203;      // proton mass
+  const double mn = PhysConst::mass_neutron;      // neutron mass
+  const double mp = PhysConst::mass_proton;      // proton mass
   const double mn_eff = mn - V;      // effective proton mass
   const double pki = (pE / 1000.0) - mp;
 
@@ -243,12 +171,11 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
       momshift = gRandom->Gaus(0.0, 1.0) * temp;
     }
   }
-  //  std::cout<<"Current Momentum Shift = "<<momshift<<std::endl;
 
   // Convert all values to GeV
   const double V = binding / 1000.;  // binding potential
-  const double mn = 0.93956536;      // neutron mass
-  const double mp = 0.93827203;      // proton mass
+  const double mn = PhysConst::mass_neutron;    // neutron mass
+  const double mp = PhysConst::mass_proton;     // proton mass
 
   double mN_eff = mn - V;
   double mN_oth = mp;
@@ -267,7 +194,6 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
       (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
       (2 * (mN_eff - el + pl * costh));
 
-  //  std::cout<<"Enu = "<<rEnu<<std::endl;
   return rEnu;
 };
 
@@ -311,8 +237,8 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
   double m_pi0 = sqrt(E_pi0 * E_pi0 - p_pi0 * p_pi0);
   double th_nu_pi0 = pnu.Vect().Angle(ppi0.Vect());
 
-  const double m_n = 0.93956536;  // neutron mass
-  const double m_p = 0.93827203;  // proton mass
+  const double m_n = PhysConst::mass_neutron;  // neutron mass
+  const double m_p = PhysConst::mass_proton;  // proton mass
   double th_pi0_mu = ppi0.Vect().Angle(pmu.Vect());
 
   double rEnu = (m_mu * m_mu + m_pi0 * m_pi0 + m_n * m_n - m_p * m_p -
@@ -361,7 +287,7 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
   double p_pi = ppi.Vect().Mag() / 1000.;
   double m_pi = sqrt(E_pi * E_pi - p_pi * p_pi);
 
-  const double m_n = 0.93956536;  // neutron/proton mass
+  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -401,10 +327,10 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
 // Reconstruct neutrino energy from outgoing particles; will differ from the
 // actual neutrino energy. Here we use assumption of a Delta resonance
 double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
-  //********************************************************************
+//********************************************************************
 
-  const double m_Delta = 1.232;   // PDG value for Delta mass in GeV
-  const double m_n = 0.93956536;  // neutron/proton mass
+  const double m_Delta = PhysConst::mass_delta;   // PDG value for Delta mass in GeV
+  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -419,6 +345,7 @@ double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
   return rEnu;
 };
 
+// MOVE TO T2K UTILS!
 //********************************************************************
 // Reconstruct Enu using "extended MiniBooNE" as defined in Raquel's T2K TN
 //
@@ -432,18 +359,14 @@ double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   TVector3 p_nu_vect_unit = pnu.Vect() * (1. / pnu.E());
 
   double E_mu = pmu.E() / 1000.;
-  // double p_mu = pmu.Vect().Mag()/1000.;
   TVector3 p_mu_vect = pmu.Vect() * (1. / 1000.);
-  // double m_mu = sqrt(E_mu*E_mu - p_mu*p_mu);
 
   double E_pi = ppi.E() / 1000.;
-  // double p_pi = ppi.Vect().Mag()/1000.;
   TVector3 p_pi_vect = ppi.Vect() * (1. / 1000.);
-  // double m_pi = sqrt(E_pi*E_pi - p_pi*p_pi);
 
   double E_bind =
       27. / 1000.;  // This should be roughly correct for CH; but not clear!
-  double m_p = 0.939;
+  double m_p = PhysConst::mass_proton;
 
   // Makes life a little easier, gonna square this one
   double a1 = m_p - E_bind - E_mu - E_pi;
@@ -552,12 +475,12 @@ double FitUtils::Wrec(TLorentzVector pnu, TLorentzVector pmu) {
   double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu);
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
-  const double m_p = 938.27203;
+  // The factor of 1000 is necessary for downstream functions
+  const double m_p = PhysConst::mass_proton*1000;
 
   // MINERvA cut on W_exp which is tuned to W_true; so use true Enu from
   // generators
   double E_nu = pnu.E();
-  // double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
   double w_rec = sqrt(m_p * m_p + m_mu * m_mu - 2 * m_p * E_mu +
                       2 * E_nu * (m_p - E_mu + p_mu * cos(th_nu_mu)));
@@ -593,7 +516,6 @@ double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu,
   double th_nu_nuc = pnu.Vect().Angle(pnuc.Vect());
 
   double E_nu = pnu.E();
-  // double E_nu = FitUtils::EnuCC1piprec(pnu, pmu, ppi)*1000.;
 
   double w_rec = sqrt(m_nuc * m_nuc + m_mu * m_mu - 2 * E_nu * E_mu +
                       2 * E_nu * p_mu * cos(th_nu_mu) - 2 * E_nuc * E_mu +
@@ -660,6 +582,7 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   return Erecoil;
 }
 
+// MOVE TO MINERVA Utils!
 double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil = 0.0;
@@ -695,51 +618,6 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   }
 
   return Erecoil;
-}
-
-std::pair<TLorentzVector, int> FitUtils::GetHMPDG_4Mom(int pdg,
-                                                       FitEvent *event) {
-  int pdgs[] = {pdg};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-
-std::pair<TLorentzVector, int> FitUtils::GetHMFSCLepton_4Mom(FitEvent *event) {
-  int pdgs[] = {11, 13, 15, -11, -13, -15};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSMuon_4Mom(FitEvent *event) {
-  int pdgs[] = {13};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSAntiMuon_4Mom(FitEvent *event) {
-  int pdgs[] = {-13};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISNLepton_4Mom(FitEvent *event) {
-  int pdgs[] = {12, 14, 16, -12, -14, -16};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISMuonNeutrino_4Mom(
-    FitEvent *event) {
-  int pdgs[] = {14};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMISAntiMuonNeutrino_4Mom(
-    FitEvent *event) {
-  int pdgs[] = {-14};
-  return GetHMPDG_4Mom(pdgs, event, true);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSProton_4Mom(FitEvent *event) {
-  int pdgs[] = {2212};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSCPion_4Mom(FitEvent *event) {
-  int pdgs[] = {211, -211};
-  return GetHMPDG_4Mom(pdgs, event);
-}
-std::pair<TLorentzVector, int> FitUtils::GetHMFSPion_4Mom(FitEvent *event) {
-  int pdgs[] = {211, -211, 111};
-  return GetHMPDG_4Mom(pdgs, event);
 }
 
 TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal) {
@@ -782,62 +660,75 @@ Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
 }
 
 double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+  
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
+
 double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+  
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
 }
 double FitUtils::Get_STV_dalphat(FitEvent *event, bool Is0pi) {
-  std::pair<TLorentzVector, int> pmu = FitUtils::GetHMFSMuon_4Mom(event);
-  std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSProton_4Mom(event);
-  std::pair<TLorentzVector, int> pnu = FitUtils::GetHMISNLepton_4Mom(event);
-  if (!pnu.second) {
-    std::cerr << "[ERROR]: Couldn't find initial state neutrino." << std::endl;
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(14)   == 0){
+    LOG(FTL) << "Couldn't find initial state neutrino." << std::endl;
     throw;
   }
-  if (!pnu.second || !pp.second) {
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(13)   == 0)
     return 0;
-  }
-  TVector3 const &NuP = pnu.first.Vect();
-  TVector3 const &LeptonP = pmu.first.Vect();
-  TVector3 HadronP = pp.first.Vect();
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
+  TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
   if (!Is0pi) {
-    std::pair<TLorentzVector, int> pp = FitUtils::GetHMFSPion_4Mom(event);
-    HadronP += pp.first.Vect();
+    int pdgs[] = {221, -211, 111};
+    TLorentzVector pp = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+    HadronP += pp.Vect();
   }
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }

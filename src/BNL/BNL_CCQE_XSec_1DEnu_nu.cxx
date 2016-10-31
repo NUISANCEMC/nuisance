@@ -79,24 +79,9 @@ void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 };
 
 //********************************************************************
-/// @details Signal is true CCQE scattering
-///
-/// @details Cut 1: numu event
-/// @details Cut 2: Mode == 1
-/// @details Cut 3: EnuMin < Enu < EnuMax      
 bool BNL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
 //******************************************************************** 
-
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
-
-  // Select only CCQE
-  if (Mode != 1) return false;
-  
-  // Restrict energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
-
-  return true;
+  return SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
 };
 
 //********************************************************************   
