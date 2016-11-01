@@ -121,7 +121,7 @@ bool SignalDef::isNC1pi(FitEvent *event, int nuPDG, int piPDG,
   int nPion    = event->NumFSParticle(piPDG);
 
   // Check that the desired pion exists and is the only meson
-  if (nPion != 1 && nMesons != 1) return false;
+  if (nPion != 1 || nMesons != 1) return false;
 
   // Check that there are no charged leptons
   if (nLeptons != 0) return false;
@@ -327,8 +327,8 @@ bool SignalDef::isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
   if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
 
   TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector Pmu = event->GetHMISParticle(13)->fP;
-  TLorentzVector Ppip = event->GetHMISParticle(211)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
 
   double p_mu = FitUtils::p(Pmu) * 1000;
   double p_pi = FitUtils::p(Ppip) * 1000;
