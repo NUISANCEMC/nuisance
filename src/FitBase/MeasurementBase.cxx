@@ -174,15 +174,15 @@ void MeasurementBase::Reconfigure(){
     // Print Out
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
       LOG(REC).unsetf(ios_base::fixed);
-      std::cout << std::setw(7) << std::right << i << "/" << fNEvents
-		<< " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
-		<< std::left << std::setw(5) << "%) "
-		<< "[S,X,Y,Z,M,W] = ["
-		<< std::fixed << std::setprecision(2) << std::right
-		<< Signal << ", "
-		<< std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
-		<< std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
-		<< std::setw(5) << Weight << "] "<< std::endl;
+      LOG(SAM) << std::setw(7) << std::right << i << "/" << fNEvents
+	       << " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
+	       << std::left << std::setw(5) << "%) "
+	       << "[S,X,Y,Z,M,W] = ["
+	       << std::fixed << std::setprecision(2) << std::right
+	       << Signal << ", "
+	       << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
+	       << std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
+	       << std::setw(5) << Weight << "] "<< std::endl;
     }
       
   }

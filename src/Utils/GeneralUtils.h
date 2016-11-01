@@ -20,70 +20,69 @@
 #ifndef GENERALUTILS_H_SEEN
 #define GENERALUTILS_H_SEEN
 
-#include <stdlib.h>
-#include <numeric>
 #include <math.h>
-#include <iostream>
-#include <fstream>  
+#include <stdlib.h>
 #include <unistd.h>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
+#include "FitLogger.h"
 
 /*!
  *  \addtogroup Utils
  *  @{
  */
 
-//! Functions which deal with basic string and file handling. They should have no dependence on the other NUISANCE files! 
-namespace GeneralUtils{
+//! Functions which deal with basic string and file handling. They should have
+//! no dependence on the other NUISANCE files!
+namespace GeneralUtils {
 
-  /*!
-    String handling and file parsing functions
-  */
-  
-  //! Parse a string into a vector of doubles given a delimiter "del"
-  std::vector<double> ParseToDbl(std::string str, const char* del);
+/*!
+  String handling and file parsing functions
+*/
 
-  //! Parse a string into a vector of ints given a delimiter "del"
-  std::vector<int> ParseToInt(std::string str, const char* del);
+//! Parse a string into a vector of doubles given a delimiter "del"
+std::vector<double> ParseToDbl(std::string str, const char* del);
 
-  //! Parse a string into a vector of strings given a delimiter "del"  
-  std::vector<std::string> ParseToStr(std::string str, const char* del);
+//! Parse a string into a vector of ints given a delimiter "del"
+std::vector<int> ParseToInt(std::string str, const char* del);
 
-  //! Parse text file into a vector of strings
-  std::vector<std::string> ParseFileToStr(std::string str, const char* del);
-  
-  //! Convert a string to a double
-  double StrToDbl(std::string str);
+//! Parse a string into a vector of strings given a delimiter "del"
+std::vector<std::string> ParseToStr(std::string str, const char* del);
 
-  //! Convert a string to an int
-  int StrToInt(std::string str);
+//! Parse text file into a vector of strings
+std::vector<std::string> ParseFileToStr(std::string str, const char* del);
 
-  //! Convert a string to an bool
-  bool StrToBool(std::string str);
+//! Convert a string to a double
+double StrToDbl(std::string str);
 
-  //! Return the top level environmental variable for the fitter
-  std::string GetTopLevelDir();
+//! Convert a string to an int
+int StrToInt(std::string str);
 
-  //! A utility function to return a std::vector from an array
-  template< typename T, size_t N >
-    std::vector<T> makeVector( const T (&data)[N] )
-  {
-    return std::vector<T>(data, data+N);
-  }
+//! Convert a string to an bool
+bool StrToBool(std::string str);
 
+//! Return the top level environmental variable for the fitter
+std::string GetTopLevelDir();
+
+//! A utility function to return a std::vector from an array
+template <typename T, size_t N>
+std::vector<T> makeVector(const T (&data)[N]) {
+  return std::vector<T>(data, data + N);
+}
 }
 
-namespace PhysConst{
-  const double mass_proton  = 0.93827203; // Proton mass in GeV
-  const double mass_neutron = 0.93956536; // Neutron mass in GeV
-  const double mass_delta   = 1.232;      // Delta mass in GeV
-  const double mass_muon    = 0.10565837; // Muon mass in GeV
+namespace PhysConst {
+const double mass_proton = 0.93827203;   // Proton mass in GeV
+const double mass_neutron = 0.93956536;  // Neutron mass in GeV
+const double mass_delta = 1.232;         // Delta mass in GeV
+const double mass_muon = 0.10565837;     // Muon mass in GeV
 }
-
 
 /*! @} */
 #endif

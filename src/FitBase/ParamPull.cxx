@@ -45,8 +45,8 @@ void ParamPull::SetType(std::string type){
   fType = type;
   // Assume Default if empty
   if (type.empty()){
-    ERR(WRN) << "No type specified for ParmPull class " << fName << endl;
-    ERR(WRN) << "Assuming GAUSTHROW/GAUSPULL" << endl;
+    ERR(WRN) << "No type specified for ParmPull class " << fName << std::endl;
+    ERR(WRN) << "Assuming GAUSTHROW/GAUSPULL" << std::endl;
 
     type = "GAUSTHROW/GAUSPULL";
   }
@@ -106,7 +106,7 @@ void ParamPull::SetupHistograms(std::string input){
   else if (!fFileType.compare("VECT")) ReadVectFile(input);
   else if (!fFileType.compare("DIAL")) ReadDialInput(input);
   else {
-    ERR(FTL) << "Unknown ParamPull Type: " << input << endl;
+    ERR(FTL) << "Unknown ParamPull Type: " << input << std::endl;
     throw;
   }
   
@@ -269,8 +269,8 @@ void ParamPull::ReadFitFile(std::string input){
   // Read Data
   fDataHist = (TH1D*) tempfile->Get("fit_dials_free");
   if (!fDataHist){
-    ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << endl;
-    ERR(FTL) << "File Entries:" << endl;
+    ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << std::endl;
+    ERR(FTL) << "File Entries:" << std::endl;
     tempfile->ls();
 
     throw;
@@ -283,8 +283,8 @@ void ParamPull::ReadFitFile(std::string input){
   // Read Covar
   TH2D* tempcov = (TH2D*) tempfile->Get("covariance_free");
   if (!tempcov){
-    ERR(FTL) << "Can't find TH2D covariance_free in " << fName << endl;
-    ERR(FTL) << "File Entries:" << endl;
+    ERR(FTL) << "Can't find TH2D covariance_free in " << fName << std::endl;
+    ERR(FTL) << "File Entries:" << std::endl;
     tempfile->ls();
 
     throw;
@@ -311,32 +311,32 @@ void ParamPull::ReadRootFile(std::string input){
 
   // Check all given
   if (inputlist.size() < 2){
-    ERR(FTL) << "Covar supplied in 'ROOT' format should have 3 semi-colon seperated entries!" << endl
-	     << "ROOT:filename;histname[;covarname]" << endl;
-    ERR(FTL) << "histname = TH1D, covarname = TH2D" << endl;
+    ERR(FTL) << "Covar supplied in 'ROOT' format should have 3 semi-colon seperated entries!" << std::endl
+	     << "ROOT:filename;histname[;covarname]" << std::endl;
+    ERR(FTL) << "histname = TH1D, covarname = TH2D" << std::endl;
     throw;
   }
 
   // Get Entries
   std::string filename  = inputlist[0];
-  cout << filename << endl;
+  LOG(DEB) << filename << std::endl;
   std::string histname  = inputlist[1];
-  cout << histname << endl;
-  cout << input<< endl;
+  LOG(DEB) << histname << std::endl;
+  LOG(DEB) << input<< std::endl;
 
   // Read File
   TFile* tempfile = new TFile(filename.c_str(),"READ");
   if (tempfile->IsZombie()){
-    ERR(FTL) << "Can't find file in " << fName << endl;
-    ERR(FTL) << "location = " << filename << endl;
+    ERR(FTL) << "Can't find file in " << fName << std::endl;
+    ERR(FTL) << "location = " << filename << std::endl;
     throw;
   }
 
   // Read Hist
   fDataHist = (TH1D*) tempfile->Get(histname.c_str());
   if (!fDataHist){
-    ERR(FTL) << "Can't find TH1D hist " << histname << " in " << fName << endl;
-    ERR(FTL) << "File Entries:" << endl;
+    ERR(FTL) << "Can't find TH1D hist " << histname << " in " << fName << std::endl;
+    ERR(FTL) << "File Entries:" << std::endl;
     tempfile->ls();
 
     throw;
@@ -345,16 +345,16 @@ void ParamPull::ReadRootFile(std::string input){
   fDataHist->SetNameTitle( (fName + "_data").c_str(),
 			   (fName + " data" + fPlotTitles).c_str() );
 
-  cout << "READING COVAR" << endl;
+  LOG(DEB) << "READING COVAR" << std::endl;
   // Read Covar
   if (inputlist.size() > 2){
     std::string covarname = inputlist[2];
-    cout << "COVARNAME = " <<covarname << endl;
+    LOG(DEB) << "COVARNAME = " <<covarname << std::endl;
     
     TH2D* tempcov = (TH2D*) tempfile->Get(covarname.c_str());
     if (!tempcov){
-      ERR(FTL) << "Can't find TH2D covar " << covarname << " in " << fName << endl;
-      ERR(FTL) << "File Entries:" << endl;
+      ERR(FTL) << "Can't find TH2D covar " << covarname << " in " << fName << std::endl;
+      ERR(FTL) << "File Entries:" << std::endl;
       tempfile->ls();
       
       throw;
@@ -373,7 +373,7 @@ void ParamPull::ReadRootFile(std::string input){
   // Uncorrelated
   } else {
     LOG(SAM) <<"No Covar provided so using diagonal errors for "
-	     << fName << endl;
+	     << fName << std::endl;
     fCovar = NULL;
   }
 }
@@ -384,8 +384,8 @@ void ParamPull::ReadVectFile(std::string input){
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input,";");
   if (inputlist.size() < 4){
-    ERR(FTL) << "Need 3 inputs for vector input in " << fName << endl;
-    ERR(FTL) << "Inputs: " << input << endl;
+    ERR(FTL) << "Need 3 inputs for vector input in " << fName << std::endl;
+    ERR(FTL) << "Inputs: " << input << std::endl;
     throw;
   }
 
@@ -393,8 +393,8 @@ void ParamPull::ReadVectFile(std::string input){
   std::string rootname   = inputlist[0];
   TFile* tempfile = new TFile(rootname.c_str(),"READ");
   if (tempfile->IsZombie()){
-    ERR(FTL) << "Can't find file in " << fName << endl;
-    ERR(FTL) << "location = " << rootname << endl;
+    ERR(FTL) << "Can't find file in " << fName << std::endl;
+    ERR(FTL) << "location = " << rootname << std::endl;
     throw;
   }
 
@@ -402,21 +402,21 @@ void ParamPull::ReadVectFile(std::string input){
   std::string tagname = inputlist[1];
   //  TVector<std::string> dialtags = tempfile->Get(tagname.c_str());
   //  if (!dialtags){
-  //    ERR(FTL) << "Can't find list of dial names!" << endl;
+  //    ERR(FTL) << "Can't find list of dial names!" << std::endl;
   //  }
   
   // Get Values 
   std::string valuename  = inputlist[2];
   TVectorD* dialvals = (TVectorD*)tempfile->Get(valuename.c_str());
   if (!dialvals){
-    ERR(FTL) << "Can't find dial values" << endl;
+    ERR(FTL) << "Can't find dial values" << std::endl;
   }
 
   // Get Matrix 
   std::string matrixname = inputlist[3];
   TMatrixD* matrixvals = (TMatrixD*)tempfile->Get(matrixname.c_str());
   if (!matrixvals){
-    ERR(FTL) << "Can't find matirx values" << endl;
+    ERR(FTL) << "Can't find matirx values" << std::endl;
   }
  
   // Get Types
@@ -442,8 +442,8 @@ void ParamPull::ReadDialInput(std::string input){
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input,";");
   if (inputlist.size() < 3){
-    ERR(FTL) << "Need 3 inputs for dial input in " << fName << endl;
-    ERR(FTL) << "Inputs: " << input << endl;
+    ERR(FTL) << "Need 3 inputs for dial input in " << fName << std::endl;
+    ERR(FTL) << "Inputs: " << input << std::endl;
     throw;
   }
 
@@ -495,8 +495,8 @@ bool ParamPull::CheckDialsValid(){
 
     // If it doesn't but its a sample norm also continue
     if (name.find("_norm") != std::string::npos){
-      ERR(WRN) << "Norm dial included in covar but not set in FitWeight." << endl;
-      ERR(WRN) << "Assuming its a sample norm and skipping..." << endl;
+      ERR(WRN) << "Norm dial included in covar but not set in FitWeight." << std::endl;
+      ERR(WRN) << "Assuming its a sample norm and skipping..." << std::endl;
     }
 
     // Dial unknown so print a help statement
@@ -507,19 +507,19 @@ bool ParamPull::CheckDialsValid(){
 	    << fDataHist->GetBinContent(i+1) + fDataHist->GetBinError(i+1) << " "
 	    << fDataHist->GetBinError(i+1) << " ";
 
-    if (!fType.empty()) tempstr << fType << endl;
-    else tempstr << "FREE" << endl;
+    if (!fType.empty()) tempstr << fType << std::endl;
+    else tempstr << "FREE" << std::endl;
     helpstring += tempstr.str(); 
   }
 
   // Show statement before failing
   if (!helpstring.empty()){
     
-    ERR(WRN) <<"Dial(s) included in covar but not set in FitWeight." << endl
-             << "ParamPulls needs to know how you want it to be treated." << endl
-             <<"Include the following lines into your card:" << endl;
+    ERR(WRN) <<"Dial(s) included in covar but not set in FitWeight." << std::endl
+             << "ParamPulls needs to know how you want it to be treated." << std::endl
+             <<"Include the following lines into your card:" << std::endl;
 
-    std::cout << helpstring << endl;
+    ERR(WRN) << helpstring << std::endl;
     throw;
     return false;
   } else {
@@ -567,10 +567,10 @@ void ParamPull::ResetToy(void){
 
   if (fDataHist) delete fDataHist;
 
-  cout << "Resetting toy" << endl;
-  cout << fDataTrue << endl;
+  LOG(DEB) << "Resetting toy" << std::endl;
+  LOG(DEB) << fDataTrue << std::endl;
   fDataHist = (TH1D*)fDataTrue->Clone();
-  cout << "Setting name" << endl;
+  LOG(DEB) << "Setting name" << std::endl;
   fDataHist->SetNameTitle( (fName + "_data").c_str(),
 			   (fName + " data" + fPlotTitles).c_str() );
   
@@ -603,8 +603,8 @@ void ParamPull::SetFakeData(std::string fakeinput){
     
   } else {
 
-    ERR(FTL) << "Trying to set fake data for ParamPulls not from MC!" << endl;
-    ERR(FTL) << "Not currently implemented.." << endl;
+    ERR(FTL) << "Trying to set fake data for ParamPulls not from MC!" << std::endl;
+    ERR(FTL) << "Not currently implemented.." << std::endl;
     throw;
     
   }
@@ -647,7 +647,7 @@ double ParamPull::GetLikelihood(){
   }
 
 
-  cout << "Likelihood = " << like << " " << fCalcType << endl;
+  LOG(DEB) << "Likelihood = " << like << " " << fCalcType << std::endl;
   return like;
   
 };
@@ -672,7 +672,7 @@ void ParamPull::ThrowCovariance(){
 
   // Reset toy for throw
   ResetToy();
-  cout << "Toy Reset " << endl;
+  LOG(DEB) << "Toy Reset " << std::endl;
   
   // Generate random Gaussian throws
   std::vector<double> randthrows;
@@ -717,7 +717,7 @@ void ParamPull::ThrowCovariance(){
   
   // Print Status
   LOG(REC) << "Created new toy histogram. Total Fractional Dif = "
-	   << totalres << endl;
+	   << totalres << std::endl;
   return;
 };
 

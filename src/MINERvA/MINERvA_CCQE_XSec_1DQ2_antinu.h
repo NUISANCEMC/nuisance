@@ -19,10 +19,11 @@
 
 #ifndef MINERVA_CCQE_XSec_1DQ2_antinu_H_SEEN
 #define MINERVA_CCQE_XSec_1DQ2_antinu_H_SEEN
-#include"Measurement1D.h"
-//********************************************************************  
+
+#include "Measurement1D.h"
+//********************************************************************
 class MINERvA_CCQE_XSec_1DQ2_antinu : public Measurement1D {
-//********************************************************************  
+//********************************************************************
 public:
 
   MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
@@ -35,7 +36,7 @@ public:
  private:
 
   bool isFluxFix, fullphasespace;
-  
+
 };
-  
+
 #endif

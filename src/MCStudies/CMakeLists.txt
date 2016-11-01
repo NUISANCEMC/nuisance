@@ -41,6 +41,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
+# Needed for experiment specific signal flags
+include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
+include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
+
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
 set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})

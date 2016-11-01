@@ -1,3 +1,24 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NUISANCE.
+*
+*    NUISANCE is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NUISANCE is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 
 // The constructor
@@ -88,7 +109,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
       piIndex.push_back(j);
     // Find muon
     } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
+      Pmu = (event->PartInfo(j))->fP;
     }
   }
 
@@ -114,16 +135,16 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
   return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, false);
 }
 
-//******************************************************************** 
+//********************************************************************
 void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
-//******************************************************************** 
+//********************************************************************
   Measurement1D::ScaleEvents();
 
   onePions->Scale(this->fScaleFactor, "width");
@@ -135,10 +156,10 @@ void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
   return;
 }
 
-//******************************************************************** 
+//********************************************************************
 // Need to override FillHistograms() here because we fill the histogram N_pion times
 void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
-//******************************************************************** 
+//********************************************************************
 
   if (Signal){
 
@@ -154,7 +175,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
         onePions->Fill(th, Weight);
       } else if (nPions == 2) {
         twoPions->Fill(th, Weight);
-      } else if (nPions == 3) { 
+      } else if (nPions == 3) {
         threePions->Fill(th, Weight);
       } else if (nPions > 3) {
         morePions->Fill(th, Weight);
@@ -169,9 +190,9 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 }
 
 
-//******************************************************************** 
+//********************************************************************
 void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
-//******************************************************************** 
+//********************************************************************
   Measurement1D::Write(drawOpts);
 
   hnPions->Write();

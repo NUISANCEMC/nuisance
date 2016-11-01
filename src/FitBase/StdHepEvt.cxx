@@ -23,6 +23,9 @@
 
 #include "StdHepEvt.h"
 
+// Include logging
+#include "FitLogger.h"
+
 StdHepReader::StdHepReader() {
 };
 
@@ -32,29 +35,29 @@ bool StdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("StdHepN", &StdHepN);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"StdHepN\": "
-              << SBAStatus << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"StdHepN\": "
+	     << SBAStatus << std::endl;
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepPdg", StdHepPdg);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"StdHepPdg\": "
-              << SBAStatus << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"StdHepPdg\": "
+	     << SBAStatus << std::endl;
   }
   SBAStatus = chain->SetBranchAddress("StdHepStatus", StdHepStatus);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"StdHepStatus\": "
-              << SBAStatus
-              << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"StdHepStatus\": "
+	     << SBAStatus
+	     << std::endl;
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepP4", StdHepP4);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"StdHepP4\": "
-              << SBAStatus << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"StdHepP4\": "
+	     << SBAStatus << std::endl;
   }
   return ok;
 }
@@ -66,16 +69,16 @@ bool GiBUUStdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("GiBUU2NeutCode", &GiBUU2NeutCode);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"GiBUU2NeutCode\": "
-              << SBAStatus
-              << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"GiBUU2NeutCode\": "
+	     << SBAStatus
+	     << std::endl;
   }
   SBAStatus = chain->SetBranchAddress("EvtWght", &EvtWght);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (! (!SBAStatus || SBAStatus == 5) ) {
-    std::cout << "Failed to set branch address for \"EvtWght\": "
-              << SBAStatus
-              << std::endl;
+    ERR(WRN) << "Failed to set branch address for \"EvtWght\": "
+	     << SBAStatus
+	     << std::endl;
   }
   return ok;
 }

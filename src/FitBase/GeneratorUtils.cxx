@@ -67,8 +67,8 @@ void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
 
   nemdls_.xmacoh = nvect->COHMA;
   nemdls_.rad0nu = nvect->COHR0;
-  nemdls_.fa1coh = nvect->COHA1err;
-  nemdls_.fb1coh = nvect->COHb1err;
+  //nemdls_.fa1coh = nvect->COHA1err;
+  //nemdls_.fb1coh = nvect->COHb1err;
 
   //neutdis_.nepdf = NEPDFdef;
   //neutdis_.nebodek = NEBODEKdef;
@@ -117,7 +117,7 @@ void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
 
   if ( (int)nvect->NfsiVert() == 1 ) { // An event with FSI must have at least two vertices
     //    if (nvect->NfsiPart()!=1 || nvect->Fsiprob!=-1)
-      //      cout << "Warning: T2KNeutUtils::fill_neut_commons(TTree) NfsiPart!=1 or Fsiprob!=-1 when NfsiVert==1" << endl;
+      //      ERR(WRN) << "T2KNeutUtils::fill_neut_commons(TTree) NfsiPart!=1 or Fsiprob!=-1 when NfsiVert==1" << endl;
 
     fsihist_.nvert = 0;
     fsihist_.nvcvert = 0;
@@ -666,7 +666,7 @@ int GeneratorUtils::ConvertNuanceMode(NuanceEvent * evt){
   // 99 -> UNKNOWN NEUT MODE
   case 99: return sg*0;
   default:
-    std::cerr << "Unknown Nuance Channel ID = "<<ch<<std::endl;
+    ERR(FTL) << "Unknown Nuance Channel ID = "<<ch<<std::endl;
     throw("Exiting.");
     return 0;
   }

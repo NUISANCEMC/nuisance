@@ -82,8 +82,8 @@ FitWeight::FitWeight(std::string name) {
   fSplineHead = NULL;
 
   this->fName = name;
-  std::cout << "Creating FitWeight norm enum = " << this->fNormEnum
-            << std::endl;
+  LOG(FIT) << "Creating FitWeight norm enum = " << this->fNormEnum
+	   << std::endl;
 }
 
 //********************************************************************
@@ -428,14 +428,14 @@ void FitWeight::PrintState() {
       double val = fDialFuncs.at(i).Eval(fDialValues.at(i));
 
       LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
-      std::cout << std::setw(40) << fDialNames.at(i) << std::setw(5) << " = " << val
-		<< " " << fDialUnits.at(i) << std::endl;
+      LOG(MIN) << std::setw(40) << fDialNames.at(i) << std::setw(5) << " = " << val
+	       << " " << fDialUnits.at(i) << std::endl;
       
     } else {
       (void)val;
       LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
-      std::cout << std::setw(40) << std::left << fDialNames.at(i) << std::setw(5)
-		<< " = " << fDialValues.at(i) << " " << fDialUnits.at(i) << std::endl;
+      LOG(MIN) << std::setw(40) << std::left << fDialNames.at(i) << std::setw(5)
+	       << " = " << fDialValues.at(i) << " " << fDialUnits.at(i) << std::endl;
     }
   }
 
@@ -527,7 +527,6 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 #ifdef __GENIE_ENABLED__
     case kGENIE:
       if (fIsUsingGenie) {
-	double gw =  fGenieRW->CalcWeight(*(evt->genie_event->event));
         rw_weight *= fGenieRW->CalcWeight(*(evt->genie_event->event));
       }
 #endif
@@ -669,23 +668,20 @@ void FitWeight::SetupNIWGRW() {
 void FitWeight::SetupNuwroRW() {
   //********************************************************************
 
-  LOG(FIT) << "Setting up NUWRO RW" << std::endl;
+  LOG(FIT) << "Setting up NuWro RW" << std::endl;
+
   fIsUsingNuwro = true;
   fIsNuwroChanged = true;
 
-  // Create Engine
-  std::cout << "FitWeight::SetupNuwroRW()" << std::endl;
-
-  StopTalking();
+  // Create the engine
   fNuwroRW = new nuwro::rew::NuwroReWeight();
-  StartTalking();
 
   // Get List of Veto Calcs (For Debugging)
   std::string rw_engine_list =
       FitPar::Config().GetParS("FitWeight.fNuwroRW_veto");
   bool xsec_qel = rw_engine_list.find("nuwro_QEL") == std::string::npos;
   bool xsec_flag = rw_engine_list.find("nuwro_FlagNorm") == std::string::npos;
-  bool xsec_res = rw_engine_list.find("nuwro_RES") == std::string::npos;
+  //bool xsec_res = rw_engine_list.find("nuwro_RES") == std::string::npos;
 
   // Add the RW Calcs
   if (xsec_qel)
@@ -1166,7 +1162,7 @@ void FitWeight::SetupSpline(std::string dialname, std::string splinename,
                             std::string points_def) {
 //********************************************************************
 
-  cout << "Setting up spline " << fSplineHead << endl;
+  LOG(DEB) << "Setting up spline " << fSplineHead << endl;
   // Create spline head if none setup
   if (!fSplineHead) fSplineHead = new FitSplineHead();
 
@@ -1179,7 +1175,7 @@ void FitWeight::SetupSpline(std::string dialname, std::string splinename,
   }
 
   // Add new spline
-  cout << "Added spline" << endl;
+  LOG(DEB) << "Added spline" << endl;
   FitSpline* spl = new FitSpline(dialname, splinename, list_enums, points_def);
   fSplineHead->AddSpline(spl);
 

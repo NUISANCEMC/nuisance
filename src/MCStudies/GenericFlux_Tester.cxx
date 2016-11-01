@@ -19,6 +19,9 @@
 
 #include "GenericFlux_Tester.h"
 
+#include "T2K_SignalDef.h"
+#include "MINERvA_SignalDef.h"
+
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
@@ -73,7 +76,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   LOG(SAM) << " Generic Flux Scaling Factor = "<< fScaleFactor << endl;
 
   if (fScaleFactor <= 0.0){
-    std::cout << "SCALE FACTOR TO LOW " << std::endl;
+    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
     sleep(20);
   }
 
@@ -265,7 +268,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  //  std::cout<<"Filling signal"<<std::endl;
+  LOG(DEB)<<"Filling signal"<<std::endl;
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
   Nleptons = 0;
@@ -497,7 +500,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   xsecScaling = fScaleFactor;
 
   if (fScaleFactor <= 0.0){
-    std::cout << "SCALE FACTOR TO LOW " << std::endl;
+    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
     sleep(20);
   }
 

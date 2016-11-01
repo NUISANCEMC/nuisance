@@ -43,7 +43,7 @@ MiniBooNE_CC1pip_XSec_2DTuCosmu_nu::MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(std::stri
 
 /*
 void MiniBooNE_CC1pip_XSec_2DTuCosmu_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   fDataHist = (TH2D*)(dataFile->Get("MUCTVKEXSec")->Clone());

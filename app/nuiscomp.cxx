@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  std::cout<<"Starting nuiscomp.exe"<<std::endl;
+  LOG(FIT)<<"Starting nuiscomp.exe"<<std::endl;
 
   // Make minimizer class and run fit
   ComparisonRoutines* min = new ComparisonRoutines(argc, argv);
@@ -64,9 +64,9 @@ int main(int argc, char* argv[]){
   min->SaveCurrentState();
 
   // Show Final Status
-  std::cout<<"-------------------------------------"<<std::endl;
-  std::cout<<"Comparison Complete."<<std::endl;
-  std::cout<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"Comparison Complete."<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
   
   return status;
 }

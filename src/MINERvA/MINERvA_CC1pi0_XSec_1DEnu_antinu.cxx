@@ -1,3 +1,24 @@
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NUISANCE.
+*
+*    NUISANCE is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NUISANCE is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CC1pi0_XSec_1DEnu_antinu.h"
 
 // The constructor
@@ -60,26 +81,26 @@ void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-// ************************************** 
-// MINERvA CC1pi0 in anti-neutrino mode   
-// Unfortunately there's no information on the neutrino component which is      
-// subtracted off      
-//  
-// 2014 analysis:      
-//                Exactly one positive muon                  
-//                Exactly one observed pi0                   
-//                No pi+/pi allowed       
-//                No information on what is done with mesons, oops?             
-//                No information on what is done with nucleons, oops?           
-//  
-// 2016 analysis:      
-//                Exactly one positive muon                  
-//                Exactly one observed pi0                   
-//                No other mesons         
-//                No restriction on number of nucleons       
-//  
-//******************************************************************** 
+// **************************************
+// MINERvA CC1pi0 in anti-neutrino mode
+// Unfortunately there's no information on the neutrino component which is
+// subtracted off
+//
+// 2014 analysis:
+//                Exactly one positive muon
+//                Exactly one observed pi0
+//                No pi+/pi allowed
+//                No information on what is done with mesons, oops?
+//                No information on what is done with nucleons, oops?
+//
+// 2016 analysis:
+//                Exactly one positive muon
+//                Exactly one observed pi0
+//                No other mesons
+//                No restriction on number of nucleons
+//
+//********************************************************************
 bool MINERvA_CC1pi0_XSec_1DEnu_antinu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
 }

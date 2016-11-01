@@ -1,5 +1,8 @@
-#include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 #include <iomanip>
+
+#include "T2K_SignalDef.h"
+
+#include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 
 // The constructor
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu::T2K_CC1pip_CH_XSec_1Dthq3pi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
@@ -22,21 +25,21 @@ T2K_CC1pip_CH_XSec_1Dthq3pi_nu::T2K_CC1pip_CH_XSec_1Dthq3pi_nu(std::string input
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
   TH1D *dataCopy = (TH1D*)(dataFile->Get("hResult_sliced_0_1"))->Clone();
 
   double *binEdges = new double[dataCopy->GetNbinsX()-1];
-  std::cout << dataCopy->GetNbinsX() << std::endl;
+  LOG(DEB) << dataCopy->GetNbinsX() << std::endl;
   for (int i = 1; i < dataCopy->GetNbinsX()+1; i++) {
     binEdges[i-1] = dataCopy->GetBinLowEdge(i);
-    std::cout << i-1 << " " << binEdges[i-1] << std::endl;
+    LOG(DEB) << i-1 << " " << binEdges[i-1] << std::endl;
   }
 
   for (int i = 0; i < dataCopy->GetNbinsX()+5; i++) {
-    std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
+    LOG(DEB) << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
   fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataCopy->GetNbinsX()-1, binEdges);
@@ -44,7 +47,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetDataValues(std::string fileLocation) {
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
     fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
+    LOG(DEB) << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
   fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
@@ -57,7 +60,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetDataValues(std::string fileLocation) {
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetCovarMatrix(std::string fileLocation) {
-  std::cout << "Covariance: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Covariance: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH2D *covarMatrix = (TH2D*)(dataFile->Get("TMatrixDBase;1"))->Clone();
@@ -65,7 +68,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetCovarMatrix(std::string fileLocation) {
   int nBinsX = covarMatrix->GetXaxis()->GetNbins();
   int nBinsY = covarMatrix->GetYaxis()->GetNbins();
 
-  if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
+  if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
   // First bin is underflow, last bin is overflow
   this->covar = new TMatrixDSym(nBinsX-2);
@@ -77,7 +80,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetCovarMatrix(std::string fileLocation) {
     for (int j = 1; j < nBinsY-1; j++) {
       (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
       (*this->fFullCovar)(i-1, j-1) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
-      std::cout << "covar(" << i-1 << ", " << j-1 << ") = " << (*this->covar)(i-1,j-1) << std::endl;
+      LOG(DEB) << "covar(" << i-1 << ", " << j-1 << ") = " << (*this->covar)(i-1,j-1) << std::endl;
     }
   } //should now have set covariance, I hope
 
@@ -102,7 +105,7 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::FillEventVariables(FitEvent *event) {
     if (PID == 211) {
       Ppip = event->PartInfo(j)->fP;
     } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
+      Pmu = (event->PartInfo(j))->fP;
     }
   }
 
@@ -113,9 +116,9 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dthq3pi_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // This sample requires pion directional information so can not include Michel tag sample
 // i.e. will need to cut the pion phase space
   return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);

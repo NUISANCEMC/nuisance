@@ -52,6 +52,8 @@ MINERvA_CCinc_XSec_1Dx_ratio.cxx
 MINERvA_CCinc_XSec_1DEnu_ratio.cxx
 MINERvA_CCinc_XSec_1Dx_nu.cxx
 MINERvA_CCinc_XSec_1DEnu_nu.cxx
+
+MINERvA_SignalDef.cxx
 )
 
 set(HEADERFILES
@@ -90,6 +92,8 @@ MINERvA_CCinc_XSec_1Dx_ratio.h
 MINERvA_CCinc_XSec_1DEnu_ratio.h
 MINERvA_CCinc_XSec_1Dx_nu.h
 MINERvA_CCinc_XSec_1DEnu_nu.h
+
+MINERvA_SignalDef.h
 )
 
 set(LIBNAME expMINERvA)

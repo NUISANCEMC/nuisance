@@ -75,6 +75,8 @@ if [[ "@USE_GENIE@" != "0" ]]; then
   export LOG4CPP_LIB="@LOG4CPP_LIB@"
   export LOG4CPP_INC="@LOG4CPP_INC@"
 
+  export LHAPATH="@LHAPATH@"
+
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE@/lib:"* ]]; then
     export LD_LIBRARY_PATH=@GENIE@/lib:$LD_LIBRARY_PATH
   fi

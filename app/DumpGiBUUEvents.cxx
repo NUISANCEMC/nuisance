@@ -20,17 +20,18 @@
 #include <iostream>
 
 #include "StdHepEvt.h"
+#include "FitLogger.h"
 
 int main(int argv, char const *argc[]) {
   if (argv != 2) {
-    std::cerr << "[ERROR]: expected a single input GiBUU rootracker file."
+    ERR(FTL) << "[ERROR]: expected a single input GiBUU rootracker file."
               << std::endl;
     return 1;
   }
   std::string inpf(argc[1]);
 
   if (!inpf.length()) {
-    std::cerr << "[ERROR]: expected an input GiBUU rootracker file."
+    ERR(FTL) << "[ERROR]: expected an input GiBUU rootracker file."
               << std::endl;
     return 2;
   }
@@ -42,14 +43,14 @@ int main(int argv, char const *argc[]) {
   bool ok = giRead.SetBranchAddresses(&tn);
 
   if (!ok) {
-    std::cerr
-        << "[ERROR]: Could not correctly set branch address for input file."
-        << std::endl;
+    ERR(FTL)
+      << "[ERROR]: Could not correctly set branch address for input file."
+      << std::endl;
     return 4;
   }
 
   for (Long64_t ievt = 0; ievt < tn.GetEntries(); ++ievt) {
     tn.GetEntry(ievt);
-    std::cout << WriteGiBUUEvent(giRead) << std::endl;
+    LOG(EVT) << WriteGiBUUEvent(giRead) << std::endl;
   }
 }

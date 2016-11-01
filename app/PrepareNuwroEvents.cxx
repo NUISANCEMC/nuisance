@@ -7,6 +7,7 @@
 #include "TH1D.h"
 #include "TTree.h"
 #include "PlotUtils.h"
+#include "FitLogger.h"
 
 void printInputCommands(){ return; };
 void CreateRateHistograms(std::string inputs, bool force_out);
@@ -39,7 +40,7 @@ int main(int argc, char* argv[]){
 
   CreateRateHistograms(inputfiles[0], force_output);
   
-  std::cout << "Finished NUWRO Prep." << std::endl;
+  LOG(FIT) << "Finished NUWRO Prep." << std::endl;
 };
 
 //*******************************
@@ -68,7 +69,7 @@ void CreateRateHistograms(std::string inputs, bool force_out){
   
   allpdg.push_back(0);
 
-  std::cout<<"Nuwro fluxtype = "<<fluxtype<<std::endl;
+  LOG(FIT)<<"Nuwro fluxtype = "<<fluxtype<<std::endl;
   if (fluxtype == 0){
     
     std::string fluxstring = evt->par.beam_energy;
@@ -77,15 +78,15 @@ void CreateRateHistograms(std::string inputs, bool force_out){
     double Elow  = double(fluxvals[0])/1000.0;
     double Ehigh = double(fluxvals[1])/1000.0;
 
-    std::cout << " - Adding new nuwro flux "
-	      << "pdg: " << pdg
-	      << "Elow: " << Elow
-	      << "Ehigh: " << Ehigh
-	      << std::endl;
-
+    LOG(FIT) << " - Adding new nuwro flux "
+	     << "pdg: " << pdg
+	     << "Elow: " << Elow
+	     << "Ehigh: " << Ehigh
+	     << std::endl;
+    
     TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
     for (int j = 2; j < fluxvals.size(); j++){
-      cout << j <<" "<<fluxvals[j]<<endl;
+      LOG(DEB) << j <<" "<<fluxvals[j]<<endl;
       fluxplot->SetBinContent(j-1, fluxvals[j]);
     }
 
@@ -129,12 +130,12 @@ void CreateRateHistograms(std::string inputs, bool force_out){
       double Elow  = double(fluxvals[2])/1000.0;
       double Ehigh = double(fluxvals[3])/1000.0;
 
-      std::cout << " - Adding new nuwro flux "
-		<< "pdg: " << pdg
-		<< "pctg: " << pctg
-		<< "Elow: " << Elow
-		<< "Ehigh: " << Ehigh
-		<< std::endl;
+      LOG(FIT) << " - Adding new nuwro flux "
+	       << "pdg: " << pdg
+	       << "pctg: " << pctg
+	       << "Elow: " << Elow
+	       << "Ehigh: " << Ehigh
+	       << std::endl;
       
       TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
       for (int j = 4; j < fluxvals.size(); j++){
@@ -205,11 +206,11 @@ void CreateRateHistograms(std::string inputs, bool force_out){
     intxseclist[pdg] += TotXSec;
 
     if (i % countwidth == 0)
-      cout << "Processed " << i <<" events "
-	   << " (" << int(i*100.0/nevents) << "%)"
-	   << " : E, W, PDG = " 
-	   << Enu << ", " << TotXSec << ", "
-	   << pdg << std::endl;
+      LOG(FIT) << "Processed " << i <<" events "
+	       << " (" << int(i*100.0/nevents) << "%)"
+	       << " : E, W, PDG = " 
+	       << Enu << ", " << TotXSec << ", "
+	       << pdg << std::endl;
 	    
   }
 
@@ -221,8 +222,8 @@ void CreateRateHistograms(std::string inputs, bool force_out){
     int pdg = allpdg[i];
     double AvgXSec = intxseclist[0] * 1E38 / double(nevtlist[0]);
 
-    cout << pdg << " Avg XSec = " << AvgXSec << endl;
-    cout << pdg << " nevents = " << double(nevtlist[pdg]) << endl;
+    LOG(FIT) << pdg << " Avg XSec = " << AvgXSec << endl;
+    LOG(FIT) << pdg << " nevents = " << double(nevtlist[pdg]) << endl;
     
     // Convert events to PDF
     eventlist[pdg] -> Scale(1.0 / zeroevents->Integral("width"));
@@ -258,7 +259,7 @@ void HaddNuwroFiles(std::vector<std::string>& inputs, bool force_out){
   for (UInt_t i = 0; i < inputs.size(); i++){    
     cmd += inputs[i] + " ";
   }
-  std::cout<<" Running HADD from ExtFit_PrepareNuwro: "<<cmd<<std::endl;
+  LOG(FIT) <<" Running HADD from ExtFit_PrepareNuwro: "<<cmd<<std::endl;
 
   // Start HADD
   system(cmd.c_str());

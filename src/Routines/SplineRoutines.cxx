@@ -73,7 +73,7 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]){
       else if (!std::strcmp(argv[i], "-e")) { error_flag -= 1; }
       else if (!std::strcmp(argv[i], "+e")) { error_flag += 1; }
       else {
-	std::cerr << "ERROR: unknown command line option given! - '"
+	ERR(FTL) << "ERROR: unknown command line option given! - '"
 		  <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
 	throw;
       }
@@ -81,8 +81,8 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]){
   }
 
   if (fCardFile.empty()){
-    std::cerr << "ERROR: card file not specified."   << std::endl;
-    std::cerr << "Run with '-h' to see options." << std::endl;
+    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
+    ERR(FTL) << "Run with '-h' to see options." << std::endl;
     throw;
   }
     
@@ -173,10 +173,12 @@ void SplineRoutines::ReadCard(std::string cardfile){
     // Show line if bad to help user
     if (samstatus == kErrorStatus ||
 	genstatus == kErrorStatus ||
-	parstatus == kErrorStatus) {
+	parstatus == kErrorStatus ||
+	evtstatus == kErrorStatus ||
+	binstatus == kErrorStatus) {
       ERR(FTL) << "Bad Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      ERR(FTL) << line << endl;
       throw;
     }
     
@@ -686,8 +688,6 @@ void SplineRoutines::TestEventSplines(){
 
     fRW->ReadSplineHead(splinput->GetSplineHead());
     
-    int countwidth = (nevents/10);
-
     // Small Plots on event-by-event
     // -------------------------------
 
@@ -800,7 +800,7 @@ void SplineRoutines::SaveEventSplines(){
     fRW->SetupSpline( name, fSplineTypes[name], fSplinePoints[name] );
   }
 
-  cout << "Starting spline inputs" <<  endl;
+  LOG(FIT) << "Starting spline inputs" <<  endl;
   // iterate over generic events
   std::map<std::string, InputHandler*>::const_iterator iter = fGenericInputs.begin();
 

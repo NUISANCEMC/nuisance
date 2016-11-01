@@ -71,14 +71,14 @@ FitSpline::FitSpline(std::string ident, std::string dist,
 
     if      (!choose_type.compare("PNTS")) points_final = points_temp;
     else if (!choose_type.compare("SCAN")){
-      std::cout<<"RUNNING SCAN"<<std::endl;
+      LOG(FIT)<<"RUNNING SCAN"<<std::endl;
       int npoints = int(points_temp[0]);
       double low  = double(points_temp[1]);
 
       double high = double(points_temp[2]);
-      std::cout<<"Npoints "<<npoints<<" "<<low<<" "<<high<<std::endl;
+      LOG(FIT)<<"Npoints "<<npoints<<" "<<low<<" "<<high<<std::endl;
       for (int i = 0; i < npoints; i++){
-	std::cout<<"Pushing back "<< low + (i+0.)*(high - low)/(npoints-1.0+0.)<<std::endl;
+	LOG(FIT)<<"Pushing back "<< low + (i+0.)*(high - low)/(npoints-1.0+0.)<<std::endl;
 	points_final.push_back( low + (i+0.)*(high - low)/(npoints-1.0+0.) );
       }
     }
@@ -176,7 +176,7 @@ void FitSpline::SetType(std::string type){
   else if (!type.compare( "1DTSpline3")){
     SetType( k1DTSpline3, x_vals[0].size()*4, 1, false );
   }
-  else { std::cout << "Unkown dial value: "<<type<<std::endl; exit(-1); }
+  else { ERR(FTL) << "Unkown dial value: "<<type<<std::endl; exit(-1); }
   return;
 }
 
@@ -203,7 +203,7 @@ double FitSpline::DoEval(const double* x, const double* par, const bool use_offs
 
     // N Polynomial sets without constant
   case (k1DPol1): {
-    //    std::cout<<"Calcing pol1 with "<<y[0]<<" "<<par[0+off]<<std::endl;
+    LOG(DEB)<<"Calcing pol1 with "<<y[0]<<" "<<par[0+off]<<std::endl;
     return ( 1.0 + par[0+off] * y[0] ); }
 
   case (k1DPol2): { return ( 1.0 + par[0+off] * y[0] +
@@ -226,18 +226,18 @@ double FitSpline::DoEval(const double* x, const double* par, const bool use_offs
 
   case (k1DPol6): {
 
-    //    cout << "Calcing 1Dpol6 with " << y[0] << endl;
-    //    cout << "Par 0 " << par[0+off] << endl;
-    //    cout << "Par 1 " << par[1+off] << endl;
-    //    cout << "Par 2 " << par[2+off] << endl;
-
+    LOG(DEB) << "Calcing 1Dpol6 with " << y[0] << std::endl;
+    LOG(DEB) << "Par 0 " << par[0+off] << std::endl;
+    LOG(DEB) << "Par 1 " << par[1+off] << std::endl;
+    LOG(DEB) << "Par 2 " << par[2+off] << std::endl;
+    
     double val = ( 1.0 + par[0+off] * y[0] +
 			     par[1+off] * y[0] * y[0] +
 			     par[2+off] * y[0] * y[0] * y[0] +
 			     par[3+off] * pow(y[0],4) +
 			     par[4+off] * pow(y[0],5) +
 			     par[5+off] * pow(y[0],6) );
-    //    cout << "VAL = " << val << endl;
+    LOG(DEB) << "VAL = " << val << std::endl;
     return val;}
 
     // N Polynomial sets (with constant)
@@ -326,9 +326,8 @@ double FitSpline::DoEval(const double* x, const double* par, const bool use_offs
 
     // DEFAULT OPTION
   default:
-    std::cerr<<"Evaluating function enum not found!"<<std::endl;
+    ERR(FTL)<<"Evaluating function enum not found!"<<std::endl;
     exit(-1);
-    return 1.0;
   }
 };
 
@@ -379,15 +378,14 @@ std::vector<double> FitSpline::GetSplineCoeff(double* weights){
 
   /// DEFAULT
   default:
-    std::cout<<"DIAL HAS NO COEFFICIENT SET Implementation"<<std::endl;
-    std::cout<<"Dial Enum = "<<this->spline<<std::endl;
+    ERR(FTL)<<"DIAL HAS NO COEFFICIENT SET Implementation"<<std::endl;
+    ERR(FTL)<<"Dial Enum = "<<this->spline<<std::endl;
     exit(-1);
-    break;
   }
 
 
   if (coeff.empty()){
-    std::cerr<<"Error no dial coefficients saved from GetDialCoeff()"<<std::endl;
+    ERR(FTL)<<"Error no dial coefficients saved from GetDialCoeff()"<<std::endl;
     exit(-1);
   }
 

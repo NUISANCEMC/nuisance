@@ -18,18 +18,19 @@
 *******************************************************************************/
 #ifndef MINERVA_1DQ2_nu_H_SEEN
 #define MINERVA_1DQ2_nu_H_SEEN
-#include"Measurement1D.h"
+
+#include "Measurement1D.h"
 
 ///\brief MINERvA CCQE+2p2h Analysis : Q2 Distribution
 ///
-///\n Ref: 
-///\n Input: CH events generated with at least CCQE+2p2h interaction modes with flux given in Ref. 
-//********************************************************************  
+///\n Ref:
+///\n Input: CH events generated with at least CCQE+2p2h interaction modes with flux given in Ref.
+//********************************************************************
 class MINERvA_CCQE_XSec_1DQ2_nu : public Measurement1D {
-//********************************************************************  
+//********************************************************************
 public:
 
-  ///\brief Setup data histograms and full covariance matrix 
+  ///\brief Setup data histograms and full covariance matrix
   ///\n Available fit options: FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK
   ///\n Sample is given as /neutron.
   ///
@@ -55,7 +56,7 @@ public:
 
   bool isFluxFix; /// Flag for using updated flux
   bool fullphasespace; /// Flag for restricting phase space
-  
+
 };
-  
+
 #endif

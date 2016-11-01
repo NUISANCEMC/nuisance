@@ -61,16 +61,14 @@ void BEBC_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   }
 
   double hadMass = FitUtils::MpPi(Pp, Ppi0);
-  double Enu;
+  double Enu     = -1.0;
 
   // weirdly, the Enu distribution does not have a W < 1.4GeV cut
   if (hadMass < 1400) {
-    //std::cout << "hadMass = " << hadMass << "      " << "Enu = " << Enu << std::endl;
-    //std::cout << "Enu vec = " << Pnu.E() << std::endl;
+    LOG(DEB) << "hadMass = " << hadMass << "      " << "Enu = " << Enu << std::endl;
+    LOG(DEB) << "Enu vec = " << Pnu.E() << std::endl;
     Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
-  } else {
-    Enu = -1.0;
-  }
+  } 
 
   fXVar = Enu;
 

@@ -87,10 +87,10 @@ std::map< int, InputHandler* > EventManager::GetInputs(){
 void EventManager::AddInput(std::string handle, std::string infile){
 
   if (finputs.find(GetInputID(infile)) != finputs.end()){
-    std::cout<<"Event manager already contains this input. skipping"<<std::endl;
+    LOG(SAM)<<"Event manager already contains this input. skipping"<<std::endl;
     return;
   } else {
-    std::cout<<"Adding input "<<infile<<std::endl;
+    LOG(SAM)<<"Adding input "<<infile<<std::endl;
   }
 
   int id = GetInputID(infile);

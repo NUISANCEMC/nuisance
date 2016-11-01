@@ -17,11 +17,13 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "MINERvA_SignalDef.h"
+
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
 
-//******************************************************************** 
+//********************************************************************
 MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   // Setup Measurement Defaults
   fName = name;
@@ -83,8 +85,8 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*13./7./this->TotalIntegratedFlux(); 
-  
+  fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*13./7./this->TotalIntegratedFlux();
+
 };
 
 //********************************************************************
@@ -93,7 +95,7 @@ void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 
   double q2qe = -1.0;
   double ThetaMu = 1.0;
-  
+
   // Get the relevant signal information
   for (UInt_t j = 0; j < event->Npart(); ++j){
 
@@ -101,7 +103,7 @@ void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 
     ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
     q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 30.,  false);
-    
+
     break;
   }
 

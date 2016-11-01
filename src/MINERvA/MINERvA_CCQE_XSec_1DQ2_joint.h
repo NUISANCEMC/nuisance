@@ -20,7 +20,6 @@
 #ifndef MINERVA_1DQ2_joint_H_SEEN
 #define MINERVA_1DQ2_joint_H_SEEN
 
-
 // Fit Includes
 #include "MeasurementBase.h"
 #include "JointMeas1D.h"
@@ -37,8 +36,8 @@ public:
  private:
 
   // This is a dummy, the signal is defined separately for each sample!
-  bool isSignal(){return false;};  
-  
+  bool isSignal(){return false;};
+
   bool isFluxFix, fullphasespace;
 
   // Need to have the neutrino and anti-neutrino objects here
@@ -47,5 +46,5 @@ public:
   Int_t nBins;
 
 };
-  
+
 #endif

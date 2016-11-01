@@ -27,6 +27,7 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu.cxx
 T2K_CC1pip_CH_XSec_1Dthpi_nu.cxx
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.cxx
+T2K_SignalDef.cxx
 )
 
 set(HEADERFILES
@@ -40,6 +41,7 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu.h
 T2K_CC1pip_CH_XSec_1Dthpi_nu.h
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.h
+T2K_SignalDef.h
 )
 
 set(LIBNAME expT2K)

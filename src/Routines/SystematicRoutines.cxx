@@ -29,23 +29,23 @@ void SystematicRoutines::Init(){
 
   fInputFile = "";
   fInputRootFile = NULL;
-  
+
   fOutputFile = "";
   fOutputRootFile = NULL;
 
   fCovar  = fCovarFree  = NULL;
   fCorrel = fCorrelFree = NULL;
   fDecomp = fDecompFree = NULL;
-  
+
   fStrategy = "ErrorBands";
   fRoutines.clear();
 
   fCardFile = "";
-  
+
   fFakeDataInput = "";
 
   fSampleFCN    = NULL;
-  
+
   fAllowedRoutines = ("ErrorBands,PlotLimits");
 
 };
@@ -84,25 +84,31 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
       else if (!std::strcmp(argv[i], "-e")) { error_flag -= 1; }
       else if (!std::strcmp(argv[i], "+e")) { error_flag += 1; }
       else {
-	std::cerr << "ERROR: unknown command line option given! - '"
-		  <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
+	ERR(FTL) << "ERROR: unknown command line option given! - '"
+		 <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
 	throw;
       }
     }
   }
 
   if (fCardFile.empty()){
-    std::cerr << "ERROR: card file not specified."   << std::endl;
-    std::cerr << "Run with '-h' to see options." << std::endl;
+    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
+    ERR(FTL) << "Run with '-h' to see options." << std::endl;
     throw;
   }
-  
+
   if (fOutputFile.empty()){
-    std::cerr << "WARNING: output file not specified." << std::endl;
-    std::cerr << "Using cardfile.root" << std::endl;
+    ERR(FTL) << "WARNING: output file not specified." << std::endl;
+    ERR(FTL) << "Using cardfile.root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
-  
+
+  if(fCardFile == fOutputFile){
+    std::cerr << "WARNING: output file and card file are the same file, "
+      "writing: " << fCardFile << ".root" << std::endl;
+    fOutputFile = fCardFile + ".root";
+  }
+
   // Fill fit routines and check they are good
   fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
   for (UInt_t i = 0; i < fRoutines.size(); i++){
@@ -113,7 +119,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
       throw;
     }
   }
-  
+
   // CONFIG
   // ---------------------------
   std::string par_dir =  GeneralUtils::GetTopLevelDir()+"/parameters/";
@@ -127,12 +133,12 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   if (!maxevents_flag.empty()){
     FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
   }
-  
+
   if (verbosity_flag != 0){
     int curverb = FitPar::Config().GetParI("VERBOSITY");
     FitPar::Config().SetParI("VERBOSITY", curverb + verbosity_flag);
   }
-  
+
   if (error_flag != 0){
     int curwarn = FitPar::Config().GetParI("ERROR");
     FitPar::Config().SetParI("ERROR", curwarn + error_flag);
@@ -142,7 +148,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   ERR_VERB(FitPar::Config().GetParI("ERROR"));
 
   // CARD
-  // --------------------------- 
+  // ---------------------------
   // Parse Card Options
   ReadCard(fCardFile);
 
@@ -153,12 +159,12 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   FitPar::Config().Write();
 
   // Starting Setup
-  // --------------------------- 
+  // ---------------------------
   SetupCovariance();
   SetupFCN();
   GetCovarFromFCN();
   SetupRWEngine();
-  
+
   return;
 };
 
@@ -177,7 +183,7 @@ void SystematicRoutines::ReadCard(std::string cardfile){
     std::string line = (*iter);
     linecount++;
 
-    // Skip Empties 
+    // Skip Empties
     if (line.empty()) continue;
     if (line.c_str()[0] == '#') continue;
 
@@ -188,22 +194,22 @@ void SystematicRoutines::ReadCard(std::string cardfile){
     if (samstatus == kErrorStatus) {
       ERR(FTL) << "Bad Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      LOG(FIT) << line << endl;
       throw;
     }
   }
-  
+
   // Read Parameters second
   linecount = 0;
   for (std::vector<std::string>::iterator iter = cardlines.begin();
        iter != cardlines.end(); iter++){
     std::string line = (*iter);
     linecount++;
-    
+
     // Skip Empties
     if (line.empty()) continue;
     if (line.c_str()[0] == '#') continue;
-        
+
     // Try Parameter Reads
     int parstatus = ReadParameters(line);
     int fakstatus = ReadFakeDataPars(line);
@@ -213,11 +219,11 @@ void SystematicRoutines::ReadCard(std::string cardfile){
 	fakstatus == kErrorStatus ){
       ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      LOG(FIT) << line << endl;
       throw;
     }
   }
- 
+
   return;
 };
 
@@ -225,17 +231,17 @@ void SystematicRoutines::ReadCard(std::string cardfile){
 int SystematicRoutines::ReadParameters(std::string parstring){
 //******************************************
 
-  std::string inputspec = "RW Dial Inputs Syntax \n" 
+  std::string inputspec = "RW Dial Inputs Syntax \n"
     "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
     "fix  input: TYPE  NAME  VALUE  [STATE] \n"
     "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-    "Allowed Types: \n" 
-    "neut_parameter,niwg_parameter,t2k_parameter," 
+    "Allowed Types: \n"
+    "neut_parameter,niwg_parameter,t2k_parameter,"
     "nuwro_parameter,gibuu_parameter";
-    
+
   // Check sample input
   if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-  
+
   // Parse inputs
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
 
@@ -244,7 +250,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
       strvct[0].find("parameter") == std::string::npos){
     return kGoodStatus;
   }
-  
+
   // Check length
   if (strvct.size() < 3){
     ERR(FTL) << "Input rw dials need to provide at least 3 inputs." << std::endl;
@@ -260,7 +266,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
   double maxval  = parval + 1.0;
   double stepval = 1.0;
   std::string state = "FIX"; //[DEFAULT]
-  
+
   // Check Type
   if (FitBase::ConvDialType(partype) == kUNKNOWN){
     ERR(FTL) << "Unknown parameter type! " << partype << endl;
@@ -274,7 +280,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
-  
+
   // Option Extra (No Limits)
   if (strvct.size() == 4){
     state = strvct[3];
@@ -286,7 +292,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
-  
+
   // Option Extra (With limits and steps)
   if (strvct.size() >= 6){
     minval  = GeneralUtils::StrToDbl(strvct[3]);
@@ -317,19 +323,19 @@ int SystematicRoutines::ReadParameters(std::string parstring){
     ERR(FTL) << "Duplicate parameter names given for " << parname << endl;
     throw;
   }
-  
+
   // Setup Containers
   fParams.push_back(parname);
 
   fTypeVals[parname]  = FitBase::ConvDialType(partype);
-  
+
   fStartVals[parname] = parval;
   fCurVals[parname]   = fStartVals[parname];
-  
+
   fErrorVals[parname] = 0.0;
 
   fStateVals[parname] = state;
-  
+
   bool fixstate = state.find("FIX") != std::string::npos;
   fFixVals[parname]      = fixstate;
   fStartFixVals[parname] = fFixVals[parname];
@@ -354,7 +360,7 @@ int SystematicRoutines::ReadFakeDataPars(std::string parstring){
   std::string inputspec = "Fake Data Dial Inputs Syntax \n"
     "fake value: fake_parameter  NAME  VALUE  \n"
     "Name should match dialnames given in actual dial specification.";
-  
+
   // Check sample input
   if (parstring.find("fake_parameter") == std::string::npos)
     return kGoodStatus;
@@ -385,7 +391,7 @@ int SystematicRoutines::ReadFakeDataPars(std::string parstring){
   // Print the fake parameter
   LOG(MIN) << "Read Fake Parameter " << parname << " " << parval << std::endl;
 
-  // Tell reader its all good  
+  // Tell reader its all good
   return kGoodStatus;
 }
 
@@ -393,7 +399,7 @@ int SystematicRoutines::ReadFakeDataPars(std::string parstring){
 int SystematicRoutines::ReadSamples(std::string samstring){
 //******************************************
   std::string inputspec = "";
-  
+
   // Check sample input
   if (samstring.find("sample") == std::string::npos)
     return kGoodStatus;
@@ -410,7 +416,6 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   // Check length
   if (strvct.size() < 3){
     ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    ERR(FTL) << "    Received: "<< inputspec << std::endl;
     return kErrorStatus;
   }
 
@@ -434,14 +439,14 @@ int SystematicRoutines::ReadSamples(std::string samstring){
     ERR(FTL) << "Duplicate samples given for " << samname << endl;
     throw;
   }
-  
+
   fParams.push_back(normname);
-  
+
   fTypeVals[normname]  = kNORM;
   fStartVals[normname] = samnorm;
   fCurVals[normname]   = fStartVals[normname];
   fErrorVals[normname] = 0.0;
-  
+
   fMinVals[normname]  = 0.1;
   fMaxVals[normname]  = 10.0;
   fStepVals[normname] = 0.5;
@@ -471,7 +476,7 @@ void SystematicRoutines::SetupRWEngine(){
     FitBase::GetRW() -> IncludeDial(name, fTypeVals.at(name) );
   }
   UpdateRWEngine(fStartVals);
-  
+
   return;
 }
 
@@ -483,7 +488,7 @@ void SystematicRoutines::SetupFCN(){
   if (fSampleFCN) delete fSampleFCN;
   fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
   SetFakeData();
-    
+
   return;
 }
 
@@ -523,7 +528,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 
   // Keep track of what is being thrown
   std::map<std::string, std::string> dialthrowhandle;
-  
+
   // Get Covariance Objects from FCN
   std::list<ParamPull*> inputpulls = fSampleFCN->GetPullList();
   for (PullListConstIter iter = inputpulls.begin();
@@ -547,7 +552,7 @@ void SystematicRoutines::GetCovarFromFCN(){
     for (int i = 0; i < dialhist.GetNbinsX(); i++){
       std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
       dialthrowhandle[name] = pull->GetName();
-	
+
       if (fCurVals.find(name) == fCurVals.end()){
 	ERR(WRN) << name << " Dial not found in throws, so adding that. " << endl;
 
@@ -573,7 +578,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 
   // Check if no throws given
   if (fInputThrows.empty()){
-    
+
     ERR(WRN) << "No covariances given to nuissyst" << endl;
     ERR(WRN) << "Pushing back an uncorrelated gaussian throw error for each free parameter using step size" << endl;
 
@@ -583,7 +588,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 
       // Make Terms
       std::string name     = syst + "_pull";
-      
+
       std::ostringstream pullterm;
       pullterm << "DIAL:" << syst << ";"
 	       << fStartVals[syst] << ";"
@@ -611,12 +616,12 @@ void SystematicRoutines::GetCovarFromFCN(){
   // Print Helper String
   if (!helperstr.str().empty()){
     ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << endl;
-    cout << endl << helperstr.str() << endl;
+    LOG(FIT) << endl << helperstr.str() << endl;
     sleep(2);
   }
 
-  
-  
+
+
   // Print Throw State
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams[i];
@@ -626,14 +631,14 @@ void SystematicRoutines::GetCovarFromFCN(){
       LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = FIXED" << endl;
     }
   }
-  
+
   // Pause anyway
   sleep(1);
   return;
 }
 
 
-  
+
 
 /*
   Fitting Functions
@@ -653,9 +658,9 @@ void SystematicRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals
   return;
 }
 
-//************************************* 
+//*************************************
 void SystematicRoutines::Run(){
-//************************************* 
+//*************************************
 
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
@@ -665,7 +670,7 @@ void SystematicRoutines::Run(){
 
     if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    
+
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange){
       LOG(FIT) << "Ending fit routines loop." << endl;
@@ -676,17 +681,17 @@ void SystematicRoutines::Run(){
   return;
 }
 
-//************************************* 
+//*************************************
 void SystematicRoutines::PrintState(){
-//************************************* 
+//*************************************
   LOG(FIT)<<"------------"<<std::endl;
-  
+
   // Count max size
   int maxcount = 0;
   for (UInt_t i = 0; i < fParams.size(); i++){
     maxcount = max(int(fParams[i].size()), maxcount);
   }
-  
+
   // Header
   LOG(FIT) << " #    " << left << setw(maxcount) << "Parameter "
 	   << " = "
@@ -722,9 +727,9 @@ void SystematicRoutines::PrintState(){
     double      convval   = FitBase::RWSigmaToAbs(typestr, syst, curval);
     double      converr   = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
 			     FitBase::RWSigmaToAbs(typestr, syst, 0.0));
-    
+
     std::ostringstream curparstring;
-    
+
     curparstring << " " << setw(3) << left
 		 << i << ". "
 		 << setw(maxcount) << syst << " = "
@@ -734,7 +739,7 @@ void SystematicRoutines::PrintState(){
                  << setw(10) << convval    << " +- "
                  << setw(10) << converr    << " "
                  << setw(8)  << convunits;
-      
+
 
     LOG(FIT) << curparstring.str() << endl;
   }
@@ -750,7 +755,7 @@ void SystematicRoutines::PrintState(){
 /*
   Write Functions
 */
-//************************************* 
+//*************************************
 void SystematicRoutines::SaveResults(){
 //*************************************
 
@@ -763,7 +768,7 @@ void SystematicRoutines::SaveResults(){
 //*************************************
 void SystematicRoutines::SaveCurrentState(std::string subdir){
 //*************************************
-  
+
   LOG(FIT)<<"Saving current full FCN predictions" <<std::endl;
 
   // Setup DIRS
@@ -772,14 +777,14 @@ void SystematicRoutines::SaveCurrentState(std::string subdir){
     TDirectory* newdir =(TDirectory*) gDirectory->mkdir(subdir.c_str());
     newdir->cd();
   }
-  
+
   FitBase::GetRW()->Reconfigure();
   fSampleFCN->ReconfigureAllEvents();
   fSampleFCN->Write();
 
   // Change back to current DIR
   curdir->cd();
-  
+
   return;
 }
 
@@ -788,11 +793,11 @@ void SystematicRoutines::SaveNominal(){
 //*************************************
 
   fOutputRootFile->cd();
-  
+
   LOG(FIT)<<"Saving Nominal Predictions (be cautious with this)" <<std::endl;
   FitBase::GetRW()->Reconfigure();
   SaveCurrentState("nominal");
-  
+
 };
 
 //*************************************
@@ -800,7 +805,7 @@ void SystematicRoutines::SavePrefit(){
 //*************************************
 
   fOutputRootFile->cd();
-  
+
   LOG(FIT)<<"Saving Prefit Predictions"<<std::endl;
   UpdateRWEngine(fStartVals);
   SaveCurrentState("prefit");
@@ -839,7 +844,7 @@ void SystematicRoutines::SetupCovariance(){
   for (UInt_t i = 0; i < fParams.size(); i++){
     if (!fFixVals[fParams[i]]) NFREE++;
   }
-  
+
   if (NDIM == 0) return;
 
   fCovar = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);
@@ -878,7 +883,7 @@ void SystematicRoutines::SetupCovariance(){
 //*************************************
 void SystematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
-  
+
   // Set fThrownVals to all values in currentVals
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string name = fParams.at(i);
@@ -903,7 +908,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
     pull->ResetToy();
 
   }
-    
+
   return;
 };
 
@@ -949,7 +954,7 @@ void SystematicRoutines::GenerateErrorBands(){
 
     // Generate Random Parameter Throw
     ThrowCovariance(uniformly);
-    
+
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
     chi2 = fSampleFCN->DoEval( vals );
@@ -1048,10 +1053,10 @@ void SystematicRoutines::GenerateErrorBands(){
   return;
 };
 
-//*************************************   
+//*************************************
 void SystematicRoutines::PlotLimits(){
 //*************************************
-  
+
   TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
   limfolder->cd();
 
@@ -1123,9 +1128,9 @@ void SystematicRoutines::PlotLimits(){
       // Make new folder
       TDirectory* maxfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
       maxfolder->cd();
-      
+
       allfolders.push_back(curvalstring);
-      
+
       // Update Iterations
       double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
       fSampleFCN->DoEval( vals );
