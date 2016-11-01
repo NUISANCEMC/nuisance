@@ -16,43 +16,16 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
-// Author: Callum Wilkinson    01/2014 
-
-//         Patrick Stowell     09/2015
-/**
-  Usage: ./GSLminimizerWithReWeight.exe -c card file, where samples and parameters are defined
-                             -o output file, where the results of the fit are stored
-   where:   
-*/
-
 #include "ComparisonRoutines.h"
 
 //*******************************
 void printInputCommands(){
 //*******************************
   
-  std::cout<<"ExtFit_minimizer.exe -c cardFile -o outFile [-f fitStategy] [-d fakeDataFile] [-i inputFile] [-q config_name=config_val] \n";
-  std::cout<<std::endl;
-  std::cout<<"Arguments:"<<std::endl;
-  std::cout<<"     -c cardFile:   Path to card file that defines fit samples, free parameters, and config overrides \n";
+  std::cout << "nuiscomp -c cardfile -o outfile [-q configname=configval] \n";
+  std::cout << "\n Arguments : \n";
+  std::cout << "   -c cardfile: Path to NUISANCE card file defining fit samples \n"
   std::cout<<"     -o outFile:    Path to root file that will be created to save output file.\n";
-  std::cout<<"                    To turn automatically overwrite outFile if one exists turn off use 'config overwrite_output 1'\n";
-  std::cout<<"                    To automatically use previous  outFile as an inputFile if it exists so that the fit can be continued\n";
-  std::cout<<"                    use the flag 'config use_previous_output 1'. (A warning will be printed when doing this). \n";
-  std::cout<<"     -f fitStategy: Pass a comma seperated list of fit routines to run in order. Default is Migrad,FixAtLim \n";
-  std::cout<<"                    Possible Options: \n";
-  std::cout<<"                      1. Migrad - Minuit2 Migrad Minimizer \n";
-  std::cout<<"                      2. Simplex - Simplex Minimizer \n";
-  std::cout<<"                      3. Scan - Brute force scan of parameter space \n";
-  std::cout<<"                      4. FixAtLim - Takes any free parameters close to a limit and fixes them \n";
-  std::cout<<"                      5. Scan1D - Make 1D Scans and save them in a folder \n";
-  std::cout<<"                      6. Contours - Make Contour Scans \n";
-  std::cout<<"                      7. Save - Will save the state of the fitter (Always done by default at the end) \n";
-  std::cout<<"                      Extra option LowStatFit will perform each of these options with a lower number \n";
-  std::cout<<"                      of fit events (config lowstat). Example: LowStatMigrad, LowStatScan \n";
-  std::cout<<"     -f fakeDataFile: Uses the MC generated from a previous fit as a fake data set for these fits \n";
-  std::cout<<"     -i inputFile:  Uses the results from a previous fit file as starting input for these fits \n";
   std::cout<<"     -q config_name=config_val : Allows any config parameter to be overridden from the command line.\n";
   std::cout<<"                                 This will take priority over those given in the default, or cardFile. \n";
   std::cout<<"                                 example: -q verbosity=6 -q maxevents=10000 \n";
@@ -78,7 +51,7 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  std::cout<<"Starting ExtFit_comparison.exe"<<std::endl;
+  std::cout<<"Starting nuiscomp.exe"<<std::endl;
 
   // Make minimizer class and run fit
   ComparisonRoutines* min = new ComparisonRoutines(argc, argv);

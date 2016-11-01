@@ -136,7 +136,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
   }
 
   if (!maxevents_flag.empty()){
-    FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
+    FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
   }
   
   if (verbosity_flag != 0){
@@ -825,7 +825,7 @@ void MinimizerRoutines::LowStatRoutine(std::string routine){
 //*************************************
 
   LOG(FIT) << "Running Low Statistics Routine: "<<routine<<std::endl;
-  int lowstatsevents = FitPar::Config().GetParI("LOWSTATEVENTS");
+  int lowstatsevents = FitPar::Config().GetParI("minimizer.lowstatevents");
   int maxevents      = FitPar::Config().GetParI("MAXEVENTS");
   int verbosity      = FitPar::Config().GetParI("VERBOSITY");
 

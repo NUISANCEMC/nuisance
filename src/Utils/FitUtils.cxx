@@ -245,7 +245,8 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
                  2 * m_n * (E_pi0 + E_mu) + 2 * E_pi0 * E_mu -
                  2 * p_pi0 * p_mu * cos(th_pi0_mu)) /
                 (2 * (E_pi0 + E_mu - p_pi0 * cos(th_nu_pi0) -
-                      p_mu * cos(th_nu_mu) - m_n));
+                      p_mu * cos(th_nu_mu) - m_n)); 
+
 
   return rEnu;
 };
@@ -700,6 +701,8 @@ double FitUtils::Get_STV_dphit(FitEvent *event, bool Is0pi) {
   TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
   TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
   TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
+
+// Can I has edit?
 
   if (!Is0pi) {
     int pdgs[] = {221, -211, 111};

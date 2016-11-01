@@ -29,6 +29,7 @@
 // Refill all the particle vectors etc for the event
 void FitEvent::CalcKinematics() {
 //***************************************************
+// HELLO SUBLIME
 
 #ifdef __NEUT_ENABLED__
   if (fType == kNEUT) NeutKinematics();

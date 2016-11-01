@@ -310,7 +310,7 @@ void FitParameters::Write(){
 namespace FitPar {
 
 //! Returns FitParameters singleton. Usually used for parameters,
-//! e.g. FitPar::Config().GetParI("MAXEVENTS")
+//! e.g. FitPar::Config().GetParI("input.maxevents")
 FitParameters& Config() { return FitParameters::GetParams(); };
 
   std::string GetDataBase(){ return GeneralUtils::GetTopLevelDir() + "/data/"; };

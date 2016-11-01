@@ -113,7 +113,7 @@ class FitParameters {
 namespace FitPar {
 
 //! Returns FitParameters singleton. Usually used for parameters,
-//! e.g. FitPar::Config().GetParI("MAXEVENTS")
+//! e.g. FitPar::Config().GetParI("input.maxevents")
 FitParameters& Config();
 
 

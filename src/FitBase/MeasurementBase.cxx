@@ -70,7 +70,7 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 //********************************************************************
 
   // Add this infile to the global manager
-  if (FitPar::Config().GetParB("EventManager")){
+  if (FitPar::Config().GetParB("input.eventmanager")){
     FitBase::AddInput(fName, inputfile);
 
     // Get a pointer to the input so we can grab flux stuff
@@ -100,7 +100,7 @@ void MeasurementBase::Reconfigure(){
 //***********************************************
   LOG(REC) << " Reconfiguring sample "<<fName<<std::endl;
 
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  bool using_evtmanager = FitPar::Config().GetParB("input.eventmanager");
   int input_id = -1;
   if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
   cust_event = fInput->GetEventPointer();
@@ -204,7 +204,7 @@ void MeasurementBase::ReconfigureFast(){
 //***********************************************
   LOG(REC) << " Reconfiguring signal "<<this->fName<<std::endl;
 
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  bool using_evtmanager = FitPar::Config().GetParB("input.eventmanager");
   int input_id = -1;
 
   if (using_evtmanager){
@@ -291,7 +291,7 @@ void MeasurementBase::ConvertEventRates(){
 InputHandler* MeasurementBase::GetInput(){
 //***********************************************
 
-  if(FitPar::Config().GetParB("EventManager")){
+  if(FitPar::Config().GetParB("input.eventmanager")){
     return FitBase::GetInput(FitBase::GetInputID(inputfilename));
   } else {
     return this->fInput;

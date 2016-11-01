@@ -28,7 +28,7 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
   LOG(SAM) << " -> [" << infile_name << "]" << std::endl;
 
   // Initial Setup
-  fMaxEvents    = FitPar::Config().GetParI("MAXEVENTS");
+  fMaxEvents    = FitPar::Config().GetParI("input.maxevents");
   fIsJointInput = false;
   fEvent        = new FitEvent();
   fSignalEvent  = new BaseFitEvt();

@@ -1,56 +1,130 @@
 # ######################################################
-# WARNING: MANY OF THESE ARE DEPRECATED/UNUSED BEWARE
+# NUISANCE CONFIGURATION OPTIONS
+# This file is read in by default at runtime
+# If you want to override on a case by case bases use -q at runtime
 # ######################################################
-#
+
+# MAIN Configs
+# ######################################################
+
+# Logger goes from
+# 1 Quiet
+# 2 Fitter
+# 3 Samples
+# 4 Reconfigure Loops
+# 5 Every Event print out (SHOUT)
+# -1 DEBUGGING
+config verbosity    4
+
+# ERROR goes from
+# 0 NONE
+# 1 FATAL
+# 2 WARN
+config ERROR 2
+
+# Input Configs
+# ######################################################
+
 # Default Requirements file for the externalDataFitter Package
-# MAX Events : -1 is no cut
-config MAXEVENTS -1
-config MAX_CALLS    100000
-config MAX_ITERATIONS   10000000
-config statutils.addmcerror  0
-config LOWSTATEVENTS 25000
-config SERIAL_EVAL 1
+# MAX Events : -1 is no cut. Events will be scaled automatically to give good xsec predictions.
+config input.maxevents -1
 
-config fitname BestFit
-
-config linecolour 3
-config linestyle 1
-config fillstyle 0
-
-# Do we want an event manager?
+# Turn on/off event manager
 # EventManager enables us to only loop number of events once for multiple projections of the same measurements
 # e.g. MiniBooNE CC1pi+ Q2 and MiniBooNE CC1pi+ Tmu would ordinarily require 2 reconfigures, but with this enabled it requires only one
-config EventManager 0
+config input.eventmanager 0
+
+# Event Directories 
+# Can setup default directories and use @EVENT_DIR/path to link to it
+config EVENT_DIR        /data2/stowell/NIWG/
+config NEUT_EVENT_DIR   /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
+config GENIE_EVENT_DIR  /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
+config NUWRO_EVENT_DIR  /data2/stowell/NIWG/nuwro/fit_samples/
+config GIBUU_EVENT_DIR  /data/GIBUU/DIR/
+
+# In PrepareGENIE the reconstructed splines can be saved into the file
+config save_genie_splines 1
+
+# In InputHandler the option to regenerate NuWro flux/xsec plots is available
+# Going to move this to its own app soon
+config input.regen_nuwro_plots 0
+
+# DEVEL CONFIG OPTION, don't touch!
+config cachesize  0
+
+# ReWeighting Configuration Options
+# ######################################################
+
+# Set absolute twkdial for parameters
+config params.setabstwk 1
+
+# Convert Dials in output statements using dial conversion card
+config convert_dials 0
+
+# Vetos can be used to specify RW dials NOT to be loaded in
+# Useful if one specific one has an issue
+config FitWeight.fNIWGRW_veto  ''
+config FitWeight.fNuwroRW_veto ''
+config FitWeight.fNeutRW_veto  ''
+config FitWeight.fGenieRW_veto ''
+
+
+# Output Options
+# ######################################################
+
+# Save Nominal prediction with all rw engines at default
+config savenominal 0
+
+# Save prefit with values at starting values
+config saveprefit 0
 
 # Here's the full list of drawing options
 # See src/FitBase/Measurement1D::Write for more info   
 #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP
 #config drawopts DATA/MC
-config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/CANVPDG/CANVMC
+config sample.drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/CANVPDG/CANVMC
 
-# Event Directories
-config EVENT_DIR        /data2/stowell/NIWG/
-config NEUT_EVENT_DIR   /data2/stowell/NIWG/neut/fit_samples_neut5.3.3/
-config GENIE_EVENT_DIR  /data2/stowell/NIWG/genie/fit_samples_R.2.10.0/
-config NUWRO_EVENT_DIR  /data2/stowell/NIWG/nuwro/fit_samples/
+# Save the shape scaling applied with option SHAPE into the main MC hist
+config saveshapescaling 0
 
-# 0 is quiet, 1 is verbose, 2 is xxx, 3 is xxxx, 4 is xxx
-config VERBOSITY    4
+# Set style of 1D output histograms
+config linecolour 1
+config linestyle 1
+config linewidth 1
+
+
+# Statistical Options
+# ######################################################
+
+# Add MC Statistical error to likelihoods
+config statutils.addmcerror  0
+
+# NUISMIN Configurations
+# ######################################################
+
+config minimizer.maxcalls    1000000
+config minimizer.maxiterations    1000000
+config minimizer.tolerance  0.001
+
+# Number of events required in low stats routines
+config minimizer.lowstatevents 25000
+
+
+# Error band generator configs
+# ######################################################
 
 # For -f ErrorBands creates error bands for given measurements 
 # How many throws do we want
 config error_throws 200
+
 # Are we throwing uniform or according to Gaussian?
 config error_uniform 1
 
-# When reading a file in as dial input keep dials fixed?
-config FIX_INPUT_DIAL    0
 
-# Test Statistic
-config fit_type    CHI2
-config ADD_MC_ERROR    0
+# Other Individual Case Configs 
+# ######################################################
 
-# Which covariance matrix to throw in fits. FULL is the fixed norm covariance, SUB is the individual covariance that is being used for the fit.
+# Covariance throw options for fake data studies with MiniBooNE data.
 config thrown_covariance    FULL
 config throw_mc_stat    0.0
 config throw_diag_syst    0
@@ -61,99 +135,8 @@ config throw_mc_stat    0
 config muon_momentum_shift    0.0
 config muon_momentum_throw    0
 
-# include custom ratios in chi2 calculations (unphysical)
-config CUSTOM_RATIO_CHI2    0
-
-# Save standard sets of variables for each measurement
-config SAVE_LEPTON_MOM    0
-config SAVE_NUCLEON_MOM    0
-config save_standard_dist    0
-
-# Look at sterile induced biases in cross-section results
-config STERILE_ANALYSIS    0
-config STERILE_FREE    0
-
-# sin^{2}(2*theta)_{mumu}
-config STERILE_sin2theta    0.0
-config STERILE_MIN_sin2theta    0.0
-config STERILE_MAX_sin2theta    1.0
-
-# delta m^{2}_{24} [MeV]
-config STERILE_delmass2     10.0
-config STERILE_MIN_delmass2    0.0
-config STERILE_MAX_delmass2    10.0
-
-config SAVE_NOMINAL    1
-config SAVE_PREFIT    1
-config PARRALLEL_EVAL    0
-config TEMP_DIR    /home/stowell/temp_work/
-
-
-
-
-config maxevents    -1
-config t2kreweight.verbosity    2
-
-# Are we saving nominal?
-config extfit.savenominal    0
-# Are we saving pre-fit?
-config extfit.saveprefit    0
-
-config params.setabstwk 1
-
-config minimizer.fixinputdial    0
-config minimizer.fitfunction    chi2
-config minimizer.fittype    Minuit2
-config minimizer.fitroutine    Migrad 
-
-config minimizer.maxcalls    1000000
-config minimizer.maxiterations    1000000
-
-config minimizerFCN.parralleleval >  = 0
-config minimizerFCN.parrallel_eval    0
-config minimizerFCN.cluster_submit    0
-config minimizerFCN.workdir    /scratch/stowell/
-
-config measurement.savetree    0
-config measurement.addmcerror    0
-
-config measurement.fakedata.throwncov    FULL
-config measurement.fakedata.throwmcstat    1
-config measurement.fakedata.throwdiagcov    0
-
-config measratio1D.customchi2    0
-
-config event.muonmomentumshift    0.0
-config event.muonmomentumthrow    0
-
-config sterile.dissappearance    0
-config sterile.freevalues    0
-config sterile.sin2theta    0.0
-config sterile.sin2theta_min   0.0
-config sterile.sin2theta_max    1.0
-
-config sterile.delmass2    10.0
-config sterile.delmass2_min    0.0
-config sterile.delmass2_max    100.0
-
+# MINERvA Specific Configs
 config MINERvA_XSec_CCinc_2DEavq3_nu.hadron_cut    0
+config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true      0
+config Modes.split_PN_NN     0
 
-config custom_pars.ccqe_norm.dial    0.0
-config custom_pars.ccqe_norm.val    1.0
-
-config custom_pars.mec_q0q3cuts.dial    0
-config custom_pars.mec_q0q3cuts.switch    1
-config custom_pars.mec_q0q3cuts.const    0.34
-config custom_pars.mec_q0q3cuts.grad    0.0
-
-config custom_pars.mec_q0q3cuts.const.free    1
-config custom_pars.mec_q0q3cuts.grad.free    1
-
-config custom_pars.mec_norm.dial  0.0
-config custom_pars.mec_norm.val  1.0
-
-config minimizer.tolerance  0.001
-
-config cachesize 0
-config savenominal 0
-config saveprefit 0

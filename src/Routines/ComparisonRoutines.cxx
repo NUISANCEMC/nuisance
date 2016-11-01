@@ -501,7 +501,7 @@ void ComparisonRoutines::GenerateComparison(){
 //*************************************
   
   // Main Event Loop from event Manager
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  bool using_evtmanager = FitPar::Config().GetParB("input.eventmanager");
 
   if (using_evtmanager and false) {     
     LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
