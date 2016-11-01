@@ -24,11 +24,11 @@ void printInputCommands(){
   
   std::cout << "nuiscomp -c cardfile -o outfile [-q configname=configval] \n";
   std::cout << "\n Arguments : \n";
-  std::cout << "   -c cardfile: Path to NUISANCE card file defining fit samples \n"
-  std::cout<<"     -o outFile:    Path to root file that will be created to save output file.\n";
-  std::cout<<"     -q config_name=config_val : Allows any config parameter to be overridden from the command line.\n";
-  std::cout<<"                                 This will take priority over those given in the default, or cardFile. \n";
-  std::cout<<"                                 example: -q verbosity=6 -q maxevents=10000 \n";
+  std::cout << "   -c cardfile: Path to NUISANCE card file defining fit samples \n";
+  std::cout <<"     -o outFile:    Path to root file that will be created to save output file.\n";
+  std::cout <<"     -q config_name=config_val : Allows any config parameter to be overridden from the command line.\n";
+  std::cout <<"                                 This will take priority over those given in the default, or cardFile. \n";
+  std::cout <<"                                 example: -q verbosity=6 -q maxevents=10000 \n" << std::endl;
 
   exit(-1);
 
