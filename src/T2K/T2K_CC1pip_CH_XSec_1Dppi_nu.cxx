@@ -31,12 +31,12 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, 
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
   TH1D *dataCopy = (TH1D*)(dataFile->Get("hResult_sliced_0_1"))->Clone();
-  std::cout << dataCopy->GetNbinsX() << std::endl;
+  LOG(DEB) << dataCopy->GetNbinsX() << std::endl;
 
   double *binEdges = new double[dataCopy->GetNbinsX()-1];
   for (int i = 0; i < dataCopy->GetNbinsX()-1; i++) {
@@ -49,7 +49,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
     fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << std::endl;
+    LOG(DEB) << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << std::endl;
   }
 
   fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
@@ -62,7 +62,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetDataValues(std::string fileLocation) {
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
-  std::cout << "Covariance: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Covariance: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH2D *covarMatrix = (TH2D*)(dataFile->Get("TMatrixDBase;1"))->Clone();
@@ -70,7 +70,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
   int nBinsX = covarMatrix->GetXaxis()->GetNbins();
   int nBinsY = covarMatrix->GetYaxis()->GetNbins();
 
-  if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
+  if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-2);
   this->fFullCovar = new TMatrixDSym(nBinsX-2);
@@ -79,7 +79,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
   // Last entry is BS
   for (int i = 1; i < nBinsX-1; i++) {
     for (int j = 1; j < nBinsY-1; j++) {
-      //std::cout << "(" << i << ", " << j << ") = " << covarMatrix->GetBinContent(i+1,j+1) << std::endl;
+      LOG(DEB) << "(" << i << ", " << j << ") = " << covarMatrix->GetBinContent(i+1,j+1) << std::endl;
       (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
       (*this->fFullCovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
     }

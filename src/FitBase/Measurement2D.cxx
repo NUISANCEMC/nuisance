@@ -244,9 +244,9 @@ void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
 
   if (dataFile.find(".root") == std::string::npos) {
 
-    std::cerr << "Error! " << dataFile << " is not a .root file" << std::endl;
-    std::cerr << "Currently only .root file reading is supported (MiniBooNE CC1pi+ 2D), but implementing .txt should be dirt easy" << std::endl;
-    std::cerr << "See me at " << __FILE__ << ":" << __LINE__ << std::endl;
+    ERR(FTL) << "Error! " << dataFile << " is not a .root file" << std::endl;
+    ERR(FTL) << "Currently only .root file reading is supported (MiniBooNE CC1pi+ 2D), but implementing .txt should be dirt easy" << std::endl;
+    ERR(FTL) << "See me at " << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
 
   } else {
@@ -528,7 +528,7 @@ void Measurement2D::SetBinMask(std::string maskFile){
   std::ifstream mask(maskFile.c_str(),ifstream::in);
 
   if (mask.is_open()) LOG(SAM) <<"Reading bin mask from file: "<<maskFile <<std::endl;
-  else std::cerr <<" Cannot find mask file."<<std::endl;
+  else ERR(WRN) <<" Cannot find mask file."<<std::endl;
 
   while(std::getline(mask >> std::ws, line, '\n')){
     
@@ -913,7 +913,7 @@ std::vector<TH1*> Measurement2D::GetMCList(){
     plotfillstyle = FitPar::Config().GetParI("fillstyle");
   }
 
-  std::cout << fName << " chi2 = " << GetLikelihood() << std::endl;
+  LOG(SAM) << fName << " chi2 = " << GetLikelihood() << std::endl;
 
   fMCHist->SetTitle(chi2.str().c_str());
   fMCHist->SetLineWidth(2);
@@ -1032,7 +1032,7 @@ void Measurement2D::Write(std::string drawOpt){
   bool drawMask   = (drawOpt.find("MASK") != std::string::npos);
   bool drawMap    = (drawOpt.find("MAP")  != std::string::npos);
   bool drawProj   = (drawOpt.find("PROJ") != std::string::npos);
-  bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
+  //bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   bool drawCov    = (drawOpt.find("COV") != std::string::npos);
   bool drawSliceCanvYMC = (drawOpt.find("CANVYMC") != std::string::npos);
   bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);

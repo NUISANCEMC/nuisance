@@ -19,7 +19,6 @@
 
 #include "GeneralUtils.h"
 
-
 std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del){
 
   std::istringstream stream(str);
@@ -111,7 +110,7 @@ std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const cha
   read.open(str.c_str());
   
   if (!read.is_open()){
-    std::cerr << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
+    ERR(FTL) << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
     throw;
   }
   
@@ -132,7 +131,7 @@ std::string GeneralUtils::GetTopLevelDir(){
   if(first){
     char * const var = getenv("EXT_FIT");
     if(!var){ 
-      std::cerr << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
+      ERR(FTL) << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
       exit(-1);
     }
     topLevelVarVal = std::string(var);
@@ -141,3 +140,4 @@ std::string GeneralUtils::GetTopLevelDir(){
 
   return topLevelVarVal;
 }
+

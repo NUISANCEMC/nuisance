@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  std::cout<<"Starting nuissyst"<<std::endl;
+  LOG(FIT)<<"Starting nuissyst"<<std::endl;
 
   // Make systematic class and run fit
   SystematicRoutines* min = new SystematicRoutines(argc, argv);
@@ -58,10 +58,10 @@ int main(int argc, char* argv[]){
   
   
   // Show Final Status
-  std::cout<<"-------------------------------------"<<std::endl;
-  if (status == 0) std::cout<<"Systematic Complete."<<std::endl;
-  else std::cerr<<"Systematic Failed (error state = "<<status<<")"<<std::endl;
-  std::cout<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
+  if (status == 0) LOG(FIT)<<"Systematic Complete."<<std::endl;
+  else ERR(FTL)<<"Systematic Failed (error state = "<<status<<")"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
   
   return status;
 }

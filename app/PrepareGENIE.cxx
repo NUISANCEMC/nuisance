@@ -4,6 +4,7 @@
 #include "TH1D.h"
 #include "TTree.h"
 #include "PlotUtils.h"
+#include "FitLogger.h"
 
 #ifdef __GENIE_ENABLED__
 #include "Conventions/Units.h"
@@ -34,8 +35,8 @@ void RunGENIEMerger(std::string inputs, std::string output){
 };
 
 void RunGENIEPrepare(std::string input, std::string flux, std::string target, std::string output){
-
-  std::cout << "Running GENIE Prepare" << std::endl;
+  
+  LOG(FIT) << "Running GENIE Prepare" << std::endl;
 
   // Setup TTree
   TChain* tn = new TChain("gtree");
@@ -54,7 +55,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
     fluxhist = (TH1D*) fluxfile->Get(fluxvect[1].c_str());
     fluxhist->SetDirectory(0);
   } else {
-    std::cout << "NO FLUX SPECIFIED" << std::endl;
+    LOG(FTL) << "NO FLUX SPECIFIED" << std::endl;
     throw;
   }
 
@@ -75,9 +76,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   // Loop over all events
   for (int i = 0; i < nevt; i++) {
     tn->GetEntry(i);
-
+    
+    StopTalking();
     EventRecord& event = *(genientpl->event);
     GHepParticle* neu = event.Probe();
+    StartTalking();
 
     // Get XSec From Spline
     GHepRecord genie_record = static_cast<GHepRecord>(event);
@@ -118,7 +121,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
     // Clear Event
     genientpl->Clear();
   }
-  std::cout << "Processed all events" << std::endl;
+  LOG(FIT) << "Processed all events" << std::endl;
 
   // Once event loop is done we can start saving stuff into the file
   bool savesplines = FitPar::Config().GetParB("save_genie_splines");
@@ -126,7 +129,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   TFile* outputfile = new TFile(input.c_str(),"UPDATE");
   outputfile->cd();
 
-  std::cout << "Getting splines " << std::endl;
+  LOG(FIT) << "Getting splines " << std::endl;
   
   // Save each of the reconstructed splines to file
   std::map<std::string, TH1D*> modeavg;
@@ -153,15 +156,15 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   if (!targdir) targdir = (TDirectory*) outputfile->mkdir("TargetGENIESplines");
   targdir->cd();
   
-  std::cout << "Getting Target Splines" << std::endl;
+  LOG(FIT) << "Getting Target Splines" << std::endl;
   // For each target save a total spline
   std::map<std::string, TH1D*> targetsplines;
 
   for (int i = 0; i < targetids.size(); i++){
-    std::cout << "Getting target "<< i << std::endl;
+    LOG(FIT) << "Getting target "<< i << std::endl;
     std::string targ = targetids[i];
     targetsplines[targ] = (TH1D*) xsechist->Clone();
-    std::cout << "Created target spline for " << targ << std::endl;
+    LOG(FIT) << "Created target spline for " << targ << std::endl;
     
     for (int j = 0; j < genieids.size(); j++){
       std::string mode = genieids[j];
@@ -169,18 +172,18 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       // Look at all matching modes/targets
       if (mode.find(targ) != std::string::npos){
 
-	std::cout << "Mode " << mode << " contains " << targ << " target!" << std::endl;
+	LOG(FIT) << "Mode " << mode << " contains " << targ << " target!" << std::endl;
 	modeavg[mode]->Write( (mode + "_cont_" + targ).c_str() , TObject::kOverwrite);
 	targetsplines[targ]->Add( modeavg[mode] );
-	std::cout << "Finished with Mode " << mode << " "  << modeavg[mode]->Integral()<<std::endl;
+	LOG(FIT) << "Finished with Mode " << mode << " "  << modeavg[mode]->Integral()<<std::endl;
       }
     }
 
-    std::cout << "Saving target spline:" <<targ<< std::endl;
+    LOG(FIT) << "Saving target spline:" <<targ<< std::endl;
     targetsplines[targ]->Write(("Total" + targ).c_str(), TObject::kOverwrite);
   }
 
-  std::cout << "Getting total splines" << std::endl;
+  LOG(FIT) << "Getting total splines" << std::endl;
   // Now we have each of the targets we need to create a total cross-section.
   int totalnucl = 0;
   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target,",");
@@ -195,7 +198,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       TH1D* xsec = iter->second;
 
       if (targstr.find(targpdg) != std::string::npos){
-	std::cout << "Adding target spline " << targstr << " : " << xsec->Integral("width") << std::endl;
+	LOG(FIT) << "Adding target spline " << targstr << " : " << xsec->Integral("width") << std::endl;
 	totalxsec->Add(xsec);
 
 	int nucl = atoi( targpdg.c_str() );
@@ -210,14 +213,14 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   eventhist = (TH1D*)fluxhist->Clone();
   eventhist->Multiply(totalxsec);
 
-  std::cout << "Dividing by Total Nucl = " << totalnucl << std::endl;
+  LOG(FIT) << "Dividing by Total Nucl = " << totalnucl << std::endl;
   eventhist->Scale(1.0 / double(totalnucl) );
 
   eventhist->Write("nuisance_events", TObject::kOverwrite);
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
 
   
-  std::cout << "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width") << std::endl;
+  LOG(FIT) << "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width") << std::endl;
 
   
   
@@ -259,7 +262,7 @@ void PrintOptions(){
 void ParseOptions(int argc, char* argv[]){
   bool flagopt = false;
 
-  // If No Arguments print commands                                                                                                                                                                                                        
+  // If No Arguments print commands
   for (int i = 1; i< argc; ++i){
     if (!std::strcmp(argv[i], "-h"))   { flagopt  = true; break; }
     //    if (!std::strcmp(argv[i], "-m"))   { gFlagMerge = true; break; }
@@ -272,7 +275,7 @@ void ParseOptions(int argc, char* argv[]){
       else if (!std::strcmp(argv[i], "-f")) { gFluxFile   = argv[i+1]; ++i; }
       else if (!std::strcmp(argv[i], "-t")) { gTarget     = argv[i+1]; ++i; } 
       else {
-	std::cerr << "ERROR: unknown command line option given! - '"
+	ERR(FTL) << "ERROR: unknown command line option given! - '"
                   <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
 	PrintOptions();
 	break;
@@ -282,23 +285,23 @@ void ParseOptions(int argc, char* argv[]){
 
   /*
   if (gOutputFile == "" && !flagopt){ 
-    std::cerr << "No output file specificed!" << std::endl; 
+    ERR(FTL) << "No output file specificed!" << std::endl; 
     flagopt = true;
   }
   */
 
   if (gInputFiles == "" && !flagopt){
-    std::cerr << "No input file(s) specified!" << std::endl;
+    ERR(FTL) << "No input file(s) specified!" << std::endl;
     flagopt = true;
   }
     
   if (!gFlagMerge && gFluxFile == "" && !flagopt){
-    std::cerr << "No flux input specified for Prepare Mode" << std::endl;
+    ERR(FTL) << "No flux input specified for Prepare Mode" << std::endl;
     flagopt = true;
   }
 
   if (!gFlagMerge && gTarget == "" && !flagopt){
-    std::cerr << "No target specified for Prepare Mode" << std::endl;
+    ERR(FTL) << "No target specified for Prepare Mode" << std::endl;
     flagopt = true;
   }
 

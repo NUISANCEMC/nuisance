@@ -314,9 +314,9 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
       MiniBooNE NCEL
     */
   } else if (!name.compare("MiniBooNE_NCEL_XSec_Treco_nu")) {
-    std::cerr
-        << "MiniBooNE_NCEL_XSec_Treco_nu not implemented in current interface."
-        << std::endl;
+    ERR(FTL)
+      << "MiniBooNE_NCEL_XSec_Treco_nu not implemented in current interface."
+      << std::endl;
     throw 5;
     // fChain->push_back(new MiniBooNE_NCEL_XSec_Treco_nu(file, rw, type,
     // fkdt));
@@ -518,7 +518,7 @@ Fake Studies
     fChain->push_back(new GenericFlux_Tester(name, file, rw, type, fkdt));
 
   } else {
-    std::cerr << "Error: could not find " << name << std::endl;
+    ERR(FTL) << "Error: could not find " << name << std::endl;
     exit(-1);
     return false;
   }

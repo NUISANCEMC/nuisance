@@ -31,13 +31,15 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include "FitLogger.h"
 
 /*!
  *  \addtogroup Utils
  *  @{
  */
 
-//! Functions which deal with basic string and file handling. They should have no dependence on the other NUISANCE files! 
+//! Functions which deal with basic string and file handling. 
+//! They should have no dependence on the other NUISANCE files! (Except for logging)
 namespace GeneralUtils{
 
   /*!

@@ -84,22 +84,22 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
       else if (!std::strcmp(argv[i], "-e")) { error_flag -= 1; }
       else if (!std::strcmp(argv[i], "+e")) { error_flag += 1; }
       else {
-	std::cerr << "ERROR: unknown command line option given! - '"
-		  <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
+	ERR(FTL) << "ERROR: unknown command line option given! - '"
+		 <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
 	throw;
       }
     }
   }
 
   if (fCardFile.empty()){
-    std::cerr << "ERROR: card file not specified."   << std::endl;
-    std::cerr << "Run with '-h' to see options." << std::endl;
+    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
+    ERR(FTL) << "Run with '-h' to see options." << std::endl;
     throw;
   }
   
   if (fOutputFile.empty()){
-    std::cerr << "WARNING: output file not specified." << std::endl;
-    std::cerr << "Using cardfile.root" << std::endl;
+    ERR(FTL) << "WARNING: output file not specified." << std::endl;
+    ERR(FTL) << "Using cardfile.root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
   
@@ -188,7 +188,7 @@ void SystematicRoutines::ReadCard(std::string cardfile){
     if (samstatus == kErrorStatus) {
       ERR(FTL) << "Bad Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      LOG(FIT) << line << endl;
       throw;
     }
   }
@@ -213,7 +213,7 @@ void SystematicRoutines::ReadCard(std::string cardfile){
 	fakstatus == kErrorStatus ){
       ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      LOG(FIT) << line << endl;
       throw;
     }
   }
@@ -410,7 +410,6 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   // Check length
   if (strvct.size() < 3){
     ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    ERR(FTL) << "    Received: "<< inputspec << std::endl;
     return kErrorStatus;
   }
 
@@ -611,7 +610,7 @@ void SystematicRoutines::GetCovarFromFCN(){
   // Print Helper String
   if (!helperstr.str().empty()){
     ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << endl;
-    cout << endl << helperstr.str() << endl;
+    LOG(FIT) << endl << helperstr.str() << endl;
     sleep(2);
   }
 

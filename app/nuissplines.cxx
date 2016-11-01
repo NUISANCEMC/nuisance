@@ -78,16 +78,16 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  std::cout<<"Starting ExtFit_splines.exe"<<std::endl;
+  LOG(FIT)<<"Starting ExtFit_splines.exe"<<std::endl;
 
   // Make minimizer class and run fit
   SplineRoutines* splRt = new SplineRoutines(argc, argv);
   splRt->Run();
 
   // Show Final Status
-  std::cout<<"-------------------------------------"<<std::endl;
-  std::cout<<"Spline Generation/Validation Finished."<<std::endl;
-  std::cout<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"Spline Generation/Validation Finished."<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
   
   return status;
 }

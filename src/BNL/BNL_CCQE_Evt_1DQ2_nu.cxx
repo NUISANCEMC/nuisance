@@ -140,16 +140,17 @@ void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
   if (Signal)
     Measurement1D::FillHistograms();
 
-  //  std::cout<<"fXVar = "<<fXVar<<" "<<Weight<<std::endl;
+  LOG(DEB) <<"fXVar = "<<fXVar<<" "<<Weight<<std::endl;
   return;
 }
 
 
 
-//********************************************************************                                                                                                                                                                      
+//********************************************************************
 /// @details Apply scaling to uncorrected fMCHist_NoCorr and scale to match data
 void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
-  //********************************************************************                                                                                                                                                                   
+  //********************************************************************
+
   this->fMCHist->Scale(fScaleFactor);
   this->fMCFine->Scale(fScaleFactor);
   if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);

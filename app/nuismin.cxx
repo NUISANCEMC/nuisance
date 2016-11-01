@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  std::cout<<"Starting ExtFit_minimizer.exe"<<std::endl;
+  LOG(FIT)<<"Starting ExtFit_minimizer.exe"<<std::endl;
 
   // Make minimizer class and run fit
   MinimizerRoutines* min = new MinimizerRoutines(argc, argv);
@@ -97,10 +97,10 @@ int main(int argc, char* argv[]){
   status = min->GetStatus();
   
   // Show Final Status
-  std::cout<<"-------------------------------------"<<std::endl;
-  if (status == 0) std::cout<<"Minimizer Complete."<<std::endl;
-  else std::cerr<<"Minimizer Failed (error state = "<<status<<")"<<std::endl;
-  std::cout<<"-------------------------------------"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
+  if (status == 0) LOG(FIT)<<"Minimizer Complete."<<std::endl;
+  else ERR(WRN)<<"Minimizer Failed (error state = "<<status<<")"<<std::endl;
+  LOG(FIT)<<"-------------------------------------"<<std::endl;
   
   return status;
 }

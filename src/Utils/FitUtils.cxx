@@ -586,7 +586,7 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
 double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   // Get total energy of hadronic system.
   double Erecoil = 0.0;
-  //  std::cout << "New Event" << std::endl;
+
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
@@ -613,8 +613,6 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 	       PID == 22){
       Erecoil += (event->PartInfo(i)->fP.E());
     }
-
-    //std::cout << "Added " << PID << " to low recoil " << Erecoil << " " << event->PartInfo(i)->fP.E() << std::endl;
   }
 
   return Erecoil;

@@ -22,7 +22,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     fName = "T2K_CC1pip_CH_XSec_1DQ2delta_nu";
     fPlotTitles = "; Q^{2}_{#Delta} (GeV^{2}); d#sigma/dQ^{2}_{#Delta} (cm^{2}/GeV^{2}/nucleon)";
   } else {
-    std::cout << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
+    LOG(SAM) << "Found no specified type, using MiniBooNE E_nu/Q2 definition" << std::endl;
     fT2KSampleType = kMB;
     fName = "T2K_CC1pip_CH_XSec_1DQ2MB_nu";
     fPlotTitles = "; Q^{2}_{MB} (GeV^{2}); d#sigma/dQ^{2}_{MB} (cm^{2}/GeV^{2}/nucleon)";
@@ -43,8 +43,8 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_Delta.root");
     this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q2_Delta.root");
   } else {
-    std::cerr << "No data type set for " << fName << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    ERR(FTL) << "No data type set for " << fName << std::endl;
+    ERR(FTL) << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
     
@@ -56,21 +56,21 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   // Don't want the last bin of dataCopy
   TH1D *dataCopy = (TH1D*)(dataFile->Get("hResult_sliced_0_1"))->Clone();
 
   const int nPoints = dataCopy->GetNbinsX()-6;
-  std::cout << nPoints << std::endl;
+  LOG(DEB) << nPoints << std::endl;
   double *binEdges = new double[nPoints+1];
   for (int i = 0; i < nPoints+1; i++) {
     binEdges[i] = dataCopy->GetBinLowEdge(i+1);
   }
 
   for (int i = 0; i < nPoints+1; i++) {
-    std::cout << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
+    LOG(DEB) << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
   }
 
   fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), nPoints, binEdges);
@@ -78,7 +78,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
     fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    std::cout << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
+    LOG(DEB) << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
   }
 
   fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
@@ -91,7 +91,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetDataValues(std::string fileLocation) {
 // Override this for now
 // Should really have Measurement1D do this properly though
 void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
-  std::cout << "Covariance: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Covariance: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH2D *covarMatrix = (TH2D*)(dataFile->Get("TMatrixDBase;1"))->Clone();
@@ -99,10 +99,10 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
   int nBinsX = covarMatrix->GetXaxis()->GetNbins();
   int nBinsY = covarMatrix->GetYaxis()->GetNbins();
 
-  std::cout << nBinsX << std::endl;
-  std::cout << fDataHist->GetNbinsX() << std::endl;
+  LOG(DEB) << nBinsX << std::endl;
+  LOG(DEB) << fDataHist->GetNbinsX() << std::endl;
 
-  if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
+  if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
   this->covar = new TMatrixDSym(nBinsX-7);
   this->fFullCovar = new TMatrixDSym(nBinsX-7);
@@ -113,7 +113,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
     for (int j = 0; j < nBinsY-7; j++) {
       (*this->covar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
       (*this->fFullCovar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
-      std::cout << "covar(" << i << ", " << j << ") = " << (*this->covar)(i,j) << std::endl;
+      LOG(DEB) << "covar(" << i << ", " << j << ") = " << (*this->covar)(i,j) << std::endl;
     }
   } //should now have set covariance, I hope
 

@@ -514,7 +514,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm, 
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
 
     // Loop over entries and insert them into the histogram
-    for (int xBin = 0; xBin < entries.size(); xBin++){
+    for (uint xBin = 0; xBin < entries.size(); xBin++){
     
       if (!skipbins or entries[xBin] != -1.0)
 	hist->SetBinContent(xBin+1, yBin+1, entries[xBin]*norm);

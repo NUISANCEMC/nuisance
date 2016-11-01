@@ -443,7 +443,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
   // Only half the covariance matrix is given, so fill up the other half
   if (fName.find("MINERvA_CC1pip") != std::string::npos || (fName.find("MINERvA_CCNpip") != std::string::npos && fName.find("2016") == std::string::npos)) {
 
-    std::cout << "Treating MINERvA CC1pi+ differently" << std::endl;
+    LOG(SAM) << "Treating MINERvA CC1pi+ differently" << std::endl;
 
     // Get a new line from the covariance
     while (std::getline(corr >> std::ws, line, '\n')) {
@@ -732,8 +732,8 @@ void Measurement1D::ScaleEvents() {
   // 1D count distributions -- need shape scaling to data
   // anything else -- flux averages
 
-  cout << "Scaling Factor = " << fScaleFactor << endl;
-  cout << "MC Hist = " << fMCHist->Integral() << endl;
+  LOG(DEB) << "Scaling Factor = " << fScaleFactor << endl;
+  LOG(DEB) << "MC Hist = " << fMCHist->Integral() << endl;
 
   // Scaling for raw event rates
   if (fIsRawEvents) {
@@ -1158,7 +1158,7 @@ void Measurement1D::Write(std::string drawOpt) {
   bool drawRatio = (drawOpt.find("RATIO") != std::string::npos);
   bool drawModes = (drawOpt.find("MODES") != std::string::npos);
   bool drawShape = (drawOpt.find("SHAPE") != std::string::npos);
-  bool residual = (drawOpt.find("RESIDUAL") != std::string::npos);
+  //  bool residual = (drawOpt.find("RESIDUAL") != std::string::npos);
   //  bool drawMatrix = (drawOpt.find("MATRIX") != std::string::npos);
   bool drawXSec = (drawOpt.find("XSEC") != std::string::npos);
   bool drawFlux = (drawOpt.find("FLUX") != std::string::npos);

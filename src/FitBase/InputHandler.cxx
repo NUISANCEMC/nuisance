@@ -267,7 +267,7 @@ void InputHandler::ReadEventSplineFile() {
     }
   }
 
-  cout << "Loaded all spline coeffs" << endl;
+  LOG(DEB) << "Loaded all spline coeffs" << endl;
 
   // Set MAXEVENTS CALC Here before we load in splines
   if (fMaxEvents > 1 and fMaxEvents < fNEvents) {
@@ -388,8 +388,8 @@ void InputHandler::ReadJointFile() {
       fFluxHist->Add(temp_flux);
       fEventHist->Add(temp_evts);
     }
-    std::cout << "Added Input File " << input_lines.at(i) << std::endl
-              << " with " << temp_events << std::endl;
+    LOG(SAM) << "Added Input File " << input_lines.at(i) << std::endl
+	     << " with " << temp_events << std::endl;
   }
 
   // Now have all correctly normalised histograms all we need to do is setup the
@@ -408,7 +408,7 @@ void InputHandler::ReadJointFile() {
   tn = new TChain(tree_name.c_str());
   for (UInt_t i = 0; i < input_lines.size(); i++) {
     // PARSE INPUT
-    std::cout << "Adding new tchain " << input_lines.at(i) << std::endl;
+    LOG(DEB) << "Adding new tchain " << input_lines.at(i) << std::endl;
     std::string temp_file = ParseInputFile(input_lines.at(i));
     tn->Add(temp_file.c_str());
   }
@@ -589,13 +589,13 @@ void InputHandler::ReadNuWroFile() {
       double Elow = double(fluxvals[0]) / 1000.0;
       double Ehigh = double(fluxvals[1]) / 1000.0;
 
-      std::cout << " - Adding new nuwro flux "
-                << "pdg: " << pdg << "Elow: " << Elow << "Ehigh: " << Ehigh
-                << std::endl;
+      LOG(SAM) << " - Adding new nuwro flux "
+	       << "pdg: " << pdg << "Elow: " << Elow << "Ehigh: " << Ehigh
+	       << std::endl;
 
       fFluxHist = new TH1D("fluxplot", "fluxplot", fluxvals.size() - 2, Elow, Ehigh);
-      for (int j = 2; j < fluxvals.size(); j++) {
-        cout << j << " " << fluxvals[j] << endl;
+      for (UInt_t j = 2; j < fluxvals.size(); j++) {
+        LOG(DEB) << "Flux bin:" << j << " = " << fluxvals[j] << endl;
         fFluxHist->SetBinContent(j - 1, fluxvals[j]);
       }
     } else if (beamtype == 1) {
@@ -603,7 +603,7 @@ void InputHandler::ReadNuWroFile() {
 
       std::vector<std::string> fluxlines =
           GeneralUtils::ParseToStr(fluxstring, "\n");
-      for (int i = 0; i < fluxlines.size(); i++) {
+      for (UInt_t i = 0; i < fluxlines.size(); i++) {
         std::vector<double> fluxvals =
             GeneralUtils::ParseToDbl(fluxlines[i], " ");
 
@@ -612,13 +612,13 @@ void InputHandler::ReadNuWroFile() {
         double Elow = double(fluxvals[2]) / 1000.0;
         double Ehigh = double(fluxvals[3]) / 1000.0;
 
-        std::cout << " - Adding new nuwro flux "
-                  << "pdg: " << pdg << "pctg: " << pctg << "Elow: " << Elow
-                  << "Ehigh: " << Ehigh << std::endl;
+        LOG(DEB) << " - Adding new nuwro flux "
+		 << "pdg: " << pdg << "pctg: " << pctg << "Elow: " << Elow
+		 << "Ehigh: " << Ehigh << std::endl;
 
         TH1D* fluxplot =
             new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
-        for (int j = 4; j < fluxvals.size(); j++) {
+        for (UInt_t j = 4; j < fluxvals.size(); j++) {
           fluxplot->SetBinContent(j + 1, fluxvals[j]);
         }
 
@@ -653,7 +653,7 @@ void InputHandler::ReadNuWroFile() {
     for (int i = 0; i < fNEvents; i++) {
       tn->GetEntry(i);
 
-      if (i % 100000 == 0) cout << " i " << i << std::endl;
+      if (i % 100000 == 0) LOG(SAM) << " i " << i << std::endl;
       // Get Variables
       Enu = fNuwroEvent->in[0].E() / 1000.0;
       TotXSec = fNuwroEvent->weight;
@@ -670,7 +670,7 @@ void InputHandler::ReadNuWroFile() {
     LOG(SAM) << " -> Flux Processing Loop Finished." << std::endl;
 
     if (fEventHist->Integral() == 0.0) {
-      std::cout << "ERROR NO EVENTS FOUND IN RANGE! " << std::endl;
+      ERR(FTL) << "NO EVENTS FOUND IN RANGE! " << std::endl;
       exit(-1);
     }
 
@@ -750,8 +750,8 @@ void InputHandler::ReadGenieFile() {
       (PlotUtils::GetObjectWithName(fInputRootFile, "nuisance_flux")).c_str());
 
   if (!fFluxHist){
-    std::cout << "GENIE FILE doesn't contain flux/xsec info" << std::endl;
-    std::cout << "Run app/PrepareGENIE first" << std::endl;
+    ERR(FTL) << "GENIE FILE doesn't contain flux/xsec info" << std::endl;
+    ERR(FTL) << "Run app/PrepareGENIE first" << std::endl;
     throw;
   }
   
@@ -769,9 +769,6 @@ void InputHandler::ReadGenieFile() {
   fXSecHist->SetNameTitle(
       (fName + "_XSEC").c_str(),
       (fName + "; E_{#nu} (GeV); Event Rate").c_str());
-
-  double average_xsec = 0.0;
-  int total_events = 0;
 
   // Setup the TChain for GENIE event tree
   tn = new TChain("gtree");

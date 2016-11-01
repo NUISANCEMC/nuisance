@@ -95,7 +95,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
       else if (!std::strcmp(argv[i], "-e")) { error_flag -= 1; }
       else if (!std::strcmp(argv[i], "+e")) { error_flag += 1; }
       else {
-	std::cerr << "ERROR: unknown command line option given! - '"
+	ERR(FTL) << "ERROR: unknown command line option given! - '"
 		  <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
 	throw;
       }
@@ -103,14 +103,14 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
   }
 
   if (fCardFile.empty()){
-    std::cerr << "ERROR: card file not specified."   << std::endl;
-    std::cerr << "Run with '-h' to see options." << std::endl;
+    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
+    ERR(FTL) << "Run with '-h' to see options." << std::endl;
     throw;
   }
   
   if (fOutputFile.empty()){
-    std::cerr << "WARNING: output file not specified." << std::endl;
-    std::cerr << "Using cardfile.root" << std::endl;
+    ERR(FTL) << "WARNING: output file not specified." << std::endl;
+    ERR(FTL) << "Using cardfile.root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
   
@@ -198,7 +198,7 @@ void MinimizerRoutines::ReadCard(std::string cardfile){
     if (samstatus == kErrorStatus) {
       ERR(FTL) << "Bad Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      ERR(FTL) << line << endl;
       throw;
     }
   }
@@ -223,7 +223,7 @@ void MinimizerRoutines::ReadCard(std::string cardfile){
 	fakstatus == kErrorStatus ){
       ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
 	       << " at line " << linecount << "!" << endl;
-      cout << line << endl;
+      ERR(FTL) << line << endl;
       throw;
     }
   }
@@ -681,7 +681,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine){
 	   !routine.compare("GSLSimAn")) {
 
     if (fMinimizer->NFree() > 0){
-      std::cout << StatusMessage(fMinimizer->Minimize()) << std::endl;
+      LOG(FIT) << StatusMessage(fMinimizer->Minimize()) << std::endl;
       GetMinimizerState();
     }
   }
@@ -1311,7 +1311,7 @@ void MinimizerRoutines::SetupCovariance(){
   }
   
   if (NDIM == 0) return;
-  cout << "NFREE == " << NFREE << endl;
+  LOG(FIT) << "NFREE == " << NFREE << endl;
   fCovar = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);
   if (NFREE > 0){
     fCovFree = new TH2D("covariance_free",

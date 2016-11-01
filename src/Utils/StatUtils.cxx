@@ -166,16 +166,14 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
 		( calc_data->GetBinContent(j+1) - calc_mc->GetBinContent(j+1) ) );
 
       } else {
+	
+        LOG(DEB) << "Error on bin (i,j) = (" << i << "," << j << ")" << std::endl;
+        LOG(DEB) << "data->GetBinContent(i+1) = " << calc_data->GetBinContent(i+1) << std::endl;
+        LOG(DEB) << "mc->GetBinContent(i+1) = " << calc_mc->GetBinContent(i+1) << std::endl;
+        LOG(DEB) << "Adding zero to chi2 instead of dying horrifically " << std::endl;
 
-	/*
-        std::cerr << "Error on bin (i,j) = (" << i << "," << j << ")" << std::endl;
-        std::cerr << "data->GetBinContent(i+1) = " << calc_data->GetBinContent(i+1) << std::endl;
-        std::cerr << "mc->GetBinContent(i+1) = " << calc_mc->GetBinContent(i+1) << std::endl;
-        std::cerr << "Adding zero to chi2 instead of dying horrifically " << std::endl;
-	*/
         Chi2 += 0.;
       }
-
     }
   }
 

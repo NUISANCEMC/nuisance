@@ -154,29 +154,6 @@ void FitEvent::NeutKinematics() {
 
   OrderStack();
 
-  /*
-  if (fNeutVect->NfsiPart() > 0){
-    cout << "NFSI Particles in NEUT = " << fNeutVect->NfsiPart() << endl;
-
-    for (int i = 0; i < fNeutVect->NfsiPart(); i++){
-      cout << fNeutVect->FsiPartInfo(i)->fPID << endl;
-    }
-  }
-  */
-    
-  /*
-    From MERGE -> Change to own loop
-
-  // FSI Vertex Counting Should go here.
-  this->fNFSIParticles = neut_event->NfsiPart();
-  fsi_particles.clear();
-  for (UInt_t i = 0; i < this->fNFSIParticles; i++) {
-    this->fsi_particles.push_back(FitParticle(neut_event->FsiPartInfo(i)));
-  }
-
->>>>>>> 11fb11c0eacec8ee8d48186e0c9c847ce29a1930
-  */
-
   return;
 };
 #endif
@@ -287,13 +264,8 @@ void FitEvent::GENIEKinematics() {
 
   // Extra Check for MEC
   if (genie_record->Summary()->ProcInfo().IsMEC()) {
-    if (pdg::IsNeutrino(genie_record->Summary()->InitState().ProbePdg())) {
-      fMode = 2;
-    } else if (pdg::IsAntiNeutrino(genie_record->Summary()->InitState().ProbePdg())) {
-      fMode = -2;
-    }
-    //    std::cout<<"Found MEC Event in Sample"<<std::endl;
-    //    sleep(10);
+    if (pdg::IsNeutrino(genie_record->Summary()->InitState().ProbePdg())) fMode = 2;
+    else if (pdg::IsAntiNeutrino(genie_record->Summary()->InitState().ProbePdg())) fMode = -2;
   } else {
     fMode = utils::ghep::NeutReactionCode(genie_record);
   }
@@ -409,16 +381,13 @@ void FitEvent::GENIEKinematics() {
 
   OrderStack();
 
-  /*
-  std::cout << "GENIE Particle Stack" << std::endl;                                                                                                                  
+  LOG(DEB) << "GENIE Particle Stack" << std::endl;                                                                                                                  
   for (int i = 0; i < fNParticles; i++){                                                                                                                                 
-    std::cout << "Particle " << i << ". "                                                                                                                               
-	      << fParticlePDG[i] << " " << fParticleMom[i][0] << " "                                                                                                     
-	      << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "                                                                                                  
-	      << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;                                                                                            
+    LOG(DEB) << "Particle " << i << ". "                                                                                                                               
+	     << fParticlePDG[i] << " " << fParticleMom[i][0] << " "                                                                                                     
+	     << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "                                                                                                  
+	     << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;                                                                                            
   } 
-  */                                                                                                                                                                       
-  
 
   return;
 };
@@ -438,8 +407,8 @@ void FitEvent::GiBUUKinematics() {
   //***************************************************
   ResetEvent();
 
-  // std::cout << "Reading GiBUU Event: " << std::endl;
-  // std::cout << WriteGiBUUEvent(*GiRead) << std::endl;
+  LOG(DEB) << "Reading GiBUU Event: " << std::endl;
+  LOG(DEB) << WriteGiBUUEvent(*GiRead) << std::endl;
 
   fMode = GiRead->GiBUU2NeutCode;
   Mode = fMode;
@@ -520,15 +489,13 @@ void FitEvent::GiBUUKinematics() {
 
   OrderStack();
 
-  /*
-  std::cout << "GiBUU Particle Stack" << std::endl;
+  LOG(DEB) << "GiBUU Particle Stack" << std::endl;
   for (int i = 0; i < fNParticles; i++){
-    std::cout << "Particle " << i << ". " 
+    LOG(DEB) << "Particle " << i << ". " 
 	      << fParticlePDG[i] << " " << fParticleMom[i][0] << " "
 	      << fParticleMom[i][1] << " " << fParticleMom[i][2] << " " 
 	      << fParticleMom[i][3] << " " << fParticleState[i] << endl;
   }
-  */  
 
 }
 #endif  //< GiBUU ifdef
@@ -560,7 +527,6 @@ void FitEvent::OrderStack(){
     for (int i = 0; i < npart; i++){
       if (oldpartstate[i] != stateorder[s]) continue;
 
-      //  std::cout << "Ordering " << i << " " << stateorder[s] << std::endl;
       fParticlePDG[fNParticles]    = oldpartpdg[i];
       fParticleState[fNParticles]  = oldpartstate[i];
       fParticleMom[fNParticles][0] = oldpartmom[i][0];
@@ -572,16 +538,13 @@ void FitEvent::OrderStack(){
     }
   }
   
-  
-  /*
-  std::cout << "Ordered stack" << endl;
+  LOG(DEB) << "Ordered stack" << endl;
   for (int i = 0; i < fNParticles; i++){
-    std::cout << "Particle " << i << ". "
+    LOG(DEB) << "Particle " << i << ". "
               << fParticlePDG[i] << " " << fParticleMom[i][0] << " "
               << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "
               << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;
   }
-  */
 
   if (fNParticles != npart){
     ERR(FTL) << "Dropped some particles when ordering the stack!" << std::endl;
@@ -883,20 +846,19 @@ return PartInfo(maxind);
 
 
 void FitEvent::Print(){
-  std::cout << "FitEvent " << std::endl;
+  LOG(EVT) << "FitEvent " << std::endl;
 
-  std::cout << " -> Particle Stack " << std::endl;
+  LOG(EVT) << " -> Particle Stack " << std::endl;
   for (int i = 0; i < fNParticles; i++){
-    std::cout << " -> -> " << i << ". " 
-	      << fParticlePDG[i]   << " "
-	      << fParticleState[i] << " " 
-	      << "  Mom(" 
-	      << fParticleMom[i][0] << ", "
-	      << fParticleMom[i][1] << ", "
-	      << fParticleMom[i][2] << ", "
-	      << fParticleMom[i][3] << ")." << std::endl;
-
-
+    LOG(EVT) << " -> -> " << i << ". " 
+	     << fParticlePDG[i]   << " "
+	     << fParticleState[i] << " " 
+	     << "  Mom(" 
+	     << fParticleMom[i][0] << ", "
+	     << fParticleMom[i][1] << ", "
+	     << fParticleMom[i][2] << ", "
+	     << fParticleMom[i][3] << ")." << std::endl;
+    
   }
   return;
 }

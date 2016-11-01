@@ -30,7 +30,7 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
 
   // // Check if this is a shape only fit - for now, there is no shape option.
   // if (!type.compare("SHAPE")){
-  //   std::cout << "MiniBooNE NCEL is not available as a shape only fit... ignoring..." << std::endl;
+  //   ERR(WRN) << "MiniBooNE NCEL is not available as a shape only fit... ignoring..." << std::endl;
   // }
 
   // // Set pointer to the reweighting engine
@@ -105,7 +105,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   //   rw_weight = rw_engine->CalcWeight(customEvent);
     
   //   // Skip any events with suspiciously large weights...
-  //   if (rw_weight > 200) {std::cout << "LARGE WEIGHT: " << rw_weight << std::endl; break;}
+  //   if (rw_weight > 200) {ERR(WRN) << "LARGE WEIGHT: " << rw_weight << std::endl; break;}
 
   //   // Sum of the true kinetic energies of particles
   //   double t_true = 0.;
@@ -179,7 +179,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   
   // this->covar = new TMatrixDSym(dim);
 
-  // if(covar.is_open()) std::cout << "Reading covariance matrix from file: " << covarFile << std::endl;
+  // if(covar.is_open()) LOG(DEB) << "Reading covariance matrix from file: " << covarFile << std::endl;
 
   // while(std::getline(covar >> std::ws, line, '\n')){
   //   std::istringstream stream(line);
@@ -260,7 +260,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // std::string line;
   // std::ifstream input(inputFile.c_str(),ifstream::in);
 
-  // if(input.is_open()) std::cout << "Reading data from file: " << inputFile << std::endl;
+  // if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
   
   // this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, this->arr_treco);
@@ -316,7 +316,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
   // this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->fPlotTitles).c_str(),
   // 				50, 0, 900, 51, this->arr_treco);
 
-  // if(response.is_open()) std::cout << "Reading in the response matrix from file: " << responseFile << std::endl;
+  // if(response.is_open()) LOG(DEB) << "Reading in the response matrix from file: " << responseFile << std::endl;
 
   // while(std::getline(response, line, '\n')){
   //   std::istringstream stream(line);

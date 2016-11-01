@@ -43,7 +43,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
 // Need this if we're reading a root file!
 /*
 void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
+  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
   TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
   TH1D *copy = (TH1D*)(dataFile->Get("BNL_reanalysis"));
