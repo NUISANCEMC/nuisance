@@ -43,33 +43,18 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
 
 void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-    TLorentzVector Pnu = (event->PartInfo(0))->fP;
-    TLorentzVector Pp;
-    TLorentzVector Pmu;
-    TLorentzVector Ppi0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-    // Loop over the particle stack
-    for (UInt_t j = 2; j < event->Npart(); ++j){
-      if (!(event->PartInfo(j))->fIsAlive || (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-      int PID = (event->PartInfo(j))->fPID;
-      if (PID == 111) {
-        Ppi0 = event->PartInfo(j)->fP;
-      } else if (PID == 13) {
-        Pmu = (event->PartInfo(j))->fP;
-      } else if (PID == 2212) {
-        Pp = event->PartInfo(j)->fP;
-      }
-    }
+  //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
+  double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
+  
+  fXVar = Enu;
 
-    //double hadMass = FitUtils::MpPi(Pp, Ppi0);
-
-    //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
-    double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
-
-    fXVar = Enu;
-
-    return;
-  }
+  return;
+}
 
 
 bool BNL_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {

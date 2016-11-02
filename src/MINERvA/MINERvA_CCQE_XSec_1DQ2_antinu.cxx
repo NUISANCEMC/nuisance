@@ -93,19 +93,11 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
 void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  double q2qe = -1.0;
-  double ThetaMu = 1.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
-  // Get the relevant signal information
-  for (UInt_t j = 0; j < event->Npart(); ++j){
-
-    if ((event->PartInfo(j))->fPID != -13) continue;
-
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-    q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 30.,  false);
-
-    break;
-  }
+  double ThetaMu  = Pnu.Vect().Angle(Pmu.Vect());
+  double q2qe     = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 30.,true);
 
   fXVar = q2qe;
   return;

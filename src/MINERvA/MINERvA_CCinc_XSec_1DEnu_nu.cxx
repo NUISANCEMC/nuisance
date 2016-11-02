@@ -62,16 +62,11 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
 void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  Enu  = (event->PartInfo(0))->fP.E()/1000.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Get the relevant signal information
-  for (UInt_t j = 0; j < event->Npart(); ++j){
-
-    if ((event->PartInfo(j))->fPID != 13) continue;
-
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-    break;
-  }
+  Enu  = Pnu.E()/1000.;
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
 
   fXVar   = Enu;
   return;

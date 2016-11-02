@@ -53,29 +53,15 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
 
 void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-    TLorentzVector Pnu = (event->PartInfo(0))->fP;
-    TLorentzVector Ppip;
-    TLorentzVector Pmu;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-    // Loop over the particle stack
-    for (unsigned int j = 2; j < event->Npart(); ++j) {
-      if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-      int PID = (event->PartInfo(j))->fPID;
-      if (PID == 211 && event->PartInfo(j)->fP.E() > Ppip.E()) {
-        Ppip = event->PartInfo(j)->fP;
-      } else if (PID == 13) {
-        Pmu = (event->PartInfo(j))->fP;
-      }
-    }
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+  double Enu = -999;
 
-    double hadMass = FitUtils::Wrec(Pnu, Pmu);
-    double Enu;
-
-    if (hadMass > 100 && hadMass < 1800) {
-      Enu = Pnu.E()/1000.;
-    } else {
-      Enu = -999;
-  }
+  if (hadMass > 100 && hadMass < 1800)
+    Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
 

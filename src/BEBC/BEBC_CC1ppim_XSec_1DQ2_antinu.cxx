@@ -45,32 +45,16 @@ BEBC_CC1ppim_XSec_1DQ2_antinu::BEBC_CC1ppim_XSec_1DQ2_antinu(std::string inputfi
 
 void BEBC_CC1ppim_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppim;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == -211) {
-      Ppim = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == -13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppim = event->GetHMFSParticle(-211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
   hadMass = FitUtils::MpPi(Pp, Ppim);
-  double q2CCpip;
+  double q2CCpip = -1.0;
 
-  if (hadMass < 1400 && hadMass > 1100) {
+  if (hadMass < 1400 && hadMass > 1100)
     q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppim);
-  } else {
-    q2CCpip = -1.0;
-  }
 
   fXVar = q2CCpip;
 

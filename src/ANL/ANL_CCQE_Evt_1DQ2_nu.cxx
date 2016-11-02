@@ -97,19 +97,11 @@ void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   // Fill histogram with reconstructed Q2 Distribution
   q2qe = 0.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Loop over the particle stack
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    
-    // Look for the outgoing muon
-    if ((event->PartInfo(j))->fPID != 13) continue;
-
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-
-    q2qe        = FitUtils::Q2QErec( (event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    
-    break;  
-  }
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
   
   fXVar = q2qe;
   return;

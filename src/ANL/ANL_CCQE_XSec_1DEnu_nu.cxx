@@ -61,22 +61,13 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
 void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 
   // Get Q2
-  double q2qe = 0.0;
-  
-  // Loop over the particle stack
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    
-    // Look for the outgoing muon
-    if ((event->PartInfo(j))->fPID != 13) continue;
-    
-    ThetaMu = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
+  double q2qe = 0.0;  
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-    Enu_rec = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    q2qe    = FitUtils::Q2QErec( (event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-
-    // Once lepton is found, don't continue the loop
-    break;  
-  }
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
+  Enu_rec = FitUtils::EnuQErec(Pmu, cos(ThetaMu), 0.,true);
   
   fXVar = Enu_rec;
 

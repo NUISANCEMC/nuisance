@@ -58,21 +58,12 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
 ///@details Fill Enu for the event
 void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
-  
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    
-    // Look for the outgoing muon
-    if ((event->PartInfo(j))->fPID != 13) continue;
-    
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
 
-    Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-    // Once lepton is found, don't continue the loop
-    break;  
-  }
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  Enu_rec = FitUtils::EnuQErec(Pmu, cos(ThetaMu), 0.,true);
   
   fXVar = Enu_rec;
   return;

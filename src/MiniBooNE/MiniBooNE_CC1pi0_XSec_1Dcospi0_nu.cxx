@@ -42,20 +42,9 @@ MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string
 
 void MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::FillEventVariables(FitEvent *event) {
   
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppi0;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j){
-    if (!event->PartInfo(j)->fIsAlive || event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 111) {
-      Ppi0 = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = event->PartInfo(j)->fP;
-    }
-  }
+  TLorentzVector Pnu  =event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double CosPi0 = cos(FitUtils::th(Pnu, Ppi0));
 

@@ -49,31 +49,12 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
 
 void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   
-  // set up the 4-vectors from NEUT
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppi0;
-  TLorentzVector Pmu;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 111) {
-      Ppi0 = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
-
-  //double hadMass = FitUtils::MpPi(Pp, Ppi0);
-    
   // no W cut on BNL CC1pi0 
   double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
-
   fXVar = q2CCpi0;
 
   return;

@@ -53,30 +53,17 @@ MINERvA_CC1pip_XSec_1Dth_20deg_nu::MINERvA_CC1pip_XSec_1Dth_20deg_nu(std::string
 
 void MINERvA_CC1pip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   hadMass = FitUtils::Wrec(Pnu, Pmu);
   hadMassHist->Fill(hadMass);
-  double th;
+  double th = -999;
 
   // MINERvA CC1pi+ imposes a 0.1 < W < 1.4 GeV hadronic mass constraint
-  if (hadMass > 100 && hadMass < 1400) {
+  if (hadMass > 100 && hadMass < 1400)
     th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
-  } else {
-    th = -999;
-  }
 
   fXVar = th;
 

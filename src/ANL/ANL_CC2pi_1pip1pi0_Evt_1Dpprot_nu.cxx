@@ -56,18 +56,7 @@ ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(std::string
 
 void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pp;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0 && (event->PartInfo(j)->fNEUTStatusCode != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    }
-  }
-
+  TLorentzVector Pp = event->GetHMFSParticle(2212)->fP;
   double pprot = FitUtils::p(Pp);
 
   this->fXVar = pprot;

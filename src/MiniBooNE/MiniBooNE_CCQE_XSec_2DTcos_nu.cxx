@@ -75,20 +75,16 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
   Ekmu = -999.9;
   costheta = -999.9;
 
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    
-    int PID = ((event->PartInfo(j))->fPID);
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
-    if (PID != 13 and !ccqelike)       continue;
-    if (abs(PID) != 13 and ccqelike)   continue;
-    
-    // Now find the kinematic values and fill the histogram
-    Ekmu     = (event->PartInfo(j))->fP.E()/1000.0 - PhysConst::mass_muon;
-    costheta = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
-    
-    break; 
-  }
+  // The highest momentum mu+/mu-. The isSignal definition should make sure we only
+  // accept events we want, so no need to do an additional check here.  
+  int pdgs[] = {13, -13};
+  TLorentzVector Pmu = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+
+  // Now find the kinematic values and fill the histogram
+  Ekmu     = Pmu.E()/1000.0 - PhysConst::mass_muon;
+  costheta = cos(Pnu.Vect().Angle(Pmu.Vect()));
 
   // Set X and Y Variables
   fXVar = Ekmu;

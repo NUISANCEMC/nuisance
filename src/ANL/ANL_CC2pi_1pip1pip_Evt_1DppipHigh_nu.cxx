@@ -56,19 +56,7 @@ ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(std::
 
 void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Ppip_high;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0 && (event->PartInfo(j)->fNEUTStatusCode != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    // Select highest momentum positive pion
-    if (PID == 211 && (event->PartInfo(j)->fP).E() > Ppip_high.E()) {
-      Ppip_high = event->PartInfo(j)->fP;
-    }
-  }
-
+  TLorentzVector Ppip_high = event->GetHMFSParticle(211)->fP;
   double ppip_highest = FitUtils::p(Ppip_high);
 
   this->fXVar = ppip_highest;

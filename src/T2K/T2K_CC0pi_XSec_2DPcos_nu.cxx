@@ -64,22 +64,11 @@ bool T2K_CC0pi_XSec_2DPcos_nu::isSignal(FitEvent *event){
 
 void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
 
-  double pmu = -999.9;
-  double CosThetaMu = -999.9;
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
-  // Loop over all particles
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-
-    // Muon section
-    if ((event->PartInfo(j))->fPID == 13){
-
-      // Now find the kinematic values and fill the histogram
-      pmu     = (event->PartInfo(j))->fP.Vect().Mag()/1000;
-      CosThetaMu = cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())));
-
-      continue;
-    }
-  }
+  double pmu = Pmu.Vect().Mag()/1000.;
+  double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
 
   fXVar = pmu;
   fYVar = CosThetaMu;

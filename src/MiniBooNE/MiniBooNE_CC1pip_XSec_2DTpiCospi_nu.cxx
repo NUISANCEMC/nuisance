@@ -59,20 +59,9 @@ void MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::SetDataValues(std::string fileLocation
 
 void MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j){
-    if (!event->PartInfo(j)->fIsAlive || event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = event->PartInfo(j)->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double Tpi = FitUtils::T(Ppip)*1000.;
   double costh = cos(FitUtils::th(Pnu, Ppip));

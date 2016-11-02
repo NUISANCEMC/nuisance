@@ -50,29 +50,14 @@ ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(std::string input
 
 void ANL_CC1npip_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
 
-  // set up the 4-vectors from NEUT
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Pin = event->PartInfo(1)->fP;
-  TLorentzVector Pn;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack to find relevant particles
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j = 0; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 2112) {
-      Pn = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pin  = event->GetHMISParticle(2212)->fP;
+  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
-  double cosmuStar;
+  double cosmuStar = -999;
 
   // Now need to boost into center-of-mass frame
   TLorentzVector CMS = Pnu + Pin;
@@ -82,12 +67,8 @@ void ANL_CC1npip_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   Pnu.Boost(CMS.BoostVector());
 
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) {
-    // Find angle in CMS frame
-    cosmuStar = cos(FitUtils::th(Pmu, Pnu));
-  } else {
-    cosmuStar = -999;
-  }
+  // Find angle in CMS frame
+  if (hadMass < 1400) cosmuStar = cos(FitUtils::th(Pmu, Pnu));
 
   fXVar = cosmuStar;
 

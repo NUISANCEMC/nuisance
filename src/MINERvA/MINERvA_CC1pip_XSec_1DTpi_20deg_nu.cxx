@@ -51,29 +51,15 @@ MINERvA_CC1pip_XSec_1DTpi_20deg_nu::MINERvA_CC1pip_XSec_1DTpi_20deg_nu(std::stri
 
 void MINERvA_CC1pip_XSec_1DTpi_20deg_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (abs(PID) == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double Tpi;
+  double Tpi     = -999;
 
-  if (hadMass > 100 && hadMass < 1400) {
+  if (hadMass > 100 && hadMass < 1400)
     Tpi = FitUtils::T(Ppip)*1000.;
-  } else {
-    Tpi = -999;
-  }
 
   fXVar = Tpi;
 

@@ -42,23 +42,10 @@ BEBC_CC1pi0_XSec_1DEnu_nu::BEBC_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitW
 
 void BEBC_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppi0;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 111) {
-      Ppi0 = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2112)->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppi0);
   double Enu     = -1.0;

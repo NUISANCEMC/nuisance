@@ -64,22 +64,16 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
 void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  Enu  = (event->PartInfo(0))->fP.E()/1000.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Get the relevant signal information
-  for (UInt_t j = 0; j < event->Npart(); ++j){
-
-    if ((event->PartInfo(j))->fPID != 13) continue;
-
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-    TLorentzVector q = ((event->PartInfo(0))->fP - (event->PartInfo(j))->fP);
-    double q0   = q.E()/1000.0;
-    double Emu  = ((event->PartInfo(j))->fP.E())/1000.0;
-    Enu_rec     = Emu + q0;
-    double Q2   = 4*Enu_rec*Emu*sin(ThetaMu/2)*sin(ThetaMu/2);
-    bjork_x     = Q2/2./q0/((PhysConst::mass_proton+PhysConst::mass_neutron)/2.); // Average nucleon masses
-    break;
-  }
+  ThetaMu     = Pnu.Vect().Angle(Pmu.Vect());
+  TLorentzVector q = Pnu - Pmu;
+  double q0   = q.E()/1000.0;
+  double Emu  = (Pmu.E())/1000.0;
+  Enu_rec     = Emu + q0;
+  double Q2   = 4*Enu_rec*Emu*sin(ThetaMu/2)*sin(ThetaMu/2);
+  bjork_x     = Q2/2./q0/((PhysConst::mass_proton+PhysConst::mass_neutron)/2.); // Average nucleon masses
 
   fXVar   = bjork_x;
   return;
@@ -91,17 +85,13 @@ void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
 bool MINERvA_CCinc_XSec_1Dx_nu::isSignal(FitEvent *event){
 //*******************************************************************
 
-  // Throw away NC events
-  if (event->Mode > 30) return false;
-
   // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  if (!SignalDef::isCCINC(event, 14, EnuMin, EnuMax)) return false;
 
   // Restrict the phase space to theta < 17 degrees
   if (ThetaMu > 0.296706) return false;
 
   // restrict energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
   if (Enu_rec < this->EnuMin || Enu_rec > this->EnuMax) return false;
 
   return true;

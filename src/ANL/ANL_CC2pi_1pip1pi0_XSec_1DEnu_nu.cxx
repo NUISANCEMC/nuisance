@@ -51,7 +51,7 @@ ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(std::string i
 
 void ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   double Enu = Pnu.E()/1000.;
 
   // No hadronic mass cut or similar here so very simple FillEventVariables

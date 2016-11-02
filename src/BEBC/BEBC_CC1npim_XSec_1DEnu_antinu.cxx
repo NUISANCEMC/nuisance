@@ -42,33 +42,15 @@ BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string input
 
 void BEBC_CC1npim_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
     
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pn;
-  TLorentzVector Ppim;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == -211) {
-      Ppim = event->PartInfo(j)->fP;
-    } else if (PID == 2112) {
-      Pn = event->PartInfo(j)->fP;
-    } else if (PID == -13) {
-      Pmu = (event->PartInfo(j))->fP;  
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
+  TLorentzVector Ppim = event->GetHMFSParticle(-211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
   double hadMass = FitUtils::MpPi(Pn, Ppim);
-  double Enu;
+  double Enu     = -1.0;
 
-  if (hadMass < 1400) {
-    Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppim);
-  } else {
-    Enu = -1.0;
-  }
-
+  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppim);
   fXVar = Enu;
 
   return;

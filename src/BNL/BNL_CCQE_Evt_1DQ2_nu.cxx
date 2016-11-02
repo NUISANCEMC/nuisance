@@ -67,10 +67,10 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   scaleF = -1.0;
 };
 
-//********************************************************************                                                                                                                                                                     
-/// @details Reset the histogram uncorrect                                                                                                                                                                                                  
+//********************************************************************           
+/// @details Reset the histogram uncorrect                  
 void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
-//********************************************************************                                                                                                                                                                       
+//********************************************************************             
   Measurement1D::ResetAll();
   this->fMCHist->Reset();
   this->fMCFine->Reset();
@@ -88,24 +88,12 @@ void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
 void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************   
 
-  q2qe = -0.1;
-  fXVar = q2qe;
+  q2qe = -0.1;  
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Fill histogram with reconstructed Q2 Distribution
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    
-    // Look for the outgoing muon
-    if ((event->PartInfo(j))->fPID != 13) continue;
-
-    ThetaMu     = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-
-    q2qe        = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 0.,true);
-    
-    break;  
-  }
-  
+  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
 
   fXVar = q2qe;
   return;
@@ -121,7 +109,7 @@ bool BNL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent *event){
 
 
 
-//********************************************************************                                                                   
+//********************************************************************                       
 /// @details Apply Q2 scaling to weight if required
 void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 //********************************************************************  
@@ -171,10 +159,10 @@ void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 }
 
 
-//********************************************************************                                                                                                                                                                      
-/// @brief Include Q2 Correction plots into data write                                                                                                                                                                                      
+//********************************************************************            
+/// @brief Include Q2 Correction plots into data write                            
 void BNL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************                                                                                                                                                                       
+//********************************************************************           
   Measurement1D::Write(drawOpt);
 
   EnuVsQ2->Write();

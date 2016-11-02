@@ -48,7 +48,7 @@ ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitW
 void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   // Very simple here!
-  double Enu = ((event->PartInfo(0))->fP).E()/1000.;
+  double Enu = event->GetNeutrinoIn()->fP.E()/1000.;
 
   this->fXVar = Enu;
 

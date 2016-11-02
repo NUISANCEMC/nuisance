@@ -40,22 +40,11 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string i
 
 void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
   
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppi0;
-  TLorentzVector Pmu;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j){
-    if (!event->PartInfo(j)->fIsAlive || event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 111) {
-      Ppi0 = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = event->PartInfo(j)->fP;
-    }
-  }
-
-// No W cut on MiniBooNE CC1pi+ 
+  // No W cut on MiniBooNE CC1pi+ 
   double CosMu = cos(FitUtils::th(Pnu, Pmu));
 
   fXVar = CosMu;

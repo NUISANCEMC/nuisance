@@ -51,36 +51,16 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
 
 void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {
 
-  // set up the 4-vectors from NEUT
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
-  //Measurement1D::FillHadMass(abs(event->Mode), hadMass, rw_weight);
-  double costhpr;
+  double costhpr = -999;
     
   // This measurement has M(Npi) = W < 1.4GeV
-  if (hadMass < 1400) {
-    costhpr = cos(FitUtils::th(Pnu,Pp));
-  } else {
-    costhpr = -999;
-  }
+  if (hadMass < 1400) costhpr = cos(FitUtils::th(Pnu,Pp));
 
   fXVar = costhpr;
 

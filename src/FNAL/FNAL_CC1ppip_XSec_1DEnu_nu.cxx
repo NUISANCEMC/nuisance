@@ -41,34 +41,15 @@ FNAL_CC1ppip_XSec_1DEnu_nu::FNAL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
 
 void FNAL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // wanna calculate hadronic mass, plot and cut for signal
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
-  double Enu;
+  double Enu     = -1.0;
 
-  if (hadMass < 1400) {
-    Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
-  } else {
-    Enu = -1.0;
-  }
-  
+  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
   fXVar = Enu;
 
   return;

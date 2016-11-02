@@ -82,29 +82,22 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 /// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
-  
+
   // Init
   q2qe = -999.9;
 
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    
-    int PID = ((event->PartInfo(j))->fPID);
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
-    if (PID != 13 and !ccqelike)       continue;
-    if (abs(PID) != 13 and ccqelike)   continue;
-    
-      // Now find the Q2QE value and fill the histogram
-    q2qe = FitUtils::Q2QErec((event->PartInfo(j))->fP, 
-			     cos(((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()))), 
-			     34., true);
-   
-    break; 
-  }
+  // The highest momentum mu+/mu-. The isSignal definition should make sure we only
+  // accept events we want, so no need to do an additional check here.        
+  int pdgs[] = {13, -13};
+  TLorentzVector Pmu = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+
+  q2qe = FitUtils::Q2QErec(Pmu,cos(Pnu.Vect().Angle(Pmu.Vect())), 34., false);
 
   // Set X Variables
   fXVar = q2qe;
-  
+
   return;
 };
 

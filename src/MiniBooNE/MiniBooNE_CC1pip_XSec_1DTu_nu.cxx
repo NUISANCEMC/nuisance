@@ -45,22 +45,11 @@ MiniBooNE_CC1pip_XSec_1DTu_nu::MiniBooNE_CC1pip_XSec_1DTu_nu(std::string inputfi
 void MiniBooNE_CC1pip_XSec_1DTu_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j){
-    if (!event->PartInfo(j)->fIsAlive || event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = event->PartInfo(j)->fP;
-    }
-  }
-
-// No W cut on MiniBooNE CC1pi+
+  // No W cut on MiniBooNE CC1pi+
   double Tmu = FitUtils::T(Pmu)*1000.;
 
   fXVar = Tmu;

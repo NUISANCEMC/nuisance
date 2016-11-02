@@ -94,20 +94,9 @@ void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::SetCovarMatrix(std::string fileLocation) {
 
 void T2K_CC1pip_CH_XSec_1Dthq3pi_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j) {
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double th_q3_pi = FitUtils::thq3pi_CC1pip_T2K(Pnu, Pmu, Ppip);
 

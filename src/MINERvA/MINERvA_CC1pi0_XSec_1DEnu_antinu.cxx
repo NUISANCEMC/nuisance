@@ -51,30 +51,15 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
 
 void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
 
-    TLorentzVector Pnu = (event->PartInfo(0))->fP;
-    TLorentzVector Ppi0;
-    TLorentzVector Pmu;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
+  
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+  double Enu     = -999;
 
-    // Loop over the particle stack
-    for (unsigned int j = 2; j < event->Npart(); ++j) {
-      if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-      int PID = (event->PartInfo(j))->fPID;
-      if (PID == 111) {
-        Ppi0 = event->PartInfo(j)->fP;
-      } else if (PID == -13) {
-        Pmu = (event->PartInfo(j))->fP;
-      }
-    }
-
-    double hadMass = FitUtils::Wrec(Pnu, Pmu);
-    double Enu;
-
-    if (hadMass > 100 && hadMass < 1800) {
-      //Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
-      Enu = Pnu.E()/1000.;
-    } else {
-      Enu = -999;
-  }
+  if (hadMass > 100 && hadMass < 1800)
+    Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
 

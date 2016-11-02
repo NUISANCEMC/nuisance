@@ -55,26 +55,13 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
 
 //********************************************************************
 void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
-  //********************************************************************
+//********************************************************************
 
-  Enu_rec = 0.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pe   = event->GetHMFSParticle(11)->fP;
 
-  // Get the relevant signal information
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-
-    int PID = (event->PartInfo(j))->fPID;
-    if (!event->PartInfo(j)->fIsAlive) continue;
-
-    if (abs(PID) == 11){
-
-      Thetae = fabs((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect())) * 180. / TMath::Pi();
-      Ee = (event->PartInfo(j))->fP.E()/1000.0;
-
-      // Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(ThetaMu), 34.,true);
-      //      Q2QEe   = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
-      break;
-    }
-  }
+  Thetae   = Pnu.Vect().Angle(Pe.Vect()) * 180. / TMath::Pi();
+  Ee       = Pe.E()/1000.0;
 
   fXVar = Thetae;
   LOG(EVT) << "fXVar = "<<fXVar<<std::endl;

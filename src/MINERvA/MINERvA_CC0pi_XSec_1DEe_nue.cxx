@@ -58,31 +58,17 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
 
 //********************************************************************
 void MINERvA_CC0pi_XSec_1DEe_nue::FillEventVariables(FitEvent *event){
-  //********************************************************************
+//********************************************************************
 
-  Enu_rec = 0.0;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pe   = event->GetHMFSParticle(11)->fP;
 
-  // Get the relevant signal information
-  for (UInt_t j = 2; j < event->Npart(); ++j){
+  Thetae   = Pnu.Vect().Angle(Pe.Vect());
+  Enu_rec  = FitUtils::EnuQErec(Pe, cos(Thetae), 34.,true);
+  Q2QEe    = FitUtils::Q2QErec(Pe, cos(Thetae), 34.,true);
+  Ee       = Pe.E()/1000.0;
 
-    int PID = (event->PartInfo(j))->fPID;
-    if (!event->PartInfo(j)->fIsAlive) continue;
-
-    if (abs(PID) == 11){
-
-      Thetae     = fabs((event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect()));
-      Ee         = (event->PartInfo(j))->fP.E()/1000.0;
-
-      Enu_rec     = FitUtils::EnuQErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
-      Q2QEe       = FitUtils::Q2QErec((event->PartInfo(j))->fP, cos(Thetae), 34.,true);
-
-      break;
-    }
-  }
-
-  LOG(EVT)<<"fXVar = "<<Ee<<std::endl;
   fXVar = Ee;
-
   return;
 }
 

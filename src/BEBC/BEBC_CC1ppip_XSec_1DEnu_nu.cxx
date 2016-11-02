@@ -27,7 +27,7 @@ BEBC_CC1ppip_XSec_1DEnu_nu::BEBC_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
   EnuMin = 5.;
   EnuMax = 200.;
   fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  fNormError = 0.20; // normalisation error on ANL BNL flux
+  fNormError = 0.20;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BEBC/theses/BEBC_theses_CC1pip_on_p_W14.txt");
@@ -37,41 +37,22 @@ BEBC_CC1ppip_XSec_1DEnu_nu::BEBC_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
   covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
-  //this->fScaleFactor = double(1.0E-38)/double(fNEvents)*(16./8.);
+
 };
 
 
 void BEBC_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // wanna calculate hadronic mass, plot and cut for signal
-
-  // Loop over the particle stack
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
-  double Enu;
+  double Enu = -1.0;
 
   // weirdly, the Enu distribution does not have a W < 1.4GeV cut
-  if (hadMass < 1400) {
-    Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
-  } else {
-    Enu = -1.0;
-  }
+  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
 
   fXVar = Enu;
 

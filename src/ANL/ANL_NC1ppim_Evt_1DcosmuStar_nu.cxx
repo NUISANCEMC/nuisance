@@ -51,27 +51,11 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string input
 
 void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Pin = event->PartInfo(1)->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppim;
-  TLorentzVector PnuOut;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0 && (event->PartInfo(j)->fNEUTStatusCode != 2)) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-
-    if (PID == -211) {
-      Ppim = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 14) {
-      PnuOut = event->PartInfo(j)->fP;
-    }
-  }
+  TLorentzVector Pnu    = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pin    = event->GetHMISParticle(2112)->fP;
+  TLorentzVector Pp     = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppim   = event->GetHMFSParticle(-211)->fP;
+  TLorentzVector PnuOut = event->GetHMFSParticle(14)->fP;
 
   // Boost into centre of mass frame
   TLorentzVector CMS = Pnu + Pin;

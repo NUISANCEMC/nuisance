@@ -51,25 +51,10 @@ BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
 
 void BNL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
   
-  // set up the 4-vectors from NEUT
-  TLorentzVector Pnu = event->PartInfo(0)->fP;
-  TLorentzVector Pp;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 2212) {
-      Pp = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
   
   // Get the hadronic mass
   double hadMass = FitUtils::MpPi(Pp, Ppip);
@@ -105,7 +90,7 @@ void BNL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
   TVector3 PpipVectPlane = PpipVect - PpipVectZ;
 
   // Then finally construct phi as the angle between pion projection and x axis
-  double phi;
+  double phi = -999;
   
   // BNL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) {
@@ -121,8 +106,6 @@ void BNL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
         phi = (180./M_PI)*(2*M_PI-PpipVectPlane.Angle(xVect));
       }
     }
-  } else {
-    phi = -999;
   }
 
   fXVar = phi;

@@ -50,29 +50,14 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   
-  TLorentzVector Pn;
-  TLorentzVector Ppip;
-
-  // Loop over the particle stack to find relevant particles 
-  // start at 2 because 0=nu, 1=nucleon, by NEUT default
-  for (UInt_t j =  2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue; //move on if NOT ALIVE and NOT NORMAL
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211)
-      Ppip = event->PartInfo(j)->fP;
-    else if (PID == 2112)
-      Pn = event->PartInfo(j)->fP;
-  }
+  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;;
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
-  double ppip;
+  double ppip    = -1.0;
   
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) {
-    ppip = FitUtils::p(Ppip)*1000.;
-  } else {
-    ppip = -1.0;
-  }
+  if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
 
   fXVar = ppip;
 
