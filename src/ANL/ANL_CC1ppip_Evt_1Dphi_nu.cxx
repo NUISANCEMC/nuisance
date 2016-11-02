@@ -17,6 +17,9 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+/** 
+ * Radecky et al. Phys Rev D, 3rd series, Vol 25, No 5, 1 March 1982, p 1161-1173
+*/
 #include "ANL_CC1ppip_Evt_1Dphi_nu.h"
 
 // The constructor

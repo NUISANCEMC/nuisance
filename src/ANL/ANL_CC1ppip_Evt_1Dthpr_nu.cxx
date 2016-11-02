@@ -16,9 +16,10 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
+/** 
+ * Derrick et al. Phys Rev D, Vol 23, Number 3, 1 Feb 1981, p 569-575
+*/
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
-//Derrick et al, Phys Rev D V23 N3, p572 fig 3
 
 // The constructor
 ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {

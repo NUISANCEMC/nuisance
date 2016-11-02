@@ -17,6 +17,10 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+/** 
+ * Derrick et al. Phys Rev D, Vol 23, Number 3, 1 Feb 1981, p 569-575
+*/
+
 #include "ANL_CC1ppip_Evt_1Dppi_nu.h"
 
 // The constructor
