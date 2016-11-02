@@ -59,6 +59,10 @@ void MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::SetDataValues(std::string fileLocation
 
 void MiniBooNE_CC1pip_XSec_2DTpiCospi_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;

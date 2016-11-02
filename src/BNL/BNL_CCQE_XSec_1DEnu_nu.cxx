@@ -59,6 +59,9 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
 void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 

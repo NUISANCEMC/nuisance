@@ -56,6 +56,9 @@ ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu::ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu(std::string inp
 
 void ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   double pmu = FitUtils::p(Pmu);
 

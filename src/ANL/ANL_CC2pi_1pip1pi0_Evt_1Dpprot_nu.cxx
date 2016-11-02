@@ -56,6 +56,9 @@ ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(std::string
 
 void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(2212) == 0)
+    return;
+
   TLorentzVector Pp = event->GetHMFSParticle(2212)->fP;
   double pprot = FitUtils::p(Pp);
 

@@ -56,6 +56,9 @@ ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu::ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(std::string
 
 void ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(2112) == 0)
+    return;
+
   TLorentzVector Pneutron = event->GetHMFSParticle(2112)->fP;
   double pneut = FitUtils::p(Pneutron);
 

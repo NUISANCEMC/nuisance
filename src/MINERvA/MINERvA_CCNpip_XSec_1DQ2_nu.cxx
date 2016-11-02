@@ -53,6 +53,10 @@ MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, 
 
 void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;

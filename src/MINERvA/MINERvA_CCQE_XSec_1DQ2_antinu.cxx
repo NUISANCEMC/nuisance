@@ -93,6 +93,9 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
 void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
+  if (event->NumFSParticle(-13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 

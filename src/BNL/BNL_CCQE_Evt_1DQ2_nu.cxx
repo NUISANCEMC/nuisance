@@ -88,7 +88,9 @@ void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
 void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************   
 
-  q2qe = -0.1;  
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 

@@ -56,6 +56,9 @@ ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(std::
 
 void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(211) == 0)
+    return;
+
   TLorentzVector Ppip_high = event->GetHMFSParticle(211)->fP;
   double ppip_highest = FitUtils::p(Ppip_high);
 

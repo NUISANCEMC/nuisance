@@ -89,15 +89,16 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string nam
 		 *14.08/8.
 		 / TotalIntegratedFlux()); 
 };
-
+  
 //******************************************************************** 
 /// @details Extract q2qe(fXVar) from the event
 void  MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
  
-  // Init
-  q2qe = -999.9;
-  
+  if (event->NumFSParticle(13) == 0 &&
+      event->NumFSParticle(-13) == 0)
+    return;
+
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
   // The highest momentum mu+/mu-. The isSignal definition should make sure we only 

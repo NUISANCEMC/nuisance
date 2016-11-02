@@ -93,6 +93,9 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
 void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 

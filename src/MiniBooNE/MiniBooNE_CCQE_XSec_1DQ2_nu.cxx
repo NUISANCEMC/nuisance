@@ -83,8 +83,9 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
 
-  // Init
-  q2qe = -999.9;
+  if (event->NumFSParticle(13) == 0 &&
+      event->NumFSParticle(-13)== 0)
+    return;
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 

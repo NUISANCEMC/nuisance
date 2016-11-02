@@ -60,6 +60,9 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
 void MINERvA_CC0pi_XSec_1DEe_nue::FillEventVariables(FitEvent *event){
 //********************************************************************
 
+  if (event->NumFSParticle(11) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pe   = event->GetHMFSParticle(11)->fP;
 

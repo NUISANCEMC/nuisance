@@ -95,6 +95,9 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************   
 
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   // Fill histogram with reconstructed Q2 Distribution
   q2qe = 0.0;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;

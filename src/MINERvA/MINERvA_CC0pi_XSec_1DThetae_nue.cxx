@@ -57,6 +57,9 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
 void MINERvA_CC0pi_XSec_1DThetae_nue::FillEventVariables(FitEvent *event){
 //********************************************************************
 
+  if (event->NumFSParticle(11) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pe   = event->GetHMFSParticle(11)->fP;
 

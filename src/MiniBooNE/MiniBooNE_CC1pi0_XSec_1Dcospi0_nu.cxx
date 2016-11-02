@@ -42,6 +42,10 @@ MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string
 
 void MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::FillEventVariables(FitEvent *event) {
   
+  if (event->NumFSParticle(111) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  =event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;

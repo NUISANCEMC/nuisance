@@ -44,6 +44,11 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(2112) == 0 ||
+      event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;

@@ -56,6 +56,9 @@ ANL_CC2pi_1pim1pip_Evt_1Dppip_nu::ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(std::string i
 
 void ANL_CC2pi_1pim1pip_Evt_1Dppip_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(211) == 0)
+    return;
+
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   double ppip = FitUtils::p(Ppip);
 

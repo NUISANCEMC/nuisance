@@ -130,6 +130,10 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
 
 void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(13) == 0 ||
+      event->NumFSParticle(211) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;

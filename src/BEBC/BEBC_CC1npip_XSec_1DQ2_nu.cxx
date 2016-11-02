@@ -45,6 +45,11 @@ BEBC_CC1npip_XSec_1DQ2_nu::BEBC_CC1npip_XSec_1DQ2_nu(std::string inputfile, FitW
 
 void BEBC_CC1npip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   
+  if (event->NumFSParticle(2112) == 0 ||
+      event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;

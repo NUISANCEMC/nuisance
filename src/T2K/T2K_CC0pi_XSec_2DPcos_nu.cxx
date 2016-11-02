@@ -64,6 +64,9 @@ bool T2K_CC0pi_XSec_2DPcos_nu::isSignal(FitEvent *event){
 
 void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
 
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 

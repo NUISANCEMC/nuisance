@@ -68,8 +68,9 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
 void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************   
 
-  // Fill histogram with reconstructed Q2 Distribution
-  q2qe = 0.0;
+  if (event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 

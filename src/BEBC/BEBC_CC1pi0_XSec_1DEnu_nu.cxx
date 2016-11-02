@@ -42,8 +42,13 @@ BEBC_CC1pi0_XSec_1DEnu_nu::BEBC_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitW
 
 void BEBC_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(111) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pp   = event->GetHMFSParticle(2112)->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 

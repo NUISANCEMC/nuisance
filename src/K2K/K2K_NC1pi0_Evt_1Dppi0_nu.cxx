@@ -41,6 +41,9 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWei
 
 void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {
 
+  if (event->NumFSParticle(111) == 0)
+    return;
+
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   double ppi0 = FitUtils::p(Ppi0)*1000.;
   fXVar = ppi0;

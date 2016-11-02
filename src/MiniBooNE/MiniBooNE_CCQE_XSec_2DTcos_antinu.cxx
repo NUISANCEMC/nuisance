@@ -70,9 +70,10 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string
 void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
 //******************************************************************** 
   
-  // Init
-  Ekmu = -999.9;
-  costheta = -999.9;
+  if (event->NumFSParticle(13) == 0 &&
+      event->NumFSParticle(-13)== 0)
+    return;
+
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
   // The highest momentum mu+/mu-. The isSignal definition should make sure we only

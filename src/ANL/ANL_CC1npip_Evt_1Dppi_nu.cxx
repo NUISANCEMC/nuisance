@@ -50,6 +50,11 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
 
 void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   
+  if (event->NumFSParticle(2112) == 0 ||
+      event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(13) == 0)
+    return;
+
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
