@@ -729,7 +729,7 @@ void FitWeight::SetupGenieRW() {
   fIsGenieChanged = true;
 
   // Create Engine
-  GHepRecord::SetPrintLevel(-2);
+  //  GHepRecord::SetPrintLevel(-2);
   StopTalking(); // Really stop it from talking to me
   fGenieRW = new genie::rew::GReWeight();
 

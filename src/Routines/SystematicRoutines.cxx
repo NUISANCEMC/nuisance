@@ -131,7 +131,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   }
 
   if (!maxevents_flag.empty()){
-    FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
+    FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
   }
 
   if (verbosity_flag != 0){

@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "GeneratorUtils.h"
+#include "FitLogger.h"
 
 #ifdef __NEUT_ENABLED__
 void GeneratorUtils::FillNeutCommons(NeutVect* nvect){

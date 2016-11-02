@@ -832,7 +832,7 @@ void MinimizerRoutines::LowStatRoutine(std::string routine){
 
   LOG(FIT) << "Running Low Statistics Routine: "<<routine<<std::endl;
   int lowstatsevents = FitPar::Config().GetParI("minimizer.lowstatevents");
-  int maxevents      = FitPar::Config().GetParI("MAXEVENTS");
+  int maxevents      = FitPar::Config().GetParI("input.maxevents");
   int verbosity      = FitPar::Config().GetParI("VERBOSITY");
 
   std::string trueroutine = routine;
@@ -841,13 +841,13 @@ void MinimizerRoutines::LowStatRoutine(std::string routine){
 		     substring.length() );
 
   // Set MAX EVENTS=1000
-  FitPar::Config().SetParI("MAXEVENTS",lowstatsevents);
+  FitPar::Config().SetParI("input.maxevents",lowstatsevents);
   FitPar::Config().SetParI("VERBOSITY",3);
   SetupFCN();
 
   RunFitRoutine(trueroutine);
 
-  FitPar::Config().SetParI("MAXEVENTS",maxevents);
+  FitPar::Config().SetParI("input.maxevents",maxevents);
   SetupFCN();
 
   FitPar::Config().SetParI("VERBOSITY",verbosity);

@@ -28,6 +28,8 @@ config ERROR 2
 # Default Requirements file for the externalDataFitter Package
 # MAX Events : -1 is no cut. Events will be scaled automatically to give good xsec predictions.
 config input.maxevents -1
+config MAXEVENTS -1
+config input.MAXEVENTS -1
 
 # Turn on/off event manager
 # EventManager enables us to only loop number of events once for multiple projections of the same measurements

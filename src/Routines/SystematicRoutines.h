@@ -138,7 +138,7 @@ public:
   //! Print current value
   void PrintState();
   
-  //! Performs a fit routine where the MAXEVENTS is set to a much lower value to try and move closer to the best fit minimum.
+  //! Performs a fit routine where the input.maxevents is set to a much lower value to try and move closer to the best fit minimum.
   void LowStatRoutine(std::string routine);
 
   //! Perform a chi2 scan in 1D around the current point

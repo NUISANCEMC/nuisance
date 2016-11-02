@@ -269,7 +269,7 @@ void InputHandler::ReadEventSplineFile() {
 
   LOG(DEB) << "Loaded all spline coeffs" << endl;
 
-  // Set MAXEVENTS CALC Here before we load in splines
+  // Set input.maxevents CALC Here before we load in splines
   if (fMaxEvents > 1 and fMaxEvents < fNEvents) {
     LOG(SAM) << " -> Reading only " << fMaxEvents
              << " events from total spline events." << std::endl;

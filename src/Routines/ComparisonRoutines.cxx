@@ -128,7 +128,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]){
   }
 
   if (!maxevents_flag.empty()){
-    FitPar::Config().SetParI("MAXEVENTS", atoi(maxevents_flag.c_str()));
+    FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
   }
 
   if (verbosity_flag != 0){
@@ -507,7 +507,7 @@ void ComparisonRoutines::GenerateComparison(){
 //*************************************
 
   // Main Event Loop from event Manager
-  bool using_evtmanager = FitPar::Config().GetParB("input.eventmanager");
+  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
 
   if (using_evtmanager and false) {
     LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
