@@ -124,7 +124,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   LOG(FIT) << "Processed all events" << std::endl;
 
   // Once event loop is done we can start saving stuff into the file
-  bool savesplines = FitPar::Config().GetParB("save_genie_splines");
+  // bool savesplines = FitPar::Config().GetParB("save_genie_splines"); // Currently not implemented
   
   TFile* outputfile = new TFile(input.c_str(),"UPDATE");
   outputfile->cd();
@@ -160,13 +160,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   // For each target save a total spline
   std::map<std::string, TH1D*> targetsplines;
 
-  for (int i = 0; i < targetids.size(); i++){
+  for (uint i = 0; i < targetids.size(); i++){
     LOG(FIT) << "Getting target "<< i << std::endl;
     std::string targ = targetids[i];
     targetsplines[targ] = (TH1D*) xsechist->Clone();
     LOG(FIT) << "Created target spline for " << targ << std::endl;
     
-    for (int j = 0; j < genieids.size(); j++){
+    for (uint j = 0; j < genieids.size(); j++){
       std::string mode = genieids[j];
 
       // Look at all matching modes/targets
@@ -189,7 +189,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target,",");
   TH1D* totalxsec = (TH1D*) xsechist->Clone();
   
-  for (int i = 0; i < targprs.size(); i++){
+  for (uint i = 0; i < targprs.size(); i++){
     std::string targpdg = targprs[i];
 
     for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin();
