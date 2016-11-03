@@ -712,7 +712,7 @@ void Measurement1D::FillHistograms() {
 void Measurement1D::ScaleEvents() {
   //********************************************************************
 
-  LOG(REC) << std::setw(20) << " " << fMCHist->Integral() << "/" << fNEvents
+  LOG(REC) << std::setw(10) << std::right << fMCHist->Integral() << "/" << fNEvents
            << " events passed selection + binning after reweight" << std::endl;
 
   // Simple function to scale to xsec result if this is all that is needed.
@@ -1144,7 +1144,7 @@ void Measurement1D::Write(std::string drawOpt) {
 
   // If null pointer return
   if (!fMCHist and !fDataHist) {
-    LOG(SAM) << fName << "Incomplete histogram set!" << std::endl;
+    ERR(WRN) << fName << "Incomplete histogram set!" << std::endl;
     return;
   }
   FitPar::Config().out->cd();
