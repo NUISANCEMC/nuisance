@@ -433,7 +433,7 @@ void FitWeight::PrintState() {
       
     } else {
       (void)val;
-      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
+      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. " << std::endl;
       LOG(MIN) << std::setw(40) << std::left << fDialNames.at(i) << std::setw(5)
 	       << " = " << fDialValues.at(i) << " " << fDialUnits.at(i) << std::endl;
     }
