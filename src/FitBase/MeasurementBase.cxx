@@ -173,24 +173,24 @@ void MeasurementBase::Reconfigure(){
 
     // Print Out
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
-      LOG(REC).unsetf(ios_base::fixed);
+      // LOG(SAM).unsetf(ios_base::fixed);
       LOG(SAM) << std::setw(7) << std::right << i << "/" << fNEvents
-	       << " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
-	       << std::left << std::setw(5) << "%) "
+       	       << " events (" << std::setw(2) << std::right 
+	       << double(i)/double(fNEvents)*100. << "%) "
 	       << "[S,X,Y,Z,M,W] = ["
 	       << std::fixed << std::setprecision(2) << std::right
 	       << Signal << ", "
 	       << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
-	       << std::setw(5) << fYVar  << ", " << std::setw(5) << Mode << ", "
+	       << std::setw(5) << fYVar  << ", " << std::setw(5) << (int)Mode << ", "
 	       << std::setw(5) << Weight << "] "<< std::endl;
     }
       
   }
 
   int npassed = fXVar_VECT.size();
-  LOG(REC) << npassed << "/" << fNEvents << " passed selection " << std::endl;
+  LOG(SAM) << npassed << "/" << fNEvents << " passed selection " << std::endl;
   if (npassed == 0) {
-    LOG(REC) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
+    LOG(SAM) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
   }
 
   // Finalise Histograms
@@ -267,10 +267,13 @@ void MeasurementBase::ReconfigureFast(){
 
     // Print Out
     if (LOG_LEVEL(REC) && (i) % countwidth == 0)
-      LOG(REC) << "Reconfigured " << i <<" signal events. [X,Y,Z,M,W] = ["
-	       << fXVar  << ", " << fYVar << ", "
-	       << fZVar  << ", " << Mode  << ", "
-	       << Weight << "] " << std::endl;
+      LOG(REC) << "Reconfigured " << std::setw(7) << std::right << i 
+	       <<" signal events. [X,Y,Z,M,W] = [" << std::setprecision(2)
+	       << std::setw(5) << std::right << fXVar  << ", "
+	       << std::setw(5) << std::right << fYVar <<  ", "
+	       << std::setw(5) << std::right << fYVar  << ", "
+	       << std::setw(5) << std::right << (int)Mode << ", "
+	       << std::setw(5) << std::right << Weight << "] "<< std::endl;
   }
 
   // Finalise histograms
