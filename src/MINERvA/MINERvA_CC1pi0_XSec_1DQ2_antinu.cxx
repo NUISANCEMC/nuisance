@@ -24,12 +24,11 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1DQ2_antinu::MINERvA_CC1pi0_XSec_1DQ2_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1DQ2_nubar_2016";
+  fName = "MINERvA_CC1pi0_XSec_1DQ2_antinu_2016";
   fPlotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/(GeV^{2})/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_q2.txt");

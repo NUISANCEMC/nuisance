@@ -19,20 +19,21 @@
 
 #include "MINERvA_SignalDef.h"
 
-#include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DTpi0_antinu.h"
 
 // The constructor
-MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CC1pi0_XSec_1DTpi0_antinu::MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dpmu_nubar_2016";
-  fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
+  fName = "MINERvA_CC1pi0_XSec_1DTpi0_antinu_2016";
+  fPlotTitles = "; T_{#pi} (GeV); d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)";
+  hadMassCut = 1800;
+  fIsDiag = false;
   EnuMin = 1.5;
   EnuMax = 10;
-  fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_pmu.txt");
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-muon-momentum.csv");
+  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi.txt");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-kinetic-energy.csv");
 
   // Error is given as percentage of cross-section
   // Need to scale the bin error properly before we do correlation -> covariance conversion
@@ -40,15 +41,15 @@ MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string i
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
   }
 
-  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_pmu_corr.txt", fDataHist->GetNbinsX());
-  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-muon-momentum.csv", fDataHist->GetNbinsX());
+  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi_corr.txt", fDataHist->GetNbinsX());
+  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-kinetic-energy.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
-void MINERvA_CC1pi0_XSec_1Dpmu_antinu::FillEventVariables(FitEvent *event) {
+void MINERvA_CC1pi0_XSec_1DTpi0_antinu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(111) == 0 ||
       event->NumFSParticle(-13) == 0)
@@ -59,18 +60,19 @@ void MINERvA_CC1pi0_XSec_1Dpmu_antinu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double pmu     = -999;
+  double Tpi0 = -999;
 
-  if (hadMass > 100 && hadMass < 1800)
-    pmu = FitUtils::p(Pmu);
+  if (hadMass > 100 && hadMass < hadMassCut) {
+      Tpi0 = FitUtils::T(Ppi0);
+  }
 
-  fXVar = pmu;
+  fXVar = Tpi0;
 
   return;
 };
 
 //********************************************************************
-bool MINERvA_CC1pi0_XSec_1Dpmu_antinu::isSignal(FitEvent *event) {
+bool MINERvA_CC1pi0_XSec_1DTpi0_antinu::isSignal(FitEvent *event) {
 //********************************************************************
   return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
 }

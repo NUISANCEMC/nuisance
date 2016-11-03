@@ -24,7 +24,7 @@
 
 class MINERvA_CCNpip_XSec_1DTpi_nu : public Measurement1D {
 public:
-  MINERvA_CCNpip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
   virtual ~MINERvA_CCNpip_XSec_1DTpi_nu() {};
 
   void FillEventVariables(FitEvent *event);
@@ -32,7 +32,9 @@ public:
   bool isSignal(FitEvent *event);
   void ScaleEvents();
   void Write(std::string drawOpts);
-
+  bool fFullPhaseSpace;
+  bool fUpdatedData;
+  
 private:
   bool isNew;
   int nPions;

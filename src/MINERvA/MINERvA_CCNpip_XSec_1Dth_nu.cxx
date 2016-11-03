@@ -22,10 +22,12 @@
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 
 // The constructor
-MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CCNpip_XSec_1Dth_nu";
+  fName = name;
   fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  fFullPhaseSpace = fName.find("_20deg") == std::string::npos;
+  fUpdatedData = fName.find("2015") == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
@@ -37,36 +39,53 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string inputfile, 
   piIndex.reserve(3);
   thVect.reserve(3);
 
-  if (type.find("NEW") != std::string::npos) {
-    fName += "_2016";
-    isNew = true;
+  // Full Phase Space
+  if (fFullPhaseSpace){
+    if (fUpdatedData){
 
-    //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
+      //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
 
-    // MINERvA has the error quoted as a percentage of the cross-section
-    // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
-    for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-      fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
-    }
+      // MINERvA has the error quoted as a percentage of the cross-section
+      // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
+      for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
+        fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
+      }
 
-    // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
-
-  } else {
-    isNew = false;
-    if (fIsShape) {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
+      // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
     } else {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
-    }
 
-    // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
-    // Please change when MINERvA releases new data!
-    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+      if (fIsShape) {
+        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
+        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
+      } else {
+        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
+        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
+      }
+
+      // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
+      // Please change when MINERvA releases new data!
+      for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+        fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+      }
+    }
+  // Restricted Phase Space
+  } else {
+    if (fUpdatedData){
+      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl; 
+      fUpdatedData = false;
+    } 
+
+    // Only 2015 20deg data
+    if (fIsShape) {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape.txt");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+
+        "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape_cov.txt", fDataHist->GetNbinsX());
+    } else {
+        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg.txt");
+        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+
+            "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_cov.txt", fDataHist->GetNbinsX());
     }
   }
 
@@ -139,7 +158,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 //********************************************************************
   // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
-  return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, false);
+  return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, fFullPhaseSpace);
 }
 
 //********************************************************************
