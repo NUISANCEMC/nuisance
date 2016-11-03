@@ -262,7 +262,6 @@ double JointFCN::GetLikelihood()  {
   }
 
   // Set Data Variable
-  LOG(MIN) << "Total Likelihood = " << like << endl;
   fLikelihood = like;
 
   return like;
@@ -347,7 +346,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 //***************************************************
   
   int starttime = time(NULL);
-  LOG(MIN) << "Starting Reconfigure iter. "<<this->fCurIter<<endl;
+  LOG(REC) << "Starting Reconfigure iter. "<<this->fCurIter<<endl;
 
 
   // Event Manager Reconf
