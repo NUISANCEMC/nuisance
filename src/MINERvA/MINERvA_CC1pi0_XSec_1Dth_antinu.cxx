@@ -22,19 +22,18 @@
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
 
 // The constructor
-MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
+MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  fName = "MINERvA_CC1pi0_XSec_1Dth_nubar";
+  fName = name;
   fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  fUpdatedData = fName.find("2015") == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10;
-  fAllowedTypes += "NEW";
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  if (type.find("NEW") != std::string::npos) {
-    fName += "_2016";
-    isNew = true;
+  if (fUpdatedData){
+
     hadMassCut = 1800;
     fIsDiag = false;
 

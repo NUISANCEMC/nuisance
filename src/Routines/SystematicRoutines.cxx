@@ -554,24 +554,23 @@ void SystematicRoutines::GetCovarFromFCN(){
       dialthrowhandle[name] = pull->GetName();
 
       if (fCurVals.find(name) == fCurVals.end()){
-	ERR(WRN) << name << " Dial not found in throws, so adding that. " << std::endl;
 
-	// Add to Containers
-	fParams.push_back(name);
-	fCurVals[name]      = dialhist.GetBinContent(i+1);
-	fStartVals[name]    = dialhist.GetBinContent(i+1);
-	fMinVals[name]      = minhist.GetBinContent(i+1);
-	fMaxVals[name]      = maxhist.GetBinContent(i+1);
-	fStepVals[name]     = 1.0;
-	fFixVals[name]      = false;
-	fStartFixVals[name] = false;
-	fTypeVals[name]     = typehist.GetBinContent(i+1);
-	fStateVals[name]    = "FREE" + pull->GetType();
+      	// Add to Containers
+      	fParams.push_back(name);
+      	fCurVals[name]      = dialhist.GetBinContent(i+1);
+      	fStartVals[name]    = dialhist.GetBinContent(i+1);
+      	fMinVals[name]      = minhist.GetBinContent(i+1);
+      	fMaxVals[name]      = maxhist.GetBinContent(i+1);
+      	fStepVals[name]     = 1.0;
+      	fFixVals[name]      = false;
+      	fStartFixVals[name] = false;
+      	fTypeVals[name]     = typehist.GetBinContent(i+1);
+      	fStateVals[name]    = "FREE" + pull->GetType();
 
-	// Maker Helper
-	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
-		  << name << " " << fMinVals[name] << " "
-		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name];
+      	// Maker Helper
+      	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
+      		  << name << " " << fMinVals[name] << " "
+      		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] <<endl;
       }
     }
   }
@@ -615,8 +614,14 @@ void SystematicRoutines::GetCovarFromFCN(){
 
   // Print Helper String
   if (!helperstr.str().empty()){
+<<<<<<< HEAD
     ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << std::endl;
     ERR(WRN) << helperstr.str() << std::endl;
+=======
+    LOG(FIT) << "To remove these statements in future studies, add the lines below to your card." << endl;
+    LOG(FIT) << endl << helperstr.str() << endl;
+    sleep(2);
+>>>>>>> a3461d7f033678ac905d2f6a97a3abc6e3d55c29
   }
 
 

@@ -17,21 +17,20 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CC1PI0_XSEC_1DPPI0_ANTINU_H_SEEN
-#define MINERVA_CC1PI0_XSEC_1DPPI0_ANTINU_H_SEEN
+#ifndef MINERVA_CC1PI0_XSEC_1DTpi0_ANTINU_H_SEEN
+#define MINERVA_CC1PI0_XSEC_1DTpi0_ANTINU_H_SEEN
 
 #include "Measurement1D.h"
 
-class MINERvA_CC1pi0_XSec_1Dppi0_antinu : public Measurement1D {
+class MINERvA_CC1pi0_XSec_1DTpi0_antinu : public Measurement1D {
 public:
-  MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  virtual ~MINERvA_CC1pi0_XSec_1Dppi0_antinu() {};
+  MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  virtual ~MINERvA_CC1pi0_XSec_1DTpi0_antinu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  bool fUpdatedData;
+
 private:
-  bool isNew;
   double hadMassCut;
 };
 

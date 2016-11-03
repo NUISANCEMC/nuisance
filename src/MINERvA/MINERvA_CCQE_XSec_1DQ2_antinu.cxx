@@ -46,7 +46,11 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   if (fullphasespace){
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape){
+        ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                 << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                 << "data normalization but full covariance will be used. " << std::endl;
+      }
       datafilename  = "Q2QE_numubar_data_fluxfix.txt";
       covarfilename = "Q2QE_numubar_covar_fluxfix.txt";
 
@@ -63,7 +67,11 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   // Restricted Phase Space
   } else {
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape){
+        ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                 << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                 << "data normalization but full covariance will be used. " << std::endl;
+      }
       datafilename  = "20deg_Q2QE_numubar_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_numubar_covar_fluxfix.txt";
 

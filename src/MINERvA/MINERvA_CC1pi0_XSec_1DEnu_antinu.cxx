@@ -29,7 +29,6 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

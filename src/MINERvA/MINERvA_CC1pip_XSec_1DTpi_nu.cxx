@@ -22,21 +22,32 @@
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 
 // The constructor
-MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
+MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  fName = "MINERvA_CC1pip_XSec_1DTpi_nu";
+  fName = name;
   fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)";
+  fFullPhaseSpace = fName.find("_20deg") == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  if (fIsShape) {
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
+  if (fFullPhaseSpace){
+    if (fIsShape) {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
+    } else {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
+    }
   } else {
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
+     if (this->fIsShape) {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_shape.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov_shape.csv", fDataHist->GetNbinsX());
+    } else {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov.csv", fDataHist->GetNbinsX());
+    }
   }
 
   this->SetupDefaultHist();
@@ -73,5 +84,6 @@ void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool MINERvA_CC1pip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, false);
+  // Last true refers to that this is the restricted MINERvA phase space, in which only forward-going muons are accepted
+  return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
 }

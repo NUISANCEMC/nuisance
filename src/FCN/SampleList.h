@@ -163,6 +163,7 @@
 // MINERvA CC1pi0
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DTpi0_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dthmu_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1DQ2_antinu.h"

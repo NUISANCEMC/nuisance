@@ -29,7 +29,6 @@ MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(std::string
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_thmu.txt");

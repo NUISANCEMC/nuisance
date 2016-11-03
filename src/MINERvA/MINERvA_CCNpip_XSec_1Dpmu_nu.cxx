@@ -29,7 +29,6 @@ MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

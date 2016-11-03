@@ -40,7 +40,8 @@ FitWeight::FitWeight(std::string name, std::string inputfile) {
   fSplineHead = NULL;
 
   this->fName = name;
-
+  fSilenceWeightCalc = false;
+  
   // If file is a root file read it
   if (inputfile.find(".root") != std::string::npos) {
     // Open File
@@ -80,6 +81,8 @@ FitWeight::FitWeight(std::string name) {
   this->fSetAbsTwk = true;
 
   fSplineHead = NULL;
+
+  fSilenceWeightCalc = false;
 
   this->fName = name;
   LOG(FIT) << "Creating FitWeight norm enum = " << this->fNormEnum
@@ -165,6 +168,10 @@ unsigned int FitWeight::GetDialPos(std::string name) {
 void FitWeight::IncludeDial(std::string name, int type, double startval) {
 //********************************************************************
   
+  // Create pointer to current ROOT directory
+  TDirectory* olddir = gDirectory;
+  
+  // Get Dial Enumerations
   int this_enum = this->GetDialEnum(name, type);
   int rw_enum = this->GetRWEnum(this_enum);
 
@@ -271,6 +278,9 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
   // Set Values
   this->SetDialValue(this_enum, startval);
 
+  // Fix Bug by returning to starting directory for this function
+  olddir->cd();
+
   return;
 }
 
@@ -365,6 +375,8 @@ void FitWeight::SetDialValue(int this_enum, double val) {
 //********************************************************************
 void FitWeight::Reconfigure(bool silent) {
   //********************************************************************
+
+  fSilenceWeightCalc = FitPar::Config().GetParB("params.silentweighting");
 
   if ((fIsUsingNeut or fIsUsingNIWG) and fIsUsingT2K) {
     ERR(WRN) << " Make sure no correlated or overlapping dials are being used "
@@ -477,6 +489,11 @@ std::string FitWeight::GetDialType(int this_enum) {
 double FitWeight::CalcWeight(BaseFitEvt* evt) {
 //********************************************************************
 
+  // Optional cout suppression
+  if (fSilenceWeightCalc){
+    StopTalking();
+  }
+
   double rw_weight = 1.0;
 
   // SPLINE WEIGHTS
@@ -548,6 +565,9 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
   }
 
   evt->Weight = rw_weight;
+
+  // Optional cout suppression
+  if (fSilenceWeightCalc) StartTalking();
   return rw_weight;
 }
 

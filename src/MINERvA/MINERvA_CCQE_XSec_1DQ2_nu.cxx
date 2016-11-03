@@ -46,14 +46,18 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
   if (fullphasespace){
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape){
+        ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                 << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                 << "data normalization but full covariance will be used. " << std::endl;
+      }
       datafilename  = "Q2QE_numu_data_fluxfix.txt";
       covarfilename = "Q2QE_numu_covar_fluxfix.txt";
 
     } else {
       if (fIsShape){
-	datafilename  = "Q2QE_numu_dataa_SHAPE-extracted.txt";
-	covarfilename = "Q2QE_numu_covara_SHAPE-extracted.txt";
+	datafilename  = "Q2QE_numu_data_SHAPE-extracted.txt";
+	covarfilename = "Q2QE_numu_covar_SHAPE-extracted.txt";
       } else {
 	datafilename  = "Q2QE_numu_data.txt";
 	covarfilename = "Q2QE_numu_covar.txt";
@@ -63,14 +67,18 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
   // Restricted Phase Space
   } else {
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape){
+        ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                 << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                 << "data normalization but full covariance will be used. " << std::endl;
+      }
       datafilename  = "20deg_Q2QE_numu_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_numu_covar_fluxfix.txt";
 
     } else {
       if (fIsShape){
-	datafilename  = "20deg_Q2QE_numu_dataa_SHAPE-extracted.txt";
-	covarfilename = "20deg_Q2QE_numu_covara_SHAPE-extracted.txt";
+	datafilename  = "20deg_Q2QE_numu_data_SHAPE-extracted.txt";
+	covarfilename = "20deg_Q2QE_numu_covar_SHAPE-extracted.txt";
       } else {
 	datafilename  = "20deg_Q2QE_numu_data.txt";
 	covarfilename = "20deg_Q2QE_numu_covar.txt";

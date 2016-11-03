@@ -147,9 +147,9 @@ void MeasurementBase::Reconfigure(){
     Weight = cust_event->Weight;
 
     // Initialize
-    fXVar = 0.0;
-    fYVar = 0.0;
-    fZVar = 0.0;
+    fXVar = -999.9;
+    fYVar = -999.9;
+    fZVar = -999.9;
     Signal = false;
     Mode = cust_event->Mode;
 
@@ -173,16 +173,18 @@ void MeasurementBase::Reconfigure(){
 
     // Print Out
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
-      // LOG(SAM).unsetf(ios_base::fixed);
-      LOG(SAM) << std::setw(7) << std::right << i << "/" << fNEvents
-       	       << " events (" << std::setw(2) << std::right  
-	       << (int)(double(i)/double(fNEvents)*100.)
-	       << "%) " << "[S,X,Y,Z,M,W] = ["
+      std::stringstream ss("");
+      ss.unsetf(ios_base::fixed);
+      ss << std::setw(7) << std::right << i << "/" << fNEvents
+	       << " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
+	       << std::left << std::setw(5) << "%) "
+	       << "[S,X,Y,Z,M,W] = ["
 	       << std::fixed << std::setprecision(2) << std::right
 	       << Signal << ", "
 	       << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
 	       << std::setw(5) << fYVar  << ", " << std::setw(3) << (int)Mode << ", "
 	       << std::setw(5) << Weight << "] "<< std::endl;
+      LOG(SAM) << ss.str();
     }
       
   }
