@@ -255,6 +255,8 @@ class FitWeight {
   bool fIsNuwroChanged;
   bool fIsT2KChanged;
 
+  bool fSilenceWeightCalc;
+  
   bool fSetAbsTwk;
 
   FitSplineHead* fSplineHead;

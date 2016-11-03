@@ -64,6 +64,9 @@ config params.setabstwk 1
 # Convert Dials in output statements using dial conversion card
 config convert_dials 0
 
+# Make RW Calculations be quiet
+condif params.silentweighting 0
+
 # Vetos can be used to specify RW dials NOT to be loaded in
 # Useful if one specific one has an issue
 config FitWeight.fNIWGRW_veto  ''
