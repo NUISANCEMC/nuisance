@@ -28,10 +28,13 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   fFullPhaseSpace = fName.find("_20deg") == std::string::npos;
   fUpdatedData = fName.find("2015") == std::string::npos;
+   // Add strings because of silly matrix reader
+  if (fUpdatedData && fName.find("2016") == std::string::npos) fName += "_2016";
+  if (!fUpdatedData && fName.find("2015") == std::string::npos) fName += "_2015";
+
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions

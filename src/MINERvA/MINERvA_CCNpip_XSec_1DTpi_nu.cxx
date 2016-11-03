@@ -33,6 +33,10 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
+  // Add strings because of silly matrix reader
+  if (fUpdatedData && fName.find("2016") == std::string::npos) fName += "_2016";
+  if (!fUpdatedData && fName.find("2015") == std::string::npos) fName += "_2015";
+
   // Reserve length 3 for the number of pions
   piIndex.reserve(3);
   TpiVect.reserve(3);

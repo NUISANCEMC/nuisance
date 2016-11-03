@@ -426,7 +426,7 @@ MINERvA Samples
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu") ||
              !name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu_2016") ){
     fChain->push_back(
-        new MINERvA_CC1pi0_XSec_1Dppi0_antinu(file, rw, type, fkdt));
+        new MINERvA_CC1pi0_XSec_1DTpi0_antinu(file, rw, type, fkdt));
 
 // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DQ2_antinu")) {
