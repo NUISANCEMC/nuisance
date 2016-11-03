@@ -175,13 +175,13 @@ void MeasurementBase::Reconfigure(){
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
       // LOG(SAM).unsetf(ios_base::fixed);
       LOG(SAM) << std::setw(7) << std::right << i << "/" << fNEvents
-       	       << " events (" << std::setw(2) << std::right 
-	       << double(i)/double(fNEvents)*100. << "%) "
-	       << "[S,X,Y,Z,M,W] = ["
+       	       << " events (" << std::setw(2) << std::right  
+	       << (int)(double(i)/double(fNEvents)*100.)
+	       << "%) " << "[S,X,Y,Z,M,W] = ["
 	       << std::fixed << std::setprecision(2) << std::right
 	       << Signal << ", "
 	       << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
-	       << std::setw(5) << fYVar  << ", " << std::setw(5) << (int)Mode << ", "
+	       << std::setw(5) << fYVar  << ", " << std::setw(3) << (int)Mode << ", "
 	       << std::setw(5) << Weight << "] "<< std::endl;
     }
       
@@ -272,7 +272,7 @@ void MeasurementBase::ReconfigureFast(){
 	       << std::setw(5) << std::right << fXVar  << ", "
 	       << std::setw(5) << std::right << fYVar <<  ", "
 	       << std::setw(5) << std::right << fYVar  << ", "
-	       << std::setw(5) << std::right << (int)Mode << ", "
+	       << std::setw(3) << std::right << (int)Mode << ", "
 	       << std::setw(5) << std::right << Weight << "] "<< std::endl;
   }
 
