@@ -15,6 +15,7 @@
 # 5 Every Event print out (SHOUT)
 # -1 DEBUGGING
 config verbosity    4
+config VERBOSITY 4
 
 # ERROR goes from
 # 0 NONE
