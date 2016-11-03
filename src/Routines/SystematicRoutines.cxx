@@ -571,7 +571,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 	// Maker Helper
 	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
 		  << name << " " << fMinVals[name] << " "
-		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] << std::endl;
+		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name];
       }
     }
   }
@@ -606,7 +606,7 @@ void SystematicRoutines::GetCovarFromFCN(){
       ERR(WRN) << "Added ParamPull : " << name << " " << pullterm.str() << " " << type << std::endl;
 
       // Add helper string for future fits
-      helperstr << "covar " << name << " " << pullterm.str() << " " << type << std::endl;
+      helperstr << "covar " << name << " " << pullterm.str() << " " << type;
 
       // Keep Track of Throws
       dialthrowhandle[syst] = pull->GetName();
