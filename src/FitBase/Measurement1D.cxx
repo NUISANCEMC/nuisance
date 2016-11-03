@@ -1147,7 +1147,8 @@ void Measurement1D::Write(std::string drawOpt) {
     LOG(SAM) << fName << "Incomplete histogram set!" << std::endl;
     return;
   }
-  FitPar::Config().out->cd();
+
+  //  FitPar::Config().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");

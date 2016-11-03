@@ -1014,7 +1014,7 @@ void Measurement2D::Write(std::string drawOpt){
     return;
   }
 
-  FitPar::Config().out->cd();
+  //  FitPar::Config().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
