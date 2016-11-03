@@ -616,8 +616,7 @@ void SystematicRoutines::GetCovarFromFCN(){
   // Print Helper String
   if (!helperstr.str().empty()){
     ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << std::endl;
-    LOG(FIT) << helperstr.str() << std::endl;
-    sleep(2);
+    ERR(WRN) << helperstr.str() << std::endl;
   }
 
 
