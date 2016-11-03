@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
 project(ExternalDataFitter)
 
+enable_language(Fortran)
+
 set (ExtFit_VERSION_MAJOR 1)
 set (ExtFit_VERSION_MINOR 0) #The q+1'th letter of the alphabet
 set (ExtFit_VERSION_REVISION 0)

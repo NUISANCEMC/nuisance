@@ -155,10 +155,12 @@ void StopTalking(){
   if (FitPar::log_verb == (unsigned int)DEB) return;
   std::cout.rdbuf(FitPar::redirect_stream.rdbuf());
   std::cerr.rdbuf(FitPar::redirect_stream.rdbuf());
+  shhpythiaitokay_();
 }
 
 void StartTalking(){
   std::cout.rdbuf(FitPar::default_cout);
   std::cerr.rdbuf(FitPar::default_cerr);
+  canihazpythia_();
 }
 

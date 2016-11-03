@@ -27,6 +27,7 @@ SignalDef.h
 )
 
 set(IMPLFILES
+PythiaQuiet.f
 FitLogger.cxx
 FitParameters.cxx
 FitUtils.cxx
@@ -35,7 +36,6 @@ PlotUtils.cxx
 StatUtils.cxx
 SignalDef.cxx
 )
-
 
 set(LIBNAME Utils)
 
