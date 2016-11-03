@@ -29,7 +29,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   fName = name;
   nBins = 16;
   fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  isFluxFix      = name.find("_newflux") != std::string::npos;
+  isFluxFix      = name.find("_oldflux") == std::string::npos;
   fullphasespace = name.find("_20deg")   == std::string::npos;
   fIsRatio = false;
   fIsSummed = false;
@@ -56,7 +56,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   if (fullphasespace){
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape) {
+          ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                   << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                   << "data normalization but full covariance will be used. " << std::endl;
+                 }
+
       datafilename  = "Q2QE_joint_data_fluxfix.txt";
       covarfilename = "Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_newflux";
@@ -78,7 +83,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   } else {
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape) {
+          ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                   << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                   << "data normalization but full covariance will be used. " << std::endl;
+                 }
+                 
       datafilename  = "20deg_Q2QE_joint_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux";

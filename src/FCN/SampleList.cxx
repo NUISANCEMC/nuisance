@@ -340,7 +340,7 @@ MINERvA Samples
 
   } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_joint_oldflux") ||
              !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux") ||
-	     //	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint") || // Currently unstable
+	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint") || 
 	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg")){
     
     fChain->push_back(new MINERvA_CCQE_XSec_1DQ2_joint(name, file, rw, type, fkdt));
