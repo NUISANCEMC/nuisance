@@ -581,6 +581,7 @@ void FitWeight::SetupNeutRW() {
   fIsNeutChanged = true;
 
   // Create RW Engine
+  StopTalking();
   fNeutRW = new neut::rew::NReWeight();
 
   // get list of vetoed calc engines (just for debug really)
@@ -619,6 +620,7 @@ void FitWeight::SetupNeutRW() {
   if (nucl_piless)
     fNeutRW->AdoptWghtCalc("nucl_piless", new neut::rew::NReWeightNuclPiless);
   fNeutRW->Reconfigure();
+  StartTalking();
 }
 #endif
 
@@ -642,6 +644,7 @@ void FitWeight::SetupNIWGRW() {
   fIsNIWGChanged = true;
 
   // Create RW Engine
+  StopTalking();
   fNIWGRW = new niwg::rew::NIWGReWeight();
 
   // Get List of Veto Calcs (For Debugging)
@@ -680,6 +683,7 @@ void FitWeight::SetupNIWGRW() {
                            new niwg::rew::NIWGReWeightHadronMultSwitch);
 
   fNIWGRW->Reconfigure();
+  StartTalking();
 }
 #endif
 
