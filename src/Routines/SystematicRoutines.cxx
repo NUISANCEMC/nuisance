@@ -984,7 +984,11 @@ void SystematicRoutines::GenerateErrorBands(){
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
     TH1D *baseplot = (TH1D*)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
-    LOG(FIT) << "Creating error bands for " << plotname << std::endl;
+    LOG(FIT) << "Creating error bands for " << plotname;
+    if (LOG_LEVEL(FIT)){
+      if (!uniformly) std::cout << " : Using COVARIANCE Throws! " << std::endl;
+      else std::cout << " : Using UNIFORM THROWS!!! " << std::endl;
+    }
 
     int nbins = baseplot->GetNbinsX()*baseplot->GetNbinsY();
 
@@ -1029,14 +1033,16 @@ void SystematicRoutines::GenerateErrorBands(){
 
     errorDIR->cd();
 
+    if (!uniformly){
+      LOG(FIT) << "Uniformly Calculating Plot Errors!" << std::endl;
+    }
     for (Int_t j = 0; j < nbins; j++){
 
       if (!uniformly){
-	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
-
+	       baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
       } else {
-	baseplot->SetBinContent(j+1, (binlowest[j] + binhighest[j]) / 2.0);
-        baseplot->SetBinError(j+1, (binhighest[j] - binlowest[j])/2.0);
+      	baseplot->SetBinContent(j+1, 0.0);//(binlowest[j] + binhighest[j]) / 2.0);
+        baseplot->SetBinError(j+1, 0.0); //(binhighest[j] - binlowest[j])/2.0);
       }
     }
 

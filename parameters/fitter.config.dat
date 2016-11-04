@@ -120,11 +120,12 @@ config minimizer.lowstatevents 25000
 # ######################################################
 
 # For -f ErrorBands creates error bands for given measurements 
-# How many throws do we want
-config error_throws 200
+# How many throws do we want (The higher the better precision)
+config error_throws 250
 
 # Are we throwing uniform or according to Gaussian?
-config error_uniform 1
+# Only use uniform if wanting to study the limits of a dial.
+config error_uniform  0
 
 
 # Other Individual Case Configs 
