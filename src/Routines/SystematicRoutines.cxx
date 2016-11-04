@@ -568,9 +568,10 @@ void SystematicRoutines::GetCovarFromFCN(){
       	fStateVals[name]    = "FREE" + pull->GetType();
 
       	// Maker Helper
-      	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
+      	helperstr << std::string(16, ' ' ) << FitBase::ConvDialType(fTypeVals[name]) << " "
       		  << name << " " << fMinVals[name] << " "
-      		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] <<endl;
+      		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] 
+		  << std::endl;
       }
     }
   }
@@ -605,7 +606,7 @@ void SystematicRoutines::GetCovarFromFCN(){
       ERR(WRN) << "Added ParamPull : " << name << " " << pullterm.str() << " " << type << std::endl;
 
       // Add helper string for future fits
-      helperstr << "covar " << name << " " << pullterm.str() << " " << type;
+      helperstr << std::string(16, ' ' ) << "covar " << name << " " << pullterm.str() << " " << type << std::endl;
 
       // Keep Track of Throws
       dialthrowhandle[syst] = pull->GetName();
@@ -614,8 +615,9 @@ void SystematicRoutines::GetCovarFromFCN(){
 
   // Print Helper String
   if (!helperstr.str().empty()){
-    LOG(FIT) << "To remove these statements in future studies, add the lines below to your card." << endl;
-    LOG(FIT) << endl << helperstr.str() << endl;
+    LOG(FIT) << "To remove these statements in future studies, add the lines below to your card:" << std::endl;
+    // Can't use the logger properly because this can be multi-line. Use cout and added spaces to look better!
+    std::cout << helperstr.str();
     sleep(2);
   }
 
