@@ -775,7 +775,6 @@ void InputHandler::ReadGenieFile() {
   tn->AddFile(fInputFile.c_str());
 
   fNEvents = tn->GetEntries();
-  LOG(SAM) << "Number of GENIE Events " << tn->GetEntries() << std::endl;
   StopTalking();
   fGenieGHep = NULL;
   fGenieNtpl = NULL;
