@@ -467,9 +467,8 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
   TDecompSVD LU = TDecompSVD(*this->covar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
 
-}
 
-return;
+  return;
 };
 
 //********************************************************************

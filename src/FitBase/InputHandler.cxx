@@ -775,7 +775,6 @@ void InputHandler::ReadGenieFile() {
   tn->AddFile(fInputFile.c_str());
 
   fNEvents = tn->GetEntries();
-  LOG(SAM) << "Number of GENIE Events " << tn->GetEntries() << std::endl;
   StopTalking();
   fGenieGHep = NULL;
   fGenieNtpl = NULL;
@@ -1010,8 +1009,10 @@ void InputHandler::PrintStartInput() {
   if (fEventType == kEVTSPLINE) return;
 
   // Get First event info
+  StopTalking();
   tn->GetEntry(0);
   fEvent->CalcKinematics();
+  StartTalking();
   LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent->PartInfo(0)->fPID
            << std::endl;
   LOG(SAM) << "             Target A     = " << fEvent->GetTargetA()
