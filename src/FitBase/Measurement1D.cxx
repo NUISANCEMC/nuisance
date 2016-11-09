@@ -799,6 +799,9 @@ double Measurement1D::GetLikelihood() {
 
   double stat = 0.0;
 
+  // If this is for a ratio, there is no data histogram to compare to!
+  if (fNoData || !fDataHist) return 0.;
+
   // Fix weird masking bug
   if (!fIsMask) {
     if (fMaskHist) {

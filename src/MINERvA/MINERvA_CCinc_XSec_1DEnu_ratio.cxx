@@ -37,7 +37,10 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   if      (name.find("C12")   != std::string::npos) target =   "C12";
   else if (name.find("Fe56")  != std::string::npos) target =  "Fe56";
   else if (name.find("Pb208") != std::string::npos) target = "Pb208";
-  else ERR(WRN) << "target " << target << " was not found!" << std::endl;
+  else {
+    ERR(FTL) << "target " << target << " was not found!" << std::endl;
+    exit(-1);
+  }
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR"<<std::endl;
@@ -45,8 +48,8 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   std::string inFileDEN = fSubInFiles.at(1);
 
   // Push classes back into list for processing loop
-  this->fSubChain.push_back(NUM);
-  this->fSubChain.push_back(DEN);
+  // this->fSubChain.push_back(NUM);
+  // this->fSubChain.push_back(DEN);
 
   // Setup the Data input
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
@@ -59,6 +62,8 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(std::string name,
   // Setup Experiments
   NUM  = new MINERvA_CCinc_XSec_1DEnu_nu("MINERvA_CCinc_XSec_1DEnu_"+target+"_CH_NUM", inFileNUM, rw, type, fakeDataFile);
   DEN  = new MINERvA_CCinc_XSec_1DEnu_nu("MINERvA_CCinc_XSec_1DEnu_"+target+"_CH_DEN", inFileDEN, rw, type, fakeDataFile);
+  NUM  ->SetNoData();
+  DEN  ->SetNoData();
 
   // Add to chain for processing
   this->fSubChain.clear();

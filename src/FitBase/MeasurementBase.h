@@ -197,6 +197,7 @@ class MeasurementBase {
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
   void SetMode(int md);
+  void SetNoData(bool isTrue=true){ fNoData = isTrue; };
 
   inline void SetXVar(double xvar){ fXVar = xvar; };
   inline void SetYVar(double yvar){ fYVar = yvar; };
@@ -225,6 +226,7 @@ protected:
   double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
   double fCurrentNorm; //!< current normalisation factor applied if fit is "FREE"
   bool fMCFilled; //!< flag whether MC plots have been filled (For ApplyNormalisation)
+  bool fNoData; //!< flag whether data plots do not exist (for ratios)
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar,fYVar,fZVar,Mode,Weight;

@@ -30,7 +30,7 @@ MeasurementBase::MeasurementBase() {
 
   fScaleFactor = 1.0;
   fMCFilled = false;
-
+  fNoData   = false;
 
 };
 
