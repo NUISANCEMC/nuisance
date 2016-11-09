@@ -51,7 +51,7 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
 void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(111) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
 
