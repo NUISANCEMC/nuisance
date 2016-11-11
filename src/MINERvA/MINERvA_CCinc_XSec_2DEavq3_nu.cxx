@@ -71,20 +71,6 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
 void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  // Set starting variables
-  double Eav  = 0.0; // Energy Avaiable
-  double q3   = 0.0; // Three momentum transfer
-  double q0   = 0.0; // True Energy Transfer
-
-  // Individual particle variables
-  int PID  = 0;
-  double Q2   = 0.0;
-  TLorentzVector q = TLorentzVector(); // reset vector
-  double Mmu = 0.0;
-  double Emu = 0.0;
-  double pmu = 0.0;
-  double ThetaMu = 0.0;
-
   // Seperate MEC
   if (splitMEC_PN_NN){
     int npr = 0;
@@ -108,50 +94,35 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
     }
   }
 
-  // Muon Variables -----------------
-  // Muon should be in slot 2 or 3.
-  for (UInt_t j = 2; j < event->Npart(); j++){
+  // Set Defaults
+  double Eav = -999.9;
+  double q3 = -999.9;
 
-    // Skip dead particles
-    PID = event->PartInfo(j)->fPID;
+  // If muon found get kinematics
+  FitParticle* muon      = event->GetHMFSParticle(13);
+  FitParticle* neutrino  = event->GetNeutrinoIn();
+  if (muon && neutrino){
 
-    // MUON
-    if (PID == 13){
+    // Set Q from Muon
+    TLorentzVector q = neutrino->fP - muon->fP;
+    double q0 = (q.E())/1.E3;
+    double q3_true = (q.Vect().Mag())/1.E3;
+    double thmu = muon->fP.Vect().Angle(neutrino->fP.Vect());
+    double pmu  = muon->fP.Vect().Mag()/1.E3;
+    double emu  = muon->fP.E()/1.E3;
+    double mmu  = muon->fP.Mag()/1.E3;
 
-      // Set q from muon
-      q = ((event->PartInfo(0))->fP - (event->PartInfo(j))->fP);
-      q0 = q.E()/1000.0;
+    // Get Enu Rec
+    double enu_rec = emu + q0;
 
-      // Other muon variables
-      ThetaMu = (event->PartInfo(0))->fP.Vect().Angle((event->PartInfo(j))->fP.Vect());
-      pmu = ((event->PartInfo(j))->fP.Vect().Mag())/1000.0;
-      Emu = ((event->PartInfo(j))->fP.E())/1000.0;
-      Mmu = ((event->PartInfo(j))->fP.Mag())/1000.0;
+    // Set Q2 QE
+    double q2qe = 2*enu_rec * (emu - pmu * cos(thmu)) - mmu*mmu;
 
-      Enu_rec = Emu + q0;
+    // Calc Q3 from Q2QE and EnuTree
+    q3 = sqrt(q2qe + q0*q0);
 
-      // Set Q2 from reconstruction method
-      Q2 = 2*Enu_rec * (Emu - pmu * cos(ThetaMu)) - Mmu*Mmu;
-
-      // merge together for q3
-      q3 = q.Vect().Mag()/1000.0;
-      if (!useq3true) q3 = sqrt( Q2 + q0*q0 );
-
-      continue;
-    }
-
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-
-    // Eav Varible -----------------
-    // P and pi+- Kinetic Energy
-    if (PID == 2212 or PID ==  211 or PID == -211){
-      Eav += FitUtils::T(event->PartInfo(j)->fP);
-
-    // Total Energy of non-neutrons
-    } else if (PID != 2112 and PID < 999 and PID != 22 and abs(PID) != 14){
-      Eav += (event->PartInfo(j)->fP.E())/1000.0;
-    }
+    // Get Eav too
+    Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
   }
 
   // Set Hist Variables

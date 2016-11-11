@@ -195,10 +195,10 @@ bool isCCincLowRecoil_MINERvA(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
 
   // Cut on muon angle greated than 20deg
-  if (pnu.Vect().Angle(pmu.Vect()) < 0.93969262078) return false;
+  if (cos(pnu.Vect().Angle(pmu.Vect())) < 0.93969262078) return false;
 
   // Cut on muon energy < 1.5 GeV
-  if (pmu.E() < 1.5) return false;
+  if (pmu.E()/1000.0 < 1.5) return false;
 
   return true;
 }
