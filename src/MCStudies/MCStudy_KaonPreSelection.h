@@ -55,7 +55,8 @@ public:
   float GetChi2();
 
  private:
-
+  
+  double fEventScaleFactor;
   TTree* fEventTree;
 
 };

@@ -64,18 +64,61 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
     this->TotalIntegratedFlux();
 
-  LOG(SAM) << " Generic Flux Scaling Factor = "<< fScaleFactor << endl;
-
-
   // Create a new TTree and add Nuisance Events Branches
   FitPar::Config().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
   GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
   
-  // Add some extra variables they might need.
+  // Add some extra variables they might need?
   // Enu, PDGnu, PDGLep, CosLep, ELep, TLep?
   
-  // Add Event Scaling Information?
+  // Add Event Scaling Information
+  // This scale factor is used to get the predicted event rate for this sample given                                                                                                                                        
+  // the input flux. Use this when merging different output event ttrees             
+  fEventTree->Branch("EventScaleFactor", &fEventScaleFactor, "EventScaleFactor/D");
+  fEventScaleFactor = fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.);
+
+  // NOTES:
+  // To get normalised predictions weight event event by 'EventScaleFactor' to get the
+  // predicted event rate for that sample given the flux used. Then to get cross-sections
+  // divide by the integrated flux from all samples. 
+  // e.g. To get the numu+numubar prediction, add the event rate predictions from both
+  // samples together, then divide by the integral of the 'nuisance_flux' histograms in each 
+  // sample.
+
+  // Every particle in the nuisance event is saved into the TTree. The list of particle
+  // status codes are given in src/FitBase/FitParticle.h. The neutrino is usually the first
+  // particle in the list.
+  // If selecting final state kaons, select only kaons with state=2.
+
+  /*
+    enum particle_state{
+    kUndefinedState = 5,
+    kInitialState   = 0,
+    kFSIState       = 1,
+    kFinalState     = 2,
+    kNuclearInitial = 3,
+    kNuclearRemnant = 4
+    };
+  */
+
+  // The structure of the particle lists are a dimensional array for each particle mom, then a 1D array
+  // for the PDG and state. Mode gives the true NEUT interaction channel code.
+  /*
+    tn->Branch("Mode", &fMode, "Mode/I");
+    tn->Branch("EventNo", &fEventNo, "EventNo/i");
+    tn->Branch("TotCrs", &fTotCrs, "TotCrs/D");
+    tn->Branch("TargetA", &fTargetA, "TargetA/I");
+    tn->Branch("TargetH", &fTargetH, "TargetH/I");
+    tn->Branch("Bound", &fBound, "Bound/O");
+    
+    tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
+    
+    tn->Branch("NParticles", &fNParticles, "NParticles/I");
+    tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
+    tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
+    tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
+  */
   
   return;
 }
@@ -86,8 +129,6 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 
   // Fill Event Variables for Muon/Neutrino?
   
-  // Fill Scaling information?
-
   // Fill the TTree only for signal
   if (isSignal(event)){
     fEventTree->Fill();
@@ -118,27 +159,30 @@ bool MCStudy_KaonPreSelection::isSignal(FitEvent *event) {
 
   // Apply a Kaon Pre-selection
   // Search for Strange Mesons (included full list from MC PDG)
+
   /*
-  PhystConst::const int pdg_strangemesons[] = {130,310,311,321,
-					       9000311,9000321,
-					       10311,10321,100311,100321,
-					       9010311,9010321,9020311,9020321,
-					       313,323,
-					       10313,10323,
-					       20313,20323,
-					       100313,100323,
-					       9000313,9000323,
-					       30313,30323,
-					       315,325,
-					       9000315,9000325,
-					       10315,10325,
-					       20315,20325,
-					       9010315,9010325,9020315,9020325,
-					       317,327,
-					       9010317,9010327};
+  PhystConst::pdg_strangemesons = {130,310,311,321,
+				   9000311,9000321,
+				   10311,10321,100311,100321,
+				   9010311,9010321,9020311,9020321,
+				   313,323,
+				   10313,10323,
+				   20313,20323,
+				   100313,100323,
+				   9000313,9000323,
+				   30313,30323,
+				   315,325,
+				   9000315,9000325,
+				   10315,10325,
+				   20315,20325,
+				   9010315,9010325,9020315,9020325,
+				   317,327,
+				   9010317,9010327};
+  PhysConst::pdg_antistrangemesons = {above * -1.0};					      
   */
 
   int nstrangemesons = event->NumFSParticle(PhysConst::pdg_strangemesons);
+  nstrangemesons += event->NumFSParticle(PhysConst::pdg_antistrangemesons);
   if (nstrangemesons < 1) return false;
 
   // Do we want any other signal?
