@@ -24,8 +24,6 @@ MiniBooNE_CC1pip_XSec_2DTuCosmu_nu::MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(std::stri
   
   fName = "MiniBooNE_CC1pip_XSec_2DTuCosmu_nu";
   fPlotTitles = "; T_{#mu} (MeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/MeV)";
-  EnuMin = 0.5;
-  EnuMax = 2.0;
   fIsDiag = true;
   fNormError = 0.107;
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

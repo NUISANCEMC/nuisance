@@ -24,8 +24,6 @@ MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string
   
   fName = "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu";
   fPlotTitles = "; cos#theta_{#pi^{0}}; d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/CH_{2})";
-  EnuMin = 0.5;
-  EnuMax = 2.;
   fIsDiag = false;
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

@@ -25,8 +25,6 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string input
   
   fName = "MiniBooNE_CC1pip_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (MeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
-  EnuMin = 0.5;
-  EnuMax = 2.;
   fIsDiag = true;
   fIsEnu1D = true;
   fNormError = 0.107;
