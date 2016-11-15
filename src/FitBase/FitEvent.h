@@ -314,7 +314,7 @@ class FitEvent : public BaseFitEvt {
   int fDistance;
 
   // Reduced Particle Stack
-  const static UInt_t kMaxParticles = 200;
+  const static UInt_t kMaxParticles = 400;
   int fNParticles;
   //  double  fParticlePos[kMaxParticles][4]; // not needed at the moment
   double fParticleMom[kMaxParticles][4];

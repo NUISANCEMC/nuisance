@@ -24,8 +24,6 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
 
   fName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
   fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
-  EnuMin = 0.5;
-  EnuMax = 2.;
   fIsDiag = true;
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

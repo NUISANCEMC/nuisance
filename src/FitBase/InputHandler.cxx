@@ -159,11 +159,11 @@ void InputHandler::ReadFitEvents(){
 
   fEventType = kINPUTFITEVENT;
 
-  fFluxHist  = (TH1D*)fInputRootFile->Get("FitFluxHist");
+  fFluxHist  = (TH1D*)fInputRootFile->Get("nuisance_fluxhist");
   fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
 			  (fName + "; E_{#nu} (GeV)").c_str());
 
-  fEventHist = (TH1D*)fInputRootFile->Get("FitEventHist");
+  fEventHist = (TH1D*)fInputRootFile->Get("nuisance_eventhist");
   fEventHist->SetNameTitle( (fName + "_EVT").c_str(),
 			    (fName + "; E_{#nu} (GeV); Event Rate").c_str());
 
@@ -173,8 +173,8 @@ void InputHandler::ReadFitEvents(){
 			   (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})")
 			   .c_str());
 
-  tn = new TChain("FitEvents", "");
-  tn->Add(Form("%s/FitEvents", fInputFile.c_str()));
+  tn = new TChain("nuisance_events", "");
+  tn->Add(Form("%s/nuisance_events", fInputFile.c_str()));
 
   // Assign nvect
   fNEvents = tn->GetEntries();
