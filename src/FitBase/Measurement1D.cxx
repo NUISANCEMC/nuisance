@@ -1149,9 +1149,9 @@ void Measurement1D::Write(std::string drawOpt) {
   if (fIsMask and drawMask)
     fMaskHist->Write((fName + "_MSK").c_str());  //< save mask
 
-  if (drawFlux) fFluxHist->Write();
-  if (drawXSec) fXSecHist->Write();
-  if (drawEvents) fEventHist->Write();
+  if (drawFlux and fFluxHist) fFluxHist->Write();
+  if (drawXSec and fXSecHist) fXSecHist->Write();
+  if (drawEvents and fEventHist) fEventHist->Write();
 
   if (fIsMask and drawMask and fMaskHist) {
     fMaskHist->Write((fName + "_MSK").c_str());  //< save mask
@@ -1177,14 +1177,6 @@ void Measurement1D::Write(std::string drawOpt) {
 
   if (fIsMask && drawMask && fMaskHist) {
     fMaskHist->Write((this->fName + "_MSK").c_str());  //< save mask
-  }
-
-  // Save neut stack
-  if (drawModes) {
-    // LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
-    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack(
-        (this->fName + "_MC_PDG").c_str(), (TH1**)this->fMCHist_PDG, 0);
-    combo_mcHist_PDG.Write();
   }
 
   // Save Matrix plots
