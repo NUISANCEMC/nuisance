@@ -51,26 +51,32 @@ check_exist (){
 select_gen (){
   if [[ ! "${1}" ]]; then
     echo "[INFO]: Assuming input files are from the NEUT Generator"
+    GEN="NEUT"
     GEN_TAG_NU="NEUT:"
     GEN_TAG_NUB="NEUT:"
   elif [[ "${1}" == "NEUT" ]] || [[ "${1}" == "neut" ]]\
    || [[ "${1}" == "Neut" ]]; then
+    GEN="NEUT"
     GEN_TAG_NU="NEUT:"
     GEN_TAG_NUB="NEUT:"
   elif [[ "${1}" == "GENIE" ]] || [[ "${1}" == "genie" ]]\
    || [[ "${1}" == "Genie" ]]; then
+    GEN="GENIE"
     GEN_TAG_NU="GENIE:"
     GEN_TAG_NUB="GENIE:"
   elif [[ "${1}" == "NUWRO" ]] || [[ "${1}" == "Nuwro" ]]\
    || [[ "${1}" == "NuWro" ]] || [[ "${1}" == "nuwro" ]]; then
+    GEN="NUWRO"
     GEN_TAG_NU="NUWRO:"
     GEN_TAG_NUB="NUWRO:"
   elif [[ "${1}" == "GIBUU" ]] || [[ "${1}" == "GiBUU" ]]\
    || [[ "${1}" == "Gibuu" ]] || [[ "${1}" == "gibuu" ]]; then
+    GEN="GiBUU"
     GEN_TAG_NU="GiBUU_nu:"
     GEN_TAG_NUB="GiBUU_nub:"
   elif [[ "${1}" == "NUANCE" ]] || [[ "${1}" == "Nuance" ]]\
    || [[ "${1}" == "nuance" ]]; then
+    GEN="NUANCE"
     GEN_TAG_NU="NUANCE:"
     GEN_TAG_NUB="NUANCE:"
   else
@@ -88,10 +94,10 @@ read GENNAME
 select_gen ${GENNAME}
 
 ## Interesting species
-ask_bool "Are you interested in mostly muon neutrino beam modes [y]/n? " "y"
+ask_bool "Are you interested in muon neutrino beam modes (FHC/PP/FC) [y]/n? " "y"
 DO_NU=${ISTRUE}
 
-ask_bool "Are you interested in mostly anti muon neutrino beam modes y/[n]? " "n"
+ask_bool "Are you interested in muon anti-neutrino beam modes (RHC/NP/RC) y/[n]? " "n"
 DO_NUB=${ISTRUE}
 
 ## Interesting Topologies
@@ -161,7 +167,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the ANL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the ANL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -230,7 +236,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the BNL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the BNL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -265,7 +271,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the FNAL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the FNAL muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -294,7 +300,7 @@ NUMUB_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NUB}" == "1" ]] && [[ "${DO_PIPROD}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the FNAL muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the FNAL muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -315,7 +321,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the BEBC muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the BEBC muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -347,7 +353,7 @@ NUMUB_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NUB}" == "1" ]] && [[ "${DO_PIPROD}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the BEBC muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the BEBC muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -372,7 +378,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_BUBBLE}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_PIPROD}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the Gargarmelle muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the Gargarmelle muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -398,7 +404,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_CCINC}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the ArgoNeuT muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the ArgoNeuT muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -423,7 +429,7 @@ NUMUB_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NUB}" == "1" ]] && [[ "${DO_CCINC}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the ArgoNeuT muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the ArgoNeuT muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -447,7 +453,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] || [[ "${DO_NC}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MiniBooNE muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MiniBooNE muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -463,10 +469,34 @@ echo -e "\n#### MiniBooNE" >> ${OUTPUTCARDFILE}
 echo "### QE-like" >> ${OUTPUTCARDFILE}
 echo -e "## numu\n" >> ${OUTPUTCARDFILE}
 
-echo "${NUMU_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_1DQ2_nu ${GEN_TAG_NU}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_1DQ2_nu ${GEN_TAG_NU}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_2DTcos_nu ${GEN_TAG_NU}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_2DTcos_nu ${GEN_TAG_NU}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+INP_VECT_COMMAND="${GEN_TAG_NU}${MB_NUMU_FILELOC}"
+MB_NUMUB_IN_NUMU_FILELOC="_MB_NUMUB_IN_NUMU_INPUT_FILE_"
+NUMU_JOINT_PREFIX="#"
+if [[ "${MB_NUMU_FILELOC}" != "_MB_NUMU_INPUT_FILE_" ]] && ( [[ "${GEN}" == "NEUT" ]] || [[ "${GEN}" == "GENIE" ]] ); then
+  FILE_EXISTS=0
+  while [[ ${FILE_EXISTS} == 0 ]]; do
+    echo -e -n "For MiniBooNE CCQE(-like) samples when using NEUT or GENIE you "
+    echo -n "need to specify an input vector containing events generated with "
+    echo -n "the muon anti-neutrino contamination in the neutrino mode beam. "
+    echo -n "Where does it live? /path/to/file.root (leave blank to ignore this experiment)?\n"
+    read -e VECT_LOC
+    check_exist ${VECT_LOC}
+  done
+  if [[ ! "${VECT_LOC}" ]]; then
+    NUMU_JOINT_PREFIX="#"
+  else
+    MB_NUMUB_IN_NUMU_FILELOC=${VECT_LOC}
+    NUMU_JOINT_PREFIX=""
+  fi
+  INP_VECT_COMMAND="${GEN_TAG_NU}(${MB_NUMU_FILELOC},${MB_NUMUB_IN_NUMU_FILELOC})"
+elif [[ "${MB_NUMU_FILELOC}" != "_MB_NUMU_INPUT_FILE_" ]] && ( [[ "${GEN}" == "NUWRO" ]] || [[ "${GEN}" == "GIBUU" ]] ); then
+  NUMU_JOINT_PREFIX=""
+fi
+
+echo "${NUMU_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_1DQ2_nu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_1DQ2_nu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_2DTcos_nu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_2DTcos_nu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
 
 
 MB_NUMUB_FILELOC="_MB_NUMUB_INPUT_FILE_"
@@ -474,7 +504,7 @@ NUMUB_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NUB}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MiniBooNE muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MiniBooNE muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -488,10 +518,34 @@ fi
 
 echo -e "\n## numubar\n" >> ${OUTPUTCARDFILE}
 
-echo "${NUMUB_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_1DQ2_antinu ${GEN_TAG_NUB}${MB_NUMUB_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMUB_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_1DQ2_antinu ${GEN_TAG_NUB}${MB_NUMUB_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMUB_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_2DTcos_antinu ${GEN_TAG_NUB}${MB_NUMUB_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMUB_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_2DTcos_antinu ${GEN_TAG_NUB}${MB_NUMUB_FILELOC}" >> ${OUTPUTCARDFILE}
+INP_VECT_COMMAND="${GEN_TAG_NUB}${MB_NUMUB_FILELOC}"
+MB_NUMU_IN_NUMUB_FILELOC="_MB_NUMU_IN_NUMUB_INPUT_FILE_"
+NUMUB_JOINT_PREFIX="#"
+if [[ "${MB_NUMUB_FILELOC}" != "_MB_NUMUB_INPUT_FILE_" ]] && [[ "${GEN}" == "NEUT" ]] || [[ "${GEN}" == "GENIE" ]]; then
+  FILE_EXISTS=0
+  while [[ ${FILE_EXISTS} == 0 ]]; do
+    echo -e -n "For MiniBooNE CCQE(-like) samples when using NEUT or GENIE you "
+    echo -n "need to specify an input vector containing events generated with "
+    echo -n "the muon neutrino contamination in the anti-neutrino mode beam. "
+    echo -n "Where does it live? /path/to/file.root (leave blank to ignore this experiment)?\n"
+    read -e VECT_LOC
+    check_exist ${VECT_LOC}
+  done
+  if [[ ! "${VECT_LOC}" ]]; then
+    NUMUB_JOINT_PREFIX="#"
+  else
+    MB_NUMU_IN_NUMUB_FILELOC=${VECT_LOC}
+    NUMUB_JOINT_PREFIX=""
+  fi
+  INP_VECT_COMMAND="${GEN_TAG_NUB}(${MB_NUMUB_FILELOC},${MB_NUMU_IN_NUMUB_FILELOC})"
+elif [[ "${MB_NUMUB_FILELOC}" != "_MB_NUMUB_INPUT_FILE_" ]] && [[ "${GEN}" == "NUWRO" ]] || [[ "${GEN}" == "GIBUU" ]]; then
+  NUMUB_JOINT_PREFIX=""
+fi
+
+echo "${NUMUB_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_1DQ2_antinu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMUB_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_1DQ2_antinu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMUB_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQE_XSec_2DTcos_antinu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
+echo "${NUMUB_JOINT_PREFIX}${QEL_PREFIX}sample MiniBooNE_CCQELike_XSec_2DTcos_antinu ${INP_VECT_COMMAND}" >> ${OUTPUTCARDFILE}
 
 echo -e "\n### CC1Pi\n" >> ${OUTPUTCARDFILE}
 
@@ -523,7 +577,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] || [[ "${DO_CCINC}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MINERvA muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MINERvA muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -546,7 +600,7 @@ echo "${NUMU_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_nu_2
 echo "${NUMU_PREFIX}${QEL_PREFIX}sample MINERvA_CC0pi_XSec_1DQ2_nu_proton ${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 
 echo -e "\n## nue\n" >> ${OUTPUTCARDFILE}
-
+NUE_PREFIX="#"
 echo "${NUE_PREFIX}${QEL_PREFIX}sample MINERvA_CC0pi_XSec_1DEe_nue ${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 echo "${NUE_PREFIX}${QEL_PREFIX}sample MINERvA_CC0pi_XSec_1DQ2_nue ${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 echo "${NUE_PREFIX}${QEL_PREFIX}sample MINERvA_CC0pi_XSec_1DThetae_nue ${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
@@ -557,7 +611,7 @@ NUMUB_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NUB}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MINERvA muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MINERvA muon anti-neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -578,10 +632,10 @@ echo "${NUMUB_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_ant
 
 echo -e "\n## numu+numubar\n" >> ${OUTPUTCARDFILE}
 
-echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint JOINT:${GEN_TAG_NUB}${MIN_NUMUB_FILELOC}${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_20deg JOINT:${GEN_TAG_NUB}${MIN_NUMUB_FILELOC}${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_oldflux JOINT:${GEN_TAG_NUB}${MIN_NUMUB_FILELOC}${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux JOINT:${GEN_TAG_NUB}${MIN_NUMUB_FILELOC}${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint ${GEN_TAG_NUB}${MIN_NUMUB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_20deg ${GEN_TAG_NUB}${MIN_NUMUB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_oldflux ${GEN_TAG_NUB}${MIN_NUMUB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PREFIX}${NUMUB_PREFIX}${QEL_PREFIX}${OLD_PREFIX}sample MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux ${GEN_TAG_NUB}${MIN_NUMUB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 
 echo -e "\n### CC1Pi" >> ${OUTPUTCARDFILE}
 echo -e "## numu\n" >> ${OUTPUTCARDFILE}
@@ -625,7 +679,7 @@ echo "${NUMU_PREFIX}${PIPROD_PREFIX}sample MINERvA_CCNpip_XSec_1DEnu_nu ${GEN_TA
 echo -e "\n### CCInc\n" >> ${OUTPUTCARDFILE}
 
 DO_MINERVA_RATIOS=0
-if [[ "${DO_NUCLEAR}" == "1" ]]; then
+if [[ "${MIN_NUMUB_FILELOC}" != "_MIN_NUMUB_INPUT_FILE_" ]] && [[ "${DO_NUCLEAR}" == "1" ]]; then
   echo -e -n "Are you interested in looking at the MINERvA target ratio samples y/[n]? "
   read MIN_RATIO
   if [[ ! "${MIN_RATIO}" ]]; then
@@ -641,7 +695,7 @@ NUMU_FE_PREFIX="#"
 if [[ "${DO_MINERVA_RATIOS}" == "1" ]] && [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_CCINC}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MINERvA iron-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MINERvA iron-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -658,7 +712,7 @@ NUMU_PB_PREFIX="#"
 if [[ "${DO_MINERVA_RATIOS}" == "1" ]] && [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_CCINC}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MINERvA lead-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MINERvA lead-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -675,7 +729,7 @@ NUMU_C_PREFIX="#"
 if [[ "${DO_MINERVA_RATIOS}" == "1" ]] && [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_CCINC}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the MINERvA C12-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the MINERvA C12-target muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
 
@@ -702,12 +756,12 @@ echo "${NUMU_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_2DEavq3_nu ${GEN_TA
 
 echo -e "\n## Target ratios\n" >> ${OUTPUTCARDFILE}
 
-echo "${NUMU_C_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_C12_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_C_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_FE_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_FE_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PB_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_PB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_C_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_C_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_FE_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_FE_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
-echo "${NUMU_PB_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH JOINT:${GEN_TAG_NU}${MIN_NUMU_PB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_C_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_C12_CH ${GEN_TAG_NU}${MIN_NUMU_C_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_FE_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH ${GEN_TAG_NU}${MIN_NUMU_FE_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PB_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH ${GEN_TAG_NU}${MIN_NUMU_PB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_C_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH ${GEN_TAG_NU}${MIN_NUMU_C_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_FE_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH ${GEN_TAG_NU}${MIN_NUMU_FE_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "${NUMU_PB_PREFIX}${CCINC_PREFIX}sample MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH ${GEN_TAG_NU}${MIN_NUMU_PB_FILELOC};${GEN_TAG_NU}${MIN_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 
 
 T2K_NUMU_FILELOC="_T2K_NUMU_INPUT_FILE_"
@@ -715,7 +769,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && ( [[ "${DO_QEL}" == "1" ]] || [[ "${DO_PIPROD}" == "1" ]] ); then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the T2K muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the T2K muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
@@ -751,7 +805,7 @@ NUMU_PREFIX="#"
 if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_NC}" == "1" ]] && [[ "${DO_PIPROD}" == "1" ]]; then
   FILE_EXISTS=0
   while [[ ${FILE_EXISTS} == 0 ]]; do
-    echo -e -n "Please specify the location of the K2K muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)? "
+    echo -e -n "Please specify the location of the K2K muon neutrino mode input vector /path/to/file.root (leave blank to ignore this experiment)?\n"
     read -e VECT_LOC
     check_exist ${VECT_LOC}
   done
