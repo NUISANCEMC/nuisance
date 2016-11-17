@@ -224,7 +224,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   } else if (fAnalysis == 1){
 
     //TODO (P.Stowell) Add a TH2Poly Measurement class
-    ERR(FTL) << " Analysis 1 is not yet available due to its awkward binning!" << endl;
+    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << endl;
     ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << endl;
     throw;
 
