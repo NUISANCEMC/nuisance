@@ -32,6 +32,9 @@ MeasurementBase::MeasurementBase() {
   fMCFilled = false;
   fNoData   = false;
 
+  EnuMin = 0.;
+  EnuMax = 1.E5;
+
 };
 
 //********************************************************************

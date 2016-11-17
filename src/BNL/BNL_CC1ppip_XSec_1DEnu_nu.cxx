@@ -100,7 +100,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool BNL_CC1ppip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-  return SignalDef::isCC1pi3Prong(event, 14, 211, 2212,EnuMin,EnuMax);
+  return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
 }
 
 /*

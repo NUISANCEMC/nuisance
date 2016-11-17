@@ -114,21 +114,27 @@ void FitEvent::NeutKinematics() {
 
   for (UInt_t i = 0; i < npart; i++) {
     NeutPart* part = fNeutVect->PartInfo(i);
-
+    
     // State
     int state = kUndefinedState;
-    if (part->fIsAlive == 0 and part->fStatus == -1) {
+    if (part->fIsAlive == false && part->fStatus == -1) {
       state = kInitialState;
-    } else if (part->fIsAlive == 0 and part->fStatus == 2) {
-      state = kFSIState;
-    } else if (part->fIsAlive == 1 and part->fStatus == 0) {
+      // NEUT is a little strange here
+      // isAlive false and status 2 means neutrino escaped detector, so NC interaction
+      // for CC it means it was an FSI particle
+    } else if (part->fIsAlive == false && part->fStatus == 2) {
+        if (fNeutVect->Mode > 30) { // NC case
+          state = kFinalState;
+        } else { // CC case
+          state = kFSIState;
+        }
+    } else if (part->fIsAlive == true && part->fStatus == 0) {
       state = kFinalState;
-    } else if (part->fIsAlive == 1 and part->fStatus == 2) {
-      state = kFinalState;  // NC Neutrino
-    } else if (part->fIsAlive == 1) {
+    } else if (part->fIsAlive == true) {
       ERR(WRN) << "Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << std::endl;
+       throw;
     }
 
     // Remove Undefined
@@ -550,6 +556,7 @@ void FitEvent::OrderStack(){
   if (fNParticles != npart){
     ERR(FTL) << "Dropped some particles when ordering the stack!" << std::endl;
   }
+
   return;
 }
 
@@ -743,6 +750,7 @@ int FitEvent::NumParticle(int pdg, int state){
 
   int nfound = 0;
   for (int i = 0; i < fNParticles; i++){
+    //std::cout << "fParticlePDG[" << i << "] = " << fParticlePDG[i] << std::endl;
 
     if (state != -1 and fParticleState[i] != (uint)state) continue;
     if (pdg == 0 or fParticlePDG[i] == pdg) nfound += 1;
