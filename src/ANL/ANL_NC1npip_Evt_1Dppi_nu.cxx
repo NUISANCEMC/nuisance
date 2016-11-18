@@ -24,7 +24,7 @@
 
 ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
   
-  fName = "ANL_CC1npip_Evt_1Dppi_nu";
+  fName = "ANL_NC1npip_Evt_1Dppi_nu";
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   fDefaultTypes="EVT/SHAPE/DIAG";
   fAllowedTypes="EVT/SHAPE/DIAG";
@@ -50,9 +50,7 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   
-  if (event->NumFSParticle(2112) == 0 ||
-      event->NumFSParticle(211) == 0)
-    return;
+  if (event->NumFSParticle(2112) == 0 || event->NumFSParticle(211) == 0) return;
 
   TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;;
