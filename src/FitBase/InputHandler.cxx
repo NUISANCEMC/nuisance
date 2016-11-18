@@ -16,7 +16,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
+#include <csignal>
 #include "InputHandler.h"
 
 //****************************************************************************
@@ -86,7 +86,7 @@ InputHandler::InputHandler(std::string handle, std::string infile_name) {
     fInputRootFile->ls();
     throw;
   }
-
+  
   // Setup MaxEvents After setup of ttree
   if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
     LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
@@ -998,8 +998,9 @@ void InputHandler::PrintStartInput() {
   // Get First event info
   StopTalking();
   tn->GetEntry(0);
-  fEvent->CalcKinematics();
   StartTalking();
+
+  fEvent->CalcKinematics();
   LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent->PartInfo(0)->fPID
            << std::endl;
   LOG(SAM) << "             Target A     = " << fEvent->GetTargetA()

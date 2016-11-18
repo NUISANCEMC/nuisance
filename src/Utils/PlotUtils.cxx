@@ -564,9 +564,7 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::s
       tempPlot->SetBinError(i+1, errors[i]);
     }
 
-    delete values;
-    delete errors;
-    delete bins;
+    delete gr;
   }
 
   // Allow alternate naming for root files

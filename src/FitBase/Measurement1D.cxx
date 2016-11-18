@@ -410,6 +410,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
 
     row++;
   }
+  covarread.close();
 
   // Scale the actualy covariance matrix by some multiplicative factor
   (*fFullCovar) *= scale;
@@ -417,6 +418,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
   // THIS IS ACTUALLY THE INVERSE COVARIANCE MATRIXA AAAAARGH
+  delete this->covar;
   this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
 
   // Now need to multiply by the scaling factor
@@ -470,9 +472,9 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
+  delete this->covar;
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
-
+  
   return;
 };
 

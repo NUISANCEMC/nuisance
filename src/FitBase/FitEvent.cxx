@@ -128,13 +128,17 @@ void FitEvent::NeutKinematics() {
         } else { // CC case
           state = kFSIState;
         }
+    } else if (part->fIsAlive == true && part->fStatus == 2 && abs(part->fPID) == 14) {
+      state = kFinalState;
+
     } else if (part->fIsAlive == true && part->fStatus == 0) {
       state = kFinalState;
+
     } else if (part->fIsAlive == true) {
       ERR(WRN) << "Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << std::endl;
-       throw;
+      throw;
     }
 
     // Remove Undefined
