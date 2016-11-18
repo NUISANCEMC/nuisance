@@ -87,6 +87,8 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile
 };
 
 
+
+
 void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   
   // // Clear the current histogram before repopulating
@@ -151,157 +153,109 @@ void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
   
   // return;
 };
-
-
-bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(NeutVect *nvect){
+void MiniBooNE_NCEL_XSec_Treco_nu::FillEventVariables(FitEvent* event){
   
-  // Only interested in true NCEL events
-  // if (nvect->Mode != 51 && nvect->Mode != 52) return false;
+  double t_true == 0.0;
+  for (UInt_t i = 0; i < event->Npart(); i++){
+    
+    FitParticle* part = event->PartInfo(i);
+    if (part->Status() != kFinalState) continue;
 
-  // // Only look at numu events
-  // if ((nvect->PartInfo(0))->fPID != 14 && (nvect->PartInfo(0))->fPID != 12) return false;
+    // Sum KE of all Protons and Neutrons
+    if (part->fPID == 2212 or part->fPID == 2112){
+      t_true += (event->PartInfo(i)->fP.E() - event->PartInfo(i)->fP.Mag());
+    }
+  }
+ 
+  // Set X Var to KE
+  fXVar = t_true;
+}
 
-  // // Restrict energy range
-  // if ((nvect->PartInfo(0))->fP.E() < this->EnuMin*1000 || (nvect->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
+void MiniBooNE_NCEL_XSec_Treco_nu::ConvertEventRates(){
 
+  // Convert TTree to Treco using the smearing matrix
+  for (int treco = 0; treco < 51; ++treco){     
+    double total = 0.;       
+    for (int ttrue = 0; ttrue < 50; ++ttrue) total += fMCFine->GetBinContent(ttrue+1)*this->response_mat->GetBinContent(ttrue+1, treco+1);      
+    this->fMCHist->SetBinContent(treco+1, total);               
+  }
+ 
+  // Scale                                                                                                                                                                                                                               
+  fMCHist->Scale(fScaleFactor, "width");
+  fMCFine->Scale(fScaleFactor, "width");
+ 
+  // Add in MC Backgrounds
+  for (int treco = 0; treco < 51; ++treco){      
+    double total = this->fMCHist->GetBinContent(treco+1) + this->BKGD_other->GetBinContent(treco+1) + this->BKGD_irrid->GetBinContent(treco+1);          
+    this->fMCHist->SetBinContent(treco+1, total);               
+  }
+}
+
+bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(FitEvent* event){
+
+  // NCEL Modes
+  if (event->Mode != 51 && event->Mode != 52) return false;
+  
+  // NuMu
+  if (event->PDGnu() != 14 && event->PDGnu() != 12) return false;
+
+  // Enu Cut
+  if (event->Enu() < EnuMin*1.E3 || event->Enu() > EnuMax*1.E3) return false;
+  
   return true;
 };
 
-
-// Read in the covariance matrix from the file specified in the constructor
-void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim){
-  
-  // // Make a counter to track the line number
-  // int row = 0;
-
-  // std::string line;
-  // std::ifstream covar(covarFile.c_str(),ifstream::in);
-  
-  // this->covar = new TMatrixDSym(dim);
-
-  // if(covar.is_open()) LOG(DEB) << "Reading covariance matrix from file: " << covarFile << std::endl;
-
-  // while(std::getline(covar >> std::ws, line, '\n')){
-  //   std::istringstream stream(line);
-  //   double entry;    
-  //   int column = 0;
-
-  //   // Loop over entries and insert them into matrix
-  //   // Multiply by the errors to get the covariance, rather than the correlation matrix
-  //   while(stream >> entry){
-  //     (*this->covar)(row, column) = entry;
-  //     if (row == column) this->fDataHist->SetBinError(row+1, sqrt(entry));
-  //     column++;
-  //   }    
-  //   row++;
-  // }
-  
-  // // Robust matrix inversion method
-  // TDecompSVD LU = TDecompSVD(*this->covar);
-  // this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
-  return;
-};
-
-
-
-// The covariance matrix contains all of the information for the chi2 calculation
-double MiniBooNE_NCEL_XSec_Treco_nu::GetChi2(){
-  // double chi2 = 0;
-  
-  // int nBins = this->fDataHist->GetNbinsX();
-
-  // for (int i = 0; i < nBins; ++i){
-  //   for (UInt_t j = 0; j < nBins; ++j){
-
-  //     double iDiff = this->fDataHist->GetBinContent(i+1) - this->fMCHist->GetBinContent(i+1);
-  //     double jDiff = this->fDataHist->GetBinContent(j+1) - this->fMCHist->GetBinContent(j+1);
-  //     chi2 += iDiff*(*this->covar)(i, j)*jDiff;
-  //   }
-  // }
-  // return chi2;
-
-};
-
-
-// Function to make an Asimov dataset (so don't throw any errors)     
-void MiniBooNE_NCEL_XSec_Treco_nu::SetFakeDataValues(std::string fakeDataFile) {
-
-  // // This is the published data
-  // TH1D *tempData = (TH1D*)this->fDataHist->Clone();
-  // TFile *fake    = new TFile(fakeDataFile.c_str());
-
-  // // This is the fake data
-  // this->fDataHist = (TH1D*)fake->Get((this->fName+"_MC").c_str());
-  // this->fDataHist ->SetNameTitle((this->fName+"_FAKE").c_str(), (this->fName+this->fPlotTitles).c_str());
-
-  // for (int xBin = 0; xBin < this->fDataHist->GetNbinsX(); ++xBin){
-
-  //   // If the fake data or real didn't didn't fill the bin, can't assign an error
-  //   if (!this->fDataHist->GetBinContent(xBin+1) || !tempData->GetBinContent(xBin+1)){
-  //     this->fDataHist->SetBinError(xBin+1, 0);
-  //     continue;
-  //   }
-
-  //   double err = tempData->GetBinError(xBin+1)*
-  //     this->fDataHist->GetBinContent(xBin+1)/(tempData->GetBinContent(xBin+1)+0.);
-  //   this->fDataHist->SetBinError(xBin+1, err);
-  // }
-
-  // delete tempData;
-  // return;
-};
 
 
 
 // Override the usual function in the base class because this is more complicated for the NCEL sample...
 void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
 
-  // std::string line;
-  // std::ifstream input(inputFile.c_str(),ifstream::in);
+   std::string line;
+   std::ifstream input(inputFile.c_str(),ifstream::in);
 
-  // if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
+   if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
   
-  // this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, this->arr_treco);
-  // this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, arr_treco);
-  // this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, arr_treco);
-  // // To get the nDOF correct...
-  // this->fNDataPointsX= 52;
+   this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, this->arr_treco);
+   this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, arr_treco);
+   this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, arr_treco);
+    To get the nDOF correct...
+   this->fNDataPointsX= 52;
 
-  // double entry = 0;
-  // int xBin     = 0;
+   double entry = 0;
+   int xBin     = 0;
 
-  // // First line is the MB data
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream1(line);
+   //    First line is the MB data
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream1(line);
   
-  // while(stream1 >> entry){
-  //   this->fDataHist->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // }
+   while(stream1 >> entry){
+     this->fDataHist->SetBinContent(xBin+1, entry);
+     xBin++;
+   }
  
-  // // Second line is "other" backgrounds
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream2(line);
-  // entry = 0;
-  // xBin  = 0;  
-  // while(stream2 >> entry){
-  //   this->BKGD_other->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // } 
+   //    Second line is "other" backgrounds
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream2(line);
+   entry = 0;
+   xBin  = 0;  
+   while(stream2 >> entry){
+     this->BKGD_other->SetBinContent(xBin+1, entry);
+     xBin++;
+   } 
 
-  // // Third line is the irreducible background
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream3(line);
-  // entry = 0;
-  // xBin  = 0;  
-  // while(stream3 >> entry){
-  //   this->BKGD_irrid->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // } 
+   //  Third line is the irreducible background
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream3(line);
+   entry = 0;
+   xBin  = 0;  
+   while(stream3 >> entry){
+     this->BKGD_irrid->SetBinContent(xBin+1, entry);
+     xBin++;
+   } 
 };
 
 // Read in the response matrix -- thus far, a response matrix is unique to the NCEL sample

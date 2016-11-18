@@ -394,6 +394,11 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
 
     // Loop over entries and insert them into matrix
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+
+    if (entries.size() <= 1){
+      ERR(WRN) << "SetCovarMatrixFromText -> Covariance matrix only has <= 1 entries on this line: " << row << std::endl;
+    }
+    
     for (std::vector<double>::iterator iter = entries.begin();
 	 iter != entries.end(); iter++){
 
@@ -1165,16 +1170,6 @@ void Measurement1D::Write(std::string drawOpt) {
     combo_fMCHist_PDG.Write();
   }
 
-  // Save Matrix plots
-  if (!fIsRawEvents and !fIsDiag) {
-    if (drawCov and fFullCovar) {
-      TH2D cov = TH2D((*fFullCovar));
-      cov.SetNameTitle((fName + "_cov").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
-      cov.Write();
-    }
-  }
-
   if (fIsMask && drawMask && fMaskHist) {
     fMaskHist->Write((this->fName + "_MSK").c_str());  //< save mask
   }
@@ -1196,17 +1191,20 @@ void Measurement1D::Write(std::string drawOpt) {
       cov.Write();
     }
 
+    if (!drawInvCov && !covar){
+      std::cout << "Missing invert! " << std::endl;
+    }
     if (drawInvCov && covar) {
       TH2D covinv = TH2D((*this->covar));
       covinv.SetNameTitle((fName + "_covinv").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
+          (fName + "_covinv;Bins; Bins;").c_str());
       covinv.Write();
     }
 
     if (drawDecomp and fDecomp) {
       TH2D covdec = TH2D((*fDecomp));
       covdec.SetNameTitle((fName + "_covdec").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
+          (fName + "_covdec;Bins; Bins;").c_str());
       covdec.Write();
     }
   }
