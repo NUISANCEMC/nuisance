@@ -32,6 +32,8 @@ MeasurementBase::MeasurementBase() {
   fMCFilled = false;
   fNoData   = false;
 
+  // Set the default values
+  // After-wards this gets set in SetupMeasurement
   EnuMin = 0.;
   EnuMax = 1.E5;
 
@@ -90,6 +92,10 @@ void MeasurementBase::SetupInputs(std::string inputfile){
   fNEvents       = fInput->GetNEvents();
  
   inputfilename = inputfile;
+  if (EnuMin == 0 && EnuMax == 1.E5) {
+    EnuMin = fFluxHist->GetBinLowEdge(1);
+    EnuMax = fFluxHist->GetBinLowEdge(fFluxHist->GetNbinsX()+1);
+  }
 }
 
 //***********************************************

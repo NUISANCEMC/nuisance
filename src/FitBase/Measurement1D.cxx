@@ -612,9 +612,10 @@ double Measurement1D::TotalIntegratedFlux(std::string intOpt, double low,
     return 1.0;
   }
 
-  // Set Energy Limits
+  // The default case of low = -9999.9 and high = -9999.9
   if (low == -9999.9) low = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
+
 
   int minBin = fFluxHist->GetXaxis()->FindBin(low);
   int maxBin = fFluxHist->GetXaxis()->FindBin(high);
