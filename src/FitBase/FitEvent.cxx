@@ -119,13 +119,14 @@ void FitEvent::NeutKinematics() {
     int state = kUndefinedState;
     if (part->fIsAlive == false && part->fStatus == -1) {
       state = kInitialState;
-      // NEUT is a little strange here
-      // isAlive false and status 2 means neutrino escaped detector, so NC interaction
-      // for CC it means it was an FSI particle
-    } else if (part->fIsAlive == false && part->fStatus == 2) {
-        if (fNeutVect->Mode > 30) { // NC case
+
+    // NEUT is a little strange here
+    // isAlive false and status 2 means neutrino escaped detector, so NC interaction
+    // for CC it means it was an FSI particle
+    } else if (part->fStatus == 2) {
+        if (abs(fNeutVect->Mode) > 30 && part->fIsAlive == false) { // NC case is a little strange...
           state = kFinalState;
-        } else { // CC case
+        } else if (part->fIsAlive == true) { // CC case
           state = kFSIState;
         }
     } else if (part->fIsAlive == true && part->fStatus == 0) {
@@ -134,7 +135,7 @@ void FitEvent::NeutKinematics() {
       ERR(WRN) << "Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << std::endl;
-       throw;
+      throw;
     }
 
     // Remove Undefined
