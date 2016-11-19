@@ -171,6 +171,8 @@ namespace StatUtils{
   //! Return Cholesky Decomposed matrix of TMatrixDSym
   TMatrixDSym* GetDecomp(TMatrixDSym* mat);
 
+  //! Return full covariances
+  TMatrixDSym* GetCovarFromCorrel(TMatrixDSym* correl, TH1D* data);
 
   //! Given a normalisation factor for a dataset add in a new normalisation term to the covariance.
   void ForceNormIntoCovar(TMatrixDSym* mat, TH1D* data, double norm);

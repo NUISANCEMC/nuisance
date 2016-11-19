@@ -33,32 +33,21 @@ public:
   //! Grab info from event
   void FillEventVariables(FitEvent *event);
 
-  //! Fill Custom Histograms
-  void FillHistograms();
-
-  //! ResetAll
-  void ResetAll();
-
-  //! Scale
-  void ScaleEvents();
-
-  //! Norm
-  void ApplyNormScale(float norm);
-
   //! Define this samples signal
   bool isSignal(FitEvent *nvect);
 
   //! Write Files
   void Write(std::string drawOpt);
 
-  //! Get Chi2
-  float GetChi2();
-
  private:
   
   double fEventScaleFactor;
   TTree* fEventTree;
-
+  int nlep;
+  int nkplus;
+  int nkaon;
+  double kplusmom;
+  double kaonmom;
 };
 
 #endif

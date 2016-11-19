@@ -480,20 +480,17 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
   // Form full covariance
   TMatrixD* trans = (TMatrixD*) (newcov)->Clone();
   trans->T();
-
   (*trans) *= (*newcov);
-  newcov = (TMatrixD*) trans->Clone();
 
-  this->covar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
-  fFullCovar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
+  fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
 
   delete newcov;
   delete trans;
 
   // Robust matrix inversion method
-  TDecompChol LU = TDecompChol(*this->covar);
+  TDecompChol LU = TDecompChol(*this->fFullCovar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
+  
   return;
 };
 

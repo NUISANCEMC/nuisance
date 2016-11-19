@@ -50,7 +50,15 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   fEventTree = NULL;
 
   // Setup fDataHist as a placeholder
-  this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
+  this->fDataHist = new TH1D(("approximate_data"), ("kaon_data"), 5, 1.0, 6.0);
+  
+  // Approximate data points for now
+  fDataHist->SetBinContent(1,0.225E-39);
+  fDataHist->SetBinContent(2,0.215E-39);
+  fDataHist->SetBinContent(3,0.175E-39);
+  fDataHist->SetBinContent(4,0.230E-39);
+  fDataHist->SetBinContent(5,0.210E-39);
+
   this->SetupDefaultHist();
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
@@ -69,9 +77,12 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   fEventTree = new TTree("nuisance_events","nuisance_events");
   GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
   
-  // Add some extra variables they might need?
-  // Enu, PDGnu, PDGLep, CosLep, ELep, TLep?
-  
+  fEventTree->Branch("nlep",&nlep, "nlep/I");
+  fEventTree->Branch("nkplus",&nkplus, "nkplus/I");
+  fEventTree->Branch("nkaon",&nkaon, "nkaon/I");
+  fEventTree->Branch("kplus_mom", &kplusmom, "kplus_mom/D");
+  fEventTree->Branch("kaon_mom", &kaonmom, "kaon_mom/D");
+
   // Add Event Scaling Information
   // This scale factor is used to get the predicted event rate for this sample given                                                                                                                                        
   // the input flux. Use this when merging different output event ttrees             
@@ -127,9 +138,45 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
 void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  // Fill Event Variables for Muon/Neutrino?
+  kplusmom = -999.9;
+  kaonmom = -999.9;
+
+  // Save Some Extra Information
+  nkplus = event->NumParticle(PhysConst::pdg_kplus);
+  nkaon  = event->NumParticle(PhysConst::pdg_strangemesons) + event->NumParticle(PhysConst::pdg_antistrangemesons);
+
+  // Nmuons
+  nlep = event->NumFSParticle(13) + event->NumFSParticle(-13);
   
-  // Fill the TTree only for signal
+  // Leading K+ Mom
+  if (event->GetHMParticle(PhysConst::pdg_kplus)){
+    
+    kplusmom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_kplus)->fP)*1000.0;
+
+  }
+
+  double strangemom = 0.0;
+  if (event->GetHMParticle(PhysConst::pdg_strangemesons)){
+
+    if (event->GetHMParticle(PhysConst::pdg_strangemesons)){
+      strangemom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_strangemesons)->fP)*1000.0;
+    }
+
+  }
+
+  double antistrangemom = 0.0;
+  if (event->GetHMParticle(PhysConst::pdg_antistrangemesons)){
+
+    if (event->GetHMParticle(PhysConst::pdg_antistrangemesons)){
+      antistrangemom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_antistrangemesons)->fP)*1000.0;
+    }
+
+  }
+
+  kaonmom = TMath::Max(strangemom, antistrangemom);
+
+  fXVar = kplusmom / 1.E3;
+
   if (isSignal(event)){
     fEventTree->Fill();
   }
@@ -140,13 +187,14 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
 void MCStudy_KaonPreSelection::Write(std::string drawOpt) {
 //********************************************************************
+//  Measurement1D::Write(drawOpt);
 
   // Save the event ttree
   fEventTree->Write();
 
   // Save Flux and Event Histograms too
-  GetInput()->GetFluxHistogram()->Write("nuisance_eventhist");
-  GetInput()->GetEventHistogram()->Write("nuisance_fluxhist");
+  GetInput()->GetFluxHistogram()->Write("nuisance_fluxhist");
+  GetInput()->GetEventHistogram()->Write("nuisance_eventhist");
 
   return;
 }
@@ -180,52 +228,11 @@ bool MCStudy_KaonPreSelection::isSignal(FitEvent *event) {
 				   9010317,9010327};
   PhysConst::pdg_antistrangemesons = {above * -1.0};					      
   */
-
-  int nstrangemesons = event->NumFSParticle(PhysConst::pdg_strangemesons);
-  nstrangemesons += event->NumFSParticle(PhysConst::pdg_antistrangemesons);
+  int nstrangemesons = event->NumParticle(PhysConst::pdg_strangemesons);
+  nstrangemesons += event->NumParticle(PhysConst::pdg_antistrangemesons);
   if (nstrangemesons < 1) return false;
 
   // Do we want any other signal?
   return true;
 };
 
-// -------------------------------------------------------------------
-// Purely MC Plot
-// Following functions are just overrides to handle this
-// -------------------------------------------------------------------
-//********************************************************************
-void MCStudy_KaonPreSelection::ScaleEvents() {
-  //********************************************************************
-  // Saving everything to a TTree so no scaling required
-  return;
-}
-
-//********************************************************************
-void MCStudy_KaonPreSelection::ApplyNormScale(float norm) {
-//********************************************************************
-
-  // Saving everything to a TTree so no scaling required
-  this->fCurrentNorm = norm;
-  return;
-}
-
-//********************************************************************
-void MCStudy_KaonPreSelection::FillHistograms() {
-//********************************************************************
-  // No Histograms need filling........
-  return;
-}
-
-//********************************************************************
-void MCStudy_KaonPreSelection::ResetAll() {
-  //********************************************************************
-  fEventTree->Reset();
-  return;
-}
-
-//********************************************************************
-float MCStudy_KaonPreSelection::GetChi2() {
-  //********************************************************************
-  // No Likelihood to test, purely MC
-  return 0.0;
-}
