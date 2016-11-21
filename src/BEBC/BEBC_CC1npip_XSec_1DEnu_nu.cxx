@@ -37,26 +37,23 @@ BEBC_CC1npip_XSec_1DEnu_nu::BEBC_CC1npip_XSec_1DEnu_nu(std::string inputfile, Fi
   covar     = StatUtils::GetInvert(fFullCovar);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
-  //this->fScaleFactor = double(1.0E-38)/double(fNEvents)*(16./8.);
 };
 
 
 void BEBC_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(2112) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
+      event->NumFSParticle(211) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double Enu     = -1.0;
 
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) Enu = Pnu.E()/1.E3;
   fXVar = Enu;
 
   return;

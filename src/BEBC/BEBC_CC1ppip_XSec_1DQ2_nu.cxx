@@ -59,8 +59,7 @@ void BEBC_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpip = -1.0;
   
   // BEBC has a M(pi, p) < 1.4 GeV cut imposed only on this channel
-  if (hadMass < 1400 && hadMass > 1100)
-    q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 
