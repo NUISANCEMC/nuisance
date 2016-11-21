@@ -537,6 +537,9 @@ Fake Studies
   } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
     fChain->push_back(new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
 
+  } else if (name.find("MuonValidation_") != std::string::npos) {
+    fChain->push_back(new MCStudy_MuonValidation(name, file, rw, type, fkdt));
+        
   } else {
     ERR(FTL) << "Error: No such sample: " << name << std::endl;
     exit(-1);
