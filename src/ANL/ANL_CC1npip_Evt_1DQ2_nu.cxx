@@ -69,7 +69,7 @@ void ANL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpip;
     
   // ANL has a M(pi, p) < 1.4 GeV cut imposed (also no cut measurement but not useful for delta tuning)
-  if (hadMass < 1400) q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
   else q2CCpip = -1.0;
 
   fXVar = q2CCpip;

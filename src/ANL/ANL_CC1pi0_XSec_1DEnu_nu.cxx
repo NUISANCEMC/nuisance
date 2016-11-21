@@ -55,7 +55,7 @@ void ANL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::MpPi(Pp, Ppi0);
   double Enu     = -1.0;
 
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
+  if (hadMass < 1400) Enu = Pnu.E()/1.E3;
 
   fXVar = Enu;
 

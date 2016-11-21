@@ -59,7 +59,7 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // I use the W < 1.4GeV cut ANL data to isolate single pion
   // there is also a W < 1.6 GeV and an uncut spectrum ANL 1982
-  if (hadMass < 1400) q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 
