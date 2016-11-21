@@ -541,9 +541,9 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
 
   int dummy;
   flagCCNpip_MINERvA_full =
-      SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax);
+      SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax);
   flagCCNpip_MINERvA_rest =
-      SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, true);
+      SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, true);
 
   // Include Michel e sample so no phase space cuts on pion, only angle
   flagCC1pip_T2K_Michel =

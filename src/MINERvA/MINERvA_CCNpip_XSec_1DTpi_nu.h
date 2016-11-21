@@ -36,13 +36,8 @@ public:
   bool fUpdatedData;
   
 private:
-  bool isNew;
-  int nPions;
-
-  std::vector<int> piIndex;
   std::vector<double> TpiVect;
 
-  TH1I *hnPions;
   TH1D *onePions;
   TH1D *twoPions;
   TH1D *threePions;

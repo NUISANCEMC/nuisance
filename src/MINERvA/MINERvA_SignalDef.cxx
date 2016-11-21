@@ -45,11 +45,11 @@ namespace SignalDef {
 // No restriction on neutral pions or other mesons
 // MINERvA has unfolded and not unfolded muon phase space for 2015
 //
-// Possible problems:
-// 1) Should there be a pi+ only cut implemented due to Michel requirement, or
-// is pi- events filled from MC?
-// 2) There is a T_pi < 350 MeV cut coming from requiring a stopping pion so the
-// Michel e is seen, this is also unclear if it's unfolded so any pion is OK
+// Possible issues with the data:
+// 1) pi- is allowed in signal even when Michel cut included; most pi- is efficiency corrected in GENIE
+// 2) There is a T_pi < 350 MeV cut coming from requiring a stopping pion; this is efficiency corrected in GENIE
+// 3) There is a 1.5 < Enu < 10.0 cut in signal definition
+// 4) There is an angular muon cut which is sometimes efficiency corrected (why we have bool isRestricted below)
 //
 // Nice things:
 // Much data given: with and without muon angle cuts and with and without shape
@@ -75,16 +75,12 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   // Check that there is only one final state lepton
   if (nLeptons != 1) return false;
 
-  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-
-  // Pion kinetic energy requirement for Michel tag, leave commented for now
-  // if (FitUtils::T(ppi)*1000. > 350 || FitUtils::T(ppi)*1000. < 35) return
-  // false; // Need to have a 35 to 350 MeV pion kinetic energy requirement
-
   // MINERvA released another CC1pi+ xsec without muon unfolding!
   // here the muon angle is < 20 degrees (seen in MINOS)
   if (isRestricted) {
+    TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+    TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
     if (th_nu_mu >= 20) return false;
   }
@@ -96,17 +92,16 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 // MINERvA CCNpi+/- signal definition from 2016 publication
 // Different to CC1pi+/- listed above; additional has W < 1.8 GeV
 //
-// Still asks for a Michel e and still unclear if this is unfolded or not
-// Says stuff like "requirement that a Michel e isolates a subsample that is
-// more nearly a pi+ prodution", yet the signal definition is both pi+ and pi-?
+// For notes on strangeness of signal definition, see CC1pip_MINERvA
 //
 // One negative muon
 // At least one charged pion
 // 1.5 < Enu < 10
 // No restrictions on pi0 or other mesons or baryons
+// W_reconstructed (ignoring initial state motion) cut at 1.8 GeV
 //
 // Also writes number of pions (nPions) if studies on this want to be done...
-bool isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
+bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
                       double EnuMax, bool isRestricted) {
   // *********************************
 
@@ -115,10 +110,9 @@ bool isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
 
   int nLeptons = event->NumFSLeptons();
 
-  // Write the number of pions to the measurement class...
-  // Maybe better to just do that inside the class?
+  // Get the number of pions (MINERvA requires at least one 211 or -211)
   int pdgs[] = {-211, 211};
-  nPions = event->NumFSParticle(pdgs);
+  int nPions = event->NumFSParticle(pdgs);
 
   // Check that there is a pion!
   if (nPions == 0) return false;
@@ -126,15 +120,22 @@ bool isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
   // Check that there is only one final state lepton
   if (nLeptons != 1) return false;
 
+  // Need the muon and the neutrino to check angles and W
+
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-
-  // MINERvA released another CC1pi+ xsec without muon unfolding!
+  // MINERvA released some data with restricted muon angle
   // Here the muon angle is < 20 degrees (seen in MINOS)
   if (isRestricted) {
+
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
     if (th_nu_mu >= 20) return false;
   }
+
+  // Lastly check the W cut (always at 1.8 GeV)
+  double Wrec = FitUtils::Wrec(pnu, pmu);
+  if (Wrec > 1800) return false;
+
 
   return true;
 };

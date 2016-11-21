@@ -18,11 +18,12 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
 
+//********************************************************************
 // The constructor
 MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
 
   fName = "MINERvA_CCNpip_XSec_1DQ2_nu_2016";
   fPlotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)";
@@ -50,23 +51,18 @@ MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, 
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
+//********************************************************************
 void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
+//********************************************************************
 
-  if (event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
-
+  if (event->NumFSParticle(13) == 0 || event->NumFSParticle(211) == 0) return;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double q2 = -999;
-
-  // Include up to some given hadronic mass cut
-  if (hadMass > 100 && hadMass < 1800) {
-    q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
-  }
+  // This Q2 defaults to calculating true Q2 (using true Enu instead of recon. Enu)
+  // This agrees with what MINERvA used
+  double q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
 
   fXVar = q2;
 
@@ -76,7 +72,5 @@ void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool MINERvA_CCNpip_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
-  int dummy;
-  return SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, false);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, false);
 }

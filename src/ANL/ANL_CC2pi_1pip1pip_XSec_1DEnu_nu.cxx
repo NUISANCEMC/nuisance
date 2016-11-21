@@ -63,9 +63,10 @@ void ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
 // Signal asks for 2pi+, 1mu-, 1n
 bool ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
+
   int pdgs[] = {13, 211, 211, 2112};
-  return SignalDef::isCCWithFS(event, 14, pdgs,
-                               EnuMin, EnuMax);
+
+  return SignalDef::isCCWithFS(event, 14, pdgs, EnuMin, EnuMax);
 }
 
 

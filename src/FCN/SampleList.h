@@ -153,9 +153,7 @@
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
-#include "MINERvA_CCNpip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
-#include "MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dpmu_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dthmu_nu.h"
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"

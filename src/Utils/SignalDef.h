@@ -57,11 +57,15 @@ template <size_t N>
 bool isCCWithFS(FitEvent *event, int nuPDG, int const (&pdgs)[N],
                 double EnuMin = 0, double EnuMax = 0) {
   // Check it's CCINC
-  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+  if (!SignalDef::isCCINC(event, nuPDG, EnuMin, EnuMax)) {
+    return false;
+  }
 
   // Remove events where the number of final state particles
   // do not match the number specified in the signal definition
-  if (N == event->NumFSParticle()) return false;
+  if (N != event->NumFSParticle()) {
+    return false;
+  }
 
   // For every particle in the list, check the number in the FS
   for (size_t p_it = 0; p_it < N; ++p_it) {
@@ -70,8 +74,11 @@ bool isCCWithFS(FitEvent *event, int nuPDG, int const (&pdgs)[N],
     for(size_t p_it2 = 0; p_it2 < N; ++p_it2) {
       nEntries += (pdgs[p_it] == pdgs[p_it2]);
     }
-    if ((size_t)event->NumFSParticle(pdgs[p_it]) != nEntries) return false;
+    if ((size_t)event->NumFSParticle(pdgs[p_it]) != nEntries) {
+      return false;
+    }
   }
+
   return true;
 }
 

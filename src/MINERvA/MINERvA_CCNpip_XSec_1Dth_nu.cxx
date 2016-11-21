@@ -18,19 +18,20 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 
+//********************************************************************
 // The constructor
 MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+//********************************************************************
 
   fName = name;
-  fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
-  fFullPhaseSpace = fName.find("_20deg") == std::string::npos;
+  fPlotTitles = "; #theta_{#pi} (degrees); (1/T#Phi) dN_{#pi}/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+
+  // If we have full phase space we won't find 20deg in name
+  fFullPhaseSpace = (fName.find("_20deg") == std::string::npos);
+  // If we have updated data we won't have 2015 in name
   fUpdatedData = fName.find("2015") == std::string::npos;
-   // Add strings because of silly matrix reader
-  if (fUpdatedData && fName.find("2016") == std::string::npos) fName += "_2016";
-  if (!fUpdatedData && fName.find("2015") == std::string::npos) fName += "_2015";
 
   EnuMin = 1.5;
   EnuMax = 10;
@@ -39,14 +40,17 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
 
   // Reserve length 3 for the number of pions
   // We fill once per pion found in the event, so can fill multiple times for one event
-  piIndex.reserve(3);
   thVect.reserve(3);
 
-  // Full Phase Space
-  if (fFullPhaseSpace){
-    if (fUpdatedData){
+  // So here is all the data we want to read in, pfoaw!
+  // Same W cut for all releases
 
-      //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_thpi.txt");
+  // Full Phase Space
+  if (fFullPhaseSpace) {
+
+    // 2016 release data
+    if (fUpdatedData) {
+
       this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
 
       // MINERvA has the error quoted as a percentage of the cross-section
@@ -57,9 +61,11 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
 
       // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
       this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
+    // 2015 release data
     } else {
 
       if (fIsShape) {
+        fName += "_shape";
         this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
         this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
       } else {
@@ -73,8 +79,11 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
         fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
       }
     }
-  // Restricted Phase Space
+
+  // Restricted Phase Space Data
   } else {
+
+    // 2016 release data unfortunately not released in 20degree forward-going, revert to 2015 data
     if (fUpdatedData){
       LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl; 
       fUpdatedData = false;
@@ -95,7 +104,6 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   this->SetupDefaultHist();
 
   // Make some auxillary helper plots
-  hnPions = new TH1I((fName+"_Npions").c_str(), (fName+"_Npions; Number of pions; Counts").c_str(), 11, -1, 10);
   onePions  = (TH1D*)(fDataHist->Clone());
   twoPions  = (TH1D*)(fDataHist->Clone());
   threePions = (TH1D*)(fDataHist->Clone());
@@ -110,14 +118,18 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
+
+// ********************************************
+// Fill the event variables
+// Here we want to fill the angle for every pion we can find in the event
 void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
+// ********************************************
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Pmu;
-  TLorentzVector Ppip;
-
-  piIndex.clear();
   thVect.clear();
+
+  if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
+  TLorentzVector Ppip;
 
   // Loop over the particle stack
   for (unsigned int j = 2; j < event->Npart(); ++j) {
@@ -128,55 +140,25 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
     int PID = (event->PartInfo(j))->fPID;
     // Select highest momentum (energy) charged pion
     if (abs(PID) == 211) {
-      piIndex.push_back(j);
-    // Find muon
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;
-    }
-  }
-
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double th;
-
-  // If hadronic mass passes signal, loop over the pions
-  if (hadMass > 100 && hadMass < 1800  && piIndex.size() > 0) {
-
-    // Loop over surviving pions and pick up their kinetic energy
-    for (unsigned int k = 0; k < piIndex.size(); ++k) {
-      Ppip = (event->PartInfo(piIndex[k]))->fP;
-      th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
+      Ppip = (event->PartInfo(j))->fP;
+      double th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
       thVect.push_back(th);
     }
-
-  } else {
-    th = -999;
   }
 
-  fXVar = th;
+  fXVar = 0;
 
   return;
 };
 
 //********************************************************************
+// The signal definition for MINERvA CCNpi+
+// Last bool refers to if we're selecting on the full phase space or not
 bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
-  return SignalDef::isCCNpip_MINERvA(event, nPions, EnuMin, EnuMax, fFullPhaseSpace);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
 }
 
-//********************************************************************
-void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
-//********************************************************************
-  Measurement1D::ScaleEvents();
-
-  onePions->Scale(this->fScaleFactor, "width");
-  twoPions->Scale(this->fScaleFactor, "width");
-  threePions->Scale(this->fScaleFactor, "width");
-  morePions->Scale(this->fScaleFactor, "width");
-  hnPions->Scale(this->fScaleFactor, "width");
-
-  return;
-}
 
 //********************************************************************
 // Need to override FillHistograms() here because we fill the histogram N_pion times
@@ -184,6 +166,8 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 //********************************************************************
 
   if (Signal){
+
+    int nPions = thVect.size();
 
     // Need to loop over all the pions in the sample
     for (size_t k = 0; k < thVect.size(); ++k) {
@@ -205,19 +189,28 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
       PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, th, Weight);
     }
-    hnPions->Fill(nPions);
   }
 
   return;
 }
 
+//********************************************************************
+void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
+//********************************************************************
+  Measurement1D::ScaleEvents();
+
+  onePions->Scale(this->fScaleFactor, "width");
+  twoPions->Scale(this->fScaleFactor, "width");
+  threePions->Scale(this->fScaleFactor, "width");
+  morePions->Scale(this->fScaleFactor, "width");
+
+  return;
+}
 
 //********************************************************************
 void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
 //********************************************************************
   Measurement1D::Write(drawOpts);
-
-  hnPions->Write();
 
   // Draw the npions stack
   onePions->SetTitle("1#pi");

@@ -72,8 +72,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 /// No restrictions on pi0 or other mesons or baryons
 ///
 /// Also writes number of pions (nPions) if studies on this want to be done...
-bool isCCNpip_MINERvA(FitEvent *event, int &nPions, double EnuMin,
-                      double EnuMax, bool isRestricted = false);
+bool isCCNpip_MINERvA(FitEvent *event, double EnuMin, double EnuMax, bool isRestricted = false);
 
 bool isCCQEnumu_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
                         bool fullphasespace = true);
