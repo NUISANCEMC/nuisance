@@ -40,49 +40,9 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   // D2 = 1 proton, 1 neutron
 };
 
-// Need this if we're reading a root file!
-/*
-void BNL_CC1ppip_XSec_1DEnu_nu::SetDataValues(std::string fileLocation) {
-  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
-
-  TH1D *copy = (TH1D*)(dataFile->Get("BNL_reanalysis"));
-
-  this->fNDataPointsX = copy->GetNbinsX()-1;
-
-  xBinBounds = new double[this->fNDataPointsX];
-  dataVals = new double[this->fNDataPointsX];
-  dataErr = new double[this->fNDataPointsX];
-
-  for (int i = 0; i < fNDataPointsX; i++) {
-    xBinBounds[i] = copy->GetBinLowEdge(i+3);
-    dataVals[i] = copy->GetBinContent(i+3)*1E-38;
-    dataErr[i] = copy->GetBinError(i+3)*1E-38;
-  }
-
-  this->fXBins = xBinBounds;
-  this->fDataValues = dataVals;
-  this->fDataErrors = dataErr;
-
-  this->fDataHist = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1, this->fXBins);
-
-  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-    this->fDataHist->SetBinContent(i+1, this->fDataValues[i]);
-    this->fDataHist->SetBinError(i+1, this->fDataErrors[i]);
-  }
-
-  fDataHist->SetDirectory(0);
-
-  dataFile->Close();
-};
-*/
-
 void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(2212) == 0 || event->NumFSParticle(211) == 0 || event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
@@ -93,7 +53,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   double Enu     = -1.0;
 
   // Found a corrected one but only reliable to ~3GeV
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) Enu = Pnu.E()/1000.;
   fXVar = Enu;
 
   return;

@@ -49,16 +49,14 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
 
 void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   
-  if (event->NumFSParticle(13) == 0 ||
-      event->NumFSParticle(111) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // no W cut on BNL CC1pi0 
-  double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
+  // No W cut on BNL CC1pi0 
+  // Want true Q2
+  double q2CCpi0 = -1*(Pnu-Pmu).Mag2()/1.E6;
   fXVar = q2CCpi0;
 
   return;

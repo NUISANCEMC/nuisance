@@ -80,8 +80,9 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
   double cosThAdler = -999;
   
   // BNL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400)
+  if (hadMass < 1400) {
     cosThAdler = cos(PpipVect.Angle(zVect));
+  }
 
   fXVar = cosThAdler;
 
