@@ -42,8 +42,7 @@ GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
 void GGM_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
+      event->NumFSParticle(211) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
@@ -55,7 +54,7 @@ void GGM_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) Enu = Pnu.E()/1.E3;
   fXVar = Enu;
 
   return;

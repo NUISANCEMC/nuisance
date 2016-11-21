@@ -102,15 +102,16 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
     }
   }
 
-  if (fCardFile.empty()){
-    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
-    ERR(FTL) << "Run with '-h' to see options." << std::endl;
-    throw;
+  if (fOutputFile.empty()) {
+    ERR(WRN) << "WARNING: output file not specified." << std::endl;
+    ERR(WRN) << "Using " << fCardFile << ".root" << std::endl;
+    fOutputFile = fCardFile + ".root";
   }
 
-  if (fOutputFile.empty()){
-    ERR(FTL) << "WARNING: output file not specified." << std::endl;
-    ERR(FTL) << "Using cardfile.root" << std::endl;
+  if (fCardFile == fOutputFile) {
+    ERR(WRN) << "WARNING: output file and card file are the same file, "
+                "writing: "
+             << fCardFile << ".root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
 
@@ -408,7 +409,13 @@ int MinimizerRoutines::ReadFakeDataPars(std::string parstring){
 //******************************************
 int MinimizerRoutines::ReadSamples(std::string samstring){
 //******************************************
-  std::string inputspec = "";
+  const static std::string inputspec =
+      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
+      "[norm]\nsample_name: Name "
+      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
+      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
+      "optional sample options.\nnorm: Additional, optional sample "
+      "normalisation factor.";
 
   // Check sample input
   if (samstring.find("sample") == std::string::npos)
@@ -433,6 +440,17 @@ int MinimizerRoutines::ReadSamples(std::string samstring){
   // Setup default inputs
   std::string samname = strvct[1];
   std::string samfile = strvct[2];
+
+  if (samfile == "FIX") {
+    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
+                "in the input card file. Line:\'"
+             << samstring << "\'" << std::endl;
+    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
+             << std::endl;
+
+    throw;
+  }
+
   std::string samtype = "DEFAULT";
   double      samnorm = 1.0;
 
