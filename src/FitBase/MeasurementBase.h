@@ -78,6 +78,13 @@ enum extraplotflags {
   kExtraPlotWrite   = 4
 };
 
+enum MeasurementSpeciesClass {
+  kSingleSpeciesMeasurement = 0,
+  kNumuWithWrongSignMeasurement,
+  kNueWithWrongSignMeasurement,
+  kFourSpeciesMeasurement,
+};
+
 
 /// InputHandler Class
 ///
@@ -190,9 +197,10 @@ class MeasurementBase {
   double GetZVar(void){ return fZVar; };
   double GetMode(void){ return this->Mode;  };
   double GetEnu(void){ return this->Enu; };
-  
+
   void SetupInputs(std::string inputfile);
   int GetInputID(void);
+  std::string GetInputFileName(){ return fInputFileName; };
   void SetSignal(bool sig);
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
@@ -202,8 +210,8 @@ class MeasurementBase {
   inline void SetXVar(double xvar){ fXVar = xvar; };
   inline void SetYVar(double yvar){ fYVar = yvar; };
   inline void SetZVar(double zvar){ fZVar = zvar; };
-  
-  
+
+
 protected:
 
   // Minimum and maximum energies
@@ -241,7 +249,10 @@ protected:
   std::vector<int>    fMode_VECT;
   std::vector<UInt_t> fIndex_VECT;
 
-  std::string inputfilename;
+  InputUtils::InputType fInputType;
+  std::string fInputFileName;
+
+  MeasurementSpeciesClass fMeasurementSpeciesType;
 };
 
 // Class TypeDefs
