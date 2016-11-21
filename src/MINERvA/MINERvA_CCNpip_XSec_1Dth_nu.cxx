@@ -63,6 +63,7 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
       this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
     // 2015 release data
     } else {
+      // 2015 release allows for shape comparisons
 
       if (fIsShape) {
         fName += "_shape";
