@@ -117,19 +117,23 @@ void FitEvent::NeutKinematics() {
     
     // State
     int state = kUndefinedState;
+    // fStatus == -1 means initial  state
     if (part->fIsAlive == false && part->fStatus == -1) {
       state = kInitialState;
 
-    // NEUT is a little strange here
-    // isAlive false and status 2 means neutrino escaped detector, so NC interaction
+    // NEUT has a bit of a strange convention for fIsAlive and fStatus combinations
+    // for NC and neutrino particle isAlive true/false and status 2 means final state particle
+    // for other particles in NC status 2 means it's an FSI particle
     // for CC it means it was an FSI particle
     } else if (part->fStatus == 2) {
-        if (abs(fNeutVect->Mode) > 30 && part->fIsAlive == false) { // NC case is a little strange...
-          state = kFinalState;
-        } else if (part->fIsAlive == true) { // CC case
-          state = kFSIState;
-        }
-    } else if (part->fIsAlive == true && part->fStatus == 2 && abs(part->fPID) == 14) {
+      // NC case is a little strange... The outgoing neutrino might be alive or not alive. Remaining particles with status 2 are FSI particles that reinteracted
+      if (abs(fNeutVect->Mode) > 30 && (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+        state = kFinalState;
+      // The usual CC case
+      } else if (part->fIsAlive == true) {
+        state = kFSIState;
+      }
+    } else if (part->fIsAlive == true && part->fStatus == 2 && (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
       state = kFinalState;
 
     } else if (part->fIsAlive == true && part->fStatus == 0) {
@@ -743,8 +747,7 @@ bool FitEvent::HasParticle(int pdg, int state){
 
   bool found = false;
   for (int i = 0; i < fNParticles; i++){
-
-    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (state != -1 && fParticleState[i] != (uint)state) continue;
     if (fParticlePDG[i] == pdg) found = true;
   }
 
@@ -860,7 +863,10 @@ return PartInfo(maxind);
 
 
 void FitEvent::Print(){
-  LOG(EVT) << "FitEvent " << std::endl;
+
+  LOG(EVT) << "FitEvent print" << std::endl;
+  LOG(EVT) << "Mode: " << fMode << std::endl;
+  LOG(EVT) << "Particles: " << fNParticles << std::endl;
 
   LOG(EVT) << " -> Particle Stack " << std::endl;
   for (int i = 0; i < fNParticles; i++){
