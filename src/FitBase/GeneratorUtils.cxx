@@ -673,11 +673,6 @@ int GeneratorUtils::ConvertNuanceMode(NuanceEvent * evt){
   }
   return 0;
 
-  // Notes copied from NuanceChannels.pdf
-
-
-
-
 }
 #endif
 

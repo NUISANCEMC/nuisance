@@ -197,6 +197,7 @@
 #include "GenericFlux_Tester.h"
 
 #include "MCStudy_KaonPreSelection.h"
+#include "MCStudy_MuonValidation.h"
 
 #include "FitWeight.h"
 

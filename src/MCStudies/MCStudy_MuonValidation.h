@@ -17,37 +17,43 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINIBOONE_CCQE_XSEC_1DQ2_ANTINU_H_SEEN
-#define MINIBOONE_CCQE_XSEC_1DQ2_ANTINU_H_SEEN
-
+#ifndef MCStudy_MuonValidation_H_SEEN
+#define MCStudy_MuonValidation_H_SEEN
 #include "Measurement1D.h"
 
 //********************************************************************
-class MiniBooNE_CCQE_XSec_1DQ2_antinu : public Measurement1D {
+class MCStudy_MuonValidation : public Measurement1D {
 //********************************************************************
 
 public:
 
-  MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~MiniBooNE_CCQE_XSec_1DQ2_antinu() {};
+  MCStudy_MuonValidation(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  virtual ~MCStudy_MuonValidation() {};
 
+  //! Grab info from event
   void FillEventVariables(FitEvent *event);
+
+  //! Define this samples signal
+  bool isSignal(FitEvent *nvect);
+
+  //! Write Files
   void Write(std::string drawOpt);
-  void FillHistograms();
-  bool isSignal(FitEvent *event);
-  void ScaleEvents();
-  void ApplyNormScale(double norm);
-  void ResetAll();
-  TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background
-  TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background
-  TH1D* fMCHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background
 
  private:
-  bool fCCQElike; ///< Flag for running in CCQELike mode
-  bool fUseCorrectedCTarget; ///< Flag for using corrected `C-Target' data.
-  TH1D* fDataHist_CCQELIKE; ///< CCQELike data contribution
-  TH1D* fDataHist_CCPIM; ///< CCPIM data contribution
-  TH1D* fDataHist_NONCCPIM; ///< NONCCPIM data contribution
+  
+  double fEventScaleFactor;
+  TTree* fEventTree;
+  float Enu;
+  float TLep  ;
+  float CosLep;
+  float Q2    ;
+  float Q2QE  ;
+  float EQE   ;
+  float q0    ;
+  float q3    ;
+  double LocalRWWeight;
+  double LocalInputWeight;
+
 };
 
 #endif

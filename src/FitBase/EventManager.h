@@ -23,7 +23,7 @@
 #include "InputHandler.h"
 #include "FitWeight.h"
 
-// This class is menat to manage one input file for many distributions 
+// This class is menat to manage one input file for many distributions
 class EventManager {
  public:
   static EventManager& Get(void);
@@ -32,12 +32,12 @@ class EventManager {
   InputHandler* GetInput(int id);
   FitEvent* GetEvent(int id, int i);
   double GetEventWeight(int id, int i);
-  void AddInput(std::string handle, std::string infile);
+  InputHandler* AddInput(std::string handle, std::string infile);
   void ResetWeightFlags();
   int GetInputID(std::string infile);
 
   std::map< int, InputHandler* > GetInputs();
-  
+
  protected:
   EventManager();
   ~EventManager();
@@ -50,8 +50,8 @@ class EventManager {
   std::map< int, std::vector< bool > > frwneeded;
   std::map< int, std::vector< double > > calc_rw;
 
-  
-  
+
+
 };
 
 
@@ -66,7 +66,7 @@ namespace FitBase {
   inline
   InputHandler* GetInput(int infile){ return EvtManager().GetInput(infile); };
   inline
-  void AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
+  InputHandler* AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
 
 
 }

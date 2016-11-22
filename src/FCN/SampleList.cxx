@@ -235,7 +235,8 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
     fChain->push_back(
         new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
-             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu")) {
+             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
+             !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {
     fChain->push_back(
         new MiniBooNE_CCQE_XSec_1DQ2_antinu(name, file, rw, type, fkdt));
 
@@ -537,6 +538,9 @@ Fake Studies
   } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
     fChain->push_back(new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
 
+  } else if (name.find("MuonValidation_") != std::string::npos) {
+    fChain->push_back(new MCStudy_MuonValidation(name, file, rw, type, fkdt));
+        
   } else {
     ERR(FTL) << "Error: No such sample: " << name << std::endl;
     exit(-1);

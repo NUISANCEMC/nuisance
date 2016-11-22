@@ -110,9 +110,9 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
 
   int nLeptons = event->NumFSLeptons();
 
-  // Get the number of pions (MINERvA requires at least one 211 or -211)
-  int pdgs[] = {-211, 211};
-  int nPions = event->NumFSParticle(pdgs);
+  // Write the number of pions to the measurement class...
+  // Maybe better to just do that inside the class?
+  int nPions = event->NumFSParticle(PhysConst::pdg_charged_pions);
 
   // Check that there is a pion!
   if (nPions == 0) return false;

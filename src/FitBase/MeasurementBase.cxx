@@ -26,72 +26,94 @@
 //********************************************************************
 // 2nd Level Constructor (Inherits From MeasurementBase.h)
 MeasurementBase::MeasurementBase() {
-//********************************************************************
+  //********************************************************************
 
   fScaleFactor = 1.0;
   fMCFilled = false;
-  fNoData   = false;
+  fNoData = false;
+  fInput = NULL;
 
   // Set the default values
   // After-wards this gets set in SetupMeasurement
   EnuMin = 0.;
   EnuMax = 1.E5;
 
+  fMeasurementSpeciesType = kSingleSpeciesMeasurement;
 };
 
 //********************************************************************
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
-MeasurementBase::~MeasurementBase() {
-//********************************************************************
+MeasurementBase::~MeasurementBase(){
+    //********************************************************************
 
 };
 
 //********************************************************************
-double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low, double high){
-//********************************************************************
+double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low,
+                                            double high) {
+  //********************************************************************
 
   // Set Energy Limits
-  if (low == -9999.9)  low  = this->EnuMin;
+  if (low == -9999.9) low = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
 
   return GetInput()->TotalIntegratedFlux(low, high, intOpt);
 };
 
 //********************************************************************
-double MeasurementBase::PredictedEventRate(std::string intOpt, double low, double high){
-//********************************************************************
+double MeasurementBase::PredictedEventRate(std::string intOpt, double low,
+                                           double high) {
+  //********************************************************************
 
   // Set Energy Limits
-  if (low == -9999.9)  low  = this->EnuMin;
+  if (low == -9999.9) low = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
 
   return GetInput()->PredictedEventRate(low, high, intOpt) * 1E-38;
-
 };
 
-
 //********************************************************************
-void MeasurementBase::SetupInputs(std::string inputfile){
-//********************************************************************
+void MeasurementBase::SetupInputs(std::string inputfile) {
+  //********************************************************************
 
   // Add this infile to the global manager
-  if (FitPar::Config().GetParB("EventManager")){
-    FitBase::AddInput(fName, inputfile);
-
-    // Get a pointer to the input so we can grab flux stuff
-    // Slightly Convoluted...
-    fInput  = FitBase::GetInput( FitBase::GetInputID(inputfile) );
-
+  if (FitPar::Config().GetParB("EventManager")) {
+    fInput = FitBase::AddInput(fName, inputfile);
   } else {
-    fInput = new InputHandler(fName, inputfile);
+    std::vector<std::string> file_descriptor =
+        GeneralUtils::ParseToStr(inputfile, ":");
+    if (file_descriptor.size() != 2) {
+      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfile
+               << "\". expected \"FILETYPE:file.root\"" << std::endl;
+      throw;
+    }
+    InputUtils::InputType inpType =
+        InputUtils::ParseInputType(file_descriptor[0]);
+
+    fInput = new InputHandler(fName, inpType, file_descriptor[1]);
   }
+
+  fFluxHist = fInput->GetFluxHistogram();
+  fEventHist = fInput->GetEventHistogram();
+  fXSecHist = fInput->GetXSecHistogram();
+  fNEvents = fInput->GetNEvents();
+
+  // Expect INPUTTYPE:FileLocation(s)
+  std::vector<std::string> file_descriptor =
+      GeneralUtils::ParseToStr(inputfile, ":");
+  if (file_descriptor.size() != 2) {
+    ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfile
+             << "\". expected \"FILETYPE:file.root\"" << std::endl;
+    throw;
+  }
+  fInputType = InputUtils::ParseInputType(file_descriptor[0]);
 
   fFluxHist      = fInput->GetFluxHistogram();
   fEventHist     = fInput->GetEventHistogram();
   fXSecHist      = fInput->GetXSecHistogram();
   fNEvents       = fInput->GetNEvents();
- 
-  inputfilename = inputfile;
+
+  fInputFileName = file_descriptor[1];
   if (EnuMin == 0 && EnuMax == 1.E5) {
     EnuMin = fFluxHist->GetBinLowEdge(1);
     EnuMax = fFluxHist->GetBinLowEdge(fFluxHist->GetNbinsX()+1);
@@ -99,36 +121,38 @@ void MeasurementBase::SetupInputs(std::string inputfile){
 }
 
 //***********************************************
-int MeasurementBase::GetInputID(){
-//***********************************************
-  return FitBase::GetInputID(inputfilename);
+int MeasurementBase::GetInputID() {
+  //***********************************************
+  return FitBase::GetInputID(fInputFileName);
 }
 
 //***********************************************
-void MeasurementBase::Reconfigure(){
-//***********************************************
-  LOG(REC) << " Reconfiguring sample "<<fName<<std::endl;
+void MeasurementBase::Reconfigure() {
+  //***********************************************
+  LOG(REC) << " Reconfiguring sample " << fName << std::endl;
 
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
-  if (using_evtmanager) input_id = FitBase::GetInputID(inputfilename);
+  if (using_evtmanager) {
+    input_id = FitBase::GetInputID(fInputFileName);
+  }
   cust_event = fInput->GetEventPointer();
 
-  if (FitPar::Config().GetParI("cachesize") > 0){
+  if (FitPar::Config().GetParI("cachesize") > 0) {
     fInput->SetupCache();
   }
-  
+
   // Reset Histograms
   this->ResetAll();
 
   // READ in spline head for this input
-  if (fInput->GetType() == kEVTSPLINE){
+  if (fInput->GetType() == kEVTSPLINE) {
     FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
   }
 
   FitEvent* cust_event = fInput->GetEventPointer();
   int fNEvents = fInput->GetNEvents();
-  int countwidth = (fNEvents/5);
+  int countwidth = (fNEvents / 5);
 
   // Reset Signal Vectors
   fXVar_VECT.clear();
@@ -137,24 +161,52 @@ void MeasurementBase::Reconfigure(){
   this->fMode_VECT.clear();
   this->fIndex_VECT.clear();
 
+
+  #ifdef __GiBUU_ENABLED__
+  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
+  #endif
+  
   size_t NSignal = 0;
   // MAIN EVENT LOOP
-  for (int i = 0; i < fNEvents; i++){
-
+  for (int i = 0; i < fNEvents; i++) {
     // Read in the TChain and Calc Kinematics
-    if (using_evtmanager){
+    if (using_evtmanager) {
       cust_event = FitBase::EvtManager().GetEvent(input_id, i);
     } else {
       fInput->ReadEvent(i);
 
       cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
-      cust_event->Weight   = cust_event->RWWeight*cust_event->InputWeight;
-
-      Weight = cust_event->Weight;
+      cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
     }
 
     Weight = cust_event->Weight;
 
+
+    #ifdef __GiBUU_ENABLED__
+    
+    /// For multi species measurements the flux scalings must be correctly
+    /// applied here
+    if (UsingGiBUU) {
+      switch (fMeasurementSpeciesType) {
+        case kSingleSpeciesMeasurement:
+        default: { break; }
+        case kNumuWithWrongSignMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght_numu;
+          break;
+        }
+        case kNueWithWrongSignMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght_nue;
+          break;
+        }
+        case kFourSpeciesMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght;
+          break;
+        }
+      }
+    }
+
+    #endif
+    
     // Initialize
     fXVar = -999.9;
     fYVar = -999.9;
@@ -167,12 +219,12 @@ void MeasurementBase::Reconfigure(){
     Signal = this->isSignal(cust_event);
 
     // Push Back Signal
-    if (Signal){
-      fXVar_VECT .push_back(fXVar);
-      fYVar_VECT .push_back(fYVar);
-      fZVar_VECT .push_back(fZVar);
-      this->fMode_VECT  .push_back(Mode);
-      this->fIndex_VECT .push_back( (UInt_t)i);
+    if (Signal) {
+      fXVar_VECT.push_back(fXVar);
+      fYVar_VECT.push_back(fYVar);
+      fZVar_VECT.push_back(fZVar);
+      this->fMode_VECT.push_back(Mode);
+      this->fIndex_VECT.push_back((UInt_t)i);
       NSignal++;
     }
 
@@ -181,21 +233,19 @@ void MeasurementBase::Reconfigure(){
     // this->FillExtraHistograms();
 
     // Print Out
-    if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)){
+    if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)) {
       std::stringstream ss("");
       ss.unsetf(ios_base::fixed);
-      ss << std::setw(7) << std::right << i << "/" << fNEvents
-	       << " events (" << std::setw(2) << double(i)/double(fNEvents)*100.
-	       << std::left << std::setw(5) << "%) "
-	       << "[S,X,Y,Z,M,W] = ["
-	       << std::fixed << std::setprecision(2) << std::right
-	       << Signal << ", "
-	       << std::setw(5) << fXVar  << ", " << std::setw(5) << fYVar <<  ", "
-	       << std::setw(5) << fYVar  << ", " << std::setw(3) << (int)Mode << ", "
-	       << std::setw(5) << Weight << "] "<< std::endl;
+      ss << std::setw(7) << std::right << i << "/" << fNEvents << " events ("
+         << std::setw(2) << double(i) / double(fNEvents) * 100. << std::left
+         << std::setw(5) << "%) "
+         << "[S,X,Y,Z,M,W] = [" << std::fixed << std::setprecision(2)
+         << std::right << Signal << ", " << std::setw(5) << fXVar << ", "
+         << std::setw(5) << fYVar << ", " << std::setw(5) << fYVar << ", "
+         << std::setw(3) << (int)Mode << ", " << std::setw(5) << Weight << "] "
+         << std::endl;
       LOG(SAM) << ss.str();
     }
-      
   }
 
   int npassed = fXVar_VECT.size();
@@ -209,23 +259,22 @@ void MeasurementBase::Reconfigure(){
   this->ConvertEventRates();
 }
 
-
 //***********************************************
-void MeasurementBase::ReconfigureFast(){
-//***********************************************
-  LOG(REC) << " Reconfiguring signal "<<this->fName<<std::endl;
+void MeasurementBase::ReconfigureFast() {
+  //***********************************************
+  LOG(REC) << " Reconfiguring signal " << this->fName << std::endl;
 
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
   int input_id = -1;
 
-  if (using_evtmanager){
-    input_id = FitBase::GetInputID(inputfilename);
+  if (using_evtmanager) {
+    input_id = FitBase::GetInputID(fInputFileName);
   } else {
     cust_event = fInput->GetEventPointer();
   }
 
   // Check if we Can't Signal Reconfigure
-  if (!fMCFilled){
+  if (!fMCFilled) {
     this->Reconfigure();
     return;
   }
@@ -234,7 +283,7 @@ void MeasurementBase::ReconfigureFast(){
   this->ResetAll();
 
   // READ in spline head for this input
-  if (fInput->GetType() == kEVTSPLINE){
+  if (fInput->GetType() == kEVTSPLINE) {
     FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
   }
 
@@ -245,24 +294,53 @@ void MeasurementBase::ReconfigureFast(){
   std::vector<double>::iterator X = fXVar_VECT.begin();
   std::vector<double>::iterator Y = fYVar_VECT.begin();
   std::vector<double>::iterator Z = fZVar_VECT.begin();
-  std::vector<int>::iterator    M = fMode_VECT.begin();
+  std::vector<int>::iterator M = fMode_VECT.begin();
   std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
+
+
+  #ifdef __GiBUU_ENABLED__
+  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
+  #endif
   
   // SIGNAL LOOP
-  for (int i = 0; I != fIndex_VECT.end(); I++, i++){
-
+  for (int i = 0; I != fIndex_VECT.end(); I++, i++) {
     // Just Update Weight
-    if (using_evtmanager){
+    if (using_evtmanager) {
       Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
     } else {
       fInput->GetTreeEntry((*I));
-      Weight = FitBase::GetRW()->CalcWeight(cust_event)	* cust_event->InputWeight;
+      Weight =
+          FitBase::GetRW()->CalcWeight(cust_event) * cust_event->InputWeight;
     }
+
+
+    #ifdef __GiBUU_ENABLED__
+    /// For multi species measurements the flux scalings must be correctly
+    /// applied here
+    if (UsingGiBUU) {
+      switch (fMeasurementSpeciesType) {
+        case kSingleSpeciesMeasurement:
+        default: { break; }
+        case kNumuWithWrongSignMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght_numu;
+          break;
+        }
+        case kNueWithWrongSignMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght_nue;
+          break;
+        }
+        case kFourSpeciesMeasurement: {
+          Weight *= cust_event->GiRead->SpeciesWght;
+          break;
+        }
+      }
+    }
+    #endif
 
     fXVar = (*X);
     fYVar = (*Y);
     fZVar = (*Z);
-    Mode  = (*M);
+    Mode = (*M);
 
     // Set signal to true because here every event looped is true signal
     Signal = true;
@@ -278,13 +356,13 @@ void MeasurementBase::ReconfigureFast(){
 
     // Print Out
     if (LOG_LEVEL(REC) && (i) % countwidth == 0)
-      LOG(REC) << "Reconfigured " << std::setw(7) << std::right << i 
-	       <<" signal events. [X,Y,Z,M,W] = [" << std::setprecision(2)
-	       << std::setw(5) << std::right << fXVar  << ", "
-	       << std::setw(5) << std::right << fYVar <<  ", "
-	       << std::setw(5) << std::right << fYVar  << ", "
-	       << std::setw(3) << std::right << (int)Mode << ", "
-	       << std::setw(5) << std::right << Weight << "] "<< std::endl;
+      LOG(REC) << "Reconfigured " << std::setw(7) << std::right << i
+               << " signal events. [X,Y,Z,M,W] = [" << std::setprecision(2)
+               << std::setw(5) << std::right << fXVar << ", " << std::setw(5)
+               << std::right << fYVar << ", " << std::setw(5) << std::right
+               << fYVar << ", " << std::setw(3) << std::right << (int)Mode
+               << ", " << std::setw(5) << std::right << Weight << "] "
+               << std::endl;
   }
 
   // Finalise histograms
@@ -293,86 +371,87 @@ void MeasurementBase::ReconfigureFast(){
 }
 
 //***********************************************
-void MeasurementBase::ConvertEventRates(){
-//***********************************************
+void MeasurementBase::ConvertEventRates() {
+  //***********************************************
 
   this->ScaleEvents();
-  this->ApplyNormScale( FitBase::GetRW()->GetSampleNorm( this->fName ) ) ;
-
+  this->ApplyNormScale(FitBase::GetRW()->GetSampleNorm(this->fName));
 }
 
 //***********************************************
-InputHandler* MeasurementBase::GetInput(){
-//***********************************************
+InputHandler* MeasurementBase::GetInput() {
+  //***********************************************
 
-  if(FitPar::Config().GetParB("EventManager")){
-    return FitBase::GetInput(FitBase::GetInputID(inputfilename));
-  } else {
-    return this->fInput;
+  if (!fInput) {
+    ERR(FTL) << "MeasurementBase::fInput not set. Please submit your command "
+                "line options and input cardfile with a bug report to: "
+                "nuisance@projects.hepforge.org"
+             << std::endl;
   }
-  return NULL;
+  return fInput;
 };
 
 //***********************************************
-void MeasurementBase::Renormalise(){
-//***********************************************
+void MeasurementBase::Renormalise() {
+  //***********************************************
 
-  // Called when the fitter has changed a measurements normalisation but not any reweight dials
-  // Means we don't have to call the time consuming reconfigure when this happens.
-  double norm = FitBase::GetRW()->GetDialValue( this->fName + "_norm" );
+  // Called when the fitter has changed a measurements normalisation but not any
+  // reweight dials
+  // Means we don't have to call the time consuming reconfigure when this
+  // happens.
+  double norm = FitBase::GetRW()->GetDialValue(this->fName + "_norm");
 
-  if ((this->fCurrentNorm == 0.0 and norm != 0.0) or not fMCFilled){
+  if ((this->fCurrentNorm == 0.0 and norm != 0.0) or not fMCFilled) {
     this->ReconfigureFast();
     return;
   }
 
   if (this->fCurrentNorm == norm) return;
 
-  this->ApplyNormScale( 1.0 / this->fCurrentNorm );
-  this->ApplyNormScale( norm );
+  this->ApplyNormScale(1.0 / this->fCurrentNorm);
+  this->ApplyNormScale(norm);
 
   return;
 };
 
-
 //***********************************************
-void MeasurementBase::SetSignal(bool sig){
-//***********************************************
+void MeasurementBase::SetSignal(bool sig) {
+  //***********************************************
   Signal = sig;
 }
 
 //***********************************************
-void MeasurementBase::SetSignal(FitEvent* evt){
-//***********************************************
+void MeasurementBase::SetSignal(FitEvent* evt) {
+  //***********************************************
   Signal = this->isSignal(evt);
 }
 
 //***********************************************
-void MeasurementBase::SetWeight(double wght){
-//***********************************************
+void MeasurementBase::SetWeight(double wght) {
+  //***********************************************
   Weight = wght;
 }
 
 //***********************************************
-void MeasurementBase::SetMode(int md){
-//***********************************************
+void MeasurementBase::SetMode(int md) {
+  //***********************************************
   Mode = md;
 }
 
-//***********************************************  
-std::vector<TH1*> MeasurementBase::GetFluxList(){
-//***********************************************  
+//***********************************************
+std::vector<TH1*> MeasurementBase::GetFluxList() {
+  //***********************************************
   return GetInput()->GetFluxList();
 }
 
 //***********************************************
-std::vector<TH1*> MeasurementBase::GetEventRateList(){
-//***********************************************
+std::vector<TH1*> MeasurementBase::GetEventRateList() {
+  //***********************************************
   return GetInput()->GetEventList();
 }
 
 //***********************************************
-std::vector<TH1*> MeasurementBase::GetXSecList(){
-//***********************************************
+std::vector<TH1*> MeasurementBase::GetXSecList() {
+  //***********************************************
   return GetInput()->GetXSecList();
 }

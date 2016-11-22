@@ -16,45 +16,29 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-ExpMultDist_CCQE_XSec_1DVar_FakeStudy.cxx
-ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
-GenericFlux_Tester.cxx
-MCStudy_KaonPreSelection.cxx
-MCStudy_MuonValidation.cxx
-)
-
-set(HEADERFILES
-ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h
-ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
-GenericFlux_Tester.h
-MCStudy_KaonPreSelection.h
-MCStudy_MuonValidation.h
-)
-
-set(LIBNAME MCStudies)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
+include_directories(${CMAKE_SOURCE_DIR}/src/Routines)
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
+include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
+include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
+include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-# Needed for experiment specific signal flags
-include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
-include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
+SET(TESTAPPS SignalDefTests)
 
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
-set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+foreach(appimpl ${TESTAPPS})
+  add_executable(${appimpl} ${appimpl}.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};${appimpl})
+  target_link_libraries(${appimpl} ${MODULETargets})
+  target_link_libraries(${appimpl} ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(${appimpl} ${ROOT_LIBS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(${appimpl} PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+  install(TARGETS ${appimpl} DESTINATION tests)
+  add_test(${appimpl} ${appimpl} 1)
+endforeach()
 
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
 
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
