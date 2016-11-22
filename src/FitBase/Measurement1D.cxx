@@ -1242,8 +1242,13 @@ void Measurement1D::Write(std::string drawOpt) {
     // Create Shape Histogram
     TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
-    double shapeScale =
-      fDataHist->Integral("width") / fMCHist->Integral("width");
+    double shapeScale = 1.0;
+    if (fIsRawEvents){
+      shapeScale = fDataHist->Integral() / fMCHist->Integral();
+    } else {
+      shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
+    }
+    
     mcShape->Scale(shapeScale);
 
     std::stringstream ss;

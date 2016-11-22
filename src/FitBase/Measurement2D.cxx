@@ -1163,8 +1163,14 @@ void Measurement2D::Write(std::string drawOpt){
     // Create Shape Histogram
     TH2D* mcShape = (TH2D*) fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
-    mcShape->Scale( fDataHist->Integral("width")
-			  / fMCHist->Integral("width"));
+    double shapeScale = 1.0;
+    if (fIsRawEvents){
+      shapeScale = fDataHist->Integral() / fMCHist->Integral();
+    } else {
+      shapeScale =  fDataHist->Integral("width") / fMCHist->Integral("width");
+    }
+    
+    mcShape->Scale( shapeScale );
 
     mcShape->SetLineWidth(3);
     mcShape->SetLineStyle(7); //dashes
