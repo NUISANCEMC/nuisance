@@ -58,7 +58,7 @@ void BEBC_CC1pi0_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   hadMass = FitUtils::MpPi(Pp, Ppi0);
   double q2CCpi0 = -1.0;
   
-  if (hadMass < 1400) q2CCpi0 = -1*(Pnu-Pmu).Mag2();
+  if (hadMass < 1400) q2CCpi0 = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpi0;
 
