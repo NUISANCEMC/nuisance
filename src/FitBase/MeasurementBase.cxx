@@ -161,8 +161,11 @@ void MeasurementBase::Reconfigure() {
   this->fMode_VECT.clear();
   this->fIndex_VECT.clear();
 
-  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
 
+  #ifdef __GiBUU_ENABLED__
+  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
+  #endif
+  
   size_t NSignal = 0;
   // MAIN EVENT LOOP
   for (int i = 0; i < fNEvents; i++) {
@@ -178,6 +181,9 @@ void MeasurementBase::Reconfigure() {
 
     Weight = cust_event->Weight;
 
+
+    #ifdef __GiBUU_ENABLED__
+    
     /// For multi species measurements the flux scalings must be correctly
     /// applied here
     if (UsingGiBUU) {
@@ -199,6 +205,8 @@ void MeasurementBase::Reconfigure() {
       }
     }
 
+    #endif
+    
     // Initialize
     fXVar = -999.9;
     fYVar = -999.9;
@@ -289,8 +297,11 @@ void MeasurementBase::ReconfigureFast() {
   std::vector<int>::iterator M = fMode_VECT.begin();
   std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
 
-  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
 
+  #ifdef __GiBUU_ENABLED__
+  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
+  #endif
+  
   // SIGNAL LOOP
   for (int i = 0; I != fIndex_VECT.end(); I++, i++) {
     // Just Update Weight
@@ -302,6 +313,8 @@ void MeasurementBase::ReconfigureFast() {
           FitBase::GetRW()->CalcWeight(cust_event) * cust_event->InputWeight;
     }
 
+
+    #ifdef __GiBUU_ENABLED__
     /// For multi species measurements the flux scalings must be correctly
     /// applied here
     if (UsingGiBUU) {
@@ -322,6 +335,7 @@ void MeasurementBase::ReconfigureFast() {
         }
       }
     }
+    #endif
 
     fXVar = (*X);
     fYVar = (*Y);

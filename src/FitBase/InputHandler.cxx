@@ -47,6 +47,7 @@ InputHandler::InputHandler(std::string const& handle,
   if (fIsJointInput) {
     ReadJointFile();
   } else {
+    fInputRootFile = new TFile(fInputFile.c_str(),"READ");
     switch (fInputType) {
       // Setup the handler for each type
       case InputUtils::kNEUT_Input: {
@@ -464,15 +465,24 @@ void InputHandler::ReadNeutFile() {
 
   // Event Type 0 Neut
   fEventType = kNEUT;
-
+  
   // Get flux histograms NEUT supplies
   fFluxHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "flux")).c_str());
+  if (!fFluxHist){
+    ERR(FTL) << "No Flux Hist in NEUT ROOT file." << std::endl;
+    throw;
+  }
   fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
                           (fName + "; E_{#nu} (GeV)").c_str());
 
   fEventHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "evtrt")).c_str());
+  if (!fEventHist){
+    ERR(FTL) <<"No Event Hist in NEUT ROOT file." << std::endl;
+    throw;
+  }
+  
   fEventHist->SetNameTitle((fName + "_EVT").c_str(),
                            (fName + "; E_{#nu} (GeV); Event Rate").c_str());
 
@@ -485,7 +495,7 @@ void InputHandler::ReadNeutFile() {
   // Read in the file once only
   tn = new TChain("neuttree", "");
   tn->Add(Form("%s/neuttree", fInputFile.c_str()));
-
+  
   // Assign nvect
   fNEvents = tn->GetEntries();
   fNeutVect = NULL;
