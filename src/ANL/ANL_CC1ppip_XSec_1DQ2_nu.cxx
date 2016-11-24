@@ -38,7 +38,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral(fEventHist->FindBin(EnuMin), fEventHist->FindBin(EnuMax)+1, "width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
+  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
 };
 
 
