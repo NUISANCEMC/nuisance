@@ -97,7 +97,7 @@ InputHandler::InputHandler(std::string const& handle,
       }
     }
   }
-  
+
   // Setup MaxEvents After setup of ttree
   if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
     LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
@@ -465,7 +465,7 @@ void InputHandler::ReadNeutFile() {
 
   // Event Type 0 Neut
   fEventType = kNEUT;
-  
+
   // Get flux histograms NEUT supplies
   fFluxHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "flux")).c_str());
@@ -482,7 +482,7 @@ void InputHandler::ReadNeutFile() {
     ERR(FTL) <<"No Event Hist in NEUT ROOT file." << std::endl;
     throw;
   }
-  
+
   fEventHist->SetNameTitle((fName + "_EVT").c_str(),
                            (fName + "; E_{#nu} (GeV); Event Rate").c_str());
 
@@ -495,7 +495,7 @@ void InputHandler::ReadNeutFile() {
   // Read in the file once only
   tn = new TChain("neuttree", "");
   tn->Add(Form("%s/neuttree", fInputFile.c_str()));
-  
+
   // Assign nvect
   fNEvents = tn->GetEntries();
   fNeutVect = NULL;
@@ -819,6 +819,8 @@ void InputHandler::ReadGiBUUFile() {
   // Replace local pointers with NULL dir'd clones.
   if (numuFlux) {
     numuFlux = static_cast<TH1D*>(numuFlux->Clone());
+    numuFlux->Scale(1.0/numuFlux->Integral("width"));
+    std::cout << "GiBUU Flux: numuFlux, Width integral = " << numuFlux->Integral("width") << std::endl;
     numuFlux->SetDirectory(NULL);
     numuFlux->SetNameTitle(
         (fName + "_numu_FLUX").c_str(),
@@ -827,6 +829,8 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (numubFlux) {
     numubFlux = static_cast<TH1D*>(numubFlux->Clone());
+    numubFlux->Scale(1.0/numubFlux->Integral("width"));
+    std::cout << "GiBUU Flux: numubFlux, Width integral = " << numubFlux->Integral("width") << std::endl;
     numubFlux->SetDirectory(NULL);
     numubFlux->SetNameTitle(
         (fName + "_numub_FLUX").c_str(),
@@ -835,6 +839,8 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (nueFlux) {
     nueFlux = static_cast<TH1D*>(nueFlux->Clone());
+    nueFlux->Scale(1.0/nueFlux->Integral("width"));
+    std::cout << "GiBUU Flux: nueFlux, Width integral = " << nueFlux->Integral("width") << std::endl;
     nueFlux->SetDirectory(NULL);
     nueFlux->SetNameTitle(
         (fName + "_nue_FLUX").c_str(),
@@ -843,6 +849,8 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (nuebFlux) {
     nuebFlux = static_cast<TH1D*>(nuebFlux->Clone());
+    nuebFlux->Scale(1.0/nuebFlux->Integral("width"));
+    std::cout << "GiBUU Flux: nuebFlux, Width integral = " << nuebFlux->Integral("width") << std::endl;
     nuebFlux->SetDirectory(NULL);
     nuebFlux->SetNameTitle(
         (fName + "_nueb_FLUX").c_str(),

@@ -561,7 +561,7 @@ echo "${NUMU_PREFIX}${PIPROD_PREFIX}sample MiniBooNE_CC1pi0_XSec_1Dppi0_nu ${GEN
 
 echo -e "\n### NCEL\n" >> ${OUTPUTCARDFILE}
 
-echo "#${NUMU_PREFIX}${QEL_PREFIX}${NC_PREFIX}sample MiniBooNE_NCEL_XSec_Treco_nu ${GEN_TAG}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
+echo "#{NUMU_PREFIX}${QEL_PREFIX}${NC_PREFIX}sample MiniBooNE_NCEL_XSec_Treco_nu ${GEN_TAG}${MB_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 
 
 
@@ -812,7 +812,7 @@ if [[ "${DO_NUCLEAR}" == "1" ]] && [[ "${DO_NU}" == "1" ]] && [[ "${DO_NC}" == "
 fi
 
 echo -e "\n#### K2K" >> ${OUTPUTCARDFILE}
-echo "### NCPi\n" >> ${OUTPUTCARDFILE}
+echo -e "### NCPi\n" >> ${OUTPUTCARDFILE}
 
 echo "${NUMU_PREFIX}${PIPROD_PREFIX}${NC_PREFIX}sample K2K_NC1pi0_Evt_1Dppi0_nu ${GEN_TAG}${T2K_NUMU_FILELOC}" >> ${OUTPUTCARDFILE}
 

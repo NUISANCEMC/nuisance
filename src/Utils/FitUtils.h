@@ -161,11 +161,11 @@ double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
 double MpPi(TLorentzVector pp, TLorentzVector ppi);
 
 /// Gets delta p T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double Get_STV_dpt(FitEvent *event, bool Is0pi);
+double Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi);
 /// Gets delta phi T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double Get_STV_dphit(FitEvent *event, bool Is0pi);
+double Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi);
 /// Gets delta alpha T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double Get_STV_dalphat(FitEvent *event, bool Is0pi);
+double Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi);
 }
 
 /*! @} */
