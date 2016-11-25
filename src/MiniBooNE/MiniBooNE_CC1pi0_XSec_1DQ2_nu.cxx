@@ -26,6 +26,8 @@ MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(std::string inputfi
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi}^{2} (cm^{2}/GeV^{2})";
   fIsDiag = false;
   fNormError = 0.107;
+  EnuMin = 0.5;
+  EnuMax = 2.0;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pi0/dxsecdq2_edit.txt");

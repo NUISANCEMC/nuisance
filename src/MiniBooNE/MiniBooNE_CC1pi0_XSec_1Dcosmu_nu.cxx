@@ -26,6 +26,8 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string i
   fPlotTitles = "; cos#theta_{#mu}; d#sigma/dcos#theta_{#mu} (cm^{2}/CH_{2})";
   fIsDiag = false;
   fNormError = 0.107;
+  EnuMin = 0.5;
+  EnuMax = 2.0;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pi0/dxsecdcosmu_edit.txt");
