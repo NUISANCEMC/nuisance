@@ -312,26 +312,29 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
   TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
   for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1) / fFluxHist->GetBinWidth(i+1) );
   }
 
   // Resolution for the interpolation used for the flux
   // Set to 100 times fines than flux histogram, should be enough buy may need tweaking!
-  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
+  int resolution = 500.*fFluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
   TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
+    double binwidth = fineFlux->GetBinWidth(i+1);
     // The start and end of the flux histogram might go to zero
     // So we really need to take care with these bins for the interpolation; here I just set it flat
     if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
-      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
+      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1) * binwidth);
     } else {
-      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S") * binwidth);
     }
   }
 
+  fineFlux->Scale( fFluxHist->Integral("width") / fineFlux->Integral("width"));
+  
   for (int i = 1; i < fMCHist->GetNbinsX()+1; i++) {
 
     // WARNING SCALING BY 1000 HERE BECAUSE MINIBOONE 2D IS ONLY DIST THAT HAS ENU ON IT!
@@ -413,26 +416,29 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
   TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
   for (int i = 0; i < fFluxHist->GetNbinsX()+1; i++){
-    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
+    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1) / fFluxHist->GetBinWidth(i+1) );
   }
 
   // Resolution for the interpolation used for the flux
   // Make 100 times finer than flux histogram, COULD BE TWEAKED
-  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
+  int resolution = 500.*fFluxHist->GetXaxis()->GetNbins();
   // The new interpolated flux histogram with fine binning
   TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
 
   // Set the new TH1D with the TGraph interpolated bin content
   for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
+    double binwidth = fineFlux->GetBinWidth(i+1);
     // The start and end of the flux histogram might go to zero
     // So we really need to take care with these bins; here I just set it flat
     if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
-      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
+      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1) * binwidth);
     } else {
-      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S") * binwidth);
     }
   }
 
+  fineFlux->Scale( fFluxHist->Integral("width") / fineFlux->Integral("width"));
+  
   for (int i = 1; i < mcHist->GetNbinsX()+1; i++) {
     // Get the low edge of the ith bin
     Double_t binLowEdge = mcHist->GetBinLowEdge(i);
