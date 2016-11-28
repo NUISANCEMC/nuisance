@@ -20,149 +20,88 @@
 #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 #include "TLorentzVector.h"
 
-/// ENTIRE CLASS NEEDS FIXING
-
-
 // The constructor
 MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
-  
 
-  // // Check if this is a shape only fit - for now, there is no shape option.
-  // if (!type.compare("SHAPE")){
-  //   ERR(WRN) << "MiniBooNE NCEL is not available as a shape only fit... ignoring..." << std::endl;
-  // }
+  fName = "MiniBooNE_NCEL_XSec_Treco_nu";
+  fPlotTitles = "; T_{reco} (MeV); Events/(12 MeV)";
+  EnuMin = 0.;
+  EnuMax = 10.0;
+  fTRecoEdges = {40.0, 52.0, 63.9, 75.9, 87.8, 99.8, 111.8, 123.7, 135.7, 147.6, 159.6, 171.6, 183.5, 195.5,   
+   207.5, 219.4, 231.4, 243.3, 255.3, 267.3, 279.2, 291.2, 303.1, 315.1, 327.1, 339.0, 351.0, 362.9, 374.9, 386.9,   
+   398.8, 410.8, 422.7, 434.7, 446.7, 458.6, 470.6, 482.5, 494.5, 506.5, 518.4, 530.4, 542.4, 554.3, 566.3, 578.2,   
+   590.2, 602.2, 614.1, 626.1, 638.0, 650.0};
 
-  // // Set pointer to the reweighting engine
-  // rw_engine = rw;
-  
-  // // Define the energy of the signal
-  // this->EnuMin = 0.;
-  // this->EnuMax = 10.;
+   SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ncqe/input_data.txt");
+   SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/ErrorMatrix.tab",   51);
+   SetResponseMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/response_mat.txt", 51);
 
-  // // In future read most of these from a card file
-  // this->inFile = inputfile;
-  // this->fName = "MB_NCEL_XSec_Treco_nu";
-  // this->fPlotTitles = "; T_{reco} (MeV); Events/(12 MeV)";
+  // Setup MC Hists
+   Measurement1D::SetupDefaultHist();
 
-  // // Because the binning is in Treco is fairly esoteric, hardcode here
-  // this->arr_treco = {40.0, 52.0, 63.9, 75.9, 87.8, 99.8, 111.8, 123.7, 135.7, 147.6, 159.6, 171.6, 183.5, 195.5,   
-  // 		     207.5, 219.4, 231.4, 243.3, 255.3, 267.3, 279.2, 291.2, 303.1, 315.1, 327.1, 339.0, 351.0, 362.9, 374.9, 386.9,   
-  // 		     398.8, 410.8, 422.7, 434.7, 446.7, 458.6, 470.6, 482.5, 494.5, 506.5, 518.4, 530.4, 542.4, 554.3, 566.3, 578.2,   
-  // 		     590.2, 602.2, 614.1, 626.1, 638.0, 650.0};
+  // Usually the MCFine histogram is a finer binned version of MC Hist.
+  // In this case we need to use it to save the true distribution before smearing.
+   if (fMCFine) delete fMCFine;
+   fMCFine = new TH1D((this->fName+"_Ttrue").c_str(), (this->fName+this->fPlotTitles).c_str(), 50, 0, 900);
 
-  // this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ncqe/input_data.txt");
-  // this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/ErrorMatrix.tab", 51);
-  // this->SetResponseMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/response_mat.txt", 51);
+  // The scale factor is quite complicated because MB didn't divide by number of targets.
+  // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
+   double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
+   fScaleFactor = (fEventHist->Integral("width")*1E-38*14.08/(fNEvents+0.))*nMolMB*0.646165;
 
-  // // Check if we're using fake data
-  // if (!fakeDataFile.empty()) this->SetFakeDataValues(fakeDataFile);
+ };
 
-  // // This will be the final data histogram
-  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(), (this->fName+this->fPlotTitles).c_str(), 51, this->arr_treco);
- 
-  // // Usually, the fMCFine histogram is a finer binned version of fMCHist. But as NCEL requires a Ttrue histogram, co-opt fMCFine for this purpose. 
-  // // Should probably change the naming to reflect the possible other use of this histogram.
-  // this->fMCFine = new TH1D((this->fName+"_Ttrue").c_str(), (this->fName+this->fPlotTitles).c_str(), 50, 0, 900);
+ void MiniBooNE_NCEL_XSec_Treco_nu::FillEventVariables(FitEvent *event){
 
-  // // Read in the histograms from the NEUT file that are required for normalisation
-  // TFile *in = new TFile(this->inFile.c_str());
-  // this->fFluxHist  = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "flux")).c_str());
-  // this->fFluxHist->SetNameTitle((this->fName+"_FLUX").c_str(), (this->fName+";E_{#nu} (GeV)").c_str());
+  double t_raw = 0.0;
 
-  // this->fEventHist = (TH1D*)in->Get((PlotUtils::GetObjectWithName(in, "evtrt")).c_str());
-  // this->fEventHist->SetNameTitle((this->fName+"_EVT").c_str(), (this->fName+";E_{#nu} (GeV); Event Rate").c_str());
+  // Loop and add all Tnucleon
+  for (UInt_t i = 0; i < event->Npart(); i++){
+    if (event->PartInfo(i)->Status() != kFinalState) continue;
 
-  // // Read in the file once only
-  // tn = new TChain("neuttree", "");
-  // tn->Add(Form("%s/neuttree", this->inFile.c_str()));
-  // fNEvents = tn->GetEntries();
-  // nvect = NULL;
-  // tn->SetBranchAddress("vectorbranch", &nvect);
+    int pdg = event->PartInfo(i)->fPID;
+    if (pdg == 2212 || pdg == 2112){
+      t_raw += FitUtils::T(event->PartInfo(i)->fP)*1.E3;
+    }
+  }
 
-  // // The scale factor is quite complicated because MB didn't divide by number of targets.
-  // // nMolMB is the number of CH_2 molecules in the MB FV (610.6 cm radius sphere) and 0.845 is the published density of the mineral oil.
-  // double nMolMB = 6.023E+23*0.845*4.0*M_PI*610.6*610.6*610.6/3.0;
-  // this->fScaleFactor = (this->fEventHist->Integral()*1E-38*14.08/(fNEvents+0.))*nMolMB*0.646165;
-};
+  fXVar = t_raw;
+}
 
+bool MiniBooNE_NCEL_XSec_Treco_nu::ScaleEvents(){
 
-void MiniBooNE_NCEL_XSec_Treco_nu::Reconfigure(double norm, bool fullconfig){
-  
-  // // Clear the current histogram before repopulating
-  // this->fMCHist->Reset();
-  // this->fMCFine->Reset();
-  // this->fCurrentNorm = norm;
+  // Now convert Ttrue to Treco...
+  for (int treco = 0; treco < 51; ++treco){
+    double total = 0.;
+    for (int ttrue = 0; ttrue < 50; ++ttrue) total += fMCFine->GetBinContent(ttrue+1)*response_mat->GetBinContent(ttrue+1, treco+1);
+      fMCHist->SetBinContent(treco+1, total);
+  }
 
-  // // Loop over all events at each iteration of the fit
-  // for (int i = 0; i < fNEvents; ++i){
-  //   tn->GetEntry(i);
+  // Scale
+  this->fMCHist->Scale(this->fScaleFactor, "width");
+  this->fMCFine->Scale(this->fScaleFactor, "width");
+  PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, fScaleFactor, "width");
 
-  //   if (!isSignal(nvect)) continue;
+  // Add in the backgrounds...
+  for (int treco = 0; treco < 51; ++treco){
+     double total = this->fMCHist->GetBinContent(treco+1) + this->BKGD_other->GetBinContent(treco+1) + this->BKGD_irrid->GetBinContent(treco+1);
+      this->fMCHist->SetBinContent(treco+1, total);
+  }
 
-  //   // Find the weight
-  //   double rw_weight = 1;
-  //   rw_weight = rw_engine->CalcWeight(customEvent);
-    
-  //   // Skip any events with suspiciously large weights...
-  //   if (rw_weight > 200) {ERR(WRN) << "LARGE WEIGHT: " << rw_weight << std::endl; break;}
-
-  //   // Sum of the true kinetic energies of particles
-  //   double t_true = 0.;
-
-  //   // Loop over the particle stack
-  //   for (UInt_t j = 2; j < nvect->Npart(); ++j){
-      
-  //     // Add the kinetic energies of any nucleons
-  //     if (abs((nvect->PartInfo(j))->fPID) == 2212)
-  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - PhysConst::mass_proton;
-  //     else if (abs((nvect->PartInfo(j))->fPID) == 2112)
-  // 	t_true += (nvect->PartInfo(j))->fP.E()/1000 - PhysConst::mass_neutron;
-
-  //   }
-    
-  //   // Now fill the Ttrue histogram
-  //   this->fMCFine->Fill(t_true*1000., rw_weight);
-  // }
-
-  // // Now convert Ttrue to Treco...
-  // for (int treco = 0; treco < 51; ++treco){
-  //   double total = 0.;
-  //   for (int ttrue = 0; ttrue < 50; ++ttrue) total += fMCFine->GetBinContent(ttrue+1)*this->response_mat->GetBinContent(ttrue+1, treco+1);
-  //   this->fMCHist->SetBinContent(treco+1, total);
-  // }
-
-  // // Scale
-  // this->fMCHist->Scale(this->fScaleFactor, "width");
-  // this->fMCFine->Scale(this->fScaleFactor, "width");
-
-  // // Add in the backgrounds...
-  // for (int treco = 0; treco < 51; ++treco){
-  //   double total = this->fMCHist->GetBinContent(treco+1) + this->BKGD_other->GetBinContent(treco+1) + this->BKGD_irrid->GetBinContent(treco+1);
-  //   this->fMCHist->SetBinContent(treco+1, total);
-  // }
-
-  // // Normalisation factor if one has been provided.
-  // if (norm){
-  //   this->fMCHist->Scale(1.0/norm);
-  // } else {
-  //   this->fMCHist->Scale(0);
-  // }
-  
-  // return;
-};
+}
 
 
-bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(NeutVect *nvect){
-  
-  // Only interested in true NCEL events
-  // if (nvect->Mode != 51 && nvect->Mode != 52) return false;
+bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(FitEvent *event){
 
-  // // Only look at numu events
-  // if ((nvect->PartInfo(0))->fPID != 14 && (nvect->PartInfo(0))->fPID != 12) return false;
+  // Should put in MB SignalDef eventually
+  if (event->Mode != 51 && event->Mode != 52) return false;
 
-  // // Restrict energy range
-  // if ((nvect->PartInfo(0))->fP.E() < this->EnuMin*1000 || (nvect->PartInfo(0))->fP.E() > this->EnuMax*1000) return false;
+  // Numu or nue
+  if (event->PDGnu != 14 && event->PDGnu != 12) return false;
+
+  // Enu
+  if (event->Enu() < EnuMin*1000.0 || event->Enu() > EnuMax*1000.0)
+    return false;
 
   return true;
 };
@@ -170,13 +109,15 @@ bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(NeutVect *nvect){
 
 // Read in the covariance matrix from the file specified in the constructor
 void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim){
-  
+
+  // Use Utils 
+
   // // Make a counter to track the line number
   // int row = 0;
 
   // std::string line;
   // std::ifstream covar(covarFile.c_str(),ifstream::in);
-  
+
   // this->covar = new TMatrixDSym(dim);
 
   // if(covar.is_open()) LOG(DEB) << "Reading covariance matrix from file: " << covarFile << std::endl;
@@ -195,61 +136,12 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   //   }    
   //   row++;
   // }
-  
+
   // // Robust matrix inversion method
   // TDecompSVD LU = TDecompSVD(*this->covar);
   // this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
 
   return;
-};
-
-
-
-// The covariance matrix contains all of the information for the chi2 calculation
-double MiniBooNE_NCEL_XSec_Treco_nu::GetChi2(){
-  // double chi2 = 0;
-  
-  // int nBins = this->fDataHist->GetNbinsX();
-
-  // for (int i = 0; i < nBins; ++i){
-  //   for (UInt_t j = 0; j < nBins; ++j){
-
-  //     double iDiff = this->fDataHist->GetBinContent(i+1) - this->fMCHist->GetBinContent(i+1);
-  //     double jDiff = this->fDataHist->GetBinContent(j+1) - this->fMCHist->GetBinContent(j+1);
-  //     chi2 += iDiff*(*this->covar)(i, j)*jDiff;
-  //   }
-  // }
-  // return chi2;
-
-};
-
-
-// Function to make an Asimov dataset (so don't throw any errors)     
-void MiniBooNE_NCEL_XSec_Treco_nu::SetFakeDataValues(std::string fakeDataFile) {
-
-  // // This is the published data
-  // TH1D *tempData = (TH1D*)this->fDataHist->Clone();
-  // TFile *fake    = new TFile(fakeDataFile.c_str());
-
-  // // This is the fake data
-  // this->fDataHist = (TH1D*)fake->Get((this->fName+"_MC").c_str());
-  // this->fDataHist ->SetNameTitle((this->fName+"_FAKE").c_str(), (this->fName+this->fPlotTitles).c_str());
-
-  // for (int xBin = 0; xBin < this->fDataHist->GetNbinsX(); ++xBin){
-
-  //   // If the fake data or real didn't didn't fill the bin, can't assign an error
-  //   if (!this->fDataHist->GetBinContent(xBin+1) || !tempData->GetBinContent(xBin+1)){
-  //     this->fDataHist->SetBinError(xBin+1, 0);
-  //     continue;
-  //   }
-
-  //   double err = tempData->GetBinError(xBin+1)*
-  //     this->fDataHist->GetBinContent(xBin+1)/(tempData->GetBinContent(xBin+1)+0.);
-  //   this->fDataHist->SetBinError(xBin+1, err);
-  // }
-
-  // delete tempData;
-  // return;
 };
 
 
@@ -261,7 +153,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // std::ifstream input(inputFile.c_str(),ifstream::in);
 
   // if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
-  
+
   // this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
   // 			      51, this->arr_treco);
   // this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
@@ -277,12 +169,12 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
   // // First line is the MB data
   // std::getline(input >> std::ws, line, '\n');
   // std::istringstream stream1(line);
-  
+
   // while(stream1 >> entry){
   //   this->fDataHist->SetBinContent(xBin+1, entry);
   //   xBin++;
   // }
- 
+
   // // Second line is "other" backgrounds
   // std::getline(input >> std::ws, line, '\n');
   // std::istringstream stream2(line);
@@ -311,7 +203,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
 
   // std::string line;
   // std::ifstream response(responseFile.c_str(),ifstream::in);
-  
+
   // // Response matrix: x axis is Ttrue, y axis is Treco
   // this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->fPlotTitles).c_str(),
   // 				50, 0, 900, 51, this->arr_treco);
