@@ -58,8 +58,7 @@ void BEBC_CC1npim_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
   hadMass = FitUtils::MpPi(Pn, Ppim);
   double q2CCpip = -1.0;
 
-  if (hadMass < 1400 && hadMass > 1100)
-    q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppim);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 

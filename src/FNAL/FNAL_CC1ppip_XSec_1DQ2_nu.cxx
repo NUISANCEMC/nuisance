@@ -50,13 +50,13 @@ void FNAL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double q2CCpip = -1.0;
   
   // FNAL has a M(pi, p) < 1.4 GeV cut imposed only on this channel
-  if (hadMass < 1400) q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
   fXVar = q2CCpip;
 
   return;

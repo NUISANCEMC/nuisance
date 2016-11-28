@@ -51,7 +51,7 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
 void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
+      event->NumFSParticle(111) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
 
@@ -64,7 +64,7 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpi0 = -1.0;
   
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
+  if (hadMass < 1400) q2CCpi0 = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpi0;
 

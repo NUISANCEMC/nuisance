@@ -235,7 +235,8 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
     fChain->push_back(
         new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
-             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu")) {
+             !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
+             !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {
     fChain->push_back(
         new MiniBooNE_CCQE_XSec_1DQ2_antinu(name, file, rw, type, fkdt));
 
@@ -340,14 +341,14 @@ MINERvA Samples
 
   } else if (!name.compare("MINERvA_CCQE_XSec_1DQ2_joint_oldflux") ||
              !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux") ||
-	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint") || 
+	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint") ||
 	     !name.compare("MINERvA_CCQE_XSec_1DQ2_joint_20deg")){
-    
+
     fChain->push_back(new MINERvA_CCQE_XSec_1DQ2_joint(name, file, rw, type, fkdt));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DEe_nue")) {
     fChain->push_back(new MINERvA_CC0pi_XSec_1DEe_nue(file, rw, type, fkdt));
-    
+
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nue")) {
     fChain->push_back(new MINERvA_CC0pi_XSec_1DQ2_nue(file, rw, type, fkdt));
 
@@ -362,12 +363,12 @@ MINERvA Samples
       CC1pi+
     */
 // DONE
-  } else if (!name.compare("MINERvA_CC1pip_XSec_1DTpi_nu") || 
+  } else if (!name.compare("MINERvA_CC1pip_XSec_1DTpi_nu") ||
              !name.compare("MINERvA_CC1pip_XSec_1DTpi_nu_20deg")) {
     fChain->push_back(new MINERvA_CC1pip_XSec_1DTpi_nu(name, file, rw, type, fkdt));
 
 // DONE
-  } else if (!name.compare("MINERvA_CC1pip_XSec_1Dth_nu") || 
+  } else if (!name.compare("MINERvA_CC1pip_XSec_1Dth_nu") ||
              !name.compare("MINERvA_CC1pip_XSec_1Dth_nu_20deg")) {
     fChain->push_back(new MINERvA_CC1pip_XSec_1Dth_nu(name, file, rw, type, fkdt));
 
@@ -375,7 +376,7 @@ MINERvA Samples
       CCNpi+
     */
   // DONE
-  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu") || 
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg") ||
@@ -384,15 +385,15 @@ MINERvA Samples
     fChain->push_back(new MINERvA_CCNpip_XSec_1Dth_nu(name, file, rw, type, fkdt));
 
  // Done
-  } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu") || 
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015") || 
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") || 
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg") || 
+  } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg_2016") ) {
     fChain->push_back(new MINERvA_CCNpip_XSec_1DTpi_nu(name, file, rw, type, fkdt));
 
- 
+
 // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
     fChain->push_back(new MINERvA_CCNpip_XSec_1Dthmu_nu(file, rw, type, fkdt));
@@ -534,8 +535,14 @@ Fake Studies
   } else if (name.find("GenericFlux_") != std::string::npos) {
     fChain->push_back(new GenericFlux_Tester(name, file, rw, type, fkdt));
 
+  } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
+    fChain->push_back(new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
+
+  } else if (name.find("MuonValidation_") != std::string::npos) {
+    fChain->push_back(new MCStudy_MuonValidation(name, file, rw, type, fkdt));
+        
   } else {
-    ERR(FTL) << "Error: could not find " << name << std::endl;
+    ERR(FTL) << "Error: No such sample: " << name << std::endl;
     exit(-1);
     return false;
   }

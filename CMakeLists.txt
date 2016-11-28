@@ -17,6 +17,10 @@ set (VERBOSE TRUE)
 
 set (CMAKE_SKIP_BUILD_RPATH TRUE)
 
+if(NOT DEFINED NOTEST OR NOT NOTEST)
+  enable_testing()
+endif()
+
 include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
 
 if(NOT DEFINED USE_NEUT AND
@@ -155,6 +159,7 @@ endforeach()
 cmessage(STATUS "Module targets:  ${MODULETargets}")
 
 add_subdirectory(app)
+add_subdirectory(src/Tests)
 
 configure_file(cmake/setup.sh.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
@@ -162,4 +167,7 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
 
+install(PROGRAMS
+  "${PROJECT_SOURCE_DIR}/scripts/nuiscardgen" DESTINATION
+  bin)
 

@@ -44,20 +44,17 @@ BEBC_CC1ppip_XSec_1DEnu_nu::BEBC_CC1ppip_XSec_1DEnu_nu(std::string inputfile, Fi
 void BEBC_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
+      event->NumFSParticle(211) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu = -1.0;
 
-  // weirdly, the Enu distribution does not have a W < 1.4GeV cut
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) Enu = Pnu.E()/1.E3;
 
   fXVar = Enu;
 

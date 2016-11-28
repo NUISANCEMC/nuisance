@@ -78,7 +78,7 @@ FitWeight::FitWeight(std::string name) {
   this->fIsUsingT2K = false;
   fIsUsingModeNorm = false;
 
-  this->fSetAbsTwk = true;
+  this->fSetAbsTwk = FitPar::Config().GetParB("params.setabstwk");
 
   fSplineHead = NULL;
 
@@ -377,7 +377,9 @@ void FitWeight::Reconfigure(bool silent) {
   //********************************************************************
 
   fSilenceWeightCalc = FitPar::Config().GetParB("params.silentweighting");
+  this->fSetAbsTwk = FitPar::Config().GetParB("params.setabstwk");
 
+  
   if ((fIsUsingNeut or fIsUsingNIWG) and fIsUsingT2K) {
     ERR(WRN) << " Make sure no correlated or overlapping dials are being used "
                 "between T2KRW and NEUT/NIWG RW"

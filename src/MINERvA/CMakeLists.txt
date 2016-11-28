@@ -41,10 +41,8 @@ MINERvA_CC1pip_XSec_1Dth_nu.cxx
 
 MINERvA_CCNpip_XSec_1DEnu_nu.cxx
 MINERvA_CCNpip_XSec_1DQ2_nu.cxx
-MINERvA_CCNpip_XSec_1DTpi_20deg_nu.cxx
 MINERvA_CCNpip_XSec_1DTpi_nu.cxx
 MINERvA_CCNpip_XSec_1Dpmu_nu.cxx
-MINERvA_CCNpip_XSec_1Dth_20deg_nu.cxx
 MINERvA_CCNpip_XSec_1Dth_nu.cxx
 MINERvA_CCNpip_XSec_1Dthmu_nu.cxx
 
@@ -82,10 +80,8 @@ MINERvA_CC1pip_XSec_1Dth_nu.h
 
 MINERvA_CCNpip_XSec_1DEnu_nu.h
 MINERvA_CCNpip_XSec_1DQ2_nu.h
-MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h
 MINERvA_CCNpip_XSec_1DTpi_nu.h
 MINERvA_CCNpip_XSec_1Dpmu_nu.h
-MINERvA_CCNpip_XSec_1Dth_20deg_nu.h
 MINERvA_CCNpip_XSec_1Dth_nu.h
 MINERvA_CCNpip_XSec_1Dthmu_nu.h
 

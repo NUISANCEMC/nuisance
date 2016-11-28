@@ -78,6 +78,13 @@ enum extraplotflags {
   kExtraPlotWrite   = 4
 };
 
+enum MeasurementSpeciesClass {
+  kSingleSpeciesMeasurement = 0,
+  kNumuWithWrongSignMeasurement,
+  kNueWithWrongSignMeasurement,
+  kFourSpeciesMeasurement,
+};
+
 
 /// InputHandler Class
 ///
@@ -190,19 +197,21 @@ class MeasurementBase {
   double GetZVar(void){ return fZVar; };
   double GetMode(void){ return this->Mode;  };
   double GetEnu(void){ return this->Enu; };
-  
+
   void SetupInputs(std::string inputfile);
   int GetInputID(void);
+  std::string GetInputFileName(){ return fInputFileName; };
   void SetSignal(bool sig);
   void SetSignal(FitEvent* evt);
   void SetWeight(double wght);
   void SetMode(int md);
+  void SetNoData(bool isTrue=true){ fNoData = isTrue; };
 
   inline void SetXVar(double xvar){ fXVar = xvar; };
   inline void SetYVar(double yvar){ fYVar = yvar; };
   inline void SetZVar(double zvar){ fZVar = zvar; };
-  
-  
+
+
 protected:
 
   // Minimum and maximum energies
@@ -225,6 +234,7 @@ protected:
   double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution
   double fCurrentNorm; //!< current normalisation factor applied if fit is "FREE"
   bool fMCFilled; //!< flag whether MC plots have been filled (For ApplyNormalisation)
+  bool fNoData; //!< flag whether data plots do not exist (for ratios)
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar,fYVar,fZVar,Mode,Weight;
@@ -239,7 +249,10 @@ protected:
   std::vector<int>    fMode_VECT;
   std::vector<UInt_t> fIndex_VECT;
 
-  std::string inputfilename;
+  InputUtils::InputType fInputType;
+  std::string fInputFileName;
+
+  MeasurementSpeciesClass fMeasurementSpeciesType;
 };
 
 // Class TypeDefs

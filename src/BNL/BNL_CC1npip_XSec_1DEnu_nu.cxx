@@ -42,19 +42,10 @@ BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
 void BNL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(2112) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
-
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  //double hadMass = FitUtils::MpPi(Pn, Ppip);
   // No W cut for BNL CC1pi+ on neutron (I'm happy if you can find it!!!)
-  double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  double Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
 

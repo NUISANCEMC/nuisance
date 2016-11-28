@@ -26,7 +26,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWei
   
   fName = "ANL_CC1ppip_XSec_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
-  EnuMin = 0;
+  EnuMin = 0.5;
   EnuMax = 6;
   fIsDiag = true;
   fNormError = 0.20;
@@ -59,7 +59,7 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // I use the W < 1.4GeV cut ANL data to isolate single pion
   // there is also a W < 1.6 GeV and an uncut spectrum ANL 1982
-  if (hadMass < 1400) q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 

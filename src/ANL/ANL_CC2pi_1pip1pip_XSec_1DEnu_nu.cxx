@@ -42,7 +42,7 @@ ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(std::string i
   covar     = StatUtils::GetInvert(fFullCovar);
 
   // Need to multiply the data by a factor because of the way the data is scanned (e.g. 1E-38)
-  fDataHist->Scale(1.E-41);
+  //fDataHist->Scale(1.E-41);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
@@ -63,9 +63,10 @@ void ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
 // Signal asks for 2pi+, 1mu-, 1n
 bool ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
+
   int pdgs[] = {13, 211, 211, 2112};
-  return SignalDef::isCCWithFS(event, 14, pdgs,
-                               EnuMin, EnuMax);
+
+  return SignalDef::isCCWithFS(event, 14, pdgs, EnuMin, EnuMax);
 }
 
 

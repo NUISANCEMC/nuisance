@@ -17,21 +17,43 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CCNPIP_XSEC_1DTH_20DEG_NU_H_SEEN
-#define MINERVA_CCNPIP_XSEC_1DTH_20DEG_NU_H_SEEN
-
+#ifndef MCStudy_MuonValidation_H_SEEN
+#define MCStudy_MuonValidation_H_SEEN
 #include "Measurement1D.h"
 
-class MINERvA_CCNpip_XSec_1Dth_20deg_nu : public Measurement1D {
+//********************************************************************
+class MCStudy_MuonValidation : public Measurement1D {
+//********************************************************************
+
 public:
-  MINERvA_CCNpip_XSec_1Dth_20deg_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  virtual ~MINERvA_CCNpip_XSec_1Dth_20deg_nu() {};
 
+  MCStudy_MuonValidation(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  virtual ~MCStudy_MuonValidation() {};
+
+  //! Grab info from event
   void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
 
-private:
-  int nPions;
+  //! Define this samples signal
+  bool isSignal(FitEvent *nvect);
+
+  //! Write Files
+  void Write(std::string drawOpt);
+
+ private:
+  
+  double fEventScaleFactor;
+  TTree* fEventTree;
+  float Enu;
+  float TLep  ;
+  float CosLep;
+  float Q2    ;
+  float Q2QE  ;
+  float EQE   ;
+  float q0    ;
+  float q3    ;
+  double LocalRWWeight;
+  double LocalInputWeight;
+
 };
 
 #endif

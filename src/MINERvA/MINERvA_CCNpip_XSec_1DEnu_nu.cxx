@@ -21,8 +21,10 @@
 
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
 
+//********************************************************************
 // The constructor
 MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
+//********************************************************************
 
   fName = "MINERvA_CCNpip_XSec_1DEnu_nu_2016";
   fPlotTitles = "; E_{#nu} (GeV); d#sigma(E_{#nu}) (cm^{2}/nucleon)";
@@ -32,7 +34,6 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
 
-  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/ccnpip_enu.txt");
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-enu.csv");
 
   // MINERvA has the error quoted as a percentage of the cross-section
@@ -42,7 +43,6 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
   }
 
   // We're given a correlation matrix, so need to convert it to a covariance matrix
-  //this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/ccnpip_enu_corr.txt", fDataHist->GetNbinsX());
   this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-enu.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();
@@ -50,21 +50,13 @@ MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents);
 };
 
+//********************************************************************
 void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
-
-  if (event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+//********************************************************************
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double Enu = -999;
-
-  if (hadMass > 100 && hadMass < 1800)
-    Enu = Pnu.E()/1000.;
+  double Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
 
@@ -72,8 +64,8 @@ void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 };
 
 //********************************************************************
+// The false refers to that this cross-section uses the full phase space
 bool MINERvA_CCNpip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  int dummy;
-  return SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, false);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, false);
 }

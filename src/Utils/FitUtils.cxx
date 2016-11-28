@@ -671,7 +671,7 @@ double FitUtils::Get_STV_dpt(FitEvent *event, bool Is0pi) {
     return 0;
 
   // Now get the TVector3s for each particle
-  TVector3 const &NuP = event->GetHMFSParticle(14)->fP.Vect();
+  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
   TVector3 const &LeptonP = event->GetHMFSParticle(13)->fP.Vect();
   TVector3 HadronP  = event->GetHMFSParticle(2212)->fP.Vect();
 

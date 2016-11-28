@@ -144,56 +144,54 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   return;
 };
 
-
-
 // Override the usual function in the base class because this is more complicated for the NCEL sample...
 void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile){
 
-  // std::string line;
-  // std::ifstream input(inputFile.c_str(),ifstream::in);
+   std::string line;
+   std::ifstream input(inputFile.c_str(),ifstream::in);
 
-  // if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
+   if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
+  
+   this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, this->arr_treco);
+   this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, arr_treco);
+   this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
+   			      51, arr_treco);
+    To get the nDOF correct...
+   this->fNDataPointsX= 52;
 
-  // this->fDataHist   = new TH1D((this->fName+"_data").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, this->arr_treco);
-  // this->BKGD_other = new TH1D((this->fName+"_BKGD_other").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, arr_treco);
-  // this->BKGD_irrid = new TH1D((this->fName+"_BKGD_irrid").c_str(), (this->fName+this->fPlotTitles).c_str(), 
-  // 			      51, arr_treco);
-  // // To get the nDOF correct...
-  // this->fNDataPointsX= 52;
+   double entry = 0;
+   int xBin     = 0;
 
-  // double entry = 0;
-  // int xBin     = 0;
+   //    First line is the MB data
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream1(line);
+  
+   while(stream1 >> entry){
+     this->fDataHist->SetBinContent(xBin+1, entry);
+     xBin++;
+   }
+ 
+   //    Second line is "other" backgrounds
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream2(line);
+   entry = 0;
+   xBin  = 0;  
+   while(stream2 >> entry){
+     this->BKGD_other->SetBinContent(xBin+1, entry);
+     xBin++;
+   } 
 
-  // // First line is the MB data
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream1(line);
-
-  // while(stream1 >> entry){
-  //   this->fDataHist->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // }
-
-  // // Second line is "other" backgrounds
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream2(line);
-  // entry = 0;
-  // xBin  = 0;  
-  // while(stream2 >> entry){
-  //   this->BKGD_other->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // } 
-
-  // // Third line is the irreducible background
-  // std::getline(input >> std::ws, line, '\n');
-  // std::istringstream stream3(line);
-  // entry = 0;
-  // xBin  = 0;  
-  // while(stream3 >> entry){
-  //   this->BKGD_irrid->SetBinContent(xBin+1, entry);
-  //   xBin++;
-  // } 
+   //  Third line is the irreducible background
+   std::getline(input >> std::ws, line, '\n');
+   std::istringstream stream3(line);
+   entry = 0;
+   xBin  = 0;  
+   while(stream3 >> entry){
+     this->BKGD_irrid->SetBinContent(xBin+1, entry);
+     xBin++;
+   } 
 };
 
 // Read in the response matrix -- thus far, a response matrix is unique to the NCEL sample

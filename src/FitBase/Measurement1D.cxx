@@ -394,6 +394,11 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
 
     // Loop over entries and insert them into matrix
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+
+    if (entries.size() <= 1){
+      ERR(WRN) << "SetCovarMatrixFromText -> Covariance matrix only has <= 1 entries on this line: " << row << std::endl;
+    }
+    
     for (std::vector<double>::iterator iter = entries.begin();
 	 iter != entries.end(); iter++){
 
@@ -405,6 +410,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
 
     row++;
   }
+  covarread.close();
 
   // Scale the actualy covariance matrix by some multiplicative factor
   (*fFullCovar) *= scale;
@@ -412,6 +418,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim, doubl
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
   // THIS IS ACTUALLY THE INVERSE COVARIANCE MATRIXA AAAAARGH
+  delete this->covar;
   this->covar = new TMatrixDSym(dim, LU.Invert().GetMatrixArray(), "");
 
   // Now need to multiply by the scaling factor
@@ -465,9 +472,9 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim){
 
   // Robust matrix inversion method
   TDecompSVD LU = TDecompSVD(*this->covar);
+  delete this->covar;
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
-
+  
   return;
 };
 
@@ -612,9 +619,10 @@ double Measurement1D::TotalIntegratedFlux(std::string intOpt, double low,
     return 1.0;
   }
 
-  // Set Energy Limits
+  // The default case of low = -9999.9 and high = -9999.9
   if (low == -9999.9) low = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
+
 
   int minBin = fFluxHist->GetXaxis()->FindBin(low);
   int maxBin = fFluxHist->GetXaxis()->FindBin(high);
@@ -798,6 +806,9 @@ double Measurement1D::GetLikelihood() {
   //********************************************************************
 
   double stat = 0.0;
+
+  // If this is for a ratio, there is no data histogram to compare to!
+  if (fNoData || !fDataHist) return 0.;
 
   // Fix weird masking bug
   if (!fIsMask) {
@@ -1146,9 +1157,9 @@ void Measurement1D::Write(std::string drawOpt) {
   if (fIsMask and drawMask)
     fMaskHist->Write((fName + "_MSK").c_str());  //< save mask
 
-  if (drawFlux) fFluxHist->Write();
-  if (drawXSec) fXSecHist->Write();
-  if (drawEvents) fEventHist->Write();
+  if (drawFlux and fFluxHist) fFluxHist->Write();
+  if (drawXSec and fXSecHist) fXSecHist->Write();
+  if (drawEvents and fEventHist) fEventHist->Write();
 
   if (fIsMask and drawMask and fMaskHist) {
     fMaskHist->Write((fName + "_MSK").c_str());  //< save mask
@@ -1162,26 +1173,8 @@ void Measurement1D::Write(std::string drawOpt) {
     combo_fMCHist_PDG.Write();
   }
 
-  // Save Matrix plots
-  if (!fIsRawEvents and !fIsDiag) {
-    if (drawCov and fFullCovar) {
-      TH2D cov = TH2D((*fFullCovar));
-      cov.SetNameTitle((fName + "_cov").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
-      cov.Write();
-    }
-  }
-
   if (fIsMask && drawMask && fMaskHist) {
     fMaskHist->Write((this->fName + "_MSK").c_str());  //< save mask
-  }
-
-  // Save neut stack
-  if (drawModes) {
-    // LOG(SAM) << "Writing MC Hist PDG"<<std::endl;
-    THStack combo_mcHist_PDG = PlotUtils::GetNeutModeStack(
-        (this->fName + "_MC_PDG").c_str(), (TH1**)this->fMCHist_PDG, 0);
-    combo_mcHist_PDG.Write();
   }
 
   // Save Matrix plots
@@ -1193,17 +1186,20 @@ void Measurement1D::Write(std::string drawOpt) {
       cov.Write();
     }
 
+    if (!drawInvCov && !covar){
+      std::cout << "Missing invert! " << std::endl;
+    }
     if (drawInvCov && covar) {
       TH2D covinv = TH2D((*this->covar));
       covinv.SetNameTitle((fName + "_covinv").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
+          (fName + "_covinv;Bins; Bins;").c_str());
       covinv.Write();
     }
 
     if (drawDecomp and fDecomp) {
       TH2D covdec = TH2D((*fDecomp));
       covdec.SetNameTitle((fName + "_covdec").c_str(),
-          (fName + "_cov;Bins; Bins;").c_str());
+          (fName + "_covdec;Bins; Bins;").c_str());
       covdec.Write();
     }
   }
@@ -1246,8 +1242,13 @@ void Measurement1D::Write(std::string drawOpt) {
     // Create Shape Histogram
     TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
-    double shapeScale =
-      fDataHist->Integral("width") / fMCHist->Integral("width");
+    double shapeScale = 1.0;
+    if (fIsRawEvents){
+      shapeScale = fDataHist->Integral() / fMCHist->Integral();
+    } else {
+      shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
+    }
+    
     mcShape->Scale(shapeScale);
 
     std::stringstream ss;

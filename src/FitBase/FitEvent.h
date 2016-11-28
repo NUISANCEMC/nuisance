@@ -193,6 +193,15 @@ class FitEvent : public BaseFitEvt {
     }
     return rtn;
   };
+  template <size_t N>
+  inline int NumParticle(int const (&pdgs)[N]) {
+    int rtn = 0;
+    for (size_t i = 0; i < N; ++i) {
+      rtn += NumParticle(pdgs[i]);
+    }
+    return rtn;
+  };
+
   // inline int NumFSParticle(std::vector<int> pdg) {
   //   return NumParticle(pdg, kFinalState);
   // };
@@ -212,10 +221,29 @@ class FitEvent : public BaseFitEvt {
   FitParticle* GetHMParticle(int pdg = 0, int state = -1);
   FitParticle* GetHMParticle(std::vector<int> pdg, int state = -1);
 
+  template <size_t N>
+  inline FitParticle* GetHMParticle(int const (&pdgs)[N]) {
+    FitParticle* rtn = NULL;
+    for (size_t i = 0; i < N; ++i) {
+      FitParticle* p = GetHMParticle(pdgs[i]);
+      // If this one is good, and we don't have one.
+      if (p && !rtn) {
+        rtn = p;
+        continue;
+      }
+      // if this one is good and it has more 3mom than the other one.
+      // (Mag2 doesn't need sqrt so slightly faster for same comparison.)
+      if (p && (p->fP.Vect().Mag2() > rtn->fP.Vect().Mag2())) {
+        rtn = p;
+      }
+    }
+    return rtn;
+  };
+
   inline FitParticle* GetHMISParticle(int pdg) {
     return GetHMParticle(pdg, kInitialState);
   };
-    template <size_t N>
+  template <size_t N>
   inline FitParticle* GetHMISParticle(int const (&pdgs)[N]) {
     FitParticle* rtn = NULL;
     for (size_t i = 0; i < N; ++i) {
@@ -302,7 +330,7 @@ class FitEvent : public BaseFitEvt {
 
   void Print();
 
- private:
+ protected:
   // Event Information
   int fMode;
   UInt_t fEventNo;
@@ -314,7 +342,7 @@ class FitEvent : public BaseFitEvt {
   int fDistance;
 
   // Reduced Particle Stack
-  const static UInt_t kMaxParticles = 200;
+  const static UInt_t kMaxParticles = 400;
   int fNParticles;
   //  double  fParticlePos[kMaxParticles][4]; // not needed at the moment
   double fParticleMom[kMaxParticles][4];

@@ -17,21 +17,37 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CCNPIP_XSEC_1DTPI_20DEG_NU_H_SEEN
-#define MINERVA_CCNPIP_XSEC_1DTPI_20DEG_NU_H_SEEN
-
+#ifndef MCStudy_KaonPreSelection_H_SEEN
+#define MCStudy_KaonPreSelection_H_SEEN
 #include "Measurement1D.h"
 
-class MINERvA_CCNpip_XSec_1DTpi_20deg_nu : public Measurement1D {
+//********************************************************************
+class MCStudy_KaonPreSelection : public Measurement1D {
+//********************************************************************
+
 public:
-  MINERvA_CCNpip_XSec_1DTpi_20deg_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  virtual ~MINERvA_CCNpip_XSec_1DTpi_20deg_nu() {};
 
+  MCStudy_KaonPreSelection(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  virtual ~MCStudy_KaonPreSelection() {};
+
+  //! Grab info from event
   void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
 
-private:
-  int nPions;
+  //! Define this samples signal
+  bool isSignal(FitEvent *nvect);
+
+  //! Write Files
+  void Write(std::string drawOpt);
+
+ private:
+  
+  double fEventScaleFactor;
+  TTree* fEventTree;
+  int nlep;
+  int nkplus;
+  int nkaon;
+  double kplusmom;
+  double kaonmom;
 };
 
 #endif

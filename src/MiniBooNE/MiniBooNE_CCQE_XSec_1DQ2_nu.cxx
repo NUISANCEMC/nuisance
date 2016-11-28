@@ -32,6 +32,11 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   /// Using the sample name "MiniBooNE_CCQE_XSec_1DQ2_nu_CCQELike" will allow
   /// the CCQELike sample without background subtraction to be fitted.
   ccqelike = name.find("CCQELike") != std::string::npos;
+
+  if(ccqelike){
+    fMeasurementSpeciesType = kNumuWithWrongSignMeasurement;
+  }
+
   EnuMin = 0.;
   EnuMax = 3.;
   fNormError = 0.107;
@@ -83,16 +88,14 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  if (event->NumFSParticle(13) == 0 &&
-      event->NumFSParticle(-13)== 0)
+  if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
     return;
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
   // The highest momentum mu+/mu-. The isSignal definition should make sure we only
   // accept events we want, so no need to do an additional check here.
-  int pdgs[] = {13, -13};
-  TLorentzVector Pmu = event->GetHMFSParticle(pdgs)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
 
   q2qe = FitUtils::Q2QErec(Pmu,cos(Pnu.Vect().Angle(Pmu.Vect())), 34., false);
 

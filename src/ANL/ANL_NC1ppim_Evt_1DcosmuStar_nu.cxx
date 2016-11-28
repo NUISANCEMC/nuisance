@@ -51,11 +51,7 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string input
 
 void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   
-  if (event->NumISParticle(2112) == 0 ||
-      event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(-211) == 0 ||
-      event->NumFSParticle(14) == 0)
-    return;
+  if (event->NumISParticle(2112) == 0 || event->NumFSParticle(2212) == 0 || event->NumFSParticle(-211) == 0 || event->NumFSParticle(14) == 0) return;
 
   TLorentzVector Pnu    = event->GetNeutrinoIn()->fP;
   TLorentzVector Pin    = event->GetHMISParticle(2112)->fP;

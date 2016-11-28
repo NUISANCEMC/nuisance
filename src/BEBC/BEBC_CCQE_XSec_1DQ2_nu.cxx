@@ -37,7 +37,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
 
 
   // In future read most of these from a card file
-  this->SetDataFromDatabase("BEBC/BEBC_CCQE_Data_NPB343_285.root", "BEBC_XSec_1DQ2_Data");  
+  this->SetDataFromDatabase("BEBC/BEBC_CCQE_Data_NPB343_285.root", "BEBC_1DQ2_Data");  
   this->SetupDefaultHist();
 
   if (applyQ2correction){

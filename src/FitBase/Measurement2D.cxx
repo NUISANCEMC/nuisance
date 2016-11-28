@@ -480,20 +480,17 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
   // Form full covariance
   TMatrixD* trans = (TMatrixD*) (newcov)->Clone();
   trans->T();
-
   (*trans) *= (*newcov);
-  newcov = (TMatrixD*) trans->Clone();
 
-  this->covar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
-  fFullCovar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
+  fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
 
   delete newcov;
   delete trans;
 
   // Robust matrix inversion method
-  TDecompChol LU = TDecompChol(*this->covar);
+  TDecompChol LU = TDecompChol(*this->fFullCovar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
+  
   return;
 };
 
@@ -1166,8 +1163,14 @@ void Measurement2D::Write(std::string drawOpt){
     // Create Shape Histogram
     TH2D* mcShape = (TH2D*) fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
-    mcShape->Scale( fDataHist->Integral("width")
-			  / fMCHist->Integral("width"));
+    double shapeScale = 1.0;
+    if (fIsRawEvents){
+      shapeScale = fDataHist->Integral() / fMCHist->Integral();
+    } else {
+      shapeScale =  fDataHist->Integral("width") / fMCHist->Integral("width");
+    }
+    
+    mcShape->Scale( shapeScale );
 
     mcShape->SetLineWidth(3);
     mcShape->SetLineStyle(7); //dashes

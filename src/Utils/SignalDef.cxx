@@ -28,9 +28,11 @@ bool SignalDef::isCCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   if (!event->HasISParticle(nuPDG)) return false;
 
   // Check that it's within the allowed range if set
-  if (EnuMin != EnuMax)
-    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000))
+  if (EnuMin != EnuMax) {
+    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) {
       return false;
+    }
+  }
 
   // Check that the charged lepton we expect has been produced
   if (!event->HasFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1)) return false;
@@ -142,8 +144,7 @@ bool SignalDef::isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
   if ((int)pdgs.size() != event->NumFSParticle()) return false;
 
   // For every particle in the list, check the number in the FS
-  for (std::vector<int>::iterator it = pdgs.begin();
-       it != pdgs.end(); ++it){
+  for (std::vector<int>::iterator it = pdgs.begin(); it != pdgs.end(); ++it){
     // Check how many times this pdg is in the vector
     int nEntries = std::count (pdgs.begin(), pdgs.end(), *it);
     if (event->NumFSParticle(*it) != nEntries)

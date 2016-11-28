@@ -40,9 +40,10 @@ ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitW
   covar = StatUtils::GetInvert(fFullCovar);
 
   // Scale to cross-section
-  fDataHist->Scale(1.E-41);
+  // PDAWG: Removed this scaling because it doesn't seem consistent.
+  //  fDataHist->Scale(1.E-41);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = this->fEventHist->Integral("width") * 1E-38 /(fNEvents+0)*(16./8.);
 };
 
 void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

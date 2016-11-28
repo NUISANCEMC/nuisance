@@ -153,9 +153,7 @@
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
-#include "MINERvA_CCNpip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
-#include "MINERvA_CCNpip_XSec_1DTpi_20deg_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dpmu_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dthmu_nu.h"
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
@@ -191,12 +189,18 @@
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 
+
+// MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
 #include "ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h"
 
 #include "GenericFlux_Tester.h"
 
+#include "MCStudy_KaonPreSelection.h"
+#include "MCStudy_MuonValidation.h"
+
 #include "FitWeight.h"
+
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {

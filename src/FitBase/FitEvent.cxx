@@ -24,7 +24,6 @@
 #include "Conventions/Units.h"
 #endif
 
-
 //***************************************************
 // Refill all the particle vectors etc for the event
 void FitEvent::CalcKinematics() {
@@ -69,12 +68,11 @@ void FitEvent::ResetEvent() {
   fBound = false;
   fNParticles = 0;
 
-  for (unsigned int i = 0; i < kMaxParticles; i++){
+  for (unsigned int i = 0; i < kMaxParticles; i++) {
     FitParticle* fp = fParticleList[i];
     if (fp) delete fp;
     fParticleList[i] = NULL;
   }
-
 }
 
 // NEUT GENERATOR SPECIFIC
@@ -117,18 +115,39 @@ void FitEvent::NeutKinematics() {
 
     // State
     int state = kUndefinedState;
-    if (part->fIsAlive == 0 and part->fStatus == -1) {
+    // fStatus == -1 means initial  state
+    if (part->fIsAlive == false && part->fStatus == -1) {
       state = kInitialState;
-    } else if (part->fIsAlive == 0 and part->fStatus == 2) {
-      state = kFSIState;
-    } else if (part->fIsAlive == 1 and part->fStatus == 0) {
+
+      // NEUT has a bit of a strange convention for fIsAlive and fStatus
+      // combinations
+      // for NC and neutrino particle isAlive true/false and status 2 means
+      // final state particle
+      // for other particles in NC status 2 means it's an FSI particle
+      // for CC it means it was an FSI particle
+    } else if (part->fStatus == 2) {
+      // NC case is a little strange... The outgoing neutrino might be alive or
+      // not alive. Remaining particles with status 2 are FSI particles that
+      // reinteracted
+      if (abs(fNeutVect->Mode) > 30 &&
+          (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+        state = kFinalState;
+        // The usual CC case
+      } else if (part->fIsAlive == true) {
+        state = kFSIState;
+      }
+    } else if (part->fIsAlive == true && part->fStatus == 2 &&
+               (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
       state = kFinalState;
-    } else if (part->fIsAlive == 1 and part->fStatus == 2) {
-      state = kFinalState;  // NC Neutrino
-    } else if (part->fIsAlive == 1) {
+
+    } else if (part->fIsAlive == true && part->fStatus == 0) {
+      state = kFinalState;
+
+    } else if (part->fIsAlive == true) {
       ERR(WRN) << "Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << std::endl;
+      throw;
     }
 
     // Remove Undefined
@@ -230,7 +249,7 @@ void FitEvent::NuwroKinematics() {
   }
 
   // Final Particles
-  for (UInt_t i = 0; i < npart_post; i++){
+  for (UInt_t i = 0; i < npart_post; i++) {
     particle* part = &fNuwroEvent->post[i];
 
     fParticleMom[fNParticles][0] = part->p4().x;
@@ -265,21 +284,24 @@ void FitEvent::GENIEKinematics() {
 
   // Extra Check for MEC
   if (genie_record->Summary()->ProcInfo().IsMEC()) {
-    if (pdg::IsNeutrino(genie_record->Summary()->InitState().ProbePdg())) fMode = 2;
-    else if (pdg::IsAntiNeutrino(genie_record->Summary()->InitState().ProbePdg())) fMode = -2;
+    if (pdg::IsNeutrino(genie_record->Summary()->InitState().ProbePdg()))
+      fMode = 2;
+    else if (pdg::IsAntiNeutrino(
+                 genie_record->Summary()->InitState().ProbePdg()))
+      fMode = -2;
   } else {
     fMode = utils::ghep::NeutReactionCode(genie_record);
   }
 
   // Set Event Info
-  Mode     = fMode;
+  Mode = fMode;
   fEventNo = 0.0;
   fTotCrs = genie_record->XSec();
   fTargetA = 0.0;
   fTargetZ = 0.0;
   fTargetH = 0;
-  fBound   = 0.0;
-  InputWeight = (1E+38/genie::units::cm2) * genie_record->XSec();
+  fBound = 0.0;
+  InputWeight = (1E+38 / genie::units::cm2) * genie_record->XSec();
 
   // Get N Particle Stack
   unsigned int npart = genie_record->GetEntries();
@@ -299,16 +321,20 @@ void FitEvent::GENIEKinematics() {
   /*
     kIStUndefined                  = -1,
     kIStInitialState               =  0,   / generator-level initial state /
-    kIStStableFinalState           =  1,   / generator-level final state: particles to be tracked by detector-level MC /
+    kIStStableFinalState           =  1,   / generator-level final state:
+    particles to be tracked by detector-level MC /
     kIStIntermediateState          =  2,
     kIStDecayedState               =  3,
     kIStCorrelatedNucleon          = 10,
     kIStNucleonTarget              = 11,
     kIStDISPreFragmHadronicState   = 12,
     kIStPreDecayResonantState      = 13,
-    kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus: marked for hadron transport modules to act on /
-    kIStFinalStateNuclearRemnant   = 15,   / low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle /
-    kIStNucleonClusterTarget       = 16,   // for composite nucleons before phase space decay
+    kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus: marked
+    for hadron transport modules to act on /
+    kIStFinalStateNuclearRemnant   = 15,   / low energy nuclear fragments
+    entering the record collectively as a 'hadronic blob' pseudo-particle /
+    kIStNucleonClusterTarget       = 16,   // for composite nucleons before
+    phase space decay
   */
 
   // Loop over all particles
@@ -318,53 +344,57 @@ void FitEvent::GENIEKinematics() {
     // State
     int state = kUndefinedState;
     switch (p->Status()) {
-    case genie::kIStNucleonTarget:
-    case genie::kIStInitialState:
-    case genie::kIStCorrelatedNucleon:
-    case genie::kIStNucleonClusterTarget:
-      state = kInitialState;
-      break;
+      case genie::kIStNucleonTarget:
+      case genie::kIStInitialState:
+      case genie::kIStCorrelatedNucleon:
+      case genie::kIStNucleonClusterTarget:
+        state = kInitialState;
+        break;
 
-    case genie::kIStStableFinalState:
-      state = kFinalState;
-      break;
+      case genie::kIStStableFinalState:
+        state = kFinalState;
+        break;
 
-    case genie::kIStHadronInTheNucleus:
-      if (abs(fMode) == 2) state = kInitialState;
-      else  state = kFSIState;
-      break;
+      case genie::kIStHadronInTheNucleus:
+        if (abs(fMode) == 2)
+          state = kInitialState;
+        else
+          state = kFSIState;
+        break;
 
-    case genie::kIStPreDecayResonantState:
-    case genie::kIStDISPreFragmHadronicState:
-    case genie::kIStIntermediateState:
-      state = kFSIState;
-      break;
+      case genie::kIStPreDecayResonantState:
+      case genie::kIStDISPreFragmHadronicState:
+      case genie::kIStIntermediateState:
+        state = kFSIState;
+        break;
 
-    case genie::kIStFinalStateNuclearRemnant:
-    case genie::kIStUndefined:
-    case genie::kIStDecayedState:
-    default:
-      break;
+      case genie::kIStFinalStateNuclearRemnant:
+      case genie::kIStUndefined:
+      case genie::kIStDecayedState:
+      default:
+        break;
     }
 
     // Flag to remove nuclear part in genie
-    if (p->Pdg() > 1000000){
-      if (state == kInitialState) state = kNuclearInitial;
-      else if (state == kFinalState) state = kNuclearRemnant;
+    if (p->Pdg() > 1000000) {
+      if (state == kInitialState)
+        state = kNuclearInitial;
+      else if (state == kFinalState)
+        state = kNuclearRemnant;
     }
 
-    //if (kRemoveGenieNuclear &&
+    // if (kRemoveGenieNuclear &&
     //    (state == kNuclearInitial || state == kNuclearRemnant)){
     //  continue;
     //}
 
     // Remove Undefined
-    //if (kRemoveUndefParticles &&
-    //	state == kUndefinedState) continue;
+    // if (kRemoveUndefParticles &&
+    //  state == kUndefinedState) continue;
 
     // Remove FSI
-    //if (kRemoveFSIParticles &&
-    //	state == kFSIState) continue;
+    // if (kRemoveFSIParticles &&
+    //  state == kFSIState) continue;
 
     fParticleState[fNParticles] = state;
 
@@ -383,11 +413,11 @@ void FitEvent::GENIEKinematics() {
   OrderStack();
 
   LOG(DEB) << "GENIE Particle Stack" << std::endl;
-  for (int i = 0; i < fNParticles; i++){
-    LOG(DEB) << "Particle " << i << ". "
-	     << fParticlePDG[i] << " " << fParticleMom[i][0] << " "
-	     << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "
-	     << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;
+  for (int i = 0; i < fNParticles; i++) {
+    LOG(DEB) << "Particle " << i << ". " << fParticlePDG[i] << " "
+             << fParticleMom[i][0] << " " << fParticleMom[i][1] << " "
+             << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "
+             << fParticleState[i] << std::endl;
   }
 
   return;
@@ -437,41 +467,42 @@ void FitEvent::GiBUUKinematics() {
     // State
     int state = kUndefinedState;
 
-    switch(GiRead->StdHepStatus[i]){
+    switch (GiRead->StdHepStatus[i]) {
+      case 0:   // Incoming
+      case 11:  // Struck nucleon
+        state = kInitialState;
+        break;
 
-    case 0:  // Incoming
-    case 11: // Struck nucleon
-      state = kInitialState;
-      break;
+      case 1:  // Good Final State
+        state = kFinalState;
+        break;
 
-    case 1: // Good Final State
-      state = kFinalState;
-      break;
-
-    default: // Other
-      break;
+      default:  // Other
+        break;
     }
 
     // Set Nuclear States Flag
     if (GiRead->StdHepPdg[i] > 1000000) {
-      if (state == kInitialState) state = kNuclearInitial;
-      else if (state == kFinalState) state = kNuclearRemnant;
+      if (state == kInitialState)
+        state = kNuclearInitial;
+      else if (state == kFinalState)
+        state = kNuclearRemnant;
       continue;
     }
 
     // Remove Nuclear States
-    //if (kRemoveGiBUUNuclear &&
-    //	(state == kNuclearInitial || state == kNuclearRemnant)){
+    // if (kRemoveGiBUUNuclear &&
+    //  (state == kNuclearInitial || state == kNuclearRemnant)){
     //  continue;
     //}
 
     // Remove Undefined
     //  if (kRemoveUndefParticles &&
-    //	state == kUndefinedState) continue;
+    //  state == kUndefinedState) continue;
 
     // Remove FSI
     //    if (kRemoveFSIParticles &&
-    //    	state == kFSIState) continue;
+    //      state == kFSIState) continue;
 
     // Set State
     fParticleState[fNParticles] = state;
@@ -491,29 +522,28 @@ void FitEvent::GiBUUKinematics() {
   OrderStack();
 
   LOG(DEB) << "GiBUU Particle Stack" << std::endl;
-  for (int i = 0; i < fNParticles; i++){
-    LOG(DEB) << "Particle " << i << ". "
-	      << fParticlePDG[i] << " " << fParticleMom[i][0] << " "
-	      << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "
-	      << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;
+  for (int i = 0; i < fNParticles; i++) {
+    LOG(DEB) << "Particle " << i << ". " << fParticlePDG[i] << " "
+             << fParticleMom[i][0] << " " << fParticleMom[i][1] << " "
+             << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "
+             << fParticleState[i] << std::endl;
   }
-
 }
 #endif  //< GiBUU ifdef
 
 //***************************************************
-void FitEvent::OrderStack(){
-//***************************************************
+void FitEvent::OrderStack() {
+  //***************************************************
 
   // Copy current stack
-  int    oldpartpdg[kMaxParticles];
-  int    oldpartstate[kMaxParticles];
+  int oldpartpdg[kMaxParticles];
+  int oldpartstate[kMaxParticles];
   double oldpartmom[kMaxParticles][4];
   int npart = fNParticles;
 
-  for (int i = 0; i < npart; i++){
-    oldpartpdg[i]    = fParticlePDG[i];
-    oldpartstate[i]  = fParticleState[i];
+  for (int i = 0; i < npart; i++) {
+    oldpartpdg[i] = fParticlePDG[i];
+    oldpartstate[i] = fParticleState[i];
     oldpartmom[i][0] = fParticleMom[i][0];
     oldpartmom[i][1] = fParticleMom[i][1];
     oldpartmom[i][2] = fParticleMom[i][2];
@@ -522,14 +552,15 @@ void FitEvent::OrderStack(){
 
   // Now run loops for each particle
   fNParticles = 0;
-  int stateorder[6] = {kInitialState, kFinalState, kFSIState, kNuclearInitial, kNuclearRemnant, kUndefinedState};
+  int stateorder[6] = {kInitialState,   kFinalState,     kFSIState,
+                       kNuclearInitial, kNuclearRemnant, kUndefinedState};
 
-  for (int s = 0; s < 6; s++){
-    for (int i = 0; i < npart; i++){
+  for (int s = 0; s < 6; s++) {
+    for (int i = 0; i < npart; i++) {
       if (oldpartstate[i] != stateorder[s]) continue;
 
-      fParticlePDG[fNParticles]    = oldpartpdg[i];
-      fParticleState[fNParticles]  = oldpartstate[i];
+      fParticlePDG[fNParticles] = oldpartpdg[i];
+      fParticleState[fNParticles] = oldpartstate[i];
       fParticleMom[fNParticles][0] = oldpartmom[i][0];
       fParticleMom[fNParticles][1] = oldpartmom[i][1];
       fParticleMom[fNParticles][2] = oldpartmom[i][2];
@@ -540,19 +571,19 @@ void FitEvent::OrderStack(){
   }
 
   LOG(DEB) << "Ordered stack" << std::endl;
-  for (int i = 0; i < fNParticles; i++){
-    LOG(DEB) << "Particle " << i << ". "
-              << fParticlePDG[i] << " " << fParticleMom[i][0] << " "
-              << fParticleMom[i][1] << " " << fParticleMom[i][2] << " "
-              << fParticleMom[i][3] << " " << fParticleState[i] << std::endl;
+  for (int i = 0; i < fNParticles; i++) {
+    LOG(DEB) << "Particle " << i << ". " << fParticlePDG[i] << " "
+             << fParticleMom[i][0] << " " << fParticleMom[i][1] << " "
+             << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "
+             << fParticleState[i] << std::endl;
   }
 
-  if (fNParticles != npart){
+  if (fNParticles != npart) {
     ERR(FTL) << "Dropped some particles when ordering the stack!" << std::endl;
   }
+
   return;
 }
-
 
 // REQUIRED FUNCTIONS FOR NUANCE
 #ifdef __NUANCE_ENABLED__
@@ -672,10 +703,8 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
 //***************************************************
 
 FitParticle* FitEvent::PartInfo(UInt_t i) {
-
   // Check Valid
   if (i > (UInt_t)fNParticles or i < 0) {
-
     ERR(FTL) << "Requesting particle beyond stack!" << std::endl;
     ERR(FTL) << "i = " << i << " N = " << fNParticles << std::endl;
     ERR(FTL) << "Mode = " << fMode << std::endl;
@@ -684,9 +713,10 @@ FitParticle* FitEvent::PartInfo(UInt_t i) {
   }
 
   // Check particle has been formed
-  if (!fParticleList[i]){
-    fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1], fParticleMom[i][2],
-				       fParticleMom[i][3], fParticlePDG[i], fParticleState[i]);
+  if (!fParticleList[i]) {
+    fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1],
+                                       fParticleMom[i][2], fParticleMom[i][3],
+                                       fParticlePDG[i], fParticleState[i]);
   }
 
   return fParticleList[i];
@@ -726,23 +756,21 @@ FitParticle* FitEvent::GetLeptonOut(void) {
   return PartInfo(GetLeptonOutPos());
 }
 
-
-bool FitEvent::HasParticle(int pdg, int state){
-
+bool FitEvent::HasParticle(int pdg, int state) {
   bool found = false;
-  for (int i = 0; i < fNParticles; i++){
-
-    if (state != -1 and fParticleState[i] != (uint)state) continue;
+  for (int i = 0; i < fNParticles; i++) {
+    if (state != -1 && fParticleState[i] != (uint)state) continue;
     if (fParticlePDG[i] == pdg) found = true;
   }
 
   return found;
 }
 
-int FitEvent::NumParticle(int pdg, int state){
-
+int FitEvent::NumParticle(int pdg, int state) {
   int nfound = 0;
-  for (int i = 0; i < fNParticles; i++){
+  for (int i = 0; i < fNParticles; i++) {
+    // std::cout << "fParticlePDG[" << i << "] = " << fParticlePDG[i] <<
+    // std::endl;
 
     if (state != -1 and fParticleState[i] != (uint)state) continue;
     if (pdg == 0 or fParticlePDG[i] == pdg) nfound += 1;
@@ -751,115 +779,101 @@ int FitEvent::NumParticle(int pdg, int state){
   return nfound;
 }
 
-int  FitEvent::NumParticle(std::vector<int> pdg, int state){
+int FitEvent::NumParticle(std::vector<int> pdg, int state) {
   int nfound = 0;
-  for (int i = 0; i < fNParticles; i++){
-
+  for (int i = 0; i < fNParticles; i++) {
     if (state != -1 and fParticleState[i] != (uint)state) continue;
-    if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()) nfound += 1;
+    if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end())
+      nfound += 1;
   }
 
   return nfound;
 }
 
-int FitEvent::NumFSLeptons(){
-
+int FitEvent::NumFSLeptons() {
   int nLeptons = 0;
 
-  for (int i = 0; i < fNParticles; i++){
+  for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kFinalState) continue;
-    if (abs(fParticlePDG[i]) == 11 ||
-        abs(fParticlePDG[i]) == 13 ||
-	abs(fParticlePDG[i]) == 15)
+    if (abs(fParticlePDG[i]) == 11 || abs(fParticlePDG[i]) == 13 ||
+        abs(fParticlePDG[i]) == 15)
       nLeptons += 1;
   }
 
   return nLeptons;
 }
 
-int FitEvent::NumFSMesons(){
-
+int FitEvent::NumFSMesons() {
   int nMesons = 0;
 
-  for (int i = 0; i < fNParticles; i++){
+  for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kFinalState) continue;
-    if (abs(fParticlePDG[i]) >= 111 &&
-        abs(fParticlePDG[i]) <= 557)
+    if (abs(fParticlePDG[i]) >= 111 && abs(fParticlePDG[i]) <= 557)
       nMesons += 1;
   }
 
   return nMesons;
 }
 
-FitParticle* FitEvent::GetHMParticle(int pdg, int state){
-
+FitParticle* FitEvent::GetHMParticle(int pdg, int state) {
   double maxmom = -9999999.9;
-  int maxind    = -1;
+  int maxind = -1;
 
-  for (int i = 0; i < fNParticles; i++){
-
+  for (int i = 0; i < fNParticles; i++) {
     if (state != -1 and fParticleState[i] != (uint)state) continue;
-    if (pdg == 0 or fParticlePDG[i] == pdg){
-
+    if (pdg == 0 or fParticlePDG[i] == pdg) {
       // Update Max Mom
-      double mom = sqrt(fParticleMom[i][0]*fParticleMom[i][0] +
-			fParticleMom[i][1]*fParticleMom[i][1] +
-			fParticleMom[i][2]*fParticleMom[i][2]);
-      if (fabs(mom) > maxmom){
-	maxmom = fabs(mom);
-	maxind = i;
+      double mom = sqrt(fParticleMom[i][0] * fParticleMom[i][0] +
+                        fParticleMom[i][1] * fParticleMom[i][1] +
+                        fParticleMom[i][2] * fParticleMom[i][2]);
+      if (fabs(mom) > maxmom) {
+        maxmom = fabs(mom);
+        maxind = i;
       }
     }
   }
 
-  if (maxind == -1){
+  if (maxind == -1) {
     return NULL;
   }
   return PartInfo(maxind);
 }
 
-FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state){
+FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
+  double maxmom = -9999999.9;
+  int maxind = -1;
 
-double maxmom = -9999999.9;
-int maxind    = -1;
-
-for (int i = 0; i < fNParticles; i++){
-
-  if (state != -1 and fParticleState[i] != (uint)state) continue;
-  if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()){
-
-    // Update Max Mom
-    double mom = sqrt(fParticleMom[i][0]*fParticleMom[i][0] +
-		      fParticleMom[i][1]*fParticleMom[i][1] +
-		      fParticleMom[i][2]*fParticleMom[i][2]);
-    if (fabs(mom) > maxmom){
-      maxmom = fabs(mom);
-      maxind = i;
+  for (int i = 0; i < fNParticles; i++) {
+    if (state != -1 and fParticleState[i] != (uint)state) continue;
+    if (std::find(pdg.begin(), pdg.end(), fParticlePDG[i]) != pdg.end()) {
+      // Update Max Mom
+      double mom = sqrt(fParticleMom[i][0] * fParticleMom[i][0] +
+                        fParticleMom[i][1] * fParticleMom[i][1] +
+                        fParticleMom[i][2] * fParticleMom[i][2]);
+      if (fabs(mom) > maxmom) {
+        maxmom = fabs(mom);
+        maxind = i;
+      }
     }
   }
- }
 
-if (maxind == -1){
-  return NULL;
- }
-return PartInfo(maxind);
+  if (maxind == -1) {
+    return NULL;
+  }
+  return PartInfo(maxind);
 }
 
-
-void FitEvent::Print(){
-  LOG(EVT) << "FitEvent " << std::endl;
-
+void FitEvent::Print() {
+  LOG(EVT) << "FitEvent print" << std::endl;
+  LOG(EVT) << "Mode: " << fMode << std::endl;
+  LOG(EVT) << "Particles: " << fNParticles << std::endl;
   LOG(EVT) << " -> Particle Stack " << std::endl;
-  for (int i = 0; i < fNParticles; i++){
-    LOG(EVT) << " -> -> " << i << ". "
-	     << fParticlePDG[i]   << " "
-	     << fParticleState[i] << " "
-	     << "  Mom("
-	     << fParticleMom[i][0] << ", "
-	     << fParticleMom[i][1] << ", "
-	     << fParticleMom[i][2] << ", "
-	     << fParticleMom[i][3] << ")." << std::endl;
-
+  for (int i = 0; i < fNParticles; i++) {
+    LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
+             << fParticleState[i] << " "
+             << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
+             << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
+             << std::endl;
   }
   return;
 }
