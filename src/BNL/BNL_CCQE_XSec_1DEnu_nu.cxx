@@ -89,19 +89,3 @@ void BNL_CCQE_XSec_1DEnu_nu::FillHistograms(){
   Measurement1D::FillHistograms();
 }
 
-
-//********************************************************************
-/// @details Perform flux unfolded scaling
-void BNL_CCQE_XSec_1DEnu_nu::ScaleEvents(){
-//******************************************************************** 
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
-  
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-
-};
-

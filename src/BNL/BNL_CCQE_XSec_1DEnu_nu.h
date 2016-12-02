@@ -32,7 +32,6 @@ class BNL_CCQE_XSec_1DEnu_nu : public Measurement1D {
   
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *nvect);
-  void ScaleEvents();
   void FillHistograms();
 
  private:

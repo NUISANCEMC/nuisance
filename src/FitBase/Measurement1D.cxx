@@ -706,11 +706,10 @@ void Measurement1D::ScaleEvents() {
 
     // Scaling for XSec as function of Enu
   } else if (fIsEnu1D) {
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
 
-    fMCHist->Scale(fScaleFactor);
-    fMCFine->Scale(fScaleFactor);
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist, fEventHist, fScaleFactor, fNEvents);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist, fEventHist, fScaleFactor, fNEvents);
+
     // Any other differential scaling
   } else {
     fMCHist->Scale(fScaleFactor, "width");

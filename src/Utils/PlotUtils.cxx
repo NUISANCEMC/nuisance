@@ -305,9 +305,13 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 
 //********************************************************************
 // This assumes the Enu axis is the x axis, as is the case for MiniBooNE 2D distributions
-void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist, double scalefactor) {
 //********************************************************************
 
+
+
+
+  
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
   TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
@@ -406,12 +410,202 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
   return;
 };
 
+TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res, std::string opt){
+
+  int nbins = hist->GetNbinsX();
+  double elow  = hist->GetXaxis()->GetBinLowEdge(1);
+  double ehigh = hist->GetXaxis()->GetBinLowEdge(nbins+1);
+  bool width = true; //opt.find("width") != std::string::npos;
+
+  TH1D* fine = new TH1D("fine","fine", nbins*res, elow, ehigh);
+
+  TGraph* temp = new TGraph();
+
+  for (int i = 0; i < nbins; i++){
+      double E = hist->GetXaxis()->GetBinCenter(i+1);
+      double C = hist->GetBinContent(i+1);
+      double W = hist->GetXaxis()->GetBinWidth(i+1);
+      if (!width) W = 1.0;
+
+      if (W != 0.0) temp->SetPoint( temp->GetN(), E, C / W );
+  }
+
+  for (int i = 0; i < fine->GetNbinsX(); i++){
+      double E = fine->GetXaxis()->GetBinCenter(i+1);
+      double W = fine->GetBinWidth(i+1);
+      if (!width) W = 1.0;
+
+      fine->SetBinContent(i+1, temp->Eval(E,0,"S") * W);
+  }
+  return fine;
+}
+
 
 //******************************************************************** 
 // This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
-void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist, TH1D* eventhist, double scalefactor, int nevents) {
 //******************************************************************** 
 
+  // Before everything starts just save everything.  
+  std::string name = std::string(mcHist->GetName());
+  
+  mcHist->Write((name + "_UNF_MC").c_str());
+  fFluxHist->Write((name + "_UNF_FLUX").c_str());
+  eventhist->Write((name + "_UNF_EVT").c_str());
+
+  TH1D* scalehist = new TH1D("scalehist","scalehist",1,0.0,1.0);
+  scalehist->SetBinContent(1,scalefactor);
+  scalehist->SetBinContent(2,nevents);
+
+  scalehist->Write((name + "_UNF_SCALE").c_str());
+
+  // Scale histograms by flux aswell for now
+  mcHist->Scale(eventhist->Integral("width") * 1E-38 * 2.0 /  nevents / fFluxHist->Integral("width"));
+
+  // Get an interpolated flux hist
+  TH1D* fineflux = PlotUtils::InterpolateFineHistogram(fFluxHist,50,"width");
+
+  // Now Get a flux PDF
+  TH1D* pdfflux = (TH1D*) mcHist->Clone();
+  pdfflux->Reset();
+
+  for (int i = 0; i < mcHist->GetNbinsX(); i++){
+
+    double Elow  = mcHist->GetXaxis()->GetBinLowEdge(i+1);
+    double Ehigh = mcHist->GetXaxis()->GetBinLowEdge(i+2);
+    double FluxInt = 0.0; 
+
+    for (int j = 0; j < fineflux->GetNbinsX(); j++){
+      double E = fineflux->GetXaxis()->GetBinCenter(j+1);
+      double C = fineflux->GetBinContent(j+1);
+      double W = fineflux->GetXaxis()->GetBinWidth(j+1);
+
+      if (E > Elow and E < Ehigh){
+        FluxInt += C;
+      }
+    }
+
+    FluxInt /= fineflux->Integral();
+    pdfflux->SetBinContent(i+1, FluxInt);
+  }
+
+  // Scale MC hist by pdfflux
+  mcHist->Divide(pdfflux);
+
+  return;
+
+
+  
+  mcHist->Scale(scalefactor);
+  mcHist->Write((name+"_AFTERSCALE").c_str());
+
+  mcHist->Scale(1.0 / fFluxHist->Integral("width"));
+
+  int NBins   = fFluxHist->GetNbinsX();
+  double EMin = fFluxHist->GetBinLowEdge(1);
+  double EMax = fFluxHist->GetBinLowEdge(NBins+1);
+  TH1D* FineFlux = new TH1D("FineFlux","FineFlux",NBins*100,EMin, EMax);
+
+  TH1D* TempFlux = (TH1D*) fFluxHist->Clone();
+  TempFlux->Scale(1.0,"width");
+
+  TempFlux->Write((name + "_TEMPFLUX").c_str());
+
+  for (int i = 0; i < FineFlux->GetNbinsX(); i++){
+    double binwidth = FineFlux->GetBinWidth(i+1);
+    FineFlux->SetBinContent(i+1, TempFlux->Interpolate(FineFlux->GetXaxis()->GetBinCenter(i+1)) * binwidth );
+  }
+
+  FineFlux->Write((name + "_FINEFLUX").c_str());
+
+
+
+  // No go through each Coarse bin and scale down the interpolations so the integral between their edges is equal to the
+  // coarse bin content.
+  for (int i = 0; i < TempFlux->GetNbinsX(); i++){
+    double ELow       = TempFlux->GetXaxis()->GetBinLowEdge(i+1);
+    double EHigh      = TempFlux->GetXaxis()->GetBinLowEdge(i+2);
+    double CoarseCont = TempFlux->GetBinContent(i+1) * TempFlux->GetBinWidth(i+1);
+    double FluxInt    = 0.0;
+
+    for (int j = 0; j < FineFlux->GetNbinsX(); j++){
+      double E        = FineFlux->GetXaxis()->GetBinCenter(j+1);
+      double FineCont = FineFlux->GetBinContent(j+1);
+      double Width    = FineFlux->GetBinWidth(j+1);
+
+      if (ELow < E and EHigh > E){
+        FluxInt += FineCont * Width;
+      }
+    }
+
+    double ScaleF = 0.0;
+    if (FluxInt != 0.0) ScaleF = CoarseCont / FluxInt;
+    ScaleF = 1.0;
+
+    for (int j = 0; j < FineFlux->GetNbinsX(); j++){
+      double E        = FineFlux->GetXaxis()->GetBinCenter(j+1);
+
+      if (ELow < E and EHigh > E){
+        FineFlux->SetBinContent(j+1, FineFlux->GetBinContent(j+1) * ScaleF);
+      }
+    }
+  }
+
+  FineFlux->Write((name + "_FINEFLUX2").c_str());
+
+
+  std::cout << "ScaleF = " << TempFlux->Integral("width") / FineFlux->Integral("width") <<" " <<fFluxHist->GetName() << std::endl;
+  FineFlux->Scale( TempFlux->Integral("width") / FineFlux->Integral("width"));
+  std::cout << "After = " << TempFlux->Integral("width") / FineFlux->Integral("width") << " " << fFluxHist->GetName() << std::endl;
+
+  FineFlux->Write((name + "_FINEFLUX3").c_str());
+
+  TH1D* pdfhist = (TH1D*) mcHist->Clone();
+
+  for (int i = 0; i < mcHist->GetNbinsX(); i++){
+    double ELow    = mcHist->GetXaxis()->GetBinLowEdge(i+1);
+    double EHigh   = mcHist->GetXaxis()->GetBinLowEdge(i+2);
+    double FluxInt = 0.0;
+    int count = 0;
+
+    for (int j = 0; j < FineFlux->GetNbinsX(); j++){
+      double E     = FineFlux->GetXaxis()->GetBinCenter(j+1);
+      double Cont  = FineFlux->GetBinContent(j+1);
+      double Width = FineFlux->GetBinWidth(j+1);
+
+      if (ELow < E and EHigh > E){
+	      FluxInt += Cont * Width;
+        count++;
+      } else {
+        continue;
+      }
+    }
+
+    FluxInt /= FineFlux->Integral("width");
+
+    pdfhist->SetBinContent(i+1, FluxInt);
+
+    if (FluxInt != 0.0){
+      mcHist->SetBinContent(i+1, mcHist->GetBinContent(i+1)/(FluxInt));
+    } else {
+      ERR(WRN) << "Flux Integral == 0.0 for bin " << i+1 
+               << " in " << mcHist->GetName() << std::endl;
+      mcHist->SetBinContent(i+1, 0.0);
+    }
+  }
+
+  pdfhist->Write((name + "_FLUXPDF").c_str());
+
+  FineFlux->Write( (std::string(mcHist->GetName()) + "_FINEFLUX" ).c_str() );
+  delete FineFlux;
+
+  return;
+
+
+
+
+
+  
   // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
   TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
 
