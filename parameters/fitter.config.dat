@@ -35,7 +35,8 @@ config input.MAXEVENTS -1
 # Turn on/off event manager
 # EventManager enables us to only loop number of events once for multiple projections of the same measurements
 # e.g. MiniBooNE CC1pi+ Q2 and MiniBooNE CC1pi+ Tmu would ordinarily require 2 reconfigures, but with this enabled it requires only one
-config input.eventmanager 1
+config input.eventmanager 0
+config EventManager 0
 
 # Event Directories 
 # Can setup default directories and use @EVENT_DIR/path to link to it
