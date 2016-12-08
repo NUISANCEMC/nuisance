@@ -105,11 +105,6 @@ InputHandler::InputHandler(std::string const& handle,
     fNEvents = fMaxEvents;
   }
 
-  // Standardize Flux/Events                                                                                                                             
-  double fluxscale = 1.0 / fFluxHist->Integral(1, fFluxHist->GetNbinsX()+1, "width");
-  fFluxHist->Scale(fluxscale);
-  fEventHist->Scale(fluxscale);
-
   fFluxList.push_back(fFluxHist);
   fEventList.push_back(this->fEventHist);
   fXSecList.push_back(this->fXSecHist);
