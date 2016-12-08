@@ -656,11 +656,8 @@ void Measurement2D::ScaleEvents(){
 
     // This assumes we have the Enu on the x-axis
     // fairly trivial to make the change but only MiniBooNE 2D CC1pi+ has Enu in a 2D
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
-
-    fMCHist->Scale(fScaleFactor);
-    fMCFine->Scale(fScaleFactor);
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist, fEventHist, fScaleFactor);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist, fEventHist, fScaleFactor);
 
   } else { // Else we just do normal scaling
 

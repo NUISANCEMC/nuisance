@@ -139,7 +139,7 @@ namespace PlotUtils{
   void FluxUnfoldedScaling(TH1D* plot, TH1D* flux, TH1D* events=NULL, double scalefactor=1.0, int nevents=1);
 
   //! Flux unfolded scaling for 2D histograms
-  void FluxUnfoldedScaling(TH2D* plot, TH1D* flux, double scalefactor=1.0);
+  void FluxUnfoldedScaling(TH2D* plot, TH1D* flux, TH1D* events=NULL, double scalefactor=1.0);
   
   //! Fill a 2D Histogram from a text file
   void Set2DHistFromText(std::string dataFile, TH2* hist, double norm, bool skipbins=false);
