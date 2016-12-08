@@ -447,8 +447,11 @@ TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res, std::string opt){
 
 //******************************************************************** 
 // This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
-void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist, TH1D* eventhist, double scalefactor, int nevents) {
+void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, double scalefactor, int nevents) {
 //******************************************************************** 
+
+  TH1D* eventhist = (TH1D*)ehist->Clone();
+  TH1D* fFluxHist = (TH1D*)fhist->Clone();
 
   if (FitPar::Config().GetParB("save_flux_debug")){
     std::string name = std::string(mcHist->GetName());
@@ -463,7 +466,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist, TH1D* eventhi
   
     scalehist->Write((name + "_UNF_SCALE").c_str());  
   }
-  
+
   // Undo width integral in SF
   mcHist->Scale( scalefactor / eventhist->Integral(1,eventhist->GetNbinsX()+1,"width"));
   
@@ -507,6 +510,9 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist, TH1D* eventhi
 
   // Scale MC hist by pdfflux
   mcHist->Divide(pdfflux);
+
+  delete eventhist;
+  delete fFluxHist;
 
   return;
 };

@@ -97,6 +97,12 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
                 "not flux averaged!"
              << std::endl;
+
+    if (FitPar::Config().GetParB("EventManager")){
+      ERR(FTL) << "Enu Measurements do not yet work with the Event Manager!" << std::endl;
+      ERR(FTL) << "If you want decent flux unfolded results please run in series mode (-q EventManager=0)" << std::endl;
+      sleep(2);
+    }
   }
 
   if (fIsEnu1D && fIsRawEvents) {
@@ -1134,6 +1140,7 @@ void Measurement1D::Write(std::string drawOpt) {
   bool drawCanvMC = (drawOpt.find("CANVMC") != std::string::npos);
 
   bool drawWeighted = (drawOpt.find("WGHT") != std::string::npos);
+
 
   if (FitPar::Config().GetParB("EventManager")){
     drawFlux = false;

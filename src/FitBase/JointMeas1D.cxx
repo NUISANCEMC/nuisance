@@ -76,6 +76,12 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   // For joint samples, input files are given as a semi-colon seperated list.
   // Parse this list and save it for later, and set up the types etc.
 
+  if (FitPar::Config().GetParB("EventManager")){
+    ERR(FTL) << "Event Manager does not yet work with JointMeas1D Samples" << std::endl;
+    ERR(FTL) << "If you want good predictions for " << fName << " then run with it turned off! (-q EventManager=0)" << std::endl;
+    sleep(2);
+  }
+
   fSubInFiles.clear();
 
   std::vector<std::string> entries = GeneralUtils::ParseToStr(input, ";");

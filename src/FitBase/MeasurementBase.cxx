@@ -93,9 +93,9 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     fInput = new InputHandler(fName, inpType, file_descriptor[1]);
   }
 
-  fFluxHist = fInput->GetFluxHistogram();
-  fEventHist = fInput->GetEventHistogram();
-  fXSecHist = fInput->GetXSecHistogram();
+  fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
+  fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
+  fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
   fNEvents = fInput->GetNEvents();
 
   // Expect INPUTTYPE:FileLocation(s)
