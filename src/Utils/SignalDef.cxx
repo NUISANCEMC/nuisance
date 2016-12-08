@@ -69,6 +69,21 @@ bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   return true;
 }
 
+bool SignalDef::isNC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check it's NCINC
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Veto event with mesons
+  if (event->NumFSMesons() != 0) return false;
+
+  // Veto events with a charged lepton
+  if (event->NumFSLeptons() != 0) return false;
+
+  return true;
+}
+
+
 bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
   // Check if it's CCINC
@@ -79,6 +94,18 @@ bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax)
 
   return true;
 }
+
+bool SignalDef::isNCEL(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check if it's NCINC
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Require modes 51/52 (NCEL)
+  if (abs(event->Mode) != 51 && abs(event->Mode) != 52) return false;
+
+  return true;
+}
+
 
 bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
@@ -200,6 +227,21 @@ bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
   if (nFS != 2) return false;
   return true;
 }
+
+bool SignalDef::isNCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
+
+  // Check this is an NCINC event
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  int nLepton = event->NumFSParticle(nuPDG);
+  int nPion   = event->NumFSParticle(piPDG);
+  int nFS     = event->NumFSParticle();
+
+  if (nLepton != 1 || nPion != 1) return false;
+  if (nFS != 2) return false;
+  return true;
+}
+
 
 bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 

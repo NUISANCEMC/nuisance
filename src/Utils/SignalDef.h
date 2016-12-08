@@ -38,9 +38,12 @@ bool isCC0pi(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
 bool isCCQELike(FitEvent *event, int nuPDG, double EnuMin = 0,
                 double EnuMax = 0);
 bool isCCQE(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
+bool isNC0pi(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
+bool isNCEL(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
 bool isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin = 0,
              double EnuMax = 0);
-
+bool isNCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin = 0,
+	      double EnuMax = 0);
 bool isCC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin = 0,
              double EnuMax = 0);
 bool isNC1pi(FitEvent *event, int nuPDG, int piPDG, double EnuMin = 0,

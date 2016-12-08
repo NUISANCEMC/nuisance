@@ -98,6 +98,8 @@ config linecolour 1
 config linestyle 1
 config linewidth 1
 
+# For GenericFlux
+config isLiteMode 0
 
 # Statistical Options
 # ######################################################
