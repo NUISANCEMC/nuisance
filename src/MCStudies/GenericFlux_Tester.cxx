@@ -19,9 +19,6 @@
 
 #include "GenericFlux_Tester.h"
 
-#include "T2K_SignalDef.h"
-#include "MINERvA_SignalDef.h"
-
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
@@ -42,13 +39,13 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   fIsShape = false;
   fIsRawEvents = false;
 
-  nu_4mom = 0;
-  pmu = 0;
-  ppip = 0;
-  ppim = 0;
-  ppi0 = 0;
-  pprot = 0;
-  pneut = 0;
+  nu_4mom = new TLorentzVector(0, 0, 0, 0);
+  pmu     = new TLorentzVector(0, 0, 0, 0);
+  ppip    = new TLorentzVector(0, 0, 0, 0);
+  ppim    = new TLorentzVector(0, 0, 0, 0);
+  ppi0    = new TLorentzVector(0, 0, 0, 0);
+  pprot   = new TLorentzVector(0, 0, 0, 0);
+  pneut   = new TLorentzVector(0, 0, 0, 0);
 
   // This function will sort out the input files automatically and parse all the
   // inputs,flags,etc.
@@ -57,6 +54,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   eventVariables = NULL;
+  liteMode = FitPar::Config().GetParB("isLiteMode");
 
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
@@ -167,13 +165,15 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva,
                          "Erecoil_minerva/F");
 
-  eventVariables->Branch("nu_4mom", &nu_4mom);
-  eventVariables->Branch("pmu_4mom", &pmu);
-  eventVariables->Branch("hm_ppip_4mom", &ppip);
-  eventVariables->Branch("hm_ppim_4mom", &ppim);
-  eventVariables->Branch("hm_ppi0_4mom", &ppi0);
-  eventVariables->Branch("hm_pprot_4mom", &pprot);
-  eventVariables->Branch("hm_pneut_4mom", &pneut);
+  if (!liteMode){
+    eventVariables->Branch("nu_4mom", &nu_4mom);
+    eventVariables->Branch("pmu_4mom", &pmu);
+    eventVariables->Branch("hm_ppip_4mom", &ppip);
+    eventVariables->Branch("hm_ppim_4mom", &ppim);
+    eventVariables->Branch("hm_ppi0_4mom", &ppi0);
+    eventVariables->Branch("hm_pprot_4mom", &pprot);
+    eventVariables->Branch("hm_pneut_4mom", &pneut);
+  }
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
@@ -195,71 +195,23 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
   LOG(SAM) << "Adding Samples" << endl;
 
   // Signal Definitions from SignalDef.cxx
-  eventVariables->Branch("flagCCQE_full", &flagCCQE_full, "flagCCQE_full/O");
-  eventVariables->Branch("flagCCQE_rest", &flagCCQE_rest, "flagCCQE_rest/O");
-  eventVariables->Branch("flagCCQEBar_full", &flagCCQEBar_full,
-                         "flagCCQEBar_full/O");
-  eventVariables->Branch("flagCCQEBar_rest", &flagCCQEBar_rest,
-                         "flagCCQEBar_rest/O");
+  eventVariables->Branch("flagCCINC",    &flagCCINC, "flagCCINC/O");
+  eventVariables->Branch("flagNCINC",    &flagNCINC, "flagNCINC/O");
+  eventVariables->Branch("flagCCQE",     &flagCCQE, "flagCCQE/O");
+  eventVariables->Branch("flagCC0pi",    &flagCC0pi,"flagCC0pi/O");
+  eventVariables->Branch("flagCCQELike", &flagCCQELike,"flagCCQELike/O");
+  eventVariables->Branch("flagNCEL",     &flagNCEL, "flagNCEL/O");
+  eventVariables->Branch("flagNC0pi",    &flagNC0pi,"flagNC0pi/O");
+  eventVariables->Branch("flagCCcoh",    &flagCCcoh, "flagCCcoh/O");
+  eventVariables->Branch("flagNCcoh",    &flagNCcoh, "flagNCcoh/O");
+  eventVariables->Branch("flagCC1pip",   &flagCC1pip,"flagCC1pip/O");
+  eventVariables->Branch("flagNC1pip",   &flagNC1pip,"flagNC1pip/O");
+  eventVariables->Branch("flagCC1pim",   &flagCC1pim,"flagCC1pim/O");
+  eventVariables->Branch("flagNC1pim",   &flagNC1pim,"flagNC1pim/O");
+  eventVariables->Branch("flagCC1pi0",   &flagCC1pi0,"flagCC1pi0/O");
+  eventVariables->Branch("flagNC1pi0",   &flagNC1pi0,"flagNC1pi0/O");
 
-  eventVariables->Branch("flagCC1pip_MiniBooNE", &flagCC1pip_MiniBooNE,
-                         "flagCC1pip_MiniBooNE/O");
 
-  eventVariables->Branch("flagCC1pip_MINERvA_full", &flagCC1pip_MINERvA_full,
-                         "flagCC1pip_MINERvA_full/O");
-  eventVariables->Branch("flagCC1pip_MINERvA_rest", &flagCC1pip_MINERvA_rest,
-                         "flagCC1pip_MINERvA_rest/O");
-  eventVariables->Branch("flagCCNpip_MINERvA_full", &flagCCNpip_MINERvA_full,
-                         "flagCCNpip_MINERvA_full/O");
-  eventVariables->Branch("flagCCNpip_MINERvA_rest", &flagCCNpip_MINERvA_rest,
-                         "flagCCNpip_MINERvA_rest/O");
-
-  eventVariables->Branch("flagCC1pip_T2K_Michel", &flagCC1pip_T2K_Michel,
-                         "flagCC1pip_T2K_Michel/O");
-  eventVariables->Branch("flagCC1pip_T2K", &flagCC1pip_T2K, "flagCC1pip_T2K/O");
-
-  eventVariables->Branch("flagCC1pi0_MiniBooNE", &flagCC1pi0_MiniBooNE,
-                         "flagCC1pi0_MiniBooNE/O");
-
-  eventVariables->Branch("flagCC1pi0Bar_MINERvA", &flagCC1pi0Bar_MINERvA,
-                         "flagCC1pi0Bar_MINERvA/O");
-
-  eventVariables->Branch("flagNC1pi0_MiniBooNE", &flagNC1pi0_MiniBooNE,
-                         "flagNC1pi0_MiniBooNE/O");
-  eventVariables->Branch("flagNC1pi0Bar_MiniBooNE", &flagNC1pi0Bar_MiniBooNE,
-                         "flagNC1pi0Bar_MiniBooNE/O");
-
-  eventVariables->Branch("flagCCcoh_MINERvA", &flagCCcoh_MINERvA,
-                         "flagCCcoh_MINERvA/O");
-  eventVariables->Branch("flagCCcohBar_MINERvA", &flagCCcohBar_MINERvA,
-                         "flagCCcohBar_MINERvA/O");
-
-  eventVariables->Branch("flagCCQEnumu_MINERvA_full",
-                         &flagCCQEnumu_MINERvA_full,
-                         "flagCCQEnumu_MINERvA_full/O");
-  eventVariables->Branch("flagCCQEnumubar_MINERvA_full",
-                         &flagCCQEnumubar_MINERvA_full,
-                         "flagCCQEnumubar_MINERvA_full/O");
-  eventVariables->Branch("flagCCQEnumu_MINERvA_rest",
-                         &flagCCQEnumu_MINERvA_rest,
-                         "flagCCQEnumu_MINERvA_rest/O");
-  eventVariables->Branch("flagCCQEnumubar_MINERvA_rest",
-                         &flagCCQEnumubar_MINERvA_rest,
-                         "flagCCQEnumubar_MINERvA_rest/O");
-
-  eventVariables->Branch("flagCCincLowRecoil_MINERvA",
-                         &flagCCincLowRecoil_MINERvA,
-                         "flagCCincLowRecoil_MINERvA/O");
-  eventVariables->Branch("flagCCincLowRecoil_MINERvA_reqhad",
-                         &flagCCincLowRecoil_MINERvA_reqhad,
-                         "flagCCincLowRecoil_MINERvA_reqhad/O");
-
-  eventVariables->Branch("flagCCQELike_MiniBooNE", &flagCCQELike_MiniBooNE,
-                         "flagCCQELike_MiniBooNE/O");
-  eventVariables->Branch("flagCCQE_MiniBooNE", &flagCCQE_MiniBooNE,
-                         "flagCCQE_MiniBooNE/O");
-  eventVariables->Branch("flagCCQEBar_MiniBooNE", &flagCCQEBar_MiniBooNE,
-                         "flagCCQEBar_MiniBooNE/O");
 };
 
 //********************************************************************
@@ -307,12 +259,15 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   float pi0_highmom = -999.9;
 
   (*nu_4mom) = event->PartInfo(0)->fP;
-  (*pmu) = TLorentzVector(0, 0, 0, 0);
-  (*ppip) = TLorentzVector(0, 0, 0, 0);
-  (*ppim) = TLorentzVector(0, 0, 0, 0);
-  (*ppi0) = TLorentzVector(0, 0, 0, 0);
-  (*pprot) = TLorentzVector(0, 0, 0, 0);
-  (*pneut) = TLorentzVector(0, 0, 0, 0);
+  
+  if (!liteMode){
+    (*pmu)   = TLorentzVector(0, 0, 0, 0);
+    (*ppip)  = TLorentzVector(0, 0, 0, 0);
+    (*ppim)  = TLorentzVector(0, 0, 0, 0);
+    (*ppi0)  = TLorentzVector(0, 0, 0, 0);
+    (*pprot) = TLorentzVector(0, 0, 0, 0);
+    (*pneut) = TLorentzVector(0, 0, 0, 0);
+  }
 
   Enu_true = nu_4mom->E();
   PDGnu = event->PartInfo(0)->fPID;
@@ -350,7 +305,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       ELep = (part_4mom.E());
       MLep = (part_4mom.Mag());
       CosLep = cos(part_4mom.Vect().Angle(nu_4mom->Vect()));
-      (*pmu) = part_4mom;
+      pmu = &part_4mom;
 
       Q2_true = -1 * (part_4mom - (*nu_4mom)).Mag2();
 
@@ -444,7 +399,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
         MPi0 = (part_4mom.Mag());
         CosPi0 = cos(part_4mom.Vect().Angle(nu_4mom->Vect()));
 
-        (*ppi0) = part_4mom;
+	(*ppi0) = part_4mom;
       }
     }
   }
@@ -529,53 +484,25 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
 
   // Some example flags are given from SignalDef.
   // See src/Utils/SignalDef.cxx for more.
-  flagCCQE_full = SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
-  //flagCCQE_rest = SignalDef::isCCQE(event, EnuMin, EnuMax, true);
-  flagCCQEBar_full = SignalDef::isCCQE(event, -14, EnuMin, EnuMax);
-  //flagCCQEBar_rest = SignalDef::isCCQEBar(event, EnuMin, EnuMax, true);
+  int nuPDG    = event->PartInfo(0)->fPID;
 
-  flagCC1pip_MiniBooNE = SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax);
-  flagCC1pip_MINERvA_full = SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax);
-  flagCC1pip_MINERvA_rest =
-      SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, true);
+  // Generic signal flags
+  flagCCINC    = SignalDef::isCCINC(event, nuPDG);
+  flagNCINC    = SignalDef::isNCINC(event, nuPDG);
+  flagCCQE     = SignalDef::isCCQE(event, nuPDG);
+  flagCCQELike = SignalDef::isCCQELike(event, nuPDG);
+  flagCC0pi    = SignalDef::isCC0pi(event, nuPDG);
+  flagNCEL     = SignalDef::isNCEL(event, nuPDG);
+  flagNC0pi    = SignalDef::isNC0pi(event, nuPDG);
+  flagCCcoh    = SignalDef::isCCCOH(event, nuPDG, 211);
+  flagNCcoh    = SignalDef::isNCCOH(event, nuPDG, 111);
+  flagCC1pip   = SignalDef::isCC1pi(event, nuPDG, 211);
+  flagNC1pip   = SignalDef::isNC1pi(event, nuPDG, 211);
+  flagCC1pim   = SignalDef::isCC1pi(event, nuPDG, -211);
+  flagNC1pim   = SignalDef::isNC1pi(event, nuPDG, -211);
+  flagCC1pi0   = SignalDef::isCC1pi(event, nuPDG, 111);
+  flagNC1pi0   = SignalDef::isNC1pi(event, nuPDG, 111);
 
-  int dummy;
-  flagCCNpip_MINERvA_full =
-      SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax);
-  flagCCNpip_MINERvA_rest =
-      SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, true);
-
-  // Include Michel e sample so no phase space cuts on pion, only angle
-  flagCC1pip_T2K_Michel =
-      SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
-  flagCC1pip_T2K = SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
-
-  flagCC1pi0_MiniBooNE = SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
-  flagCC1pi0Bar_MINERvA = SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
-  flagNC1pi0_MiniBooNE = SignalDef::isNC1pi(event, 14, 111, EnuMin, EnuMax);
-  flagNC1pi0Bar_MiniBooNE =
-    SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax);
-
-  flagCCcoh_MINERvA = SignalDef::isCCCOH(event, 14, 211, EnuMin, EnuMax);
-  flagCCcohBar_MINERvA = SignalDef::isCCCOH(event, 14, -211, EnuMin, EnuMax);
-
-  flagCCQEnumu_MINERvA_full =
-      SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, true);
-  flagCCQEnumubar_MINERvA_full =
-      SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, true);
-  flagCCQEnumu_MINERvA_rest =
-      SignalDef::isCCQEnumu_MINERvA(event, 1.5, 10.0, false);
-  flagCCQEnumubar_MINERvA_rest =
-      SignalDef::isCCQEnumubar_MINERvA(event, 1.5, 10.0, false);
-
-  flagCCincLowRecoil_MINERvA =
-      SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
-  //flagCCincLowRecoil_MINERvA_reqhad =
-  //    SignalDef::isCCincLowRecoil_MINERvA(event, 2.0, 6.0);
-
-  flagCCQELike_MiniBooNE = SignalDef::isCC0pi(event, 14, 0.0, 3.0);
-  flagCCQE_MiniBooNE = SignalDef::isCCQELike(event, 14, 0.0, 3.0);
-  flagCCQEBar_MiniBooNE = SignalDef::isCCQELike(event, -14, 0.0, 3.0);
 }
 
 // -------------------------------------------------------------------
