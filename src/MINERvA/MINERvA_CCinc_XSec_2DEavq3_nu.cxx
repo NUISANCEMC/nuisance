@@ -106,7 +106,7 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
     // Set Q from Muon
     TLorentzVector q = neutrino->fP - muon->fP;
     double q0 = (q.E())/1.E3;
-    double q3_true = (q.Vect().Mag())/1.E3;
+    //double q3_true = (q.Vect().Mag())/1.E3;
     double thmu = muon->fP.Vect().Angle(neutrino->fP.Vect());
     double pmu  = muon->fP.Vect().Mag()/1.E3;
     double emu  = muon->fP.E()/1.E3;

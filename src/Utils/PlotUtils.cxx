@@ -330,13 +330,13 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, dou
 
     double Ml = pdfflux->GetXaxis()->GetBinLowEdge(i+1);
     double Mh = pdfflux->GetXaxis()->GetBinLowEdge(i+2);
-    double Mc = pdfflux->GetXaxis()->GetBinCenter(i+1);
-    double Mw = pdfflux->GetBinWidth(i+1);
+    //double Mc = pdfflux->GetXaxis()->GetBinCenter(i+1);
+    //double Mw = pdfflux->GetBinWidth(i+1);
     double fluxint = 0.0;
 
     for (int j = 0; j < fFluxHist->GetNbinsX(); j++){
 
-      double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
+      //double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
       double Fl = fFluxHist->GetXaxis()->GetBinLowEdge(j+1);
       double Fh = fFluxHist->GetXaxis()->GetBinLowEdge(j+2);
       double Fe = fFluxHist->GetBinContent(j+1);
@@ -448,14 +448,14 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, doub
 
     double Ml = mcHist->GetXaxis()->GetBinLowEdge(i+1);
     double Mh = mcHist->GetXaxis()->GetBinLowEdge(i+2);
-    double Mc = mcHist->GetXaxis()->GetBinCenter(i+1);
-    double Me = mcHist->GetBinContent(i+1);
-    double Mw = mcHist->GetBinWidth(i+1);
+    //double Mc = mcHist->GetXaxis()->GetBinCenter(i+1);
+    //double Me = mcHist->GetBinContent(i+1);
+    //double Mw = mcHist->GetBinWidth(i+1);
     double fluxint = 0.0;
 
     for (int j = 0; j < fFluxHist->GetNbinsX(); j++){
       
-      double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
+      //double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
       double Fl = fFluxHist->GetXaxis()->GetBinLowEdge(j+1);
       double Fh = fFluxHist->GetXaxis()->GetBinLowEdge(j+2);
       double Fe = fFluxHist->GetBinContent(j+1);
