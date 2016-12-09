@@ -37,7 +37,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(
   EnuMax = 3.;
   fNormError = 0.130;
   fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/NORM";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
@@ -65,10 +65,11 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(
 
   SetupDefaultHist();
 
-  if (!fIsDiag)
-    SetCovarMatrix(FitPar::GetDataBase() +
-                   "/MiniBooNE/anti-ccqe/MiniBooNE_1DQ2_antinu.root");
-  else {
+  if (!fIsDiag){
+    ERR(FTL) << "Not allowed to run with non-diagonal covariance for MB CCQE antinu!" << std::endl;
+    ERR(FTL) << "Please run with DIAG or DEFAULT option" << std::endl;
+    throw;
+  } else {
     LOG(SAM) << "Making diagonal covar" << endl;
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
     covar = StatUtils::GetInvert(fFullCovar);

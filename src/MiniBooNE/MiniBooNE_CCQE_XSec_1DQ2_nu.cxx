@@ -41,6 +41,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   EnuMax = 3.;
   fNormError = 0.107;
   fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/NORM/MASK";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
@@ -50,11 +51,9 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
 
   // Setup Covariance
   if (!this->fIsDiag) {
-
-    /// Currently has a placeholder for the matrices as work fixing them is ongoing.
-    this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ccqe/MiniBooNE_1DQ2_nu.root");
-    StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
-
+    ERR(FTL) << "Non diagonal covariance not allowed for MB CCQE!" << std::endl;
+    ERR(FTL) << "Run with DIAG or DEFAULT option" << std::endl;
+    throw;
   } else {
     /// Assume a diagonal shape-only error is default
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
