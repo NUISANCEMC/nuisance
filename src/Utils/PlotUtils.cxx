@@ -345,6 +345,7 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, dou
       if (Fl >= Ml and Fh <= Mh){ fluxint += Fe; }
       else if (Fl < Ml and Fl < Mh and Fh > Ml and Fh < Mh){  fluxint += Fe * (Fh - Ml)/Fw;  }
       else if (Fh > Mh and Fl < Mh and Fh > Ml and Fl > Ml){  fluxint += Fe * (Mh - Fl)/Fw; }
+      else if (Ml >= Fl and Mh <= Fh){  fluxint += Fe * (Mh - Ml)/Fw; }
       else { continue; }
 
     }
@@ -463,6 +464,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, doub
       if (Fl >= Ml and Fh <= Mh){ fluxint += Fe; }
       else if (Fl < Ml and Fl < Mh and Fh > Ml and Fh < Mh){  fluxint += Fe * (Fh - Ml)/Fw;  }
       else if (Fh > Mh and Fl < Mh and Fh > Ml and Fl > Ml){  fluxint += Fe * (Mh - Fl)/Fw; }
+      else if (Ml >= Fl and Mh <= Fh){	fluxint += Fe * (Mh - Ml)/Fw; }
       else { continue; }
 
     }
