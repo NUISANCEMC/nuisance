@@ -455,7 +455,7 @@ void FitEvent::GiBUUKinematics() {
 
   // Check Stack N
   int npart = GiRead->StdHepN;
-  if (npart > kMaxParticles) {
+  if ((uint)npart > kMaxParticles) {
     ERR(FTL) << "GiBUU has too many particles" << std::endl;
     ERR(FTL) << "npart=" << npart << " kMax=" << kMaxParticles << std::endl;
     throw;

@@ -83,7 +83,7 @@ InputHandler* EventManager::AddInput(std::string handle, std::string infile) {
       InputUtils::ParseInputType(file_descriptor[0]);
 
   int id = GetInputID(file_descriptor[1]);
-  if (id != fid.size()) {
+  if ((uint)id != fid.size()) {
     LOG(SAM) << "Event manager already contains this input."
              << std::endl;
     return finputs[id];
