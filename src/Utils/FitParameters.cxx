@@ -295,13 +295,14 @@ void FitParameters::MakeParameterCard(std::string filename) {
 void FitParameters::Write(){
 
   // Loop through parameters
-  TTree* tr = new TTree("fit_header","fit_header");
+  /*  TTree* tr = new TTree("fit_header","fit_header");
   tr->Branch("par_name",  &parNames);
   tr->Branch("par_value", &parValues);
   tr->Branch("card_input", &cardLines);
   tr->Fill();
 
   tr->Write();
+  */
   return;
 }
 
