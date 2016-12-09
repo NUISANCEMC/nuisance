@@ -47,6 +47,14 @@ MINERvA_CC1pi0_XSec_1DQ2_antinu::MINERvA_CC1pi0_XSec_1DQ2_antinu(std::string inp
   this->SetupDefaultHist();
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+
+  // Print warning for covariance
+  if (!fIsDiag){
+    ERR(FTL) << "The MINERvA CC1pi0 XSec 1DQ2 antinu covariance has problems inverting. We think it "
+	     << " is not semi-positive definite. As a result the likelihoods for this class are probably not to be trusted." << std::endl;
+    sleep(3);
+  }
+
 };
 
 void MINERvA_CC1pi0_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
