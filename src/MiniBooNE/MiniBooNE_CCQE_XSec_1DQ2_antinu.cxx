@@ -145,9 +145,10 @@ bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent *event) {
   if (fCCQElike) {
     if (SignalDef::isCC0pi(event, 14, EnuMin, EnuMax) ||
         SignalDef::isCC0pi(event, -14, EnuMin, EnuMax)){
-      if(event->GetNeutrinoIn()->fPID == -14){
-        return false;
-      }
+      // P. Stowell Removed this bad check for only pdg=14 types
+      //      if(event->GetNeutrinoIn()->fPID == -14){
+      //        return false;
+      //      }
       return true;
     }
   } else {
