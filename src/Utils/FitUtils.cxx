@@ -23,7 +23,7 @@
   MISC Functions
 */
 
-// MOVE TO GENERALUTILS! CW
+
 //********************************************************************
 double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
                                   std::map<std::string, double> inmap) {
@@ -71,7 +71,6 @@ double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
 };
 
 // T2K CC1pi+ helper functions
-// MOVE TO T2KUtils! CW
 //
 //********************************************************************
 // Returns the angle between q3 and the pion defined in Raquel's CC1pi+ on CH
@@ -100,7 +99,6 @@ double FitUtils::thq3pi_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return th_q3_pi;
 }
 
-// MOVE TO T2KUtils! CW
 //********************************************************************
 // Returns the q3 defined in Raquel's CC1pi+ on CH paper
 // Uses "MiniBooNE formula" for Enu
@@ -122,7 +120,7 @@ double FitUtils::q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return q3;
 }
 
-// MOVE TO T2KUtils! CW
+
 //********************************************************************
 // Returns the W reconstruction from Raquel CC1pi+ CH thesis
 // Uses the MiniBooNE formula Enu
@@ -141,7 +139,6 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
   return wrec;
 }
 
-// MOVE TO MINERvA Utils! CW
 //********************************************************
 double FitUtils::ProtonQ2QErec(double pE, double binding) {
   //********************************************************
