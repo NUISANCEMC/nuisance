@@ -86,7 +86,7 @@ void T2K_CC1pip_CH_XSec_1DWrec_nu::SetCovarMatrix(std::string fileLocation) {
 
   TDecompChol tempMat = TDecompChol(*this->covar);
   this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  *this->covar *= 1E-38*1E-38;
+  //  *this->covar *= 1E-38*1E-38;
 
   return;
 };
