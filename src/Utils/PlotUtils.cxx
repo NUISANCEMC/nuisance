@@ -319,12 +319,23 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, dou
   eventhist->Scale(1.0/fFluxHist->Integral());
   fFluxHist->Scale(1.0/fFluxHist->Integral());
 
+  // Do interpolation for 2D plots?
+  // fFluxHist = PlotUtils::InterpolateFineHistogram(fFluxHist,100,"width");
+  // eventhist = PlotUtils::InterpolateFineHistogram(eventhist,100,"width");
+
+  // eventhist->Scale(1.0/fFluxHist->Integral());
+  // fFluxHist->Scale(1.0/fFluxHist->Integral());
+
   // Scale fMCHist by eventhist integral          
   fMCHist->Scale( eventhist->Integral(1,eventhist->GetNbinsX()+1) );
 
   // Now Get a flux PDF assuming X axis is Enu
   TH1D* pdfflux = (TH1D*) fMCHist->ProjectionX()->Clone();
+  //  pdfflux->Write( (std::string(fMCHist->GetName()) + "_PROJX").c_str());
   pdfflux->Reset();
+
+  // Awful MiniBooNE Check for the time being
+  bool ismb = std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
 
   for (int i = 0; i < pdfflux->GetNbinsX(); i++){
 
@@ -333,6 +344,14 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, dou
     double Mc = pdfflux->GetXaxis()->GetBinCenter(i+1);
     double Mw = pdfflux->GetBinWidth(i+1);
     double fluxint = 0.0;
+
+    // Scaling to match flux for MB
+    if (ismb){
+      Ml /= 1.E3;
+      Mh /= 1.E3;
+      Mc /= 1.E3;
+      Mw /= 1.E3;
+    }
 
     for (int j = 0; j < fFluxHist->GetNbinsX(); j++){
 
@@ -353,8 +372,8 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, dou
     pdfflux->SetBinContent(i+1, fluxint);
   }
 
-  for (int i = 0; i < fMCHist->GetNbinsX()+1; i++) {
-    for (int j = 0; j < fMCHist->GetNbinsY()+1; j++){ 
+  for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
+    for (int j = 0; j < fMCHist->GetNbinsY(); j++){ 
 
       if (pdfflux->GetBinContent(i+1) == 0.0) continue;
 
