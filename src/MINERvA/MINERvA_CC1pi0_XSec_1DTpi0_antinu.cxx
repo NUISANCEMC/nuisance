@@ -32,7 +32,6 @@ MINERvA_CC1pi0_XSec_1DTpi0_antinu::MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string
   EnuMax = 10;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi.txt");
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-kinetic-energy.csv");
 
   // Error is given as percentage of cross-section
@@ -41,7 +40,6 @@ MINERvA_CC1pi0_XSec_1DTpi0_antinu::MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
   }
 
-  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_tpi_corr.txt", fDataHist->GetNbinsX());
   this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-kinetic-energy.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();

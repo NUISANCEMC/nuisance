@@ -24,30 +24,28 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-    fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
-   fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
+  fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
+  fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
-     fIsDiag = true;
-    fNormError = 0.15;
-    // No hadronic mass cut on old publication
-    hadMassCut = 99999;
+  fIsDiag = true;
+  fNormError = 0.15;
+  // No hadronic mass cut on old publication
+  hadMassCut = 99999;
   fAllowedTypes += "NEW";
-
-  // THIS DATASET IS THE DODGY ONE 
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
+  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
 
-    // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
-    // Please change when MINERvA releases new data!
-    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
-    }
+  // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
+  // Please change when MINERvA releases new data!
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+  }
 
-    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fFullCovar);
+  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
+  covar     = StatUtils::GetInvert(fFullCovar);
 
   this->SetupDefaultHist();
 
@@ -80,6 +78,6 @@ void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {
 
 //********************************************************************
 bool MINERvA_CC1pi0_XSec_1Dppi0_antinu::isSignal(FitEvent *event) {
-//********************************************************************
+  //********************************************************************
   return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
 }
