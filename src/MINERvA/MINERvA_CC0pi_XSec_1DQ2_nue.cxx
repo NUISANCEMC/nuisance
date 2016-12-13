@@ -45,6 +45,11 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
 
+  // Covariance is given in 1E-40, convert to 1E-38
+  *fDecomp *= (1.0 / 10.0);
+  *fFullCovar *= (1.0 / 100.0);
+  *covar *= (100.0);
+
   // Setup Default MC Hists
   SetupDefaultHist();
 

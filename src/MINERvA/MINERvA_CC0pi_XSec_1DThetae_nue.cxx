@@ -45,6 +45,11 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(std::string inp
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
 
+  // Convert covar from 1E-40 to 1E-38
+  *fDecomp *= (1.0 / 10.0);
+  *fFullCovar *= (1.0 / 100.0);
+  *covar *= (100.0);
+
   // Setup Default MC Hists
   SetupDefaultHist();
 
