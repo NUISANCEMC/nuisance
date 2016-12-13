@@ -108,10 +108,10 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
   }
   fInputType = InputUtils::ParseInputType(file_descriptor[0]);
 
-  fFluxHist      = fInput->GetFluxHistogram();
-  fEventHist     = fInput->GetEventHistogram();
-  fXSecHist      = fInput->GetXSecHistogram();
-  fNEvents       = fInput->GetNEvents();
+  fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
+  fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
+  fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
+  fNEvents = fInput->GetNEvents();
 
   fInputFileName = file_descriptor[1];
   if (EnuMin == 0 && EnuMax == 1.E5) {
