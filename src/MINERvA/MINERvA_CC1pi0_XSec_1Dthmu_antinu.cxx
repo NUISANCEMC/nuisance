@@ -31,7 +31,6 @@ MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(std::string
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_thmu.txt");
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-muon-angle.csv");
 
   // Error is given as percentage of cross-section
@@ -40,7 +39,6 @@ MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(std::string
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
   }
 
-  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/cc1pi0_thmu_corr.txt", fDataHist->GetNbinsX());
   this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-muon-angle.csv", fDataHist->GetNbinsX());
 
   this->SetupDefaultHist();
