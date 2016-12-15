@@ -89,6 +89,20 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, s
   this->SetDataValues( basedir + datafilename );
   this->SetCovarMatrixFromText( basedir + covarfilename, 8 );
 
+  // Quick Fix for Correl/Covar Issues only for old data                                                                                                                                              
+  if (!isFluxFix){
+    fCorrel = (TMatrixDSym*)fFullCovar->Clone();
+    delete fFullCovar;
+    delete covar;
+    delete fDecomp;
+    fFullCovar = StatUtils::GetCovarFromCorrel(fCorrel,fDataHist);
+    (*fFullCovar) *= 1E76;
+  }
+
+  covar = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
+
+
   // Setup Default MC Histograms
   this->SetupDefaultHist();
 
