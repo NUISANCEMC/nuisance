@@ -278,8 +278,12 @@ void FitEvent::SetEventAddress(NtpMCEventRecord** tempevent) {
 
 //***************************************************
 void FitEvent::GENIEKinematics() {
-  //***************************************************
+//***************************************************
   ResetEvent();
+
+  if (!genie_event) return;
+  if (!genie_event->event) return;
+
   genie_record = static_cast<GHepRecord*>(genie_event->event);
 
   // Extra Check for MEC
@@ -408,6 +412,8 @@ void FitEvent::GENIEKinematics() {
     fParticlePDG[fNParticles] = p->Pdg();
 
     fNParticles++;
+
+    if (fNParticles == kMaxParticles) break;
   }
 
   OrderStack();
