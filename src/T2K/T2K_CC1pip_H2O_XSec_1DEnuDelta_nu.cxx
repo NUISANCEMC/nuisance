@@ -1,89 +1,55 @@
 #include "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h"
 
-// The constructor
-T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+// The derived neutrino energy assuming a Delta resonance and a nucleon at rest; so only requires the outgoing muon to derive (and information on the angle between the muon and the neutrino)
+// Please beware that this is NOT THE "TRUE" NEUTRINO ENERGY; IT'S A PROXY FOR THE TRUE NEUTRINO ENERGY
+// Also, this is flux-integrated cross-section, not flux averaged
 
+//******************************************************************** 
+T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+//******************************************************************** 
   measurementName = "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu";
   plotTitles = "; E^{#Delta}_{#nu} (GeV); #sigma(E^{#Delta}_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
-  isDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/H2O/T2K_CC1pi_FGD2_water3.root");
-  this->SetCovarMatrix(std::string(std::getenv("EXT_FIT"))+"/data/T2K/CC1pip/H2O/T2K_CC1pi_FGD2_water3.root");
+  // Data comes in ROOT file
+  // hResultTot is cross-section with all errors
+  // hResultStat is cross-section with stats-only errors
+  // hTruthNEUT is the NEUT cross-section given by experimenter
+  // hTruthGENIE is the GENIE cross-section given by experimenter
+  SetDataFromFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root","EnuRec_Delta/hResultTot");
+  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "EnuRec_Delta/TotalCovariance");
 
-  this->SetupDefaultHist();
+  SetupDefaultHist();
 
-  this->scaleFactor = this->eventHist->Integral("width")*1E-38/double(nevents);
+  fScaleFactor = fEventHist->Integral("width")*1E-38/double(fNEvents);
 };
 
-void T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::SetDataValues(std::string fileLocation) {
-  std::cout << "Reading: " << this->measurementName << "\nData: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
 
-  dataHist = (TH1D*)(dataFile->Get("EnuRec_Delta/hResultTot"))->Clone();
-
-  dataHist->SetDirectory(0); //should disassociate dataHist with dataFile
-  dataHist->SetNameTitle((measurementName+"_data").c_str(), (measurementName+"_MC"+plotTitles).c_str());
-
-  dataFile->Close();
-};
-
-void T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::SetCovarMatrix(std::string fileLocation) {
-  std::cout << "Covariance: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
-
-  TH2D *covarMatrix = (TH2D*)(dataFile->Get("EnuRec_Delta/TotalCovariance"))->Clone();
-
-  int nBinsX = covarMatrix->GetXaxis()->GetNbins();
-  int nBinsY = covarMatrix->GetYaxis()->GetNbins();
-
-  if ((nBinsX != nBinsY)) std::cerr << "covariance matrix not square!" << std::endl;
-  this->covar = new TMatrixDSym(nBinsX);
-  this->fullcovar = new TMatrixDSym(nBinsX);
-
-  for (int i = 1; i < nBinsX+1; i++) {
-    for (int j = 1; j < nBinsY+1; j++) {
-      (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i, j)*1E78;
-      (*this->fullcovar)(i-1, j-1) = covarMatrix->GetBinContent(i, j)*1E78;
-    }
-  } //should now have set covariance, I hope
-
-  TDecompChol tempMat = TDecompChol(*this->covar);
-  this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  *this->covar *= 1E78*1E-76; // 1E-76 comes from StatUtils::GetChi2FromCov
-
-  return;
-};
-
+//******************************************************************** 
+// Find the muon whows kinematics we use to derive the "neutrino energy"
 void T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::FillEventVariables(FitEvent *event) {
+//******************************************************************** 
 
-  TLorentzVector Pnu = (event->PartInfo(0))->fP;
-  TLorentzVector Ppip;
-  TLorentzVector Pmu;
+  // Need to make sure there's a muon
+  if (event->NumFSParticle(13) == 0) return;
 
-  // Loop over the particle stack
-  for (int j = 2; j < event->Npart(); ++j){
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fStatus != 0) continue;
-    int PID = (event->PartInfo(j))->fPID;
-    if (PID == 211) {
-      Ppip = event->PartInfo(j)->fP;
-    } else if (PID == 13) {
-      Pmu = (event->PartInfo(j))->fP;  
-    }
-  }
+  // Get the incoming neutrino
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
+  // Get the muon
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double Enu = FitUtils::EnuCC1piprecDelta(Pnu, Pmu);
 
-  this->X_VAR = Enu;
+  fXVar = Enu;
 
   return;
 };
 
 //******************************************************************** 
+// Beware: The H2O analysis has different signal definition to the CH analysis!
 bool T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::isSignal(FitEvent *event) {
 //******************************************************************** 
-// Warning: The H2O analysis has different signal definition to the CH analysis!
   return SignalDef::isCC1pip_T2K_H2O(event, EnuMin, EnuMax);
 }
