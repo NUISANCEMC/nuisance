@@ -19,11 +19,11 @@
 
 #include "MiniBooNE_CCQE_XSec_2DTcos_nu.h"
 
-//******************************************************************** 
+//********************************************************************
 MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, std::string inputfile,
 							     FitWeight *rw, std::string type,
 							     std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   // Measurement Details
   fName = name;
@@ -39,6 +39,10 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
   fPlotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
   ccqelike = name.find("CCQELike") != std::string::npos;
 
+  if(ccqelike){
+    fMeasurementSpeciesType = kNumuWithWrongSignMeasurement;
+  }
+
   // Define Bin Edges
   fNDataPointsX = 19;
   fNDataPointsY = 21;
@@ -49,38 +53,36 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
 
   // Setup Data Plots
   if (!ccqelike){
-    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_con.txt", 1E-41, 
+    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_con.txt", 1E-41,
 		  FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_err.txt", 1E-42);
   } else {
-     SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_like.txt", 1E-41, 
+     SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_like.txt", 1E-41,
 		   FitPar::GetDataBase()+"/MiniBooNE/ccqe/aski_err.txt",  1E-42);
   }
   SetupDefaultHist();
-  
+
   // Setup Covariances
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
   fIsDiag = true;
 
    // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/6./TotalIntegratedFlux(); 
-  
+  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/6./TotalIntegratedFlux();
+
 };
 
-//******************************************************************** 
+//********************************************************************
 void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
-//******************************************************************** 
-  
-  if (event->NumFSParticle(13) == 0 &&
-      event->NumFSParticle(-13)== 0)
+//********************************************************************
+
+  if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
     return;
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
   // The highest momentum mu+/mu-. The isSignal definition should make sure we only
-  // accept events we want, so no need to do an additional check here.  
-  int pdgs[] = {13, -13};
-  TLorentzVector Pmu = event->GetHMFSParticle(GeneralUtils::makeVector(pdgs))->fP;
+  // accept events we want, so no need to do an additional check here.
+  TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
 
   // Now find the kinematic values and fill the histogram
   Ekmu     = Pmu.E()/1000.0 - PhysConst::mass_muon;
@@ -93,9 +95,9 @@ void  MiniBooNE_CCQE_XSec_2DTcos_nu::FillEventVariables(FitEvent *event){
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CCQE_XSec_2DTcos_nu::isSignal(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
 
   // If CC0pi, include both charges
   if (ccqelike) {

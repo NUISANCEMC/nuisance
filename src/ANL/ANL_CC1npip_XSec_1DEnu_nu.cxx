@@ -50,14 +50,14 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double Enu     = -1.0;
     
-  if (hadMass < 1400) Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) Enu = Pnu.E()/1.E3;
   fXVar = Enu;
 
   return;

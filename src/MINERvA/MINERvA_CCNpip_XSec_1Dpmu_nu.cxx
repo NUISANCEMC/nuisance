@@ -21,15 +21,16 @@
 
 #include "MINERvA_CCNpip_XSec_1Dpmu_nu.h"
 
+//********************************************************************
 // The constructor
 MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
+//********************************************************************
 
   fName = "MINERvA_CCNpip_XSec_1Dpmu_nu_2016";
   fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  fAllowedTypes += "NEW";
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
@@ -43,7 +44,6 @@ MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
   }
 
-  //this->SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016_upd/ccnpip_pmu_corr.txt", fDataHist->GetNbinsX());
   // Correlation matrix is given
   this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-muon-momentum.csv", fDataHist->GetNbinsX());
 
@@ -52,22 +52,15 @@ MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile
   fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
+//********************************************************************
+// Very simple event variable fill
 void MINERvA_CCNpip_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
+//********************************************************************
 
-  if (event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
-
-  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  if (event->NumFSParticle(13) == 0) return;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double pmu = -999;
-
-  if (hadMass > 100 && hadMass < 1800) {
-    pmu = FitUtils::p(Pmu);
-  }
+  double pmu = FitUtils::p(Pmu);
 
   fXVar = pmu;
 
@@ -75,8 +68,8 @@ void MINERvA_CCNpip_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
 };
 
 //********************************************************************
+// The false refers to that this cross-section uses the full phase space
 bool MINERvA_CCNpip_XSec_1Dpmu_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  int dummy;
-  return SignalDef::isCCNpip_MINERvA(event, dummy, EnuMin, EnuMax, false);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, false);
 }

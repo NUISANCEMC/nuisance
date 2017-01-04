@@ -23,7 +23,7 @@
 #include "TLorentzVector.h"
 
 struct StdHepReader {
-public:
+ public:
   const static int kStdHepIdxPx = 0;
   const static int kStdHepIdxPy = 1;
   const static int kStdHepIdxPz = 2;
@@ -57,8 +57,7 @@ public:
 };
 
 struct GiBUUStdHepReader : public StdHepReader {
-
-  GiBUUStdHepReader() : StdHepReader () {};
+  GiBUUStdHepReader() : StdHepReader(){};
 
   ///\brief NEUT equivalent reaction code.
   /// CC:
@@ -69,16 +68,17 @@ struct GiBUUStdHepReader : public StdHepReader {
   /// * 12 : Delta+ (-12 : Delta0 for nubar)
   /// * 21 : Multi pion production
   /// * 26 : DIS
-  /// * 27 : Higher resonance, charge: -1
-  /// * 28 : Higher resonance, charge: 0
-  /// * 29 : Higher resonance, charge: +1
-  /// * 30 : Higher resonance, charge: +2
+  /// * 4 : Higher resonance, charge: -1
+  /// * 5 : Higher resonance, charge: 0
+  /// * 6 : Higher resonance, charge: +1
+  /// * 7 : Higher resonance, charge: +2
   ///
   /// NC:
   /// * 30 : Single pion background (non-resonant)
   /// * 31 : Delta0
   /// * 32 : Delta+
   /// * 41 : Multi pion production
+  /// * 42 : 2p2h
   /// * 46 : DIS
   /// * 47 : Higher resonance, charge: -1
   /// * 48 : Higher resonance, charge: 0
@@ -86,9 +86,23 @@ struct GiBUUStdHepReader : public StdHepReader {
   /// * 50 : Higher resonance, charge: +2
   /// * 51 : NCEL proton-target
   /// * 52 : NCEL neutron-target
+  ///
   Int_t GiBUU2NeutCode;
   ///\brief The total XSec weighting that should be applied to this event.
   Double_t EvtWght;
+
+  ///\brief Weighting which takes account of multiple input numu species.
+  ///
+  /// Defined such that W_numu + W_numubar = 1
+  Double_t SpeciesWght_numu;
+  ///\brief Weighting which takes account of multiple input nue species.
+  ///
+  /// Defined such that W_nue + W_nuebar = 1
+  Double_t SpeciesWght_nue;
+  ///\brief Weighting which takes account of multiple input neutrino species.
+  ///
+  /// Defined such that \Sum_species W_species = 1
+  Double_t SpeciesWght;
 
   bool SetBranchAddresses(TChain*);
 };

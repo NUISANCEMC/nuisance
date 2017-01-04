@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
   * D.Day et al, "Study of \nud charged-current two-pion production in the threshold region", Physical Review D, Volume 28, Number 11, 1 December 1983 \n
   * Derrick, Musgrave, Ammar, Day, Kafka and Mann, "Two- and three-pion productin by \nu\mud recations nears threshold: The implication for nucleon-decay experiments", Physical Review D, Vol 30, Number 7, 1 October 1984
 */
@@ -42,7 +42,7 @@ ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(std::string i
   covar     = StatUtils::GetInvert(fFullCovar);
 
   // Need to multiply the data by a factor because of the way the data is scanned (e.g. 1E-38)
-  fDataHist->Scale(1.E-41);
+  //fDataHist->Scale(1.E-41);
 
   this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
@@ -64,7 +64,7 @@ void ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 // Signal asks for 1pi+, 1pi0, 1mu-, 1p
 bool ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   int pdgs[] = {13, 211, 111, 2212};
-  return SignalDef::isCCWithFS(event, 14, GeneralUtils::makeVector(pdgs),
+  return SignalDef::isCCWithFS(event, 14, pdgs,
                                EnuMin, EnuMax);
 }
 
@@ -82,7 +82,7 @@ void ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::FillHistograms() {
 
 
 void ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu::ScaleEvents() {
-  
+
   PlotUtils::FluxUnfoldedScaling(mcHist, fFluxHist);
   PlotUtils::FluxUnfoldedScaling(mcFine, fFluxHist);
 

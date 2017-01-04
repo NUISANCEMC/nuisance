@@ -48,8 +48,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.)); // NEUT
+  this->fScaleFactor = (this->fEventHist->Integral("width")*(2.0/1.0)*1E-38/(fNEvents+0.)); 
     
 };
 
@@ -89,20 +88,4 @@ void BNL_CCQE_XSec_1DEnu_nu::FillHistograms(){
 
   Measurement1D::FillHistograms();
 }
-
-
-//********************************************************************
-/// @details Perform flux unfolded scaling
-void BNL_CCQE_XSec_1DEnu_nu::ScaleEvents(){
-//******************************************************************** 
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
-  
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-
-};
 

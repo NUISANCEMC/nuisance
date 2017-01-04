@@ -48,11 +48,13 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   // Setup Default MC Hists
   SetupDefaultHist();
 
-  //  fFullCovar *= 10.0;
-  //  covar      *= 1.0/10.0;
+  // Convert covar from 1E-40 to 1E-38
+  *fDecomp *= (1.0 / 10.0);
+  *fFullCovar *= (1.0 / 100.0);
+  *covar *= (100.0);
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*100.0*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
+  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
 
 };
 

@@ -40,7 +40,8 @@ FitWeight::FitWeight(std::string name, std::string inputfile) {
   fSplineHead = NULL;
 
   this->fName = name;
-
+  fSilenceWeightCalc = false;
+  
   // If file is a root file read it
   if (inputfile.find(".root") != std::string::npos) {
     // Open File
@@ -77,9 +78,11 @@ FitWeight::FitWeight(std::string name) {
   this->fIsUsingT2K = false;
   fIsUsingModeNorm = false;
 
-  this->fSetAbsTwk = true;
+  this->fSetAbsTwk = FitPar::Config().GetParB("params.setabstwk");
 
   fSplineHead = NULL;
+
+  fSilenceWeightCalc = false;
 
   this->fName = name;
   LOG(FIT) << "Creating FitWeight norm enum = " << this->fNormEnum
@@ -165,6 +168,10 @@ unsigned int FitWeight::GetDialPos(std::string name) {
 void FitWeight::IncludeDial(std::string name, int type, double startval) {
 //********************************************************************
   
+  // Create pointer to current ROOT directory
+  TDirectory* olddir = gDirectory;
+  
+  // Get Dial Enumerations
   int this_enum = this->GetDialEnum(name, type);
   int rw_enum = this->GetRWEnum(this_enum);
 
@@ -271,6 +278,9 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
   // Set Values
   this->SetDialValue(this_enum, startval);
 
+  // Fix Bug by returning to starting directory for this function
+  olddir->cd();
+
   return;
 }
 
@@ -366,6 +376,10 @@ void FitWeight::SetDialValue(int this_enum, double val) {
 void FitWeight::Reconfigure(bool silent) {
   //********************************************************************
 
+  fSilenceWeightCalc = FitPar::Config().GetParB("params.silentweighting");
+  this->fSetAbsTwk = FitPar::Config().GetParB("params.setabstwk");
+
+  
   if ((fIsUsingNeut or fIsUsingNIWG) and fIsUsingT2K) {
     ERR(WRN) << " Make sure no correlated or overlapping dials are being used "
                 "between T2KRW and NEUT/NIWG RW"
@@ -433,7 +447,7 @@ void FitWeight::PrintState() {
       
     } else {
       (void)val;
-      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. ";
+      LOG(MIN) << "-> " << std::setw(2) << i << ". " << std::setw(10) << type + "_par. " << std::endl;
       LOG(MIN) << std::setw(40) << std::left << fDialNames.at(i) << std::setw(5)
 	       << " = " << fDialValues.at(i) << " " << fDialUnits.at(i) << std::endl;
     }
@@ -476,6 +490,11 @@ std::string FitWeight::GetDialType(int this_enum) {
 //********************************************************************
 double FitWeight::CalcWeight(BaseFitEvt* evt) {
 //********************************************************************
+
+  // Optional cout suppression
+  if (fSilenceWeightCalc){
+    StopTalking();
+  }
 
   double rw_weight = 1.0;
 
@@ -548,6 +567,9 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
   }
 
   evt->Weight = rw_weight;
+
+  // Optional cout suppression
+  if (fSilenceWeightCalc) StartTalking();
   return rw_weight;
 }
 
@@ -561,6 +583,7 @@ void FitWeight::SetupNeutRW() {
   fIsNeutChanged = true;
 
   // Create RW Engine
+  StopTalking();
   fNeutRW = new neut::rew::NReWeight();
 
   // get list of vetoed calc engines (just for debug really)
@@ -599,6 +622,7 @@ void FitWeight::SetupNeutRW() {
   if (nucl_piless)
     fNeutRW->AdoptWghtCalc("nucl_piless", new neut::rew::NReWeightNuclPiless);
   fNeutRW->Reconfigure();
+  StartTalking();
 }
 #endif
 
@@ -622,6 +646,7 @@ void FitWeight::SetupNIWGRW() {
   fIsNIWGChanged = true;
 
   // Create RW Engine
+  StopTalking();
   fNIWGRW = new niwg::rew::NIWGReWeight();
 
   // Get List of Veto Calcs (For Debugging)
@@ -660,6 +685,7 @@ void FitWeight::SetupNIWGRW() {
                            new niwg::rew::NIWGReWeightHadronMultSwitch);
 
   fNIWGRW->Reconfigure();
+  StartTalking();
 }
 #endif
 

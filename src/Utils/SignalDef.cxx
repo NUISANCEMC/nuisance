@@ -28,9 +28,11 @@ bool SignalDef::isCCINC(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   if (!event->HasISParticle(nuPDG)) return false;
 
   // Check that it's within the allowed range if set
-  if (EnuMin != EnuMax)
-    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000))
+  if (EnuMin != EnuMax) {
+    if (!SignalDef::IsEnuInRange(event, EnuMin*1000, EnuMax*1000)) {
       return false;
+    }
+  }
 
   // Check that the charged lepton we expect has been produced
   if (!event->HasFSParticle(nuPDG > 0 ? nuPDG-1 : nuPDG+1)) return false;
@@ -67,6 +69,21 @@ bool SignalDef::isCC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax
   return true;
 }
 
+bool SignalDef::isNC0pi(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check it's NCINC
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Veto event with mesons
+  if (event->NumFSMesons() != 0) return false;
+
+  // Veto events with a charged lepton
+  if (event->NumFSLeptons() != 0) return false;
+
+  return true;
+}
+
+
 bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
   // Check if it's CCINC
@@ -77,6 +94,18 @@ bool SignalDef::isCCQE(FitEvent *event, int nuPDG, double EnuMin, double EnuMax)
 
   return true;
 }
+
+bool SignalDef::isNCEL(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
+
+  // Check if it's NCINC
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  // Require modes 51/52 (NCEL)
+  if (abs(event->Mode) != 51 && abs(event->Mode) != 52) return false;
+
+  return true;
+}
+
 
 bool SignalDef::isCCQELike(FitEvent *event, int nuPDG, double EnuMin, double EnuMax){
 
@@ -142,8 +171,7 @@ bool SignalDef::isCCWithFS(FitEvent *event, int nuPDG, std::vector<int> pdgs,
   if ((int)pdgs.size() != event->NumFSParticle()) return false;
 
   // For every particle in the list, check the number in the FS
-  for (std::vector<int>::iterator it = pdgs.begin();
-       it != pdgs.end(); ++it){
+  for (std::vector<int>::iterator it = pdgs.begin(); it != pdgs.end(); ++it){
     // Check how many times this pdg is in the vector
     int nEntries = std::count (pdgs.begin(), pdgs.end(), *it);
     if (event->NumFSParticle(*it) != nEntries)
@@ -199,6 +227,21 @@ bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
   if (nFS != 2) return false;
   return true;
 }
+
+bool SignalDef::isNCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, double EnuMax){
+
+  // Check this is an NCINC event
+  if (!SignalDef::isNCINC(event, nuPDG, EnuMin, EnuMax)) return false;
+
+  int nLepton = event->NumFSParticle(nuPDG);
+  int nPion   = event->NumFSParticle(piPDG);
+  int nFS     = event->NumFSParticle();
+
+  if (nLepton != 1 || nPion != 1) return false;
+  if (nFS != 2) return false;
+  return true;
+}
+
 
 bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 

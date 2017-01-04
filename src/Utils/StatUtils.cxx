@@ -842,9 +842,11 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat){
   
   TDecompChol LU = TDecompChol(*new_mat);
   LU.Decompose();
-  new_mat = new TMatrixDSym(nrows, LU.GetU().GetMatrixArray(), "");
+  delete new_mat;
 
-  return new_mat;
+  TMatrixDSym* dec_mat = new TMatrixDSym(nrows, LU.GetU().GetMatrixArray(), "");
+
+  return dec_mat;
 }
 
 
@@ -1043,4 +1045,16 @@ TH1I* StatUtils::MapToMask(TH2I* hist, TH2I* map){
 }
 
 
+TMatrixDSym* StatUtils::GetCovarFromCorrel(TMatrixDSym* correl, TH1D* data){
 
+  int nbins = correl->GetNrows();
+  TMatrixDSym* covar = new TMatrixDSym(nbins);
+
+  for (int i = 0; i < nbins; i++){
+    for (int j = 0; j < nbins; j++){
+      (*covar)(i,j) = (*correl)(i,j) * data->GetBinError(i+1) * data->GetBinError(j+1);
+    }
+  }
+
+  return covar;
+}

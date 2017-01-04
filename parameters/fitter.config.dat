@@ -15,6 +15,7 @@
 # 5 Every Event print out (SHOUT)
 # -1 DEBUGGING
 config verbosity    4
+config VERBOSITY 4
 
 # ERROR goes from
 # 0 NONE
@@ -35,6 +36,7 @@ config input.MAXEVENTS -1
 # EventManager enables us to only loop number of events once for multiple projections of the same measurements
 # e.g. MiniBooNE CC1pi+ Q2 and MiniBooNE CC1pi+ Tmu would ordinarily require 2 reconfigures, but with this enabled it requires only one
 config input.eventmanager 0
+config EventManager 0
 
 # Event Directories 
 # Can setup default directories and use @EVENT_DIR/path to link to it
@@ -58,10 +60,13 @@ config cachesize  0
 # ######################################################
 
 # Set absolute twkdial for parameters
-config params.setabstwk 1
+config params.setabstwk 0
 
 # Convert Dials in output statements using dial conversion card
 config convert_dials 0
+
+# Make RW Calculations be quiet
+condif params.silentweighting 0
 
 # Vetos can be used to specify RW dials NOT to be loaded in
 # Useful if one specific one has an issue
@@ -84,7 +89,7 @@ config saveprefit 0
 # See src/FitBase/Measurement1D::Write for more info   
 #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP
 #config drawopts DATA/MC
-config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/CANVPDG/CANVMC
+config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC
 
 # Save the shape scaling applied with option SHAPE into the main MC hist
 config saveshapescaling 0
@@ -94,6 +99,8 @@ config linecolour 1
 config linestyle 1
 config linewidth 1
 
+# For GenericFlux
+config isLiteMode 0
 
 # Statistical Options
 # ######################################################
@@ -116,11 +123,12 @@ config minimizer.lowstatevents 25000
 # ######################################################
 
 # For -f ErrorBands creates error bands for given measurements 
-# How many throws do we want
-config error_throws 200
+# How many throws do we want (The higher the better precision)
+config error_throws 250
 
 # Are we throwing uniform or according to Gaussian?
-config error_uniform 1
+# Only use uniform if wanting to study the limits of a dial.
+config error_uniform  0
 
 
 # Other Individual Case Configs 

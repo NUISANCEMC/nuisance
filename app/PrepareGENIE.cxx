@@ -120,6 +120,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
     // Clear Event
     genientpl->Clear();
+
+    if (i % (nevt/20) == 0){
+        LOG(FIT) << "Processed " << i <<  "/" << nevt << " GENIE events." << std::endl;
+    }
   }
   LOG(FIT) << "Processed all events" << std::endl;
 

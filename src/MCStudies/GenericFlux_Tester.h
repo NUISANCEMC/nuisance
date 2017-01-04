@@ -62,8 +62,10 @@ public:
 
  private:
 
-  TTree* eventVariables;
+  // Lighter flat trees that don't include vectors
+  bool liteMode;
 
+  TTree* eventVariables;
 
   TLorentzVector *nu_4mom;
   TLorentzVector *pmu;
@@ -161,38 +163,22 @@ public:
   float InputWeight;
   float FluxWeight;
 
-  bool flagCCQE_full;
-  bool flagCCQE_rest;
-  bool flagCCQEBar_full;
-  bool flagCCQEBar_rest;
-
-  bool flagCC1pip_MiniBooNE;
-  bool flagCC1pip_MINERvA_full;
-  bool flagCC1pip_MINERvA_rest;
-  bool flagCCNpip_MINERvA_full;
-  bool flagCCNpip_MINERvA_rest;
-  bool flagCC1pip_T2K_Michel;
-  bool flagCC1pip_T2K;
-
-  bool flagCC1pi0_MiniBooNE;
-  bool flagCC1pi0Bar_MINERvA;
-
-  bool flagNC1pi0_MiniBooNE;
-  bool flagNC1pi0Bar_MiniBooNE;
-
-  bool flagCCcoh_MINERvA;
-  bool flagCCcohBar_MINERvA;
-
-  bool flagCCQEnumu_MINERvA_full;
-  bool flagCCQEnumubar_MINERvA_full;
-  bool flagCCQEnumu_MINERvA_rest;
-  bool flagCCQEnumubar_MINERvA_rest;
-
-  bool flagCCincLowRecoil_MINERvA;
-  bool flagCCincLowRecoil_MINERvA_reqhad;
-  bool flagCCQELike_MiniBooNE;
-  bool flagCCQE_MiniBooNE;
-  bool flagCCQEBar_MiniBooNE;
+  // Generic signal flags
+  bool flagCCINC;
+  bool flagNCINC;
+  bool flagCCQE;
+  bool flagCC0pi;
+  bool flagCCQELike;
+  bool flagNCEL;
+  bool flagNC0pi;
+  bool flagCCcoh;
+  bool flagNCcoh;
+  bool flagCC1pip;
+  bool flagNC1pip;
+  bool flagCC1pim;
+  bool flagNC1pim;
+  bool flagCC1pi0;
+  bool flagNC1pi0;
 
   float xsecScaling;
 

@@ -41,6 +41,16 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
   SetupDefaultHist();
 
+  // Quick Fix for Correl/Covar Issues 
+  fCorrel = (TMatrixDSym*)fFullCovar->Clone();
+  delete fFullCovar;
+  delete covar;
+  delete fDecomp;
+  fFullCovar = StatUtils::GetCovarFromCorrel(fCorrel,fDataHist);
+  (*fFullCovar) *= 1E76;
+  covar = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
+
   // Setup Coplanar Hist
   fCoplanarMCHist   = NULL;
   fCoplanarDataHist = NULL;

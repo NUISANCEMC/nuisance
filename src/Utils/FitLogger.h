@@ -108,6 +108,11 @@ void StopTalking();
 
 void StartTalking();
 
+extern "C" {
+  void shhpythiaitokay_(void);
+  void canihazpythia_(void);
+}
+
 /*! @} */
 #endif // FILELOGGER_HPP
 

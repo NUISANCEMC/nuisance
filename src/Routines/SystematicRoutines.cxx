@@ -97,9 +97,10 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
     throw;
   }
 
-  if (fOutputFile.empty()){
-    ERR(FTL) << "WARNING: output file not specified." << std::endl;
-    ERR(FTL) << "Using cardfile.root" << std::endl;
+  if (fCardFile == fOutputFile) {
+    ERR(WRN) << "WARNING: output file and card file are the same file, "
+                "writing: "
+             << fCardFile << ".root" << std::endl;
     fOutputFile = fCardFile + ".root";
   }
 
@@ -193,8 +194,8 @@ void SystematicRoutines::ReadCard(std::string cardfile){
     // Show line if bad to help user
     if (samstatus == kErrorStatus) {
       ERR(FTL) << "Bad Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << endl;
-      LOG(FIT) << line << endl;
+	       << " at line " << linecount << "!" << std::endl;
+      LOG(FIT) << line << std::endl;
       throw;
     }
   }
@@ -218,8 +219,8 @@ void SystematicRoutines::ReadCard(std::string cardfile){
     if (parstatus == kErrorStatus ||
 	fakstatus == kErrorStatus ){
       ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << endl;
-      LOG(FIT) << line << endl;
+	       << " at line " << linecount << "!" << std::endl;
+      LOG(FIT) << line << std::endl;
       throw;
     }
   }
@@ -269,14 +270,14 @@ int SystematicRoutines::ReadParameters(std::string parstring){
 
   // Check Type
   if (FitBase::ConvDialType(partype) == kUNKNOWN){
-    ERR(FTL) << "Unknown parameter type! " << partype << endl;
+    ERR(FTL) << "Unknown parameter type! " << partype << std::endl;
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
 
   // Check Parameter Name
   if (FitBase::GetDialEnum(partype, parname) == -1){
-    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << endl;
+    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << std::endl;
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
@@ -288,7 +289,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
 
   // Check for weirder inputs
   if (strvct.size() > 4 && strvct.size() < 6){
-    ERR(FTL) << "Provided incomplete limits for " << parname << endl;
+    ERR(FTL) << "Provided incomplete limits for " << parname << std::endl;
     std::cout << inputspec << std::endl;
     return kErrorStatus;
   }
@@ -320,7 +321,7 @@ int SystematicRoutines::ReadParameters(std::string parstring){
 
   // Check no repeat params
   if (std::find(fParams.begin(), fParams.end(), parname) != fParams.end()){
-    ERR(FTL) << "Duplicate parameter names given for " << parname << endl;
+    ERR(FTL) << "Duplicate parameter names given for " << parname << std::endl;
     throw;
   }
 
@@ -398,7 +399,13 @@ int SystematicRoutines::ReadFakeDataPars(std::string parstring){
 //******************************************
 int SystematicRoutines::ReadSamples(std::string samstring){
 //******************************************
-  std::string inputspec = "";
+  const static std::string inputspec =
+      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
+      "[norm]\nsample_name: Name "
+      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
+      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
+      "optional sample options.\nnorm: Additional, optional sample "
+      "normalisation factor.";
 
   // Check sample input
   if (samstring.find("sample") == std::string::npos)
@@ -422,6 +429,17 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   // Setup default inputs
   std::string samname = strvct[1];
   std::string samfile = strvct[2];
+
+  if (samfile == "FIX") {
+    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
+                "in the input card file. Line:\'"
+             << samstring << "\'" << std::endl;
+    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
+             << std::endl;
+
+    throw;
+  }
+
   std::string samtype = "DEFAULT";
   double      samnorm = 1.0;
 
@@ -436,7 +454,7 @@ int SystematicRoutines::ReadSamples(std::string samstring){
 
   // Check no repeat params
   if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()){
-    ERR(FTL) << "Duplicate samples given for " << samname << endl;
+    ERR(FTL) << "Duplicate samples given for " << samname << std::endl;
     throw;
   }
 
@@ -458,7 +476,7 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   // Print read in
   LOG(MIN) << "Read sample " << samname << " "
 	   << samfile << " " << samtype << " "
-	   << samnorm << endl;
+	   << samnorm << std::endl;
 
   // Tell reader its all good
   return kGoodStatus;
@@ -521,7 +539,7 @@ void SystematicRoutines::SetFakeData(){
 //*****************************************
 void SystematicRoutines::GetCovarFromFCN(){
 //*****************************************
-  LOG(FIT) << "Loading ParamPull objects from FCN to build covar" << endl;
+  LOG(FIT) << "Loading ParamPull objects from FCN to build covar" << std::endl;
 
   // Make helperstring
   std::ostringstream helperstr;
@@ -541,7 +559,7 @@ void SystematicRoutines::GetCovarFromFCN(){
       fInputCovar.push_back(pull->GetFullCovarMatrix());
       fInputDials.push_back(pull->GetDataHist());
 
-      LOG(FIT) << "Read ParamPull: " << pull->GetName() << " " << pull->GetType() << endl;
+      LOG(FIT) << "Read ParamPull: " << pull->GetName() << " " << pull->GetType() << std::endl;
     }
 
     TH1D dialhist = pull->GetDataHist();
@@ -554,24 +572,24 @@ void SystematicRoutines::GetCovarFromFCN(){
       dialthrowhandle[name] = pull->GetName();
 
       if (fCurVals.find(name) == fCurVals.end()){
-	ERR(WRN) << name << " Dial not found in throws, so adding that. " << endl;
 
-	// Add to Containers
-	fParams.push_back(name);
-	fCurVals[name]      = dialhist.GetBinContent(i+1);
-	fStartVals[name]    = dialhist.GetBinContent(i+1);
-	fMinVals[name]      = minhist.GetBinContent(i+1);
-	fMaxVals[name]      = maxhist.GetBinContent(i+1);
-	fStepVals[name]     = 1.0;
-	fFixVals[name]      = false;
-	fStartFixVals[name] = false;
-	fTypeVals[name]     = typehist.GetBinContent(i+1);
-	fStateVals[name]    = "FREE" + pull->GetType();
+      	// Add to Containers
+      	fParams.push_back(name);
+      	fCurVals[name]      = dialhist.GetBinContent(i+1);
+      	fStartVals[name]    = dialhist.GetBinContent(i+1);
+      	fMinVals[name]      = minhist.GetBinContent(i+1);
+      	fMaxVals[name]      = maxhist.GetBinContent(i+1);
+      	fStepVals[name]     = 1.0;
+      	fFixVals[name]      = false;
+      	fStartFixVals[name] = false;
+      	fTypeVals[name]     = typehist.GetBinContent(i+1);
+      	fStateVals[name]    = "FREE" + pull->GetType();
 
-	// Maker Helper
-	helperstr << FitBase::ConvDialType(fTypeVals[name]) << " "
-		  << name << " " << fMinVals[name] << " "
-		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name] << endl;
+      	// Maker Helper
+      	helperstr << std::string(16, ' ' ) << FitBase::ConvDialType(fTypeVals[name]) << " "
+      		  << name << " " << fMinVals[name] << " "
+      		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name]
+		  << std::endl;
       }
     }
   }
@@ -579,8 +597,8 @@ void SystematicRoutines::GetCovarFromFCN(){
   // Check if no throws given
   if (fInputThrows.empty()){
 
-    ERR(WRN) << "No covariances given to nuissyst" << endl;
-    ERR(WRN) << "Pushing back an uncorrelated gaussian throw error for each free parameter using step size" << endl;
+    ERR(WRN) << "No covariances given to nuissyst" << std::endl;
+    ERR(WRN) << "Pushing back an uncorrelated gaussian throw error for each free parameter using step size" << std::endl;
 
     for (UInt_t i = 0; i < fParams.size(); i++){
       std::string syst     = fParams[i];
@@ -603,10 +621,10 @@ void SystematicRoutines::GetCovarFromFCN(){
       fInputDials.push_back(pull->GetDataHist());
 
       // Print Whats added
-      ERR(WRN) << "Added ParamPull : " << name << " " << pullterm.str() << " " << type << endl;
+      ERR(WRN) << "Added ParamPull : " << name << " " << pullterm.str() << " " << type << std::endl;
 
       // Add helper string for future fits
-      helperstr << "covar " << name << " " << pullterm.str() << " " << type << endl;
+      helperstr << std::string(16, ' ' ) << "covar " << name << " " << pullterm.str() << " " << type << std::endl;
 
       // Keep Track of Throws
       dialthrowhandle[syst] = pull->GetName();
@@ -615,8 +633,9 @@ void SystematicRoutines::GetCovarFromFCN(){
 
   // Print Helper String
   if (!helperstr.str().empty()){
-    ERR(WRN) << "To remove these warnings in future studies, add the lines below to your card." << endl;
-    LOG(FIT) << endl << helperstr.str() << endl;
+    LOG(FIT) << "To remove these statements in future studies, add the lines below to your card:" << std::endl;
+    // Can't use the logger properly because this can be multi-line. Use cout and added spaces to look better!
+    std::cout << helperstr.str();
     sleep(2);
   }
 
@@ -626,9 +645,9 @@ void SystematicRoutines::GetCovarFromFCN(){
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams[i];
     if (dialthrowhandle.find(syst) != dialthrowhandle.end()){
-      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = THROWING with " << dialthrowhandle[syst] << endl;
+      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = THROWING with " << dialthrowhandle[syst] << std::endl;
     } else {
-      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = FIXED" << endl;
+      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = FIXED" << std::endl;
     }
   }
 
@@ -673,7 +692,7 @@ void SystematicRoutines::Run(){
 
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange){
-      LOG(FIT) << "Ending fit routines loop." << endl;
+      LOG(FIT) << "Ending fit routines loop." << std::endl;
       break;
     }
   }
@@ -741,12 +760,12 @@ void SystematicRoutines::PrintState(){
                  << setw(8)  << convunits;
 
 
-    LOG(FIT) << curparstring.str() << endl;
+    LOG(FIT) << curparstring.str() << std::endl;
   }
 
   LOG(FIT)<<"------------"<<std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT)<<"Likelihood for JointFCN == " << like << endl;
+  LOG(FIT)<<"Likelihood for JointFCN == " << like << std::endl;
   LOG(FIT)<<"------------"<<std::endl;
 }
 
@@ -983,7 +1002,11 @@ void SystematicRoutines::GenerateErrorBands(){
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
     TH1D *baseplot = (TH1D*)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
-    LOG(FIT) << "Creating error bands for " << plotname << std::endl;
+    LOG(FIT) << "Creating error bands for " << plotname;
+    if (LOG_LEVEL(FIT)){
+      if (!uniformly) std::cout << " : Using COVARIANCE Throws! " << std::endl;
+      else std::cout << " : Using UNIFORM THROWS!!! " << std::endl;
+    }
 
     int nbins = baseplot->GetNbinsX()*baseplot->GetNbinsY();
 
@@ -1028,14 +1051,16 @@ void SystematicRoutines::GenerateErrorBands(){
 
     errorDIR->cd();
 
+    if (!uniformly){
+      LOG(FIT) << "Uniformly Calculating Plot Errors!" << std::endl;
+    }
     for (Int_t j = 0; j < nbins; j++){
 
       if (!uniformly){
-	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
-
+	       baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
       } else {
-	baseplot->SetBinContent(j+1, (binlowest[j] + binhighest[j]) / 2.0);
-        baseplot->SetBinError(j+1, (binhighest[j] - binlowest[j])/2.0);
+      	baseplot->SetBinContent(j+1, 0.0);//(binlowest[j] + binhighest[j]) / 2.0);
+        baseplot->SetBinError(j+1, 0.0); //(binhighest[j] - binlowest[j])/2.0);
       }
     }
 

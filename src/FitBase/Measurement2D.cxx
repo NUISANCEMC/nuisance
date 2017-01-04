@@ -94,6 +94,11 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type, Fi
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
                 "not flux averaged!"
              << std::endl;
+    if (FitPar::Config().GetParB("EventManager")){
+      ERR(FTL) << "Enu Measurements do not yet work with the Event Manager!" <<std::endl;
+      ERR(FTL) << "If you want decent flux unfolded results please run in series mode (-q EventManager=0)" << std::endl;
+      sleep(2);
+    }
   }
 
   if (fIsEnu && fIsRawEvents) {
@@ -480,20 +485,17 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim){
   // Form full covariance
   TMatrixD* trans = (TMatrixD*) (newcov)->Clone();
   trans->T();
-
   (*trans) *= (*newcov);
-  newcov = (TMatrixD*) trans->Clone();
 
-  this->covar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
-  fFullCovar = new TMatrixDSym(dim, newcov->GetMatrixArray(), "");
+  fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
 
   delete newcov;
   delete trans;
 
   // Robust matrix inversion method
-  TDecompChol LU = TDecompChol(*this->covar);
+  TDecompChol LU = TDecompChol(*this->fFullCovar);
   this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
+  
   return;
 };
 
@@ -654,11 +656,8 @@ void Measurement2D::ScaleEvents(){
 
     // This assumes we have the Enu on the x-axis
     // fairly trivial to make the change but only MiniBooNE 2D CC1pi+ has Enu in a 2D
-    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
-
-    fMCHist->Scale(fScaleFactor);
-    fMCFine->Scale(fScaleFactor);
+    PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist, fEventHist, fScaleFactor);
+    PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist, fEventHist, fScaleFactor);
 
   } else { // Else we just do normal scaling
 
@@ -1014,7 +1013,7 @@ void Measurement2D::Write(std::string drawOpt){
     return;
   }
 
-  FitPar::Config().out->cd();
+  //  FitPar::Config().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
@@ -1166,8 +1165,14 @@ void Measurement2D::Write(std::string drawOpt){
     // Create Shape Histogram
     TH2D* mcShape = (TH2D*) fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
-    mcShape->Scale( fDataHist->Integral("width")
-			  / fMCHist->Integral("width"));
+    double shapeScale = 1.0;
+    if (fIsRawEvents){
+      shapeScale = fDataHist->Integral() / fMCHist->Integral();
+    } else {
+      shapeScale =  fDataHist->Integral("width") / fMCHist->Integral("width");
+    }
+    
+    mcShape->Scale( shapeScale );
 
     mcShape->SetLineWidth(3);
     mcShape->SetLineStyle(7); //dashes

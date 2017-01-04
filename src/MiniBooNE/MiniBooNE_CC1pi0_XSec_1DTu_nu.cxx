@@ -24,10 +24,10 @@ MiniBooNE_CC1pi0_XSec_1DTu_nu::MiniBooNE_CC1pi0_XSec_1DTu_nu(std::string inputfi
 
   fName = "MiniBooNE_CC1pi0_XSec_1DTu_nu";
   fPlotTitles = "; T_{#mu} (GeV); d#sigma/dE_{#mu} (cm^{2}/GeV^{2}/CH_{2})";
-  EnuMin = 0.5;
-  EnuMax = 2.;
   fIsDiag = false;
   fNormError = 0.107;
+  EnuMin = 0.5;
+  EnuMax = 2.0;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pi0/dxsecdemu_edit.txt");

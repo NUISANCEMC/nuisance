@@ -22,21 +22,34 @@
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 
 // The constructor
-MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pip_XSec_1Dth_nu";
+  fName = name; 
   fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  fFullPhaseSpace = name.find("_20deg") == std::string::npos;
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  if (fIsShape) {
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_shape.csv");
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", fDataHist->GetNbinsX());
+  // Full Phase Space
+  if (fFullPhaseSpace){
+    if (fIsShape) {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_shape.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_cov_shape.csv", fDataHist->GetNbinsX());
+    } else {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", fDataHist->GetNbinsX());
+    }
+  // Restricted Phase Space
   } else {
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta.csv");
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_cov.csv", fDataHist->GetNbinsX());
+      if (fIsShape) {
+        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_20_shape.csv");
+        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_20_cov_shape.csv", fDataHist->GetNbinsX());
+    } else {
+      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_20.csv");
+      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_theta_20_cov.csv", fDataHist->GetNbinsX());
+    }
   }
 
   this->SetupDefaultHist();
@@ -52,12 +65,12 @@ MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string inputfile, 
 
 void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(211) == 0 ||
+  if (event->NumFSParticle(PhysConst::pdg_charged_pions) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
@@ -75,5 +88,5 @@ void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 bool MINERvA_CC1pip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 //********************************************************************
   // Last false refers to that this is NOT the restricted MINERvA phase space, in which only forward-going muons are accepted
-  return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, false);
+  return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
 }

@@ -305,196 +305,202 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]){
 
 //********************************************************************
 // This assumes the Enu axis is the x axis, as is the case for MiniBooNE 2D distributions
-void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fFluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist, double scalefactor) {
 //********************************************************************
+  
+  // Make clones to avoid changing stuff
+  TH1D* eventhist = (TH1D*)ehist->Clone();
+  TH1D* fFluxHist = (TH1D*)fhist->Clone();
 
-  // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
+  // Undo width integral in SF  
+  fMCHist->Scale( scalefactor / eventhist->Integral(1,eventhist->GetNbinsX()+1,"width"));
 
-  for (int i = 0; i < fFluxHist->GetNbinsX(); i++){
-    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
+  // Standardise The Flux       
+  eventhist->Scale(1.0/fFluxHist->Integral());
+  fFluxHist->Scale(1.0/fFluxHist->Integral());
+
+  // Do interpolation for 2D plots?
+  // fFluxHist = PlotUtils::InterpolateFineHistogram(fFluxHist,100,"width");
+  // eventhist = PlotUtils::InterpolateFineHistogram(eventhist,100,"width");
+
+  // eventhist->Scale(1.0/fFluxHist->Integral());
+  // fFluxHist->Scale(1.0/fFluxHist->Integral());
+
+  // Scale fMCHist by eventhist integral          
+  fMCHist->Scale( eventhist->Integral(1,eventhist->GetNbinsX()+1) );
+
+  // Now Get a flux PDF assuming X axis is Enu
+  TH1D* pdfflux = (TH1D*) fMCHist->ProjectionX()->Clone();
+  //  pdfflux->Write( (std::string(fMCHist->GetName()) + "_PROJX").c_str());
+  pdfflux->Reset();
+
+  // Awful MiniBooNE Check for the time being
+  bool ismb = std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
+
+  for (int i = 0; i < pdfflux->GetNbinsX(); i++){
+
+    double Ml = pdfflux->GetXaxis()->GetBinLowEdge(i+1);
+    double Mh = pdfflux->GetXaxis()->GetBinLowEdge(i+2);
+    //double Mc = pdfflux->GetXaxis()->GetBinCenter(i+1);
+    //double Mw = pdfflux->GetBinWidth(i+1);
+    double fluxint = 0.0;
+
+    // Scaling to match flux for MB
+    if (ismb){
+      Ml /= 1.E3;
+      Mh /= 1.E3;
+      //  Mc /= 1.E3;
+      //  Mw /= 1.E3;
+    }
+
+    for (int j = 0; j < fFluxHist->GetNbinsX(); j++){
+
+      //double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
+      double Fl = fFluxHist->GetXaxis()->GetBinLowEdge(j+1);
+      double Fh = fFluxHist->GetXaxis()->GetBinLowEdge(j+2);
+      double Fe = fFluxHist->GetBinContent(j+1);
+      double Fw = fFluxHist->GetXaxis()->GetBinWidth(j+1);
+
+      if (Fl >= Ml and Fh <= Mh){ fluxint += Fe; }
+      else if (Fl < Ml and Fl < Mh and Fh > Ml and Fh < Mh){  fluxint += Fe * (Fh - Ml)/Fw;  }
+      else if (Fh > Mh and Fl < Mh and Fh > Ml and Fl > Ml){  fluxint += Fe * (Mh - Fl)/Fw; }
+      else if (Ml >= Fl and Mh <= Fh){  fluxint += Fe * (Mh - Ml)/Fw; }
+      else { continue; }
+
+    }
+
+    pdfflux->SetBinContent(i+1, fluxint);
   }
 
-  // Resolution for the interpolation used for the flux
-  // Set to 100 times fines than flux histogram, should be enough buy may need tweaking!
-  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
-  // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
+  for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
+    for (int j = 0; j < fMCHist->GetNbinsY(); j++){ 
 
-  // Set the new TH1D with the TGraph interpolated bin content
-  for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
-    // The start and end of the flux histogram might go to zero
-    // So we really need to take care with these bins for the interpolation; here I just set it flat
-    if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
-      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
-    } else {
-      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
-    }
-  }
+      if (pdfflux->GetBinContent(i+1) == 0.0) continue;
 
-  for (int i = 1; i < fMCHist->GetNbinsX()+1; i++) {
+      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j+2) - fMCHist->GetYaxis()->GetBinLowEdge(j+1);
+      fMCHist->SetBinContent(i+1, j+1, fMCHist->GetBinContent(i+1,j+1) /pdfflux->GetBinContent(i+1) / binWidth);
+      fMCHist->SetBinError(i+1, j+1, fMCHist->GetBinError(i+1,j+1) /pdfflux->GetBinContent(i+1) / binWidth);
 
-    // WARNING SCALING BY 1000 HERE BECAUSE MINIBOONE 2D IS ONLY DIST THAT HAS ENU ON IT!
-    //
-    // Get the low edge of the ith bin
-    Double_t binLowEdge = fMCHist->GetXaxis()->GetBinLowEdge(i)/1000.;
-    // Get the high edge of the ith bin
-    Double_t binHighEdge = fMCHist->GetXaxis()->GetBinLowEdge(i+1)/1000.;
-
-    // Find the correpsonding bin in the interpolated flux histogram
-    // Start by finding the low edge of the bin
-    Int_t fluxLow = 0;
-    Int_t fluxHigh = 0;
-
-    // Find the binLowEdge in the new interpolated flux histogram which matches the mc binning's edge
-    double diff = 999; // Set the initial difference to be very large
-    for (; fluxLow < fineFlux->GetNbinsX(); fluxLow++) {
-      // the difference between the mc bin edge and the flux bin edge
-      double temp = fabs(binLowEdge - fineFlux->GetBinLowEdge(fluxLow));
-      // if difference is larger than previous
-      if (temp < diff) {
-        diff = temp;
-      } else {
-        break;
-      }
-    }
-
-    if (diff > 0.5) {
-      // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
-      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
-      LOG(WRN) << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
-      LOG(SAM) << "fluxLow = " << fluxLow << std::endl;
-      LOG(SAM) << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
-    }
-
-    diff = 999;
-    for (; fluxHigh < fineFlux->GetNbinsX(); fluxHigh++) {
-      double temp = fabs(binHighEdge - fineFlux->GetBinLowEdge(fluxHigh));
-      if (temp < diff) {
-        diff = temp;
-      } else {
-        break;
-      }
-    }
-
-    if (diff > 0.5) {
-      // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
-      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
-      LOG(WRN) << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << fMCHist->GetName() << std::endl;
-      LOG(SAM) << "fluxHigh = " << fluxHigh << std::endl;
-      LOG(SAM) << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
-    }
-
-    // fluxHigh - 1 because Integral takes the binLowEdge into account, and fluxHigh is our high edge
-    double fluxInt = fineFlux->Integral(fluxLow, fluxHigh - 1, "width");
-    if (fluxInt == 0) continue;
-
-    // Now scale every y axis bin for every x axis by the flux
-    for (int j = 1; j < fMCHist->GetYaxis()->GetNbins()+1; j++) {
-      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j+1) - fMCHist->GetYaxis()->GetBinLowEdge(j);
-      fMCHist->SetBinContent(i, j, fMCHist->GetBinContent(i,j)/(fluxInt*binWidth));
-      fMCHist->SetBinError(i, j, fMCHist->GetBinError(i,j)/(fluxInt*binWidth));
     }
   }
 
-  delete fineFlux;
-  delete fluxGraph;
+  delete eventhist;
+  delete fFluxHist;
 
   return;
 };
 
+TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res, std::string opt){
+
+  int nbins = hist->GetNbinsX();
+  double elow  = hist->GetXaxis()->GetBinLowEdge(1);
+  double ehigh = hist->GetXaxis()->GetBinLowEdge(nbins+1);
+  bool width = true; //opt.find("width") != std::string::npos;
+
+  TH1D* fine = new TH1D("fine","fine", nbins*res, elow, ehigh);
+
+  TGraph* temp = new TGraph();
+
+  for (int i = 0; i < nbins; i++){
+      double E = hist->GetXaxis()->GetBinCenter(i+1);
+      double C = hist->GetBinContent(i+1);
+      double W = hist->GetXaxis()->GetBinWidth(i+1);
+      if (!width) W = 1.0;
+
+      if (W != 0.0) temp->SetPoint( temp->GetN(), E, C / W );
+  }
+
+  for (int i = 0; i < fine->GetNbinsX(); i++){
+      double E = fine->GetXaxis()->GetBinCenter(i+1);
+      double W = fine->GetBinWidth(i+1);
+      if (!width) W = 1.0;
+
+      fine->SetBinContent(i+1, temp->Eval(E,0,"S") * W);
+  }
+
+  fine->Scale(hist->Integral(1,hist->GetNbinsX()+1) / fine->Integral(1, fine->GetNbinsX()+1));
+  std::cout << "Interpolation Difference = " << fine->Integral(1,fine->GetNbinsX()+1) << "/" << hist->Integral(1,hist->GetNbinsX()+1) << std::endl; 
+	   
+  return fine;
+}
+
+
+
 
 //******************************************************************** 
 // This interpolates the flux by a TGraph instead of requiring the flux and MC flux to have the same binning
-void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fFluxHist) {
+void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, double scalefactor, int nevents) {
 //******************************************************************** 
 
-  // Make a temporary TGraph which holds the points from the flux (essentially copying the TH1D to a TGraph)
-  TGraph* fluxGraph = new TGraph(fFluxHist->GetNbinsX());
+  TH1D* eventhist = (TH1D*)ehist->Clone();
+  TH1D* fFluxHist = (TH1D*)fhist->Clone();
 
-  for (int i = 0; i < fFluxHist->GetNbinsX()+1; i++){
-    fluxGraph->SetPoint(i, fFluxHist->GetXaxis()->GetBinCenter(i+1), fFluxHist->GetBinContent(i+1));
+  if (FitPar::Config().GetParB("save_flux_debug")){
+    std::string name = std::string(mcHist->GetName());
+    
+    mcHist->Write((name + "_UNF_MC").c_str());
+    fFluxHist->Write((name + "_UNF_FLUX").c_str());
+    eventhist->Write((name + "_UNF_EVT").c_str());
+    
+    TH1D* scalehist = new TH1D("scalehist","scalehist",1,0.0,1.0);
+    scalehist->SetBinContent(1,scalefactor);
+    scalehist->SetBinContent(2,nevents);
+  
+    scalehist->Write((name + "_UNF_SCALE").c_str());  
   }
 
-  // Resolution for the interpolation used for the flux
-  // Make 100 times finer than flux histogram, COULD BE TWEAKED
-  int resolution = 100.*fFluxHist->GetXaxis()->GetNbins();
-  // The new interpolated flux histogram with fine binning
-  TH1D* fineFlux = new TH1D("fineFlux", "fineFlux", resolution, fFluxHist->GetXaxis()->GetBinLowEdge(1), fFluxHist->GetXaxis()->GetBinLowEdge(fFluxHist->GetNbinsX()+1));
+  // Undo width integral in SF
+  mcHist->Scale( scalefactor / eventhist->Integral(1,eventhist->GetNbinsX()+1,"width"));
+  
+  // Standardise The Flux
+  eventhist->Scale(1.0/fFluxHist->Integral());
+  fFluxHist->Scale(1.0/fFluxHist->Integral());
 
-  // Set the new TH1D with the TGraph interpolated bin content
-  for (int i = 0; i < fineFlux->GetNbinsX(); i++) {
-    // The start and end of the flux histogram might go to zero
-    // So we really need to take care with these bins; here I just set it flat
-    if (fFluxHist->GetBinCenter(1) > fineFlux->GetXaxis()->GetBinCenter(i+1)) {
-      fineFlux->SetBinContent(i+1, fFluxHist->GetBinContent(1));
-    } else {
-      fineFlux->SetBinContent(i+1, fluxGraph->Eval(fineFlux->GetXaxis()->GetBinCenter(i+1), 0, "S"));
+  // Scale mcHist by eventhist integral
+  mcHist->Scale( eventhist->Integral(1,eventhist->GetNbinsX()+1) );
+  
+  // Now Get a flux PDF
+  TH1D* pdfflux = (TH1D*) mcHist->Clone();
+  pdfflux->Reset();
+
+  for (int i = 0; i < mcHist->GetNbinsX(); i++){
+
+    double Ml = mcHist->GetXaxis()->GetBinLowEdge(i+1);
+    double Mh = mcHist->GetXaxis()->GetBinLowEdge(i+2);
+    //double Mc = mcHist->GetXaxis()->GetBinCenter(i+1);
+    //double Me = mcHist->GetBinContent(i+1);
+    //double Mw = mcHist->GetBinWidth(i+1);
+    double fluxint = 0.0;
+
+    for (int j = 0; j < fFluxHist->GetNbinsX(); j++){
+      
+      //double Fc = fFluxHist->GetXaxis()->GetBinCenter(j+1);
+      double Fl = fFluxHist->GetXaxis()->GetBinLowEdge(j+1);
+      double Fh = fFluxHist->GetXaxis()->GetBinLowEdge(j+2);
+      double Fe = fFluxHist->GetBinContent(j+1);
+      double Fw = fFluxHist->GetXaxis()->GetBinWidth(j+1);
+      
+      if (Fl >= Ml and Fh <= Mh){ fluxint += Fe; }
+      else if (Fl < Ml and Fl < Mh and Fh > Ml and Fh < Mh){  fluxint += Fe * (Fh - Ml)/Fw;  }
+      else if (Fh > Mh and Fl < Mh and Fh > Ml and Fl > Ml){  fluxint += Fe * (Mh - Fl)/Fw; }
+      else if (Ml >= Fl and Mh <= Fh){	fluxint += Fe * (Mh - Ml)/Fw; }
+      else { continue; }
+
     }
+
+    pdfflux->SetBinContent(i+1, fluxint);
   }
 
-  for (int i = 1; i < mcHist->GetNbinsX()+1; i++) {
-    // Get the low edge of the ith bin
-    Double_t binLowEdge = mcHist->GetBinLowEdge(i);
-    // Get the high edge of the ith bin
-    Double_t binHighEdge = mcHist->GetBinLowEdge(i+1);
+  // Scale MC hist by pdfflux
+  for (int i = 0; i < mcHist->GetNbinsX(); i++){
+    if (pdfflux->GetBinContent(i+1) == 0.0) continue;
 
-    // Find the correpsonding bin in the interpolated flux histogram
-    // Start by finding the low edge of the bin
-    Int_t fluxLow = 0;
-    Int_t fluxHigh = 0;
-
-    // Find the binLowEdge in the new interpolated flux histogram which matches the mc binning's edge
-    double diff = 999; // Set the initial difference to be very large
-    for (; fluxLow < fineFlux->GetNbinsX(); fluxLow++) {
-      // the difference between the mc bin edge and the flux bin edge
-      double temp = fabs(binLowEdge - fineFlux->GetBinLowEdge(fluxLow));
-      // if difference is larger than previous
-      if (temp < diff) {
-        diff = temp;
-      } else {
-        break;
-      }
-    }
-
-    if (diff > 0.5) {
-      // This is a known issue for all BEBC 1pi 1DEnu classes in the first bin, where the flux histogram starts at 8.9GeV but MC binning starts at 5GeV
-      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
-      LOG(WRN) << "Couldn't find good low-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
-      LOG(SAM) << "fluxLow = " << fluxLow << std::endl;
-      LOG(SAM) << "binLowEdge - fineFlux->GetBinLowEdge(fluxLow) = " << binLowEdge << " - " << fineFlux->GetBinLowEdge(fluxLow) << " = " << binLowEdge - fineFlux->GetBinLowEdge(fluxLow) << std::endl;
-    }
-
-    diff = 999;
-    for (; fluxHigh < fineFlux->GetNbinsX(); fluxHigh++) {
-      double temp = fabs(binHighEdge - fineFlux->GetBinLowEdge(fluxHigh));
-      if (temp < diff) {
-        diff = temp;
-      } else {
-        break;
-      }
-    }
-
-    if (diff > 0.5) {
-      // This is a known issue for anti-nu BEBC 1pi 1DEnu classes in the last bin, where the flux histogram ends at 180 GeV but MC binning continues to 200 GeV
-      LOG(WRN) << __FILE__ << ":" << __LINE__ << std::endl;
-      LOG(WRN) << "Couldn't find good high-edge bin match for flux histogram " << fFluxHist->GetName() << " and MC " << mcHist->GetName() << std::endl;
-      LOG(SAM) << "fluxHigh = " << fluxHigh << std::endl;
-      LOG(SAM) << "binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) = " << binHighEdge << " - " << fineFlux->GetBinLowEdge(fluxHigh) << " = " << binHighEdge - fineFlux->GetBinLowEdge(fluxHigh) << std::endl;
-    }
-
-    // fluxHigh - 1 because Integral takes the binLowEdge into account, and fluxHigh is our high edge
-    double fluxInt = fineFlux->Integral(fluxLow, fluxHigh - 1, "width");
-
-    // Scale the bin content in bin i by the flux integral in that bin
-    if (fluxInt == 0) continue;
-
-    mcHist->SetBinContent(i, mcHist->GetBinContent(i)/fluxInt);
-    mcHist->SetBinError(i, mcHist->GetBinError(i)/fluxInt);
+    mcHist->SetBinContent(i+1, mcHist->GetBinContent(i+1) / pdfflux->GetBinContent(i+1));
+    mcHist->SetBinError(i+1, mcHist->GetBinError(i+1) / pdfflux->GetBinContent(i+1));
   }
 
-  delete fineFlux;
-  delete fluxGraph;
+  delete eventhist;
+  delete fFluxHist;
 
   return;
 };
@@ -564,9 +570,7 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::s
       tempPlot->SetBinError(i+1, errors[i]);
     }
 
-    delete values;
-    delete errors;
-    delete bins;
+    delete gr;
   }
 
   // Allow alternate naming for root files

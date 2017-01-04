@@ -45,11 +45,16 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(std::string inputfile, 
   SetDataFromFile(datafile, "Data_" + dist_name);
   SetCovarFromDataFile(datafile, "Covar_" + dist_name);
 
+  // Covariance is given in 1E-40, convert to 1E-38
+  *fDecomp *= (1.0 / 10.0);
+  *fFullCovar *= (1.0 / 100.0);
+  *covar *= (100.0);
+
   // Setup Default MC Hists
   SetupDefaultHist();
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (this->fEventHist->Integral("width")*100.0*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
+  fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
 
 };
 

@@ -31,29 +31,18 @@ public:
   MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
   virtual ~MiniBooNE_NCEL_XSec_Treco_nu() {};
 
-  void Reconfigure(double norm, bool fullconfig=false);
+  void FillEventVariables(FitEvent *event);
 
-  double GetChi2();
+  bool isSignal(FitEvent *event);
 
-#ifdef __NEUT_ENABLED__
-  bool isSignal(NeutVect *nvect);
-#endif
+  void ScaleEvents();
 
   void SetDataValues(std::string inputFile);
-
-  void SetFakeDataValues(std::string fakeDataFile);
 
  private:
   void SetCovarMatrix(std::string covarFile, int dim);
 
   void SetResponseMatrix(std::string responseFile, int dim);
-
-  std::string inFile;
-  TChain *tn;
-  Int_t fNEvents;
-#ifdef __NEUT_ENABLED__
-  NeutVect *nvect;
-#endif
 
   // Because the Treco binning is irregular, store an array of bin edges...
   double arr_treco[52];
@@ -61,10 +50,6 @@ public:
   TH1D *BKGD_other;
   TH1D *BKGD_irrid;
   TH2D *response_mat;
-
-  Double_t totIntFlux;
-
-  FitWeight *rw_engine;
 
 };
 

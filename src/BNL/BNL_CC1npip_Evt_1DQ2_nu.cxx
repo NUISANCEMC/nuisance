@@ -49,18 +49,14 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
 
 void BNL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(2112) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // no hadronic mass constraint in BNL CC1n1pi+
-  double q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  // No hadronic mass constraint in BNL CC1n1pi+
+  // This Q2 is Q2 true
+  double q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 

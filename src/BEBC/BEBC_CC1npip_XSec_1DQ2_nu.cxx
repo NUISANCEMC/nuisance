@@ -59,8 +59,7 @@ void BEBC_CC1npip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpip = -1.0;
   
   // BEBC has a 1.1GeV < M(pi, p) < 1.4 GeV cut imposed (also no cut measurement but not useful for delta tuning)
-  if (hadMass < 1400 && hadMass > 1100)
-    q2CCpip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2CCpip;
 

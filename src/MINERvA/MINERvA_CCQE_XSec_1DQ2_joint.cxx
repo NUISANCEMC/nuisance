@@ -29,7 +29,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   fName = name;
   nBins = 16;
   fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  isFluxFix      = name.find("_newflux") != std::string::npos;
+  isFluxFix      = name.find("_oldflux") == std::string::npos;
   fullphasespace = name.find("_20deg")   == std::string::npos;
   fIsRatio = false;
   fIsSummed = false;
@@ -56,7 +56,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   if (fullphasespace){
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape) {
+          ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                   << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                   << "data normalization but full covariance will be used. " << std::endl;
+                 }
+
       datafilename  = "Q2QE_joint_data_fluxfix.txt";
       covarfilename = "Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_newflux";
@@ -78,7 +83,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   } else {
 
     if (isFluxFix){
-      if (fIsShape) fIsShape = false;
+      if (fIsShape) {
+          ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
+                   << "datasets with fixed flux information. NUISANCE will scale MC to match "
+                   << "data normalization but full covariance will be used. " << std::endl;
+                 }
+                 
       datafilename  = "20deg_Q2QE_joint_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux";
@@ -110,7 +120,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   this->fSubChain.push_back(MIN_anu);
   this->fSubChain.push_back(MIN_nu);
 
-  this->fFluxHist = GetCombinedFlux();
+  this->fFluxHist  = GetCombinedFlux();
   this->fEventHist = GetCombinedEventRate();
 
   // Setup Default MC Hists
@@ -132,6 +142,7 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
       MIN_anu = static_cast<MINERvA_CCQE_XSec_1DQ2_antinu*>(exp);
       TH1D* MIN_anu_mc = (TH1D*) MIN_anu->GetMCList().at(0);
       for (int i = 0; i < 8; i++){
+	std::cout << "Adding MIN_anu_MC " << i+1 << " : " << i+1 << " " << MIN_anu_mc->GetBinContent(i+1) << std::endl;
 	fMCHist->SetBinContent(i+1, MIN_anu_mc->GetBinContent(i+1));
 	fMCHist->SetBinError(i+1, MIN_anu_mc->GetBinError(i+1));
       }
@@ -140,10 +151,12 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
       MIN_nu = static_cast<MINERvA_CCQE_XSec_1DQ2_nu*>(exp);
       TH1D* MIN_nu_mc = (TH1D*) MIN_nu->GetMCList().at(0);
       for (int i = 0; i < 8; i++){
+	std::cout << "Adding MIN_nu_MC " << i+1+8 << " : " << i+1 << " " << MIN_nu_mc->GetBinContent(i+1) << std::endl;
 	fMCHist->SetBinContent(i+1+8, MIN_nu_mc->GetBinContent(i+1));
+	fMCHist  ->SetBinError(i+1+8, MIN_nu_mc->GetBinError(i+1));
       }
 
-    } else break;
+    } 
     sample++;
   }
 

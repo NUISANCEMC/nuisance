@@ -21,39 +21,29 @@
 
 EventManager* EventManager::m_evtmgrInstance = NULL;
 
-EventManager& EventManager::Get(void){
-  if (!m_evtmgrInstance){
+EventManager& EventManager::Get(void) {
+  if (!m_evtmgrInstance) {
     m_evtmgrInstance = new EventManager;
   }
   return *m_evtmgrInstance;
 }
 
+FitWeight* EventManager::GetRW() { return fRW; };
 
+InputHandler* EventManager::GetInput(int infile) { return finputs[infile]; };
 
-FitWeight* EventManager::GetRW(){
-  return fRW;
-};
-
-InputHandler* EventManager::GetInput(int infile) {
-  return finputs[infile];
-};
-
-
-FitEvent* EventManager::GetEvent(int infile, int i){
-
+FitEvent* EventManager::GetEvent(int infile, int i) {
   finputs[infile]->ReadEvent(i);
   FitEvent* evtpt = finputs[infile]->GetEventPointer();
 
   // If we don't need a full reweight
-  if (!frwneeded[infile][i]){
-
+  if (!frwneeded[infile][i]) {
     evtpt->Weight = calc_rw[infile][i];
 
-  // if we do need a full reweight
+    // if we do need a full reweight
   } else {
-
     evtpt->RWWeight = fRW->CalcWeight(evtpt);
-    evtpt->Weight = evtpt->RWWeight*evtpt->InputWeight;
+    evtpt->Weight = evtpt->RWWeight * evtpt->InputWeight;
 
     calc_rw[infile][i] = evtpt->Weight;
     frwneeded[infile][i] = false;
@@ -62,9 +52,7 @@ FitEvent* EventManager::GetEvent(int infile, int i){
   return evtpt;
 }
 
-
-double EventManager::GetEventWeight(int infile, int i){
-
+double EventManager::GetEventWeight(int infile, int i) {
   if (!frwneeded[infile][i]) {
     return calc_rw[infile][i];
   }
@@ -79,60 +67,65 @@ double EventManager::GetEventWeight(int infile, int i){
   return Weight;
 }
 
+std::map<int, InputHandler*> EventManager::GetInputs() { return finputs; }
 
-std::map< int, InputHandler* > EventManager::GetInputs(){
-  return finputs;
-}
+InputHandler* EventManager::AddInput(std::string handle, std::string infile) {
 
-void EventManager::AddInput(std::string handle, std::string infile){
+  // Expect INPUTTYPE:FileLocation(s)
+  std::vector<std::string> file_descriptor =
+      GeneralUtils::ParseToStr(infile, ":");
+  if (file_descriptor.size() != 2) {
+    ERR(FTL) << "File descriptor had no filetype declaration: \"" << infile
+             << "\". expected \"FILETYPE:file.root\"" << std::endl;
+    throw;
+  }
+  InputUtils::InputType inpType =
+      InputUtils::ParseInputType(file_descriptor[0]);
 
-  if (finputs.find(GetInputID(infile)) != finputs.end()){
-    LOG(SAM)<<"Event manager already contains this input. skipping"<<std::endl;
-    return;
+  int id = GetInputID(file_descriptor[1]);
+  if ((uint)id != fid.size()) {
+    LOG(SAM) << "Event manager already contains this input."
+             << std::endl;
+    return finputs[id];
   } else {
-    LOG(SAM)<<"Adding input "<<infile<<std::endl;
+    LOG(SAM) << "Adding input " << file_descriptor[1] << std::endl;
   }
 
-  int id = GetInputID(infile);
-
-  fid[infile] = id;
-  finputs[id] = new InputHandler(handle, infile);
-  frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(),true);
-  calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(),0.0);
+  fid[file_descriptor[1]] = id;
+  finputs[id] = new InputHandler(handle, inpType, file_descriptor[1]);
+  frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(), true);
+  calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(), 0.0);
+  return finputs[id];
 }
 
-// Reset the weight flags 
+// Reset the weight flags
 // Should be called for every succesful event loop
-void EventManager::ResetWeightFlags(){
-
+void EventManager::ResetWeightFlags() {
   // Loop over the inpts
   for (std::map<int, InputHandler*>::iterator iter = finputs.begin();
-       iter != finputs.end(); iter++){
-
+       iter != finputs.end(); iter++) {
     int id = iter->first;
     frwneeded[id].clear();
     // Reset so that all events need the reweight
-    frwneeded[id]= std::vector<bool>(finputs[id]->GetNEvents(),true);
+    frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(), true);
   }
 }
 
-EventManager::EventManager(){
+EventManager::EventManager() {
   fRW = new FitWeight("FitWeight");
   finputs.clear();
 };
 
-EventManager::~EventManager(){
+EventManager::~EventManager() {
   delete fRW;
   finputs.clear();
 };
 
-
-
-int EventManager::GetInputID(std::string infile){
-
-  if (fid.find(infile) == fid.end()){
+int EventManager::GetInputID(std::string infile) {
+  if (fid.find(infile) == fid.end()) {
     return fid.size();
   }
 
   return fid[infile];
 }
+

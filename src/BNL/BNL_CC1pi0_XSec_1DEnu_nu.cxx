@@ -43,18 +43,10 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
 
 void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(111) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
-
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
-  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
-  double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
+  double Enu = Pnu.E()/1000.;
   
   fXVar = Enu;
 
@@ -63,7 +55,7 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
 
 bool BNL_CC1pi0_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-  return SignalDef::isCC1pi3Prong(event, 14, 111, 2112,EnuMin,EnuMax);
+  return SignalDef::isCC1pi3Prong(event, 14, 111, 2212, EnuMin, EnuMax);
 }
 
 

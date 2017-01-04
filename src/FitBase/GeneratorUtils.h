@@ -71,5 +71,6 @@ namespace GeneratorUtils {
 #ifdef __NUANCE_ENABLED__
   int ConvertNuanceMode(NuanceEvent * evt);
 #endif
+
 };
 #endif

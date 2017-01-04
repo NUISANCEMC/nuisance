@@ -18,6 +18,8 @@
 *******************************************************************************/
 
 #include "FitLogger.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace FitPar{
   unsigned int log_verb = 0; //!< Current VERBOSITY
@@ -26,9 +28,13 @@ namespace FitPar{
   bool super_rainbow_mode = true; //!< For when fitting gets boring.
   unsigned int super_rainbow_mode_colour = 0;
 
+  // For redirecting various print outs
   std::streambuf *default_cout = std::cout.rdbuf();
   std::streambuf *default_cerr = std::cerr.rdbuf();
   std::ofstream redirect_stream("/dev/null");
+  int silentfd = open("/dev/null",O_WRONLY);
+  int savedstdoutfd = dup(fileno(stdout));
+  int savedstderrfd = dup(fileno(stderr));
 }
 
 std::ostream* logStream(&std::cout);
@@ -155,10 +161,20 @@ void StopTalking(){
   if (FitPar::log_verb == (unsigned int)DEB) return;
   std::cout.rdbuf(FitPar::redirect_stream.rdbuf());
   std::cerr.rdbuf(FitPar::redirect_stream.rdbuf());
+  shhpythiaitokay_();
+  fflush(stdout); 
+  fflush(stderr);
+  dup2(FitPar::silentfd, fileno(stdout));
+  dup2(FitPar::silentfd, fileno(stderr));
 }
 
 void StartTalking(){
   std::cout.rdbuf(FitPar::default_cout);
   std::cerr.rdbuf(FitPar::default_cerr);
+  canihazpythia_();
+  fflush(stdout); 
+  fflush(stderr);
+  dup2(FitPar::savedstdoutfd, fileno(stdout));
+  dup2(FitPar::savedstderrfd, fileno(stderr));
 }
 

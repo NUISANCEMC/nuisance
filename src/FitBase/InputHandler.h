@@ -20,81 +20,86 @@
 #ifndef INPUT_HANDLER_H
 #define INPUT_HANDLER_H
 
-#include "TObject.h"
-#include "FitEvent.h"
-#include "FitWeight.h"
-#include "FitParameters.h"
-#include "PlotUtils.h"
-#include "FitUtils.h"
-#include "stdint.h"
-
-#include <vector>
-#include <string>
+#include <cstring>
 #include <iostream>
 #include <sstream>
-#include <cstring>
+#include <string>
+#include <vector>
+
+#include "stdint.h"
+
+#include "TObject.h"
+
+#include "FitEvent.h"
+#include "FitParameters.h"
+#include "FitUtils.h"
+#include "FitWeight.h"
+#include "PlotUtils.h"
+#include "InputUtils.h"
 
 #ifdef __GENIE_ENABLED__
 #include "Conventions/Units.h"
 #endif
 
 class InputHandler {
-
  public:
-  InputHandler (void) {};
-  ~InputHandler (void) {};
+  InputHandler(void){};
+  ~InputHandler(void){};
 
-  InputHandler(std::string handle, std::string infile_name);
-  std::string ParseInputFile(std::string inputfile);
+  InputHandler(std::string const& handle, InputUtils::InputType inpType,
+               std::string const& inputs);
 
-  void ReadBinSplineFile   (void);
-  void ReadHistogramFile   (void);
-  void ReadNeutFile        (void);
-  void ReadNuanceFile      (void);
-  void ReadGenieFile       (void);
-  void ReadNuWroFile       (void);
-  void ReadEventSplineFile (void);
-  void ReadJointFile       (void);
-  void ReadGiBUUFile (bool IsNuBarDominant);
-  void ReadEmptyEvents     (void); // For Validations
-  void ReadFitEvents       (void);
-  FitSplineHead* GetSplineHead (void);
+  void ReadBinSplineFile(void);
+  void ReadHistogramFile(void);
+  void ReadNeutFile(void);
+  void ReadNuanceFile(void);
+  void ReadGenieFile(void);
+  void ReadNuWroFile(void);
+  void ReadEventSplineFile(void);
+  void ReadJointFile(void);
+  void ReadGiBUUFile(void);
+  void ReadEmptyEvents(void);  // For Validations
+  void ReadFitEvents(void);
+  FitSplineHead* GetSplineHead(void);
 
-  double PredictedEventRate  (double low, double high, std::string intOpt="width");
-  double TotalIntegratedFlux (double low, double high, std::string intOpt="width");
-  
-  inline FitEvent*   GetEventPointer  (void) { return fEvent;       };
-  inline BaseFitEvt* GetSignalPointer (void) { return fSignalEvent; };
+  double PredictedEventRate(double low, double high,
+                            std::string intOpt = "width");
+  double TotalIntegratedFlux(double low, double high,
+                             std::string intOpt = "width");
 
-  inline int GetNEvents (void) const { return fNEvents; };
-  int GetGenEvents (void);
+  inline FitEvent* GetEventPointer(void) { return fEvent; };
+  inline BaseFitEvt* GetSignalPointer(void) { return fSignalEvent; };
 
-  void PrintStartInput (void);
-  void ReadEvent (unsigned int i);
+  inline int GetNEvents(void) const { return fNEvents; };
+  int GetGenEvents(void);
+  std::string GetInputFileName(){return fInputFile; }
+  InputUtils::InputType GetInputFileType(){return fInputType; }
 
-  inline TH1D* GetFluxHistogram  (void) { return fFluxHist;  };
-  inline TH1D* GetEventHistogram (void) { return fEventHist; };
-  inline TH1D* GetXSecHistogram  (void) { return fXSecHist;  };
-  
-  std::vector<TH1*> GetFluxList  (void) { return fFluxList;  };
-  std::vector<TH1*> GetEventList (void) { return fEventList; };
-  std::vector<TH1*> GetXSecList  (void) { return fXSecList;  };
+  void PrintStartInput(void);
+  void ReadEvent(unsigned int i);
+
+  inline TH1D* GetFluxHistogram(void) { return fFluxHist; };
+  inline TH1D* GetEventHistogram(void) { return fEventHist; };
+  inline TH1D* GetXSecHistogram(void) { return fXSecHist; };
+
+  std::vector<TH1*> GetFluxList(void) { return fFluxList; };
+  std::vector<TH1*> GetEventList(void) { return fEventList; };
+  std::vector<TH1*> GetXSecList(void) { return fXSecList; };
 
   inline int GetType(void) const { return fEventType; };
-  
-  bool CanIGoFast (void);
+
+  bool CanIGoFast(void);
   void GetTreeEntry(const Long64_t entry);
-  std::string GetInputStateString (void);
-  double GetInputWeight(const int entry=-1);
+  std::string GetInputStateString(void);
+  double GetInputWeight(const int entry = -1);
 
   void SetupCache();
-  
- protected:
 
+ protected:
   FitEvent* fEvent;
   int fEventType;
   BaseFitEvt* fSignalEvent;
-  
+
   FitSplineHead* fSplineHead;
 
   int fMaxEvents;
@@ -107,7 +112,8 @@ class InputHandler {
 
   std::string fName;
   std::string fInput;
-  std::string fInputType;
+
+  InputUtils::InputType fInputType;
   std::string fInputFile;
   TFile* fInputRootFile;
 
@@ -118,30 +124,32 @@ class InputHandler {
   std::vector<TH1D*> fJointIndexHist;
   std::vector<double> fJointIndexScale;
   bool fIsJointInput;
+  bool fIsExplicitJointInput; // Kept for backwards compatibility
 
   std::vector<TH1*> fXSecList;
   std::vector<TH1*> fEventList;
   std::vector<TH1*> fFluxList;
 
   double** fSplineArray;
-  //  std::vector<double*> fAllSplines;
-  
-  // Horribly Wrapped Event Objects!
-  // Have to add this hear incase one generator isn't supported.
+//  std::vector<double*> fAllSplines;
+
+// Horribly Wrapped Event Objects!
+// Have to add this hear incase one generator isn't supported.
 #ifdef __NEUT_ENABLED__
-  NeutVect *fNeutVect; //!< Pointer to NEUT Events
+  NeutVect* fNeutVect;  //!< Pointer to NEUT Events
 #endif
 #ifdef __NUWRO_ENABLED__
-  event* fNuwroEvent; //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
+  event*
+      fNuwroEvent;  //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
 #endif
 #ifdef __GENIE_ENABLED__
   GHepRecord* fGenieGHep;
-  NtpMCEventRecord * fGenieNtpl; 
+  NtpMCEventRecord* fGenieNtpl;
 #endif
 #ifdef __NUANCE_ENABLED__
   NuanceEvent* fNuanceEvt;
 #endif
-    
+
   TChain* tn;
 };
 #endif
