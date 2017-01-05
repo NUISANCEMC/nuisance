@@ -6,8 +6,8 @@
 T2K_CC1pip_H2O_XSec_1Dpmu_nu::T2K_CC1pip_H2O_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 //******************************************************************** 
 
-  measurementName = "T2K_CC1pip_H2O_XSec_1Dpmu_nu";
-  plotTitles = "; p_{#mu} (GeV/c); d#sigma/dp_{#mu} (cm^{2}/(GeV/c)/nucleon)";
+  fName = "T2K_CC1pip_H2O_XSec_1Dpmu_nu";
+  fPlotTitles = "; p_{#mu} (GeV/c); d#sigma/dp_{#mu} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -18,7 +18,7 @@ T2K_CC1pip_H2O_XSec_1Dpmu_nu::T2K_CC1pip_H2O_XSec_1Dpmu_nu(std::string inputfile
   // hTruthNEUT is the NEUT cross-section given by experimenter
   // hTruthGENIE is the GENIE cross-section given by experimenter
   SetDataFromFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root","MuMom/hResultTot");
-  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "MuMom/TotalCovariance");
+  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "MuMom/TotalCovariance", true);
 
   SetupDefaultHist();
 
@@ -38,7 +38,7 @@ void T2K_CC1pip_H2O_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
 
   double p_mu = FitUtils::p(Pmu);
 
-  this->X_VAR = p_mu;
+  fXVar = p_mu;
 
   return;
 };

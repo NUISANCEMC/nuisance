@@ -475,6 +475,7 @@ T2K Samples
 	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
 	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
     fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type));
+
     /*
       T2K CC1pi+ CH samples
     */
@@ -510,25 +511,25 @@ T2K Samples
       T2K CC1pi+ H2O samples
     */
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1DEnuDelta_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1DEnuMB_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1DEnuMB_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1DEnuMB_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcosmu_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1Dcosmu_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1Dcosmu_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcosmupi_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1Dcosmupi_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1Dcosmupi_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcospi_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1Dcospi_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1Dcospi_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dpmu_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1Dpmu_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1Dpmu_nu(file, rw, type, fkdt));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dppi_nu")) {
-    fChain->push_back(new T2K_CC1pip_H2O_XSec_1Dppi_nu(file, rw, type, fkdt));
+    fChain->push_back(new   T2K_CC1pip_H2O_XSec_1Dppi_nu(file, rw, type, fkdt));
 
     /*
       T2K CC0pi + np CH samples

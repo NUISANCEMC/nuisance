@@ -6,11 +6,10 @@
 T2K_CC1pip_H2O_XSec_1Dcospi_nu::T2K_CC1pip_H2O_XSec_1Dcospi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 //******************************************************************** 
 
-  measurementName = "T2K_CC1pip_H2O_XSec_1Dcospi_nu";
-  plotTitles = "; cos#theta_{#pi}; d#sigma/dcos#theta_{#pi} (cm^{2}/nucleon)";
+  fName = "T2K_CC1pip_H2O_XSec_1Dcospi_nu";
+  fPlotTitles = "; cos#theta_{#pi}; d#sigma/dcos#theta_{#pi} (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 10.;
-  isDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Data comes in ROOT file
@@ -18,8 +17,8 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu::T2K_CC1pip_H2O_XSec_1Dcospi_nu(std::string input
   // hResultStat is cross-section with stats-only errors
   // hTruthNEUT is the NEUT cross-section given by experimenter
   // hTruthGENIE is the GENIE cross-section given by experimenter
-  SetDataFromFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root","PosPiCos/hResultTot");
-  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "PosPiCos/TotalCovariance");
+  SetDataFromFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root","PosPionCos/hResultTot");
+  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "PosPionCos/TotalCovariance", true);
 
   SetupDefaultHist();
 
