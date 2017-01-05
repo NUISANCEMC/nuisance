@@ -39,19 +39,20 @@
 #include "ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pim1pip_Evt_1Dppim_nu.h"
 #include "ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu.h"
-
+// ANL CC2pi 1pip1pip (mm, even more exotic!)
 #include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h"
-
+// ANL CC2pi 1pip1pi0 (mm, even more exotic!)
 #include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.h"
 
+// ArgoNeuT CC-inclusive
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h"
@@ -111,12 +112,12 @@
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_nu.h"
 
-// MiniBooNE CC1pi+
+// MiniBooNE CC1pi+ 1D
 #include "MiniBooNE_CC1pip_XSec_1DEnu_nu.h"
 #include "MiniBooNE_CC1pip_XSec_1DQ2_nu.h"
 #include "MiniBooNE_CC1pip_XSec_1DTpi_nu.h"
 #include "MiniBooNE_CC1pip_XSec_1DTu_nu.h"
-
+// MiniBooNE CC1pi+ 2D
 #include "MiniBooNE_CC1pip_XSec_2DQ2Enu_nu.h"
 #include "MiniBooNE_CC1pip_XSec_2DTpiCospi_nu.h"
 #include "MiniBooNE_CC1pip_XSec_2DTpiEnu_nu.h"
@@ -131,6 +132,7 @@
 #include "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu.h"
 #include "MiniBooNE_CC1pi0_XSec_1Dppi0_nu.h"
 
+// MiniBooNE NC1pi0
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
 
 // MiniBooNE NCEL
@@ -140,6 +142,7 @@
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
 #include "MINERvA_CCQE_XSec_1DQ2_joint.h"
 #include "MINERvA_CCQE_XSec_1DQ2_nu.h"
+
 // MINERvA CC0pi
 #include "MINERvA_CC0pi_XSec_1DEe_nue.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
@@ -151,6 +154,7 @@
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
+
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 #include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
@@ -158,6 +162,7 @@
 #include "MINERvA_CCNpip_XSec_1Dthmu_nu.h"
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
+
 // MINERvA CC1pi0
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
@@ -174,6 +179,7 @@
 
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
+
 // T2K CC1pi+ on CH
 #include "T2K_CC1pip_CH_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
@@ -183,12 +189,21 @@
 #include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
+
+// T2K CC1pi+ on H2O
+#include "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1DEnuMB_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1Dcosmu_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1Dcosmupi_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1Dcospi_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
+#include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
+
 // T2K STV CC0pi
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
-
 
 // MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
