@@ -522,8 +522,11 @@ void Measurement1D::SetSmearingMatrix(std::string smearfile, int truedim, int re
 }
 
 //********************************************************************
+// FullUnits refers to if we have "real" unscaled units in the covariance matrix, e.g. 1E-76.
+// If this is the case we need to scale it so that the chi2 contribution is correct
+// NUISANCE internally assumes the covariance matrix has units of 1E76
 void Measurement1D::SetCovarFromDataFile(std::string covarFile,
-    std::string covName) {
+    std::string covName, bool FullUnits) {
   //********************************************************************
 
   LOG(SAM) << "Getting covariance from " << covarFile << "->" << covName
@@ -532,6 +535,10 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile,
   TFile* tempFile = new TFile(covarFile.c_str(), "READ");
   TH2D* covPlot = (TH2D*)tempFile->Get(covName.c_str());
   covPlot->SetDirectory(0);
+  // Scale the covariance matrix if it comes in normal units
+  if (FullUnits) {
+    covPlot->Scale(1.E76);
+  }
 
   int dim = covPlot->GetNbinsX();
   fFullCovar = new TMatrixDSym(dim);
@@ -841,7 +848,9 @@ double Measurement1D::GetLikelihood() {
 
   // Get Chi2
   if (fIsChi2) {
+    // If this isn't a diagonal matrix (i.e. it has a covariance supplied)
     if (!fIsDiag) {
+      // If we don't want to get the chi2 from SVD decomp
       if (!fIsChi2SVD) {
         stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
       } else {
