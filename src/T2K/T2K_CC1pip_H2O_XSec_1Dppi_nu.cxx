@@ -9,7 +9,7 @@ T2K_CC1pip_H2O_XSec_1Dppi_nu::T2K_CC1pip_H2O_XSec_1Dppi_nu(std::string inputfile
   fName = "T2K_CC1pip_H2O_XSec_1Dppi_nu";
   fPlotTitles = "; p_{#pi^{+}} (GeV/c); d#sigma/dp_{#pi^{+}} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Data comes in ROOT file

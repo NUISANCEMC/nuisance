@@ -8,7 +8,7 @@
 T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
 
   // Here we can give either MB (kMB), extended MB (keMB) or Delta (kDelta)

@@ -10,7 +10,7 @@ T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(std::string
   fName = "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu";
   fPlotTitles = "; E^{#Delta}_{#nu} (GeV); #sigma(E^{#Delta}_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Data comes in ROOT file

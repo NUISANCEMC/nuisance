@@ -25,6 +25,7 @@
 //********************************************************************
 Measurement1D::Measurement1D() {
   //********************************************************************
+  fScaleFactor = -1.0;
   fCurrentNorm = 1.0;
   fMCHist = NULL;
   fDataHist = NULL;
@@ -685,6 +686,14 @@ void Measurement1D::FillHistograms() {
 //********************************************************************
 void Measurement1D::ScaleEvents() {
   //********************************************************************
+  
+  // Check that the fScaleFactor variable has been set and makes sense
+  if (fScaleFactor < 0) {
+    LOG(ERR) << "I found a negative fScaleFactor in " << __FILE__ << ":" << __LINE__ << std::endl;
+    LOG(ERR) << "fScaleFactor = " << fScaleFactor << std::endl;
+    LOG(ERR) << "EXITING" << std::endl;
+    exit(-1);
+  }
 
   LOG(REC) << std::setw(10) << std::right << fMCHist->Integral() << "/" << fNEvents
     << " events passed selection + binning after reweight" << std::endl;

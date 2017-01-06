@@ -223,12 +223,13 @@ protected:
   FitEvent* cust_event;
   FitWeight* fRW; //!< Pointer to the rw engine
   InputHandler* fInput; //!< Instance of the input handler
-  std::string fName;
+
+  std::string fName; //!< Name of the sample
   int fEventType;
 
-  TH1D* fEventHist;
-  TH1D* fXSecHist;
-  TH1D* fFluxHist;
+  TH1D* fEventHist; //!< The event rate histogram (flux*xsec)
+  TH1D* fXSecHist; //!< The cross-section histogram
+  TH1D* fFluxHist; //!< The flux histogram
 
   double fBeamDistance; //!< Incoming Particle flight distance (for oscillation analysis)
   double fScaleFactor; //!< fScaleFactor applied to events to convert from eventrate to final distribution

@@ -18,7 +18,6 @@
 *******************************************************************************/
 
 #include "FitUtils.h"
-
 #include "T2K_SignalDef.h"
 
 namespace SignalDef {

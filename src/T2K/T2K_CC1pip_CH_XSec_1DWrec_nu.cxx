@@ -10,7 +10,7 @@ T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile
   fName = "T2K_CC1pip_CH_XSec_1DWrec_nu";
   fPlotTitles = "; W_{rec} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c^{2})/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

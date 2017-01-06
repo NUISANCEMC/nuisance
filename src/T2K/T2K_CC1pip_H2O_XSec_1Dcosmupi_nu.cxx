@@ -8,8 +8,8 @@ T2K_CC1pip_H2O_XSec_1Dcosmupi_nu::T2K_CC1pip_H2O_XSec_1Dcosmupi_nu(std::string i
 
   fName = "T2K_CC1pip_H2O_XSec_1Dcosmupi_nu";
   fPlotTitles = "; cos#theta_{#pi,#mu}; d#sigma/dcos#theta_{#pi#mu} (cm^{2}/nucleon)";
-  EnuMin = 0;
-  EnuMax = 10;
+  EnuMin = 0.;
+  EnuMax = 100.;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Data comes in ROOT file
