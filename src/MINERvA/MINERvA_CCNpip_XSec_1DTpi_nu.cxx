@@ -116,7 +116,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std
   threePions->SetNameTitle((fName+"_3pions").c_str(), (fName+"_3pions"+fPlotTitles).c_str());
   morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+fPlotTitles).c_str());
 
-  fScaleFactor = fEventHist->Integral(fEventHist->FindBin(EnuMin), fEventHist->FindBin(EnuMax), "width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 
 };
 
