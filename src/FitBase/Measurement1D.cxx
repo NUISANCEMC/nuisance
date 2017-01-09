@@ -689,9 +689,9 @@ void Measurement1D::ScaleEvents() {
   
   // Check that the fScaleFactor variable has been set and makes sense
   if (fScaleFactor < 0) {
-    LOG(ERR) << "I found a negative fScaleFactor in " << __FILE__ << ":" << __LINE__ << std::endl;
-    LOG(ERR) << "fScaleFactor = " << fScaleFactor << std::endl;
-    LOG(ERR) << "EXITING" << std::endl;
+    ERR(FTL) << "I found a negative fScaleFactor in " << __FILE__ << ":" << __LINE__ << std::endl;
+    ERR(FTL) << "fScaleFactor = " << fScaleFactor << std::endl;
+    ERR(FTL) << "EXITING" << std::endl;
     exit(-1);
   }
 
