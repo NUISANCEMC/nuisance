@@ -21,7 +21,7 @@
 
 // The constructor
 MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "MiniBooNE_CC1pip_XSec_2DTuEnu_nu";
   fPlotTitles = "; E_{#nu} (MeV); T_{#mu} (MeV); d#sigma(E_{#nu})/dT_{#mu} (cm^{2}/MeV)";
   fIsDiag = true;
@@ -35,7 +35,7 @@ MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(std::string i
   covar     = StatUtils::GetInvert(fFullCovar);
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
 };
 
 
@@ -72,8 +72,8 @@ void MiniBooNE_CC1pip_XSec_2DTuEnu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CC1pip_XSec_2DTuEnu_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax);
 }

@@ -44,7 +44,7 @@ MINERvA_CC1pi0_XSec_1DTpi0_antinu::MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string
 
   this->SetupDefaultHist();
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pi0_XSec_1DTpi0_antinu::FillEventVariables(FitEvent *event) {

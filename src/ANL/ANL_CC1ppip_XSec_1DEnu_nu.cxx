@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * Radecky et al. Phys Rev D, 3rd series, volume 25, number 5, 1 March 1982, p 1161-1173
 */
 #include "ANL_CC1ppip_XSec_1DEnu_nu.h"
@@ -39,7 +39,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 
@@ -58,7 +58,7 @@ void ANL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
-      
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) Enu = Pnu.E()/1.E3;
 
@@ -86,9 +86,9 @@ void ANL_CC1ppip_XSec_1DEnu_nu::FillHistograms() {
 
 
 void ANL_CC1ppip_XSec_1DEnu_nu::ScaleEvents() {
-  
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

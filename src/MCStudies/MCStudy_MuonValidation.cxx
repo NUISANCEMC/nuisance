@@ -51,7 +51,7 @@ MCStudy_MuonValidation::MCStudy_MuonValidation(std::string name, std::string inp
 
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("approximate_data"), ("kaon_data"), 5, 1.0, 6.0);
-  
+
   this->SetupDefaultHist();
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
@@ -62,7 +62,7 @@ MCStudy_MuonValidation::MCStudy_MuonValidation(std::string name, std::string inp
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+  this->fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
     this->TotalIntegratedFlux();
 
   // Create a new TTree and add Nuisance Events Branches
@@ -82,10 +82,10 @@ MCStudy_MuonValidation::MCStudy_MuonValidation(std::string name, std::string inp
   fEventTree->Branch("q0",&q0,"q0/F");
   fEventTree->Branch("q3",&q3,"q3/F");
 
-  // the input flux. Use this when merging different output event ttrees             
+  // the input flux. Use this when merging different output event ttrees
   fEventTree->Branch("EventScaleFactor", &fEventScaleFactor, "EventScaleFactor/D");
-  fEventScaleFactor = fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.);
-  
+  fEventScaleFactor = GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.);
+
   return;
 }
 
@@ -96,7 +96,7 @@ void MCStudy_MuonValidation::FillEventVariables(FitEvent *event) {
   FitParticle* muon = NULL;
   FitParticle* nu   = event->GetNeutrinoIn();
   bool IsNuMu = event->PDGnu() > 0;
-  
+
   if (IsNuMu)  muon = event->GetHMFSParticle(13);
   else muon = event->GetHMFSParticle(-13);
 
@@ -116,19 +116,19 @@ void MCStudy_MuonValidation::FillEventVariables(FitEvent *event) {
     Enu = event->Enu() / 1.E3;
 
     TLep   = (muon->fP.E() - muon->fP.Mag()) / 1.E3;
-    CosLep = cos(muon->fP.Vect().Angle( nu->fP.Vect() )); 
+    CosLep = cos(muon->fP.Vect().Angle( nu->fP.Vect() ));
 
     Q2   = fabs((muon->fP - nu->fP).Mag2() / 1.E6);
 
     Q2QE = FitUtils::Q2QErec(muon->fP, CosLep, 34., IsNuMu);
     EQE  = FitUtils::EnuQErec(muon->fP, CosLep, 34., IsNuMu);
-    
+
     q0 = fabs((muon->fP - nu->fP).E()) / 1.E3;
     q3 = fabs((muon->fP - nu->fP).Vect().Mag()) / 1.E3;
 
     LocalRWWeight = event->RWWeight;
     LocalInputWeight = event->InputWeight;
-    
+
   }
 
   // Fill Tree
@@ -160,7 +160,7 @@ bool MCStudy_MuonValidation::isSignal(FitEvent *event) {
 //********************************************************************
 
   if (!event->HasFSMuon()) return false;
-  
+
   // Do we want any other signal?
   return true;
 };

@@ -24,55 +24,55 @@
  *  @{
  */
 
-
-#include <stdlib.h>
-#include <numeric>
 #include <math.h>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
+#include <stdlib.h>
 #include <deque>
+#include <iomanip>
+#include <iostream>
 #include <list>
+#include <numeric>
+#include <sstream>
+#include <string>
 
 // ROOT includes
-#include <TROOT.h>
+#include <TArrayF.h>
+#include <TCanvas.h>
+#include <TCut.h>
+#include <TDecompChol.h>
+#include <TDecompSVD.h>
+#include <TGraph.h>
+#include <TGraphErrors.h>
 #include <TH1D.h>
 #include <TH2D.h>
-#include <TArrayF.h>
-#include <TGraph.h>
-#include <TCut.h>
-#include <TGraphErrors.h>
 #include <TMatrixDSym.h>
-#include <TDecompSVD.h>
-#include <TDecompChol.h>
+#include <TROOT.h>
 #include <TSystem.h>
-#include <TCanvas.h>
 #include "Measurement1D.h"
 
 // External data fit includes
-#include "MeasurementBase.h"
 #include "FitEvent.h"
-#include "FitUtils.h"
-#include "StatUtils.h"
-#include "PlotUtils.h"
 #include "FitParameters.h"
+#include "FitUtils.h"
+#include "MeasurementBase.h"
+#include "PlotUtils.h"
+#include "StatUtils.h"
 
 #include "InputHandler.h"
 
 /// Joint Measurement 1D Class
 ///
-/// Base class used to setup measurements that require multiple distributions to then be merged.
-/// The "fSubChain" object is used to keep track of each of the individual experiments which are then
+/// Base class used to setup measurements that require multiple distributions to
+/// then be merged.
+/// The "fSubChain" object is used to keep track of each of the individual
+/// experiments which are then
 /// automatically reconfigured, written, etc.
 
 //********************************************************************
 //! Base class to setup measurements that require several sub measurements
 class JointMeas1D : public Measurement1D {
-//********************************************************************
+  //********************************************************************
 
  public:
-
   /*
     Constructor/Deconstuctor
   */
@@ -88,22 +88,27 @@ class JointMeas1D : public Measurement1D {
 
   /*
     Worker Node Functions
-    - Input handler does the long reconfigures so gives option for cluster submission
+    - Input handler does the long reconfigures so gives option for cluster
+    submission
     - on a sample by sample basis
   */
-
 
   /*
     Setup Functions
   */
-  /// Setup the measurement and weight engines, parse the input files and setup sub measurements.
-  virtual void SetupMeasurement(std::string input, std::string type, FitWeight *rw, std::string fkdt);
+  /// Setup the measurement and weight engines, parse the input files and setup
+  /// sub measurements.
+  virtual void SetupMeasurement(std::string input, std::string type,
+                                FitWeight* rw, std::string fkdt);
 
   /*
     XSec Functions
   */
-  /// Return total integrated flux. Will integrate flux of all sub samples if required.
-  virtual double TotalIntegratedFlux(std::string intOpt="width",double low=-9999.9, double high=-9999.9);
+  /// Return total integrated flux. Will integrate flux of all sub samples if
+  /// required.
+  virtual double TotalIntegratedFlux(std::string intOpt = "width",
+                                     double low = -9999.9,
+                                     double high = -9999.9);
 
   /*
     Reconfigure Functions
@@ -113,7 +118,8 @@ class JointMeas1D : public Measurement1D {
   virtual void Reconfigure();
   virtual void ReconfigureFast();
 
-  /// Stitch the sub sample plots together to make a final fMCHist after reconfigure has been called
+  /// Stitch the sub sample plots together to make a final fMCHist after
+  /// reconfigure has been called
   virtual void MakePlots();
 
   /*
@@ -133,6 +139,14 @@ class JointMeas1D : public Measurement1D {
   //! Return an event rate integrated across all sub samples
   virtual TH1D* GetCombinedEventRate();
 
+  virtual TH1D* GetEventHistogram() { return GetCombinedEventRate(); };
+  virtual TH1D* GetXSecHistogram() {
+    ERR(WRN)
+        << "XSec histogram not properly implemented for joint measurements.";
+    return MeasurementBase::GetXSecHistogram();
+  };
+  virtual TH1D* GetFluxHistogram() { return GetCombinedFlux(); };
+
   /*
     Write Functions
   */
@@ -140,15 +154,16 @@ class JointMeas1D : public Measurement1D {
   //! Write the current status of the plots to the current directory
   virtual void Write(std::string drawOpt);
 
-  std::vector<MeasurementBase*> fSubChain; //!< Vector of experimental classes that are the sub measurements
-  std::vector<std::string>      fSubInFiles; //!< vector of input files for each of the sub measurements.
+  std::vector<MeasurementBase*> fSubChain;  //!< Vector of experimental classes
+                                            //! that are the sub measurements
+  std::vector<std::string>
+      fSubInFiles;  //!< vector of input files for each of the sub measurements.
 
-protected:
-
-  bool fIsRatio; //!< Flag: is this sample a hist1/hist2 ratio sample
-  bool fIsSummed; //!< Flag: is this sample a combination hist1 + hist2
-  bool fSaveSubMeas; //!< Flag: Save each of the histograms from the sub samples as well as this joint samples plots
-
+ protected:
+  bool fIsRatio;      //!< Flag: is this sample a hist1/hist2 ratio sample
+  bool fIsSummed;     //!< Flag: is this sample a combination hist1 + hist2
+  bool fSaveSubMeas;  //!< Flag: Save each of the histograms from the sub
+                      //! samples as well as this joint samples plots
 };
 
 /*! @} */

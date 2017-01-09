@@ -16,14 +16,14 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-/** 
+/**
  * Radecky et al. Phys Rev D, 3rd series, volume 25, number 5, 1 March 1982, p 1161-1173
 */
 #include "ANL_CC1ppip_XSec_1DQ2_nu.h"
 
 // The constructor
 ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "ANL_CC1ppip_XSec_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 0.5;
@@ -38,12 +38,12 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
 };
 
 
 void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)

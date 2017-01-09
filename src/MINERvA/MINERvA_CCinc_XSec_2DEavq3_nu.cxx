@@ -62,7 +62,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfi
   SetupDefaultHist();
 
   // Set Scale Factor
-  fScaleFactor = (this->fEventHist->Integral("width")*1E-42/(fNEvents+0.))/this->TotalIntegratedFlux();
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-42/(fNEvents+0.))/this->TotalIntegratedFlux();
 };
 
 

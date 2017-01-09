@@ -36,7 +36,7 @@ GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 void GGM_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

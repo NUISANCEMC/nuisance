@@ -16,14 +16,14 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-/** 
+/**
  * Derrick et al. Phys Rev D, Vol 23, Number 3, 1 Feb 1981, p 569-575
 */
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
 
 // The constructor
 ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1ppip_Evt_1Dthpr_nu";
   fPlotTitles = "; cos #theta_{p}; Number of events";
   EnuMin = 0;
@@ -43,11 +43,11 @@ ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitW
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
-  
+
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.))*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.))*(16./8.);
 };
 
 void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {
@@ -64,7 +64,7 @@ void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double costhpr = -999;
-    
+
   // This measurement has M(Npi) = W < 1.4GeV
   if (hadMass < 1400) costhpr = cos(FitUtils::th(Pnu,Pp));
 

@@ -22,7 +22,7 @@ ArgoNeuT_CCInc_XSec_1Dpmu_antinu::ArgoNeuT_CCInc_XSec_1Dpmu_antinu(
 
   SetupDefaultHist();
 
-  fScaleFactor = fEventHist->Integral("width") * double(1E-38) / double(fNEvents) *
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) *
                 (40.0 /*Data is /Ar */) / TotalIntegratedFlux("width");
 };
 

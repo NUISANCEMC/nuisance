@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * Derrick et al. Phys Rev D, Vol 23, Number 3, 1 Feb 1981, p 569-575
 */
 
@@ -48,7 +48,7 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*(16./8.);
 };
 
 void ANL_CC1ppip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {

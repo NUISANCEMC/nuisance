@@ -21,7 +21,7 @@
 
 // The constructor
 MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "MiniBooNE_CC1pi0_XSec_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi}^{2} (cm^{2}/GeV^{2})";
   fIsDiag = false;
@@ -35,7 +35,7 @@ MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(std::string inputfi
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdq2_covar.txt", this->fNDataPointsX-1);
   this->SetupDefaultHist();
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 void MiniBooNE_CC1pi0_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
@@ -47,7 +47,7 @@ void MiniBooNE_CC1pi0_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  
+
   double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
 
   fXVar = q2CCpi0;
@@ -55,8 +55,8 @@ void MiniBooNE_CC1pi0_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CC1pi0_XSec_1DQ2_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }

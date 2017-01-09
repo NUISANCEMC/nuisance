@@ -21,6 +21,7 @@
 #define INPUT_UTILS_H
 
 #include <string>
+#include "TFile.h"
 
 namespace InputUtils {
 
@@ -42,6 +43,9 @@ enum InputType {
 InputType ParseInputType(std::string const &inp);
 bool IsJointInput(std::string const &inputs);
 std::string ExpandInputDirectories(std::string const &inputs);
+
+InputType GuessInputTypeFromFile(TFile *inpF);
+std::string PrependGuessedInputTypeToName(std::string const &inpFName);
 }
 
 inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
@@ -79,5 +83,7 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
     default: { return os << "kInvalid_Input"; }
   }
 }
+
+
 
 #endif

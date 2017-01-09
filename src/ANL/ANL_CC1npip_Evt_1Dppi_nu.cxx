@@ -21,7 +21,7 @@
 
 // The constructor
 ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1npip_Evt_1Dppi_nu";
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   EnuMin = 0;
@@ -45,11 +45,11 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/double(fNEvents)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/double(fNEvents)*(16./8.);
 };
 
 void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2112) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -62,7 +62,7 @@ void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double ppip;
-  
+
   // This measurement has a 1.4 GeV M(Npi) constraint
   if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
   else ppip = -1.0;

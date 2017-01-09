@@ -54,7 +54,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   this->SetupDefaultHist();
 
   // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
 
 };
 

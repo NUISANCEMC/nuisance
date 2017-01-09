@@ -18,12 +18,12 @@
 *******************************************************************************/
 #include "ANL_NC1ppim_XSec_1DEnu_nu.h"
 
-/** 
+/**
   * M. Derrick et al., "Study of the reaction \nu n \rightarrow \nu p \pi^-", Physics Letters, Volume 92B, Number 3,4, 363, 19 May 1980
 */
 
 ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_NC1ppim_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu};#sigma(E_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 0.3;
@@ -43,7 +43,7 @@ ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitW
   // PDAWG: Removed this scaling because it doesn't seem consistent.
   //  fDataHist->Scale(1.E-41);
 
-  this->fScaleFactor = this->fEventHist->Integral("width") * 1E-38 /(fNEvents+0)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width") * 1E-38 /(fNEvents+0)*(16./8.);
 };
 
 void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {

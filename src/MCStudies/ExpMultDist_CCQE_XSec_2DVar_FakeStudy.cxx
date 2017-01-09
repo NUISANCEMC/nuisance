@@ -19,11 +19,11 @@
 
 #include "ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h"
 
-//******************************************************************** 
+//********************************************************************
 /// @brief Class to perform CCQE Fake Data Studies on a custom measurement
 ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-//******************************************************************** 
-  
+//********************************************************************
+
   // Measurement Details
   fName = name;
 
@@ -38,7 +38,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
 
   // This function will sort out the input files automatically and parse all the inputs,flags,etc.
   // There may be complex cases where you have to do this by hand, but usually this will do.
-  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
+  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Use the name to define what variable to measure
   int nbinsx, nbinsy;
@@ -58,10 +58,10 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
     nbinsx = 20; binlowx = 0.0; binhighx = 3.0;
     nbinsy = 10;  binlowy = -1.0; binhighy = 1.0;
   }
-  
+
   // Setup the datahist as empty, we will use fake data to fill it.
   this->fDataHist = new TH2D((fName + "_data").c_str(), (fName + "_data" + fPlotTitles).c_str(), nbinsx, binlowx, binhighx, nbinsy, binlowy, binhighy);
-  
+
   // Once fDataHist is setup this function will automatically generate matching MC histograms
   this->SetupDefaultHist();
 
@@ -76,26 +76,26 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
     }
   }
 
-  
+
   // Setup Covariance assuming a diagonal covar.
   // If you want a full covariance to be used examples are given in the MINERvA 2D classes
   //fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   //  covar     = StatUtils::GetInvert(fFullCovar);
-  
+
 
   // 3. The generator is organised in SetupMeasurement so it gives the cross-section in "per nucleon" units.
   //    So some extra scaling for a specific measurement may be required. For Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and divide by the number of neutrons 6.
-  this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))  * (12.0 / 6.0)  /this->TotalIntegratedFlux();
+  this->fScaleFactor = (GetEventHistogram()->Integral()*1E-38/(fNEvents+0.))  * (12.0 / 6.0)  /this->TotalIntegratedFlux();
 
 };
 
 
 
-//******************************************************************** 
+//********************************************************************
 /// @details Extract Enu and totcrs from event assuming quasi-elastic scattering
 void ExpMultDist_CCQE_XSec_2DVar_FakeStudy::FillEventVariables(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
 
   // MUST be defined for each new sample.
   // This function reads in the FitEvent format and lets you grab any information you need
@@ -105,14 +105,14 @@ void ExpMultDist_CCQE_XSec_2DVar_FakeStudy::FillEventVariables(FitEvent *event){
   // Define empty variables
   fXVar = -1.0;
   fYVar = -1.0;
-  
+
   double q2qe = 0.0;
   double CosThetaMu = -2.0;
   double TMu = 0.0;
-  
+
   // Loop over the particle stack
   for (UInt_t j = 2; j < event->Npart(); ++j){
-    
+
     // Look for the outgoing muon
     if ((event->PartInfo(j))->fPID != 13) continue;
 
@@ -124,26 +124,26 @@ void ExpMultDist_CCQE_XSec_2DVar_FakeStudy::FillEventVariables(FitEvent *event){
 
     CosThetaMu = cos(ThetaMu);
     TMu = FitUtils::T((event->PartInfo(j))->fP);
-    
+
     // Once lepton is found, don't continue the loop
-    break;  
+    break;
   }
 
   if (this->plottype == 1) {fXVar = q2qe; fYVar = TMu;}
   else if (this->plottype == 2) {fXVar = q2qe; fXVar = CosThetaMu;}
   else if (this->plottype == 3) {fXVar = TMu; fYVar = CosThetaMu;}
-  
+
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 /// @details Signal is true CCQE scattering
 ///
 /// @details Cut 1: numu event
 /// @details Cut 2: Mode == 1
 /// @details Cut 3: EnuMin < Enu < EnuMax
 bool ExpMultDist_CCQE_XSec_2DVar_FakeStudy::isSignal(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
 
   // Place cuts on each of the events here.
   // MUST be defined for all new samples, there is no default signal definition.
@@ -154,13 +154,13 @@ bool ExpMultDist_CCQE_XSec_2DVar_FakeStudy::isSignal(FitEvent *event){
   // this function is inefficient.
 
   // Mode and Enu are automatically avaialble in this function, they don't need to be set earlier.
-  
+
   // Only look at numu events
   if ((event->PartInfo(0))->fPID != 14) return false;
 
   // Only look at CCQE Events and MEC Events
   if (Mode != 1 and Mode != 2) return false;
-  
+
   // Restrict energy range
   if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
 

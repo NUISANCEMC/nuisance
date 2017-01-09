@@ -86,9 +86,9 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
 
     // 2016 release data unfortunately not released in 20degree forward-going, revert to 2015 data
     if (fUpdatedData){
-      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl; 
+      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl;
       fUpdatedData = false;
-    } 
+    }
 
     // Only 2015 20deg data
     if (fIsShape) {
@@ -116,7 +116,7 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+fPlotTitles).c_str());
 
 
-  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 

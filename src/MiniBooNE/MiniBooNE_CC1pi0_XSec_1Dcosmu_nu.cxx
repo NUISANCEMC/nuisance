@@ -21,7 +21,7 @@
 
 // The constructor
 MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "MiniBooNE_CC1pi0_XSec_1Dcosmu_nu";
   fPlotTitles = "; cos#theta_{#mu}; d#sigma/dcos#theta_{#mu} (cm^{2}/CH_{2})";
   fIsDiag = false;
@@ -35,11 +35,11 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(std::string i
   this->SetupDefaultHist();
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(111) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
@@ -48,7 +48,7 @@ void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // No W cut on MiniBooNE CC1pi+ 
+  // No W cut on MiniBooNE CC1pi+
   double CosMu = cos(FitUtils::th(Pnu, Pmu));
 
   fXVar = CosMu;
@@ -56,8 +56,8 @@ void MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }

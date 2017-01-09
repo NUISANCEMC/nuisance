@@ -103,8 +103,10 @@ class Measurement1D : public MeasurementBase {
   //! "covar")
   virtual void SetCovarMatrix(std::string covarFile);
 
-  //! Read the correlation matrix from a text file given the covar size and convert to covariance matrix
-  virtual void SetCovarMatrixFromText(std::string covarFile, int dim, double scale = 1.0);
+  //! Read the correlation matrix from a text file given the covar size and
+  //! convert to covariance matrix
+  virtual void SetCovarMatrixFromText(std::string covarFile, int dim,
+                                      double scale = 1.0);
   //
   //! Read the covariance matrix from a text file given the covar size
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
@@ -119,14 +121,14 @@ class Measurement1D : public MeasurementBase {
   //! Set the bin mask from a text file
   virtual void SetBinMask(std::string maskFile);
 
-  //! Set the flux histogram from a ROOT file
-  virtual void SetFluxHistogram(std::string fluxFile, int minE, int maxE,
-                                double fluxNorm);
+  // //! Set the flux histogram from a ROOT file
+  // virtual void SetFluxHistogram(std::string fluxFile, int minE, int maxE,
+  //                               double fluxNorm);
 
-  //! Get the total integrated flux between this samples energy range
-  virtual double TotalIntegratedFlux(std::string intOpt = "width",
-                                     double low = -9999.9,
-                                     double high = -9999.9);
+  // //! Get the total integrated flux between this samples energy range
+  // virtual double TotalIntegratedFlux(std::string intOpt = "width",
+  //                                    double low = -9999.9,
+  //                                    double high = -9999.9);
 
   //! Reset histograms to zero
   virtual void ResetAll(void);
@@ -214,7 +216,7 @@ class Measurement1D : public MeasurementBase {
   TH1D* fMCHist;  //!< default MC Histogram used in the chi2 fits
   TH1D* fMCFine;  //!< finely binned MC histogram
   TH1D* fMCStat;  //!< histogram with unweighted events to properly calculate
-                  //!statistical error on MC
+                  //! statistical error on MC
   TH1D* fMCWeighted;  //!< Weighted histogram before xsec scaling
 
   TH1I* fMaskHist;  //!< Mask histogram for neglecting specific bins
@@ -227,7 +229,7 @@ class Measurement1D : public MeasurementBase {
   TMatrixDSym* fDecomp;     //!< Decomposed Covariance
   TMatrixDSym* fCorrel;     //!< Correlation Matrix
   TMatrixD* fSmearMatrix;   //!< Smearing matrix (note, this is not symmetric,
-                            //!and also in general not square)
+                            //! and also in general not square)
   double fCovDet;           //!< Determinant of the covariance
   double fNormError;        //!< Sample norm error
   std::string fFitType;
@@ -254,6 +256,8 @@ class Measurement1D : public MeasurementBase {
 
   std::string fAllowedTypes;  //!< Fit Types Possible
   std::string fDefaultTypes;  //!< Starting Default Fit Types
+
+  size_t NSignal;
 };
 
 /*! @} */

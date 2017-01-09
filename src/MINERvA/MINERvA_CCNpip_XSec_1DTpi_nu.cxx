@@ -59,7 +59,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std
 
     // 2015 release
     } else {
-      
+
       // If we're doing shape only
       if (fIsShape) {
         fName += "_shape";
@@ -82,9 +82,9 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std
 
     // Only 2015 data released restricted muon phase space cross-section unfortunately
     if (fUpdatedData){
-      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl; 
+      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl;
       fUpdatedData = false;
-    } 
+    }
 
     // If we're using the shape only data
     if (fIsShape) {
@@ -116,7 +116,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std
   threePions->SetNameTitle((fName+"_3pions").c_str(), (fName+"_3pions"+fPlotTitles).c_str());
   morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+fPlotTitles).c_str());
 
-  fScaleFactor = fEventHist->Integral(fEventHist->FindBin(EnuMin), fEventHist->FindBin(EnuMax), "width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = GetEventHistogram()->Integral(GetEventHistogram()->FindBin(EnuMin), GetEventHistogram()->FindBin(EnuMax), "width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 
 };
 

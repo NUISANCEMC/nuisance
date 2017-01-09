@@ -21,7 +21,7 @@
 
 // The constructor
 BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "BNL_CC1ppip_Evt_1DcosthAdler_nu";
   fPlotTitles = "; cos#theta_{Adler}; Number of events";
   EnuMin = 0;
@@ -43,12 +43,12 @@ BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -58,7 +58,7 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  
+
   // Get the hadronic mass
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   // Need to boost pion and muon into resonance rest-frame to get phi (e.g. see F. Sanchez arxiv 1511.00501v2)
@@ -78,7 +78,7 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
 
   // Then finally construct phi as the angle between pion projection and x axis
   double cosThAdler = -999;
-  
+
   // BNL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) {
     cosThAdler = cos(PpipVect.Angle(zVect));
@@ -106,9 +106,9 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
 
 
 void BNL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
-  
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

@@ -16,8 +16,8 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#include <csignal>
 #include "InputHandler.h"
+#include <csignal>
 
 //****************************************************************************
 InputHandler::InputHandler(std::string const& handle,
@@ -47,7 +47,7 @@ InputHandler::InputHandler(std::string const& handle,
   if (fIsJointInput) {
     ReadJointFile();
   } else {
-    fInputRootFile = new TFile(fInputFile.c_str(),"READ");
+    fInputRootFile = new TFile(fInputFile.c_str(), "READ");
     switch (fInputType) {
       // Setup the handler for each type
       case InputUtils::kNEUT_Input: {
@@ -280,7 +280,7 @@ void InputHandler::ReadJointFile() {
 
   std::vector<std::string> inputs;
 
-  if (fIsExplicitJointInput) { // Included for backwards compatibility.
+  if (fIsExplicitJointInput) {  // Included for backwards compatibility.
     std::string line;
     std::ifstream card(fInputFile.c_str(), ifstream::in);
 
@@ -319,7 +319,7 @@ void InputHandler::ReadJointFile() {
 
     inputs = GeneralUtils::ParseToStr(fInputFile, ",");
     inputs.front() = inputs.front().substr(1);
-    inputs.back() = inputs.back().substr(0,inputs.back().size()-1);
+    inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
 
     for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
       LOG(SAM) << "\t -> Found input file: " << inputs[inp_it] << std::endl;
@@ -469,7 +469,7 @@ void InputHandler::ReadNeutFile() {
   // Get flux histograms NEUT supplies
   fFluxHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "flux")).c_str());
-  if (!fFluxHist){
+  if (!fFluxHist) {
     ERR(FTL) << "No Flux Hist in NEUT ROOT file." << std::endl;
     throw;
   }
@@ -478,8 +478,8 @@ void InputHandler::ReadNeutFile() {
 
   fEventHist = (TH1D*)fInputRootFile->Get(
       (PlotUtils::GetObjectWithName(fInputRootFile, "evtrt")).c_str());
-  if (!fEventHist){
-    ERR(FTL) <<"No Event Hist in NEUT ROOT file." << std::endl;
+  if (!fEventHist) {
+    ERR(FTL) << "No Event Hist in NEUT ROOT file." << std::endl;
     throw;
   }
 
@@ -819,8 +819,9 @@ void InputHandler::ReadGiBUUFile() {
   // Replace local pointers with NULL dir'd clones.
   if (numuFlux) {
     numuFlux = static_cast<TH1D*>(numuFlux->Clone());
-    numuFlux->Scale(1.0/numuFlux->Integral("width"));
-    std::cout << "GiBUU Flux: numuFlux, Width integral = " << numuFlux->Integral("width") << std::endl;
+    numuFlux->Scale(1.0 / numuFlux->Integral("width"));
+    std::cout << "GiBUU Flux: numuFlux, Width integral = "
+              << numuFlux->Integral("width") << std::endl;
     numuFlux->SetDirectory(NULL);
     numuFlux->SetNameTitle(
         (fName + "_numu_FLUX").c_str(),
@@ -829,8 +830,9 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (numubFlux) {
     numubFlux = static_cast<TH1D*>(numubFlux->Clone());
-    numubFlux->Scale(1.0/numubFlux->Integral("width"));
-    std::cout << "GiBUU Flux: numubFlux, Width integral = " << numubFlux->Integral("width") << std::endl;
+    numubFlux->Scale(1.0 / numubFlux->Integral("width"));
+    std::cout << "GiBUU Flux: numubFlux, Width integral = "
+              << numubFlux->Integral("width") << std::endl;
     numubFlux->SetDirectory(NULL);
     numubFlux->SetNameTitle(
         (fName + "_numub_FLUX").c_str(),
@@ -839,8 +841,9 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (nueFlux) {
     nueFlux = static_cast<TH1D*>(nueFlux->Clone());
-    nueFlux->Scale(1.0/nueFlux->Integral("width"));
-    std::cout << "GiBUU Flux: nueFlux, Width integral = " << nueFlux->Integral("width") << std::endl;
+    nueFlux->Scale(1.0 / nueFlux->Integral("width"));
+    std::cout << "GiBUU Flux: nueFlux, Width integral = "
+              << nueFlux->Integral("width") << std::endl;
     nueFlux->SetDirectory(NULL);
     nueFlux->SetNameTitle(
         (fName + "_nue_FLUX").c_str(),
@@ -849,8 +852,9 @@ void InputHandler::ReadGiBUUFile() {
   }
   if (nuebFlux) {
     nuebFlux = static_cast<TH1D*>(nuebFlux->Clone());
-    nuebFlux->Scale(1.0/nuebFlux->Integral("width"));
-    std::cout << "GiBUU Flux: nuebFlux, Width integral = " << nuebFlux->Integral("width") << std::endl;
+    nuebFlux->Scale(1.0 / nuebFlux->Integral("width"));
+    std::cout << "GiBUU Flux: nuebFlux, Width integral = "
+              << nuebFlux->Integral("width") << std::endl;
     nuebFlux->SetDirectory(NULL);
     nuebFlux->SetNameTitle(
         (fName + "_nueb_FLUX").c_str(),
@@ -934,7 +938,9 @@ void InputHandler::ReadGiBUUFile() {
         LOG(SAM) << "\tGiBUU File: " << fInputFile << " -- ev: " << nevt
                  << " has IS nu (" << isnu->fPID
                  << "), species weight: " << giRead->SpeciesWght << std::endl;
-        if ((giRead->SpeciesWght < 0.5)) {
+        if ((giRead->SpeciesWght < 0.5) &&
+            (maskHW > 1)) {  // If we only care about a single species, then
+                             // species-weight might not be filled.
           continue;
         }
         fFluxHist = nueFlux;
@@ -951,7 +957,9 @@ void InputHandler::ReadGiBUUFile() {
         LOG(SAM) << "\tGiBUU File: " << fInputFile << " -- ev: " << nevt
                  << " has IS nu (" << isnu->fPID
                  << "), species weight: " << giRead->SpeciesWght << std::endl;
-        if (giRead->SpeciesWght < 0.5) {
+        if ((giRead->SpeciesWght < 0.5) &&
+            (maskHW > 1)) {  // If we only care about a single species, then
+                             // species-weight might not be filled.
           continue;
         }
         IsNuBarDominant = true;
@@ -969,7 +977,9 @@ void InputHandler::ReadGiBUUFile() {
         LOG(SAM) << "\tGiBUU File: " << fInputFile << " -- ev: " << nevt
                  << " has IS nu (" << isnu->fPID
                  << "), species weight: " << giRead->SpeciesWght << std::endl;
-        if (giRead->SpeciesWght < 0.5) {
+        if ((giRead->SpeciesWght < 0.5) &&
+            (maskHW > 1)) {  // If we only care about a single species, then
+                             // species-weight might not be filled.
           continue;
         }
         fFluxHist = numuFlux;
@@ -986,7 +996,9 @@ void InputHandler::ReadGiBUUFile() {
         LOG(SAM) << "\tGiBUU File: " << fInputFile << " -- ev: " << nevt
                  << " has IS nu (" << isnu->fPID
                  << "), species weight: " << giRead->SpeciesWght << std::endl;
-        if (giRead->SpeciesWght < 0.5) {
+        if ((giRead->SpeciesWght < 0.5) &&
+            (maskHW > 1)) {  // If we only care about a single species, then
+                             // species-weight might not be filled.
           continue;
         }
         IsNuBarDominant = true;
@@ -998,65 +1010,6 @@ void InputHandler::ReadGiBUUFile() {
       default: {}
     }
   }
-
-  if (numuFlux) {
-    numuFlux->Scale(SpeciesWeights[0]);
-    TH1D* numuEvt =
-        static_cast<TH1D*>(numuFlux->Clone((fName + "_numu_EVT").c_str()));
-    numuEvt->Reset();
-    numuEvt->SetBinContent(1, SpeciesWeights[0] * double(fNEvents) /
-                                  numuEvt->GetXaxis()->GetBinWidth(1));
-
-    TH1D* numuXSec =
-        static_cast<TH1D*>(numuEvt->Clone((fName + "_numu_XSEC").c_str()));
-    numuXSec->Divide(fFluxHist);
-
-    numuXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
-  }
-  if (numubFlux) {
-    numubFlux->Scale(SpeciesWeights[1]);
-    TH1D* numubEvt =
-        static_cast<TH1D*>(numubFlux->Clone((fName + "_numub_EVT").c_str()));
-    numubEvt->Reset();
-    numubEvt->SetBinContent(1, SpeciesWeights[1] * double(fNEvents) /
-                                   numubEvt->GetXaxis()->GetBinWidth(1));
-
-    TH1D* numubXSec =
-        static_cast<TH1D*>(numubEvt->Clone((fName + "_numub_XSEC").c_str()));
-    numubXSec->Divide(fFluxHist);
-
-    numubXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
-  }
-  if (nueFlux) {
-    nueFlux->Scale(SpeciesWeights[2]);
-    TH1D* nueEvt =
-        static_cast<TH1D*>(nueFlux->Clone((fName + "_nue_EVT").c_str()));
-    nueEvt->Reset();
-    nueEvt->SetBinContent(1, SpeciesWeights[2] * double(fNEvents) /
-                                 nueEvt->GetXaxis()->GetBinWidth(1));
-
-    TH1D* nueXSec =
-        static_cast<TH1D*>(nueEvt->Clone((fName + "_nue_XSEC").c_str()));
-    nueXSec->Divide(fFluxHist);
-
-    nueXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
-  }
-  if (nuebFlux) {
-    nuebFlux->Scale(SpeciesWeights[3]);
-    TH1D* nuebEvt =
-        static_cast<TH1D*>(nuebFlux->Clone((fName + "_nueb_EVT").c_str()));
-    nuebEvt->Reset();
-    nuebEvt->SetBinContent(1, SpeciesWeights[3] * double(fNEvents) /
-                                  nuebEvt->GetXaxis()->GetBinWidth(1));
-
-    TH1D* nuebXSec =
-        static_cast<TH1D*>(nuebEvt->Clone((fName + "_nueb_XSEC").c_str()));
-    nuebXSec->Divide(fFluxHist);
-
-    nuebXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
-  }
-
-  tn->GetEntry(0);
 
   if (Found_nu != Found_nuMask) {
     ERR(FTL) << "Input GiBUU file (" << fInputFile
@@ -1081,6 +1034,74 @@ void InputHandler::ReadGiBUUFile() {
     throw;
   }
 
+  if (numuFlux) {
+    if ((maskHW > 1) && !GeneralUtils::IsSmallNum(SpeciesWeights[0])) {
+      numuFlux->Scale(SpeciesWeights[0]);
+    }
+
+    TH1D* numuEvt =
+        static_cast<TH1D*>(numuFlux->Clone((fName + "_numu_EVT").c_str()));
+    numuEvt->Reset();
+    numuEvt->SetBinContent(1, SpeciesWeights[0] * double(fNEvents) /
+                                  numuEvt->GetXaxis()->GetBinWidth(1));
+
+    TH1D* numuXSec =
+        static_cast<TH1D*>(numuEvt->Clone((fName + "_numu_XSEC").c_str()));
+    numuXSec->Divide(fFluxHist);
+
+    numuXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
+  }
+  if (numubFlux) {
+    if ((maskHW > 1) && !GeneralUtils::IsSmallNum(SpeciesWeights[1])) {
+      numubFlux->Scale(SpeciesWeights[1]);
+    }
+    TH1D* numubEvt =
+        static_cast<TH1D*>(numubFlux->Clone((fName + "_numub_EVT").c_str()));
+    numubEvt->Reset();
+    numubEvt->SetBinContent(1, SpeciesWeights[1] * double(fNEvents) /
+                                   numubEvt->GetXaxis()->GetBinWidth(1));
+
+    TH1D* numubXSec =
+        static_cast<TH1D*>(numubEvt->Clone((fName + "_numub_XSEC").c_str()));
+    numubXSec->Divide(fFluxHist);
+
+    numubXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
+  }
+  if (nueFlux) {
+    if ((maskHW > 1) && !GeneralUtils::IsSmallNum(SpeciesWeights[2])) {
+      nueFlux->Scale(SpeciesWeights[2]);
+    }
+    TH1D* nueEvt =
+        static_cast<TH1D*>(nueFlux->Clone((fName + "_nue_EVT").c_str()));
+    nueEvt->Reset();
+    nueEvt->SetBinContent(1, SpeciesWeights[2] * double(fNEvents) /
+                                 nueEvt->GetXaxis()->GetBinWidth(1));
+
+    TH1D* nueXSec =
+        static_cast<TH1D*>(nueEvt->Clone((fName + "_nue_XSEC").c_str()));
+    nueXSec->Divide(fFluxHist);
+
+    nueXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
+  }
+  if (nuebFlux) {
+    if ((maskHW > 1) && !GeneralUtils::IsSmallNum(SpeciesWeights[3])) {
+      nuebFlux->Scale(SpeciesWeights[3]);
+    }
+    TH1D* nuebEvt =
+        static_cast<TH1D*>(nuebFlux->Clone((fName + "_nueb_EVT").c_str()));
+    nuebEvt->Reset();
+    nuebEvt->SetBinContent(1, SpeciesWeights[3] * double(fNEvents) /
+                                  nuebEvt->GetXaxis()->GetBinWidth(1));
+
+    TH1D* nuebXSec =
+        static_cast<TH1D*>(nuebEvt->Clone((fName + "_nueb_XSEC").c_str()));
+    nuebXSec->Divide(fFluxHist);
+
+    nuebXSec->SetTitle((fName + "; E_{#nu} (GeV);XSec").c_str());
+  }
+
+  tn->GetEntry(0);
+
   LOG(SAM) << "\tInput GiBUU file species weights: (numu:" << SpeciesWeights[0]
            << ",numub:" << SpeciesWeights[1] << ",nue:" << SpeciesWeights[2]
            << ",nueb:" << SpeciesWeights[3] << ")" << std::endl;
@@ -1093,8 +1114,9 @@ void InputHandler::ReadGiBUUFile() {
 
   fEventHist = static_cast<TH1D*>(fFluxHist->Clone((fName + "_EVT").c_str()));
   fEventHist->Reset();
-  fEventHist->SetBinContent(
-      1, double(fNEvents) / fEventHist->GetXaxis()->GetBinWidth(1));
+  fEventHist->SetBinContent(1, double(fNEvents) *
+                                   TotalIntegratedFlux(0, 1.E5, "width") /
+                                   fEventHist->GetXaxis()->GetBinWidth(1));
 
   fXSecHist = static_cast<TH1D*>(fEventHist->Clone((fName + "_XSEC").c_str()));
   fXSecHist->Divide(fFluxHist);
@@ -1339,17 +1361,45 @@ double InputHandler::TotalIntegratedFlux(double low, double high,
                                          std::string intOpt) {
   //********************************************************************
 
-  if (fEventType == kGiBUU) {
-    return 1.0;
+  Int_t minBin = fFluxHist->GetXaxis()->FindFixBin(low);
+  Int_t maxBin = fFluxHist->GetXaxis()->FindFixBin(high);
+
+  if ((fFluxHist->IsBinOverflow(minBin) && (low != -9999.9))) {
+    minBin = 1;
   }
 
-  int minBin = fFluxHist->GetXaxis()->FindBin(low);
-  int maxBin = fFluxHist->GetXaxis()->FindBin(high);
+  if ((fFluxHist->IsBinOverflow(maxBin) && (high != -9999.9))) {
+    maxBin = fFluxHist->GetXaxis()->GetNbins() + 1;
+  }
 
-  double integral = fFluxHist->Integral(minBin, maxBin + 1, intOpt.c_str());
 
-  return integral;
-};
+  // If we are within a single bin
+  if (minBin == maxBin) {
+    // Get the contained fraction of the single bin's width
+    return ((high - low) / fFluxHist->GetXaxis()->GetBinWidth(minBin)) *
+           fFluxHist->Integral(minBin, minBin, intOpt.c_str());
+  }
+
+  double lowBinUpEdge = fFluxHist->GetXaxis()->GetBinUpEdge(minBin);
+  double highBinLowEdge = fFluxHist->GetXaxis()->GetBinLowEdge(maxBin);
+
+  double lowBinfracIntegral =
+      ((lowBinUpEdge - low) / fFluxHist->GetXaxis()->GetBinWidth(minBin)) *
+      fFluxHist->Integral(minBin, minBin, intOpt.c_str());
+  double highBinfracIntegral =
+      ((high - highBinLowEdge) / fFluxHist->GetXaxis()->GetBinWidth(maxBin)) *
+      fFluxHist->Integral(maxBin, maxBin, intOpt.c_str());
+
+  // If they are neighbouring bins
+  if ((minBin + 1) == maxBin) {
+    // Get the contained fraction of the two bin's width
+    return lowBinfracIntegral + highBinfracIntegral;
+  }
+
+  // If there are filled bins between them
+  return lowBinfracIntegral + highBinfracIntegral +
+         fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
+}
 
 //********************************************************************
 double InputHandler::PredictedEventRate(double low, double high,

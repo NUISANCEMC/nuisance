@@ -21,7 +21,7 @@
 
 // The constructor
 MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "MiniBooNE_CC1pi0_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
   fIsDiag = false;
@@ -37,7 +37,7 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(std::string input
   this->SetupDefaultHist();
 
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
 };
 
 void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -49,7 +49,7 @@ void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  =event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  
+
   double Enu = FitUtils::EnuCC1pi0rec(Pnu, Pmu, Ppi0);
 
   fXVar = Enu;
@@ -57,15 +57,15 @@ void MiniBooNE_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-// **************************************************                                  
-// MiniBooNE CC1pi0 signal definition      
-//                                         
+// **************************************************
+// MiniBooNE CC1pi0 signal definition
+//
 // The signal definition is:
 //                          Exactly one negative muon
-//                          Exactly one pi0       
-//                          No additional mesons  
+//                          Exactly one pi0
+//                          No additional mesons
 //                          Any number of nucleons
-//                                         
+//
 // Does a few clever cuts on the likelihood to reduce CCQE contamination by
 // looking at "fuzziness" of the ring; CCQE events are sharp, CC1pi0 are fuzzy
 // (because of the pi0->2 gamma collinearity)

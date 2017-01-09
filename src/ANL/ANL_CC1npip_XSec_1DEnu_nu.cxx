@@ -29,17 +29,17 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMax = 1.5;
   fIsDiag = true;
   fNormError = 0.20;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
-  
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+
   // Setup Plots
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/anl82corr-numu-n-to-mu-n-piplus-lowW_edges.txt");
   this->SetupDefaultHist();
-  
+
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
-  
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
+
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
 };
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -56,7 +56,7 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double Enu     = -1.0;
-    
+
   if (hadMass < 1400) Enu = Pnu.E()/1.E3;
   fXVar = Enu;
 
@@ -80,9 +80,9 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillHistograms() {
 
 
 void ANL_CC1npip_XSec_1DEnu_nu::ScaleEvents() {
-  
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

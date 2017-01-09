@@ -21,7 +21,7 @@
 
 // The constructor
 BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "BEBC_CC1ppip_XSec_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)";
   EnuMin = 5;
@@ -39,12 +39,12 @@ BEBC_CC1ppip_XSec_1DQ2_nu::BEBC_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitW
   hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
   hadMassHist->SetTitle((fName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/((fNEvents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
 };
 
 
 void BEBC_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -57,7 +57,7 @@ void BEBC_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   hadMass = FitUtils::MpPi(Pp, Ppip);
   double q2CCpip = -1.0;
-  
+
   // BEBC has a M(pi, p) < 1.4 GeV cut imposed only on this channel
   if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
 
@@ -82,7 +82,7 @@ void BEBC_CC1ppip_XSec_1DQ2_nu::FillHistograms() {
 }
 
 void BEBC_CC1ppip_XSec_1DQ2_nu::Write(std::string drawOpt) {
-  
+
   Measurement1D::Write(drawOpt);
   hadMassHist->Scale(1/hadMassHist->Integral());
   hadMassHist->Write();

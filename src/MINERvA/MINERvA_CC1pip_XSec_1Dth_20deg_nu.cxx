@@ -48,7 +48,7 @@ MINERvA_CC1pip_XSec_1Dth_20deg_nu::MINERvA_CC1pip_XSec_1Dth_20deg_nu(std::string
 
   hadMassHist = new TH1D((fName+"_hadMass").c_str(), (fName+"_hadMass").c_str(), 100, 1000, 2000);
 
-  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pip_XSec_1Dth_20deg_nu::FillEventVariables(FitEvent *event) {

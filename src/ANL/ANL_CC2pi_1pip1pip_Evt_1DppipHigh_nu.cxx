@@ -49,7 +49,7 @@ ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(std::
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 
@@ -89,8 +89,8 @@ void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::FillHistograms() {
 
 void ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(mcHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(mcFine, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(mcHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(mcFine, GetFluxHistogram());
 
   mcHist->Scale(fScaleFactor);
   mcFine->Scale(fScaleFactor);

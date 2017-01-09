@@ -19,6 +19,7 @@
 
 #include "FitParameters.h"
 #include "GeneralUtils.h"
+#include "GeneratorUtils.h"
 
 #include "InputUtils.h"
 
@@ -81,5 +82,70 @@ std::string ExpandInputDirectories(std::string const &inputs) {
   }
 
   return expandedInputs;
+}
+
+InputType GuessInputTypeFromFile(TFile *inpF) {
+  if (!inpF) {
+    return kInvalid_Input;
+  }
+  TTree *NEUT_Input =
+      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NEUT_TreeName.c_str()));
+  if (NEUT_Input) {
+    return kNEUT_Input;
+  }
+  TTree *NUWRO_Input =
+      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NuWro_TreeName.c_str()));
+  if (NUWRO_Input) {
+    return kNUWRO_Input;
+  }
+  TTree *GENIE_Input =
+      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GENIE_TreeName.c_str()));
+  if (GENIE_Input) {
+    return kGENIE_Input;
+  }
+  TTree *GiBUU_Input =
+      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GiBUU_TreeName.c_str()));
+  if (GiBUU_Input) {
+    return kGiBUU_Input;
+  }
+
+  return kInvalid_Input;
+}
+
+std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
+  TFile *inpF = TFile::Open(inpFName.c_str(), "READ");
+  if (!inpF || !inpF->IsOpen()) {
+    ERR(FTL) << "Couldn't open \"" << inpFName << "\" for reading."
+             << std::endl;
+    throw;
+  }
+  InputType iType = GuessInputTypeFromFile(inpF);
+  if (iType == kInvalid_Input) {
+    ERR(FTL) << "Couldn't determine input type from file: " << inpFName
+             << "." << std::endl;
+    throw;
+  }
+  inpF->Close();
+  delete inpF;
+
+  switch (iType) {
+    case kNEUT_Input: {
+      return "NEUT:" + inpFName;
+    }
+    case kNUWRO_Input: {
+      return "NUWRO:" + inpFName;
+    }
+    case kGENIE_Input: {
+      return "GENIE:" + inpFName;
+    }
+    case kGiBUU_Input: {
+      return "GiBUU:" + inpFName;
+    }
+    default: {
+      ERR(FTL) << "Input type from file: " << inpFName << " was invalid."
+               << std::endl;
+      throw;
+    }
+  }
 }
 }
