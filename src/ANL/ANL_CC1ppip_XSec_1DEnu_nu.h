@@ -30,11 +30,12 @@ public:
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  //void ScaleEvents();
-  //void FillHistograms();
-
 
  private:
+  // What W cut are we imposing
+  double wTrueCut;
+  // Are we using corrected data?
+  bool UseCorrectedData;
 
 };
   
