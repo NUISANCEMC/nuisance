@@ -26,8 +26,6 @@
 // The constructor
 ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) : wTrueCut(2.0), UseCorrectedData(true) {
 
-  std::cout << type << " in ANL CC1piplus1n" << std::endl;
-
   // Measurement Details
   fName = "ANL_CC1npip_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";

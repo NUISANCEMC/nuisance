@@ -26,8 +26,6 @@
 // The constructor
 ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  std::cout << type << " in ANL CC1pi0" << std::endl;
-
   fName = "ANL_CC1pi0_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
   EnuMin = 0.;
