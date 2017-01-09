@@ -112,7 +112,12 @@ class Measurement1D : public MeasurementBase {
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
 
   //! Set the covariance from a custom root file
-  virtual void SetCovarFromDataFile(std::string covarFile, std::string covName);
+  //! FullUnits refers to if the covariance has "real" unscaled units, e.g.
+  //! 1E-76
+  //! If that is the case we need to scale it to make sure the extracted chi2 is
+  //! correct
+  virtual void SetCovarFromDataFile(std::string covarFile, std::string covName,
+                                    bool FullUnits = false);
 
   //! Set the smearing matrix from a text file given the size of the matrix
   virtual void SetSmearingMatrix(std::string smearfile, int truedim,

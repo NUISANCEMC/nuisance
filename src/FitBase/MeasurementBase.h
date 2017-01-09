@@ -231,9 +231,11 @@ class MeasurementBase {
 
   BaseFitEvt* signal_event;
   FitEvent* cust_event;
+
   FitWeight* fRW;        //!< Pointer to the rw engine
   InputHandler* fInput;  //!< Instance of the input handler
-  std::string fName;
+
+  std::string fName; //!< Name of the sample
   int fEventType;
 
   double fBeamDistance;  //!< Incoming Particle flight distance (for oscillation

@@ -18,7 +18,6 @@
 *******************************************************************************/
 
 #include "FitUtils.h"
-
 #include "T2K_SignalDef.h"
 
 namespace SignalDef {
@@ -38,8 +37,9 @@ bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
   double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
   double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
 
-  if (p_mu <= 200 || p_pi <= 200 || cos_th_mu <= 0.3 || cos_th_pi <= 0.3)
+  if (p_mu <= 200 || p_pi <= 200 || cos_th_mu <= 0.3 || cos_th_pi <= 0.3) {
     return false;
+  }
 
   return true;
 };
@@ -138,8 +138,9 @@ bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
 
   // mu phase space
-  if ((pmu.Vect().Mag() < 250) || (pnu.Vect().Angle(pmu.Vect()) < -0.6))
+  if ((pmu.Vect().Mag() < 250) || (pnu.Vect().Angle(pmu.Vect()) < -0.6)) {
     return false;
+  }
 
   // p phase space
   if ((pp.Vect().Mag() < 250) || (pp.Vect().Mag() > 1E3) ||

@@ -10,7 +10,7 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu::T2K_CC1pip_CH_XSec_1Dthmupi_nu(std::string input
   fName = "T2K_CC1pip_CH_XSec_1Dthmupi_nu";
   fPlotTitles = "; #theta_{#pi,#mu} (radians); d#sigma/d#theta_{#pi} (cm^{2}/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

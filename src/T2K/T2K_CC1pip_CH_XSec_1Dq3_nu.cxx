@@ -10,7 +10,7 @@ T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, Fi
   fName = "T2K_CC1pip_CH_XSec_1Dq3_nu";
   fPlotTitles = "; q_{3} (GeV/c); d#sigma/dq_{3} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 

@@ -26,6 +26,13 @@ T2K_CC1pip_CH_XSec_1Dq3_nu.cxx
 T2K_CC1pip_CH_XSec_1Dthmupi_nu.cxx
 T2K_CC1pip_CH_XSec_1Dthpi_nu.cxx
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu.cxx
+T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.cxx
+T2K_CC1pip_H2O_XSec_1DEnuMB_nu.cxx
+T2K_CC1pip_H2O_XSec_1Dcosmu_nu.cxx
+T2K_CC1pip_H2O_XSec_1Dcosmupi_nu.cxx
+T2K_CC1pip_H2O_XSec_1Dcospi_nu.cxx
+T2K_CC1pip_H2O_XSec_1Dpmu_nu.cxx
+T2K_CC1pip_H2O_XSec_1Dppi_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.cxx
 T2K_SignalDef.cxx
 )
@@ -40,6 +47,13 @@ T2K_CC1pip_CH_XSec_1Dq3_nu.h
 T2K_CC1pip_CH_XSec_1Dthmupi_nu.h
 T2K_CC1pip_CH_XSec_1Dthpi_nu.h
 T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h
+T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h
+T2K_CC1pip_H2O_XSec_1DEnuMB_nu.h
+T2K_CC1pip_H2O_XSec_1Dcosmu_nu.h
+T2K_CC1pip_H2O_XSec_1Dcosmupi_nu.h
+T2K_CC1pip_H2O_XSec_1Dcospi_nu.h
+T2K_CC1pip_H2O_XSec_1Dpmu_nu.h
+T2K_CC1pip_H2O_XSec_1Dppi_nu.h
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.h
 T2K_SignalDef.h
 )

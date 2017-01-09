@@ -10,7 +10,7 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(std::string inputfile, 
   fName = "T2K_CC1pip_CH_XSec_1Dppi_nu";
   fPlotTitles = "; p_{#pi} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
