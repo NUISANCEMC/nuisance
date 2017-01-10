@@ -97,12 +97,12 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   // Setup Plots
   this->SetDataValues(DataLocation);
   this->SetupDefaultHist();
-  
+
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
-  
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
+
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
 };
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -124,8 +124,6 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   if (hadMass/1000. < wTrueCut) {
     Enu = Pnu.E()/1.E3;
   }
-
-  fXVar = Enu;
 
   return;
 };

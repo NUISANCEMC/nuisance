@@ -25,9 +25,9 @@
 /// @details Q2 Extracted assuming numu CCQE scattering of free nucleons.
 FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 					     std::string type, std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
-  // Measurement Details                        
+  // Measurement Details
   fName = "FNAL_CCQE_Evt_1DQ2_nu";
   EnuMin = 0.;
   EnuMax = 200.;
@@ -49,24 +49,24 @@ FNAL_CCQE_Evt_1DQ2_nu::FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *r
 
   // Mask out the first bin if required
   this->SetBinMask(GeneralUtils::GetTopLevelDir() + "/data/FNAL/FNAL_CCQE_BinMask_PRD29_436.dat");
-  
+
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
   // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); // NEUT
+  this->fScaleFactor = (GetEventHistogram()->Integral()/(fNEvents+0.)); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
-  
+
 };
 
 
 //********************************************************************
 /// @details Extract q2qe from event assuming quasi-elastic scattering
 void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
-//********************************************************************   
+//********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
@@ -76,7 +76,7 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
   q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
-  
+
   fXVar = q2qe;
   return;
 };
@@ -103,12 +103,12 @@ void FNAL_CCQE_Evt_1DQ2_nu::ResetAll(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 /// @details Apply additional event weights for free nucleon measurements
 void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms(){
-//******************************************************************** 
+//********************************************************************
 
-  
+
   if (applyQ2correction){
     this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
@@ -120,9 +120,9 @@ void FNAL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
-//******************************************************************** 
+//********************************************************************
 
   this->fMCHist->Scale(fScaleFactor);
   if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
@@ -130,7 +130,7 @@ void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 
   // Scale to match data
   scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
-  
+
   this->fMCHist->Scale(scaleF);
   this->fMCFine->Scale(scaleF);
 
@@ -142,10 +142,10 @@ void FNAL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 }
 
 
-//********************************************************************    
+//********************************************************************
 /// @brief Include Q2 Correction plots into data write
 void FNAL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************     
+//********************************************************************
 
   Measurement1D::Write(drawOpt);
 
@@ -153,7 +153,7 @@ void FNAL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
     this->CorrectionHist->Write();
     this->fMCHist_NoCorr->Write();
   }
-    
+
 
   return;
 }

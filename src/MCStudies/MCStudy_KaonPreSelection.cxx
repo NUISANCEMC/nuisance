@@ -51,7 +51,7 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
 
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("approximate_data"), ("kaon_data"), 5, 1.0, 6.0);
-  
+
   // Approximate data points for now
   fDataHist->SetBinContent(1,0.225E-39);
   fDataHist->SetBinContent(2,0.215E-39);
@@ -69,14 +69,14 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+  this->fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
     this->TotalIntegratedFlux();
 
   // Create a new TTree and add Nuisance Events Branches
   FitPar::Config().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
   GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
-  
+
   fEventTree->Branch("nlep",&nlep, "nlep/I");
   fEventTree->Branch("nkplus",&nkplus, "nkplus/I");
   fEventTree->Branch("nkaon",&nkaon, "nkaon/I");
@@ -84,17 +84,17 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   fEventTree->Branch("kaon_mom", &kaonmom, "kaon_mom/D");
 
   // Add Event Scaling Information
-  // This scale factor is used to get the predicted event rate for this sample given                                                                                                                                        
-  // the input flux. Use this when merging different output event ttrees             
+  // This scale factor is used to get the predicted event rate for this sample given
+  // the input flux. Use this when merging different output event ttrees
   fEventTree->Branch("EventScaleFactor", &fEventScaleFactor, "EventScaleFactor/D");
-  fEventScaleFactor = fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.);
+  fEventScaleFactor = GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.);
 
   // NOTES:
   // To get normalised predictions weight event event by 'EventScaleFactor' to get the
   // predicted event rate for that sample given the flux used. Then to get cross-sections
-  // divide by the integrated flux from all samples. 
+  // divide by the integrated flux from all samples.
   // e.g. To get the numu+numubar prediction, add the event rate predictions from both
-  // samples together, then divide by the integral of the 'nuisance_flux' histograms in each 
+  // samples together, then divide by the integral of the 'nuisance_flux' histograms in each
   // sample.
 
   // Every particle in the nuisance event is saved into the TTree. The list of particle
@@ -122,15 +122,15 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
     tn->Branch("TargetA", &fTargetA, "TargetA/I");
     tn->Branch("TargetH", &fTargetH, "TargetH/I");
     tn->Branch("Bound", &fBound, "Bound/O");
-    
+
     tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
-    
+
     tn->Branch("NParticles", &fNParticles, "NParticles/I");
     tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
     tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
     tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
   */
-  
+
   return;
 }
 
@@ -147,10 +147,10 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 
   // Nmuons
   nlep = event->NumFSParticle(13) + event->NumFSParticle(-13);
-  
+
   // Leading K+ Mom
   if (event->GetHMParticle(PhysConst::pdg_kplus)){
-    
+
     kplusmom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_kplus)->fP)*1000.0;
 
   }
@@ -226,7 +226,7 @@ bool MCStudy_KaonPreSelection::isSignal(FitEvent *event) {
 				   9010315,9010325,9020315,9020325,
 				   317,327,
 				   9010317,9010327};
-  PhysConst::pdg_antistrangemesons = {above * -1.0};					      
+  PhysConst::pdg_antistrangemesons = {above * -1.0};
   */
   int nstrangemesons = event->NumParticle(PhysConst::pdg_strangemesons);
   nstrangemesons += event->NumParticle(PhysConst::pdg_antistrangemesons);

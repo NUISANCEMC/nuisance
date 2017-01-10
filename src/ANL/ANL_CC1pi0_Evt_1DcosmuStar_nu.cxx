@@ -21,7 +21,7 @@
 
 // The constructor
 ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1pi0_Evt_1DcosmuStar_nu";
   fPlotTitles = "; cos(#theta*); Number of events";
   EnuMin = 0;
@@ -44,12 +44,12 @@ ANL_CC1pi0_Evt_1DcosmuStar_nu::ANL_CC1pi0_Evt_1DcosmuStar_nu(std::string inputfi
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void ANL_CC1pi0_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumISParticle(2112) == 0 ||
       event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(111) == 0 ||
@@ -71,7 +71,7 @@ void ANL_CC1pi0_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
   Pmu.Boost(-CMS.BoostVector());
   // Boost the neutrino forwards
   Pnu.Boost(CMS.BoostVector());
-  
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   // Find angle in CMS frame
   if (hadMass < 1400) cosmuStar = cos(FitUtils::th(Pmu, Pnu));

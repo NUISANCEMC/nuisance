@@ -21,7 +21,7 @@
 
 // The constructor
 ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1pi0_Evt_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
@@ -44,7 +44,7 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -62,7 +62,7 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pp, Ppi0);
   double q2CCpi0 = -1.0;
-  
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) q2CCpi0 = -1*(Pnu-Pmu).Mag2()/1.E6;
 
@@ -88,9 +88,9 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillHistograms() {
 
 
 void ANL_CC1pi0_Evt_1DQ2_nu::ScaleEvents() {
-  
- // PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  //PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+ // PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  //PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

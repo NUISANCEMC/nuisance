@@ -40,12 +40,12 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   fIsRawEvents = false;
 
   nu_4mom = new TLorentzVector(0, 0, 0, 0);
-  pmu     = new TLorentzVector(0, 0, 0, 0);
-  ppip    = new TLorentzVector(0, 0, 0, 0);
-  ppim    = new TLorentzVector(0, 0, 0, 0);
-  ppi0    = new TLorentzVector(0, 0, 0, 0);
-  pprot   = new TLorentzVector(0, 0, 0, 0);
-  pneut   = new TLorentzVector(0, 0, 0, 0);
+  pmu = new TLorentzVector(0, 0, 0, 0);
+  ppip = new TLorentzVector(0, 0, 0, 0);
+  ppim = new TLorentzVector(0, 0, 0, 0);
+  ppi0 = new TLorentzVector(0, 0, 0, 0);
+  pprot = new TLorentzVector(0, 0, 0, 0);
+  pneut = new TLorentzVector(0, 0, 0, 0);
 
   // This function will sort out the input files automatically and parse all the
   // inputs,flags,etc.
@@ -68,12 +68,13 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  this->fScaleFactor = (this->fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) /
-    this->TotalIntegratedFlux();
+  this->fScaleFactor =
+      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+      this->TotalIntegratedFlux();
 
-  LOG(SAM) << " Generic Flux Scaling Factor = "<< fScaleFactor << endl;
+  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << endl;
 
-  if (fScaleFactor <= 0.0){
+  if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
     sleep(20);
   }
@@ -165,7 +166,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva,
                          "Erecoil_minerva/F");
 
-  if (!liteMode){
+  if (!liteMode) {
     eventVariables->Branch("nu_4mom", &nu_4mom);
     eventVariables->Branch("pmu_4mom", &pmu);
     eventVariables->Branch("hm_ppip_4mom", &ppip);
@@ -195,23 +196,21 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
   LOG(SAM) << "Adding Samples" << endl;
 
   // Signal Definitions from SignalDef.cxx
-  eventVariables->Branch("flagCCINC",    &flagCCINC, "flagCCINC/O");
-  eventVariables->Branch("flagNCINC",    &flagNCINC, "flagNCINC/O");
-  eventVariables->Branch("flagCCQE",     &flagCCQE, "flagCCQE/O");
-  eventVariables->Branch("flagCC0pi",    &flagCC0pi,"flagCC0pi/O");
-  eventVariables->Branch("flagCCQELike", &flagCCQELike,"flagCCQELike/O");
-  eventVariables->Branch("flagNCEL",     &flagNCEL, "flagNCEL/O");
-  eventVariables->Branch("flagNC0pi",    &flagNC0pi,"flagNC0pi/O");
-  eventVariables->Branch("flagCCcoh",    &flagCCcoh, "flagCCcoh/O");
-  eventVariables->Branch("flagNCcoh",    &flagNCcoh, "flagNCcoh/O");
-  eventVariables->Branch("flagCC1pip",   &flagCC1pip,"flagCC1pip/O");
-  eventVariables->Branch("flagNC1pip",   &flagNC1pip,"flagNC1pip/O");
-  eventVariables->Branch("flagCC1pim",   &flagCC1pim,"flagCC1pim/O");
-  eventVariables->Branch("flagNC1pim",   &flagNC1pim,"flagNC1pim/O");
-  eventVariables->Branch("flagCC1pi0",   &flagCC1pi0,"flagCC1pi0/O");
-  eventVariables->Branch("flagNC1pi0",   &flagNC1pi0,"flagNC1pi0/O");
-
-
+  eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
+  eventVariables->Branch("flagNCINC", &flagNCINC, "flagNCINC/O");
+  eventVariables->Branch("flagCCQE", &flagCCQE, "flagCCQE/O");
+  eventVariables->Branch("flagCC0pi", &flagCC0pi, "flagCC0pi/O");
+  eventVariables->Branch("flagCCQELike", &flagCCQELike, "flagCCQELike/O");
+  eventVariables->Branch("flagNCEL", &flagNCEL, "flagNCEL/O");
+  eventVariables->Branch("flagNC0pi", &flagNC0pi, "flagNC0pi/O");
+  eventVariables->Branch("flagCCcoh", &flagCCcoh, "flagCCcoh/O");
+  eventVariables->Branch("flagNCcoh", &flagNCcoh, "flagNCcoh/O");
+  eventVariables->Branch("flagCC1pip", &flagCC1pip, "flagCC1pip/O");
+  eventVariables->Branch("flagNC1pip", &flagNC1pip, "flagNC1pip/O");
+  eventVariables->Branch("flagCC1pim", &flagCC1pim, "flagCC1pim/O");
+  eventVariables->Branch("flagNC1pim", &flagNC1pim, "flagNC1pim/O");
+  eventVariables->Branch("flagCC1pi0", &flagCC1pi0, "flagCC1pi0/O");
+  eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
 };
 
 //********************************************************************
@@ -220,7 +219,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  LOG(DEB)<<"Filling signal"<<std::endl;
+  LOG(DEB) << "Filling signal" << std::endl;
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
   Nleptons = 0;
@@ -259,12 +258,12 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   float pi0_highmom = -999.9;
 
   (*nu_4mom) = event->PartInfo(0)->fP;
-  
-  if (!liteMode){
-    (*pmu)   = TLorentzVector(0, 0, 0, 0);
-    (*ppip)  = TLorentzVector(0, 0, 0, 0);
-    (*ppim)  = TLorentzVector(0, 0, 0, 0);
-    (*ppi0)  = TLorentzVector(0, 0, 0, 0);
+
+  if (!liteMode) {
+    (*pmu) = TLorentzVector(0, 0, 0, 0);
+    (*ppip) = TLorentzVector(0, 0, 0, 0);
+    (*ppim) = TLorentzVector(0, 0, 0, 0);
+    (*ppi0) = TLorentzVector(0, 0, 0, 0);
     (*pprot) = TLorentzVector(0, 0, 0, 0);
     (*pneut) = TLorentzVector(0, 0, 0, 0);
   }
@@ -317,7 +316,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       q3_true = (part_4mom - (*nu_4mom)).Vect().Mag();
 
       // Get W_true with assumption of initial state nucleon at rest
-      float m_n = (float)PhysConst::mass_proton*1000.;
+      float m_n = (float)PhysConst::mass_proton * 1000.;
       W_nuc_rest = sqrt(-Q2_true + 2 * m_n * (Enu_true - ELep) + m_n * m_n);
 
       // Get the Bjorken x and y variables
@@ -399,7 +398,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
         MPi0 = (part_4mom.Mag());
         CosPi0 = cos(part_4mom.Vect().Angle(nu_4mom->Vect()));
 
-	(*ppi0) = part_4mom;
+        (*ppi0) = part_4mom;
       }
     }
   }
@@ -415,7 +414,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     CosPmuPpip = cos(pmu->Vect().Angle(ppip->Vect()));
   if (Nleptons > 0 && Npineg > 0)
     CosPmuPpim = cos(pmu->Vect().Angle(ppim->Vect()));
-  if (Nleptons > 0 && Npi0 > 0) CosPmuPpi0 = cos(pmu->Vect().Angle(ppi0->Vect()));
+  if (Nleptons > 0 && Npi0 > 0)
+    CosPmuPpi0 = cos(pmu->Vect().Angle(ppi0->Vect()));
   if (Nleptons > 0 && Nprotons > 0)
     CosPmuPprot = cos(pmu->Vect().Angle(pprot->Vect()));
   if (Nleptons > 0 && Nneutrons > 0)
@@ -434,7 +434,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     CosPpimPprot = cos(ppim->Vect().Angle(pprot->Vect()));
   if (Npineg > 0 && Nneutrons > 0)
     CosPpimPneut = cos(ppim->Vect().Angle(pneut->Vect()));
-  if (Npineg > 0 && Npi0 > 0) CosPpimPpi0 = cos(ppim->Vect().Angle(ppi0->Vect()));
+  if (Npineg > 0 && Npi0 > 0)
+    CosPpimPpi0 = cos(ppim->Vect().Angle(ppi0->Vect()));
 
   if (Npi0 > 0 && Nprotons > 0)
     CosPi0Pprot = cos(ppi0->Vect().Angle(pprot->Vect()));
@@ -450,11 +451,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   RWWeight = event->RWWeight;
   InputWeight = event->InputWeight;
   FluxWeight =
-      fFluxHist->GetBinContent(fFluxHist->FindBin(Enu)) / fFluxHist->Integral();
+      GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) / GetFluxHistogram()->Integral();
 
   xsecScaling = fScaleFactor;
 
-  if (fScaleFactor <= 0.0){
+  if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
     sleep(20);
   }
@@ -484,25 +485,24 @@ void GenericFlux_Tester::FillSignalFlags(FitEvent *event) {
 
   // Some example flags are given from SignalDef.
   // See src/Utils/SignalDef.cxx for more.
-  int nuPDG    = event->PartInfo(0)->fPID;
+  int nuPDG = event->PartInfo(0)->fPID;
 
   // Generic signal flags
-  flagCCINC    = SignalDef::isCCINC(event, nuPDG);
-  flagNCINC    = SignalDef::isNCINC(event, nuPDG);
-  flagCCQE     = SignalDef::isCCQE(event, nuPDG);
+  flagCCINC = SignalDef::isCCINC(event, nuPDG);
+  flagNCINC = SignalDef::isNCINC(event, nuPDG);
+  flagCCQE = SignalDef::isCCQE(event, nuPDG);
   flagCCQELike = SignalDef::isCCQELike(event, nuPDG);
-  flagCC0pi    = SignalDef::isCC0pi(event, nuPDG);
-  flagNCEL     = SignalDef::isNCEL(event, nuPDG);
-  flagNC0pi    = SignalDef::isNC0pi(event, nuPDG);
-  flagCCcoh    = SignalDef::isCCCOH(event, nuPDG, 211);
-  flagNCcoh    = SignalDef::isNCCOH(event, nuPDG, 111);
-  flagCC1pip   = SignalDef::isCC1pi(event, nuPDG, 211);
-  flagNC1pip   = SignalDef::isNC1pi(event, nuPDG, 211);
-  flagCC1pim   = SignalDef::isCC1pi(event, nuPDG, -211);
-  flagNC1pim   = SignalDef::isNC1pi(event, nuPDG, -211);
-  flagCC1pi0   = SignalDef::isCC1pi(event, nuPDG, 111);
-  flagNC1pi0   = SignalDef::isNC1pi(event, nuPDG, 111);
-
+  flagCC0pi = SignalDef::isCC0pi(event, nuPDG);
+  flagNCEL = SignalDef::isNCEL(event, nuPDG);
+  flagNC0pi = SignalDef::isNC0pi(event, nuPDG);
+  flagCCcoh = SignalDef::isCCCOH(event, nuPDG, 211);
+  flagNCcoh = SignalDef::isNCCOH(event, nuPDG, 111);
+  flagCC1pip = SignalDef::isCC1pi(event, nuPDG, 211);
+  flagNC1pip = SignalDef::isNC1pi(event, nuPDG, 211);
+  flagCC1pim = SignalDef::isCC1pi(event, nuPDG, -211);
+  flagNC1pim = SignalDef::isNC1pi(event, nuPDG, -211);
+  flagCC1pi0 = SignalDef::isCC1pi(event, nuPDG, 111);
+  flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
 }
 
 // -------------------------------------------------------------------

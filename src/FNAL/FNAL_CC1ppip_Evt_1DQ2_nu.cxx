@@ -21,7 +21,7 @@
 
 // The constructor
 FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "FNAL_CC1ppip_Evt_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
   EnuMin = 10;
@@ -43,7 +43,7 @@ FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -61,7 +61,7 @@ void FNAL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double q2CCpip = -1.0;
-  
+
   // FNAL has a M(pi, p) < 1.4 GeV cut imposed only on this channel
   if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
   fXVar = q2CCpip;

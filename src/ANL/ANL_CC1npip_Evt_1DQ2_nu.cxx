@@ -22,8 +22,8 @@
 // The constructor
 //********************************************************************
 ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-//********************************************************************  
- 
+//********************************************************************
+
   fName = "ANL_CC1npip_Evt_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
@@ -47,7 +47,7 @@ ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral()/double(fNEvents))*(16./8.); // NEUT
+  this->fScaleFactor = (GetEventHistogram()->Integral()/double(fNEvents))*(16./8.); // NEUT
 };
 
 
@@ -67,7 +67,7 @@ void ANL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double q2CCpip;
-    
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed (also no cut measurement but not useful for delta tuning)
   if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
   else q2CCpip = -1.0;

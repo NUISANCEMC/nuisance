@@ -114,7 +114,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(
 
   // ScaleFactor
   double NNucPerNTarg = fUseCorrectedCTarget ? 12.0/6.0 : 14.08/8.0;
-  fScaleFactor = ((fEventHist->Integral("width") * 1E-38 / (fNEvents + 0.)) *
+  fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) *
                   NNucPerNTarg / TotalIntegratedFlux());
 };
 

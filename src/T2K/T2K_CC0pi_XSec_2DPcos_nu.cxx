@@ -52,7 +52,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
   fNormError = 0.089; // Set from covar mat instead...
 
   // Get Scaling
-  fScaleFactor = ((fEventHist->Integral("width")/(fNEvents+0.)) * 1E-38 /
+  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 /
 		  (TotalIntegratedFlux()));
 
 };

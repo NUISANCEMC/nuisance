@@ -45,7 +45,7 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(
 
   SetupDefaultHist();
 
-  fScaleFactor = fEventHist->Integral("width") * double(1E-38) *
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) *
                 (13.0 / 6.0 /*Data is /neutron */) /
                 (double(fNEvents) * TotalIntegratedFlux("width"));
 };

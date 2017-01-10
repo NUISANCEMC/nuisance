@@ -88,7 +88,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
                    << "datasets with fixed flux information. NUISANCE will scale MC to match "
                    << "data normalization but full covariance will be used. " << std::endl;
                  }
-                 
+
       datafilename  = "20deg_Q2QE_joint_data_fluxfix.txt";
       covarfilename = "20deg_Q2QE_joint_covar_fluxfix.txt";
       neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg_newflux";
@@ -119,9 +119,6 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   this->fSubChain.clear();
   this->fSubChain.push_back(MIN_anu);
   this->fSubChain.push_back(MIN_nu);
-
-  this->fFluxHist  = GetCombinedFlux();
-  this->fEventHist = GetCombinedEventRate();
 
   // Setup Default MC Hists
   SetupDefaultHist();
@@ -156,7 +153,7 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots(){
 	fMCHist  ->SetBinError(i+1+8, MIN_nu_mc->GetBinError(i+1));
       }
 
-    } 
+    }
     sample++;
   }
 

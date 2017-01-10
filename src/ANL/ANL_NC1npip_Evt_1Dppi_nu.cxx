@@ -18,12 +18,12 @@
 *******************************************************************************/
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 
-/** 
+/**
   * M. Derrick et al., "Study of single-pion production by weak neutral currents in low-energy \nu d interactions", Physical Review D, Volume 23, Number 3, 569, 1 February 1981
 */
 
 ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_NC1npip_Evt_1Dppi_nu";
   fPlotTitles = "; p_{#pi} (MeV); Number of events";
   fDefaultTypes="EVT/SHAPE/DIAG";
@@ -45,11 +45,11 @@ ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.)*GetFluxHistogram()->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2112) == 0 || event->NumFSParticle(211) == 0) return;
 
   TLorentzVector Pn   = event->GetHMFSParticle(2112)->fP;;
@@ -57,7 +57,7 @@ void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double ppip    = -1.0;
-  
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
 

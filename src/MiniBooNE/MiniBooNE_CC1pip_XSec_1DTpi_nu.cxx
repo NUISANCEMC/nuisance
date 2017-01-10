@@ -27,7 +27,7 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
   fIsDiag = true;
   fNormError = 0.107;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  
+
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSec_KEpi.txt");
   this->SetupDefaultHist();
 
@@ -35,13 +35,13 @@ MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string input
   covar = StatUtils::GetInvert(fFullCovar);
   //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 
-//********************************************************************   
+//********************************************************************
 void MiniBooNE_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
-//********************************************************************   
+//********************************************************************
 
   if (event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)

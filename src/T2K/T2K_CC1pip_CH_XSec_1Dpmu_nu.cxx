@@ -18,7 +18,7 @@ T2K_CC1pip_CH_XSec_1Dpmu_nu::T2K_CC1pip_CH_XSec_1Dpmu_nu(std::string inputfile, 
 
   this->SetupDefaultHist();
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now
@@ -91,7 +91,7 @@ void T2K_CC1pip_CH_XSec_1Dpmu_nu::SetCovarMatrix(std::string fileLocation) {
 
 
 void T2K_CC1pip_CH_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(13) == 0 ||
       event->NumFSParticle(211) == 0)
     return;
@@ -107,9 +107,9 @@ void T2K_CC1pip_CH_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dpmu_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // Warning: The CH analysis has different signal definition to the H2O analysis!
 //
 // If Michel e- is used for pion PID we don't have directional info on pion; set the bool to true

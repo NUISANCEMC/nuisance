@@ -2,9 +2,9 @@
 
 // The cos of the angle between the pion and the neutrino
 
-//******************************************************************** 
+//********************************************************************
 T2K_CC1pip_H2O_XSec_1Dcospi_nu::T2K_CC1pip_H2O_XSec_1Dcospi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   fName = "T2K_CC1pip_H2O_XSec_1Dcospi_nu";
   fPlotTitles = "; cos#theta_{#pi}; d#sigma/dcos#theta_{#pi} (cm^{2}/nucleon)";
@@ -22,13 +22,13 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu::T2K_CC1pip_H2O_XSec_1Dcospi_nu(std::string input
 
   SetupDefaultHist();
 
-  fScaleFactor = (fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
-//******************************************************************** 
+//********************************************************************
 // Find the cos theta of the angle between pion and neutrino
 void T2K_CC1pip_H2O_XSec_1Dcospi_nu::FillEventVariables(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 
   // Need to make sure there's a pion
   if (event->NumFSParticle(211) == 0) return;
@@ -45,9 +45,9 @@ void T2K_CC1pip_H2O_XSec_1Dcospi_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 // Beware: The H2O analysis has different signal definition to the CH analysis!
 bool T2K_CC1pip_H2O_XSec_1Dcospi_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pip_T2K_H2O(event, EnuMin, EnuMax);
 }
