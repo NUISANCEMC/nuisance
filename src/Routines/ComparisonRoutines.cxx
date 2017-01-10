@@ -365,6 +365,7 @@ int ComparisonRoutines::ReadFakeDataPars(std::string parstring) {
 //******************************************
 int ComparisonRoutines::ReadSamples(std::string samstring) {
   //******************************************
+
   const static std::string inputspec =
       "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
       "[norm]\nsample_name: Name "
@@ -411,6 +412,7 @@ int ComparisonRoutines::ReadSamples(std::string samstring) {
   // Optional Type
   if (strvct.size() > 3) {
     samtype = strvct[3];
+    samname += samtype;
   }
 
   // Optional Norm
@@ -419,7 +421,7 @@ int ComparisonRoutines::ReadSamples(std::string samstring) {
   // Add Sample Names as Norm Dials
   std::string normname = samname + "_norm";
 
-  // Check no repeat params
+  // Now match and check there are no repeated parameter names
   if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()) {
     ERR(FTL) << "Duplicate samples given for " << samname << endl;
     throw;

@@ -444,7 +444,10 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   double      samnorm = 1.0;
 
   // Optional Type
-  if (strvct.size() > 3) samtype = strvct[3];
+  if (strvct.size() > 3) {
+    samtype = strvct[3];
+    samname += samtype;
+  }
 
   // Optional Norm
   if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);

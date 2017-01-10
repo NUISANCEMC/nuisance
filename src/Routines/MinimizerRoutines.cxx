@@ -457,6 +457,7 @@ int MinimizerRoutines::ReadSamples(std::string samstring){
   // Optional Type
   if (strvct.size() > 3){
     samtype = strvct[3];
+    samname += samtype;
   }
 
   // Optional Norm
