@@ -22,10 +22,10 @@
 //********************************************************************
 /// @brief BNL CCQE Enu Measurement on Free Nucleons (Ref:PRD23 2499)
 ///
-/// @details Enu Extracted assuming numu CCQE scattering of free nucleons.  
+/// @details Enu Extracted assuming numu CCQE scattering of free nucleons.
 //********************************************************************
 BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
   // Measurement Details
   fName = "BNL_CCQE_Evt_1DQ2_nu";
@@ -33,7 +33,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
   EnuMax = 10.;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  
+
   // override input options
   fIsDiag = true;
   fIsRawEvents =true;
@@ -53,24 +53,24 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
     this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
-  
+
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
   LOG(SAM)<<"Setting up scaling"<<std::endl;
   // Setup Scaling
-  this->fEventHist->Scale(this->fDataHist->Integral()/this->fEventHist->Integral());
-  
+  GetEventHistogram()->Scale(this->fDataHist->Integral()/GetEventHistogram()->Integral());
+
   // Different generators require slightly different rescaling factors.
-  this->fScaleFactor = (this->fEventHist->Integral()/(fNEvents+0.)); 
+  this->fScaleFactor = (GetEventHistogram()->Integral()/(fNEvents+0.));
   scaleF = -1.0;
 };
 
-//********************************************************************           
-/// @details Reset the histogram uncorrect                  
+//********************************************************************
+/// @details Reset the histogram uncorrect
 void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
-//********************************************************************             
+//********************************************************************
   Measurement1D::ResetAll();
   this->fMCHist->Reset();
   this->fMCFine->Reset();
@@ -84,9 +84,9 @@ void BNL_CCQE_Evt_1DQ2_nu::ResetAll(){
 
 
 //********************************************************************
-/// @details Extract Enu and totcrs from event assuming quasi-elastic scattering    
+/// @details Extract Enu and totcrs from event assuming quasi-elastic scattering
 void BNL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
-//********************************************************************   
+//********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
@@ -111,10 +111,10 @@ bool BNL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent *event){
 
 
 
-//********************************************************************                       
+//********************************************************************
 /// @details Apply Q2 scaling to weight if required
 void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
-//********************************************************************  
+//********************************************************************
 
   if (Signal){
     if (applyQ2correction){
@@ -124,7 +124,7 @@ void BNL_CCQE_Evt_1DQ2_nu::FillHistograms(){
       if (fXVar < 0.225)
 	this->Weight *= this->CorrectionHist->Interpolate(fXVar);
     }
-    
+
     EnuVsQ2->Fill(Enu,fXVar, Weight);
   }
   if (Signal)
@@ -147,7 +147,7 @@ void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
 
   // Scale to match data
   scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
-  
+
   this->fMCHist->Scale(scaleF);
   this->fMCFine->Scale(scaleF);
 
@@ -155,16 +155,16 @@ void BNL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
     scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
     this->fMCHist_NoCorr->Scale(scaleF);
   }
-  
+
   return;
 
 }
 
 
-//********************************************************************            
-/// @brief Include Q2 Correction plots into data write                            
+//********************************************************************
+/// @brief Include Q2 Correction plots into data write
 void BNL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************           
+//********************************************************************
   Measurement1D::Write(drawOpt);
 
   EnuVsQ2->Write();

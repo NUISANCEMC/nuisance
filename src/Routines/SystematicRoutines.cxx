@@ -444,7 +444,14 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   double      samnorm = 1.0;
 
   // Optional Type
-  if (strvct.size() > 3) samtype = strvct[3];
+  if (strvct.size() > 3) {
+    samtype = strvct[3];
+    samname += "_"+samtype;
+    // Also get rid of the / and replace it with underscore because it might not be supported character
+    while (samname.find("/") != std::string::npos) {
+      samname.replace(samname.find("/"), 1, std::string("_"));
+    }
+  }
 
   // Optional Norm
   if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);

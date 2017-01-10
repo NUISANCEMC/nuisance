@@ -10,7 +10,7 @@ T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile
   fName = "T2K_CC1pip_CH_XSec_1DWrec_nu";
   fPlotTitles = "; W_{rec} (GeV/c); d#sigma/dW_{rec} (cm^{2}/(GeV/c^{2})/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
@@ -19,7 +19,7 @@ T2K_CC1pip_CH_XSec_1DWrec_nu::T2K_CC1pip_CH_XSec_1DWrec_nu(std::string inputfile
 
   this->SetupDefaultHist();
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now

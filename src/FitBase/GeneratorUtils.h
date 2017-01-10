@@ -56,6 +56,7 @@
 
 namespace GeneratorUtils {
 
+  extern const std::string NEUT_TreeName;
 #ifdef __NEUT_ENABLED__
   void FillNeutCommons(NeutVect* nvect);
 #endif
@@ -64,6 +65,7 @@ namespace GeneratorUtils {
   niwg::rew::NIWGEvent* GetNIWGEvent(NeutVect* nvect);
 #endif
 
+  extern const std::string NuWro_TreeName;
 #ifdef __NUWRO_ENABLED__
   int ConvertNuwroMode (event * e);
 #endif
@@ -72,5 +74,7 @@ namespace GeneratorUtils {
   int ConvertNuanceMode(NuanceEvent * evt);
 #endif
 
+  extern const std::string GENIE_TreeName;
+  extern const std::string GiBUU_TreeName;
 };
 #endif

@@ -22,14 +22,14 @@
 ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
   // Measurement Details
-  fName = name; 
+  fName = name;
   EnuMin = 0.;
   EnuMax = 6.;
   fIsDiag = true;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   fDefaultTypes = "FIX/DIAG";
   fAllowedTypes = "FIX,FREE,SHAPE/DIAG/Q2CORR/ENUCORR";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   LOG(SAM) << "SETTING DATA"<<std::endl;
 
@@ -37,7 +37,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu_PRL31")){
     SetDataFromDatabase("ANL/ANL_CCQE_Data_PRL31_844.root", "ANL_1DEnu_Data");
     EnuMax = 3.0; // Move EnuMax down
-  } else { 
+  } else {
     SetDataFromDatabase("ANL/ANL_CCQE_Data_PRD16_3103.root", "ANL_1DEnu_fluxtuned_Data");
   }
 
@@ -50,9 +50,9 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(std::string name, std::string inp
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
-  
+
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*2.0/1.0*1E-38/(fNEvents+0.)); // NEUT
+  fScaleFactor = (GetEventHistogram()->Integral("width")*2.0/1.0*1E-38/(fNEvents+0.)); // NEUT
 
 };
 
@@ -64,14 +64,14 @@ void ANL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
     return;
 
   // Get Q2
-  double q2qe = 0.0;  
+  double q2qe = 0.0;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
   q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
   Enu_rec = FitUtils::EnuQErec(Pmu, cos(ThetaMu), 0.,true);
-  
+
   fXVar = Enu_rec;
 
   // We save q2 into fYVar incase correction is applied
@@ -90,7 +90,7 @@ bool ANL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
 };
 
 
-//! If Q2 correction is applied the CorrectionHist is interpolated 
+//! If Q2 correction is applied the CorrectionHist is interpolated
 //! using the Q2QE value saved in fYVar
 void ANL_CCQE_XSec_1DEnu_nu::FillHistograms(){
 

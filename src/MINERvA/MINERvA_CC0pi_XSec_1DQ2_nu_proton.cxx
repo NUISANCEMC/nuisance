@@ -41,7 +41,7 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
   SetupDefaultHist();
 
-  // Quick Fix for Correl/Covar Issues 
+  // Quick Fix for Correl/Covar Issues
   fCorrel = (TMatrixDSym*)fFullCovar->Clone();
   delete fFullCovar;
   delete covar;
@@ -56,7 +56,7 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string
   fCoplanarDataHist = NULL;
 
   // Setup a scaling factor for evt->xsec
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
 };
 
 

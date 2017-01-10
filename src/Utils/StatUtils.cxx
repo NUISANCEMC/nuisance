@@ -307,13 +307,15 @@ double StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask) {
     double dt = calc_data->GetBinContent(i+1);
     double mc = calc_mc->GetBinContent(i+1);
 
-    if (dt == 0 or mc == 0) {
-      LOG(REC) << "Found no MC in bin " << i << " for " << calc_data->GetName() << " (" << calc_data->GetBinLowEdge(i) << " - " << calc_data->GetBinLowEdge(i+1) << ")" << std::endl;
-      continue;
-    }
+    if (mc == 0) continue;
 
-    // Do the chi2 for Poisson distributions
-    chi2 +=  2 * (mc - dt + (dt*log(dt/mc)));
+    if (dt == 0){
+      // Only add difference
+      chi2 += 2 * (mc - dt);
+    } else {
+      // Do the chi2 for Poisson distributions
+      chi2 +=  2 * (mc - dt + (dt*log(dt/mc)));
+    }
 
 /*
     LOG(REC)<<"Evt Chi2 cont = "<<i<<" "

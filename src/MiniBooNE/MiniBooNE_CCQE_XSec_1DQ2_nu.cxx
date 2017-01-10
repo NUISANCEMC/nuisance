@@ -76,7 +76,7 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::
   }
 
   // Get Scale Factor
-  fScaleFactor = ((fEventHist->Integral("width")*1E-38/(fNEvents+0.))
+  fScaleFactor = ((GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))
 		 * (14.08/6.0)
 		 / TotalIntegratedFlux());
 

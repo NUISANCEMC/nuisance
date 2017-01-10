@@ -18,6 +18,15 @@
 ################################################################################
 
 if(DEFINED BUILD_GiBUU AND BUILD_GiBUU)
+
+  if (DEFINED NO_EXTERNAL_UPDATE AND NO_EXTERNAL_UPDATE)
+      set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                   PROPERTY EP_UPDATE_DISCONNECTED 1)
+      cmessage(STATUS "Will not attempt to update third party GiBUU tools for each build.")
+    else()
+      set(NO_EXTERNAL_UPDATE 0)
+  endif()
+
   include(ExternalProject)
 
   ExternalProject_Add(GiBUUTools
@@ -26,7 +35,9 @@ if(DEFINED BUILD_GiBUU AND BUILD_GiBUU)
   CMAKE_ARGS
   -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
   -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-  -DUSE_GIBUU=1)
+  -DUSE_GiBUU=1
+  -DFORCECPP03=1
+  -DNO_EXTERNAL_UPDATE=${NO_EXTERNAL_UPDATE})
 
   cmessage(STATUS "Building GiBUU and GiBUUTools")
   set(BUILD_GiBUU 1)

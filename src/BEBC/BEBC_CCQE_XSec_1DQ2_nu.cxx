@@ -24,9 +24,9 @@
 ///
 /// @details Q2 Extracted assuming numu CCQE scattering of free nucleons.
 BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
-  // Measurement Details                        
+  // Measurement Details
   fName = name;
   EnuMin = 0.;
   EnuMax = 200.;
@@ -37,7 +37,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
 
 
   // In future read most of these from a card file
-  this->SetDataFromDatabase("BEBC/BEBC_CCQE_Data_NPB343_285.root", "BEBC_1DQ2_Data");  
+  this->SetDataFromDatabase("BEBC/BEBC_CCQE_Data_NPB343_285.root", "BEBC_1DQ2_Data");
   this->SetupDefaultHist();
 
   if (applyQ2correction){
@@ -46,24 +46,24 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(std::string name, std::string inp
     this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
   }
 
-  
+
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
   // Generate events on H2 to get the normalisation right.
-  this->fScaleFactor = (this->fEventHist->Integral("width")/(fNEvents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")/(fNEvents+0.))*1E-38 / (this->TotalIntegratedFlux("width")); // NEUT
 
   // Set starting scale factor
   scaleF = -1.0;
-  
+
 };
 
 
 //********************************************************************
 /// @details Extract q2qe from event assuming quasi-elastic scattering
 void BEBC_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
-//********************************************************************   
+//********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
@@ -106,12 +106,12 @@ void BEBC_CCQE_XSec_1DQ2_nu::ResetAll(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 /// @details Apply additional event weights for free nucleon measurements
 void BEBC_CCQE_XSec_1DQ2_nu::FillHistograms(){
-//******************************************************************** 
+//********************************************************************
 
-  
+
   if (applyQ2correction){
     this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
@@ -123,9 +123,9 @@ void BEBC_CCQE_XSec_1DQ2_nu::FillHistograms(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 void BEBC_CCQE_XSec_1DQ2_nu::ScaleEvents(){
-//******************************************************************** 
+//********************************************************************
 
   Measurement1D::ScaleEvents();
   if (applyQ2correction) this->fMCHist_NoCorr->Scale(this->fScaleFactor, "width");
@@ -133,23 +133,23 @@ void BEBC_CCQE_XSec_1DQ2_nu::ScaleEvents(){
   return;
 }
 
-//******************************************************************** 
+//********************************************************************
 void BEBC_CCQE_XSec_1DQ2_nu::ApplyNormScale(double norm){
 //********************************************************************
 
   Measurement1D::ApplyNormScale(norm);
   if (norm == 0.0) scaleF = 0.0;
   else scaleF = 1.0/norm;
-  
+
   if (applyQ2correction) this->fMCHist_NoCorr->Scale(scaleF);
 
   return;
 }
-  
-//********************************************************************    
+
+//********************************************************************
 /// @brief Include Q2 Correction plots into data write
 void BEBC_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************     
+//********************************************************************
 
   Measurement1D::Write(drawOpt);
 
@@ -157,7 +157,7 @@ void BEBC_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
     this->CorrectionHist->Write();
     this->fMCHist_NoCorr->Write();
   }
-    
+
 
   return;
 }

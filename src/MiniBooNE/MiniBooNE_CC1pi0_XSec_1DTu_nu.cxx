@@ -35,7 +35,7 @@ MiniBooNE_CC1pi0_XSec_1DTu_nu::MiniBooNE_CC1pi0_XSec_1DTu_nu(std::string inputfi
   //this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/cc1pi0/dxsecdemu_covar.txt", this->fNDataPointsX-1);
   this->SetupDefaultHist();
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 void MiniBooNE_CC1pi0_XSec_1DTu_nu::FillEventVariables(FitEvent *event) {
@@ -47,16 +47,16 @@ void MiniBooNE_CC1pi0_XSec_1DTu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  
-  double TuCCpi0 = FitUtils::T(Pmu); 
+
+  double TuCCpi0 = FitUtils::T(Pmu);
 
   fXVar = TuCCpi0;
-  
+
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CC1pi0_XSec_1DTu_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }

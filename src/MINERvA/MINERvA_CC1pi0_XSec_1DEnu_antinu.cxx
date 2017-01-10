@@ -44,7 +44,7 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string i
   this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-enu.csv", fDataHist->GetNbinsX());
   this->SetupDefaultHist();
 
-  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents);
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents);
 };
 
 void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
@@ -56,7 +56,7 @@ void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
-  
+
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double Enu     = -999;
 

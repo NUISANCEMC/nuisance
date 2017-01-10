@@ -43,7 +43,7 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -89,8 +89,8 @@ void BNL_CC1ppip_Evt_1DQ2_nu::FillHistograms() {
 
 void BNL_CC1ppip_Evt_1DQ2_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

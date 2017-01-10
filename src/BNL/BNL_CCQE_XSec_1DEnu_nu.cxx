@@ -22,10 +22,10 @@
 //********************************************************************
 /// @brief BNL CCQE Enu Measurement on Free Nucleons (Ref:PRD23 2499)
 ///
-/// @details Enu Extracted assuming numu CCQE scattering of free nucleons.  
-//******************************************************************** 
+/// @details Enu Extracted assuming numu CCQE scattering of free nucleons.
+//********************************************************************
 BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-//******************************************************************** 
+//********************************************************************
 
   // Measurement Details
   fName = "BNL_CCQE_XSec_1DEnu_nu";
@@ -34,7 +34,7 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   fIsDiag = true;
   applyQ2correction = type.find("Q2CORR") != std::string::npos;
   SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  
+
   // Setup Plots
   this->SetDataFromDatabase("BNL/BNL_Data_PRD23_2499.root", "BNL_1DEnu_Data");
   this->SetupDefaultHist();
@@ -48,15 +48,15 @@ BNL_CCQE_XSec_1DEnu_nu::BNL_CCQE_XSec_1DEnu_nu(std::string inputfile, FitWeight 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*(2.0/1.0)*1E-38/(fNEvents+0.)); 
-    
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*(2.0/1.0)*1E-38/(fNEvents+0.));
+
 };
 
 
 //********************************************************************
 ///@details Fill Enu for the event
 void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
@@ -66,22 +66,22 @@ void BNL_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 
   ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
   Enu_rec = FitUtils::EnuQErec(Pmu, cos(ThetaMu), 0.,true);
-  
+
   fXVar = Enu_rec;
   return;
 };
 
 //********************************************************************
 bool BNL_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event){
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
 };
 
-//********************************************************************   
-/// @details Apply Q2 scaling to weight if required    
+//********************************************************************
+/// @details Apply Q2 scaling to weight if required
 void BNL_CCQE_XSec_1DEnu_nu::FillHistograms(){
-//********************************************************************        
-    
+//********************************************************************
+
   if (applyQ2correction){
     this->Weight *= this->CorrectionHist->Interpolate(q2qe);
   }

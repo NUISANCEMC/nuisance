@@ -56,9 +56,9 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(std::string input
   // this->ReadEventFile();
 
   //  // Different generators require slightly different rescaling factors.
-  // if      (this->fEventType == 0) this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
-  // else if (this->fEventType == 1) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // NUWRO
-  // else if (this->fEventType == 5) this->fScaleFactor = (this->fEventHist->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./this->fFluxHist->Integral(); // GENIE
+  // if      (this->fEventType == 0) this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))*14.08/14.0/this->TotalIntegratedFlux(); // NEUT
+  // else if (this->fEventType == 1) this->fScaleFactor = (GetEventHistogram()->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./GetFluxHistogram()->Integral(); // NUWRO
+  // else if (this->fEventType == 5) this->fScaleFactor = (GetEventHistogram()->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./GetFluxHistogram()->Integral(); // GENIE
 
 };
 

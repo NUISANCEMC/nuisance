@@ -21,7 +21,7 @@
 
 // The constructor
 BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "BNL_CC1pi0_Evt_1DQ2_nu";
   fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
   EnuMin = 0;
@@ -43,18 +43,18 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // No W cut on BNL CC1pi0 
+  // No W cut on BNL CC1pi0
   // Want true Q2
   double q2CCpi0 = -1*(Pnu-Pmu).Mag2()/1.E6;
   fXVar = q2CCpi0;

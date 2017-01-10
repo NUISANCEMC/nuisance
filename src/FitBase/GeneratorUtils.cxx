@@ -22,6 +22,15 @@
 #include "GeneratorUtils.h"
 #include "FitLogger.h"
 
+
+namespace GeneratorUtils {
+
+  const std::string NEUT_TreeName = "neuttree";
+  const std::string NuWro_TreeName = "treeout";
+  const std::string GENIE_TreeName = "gtree";
+  const std::string GiBUU_TreeName = "giRooTracker";
+}
+
 #ifdef __NEUT_ENABLED__
 void GeneratorUtils::FillNeutCommons(NeutVect* nvect){
 

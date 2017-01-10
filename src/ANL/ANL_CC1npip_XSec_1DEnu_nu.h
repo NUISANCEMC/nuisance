@@ -28,11 +28,13 @@ public:
   virtual ~ANL_CC1npip_XSec_1DEnu_nu() {};
   
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
 
  private:
+  // What W cut are we imposing
+  double wTrueCut;
+  // Are we using corrected data?
+  bool UseCorrectedData;
 };
   
 #endif

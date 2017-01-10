@@ -93,9 +93,9 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     fInput = new InputHandler(fName, inpType, file_descriptor[1]);
   }
 
-  fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
-  fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
-  fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
+  // fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
+  // fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
+  // fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
   fNEvents = fInput->GetNEvents();
 
   // Expect INPUTTYPE:FileLocation(s)
@@ -108,15 +108,11 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
   }
   fInputType = InputUtils::ParseInputType(file_descriptor[0]);
 
-  fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
-  fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
-  fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
-  fNEvents = fInput->GetNEvents();
-
   fInputFileName = file_descriptor[1];
   if (EnuMin == 0 && EnuMax == 1.E5) {
-    EnuMin = fFluxHist->GetBinLowEdge(1);
-    EnuMax = fFluxHist->GetBinLowEdge(fFluxHist->GetNbinsX()+1);
+    EnuMin = fInput->GetFluxHistogram()->GetBinLowEdge(1);
+    EnuMax = fInput->GetFluxHistogram()->GetBinLowEdge(
+        fInput->GetFluxHistogram()->GetNbinsX() + 1);
   }
 }
 
@@ -161,11 +157,10 @@ void MeasurementBase::Reconfigure() {
   this->fMode_VECT.clear();
   this->fIndex_VECT.clear();
 
-
-  #ifdef __GiBUU_ENABLED__
+#ifdef __GiBUU_ENABLED__
   bool UsingGiBUU = (fInput->GetType() == kGiBUU);
-  #endif
-  
+#endif
+
   size_t NSignal = 0;
   // MAIN EVENT LOOP
   for (int i = 0; i < fNEvents; i++) {
@@ -181,9 +176,8 @@ void MeasurementBase::Reconfigure() {
 
     Weight = cust_event->Weight;
 
+#ifdef __GiBUU_ENABLED__
 
-    #ifdef __GiBUU_ENABLED__
-    
     /// For multi species measurements the flux scalings must be correctly
     /// applied here
     if (UsingGiBUU) {
@@ -205,8 +199,8 @@ void MeasurementBase::Reconfigure() {
       }
     }
 
-    #endif
-    
+#endif
+
     // Initialize
     fXVar = -999.9;
     fYVar = -999.9;
@@ -297,11 +291,10 @@ void MeasurementBase::ReconfigureFast() {
   std::vector<int>::iterator M = fMode_VECT.begin();
   std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
 
-
-  #ifdef __GiBUU_ENABLED__
+#ifdef __GiBUU_ENABLED__
   bool UsingGiBUU = (fInput->GetType() == kGiBUU);
-  #endif
-  
+#endif
+
   // SIGNAL LOOP
   for (int i = 0; I != fIndex_VECT.end(); I++, i++) {
     // Just Update Weight
@@ -313,8 +306,7 @@ void MeasurementBase::ReconfigureFast() {
           FitBase::GetRW()->CalcWeight(cust_event) * cust_event->InputWeight;
     }
 
-
-    #ifdef __GiBUU_ENABLED__
+#ifdef __GiBUU_ENABLED__
     /// For multi species measurements the flux scalings must be correctly
     /// applied here
     if (UsingGiBUU) {
@@ -335,7 +327,7 @@ void MeasurementBase::ReconfigureFast() {
         }
       }
     }
-    #endif
+#endif
 
     fXVar = (*X);
     fYVar = (*Y);
@@ -387,6 +379,7 @@ InputHandler* MeasurementBase::GetInput() {
                 "line options and input cardfile with a bug report to: "
                 "nuisance@projects.hepforge.org"
              << std::endl;
+    throw;
   }
   return fInput;
 };

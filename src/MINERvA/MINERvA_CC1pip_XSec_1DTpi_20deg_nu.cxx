@@ -45,7 +45,7 @@ MINERvA_CC1pip_XSec_1DTpi_20deg_nu::MINERvA_CC1pip_XSec_1DTpi_20deg_nu(std::stri
     fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
   }
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 

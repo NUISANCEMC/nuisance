@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * Radecky et al. Phys Rev D, 3rd series, Vol 25, No 5, 1 March 1982, p 1161-1173
 */
 
@@ -25,7 +25,7 @@
 
 // The constructor
 ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1ppip_Evt_1DcosthAdler_nu";
   fPlotTitles = "; cos#theta_{Adler}; Number of events";
   EnuMin = 0;
@@ -48,12 +48,12 @@ ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -109,9 +109,9 @@ void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
 
 
 void ANL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
-  
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

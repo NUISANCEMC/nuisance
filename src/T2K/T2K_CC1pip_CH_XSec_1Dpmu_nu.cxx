@@ -7,16 +7,18 @@ T2K_CC1pip_CH_XSec_1Dpmu_nu::T2K_CC1pip_CH_XSec_1Dpmu_nu(std::string inputfile, 
   fName = "T2K_CC1pip_CH_XSec_1Dpmu_nu";
   fPlotTitles = "; p_{#mu} (GeV/c); d#sigma/dp_{#mu} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 0.;
-  EnuMax = 10.;
+  EnuMax = 100.;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
+  // Currently the data is given in individual root files
+  // This will likely change when results become official
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root");
   this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root");
 
   this->SetupDefaultHist();
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 // Override this for now
@@ -89,7 +91,7 @@ void T2K_CC1pip_CH_XSec_1Dpmu_nu::SetCovarMatrix(std::string fileLocation) {
 
 
 void T2K_CC1pip_CH_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(13) == 0 ||
       event->NumFSParticle(211) == 0)
     return;
@@ -105,9 +107,9 @@ void T2K_CC1pip_CH_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dpmu_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
 // Warning: The CH analysis has different signal definition to the H2O analysis!
 //
 // If Michel e- is used for pion PID we don't have directional info on pion; set the bool to true

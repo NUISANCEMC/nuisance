@@ -54,7 +54,7 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(std::string inputfile, 
   *covar *= (100.0);
 
   // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
 
 };
 

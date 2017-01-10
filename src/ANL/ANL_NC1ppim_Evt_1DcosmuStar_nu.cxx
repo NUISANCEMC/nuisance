@@ -18,12 +18,12 @@
 *******************************************************************************/
 #include "ANL_NC1ppim_Evt_1DcosmuStar_nu.h"
 
-/** 
+/**
   * M. Derrick et al., "Study of the reaction \nu n \rightarrow \nu p \pi^-", Physics Letters, Volume 92B, Number 3,4, 363, 19 May 1980
 */
 
 ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_NC1ppim_Evt_1DcosmuStar_nu";
   fPlotTitles = "; cos*_{#mu}; Number of events";
   EnuMin = 0.3;
@@ -46,11 +46,11 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string input
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/((fNEvents+0.)*fFluxHist->Integral("width"))*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.)*GetFluxHistogram()->Integral("width"))*(16./8.);
 };
 
 void ANL_NC1ppim_Evt_1DcosmuStar_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumISParticle(2112) == 0 || event->NumFSParticle(2212) == 0 || event->NumFSParticle(-211) == 0 || event->NumFSParticle(14) == 0) return;
 
   TLorentzVector Pnu    = event->GetNeutrinoIn()->fP;

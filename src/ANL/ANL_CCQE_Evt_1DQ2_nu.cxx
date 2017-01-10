@@ -26,9 +26,9 @@
 ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfile,
 					   FitWeight *rw,    std::string type,
 					   std::string fakeDataFile){
-//********************************************************************  
+//********************************************************************
 
-  // Measurement Details                        
+  // Measurement Details
   fName = name;
   EnuMin = 0.;
   EnuMax = 6.;
@@ -46,7 +46,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 
     this->SetDataFromDatabase("ANL/ANL_CCQE_Data_PRL31_844.root", "ANL_1DQ2_Data");
     applyEnucorrection = false;
-    EnuMax = 3.0; // Move EnuMax down 
+    EnuMax = 3.0; // Move EnuMax down
 
   } else if (!name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD16")){
 
@@ -57,7 +57,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 
     this->SetDataFromDatabase("ANL/ANL_Data_PRD26_537.root","ANL_1DQ2_Data");
 
-  } 
+  }
 
   // Setup Histograms
   this->SetupDefaultHist();
@@ -74,26 +74,26 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfi
 
     this->EnuFluxUnfoldPlot = (TH1D*)this->EnuRatePlot->Clone();
     for (int i = 0; i < this->EnuFluxUnfoldPlot->GetNbinsX(); i++) this->EnuFluxUnfoldPlot->SetBinContent(i+1,1.0);
-    PlotUtils::FluxUnfoldedScaling(EnuFluxUnfoldPlot, fFluxHist);
+    PlotUtils::FluxUnfoldedScaling(EnuFluxUnfoldPlot, GetFluxHistogram());
   }
-  
+
   // Setup Covariance
   //  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   //  covar     = StatUtils::GetInvert(fFullCovar);
 
-  //  this->fEventHist->Scale(fDataHist->Integral()/fEventHist->Integral());
-  this->fScaleFactor = (this->fDataHist->Integral("width")/(fNEvents+0.)); 
+  //  GetEventHistogram()->Scale(fDataHist->Integral()/GetEventHistogram()->Integral());
+  this->fScaleFactor = (this->fDataHist->Integral("width")/(fNEvents+0.));
 
   // Set starting scale factor
   scaleF = -1.0;
-  
+
 };
 
 
 //********************************************************************
 /// @details Extract q2qe from event assuming quasi-elastic scattering
 void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
-//********************************************************************   
+//********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
@@ -105,7 +105,7 @@ void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
   q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
-  
+
   fXVar = q2qe;
   return;
 };
@@ -144,14 +144,14 @@ void ANL_CCQE_Evt_1DQ2_nu::ResetAll(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 /// @details Apply additional event weights for free nucleon measurements
 void ANL_CCQE_Evt_1DQ2_nu::FillHistograms(){
-//******************************************************************** 
+//********************************************************************
 
   if (applyEnucorrection)
     this->EnuvsQ2Plot->Fill(fXVar, Enu, Weight);
-  
+
   if (applyQ2correction){
     this->fMCHist_NoCorr->Fill(fXVar, Weight);
 
@@ -163,12 +163,12 @@ void ANL_CCQE_Evt_1DQ2_nu::FillHistograms(){
 
 }
 
-//******************************************************************** 
+//********************************************************************
 void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
-//******************************************************************** 
+//********************************************************************
 
   if (applyEnucorrection){
-    this->EnuvsQ2Plot->Scale(fEventHist->Integral()/(fNEvents+0.));
+    this->EnuvsQ2Plot->Scale(GetEventHistogram()->Integral()/(fNEvents+0.));
     for (int j =  0; j < EnuvsQ2Plot->GetNbinsY(); j++){
       for (int i = 0; i < EnuvsQ2Plot->GetNbinsX(); i++){
 	this->EnuvsQ2Plot->SetBinContent(i+1,j+1, this->EnuvsQ2Plot->GetBinContent(i+1,j+1) * EnuFluxUnfoldPlot->GetBinContent(j+1));
@@ -192,17 +192,17 @@ void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
     scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
     this->fMCHist_NoCorr->Scale(scaleF);
   }
-  
+
 
 
 
 }
 
 
-//********************************************************************    
+//********************************************************************
 /// @brief Include Q2 Correction plots into data write
 void ANL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************     
+//********************************************************************
 
   Measurement1D::Write(drawOpt);
 

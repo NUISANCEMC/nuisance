@@ -67,7 +67,7 @@ MiniBooNE_CCQE_XSec_2DTcos_nu::MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, s
   fIsDiag = true;
 
    // Different generators require slightly different rescaling factors.
-  fScaleFactor = (fEventHist->Integral("width")*1E-38/(fNEvents+0.))*14.08/6./TotalIntegratedFlux();
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))*14.08/6./TotalIntegratedFlux();
 
 };
 

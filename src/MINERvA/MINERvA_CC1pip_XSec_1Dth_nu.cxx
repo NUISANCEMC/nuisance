@@ -24,7 +24,7 @@
 // The constructor
 MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = name; 
+  fName = name;
   fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
   fFullPhaseSpace = name.find("_20deg") == std::string::npos;
   EnuMin = 1.5;
@@ -60,7 +60,7 @@ MINERvA_CC1pip_XSec_1Dth_nu::MINERvA_CC1pip_XSec_1Dth_nu(std::string name, std::
     fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
   }
 
-  fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {

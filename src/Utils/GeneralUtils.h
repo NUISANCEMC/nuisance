@@ -28,6 +28,7 @@
 #include <iostream>
 #include <iostream>
 #include <numeric>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -96,7 +97,7 @@ size_t GetFirstOnBit(T const& d) {
   T c = d;
   size_t fob = 0;
   while (bool(c)) {
-    if(c & 1){
+    if (c & 1) {
       return fob;
     } else {
       c = (c >> 1);
@@ -104,6 +105,15 @@ size_t GetFirstOnBit(T const& d) {
     fob++;
   }
   return fob;
+}
+
+template <typename T>
+size_t IsSmallNum(T const& d) {
+  if (std::numeric_limits<T>::is_integer) {
+    return (d == 0);
+  }
+  return (((d > 0) && (d < std::numeric_limits<T>::epsilon())) ||
+          ((d < 0) && (d > -std::numeric_limits<T>::epsilon())));
 }
 }
 
@@ -113,7 +123,7 @@ const double mass_neutron = 0.93956536;  // Neutron mass in GeV
 const double mass_delta = 1.232;         // Delta mass in GeV
 const double mass_muon = 0.10565837;     // Muon mass in GeV
 const int pdg_neutrinos[] = {12, -12, 14, -14 /*, 16, -16*/};
-const int pdg_muons[] = {13,-13};
+const int pdg_muons[] = {13, -13};
 const int pdg_pions[] = {211, -211, 111};
 const int pdg_charged_pions[] = {211, -211};
 const int pdg_strangemesons[] = {

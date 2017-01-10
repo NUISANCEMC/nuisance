@@ -20,9 +20,9 @@
 #include "MiniBooNE_CC1pip_XSec_1DEnu_nu.h"
 
 // The constructor
-//********************************************************************   
+//********************************************************************
 MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "MiniBooNE_CC1pip_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (MeV); #sigma(E_{#nu}) (cm^{2}/CH_{2})";
   fIsDiag = true;
@@ -37,14 +37,14 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(std::string input
   covar = StatUtils::GetInvert(fFullCovar);
   //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
 };
 
 
-//********************************************************************   
+//********************************************************************
 void MiniBooNE_CC1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent* event) {
-//********************************************************************   
-  
+//********************************************************************
+
   if (event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
@@ -65,26 +65,26 @@ void MiniBooNE_CC1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent* event) {
   return;
 };
 
-// *********************************************       
-// MiniBooNE CC1pi+ signal definition      
-// Warning: This one is a little scary because there's a W = 1.35 GeV cut for        
-// signal in the selection     
-//          Although this is unfolded over and is filled up with NUANCE                                
-//          So there is actually no W cut applied, but everything above W = 1.35                       
-//          GeV is NUANCE...                                       
-//                             
-// The signal definition is:                                       
-//                            Exactly one negative muon            
-//                            Exactly one positive pion            
-//                            No other mesons                      
-//                            No requirements on photons, nucleons and                                 
-//                            multi-nucleons                       
-//                            Doesn't mention other leptons        
-//                             
-// Additionally, it asks for 2 Michel e- from decay of muon and pion                                   
-// So there is good purity and we can be fairly sure that the positive pion is a                       
-// positive pion 
-// 
+// *********************************************
+// MiniBooNE CC1pi+ signal definition
+// Warning: This one is a little scary because there's a W = 1.35 GeV cut for
+// signal in the selection
+//          Although this is unfolded over and is filled up with NUANCE
+//          So there is actually no W cut applied, but everything above W = 1.35
+//          GeV is NUANCE...
+//
+// The signal definition is:
+//                            Exactly one negative muon
+//                            Exactly one positive pion
+//                            No other mesons
+//                            No requirements on photons, nucleons and
+//                            multi-nucleons
+//                            Doesn't mention other leptons
+//
+// Additionally, it asks for 2 Michel e- from decay of muon and pion
+// So there is good purity and we can be fairly sure that the positive pion is a
+// positive pion
+//
 bool MiniBooNE_CC1pip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax);
 }

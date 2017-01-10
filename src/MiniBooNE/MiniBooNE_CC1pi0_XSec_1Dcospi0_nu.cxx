@@ -21,7 +21,7 @@
 
 // The constructor
 MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
-  
+
   fName = "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu";
   fPlotTitles = "; cos#theta_{#pi^{0}}; d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/CH_{2})";
   fIsDiag = false;
@@ -36,12 +36,12 @@ MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(std::string
   this->SetupDefaultHist();
 
   // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
 };
 
 
 void MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(111) == 0 ||
       event->NumFSParticle(13) == 0)
     return;
@@ -57,8 +57,8 @@ void MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::FillEventVariables(FitEvent *event) {
   return;
 };
 
-//******************************************************************** 
+//********************************************************************
 bool MiniBooNE_CC1pi0_XSec_1Dcospi0_nu::isSignal(FitEvent *event) {
-//******************************************************************** 
+//********************************************************************
   return SignalDef::isCC1pi(event, 14, 111, EnuMin, EnuMax);
 }

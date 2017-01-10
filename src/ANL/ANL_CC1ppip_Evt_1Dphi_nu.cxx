@@ -17,14 +17,14 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * Radecky et al. Phys Rev D, 3rd series, Vol 25, No 5, 1 March 1982, p 1161-1173
 */
 #include "ANL_CC1ppip_Evt_1Dphi_nu.h"
 
 // The constructor
 ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "ANL_CC1ppip_Evt_1Dphi_nu";
   fPlotTitles = "; #phi_{Adler}; Number of events";
   EnuMin = 0;
@@ -49,12 +49,12 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
 
   TRandom3 rand;
 
-  this->fScaleFactor = this->fEventHist->Integral("width")/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void ANL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -101,7 +101,7 @@ void ANL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
 
   // Then finally construct phi as the angle between pion projection and x axis
   double phi = -999;
-  
+
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
   if (hadMass < 1400) {
     if (PpipVectPlane.Y() > 0) {
@@ -116,7 +116,7 @@ void ANL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
         phi = (180./M_PI)*(2*M_PI-PpipVectPlane.Angle(xVect));
       }
     }
-  } 
+  }
 
   fXVar = phi;
 
@@ -140,9 +140,9 @@ void ANL_CC1ppip_Evt_1Dphi_nu::FillHistograms() {
 
 
 void ANL_CC1ppip_Evt_1Dphi_nu::ScaleEvents() {
-  
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);

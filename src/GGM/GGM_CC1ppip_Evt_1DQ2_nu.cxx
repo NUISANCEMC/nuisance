@@ -21,7 +21,7 @@
 
 // The constructor
 GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-  
+
   fName = "GGM_CC1ppip_Evt_1DQ2_nu";
   // could replace with fName = std::string(__FILE__).substr(0, std::string(__FILE__).find_last_of("."))
   fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
@@ -43,12 +43,12 @@ GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = this->fEventHist->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
 };
 
 
 void GGM_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
-  
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)

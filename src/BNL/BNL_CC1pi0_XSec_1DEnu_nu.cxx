@@ -37,7 +37,7 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (this->fEventHist->Integral("width")*1E-38)/(fNEvents+0.)*16./8.;
+  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/(fNEvents+0.)*16./8.;
 };
 
 
@@ -47,7 +47,7 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   //BNL doesn't have a W cut for CC1pi0 sadly (I'm super happy if you can find it!)
   double Enu = Pnu.E()/1000.;
-  
+
   fXVar = Enu;
 
   return;
@@ -73,8 +73,8 @@ void BNL_CC1pi0_XSec_1DEnu_nu::FillHistograms() {
 
 void BNL_CC1pi0_XSec_1DEnu_nu::ScaleEvents() {
 
-  PlotUtils::FluxUnfoldedScaling(fMCHist, fFluxHist);
-  PlotUtils::FluxUnfoldedScaling(fMCFine, fFluxHist);
+  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
+  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
 
   fMCHist->Scale(fScaleFactor);
   fMCFine->Scale(fScaleFactor);
