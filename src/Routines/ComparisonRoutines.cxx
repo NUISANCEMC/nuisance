@@ -412,7 +412,12 @@ int ComparisonRoutines::ReadSamples(std::string samstring) {
   // Optional Type
   if (strvct.size() > 3) {
     samtype = strvct[3];
-    samname += samtype;
+    // Append the sample type to the normalsiation name
+    samname += "_"+samtype;
+    // Also get rid of the / and replace it with underscore because it might not be supported character
+    while (samname.find("/") != std::string::npos) {
+      samname.replace(samname.find("/"), 1, std::string("_"));
+    }
   }
 
   // Optional Norm

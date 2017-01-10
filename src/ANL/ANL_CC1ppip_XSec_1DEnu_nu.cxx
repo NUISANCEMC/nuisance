@@ -34,7 +34,6 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   fNormError = 0.20; // normalisation error on ANL BNL flux
   fDefaultTypes = "FIX/DIAG";
   fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR/W14/W16/NOW";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // User can specify "UNCORR" for uncorrected data
   // Default is to use correction
@@ -59,6 +58,8 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
     wTrueCut = 10.0;
     fName += "_noW";
   }
+
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Now read in different data depending on what the user has specified
   std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/";
