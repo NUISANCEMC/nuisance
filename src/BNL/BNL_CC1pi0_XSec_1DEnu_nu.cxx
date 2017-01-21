@@ -28,16 +28,36 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
   EnuMax = 6.0;
   fIsDiag = true;
   fNormError = 0.15;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  // THIS IS DEFINITELY DODGY WITH THE "CORRECTION"; EnuMax for BNL definitely stops at 3GeV because of flux uncertainties, although correction goes to 6!
+  fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_1986.txt");
-  this->SetupDefaultHist();
+  // User can give option of corrected BNL data or not
+  // The correction follows Wilkinson & Rodriguez et al.
+  if (type.find("UNCORR") != std::string::npos) {
+    UseCorrectedData = false;
+  } else {
+    UseCorrectedData = true;
+  }
+
+  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/";
+
+  if (UseCorrectedData) {
+    DataLocation += "BNL_CC1pi0_on_n_1986_corr.txt";
+    fName += "_corr";
+  } else {
+    DataLocation += "BNL_CC1pi0_on_n_1986.txt";
+    fName += "_uncorr";
+  }
+
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/(fNEvents+0.)*16./8.;
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/(fNEvents+0.)*16./8.;
 };
 
 

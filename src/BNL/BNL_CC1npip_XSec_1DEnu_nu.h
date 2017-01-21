@@ -34,6 +34,7 @@ public:
   //void FillHistograms();
 
  private:
+  bool UseCorrectedData;
 };
   
 #endif

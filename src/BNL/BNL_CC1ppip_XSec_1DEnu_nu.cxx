@@ -28,16 +28,38 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMax = 3.0;
   fIsDiag = true;
   fNormError = 0.15;
+  fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR";
+
+  // User can give option of corrected BNL data or not
+  // The correction follows Wilkinson & Rodriguez et al.
+  if (type.find("UNCORR") != std::string::npos) {
+    UseCorrectedData = false;
+  } else {
+    UseCorrectedData = true;
+  }
+
+  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/";
+
+  if (UseCorrectedData) {
+    DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
+    fName += "_corr";
+    EnuMax = 6.0;
+  } else {
+    DataLocation += "BNL_CC1pip_on_p_1986.txt";
+    fName += "_uncorr";
+    EnuMax = 3.0;
+  }
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
-  // D2 = 1 proton, 1 neutron
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
 };
 
 void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
