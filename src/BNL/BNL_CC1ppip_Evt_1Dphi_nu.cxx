@@ -24,7 +24,7 @@ BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWei
 
   fName = "BNL_CC1ppip_Evt_1Dphi_nu";
   fPlotTitles = "; #phi_{Adler}; Number of events";
-  EnuMin = 0;
+  EnuMin = 0.5;
   EnuMax = 6.0;
   fIsDiag = true;
   fIsRawEvents = true;

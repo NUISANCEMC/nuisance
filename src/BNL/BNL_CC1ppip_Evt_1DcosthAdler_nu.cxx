@@ -24,7 +24,7 @@ BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inp
 
   fName = "BNL_CC1ppip_Evt_1DcosthAdler_nu";
   fPlotTitles = "; cos#theta_{Adler}; Number of events";
-  EnuMin = 0;
+  EnuMin = 0.5;
   EnuMax = 6.0;
   fIsDiag = true;
   fIsRawEvents = true;
