@@ -73,7 +73,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
     } else {
       ERR(FTL) << "Can not run ANL CC1pi+1p W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
       ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
-      exit(-1);
+      throw;
     }
 
   // If we're using raw uncorrected data
@@ -88,12 +88,12 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
     } else {
       ERR(FTL) << "Can only run W = 1.4, 1.6 and no W cut" << std::endl;
       ERR(FTL) << "You specified: " << wTrueCut << std::endl;
-      exit(-1);
+      throw;
     }
   }
 
-  this->SetDataValues(DataLocation);
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
