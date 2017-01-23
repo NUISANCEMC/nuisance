@@ -41,10 +41,14 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pi0_on_n/";
   if (HadCut == 1.4) {
     DataLocation += "ANL_CC1pi0_on_n_noEvents_Q2_W14GeV_firstQ2rem.txt";
-    fName += "_W14";
   } else {
     DataLocation += "ANL_CC1pi0_on_n_noEvents_Q2_noWcut_firstQ2rem.txt";
-    fName += "_NOW";
+  }
+  // Get rid of the slashes in the type
+  if (!type.empty()) {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
   }
 
   SetupMeasurement(inputfile, type, rw, fakeDataFile);

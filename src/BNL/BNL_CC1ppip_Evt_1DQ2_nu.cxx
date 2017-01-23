@@ -39,13 +39,16 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
 
   // Look if user has specified a W cut
   if (type.find("W14") != std::string::npos) {
-    fName += "_W14";
     HadCut = 1.4;
   } else {
-    fName += "_NOW";
     HadCut = 10.0;
     EnuMin = 0.0;
     EnuMax = 10.0;
+  }
+  if (!type.empty()) {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

@@ -43,10 +43,13 @@ BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   if (UseCorrectedData) {
     DataLocation += "BNL_CC1pip_on_n_1986_corr.txt";
-    fName += "_CORR";
   } else {
     DataLocation += "BNL_CC1pip_on_n_1986.txt";
-    fName += "_UNCORR";
+  }
+  if (!type.empty()) {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

@@ -40,10 +40,8 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   // Default is to use correction
   if (type.find("UNCORR") != std::string::npos) {
     UseCorrectedData = false;
-    fName += "_UNCORR";
   } else {
     UseCorrectedData = true;
-    fName += "_CORR";
   }
 
   // User can specify "W14" for W < 1.4 GeV cut
@@ -51,14 +49,11 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   //                  The default is W < 2.0
   if (type.find("W14") != std::string::npos) {
     wTrueCut = 1.4;
-    fName += "_W14";
   } else if (type.find("W16") != std::string::npos) {
     wTrueCut = 1.6;
-    fName += "_W16";
   } else {
     // In the case 
     wTrueCut = 10.0;
-    fName += "_NOW";
   }
 
   if (UseCorrectedData && wTrueCut == 1.6) {
@@ -66,6 +61,13 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
     ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
     ERR(FTL) << "Reverting to using uncorrected data!" << std::endl;
     UseCorrectedData = false;
+  }
+
+  // Get rid of the slashes in the type
+  if (!type.empty()) {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
