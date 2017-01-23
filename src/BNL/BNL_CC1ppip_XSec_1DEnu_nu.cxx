@@ -43,11 +43,11 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   if (UseCorrectedData) {
     DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
-    fName += "_corr";
+    fName += "_CORR";
     EnuMax = 6.0;
   } else {
     DataLocation += "BNL_CC1pip_on_p_1986.txt";
-    fName += "_uncorr";
+    fName += "_UNCORR";
     EnuMax = 3.0;
   }
 

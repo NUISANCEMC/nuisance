@@ -31,8 +31,8 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fAllowedTypes += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_firstQ2gone.txt");
-  this->SetupDefaultHist();
+  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_firstQ2rem.txt");
+  SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
@@ -43,7 +43,7 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
+  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
 };
 
 

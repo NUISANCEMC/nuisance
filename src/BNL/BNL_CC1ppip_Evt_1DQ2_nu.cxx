@@ -42,7 +42,7 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
     fName += "_W14";
     HadCut = 1.4;
   } else {
-    fName += "_noW";
+    fName += "_NOW";
     HadCut = 10.0;
     EnuMin = 0.0;
     EnuMax = 10.0;
@@ -55,11 +55,11 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
 
   // If W < 1.4 GeV cut
   if (HadCut == 1.4) {
-    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_finebin_firstQ2gone.txt";
+    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_firstQ2rem.txt";
   // If W < 2.0 GeV
   } else {
     // No Enu cuts on full W space
-    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_bin.txt";
+    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_firstQ2rem.txt";
   }
 
   SetDataValues(DataLocation);
@@ -74,7 +74,7 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
+  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
 };
 
 

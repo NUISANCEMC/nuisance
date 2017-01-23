@@ -33,13 +33,30 @@ ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fIsDiag = true;
   fIsRawEvents = true;
   fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG";
+  fAllowedTypes="EVT/SHAPE/DIAG/W14/NOW";
+
+  // User can specify W < 1.4 or no W cut
+  if (type.find("W14") != std::string::npos) {
+    HadCut = 1.4;
+  } else {
+    HadCut = 10.0;
+  }
+    
+  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/";
+  if (HadCut == 1.4) {
+    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_W14GeV_firstQ2rem.txt";
+    fName += "_W14";
+  } else {
+    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_firstQ2rem.txt";
+    fName += "_NOW";
+  }
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_14GeV_bin_firstQ2gone.txt");
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
-  // set Poisson errors on fDataHist (scanned does not have this)
+  // Set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
@@ -48,16 +65,15 @@ ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
+  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
 void ANL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
+  if (event->NumFSParticle(2212) == 0 || event->NumFSParticle(211) == 0 || event->NumFSParticle(13) == 0) {
     return;
+  }
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
@@ -67,8 +83,10 @@ void ANL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double q2CCpip = -1.0;
 
-  // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+  // ANL has a M(pi, p) < 1.4 GeV cut imposed or no W cut
+  if (hadMass < HadCut*1000.) {
+    q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+  }
 
   fXVar = q2CCpip;
 

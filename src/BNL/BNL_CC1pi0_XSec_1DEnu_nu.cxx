@@ -43,10 +43,10 @@ BNL_CC1pi0_XSec_1DEnu_nu::BNL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
 
   if (UseCorrectedData) {
     DataLocation += "BNL_CC1pi0_on_n_1986_corr.txt";
-    fName += "_corr";
+    fName += "_CORR";
   } else {
     DataLocation += "BNL_CC1pi0_on_n_1986.txt";
-    fName += "_uncorr";
+    fName += "_UNCORR";
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);

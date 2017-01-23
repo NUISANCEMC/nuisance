@@ -29,11 +29,12 @@ public:
   virtual ~ANL_CC1pi0_Evt_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
-//  void ScaleEvents();
   bool isSignal(FitEvent *event);
+//  void ScaleEvents();
  // void FillHistograms();
 
  private:
+  double HadCut;
 };
   
 #endif
