@@ -222,7 +222,8 @@ int JointFCN::GetNDOF() {
 //***************************************************
 double JointFCN::GetLikelihood() {
   //***************************************************
-  LOG(MIN) << "Getting likelihoods..." << endl;
+
+  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..." << " : " << "-2logL" << endl;
 
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
@@ -237,7 +238,7 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    LOG(MIN) << "-> " << exp->GetName() << " : " << newlike << endl;
+    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << endl;
 
     // Add Weight Scaling
     like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());

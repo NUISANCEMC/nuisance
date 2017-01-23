@@ -772,7 +772,7 @@ void SystematicRoutines::PrintState(){
 
   LOG(FIT)<<"------------"<<std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT)<<"Likelihood for JointFCN == " << like << std::endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
   LOG(FIT)<<"------------"<<std::endl;
 }
 
