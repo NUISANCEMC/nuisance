@@ -22,19 +22,17 @@
 SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(std::string name, std::string inputfile,
 							 FitWeight *rw, std::string type, 
 							 std::string fakeDataFile){
-
   // Measurement Details
   fName = name;
   fDefaultTypes = "DIAG";
   fAllowedTypes += "EVT";
-  HM_track = NULL;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  // fIsRawEvents = true;
 
   // Setup Plots
   this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
   this->SetDataValues(FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig10a_CVs.csv");
-  this->GetTH2DFromFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
+  this->muonStopEff = (TH2D*)PlotUtils::GetHistFromRootFile(
+		    FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
   this->SetupDefaultHist();
 
   PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_PDG);
@@ -42,27 +40,23 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(std::string name, std::
 
   // Estimate the number of CH molecules in SciBooNE...
   double nTargets = 10.6E6/13.*6.022E23;
-  // This is sort of meaningless right now
-  this->fScaleFactor = GetEventHistogram()->Integral()*1E-38*13./double(fNEvents)*nTargets;
-
-  std::cout << "Quick test: evthist->Integral() = " << GetEventHistogram()->Integral() << "; evthist->Integral(width) = " << GetEventHistogram()->Integral("width") << std::endl;
+  this->fScaleFactor = GetEventHistogram()->Integral("width")*1E-38*13./double(fNEvents)*nTargets;
 
 };
 
 void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 
-  //if (this->HM_track == NULL) return;
   if (event->NumFSParticle(PhysConst::pdg_muons) == 0) return;
 
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
-  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
+  FitParticle *nu   = event->GetNeutrinoIn();
 
-  q2qe = FitUtils::Q2QErec(muon->fP,cos(Pnu.Vect().Angle(muon->fP.Vect())), 27., true);
+  q2qe = FitUtils::Q2QErec(muon->fP,cos(nu->fP.Vect().Angle(muon->fP.Vect())), 27., true);
 
   if (q2qe < 0) return;
 
   // Need to figure out if this is the best place to set weights long term... but...
-  this->Weight *= this->CalcEfficiency(event->GetNeutrinoIn(), muon);
+  this->Weight *= SciBooNEUtils::CalcEfficiency(this->muonStopEff, nu, muon);
   
   // Set X Variables
   fXVar = q2qe;
@@ -73,13 +67,10 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
 
   int nCharged = 0;
-  this->HM_track = NULL;
 
-  // For now, choose the muon
+  // For now, require a muon
   if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
     return false;
-
-  TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
 
   // For one track, require a single FS particle.
   for (UInt_t j = 0; j < event->Npart(); j++){
@@ -95,10 +86,6 @@ bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
       // Must be reconstructed as a track in SciBooNE
       if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(j))) continue;
       nCharged += 1;
-      if (!this->HM_track)
-	this->HM_track = event->PartInfo(j);
-      else if (event->PartInfo(j)->fP.Vect().Mag2() > this->HM_track->fP.Vect().Mag2())
-	this->HM_track = event->PartInfo(j);
     }
   } // end loop over particle stack
 
@@ -109,27 +96,3 @@ bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
 
 };
 
-// This function reads in the efficiency matrix from a root file
-void SciBooNE_CCCOH_1TRK_1DQ2_nu::GetTH2DFromFile(std::string fileName, std::string histName){
-  
-  TFile *inFile = new TFile(fileName.c_str());
-  this->muonStopEff = (TH2D*)(inFile->Get(histName.c_str()))->Clone();  
-  this->muonStopEff->SetDirectory(0);
-  inFile->Close();
-  return;
-}
-
-// Expects to have a histogram in terms of p-theta which gives the efficiency, 
-// and the relevant FitParticle to calculate a weight for
-double SciBooNE_CCCOH_1TRK_1DQ2_nu::CalcEfficiency(FitParticle *nu, FitParticle *HMT){
-
-  double eff = 1.;
-  
-  if (this->muonStopEff){
-    double pmu = HMT->fP.Vect().Mag()/1000.;
-    double thetamu = nu->fP.Vect().Angle(HMT->fP.Vect());
-    eff = this->muonStopEff->GetBinContent(this->muonStopEff->FindBin(pmu, thetamu));
-  }
-
-  return eff;
-}

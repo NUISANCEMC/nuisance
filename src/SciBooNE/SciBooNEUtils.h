@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <TLorentzVector.h>
+#include <TH2D.h>
 
 #include "FitParticle.h"
 #include "FitLogger.h"
@@ -44,6 +45,7 @@
 
 namespace SciBooNEUtils {
 
+  double CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon);
   TVector3 DistanceInScintillator(FitParticle* particle);
   bool PassesCOHDistanceCut(FitParticle* particle);
 

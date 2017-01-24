@@ -19,6 +19,21 @@
 
 #include "SciBooNEUtils.h"
 
+double SciBooNEUtils::CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon){
+
+  double eff = 1.;
+
+  if (!effHist) return eff;
+
+  double pmu = muon->fP.Vect().Mag()/1000.;
+  double thetamu = nu->fP.Vect().Angle(muon->fP.Vect());
+  eff = effHist->GetBinContent(effHist->FindBin(pmu, thetamu));
+
+  return eff;
+}
+
+
+
 // Function to calculate the distance the particle travels in scintillator
 TVector3 SciBooNEUtils::DistanceInScintillator(FitParticle* particle){
 

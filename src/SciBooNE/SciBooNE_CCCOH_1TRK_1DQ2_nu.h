@@ -37,15 +37,10 @@ public:
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 
-  // For dealing with the efficiency
-  void GetTH2DFromFile(std::string fileName, std::string histName);
-  double CalcEfficiency(FitParticle *nu, FitParticle *HMT);
-  
   TH1D* fMCHist_PDG[61]; ///<! Plots in CCQELike mode to tag PDG of the background
 
  private:
   double q2qe; ///<! X_Variable
-  FitParticle *HM_track;
   TH2D *muonStopEff;
 };
   
