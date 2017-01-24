@@ -538,6 +538,18 @@ T2K Samples
     fChain->push_back(new T2K_CC0pinp_STV_XSec_1Ddpt_nu(file, rw, type, fkdt));
 
     /*
+      SciBooNE COH studies
+    */
+  } else if (!name.compare("SciBooNE_CCCOH_1TRK_1DQ2_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_1TRK_1DQ2_nu(name, file, rw, type, fkdt));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_MuPr_1DQ2_nu(name, file, rw, type, fkdt));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(name, file, rw, type, fkdt));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(name, file, rw, type, fkdt));
+
+    /*
 K2K Samples
     */
     /*
