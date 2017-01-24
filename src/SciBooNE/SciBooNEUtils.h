@@ -46,8 +46,8 @@
 namespace SciBooNEUtils {
 
   double CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon);
-  TVector3 DistanceInScintillator(FitParticle* particle);
-  bool PassesCOHDistanceCut(FitParticle* particle);
+  TVector3 DistanceInScintillator(FitParticle* beam, FitParticle* particle);
+  bool PassesCOHDistanceCut(FitParticle* beam, FitParticle* particle);
 
 }
 #endif

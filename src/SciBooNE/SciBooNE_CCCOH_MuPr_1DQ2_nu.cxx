@@ -85,7 +85,7 @@ bool SciBooNE_CCCOH_MuPr_1DQ2_nu::isSignal(FitEvent *event){
     if (abs(PID) == 211 || abs(PID) == 13 || PID == 2212){
       
       // Must be reconstructed as a track in SciBooNE
-      if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(j))) continue;
+      if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(0), event->PartInfo(j))) continue;
       nCharged += 1;
       if (PID == 2212) nProtons += 1;
     }

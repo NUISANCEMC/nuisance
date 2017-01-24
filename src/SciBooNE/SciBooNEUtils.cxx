@@ -35,19 +35,26 @@ double SciBooNEUtils::CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle
 
 
 // Function to calculate the distance the particle travels in scintillator
-TVector3 SciBooNEUtils::DistanceInScintillator(FitParticle* particle){
+TVector3 SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* particle){
 
   TVector3 vect(0.,0.,0.);
 
   if (particle->fP.Vect().Mag() > 150.) vect.SetZ(100.);
-					  
+
+  double mom = particle->fP.Vect().Mag();
+  double zmom = mom*cos(beam->fP.Vect().Angle(particle->fP.Vect()));
+
+  // VERY TERRIBLE APPROXIMATION
+  if (fabs(zmom) > 250.) vect.SetZ(100.); // <<< DRAGONS
+  // ^^^ HERE BE DRAGONS
+  LOG(DEB) << "MOM = " << mom << "; ZMOM = " << zmom << std::endl;
   return vect;
 }
 
 // Function to check whether the particle has travelled 8cm in the beam direction (3 layers)
-bool SciBooNEUtils::PassesCOHDistanceCut(FitParticle* particle){
+bool SciBooNEUtils::PassesCOHDistanceCut(FitParticle* beam, FitParticle* particle){
   
-  TVector3 vect = SciBooNEUtils::DistanceInScintillator(particle);
+  TVector3 vect = SciBooNEUtils::DistanceInScintillator(beam, particle);
   
   // False if the z-axis direction too low
   if (vect[2] < 80) return false;

@@ -84,15 +84,14 @@ bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
     if (abs(PID) == 211 || abs(PID) == 13 || PID == 2212){
       
       // Must be reconstructed as a track in SciBooNE
-      if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(j))) continue;
+      if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(0), event->PartInfo(j))) continue;
       nCharged += 1;
     }
   } // end loop over particle stack
 
   // This is the 1 track sample
-  if (nCharged == 1) return true;
-
-  return false;
+  if (nCharged != 1) return false;
+  return true;
 
 };
 
