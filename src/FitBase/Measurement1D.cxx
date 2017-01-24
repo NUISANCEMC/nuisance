@@ -270,7 +270,7 @@ void Measurement1D::SetDataValues(std::string dataFile) {
   // Override this function if the input file isn't in a suitable format
   LOG(SAM) << "Reading data from: " << dataFile.c_str() << std::endl;
   fDataHist =
-      PlotUtils::GetTH1DFromFile(dataFile, (fName + "_data"), fPlotTitles);
+    PlotUtils::GetTH1DFromFile(dataFile, (fName + "_data"), fPlotTitles);
   fDataTrue = (TH1D*)fDataHist->Clone();
 
   // Number of data points is number of bins
@@ -286,7 +286,7 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile,
 
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
            << std::endl;
-  fDataHist = PlotUtils::GetTH1DFromRootFile(
+  fDataHist = (TH1D*)PlotUtils::GetHistFromRootFile(
       (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
@@ -300,7 +300,7 @@ void Measurement1D::SetDataFromFile(std::string inhistfile,
 
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
            << std::endl;
-  fDataHist = PlotUtils::GetTH1DFromRootFile((inhistfile), histname);
+  fDataHist = (TH1D*)PlotUtils::GetHistFromRootFile((inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
   return;

@@ -567,7 +567,11 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::s
 
     for (int i = 0; i < npoints; ++i){
       tempPlot->SetBinContent(i+1, values[i]);
-      tempPlot->SetBinError(i+1, errors[i]);
+
+      // If only two columns are present in the input file, use the sqrt(values) as the error
+      // equivalent to assuming that the error is statistical
+      if (!errors[i]) tempPlot->SetBinError(i+1, sqrt(values[i]));
+      else tempPlot->SetBinError(i+1, errors[i]);
     }
 
     delete gr;
@@ -688,10 +692,11 @@ TH2D* PlotUtils::GetDecompCovarPlot(TMatrixDSym* cov, std::string name){
   return PlotUtils::GetCovarPlot(cov, name + "_DECCOV", name + "_DECCOV;Bins;Bins;Decomp Covariance (#times10^{-76})");
 }
 
-TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name){
+// RENAME
+TH1* PlotUtils::GetHistFromRootFile(std::string file, std::string name){
 
   TFile* rootHistFile = new TFile(file.c_str(),"READ");
-  TH1D* tempHist =  (TH1D*) rootHistFile->Get(name.c_str())->Clone();
+  TH1* tempHist =  (TH1*) rootHistFile->Get(name.c_str())->Clone();
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
