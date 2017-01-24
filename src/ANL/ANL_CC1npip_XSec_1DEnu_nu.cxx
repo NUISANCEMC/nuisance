@@ -123,9 +123,11 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     
   // ANL has a W cuts at 1.4, 1.6 and no w cut
   // This is set by user, or defaults to 2.0
-  if (hadMass/1000. < wTrueCut) {
+  if (hadMass < wTrueCut*1000.) {
     Enu = Pnu.E()/1.E3;
   }
+
+  fXVar = Enu;
 
   return;
 };
