@@ -36,8 +36,15 @@ public:
   
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
+  
+  // These functions are overridden to make the mode plots... probably a better way to do this
+  void ScaleEvents();
+  void FillHistograms();
+  void Write(std::string drawOpt);
+  void ApplyNormScale(double norm);
+  void ResetAll();
 
-  TH1D* fMCHist_PDG[61]; ///<! Plots in CCQELike mode to tag PDG of the background
+  TH1D *fMCHist_modes[4];
 
  private:
   double q2qe; ///<! X_Variable

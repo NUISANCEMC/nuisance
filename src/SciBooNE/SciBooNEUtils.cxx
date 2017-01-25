@@ -39,13 +39,11 @@ TVector3 SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* p
 
   TVector3 vect(0.,0.,0.);
 
-  if (particle->fP.Vect().Mag() > 150.) vect.SetZ(100.);
-
   double mom = particle->fP.Vect().Mag();
   double zmom = mom*cos(beam->fP.Vect().Angle(particle->fP.Vect()));
 
   // VERY TERRIBLE APPROXIMATION
-  if (fabs(zmom) > 250.) vect.SetZ(100.); // <<< DRAGONS
+  if (fabs(zmom) > 200.) vect.SetZ(100.); // <<< DRAGONS
   // ^^^ HERE BE DRAGONS
   LOG(DEB) << "MOM = " << mom << "; ZMOM = " << zmom << std::endl;
   return vect;
@@ -62,3 +60,66 @@ bool SciBooNEUtils::PassesCOHDistanceCut(FitParticle* beam, FitParticle* particl
   
 }
 
+
+
+void SciBooNEUtils::CreateModeArray(TH1* hist, TH1* modearray[]){
+
+  std::string nameArr[] = {"CCCOH", "CCRES", "CCQElike", "Other"};
+  for (int i = 0; i < 4; ++i)
+    modearray[i] = (TH1*)hist->Clone(Form("%s_%s",hist->GetName(),nameArr[i].c_str()));
+  return;
+};
+
+void SciBooNEUtils::DeleteModeArray(TH1* modearray[]){
+  for (int i = 0; i < 4; ++i)
+    delete modearray[i];
+  return;
+};
+
+
+void SciBooNEUtils::FillModeArray(TH1* hist[], int mode, double xval, double weight){
+
+  switch(abs(mode)) {
+  case 16: 
+    // CCCOH case
+    hist[0]->Fill(xval, weight);
+    break;
+  case 11:
+  case 12:
+  case 13:
+    // CCRES case
+    hist[1]->Fill(xval, weight);
+    break;
+  case 1:
+  case 2:
+    // CCQE-like case
+    hist[2]->Fill(xval, weight);
+    break;
+  default:
+    // Everything else
+    hist[3]->Fill(xval, weight);    
+  }
+  return;
+};
+
+void SciBooNEUtils::ScaleModeArray(TH1* hist[], double factor, std::string option){
+  
+  for (int i = 0; i < 4; ++i)
+    if (hist[i]) hist[i]->Scale(factor,option.c_str());
+  return;
+};
+
+void SciBooNEUtils::ResetModeArray(TH1* hist[]){
+  
+  for (int i = 0; i < 4; ++i)
+    if (hist[i]) hist[i]->Reset();
+  return;
+};
+
+
+void SciBooNEUtils::WriteModeArray(TH1* hist[]){
+
+  for (int i = 0; i < 4; ++i)
+    if (hist[i]) hist[i]->Write();
+  return;
+};
