@@ -45,7 +45,7 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
     EnuMin = 0.0;
     EnuMax = 10.0;
   }
-  if (!type.empty()) {
+  if (!type.empty() && type != "DEFAULT") {
     std::string temp_type = type;
     std::replace(temp_type.begin(), temp_type.end(), '/', '_');
     fName += "_"+temp_type;

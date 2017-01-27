@@ -46,7 +46,7 @@ BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   } else {
     DataLocation += "BNL_CC1pip_on_n_1986.txt";
   }
-  if (!type.empty()) {
+  if (!type.empty() && type != "DEFAULT") {
     std::string temp_type = type;
     std::replace(temp_type.begin(), temp_type.end(), '/', '_');
     fName += "_"+temp_type;

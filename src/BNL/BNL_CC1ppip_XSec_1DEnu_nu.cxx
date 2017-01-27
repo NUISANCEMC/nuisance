@@ -48,7 +48,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
     DataLocation += "BNL_CC1pip_on_p_1986.txt";
     EnuMax = 3.0;
   }
-  if (!type.empty()) {
+  if (!type.empty() && type != "DEFAULT") {
     std::string temp_type = type;
     std::replace(temp_type.begin(), temp_type.end(), '/', '_');
     fName += "_"+temp_type;

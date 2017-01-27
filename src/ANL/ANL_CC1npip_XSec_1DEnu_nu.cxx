@@ -28,7 +28,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   // Measurement Details
   fName = "ANL_CC1npip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 1.5;
   fIsDiag = true;
@@ -64,7 +64,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   }
 
   // Get rid of the slashes in the type
-  if (!type.empty()) {
+  if (!type.empty() && type != "DEFAULT") {
     std::string temp_type = type;
     std::replace(temp_type.begin(), temp_type.end(), '/', '_');
     fName += "_"+temp_type;

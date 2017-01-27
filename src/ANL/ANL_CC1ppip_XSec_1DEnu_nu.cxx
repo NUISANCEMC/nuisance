@@ -61,7 +61,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
     UseCorrectedData = false;
   }
   // Get rid of the slashes in the type
-  if (!type.empty()) {
+  if (!type.empty() && type != "DEFAULT") {
     std::string temp_type = type;
     std::replace(temp_type.begin(), temp_type.end(), '/', '_');
     fName += "_"+temp_type;
