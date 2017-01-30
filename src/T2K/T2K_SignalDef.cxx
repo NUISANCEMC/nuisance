@@ -114,16 +114,16 @@ bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   // Require a numu CC0pi event
   if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
 
-  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
-  double CosThetaMu = cos(pnu.Vect().Angle(pmu.Vect()));
-  double pmu = pmu.Vect().Mag();
+  double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
+  double p_mu = Pmu.Vect().Mag();
 
   // If we're doing a restricted phase space, Analysis II asks for:
   // Cos(theta_mu) > 0.0 and p_mu > 200 MeV
   if (forwardgoing) {
-    if (CosThetaMu < 0.0 || pmu < 200) return false;
+    if (CosThetaMu < 0.0 || p_mu < 200) return false;
   }
 
   return true;
