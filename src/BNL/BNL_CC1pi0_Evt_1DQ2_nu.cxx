@@ -31,7 +31,8 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight 
   fAllowedTypes += "EVT";
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_firstQ2rem.txt");
+  //SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_firstQ2rem.txt");
+  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_HighQ2Gone.txt");
   SetupDefaultHist();
 
   // set Poisson errors on fDataHist (scanned does not have this)

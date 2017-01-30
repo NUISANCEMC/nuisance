@@ -62,7 +62,8 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   // If W < 2.0 GeV
   } else {
     // No Enu cuts on full W space
-    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_firstQ2rem.txt";
+    //DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_firstQ2rem.txt";
+    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_HighQ2Gone.txt";
   }
 
   SetDataValues(DataLocation);

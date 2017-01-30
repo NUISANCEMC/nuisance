@@ -46,7 +46,8 @@ ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
   if (HadCut == 1.4) {
     DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_W14GeV_firstQ2rem.txt";
   } else {
-    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_firstQ2rem.txt";
+    //DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_firstQ2rem.txt";
+    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt";
   }
   // Get rid of the slashes in the type
   if (!type.empty() && type != "DEFAULT") {
