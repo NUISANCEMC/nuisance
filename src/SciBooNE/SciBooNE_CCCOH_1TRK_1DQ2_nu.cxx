@@ -29,7 +29,7 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(std::string name, std::
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  this->fPlotTitles = "; Q^{2} (GeV^{2}); Entries/0.05 (GeV^{2})";
   this->SetDataValues(FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig10a_CVs.csv");
   this->muonStopEff = (TH2D*)PlotUtils::GetHistFromRootFile(
 		    FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
@@ -83,17 +83,17 @@ bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
 
     int PID = event->PartInfo(j)->fPID;
 
-    // Look for pions, muons, protons
-    if (abs(PID) == 211 || abs(PID) == 13 || PID == 2212){
+    // Look for pions, protons
+    if (abs(PID) == 211 || PID == 2212){
       
       // Must be reconstructed as a track in SciBooNE
-      if (! SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(0), event->PartInfo(j))) continue;
+      if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
       nCharged += 1;
     }
   } // end loop over particle stack
 
   // This is the 1 track sample
-  if (nCharged != 1) return false;
+  if (nCharged != 0) return false;
   return true;
 
 };

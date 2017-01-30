@@ -36,6 +36,7 @@
 #include <TH2D.h>
 
 #include "FitParticle.h"
+#include "FitEvent.h"
 #include "FitLogger.h"
 
 /*!
@@ -46,8 +47,7 @@
 namespace SciBooNEUtils {
 
   double CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon);
-  TVector3 DistanceInScintillator(FitParticle* beam, FitParticle* particle);
-  bool PassesCOHDistanceCut(FitParticle* beam, FitParticle* particle);
+  bool DistanceInScintillator(FitParticle* beam, FitParticle* particle);
 
   // Functions to break the plots into modes
   void CreateModeArray(TH1* hist, TH1* modearray[]);
@@ -56,6 +56,11 @@ namespace SciBooNEUtils {
   void ScaleModeArray(TH1* hist[], double factor, std::string option = "");
   void DeleteModeArray(TH1* modearray[]);
   void WriteModeArray(TH1* hist[]);
+
+  bool isMuPiSignal(FitEvent *event, bool withVA);
+  double CalcThetaPr(FitEvent *event);
+  double CalcThetaPi(FitEvent *event);
+  FitParticle* GetSecondaryTrack(FitEvent *event);
 
 }
 #endif

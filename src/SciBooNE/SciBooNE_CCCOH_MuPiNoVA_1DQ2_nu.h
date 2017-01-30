@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-// This class corresponds to Fig 10a from PRD78 112004 (2008)
+// This class corresponds to Fig 10d from PRD78 112004 (2008)
 
 #ifndef SCIBOONE_CCCOH_MUPINOVA_1DQ2_NU_H_SEEN
 #define SCIBOONE_CCCOH_MUPINOVA_1DQ2_NU_H_SEEN

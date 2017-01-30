@@ -18,6 +18,8 @@
 *******************************************************************************/
 
 #include "SciBooNEUtils.h"
+#include "FitParameters.h"
+#include "FitUtils.h"
 
 double SciBooNEUtils::CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon){
 
@@ -35,31 +37,21 @@ double SciBooNEUtils::CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle
 
 
 // Function to calculate the distance the particle travels in scintillator
-TVector3 SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* particle){
+bool SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* particle){
 
-  TVector3 vect(0.,0.,0.);
-
-  double mom = particle->fP.Vect().Mag();
+  double mom  = particle->fP.Vect().Mag();
   double zmom = mom*cos(beam->fP.Vect().Angle(particle->fP.Vect()));
-
-  // VERY TERRIBLE APPROXIMATION
-  if (fabs(zmom) > 200.) vect.SetZ(100.); // <<< DRAGONS
-  // ^^^ HERE BE DRAGONS
-  LOG(DEB) << "MOM = " << mom << "; ZMOM = " << zmom << std::endl;
-  return vect;
-}
-
-// Function to check whether the particle has travelled 8cm in the beam direction (3 layers)
-bool SciBooNEUtils::PassesCOHDistanceCut(FitParticle* beam, FitParticle* particle){
+  int PID     = particle->fPID;
   
-  TVector3 vect = SciBooNEUtils::DistanceInScintillator(beam, particle);
-  
-  // False if the z-axis direction too low
-  if (vect[2] < 80) return false;
+  if (abs(PID) == 211){
+    if (fabs(zmom) < FitPar::Config().GetParD("SciBooNE_COH_pion_cut"))
+      return false;
+  } else if (PID == 2212){
+    if (fabs(zmom) < FitPar::Config().GetParD("SciBooNE_COH_proton_cut"))
+      return false;
+  }
   return true;
-  
 }
-
 
 
 void SciBooNEUtils::CreateModeArray(TH1* hist, TH1* modearray[]){
@@ -123,3 +115,92 @@ void SciBooNEUtils::WriteModeArray(TH1* hist[]){
     if (hist[i]) hist[i]->Write();
   return;
 };
+
+
+// Shared signal definitions
+bool SciBooNEUtils::isMuPiSignal(FitEvent *event, bool withVA){
+  
+  int nCharged = 0;
+  int nPions   = 0;
+  int nVertex  = 0;
+
+  // For now, require a muon       
+  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
+    return false;
+
+  // For one track, require a single FS particle.      
+  for (UInt_t j = 2; j < event->Npart(); j++){
+    
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
+    
+    int PID = event->PartInfo(j)->fPID;
+    
+    // Look for pions, muons, protons    
+    if (abs(PID) == 211 || PID == 2212){
+      
+      // Must be reconstructed as a track in SciBooNE    
+      if (SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))){
+	nCharged += 1;
+	if (PID == 211) nPions += 1;
+      } else nVertex += 1;
+    }
+    // Also include neutrons in VA     
+    // if (PID == 2112) nVertex += 1;
+  } // end loop over particle stack   
+
+  if (nCharged != 1) return false;
+  if (nPions   != 1) return false;
+
+  // Cover both VA cases
+  if (withVA  && nVertex == 0) return false;
+  if (!withVA && nVertex != 0) return false;
+  return true;  
+}
+
+FitParticle* SciBooNEUtils::GetSecondaryTrack(FitEvent *event){
+  
+  for (UInt_t j = 2; j < event->Npart(); j++){
+
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
+
+    // Need a pion which 
+    if (event->PartInfo(j)->fPID != 211) continue;
+    if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
+    return event->PartInfo(j);
+  } // end loop over particle stack                
+  
+  return 0;
+}
+
+double SciBooNEUtils::CalcThetaPr(FitEvent *event){
+  
+  FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
+  FitParticle *nu   = event->GetNeutrinoIn();
+
+  // Construct the vector p_pr = (-p_mux, -p_muy, Enurec - pmucosthetamu)
+  // where p_mux, p_muy are the projections of the muon momentum onto the x and y dimension respectively
+  double Enuqe = FitUtils::EnuQErec(muon->fP,cos(nu->fP.Vect().Angle(muon->fP.Vect())), 27., true);
+  double p_pr_z = Enuqe - muon->fP.Vect().Mag()*cos(nu->fP.Vect().Angle(muon->fP.Vect()));
+
+  FitParticle* secondary = SciBooNEUtils::GetSecondaryTrack(event);
+  
+  if (!secondary) return -999.;
+  
+  TVector3 p_pr  = TVector3(-muon->fP.Vect().X(), -muon->fP.Vect().Y(), -p_pr_z);
+  double thetapr = p_pr.Angle(secondary->fP.Vect())/TMath::Pi()*180.;
+
+  return thetapr;
+}
+
+double SciBooNEUtils::CalcThetaPi(FitEvent *event){
+
+  FitParticle *nu   = event->GetNeutrinoIn();
+  FitParticle* secondary = SciBooNEUtils::GetSecondaryTrack(event);
+
+  if (!secondary) return -999.;
+
+  double thetapi = secondary->fP.Vect().Angle(nu->fP.Vect())/TMath::Pi()*180.;
+  return thetapi;
+}

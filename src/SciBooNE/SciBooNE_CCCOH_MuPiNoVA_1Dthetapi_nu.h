@@ -17,22 +17,22 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-// This class corresponds to Fig 10c from PRD78 112004 (2008)
+// This class corresponds to Fig 12 from PRD78 112004 (2008)
 
-#ifndef SCIBOONE_CCCOH_MUPIVA_1DQ2_NU_H_SEEN
-#define SCIBOONE_CCCOH_MUPIVA_1DQ2_NU_H_SEEN
+#ifndef SCIBOONE_CCCOH_MUPINOVA_1DTHETAPI_NU_H_SEEN
+#define SCIBOONE_CCCOH_MUPINOVA_1DTHETAPI_NU_H_SEEN
 
 #include "Measurement1D.h"
 #include "SciBooNEUtils.h"
 
 //******************************************************************** 
-class SciBooNE_CCCOH_MuPiVA_1DQ2_nu : public Measurement1D {
+class SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu : public Measurement1D {
 //******************************************************************** 
 
 public:
 
-  SciBooNE_CCCOH_MuPiVA_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~SciBooNE_CCCOH_MuPiVA_1DQ2_nu() {};
+  SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  virtual ~SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu() {};
   
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
@@ -47,7 +47,7 @@ public:
   TH1D *fMCHist_modes[4];
 
  private:
-  double q2qe; ///<! X_Variable
+  double thetapi; ///<! X_Variable
   TH2D *muonStopEff;
 };
   

@@ -21,6 +21,8 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu.cxx
 SciBooNE_CCCOH_MuPr_1DQ2_nu.cxx
 SciBooNE_CCCOH_MuPiVA_1DQ2_nu.cxx
 SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.cxx
+SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.cxx
+SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.cxx
 SciBooNEUtils.cxx
 )
 
@@ -29,6 +31,8 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu.h
 SciBooNE_CCCOH_MuPr_1DQ2_nu.h
 SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h
 SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h
+SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h
+SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h
 SciBooNEUtils.h
 )
 

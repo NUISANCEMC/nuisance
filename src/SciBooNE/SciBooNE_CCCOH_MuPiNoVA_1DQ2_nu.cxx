@@ -29,7 +29,7 @@ SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu::SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(std::string nam
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup Plots
-  this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  this->fPlotTitles = "; Q^{2} (GeV^{2}); Entries/0.05 (GeV^{2})";
   this->SetDataValues(FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig10d_CVs.csv");
   this->muonStopEff = (TH2D*)PlotUtils::GetHistFromRootFile(
 		      FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
@@ -68,41 +68,7 @@ void SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu::isSignal(FitEvent *event){
-
-  int nCharged = 0;
-  int nPions   = 0;
-  int nVertex  = 0;
-
-  // For now, require a muon
-  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
-    return false;
-
-  // For one track, require a single FS particle.
-  for (UInt_t j = 2; j < event->Npart(); j++){
-
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-
-    int PID = event->PartInfo(j)->fPID;
-
-    // Look for pions, muons, protons
-    if (abs(PID) == 211 || PID == 2212){
-      
-      // Must be reconstructed as a track in SciBooNE
-      if (SciBooNEUtils::PassesCOHDistanceCut(event->PartInfo(0), event->PartInfo(j))){
-	nCharged += 1;
-	if (PID == 211) nPions += 1;
-      } else nVertex += 1;
-    }
-    // Also include neutrons in VA
-    if (PID == 2112) nVertex += 1;
-  } // end loop over particle stack
-
-  if (nCharged != 2) return false;
-  if (nPions   != 1) return false;
-  if (nVertex  != 0) return false;
-  return true;
-
+  return SciBooNEUtils::isMuPiSignal(event, false);
 };
 
 

@@ -207,6 +207,8 @@
 #include "SciBooNE_CCCOH_MuPr_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
 
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
