@@ -33,6 +33,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   // User can give option of corrected BNL data or not
   // The correction follows Wilkinson & Rodriguez et al.
+  // Currently I've only implemented no W cut data but will implement the W < 1.4
   if (type.find("UNCORR") != std::string::npos) {
     UseCorrectedData = false;
   } else {
@@ -77,8 +78,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
-  // Found a corrected one but only reliable to ~3GeV
-  if (hadMass < 1400) Enu = Pnu.E()/1000.;
+  Enu = Pnu.E()/1000.;
   fXVar = Enu;
 
   return;
