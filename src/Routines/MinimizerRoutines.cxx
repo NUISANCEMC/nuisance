@@ -88,6 +88,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]){
       if (!std::strcmp(argv[i], "-c"))      { fCardFile=argv[i+1]; ++i;}
       else if (!std::strcmp(argv[i], "-o")) { fOutputFile=argv[i+1]; ++i;}
       else if (!std::strcmp(argv[i], "-f")) { fStrategy=argv[i+1]; ++i;}
+      else if (!std::strcmp(argv[i], "-d")) { fFakeDataInput=argv[i+1]; ++i;}
       else if (!std::strcmp(argv[i], "-q")) { configs_cmd.push_back(argv[i+1]); ++i;}
       else if (!std::strcmp(argv[i], "-n")) { maxevents_flag=argv[i+1]; ++i;}
       else if (!std::strcmp(argv[i], "-v")) { verbosity_flag -= 1; }
@@ -251,7 +252,14 @@ int MinimizerRoutines::ReadParameters(std::string parstring){
     "nuwro_parameter,gibuu_parameter";
 
   // Check sample input
-  if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
+  if (parstring.find("parameter") == std::string::npos) {
+    return kGoodStatus;
+  }
+
+  // If we find fake_parameter
+  if (parstring.find("fake_parameter") != std::string::npos) {
+    return kGoodStatus;
+  }
 
   // Parse inputs
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
@@ -379,9 +387,8 @@ int MinimizerRoutines::ReadFakeDataPars(std::string parstring){
   // Parse inputs
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
 
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0] == "fake_parameter"){
+  // Skip if comment somewhere later in line
+  if (strvct[0].c_str()[0] == '#') {
     return kGoodStatus;
   }
 
@@ -615,20 +622,31 @@ void MinimizerRoutines::SetupFitter(std::string routine){
 }
 
 //*************************************
+// Set fake data from user input
 void MinimizerRoutines::SetFakeData(){
 //*************************************
 
+  // If the fake data input field (-d) isn't provided, return to caller
   if (fFakeDataInput.empty()) return;
 
-  if (fFakeDataInput.compare("MC") == 0){
+  // If user specifies -d MC we set the data to the MC
+  // User can also specify fake data parameters to reweight by doing "fake_parameter" in input card file
+  // "fake_parameter" gets read in ReadCard function (reads to fFakeVals)
+  if (fFakeDataInput.compare("MC") == 0) {
 
-    LOG(FIT)<<"Setting fake data from MC starting prediction." <<std::endl;
+    LOG(FIT) << "Setting fake data from MC starting prediction." << std::endl;
+    // fFakeVals get read in in ReadCard
     UpdateRWEngine(fFakeVals);
 
+    // Reconfigure the reweight engine
     FitBase::GetRW()->Reconfigure();
+    // Reconfigure all the samples to the new reweight
     fSampleFCN->ReconfigureAllEvents();
+    // Feed on and set the fake-data in each measurement class
     fSampleFCN->SetFakeData("MC");
 
+    // Changed the reweight engine values back to the current values 
+    // So we start the fit at a different value than what we set the fake-data to
     UpdateRWEngine(fCurVals);
 
     LOG(FIT)<<"Set all data to fake MC predictions."<<std::endl;

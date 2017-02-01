@@ -709,7 +709,7 @@ void Measurement1D::ScaleEvents() {
     ERR(FTL) << "I found a negative fScaleFactor in " << __FILE__ << ":" << __LINE__ << std::endl;
     ERR(FTL) << "fScaleFactor = " << fScaleFactor << std::endl;
     ERR(FTL) << "EXITING" << std::endl;
-    exit(-1);
+    throw;
   }
 
   LOG(REC) << std::setw(10) << std::right << NSignal << "/"
@@ -782,6 +782,9 @@ void Measurement1D::ScaleEvents() {
       fMCFine->SetBinError(i + 1, fMCFine->Integral());
     }
   }
+  
+  // Set the number of signal events back to zero so we don't keep counting
+  NSignal = 0;
 
   return;
 };

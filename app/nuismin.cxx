@@ -51,7 +51,11 @@ void printInputCommands(){
   std::cout<<"                      7. Save - Will save the state of the fitter (Always done by default at the end) \n";
   std::cout<<"                      Extra option LowStatFit will perform each of these options with a lower number \n";
   std::cout<<"                      of fit events (config lowstat). Example: LowStatMigrad, LowStatScan \n";
-  std::cout<<"     -f fakeDataFile: Uses the MC generated from a previous fit as a fake data set for these fits \n";
+  std::cout<<"     -d fakeDataFile: Uses the MC generated from a previous fit as a fake data set for these fits \n";
+  std::cout<<"                      Can also specify MC to set the fake-data to the Monte-Carlo prediction\n";
+  std::cout<<"                         In this case, you can specify fake_parameter PARAM_NAME PARAM_VALUE in the card\n";
+  std::cout<<"                         to reweight the MC parameter PARAM_NAME to some PARAM_VALUE. The minimiser will start\n";
+  std::cout<<"                         at whatever neut_parameter or genie_parameter is set to in the cardfile.\n";
   std::cout<<"     -i inputFile:  Uses the results from a previous fit file as starting input for these fits \n";
   std::cout<<"     -q config_name=config_val : Allows any config parameter to be overridden from the command line.\n";
   std::cout<<"                                 This will take priority over those given in the default, or cardFile. \n";
