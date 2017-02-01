@@ -44,7 +44,7 @@ ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeigh
     
   std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/";
   if (HadCut == 1.4) {
-    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_W14GeV_firstQ2rem.txt";
+    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt";
   } else {
     //DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_firstQ2rem.txt";
     DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt";
