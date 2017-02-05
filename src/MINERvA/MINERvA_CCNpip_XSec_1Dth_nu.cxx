@@ -129,7 +129,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   thVect.clear();
 
   if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
-  if (event->NumFSParticle(13) == 0) continue;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
