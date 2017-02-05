@@ -65,7 +65,7 @@ void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double ppi0 = -999;
 
-  if (hadMass > 100 && hadMass < hadMassCut) {
+  if (hadMass < hadMassCut) {
     // 2016 does pion kinetic energy in GeV
     // 2015 does pion momentum in GeV
     ppi0 = FitUtils::p(Ppi0);
