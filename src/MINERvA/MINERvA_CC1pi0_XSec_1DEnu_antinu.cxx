@@ -60,7 +60,7 @@ void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double Enu     = -999;
 
-  if (hadMass > 100 && hadMass < 1800)
+  if (hadMass < 1800)
     Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
