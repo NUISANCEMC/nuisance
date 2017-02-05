@@ -53,14 +53,15 @@ MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, 
 void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  if (event->NumFSParticle(13) == 0 || event->NumFSParticle(211) == 0) return;
+  if (event->NumFSParticle(13) == 0) return;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
   // This Q2 defaults to calculating true Q2 (using true Enu instead of recon. Enu)
   // This agrees with what MINERvA used
-  double q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  double q2 = -999;
+  if (hadMass < 1800) q2 = -1*(Pnu-Pmu).Mag2()/1.E6;
 
   fXVar = q2;
 

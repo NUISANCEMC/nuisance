@@ -58,9 +58,13 @@ void MINERvA_CCNpip_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0) return;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double pmu = FitUtils::p(Pmu);
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+
+  double pmu = -999;
+  if (hadMass < 1800) pmu = Pmu.Vect().Mag()/1000.;
 
   fXVar = pmu;
 

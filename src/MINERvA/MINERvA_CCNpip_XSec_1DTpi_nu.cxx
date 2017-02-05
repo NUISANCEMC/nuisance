@@ -163,23 +163,31 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(
 void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   //********************************************************************
 
+  if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
+  if (event->NumFSParticle(13) == 0) return;
+
   // Clear out the vectors
   TpiVect.clear();
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
 
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j) {
-    // Only include alive particles
-    if (!(event->PartInfo(j))->fIsAlive &&
-        (event->PartInfo(j))->fNEUTStatusCode != 0)
-      continue;
+  if (hadMass < 1800) {
 
-    int PID = (event->PartInfo(j))->fPID;
-    // Pick up the charged pions in the event
-    if (abs(PID) == 211) {
-      double ppi = FitUtils::T(event->PartInfo(j)->fP) * 1000.;
-      TpiVect.push_back(ppi);
+    // Loop over the particle stack
+    for (unsigned int j = 2; j < event->Npart(); ++j) {
+      // Only include alive particles
+      if (!(event->PartInfo(j))->fIsAlive &&
+          (event->PartInfo(j))->fNEUTStatusCode != 0)
+        continue;
+
+      int PID = (event->PartInfo(j))->fPID;
+      // Pick up the charged pions in the event
+      if (abs(PID) == 211) {
+        double ppi = FitUtils::T(event->PartInfo(j)->fP) * 1000.;
+        TpiVect.push_back(ppi);
+      }
     }
   }
 
@@ -222,7 +230,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
         morePions->Fill(tpi, Weight);
       }
 
-      PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, TpiVect[k], Weight);
+      PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, tpi, Weight);
     }
   }
 }
@@ -267,7 +275,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::Write(std::string drawOpts) {
   morePions->SetFillColor(morePions->GetLineColor());
 
   THStack pionStack =
-      THStack((fName + "_pionStack").c_str(), (fName + "_pionStack").c_str());
+    THStack((fName + "_pionStack").c_str(), (fName + "_pionStack").c_str());
 
   pionStack.Add(onePions);
   pionStack.Add(twoPions);

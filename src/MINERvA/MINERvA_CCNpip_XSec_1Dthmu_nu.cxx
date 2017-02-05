@@ -56,7 +56,10 @@ void MINERvA_CCNpip_XSec_1Dthmu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double thmu = (180./M_PI)*FitUtils::th(Pnu, Pmu);
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+
+  double thmu = -999;
+  if (hadMass < 1800) thmu = (180./M_PI)*FitUtils::th(Pnu, Pmu);
 
   fXVar = thmu;
 
