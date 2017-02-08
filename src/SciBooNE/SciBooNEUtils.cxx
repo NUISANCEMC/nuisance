@@ -56,8 +56,8 @@ bool SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* parti
 
 void SciBooNEUtils::CreateModeArray(TH1* hist, TH1* modearray[]){
 
-  std::string nameArr[] = {"CCCOH", "CCRES", "CCQElike", "Other"};
-  for (int i = 0; i < 4; ++i)
+  std::string nameArr[] = {"CCCOH", "CCRES", "CCQE", "2p2h", "Other"};
+  for (int i = 0; i < 5; ++i)
     modearray[i] = (TH1*)hist->Clone(Form("%s_%s",hist->GetName(),nameArr[i].c_str()));
   return;
 };
@@ -83,27 +83,29 @@ void SciBooNEUtils::FillModeArray(TH1* hist[], int mode, double xval, double wei
     hist[1]->Fill(xval, weight);
     break;
   case 1:
+    hist[2]->Fill(xval, weight);
+    break;
   case 2:
     // CCQE-like case
-    hist[2]->Fill(xval, weight);
+    hist[3]->Fill(xval, weight);
     break;
   default:
     // Everything else
-    hist[3]->Fill(xval, weight);    
+    hist[4]->Fill(xval, weight);    
   }
   return;
 };
 
 void SciBooNEUtils::ScaleModeArray(TH1* hist[], double factor, std::string option){
   
-  for (int i = 0; i < 4; ++i)
+  for (int i = 0; i < 5; ++i)
     if (hist[i]) hist[i]->Scale(factor,option.c_str());
   return;
 };
 
 void SciBooNEUtils::ResetModeArray(TH1* hist[]){
   
-  for (int i = 0; i < 4; ++i)
+  for (int i = 0; i < 5; ++i)
     if (hist[i]) hist[i]->Reset();
   return;
 };
@@ -111,11 +113,49 @@ void SciBooNEUtils::ResetModeArray(TH1* hist[]){
 
 void SciBooNEUtils::WriteModeArray(TH1* hist[]){
 
-  for (int i = 0; i < 4; ++i)
+  for (int i = 0; i < 5; ++i)
     if (hist[i]) hist[i]->Write();
   return;
 };
 
+bool SciBooNEUtils::isMuPrSignal(FitEvent *event, bool withVA){
+
+  int nCharged = 0;
+  int nProtons = 0;
+  int nVertex  = 0;
+
+  // For now, require a muon
+  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
+    return false;
+
+  // For one track, require a single FS particle.
+  for (UInt_t j = 2; j < event->Npart(); j++){
+
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
+
+    int PID = event->PartInfo(j)->fPID;
+
+    // Look for pions, muons, protons
+    if (abs(PID) == 211 || PID == 2212){
+
+      // Must be reconstructed as a track in SciBooNE
+      if (SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))){
+	nCharged += 1;
+	if (PID == 2212) nProtons += 1;
+      } else nVertex += 1;	
+    }
+  } // end loop over particle stack
+
+  if (nCharged != 1) return false;
+  if (nProtons != 1) return false;
+
+  // Cover both VA cases
+  if (withVA  && nVertex == 0) return false;
+  if (!withVA && nVertex != 0) return false;
+  return true;
+
+}
 
 // Shared signal definitions
 bool SciBooNEUtils::isMuPiSignal(FitEvent *event, bool withVA){
@@ -165,8 +205,9 @@ FitParticle* SciBooNEUtils::GetSecondaryTrack(FitEvent *event){
     if (!(event->PartInfo(j))->fIsAlive) continue;
     if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
 
-    // Need a pion which 
-    if (event->PartInfo(j)->fPID != 211) continue;
+    // Need a pion or proton
+    if (event->PartInfo(j)->fPID != 211 && 
+	event->PartInfo(j)->fPID != 2212) continue;
     if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
     return event->PartInfo(j);
   } // end loop over particle stack                
@@ -178,6 +219,8 @@ double SciBooNEUtils::CalcThetaPr(FitEvent *event){
   
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
   FitParticle *nu   = event->GetNeutrinoIn();
+
+  if (!muon || !nu) return -999;
 
   // Construct the vector p_pr = (-p_mux, -p_muy, Enurec - pmucosthetamu)
   // where p_mux, p_muy are the projections of the muon momentum onto the x and y dimension respectively

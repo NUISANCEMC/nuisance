@@ -69,34 +69,11 @@ void SciBooNE_CCCOH_MuPr_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 bool SciBooNE_CCCOH_MuPr_1DQ2_nu::isSignal(FitEvent *event){
 
-  int nCharged = 0;
-  int nProtons = 0;
-
-  // For now, require a muon
-  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
-    return false;
-
-  // For one track, require a single FS particle.
-  for (UInt_t j = 2; j < event->Npart(); j++){
-
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-
-    int PID = event->PartInfo(j)->fPID;
-
-    // Look for pions, muons, protons
-    if (abs(PID) == 211 || PID == 2212){
-      
-      // Must be reconstructed as a track in SciBooNE
-      if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
-      nCharged += 1;
-      if (PID == 2212) nProtons += 1;
-    }
-  } // end loop over particle stack
-
-  if (nCharged != 1) return false;
-  if (nProtons != 1) return false;
-  LOG(DEB) << "SciBooNE_CCCOH_MuPr_1DQ2_nu::isSignal == true" << std::endl;
+  if (!SciBooNEUtils::isMuPrSignal(event, true) &&
+      !SciBooNEUtils::isMuPrSignal(event, false)) return false;
+  
+  // Only 90% of protons are correctly identified... the rest get mis-IDed as pions
+  this->Weight *= 0.9;
   return true;
 
 };

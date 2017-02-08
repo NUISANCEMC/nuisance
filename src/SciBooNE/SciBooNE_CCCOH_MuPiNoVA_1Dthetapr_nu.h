@@ -44,7 +44,7 @@ public:
   void ApplyNormScale(double norm);
   void ResetAll();
 
-  TH1D *fMCHist_modes[4];
+  TH1D *fMCHist_modes[5];
 
  private:
   double thetapr; ///<! X_Variable

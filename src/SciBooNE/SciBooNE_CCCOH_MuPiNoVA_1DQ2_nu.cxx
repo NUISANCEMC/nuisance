@@ -68,7 +68,16 @@ void SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu::isSignal(FitEvent *event){
-  return SciBooNEUtils::isMuPiSignal(event, false);
+
+  if (SciBooNEUtils::isMuPiSignal(event, false)) return true;
+
+  // Also include 10% of protons
+  if (SciBooNEUtils::isMuPrSignal(event, false)){
+    this->Weight*=0.1;
+    return true;
+  }
+
+  return false;
 };
 
 

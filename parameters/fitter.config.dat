@@ -151,5 +151,5 @@ config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true      0
 config Modes.split_PN_NN     0
 
 # SciBooNE specific
-config SciBooNE_COH_pion_cut   100
-config SciBooNE_COH_proton_cut 300
+config SciBooNE_COH_pion_cut   150
+config SciBooNE_COH_proton_cut 450

@@ -58,6 +58,8 @@ namespace SciBooNEUtils {
   void WriteModeArray(TH1* hist[]);
 
   bool isMuPiSignal(FitEvent *event, bool withVA);
+  bool isMuPrSignal(FitEvent *event, bool withVA);
+
   double CalcThetaPr(FitEvent *event);
   double CalcThetaPi(FitEvent *event);
   FitParticle* GetSecondaryTrack(FitEvent *event);

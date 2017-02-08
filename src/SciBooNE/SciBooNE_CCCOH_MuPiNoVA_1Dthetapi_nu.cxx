@@ -69,8 +69,19 @@ void SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::isSignal(FitEvent *event){
-  // Also need to add the theta_proton > 20 deg. cut here
-  return SciBooNEUtils::isMuPiSignal(event, false);
+
+  // Require dth_proton > 20
+  if (SciBooNEUtils::CalcThetaPr(event) < 20) return false;
+
+  if (SciBooNEUtils::isMuPiSignal(event, false)) return true;
+
+  // Also include 10% of protons
+  if (SciBooNEUtils::isMuPrSignal(event, false)){
+    this->Weight*=0.1;
+    return true;
+  }
+
+  return false;
 };
 
 
