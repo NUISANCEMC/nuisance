@@ -75,7 +75,8 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::MpPi(Pp, Ppip);
+  // Include W < 1.4 GeV data sometime soon
+  //double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
   Enu = Pnu.E()/1000.;
