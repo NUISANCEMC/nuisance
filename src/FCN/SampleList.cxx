@@ -410,7 +410,9 @@ MINERvA Samples
       CC1pi0
     */
   // Done
-  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu")) {
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016")) {
     fChain->push_back(
         new MINERvA_CC1pi0_XSec_1Dth_antinu(name, file, rw, type, fkdt));
 
