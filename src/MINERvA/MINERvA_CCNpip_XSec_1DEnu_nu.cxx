@@ -26,13 +26,12 @@
 MINERvA_CCNpip_XSec_1DEnu_nu::MINERvA_CCNpip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 //********************************************************************
 
-  fName = "MINERvA_CCNpip_XSec_1DEnu_nu_2016";
+  fName = "MINERvA_CCNpip_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (GeV); d#sigma(E_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-enu.csv");
 
@@ -65,7 +64,6 @@ void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   fXVar = Enu;
 
-  return;
 };
 
 //********************************************************************

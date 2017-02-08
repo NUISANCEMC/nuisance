@@ -30,7 +30,7 @@ public:
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 
-  private:
+private:
 };
 
 #endif

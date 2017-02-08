@@ -24,14 +24,12 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dppi0_nubar";
+  fName = "MINERvA_CC1pi0_XSec_1Dppi0_antinu";
   fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = true;
   fNormError = 0.15;
-  // No hadronic mass cut on old publication
-  hadMassCut = 99999;
   fAllowedTypes += "NEW";
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
@@ -62,14 +60,8 @@ void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double ppi0 = -999;
-
-  if (hadMass < hadMassCut) {
-    // 2016 does pion kinetic energy in GeV
-    // 2015 does pion momentum in GeV
-    ppi0 = FitUtils::p(Ppi0);
-  }
+  // 2015 does pion momentum in GeV
+  double ppi0 = FitUtils::p(Ppi0);
 
   fXVar = ppi0;
 

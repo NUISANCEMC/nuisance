@@ -36,7 +36,6 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
   // We fill once per pion found in the event, so can fill multiple times for one event
@@ -102,7 +101,8 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
     }
   }
 
-  this->SetupDefaultHist();
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  Measurement1D::SetupDefaultHist();
 
   // Make some auxillary helper plots
   onePions  = (TH1D*)(fDataHist->Clone());
@@ -176,10 +176,10 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
   if (Signal){
 
-    int nPions = thVect.size();
+    unsigned int nPions = thVect.size();
 
-    // Need to loop over all the pions in the sample
-    for (size_t k = 0; k < thVect.size(); ++k) {
+    // Need to loop over all the pions in the event
+    for (size_t k = 0; k < nPions; ++k) {
 
       double th = thVect[k];
       this->fMCHist->Fill(th, Weight);

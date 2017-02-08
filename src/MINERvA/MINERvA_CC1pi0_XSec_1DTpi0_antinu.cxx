@@ -21,12 +21,14 @@
 
 #include "MINERvA_CC1pi0_XSec_1DTpi0_antinu.h"
 
+// The 2016 MINERvA measurement is in Tpi
+// The 2016 MINERvA measurement is in ppi
+
 // The constructor
 MINERvA_CC1pi0_XSec_1DTpi0_antinu::MINERvA_CC1pi0_XSec_1DTpi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1DTpi0_antinu_2016";
+  fName = "MINERvA_CC1pi0_XSec_1DTpi0_antinu";
   fPlotTitles = "; T_{#pi} (GeV); d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)";
-  hadMassCut = 1800;
   fIsDiag = false;
   EnuMin = 1.5;
   EnuMax = 10;
@@ -60,13 +62,11 @@ void MINERvA_CC1pi0_XSec_1DTpi0_antinu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double Tpi0 = -999;
 
-  if (hadMass < hadMassCut) {
+  if (hadMass < 1800)
     Tpi0 = FitUtils::T(Ppi0);
-  }
 
   fXVar = Tpi0;
 
-  return;
 };
 
 //********************************************************************

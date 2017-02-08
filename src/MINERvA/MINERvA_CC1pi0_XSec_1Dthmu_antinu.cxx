@@ -24,7 +24,7 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dthmu_nubar_2016";
+  fName = "MINERvA_CC1pi0_XSec_1Dthmu_antinu";
   fPlotTitles = "; #theta_{#mu}; d#sigma/d#theta_{#mu} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;

@@ -26,7 +26,7 @@
 MINERvA_CCNpip_XSec_1Dthmu_nu::MINERvA_CCNpip_XSec_1Dthmu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 //********************************************************************
 
-  fName = "MINERvA_CCNpip_XSec_1Dthmu_nu_2016";
+  fName = "MINERvA_CCNpip_XSec_1Dthmu_nu";
   fPlotTitles = "; #theta_{#mu} (degrees); d#sigma/d#theta_{#mu} (cm^{2}/degrees/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
@@ -63,7 +63,6 @@ void MINERvA_CCNpip_XSec_1Dthmu_nu::FillEventVariables(FitEvent *event) {
 
   fXVar = thmu;
 
-  return;
 };
 
 //********************************************************************

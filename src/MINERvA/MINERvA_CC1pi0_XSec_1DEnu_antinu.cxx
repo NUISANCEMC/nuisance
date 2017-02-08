@@ -24,7 +24,7 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  fName = "MINERvA_CC1pi0_XSec_1DEnu_nubar_2016";
+  fName = "MINERvA_CC1pi0_XSec_1DEnu_antinu";
   fPlotTitles = "; E_{#nu} (GeV); d#sigma(E_{#nu}) (cm^{2}/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
