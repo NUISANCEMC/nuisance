@@ -284,7 +284,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++) {
     // Skip particles that weren't in the final state
-    bool part_alive = event->PartInfo(i)->fIsAlive;
+    bool part_alive = event->PartInfo(i)->fIsAlive and event->PartInfo(i)->Status() == kFinalState;
     if (!part_alive) continue;
 
     // PDG Particle
