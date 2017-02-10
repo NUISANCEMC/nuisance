@@ -34,11 +34,27 @@ enum InputType {
   kEVSPLN_Input,
   kEMPTY_Input,
   kFEVENT_Input,
-  kJOINT_Input, // Kept for backwards compatibility
+  kJOINT_Input,  // Kept for backwards compatibility
   kInvalid_Input,
   kHIST_Input,   // Not sure if this are currently used.
   kBNSPLN_Input  // Not sure if this are currently used.
 };
+
+inline std::string EnsureTrailSlash(std::string str) {
+  if (str[str.length() - 1] != '/') {
+    str += '/';
+  }
+  return str;
+}
+
+inline std::string RemoveDoubleSlash(std::string str) {
+  size_t torpl = str.find("//");
+  while (torpl != std::string::npos) {
+    str.replace(torpl, 2, "/");
+    torpl = str.find("//");
+  }
+  return str;
+}
 
 InputType ParseInputType(std::string const &inp);
 bool IsJointInput(std::string const &inputs);
@@ -83,7 +99,5 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
     default: { return os << "kInvalid_Input"; }
   }
 }
-
-
 
 #endif

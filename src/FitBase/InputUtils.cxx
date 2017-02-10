@@ -73,15 +73,16 @@ std::string ExpandInputDirectories(std::string const &inputs) {
 
   for (size_t i = 0; i < nfiledir; i++) {
     std::string tempdir = "@" + filedir[i];
+    std::string const &event_folder =
+        EnsureTrailSlash(FitPar::Config().GetParS(filedir[i]));
     size_t torpl = expandedInputs.find(tempdir);
-    if (torpl != std::string::npos) {
-      std::string event_folder = FitPar::Config().GetParS(filedir[i]);
+    while (torpl != std::string::npos) {
       expandedInputs.replace(torpl, tempdir.size(), event_folder);
-      break;
+      torpl = expandedInputs.find(tempdir);
     }
   }
 
-  return expandedInputs;
+  return RemoveDoubleSlash(expandedInputs);
 }
 
 InputType GuessInputTypeFromFile(TFile *inpF) {
@@ -121,8 +122,8 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
   }
   InputType iType = GuessInputTypeFromFile(inpF);
   if (iType == kInvalid_Input) {
-    ERR(FTL) << "Couldn't determine input type from file: " << inpFName
-             << "." << std::endl;
+    ERR(FTL) << "Couldn't determine input type from file: " << inpFName << "."
+             << std::endl;
     throw;
   }
   inpF->Close();

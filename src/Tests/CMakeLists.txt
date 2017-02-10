@@ -26,7 +26,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-SET(TESTAPPS SignalDefTests)
+SET(TESTAPPS SignalDefTests ParserTests)
 
 foreach(appimpl ${TESTAPPS})
   add_executable(${appimpl} ${appimpl}.cxx)
@@ -40,5 +40,3 @@ foreach(appimpl ${TESTAPPS})
   install(TARGETS ${appimpl} DESTINATION tests)
   add_test(${appimpl} ${appimpl} 1)
 endforeach()
-
-
