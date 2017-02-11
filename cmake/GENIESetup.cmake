@@ -42,22 +42,6 @@ endif()
 
 execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-execute_process (COMMAND genie-config
-  --libdir OUTPUT_VARIABLE GENIE_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-if(${GENIE_LIBDIR} MATCHES .*2_10_.*)
-  message(STATUS "Replacing \"ReinSeghal\" with \"ReinSehgal\" due to known bug with version 2.10 of genie-config.")
-  set(OLD_GENIE_LD_LFLAGS ${GENIE_LD_FLAGS})
-  STRING(REPLACE "ReinSeghal" "ReinSehgal" GENIE_FIX_LD_FLAGS ${GENIE_LD_FLAGS})
-  message(STATUS "${OLD_GENIE_LD_LFLAGS} => ${GENIE_FIX_LD_FLAGS}")
-  set(GENIE_LD_FLAGS ${GENIE_FIX_LD_FLAGS})
-endif()
-
-
-set(GENIE_LD_FLAGS "${GENIE_LD_FLAGS} -lGReWeight ${GENIE_LD_FLAGS}")
-
-
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -82,14 +66,6 @@ if(NOT DEFINED LHAPDF_INC AND NOT DEFINED ENV{LHAPDF_INC})
     " $ cmake -DLHAPDF_INC=/path/to/LHAPDF_includes or as and environment vairable"
     " $ export LHAPDF_INC=/path/to/LHAPDF_includes")
 
-endif()
-
-if(NOT DEFINED LHAPATH  AND NOT DEFINED ENV{LHAPATH})
-
-  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. "
-    "This is ")
-elseif(DEFINED ENV{LHAPATH})
-  set(LHAPATH $ENV{LHAPATH})
 endif()
 
 if(NOT DEFINED LHAPDF_INC AND DEFINED ENV{LHAPDF_INC})
@@ -168,4 +144,4 @@ set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} ${GENIE_LD_FLAGS} -L${LHAPDF
 
 set(NEED_PYTHIA6 TRUE)
 set(NEED_ROOTPYTHIA6 TRUE)
-
+set(NEED_ROOTEVEGEN TRUE)

@@ -650,7 +650,7 @@ void InputHandler::ReadNuWroFile() {
 
       if (i % 100000 == 0) LOG(SAM) << " i " << i << std::endl;
       // Get Variables
-      Enu = fNuwroEvent->in[0].E() / 1000.0;
+      Enu = fNuwroEvent->in[0].t / 1000.0;
       TotXSec = fNuwroEvent->weight;
 
       // Fill a flux and xsec histogram

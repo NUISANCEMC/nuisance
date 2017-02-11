@@ -37,11 +37,6 @@ set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
 
 set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;Geom;GenVector)
 
-if(USE_GENIE)
-  cmessage(STATUS "GENIE requires eve generation libraries")
-  set(ROOT_LIBS Eve;EG;TreePlayer;Geom;Ged;Gui;${ROOT_LIBS})
-endif()
-
 if(NOT DEFINED USE_MINIMIZER)
   if("${ROOT_FEATURES}" MATCHES "minuit2")
     cmessage(STATUS "ROOT built with MINUIT2 support")
@@ -57,12 +52,78 @@ if("${ROOT_FEATURES}" MATCHES "opengl")
   set(ROOT_LIBS ${ROOT_LIBS};RGL)
 endif()
 
-if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
-  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6;Pythia6)
-endif()
-
 cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
 cmessage ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
 cmessage ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
+
+
+#Helper functions for building dictionaries
+function(GenROOTDictionary OutputDictName Header LinkDef)
+
+  get_directory_property(incdirs INCLUDE_DIRECTORIES)
+  string(REPLACE ";" ";-I" LISTDIRINCLUDES "-I${incdirs}")
+  string(REPLACE " " ";" LISTCPPFLAGS "${CMAKE_CXX_FLAGS}")
+
+  #ROOT5 CINT cannot handle it.
+  list(REMOVE_ITEM LISTCPPFLAGS "-std=c++11")
+
+  message(STATUS "LISTCPPFLAGS: ${LISTCPPFLAGS}")
+  message(STATUS "LISTINCLUDES: ${LISTDIRINCLUDES}")
+  #Learn how to generate the Dict.cxx and Dict.hxx
+  add_custom_command(
+    OUTPUT "${OutputDictName}.cxx" "${OutputDictName}.h"
+    COMMAND rootcint
+    ARGS -f ${OutputDictName}.cxx -c
+    -p ${LISTDIRINCLUDES} ${LISTCPPFLAGS} ${Header} ${LinkDef}
+    DEPENDS ${Header};${LinkDef})
+endfunction()
+
+
+function(BuildROOTProject ProjectName InputFile CommaSeparatedClassesToDump LIBLINKMODE)
+
+  string(REPLACE "," ";" HeadersToDump ${CommaSeparatedClassesToDump})
+  set(OUTPUTFILES ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectSource.cxx
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}LinkDef.h
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectHeaders.h
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectInstances.h)
+
+  cmessage(STATUS "As part of ROOT project: ${ProjectName}")
+  foreach (header ${HeadersToDump})
+    LIST(APPEND OUTPUTFILES "${CMAKE_BINARY_DIR}/${ProjectName}/${header}.h")
+    cmessage(STATUS "Will generate: ${CMAKE_BINARY_DIR}/${ProjectName}/${header}.h")
+  endforeach()
+
+  add_custom_command(
+    OUTPUT ${OUTPUTFILES}
+    COMMAND ${CMAKE_BINARY_DIR}/src/Utils/DumpROOTClassesFromVector
+    ARGS ${InputFile}
+      ${CMAKE_BINARY_DIR}/${ProjectName}
+      ${CommaSeparatedClassesToDump}
+    VERBATIM
+    DEPENDS DumpROOTClassesFromVector)
+
+  add_custom_target(${ProjectName}_sources
+    DEPENDS ${OUTPUTFILES})
+
+  GenROOTDictionary(
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectDict
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectHeaders.h
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}LinkDef.h
+    )
+
+  add_custom_target(${ProjectName}ProjectDict
+    DEPENDS
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectDict.cxx
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectDict.h )
+  # add_dependencies(${ProjectName}ProjectDict ${ProjectName}_sources)
+
+  #ProjectSource.cxx includes ProjectDict.cxx, so no need to add to compilation.
+  set(ROAA_SOURCEFILES
+    ${CMAKE_BINARY_DIR}/${ProjectName}/${ProjectName}ProjectSource.cxx)
+
+  add_library(${ProjectName} ${LIBLINKMODE} ${ROAA_SOURCEFILES})
+  add_dependencies(${ProjectName} ${ProjectName}ProjectDict)
+
+endfunction()

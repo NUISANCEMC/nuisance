@@ -56,3 +56,12 @@ else()
 endif()
 
 cmessage(STATUS "Reweight engine include directories: ${RWENGINE_INCLUDE_DIRECTORIES}")
+
+if(DEFINED NEED_ROOTEVEGEN AND NEED_ROOTEVEGEN)
+  cmessage(STATUS "Require ROOT eve generation libraries")
+  set(ROOT_LIBS Eve;EG;TreePlayer;Geom;Ged;Gui;${ROOT_LIBS})
+endif()
+if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
+  cmessage(STATUS "Require ROOT Pythia6 libraries")
+  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6;Pythia6)
+endif()

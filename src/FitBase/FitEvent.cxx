@@ -222,10 +222,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_in; i++) {
     particle* part = &fNuwroEvent->in[i];
 
-    fParticleMom[fNParticles][0] = part->p4().x;
-    fParticleMom[fNParticles][1] = part->p4().y;
-    fParticleMom[fNParticles][2] = part->p4().z;
-    fParticleMom[fNParticles][3] = part->p4().t;
+    fParticleMom[fNParticles][0] = part->x;
+    fParticleMom[fNParticles][1] = part->y;
+    fParticleMom[fNParticles][2] = part->z;
+    fParticleMom[fNParticles][3] = part->t;
 
     fParticleState[fNParticles] = kInitialState;
     fParticlePDG[fNParticles] = part->pdg;
@@ -237,10 +237,10 @@ void FitEvent::NuwroKinematics() {
     for (UInt_t i = 0; i < npart_out; i++) {
       particle* part = &fNuwroEvent->out[i];
 
-      fParticleMom[fNParticles][0] = part->p4().x;
-      fParticleMom[fNParticles][1] = part->p4().y;
-      fParticleMom[fNParticles][2] = part->p4().z;
-      fParticleMom[fNParticles][3] = part->p4().t;
+      fParticleMom[fNParticles][0] = part->x;
+      fParticleMom[fNParticles][1] = part->y;
+      fParticleMom[fNParticles][2] = part->z;
+      fParticleMom[fNParticles][3] = part->t;
 
       fParticleState[fNParticles] = kFSIState;
       fParticlePDG[fNParticles] = part->pdg;
@@ -252,10 +252,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_post; i++) {
     particle* part = &fNuwroEvent->post[i];
 
-    fParticleMom[fNParticles][0] = part->p4().x;
-    fParticleMom[fNParticles][1] = part->p4().y;
-    fParticleMom[fNParticles][2] = part->p4().z;
-    fParticleMom[fNParticles][3] = part->p4().t;
+    fParticleMom[fNParticles][0] = part->x;
+    fParticleMom[fNParticles][1] = part->y;
+    fParticleMom[fNParticles][2] = part->z;
+    fParticleMom[fNParticles][3] = part->t;
 
     fParticleState[fNParticles] = kFinalState;
     fParticlePDG[fNParticles] = part->pdg;
