@@ -60,6 +60,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
 set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
