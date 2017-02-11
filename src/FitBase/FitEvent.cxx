@@ -876,7 +876,7 @@ void FitEvent::Print() {
   LOG(EVT) << " -> Particle Stack " << std::endl;
   for (int i = 0; i < fNParticles; i++) {
     LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
-             << fParticleState[i] << " "
+             << fParticleState[i] << " " 
              << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
              << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
              << std::endl;

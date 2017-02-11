@@ -37,7 +37,10 @@ MiniBooNE_CCQE_XSec_2DTcos_nu.cxx
 MiniBooNE_CC1pip_XSec_1DTu_nu.cxx
 # MiniBooNE_NCEL_XSec_Treco_nu.cxx
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu.cxx
-MiniBooNE_NCpi0_XSec_1Dppi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dppi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.cxx
+MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.cxx
 )
 
 set(HEADERFILES
@@ -61,7 +64,10 @@ MiniBooNE_CCQE_XSec_2DTcos_nu.h
 MiniBooNE_CC1pip_XSec_1DTu_nu.h
 # MiniBooNE_NCEL_XSec_Treco_nu.h
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu.h
-MiniBooNE_NCpi0_XSec_1Dppi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h
+MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h
 )
 
 set(LIBNAME expMiniBooNE)

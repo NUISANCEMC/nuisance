@@ -178,11 +178,23 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
   fXVar = kplusmom / 1.E3;
 
   if (isSignal(event)){
+
     fEventTree->Fill();
+
+    int nstrangemesons = event->NumParticle(321);
+    int nstrangefsmesons = event->NumFSParticle(321);
+
+    if (nstrangemesons > 0){
+      std::cout << "New Event ----------------------------" << std::endl;
+      std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;
+      event->fNeutVect->Dump();
+    }
+
   }
 
   return;
 };
+
 
 //********************************************************************
 void MCStudy_KaonPreSelection::Write(std::string drawOpt) {

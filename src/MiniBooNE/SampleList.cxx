@@ -311,26 +311,24 @@ bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
     fChain->push_back(
         new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(file, rw, type, fkdt));
 
-    /* 
-       MIniBooNE NC1pi0
+    /*
+      MiniBooNE NC1pi0
     */
-  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_fhc_nu") || 
-	     !name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_fhc_combined")) {
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_nu")) {
     fChain->push_back(
-		      new MiniBooNE_NC1pi0_XSec_1Dppi0_nu(name,file,rw,type,fkdt));
-  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc_nu") ||
-             !name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc_combined")) {
+        new MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(file, rw, type, fkdt));
+
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_nu")) {
     fChain->push_back(
-		      new MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(name,file,rw,type,fkdt));
-  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_rhc_antinu") ||
-             !name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_rhc_combined")) {
+        new MiniBooNE_NC1pi0_XSec_1Dppi0_nu(file, rw, type, fkdt));
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_nubar")) {
     fChain->push_back(
-                      new MiniBooNE_NC1pi0_XSec_1Dppi0_antinu(name,file,rw,type,fkdt));
-  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc_antinu") ||
-             !name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc_combined")) {
+       new MiniBooNE_NC1pi0_XSec_1Dcospi0_nubar(file, rw, type, fkdt));
+
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_nubar")) {
     fChain->push_back(
-                      new MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(name,file,rw,type,fkdt));
-  
+       new MiniBooNE_NC1pi0_XSec_1Dppi0_nubar(file, rw, type, fkdt));
+
     /*
       MiniBooNE NCEL
     */
@@ -399,14 +397,18 @@ MINERvA Samples
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2016") ||
-             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg")) {
+             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg") ||
+             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg_2015") ||
+             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg_2016")) {
     fChain->push_back(new MINERvA_CCNpip_XSec_1Dth_nu(name, file, rw, type, fkdt));
 
  // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg_2015") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg_2016") ) {
     fChain->push_back(new MINERvA_CCNpip_XSec_1DTpi_nu(name, file, rw, type, fkdt));
 
 
@@ -430,17 +432,18 @@ MINERvA Samples
       CC1pi0
     */
   // Done
-  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu") ||
-             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015") ||
-             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016")) {
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu")) {
     fChain->push_back(
         new MINERvA_CC1pi0_XSec_1Dth_antinu(name, file, rw, type, fkdt));
 
-  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu")) {
+// DODGY TPI/PPI DATASET, COME BACK TOO
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu_2015")) {
     fChain->push_back(
         new MINERvA_CC1pi0_XSec_1Dppi0_antinu(file, rw, type, fkdt));
 
-  } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu")) {
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu_2016") ){
     fChain->push_back(
         new MINERvA_CC1pi0_XSec_1DTpi0_antinu(file, rw, type, fkdt));
 
