@@ -58,8 +58,9 @@ void MINERvA_CC1pi0_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double Q2      = -999;
 
-  if (hadMass < 1800)
-    Q2 = -1*(Pnu-Pmu).Mag2();
+  if (hadMass < 1800) {
+    Q2 = -1*(Pnu-Pmu).Mag2()/1.E6;
+  }
 
   fXVar = Q2;
 
