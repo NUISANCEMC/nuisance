@@ -34,6 +34,9 @@ TemplateMeas1D.cxx
 InputUtils.cxx
 NEUTInputHandler.cxx
 GENIEInputHandler.cxx
+NuWroInputHandler.cxx
+GIBUUInputHandler.cxx
+NUANCEInputHandler.cxx
 )
 
 set(HEADERFILES
@@ -45,7 +48,10 @@ InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
 InputUtils.h
 NEUTInputHandler.h
 GENIEInputHandler.h
+NuWroInputHandler.h
 InputHandler2.h
+GIBUUInputHandler.h
+NUANCEInputHandler.h
 )
 
 set(LIBNAME FitBase)

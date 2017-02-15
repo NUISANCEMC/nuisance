@@ -314,7 +314,7 @@ void InputHandler::SetupCache() {
 //********************************************************************
 void InputHandler::ReadJointFile() {
   //********************************************************************
-
+/*
   std::vector<std::string> inputs;
 
   if (fIsExplicitJointInput) {  // Included for backwards compatibility.
@@ -448,7 +448,7 @@ void InputHandler::ReadJointFile() {
     fEventType = kNEUT;
     fNeutVect = NULL;
     tn->SetBranchAddress("vectorbranch", &fNeutVect);
-    fEvent->SetEventAddress(&fNeutVect);
+    //fEvent->SetEventAddress(&fNeutVect);
 #endif
   } else if (temp_EventType == kNUWRO) {
 #ifdef __NUWRO_ENABLED__
@@ -463,7 +463,7 @@ void InputHandler::ReadJointFile() {
     fGenieGHep = NULL;
     fGenieNtpl = NULL;
     tn->SetBranchAddress("gmcrec", &fGenieNtpl);
-    fEvent->SetEventAddress(&fGenieNtpl);
+    //fEvent->SetEventAddress(&fGenieNtpl);
 #endif
   }
 
@@ -488,14 +488,14 @@ void InputHandler::ReadJointFile() {
   fXSecHist = (TH1D*)fEventHist->Clone();
   fXSecHist->Divide(fFluxHist);
   fXSecHist->SetNameTitle((fName + "_XSEC").c_str(), (fName + "_XSEC").c_str());
-
+*/
   return;
 }
 
 //********************************************************************
 void InputHandler::ReadNeutFile() {
 //********************************************************************
-
+/*
 #ifdef __NEUT_ENABLED__
 
   LOG(SAM) << " -> Setting up NEUT inputs" << std::endl;
@@ -539,7 +539,7 @@ void InputHandler::ReadNeutFile() {
   tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent->SetEventAddress(&fNeutVect);
+  //fEvent->SetEventAddress(&fNeutVect);
 
   // Print out what was read in
   LOG(SAM) << " -> Successfully Read NEUT file" << std::endl;
@@ -553,7 +553,7 @@ void InputHandler::ReadNeutFile() {
   ERR(FTL) << "Rebuild with --enable-neut or check FitBuild.h!" << std::endl;
   exit(-1);
 #endif
-
+*/
   return;
 }
 
@@ -561,6 +561,7 @@ void InputHandler::ReadNeutFile() {
 void InputHandler::ReadNuWroFile() {
 //********************************************************************
 
+/*
 #ifdef __NUWRO_ENABLED__
 
   LOG(SAM) << " -> Setting up Nuwro inputs" << std::endl;
@@ -760,14 +761,14 @@ void InputHandler::ReadNuWroFile() {
   ERR(FTL) << "Rebuild with --enable-nuwro or check FitBuild.h!" << std::endl;
   exit(-1);
 #endif
-
+*/
   return;
 }
 
 //********************************************************************
 void InputHandler::ReadGenieFile() {
 //********************************************************************
-
+/*
 #ifdef __GENIE_ENABLED__
 
   // Event Type 5 GENIE
@@ -813,7 +814,7 @@ void InputHandler::ReadGenieFile() {
   tn->SetBranchAddress("gmcrec", &fGenieNtpl);
 
   // Make the custom event read in nvect when calling CalcKinematics
-  fEvent->SetEventAddress(&fGenieNtpl);
+  //fEvent->SetEventAddress(&fGenieNtpl);
 
   // Set Titles
   fEventHist->SetNameTitle(
@@ -834,13 +835,14 @@ void InputHandler::ReadGenieFile() {
   ERR(FTL) << "Rebuild with --enable-genie or check FitBuild.h!" << std::endl;
   exit(-1);
 #endif
-
+*/
   return;
 }
 
 //********************************************************************
 void InputHandler::ReadGiBUUFile() {
 //********************************************************************
+  /*
 #ifdef __GiBUU_ENABLED__
   fEventType = kGiBUU;
 
@@ -1166,6 +1168,7 @@ void InputHandler::ReadGiBUUFile() {
   ERR(FTL) << "Rebuild with -DUSE_GiBUU=1." << std::endl;
   exit(-1);
 #endif
+*/
 }
 
 //********************************************************************
@@ -1188,7 +1191,7 @@ void InputHandler::ReadHistogramFile() {
 //********************************************************************
 void InputHandler::ReadNuanceFile() {
 //********************************************************************
-
+/*
 #ifdef __NUANCE_ENABLED__
   // Read in Nuance output ROOT file (converted from hbook)
   LOG(SAM) << " Reading NUANCE " << std::endl;
@@ -1266,6 +1269,7 @@ void InputHandler::ReadNuanceFile() {
   ERR(FTL) << "Rebuild with -DUSE_NUANCE=1!" << std::endl;
   exit(-1);
 #endif
+*/
 }
 
 //********************************************************************

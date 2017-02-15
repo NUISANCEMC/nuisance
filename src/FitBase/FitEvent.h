@@ -81,50 +81,34 @@ class FitEvent : public BaseFitEvt {
 /* Event Convertors */
 #ifdef __NEUT_ENABLED__
   //! Constructor assigns event address to NeutVect memory.
-  FitEvent(NeutVect* event) { this->SetEventAddress(&event); };
-
-  //! Set event address to NeutVect memory
-  void SetEventAddress(NeutVect** tempevent);
-
-  //! Convert NeutVect to common format
-  void NeutKinematics(void);
+  FitEvent(NeutVect* event) { 
+    fNeutVect = event;
+    fType = kNEUT;
+  };
 #endif
 
 #ifdef __NUWRO_ENABLED__
   //! Constructor assigns event address to NuWro event class memory.
-  FitEvent(event* tempEvent) { this->SetEventAddress(&tempEvent); };
-
-  //! Set event address to NuWro event class memory
-  void SetEventAddress(event** tempevent);
-
-  //! Convert NuWro event class to common format
-  void NuwroKinematics(void);
+  FitEvent(event* tempEvent) { 
+    fType = kNUWRO;
+    fNuwroEvent = tempEvent;
+  };
 #endif
 
 #ifdef __GENIE_ENABLED__
   //! Constructor assigns event address to GENIE event class memory.
-  FitEvent(NtpMCEventRecord* tempevent) { this->SetEventAddress(&tempevent); };
+  FitEvent(NtpMCEventRecord* tempevent) { 
+    fType = kGENIE;
+    genie_event = tempevent;
+};
 
-  //! Set event address to GENIE event record memory
-  //! Gets GHepRecord from NTuple record.
-  void SetEventAddress(NtpMCEventRecord** tempevent);
-
-  //! Convert GENIE event class to common format
-  void GENIEKinematics(void);
-
-  //! Flag to remove nuclear components in GENIE
-  static const bool kRemoveGenieNuclear = true;
 #endif
 
 #ifdef __GiBUU_ENABLED__
-  //! Constructor assisgns event address to a GiBUU reader
-  void SetEventAddress(GiBUUStdHepReader* tempevent);
-
-  //! Convert GiBUUStdHep event class to common format
-  void GiBUUKinematics(void);
-
-  //! Flag to remove nuclear components in GiBUU
-  static const bool kRemoveGiBUUNuclear = true;
+FitEvent(GiBUUStdHepReader* tempevent){
+    fType = kGiBUU;
+    GiRead = tempevent;
+}
 #endif
 
 #ifdef __NUANCE_ENABLED__

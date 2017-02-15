@@ -25,7 +25,7 @@
 #include "InputHandler2.h"
 #include "NEUTInputHandler.h"
 #include "GENIEInputHandler.h"
-
+#include "NuWroInputHandler.h"
 namespace InputUtils {
 
 enum InputType {
