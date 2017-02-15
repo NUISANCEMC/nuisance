@@ -43,7 +43,8 @@
 #include "JointFCN.h"
 #include "FitParameters.h"
 #include "GeneralUtils.h"
-
+#include "NuisConfig.h"
+#include "NuisKey.h"
 #include "FitLogger.h"
 
 enum minstate {
@@ -86,6 +87,8 @@ public:
 
   //! Loops through each line of the card file and passes it to other read functions
   void ReadCard(std::string cardfile);
+
+  void ReadXML(std::string cardfile);
 
   //! Check for parameter string in the line and assign the correct type.
   //! Fills maps for each of the parameters

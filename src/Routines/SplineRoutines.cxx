@@ -36,7 +36,7 @@ void SplineRoutines::Init() {
   fSampleFCN = NULL;
   fRW = NULL;
 
-  fAllowedRoutines = ("SaveEvents,SaveSplineEvents");
+  fAllowedRoutines = ("SaveEvents,TestEvents,SaveSplineEvents");
 };
 
 //*************************************
@@ -109,6 +109,24 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
 
   // CONFIG
   // ---------------------------
+  nuisconfig conf = Config::Get();
+
+  // Read Card Inputs
+  conf.LoadConfig( fCardFile, "xmlinput" );
+  
+  // Add the CMD Overrides
+  for (UInt_t iter = 0; iter < configs_cmd.size(); iter++) {
+    //  conf.AddConfig(configs_cmd[iter])
+  }
+  // Call reconfigure
+  conf.Reconfigure();
+
+  // Save Config
+  conf.WriteConfig( fOutputFile + ".xml" );
+
+  // ---------------------------
+
+  // Start Setting up other stuff
   std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
   FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
   FitPar::Config().ReadParamFile(fCardFile);
@@ -134,11 +152,6 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
   LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
   ERR_VERB(FitPar::Config().GetParI("ERROR"));
 
-  // CARD
-  // ---------------------------
-  // Parse Card Options
-  ReadCard(fCardFile);
-
   // Outputs
   // ---------------------------
   // Save Configs to output file
@@ -148,364 +161,13 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
   // Starting Setup
   // ---------------------------
   SetupRWEngine();
-  SetupSamples();
-  SetupGenericInputs();
 
+    //SaveEvents();
+    //TestEvents();
+  //GenerateEventSplines();
   return;
 };
 
-//*************************************
-void SplineRoutines::ReadCard(std::string cardfile) {
-  //*************************************
-
-  // Read cardlines into vector
-  std::vector<std::string> cardlines =
-      GeneralUtils::ParseFileToStr(cardfile, "\n");
-  FitPar::Config().cardLines = cardlines;
-
-  // Read Inputs
-  int linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++) {
-    std::string line = (*iter);
-    linecount++;
-
-    // Skip Comments
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
-
-    // Read Valid Samples
-    int samstatus = ReadSamples(line);
-    int genstatus = ReadGenericInputs(line);
-    int parstatus = ReadParameters(line);
-    int evtstatus = ReadEventSplines(line);
-    int binstatus = ReadBinSplines(line);
-
-    // Show line if bad to help user
-    if (samstatus == kErrorStatus || genstatus == kErrorStatus ||
-        parstatus == kErrorStatus || evtstatus == kErrorStatus ||
-        binstatus == kErrorStatus) {
-      ERR(FTL) << "Bad Input in cardfile " << fCardFile << " at line "
-               << linecount << "!" << endl;
-      ERR(FTL) << line << endl;
-      throw;
-    }
-  }
-
-  return;
-};
-
-//*****************************************
-int SplineRoutines::ReadEventSplines(std::string splstring) {
-  //*****************************************
-  std::string inputspec = "eventspline dialnames type points";
-
-  // Check spline input
-  if (splstring.find("eventspline") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(splstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0].find("eventspline") == std::string::npos) {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 4) {
-    ERR(FTL) << "Input rw dials need to provide at least 4 inputs."
-             << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Read Values
-  std::string parname = strvct[1];
-  std::string partype = strvct[2];
-  std::string parpnts = strvct[3];
-
-  // Fill Containers
-  fSplineNames.push_back(parname);
-  fSplineTypes[parname] = partype;
-  fSplinePoints[parname] = parpnts;
-
-  // Return
-  LOG(FIT) << "Read Spline: " << parname << " " << partype << " " << parpnts
-           << endl;
-  return kGoodStatus;
-}
-
-//*****************************************
-int SplineRoutines::ReadParameters(std::string parstring) {
-  //******************************************
-
-  std::string inputspec =
-      "RW Dial Inputs Syntax \n"
-      "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
-      "fix  input: TYPE  NAME  VALUE  [STATE] \n"
-      "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-      "Allowed Types: \n"
-      "neut_parameter,niwg_parameter,t2k_parameter,"
-      "nuwro_parameter,gibuu_parameter";
-
-  // Check sample input
-  if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0].find("parameter") == std::string::npos) {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "Input rw dials need to provide at least 3 inputs."
-             << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string partype = strvct[0];
-  std::string parname = strvct[1];
-  double parval = GeneralUtils::StrToDbl(strvct[2]);
-  double minval = parval - 1.0;
-  double maxval = parval + 1.0;
-  double stepval = 1.0;
-  std::string state = "FIX";  //[DEFAULT]
-
-  // Check Type
-  if (FitBase::ConvDialType(partype) == kUNKNOWN) {
-    ERR(FTL) << "Unknown parameter type! " << partype << endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Check Parameter Name
-  if (FitBase::GetDialEnum(partype, parname) == -1) {
-    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (No Limits)
-  if (strvct.size() == 4) {
-    state = strvct[3];
-  }
-
-  // Check for weirder inputs
-  if (strvct.size() > 4 && strvct.size() < 6) {
-    ERR(FTL) << "Provided incomplete limits for " << parname << endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (With limits and steps)
-  if (strvct.size() >= 6) {
-    minval = GeneralUtils::StrToDbl(strvct[3]);
-    maxval = GeneralUtils::StrToDbl(strvct[4]);
-    stepval = GeneralUtils::StrToDbl(strvct[5]);
-  }
-
-  // Option Extra (dial state after limits)
-  if (strvct.size() == 7) {
-    state = strvct[6];
-  }
-
-  // Run Parameter Conversion if needed
-  if (state.find("ABS") != std::string::npos) {
-    parval = FitBase::RWAbsToSigma(partype, parname, parval);
-    minval = FitBase::RWAbsToSigma(partype, parname, minval);
-    maxval = FitBase::RWAbsToSigma(partype, parname, maxval);
-    stepval = FitBase::RWAbsToSigma(partype, parname, stepval);
-  } else if (state.find("FRAC") != std::string::npos) {
-    parval = FitBase::RWFracToSigma(partype, parname, parval);
-    minval = FitBase::RWFracToSigma(partype, parname, minval);
-    maxval = FitBase::RWFracToSigma(partype, parname, maxval);
-    stepval = FitBase::RWFracToSigma(partype, parname, stepval);
-  }
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), parname) != fParams.end()) {
-    ERR(FTL) << "Duplicate parameter names given for " << parname << endl;
-    throw;
-  }
-
-  // Setup Containers
-  fParams.push_back(parname);
-
-  fTypeVals[parname] = FitBase::ConvDialType(partype);
-
-  fStartVals[parname] = parval;
-  fCurVals[parname] = fStartVals[parname];
-
-  fErrorVals[parname] = 0.0;
-
-  fStateVals[parname] = state;
-
-  bool fixstate = state.find("FIX") != std::string::npos;
-  fFixVals[parname] = fixstate;
-  fStartFixVals[parname] = fFixVals[parname];
-
-  fMinVals[parname] = minval;
-  fMaxVals[parname] = maxval;
-  fStepVals[parname] = stepval;
-
-  // Print the parameter
-  LOG(MIN) << "Read Parameter " << parname << " " << parval << " " << minval
-           << " " << maxval << " " << stepval << " " << state << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//******************************************
-int SplineRoutines::ReadGenericInputs(std::string samstring) {
-  //******************************************
-  std::string inputspec = "genericinput  inputfile  [outputfile]  [type]";
-
-  // Check generic input
-  if (samstring.find("genericinput") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
-
-  // Skip if comment or input somewhere later in line
-  if (strvct[0].c_str()[0] == '#' || strvct[0] != "genericinput") {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "genericinput need to provide at least 2 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string inname = strvct[1];
-  std::string infile = strvct[2];
-  std::string outfile = infile + ".nuisancefile.root";
-  std::string type = "FULLSPLINES";
-
-  // Optional Specify outputname
-  if (strvct.size() > 3) {
-    outfile = strvct[3];
-  }
-
-  // Optional specify type
-  if (strvct.size() > 4) {
-    type = strvct[4];
-  }
-
-  // Add to maps
-  fGenericInputNames.push_back(inname);
-
-  fGenericInputFiles[inname] = infile;
-  fGenericOutputFiles[inname] = outfile;
-  fGenericOutputTypes[inname] = type;
-
-  // Print out
-  LOG(FIT) << "Read Generic Input: " << inname << " " << infile << " "
-           << outfile << " (" << type << ")" << endl;
-
-  return kGoodStatus;
-}
-
-//******************************************
-int SplineRoutines::ReadSamples(std::string samstring) {
-  //******************************************
-  const static std::string inputspec =
-      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
-      "[norm]\nsample_name: Name "
-      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
-      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
-      "optional sample options.\nnorm: Additional, optional sample "
-      "normalisation factor.";
-
-  // Check sample input
-  if (samstring.find("sample") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
-
-  // Skip if comment or sample somewhere later in line
-  if (strvct[0].c_str()[0] == '#' || strvct[0] != "sample") {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string samname = strvct[1];
-  std::string samfile = strvct[2];
-
-  if (samfile == "FIX") {
-    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
-                "in the input card file. Line:\'"
-             << samstring << "\'" << std::endl;
-    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
-             << std::endl;
-
-    throw;
-  }
-
-  std::string samtype = "DEFAULT";
-  double samnorm = 1.0;
-
-  // Optional Type
-  if (strvct.size() > 3) {
-    samtype = strvct[3];
-    samname += "_"+samtype;
-    // Also get rid of the / and replace it with underscore because it might not be supported character
-    while (samname.find("/") != std::string::npos) {
-      samname.replace(samname.find("/"), 1, std::string("_"));
-    }
-  }
-
-  // Optional Norm
-  if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
-
-  // Add Sample Names as Norm Dials
-  std::string normname = samname + "_norm";
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()) {
-    ERR(FTL) << "Duplicate samples given for " << samname << endl;
-    throw;
-  }
-
-  fParams.push_back(normname);
-
-  fTypeVals[normname] = kNORM;
-  fStartVals[normname] = samnorm;
-  fCurVals[normname] = fStartVals[normname];
-  fErrorVals[normname] = 0.0;
-
-  fMinVals[normname] = 0.1;
-  fMaxVals[normname] = 10.0;
-  fStepVals[normname] = 0.5;
-
-  bool state = samtype.find("FREE") == std::string::npos;
-  fFixVals[normname] = state;
-  fStartFixVals[normname] = state;
-
-  // Print read in
-  LOG(MIN) << "Read sample " << samname << " " << samfile << " " << samtype
-           << " " << samnorm << endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
 
 /*
   Setup Functions
@@ -515,57 +177,36 @@ void SplineRoutines::SetupRWEngine() {
   //*************************************
 
   fRW = new FitWeight("splineweight");
+  std::vector<nuiskey> splinekeys    = Config::QueryKeys("spline");
+  std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
 
-  for (UInt_t i = 0; i < fParams.size(); i++) {
-    std::string name = fParams[i];
-    fRW->IncludeDial(name, fTypeVals.at(name));
+  // Add Parameters
+  for (int i = 0; i < splinekeys.size(); i++){
+    nuiskey key = splinekeys[i];
+    std::cout <<  key.GetS("name") << " " << key.GetS("type") << " " << FitBase::ConvDialType(key.GetS("type")) << std::endl;
+    fRW->IncludeDial( key.GetS("name"), 
+		      FitBase::ConvDialType(key.GetS("type")));
+		      
   }
+
+  for (int i = 0; i < parameterkeys.size(); i++){
+    nuiskey key = parameterkeys[i];
+    fRW->IncludeDial( key.GetS("name"), 
+		      FitBase::ConvDialType(key.GetS("type")));
+  }
+
   UpdateRWEngine(fStartVals);
 
   return;
 }
 
-//*************************************
-void SplineRoutines::SetupGenericInputs() {
-  //*************************************
-
-  fGenericInputs.clear();
-  for (unsigned int i = 0; i < fGenericInputNames.size(); i++) {
-    std::string name = fGenericInputNames[i];
-    std::vector<std::string> file_descriptor =
-        GeneralUtils::ParseToStr(fGenericInputFiles[name], ":");
-    if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \""
-               << fGenericInputFiles[name]
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
-    }
-    InputUtils::InputType inpType =
-        InputUtils::ParseInputType(file_descriptor[0]);
-    fGenericInputs[name] = (new InputHandler(name, inpType, file_descriptor[1]));
-  }
-}
-
-//*************************************
-void SplineRoutines::SetupSamples() {
-  //*************************************
-
-  /*
-  LOG(FIT)<<"Making the jointFCN"<<std::endl;
-  if (fSampleFCN) delete fSampleFCN;
-  fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
-  fSamples = fSampleFCN->GetSampleList();
-  */
-
-  return;
-}
 
 /*
   Fitting Functions
 */
 //*************************************
 void SplineRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals) {
-  //*************************************
+//*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
@@ -579,332 +220,304 @@ void SplineRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals) {
 }
 
 //*************************************
-void SplineRoutines::Run() {
-  //*************************************
+void SplineRoutines::Run(){
+//*************************************
 
-  for (UInt_t i = 0; i < fRoutines.size(); i++) {
-    std::string routine = fRoutines.at(i);
-    int fitstate = kFitUnfinished;
-    LOG(FIT) << "Running Routine: " << routine << std::endl;
+  for (int i = 0; i < fRoutines.size(); i++){
 
-    // Try Routines
-    if (!routine.compare("SaveSplineEvents"))
-      SaveEventSplines();
-    else if (!routine.compare("SaveEvents"))
-      SaveEvents();
+    LOG(FIT) << "Running Routine: " << fRoutines[i] << std::endl;
+    std::string rout = fRoutines[i];
+    if       (!rout.compare("SaveEvents")) SaveEvents();
+    else if  (!rout.compare("TestEvents")) TestEvents();
 
-    // If ending early break here
-    if (fitstate == kFitFinished || fitstate == kNoChange) {
-      LOG(FIT) << "Ending fit routines loop." << endl;
-      break;
-    }
   }
 
-  return;
+
 }
 
 //*************************************
 void SplineRoutines::SaveEvents() {
-  //*************************************
+//*************************************
 
-  // Make a new RWm Engine
-  if (fRW) delete fRW;
-  SetupRWEngine();
+  // Generate a set of nominal events
+  // Method, Loop over inputs, create input handler, then create a ttree
+  std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
+  for (int i = 0; i < eventkeys.size(); i++){
+    nuiskey key = eventkeys.at(i);
 
-  // Set RW engine to central values
-  UpdateRWEngine(fCurVals);
+    // Get I/O
+    std::string inputfilename  = key.GetS("input");
+    if (inputfilename.empty()){
+      ERR(FTL) << "No input given for set of input events!" << std::endl;
+      throw;
+    }
 
-  // iterate over generic events
-  std::map<std::string, InputHandler*>::const_iterator iter =
-      fGenericInputs.begin();
+    std::string outputfilename = key.GetS("output");
+    if (outputfilename.empty()){
+      outputfilename = inputfilename + ".nuisance.root";
+      ERR(FTL) << "No output give for set of output events! Saving to " 
+	       << outputfilename << std::endl;
+    }
 
-  // Iterate over all inputs
-  for (; iter != fGenericInputs.end(); iter++) {
-    std::string name = (iter->first);
+    // Make new outputfile
+    TFile* outputfile = new TFile(outputfilename.c_str(),"RECREATE");
+    outputfile->cd();
 
-    LOG(FIT) << "Creating new nuisance event set in:" << endl;
-    LOG(FIT) << "Name = " << name << endl;
-    LOG(FIT) << "InputFile = " << fGenericInputFiles[name] << endl;
-    LOG(FIT) << "OutputFile = " << fGenericOutputFiles[name] << endl;
-    LOG(FIT) << "Type = " << fGenericOutputTypes[name] << endl;
-
-    // Create a new TFile
-    TFile* eventfile = new TFile(fGenericOutputFiles[name].c_str(), "RECREATE");
-    eventfile->cd();
-
-    // Get Input
-    InputHandler* curinput = (iter->second);
-    int nevents = curinput->GetNEvents();
-
-    // Setup Event
-    FitEvent* custevent = curinput->GetEventPointer();
-
-    // Setup TTree
-    eventfile->cd();
-    TTree* evttree = new TTree("FitEvents", "FitEvents");
-    custevent->AddBranchesToTree(evttree);
-
+    // Make a new input handler
+    std::vector<std::string> file_descriptor =
+      GeneralUtils::ParseToStr(inputfilename, ":");
+    if (file_descriptor.size() != 2) {
+      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
+               << "\". expected \"FILETYPE:file.root\"" << std::endl;
+      throw;
+    }
+    InputUtils::InputType inptype =
+      InputUtils::ParseInputType(file_descriptor[0]);
+    
+    InputHandler* input = new InputHandler("eventsaver", inptype, file_descriptor[1]);
+    
+    // Get info from inputhandler
+    int nevents = input->GetNEvents();
     int countwidth = (nevents / 50);
+    FitEvent* nuisevent = input->GetEventPointer();
 
-    // Run Loop and Fill Event Tree
+    // Setup a TTree to save the event
+    outputfile->cd();
+    TTree* eventtree = new TTree("nuisance_events","nuisance_events");
+    nuisevent->AddBranchesToTree(eventtree);
+
+    // Loop over all events and fill the TTree
     for (int i = 0; i < nevents; i++) {
       // Grab new event
-      curinput->ReadEvent(i);
+      input->ReadEvent(i);
 
-      // Fill event info
-      custevent->CalcKinematics();
+      // Fill event info          
+      nuisevent->CalcKinematics();
 
-      // Fill Spline/Weight Info
-      fRW->CalcWeight(custevent);
+      // Save everything          
+      eventtree->Fill();
 
-      // Save everything
-      evttree->Fill();
-
+      // Logging
       if (i % countwidth == 0) {
-        LOG(REC) << "Filled " << i << "/" << nevents << " nuisance events."
-                 << endl;
+        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance events." << std::endl;
       }
     }
+    
+    // Save flux and close file
+    outputfile->cd();
+    eventtree->Write();
+    input->GetFluxHistogram()->Write("nuisance_fluxhist");
+    input->GetEventHistogram()->Write("nuisance_eventhist");
 
-    // Save TTree alongside flux info
-    eventfile->cd();
-    evttree->Write();
-    curinput->GetFluxHistogram()->Write("FitFluxHist");
-    curinput->GetEventHistogram()->Write("FitEventHist");
+    // Close Output
+    outputfile->Close();
 
-    // Close file
-    eventfile->Close();
+    // Delete Inputs
+    delete input;
   }
+  
+  // remove Keys
+  eventkeys.clear();
+
+  // Finished
+  LOG(FIT) << "Finished processing all nuisance events." << std::endl;
 }
 
 //*************************************
-void SplineRoutines::TestEventSplines() {
-  //*************************************
+void SplineRoutines::TestEvents(){
+//*************************************
 
-  // Make a new RW Engine
-  if (fRW) delete fRW;
-  SetupRWEngine();
+  // Create a new file for the test samples
+  TFile* testfile = new TFile("testfile.root","RECREATE");
 
-  // Set RW engine to central values
-  UpdateRWEngine(fCurVals);
+  // Loop over all tests
+  int count = 0;
+  std::vector<nuiskey> testkeys = Config::QueryKeys("sampletest");
+  for (std::vector<nuiskey>::iterator iter = testkeys.begin();
+       iter != testkeys.end(); iter++){
+    nuiskey key = (*iter);
+    
+    // 0. Create new measurement list
+    std::list<MeasurementBase*> samplelist;
+    
+    // 1. Build Sample From Events
+    std::string samplename = key.GetS("name");
+    std::string eventsid = key.GetS("inputid");
+    nuiskey eventskey = Config::QueryLastKey("events","id=" + eventsid);
+    std::string rawfile = eventskey.GetS("input");
+    MeasurementBase* rawsample = SampleUtils::CreateSample(samplename, rawfile, "", "", FitBase::GetRW());
 
-  // Create list of new temp InputHandlers
-  std::map<std::string, InputHandler*> evtsplinehandles;
-  for (UInt_t i = 0; i < fGenericInputNames.size(); i++) {
-    std::string name = fGenericInputNames[i];
+    // 2. Build Sample From Nuisance Events
+    std::string eventsfile = eventskey.GetS("output");
+    MeasurementBase* nuissample = SampleUtils::CreateSample(samplename, "FEVENT:" + eventsfile, "", "", FitBase::GetRW());
 
-    evtsplinehandles[name] = (new InputHandler(
-        name + "_splines", InputUtils::kEVSPLN_Input, fGenericOutputFiles[name]));
-  }
+    // 3. Make some folders to save stuff
+    TDirectory* sampledir   = (TDirectory*) testfile->mkdir(Form((samplename+"_test_%d").c_str(),count));
+    TDirectory* rawdir      = (TDirectory*) sampledir->mkdir("raw");
+    TDirectory* nuisancedir = (TDirectory*) sampledir->mkdir("nuisance");
+    TDirectory* difdir      = (TDirectory*) sampledir->mkdir("difference");
 
-  // Iterate over both inputs/outputs
-  std::map<std::string, InputHandler*>::const_iterator initer =
-      fGenericInputs.begin();
-  std::map<std::string, InputHandler*>::const_iterator outiter =
-      evtsplinehandles.begin();
+    // 4. Reconfigure both
+    rawdir->cd();
+    rawsample->Reconfigure();
+    rawsample->Write();
 
-  // Iterate over all inputs
-  for (; initer != fGenericInputs.end(); initer++, outiter++) {
-    std::string name = (initer->first);
-    LOG(FIT) << "Testing event splines in " << name << endl;
+    nuisancedir->cd();
+    nuissample->Reconfigure();
+    nuissample->Write();
 
-    // Create a new TFile
-    TFile* splinefile = new TFile(fGenericOutputFiles[name].c_str(), "UPDATE");
-    splinefile->cd();
+    // 4. Compare Raw to Nuisance Events
 
-    // Get Input
-    InputHandler* rawinput = (initer->second);
-    InputHandler* splinput = (outiter->second);
-    int nevents = splinput->GetNEvents();  // Should match...
-    nevents = 100;
+    // Loop over all keyse
+    TIter next(rawdir->GetListOfKeys());
+    TKey *dirkey;
+    while ((dirkey = (TKey*)next())) {
+      
+      // If not a 1D/2D histogram skip
+      TClass *cl = gROOT->GetClass(dirkey->GetClassName());
+      if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
 
-    FitEvent* rawevent = rawinput->GetEventPointer();
-    FitEvent* splevent = splinput->GetEventPointer();
+      // Get TH1* from both dir
+      TH1 *rawplot      = (TH1*)rawdir->Get(dirkey->GetName());
+      TH1 *nuisanceplot = (TH1*)nuisancedir->Get(dirkey->GetName());
 
-    fRW->ReadSplineHead(splinput->GetSplineHead());
+      // Take Difference
+      nuisanceplot->Add(rawplot,-1.0);
 
-    // Small Plots on event-by-event
-    // -------------------------------
-
-    // Make folder for graphs
-    TDirectory* graphdir = splinefile->mkdir("testgraphs");
-    graphdir->cd();
-
-    // Create Plot for each event
-    for (int i = 0; i < nevents; i++) {
-      // Grab new event from each sample
-      rawinput->ReadEvent(i);
-      splinput->ReadEvent(i);
-
-      // Start Loop for each parameter //TODO Make it test ND splines
-      for (unsigned int j = 0; j < fParams.size(); j++) {
-        std::string name = fParams.at(j);
-        if (fFixVals[name]) continue;
-
-        double startval = fCurVals[name];
-
-        // 1D Parameter Loop
-        std::vector<double> xvals;
-        std::vector<double> yvals_raw;
-        std::vector<double> yvals_spl;
-
-        // Start at min and loop
-        fCurVals[name] = fMinVals[name];
-        while (fCurVals[name] < fMaxVals[name]) {
-          // Update
-          UpdateRWEngine(fCurVals);
-          fRW->ReadSplineHead(splinput->GetSplineHead());
-
-          // Calc Weights
-          xvals.push_back(fCurVals[name]);
-          yvals_raw.push_back(fRW->CalcWeight(rawevent));
-          yvals_spl.push_back(fRW->CalcWeight(splevent));
-
-          // Step
-          fCurVals[name] = fCurVals[name] + fStepVals[name];
-        }
-
-        // Reset to normal
-        fCurVals[name] = startval;
-        splinefile->cd();
-        TGraph* graw = new TGraph(xvals.size(), &xvals[0], &yvals_raw[0]);
-        graw->SetNameTitle(
-            ("evspltest_raw_" + name).c_str(),
-            ("evspltest_raw_" + name + ";" + name + ";weight").c_str());
-        graw->SetLineColor(kBlue);
-        graw->SetMarkerColor(kBlue);
-        graw->SetLineWidth(2);
-        graw->SetMarkerStyle(0);
-
-        TGraph* gspl = new TGraph(xvals.size(), &xvals[0], &yvals_spl[0]);
-        gspl->SetNameTitle(
-            ("evspltest_spl_" + name).c_str(),
-            ("evspltest_spl_" + name + ";" + name + ";weight").c_str());
-        gspl->SetLineColor(kRed);
-        gspl->SetMarkerColor(kRed);
-        gspl->SetLineWidth(2);
-        gspl->SetMarkerStyle(20);
-
-        TCanvas* c1 = new TCanvas(("evspltest_" + name).c_str(),
-                                  ("evspltest_" + name).c_str(), 800, 600);
-
-        TLegend* l1 = new TLegend(0.6, 0.6, 0.9, 0.9);
-        l1->AddEntry(graw, "RAW", "l");
-        l1->AddEntry(gspl, "SPL", "l");
-
-        c1->cd();
-        graw->Draw("APL");
-        gspl->Draw("PL SAME");
-        l1->Draw("SAME");
-
-        graphdir->cd();
-        c1->Write();
-
-        delete graw;
-        delete gspl;
-        delete l1;
-      }
+      // Save to dif folder
+      difdir->cd();
+      nuisanceplot->Write();
     }
 
-    // Clean up
-    splinefile->Close();
+    // 5. Tidy Up                                                          
+    samplelist.clear();
+    
+    // Iterator
+    count++;
   }
-
-  // Finish Up
-  evtsplinehandles.clear();
 }
 
-//*************************************
-void SplineRoutines::SaveEventSplines() {
-  //*************************************
 
-  // Make a new RWm Engine
+
+//************************************* 
+void SplineRoutines::GenerateEventSplines(){
+//************************************* 
   if (fRW) delete fRW;
   SetupRWEngine();
 
-  // Set RW engine to central values
-  UpdateRWEngine(fCurVals);
+  // Setup the spline reader
+  SplineReader* splinereader = new SplineReader(fRW);
+  std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
+  // Add splines to splinereader
+  for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
+       iter != splinekeys.end(); iter++){
+    nuiskey splkey = (*iter);
 
-  // Add Splines to RW Engine
-  for (UInt_t i = 0; i < fSplineNames.size(); i++) {
-    std::string name = fSplineNames.at(i);
-    fRW->SetupSpline(name, fSplineTypes[name], fSplinePoints[name]);
+    // Spline Info
+    std::string splname = splkey.GetS("name");
+    std::string type    = splkey.GetS("type");
+    std::string form    = splkey.GetS("form");
+    std::string points  = splkey.GetS("points");
+
+    // Add Spline Info To Reader
+    splinereader->AddSpline(splname, type, form, points);
   }
+  splinereader->SetupSplineSet();
 
-  LOG(FIT) << "Starting spline inputs" << endl;
-  // iterate over generic events
-  std::map<std::string, InputHandler*>::const_iterator iter =
-      fGenericInputs.begin();
+  // Event Loop
+  // Loop over all events and calculate weights for each parameter set.
+  
+  // Generate a set of nominal events        
+  // Method, Loop over inputs, create input handler, then create a ttree   
+  std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
+  for (int i = 0; i < eventkeys.size(); i++){
+    nuiskey key = eventkeys.at(i);
 
-  // Iterate over all inputs
-  for (; iter != fGenericInputs.end(); iter++) {
-    std::string name = (iter->first);
-
-    LOG(FIT) << "Creating new spline set in:" << endl;
-    LOG(FIT) << "Name = " << name << endl;
-    LOG(FIT) << "InputFile = " << fGenericInputFiles[name] << endl;
-    LOG(FIT) << "OutputFile = " << fGenericOutputFiles[name] << endl;
-    LOG(FIT) << "Type = " << fGenericOutputTypes[name] << endl;
-
-    // Create a new TFile
-    TFile* splinefile =
-        new TFile(fGenericOutputFiles[name].c_str(), "RECREATE");
-    splinefile->cd();
-
-    // Get Input
-    InputHandler* curinput = (iter->second);
-    int nevents = curinput->GetNEvents();
-
-    // Setup Event
-    FitEvent* custevent = curinput->GetEventPointer();
-
-    // Setup TTree
-    splinefile->cd();
-    TTree* evttree = new TTree("FitEvents", "FitEvents");
-    fRW->SetupEventCoeff(static_cast<BaseFitEvt*>(custevent));
-    custevent->AddBranchesToTree(evttree);
-    custevent->AddSplineCoeffToTree(evttree);
-    LOG(REC) << "Added events+splines to TTree" << endl;
-    int countwidth = (nevents / 400);
-
-    // Make folder for graphs
-    TDirectory* graphdir = splinefile->mkdir("gengraphs");
-    graphdir->cd();
-
-    // Run Loop and Fill Event Tree
-    for (int i = 0; i < nevents; i++) {
-      // Grab new event
-      curinput->ReadEvent(i);
-
-      // Fill event info
-      custevent->CalcKinematics();
-
-      bool save = false;
-      if (i % nevents / 20 == 0) save = true;
-      // Fill Spline/Weight Info
-      fRW->GenSplines(custevent, save);
-      fRW->CalcWeight(custevent);
-
-      // Save everything
-      evttree->Fill();
-
-      if (i % countwidth == 0) {
-        LOG(REC) << "Filled " << i << "/" << nevents << " spline events."
-                 << endl;
-      }
+    // Get I/O 
+    std::string inputfilename  = key.GetS("input");
+    if (inputfilename.empty()){
+      ERR(FTL) << "No input given for set of input events!" << std::endl;
+      throw;
     }
 
-    // Save TTree alongside flux info
-    splinefile->cd();
-    fRW->GetSplineHeader()->Write("FitSplineHead");
-    evttree->Write();
-    curinput->GetFluxHistogram()->Write("FitFluxHist");
-    curinput->GetEventHistogram()->Write("FitEventHist");
+    std::string outputfilename = key.GetS("output");
+    if (outputfilename.empty()){
+      outputfilename = inputfilename + ".nuisance.root";
+      ERR(FTL) << "No output give for set of output events! Saving to "
+	       << outputfilename << std::endl;
+    }
 
-    // Close file
-    splinefile->Close();
+    // Make new outputfile    
+    TFile* outputfile = new TFile(outputfilename.c_str(),"RECREATE");
+    outputfile->cd();
+
+    // Make a new input handler              
+    std::vector<std::string> file_descriptor =
+      GeneralUtils::ParseToStr(inputfilename, ":");
+    if (file_descriptor.size() != 2) {
+      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
+	       << "\". expected \"FILETYPE:file.root\"" << std::endl;
+      throw;
+    }
+    InputUtils::InputType inptype =
+      InputUtils::ParseInputType(file_descriptor[0]);
+
+    InputHandler* input = new InputHandler("eventsaver", inptype, file_descriptor[1]);
+
+    // Get info from inputhandler            
+    int nevents = input->GetNEvents();
+    int countwidth = (nevents / 50);
+    FitEvent* nuisevent = input->GetEventPointer();
+
+    // Setup a TTree to save the event      
+    outputfile->cd();
+    TTree* eventtree = new TTree("nuisance_events","nuisance_events");
+    nuisevent->AddBranchesToTree(eventtree);
+
+    // Save the spline reader
+    splinereader->Write("spline_reader");
+
+    // Setup the spline TTree
+    TTree* splinetree = new TTree("spline_tree","spline_tree");
+    splinereader->AddCoefficientsToTree(splinetree);
+
+    // Loop over all events and fill the TTree                 
+    for (int i = 0; i < nevents; i++) {
+      // Grab new event  
+      input->ReadEvent(i);
+
+      // Fill event info 
+      nuisevent->CalcKinematics();
+
+      // Calculate the weights for each parameter set
+      splinereader->FitSplinesForEvent(nuisevent);
+
+      // Save everything 
+      eventtree->Fill();
+      splinetree->Fill();
+
+      // Logging         
+      if (i % countwidth == 0) {
+        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance events." << std::endl;
+      }
+    }
+    // Save flux and close file             
+    outputfile->cd();
+    eventtree->Write();
+    splinetree->Write();
+
+    input->GetFluxHistogram()->Write("nuisance_fluxhist");
+    input->GetEventHistogram()->Write("nuisance_eventhist");
+
+    // Close Output      
+    outputfile->Close();
+
+    // Delete Inputs     
+    delete input;
   }
-  TestEventSplines();
+
+  // remove Keys         
+  eventkeys.clear();
 }
 
 /*

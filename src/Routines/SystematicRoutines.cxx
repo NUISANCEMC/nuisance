@@ -173,6 +173,14 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
 void SystematicRoutines::ReadCard(std::string cardfile){
 //*************************************
 
+
+
+
+
+  
+
+
+
   // Read cardlines into vector
   std::vector<std::string> cardlines = GeneralUtils::ParseFileToStr(cardfile,"\n");
   FitPar::Config().cardLines = cardlines;

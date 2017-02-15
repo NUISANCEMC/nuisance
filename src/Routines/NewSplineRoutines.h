@@ -45,9 +45,6 @@
 #include "FitParameters.h"
 #include "FitLogger.h"
 #include "BaseFitEvt.h"
-#include "NuisConfig.h"
-#include "NuisKey.h"
-#include "SplineReader.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -85,6 +82,29 @@ public:
 
   //! Splits the arguments ready for initial setup
   void ParseArgs(int argc, char* argv[]);
+
+  //! Sorts out configuration and verbosity right at the very start.
+  //! Calls readCard to set everything else up.
+  void InitialSetup();
+
+  //! Loops through each line of the card file and passes it to other read functions
+  void ReadCard(std::string cardfile);
+
+  //! Check for parameter string in the line and assign the correct type.
+  //! Fills maps for each of the parameters
+  int ReadParameters(std::string parstring);
+
+  //! Read in the samples so we can set up the free normalisation dials if required
+  int ReadSamples(std::string sampleString);
+
+  //! Read Generic Inputs
+  int ReadGenericInputs(std::string sampleString);
+
+  //! Read Event Splines
+  int ReadEventSplines(std::string splstring);
+
+  //! Read Bin Splines
+  int ReadBinSplines(std::string binstring){ return kGoodStatus; };
   
   /*
     Setup Functions
@@ -96,14 +116,22 @@ public:
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void SetupRWEngine();
 
-  void Run();
-  void SaveEvents();
-  void TestEvents();
-  void GenerateEventSplines();
+  //! Setups up the jointFCN and uses it to grab samples.
+  void SetupSamples();
 
+  void SetupGenericInputs();
+
+  void SaveEvents();
+
+  void SaveEventSplines();
+
+  void TestEventSplines();
   /*
     Fitting Functions
   */
+
+  //! Main function to actually start iterating over the different required fit routines
+  void Run();
 
   //! Given a new map change the values that the RW engine is currently set to
   void UpdateRWEngine(std::map<std::string,double>& updateVals);

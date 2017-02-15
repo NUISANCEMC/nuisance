@@ -62,6 +62,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   Init();
   std::vector<std::string> configs_cmd;
   std::string maxevents_flag = "";
+  std::string xmlinput = "";
   int verbosity_flag = 0;
   int error_flag = 0;
 
@@ -92,31 +93,14 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
         error_flag -= 1;
       } else if (!std::strcmp(argv[i], "+e")) {
         error_flag += 1;
+      } else if (!std::strcmp(argv[i], "-x")) {
+	xmlinput = argv[i + 1];
       } else {
         ERR(FTL) << "ERROR: unknown command line option given! - '" << argv[i]
                  << " " << argv[i + 1] << "'" << std::endl;
         throw;
       }
     }
-  }
-
-  if (fCardFile.empty()) {
-    ERR(FTL) << "ERROR: card file not specified." << std::endl;
-    ERR(FTL) << "Run with '-h' to see options." << std::endl;
-    throw;
-  }
-
-  if (fOutputFile.empty()) {
-    ERR(WRN) << "WARNING: output file not specified." << std::endl;
-    ERR(WRN) << "Using " << fCardFile << ".root" << std::endl;
-    fOutputFile = fCardFile + ".root";
-  }
-
-  if (fCardFile == fOutputFile) {
-    ERR(WRN) << "WARNING: output file and card file are the same file, "
-                "writing: "
-             << fCardFile << ".root" << std::endl;
-    fOutputFile = fCardFile + ".root";
   }
 
   // Fill fit routines and check they are good
@@ -132,9 +116,17 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
 
   // CONFIG
   // ---------------------------
+  // Get Config()
+  nuisconfig conf = Config::Get();
+  if (!xmlinput.empty()){
+    conf.LoadConfig( xmlinput, "xmlinput" );
+  }
+  conf.WriteConfig( fOutputFile + ".xml" );
+
+
   std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
   FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
-  FitPar::Config().ReadParamFile(fCardFile);
+  if (!fCardFile.empty()) FitPar::Config().ReadParamFile(fCardFile);
 
   for (UInt_t iter = 0; iter < configs_cmd.size(); iter++) {
     FitPar::Config().ForceParam(configs_cmd[iter]);
@@ -160,7 +152,8 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   // CARD
   // ---------------------------
   // Parse Card Options
-  ReadCard(fCardFile);
+  if (!fCardFile.empty())   ReadCard(fCardFile);
+  if (!xmlinput.empty()) ReadXML(xmlinput);
 
   // Outputs
   // ---------------------------
@@ -176,9 +169,40 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   return;
 };
 
+//*************************************  
+void ComparisonRoutines::ReadXML(std::string cardfile){
+//*************************************  
+
+  // Setup Parameters
+  std::vector<nuiskey> samplekeys = Config::QueryKeys("parameter");
+  for (int i = 0; i < samplekeys.size(); i++){
+    nuiskey key = samplekeys.at(i);
+
+    // Get Inputs
+    std::string partype = key.GetS("type");
+    std::string parname = key.GetS("name");
+    double parnom = key.GetD("nom");
+    double parlow = key.GetD("low");
+    double parhig = key.GetD("high");
+    std::vector<double> parlim = key.GetVD("lim",",");
+      
+
+    std::cout << "Read Parameter " << partype << " " << parname << " " << parnom << " " << parlow << " " << parhig << std::endl;
+
+
+
+
+  }
+
+  
+
+}
+
 //*************************************
 void ComparisonRoutines::ReadCard(std::string cardfile) {
-  //*************************************
+//*************************************
+
+  // If a card file is provided add input to global config
 
   // Read cardlines into vector
   std::vector<std::string> cardlines =
