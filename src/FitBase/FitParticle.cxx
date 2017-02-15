@@ -22,6 +22,7 @@
 // NEUT Constructor
 #ifdef __NEUT_ENABLED__
 FitParticle::FitParticle(NeutPart* part) {
+
   // Set Momentum
   fP = TLorentzVector(part->fP.X(), part->fP.Y(), part->fP.Z(), part->fP.T());
 
@@ -33,9 +34,9 @@ FitParticle::FitParticle(NeutPart* part) {
 
 // NEUT FSI defined in neutclass/neutfsipart
 FitParticle::FitParticle(NeutFsiPart* part) {
+
   // Set Momentum
-  fP = TLorentzVector(part->fDir.X(), part->fDir.Y(), part->fDir.Z(),
-                      part->fDir.T());
+  fP = TLorentzVector(part->fDir.X(), part->fDir.Y(), part->fDir.Z(), part->fDir.T());
 
   fPID = part->fPID;
   // Set these to zero because they don't make sense in NEUT
@@ -49,8 +50,8 @@ FitParticle::FitParticle(NeutFsiPart* part) {
 #ifdef __NUWRO_ENABLED__
 FitParticle::FitParticle(particle* nuwro_particle, Int_t state) {
   // Set Momentum
-  this->fP = TLorentzVector(nuwro_particle->x, nuwro_particle->y,
-                            nuwro_particle->z, nuwro_particle->t);
+  this->fP = TLorentzVector(nuwro_particle->p4().x, nuwro_particle->p4().y,
+                            nuwro_particle->p4().z, nuwro_particle->p4().t);
   fPID = nuwro_particle->pdg;
 
   // Set status manually from switch
@@ -73,7 +74,7 @@ FitParticle::FitParticle(particle* nuwro_particle, Int_t state) {
       break;  // Other?
   }
 
-  fMass = fP.M();
+  fMass = nuwro_particle->m();
 };
 #endif
 
@@ -168,31 +169,22 @@ FitParticle::FitParticle(UInt_t* i) {
 };
 
 // NUANCE Particle
-FitParticle::FitParticle(double x, double y, double z, double t, int pdg,
-                         Int_t state) {
+FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t state){
+
   // Set Momentum
-  this->fP = TLorentzVector(x, y, z, t);
+  this->fP = TLorentzVector(x,
+			    y,
+			    z,
+			    t);
   fPID = pdg;
   fStatus = state;
 
   // Set status manually from switch
-  switch (state) {
-    case kInitialState:
-      fIsAlive = 0;
-      fNEUTStatusCode = 1;
-      break;  // Initial State
-    case kFinalState:
-      fIsAlive = 1;
-      fNEUTStatusCode = 0;
-      break;  // Final State
-    case kFSIState:
-      fIsAlive = 0;
-      fNEUTStatusCode = 2;
-      break;  // Intermediate State
-    default:
-      fIsAlive = -1;
-      fNEUTStatusCode = 3;
-      break;  // Other?
+  switch(state){
+  case     kInitialState: fIsAlive= 0; fNEUTStatusCode=1; break; // Initial State
+  case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
+  case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
+  default: fIsAlive=-1; fNEUTStatusCode=3; break; // Other?
   }
 
   fMass = fP.Mag();

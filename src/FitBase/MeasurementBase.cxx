@@ -25,7 +25,7 @@
 
 //********************************************************************
 // 2nd Level Constructor (Inherits From MeasurementBase.h)
-MeasurementBase::MeasurementBase() {
+MeasurementBase::MeasurementBase(void) {
   //********************************************************************
 
   fScaleFactor = 1.0;
@@ -38,8 +38,25 @@ MeasurementBase::MeasurementBase() {
   EnuMin = 0.;
   EnuMax = 1.E5;
 
+  std::cout << "Calling MeasurememntBase Constructor!" << std::endl;
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
+
+  // Build InputHandler if one has not been provided.
+  // fName = name;
+  // SetupInputs(inputfile);
+  // fType = type;
+
+  // Now Run Initial User Setup
+  // InitialSetup();
+
+  // Sort out type setups inside the classes
+
+  // Run Fake data setups if one has not been provided.
+
+  // 
+
 };
+
 
 //********************************************************************
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
@@ -56,8 +73,7 @@ double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low,
   // Set Energy Limits
   if (low == -9999.9) low = this->EnuMin;
   if (high == -9999.9) high = this->EnuMax;
-
-  return GetInput()->TotalIntegratedFlux(low, high, intOpt);
+  return GetInput()->TotalIntegratedFlux(low,high, intOpt);
 };
 
 //********************************************************************
@@ -76,9 +92,10 @@ double MeasurementBase::PredictedEventRate(std::string intOpt, double low,
 void MeasurementBase::SetupInputs(std::string inputfile) {
   //********************************************************************
 
+  
   // Add this infile to the global manager
   if (FitPar::Config().GetParB("EventManager")) {
-    fInput = FitBase::AddInput(fName, inputfile);
+    //fInput = FitBase::AddInput(fName, inputfile);
   } else {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfile, ":");
@@ -90,12 +107,11 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     InputUtils::InputType inpType =
         InputUtils::ParseInputType(file_descriptor[0]);
 
-    fInput = new InputHandler(fName, inpType, file_descriptor[1]);
+//    fInput = new InputHandler(fName, inpType, file_descriptor[1]);
+    fInput = InputUtils::CreateInputHandler(fName, inpType, file_descriptor[1]);
   }
+  
 
-  // fFluxHist = (TH1D*)  fInput->GetFluxHistogram()->Clone();
-  // fEventHist = (TH1D*) fInput->GetEventHistogram()->Clone();
-  // fXSecHist = (TH1D*)  fInput->GetXSecHistogram()->Clone();
   fNEvents = fInput->GetNEvents();
 
   // Expect INPUTTYPE:FileLocation(s)
@@ -114,6 +130,9 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     EnuMax = fInput->GetFluxHistogram()->GetBinLowEdge(
         fInput->GetFluxHistogram()->GetNbinsX() + 1);
   }
+
+  fFluxHist = fInput->GetFluxHistogram();
+  fEventHist = fInput->GetEventHistogram();
 }
 
 //***********************************************
@@ -127,103 +146,37 @@ void MeasurementBase::Reconfigure() {
   //***********************************************
   LOG(REC) << " Reconfiguring sample " << fName << std::endl;
 
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
-  int input_id = -1;
-  if (using_evtmanager) {
-    input_id = FitBase::GetInputID(fInputFileName);
-  }
-  cust_event = fInput->GetEventPointer();
-
-  if (FitPar::Config().GetParI("cachesize") > 0) {
-    fInput->SetupCache();
-  }
-
   // Reset Histograms
   this->ResetAll();
 
-  // READ in spline head for this input
-  if (fInput->GetType() == kEVTSPLINE) {
-    FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
-  }
-
-  FitEvent* cust_event = fInput->GetEventPointer();
+  // FitEvent* cust_event = fInput->GetEventPointer();
   int fNEvents = fInput->GetNEvents();
   int countwidth = (fNEvents / 5);
 
-  // Reset Signal Vectors
-  fXVar_VECT.clear();
-  fYVar_VECT.clear();
-  fZVar_VECT.clear();
-  this->fMode_VECT.clear();
-  this->fIndex_VECT.clear();
-
-#ifdef __GiBUU_ENABLED__
-  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
-#endif
-
-  size_t NSignal = 0;
+  
   // MAIN EVENT LOOP
+  FitEvent* cust_event = NULL;
   for (int i = 0; i < fNEvents; i++) {
-    // Read in the TChain and Calc Kinematics
-    if (using_evtmanager) {
-      cust_event = FitBase::EvtManager().GetEvent(input_id, i);
-    } else {
-      fInput->ReadEvent(i);
-
+      cust_event = fInput->GetNuisanceEvent(i);
       cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
       cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
-    }
+ 
+      Weight = cust_event->Weight;
 
-    Weight = cust_event->Weight;
-
-#ifdef __GiBUU_ENABLED__
-
-    /// For multi species measurements the flux scalings must be correctly
-    /// applied here
-    if (UsingGiBUU) {
-      switch (fMeasurementSpeciesType) {
-        case kSingleSpeciesMeasurement:
-        default: { break; }
-        case kNumuWithWrongSignMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght_numu;
-          break;
-        }
-        case kNueWithWrongSignMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght_nue;
-          break;
-        }
-        case kFourSpeciesMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght;
-          break;
-        }
-      }
-    }
-
-#endif
-
-    // Initialize
-    fXVar = -999.9;
-    fYVar = -999.9;
-    fZVar = -999.9;
-    Signal = false;
-    Mode = cust_event->Mode;
-
+      // Initialize
+      fXVar = -999.9;
+      fYVar = -999.9;
+      fZVar = -999.9;
+      Signal = false;
+      Mode = cust_event->Mode;
+    
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);
     Signal = this->isSignal(cust_event);
 
-    // Push Back Signal
-    if (Signal) {
-      fXVar_VECT.push_back(fXVar);
-      fYVar_VECT.push_back(fYVar);
-      fZVar_VECT.push_back(fZVar);
-      this->fMode_VECT.push_back(Mode);
-      this->fIndex_VECT.push_back((UInt_t)i);
-      NSignal++;
-    }
-
     // Fill Histogram Values
     this->FillHistograms();
+    // this->ProcessExtraHistograms(kCMD_FillHistograms, []);
     // this->FillExtraHistograms();
 
     // Print Out
@@ -256,110 +209,7 @@ void MeasurementBase::Reconfigure() {
 //***********************************************
 void MeasurementBase::ReconfigureFast() {
   //***********************************************
-  LOG(REC) << " Reconfiguring signal " << this->fName << std::endl;
-
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
-  int input_id = -1;
-
-  if (using_evtmanager) {
-    input_id = FitBase::GetInputID(fInputFileName);
-  } else {
-    cust_event = fInput->GetEventPointer();
-  }
-
-  // Check if we Can't Signal Reconfigure
-  if (!fMCFilled) {
-    this->Reconfigure();
-    return;
-  }
-
-  // Reset Histograms
-  this->ResetAll();
-
-  // READ in spline head for this input
-  if (fInput->GetType() == kEVTSPLINE) {
-    FitBase::GetRW()->ReadSplineHead(fInput->GetSplineHead());
-  }
-
-  // Get Pointer To Base Event (Just Generator Formats)
-  int countwidth = (fIndex_VECT.size() / 5);
-
-  // Setup Iterators
-  std::vector<double>::iterator X = fXVar_VECT.begin();
-  std::vector<double>::iterator Y = fYVar_VECT.begin();
-  std::vector<double>::iterator Z = fZVar_VECT.begin();
-  std::vector<int>::iterator M = fMode_VECT.begin();
-  std::vector<UInt_t>::iterator I = fIndex_VECT.begin();
-
-#ifdef __GiBUU_ENABLED__
-  bool UsingGiBUU = (fInput->GetType() == kGiBUU);
-#endif
-
-  // SIGNAL LOOP
-  for (int i = 0; I != fIndex_VECT.end(); I++, i++) {
-    // Just Update Weight
-    if (using_evtmanager) {
-      Weight = FitBase::EvtManager().GetEventWeight(input_id, (*I));
-    } else {
-      fInput->GetTreeEntry((*I));
-      Weight =
-          FitBase::GetRW()->CalcWeight(cust_event) * cust_event->InputWeight;
-    }
-
-#ifdef __GiBUU_ENABLED__
-    /// For multi species measurements the flux scalings must be correctly
-    /// applied here
-    if (UsingGiBUU) {
-      switch (fMeasurementSpeciesType) {
-        case kSingleSpeciesMeasurement:
-        default: { break; }
-        case kNumuWithWrongSignMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght_numu;
-          break;
-        }
-        case kNueWithWrongSignMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght_nue;
-          break;
-        }
-        case kFourSpeciesMeasurement: {
-          Weight *= cust_event->GiRead->SpeciesWght;
-          break;
-        }
-      }
-    }
-#endif
-
-    fXVar = (*X);
-    fYVar = (*Y);
-    fZVar = (*Z);
-    Mode = (*M);
-
-    // Set signal to true because here every event looped is true signal
-    Signal = true;
-
-    // Sort Histograms
-    this->FillHistograms();
-
-    // Get Next Iteration
-    X++;
-    Y++;
-    Z++;
-    M++;
-
-    // Print Out
-    if (LOG_LEVEL(REC) && (i) % countwidth == 0)
-      LOG(REC) << "Reconfigured " << std::setw(7) << std::right << i
-               << " signal events. [X,Y,Z,M,W] = [" << std::setprecision(2)
-               << std::setw(5) << std::right << fXVar << ", " << std::setw(5)
-               << std::right << fYVar << ", " << std::setw(5) << std::right
-               << fYVar << ", " << std::setw(3) << std::right << (int)Mode
-               << ", " << std::setw(5) << std::right << Weight << "] "
-               << std::endl;
-  }
-
-  // Finalise histograms
-  fMCFilled = true;
-  this->ConvertEventRates();
+  this->Reconfigure();
 }
 
 //***********************************************
@@ -371,7 +221,7 @@ void MeasurementBase::ConvertEventRates() {
 }
 
 //***********************************************
-InputHandler* MeasurementBase::GetInput() {
+InputHandlerBase* MeasurementBase::GetInput() {
   //***********************************************
 
   if (!fInput) {

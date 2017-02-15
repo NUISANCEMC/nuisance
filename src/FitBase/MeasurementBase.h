@@ -68,6 +68,7 @@
 #include "EventManager.h"
 #include "InputHandler.h"
 #include "TObject.h"
+#include "InputHandler2.h"
 
 /// Enumerations to help with extra plot functions
 enum extraplotflags {
@@ -101,11 +102,11 @@ class MeasurementBase {
     Constructor/Destructors
   */
   //! Default Constructor. Set everything to NULL
-  MeasurementBase(void);
+  MeasurementBase();
 
   //! Default virtual destructor
   virtual ~MeasurementBase(void);
-
+  virtual void InitialSetup(void){};
   /*
     Reconfigure Functions
   */
@@ -177,6 +178,8 @@ class MeasurementBase {
   ///! Save Histograms
   virtual void Write(std::string drawOpt = "") = 0;
 
+
+
   /*
     Histogram Access Functions
   */
@@ -199,7 +202,7 @@ class MeasurementBase {
   virtual TH1D* GetFluxHistogram() { return fInput->GetFluxHistogram(); };
 
   ///! Return input for this sample
-  InputHandler* GetInput(void);
+  InputHandlerBase* GetInput(void);
 
   std::string GetName(void) { return fName; };
   double GetScaleFactor(void) { return fScaleFactor; };
@@ -233,7 +236,7 @@ class MeasurementBase {
   FitEvent* cust_event;
 
   FitWeight* fRW;        //!< Pointer to the rw engine
-  InputHandler* fInput;  //!< Instance of the input handler
+  InputHandlerBase* fInput;  //!< Instance of the input handler
 
   std::string fName; //!< Name of the sample
   int fEventType;
@@ -263,7 +266,9 @@ class MeasurementBase {
 
   InputUtils::InputType fInputType;
   std::string fInputFileName;
-
+  TH1D* fFluxHist;
+  TH1D* fEventHist;
+  
   MeasurementSpeciesClass fMeasurementSpeciesType;
 };
 

@@ -75,7 +75,7 @@ InputHandler::InputHandler(std::string const& handle,
         break;
       }
       case InputUtils::kEVSPLN_Input: {
-        ReadEventSplineFile();
+        ReadNewSplines();
         break;
       }
       case InputUtils::kNUANCE_Input: {
@@ -154,6 +154,43 @@ void InputHandler::ReadFitEvents() {
   LOG(SAM) << " -> Successfully Read FEvent file" << std::endl;
 
   return;
+}
+
+//********************************************************************
+void InputHandler::ReadNewSplines(){
+//********************************************************************
+
+  fEventType = kNEWSPLINE;
+
+  fFluxHist = (TH1D*)fInputRootFile->Get("nuisance_fluxhist");
+  fFluxHist->SetNameTitle((fName + "_FLUX").c_str(),
+                          (fName + "; E_{#nu} (GeV)").c_str());
+
+  fEventHist = (TH1D*)fInputRootFile->Get("nuisance_eventhist");
+  fEventHist->SetNameTitle((fName + "_EVT").c_str(),
+                           (fName + "; E_{#nu} (GeV); Event Rate").c_str());
+
+  fXSecHist = (TH1D*)fEventHist->Clone();
+  fXSecHist->Divide(fFluxHist);
+  fXSecHist->SetNameTitle(
+			  (fName + "_XSEC").c_str(),
+			  (fName + "_XSEC;E_{#nu} (GeV); XSec (1#times10^{-38} cm^{2})").c_str());
+
+  tn = new TChain("nuisance_events", "");
+  tn->Add(Form("%s/nuisance_events", fInputFile.c_str()));
+
+  fNEvents = tn->GetEntries();
+  fEvent->SetType(kEVTSPLINE);
+  fEvent->SetBranchAddress(tn);
+
+  // Setup the reader and spline coeff-cients
+  //  fEvent->fSplineReader = new SplineReader(FitBase::GetRW());
+  //fEvent->fSplineReader->Read((TTree*)fInputRootFile->Get("spline_reader"));
+
+  //  fSplineTree = (TTree*)fInputRootFile->Get("spline_coeff");
+  //  fSplineTree->SetBranchAddress("coeff",&fEvent->fSplineCoeff);
+  //  tn->AddFriend(fSplineTree);
+  
 }
 
 //********************************************************************
@@ -650,7 +687,7 @@ void InputHandler::ReadNuWroFile() {
 
       if (i % 100000 == 0) LOG(SAM) << " i " << i << std::endl;
       // Get Variables
-      Enu = fNuwroEvent->in[0].t / 1000.0;
+      Enu = fNuwroEvent->in[0].E() / 1000.0;
       TotXSec = fNuwroEvent->weight;
 
       // Fill a flux and xsec histogram
@@ -1288,8 +1325,8 @@ void InputHandler::ReadEvent(unsigned int i) {
   //********************************************************************
 
   bool using_events = (fEventType == kNEUT || fEventType == kGENIE ||
-                       fEventType == kNUWRO || fEventType == kEVTSPLINE ||
-                       fEventType == kNUANCE || fEventType == kGiBUU);
+                       fEventType == kNUWRO || fEventType == kNEWSPLINE || fEventType == kINPUTFITEVENT || 
+                       fEventType == kNUANCE || fEventType == kGiBUU );
 
   if (using_events) {
     tn->LoadTree(i);
@@ -1300,6 +1337,7 @@ void InputHandler::ReadEvent(unsigned int i) {
     fEvent->InputWeight = GetInputWeight(i);
   } else {
     GetTreeEntry(i);
+    fEvent->CalcKinematics();
   }
 }
 

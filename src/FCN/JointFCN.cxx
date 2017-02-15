@@ -303,14 +303,16 @@ void JointFCN::LoadSamples(std::string cardinput)
                << type << ")" << std::endl;
       std::string fakeData = "";
       fOutputDir->cd();
-      bool LoadedSample = SampleUtils::LoadSample(&fSamples, name, files, type,
-                                                  fakeData, FitBase::GetRW());
+      MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(name, files, type,
+                                            fakeData, FitBase::GetRW());
 
-      if (!LoadedSample) {
+      if (!NewLoadedSample) {
         ERR(FTL) << "Could not load sample provided: " << name << std::endl;
         ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx"
                  << endl;
         throw;
+      } else {
+        fSamples.push_back(NewLoadedSample);
       }
     }
 

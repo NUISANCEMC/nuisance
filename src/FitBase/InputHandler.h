@@ -92,6 +92,7 @@ class InputHandler {
   void GetTreeEntry(const Long64_t entry);
   std::string GetInputStateString(void);
   double GetInputWeight(const int entry = -1);
+  void ReadNewSplines();
 
   void SetupCache();
 
@@ -150,6 +151,7 @@ class InputHandler {
   NuanceEvent* fNuanceEvt;
 #endif
 
+  TTree* fSplineTree;
   TChain* tn;
 };
 #endif

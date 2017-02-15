@@ -28,7 +28,7 @@
 // Refill all the particle vectors etc for the event
 void FitEvent::CalcKinematics() {
 //***************************************************
-// HELLO SUBLIME
+ResetParticleList();
 
 #ifdef __NEUT_ENABLED__
   if (fType == kNEUT) NeutKinematics();
@@ -49,9 +49,18 @@ void FitEvent::CalcKinematics() {
 #ifdef __GiBUU_ENABLED__
   if (fType == kGiBUU) GiBUUKinematics();
 #endif
+  if (LOG_LEVEL(FIT)) Print();
 
   return;
 };
+
+void FitEvent::ResetParticleList(){
+  for (unsigned int i = 0; i < kMaxParticles; i++) {
+    FitParticle* fp = fParticleList[i];
+    if (fp) delete fp;
+    fParticleList[i] = NULL;
+  }
+}
 
 //***************************************************
 void FitEvent::ResetEvent() {
@@ -194,6 +203,8 @@ void FitEvent::NuwroKinematics() {
 
   // Sort Event Info
   fMode = GeneratorUtils::ConvertNuwroMode(fNuwroEvent);
+  if (abs(fMode) > 60) fMode = 0;
+
   Mode = fMode;
   fEventNo = 0.0;
   fTotCrs = 0.0;
@@ -222,10 +233,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_in; i++) {
     particle* part = &fNuwroEvent->in[i];
 
-    fParticleMom[fNParticles][0] = part->x;
-    fParticleMom[fNParticles][1] = part->y;
-    fParticleMom[fNParticles][2] = part->z;
-    fParticleMom[fNParticles][3] = part->t;
+    fParticleMom[fNParticles][0] = part->p4().x;
+    fParticleMom[fNParticles][1] = part->p4().y;
+    fParticleMom[fNParticles][2] = part->p4().z;
+    fParticleMom[fNParticles][3] = part->p4().t;
 
     fParticleState[fNParticles] = kInitialState;
     fParticlePDG[fNParticles] = part->pdg;
@@ -237,10 +248,10 @@ void FitEvent::NuwroKinematics() {
     for (UInt_t i = 0; i < npart_out; i++) {
       particle* part = &fNuwroEvent->out[i];
 
-      fParticleMom[fNParticles][0] = part->x;
-      fParticleMom[fNParticles][1] = part->y;
-      fParticleMom[fNParticles][2] = part->z;
-      fParticleMom[fNParticles][3] = part->t;
+      fParticleMom[fNParticles][0] = part->p4().x;
+      fParticleMom[fNParticles][1] = part->p4().y;
+      fParticleMom[fNParticles][2] = part->p4().z;
+      fParticleMom[fNParticles][3] = part->p4().t;
 
       fParticleState[fNParticles] = kFSIState;
       fParticlePDG[fNParticles] = part->pdg;
@@ -252,10 +263,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_post; i++) {
     particle* part = &fNuwroEvent->post[i];
 
-    fParticleMom[fNParticles][0] = part->x;
-    fParticleMom[fNParticles][1] = part->y;
-    fParticleMom[fNParticles][2] = part->z;
-    fParticleMom[fNParticles][3] = part->t;
+    fParticleMom[fNParticles][0] = part->p4().x;
+    fParticleMom[fNParticles][1] = part->p4().y;
+    fParticleMom[fNParticles][2] = part->p4().z;
+    fParticleMom[fNParticles][3] = part->p4().t;
 
     fParticleState[fNParticles] = kFinalState;
     fParticlePDG[fNParticles] = part->pdg;
@@ -689,6 +700,7 @@ void FitEvent::SetBranchAddress(TChain* tn) {
 
 void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("Mode", &fMode, "Mode/I");
+  
   tn->Branch("EventNo", &fEventNo, "EventNo/i");
   tn->Branch("TotCrs", &fTotCrs, "TotCrs/D");
   tn->Branch("TargetA", &fTargetA, "TargetA/I");
@@ -701,8 +713,9 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
   tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
   tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
+  
 
-  tn->SetAlias("Enu", "ParticleMom[0][4]");
+  // tn->SetAlias("Enu", "ParticleMom[0][4]");
 }
 
 /* Event Access Functions */
@@ -755,6 +768,8 @@ int FitEvent::GetLeptonOutPos(void) const {
 FitParticle* FitEvent::GetBeamPart(void) { return PartInfo(GetBeamPartPos()); }
 
 FitParticle* FitEvent::GetNeutrinoIn(void) {
+  // std::cout << "Neutrino In Pos " << std::endl;
+  // Print();
   return PartInfo(GetNeutrinoInPos());
 }
 
@@ -870,13 +885,13 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 }
 
 void FitEvent::Print() {
-  LOG(EVT) << "FitEvent print" << std::endl;
+  LOG(EVT) << "EVTEvent print" << std::endl;
   LOG(EVT) << "Mode: " << fMode << std::endl;
   LOG(EVT) << "Particles: " << fNParticles << std::endl;
   LOG(EVT) << " -> Particle Stack " << std::endl;
   for (int i = 0; i < fNParticles; i++) {
     LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
-             << fParticleState[i] << " " 
+             << fParticleState[i] << " "
              << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
              << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
              << std::endl;

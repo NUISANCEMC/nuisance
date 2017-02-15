@@ -51,6 +51,12 @@ using namespace genie;
 #include "GeneratorUtils.h"
 #include "TArrayD.h"
 
+// New Fit Event Structure.
+// Fit Event should contain a pointer to the BaseFitEvent.
+// Each subclass should have a FillNUISANCEEvent function.
+// 
+
+
 //! Converts NEUT/NuWro/GENIE events to a comman format straight from the tree
 class FitEvent : public BaseFitEvt {
  public:
@@ -70,6 +76,7 @@ class FitEvent : public BaseFitEvt {
 
   //! Reset the event variables
   void ResetEvent(void);
+  void ResetParticleList(void);
 
 /* Event Convertors */
 #ifdef __NEUT_ENABLED__
@@ -330,7 +337,6 @@ class FitEvent : public BaseFitEvt {
 
   void Print();
 
- protected:
   // Event Information
   int fMode;
   UInt_t fEventNo;
@@ -349,6 +355,11 @@ class FitEvent : public BaseFitEvt {
   UInt_t fParticleState[kMaxParticles];
   int fParticlePDG[kMaxParticles];
   FitParticle* fParticleList[kMaxParticles];
+
+  double* fNEUT_ParticleStatusCode;
+  double* fNEUT_ParticleAliveCode;
+
+
 };
 
 /*! @} */

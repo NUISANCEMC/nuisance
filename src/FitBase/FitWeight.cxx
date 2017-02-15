@@ -151,7 +151,9 @@ unsigned int FitWeight::GetDialPos(std::string name) {
   std::vector<std::string>::iterator naIter = fDialNames.begin();
   unsigned int count = 0;
 
+  std::cout << " Getting dial pos " << std::endl;
   for (; naIter != fDialNames.end(); naIter++) {
+    LOG(FIT) << " " << (std::string)(*naIter) << " = " << count << std::endl;
     if (((std::string)(*naIter)) == name) {
       return count;
     }
@@ -265,6 +267,7 @@ void FitWeight::IncludeDial(std::string name, int type, double startval) {
   }
 
   // Setup ENUMS
+  std::cout << "Dial Enum Included" << std::endl;
   fDialEnums.push_back(this_enum);
   fDialNames.push_back(name);
   fDialValues.push_back(startval);

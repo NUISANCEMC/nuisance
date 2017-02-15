@@ -134,10 +134,6 @@
 
 // MiniBooNE NC1pi0
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h"
 
 // MiniBooNE NCEL
 // #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
@@ -226,9 +222,10 @@ namespace SampleUtils {
 
 //! Create a given sample given its name, file, type, fakdata(fkdt) file and the
 //! current rw engine and push it back into the list fChain.
-bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
+/*bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
                 std::string file, std::string type, std::string fkdt,
-                FitWeight* rw);
+                FitWeight* rw);*/
+MeasurementBase* CreateSample(std::string name, std::string file, std::string type, std::string fkdt, FitWeight* rw);
 }
 
 /*! @} */

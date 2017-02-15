@@ -22,6 +22,9 @@
 
 #include <string>
 #include "TFile.h"
+#include "InputHandler2.h"
+#include "NEUTInputHandler.h"
+#include "GENIEInputHandler.h"
 
 namespace InputUtils {
 
@@ -34,27 +37,11 @@ enum InputType {
   kEVSPLN_Input,
   kEMPTY_Input,
   kFEVENT_Input,
-  kJOINT_Input,  // Kept for backwards compatibility
+  kJOINT_Input, // Kept for backwards compatibility
   kInvalid_Input,
   kHIST_Input,   // Not sure if this are currently used.
   kBNSPLN_Input  // Not sure if this are currently used.
 };
-
-inline std::string EnsureTrailSlash(std::string str) {
-  if (str[str.length() - 1] != '/') {
-    str += '/';
-  }
-  return str;
-}
-
-inline std::string RemoveDoubleSlash(std::string str) {
-  size_t torpl = str.find("//");
-  while (torpl != std::string::npos) {
-    str.replace(torpl, 2, "/");
-    torpl = str.find("//");
-  }
-  return str;
-}
 
 InputType ParseInputType(std::string const &inp);
 bool IsJointInput(std::string const &inputs);
@@ -62,6 +49,11 @@ std::string ExpandInputDirectories(std::string const &inputs);
 
 InputType GuessInputTypeFromFile(TFile *inpF);
 std::string PrependGuessedInputTypeToName(std::string const &inpFName);
+
+InputHandlerBase* CreateInputHandler(std::string const& handle, 
+                                     InputUtils::InputType inpType,
+                                     std::string const& inputs);
+
 }
 
 inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
@@ -99,5 +91,7 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
     default: { return os << "kInvalid_Input"; }
   }
 }
+
+
 
 #endif

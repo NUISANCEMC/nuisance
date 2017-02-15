@@ -23,7 +23,7 @@
    Constructor/destructor Functions
 */
 //********************************************************************
-Measurement1D::Measurement1D() {
+Measurement1D::Measurement1D(void) {
   //********************************************************************
   fScaleFactor = -1.0;
   fCurrentNorm = 1.0;

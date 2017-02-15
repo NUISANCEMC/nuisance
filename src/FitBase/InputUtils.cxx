@@ -22,6 +22,7 @@
 #include "GeneratorUtils.h"
 
 #include "InputUtils.h"
+#include "InputHandler2.h"
 
 namespace InputUtils {
 //********************************************************************
@@ -73,16 +74,15 @@ std::string ExpandInputDirectories(std::string const &inputs) {
 
   for (size_t i = 0; i < nfiledir; i++) {
     std::string tempdir = "@" + filedir[i];
-    std::string const &event_folder =
-        EnsureTrailSlash(FitPar::Config().GetParS(filedir[i]));
     size_t torpl = expandedInputs.find(tempdir);
-    while (torpl != std::string::npos) {
+    if (torpl != std::string::npos) {
+      std::string event_folder = FitPar::Config().GetParS(filedir[i]);
       expandedInputs.replace(torpl, tempdir.size(), event_folder);
-      torpl = expandedInputs.find(tempdir);
+      break;
     }
   }
 
-  return RemoveDoubleSlash(expandedInputs);
+  return expandedInputs;
 }
 
 InputType GuessInputTypeFromFile(TFile *inpF) {
@@ -122,8 +122,8 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
   }
   InputType iType = GuessInputTypeFromFile(inpF);
   if (iType == kInvalid_Input) {
-    ERR(FTL) << "Couldn't determine input type from file: " << inpFName << "."
-             << std::endl;
+    ERR(FTL) << "Couldn't determine input type from file: " << inpFName
+             << "." << std::endl;
     throw;
   }
   inpF->Close();
@@ -149,4 +149,17 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
     }
   }
 }
+
+InputHandlerBase* CreateInputHandler(std::string const& handle, 
+                                     InputUtils::InputType inpType,
+                                     std::string const& inputs){
+  switch(inpType){
+    case (kNEUT_Input): {return new NEUTInputHandler(handle, inputs);}
+    case (kGENIE_Input): {return new GENIEInputHandler(handle, inputs);}
+    default:
+    return NULL;
+  }
+
+  return NULL;
+};
 }
