@@ -24,6 +24,8 @@ GeneralUtils.h
 PlotUtils.h
 StatUtils.h
 SignalDef.h
+NuisConfig.h
+NuisKey.h
 )
 
 set(IMPLFILES
@@ -35,6 +37,8 @@ GeneralUtils.cxx
 PlotUtils.cxx
 StatUtils.cxx
 SignalDef.cxx
+NuisConfig.cxx
+NuisKey.cxx
 )
 
 set(LIBNAME Utils)

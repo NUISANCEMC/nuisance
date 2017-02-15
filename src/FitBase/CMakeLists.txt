@@ -32,6 +32,8 @@ GeneratorUtils.cxx
 StdHepEvt.cxx
 TemplateMeas1D.cxx
 InputUtils.cxx
+NEUTInputHandler.cxx
+GENIEInputHandler.cxx
 )
 
 set(HEADERFILES
@@ -41,6 +43,9 @@ BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
 InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
 InputUtils.h
+NEUTInputHandler.h
+GENIEInputHandler.h
+InputHandler2.h
 )
 
 set(LIBNAME FitBase)

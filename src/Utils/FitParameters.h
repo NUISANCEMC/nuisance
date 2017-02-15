@@ -116,10 +116,12 @@ namespace FitPar {
 //! e.g. FitPar::Config().GetParI("input.maxevents")
 FitParameters& Config();
 
-
 //! Return Fitter DataBase
 std::string GetDataBase();
 }
 
+
 /*! @} */
 #endif
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret  
+
