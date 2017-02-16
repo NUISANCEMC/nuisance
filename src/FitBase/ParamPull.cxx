@@ -553,7 +553,7 @@ void ParamPull::Reconfigure(){
       // If Match set value
       if (!syst.compare( fMCHist->GetXaxis()->GetBinLabel(j+1) )){
 	
-	double curval = rw->GetDialValue(syst, fDialOptions);
+	double curval = rw->GetDialValue(syst);
 	fMCHist->SetBinContent(j+1, curval);
       }
     }

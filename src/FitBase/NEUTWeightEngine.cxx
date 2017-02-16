@@ -4,17 +4,15 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
 	fName = name;
-
 	LOG(FIT) << "Setting up NEUT RW : " << fName << endl;
-	fHasChanged = true;
 
 	// Create RW Engine suppressing cout
 	StopTalking();
 	fNeutRW = new neut::rew::NReWeight();
+	TDirectory* olddir = gDirectory;
 
 	// get list of vetoed calc engines (just for debug really)
-	std::string rw_engine_list =
-	    FitPar::Config().GetParS("FitWeight.fNeutRW_veto");
+	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight.fNeutRW_veto");
 	bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
 	bool xsec_res = rw_engine_list.find("xsec_res") == std::string::npos;
 	bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
@@ -48,17 +46,26 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 	if (nucl_piless)
 		fNeutRW->AdoptWghtCalc("nucl_piless", new neut::rew::NReWeightNuclPiless);
 	fNeutRW->Reconfigure();
+	olddir->cd();
 
+	// Set Abs Twk Config
+	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
+	
 	// allow cout again
 	StartTalking();
 };
 
 
-void NEUTWeightEngine::IncludeDial(std::string name, double startval){
-	// Add to systematics map
-	int nuisenum = FitBase::GetDialEnum(kNEUT, name);
-	fNeutNameSysts[name]     = static_cast<neut::rew::NSyst_t>(nuisenum % 1000);
-	fNeutEnumSysts[nuisenum] = static_cast<neut::rew::NSyst_t>(nuisenum % 1000);
+void NEUTWeightEngine::IncludeDial(int nuisenum, double startval){
+
+	// Get RW Enum and name
+	int rwenum = (nuisenum % 1000);
+	neut::rew::NSyst_t rwsyst = static_cast<neut::rew::NSyst_t>(rwenum);
+	std::string name = NSyst::AsString(rwsyst);
+
+	// Fill Maps
+	fNeutNameSysts[name]     = rwsyst;
+	fNeutEnumSysts[nuisenum] = rwsyst;
 	
 	// Initialize dial
 	fNeutRW->Systematics().Init( fNeutEnumSysts[nuisenum] );
@@ -77,15 +84,9 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval){
 
 
 void NEUTWeightEngine::SetDialValue(int nuisenum, double val){
-	// Set Current Map Values
-	fEnumCurValues[nuisenum] = val;
-
 	// Set RW engine values
 	int rwenum = (nuisenum % 1000);
 	fNeutRW->Systematics().Set(static_cast<neut::rew::NSyst_t>(rwenum), val);
-
-	// Flag that RW engine changed
-	fHasChanged = true;
 }
 
 
@@ -103,15 +104,13 @@ void NEUTWeightEngine::Reconfigure(bool silent){
 
 double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt){
 
-	// Make nom weight
-	double rw_weight;
-
+	StopTalking();
 	// Fill NEUT Common Blocks
 	GeneratorUtils::FillNeutCommons(evt->fNeutVect);
 
 	// Call Weight calculation
-    rw_weight *= fNeutRW->CalcWeight();
-
+    double rw_weight = fNeutRW->CalcWeight();
+    StartTalking();
     // Return rw_weight
     return rw_weight;
 }

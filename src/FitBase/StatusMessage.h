@@ -1,3 +1,6 @@
+#ifndef STATUS_MESSAGE_H
+#define STATUS_MESSAGE_H
+
 #include <iostream>
 #include <sstream>
 
@@ -328,3 +331,4 @@ inline std::string StatusMessage(bool happy = true) {
   }
   return ss.str();
 }
+#endif

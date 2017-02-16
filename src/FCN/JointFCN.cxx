@@ -241,7 +241,7 @@ double JointFCN::GetLikelihood() {
     LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << endl;
 
     // Add Weight Scaling
-    like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
+    // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
 
     // Add to total
     like += newlike;

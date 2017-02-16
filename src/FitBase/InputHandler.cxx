@@ -221,6 +221,7 @@ void InputHandler::ReadEmptyEvents() {
 void InputHandler::ReadEventSplineFile() {
   //********************************************************************
 
+/*
   LOG(SAM) << " -> Setting up SPLINE inputs" << std::endl;
 
   // Event Type 7 SPLINES
@@ -295,13 +296,16 @@ void InputHandler::ReadEventSplineFile() {
              << "PTS(" << spl->points << ") " << std::endl;
     cnt++;
   }
+  */
 }
 
+/*
 //********************************************************************
 FitSplineHead* InputHandler::GetSplineHead() {
   //********************************************************************
   return fSplineHead;
 }
+*/
 
 //********************************************************************
 void InputHandler::SetupCache() {
@@ -1393,7 +1397,8 @@ int InputHandler::GetGenEvents() {
   //********************************************************************
 
   if (fEventType == 6)
-    return fSplineHead->ngen_events;
+    //return fSplineHead->ngen_events;
+    return 0;
   else
     return GetNEvents();
 }

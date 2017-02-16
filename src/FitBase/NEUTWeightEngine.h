@@ -30,10 +30,11 @@ class NEUTWeightEngine : public WeightEngineBase {
 		NEUTWeightEngine(std::string name);
 		~NEUTWeightEngine(){};
 
-		void IncludeDial(std::string name, double startval);
+		void IncludeDial(int nuisenum, double startval);
 		void SetDialValue(int rwenum, double val);
 		void Reconfigure(bool silent = false);
 		double CalcWeight(BaseFitEvt* evt);
+		inline bool NeedsEventReWeight(){return true;};
 
 		std::map<std::string, neut::rew::NSyst_t> fNeutNameSysts;
 		std::map<int, neut::rew::NSyst_t> fNeutEnumSysts;

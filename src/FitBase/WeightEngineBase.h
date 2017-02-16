@@ -29,12 +29,12 @@ public:
 	// ~WeightEngineBase(){};
 
 	// Functions requiring Override
-	void IncludeDial(std::string name, int type, double startval);
-	void SetDialValue(int rwenum, double val);
-	void Reconfigure(bool silent);
-	double CalcWeight(BaseFitEvt* evt);
-	double GetDialValue(int rwenum);
-	
+	virtual void IncludeDial(int nuisenum, double startval) = 0;
+	virtual void SetDialValue(int rwenum, double val) = 0;
+	virtual void Reconfigure(bool silent) = 0;
+	virtual double CalcWeight(BaseFitEvt* evt) = 0;
+	virtual double GetDialValue(int rwenum);
+	virtual bool NeedsEventReWeight() = 0;
 
 	bool fHasChanged;
 	std::map<int, double> fEnumCurValues;

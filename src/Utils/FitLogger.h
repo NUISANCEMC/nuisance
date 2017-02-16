@@ -109,8 +109,8 @@ void StopTalking();
 void StartTalking();
 
 extern "C" {
-  void shhpythiaitokay_(void);
-  void canihazpythia_(void);
+  void shhnuisancepythiaitokay_(void);
+  void canihaznuisancepythia_(void);
 }
 
 /*! @} */

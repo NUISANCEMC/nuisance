@@ -60,7 +60,7 @@ class InputHandler {
   void ReadGiBUUFile(void);
   void ReadEmptyEvents(void);  // For Validations
   void ReadFitEvents(void);
-  FitSplineHead* GetSplineHead(void);
+  //  FitSplineHead* GetSplineHead(void);
 
   double PredictedEventRate(double low, double high,
                             std::string intOpt = "width");
@@ -101,7 +101,7 @@ class InputHandler {
   int fEventType;
   BaseFitEvt* fSignalEvent;
 
-  FitSplineHead* fSplineHead;
+  //  FitSplineHead* fSplineHead;
 
   int fMaxEvents;
   int fNEvents;

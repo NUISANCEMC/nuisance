@@ -19,7 +19,6 @@
 set(IMPLFILES
 ComparisonRoutines.cxx
 SystematicRoutines.cxx
-SplineRoutines.cxx
 )
 
 if(USE_MINIMIZER)
@@ -29,7 +28,6 @@ endif()
 set(HEADERFILES
 ComparisonRoutines.h
 SystematicRoutines.h
-SplineRoutines.h
 )
 
 if(USE_MINIMIZER)
