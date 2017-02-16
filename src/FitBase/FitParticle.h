@@ -64,49 +64,19 @@ enum particle_state{
 class FitParticle {
 
   public:
+  FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
 
+  FitParticle(){};
   //! Virtual Destructor
   ~FitParticle(){ };
 
-  //! Default Constructor
-  FitParticle(){
-    fPID = -1;
-  };
-
-#ifdef __NEUT_ENABLED__
-  //! NEUT Constructor
-  FitParticle(NeutPart* part);
-  //! NEUT FSI particles constructor
-  FitParticle(NeutFsiPart* part);
-#endif
-
-
-#ifdef __NUWRO_ENABLED__
-  //! NUWRO Constructor
-  FitParticle(particle* nuwro_particle, Int_t state);
-#endif
-
-
-#ifdef __GENIE_ENABLED__
-  //! GENIE Constructor
-  FitParticle(genie::GHepParticle* genie_particle);
-#endif
-
-#ifdef __GiBUU_ENABLED__
-  //! GiBUU Constructor
-  FitParticle(GiBUUStdHepReader* GiRead, Int_t p_it);
-#endif
-
-  //! NULL Constructor for when the generator screws up.
-  FitParticle(UInt_t* i);
-
+ 
   TLorentzVector fP; //!< Particle 4 Momentum
   int fPID; //!< Particle PDG Code
   int fIsAlive; //!< Whether the particle is alive at the end of the event (Yes 1, No 0, Other? -1)
   int fNEUTStatusCode; //!< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
   double fMass; //!< Particle Mass
-
-  FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
+ 
 
   inline int  Status (void) const { return fStatus; };
   inline int  PDG    (void) const { return fPID;    };

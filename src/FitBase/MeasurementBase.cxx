@@ -41,20 +41,6 @@ MeasurementBase::MeasurementBase(void) {
   std::cout << "Calling MeasurememntBase Constructor!" << std::endl;
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
 
-  // Build InputHandler if one has not been provided.
-  // fName = name;
-  // SetupInputs(inputfile);
-  // fType = type;
-
-  // Now Run Initial User Setup
-  // InitialSetup();
-
-  // Sort out type setups inside the classes
-
-  // Run Fake data setups if one has not been provided.
-
-  // 
-
 };
 
 

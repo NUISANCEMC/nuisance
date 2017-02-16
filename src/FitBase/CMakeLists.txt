@@ -37,6 +37,8 @@ GENIEInputHandler.cxx
 NuWroInputHandler.cxx
 GIBUUInputHandler.cxx
 NUANCEInputHandler.cxx
+WeightEngineBase.cxx
+NEUTWeightEngine.cxx
 )
 
 set(HEADERFILES
@@ -52,6 +54,8 @@ NuWroInputHandler.h
 InputHandler2.h
 GIBUUInputHandler.h
 NUANCEInputHandler.h
+WeightEngineBase.h
+NEUTWeightEngine.h
 )
 
 set(LIBNAME FitBase)

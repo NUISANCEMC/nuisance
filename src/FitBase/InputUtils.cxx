@@ -157,6 +157,7 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     case (kNEUT_Input): {return new NEUTInputHandler(handle, inputs);}
     case (kGENIE_Input): {return new GENIEInputHandler(handle, inputs);}
     case (kNUWRO_Input): {return new NuWroInputHandler(handle, inputs);}
+    case (kGiBUU_Input): {return new GIBUUInputHandler(handle, inputs);}
     default:
     return NULL;
   }

@@ -56,7 +56,6 @@
 #include "PlotUtils.h"
 #include "StatUtils.h"
 
-#include "InputHandler.h"
 #include "SignalDef.h"
 
 //********************************************************************

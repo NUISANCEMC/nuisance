@@ -66,7 +66,6 @@
 #endif
 
 #include "EventManager.h"
-#include "InputHandler.h"
 #include "TObject.h"
 #include "InputHandler2.h"
 

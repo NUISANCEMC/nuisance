@@ -129,6 +129,9 @@ using namespace genie::rew;
 #include "TCanvas.h"
 #include "TGraph2D.h"
 
+//#include "GeneratorWeightBase.h"
+//#include "GeneratorNEUTReweight.h"
+
 //******************************************
 class FitWeight {
   //******************************************

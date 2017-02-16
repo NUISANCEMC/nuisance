@@ -1,5 +1,5 @@
-#ifndef NEUTINPUTHANDLER_H
-#define NEUTINPUTHANDLER_H
+#ifndef GIBUUINPUTHANDLER_H
+#define GIBUUINPUTHANDLER_H
 #include "InputHandler2.h"
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
