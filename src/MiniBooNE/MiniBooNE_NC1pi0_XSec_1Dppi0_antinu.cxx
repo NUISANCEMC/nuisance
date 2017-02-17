@@ -43,7 +43,7 @@ MiniBooNE_NC1pi0_XSec_1Dppi0_antinu::MiniBooNE_NC1pi0_XSec_1Dppi0_antinu(std::st
   }
 
   SetDataValues(GeneralUtils::GetTopLevelDir() + data_filename);
-  SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir() + covar_filename, 11, 1.E-5);
+  SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir() + covar_filename, 10, 1.E-5);
   SetupDefaultHist();
   StatUtils::SetDataErrorFromCov(fDataHist,fFullCovar,1E-38);
 
