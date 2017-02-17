@@ -94,7 +94,8 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
       } else if (!std::strcmp(argv[i], "+e")) {
         error_flag += 1;
       } else if (!std::strcmp(argv[i], "-x")) {
-	xmlinput = argv[i + 1];
+	      xmlinput = argv[i + 1];
+        ++i;
       } else {
         ERR(FTL) << "ERROR: unknown command line option given! - '" << argv[i]
                  << " " << argv[i + 1] << "'" << std::endl;
@@ -121,8 +122,6 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   if (!xmlinput.empty()){
     conf.LoadConfig( xmlinput, "xmlinput" );
   }
-  conf.WriteConfig( fOutputFile + ".xml" );
-
 
   std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
   FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
@@ -152,8 +151,9 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   // CARD
   // ---------------------------
   // Parse Card Options
-  if (!fCardFile.empty())   ReadCard(fCardFile);
-  if (!xmlinput.empty()) ReadXML(xmlinput);
+  if (!fCardFile.empty()) ReadCard(fCardFile);
+  if (!xmlinput.empty())  ReadXML(xmlinput);
+  conf.WriteConfig( fOutputFile + ".xml" );
 
   // Outputs
   // ---------------------------
@@ -174,9 +174,9 @@ void ComparisonRoutines::ReadXML(std::string cardfile){
 //*************************************  
 
   // Setup Parameters
-  std::vector<nuiskey> samplekeys = Config::QueryKeys("parameter");
-  for (int i = 0; i < samplekeys.size(); i++){
-    nuiskey key = samplekeys.at(i);
+  std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
+  for (int i = 0; i < parkeys.size(); i++){
+    nuiskey key = parkeys.at(i);
 
     // Get Inputs
     std::string partype = key.GetS("type");
@@ -184,24 +184,56 @@ void ComparisonRoutines::ReadXML(std::string cardfile){
     double parnom = key.GetD("nom");
     double parlow = key.GetD("low");
     double parhig = key.GetD("high");
-    std::vector<double> parlim = key.GetVD("lim",",");
       
-
     std::cout << "Read Parameter " << partype << " " << parname << " " << parnom << " " << parlow << " " << parhig << std::endl;
-
-
-
 
   }
 
-  
+  // Setup Samples
+  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  for (size_t i = 0; i < samplekeys.size(); i++){
+    nuiskey key = samplekeys.at(i);
+
+    // Get Sample Options
+    std::string samplename = key.GetS("name");
+    std::string samplefile = key.GetS("input");
+
+    std::string sampletype = 
+      key.Has("type") ? key.GetS("type") : "DEFAULT";
+
+    double samplenorm = 
+      key.Has("norm") ? key.GetD("norm") : 1.0;
+
+    // If FREE add to parameters otherwise continue
+    if (sampletype.find("FREE") == std::string::npos){
+      continue;
+    }
+
+    // Form norm dial from samplename + sampletype + "_norm";
+    std::string normname = samplename + sampletype + "_norm";
+
+    // Check normname not already present
+    if (fTypeVals.find("normname") != fTypeVals.end()){
+      continue;
+    }
+
+    // Add new norm dial to list if its passed above checks
+    fParams.push_back(normname);
+
+    fTypeVals[normname] = kNORM;
+    fStateVals[normname] = sampletype;
+    fCurVals[normname] = samplenorm;
+
+  }
 
 }
 
 //*************************************
 void ComparisonRoutines::ReadCard(std::string cardfile) {
 //*************************************
-
+  Config::ConvertAndLoadCardToXMLFormat(cardfile);
+}
+/*
   // If a card file is provided add input to global config
 
   // Read cardlines into vector
@@ -255,9 +287,7 @@ void ComparisonRoutines::ReadCard(std::string cardfile) {
       throw;
     }
   }
-
-  return;
-};
+*/
 
 //*****************************************
 int ComparisonRoutines::ReadParameters(std::string parstring) {
@@ -491,7 +521,9 @@ void ComparisonRoutines::SetupFCN() {
 
   LOG(FIT) << "Making the jointFCN" << std::endl;
   if (fSampleFCN) delete fSampleFCN;
-  fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
+  FitPar::Config().out = fOutputRootFile;
+  fOutputRootFile->cd();
+  fSampleFCN = new JointFCN(fOutputRootFile);
   SetFakeData();
 
   return;

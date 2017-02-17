@@ -71,7 +71,8 @@ enum generator_event_type {
   kMODENORM = 10,
   kEMPTY = 11,
   kINPUTFITEVENT = 12,
-  kNEWSPLINE = 13
+  kNEWSPLINE = 13,
+  kLIKEWEIGHT = 14
 };
 
 inline std::ostream& operator<<(std::ostream& os,

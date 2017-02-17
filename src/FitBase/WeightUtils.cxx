@@ -127,6 +127,7 @@ int FitBase::ConvDialType(std::string type){
   else if (!type.compare("genie_parameter")) return kGENIE;
   else if (!type.compare("norm_parameter")) return kNORM;
   else if (!type.compare("modenorm_parameter")) return kMODENORM;
+  else if (!type.compare("likeweight_parameter")) return kLIKEWEIGHT;
   else return kUNKNOWN;
   
 }
@@ -141,6 +142,7 @@ std::string FitBase::ConvDialType(int type){
   case kGENIE: { return "genie_parameter"; }
   case kNORM:  { return "norm_parameter";  }
   case kMODENORM: { return "modenorm_parameter"; }
+  case kLIKEWEIGHT: { return "likeweight_parameter"; }
   default: return "unknown_parameter"; 
   }
   
@@ -238,6 +240,14 @@ int FitBase::GetDialEnum(int type, std::string name){
       throw;
     }
     this_enum = 60 + mode_num + offset;
+    break;
+  }
+
+  case kLIKEWEIGHT: {
+    if (gLikeWeightEnums.find(name) == gLikeWeightEnums.end()){
+      gLikeWeightEnums[name] = gLikeWeightEnums.size() + 1 + offset; 
+    }
+    this_enum = gLikeWeightEnums[name];
     break;
   }
    

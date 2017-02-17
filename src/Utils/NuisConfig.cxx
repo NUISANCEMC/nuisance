@@ -69,7 +69,11 @@ void nuisconfig::LoadConfig(std::string filename, std::string state=""){
   while( child!=0 ){ 
     // Add additional state flag if given
     if (!state.empty()){
-      fXML->NewAttr(child, 0,"state",state.c_str());
+      if (GetS(child, "source").empty()){
+        fXML->NewAttr(child, 0,"source",state.c_str());
+      } else {
+        // fXML->SetAttr
+      }
     }
 
     // Add this child to the main config list
@@ -198,6 +202,42 @@ std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name){
   return temp;
 }
 
+bool nuisconfig::Has(XMLNodePointer_t node, std::string name){
+
+  // If node empty return empty
+  if (node == 0) return false;
+
+  // Get Attribute from child with name
+  XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
+  bool found = false;
+
+  // Check if its a search or exact (should probs just add wildcards...)
+  bool exact = true;
+  if (name.size() > 0){
+    if (name[0] == '*' and name[name.size()-1] == '*'){
+      exact = false;
+    }
+  }
+    
+  // Loop over all attributes
+  while ( attr!=0 ){
+    
+    // Find value of correct name
+    if (exact){
+      if (std::string(fXML->GetAttrName(attr)) == name.c_str()){
+        found = true;
+      }
+    } else {
+      
+    }
+
+    // Next Attribute
+    attr = fXML->GetNextAttr(attr);
+  }
+
+  return found;
+}
+
 /// Get Bools from a given node                                                                                            
 bool nuisconfig::GetB(XMLNodePointer_t node, std::string name){
   std::string tempattr = GetS(node, name);
@@ -241,4 +281,23 @@ nuisconfig& nuisconfig::GetConfig(void) {
   if (!m_nuisconfigInstance)  m_nuisconfigInstance = new nuisconfig;
   return *m_nuisconfigInstance;
 };
+
+
+void nuisconfig::AddS(XMLNodePointer_t node, std::string name, std::string val){
+  fXML->NewAttr(node, 0, name.c_str(), val.c_str());
+}
+
+void nuisconfig::AddB(XMLNodePointer_t node, std::string name, bool val){
+  AddS(node, name, GeneralUtils::BoolToStr(val));
+}
+
+void nuisconfig::AddI(XMLNodePointer_t node, std::string name, int val){
+  AddS(node, name, GeneralUtils::IntToStr(val));
+}
+void nuisconfig::AddD(XMLNodePointer_t node, std::string name, double val){
+  AddS(node, name, GeneralUtils::DblToStr(val));
+}
+
+
+
 

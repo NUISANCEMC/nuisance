@@ -18,6 +18,10 @@ void FitWeight::AddRWEngine(int type) {
 	case kNORM:  
 		fAllRW[type] = new SampleNormEngine("normrw");
 		break;
+
+	case kLIKEWEIGHT:
+		fAllRW[type] = new LikelihoodWeightEngine("likerw");
+		break;
 	}
 
 }

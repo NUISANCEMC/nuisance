@@ -23,7 +23,54 @@ JointFCN::JointFCN(std::string cardfile, TFile* outfile) {
   fNDials = 0;
 
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
+  fOutputDir->cd();
 };
+
+
+JointFCN::JointFCN(TFile* outfile){
+
+  fOutputDir = gDirectory;
+  if (outfile)
+    FitPar::Config().out = outfile;
+
+  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  LoadSamples(samplekeys);
+
+  fCurIter = 0;
+  fMCFilled = false;
+
+  // fOutputDir->cd();
+
+  fIterationTree = NULL;
+  fDialVals = NULL;
+  fNDials = 0;
+
+  fUsingEventManager = FitPar::Config().GetParB("EventManager");
+  fOutputDir->cd();
+
+}
+
+JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile) {
+
+  fOutputDir = gDirectory;
+  if (outfile)
+    FitPar::Config().out = outfile;
+
+  LoadSamples(samplekeys);
+
+  fCurIter = 0;
+  fMCFilled = false;
+
+  fOutputDir->cd();
+
+  fIterationTree = NULL;
+  fDialVals = NULL;
+  fNDials = 0;
+
+  fUsingEventManager = FitPar::Config().GetParB("EventManager");
+  fOutputDir->cd();
+
+}
 
 //***************************************************
 JointFCN::~JointFCN() {
@@ -269,6 +316,35 @@ double JointFCN::GetLikelihood() {
   return like;
 };
 
+void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys){
+
+  LOG(MIN) << "Loading Samples " << std::endl;
+  for (size_t i = 0; i < samplekeys.size(); i++) {
+    nuiskey key = samplekeys[i];
+
+    // Get Sample Options
+    std::string samplename = key.GetS("name");
+    std::string samplefile = key.GetS("input");
+    std::string sampletype = key.GetS("type");
+    std::string fakeData = "";
+
+    fOutputDir->cd();
+    MeasurementBase* NewLoadedSample
+      = SampleUtils::CreateSample(samplename, samplefile,
+                                  sampletype, fakeData, FitBase::GetRW());
+
+    if (!NewLoadedSample) {
+      ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;
+      ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx"
+               << endl;
+      throw;
+    } else {
+      fSamples.push_back(NewLoadedSample);
+    }
+  }
+}
+
+
 //***************************************************
 void JointFCN::LoadSamples(std::string cardinput)
 //***************************************************
@@ -304,7 +380,7 @@ void JointFCN::LoadSamples(std::string cardinput)
       std::string fakeData = "";
       fOutputDir->cd();
       MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(name, files, type,
-                                            fakeData, FitBase::GetRW());
+                                         fakeData, FitBase::GetRW());
 
       if (!NewLoadedSample) {
         ERR(FTL) << "Could not load sample provided: " << name << std::endl;
@@ -448,7 +524,7 @@ void JointFCN::ReconfigureUsingManager() {
 
       // Get Weight
       double Weight =
-          (FitBase::GetRW()->CalcWeight(cevent) * cevent->InputWeight);
+        (FitBase::GetRW()->CalcWeight(cevent) * cevent->InputWeight);
 
       // Skip if dodgy event
       if (fabs(cevent->Mode) > 60 || cevent->Mode == 0) continue;

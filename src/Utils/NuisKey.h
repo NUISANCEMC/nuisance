@@ -25,13 +25,17 @@ class nuiskey{
   std::vector<int>         GetVI(std::string name, const char* del);
   std::vector<double>      GetVD(std::string name, const char* del);
 
+  void ChangeS(std::string name, std::string newval);
   void ChangeI(std::string name, int newval);
   void ChangeD(std::string name, double newval);
   void ChangeB(std::string name, bool newval);
 
+  void AddS(std::string name, std::string newval);
   void AddI(std::string name, int newval);
   void AddD(std::string name, double newval);
   void AddB(std::string name, bool newval);
+
+  bool Has(std::string name);
 
   XMLNodePointer_t fNode; ///< XML Node in Config::Get().fXML for this key                                                   
 };
@@ -44,5 +48,15 @@ namespace Config{
 
   // Create a new global config entry
   nuiskey CreateKey(const std::string name);
+
+
+  void ConvertAndLoadCardToXMLFormat(const std::string cardfile);
+
+  // Backwards compatible sample key options
+  nuiskey CreateSampleKeyFromLine(const std::string line);
+  nuiskey CreateParameterKeyFromLine(const std::string line);
+  nuiskey CreatePullKeyFromLine(const std::string line);
+  nuiskey CreateOldConfigKeyFromLine(const std::string line);
+
 }
 #endif

@@ -1,11 +1,13 @@
 #ifndef FITWEIGHT2_H
 #define FITWEIGHT2_H
+
 #include "WeightUtils.h"
 #include "WeightEngineBase.h"
 #include "NEUTWeightEngine.h"
 #include "GENIEWeightEngine.h"
 #include "NuWroWeightEngine.h"
 #include "SampleNormEngine.h"
+#include "LikelihoodWeightEngine.h"
 
 #include <map>
 #include <vector>

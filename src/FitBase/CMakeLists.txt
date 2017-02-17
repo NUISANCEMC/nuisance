@@ -43,6 +43,7 @@ NuWroWeightEngine.cxx
 GENIEWeightEngine.cxx
 WeightUtils.cxx
 SampleNormEngine.cxx
+LikelihoodWeightEngine.cxx
 )
 
 set(HEADERFILES
@@ -64,6 +65,7 @@ NuWroWeightEngine.h
 GENIEWeightEngine.h
 WeightUtils.h
 SampleNormEngine.h
+LikelihoodWeightEngine.h
 )
 
 set(LIBNAME FitBase)

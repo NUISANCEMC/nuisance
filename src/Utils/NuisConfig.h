@@ -74,6 +74,15 @@ public:
   // Add Children to root node
   XMLNodePointer_t CreateNode(std::string name);
 
+  // Add attribute to node
+  void AddS(XMLNodePointer_t node, std::string name, std::string val);
+  void AddB(XMLNodePointer_t node, std::string name, bool val);
+  void AddI(XMLNodePointer_t node, std::string name, int val);
+  void AddD(XMLNodePointer_t node, std::string name, double val);
+
+  // Check has element
+  bool Has(XMLNodePointer_t node, std::string name);
+
   // Reconfigure (sorts overrides, logger, etc)
   void Reconfigure(){};
 

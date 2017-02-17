@@ -68,6 +68,13 @@ int StrToInt(std::string str);
 //! Convert a string to an bool
 bool StrToBool(std::string str);
 
+std::string BoolToStr(bool val);
+
+std::string IntToStr(int val);
+
+std::string DblToStr(int val);
+
+
 //! Return the top level environmental variable for the fitter
 std::string GetTopLevelDir();
 

@@ -19,7 +19,32 @@
 
 #include "GeneralUtils.h"
 
-std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del){
+
+std::string GeneralUtils::BoolToStr(bool val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+}
+
+std::string GeneralUtils::IntToStr(int val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+};
+
+std::string GeneralUtils::DblToStr(int val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+
+};
+
+
+
+
+
+
+std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -34,7 +59,7 @@ std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* d
   return vals;
 
 }
-std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del){
+std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -49,11 +74,11 @@ std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del){
     vals.push_back(entry);
 
   }
-  
+
   return vals;
 }
 
-std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del){
+std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -73,8 +98,8 @@ std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del){
 }
 
 // To stop rooku's skin from crawling :p
-double GeneralUtils::StrToDbl(std::string str){
-  
+double GeneralUtils::StrToDbl(std::string str) {
+
   std::istringstream stream(str);
   double val;
   stream >> val;
@@ -82,7 +107,7 @@ double GeneralUtils::StrToDbl(std::string str){
   return val;
 }
 
-int GeneralUtils::StrToInt(std::string str){
+int GeneralUtils::StrToInt(std::string str) {
 
   std::istringstream stream(str);
   int val;
@@ -91,12 +116,12 @@ int GeneralUtils::StrToInt(std::string str){
   return val;
 }
 
-bool GeneralUtils::StrToBool(std::string str){
+bool GeneralUtils::StrToBool(std::string str) {
 
-  // convert result to lower case         
-  for(int i = 0; str[i]; i++) str[i] = tolower(str[i]);
+  // convert result to lower case
+  for (int i = 0; str[i]; i++) str[i] = tolower(str[i]);
 
-  // Test for true/false       
+  // Test for true/false
   if      (!str.compare("false")) return false;
   else if (!str.compare("true") ) return true;
 
@@ -109,36 +134,36 @@ bool GeneralUtils::StrToBool(std::string str){
 }
 
 
-std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del){
-  
+std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del) {
+
   std::vector<std::string> linevect;
   std::string line;
-  
+
   std::ifstream read;
   read.open(str.c_str());
-  
-  if (!read.is_open()){
+
+  if (!read.is_open()) {
     ERR(FTL) << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
     throw;
   }
-  
-  while( std::getline(read >> std::ws, line, *del) ){
+
+  while ( std::getline(read >> std::ws, line, *del) ) {
     linevect.push_back(line);
   }
 
   read.close();
-  
+
   return linevect;
 }
 
-std::string GeneralUtils::GetTopLevelDir(){
+std::string GeneralUtils::GetTopLevelDir() {
 
   static bool first = true;
   static std::string topLevelVarVal;
-  
-  if(first){
+
+  if (first) {
     char * const var = getenv("EXT_FIT");
-    if(!var){ 
+    if (!var) {
       ERR(FTL) << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
       exit(-1);
     }

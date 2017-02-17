@@ -108,6 +108,7 @@ double RWFracToSigma(std::string type, std::string name, double val);
  int GetDialEnum(std::string type, std::string name);
  int GetDialEnum(int type, std::string name);
  static std::map<std::string, int> gNormEnums;
+ static std::map<std::string, int> gLikeWeightEnums;
 }
 
 #endif

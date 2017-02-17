@@ -30,6 +30,9 @@
 #include "Math/Functor.h"
 #include "ParamPull.h"
 
+#include "NuisConfig.h"
+#include "NuisKey.h"
+
 using namespace FitUtils;
 using namespace FitBase;
 //! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
@@ -39,13 +42,15 @@ class JointFCN
 
   //! Constructor
   //! cardfile = Path to input card file listing samples
-  JointFCN(std::string cardfile, TFile *outfile);
-
+  JointFCN(std::string cardfile, TFile *outfile=NULL);
+  JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile=NULL);
+  JointFCN(TFile* outfile=NULL); // Loads from global config
   //! Destructor
   ~JointFCN();
 
   //! Create sample list from cardfile
   void LoadSamples(std::string cardFile);
+  void LoadSamples(std::vector<nuiskey> samplekeys);
 
   //! Main Likelihood evaluation FCN
   double DoEval(const double *x);
