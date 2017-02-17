@@ -22,6 +22,23 @@
 /*
    Constructor/destructor Functions
 */
+
+// void Measurement1D::SetupConfig(nuiskey){
+//   // Get name/rename
+//   // Get input file
+//   // Get Types.
+// }
+
+// void Measurement1D::PostConstructorCheck(nuiskey){
+
+//   // Check everything has been setup correctly. Looking for data/mc, etc.
+// }
+
+
+// Write needs a rename option
+// THStack should be merged into a different base class that all
+
+
 //********************************************************************
 Measurement1D::Measurement1D(void) {
   //********************************************************************

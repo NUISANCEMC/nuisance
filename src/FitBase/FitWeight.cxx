@@ -3,7 +3,6 @@
 void FitWeight::AddRWEngine(int type) {
 
 	switch (type) {
-
 	case kNEUT:  
 		fAllRW[type] = new NEUTWeightEngine("neutrw");
 		break;
@@ -19,7 +18,6 @@ void FitWeight::AddRWEngine(int type) {
 	case kNORM:  
 		fAllRW[type] = new SampleNormEngine("normrw");
 		break;
-
 	}
 
 }
