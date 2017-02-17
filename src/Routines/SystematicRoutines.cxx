@@ -945,7 +945,12 @@ void SystematicRoutines::GenerateErrorBands(){
   TDirectory* errorDIR = (TDirectory*) fOutputRootFile->mkdir("error_bands");
   errorDIR->cd();
 
-  TFile* tempfile = new TFile((fOutputFile + ".throws.root").c_str(),"RECREATE");
+  // Make a second file to store throws
+  std::string tempFileName = fOutputFile;
+  if (tempFileName.find(".root") != std::string::npos) tempFileName.erase(tempFileName.find(".root"), 5);
+  tempFileName += ".throws.root";
+  TFile* tempfile = new TFile(tempFileName.c_str(),"RECREATE");
+
   tempfile->cd();
   int nthrows = FitPar::Config().GetParI("error_throws");
 
