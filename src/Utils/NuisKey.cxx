@@ -148,6 +148,33 @@ void nuiskey::AddB(std::string name, bool newval){
   Config::Get().AddB(fNode, name, newval);
 }
 
+void nuiskey::SetS(std::string name, std::string newval){
+  Config::Get().SetS(fNode, name, newval);
+}
+void nuiskey::SetI(std::string name, int newval){
+  Config::Get().SetI(fNode, name, newval);
+}
+void nuiskey::SetD(std::string name, double newval){
+  Config::Get().SetD(fNode, name, newval);
+}
+void nuiskey::SetB(std::string name, bool newval){
+  Config::Get().SetB(fNode, name, newval);
+}
+
+void nuiskey::ChangeS(std::string name, std::string newval){
+  Config::Get().ChangeS(fNode, name, newval);
+}
+void nuiskey::ChangeI(std::string name, int newval){
+  Config::Get().ChangeI(fNode, name, newval);
+}
+void nuiskey::ChangeD(std::string name, double newval){
+  Config::Get().ChangeD(fNode, name, newval);
+}
+void nuiskey::ChangeB(std::string name, bool newval){
+  Config::Get().ChangeB(fNode, name, newval);
+}
+
+
 
 
 void Config::ConvertAndLoadCardToXMLFormat(const std::string cardfile){

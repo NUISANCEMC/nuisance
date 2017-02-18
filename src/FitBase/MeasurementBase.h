@@ -142,7 +142,7 @@ class MeasurementBase {
   SampleSettings LoadSampleSettings(nuiskey samplekey);
   void FinaliseSampleSettings();
   void FinaliseMeasurement(); 
-  
+
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
     return signalSize;
@@ -276,6 +276,7 @@ class MeasurementBase {
   TH1D* fEventHist;
   
   MeasurementSpeciesClass fMeasurementSpeciesType;
+  SampleSettings fSettings;
 };
 
 // Class TypeDefs

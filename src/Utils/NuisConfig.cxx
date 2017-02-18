@@ -127,7 +127,7 @@ void nuisconfig::WriteConfig(std::string outputname) {
 }
 
 
-void nuisconfig::CheckCallCount(std::string name){
+void nuisconfig::CheckCallCount(std::string name) {
 
   // Add Count Warning Flag so we only warn once...
   if (fConfigCallWarning.find(name) == fConfigCallWarning.end()) {
@@ -367,6 +367,45 @@ void nuisconfig::AddD(XMLNodePointer_t node, std::string name, double val) {
   AddS(node, name, GeneralUtils::DblToStr(val));
 }
 
+void nuisconfig::SetS(XMLNodePointer_t node, std::string name, std::string val) {
+
+  // Remove and readd attribute
+  if (fXML->HasAttr(node, name.c_str())){
+    fXML->FreeAttr(node, name.c_str());
+  }
+
+  AddS(node, name, val);
+}
+
+void nuisconfig::SetB(XMLNodePointer_t node, std::string name, bool val) {
+  SetS(node, name, GeneralUtils::BoolToStr(val));
+}
+
+void nuisconfig::SetI(XMLNodePointer_t node, std::string name, int val) {
+  SetS(node, name, GeneralUtils::IntToStr(val));
+}
+void nuisconfig::SetD(XMLNodePointer_t node, std::string name, double val) {
+  SetS(node, name, GeneralUtils::DblToStr(val));
+}
+
+void nuisconfig::ChangeS(XMLNodePointer_t node, std::string name, std::string val) {
+  if (!fXML->HasAttr(node, name.c_str())) return;
+  SetS(node, name, val);
+}
+
+void nuisconfig::ChangeB(XMLNodePointer_t node, std::string name, bool val) {
+  ChangeS(node, name, GeneralUtils::BoolToStr(val));
+}
+
+void nuisconfig::ChangeI(XMLNodePointer_t node, std::string name, int val) {
+  ChangeS(node, name, GeneralUtils::IntToStr(val));
+}
+void nuisconfig::ChangeD(XMLNodePointer_t node, std::string name, double val) {
+  ChangeS(node, name, GeneralUtils::DblToStr(val));
+}
+
+
+
 void nuisconfig::RemoveEmptyNodes() {
   std::vector<XMLNodePointer_t> nodelist = Config::Get().GetNodes();
   for (size_t i = 0; i < nodelist.size(); i++) {
@@ -453,6 +492,85 @@ bool nuisconfig::MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2) {
   }
   return matching;
 }
+
+
+std::string nuisconfig::GetTag(std::string name) {
+
+  std::vector<XMLAttrPointer_t> alltags = GetNodes("tag");
+  std::string tagval = "";
+  bool tagfound = false;
+
+  for (size_t i = 0; i < alltags.size(); i++) {
+    if (!Has(alltags[i], name)) continue;
+    tagval = GetS(alltags[i], name);
+    tagfound = true;
+  }
+
+  if (!tagfound) {
+    ERR(FTL) << "Cannot find tag " << name << " in global conig!" << std::endl;
+    throw;
+  }
+
+  return tagval;
+};
+
+void nuisconfig::ExpandAllTags() {
+  return;
+  /*
+  // Loop over children and look for name
+  XMLNodePointer_t child = fXML->GetChild(fMainNode);
+  while (child != 0) {
+
+    // Loop over attributes and search for tags
+    XMLAttrPointer_t attr = fXML->GetFirstAttr(child);
+    while ( attr != 0 ) {
+
+      // Search attribute value for <>
+      std::string attrval = std::string(fXML->GetAttrValue(attr));
+      std::string attrname = std::string(fXML->GetAttrName(attr));
+
+      // Search for <>
+      while (attrval.find("<") != std::string::npos and 
+             attrval.find(">") != std::string::npos){
+
+        size_t startdel = 0;
+        size_t enddel = 0;
+        std::string replacestring = "";
+
+        for (size_t i = 0; i < attrval.size(); i++){
+
+          if (attrval[i] == '<'){
+            replacestring = "";
+            startdel = i;
+          }
+          
+          replacestring.push_back(attrval[i]);
+
+          if (attrval[i] == '>'){
+            enddel = i;
+            break;
+          }
+        }
+
+        attrval.replace(startdel, replacestring, GetTag(replacestring) );
+      }
+
+      fXML->FreeAttr(child, attr);
+      attr = fXML->NewAttr(child, attr, attrname.c_str(), attrval.c_str());
+
+      // Get Next Attribute
+      attr = fXML->GetNextAttr(attr);
+    }
+    child = fXML->GetNext(child);
+  }
+*/
+
+
+
+};
+
+
+
 
 
 

@@ -83,6 +83,17 @@ public:
   void AddI(XMLNodePointer_t node, std::string name, int val);
   void AddD(XMLNodePointer_t node, std::string name, double val);
 
+  void SetS(XMLNodePointer_t node, std::string name, std::string val);
+  void SetB(XMLNodePointer_t node, std::string name, bool val);
+  void SetI(XMLNodePointer_t node, std::string name, int val);
+  void SetD(XMLNodePointer_t node, std::string name, double val);
+
+  void ChangeS(XMLNodePointer_t node, std::string name, std::string val);
+  void ChangeB(XMLNodePointer_t node, std::string name, bool val);
+  void ChangeI(XMLNodePointer_t node, std::string name, int val);
+  void ChangeD(XMLNodePointer_t node, std::string name, double val);
+
+
   // Check has element
   bool Has(XMLNodePointer_t node, std::string name);
 
@@ -105,6 +116,9 @@ public:
   bool MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2);
   void PrintNode(XMLNodePointer_t node);
   void RemoveNode(XMLNodePointer_t node);
+
+  std::string GetTag(std::string name);
+  void ExpandAllTags();
 
  private:
 

@@ -20,7 +20,7 @@
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 
 //********************************************************************
-MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey){
+MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
   // 1. Initalise sample Settings ---------------------------------------
@@ -32,18 +32,20 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey){
   fSettings.DefineAllowedTargets("C,H");
 
   // Define input data information
-  fSettings.FoundFill("name","CCQELike",ccqelike, true);
+  fSettings.FoundFill("name", "CCQELike", ccqelike, true);
   if (ccqelike) {
     // CCQELike plot information
-    fSettings.Title("MiniBooNE #nu_#mu CCQE");
-    fSettings.SetDataInput(  FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_like.txt" );
-    fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt" );
+    fSettings.SetTitle("MiniBooNE #nu_#mu CCQE");
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_like.txt" );
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
+    fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_bkg.txt" );
     fSettings.SetHasExtraHistograms(true);
     fSettings.DefineAllowedSpecies("numu,numub");
   } else {
     // CCQE Plot Information
-    fSettings.Title("MiniBooNE #nu_#mu CC0#pi");
-    fSettings.SetDataInput(  FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt" );
+    fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi");
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
     fSettings.DefineAllowedSpecies("numu");
   }
 
@@ -52,28 +54,31 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey){
   // 2. Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   // Multiply by 14.08/6.0 to get per neutron
-  fScaleFactor *= (14.08/6.0);
- 
+  fScaleFactor *= (14.08 / 6.0);
+
   // 3. Plot Setup -------------------------------------------------------
-  fDataHist = PlotUtils::TH1DFromText( fSettings.GetDataInput() );
+  // fDataHist  = PlotUtils::TH1DFromText( fSettings.GetDataInput() );
+  // fFullCovar = DataUtils::CovarFromText( fSettings.GetCovarInput() );
 
-  /// If CCQELike is used an additional the CCQELike BKG is saved.
-  if (ccqelike){
-    fDataHist_CCQELIKE = PlotUtils::TH1DFromText( fSettings.GetS("ccqelikebkg_input") );
-    fDataHist_CCQELike->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(), 
-          "MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles() );
+  /// If CCQELike is used the CCQELike BKG is saved.
+  if (ccqelike) {
+    // fDataHist_CCQELIKE = PlotUtils::TH1DFromText( fSettings.GetS("ccqelikebkg_input") );
+    fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(),
+                                      ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
 
-    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_CCQELIKE);
+    PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist, (TH1**)this->fMCHist_CCQELIKE);
     PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
   }
 
   // 4. Final Check for all requirements, necessary to setup all extra plots.
+  // If any are NULL it sets up DecompCovar, InvCovar, ModeHist, FineHist, StatHist, MaskHist
+  // MapHist.
   FinaliseMeasurement();
 };
 
 //********************************************************************
 /// @details Extract q2qe(fXVar) from the event
-void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
+void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
@@ -85,7 +90,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   // accept events we want, so no need to do an additional check here.
   TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
 
-  q2qe = FitUtils::Q2QErec(Pmu,cos(Pnu.Vect().Angle(Pmu.Vect())), 34., false);
+  q2qe = FitUtils::Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 34., false);
 
   // Set X Variables
   fXVar = q2qe;
@@ -94,7 +99,7 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 };
 
 //********************************************************************
-bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
+bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 //********************************************************************
 
   // If CC0pi, include both charges
@@ -113,12 +118,12 @@ bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
 
 //********************************************************************
 /// @details Fills a ccqe-like background plot if required
-void MiniBooNE_CCQE_XSec_1DQ2_nu::FillHistograms(){
+void MiniBooNE_CCQE_XSec_1DQ2_nu::FillHistograms() {
 //********************************************************************
 
   Measurement1D::FillHistograms();
 
-  if (Mode != 1 and Mode != 2 and ccqelike and Signal){
+  if (Mode != 1 and Mode != 2 and ccqelike and Signal) {
     PlotUtils::FillNeutModeArray(fMCHist_CCQELIKE, Mode, fXVar, Weight);
   }
 }
@@ -126,12 +131,12 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::FillHistograms(){
 
 //********************************************************************
 /// @details Extra write command to save the CCQELike PDG if required
-void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
+void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt) {
 //********************************************************************
   // Add renaming option to Measurement1D
   Measurement1D::Write(drawOpt);
 
-  if (ccqelike){
+  if (ccqelike) {
     fDataHist_CCQELIKE->Write();
 
     THStack combo_fMCHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(), (TH1**)this->fMCHist_CCQELIKE, 0);
@@ -143,7 +148,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
 
 //********************************************************************
 /// @details Extra scale command for CCQELIKE PDG Hist
-void MiniBooNE_CCQE_XSec_1DQ2_nu::ResetAll(){
+void MiniBooNE_CCQE_XSec_1DQ2_nu::ResetAll() {
 //********************************************************************
 
   if (ccqelike)
@@ -153,21 +158,21 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::ResetAll(){
 
 //********************************************************************
 /// @details Extra scale command for CCQELIKE PDG Hist
-void MiniBooNE_CCQE_XSec_1DQ2_nu::ScaleEvents(){
+void MiniBooNE_CCQE_XSec_1DQ2_nu::ScaleEvents() {
 //********************************************************************
 
   Measurement1D::ScaleEvents();
   if (ccqelike)
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, fScaleFactor,"width");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, fScaleFactor, "width");
 
 }
 
 
 //********************************************************************
 /// @details Apply norm scaling to CCQELIKE PDG Hist
-void MiniBooNE_CCQE_XSec_1DQ2_nu::ApplyNormScale(double norm){
+void MiniBooNE_CCQE_XSec_1DQ2_nu::ApplyNormScale(double norm) {
 //********************************************************************
   Measurement1D::ApplyNormScale(norm);
   if (ccqelike)
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0/norm, "");
+    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0 / norm, "");
 }

@@ -216,6 +216,8 @@
 
 #include "FitWeight.h"
 
+#include "NuisConfig.h"
+#include "NuisKey.h"
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {
@@ -226,6 +228,7 @@ namespace SampleUtils {
                 std::string file, std::string type, std::string fkdt,
                 FitWeight* rw);*/
 MeasurementBase* CreateSample(std::string name, std::string file, std::string type, std::string fkdt, FitWeight* rw);
+MeasurementBase* CreateSample(nuiskey samplekey);
 }
 
 /*! @} */

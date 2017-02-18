@@ -8,6 +8,21 @@ namespace SampleUtils {
 MeasurementBase* CreateSample(std::string name, std::string file, 
   std::string type, std::string fkdt, FitWeight* rw){
 
+  nuiskey samplekey;
+  samplekey.AddS("name",name);
+  samplekey.AddS("input",file);
+  samplekey.AddS("type",type);
+
+  return CreateSample(samplekey);
+}
+
+MeasurementBase* CreateSample(nuiskey samplekey){
+
+  FitWeight* rw = FitBase::GetRW();
+  std::string name = samplekey.GetS("name");
+  std::string file = samplekey.GetS("input");
+  std::string type = samplekey.GetS("type");
+  std::string fkdt = "";
   /*
      ANL CCQE Samples
   */
@@ -233,7 +248,7 @@ MeasurementBase* CreateSample(std::string name, std::string file,
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")) {
     return (
-        new MiniBooNE_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
+        new MiniBooNE_CCQE_XSec_1DQ2_nu(samplekey));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {

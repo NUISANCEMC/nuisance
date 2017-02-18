@@ -25,6 +25,11 @@ class nuiskey{
   std::vector<int>         GetVI(std::string name, const char* del);
   std::vector<double>      GetVD(std::string name, const char* del);
 
+  void SetS(std::string name, std::string newval);
+void SetI(std::string name, int newval);
+  void SetD(std::string name, double newval);
+  void SetB(std::string name, bool newval);
+
   void ChangeS(std::string name, std::string newval);
   void ChangeI(std::string name, int newval);
   void ChangeD(std::string name, double newval);

@@ -22,6 +22,7 @@
 #include "GeneratorUtils.h"
 #include "FitLogger.h"
 
+// TODO, Make a generator variables box, and keep an original particle stack when OrderStack is called.
 
 namespace GeneratorUtils {
 

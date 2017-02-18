@@ -28,7 +28,7 @@ class MiniBooNE_CCQE_XSec_1DQ2_nu : public Measurement1D {
 
 public:
 
-  MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
