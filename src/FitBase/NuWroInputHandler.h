@@ -29,6 +29,8 @@ public:
 	std::vector<double> jointindexscale;
 
 	TChain* fNuWroTree;
+	int fMultiCore_NCores;
+	TChain* fNuWroTree_MultiCore;
 
 #ifdef __NUWRO_ENABLED__
   int ConvertNuwroMode (event * e);
@@ -36,6 +38,7 @@ public:
 
 #ifdef __NUWRO_ENABLED__
     event* fNuWroEvent;  //!< Pointer to NuWro Events (Set to bool if NUWRO disabled)
+    event* fNuWroEvent_MultiCore;
 #endif
 
 };

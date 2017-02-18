@@ -128,6 +128,35 @@ int MeasurementBase::GetInputID() {
 }
 
 //***********************************************
+SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey){
+//***********************************************
+  SampleSettings setting = SampleSettings(samplekey);
+
+  // Used as an initial setup function incase we need to do anything here.
+  LOG(SAM) << "Loading Inputs for " << setting.GetName() << std::endl;
+  SetupInputs( setting.Get("input") );
+
+  return setting;
+}
+
+void MeasurementBase::FinaliseSampleSettings(){
+
+  // Set type options
+
+  // Set Fit Options
+
+}
+
+void FinaliseMeasurement(){
+
+  // Run SetupDefaultHist and Masking functions if needed.
+
+  // Run checks on input species and targets if they have been given.
+}
+
+
+
+//***********************************************
 void MeasurementBase::Reconfigure() {
   //***********************************************
   LOG(REC) << " Reconfiguring sample " << fName << std::endl;

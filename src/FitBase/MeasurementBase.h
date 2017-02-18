@@ -68,6 +68,9 @@
 #include "EventManager.h"
 #include "TObject.h"
 #include "InputHandler2.h"
+#include "NuisConfig.h"
+#include "NuisKey.h"
+#include "SampleSettings.h"
 
 /// Enumerations to help with extra plot functions
 enum extraplotflags {
@@ -136,6 +139,10 @@ class MeasurementBase {
                                     double low = -9999.9,
                                     double high = -9999.9);
 
+  SampleSettings LoadSampleSettings(nuiskey samplekey);
+  void FinaliseSampleSettings();
+  void FinaliseMeasurement(); 
+  
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
     return signalSize;

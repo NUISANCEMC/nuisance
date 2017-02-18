@@ -186,5 +186,7 @@ class BaseFitEvt {
   //SplineReader* fSplineReader;
   double* fSplineCoeff;
 
+  int eventid;
+
 };
 #endif

@@ -21,6 +21,8 @@
 #define NUISCONFIG_H_SEEN
 #include "TXMLEngine.h"
 #include "GeneralUtils.h"
+#include <algorithm>
+#include <map>
 
 // New NUISANCE Config Class
 class nuisconfig {
@@ -55,9 +57,10 @@ public:
   double ConfD(const std::string name);
 
   /// Node Functions
+  void CheckCallCount(std::string name);
 
   // Get List of nodes
-  std::vector<XMLNodePointer_t> GetNodes(std::string type);
+  std::vector<XMLNodePointer_t> GetNodes(std::string type="");
 
   /// Get String from a given node
   std::string GetS(XMLNodePointer_t node, std::string name);
@@ -97,11 +100,21 @@ public:
   std::vector<int> GetVI(XMLNodePointer_t node, std::string name, const char* del);
   std::vector<double> GetVD(XMLNodePointer_t node, std::string name, const char* del);
 
+  void RemoveEmptyNodes();
+  void RemoveIdenticalNodes();
+  bool MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2);
+  void PrintNode(XMLNodePointer_t node);
+  void RemoveNode(XMLNodePointer_t node);
+
  private:
 
   XMLNodePointer_t fMainNode; ///< Main XML Parent Node
   TXMLEngine* fXML; ///< ROOT XML Engine
   std::vector<XMLDocPointer_t> fXMLDocs; ///< List of all XML document inputs
+
+  int fCurrentTime; ///< Unix time for inefficiency checking
+  std::map<std::string, int> fConfigCallCount; ///< To check for inefficiency.
+  std::map<std::string, bool> fConfigCallWarning; ///< Only print warning once.
 
 protected:
   static nuisconfig* m_nuisconfigInstance;

@@ -20,66 +20,55 @@
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 
 //********************************************************************
-MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile,
-							 FitWeight *rw, std::string type,
-							 std::string fakeDataFile){
+MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey){
 //********************************************************************
 
-  // Measurement Details
-  fName = name;
-  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
+  // 1. Initalise sample Settings ---------------------------------------
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.DefineAllowedTargets("C,H");
 
-  /// Using the sample name "MiniBooNE_CCQE_XSec_1DQ2_nu_CCQELike" will allow
-  /// the CCQELike sample without background subtraction to be fitted.
-  ccqelike = name.find("CCQELike") != std::string::npos;
-
-  if(ccqelike){
-    fMeasurementSpeciesType = kNumuWithWrongSignMeasurement;
-  }
-
-  EnuMin = 0.;
-  EnuMax = 3.;
-  fNormError = 0.107;
-  fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/NORM/MASK";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
-  // Setup Plots
-  this->fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt");
-  this->SetupDefaultHist();
-
-  // Setup Covariance
-  if (!this->fIsDiag) {
-    ERR(FTL) << "Non diagonal covariance not allowed for MB CCQE!" << std::endl;
-    ERR(FTL) << "Run with DIAG or DEFAULT option" << std::endl;
-    throw;
+  // Define input data information
+  fSettings.FoundFill("name","CCQELike",ccqelike, true);
+  if (ccqelike) {
+    // CCQELike plot information
+    fSettings.Title("MiniBooNE #nu_#mu CCQE");
+    fSettings.SetDataInput(  FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_like.txt" );
+    fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt" );
+    fSettings.SetHasExtraHistograms(true);
+    fSettings.DefineAllowedSpecies("numu,numub");
   } else {
-    /// Assume a diagonal shape-only error is default
-    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fFullCovar);
+    // CCQE Plot Information
+    fSettings.Title("MiniBooNE #nu_#mu CC0#pi");
+    fSettings.SetDataInput(  FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_con.txt" );
+    fSettings.DefineAllowedSpecies("numu");
   }
 
-  /// If CCQELike is used an additional the CCQELike BKG is used and a PDG Histogram is saved
+  FinaliseSampleSettings();
+
+  // 2. Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // Multiply by 14.08/6.0 to get per neutron
+  fScaleFactor *= (14.08/6.0);
+ 
+  // 3. Plot Setup -------------------------------------------------------
+  fDataHist = PlotUtils::TH1DFromText( fSettings.GetDataInput() );
+
+  /// If CCQELike is used an additional the CCQELike BKG is saved.
   if (ccqelike){
-
-    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile(FitPar::GetDataBase()+"/MiniBooNE/ccqe/asqq_bkg.txt",
-						   (this->fName+"_data_CCQELIKE"), this->fPlotTitles);
-
-    for (int i = 0; i < fDataHist->GetNbinsX(); i++){
-      this->fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1) + fDataHist_CCQELIKE->GetBinContent(i+1));
-    }
+    fDataHist_CCQELIKE = PlotUtils::TH1DFromText( fSettings.GetS("ccqelikebkg_input") );
+    fDataHist_CCQELike->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(), 
+          "MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles() );
 
     PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_CCQELIKE);
     PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
-
   }
 
-  // Get Scale Factor
-  fScaleFactor = ((GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))
-		 * (14.08/6.0)
-		 / TotalIntegratedFlux());
-
+  // 4. Final Check for all requirements, necessary to setup all extra plots.
+  FinaliseMeasurement();
 };
 
 //********************************************************************
@@ -139,7 +128,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::FillHistograms(){
 /// @details Extra write command to save the CCQELike PDG if required
 void MiniBooNE_CCQE_XSec_1DQ2_nu::Write(std::string drawOpt){
 //********************************************************************
-
+  // Add renaming option to Measurement1D
   Measurement1D::Write(drawOpt);
 
   if (ccqelike){

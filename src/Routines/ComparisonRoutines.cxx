@@ -66,6 +66,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   int verbosity_flag = 0;
   int error_flag = 0;
 
+  
   // If No Arguments print commands
   for (int i = 1; i < argc; ++i) {
     if (i + 1 != argc) {
@@ -122,6 +123,13 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   if (!xmlinput.empty()){
     conf.LoadConfig( xmlinput, "xmlinput" );
   }
+
+  // This should be setup to save stuff into the configuration
+  fCompKey = Config::Get().CreateNode("nuiscomp");
+  fCompKey.AddS("cardfile",fCardFile);
+  fCompKey.AddS("outputfile",fOutputFile);
+  fCompKey.AddS("strategy",fStrategy);
+  fCompKey.AddS("xmlinput",xmlinput);
 
   std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
   FitPar::Config().ReadParamFile(par_dir + "config.list.dat");

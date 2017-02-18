@@ -160,6 +160,7 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   //********************************************************************
 
   double momshift = 0.0;
+  /*
   double temp = FitPar::Config().GetParD("muon_momentum_shift");
   if (temp != -999.9 and temp != 0.0) {
     if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
@@ -168,6 +169,9 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
       momshift = gRandom->Gaus(0.0, 1.0) * temp;
     }
   }
+  */
+  
+  
 
   // Convert all values to GeV
   const double V = binding / 1000.;           // binding potential
@@ -197,6 +201,7 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
 double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
                          bool neutrino) {
   double momshift = 0.0;
+  /*
   double temp = FitPar::Config().GetParD("muon_momentum_shift");
   if (temp != -999.9 and temp != 0.0) {
     if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
@@ -205,6 +210,9 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
       momshift = gRandom->Gaus(0.0, 1.0) * temp;
     }
   }
+  */
+  
+
 
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton

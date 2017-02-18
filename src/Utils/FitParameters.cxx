@@ -128,6 +128,7 @@ void FitParameters::SetParI(std::string parName, int val) {
 
 // Parameter fetch commands
 int FitParameters::GetParI(std::string parName) {
+    return Config::Get().ConfI(parName);
   if (parName == "VERBOSITY") {
     if (parameterMap_all.find(parName) != parameterMap_all.end()) {
       int tempVal = 1;
@@ -181,6 +182,9 @@ int FitParameters::GetParI(std::string parName) {
 
 // Parameter fetch commands
 bool FitParameters::GetParB(std::string parName) {
+  return Config::Get().ConfB(parName);
+
+
   // Check if it is saved in bool map
   if (parameterMap_bool.find(parName) != parameterMap_bool.end()) {
     return parameterMap_bool[parName];
@@ -203,6 +207,7 @@ bool FitParameters::GetParB(std::string parName) {
 };
 
 double FitParameters::GetParD(std::string parName) {
+    return Config::Get().ConfD(parName);
   // Check if it is saved in int map
   if (parameterMap_double.find(parName) != parameterMap_double.end()) {
     return parameterMap_double[parName];
@@ -222,6 +227,7 @@ double FitParameters::GetParD(std::string parName) {
 };
 
 std::string FitParameters::GetParS(std::string parName) {
+    return Config::Get().ConfS(parName);
   // Check if it is saved in int map
   if (parameterMap_all.find(parName) != parameterMap_all.end()) {
     return parameterMap_all[parName];

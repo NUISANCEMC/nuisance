@@ -105,8 +105,17 @@ void NEUTWeightEngine::Reconfigure(bool silent){
 double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt){
 
 	StopTalking();
-	// Fill NEUT Common Blocks
-	GeneratorUtils::FillNeutCommons(evt->fNeutVect);
+
+	// Check if event has changed incase common blocks need filling
+	if (evt->eventid != fLastEventID or evt != fLastEventPointer){
+		
+		// Fill NEUT Common blocks
+		GeneratorUtils::FillNeutCommons(evt->fNeutVect);
+
+		// Save last one
+		fLastEventID = evt->eventid;
+		fLastEventPointer = evt;
+	}
 
 	// Call Weight calculation
     double rw_weight = fNeutRW->CalcWeight();

@@ -19,34 +19,37 @@
 #include "NuisConfig.h"
 #include "FitParameters.h"
 
-nuisconfig::nuisconfig(){
+nuisconfig::nuisconfig() {
 
   // Initial Setup
-  std::string filename = GeneralUtils::GetTopLevelDir() + "/parameters/config.xml"; 
+  std::string filename = GeneralUtils::GetTopLevelDir() + "/parameters/config.xml";
   std::cout << "[NUIS]: Loading DEFAULT config from : " << filename;
-  
+
   // Create XML Engine
   fXML = new TXMLEngine;
-  
+
   // Load in documents
   fXMLDocs.clear();
+  fXML->SetSkipComments(true);
   fXMLDocs.push_back( fXML->ParseFile(filename.c_str()) );
-  
+  fXML->SetSkipComments(false);
+
   // Setup Main XML Node
   fMainNode = fXML->DocGetRootElement( fXMLDocs[0] );
-  
+  //RemoveIdenticalNodes();
+
   std::cout << "  ->  DONE. " << std::endl;
 
 
 }
 
-nuisconfig::~nuisconfig(){
-  
+nuisconfig::~nuisconfig() {
+
   // Free all xml docs
   //  for (int i = 0; i < fXMLDocs.size(); i++){
   //    fXML->FreeDoc( fXMLDocs.at(i) );
   //  }
-  
+
   // Remove XMLDocs
   //fXMLDocs.clear();
 
@@ -55,72 +58,135 @@ nuisconfig::~nuisconfig(){
 
 }
 
-void nuisconfig::LoadConfig(std::string filename, std::string state=""){
-  
+void nuisconfig::LoadConfig(std::string filename, std::string state = "") {
+
   // Add new file to xml docs list
   fXMLDocs.push_back( fXML->ParseFile( filename.c_str() ) );
 
   // Get New Doc ROOT
   int nxml = fXMLDocs.size();
-  XMLNodePointer_t newdocroot = fXML->DocGetRootElement( fXMLDocs[nxml-1] );
+  XMLNodePointer_t newdocroot = fXML->DocGetRootElement( fXMLDocs[nxml - 1] );
+
 
   // Loop over children and add
   XMLNodePointer_t child = fXML->GetChild( newdocroot );
-  while( child!=0 ){ 
+  while ( child != 0 ) {
     // Add additional state flag if given
-    if (!state.empty()){
-      if (GetS(child, "source").empty()){
-        fXML->NewAttr(child, 0,"source",state.c_str());
+    if (!state.empty()) {
+      if (GetS(child, "source").empty()) {
+        fXML->NewAttr(child, 0, "source", state.c_str());
       } else {
         // fXML->SetAttr
+      }
+
+      // If its a config node, then remove previous attributes, overriding
+      if (!std::string(fXML->GetNodeName(child)).compare("config")) {
+
+        // Loop over attribues
+        XMLAttrPointer_t attr1 = fXML->GetFirstAttr(child);
+        while ( attr1 != 0 ) {
+          if (!ConfS(fXML->GetAttrName(attr1)).empty()) {
+            std::vector<XMLNodePointer_t> confignodes = GetNodes("config");
+
+            for (size_t i = 0; i < confignodes.size(); i++) {
+              if (fXML->HasAttr(confignodes[i], fXML->GetAttrName(attr1))) {
+                std::cout << fXML->GetAttrName(attr1) << std::endl;
+                fXML->FreeAttr(confignodes[i], fXML->GetAttrName(attr1));
+                break;
+              }
+            }
+          }
+          attr1 = fXML->GetNextAttr(attr1);
+        }
       }
     }
 
     // Add this child to the main config list
     fXML->AddChild( fMainNode, child );
-    
+
     // Get Next Child
     child = fXML->GetNext(child);
   }
+  // std::cout << "Removing Identical Nodes" << std::endl;
+  RemoveEmptyNodes();
+  RemoveIdenticalNodes();
+  // std::cout << "Finished removing nodes" << std::endl;
 }
 
-XMLNodePointer_t nuisconfig::CreateNode(std::string name){
+XMLNodePointer_t nuisconfig::CreateNode(std::string name) {
   return fXML->NewChild(fMainNode, 0, name.c_str());
 }
 
-void nuisconfig::WriteConfig(std::string outputname){
+void nuisconfig::WriteConfig(std::string outputname) {
   // Create a New XML Doc
   XMLDocPointer_t newxmldoc = fXML->NewDoc();
   fXML->DocSetRootElement(newxmldoc, fMainNode);
 
-  // Save document to file                                                                                                                                                                           
+  // Save document to file
   fXML->SaveDoc(newxmldoc, outputname.c_str());
 }
 
-std::string nuisconfig::ConfS(const std::string name){  
+
+void nuisconfig::CheckCallCount(std::string name){
+
+  // Add Count Warning Flag so we only warn once...
+  if (fConfigCallWarning.find(name) == fConfigCallWarning.end()) {
+    fConfigCallWarning[name] = false;
+    fConfigCallCount[name] = 0;
+  }
+
+  // Check for inefficiency and warn if it happens
+  if (abs(time(NULL) - fCurrentTime) > 1) {
+    fCurrentTime = time(NULL);
+
+    // Check count since last 10 seconds
+    if (!fConfigCallWarning[name] and fConfigCallCount[name] > 100) {
+      ERR(WRN) << "Config Parameter " << name
+               << " has been requested " << fConfigCallCount[name]
+               << " times in the last second." << std::endl;
+      ERR(WRN) << "This is very inefficient! Please try to change this." << std::endl;
+      fConfigCallWarning[name] = true;
+    }
+
+    // Reset counter
+    fConfigCallCount[name] = 0;
+  }
+
+  // Add to Call Count
+  fConfigCallCount[name] += 1;
+
+}
+
+std::string nuisconfig::ConfS(const std::string name) {
   std::string temp = "";
-  
+
+  CheckCallCount(name);
+
   // Loop over children and look for name
   XMLNodePointer_t child = fXML->GetChild(fMainNode);
-  while (child!=0) {
+  while (child != 0) {
 
+    // std::cout << "Child = " << fXML->GetNodeName(child) << std::endl;
     // Select only config parameters
-    if (std::string(fXML->GetNodeName(child)) == "config"){
-      
+    if (!std::string(fXML->GetNodeName(child)).compare("config")) {
+
+      // std::cout << "Found Config " << std::endl;
       // Loop over config attributes and search for name
       XMLAttrPointer_t attr = fXML->GetFirstAttr(child);
-      while ( attr!=0 ){
+      while ( attr != 0 ) {
 
-	// Save name value
-	if (std::string(fXML->GetAttrName(attr)) == name.c_str()){
-	  temp = fXML->GetAttrValue(attr);
-	}
+        // Save name value
+        // std::cout << "Setting Temp " << std::string(fXML->GetAttrName(attr)) << " '" << fXML->GetAttrValue(attr) << "' " << std::endl;
+        if (std::string(fXML->GetAttrName(attr)) == name.c_str()) {
+          // std::cout << "Setting Temp " << std::string(fXML->GetAttrName(attr)) << " " << fXML->GetAttrValue(attr) << std::endl;
+          temp = fXML->GetAttrValue(attr);
+        }
 
-	// Get Next Attribute
-	attr = fXML->GetNextAttr(attr);
+        // Get Next Attribute
+        attr = fXML->GetNextAttr(attr);
       }
     }
-  
+
     // Next Child
     child = fXML->GetNext(child);
   }
@@ -129,47 +195,50 @@ std::string nuisconfig::ConfS(const std::string name){
   return temp;
 }
 
-bool nuisconfig::ConfB(const std::string name){
+bool nuisconfig::ConfB(const std::string name) {
   std::string pars = ConfS(name);
   return GeneralUtils::StrToBool(pars);
 }
 
-int nuisconfig::ConfI(const std::string name){
+int nuisconfig::ConfI(const std::string name) {
   std::string pars = ConfS(name);
   return GeneralUtils::StrToInt(pars);
 }
 
-double nuisconfig::ConfD(const std::string name){
+double nuisconfig::ConfD(const std::string name) {
   std::string pars = ConfS(name);
   return GeneralUtils::StrToDbl(pars);
 }
 
-std::vector<XMLNodePointer_t> nuisconfig::GetNodes(const std::string type){
+std::vector<XMLNodePointer_t> nuisconfig::GetNodes(const std::string type) {
   std::vector<XMLNodePointer_t> nodelist;
 
   /// Loop over all children
   XMLNodePointer_t child = fXML->GetChild(fMainNode);
-  while (child!=0) {
+  while (child != 0) {
 
     /// Get nodes for given type (if type empty return all)
-    if (std::string(fXML->GetNodeName(child)) == type.c_str() or type.empty()){
+    if (std::string(fXML->GetNodeName(child)) == type.c_str() or type.empty()) {
       nodelist.push_back(child);
     }
 
     // Next child
     child = fXML->GetNext(child);
   }
-  
+
   // return list
   return nodelist;
 }
 
 
-/// Get String from a given node                                                                                           
-std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name){
+/// Get String from a given node
+std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name) {
 
   // If node empty return empty
   if (node == 0) return "";
+
+  // Check request count
+  CheckCallCount(name);
 
   // Get Attribute from child with name
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
@@ -177,22 +246,22 @@ std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name){
 
   // Check if its a search or exact (should probs just add wildcards...)
   bool exact = true;
-  if (name.size() > 0){
-    if (name[0] == '*' and name[name.size()-1] == '*'){
+  if (name.size() > 0) {
+    if (name[0] == '*' and name[name.size() - 1] == '*') {
       exact = false;
     }
   }
-    
+
   // Loop over all attributes
-  while ( attr!=0 ){
-    
+  while ( attr != 0 ) {
+
     // Find value of correct name
-    if (exact){
-      if (std::string(fXML->GetAttrName(attr)) == name.c_str()){
-	temp = fXML->GetAttrValue(attr);
+    if (exact) {
+      if (std::string(fXML->GetAttrName(attr)) == name.c_str()) {
+        temp = fXML->GetAttrValue(attr);
       }
     } else {
-      
+
     }
 
     // Next Attribute
@@ -202,7 +271,7 @@ std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name){
   return temp;
 }
 
-bool nuisconfig::Has(XMLNodePointer_t node, std::string name){
+bool nuisconfig::Has(XMLNodePointer_t node, std::string name) {
 
   // If node empty return empty
   if (node == 0) return false;
@@ -213,22 +282,22 @@ bool nuisconfig::Has(XMLNodePointer_t node, std::string name){
 
   // Check if its a search or exact (should probs just add wildcards...)
   bool exact = true;
-  if (name.size() > 0){
-    if (name[0] == '*' and name[name.size()-1] == '*'){
+  if (name.size() > 0) {
+    if (name[0] == '*' and name[name.size() - 1] == '*') {
       exact = false;
     }
   }
-    
+
   // Loop over all attributes
-  while ( attr!=0 ){
-    
+  while ( attr != 0 ) {
+
     // Find value of correct name
-    if (exact){
-      if (std::string(fXML->GetAttrName(attr)) == name.c_str()){
+    if (exact) {
+      if (std::string(fXML->GetAttrName(attr)) == name.c_str()) {
         found = true;
       }
     } else {
-      
+
     }
 
     // Next Attribute
@@ -238,42 +307,42 @@ bool nuisconfig::Has(XMLNodePointer_t node, std::string name){
   return found;
 }
 
-/// Get Bools from a given node                                                                                            
-bool nuisconfig::GetB(XMLNodePointer_t node, std::string name){
+/// Get Bools from a given node
+bool nuisconfig::GetB(XMLNodePointer_t node, std::string name) {
   std::string tempattr = GetS(node, name);
   return GeneralUtils::StrToBool(tempattr);
 }
 
-/// Get int from given node                                                                                                
-int nuisconfig::GetI(XMLNodePointer_t node, std::string name){
+/// Get int from given node
+int nuisconfig::GetI(XMLNodePointer_t node, std::string name) {
   std::string tempattr = GetS(node, name);
   return GeneralUtils::StrToInt(tempattr);
 }
 
-/// Get double from given node                                                                                             
-double nuisconfig::GetD(XMLNodePointer_t node, std::string name){
+/// Get double from given node
+double nuisconfig::GetD(XMLNodePointer_t node, std::string name) {
   std::string tempattr = GetS(node, name);
   return GeneralUtils::StrToDbl(tempattr);
 }
 
-std::vector<std::string> nuisconfig::GetVS(XMLNodePointer_t node, std::string name, const char* del){
+std::vector<std::string> nuisconfig::GetVS(XMLNodePointer_t node, std::string name, const char* del) {
   std::string tempattr = GetS(node, name);
-  return GeneralUtils::ParseToStr(tempattr,del);
+  return GeneralUtils::ParseToStr(tempattr, del);
 }
 
-std::vector<int> nuisconfig::GetVI(XMLNodePointer_t node, std::string name, const char* del){
+std::vector<int> nuisconfig::GetVI(XMLNodePointer_t node, std::string name, const char* del) {
   std::string tempattr = GetS(node, name);
-  return GeneralUtils::ParseToInt(tempattr,del);
+  return GeneralUtils::ParseToInt(tempattr, del);
 }
 
-std::vector<double> nuisconfig::GetVD(XMLNodePointer_t node, std::string name, const char* del){
+std::vector<double> nuisconfig::GetVD(XMLNodePointer_t node, std::string name, const char* del) {
   std::string tempattr = GetS(node, name);
-  return GeneralUtils::ParseToDbl(tempattr,del);
+  return GeneralUtils::ParseToDbl(tempattr, del);
 }
 
 
 namespace Config {
-  nuisconfig& Get() { return nuisconfig::GetConfig(); };
+nuisconfig& Get() { return nuisconfig::GetConfig(); };
 }
 
 nuisconfig* nuisconfig::m_nuisconfigInstance = NULL;
@@ -283,19 +352,106 @@ nuisconfig& nuisconfig::GetConfig(void) {
 };
 
 
-void nuisconfig::AddS(XMLNodePointer_t node, std::string name, std::string val){
+void nuisconfig::AddS(XMLNodePointer_t node, std::string name, std::string val) {
   fXML->NewAttr(node, 0, name.c_str(), val.c_str());
 }
 
-void nuisconfig::AddB(XMLNodePointer_t node, std::string name, bool val){
+void nuisconfig::AddB(XMLNodePointer_t node, std::string name, bool val) {
   AddS(node, name, GeneralUtils::BoolToStr(val));
 }
 
-void nuisconfig::AddI(XMLNodePointer_t node, std::string name, int val){
+void nuisconfig::AddI(XMLNodePointer_t node, std::string name, int val) {
   AddS(node, name, GeneralUtils::IntToStr(val));
 }
-void nuisconfig::AddD(XMLNodePointer_t node, std::string name, double val){
+void nuisconfig::AddD(XMLNodePointer_t node, std::string name, double val) {
   AddS(node, name, GeneralUtils::DblToStr(val));
+}
+
+void nuisconfig::RemoveEmptyNodes() {
+  std::vector<XMLNodePointer_t> nodelist = Config::Get().GetNodes();
+  for (size_t i = 0; i < nodelist.size(); i++) {
+    if (fXML->IsEmptyNode(nodelist[i])) {
+      RemoveNode(nodelist[i]);
+    }
+  }
+}
+
+void nuisconfig::RemoveIdenticalNodes() {
+  std::vector<XMLNodePointer_t> removed;
+
+  // Loop over all nodes and check for identical nodes
+  std::vector<XMLNodePointer_t> nodelist = Config::Get().GetNodes();
+  for (size_t i = 0; i < nodelist.size(); i++) {
+    for (size_t j = 0; j < nodelist.size(); j++) {
+
+      XMLNodePointer_t node1 = nodelist[i];
+      XMLNodePointer_t node2 = nodelist[j];
+
+      // Check node already removed.
+      if (std::find(removed.begin(), removed.end(), node1) != removed.end()) continue;
+      if (std::find(removed.begin(), removed.end(), node2) != removed.end()) continue;
+      if (i == j) continue;
+
+      // Check matching
+      if (!MatchingNodes(node1, node2)) continue;
+
+      if (std::string(fXML->GetNodeName(node1)).compare("config") and fXML->IsEmptyNode(node1)) {
+
+        // Matching so print out warning
+        std::cout << "Matching nodes given! Removing node1!" << std::endl
+                  << "Node 1" << std::endl;
+        PrintNode(node1);
+
+        std::cout << "Node 2" << std::endl;
+        PrintNode(node2);
+
+      }
+
+      // Remove node
+      removed.push_back(node1);
+
+    }
+  }
+
+  // Now go through and remove this node.
+  for (size_t i = 0; i < removed.size(); i++) {
+    RemoveNode( removed.at(i) );
+  }
+
+  return;
+}
+
+
+void nuisconfig::RemoveNode(XMLNodePointer_t node) {
+  fXML->FreeAllAttr(node);
+  fXML->CleanNode(node);
+  fXML->FreeNode(node);
+  fXML->UnlinkNode(node);
+}
+
+void nuisconfig::PrintNode(XMLNodePointer_t node) {
+
+  // Print Node Name
+  std::cout << fXML->GetNodeName(node) << std::endl;
+
+  // Loop and print all attributes
+  XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
+  while ( attr != 0 ) {
+    std::cout << " -> " << fXML->GetAttrName(attr) << " : " << fXML->GetAttrValue(attr) << std::endl;
+    attr = fXML->GetNextAttr(attr);
+  }
+
+}
+
+bool nuisconfig::MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2) {
+
+  bool matching = true;
+  XMLAttrPointer_t attr = fXML->GetFirstAttr(node1);
+  while ( attr != 0 ) {
+    if (GetS(node2, fXML->GetAttrName(attr)) != fXML->GetAttrValue(attr)) matching = false;
+    attr = fXML->GetNextAttr(attr);
+  }
+  return matching;
 }
 
 

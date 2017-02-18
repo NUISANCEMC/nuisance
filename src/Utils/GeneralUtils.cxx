@@ -119,12 +119,12 @@ int GeneralUtils::StrToInt(std::string str) {
 bool GeneralUtils::StrToBool(std::string str) {
 
   // convert result to lower case
-  for (int i = 0; str[i]; i++) str[i] = tolower(str[i]);
+  // for (int i = 0; i < str.size(); i++) str[i] = tolower(str[i]);
 
   // Test for true/false
   if      (!str.compare("false")) return false;
   else if (!str.compare("true") ) return true;
-
+  if (str.empty()) return false;
   // Push into bool
   std::istringstream stream(str);
   bool val;

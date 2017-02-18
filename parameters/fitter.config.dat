@@ -1,6 +1,6 @@
 # ######################################################
 # NUISANCE CONFIGURATION OPTIONS
-# This file is read in by default at runtime
+# This file is read in by default at runtime
 # If you want to override on a case by case bases use -q at runtime
 # ######################################################
 

@@ -181,6 +181,8 @@ protected:
   //! Vector of fake parameter names
   std::map<std::string,double> fFakeVals;
 
+  nuiskey fCompKey;
+
 };
 
 /*! @} */

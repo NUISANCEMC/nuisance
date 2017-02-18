@@ -83,6 +83,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+
+	// Setup extra flags
+	save_extra = FitPar::Config().GetParB("save_extra_neut_info");
 };
 
 
@@ -93,6 +96,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry){
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
+	fNUISANCEEvent->eventid = entry;
 
 	// Setup Input scaling for joint inputs
 	if (jointinput){
@@ -174,7 +178,6 @@ void NEUTInputHandler::CalcNUISANCEKinematics(){
 	}
 
 	// Initialise Extra NEUT Information in NUISANCE Event
-	bool save_extra = FitPar::Config().GetParB("save_extra_neut_info");
 	if (save_extra){
 
 		// Add one of these for each exta piece of information you
@@ -257,7 +260,8 @@ BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry){
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
-
+	fBaseEvent->eventid = entry;
+	
 	// Set joint scaling if required
 	if (jointinput){
 		fBaseEvent->InputWeight = GetInputWeight(entry);

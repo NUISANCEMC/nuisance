@@ -22,6 +22,14 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	// Setup the TChain
 	fNuWroTree = new TChain("treeout");
 
+	// Add option for multi core loading.
+	fMultiCore_NCores = FitPar::Config().GetParI("cores");
+	fNuWroTree_MultiCore = new TChain[fMultiCore_NCores];
+	fNuWroEvent_MultiCore = new event[fMultiCore_NCores];
+	for (int i = 0; i < fMultiCore_NCores ; i++){
+		// fNuWroTree_MultiCore[i] = TChain("treeout");
+	}
+
 	// Loop over all inputs and grab flux, eventhist, and nevents
 	// Also add it to the TChain
 	int evtcounter = 0;
@@ -30,6 +38,10 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 
 		// Add to TChain
 		fNuWroTree->Add( inputs[inp_it].c_str() );
+
+		for (int i = 0; i < fMultiCore_NCores ; i++){
+			fNuWroTree_MultiCore[i].Add( inputs[inp_it].c_str() );
+		}	
 
 		// Open File for histogram access
 		TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
@@ -83,6 +95,11 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fNuWroEvent = NULL;
 	fNuWroTree->SetBranchAddress("e", &fNuWroEvent);
 
+	for (int i = 0; i < fMultiCore_NCores ; i++){
+		// fNuWroEvent_MultiCore[i] = NULL;
+		// fNuWroTree_MultiCore[i].SetBranchAddress("e", &(&fNuWroEvent_MultiCore[i]);
+	}
+
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
 		TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
@@ -96,6 +113,8 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+
+
 };
 
 // Automatically reprocesses nuwro input flux
@@ -111,6 +130,9 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
+
+	// Get latest TTree and get entry, loop round in parrallel and grab entries from other TTrees.
+	// Get event corresponding to this TTree and replace pointer in fNuWroEvent with it.
 
 	// Setup Input scaling for joint inputs
 	if (jointinput) {

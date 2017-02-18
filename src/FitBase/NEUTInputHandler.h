@@ -29,6 +29,7 @@ public:
 	bool jointinput;
 	std::vector<double> jointindexscale;
 
+	bool save_extra;
 	TChain* fNEUTTree;
 	NeutVect* fNeutVect;  
 };
