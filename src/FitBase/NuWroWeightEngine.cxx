@@ -84,6 +84,9 @@ void NuWroWeightEngine::Reconfigure(bool silent) {
 
 double NuWroWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
+	// Skip Non GENIE
+	if (evt->fType != kNUWRO) return 1.0;
+
 	// Call Weight calculation
 	double rw_weight = fNuwroRW->CalcWeight(evt->fNuwroEvent);
 	

@@ -43,6 +43,13 @@ MeasurementBase::MeasurementBase(void) {
 
 };
 
+void MeasurementBase::FinaliseMeasurement(){
+
+  // Used to setup default data hists, covars, etc.
+
+
+
+}
 
 //********************************************************************
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
@@ -131,6 +138,7 @@ int MeasurementBase::GetInputID() {
 SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey){
 //***********************************************
   SampleSettings setting = SampleSettings(samplekey);
+  fName = setting.GetS("name");
 
   // Used as an initial setup function incase we need to do anything here.
   LOG(SAM) << "Loading Inputs for " << setting.GetName() << std::endl;
@@ -184,13 +192,21 @@ void MeasurementBase::Reconfigure() {
       fZVar = -999.9;
       Signal = false;
       Mode = cust_event->Mode;
-    
+
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);
     Signal = this->isSignal(cust_event);
 
+    fEventVariables.fX = fXVar;
+    fEventVariables.fY = fXVar;
+    fEventVariables.fZ = fXVar;
+    fEventVariables.fMode = Mode;
+    fEventVariables.fSignal = Signal;
+    
     // Fill Histogram Values
-    this->FillHistograms();
+    this->FillHistogramsFromBox(fEventVariables, Weight);
+
+    // this->FillHistograms();
     // this->ProcessExtraHistograms(kCMD_FillHistograms, []);
     // this->FillExtraHistograms();
 
@@ -219,6 +235,38 @@ void MeasurementBase::Reconfigure() {
   // Finalise Histograms
   fMCFilled = true;
   this->ConvertEventRates();
+}
+
+void MeasurementBase::FillHistogramsFromBox(MeasurementVariablesBox var, double weight){
+
+  fXVar  = fEventVariables.fX;
+  fYVar  = fEventVariables.fY;
+  fZVar  = fEventVariables.fZ;
+  Signal = fEventVariables.fSignal;
+  Mode   = fEventVariables.fMode;
+  Weight = weight;
+
+  FillHistograms();
+
+}
+
+void MeasurementBase::FillVariableBox(FitEvent* event){
+  
+  fEventVariables.Reset();
+
+  this->FillEventVariables(event);
+  Signal = this->isSignal(event);
+
+  fEventVariables.fX = fXVar;
+  fEventVariables.fY = fXVar;
+  fEventVariables.fZ = fXVar;
+  fEventVariables.fMode = Mode;
+  fEventVariables.fSignal = Signal;
+
+}
+
+MeasurementVariablesBox MeasurementBase::GetVariableBox(){
+  return fEventVariables;
 }
 
 //***********************************************

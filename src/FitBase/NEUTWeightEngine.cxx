@@ -104,6 +104,9 @@ void NEUTWeightEngine::Reconfigure(bool silent){
 
 double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt){
 
+	// Skip Non GENIE
+	if (evt->fType != kNEUT) return 1.0;
+
 	StopTalking();
 
 	// Check if event has changed incase common blocks need filling

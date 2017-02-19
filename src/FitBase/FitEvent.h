@@ -68,6 +68,7 @@ class FitEvent : public BaseFitEvt {
     for (UInt_t i = 0; i < kMaxParticles; i++) {
       fParticleList[i] = NULL;
     }
+    fGenInfo = NULL;
   };
   ~FitEvent(){};
 
@@ -112,12 +113,15 @@ FitEvent(GiBUUStdHepReader* tempevent){
 #endif
 
 #ifdef __NUANCE_ENABLED__
-  //! Constructor assigns event address to a Nuance reader
-  void SetEventAddress(NuanceEvent** tempevent);
-
-  //! Convert Nuance event class to common format
-  void NuanceKinematics(void);
+FitEvent(NuanceEvent* tempevent){
+  fType = kNUANCE;
+  nuance_event = tempevent;
+}
 #endif
+
+  FitEvent(int type){
+    fType = type;
+  }
 
   /* Standard Event Functions */
 
@@ -340,8 +344,14 @@ FitEvent(GiBUUStdHepReader* tempevent){
   int fParticlePDG[kMaxParticles];
   FitParticle* fParticleList[kMaxParticles];
 
+  // Keep double the stack for saving.
+  double fOrigParticleMom[kMaxParticles][4];
+  UInt_t fOrigParticleState[kMaxParticles];
+  int fOrigParticlePDG[kMaxParticles];
+
   double* fNEUT_ParticleStatusCode;
   double* fNEUT_ParticleAliveCode;
+  GeneratorInfoBase* fGenInfo;
 
 
 };

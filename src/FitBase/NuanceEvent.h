@@ -25,9 +25,14 @@
  *  \addtogroup FitBase
  *  @{
  */
+#include "TTree.h"
 
 class NuanceEvent {
  public:
+
+  NuanceEvent(){};
+  void SetBranchAddresses(TTree* tn);
+
 
   bool cc;
   bool bound;

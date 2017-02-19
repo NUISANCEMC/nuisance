@@ -34,4 +34,16 @@ public:
 	NeutVect* fNeutVect;  
 };
 
+class NEUTGeneratorInfo : GeneratorInfoBase {
+public:
+  NEUTGeneratorInfo(){};
+  ~NEUTGeneratorInfo(){};
+  void AddBranchesToTree(TTree* tn);
+
+  const static UInt_t kMaxParticles = 400;
+  int fNEUT_ParticleStatusCode[kMaxParticles];
+  int fNEUT_ParticleAliveCode[kMaxParticles];
+
+};
+
 #endif

@@ -1,5 +1,8 @@
 #include "SampleSettings.h"
 
+SampleSettings::SampleSettings(){
+};
+
 SampleSettings::SampleSettings(nuiskey key){
 	fKeyValues = key;
 	if (!key.Has("type")) key.AddS("type","DEFAULT");
@@ -57,6 +60,10 @@ void SampleSettings::SetTitle(std::string val){
 
 void SampleSettings::SetDataInput(std::string val){
 	SetDefault("data",val);
+};
+
+void SampleSettings::SetCovarInput(std::string val){
+	SetDefault("covar",val);
 };
 
 void SampleSettings::SetDefault(std::string name, std::string val){

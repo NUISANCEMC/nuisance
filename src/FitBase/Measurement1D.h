@@ -134,6 +134,10 @@ class Measurement1D : public MeasurementBase {
   //                                    double low = -9999.9,
   //                                    double high = -9999.9);
 
+
+  virtual void FinaliseSampleSettings();
+  virtual void FinaliseMeasurement(); 
+
   //! Reset histograms to zero
   virtual void ResetAll(void);
 

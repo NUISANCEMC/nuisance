@@ -57,12 +57,15 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   fScaleFactor *= (14.08 / 6.0);
 
   // 3. Plot Setup -------------------------------------------------------
-  // fDataHist  = PlotUtils::TH1DFromText( fSettings.GetDataInput() );
+  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
+  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
+
   // fFullCovar = DataUtils::CovarFromText( fSettings.GetCovarInput() );
 
   /// If CCQELike is used the CCQELike BKG is saved.
   if (ccqelike) {
-    // fDataHist_CCQELIKE = PlotUtils::TH1DFromText( fSettings.GetS("ccqelikebkg_input") );
+    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"), 
+                                                     fSettings.GetName() + "_data" );
     fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(),
                                       ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
 

@@ -24,22 +24,7 @@
 #include "Conventions/Units.h"
 #endif
 
-//***************************************************
-// Refill all the particle vectors etc for the event
-void FitEvent::CalcKinematics() {
-//***************************************************
-ResetParticleList();
-
-#ifdef __NUANCE_ENABLED__
-  if (fType == kNUANCE) NuanceKinematics();
-#endif
-
-  if (LOG_LEVEL(FIT)) Print();
-
-  return;
-};
-
-void FitEvent::ResetParticleList(){
+void FitEvent::ResetParticleList() {
   for (unsigned int i = 0; i < kMaxParticles; i++) {
     FitParticle* fp = fParticleList[i];
     if (fp) delete fp;
@@ -66,7 +51,22 @@ void FitEvent::ResetEvent() {
     FitParticle* fp = fParticleList[i];
     if (fp) delete fp;
     fParticleList[i] = NULL;
+
+    fParticlePDG[i] = 0;
+    fParticleState[i] = kUndefinedState;
+    fParticleMom[i][0] = 0.0;
+    fParticleMom[i][1] = 0.0;
+    fParticleMom[i][2] = 0.0;
+    fParticleMom[i][3] = 0.0;
+
+    fOrigParticlePDG[i] = 0;
+    fOrigParticleState[i] = kUndefinedState;
+    fOrigParticleMom[i][0] = 0.0;
+    fOrigParticleMom[i][1] = 0.0;
+    fOrigParticleMom[i][2] = 0.0;
+    fOrigParticleMom[i][3] = 0.0;
   }
+
 }
 
 
@@ -75,35 +75,36 @@ void FitEvent::OrderStack() {
   //***************************************************
 
   // Copy current stack
-  int oldpartpdg[kMaxParticles];
-  int oldpartstate[kMaxParticles];
-  double oldpartmom[kMaxParticles][4];
   int npart = fNParticles;
+  double fOrigParticleMom[kMaxParticles][4];
+  UInt_t fOrigParticleState[kMaxParticles];
+  int fOrigParticlePDG[kMaxParticles];
 
   for (int i = 0; i < npart; i++) {
-    oldpartpdg[i] = fParticlePDG[i];
-    oldpartstate[i] = fParticleState[i];
-    oldpartmom[i][0] = fParticleMom[i][0];
-    oldpartmom[i][1] = fParticleMom[i][1];
-    oldpartmom[i][2] = fParticleMom[i][2];
-    oldpartmom[i][3] = fParticleMom[i][3];
+    fOrigParticlePDG[i]    = fParticlePDG[i];
+    fOrigParticleState[i]  = fParticleState[i];
+    fOrigParticleMom[i][0] = fParticleMom[i][0];
+    fOrigParticleMom[i][1] = fParticleMom[i][1];
+    fOrigParticleMom[i][2] = fParticleMom[i][2];
+    fOrigParticleMom[i][3] = fParticleMom[i][3];
   }
 
   // Now run loops for each particle
   fNParticles = 0;
   int stateorder[6] = {kInitialState,   kFinalState,     kFSIState,
-                       kNuclearInitial, kNuclearRemnant, kUndefinedState};
+                       kNuclearInitial, kNuclearRemnant, kUndefinedState
+                      };
 
   for (int s = 0; s < 6; s++) {
     for (int i = 0; i < npart; i++) {
-      if (oldpartstate[i] != stateorder[s]) continue;
+      if (fOrigParticleState[i] != stateorder[s]) continue;
 
-      fParticlePDG[fNParticles] = oldpartpdg[i];
-      fParticleState[fNParticles] = oldpartstate[i];
-      fParticleMom[fNParticles][0] = oldpartmom[i][0];
-      fParticleMom[fNParticles][1] = oldpartmom[i][1];
-      fParticleMom[fNParticles][2] = oldpartmom[i][2];
-      fParticleMom[fNParticles][3] = oldpartmom[i][3];
+      fParticlePDG[fNParticles]    = fOrigParticlePDG[i];
+      fParticleState[fNParticles]  = fOrigParticleState[i];
+      fParticleMom[fNParticles][0] = fOrigParticleMom[i][0];
+      fParticleMom[fNParticles][1] = fOrigParticleMom[i][1];
+      fParticleMom[fNParticles][2] = fOrigParticleMom[i][2];
+      fParticleMom[fNParticles][3] = fOrigParticleMom[i][3];
 
       fNParticles++;
     }
@@ -124,82 +125,6 @@ void FitEvent::OrderStack() {
   return;
 }
 
-// REQUIRED FUNCTIONS FOR NUANCE
-#ifdef __NUANCE_ENABLED__
-//***************************************************
-void FitEvent::SetEventAddress(NuanceEvent** tempevent) {
-  //***************************************************
-  fType = kNUANCE;
-  nuance_event = *tempevent;
-}
-
-//***************************************************
-void FitEvent::NuanceKinematics() {
-  //***************************************************
-  ResetEvent();
-
-  fMode = GeneratorUtils::ConvertNuanceMode(nuance_event);
-  Mode = fMode;
-  fEventNo = 0.0;
-  fTotCrs = 1.0;
-  fTargetA = 0.0;
-  fTargetZ = 0.0;
-  fTargetH = 0;
-  fBound = 0.0;
-
-  // Fill particle Stack
-  fNParticles = 0;
-
-  // Check Particle Stack
-  UInt_t npart = 2 + nuance_event->n_leptons + nuance_event->n_hadrons;
-
-  if (npart > kMaxParticles) {
-    ERR(FTL) << "NUANCE has too many particles" << std::endl;
-    ERR(FTL) << "npart=" << npart << " kMax=" << kMaxParticles << std::endl;
-    throw;
-  }
-
-  // Fill Neutrino
-  fParticleState[0] = kInitialState;
-  fParticleMom[0][0] = nuance_event->p_neutrino[0];
-  fParticleMom[0][1] = nuance_event->p_neutrino[1];
-  fParticleMom[0][2] = nuance_event->p_neutrino[2];
-  fParticleMom[0][3] = nuance_event->p_neutrino[3];
-  fParticlePDG[0] = nuance_event->neutrino;
-
-  // Fill Target Nucleon
-  fParticleState[1] = kInitialState;
-  fParticleMom[1][0] = nuance_event->p_targ[0];
-  fParticleMom[1][1] = nuance_event->p_targ[1];
-  fParticleMom[1][2] = nuance_event->p_targ[2];
-  fParticleMom[1][3] = nuance_event->p_targ[3];
-  fParticlePDG[1] = nuance_event->target;
-  fNParticles = 2;
-
-  // Fill Outgoing Leptons
-  for (int i = 0; i < nuance_event->n_leptons; i++) {
-    fParticleState[fNParticles] = kFinalState;
-    fParticleMom[fNParticles][0] = nuance_event->p_lepton[i][0];
-    fParticleMom[fNParticles][1] = nuance_event->p_lepton[i][1];
-    fParticleMom[fNParticles][2] = nuance_event->p_lepton[i][2];
-    fParticleMom[fNParticles][3] = nuance_event->p_lepton[i][3];
-    fParticlePDG[fNParticles] = nuance_event->lepton[i];
-    fNParticles++;
-  }
-
-  // Fill Outgoing Hadrons
-  for (int i = 0; i < nuance_event->n_hadrons; i++) {
-    fParticleState[fNParticles] = kFinalState;
-    fParticleMom[fNParticles][0] = nuance_event->p_hadron[i][0];
-    fParticleMom[fNParticles][1] = nuance_event->p_hadron[i][1];
-    fParticleMom[fNParticles][2] = nuance_event->p_hadron[i][2];
-    fParticleMom[fNParticles][3] = nuance_event->p_hadron[i][3];
-    fParticlePDG[fNParticles] = nuance_event->hadron[i];
-    fNParticles++;
-  }
-}
-#endif
-
 /* Read/Write own event class */
 void FitEvent::SetBranchAddress(TChain* tn) {
   fType = kINPUTFITEVENT;
@@ -215,14 +140,19 @@ void FitEvent::SetBranchAddress(TChain* tn) {
   tn->SetBranchAddress("InputWeight", &InputWeight);
 
   tn->SetBranchAddress("NParticles", &fNParticles);
-  tn->SetBranchAddress("ParticleState", fParticleState);
-  tn->SetBranchAddress("ParticlePDG", fParticlePDG);
-  tn->SetBranchAddress("ParticleMom", fParticleMom);
+
+  // Save original particle stack/unordered
+  tn->SetBranchAddress("ParticleState", fOrigParticleState);
+  tn->SetBranchAddress("ParticlePDG", fOrigParticlePDG);
+  tn->SetBranchAddress("ParticleMom", fOrigParticleMom);
+
+  // Shouldn't be a need to read back in Generator Info...
+  // fGenInfo->SetBranchAddress(tn);
 }
 
 void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("Mode", &fMode, "Mode/I");
-  
+
   tn->Branch("EventNo", &fEventNo, "EventNo/i");
   tn->Branch("TotCrs", &fTotCrs, "TotCrs/D");
   tn->Branch("TargetA", &fTargetA, "TargetA/I");
@@ -232,12 +162,13 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
 
   tn->Branch("NParticles", &fNParticles, "NParticles/I");
+  // Load original particle stack into norm stack, before ordering.
   tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
   tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
   tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
-  
 
-  // tn->SetAlias("Enu", "ParticleMom[0][4]");
+  // Save Extra Generator Information
+  if (fGenInfo) fGenInfo->AddBranchesToTree(tn);
 }
 
 /* Event Access Functions */

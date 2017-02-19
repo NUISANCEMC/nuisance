@@ -44,7 +44,11 @@ GENIEWeightEngine.cxx
 WeightUtils.cxx
 SampleNormEngine.cxx
 LikelihoodWeightEngine.cxx
+NuanceEvent.cxx
 SampleSettings.cxx
+FitEventInputHandler.cxx
+SplineWeightEngine.cxx
+SplineInputHandler.cxx
 )
 
 set(HEADERFILES
@@ -68,6 +72,9 @@ WeightUtils.h
 SampleNormEngine.h
 LikelihoodWeightEngine.h
 SampleSettings.h
+FitEventInputHandler.h
+SplineWeightEngine.h
+SplineInputHandler.h
 )
 
 set(LIBNAME FitBase)

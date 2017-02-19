@@ -189,4 +189,14 @@ class BaseFitEvt {
   int eventid;
 
 };
+
+
+// Box object that allows user to save extra generator level info.
+class GeneratorInfoBase {
+public:
+  GeneratorInfoBase(){};
+  virtual ~GeneratorInfoBase(){};
+  virtual void AddBranchesToTree(TTree* tn){};
+};
+
 #endif

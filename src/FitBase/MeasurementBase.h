@@ -139,9 +139,9 @@ class MeasurementBase {
                                     double low = -9999.9,
                                     double high = -9999.9);
 
-  SampleSettings LoadSampleSettings(nuiskey samplekey);
-  void FinaliseSampleSettings();
-  void FinaliseMeasurement(); 
+  virtual SampleSettings LoadSampleSettings(nuiskey samplekey);
+  virtual void FinaliseSampleSettings();
+  virtual void FinaliseMeasurement(); 
 
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
@@ -184,8 +184,11 @@ class MeasurementBase {
   ///! Save Histograms
   virtual void Write(std::string drawOpt = "") = 0;
 
+  virtual void FillVariableBox(FitEvent* event);
 
+  virtual MeasurementVariablesBox GetVariableBox();
 
+  void FillHistogramsFromBox(MeasurementVariablesBox var, double weight);
   /*
     Histogram Access Functions
   */
@@ -277,7 +280,20 @@ class MeasurementBase {
   
   MeasurementSpeciesClass fMeasurementSpeciesType;
   SampleSettings fSettings;
+
+  MeasurementVariableBox fEventVariables;
 };
+
+class MeasurementVariableBox {
+public:
+  MeasurementVariableBox(){};
+  ~MeasurementVariableBox(){};
+
+  double fX, fY, fZ;
+  int fMode, fEntry;
+};
+
+
 
 // Class TypeDefs
 typedef std::list<MeasurementBase*>::const_iterator MeasListConstIter;

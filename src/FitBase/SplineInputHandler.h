@@ -1,19 +1,17 @@
-#ifndef NUANCEINPUTHANDLER_H
-#define NUANCEINPUTHANDLER_H
-#include "InputHandler2.h"
-#ifdef __NUANCE_ENABLED__
-#endif
+#ifndef SPLINE_INPUTHANDLER_H
+#define SPLINE_INPUTHANDLER_H
 
+#include "InputHandler2.h"
+#include "FitEvent.h"
 #include "PlotUtils.h"
 
-class NUANCEInputHandler : public InputHandlerBase {
+class SplineInputHandler : public InputHandlerBase {
 public:
 
-	NUANCEInputHandler(std::string const& handle, std::string const& rawinputs);
-	~NUANCEInputHandler() {};
+	SplineInputHandler(std::string const& handle, std::string const& rawinputs);
+	~SplineInputHandler(){};
 
 	FitEvent* GetNuisanceEvent(const UInt_t entry);
-	void CalcNUISANCEKinematics();
 	double GetInputWeight(int entry);
 	BaseFitEvt* GetBaseEvent(const UInt_t entry);
 	void Print();
@@ -26,8 +24,7 @@ public:
 	bool jointinput;
 	std::vector<double> jointindexscale;
 
-	NuanceEvent* fNuanceEvent;
-	TChain* fNUANCETree;
+	bool save_extra;
+	TChain* fFitEventTree;
 };
-
 #endif

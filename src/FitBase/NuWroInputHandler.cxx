@@ -114,7 +114,13 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
 
-
+	// Setup Extra Flags
+	int maxevents = FitPar::Config().GetParI("input.maxevents");
+	if (maxevents > 1 && maxevents < fNEvents) {
+		LOG(SAM) << " -> Reading only " << maxevents << " events from total."
+		         << std::endl;
+		fNEvents = maxevents;
+	}
 };
 
 // Automatically reprocesses nuwro input flux

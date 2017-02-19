@@ -105,4 +105,7 @@ inline double TotalIntegratedFlux(double low, double high,
 	int fEventType;
 };
 
+
+
+
 #endif

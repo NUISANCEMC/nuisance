@@ -1306,7 +1306,7 @@ void InputHandler::PrintStartInput() {
   tn->GetEntry(0);
   StartTalking();
 
-  fEvent->CalcKinematics();
+  // fEvent->CalcKinematics();
   LOG(SAM) << " -> Event 0. Neutrino PDG = " << fEvent->PartInfo(0)->fPID
            << std::endl;
   LOG(SAM) << "             Target A     = " << fEvent->GetTargetA()
@@ -1320,7 +1320,7 @@ std::string InputHandler::GetInputStateString() {
   //********************************************************************
 
   tn->GetEntry(0);
-  fEvent->CalcKinematics();
+  // fEvent->CalcKinematics();
   std::ostringstream state;
   state << "T" << fEventType << "_PDG" << fEvent->PartInfo(0)->fPID << "_Z"
         << fEvent->GetTargetZ() << "_A" << fEvent->GetTargetA();
@@ -1339,13 +1339,13 @@ void InputHandler::ReadEvent(unsigned int i) {
   if (using_events) {
     tn->LoadTree(i);
     tn->GetEntry(i);
-    fEvent->CalcKinematics();
+    // fEvent->CalcKinematics();
     fEvent->Index = i;
     fEventIndex = i;
     fEvent->InputWeight = GetInputWeight(i);
   } else {
     GetTreeEntry(i);
-    fEvent->CalcKinematics();
+    // fEvent->CalcKinematics();
   }
 }
 

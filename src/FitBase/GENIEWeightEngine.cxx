@@ -142,6 +142,9 @@ void GENIEWeightEngine::Reconfigure(bool silent) {
 
 double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
+	// Skip Non GENIE
+	if (evt->fType != kGENIE) return 1.0;
+
 	// Make nom weight
 	double rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
 

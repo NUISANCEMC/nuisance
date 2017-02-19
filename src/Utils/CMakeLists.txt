@@ -27,6 +27,7 @@ SignalDef.h
 NuisConfig.h
 NuisKey.h
 BeamUtils.h
+TargetUtils.h
 )
 
 set(IMPLFILES
@@ -41,6 +42,7 @@ SignalDef.cxx
 NuisConfig.cxx
 NuisKey.cxx
 BeamUtils.cxx
+TargetUtils.cxx
 )
 
 set(LIBNAME Utils)

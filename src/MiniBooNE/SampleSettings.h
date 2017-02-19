@@ -17,17 +17,20 @@ public:
 	void SetAllowedTypes(std::string allowed, std::string defaulttype="FIX");
 	void SetEnuRangeFromFlux(TH1D* fluxhist);
 	void SetEnuRange(double min, double max);
-	void SetCovarInput(std::string val);
 	std::string Title();
 	void DefineAllowedTargets(std::string targ);
 
 	void FoundFill(std::string name, std::string substr, bool& cont, bool def);
 	void SetTitle(std::string val);
 	void SetDataInput(std::string val);
+	void SetCovarInput(std::string val);
+
 	void SetDefault(std::string name, std::string val);
 	void SetDefault(std::string name, double val);
 	void SetHasExtraHistograms(bool opt = true);
 	void DefineAllowedSpecies(std::string species);
+
+	bool Has(std::string name){return fKeyValues.Has(name);};
 
 	std::string GetDataInput();
 	std::string PlotTitles();
