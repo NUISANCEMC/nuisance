@@ -78,7 +78,7 @@ class FitEvent : public BaseFitEvt {
   //! Reset the event variables
   void ResetEvent(void);
   void ResetParticleList(void);
-
+  void HardReset();
 /* Event Convertors */
 #ifdef __NEUT_ENABLED__
   //! Constructor assigns event address to NeutVect memory.
@@ -334,6 +334,7 @@ FitEvent(NuanceEvent* tempevent){
   int fTargetH;
   bool fBound;
   int fDistance;
+  int fTargetPDG;
 
   // Reduced Particle Stack
   const static UInt_t kMaxParticles = 400;

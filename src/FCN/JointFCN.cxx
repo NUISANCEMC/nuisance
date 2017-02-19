@@ -330,8 +330,7 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys){
 
     fOutputDir->cd();
     MeasurementBase* NewLoadedSample
-      = SampleUtils::CreateSample(samplename, samplefile,
-                                  sampletype, fakeData, FitBase::GetRW());
+      = SampleUtils::CreateSample(key);
 
     if (!NewLoadedSample) {
       ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;

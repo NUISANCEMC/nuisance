@@ -74,11 +74,13 @@
 
 /// Enumerations to help with extra plot functions
 enum extraplotflags {
-  kExtraPlotError = 0,
-  kExtraPlotReset = 1,
-  kExtraPlotFill = 2,
-  kExtraPlotConvert = 3,
-  kExtraPlotWrite = 4
+  kCMD_Reset = 0,
+  kCMD_Fill,
+  kCMD_Scale,
+  kCMD_Norm,
+  kCMD_Write,
+  kCMD_Error,
+  kCMD_extraplotflags
 };
 
 enum MeasurementSpeciesClass {
@@ -98,8 +100,26 @@ enum MeasurementSpeciesClass {
 
 //! 2nd level experiment class that handles converting MC into a common format
 //! and calling reconfigure
+
+class MeasurementVariableBox {
+public:
+  MeasurementVariableBox() {};
+  ~MeasurementVariableBox() {};
+
+  virtual void Reset() {
+    fX = fY = fZ = -999.9;
+    fMode = fEntry = -999;
+    fSignal = false;
+  }
+
+  double fX, fY, fZ;
+  int fMode, fEntry;
+  bool fSignal;
+};
+
+
 class MeasurementBase {
- public:
+public:
   /*
     Constructor/Destructors
   */
@@ -108,7 +128,7 @@ class MeasurementBase {
 
   //! Default virtual destructor
   virtual ~MeasurementBase(void);
-  virtual void InitialSetup(void){};
+  virtual void InitialSetup(void) {};
   /*
     Reconfigure Functions
   */
@@ -141,7 +161,15 @@ class MeasurementBase {
 
   virtual SampleSettings LoadSampleSettings(nuiskey samplekey);
   virtual void FinaliseSampleSettings();
-  virtual void FinaliseMeasurement(); 
+  virtual void FinaliseMeasurement();
+  virtual void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
+                                      double weight = 1.0);
+
+  virtual void FillExtraHistograms(MeasurementVariableBox* vars, double weight = 1.0);
+  virtual void ScaleExtraHistograms(MeasurementVariableBox* vars);
+  virtual void ResetExtraHistograms();
+  virtual void NormExtraHistograms(MeasurementVariableBox* vars, double norm = 1.0);
+  virtual void WriteExtraHistograms();
 
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
@@ -169,14 +197,14 @@ class MeasurementBase {
 
   ///! Fill the histogram for this event using fXVar and fYVar (Handled in each
   /// inherited sample)
-  virtual void FillHistograms(void){};
+  virtual void FillHistograms(void) {};
 
   ///! Convert event rates to whatever distributions you need.
   virtual void ConvertEventRates(void);
 
   ///! Call scale events after the plots have been filled at the end of
   /// reconfigure.
-  virtual void ScaleEvents(void){};
+  virtual void ScaleEvents(void) {};
 
   ///! Apply the scale factor at the end of reconfigure.
   virtual void ApplyNormScale(double norm) { (void)norm; };
@@ -186,9 +214,9 @@ class MeasurementBase {
 
   virtual void FillVariableBox(FitEvent* event);
 
-  virtual MeasurementVariablesBox GetVariableBox();
+  virtual MeasurementVariableBox* GetVariableBox();
 
-  void FillHistogramsFromBox(MeasurementVariablesBox var, double weight);
+  void FillHistogramsFromBox(MeasurementVariableBox* var, double weight);
   /*
     Histogram Access Functions
   */
@@ -235,7 +263,16 @@ class MeasurementBase {
   inline void SetYVar(double yvar) { fYVar = yvar; };
   inline void SetZVar(double zvar) { fZVar = zvar; };
 
- protected:
+  void SetAutoProcessTH1(TH1* hist,  int c1 = -1,
+                         int c2 = -1, int c3 = -1,
+                         int c4 = -1, int c5 = -1);
+  void AutoFillExtraTH1();
+  void AutoResetExtraTH1();
+  void AutoScaleExtraTH1();
+  void AutoNormExtraTH1(double norm);
+  void AutoWriteExtraTH1();
+
+protected:
   // Minimum and maximum energies
   double Enu;     //!< Neutrino Energy
   double EnuMin;  //!< Minimum incoming particle energy of events to include
@@ -251,13 +288,13 @@ class MeasurementBase {
   int fEventType;
 
   double fBeamDistance;  //!< Incoming Particle flight distance (for oscillation
-                         //! analysis)
+  //! analysis)
   double fScaleFactor;   //!< fScaleFactor applied to events to convert from
-                         //! eventrate to final distribution
+  //! eventrate to final distribution
   double
-      fCurrentNorm;  //!< current normalisation factor applied if fit is "FREE"
+  fCurrentNorm;  //!< current normalisation factor applied if fit is "FREE"
   bool fMCFilled;    //!< flag whether MC plots have been filled (For
-                     //! ApplyNormalisation)
+  //! ApplyNormalisation)
   bool fNoData;      //!< flag whether data plots do not exist (for ratios)
 
   // TEMP OBJECTS TO HANDLE MERGE
@@ -277,21 +314,17 @@ class MeasurementBase {
   std::string fInputFileName;
   TH1D* fFluxHist;
   TH1D* fEventHist;
-  
+
   MeasurementSpeciesClass fMeasurementSpeciesType;
   SampleSettings fSettings;
 
-  MeasurementVariableBox fEventVariables;
+  MeasurementVariableBox* fEventVariables;
+
+  std::map<TH1*, std::vector<int> > fExtraTH1s;
+  // std::map<TH1*, bool[6] > fExtaStacks;
+
 };
 
-class MeasurementVariableBox {
-public:
-  MeasurementVariableBox(){};
-  ~MeasurementVariableBox(){};
-
-  double fX, fY, fZ;
-  int fMode, fEntry;
-};
 
 
 

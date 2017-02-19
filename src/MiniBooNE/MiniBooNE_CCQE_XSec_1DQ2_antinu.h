@@ -28,16 +28,19 @@ class MiniBooNE_CCQE_XSec_1DQ2_antinu : public Measurement1D {
 
 public:
 
-  MiniBooNE_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_antinu() {};
 
   void FillEventVariables(FitEvent *event);
-  void Write(std::string drawOpt);
-  void FillHistograms();
+  // void Write(std::string drawOpt);
+  // void FillHistograms();
   bool isSignal(FitEvent *event);
-  void ScaleEvents();
-  void ApplyNormScale(double norm);
-  void ResetAll();
+  // void ScaleEvents();
+  // void ApplyNormScale(double norm);
+  // void ResetAll();
+
+    void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
+                             double weight = 1.0);
   TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background
   TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background
   TH1D* fMCHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background

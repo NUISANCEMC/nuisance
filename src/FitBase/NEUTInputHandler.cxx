@@ -93,12 +93,15 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		         << std::endl;
 		fNEvents = maxevents;
 	}
-
+	fNUISANCEEvent = new FitEvent(fNeutVect);
+	fNUISANCEEvent->HardReset();
+	std::cout << "Neut Event Address " << fNeutVect << std::endl;
 };
 
 
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
-
+// 
+	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
 	// Make sure events setup
 	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fNeutVect);
 
@@ -163,18 +166,25 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
 }
 
 void NEUTInputHandler::CalcNUISANCEKinematics() {
-
+	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
 	// Reset all variables
 	fNUISANCEEvent->ResetEvent();
-
+	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
 	// Fill Globals
 	fNUISANCEEvent->fMode    = fNeutVect->Mode;
 	fNUISANCEEvent->Mode     = fNeutVect->Mode;
 	fNUISANCEEvent->fEventNo = fNeutVect->EventNo;
 	fNUISANCEEvent->fTargetA = fNeutVect->TargetA;
 	fNUISANCEEvent->fTargetZ = fNeutVect->TargetZ;
-	fNUISANCEEvent->fTargetH = fNeutVect->TargetH;
+	fNUISANCEEvent->fTargetH   = fNeutVect->TargetH;
 	fNUISANCEEvent->fBound = bool(fNeutVect->Ibound);
+
+	if (fNUISANCEEvent->fBound) {
+		fNUISANCEEvent->fTargetPDG = TargetUtils::GetTargetPDGFromZA(fNUISANCEEvent->fTargetZ,
+		                             fNUISANCEEvent->fTargetA);
+	} else {
+		fNUISANCEEvent->fTargetPDG = 1000010010;
+	}
 
 	// Check Particle Stack
 	UInt_t npart = fNeutVect->Npart();
@@ -284,8 +294,8 @@ void NEUTInputHandler::Print() {}
 
 void NEUTGeneratorInfo::AddBranchesToTree(TTree* tn) {
 	tn->Branch("NEUT_ParticleStatusCode",
-		fNEUT_ParticleStatusCode,"NEUT_ParticleStatusCode[NParticles]/I");
+	           fNEUT_ParticleStatusCode, "NEUT_ParticleStatusCode[NParticles]/I");
 	tn->Branch("NEUT_ParticleAliveCode",
-		fNEUT_ParticleStatusCode,"NEUT_ParticleAliveCode[NParticles]/I");
+	           fNEUT_ParticleStatusCode, "NEUT_ParticleAliveCode[NParticles]/I");
 }
 

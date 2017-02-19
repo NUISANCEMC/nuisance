@@ -97,3 +97,12 @@ std::string SampleSettings::PlotTitles(){
 std::string SampleSettings::GetS(std::string name){
 	return fKeyValues.GetS(name);
 }
+
+void SampleSettings::SetSuggestedFlux(std::string str){
+	SetS("suggested_flux", str);
+}
+
+void SampleSettings::SetDescription(std::string str){
+	SetS("description", str);
+}
+

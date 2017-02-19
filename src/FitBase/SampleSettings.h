@@ -29,7 +29,9 @@ public:
 	void SetDefault(std::string name, double val);
 	void SetHasExtraHistograms(bool opt = true);
 	void DefineAllowedSpecies(std::string species);
-
+	void SetSuggestedFlux(std::string str);
+	void SetDescription(std::string str);
+	
 	bool Has(std::string name){return fKeyValues.Has(name);};
 
 	std::string GetDataInput();

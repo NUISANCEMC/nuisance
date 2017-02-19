@@ -121,6 +121,10 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 		         << std::endl;
 		fNEvents = maxevents;
 	}
+
+	fNUISANCEEvent = new FitEvent(fNuWroEvent);
+	fNUISANCEEvent->HardReset();
+	std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 };
 
 // Automatically reprocesses nuwro input flux
@@ -130,13 +134,13 @@ void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {
 }
 
 FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
-
+	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Make sure events setup
 	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fNuWroEvent);
-
+	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
-
+	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Get latest TTree and get entry, loop round in parrallel and grab entries from other TTrees.
 	// Get event corresponding to this TTree and replace pointer in fNuWroEvent with it.
 
@@ -147,6 +151,7 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
 		fNUISANCEEvent->InputWeight = 1.0;
 	}
 
+	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Run NUISANCE Vector Filler
 	CalcNUISANCEKinematics();
 
@@ -400,7 +405,7 @@ int NuWroInputHandler::ConvertNuwroMode (event * e) {
 #endif
 
 void NuWroInputHandler::CalcNUISANCEKinematics() {
-
+	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Reset all variables
 	fNUISANCEEvent->ResetEvent();
 	FitEvent* evt = fNUISANCEEvent;

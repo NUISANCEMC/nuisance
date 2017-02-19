@@ -35,7 +35,7 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
   case     kInitialState: fIsAlive= 0; fNEUTStatusCode=1; break; // Initial State
   case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
   case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
-  default: fIsAlive=-1; fNEUTStatusCode=3; break; // Other?
+  default: fIsAlive=0; fNEUTStatusCode=999; break; // Other?
   }
 
   fMass = fP.Mag();

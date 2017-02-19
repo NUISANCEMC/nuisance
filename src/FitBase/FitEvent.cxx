@@ -26,8 +26,14 @@
 
 void FitEvent::ResetParticleList() {
   for (unsigned int i = 0; i < kMaxParticles; i++) {
-    FitParticle* fp = fParticleList[i];
-    if (fp) delete fp;
+     FitParticle* fp = fParticleList[i];
+     if (fp) delete fp;
+    fParticleList[i] = NULL;
+  }
+}
+
+void FitEvent::HardReset(){
+  for (unsigned int i = 0; i < kMaxParticles; i++) {
     fParticleList[i] = NULL;
   }
 }
@@ -49,6 +55,7 @@ void FitEvent::ResetEvent() {
 
   for (unsigned int i = 0; i < kMaxParticles; i++) {
     FitParticle* fp = fParticleList[i];
+    // std::cout << "Fit Particle = " << fp << std::endl;
     if (fp) delete fp;
     fParticleList[i] = NULL;
 

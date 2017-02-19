@@ -1251,6 +1251,8 @@ void Measurement1D::Write(std::string drawOpt) {
   if (fEventType == 4 or fEventType == 3) {
     return;
   }
+  AutoWriteExtraTH1();
+  WriteExtraHistograms();
 
   // Draw Extra plots
   if (drawFine) this->GetFineList().at(0)->Write();

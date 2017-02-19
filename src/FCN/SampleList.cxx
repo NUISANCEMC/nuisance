@@ -253,7 +253,7 @@ MeasurementBase* CreateSample(nuiskey samplekey){
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {
     return (
-        new MiniBooNE_CCQE_XSec_1DQ2_antinu(name, file, rw, type, fkdt));
+        new MiniBooNE_CCQE_XSec_1DQ2_antinu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CCQE_XSec_2DTcos_nu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_2DTcos_nu")) {

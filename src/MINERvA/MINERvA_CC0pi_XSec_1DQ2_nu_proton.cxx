@@ -98,6 +98,7 @@ bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::isSignal(FitEvent *event){
 
 bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::SortExtraPlots(int state){
 
+/*
   switch(state){
 
   // Reset Histograms at start of event loop
@@ -120,6 +121,6 @@ bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::SortExtraPlots(int state){
     fCoplanarMCHist->Write();
     break;
   }
-
+*/
   return true;
 }

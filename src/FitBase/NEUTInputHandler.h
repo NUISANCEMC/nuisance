@@ -1,6 +1,7 @@
 #ifndef NEUTINPUTHANDLER_H
 #define NEUTINPUTHANDLER_H
 #include "InputHandler2.h"
+#include "TargetUtils.h"
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
 #include "neutvect.h"
