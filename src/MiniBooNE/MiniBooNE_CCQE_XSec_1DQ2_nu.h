@@ -32,23 +32,15 @@ public:
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_nu() {};
 
   void FillEventVariables(FitEvent *event);
-  // void FillHistograms();
-  // void Write(std::string drawOpt);
   bool isSignal(FitEvent *event);
-  // void ScaleEvents();
-  // void ApplyNormScale(double norm);
-  // void ResetAll();
   void FillExtraHistograms(MeasurementVariableBox* vars, double weight = 1.0);
-
-
-  TH1D* fMCHist_CCQELIKE[61]; ///<! Plots in CCQELike mode to tag PDG of the background
-
+  
 private:
   double q2qe; ///<! X_Variable
   bool bad_particle; ///<! Used in CCQELike mode to tag events without nucleons, muons or photons.
   bool ccqelike; ///<! Flag for running in CCQELike mode
   TH1D* fDataHist_CCQELIKE; ///<! CCQELike data contribution
-  TH1D* fMCHist_CCQELIKETOTAL;
+  TrueModeStack* fMCHist_CCQELIKE;
 };
 
 #endif

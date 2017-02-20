@@ -7,6 +7,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	jointinput = false;
 	jointindexswitch = 0;
 
+	// Get initial flags
+	fMaxEvents = FitPar::Config().GetParI("input.fMaxEvents");
+
 	// Form list of all inputs, remove brackets if required.
 	std::vector<std::string> inputs = GeneralUtils::ParseToStr(rawinputs, ",");
 	if (inputs.front()[0] == '(') {
@@ -70,13 +73,25 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	fNeutVect = NULL;
 	fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
 
+	fNUISANCEEvent = new FitEvent(fNeutVect);
+	fNUISANCEEvent->HardReset();
+	std::cout << "Neut Event Address " << fNeutVect << std::endl;
+
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
 		TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
 
+		// Determine nallowed
+		int nallowed = jointindexhigh[i] - jointindexlow[i];
+		if (fMaxEvents != -1) {
+			nallowed = int( double(nallowed) *
+			                (double(fMaxEvents) / double(fNEvents)) );
+		}
+
+		// Set scale, undoing other scale factor.
 		double scale = double(fNEvents) / fEventHist->Integral("width");
 		scale *= eventhist->Integral("width");
-		scale /= double(jointindexhigh[i] - jointindexlow[i]);
+		scale /= double(jointindexallowed[i]);
 
 		jointindexscale .push_back(scale);
 	}
@@ -87,23 +102,19 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	// Setup extra flags
 	save_extra = FitPar::Config().GetParB("save_extra_neut_info");
 
-	int maxevents = FitPar::Config().GetParI("input.maxevents");
-	if (maxevents > 1 && maxevents < fNEvents) {
-		LOG(SAM) << " -> Reading only " << maxevents << " events from total."
+	if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
+		LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
 		         << std::endl;
-		fNEvents = maxevents;
+		fNEvents = fMaxEvents;
 	}
-	fNUISANCEEvent = new FitEvent(fNeutVect);
-	fNUISANCEEvent->HardReset();
-	std::cout << "Neut Event Address " << fNeutVect << std::endl;
+
 };
 
 
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
-// 
-	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
-	// Make sure events setup
-	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fNeutVect);
+
+	// Check for out of range
+	if (entry >= fMaxEvents) return NULL;
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
@@ -119,6 +130,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 	// Run NUISANCE Vector Filler
 	CalcNUISANCEKinematics();
 
+	// Return event pointer
 	return fNUISANCEEvent;
 }
 
@@ -272,9 +284,6 @@ double NEUTInputHandler::GetInputWeight(int entry) {
 
 BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 
-	// Make sure events setup
-	// if (!fBaseEvent) fBaseEvent = new BaseFitEvt(fNeutVect);
-
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
 	fBaseEvent->eventid = entry;
@@ -289,10 +298,36 @@ BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 	return fBaseEvent;
 }
 
+
+FitEvent* NEUTInputHandler::NextNuisanceEvent() {
+	fCurrentIndex++;
+
+
+	if (jointinput and fMaxEvents != -1) {
+		while ( entry < jointindexlow[jointindexswitch] ||
+		        entry >= jointindexhigh[jointindexswitch] ) {
+			jointindexswitch++;
+
+			// Loop Around
+			if (jointindexswitch == jointindexlow.size()) {
+				jointindexswitch = 0;
+			}
+		}
+
+
+		if (fCurrentIndex > jointindexlow[jointindexswitch] + jointindexallowed[jointindexswitch]) {
+			fCurrentIndex = jointindexlow[jointindexswitch];
+		}
+	}
+
+	return GetNuisanceEvent(fCurrentIndex);
+}
+
+
 void NEUTInputHandler::Print() {}
 
 
-void NEUTGeneratorInfo::AddBranchesToTree(TTree* tn) {
+void NEUTGeneratorInfo::AddBranchesToTree(TTree * tn) {
 	tn->Branch("NEUT_ParticleStatusCode",
 	           fNEUT_ParticleStatusCode, "NEUT_ParticleStatusCode[NParticles]/I");
 	tn->Branch("NEUT_ParticleAliveCode",

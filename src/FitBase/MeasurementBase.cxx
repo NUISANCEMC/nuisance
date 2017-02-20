@@ -181,9 +181,9 @@ void MeasurementBase::Reconfigure() {
 
 
   // MAIN EVENT LOOP
-  FitEvent* cust_event = NULL;
-  for (int i = 0; i < fNEvents; i++) {
-    cust_event = fInput->GetNuisanceEvent(i);
+  FitEvent* cust_event = fInput->GetFirstNuisanceEvent();
+  while(cust_event != 0){
+
     cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
     cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
 
@@ -229,6 +229,9 @@ void MeasurementBase::Reconfigure() {
          << std::endl;
       LOG(SAM) << ss.str();
     }
+
+    // iterate
+    cust_event = fInput->GetNextNuisanceEvent();
   }
 
   int npassed = fXVar_VECT.size();
@@ -378,6 +381,8 @@ std::vector<TH1*> MeasurementBase::GetXSecList() {
 void MeasurementBase::ProcessExtraHistograms(int cmd,
     MeasurementVariableBox* vars,
     double weight) {
+  // This should be overriden if we have extra histograms!!!
+  // Add a flag to tell user this...
   return;
 }
 
@@ -400,7 +405,12 @@ void MeasurementBase::WriteExtraHistograms() {
   ProcessExtraHistograms(kCMD_Write, NULL, 1.00);
 }
 
-void MeasurementBase::SetAutoProcessTH1(TH1* hist,  int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcessTH1(TH1D* hist, int c1, int c2, int c3, int c4, int c5) {
+  FakeStack* fake = new FakeStack(hist);
+  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
+}
+
+void MeasurementBase::SetAutoProcessTH1(StackBase* hist,  int c1, int c2, int c3, int c4, int c5) {
 
   // Set Defaults
   // int ncommands = kCMD_extraplotflags;
@@ -440,7 +450,7 @@ void MeasurementBase::SetAutoProcessTH1(TH1* hist,  int c1, int c2, int c3, int 
     case kCMD_Write:
       fExtraTH1s[hist][givenflags[i]] = 1;
       break;
-      
+
     case kCMD_Fill:
       ERR(FTL) << "Can't auto fill yet!" << std::endl;
       autoflags[givenflags[i]] = 1;

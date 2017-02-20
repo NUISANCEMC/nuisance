@@ -130,8 +130,13 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
     }
     PlotUtils::CreateNeutModeArray((TH1D*)this->fDataHist, (TH1**)this->fMCHist_NONCCPIM);
     PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_NONCCPIM);
+
+
+    // Create a new Stack
+
+
   }
-    FinaliseMeasurement();
+  FinaliseMeasurement();
 
 };
 
@@ -262,7 +267,10 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::ProcessExtraHistograms(int cmd, Measuremen
   }
 }
 
-
+MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox(){
+  if (fCCQElike) return new MiniBooNE_CCQELike_Box();
+  else return new MeasurementVariableBox(); // return default
+};
 
 
 

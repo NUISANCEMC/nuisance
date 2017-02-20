@@ -75,21 +75,21 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 
   /// If CCQELike is used the CCQELike BKG is saved.
   if (ccqelike) {
+
+    // Make Data CCQELike BKG
     fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
                          fSettings.GetName() + "_CCQELIKEBKG_data" );
-    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
-
     fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
                                       ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
+    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
-    fMCHist_CCQELIKETOTAL = (TH1D*) fDataHist_CCQELIKE->Clone();
-    fMCHist_CCQELIKETOTAL->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_MC_TOTAL").c_str(),
-                                         ("MiniBooNE #nu_#mu CCQE-Like Backgrounds MC" + fSettings.PlotTitles()).c_str() );
-    SetAutoProcessTH1(fMCHist_CCQELIKETOTAL, kCMD_Reset, kCMD_Scale, kCMD_Norm, kCMD_Write);
+    // Make MC Clone
+    fMCHist_CCQELIKE = new TrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
+                                      "CCQE-like BKG MC" + fSettings.PlotTitles(),
+                                      fDataHist_CCQELIKE);
+    SetAutoProcessTH1(fMCHist_CCQELIKE, kCMD_Reset, kCMD_Scale, kCMD_Norm, kCMD_Write);
 
 
-    PlotUtils::CreateNeutModeArray((TH1D*)this->fDataHist, (TH1**)this->fMCHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
   }
 
   // 4. Final Check for all requirements, necessary to setup all extra plots.
@@ -146,10 +146,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* va
 
   if ((vars->fMode != 1 and vars->fMode != 2) and
       (vars->fSignal)) {
-    PlotUtils::FillNeutModeArray(fMCHist_CCQELIKE, vars->fMode,
-                                 vars->fX, weight);
-
-  fMCHist_CCQELIKETOTAL->Fill(vars->fX, weight);
+    fMCHist_CCQELIKE->Fill(vars->fMode, vars->fX, weight);
   }
 
   return;

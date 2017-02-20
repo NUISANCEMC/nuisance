@@ -26,6 +26,7 @@ public:
 	std::vector<TH1D*> jointeventinputs;
 	std::vector<int> jointindexlow;
 	std::vector<int> jointindexhigh;
+	std::vector<int> jointindexallowed;
 	size_t jointindexswitch;
 	bool jointinput;
 	std::vector<double> jointindexscale;

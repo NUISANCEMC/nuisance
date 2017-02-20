@@ -21,7 +21,8 @@
 #define MINIBOONE_CCQE_XSEC_1DQ2_ANTINU_H_SEEN
 
 #include "Measurement1D.h"
-
+#include "MeasurementBase.h"
+#include "MiniBooNE_Boxes.h"
 //********************************************************************
 class MiniBooNE_CCQE_XSec_1DQ2_antinu : public Measurement1D {
 //********************************************************************
@@ -38,14 +39,16 @@ public:
   // void ScaleEvents();
   // void ApplyNormScale(double norm);
   // void ResetAll();
+  MeasurementVariableBox* CreateBox();
 
-    void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
-                             double weight = 1.0);
+  void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
+                              double weight = 1.0);
+
   TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background
   TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background
   TH1D* fMCHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background
 
- private:
+private:
   bool fCCQElike; ///< Flag for running in CCQELike mode
   bool fUseCorrectedCTarget; ///< Flag for using corrected `C-Target' data.
   TH1D* fDataHist_CCQELIKE; ///< CCQELike data contribution

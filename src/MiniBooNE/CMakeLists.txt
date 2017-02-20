@@ -68,6 +68,7 @@ MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h
 MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h
 MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h
 MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h
+MiniBooNE_Boxes.h
 )
 
 set(LIBNAME expMiniBooNE)

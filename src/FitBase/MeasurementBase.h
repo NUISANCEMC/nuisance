@@ -71,6 +71,7 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 #include "SampleSettings.h"
+#include "StackBase.h"
 
 /// Enumerations to help with extra plot functions
 enum extraplotflags {
@@ -100,22 +101,6 @@ enum MeasurementSpeciesClass {
 
 //! 2nd level experiment class that handles converting MC into a common format
 //! and calling reconfigure
-
-class MeasurementVariableBox {
-public:
-  MeasurementVariableBox() {};
-  ~MeasurementVariableBox() {};
-
-  virtual void Reset() {
-    fX = fY = fZ = -999.9;
-    fMode = fEntry = -999;
-    fSignal = false;
-  }
-
-  double fX, fY, fZ;
-  int fMode, fEntry;
-  bool fSignal;
-};
 
 
 class MeasurementBase {
@@ -170,6 +155,7 @@ public:
   virtual void ResetExtraHistograms();
   virtual void NormExtraHistograms(MeasurementVariableBox* vars, double norm = 1.0);
   virtual void WriteExtraHistograms();
+  virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox();};
 
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
@@ -263,7 +249,13 @@ public:
   inline void SetYVar(double yvar) { fYVar = yvar; };
   inline void SetZVar(double zvar) { fZVar = zvar; };
 
+
+
+
   void SetAutoProcessTH1(TH1* hist,  int c1 = -1,
+                         int c2 = -1, int c3 = -1,
+                         int c4 = -1, int c5 = -1);
+  void SetAutoProcessTH1(StackBase* hist, int c1 = -1,
                          int c2 = -1, int c3 = -1,
                          int c4 = -1, int c5 = -1);
   void AutoFillExtraTH1();
@@ -320,7 +312,7 @@ protected:
 
   MeasurementVariableBox* fEventVariables;
 
-  std::map<TH1*, std::vector<int> > fExtraTH1s;
+  std::map<StackBase*, std::vector<int> > fExtraTH1s;
   // std::map<TH1*, bool[6] > fExtaStacks;
 
 };

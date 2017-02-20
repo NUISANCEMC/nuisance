@@ -75,6 +75,7 @@ SampleSettings.h
 FitEventInputHandler.h
 SplineWeightEngine.h
 SplineInputHandler.h
+MeasurementVariableBox.h
 )
 
 set(LIBNAME FitBase)

@@ -94,15 +94,27 @@ inline double TotalIntegratedFlux(double low, double high,
   std::vector<TH1*> GetEventList(void) { return std::vector<TH1*>(1,fEventHist); };
   std::vector<TH1*> GetXSecList(void) { return std::vector<TH1*>(1,GetXSecHistogram()); };
 
+  virtual FitEvent* FirstNuisanceEvent(){
+    fCurrentIndex = 0;
+    return GetNuisanceEvent(fCurrentIndex);
+  };
+
+  virtual FitEvent* NextNuisanceEvent(){
+    fCurrentIndex++;
+    return GetNuisanceEvent(fCurrentIndex);
+  }
+
 
 	std::string fName;
 	TH1D* fFluxHist;
 	TH1D* fEventHist;
 	TH1D* fXSecHist;
 	int fNEvents;
+  int fMaxEvents;
 	FitEvent* fNUISANCEEvent;
 	BaseFitEvt* fBaseEvent;
 	int fEventType;
+  int fCurrentIndex;
 };
 
 
