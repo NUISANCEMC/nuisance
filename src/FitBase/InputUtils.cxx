@@ -32,7 +32,8 @@ InputType ParseInputType(std::string const &inp) {
   // The hard-coded list of supported input generators
   const static std::string filetypes[] = {"NEUT",  "NUWRO",  "GENIE",
                                           "GiBUU", "NUANCE", "EVSPLN",
-                                          "EMPTY", "FEVENT", "JOINT"};
+                                          "EMPTY", "FEVENT", "JOINT"
+                                         };
 
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
 
@@ -52,8 +53,8 @@ bool IsJointInput(std::string const &inputs) {
   if (isJoint && (inputs[inputs.length() - 1] != ')')) {
     ERR(FTL) << "Inputs specifier: \"" << inputs
              << "\" looks like a composite input specifier -- "
-                "(filea.root,fileb.root), however, it did not end in a \')\', "
-                "it ended in a \'"
+             "(filea.root,fileb.root), however, it did not end in a \')\', "
+             "it ended in a \'"
              << inputs[inputs.length() - 1] << "\'" << std::endl;
     throw;
   }
@@ -68,7 +69,8 @@ std::string ExpandInputDirectories(std::string const &inputs) {
   // Can specify NEUT_DIR = "" and others in parameters/fitter.config.dat
   const static std::string filedir[] = {"NEUT_DIR",   "NUWRO_DIR",
                                         "GENIE_DIR",  "NUANCE_DIR",
-                                        "EVSPLN_DIR", "GIBUU_DIR"};
+                                        "EVSPLN_DIR", "GIBUU_DIR"
+                                       };
   size_t nfiledir = GeneralUtils::GetArraySize(filedir);
   std::string expandedInputs = inputs;
 
@@ -90,22 +92,22 @@ InputType GuessInputTypeFromFile(TFile *inpF) {
     return kInvalid_Input;
   }
   TTree *NEUT_Input =
-      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NEUT_TreeName.c_str()));
+    dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NEUT_TreeName.c_str()));
   if (NEUT_Input) {
     return kNEUT_Input;
   }
   TTree *NUWRO_Input =
-      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NuWro_TreeName.c_str()));
+    dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::NuWro_TreeName.c_str()));
   if (NUWRO_Input) {
     return kNUWRO_Input;
   }
   TTree *GENIE_Input =
-      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GENIE_TreeName.c_str()));
+    dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GENIE_TreeName.c_str()));
   if (GENIE_Input) {
     return kGENIE_Input;
   }
   TTree *GiBUU_Input =
-      dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GiBUU_TreeName.c_str()));
+    dynamic_cast<TTree *>(inpF->Get(GeneratorUtils::GiBUU_TreeName.c_str()));
   if (GiBUU_Input) {
     return kGiBUU_Input;
   }
@@ -130,38 +132,72 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
   delete inpF;
 
   switch (iType) {
-    case kNEUT_Input: {
-      return "NEUT:" + inpFName;
-    }
-    case kNUWRO_Input: {
-      return "NUWRO:" + inpFName;
-    }
-    case kGENIE_Input: {
-      return "GENIE:" + inpFName;
-    }
-    case kGiBUU_Input: {
-      return "GiBUU:" + inpFName;
-    }
-    default: {
-      ERR(FTL) << "Input type from file: " << inpFName << " was invalid."
-               << std::endl;
-      throw;
-    }
+  case kNEUT_Input: {
+    return "NEUT:" + inpFName;
+  }
+  case kNUWRO_Input: {
+    return "NUWRO:" + inpFName;
+  }
+  case kGENIE_Input: {
+    return "GENIE:" + inpFName;
+  }
+  case kGiBUU_Input: {
+    return "GiBUU:" + inpFName;
+  }
+  default: {
+    ERR(FTL) << "Input type from file: " << inpFName << " was invalid."
+             << std::endl;
+    throw;
+  }
   }
 }
 
-InputHandlerBase* CreateInputHandler(std::string const& handle, 
+InputHandlerBase* CreateInputHandler(std::string const& handle,
                                      InputUtils::InputType inpType,
-                                     std::string const& inputs){
-  switch(inpType){
-    case (kNEUT_Input): {return new NEUTInputHandler(handle, inputs);}
-    case (kGENIE_Input): {return new GENIEInputHandler(handle, inputs);}
-    case (kNUWRO_Input): {return new NuWroInputHandler(handle, inputs);}
-    case (kGiBUU_Input): {return new GIBUUInputHandler(handle, inputs);}
-    default:
-    return NULL;
+                                     std::string const& inputs) {
+
+  InputHandlerBase* input = NULL;
+
+  switch (inpType) {
+
+
+  case (kNEUT_Input):
+#ifdef __NEUT_ENABLED__
+    input = new NEUTInputHandler(handle, inputs);
+    break;
+#endif
+
+
+  case (kGENIE_Input):
+#ifdef __GENIE_ENABLED__
+    input = new GENIEInputHandler(handle, inputs);
+    break;
+#endif
+
+
+  case (kNUWRO_Input):
+#ifdef __NUWRO_ENABLED__
+    input = new NuWroInputHandler(handle, inputs);
+    break;
+#endif
+
+
+  case (kGiBUU_Input):
+#ifdef __GIBUU_ENABLED__
+    input = new GIBUUInputHandler(handle, inputs);
+    break;
+#endif
+
+  default:
+    break;
   }
 
-  return NULL;
+  /// Input failed
+  if (!input) {
+    ERR(FTL) << "Input handler creation failed!" << std::endl;
+  }
+
+
+  return input;
 };
 }

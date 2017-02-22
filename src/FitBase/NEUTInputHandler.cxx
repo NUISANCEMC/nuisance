@@ -1,4 +1,19 @@
+#ifdef __NEUT_ENABLED__
 #include "NEUTInputHandler.h"
+
+void NEUTGeneratorInfo::AddBranchesToTree(TTree * tn) {
+	tn->Branch("NEUT_ParticleStatusCode",
+	           fNEUT_ParticleStatusCode, "NEUT_ParticleStatusCode[NParticles]/I");
+	tn->Branch("NEUT_ParticleAliveCode",
+	           fNEUT_ParticleStatusCode, "NEUT_ParticleAliveCode[NParticles]/I");
+}
+
+void NEUTGeneratorInfo::Reset() {
+	for (size_t i = 0; i < kMaxParticles; i++) {
+		fNEUT_ParticleStatusCode[i] = -1;
+		fNEUT_ParticleAliveCode[i]  = 9;
+	}
+}
 
 NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const& rawinputs) {
 
@@ -62,9 +77,6 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
 		else fEventHist->Add(eventhist);
 
-		// Remove file
-		//inp_file->Close();
-		//delete inp_file;
 	}
 
 	// Setup NEvents and the FitEvent
@@ -75,7 +87,6 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 
 	fNUISANCEEvent = new FitEvent(fNeutVect);
 	fNUISANCEEvent->HardReset();
-	std::cout << "Neut Event Address " << fNeutVect << std::endl;
 
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -87,6 +98,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 			nallowed = int( double(nallowed) *
 			                (double(fMaxEvents) / double(fNEvents)) );
 		}
+		jointindexallowed.push_back(nallowed);
 
 		// Set scale, undoing other scale factor.
 		double scale = double(fNEvents) / fEventHist->Integral("width");
@@ -100,8 +112,13 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
 
 	// Setup extra flags
-	save_extra = FitPar::Config().GetParB("save_extra_neut_info");
+	fSaveExtra = FitPar::Config().GetParB("save_extra_neut_info");
+	if (fSaveExtra) {
+		fNeutInfo = new NEUTGeneratorInfo();
+		fNUISANCEEvent->fGenInfo = fNeutInfo;
+	}
 
+	// Setup Max Events
 	if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
 		LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
 		         << std::endl;
@@ -113,8 +130,8 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
-	// Check for out of range
-	if (entry >= fMaxEvents) return NULL;
+	// Catch too large entries
+	if (entry >= fNEvents) return NULL;
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
@@ -178,10 +195,10 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
 }
 
 void NEUTInputHandler::CalcNUISANCEKinematics() {
-	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
+
 	// Reset all variables
 	fNUISANCEEvent->ResetEvent();
-	// std::cout << "Neut Event Address " << fNeutVect << std::endl;
+
 	// Fill Globals
 	fNUISANCEEvent->fMode    = fNeutVect->Mode;
 	fNUISANCEEvent->Mode     = fNeutVect->Mode;
@@ -205,17 +222,6 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 		ERR(FTL) << "NEUT has too many particles" << std::endl;
 		ERR(FTL) << "npart=" << npart << " kMax=" << kmax << std::endl;
 		throw;
-	}
-
-	// Initialise Extra NEUT Information in NUISANCE Event
-	if (save_extra) {
-
-		// Make sure FitEvent has extra info class
-		// if (!fNUISANCEEvent->fGenInfo) {
-		// 	fNUISANCEEvent->fGenInfo = new NEUTGeneratorInfo();
-		// 	this->fExtraGenInfo = fNUISANCEEvent->fGenInfo;
-		// }
-
 	}
 
 	// Fill Particle Stack
@@ -251,10 +257,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 		fNUISANCEEvent->fParticlePDG[curpart] = part->fPID;
 
 		// Extra
-		// if (save_extra) {
-		// 	fExtraGenInfo->fNEUT_ParticleStatusCode[curpart] = part->fStatus;
-		// 	fExtraGenInfo->fNEUT_ParticleAliveCode[curpart] = part->fIsAlive;
-		// }
+		if (fSaveExtra) {
+		 	fNeutInfo->fNEUT_ParticleStatusCode[curpart] = part->fStatus;
+		 	fNeutInfo->fNEUT_ParticleAliveCode[curpart] = part->fIsAlive;
+		}
 
 		// Add up particle count
 		fNUISANCEEvent->fNParticles++;
@@ -266,7 +272,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 }
 
 
-double NEUTInputHandler::GetInputWeight(int entry) {
+double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 
 	// Find Switch Scale
 	while ( entry < jointindexlow[jointindexswitch] ||
@@ -297,40 +303,4 @@ BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	return fBaseEvent;
 }
-
-
-FitEvent* NEUTInputHandler::NextNuisanceEvent() {
-	fCurrentIndex++;
-
-
-	if (jointinput and fMaxEvents != -1) {
-		while ( entry < jointindexlow[jointindexswitch] ||
-		        entry >= jointindexhigh[jointindexswitch] ) {
-			jointindexswitch++;
-
-			// Loop Around
-			if (jointindexswitch == jointindexlow.size()) {
-				jointindexswitch = 0;
-			}
-		}
-
-
-		if (fCurrentIndex > jointindexlow[jointindexswitch] + jointindexallowed[jointindexswitch]) {
-			fCurrentIndex = jointindexlow[jointindexswitch];
-		}
-	}
-
-	return GetNuisanceEvent(fCurrentIndex);
-}
-
-
-void NEUTInputHandler::Print() {}
-
-
-void NEUTGeneratorInfo::AddBranchesToTree(TTree * tn) {
-	tn->Branch("NEUT_ParticleStatusCode",
-	           fNEUT_ParticleStatusCode, "NEUT_ParticleStatusCode[NParticles]/I");
-	tn->Branch("NEUT_ParticleAliveCode",
-	           fNEUT_ParticleStatusCode, "NEUT_ParticleAliveCode[NParticles]/I");
-}
-
+#endif

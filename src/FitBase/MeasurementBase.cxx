@@ -40,7 +40,7 @@ MeasurementBase::MeasurementBase(void) {
 
   std::cout << "Calling MeasurememntBase Constructor!" << std::endl;
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
-  fEventVariables = new MeasurementVariableBox();
+  fEventVariables = NULL;
 
 };
 
@@ -181,8 +181,10 @@ void MeasurementBase::Reconfigure() {
 
 
   // MAIN EVENT LOOP
-  FitEvent* cust_event = fInput->GetFirstNuisanceEvent();
-  while(cust_event != 0){
+  FitEvent* cust_event = fInput->FirstNuisanceEvent();
+  int i = 0;
+  int npassed = 0;
+  while(cust_event){
 
     cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
     cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
@@ -199,21 +201,19 @@ void MeasurementBase::Reconfigure() {
     // Extract Measurement Variables
     this->FillEventVariables(cust_event);
     Signal = this->isSignal(cust_event);
+    if (Signal) npassed++;
 
-    fEventVariables->fX = fXVar;
-    fEventVariables->fY = fXVar;
-    fEventVariables->fZ = fXVar;
-    fEventVariables->fMode = Mode;
-    fEventVariables->fSignal = Signal;
+    GetBox()->fX = fXVar;
+    GetBox()->fY = fYVar;
+    GetBox()->fZ = fZVar;
+    GetBox()->fMode = Mode;
+    GetBox()->fSignal = Signal;
 
     // Fill Histogram Values
-    this->FillExtraHistograms(fEventVariables, Weight);
-    this->FillHistogramsFromBox(fEventVariables, Weight);
-
-
-    // this->FillHistograms();
-    // this->ProcessExtraHistograms(kCMD_FillHistograms, []);
-    // this->FillExtraHistograms();
+    GetBox()->FillBoxFromEvent(cust_event);
+    
+    this->FillExtraHistograms(GetBox(), Weight);
+    this->FillHistogramsFromBox(GetBox(), Weight);
 
     // Print Out
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)) {
@@ -231,10 +231,10 @@ void MeasurementBase::Reconfigure() {
     }
 
     // iterate
-    cust_event = fInput->GetNextNuisanceEvent();
+    cust_event = fInput->NextNuisanceEvent();
+    i++;
   }
 
-  int npassed = fXVar_VECT.size();
   LOG(SAM) << npassed << "/" << fNEvents << " passed selection " << std::endl;
   if (npassed == 0) {
     LOG(SAM) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
@@ -247,11 +247,11 @@ void MeasurementBase::Reconfigure() {
 
 void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double weight) {
 
-  fXVar  = fEventVariables->fX;
-  fYVar  = fEventVariables->fY;
-  fZVar  = fEventVariables->fZ;
-  Signal = fEventVariables->fSignal;
-  Mode   = fEventVariables->fMode;
+  fXVar  = var->fX;
+  fYVar  = var->fY;
+  fZVar  = var->fZ;
+  Signal = var->fSignal;
+  Mode   = var->fMode;
   Weight = weight;
 
   FillHistograms();
@@ -260,20 +260,21 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double 
 
 void MeasurementBase::FillVariableBox(FitEvent* event) {
 
-  fEventVariables->Reset();
+  GetBox()->Reset();
 
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
 
-  fEventVariables->fX = fXVar;
-  fEventVariables->fY = fXVar;
-  fEventVariables->fZ = fXVar;
-  fEventVariables->fMode = Mode;
-  fEventVariables->fSignal = Signal;
+  GetBox()->fX = fXVar;
+  GetBox()->fY = fXVar;
+  GetBox()->fZ = fXVar;
+  GetBox()->fMode = Mode;
+  GetBox()->fSignal = Signal;
 
 }
 
-MeasurementVariableBox* MeasurementBase::GetVariableBox() {
+MeasurementVariableBox* MeasurementBase::GetBox() {
+  if (!fEventVariables) fEventVariables = CreateBox();
   return fEventVariables;
 }
 
@@ -288,12 +289,12 @@ void MeasurementBase::ConvertEventRates() {
   //***********************************************
 
   AutoScaleExtraTH1();
-  ScaleExtraHistograms(fEventVariables);
+  ScaleExtraHistograms(GetBox());
   this->ScaleEvents();
 
   double norm = FitBase::GetRW()->GetSampleNorm(this->fName);
   AutoNormExtraTH1(norm);
-  NormExtraHistograms(fEventVariables, norm);
+  NormExtraHistograms(GetBox(), norm);
   this->ApplyNormScale(norm);
 
 }
@@ -405,7 +406,7 @@ void MeasurementBase::WriteExtraHistograms() {
   ProcessExtraHistograms(kCMD_Write, NULL, 1.00);
 }
 
-void MeasurementBase::SetAutoProcessTH1(TH1D* hist, int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcessTH1(TH1* hist, int c1, int c2, int c3, int c4, int c5) {
   FakeStack* fake = new FakeStack(hist);
   SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
 }
@@ -461,7 +462,7 @@ void MeasurementBase::SetAutoProcessTH1(StackBase* hist,  int c1, int c2, int c3
     }
   }
 
-  LOG(SAM) << "AutoProcessing " << hist->GetName() << std::endl;
+  // LOG(SAM) << "AutoProcessing " << hist->GetName() << std::endl;
 };
 
 void MeasurementBase::AutoFillExtraTH1() {
@@ -471,7 +472,7 @@ void MeasurementBase::AutoFillExtraTH1() {
 
 void MeasurementBase::AutoResetExtraTH1() {
 
-  for (std::map<TH1*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
 
     if (!((*iter).second)[kCMD_Reset]) continue;
@@ -480,7 +481,7 @@ void MeasurementBase::AutoResetExtraTH1() {
 };
 
 void MeasurementBase::AutoScaleExtraTH1() {
-  for (std::map<TH1*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
 
     if (!((*iter).second)[kCMD_Scale]) continue;
@@ -492,7 +493,7 @@ void MeasurementBase::AutoNormExtraTH1(double norm) {
   double sfactor = 0.0;
   if (norm != 0.0) sfactor = 1.0 / norm;
 
-  for (std::map<TH1*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
 
     if (!((*iter).second)[kCMD_Norm]) continue;
@@ -501,7 +502,7 @@ void MeasurementBase::AutoNormExtraTH1(double norm) {
 };
 
 void MeasurementBase::AutoWriteExtraTH1() {
-  for (std::map<TH1*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
 
     if (!(((*iter).second)[kCMD_Write])) continue;

@@ -72,6 +72,7 @@
 #include "NuisKey.h"
 #include "SampleSettings.h"
 #include "StackBase.h"
+#include "StandardStacks.h"
 
 /// Enumerations to help with extra plot functions
 enum extraplotflags {
@@ -200,7 +201,7 @@ public:
 
   virtual void FillVariableBox(FitEvent* event);
 
-  virtual MeasurementVariableBox* GetVariableBox();
+  virtual MeasurementVariableBox* GetBox();
 
   void FillHistogramsFromBox(MeasurementVariableBox* var, double weight);
   /*

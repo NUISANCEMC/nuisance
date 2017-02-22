@@ -1,5 +1,6 @@
 #ifndef MEASUREMENTVARIABLEBOX_H
 #define MEASUREMENTVARIABLEBOX_H
+#include "FitEvent.h"
 
 class MeasurementVariableBox {
 public:
@@ -10,6 +11,10 @@ public:
     fX = fY = fZ = -999.9;
     fMode = fEntry = -999;
     fSignal = false;
+  }
+
+  virtual void FillBoxFromEvent(FitEvent* evt){
+    return;
   }
 
   double fX, fY, fZ;

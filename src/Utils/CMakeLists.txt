@@ -28,6 +28,8 @@ NuisConfig.h
 NuisKey.h
 BeamUtils.h
 TargetUtils.h
+StackBase.h
+StandardStacks.h
 )
 
 set(IMPLFILES
@@ -43,6 +45,8 @@ NuisConfig.cxx
 NuisKey.cxx
 BeamUtils.cxx
 TargetUtils.cxx
+StackBase.cxx
+StandardStacks.cxx
 )
 
 set(LIBNAME Utils)

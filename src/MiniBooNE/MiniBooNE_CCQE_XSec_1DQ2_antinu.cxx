@@ -109,8 +109,12 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
 
     fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(),
                                       ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
-    PlotUtils::CreateNeutModeArray((TH1D*)this->fDataHist, (TH1**)this->fMCHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCQELIKE);
+
+    fMCHist_CCQELIKE = new NuNuBarTrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
+        "CCQE-like BKG MC" + fSettings.PlotTitles(),
+        fDataHist_CCQELIKE );
+    SetAutoProcessTH1(fMCHist_CCQELIKE, kCMD_Reset, kCMD_Scale, kCMD_Norm, kCMD_Write);
+
 
     // CCPIM
     fDataHist_CCPIM = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccpimbkg_input"),
@@ -182,95 +186,32 @@ bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent * event) {
 };
 
 
-void MiniBooNE_CCQE_XSec_1DQ2_antinu::ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars, double weight) {
+void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillExtraHistograms(MeasurementVariableBox* vars, double weight) {
 
   // No Extra Hists if not ccqelike
   if (!fCCQElike) return;
 
-  // Call commands
-  switch (cmd) {
-  // Fill Command --------------------------------------------------
-  case kCMD_Fill:
+  // Use MiniBooNE box
+  MiniBooNE_CCQELike_Box* mbbox = static_cast<MiniBooNE_CCQELike_Box*>(vars);
 
-    if ((vars->fMode != 1 and vars->fMode != 2) and
-        (vars->fSignal)) {
+  if ((vars->fMode != 1 and vars->fMode != 2) and
+      (vars->fSignal)) {
 
-      if (fabs(vars->fMode) == 11 or fabs(vars->fMode == 13)) {
-        PlotUtils::FillNeutModeArray(fMCHist_CCPIM, vars->fMode,
-                                     vars->fX, weight);
+    if (fabs(vars->fMode) == 11 or fabs(vars->fMode == 13)) {
+      PlotUtils::FillNeutModeArray(fMCHist_CCPIM, vars->fMode,
+                                   vars->fX, weight);
 
-      } else {
-        PlotUtils::FillNeutModeArray(fMCHist_NONCCPIM, vars->fMode,
-                                     vars->fX, weight);
-      }
-
-      PlotUtils::FillNeutModeArray(fMCHist_CCQELIKE, vars->fMode,
+    } else {
+      PlotUtils::FillNeutModeArray(fMCHist_NONCCPIM, vars->fMode,
                                    vars->fX, weight);
     }
 
-
-
-    break;
-
-  // Reset Command --------------------------------------------------
-  case kCMD_Reset:
-    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCQELIKE);
-    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_CCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)fMCHist_NONCCPIM);
-    break;
-
-  // Scale Command --------------------------------------------------
-  case kCMD_Scale:
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, fScaleFactor, "width");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, fScaleFactor, "width");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, fScaleFactor, "width");
-    break;
-
-  // Apply norm scale --------------------------------------------------
-  case kCMD_Norm: {
-    double norm = weight;
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCQELIKE, 1.0 / norm, "");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_CCPIM, 1.0 / norm, "");
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_NONCCPIM, 1.0 / norm, "");
-    break;
-  }
-
-  // Write extra histograms
-  case kCMD_Write: {
-
-    // Write Stack
-    THStack combo_fMCHist_CCQELIKE = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCQELIKE").c_str(),
-                                     (TH1**)this->fMCHist_CCQELIKE, 0);
-    combo_fMCHist_CCQELIKE.Write();
-
-    // Write BKG Data
-    fDataHist_CCPIM->Write();
-
-    // Write Stack
-    THStack combo_fMCHist_CCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_CCPIM").c_str(),
-                                  (TH1**)this->fMCHist_CCPIM, 0);
-    combo_fMCHist_CCPIM.Write();
-
-    // Write BKG Data
-    fDataHist_NONCCPIM->Write();
-
-    // Write Stack
-    THStack combo_fMCHist_NONCCPIM = PlotUtils::GetNeutModeStack((this->fName + "_MC_NONCCPIM").c_str(),
-                                     (TH1**)this->fMCHist_NONCCPIM, 0);
-    combo_fMCHist_NONCCPIM.Write();
-
-    break;
-  }
-
-  default:
-    break;
+    fMCHist_CCQELIKE->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
   }
 }
 
-MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox(){
-  if (fCCQElike) return new MiniBooNE_CCQELike_Box();
-  else return new MeasurementVariableBox(); // return default
-};
-
-
+ MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox() {
+  if (fCCQElike){ return new MiniBooNE_CCQELike_Box(); }
+  else { return new MeasurementVariableBox(); }
+ };
 

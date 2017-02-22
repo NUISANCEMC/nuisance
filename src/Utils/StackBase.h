@@ -2,85 +2,55 @@
 #define STACK_BASE_H
 
 #include "MeasurementVariableBox.h"
+#include "FitLogger.h"
+#include "GeneralUtils.h"
+#include "TH1.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "THStack.h"
+#include "TH2.h"
+#include "TH3.h"
 
 class StackBase {
 public:
 	StackBase() {};
 	~StackBase() {};
 
-	virtual void AddMode(std::string name, std::string title, 
-						int linecolor=1, int linewidth=1, int fillstyle=1001) {
-
-		// int ncur = fAllLabels.size();
-		fAllLabels.push_back(name);
-		fAllTitles.push_back(title);
-		fAllStyles.push_back(std::vector<int>(1, linecolor));
-	}
-
-
+	virtual void AddMode(std::string name, std::string title,
+	                     int linecolor = 1, int linewidth = 1, int fillstyle = 1001);
+	virtual void AddMode(int index, std::string name, std::string title,
+	                     int linecolor = 1, int linewidth = 1, int fillstyle = 1001);
+	
 	virtual bool IncludeInStack(TH1* hist) {return true;};
 	virtual bool IncludeInStack(int index) {return true;};
 
-	virtual void SetupStack(TH1* hist) {
-		fTemplate = (TH1*) hist->Clone(fName.c_str());
-		fTemplate->Reset();
+	virtual void SetupStack(TH1* hist);
+	virtual void Scale(double sf, std::string opt = "");
+	virtual void Reset();
+	virtual void FillStack(int index, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+	virtual void Write();
 
-		// Determine template dim
-		fNDim = fTemplate->GetDimension();
+	virtual void Add(StackBase* hist, double scale);
+	virtual void Add(TH1* hist, double scale);
+	
+	virtual void AddNewHist(std::string name, TH1* hist);
+	virtual void AddToCategory(std::string name, TH1* hist);
+	virtual void AddToCategory(int index, TH1* hist);
 
-		for (size_t i = 0; i < fAllLabels.size(); i++) {
-			fAllHists.push_back( (TH1*) fTemplate->Clone( fAllLabels[i].c_str() ) );
-		}
-	};
+	virtual void Divide(TH1* hist);
+	virtual void Multiply(TH1* hist);
+	virtual TH1* GetHist(int entry);
+	virtual TH1* GetHist(std::string label);
+	virtual THStack GetStack();
 
-	virtual void Scale(double sf, std::string opt=""){
-		for (size_t i = 0; i < fAllLabels.size(); i++) {
-			fAllHists[i]->Scale(sf, opt.c_str());
-		}
-	};
-
-	virtual void Reset(){
-		for (size_t i = 0; i < fAllLabels.size(); i++) {
-			fAllHists[i]->Reset();
-		}
-	};
-
-	virtual void FillStack(int index, double x, double y = 1.0, double z = 1.0, double weight = 1.0) {
-		if (fNDim == 1)      fAllHists[index]->Fill(x, y);
-		else if (fNDim == 2) ((TH2*)fAllHists[index])->Fill(x, y, z);
-		else if (fNDim == 3) ((TH3*)fAllHists[index])->Fill(x, y, z, weight);
-	}
-
-	// Should add GetStack Function
-	// Should add Scale Function
-
-	virtual void Write() {
-		THStack* st = new THStack();
-
-		// Loop and add all histograms
-		for (size_t i = 0; i < fAllLabels.size(); i++) {
-
-			if (!IncludeInStack(fAllHists[i])) continue;
-			if (!IncludeInStack(i)) continue;
-
-			fAllHists[i]->SetTitle( fAllTitles[i].c_str() );
-			fAllHists[i]->GetXaxis()->SetTitle( fXTitle.c_str() );
-			fAllHists[i]->GetYaxis()->SetTitle( fYTitle.c_str() );
-			fAllHists[i]->GetZaxis()->SetTitle( fZTitle.c_str() );
-			fAllHists[i]->SetLineColor( fAllStyles[i][0] );
-			st->Add(fAllHists[i]);
-		}
-		st->SetTitle(fTitle.c_str());
-		st->SetName(fName.c_str());
-		st->Write();
-		delete st;
-	};
+	std::string GetType(){return fType;};
 
 	std::string fName;
 	std::string fTitle;
 	std::string fXTitle;
 	std::string fYTitle;
 	std::string fZTitle;
+	std::string fType;
 
 	TH1* fTemplate;
 	int fNDim;
@@ -92,37 +62,6 @@ public:
 	std::vector<TH1*> fAllHists;
 };
 
-
-
-class TrueModeStack : public StackBase {
-public:
-
-	// Individual constructor.
-	TrueModeStack(std::string name, std::string title, TH1* hist){
-		fName = name;
-		fTitle = title;
-
-		AddMode("CCQE", "CCQE", kBlue, 2, 3004);
-		AddMode("2p2h", "2p2h", kRed, 2, 3004 );
-		AddMode("RES", "RES",   kGreen, 2, 3004 );
-
-		StackBase::SetupStack(hist);
-	};
-
-	void Fill(int mode, double x, double y = 1.0, double z = 1.0, double weight = 1.0) {
-		StackBase::FillStack(ConvertModeToIndex(mode), x, y, z, weight);
-	};
-
-	// Should be kept in sync with constructor.
-	int ConvertModeToIndex(int mode) {
-		switch (abs(mode)) {
-		case 1:  return 0; // CCQE
-		case 2:  return 1; // 2p2h
-		case 16: return 2; // RES
-		default: return -1;
-		}
-	};
-};
 
 /*
 class NuSpeciesStack : public StackBase {
@@ -174,43 +113,6 @@ public:
 }
 
 */
-
-// Setup pointer to template, and have reset,write,etc functions act on that.
-class FakeStack : public StackBase {
-public:
-	FakeStack(TH1D* hist) {
-		fTemplate =  (TH1*)hist;
-		fNDim = fTemplate->GetDimension();
-	}
-
-	FakeStack(TH2D* hist) {
-		fTemplate = (TH1*)hist;
-		fNDim = fTemplate->GetDimension();
-	}
-
-	~FakeStack() {
-		fTemplate = NULL;
-		fNDim = 0;
-	}
-
-	void Fill(double x, double y = 1.0, double z = 1.0, double weight = 1.0) {
-		if (fNDim == 1)      fTemplate->Fill(x, y);
-		else if (fNDim == 2) ((TH2*)fTemplate)->Fill(x, y, z);
-		else if (fNDim == 3) ((TH3*)fTemplate)->Fill(x, y, z, weight);
-	}
-	
-	void Scale(double norm, std::string opt){
-		fTemplate->Scale(norm, opt.c_str());
-	}
-	
-	void Reset(){
-		fTemplate->Reset();
-	}
-	
-	void Write(){
-		fTemplate->Write();
-	}
-};
 
 
 #endif

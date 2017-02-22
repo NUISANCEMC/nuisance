@@ -41,12 +41,12 @@ public:
   // void ResetAll();
   MeasurementVariableBox* CreateBox();
 
-  void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
+  void FillExtraHistograms(MeasurementVariableBox* vars,
                               double weight = 1.0);
 
   TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background
   TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background
-  TH1D* fMCHist_CCQELIKE[61]; ///< Plots in CCQELike mode to tag PDG of the background
+  NuNuBarTrueModeStack* fMCHist_CCQELIKE; ///< Plots in CCQELike mode to tag PDG of the background
 
 private:
   bool fCCQElike; ///< Flag for running in CCQELike mode

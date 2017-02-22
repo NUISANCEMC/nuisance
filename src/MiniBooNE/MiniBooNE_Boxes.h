@@ -15,7 +15,7 @@ public:
 
 	void FillBoxFromEvent(FitEvent* event) {
 
-
+		fPDGnu = event->PDGnu();
 		fNProtons = event->NumFSParticle(2212);
 		fNNeutrons = event->NumFSParticle(2112);
 		fTargetTest = event->fTargetPDG;
@@ -38,6 +38,7 @@ public:
 	int fNIntermediatePions;
 	std::vector<double> fFSPionMom;
 	int fTargetTest;
+	int fPDGnu;
 
 };
 

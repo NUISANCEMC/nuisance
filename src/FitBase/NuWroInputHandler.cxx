@@ -1,4 +1,11 @@
+#ifdef __NUWRO_ENABLED__
 #include "NuWroInputHandler.h"
+
+void NuWroGeneratorInfo::AddBranchesToTree(TTree * tn) {
+}
+
+void NuWroGeneratorInfo::Reset() {
+}
 
 NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string const& rawinputs) {
 
@@ -6,6 +13,7 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fName = handle;
 	jointinput = false;
 	jointindexswitch = 0;
+	fMaxEvents = FitPar::Config().GetParI("input.fMaxEvents");
 
 	// Form list of all inputs, remove brackets if required.
 	std::vector<std::string> inputs = GeneralUtils::ParseToStr(rawinputs, ",");
@@ -22,14 +30,6 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	// Setup the TChain
 	fNuWroTree = new TChain("treeout");
 
-	// Add option for multi core loading.
-	fMultiCore_NCores = FitPar::Config().GetParI("cores");
-	fNuWroTree_MultiCore = new TChain[fMultiCore_NCores];
-	fNuWroEvent_MultiCore = new event[fMultiCore_NCores];
-	for (int i = 0; i < fMultiCore_NCores ; i++){
-		// fNuWroTree_MultiCore[i] = TChain("treeout");
-	}
-
 	// Loop over all inputs and grab flux, eventhist, and nevents
 	// Also add it to the TChain
 	int evtcounter = 0;
@@ -38,10 +38,6 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 
 		// Add to TChain
 		fNuWroTree->Add( inputs[inp_it].c_str() );
-
-		for (int i = 0; i < fMultiCore_NCores ; i++){
-			fNuWroTree_MultiCore[i].Add( inputs[inp_it].c_str() );
-		}	
 
 		// Open File for histogram access
 		TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
@@ -83,10 +79,6 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 
 		if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
 		else fEventHist->Add(eventhist);
-
-		// Remove file
-		//inp_file->Close();
-		//delete inp_file;
 	}
 
 	// Setup NEvents and the FitEvent
@@ -95,18 +87,25 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fNuWroEvent = NULL;
 	fNuWroTree->SetBranchAddress("e", &fNuWroEvent);
 
-	for (int i = 0; i < fMultiCore_NCores ; i++){
-		// fNuWroEvent_MultiCore[i] = NULL;
-		// fNuWroTree_MultiCore[i].SetBranchAddress("e", &(&fNuWroEvent_MultiCore[i]);
-	}
+	fNUISANCEEvent = new FitEvent(fNuWroEvent);
+	fNUISANCEEvent->HardReset();
 
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
 		TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
 
+		// Determine nallowed
+		int nallowed = jointindexhigh[i] - jointindexlow[i];
+		if (fMaxEvents != -1) {
+			nallowed = int( double(nallowed) *
+			                (double(fMaxEvents) / double(fNEvents)) );
+		}
+		jointindexallowed.push_back(nallowed);
+
+		// Set scale, undoing other scale factor.
 		double scale = double(fNEvents) / fEventHist->Integral("width");
 		scale *= eventhist->Integral("width");
-		scale /= double(jointindexhigh[i] - jointindexlow[i]);
+		scale /= double(jointindexallowed[i]);
 
 		jointindexscale .push_back(scale);
 	}
@@ -114,33 +113,36 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
 
-	// Setup Extra Flags
-	int maxevents = FitPar::Config().GetParI("input.maxevents");
-	if (maxevents > 1 && maxevents < fNEvents) {
-		LOG(SAM) << " -> Reading only " << maxevents << " events from total."
-		         << std::endl;
-		fNEvents = maxevents;
+	// Setup extra flags
+	save_extra = FitPar::Config().GetParB("save_extra_nuwro_info");
+	if (save_extra) {
+		fNuWroInfo = new NuWroGeneratorInfo();
+		fNUISANCEEvent->fGenInfo = fNuWroInfo;
 	}
 
-	fNUISANCEEvent = new FitEvent(fNuWroEvent);
-	fNUISANCEEvent->HardReset();
-	std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
+	// Setup Max Events
+	if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
+		LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
+		         << std::endl;
+		fNEvents = fMaxEvents;
+	}
+
+
 };
 
-// Automatically reprocesses nuwro input flux
 void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {
 
 
 }
 
 FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
-	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
-	// Make sure events setup
-	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fNuWroEvent);
-	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
+
+	// Catch too large entries
+	if (entry >= fNEvents) return NULL;
+
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
-	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
+
 	// Get latest TTree and get entry, loop round in parrallel and grab entries from other TTrees.
 	// Get event corresponding to this TTree and replace pointer in fNuWroEvent with it.
 
@@ -151,7 +153,6 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
 		fNUISANCEEvent->InputWeight = 1.0;
 	}
 
-	// std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
 	// Run NUISANCE Vector Filler
 	CalcNUISANCEKinematics();
 
@@ -438,13 +439,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 	}
 
 	// Setup Infomation for extra stuff
-	// Example given for NEUT Particles
 	// if (fSaveExtraInfo){
-	// if (!fNUISANCEEvent->fNEUT_ParticleStatusCode)
-	// 	fNUISANCEEvent->fNEUT_ParticleStatusCode = new double[kmax];
-
-	// if (!fNUISANCEEvent->fNEUT_ParticleStatusCode)
-	// 	fNUISANCEEvent->fNEUT_ParticleStatusCode = new double[kmax];
 	// }
 
 	// Sort Particles
@@ -452,7 +447,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 	std::vector<particle>::iterator p_iter;
 
 	// Initial State
-	for (p_iter = fNuWroEvent->in.begin(); p_iter!= fNuWroEvent->in.end(); p_iter++) {
+	for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end(); p_iter++) {
 		AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState);
 	}
 
@@ -515,8 +510,8 @@ double NuWroInputHandler::GetInputWeight(int entry) {
 
 BaseFitEvt* NuWroInputHandler::GetBaseEvent(const UInt_t entry) {
 
-	// Make sure events setup
-	// if (!fBaseEvent) fBaseEvent = new BaseFitEvt(fNeutVect);
+	// Catch too large entries
+	if (entry >= fNEvents) return NULL;
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
@@ -531,6 +526,5 @@ BaseFitEvt* NuWroInputHandler::GetBaseEvent(const UInt_t entry) {
 	return fBaseEvent;
 }
 
-void NuWroInputHandler::Print() {}
-
+#endif
 
