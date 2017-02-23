@@ -37,7 +37,7 @@ public:
 	std::string GetDataInput();
 	std::string PlotTitles();
 	std::string GetS(std::string name);
-
+	std::string GetCovarInput();
 
 	std::vector<int> fAllowedTargets;
 	std::vector<int> fAllowedSpecies;

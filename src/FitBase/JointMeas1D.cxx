@@ -76,7 +76,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   // For joint samples, input files are given as a semi-colon seperated list.
   // Parse this list and save it for later, and set up the types etc.
 
-  if (FitPar::Config().GetParB("EventManager")){
+  if (FitPar::Config().GetParB("EventManager")) {
     ERR(FTL) << "Event Manager does not yet work with JointMeas1D Samples" << std::endl;
     ERR(FTL) << "If you want good predictions for " << fName << " then run with it turned off! (-q EventManager=0)" << std::endl;
     sleep(2);
@@ -88,13 +88,13 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
 
   if (entries.size() < 2) {
     ERR(FTL) << "Joint measurement expected to recieve at least two semi-colon "
-                "separated input files, but recieved: \""
+             "separated input files, but recieved: \""
              << input << "\"" << std::endl;
     throw;
   }
 
   std::vector<std::string> first_file_descriptor =
-      GeneralUtils::ParseToStr(entries.front(), ":");
+    GeneralUtils::ParseToStr(entries.front(), ":");
 
   if (first_file_descriptor.size() != 2) {
     ERR(FTL) << "Found Joint measurement where the input file had no type: \""
@@ -139,7 +139,7 @@ double JointMeas1D::TotalIntegratedFlux(std::string intOpt, double low,
 
   // Destroy the job for sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
     double expflux = exp->TotalIntegratedFlux(intOpt, low, high);
@@ -172,20 +172,25 @@ void JointMeas1D::Reconfigure() {
   // need to loop over each sample explicitly and cast it to an InputHandler
   // before calling ReconfigureAllEvents.
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
     exp->Reconfigure();
   }
 
+ConvertEventRates();
+  return;
+}
+
+void JointMeas1D::ConvertEventRates(){
   // Joint function called by top level class
   MakePlots();
 
   // Do Final Normalisation
   ApplyNormScale(fRW->GetSampleNorm(this->fName));
 
-  return;
 }
+
 
 //********************************************************************
 void JointMeas1D::ReconfigureFast() {
@@ -197,17 +202,13 @@ void JointMeas1D::ReconfigureFast() {
   // need to loop over each sample explicitly and cast it to an InputHandler
   // before calling ReconfigureAllEvents.
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
     exp->ReconfigureFast();
   }
 
-  // Joint function called by top level class
-  MakePlots();
-
-  // Do Final Normalisation
-  ApplyNormScale(fRW->GetSampleNorm(this->fName));
+ConvertEventRates();
 
   return;
 }
@@ -222,7 +223,7 @@ void JointMeas1D::MakePlots() {
   // If Summed
   if (fIsSummed) {
     for (std::vector<MeasurementBase*>::const_iterator expIter =
-             fSubChain.begin();
+           fSubChain.begin();
          expIter != fSubChain.end(); expIter++) {
       MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
 
@@ -237,7 +238,7 @@ void JointMeas1D::MakePlots() {
   if (fIsRatio) {
     int sample = 0;
     for (std::vector<MeasurementBase*>::const_iterator expIter =
-             fSubChain.begin();
+           fSubChain.begin();
          expIter != fSubChain.end(); expIter++) {
       MeasurementBase* exp = *expIter;
 
@@ -274,7 +275,7 @@ std::vector<TH1*> JointMeas1D::GetMCList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -298,7 +299,7 @@ std::vector<TH1*> JointMeas1D::GetDataList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -322,7 +323,7 @@ std::vector<TH1*> JointMeas1D::GetFineList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -346,7 +347,7 @@ std::vector<TH1*> JointMeas1D::GetMaskList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -370,7 +371,7 @@ std::vector<TH1*> JointMeas1D::GetFluxList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -394,7 +395,7 @@ std::vector<TH1*> JointMeas1D::GetEventRateList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -418,7 +419,7 @@ std::vector<TH1*> JointMeas1D::GetXSecList() {
 
   // Return vector from all sub samples
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -440,7 +441,7 @@ TH1D* JointMeas1D::GetCombinedFlux() {
   int sample = 0;
 
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -471,7 +472,7 @@ TH1D* JointMeas1D::GetCombinedEventRate() {
   int sample = 0;
 
   for (std::vector<MeasurementBase*>::const_iterator expIter =
-           fSubChain.begin();
+         fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {
     MeasurementBase* exp = *expIter;
 
@@ -507,7 +508,7 @@ void JointMeas1D::Write(std::string drawOpt) {
 
   if (fSaveSubMeas) {
     for (std::vector<MeasurementBase*>::const_iterator expIter =
-             fSubChain.begin();
+           fSubChain.begin();
          expIter != fSubChain.end(); expIter++) {
       MeasurementBase* exp = *expIter;
       exp->Write(drawOpt);
@@ -516,3 +517,17 @@ void JointMeas1D::Write(std::string drawOpt) {
 
   return;
 };
+
+//********************************************************************
+std::vector<MeasurementBase*> JointMeas1D::GetSubSamples() {
+//********************************************************************
+
+  std::vector<MeasurementBase*> exps;
+  for (std::vector<MeasurementBase*>::const_iterator expIter =
+         fSubChain.begin();
+       expIter != fSubChain.end(); expIter++) {
+    exps.push_back(*expIter);
+  }
+
+  return exps;
+}

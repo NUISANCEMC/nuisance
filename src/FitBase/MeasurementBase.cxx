@@ -89,7 +89,8 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
 
   // Add this infile to the global manager
   if (FitPar::Config().GetParB("EventManager")) {
-    //fInput = FitBase::AddInput(fName, inputfile);
+    fInput = FitBase::AddInput(fName, inputfile);
+    std::cout << "Pushing Back fInput as " << fInput << std::endl;
   } else {
     std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(inputfile, ":");
@@ -101,7 +102,6 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     InputUtils::InputType inpType =
       InputUtils::ParseInputType(file_descriptor[0]);
 
-//    fInput = new InputHandler(fName, inpType, file_descriptor[1]);
     fInput = InputUtils::CreateInputHandler(fName, inpType, file_descriptor[1]);
   }
 
@@ -211,8 +211,7 @@ void MeasurementBase::Reconfigure() {
 
     // Fill Histogram Values
     GetBox()->FillBoxFromEvent(cust_event);
-    
-    this->FillExtraHistograms(GetBox(), Weight);
+    // this->FillExtraHistograms(GetBox(), Weight);
     this->FillHistogramsFromBox(GetBox(), Weight);
 
     // Print Out
@@ -255,22 +254,25 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double 
   Weight = weight;
 
   FillHistograms();
+  FillExtraHistograms(var, weight);
 
 }
 
-void MeasurementBase::FillVariableBox(FitEvent* event) {
+MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
 
   GetBox()->Reset();
 
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
+  GetBox()->FillBoxFromEvent(event);
 
   GetBox()->fX = fXVar;
   GetBox()->fY = fXVar;
   GetBox()->fZ = fXVar;
-  GetBox()->fMode = Mode;
+  GetBox()->fMode = event->Mode;
   GetBox()->fSignal = Signal;
 
+  return GetBox();
 }
 
 MeasurementVariableBox* MeasurementBase::GetBox() {

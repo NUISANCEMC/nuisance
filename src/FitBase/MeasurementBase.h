@@ -199,7 +199,7 @@ public:
   ///! Save Histograms
   virtual void Write(std::string drawOpt = "") = 0;
 
-  virtual void FillVariableBox(FitEvent* event);
+  virtual MeasurementVariableBox* FillVariableBox(FitEvent* event);
 
   virtual MeasurementVariableBox* GetBox();
 
@@ -250,7 +250,9 @@ public:
   inline void SetYVar(double yvar) { fYVar = yvar; };
   inline void SetZVar(double zvar) { fZVar = zvar; };
 
-
+  virtual std::vector<MeasurementBase*> GetSubSamples(){
+    return std::vector<MeasurementBase*>(1, this);
+  }
 
 
   void SetAutoProcessTH1(TH1* hist,  int c1 = -1,
@@ -264,6 +266,14 @@ public:
   void AutoScaleExtraTH1();
   void AutoNormExtraTH1(double norm);
   void AutoWriteExtraTH1();
+
+
+  // functions that need to be added.
+  // - Initial Check
+  // - Check Target/Beam loop.
+  // - Check flux shape if suggested one given.
+  // - Return MeasurementList (returns )
+
 
 protected:
   // Minimum and maximum energies

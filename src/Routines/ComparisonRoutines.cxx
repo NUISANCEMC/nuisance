@@ -605,6 +605,12 @@ void ComparisonRoutines::GenerateComparison() {
 
   // Main Event Loop from event Manager
   bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  fSampleFCN->ReconfigureAllEvents();
+  return;
+
+}
+/*
+
 
   if (using_evtmanager and false) {
     LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
@@ -670,7 +676,7 @@ void ComparisonRoutines::GenerateComparison() {
   } else {
     fSampleFCN->ReconfigureAllEvents();
   }
-}
+}*/
 
 //*************************************
 void ComparisonRoutines::PrintState() {

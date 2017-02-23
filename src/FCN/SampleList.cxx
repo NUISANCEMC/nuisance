@@ -324,7 +324,7 @@ MeasurementBase* CreateSample(nuiskey samplekey){
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1Dppi0_nu")) {
     return (
-        new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(file, rw, type, fkdt));
+        new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(samplekey));
 
     /*
       MiniBooNE NCEL

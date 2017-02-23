@@ -122,6 +122,10 @@ class JointMeas1D : public Measurement1D {
   /// reconfigure has been called
   virtual void MakePlots();
 
+
+  virtual std::vector<MeasurementBase*> GetSubSamples();
+  virtual void ConvertEventRates();
+  
   /*
     Access Functions
   */

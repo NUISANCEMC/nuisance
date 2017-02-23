@@ -10,6 +10,7 @@
 #include "THStack.h"
 #include "TH2.h"
 #include "TH3.h"
+#include "FitParameters.h"
 
 class StackBase {
 public:
@@ -21,9 +22,9 @@ public:
 	virtual void AddMode(int index, std::string name, std::string title,
 	                     int linecolor = 1, int linewidth = 1, int fillstyle = 1001);
 	
-	virtual bool IncludeInStack(TH1* hist) {return true;};
-	virtual bool IncludeInStack(int index) {return true;};
-
+	virtual bool IncludeInStack(TH1* hist);
+	virtual bool IncludeInStack(int index);
+	
 	virtual void SetupStack(TH1* hist);
 	virtual void Scale(double sf, std::string opt = "");
 	virtual void Reset();

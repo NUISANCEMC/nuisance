@@ -23,7 +23,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	jointindexswitch = 0;
 
 	// Get initial flags
-	fMaxEvents = FitPar::Config().GetParI("input.fMaxEvents");
+	fMaxEvents = FitPar::Config().GetParI("input.maxevents");
 
 	// Form list of all inputs, remove brackets if required.
 	std::vector<std::string> inputs = GeneralUtils::ParseToStr(rawinputs, ",");
@@ -34,11 +34,13 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
 	}
 	for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
-		LOG(SAM) << "\t -> Found input file: " << inputs[inp_it] << std::endl;
+		LOG(SAM) << "  -> Found input file: " << inputs[inp_it] << std::endl;
 	}
 
 	// Setup the TChain
 	fNEUTTree = new TChain("neuttree");
+
+	// Need to keep a map of flux histograms for PDG. And allow measurements to redfine flux.
 
 	// Loop over all inputs and grab flux, eventhist, and nevents
 	// Also add it to the TChain
@@ -99,6 +101,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 			                (double(fMaxEvents) / double(fNEvents)) );
 		}
 		jointindexallowed.push_back(nallowed);
+
+		LOG(SAM) << " -> Reading " << nallowed
+		         << " events from " << inputs[i] << std::endl;
 
 		// Set scale, undoing other scale factor.
 		double scale = double(fNEvents) / fEventHist->Integral("width");
@@ -258,8 +263,8 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
 		// Extra
 		if (fSaveExtra) {
-		 	fNeutInfo->fNEUT_ParticleStatusCode[curpart] = part->fStatus;
-		 	fNeutInfo->fNEUT_ParticleAliveCode[curpart] = part->fIsAlive;
+			fNeutInfo->fNEUT_ParticleStatusCode[curpart] = part->fStatus;
+			fNeutInfo->fNEUT_ParticleAliveCode[curpart] = part->fIsAlive;
 		}
 
 		// Add up particle count

@@ -63,7 +63,7 @@
 class Measurement1D : public MeasurementBase {
   //********************************************************************
 
- public:
+public:
   /*
     Constructor/Deconstuctor
   */
@@ -136,7 +136,7 @@ class Measurement1D : public MeasurementBase {
 
 
   virtual void FinaliseSampleSettings();
-  virtual void FinaliseMeasurement(); 
+  virtual void FinaliseMeasurement();
 
   //! Reset histograms to zero
   virtual void ResetAll(void);
@@ -208,8 +208,9 @@ class Measurement1D : public MeasurementBase {
   //! array of histograms to handle fMCHist for each interaction channel.
   // TODO (P.Stowell) Figure out why I put mcHist as unprotected! :S
   TH1D* fMCHist_PDG[61];
+  TrueModeStack* fMCHist_Modes;
 
- protected:
+protected:
   // data histograms
   TH1D* fDataHist;  //!< default data histogram
   TH1D* fDataOrig;  //!< histogram to store original data before throws.
@@ -217,14 +218,14 @@ class Measurement1D : public MeasurementBase {
 
   // Fake Data Flag
   bool
-      fIsFakeData;  //!< Flag: whether the current data is actually fake from MC
+  fIsFakeData;  //!< Flag: whether the current data is actually fake from MC
   std::string fakeDataFile;  //!< Input fake data file
 
   // The histogram into which the measurement will be filled
   TH1D* fMCHist;  //!< default MC Histogram used in the chi2 fits
   TH1D* fMCFine;  //!< finely binned MC histogram
   TH1D* fMCStat;  //!< histogram with unweighted events to properly calculate
-                  //! statistical error on MC
+  //! statistical error on MC
   TH1D* fMCWeighted;  //!< Weighted histogram before xsec scaling
 
   TH1I* fMaskHist;  //!< Mask histogram for neglecting specific bins
@@ -237,7 +238,7 @@ class Measurement1D : public MeasurementBase {
   TMatrixDSym* fDecomp;     //!< Decomposed Covariance
   TMatrixDSym* fCorrel;     //!< Correlation Matrix
   TMatrixD* fSmearMatrix;   //!< Smearing matrix (note, this is not symmetric,
-                            //! and also in general not square)
+  //! and also in general not square)
   double fCovDet;           //!< Determinant of the covariance
   double fNormError;        //!< Sample norm error
   std::string fFitType;

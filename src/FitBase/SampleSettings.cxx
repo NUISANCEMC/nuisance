@@ -25,6 +25,10 @@ void SampleSettings::SetYTitle(std::string name){
 	SetDefault("ytitle",name);
 };
 
+std::string SampleSettings::GetCovarInput(){
+	return GetS("covar");
+}
+
 void SampleSettings::SetAllowedTypes(std::string allowed, std::string defaulttype){
 	SetDefault("default_types",allowed);
 	SetDefault("allowed_types",defaulttype);

@@ -32,6 +32,7 @@
 
 #include "NuisConfig.h"
 #include "NuisKey.h"
+#include "MeasurementVariableBox.h"
 
 using namespace FitUtils;
 using namespace FitBase;
@@ -116,6 +117,10 @@ class JointFCN
   //! Reconfigure Fast looping over duplicate inputs
   void ReconfigureFastUsingManager();
   
+
+std::vector<MeasurementBase*> GetSubSampleList(); 
+std::vector<InputHandlerBase*> GetInputList();
+
  private: 
 
   //! Append the experiments to include in the fit to this list
@@ -142,6 +147,21 @@ class JointFCN
 
   bool fUsingEventManager; //!< Flag for doing joint comparisons
   
+  std::vector< std::vector<MeasurementVariableBox*> > fSignalEventBoxes;
+  std::vector< bool > fSignalEventFlags;
+  std::vector< std::vector<bool> > fSampleSignalFlags;
+
+  std::vector<InputHandlerBase*> fInputList;
+  std::vector<MeasurementBase*> fSubSampleList;
+
+  // iterator should go:
+  // Iterate over fSignalList
+  // If true get entry, and get 'next' in fSampleSignalList and fSampleSignalBoxes
+  // - Iterate over entry in fSampleSignalList
+  // - If true get 'next' in element in fSampleSignalBoxes.
+  // - - Fill input from MeasurementVariableBox*
+
+
 };
 
 /*! @} */

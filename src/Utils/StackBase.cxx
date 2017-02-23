@@ -7,7 +7,13 @@ void StackBase::AddMode(std::string name, std::string title,
 	// int ncur = fAllLabels.size();
 	fAllLabels.push_back(name);
 	fAllTitles.push_back(title);
-	fAllStyles.push_back(std::vector<int>(1, linecolor));
+
+	std::vector<int> temp;
+	temp.push_back(linecolor);
+	temp.push_back(linewidth);
+	temp.push_back(fillstyle);
+
+	fAllStyles.push_back(temp);
 }
 
 void StackBase::AddMode(int index, std::string name, std::string title,
@@ -21,9 +27,24 @@ void StackBase::AddMode(int index, std::string name, std::string title,
 
 	fAllLabels[index] = (name);
 	fAllTitles[index] = (title);
-	fAllStyles[index] = (std::vector<int>(1, linecolor));
+
+	std::vector<int> temp;
+	temp.push_back(linecolor);
+	temp.push_back(linewidth);
+	temp.push_back(fillstyle);
+
+	fAllStyles[index] = temp;
 }
 
+bool StackBase::IncludeInStack(TH1* hist){
+	if (!FitPar::Config().GetParB("includeemptystackhists") and
+		hist->Integral() == 0.0) return false;
+	return true;
+}
+
+bool StackBase::IncludeInStack(int index){
+	return true;
+}
 
 void StackBase::SetupStack(TH1* hist) {
 	fTemplate = (TH1*) hist->Clone(fName.c_str());
@@ -71,6 +92,9 @@ void StackBase::Write() {
 		fAllHists[i]->GetYaxis()->SetTitle( fYTitle.c_str() );
 		fAllHists[i]->GetZaxis()->SetTitle( fZTitle.c_str() );
 		fAllHists[i]->SetLineColor( fAllStyles[i][0] );
+		fAllHists[i]->SetLineWidth( fAllStyles[i][1] );
+		fAllHists[i]->SetFillStyle( fAllStyles[i][2] );
+		fAllHists[i]->SetFillColor( fAllStyles[i][0] );
 		st->Add(fAllHists[i]);
 	}
 	st->SetTitle(fTitle.c_str());

@@ -282,10 +282,11 @@ int BeamSpeciesStack::ConvertSpeciesToIndex(int species) {
 	case -14: return 9; // numubar
 	case 16: return 10; // nutau
 	case -16: return 11; //nutaubar
+	default: return 12;
 	}
 };
 
-void BeamSpeciesStack::FillStack(int species, double x, double y, double z, double weight) {
+void BeamSpeciesStack::Fill(int species, double x, double y, double z, double weight) {
 	StackBase::FillStack(ConvertSpeciesToIndex(species), x, y, z, weight);
 }
 
@@ -304,7 +305,7 @@ TargetTypeStack::TargetTypeStack(std::string name, std::string title, TH1* hist)
 	StackBase::SetupStack(hist);
 }
 
-void TargetTypeStack::FillStack(int pdg, double x, double y, double z, double weight){
+void TargetTypeStack::Fill(int pdg, double x, double y, double z, double weight){
 	int index = ConvertPDGToIndex(pdg);
 	StackBase::FillStack(index, x, y, z, weight);
 }
@@ -342,7 +343,7 @@ CCTopologyStack::CCTopologyStack(std::string name, std::string title, TH1* hist)
 
 }
 
-void CCTopologyStack::FillStack(FitEvent* evt, double x, double y, double z, double weight) {
+void CCTopologyStack::Fill(FitEvent* evt, double x, double y, double z, double weight) {
 	int index = GetIndexFromEventParticles(evt);
 	StackBase::FillStack(index, x, y, z, weight);
 }

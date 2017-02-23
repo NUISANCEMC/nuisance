@@ -75,7 +75,7 @@ public:
 	BeamSpeciesStack(std::string name, std::string title, TH1* hist);
 
 	/// Fills stack using neutrino species
-	void FillStack(int species, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+	void Fill(int species, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
 
 	/// List converts PDG Beam to index. 
 	/// Should be kept in sync with constructor.
@@ -91,7 +91,7 @@ public:
 	TargetTypeStack(std::string name, std::string title, TH1* hist);
 
 	/// Fills stack using target pdg 
-	void FillStack(int pdg, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+	void Fill(int pdg, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
 
 	/// List converts PDG Beam to index. 
 	/// Should be kept in sync with constructor.
@@ -111,7 +111,7 @@ public:
 	CCTopologyStack(std::string name, std::string title, TH1* hist);
 
 	/// Fills stack using FitEvent
-	void FillStack(FitEvent* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+	void Fill(FitEvent* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
 
 	/// Extracts index from evt particle counts
 	int GetIndexFromEventParticles(FitEvent* evt);

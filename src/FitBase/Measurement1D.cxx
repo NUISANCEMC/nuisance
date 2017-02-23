@@ -23,7 +23,7 @@
    Constructor/destructor Functions
 */
 
-// void Measurement1D::SetupConfig(nuiskey){
+// void Measurement1D::DeConfig(nuiskey){
 //   // Get name/rename
 //   // Get input file
 //   // Get Types.
@@ -70,6 +70,7 @@ Measurement1D::Measurement1D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fInput = NULL;
 
   NSignal = 0;
 }
@@ -139,6 +140,13 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
                                      FitWeight* rw, std::string fkdt) {
   //********************************************************************
 
+
+  //nuiskey samplekey = Config::CreateKey("sample");
+//  samplekey.AddS("name", fName);
+//  samplekey.AddS("type",type);
+//  samplekey.AddS("input",inputfile);
+//  fSettings = LoadSampleSettings(samplekey);
+
   // Reset everything to NULL
   Init();
 
@@ -174,7 +182,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
 
   fRW = rw;
 
-  // SetupInputs(inputfile);
+  if (!fInput) SetupInputs(inputfile);
 
   // Set Default Options
   SetFitOptions(fDefaultTypes);
@@ -186,6 +194,8 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   //  // Set Enu Flux Scaling
   //  if (isFlatFluxFolding) this->Input()->ApplyFluxFolding(
   //  this->defaultFluxHist );
+
+  // FinaliseMeasurement();
 }
 
 //********************************************************************
@@ -222,6 +232,9 @@ void Measurement1D::SetupDefaultHist() {
 
     SetBinMask(maskloc);
   }
+
+  fMCHist_Modes = new TrueModeStack( (fName + "_MODES").c_str(), ("True Channels"), fMCHist);
+  SetAutoProcessTH1(fMCHist_Modes);
 
   return;
 }
@@ -748,7 +761,7 @@ void Measurement1D::FillHistograms() {
     fMCStat->Fill(fXVar, 1.0);
     NSignal++;
 
-    PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, fXVar, Weight);
+    fMCHist_Modes->Fill(Mode, fXVar, Weight);
   }
 
   return;

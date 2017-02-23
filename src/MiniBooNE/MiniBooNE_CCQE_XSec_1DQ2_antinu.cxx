@@ -18,15 +18,9 @@
 *******************************************************************************/
 
 #include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
-
 #include <csignal>
 
-//********************************************************************
-/// @brief MiniBooNE CCQE antinumu 1DQ2 Measurement on CH2 (Ref: - )
-///
-//********************************************************************
 MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplekey) {
-  //********************************************************************
 
   // Sample overview
   std::string descrip = "MiniBooNE CCQE/CC0pi sample. \n" \
@@ -57,6 +51,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
   }
 
   if (fCCQElike) {
+
     // CCQELike plot information
     fSettings.SetTitle("MiniBooNE #nu_#mu CCQE on CH");
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_like.txt" );
@@ -66,6 +61,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
     fSettings.SetHasExtraHistograms(true);
     fSettings.DefineAllowedSpecies("numu,numub");
     fSettings.DefineAllowedTargets("C,H");
+
   } else if (!fUseCorrectedCTarget) {
     // CCQE Plot Information
     fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi on CH");
@@ -73,13 +69,15 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
     fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_diagcovar" );
     fSettings.DefineAllowedSpecies("numu");
     fSettings.DefineAllowedTargets("C,H");
+
   } else {
+
     // CCQE Corrected Target Plot Information
     fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi on C");
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_con_ctarget.txt" );
     fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_diagcovar" );
     fSettings.DefineAllowedSpecies("numu");
-    fSettings.DefineAllowedTargets("C,H");
+    fSettings.DefineAllowedTargets("C");
   }
 
   FinaliseSampleSettings();
@@ -92,7 +90,6 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
                   NNucPerNTarg / TotalIntegratedFlux());
 
   // 3. Plot Setup -------------------------------------------------------
-  std::cout << "Loading Data" << std::endl;
   fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
   fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
 
@@ -100,54 +97,51 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
   ///
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG
   /// Histogram is saved
-  std::cout << "Loading CCQELike" << std::endl;
   if (fCCQElike) {
-    // CCQELike
-    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
-                         fSettings.GetName() + "_data" );
-    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
+    // CCQELike Data
+    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
+                         fSettings.GetName() + "_CCQELIKE_data" );
     fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(),
                                       ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
+    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
-    fMCHist_CCQELIKE = new NuNuBarTrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
-        "CCQE-like BKG MC" + fSettings.PlotTitles(),
+    // CCQELike MC
+    fMCHist_CCQELIKE = new NuNuBarTrueModeStack( fSettings.Name() + "_CCQELIKE_MC",
+        "CCQE-like MC" + fSettings.PlotTitles(),
         fDataHist_CCQELIKE );
-    SetAutoProcessTH1(fMCHist_CCQELIKE, kCMD_Reset, kCMD_Scale, kCMD_Norm, kCMD_Write);
+    SetAutoProcessTH1(fMCHist_CCQELIKE);
 
 
-    // CCPIM
+    // Data CCRES
     fDataHist_CCPIM = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccpimbkg_input"),
-                      fSettings.GetName() + "_data" );
-    fDataHist_CCPIM->SetNameTitle( (fSettings.Name() + "_CCPIM_BKG").c_str(),
+                      fSettings.GetName() + "_CCPIM_BKG_data" );
+    fDataHist_CCPIM->SetNameTitle( (fSettings.Name() + "_CCPIM_data").c_str(),
                                    ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
-    PlotUtils::CreateNeutModeArray((TH1D*)this->fDataHist, (TH1**)this->fMCHist_CCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_CCPIM);
+    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
+
+    // MC CCRES
+    fMCHist_CCPIM = new NuNuBarTrueModeStack(fSettings.Name() + "_CCPIM_BKG_MC", "CCQE-like BKG CC-RES" + fSettings.PlotTitles(), fDataHist_CCPIM);
+    SetAutoProcessTH1(fMCHist_CCPIM);
 
     // Make NON CCPIM
     fDataHist_NONCCPIM = (TH1D *)fDataHist_CCQELIKE->Clone();
     fDataHist_NONCCPIM->SetNameTitle((fName + "_data_NONCCPIM").c_str(),
                                      (fName + "_data_NONCCPIM").c_str());
-    for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-      fDataHist_NONCCPIM->SetBinContent(i + 1, fDataHist_CCQELIKE->GetBinContent(i + 1)
-                                        - fDataHist_CCPIM->GetBinContent(i + 1));
-    }
-    PlotUtils::CreateNeutModeArray((TH1D*)this->fDataHist, (TH1**)this->fMCHist_NONCCPIM);
-    PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_NONCCPIM);
+    fDataHist_NONCCPIM->Add( fDataHist_CCPIM, -1.0 );
+    SetAutoProcessTH1(fDataHist_NONCCPIM, kCMD_Write);
 
-
-    // Create a new Stack
-
-
+    fMCHist_NONCCPIM = new NuNuBarTrueModeStack(
+      fSettings.Name() + "_NONCCPIM_BKG",
+      "CCQE-like BKG CC-NonRES" + fSettings.PlotTitles(),
+      fDataHist_NONCCPIM);
+    SetAutoProcessTH1(fMCHist_NONCCPIM);
   }
-  FinaliseMeasurement();
 
+  FinaliseMeasurement();
 };
 
-//********************************************************************
-/// @details Extract q2qe(fXVar) from the event
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent * event) {
-  //********************************************************************
 
   if (event->NumFSParticle(PhysConst::pdg_muons) == 0) return;
 
@@ -164,18 +158,12 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent * event) {
   return;
 };
 
-//********************************************************************
 bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent * event) {
-  //********************************************************************
 
   // If CC0pi, include both charges
   if (fCCQElike) {
     if (SignalDef::isCC0pi(event, 14, EnuMin, EnuMax) ||
         SignalDef::isCC0pi(event, -14, EnuMin, EnuMax)) {
-      // P. Stowell Removed this bad check for only pdg=14 types
-      //      if(event->GetNeutrinoIn()->fPID == -14){
-      //        return false;
-      //      }
       return true;
     }
   } else {
@@ -189,29 +177,25 @@ bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent * event) {
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillExtraHistograms(MeasurementVariableBox* vars, double weight) {
 
   // No Extra Hists if not ccqelike
-  if (!fCCQElike) return;
+  if (!fCCQElike or !vars->fSignal) return;
 
-  // Use MiniBooNE box
+  // Use alternative MiniBooNE box
   MiniBooNE_CCQELike_Box* mbbox = static_cast<MiniBooNE_CCQELike_Box*>(vars);
 
-  if ((vars->fMode != 1 and vars->fMode != 2) and
-      (vars->fSignal)) {
-
-    if (fabs(vars->fMode) == 11 or fabs(vars->fMode == 13)) {
-      PlotUtils::FillNeutModeArray(fMCHist_CCPIM, vars->fMode,
-                                   vars->fX, weight);
-
+  // Fill Stacks
+  if (vars->fMode != -1 and vars->fMode != -2) {
+    if (fabs(vars->fMode) == 11 or fabs(vars->fMode) == 12 or fabs(vars->fMode == 13)) {
+      fMCHist_CCPIM->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
     } else {
-      PlotUtils::FillNeutModeArray(fMCHist_NONCCPIM, vars->fMode,
-                                   vars->fX, weight);
+      fMCHist_NONCCPIM->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
     }
-
-    fMCHist_CCQELIKE->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
   }
+
+  fMCHist_CCQELIKE->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
 }
 
- MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox() {
-  if (fCCQElike){ return new MiniBooNE_CCQELike_Box(); }
+MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox() {
+  if (fCCQElike) { return new MiniBooNE_CCQELike_Box(); }
   else { return new MeasurementVariableBox(); }
- };
+};
 

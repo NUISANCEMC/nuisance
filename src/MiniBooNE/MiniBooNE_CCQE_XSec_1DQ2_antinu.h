@@ -23,30 +23,31 @@
 #include "Measurement1D.h"
 #include "MeasurementBase.h"
 #include "MiniBooNE_Boxes.h"
-//********************************************************************
+
+/// MiniBooNE antinu CCQE sample class : arXiv:1002:2680
 class MiniBooNE_CCQE_XSec_1DQ2_antinu : public Measurement1D {
-//********************************************************************
 
 public:
 
+  /// Default constructor. Setup from the following name keys
+  /// MiniBooNE_CCQE_XSec_1DQ2_antinu \n
+  /// MiniBooNE_CCQELike_XSec_1DQ2_antinu \n
+  /// MiniBooNE_CCQE_XSec_1DQ2_antinu_CTarg 
   MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_antinu() {};
 
+  /// Main fill event variables: X = Q2_QE
   void FillEventVariables(FitEvent *event);
-  // void Write(std::string drawOpt);
-  // void FillHistograms();
+
+  /// Signal definition: antinumu CCQE+2p2h or numu/antinumu CC0pi
   bool isSignal(FitEvent *event);
-  // void ScaleEvents();
-  // void ApplyNormScale(double norm);
-  // void ResetAll();
+
+  /// Uses MiniBooNE_CCQELike_Box instead.
   MeasurementVariableBox* CreateBox();
 
+  /// Fills extra PDG Histograms
   void FillExtraHistograms(MeasurementVariableBox* vars,
                               double weight = 1.0);
-
-  TH1D* fMCHist_NONCCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM background
-  TH1D* fMCHist_CCPIM[61]; ///< Plots in CCQELike mode to tag PDG of the CCPIM background
-  NuNuBarTrueModeStack* fMCHist_CCQELIKE; ///< Plots in CCQELike mode to tag PDG of the background
 
 private:
   bool fCCQElike; ///< Flag for running in CCQELike mode
@@ -54,6 +55,11 @@ private:
   TH1D* fDataHist_CCQELIKE; ///< CCQELike data contribution
   TH1D* fDataHist_CCPIM; ///< CCPIM data contribution
   TH1D* fDataHist_NONCCPIM; ///< NONCCPIM data contribution
+
+  NuNuBarTrueModeStack* fMCHist_NONCCPIM; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM 
+  NuNuBarTrueModeStack* fMCHist_CCPIM; ///< Plots in CCQELike mode to tag PDG of the CCPIM 
+  NuNuBarTrueModeStack* fMCHist_CCQELIKE; ///< Plots in CCQELike mode to tag PDG numu/numubar modes
+
 };
 
 #endif
