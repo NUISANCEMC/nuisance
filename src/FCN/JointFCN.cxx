@@ -491,10 +491,10 @@ std::vector<InputHandlerBase*> JointFCN::GetInputList() {
     for (size_t i = 0; i < subsamples.size(); i++) {
 
       InputHandlerBase* inp = subsamples[i]->GetInput();
-       if (std::find(InputList.begin(), InputList.end(), inp) ==  InputList.end()) {
-      InputList.push_back(subsamples[i]->GetInput());
+      if (std::find(InputList.begin(), InputList.end(), inp) ==  InputList.end()) {
+        InputList.push_back(subsamples[i]->GetInput());
 
-       }
+      }
     }
   }
 
@@ -544,6 +544,7 @@ void JointFCN::ReconfigureUsingManager() {
   // - Call ScaleEvents, etc.
 
   LOG(SAM) << "Reconfuguringusingeventmanager" << std::endl;
+  int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -554,7 +555,6 @@ void JointFCN::ReconfigureUsingManager() {
 
   // Check saving variables flag
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
-  savesignal = true;
   if (savesignal) {
 
     // Reset all of our event signal vectors
@@ -565,12 +565,10 @@ void JointFCN::ReconfigureUsingManager() {
   }
 
   // Check out list of inputs
-  // if (fInputList.empty()) {
-  fInputList = GetInputList();
-  fSubSampleList = GetSubSampleList();
-  // }
-  LOG(SAM) << "InputList size = " << fInputList.size() << std::endl;
-
+  if (fInputList.empty()) {
+    fInputList = GetInputList();
+    fSubSampleList = GetSubSampleList();
+  }
 
   int fillcount = 0;
   // Loop over all inputs
@@ -582,7 +580,7 @@ void JointFCN::ReconfigureUsingManager() {
     FitEvent* curevent = curinput->FirstNuisanceEvent();
     int i = 0;
     int nevents = curinput->GetNEvents();
-    int countwidth = nevents / 20;
+    int countwidth = nevents / 5;
 
     // Start event loop
     while (curevent) {
@@ -635,10 +633,10 @@ void JointFCN::ReconfigureUsingManager() {
         bool signal = curmeas->isSignal(curevent);
 
         // Get the event box after fill event variable
-          // std::cout << "Filling Meas Full = " << curmeas << std::endl;
+        // std::cout << "Filling Meas Full = " << curmeas << std::endl;
 
         curmeas->FillHistogramsFromBox(box, rwweight);
-        if (signal){
+        if (signal) {
           fillcount++;
         }
 
@@ -682,119 +680,19 @@ void JointFCN::ReconfigureUsingManager() {
     MeasurementBase* exp = (*iterSam);
     exp->ConvertEventRates();
   }
-  std::cout << "Full fillcount = " << fillcount << std::endl;
 
-  Write();
-  ReconfigureFastUsingManager();
+  LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
+  if (savesignal){
+    double mem = ( //sizeof(fSignalEventBoxes) + 
+                  // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
+                  sizeof(MeasurementVariableBox1D) * fillcount) * 1E-6;
+    LOG(REC) << " -> Saved " << fillcount << " signal boxes for faster access. (~" << mem << " MB)" << std::endl;
+  }
+
+
+  LOG(REC) << "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart << std::endl;
 };
 
-
-
-
-// ReconfigureFastEvtManager(){
-// - Check for saved variables: Use normal if not.
-// - Iterate over signalboolvector and look for true.
-// - get tree entry and calculate new event weight.
-// - Loop over measurements looking for ones that are actually signal.
-// - MultiThread the FillHistogramsFromBox thing.
-// - Create an array of what each box corresponds to.
-
-// - If signal, get 'next' box and call FillHistogramsFromBox(weight)
-// - Finish loop.
-// - Call ScaleEvents, etc.
-
-/*
-
-
-  LOG(MIN) << "Using manager." << endl;
-  FitBase::EvtManager().ResetWeightFlags();
-
-  // Get list of inputs
-  std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
-  std::map<int, InputHandler*>::const_iterator iterInp;
-
-  // Check Matchup
-  for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
-    int input_id = (iterInp->first);
-    LOG(REC) << "Input " << input_id
-             << " (Type: " << iterInp->second->GetInputFileType()
-             << ", Location:" << iterInp->second->GetInputFileName()
-             << ") Valid for : " << endl;
-
-    for (MeasListConstIter iterSam = fSamples.begin();
-         iterSam != fSamples.end(); iterSam++) {
-      MeasurementBase* exp = (*iterSam);
-      int exp_id = exp->GetInputID();
-      if (exp_id != input_id) continue;
-
-      LOG(REC) << " ---> " << exp->GetName() << endl;
-    }
-  }
-
-  // Start looping over inputs
-  for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
-    int input_id = (iterInp->first);
-    InputHandler* cur_input = (iterInp->second);
-
-    FitEvent* cevent = cur_input->GetEventPointer();
-    int fNEvents = cur_input->GetNEvents();
-    int countwidth = (fNEvents / 10);
-
-    // MAIN EVENT LOOP
-    for (int i = 0; i < fNEvents; i++) {
-      // Get Event from input list
-      cevent = FitBase::EvtManager().GetEvent(input_id, i);
-
-      // Get Weight
-      double Weight =
-        (FitBase::GetRW()->CalcWeight(cevent) * cevent->InputWeight);
-
-      // Skip if dodgy event
-      if (fabs(cevent->Mode) > 60 || cevent->Mode == 0) continue;
-
-      // Remove bad weights
-      if (Weight > 200.0 || Weight <= 0.0) Weight = 0.0;
-
-      // Loop over samples and fill histograms
-      int j = 0;
-      for (MeasListConstIter iterSam = fSamples.begin();
-           iterSam != fSamples.end(); iterSam++, j++) {
-        MeasurementBase* exp = (*iterSam);
-        int exp_id = exp->GetInputID();
-        if (exp_id != input_id) continue;
-
-        // Reset State of event by event vars
-        exp->SetXVar(-999.9);
-        exp->SetYVar(-999.9);
-        exp->SetZVar(-999.9);
-        exp->SetMode(-999);
-        exp->SetSignal(false);
-
-        // Fill exp
-        exp->SetMode(cevent->Mode);
-        exp->FillEventVariables(cevent);
-        exp->SetSignal(exp->isSignal(cevent));
-
-        exp->SetWeight(Weight);
-        exp->FillHistograms();
-      }
-
-      // Print Out
-      if (LOG_LEVEL(REC) and i % countwidth == 0)
-        LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
-                 << " for input " << input_id << std::endl;
-    }
-  }
-
-  // Convert Binned events
-  MeasListConstIter iterSam = fSamples.begin();
-  for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
-    exp->ConvertEventRates();
-  }
-
-  return;
-}*/
 
 //***************************************************
 void JointFCN::ReconfigureFastUsingManager() {
@@ -811,6 +709,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 // - If signal, get 'next' box and call FillHistogramsFromBox(weight)
 // - Finish loop.
 // - Call ScaleEvents, etc.
+
+  int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -833,10 +733,11 @@ void JointFCN::ReconfigureFastUsingManager() {
   std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
   std::vector< std::vector<bool> >::iterator samsig_iter = fSampleSignalFlags.begin();
 
-  std::cout << "Running over " << fSignalEventBoxes.size() << " signal boxes." << std::endl;
-  std::cout << "From " << fSampleSignalFlags.size() << " signal flags." << std::endl;
+  // Setup stuff for logging
   int fillcount = 0;
-
+  int nevents = fSignalEventFlags.size();
+  int countwidth = nevents / 5;
+ 
   // Start input iterators
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
   for (; inp_iter != fInputList.end(); inp_iter++) {
@@ -847,43 +748,49 @@ void JointFCN::ReconfigureFastUsingManager() {
     int i = 0;
     while (curevent != 0) {
 
+      // Logging
+      if (LOG_LEVEL(REC)){
+        if (i % countwidth == 0){
+          LOG(REC) << "Processed " << i << " signal events." << std::endl;
+        }
+      }
+
       // If event is not signal skip it.
       if (!(*inpsig_iter)) {
-        curevent = curinput->NextNuisanceEvent();
         inpsig_iter++;
         i++;
         continue;
       }
 
+      // Get Event
+      curevent = curinput->GetNuisanceEvent(i);
+      if (!curevent) break;
+
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
-      double rwweight = 1.0; //curevent->Weight;
+      double rwweight = curevent->Weight;
 
       // Iterate over the measurements and get the corresponding signal boxes.
       size_t measitercount = 0;
       size_t boxitercount = 0;
+
+      // Get vectors for this event
       std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
-      for (; meas_iter != fSubSampleList.end(); meas_iter++) {
+      std::vector<bool>::iterator subsamsig_iter = (*samsig_iter).begin();
+      std::vector<MeasurementVariableBox*>::iterator subbox_iter = (*box_iter).begin();
+
+      for (; meas_iter != fSubSampleList.end(); meas_iter++, subsamsig_iter++) {
 
         // Get Measurement
         MeasurementBase* curmeas = (*meas_iter);
 
         // If not signal continue
-        if ((*samsig_iter)[measitercount]) {
-
-          // Get latest box
-          MeasurementVariableBox* box = (*box_iter)[boxitercount];
-          // box->Print();
+        if (*subsamsig_iter) {
+          curmeas->FillHistogramsFromBox((*subbox_iter), rwweight);
+          subbox_iter++;
           fillcount++;
-          curmeas->FillHistogramsFromBox(box, rwweight);
-                  boxitercount++;
-
         }
-
-        // Next iter
-        measitercount++;
-
       }
 
       // Iterate over boxes
@@ -891,13 +798,11 @@ void JointFCN::ReconfigureFastUsingManager() {
       box_iter++;
 
       // iterate to next signal event
-      curevent = curinput->NextNuisanceEvent();
       inpsig_iter++;
       i++;
     }
   }
 
-  std::cout << "Filled = " << fillcount << std::endl;
   // Now loop over all Measurements
   // Convert Binned events
   iterSam = fSamples.begin();
@@ -906,6 +811,8 @@ void JointFCN::ReconfigureFastUsingManager() {
     exp->ConvertEventRates();
   }
 
+  LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
+  LOG(REC) << "Time taken ReconfigureFastUsingManager() : " << time(NULL) - timestart << std::endl;
 }
 
 //***************************************************

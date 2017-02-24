@@ -33,6 +33,7 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 #include "MeasurementVariableBox.h"
+#include "MeasurementVariableBox1D.h"
 
 using namespace FitUtils;
 using namespace FitBase;

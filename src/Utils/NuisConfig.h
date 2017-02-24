@@ -41,10 +41,34 @@ public:
   /// Adds a new configuration list
   void LoadConfig(std::string filename, std::string state);
 
+  /// Adds a new config from new xml file format
+  void LoadXMLConfig(std::string filename, std::string state);
+
+  /// Adds a new config from old card file format
+  void LoadCardConfig(std::string filename, std::string state);
+
   /// Save the config to file
   void WriteConfig(std::string filename);
 
+void OverrideConfig(std::string conf);
+
+XMLNodePointer_t GetConfigNode(std::string name);
+
+
+
   /// Request a string config key
+  std::string SetConfS(const std::string name, std::string val);
+
+  /// Get SetConfig Bool
+  bool SetConfB(const std::string name, bool val);
+
+  /// Get SetConfig Int
+  int SetConfI(const std::string name, int val);
+
+  /// Get SetConfig Double
+  double SetConfD(const std::string name, double val);
+
+  // Set config
   std::string ConfS(const std::string name);
 
   /// Get Config Bool
@@ -76,6 +100,13 @@ public:
   
   // Add Children to root node
   XMLNodePointer_t CreateNode(std::string name);
+
+  // Add line
+  void AddXMLLine(std::string line);
+
+  std::string ConvertSampleLineToXML(std::string line);
+  std::string ConvertParameterLineToXML(std::string line);
+  void FinaliseConfig(std::string name);
 
   // Add attribute to node
   void AddS(XMLNodePointer_t node, std::string name, std::string val);

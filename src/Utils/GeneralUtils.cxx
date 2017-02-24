@@ -40,6 +40,13 @@ std::string GeneralUtils::DblToStr(int val) {
 };
 
 
+std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc, char* argv[]){
+  std::vector<std::string> vect;
+  for (int i = 1; i < argc; i++){
+    vect.push_back( std::string(argv[i]) );
+  }
+  return vect;
+}
 
 
 

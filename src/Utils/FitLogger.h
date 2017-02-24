@@ -100,6 +100,8 @@ inline void ERR_VERB(int verb){ FitPar::err_verb = verb; };
 
 /// Logging Function. Use as a string stream.  e.g. LOG(SAM) << "This sample is dope." << std::endl;
 std::ostream& LOG(int level);
+std::ostream& LOG();
+
 
 //! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;
 std::ostream& ERR(int level);

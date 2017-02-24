@@ -154,7 +154,8 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent * event) {
 
   // Set X Variables
   fXVar = FitUtils::Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 30., false);
-
+  fPDGnu = event->PDGnu();
+  
   return;
 };
 
@@ -177,25 +178,19 @@ bool MiniBooNE_CCQE_XSec_1DQ2_antinu::isSignal(FitEvent * event) {
 void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillExtraHistograms(MeasurementVariableBox* vars, double weight) {
 
   // No Extra Hists if not ccqelike
-  if (!fCCQElike or !vars->fSignal) return;
-
-  // Use alternative MiniBooNE box
-  MiniBooNE_CCQELike_Box* mbbox = static_cast<MiniBooNE_CCQELike_Box*>(vars);
+  if (!fCCQElike or !Signal) return;
 
   // Fill Stacks
-  if (vars->fMode != -1 and vars->fMode != -2) {
-    if (fabs(vars->fMode) == 11 or fabs(vars->fMode) == 12 or fabs(vars->fMode == 13)) {
-      fMCHist_CCPIM->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
+  if (Mode != -1 and Mode != -2) {
+    if (fabs(Mode) == 11 or fabs(Mode) == 12 or fabs(Mode == 13)) {
+      fMCHist_CCPIM->Fill(fPDGnu, Mode, fXVar, weight);
     } else {
-      fMCHist_NONCCPIM->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
+      fMCHist_NONCCPIM->Fill(fPDGnu, Mode, fXVar, weight);
     }
   }
 
-  fMCHist_CCQELIKE->Fill(mbbox->fPDGnu, vars->fMode, vars->fX, weight);
+  fMCHist_CCQELIKE->Fill(fPDGnu, Mode, fXVar, weight);
 }
 
-MeasurementVariableBox* MiniBooNE_CCQE_XSec_1DQ2_antinu::CreateBox() {
-  if (fCCQElike) { return new MiniBooNE_CCQELike_Box(); }
-  else { return new MeasurementVariableBox(); }
-};
+
 

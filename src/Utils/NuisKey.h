@@ -55,7 +55,7 @@ namespace Config{
   nuiskey CreateKey(const std::string name);
 
 
-  void ConvertAndLoadCardToXMLFormat(const std::string cardfile);
+  // void ConvertAndLoadCardToXMLFormat(const std::string cardfile);
 
   // Backwards compatible sample key options
   nuiskey CreateSampleKeyFromLine(const std::string line);

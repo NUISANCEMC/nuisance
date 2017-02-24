@@ -84,6 +84,9 @@ std::string GetTopLevelDir();
 //   return std::vector<T>(data, data + N);
 // }
 
+std::vector<std::string> LoadCharToVectStr(int argc, char* argv[]);
+
+
 template <typename T, size_t N>
 size_t GetArraySize(const T (&data)[N]) {
   return N;

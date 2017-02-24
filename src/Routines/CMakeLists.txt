@@ -19,6 +19,8 @@
 set(IMPLFILES
 ComparisonRoutines.cxx
 SystematicRoutines.cxx
+BaseRoutines.cxx
+ParserUtils.cxx
 )
 
 if(USE_MINIMIZER)
@@ -28,6 +30,8 @@ endif()
 set(HEADERFILES
 ComparisonRoutines.h
 SystematicRoutines.h
+BaseRoutines.h
+ParserUtils.h
 )
 
 if(USE_MINIMIZER)

@@ -23,8 +23,7 @@ nuisconfig::nuisconfig() {
 
   // Initial Setup
   std::string filename = GeneralUtils::GetTopLevelDir() + "/parameters/config.xml";
-  std::cout << "[NUIS]: Loading DEFAULT config from : " << filename;
-
+  LOG() << "Loading DEFAULT config from : " << filename;
   // Create XML Engine
   fXML = new TXMLEngine;
 
@@ -38,7 +37,7 @@ nuisconfig::nuisconfig() {
   fMainNode = fXML->DocGetRootElement( fXMLDocs[0] );
   //RemoveIdenticalNodes();
 
-  std::cout << "  ->  DONE. " << std::endl;
+  std::cout << " -> DONE." << std::endl;
 
 
 }
@@ -58,8 +57,229 @@ nuisconfig::~nuisconfig() {
 
 }
 
-void nuisconfig::LoadConfig(std::string filename, std::string state = "") {
+void nuisconfig::OverrideConfig(std::string conf) {
+  std::vector<std::string> opts = GeneralUtils::ParseToStr(conf, "=");
+  SetConfS(opts[0], opts[1]);
+}
 
+
+XMLNodePointer_t nuisconfig::GetConfigNode(std::string name) {
+
+  // Loop over children and look for name
+  XMLNodePointer_t child = fXML->GetChild(fMainNode);
+  while (child != 0) {
+
+    // std::cout << "Child = " << fXML->GetNodeName(child) << std::endl;
+    // Select only config parameters
+    if (!std::string(fXML->GetNodeName(child)).compare("config")) {
+
+      // std::cout << "Found Config " << std::endl;
+      // Loop over config attributes and search for name
+      XMLAttrPointer_t attr = fXML->GetFirstAttr(child);
+      while ( attr != 0 ) {
+
+        // Save name value
+        // std::cout << "Setting Temp " << std::string(fXML->GetAttrName(attr)) << " '" << fXML->GetAttrValue(attr) << "' " << std::endl;
+        if (std::string(fXML->GetAttrName(attr)) == name.c_str()) {
+          return child;
+        }
+
+        // Get Next Attribute
+        attr = fXML->GetNextAttr(attr);
+      }
+    }
+
+    // Next Child
+    child = fXML->GetNext(child);
+  }
+
+  return 0;
+}
+
+/// Request a string config key
+std::string nuisconfig::SetConfS(const std::string name, std::string val) {
+  XMLNodePointer_t node = GetConfigNode(name);
+  if (!node) node = CreateNode("config");
+  SetS(node, name, val);
+}
+
+/// Get nuisconfig::SetConfig Bool
+bool nuisconfig::SetConfB(const std::string name, bool val) {
+  XMLNodePointer_t node = GetConfigNode(name);
+  if (!node) node = CreateNode("config");
+  SetB(node, name, val);
+}
+
+/// Get nuisconfig::SetConfig Int
+int nuisconfig::SetConfI(const std::string name, int val) {
+  XMLNodePointer_t node = GetConfigNode(name);
+  if (!node) node = CreateNode("config");
+  SetI(node, name, val);
+}
+
+/// Get nuisconfig::SetConfig Double
+double nuisconfig::SetConfD(const std::string name, double val) {
+  XMLNodePointer_t node = GetConfigNode(name);
+  if (!node) node = CreateNode("config");
+  SetD(node, name, val);
+}
+
+
+std::string nuisconfig::ConvertParameterLineToXML(std::string line) {
+
+  // Parse
+  std::vector<std::string> parsed = GeneralUtils::ParseToStr(line, " ");
+
+  // Min limits
+  if (parsed.size() < 2) {
+    ERR(FTL) << " Insufficient parameter options" << std::endl;
+    throw;
+  }
+
+  // Setup XMLLine
+  std::string xmlline = "parameter";
+
+  // Name
+  xmlline += " name=\"" + parsed[0] + "\"";
+
+  // Nominal
+  xmlline += " nominal=\"" + parsed[1] + "\"";
+
+  // State
+  xmlline += " state=\"" + parsed[2] + "\"";
+
+  return "<" + xmlline + "/>";
+}
+
+std::string nuisconfig::ConvertSampleLineToXML(std::string line) {
+
+  // Parse
+  std::vector<std::string> parsed = GeneralUtils::ParseToStr(line, " ");
+
+  // Min limits
+  if (parsed.size() < 2) {
+    ERR(FTL) << "Insufficient sample options" << std::endl;
+  }
+
+  // Setup XMLLine
+  std::string xmlline = "sample";
+
+  // Name
+  xmlline += " name=\"" + parsed[1] + "\"";
+
+  // InputFile
+  xmlline += " input=\"" + parsed[2] + "\"";
+
+  // If option add it
+  if (parsed.size() > 3) {
+    xmlline += " state=\"" + parsed[3] + "\"";
+  }
+
+  // If norm add it
+  if (parsed.size() > 4) {
+    xmlline += " norm=\"" + parsed[4] + "\"";
+  }
+
+  return "<" + xmlline + "/>";
+}
+
+
+void nuisconfig::AddXMLLine(std::string line) {
+
+  // LOG() << "Adding XMLLine in nuisconfig " << std::endl;
+
+  // XMLLine
+  std::string xmlline = "";
+
+  // If = in it its not an xml
+  if (line.find("=") != std::string::npos) {
+    xmlline = "<" + line + "/>";
+
+    // Else Convert it to a line
+  } else {
+
+    // Parse XMLLine
+    std::vector<std::string> parsed = GeneralUtils::ParseToStr(line, " ");
+    if (parsed.empty()) return;
+
+    // Convert it to new fomat
+    if (!parsed[0].compare("sample")) {
+      xmlline = ConvertSampleLineToXML(line);
+    } else if (!parsed[0].compare("sample")) {
+      xmlline = ConvertParameterLineToXML(line);
+    }
+  }
+
+  // Ad the line
+  LOG() << "Adding line to config: " << xmlline;
+  // fXML->AddRawLine(fMainNode, xmlline.c_str());
+
+  // Make XML Structure
+  fXMLDocs.push_back( fXML->ParseString(xmlline.c_str()) );
+
+  int nxml = fXMLDocs.size();
+  XMLNodePointer_t newdocroot = fXML->DocGetRootElement( fXMLDocs[nxml - 1] );
+  fXML->AddChild( fMainNode, newdocroot );
+  /*
+  // Loop over children and add
+  XMLNodePointer_t child = fXML->GetChild( newdocroot );
+  while ( child != 0 ) {
+    // Add additional state flag if given
+    std::string state = "";
+    if (!state.empty()) {
+      if (GetS(child, "source").empty()) {
+        fXML->NewAttr(child, 0, "source", state.c_str());
+      } else {
+        // fXML->SetAttr
+      }
+
+      // If its a config node, then remove previous attributes, overriding
+      if (!std::string(fXML->GetNodeName(child)).compare("config")) {
+
+        // Loop over attribues
+        XMLAttrPointer_t attr1 = fXML->GetFirstAttr(child);
+        while ( attr1 != 0 ) {
+          if (!ConfS(fXML->GetAttrName(attr1)).empty()) {
+            std::vector<XMLNodePointer_t> confignodes = GetNodes("config");
+
+            for (size_t i = 0; i < confignodes.size(); i++) {
+              if (fXML->HasAttr(confignodes[i], fXML->GetAttrName(attr1))) {
+                std::cout << fXML->GetAttrName(attr1) << std::endl;
+                fXML->FreeAttr(confignodes[i], fXML->GetAttrName(attr1));
+                break;
+              }
+            }
+          }
+          attr1 = fXML->GetNextAttr(attr1);
+        }
+      }
+    }
+
+    std::cout << "Adding Child " << std::endl;
+    // Add this child to the main config list
+    fXML->AddChild( fMainNode, child );
+
+    // Get Next Child
+    child = fXML->GetNext(child);
+  }
+  */
+  // std::cout << "Removing Identical Nodes" << std::endl;
+  std::cout << " -> DONE." << std::endl;
+
+}
+
+void nuisconfig::FinaliseConfig(std::string name) {
+
+  // Save full config to file
+  WriteConfig(name);
+  RemoveEmptyNodes();
+  RemoveIdenticalNodes();
+  LOG() << "Finished setting up config -> DONE." << std::endl;
+}
+
+void nuisconfig::LoadXMLConfig(std::string filename, std::string state = "") {
+
+  LOG() << "Loading XML config from : " << filename;
   // Add new file to xml docs list
   fXMLDocs.push_back( fXML->ParseFile( filename.c_str() ) );
 
@@ -108,10 +328,72 @@ void nuisconfig::LoadConfig(std::string filename, std::string state = "") {
     child = fXML->GetNext(child);
   }
   // std::cout << "Removing Identical Nodes" << std::endl;
-  RemoveEmptyNodes();
-  RemoveIdenticalNodes();
-  // std::cout << "Finished removing nodes" << std::endl;
+  std::cout << " -> DONE." << std::endl;
 }
+
+
+void nuisconfig::LoadConfig(std::string filename, std::string state) {
+
+  // Open file and see if its XML
+  LOG() << "Trying to parse file : " << filename;
+  // StopTalking();
+  XMLDocPointer_t tempdoc = fXML->ParseFile( filename.c_str() );
+  // StartTalking();
+
+  if (tempdoc) {
+    std::cout << " -> Found XML file." << std::endl;
+    LoadXMLConfig(filename, state);
+  } else {
+    std::cout << " -> Assuming its a simple card file." << std::endl;
+    LoadCardConfig(filename, state);
+  }
+
+}
+
+void nuisconfig::LoadCardConfig(std::string filename, std::string state) {
+
+  // Build XML Config from the card file
+  std::vector<std::string> cardlines =
+    GeneralUtils::ParseFileToStr(filename, "\n");
+  int linecount = 0;
+
+  for (std::vector<std::string>::iterator iter = cardlines.begin();
+       iter != cardlines.end(); iter++) {
+    std::string line = (*iter);
+    linecount++;
+
+    // Skip Comments
+    if (line.empty()) continue;
+    if (line.c_str()[0] == '#') continue;
+
+    // Parse whitespace
+    std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");
+    if (strvct.empty()) continue;
+
+    // Get Identifier
+    std::string id = strvct[0];
+
+    // // Build backwards compatible xml configs
+    // if (!id.compare("sample")) Config::CreateSampleKeyFromLine(line);
+
+    // if (id.find("_parameter") != std::string::npos)
+    //   Config::CreateParameterKeyFromLine(line);
+
+    // if (!id.compare("covar") ||
+    //     !id.compare("pull")  ||
+    //     !id.compare("throw"))
+    //   Config::CreatePullKeyFromLine(line);
+
+    // if (!id.compare("config"))
+    //   Config::CreateOldConfigKeyFromLine(line);
+  }
+
+
+  return;
+
+}
+
+
 
 XMLNodePointer_t nuisconfig::CreateNode(std::string name) {
   return fXML->NewChild(fMainNode, 0, name.c_str());
@@ -370,7 +652,7 @@ void nuisconfig::AddD(XMLNodePointer_t node, std::string name, double val) {
 void nuisconfig::SetS(XMLNodePointer_t node, std::string name, std::string val) {
 
   // Remove and readd attribute
-  if (fXML->HasAttr(node, name.c_str())){
+  if (fXML->HasAttr(node, name.c_str())) {
     fXML->FreeAttr(node, name.c_str());
   }
 
@@ -530,7 +812,7 @@ void nuisconfig::ExpandAllTags() {
       std::string attrname = std::string(fXML->GetAttrName(attr));
 
       // Search for <>
-      while (attrval.find("<") != std::string::npos and 
+      while (attrval.find("<") != std::string::npos and
              attrval.find(">") != std::string::npos){
 
         size_t startdel = 0;
@@ -543,7 +825,7 @@ void nuisconfig::ExpandAllTags() {
             replacestring = "";
             startdel = i;
           }
-          
+
           replacestring.push_back(attrval[i]);
 
           if (attrval[i] == '>'){
@@ -563,7 +845,7 @@ void nuisconfig::ExpandAllTags() {
     }
     child = fXML->GetNext(child);
   }
-*/
+  */
 
 
 

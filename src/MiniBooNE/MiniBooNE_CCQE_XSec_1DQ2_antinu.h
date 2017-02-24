@@ -43,7 +43,7 @@ public:
   bool isSignal(FitEvent *event);
 
   /// Uses MiniBooNE_CCQELike_Box instead.
-  MeasurementVariableBox* CreateBox();
+  // MeasurementVariableBox* CreateBox();
 
   /// Fills extra PDG Histograms
   void FillExtraHistograms(MeasurementVariableBox* vars,
@@ -59,7 +59,7 @@ private:
   NuNuBarTrueModeStack* fMCHist_NONCCPIM; ///< Plots in CCQELike mode to tag PDG of the NONCCPIM 
   NuNuBarTrueModeStack* fMCHist_CCPIM; ///< Plots in CCQELike mode to tag PDG of the CCPIM 
   NuNuBarTrueModeStack* fMCHist_CCQELIKE; ///< Plots in CCQELike mode to tag PDG numu/numubar modes
-
+  int fPDGnu;
 };
 
 #endif

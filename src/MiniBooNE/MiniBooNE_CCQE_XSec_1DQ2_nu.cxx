@@ -144,9 +144,8 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* va
   // No Extra Hists if not ccqelike
   if (!ccqelike) return;
 
-  if ((vars->fMode != 1 and vars->fMode != 2) and
-      (vars->fSignal)) {
-    fMCHist_CCQELIKE->Fill(vars->fMode, vars->fX, weight);
+  if ((Mode != 1 and Mode != 2) and (Signal)) {
+    fMCHist_CCQELIKE->Fill(Mode, fXVar, weight);
   }
 
   return;

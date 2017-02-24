@@ -57,6 +57,8 @@
 #include "StatUtils.h"
 
 #include "SignalDef.h"
+#include "MeasurementVariableBox.h"
+#include "MeasurementVariableBox1D.h"
 
 //********************************************************************
 //! 1D Measurement base class. Histogram handling is done in this base layer.
@@ -109,6 +111,8 @@ public:
   //
   //! Read the covariance matrix from a text file given the covar size
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
+
+  virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox1D();};
 
   //! Set the covariance from a custom root file
   //! FullUnits refers to if the covariance has "real" unscaled units, e.g.

@@ -54,6 +54,7 @@
 #include "PlotUtils.h"
 #include "SignalDef.h"
 #include "StatUtils.h"
+#include "MeasurementVariableBox2D.h"
 
 //********************************************************************
 //! 2D Measurement base class. Histogram handling is done in this base layer.
@@ -155,6 +156,9 @@ class Measurement2D : public MeasurementBase {
   /*
     Fake Data Functions
   */
+
+  virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox2D();};
+
 
   //! Set fake data values from MC. Use external file, or current MC prediction
   //! using option "MC"

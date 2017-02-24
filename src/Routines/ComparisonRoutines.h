@@ -46,6 +46,7 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 #include "FitLogger.h"
+#include "ParserUtils.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -59,7 +60,7 @@ enum minstate {
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
-class ComparisonRoutines{
+class ComparisonRoutines {
 //*************************************
 
 public:
@@ -86,19 +87,7 @@ public:
   void InitialSetup();
 
   //! Loops through each line of the card file and passes it to other read functions
-  void ReadCard(std::string cardfile);
-
-  void ReadXML(std::string cardfile);
-
-  //! Check for parameter string in the line and assign the correct type.
-  //! Fills maps for each of the parameters
-  int ReadParameters(std::string parstring);
-
-  //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
-  int ReadFakeDataPars(std::string parstring);
-
-  //! Read in the samples so we can set up the free normalisation dials if required
-  int ReadSamples(std::string sampleString);
+  void SetupComparisonsFromXML();
 
   /*
     Setup Functions

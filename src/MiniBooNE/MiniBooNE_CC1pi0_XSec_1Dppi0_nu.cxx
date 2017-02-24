@@ -84,7 +84,7 @@ bool MiniBooNE_CC1pi0_XSec_1Dppi0_nu::isSignal(FitEvent *event) {
 //********************************************************************
 void MiniBooNE_CC1pi0_XSec_1Dppi0_nu::FillExtraHistograms(MeasurementVariableBox* box, double weight){
 //********************************************************************
-  if (!box->fSignal) return;
-  fTargetStack->Fill( fTargetPDG, box->fX, weight );
+  if (!Signal) return;
+  fTargetStack->Fill( fTargetPDG, fXVar, weight );
 }
 

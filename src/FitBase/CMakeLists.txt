@@ -49,6 +49,9 @@ SampleSettings.cxx
 FitEventInputHandler.cxx
 SplineWeightEngine.cxx
 SplineInputHandler.cxx
+MeasurementVariableBox.cxx
+MeasurementVariableBox2D.cxx
+MeasurementVariableBox1D.cxx
 )
 
 set(HEADERFILES
@@ -76,6 +79,8 @@ FitEventInputHandler.h
 SplineWeightEngine.h
 SplineInputHandler.h
 MeasurementVariableBox.h
+MeasurementVariableBox2D.h
+MeasurementVariableBox1D.h
 )
 
 set(LIBNAME FitBase)

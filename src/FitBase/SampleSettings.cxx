@@ -54,6 +54,8 @@ void SampleSettings::FoundFill(std::string name, std::string substr, bool& cont,
 	std::string compstring = fKeyValues.GetS(name);
 	if (compstring.find(substr) != std::string::npos){
 		cont = def;
+	} else {
+		cont = !def;
 	}
 };
 

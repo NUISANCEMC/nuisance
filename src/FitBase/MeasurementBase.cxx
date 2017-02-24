@@ -38,7 +38,6 @@ MeasurementBase::MeasurementBase(void) {
   EnuMin = 0.;
   EnuMax = 1.E5;
 
-  std::cout << "Calling MeasurememntBase Constructor!" << std::endl;
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
   fEventVariables = NULL;
 
@@ -90,7 +89,6 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
   // Add this infile to the global manager
   if (FitPar::Config().GetParB("EventManager")) {
     fInput = FitBase::AddInput(fName, inputfile);
-    std::cout << "Pushing Back fInput as " << fInput << std::endl;
   } else {
     std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(inputfile, ":");
@@ -156,12 +154,12 @@ void MeasurementBase::FinaliseSampleSettings() {
 
 }
 
-void FinaliseMeasurement() {
+// void MeasurementBase::FinaliseMeasurement() {
 
-  // Run SetupDefaultHist and Masking functions if needed.
+//   // Run SetupDefaultHist and Masking functions if needed.
 
-  // Run checks on input species and targets if they have been given.
-}
+//   // Run checks on input species and targets if they have been given.
+// }
 
 
 
@@ -203,11 +201,11 @@ void MeasurementBase::Reconfigure() {
     Signal = this->isSignal(cust_event);
     if (Signal) npassed++;
 
-    GetBox()->fX = fXVar;
-    GetBox()->fY = fYVar;
-    GetBox()->fZ = fZVar;
-    GetBox()->fMode = Mode;
-    GetBox()->fSignal = Signal;
+    GetBox()->SetX(fXVar);
+    GetBox()->SetY(fYVar);
+    GetBox()->SetZ(fZVar);
+    GetBox()->SetMode(Mode);
+    // GetBox()->fSignal = Signal;
 
     // Fill Histogram Values
     GetBox()->FillBoxFromEvent(cust_event);
@@ -246,11 +244,11 @@ void MeasurementBase::Reconfigure() {
 
 void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double weight) {
 
-  fXVar  = var->fX;
-  fYVar  = var->fY;
-  fZVar  = var->fZ;
-  Signal = var->fSignal;
-  Mode   = var->fMode;
+  fXVar  = var->GetX();
+  fYVar  = var->GetY();
+  fZVar  = var->GetZ();
+  // Signal = var->fSignal;
+  // Mode   = var->fMode;
   Weight = weight;
 
   FillHistograms();
@@ -266,11 +264,11 @@ MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
   Signal = this->isSignal(event);
   GetBox()->FillBoxFromEvent(event);
 
-  GetBox()->fX = fXVar;
-  GetBox()->fY = fXVar;
-  GetBox()->fZ = fXVar;
-  GetBox()->fMode = event->Mode;
-  GetBox()->fSignal = Signal;
+  GetBox()->SetX(fXVar);
+  GetBox()->SetY(fYVar);
+  GetBox()->SetZ(fZVar);
+  GetBox()->SetMode(event->Mode);
+  // GetBox()->fSignal = Signal;
 
   return GetBox();
 }

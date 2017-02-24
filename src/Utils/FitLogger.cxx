@@ -55,19 +55,21 @@ void LOG_VERB(std::string verb){
   else if (!verb.compare("EVT"))   FitPar::log_verb=6;
   else FitPar::log_verb = GeneralUtils::StrToInt(verb);
   
+  std::cout << "Set logging verbosity to : " << FitPar::log_verb << std::endl;
   return;
 }
 
 //******************************************
 void ERR_VERB(std::string verb){
 //******************************************
-
+  std::cout << "Setting ERROR VERB" << std::endl;
 
   if    (!verb.compare("ERRQUIET")) FitPar::err_verb=0;
   else if (!verb.compare("FTL")) FitPar::err_verb=1;
   else if (!verb.compare("WRN")) FitPar::err_verb=2;
-  else FitPar::log_verb = GeneralUtils::StrToInt(verb);
+  else FitPar::err_verb = GeneralUtils::StrToInt(verb);
 
+  std::cout << "Set error verbosity to : " << FitPar::err_verb << std::endl;
   return;
 }
 
@@ -84,6 +86,11 @@ bool LOG_LEVEL(int level){
   }
 
   return true;
+}
+
+std::ostream& LOG(){
+  std::cout << "[ NUISANCE ]: ";
+  return *logStream;
 }
 
 //******************************************
