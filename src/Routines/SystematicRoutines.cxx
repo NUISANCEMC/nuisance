@@ -993,7 +993,6 @@ void SystematicRoutines::GenerateErrorBands(){
 
     // Save the FCN
     fSampleFCN->Write();
-
     parameterTree->Fill();
   }
 
@@ -1002,9 +1001,9 @@ void SystematicRoutines::GenerateErrorBands(){
 
   //  fDecompFree->Write();
   //  fCovarFree->Write();
-  //  parameterTree->Write();
+  parameterTree->Write();
 
-  //  delete parameterTree;
+  delete parameterTree;
 
   // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
   TIter next(nominal->GetListOfKeys());
