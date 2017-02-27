@@ -28,7 +28,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   // Measurement Details
   fName = "ANL_CC1npip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 1.5;
   fIsDiag = true;
@@ -75,7 +75,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
     } else {
       ERR(FTL) << "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
       ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
-      exit(-1);
+      throw;
     }
 
   // If we're using raw uncorrected data
@@ -90,19 +90,19 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
     } else {
       ERR(FTL) << "Can only run W = 1.4, 1.6 and no W cut" << std::endl;
       ERR(FTL) << "You specified: " << wTrueCut << std::endl;
-      exit(-1);
+      throw;
     }
   }
 
   // Setup Plots
-  this->SetDataValues(DataLocation);
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -124,6 +124,8 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   if (hadMass/1000. < wTrueCut) {
     Enu = Pnu.E()/1.E3;
   }
+
+  fXVar = Enu;
 
   return;
 };
