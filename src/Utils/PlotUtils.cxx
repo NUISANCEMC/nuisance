@@ -432,8 +432,8 @@ TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res, std::string opt){
 void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, double scalefactor, int nevents) {
 //******************************************************************** 
 
-  TH1D* eventhist = (TH1D*)ehist->Clone();
-  TH1D* fFluxHist = (TH1D*)fhist->Clone();
+  TH1D* eventhist = (TH1D*)ehist->Clone("tempeventhist");
+  TH1D* fFluxHist = (TH1D*)fhist->Clone("tempfluxhist");
 
   if (FitPar::Config().GetParB("save_flux_debug")){
     std::string name = std::string(mcHist->GetName());
@@ -450,14 +450,14 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, doub
   }
 
   // Undo width integral in SF
-  mcHist->Scale( scalefactor / eventhist->Integral(1,eventhist->GetNbinsX()+1,"width"));
+  mcHist->Scale( scalefactor / eventhist->Integral("width"));
   
   // Standardise The Flux
-  eventhist->Scale(1.0/fFluxHist->Integral());
-  fFluxHist->Scale(1.0/fFluxHist->Integral());
+  eventhist->Scale(1.0/fFluxHist->Integral("width"));
+  fFluxHist->Scale(1.0/fFluxHist->Integral("width"));
 
   // Scale mcHist by eventhist integral
-  mcHist->Scale( eventhist->Integral(1,eventhist->GetNbinsX()+1) );
+  mcHist->Scale( eventhist->Integral() );
   
   // Now Get a flux PDF
   TH1D* pdfflux = (TH1D*) mcHist->Clone();
@@ -493,10 +493,27 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist, doub
 
   // Scale MC hist by pdfflux
   for (int i = 0; i < mcHist->GetNbinsX(); i++){
-    if (pdfflux->GetBinContent(i+1) == 0.0) continue;
+    if (pdfflux->GetBinContent(i+1) == 0.0){
+      mcHist->SetBinContent(i+1, 0.0);
+      mcHist->SetBinError(i+1, 0.0);
+    } else {
+      mcHist->SetBinContent(i+1, mcHist->GetBinContent(i+1) / pdfflux->GetBinContent(i+1));
+      mcHist->SetBinError(i+1, mcHist->GetBinError(i+1) / pdfflux->GetBinContent(i+1));
+    }
+  }
 
-    mcHist->SetBinContent(i+1, mcHist->GetBinContent(i+1) / pdfflux->GetBinContent(i+1));
-    mcHist->SetBinError(i+1, mcHist->GetBinError(i+1) / pdfflux->GetBinContent(i+1));
+  if (FitPar::Config().GetParB("save_flux_debug")){
+    std::string name = std::string(mcHist->GetName());
+
+    mcHist->Write((name + "_UNF_MC_AFTER").c_str());
+    fhist->Write((name + "_UNF_FLUX_AFTER").c_str());
+    ehist->Write((name + "_UNF_EVT_AFTER").c_str());
+
+    TH1D* scalehist = new TH1D("scalehist","scalehist",1,0.0,1.0);
+    scalehist->SetBinContent(1,scalefactor);
+    scalehist->SetBinContent(2,nevents);
+
+    scalehist->Write((name + "_UNF_SCALE_AFTER").c_str());
   }
 
   delete eventhist;

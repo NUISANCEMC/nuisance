@@ -60,11 +60,11 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw,
 
   LOG(SAM)<<"Setting up scaling"<<std::endl;
   // Setup Scaling
-  GetEventHistogram()->Scale(this->fDataHist->Integral()/GetEventHistogram()->Integral());
+  //  GetEventHistogram()->Scale(this->fDataHist->Integral()/GetEventHistogram()->Integral());
 
   // Different generators require slightly different rescaling factors.
   this->fScaleFactor = (GetEventHistogram()->Integral()/(fNEvents+0.));
-  scaleF = -1.0;
+  //  scaleF = -1.0;
 };
 
 //********************************************************************
