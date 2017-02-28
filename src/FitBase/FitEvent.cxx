@@ -79,7 +79,9 @@ void FitEvent::ResetEvent() {
 #ifdef __NEUT_ENABLED__
 //***************************************************
 void FitEvent::SetEventAddress(NeutVect** tempevent) {
-  //***************************************************
+//***************************************************
+
+  save_neut_status = FitPar::Config().GetParB("save_neut_status");
   fType = kNEUT;
   fNeutVect = *tempevent;
 }
@@ -88,6 +90,7 @@ void FitEvent::SetEventAddress(NeutVect** tempevent) {
 void FitEvent::NeutKinematics() {
   //***************************************************
   ResetEvent();
+
 
   // Get Event Info
   fMode = fNeutVect->Mode;
@@ -166,13 +169,18 @@ void FitEvent::NeutKinematics() {
     fParticleMom[fNParticles][2] = part->fP.Z();
     fParticleMom[fNParticles][3] = part->fP.T();
 
+    //    if (save_neut_status){
+    fParticleNEUTStatus[fNParticles] = part->fStatus;
+    fParticleNEUTAlive[fNParticles] = part->fIsAlive;;
+      //    }
+
     // PDG
     fParticlePDG[fNParticles] = part->fPID;
 
     fNParticles++;
   }
 
-  OrderStack();
+  //  OrderStack();
 
   return;
 };
@@ -222,10 +230,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_in; i++) {
     particle* part = &fNuwroEvent->in[i];
 
-    fParticleMom[fNParticles][0] = part->x;
-    fParticleMom[fNParticles][1] = part->y;
-    fParticleMom[fNParticles][2] = part->z;
-    fParticleMom[fNParticles][3] = part->t;
+    fParticleMom[fNParticles][0] = part->p4().x;
+    fParticleMom[fNParticles][1] = part->p4().y;
+    fParticleMom[fNParticles][2] = part->p4().z;
+    fParticleMom[fNParticles][3] = part->p4().t;
 
     fParticleState[fNParticles] = kInitialState;
     fParticlePDG[fNParticles] = part->pdg;
@@ -237,10 +245,10 @@ void FitEvent::NuwroKinematics() {
     for (UInt_t i = 0; i < npart_out; i++) {
       particle* part = &fNuwroEvent->out[i];
 
-      fParticleMom[fNParticles][0] = part->x;
-      fParticleMom[fNParticles][1] = part->y;
-      fParticleMom[fNParticles][2] = part->z;
-      fParticleMom[fNParticles][3] = part->t;
+      fParticleMom[fNParticles][0] = part->p4().x;
+      fParticleMom[fNParticles][1] = part->p4().y;
+      fParticleMom[fNParticles][2] = part->p4().z;
+      fParticleMom[fNParticles][3] = part->p4().t;
 
       fParticleState[fNParticles] = kFSIState;
       fParticlePDG[fNParticles] = part->pdg;
@@ -252,10 +260,10 @@ void FitEvent::NuwroKinematics() {
   for (UInt_t i = 0; i < npart_post; i++) {
     particle* part = &fNuwroEvent->post[i];
 
-    fParticleMom[fNParticles][0] = part->x;
-    fParticleMom[fNParticles][1] = part->y;
-    fParticleMom[fNParticles][2] = part->z;
-    fParticleMom[fNParticles][3] = part->t;
+    fParticleMom[fNParticles][0] = part->p4().x;
+    fParticleMom[fNParticles][1] = part->p4().y;
+    fParticleMom[fNParticles][2] = part->p4().z;
+    fParticleMom[fNParticles][3] = part->p4().t;
 
     fParticleState[fNParticles] = kFinalState;
     fParticlePDG[fNParticles] = part->pdg;
@@ -702,7 +710,11 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
   tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
 
-  tn->SetAlias("Enu", "ParticleMom[0][4]");
+  if (save_neut_status){
+    tn->Branch("ParticleNEUTStatus", fParticleNEUTStatus, "ParticleNEUTStatus[NParticles]/I");
+    tn->Branch("ParticleNEUTAlive", fParticleNEUTAlive, "ParticleNEUTAlive[NParticles]/I");
+  }
+
 }
 
 /* Event Access Functions */
@@ -870,16 +882,31 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 }
 
 void FitEvent::Print() {
+
+
+
   LOG(EVT) << "FitEvent print" << std::endl;
   LOG(EVT) << "Mode: " << fMode << std::endl;
   LOG(EVT) << "Particles: " << fNParticles << std::endl;
   LOG(EVT) << " -> Particle Stack " << std::endl;
   for (int i = 0; i < fNParticles; i++) {
     LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
-             << fParticleState[i] << " " 
+             << fParticleState[i] << " "
              << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
              << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
              << std::endl;
   }
   return;
+}
+
+void FitEvent::PrintChris(){
+
+  std::cout << "FitEvent print ---- " << std::endl;
+  for (int i = 0; i < fNParticles; i++){
+    std::cout << PartInfo(i)->fPID
+	      << " state " << fParticleState[i]
+	      << " status " <<fParticleNEUTStatus[i]
+	      << " alive " << fParticleNEUTAlive[i] << std::endl;
+  }
+  std::cout << " " << std::endl;
 }

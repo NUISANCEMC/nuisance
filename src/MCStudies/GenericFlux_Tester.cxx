@@ -149,6 +149,8 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/F");
   eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/F");
 
+  eventVariables->Branch("Nother", &Nother, "Nother/I");
+
   eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");
   eventVariables->Branch("q0_true", &q0_true, "q0_true/F");
   eventVariables->Branch("q3_true", &q3_true, "q3_true/F");
@@ -400,6 +402,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
         (*ppi0) = part_4mom;
       }
+    } else {
+      Nother++;
     }
   }
 

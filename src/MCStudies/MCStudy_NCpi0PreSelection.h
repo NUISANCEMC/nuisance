@@ -17,18 +17,18 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MCStudy_KaonPreSelection_H_SEEN
-#define MCStudy_KaonPreSelection_H_SEEN
+#ifndef MCStudy_NCpi0PreSelection_H_SEEN
+#define MCStudy_NCpi0PreSelection_H_SEEN
 #include "Measurement1D.h"
 
 //********************************************************************
-class MCStudy_KaonPreSelection : public Measurement1D {
+class MCStudy_NCpi0PreSelection : public Measurement1D {
 //********************************************************************
 
 public:
 
-  MCStudy_KaonPreSelection(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~MCStudy_KaonPreSelection() {};
+  MCStudy_NCpi0PreSelection(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  virtual ~MCStudy_NCpi0PreSelection() {};
 
   //! Grab info from event
   void FillEventVariables(FitEvent *event);
@@ -48,7 +48,6 @@ public:
   int nkaon;
   double kplusmom;
   double kaonmom;
-  bool fKaonLogging;
 };
 
 #endif
