@@ -42,6 +42,7 @@ if(USE_GENIE)
   set(ROOT_LIBS Eve;EG;TreePlayer;Geom;Ged;Gui;${ROOT_LIBS})
 endif()
 
+# Check if we have Minuit2 enabled
 if(NOT DEFINED USE_MINIMIZER)
   if("${ROOT_FEATURES}" MATCHES "minuit2")
     cmessage(STATUS "ROOT built with MINUIT2 support")
@@ -50,6 +51,21 @@ if(NOT DEFINED USE_MINIMIZER)
     cmessage(STATUS "ROOT built without MINUIT2 support, minimizer functionality will be disabled.")
     set(USE_MINIMIZER 0)
   endif()
+endif()
+
+# Check ROOT version is 5.34/34 or 5.34/36
+string(REGEX MATCH "5.34/([0-9]+)" ROOTVERSMATCH ${ROOT_VERSION})
+if( NOT ROOTVERSMATCH OR  ${CMAKE_MATCH_1} LESS "19")
+  cmessage(WARNING "ROOT Version: ${ROOT_VERSION} has out of date minimizer interface. Disabling minimizer, please update to 5.34/19 or greater to enable minimization features.")
+  set(USE_MINIMIZER 0)
+endif()
+
+
+if("${ROOT_VERSION}" MATCHES "5.34/34" OR "${ROOT_VERSION}" MATCHES "5.34/36" OR "${ROOT_VERSION}" MATCHES "5.34/32")
+  cmessage(STATUS "Found valid ROOT version ${ROOT_VERSION}")
+else()
+  cmessage(STATUS "You've supplied an invalid ROOT version! NUISANCE only support 5.34/34 and 5.34/36: turning minimizer OFF")
+  set(USE_MINIMIZER 0)
 endif()
 
 if("${ROOT_FEATURES}" MATCHES "opengl")
