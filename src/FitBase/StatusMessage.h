@@ -5,6 +5,8 @@
 #include <sstream>
 
 inline std::string StatusMessage(bool happy = true) {
+    return "";
+    
   std::stringstream ss("");
   if (happy) {
     ss << "   @@@                                                       "

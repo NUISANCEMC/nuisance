@@ -21,6 +21,7 @@ ComparisonRoutines.cxx
 SystematicRoutines.cxx
 BaseRoutines.cxx
 ParserUtils.cxx
+SplineRoutines.cxx
 )
 
 if(USE_MINIMIZER)
@@ -32,6 +33,7 @@ ComparisonRoutines.h
 SystematicRoutines.h
 BaseRoutines.h
 ParserUtils.h
+SplineRoutines.h
 )
 
 if(USE_MINIMIZER)

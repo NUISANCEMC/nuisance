@@ -256,10 +256,18 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double 
 
 }
 
+void MeasurementBase::FillHistograms(double weight){
+  Weight = weight;
+  FillHistograms();
+  FillExtraHistograms(GetBox(), Weight);
+}
+
+
 MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
 
   GetBox()->Reset();
-
+  Mode = event->Mode;
+  
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
   GetBox()->FillBoxFromEvent(event);

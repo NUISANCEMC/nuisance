@@ -51,6 +51,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "FitLogger.h"
+#include "ParserUtils.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -105,6 +106,7 @@ public:
 
   //! Read in the samples so we can set up the free normalisation dials if required
   int ReadSamples(std::string sampleString);
+void SetupMinimizerFromXML();
 
   /*
     Setup Functions
@@ -256,6 +258,9 @@ protected:
   TH2D* fCorFree;
   TH2D* fDecFree;
   TH2D* fCovFree;
+
+    nuiskey fCompKey;
+
 };
 
 /*! @} */

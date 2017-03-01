@@ -8,6 +8,7 @@
 #include "NuWroWeightEngine.h"
 #include "SampleNormEngine.h"
 #include "LikelihoodWeightEngine.h"
+#include "SplineWeightEngine.h"
 
 #include <map>
 #include <vector>
@@ -32,6 +33,9 @@ public:
 
   double GetDialValue(std::string name);
   double GetDialValue(int rwenum);
+  
+  int GetDialPos(std::string name);
+  int GetDialPos(int rwenum);
 
   bool DialIncluded(std::string name);
   bool DialIncluded(int rwenum);
@@ -39,6 +43,8 @@ public:
   double CalcWeight(BaseFitEvt* evt);
   bool HasRWDialChanged(const double* x) { return true; };
   bool NeedsEventReWeight(const double* x);
+
+  void SetAllDials(const double* x, int n);
 
   double GetSampleNorm(std::string name);
 

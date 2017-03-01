@@ -47,7 +47,7 @@ using namespace genie;
 #endif
 
 #include "TArrayD.h"
-//#include "SplineReader.h"
+#include "SplineReader.h"
 
 /*!
  *  \addtogroup FitBase
@@ -72,7 +72,8 @@ enum generator_event_type {
   kEMPTY = 11,
   kINPUTFITEVENT = 12,
   kNEWSPLINE = 13,
-  kLIKEWEIGHT = 14
+  kLIKEWEIGHT = 14,
+  kSPLINEPARAMETER = 15,
 };
 
 inline std::ostream& operator<<(std::ostream& os,
@@ -126,6 +127,7 @@ class BaseFitEvt {
   ~BaseFitEvt();
   BaseFitEvt(const BaseFitEvt* obj);
 
+  void ResetWeight();
   inline void SetType(int type){fType = type;};
   
   double fXVar;
@@ -185,6 +187,8 @@ class BaseFitEvt {
   // New Splines
   //SplineReader* fSplineReader;
   double* fSplineCoeff;
+  SplineReader* fSplineRead;
+  double fDialCoeffs[400];
 
   int eventid;
 

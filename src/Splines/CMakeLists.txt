@@ -19,11 +19,17 @@
 set(IMPLFILES
 FitSpline.cxx
 FitSplineHead.cxx
+SplineReader.cxx
+SplineWriter.cxx
+Spline.cxx
 )
 
 set(HEADERFILES
 FitSpline.h
 FitSplineHead.h
+SplineReader.h
+SplineWriter.h
+Spline.h
 )
 
 set(LIBNAME Splines)

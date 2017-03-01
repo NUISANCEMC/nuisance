@@ -126,6 +126,9 @@ public:
   //! Call reconfigure only looping over signal events to save time.
   virtual void ReconfigureFast(void);
 
+  virtual void FillHistograms(double weight);
+
+
   //! Call reconfigure looping over all MC events including background
   virtual void Reconfigure(void);
 
@@ -157,6 +160,11 @@ public:
   virtual void NormExtraHistograms(MeasurementVariableBox* vars, double norm = 1.0);
   virtual void WriteExtraHistograms();
   virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox();};
+
+  // virtual void WriteState(){
+  //   if (fReconfigureType == kFullReconfigure) Write(); // Saves all the histograms
+  //   else if (fReconfigureType == kSignalReconfigure) WriteCore(); // Saves just the MC Histograms
+  // }
 
   int GetPassed() {
     int signalSize = fXVar_VECT.size();
@@ -250,7 +258,7 @@ public:
   inline void SetYVar(double yvar) { fYVar = yvar; };
   inline void SetZVar(double zvar) { fZVar = zvar; };
 
-  virtual std::vector<MeasurementBase*> GetSubSamples(){
+  virtual std::vector<MeasurementBase*> GetSubSamples() {
     return std::vector<MeasurementBase*>(1, this);
   }
 

@@ -595,7 +595,9 @@ void JointFCN::ReconfigureUsingManager() {
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
-      double rwweight = 1.0; //curevent->Weight;
+      double rwweight = curevent->Weight;
+
+      std::cout << "Event " << i << " Weight = " << rwweight << std::endl;
 
       // Setup flag for if signal found in at least one sample
       bool foundsignal = false;
@@ -635,7 +637,7 @@ void JointFCN::ReconfigureUsingManager() {
         // Get the event box after fill event variable
         // std::cout << "Filling Meas Full = " << curmeas << std::endl;
 
-        curmeas->FillHistogramsFromBox(box, rwweight);
+        curmeas->FillHistograms(rwweight);
         if (signal) {
           fillcount++;
         }

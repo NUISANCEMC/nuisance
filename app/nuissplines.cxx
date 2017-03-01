@@ -26,7 +26,7 @@
    where:   
 */
 
-//#include "SplineRoutines.h"
+#include "SplineRoutines.h"
 
 //*******************************
 void printInputCommands(){
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]){
   // Program status;
   int status = 0;
   
-  /*
+  
   // If No Arguments print commands
   if (argc == 1) printInputCommands();
     
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
   LOG(FIT)<<"-------------------------------------"<<std::endl;
   LOG(FIT)<<"Spline Generation/Validation Finished."<<std::endl;
   LOG(FIT)<<"-------------------------------------"<<std::endl;
-  */
+  
   return 0;
 }
 

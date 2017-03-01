@@ -28,6 +28,8 @@
 #include "NuWroInputHandler.h"
 #include "GIBUUInputHandler.h"
 #include "NUANCEInputHandler.h"
+#include "FitEventInputHandler.h"
+#include "SplineInputHandler.h"
 
 namespace InputUtils {
 

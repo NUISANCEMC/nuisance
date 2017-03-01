@@ -1,7 +1,7 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
+*    This file is pddrt of NUISANCE.
 *
 *    NUISANCE is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@
 
 void FitEvent::ResetParticleList() {
   for (unsigned int i = 0; i < kMaxParticles; i++) {
-     FitParticle* fp = fParticleList[i];
-     if (fp) delete fp;
+    FitParticle* fp = fParticleList[i];
+    if (fp) delete fp;
     fParticleList[i] = NULL;
   }
 }
 
-void FitEvent::HardReset(){
+void FitEvent::HardReset() {
   for (unsigned int i = 0; i < kMaxParticles; i++) {
     fParticleList[i] = NULL;
   }
@@ -54,9 +54,9 @@ void FitEvent::ResetEvent() {
   fNParticles = 0;
 
   for (unsigned int i = 0; i < kMaxParticles; i++) {
-    FitParticle* fp = fParticleList[i];
+    // FitParticle* fp = fParticleList[i];
     // std::cout << "Fit Particle = " << fp << std::endl;
-    if (fp) delete fp;
+    // if (fp) delete fp;
     fParticleList[i] = NULL;
 
     fParticlePDG[i] = 0;
@@ -83,9 +83,6 @@ void FitEvent::OrderStack() {
 
   // Copy current stack
   int npart = fNParticles;
-  double fOrigParticleMom[kMaxParticles][4];
-  UInt_t fOrigParticleState[kMaxParticles];
-  int fOrigParticlePDG[kMaxParticles];
 
   for (int i = 0; i < npart; i++) {
     fOrigParticlePDG[i]    = fParticlePDG[i];
@@ -117,12 +114,14 @@ void FitEvent::OrderStack() {
     }
   }
 
-  LOG(DEB) << "Ordered stack" << std::endl;
-  for (int i = 0; i < fNParticles; i++) {
-    LOG(DEB) << "Particle " << i << ". " << fParticlePDG[i] << " "
-             << fParticleMom[i][0] << " " << fParticleMom[i][1] << " "
-             << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "
-             << fParticleState[i] << std::endl;
+  if (LOG_LEVEL(DEB)) {
+    LOG(DEB) << "Ordered stack" << std::endl;
+    for (int i = 0; i < fNParticles; i++) {
+      LOG(DEB) << "Particle " << i << ". " << fParticlePDG[i] << " "
+               << fParticleMom[i][0] << " " << fParticleMom[i][1] << " "
+               << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "
+               << fParticleState[i] << std::endl;
+    }
   }
 
   if (fNParticles != npart) {
@@ -136,6 +135,8 @@ void FitEvent::OrderStack() {
 void FitEvent::SetBranchAddress(TChain* tn) {
   fType = kINPUTFITEVENT;
 
+  std::cout << "Setting Branch Address " << std::endl;
+  sleep(1);
   tn->SetBranchAddress("Mode", &fMode);
   tn->SetBranchAddress("Mode", &Mode);
   tn->SetBranchAddress("EventNo", &fEventNo);
@@ -149,16 +150,16 @@ void FitEvent::SetBranchAddress(TChain* tn) {
   tn->SetBranchAddress("NParticles", &fNParticles);
 
   // Save original particle stack/unordered
-  tn->SetBranchAddress("ParticleState", fOrigParticleState);
-  tn->SetBranchAddress("ParticlePDG", fOrigParticlePDG);
-  tn->SetBranchAddress("ParticleMom", fOrigParticleMom);
+  tn->SetBranchAddress("ParticleState", fParticleState);
+  tn->SetBranchAddress("ParticlePDG", fParticlePDG);
+  tn->SetBranchAddress("ParticleMom", fParticleMom);
 
   // Shouldn't be a need to read back in Generator Info...
   // fGenInfo->SetBranchAddress(tn);
 }
 
 void FitEvent::AddBranchesToTree(TTree* tn) {
-  tn->Branch("Mode", &fMode, "Mode/I");
+  tn->Branch("Mode", &Mode, "Mode/I");
 
   tn->Branch("EventNo", &fEventNo, "EventNo/i");
   tn->Branch("TotCrs", &fTotCrs, "TotCrs/D");
@@ -170,12 +171,12 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
 
   tn->Branch("NParticles", &fNParticles, "NParticles/I");
   // Load original particle stack into norm stack, before ordering.
-  tn->Branch("ParticleState", fParticleState, "ParticleState[NParticles]/i");
-  tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
-  tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
+  tn->Branch("ParticleState", fOrigParticleState, "ParticleState[NParticles]/i");
+  tn->Branch("ParticlePDG", fOrigParticlePDG, "ParticlePDG[NParticles]/I");
+  tn->Branch("ParticleMom", fOrigParticleMom, "ParticleMom[NParticles][4]/D");
 
   // Save Extra Generator Information
-  if (fGenInfo) fGenInfo->AddBranchesToTree(tn);
+  // if (fGenInfo) fGenInfo->AddBranchesToTree(tn);
 }
 
 /* Event Access Functions */
@@ -345,16 +346,19 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 }
 
 void FitEvent::Print() {
-  LOG(EVT) << "EVTEvent print" << std::endl;
-  LOG(EVT) << "Mode: " << fMode << std::endl;
-  LOG(EVT) << "Particles: " << fNParticles << std::endl;
-  LOG(EVT) << " -> Particle Stack " << std::endl;
-  for (int i = 0; i < fNParticles; i++) {
-    LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
-             << fParticleState[i] << " "
-             << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
-             << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
-             << std::endl;
+
+  if (LOG_LEVEL(EVT)or true) {
+    LOG() << "EVTEvent print" << std::endl;
+    LOG() << "Mode: " << fMode << std::endl;
+    LOG() << "Particles: " << fNParticles << std::endl;
+    LOG() << " -> Particle Stack " << std::endl;
+    for (int i = 0; i < fNParticles; i++) {
+      LOG() << " -> -> " << i << ". " << fParticlePDG[i] << " "
+            << fParticleState[i] << " "
+            << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
+            << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
+            << std::endl;
+    }
   }
   return;
 }

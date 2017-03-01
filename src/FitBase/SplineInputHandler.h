@@ -16,15 +16,10 @@ public:
 	BaseFitEvt* GetBaseEvent(const UInt_t entry);
 	void Print();
 
-	std::vector<TH1D*> jointfluxinputs;
-	std::vector<TH1D*> jointeventinputs;
-	std::vector<int> jointindexlow;
-	std::vector<int> jointindexhigh;
-	size_t jointindexswitch;
-	bool jointinput;
-	std::vector<double> jointindexscale;
-
 	bool save_extra;
 	TChain* fFitEventTree;
+	SplineReader* fSplRead;
+	double fSplineCoeff[400];
+	TTree* fSplTree;
 };
 #endif

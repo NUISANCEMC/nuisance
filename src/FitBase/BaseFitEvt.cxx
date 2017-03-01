@@ -144,6 +144,7 @@ BaseFitEvt::BaseFitEvt() {
   BinIndex = -1;
 
   dial_coeff = NULL;
+  fSplineRead = NULL;
 };
 
 BaseFitEvt::~BaseFitEvt(){};
@@ -214,6 +215,11 @@ void BaseFitEvt::SetSplineCoeffAddress(TTree* tn){
   
   tn->SetBranchAddress("DialCoeff",dial_coeff);
   
+}
+
+void BaseFitEvt::ResetWeight(){
+  InputWeight = 1.0;
+  // Reset Spline Reader
 }
 
 void BaseFitEvt::FillCoeff(double* vals){

@@ -124,6 +124,12 @@ public:
     return GetNuisanceEvent(fCurrentIndex);
   };
 
+
+  virtual BaseFitEvt* FirstBaseEvent() {
+    fCurrentIndex = 0;
+    return GetBaseEvent(fCurrentIndex);
+  };
+
   virtual BaseFitEvt* NextBaseEvent() {
     fCurrentIndex++;
 

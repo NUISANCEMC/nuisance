@@ -31,6 +31,10 @@ public:
   MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_nu() {};
 
+  // Multiple Constrictuors.
+  void Setup_MiniBooNE_CCQE_XSec_1DQ2_nu();
+  void Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu();
+
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
   void FillExtraHistograms(MeasurementVariableBox* vars, double weight = 1.0);

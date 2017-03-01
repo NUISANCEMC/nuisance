@@ -92,13 +92,14 @@ void NEUTWeightEngine::SetDialValue(int nuisenum, double val){
 
 void NEUTWeightEngine::Reconfigure(bool silent){
 	// Hush now...
-	if (silent) StopTalking();
+	// if (silent) StopTalking();
 
 	// Reconf
 	fNeutRW->Reconfigure();
+	fNeutRW->Print();
 
 	// Shout again
-	if (silent) StartTalking();
+	// if (silent) StartTalking();
 }
 
 
@@ -110,15 +111,15 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt){
 	StopTalking();
 
 	// Check if event has changed incase common blocks need filling
-	if (evt->eventid != fLastEventID or evt != fLastEventPointer){
+	// if (evt->eventid != fLastEventID or evt != fLastEventPointer){
 		
 		// Fill NEUT Common blocks
 		GeneratorUtils::FillNeutCommons(evt->fNeutVect);
 
 		// Save last one
-		fLastEventID = evt->eventid;
-		fLastEventPointer = evt;
-	}
+		// fLastEventID = evt->eventid;
+		// fLastEventPointer = evt;
+	// }
 
 	// Call Weight calculation
     double rw_weight = fNeutRW->CalcWeight();

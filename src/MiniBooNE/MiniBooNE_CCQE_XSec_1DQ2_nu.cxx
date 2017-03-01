@@ -23,17 +23,30 @@
 MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
-  // Sample overview
-  std::string descrip = "MiniBooNE CCQE/CC0pi sample. \n" \
+  // Initalise sample Settings ---------------------------------------
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.FoundFill("name", "CCQELike", ccqelike, true);
+
+  // Multiple constructors for similar samples
+  if (ccqelike) Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu();
+  else Setup_MiniBooNE_CCQE_XSec_1DQ2_nu();
+
+  // Final Check for all requirements, necessary to setup all extra plots.
+  FinaliseMeasurement();
+}
+
+//********************************************************************
+void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQE_XSec_1DQ2_nu() {
+//********************************************************************
+
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE CCQE sample. \n" \
                         "Target: CH2.08 \n" \
                         "Flux: CCQE  = Forward Horn Current numu \n" \
-                        "      CC0pi = Forward Horn Current numu+numub \n" \
-                        "Signal: CCQE  = True CCQE + True 2p2h (Mode == 1 or 2) \n" \
-                        "        CC0pi = Events with 1 mu+/mu-, N nucleons, 0 other";
+                        "Signal: CCQE  = True CCQE + True 2p2h (Mode == 1 or 2) \n";
 
-  // 1. Initalise sample Settings ---------------------------------------
-  fSettings = LoadSampleSettings(samplekey);
-  fSettings.SetDescription(descrip);
+                        // Setup common settings
+                        fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
   fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
@@ -41,23 +54,11 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   fSettings.DefineAllowedTargets("C,H");
   fSettings.SetSuggestedFlux( FitPar::GetDataBase() + "/MiniBooNE/ccqe/mb_ccqe_flux.root");
 
-  // Define input data information
-  fSettings.FoundFill("name", "CCQELike", ccqelike, true);
-  if (ccqelike) {
-    // CCQELike plot information
-    fSettings.SetTitle("MiniBooNE #nu_#mu CCQE");
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_like.txt" );
-    fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
-    fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_bkg.txt" );
-    fSettings.SetHasExtraHistograms(true);
-    fSettings.DefineAllowedSpecies("numu,numub");
-  } else {
-    // CCQE Plot Information
-    fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi");
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
-    fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
-    fSettings.DefineAllowedSpecies("numu");
-  }
+  // CCQE Plot Information
+  fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
+  fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
 
@@ -71,35 +72,65 @@ MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
   fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
 
-  // fFullCovar = DataUtils::CovarFromText( fSettings.GetCovarInput() );
-
-  /// If CCQELike is used the CCQELike BKG is saved.
-  if (ccqelike) {
-
-    // Make Data CCQELike BKG
-    fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
-                         fSettings.GetName() + "_CCQELIKEBKG_data" );
-    fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
-                                      ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
-    SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
-
-    // Make MC Clone
-    fMCHist_CCQELIKE = new TrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
-                                      "CCQE-like BKG MC" + fSettings.PlotTitles(),
-                                      fDataHist_CCQELIKE);
-    SetAutoProcessTH1(fMCHist_CCQELIKE, kCMD_Reset, kCMD_Scale, kCMD_Norm, kCMD_Write);
-
-
-  }
-
-  // 4. Final Check for all requirements, necessary to setup all extra plots.
-  // If any are NULL it sets up DecompCovar, InvCovar, ModeHist, FineHist, StatHist, MaskHist
-  // MapHist.
-  FinaliseMeasurement();
 };
 
 //********************************************************************
-/// @details Extract q2qe(fXVar) from the event
+void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu() {
+//********************************************************************
+
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE CC0pi sample. \n" \
+                        "Target: CH2.08 \n" \
+                        "Flux: MiniBooNE Forward Horn Current numu \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
+
+  // Setup common settings
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.SetSuggestedFlux( FitPar::GetDataBase() + "/MiniBooNE/ccqe/mb_ccqe_flux.root");
+
+  // CCQELike plot information
+  fSettings.SetTitle("MiniBooNE #nu_#mu CCQE");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_like.txt" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
+  fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_bkg.txt" );
+  fSettings.SetHasExtraHistograms(true);
+  fSettings.DefineAllowedSpecies("numu,numub");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // Multiply by 14.08/6.0 to get per neutron
+  fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) *
+                  (14.08 / 6.0) / TotalIntegratedFlux());
+
+  // Plot Setup -------------------------------------------------------
+  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
+  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
+
+
+  // Make Data CCQELike BKG
+  fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
+                       fSettings.GetName() + "_CCQELIKEBKG_data" );
+  fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
+                                    ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
+  SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
+
+  // Make MC Clone
+  fMCHist_CCQELIKE = new TrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
+                                        "CCQE-like BKG MC" + fSettings.PlotTitles(),
+                                        fDataHist_CCQELIKE);
+  SetAutoProcessTH1(fMCHist_CCQELIKE);
+
+};
+
+
+//********************************************************************
 void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
@@ -116,7 +147,6 @@ void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // Set X Variables
   fXVar = q2qe;
-
   return;
 };
 

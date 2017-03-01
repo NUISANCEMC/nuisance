@@ -67,6 +67,7 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
 	// Setup NEvents and the FitEvent
     fNEvents = fFitEventTree->GetEntries();
     fEventType = kINPUTFITEVENT;
+    fNUISANCEEvent = new FitEvent(kINPUTFITEVENT);
     fNUISANCEEvent->SetBranchAddress(fFitEventTree);
 
     // Normalise event histograms for relative flux contributions.
@@ -88,8 +89,8 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
 
 FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry){
 
-	// Make sure events setup
-	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(kINPUTFITEVENT);
+	// Return NULL if out of bounds
+	if (entry >= fNEvents) return NULL;
 
 	// Reset all variables before tree read
 	fNUISANCEEvent->ResetEvent();

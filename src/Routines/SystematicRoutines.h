@@ -43,6 +43,7 @@
 #include "FitEvent.h"
 #include "JointFCN.h"
 #include "FitParameters.h"
+#include "ParserUtils.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -101,6 +102,7 @@ public:
   /*
     Setup Functions
   */
+void SetupSystematicsFromXML();
 
   //! Setup the configuration given the arguments passed at the commandline and card file
   void SetupConfig();
@@ -249,6 +251,7 @@ protected:
   std::vector <TH1D>        fInputDials; //!< Vector of Input Histograms
   std::vector <TMatrixDSym> fInputCovar; //!< Vector of Input Covariances  
 
+  nuiskey fCompKey;
 
 };
 

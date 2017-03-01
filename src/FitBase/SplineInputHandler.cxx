@@ -1,83 +1,78 @@
 #include "SplineInputHandler.h"
 
-SplineInputHandler::SplineInputHandler(std::string const& handle, std::string const& rawinputs){
+SplineInputHandler::SplineInputHandler(std::string const& handle, std::string const& rawinputs) {
 
 	// Run a joint input handling
 	fName = handle;
 	jointinput = false;
 	jointindexswitch = 0;
 
-	// Form list of all inputs, remove brackets if required.
-	std::vector<std::string> inputs = GeneralUtils::ParseToStr(rawinputs, ",");
-	if (inputs.front()[0] == '('){
-		inputs.front() = inputs.front().substr(1);
-	} 
-	if (inputs.back()[inputs.back().size()-1] == ')'){
-		inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
-	}
-    for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
-      LOG(SAM) << "\t -> Found input file: " << inputs[inp_it] << std::endl;
-    }
-
-    // Setup the TChain
+	// Setup the TChain
 	fFitEventTree = new TChain("nuisance_events");
-	
-    // Loop over all inputs and grab flux, eventhist, and nevents
-    // Also add it to the TChain
-    int evtcounter = 0;
-    if (inputs.size() > 1) jointinput = true;
-    for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
 
-    	// Add to TChain
-    	fFitEventTree->Add( inputs[inp_it].c_str() );
+	// Add to TChain
+	fFitEventTree->Add( rawinputs.c_str() );
 
-    	// Open File for histogram access
-    	TFile* inp_file = new TFile(inputs[inp_it].c_str(),"READ");
+	// Open File for histogram access
+	int evtcounter = 0;
+	TFile* inp_file = new TFile(rawinputs.c_str(), "READ");
 
-    	// Get Flux/Event hist
-    	TH1D* fluxhist  = (TH1D*)inp_file->Get(
-    			(PlotUtils::GetObjectWithName(inp_file, "nuisance_fluxhist")).c_str());
-    	TH1D* eventhist = (TH1D*)inp_file->Get(
-    			(PlotUtils::GetObjectWithName(inp_file, "nuisance_eventhist")).c_str());
+	// Get Flux/Event hist
+	TH1D* fluxhist  = (TH1D*)inp_file->Get(
+	                      (PlotUtils::GetObjectWithName(inp_file, "nuisance_fluxhist")).c_str());
+	TH1D* eventhist = (TH1D*)inp_file->Get(
+	                      (PlotUtils::GetObjectWithName(inp_file, "nuisance_eventhist")).c_str());
 
-    	// Get N events
-    	TTree* neuttree = (TTree*)inp_file->Get("nuisance_events");
-    	int nevents = neuttree->GetEntries();
+	// Get N events
+	TTree* neuttree = (TTree*)inp_file->Get("nuisance_events");
+	int nevents = neuttree->GetEntries();
 
-    	// Push into individual input vectors
-    	jointfluxinputs.push_back( (TH1D*) fluxhist->Clone() );
-    	jointeventinputs.push_back( (TH1D*) eventhist->Clone() );
+	// Push into individual input vectors
+	jointfluxinputs.push_back( (TH1D*) fluxhist->Clone() );
+	jointeventinputs.push_back( (TH1D*) eventhist->Clone() );
 
-    	jointindexlow.push_back(evtcounter);
-    	jointindexhigh.push_back(evtcounter + nevents);
-    	evtcounter += nevents;
+	jointindexlow.push_back(evtcounter);
+	jointindexhigh.push_back(evtcounter + nevents);
+	evtcounter += nevents;
 
-    	// Add to the total flux/event hist
-    	if (!fFluxHist) fFluxHist = (TH1D*) fluxhist->Clone();
-    	else fFluxHist->Add(fluxhist);
+	// Add to the total flux/event hist
+	if (!fFluxHist) fFluxHist = (TH1D*) fluxhist->Clone();
+	else fFluxHist->Add(fluxhist);
 
-    	if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
-    	else fEventHist->Add(eventhist);
+	if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
+	else fEventHist->Add(eventhist);
 
-    	// Remove file
-    	//inp_file->Close();
-    	//delete inp_file;
-	}
 
 	// Setup NEvents and the FitEvent
-    fNEvents = fFitEventTree->GetEntries();
-    fEventType = kINPUTFITEVENT;
-    fNUISANCEEvent->SetBranchAddress(fFitEventTree);
+	fNEvents = fFitEventTree->GetEntries();
+	fEventType = kNEWSPLINE;
+	fNUISANCEEvent = new FitEvent();
+	fNUISANCEEvent->SetBranchAddress(fFitEventTree);
 
-    // Normalise event histograms for relative flux contributions.
-    for (size_t i = 0; i < jointeventinputs.size(); i++) { 
-    	TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
+	// Setup Reader
+	fSplRead = new SplineReader();
+	fSplRead->Read( (TTree*)inp_file->Get("spline_reader") );
+	fNUISANCEEvent->fSplineRead = this->fSplRead;
 
-    	double scale = double(fNEvents) / fEventHist->Integral("width");
-    	scale *= eventhist->Integral("width");
-    	scale /= double(jointindexhigh[i] - jointindexlow[i]);
+	// Setup Friend Spline TTree
+	fSplTree = (TTree*)inp_file->Get("spline_tree");
+	// fSplTree->Add( rawinputs.c_str() );
+	// fSplineCoeff = new double[400];
+	fSplTree->SetBranchAddress( "SplineCoeff", fSplineCoeff );
+	// fSplTree->GetEntry(0);
+	// std::cout << " Branch Address " << fSplineCoeff << std::endl;
 
-    	jointindexscale .push_back(scale);
+	fNUISANCEEvent->fSplineCoeff = this->fSplineCoeff;
+
+	// Normalise event histograms for relative flux contributions.
+	for (size_t i = 0; i < jointeventinputs.size(); i++) {
+		TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
+
+		double scale = double(fNEvents) / fEventHist->Integral("width");
+		scale *= eventhist->Integral("width");
+		scale /= double(jointindexhigh[i] - jointindexlow[i]);
+
+		jointindexscale .push_back(scale);
 	}
 
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
@@ -86,23 +81,30 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 };
 
 
-FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry){
+FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Make sure events setup
-	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(kINPUTFITEVENT);
+	if (entry >= fNEvents) return NULL;
 
 	// Reset all variables before tree read
 	fNUISANCEEvent->ResetEvent();
 
 	// Read NUISANCE Tree
+	// std::cout << "Getting entry " << entry << std::endl;
 	fFitEventTree->GetEntry(entry);
+	
+	// std::cout << "Event Coeff = "  << fSplTree << " " << fSplineCoeff << " " << fNUISANCEEvent->fSplineCoeff << std::endl;
+	fSplTree->GetEntry(entry);
+	// std::cout << "Showing " << entry << std::endl;
+	// fSplTree->Show(entry);
+
 	fNUISANCEEvent->eventid = entry;
 
-	// Run Initial, FSI, Final, Other ordering. 
+	// Run Initial, FSI, Final, Other ordering.
 	fNUISANCEEvent-> OrderStack();
 
 	// Setup Input scaling for joint inputs
-	if (jointinput){
+	if (jointinput) {
 		fNUISANCEEvent->InputWeight *= GetInputWeight(entry);
 	} else {
 		fNUISANCEEvent->InputWeight *= 1.0;
@@ -112,15 +114,15 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry){
 }
 
 
-double SplineInputHandler::GetInputWeight(int entry){
+double SplineInputHandler::GetInputWeight(int entry) {
 
 	// Find Switch Scale
-	while( entry < jointindexlow[jointindexswitch] ||
-	       entry >= jointindexhigh[jointindexswitch] ){
+	while ( entry < jointindexlow[jointindexswitch] ||
+	        entry >= jointindexhigh[jointindexswitch] ) {
 		jointindexswitch++;
 
 		// Loop Around
-		if (jointindexswitch == jointindexlow.size()){ 
+		if (jointindexswitch == jointindexlow.size()) {
 			jointindexswitch = 0;
 		}
 	}
@@ -128,17 +130,19 @@ double SplineInputHandler::GetInputWeight(int entry){
 };
 
 
-BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry){
+BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Make sure events setup
-	// if (!fBaseEvent) fBaseEvent = new BaseFitEvt(fNeutVect);
+	if (entry >= fNEvents) return NULL;
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fFitEventTree->GetEntry(entry);
+	// fSplTree->GetEntry(entry);
+
 	fBaseEvent->eventid = entry;
-	
+
 	// Set joint scaling if required
-	if (jointinput){
+	if (jointinput) {
 		fBaseEvent->InputWeight *= GetInputWeight(entry);
 	} else {
 		fBaseEvent->InputWeight *= 1.0;
@@ -147,6 +151,6 @@ BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry){
 	return fBaseEvent;
 }
 
-void SplineInputHandler::Print(){}
+void SplineInputHandler::Print() {}
 
-	
+

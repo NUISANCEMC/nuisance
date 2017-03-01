@@ -8,11 +8,12 @@ namespace SampleUtils {
 MeasurementBase* CreateSample(std::string name, std::string file, 
   std::string type, std::string fkdt, FitWeight* rw){
 
-  nuiskey samplekey;
+  nuiskey samplekey = Config::CreateKey("sample");
   samplekey.AddS("name",name);
   samplekey.AddS("input",file);
   samplekey.AddS("type",type);
 
+  std::cout << "Created SampleKey " << name <<  " " << samplekey.GetS("name") << std::endl;
   return CreateSample(samplekey);
 }
 
@@ -23,6 +24,8 @@ MeasurementBase* CreateSample(nuiskey samplekey){
   std::string file = samplekey.GetS("input");
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
+
+  std::cout << "Creating sample from name = " << name << std::endl;
   /*
      ANL CCQE Samples
   */
@@ -362,7 +365,7 @@ MINERvA Samples
     return (new MINERvA_CCQE_XSec_1DQ2_joint(name, file, rw, type, fkdt));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DEe_nue")) {
-    return (new MINERvA_CC0pi_XSec_1DEe_nue(file, rw, type, fkdt));
+    return (new MINERvA_CC0pi_XSec_1DEe_nue(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nue")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_nue(file, rw, type, fkdt));

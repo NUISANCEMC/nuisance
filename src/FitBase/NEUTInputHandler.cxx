@@ -89,6 +89,8 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 
 	fNUISANCEEvent = new FitEvent(fNeutVect);
 	fNUISANCEEvent->HardReset();
+	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
+
 
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -296,6 +298,8 @@ double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
+	if (entry >= fNEvents) return NULL;
+
 	fNEUTTree->GetEntry(entry);
 	fBaseEvent->eventid = entry;
 

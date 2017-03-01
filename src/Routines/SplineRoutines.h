@@ -48,6 +48,8 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 #include "SplineReader.h"
+#include "SplineWriter.h"
+#include "ParserUtils.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -160,6 +162,7 @@ protected:
   std::vector<std::string> fSplineNames;
   std::map<std::string, std::string> fSplineTypes;
   std::map<std::string, std::string> fSplinePoints;
+    nuiskey fCompKey;
   
   
 };

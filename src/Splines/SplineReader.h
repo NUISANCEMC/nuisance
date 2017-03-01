@@ -1,45 +1,37 @@
 #ifndef SPLINEREADER_H
 #define SPLINEREADER_H
-#include "FitWeight.h"
+// #include "FitWeight.h"
 #include "Spline.h"
+#include "TTree.h"
+// #include "GeneralUtils.h"
 
 class SplineReader {
- public:
-  SplineReader(FitWeight* fw){
-    fRW = fw;
-  };
-  ~SplineReader(){};
+public:
+  SplineReader() {};
+  ~SplineReader() {};
 
-  void AddSpline(std::string splname, std::string type, std::string form, std::string points);
-  void SetupSplineSet();
-  void Write(std::string name);
-  void AddCoefficientsToTree(TTree* tree);
-  void FitSplinesForEvent(FitEvent* event);
+  void AddSpline(nuiskey splkey);
   void Read(TTree* tr);
-  void Reconfigure();
-  //  double CalcWeight(FitEvent* event);
-  int fNPar;
-  int fNWeight;
-  
-  double* fCoEffStorer;
-  int fNCoEff;
-  std::vector< double> fMaxVect;
-  std::vector<double> fMinVect;
-  std::vector< std::vector<double> > fParVect;
-  std::vector< int > fSetIndex;
-  std::vector< double > fValList;
 
-  double** fParSets;
-  double* fWeights;
-  FitWeight* fRW;
-  std::vector< double > fWeightList;
+  void Reconfigure(std::map< std::string, double >& vals);
+  bool NeedsReconfigure();
+  void SetNeedsReconfigure(bool val = true);
+
+  double CalcWeight(double* coeffs);
+
   std::vector<Spline> fAllSplines;
-  int totalcount;
   std::vector<std::string> fSpline;
   std::vector<std::string> fType;
   std::vector<std::string> fForm;
   std::vector<std::string> fPoints;
-  std::vector< std::vector<int> > fPositions;
+
+  std::vector<double> fDialValues;
+  std::vector<double> fParValues;
+
+  bool fNeedsReconfigure;
+
+
+
 };
 
 #endif

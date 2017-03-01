@@ -10,3 +10,8 @@ double WeightEngineBase::GetDialValue(int rwenum) {
 		throw;
 	}
 };
+
+void WeightEngineBase::IncludeDial(std::string name, int type, double startval){
+	int rwenum = FitBase::GetDialEnum(type, name);
+	IncludeDial(rwenum, startval);
+}

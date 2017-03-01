@@ -189,12 +189,26 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
                << parstate << std::endl;
     }
 
+    // Convert if required
+    if (parstate.find("ABS") != std::string::npos) {
+      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+    } else if (parstate.find("FRAC") != std::string::npos) {
+      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+    }
+
     // Push into vectors
     fParams.push_back(parname);
 
     fTypeVals[parname]  = FitBase::ConvDialType(partype);;
-    fStateVals[parname] = parnom;
     fCurVals[parname]   = parnom;
+    fStateVals[parname] = parstate;
+
   }
 
   // Setup Samples ----------------------------------------------

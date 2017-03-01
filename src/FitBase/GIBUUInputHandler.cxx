@@ -327,7 +327,7 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle, std::string cons
 FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Make sure events setup
-	if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fGiReader);
+	// if (!fNUISANCEEvent) fNUISANCEEvent = new FitEvent(fGiReader);
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fGIBUUTree->GetEntry(entry);

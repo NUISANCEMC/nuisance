@@ -188,6 +188,14 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     break;
 #endif
 
+  case (kFEVENT_Input):
+    input = new FitEventInputHandler(handle, inputs);
+    break;
+
+  case (kEVSPLN_Input):
+    input = new SplineInputHandler(handle, inputs);
+    break;
+
   default:
     break;
   }

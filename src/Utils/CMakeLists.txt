@@ -58,6 +58,7 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/Splines)
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/FitBase)
 target_include_directories(${LIBNAME} PUBLIC ${RWENGINE_INCLUDE_DIRECTORIES})
 

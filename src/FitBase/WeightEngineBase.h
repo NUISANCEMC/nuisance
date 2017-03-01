@@ -20,6 +20,7 @@
 #include "GeneratorUtils.h"
 #include "TCanvas.h"
 #include "TGraph2D.h"
+#include "WeightUtils.h"
 
 class WeightEngineBase {
 
@@ -29,6 +30,7 @@ public:
 	// ~WeightEngineBase(){};
 
 	// Functions requiring Override
+	virtual void IncludeDial(std::string name, int type, double startval);
 	virtual void IncludeDial(int nuisenum, double startval) = 0;
 	virtual void SetDialValue(int rwenum, double val) = 0;
 	virtual void Reconfigure(bool silent) = 0;

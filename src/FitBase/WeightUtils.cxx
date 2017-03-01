@@ -128,6 +128,7 @@ int FitBase::ConvDialType(std::string type){
   else if (!type.compare("norm_parameter")) return kNORM;
   else if (!type.compare("modenorm_parameter")) return kMODENORM;
   else if (!type.compare("likeweight_parameter")) return kLIKEWEIGHT;
+  else if (!type.compare("spline_parameter")) return kSPLINEPARAMETER;
   else return kUNKNOWN;
   
 }
@@ -143,6 +144,7 @@ std::string FitBase::ConvDialType(int type){
   case kNORM:  { return "norm_parameter";  }
   case kMODENORM: { return "modenorm_parameter"; }
   case kLIKEWEIGHT: { return "likeweight_parameter"; }
+  case kSPLINEPARAMETER: {return "spline_parameter";}
   default: return "unknown_parameter"; 
   }
   
@@ -251,6 +253,12 @@ int FitBase::GetDialEnum(int type, std::string name){
     break;
   }
    
+  case kSPLINEPARAMETER: {
+      if (gSplineParameterEnums.find(name) == gSplineParameterEnums.end()){
+      gSplineParameterEnums[name] = gSplineParameterEnums.size() + 1 + offset; 
+    }
+    this_enum = gSplineParameterEnums[name];
+  }
 
   }
 
