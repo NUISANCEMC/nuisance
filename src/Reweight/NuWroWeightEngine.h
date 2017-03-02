@@ -6,20 +6,35 @@
 #include "WeightEngineBase.h"
 #include "WeightUtils.h"
 
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+#include "NuwroReWeight.h"
+#include "event1.h"
+#include "NuwroReWeight_FlagNorm.h"
+#include "NuwroReWeight_QEL.h"
+#include "NuwroReWeight_SPP.h"
+#include "NuwroSyst.h"
+#include "NuwroSystUncertainty.h"
+#endif
+
 class NuWroWeightEngine : public WeightEngineBase {
-	public:
-		NuWroWeightEngine(std::string name);
-		~NuWroWeightEngine(){};
+public:
+	NuWroWeightEngine(std::string name);
+	~NuWroWeightEngine() {};
 
-		void IncludeDial(int nuisenum, double startval);
-		void SetDialValue(int rwenum, double val);
-		void Reconfigure(bool silent = false);
-		double CalcWeight(BaseFitEvt* evt);
-		inline bool NeedsEventReWeight(){ return true; };
+	void IncludeDial(std::string name, double startval);
 
-		std::map<std::string, nuwro::rew::NuwroSyst_t> fNuwroNameSysts;
-		std::map<int, nuwro::rew::NuwroSyst_t> fNuwroEnumSysts;
-		nuwro::rew::NuwroReWeight* fNuwroRW;
+	void SetDialValue(std::string name, double val);
+	void SetDialValue(int rwenum, double val);
+
+	void Reconfigure(bool silent = false);
+	double CalcWeight(BaseFitEvt* evt);
+
+	inline bool NeedsEventReWeight() { return true; };
+
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+	std::vector<nuwro::rew::NuwroSyst_t> fNUWROSysts;
+	nuwro::rew::NuwroReWeight* fNuwroRW;
+#endif
 };
 
 #endif

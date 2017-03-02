@@ -47,9 +47,11 @@ public:
 	double CalcWeight(BaseFitEvt* evt);
 	inline bool NeedsEventReWeight() { return true; };
 
+#ifdef __GENIE_ENABLED__
 	std::map<std::string, genie::rew::GSyst_t> fGenieNameSysts;
 	std::map<int, genie::rew::GSyst_t> fGenieEnumSysts;
 	genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
+#endif
 
 };
 

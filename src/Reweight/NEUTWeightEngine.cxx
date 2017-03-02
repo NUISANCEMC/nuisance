@@ -1,10 +1,11 @@
 #include "NEUTWeightEngine.h"
 
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
+#ifdef __NEUT_ENABLED__
 
 	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up NEUT RW : " << fName << endl;
+	fCalcName = name;
+	LOG(FIT) << "Setting up NEUT RW : " << fCalcName << endl;
 
 	// Create RW Engine suppressing cout
 	StopTalking();
@@ -50,81 +51,97 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
 	// Set Abs Twk Config
 	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
-	
+
 	// allow cout again
 	StartTalking();
+
+#else
+	ERR(FTL) << "NEUT RW NOT ENABLED!" << std::endl;
+#endif
+
 };
 
+void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
+#ifdef __NEUT_ENABLED__
 
-void NEUTWeightEngine::IncludeDial(int nuisenum, double startval){
-
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
-	neut::rew::NSyst_t rwsyst = static_cast<neut::rew::NSyst_t>(rwenum);
-	std::string name = NSyst::AsString(rwsyst);
+	// Get NEUT Syst.
+	neut::rew::NSyst_t gensyst = NSyst::FromString(name);
+	int nuisenum = Reweight::ConvDial(name, kNEUT);
 
 	// Fill Maps
-	fNeutNameSysts[name]     = rwsyst;
-	fNeutEnumSysts[nuisenum] = rwsyst;
-	
+	int index = fValues.size();
+	fValues.push_back(0.0);
+	fNEUTSysts.push_back(gensyst);
+
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
+
 	// Initialize dial
-	fNeutRW->Systematics().Init( fNeutEnumSysts[nuisenum] );
+	fNeutRW->Systematics().Init( fNEUTSysts[index] );
 
 	// If Absolute
-	if (fIsAbsTwk){
-		NSystUncertainty::Instance()->SetUncertainty( fNeutEnumSysts[nuisenum], 1.0, 1.0 );
-	} 
-
-	// Set Value if given
-	if (startval != -999.9){
-		SetDialValue(nuisenum, startval);
+	if (fIsAbsTwk) {
+		NSystUncertainty::Instance()->SetUncertainty( fNEUTSysts[index], 1.0, 1.0 );
 	}
 
-};
+	// Set Value if given
+	if (startval != -999.9) {
+		SetDialValue(nuisenum, startval);
+	}
+#endif
+}
 
+void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
+#ifdef __NEUT_ENABLED__
+	fValues[fEnumIndex[nuisenum]] = val;
+	fNeutRW->Systematics().Set(fNEUTSysts[fEnumIndex[nuisenum]], val);
+#endif
+}
 
-void NEUTWeightEngine::SetDialValue(int nuisenum, double val){
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fNeutRW->Systematics().Set(static_cast<neut::rew::NSyst_t>(rwenum), val);
+void NEUTWeightEngine::SetDialValue(std::string name, double val) {
+#ifdef __NEUT_ENABLED__
+	fValues[fNameIndex[name]] = val;
+	fNeutRW->Systematics().Set(fNEUTSysts[fNameIndex[name]], val);
+#endif
 }
 
 
-void NEUTWeightEngine::Reconfigure(bool silent){
+void NEUTWeightEngine::Reconfigure(bool silent) {
+#ifdef __NEUT_ENABLED__
 	// Hush now...
-	 if (silent) StopTalking();
+	if (silent) StopTalking();
 
 	// Reconf
 	fNeutRW->Reconfigure();
 
 	// Shout again
-	 if (silent) StartTalking();
+	if (silent) StartTalking();
+#endif
 }
 
 
-double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt){
+double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt) {
+	double rw_weight = 1.0;
 
+#ifdef __NEUT_ENABLED__
 	// Skip Non GENIE
 	if (evt->fType != kNEUT) return 1.0;
 
+	// Hush now
 	StopTalking();
 
-	// Check if event has changed incase common blocks need filling
-	// if (evt->eventid != fLastEventID or evt != fLastEventPointer){
-		
-		// Fill NEUT Common blocks
-		GeneratorUtils::FillNeutCommons(evt->fNeutVect);
-
-		// Save last one
-		// fLastEventID = evt->eventid;
-		// fLastEventPointer = evt;
-	// }
+	// Fill NEUT Common blocks
+	GeneratorUtils::FillNeutCommons(evt->fNeutVect);
 
 	// Call Weight calculation
-    double rw_weight = fNeutRW->CalcWeight();
-    StartTalking();
-    // Return rw_weight
-    return rw_weight;
+	rw_weight = fNeutRW->CalcWeight();
+
+	// Speak Now
+	StartTalking();
+#endif
+
+	// Return rw_weight
+	return rw_weight;
 }
 
 

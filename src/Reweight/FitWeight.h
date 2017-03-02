@@ -9,6 +9,8 @@
 #include "SampleNormEngine.h"
 #include "LikelihoodWeightEngine.h"
 #include "SplineWeightEngine.h"
+#include "NUISANCEWeightEngine.h"
+#include "T2KWeightEngine.h"
 
 #include <map>
 #include <vector>
@@ -23,7 +25,6 @@ public:
   // Includes
   void IncludeDial(std::string name, std::string type, double val = -9999.9);
   void IncludeDial(std::string name, int type, double val = -9999.9);
-  void IncludeDial(int rwenum, double val = -9999.9);
 
   // Update RW Engines
   void Reconfigure(bool silent = false);

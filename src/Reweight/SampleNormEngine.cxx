@@ -3,8 +3,8 @@
 SampleNormEngine::SampleNormEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up Sample Norm RW : " << fName << endl;
+	fCalcName = name;
+	LOG(FIT) << "Setting up Sample Norm RW : " << fCalcName << endl;
 
 	// Set Abs Twk Config
 	fIsAbsTwk = true;
@@ -12,35 +12,39 @@ SampleNormEngine::SampleNormEngine(std::string name) {
 };
 
 
-void SampleNormEngine::IncludeDial(int nuisenum, double startval) {
+void SampleNormEngine::IncludeDial(std::string name, double startval) {
 
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
+	// Get NUISANCE Enum
+	int nuisenum = Reweight::ConvDial(name, kNORM);
 
 	// Fill Maps
-	fNormEnumSysts[nuisenum] = rwenum;
+	int index = fValues.size();
+	fValues.push_back(1.0);
 
-	// Initialise dial
-	fNormValues[rwenum] = 1.0;
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
 
 	// Set Value if given
 	if (startval != -999.9) {
-		SetDialValue(nuisenum, startval);
+		SetDialValue(name, startval);
 	}
-
 };
 
 
 void SampleNormEngine::SetDialValue(int nuisenum, double val) {
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fNormValues[rwenum] = val;
+	fValues[fEnumIndex[nuisenum]] = val;
 }
 
+void SampleNormEngine::SetDialValue(std::string name, double val){
+	fValues[fNameIndex[name]] = val;
+}
 
 void SampleNormEngine::Reconfigure(bool silent) {
 	// Empty placeholder incase we want print statements...
 }
+
+
+
 
 
 

@@ -580,22 +580,24 @@ void JointFCN::ReconfigureUsingManager() {
     FitEvent* curevent = curinput->FirstNuisanceEvent();
     int i = 0;
     int nevents = curinput->GetNEvents();
-    int countwidth = nevents / 5;
+    int countwidth = nevents / 20;
 
     // Start event loop
     while (curevent) {
 
-      // Logging
-      if (LOG_LEVEL(REC)) {
-        if (i % countwidth == 0) {
-          LOG(REC) << "Processed " << i << " events." << std::endl;
-        }
-      }
+      
 
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
+
+      // Logging
+      if (LOG_LEVEL(REC)) {
+        if (i % countwidth == 0) {
+          LOG(REC) << "Processed " << i << " events. W = " << rwweight << std::endl;
+        }
+      }
 
       // std::cout << "Event " << i << " Weight = " << rwweight << std::endl;
 

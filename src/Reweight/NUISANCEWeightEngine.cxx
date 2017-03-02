@@ -1,83 +1,99 @@
 #include "NUISANCEWeightEngine.h"
+#include "NUISANCEWeightCalcs.h"
 
-
-// NUISANCE Weight Calc Base
-double NUISANCEWeightCalc::CalcWeight(BaseFitEvt* evt){
-	return 1.0; // DEFAULT
-}
-	
-void NUISANCEWeightCalc::SetDialValue(int rwenum, double val){
-
-	// Check found
-	if (fDialSystIndices.find(rwenum) == fDialSystIndices.end()){
-		"Trying to set unknown dial value!"
-	}
-
-
-
-
-			
-}
-
-bool NUISANCEWeightCalc::IsHandled(int rwenum){
-	return false;
-}
-
-void NUISANCEWeightCalc::Print(){
-
-	// Loop over enum names
-	for (std::map<int, std::string>::iterator iter = fNUISWEIGHTCalcs.begin();
-		iter != fNUISWEIGHTCalcs.end(); iter++){
-		std::cout << "NUISANCE Weight Calc " << iter->second << " " << fDialValues->at(iter->first) << std::endl;
-	}
-
-}
-
-
-
-
-
-
-
-
-// Main NUISANCE Weight Engine
 NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
 
-	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up NUISANCE RW : " << fName << endl;
+	// Setup the NUISANCE Reweight engine
+	fCalcName = name;
+	LOG(FIT) << "Setting up NUISANCE Custom RW : " << fCalcName << endl;
+
+	// Load in all Weight Calculations
+	fWeightCalculators.push_back( new GaussianModeCorr() );
+
+	// Set Abs Twk Config
+	fIsAbsTwk = true;
 
 };
 
 
-void NUISANCEWeightEngine::IncludeDial(int nuisenum, double startval){
+void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
 
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
-	
-	// Check RW Enum not handled by any of the 
+	// Get NUISANCE Enum
+	int nuisenum = Reweight::ConvDial(name, kCUSTOM);
 
+	// Fill Maps
+	int index = fValues.size();
+	fValues.push_back(1.0);
+
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
+
+	// Set Value if given
+	if (startval != -999.9) {
+		SetDialValue(name, startval);
+	}
 };
 
 
-void NUISANCEWeightEngine::SetDialValue(int nuisenum, double val){
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fNeutRW->Systematics().Set(static_cast<neut::rew::NSyst_t>(rwenum), val);
+void NUISANCEWeightEngine::SetDialValue(int nuisenum, double val) {
+	fValues[fEnumIndex[nuisenum]] = val;
+}
+
+void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
+	fValues[fNameIndex[name]] = val;
+}
+
+void NUISANCEWeightEngine::Reconfigure(bool silent) {
+
+	// Loop over all names
+	for (std::map<int, size_t>::iterator enumiter = fEnumIndex.begin();
+	        enumiter != fEnumIndex.end(); enumiter++) {
+
+		for (std::vector<NUISANCEWeightCalc*>::iterator calciter = fWeightCalculators.begin();
+		        calciter != fWeightCalculators.end(); calciter++) {
+
+			NUISANCEWeightCalc* nuiscalc = static_cast<NUISANCEWeightCalc*>(*calciter);
+			if (nuiscalc->IsHandled(enumiter->first)) {
+				nuiscalc->SetDialValue(enumiter->first, fValues[enumiter->second]);
+			}
+		}
+	}
 }
 
 
-void NUISANCEWeightEngine::Reconfigure(bool silent){
-	// Hush now...
-}
 
-
-double NUISANCEWeightEngine::CalcWeight(BaseFitEvt* evt){
+double NUISANCEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	double rw_weight = 1.0;
 
-    // Return rw_weight
-    return rw_weight;
+	// Cast as usable class
+	for (std::vector<NUISANCEWeightCalc*>::iterator iter = fWeightCalculators.begin();
+	        iter != fWeightCalculators.end(); iter++) {
+		NUISANCEWeightCalc* nuiscalc = static_cast<NUISANCEWeightCalc*>(*iter);
+
+		rw_weight *= nuiscalc->CalcWeight(evt);
+	}
+
+	// Return rw_weight
+	return rw_weight;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

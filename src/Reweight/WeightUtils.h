@@ -92,6 +92,8 @@ using namespace t2krew;
 using namespace genie;
 using namespace genie::rew;
 #endif
+#include "NUISANCESyst.h"
+#include "GlobalDialList.h"
 
 namespace FitBase {
 
@@ -111,5 +113,31 @@ double RWFracToSigma(std::string type, std::string name, double val);
  static std::map<std::string, int> gLikeWeightEnums;
  static std::map<std::string, int> gSplineParameterEnums;
 }
+
+
+namespace Reweight {
+
+	int ConvDial(std::string name, std::string type, bool exceptions=false);
+	int ConvDial(std::string name, int type, bool exceptions=false);
+	std::string ConvDial(int nuisenum);
+
+    int ConvDialType(std::string type);
+    std::string ConvDialType(int type);
+
+	int NEUTEnumFromName(std::string name);
+	int NIWGEnumFromName(std::string name);
+	int NUWROEnumFromName(std::string name);
+	int T2KEnumFromName(std::string name);
+	int GENIEEnumFromName(std::string name);
+	int CustomEnumFromName(std::string name); 
+	
+	int NUISANCEEnumFromName(std::string name, int type);
+
+	static const int kNoDialFound       = -1;
+	static const int kNoTypeFound       = -2;
+	static const int kGeneratorNotBuilt = -3;
+}
+
+
 
 #endif

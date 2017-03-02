@@ -24,8 +24,16 @@ void FitWeight::AddRWEngine(int type) {
 		fAllRW[type] = new LikelihoodWeightEngine("likerw");
 		break;
 
+	case kT2K:
+		fAllRW[type] = new T2KWeightEngine("t2krw");
+		break;
+
+	case kCUSTOM:
+		fAllRW[type] = new NUISANCEWeightEngine("nuisrw");
+		break;
+
 	case kSPLINEPARAMETER:
-	std::cout << "Setting up Spline RW Engine " << std::endl;
+		std::cout << "Setting up Spline RW Engine " << std::endl;
 		fAllRW[type] = new SplineWeightEngine("splinerw");
 		break;
 	}
@@ -33,76 +41,38 @@ void FitWeight::AddRWEngine(int type) {
 }
 
 void FitWeight::IncludeDial(std::string name, std::string type, double val) {
-	int nuisenum = FitBase::GetDialEnum(type, name);
-	IncludeDial(nuisenum, val);
+	// Should register the dial here.
+	int typeenum = Reweight::ConvDialType(type);
+	IncludeDial(name, typeenum, val);
+}
+
+void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
+
+	// Get the dial enum
+	int nuisenum = Reweight::ConvDial(name, dialtype);
+
+	// Setup RW Engine Pointer
+	if (fAllRW.find(dialtype) == fAllRW.end()) {
+		AddRWEngine(dialtype);
+	}
+	WeightEngineBase* rw = fAllRW[dialtype];
+
+	// Include the dial
+	rw->IncludeDial(name, val);
+
+	// Set Dial Value
+	if (val != -9999.9) {
+		rw->SetDialValue(name, val);
+	}
 
 	// Sort Maps
-	fAllEnums[name]  = nuisenum;
+	fAllEnums[name]      = nuisenum;
 	fAllValues[nuisenum] = val;
 
 	// Sort Lists
 	fNameList.push_back(name);
 	fEnumList.push_back(nuisenum);
 	fValueList.push_back(val);
-}
-
-void FitWeight::IncludeDial(std::string name, int type, double val) {
-
-	// Get the dial type.
-	int rwenum = FitBase::GetDialEnum(type, name);
-	int dialtype = int(rwenum - (rwenum % 1000)) / 1000;
-	std::cout << "DialType = " << dialtype << std::endl;
-
-	if (fAllRW.find(dialtype) == fAllRW.end()) {
-		AddRWEngine(dialtype);
-	}
-
-	// Pointer to relevant engine
-	WeightEngineBase* rw = fAllRW[dialtype];
-	std::cout << "Adding rw dial " << rw << std::endl;
-
-	// Include the dial
-	std::cout << "Including new dial " << name << " " << type << " " << val << std::endl;
-	rw->IncludeDial(name, type, val);
-
-	// Set Dial Value
-	if (val != -9999.9) {
-		std::cout << "Setting nominal dial value " << val << std::endl;
-		rw->SetDialValue(rwenum, val);
-	}
-
-	// Sort Maps
-	fAllEnums[name]   = rwenum;
-	fAllValues[rwenum] = val;
-
-	// Sort Lists
-	fNameList.push_back(name);
-	fEnumList.push_back(rwenum);
-	fValueList.push_back(val);
-}
-
-void FitWeight::IncludeDial(int rwenum, double val) {
-
-	// Get the dial type.
-	int dialtype = int(rwenum - (rwenum % 1000)) / 1000;
-	std::cout << "DialType = " << dialtype << std::endl;
-
-	if (fAllRW.find(dialtype) == fAllRW.end()) {
-		AddRWEngine(dialtype);
-	}
-
-
-
-	// Pointer to relevant engine
-	WeightEngineBase* rw = fAllRW[dialtype];
-
-	std::cout << "Adding rw dial " << rw << std::endl;
-
-	// Include the dial
-	rw->IncludeDial(rwenum, val);
-
-	// Set Dial Value
-	if (val != -9999.9) rw->SetDialValue(rwenum, val);
 }
 
 void FitWeight::Reconfigure(bool silent) {
@@ -118,14 +88,11 @@ void FitWeight::SetDialValue(std::string name, double val) {
 	SetDialValue(nuisenum, val);
 }
 
+
+// Allow for name aswell using GlobalList to determine sample name.
 void FitWeight::SetDialValue(int nuisenum, double val) {
 	// Conv dial type
 	int dialtype = int(nuisenum - (nuisenum % 1000)) / 1000;
-
-	// Check dial type available
-	if (fAllRW.find(dialtype) == fAllRW.end()) {
-		AddRWEngine(dialtype);
-	}
 
 	// Get RW Engine for this dial
 	fAllRW[dialtype]->SetDialValue(nuisenum, val);
@@ -141,7 +108,7 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
 }
 
 void FitWeight::SetAllDials(const double* x, int n) {
-	for (int i = 0; i < n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		int rwenum = fEnumList[i];
 		SetDialValue(rwenum, x[i]);
 	}
@@ -184,12 +151,10 @@ bool FitWeight::DialIncluded(int rwenum) {
 
 
 double FitWeight::CalcWeight(BaseFitEvt* evt) {
-	// std::cout << "New Event Weight" << std::endl;
 	double rwweight = 1.0;
 	for (std::map<int, WeightEngineBase*>::iterator iter = fAllRW.begin();
 	        iter != fAllRW.end(); iter++) {
 		double w = (*iter).second->CalcWeight(evt);
-		// std::cout << "Iter Weight = " << iter->first <<" " << w << std::endl;
 		rwweight *= w;
 	}
 	return rwweight;

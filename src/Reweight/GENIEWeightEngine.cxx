@@ -1,10 +1,11 @@
 #include "GENIEWeightEngine.h"
 
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
+#ifdef __GENIE_ENABLED__
 
 	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up GENIE RW : " << fName << endl;
+	fCalcName = name;
+	LOG(FIT) << "Setting up GENIE RW : " << fCalcName << endl;
 
 	// Create RW Engine suppressing cout
 	StopTalking();
@@ -88,13 +89,18 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 
 	// Set Abs Twk Config
 	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
-	
+
 	// allow cout again
 	StartTalking();
+
+#else
+	ERR(FTL) << "GENIE RW NOT ENABLED" << std::endl;
+#endif
 };
 
 
 void GENIEWeightEngine::IncludeDial(int nuisenum, double startval) {
+#ifdef __GENIE_ENABLED__
 
 	// Get RW Enum and name
 	int rwenum = (nuisenum % 1000);
@@ -118,17 +124,21 @@ void GENIEWeightEngine::IncludeDial(int nuisenum, double startval) {
 		SetDialValue(nuisenum, startval);
 	}
 
+#endif
 };
 
 
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
+#ifdef __GENIE_ENABLED__
 	// Set RW engine values
 	int rwenum = (nuisenum % 1000);
 	fGenieRW->Systematics().Set(static_cast<genie::rew::GSyst_t>(rwenum), val);
+#endif
 }
 
 
 void GENIEWeightEngine::Reconfigure(bool silent) {
+#ifdef __GENIE_ENABLED__
 	// Hush now...
 	if (silent) StopTalking();
 
@@ -137,16 +147,20 @@ void GENIEWeightEngine::Reconfigure(bool silent) {
 
 	// Shout again
 	if (silent) StartTalking();
+#endif
 }
 
 
 double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
+	double rw_weight = 1.0;
 
+#ifdef __GENIE_ENABLED__
 	// Skip Non GENIE
 	if (evt->fType != kGENIE) return 1.0;
 
 	// Make nom weight
-	double rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
+	rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
+#endif
 
 	// Return rw_weight
 	return rw_weight;

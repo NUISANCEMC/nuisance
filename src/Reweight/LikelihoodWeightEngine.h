@@ -12,15 +12,14 @@ class LikelihoodWeightEngine : public WeightEngineBase {
 		LikelihoodWeightEngine(std::string name);
 		~LikelihoodWeightEngine(){};
 
-		void IncludeDial(int nuisenum, double startval);
+		void IncludeDial(std::string name, double startval);
+				void SetDialValue(std::string name, double val);
+
 		void SetDialValue(int rwenum, double val);
 		void Reconfigure(bool silent = false);
 		inline double CalcWeight(BaseFitEvt* evt) {return 1.0;};
 		inline bool NeedsEventReWeight(){ return false; };
 
-		std::map<std::string, int> fLikeWeightNameSysts;
-		std::map<int, int> fLikeWeightEnumSysts;
-		std::map<int, double> fLikeWeightValues;
 };
 
 #endif

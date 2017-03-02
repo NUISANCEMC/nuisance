@@ -1,10 +1,11 @@
 #include "NuWroWeightEngine.h"
 
 NuWroWeightEngine::NuWroWeightEngine(std::string name) {
+#ifdef __NUWRO_REWEIGHT_ENABLED__
 
 	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up NEUT RW : " << fName << endl;
+	fCalcName = name;
+	LOG(FIT) << "Setting up NuWro RW : " << fCalcName << endl;
 
 	// Create RW Engine suppressing cout
 	StopTalking();
@@ -33,44 +34,60 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
 
 	// allow cout again
 	StartTalking();
+#else
+	ERR(FTL) << "NUWRO RW NOT ENABLED! " << std::endl;
+#endif
 };
 
 
-void NuWroWeightEngine::IncludeDial(int nuisenum, double startval) {
+void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
+#ifdef __NUWRO_REWEIGHT_ENABLED__
 
 	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
-	nuwro::rew::NuwroSyst_t rwsyst = static_cast<nuwro::rew::NuwroSyst_t>(rwenum);
-	std::string name = nuwro::rew::NuwroSyst::AsString(rwsyst);
+	nuwro::rew::NuwroSyst_t gensyst = nuwro::rew::NuwroSyst::FromString(name);
+	int nuisenum = Reweight::ConvDial(name, kNUWRO);
 
 	// Fill Maps
-	fNuwroNameSysts[name]     = rwsyst;
-	fNuwroEnumSysts[nuisenum] = rwsyst;
+	int index = fValues.size();
+	fValues.push_back(0.0);
+	fNUWROSysts.push_back(gensyst);
 
-	// Initialize dial
-	fNuwroRW->Systematics().Add( fNuwroEnumSysts[nuisenum] );
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
+
+	// Initialise Dial
+	fNuwroRW->Systematics().Add( fNUWROSysts[index] );
 
 	// If Absolute
 	if (fIsAbsTwk) {
-		nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty( fNuwroEnumSysts[nuisenum], 1.0, 1.0 );
+		nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty( fNUWROSysts[index], 1.0, 1.0 );
 	}
 
 	// Set Value if given
 	if (startval != -999.9) {
-		SetDialValue(nuisenum, startval);
+		SetDialValue(name, startval);
 	}
-
+#endif
 };
 
 
 void NuWroWeightEngine::SetDialValue(int nuisenum, double val) {
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fNuwroRW->Systematics().SetSystVal(static_cast<nuwro::rew::NuwroSyst_t>(rwenum), val);
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+	fValues[fEnumIndex[nuisenum]] = val;
+	fNuwroRW->Systematics().SetSystVal(fNUWROSysts[fEnumIndex[nuisenum]], val);
+#endif
+}
+
+void NuWroWeightEngine::SetDialValue(std::string name, double val) {
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+	fValues[fNameIndex[name]] = val;
+	fNuwroRW->Systematics().SetSystVal(fNUWROSysts[fNameIndex[name]], val);
+#endif
 }
 
 
 void NuWroWeightEngine::Reconfigure(bool silent) {
+#ifdef __NUWRO_REWEIGHT_ENABLED__
 	// Hush now...
 	if (silent) StopTalking();
 
@@ -79,17 +96,21 @@ void NuWroWeightEngine::Reconfigure(bool silent) {
 
 	// Shout again
 	if (silent) StartTalking();
+#endif
 }
 
 
 double NuWroWeightEngine::CalcWeight(BaseFitEvt* evt) {
+	double rw_weight = 1.0;
 
+#ifdef __NUWRO_REWEIGHT_ENABLED__
 	// Skip Non GENIE
 	if (evt->fType != kNUWRO) return 1.0;
 
 	// Call Weight calculation
-	double rw_weight = fNuwroRW->CalcWeight(evt->fNuwroEvent);
-	
+	rw_weight = fNuwroRW->CalcWeight(evt->fNuwroEvent);
+#endif
+
 	// Return rw_weight
 	return rw_weight;
 }

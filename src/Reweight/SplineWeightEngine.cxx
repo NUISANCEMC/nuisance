@@ -2,10 +2,10 @@
 
 SplineWeightEngine::SplineWeightEngine(std::string name) {
 
-	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up Spline RW : " << fName << endl;
-	sleep(2);
+	// Setup the Reweight engien
+	fCalcName = name;
+	LOG(FIT) << "Setting up Spline RW : " << fCalcName << endl;
+
 	// Set Abs Twk Config
 	fIsAbsTwk = true;
 
@@ -13,61 +13,45 @@ SplineWeightEngine::SplineWeightEngine(std::string name) {
 
 
 void SplineWeightEngine::IncludeDial(std::string name, int type, double startval) {
-	int nuisenum = FitBase::GetDialEnum(type, name);
-	int rwenum = (nuisenum % 1000);
 
-	fSplineNameSysts[name] = rwenum;
-	fSplineSystNames[rwenum] = name;
-
-	IncludeDial(rwenum, startval);
-	std::cout << "Included Spline Dial " << name << " " << startval << std::endl;
-	sleep(1);
-}
-
-void SplineWeightEngine::IncludeDial(int nuisenum, double startval) {
-
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
+	// Get NUISANCE Enum
+	int nuisenum = Reweight::ConvDial(name, kNEWSPLINE);
 
 	// Fill Maps
-	fSplineEnumSysts[nuisenum] = rwenum;
+	int index = fValues.size();
+	fValues.push_back(0.0);
 
-	// Initialise dial
-	fSplineValues[rwenum] = 1.0;
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
 
 	// Set Value if given
 	if (startval != -999.9) {
-		SetDialValue(nuisenum, startval);
+		SetDialValue(name, startval);
 	}
-
-};
+}
 
 
 void SplineWeightEngine::SetDialValue(int nuisenum, double val) {
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fSplineValues[rwenum] = val;
-	std::cout << "Setting Dial Value " << nuisenum << " to " << val << std::endl;
-	// sleep(10);
+	fValues[fEnumIndex[nuisenum]] = val;
+}
+
+void SplineWeightEngine::SetDialValue(std::string name, double val){
+	fValues[fNameIndex[name]] = val;
 }
 
 
 void SplineWeightEngine::Reconfigure(bool silent) {
-	// Reconfigure here does nothing as spline readers in events need to be
-	// reconfigured.
-	for (std::map<std::string, int>::iterator iter = fSplineNameSysts.begin();
-	        iter != fSplineNameSysts.end(); iter++) {
+	for (std::map<std::string, size_t>::iterator iter = fNameIndex.begin(); 
+		iter != fNameIndex.end(); iter++){
 
-		std::cout << "Saved into spline value map " << iter->first << " " << fSplineValues[ iter->second ] <<" " << iter->second << std::endl;
-		fSplineValueMap[ iter->first ] = fSplineValues[ iter->second ];
+		LOG() << "Reconfiguring Spline " << iter->first << " to be " << fValues[ iter->second ] << " Inside SPL RW" << std::endl;
+		fSplineValueMap[ iter->first ] = fValues[ iter->second ];
 	}
-	// sleep(5);
 }
 
 
 double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
-	// return 1.0;
 	if (!evt->fSplineRead) return 1.0;
 
 	// if (!evt->fSplineRead->NeedsReconfigure()) {
@@ -76,7 +60,6 @@ double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	// }
 	double rw_weight = evt->fSplineRead->CalcWeight( evt->fSplineCoeff );
 	
-	// std::cout << "Returning Weight = " << rw_weight << std::endl;
 	return rw_weight;
 	
 }

@@ -27,21 +27,32 @@ class WeightEngineBase {
 public:
 
 	WeightEngineBase(){};
-	// ~WeightEngineBase(){};
+	virtual ~WeightEngineBase(){};
 
 	// Functions requiring Override
-	virtual void IncludeDial(std::string name, int type, double startval);
-	virtual void IncludeDial(int nuisenum, double startval) = 0;
-	virtual void SetDialValue(int rwenum, double val) = 0;
-	virtual void Reconfigure(bool silent) = 0;
-	virtual double CalcWeight(BaseFitEvt* evt) = 0;
-	virtual double GetDialValue(int rwenum);
+	virtual void IncludeDial(std::string name, double startval){};
+
+	virtual void SetDialValue(int nuisenum, double val){};
+	virtual void SetDialValue(std::string name, double val){};
+
+	virtual bool IsDialIncluded(std::string name);
+	virtual bool IsDialIncluded(int nuisenum);
+
+	virtual double GetDialValue(std::string name);
+	virtual double GetDialValue(int nuisenum);
+
+	virtual void Reconfigure(bool silent){};
+	
+	virtual double CalcWeight(BaseFitEvt* evt){ return 1.0; };
 	virtual bool NeedsEventReWeight() = 0;
 
 	bool fHasChanged;
-	std::map<int, double> fEnumCurValues;
-	std::string fName;
 	bool fIsAbsTwk;
+
+	std::vector<double> fValues;
+	std::map<int, size_t> fEnumIndex;
+	std::map<std::string, size_t> fNameIndex;
+	std::string fCalcName;
 };
 
 

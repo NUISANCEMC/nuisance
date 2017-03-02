@@ -26,22 +26,26 @@
 #include "FitWeight.h"
 
 class NEUTWeightEngine : public WeightEngineBase {
-	public:
-		NEUTWeightEngine(std::string name);
-		~NEUTWeightEngine(){};
+public:
+	NEUTWeightEngine(std::string name);
+	~NEUTWeightEngine() {};
 
-		void IncludeDial(int nuisenum, double startval);
-		void SetDialValue(int rwenum, double val);
-		void Reconfigure(bool silent = false);
-		double CalcWeight(BaseFitEvt* evt);
-		inline bool NeedsEventReWeight(){ return true; };
+	void IncludeDial(std::string name, double startval);
 
-		std::map<std::string, neut::rew::NSyst_t> fNeutNameSysts;
-		std::map<int, neut::rew::NSyst_t> fNeutEnumSysts;
-		neut::rew::NReWeight* fNeutRW;
+	void SetDialValue(std::string name, double val);
+	void SetDialValue(int nuisenum, double val);
 
-		int fLastEventID;
-		BaseFitEvt* fLastEventPointer;
+	void Reconfigure(bool silent = false);
+
+	double CalcWeight(BaseFitEvt* evt);
+
+	inline bool NeedsEventReWeight() { return true; };
+
+
+#ifdef __NEUT_ENABLED__
+	std::vector<neut::rew::NSyst_t> fNEUTSysts;
+	neut::rew::NReWeight* fNeutRW;
+#endif
 };
 
 #endif

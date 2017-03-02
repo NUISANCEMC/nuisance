@@ -3,8 +3,8 @@
 LikelihoodWeightEngine::LikelihoodWeightEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
-	fName = name;
-	LOG(FIT) << "Setting up Likelihood Weight RW : " << fName << endl;
+	fCalcName = name;
+	LOG(FIT) << "Setting up Likelihood Weight RW : " << fCalcName << endl;
 
 	// Set Abs Twk Config
 	fIsAbsTwk = true;
@@ -12,35 +12,39 @@ LikelihoodWeightEngine::LikelihoodWeightEngine(std::string name) {
 };
 
 
-void LikelihoodWeightEngine::IncludeDial(int nuisenum, double startval) {
+void LikelihoodWeightEngine::IncludeDial(std::string name, double startval) {
 
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
+	// Get NUISANCE Enum
+	int nuisenum = Reweight::ConvDial(name, kNORM);
 
 	// Fill Maps
-	fLikeWeightEnumSysts[nuisenum] = rwenum;
+	int index = fValues.size();
+	fValues.push_back(1.0);
 
-	// Initialise dial
-	fLikeWeightValues[rwenum] = 1.0;
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
 
 	// Set Value if given
 	if (startval != -999.9) {
-		SetDialValue(nuisenum, startval);
+		SetDialValue(name, startval);
 	}
-
 };
 
 
 void LikelihoodWeightEngine::SetDialValue(int nuisenum, double val) {
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fLikeWeightValues[rwenum] = val;
+	fValues[fEnumIndex[nuisenum]] = val;
 }
 
+void LikelihoodWeightEngine::SetDialValue(std::string name, double val){
+	fValues[fNameIndex[name]] = val;
+}
 
 void LikelihoodWeightEngine::Reconfigure(bool silent) {
 	// Empty placeholder incase we want print statements...
 }
+
+
+
 
 
 
