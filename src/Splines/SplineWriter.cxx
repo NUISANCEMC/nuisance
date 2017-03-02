@@ -89,7 +89,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
 
     // Fill Weight Set
     fWeightList[i] = weight;
-    std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << std::endl;
+    // std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << std::endl;
 
   }
 
@@ -209,13 +209,24 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
         // gr->Draw("APL");
         hist->SetLineColor(kRed);
         hist->Draw("HIST C");
+        hist->SetTitle("Spline Response");
+        hist->GetYaxis()->SetRangeUser(0.0,3.0);
+        // gStyle->SetOptStat(0);
+        hist->SetStats(0);
         gr->SetMarkerStyle(20);
+        gr->SetTitle("True Weight Points");
         gr->Draw("P SAME");
+        gPad->BuildLegend();
+        gPad->Update();
 
+        hist->SetTitle(fSpline[i].c_str());
+        hist->GetXaxis()->SetTitle("Dial Variation");
+        hist->GetYaxis()->SetTitle("Event Weight");
         gPad->Update();
         gPad->SaveAs(("F2_eval_" + fSpline[i] + ".pdf").c_str());
 
         delete gr;
+        sleep(3);
         // delete f1;
       }
       coeffcount += npar;

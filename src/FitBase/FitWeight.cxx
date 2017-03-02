@@ -143,7 +143,6 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
 void FitWeight::SetAllDials(const double* x, int n) {
 	for (int i = 0; i < n; i++) {
 		int rwenum = fEnumList[i];
-		std::cout << "Setting dial value " << rwenum << " " << x[i] << std::endl;
 		SetDialValue(rwenum, x[i]);
 	}
 	Reconfigure();

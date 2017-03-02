@@ -597,7 +597,7 @@ void JointFCN::ReconfigureUsingManager() {
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
 
-      std::cout << "Event " << i << " Weight = " << rwweight << std::endl;
+      // std::cout << "Event " << i << " Weight = " << rwweight << std::endl;
 
       // Setup flag for if signal found in at least one sample
       bool foundsignal = false;

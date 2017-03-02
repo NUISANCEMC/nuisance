@@ -92,14 +92,13 @@ void NEUTWeightEngine::SetDialValue(int nuisenum, double val){
 
 void NEUTWeightEngine::Reconfigure(bool silent){
 	// Hush now...
-	// if (silent) StopTalking();
+	 if (silent) StopTalking();
 
 	// Reconf
 	fNeutRW->Reconfigure();
-	fNeutRW->Print();
 
 	// Shout again
-	// if (silent) StartTalking();
+	 if (silent) StartTalking();
 }
 
 

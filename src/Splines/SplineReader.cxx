@@ -63,7 +63,6 @@ void SplineReader::Read(TTree* tr) {
     fAllSplines.push_back( Spline(fSpline[i], fForm[i],
                                   GeneralUtils::ParseToDbl(fPoints[i], ",")) );
   }
-  sleep(10);
 }
 
 
@@ -72,11 +71,11 @@ void SplineReader::Reconfigure(std::map< std::string, double >& vals) {
   for (std::map<std::string, double>::iterator iter = vals.begin(); 
       iter != vals.end(); iter++){
 
-    std::cout << " Found " << iter->first << " in map handed to reader." << std::endl;
+    // std::cout << " Found " << iter->first << " in map handed to reader." << std::endl;
     for (size_t i = 0; i < fSpline.size(); i++){
-      std::cout << " Comparing it to : " << fSpline[i] << std::endl;
+      // std::cout << " Comparing it to : " << fSpline[i] << std::endl;
       if (!fSpline[i].compare(iter->first.c_str())){
-        std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
+        // std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
         // sleep(1);
         fAllSplines[i].Reconfigure(iter->second);
       }
@@ -100,13 +99,13 @@ double SplineReader::CalcWeight(double* coeffs) {
   double rw_weight = 1.0;
 
   for (size_t i = 0; i < fAllSplines.size(); i++) {
-     std::cout << "Evaluating spline " << fAllSplines[i].GetName() << " at coeff offset " << off <<  "(" << coeffs << ")" << std::endl;
-     for (int j = 0; j < fAllSplines[i].GetNPar(); j++){
-       std::cout << "Coeff " << j+off << " " << coeffs[off+j] << std::endl;
-    }
+     // std::cout << "Evaluating spline " << fAllSplines[i].GetName() << " at coeff offset " << off <<  "(" << coeffs << ")" << std::endl;
+     // for (int j = 0; j < fAllSplines[i].GetNPar(); j++){
+       // std::cout << "Coeff " << j+off << " " << coeffs[off+j] << std::endl;
+    // }
     double w = fAllSplines[i].DoEval( &coeffs[off] );
     rw_weight *= w;
-    std::cout << "Spline RW Weight = " << rw_weight << " " << w << std::endl;
+    // std::cout << "Spline RW Weight = " << rw_weight << " " << w << std::endl;
     off += fAllSplines[i].GetNPar();
   }
 

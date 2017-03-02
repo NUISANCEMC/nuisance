@@ -54,7 +54,7 @@ double Spline::operator()(const Double_t* x, const Double_t* par) const {
 }
 
 void Spline::Reconfigure(double x) {
-  std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
+  // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
   fX = x;
   fOutsideLimits = false;
 
@@ -90,7 +90,7 @@ double Spline::DoEval(const Double_t* par, bool checkresponse) const {
     }
 
     if (!hasresponse) {
-      std::cout << "No Response" << std::endl;
+      // std::cout << "No Response" << std::endl;
       return 1.0;
     }
   }
@@ -232,7 +232,6 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool dr
   // StartTalking();
 
   for (int i = 0; i < this->GetNPar(); i++) {
-    std::cout << "Saved Norm Parameter " << " " << i << " " << func->GetParameter(i) << std::endl;
     coeff[i] = func->GetParameter(i);
   }
 

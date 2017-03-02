@@ -172,7 +172,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     } else if (!key.Has("name")) {
       ERR(FTL) << "No name given for parameter " << i << std::endl;
       throw;
-    } else if (!key.Has("nom")) {
+    } else if (!key.Has("nominal")) {
       ERR(FTL) << "No nominal given for parameter " << i << std::endl;
       throw;
     }
@@ -180,7 +180,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     // Get Inputs
     std::string partype = key.GetS("type");
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nom");
+    double parnom  = key.GetD("nominal");
     double parlow  = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;

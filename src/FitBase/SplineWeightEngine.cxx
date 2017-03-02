@@ -76,7 +76,7 @@ double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	// }
 	double rw_weight = evt->fSplineRead->CalcWeight( evt->fSplineCoeff );
 	
-	std::cout << "Returning Weight = " << rw_weight << std::endl;
+	// std::cout << "Returning Weight = " << rw_weight << std::endl;
 	return rw_weight;
 	
 }
