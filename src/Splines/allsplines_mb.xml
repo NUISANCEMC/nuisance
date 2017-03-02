@@ -1,0 +1,55 @@
+<nuisance>
+
+<!-- Parameter Defintion: Need to set starting points here and tell fitweight what type each dial is.. Can include extra fixed dials. -->
+<!-- CCQE -->
+<parameter name="NXSec_VecFFCCQE" nominal="2.0" type="t2k_parameter" /> <!-- FIXED -->
+<parameter name="NXSec_AxlFFCCQE" nominal="0.0" type="t2k_parameter" /> <!-- FIXED -->
+
+<parameter name="NXSec_MaCCQE"      nominal="0.0" type="t2k_parameter"     />
+<parameter name="NIWGMEC_Norm_C12"  nominal="0.0" type="t2k_parameter" />
+<parameter name="NIWG_rpaCCQE_norm" nominal="1.0" type="t2k_parameter"/> <!-- FIXED -->
+<parameter name="NIWG2014a_pF_C12"  nominal="0.0" type="t2k_parameter" />
+
+<!-- RES -->
+<parameter name="NXSec_MaNFFRES"  nominal="0.0" type="t2k_parameter"/>
+<parameter name="NXSec_CA5RES"    nominal="0.0" type="t2k_parameter"/>
+<parameter name="NXSec_BgSclRES"  nominal="0.0" type="t2k_parameter"/>
+
+<!-- FSI -->
+<parameter name="NCasc_FrAbs_pi"      nominal="0.0" type="t2k_parameter"/>
+<parameter name="NCasc_FrInelLow_pi"  nominal="0.0" type="t2k_parameter"/>
+<parameter name="NCasc_FrCExLow_pi"   nominal="0.0" type="t2k_parameter"/>
+<parameter name="NCasc_FrInelHigh_pi" nominal="0.0" type="t2k_parameter"/>
+<parameter name="NCasc_FrCExHigh_pi"  nominal="0.0" type="t2k_parameter"/>
+<parameter name="NCasc_FrPiProd_pi"   nominal="0.0" type="t2k_parameter"/>
+
+
+<!-- Spline Definition : Names must match those given in the parameter list -->
+<!-- CCQE -->
+<spline name="NXSec_MaCCQE"     form="1DTSpline3" points="-5.0,-3.0,-1.0,0.0,1.0,3.0,5.0" />
+<spline name="NIWGMEC_Norm_C12" form="1DTPol1"    points="-1.0,0.0,1.0,3.0,5.0"           />
+<spline name="NIWG2014a_pF_C12" form="1DTSpline3" points="-5.0,-3.0,-1.0,0.0,1.0,3.0,5.0" />
+
+<!-- RES -->
+<spline name="NXSec_MaNFFRES"  form="1DTSpline3" points="-5.0,-3.0,-1.0,0.0,1.0,3.0,5.0" />
+<spline name="NXSec_CA5RES"    form="1DTSpline3" points="-5.0,-3.0,-1.0,0.0,1.0,3.0,5.0" />
+<spline name="NXSec_BgSclRES"  form="1DTSpline3" points="-5.0,-3.0,-1.0,0.0,1.0,3.0,5.0" />
+
+<!-- FSI -->
+<spline name="NCasc_FrAbs_pi"      form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+<spline name="NCasc_FrInelLow_pi"  form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+<spline name="NCasc_FrCExLow_pi"   form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+<spline name="NCasc_FrInelHigh_pi" form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+<spline name="NCasc_FrCExHigh_pi"  form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+<spline name="NCasc_FrPiProd_pi"   form="1DTSpline3" points="-2.0,-1.0,0.0,1.0,2.0"/>
+
+
+<!-- Setup Event Inputs and ouputs -->
+<events input="NEUT:/data/stowell/NIWG/NuisanceEvents/Winter2016/neut/MB_numu_fhc_trunk_merge.root" output="largesplineset_mb.root" />
+
+
+<!-- Draw Splines : When set to 1 GenerateEventSplines will pause every event and generate a set of plots for that event.
+     its a pretty crude validation system. Will put something better in place soon. -->
+<config drawsplines="1"/>
+
+</nuisance>
