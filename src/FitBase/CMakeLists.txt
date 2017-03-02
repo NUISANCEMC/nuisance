@@ -20,7 +20,6 @@ set(IMPLFILES
 ParamPull.cxx
 BaseFitEvt.cxx
 FitParticle.cxx
-FitWeight.cxx
 Measurement1D.cxx
 EventManager.cxx
 InputHandler.cxx
@@ -37,17 +36,9 @@ GENIEInputHandler.cxx
 NuWroInputHandler.cxx
 GIBUUInputHandler.cxx
 NUANCEInputHandler.cxx
-WeightEngineBase.cxx
-NEUTWeightEngine.cxx
-NuWroWeightEngine.cxx
-GENIEWeightEngine.cxx
-WeightUtils.cxx
-SampleNormEngine.cxx
-LikelihoodWeightEngine.cxx
 NuanceEvent.cxx
 SampleSettings.cxx
 FitEventInputHandler.cxx
-SplineWeightEngine.cxx
 SplineInputHandler.cxx
 MeasurementVariableBox.cxx
 MeasurementVariableBox2D.cxx
@@ -58,7 +49,7 @@ set(HEADERFILES
 ParamPull.h
 NuanceEvent.h
 BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
+EventManager.h  FitParticle.h      MeasurementBase.h
 InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
 InputUtils.h
 NEUTInputHandler.h
@@ -67,16 +58,8 @@ NuWroInputHandler.h
 InputHandler2.h
 GIBUUInputHandler.h
 NUANCEInputHandler.h
-WeightEngineBase.h
-NEUTWeightEngine.h
-NuWroWeightEngine.h
-GENIEWeightEngine.h
-WeightUtils.h
-SampleNormEngine.h
-LikelihoodWeightEngine.h
 SampleSettings.h
 FitEventInputHandler.h
-SplineWeightEngine.h
 SplineInputHandler.h
 MeasurementVariableBox.h
 MeasurementVariableBox2D.h
@@ -93,6 +76,7 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

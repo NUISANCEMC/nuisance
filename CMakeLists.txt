@@ -112,6 +112,7 @@ set(CORE
   MCStudies
   FitBase
   Splines
+  Reweight
   Utils
   #Devel
   )

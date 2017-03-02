@@ -188,7 +188,7 @@ class BaseFitEvt {
   //SplineReader* fSplineReader;
   double* fSplineCoeff;
   SplineReader* fSplineRead;
-  double fDialCoeffs[400];
+  // double fDialCoeffs;
 
   int eventid;
 

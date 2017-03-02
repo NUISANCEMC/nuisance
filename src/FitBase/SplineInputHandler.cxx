@@ -56,12 +56,7 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 
 	// Setup Friend Spline TTree
 	fSplTree = (TTree*)inp_file->Get("spline_tree");
-	// fSplTree->Add( rawinputs.c_str() );
-	// fSplineCoeff = new double[400];
 	fSplTree->SetBranchAddress( "SplineCoeff", fSplineCoeff );
-	// fSplTree->GetEntry(0);
-	// std::cout << " Branch Address " << fSplineCoeff << std::endl;
-
 	fNUISANCEEvent->fSplineCoeff = this->fSplineCoeff;
 
 	// Normalise event histograms for relative flux contributions.
@@ -90,13 +85,8 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 	fNUISANCEEvent->ResetEvent();
 
 	// Read NUISANCE Tree
-	// std::cout << "Getting entry " << entry << std::endl;
 	fFitEventTree->GetEntry(entry);
-	
-	// std::cout << "Event Coeff = "  << fSplTree << " " << fSplineCoeff << " " << fNUISANCEEvent->fSplineCoeff << std::endl;
 	fSplTree->GetEntry(entry);
-	// std::cout << "Showing " << entry << std::endl;
-	// fSplTree->Show(entry);
 
 	fNUISANCEEvent->eventid = entry;
 
