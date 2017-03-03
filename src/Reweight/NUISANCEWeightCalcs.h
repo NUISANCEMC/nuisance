@@ -49,22 +49,23 @@ public:
 	// 3 q3 pos
 	// 4 q3 width
 	static const int kPosNorm = 0;
-	static const int kPosPq0  = 1;
-	static const int kPosWq0  = 2;
-	static const int kPosPq3  = 3;
-	static const int kPosWq3  = 4;
+	static const int kPosTilt = 1;
+	static const int kPosPq0  = 2;
+	static const int kPosWq0  = 3;
+	static const int kPosPq3  = 4;
+	static const int kPosWq3  = 5;
 
 	bool fApply_CCQE;
-	double fGausVal_CCQE[5];
+	double fGausVal_CCQE[6];
 
 	bool fApply_2p2h;
-	double fGausVal_2p2h[5];
+	double fGausVal_2p2h[6];
 
 	bool fApply_2p2h_PPandNN;
-	double fGausVal_2p2h_PPandNN[5];
+	double fGausVal_2p2h_PPandNN[6];
 
 	bool fApply_2p2h_NP;
-	double fGausVal_2p2h_NP[5];
+	double fGausVal_2p2h_NP[6];
 	bool fDebugStatements;
 
 

@@ -5,6 +5,7 @@ GaussianModeCorr::GaussianModeCorr() {
 	// Init
 	fApply_CCQE = false;
 	fGausVal_CCQE[kPosNorm] = 0.0;
+	fGausVal_CCQE[kPosTilt] = 0.0;
 	fGausVal_CCQE[kPosPq0]  = 1.0;
 	fGausVal_CCQE[kPosWq0]  = 1.0;
 	fGausVal_CCQE[kPosPq3]  = 1.0;
@@ -12,6 +13,7 @@ GaussianModeCorr::GaussianModeCorr() {
 
 	fApply_2p2h = false;
 	fGausVal_2p2h[kPosNorm] = 0.0;
+	fGausVal_2p2h[kPosTilt]    = 0.0;
 	fGausVal_2p2h[kPosPq0]  = 1.0;
 	fGausVal_2p2h[kPosWq0]  = 1.0;
 	fGausVal_2p2h[kPosPq3]  = 1.0;
@@ -19,6 +21,7 @@ GaussianModeCorr::GaussianModeCorr() {
 
 	fApply_2p2h_PPandNN = false;
 	fGausVal_2p2h_PPandNN[kPosNorm] = 0.0;
+	fGausVal_2p2h_PPandNN[kPosTilt] = 0.0;
 	fGausVal_2p2h_PPandNN[kPosPq0]  = 1.0;
 	fGausVal_2p2h_PPandNN[kPosWq0]  = 1.0;
 	fGausVal_2p2h_PPandNN[kPosPq3]  = 1.0;
@@ -26,6 +29,7 @@ GaussianModeCorr::GaussianModeCorr() {
 
 	fApply_2p2h_NP = false;
 	fGausVal_2p2h_NP[kPosNorm] = 0.0;
+	fGausVal_2p2h_NP[kPosTilt] = 0.0;
 	fGausVal_2p2h_NP[kPosPq0]  = 1.0;
 	fGausVal_2p2h_NP[kPosWq0]  = 1.0;
 	fGausVal_2p2h_NP[kPosPq3]  = 1.0;
@@ -103,15 +107,30 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]){
 
 
 	double Norm = vals[kPosNorm];
+	double Tilt = vals[kPosTilt];
 	double Pq0  = vals[kPosPq0];
 	double Wq0  = vals[kPosWq0];
 	double Pq3  = vals[kPosPq3];
 	double Wq3  = vals[kPosWq3];
 
-	double w = Norm;
-	w *= TMath::Gaus(q0, Pq0, Wq0);
-	w *= TMath::Gaus(q3, Pq3, Wq3);
+	//	double w = Norm;
+	//	w *= TMath::Gaus(q0, Pq0, Wq0);
+	//	w *= TMath::Gaus(q3, Pq3*sin(Tilt), Wq3);
 
+	double a = cos(Tilt)*cos(Tilt) / (2*Wq0*Wq0);
+	a += sin(Tilt)*sin(Tilt) / (2*Wq3*Wq3);
+
+	double b = - sin(2*Tilt) / (4*Wq0*Wq0);
+	b += sin(2*Tilt) / (4*Wq3*Wq3);
+
+	double c = sin(Tilt)*sin(Tilt) / (2*Wq0*Wq0);
+	c += cos(Tilt)*cos(Tilt) / (2*Wq3*Wq3);
+
+	double w = Norm;
+	w *= exp(-a  * (q0 - Pq0)*(q0 - Pq0));
+	w *= exp(+2.0*b * (q0 - Pq0)*(q3 - Pq3));
+	w *= exp(-c  * (q3 - Pq3)*(q3 - Pq3));
+	  
 	if (fDebugStatements) std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w << std::endl;
 
 	return w;
@@ -172,21 +191,25 @@ bool GaussianModeCorr::IsHandled(int rwenum) {
 	int curenum = rwenum % 1000;
 	switch (curenum) {
 	case kGaussianCorr_CCQE_norm:
+	case kGaussianCorr_CCQE_tilt:
 	case kGaussianCorr_CCQE_Pq0:
 	case kGaussianCorr_CCQE_Wq0:
 	case kGaussianCorr_CCQE_Pq3:
 	case kGaussianCorr_CCQE_Wq3:
 	case kGaussianCorr_2p2h_norm:
+	case kGaussianCorr_2p2h_tilt:
 	case kGaussianCorr_2p2h_Pq0:
 	case kGaussianCorr_2p2h_Wq0:
 	case kGaussianCorr_2p2h_Pq3:
 	case kGaussianCorr_2p2h_Wq3:
 	case kGaussianCorr_2p2h_PPandNN_norm:
+	case kGaussianCorr_2p2h_PPandNN_tilt:
 	case kGaussianCorr_2p2h_PPandNN_Pq0:
 	case kGaussianCorr_2p2h_PPandNN_Wq0:
 	case kGaussianCorr_2p2h_PPandNN_Pq3:
 	case kGaussianCorr_2p2h_PPandNN_Wq3:
 	case kGaussianCorr_2p2h_NP_norm:
+	case kGaussianCorr_2p2h_NP_tilt:
 	case kGaussianCorr_2p2h_NP_Pq0:
 	case kGaussianCorr_2p2h_NP_Wq0:
 	case kGaussianCorr_2p2h_NP_Pq3:
