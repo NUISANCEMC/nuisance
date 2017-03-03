@@ -54,9 +54,8 @@ void FitEvent::ResetEvent() {
   fNParticles = 0;
 
   for (unsigned int i = 0; i < kMaxParticles; i++) {
-    // FitParticle* fp = fParticleList[i];
-    // std::cout << "Fit Particle = " << fp << std::endl;
-    // if (fp) delete fp;
+    FitParticle* fp = fParticleList[i];
+    if (fp) delete fp;
     fParticleList[i] = NULL;
 
     fParticlePDG[i] = 0;
@@ -145,6 +144,7 @@ void FitEvent::SetBranchAddress(TChain* tn) {
   tn->SetBranchAddress("TargetH", &fTargetH);
   tn->SetBranchAddress("Bound", &fBound);
 
+  tn->SetBranchAddress("RWWeight", &SavedRWWeight);
   tn->SetBranchAddress("InputWeight", &InputWeight);
 
   tn->SetBranchAddress("NParticles", &fNParticles);
@@ -167,6 +167,7 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("TargetH", &fTargetH, "TargetH/I");
   tn->Branch("Bound", &fBound, "Bound/O");
 
+  tn->Branch("RWWeight", &RWWeight, "RWWeight/D");
   tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
 
   tn->Branch("NParticles", &fNParticles, "NParticles/I");
@@ -347,13 +348,13 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 
 void FitEvent::Print() {
 
-  if (LOG_LEVEL(EVT)or true) {
-    LOG() << "EVTEvent print" << std::endl;
-    LOG() << "Mode: " << fMode << std::endl;
-    LOG() << "Particles: " << fNParticles << std::endl;
-    LOG() << " -> Particle Stack " << std::endl;
+  if (LOG_LEVEL(EVT) or true) {
+    LOG(EVT) << "EVTEvent print" << std::endl;
+    LOG(EVT) << "Mode: " << fMode << std::endl;
+    LOG(EVT) << "Particles: " << fNParticles << std::endl;
+    LOG(EVT) << " -> Particle Stack " << std::endl;
     for (int i = 0; i < fNParticles; i++) {
-      LOG() << " -> -> " << i << ". " << fParticlePDG[i] << " "
+      LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
             << fParticleState[i] << " "
             << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
             << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."

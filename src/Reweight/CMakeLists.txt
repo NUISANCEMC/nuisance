@@ -17,6 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
+GlobalDialList.cxx
 FitWeight.cxx
 WeightEngineBase.cxx
 NEUTWeightEngine.cxx
@@ -26,9 +27,15 @@ WeightUtils.cxx
 SampleNormEngine.cxx
 LikelihoodWeightEngine.cxx
 SplineWeightEngine.cxx
+NUISANCESyst.cxx
+T2KWeightEngine.cxx
+NUISANCEWeightEngine.cxx
+NUISANCEWeightCalcs.cxx
+NIWGWeightEngine.cxx
 )
 
 set(HEADERFILES
+GlobalDialList.h
 FitWeight.h    
 WeightEngineBase.h
 NEUTWeightEngine.h
@@ -38,6 +45,11 @@ WeightUtils.h
 SampleNormEngine.h
 LikelihoodWeightEngine.h
 SplineWeightEngine.h
+NUISANCESyst.h
+T2KWeightEngine.h
+NUISANCEWeightEngine.h
+NUISANCEWeightCalcs.h
+NIWGWeightEngine.h
 )
 
 set(LIBNAME Reweight)

@@ -11,6 +11,7 @@
 #include "SplineWeightEngine.h"
 #include "NUISANCEWeightEngine.h"
 #include "T2KWeightEngine.h"
+#include "NIWGWeightEngine.h"
 
 #include <map>
 #include <vector>
@@ -56,7 +57,7 @@ public:
   inline std::vector<double> GetDialValues() { return fValueList; };
   void GetAllDials(double* x, int n);
 
-  void Print() {};
+  void Print();
 
   std::vector<int> fEnumList;
   std::vector<std::string> fNameList;

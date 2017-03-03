@@ -44,7 +44,7 @@ void SplineWeightEngine::Reconfigure(bool silent) {
 	for (std::map<std::string, size_t>::iterator iter = fNameIndex.begin(); 
 		iter != fNameIndex.end(); iter++){
 
-		LOG() << "Reconfiguring Spline " << iter->first << " to be " << fValues[ iter->second ] << " Inside SPL RW" << std::endl;
+		LOG(FIT) << "Reconfiguring Spline " << iter->first << " to be " << fValues[ iter->second ] << " Inside SPL RW" << std::endl;
 		fSplineValueMap[ iter->first ] = fValues[ iter->second ];
 	}
 }

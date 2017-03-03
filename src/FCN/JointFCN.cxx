@@ -205,6 +205,9 @@ double JointFCN::DoEval(const double* x) {
     FitBase::GetRW()->Reconfigure();
     FitBase::EvtManager().ResetWeightFlags();
   }
+  if (LOG_LEVEL(REC)){
+    FitBase::GetRW()->Print();
+  }
 
   // SORT SAMPLES
   ReconfigureSamples();
@@ -595,7 +598,7 @@ void JointFCN::ReconfigureUsingManager() {
       // Logging
       if (LOG_LEVEL(REC)) {
         if (i % countwidth == 0) {
-          LOG(REC) << "Processed " << i << " events. W = " << rwweight << std::endl;
+          LOG(REC) << "Processed " << i << " events. [M, W] = [" << curevent->Mode << ", " << rwweight << "]" << std::endl;
         }
       }
 
@@ -669,6 +672,8 @@ void JointFCN::ReconfigureUsingManager() {
           fSampleSignalFlags.push_back(signalbitset);
         }
       }
+      signalboxes.clear();
+      signalbitset.clear();
 
       // iterate
       curevent = curinput->NextNuisanceEvent();
@@ -791,6 +796,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
         // If not signal continue
         if (*subsamsig_iter) {
+          // std::cout << "Filling histograms from box " << std::endl;
+          curmeas->SetSignal(true);
           curmeas->FillHistogramsFromBox((*subbox_iter), rwweight);
           subbox_iter++;
           fillcount++;

@@ -6,6 +6,8 @@
 #include "BaseFitEvt.h"
 #include "WeightUtils.h"
 #include "NUISANCESyst.h"
+#include "FitParameters.h"
+
 using namespace Reweight;
 
  class NUISANCEWeightCalc {
@@ -63,6 +65,7 @@ public:
 
 	bool fApply_2p2h_NP;
 	double fGausVal_2p2h_NP[5];
+	bool fDebugStatements;
 
 
 

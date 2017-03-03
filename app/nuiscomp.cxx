@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Read input arguments such as card file, parameter arguments, and fit routines
-  LOG() << "Starting nuiscomp.exe" << std::endl;
+  LOG(FIT) << "Starting nuiscomp.exe" << std::endl;
 
   // Make minimizer class and run fit
   ComparisonRoutines* comp = new ComparisonRoutines(argc, argv);

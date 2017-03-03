@@ -33,8 +33,11 @@ void FitWeight::AddRWEngine(int type) {
 		break;
 
 	case kSPLINEPARAMETER:
-		std::cout << "Setting up Spline RW Engine " << std::endl;
 		fAllRW[type] = new SplineWeightEngine("splinerw");
+		break;
+
+	case kNIWG:
+		fAllRW[type] = new NIWGWeightEngine("niwgrw");
 		break;
 	}
 
@@ -155,6 +158,7 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
 	for (std::map<int, WeightEngineBase*>::iterator iter = fAllRW.begin();
 	        iter != fAllRW.end(); iter++) {
 		double w = (*iter).second->CalcWeight(evt);
+		// LOG(FIT) << "Iter " << (*iter).second->fCalcName << " = " << w << std::endl;
 		rwweight *= w;
 	}
 	return rwweight;
@@ -213,4 +217,12 @@ double FitWeight::GetSampleNorm(std::string name) {
 	}
 }
 
+
+void FitWeight::Print() {
+
+	LOG(REC) << "Fit Weight State: " << std::endl;
+	for (size_t i = 0; i < fNameList.size(); i++) {
+		LOG(REC) << " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i] << std::endl;
+	}
+}
 

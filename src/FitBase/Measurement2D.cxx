@@ -652,12 +652,14 @@ void Measurement2D::ResetAll() {
 void Measurement2D::FillHistograms() {
   //********************************************************************
 
+  // std::cout << "2D Histograms " << Signal << std::endl;
   if (Signal) {
+    // std::cout << "Filling 2D Histograms " << fXVar << " " << fYVar << std::endl;
     fMCHist->Fill(fXVar, fYVar, Weight);
     fMCFine->Fill(fXVar, fYVar, Weight);
 
-    PlotUtils::FillNeutModeArray((TH2D**)fMCHist_PDG, Mode, fXVar, fYVar,
-                                 Weight);
+    // PlotUtils::FillNeutModeArray((TH2D**)fMCHist_PDG, Mode, fXVar, fYVar,
+                                 // Weight);
   }
 
   return;
@@ -1077,6 +1079,8 @@ void Measurement2D::Write(std::string drawOpt) {
     drawEvents = false;
   }
 
+  if (fMaskHist) fMaskHist->Write();
+  
   // Save standard plots
   if (drawData) this->GetDataList().at(0)->Write();
   if (drawNormal) this->GetMCList().at(0)->Write();

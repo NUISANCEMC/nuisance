@@ -58,6 +58,8 @@ namespace FitPar{
   extern bool super_rainbow_mode; //!< For when fitting gets boring.
   extern unsigned int super_rainbow_mode_colour;
 
+  extern bool showtrace; // Quick Tracing for debugging
+
   extern std::streambuf *default_cout; //!< Where the STDOUT stream is currently directed
   extern std::streambuf *default_cerr; //!< Where the STDERR stream is currently directed
   extern std::ofstream  redirect_stream; //!< Where should unwanted messages be thrown
@@ -94,13 +96,18 @@ bool LOG_LEVEL(int level);
 void LOG_VERB(std::string verb);
 inline void LOG_VERB(int verb){ FitPar::log_verb = verb; };
 
+void SET_TRACE(bool val);
+
 //! Set ERROR VERBOSITY from a string
 void ERR_VERB(std::string verb);
 inline void ERR_VERB(int verb){ FitPar::err_verb = verb; };
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+
 /// Logging Function. Use as a string stream.  e.g. LOG(SAM) << "This sample is dope." << std::endl;
-std::ostream& LOG(int level);
-std::ostream& LOG();
+std::ostream& _LOG(int level, const char* filename, const char* funct, int line);
+#define LOG(level) _LOG(level, __FILENAME__, __FUNCTION__, __LINE__) 
 
 
 //! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;

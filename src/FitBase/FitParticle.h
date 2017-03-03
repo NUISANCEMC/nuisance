@@ -68,7 +68,7 @@ class FitParticle {
 
   FitParticle(){};
   //! Virtual Destructor
-  ~FitParticle(){ };
+  ~FitParticle(){};
 
  
   TLorentzVector fP; //!< Particle 4 Momentum

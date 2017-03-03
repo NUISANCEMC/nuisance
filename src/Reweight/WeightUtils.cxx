@@ -479,7 +479,7 @@ std::string Reweight::ConvDial(int nuisenum) {
     }
   }
 
-  LOG() << "Cannot find dial with enum = " << nuisenum << std::endl;
+  LOG(FIT) << "Cannot find dial with enum = " << nuisenum << std::endl;
 }
 
 

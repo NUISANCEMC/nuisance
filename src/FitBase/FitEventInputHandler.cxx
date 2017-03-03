@@ -68,7 +68,9 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
     fNEvents = fFitEventTree->GetEntries();
     fEventType = kINPUTFITEVENT;
     fNUISANCEEvent = new FitEvent(kINPUTFITEVENT);
+    fNUISANCEEvent->HardReset();
     fNUISANCEEvent->SetBranchAddress(fFitEventTree);
+
 
     // Normalise event histograms for relative flux contributions.
     for (size_t i = 0; i < jointeventinputs.size(); i++) { 
@@ -100,13 +102,13 @@ FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry){
 	fNUISANCEEvent->eventid = entry;
 
 	// Run Initial, FSI, Final, Other ordering. 
-	fNUISANCEEvent-> OrderStack();
+	// fNUISANCEEvent-> OrderStack();
 
 	// Setup Input scaling for joint inputs
 	if (jointinput){
-		fNUISANCEEvent->InputWeight = fNUISANCEEvent->InputWeight * GetInputWeight(entry);
+		fNUISANCEEvent->InputWeight = fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight * GetInputWeight(entry);
 	} else {
-		fNUISANCEEvent->InputWeight = fNUISANCEEvent->InputWeight;
+		fNUISANCEEvent->InputWeight = fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight;
 	}
 
 	return fNUISANCEEvent;
@@ -140,9 +142,9 @@ BaseFitEvt* FitEventInputHandler::GetBaseEvent(const UInt_t entry){
 	
 	// Set joint scaling if required
 	if (jointinput){
-		fNUISANCEEvent->InputWeight = fNUISANCEEvent->InputWeight * GetInputWeight(entry);
+		fNUISANCEEvent->InputWeight = fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight * GetInputWeight(entry);
 	} else {
-		fNUISANCEEvent->InputWeight = fNUISANCEEvent->InputWeight;
+		fNUISANCEEvent->InputWeight = fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight;
 	}
 
 	return fBaseEvent;

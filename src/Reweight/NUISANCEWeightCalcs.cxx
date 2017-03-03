@@ -31,6 +31,8 @@ GaussianModeCorr::GaussianModeCorr() {
 	fGausVal_2p2h_NP[kPosPq3]  = 1.0;
 	fGausVal_2p2h_NP[kPosWq3]  = 1.0;
 
+	fDebugStatements = FitPar::Config().GetParB("GaussianModeCorr_DEBUG");
+
 }
 
 double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
@@ -51,30 +53,49 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 	double q0 = fabs(q.E())/1.E3;
 	double q3 = fabs(q.Vect().Mag())/1.E3;
 
+	int initialstate = -1; // Undef
+	if (fApply_2p2h_PPandNN or fApply_2p2h_NP){
+		if (abs(fevt->Mode) == 2){
+
+			int nump = fevt->NumISParticle(2212);
+			int numn = fevt->NumISParticle(2112);
+
+			if (nump == 2 or numn == 2){
+				initialstate = 1;
+			} else if (nump == 1 and numn == 1){
+				initialstate = 2;
+			} else {
+				ERR(WRN) << "NUM  N P = " << nump << " "<< numn << std::endl;
+			}
+		}
+	}
+
+
 	// std::cout << "Got q0 q3 = " << q0 << " " << q3 << std::endl;
 
 	// Apply weighting
 	if (fApply_CCQE and abs(fevt->Mode) == 1){
-		// std::cout << "Getting CCQE Weight" << std::endl;
+		if (fDebugStatements) std::cout << "Getting CCQE Weight" << std::endl;
 		rw_weight *= GetGausWeight(q0,q3,fGausVal_CCQE);
 	}
 
 	if (fApply_2p2h and abs(fevt->Mode) == 2){
-		// std::cout << "Getting 2p2h Weight" << std::endl;
+		if (fDebugStatements) std::cout << "Getting 2p2h Weight" << std::endl;
 		rw_weight *= GetGausWeight(q0,q3,fGausVal_2p2h);
 	}
 
-	if (fApply_2p2h_PPandNN and abs(fevt->Mode) == 2){
-		// std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
+	if (fApply_2p2h_PPandNN and abs(fevt->Mode) == 2 and initialstate == 1){
+		if (fDebugStatements) std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
 		rw_weight *= GetGausWeight(q0,q3,fGausVal_2p2h_PPandNN);
 	}
 
-	if (fApply_2p2h_NP and abs(fevt->Mode) == 2){
-		// std::cout << "Getting 2p2h NP Weight" << std::endl;
+	if (fApply_2p2h_NP and abs(fevt->Mode) == 2 and initialstate == 2){
+		if (fDebugStatements) std::cout << "Getting 2p2h NP Weight" << std::endl;
 		rw_weight *= GetGausWeight(q0,q3,fGausVal_2p2h_NP);
 	}
 
 
+	if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
 	return rw_weight;
 }
 
@@ -91,7 +112,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]){
 	w *= TMath::Gaus(q0, Pq0, Wq0);
 	w *= TMath::Gaus(q3, Pq3, Wq3);
 
-	// std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w << std::endl;
+	if (fDebugStatements) std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w << std::endl;
 
 	return w;
 }

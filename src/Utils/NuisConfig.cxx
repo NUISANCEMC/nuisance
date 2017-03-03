@@ -23,7 +23,7 @@ nuisconfig::nuisconfig() {
 
   // Initial Setup
   std::string filename = GeneralUtils::GetTopLevelDir() + "/parameters/config.xml";
-  LOG() << "Loading DEFAULT config from : " << filename;
+  LOG(FIT) << "Loading DEFAULT config from : " << filename;
   // Create XML Engine
   fXML = new TXMLEngine;
 
@@ -186,7 +186,7 @@ std::string nuisconfig::ConvertSampleLineToXML(std::string line) {
 
 void nuisconfig::AddXMLLine(std::string line) {
 
-  // LOG() << "Adding XMLLine in nuisconfig " << std::endl;
+  // LOG(FIT) << "Adding XMLLine in nuisconfig " << std::endl;
 
   // XMLLine
   std::string xmlline = "";
@@ -211,7 +211,7 @@ void nuisconfig::AddXMLLine(std::string line) {
   }
 
   // Ad the line
-  LOG() << "Adding line to config: " << xmlline;
+  LOG(FIT) << "Adding line to config: " << xmlline;
   // fXML->AddRawLine(fMainNode, xmlline.c_str());
 
   // Make XML Structure
@@ -274,12 +274,12 @@ void nuisconfig::FinaliseConfig(std::string name) {
   WriteConfig(name);
   RemoveEmptyNodes();
   RemoveIdenticalNodes();
-  LOG() << "Finished setting up config -> DONE." << std::endl;
+  LOG(FIT) << "Finished setting up config -> DONE." << std::endl;
 }
 
 void nuisconfig::LoadXMLConfig(std::string filename, std::string state = "") {
 
-  LOG() << "Loading XML config from : " << filename;
+  LOG(FIT) << "Loading XML config from : " << filename;
   // Add new file to xml docs list
   fXMLDocs.push_back( fXML->ParseFile( filename.c_str() ) );
 
@@ -335,7 +335,7 @@ void nuisconfig::LoadXMLConfig(std::string filename, std::string state = "") {
 void nuisconfig::LoadConfig(std::string filename, std::string state) {
 
   // Open file and see if its XML
-  LOG() << "Trying to parse file : " << filename;
+  LOG(FIT) << "Trying to parse file : " << filename;
   // StopTalking();
   XMLDocPointer_t tempdoc = fXML->ParseFile( filename.c_str() );
   // StartTalking();
