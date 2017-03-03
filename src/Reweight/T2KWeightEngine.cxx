@@ -42,7 +42,7 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
 	// Fill Maps
 	int index = fValues.size();
 	fValues.push_back(0.0);
-	fNEUTSysts.push_back(gensyst);
+	fT2KSysts.push_back(gensyst);
 
 	fEnumIndex[nuisenum] = index;
 	fNameIndex[name] = index;

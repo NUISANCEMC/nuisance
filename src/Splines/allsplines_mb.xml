@@ -1,5 +1,10 @@
 <nuisance>
 
+<!-- Example Card File for spline generation -->
+<!-- Should be run with
+$ nuissplines -c allsplines_mb.xml -f GenerateEventSplines
+-->
+
 <!-- Parameter Defintion: Need to set starting points here and tell fitweight what type each dial is.. Can include extra fixed dials. -->
 <!-- CCQE -->
 <parameter name="NXSec_VecFFCCQE" nominal="2.0" type="t2k_parameter" /> <!-- FIXED -->
