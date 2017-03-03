@@ -364,7 +364,7 @@ void FitEvent::Print() {
 }
 
 void FitEvent::PrintChris(){
-
+  /*
   std::cout << "FitEvent print ---- " << std::endl;
   for (int i = 0; i < fNParticles; i++){
     std::cout << PartInfo(i)->fPID
@@ -373,4 +373,5 @@ void FitEvent::PrintChris(){
 	      << " alive " << fParticleNEUTAlive[i] << std::endl;
   }
   std::cout << " " << std::endl;
+  */
 }

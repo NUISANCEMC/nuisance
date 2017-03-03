@@ -47,7 +47,7 @@ void printInputCommands() {
 int main(int argc, char* argv[]) {
   //*******************************
 
-<<<<<<< HEAD
+  //<<<<<<< HEAD
   // // Program status;
   // int status = 0;
 
