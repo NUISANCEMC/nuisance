@@ -22,9 +22,9 @@ void SplineWriter::Write(std::string name) {
 
 void SplineWriter::AddCoefficientsToTree(TTree* tr) {
   // Add only the fitted spline coefficients to the ttree
-  std::cout << "Saving Spline Coeff to TTree = " << Form("SplineCoeff[%d]/D", fNCoEff) << std::endl;
-  sleep(1);
-  tr->Branch("SplineCoeff", fCoEffStorer, Form("SplineCoeff[%d]/D", fNCoEff));
+  std::cout << "Saving Spline Coeff to TTree = " << Form("SplineCoeff[%d]/F", fNCoEff) << std::endl;
+  //  sleep(1);
+  tr->Branch("SplineCoeff", fCoEffStorer, Form("SplineCoeff[%d]/F", fNCoEff));
 }
 
 
@@ -36,7 +36,7 @@ void SplineWriter::SetupSplineSet() {
   for (int i = 0; i < fAllSplines.size(); i++) {
     fNCoEff += fAllSplines[i].GetNPar();
   }
-  fCoEffStorer = new double[fNCoEff];
+  fCoEffStorer = new float[fNCoEff];
 
   std::cout << "NCoeff = " << fNCoEff << std::endl;
 
@@ -45,6 +45,11 @@ void SplineWriter::SetupSplineSet() {
   std::vector<double> nomvals = fRW->GetDialValues();
   fParVect.clear();
   fSetIndex.clear();
+
+  fParVect.push_back(nomvals);
+  fSetIndex.push_back(0);
+  fWeightList.push_back(1.0);
+  fValList.push_back(0.0);
 
   // Loop over all splines.
   for (int i = 0; i < fAllSplines.size(); i++) {
@@ -62,7 +67,7 @@ void SplineWriter::SetupSplineSet() {
       fParVect.push_back(newvals);
       fValList.push_back(vals[j]);
       fWeightList.push_back(1.0);
-      fSetIndex.push_back(i);
+      fSetIndex.push_back(i+1);
     }
   }
 
@@ -79,17 +84,25 @@ void SplineWriter::SetupSplineSet() {
 
 void SplineWriter::FitSplinesForEvent(FitEvent* event) {
 
+  fRW->SetAllDials(&fParVect[0][0], fParVect[0].size());
+  double nomweight = fRW->CalcWeight(event);
+
   // Loop over parameter sets
-  for (int i = 0; i < fParVect.size(); i++) {
+  for (int i = 1; i < fParVect.size(); i++) {
     // Update FRW
     fRW->SetAllDials(&fParVect[i][0], fParVect[i].size());
 
     // Calculate a weight for event
     double weight = fRW->CalcWeight(event);
 
-    // Fill Weight Set
-    fWeightList[i] = weight;
-    // std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << std::endl;
+
+    if (weight >= 0.0 and weight < 200){
+      // Fill Weight Set
+      fWeightList[i] = weight/nomweight;
+      // std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << std::endl;
+    } else {
+      fWeightList[i] = 1.0;
+    }
 
   }
 
@@ -105,7 +118,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
     int npar = (fAllSplines[i]).GetNPar();
 
     for (int j = 0; j <  fSetIndex.size(); j++) {
-      if (fSetIndex[j] != i) continue;
+      if (fSetIndex[j] != i+1) continue;
       xvals.push_back(fValList[j]);
       yvals.push_back(fWeightList[j] - 0.0);
       if (fWeightList[j] != 1.0) hasresponse = true;
@@ -115,6 +128,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
     if (hasresponse) {
       (fAllSplines[i]).FitCoeff(int(xvals.size()), &xvals[0], &yvals[0], &fCoEffStorer[coeffcount], fDrawSplines);
     } else {
+      //      std::cout << "Spline " << fSpline[i] << " has no response. " << std::endl;
       for (int i = 0; i < npar; i++) {
         fCoEffStorer[coeffcount + i] = 0.0;
       }
@@ -134,8 +148,8 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       }
 
       double xwidth = xmax - xmin;
-      xmin = xmin - xwidth * 0.01;
-      xmax = xmax + xwidth * 0.01;
+      xmin = xmin - 0.01;
+      xmax = xmax + 0.01;
 
       TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
       for (int k = 0; k < 100; k++) {
@@ -175,7 +189,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       int npar = (fAllSplines[i]).GetNPar();
 
       for (int j = 0; j <  fSetIndex.size(); j++) {
-        if (fSetIndex[j] != i) continue;
+        if (fSetIndex[j] != i+1) continue;
         xvals.push_back(fValList[j]);
         yvals.push_back(fWeightList[j] - 0.0);
         if (fWeightList[j] != 1.0) hasresponse = true;
@@ -194,9 +208,9 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
           if (xvals[i] < xmin) xmin = xvals[i];
         }
 
-        double xwidth = xmax - xmin;
-        xmin = xmin - xwidth * 0.01;
-        xmax = xmax + xwidth * 0.01;
+	//        double xwidth = xmax - xmin;
+	// xmin = xmin - xwidth * 0.01;
+        //xmax = xmax + xwidth * 0.01;
 
         TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
         for (int k = 0; k < 100; k++) {
@@ -226,7 +240,8 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
         gPad->SaveAs(("F2_eval_" + fSpline[i] + ".pdf").c_str());
 
         delete gr;
-        sleep(3);
+	std::cout << "Saved hist for " << fSpline[i] << std::endl;
+        sleep(5);
         // delete f1;
       }
       coeffcount += npar;

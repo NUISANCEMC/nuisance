@@ -19,7 +19,8 @@ class SplineWriter : public SplineReader {
 
 
   int fNCoEff;
-  double* fCoEffStorer;
+  //  double* fCoEffStorer;
+  float* fCoEffStorer;
 
   std::vector< std::vector<double> > fParVect;
   std::vector< int > fSetIndex;

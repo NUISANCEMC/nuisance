@@ -26,8 +26,12 @@ public:
   double DoEval(const Double_t* x, const Double_t* par) const;
   double DoEval(const Double_t* par, bool checkresponse=true) const;
 
-
+  float operator()(const Float_t* x, const Float_t* par) const;
+  float DoEval(const Float_t* x, const Float_t* par) const;
+  float DoEval(const Float_t* par, bool checkresponse=true) const;
+  
   void FitCoeff(int n, double* x, double* y, double* par, bool draw);
+  void FitCoeff(int n, double* x, double* y, float* par, bool draw);
 
   inline std::string GetName(void) { return fName; };
   inline int GetNDim(void) { return fNDim; };
@@ -36,7 +40,7 @@ public:
   inline std::string GetForm() {return fForm;};
 
   void Reconfigure(double x);
-
+  void Reconfigure(float x);
 
   std::string fName;
   std::vector<std::string> fSplineNames;
@@ -46,10 +50,10 @@ public:
   std::string fForm;
   bool fOutsideLimits;
 
-  mutable std::vector<double> fXScan;
-  mutable double fX;
-  mutable double fXMin;
-  mutable double fXMax;
+  mutable std::vector<float> fXScan;
+  mutable float fX;
+  mutable float fXMin;
+  mutable float fXMax;
   int  fSplineOffset;
 
   // Spline List
@@ -73,18 +77,18 @@ public:
   };
 
   // Available Spline Functions
-  double Spline1DPol1(const Double_t* par) const;
-  double Spline1DPol2(const Double_t* par) const;
-  double Spline1DPol3(const Double_t* par) const;
-  double Spline1DPol4(const Double_t* par) const;
-  double Spline1DPol5(const Double_t* par) const;
-  double Spline1DPol6(const Double_t* par) const;
+  float Spline1DPol1(const Float_t* par) const;
+  float Spline1DPol2(const Float_t* par) const;
+  float Spline1DPol3(const Float_t* par) const;
+  float Spline1DPol4(const Float_t* par) const;
+  float Spline1DPol5(const Float_t* par) const;
+  float Spline1DPol6(const Float_t* par) const;
 
-  double Spline1DTSpline3(const Double_t* par) const;
+  float Spline1DTSpline3(const Float_t* par) const;
 
   // Available Fitting Functions
-  void FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool draw);
-  void GetCoeff1DTSpline3(int n, double* x, double* y, double* coeff, bool draw);
+  void FitCoeff1DGraph(int n, double* x, double* y, float* coeff, bool draw);
+  void GetCoeff1DTSpline3(int n, double* x, double* y, float* coeff, bool draw);
 
 
 

@@ -149,6 +149,7 @@ void SplineRoutines::SetupRWEngine() {
     fRW->SetDialValue( key.GetS("name"), key.GetD("nominal") );
 
   }
+  fRW->Reconfigure();
 
   // for (int i = 0; i < parameterkeys.size(); i++){
   //   nuiskey key = parameterkeys[i];
@@ -460,7 +461,7 @@ void SplineRoutines::GenerateEventSplines() {
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
-    int countwidth = (nevents / 10);
+    int countwidth = (nevents / 1000);
     FitEvent* nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
@@ -474,7 +475,7 @@ void SplineRoutines::GenerateEventSplines() {
     // Setup the spline TTree
     TTree* splinetree = new TTree("spline_tree", "spline_tree");
     splwrite->AddCoefficientsToTree(splinetree);
-
+    int lasttime = time(NULL);
     // Loop over all events and fill the TTree
     while (nuisevent) {
 
@@ -492,7 +493,19 @@ void SplineRoutines::GenerateEventSplines() {
       // sleep(4);
       // Logging
       if (i % countwidth == 0) {
-        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline events." << std::endl;
+	
+	std::ostringstream timestring;
+	int timeelapsed = time(NULL) - lasttime;
+	if (i != 0 and timeelapsed){
+	lasttime = time(NULL);
+
+	int eventsleft = nevents - i;
+	float speed = float(countwidth) / float(timeelapsed);
+	float proj = (float(eventsleft)/float(speed))/60/60; 
+	timestring << proj << " hours remaining.";
+	
+	}
+        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
       }
 
       // Iterate

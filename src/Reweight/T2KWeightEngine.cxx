@@ -83,7 +83,9 @@ void T2KWeightEngine::Reconfigure(bool silent) {
 	if (silent) StopTalking();
 
 	// Reconf
+	StopTalking();
 	fT2KRW->Reconfigure();
+	StartTalking();
 
 	// Shout again
 	if (silent) StartTalking();

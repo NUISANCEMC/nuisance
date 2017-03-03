@@ -8,7 +8,12 @@ Spline::Spline(std::string splname, std::string form,
   fSplineNames = GeneralUtils::ParseToStr(splname, ":");
   fName = splname;
   fForm = form;
-  fXScan = x;
+
+  fXScan.clear();
+  for (size_t i = 0; i < x.size(); i++){
+    fXScan.push_back(x[i]);
+  }
+
   fX = 0.0;
 
   // Set X Min/Max from scan points
@@ -53,7 +58,22 @@ double Spline::operator()(const Double_t* x, const Double_t* par) const {
   return val;
 }
 
+float Spline::operator()(const Float_t* x, const Float_t* par) const {
+  float val = DoEval(x, par);
+  if (val < 0.0) val = 0.0;
+  return val;
+}
+
 void Spline::Reconfigure(double x) {
+  // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
+  fX = x;
+  fOutsideLimits = false;
+
+  if (fX > fXMax) fX = fXMax;
+  else if (fX < fXMin) fX = fXMin;
+}
+
+void Spline::Reconfigure(float x) {
   // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
   fX = x;
   fOutsideLimits = false;
@@ -77,7 +97,33 @@ double Spline::DoEval(const Double_t* x, const Double_t* par) const {
   return w;
 }
 
+float Spline::DoEval(const Float_t* x, const Float_t* par) const {
+
+  // Setup current fX to value
+  fX = x[0];
+  if (fX > fXMax) fX = fXMax;
+  else if (fX < fXMin) fX = fXMin;
+
+  double w = DoEval(&par[0], false);
+
+  if (w < 0.0) w = 0.0;
+
+  // Now evaluate spline how FitWeight will do it.
+  return w;
+}
+
 double Spline::DoEval(const Double_t* par, bool checkresponse) const {
+  
+  Float_t* temp = new Float_t[fNPar];
+  for (size_t i = 0; i < fNPar; i++){
+    temp[i] = par[i];
+  }
+  double val = DoEval(temp, checkresponse);
+  delete temp;
+  return val;
+}
+
+float Spline::DoEval(const Float_t* par, bool checkresponse) const {
 
   // Check response
   if (checkresponse) {
@@ -114,38 +160,38 @@ double Spline::DoEval(const Double_t* par, bool checkresponse) const {
 
 // Spline Functions
 // ----------------------------------------------
-double Spline::Spline1DPol1(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol1(const Float_t* par) const {
+  float xp = fX;
   // std::cout << "Eval 1DPol1 with " << par[0] << " " << par[1]  << " " << xp << " " << par[0] + par[1] * xp << std::endl;
   return par[0] + par[1] * xp;
 };
 
-double Spline::Spline1DPol2(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol2(const Float_t* par) const {
+  float xp = fX;
   return par[0] + par[1] * xp + par[2] * xp * xp;
 };
 
-double Spline::Spline1DPol3(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol3(const Float_t* par) const {
+  float xp = fX;
   return par[0] + par[1] * xp + par[2] * xp * xp + par[3] * xp * xp * xp;
 };
 
-double Spline::Spline1DPol4(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol4(const Float_t* par) const {
+  float xp = fX;
   return (par[0] + par[1] * xp + par[2] * xp * xp + par[3] * xp * xp * xp +
           par[4] * xp * xp * xp * xp);
 };
 
-double Spline::Spline1DPol5(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol5(const Float_t* par) const {
+  float xp = fX;
   return (par[0] + par[1] * xp + par[2] * xp * xp + par[3] * xp * xp * xp +
           par[4] * xp * xp * xp * xp + par[5] * xp * xp * xp * xp * xp);
 };
 
-double Spline::Spline1DPol6(const Double_t* par) const {
-  double xp = fX;
+float Spline::Spline1DPol6(const Float_t* par) const {
+  float xp = fX;
 
-  double w = 0.0;
+  float w = 0.0;
   // std::cout << "Pol Eval " << std::endl;
   for (int i = fNPar-1; i > 0; i--){
     w = xp * (par[0+i] + w);
@@ -156,11 +202,11 @@ double Spline::Spline1DPol6(const Double_t* par) const {
 
 
 
-double Spline::Spline1DTSpline3(const Double_t* par) const {
+float Spline::Spline1DTSpline3(const Float_t* par) const {
 
   // iterator over knot values and find width
-  std::vector<double>::iterator iter_low  = fXScan.begin();
-  std::vector<double>::iterator iter_high = fXScan.begin();
+  std::vector<float>::iterator iter_low  = fXScan.begin();
+  std::vector<float>::iterator iter_high = fXScan.begin();
   iter_high++;
   int off = 0;
 
@@ -174,14 +220,14 @@ double Spline::Spline1DTSpline3(const Double_t* par) const {
     iter_high++;
   }
 
-  double dx   = fX - (*iter_low);
-  double weight = (par[off] + dx * (par[off + 1] + dx * (par[off + 2] + dx * par[off + 3])));
+  float dx   = fX - (*iter_low);
+  float weight = (par[off] + dx * (par[off + 1] + dx * (par[off + 2] + dx * par[off + 3])));
 
   return weight;
 };
 
 
-void Spline::FitCoeff(int n, double* x, double* y, double* coeff, bool draw) {
+void Spline::FitCoeff(int n, double* x, double* y, float* coeff, bool draw) {
 
   switch (fType) {
 
@@ -207,7 +253,7 @@ void Spline::FitCoeff(int n, double* x, double* y, double* coeff, bool draw) {
 
 
 // Fitting Functions
-void Spline::FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool draw) {
+void Spline::FitCoeff1DGraph(int n, double* x, double* y, float* coeff, bool draw) {
 
   TGraph* gr = new TGraph(n, x, y);
   double xmin = 99999.9;
@@ -228,6 +274,7 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool dr
 
   // Run the actual spline fit
   // StopTalking();
+  std::cout << "Fixing TGraph" << std::endl;
   gr->Fit(func, "FMWQ");
   // StartTalking();
 
@@ -239,6 +286,7 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool dr
     gr->Draw("APL");
     gPad->Update();
     gPad->SaveAs(("plot_test_" + fName + ".pdf").c_str());
+    std::cout << "Saving Graph" << std::endl;
     sleep(3);
   }
 
@@ -248,7 +296,7 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, double* coeff, bool dr
 
 
 // Spline extraction Functions
-void Spline::GetCoeff1DTSpline3(int n, double* x, double* y, double* coeff, bool draw) {
+void Spline::GetCoeff1DTSpline3(int n, double* x, double* y, float* coeff, bool draw) {
 
   TSpline3 temp_spline = TSpline3("temp_spline", x, y, n);
   for (size_t i = 0; i < n; i++) {
