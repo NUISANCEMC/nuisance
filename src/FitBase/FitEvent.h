@@ -30,6 +30,7 @@
 #include "FitParticle.h"
 #include "TLorentzVector.h"
 #include "TSpline.h"
+#include "FitParameters.h"
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
@@ -324,6 +325,7 @@ FitEvent(NuanceEvent* tempevent){
   void AddBranchesToTree(TTree* tn);
 
   void Print();
+  void PrintChris();
 
   // Event Information
   int fMode;
@@ -353,7 +355,6 @@ FitEvent(NuanceEvent* tempevent){
   double* fNEUT_ParticleStatusCode;
   double* fNEUT_ParticleAliveCode;
   GeneratorInfoBase* fGenInfo;
-
 
 };
 

@@ -17,14 +17,14 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "MCStudy_KaonPreSelection.h"
+#include "MCStudy_NCpi0PreSelection.h"
 
 #include "T2K_SignalDef.h"
 #include "MINERvA_SignalDef.h"
 
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
-MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string inputfile,
+MCStudy_NCpi0PreSelection::MCStudy_NCpi0PreSelection(std::string name, std::string inputfile,
                                        FitWeight *rw, std::string type,
                                        std::string fakeDataFile) {
   //********************************************************************
@@ -75,7 +75,7 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   // Create a new TTree and add Nuisance Events Branches
   FitPar::Config().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
-  GetInput()->GetNuisanceEvent(0)->AddBranchesToTree(fEventTree);
+  GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
 
   fEventTree->Branch("nlep",&nlep, "nlep/I");
   fEventTree->Branch("nkplus",&nkplus, "nkplus/I");
@@ -132,13 +132,13 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   */
 
   // Logging Flag
-  fKaonLogging = FitPar::Config().GetParB("KaonLogging");
+  fNCpi0Logging = FitPar::Config().GetParB("NCpi0Logging");
 
   return;
 }
 
 //********************************************************************
-void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
+void MCStudy_NCpi0PreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
   
   // Reset
@@ -160,9 +160,9 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 
   // Fill If Signal
   if (isSignal(event)){
-    fEventTree->Fill();
 
-    if (fKaonLogging){
+    fEventTree->Fill();
+    if (fNCpi0Logging){
       int nstrangemesons = event->NumParticle(321);
       int nstrangefsmesons = event->NumFSParticle(321);
       
@@ -178,8 +178,9 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
   return;
 };
 
+
 //********************************************************************
-void MCStudy_KaonPreSelection::Write(std::string drawOpt) {
+void MCStudy_NCpi0PreSelection::Write(std::string drawOpt) {
 //********************************************************************
 
   // Save the event ttree
@@ -194,39 +195,19 @@ void MCStudy_KaonPreSelection::Write(std::string drawOpt) {
 
 
 //********************************************************************
-/// Select only events with final state Kaons
-bool MCStudy_KaonPreSelection::isSignal(FitEvent *event) {
+/// Select only events with final state NCpi0s
+bool MCStudy_NCpi0PreSelection::isSignal(FitEvent *event) {
 //********************************************************************
 
-  // Update to include all events
-  return true;
-
-  // Apply a Kaon Pre-selection
+  // Apply a NCpi0 Pre-selection
   // Search for Strange Mesons (included full list from MC PDG)
+  int npi0 = event->NumParticle(111);
+  if (npi0 <= 0) return false;
 
-  /*
-  PhystConst::pdg_strangemesons = {130,310,311,321,
-				   9000311,9000321,
-				   10311,10321,100311,100321,
-				   9010311,9010321,9020311,9020321,
-				   313,323,
-				   10313,10323,
-				   20313,20323,
-				   100313,100323,
-				   9000313,9000323,
-				   30313,30323,
-				   315,325,
-				   9000315,9000325,
-				   10315,10325,
-				   20315,20325,
-				   9010315,9010325,9020315,9020325,
-				   317,327,
-				   9010317,9010327};
-  PhysConst::pdg_antistrangemesons = {above * -1.0};
-  */
-  int nstrangemesons = event->NumParticle(PhysConst::pdg_strangemesons);
-  nstrangemesons += event->NumParticle(PhysConst::pdg_antistrangemesons);
-  if (nstrangemesons < 1) return false;
+
+  int nlep = (event->NumFSParticle(11) + event->NumFSParticle(13) + event->NumFSParticle(15) + 
+	      event->NumFSParticle(-11) + event->NumFSParticle(-13) + event->NumFSParticle(-15));
+  if (nlep > 0) return false;
 
   // Do we want any other signal?
   return true;

@@ -75,7 +75,6 @@ void FitEvent::ResetEvent() {
 
 }
 
-
 //***************************************************
 void FitEvent::OrderStack() {
   //***************************************************
@@ -348,7 +347,7 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 
 void FitEvent::Print() {
 
-  if (LOG_LEVEL(EVT) or true) {
+  if (LOG_LEVEL(EVT)) {
     LOG(EVT) << "EVTEvent print" << std::endl;
     LOG(EVT) << "Mode: " << fMode << std::endl;
     LOG(EVT) << "Particles: " << fNParticles << std::endl;
@@ -362,4 +361,16 @@ void FitEvent::Print() {
     }
   }
   return;
+}
+
+void FitEvent::PrintChris(){
+
+  std::cout << "FitEvent print ---- " << std::endl;
+  for (int i = 0; i < fNParticles; i++){
+    std::cout << PartInfo(i)->fPID
+	      << " state " << fParticleState[i]
+	      << " status " <<fParticleNEUTStatus[i]
+	      << " alive " << fParticleNEUTAlive[i] << std::endl;
+  }
+  std::cout << " " << std::endl;
 }

@@ -300,10 +300,16 @@ void MeasurementBase::ConvertEventRates() {
   ScaleExtraHistograms(GetBox());
   this->ScaleEvents();
 
-  double norm = FitBase::GetRW()->GetSampleNorm(this->fName);
-  AutoNormExtraTH1(norm);
-  NormExtraHistograms(GetBox(), norm);
-  this->ApplyNormScale(norm);
+  double normval = FitBase::GetRW()->GetSampleNorm(this->fName);
+  if (normval < 0.01 or normval > 10.0){
+    ERR(WRN) << "Norm Value inside MeasurementBase::ConvertEventRates() looks off!" << std::endl;
+    ERR(WRN) << "It could have become out of sync with the minimizer norm list." << std::endl;
+    ERR(WRN) << "Setting it to 1.0" << std::endl;
+    normval = 1.0;
+  }
+  AutoNormExtraTH1(normval);
+  NormExtraHistograms(GetBox(), normval);
+  this->ApplyNormScale(normval);
 
 }
 
