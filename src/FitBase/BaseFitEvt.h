@@ -186,7 +186,7 @@ class BaseFitEvt {
 
   // New Splines
   //SplineReader* fSplineReader;
-  double* fSplineCoeff;
+  float* fSplineCoeff;
   SplineReader* fSplineRead;
   double SavedRWWeight;
   // double fDialCoeffs;

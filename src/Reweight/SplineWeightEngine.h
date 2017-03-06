@@ -11,7 +11,7 @@ class SplineWeightEngine : public WeightEngineBase {
 		SplineWeightEngine(std::string name);
 		~SplineWeightEngine(){};
 
-		void IncludeDial(std::string name, int type, double startval);
+		void IncludeDial(std::string name,  double startval);
 		void SetDialValue(std::string name, double val);
 		void SetDialValue(int rwenum, double val);
 		void Reconfigure(bool silent = false);

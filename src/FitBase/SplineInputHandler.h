@@ -19,7 +19,10 @@ public:
 	bool save_extra;
 	TChain* fFitEventTree;
 	SplineReader* fSplRead;
-	double fSplineCoeff[400];
+	float fSplineCoeff[1000];
 	TTree* fSplTree;
+
+	std::vector< std::vector<float> > fAllSplineCoeff;
+	int fNPar;
 };
 #endif

@@ -17,7 +17,7 @@ public:
   bool NeedsReconfigure();
   void SetNeedsReconfigure(bool val = true);
 
-  double CalcWeight(double* coeffs);
+  double CalcWeight(float* coeffs);
 
   std::vector<Spline> fAllSplines;
   std::vector<std::string> fSpline;
