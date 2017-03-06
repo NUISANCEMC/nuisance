@@ -59,6 +59,8 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 	fSplTree->SetBranchAddress( "SplineCoeff", fSplineCoeff );
 	fNUISANCEEvent->fSplineCoeff = this->fSplineCoeff;
 
+	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
+
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
 		TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
@@ -126,8 +128,8 @@ BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 	if (entry >= fNEvents) return NULL;
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
-	fFitEventTree->GetEntry(entry);
-	// fSplTree->GetEntry(entry);
+	// fFitEventTree->GetEntry(entry);
+	fSplTree->GetEntry(entry);
 
 	fBaseEvent->eventid = entry;
 

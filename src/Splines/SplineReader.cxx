@@ -93,7 +93,7 @@ void SplineReader::SetNeedsReconfigure(bool val) {
   fNeedsReconfigure = val;
 }
 
-double SplineReader::CalcWeight(double* coeffs) {
+double SplineReader::CalcWeight(float* coeffs) {
 
   int off = 0;
   double rw_weight = 1.0;

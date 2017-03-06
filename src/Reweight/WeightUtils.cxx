@@ -465,7 +465,7 @@ int Reweight::ConvDial(std::string name, int type, bool exceptions) {
 
   // Now register dial
   // std::cout << "Returning " << nuisenum << std::endl;
-  // Reweight::DialList().RegisterDialEnum(name, type, nuisenum);
+  Reweight::DialList().RegisterDialEnum(name, type, nuisenum);
 
   return nuisenum;
 }

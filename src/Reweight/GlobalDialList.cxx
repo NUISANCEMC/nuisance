@@ -24,6 +24,10 @@ int GlobalDialList::EnumFromNameAndType(std::string name, int type){
 
 void GlobalDialList::RegisterDialEnum(std::string name, int type, int nuisenum){
 
+  if (std::find(fAllDialNames.begin(), fAllDialNames.end(), name) != fAllDialNames.end()){
+    return;
+  }
+
   std::cout << "Registed Dial : " << name << " " << type << " " << nuisenum << std::endl;
   fAllDialNames.push_back(name);
   fAllDialTypes.push_back(type);

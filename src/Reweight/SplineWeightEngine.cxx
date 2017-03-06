@@ -12,7 +12,7 @@ SplineWeightEngine::SplineWeightEngine(std::string name) {
 };
 
 
-void SplineWeightEngine::IncludeDial(std::string name, int type, double startval) {
+void SplineWeightEngine::IncludeDial(std::string name, double startval) {
 
 	// Get NUISANCE Enum
 	int nuisenum = Reweight::ConvDial(name, kNEWSPLINE);
@@ -24,14 +24,19 @@ void SplineWeightEngine::IncludeDial(std::string name, int type, double startval
 	fEnumIndex[nuisenum] = index;
 	fNameIndex[name] = index;
 
+	std::cout << "Inlcuded Spline Dial " << name << " " << nuisenum << " " << startval << std::endl;
+
 	// Set Value if given
 	if (startval != -999.9) {
 		SetDialValue(name, startval);
 	}
+	
 }
 
 
 void SplineWeightEngine::SetDialValue(int nuisenum, double val) {
+  LOG(FIT) << "Enum Val " << nuisenum << std::endl;
+  LOG(FIT) << fEnumIndex.size() << std::endl;
 	fValues[fEnumIndex[nuisenum]] = val;
 }
 

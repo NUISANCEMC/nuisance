@@ -753,7 +753,7 @@ void JointFCN::ReconfigureFastUsingManager() {
     InputHandlerBase* curinput = (*inp_iter);
 
     // Get Events
-    FitEvent* curevent = curinput->FirstNuisanceEvent();
+    BaseFitEvt* curevent = curinput->FirstBaseEvent();
     int i = 0;
     while (curevent != 0) {
 
@@ -772,7 +772,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       }
 
       // Get Event
-      curevent = curinput->GetNuisanceEvent(i);
+      curevent = curinput->GetBaseEvent(i);
       if (!curevent) break;
 
       // Get Event Weight
