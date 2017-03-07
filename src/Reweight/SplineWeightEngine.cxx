@@ -63,7 +63,8 @@ double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
   }
   
   double rw_weight = evt->fSplineRead->CalcWeight( evt->fSplineCoeff );
-  
+  if (rw_weight < 0.0) rw_weight = 0.0;
+
   return rw_weight;
 }
 

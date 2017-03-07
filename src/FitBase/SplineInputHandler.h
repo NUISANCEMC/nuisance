@@ -22,6 +22,8 @@ public:
 	float fSplineCoeff[1000];
 	TTree* fSplTree;
 
+	std::vector<float> fStartingWeights;
+
 	std::vector< std::vector<float> > fAllSplineCoeff;
 	int fNPar;
 };

@@ -65,20 +65,25 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
 
 	// Load into memory
-	/*
+	
 	for (int j = 0; j < fNEvents; j++){
 	  std::vector<float> tempval;
-	  fSplTree->GetEntry(j);
-	  for (int i = 0; i < fNPar; i++){
-	    tempval.push_back( fSplineCoeff[i] );
-	  }
-	  fAllSplineCoeff.push_back(tempval);
-	  if (j % (fNEvents/10) == 0 and j != 0) {
-	    LOG(SAM) << "Pushed " << int(j*100/fNEvents)+1 << "% of spline sets into memory for " << fName 
-		     << " (~" << int(sizeof(float)*tempval.size()*fAllSplineCoeff.size()/1.E6) <<"MB)" << std::endl;
-	  }
+	  
+	  fFitEventTree->GetEntry(j);
+	  //fSplTree->GetEntry(j);
+
+	  //for (int i = 0; i < fNPar; i++){
+	  //  tempval.push_back( fSplineCoeff[i] );
+	  //}
+	  //fAllSplineCoeff.push_back(tempval);
+	  //	  if (j % (fNEvents/10) == 0 and j != 0) {
+	  //  LOG(SAM) << "Pushed " << int(j*100/fNEvents)+1 << "% of spline sets into memory for " << fName 
+	  //	     << " (~" << int(sizeof(float)*tempval.size()*fAllSplineCoeff.size()/1.E6) <<"MB)" << std::endl;
+	  //}
+
+	  fStartingWeights.push_back(fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight);
 	}
-	*/
+	
 	fEventType = kSPLINEPARAMETER;
 
 	// Normalise event histograms for relative flux contributions.
@@ -118,9 +123,9 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Setup Input scaling for joint inputs
 	if (jointinput) {
-		fNUISANCEEvent->InputWeight *= fNUISANCEEvent->SavedRWWeight * GetInputWeight(entry);
+	  fNUISANCEEvent->InputWeight = fStartingWeights[entry] * GetInputWeight(entry);
 	} else {
-		fNUISANCEEvent->InputWeight *= fNUISANCEEvent->SavedRWWeight;
+	  fNUISANCEEvent->InputWeight = fStartingWeights[entry];
 	}
 
 	return fNUISANCEEvent;
@@ -150,17 +155,19 @@ BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	// fFitEventTree->GetEntry(entry);
-	//fSplTree->GetEntry(entry);
+	//	fSplTree->GetEntry(entry);
+	//        fSplTree->GetEntry(entry);
+	//        fBaseEvent->fSplineCoeff = fSplineCoeff;
 
-	//	fBaseEvent->fSplineCoeff = &fAllSplineCoeff[entry][0];
+	//fBaseEvent->fSplineCoeff = &fAllSplineCoeff[entry][0];
 
 	fBaseEvent->eventid = entry;
 
 	// Set joint scaling if required
 	if (jointinput) {
-		fBaseEvent->InputWeight *= GetInputWeight(entry);
+	  fBaseEvent->InputWeight = fStartingWeights[entry] * GetInputWeight(entry);
 	} else {
-		fBaseEvent->InputWeight *= 1.0;
+	  fBaseEvent->InputWeight = fStartingWeights[entry];
 	}
 
 	return fBaseEvent;

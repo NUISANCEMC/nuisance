@@ -685,9 +685,12 @@ void JointFCN::ReconfigureUsingManager() {
 
 	  if (fIsAllSplines){
 	    std::vector<float> coeff;
+	    //	    std::cout << "Pushed Back Set : ";
 	    for (size_t l = 0; l < curevent->fSplineRead->GetNPar(); l++){
+	      //  std::cout << " " << curevent->fSplineCoeff[l];
 	      coeff.push_back( curevent->fSplineCoeff[l] );
 	    }
+	    //	    std::cout << std::endl;
 	    fSignalEventSplines.push_back(coeff);
 	  }
 	}
@@ -801,6 +804,12 @@ void JointFCN::ReconfigureFastUsingManager() {
       if (!(*inpsig_iter)) {
         inpsig_iter++;
         i++;
+	if (LOG_LEVEL(REC)){
+	  if (i % countwidth == 0){
+	    std::cout << std::endl;
+	  }
+	}
+
         continue;
       }
 
@@ -810,13 +819,19 @@ void JointFCN::ReconfigureFastUsingManager() {
 
       // Setup signal splines if required.
       if (fIsAllSplines){
-	curevent->fSplineCoeff = &(*spline_iter)[0];
+      	curevent->fSplineCoeff = &(*spline_iter)[0];
       }
 
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
+
+      if (LOG_LEVEL(REC)){
+        if (i % countwidth == 0){
+          LOG(REC) << "Processed " << i << " signal events. W = " << rwweight<< std::endl;
+        }
+      }
 
       // Iterate over the measurements and get the corresponding signal boxes.
       size_t measitercount = 0;

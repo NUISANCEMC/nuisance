@@ -90,7 +90,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
   this->SetCovarMatrixFromText( basedir + covarfilename, 8 );
 
   // Quick Fix for Correl/Covar Issues only for old data
-  if (!isFluxFix){
+  if (!isFluxFix or !fullphasespace){
     fCorrel = (TMatrixDSym*)fFullCovar->Clone();
     delete fFullCovar;
     delete covar;

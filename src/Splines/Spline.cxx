@@ -70,7 +70,7 @@ void Spline::Reconfigure(double x) {
   fOutsideLimits = false;
 
   if (fX > fXMax) fX = fXMax;
-  else if (fX < fXMin) fX = fXMin;
+  if (fX < fXMin) fX = fXMin;
 }
 
 void Spline::Reconfigure(float x) {
@@ -79,7 +79,7 @@ void Spline::Reconfigure(float x) {
   fOutsideLimits = false;
 
   if (fX > fXMax) fX = fXMax;
-  else if (fX < fXMin) fX = fXMin;
+  if (fX < fXMin) fX = fXMin;
 }
 
 double Spline::DoEval(const Double_t* x, const Double_t* par) const {
@@ -87,7 +87,7 @@ double Spline::DoEval(const Double_t* x, const Double_t* par) const {
   // Setup current fX to value
   fX = x[0];
   if (fX > fXMax) fX = fXMax;
-  else if (fX < fXMin) fX = fXMin;
+  if (fX < fXMin) fX = fXMin;
 
   double w = DoEval(&par[0], false);
 
@@ -102,7 +102,7 @@ float Spline::DoEval(const Float_t* x, const Float_t* par) const {
   // Setup current fX to value
   fX = x[0];
   if (fX > fXMax) fX = fXMax;
-  else if (fX < fXMin) fX = fXMin;
+  if (fX < fXMin) fX = fXMin;
 
   double w = DoEval(&par[0], false);
 
