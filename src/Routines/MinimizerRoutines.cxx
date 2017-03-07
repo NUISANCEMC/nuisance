@@ -78,8 +78,8 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   nuisconfig configuration = Config::Get();
   std::string cardfile = "";
   int maxevents = -1;
-  int errorcount = Config::Get().GetParI("ERROR");
-  int verbocount = Config::Get().GetParI("VERBOSITY");
+  int errorcount = 0;//Config::Get().GetParI("ERROR");
+  int verbocount = 0;//Config::Get().GetParI("VERBOSITY");
   std::vector<std::string> xmlcmds;
   std::vector<std::string> configargs;
 
@@ -132,6 +132,7 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   }
 
   // Add Error Verbo Lines
+  verbocount += FitPar::Config().GetParI("VERBOSITY");
   FitPar::log_verb = verbocount;
   LOG_VERB(verbocount);
   ERR_VERB(errorcount);

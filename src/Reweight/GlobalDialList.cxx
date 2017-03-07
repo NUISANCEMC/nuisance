@@ -12,11 +12,16 @@ int GlobalDialList::EnumFromNameAndType(std::string name, int type){
 
   // Get Type Container
   std::map<std::string, int> enumcont = fTypeEnumCont[type];
+  //  LOG(FIT) << "Getting Enum From name and type " << name << " " << type << std::endl;
 
   // Check name is in container, if its not add it
   if (enumcont.find(name) == enumcont.end()){
+    //    LOG(FIT) << " Name not found in Enum type " << type << std::endl;
     int index = enumcont.size();
     enumcont[name] = index;
+    //    LOG(FIT) << "Returning new index of " << index << std::endl;
+    fTypeEnumCont[type][name] = index;
+    return index;
   }
 
   return enumcont[name];
@@ -28,7 +33,7 @@ void GlobalDialList::RegisterDialEnum(std::string name, int type, int nuisenum){
     return;
   }
 
-  std::cout << "Registed Dial : " << name << " " << type << " " << nuisenum << std::endl;
+  LOG(FIT) << "Registed Dial Enum : " << name << " " << type << " " << nuisenum << std::endl;
   fAllDialNames.push_back(name);
   fAllDialTypes.push_back(type);
   fAllDialEnums.push_back(nuisenum);

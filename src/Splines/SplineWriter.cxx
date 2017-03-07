@@ -87,6 +87,11 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
   fRW->SetAllDials(&fParVect[0][0], fParVect[0].size());
   double nomweight = fRW->CalcWeight(event);
 
+  event->RWWeight = nomweight;
+  if (fDrawSplines){
+    std::cout << "Nominal Spline Weight = " << nomweight << std::endl;
+  }
+
   // Loop over parameter sets
   for (int i = 1; i < fParVect.size(); i++) {
     // Update FRW
@@ -99,7 +104,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
     if (weight >= 0.0 and weight < 200){
       // Fill Weight Set
       fWeightList[i] = weight/nomweight;
-      // std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << std::endl;
+      if (fDrawSplines) std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << " " << weight/nomweight << std::endl;
     } else {
       fWeightList[i] = 1.0;
     }
@@ -142,9 +147,9 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       int n = xvals.size();
       double xmin = 99999.9;
       double xmax = -99999.9;
-      for (int i = 0; i < n; i++) {
-        if (xvals[i] > xmax) xmax = xvals[i];
-        if (xvals[i] < xmin) xmin = xvals[i];
+      for (int j = 0; j < n; j++) {
+        if (xvals[j] > xmax) xmax = xvals[j];
+        if (xvals[j] < xmin) xmin = xvals[j];
       }
 
       double xwidth = xmax - xmin;
@@ -154,7 +159,8 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
       for (int k = 0; k < 100; k++) {
         double xtemp = hist->GetXaxis()->GetBinCenter(k + 1);
-        double ytemp = fAllSplines[i].DoEval(&xtemp, &fCoEffStorer[coeffcount]);
+	fAllSplines[i].Reconfigure(xtemp);
+        double ytemp = fAllSplines[i].DoEval(&fCoEffStorer[coeffcount]);
         hist->SetBinContent(k + 1, ytemp);
         // std::cout << "Set Temp " << k << " " << ytemp << std::endl;
       }
@@ -203,9 +209,9 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
         int n = xvals.size();
         double xmin = 99999.9;
         double xmax = -99999.9;
-        for (int i = 0; i < n; i++) {
-          if (xvals[i] > xmax) xmax = xvals[i];
-          if (xvals[i] < xmin) xmin = xvals[i];
+        for (int j = 0; j < n; j++) {
+          if (xvals[j] > xmax) xmax = xvals[j];
+          if (xvals[j] < xmin) xmin = xvals[j];
         }
 
 	//        double xwidth = xmax - xmin;
@@ -213,11 +219,17 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
         //xmax = xmax + xwidth * 0.01;
 
         TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
+	//	for (int k = 0; k < fAllSplines[i].GetNPar(); k++){
+	//	  std::cout << fAllSplines[i].GetName() << " Coeff " << k << " = " << fCoEffStorer[coeffcount + k] << std::endl;
+	//	}
+
         for (int k = 0; k < 100; k++) {
           double xtemp = hist->GetXaxis()->GetBinCenter(k + 1);
-          double ytemp = fAllSplines[i].DoEval(&xtemp, &fCoEffStorer[coeffcount]);
+	  fAllSplines[i].Reconfigure(xtemp);
+          double ytemp = fAllSplines[i].DoEval(&fCoEffStorer[coeffcount]);
           hist->SetBinContent(k + 1, ytemp);
-          // std::cout << "Set Temp " << k << " " << ytemp << std::endl;
+	  
+	  //          std::cout << "Set Temp " << k << " " << ytemp << " First Coeff = " << fCoEffStorer[coeffcount] << std::endl;
         }
 
         // gr->Draw("APL");

@@ -467,6 +467,8 @@ void SplineRoutines::GenerateEventSplines() {
     // Setup a TTree to save the event
     outputfile->cd();
     TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+
+    // Add a flag that allows just splines to be saved.
     nuisevent->AddBranchesToTree(eventtree);
 
     // Save the spline reader
@@ -531,6 +533,34 @@ void SplineRoutines::GenerateEventSplines() {
   eventkeys.clear();
 
 }
+
+/*
+//*************************************                                                                                                                                                                                                    
+void SplineRoutines::MergeSplines() {
+//*************************************                                                                                                                                                                                                     
+  // Loop over all 'splinemerge' keys.
+  // Add them to the Merger.
+  // Call setup splines.
+
+  // Get the key with eventinput
+  // - remaining keys should have splineinput
+  // - Loop over number of entries.
+  // - FillEntry in merger.
+  // - Fill NUISANCEEvent into a new TTree.
+  
+
+
+
+
+
+
+
+
+
+
+
+}
+*/
 
 //*************************************
 // void SplineRoutines::TestEventSplines() {

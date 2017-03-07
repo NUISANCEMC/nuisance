@@ -148,13 +148,14 @@ std::vector<InputHandlerBase*> GetInputList();
 
   bool fUsingEventManager; //!< Flag for doing joint comparisons
   
+  std::vector< std::vector<float> > fSignalEventSplines;
   std::vector< std::vector<MeasurementVariableBox*> > fSignalEventBoxes;
   std::vector< bool > fSignalEventFlags;
   std::vector< std::vector<bool> > fSampleSignalFlags;
 
   std::vector<InputHandlerBase*> fInputList;
   std::vector<MeasurementBase*> fSubSampleList;
-
+  bool fIsAllSplines;
   // iterator should go:
   // Iterate over fSignalList
   // If true get entry, and get 'next' in fSampleSignalList and fSampleSignalBoxes

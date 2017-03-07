@@ -59,7 +59,8 @@ namespace FitPar{
   extern unsigned int super_rainbow_mode_colour;
 
   extern bool showtrace; // Quick Tracing for debugging
-
+  extern int nloggercalls;
+  extern int timelastlog;
   extern std::streambuf *default_cout; //!< Where the STDOUT stream is currently directed
   extern std::streambuf *default_cerr; //!< Where the STDERR stream is currently directed
   extern std::ofstream  redirect_stream; //!< Where should unwanted messages be thrown

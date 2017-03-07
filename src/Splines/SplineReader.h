@@ -17,6 +17,7 @@ public:
   bool NeedsReconfigure();
   void SetNeedsReconfigure(bool val = true);
 
+  int GetNPar();
   double CalcWeight(float* coeffs);
 
   std::vector<Spline> fAllSplines;

@@ -424,7 +424,8 @@ int Reweight::ConvDial(std::string name, int type, bool exceptions) {
   case kMODENORM:
   case kLIKEWEIGHT:
   case kSPLINEPARAMETER:
-    genenum = NUISANCEEnumFromName(name, kLIKEWEIGHT);
+  case kNEWSPLINE:
+    genenum = NUISANCEEnumFromName(name, type);
     break;
 
   default:

@@ -54,12 +54,32 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 	fSplRead->Read( (TTree*)inp_file->Get("spline_reader") );
 	fNUISANCEEvent->fSplineRead = this->fSplRead;
 
+	// Load into memory
+	fNPar = fSplRead->GetNPar();
+
 	// Setup Friend Spline TTree
 	fSplTree = (TTree*)inp_file->Get("spline_tree");
 	fSplTree->SetBranchAddress( "SplineCoeff", fSplineCoeff );
 	fNUISANCEEvent->fSplineCoeff = this->fSplineCoeff;
 
 	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
+
+	// Load into memory
+	/*
+	for (int j = 0; j < fNEvents; j++){
+	  std::vector<float> tempval;
+	  fSplTree->GetEntry(j);
+	  for (int i = 0; i < fNPar; i++){
+	    tempval.push_back( fSplineCoeff[i] );
+	  }
+	  fAllSplineCoeff.push_back(tempval);
+	  if (j % (fNEvents/10) == 0 and j != 0) {
+	    LOG(SAM) << "Pushed " << int(j*100/fNEvents)+1 << "% of spline sets into memory for " << fName 
+		     << " (~" << int(sizeof(float)*tempval.size()*fAllSplineCoeff.size()/1.E6) <<"MB)" << std::endl;
+	  }
+	}
+	*/
+	fEventType = kSPLINEPARAMETER;
 
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -89,6 +109,7 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 	// Read NUISANCE Tree
 	fFitEventTree->GetEntry(entry);
 	fSplTree->GetEntry(entry);
+	fNUISANCEEvent->fSplineCoeff = fSplineCoeff;
 
 	fNUISANCEEvent->eventid = entry;
 
@@ -97,9 +118,9 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Setup Input scaling for joint inputs
 	if (jointinput) {
-		fNUISANCEEvent->InputWeight *= GetInputWeight(entry);
+		fNUISANCEEvent->InputWeight *= fNUISANCEEvent->SavedRWWeight * GetInputWeight(entry);
 	} else {
-		fNUISANCEEvent->InputWeight *= 1.0;
+		fNUISANCEEvent->InputWeight *= fNUISANCEEvent->SavedRWWeight;
 	}
 
 	return fNUISANCEEvent;
@@ -129,7 +150,9 @@ BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	// fFitEventTree->GetEntry(entry);
-	fSplTree->GetEntry(entry);
+	//fSplTree->GetEntry(entry);
+
+	//	fBaseEvent->fSplineCoeff = &fAllSplineCoeff[entry][0];
 
 	fBaseEvent->eventid = entry;
 

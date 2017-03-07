@@ -65,7 +65,7 @@ float Spline::operator()(const Float_t* x, const Float_t* par) const {
 }
 
 void Spline::Reconfigure(double x) {
-  // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
+  //   std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
   fX = x;
   fOutsideLimits = false;
 
@@ -162,7 +162,7 @@ float Spline::DoEval(const Float_t* par, bool checkresponse) const {
 // ----------------------------------------------
 float Spline::Spline1DPol1(const Float_t* par) const {
   float xp = fX;
-  // std::cout << "Eval 1DPol1 with " << par[0] << " " << par[1]  << " " << xp << " " << par[0] + par[1] * xp << std::endl;
+  //std::cout << "Eval 1DPol1 with " << par[0] << " " << par[1]  << " " << xp << " " << par[0] + par[1] * xp << std::endl;
   return par[0] + par[1] * xp;
 };
 
@@ -274,7 +274,7 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, float* coeff, bool dra
 
   // Run the actual spline fit
   // StopTalking();
-  std::cout << "Fixing TGraph" << std::endl;
+  //  std::cout << "Fixing TGraph" << std::endl;
   gr->Fit(func, "FMWQ");
   // StartTalking();
 
@@ -312,8 +312,8 @@ void Spline::GetCoeff1DTSpline3(int n, double* x, double* y, float* coeff, bool 
 
   if (draw) {
     TGraph* gr = new TGraph(n, x, y);
-    temp_spline.Draw("C");
-    gr->Draw("PL");
+    temp_spline.Draw("CA");
+    gr->Draw("PL SAME");
     gPad->Update();
     gPad->SaveAs(("plot_test_" + fName + ".pdf").c_str());
     // sleep(3);

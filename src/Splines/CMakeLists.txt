@@ -21,6 +21,7 @@ FitSpline.cxx
 FitSplineHead.cxx
 SplineReader.cxx
 SplineWriter.cxx
+SplineMerger.cxx
 Spline.cxx
 )
 
@@ -29,6 +30,7 @@ FitSpline.h
 FitSplineHead.h
 SplineReader.h
 SplineWriter.h
+SplineMerger.h
 Spline.h
 )
 

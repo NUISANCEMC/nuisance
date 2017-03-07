@@ -27,7 +27,7 @@ namespace FitPar{
   bool use_colors = true; //!< Use BASH Terminal Colors Flag
   bool super_rainbow_mode = true; //!< For when fitting gets boring.
   unsigned int super_rainbow_mode_colour = 0;
-   bool showtrace = true;
+   bool showtrace = false;
   // For redirecting various print outs
   std::streambuf *default_cout = std::cout.rdbuf();
   std::streambuf *default_cerr = std::cerr.rdbuf();
@@ -35,6 +35,10 @@ namespace FitPar{
   int silentfd = open("/dev/null",O_WRONLY);
   int savedstdoutfd = dup(fileno(stdout));
   int savedstderrfd = dup(fileno(stderr));
+
+  int nloggercalls = 0;
+  int timelastlog = 0;
+
 }
 
 std::ostream* logStream(&std::cout);
@@ -103,13 +107,31 @@ std::ostream& _LOG(int level, const char* filename, const char* func, int line)
 //******************************************
 {
 
+  if (FitPar::nloggercalls > 1000){
+    std::cout << "[WARNING] : Large number of logger calls being piped to LOGGER." << std::endl;
+    std::cout << "This is super inefficient. : " << FitPar::nloggercalls << std::endl;
+    std::cout << "Occuring at " << filename << "::" << func << "[l. " << line << "]" << std::endl;
+    FitPar::nloggercalls = -1;
+  }
+
+  if (abs(time(NULL) - FitPar::timelastlog) > 10){
+    FitPar::timelastlog = time(NULL);
+    FitPar::nloggercalls = 0;
+  }
+
+  if (FitPar::nloggercalls != -1){
+    FitPar::nloggercalls++;
+  }
+
+  
+
   if (FitPar::log_verb < (unsigned int)level && 
       FitPar::log_verb != (unsigned int)DEB){
     return nullStream;
   } else {
 
     if (FitPar::showtrace){
-      std::cout << filename << "::" << func << "[l" << line << "] : ";
+      std::cout << filename << "::" << func << "[l. " << line << "] : ";
     }
 
     if (FitPar::super_rainbow_mode and FitPar::use_colors){

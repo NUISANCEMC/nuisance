@@ -14,7 +14,7 @@ void SplineReader::AddSpline(nuiskey splinekey) {
   std::string points      = splinekey.GetS("points");
   std::string extrapolate = splinekey.GetS("extrapolate");
 
-  std::cout << "AddSpline " << splname << " " << type << " " << form << " " << points << std::endl;
+  //  std::cout << "AddSpline " << splname << " " << type << " " << form << " " << points << std::endl;
 
   // Add the spline to the list of all forms
   fAllSplines.push_back( Spline(splname, form, GeneralUtils::ParseToDbl(points, ",")) );
@@ -43,23 +43,16 @@ void SplineReader::Read(TTree* tr) {
   tr->GetEntry(0);
 
   // Copy over
-  std::cout << "TempSpline Size = " <<tempspline->size() << std::endl; 
   for (size_t i = 0; i < tempspline->size(); i++){
     fSpline.push_back(tempspline->at(i));
     fType.push_back(temptype->at(i));
     fForm.push_back(tempform->at(i));
     fPoints.push_back(temppoints->at(i));
-    std::cout << " Found Spline In TTree " << tempspline->at(i) << std::endl;
   }
-  /*
-  delete tempspline;
-  delete tempform;
-  delete temppoints;
-  delete temptype;
-*/
+
   // Loop through and add splines from read type.
   for (size_t i = 0; i < fSpline.size(); i++) {
-    std::cout << "Adding New Spline " << fSpline[i] << " " << fForm[i] << " " << fPoints[i] << std::endl;
+    LOG(SAM) << "Registering Input Spline " << fSpline[i] << " " << fForm[i] << " " << fPoints[i] << std::endl;
     fAllSplines.push_back( Spline(fSpline[i], fForm[i],
                                   GeneralUtils::ParseToDbl(fPoints[i], ",")) );
   }
@@ -116,7 +109,13 @@ double SplineReader::CalcWeight(float* coeffs) {
 
 
 
-
+int SplineReader::GetNPar(){
+  int n = 0;
+  for (int i = 0; i < fAllSplines.size(); i++){
+    n += fAllSplines[i].GetNPar();
+  }
+  return n;
+}
 
 
 

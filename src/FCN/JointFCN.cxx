@@ -485,6 +485,7 @@ void JointFCN::ReconfigureAllEvents() {
 std::vector<InputHandlerBase*> JointFCN::GetInputList() {
 
   std::vector<InputHandlerBase*> InputList;
+  fIsAllSplines = true;
 
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
@@ -495,11 +496,16 @@ std::vector<InputHandlerBase*> JointFCN::GetInputList() {
 
       InputHandlerBase* inp = subsamples[i]->GetInput();
       if (std::find(InputList.begin(), InputList.end(), inp) ==  InputList.end()) {
+
+	if (subsamples[i]->GetInput()->GetType() != kSPLINEPARAMETER) fIsAllSplines = false;
+
         InputList.push_back(subsamples[i]->GetInput());
 
       }
     }
   }
+
+  
 
   return InputList;
 }
@@ -564,6 +570,7 @@ void JointFCN::ReconfigureUsingManager() {
     fSignalEventBoxes.clear();
     fSignalEventFlags.clear();
     fSampleSignalFlags.clear();
+    fSignalEventSplines.clear();
 
   }
 
@@ -573,10 +580,17 @@ void JointFCN::ReconfigureUsingManager() {
     fSubSampleList = GetSubSampleList();
   }
 
+  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  for (; inp_iter != fInputList.end(); inp_iter++) {
+    InputHandlerBase* curinput = (*inp_iter);
+    BaseFitEvt* curevent = curinput->FirstBaseEvent();
+    if (curevent->fSplineRead) curevent->fSplineRead->SetNeedsReconfigure(true);
+  }
+
   int fillcount = 0;
   // Loop over all inputs
   int inputcount = 0;
-  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  inp_iter = fInputList.begin();
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
 
@@ -587,8 +601,6 @@ void JointFCN::ReconfigureUsingManager() {
 
     // Start event loop
     while (curevent) {
-
-      
 
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
@@ -670,7 +682,15 @@ void JointFCN::ReconfigureUsingManager() {
         if (foundsignal) {
           fSignalEventBoxes.push_back(signalboxes);
           fSampleSignalFlags.push_back(signalbitset);
-        }
+
+	  if (fIsAllSplines){
+	    std::vector<float> coeff;
+	    for (size_t l = 0; l < curevent->fSplineRead->GetNPar(); l++){
+	      coeff.push_back( curevent->fSplineCoeff[l] );
+	    }
+	    fSignalEventSplines.push_back(coeff);
+	  }
+	}
       }
       signalboxes.clear();
       signalbitset.clear();
@@ -692,10 +712,14 @@ void JointFCN::ReconfigureUsingManager() {
 
   LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
   if (savesignal){
-    double mem = ( //sizeof(fSignalEventBoxes) + 
+    int mem = ( //sizeof(fSignalEventBoxes) + 
                   // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
                   sizeof(MeasurementVariableBox1D) * fillcount) * 1E-6;
     LOG(REC) << " -> Saved " << fillcount << " signal boxes for faster access. (~" << mem << " MB)" << std::endl;
+    if (fIsAllSplines and !fSignalEventSplines.empty()){
+      int splmem = sizeof(float)* fSignalEventSplines.size() * fSignalEventSplines[0].size() * 1E-6;
+      LOG(REC) << " -> Saved " << fillcount << " spline sets into memory. (~" << splmem << " MB)" << std::endl;
+    }
   }
 
 
@@ -740,6 +764,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Get iterators
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
   std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
+  std::vector< std::vector<float> >::iterator spline_iter = fSignalEventSplines.begin();
   std::vector< std::vector<bool> >::iterator samsig_iter = fSampleSignalFlags.begin();
 
   // Setup stuff for logging
@@ -747,8 +772,16 @@ void JointFCN::ReconfigureFastUsingManager() {
   int nevents = fSignalEventFlags.size();
   int countwidth = nevents / 5;
  
-  // Start input iterators
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  for (; inp_iter != fInputList.end(); inp_iter++) {
+    InputHandlerBase* curinput = (*inp_iter);
+    BaseFitEvt* curevent = curinput->FirstBaseEvent();
+    if (curevent->fSplineRead) curevent->fSplineRead->SetNeedsReconfigure(true);
+  }
+
+
+  // Start input iterators
+  inp_iter = fInputList.begin();
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
 
@@ -774,6 +807,11 @@ void JointFCN::ReconfigureFastUsingManager() {
       // Get Event
       curevent = curinput->GetBaseEvent(i);
       if (!curevent) break;
+
+      // Setup signal splines if required.
+      if (fIsAllSplines){
+	curevent->fSplineCoeff = &(*spline_iter)[0];
+      }
 
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
@@ -807,6 +845,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       // Iterate over boxes
       samsig_iter++;
       box_iter++;
+      spline_iter++;
 
       // iterate to next signal event
       inpsig_iter++;
