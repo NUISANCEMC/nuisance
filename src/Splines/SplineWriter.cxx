@@ -114,13 +114,25 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
   // Loop over splines
   int count = 0;
   int coeffcount = 0;
-  for (int i = 0; i < fAllSplines.size(); i++) {
+  int n = fAllSplines.size();
+
+  std::vector<int> splinecounter;
+  for (int i = 0; i < n; i++) {
+    splinecounter.push_back(coeffcount);
+    coeffcount += fAllSplines[i].GetNPar();
+  }
+
+  int parrallel = int(!fDrawSplines);
+
+  //#pragma omp parallel for if (parrallel)
+  for (int i = 0; i < n; i++) {
 
     // Store X/Y Vals
     std::vector<double> xvals;
     std::vector<double> yvals;
     bool hasresponse = false;
     int npar = (fAllSplines[i]).GetNPar();
+    coeffcount = splinecounter[i];
 
     for (int j = 0; j <  fSetIndex.size(); j++) {
       if (fSetIndex[j] != i+1) continue;
@@ -172,13 +184,15 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       gr->Draw("P SAME");
 
       gPad->Update();
-      gPad->SaveAs(("F1eval_" + fSpline[i] + ".pdf").c_str());
+      std::cout << "Writing : " << ("F1eval_" + fSpline[i] + ".pdf") << std::endl;
+      //gPad->SaveAs(("F1eval_" + fSpline[i] + ".pdf").c_str());
 
       delete gr;
       // delete f1;
     }
 
-    coeffcount += npar;
+    //    std::cout << "Finished Calcing splines for " << fAllSplines[i].GetName() << std::endl;
+    //    coeffcount += npar;
   }
 
 

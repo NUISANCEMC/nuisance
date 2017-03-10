@@ -30,9 +30,6 @@ void SplineMerger::AddSplineSetFromFile(TFile* file){
   // Now Get the coefficients setup.
   size_t index = fSplineTreeList.size();
   fSplineTreeList.push_back( (TTree*) file->Get("spline_tree") );
-  //  float temp[1000];
-  //  fSplineAddressList.push_back(temp);
-  fSplineTreeList[index]->SetBranchAddress("SplineCoeff", fSplineAddressList[index]);
 
 }
 
@@ -46,6 +43,15 @@ void SplineMerger::SetupSplineSet(){
 
   // Define Storer
   fCoEffStorer = new float[fNCoEff];
+
+  // Loop over each TTree and set spline address
+  int off = 0;
+  for (size_t i = 0; i < fSplineSizeList.size(); i++){
+    float* add = &(fCoEffStorer[off]);
+    TTree* tree = (fSplineTreeList[i]);
+    tree->SetBranchAddress("SplineCoeff", add);
+    off += fSplineSizeList[i];
+  }
 
 }
 

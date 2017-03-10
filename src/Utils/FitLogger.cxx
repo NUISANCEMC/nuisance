@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 namespace FitPar{
-  unsigned int log_verb = 0; //!< Current VERBOSITY
+  unsigned int log_verb = 4; //!< Current VERBOSITY
   unsigned int err_verb = 0; //!< Current ERROR VERBOSITY
   bool use_colors = true; //!< Use BASH Terminal Colors Flag
   bool super_rainbow_mode = true; //!< For when fitting gets boring.

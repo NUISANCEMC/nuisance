@@ -100,7 +100,7 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
 
   // Add CMD XML Structs
   for (size_t i = 0; i < xmlcmds.size(); i++) {
-    // std::cout << "Adding XML Line " << xmlcmds[i] << std::endl;
+    std::cout << "Adding XML Line " << xmlcmds[i] << std::endl;
     configuration.AddXMLLine(xmlcmds[i]);
   }
 
@@ -108,7 +108,7 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
   for (size_t i = 0; i < configargs.size(); i++) {
     configuration.OverrideConfig(configargs[i]);
   }
-
+  
   // Add Error Verbo Lines
   FitPar::log_verb = verbocount;
   LOG_VERB(verbocount);
@@ -534,7 +534,7 @@ void SplineRoutines::GenerateEventSplines() {
 
 }
 
-/*
+
 //*************************************                                                                                                                                                                                                    
 void SplineRoutines::MergeSplines() {
 //*************************************                                                                                                                                                                                                     
@@ -547,20 +547,121 @@ void SplineRoutines::MergeSplines() {
   // - Loop over number of entries.
   // - FillEntry in merger.
   // - Fill NUISANCEEvent into a new TTree.
-  
+
+  SplineMerger* splmerge = new SplineMerger();
+  std::vector<nuiskey> splinekeys = Config::QueryKeys("splinemerge");
+  for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
+       iter != splinekeys.end(); iter++) {
+    nuiskey splkey = (*iter);
+
+    TFile* infile = new TFile(splkey.GetS("input").c_str(), "READ");
+    splmerge->AddSplineSetFromFile(infile);
+
+  }
+  splmerge->SetupSplineSet();
+
+  // Now get Event File
+  std::vector<nuiskey> eventkeys = Config::QueryKeys("eventmerge");
+  nuiskey key = eventkeys[0];
+
+  std::string inputfilename  = key.GetS("input");
+
+  // Make a new input handler                                                                                                                                                                                                             
+  std::vector<std::string> file_descriptor =
+    GeneralUtils::ParseToStr(inputfilename, ":");
+  if (file_descriptor.size() != 2) {
+    ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
+	     << "\". expected \"FILETYPE:file.root\"" << std::endl;
+    throw;
+  }
+  InputUtils::InputType inptype =
+    InputUtils::ParseInputType(file_descriptor[0]);
+
+  InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+
+  std::string outputfilename = key.GetS("output");
+  if (outputfilename.empty()) {
+    outputfilename = inputfilename + ".nuisance.root";
+    ERR(FTL) << "No output give for set of output events! Saving to "
+	     << outputfilename << std::endl;
+  }
+
+  // Make new outputfile                                                                                                                                                                                                                  
+  TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+  outputfile->cd();
 
 
+  // Get info from inputhandler                                                                                                                                                                                                           
+  int nevents = input->GetNEvents();
+  int countwidth = (nevents / 1000);
+  FitEvent* nuisevent = input->FirstNuisanceEvent();
 
+  // Setup a TTree to save the event                                                                                                                                                                                                      
+  outputfile->cd();
+  TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
 
+  // Add a flag that allows just splines to be saved.                                                                                                                                                                                     
+  nuisevent->AddBranchesToTree(eventtree);
 
+  // Save the spline reader                                                                                                                                                                                                               
+  splmerge->Write("spline_reader");
 
+  // Setup the spline TTree                                                                                                                                                                                                               
+  TTree* splinetree = new TTree("spline_tree", "spline_tree");
+  splmerge->AddCoefficientsToTree(splinetree);
 
+  int lasttime = time(NULL);
+  int i = 0;
+  // Loop over all events and fill the TTree                                                                                                                                                                                              
+  while (nuisevent) {
 
+    // Calculate the weights for each parameter set                                                                                                                                                                                       
+    splmerge->FillMergedSplines(i);
+    
+    // Save everything                                                                                                                                                                                                                    
+    eventtree->Fill();
+    splinetree->Fill();
 
+    // Logging                                                                                                                                                                                                                            
+    if (i % countwidth == 0) {
 
+      std::ostringstream timestring;
+      int timeelapsed = time(NULL) - lasttime;
+      if (i != 0 and timeelapsed){
+        lasttime = time(NULL);
 
+        int eventsleft = nevents - i;
+        float speed = float(countwidth) / float(timeelapsed);
+        float proj = (float(eventsleft)/float(speed))/60/60;
+        timestring << proj << " hours remaining.";
+
+      }
+      LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+    }
+
+    // Iterate                                                                                                                                                                                                                            
+    i++;
+    nuisevent = input->NextNuisanceEvent();
+  }
+
+  // Save flux and close file                                                                                                                                                                                                             
+  outputfile->cd();
+  eventtree->Write();
+  splinetree->Write();
+
+  input->GetFluxHistogram()->Write("nuisance_fluxhist");
+  input->GetEventHistogram()->Write("nuisance_eventhist");
+
+  // Close Output                                                                                                                                                                                                                         
+  outputfile->Close();
+
+  // Delete Inputs                                                                                                                                                                                                                        
+  delete input;
 }
-*/
+
+
+
+
 
 //*************************************
 // void SplineRoutines::TestEventSplines() {

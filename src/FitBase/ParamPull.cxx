@@ -702,11 +702,12 @@ void ParamPull::ThrowCovariance(){
     // Calc Bin Mod
     double binmod  = 0.0;
     for (int j = 0; j < fDataHist->GetNbinsX(); j++){
+      //      std::cout << "DECOMP " << j << " " << i << " " << randthrows.at(j) << std::endl;
       binmod += (*fDecomp)(j,i) * randthrows.at(j);
     }
 
     // Add up fraction dif
-    totalres += binmod / fDataHist->GetBinContent(i+1);
+    totalres += binmod;
     
     // Add to current data
     fDataHist->SetBinContent(i+1,fDataHist->GetBinContent(i+1) + binmod);
@@ -717,7 +718,7 @@ void ParamPull::ThrowCovariance(){
 			   (fName + " toydata" + fPlotTitles).c_str() );
   
   // Print Status
-  LOG(REC) << "Created new toy histogram. Total Fractional Dif = "
+  LOG(REC) << "Created new toy histogram. Total Dif = "
 	   << totalres << std::endl;
   return;
 };

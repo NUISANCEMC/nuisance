@@ -24,6 +24,12 @@ Spline::Spline(std::string splname, std::string form,
     if (fXScan[i] < fXMin) fXMin = fXScan[i];
   }
 
+  // Setup iters
+  iter_low = fXScan.begin();
+  iter_high = fXScan.begin();
+  iter_high++;
+  off = 0;
+
   // Set form from list
   if      (!fForm.compare("1DPol1")) { Setup( k1DPol1, 1, 2 ); }
   else if (!fForm.compare("1DPol2")) { Setup( k1DPol2, 1, 3 ); }
@@ -52,11 +58,24 @@ void Spline::Setup(int type, int ndim, int npar) {
   fNPar = npar;
 }
 
+
 double Spline::operator()(const Double_t* x, const Double_t* par) const {
-  double val = DoEval(x, par);
+
+  Float_t tempx;
+  tempx = x[0];
+
+  Float_t* tempp = new Float_t[fNPar];
+  for (size_t i = 0; i < fNPar; i++){
+    tempp[i] = par[i];
+  }
+
+  float val = DoEval(&tempx, tempp);
+  delete tempp;
+
   if (val < 0.0) val = 0.0;
   return val;
 }
+
 
 float Spline::operator()(const Float_t* x, const Float_t* par) const {
   float val = DoEval(x, par);
@@ -64,6 +83,7 @@ float Spline::operator()(const Float_t* x, const Float_t* par) const {
   return val;
 }
 
+/*
 void Spline::Reconfigure(double x) {
   //   std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
   fX = x;
@@ -72,6 +92,7 @@ void Spline::Reconfigure(double x) {
   if (fX > fXMax) fX = fXMax;
   if (fX < fXMin) fX = fXMin;
 }
+*/
 
 void Spline::Reconfigure(float x) {
   // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
@@ -81,7 +102,7 @@ void Spline::Reconfigure(float x) {
   if (fX > fXMax) fX = fXMax;
   if (fX < fXMin) fX = fXMin;
 }
-
+/*
 double Spline::DoEval(const Double_t* x, const Double_t* par) const {
 
   // Setup current fX to value
@@ -96,6 +117,7 @@ double Spline::DoEval(const Double_t* x, const Double_t* par) const {
   // Now evaluate spline how FitWeight will do it.
   return w;
 }
+*/
 
 float Spline::DoEval(const Float_t* x, const Float_t* par) const {
 
@@ -111,7 +133,7 @@ float Spline::DoEval(const Float_t* x, const Float_t* par) const {
   // Now evaluate spline how FitWeight will do it.
   return w;
 }
-
+/*
 double Spline::DoEval(const Double_t* par, bool checkresponse) const {
   
   Float_t* temp = new Float_t[fNPar];
@@ -122,6 +144,7 @@ double Spline::DoEval(const Double_t* par, bool checkresponse) const {
   delete temp;
   return val;
 }
+*/
 
 float Spline::DoEval(const Float_t* par, bool checkresponse) const {
 
@@ -205,20 +228,24 @@ float Spline::Spline1DPol6(const Float_t* par) const {
 float Spline::Spline1DTSpline3(const Float_t* par) const {
 
   // iterator over knot values and find width
-  std::vector<float>::iterator iter_low  = fXScan.begin();
-  std::vector<float>::iterator iter_high = fXScan.begin();
-  iter_high++;
-  int off = 0;
+  if (iter_low == fXScan.end() or iter_high == fXScan.end()){
+    iter_low  = fXScan.begin();
+    iter_high = fXScan.begin();
+    iter_high++;
+    off = 0;
+  }
 
   // Find matching point
-  while ( iter_high != fXScan.end() ) {
-    if (fX >= (*iter_low) and fX < (*iter_high)) {
-      break;
-    }
+  while ( iter_high != fXScan.end() and 
+	  (fX < (*iter_low) or fX >= (*iter_high)) ) {
+    //    if (fX >= (*iter_low) and fX < (*iter_high)) {
+    //      break;
+    //    }
     off += 4;
     iter_low++;
     iter_high++;
   }
+
 
   float dx   = fX - (*iter_low);
   float weight = (par[off] + dx * (par[off + 1] + dx * (par[off + 2] + dx * par[off + 3])));
@@ -273,10 +300,25 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, float* coeff, bool dra
   func->FixParameter(0, 1.0); // Fix so 1.0 at nominal
 
   // Run the actual spline fit
-  // StopTalking();
-  //  std::cout << "Fixing TGraph" << std::endl;
-  gr->Fit(func, "FMWQ");
-  // StartTalking();
+  StopTalking();
+  
+  // If linear fit with two points
+  if (n == 2 and fType == k1DPol1){
+
+    float m = (y[1] - y[0]) / (x[1] - x[0]);
+    float c = y[0] - (0.0 - x[0]) * m;
+
+    func->SetParameter(0, c);
+    func->SetParameter(1, m);
+
+  } else if (fType == k1DPol1){
+    gr->Fit(func, "WQ");
+  } else {
+    gr->Fit(func, "FMWQ");
+  }
+
+
+  StartTalking();
 
   for (int i = 0; i < this->GetNPar(); i++) {
     coeff[i] = func->GetParameter(i);
@@ -298,7 +340,10 @@ void Spline::FitCoeff1DGraph(int n, double* x, double* y, float* coeff, bool dra
 // Spline extraction Functions
 void Spline::GetCoeff1DTSpline3(int n, double* x, double* y, float* coeff, bool draw) {
 
+  StopTalking();
   TSpline3 temp_spline = TSpline3("temp_spline", x, y, n);
+  StartTalking();
+
   for (size_t i = 0; i < n; i++) {
 
     double a, b, c, d, e;

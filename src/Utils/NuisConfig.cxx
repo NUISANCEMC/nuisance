@@ -328,7 +328,9 @@ void nuisconfig::LoadXMLConfig(std::string filename, std::string state = "") {
     child = fXML->GetNext(child);
   }
   // std::cout << "Removing Identical Nodes" << std::endl;
-  std::cout << " -> DONE." << std::endl;
+  if (LOG_LEVEL(FIT)){
+    std::cout << " -> DONE." << std::endl;
+  }
 }
 
 

@@ -65,8 +65,8 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   nuisconfig configuration = Config::Get();
   std::string cardfile = "";
   int maxevents = -1;
-  int errorcount = Config::Get().GetParI("ERROR");
-  int verbocount = Config::Get().GetParI("VERBOSITY");
+  int errorcount = 0;//Config::Get().GetParI("ERROR");
+  int verbocount = 0;//Config::Get().GetParI("VERBOSITY");
   std::vector<std::string> xmlcmds;
   std::vector<std::string> configargs;
 
@@ -119,7 +119,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   }
 
   // Add Error Verbo Lines
-  FitPar::log_verb = verbocount;
+  FitPar::log_verb = 2; //verbocount + FitPar::Config().GetParI("VERBOSITY");
   LOG_VERB(verbocount);
   ERR_VERB(errorcount);
 
@@ -758,7 +758,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 	       << fStartVals[syst] << ";"
 	       << fStepVals[syst];
 
-      std::string type = fTypeVals[syst] + "/GAUSTHROW";
+      std::string type = "GAUSTHROW/NEUT";
 
       // Push Back Pulls
       ParamPull* pull = new ParamPull( name, pullterm.str(), type );
@@ -1148,6 +1148,8 @@ void SystematicRoutines::GenerateErrorBands(){
   }
 
   fOutputRootFile->cd();
+  errorDIR->cd();
+  LOG(FIT) << "Writing iteration tree." << std::endl;
   fSampleFCN->WriteIterationTree();
 
   //  fDecompFree->Write();

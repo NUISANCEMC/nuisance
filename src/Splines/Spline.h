@@ -23,14 +23,14 @@ public:
   void Setup(int type, int ndim, int npar);
 
   double operator()(const Double_t* x, const Double_t* par) const;
-  double DoEval(const Double_t* x, const Double_t* par) const;
-  double DoEval(const Double_t* par, bool checkresponse=true) const;
+  //  double DoEval(const Double_t* x, const Double_t* par) const;
+  //  double DoEval(const Double_t* par, bool checkresponse=true) const;
 
   float operator()(const Float_t* x, const Float_t* par) const;
   float DoEval(const Float_t* x, const Float_t* par) const;
   float DoEval(const Float_t* par, bool checkresponse=true) const;
   
-  void FitCoeff(int n, double* x, double* y, double* par, bool draw);
+  //  void FitCoeff(int n, double* x, double* y, double* par, bool draw);
   void FitCoeff(int n, double* x, double* y, float* par, bool draw);
 
   inline std::string GetName(void) { return fName; };
@@ -39,7 +39,7 @@ public:
   inline int GetNPar(void) { return fNPar;  };
   inline std::string GetForm() {return fForm;};
 
-  void Reconfigure(double x);
+  //void Reconfigure(double x);
   void Reconfigure(float x);
 
   std::string fName;
@@ -55,6 +55,10 @@ public:
   mutable float fXMin;
   mutable float fXMax;
   int  fSplineOffset;
+
+  mutable std::vector<float>::iterator iter_low;
+  mutable std::vector<float>::iterator iter_high;
+  mutable int off;
 
   // Spline List
   enum spline_types {

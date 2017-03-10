@@ -49,6 +49,7 @@
 #include "NuisKey.h"
 #include "SplineReader.h"
 #include "SplineWriter.h"
+#include "SplineMerger.h"
 #include "ParserUtils.h"
 
 enum minstate {
@@ -116,6 +117,8 @@ public:
 
   //! Get previous fit status from a file
   Int_t GetStatus();
+
+  void MergeSplines();
 
 protected:
 

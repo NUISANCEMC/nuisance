@@ -91,15 +91,22 @@ double SplineReader::CalcWeight(float* coeffs) {
   int off = 0;
   double rw_weight = 1.0;
 
+  // Form Offset list
+  std::vector<int> offsets;
+  for (size_t i = 0; i < fAllSplines.size(); i++) {
+    offsets.push_back(off);
+    off +=  fAllSplines[i].GetNPar();
+  }
+
+#pragma omp parrallel for
   for (size_t i = 0; i < fAllSplines.size(); i++) {
      // std::cout << "Evaluating spline " << fAllSplines[i].GetName() << " at coeff offset " << off <<  "(" << coeffs << ")" << std::endl;
      // for (int j = 0; j < fAllSplines[i].GetNPar(); j++){
        // std::cout << "Coeff " << j+off << " " << coeffs[off+j] << std::endl;
     // }
-    double w = fAllSplines[i].DoEval( &coeffs[off] );
+    double w = fAllSplines[i].DoEval( &coeffs[offsets[i]] );
     rw_weight *= w;
     // std::cout << "Spline RW Weight = " << rw_weight << " " << w << std::endl;
-    off += fAllSplines[i].GetNPar();
   }
 
   if (rw_weight <= 0.0) rw_weight = 1.0;
