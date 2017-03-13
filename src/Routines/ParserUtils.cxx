@@ -107,7 +107,10 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 	std::string splitline = "";
 	int linecount = 0;
 
-
+	std::cout << "Parsing Split" << std::endl;
+	for (size_t i = 0; i < args.size(); i++) {
+		std::cout << i <<  " " << args[i] << std::endl;
+	}	
 	for (size_t i = 0; i < args.size(); i++) {
 		if (args.empty()) break;
 
@@ -129,6 +132,8 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 		}
 	}
 
+	std::cout << "Found Splie Line " << splitline << std::endl; 
+
 	// Remove from vector
 	if (indexfound != -1) {
 		for (int i = indexfound; i <= indexfound + linecount; i++) {
@@ -141,10 +146,10 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 
 void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string opt, std::vector<std::string>& val, bool required, bool duplicates) {
 
-	// std::cout << "Starting split argument" << std::endl;
+	//std::cout << "Starting split argument" << std::endl;
 	while (std::find(args.begin(), args.end(), opt) != args.end()) {
 		std::string temp = "";
-		ParseSplitArgument(args, opt, temp, required, duplicates);
+		ParseArgument(args, opt, temp, required, duplicates);
 
 		std::cout << "Pushing Back Split Argument for " << opt << " " << temp << std::endl;
 		val.push_back(temp);

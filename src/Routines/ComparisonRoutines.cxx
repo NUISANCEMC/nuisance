@@ -76,7 +76,8 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   ParserUtils::ParseArgument(args, "-o", fOutputFile, false, false);
   ParserUtils::ParseArgument(args, "-n", maxevents, false, false);
   ParserUtils::ParseArgument(args, "-f", fStrategy, false, false);
-  ParserUtils::ParseSplitArgument(args, "-i", xmlcmds);
+  ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
+  ParserUtils::ParseArgument(args, "-i", xmlcmds);
   ParserUtils::ParseArgument(args, "-q", configargs);
   ParserUtils::ParseCounter(args, "e", errorcount);
   ParserUtils::ParseCounter(args, "v", verbocount);
