@@ -16,14 +16,9 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #ifndef COMPARISON_ROUTINES_H
 #define COMPARISON_ROUTINES_H
-
-/*!
- *  \addtogroup Minimizer
- *  @{
- */
+/*! \addtogroup Routines @{ */
 
 #include "TH1.h"
 #include "TF1.h"
@@ -59,7 +54,7 @@ enum minstate {
 };
 
 //*************************************
-//! Collects all possible fit routines into a single class to avoid repeated code
+/// Collects all possible fit routines into a single class to avoid repeated code
 class ComparisonRoutines {
 //*************************************
 
@@ -69,74 +64,67 @@ public:
     Constructor/Destructor
   */
 
-  //! Constructor reads in arguments given at the command line for the fit here.
+  /// Constructor reads in arguments given at the command line for the fit here.
   ComparisonRoutines(int argc, char* argv[]);
     
-  //! Default destructor
+  /// Default destructor
   ~ComparisonRoutines();
 
-  //! Reset everything to default/NULL
+  /// Reset everything to default/NULL
   void Init();
   
   /*
     Input Functions
   */
 
-  //! Sorts out configuration and verbosity right at the very start.
-  //! Calls readCard to set everything else up.
-  void InitialSetup();
-
-  //! Loops through each line of the card file and passes it to other read functions
+  /// Queries configuration keys to setup Parameters/Samples/FakeParameters
   void SetupComparisonsFromXML();
 
   /*
     Setup Functions
   */
 
-  //! Setup the configuration given the arguments passed at the commandline and card file
-  void SetupConfig();
-
-  //! Setups up our custom RW engine with all the parameters passed in the card file
+  /// Setups up our custom RW engine with all the parameters passed in the card file
   void SetupRWEngine();
 
-  //! Setups up the jointFCN.
+  /// Setups up the jointFCN.
   void SetupFCN();
 
-  //! Set the current data histograms in each sample to the fake data.
+  /// Set the current data histograms in each sample to the fake data.
   void SetFakeData();
 
   /*
     Fitting Functions
   */
 
-  //! Main function to actually start iterating over the different required fit routines
+  /// Main function to actually start iterating over the different required fit routines
   void Run();
 
-  //! Creates a comparison from FCN
+  /// Creates a comparison from FCN
   void GenerateComparison();
   
-  //! Given a new map change the values that the RW engine is currently set to
+  /// Given a new map change the values that the RW engine is currently set to
   void UpdateRWEngine(std::map<std::string,double>& updateVals);
 
-  //! Print current value
+  /// Print current value
   void PrintState();
   
   /*
     Write Functions
   */
 
-  //! Save the sample plots for current MC
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
+  /// Save the sample plots for current MC
+  /// dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
 
-  //! Save starting predictions into a seperate folder
+  /// Save starting predictions into a seperate folder
   void SaveNominal();
 
   /*
     MISC Functions
   */
 
-  //! Get previous fit status from a file
+  /// Get previous fit status from a file
   Int_t GetStatus();
 
 protected:
@@ -144,33 +132,35 @@ protected:
   //! Our Custom ReWeight Object
   FitWeight* rw;
 
-  std::string fOutputFile;
-  std::string fInputFile;
+  std::string fOutputFile; ///< Output file name
+  // std::string fInputFile;  ///< Input file name
 
-  TFile* fInputRootFile;
-  TFile* fOutputRootFile;
+  // TFile* fInputRootFile;   ///< 
+  TFile* fOutputRootFile; ///< Output ROOT TFile
 
-  JointFCN* fSampleFCN;
+  JointFCN* fSampleFCN; ///< Joint Samples Container that handles reconfigures.
 
-  std::string fCardFile;
+  std::string fCardFile; ///< Input card/XML file.
 
-  std::string fStrategy;
-  std::vector<std::string> fRoutines;
-  std::string fAllowedRoutines;
+  std::string fStrategy; ///< Comparison routine selection.
+  std::vector<std::string> fRoutines; ///< Split vector of comparison routine selection.
+  std::string fAllowedRoutines; ///< Hard coded list of allowed routines.
   
-  std::string fFakeDataInput;
+  /// Fake data flag. Can be 'MC' to use 'fake_parameter'
+  /// or 'path_to_file.root' to use previous NUISANCE MC predictions.
+  std::string fFakeDataInput; 
 
   // Input Dial Vals
-  //! Vector of dial names
-  std::vector<std::string> fParams;
-  std::map<std::string, std::string> fStateVals;
-  std::map<std::string, double>      fCurVals;
-  std::map<std::string, int>         fTypeVals;
+  std::vector<std::string> fParams; ///< Vector of dial names.
+  std::map<std::string, std::string> fStateVals; ///< Map of dial states
+  std::map<std::string, double>      fCurVals; ///< Map of dial values
+  std::map<std::string, int>         fTypeVals; ///< Map of dial type enums.
 
-  //! Vector of fake parameter names
-  std::map<std::string,double> fFakeVals;
+  // Fake Dial Vals
+  std::map<std::string,double> fFakeVals; ///< Map of fake data settings.
 
-  nuiskey fCompKey;
+  // Configuration
+  nuiskey fCompKey; ///< Configuration Key for this Comparison Instance
 
 };
 

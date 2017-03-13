@@ -2,7 +2,6 @@
 
 void FitWeight::AddRWEngine(int type) {
 
-	std::cout << "Creating NEW WEIGHT ENGINE" << std::endl;
 	switch (type) {
 	case kNEUT:
 		fAllRW[type] = new NEUTWeightEngine("neutrw");

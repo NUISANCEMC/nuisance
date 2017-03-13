@@ -26,7 +26,7 @@ class nuiskey{
   std::vector<double>      GetVD(std::string name, const char* del);
 
   void SetS(std::string name, std::string newval);
-void SetI(std::string name, int newval);
+  void SetI(std::string name, int newval);
   void SetD(std::string name, double newval);
   void SetB(std::string name, bool newval);
 
@@ -45,7 +45,8 @@ void SetI(std::string name, int newval);
   XMLNodePointer_t fNode; ///< XML Node in Config::Get().fXML for this key                                                   
 };
 
-namespace Config{
+namespace Config {
+
   // Return a vector of keys for use
   std::vector<nuiskey> QueryKeys(const std::string name, const std::string test1="");
   nuiskey QueryFirstKey(const std::string name, const std::string test1="");
@@ -62,6 +63,6 @@ namespace Config{
   nuiskey CreateParameterKeyFromLine(const std::string line);
   nuiskey CreatePullKeyFromLine(const std::string line);
   nuiskey CreateOldConfigKeyFromLine(const std::string line);
-
+  
 }
 #endif

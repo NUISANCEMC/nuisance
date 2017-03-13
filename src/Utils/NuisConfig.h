@@ -168,6 +168,7 @@ protected:
 // Get Function for Singleton
 namespace Config {
   nuisconfig& Get();
+
 }
 
 

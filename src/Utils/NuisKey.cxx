@@ -29,6 +29,11 @@ std::vector<double>      nuiskey::GetVD(std::string name, const char* del){
 };
 
 
+
+
+
+
+
 std::vector<nuiskey> Config::QueryKeys(const std::string type, const std::string test1){
 
   // Get Vector of nodes     

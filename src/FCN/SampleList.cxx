@@ -13,7 +13,7 @@ MeasurementBase* CreateSample(std::string name, std::string file,
   samplekey.AddS("input",file);
   samplekey.AddS("type",type);
 
-  std::cout << "Created SampleKey " << name <<  " " << samplekey.GetS("name") << std::endl;
+  // std::cout << "Created SampleKey " << name <<  " " << samplekey.GetS("name") << std::endl;
   return CreateSample(samplekey);
 }
 
@@ -25,7 +25,7 @@ MeasurementBase* CreateSample(nuiskey samplekey){
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
 
-  std::cout << "Creating sample from name = " << name << std::endl;
+  // std::cout << "Creating sample from name = " << name << std::endl;
   /*
      ANL CCQE Samples
   */
@@ -575,6 +575,9 @@ Fake Studies
 
   } else if (name.find("GenericFlux_") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
+
+  } else if (!name.compare("ElectronFlux_FlatTree")){
+    return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));
 
     //<<<<<<< HEAD
     //  } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {

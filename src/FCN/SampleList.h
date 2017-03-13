@@ -213,6 +213,7 @@
 
 #include "MCStudy_KaonPreSelection.h"
 #include "MCStudy_MuonValidation.h"
+#include "ElectronFlux_FlatTree.h"
 
 #include "FitWeight.h"
 

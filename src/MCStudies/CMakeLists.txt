@@ -22,6 +22,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
 GenericFlux_Tester.cxx
 #MCStudy_KaonPreSelection.cxx
 MCStudy_MuonValidation.cxx
+ElectronFlux_FlatTree.cxx
 )
 
 set(HEADERFILES
@@ -30,6 +31,7 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
 GenericFlux_Tester.h
 #MCStudy_KaonPreSelection.h
 MCStudy_MuonValidation.h
+ElectronFlux_FlatTree.h
 )
 
 set(LIBNAME MCStudies)

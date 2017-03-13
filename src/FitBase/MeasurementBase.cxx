@@ -140,7 +140,7 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
   fName = setting.GetS("name");
 
   // Used as an initial setup function incase we need to do anything here.
-  LOG(SAM) << "Loading Inputs for " << setting.GetName() << std::endl;
+  LOG(SAM) << "Loading Sample : " << setting.GetName() << std::endl;
   SetupInputs( setting.GetS("input") );
 
   return setting;

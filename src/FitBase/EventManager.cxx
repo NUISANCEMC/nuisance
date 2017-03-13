@@ -87,18 +87,18 @@ InputHandlerBase* EventManager::AddInput(std::string handle, std::string infile)
 
   int id = GetInputID(file_descriptor[1]);
   if ((uint)id != fid.size()) {
-    LOG(SAM) << "Event manager already contains this input."
+    LOG(SAM) << "Event manager already contains " << file_descriptor[1] 
              << std::endl;
     return finputs[id];
-  } else {
-    LOG(SAM) << "Adding input " << file_descriptor[1] << std::endl;
-  }
+  } 
 
   fid[file_descriptor[1]] = id;
   finputs[id] = InputUtils::CreateInputHandler(handle, inpType, file_descriptor[1]);
   frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(), true);
   calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(), 0.0);
   
+  LOG(SAM) << "Registered " << handle << " with EventManager." << std::endl;
+
   return finputs[id];
 }
 

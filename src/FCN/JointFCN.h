@@ -44,14 +44,12 @@ class JointFCN
 
   //! Constructor
   //! cardfile = Path to input card file listing samples
-  JointFCN(std::string cardfile, TFile *outfile=NULL);
   JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile=NULL);
   JointFCN(TFile* outfile=NULL); // Loads from global config
   //! Destructor
   ~JointFCN();
 
   //! Create sample list from cardfile
-  void LoadSamples(std::string cardFile);
   void LoadSamples(std::vector<nuiskey> samplekeys);
 
   //! Main Likelihood evaluation FCN
@@ -156,14 +154,7 @@ std::vector<InputHandlerBase*> GetInputList();
   std::vector<InputHandlerBase*> fInputList;
   std::vector<MeasurementBase*> fSubSampleList;
   bool fIsAllSplines;
-  // iterator should go:
-  // Iterate over fSignalList
-  // If true get entry, and get 'next' in fSampleSignalList and fSampleSignalBoxes
-  // - Iterate over entry in fSampleSignalList
-  // - If true get 'next' in element in fSampleSignalBoxes.
-  // - - Fill input from MeasurementVariableBox*
-
-
+  
 };
 
 /*! @} */

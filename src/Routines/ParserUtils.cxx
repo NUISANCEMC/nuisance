@@ -141,7 +141,7 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 
 void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string opt, std::vector<std::string>& val, bool required, bool duplicates) {
 
-	std::cout << "Starting split argument" << std::endl;
+	// std::cout << "Starting split argument" << std::endl;
 	while (std::find(args.begin(), args.end(), opt) != args.end()) {
 		std::string temp = "";
 		ParseSplitArgument(args, opt, temp, required, duplicates);
@@ -169,22 +169,26 @@ void ParserUtils::ParseRemainingXML(std::vector<std::string>& args, std::vector<
 		temp += args[i] + " ";
 	}
 
-	// Printout
-	std::cout << "Remaining XML = " << temp << std::endl;
-
 	return;
 }
 
 void ParserUtils::ParseCounter(std::vector<std::string>& args, std::string opt, int& count) {
 
+	std::vector<int> indexlist;
+
 	for (size_t i = 0; i < args.size(); i++) {
 		if (!(args[i]).compare( "+" + opt)) {
 			count++;
+			indexlist.push_back(i);
 		} else if (!(args[i]).compare( "-" + opt)) {
 			count--;
+			indexlist.push_back(i);
 		}
 	}
 
+	for (size_t i = 0; i < indexlist.size(); i++){
+		args.erase(args.begin() + indexlist[i]);
+	}
 }
 
 
