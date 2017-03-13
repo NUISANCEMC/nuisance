@@ -29,14 +29,6 @@ public:
 	int ConvertGENIEReactionCode(GHepRecord* gheprec);
 #endif
 	
-	std::vector<TH1D*> jointfluxinputs;
-	std::vector<TH1D*> jointeventinputs;
-	std::vector<int> jointindexlow;
-	std::vector<int> jointindexhigh;
-	size_t jointindexswitch;
-	bool jointinput;
-	std::vector<double> jointindexscale;
-
 #ifdef __GENIE_ENABLED__
 	  GHepRecord* fGenieGHep;
 	  NtpMCEventRecord* fGenieNtpl;

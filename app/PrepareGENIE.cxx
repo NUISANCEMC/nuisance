@@ -52,8 +52,27 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   TH1D* fluxhist = NULL;
   if (fluxvect.size() > 1){
     TFile* fluxfile = new TFile(fluxvect[0].c_str(),"READ");
-    fluxhist = (TH1D*) fluxfile->Get(fluxvect[1].c_str());
-    fluxhist->SetDirectory(0);
+    if (!fluxfile->IsZombie()){
+      fluxhist = (TH1D*) fluxfile->Get(fluxvect[1].c_str());
+      fluxhist->SetDirectory(0);
+    } else {
+      
+      if (fluxvect[0] == '1.0'){
+	fluxhist = new TH1D("fluxhist","fluxhist", 40, GeneralUtils::StrToDbl(fluxvect[1]), GeneralUtils::StrToDbl(fluxvect[2]));
+	for (int i = 0; i < fluxhist->GetNbinsX(); i++){
+	  fluxhist->SetBinContent(i+1, 1.0);
+	}
+      } else {
+	//	TF1 f1 = TF1("1.0", GeneralUtils::StrToDbl(fluxvect[1]),  GeneralUtils::StrToDbl(fluxvect[2]), 1);
+	//	std::cout << "Created TF1 with '" << fluxvect[0].c_str()<<"' " << GeneralUtils::StrToDbl(fluxvect[1]) << " " << GeneralUtils::StrToDbl(fluxvect[2]) << std::endl;
+	fluxhist = new TH1D("fluxhist","fluxhist", 40, GeneralUtils::StrToDbl(fluxvect[1]), GeneralUtils::StrToDbl(fluxvect[2]));
+	for (int i = 0; i < fluxhist->GetNbinsX(); i++){
+	  fluxhist->SetBinContent(i+1, 1.0);//f1.Eval(fluxhist->GetXaxis()->GetBinCenter(i+1)));
+	  //	  std::cout << "Filling Flux Hist " << f1.Eval(fluxhist->GetXaxis()->GetBinCenter(i+1)) << std::endl;
+	}
+	sleep(10);	
+      }
+    }
   } else {
     LOG(FTL) << "NO FLUX SPECIFIED" << std::endl;
     throw;
@@ -117,6 +136,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
     // Fill total event hist
     eventhist->Fill(neu->E());
+    std::cout << "Electron Energy = " << neu->E() << std::endl;
 
     // Clear Event
     genientpl->Clear();
