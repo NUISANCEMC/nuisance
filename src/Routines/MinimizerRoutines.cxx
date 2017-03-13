@@ -73,13 +73,15 @@ MinimizerRoutines::~MinimizerRoutines() {
 MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
 //*************************************
 
-  // Set everything to defaults
+  // Initialise Defaults
   Init();
   nuisconfig configuration = Config::Get();
+
+  // Default containers
   std::string cardfile = "";
-  int maxevents = -1;
-  int errorcount = 0;//Config::Get().GetParI("ERROR");
-  int verbocount = 0;//Config::Get().GetParI("VERBOSITY");
+  std::string maxevents = "-1";
+  int errorcount = 0;
+  int verbocount = 0;
   std::vector<std::string> xmlcmds;
   std::vector<std::string> configargs;
 
@@ -89,12 +91,12 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   ParserUtils::ParseArgument(args, "-o", fOutputFile, false, false);
   ParserUtils::ParseArgument(args, "-n", maxevents, false, false);
   ParserUtils::ParseArgument(args, "-f", fStrategy, false, false);
-  ParserUtils::ParseSplitArgument(args, "-i", xmlcmds);
+  ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
+  ParserUtils::ParseArgument(args, "-i", xmlcmds);
   ParserUtils::ParseArgument(args, "-q", configargs);
   ParserUtils::ParseCounter(args, "e", errorcount);
   ParserUtils::ParseCounter(args, "v", verbocount);
   ParserUtils::CheckBadArguments(args);
-
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
@@ -107,22 +109,29 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
     ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
 
   } else if (fOutputFile.empty()) {
-    ERR(FTL) << "No output file supplied!" << std::endl;
+    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
     throw;
   }
 
-  // Setup this configuration
-  fCompKey = Config::Get().CreateNode("nuiscomp");
-  fCompKey.AddS("cardfile", fCardFile);
-  fCompKey.AddS("outputfile", fOutputFile);
-  fCompKey.AddS("strategy", fStrategy);
+  // Configuration Setup =============================
+
+  // Check no comp key is available
+  nuiskey fCompKey;
+  if (Config::Get().GetNodes("nuiscomp").empty()) {
+    fCompKey = Config::Get().CreateNode("nuiscomp");
+  } else {
+    fCompKey = Config::Get().GetNodes("nuiscomp")[0];
+  }
+
+  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
 
   // Load XML Cardfile
   configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
 
   // Add CMD XML Structs
   for (size_t i = 0; i < xmlcmds.size(); i++) {
-    // std::cout << "Adding XML Line " << xmlcmds[i] << std::endl;
     configuration.AddXMLLine(xmlcmds[i]);
   }
 
@@ -130,17 +139,23 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   for (size_t i = 0; i < configargs.size(); i++) {
     configuration.OverrideConfig(configargs[i]);
   }
-
-  // Add Error Verbo Lines
-  verbocount += FitPar::Config().GetParI("VERBOSITY");
-  FitPar::log_verb = verbocount;
-  LOG_VERB(verbocount);
-  ERR_VERB(errorcount);
+  if (!maxevents.compare("-1")){
+    configuration.OverrideConfig("MAXEVENTS=" + maxevents);
+  }
 
   // Finish configuration XML
   configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
 
-  // Proper Setup
+  // Add Error Verbo Lines
+  verbocount += Config::Get().GetParI("VERBOSITY");
+  errorcount += Config::Get().GetParI("ERROR");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  FitPar::log_verb = verbocount;
+  LOG_VERB(verbocount);
+  ERR_VERB(errorcount);
+
+  // Minimizer Setup ========================================
   fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
   SetupMinimizerFromXML();
 

@@ -22,41 +22,6 @@
 void printInputCommands() {
 //*******************************
 
-  /*
-  std::cout << "NUISCOMP : NUISANCE Fixed Comparison App\n\n";
-  std::cout << "Running with cardfile usage example : \n";
-  std::cout << "  nuiscomp -c cardfile [-o outfile] [-n nevents] [-q config=val] [-i 'xmlstruct']\n";
-  std::cout << "\n  Arguments : \n";
-  std::cout << "\t  -c cardfile    : Path to NUISANCE card file defining fit samples \n\n";
-  std::cout << "\t[ -o outfile ]   : Path to root file that will be created to save output file.\n\n";
-  std::cout << "\t[ -n nevents ]   : Sets Max Events \n\n";
-  std::cout << "\t[ -q config=val ]: Allows any config parameter to be overridden from the command line.\n";
-  std::cout << "\t                   This will take priority over those given in the default, or cardFile. \n";
-  std::cout << "\t                   (e.g.): -q verbosity=6 -q maxevents=10000 \n\n";
-  std::cout << "\t[ -i 'xmlstruc' ]: Include additional xml/simple-card structures at runtime. \n";
-  std::cout << "\t                   (        xml e.g.): -i '\'sample name=\"MiniBooNE_CCQE_XSec_1DQ2_nu\""
-            << " input=\"NEUT:miniboone_events.root\"\'" << std::endl;
-  std::cout << "\t                   (simple-card e.g.): -i \'sample MiniBooNE_CCQE_XSec_1DQ2_nu"
-            << " NEUT:miniboone_events.root\' \n\n\n" << std::endl;
-
-  std::cout << "Running with cmd-line xmlstruct useage example : \n";
-  std::cout << "  nuiscomp -i 'xmlstruct' -o outfile [-n nevents] [-q config=val] [-i 'xmlstruct']\n";
-  std::cout << "\n  Arguments : \n";
-  std::cout << "\t  -i 'xmlstruc' : At least one xml struct is required if running without a card file. "
-            << "See below for struct examples. \n\n";
-  std::cout << "\t  -o outfile    : Path to root file that will be created to save output file (REQUIRED) \n\n";
-  std::cout << "\t[ -n nevents ]   : Sets Max Events \n\n";
-  std::cout << "\t[ -q config=val ]: Allows any config parameter to be overridden from the command line.\n";
-  std::cout << "\t                   This will take priority over those given in the default, or cardFile. \n";
-  std::cout << "\t                   (e.g.): -q verbosity=6 -q maxevents=10000 \n\n";
-  std::cout << "\t[ -i 'xmlstruc' ]: Include additional xml/simple-card structures at runtime. \n";
-  std::cout << "\t                   (        xml e.g.): -i \'sample name=\"MiniBooNE_CCQE_XSec_1DQ2_nu\""
-            << " input=\"NEUT:miniboone_events.root\"\'" << std::endl;
-  std::cout << "\t                   (simple-card e.g.): -i \'sample MiniBooNE_CCQE_XSec_1DQ2_nu"
-            << " NEUT:miniboone_events.root\' \n" << std::endl;
-
-  exit(-1);
-  */
   std::cout << "nuiscomp : NUISANCE Data Comparison App \n" << std::endl;
 
   std::cout << "# Running nuiscomp with a  card file #\n"
@@ -68,6 +33,10 @@ void printInputCommands() {
             << "################################################\n"
             << "nuiscomp  -i 'cardstructure' -o outputfile.root [ -c cardfile.xml [ -f routines ] [ -n maxevents ]    \n"
             << "        [ -d fakedata ] [ -q config=val ] [ +e/-e ] [ +v/-v ] \n"
+            << std::endl;
+
+  sleep(4);
+  std::cout << ""
             << "\n"
             << " \n"
             << "           -c cardfile.xml    : NUISANCE format card file defining comparisons.       \n"
@@ -113,7 +82,7 @@ void printInputCommands() {
             << "            +v/-v             : Increase/Decrease the default logging verbosity by 1.\n"
             << " \n\n" << std::endl;
 
-
+  sleep(4);
   std::cout << "# nuiscomp Running Examples #"
             << "############################# \n"
             << " \n"
@@ -137,7 +106,7 @@ void printInputCommands() {
             << " \n\n"
             << std::endl;
 
-
+  sleep(4);
   std::cout << "# NUISANCE Card Format Structure Examples # \n"
             << "########################################### \n"
             << "\n"
