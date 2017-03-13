@@ -102,7 +102,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
 FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry){
 #ifdef __GENIE_ENABLED__	
 
-  if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);
@@ -293,7 +293,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics(){
 	    fNUISANCEEvent->fNParticles++;
 
 	    // Extra Check incase GENIE fails.
-	    if (fNUISANCEEvent->fNParticles == kmax) {
+	    if ((UInt_t)fNUISANCEEvent->fNParticles == kmax) {
 	    	ERR(WRN) << "Number of GENIE Particles exceeds maximum!" << std::endl;
 	    	ERR(WRN) << "Extend kMax, or run without including FSI particles!" << std::endl;
 	    	break;
@@ -328,7 +328,7 @@ double GENIEInputHandler::GetInputWeight(int entry){
 BaseFitEvt* GENIEInputHandler::GetBaseEvent(const UInt_t entry){
 #ifdef __GENIE_ENABLED__
 
-  if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Read entry from TTree to fill GENIE Vect in BaseFitEvt;
 	fGENIETree->GetEntry(entry);

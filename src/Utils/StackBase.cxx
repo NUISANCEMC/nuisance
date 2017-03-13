@@ -71,7 +71,7 @@ void StackBase::Reset() {
 };
 
 void StackBase::FillStack(int index, double x, double y, double z, double weight) {
-	if (index < 0 or index >= fAllLabels.size()) return;
+  if (index < 0 or (UInt_t)index >= fAllLabels.size()) return;
 
 	if (fNDim == 1)      fAllHists[index]->Fill(x, y);
 	else if (fNDim == 2) ((TH2*)fAllHists[index])->Fill(x, y, z);

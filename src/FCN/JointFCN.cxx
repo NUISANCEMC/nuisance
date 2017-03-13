@@ -689,16 +689,10 @@ void JointFCN::ReconfigureUsingManager() {
 
 	  if (fIsAllSplines){
 	    std::vector<float> coeff;
-	    //	    std::cout << "Pushed Back Set : ";
-	    for (size_t l = 0; l < curevent->fSplineRead->GetNPar(); l++){
-	      //  std::cout << " " << curevent->fSplineCoeff[l];
+	    for (size_t l = 0; l < (UInt_t)curevent->fSplineRead->GetNPar(); l++){
 	      coeff.push_back( curevent->fSplineCoeff[l] );
 	    }
-	    //	    std::cout << std::endl;
-	    //	    std::cout << "Pushing Back " << coeff.size() << std::endl;
 	    fSignalEventSplines.push_back(coeff);
-	    //	    std::cout << "Spline List Size " << fSignalEventSplines.size() << std::endl;
-
 	  }
 	}
       }
@@ -768,8 +762,6 @@ void JointFCN::ReconfigureFastUsingManager() {
   }
 
   // Loop over all inputs
-  int curindex = 0;
-
   // Get iterators
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
   std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
@@ -797,7 +789,6 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Start input iterators
   inp_iter = fInputList.begin();
-  int vcount = 0;
   
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
@@ -811,7 +802,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       // Logging
       if (LOG_LEVEL(REC)){
         if (i % countwidth == 0){
-          LOG(REC) << "Processed " << i << " signal events." << std::endl;
+          LOG(REC) << "Processed " << i << " signal events.";
         }
       }
 
@@ -838,20 +829,17 @@ void JointFCN::ReconfigureFastUsingManager() {
       }
 
       // Get Event Weight
-      //      std::cout << "Calcing Weight with = " << fIsAllSplines << " "<< curevent->fSplineCoeff << std::endl;
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
 
       if (LOG_LEVEL(REC)){
         if (i % countwidth == 0){
-          LOG(REC) << "Processed " << i << " signal events. W = " << rwweight<< std::endl;
+	  std::cout << " W = " << rwweight<< std::endl;
         }
       }
 
       // Iterate over the measurements and get the corresponding signal boxes.
-      size_t measitercount = 0;
-      size_t boxitercount = 0;
 
       // Get vectors for this event
       std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
@@ -865,7 +853,6 @@ void JointFCN::ReconfigureFastUsingManager() {
 
         // If not signal continue
         if (*subsamsig_iter) {
-          // std::cout << "Filling histograms from box " << std::endl;
           curmeas->SetSignal(true);
           curmeas->FillHistogramsFromBox((*subbox_iter), rwweight);
           subbox_iter++;

@@ -138,7 +138,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Catch too large entries
-	if (entry >= fNEvents) return NULL;
+       if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
@@ -282,8 +282,8 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 
 	// Find Switch Scale
-	while ( entry < jointindexlow[jointindexswitch] ||
-	        entry >= jointindexhigh[jointindexswitch] ) {
+  while ( entry < (UInt_t)jointindexlow[jointindexswitch] ||
+	  entry >= (UInt_t)jointindexhigh[jointindexswitch] ) {
 		jointindexswitch++;
 
 		// Loop Around
@@ -298,7 +298,7 @@ double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
-	if (entry >= fNEvents) return NULL;
+        if (entry >= (UInt_t)fNEvents) return NULL;
 
 	fNEUTTree->GetEntry(entry);
 	fBaseEvent->eventid = entry;

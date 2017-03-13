@@ -68,8 +68,7 @@ void SplineReader::Reconfigure(std::map< std::string, double >& vals) {
     for (size_t i = 0; i < fSpline.size(); i++){
       // std::cout << " Comparing it to : " << fSpline[i] << std::endl;
       if (!fSpline[i].compare(iter->first.c_str())){
-	std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
-        // sleep(1);
+	//std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
         fAllSplines[i].Reconfigure(iter->second);
       }
     }
@@ -98,19 +97,23 @@ double SplineReader::CalcWeight(float* coeffs) {
     off +=  fAllSplines[i].GetNPar();
   }
 
-#pragma omp parrallel for
+  // #pragma omp parrallel for
   for (size_t i = 0; i < fAllSplines.size(); i++) {
-     // std::cout << "Evaluating spline " << fAllSplines[i].GetName() << " at coeff offset " << off <<  "(" << coeffs << ")" << std::endl;
-     // for (int j = 0; j < fAllSplines[i].GetNPar(); j++){
-       // std::cout << "Coeff " << j+off << " " << coeffs[off+j] << std::endl;
+
+    // std::cout << "Evaluating spline " << fAllSplines[i].GetName() << " at coeff offset " << off <<  "(" << coeffs << ")" << std::endl;
+    // for (int j = 0; j < fAllSplines[i].GetNPar(); j++){
+    // std::cout << "Coeff " << j+off << " " << coeffs[off+j] << std::endl;
     // }
+
     double w = fAllSplines[i].DoEval( &coeffs[offsets[i]] );
     rw_weight *= w;
+    
     // std::cout << "Spline RW Weight = " << rw_weight << " " << w << std::endl;
   }
 
   if (rw_weight <= 0.0) rw_weight = 1.0;
   // std::cout << "Returning spline rw_weight = " << rw_weight << std::endl;
+
   return rw_weight;
 }
 
@@ -118,7 +121,7 @@ double SplineReader::CalcWeight(float* coeffs) {
 
 int SplineReader::GetNPar(){
   int n = 0;
-  for (int i = 0; i < fAllSplines.size(); i++){
+  for (size_t i = 0; i < fAllSplines.size(); i++){
     n += fAllSplines[i].GetNPar();
   }
   return n;

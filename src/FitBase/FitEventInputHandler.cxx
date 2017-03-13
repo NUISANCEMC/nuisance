@@ -71,6 +71,8 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
     fNUISANCEEvent->HardReset();
     fNUISANCEEvent->SetBranchAddress(fFitEventTree);
 
+    fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
+
 
     // Normalise event histograms for relative flux contributions.
     for (size_t i = 0; i < jointeventinputs.size(); i++) { 
@@ -92,7 +94,7 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
 FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry){
 
 	// Return NULL if out of bounds
-	if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Reset all variables before tree read
 	fNUISANCEEvent->ResetEvent();
@@ -132,9 +134,6 @@ double FitEventInputHandler::GetInputWeight(int entry){
 
 
 BaseFitEvt* FitEventInputHandler::GetBaseEvent(const UInt_t entry){
-
-	// Make sure events setup
-	// if (!fBaseEvent) fBaseEvent = new BaseFitEvt(fNeutVect);
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fFitEventTree->GetEntry(entry);

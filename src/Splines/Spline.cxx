@@ -44,7 +44,7 @@ Spline::Spline(std::string splname, std::string form,
   }
 
   // Run Checks
-  if (fNDim != fSplineNames.size()) {
+  if ((UInt_t)fNDim != fSplineNames.size()) {
     ERR(FTL) << "Spline Dim:Names mismatch!" << std::endl;
     throw;
   }
@@ -65,7 +65,7 @@ double Spline::operator()(const Double_t* x, const Double_t* par) const {
   tempx = x[0];
 
   Float_t* tempp = new Float_t[fNPar];
-  for (size_t i = 0; i < fNPar; i++){
+  for (size_t i = 0; i < (UInt_t)fNPar; i++){
     tempp[i] = par[i];
   }
 
@@ -341,7 +341,7 @@ void Spline::GetCoeff1DTSpline3(int n, double* x, double* y, float* coeff, bool 
   TSpline3 temp_spline = TSpline3("temp_spline", x, y, n);
   StartTalking();
 
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < (UInt_t)n; i++) {
 
     double a, b, c, d, e;
     temp_spline.GetCoeff(i, a, b, c, d, e);

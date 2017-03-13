@@ -159,7 +159,7 @@ protected:
   std::map<std::string, std::string> fGenericInputFiles;
   std::map<std::string, std::string> fGenericOutputFiles;
   std::map<std::string, std::string> fGenericOutputTypes;
-  std::map<std::string, InputHandler*> fGenericInputs;
+  std::map<std::string, InputHandlerBase*> fGenericInputs;
 
 
   std::vector<std::string> fSplineNames;

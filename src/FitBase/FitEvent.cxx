@@ -99,7 +99,7 @@ void FitEvent::OrderStack() {
 
   for (int s = 0; s < 6; s++) {
     for (int i = 0; i < npart; i++) {
-      if (fOrigParticleState[i] != stateorder[s]) continue;
+      if ((UInt_t)fOrigParticleState[i] != (UInt_t)stateorder[s]) continue;
 
       fParticlePDG[fNParticles]    = fOrigParticlePDG[i];
       fParticleState[fNParticles]  = fOrigParticleState[i];

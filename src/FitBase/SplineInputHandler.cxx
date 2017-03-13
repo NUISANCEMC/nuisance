@@ -106,13 +106,14 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Make sure events setup
-	if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Reset all variables before tree read
 	fNUISANCEEvent->ResetEvent();
 
 	// Read NUISANCE Tree
 	fFitEventTree->GetEntry(entry);
+
 	fSplTree->GetEntry(entry);
 	fNUISANCEEvent->fSplineCoeff = fSplineCoeff;
 
@@ -151,15 +152,7 @@ double SplineInputHandler::GetInputWeight(int entry) {
 BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Make sure events setup
-	if (entry >= fNEvents) return NULL;
-
-	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
-	// fFitEventTree->GetEntry(entry);
-	//	fSplTree->GetEntry(entry);
-	//        fSplTree->GetEntry(entry);
-	//        fBaseEvent->fSplineCoeff = fSplineCoeff;
-
-	//fBaseEvent->fSplineCoeff = &fAllSplineCoeff[entry][0];
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	fBaseEvent->eventid = entry;
 

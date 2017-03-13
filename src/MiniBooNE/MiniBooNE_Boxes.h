@@ -26,7 +26,7 @@ public:
 		fNNeutrons = event->NumFSParticle(2112);
 		fTargetTest = event->fTargetPDG;
 
-		for (size_t i = 0; i < event->fNParticles; i++) {
+		for (size_t i = 0; i < (UInt_t)event->fNParticles; i++) {
 			FitParticle* p = event->PartInfo(i);
 
 			if (p->Status() == kInitialState) {

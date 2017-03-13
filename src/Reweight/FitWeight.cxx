@@ -111,11 +111,11 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
 }
 
 void FitWeight::SetAllDials(const double* x, int n) {
-	for (size_t i = 0; i < n; i++) {
-		int rwenum = fEnumList[i];
-		SetDialValue(rwenum, x[i]);
-	}
-	Reconfigure();
+  for (size_t i = 0; i < (UInt_t)n; i++) {
+    int rwenum = fEnumList[i];
+    SetDialValue(rwenum, x[i]);
+  }
+  Reconfigure();
 }
 
 

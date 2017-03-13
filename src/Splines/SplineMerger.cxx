@@ -28,7 +28,7 @@ void SplineMerger::AddSplineSetFromFile(TFile* file){
 
 
   // Now Get the coefficients setup.
-  size_t index = fSplineTreeList.size();
+  //size_t index = fSplineTreeList.size();
   fSplineTreeList.push_back( (TTree*) file->Get("spline_tree") );
 
 }
@@ -87,7 +87,7 @@ void SplineMerger::FillMergedSplines(int entry){
 
   size_t count = 0;
   for (size_t i = 0; i < fSplineSizeList.size(); i++){
-    for (size_t j = 0; j < fSplineSizeList[i]; j++){
+    for (size_t j = 0; j < (UInt_t)fSplineSizeList[i]; j++){
       fCoEffStorer[count] = fSplineAddressList[i][j];
       count++;
     }

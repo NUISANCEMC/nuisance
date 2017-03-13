@@ -22,7 +22,6 @@ BaseFitEvt.cxx
 FitParticle.cxx
 Measurement1D.cxx
 EventManager.cxx
-InputHandler.cxx
 Measurement2D.cxx
 FitEvent.cxx
 JointMeas1D.cxx
@@ -49,8 +48,7 @@ set(HEADERFILES
 ParamPull.h
 NuanceEvent.h
 BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h      MeasurementBase.h
-InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
+EventManager.h  FitParticle.h      MeasurementBase.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
 InputUtils.h
 NEUTInputHandler.h
 GENIEInputHandler.h

@@ -137,7 +137,7 @@ void SplineRoutines::SetupRWEngine() {
   std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
 
   // Add Parameters
-  for (int i = 0; i < parameterkeys.size(); i++) {
+  for (size_t i = 0; i < parameterkeys.size(); i++) {
     nuiskey key = parameterkeys[i];
 
     std::string parname = key.GetS("name");
@@ -200,7 +200,7 @@ void SplineRoutines::Run() {
     throw;
   }
 
-  for (int i = 0; i < fRoutines.size(); i++) {
+  for (size_t i = 0; i < fRoutines.size(); i++) {
 
     LOG(FIT) << "Running Routine: " << fRoutines[i] << std::endl;
     std::string rout = fRoutines[i];
@@ -225,7 +225,7 @@ void SplineRoutines::SaveEvents() {
   // Generate a set of nominal events
   // Method, Loop over inputs, create input handler, then create a ttree
   std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
-  for (int i = 0; i < eventkeys.size(); i++) {
+  for (size_t i = 0; i < eventkeys.size(); i++) {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
@@ -425,7 +425,7 @@ void SplineRoutines::GenerateEventSplines() {
   // Generate a set of nominal events
   // Method, Loop over inputs, create input handler, then create a ttree
   std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
-  for (int i = 0; i < eventkeys.size(); i++) {
+  for (size_t i = 0; i < eventkeys.size(); i++) {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O

@@ -33,7 +33,7 @@ void SplineWriter::SetupSplineSet() {
 
   // Create the coefficients double*
   fNCoEff = 0;
-  for (int i = 0; i < fAllSplines.size(); i++) {
+  for (size_t i = 0; i < fAllSplines.size(); i++) {
     fNCoEff += fAllSplines[i].GetNPar();
   }
   fCoEffStorer = new float[fNCoEff];
@@ -52,7 +52,7 @@ void SplineWriter::SetupSplineSet() {
   fValList.push_back(0.0);
 
   // Loop over all splines.
-  for (int i = 0; i < fAllSplines.size(); i++) {
+  for (size_t i = 0; i < fAllSplines.size(); i++) {
 
     // For each dial loop over all points within a given position
     std::vector<double> newvals = nomvals;
@@ -62,7 +62,7 @@ void SplineWriter::SetupSplineSet() {
 
     // Split Points
     std::vector<double> vals = GeneralUtils::ParseToDbl(fPoints[i], ",");
-    for (int j = 0; j < vals.size(); j++) {
+    for (size_t j = 0; j < vals.size(); j++) {
       newvals[pos] = vals[j];
       fParVect.push_back(newvals);
       fValList.push_back(vals[j]);
@@ -72,28 +72,31 @@ void SplineWriter::SetupSplineSet() {
   }
 
   // Print out the parameter set
-  std::cout << "Parset | Index | Pars --- " << std::endl;
-  for (int i = 0; i < fSetIndex.size(); i++) {
-    std::cout << " Set " << i << ". | " << fSetIndex[i] << " | ";
-    for (int j = 0; j < fParVect[i].size(); j++) {
-      std::cout << " " << fParVect[i][j];
-    }
+  LOG(FIT) << "Parset | Index | Pars --- " << std::endl;
+  for (size_t i = 0; i < fSetIndex.size(); i++) {
+    LOG(FIT) << " Set " << i << ". | " << fSetIndex[i] << " | ";
+    if (LOG_LEVEL(FIT)){
+      for (size_t j = 0; j < fParVect[i].size(); j++) {
+	std::cout << " " << fParVect[i][j];
+      }
     std::cout << std::endl;
+    }
   }
 }
 
 void SplineWriter::FitSplinesForEvent(FitEvent* event) {
 
+  // Get Starting Weight
   fRW->SetAllDials(&fParVect[0][0], fParVect[0].size());
   double nomweight = fRW->CalcWeight(event);
-
   event->RWWeight = nomweight;
+
   if (fDrawSplines){
     std::cout << "Nominal Spline Weight = " << nomweight << std::endl;
   }
 
   // Loop over parameter sets
-  for (int i = 1; i < fParVect.size(); i++) {
+  for (size_t i = 1; i < fParVect.size(); i++) {
     // Update FRW
     fRW->SetAllDials(&fParVect[i][0], fParVect[i].size());
 
@@ -112,7 +115,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
   }
 
   // Loop over splines
-  int count = 0;
+  //  int count = 0;
   int coeffcount = 0;
   int n = fAllSplines.size();
 
@@ -122,7 +125,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
     coeffcount += fAllSplines[i].GetNPar();
   }
 
-  int parrallel = int(!fDrawSplines);
+  //  int parrallel = int(!fDrawSplines);
 
   //#pragma omp parallel for if (parrallel)
   for (int i = 0; i < n; i++) {
@@ -134,7 +137,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
     int npar = (fAllSplines[i]).GetNPar();
     coeffcount = splinecounter[i];
 
-    for (int j = 0; j <  fSetIndex.size(); j++) {
+    for (size_t j = 0; j <  fSetIndex.size(); j++) {
       if (fSetIndex[j] != i+1) continue;
       xvals.push_back(fValList[j]);
       yvals.push_back(fWeightList[j] - 0.0);
@@ -164,7 +167,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
         if (xvals[j] < xmin) xmin = xvals[j];
       }
 
-      double xwidth = xmax - xmin;
+      //double xwidth = xmax - xmin;
       xmin = xmin - 0.01;
       xmax = xmax + 0.01;
 
@@ -199,7 +202,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
   // Check overrides
   if (fDrawSplines) {
     coeffcount = 0;
-    for (int i = 0; i < fAllSplines.size(); i++) {
+    for (size_t i = 0; i < fAllSplines.size(); i++) {
 
 
       // Store X/Y Vals
@@ -208,8 +211,8 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event) {
       bool hasresponse = false;
       int npar = (fAllSplines[i]).GetNPar();
 
-      for (int j = 0; j <  fSetIndex.size(); j++) {
-        if (fSetIndex[j] != i+1) continue;
+      for (size_t j = 0; j <  fSetIndex.size(); j++) {
+        if ((UInt_t)fSetIndex[j] != (UInt_t)i+1) continue;
         xvals.push_back(fValList[j]);
         yvals.push_back(fWeightList[j] - 0.0);
         if (fWeightList[j] != 1.0) hasresponse = true;

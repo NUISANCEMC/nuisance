@@ -394,7 +394,7 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
 	// Check Stack N
 	int npart = fGiReader->StdHepN;
 	int kmax = evt->kMaxParticles;
-	if ((uint)npart > kmax) {
+	if ((UInt_t)npart > (UInt_t)kmax) {
 		ERR(FTL) << "GiBUU has too many particles" << std::endl;
 		ERR(FTL) << "npart=" << npart << " kMax=" << kmax << std::endl;
 		throw;

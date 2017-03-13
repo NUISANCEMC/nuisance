@@ -140,7 +140,7 @@ void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {
 FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Catch too large entries
-	if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
@@ -513,7 +513,7 @@ double NuWroInputHandler::GetInputWeight(int entry) {
 BaseFitEvt* NuWroInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Catch too large entries
-	if (entry >= fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);

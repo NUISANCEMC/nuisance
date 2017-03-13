@@ -101,6 +101,7 @@ std::string nuisconfig::SetConfS(const std::string name, std::string val) {
   XMLNodePointer_t node = GetConfigNode(name);
   if (!node) node = CreateNode("config");
   SetS(node, name, val);
+  return val;
 }
 
 /// Get nuisconfig::SetConfig Bool
@@ -108,6 +109,7 @@ bool nuisconfig::SetConfB(const std::string name, bool val) {
   XMLNodePointer_t node = GetConfigNode(name);
   if (!node) node = CreateNode("config");
   SetB(node, name, val);
+  return val;
 }
 
 /// Get nuisconfig::SetConfig Int
@@ -115,6 +117,7 @@ int nuisconfig::SetConfI(const std::string name, int val) {
   XMLNodePointer_t node = GetConfigNode(name);
   if (!node) node = CreateNode("config");
   SetI(node, name, val);
+  return val;
 }
 
 /// Get nuisconfig::SetConfig Double
@@ -122,6 +125,7 @@ double nuisconfig::SetConfD(const std::string name, double val) {
   XMLNodePointer_t node = GetConfigNode(name);
   if (!node) node = CreateNode("config");
   SetD(node, name, val);
+  return val;
 }
 
 

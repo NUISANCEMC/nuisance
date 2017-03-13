@@ -473,7 +473,7 @@ int Reweight::ConvDial(std::string name, int type, bool exceptions) {
 
 
 std::string Reweight::ConvDial(int nuisenum) {
-  GlobalDialList* temp;
+  //GlobalDialList* temp;
   for (size_t i = 0; i < Reweight::DialList().fAllDialEnums.size(); i++) {
     if (Reweight::DialList().fAllDialEnums[i] == nuisenum) {
       return Reweight::DialList().fAllDialNames[i];
@@ -481,6 +481,7 @@ std::string Reweight::ConvDial(int nuisenum) {
   }
 
   LOG(FIT) << "Cannot find dial with enum = " << nuisenum << std::endl;
+  return "";
 }
 
 
