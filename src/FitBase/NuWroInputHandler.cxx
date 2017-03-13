@@ -89,6 +89,8 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 
 	fNUISANCEEvent = new FitEvent(fNuWroEvent);
 	fNUISANCEEvent->HardReset();
+	
+	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
 
 	// Normalise event histograms for relative flux contributions.
 	for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -518,9 +520,9 @@ BaseFitEvt* NuWroInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Set joint scaling if required
 	if (jointinput) {
-		fBaseEvent->InputWeight = GetInputWeight(entry);
+	  fBaseEvent->InputWeight = GetInputWeight(entry);
 	} else {
-		fBaseEvent->InputWeight = 1.0;
+	  fBaseEvent->InputWeight = 1.0;
 	}
 
 	return fBaseEvent;

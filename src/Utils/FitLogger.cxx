@@ -195,6 +195,7 @@ std::ostream& ERR(int level)
 
 
 void StopTalking(){
+  //  return;
   // Only redirect if we're not debugging
   if (FitPar::log_verb == (unsigned int)DEB) return;
   std::cout.rdbuf(FitPar::redirect_stream.rdbuf());

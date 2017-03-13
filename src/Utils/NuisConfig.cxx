@@ -375,19 +375,19 @@ void nuisconfig::LoadCardConfig(std::string filename, std::string state) {
     // Get Identifier
     std::string id = strvct[0];
 
-    // // Build backwards compatible xml configs
-    // if (!id.compare("sample")) Config::CreateSampleKeyFromLine(line);
+    // Build backwards compatible xml configs
+    if (!id.compare("sample")) Config::CreateSampleKeyFromLine(line);
 
-    // if (id.find("_parameter") != std::string::npos)
-    //   Config::CreateParameterKeyFromLine(line);
+    if (id.find("_parameter") != std::string::npos)
+      Config::CreateParameterKeyFromLine(line);
 
-    // if (!id.compare("covar") ||
-    //     !id.compare("pull")  ||
-    //     !id.compare("throw"))
-    //   Config::CreatePullKeyFromLine(line);
+    if (!id.compare("covar") ||
+	!id.compare("pull")  ||
+	!id.compare("throw"))
+      Config::CreatePullKeyFromLine(line);
 
-    // if (!id.compare("config"))
-    //   Config::CreateOldConfigKeyFromLine(line);
+    if (!id.compare("config"))
+      Config::CreateOldConfigKeyFromLine(line);
   }
 
 

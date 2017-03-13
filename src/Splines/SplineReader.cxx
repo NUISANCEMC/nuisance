@@ -68,7 +68,7 @@ void SplineReader::Reconfigure(std::map< std::string, double >& vals) {
     for (size_t i = 0; i < fSpline.size(); i++){
       // std::cout << " Comparing it to : " << fSpline[i] << std::endl;
       if (!fSpline[i].compare(iter->first.c_str())){
-        // std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
+	std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
         // sleep(1);
         fAllSplines[i].Reconfigure(iter->second);
       }

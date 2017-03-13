@@ -79,19 +79,22 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
     fGenieNtpl = NULL;
     fGENIETree->SetBranchAddress("gmcrec",&fGenieNtpl);
 
+    fNUISANCEEvent = new FitEvent(fGenieNtpl);
+    fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
+
     // Normalise event histograms for relative flux contributions.
     for (size_t i = 0; i < jointeventinputs.size(); i++) { 
-    	TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
+      TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
 
-    	double scale = double(fNEvents) / fEventHist->Integral("width");
-    	scale *= eventhist->Integral("width");
-    	scale /= double(jointindexhigh[i] - jointindexlow[i]);
+      double scale = double(fNEvents) / fEventHist->Integral("width");
+      scale *= eventhist->Integral("width");
+      scale /= double(jointindexhigh[i] - jointindexlow[i]);
 
-    	jointindexscale .push_back(scale);
-	}
+      jointindexscale .push_back(scale);
+    }
 
-	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
-	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+    fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
+    fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
 #endif
 };
 
@@ -99,27 +102,24 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
 FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry){
 #ifdef __GENIE_ENABLED__	
 
-	// Make sure events setup
-	if (!fNUISANCEEvent) {
-		fNUISANCEEvent = new FitEvent(fGenieNtpl);
-	}
+  if (entry >= fNEvents) return NULL;
 
-	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
-	fGENIETree->GetEntry(entry);
+  // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
+  fGENIETree->GetEntry(entry);
 
-	// Setup Input scaling for joint inputs
-	if (jointinput){
-		fNUISANCEEvent->InputWeight = GetInputWeight(entry);
-	} else {
-		fNUISANCEEvent->InputWeight = 1.0;
-	}
+  // Setup Input scaling for joint inputs
+  if (jointinput){
+    fNUISANCEEvent->InputWeight = GetInputWeight(entry);
+  } else {
+    fNUISANCEEvent->InputWeight = 1.0;
+  }
 
-	// Run NUISANCE Vector Filler
-	CalcNUISANCEKinematics();
+  // Run NUISANCE Vector Filler
+  CalcNUISANCEKinematics();
 
-	return fNUISANCEEvent;
+  return fNUISANCEEvent;
 #endif
-	return NULL;
+  return NULL;
 }
 
 
@@ -328,10 +328,9 @@ double GENIEInputHandler::GetInputWeight(int entry){
 BaseFitEvt* GENIEInputHandler::GetBaseEvent(const UInt_t entry){
 #ifdef __GENIE_ENABLED__
 
-	// Make sure events setup
-	// if (!fBaseEvent) fBaseEvent = new BaseFitEvt(fGenieNtpl);
+  if (entry >= fNEvents) return NULL;
 
-	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
+	// Read entry from TTree to fill GENIE Vect in BaseFitEvt;
 	fGENIETree->GetEntry(entry);
 
 	// Set joint scaling if required

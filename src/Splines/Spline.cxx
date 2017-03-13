@@ -95,7 +95,7 @@ void Spline::Reconfigure(double x) {
 */
 
 void Spline::Reconfigure(float x) {
-  // std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
+  //  std::cout << "Reconfigured spline : " << fName << " : " << fForm << " to be " << x << std::endl;
   fX = x;
   fOutsideLimits = false;
 
@@ -148,6 +148,9 @@ double Spline::DoEval(const Double_t* par, bool checkresponse) const {
 
 float Spline::DoEval(const Float_t* par, bool checkresponse) const {
 
+  if (!par) return 1.0;
+
+  //  std::cout << "Spline::DoEval = " << par << std::endl;
   // Check response
   if (checkresponse) {
     bool hasresponse = false;
@@ -227,25 +230,19 @@ float Spline::Spline1DPol6(const Float_t* par) const {
 
 float Spline::Spline1DTSpline3(const Float_t* par) const {
 
-  // iterator over knot values and find width
-  if (iter_low == fXScan.end() or iter_high == fXScan.end()){
-    iter_low  = fXScan.begin();
-    iter_high = fXScan.begin();
-    iter_high++;
-    off = 0;
-  }
-
+  //  std::cout << "Doing Spline Eval " << fX << " " << par << std::endl;
   // Find matching point
+  iter_low  = fXScan.begin();
+  iter_high = fXScan.begin();
+  iter_high++;
+  off = 0;
+  
   while ( iter_high != fXScan.end() and 
 	  (fX < (*iter_low) or fX >= (*iter_high)) ) {
-    //    if (fX >= (*iter_low) and fX < (*iter_high)) {
-    //      break;
-    //    }
     off += 4;
     iter_low++;
     iter_high++;
   }
-
 
   float dx   = fX - (*iter_low);
   float weight = (par[off] + dx * (par[off + 1] + dx * (par[off + 2] + dx * par[off + 3])));

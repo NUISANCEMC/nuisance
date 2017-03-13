@@ -127,7 +127,7 @@
 
 <!-- # For -f ErrorBands creates error bands for given measurements -->
 <!-- # How many throws do we want (The higher the better precision) -->
-<config error_throws='500'/>
+<config error_throws='250'/>
 
 <!-- # Are we throwing uniform or according to Gaussian? -->
 <!-- # Only use uniform if wanting to study the limits of a dial. -->

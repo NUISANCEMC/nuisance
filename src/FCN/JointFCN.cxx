@@ -580,12 +580,16 @@ void JointFCN::ReconfigureUsingManager() {
     fSubSampleList = GetSubSampleList();
   }
 
+  std::cout << "Reconfiguring." << std::endl;
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
     BaseFitEvt* curevent = curinput->FirstBaseEvent();
-    if (curevent->fSplineRead) curevent->fSplineRead->SetNeedsReconfigure(true);
+    if (curevent->fSplineRead){
+      curevent->fSplineRead->SetNeedsReconfigure(true);
+    }
   }
+  std::cout << "Reconfigured." << std::endl;
 
   int fillcount = 0;
   // Loop over all inputs
@@ -691,7 +695,10 @@ void JointFCN::ReconfigureUsingManager() {
 	      coeff.push_back( curevent->fSplineCoeff[l] );
 	    }
 	    //	    std::cout << std::endl;
+	    //	    std::cout << "Pushing Back " << coeff.size() << std::endl;
 	    fSignalEventSplines.push_back(coeff);
+	    //	    std::cout << "Spline List Size " << fSignalEventSplines.size() << std::endl;
+
 	  }
 	}
       }
@@ -724,8 +731,7 @@ void JointFCN::ReconfigureUsingManager() {
       LOG(REC) << " -> Saved " << fillcount << " spline sets into memory. (~" << splmem << " MB)" << std::endl;
     }
   }
-
-
+  
   LOG(REC) << "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart << std::endl;
 };
 
@@ -770,11 +776,17 @@ void JointFCN::ReconfigureFastUsingManager() {
   std::vector< std::vector<float> >::iterator spline_iter = fSignalEventSplines.begin();
   std::vector< std::vector<bool> >::iterator samsig_iter = fSampleSignalFlags.begin();
 
+  int signalcalls = 0;
+  for (size_t i = 0; i < fSignalEventFlags.size(); i++){
+    if (fSignalEventFlags[i]) signalcalls++;
+  }
+
   // Setup stuff for logging
   int fillcount = 0;
   int nevents = fSignalEventFlags.size();
   int countwidth = nevents / 5;
- 
+
+  // Spline Reconfigure
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
@@ -785,13 +797,16 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Start input iterators
   inp_iter = fInputList.begin();
+  int vcount = 0;
+  
   for (; inp_iter != fInputList.end(); inp_iter++) {
     InputHandlerBase* curinput = (*inp_iter);
 
     // Get Events
     BaseFitEvt* curevent = curinput->FirstBaseEvent();
     int i = 0;
-    while (curevent != 0) {
+
+    while (curevent != 0 and (inpsig_iter != fSignalEventFlags.end())) {
 
       // Logging
       if (LOG_LEVEL(REC)){
@@ -823,6 +838,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       }
 
       // Get Event Weight
+      //      std::cout << "Calcing Weight with = " << fIsAllSplines << " "<< curevent->fSplineCoeff << std::endl;
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;

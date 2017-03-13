@@ -79,6 +79,7 @@ nuiskey Config::CreateParameterKeyFromLine(const std::string line){
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");
 
   // Add to key
+  parameterkey.AddS("type", strvct[0]);
   parameterkey.AddS("name", strvct[1]);
   parameterkey.AddS("nominal", strvct[2]);
 
@@ -100,13 +101,24 @@ bool nuiskey::Has(const std::string name){
 
 nuiskey Config::CreatePullKeyFromLine(const std::string line){
   nuiskey pullkey = Config::CreateKey("pull");
+
+  // Parse
+  std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");
+  pullkey.AddS("name", strvct[1]);
+  pullkey.AddS("input", strvct[2]);
+  pullkey.AddS("type", strvct[3]);
+    
   return pullkey;
 }
 
 
 nuiskey Config::CreateOldConfigKeyFromLine(const std::string line){
-nuiskey configkey = Config::CreateKey("config");
-return configkey;
+  nuiskey configkey = Config::CreateKey("config");
+
+  std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");
+  configkey.AddS( strvct[1], strvct[2] );
+
+  return configkey;
 }
 
 nuiskey Config::CreateSampleKeyFromLine(const std::string line){
