@@ -576,8 +576,13 @@ Fake Studies
   } else if (name.find("GenericFlux_") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
 
-  } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
-    return (new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
+    //<<<<<<< HEAD
+    //  } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
+    //    return (new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
+    //=======
+    //} else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
+    //fChain->push_back(new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
+    //>>>>>>> 96ed014ac03821c4f771d6c484740e8b25350aa1
 
   } else if (name.find("MuonValidation_") != std::string::npos) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
