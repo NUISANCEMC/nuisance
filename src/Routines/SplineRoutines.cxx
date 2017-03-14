@@ -207,6 +207,7 @@ void SplineRoutines::Run() {
     if       (!rout.compare("SaveEvents")) SaveEvents();
     else if  (!rout.compare("TestEvents")) TestEvents();
     else if  (!rout.compare("GenerateEventSplines")) GenerateEventSplines();
+    else if  (!rout.compare("TestSplines_1DEventScan")) TestSplines_1DEventScan();
 
   }
 
@@ -659,6 +660,8 @@ void SplineRoutines::MergeSplines() {
   delete input;
 }
 
+
+
 //*************************************
 void SplineRoutines::TestSplines_1DEventScan() {
 //*************************************
@@ -666,6 +669,26 @@ void SplineRoutines::TestSplines_1DEventScan() {
   // Setup RW Engine
   if (fRW) delete fRW;
   SetupRWEngine();
+
+  // Make a spline RW Engine too.
+  FitWeight* splweight = new FitWeight("splinerwaweight");
+  // std::vector<nuiskey> splinekeys    = Config::QueryKeys("spline");
+  std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
+
+  // Add Parameters
+  for (size_t i = 0; i < parameterkeys.size(); i++) {
+    nuiskey key = parameterkeys[i];
+
+    std::string parname = key.GetS("name");
+    std::string partype = key.GetS("type");
+    double nom = key.GetD("nominal");
+
+    splweight->IncludeDial( key.GetS("name"),
+                      kSPLINEPARAMETER, nom);
+    splweight->SetDialValue( key.GetS("name"), key.GetD("nominal") );
+
+  }
+  splweight->Reconfigure();
 
   // Make a high resolution spline set.
   std::vector<double> nomvals = fRW->GetDialValues();
@@ -676,7 +699,6 @@ void SplineRoutines::TestSplines_1DEventScan() {
 
 
   // Loop over all params
-  std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
   // Add Parameters
   for (size_t i = 0; i < parameterkeys.size(); i++) {
     nuiskey key = parameterkeys[i];
@@ -684,11 +706,18 @@ void SplineRoutines::TestSplines_1DEventScan() {
     // Get Par Name
     std::string name = key.GetS("name");
 
+    if (!key.Has("low") or !key.Has("high") or !key.Has("step")){
+      continue;
+    }
+
     // Push Back Scan
     double low  = key.GetD("low");
     double high = key.GetD("high");
     double cur = low;
-    while (cur < high){
+    double step = key.GetD("step");
+
+
+    while (cur <= high) {
 
       // Make new set
       std::vector<double> newvals = nomvals;
@@ -699,11 +728,25 @@ void SplineRoutines::TestSplines_1DEventScan() {
       scanparset_vals.push_back(newvals);
 
       // Move to next one
-      cur += (high-low)/double(testres);
+      cur += step;
     }
   }
 
- 
+  for (int i = 0; i < scanparset_names.size(); i++){
+    std::cout << "Parset " << i;
+    for (int j =0 ; j < scanparset_vals[i].size(); j++){
+      std::cout << " " << scanparset_vals[i][j];
+    }
+    std::cout << std::endl;
+  }
+
+
+  sleep(3);
+  // Weight holders
+  double* rawweights = new double[scanparset_vals.size()];
+  double* splweights = new double[scanparset_vals.size()];
+  int NParSets = scanparset_vals.size();
+
   // Loop over all event I/O
   std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
   for (size_t i = 0; i < eventkeys.size(); i++) {
@@ -724,8 +767,8 @@ void SplineRoutines::TestSplines_1DEventScan() {
     }
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
-    outputfile->cd();
+    // TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    // outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
@@ -744,46 +787,63 @@ void SplineRoutines::TestSplines_1DEventScan() {
     InputHandlerBase* output =  InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input, outputfilename);
 
     // Get Base Events for each case.
-    BaseFitEvt* rawevent = input->FirstBaseEvent();
-    BaseFitEvt* splevent = output->FirstBaseEvent();
+    FitEvent* rawevent = input->FirstNuisanceEvent();
+    FitEvent* splevent = output->FirstNuisanceEvent();
 
 
     // Setup outputfile
     std::string outputtest = outputfilename + ".splinetest.1DEventScan.root";
-    TFile* outputtestfile = new TFile(outputtest.c_str(), "READ");
+    TFile* outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
     outputtestfile->cd();
 
     // Save a TTree of weights and differences.
+    TTree* weighttree = new TTree("weightscan", "weightscan");
+    weighttree->Branch("NParSets",      &NParSets,  "NParSets/I");
+    weighttree->Branch("RawWeights",    rawweights, "RawWeights[NParSets]/F");
+    weighttree->Branch("SplineWeights", splweights, "SplineWeights[NParSets]/F");
 
+    // Also need to save the spline sets somehow.
 
     // Count
     int i = 0;
+    int nevents = input->GetNEvents();
     while (rawevent and splevent) {
 
       // Loop over 1D parameter sets.
-      for (size_t j = 0; j < scanparset_vals.size(); j++){
+      for (size_t j = 0; j < scanparset_vals.size(); j++) {
 
         // Reconfigure
+        fRW->SetAllDials(&scanparset_vals[j][0], scanparset_vals[j].size());
+        fRW->Reconfigure();
+
+        splweight->SetAllDials(&scanparset_vals[j][0], scanparset_vals[j].size());
+        splweight->Reconfigure();
+
+        splevent->fSplineRead->SetNeedsReconfigure(true);
 
         // Calc weight for both events
+        rawweights[j] = fRW->CalcWeight(rawevent);
+        splweights[j] = splweight->CalcWeight(splevent);
+      }
+  
 
-        // Fill Array
-
+      if (i % 1000 == 0){
+        std::cout << "Processed " << i << "/" << nevents << std::endl;
       }
 
-
-
+      // Fill Array
+      weighttree->Fill();
+      
       // Iterate to next event.
       i++;
-      rawevent = input->NextBaseEvent();
-      splevent = output->NextBaseEvent();
+      rawevent = input->NextNuisanceEvent();
+      splevent = output->NextNuisanceEvent();
     }
+
+    outputtestfile->cd();
+    weighttree->Write();
+    outputtestfile->Close();
   }
-
-
-
-
-
 }
 
 
