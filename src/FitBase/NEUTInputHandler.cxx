@@ -23,7 +23,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	jointindexswitch = 0;
 
 	// Get initial flags
-	fMaxEvents = FitPar::Config().GetParI("input.maxevents");
+	fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
 	// Form list of all inputs, remove brackets if required.
 	std::vector<std::string> inputs = GeneralUtils::ParseToStr(rawinputs, ",");
