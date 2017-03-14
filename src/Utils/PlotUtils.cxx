@@ -64,7 +64,7 @@ std::string PlotUtils::GetObjectWithName(TFile *inFile, std::string substring){
 
   TIter nextkey(inFile->GetListOfKeys());
   TKey *key;
-  std::string output="NULL";
+  std::string output="";
 
   while ( (key = (TKey*)nextkey()) ) {
     std::string test(key->GetName());
