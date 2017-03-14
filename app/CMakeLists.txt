@@ -100,6 +100,17 @@ if(USE_GENIE)
   endif()
 endif()
 
+if(USE_NEUT)
+  add_executable(PrepareNEUT PrepareNEUT.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNEUT)
+  target_link_libraries(PrepareNEUT ${MODULETargets})
+  target_link_libraries(PrepareNEUT ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(PrepareNEUT ${ROOT_LIBS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+     set_target_properties(PrepareNEUT PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+endif()
+
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
 #if(USE_NuWro)
