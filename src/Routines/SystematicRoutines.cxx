@@ -128,7 +128,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   for (size_t i = 0; i < configargs.size(); i++) {
     configuration.OverrideConfig(configargs[i]);
   }
-  if (!maxevents.compare("-1")){
+  if (maxevents.compare("-1")){
     configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
 

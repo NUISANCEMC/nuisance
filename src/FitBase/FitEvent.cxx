@@ -133,8 +133,6 @@ void FitEvent::OrderStack() {
 void FitEvent::SetBranchAddress(TChain* tn) {
   fType = kINPUTFITEVENT;
 
-  std::cout << "Setting Branch Address " << std::endl;
-  sleep(1);
   tn->SetBranchAddress("Mode", &fMode);
   tn->SetBranchAddress("Mode", &Mode);
   tn->SetBranchAddress("EventNo", &fEventNo);

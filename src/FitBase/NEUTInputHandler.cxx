@@ -17,6 +17,8 @@ void NEUTGeneratorInfo::Reset() {
 
 NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const& rawinputs) {
 
+	LOG(SAM) << "Creating NEUTInputHandler : " << handle << std::endl;
+
 	// Run a joint input handling
 	fName = handle;
 	jointinput = false;
@@ -34,7 +36,10 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
 	}
 	for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
-		LOG(SAM) << "  -> Found input file: " << inputs[inp_it] << std::endl;
+		if (LOG_LEVEL(SAM)) {
+			std::cout << "\t\t|-> Input File " << inp_it
+			          << "      : " << inputs[inp_it] << std::endl;
+		}
 	}
 
 	// Setup the TChain
@@ -104,9 +109,6 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		}
 		jointindexallowed.push_back(nallowed);
 
-		LOG(SAM) << " -> Reading " << nallowed
-		         << " events from " << inputs[i] << std::endl;
-
 		// Set scale, undoing other scale factor.
 		double scale = double(fNEvents) / fEventHist->Integral("width");
 		scale *= eventhist->Integral("width");
@@ -118,6 +120,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
 	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
 
+
 	// Setup extra flags
 	fSaveExtra = FitPar::Config().GetParB("save_extra_neut_info");
 	if (fSaveExtra) {
@@ -125,10 +128,21 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		fNUISANCEEvent->fGenInfo = fNeutInfo;
 	}
 
+	// Print out Status
+	if (LOG_LEVEL(SAM)) {
+		std::cout << "\t\t|-> Total Entries    : " << fNEvents << std::endl
+		          << "\t\t|-> Event Integral   : " << fEventHist->Integral("width") * 1.E-38 << " events/nucleon" << std::endl
+		          << "\t\t|-> Flux Integral    : " << fFluxHist->Integral("width") << " /cm2" << std::endl
+		          << "\t\t|-> Event/Flux       : "
+		          << fEventHist->Integral("width") * 1.E-38 / fFluxHist->Integral("width") << " cm2/nucleon" <<  std::endl
+		          << "\t\t|-> Save Extra Info  : " << fSaveExtra << std::endl;
+	}
+
 	// Setup Max Events
 	if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
-		LOG(SAM) << " -> Reading only " << fMaxEvents << " events from total."
-		         << std::endl;
+		if (LOG_LEVEL(SAM)) {
+			std::cout << "\t\t|-> Read Max Entries : " << fMaxEvents << std::endl;
+		}
 		fNEvents = fMaxEvents;
 	}
 
@@ -138,7 +152,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Catch too large entries
-       if (entry >= (UInt_t)fNEvents) return NULL;
+	if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
@@ -282,8 +296,8 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 
 	// Find Switch Scale
-  while ( entry < (UInt_t)jointindexlow[jointindexswitch] ||
-	  entry >= (UInt_t)jointindexhigh[jointindexswitch] ) {
+	while ( entry < (UInt_t)jointindexlow[jointindexswitch] ||
+	        entry >= (UInt_t)jointindexhigh[jointindexswitch] ) {
 		jointindexswitch++;
 
 		// Loop Around
@@ -298,7 +312,7 @@ double NEUTInputHandler::GetInputWeight(const UInt_t entry) {
 BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
-        if (entry >= (UInt_t)fNEvents) return NULL;
+	if (entry >= (UInt_t)fNEvents) return NULL;
 
 	fNEUTTree->GetEntry(entry);
 	fBaseEvent->eventid = entry;
