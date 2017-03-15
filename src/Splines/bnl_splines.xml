@@ -1,0 +1,20 @@
+<nuisance>
+
+<!-- Parameter Nominal Set Definition -->
+<parameter name="VecFFCCQE"  type="neut_parameter"  nominal="2"   /> <!--FIXED-->
+<parameter name="AxlFFCCQE"  type="neut_parameter"  nominal="0"   /> <!--FIXED-->
+<parameter name="MaCCQE"     type="neut_parameter"  nominal="0.0" low="-3.0" high="3.0" step="0.20"/>
+<parameter name="CA5RES"     type="neut_parameter"  nominal="0.0" low="-3.0" high="3.0" step="0.20"/>
+<parameter name="MaNFFRES"   type="neut_parameter"  nominal="0.0" low="-3.0" high="3.0" step="0.20"/>
+<parameter name="BgSclRES"   type="neut_parameter"  nominal="0.0" low="-3.0" high="3.0" step="0.20"/>
+
+<!-- Spline Definition -->
+<spline name="MaCCQE"     form="1DTSpline3" points="-3.0,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,3.0" />
+<spline name="CA5RES"     form="1DTSpline3" points="-3.0,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,3.0" />
+<spline name="MaNFFRES"   form="1DTSpline3" points="-3.0,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,3.0" />
+<spline name="BgSclRES"   form="1DTSpline3" points="-3.0,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,3.0" />
+
+<!-- Event I/O Definition -->
+<events input="NEUT:/home/stowell/DataStorage/NEUT/freenucleons_dipole_neut_trunk_NUISANCE_BNL_fhc_numu_D2_numu.root" output="bnl_neut_splines.root" />
+
+</nuisance>
