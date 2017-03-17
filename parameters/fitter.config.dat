@@ -14,8 +14,8 @@
 # 4 Reconfigure Loops
 # 5 Every Event print out (SHOUT)
 # -1 DEBUGGING
-config verbosity    -4
-config VERBOSITY -4
+config verbosity  2
+config VERBOSITY  2
 
 # ERROR goes from
 # 0 NONE
@@ -151,5 +151,6 @@ config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true      0
 config Modes.split_PN_NN     0
 
 # SciBooNE specific
-config SciBooNE_COH_pion_cut   150
-config SciBooNE_COH_proton_cut 450
+config SciBarDensity  1.04
+config SciBarRecoDist 10.0
+config PenetratingMuonEnergy 1.4

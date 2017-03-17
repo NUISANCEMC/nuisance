@@ -21,35 +21,98 @@
 #include "FitParameters.h"
 #include "FitUtils.h"
 
-double SciBooNEUtils::CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon){
+namespace FitPar{
+  double SciBarDensity    = FitPar::Config().GetParD("SciBarDensity");
+  double SciBarRecoDist   = FitPar::Config().GetParD("SciBarRecoDist");
+  double PenetratingMuonE = FitPar::Config().GetParD("PenetratingMuonEnergy");
+}
+
+double SciBooNEUtils::StoppedEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon){
 
   double eff = 1.;
 
   if (!effHist) return eff;
-
-  double pmu = muon->fP.Vect().Mag()/1000.;
-  double thetamu = nu->fP.Vect().Angle(muon->fP.Vect());
-  eff = effHist->GetBinContent(effHist->FindBin(pmu, thetamu));
+  eff = effHist->GetBinContent(effHist->FindBin(FitUtils::p(muon), FitUtils::th(nu, muon)/TMath::Pi()*180.));
 
   return eff;
 }
 
+double SciBooNEUtils::PenetratedEfficiency(FitParticle *nu, FitParticle *muon){
+
+  double eff = 1.;
+
+  if (FitUtils::th(nu, muon)/TMath::Pi()*180. > 50) eff = 0.;
+  if (FitUtils::p(muon) < 1.4) eff = 0.;
+
+  return eff;
+}
+
+double SciBooNEUtils::BetheBlochCH(double E, double mass){
+
+  double beta2 = 1 - mass*mass/E/E;
+  double gamma = 1./sqrt(1-beta2);
+  double mass_ratio = PhysConst::mass_electron*1000./mass;
+  // Argh, have to remember to convert to MeV or you'll hate yourself!
+  double I2 = 68.7e-6*68.7e-6;
+
+  double w_max = 2*PhysConst::mass_electron*1000.*beta2*gamma*gamma;
+  w_max /= 1 + 2*gamma*mass_ratio + mass_ratio*mass_ratio;
+
+
+  // Values taken from the PDG for K = 0.307075 MeV mol-1 cm2, mean ionization energy I = 68.7 eV (Polystyrene)
+  // <Z/A> = 0.53768 (pdg.lbl.gov/AtomicNuclearProperties)
+  double log_term = log(2*PhysConst::mass_electron*1000.*beta2*gamma*gamma*w_max/I2);
+  double dedx = 0.307075*0.53768/beta2*(0.5*log_term - beta2);
+
+  return dedx;
+}
+
+
+// This function returns an estimate of the range of the particle in scintillator.
+// It uses crude integration and Bethe-Blocke to approximate the range.
+double SciBooNEUtils::RangeInScintillator(FitParticle* particle, int nsteps){
+
+  // The particle energy
+  double E  = particle->fP.E();
+  double M  = particle->fP.M();
+  double Ek = E - M;
+
+  double step_size = Ek/float(nsteps);
+  double range = 0;
+
+  // Add an offset to make the integral a touch more accurate
+  Ek -= step_size/2.;
+  for (int i = 0; i < nsteps; ++i){
+    
+    double dEdx = SciBooNEUtils::BetheBlochCH(Ek+M, M);
+    
+    Ek -= step_size;
+    // dEdx is -ve
+    range -= step_size/dEdx;
+    
+  }
+
+  // Account for density of polystyrene
+  range /= FitPar::SciBarDensity;
+
+  // Range estimate is in cm
+  return range;
+}
 
 
 // Function to calculate the distance the particle travels in scintillator
 bool SciBooNEUtils::DistanceInScintillator(FitParticle* beam, FitParticle* particle){
 
-  double mom  = particle->fP.Vect().Mag();
-  double zmom = mom*cos(beam->fP.Vect().Angle(particle->fP.Vect()));
   int PID     = particle->fPID;
-  
-  if (abs(PID) == 211){
-    if (fabs(zmom) < FitPar::Config().GetParD("SciBooNE_COH_pion_cut"))
-      return false;
-  } else if (PID == 2212){
-    if (fabs(zmom) < FitPar::Config().GetParD("SciBooNE_COH_proton_cut"))
-      return false;
-  }
+
+  // Ignore particles which are not protons or pions
+  if (abs(PID) != 211 && PID != 2212) return false;
+
+  //double test = SciBooNEUtils::BetheBlochCH(particle);
+  double dist  = SciBooNEUtils::RangeInScintillator(particle, 50);
+  double zdist = dist*cos(FitUtils::th(beam, particle));
+
+  if (abs(zdist) < FitPar::SciBarRecoDist) return false;
   return true;
 }
 
@@ -118,7 +181,40 @@ void SciBooNEUtils::WriteModeArray(TH1* hist[]){
   return;
 };
 
-bool SciBooNEUtils::isMuPrSignal(FitEvent *event, bool withVA){
+bool SciBooNEUtils::is1TRK(FitEvent *event){
+  
+  int nCharged = 0;
+
+  // For now, require a muon
+  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
+    return false;
+
+  // For one track, require a single FS particle.
+  for (UInt_t j = 2; j < event->Npart(); j++){
+
+    if (!(event->PartInfo(j))->fIsAlive) continue;
+    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
+
+    int PID = event->PartInfo(j)->fPID;
+
+    // Look for pions, protons
+    if (abs(PID) == 211 || PID == 2212){
+
+      // Must be reconstructed as a track in SciBooNE
+      if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
+      nCharged += 1;
+
+    }
+  } // end loop over particle stack
+
+  // This is the 1 track sample, require only a muon
+  if (nCharged != 0) return false;
+  return true;
+
+}
+
+// withVA: 0 = either; -1 = no VA; +1 = VA
+bool SciBooNEUtils::isMuPr(FitEvent *event, int VA){
 
   int nCharged = 0;
   int nProtons = 0;
@@ -151,14 +247,14 @@ bool SciBooNEUtils::isMuPrSignal(FitEvent *event, bool withVA){
   if (nProtons != 1) return false;
 
   // Cover both VA cases
-  if (withVA  && nVertex == 0) return false;
-  if (!withVA && nVertex != 0) return false;
+  if (VA > 0 && nVertex == 0) return false;
+  if (VA < 0 && nVertex != 0) return false;
   return true;
 
 }
 
 // Shared signal definitions
-bool SciBooNEUtils::isMuPiSignal(FitEvent *event, bool withVA){
+bool SciBooNEUtils::isMuPi(FitEvent *event, int VA){
   
   int nCharged = 0;
   int nPions   = 0;
@@ -193,8 +289,8 @@ bool SciBooNEUtils::isMuPiSignal(FitEvent *event, bool withVA){
   if (nPions   != 1) return false;
 
   // Cover both VA cases
-  if (withVA  && nVertex == 0) return false;
-  if (!withVA && nVertex != 0) return false;
+  if (VA > 0 && nVertex == 0) return false;
+  if (VA < 0 && nVertex != 0) return false;
   return true;  
 }
 
@@ -210,11 +306,13 @@ FitParticle* SciBooNEUtils::GetSecondaryTrack(FitEvent *event){
 	event->PartInfo(j)->fPID != 2212) continue;
     if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
     return event->PartInfo(j);
-  } // end loop over particle stack                
+  } // end loop over particle stack     
   
   return 0;
 }
 
+
+// NOTE: need to adapt this to allow for penetrating events...
 double SciBooNEUtils::CalcThetaPr(FitEvent *event){
   
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
@@ -224,15 +322,18 @@ double SciBooNEUtils::CalcThetaPr(FitEvent *event){
 
   // Construct the vector p_pr = (-p_mux, -p_muy, Enurec - pmucosthetamu)
   // where p_mux, p_muy are the projections of the muon momentum onto the x and y dimension respectively
-  double Enuqe = FitUtils::EnuQErec(muon->fP,cos(nu->fP.Vect().Angle(muon->fP.Vect())), 27., true);
-  double p_pr_z = Enuqe - muon->fP.Vect().Mag()*cos(nu->fP.Vect().Angle(muon->fP.Vect()));
+  double Enuqe = FitUtils::EnuQErec(muon->fP,cos(FitUtils::th(nu, muon)), 27., true)*1000.;
+  double p_pr_z = Enuqe - muon->fP.Vect().Mag()*cos(FitUtils::th(nu, muon));
 
   FitParticle* secondary = SciBooNEUtils::GetSecondaryTrack(event);
   
   if (!secondary) return -999.;
   
-  TVector3 p_pr  = TVector3(-muon->fP.Vect().X(), -muon->fP.Vect().Y(), -p_pr_z);
+  TVector3 p_pr  = TVector3(-muon->fP.Vect().X(), -muon->fP.Vect().Y(), p_pr_z);
   double thetapr = p_pr.Angle(secondary->fP.Vect())/TMath::Pi()*180.;
+
+  //std::cout << "EnuQE = " << Enuqe << "; X = " << -muon->fP.Vect().X() << "; X = " << -muon->fP.Vect().Y() << "; X = "  << -p_pr_z << std::endl;
+  //std::cout << "Theta pr = " << thetapr << std::endl << std::endl;
 
   return thetapr;
 }
@@ -244,6 +345,6 @@ double SciBooNEUtils::CalcThetaPi(FitEvent *event){
 
   if (!secondary) return -999.;
 
-  double thetapi = secondary->fP.Vect().Angle(nu->fP.Vect())/TMath::Pi()*180.;
+  double thetapi = FitUtils::th(secondary, nu)/TMath::Pi()*180.;
   return thetapi;
 }

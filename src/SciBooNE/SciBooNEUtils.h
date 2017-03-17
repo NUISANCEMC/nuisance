@@ -44,9 +44,19 @@
  *  @{
  */
 
+namespace FitPar {
+  extern double SciBarDensity;
+  extern double SciBarRecoDist;
+  extern double PenetratingMuonE;
+}
+
 namespace SciBooNEUtils {
 
-  double CalcEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon);
+  double StoppedEfficiency(TH2D *effHist, FitParticle *nu, FitParticle *muon);
+  double PenetratedEfficiency(FitParticle *nu, FitParticle *muon);
+  double BetheBlochCH(double beta, double mass);
+  double RangeInScintillator(FitParticle* particle, int nsteps=50);
+
   bool DistanceInScintillator(FitParticle* beam, FitParticle* particle);
 
   // Functions to break the plots into modes
@@ -57,8 +67,10 @@ namespace SciBooNEUtils {
   void DeleteModeArray(TH1* modearray[]);
   void WriteModeArray(TH1* hist[]);
 
-  bool isMuPiSignal(FitEvent *event, bool withVA);
-  bool isMuPrSignal(FitEvent *event, bool withVA);
+  // Default to being agnostic about VA
+  bool isMuPi(FitEvent *event, int VA=0);
+  bool isMuPr(FitEvent *event, int VA=0);
+  bool is1TRK(FitEvent *event);
 
   double CalcThetaPr(FitEvent *event);
   double CalcThetaPi(FitEvent *event);

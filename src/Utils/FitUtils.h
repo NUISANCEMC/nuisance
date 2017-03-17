@@ -75,9 +75,11 @@ double T(TLorentzVector part);
 
 //! Returns momentum of particle
 double p(TLorentzVector part);
+double p(FitParticle* part);
 
 //! Returns angle between particles (_NOT_ cosine!)
 double th(TLorentzVector part, TLorentzVector part2);
+double th(FitParticle* part1, FitParticle* part2);
 
 //! Hadronic mass reconstruction
 double Wrec(TLorentzVector pnu, TLorentzVector pmu);
@@ -102,6 +104,14 @@ double Q2QErec(TLorentzVector pmu, double costh, double binding,
 //! Function returns the reconstructed E_{nu} values
 double EnuQErec(TLorentzVector pmu, double costh, double binding,
                 bool neutrino = true);
+
+//! Function to calculate the reconstructed Q^{2}_{QE}
+double Q2QErec(double pl, double costh, double binding,
+	       bool neutrino = true);
+
+//! Function returns the reconstructed E_{nu} values
+double EnuQErec(double pl, double costh, double binding,
+		bool neutrino = true);
 
 /*
   CCQE1p MINERvA

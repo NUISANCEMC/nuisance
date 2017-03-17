@@ -59,8 +59,8 @@ void SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::FillEventVariables(FitEvent *event){
 
   if (thetapi < 0) return;
 
-  // Need to figure out if this is the best place to set weights long term... but...
-  this->Weight *= SciBooNEUtils::CalcEfficiency(this->muonStopEff, nu, muon);
+  // This is the stopped sample ONLY
+  this->Weight *= SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon);
   
   // Set X Variables
   fXVar = thetapi;
@@ -73,10 +73,10 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::isSignal(FitEvent *event){
   // Require dth_proton > 20
   if (SciBooNEUtils::CalcThetaPr(event) < 20) return false;
 
-  if (SciBooNEUtils::isMuPiSignal(event, false)) return true;
+  if (SciBooNEUtils::isMuPi(event, -1)) return true;
 
   // Also include 10% of protons
-  if (SciBooNEUtils::isMuPrSignal(event, false)){
+  if (SciBooNEUtils::isMuPr(event, -1)){
     this->Weight*=0.1;
     return true;
   }

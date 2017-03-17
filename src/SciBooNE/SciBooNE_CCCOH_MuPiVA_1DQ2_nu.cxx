@@ -54,13 +54,17 @@ void SciBooNE_CCCOH_MuPiVA_1DQ2_nu::FillEventVariables(FitEvent *event){
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
   FitParticle *nu   = event->GetNeutrinoIn();
 
-  q2qe = FitUtils::Q2QErec(muon->fP,cos(nu->fP.Vect().Angle(muon->fP.Vect())), 27., true);
-
-  if (q2qe < 0) return;
-
   // Need to figure out if this is the best place to set weights long term... but...
-  this->Weight *= SciBooNEUtils::CalcEfficiency(this->muonStopEff, nu, muon);
-  
+  if (SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon) >
+      SciBooNEUtils::PenetratedEfficiency(nu, muon)){
+    this->Weight *= SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon);
+    q2qe = FitUtils::Q2QErec(FitUtils::p(muon),cos(FitUtils::th(nu,muon)), 27., true);
+  } else {
+    this->Weight *= SciBooNEUtils::PenetratedEfficiency(nu, muon);
+    q2qe = FitUtils::Q2QErec(FitPar::PenetratingMuonE,cos(FitUtils::th(nu,muon)), 27., true);
+  }
+
+  if (q2qe < 0) return;  
   // Set X Variables
   fXVar = q2qe;
   return;
@@ -69,10 +73,10 @@ void SciBooNE_CCCOH_MuPiVA_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 bool SciBooNE_CCCOH_MuPiVA_1DQ2_nu::isSignal(FitEvent *event){
 
-  if (SciBooNEUtils::isMuPiSignal(event, true)) return true;
+  if (SciBooNEUtils::isMuPi(event, 1)) return true;
 
   // Also include 10% of protons
-  if (SciBooNEUtils::isMuPrSignal(event, true)){
+  if (SciBooNEUtils::isMuPr(event, 1)){
     this->Weight*=0.1;
     return true;
   }
