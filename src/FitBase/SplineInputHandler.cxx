@@ -65,13 +65,7 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 		          << fEventHist->Integral("width") * 1.E-38 / fFluxHist->Integral("width") << " cm2/nucleon" <<  std::endl;
 	}
 
-	// Setup Reader
-	fSplRead = new SplineReader();
-	fSplRead->Read( (TTree*)inp_file->Get("spline_reader") );
-	fNUISANCEEvent->fSplineRead = this->fSplRead;
-
 	// Load into memory
-
 	for (int j = 0; j < fNEvents; j++) {
 		std::vector<float> tempval;
 
@@ -116,6 +110,11 @@ SplineInputHandler::SplineInputHandler(std::string const& handle, std::string co
 
 	// Setup Spline Reader
 	LOG(SAM) << "Loading Spline Reader." << std::endl;
+
+	fSplRead = new SplineReader();
+	fSplRead->Read( (TTree*)inp_file->Get("spline_reader") );
+	fNUISANCEEvent->fSplineRead = this->fSplRead;
+
 	fNPar = fSplRead->GetNPar();
 
 	// Setup Friend Spline TTree

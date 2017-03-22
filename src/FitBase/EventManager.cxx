@@ -135,3 +135,8 @@ int EventManager::GetInputID(std::string infile) {
   return fid[infile];
 }
 
+void EventManager::SetRW(FitWeight* rw){
+  fRW = rw;
+}
+
+

@@ -17,7 +17,7 @@ void SplineReader::AddSpline(nuiskey splinekey) {
   //  std::cout << "AddSpline " << splname << " " << type << " " << form << " " << points << std::endl;
 
   // Add the spline to the list of all forms
-  fAllSplines.push_back( Spline(splname, form, GeneralUtils::ParseToDbl(points, ",")) );
+  fAllSplines.push_back( Spline(splname, form, points) );
   fSpline.push_back(splname);
   fType.push_back(type);
   fForm.push_back(form);
@@ -53,24 +53,24 @@ void SplineReader::Read(TTree* tr) {
   // Loop through and add splines from read type.
   for (size_t i = 0; i < fSpline.size(); i++) {
     LOG(SAM) << "Registering Input Spline " << fSpline[i] << " " << fForm[i] << " " << fPoints[i] << std::endl;
-    fAllSplines.push_back( Spline(fSpline[i], fForm[i],
-                                  GeneralUtils::ParseToDbl(fPoints[i], ",")) );
+    fAllSplines.push_back( Spline(fSpline[i], fForm[i], fPoints[i]) );
   }
 }
 
 
 void SplineReader::Reconfigure(std::map< std::string, double >& vals) {
 
+  // std::cout << "NEW SPLINE READER =========" << std::endl;
   for (std::map<std::string, double>::iterator iter = vals.begin(); 
       iter != vals.end(); iter++){
 
-    // std::cout << " Found " << iter->first << " in map handed to reader." << std::endl;
+    // std::cout << "Found " << iter->first << " in map handed to reader." << std::endl;
     for (size_t i = 0; i < fSpline.size(); i++){
-      // std::cout << " Comparing it to : " << fSpline[i] << std::endl;
-      if (!fSpline[i].compare(iter->first.c_str())){
-	//std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
-        fAllSplines[i].Reconfigure(iter->second);
-      }
+      // std::cout << "Passing it to : " << fSpline[i] << std::endl;
+      // if (!fSpline[i].compare(iter->first.c_str())){
+	      // std::cout << "Reconfiguring Value inside Reader to be " << fSpline[i] << " " << iter->second << std::endl;
+        fAllSplines[i].Reconfigure(iter->first, iter->second);
+      // }
     }
   }
 

@@ -30,6 +30,8 @@ class EventManager {
   static EventManager& Get(void);
 
   FitWeight* GetRW();
+  void SetRW(FitWeight* rw);
+
   InputHandlerBase* GetInput(int id);
   FitEvent* GetEvent(int id, int i);
   double GetEventWeight(int id, int i);
@@ -62,6 +64,8 @@ namespace FitBase {
   EventManager& EvtManager(){ return EventManager::Get(); };
   inline
   FitWeight* GetRW(){ return EvtManager().GetRW(); };
+  inline
+  void SetRW(FitWeight* rw){ EvtManager().SetRW(rw); };
   inline
   int GetInputID(std::string infile){ return EvtManager().GetInputID(infile); };
   inline

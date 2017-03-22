@@ -112,20 +112,17 @@ public:
   void TestSplines_1DEventScan();
 
   /// Scan parameter space in 1D at finer resolution than points. Compare likelihoods for all testsamples.
-  void TestSplines_1DLikelihoodScan(){};
-
-  /// Scan parameter space in 2D at 0.5 point resolution, compare average weight difference.
-  void TestSplines_2DEventScan(){};
-
-  /// Scan parameter space in 2D at 0.5 point resolution, compare likelihoods for all testsamples.
-  void TestSplines_2DLikelihoodScan(){};
+  void TestSplines_1DLikelihoodScan();
 
   /// Randomly throw in parameter space. For each throw, calc average weight difference.
-  void TestSplines_NDEventThrow(){};
+  void TestSplines_NDEventThrow();
 
   /// Randomly thow in parameter space. For each throw, calc likelihood difference for each sample.
-  void TestSplines_NDLikelihoodThrow(){};
+  void TestSplines_NDLikelihoodThrow();
 
+
+  /// Generate a set of spline vs weight canvases and save to file
+  void SaveSplinePlots();
 
   /*
     Fitting Functions

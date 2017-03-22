@@ -319,7 +319,7 @@ double JointFCN::GetLikelihood() {
 
 void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
 
-  LOG(MIN) << "Loading Samples " << std::endl;
+  LOG(MIN) << "Loading Samples : " << samplekeys.size() << std::endl;
   for (size_t i = 0; i < samplekeys.size(); i++) {
     nuiskey key = samplekeys[i];
 
@@ -328,6 +328,8 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
     std::string samplefile = key.GetS("input");
     std::string sampletype = key.GetS("type");
     std::string fakeData = "";
+
+    LOG(MIN) << "Loading Sample : " << samplename << std::endl;
 
     fOutputDir->cd();
     MeasurementBase* NewLoadedSample
@@ -574,9 +576,7 @@ void JointFCN::ReconfigureUsingManager() {
         curevent->fSplineRead->SetNeedsReconfigure(true);
       }
     }
-
-  }
-
+  } 
 
   // MAIN INPUT LOOP ====================
 
@@ -686,7 +686,7 @@ void JointFCN::ReconfigureUsingManager() {
 
       // If all inputs are splines we can save the spline coefficients
       // for fast in memory reconfigures later.
-      if (fIsAllSplines) {
+      if (fIsAllSplines and savesignal and foundsignal) {
 
         // Make temp vector to push back with
         std::vector<float> coeff;
@@ -695,7 +695,17 @@ void JointFCN::ReconfigureUsingManager() {
         }
 
         // Push back to signal event splines. Kept in sync with fSignalEventBoxes size.
+        int splinecount = fSignalEventSplines.size();
         fSignalEventSplines.push_back(coeff);
+
+        // if (splinecount % 1000 == 0) {
+          // std::cout << "Pushed Back Coeff " << splinecount << " : ";
+          // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
+            // std::cout << " " << fSignalEventSplines[splinecount][l];
+          // }
+          // std::cout << std::endl;
+        // }
+
       }
 
       // Clean up vectors once done with this event
@@ -731,7 +741,7 @@ void JointFCN::ReconfigureUsingManager() {
     LOG(REC) << " -> Saved " << fillcount << " signal boxes for faster access. (~" << mem << " MB)" << std::endl;
     if (fIsAllSplines and !fSignalEventSplines.empty()) {
       int splmem = sizeof(float) * fSignalEventSplines.size() * fSignalEventSplines[0].size() * 1E-6;
-      LOG(REC) << " -> Saved " << fillcount << " spline sets into memory. (~" << splmem << " MB)" << std::endl;
+      LOG(REC) << " -> Saved " << fillcount << " " << fSignalEventSplines.size() << " spline sets into memory. (~" << splmem << " MB)" << std::endl;
     }
   }
 
@@ -768,6 +778,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
   std::vector< std::vector<float> >::iterator spline_iter = fSignalEventSplines.begin();
   std::vector< std::vector<bool> >::iterator samsig_iter = fSampleSignalFlags.begin();
+  int splinecount = 0;
 
   // Setup stuff for logging
   int fillcount = 0;
@@ -775,8 +786,9 @@ void JointFCN::ReconfigureFastUsingManager() {
   int countwidth = nevents / 5;
 
   // If All Splines tell splines they need a reconfigure.
-  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();  
-  if (fIsAllSplines){
+  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  if (fIsAllSplines) {
+    LOG(REC) << "All Spline Inputs so using fast spline loop." << std::endl;
     for (; inp_iter != fInputList.end(); inp_iter++) {
       InputHandlerBase* curinput = (*inp_iter);
 
@@ -813,14 +825,14 @@ void JointFCN::ReconfigureFastUsingManager() {
       // If event has not been flagged as signal in vector skip it.
       if (!(*inpsig_iter)) {
 
-        inpsig_iter++;
-        i++;
-
         if (LOG_LEVEL(REC)) {
           if (i % countwidth == 0) {
             std::cout << std::endl;
           }
         }
+
+        inpsig_iter++;
+        i++;
 
         continue;
       }
@@ -831,7 +843,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       // End iterator if NULL pointer at this entry..
       if (!curevent) break;
 
-      // Setup signal splines pointer for this event if required. 
+      // Setup signal splines pointer for this event if required.
       if (fIsAllSplines) {
         curevent->fSplineCoeff = &(*spline_iter)[0];
       }
@@ -868,11 +880,19 @@ void JointFCN::ReconfigureFastUsingManager() {
         }
       }
 
+      // if (splinecount % 1000 == 0) {
+        // std::cout << "Read Back Coeff " << splinecount << " : ";
+        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
+          // std::cout << " " << fSignalEventSplines[splinecount][l];
+        // }
+        // std::cout << std::endl;
+      // }
+
       // Iterate over the main signal event containers.
       samsig_iter++;
       box_iter++;
       spline_iter++;
-
+      splinecount++;
       // iterate to next signal event
       inpsig_iter++;
       i++;
