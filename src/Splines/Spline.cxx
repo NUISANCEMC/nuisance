@@ -332,15 +332,7 @@ float Spline::Spline2DTSpline3(const Float_t* par) const {
 
 float Spline::Spline2DPol(const Float_t* par, int n) const {
 
-  // float wx = 2.0 * (fVal[0] - fValMin[0] - (fValMax[0] - fValMin[0]) / 2.0) / (fValMax[0] - fValMin[0]);
-  // float wy = 2.0 * (fVal[1] - fValMin[1] - (fValMax[1] - fValMin[1]) / 2.0) / (fValMax[1] - fValMin[1]);
 
-  float wx = (fVal[0] - fValMin[0]) / (fValMax[0] - fValMin[0]);
-  float wy = (fVal[1] - fValMin[1]) / (fValMax[1] - fValMin[1]);
-
-
-  int count = 0;
-  bool speak = false;
 
   // float w = 0.0;
   // // std::cout << "Pol Eval " << std::endl;
@@ -367,67 +359,21 @@ float Spline::Spline2DPol(const Float_t* par, int n) const {
   //   if (i == 0)
 
   // }
-// float w = 0.0;
-//  w += par[count++];
-//  w += par[count++] * wx;
-//  w += par[count++] * wy;
-
-//  w += par[count++] * wx * wy; // / 10.0;
-//  w += par[count++] * wx * wx; // / 10.0;
-//  w += par[count++] * wy * wy; // / 10.0;
-
-//  w += par[count++] * wx * wx * wy; // / 100.0;
-//  w += par[count++] * wx * wy * wy; // / 100.0;
-//  w += par[count++] * wx * wx * wx; // / 100.0;
-//  w += par[count++] * wy * wy * wy; // / 100.0;
-
-
-//    w += par[count++] * wx * wx * wx * wx; // / 100.0;
-//    w += par[count++] * wx * wx * wx * wy; // / 100.0;
-//    w += par[count++] * wx * wx * wy * wy; // / 100.0;
-//    w += par[count++] * wx * wy * wy * wy; // / 100.0;
-//    w += par[count++] * wy * wy * wy * wy; // / 100.0;
-
-//    w += par[count++] * wx * wx * wx * wx * wx; // / 1000.0;
-//    w += par[count++] * wx * wx * wx * wx * wy; // / 1000.0;
-//    w += par[count++] * wx * wx * wx * wy * wy; // / 1000.0;
-//    w += par[count++] * wx * wx * wy * wy * wy; // / 1000.0;
-//    w += par[count++] * wx * wy * wy * wy * wy; // / 1000.0;
-//    w += par[count++] * wy * wy * wy * wy * wy; // / 1000.0;
-
-//      w += par[count++] * wx * wx * wx * wx * wx * wx; // / 10000.0;
-//      w += par[count++] * wx * wx * wx * wx * wx * wy; // / 10000.0;
-//      w += par[count++] * wx * wx * wx * wx * wy * wy; // / 10000.0;
-//      w += par[count++] * wx * wx * wx * wy * wy * wy; // / 10000.0;
-//      w += par[count++] * wx * wx * wy * wy * wy * wy; // / 10000.0;
-//      w += par[count++] * wx * wy * wy * wy * wy * wy; // / 10000.0;
-//      w += par[count++] * wy * wy * wy * wy * wy * wy; // / 10000.0;
-
-  // float w = 0.0;
-  // int power = 6;
-  // for (int i = 0; i < power; i++){
-  //   int xpower = power;
-  //   int ypower = 0;
-  //   while (ypower <= power){
-  //     w += par[count++] * pow(wx,xpower) * pow(wy, ypower);
-  //     xpower--;
-  //     ypower++;
-  //   }
-  // }
-
-
+  float wx = (fVal[0] - fValMin[0]) / (fValMax[0] - fValMin[0]);
+  float wy = (fVal[1] - fValMin[1]) / (fValMax[1] - fValMin[1]);
   float w = 0.0;
-
+  int count = 0;
+  w += par[count++];
   w += par[count++] * wx;
   w += par[count++] * wy;
 
-  w += par[count++] * wx * wy; // / 10.0;
   w += par[count++] * wx * wx; // / 10.0;
+  w += par[count++] * wx * wy; // / 10.0;
   w += par[count++] * wy * wy; // / 10.0;
 
+  w += par[count++] * wx * wx * wx; // / 100.0;
   w += par[count++] * wx * wx * wy; // / 100.0;
   w += par[count++] * wx * wy * wy; // / 100.0;
-  w += par[count++] * wx * wx * wx; // / 100.0;
   w += par[count++] * wy * wy * wy; // / 100.0;
 
 
@@ -452,15 +398,74 @@ float Spline::Spline2DPol(const Float_t* par, int n) const {
   w += par[count++] * wx * wy * wy * wy * wy * wy; // / 10000.0;
   w += par[count++] * wy * wy * wy * wy * wy * wy; // / 10000.0;
 
+  // float w = 0.0;
+  // int power = 6;
+  // for (int i = 0; i < power; i++){
+  //   int xpower = power;
+  //   int ypower = 0;
+  //   while (ypower <= power){
+  //     w += par[count++] * pow(wx,xpower) * pow(wy, ypower);
+  //     xpower--;
+  //     ypower++;
+  //   }
+  // }
+
+  // float wx1 = (fVal[0] - fValMin[0]) / (fValMax[0] - fValMin[0]);
+  // float wy1 = (fVal[1] - fValMin[1]) / (fValMax[1] - fValMin[1]);
+
+  // int count = 0;
+  // bool speak = false;
+
+  // float w = 0.0;
+  // float wx2 = wx1*wx1;
+  // float wy2 = wy1*wy1;
+
+  // float wx3 = wx2*wx1;
+  // float wy3 = wy3*wy1;
+
+  // // w += par[count++] * wx
+
+  // w += par[count++] * wx1;
+  // w += par[count++] * wy1;
+
+  // w += par[count++] * wx2;
+  // w += par[count++] * wx1 * wy1;
+  // w += par[count++] * wy2;
+
+  // w += par[count++] * wx3;
+  // w += par[count++] * wx2 * wy1;
+  // w += par[count++] * wx1 * wy2;
+  // w += par[count++] * wy3;
+
+  // w += par[count++] * wx3 * wx1;
+  // w += par[count++] * wx3 * wy1;
+  // w += par[count++] * wx2 * wy2;
+  // w += par[count++] * wx1 * wy3;
+  // w += par[count++] * wy1 * wy3;
+
+  // w += par[count++] * wx3 * wx2;
+  // w += par[count++] * wx3 * wx1 * wy1;
+  // w += par[count++] * wx3 * wy2;
+  // w += par[count++] * wx2 * wy3;
+  // w += par[count++] * wx1 * wy3;
+  // w += par[count++] * wy3 * wy2;
+
+  // w += par[count++] * wx3 * wx3;
+  // w += par[count++] * wx3 * wx2 * wy1;
+  // w += par[count++] * wx3 * wx1 * wy2;
+  // w += par[count++] * wx3 * wy3;
+  // w += par[count++] * wx2 * wy3 * wy1;
+  // w += par[count++] * wx1 * wy3 * wy3;
+  // w += par[count++] * wy3 * wy3;
 
 
-  if (wx != 0.0 and speak) {
-    for (int i = 0; i < count; i++) {
-      std::cout << "Evaluated " << fName << " spline coeff " << i << " = " << par[i] << std::endl;
-    }
-    std::cout << "End Weight = " << w << " " << wx << " " << wy << std::endl;
-    // sleep(1);
-  }
+  // if (wx1 != 0.0 and speak) {
+  //   for (int i = 0; i < count; i++) {
+  //     std::cout << "Evaluated " << fName << " spline coeff " << i << " = " << par[i] << std::endl;
+  //   }
+  //   std::cout << "End Weight = " << w << " " << wx1 << " " << wy1 << std::endl;
+  //   // sleep(1);
+  // }
   // Add up all coefficients.
   // for (int i = 0; i <= n; i++) {
   // wx += pow(x, i) * par[count++];

@@ -37,7 +37,16 @@ public:
   void SetupSplineSet();
   void Write(std::string name);
   void AddCoefficientsToTree(TTree* tree);
-  void FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas = NULL, bool saveplot = false);
+  void FitSplinesForEvent(TCanvas* fitcanvas = NULL, bool saveplot = false);
+  void AddWeightsToTree(TTree* tr);
+  void ReadWeightsFromTree(TTree* tr);
+  void FitSplinesForEvent(double* weightvals, float* coeff);
+
+  void GetWeightsForEvent(FitEvent* event, double* weights);
+  void GetWeightsForEvent(FitEvent* event);
+
+  inline int GetNWeights(){return fParVect.size();};
+  inline int GetNPars(){ return fNCoEff;};
 
   int fNCoEff;
   //  double* fCoEffStorer;
@@ -45,7 +54,7 @@ public:
 
   std::vector< std::vector<double> > fParVect;
   std::vector< int > fSetIndex;
-  std::vector< double > fWeightList;
+  double* fWeightList;
   std::vector< std::vector<double> > fValList;
 
   FitWeight* fRW;
@@ -54,17 +63,17 @@ public:
   std::vector<TH1D*> fAllDrawnHists;
   std::vector<TGraph*> fAllDrawnGraphs;
 
-  std::map<Spline*,SplineFCN*> fSplineFCNs;
-  std::map<Spline*,ROOT::Math::Functor*> fSplineFunctors;
-  std::map<Spline*,ROOT::Math::Minimizer*> fSplineMinimizers;
+  std::map<Spline*, SplineFCN*> fSplineFCNs;
+  std::map<Spline*, ROOT::Math::Functor*> fSplineFunctors;
+  std::map<Spline*, ROOT::Math::Minimizer*> fSplineMinimizers;
 
   // Available Fitting Functions
-void FitCoeff(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
-void FitCoeff1DGraph(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
-void GetCoeff1DTSpline3(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
-void FitCoeff2DGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
-void FitCoeffNDGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
-
+  void FitCoeff(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
+  void FitCoeff1DGraph(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
+  void GetCoeff1DTSpline3(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
+  // void FitCoeff2DGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
+  void FitCoeffNDGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
+  void FitCoeff2DGraph(Spline* spl,  int n,  double* x,  double* y,  double* w, float* coeff, bool draw);
 
 };
 
@@ -73,7 +82,7 @@ namespace SplineUtils {
 
 double Func2DWrapper(double* x, double* p);
 extern Spline* gSpline;
-  // return 1.0;
+// return 1.0;
 // }
 // void FitCoeff2DGraph(Spline* spl, int n, double* x, double* y, double* z, float* coeff, bool draw);
 

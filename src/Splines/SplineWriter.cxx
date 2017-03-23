@@ -20,6 +20,18 @@ void SplineWriter::Write(std::string name) {
   delete tr;
 }
 
+void SplineWriter::AddWeightsToTree(TTree* tr) {
+  // Add only the fitted spline coefficients to the ttree
+  std::cout << "Saving Spline Weights to TTree = " << Form("SplineWeights[%d]/F", (int)fValList.size()) << std::endl;
+  //  sleep(1);
+  tr->Branch("SplineWeights", fWeightList, Form("SplineWeights[%d]/D", (int)fValList.size()));
+}
+
+void SplineWriter::ReadWeightsFromTree(TTree* tr) {
+  tr->SetBranchAddress("SplineWeights", fWeightList);
+}
+
+
 void SplineWriter::AddCoefficientsToTree(TTree* tr) {
   // Add only the fitted spline coefficients to the ttree
   std::cout << "Saving Spline Coeff to TTree = " << Form("SplineCoeff[%d]/F", fNCoEff) << std::endl;
@@ -48,7 +60,7 @@ void SplineWriter::SetupSplineSet() {
 
   fParVect.push_back(nomvals);
   fSetIndex.push_back(0);
-  fWeightList.push_back(1.0);
+  // fWeightList.push_back(1.0);
   fValList.push_back(std::vector<double>(1, 0.0));
 
   // Loop over all splines.
@@ -74,9 +86,14 @@ void SplineWriter::SetupSplineSet() {
       }
       fParVect.push_back(newvals);
       fValList.push_back(vals[j]);
-      fWeightList.push_back(1.0);
+      // fWeightList.push_back(1.0);
       fSetIndex.push_back(i + 1);
     }
+  }
+
+  fWeightList = new double[fValList.size()];
+  for (int i = 0; i < fValList.size(); i++) {
+    fWeightList[i] = 1.0;
   }
 
   // Print out the parameter set
@@ -92,8 +109,7 @@ void SplineWriter::SetupSplineSet() {
   }
 }
 
-void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool saveplot ) {
-
+void SplineWriter::GetWeightsForEvent(FitEvent* event) {
   // Get Starting Weight
   fRW->SetAllDials(&fParVect[0][0], fParVect[0].size());
   double nomweight = fRW->CalcWeight(event);
@@ -102,6 +118,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
   if (fDrawSplines) {
     std::cout << "Nominal Spline Weight = " << nomweight << std::endl;
   }
+  fWeightList[0] = nomweight;
 
   // Loop over parameter sets
   for (size_t i = 1; i < fParVect.size(); i++) {
@@ -119,8 +136,83 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
     } else {
       fWeightList[i] = 1.0;
     }
-
   }
+}
+
+void SplineWriter::GetWeightsForEvent(FitEvent* event, double* weights) {
+  // Get Starting Weight
+  fRW->SetAllDials(&fParVect[0][0], fParVect[0].size());
+  double nomweight = fRW->CalcWeight(event);
+  event->RWWeight = nomweight;
+
+  if (fDrawSplines) {
+    std::cout << "Nominal Spline Weight = " << nomweight << std::endl;
+  }
+  weights[0] = nomweight;
+
+  // Loop over parameter sets
+  for (size_t i = 1; i < fParVect.size(); i++) {
+    // Update FRW
+    fRW->SetAllDials(&fParVect[i][0], fParVect[i].size());
+
+    // Calculate a weight for event
+    double weight = fRW->CalcWeight(event);
+
+
+    if (weight >= 0.0 and weight < 200) {
+      // Fill Weight Set
+      weights[i] = weight / nomweight;
+      if (fDrawSplines) std::cout << "Calculating values from weight set " << i << " " << fParVect[i][0] << " = " << weight << " " << weight / nomweight << std::endl;
+    } else {
+      weights[i] = 1.0;
+    }
+  }
+}
+
+
+void SplineWriter::FitSplinesForEvent(double* inputweights, float* coeff) {
+
+  int n = fAllSplines.size();
+  int coeffcount = 0;
+
+  for (int i = 0; i < n; i++) {
+
+    // DialVals
+    std::vector<std::vector<double> > dialvals;
+    std::vector<double> weightvals;
+    bool hasresponse = false;
+
+    for (size_t j = 0; j <  fSetIndex.size(); j++) {
+      if (fSetIndex[j] != i + 1) continue;
+
+      dialvals.push_back(fValList[j]);
+      double tempw = inputweights[j];
+      weightvals.push_back(tempw);
+
+      if (tempw != 1.0) hasresponse = true;
+    }
+
+    // Perform Fit
+    if (hasresponse) {
+      // std::cout << "Fitting Coeff" << std::endl;
+      FitCoeff(&fAllSplines[i], dialvals, weightvals, &coeff[coeffcount], fDrawSplines);
+    } else {
+      for (int j = 0; coeffcount + j < fNCoEff; j++) {
+        // std::cout << "Setting 0.0 response " << coeffcount + i << " " << fNCoEff <<  std::endl;
+        coeff[coeffcount + j] = 0.0;
+      }
+    }
+
+    // std::cout << "Adding coeffcount" << std::endl;
+    // Offset coeffcount
+    coeffcount += (fAllSplines[i]).GetNPar();
+  }
+// std::cout << "FitEvent" << std::endl;
+  return;
+}
+
+
+void SplineWriter::FitSplinesForEvent(TCanvas * fitcanvas, bool saveplot) {
 
   // Loop over splines
   //  int count = 0;
@@ -133,7 +225,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
     coeffcount += fAllSplines[i].GetNPar();
   }
 
-  //#pragma omp parallel for if (parrallel)
+  #pragma omp parallel for
   for (int i = 0; i < n; i++) {
 
     // Store X/Y Vals
@@ -145,25 +237,18 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
 
     for (size_t j = 0; j <  fSetIndex.size(); j++) {
       if (fSetIndex[j] != i + 1) continue;
+
       dialvals.push_back(fValList[j]);
-      weightvals.push_back(fWeightList[j] - 0.0);
-      if (fWeightList[j] != 1.0) hasresponse = true;
+      double tempw = fWeightList[j];
+      weightvals.push_back(tempw);
+
+      if (tempw != 1.0) hasresponse = true;
     }
 
     // Make a new graph and fit coeff if response
     if (hasresponse) {
       FitCoeff(&fAllSplines[i], dialvals, weightvals, &fCoEffStorer[coeffcount], fDrawSplines);
-      // for (int k = 0; k < npar; k++){
-      // std::cout << "Spline Coeff " << k << " saved as " << fCoEffStorer[coeffcount+k] << std::endl;
-      // }
-
-      // Move spline fitting to inside SplineWriter as thats where it is done.
-      // Make sure that one minimizer is created PER spline.
-      // Make sure that spline has the ability to calculate the difference between a list of weights and its current set.
-      // by fast calculation.
-
     } else {
-      //      std::cout << "Spline " << fSpline[i] << " has no response. " << std::endl;
       for (int i = 0; i < npar; i++) {
         fCoEffStorer[coeffcount + i] = 0.0;
       }
@@ -171,87 +256,87 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
   }
 
 
-  // Check overrides
-  // if (saveplot) {
-  //   coeffcount = 0;
+// Check overrides
+// if (saveplot) {
+//   coeffcount = 0;
 
-  //   // Make new canvas to save stuff into
-  //   if (fitcanvas) delete fitcanvas;
-  //   fitcanvas = new TCanvas("c1", "c1", fAllSplines.size() * 400 , 600);
-  //   fitcanvas->Divide(fAllSplines.size(), 1);
+//   // Make new canvas to save stuff into
+//   if (fitcanvas) delete fitcanvas;
+//   fitcanvas = new TCanvas("c1", "c1", fAllSplines.size() * 400 , 600);
+//   fitcanvas->Divide(fAllSplines.size(), 1);
 
-  //   // Clear out points
-  //   for (size_t i = 0; i < fAllDrawnGraphs.size(); i++) {
-  //     if (fAllDrawnGraphs[i]) delete fAllDrawnGraphs[i];
-  //     if (fAllDrawnHists[i]) delete fAllDrawnHists[i];
-  //   }
-  //   fAllDrawnGraphs.clear();
-  //   fAllDrawnHists.clear();
+//   // Clear out points
+//   for (size_t i = 0; i < fAllDrawnGraphs.size(); i++) {
+//     if (fAllDrawnGraphs[i]) delete fAllDrawnGraphs[i];
+//     if (fAllDrawnHists[i]) delete fAllDrawnHists[i];
+//   }
+//   fAllDrawnGraphs.clear();
+//   fAllDrawnHists.clear();
 
 
-  //   for (size_t i = 0; i < fAllSplines.size(); i++) {
+//   for (size_t i = 0; i < fAllSplines.size(); i++) {
 
-  //     fitcanvas->cd(i + 1);
+//     fitcanvas->cd(i + 1);
 
-  //     // Store X/Y Vals
-  //     std::vector<std::vector<double> > dialvals;
-  //     std::vector<double> weightvals;
-  //     bool hasresponse = false;
-  //     int npar = (fAllSplines[i]).GetNPar();
+//     // Store X/Y Vals
+//     std::vector<std::vector<double> > dialvals;
+//     std::vector<double> weightvals;
+//     bool hasresponse = false;
+//     int npar = (fAllSplines[i]).GetNPar();
 
-  //     for (size_t j = 0; j <  fSetIndex.size(); j++) {
-  //       if ((UInt_t)fSetIndex[j] != (UInt_t)i + 1) continue;
-  //       dialvals.push_back(fValList[j]);
-  //       weightvals.push_back(fWeightList[j] - 0.0);
-  //       if (fWeightList[j] != 1.0) hasresponse = true;
-  //     }
+//     for (size_t j = 0; j <  fSetIndex.size(); j++) {
+//       if ((UInt_t)fSetIndex[j] != (UInt_t)i + 1) continue;
+//       dialvals.push_back(fValList[j]);
+//       weightvals.push_back(fWeightList[j] - 0.0);
+//       if (fWeightList[j] != 1.0) hasresponse = true;
+//     }
 
-  //     if (hasresponse) {
+//     if (hasresponse) {
 
-  //       TGraph* gr = new TGraph(dialvals.size(), dialvals, weightvals);
-  //       fAllDrawnGraphs.push_back(gr);
+//       TGraph* gr = new TGraph(dialvals.size(), dialvals, weightvals);
+//       fAllDrawnGraphs.push_back(gr);
 
-  //       // Get XMax Min
-  //       int n = xvals.size();
-  //       double xmin = 99999.9;
-  //       double xmax = -99999.9;
-  //       for (int j = 0; j < n; j++) {
-  //         if (xvals[j] > xmax) xmax = xvals[j];
-  //         if (xvals[j] < xmin) xmin = xvals[j];
-  //       }
+//       // Get XMax Min
+//       int n = xvals.size();
+//       double xmin = 99999.9;
+//       double xmax = -99999.9;
+//       for (int j = 0; j < n; j++) {
+//         if (xvals[j] > xmax) xmax = xvals[j];
+//         if (xvals[j] < xmin) xmin = xvals[j];
+//       }
 
-  //       TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
-  //       fAllDrawnHists.push_back(hist);
+//       TH1D* hist = new TH1D("temp", "temp", 100, xmin, xmax);
+//       fAllDrawnHists.push_back(hist);
 
-  //       for (int k = 0; k < 100; k++) {
-  //         double xtemp = hist->GetXaxis()->GetBinCenter(k + 1);
-  //         fAllSplines[i].Reconfigure(xtemp);
-  //         double ytemp = fAllSplines[i].DoEval(&fCoEffStorer[coeffcount]);
-  //         hist->SetBinContent(k + 1, ytemp);
-  //       }
+//       for (int k = 0; k < 100; k++) {
+//         double xtemp = hist->GetXaxis()->GetBinCenter(k + 1);
+//         fAllSplines[i].Reconfigure(xtemp);
+//         double ytemp = fAllSplines[i].DoEval(&fCoEffStorer[coeffcount]);
+//         hist->SetBinContent(k + 1, ytemp);
+//       }
 
-  //       // gr->Draw("APL");
-  //       hist->SetLineColor(kRed);
-  //       hist->Draw("HIST C");
-  //       hist->SetTitle("Spline Response");
-  //       // hist->GetYaxis()->SetRangeUser(0.0, 3.0);
+//       // gr->Draw("APL");
+//       hist->SetLineColor(kRed);
+//       hist->Draw("HIST C");
+//       hist->SetTitle("Spline Response");
+//       // hist->GetYaxis()->SetRangeUser(0.0, 3.0);
 
-  //       // gStyle->SetOptStat(0);
-  //       hist->SetStats(0);
-  //       gr->SetMarkerStyle(20);
-  //       gr->SetTitle("True Weight Points");
-  //       gr->Draw("P SAME");
-  //       gPad->BuildLegend(0.6, 0.6, 0.85, 0.85);
-  //       gPad->Update();
+//       // gStyle->SetOptStat(0);
+//       hist->SetStats(0);
+//       gr->SetMarkerStyle(20);
+//       gr->SetTitle("True Weight Points");
+//       gr->Draw("P SAME");
+//       gPad->BuildLegend(0.6, 0.6, 0.85, 0.85);
+//       gPad->Update();
 
-  //       hist->SetTitle(fSpline[i].c_str());
-  //       hist->GetXaxis()->SetTitle("Dial Variation");
-  //       hist->GetYaxis()->SetTitle("Event Weight");
-  //       fitcanvas->Update();
-  //     }
-  //     coeffcount += npar;
-  //   }
-  // }
+//       hist->SetTitle(fSpline[i].c_str());
+//       hist->GetXaxis()->SetTitle("Dial Variation");
+//       hist->GetYaxis()->SetTitle("Event Weight");
+//       fitcanvas->Update();
+//     }
+//     coeffcount += npar;
+//   }
+// }
 }
 
 
@@ -259,7 +344,7 @@ void SplineWriter::FitSplinesForEvent(FitEvent* event, TCanvas* fitcanvas, bool 
 
 // Fitting
 // ----------------------------------------------
-void SplineWriter::FitCoeff(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw) {
+void SplineWriter::FitCoeff(Spline * spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float * coeff, bool draw) {
 
   std::vector<double> x;
   std::vector<double> y;
@@ -293,16 +378,21 @@ void SplineWriter::FitCoeff(Spline* spl, std::vector< std::vector<double> >& v, 
   case k2DPol6:
   case k2DGaus:
   case k2DTSpline3:
-    FitCoeff2DGraph(spl, v, w, coeff, draw);
+    FitCoeff2DGraph(spl, v.size(), &x[0], &y[0], &w[0], coeff, draw);
     break;
 
   default:
     break;
   }
 
+  // fSplineFCNs[spl] = new SplineFCN(spl, v, w);
+  // fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
+  // sleep(1);
+  // delete fSplineFCNs[spl];
+
 }
 
-void SplineWriter::FitCoeff1DGraph(Spline* spl, int n, double* x, double* y, float* coeff, bool draw) {
+void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, float * coeff, bool draw) {
 
   TGraph* gr = new TGraph(n, x, y);
   double xmin = 99999.9;
@@ -358,11 +448,11 @@ void SplineWriter::FitCoeff1DGraph(Spline* spl, int n, double* x, double* y, flo
   delete gr;
 }
 
-double SplineFCN::operator()(const double* x) const {
+double SplineFCN::operator()(const double * x) const {
   return DoEval(x);
 }
 
-double SplineFCN::DoEval(const double* x) const {
+double SplineFCN::DoEval(const double * x) const {
 
   float* fx = new float[fSpl->GetNPar()];
   for (int i = 0; i < fSpl->GetNPar(); i++) {
@@ -402,7 +492,7 @@ void SplineFCN::SetCorrelated(bool state) {
 
 
 
-void SplineFCN::SaveAs(std::string name, const float* fx) {
+void SplineFCN::SaveAs(std::string name, const float * fx) {
 
 
   if (fVal[0].size() != 2) {
@@ -482,22 +572,22 @@ namespace SplineUtils {
 Spline* gSpline = NULL;
 }
 
-double SplineUtils::Func2DWrapper(double* x, double* p) {
+double SplineUtils::Func2DWrapper(double * x, double * p) {
   // std::cout << "2D Func Wrapper " << x[0] << " " << x[1] << std::endl;
   return (*gSpline)(x, p);
 }
 
-void SplineWriter::FitCoeff2DGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw) {
+void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, double * w, float * coeff, bool draw) {
 
-// Make a 2D Function
-  SplineUtils::gSpline = spl;
+  if (SplineUtils::gSpline != spl)
+    SplineUtils::gSpline = spl;
+
   TF2* f2 = new TF2("f2", SplineUtils::Func2DWrapper, -30.0, 30.0, -30.0, 30.0, spl->GetNPar());
-  TGraph2D* histmc = new TGraph2D();
-  for (size_t i = 0; i < v.size(); i++) {
-    histmc->SetPoint(histmc->GetN(), v[i][0], v[i][1], w[i]);
-  }
+  TGraph2D* histmc = new TGraph2D(n, x, y, w);
+  f2->SetNpx(400);
+
   StopTalking();
-  histmc->Fit(f2,"FMWQ");
+  histmc->Fit(f2, "FMWQ");
   StartTalking();
 
   for (int i = 0; i < spl->GetNPar(); i++) {
@@ -508,16 +598,10 @@ void SplineWriter::FitCoeff2DGraph(Spline* spl, std::vector< std::vector<double>
   delete f2;
   delete histmc;
 
-  // fSplineFCNs[spl] = new SplineFCN(spl, v, w);
-  // fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
-  // sleep(1);
-  // delete fSplineFCNs[spl];
-
-
 }
 
 
-void SplineWriter::FitCoeffNDGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw) {
+void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float * coeff, bool draw) {
 
   // TGraph2D* gr = new TGraph2D(n, x, y);
   // double xmin = 99999.9;
@@ -643,7 +727,7 @@ void SplineWriter::FitCoeffNDGraph(Spline* spl, std::vector< std::vector<double>
 
 
 // Spline extraction Functions
-void SplineWriter::GetCoeff1DTSpline3(Spline* spl, int n, double* x, double* y, float* coeff, bool draw) {
+void SplineWriter::GetCoeff1DTSpline3(Spline * spl, int n, double * x, double * y, float * coeff, bool draw) {
 
   StopTalking();
   TSpline3 temp_spline = TSpline3("temp_spline", x, y, n);

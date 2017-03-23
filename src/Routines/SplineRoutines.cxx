@@ -467,7 +467,7 @@ void SplineRoutines::GenerateEventSplines() {
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
-    int countwidth = 1000; //(nevents / 1000);
+    int countwidth = (nevents / 1000);
     FitEvent* nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
@@ -481,22 +481,37 @@ void SplineRoutines::GenerateEventSplines() {
     splwrite->Write("spline_reader");
 
     // Setup the spline TTree
-    TTree* splinetree = new TTree("spline_tree", "spline_tree");
-    splwrite->AddCoefficientsToTree(splinetree);
+    TTree* weighttree = new TTree("weight_tree", "weight_tree");
+    splwrite->AddWeightsToTree(weighttree);
+
+    // Make container for all weights
+    int nweights = splwrite->GetNWeights()+1;
+    double** weightcont = new double*[nevents];
+    for (int k = 0; k < nevents; k++) {
+      weightcont[k] = new double[nweights];
+    }
+
+    int npar = splwrite->GetNPars();
+
+
     int lasttime = time(NULL);
     // Loop over all events and fill the TTree
     while (nuisevent) {
 
       // std::cout << "Fitting event " << i << std::endl;
       // Calculate the weights for each parameter set
-      splwrite->FitSplinesForEvent(nuisevent);
+      // splwrite->FitSplinesForEvent(nuisevent);
+      splwrite->GetWeightsForEvent(nuisevent, weightcont[i]);
 
       // Save everything
       eventtree->Fill();
-      splinetree->Fill();
+      weighttree->Fill();
+      // splinetree->Fill();
 
       // nuisevent->Print();
       // std::cout << "Done with event " << i << std::endl;
+
+      // Push weight sets into a the array
 
       // sleep(4);
       // Logging
@@ -513,20 +528,109 @@ void SplineRoutines::GenerateEventSplines() {
           timestring << proj << " hours remaining.";
 
         }
-        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline weights. " << timestring.str() << std::endl;
       }
 
       // Iterate
       i++;
       nuisevent = input->NextNuisanceEvent();
     }
-    // Save flux and close file
+
     outputfile->cd();
     eventtree->Write();
-    splinetree->Write();
-
+    weighttree->Write();
     input->GetFluxHistogram()->Write("nuisance_fluxhist");
     input->GetEventHistogram()->Write("nuisance_eventhist");
+    outputfile->Close();
+
+    outputfile = new TFile(outputfilename.c_str(), "UPDATE");
+    outputfile->cd();
+
+    weighttree = (TTree*) outputfile->Get("weight_tree");
+    splwrite->ReadWeightsFromTree(weighttree);
+
+
+    // Divide weights container into Ncores.
+    // Parrallelise this loop checking for what core we are on.
+    // for (int i = 0; i < nevents; i++){
+    // splwriterlist[int(i / (nevents/4))]->FitSplinesForEvent(coeff);
+    // }
+
+    // // Now loop over weights tree
+    // for (int i = 0; i < weighttree->GetEntries(); i++) {
+    //   weighttree->GetEntry(i);
+    //   splwrite->FitSplinesForEvent();
+    //   splinetree->Fill();
+
+    //   if (i % countwidth == 0) {
+
+    //     std::ostringstream timestring;
+    //     int timeelapsed = time(NULL) - lasttime;
+    //     if (i != 0 and timeelapsed) {
+    //       lasttime = time(NULL);
+
+    //       int eventsleft = nevents - i;
+    //       float speed = float(countwidth) / float(timeelapsed);
+    //       float proj = (float(eventsleft) / float(speed)) / 60 / 60;
+    //       timestring << proj << " hours remaining.";
+
+    //     }
+    //     LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+    //   }
+    // }
+
+    // Get Splines
+    float** allcoeff = new float*[nevents];
+    for (int k = 0; k < nevents; k++){
+      allcoeff[k] = new float[npar];
+    }
+
+    for (int i = 0; i < nevents; i++) {
+      splwrite->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+
+      if (i % countwidth == 0) {
+
+        std::ostringstream timestring;
+        int timeelapsed = time(NULL) - lasttime;
+        if (i != 0 and timeelapsed) {
+          lasttime = time(NULL);
+
+          int eventsleft = nevents - i;
+          float speed = float(countwidth) / float(timeelapsed);
+          float proj = (float(eventsleft) / float(speed)) / 60 / 60;
+          timestring << proj << " hours remaining.";
+
+        }
+        LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+      }
+    }
+
+    // Save Splines into TTree
+    float* coeff = new float[npar];
+    outputfile->cd();
+    TTree* splinetree = new TTree("spline_tree", "spline_tree");
+
+    splinetree->Branch("SplineCoeff", coeff, Form("SplineCoeff[%d]/F",npar));
+
+    std::cout << "Saving to the allcoeff" << std::endl;
+    for (int k = 0; k < nevents; k++) {
+      for (int l = 0; l < npar; l++) {
+        coeff[l] = allcoeff[k][l];
+      }
+      std::cout << "Coeff 0, 1, 2 = " << coeff[0] << " " << coeff[1] << " " << coeff[2] << std::endl;
+      splinetree->Fill();
+    }
+
+    // Save flux and close file
+    outputfile->cd();
+    splinetree->Write();
+
+    // Delete the container.
+    for (int k = 0; k < nevents; k++) {
+      delete weightcont[k];
+    }
+    delete weightcont;
+    delete coeff;
 
     // Close Output
     outputfile->Close();
@@ -1138,7 +1242,8 @@ void SplineRoutines::SaveSplinePlots() {
 
       // std::cout << "Fitting event " << i << std::endl;
       // Calculate the weights for each parameter set
-      splwrite->FitSplinesForEvent(nuisevent, fitcanvas, true);
+      splwrite->GetWeightsForEvent(nuisevent);
+      splwrite->FitSplinesForEvent(fitcanvas, true);
 
       if (fitcanvas) {
         outputfile->cd();
@@ -1278,7 +1383,7 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
   if (fOutputRootFile) delete fOutputRootFile;
   fOutputRootFile = new TFile(fOutputFile.c_str(), "RECREATE");
 
-    fOutputRootFile->ls();
+  fOutputRootFile->ls();
   // Make two new JointFCN
   JointFCN* rawfcn = new JointFCN(rawkeys, fOutputRootFile);
   JointFCN* splfcn = new JointFCN(splkeys, fOutputRootFile);
@@ -1427,7 +1532,7 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
   if (fOutputRootFile) delete fOutputRootFile;
   fOutputRootFile = new TFile(fOutputFile.c_str(), "RECREATE");
 
-    fOutputRootFile->ls();
+  fOutputRootFile->ls();
   // Make two new JointFCN
   JointFCN* rawfcn = new JointFCN(rawkeys, fOutputRootFile);
   JointFCN* splfcn = new JointFCN(splkeys, fOutputRootFile);
