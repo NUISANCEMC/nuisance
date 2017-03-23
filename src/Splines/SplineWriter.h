@@ -66,6 +66,7 @@ public:
   std::map<Spline*, SplineFCN*> fSplineFCNs;
   std::map<Spline*, ROOT::Math::Functor*> fSplineFunctors;
   std::map<Spline*, ROOT::Math::Minimizer*> fSplineMinimizers;
+  //  Spline* gSpline;
 
   // Available Fitting Functions
   void FitCoeff(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
@@ -74,14 +75,15 @@ public:
   // void FitCoeff2DGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
   void FitCoeffNDGraph(Spline* spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float* coeff, bool draw);
   void FitCoeff2DGraph(Spline* spl,  int n,  double* x,  double* y,  double* w, float* coeff, bool draw);
+  //double Func2DWrapper(double* x, double* p);
 
 };
 
 
 namespace SplineUtils {
 
-double Func2DWrapper(double* x, double* p);
-extern Spline* gSpline;
+  double Func2DWrapper(double* x, double* p);
+  extern Spline* gSpline;
 // return 1.0;
 // }
 // void FitCoeff2DGraph(Spline* spl, int n, double* x, double* y, double* z, float* coeff, bool draw);

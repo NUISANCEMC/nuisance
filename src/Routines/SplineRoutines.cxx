@@ -207,7 +207,9 @@ void SplineRoutines::Run() {
     std::string rout = fRoutines[i];
     if       (!rout.compare("SaveEvents")) SaveEvents();
     else if  (!rout.compare("TestEvents")) TestEvents();
-    else if  (!rout.compare("GenerateEventSplines")) GenerateEventSplines();
+    else if  (!rout.compare("GenerateEventSplines")){  GenerateEventSplines(); }
+    // else if  (!rout.compare("GenerateEventWeights")) { GenerateEventWeights(); }
+    // else if  (!rout.compare("BuildEventSplines"))    { BuildEventSplines(); }
     else if  (!rout.compare("TestSplines_1DEventScan")) TestSplines_1DEventScan();
     else if  (!rout.compare("TestSplines_NDEventThrow")) TestSplines_NDEventThrow();
     else if  (!rout.compare("SaveSplinePlots")) SaveSplinePlots();
@@ -424,6 +426,25 @@ void SplineRoutines::GenerateEventSplines() {
   splwrite->SetupSplineSet();
 
 
+  // Make an ugly list for N cores
+  int ncores = FitPar::Config().GetParI("NCORES");//omp_get_max_threads();
+  std::vector<SplineWriter*> splwriterlist;
+
+  for (int i = 0; i < ncores; i++){
+    SplineWriter* tmpwriter = new SplineWriter(fRW);
+
+    for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
+	 iter != splinekeys.end(); iter++) {
+      nuiskey splkey = (*iter);
+
+      // Add Spline Info To Reader                                                                                                                                                                                                            
+      tmpwriter->AddSpline(splkey);
+    }
+    tmpwriter->SetupSplineSet();
+
+    splwriterlist.push_back(tmpwriter);
+  }
+
 
   // Event Loop
   // Loop over all events and calculate weights for each parameter set.
@@ -495,6 +516,8 @@ void SplineRoutines::GenerateEventSplines() {
 
 
     int lasttime = time(NULL);
+
+    // Could reorder this to save the weightconts in order instead of reconfiguring per event.
     // Loop over all events and fill the TTree
     while (nuisevent) {
 
@@ -585,10 +608,28 @@ void SplineRoutines::GenerateEventSplines() {
       allcoeff[k] = new float[npar];
     }
 
-    for (int i = 0; i < nevents; i++) {
-      splwrite->FitSplinesForEvent(weightcont[i], allcoeff[i]);
 
-      if (i % countwidth == 0) {
+
+#pragma omp parallel for num_threads(ncores)
+    for (int i = 0; i < nevents; i++) {
+
+      //#pragma omp atomic
+      //      printf("Using Thread %d to build event %d \n", int(omp_get_thread_num()), (int)i );
+      //      std::cout<< " -> Writer = " << splwriterlist[ i / (nevents/ncores) ] << std::endl;
+
+      //      #pragma omp atomic
+      splwriterlist[ int(omp_get_thread_num()) ]->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+      
+      //      splwrite->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+
+      
+      if (i % 500 == 0) {
+
+	if (LOG_LEVEL(REC)){
+	  printf("Using Thread %d to build event %d \n", int(omp_get_thread_num()), (int)i );
+	}
+      }
+      /*
 
         std::ostringstream timestring;
         int timeelapsed = time(NULL) - lasttime;
@@ -599,10 +640,12 @@ void SplineRoutines::GenerateEventSplines() {
           float speed = float(countwidth) / float(timeelapsed);
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
+	  timestring << " Using Writer at " << i / (nevents/ncores) << " = " << splwriterlist[ i / (nevents/ncores) ] << std::endl;
 
         }
         LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
       }
+      */
     }
 
     // Save Splines into TTree

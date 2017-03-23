@@ -225,7 +225,7 @@ void SplineWriter::FitSplinesForEvent(TCanvas * fitcanvas, bool saveplot) {
     coeffcount += fAllSplines[i].GetNPar();
   }
 
-  #pragma omp parallel for
+  //  #pragma omp parallel for
   for (int i = 0; i < n; i++) {
 
     // Store X/Y Vals
@@ -414,6 +414,7 @@ void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, 
   // Run the actual spline fit
   StopTalking();
 
+  
   // If linear fit with two points
   if (n == 2 and spl->GetType() == k1DPol1) {
 
@@ -428,7 +429,7 @@ void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, 
   } else {
     gr->Fit(func, "FMWQ");
   }
-
+  
 
   StartTalking();
 
@@ -569,7 +570,7 @@ void SplineFCN::SaveAs(std::string name, const float * fx) {
 }
 
 namespace SplineUtils {
-Spline* gSpline = NULL;
+  Spline* gSpline = NULL;
 }
 
 double SplineUtils::Func2DWrapper(double * x, double * p) {
@@ -579,25 +580,28 @@ double SplineUtils::Func2DWrapper(double * x, double * p) {
 
 void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, double * w, float * coeff, bool draw) {
 
+  #pragma omp critical
+  {
+  //  if (gSpline != spl) gSpline = spl;
   if (SplineUtils::gSpline != spl)
     SplineUtils::gSpline = spl;
 
-  TF2* f2 = new TF2("f2", SplineUtils::Func2DWrapper, -30.0, 30.0, -30.0, 30.0, spl->GetNPar());
+  TF2* f2 = new TF2("f2", Func2DWrapper, -30.0, 30.0, -30.0, 30.0, spl->GetNPar());
   TGraph2D* histmc = new TGraph2D(n, x, y, w);
   f2->SetNpx(400);
 
   StopTalking();
   histmc->Fit(f2, "FMWQ");
   StartTalking();
-
+  
   for (int i = 0; i < spl->GetNPar(); i++) {
     coeff[i] = f2->GetParameter(i);
-    // std::cout << "Fit 2D Func " << i << " = " << coeff[i] << std::endl;
+    //    std::cout << "Fit 2D Func " << i << " = " << coeff[i] << std::endl;
   }
 
   delete f2;
   delete histmc;
-
+  }
 }
 
 

@@ -51,7 +51,7 @@
 #include "SplineWriter.h"
 #include "SplineMerger.h"
 #include "ParserUtils.h"
-
+#include "OpenMPWrapper.h"
 enum minstate {
   kErrorStatus = -1,
   kGoodStatus,

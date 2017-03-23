@@ -30,6 +30,7 @@ BeamUtils.h
 TargetUtils.h
 StackBase.h
 StandardStacks.h
+OpenMPWrapper.h
 )
 
 set(IMPLFILES
