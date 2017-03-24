@@ -506,7 +506,7 @@ void SplineRoutines::GenerateEventSplines() {
     splwrite->AddWeightsToTree(weighttree);
 
     // Make container for all weights
-    int nweights = splwrite->GetNWeights()+1;
+    int nweights = splwrite->GetNWeights();
     double** weightcont = new double*[nevents];
     for (int k = 0; k < nevents; k++) {
       weightcont[k] = new double[nweights];
@@ -525,6 +525,21 @@ void SplineRoutines::GenerateEventSplines() {
       // Calculate the weights for each parameter set
       // splwrite->FitSplinesForEvent(nuisevent);
       splwrite->GetWeightsForEvent(nuisevent, weightcont[i]);
+      bool hasresponse = false;
+      for (int j = 0; j < nweights; j++){
+
+	if (weightcont[i][j] != 1.0){
+	  //	  std::cout << "Non Zero Weight at " << i << " " << j << std::endl;
+	  hasresponse = true;
+	} else {
+	  //	  std::cout << "Empty Weight at " << i << " " << j << std::endl;
+	}
+      }
+      if (!hasresponse){
+	//	std::cout << "Deleting flat response " << nuisevent->Mode << std::endl;
+	delete weightcont[i];
+	weightcont[i] = NULL;
+      }
 
       // Save everything
       eventtree->Fill();
@@ -618,7 +633,13 @@ void SplineRoutines::GenerateEventSplines() {
       //      std::cout<< " -> Writer = " << splwriterlist[ i / (nevents/ncores) ] << std::endl;
 
       //      #pragma omp atomic
-      splwriterlist[ int(omp_get_thread_num()) ]->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+      if (weightcont[i]){
+	splwriterlist[ int(omp_get_thread_num()) ]->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+      } else {
+	for (int j = 0; j < npar; j++){
+	  allcoeff[i][j] = float(0.0);
+	}
+      }
       
       //      splwrite->FitSplinesForEvent(weightcont[i], allcoeff[i]);
 

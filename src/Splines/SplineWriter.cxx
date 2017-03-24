@@ -166,6 +166,7 @@ void SplineWriter::GetWeightsForEvent(FitEvent* event, double* weights) {
     } else {
       weights[i] = 1.0;
     }
+    fWeightList[i] = weights[i];
   }
 }
 
