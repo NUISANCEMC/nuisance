@@ -23,54 +23,58 @@
 
 #include "ANL_CC1ppip_Evt_1DQ2_nu.h"
 
-// The constructor
-ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "ANL_CC1ppip_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0;
-  EnuMax = 6.0;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG/W14/NOW";
+//********************************************************************
+ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  // User can specify W < 1.4 or no W cut
-  if (type.find("W14") != std::string::npos) {
-    HadCut = 1.4;
-  } else {
-    HadCut = 10.0;
-  }
-    
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1ppip Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // Hadronic Cut Info
+  HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
-    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt" );
   } else {
-    //DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_firstQ2rem.txt";
-    DataLocation += "ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt";
-  }
-  // Get rid of the slashes in the type
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt" );
   }
 
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  FinaliseSampleSettings();
 
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
 
-  // Set Poisson errors on fDataHist (scanned does not have this)
+  // Plot Setup -------------------------------------------------------
+  SetDataValues( fSettings.GetDataInput() );
+
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
+    fDataHist->SetBinError(i + 1, sqrt(fDataHist->GetBinContent(i + 1)));
   }
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
 };
 
 
@@ -89,8 +93,8 @@ void ANL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpip = -1.0;
 
   // ANL has a M(pi, p) < 1.4 GeV cut imposed or no W cut
-  if (hadMass < HadCut*1000.) {
-    q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < HadCut * 1000.) {
+    q2CCpip = -1 * (Pnu - Pmu).Mag2() / 1.E6;
   }
 
   fXVar = q2CCpip;
@@ -102,26 +106,3 @@ bool ANL_CC1ppip_Evt_1DQ2_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
 }
 
-/*
-void ANL_CC1ppip_Evt_1DQ2_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void ANL_CC1ppip_Evt_1DQ2_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

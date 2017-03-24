@@ -23,17 +23,13 @@
 #include "Measurement1D.h"
 
 class ANL_CC1npip_Evt_1DcosmuStar_nu : public Measurement1D {
-
 public:
-  ANL_CC1npip_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~ANL_CC1npip_Evt_1DcosmuStar_nu() {};
+	ANL_CC1npip_Evt_1DcosmuStar_nu(nuiskey samplekey);
 
-  void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
-  bool isSignal(FitEvent *event);
-  //void FillHistograms();
+	virtual ~ANL_CC1npip_Evt_1DcosmuStar_nu() {};
 
- private:
+	void FillEventVariables(FitEvent *event);
+	bool isSignal(FitEvent *event);
 
 };
 

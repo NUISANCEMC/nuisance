@@ -21,6 +21,8 @@ public:
 	void DefineAllowedTargets(std::string targ);
 
 	void FoundFill(std::string name, std::string substr, bool& cont, bool def);
+	// void FoundFill(std::string name, std::string substr, double& val, double )
+	bool Found(std::string name, std::string substr);
 	void SetTitle(std::string val);
 	void SetDataInput(std::string val);
 	void SetCovarInput(std::string val);

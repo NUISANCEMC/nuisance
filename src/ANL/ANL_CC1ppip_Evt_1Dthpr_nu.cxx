@@ -21,34 +21,49 @@
 */
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
 
-// The constructor
-ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+//********************************************************************
+ANL_CC1ppip_Evt_1Dthpr_nu::ANL_CC1ppip_Evt_1Dthpr_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC1ppip_Evt_1Dthpr_nu";
-  fPlotTitles = "; cos #theta_{p}; Number of events";
-  EnuMin = 0;
-  EnuMax = 1.5; // Different EnuMax for cos(thpr), see Derrick et al, Phys Rev D V23 N3, p572 fig 3
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1npip Event Rate 1DcosmuStar nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_thProt.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("cos #theta_{p}");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.DefineAllowedTargets("D,H");
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
+  // CCQELike plot information
+  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_thProt.csv" );
+  fSettings.DefineAllowedSpecies("numu");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataValues( fSettings.GetDataInput() );
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
     fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
   }
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.))*(16./8.);
 };
+
+
+
 
 void ANL_CC1ppip_Evt_1Dthpr_nu::FillEventVariables(FitEvent *event) {
 

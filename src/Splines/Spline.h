@@ -3,9 +3,6 @@
 #include <vector>
 #include "TObject.h"
 #include "FitParameters.h"
-
-// #include "PlotUtils.h"
-// #include "FitUtils.h"
 #include "stdint.h"
 #include "stdlib.h"
 #include "TCanvas.h"
@@ -20,22 +17,43 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "TH1D.h"
+#include "Math/IFunction.h"
+#include "Math/IParamFunction.h"
 
 // Spline Class
-class Spline {
-public:
+class Spline : public  ROOT::Math::ParamFunctor { 
+private:
 
+   const double* pars;
+ 
+public:
+   double DoEvalPar(const double* x, const double* p) const ;
+ 
+   unsigned int NDim() const{
+      return fNDim;
+   }
+   // ROOT::Math::IParametricFunctionMultiDim* Clone() const{
+   //    return new Spline(this->fName, this->fForm, this->fPoints);
+   // }
+ 
+   const double* Parameters() const{
+      return pars;
+   }
+ 
+   void SetParameters(const double* p){
+      pars = p;
+   }
+ 
+   unsigned int NPar() const{
+      return fNPar;
+   }
+ 
   Spline(std::string splname, std::string form, std::string points);
   ~Spline() {};
 
   void Setup(int type, int ndim, int npar);
 
-  double operator()(const Double_t* x, const Double_t* par) const;
-  // double operator()(const Double_t* x, const Double_t* y, const Double_t* par) const;
-
-  //  double DoEval(const Double_t* x, const Double_t* par) const;
-  //  double DoEval(const Double_t* par, bool checkresponse=true) const;
-
+  double operator()(const Double_t* x, const Double_t* par);
   float operator()(const Float_t* x, const Float_t* par) const;
 
   float DoEval(const Float_t* x, const Float_t* par) const;
@@ -53,6 +71,19 @@ public:
   //void Reconfigure(double x);
   void Reconfigure(float x, int index = 0);
   void Reconfigure(std::string name, float x);
+
+   // Available Spline Functions
+  float Spline1DPol1(const Float_t* par) const;
+  float Spline1DPol2(const Float_t* par) const;
+  float Spline1DPol3(const Float_t* par) const;
+  float Spline1DPol4(const Float_t* par) const;
+  float Spline1DPol5(const Float_t* par) const;
+  float Spline1DPol6(const Float_t* par) const;
+  float Spline2DPol(const Float_t* par, int n) const;
+  float Spline2DGaus(const Float_t* par) const;
+
+  float Spline1DTSpline3(const Float_t* par) const;
+  float Spline2DTSpline3(const Float_t* par) const;
 
 
   std::string fName;
@@ -72,15 +103,12 @@ public:
 
   mutable std::vector< std::vector<float> > fSplitScan;
 
-
-
-
   mutable std::vector<float> fXScan;
   mutable float fX;
   mutable float fXMin;
   mutable float fXMax;
 
-    mutable std::vector<float> fYScan;
+  mutable std::vector<float> fYScan;
   mutable float fY;
   mutable float fYMin;
   mutable float fYMax;
@@ -95,46 +123,22 @@ public:
   // Create a new function for fitting.
   ROOT::Math::Minimizer* minimizer;
 
-  // Available Spline Functions
-  float Spline1DPol1(const Float_t* par) const;
-  float Spline1DPol2(const Float_t* par) const;
-  float Spline1DPol3(const Float_t* par) const;
-  float Spline1DPol4(const Float_t* par) const;
-  float Spline1DPol5(const Float_t* par) const;
-  float Spline1DPol6(const Float_t* par) const;
-  float Spline2DPol(const Float_t* par, int n) const;
-  float Spline2DGaus(const Float_t* par) const;
-
-float GetMonomial(int p) const;
-  float Spline1DTSpline3(const Float_t* par) const;
-float Spline2DTSpline3(const Float_t* par) const;
-
-
-// void FitCoeff2DGraph(std::vector< std::vector<double> > v, std::vector<double> w, float* coeff, bool draw);
+  TF1* fROOTFunction;
+  TF1* GetFunction();
 
 };
 
-// class SplineFCN {
-// public:
-
-//   SplineFCN(Spline* spl, std::vector<std::vector<double> > v, std::vector<double> w) { fSpl = spl; fVal = v; fWeight = w; };
-//   ~SplineFCN() {};
-
-//   double operator()(const double* x) const;
-//   double DoEval(const double *x) const;
-// void SaveAs(std::string name, const double* x);
-
-//   std::vector< std::vector<double> > fVal;
-//   std::vector< double > fWeight;
-//   Spline* fSpl;
-
-// };
 
 namespace SplineUtils {
-// // Available Fitting Functions
-// void FitCoeff1DGraph(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
-// void GetCoeff1DTSpline3(Spline* spl, int n, double* x, double* y, float* coeff, bool draw);
-// // void FitCoeff2DGraph(Spline* spl, int n, double* x, double* y, double* z, float* coeff, bool draw);
+
+  double Func2DWrapper(double* x, double* p);
+  extern Spline* gSpline;
+
+}
+
+
+
+namespace SplineUtils {
 
 // Spline List
 enum spline_types {

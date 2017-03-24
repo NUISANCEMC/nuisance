@@ -25,7 +25,7 @@
 class ANL_CC1ppip_Evt_1Dphi_nu : public Measurement1D {
 
 public:
-  ANL_CC1ppip_Evt_1Dphi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  ANL_CC1ppip_Evt_1Dphi_nu(nuiskey samplekey);
   virtual ~ANL_CC1ppip_Evt_1Dphi_nu() {};
   
   void FillEventVariables(FitEvent *event);

@@ -40,6 +40,8 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   if      (name.find("DEN")   != std::string::npos) target =   "CH";
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
+  //  fIsNumerator = (name.find("NUM")   != std::string::npos);
+
   // Setup the Data Plots
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string smearfilename  = "CCinc_"+target+"_x_smear.csv";
@@ -78,6 +80,8 @@ void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
   double Q2   = 4*Enu_rec*Emu*sin(ThetaMu/2)*sin(ThetaMu/2);
   bjork_x     = Q2/2./q0/((PhysConst::mass_proton+PhysConst::mass_neutron)/2.); // Average nucleon masses
 
+  //  if (fIsNumerator)
+
   fXVar   = bjork_x;
   return;
 }
@@ -107,9 +111,6 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
   this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
   this->fDataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->fPlotTitles).c_str());
   this->ApplySmearingMatrix();
-
-  // Get rid of this because it causes odd behaviour
-  //Measurement1D::ScaleEvents();
 
   this->fMCHist->Scale(this->fScaleFactor, "width");
 

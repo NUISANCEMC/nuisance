@@ -16,6 +16,11 @@ void SampleSettings::SetS(std::string name, std::string val){
 	fKeyValues.SetS(name, val);
 };
 
+bool SampleSettings::Found(std::string name, std::string substr){
+	std::string compstring = fKeyValues.GetS(name);
+	return compstring.find(substr) != std::string::npos;
+}
+
 
 void SampleSettings::SetXTitle(std::string name){
 	SetDefault("xtitle",name);

@@ -19,61 +19,59 @@
 
 #include "ANL_CC1npip_Evt_1DQ2_nu.h"
 
-// The constructor
-// User can specify W < 1.4 or no W cut in std::string type (W14 or NOW, default reverts to NOW)
+
 //********************************************************************
-ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
-  fName = "ANL_CC1npip_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0;
-  EnuMax = 1.5;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes = "EVT/SHAPE/DIAG/W14/NOW";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1npip Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // User can specify W < 1.4 or no W cut
-  if (type.find("W14") != std::string::npos) {
-    HadCut = 1.4;
-  } else {
-    HadCut = 10.0;
-  }
-    
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/";
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // Hadronic Cut Info
+  HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
-    DataLocation += "ANL_CC1pip_on_n_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pip_on_n/ANL_CC1pip_on_n_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt" );
   } else {
-    //DataLocation += "ANL_CC1pip_on_n_noEvents_Q2_noWcut_firstQ2rem.txt";
-    DataLocation += "ANL_CC1pip_on_n_noEvents_Q2_noWcut_HighQ2Gone.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pip_on_n/ANL_CC1pip_on_n_noEvents_Q2_noWcut_HighQ2Gone.txt" );
   }
 
-  // Get rid of the slashes in the type
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
-  }
+  FinaliseSampleSettings();
 
-  SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
 
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  // Plot Setup -------------------------------------------------------
+  SetDataValues( fSettings.GetDataInput() );
 
-  // Set Poisson errors on fDataHist (scanned does not have this)
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
+    fDataHist->SetBinError(i + 1, sqrt(fDataHist->GetBinContent(i + 1)));
   }
 
-  // Setup Covariance
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  fScaleFactor = (GetEventHistogram()->Integral()/double(fNEvents));
 };
-
 
 //********************************************************************
 void ANL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
@@ -92,8 +90,8 @@ void ANL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpip;
 
   // ANL has a M(pi, p) < 1.4 GeV cut imposed (also no cut measurement but not useful for delta tuning)
-  if (hadMass < HadCut*1000.) {
-    q2CCpip = -1.0*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < HadCut * 1000.) {
+    q2CCpip = -1.0 * (Pnu - Pmu).Mag2() / 1.E6;
   } else {
     q2CCpip = -1.0;
   }

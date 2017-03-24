@@ -408,9 +408,7 @@ void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, 
   xmax = xmax + xwidth * 0.01;
 
   // Create a new function for fitting.
-  TF1* func = new TF1("f1", spl, -30.0, 30.0, spl->GetNPar());
-  func->SetNpx(400);
-  func->FixParameter(0, 1.0); // Fix so 1.0 at nominal
+  TF1* func = spl->GetFunction(); 
 
   // Run the actual spline fit
   StopTalking();
@@ -446,7 +444,7 @@ void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, 
     sleep(3);
   }
 
-  delete func;
+  // delete func;
   delete gr;
 }
 
@@ -570,24 +568,15 @@ void SplineFCN::SaveAs(std::string name, const float * fx) {
   // gPad->SaveAs(name.c_str());
 }
 
-namespace SplineUtils {
-  Spline* gSpline = NULL;
-}
 
-double SplineUtils::Func2DWrapper(double * x, double * p) {
-  // std::cout << "2D Func Wrapper " << x[0] << " " << x[1] << std::endl;
-  return (*gSpline)(x, p);
-}
 
 void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, double * w, float * coeff, bool draw) {
 
   #pragma omp critical
   {
-  //  if (gSpline != spl) gSpline = spl;
-  if (SplineUtils::gSpline != spl)
-    SplineUtils::gSpline = spl;
 
-  TF2* f2 = new TF2("f2", Func2DWrapper, -30.0, 30.0, -30.0, 30.0, spl->GetNPar());
+  TF2* f2 = (TF2*) spl->GetFunction();
+
   TGraph2D* histmc = new TGraph2D(n, x, y, w);
   f2->SetNpx(400);
 
@@ -597,44 +586,15 @@ void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, 
   
   for (int i = 0; i < spl->GetNPar(); i++) {
     coeff[i] = f2->GetParameter(i);
-    //    std::cout << "Fit 2D Func " << i << " = " << coeff[i] << std::endl;
   }
 
-  delete f2;
+  // delete f2;
   delete histmc;
   }
 }
 
 
 void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float * coeff, bool draw) {
-
-  // TGraph2D* gr = new TGraph2D(n, x, y);
-  // double xmin = 99999.9;
-  // double xmax = -99999.9;
-  // double ymin = 99999.9;
-  // double ymax = -99999.9;
-  // for (int i = 0; i < n; i++) {
-  //   if (x[i] > xmax) xmax = x[i];
-  //   if (x[i] < xmin) xmin = x[i];
-  //   if (y[i] > ymax) ymax = y[i];
-  //   if (y[i] < ymin) ymin = y[i];
-  // }
-  // double xwidth = xmax - xmin;
-  // xmin = xmin - xwidth * 0.01;
-  // xmax = xmax + xwidth * 0.01;
-  // double ywidth = ymax - ymin;
-  // ymin = ymin - ywidth * 0.01;
-  // ymax = ymax + ywidth * 0.01;
-
-
-  // StopTalking();
-
-  // Build if not already in writer
-  // if (fSplineFCNs.find(spl) != fSplineFCNs.end()) {
-  //    fSplineFCNs.erase(spl);
-  // }
-  //    fSplineFCNs[spl] = new SplineFCN(spl, v, w);
-
 
   if (fSplineFunctors.find(spl) != fSplineFunctors.end()) {
     delete fSplineFunctors[spl];
@@ -652,14 +612,12 @@ void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double
   }
 
 
-
   if  (fSplineMinimizers.find(spl) == fSplineMinimizers.end()) {
     std::cout << "Building new ND minimizer for " << spl << std::endl;
     fSplineFCNs[spl] = new SplineFCN(spl, v, w);
 
     // fSplineFCNs[spl] = new SplineFCN(spl, v, w);
     fSplineFunctors[spl] = new ROOT::Math::Functor( *fSplineFCNs[spl], spl->GetNPar() );
-// fitclass = "GSLSimAn"; fittype = "";
     fSplineMinimizers[spl] = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Combined");
     fSplineMinimizers[spl]->SetMaxFunctionCalls(1E8);
     fSplineMinimizers[spl]->SetMaxIterations(1E8);
@@ -667,17 +625,8 @@ void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double
     fSplineMinimizers[spl]->SetStrategy(2);
 
     for (int j = 0; j < spl->GetNPar(); j++) {
-      if (j != 0) {
         fSplineMinimizers[spl]->SetVariable(j, Form("Par_%i", j), 0.1, 0.1);
-        // fSplineMinimizers[spl]->SetParameter(j, Form("Par_%i", j), 0.1, 0.1, -100.0, 100.0 );
-      } else {
-        fSplineMinimizers[spl]->SetVariable(j, Form("Par_%i", j), 1.0, 0.1);
-        // fSplineMinimizers[spl]->SetParameter(j, Form("Par_%i", j), 1.0, 0.1, -100.0, 100.0 );
-        // fSplineMinimizers[spl]->FixVariable(j);
-      }
     }
-    // fSplineMinimizers[spl]->SetFunction(*fSplineFunctors[spl]);
-    sleep(1);
   }
   // Create a new function for fitting.
   // StopTalking();
@@ -748,7 +697,6 @@ void SplineWriter::GetCoeff1DTSpline3(Spline * spl, int n, double * x, double * 
     coeff[i * 4 + 2] = d;
     coeff[i * 4 + 3] = e;
 
-    // std::cout << "Setting Spline Coeff Set " << i << " to " << y[i] << " " << c << " " << d << " " << e << std::endl;
   }
 
   if (draw) {

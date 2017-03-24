@@ -26,7 +26,9 @@
 
 <config cores='2' />
 <config spline_test_throws='50' />
-
+<config spline_cores='6' />
+<config spline_chunks='10' />
+<config spline_procchunk='-1' />
 <!-- # Input Configs -->
 <!-- # ###################################################### -->
 

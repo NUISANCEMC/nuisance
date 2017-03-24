@@ -25,16 +25,14 @@
 
 class ANL_CC1pi0_Evt_1DQ2_nu : public Measurement1D {
 public:
-  ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  virtual ~ANL_CC1pi0_Evt_1DQ2_nu() {};
-  
-  void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
-//  void ScaleEvents();
- // void FillHistograms();
+	ANL_CC1pi0_Evt_1DQ2_nu(nuiskey samplekey);
+	virtual ~ANL_CC1pi0_Evt_1DQ2_nu() {};
 
- private:
-  double HadCut;
+	void FillEventVariables(FitEvent *event);
+	bool isSignal(FitEvent *event);
+
+private:
+	double HadCut;
 };
-  
+
 #endif

@@ -19,55 +19,58 @@
 
 #include "ANL_CC1pi0_Evt_1DQ2_nu.h"
 
-// The constructor
-ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+//********************************************************************
+ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC1pi0_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0;
-  EnuMax = 1.5;
-  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG/W14/NOW";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1pi0 Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // User can specify W < 1.4 or no W cut
-  if (type.find("W14") != std::string::npos) {
-    HadCut = 1.4;
-  } else {
-    HadCut = 10.0;
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.DefineAllowedTargets("D,H");
 
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pi0_on_n/";
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1#pi^{0}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // Hadronic Cut Info
+  HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
-    DataLocation += "ANL_CC1pi0_on_n_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt" );
   } else {
-    //DataLocation += "ANL_CC1pi0_on_n_noEvents_Q2_noWcut_firstQ2rem.txt";
-    DataLocation += "ANL_CC1pi0_on_n_noEvents_Q2_noWcut_HighQ2Gone.txt";
-  }
-  // Get rid of the slashes in the type
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/data/ANL/CC1pi0_on_n/ANL_CC1pi0_on_n_noEvents_Q2_noWcut_HighQ2Gone.txt" );
   }
 
-  SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  FinaliseSampleSettings();
 
-  // Set Poisson errors on fDataHist (scanned does not have this)
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
+
+  // Plot Setup -------------------------------------------------------
+  SetDataValues( fSettings.GetDataInput() );
+
+  // set Poisson errors on fDataHist (scanned does not have this)
   // Simple counting experiment here
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
+    fDataHist->SetBinError(i + 1, sqrt(fDataHist->GetBinContent(i + 1)));
   }
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
 };
-
 
 void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
@@ -84,8 +87,8 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double q2CCpi0 = -1.0;
 
   // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < HadCut*1000.) {
-    q2CCpi0 = -1.0*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < HadCut * 1000.) {
+    q2CCpi0 = -1.0 * (Pnu - Pmu).Mag2() / 1.E6;
   }
 
   fXVar = q2CCpi0;

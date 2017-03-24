@@ -80,14 +80,5 @@ public:
 };
 
 
-namespace SplineUtils {
-
-  double Func2DWrapper(double* x, double* p);
-  extern Spline* gSpline;
-// return 1.0;
-// }
-// void FitCoeff2DGraph(Spline* spl, int n, double* x, double* y, double* z, float* coeff, bool draw);
-
-}
 
 #endif
