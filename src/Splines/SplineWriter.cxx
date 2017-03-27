@@ -170,6 +170,25 @@ void SplineWriter::GetWeightsForEvent(FitEvent* event, double* weights) {
   }
 }
 
+void SplineWriter::ReconfigureSet(int iset){
+  fCurrentSet = iset;
+  fRW->SetAllDials(&fParVect[iset][0], fParVect[iset].size());
+}
+
+
+double SplineWriter::GetWeightForThisSet(FitEvent* event, int iset){
+  if (iset != -1 and iset != fCurrentSet){
+    ReconfigureSet(iset);
+  }
+  return fRW->CalcWeight(event);
+}
+
+void SplineWriter::SetWeights(double* weights){
+  for (int i = 0; i < fParVect.size(); i++){
+    fWeightList[i] = weights[i];
+  }
+}
+
 
 void SplineWriter::FitSplinesForEvent(double* inputweights, float* coeff) {
 

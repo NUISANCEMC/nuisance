@@ -44,6 +44,9 @@ public:
 
   void GetWeightsForEvent(FitEvent* event, double* weights);
   void GetWeightsForEvent(FitEvent* event);
+  void ReconfigureSet(int iset);
+  double GetWeightForThisSet(FitEvent* event, int iset=-1);
+  void SetWeights(double* weights);
 
   inline int GetNWeights(){return fParVect.size();};
   inline int GetNPars(){ return fNCoEff;};
@@ -56,7 +59,7 @@ public:
   std::vector< int > fSetIndex;
   double* fWeightList;
   std::vector< std::vector<double> > fValList;
-
+  int fCurrentSet;
   FitWeight* fRW;
   bool fDrawSplines;
 

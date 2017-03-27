@@ -104,6 +104,7 @@ public:
   void TestEvents();
   void GenerateEventSplines();
   void GenerateEventWeights();
+  void GenerateEventWeightChunks(int procchunk = -1);
   void BuildEventSplines(int procchunk = -1);
   void MergeEventSplinesChunks();
   /* 

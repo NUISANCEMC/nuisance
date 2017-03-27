@@ -20,6 +20,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
       LOG(SAM) << "\t -> Found input file: " << inputs[inp_it] << std::endl;
     }
 
+    fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
+
     // Setup the TChain
     fGENIETree = new TChain("gtree");
 	
@@ -80,6 +82,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
     fGENIETree->SetBranchAddress("gmcrec",&fGenieNtpl);
 
     fNUISANCEEvent = new FitEvent(fGenieNtpl);
+    fNUISANCEEvent->HardReset();
     fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);
 
     // Normalise event histograms for relative flux contributions.
@@ -95,6 +98,14 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
 
     fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
     fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+
+    // Setup Max Events
+    if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
+      if (LOG_LEVEL(SAM)) {
+	std::cout << "\t\t|-> Read Max Entries : " << fMaxEvents << std::endl;
+      }
+      fNEvents = fMaxEvents;
+    }
 #endif
 };
 
@@ -144,7 +155,7 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p, int mode){
     phase space decay
   */
 
-	int state = kUndefinedState;
+  int state = kUndefinedState;
     switch (p->Status()) {
       case genie::kIStNucleonTarget:
       case genie::kIStInitialState:
@@ -192,16 +203,17 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p, int mode){
 #ifdef __GENIE_ENABLED__
 int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec){
 
-	if (gheprec->Summary()->ProcInfo().IsMEC()) {
-	    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-	      return 2;
-	    else if (pdg::IsAntiNeutrino(
-	                 gheprec->Summary()->InitState().ProbePdg()))
-	      return -2;
-	} else {
-	    return utils::ghep::NeutReactionCode(gheprec);
-	}
-	return 0;
+  if (gheprec->Summary()->ProcInfo().IsMEC()) {
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
+      return 2;
+    else if (pdg::IsAntiNeutrino(
+				 gheprec->Summary()->InitState().ProbePdg()))
+      return -2;
+  } else {
+    return 0;
+    //    return utils::ghep::NeutReactionCode(gheprec);
+  }
+  return 0;
 }
 #endif
 
@@ -241,7 +253,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics(){
     }
 
     // Initialise Extra NEUT Information in NUISANCE Event
-	bool save_extra = FitPar::Config().GetParB("save_extra_genie_info");
+    bool save_extra = false;//FitPar::Config().GetParB("save_extra_genie_info");
 	if (save_extra){
 		// Add one of these for each exta piece of information you
 		// add to FitEvent for specific generators.
