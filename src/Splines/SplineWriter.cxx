@@ -42,7 +42,7 @@ void SplineWriter::AddCoefficientsToTree(TTree* tr) {
 
 void SplineWriter::SetupSplineSet() {
   std::cout << "Setting up spline set" << std::endl;
-
+  fDrawSplines = FitPar::Config().GetParB("draw_splines");
   // Create the coefficients double*
   fNCoEff = 0;
   for (size_t i = 0; i < fAllSplines.size(); i++) {
@@ -405,10 +405,12 @@ void SplineWriter::FitCoeff(Spline * spl, std::vector< std::vector<double> >& v,
     break;
   }
 
-  // fSplineFCNs[spl] = new SplineFCN(spl, v, w);
-  // fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
-  // sleep(1);
-  // delete fSplineFCNs[spl];
+  if (fDrawSplines){
+    fSplineFCNs[spl] = new SplineFCN(spl, v, w);
+    fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
+    sleep(1);
+    delete fSplineFCNs[spl];
+  }
 
 }
 
@@ -514,7 +516,7 @@ void SplineFCN::SetCorrelated(bool state) {
 void SplineFCN::SaveAs(std::string name, const float * fx) {
 
 
-  if (fVal[0].size() != 2) {
+  if (fVal[0].size() > 2) {
     TCanvas* c1 = new TCanvas("c1", "c1", 800, 600);
     c1->Divide(2, 1);
     TH1D* histmc = new TH1D("hist", "hist", fVal.size(), 0.0, double(fVal.size()));
@@ -545,7 +547,7 @@ void SplineFCN::SaveAs(std::string name, const float * fx) {
     c1->Update();
     c1->SaveAs(name.c_str());
     delete c1;
-  } else {
+  } else if (fVal[0].size() == 2){
 
     TGraph2D* histmc = new TGraph2D();
     TGraph2D* histdt = new TGraph2D();
@@ -580,7 +582,44 @@ void SplineFCN::SaveAs(std::string name, const float * fx) {
     gPad->Update();
     c1->SaveAs(name.c_str());
     delete c1;
+  } else if (fVal[0].size() == 1){
+    
+    TGraph* histmc = new TGraph();
+    TGraph* histdt = new TGraph();
+    TGraph* histdif = new TGraph();
+
+    for (size_t i = 0; i < fVal.size(); i++) {
+      for (size_t j = 0; j < fVal[i].size(); j++) {
+        fSpl->Reconfigure(fVal[i][j], j);
+      }
+
+      histmc->SetPoint(histmc->GetN(), fVal[i][0], fSpl->DoEval(fx));
+      histdt->SetPoint(histdt->GetN(), fVal[i][0], fWeight[i]);
+      histdif->SetPoint(histdif->GetN(), fVal[i][0], fabs(fSpl->DoEval(fx) - fWeight[i]));
+
+    }
+    TCanvas* c1 = new TCanvas("c1", "c1", 800, 600);
+    c1->Divide(2, 1);
+    c1->cd(1);
+    histmc->SetTitle(("Spline;" + fSpl->GetName()).c_str());
+    histmc->Draw("AC");
+    histmc->SetLineColor(kRed);
+
+    histdt->SetTitle(("Raw;" + fSpl->GetName()).c_str());
+    histdt->Draw("SAME P");
+    histdt->SetMarkerStyle(20);
+    gPad->Update();
+
+    c1->cd(2);
+    histdif->SetTitle(("Dif;" + fSpl->GetName()).c_str());
+    histdif->Draw("APL");
+ 
+    gPad->Update();
+    c1->SaveAs(name.c_str());
+    delete c1;
+
   }
+
 
 
 

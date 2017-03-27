@@ -153,7 +153,7 @@ void GENIEWeightEngine::Reconfigure(bool silent) {
 
 double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	double rw_weight = 1.0;
-	return rw_weight;
+	
 #ifdef __GENIE_ENABLED__
 	// Skip Non GENIE
 	if (evt->fType != kGENIE) return 1.0;

@@ -954,7 +954,7 @@ void SplineRoutines::GenerateEventSplines() {
 
 
 
-    #pragma omp parallel for num_threads(ncores)
+    //    #pragma omp parallel for num_threads(ncores)
     for (int i = 0; i < nevents; i++) {
 
       //#pragma omp atomic
@@ -1181,7 +1181,7 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
 
 
       // Loop over ncores and process chunks
-      #pragma omp parallel for num_threads(ncores)
+      //      #pragma omp parallel for num_threads(ncores)
       for (int k = 0; k < neventsinchunk; k++) {
 
         if (weightcont[k]) {
@@ -1600,6 +1600,237 @@ void SplineRoutines::TestSplines_1DEventScan() {
     }
     std::cout << std::endl;
   }
+  
+  // Weight holders
+  double* rawweights = new double[scanparset_vals.size()];
+  double* splweights = new double[scanparset_vals.size()];
+  double* difweights = new double[scanparset_vals.size()];
+  int nweights = scanparset_vals.size();
+  int NParSets = scanparset_vals.size();
+
+  // Loop over all event I/O
+  std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
+  for (size_t i = 0; i < eventkeys.size(); i++) {
+    nuiskey key = eventkeys.at(i);
+
+    // Get I/O
+    std::string inputfilename  = key.GetS("input");
+    if (inputfilename.empty()) {
+      ERR(FTL) << "No input given for set of input events!" << std::endl;
+      throw;
+    }
+
+    std::string outputfilename = key.GetS("output");
+    if (outputfilename.empty()) {
+      outputfilename = inputfilename + ".nuisance.root";
+      ERR(FTL) << "No output give for set of output events! Saving to "
+               << outputfilename << std::endl;
+    }
+
+    // Make a new input handler
+    std::vector<std::string> file_descriptor =
+      GeneralUtils::ParseToStr(inputfilename, ":");
+    if (file_descriptor.size() != 2) {
+      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
+               << "\". expected \"FILETYPE:file.root\"" << std::endl;
+      throw;
+    }
+    InputUtils::InputType inptype =
+      InputUtils::ParseInputType(file_descriptor[0]);
+
+
+    // Make handlers for input and output
+    InputHandlerBase* input  = InputUtils::CreateInputHandler("rawevents", inptype, file_descriptor[1]);
+    InputHandlerBase* output =  InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input, outputfilename);
+
+    // Get Base Events for each case.
+    FitEvent* rawevent = input->FirstNuisanceEvent();
+    FitEvent* splevent = output->FirstNuisanceEvent();
+
+
+    // Setup outputfile
+    std::string outputtest = outputfilename + ".splinetest.1DEventScan.root";
+    TFile* outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
+    outputtestfile->cd();
+
+    // Save Parameter Sets
+    for (size_t i = 0; i < scanparset_hists.size(); i++) {
+      scanparset_hists[i]->Write(Form("Paramater_Set_%i", (int)i));
+    }
+
+    // Save a TTree of weights and differences.
+    TTree* weighttree = new TTree("weightscan", "weightscan");
+
+    // Make a branch for each weight set
+    for (size_t i = 0; i < scanparset_hists.size(); i++) {
+      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i], Form("RawWeights_Set_%i/D", (int)i) );
+      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i], Form("SplineWeights_Set_%i/D", (int)i) );
+      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i], Form("DifWeights_Set_%i/D", (int)i) );
+
+    }
+
+    // Count
+    int i = 0;
+    int nevents = input->GetNEvents();
+    int lasttime = time(NULL);
+
+    // Load N Chunks of the Weights into Memory
+    // Split into N processing chunks
+    int nchunks = FitPar::Config().GetParI("spline_chunks");
+    if (nchunks <= 0) nchunks = 1;
+    if (nchunks >= nevents / 2) nchunks = nevents / 2;
+    
+    std::cout << "Starting NChunks " << nchunks << std::endl;
+    for (int ichunk = 0; ichunk < nchunks; ichunk++) {
+
+      // Skip to only do one processing chunk
+      //      if (procchunk != -1 and procchunk != ichunk) continue;
+
+      LOG(FIT) << "On Processing Chunk " << ichunk << std::endl;
+      int neventsinchunk   = nevents / nchunks;
+      int loweventinchunk  = neventsinchunk * ichunk;
+      int higheventinchunk = neventsinchunk * (ichunk + 1);
+
+      double** allrawweights = new double*[neventsinchunk];
+      double** allsplweights = new double*[neventsinchunk];
+      double** alldifweights = new double*[neventsinchunk];
+      for (int k = 0; k < neventsinchunk; k++){
+        allrawweights[k] = new double[nweights];
+	allsplweights[k] = new double[nweights];
+	alldifweights[k] = new double[nweights];
+      }
+
+      // Start Set Processing Here.
+      for (int iset = 0; iset < nweights; iset++) {
+
+	// Reconfigure
+        fRW->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        fRW->Reconfigure();
+
+        // Reconfigure spline RW
+        splweight->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        splweight->Reconfigure();
+
+        splevent->fSplineRead->SetNeedsReconfigure(true);
+
+        // Could reorder this to save the weightconts in order instead of reconfiguring per event.
+        // Loop over all events and fill the TTree
+        for (int i = 0; i < neventsinchunk; i++){
+
+	  rawevent = input->GetNuisanceEvent(i+loweventinchunk);
+	  splevent = output->GetNuisanceEvent(i+loweventinchunk);
+
+	  allrawweights[i][iset] = fRW->CalcWeight(rawevent);
+	  allsplweights[i][iset] = splweight->CalcWeight(splevent);
+	  alldifweights[i][iset] = allsplweights[i][iset] - allrawweights[i][iset];
+        }
+	
+	std::ostringstream timestring;
+        int timeelapsed = time(NULL) - lasttime;
+        if  (timeelapsed) {
+          lasttime = time(NULL);
+
+          int setsleft = (nweights-iset-1) + (nweights * (nchunks - ichunk - 1));
+          float proj = (float(setsleft) *timeelapsed) / 60 / 60;
+          timestring << setsleft << " sets remaining. Last one took " << timeelapsed << ". " << proj << " hours remaining.";
+
+        }
+
+	LOG(REC) << "Processed Set " << iset << "/" << nweights <<" in chunk " << ichunk << "/" << nchunks << " " << timestring.str() << std::endl;
+
+      }
+
+      // Fill weights for this chunk into the TTree
+      for (int k = 0; k < neventsinchunk; k++){
+	for (int l = 0; l < nweights; l++){
+	  rawweights[l] = allrawweights[k][l];
+	  splweights[l] = allsplweights[k][l];
+	  difweights[l] = alldifweights[k][l];
+	}
+        weighttree->Fill();
+      }
+    }
+
+
+    // Loop over nchunks
+
+    // Loop over parameter sets
+    // Set All Dials and reconfigure
+
+    // Loop over events in chunk
+    // Fill Chunkweightcontainers
+    
+    // Once all dials are done, fill the weight tree
+    
+    // Iterator to next chunk
+    
+
+    outputtestfile->cd();
+    weighttree->Write();
+    outputtestfile->Close();
+  }
+}
+
+  
+
+
+
+
+/*
+  // Make a high resolution spline set.
+  std::vector<double> nomvals = fRW->GetDialValues();
+  int testres = FitPar::Config().GetParI("spline_test_resolution");
+
+  std::vector< std::vector<double> > scanparset_vals;
+  std::vector< TH1D* > scanparset_hists;
+
+  // Loop over all params
+  // Add Parameters
+  for (size_t i = 0; i < parameterkeys.size(); i++) {
+    nuiskey key = parameterkeys[i];
+
+    // Get Par Name
+    std::string name = key.GetS("name");
+
+    if (!key.Has("low") or !key.Has("high") or !key.Has("step")) {
+      continue;
+    }
+
+    // Push Back Scan
+    double low  = key.GetD("low");
+    double high = key.GetD("high");
+    double cur = low;
+    double step = key.GetD("step");
+
+    while (cur <= high) {
+
+      // Make new set
+      std::vector<double> newvals = nomvals;
+      newvals[i] = cur;
+
+      // Add to vects
+      scanparset_vals.push_back(newvals);
+
+      TH1D* parhist = (TH1D*)parhisttemplate->Clone();
+      for (size_t j = 0; j < newvals.size(); j++) {
+        parhist->SetBinContent(j + 1, newvals[j]);
+      }
+      scanparset_hists.push_back(parhist);
+
+
+      // Move to next one
+      cur += step;
+    }
+  }
+
+  // Print out the parameter set to test
+  for (int i = 0; i < scanparset_vals.size(); i++) {
+    std::cout << "Parset " << i;
+    for (int j = 0 ; j < scanparset_vals[i].size(); j++) {
+      std::cout << " " << scanparset_vals[i][j];
+    }
+    std::cout << std::endl;
+  }
 
 
   // Weight holders
@@ -1714,7 +1945,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
   }
 }
 
-
+*/
 
 //*************************************
 void SplineRoutines::TestSplines_NDEventThrow() {
