@@ -19,27 +19,47 @@
 
 #include "BEBC_CC1npim_XSec_1DQ2_antinu.h"
 
-// The constructor
-BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  fName = "BEBC_CC1npim_XSec_1DQ2_antinu";
-  fPlotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/neutron)";
-  EnuMin = 5.;
-  EnuMax = 200.;
-  fIsDiag = true;
-  fNormError = 0.20;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+BEBC_CC1npim_XSec_1DQ2_antinu::BEBC_CC1npim_XSec_1DQ2_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BEBC/Dfill/BEBC_Dfill_CC1pi-_on_n_W14_edit.txt");
-  this->SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BEBC_CC1npim_XSec_1DQ2_antinu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2}/neutron)");
+  fSettings.SetAllowedTypes("FIX/FREE,SHAPE/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(5.0, 200.0);
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("BEBC_CC1npim_XSec_1DQ2_antinu");
+  fSettings.DefineAllowedSpecies("numub");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/BEBC/Dfill/BEBC_Dfill_CC1pi-_on_n_W14_edit.txt" );
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*2./1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
 
   hadMassHist = new TH1D((fName+"_Wrec").c_str(),(fName+"_Wrec").c_str(), 100, 1000, 2000);
   hadMassHist->SetTitle((fName+"; W_{rec} (GeV/c^{2}); Area norm. # of events").c_str());
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*this->TotalIntegratedFlux("width"))*16./8.;
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 
@@ -72,7 +92,7 @@ bool BEBC_CC1npim_XSec_1DQ2_antinu::isSignal(FitEvent *event) {
 void BEBC_CC1npim_XSec_1DQ2_antinu::FillHistograms() {
 
   Measurement1D::FillHistograms();
-
+  
   hadMassHist->Fill(hadMass);
 
   return;
@@ -81,6 +101,7 @@ void BEBC_CC1npim_XSec_1DQ2_antinu::FillHistograms() {
 void BEBC_CC1npim_XSec_1DQ2_antinu::Write(std::string drawOpt) {
 
   Measurement1D::Write(drawOpt);
+
   hadMassHist->Scale(1/hadMassHist->Integral());
   hadMassHist->Write();
 

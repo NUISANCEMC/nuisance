@@ -19,26 +19,46 @@
 
 #include "BEBC_CC1npim_XSec_1DEnu_antinu.h"
 
-// The constructor
-BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  fName = "BEBC_CC1npim_XSec_1DEnu_antinu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
-  EnuMin = 5.;
-  EnuMax = 200.;
-  fIsDiag = true;
-  fNormError = 0.20;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BEBC/theses/BEBC_theses_ANU_CC1pi-_nFin_W14.txt");
-  this->SetupDefaultHist();
+//********************************************************************
+BEBC_CC1npim_XSec_1DEnu_antinu::BEBC_CC1npim_XSec_1DEnu_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BEBC_CC1npim_XSec_1DEnu_antinu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/neutron)");
+  fSettings.SetAllowedTypes("FIX/FREE,SHAPE/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(5.0, 200.0);
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("BEBC_CC1npim_XSec_1DEnu_antinu");
+  fSettings.DefineAllowedSpecies("numub");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/BEBC/theses/BEBC_theses_ANU_CC1pi-_nFin_W14.txt" );
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 void BEBC_CC1npim_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
 

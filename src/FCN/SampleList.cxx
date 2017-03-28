@@ -214,50 +214,50 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       BEBC Samples
     */
   } else if (!name.compare("BEBC_CCQE_XSec_1DQ2_nu")) {
-    return (new BEBC_CCQE_XSec_1DQ2_nu(name, file, rw, type, fkdt));
+    return (new BEBC_CCQE_XSec_1DQ2_nu(samplekey));
     /*
       BEBC CC1ppip samples
     */
   } else if (!name.compare("BEBC_CC1ppip_XSec_1DEnu_nu")) {
-    return (new BEBC_CC1ppip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BEBC_CC1ppip_XSec_1DQ2_nu")) {
-    return (new BEBC_CC1ppip_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1ppip_XSec_1DQ2_nu(samplekey));
     /*
       BEBC CC1npip samples
     */
   } else if (!name.compare("BEBC_CC1npip_XSec_1DEnu_nu")) {
-    return (new BEBC_CC1npip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1npip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BEBC_CC1npip_XSec_1DQ2_nu")) {
-    return (new BEBC_CC1npip_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1npip_XSec_1DQ2_nu(samplekey));
     /*
       BEBC CC1pi0 samples
     */
   } else if (!name.compare("BEBC_CC1pi0_XSec_1DEnu_nu")) {
-    return (new BEBC_CC1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1pi0_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BEBC_CC1pi0_XSec_1DQ2_nu")) {
-    return (new BEBC_CC1pi0_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new BEBC_CC1pi0_XSec_1DQ2_nu(samplekey));
     /*
       BEBC CC1npim samples
     */
   } else if (!name.compare("BEBC_CC1npim_XSec_1DEnu_antinu")) {
-    return (new BEBC_CC1npim_XSec_1DEnu_antinu(file, rw, type, fkdt));
+    return (new BEBC_CC1npim_XSec_1DEnu_antinu(samplekey));
   } else if (!name.compare("BEBC_CC1npim_XSec_1DQ2_antinu")) {
-    return (new BEBC_CC1npim_XSec_1DQ2_antinu(file, rw, type, fkdt));
+    return (new BEBC_CC1npim_XSec_1DQ2_antinu(samplekey));
     /*
       BEBC CC1ppim samples
     */
   } else if (!name.compare("BEBC_CC1ppim_XSec_1DEnu_antinu")) {
-    return (new BEBC_CC1ppim_XSec_1DEnu_antinu(file, rw, type, fkdt));
+    return (new BEBC_CC1ppim_XSec_1DEnu_antinu(samplekey));
   } else if (!name.compare("BEBC_CC1ppim_XSec_1DQ2_antinu")) {
-    return (new BEBC_CC1ppim_XSec_1DQ2_antinu(file, rw, type, fkdt));
+    return (new BEBC_CC1ppim_XSec_1DQ2_antinu(samplekey));
 
     /*
       GGM CC1ppip samples
     */
   } else if (!name.compare("GGM_CC1ppip_XSec_1DEnu_nu")) {
-    return (new GGM_CC1ppip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new GGM_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("GGM_CC1ppip_Evt_1DQ2_nu")) {
-    return (new GGM_CC1ppip_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new GGM_CC1ppip_Evt_1DQ2_nu(samplekey));
 
     /*
       MiniBooNE Samples

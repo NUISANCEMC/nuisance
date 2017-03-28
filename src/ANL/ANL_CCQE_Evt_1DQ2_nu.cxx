@@ -37,8 +37,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
   fSettings.SetEnuRange(0.0, 6.0);
   fSettings.DefineAllowedTargets("D,H");
-  fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/ANL/ANL_CCQE_Data_PRL31_844.root");
-  fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
+
   // plot information
   fSettings.SetTitle("ANL #nu_mu CCQE");
   fSettings.DefineAllowedSpecies("numu");

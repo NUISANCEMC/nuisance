@@ -19,33 +19,47 @@
 
 #include "GGM_CC1ppip_Evt_1DQ2_nu.h"
 
-// The constructor
-GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "GGM_CC1ppip_Evt_1DQ2_nu";
-  // could replace with fName = std::string(__FILE__).substr(0, std::string(__FILE__).find_last_of("."))
-  fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
-  EnuMin = 1;
-  EnuMax = 10;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/GGM/CC1pip_on_p/GGM_CC1ppip_Q2_events_bin_edit.txt");
-  this->SetupDefaultHist();
+//********************************************************************
+GGM_CC1ppip_Evt_1DQ2_nu::GGM_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "GGM_CC1ppip_Evt_1DQ2_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC1#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(1.0, 10.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
-};
+  // plot information
+  fSettings.SetTitle("GGM_CC1ppip_Evt_1DQ2_nu");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "GGM/CC1pip_on_p/GGM_CC1ppip_Q2_events_bin_edit.txt");
 
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor for shape
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents+0.)*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
+}
 
 void GGM_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
