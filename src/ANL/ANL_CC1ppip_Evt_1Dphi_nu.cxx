@@ -45,7 +45,7 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(nuiskey samplekey) {
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_phiAdler_1982.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_phiAdler_1982.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

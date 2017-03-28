@@ -81,7 +81,7 @@
 #include "FNAL_CC1ppip_XSec_1DEnu_nu.h"
 #include "FNAL_CC1ppip_XSec_1DQ2_nu.h"
 // FNAL CC1ppim
-//#include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
+#include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
 
 // BEBC CCQE
 #include "BEBC_CCQE_XSec_1DQ2_nu.h"

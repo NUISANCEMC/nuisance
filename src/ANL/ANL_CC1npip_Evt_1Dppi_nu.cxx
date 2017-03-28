@@ -40,7 +40,7 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
 
   // plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

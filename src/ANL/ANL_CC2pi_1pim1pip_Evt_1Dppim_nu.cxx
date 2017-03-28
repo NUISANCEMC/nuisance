@@ -46,7 +46,7 @@ ANL_CC2pi_1pim1pip_Evt_1Dppim_nu::ANL_CC2pi_1pim1pip_Evt_1Dppim_nu(nuiskey sampl
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip_ppim_weight.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip_ppim_weight.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

@@ -45,7 +45,7 @@ ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(nuiskey sampl
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC2#pi");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_xsec.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_xsec.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

@@ -24,14 +24,11 @@
 
 class FNAL_CC1ppip_XSec_1DQ2_nu : public Measurement1D {
 public:
-  FNAL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  FNAL_CC1ppip_XSec_1DQ2_nu(nuiskey samplekey);
   virtual ~FNAL_CC1ppip_XSec_1DQ2_nu() {};
 
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
-
 
  private:
 

@@ -19,34 +19,46 @@
 
 #include "BNL_CC1npip_Evt_1DQ2_nu.h"
 
-// The constructor
-BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "BNL_CC1npip_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0.;
-  EnuMax = 3.;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fAllowedTypes += "EVT";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  //SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_firstQ2rem.txt");
-  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_HighQ2Gone.txt");
-  SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BNL_CC1npip_Evt_1DQ2_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("BNL_CC1npip_Evt_1DQ2_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/BNL/CC1pip_on_n/BNL_CC1pip_on_n_noEvents_q2_noWcut_HighQ2Gone.txt" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 void BNL_CC1npip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
@@ -69,27 +81,3 @@ bool BNL_CC1npip_Evt_1DQ2_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi3Prong(event, 14, 211, 2112, EnuMin, EnuMax);
 }
 
-
-/*
-void BNL_CC1npip_Evt_1DQ2_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void BNL_CC1npip_Evt_1DQ2_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

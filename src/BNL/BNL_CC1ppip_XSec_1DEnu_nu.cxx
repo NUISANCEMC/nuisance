@@ -19,51 +19,61 @@
 
 #include "BNL_CC1ppip_XSec_1DEnu_nu.h"
 
-// The constructor
-BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "BNL_CC1ppip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
-  EnuMin = 0.;
-  EnuMax = 3.0;
-  fIsDiag = true;
-  fNormError = 0.15;
-  fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BNL_CC1ppip_XSec_1DEnu_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // User can give option of corrected BNL data or not
-  // The correction follows Wilkinson & Rodriguez et al.
-  // Currently I've only implemented no W cut data but will implement the W < 1.4
-  if (type.find("UNCORR") != std::string::npos) {
-    UseCorrectedData = false;
-  } else {
-    UseCorrectedData = true;
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma (cm^{2}/proton)");
+  fSettings.SetAllowedTypes("FIX/DIAG", "FIX,FREE,SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetS("norm_error", "0.15");
+  fSettings.DefineAllowedTargets("D,H");
 
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/";
+  // plot information
+  fSettings.SetTitle("BNL_CC1ppip_XSec_1DEnu_nu");
+  fSettings.DefineAllowedSpecies("numu");
 
+  // User can specifiy to use uncorrected data
+  UseCorrectedData = !fSettings.Found("name", "Uncorr");
+
+  // Now read in different data depending on what the user has specified
+  std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/BNL/CC1pip_on_p/";
+
+  // If we're using corrected data
   if (UseCorrectedData) {
     DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
-    EnuMax = 6.0;
+    fSettings.SetEnuRange(0.0, 6.0);
+
+    // If we're using raw uncorrected data
   } else {
     DataLocation += "BNL_CC1pip_on_p_1986.txt";
-    EnuMax = 3.0;
+    fSettings.SetEnuRange(0.0, 3.0);
   }
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
-  }
+  fSettings.SetDataInput(DataLocation);
 
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  FinaliseSampleSettings();
 
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/proton
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / ((fNEvents + 0.)) * 2. / 1.;
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
 
-  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -79,7 +89,7 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   //double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
-  Enu = Pnu.E()/1000.;
+  Enu = Pnu.E() / 1000.;
   fXVar = Enu;
 
   return;
@@ -89,26 +99,3 @@ bool BNL_CC1ppip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
 }
 
-/*
-void BNL_CC1ppip_XSec_1DEnu_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void BNL_CC1ppip_XSec_1DEnu_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

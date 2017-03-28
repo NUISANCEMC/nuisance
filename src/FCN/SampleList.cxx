@@ -13,7 +13,6 @@ MeasurementBase* CreateSample(std::string name, std::string file,
   samplekey.AddS("input", file);
   samplekey.AddS("type", type);
 
-  // std::cout << "Created SampleKey " << name <<  " " << samplekey.GetS("name") << std::endl;
   return CreateSample(samplekey);
 }
 
@@ -25,7 +24,6 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
 
-  // std::cout << "Creating sample from name = " << name << std::endl;
   /*
      ANL CCQE Samples
   */
@@ -146,71 +144,71 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       ArgoNeut Samples
     */
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
-    return (
-             new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(file, rw, type, fkdt));
+    return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
-    return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(file, rw, type, fkdt));
+    return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_antinu")) {
-    return (
-             new ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(file, rw, type, fkdt));
+    return (new ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_nu")) {
-    return (
-             new ArgoNeuT_CCInc_XSec_1Dthetamu_nu(file, rw, type, fkdt));
+    return (new ArgoNeuT_CCInc_XSec_1Dthetamu_nu(samplekey));
+
     /*
       BNL Samples
     */
   } else if (!name.compare("BNL_CCQE_XSec_1DEnu_nu")) {
-    return (new BNL_CCQE_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new BNL_CCQE_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CCQE_Evt_1DQ2_nu")) {
-    return (new BNL_CCQE_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new BNL_CCQE_Evt_1DQ2_nu(samplekey));
+
     /*
       BNL CC1ppip samples
     */
-  } else if (!name.compare("BNL_CC1ppip_XSec_1DEnu_nu")) {
-    return (new BNL_CC1ppip_XSec_1DEnu_nu(file, rw, type, fkdt));
-  } else if (!name.compare("BNL_CC1ppip_Evt_1DQ2_nu")) {
-    return (new BNL_CC1ppip_Evt_1DQ2_nu(file, rw, type, fkdt));
+  } else if (!name.compare("BNL_CC1ppip_XSec_1DEnu_nu") ||
+             !name.compare("BNL_CC1ppip_XSec_1DEnu_nu_Uncorr")) {
+    return (new BNL_CC1ppip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC1ppip_Evt_1DQ2_nu") ||
+             !name.compare("BNL_CC1ppip_Evt_1DQ2_nu_W14Cut")) {
+    return (new BNL_CC1ppip_Evt_1DQ2_nu(samplekey));
   } else if (!name.compare("BNL_CC1ppip_Evt_1DcosthAdler_nu")) {
-    return (
-             new BNL_CC1ppip_Evt_1DcosthAdler_nu(file, rw, type, fkdt));
+    return (new BNL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
   } else if (!name.compare("BNL_CC1ppip_Evt_1Dphi_nu")) {
-    return (new BNL_CC1ppip_Evt_1Dphi_nu(file, rw, type, fkdt));
+    return (new BNL_CC1ppip_Evt_1Dphi_nu(samplekey));
 
     /*
       BNL CC1npip samples
     */
-  } else if (!name.compare("BNL_CC1npip_XSec_1DEnu_nu")) {
-    return (new BNL_CC1npip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("BNL_CC1npip_XSec_1DEnu_nu") ||
+             !name.compare("BNL_CC1npip_XSec_1DEnu_nu_Uncorr")) {
+    return (new BNL_CC1npip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC1npip_Evt_1DQ2_nu")) {
-    return (new BNL_CC1npip_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new BNL_CC1npip_Evt_1DQ2_nu(samplekey));
     /*
       BNL CC1pi0 samples
     */
   } else if (!name.compare("BNL_CC1pi0_XSec_1DEnu_nu")) {
-    return (new BNL_CC1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new BNL_CC1pi0_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC1pi0_Evt_1DQ2_nu")) {
-    return (new BNL_CC1pi0_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new BNL_CC1pi0_Evt_1DQ2_nu(samplekey));
 
     /*
       FNAL Samples
     */
   } else if (!name.compare("FNAL_CCQE_Evt_1DQ2_nu")) {
-    return (new FNAL_CCQE_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new FNAL_CCQE_Evt_1DQ2_nu(samplekey));
     /*
       FNAL CC1ppip
     */
   } else if (!name.compare("FNAL_CC1ppip_XSec_1DEnu_nu")) {
-    return (new FNAL_CC1ppip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new FNAL_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("FNAL_CC1ppip_XSec_1DQ2_nu")) {
-    return (new FNAL_CC1ppip_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new FNAL_CC1ppip_XSec_1DQ2_nu(samplekey));
   } else if (!name.compare("FNAL_CC1ppip_Evt_1DQ2_nu")) {
-    return (new FNAL_CC1ppip_Evt_1DQ2_nu(file, rw, type, fkdt));
+    return (new FNAL_CC1ppip_Evt_1DQ2_nu(samplekey));
     /*
       FNAL CC1ppim
     */
-    //    } else if (!name.compare("FNAL_CC1ppim_XSec_1DEnu_antinu")) {
-    //      return (new FNAL_CC1ppim_XSec_1DEnu_antinu(file, rw, type,
-    //      fkdt));
+  } else if (!name.compare("FNAL_CC1ppim_XSec_1DEnu_antinu")) {
+    return (new FNAL_CC1ppim_XSec_1DEnu_antinu(samplekey));
 
     /*
       BEBC Samples

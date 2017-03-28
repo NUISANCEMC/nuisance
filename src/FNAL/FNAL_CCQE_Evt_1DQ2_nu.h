@@ -21,6 +21,7 @@
 #define FNAL_CCQE_Evt_1DQ2_NU_H_SEEN
 
 #include "Measurement1D.h"
+#include "CustomVariableBoxes.h"
 
 //********************************************************************
 class FNAL_CCQE_Evt_1DQ2_nu : public Measurement1D {
@@ -28,24 +29,35 @@ class FNAL_CCQE_Evt_1DQ2_nu : public Measurement1D {
 
 public:
 
-  FNAL_CCQE_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
-  virtual ~FNAL_CCQE_Evt_1DQ2_nu() {}; 
+  FNAL_CCQE_Evt_1DQ2_nu(nuiskey samplekey);
+  virtual ~FNAL_CCQE_Evt_1DQ2_nu() {};
   
-  void FillEventVariables(FitEvent *event);       
-  bool isSignal(FitEvent *event);                 
+  /// \brief Get Q2 assuming QE
+  void FillEventVariables(FitEvent *event);
+
+  /// \brief Get True CCQE
+  bool isSignal(FitEvent *event);
+
+  /// \brief Fill main histograms and correction histograms             
   void FillHistograms();
-  void Write(std::string drawOpt);
-  void ResetAll();
+
+  /// \brief scale the MC Hist and correction histograms
   void ScaleEvents();
 
+  /// \brief Use Q2 Box to save correction info
+  inline Q2VariableBox1D* GetQ2Box(){ return static_cast<Q2VariableBox1D*>(GetBox()); };
+
+  /// \brief Create Q2 Box to save correction info
+  inline MeasurementVariableBox* CreateBox(){ return new Q2VariableBox1D(); };
+
  private:
+
   bool applyQ2correction; ///< Flag of whether deut correction applied
   TH1D* CorrectionHist; ///< Correction factor
   TH1D* fMCHist_NoCorr; ///< Uncorrected fMCHist
-  double q2qe;       ///< fXVar
-  double scaleF; ///< Nominal Scale Factor
 
+  double ThetaMu;
+  double q2qe;
 
-};
-  
+};  
 #endif

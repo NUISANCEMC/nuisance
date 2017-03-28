@@ -19,34 +19,48 @@
 
 #include "BNL_CC1pi0_Evt_1DQ2_nu.h"
 
-// The constructor
-BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "BNL_CC1pi0_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0;
-  EnuMax = 6.0;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fAllowedTypes += "EVT";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  //SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_firstQ2rem.txt");
-  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_HighQ2Gone.txt");
-  SetupDefaultHist();
+//********************************************************************
+BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BNL_CC1pi0_Evt_1DQ2_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
+  // CCQELike plot information
+  fSettings.SetTitle("BNL_CC1pi0_Evt_1DQ2_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/BNL/CC1pi0_on_n/BNL_CC1pi0_on_n_noEvents_q2_noWcut_HighQ2Gone.txt" );
+  fSettings.DefineAllowedSpecies("numu");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
-};
 
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
+};
 
 void BNL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 

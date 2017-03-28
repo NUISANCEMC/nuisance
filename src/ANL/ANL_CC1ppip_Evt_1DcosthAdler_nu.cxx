@@ -45,7 +45,7 @@ ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(nuiskey samplek
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_costhAdler_1982.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_costhAdler_1982.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

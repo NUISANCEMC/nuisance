@@ -24,13 +24,11 @@
 
 class BNL_CC1npip_Evt_1DQ2_nu : public Measurement1D {
 public:
-  BNL_CC1npip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  BNL_CC1npip_Evt_1DQ2_nu(nuiskey samplekey);
   virtual ~BNL_CC1npip_Evt_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
 
  private:
 };

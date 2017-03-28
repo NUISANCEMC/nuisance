@@ -45,6 +45,9 @@ public:
   /// \brief Fill main histograms and correction histograms             
   void FillHistograms();
 
+  /// \brief scale normal MC and corrected MC
+  void ScaleEvents();
+  
   /// \brief Use Q2 Box to save correction info
   inline Q2VariableBox1D* GetQ2Box(){ return static_cast<Q2VariableBox1D*>(GetBox()); };
 

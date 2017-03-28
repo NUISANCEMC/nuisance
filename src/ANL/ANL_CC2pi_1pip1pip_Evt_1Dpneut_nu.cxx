@@ -46,7 +46,7 @@ ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu::ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(nuiskey sam
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC2#pi");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_pNeutron_weight.csv");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_pNeutron_weight.csv");
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();

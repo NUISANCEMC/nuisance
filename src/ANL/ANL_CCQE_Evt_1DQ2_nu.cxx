@@ -37,7 +37,8 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
   fSettings.SetEnuRange(0.0, 6.0);
   fSettings.DefineAllowedTargets("D,H");
-
+  fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/ANL/ANL_CCQE_Data_PRL31_844.root");
+  fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
   // plot information
   fSettings.SetTitle("ANL #nu_mu CCQE");
   fSettings.DefineAllowedSpecies("numu");
@@ -60,6 +61,10 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
 
   // is Q2 Correction applied
   applyQ2correction = fSettings.Found("type", "Q2CORR");
+  if (applyQ2correction) {
+    fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/ANL/ANL_CCQE_Data_PRL31_844.root");
+    fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
+  }
 
   FinaliseSampleSettings();
 
@@ -141,3 +146,16 @@ void ANL_CCQE_Evt_1DQ2_nu::FillHistograms() {
 
 }
 
+//********************************************************************
+void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents() {
+//********************************************************************
+
+  Measurement1D::ScaleEvents();
+
+  // Flux unfold our extra histogram
+  if (applyQ2correction) {
+    if (fMCHist_NoCorr->Integral()) {
+      fMCHist_NoCorr->Scale(fDataHist->Integral() / fMCHist_NoCorr->Integral());
+    }
+  }
+}

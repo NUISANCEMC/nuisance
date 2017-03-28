@@ -24,14 +24,11 @@
 
 class FNAL_CC1ppim_XSec_1DEnu_antinu : public Measurement1D {
 public:
-  FNAL_CC1ppim_XSec_1DEnu_antinu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  FNAL_CC1ppim_XSec_1DEnu_antinu(nuiskey samplekey);
   virtual ~FNAL_CC1ppim_XSec_1DEnu_antinu() {};
 
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
-
 
  private:
 

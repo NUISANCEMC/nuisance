@@ -44,7 +44,7 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(nuiskey samplekey
 
   // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/NC1ppim/ANL_NC1ppim_cosMuStar.csv" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
