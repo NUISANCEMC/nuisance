@@ -42,6 +42,7 @@ SplineInputHandler.cxx
 MeasurementVariableBox.cxx
 MeasurementVariableBox2D.cxx
 MeasurementVariableBox1D.cxx
+CustomVariableBoxes.h
 )
 
 set(HEADERFILES
@@ -62,6 +63,7 @@ SplineInputHandler.h
 MeasurementVariableBox.h
 MeasurementVariableBox2D.h
 MeasurementVariableBox1D.h
+CustomVariableBoxes.h
 )
 
 set(LIBNAME FitBase)

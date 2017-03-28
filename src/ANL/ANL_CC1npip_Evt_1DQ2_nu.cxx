@@ -60,14 +60,10 @@ ANL_CC1npip_Evt_1DQ2_nu::ANL_CC1npip_Evt_1DQ2_nu(nuiskey samplekey) {
   fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
-
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i + 1, sqrt(fDataHist->GetBinContent(i + 1)));
-  }
-
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+  
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 

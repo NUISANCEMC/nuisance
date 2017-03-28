@@ -31,21 +31,28 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   */
 
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu") ||
+      !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRD26") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRL31") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRD16")) {
-    return (new ANL_CCQE_XSec_1DEnu_nu(name, file, rw, type, fkdt));
+    return (new ANL_CCQE_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_CCQE_Evt_1DQ2_nu") ||
              !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRL31") ||
+             !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD26") ||
              !name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD16")) {
-    return (new ANL_CCQE_Evt_1DQ2_nu(name, file, rw, type, fkdt));
+    return (new ANL_CCQE_Evt_1DQ2_nu(samplekey));
     /*
       ANL CC1ppip samples
     */
-  } else if (!name.compare("ANL_CC1ppip_XSec_1DEnu_nu")) {
-    return (new ANL_CC1ppip_XSec_1DEnu_nu(file, rw, type, fkdt));
+  } else if (!name.compare("ANL_CC1ppip_XSec_1DEnu_nu") ||
+             !name.compare("ANL_CC1ppip_XSec_1DEnu_nu_W14Cut") ||
+             !name.compare("ANL_CC1ppip_XSec_1DEnu_nu_Uncorr") ||
+             !name.compare("ANL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr") ||
+             !name.compare("ANL_CC1ppip_XSec_1DEnu_nu_W16Cut_Uncorr")) {
+    return (new ANL_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_XSec_1DQ2_nu")) {
-    return (new ANL_CC1ppip_XSec_1DQ2_nu(file, rw, type, fkdt));
-  } else if (!name.compare("ANL_CC1ppip_Evt_1DQ2_nu")) {
+    return (new ANL_CC1ppip_XSec_1DQ2_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DQ2_nu") ||
+             !name.compare("ANL_CC1ppip_Evt_1DQ2_nu_W14Cut")) {
     return (new ANL_CC1ppip_Evt_1DQ2_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_Evt_1Dppi_nu")) {
     return (new ANL_CC1ppip_Evt_1Dppi_nu(samplekey));
@@ -54,8 +61,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("ANL_CC1ppip_Evt_1DcosmuStar_nu")) {
     return (new ANL_CC1ppip_Evt_1DcosmuStar_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_Evt_1DcosthAdler_nu")) {
-    return (
-             new ANL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
+    return (new ANL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_Evt_1Dphi_nu")) {
     return (new ANL_CC1ppip_Evt_1Dphi_nu(samplekey));
     /*
@@ -92,50 +98,53 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       ANL NC1npip sample
     */
   } else if (!name.compare("ANL_NC1npip_Evt_1Dppi_nu")) {
-    return (new ANL_NC1npip_Evt_1Dppi_nu(file, rw, type, fkdt));
+    return (new ANL_NC1npip_Evt_1Dppi_nu(samplekey));
     /*
       ANL NC1ppim sample
     */
   } else if (!name.compare("ANL_NC1ppim_XSec_1DEnu_nu")) {
-    return (new ANL_NC1ppim_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new ANL_NC1ppim_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_NC1ppim_Evt_1DcosmuStar_nu")) {
-    return (new ANL_NC1ppim_Evt_1DcosmuStar_nu(file, rw, type, fkdt));
+    return (new ANL_NC1ppim_Evt_1DcosmuStar_nu(samplekey));
     /*
       ANL CC2pi sample
     */
   } else if (!name.compare("ANL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
-    return (new   ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pim1pip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu")) {
-    return (new   ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppip_nu")) {
-    return (new   ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dppim_nu")) {
-    return (new   ANL_CC2pi_1pim1pip_Evt_1Dppim_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pim1pip_Evt_1Dppim_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu")) {
-    return (new   ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu(samplekey));
 
   } else if (!name.compare("ANL_CC2pi_1pip1pip_XSec_1DEnu_nu")) {
-    return (new   ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu")) {
-    return (new   ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu")) {
-    return (new   ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu")) {
-    return (new   ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu")) {
-    return (new   ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu(samplekey));
 
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu")) {
-    return (new   ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu")) {
-    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu")) {
-    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu")) {
-    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu(samplekey));
   } else if (!name.compare("ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu")) {
-    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(file, rw, type, fkdt));
+    return (new   ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu(samplekey));
 
+    /*
+      ArgoNeut Samples
+    */
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
     return (
              new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(file, rw, type, fkdt));

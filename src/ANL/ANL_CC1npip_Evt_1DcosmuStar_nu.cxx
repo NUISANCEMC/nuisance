@@ -50,7 +50,9 @@ ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(nuiskey samplekey
   fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

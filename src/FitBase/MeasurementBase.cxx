@@ -184,7 +184,7 @@ void MeasurementBase::Reconfigure() {
   int npassed = 0;
   while(cust_event){
 
-    cust_event->RWWeight = FitBase::GetRW()->CalcWeight(cust_event);
+    cust_event->RWWeight = fRW->CalcWeight(cust_event);
     cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
 
     Weight = cust_event->Weight;
@@ -300,7 +300,7 @@ void MeasurementBase::ConvertEventRates() {
   ScaleExtraHistograms(GetBox());
   this->ScaleEvents();
 
-  double normval = FitBase::GetRW()->GetSampleNorm(this->fName);
+  double normval = fRW->GetSampleNorm(this->fName);
   if (normval < 0.01 or normval > 10.0){
     ERR(WRN) << "Norm Value inside MeasurementBase::ConvertEventRates() looks off!" << std::endl;
     ERR(WRN) << "It could have become out of sync with the minimizer norm list." << std::endl;
@@ -335,7 +335,7 @@ void MeasurementBase::Renormalise() {
   // reweight dials
   // Means we don't have to call the time consuming reconfigure when this
   // happens.
-  double norm = FitBase::GetRW()->GetDialValue(this->fName + "_norm");
+  double norm = fRW->GetDialValue(this->fName + "_norm");
 
   if ((this->fCurrentNorm == 0.0 and norm != 0.0) or not fMCFilled) {
     this->ReconfigureFast();

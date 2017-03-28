@@ -24,33 +24,47 @@
 
 #include "ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu.h"
 
-// The constructor
-ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu::ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu::ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu";
-  fPlotTitles = "; p_{#mu} (GeV); Number of events (area norm.)";
-  EnuMin = 0.;
-  EnuMax = 6.0;
-  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  fIsRawEvents = true;
-  fNormError = 0.20; // normalisation error on ANL BNL flux
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // there's also _unweight rather than weight data file
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip_pMu_weight.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#mu} (GeV)");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("ANL #nu_mu CC2#pi");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip_pMu_weight.csv" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  for (int i = 0; i < fDataHist->GetNbinsX()+1; ++i) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  FinaliseSampleSettings();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
+
 
 
 

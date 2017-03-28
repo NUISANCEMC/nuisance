@@ -25,7 +25,7 @@
 class ANL_CC1ppip_XSec_1DEnu_nu : public Measurement1D {
 
 public:
-  ANL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  ANL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey);
   virtual ~ANL_CC1ppip_XSec_1DEnu_nu() {};
 
   void FillEventVariables(FitEvent *event);

@@ -25,14 +25,11 @@
 class ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu : public Measurement1D {
 
 public:
-  ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu(nuiskey samplekey);
   virtual ~ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  //void ScaleEvents();
-  //void FillHistograms();
-
 
  private:
 

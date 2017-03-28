@@ -22,35 +22,49 @@
   * M. Derrick et al., "Study of the reaction \nu n \rightarrow \nu p \pi^-", Physics Letters, Volume 92B, Number 3,4, 363, 19 May 1980
 */
 
-ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+//********************************************************************
+ANL_NC1ppim_XSec_1DEnu_nu::ANL_NC1ppim_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_NC1ppim_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu};#sigma(E_{#nu}) (cm^{2}/nucleon)";
-  EnuMin = 0.3;
-  EnuMax = 1.5;
-  fIsDiag = true;
-  fIsRawEvents = false;
-  fIsEnu1D = true;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL_NC1ppim_XSec_1DEnu_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1ppim/ANL_NC1ppim_Enu_xsec.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(0.3, 1.5);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("ANL #nu_mu NC1n#pi^{+}");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/NC1ppim/ANL_NC1ppim_Enu_xsec.csv" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  // Scale to cross-section
-  // PDAWG: Removed this scaling because it doesn't seem consistent.
-  //  fDataHist->Scale(1.E-41);
+  FinaliseSampleSettings();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width") * 1E-38 /(fNEvents+0)*(16./8.);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.)*GetFluxHistogram()->Integral("width"))*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 void ANL_NC1ppim_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   // Very simple here!
   double Enu = event->GetNeutrinoIn()->fP.E()/1000.;
-
   this->fXVar = Enu;
 
   return;

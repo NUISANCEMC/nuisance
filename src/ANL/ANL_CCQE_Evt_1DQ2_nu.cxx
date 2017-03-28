@@ -20,204 +20,124 @@
 #include "ANL_CCQE_Evt_1DQ2_nu.h"
 
 //********************************************************************
-/// @brief ANL CCQE Q2 Measurement on Free Nucleons (Ref: PRD16 3103)
-///
-/// @details Q2 Extracted assuming numu CCQE scattering of free nucleons.
-ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfile,
-					   FitWeight *rw,    std::string type,
-					   std::string fakeDataFile){
+ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
-  // Measurement Details
-  fName = name;
-  EnuMin = 0.;
-  EnuMax = 6.;
-  applyQ2correction = type.find("Q2CORR") != std::string::npos;
-  applyEnucorrection = type.find("ENUCORR") != std::string::npos;
-  fDefaultTypes="SHAPE/DIAG";
-  fAllowedTypes="SHAPE/DIAG/Q2CORR/MASK";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CCQ2 Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fIsDiag = true;
-  fIsRawEvents = true;
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CCQE} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  // In future read most of these from a card file
-  if (!name.compare("ANL_CCQE_Evt_1DQ2_nu_PRL31")){
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CCQE");
+  fSettings.DefineAllowedSpecies("numu");
 
-    this->SetDataFromDatabase("ANL/ANL_CCQE_Data_PRL31_844.root", "ANL_1DQ2_Data");
-    applyEnucorrection = false;
-    EnuMax = 3.0; // Move EnuMax down
+  // Hadronic Cut Info
+  if (fSettings.Found("name", "PRL31")) {
 
-  } else if (!name.compare("ANL_CCQE_Evt_1DQ2_nu_PRD16")){
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRL31_844.root;ANL_1DQ2_Data" );
+    fSettings.SetEnuRange(0.0, 3.0);
 
-    applyEnucorrection = false;
-    this->SetDataFromDatabase("ANL/ANL_CCQE_Data_PRD16_3103.root", "ANL_1DQ2_Data");
+  } else if (fSettings.Found("name", "PRD16")) {
+
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRD16_3103.root;ANL_1DQ2_Data" );
 
   } else {
 
-    this->SetDataFromDatabase("ANL/ANL_Data_PRD26_537.root","ANL_1DQ2_Data");
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "ANL/ANL_Data_PRD26_537.root;ANL_1DQ2_Data" );
 
   }
 
-  // Setup Histograms
-  this->SetupDefaultHist();
+  // is Q2 Correction applied
+  applyQ2correction = fSettings.Found("type", "Q2CORR");
 
-  if (applyQ2correction){
-    this->CorrectionHist = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_CCQE_Data_PRL31_844.root","ANL_1DQ2_Correction");
-    this->fMCHist_NoCorr = (TH1D*) this->fMCHist->Clone();
-    this->fMCHist_NoCorr->SetNameTitle( (this->fName + "_NOCORR").c_str(),(this->fName + "_NOCORR").c_str());
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor for shape
+  fScaleFactor = (fDataHist->Integral() / (fNEvents + 0.));
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Correction Histogram
+  if (applyQ2correction) {
+
+    // Correction Hist
+    CorrectionHist = PlotUtils::GetTH1DFromFile( fSettings.GetS("q2correction_file"),
+                     fSettings.GetS("q2correction_hist") );
+    SetAutoProcessTH1(CorrectionHist, kCMD_Write);
+
+
+    // Make uncorrected MC hist
+    fMCHist_NoCorr = (TH1D*) fDataHist->Clone();
+    fMCHist_NoCorr->Reset();
+    fMCHist_NoCorr->SetNameTitle( (fName + "_NOCORR").c_str(),
+                                  (fName + "_NOCORR").c_str());
+    SetAutoProcessTH1(fMCHist_NoCorr);
   }
 
-  if (applyEnucorrection){
-    this->EnuRatePlot = PlotUtils::GetTH1DFromFile(GeneralUtils::GetTopLevelDir() + "/data/ANL/ANL_Data_PRD26_537.root","ANL_1DEnu_Rate");
-    this->EnuvsQ2Plot = PlotUtils::MergeIntoTH2D(fDataHist, EnuRatePlot, "Events");
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-    this->EnuFluxUnfoldPlot = (TH1D*)this->EnuRatePlot->Clone();
-    for (int i = 0; i < this->EnuFluxUnfoldPlot->GetNbinsX(); i++) this->EnuFluxUnfoldPlot->SetBinContent(i+1,1.0);
-    PlotUtils::FluxUnfoldedScaling(EnuFluxUnfoldPlot, GetFluxHistogram());
-  }
-
-  // Setup Covariance
-  //  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  //  covar     = StatUtils::GetInvert(fFullCovar);
-
-  //  GetEventHistogram()->Scale(fDataHist->Integral()/GetEventHistogram()->Integral());
-  this->fScaleFactor = (this->fDataHist->Integral("width")/(fNEvents+0.));
-
-  // Set starting scale factor
-  scaleF = -1.0;
-
-};
-
+}
 
 //********************************************************************
-/// @details Extract q2qe from event assuming quasi-elastic scattering
-void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent *event){
+void ANL_CCQE_Evt_1DQ2_nu::FillEventVariables(FitEvent * event) {
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0)
     return;
 
   // Fill histogram with reconstructed Q2 Distribution
-  q2qe = 0.0;
+  fXVar = -999.9;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
-  q2qe = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0.,true);
+  fXVar = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 0., true);
 
-  fXVar = q2qe;
+  GetQ2Box()->fQ2 = fXVar;
   return;
 };
 
 //********************************************************************
-/// @brief Signal is defined as True CCQE numu scattering
-/// @details cut 1: CCQE event
-/// @details cut 2: numu event
-/// @details cut 3: EnuMin < Enu < EnuMax
-/// @details cut 4: Q2 non-zero
-bool ANL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent *event){
+bool ANL_CCQE_Evt_1DQ2_nu::isSignal(FitEvent * event) {
 //********************************************************************
 
   if (!SignalDef::isCCQE(event, 14, EnuMin, EnuMax)) return false;
 
   // Q2 cut
-  if (q2qe <= 0) return false;
+  if (GetQ2Box()->fQ2 <= 0) return false;
 
   return true;
 };
 
 //********************************************************************
-/// @details Reset the histogram uncorrect
-void ANL_CCQE_Evt_1DQ2_nu::ResetAll(){
+void ANL_CCQE_Evt_1DQ2_nu::FillHistograms() {
 //********************************************************************
 
-  Measurement1D::ResetAll();
-  this->fMCHist->Reset();
+  if (applyQ2correction) {
+    fMCHist_NoCorr->Fill( GetQ2Box()->fQ2, Weight);
 
-  if (applyEnucorrection)
-    this->EnuvsQ2Plot->Reset();
-
-  if (applyQ2correction)
-    this->fMCHist_NoCorr->Reset();
-
-
-}
-
-//********************************************************************
-/// @details Apply additional event weights for free nucleon measurements
-void ANL_CCQE_Evt_1DQ2_nu::FillHistograms(){
-//********************************************************************
-
-  if (applyEnucorrection)
-    this->EnuvsQ2Plot->Fill(fXVar, Enu, Weight);
-
-  if (applyQ2correction){
-    this->fMCHist_NoCorr->Fill(fXVar, Weight);
-
-    if (fXVar < 0.225)
-      this->Weight *= this->CorrectionHist->Interpolate(fXVar);
+    if (GetQ2Box()->fQ2 < CorrectionHist->GetXaxis()->GetXmax() &&
+        GetQ2Box()->fQ2 > CorrectionHist->GetXaxis()->GetXmin())
+      Weight *= CorrectionHist->Interpolate(GetQ2Box()->fQ2);
   }
 
   Measurement1D::FillHistograms();
 
 }
 
-//********************************************************************
-void ANL_CCQE_Evt_1DQ2_nu::ScaleEvents(){
-//********************************************************************
-
-  if (applyEnucorrection){
-    this->EnuvsQ2Plot->Scale(GetEventHistogram()->Integral()/(fNEvents+0.));
-    for (int j =  0; j < EnuvsQ2Plot->GetNbinsY(); j++){
-      for (int i = 0; i < EnuvsQ2Plot->GetNbinsX(); i++){
-	this->EnuvsQ2Plot->SetBinContent(i+1,j+1, this->EnuvsQ2Plot->GetBinContent(i+1,j+1) * EnuFluxUnfoldPlot->GetBinContent(j+1));
-      }
-    }
-  }
-
-
-  this->fMCHist->Scale(fScaleFactor);
-  this->fMCFine->Scale(fScaleFactor);
-  if (applyQ2correction) this->fMCHist_NoCorr->Scale(fScaleFactor);
-
-
-  // Scale to match data
-  scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist, fMaskHist);
-
-  this->fMCHist->Scale(scaleF);
-  this->fMCFine->Scale(scaleF);
-
-  if (applyQ2correction){
-    scaleF = PlotUtils::GetDataMCRatio(fDataHist, fMCHist_NoCorr, fMaskHist);
-    this->fMCHist_NoCorr->Scale(scaleF);
-  }
-
-
-
-
-}
-
-
-//********************************************************************
-/// @brief Include Q2 Correction plots into data write
-void ANL_CCQE_Evt_1DQ2_nu::Write(std::string drawOpt){
-//********************************************************************
-
-  Measurement1D::Write(drawOpt);
-
-  if (applyQ2correction){
-    this->CorrectionHist->Write();
-    this->fMCHist_NoCorr->Write();
-  }
-
-  if (applyEnucorrection){
-    this->EnuvsQ2Plot->Write();
-    ((TH1D*)this->EnuvsQ2Plot->ProjectionX())->Write();
-    ((TH1D*)this->EnuvsQ2Plot->ProjectionY())->Write();
-    EnuFluxUnfoldPlot->Write();
-    EnuRatePlot->Write();
-  }
-
-  return;
-}

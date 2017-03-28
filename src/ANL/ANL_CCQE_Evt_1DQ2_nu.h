@@ -21,40 +21,42 @@
 #define ANL_CCQE_Evt_1DQ2_NU_H_SEEN
 
 #include "Measurement1D.h"
+#include "CustomVariableBoxes.h"
 
-/*!
-  ANL Charged Current Quasi-elastic Measurement \n
-  1D Event Rate in Q2QE \n
-  Class supports multiple published datasets: \n
-  \item PRD.26.537  = ANL_CCQE_XSec_1DQ2_nu_PRD26, or ANL_CCQE_XSec_1DEnu_nu
-  \item PRD.16.3103 = ANL_CCQE_XSec_1DQ2_nu_PRD16
-  \item PRL.31.844  = ANL_CCQE_XSec_1DEQ2_nu_PRL31
-*/
+/// \brief ANL Charged Current Quasi-elastic Measurement.
+///  1D Event Rate in Q2QE 
+///
+///  Class supports multiple published datasets: \n
+///  - PRD.26.537  = ANL_CCQE_XSec_1DQ2_nu_PRD26, or ANL_CCQE_XSec_1DEnu_nu
+///  - PRD.16.3103 = ANL_CCQE_XSec_1DQ2_nu_PRD16
+///  - PRL.31.844  = ANL_CCQE_XSec_1DEQ2_nu_PRL31
 class ANL_CCQE_Evt_1DQ2_nu : public Measurement1D {
-
 public:
 
-  ANL_CCQE_Evt_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey);
   virtual ~ANL_CCQE_Evt_1DQ2_nu() {}; 
   
+  /// \brief Fill Q2QE Event Information
   void FillEventVariables(FitEvent *event);       
-  bool isSignal(FitEvent *event);                 
+
+  /// \brief Selection only true CCQE
+  bool isSignal(FitEvent *event);    
+
+  /// \brief Fill main histograms and correction histograms             
   void FillHistograms();
-  void ResetAll();
-  void ScaleEvents();
-  void Write(std::string drawOpt);
+
+  /// \brief Use Q2 Box to save correction info
+  inline Q2VariableBox1D* GetQ2Box(){ return static_cast<Q2VariableBox1D*>(GetBox()); };
+
+  /// \brief Create Q2 Box to save correction info
+  inline MeasurementVariableBox* CreateBox(){ return new Q2VariableBox1D(); };
+
  private:
 
   bool applyQ2correction; ///< Flag of whether deut correction applied
   TH1D* CorrectionHist; ///< Correction factor
   TH1D* fMCHist_NoCorr; ///< Uncorrected fMCHist
-  double q2qe;       ///< fXVar
-  double scaleF; ///< Nominal Scale Factor
-  bool applyEnucorrection;
-  TH2D* EnuvsQ2Plot; // For Scaling
 
-  TH1D* EnuFluxUnfoldPlot;
-  TH1D* EnuRatePlot;
 
 };
   

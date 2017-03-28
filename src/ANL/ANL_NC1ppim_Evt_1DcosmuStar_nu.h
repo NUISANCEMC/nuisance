@@ -25,21 +25,14 @@
    ANL Neutral Current 1p pi- Measurement. \n\n
    1D total cross-section \n
 */  
-
 class ANL_NC1ppim_Evt_1DcosmuStar_nu : public Measurement1D {
  public:
   
-  ANL_NC1ppim_Evt_1DcosmuStar_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  
+  ANL_NC1ppim_Evt_1DcosmuStar_nu(nuiskey samplekey);
   virtual ~ANL_NC1ppim_Evt_1DcosmuStar_nu() {};
   
-  //void ResetAll();
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
-  //void ScaleEvents(); 
-  //void ApplyNormScale(double norm);
-  //void Write();
 
  private:
 };

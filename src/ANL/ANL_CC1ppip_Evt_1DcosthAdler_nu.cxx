@@ -52,13 +52,12 @@ ANL_CC1ppip_Evt_1DcosthAdler_nu::ANL_CC1ppip_Evt_1DcosthAdler_nu(nuiskey samplek
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+  fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.) * 2. / 1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -94,8 +93,8 @@ void ANL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
   TVector3 PnuVect = Pnu.Vect();
   TVector3 PmuVect = Pmu.Vect();
   // Define the z-direction; should be same as Pres
-  TVector3 zVect = (PnuVect-PmuVect);
-  zVect *= 1/double(zVect.Mag());
+  TVector3 zVect = (PnuVect - PmuVect);
+  zVect *= 1 / double(zVect.Mag());
 
   // Then finally construct phi as the angle between pion projection and x axis
   double cosThAdler = -999;

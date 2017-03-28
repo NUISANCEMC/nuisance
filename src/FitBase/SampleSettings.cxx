@@ -105,6 +105,14 @@ std::string SampleSettings::PlotTitles(){
 	return ";" + GetS("xtitle") + ";" + GetS("ytitle");
 };
 
+std::string SampleSettings::GetFullTitles(){
+	return Title() + PlotTitles();
+}
+
+int SampleSettings::GetI(std::string name){
+	return fKeyValues.GetI(name);
+}
+
 std::string SampleSettings::GetS(std::string name){
 	return fKeyValues.GetS(name);
 }

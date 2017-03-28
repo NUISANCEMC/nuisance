@@ -33,12 +33,15 @@ public:
 	void DefineAllowedSpecies(std::string species);
 	void SetSuggestedFlux(std::string str);
 	void SetDescription(std::string str);
+
+	std::string GetFullTitles();
 	
 	bool Has(std::string name){return fKeyValues.Has(name);};
 
 	std::string GetDataInput();
 	std::string PlotTitles();
 	std::string GetS(std::string name);
+	int GetI(std::string name);
 	std::string GetCovarInput();
 
 	std::vector<int> fAllowedTargets;

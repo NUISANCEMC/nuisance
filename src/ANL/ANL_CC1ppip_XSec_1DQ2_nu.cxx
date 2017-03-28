@@ -21,26 +21,46 @@
 */
 #include "ANL_CC1ppip_XSec_1DQ2_nu.h"
 
-// The constructor
-ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  fName = "ANL_CC1ppip_XSec_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/proton)";
-  EnuMin = 0.5;
-  EnuMax = 6;
-  fIsDiag = true;
-  fNormError = 0.20;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt");
-  SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1ppip XSec 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetAllowedTypes("FIX/FREE,SHAPE/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput(  FitPar::GetDataBase()
+                           + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt" );
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / ((fNEvents + 0.) * TotalIntegratedFlux("width")) * 2. / 1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
@@ -59,7 +79,7 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // I use the W < 1.4GeV cut ANL data to isolate single pion
   // there is also a W < 1.6 GeV and an uncut spectrum ANL 1982
-  if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < 1400) q2CCpip = -1 * (Pnu - Pmu).Mag2() / 1.E6;
 
   fXVar = q2CCpip;
 

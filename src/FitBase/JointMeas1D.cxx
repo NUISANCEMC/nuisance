@@ -118,7 +118,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
 
   // Set Engine and Fake Data
   fRW = rw;
-  fakeDataFile = fkdt;
+  fFakeDataInput = fkdt;
 
   // Set Fit Options
   SetFitOptions(type);

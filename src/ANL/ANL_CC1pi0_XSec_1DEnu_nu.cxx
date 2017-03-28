@@ -23,7 +23,6 @@
 
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
 
-
 //********************************************************************
 ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
 //********************************************************************
@@ -56,7 +55,7 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
   //                  The default is W < 2.0
   if (fSettings.Found("name", "W14Cut")) wTrueCut = 1.4;
   else if (fSettings.Found("name", "W16Cut")) wTrueCut = 1.6;
-  else wTrueCut = 2.0;
+  else wTrueCut = 10.0;
 
 
   // Flag for bad combo
@@ -91,7 +90,6 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
   }
   fSettings.SetDataInput(DataLocation);
 
-
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
@@ -99,13 +97,8 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
   fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
-
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i + 1, sqrt(fDataHist->GetBinContent(i + 1)));
-  }
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

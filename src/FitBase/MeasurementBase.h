@@ -132,7 +132,7 @@ public:
   //! Call reconfigure looping over all MC events including background
   virtual void Reconfigure(void);
 
-  virtual TH2D GetCovarMatrix(void) = 0;
+  // virtual TH2D GetCovarMatrix(void) = 0;
   virtual double GetLikelihood(void) { return 0.0; };
   virtual int GetNDOF(void) { return 0; };
   virtual void ThrowCovariance(void) = 0;

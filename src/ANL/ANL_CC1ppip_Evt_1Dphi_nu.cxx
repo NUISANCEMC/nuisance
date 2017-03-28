@@ -55,11 +55,10 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(nuiskey samplekey) {
   fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
-    TRandom3 rand;
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 

@@ -24,29 +24,44 @@
 
 #include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
 
-// The constructor
-ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::ANL_CC2pi_1pip1pip_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/nucleon)";
-  EnuMin = 0.;
-  EnuMax = 6.0;
-  fIsDiag = true; // refers to covariance matrix; this measurement has none so only use errors, not covariance
-  fNormError = 0.20; // normalisation error on ANL BNL flux
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_xsec.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG", "FIX,FREE,SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("ANL #nu_mu CC2#pi");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC2pi/1pip1pip/CC2pi_1pip1pip1n_xsec.csv" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  // Need to multiply the data by a factor because of the way the data is scanned (e.g. 1E-38)
-  //fDataHist->Scale(1.E-41);
+  FinaliseSampleSettings();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 
 void ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -68,28 +83,3 @@ bool ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
 
   return SignalDef::isCCWithFS(event, 14, pdgs, EnuMin, EnuMax);
 }
-
-
-/*
-void ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void ANL_CC2pi_1pip1pip_XSec_1DEnu_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(mcHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(mcFine, GetFluxHistogram());
-
-  mcHist->Scale(fScaleFactor);
-  mcFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

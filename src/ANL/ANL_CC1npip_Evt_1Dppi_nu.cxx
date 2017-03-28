@@ -38,16 +38,10 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
   fSettings.SetEnuRange(0.0, 1.5);
   fSettings.DefineAllowedTargets("D,H");
 
-  // CCQELike plot information
+  // plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
   fSettings.SetDataInput(  FitPar::GetDataBase() + "/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
   fSettings.DefineAllowedSpecies("numu");
-
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
 
   FinaliseSampleSettings();
 
@@ -56,7 +50,9 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
   fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

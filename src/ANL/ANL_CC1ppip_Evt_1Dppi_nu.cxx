@@ -1,4 +1,4 @@
- // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -52,10 +52,12 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(nuiskey samplekey) {
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+  fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.) * 2. / 1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataValues( fSettings.GetDataInput() );
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -79,7 +81,7 @@ void ANL_CC1ppip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   double ppip    = -1.0;
 
   // This has a hadMass constraint of 1.4 GeV
-  if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
+  if (hadMass < 1400) ppip = FitUtils::p(Ppip) * 1000.;
 
   fXVar = ppip;
 
