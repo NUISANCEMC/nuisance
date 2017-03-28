@@ -58,7 +58,7 @@ BEBC_CCQE_XSec_1DQ2_nu::BEBC_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   fScaleFactor = (GetEventHistogram()->Integral("width")/(fNEvents+0.))*1E-38 / (TotalIntegratedFlux("width"));
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetDataFromRootFile( fSettings.GetDataInput() );
   SetCovarFromDiagonal();
 
   // Correction Histogram

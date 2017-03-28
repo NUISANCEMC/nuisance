@@ -72,7 +72,7 @@ ANL_CCQE_Evt_1DQ2_nu::ANL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   fScaleFactor = (fDataHist->Integral() / (fNEvents + 0.));
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetDataFromRootFile( fSettings.GetDataInput() );
   SetPoissonErrors();
   SetCovarFromDiagonal();
 

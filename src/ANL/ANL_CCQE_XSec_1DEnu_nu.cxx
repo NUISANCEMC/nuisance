@@ -67,7 +67,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   fScaleFactor = (GetEventHistogram()->Integral("width") * 2.0 / 1.0 * 1E-38 / (fNEvents + 0.));
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetDataFromRootFile( fSettings.GetDataInput() );
   SetCovarFromDiagonal();
 
   // Correction Histogram
