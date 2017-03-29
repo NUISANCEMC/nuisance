@@ -101,7 +101,7 @@ FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry){
 
 	// Read NUISANCE Tree
 	fFitEventTree->GetEntry(entry);
-	fNUISANCEEvent->eventid = entry;
+	// fNUISANCEEvent->eventid = entry;
 
 	// Run Initial, FSI, Final, Other ordering. 
 	// fNUISANCEEvent-> OrderStack();
@@ -137,7 +137,7 @@ BaseFitEvt* FitEventInputHandler::GetBaseEvent(const UInt_t entry){
 
 	// Read entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fFitEventTree->GetEntry(entry);
-	fBaseEvent->eventid = entry;
+	// fBaseEvent->eventid = entry;
 	
 	// Set joint scaling if required
 	if (jointinput){

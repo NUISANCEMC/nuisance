@@ -17,172 +17,315 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
+#include "ElectronScattering_DurhamData.h"
 
 //********************************************************************
-MiniBooNE_CCQE_XSec_1DQ2_nu::MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
+ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) {
 //********************************************************************
 
-  // Initalise sample Settings ---------------------------------------
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "Electron Scattering Durham Data sample. \n" \
+                        "Target: Multiple \n" \
+                        "Flux: Energy should match data being handled \n" \
+                        "Signal: Any event with an electron in the final state \n";
   fSettings = LoadSampleSettings(samplekey);
-  fSettings.FoundFill("name", "CCQELike", ccqelike, true);
-
-  // Multiple constructors for similar samples
-  if (ccqelike) Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu();
-  else Setup_MiniBooNE_CCQE_XSec_1DQ2_nu();
-
-  // Final Check for all requirements, necessary to setup all extra plots.
-  FinaliseMeasurement();
-}
-
-//********************************************************************
-void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQE_XSec_1DQ2_nu() {
-//********************************************************************
-
-  // Sample overview ---------------------------------------------------
-  std::string descrip = "MiniBooNE CCQE sample. \n" \
-                        "Target: CH2.08 \n" \
-                        "Flux: CCQE  = Forward Horn Current numu \n" \
-                        "Signal: CCQE  = True CCQE + True 2p2h (Mode == 1 or 2) \n";
-
-                        // Setup common settings
-                        fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
-  fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
-  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
-  fSettings.DefineAllowedTargets("C,H");
-  fSettings.SetSuggestedFlux( FitPar::GetDataBase() + "/MiniBooNE/ccqe/mb_ccqe_flux.root");
-
-  // CCQE Plot Information
-  fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
-  fSettings.DefineAllowedSpecies("numu");
-
-  FinaliseSampleSettings();
-
-  // 2. Scaling Setup ---------------------------------------------------
-  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  // Multiply by 14.08/6.0 to get per neutron
-  fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) *
-                  (14.08 / 6.0) / TotalIntegratedFlux());
-
-  // 3. Plot Setup -------------------------------------------------------
-  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
-  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
-
-};
-
-//********************************************************************
-void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu() {
-//********************************************************************
-
-  // Sample overview ---------------------------------------------------
-  std::string descrip = "MiniBooNE CC0pi sample. \n" \
-                        "Target: CH2.08 \n" \
-                        "Flux: MiniBooNE Forward Horn Current numu \n" \
-                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
-
-  // Setup common settings
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
-  fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
+  fSettings.DefineAllowedSpecies("electron");
+  fSettings.SetTitle("Electron");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
-  fSettings.DefineAllowedTargets("C,H");
-  fSettings.SetSuggestedFlux( FitPar::GetDataBase() + "/MiniBooNE/ccqe/mb_ccqe_flux.root");
-
-  // CCQELike plot information
-  fSettings.SetTitle("MiniBooNE #nu_#mu CCQE");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_like.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
-  fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_bkg.txt" );
-  fSettings.SetHasExtraHistograms(true);
-  fSettings.DefineAllowedSpecies("numu,numub");
+  fSettings.SetXTitle("q0");
+  fSettings.SetYTitle("#sigma");
 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  // Multiply by 14.08/6.0 to get per neutron
-  fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) *
-                  (14.08 / 6.0) / TotalIntegratedFlux());
-
+  // fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / TotalIntegratedFlux());
+  fScaleFactor = 1.0;
+  
   // Plot Setup -------------------------------------------------------
-  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
-  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
+  SetDataFromName(fSettings.GetS("name"));
+  SetCovarFromDiagonal();
 
-
-  // Make Data CCQELike BKG
-  fDataHist_CCQELIKE = PlotUtils::GetTH1DFromFile( fSettings.GetS("ccqelikebkg_input"),
-                       fSettings.GetName() + "_CCQELIKEBKG_data" );
-  fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
-                                    ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
-  SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
-
-  // Make MC Clone
-  fMCHist_CCQELIKE = new TrueModeStack( fSettings.Name() + "_CCQELIKE_BKG_MC",
-                                        "CCQE-like BKG MC" + fSettings.PlotTitles(),
-                                        fDataHist_CCQELIKE);
-  SetAutoProcessTH1(fMCHist_CCQELIKE);
-
+  // Finish up
+  FinaliseMeasurement();
 };
 
+//********************************************************************
+void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
+//********************************************************************
+
+  // Data Should be given in the format
+  // Electron_Z_A_Energy_Theta_Source
+  std::vector<std::string> splitstring = GeneralUtils::ParseToStr(name, "_");
+  std::string zstring = splitstring[1];
+  std::string astring = splitstring[2];
+  std::string estring = splitstring[3];
+  std::string tstring = splitstring[4];
+  std::string sstring = splitstring[5];
+
+  fYCenter = GeneralUtils::StrToDbl(tstring);
+  fZCenter = GeneralUtils::StrToDbl(estring);
+
+  // Create effective E and Theta bin Edges
+  std::vector<double> thetabinedges;
+  std::vector<double> ebinedges;
+
+  int nthetabins    = FitPar::Config().GetParI("Electron_NThetaBins");
+  int nebins        = FitPar::Config().GetParI("Electron_NEnergyBins");
+  double thetawidth = FitPar::Config().GetParD("Electron_ThetaWidth");
+  double ewidth     = FitPar::Config().GetParD("Electron_EnergyWidth");
+
+  for (int i = -nthetabins; i <= nthetabins; i++) {
+    thetabinedges.push_back( fYCenter + thetawidth * (double(i)) );
+  }
+  for (int i = -nebins; i <= nebins; i++) {
+    ebinedges.push_back( fZCenter + ewidth * (double(i)) );
+  }
+
+  // Determine target
+  std::string target = "";
+  if (!zstring.compare("6") && !astring.compare("12")) target = "12C.dat";
+  else {
+    ERR(FTL) << "Target not supported in electron scattering module!" << std::endl;
+    throw;
+  }
+
+
+  // Fill Data Points
+
+  std::string line;
+  std::ifstream mask( (FitPar::GetDataBase() + "/Electron/" + target).c_str() , ifstream::in);
+  int i = 0;
+
+  std::vector<double> pointx;
+  std::vector<double> errorx;
+  std::vector<double> pointy;
+  std::vector<double> errory;
+
+  while (std::getline(mask >> std::ws, line, '\n')) {
+    // std::cout << "Line = " << line << std::endl;
+    if (line.empty()) continue;
+
+    std::vector<std::string> lineentries = GeneralUtils::ParseToStr(line, " ");
+    // std::cout << "Checking : " << line << std::endl;
+    if (zstring.compare(lineentries[0])) continue;
+    if (astring.compare(lineentries[1])) continue;
+    if (estring.compare(lineentries[2])) continue;
+    if (tstring.compare(lineentries[3])) continue;
+    if (sstring.compare(lineentries[7])) continue;
+
+    std::cout << "Registering data point : " << line << std::endl;
+
+    std::cout << "Adding Graph Point : " <<  GeneralUtils::StrToDbl(lineentries[4]) << " " << GeneralUtils::StrToDbl(lineentries[5]) << std::endl;
+    pointx.push_back(GeneralUtils::StrToDbl(lineentries[4]));
+    errorx.push_back(0.0);
+    pointy.push_back(GeneralUtils::StrToDbl(lineentries[5]));
+    errory.push_back(GeneralUtils::StrToDbl(lineentries[6]));
+
+    i++;
+  }
+
+  fDataGraph = new TGraphErrors(pointx.size(), &pointx[0], &pointy[0], &errorx[0], &errory[0]);
+
+  // Now form an effective data and mc histogram
+  std::vector<double> q0binedges;
+  const double* x = fDataGraph->GetX();
+
+  // Loop over graph and get mid way point between each data point.
+  for (int i = 0; i < fDataGraph->GetN(); i++) {
+    std::cout << "X Point = " << x[i] << std::endl;
+
+    if (i == 0) {
+      // First point set lower width as half distance to point above
+      q0binedges.push_back(x[0] - ((x[1] - x[0]) / 2.0));
+    } else if (i == fDataGraph->GetN() - 1) {
+      // Last point set upper width as half distance to point above.
+      q0binedges.push_back(x[i] - ((x[i] - x[i - 1]) / 2.0));
+      q0binedges.push_back(x[i] + ((x[i] - x[i - 1]) / 2.0));
+    } else {
+      // Set half distance to point below
+      q0binedges.push_back(x[i] - ((x[i] - x[i - 1]) / 2.0));
+    }
+
+  }
+
+  for (int i  = 0; i < q0binedges.size(); i++) {
+    std::cout << "Q0 Edge " << i << " = " << q0binedges[i] << std::endl;
+  }
+
+  for (int i  = 0; i < ebinedges.size(); i++) {
+    std::cout << "e Edge " << i << " = " << ebinedges[i] << std::endl;
+  }
+  for (int i  = 0; i < thetabinedges.size(); i++) {
+    std::cout << "theta Edge " << i << " = " << thetabinedges[i] << std::endl;
+  }
+
+  // Form the data hist, mchist, etc
+  fDataHist = new TH1D("electron_data", "electron_data",
+                       q0binedges.size() - 1, &q0binedges[0]);
+  fMCHist = (TH1D*) fDataHist->Clone("MC");
+
+  const double* y = fDataGraph->GetY();
+  const double* ey = fDataGraph->GetEY();
+  for (int i = 0; i < fDataGraph->GetN(); i++) {
+    std::cout << "Setting Data Bin " << i + 1 << " to " << y[i] << " +- " << ey[i] << std::endl;
+    fDataHist->SetBinContent(i + 1, y[i]);
+    fDataHist->SetBinError(i + 1, ey[i]);
+
+    fMCHist->SetBinContent(i + 1, 0.0);
+    fMCHist->SetBinError(i + 1, 0.0);
+  }
+
+
+
+  fMCScan_Q0vsThetavsE = new TH3D("mc_q0vsthetavse", "mc_q0vsthetavse",
+                                  q0binedges.size() - 1, &q0binedges[0],
+                                  thetabinedges.size() - 1, &thetabinedges[0],
+                                  ebinedges.size() - 1 , &ebinedges[0]);
+  fMCScan_Q0vsThetavsE->Reset();
+  fMCScan_Q0vsTheta = new TH2D("mc_q0vstheta", "mc_q0vstheta",
+                               q0binedges.size() - 1, &q0binedges[0],
+                               thetabinedges.size() - 1, &thetabinedges[0]);
+  fMCScan_Q0vsTheta->Reset();
+
+  fMCScan_Q0vsE = new TH2D("mc_q0vse", "mc_q0vse",
+                           q0binedges.size() - 1, &q0binedges[0],
+                           ebinedges.size() - 1 , &ebinedges[0]);
+  fMCScan_Q0vsE->Reset();
+}
+
 
 //********************************************************************
-void  MiniBooNE_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
+void  ElectronScattering_DurhamData::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
+  if (event->NumFSParticle(11) == 0)
     return;
 
-  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
+  FitParticle* ein  = event->PartInfo(0);
+  FitParticle* eout = event->GetHMFSParticle(11);
 
-  // The highest momentum mu+/mu-. The isSignal definition should make sure we only
-  // accept events we want, so no need to do an additional check here.
-  TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
+  double q0    = 0.0;
+  double E     = ein->fP.E() / 1000.0;
+  double theta = ein->fP.Vect().Angle(eout->fP.Vect()) * 180;
 
-  q2qe = FitUtils::Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 34., false);
+  fXVar = q0;
+  fYVar = theta;
+  fZVar = E;
 
-  // Set X Variables
-  fXVar = q2qe;
   return;
 };
 
 //********************************************************************
-bool MiniBooNE_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event) {
+bool ElectronScattering_DurhamData::isSignal(FitEvent *event) {
 //********************************************************************
 
-  // If CC0pi, include both charges
-  if (ccqelike) {
-    if (SignalDef::isCC0pi(event, 14, EnuMin, EnuMax) ||
-        SignalDef::isCC0pi(event, -14, EnuMin, EnuMax))
-      return true;
-  } else {
-    if (SignalDef::isCCQELike(event, 14, EnuMin, EnuMax))
-      return true;
-  }
+  if (event->NumFSParticle(11) == 0)
+    return false;
 
-  return false;
 
+  if (fXVar < fXLowLim or fXVar > fXHighLim) return false;
+  if (fYVar < fYLowLim or fYVar > fYHighLim) return false;
+  if (fZVar < fZLowLim or fZVar > fZHighLim) return false;
+
+  return true;
 };
 
+//********************************************************************
+void ElectronScattering_DurhamData::FillHistograms() {
+//********************************************************************
 
-void MiniBooNE_CCQE_XSec_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight) {
-
-  // No Extra Hists if not ccqelike
-  if (!ccqelike) return;
-
-  if ((Mode != 1 and Mode != 2) and (Signal)) {
-    fMCHist_CCQELIKE->Fill(Mode, fXVar, weight);
+  if (Signal) {
+    fMCScan_Q0vsThetavsE->Fill(fXVar, fYVar, fZVar, Weight);
   }
 
+}
+
+void ElectronScattering_DurhamData::ResetAll() {
+  fMCScan_Q0vsThetavsE->Reset();
+}
+
+void ElectronScattering_DurhamData::ApplyNormScale(double norm) {
+  fMCScan_Q0vsThetavsE->Scale(1.0 / norm);
+  fMCScan_Q0vsTheta->Scale(1.0 / norm);
+  fMCScan_Q0vsE->Scale(1.0 / norm);
+  fMCHist->Scale(1.0 / norm);
+}
+
+//********************************************************************
+void ElectronScattering_DurhamData::ScaleEvents() {
+//********************************************************************
+
+  fMCScan_Q0vsThetavsE->Scale(fScaleFactor, "width");
+
+  // // Project into fMCScan_Q0vsTheta
+  // for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
+  //   for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
+  //     double total = 0.;
+  //     for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
+  //       double zwidth = fMCScan_Q0vsThetavsE->GetZaxis()->GetBinWidth(z + 1);
+  //       total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * zwidth;
+  //     }
+  //     fMCScan_Q0vsTheta->SetBinContent(x + 1, y + 1, total);
+  //   }
+  // }
+
+  // // Project into fMCScan_Q0vsE
+  // for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
+  //   for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
+  //     double total = 0.;
+  //     for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
+  //       double ywidth = fMCScan_Q0vsThetavsE->GetYaxis()->GetBinWidth(y + 1);
+  //       total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * ywidth;
+  //     }
+  //     fMCScan_Q0vsE->SetBinContent(x + 1, z + 1, total);
+  //   }
+  // }
+
+  // // Project fMCScan_Q0vsTheta into MC Hist
+  // for (int x = 0; x < fMCScan_Q0vsTheta->GetNbinsX(); x++) {
+  //   double total = 0.;
+  //   for (int y = 0; y < fMCScan_Q0vsTheta->GetNbinsY(); y++) {
+  //     double ywidth = fMCScan_Q0vsTheta->GetYaxis()->GetBinWidth(y + 1);
+  //     total += fMCScan_Q0vsTheta->GetBinContent(x + 1, y + 1);
+  //   }
+  //   fMCHist->SetBinContent(x + 1, total);
+  // }
+
+}
+
+//********************************************************************
+int ElectronScattering_DurhamData::GetNDOF() {
+//********************************************************************
+  return fDataGraph->GetN();
+}
+
+
+void ElectronScattering_DurhamData::Write(std::string drawOpts) {
+
+  fMCScan_Q0vsThetavsE->Write();
+  fMCScan_Q0vsTheta->Write();
+  fMCScan_Q0vsE->Write();
+  fMCHist->Write();
+
+  fDataHist->Write();
+  fDataGraph->Write();
+
+}
+
+double ElectronScattering_DurhamData::GetLikelihood() {
+  return 0.0;
+}
+
+void ElectronScattering_DurhamData::SetFitOptions(std::string opt) {
   return;
 }
 
-void ElectronScattering_DurhamData::ScaleEvents(){
+TH1D* ElectronScattering_DurhamData::GetMCHistogram(void) {
+  return fMCHist;
+}
 
-  // Project 3D distribution into 1D by first projecting out Enu, then projecting out Theta.
-
+TH1D* ElectronScattering_DurhamData::GetDataHistogram(void) {
+  return fDataHist;
 }

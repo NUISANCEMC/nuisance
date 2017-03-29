@@ -54,10 +54,10 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
   HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
     fSettings.SetDataInput(  FitPar::GetDataBase()
-                             + "/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_firstQ2rem.txt" );
+                             + "/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_firstQ2rem.txt" );
   } else {
     fSettings.SetDataInput(  FitPar::GetDataBase()
-                             + "/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_noWcut_HighQ2Gone.txt");
+                             + "/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_noWcut_HighQ2Gone.txt");
     fSettings.SetEnuRange(0.0, 10.0);
   }
 

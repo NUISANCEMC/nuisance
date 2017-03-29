@@ -267,84 +267,72 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")) {
-    return (
-             new MiniBooNE_CCQE_XSec_1DQ2_nu(samplekey));
+    return (new MiniBooNE_CCQE_XSec_1DQ2_nu(samplekey));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {
-    return (
-             new MiniBooNE_CCQE_XSec_1DQ2_antinu(samplekey));
+    return (new MiniBooNE_CCQE_XSec_1DQ2_antinu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CCQE_XSec_2DTcos_nu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_2DTcos_nu")) {
-    return (
-             new MiniBooNE_CCQE_XSec_2DTcos_nu(name, file, rw, type, fkdt));
+    return (new MiniBooNE_CCQE_XSec_2DTcos_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CCQE_XSec_2DTcos_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_2DTcos_antinu")) {
-    return (
-             new MiniBooNE_CCQE_XSec_2DTcos_antinu(name, file, rw, type, fkdt));
+    return (new MiniBooNE_CCQE_XSec_2DTcos_antinu(samplekey));
 
     /*
       MiniBooNE CC1pi+
     */
     // 1D
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_1DEnu_nu")) {
-    return (new MiniBooNE_CC1pip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_1DEnu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_1DQ2_nu")) {
-    return (new MiniBooNE_CC1pip_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_1DQ2_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_1DTpi_nu")) {
-    return (new MiniBooNE_CC1pip_XSec_1DTpi_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_1DTpi_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_1DTu_nu")) {
-    return (new MiniBooNE_CC1pip_XSec_1DTu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_1DTu_nu(samplekey));
 
     // 2D
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_2DQ2Enu_nu")) {
-    return (
-             new MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_2DTpiCospi_nu")) {
-    return (
-             new MiniBooNE_CC1pip_XSec_2DTpiCospi_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_2DTpiCospi_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_2DTpiEnu_nu")) {
-    return (
-             new MiniBooNE_CC1pip_XSec_2DTpiEnu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_2DTpiEnu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_2DTuCosmu_nu")) {
-    return (
-             new MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pip_XSec_2DTuEnu_nu")) {
-    return (
-             new MiniBooNE_CC1pip_XSec_2DTuEnu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pip_XSec_2DTuEnu_nu(samplekey));
 
     /*
       MiniBooNE CC1pi0
     */
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1DEnu_nu")) {
-    return (new MiniBooNE_CC1pi0_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pi0_XSec_1DEnu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1DQ2_nu")) {
-    return (new MiniBooNE_CC1pi0_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pi0_XSec_1DQ2_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1DTu_nu")) {
-    return (new MiniBooNE_CC1pi0_XSec_1DTu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pi0_XSec_1DTu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1Dcosmu_nu")) {
-    return (
-             new MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1Dcospi0_nu")) {
-    return (
-             new MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(file, rw, type, fkdt));
+    return (new MiniBooNE_CC1pi0_XSec_1Dcospi0_nu(samplekey));
 
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1Dppi0_nu")) {
-    return (
-             new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(samplekey));
+    return (new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(samplekey));
 
     /*
       MiniBooNE NCEL
@@ -385,15 +373,15 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CC0pi_XSec_1DEe_nue(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nue")) {
-    return (new MINERvA_CC0pi_XSec_1DQ2_nue(file, rw, type, fkdt));
+    return (new MINERvA_CC0pi_XSec_1DQ2_nue(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DThetae_nue")) {
     return (
-             new MINERvA_CC0pi_XSec_1DThetae_nue(file, rw, type, fkdt));
+             new MINERvA_CC0pi_XSec_1DThetae_nue(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nu_proton")) {
     return (
-             new MINERvA_CC0pi_XSec_1DQ2_nu_proton(file, rw, type, fkdt));
+             new MINERvA_CC0pi_XSec_1DQ2_nu_proton(samplekey));
     /*
       CC1pi+
     */
@@ -494,8 +482,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
              !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
              !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
-    return (
-             new MINERvA_CCinc_XSec_1DEnu_ratio(name, file, rw, type, fkdt));
+    return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
 
     /*
     T2K Samples
@@ -574,7 +561,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       NC1pi0
     */
   } else if (!name.compare("K2K_NC1pi0_Evt_1Dppi0_nu")) {
-    return (new K2K_NC1pi0_Evt_1Dppi0_nu(file, rw, type, fkdt));
+    return (new K2K_NC1pi0_Evt_1Dppi0_nu(samplekey));
 
     /*
     Fake Studies
@@ -596,6 +583,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("ElectronFlux_FlatTree")) {
     return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));
 
+  } else if (name.find("ElectronData_") != std::string::npos) {
+    return new ElectronScattering_DurhamData(samplekey);
+
     //<<<<<<< HEAD
     //  } else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
     //    return (new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
@@ -613,7 +603,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return NULL;
   }
 
-  // Return NULL if no sample loaded.
+// Return NULL if no sample loaded.
   return NULL;
 }
 }

@@ -152,6 +152,18 @@ void Measurement1D::FinaliseSampleSettings() {
 }
 
 //********************************************************************
+void Measurement1D::CreateDataHistogram(int dimx, double* binx) {
+//********************************************************************
+
+  if (fDataHist) delete fDataHist;
+
+  fDataHist = new TH1D( (fSettings.GetName() + "_data").c_str(), (fSettings.GetFullTitles()).c_str(),
+                        dimx, binx) ;
+
+}
+
+
+//********************************************************************
 void Measurement1D::SetDataFromTextFile(std::string datafile) {
 //********************************************************************
 
@@ -178,8 +190,8 @@ void Measurement1D::SetDataFromRootFile(std::string datafile,
 //********************************************************************
 void Measurement1D::SetPoissonErrors() {
 //********************************************************************
-  
-  if (!fDataHist){
+
+  if (!fDataHist) {
     ERR(FTL) << "Need a data hist to setup possion errors! " << std::endl;
     ERR(FTL) << "Setup Data First!" << std::endl;
     throw;
@@ -208,17 +220,21 @@ void Measurement1D::SetCovarFromDiagonal(TH1D* data) {
 
   }
 
-  if (!fIsDiag) {
-    ERR(FTL) << "SetCovarMatrixFromDiag called for measurement "
-             << "that is not set as diagonal." << std::endl;
-    throw;
-  }
+  // if (!fIsDiag) {
+  //   ERR(FTL) << "SetCovarMatrixFromDiag called for measurement "
+  //            << "that is not set as diagonal." << std::endl;
+  //   throw;
+  // }
 
 }
 
 //********************************************************************
 void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
 //********************************************************************
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
@@ -241,6 +257,10 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile, std::string histna
 //********************************************************************
 void Measurement1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 //********************************************************************
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
 
   LOG(SAM) << "Reading inverted covariance from text file: " << covfile << std::endl;
   covar       = StatUtils::GetCovarFromTextFile(covfile, dim);
@@ -278,8 +298,8 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   fFullCovar = new TMatrixDSym(dim);
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-    (*fFullCovar)(i,j) = (*correlation)(i,j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
-  }
+      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
+    }
   }
 
   // Fill other covars.
@@ -306,8 +326,8 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile, std::string 
   fFullCovar = new TMatrixDSym(fDataHist->GetNbinsX());
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-    (*fFullCovar)(i,j) = (*correlation)(i,j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
-  }
+      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
+    }
   }
 
   // Fill other covars.
@@ -321,6 +341,10 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile, std::string 
 //********************************************************************
 void Measurement1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
 //********************************************************************
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
 
   LOG(SAM) << "Reading cholesky from text file: " << covfile << std::endl;
   TMatrixD* temp = StatUtils::GetMatrixFromTextFile(covfile, dim, dim);
@@ -363,6 +387,17 @@ void Measurement1D::ScaleData(double scale) {
 //********************************************************************
   fDataHist->Scale(scale);
 }
+
+
+//********************************************************************
+void Measurement1D::ScaleDataErrors(double scale) {
+//********************************************************************
+  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+    fDataHist->SetBinError(i + 1, fDataHist->GetBinError(i + 1) * scale);
+  }
+}
+
+
 
 //********************************************************************
 void Measurement1D::ScaleCovar(double scale) {
@@ -761,9 +796,9 @@ void Measurement1D::ScaleEvents() {
 
 
     // if (fMCHist_Modes) {
-      // PlotUtils::FluxUnfoldedScaling(fMCHist_Modes, GetFluxHistogram(),
-                                     // GetEventHistogram(), fScaleFactor,
-                                     // fNEvents);
+    // PlotUtils::FluxUnfoldedScaling(fMCHist_Modes, GetFluxHistogram(),
+    // GetEventHistogram(), fScaleFactor,
+    // fNEvents);
     // }
 
     // Any other differential scaling

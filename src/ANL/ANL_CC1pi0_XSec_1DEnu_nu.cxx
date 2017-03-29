@@ -67,7 +67,7 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
   }
 
   // Now read in different data depending on what the user has specified
-  std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/ANL/CC1pip_on_n/";
+  std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/ANL/CC1pi0_on_n/";
 
   // If we're using corrected data
   if (UseCorrectedData) {
@@ -94,7 +94,7 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = (GetEventHistogram()->Integral() / double(fNEvents));
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 * 2.0 / 1.0 / (fNEvents + 0.));
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );

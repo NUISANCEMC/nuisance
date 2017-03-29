@@ -25,7 +25,7 @@
 class MiniBooNE_CC1pip_XSec_1DTpi_nu : public Measurement1D {
 public:
 
-  MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CC1pip_XSec_1DTpi_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CC1pip_XSec_1DTpi_nu() {};
 
   void FillEventVariables(FitEvent *event);

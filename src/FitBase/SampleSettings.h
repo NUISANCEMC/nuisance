@@ -14,6 +14,9 @@ public:
 	void SetS(std::string name, std::string val);
 	void SetXTitle(std::string name);
 	void SetYTitle(std::string name);
+	void SetZTitle(std::string name);
+	void SetNormError(double norm);
+
 	void SetAllowedTypes(std::string allowed, std::string defaulttype="FIX");
 	void SetEnuRangeFromFlux(TH1D* fluxhist);
 	void SetEnuRange(double min, double max);
@@ -25,6 +28,9 @@ public:
 	bool Found(std::string name, std::string substr);
 	void SetTitle(std::string val);
 	void SetDataInput(std::string val);
+	void SetErrorInput(std::string val);
+	std::string GetErrorInput();
+
 	void SetCovarInput(std::string val);
 
 	void SetDefault(std::string name, std::string val);

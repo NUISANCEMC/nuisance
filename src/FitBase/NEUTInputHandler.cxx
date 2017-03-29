@@ -156,7 +156,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);
-	fNUISANCEEvent->eventid = entry;
+	// fNUISANCEEvent->eventid = entry;
 
 	// Setup Input scaling for joint inputs
 	if (jointinput) {
@@ -315,7 +315,7 @@ BaseFitEvt* NEUTInputHandler::GetBaseEvent(const UInt_t entry) {
 	if (entry >= (UInt_t)fNEvents) return NULL;
 
 	fNEUTTree->GetEntry(entry);
-	fBaseEvent->eventid = entry;
+	// fBaseEvent->eventid = entry;
 
 	// Set joint scaling if required
 	if (jointinput) {

@@ -25,7 +25,7 @@
 class K2K_NC1pi0_Evt_1Dppi0_nu : public Measurement1D {
 public:
 
-  K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey);
   virtual ~K2K_NC1pi0_Evt_1Dppi0_nu() {};
 
   void FillEventVariables(FitEvent *event);

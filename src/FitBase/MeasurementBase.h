@@ -115,10 +115,10 @@ public:
   //! Default virtual destructor
   virtual ~MeasurementBase(void);
   virtual void InitialSetup(void) {};
+
   /*
     Reconfigure Functions
   */
-
   //! Function called if MC tuning dials haven't been changed and all we want to
   //! do is update the normalisation.
   virtual void Renormalise(void);
@@ -149,6 +149,8 @@ public:
                                     double high = -9999.9);
 
   virtual SampleSettings LoadSampleSettings(nuiskey samplekey);
+  virtual SampleSettings LoadSampleSettings(std::string name, std::string input, std::string type);
+
   virtual void FinaliseSampleSettings();
   virtual void FinaliseMeasurement();
   virtual void ProcessExtraHistograms(int cmd, MeasurementVariableBox* vars,
@@ -161,13 +163,8 @@ public:
   virtual void WriteExtraHistograms();
   virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox();};
 
-  // virtual void WriteState(){
-  //   if (fReconfigureType == kFullReconfigure) Write(); // Saves all the histograms
-  //   else if (fReconfigureType == kSignalReconfigure) WriteCore(); // Saves just the MC Histograms
-  // }
-
   int GetPassed() {
-    int signalSize = fXVar_VECT.size();
+    int signalSize = 0;
     return signalSize;
   }
 
@@ -315,12 +312,6 @@ protected:
   int fNEvents;
   double Enu_rec, ThetaMu, CosThetaMu;
 
-  std::vector<double> fXVar_VECT;
-  std::vector<double> fYVar_VECT;
-  std::vector<double> fZVar_VECT;
-  std::vector<int> fMode_VECT;
-  std::vector<UInt_t> fIndex_VECT;
-
   InputUtils::InputType fInputType;
   std::string fInputFileName;
   TH1D* fFluxHist;
@@ -332,6 +323,7 @@ protected:
   MeasurementVariableBox* fEventVariables;
 
   std::map<StackBase*, std::vector<int> > fExtraTH1s;
+  int NSignal;
   // std::map<TH1*, bool[6] > fExtaStacks;
 
 };

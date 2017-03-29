@@ -134,9 +134,11 @@ void BNL_CCQE_XSec_1DEnu_nu::ScaleEvents() {
   Measurement1D::ScaleEvents();
 
   // Flux unfold our extra histogram
-  PlotUtils::FluxUnfoldedScaling(fMCHist_NoCorr, GetFluxHistogram(),
-                                 GetEventHistogram(), fScaleFactor,
-                                 fNEvents);
+  if (applyQ2correction) {
+    PlotUtils::FluxUnfoldedScaling(fMCHist_NoCorr, GetFluxHistogram(),
+                                   GetEventHistogram(), fScaleFactor,
+                                   fNEvents);
+  }
 
 }
 

@@ -141,7 +141,7 @@ FitEvent* SplineInputHandler::GetNuisanceEvent(const UInt_t entry) {
 	fSplTree->GetEntry(entry);
 	fNUISANCEEvent->fSplineCoeff = fSplineCoeff;
 
-	fNUISANCEEvent->eventid = entry;
+	// fNUISANCEEvent->eventid = entry;
 
 	// Run Initial, FSI, Final, Other ordering.
 	fNUISANCEEvent-> OrderStack();
@@ -178,7 +178,7 @@ BaseFitEvt* SplineInputHandler::GetBaseEvent(const UInt_t entry) {
 	// Make sure events setup
 	if (entry >= (UInt_t)fNEvents) return NULL;
 
-	fBaseEvent->eventid = entry;
+	// fBaseEvent->eventid = entry;
 
 	// Set joint scaling if required
 	if (jointinput) {

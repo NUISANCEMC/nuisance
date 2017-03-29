@@ -19,24 +19,46 @@
 
 #include "MiniBooNE_CC1pip_XSec_1DTpi_nu.h"
 
-// The constructor
-MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+MiniBooNE_CC1pip_XSec_1DTpi_nu::MiniBooNE_CC1pip_XSec_1DTpi_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
-  fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})";
-  fIsDiag = true;
-  fNormError = 0.107;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE_CC1pip_XSec_1DTpi_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSec_KEpi.txt");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("T_{#pi} (MeV)");
+  fSettings.SetYTitle("d#sigma/dT_{#pi^{+}}} (cm^{2}/MeV/CH_{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetNormError(0.107);
+  fSettings.DefineAllowedTargets("C,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
-  //StatUtils::ForceNormIntoCovar(this->covar, this->fDataHist, this->fNormError);
+  // CCQELike plot information
+  fSettings.SetTitle("MiniBooNE_CC1pip_XSec_1DTpi_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/CC1pip/ccpipXSec_KEpi.txt" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08)/TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
 
 
 //********************************************************************

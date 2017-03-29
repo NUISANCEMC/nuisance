@@ -690,6 +690,12 @@ TH2D* PlotUtils::GetDecompCovarPlot(TMatrixDSym* cov, std::string name){
 
 TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name){
 
+  if (name.empty()){
+    std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file,";");
+    file = tempfile[0];
+    name = tempfile[1];
+  }
+
   TFile* rootHistFile = new TFile(file.c_str(),"READ");
   TH1D* tempHist =  (TH1D*) rootHistFile->Get(name.c_str())->Clone();
   tempHist->SetDirectory(0);
@@ -700,8 +706,32 @@ TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name){
 }
 
 
+TH2D* PlotUtils::GetTH2DFromRootFile(std::string file, std::string name){
+
+  if (name.empty()){
+    std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file,";");
+    file = tempfile[0];
+    name = tempfile[1];
+  }
+
+  TFile* rootHistFile = new TFile(file.c_str(),"READ");
+  TH2D* tempHist =  (TH2D*) rootHistFile->Get(name.c_str())->Clone();
+  tempHist->SetDirectory(0);
+
+  rootHistFile->Close();
+
+  return tempHist;
+}
 
 
+TH2D* PlotUtils::GetTH2DFromTextFile(std::string file){
+
+  /// Contents should be 
+  /// Low Edfe
+
+
+  return NULL;
+}
 
 
 void PlotUtils::AddNeutModeArray(TH1D* hist1[], TH1D* hist2[], double scaling){

@@ -21,44 +21,47 @@
 #include <sstream>
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
 
-MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+//********************************************************************
+MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey samplekey) {
+//********************************************************************
 
-  // Setup Measurement
-  fName         = "MINERvA_CC0pi_XSec_1DQ2_nu_proton";
-  fPlotTitles   = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2})";
-  fDefaultTypes = "FIX/FULL";
-  fAllowedTypes = "FIX/FULL,DIAG";
-  fNormError    = 0.100;
-  EnuMin        = 0.;
-  EnuMax        = 100.0;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CC0pi_XSec_1DQ2_nu_proton sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // Setup Data
-  SetDataValues( FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_data.txt" );
-  SetCovarMatrixFromText(FitPar::GetDataBase()+"/MINERvA/CCQE/proton_Q2QE_nu_covar.txt", 7);
-  SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(0.0, 100.0);
+  fSettings.DefineAllowedTargets("C,H");
 
-  // Quick Fix for Correl/Covar Issues
-  fCorrel = (TMatrixDSym*)fFullCovar->Clone();
-  delete fFullCovar;
-  delete covar;
-  delete fDecomp;
-  fFullCovar = StatUtils::GetCovarFromCorrel(fCorrel,fDataHist);
-  (*fFullCovar) *= 1E76;
-  covar = StatUtils::GetInvert(fFullCovar);
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CC0pi_XSec_1DQ2_nu_proton");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_data.txt" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_covar.txt" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  // Setup Coplanar Hist
-  fCoplanarMCHist   = NULL;
-  fCoplanarDataHist = NULL;
+  FinaliseSampleSettings();
 
-  // Setup a scaling factor for evt->xsec
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/TotalIntegratedFlux();
-};
 
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCorrelationFromTextFile(fSettings.GetCovarInput() );
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
+};
 
 void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
 
@@ -94,33 +97,3 @@ void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
 bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::isSignal(FitEvent *event){
   return SignalDef::isCC0pi1p_MINERvA(event, EnuMin*1.E3, EnuMax*1.E3);
 };
-
-
-bool MINERvA_CC0pi_XSec_1DQ2_nu_proton::SortExtraPlots(int state){
-
-/*
-  switch(state){
-
-  // Reset Histograms at start of event loop
-  case kExtraPlotReset:
-    fCoplanarMCHist->Reset();
-    break;
-
-  // Fill calls for extra histograms on each event
-  case kExtraPlotFill:
-    fCoplanarMCHist->Fill(fYVar, Weight);
-    break;
-
-  // Extra handling for histograms after event loop
-  case kExtraPlotConvert:
-    fCoplanarMCHist->Scale( fCoplanarDataHist->Integral() / fCoplanarMCHist->Integral() );
-    break;
-
-  // Save the extra histograms
-  case kExtraPlotWrite:
-    fCoplanarMCHist->Write();
-    break;
-  }
-*/
-  return true;
-}

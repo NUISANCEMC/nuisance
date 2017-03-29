@@ -51,10 +51,10 @@ ANL_CC1ppip_Evt_1DQ2_nu::ANL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
   HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
     fSettings.SetDataInput(  FitPar::GetDataBase()
-                             + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt" );
+                             + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_W14GeV_rebin_firstQ2rem.txt" );
   } else {
     fSettings.SetDataInput(  FitPar::GetDataBase()
-                             + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt" );
+                             + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_Q2_noW_HighQ2Gone.txt" );
   }
 
   FinaliseSampleSettings();

@@ -30,6 +30,15 @@ void SampleSettings::SetYTitle(std::string name){
 	SetDefault("ytitle",name);
 };
 
+
+void SampleSettings::SetZTitle(std::string name){
+	SetDefault("ztitle",name);
+};
+
+void SampleSettings::SetNormError(double norm){
+	SetDefault("norm_error",GeneralUtils::DblToStr(norm));
+};
+
 std::string SampleSettings::GetCovarInput(){
 	return GetS("covar");
 }
@@ -73,6 +82,12 @@ void SampleSettings::SetDataInput(std::string val){
 	SetDefault("data",val);
 };
 
+void SampleSettings::SetErrorInput(std::string val){
+	SetDefault("error",val);
+};
+
+
+
 void SampleSettings::SetCovarInput(std::string val){
 	SetDefault("covar",val);
 };
@@ -99,6 +114,11 @@ std::string SampleSettings::Title(){
 
 std::string SampleSettings::GetDataInput(){
 	return GetS("data");
+};
+
+
+std::string SampleSettings::GetErrorInput(){
+	return GetS("error");
 };
 
 std::string SampleSettings::PlotTitles(){

@@ -38,12 +38,11 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(nuiskey samplekey) {
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.0, 20.0);
   fSettings.DefineAllowedTargets("C,H");
-  // fSettings.SetSuggestedFlux( FitPar::GetDataBase() + "/MiniBooNE/ccqe/mb_ccqe_flux.root");
 
   // CCQELike plot information
   fSettings.SetTitle("MINERvA #nu_e CC0#pi");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/MINERvA_CC0pi_nue_Data_ARX1509_05729.root" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CC0pi/MINERvA_CC0pi_nue_Data_ARX1509_05729.root" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/MINERvA_CC0pi_nue_Data_ARX1509_05729.root;Data_1DEe" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CC0pi/MINERvA_CC0pi_nue_Data_ARX1509_05729.root;Covar_1DEe" );
   fSettings.DefineAllowedSpecies("nue,nueb");
 
   FinaliseSampleSettings();
@@ -53,13 +52,9 @@ MINERvA_CC0pi_XSec_1DEe_nue::MINERvA_CC0pi_XSec_1DEe_nue(nuiskey samplekey) {
   fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / TotalIntegratedFlux();
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromFile( fSettings.GetDataInput(), "Data_1DEe" );
-  SetCovarFromDataFile(fSettings.GetCovarInput(), "Covar_1DEe");
-
-  // Extra Convert covar from 1E-40 to 1E-38
-  *fDecomp *= (1.0 / 10.0);
-  *fFullCovar *= (1.0 / 100.0);
-  *covar *= (100.0);
+  SetDataFromRootFile( fSettings.GetDataInput() );
+  SetCovarFromRootFile(fSettings.GetCovarInput() );
+  ScaleCovar(1.0 / 100.0);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

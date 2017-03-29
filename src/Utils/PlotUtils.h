@@ -153,6 +153,13 @@ namespace PlotUtils{
   //! Grab a 1D Histrogram from a ROOT File
   TH1D* GetTH1DFromRootFile(std::string file, std::string name);
 
+  //! Grab a 2D Histrogram from a ROOT File
+  TH2D* GetTH2DFromRootFile(std::string file, std::string name);
+
+   //! Grab a 2D Histrogram from a ROOT File
+  TH2D* GetTH2DFromTextFile(std::string file);
+
+
   //! Scale mc to match data considering empty and masked bins
   void ScaleToData(TH1D* data, TH1D* mc, TH1I* mask);
 
@@ -214,6 +221,8 @@ namespace PlotUtils{
   
   //! Return a projection of a 2D Histogram onto Y accounting for bin masking
   TH1D* GetProjectionY(TH2D* hist, TH2I* mask);
+
+
   
 }
 

@@ -90,9 +90,8 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
                   NNucPerNTarg / TotalIntegratedFlux());
 
   // 3. Plot Setup -------------------------------------------------------
-  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
-  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
-
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
 
   ///
   /// If CCQELike is used an additional the CCQELike BKG is used and a PDG
@@ -155,7 +154,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent * event) {
   // Set X Variables
   fXVar = FitUtils::Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 30., false);
   fPDGnu = event->PDGnu();
-  
+
   return;
 };
 

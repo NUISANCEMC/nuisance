@@ -57,7 +57,6 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQE_XSec_1DQ2_nu() {
   // CCQE Plot Information
   fSettings.SetTitle("MiniBooNE #nu_#mu CC0#pi");
   fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
@@ -69,9 +68,9 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQE_XSec_1DQ2_nu() {
                   (14.08 / 6.0) / TotalIntegratedFlux());
 
   // 3. Plot Setup -------------------------------------------------------
-  fDataHist  = PlotUtils::GetTH1DFromFile( fSettings.GetDataInput(), fSettings.GetName() );
-  fDataHist->SetTitle( (fSettings.Title() + fSettings.PlotTitles()).c_str() );
-
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+  
 };
 
 //********************************************************************

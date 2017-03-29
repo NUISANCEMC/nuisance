@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016 L. Pickering, P towell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -89,6 +89,8 @@ public:
   /// Replaces the old 'SetupMeasurement' function.
   void FinaliseSampleSettings();
 
+  /// \brief Creates the 1D data distribution given the binning provided.
+  virtual void CreateDataHistogram(int dimx, double* binx);
 
   /// \brief Read 1D data inputs from a text file.
   ///
@@ -148,7 +150,7 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCovarFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCovarFromRootFile(std::string covfile, std::string histname="");
 
   /// \brief Read the inverted data covariance from a text file.
   ///
@@ -169,7 +171,7 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCovarInvertFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCovarInvertFromRootFile(std::string covfile, std::string histname="");
 
   /// \brief Read the data correlations from a text file.
   ///
@@ -193,7 +195,7 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCorrelationFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCorrelationFromRootFile(std::string covfile, std::string histname="");
 
 
   /// \brief Read the cholesky decomposed covariance from a text file and turn it into a covariance
@@ -215,11 +217,15 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCholDecompFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCholDecompFromRootFile(std::string covfile, std::string histname="");
 
 
   /// \brief Scale the data by some scale factor
   virtual void ScaleData(double scale);
+
+
+  /// \brief Scale the data error bars by some scale factor
+  virtual void ScaleDataErrors(double scale);
 
 
   /// \brief Scale the covariaince and its invert/decomp by some scale factor.
@@ -249,16 +255,7 @@ public:
   /// - "data/masks/" + fName + ".mask";
   virtual void SetBinMask(std::string maskfile);
 
-
-  /// \brief Final constructor setup
-  /// \warning Should be called right at the end of the constructor.
-  ///
-  /// Contains a series of checks to ensure the data and inputs have been setup.
-  /// Also creates the MC histograms needed for fitting.
-  virtual void FinaliseMeasurement();
-
-
-
+  
   /// \brief Set the current fit options from a string.
   ///
   /// This is called twice for each sample, once to set the default
@@ -281,6 +278,16 @@ public:
   /// - 'FULL,FREE,SHAPE/MASK/NORM' = User can give either FULL, FREE, or SHAPE as on option.
   /// MASK and NORM can also be included as options.
   virtual void SetFitOptions(std::string opt);
+
+
+  /// \brief Final constructor setup
+  /// \warning Should be called right at the end of the constructor.
+  ///
+  /// Contains a series of checks to ensure the data and inputs have been setup.
+  /// Also creates the MC histograms needed for fitting.
+  void FinaliseMeasurement();
+
+
 
 
   /*

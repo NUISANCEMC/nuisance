@@ -47,7 +47,7 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
     fSettings.SetDataInput(  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRL31_844.root;ANL_1DEnu_Data" );
     fSettings.SetEnuRange(0.0, 3.0);
 
-  } else if (fSettings.Found("name", "PRD16")) {
+  } else {
 
     fSettings.SetDataInput(  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRD16_3103.root;ANL_1DEnu_fluxtuned_Data" );
 
@@ -144,9 +144,11 @@ void ANL_CCQE_XSec_1DEnu_nu::ScaleEvents() {
   Measurement1D::ScaleEvents();
 
   // Flux unfold our extra histogram
-  PlotUtils::FluxUnfoldedScaling(fMCHist_NoCorr, GetFluxHistogram(),
-                                 GetEventHistogram(), fScaleFactor,
-                                 fNEvents);
+  if (applyQ2correction) {
+    PlotUtils::FluxUnfoldedScaling(fMCHist_NoCorr, GetFluxHistogram(),
+                                   GetEventHistogram(), fScaleFactor,
+                                   fNEvents);
+  }
 
 }
 

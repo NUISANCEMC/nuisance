@@ -21,6 +21,7 @@
 #define ElectronScattering_DurhamData_H_SEEN
 
 #include "Measurement1D.h"
+#include "TH3D.h"
 
 //********************************************************************
 class ElectronScattering_DurhamData : public Measurement1D {
@@ -35,11 +36,30 @@ public:
   void FillHistograms();
   bool isSignal(FitEvent *event);
   void ScaleEvents(); // Converts TH3D to TH1D
+  void ResetAll();
+  void ApplyNormScale(double norm);
+  void Write(std::string drawOpts);
+void SetDataFromName(std::string name);
+  int GetNDOF();
+  double GetLikelihood();
+  void SetFitOptions(std::string opt);
+  // MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox1D();};
+  // ElectronVariableBox* GetBox() { return static_cast<ElectronVariableBox*>(MeasurementBase::GetBox()); };
+
+  TH1D* GetMCHistogram(void);
+  TH1D* GetDataHistogram(void);
 
 private:
 
-  TH3D* fMCScan_EvsThetavsQ0;
-  
+  TH3D* fMCScan_Q0vsThetavsE;
+  TH2D* fMCScan_Q0vsTheta;
+  TH2D* fMCScan_Q0vsE;
+  // TH1D* fMCHist;
+  // TH1D* fDataHist;
+  TGraphErrors* fDataGraph;
+
+  double fXLowLim, fXHighLim, fYLowLim, fYHighLim, fZLowLim, fZHighLim;
+  double fYCenter, fZCenter;
 };
 
 #endif

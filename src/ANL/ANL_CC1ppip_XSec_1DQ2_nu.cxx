@@ -45,7 +45,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(nuiskey samplekey) {
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
   fSettings.DefineAllowedSpecies("numu");
   fSettings.SetDataInput(  FitPar::GetDataBase()
-                           + "/data/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt" );
+                           + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_dSigdQ2_W14_1982.txt" );
 
   FinaliseSampleSettings();
 

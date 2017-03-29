@@ -35,7 +35,7 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings.SetXTitle("E_{#nu} (GeV)");
   fSettings.SetYTitle("#sigma (cm^{2}/proton)");
   fSettings.SetAllowedTypes("FIX/DIAG", "FIX,FREE,SHAPE/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetEnuRange(0.0, 6.0);
   fSettings.SetS("norm_error", "0.15");
   fSettings.DefineAllowedTargets("D,H");
 
@@ -52,12 +52,12 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
   // If we're using corrected data
   if (UseCorrectedData) {
     DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
-    fSettings.SetEnuRange(0.0, 6.0);
+    fSettings.SetEnuRange(0.0, 3.0);
 
     // If we're using raw uncorrected data
   } else {
     DataLocation += "BNL_CC1pip_on_p_1986.txt";
-    fSettings.SetEnuRange(0.0, 3.0);
+    fSettings.SetEnuRange(0.0, 6.0);
   }
   fSettings.SetDataInput(DataLocation);
 

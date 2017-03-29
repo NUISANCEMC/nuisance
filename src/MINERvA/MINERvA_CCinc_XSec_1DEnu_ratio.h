@@ -28,7 +28,7 @@
 class MINERvA_CCinc_XSec_1DEnu_ratio : public JointMeas1D {
 public:
 
-  MINERvA_CCinc_XSec_1DEnu_ratio(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCinc_XSec_1DEnu_ratio(nuiskey samplekey);
   virtual ~MINERvA_CCinc_XSec_1DEnu_ratio() {};
 
   void MakePlots();
@@ -37,9 +37,6 @@ public:
   void ScaleEvents(){return;};;
 
   void SetCovarMatrixFromText(std::string covarFile, int dim);
-
-  // Custom write function because the ratio has much more limited information available than normal.
-  void Write(std::string drawOpt);
 
  private:
 

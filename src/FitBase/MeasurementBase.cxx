@@ -61,7 +61,7 @@ MeasurementBase::~MeasurementBase() {
 //********************************************************************
 double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low,
     double high) {
-  //********************************************************************
+//********************************************************************
 
   // Set Energy Limits
   if (low == -9999.9) low = this->EnuMin;
@@ -129,7 +129,7 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
 
 //***********************************************
 int MeasurementBase::GetInputID() {
-  //***********************************************
+//***********************************************
   return FitBase::GetInputID(fInputFileName);
 }
 
@@ -146,26 +146,27 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
   return setting;
 }
 
-void MeasurementBase::FinaliseSampleSettings() {
+//***********************************************
+SampleSettings MeasurementBase::LoadSampleSettings(std::string name, std::string input, std::string type) {
+//***********************************************
 
-  // Set type options
+  nuiskey samplekey = Config::CreateKey("sample");
+  samplekey.SetS("name",name);
+  samplekey.SetS("input",input);
+  samplekey.SetS("type",type);
 
-  // Set Fit Options
-
+  return LoadSampleSettings(samplekey);
 }
 
-// void MeasurementBase::FinaliseMeasurement() {
+void MeasurementBase::FinaliseSampleSettings() {
 
-//   // Run SetupDefaultHist and Masking functions if needed.
-
-//   // Run checks on input species and targets if they have been given.
-// }
-
+}
 
 
 //***********************************************
 void MeasurementBase::Reconfigure() {
-  //***********************************************
+//***********************************************
+  
   LOG(REC) << " Reconfiguring sample " << fName << std::endl;
 
   // Reset Histograms
@@ -236,6 +237,9 @@ void MeasurementBase::Reconfigure() {
   if (npassed == 0) {
     LOG(SAM) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
   }
+  LOG(REC) << std::setw(10) << std::right << NSignal << "/"
+           << fNEvents << " events passed selection + binning after reweight"
+           << std::endl;
 
   // Finalise Histograms
   fMCFilled = true;

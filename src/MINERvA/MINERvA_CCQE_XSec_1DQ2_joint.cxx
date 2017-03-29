@@ -108,8 +108,8 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std
   }
 
   // Setup Data
-  this->SetDataValues( basedir + datafilename );
-  this->SetCovarMatrixFromText( basedir + covarfilename, nBins);
+  this->SetDataFromTextFile( basedir + datafilename );
+  this->SetCovarFromTextFile( basedir + covarfilename );
 
   // Setup Experiments
   MIN_anu = new MINERvA_CCQE_XSec_1DQ2_antinu(antineutrinoclass, inFileAntineutrino, rw, type, fakeDataFile);

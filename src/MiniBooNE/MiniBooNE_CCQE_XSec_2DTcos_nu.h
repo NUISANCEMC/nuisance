@@ -28,7 +28,7 @@ class MiniBooNE_CCQE_XSec_2DTcos_nu : public Measurement2D {
 
 public:
 
-  MiniBooNE_CCQE_XSec_2DTcos_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CCQE_XSec_2DTcos_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_2DTcos_nu() {};
   
   void FillEventVariables(FitEvent *event);
