@@ -42,7 +42,7 @@ ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) 
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   // fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / TotalIntegratedFlux());
   fScaleFactor = 1.0;
-  
+
   // Plot Setup -------------------------------------------------------
   SetDataFromName(fSettings.GetS("name"));
   SetCovarFromDiagonal();
@@ -206,13 +206,15 @@ void  ElectronScattering_DurhamData::FillEventVariables(FitEvent *event) {
   FitParticle* ein  = event->PartInfo(0);
   FitParticle* eout = event->GetHMFSParticle(11);
 
-  double q0    = 0.0;
+  double q0    = fabs(ein->fP.E() - eout->fP.E()) / 1000.0;
   double E     = ein->fP.E() / 1000.0;
   double theta = ein->fP.Vect().Angle(eout->fP.Vect()) * 180;
 
   fXVar = q0;
   fYVar = theta;
   fZVar = E;
+
+  std::cout << "Got Event " << q0 << " " << theta << " " << E << std::endl;
 
   return;
 };
@@ -225,9 +227,9 @@ bool ElectronScattering_DurhamData::isSignal(FitEvent *event) {
     return false;
 
 
-  if (fXVar < fXLowLim or fXVar > fXHighLim) return false;
-  if (fYVar < fYLowLim or fYVar > fYHighLim) return false;
-  if (fZVar < fZLowLim or fZVar > fZHighLim) return false;
+  // if (fXVar < fXLowLim or fXVar > fXHighLim) return false;
+  // if (fYVar < fYLowLim or fYVar > fYHighLim) return false;
+  // if (fZVar < fZLowLim or fZVar > fZHighLim) return false;
 
   return true;
 };
@@ -237,9 +239,12 @@ void ElectronScattering_DurhamData::FillHistograms() {
 //********************************************************************
 
   if (Signal) {
-    fMCScan_Q0vsThetavsE->Fill(fXVar, fYVar, fZVar, Weight);
-  }
-
+    fMCScan_Q0vsThetavsE->Fill(fXVar, fYVar, fZVar);
+  
+  fMCHist->Fill(fXVar);
+  fMCScan_Q0vsTheta->Fill(fXVar, fYVar);
+  fMCScan_Q0vsE->Fill(fXVar, fZVar);
+}
 }
 
 void ElectronScattering_DurhamData::ResetAll() {
@@ -259,39 +264,42 @@ void ElectronScattering_DurhamData::ScaleEvents() {
 
   fMCScan_Q0vsThetavsE->Scale(fScaleFactor, "width");
 
-  // // Project into fMCScan_Q0vsTheta
-  // for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
-  //   for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
-  //     double total = 0.;
-  //     for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
-  //       double zwidth = fMCScan_Q0vsThetavsE->GetZaxis()->GetBinWidth(z + 1);
-  //       total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * zwidth;
-  //     }
-  //     fMCScan_Q0vsTheta->SetBinContent(x + 1, y + 1, total);
-  //   }
-  // }
+  // Project into fMCScan_Q0vsTheta
+  for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
+    for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
+      double total = 0.;
+      for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
+        double zwidth = fMCScan_Q0vsThetavsE->GetZaxis()->GetBinWidth(z + 1);
+        total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * zwidth;
+      }
+      fMCScan_Q0vsTheta->SetBinContent(x + 1, y + 1, total);
+    }
+  }
 
-  // // Project into fMCScan_Q0vsE
-  // for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
-  //   for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
-  //     double total = 0.;
-  //     for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
-  //       double ywidth = fMCScan_Q0vsThetavsE->GetYaxis()->GetBinWidth(y + 1);
-  //       total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * ywidth;
-  //     }
-  //     fMCScan_Q0vsE->SetBinContent(x + 1, z + 1, total);
-  //   }
-  // }
+  // Project into fMCScan_Q0vsE
+  for (int x = 0; x < fMCScan_Q0vsThetavsE->GetNbinsX(); x++) {
+    for (int z = 0; z < fMCScan_Q0vsThetavsE->GetNbinsZ(); z++) {
+      double total = 0.;
+      for (int y = 0; y < fMCScan_Q0vsThetavsE->GetNbinsY(); y++) {
+        double ywidth = fMCScan_Q0vsThetavsE->GetYaxis()->GetBinWidth(y + 1);
+        total += fMCScan_Q0vsThetavsE->GetBinContent(x + 1, y + 1, z + 1) * ywidth;
+      }
+      fMCScan_Q0vsE->SetBinContent(x + 1, z + 1, total);
+    }
+  }
 
-  // // Project fMCScan_Q0vsTheta into MC Hist
-  // for (int x = 0; x < fMCScan_Q0vsTheta->GetNbinsX(); x++) {
-  //   double total = 0.;
-  //   for (int y = 0; y < fMCScan_Q0vsTheta->GetNbinsY(); y++) {
-  //     double ywidth = fMCScan_Q0vsTheta->GetYaxis()->GetBinWidth(y + 1);
-  //     total += fMCScan_Q0vsTheta->GetBinContent(x + 1, y + 1);
-  //   }
-  //   fMCHist->SetBinContent(x + 1, total);
-  // }
+  // Project fMCScan_Q0vsTheta into MC Hist
+  for (int x = 0; x < fMCScan_Q0vsTheta->GetNbinsX(); x++) {
+    double total = 0.;
+    for (int y = 0; y < fMCScan_Q0vsTheta->GetNbinsY(); y++) {
+      double ywidth = fMCScan_Q0vsTheta->GetYaxis()->GetBinWidth(y + 1);
+      total += fMCScan_Q0vsTheta->GetBinContent(x + 1, y + 1);
+    }
+    double xwidth = fMCScan_Q0vsTheta->GetXaxis()->GetBinWidth(x + 1);
+    fMCHist->SetBinContent(x + 1, total * xwidth);
+  }
+
+  fMCHist->Scale(fDataHist->Integral() / fMCHist->Integral());
 
 }
 
@@ -307,10 +315,9 @@ void ElectronScattering_DurhamData::Write(std::string drawOpts) {
   fMCScan_Q0vsThetavsE->Write();
   fMCScan_Q0vsTheta->Write();
   fMCScan_Q0vsE->Write();
-  fMCHist->Write();
-
-  fDataHist->Write();
   fDataGraph->Write();
+
+  Measurement1D::Write(drawOpts);
 
 }
 

@@ -29,7 +29,7 @@
 class MINERvA_CCQE_XSec_1DQ2_joint : public JointMeas1D {
 public:
 
-  MINERvA_CCQE_XSec_1DQ2_joint(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey);
   virtual ~MINERvA_CCQE_XSec_1DQ2_joint() {};
   void MakePlots();
 

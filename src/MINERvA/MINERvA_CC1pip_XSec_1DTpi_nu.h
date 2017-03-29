@@ -24,12 +24,13 @@
 
 class MINERvA_CC1pip_XSec_1DTpi_nu : public Measurement1D {
 public:
-  MINERvA_CC1pip_XSec_1DTpi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CC1pip_XSec_1DTpi_nu(nuiskey samplekey);
   virtual ~MINERvA_CC1pip_XSec_1DTpi_nu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
   bool fFullPhaseSpace;
+  bool fFluxCorrection;
 
   private:
 };

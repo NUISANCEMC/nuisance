@@ -24,7 +24,7 @@
 
 class MINERvA_CCNpip_XSec_1DTpi_nu : public Measurement1D {
 public:
-  MINERvA_CCNpip_XSec_1DTpi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCNpip_XSec_1DTpi_nu(nuiskey samplekey);
   virtual ~MINERvA_CCNpip_XSec_1DTpi_nu() {};
 
   void FillEventVariables(FitEvent *event);
@@ -34,6 +34,7 @@ public:
   void Write(std::string drawOpts);
   bool fFullPhaseSpace;
   bool fUpdatedData;
+  bool fFluxCorrection;
   
 private:
   std::vector<double> TpiVect;
