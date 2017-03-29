@@ -29,6 +29,12 @@
 <config spline_cores='6' />
 <config spline_chunks='10' />
 <config spline_procchunk='-1' />
+
+<config Electron_NThetaBins='4' />
+<config Electron_NEnergyBins='4' />
+<config Electron_ThetaWidth='1.0' />
+<config Electron_EnergyWidth='0.100' />
+
 <!-- # Input Configs -->
 <!-- # ###################################################### -->
 

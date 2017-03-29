@@ -128,6 +128,7 @@ set(EXPERIMENTS
   ArgoNeuT
   BEBC
   BNL
+  Electron
   FNAL
   GGM
   K2K
