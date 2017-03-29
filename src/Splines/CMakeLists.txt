@@ -17,8 +17,6 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-FitSpline.cxx
-FitSplineHead.cxx
 SplineReader.cxx
 SplineWriter.cxx
 SplineMerger.cxx
@@ -27,8 +25,6 @@ Spline.cxx
 )
 
 set(HEADERFILES
-FitSpline.h
-FitSplineHead.h
 SplineReader.h
 SplineWriter.h
 SplineUtils.h

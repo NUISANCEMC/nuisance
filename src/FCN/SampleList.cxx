@@ -334,6 +334,22 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("MiniBooNE_CC1pi0_XSec_1Dppi0_nu")) {
     return (new MiniBooNE_CC1pi0_XSec_1Dppi0_nu(samplekey));
 
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu") ||
+             !name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc")) {
+    return (new MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(samplekey));
+
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_nu") ||
+             !name.compare("MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc")) {
+    return (new MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(samplekey));
+
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_antinu") ||
+             !name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_rhc")) {
+    return (new MiniBooNE_NC1pi0_XSec_1Dppi0_antinu(samplekey));
+
+  } else if (!name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_nu") ||
+             !name.compare("MiniBooNE_NC1pi0_XSec_1Dppi0_fhc")) {
+    return (new MiniBooNE_NC1pi0_XSec_1Dppi0_nu(samplekey));
+
     /*
       MiniBooNE NCEL
     */

@@ -43,6 +43,8 @@ MeasurementVariableBox.cxx
 MeasurementVariableBox2D.cxx
 MeasurementVariableBox1D.cxx
 CustomVariableBoxes.h
+GeneratorInfoBase.h
+InputTypes.h
 )
 
 set(HEADERFILES
@@ -64,6 +66,7 @@ MeasurementVariableBox.h
 MeasurementVariableBox2D.h
 MeasurementVariableBox1D.h
 CustomVariableBoxes.h
+GeneratorInfoBase.h
 )
 
 set(LIBNAME FitBase)

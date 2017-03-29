@@ -50,7 +50,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/GGM)
 include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
 include_directories(${CMAKE_SOURCE_DIR}/src/MiniBooNE)
 include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
-
+include_directories(${CMAKE_SOURCE_DIR}/src/Electron)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 

@@ -131,6 +131,13 @@
 #include "MiniBooNE_CC1pi0_XSec_1Dcosmu_nu.h"
 #include "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu.h"
 #include "MiniBooNE_CC1pi0_XSec_1Dppi0_nu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
+
+
+
 
 // MiniBooNE NC1pi0
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
