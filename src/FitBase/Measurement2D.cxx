@@ -196,8 +196,10 @@ void Measurement2D::FinaliseSampleSettings() {
 void Measurement2D::CreateDataHistogram(int dimx, double* binx, int dimy, double* biny) {
   if (fDataHist) delete fDataHist;
 
+  LOG(SAM) << "Creating Data Histogram dim : " << dimx << " " << dimy << std::endl;
+
   fDataHist = new TH2D( (fSettings.GetName() + "_data").c_str(), (fSettings.GetFullTitles()).c_str(),
-                        dimx-1, binx, dimy-1, biny );
+                        dimx - 1, binx, dimy - 1, biny );
 
 }
 
@@ -211,6 +213,7 @@ void Measurement2D::SetDataFromRootFile(std::string datfile, std::string histnam
 
 void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D* hist) {
 
+  LOG(SAM) << "Setting data values from text file" << std::endl;
   if (!hist) hist = fDataHist;
 
   // Read TH2D From textfile
@@ -218,16 +221,17 @@ void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D* hist) {
   valhist->Reset();
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0, true);
 
-  // Fill Errors
+ LOG(SAM) << " -> Filling values from read hist." << std::endl;
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinContent(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-
+  LOG(SAM) << " --> Done" << std::endl;
 }
 
 void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D* hist) {
+  LOG(SAM) << "Setting data errors from text file" << std::endl;
 
   if (!hist) hist = fDataHist;
 
@@ -237,20 +241,30 @@ void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D* hist) {
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0);
 
   // Fill Errors
+ LOG(SAM) << " -> Filling errors from read hist." << std::endl;
+
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinError(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
+  LOG(SAM) << " --> Done" << std::endl;
+
 
 }
 
 void Measurement2D::SetMapValuesFromText(std::string dataFile) {
 
-  // if (!hist) hist = fMapHist;
+  TH2D* hist = fDataHist;
+  std::vector<double> edgex;
+  std::vector<double> edgey;
+
+  for (int i = 0; i <= hist->GetNbinsX(); i++) edgex.push_back(hist->GetXaxis()->GetBinLowEdge(i+1));
+  for (int i = 0; i <= hist->GetNbinsY(); i++) edgey.push_back(hist->GetYaxis()->GetBinLowEdge(i+1));
+
 
   fMapHist = new TH2I((fName + "_map").c_str(), (fName + fPlotTitles).c_str(),
-                      fNDataPointsX - 1, fXBins, fNDataPointsY - 1, fYBins);
+                      edgex.size()-1, &edgex[0], edgey.size()-1, &edgey[0]);
 
   LOG(SAM) << "Reading map from: " << dataFile << std::endl;
   PlotUtils::Set2DHistFromText(dataFile, fMapHist, 1.0);
@@ -303,7 +317,7 @@ void Measurement2D::SetCovarFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = fDataHist->GetNbinsX();
+    dim = this->GetNDOF(false);
   }
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
@@ -329,7 +343,7 @@ void Measurement2D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = fDataHist->GetNbinsX();
+    dim = this->GetNDOF(false);
   }
 
   LOG(SAM) << "Reading inverted covariance from text file: " << covfile << std::endl;
@@ -354,7 +368,7 @@ void Measurement2D::SetCovarInvertFromRootFile(std::string covfile, std::string 
 void Measurement2D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
-  if (dim == -1) dim = fDataHist->GetNbinsX();
+  if (dim == -1) dim = this->GetNDOF(false);
   LOG(SAM) << "Reading data correlations from text file: " << covfile << ";" << dim << std::endl;
   TMatrixDSym* correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
@@ -413,10 +427,10 @@ void Measurement2D::SetCholDecompFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = fDataHist->GetNbinsX();
+    dim = this->GetNDOF(false);
   }
 
-  LOG(SAM) << "Reading cholesky from text file: " << covfile << std::endl;
+  LOG(SAM) << "Reading cholesky from text file: " << covfile << " " << dim << std::endl;
   TMatrixD* temp = StatUtils::GetMatrixFromTextFile(covfile, dim, dim);
 
   TMatrixD* trans = (TMatrixD*)temp->Clone();
@@ -463,9 +477,9 @@ void Measurement2D::ScaleData(double scale) {
 void Measurement2D::ScaleDataErrors(double scale) {
 //********************************************************************
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-    for (int j = 0; j < fDataHist->GetNbinsY(); j++){
-    fDataHist->SetBinError(i + 1, j + 1, fDataHist->GetBinError(i + 1, j+1) * scale);
-  }
+    for (int j = 0; j < fDataHist->GetNbinsY(); j++) {
+      fDataHist->SetBinError(i + 1, j + 1, fDataHist->GetBinError(i + 1, j + 1) * scale);
+    }
   }
 }
 
@@ -784,7 +798,7 @@ void Measurement2D::FillHistograms() {
     fMCFine->Fill(fXVar, fYVar, Weight);
     fMCStat->Fill(fXVar, fYVar, 1.0);
 
-    if (fMCHist_Modes) fMCHist_Modes->Fill(Mode, fXVar,  fYVar, Weight);
+    if (fMCHist_Modes) fMCHist_Modes->Fill(Mode, fXVar, fYVar, Weight);
   }
 
   return;
@@ -795,10 +809,10 @@ void Measurement2D::ScaleEvents() {
 //********************************************************************
 
   // Fill MCWeighted;
-  for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
-    fMCWeighted->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1));
-    fMCWeighted->SetBinError(i + 1,   fMCHist->GetBinError(i + 1));
-  }
+  // for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
+  // fMCWeighted->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1));
+  // fMCWeighted->SetBinError(i + 1,   fMCHist->GetBinError(i + 1));
+  // }
 
 
   // Setup Stat ratios for MC and MC Fine
@@ -851,7 +865,7 @@ void Measurement2D::ScaleEvents() {
     fMCHist->Scale(fScaleFactor, "width");
     fMCFine->Scale(fScaleFactor, "width");
 
-    if (fMCHist_Modes) fMCHist_Modes->Scale(fScaleFactor, "width");
+    // if (fMCHist_Modes) fMCHist_Modes->Scale(fScaleFactor, "width");
   }
 
 
@@ -891,11 +905,9 @@ void Measurement2D::ApplyNormScale(double norm) {
 */
 
 //********************************************************************
-int Measurement2D::GetNDOF() {
+int Measurement2D::GetNDOF(bool applymasking) {
   //********************************************************************
-  return fDataHist->GetNbinsX() - fMaskHist->Integral();
-
-  /// 2D Version
+  // return fDataHist->GetNbinsX() - fMaskHist->Integral();
 
   // Just incase it has gone...
   if (!fDataHist) return 0;
@@ -906,8 +918,7 @@ int Measurement2D::GetNDOF() {
   // not data points
   for (int xBin = 0; xBin < fDataHist->GetNbinsX() + 1; ++xBin) {
     for (int yBin = 0; yBin < fDataHist->GetNbinsY() + 1; ++yBin) {
-      if (fDataHist->GetBinContent(xBin, yBin) != 0 &&
-          fDataHist->GetBinError(xBin, yBin) != 0)
+      if (fDataHist->GetBinContent(xBin, yBin) != 0)
         ++nDOF;
     }
   }
@@ -921,7 +932,9 @@ int Measurement2D::GetNDOF() {
           if (fMaskHist->GetBinContent(xBin, yBin) > 0.5) ++nMasked;
 
   // Take away those masked DOF
-  nDOF -= nMasked;
+  if (applymasking) {
+    nDOF -= nMasked;
+  }
 
   return nDOF;
 }
@@ -1619,6 +1632,11 @@ void Measurement2D::SetupDefaultHist() {
                      fMCHist->GetXaxis()->GetBinLowEdge(nBinsX + 1), nBinsY * 3,
                      fMCHist->GetYaxis()->GetBinLowEdge(1),
                      fMCHist->GetYaxis()->GetBinLowEdge(nBinsY + 1));
+
+  // Setup MC Stat
+  fMCStat = (TH2D*)fMCHist->Clone();
+  fMCStat->Reset();
+
 
   // Setup the NEUT Mode Array
   PlotUtils::CreateNeutModeArray(fMCHist, (TH1**)fMCHist_PDG);

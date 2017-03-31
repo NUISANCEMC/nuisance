@@ -27,7 +27,7 @@ class MINERvA_CCinc_XSec_1Dx_nu : public Measurement1D {
 
 public:
 
-  MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, std::string type);
   virtual ~MINERvA_CCinc_XSec_1Dx_nu() {};
 
   // Functions for handling each neut event

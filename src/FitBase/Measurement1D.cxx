@@ -639,6 +639,10 @@ void Measurement1D::SetFitOptions(std::string opt) {
   if (opt.find("NORM") != std::string::npos) fAddNormPen = true;
   if (opt.find("MASK") != std::string::npos) fIsMask = true;
 
+
+
+  std::cout << fSettings.fKeyValues.fNode << std::endl;
+
   return;
 };
 
@@ -749,10 +753,10 @@ void Measurement1D::ScaleEvents() {
 //********************************************************************
 
   // Fill MCWeighted;
-  for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
-    fMCWeighted->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1));
-    fMCWeighted->SetBinError(i + 1,   fMCHist->GetBinError(i + 1));
-  }
+  // for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
+  //   fMCWeighted->SetBinContent(i + 1, fMCHist->GetBinContent(i + 1));
+  //   fMCWeighted->SetBinError(i + 1,   fMCHist->GetBinError(i + 1));
+  // }
 
 
   // Setup Stat ratios for MC and MC Fine
@@ -1037,12 +1041,12 @@ TH1D* Measurement1D::GetMCHistogram() {
   int fillcolor = 0;
   int fillstyle = 1001;
 
-  if (fSettings.Has("linecolor")) linecolor = fSettings.GetI("linecolor");
-  if (fSettings.Has("linestyle")) linestyle = fSettings.GetI("linestyle");
-  if (fSettings.Has("linewidth")) linewidth = fSettings.GetI("linewidth");
+  // if (fSettings.Has("linecolor")) linecolor = fSettings.GetI("linecolor");
+  // if (fSettings.Has("linestyle")) linestyle = fSettings.GetI("linestyle");
+  // if (fSettings.Has("linewidth")) linewidth = fSettings.GetI("linewidth");
 
-  if (fSettings.Has("fillcolor")) fillcolor = fSettings.GetI("fillcolor");
-  if (fSettings.Has("fillstyle")) fillstyle = fSettings.GetI("fillstyle");
+  // if (fSettings.Has("fillcolor")) fillcolor = fSettings.GetI("fillcolor");
+  // if (fSettings.Has("fillstyle")) fillstyle = fSettings.GetI("fillstyle");
 
   fMCHist->SetTitle(chi2.str().c_str());
 
@@ -1066,9 +1070,9 @@ TH1D* Measurement1D::GetDataHistogram() {
   int datastyle = 1;
   int datawidth = 1;
 
-  if (fSettings.Has("datacolor")) datacolor = fSettings.GetI("datacolor");
-  if (fSettings.Has("datastyle")) datastyle = fSettings.GetI("datastyle");
-  if (fSettings.Has("datawidth")) datawidth = fSettings.GetI("datawidth");
+  // if (fSettings.Has("datacolor")) datacolor = fSettings.GetI("datacolor");
+  // if (fSettings.Has("datastyle")) datastyle = fSettings.GetI("datastyle");
+  // if (fSettings.Has("datawidth")) datawidth = fSettings.GetI("datawidth");
 
   fDataHist->SetLineColor(datacolor);
   fDataHist->SetLineWidth(datawidth);

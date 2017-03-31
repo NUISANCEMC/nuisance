@@ -66,6 +66,10 @@ public:
 
 	bool fApply_2p2h_NP;
 	double fGausVal_2p2h_NP[6];
+
+	bool fApply_CC1pi;
+	double fGausVal_CC1pi[6];
+
 	bool fDebugStatements;
 
 

@@ -773,6 +773,8 @@ void JointFCN::ReconfigureFastUsingManager() {
     return;
   }
 
+  bool fFillNuisanceEvent = FitPar::Config().GetParB("FullEventOnSignalReconfigure");
+
   // Setup fast vector iterators.
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
   std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
@@ -838,7 +840,8 @@ void JointFCN::ReconfigureFastUsingManager() {
       }
 
       // Get The Base Event
-      curevent = curinput->GetBaseEvent(i);
+      if (fFillNuisanceEvent) curinput->GetNuisanceEvent(i);
+      else curevent = curinput->GetBaseEvent(i);
 
       // End iterator if NULL pointer at this entry..
       if (!curevent) break;

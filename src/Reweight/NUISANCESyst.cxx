@@ -14,7 +14,7 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 
 	switch (type) {
 	case kGaussianCorr_CCQE_norm:             { return "GaussianCorr_CCQE_norm";  }
-	case kGaussianCorr_CCQE_tilt:              { return "GaussianCorr_CCQE_tilt";   }
+	case kGaussianCorr_CCQE_tilt:             { return "GaussianCorr_CCQE_tilt";   }
 	case kGaussianCorr_CCQE_Pq0:              { return "GaussianCorr_CCQE_Pq0";   }
 	case kGaussianCorr_CCQE_Wq0:              { return "GaussianCorr_CCQE_Wq0";   }
 	case kGaussianCorr_CCQE_Pq3:              { return "GaussianCorr_CCQE_Pq3";   }
@@ -37,6 +37,12 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 	case kGaussianCorr_2p2h_NP_Wq0:           { return "GaussianCorr_2p2h_NP_Wq0";   }
 	case kGaussianCorr_2p2h_NP_Pq3:           { return "GaussianCorr_2p2h_NP_Pq3";   }
 	case kGaussianCorr_2p2h_NP_Wq3:           { return "GaussianCorr_2p2h_NP_Wq3";   }
+	case kGaussianCorr_CC1pi_norm:            { return "GaussianCorr_CC1pi_norm";  }
+	case kGaussianCorr_CC1pi_tilt:            { return "GaussianCorr_CC1pi_tilt";   }
+	case kGaussianCorr_CC1pi_Pq0:             { return "GaussianCorr_CC1pi_Pq0";   }
+	case kGaussianCorr_CC1pi_Wq0:             { return "GaussianCorr_CC1pi_Wq0";   }
+	case kGaussianCorr_CC1pi_Pq3:             { return "GaussianCorr_CC1pi_Pq3";   }
+	case kGaussianCorr_CC1pi_Wq3:             { return "GaussianCorr_CC1pi_Wq3";   }
 
 	default: return "unknown_nuisance_dial";
 	}

@@ -377,7 +377,7 @@ public:
   ///
   /// Returns the number bins inside the data histogram accounting for
   /// any bin masking applied.
-  virtual int GetNDOF(void);
+  virtual int GetNDOF(bool applymasking=true);
 
   /// \brief Return Data/MC Likelihood at current state
   ///

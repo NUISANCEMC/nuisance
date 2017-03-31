@@ -24,7 +24,7 @@
 
 class MINERvA_CCNpip_XSec_1Dthmu_nu : public Measurement1D {
 public:
-  MINERvA_CCNpip_XSec_1Dthmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCNpip_XSec_1Dthmu_nu(nuiskey samplekey);
   virtual ~MINERvA_CCNpip_XSec_1Dthmu_nu() {};
 
   void FillEventVariables(FitEvent *event);

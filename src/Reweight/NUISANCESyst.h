@@ -30,6 +30,12 @@ enum NUISANCESyst {
 	kGaussianCorr_2p2h_NP_Wq0,
 	kGaussianCorr_2p2h_NP_Pq3,
 	kGaussianCorr_2p2h_NP_Wq3,
+	kGaussianCorr_CC1pi_norm,
+	kGaussianCorr_CC1pi_tilt,
+	kGaussianCorr_CC1pi_Pq0,
+	kGaussianCorr_CC1pi_Wq0,
+	kGaussianCorr_CC1pi_Pq3,
+	kGaussianCorr_CC1pi_Wq3,
 
 	kNUISANCEDial_LAST
 };

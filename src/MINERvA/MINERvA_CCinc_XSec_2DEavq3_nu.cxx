@@ -21,73 +21,88 @@
 
 #include "MINERvA_CCinc_XSec_2DEavq3_nu.h"
 
+
+
 //********************************************************************
-MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey) {
 //********************************************************************
 
-  // Measurement Details
-  fName = "MINERvA_CCinc_XSec_2DEavq3_nu";
-  fPlotTitles = "; q_{3} (GeV); E_{avail} (GeV); d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})";
-  EnuMin = 2.;
-  EnuMax = 6.;
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCinc_XSec_2DEavq3_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Medium Energy FHC numu  \n" \
+                        "Signal: CC-inclusive with theta < 20deg \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("q_{3} (GeV)");
+  fSettings.SetYTitle("E_{avail} (GeV)");
+  fSettings.SetZTitle("d^{2}#sigma/dq_{3}dE_{avail} (cm^{2}/GeV^{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(2.0, 6.0);
+  fSettings.DefineAllowedTargets("C,H");
+
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CCinc_XSec_2DEavq3_nu");
+
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCEavq3/data_2D.txt" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCEavq3/covar_2D.txt" );
+  fSettings.SetMapInput( FitPar::GetDataBase() + "/MINERvA/CCEavq3/map_2D.txt" );
+  fSettings.DefineAllowedSpecies("numu");
+
   hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
   useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
   splitMEC_PN_NN = FitPar::Config().GetParB("Modes.split_PN_NN");
-  fNormError = 0.107;
-  fDefaultTypes = "FIX/FULL";
-  fAllowedTypes = "FIX,FREE,SHAPE/FULL,DIAG/MASK";
-  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  // Binning for the 2D Histograms
-  this->fNDataPointsX = 7;
-  this->fNDataPointsY = 17;
-  Double_t tempx[7] = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
-  Double_t tempy[17] = {0.0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50, 0.60, 0.80};
-  this->fXBins = tempx;
-  this->fYBins = tempy;
+  FinaliseSampleSettings();
 
-  // Fill data and 1Dto2D Maps for covariance
-  SetDataValuesFromText(   FitPar::GetDataBase()+"/MINERvA/CCEavq3/data_2D.txt", 1E-42);
-  SetMapValuesFromText(    FitPar::GetDataBase()+"/MINERvA/CCEavq3/map_2D.txt");
-  SetCovarMatrixFromChol(  FitPar::GetDataBase()+"/MINERvA/CCEavq3/covar_2D.txt", 67);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-42 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
 
-  // Data is in 1E-42 and so is the covariance, need to scale accordingly.
-  (*this->fFullCovar) *= 1E-16;
-  (*this->covar)      *= 1E16;
+  // Plot Setup -------------------------------------------------------
+  Double_t binx[7] = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
+  Double_t biny[17] = {0.0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50, 0.60, 0.80};
+  CreateDataHistogram(7, binx, 17, biny);
 
-  // Set data errors from covariance matrix
+  SetDataValuesFromTextFile( fSettings.GetDataInput() );
+  std::cout << "Scaling Data" << std::endl;
+  ScaleData(1E-42);
+
+  SetMapValuesFromText( fSettings.GetMapInput() );
+
+  SetCholDecompFromTextFile( fSettings.GetCovarInput() );
+  ScaleCovar(1E-16);
+
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
 
-  // Setup mc Histograms
-  SetupDefaultHist();
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  // Set Scale Factor
-  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-42/(fNEvents+0.))/this->TotalIntegratedFlux();
 };
 
-
-
 //********************************************************************
-void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
+void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   // Seperate MEC
-  if (splitMEC_PN_NN){
+  if (splitMEC_PN_NN) {
     int npr = 0;
     int nne = 0;
 
-    for (UInt_t j = 0; j < event->Npart(); j++){
+    for (UInt_t j = 0; j < event->Npart(); j++) {
       if ((event->PartInfo(j))->fIsAlive) continue;
 
       if (event->PartInfo(j)->fPID == 2212) npr++;
       else if (event->PartInfo(j)->fPID == 2112) nne++;
     }
 
-    if (event->Mode == 2 and npr == 1 and nne == 1){
+    if (event->Mode == 2 and npr == 1 and nne == 1) {
       event->Mode = 2;
       Mode = 2;
 
-    } else if (event->Mode == 2 and npr == 0 and nne == 2){
+    } else if (event->Mode == 2 and npr == 0 and nne == 2) {
       event->Mode = 3;
       Mode = 3;
 
@@ -101,25 +116,25 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
   // If muon found get kinematics
   FitParticle* muon      = event->GetHMFSParticle(13);
   FitParticle* neutrino  = event->GetNeutrinoIn();
-  if (muon && neutrino){
+  if (muon && neutrino) {
 
     // Set Q from Muon
     TLorentzVector q = neutrino->fP - muon->fP;
-    double q0 = (q.E())/1.E3;
+    double q0 = (q.E()) / 1.E3;
     //double q3_true = (q.Vect().Mag())/1.E3;
     double thmu = muon->fP.Vect().Angle(neutrino->fP.Vect());
-    double pmu  = muon->fP.Vect().Mag()/1.E3;
-    double emu  = muon->fP.E()/1.E3;
-    double mmu  = muon->fP.Mag()/1.E3;
+    double pmu  = muon->fP.Vect().Mag() / 1.E3;
+    double emu  = muon->fP.E() / 1.E3;
+    double mmu  = muon->fP.Mag() / 1.E3;
 
     // Get Enu Rec
     double enu_rec = emu + q0;
 
     // Set Q2 QE
-    double q2qe = 2*enu_rec * (emu - pmu * cos(thmu)) - mmu*mmu;
+    double q2qe = 2 * enu_rec * (emu - pmu * cos(thmu)) - mmu * mmu;
 
     // Calc Q3 from Q2QE and EnuTree
-    q3 = sqrt(q2qe + q0*q0);
+    q3 = sqrt(q2qe + q0 * q0);
 
     // Get Eav too
     Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
@@ -133,7 +148,7 @@ void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event){
 }
 
 //********************************************************************
-bool MINERvA_CCinc_XSec_2DEavq3_nu::isSignal(FitEvent *event){
+bool MINERvA_CCinc_XSec_2DEavq3_nu::isSignal(FitEvent *event) {
 //********************************************************************
   return SignalDef::isCCincLowRecoil_MINERvA(event, EnuMin, EnuMax);
 }

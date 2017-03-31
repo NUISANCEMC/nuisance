@@ -215,7 +215,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
         morePions->Fill(tpi, Weight);
       }
 
-      PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, tpi, Weight);
+      if (fMCHist_Modes) fMCHist_Modes->Fill(Mode, tpi, Weight);
     }
   }
 }

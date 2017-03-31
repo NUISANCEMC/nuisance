@@ -26,22 +26,21 @@ ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(nuiskey samplekey
   // Sample overview ---------------------------------------------------
   std::string descrip = "ANL CC1npip Event Rate 1DcosmuStar nu sample. \n" \
                         "Target: D2 \n" \
-                        "Flux:  \n" \
-                        "Signal:  \n";
+                        "Flux: ANL fhc numu \n" \
+                        "Signal: CC1pi 3 Prong (SignalDef::isCC1pi3Prong) \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
-  fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos(#theta*)");
-  fSettings.SetYTitle("Number of events");
-  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  fSettings.SetEnuRange(0.0, 1.5);
-  fSettings.DefineAllowedTargets("D,H");
 
-  // CCQELike plot information
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_CC1npip_cosmuStar.csv" );
-  fSettings.DefineAllowedSpecies("numu");
+  // fSettings.SetDescription(descrip);
+  // fSettings.SetXTitle("cos(#theta*)");
+  // fSettings.SetYTitle("Number of events");
+  // fSettings.SetEnuRange(0.0, 1.5);
+  // fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  // fSettings.DefineAllowedTargets("D,H");
+  // fSettings.DefineAllowedSpecies("numu");
+  // fSettings.SetDataInput( FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_CC1npip_cosmuStar.csv" );
 
   FinaliseSampleSettings();
 

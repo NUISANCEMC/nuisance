@@ -38,11 +38,11 @@ void StackBase::AddMode(int index, std::string name, std::string title,
 
 bool StackBase::IncludeInStack(TH1* hist){
 	if (!FitPar::Config().GetParB("includeemptystackhists") and
-		hist->Integral() == 0.0) return false;
+	        hist->Integral() == 0.0) return false;
 	return true;
 }
 
-bool StackBase::IncludeInStack(int index){
+bool StackBase::IncludeInStack(int index) {
 	return true;
 }
 
@@ -54,12 +54,13 @@ void StackBase::SetupStack(TH1* hist) {
 	fNDim = fTemplate->GetDimension();
 
 	for (size_t i = 0; i < fAllLabels.size(); i++) {
-		fAllHists.push_back( (TH1*) fTemplate->Clone( fAllLabels[i].c_str() ) );
+		fAllHists.push_back( (TH1*) fTemplate->Clone( (fName + "_" + fAllLabels[i]).c_str() ) );
 	}
 };
 
 void StackBase::Scale(double sf, std::string opt) {
 	for (size_t i = 0; i < fAllLabels.size(); i++) {
+		std::cout << "Scaling Stack Hist " << i << " by " << sf << std::endl;
 		fAllHists[i]->Scale(sf, opt.c_str());
 	}
 };
@@ -71,10 +72,17 @@ void StackBase::Reset() {
 };
 
 void StackBase::FillStack(int index, double x, double y, double z, double weight) {
-  if (index < 0 or (UInt_t)index >= fAllLabels.size()) return;
+	if (index < 0 or (UInt_t)index >= fAllLabels.size()) {
+		ERR(WRN) << "Returning Stack Fill Because Range = " << index << " " << fAllLabels.size() << std::endl;
+		return;
+	}
 
 	if (fNDim == 1)      fAllHists[index]->Fill(x, y);
-	else if (fNDim == 2) ((TH2*)fAllHists[index])->Fill(x, y, z);
+	else if (fNDim == 2) {
+		// std::cout << "Filling 2D Stack " << index << " " << x << " " << y << " " << z << std::endl;
+		((TH2*)fAllHists[index])->Fill(x, y, z);
+	}
+
 	else if (fNDim == 3) ((TH3*)fAllHists[index])->Fill(x, y, z, weight);
 }
 
@@ -82,10 +90,11 @@ void StackBase::Write() {
 	THStack* st = new THStack();
 
 	// Loop and add all histograms
+	bool saveseperate = FitPar::Config().GetParB("WriteSeperateStacks");
 	for (size_t i = 0; i < fAllLabels.size(); i++) {
 
-		if (!IncludeInStack(fAllHists[i])) continue;
-		if (!IncludeInStack(i)) continue;
+		// if (!IncludeInStack(fAllHists[i])) continue;
+		// if (!IncludeInStack(i)) continue;
 
 		fAllHists[i]->SetTitle( fAllTitles[i].c_str() );
 		fAllHists[i]->GetXaxis()->SetTitle( fXTitle.c_str() );
@@ -95,12 +104,15 @@ void StackBase::Write() {
 		fAllHists[i]->SetLineWidth( fAllStyles[i][1] );
 		fAllHists[i]->SetFillStyle( fAllStyles[i][2] );
 		fAllHists[i]->SetFillColor( fAllStyles[i][0] );
+		if (saveseperate) fAllHists[i]->Write();
+
 		st->Add(fAllHists[i]);
 	}
 	st->SetTitle(fTitle.c_str());
 	st->SetName(fName.c_str());
 	st->Write();
 	delete st;
+
 };
 
 void StackBase::Multiply(TH1* hist) {
@@ -167,7 +179,7 @@ THStack StackBase::GetStack() {
 }
 
 
-void StackBase::AddNewHist(std::string name, TH1* hist){
+void StackBase::AddNewHist(std::string name, TH1* hist) {
 	AddMode( fAllLabels.size(), name, hist->GetTitle(), hist->GetLineColor());
 	fAllHists.push_back( (TH1*) hist->Clone() );
 }

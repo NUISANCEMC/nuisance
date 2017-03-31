@@ -31,6 +31,8 @@ public:
 	void SetErrorInput(std::string val);
 	std::string GetErrorInput();
 
+	std::string GetMapInput();
+	void SetMapInput(std::string val);
 	void SetCovarInput(std::string val);
 
 	void SetDefault(std::string name, std::string val);

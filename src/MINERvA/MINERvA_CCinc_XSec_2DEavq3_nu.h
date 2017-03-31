@@ -29,7 +29,7 @@ class MINERvA_CCinc_XSec_2DEavq3_nu : public Measurement2D {
  public:
 
   // Constructor
- MINERvA_CCinc_XSec_2DEavq3_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+ MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey);
 
   // Destructor
   virtual ~MINERvA_CCinc_XSec_2DEavq3_nu() {

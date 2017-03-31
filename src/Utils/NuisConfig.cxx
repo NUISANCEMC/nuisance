@@ -19,6 +19,37 @@
 #include "NuisConfig.h"
 #include "FitParameters.h"
 
+struct SXmlAttr_t {
+   SXmlAttr_t  *fNext;
+   // after structure itself memory for attribute name is preserved
+   // if first byte is 0, this is special attribute
+   static inline char* Name(void* arg) { return (char*)arg + sizeof(SXmlAttr_t); }
+};
+
+enum EXmlNodeType {
+  kXML_NODE    = 1,    // normal node with children
+  kXML_COMMENT = 2,    // comment (stored as value of node fName)
+  kXML_PI_NODE = 3,    // processing instructions node (like <?name  attr="" ?>
+  kXML_RAWLINE = 4,    // just one line of xml code
+  kXML_CONTENT = 5     // node content, can appear many times in between of normal nodes
+};
+
+struct SXmlNode_t {
+   EXmlNodeType fType;    //  this is node type - node, comment, processing instruction and so on
+   SXmlAttr_t  *fAttr;    // first attribute
+   SXmlAttr_t  *fNs;      // name space definition (if any)
+   SXmlNode_t  *fNext;    // next node on the same level of hierarchy
+   SXmlNode_t  *fChild;   // first child node
+   SXmlNode_t  *fLastChild; // last child node
+   SXmlNode_t  *fParent;   // parent node
+   // consequent bytes after structure are node name
+   // if first byte is 0, next is node content
+   static inline char* Name(void* arg) { return (char*)arg + sizeof(SXmlNode_t); }
+};
+
+
+
+
 nuisconfig::nuisconfig() {
 
   // Initial Setup
@@ -31,7 +62,7 @@ nuisconfig::nuisconfig() {
   // Load in documents
   fXMLDocs.clear();
   fXML->SetSkipComments(true);
-  fXMLDocs.push_back( fXML->ParseFile(filename.c_str()) );
+  fXMLDocs.push_back( fXML->ParseFile(filename.c_str(), 1000000) );
 
   // Setup Main XML Node
   fMainNode = fXML->DocGetRootElement( fXMLDocs[0] );
@@ -211,7 +242,7 @@ void nuisconfig::AddXMLLine(std::string line) {
 
   // Ad the line
   std::cout << "[ NUISANCE ]: Adding XMLLine in nuisconfig: '"
-            << xmlline << "'"; 
+            << xmlline << "'";
 
   // Make XML Structure
   fXMLDocs.push_back( fXML->ParseString(xmlline.c_str()) );
@@ -237,7 +268,7 @@ void nuisconfig::LoadXMLConfig(std::string filename, std::string state = "") {
 
   std::cout << "[ NUISANCE ]: Loading XML config from : " << filename;
   // Add new file to xml docs list
-  fXMLDocs.push_back( fXML->ParseFile( filename.c_str() ) );
+  fXMLDocs.push_back( fXML->ParseFile( filename.c_str(), 1000000 ) );
 
   // Get New Doc ROOT
   int nxml = fXMLDocs.size();
@@ -293,7 +324,7 @@ void nuisconfig::LoadConfig(std::string filename, std::string state) {
   // Open file and see if its XML
   std::cout << "[ NUISANCE ]: Trying to parse file : " << filename;
   StopTalking();
-  XMLDocPointer_t tempdoc = fXML->ParseFile( filename.c_str() );
+  XMLDocPointer_t tempdoc = fXML->ParseFile( filename.c_str() , 1000000);
   StartTalking();
 
   if (tempdoc) {
@@ -490,11 +521,17 @@ std::string nuisconfig::GetS(XMLNodePointer_t node, std::string name) {
     }
   }
 
+  if (!fXML) {
+    std::cout << "AAAAH NO XML" << std::endl;
+    throw;
+  }
+
   // Loop over all attributes
   while ( attr != 0 ) {
 
     // Find value of correct name
     if (exact) {
+      // std::cout << "Getting Attr name = " << attr << " " << name << std::endl;
       if (std::string(fXML->GetAttrName(attr)) == name.c_str()) {
         temp = fXML->GetAttrValue(attr);
       }
@@ -515,7 +552,11 @@ bool nuisconfig::Has(XMLNodePointer_t node, std::string name) {
   if (node == 0) return false;
 
   // Get Attribute from child with name
+  SXmlNode_t* snode = (SXmlNode_t*) node;
+  SXmlAttr_t* sattr = snode->fAttr;
+
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
+  
   bool found = false;
 
   // Check if its a search or exact (should probs just add wildcards...)

@@ -944,6 +944,7 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
 
   // Create map if required
   if (!map) map = StatUtils::GenerateMap(data);
+  std::cout << data << " " << cov <<  " " << map <<  " " << scale << std::endl;
 
   // Set Bin Errors from cov diag
   int count = 0;

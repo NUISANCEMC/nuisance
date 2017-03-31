@@ -74,6 +74,7 @@ TrueModeStack::TrueModeStack(std::string name, std::string title, TH1* hist) {
 };
 
 int TrueModeStack::ConvertModeToIndex(int mode) {
+	// std::cout << "Converting Mode " << (mode) << std::endl;
 	switch (abs(mode)) {
 	case 1:  return 0;  // CCQE
 	case 2:  return 1;  // CC2p2h
@@ -111,7 +112,7 @@ void TrueModeStack::Fill(int mode, double x, double y, double z, double weight) 
 };
 
 void TrueModeStack::Fill(FitEvent* evt, double x, double y, double z, double weight) {
-	StackBase::FillStack(ConvertModeToIndex(evt->fMode), x, y, z, weight);
+	StackBase::FillStack(ConvertModeToIndex(evt->Mode), x, y, z, weight);
 };
 
 void TrueModeStack::Fill(BaseFitEvt* evt, double x, double y, double z, double weight) {

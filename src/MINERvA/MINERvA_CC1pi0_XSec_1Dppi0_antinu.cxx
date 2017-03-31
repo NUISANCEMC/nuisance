@@ -21,33 +21,52 @@
 
 #include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
 
-// The constructor
-MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dppi0_antinu";
-  fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)";
-  EnuMin = 1.5;
-  EnuMax = 10;
-  fIsDiag = true;
-  fNormError = 0.15;
-  fAllowedTypes += "NEW";
 
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+MINERvA_CC1pi0_XSec_1Dppi0_antinu::MINERvA_CC1pi0_XSec_1Dppi0_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CC1pi0_XSec_1Dppi0_antinu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
-  // Please change when MINERvA releases new data!
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#pi^{0}} (GeV/c)");
+  fSettings.SetYTitle("d#sigma/dp_{#pi^{0}} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CC1pi0_XSec_1Dppi0_antinu");
+  fSettings.DefineAllowedSpecies("numu");
+  fFluxCorrected = fSettings.Found("name", "fluxcorr");
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2015/ccpi0_ppi0.csv");
+  SetCovarFromDiagonal();
+
+  if (fFluxCorrected) {
+    // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
+    // Please change when MINERvA releases new data!
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) * 1.11);
+    }
   }
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  this->SetupDefaultHist();
-
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 void MINERvA_CC1pi0_XSec_1Dppi0_antinu::FillEventVariables(FitEvent *event) {

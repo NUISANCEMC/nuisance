@@ -24,33 +24,30 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "ANL CC1npip Event Rate 1DcosmuStar nu sample. \n" \
-                        "Target: D2 \n" \
-                        "Flux:  \n" \
-                        "Signal:  \n";
+  std::string descrip = "ANL_CC1npip_Evt_1Dppi_nu sample. \n" \
+                        "Dist   : Pion Momentum : p_{#pi} \n" \
+                        "Signal : numuCC1pi+1p : #nu_{#mu}-CC-1#pi^{+}-1p \n" \
+                        "Target : Deuterium : D2 \n" \
+                        "Flux   : ANL FHC numu \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
-  fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#pi} (MeV)");
-  fSettings.SetYTitle("Number of events");
-  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  fSettings.SetEnuRange(0.0, 1.5);
-  fSettings.DefineAllowedTargets("D,H");
-
-  // plot information
-  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
-  fSettings.DefineAllowedSpecies("numu");
-
+  // fSettings.SetDescription(descrip);
+  // fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  // fSettings.SetPlotTitles("p_{#pi} (MeV); Number of events");
+  // fSettings.SetAllowedTypes("EVT/SHAPE/DIAG");
+  // fSettings.SetDefaultTypes("EVT/SHAPE/DIAG");
+  // fSettings.SetAllowedTargets("D,H");
+  // fSettings.SetAllowedSpecies("numu");
+  // fSettings.SetEnergyRange(0.0, 1.5);
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+  fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.) * 2. / 1.;
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetDataFromTextFile( FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
   SetPoissonErrors();
   SetCovarFromDiagonal();
 
@@ -75,7 +72,7 @@ void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   double ppip;
 
   // This measurement has a 1.4 GeV M(Npi) constraint
-  if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
+  if (hadMass < 1400) ppip = FitUtils::p(Ppip) * 1000.;
   else ppip = -1.0;
 
   fXVar = ppip;

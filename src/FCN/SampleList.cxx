@@ -421,35 +421,35 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2016") ||
-             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg") ||
+             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015_fluxcorr") ||
-             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1Dth_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DTpi_nu") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg") ||
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
 
 // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
-    return (new MINERvA_CCNpip_XSec_1Dthmu_nu(file, rw, type, fkdt));
+    return (new MINERvA_CCNpip_XSec_1Dthmu_nu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dpmu_nu")) {
-    return (new MINERvA_CCNpip_XSec_1Dpmu_nu(file, rw, type, fkdt));
+    return (new MINERvA_CCNpip_XSec_1Dpmu_nu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DQ2_nu")) {
-    return (new MINERvA_CCNpip_XSec_1DQ2_nu(file, rw, type, fkdt));
+    return (new MINERvA_CCNpip_XSec_1DQ2_nu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DEnu_nu")) {
-    return (new MINERvA_CCNpip_XSec_1DEnu_nu(file, rw, type, fkdt));
+    return (new MINERvA_CCNpip_XSec_1DEnu_nu(samplekey));
 
     /*
       CC1pi0
@@ -457,53 +457,50 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu") ||
              !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015") ||
-             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1Dth_antinu(name, file, rw, type, fkdt));
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_fluxcorr") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr")) {
+    return (new MINERvA_CC1pi0_XSec_1Dth_antinu(samplekey));
 
-  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1Dppi0_antinu(file, rw, type, fkdt));
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dppi0_antinu_fluxcorr")) {
+    return (new MINERvA_CC1pi0_XSec_1Dppi0_antinu(samplekey));
 
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi0_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1DTpi0_antinu(file, rw, type, fkdt));
+    return (new MINERvA_CC1pi0_XSec_1DTpi0_antinu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DQ2_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1DQ2_antinu(file, rw, type, fkdt));
+    return (new MINERvA_CC1pi0_XSec_1DQ2_antinu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dthmu_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1Dthmu_antinu(file, rw, type, fkdt));
+    return (new MINERvA_CC1pi0_XSec_1Dthmu_antinu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dpmu_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1Dpmu_antinu(file, rw, type, fkdt));
+    return (new MINERvA_CC1pi0_XSec_1Dpmu_antinu(samplekey));
 
 // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DEnu_antinu")) {
-    return (
-             new MINERvA_CC1pi0_XSec_1DEnu_antinu(file, rw, type, fkdt));
+    return (new MINERvA_CC1pi0_XSec_1DEnu_antinu(samplekey));
 
     /*
       CCINC
     */
   } else if (!name.compare("MINERvA_CCinc_XSec_2DEavq3_nu")) {
-    return (new MINERvA_CCinc_XSec_2DEavq3_nu(file, rw, type, fkdt));
+    return (new MINERvA_CCinc_XSec_2DEavq3_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1Dx_ratio_C12_CH") ||
-             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH") ||
-             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
+               !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH") ||
+               !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
     return (
-             new MINERvA_CCinc_XSec_1Dx_ratio(name, file, rw, type, fkdt));
+             new MINERvA_CCinc_XSec_1Dx_ratio(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
-             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
-             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
+               !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
+               !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
     return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
 
     /*
@@ -511,9 +508,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
 
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
-             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
-             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
-    return (new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type));
+               !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
+               !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+    return (new T2K_CC0pi_XSec_2DPcos_nu(samplekey));
 
     /*
       T2K CC1pi+ CH samples
@@ -550,31 +547,31 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       T2K CC1pi+ H2O samples
     */
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1DEnuDelta_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1DEnuMB_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1DEnuMB_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1DEnuMB_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcosmu_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1Dcosmu_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1Dcosmu_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcosmupi_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1Dcosmupi_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1Dcosmupi_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dcospi_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1Dcospi_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1Dcospi_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dpmu_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1Dpmu_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1Dpmu_nu(samplekey));
 
   } else if (!name.compare("T2K_CC1pip_H2O_XSec_1Dppi_nu")) {
-    return (new   T2K_CC1pip_H2O_XSec_1Dppi_nu(file, rw, type, fkdt));
+    return (new   T2K_CC1pip_H2O_XSec_1Dppi_nu(samplekey));
 
     /*
       T2K CC0pi + np CH samples
     */
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
-    return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(file, rw, type, fkdt));
+    return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
 
     /*
     K2K Samples
@@ -590,12 +587,12 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
 
   } else if (name.find("ExpMultDist_CCQE_XSec_1D") != std::string::npos &&
-             name.find("_FakeStudy") != std::string::npos) {
+               name.find("_FakeStudy") != std::string::npos) {
     return (
              new ExpMultDist_CCQE_XSec_1DVar_FakeStudy(name, file, rw, type, fkdt));
 
   } else if (name.find("ExpMultDist_CCQE_XSec_2D") != std::string::npos &&
-             name.find("_FakeStudy") != std::string::npos) {
+               name.find("_FakeStudy") != std::string::npos) {
     return (
              new ExpMultDist_CCQE_XSec_2DVar_FakeStudy(name, file, rw, type, fkdt));
 
