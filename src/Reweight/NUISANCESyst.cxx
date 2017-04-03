@@ -43,6 +43,7 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 	case kGaussianCorr_CC1pi_Wq0:             { return "GaussianCorr_CC1pi_Wq0";   }
 	case kGaussianCorr_CC1pi_Pq3:             { return "GaussianCorr_CC1pi_Pq3";   }
 	case kGaussianCorr_CC1pi_Wq3:             { return "GaussianCorr_CC1pi_Wq3";   }
+	case kGaussianCorr_AllowSuppression:      { return "GaussianCorr_AllowSuppression";   }
 
 	default: return "unknown_nuisance_dial";
 	}

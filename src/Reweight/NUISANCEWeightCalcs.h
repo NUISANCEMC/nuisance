@@ -70,6 +70,8 @@ public:
 	bool fApply_CC1pi;
 	double fGausVal_CC1pi[6];
 
+	bool fAllowSuppression;
+
 	bool fDebugStatements;
 
 
