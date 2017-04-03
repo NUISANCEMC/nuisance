@@ -601,6 +601,8 @@ void JointFCN::ReconfigureUsingManager() {
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
+      // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
+      
 
       // Logging
       if (LOG_LEVEL(REC)) {

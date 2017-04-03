@@ -14,7 +14,7 @@ for line in (open(sys.argv[1])):
     uid = "ElectronData_" + z + "_" + a + "_" + e + "_" + t + "_" + s
     if (uid not in uniquelist):
         uniquelist.append(uid)
-        print uid
+        print sys.argv[2] + uid + sys.argv[3]
 
 
 

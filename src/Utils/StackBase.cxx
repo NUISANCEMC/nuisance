@@ -93,8 +93,8 @@ void StackBase::Write() {
 	bool saveseperate = FitPar::Config().GetParB("WriteSeperateStacks");
 	for (size_t i = 0; i < fAllLabels.size(); i++) {
 
-		// if (!IncludeInStack(fAllHists[i])) continue;
-		// if (!IncludeInStack(i)) continue;
+		if (!IncludeInStack(fAllHists[i])) continue;
+		if (!IncludeInStack(i)) continue;
 
 		fAllHists[i]->SetTitle( fAllTitles[i].c_str() );
 		fAllHists[i]->GetXaxis()->SetTitle( fXTitle.c_str() );
