@@ -160,7 +160,7 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
 	// Make nom weight
 	rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
-	std::cout << "Returning GENIE Weight for electron scattering = " << rw_weight << std::endl;
+	//	std::cout << "Returning GENIE Weight for electron scattering = " << rw_weight << std::endl;
 #endif
 
 	// Return rw_weight
