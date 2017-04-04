@@ -493,14 +493,14 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCinc_XSec_2DEavq3_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1Dx_ratio_C12_CH") ||
-               !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH") ||
-               !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
+             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH")) {
     return (
              new MINERvA_CCinc_XSec_1Dx_ratio(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
-               !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
-               !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
+             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
     return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
 
     /*
@@ -508,8 +508,8 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
 
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
-               !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
-               !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
+             !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
     return (new T2K_CC0pi_XSec_2DPcos_nu(samplekey));
 
     /*
@@ -587,17 +587,20 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
 
   } else if (name.find("ExpMultDist_CCQE_XSec_1D") != std::string::npos &&
-               name.find("_FakeStudy") != std::string::npos) {
+             name.find("_FakeStudy") != std::string::npos) {
     return (
              new ExpMultDist_CCQE_XSec_1DVar_FakeStudy(name, file, rw, type, fkdt));
 
   } else if (name.find("ExpMultDist_CCQE_XSec_2D") != std::string::npos &&
-               name.find("_FakeStudy") != std::string::npos) {
+             name.find("_FakeStudy") != std::string::npos) {
     return (
              new ExpMultDist_CCQE_XSec_2DVar_FakeStudy(name, file, rw, type, fkdt));
 
   } else if (name.find("GenericFlux_") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
+
+  } else if (!name.compare("T2K2017_FakeData")) {
+    return (new T2K2017_FakeData(samplekey));
 
   } else if (!name.compare("ElectronFlux_FlatTree")) {
     return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));

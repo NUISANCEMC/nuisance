@@ -23,6 +23,7 @@ GenericFlux_Tester.cxx
 #MCStudy_KaonPreSelection.cxx
 MCStudy_MuonValidation.cxx
 ElectronFlux_FlatTree.cxx
+T2K2017_FakeData.cxx
 )
 
 set(HEADERFILES
@@ -32,6 +33,7 @@ GenericFlux_Tester.h
 #MCStudy_KaonPreSelection.h
 MCStudy_MuonValidation.h
 ElectronFlux_FlatTree.h
+T2K2017_FakeData.h
 )
 
 set(LIBNAME MCStudies)

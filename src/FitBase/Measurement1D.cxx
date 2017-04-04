@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016 L. Pickering, P caltowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This ile is part of NUISANCE.
@@ -186,6 +186,13 @@ void Measurement1D::SetDataFromRootFile(std::string datafile,
 
   return;
 };
+
+//********************************************************************
+void Measurement1D::SetEmptyData(){
+//********************************************************************
+
+  fDataHist = new TH1D("EMPTY_DATA","EMPTY_DATA",1,0.0,1.0);
+}
 
 //********************************************************************
 void Measurement1D::SetPoissonErrors() {

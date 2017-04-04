@@ -59,18 +59,21 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
       // Function with EnuRange
       if (fluxvect.size() == 3){
-
+	
         ERR(FTL) << "FUNCTION WITH ENU RANGE NOT SUPPORTED SORRY!" << std::endl;
         throw;
+	
+	// Single Enu
+      } 
+    }
 
-      // Single Enu
-      } else if (fluxvect.size() == 1){
+  } else if (fluxvect.size() == 1){
 
-        double E = GeneralUtils::StrToDbl(fluxvect[0]);
-        fluxhist = new TH1D("fluxhist","fluxhist",1, E-0.00001, E+0.00001);
-        fluxhist->SetBinContent(1, 1.0);
-
-      }
+    double E = GeneralUtils::StrToDbl(fluxvect[0]);
+    fluxhist = new TH1D("fluxhist","fluxhist",1, E-0.00001, E+0.00001);
+    fluxhist->SetBinContent(1, 1.0);
+    
+  
 
 
       // if (fluxvect[0] == '1.0') {
@@ -87,7 +90,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       //     //    std::cout << "Filling Flux Hist " << f1.Eval(fluxhist->GetXaxis()->GetBinCenter(i+1)) << std::endl;
       //   }
       //   sleep(10);
-    }
+    
   } else {
     LOG(FTL) << "NO FLUX SPECIFIED" << std::endl;
     throw;

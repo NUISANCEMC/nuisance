@@ -113,6 +113,11 @@ public:
   virtual void SetDataFromRootFile(std::string inhistfile, std::string histname = "");
 
 
+  /// \brief Setup a default empty data histogram
+  ///
+  /// Only used for flattree creators.
+  virtual void SetEmptyData();
+
   /// \brief Set data bin errors to sqrt(entries)
   ///
   /// \warning REQUIRES DATA HISTOGRAM TO BE SET FIRST
