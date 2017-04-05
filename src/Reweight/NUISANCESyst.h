@@ -36,6 +36,7 @@ enum NUISANCESyst {
 	kGaussianCorr_CC1pi_Wq0,
 	kGaussianCorr_CC1pi_Pq3,
 	kGaussianCorr_CC1pi_Wq3,
+	kGaussianCorr_AllowSuppression,
 
 	kNUISANCEDial_LAST
 };
