@@ -24,7 +24,7 @@
 T2K2017_FakeData::T2K2017_FakeData(nuiskey samplekey) {
 //********************************************************************
 
-   // Sample overview ---------------------------------------------------
+  // Sample overview ---------------------------------------------------
   std::string descrip = "T2K2017 Event Kinematics MC Study \n" \
                         "Target: CH/H2O \n" \
                         "Flux: T2K numu flux \n" \
@@ -42,29 +42,65 @@ T2K2017_FakeData::T2K2017_FakeData(nuiskey samplekey) {
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)/TotalIntegratedFlux();
+  fScaleFactor = GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.) / TotalIntegratedFlux();
+
+  // Setup some MC Histograms
+  const int nbin_x = 14;
+  const double binedge_x[15] = {0., 300., 400., 500., 600., 700., 800., 900., 1000., 1250., 1500., 2000., 3000., 5000., 30000.};
+  const int nbin_y = 10;
+  const double binedge_y[11] = { -1, 0.6, 0.7, 0.8, 0.85, 0.9, 0.92, 0.94, 0.96, 0.98, 1.};
+
+  fMCHist_FGD1NuMuCC0Pi = new TH2D((fName + "_FGD1NuMuCC0Pi_MC").c_str(),
+                                   (fName + "_FGD1NuMuCC0Pi_MC").c_str(),
+                                   nbin_x, binedge_x, nbin_y, binedge_y);
+
+  fMCHistPDG_FGD1NuMuCC0Pi = new TrueModeStack((fName + "_FGD1NuMuCC0Pi_MC_PDG").c_str(),
+      (fName + "_FGD1NuMuCC0Pi_MC_PDG").c_str(),
+      fMCHist_FGD1NuMuCC0Pi);
+
+  fMCFine_FGD1NuMuCC0Pi = new TH2D((fName + "_FGD1NuMuCC0Pi_MC_FINE").c_str(),
+                                   (fName + "_FGD1NuMuCC0Pi_MC_FINE").c_str(),
+                                   40, 0., 1000., 40, -1., 1.);
+
+  fMCFinePDG_FGD1NuMuCC0Pi = new TrueModeStack((fName + "_FGD1NuMuCC0Pi_MC_FINE_PDG").c_str(),
+      (fName + "_FGD1NuMuCC0Pi_MC_FINE_PDG").c_str(),
+      fMCFine_FGD1NuMuCC0Pi);
+
+  SetAutoProcessTH1(fMCHist_FGD1NuMuCC0Pi);
+  SetAutoProcessTH1(fMCHistPDG_FGD1NuMuCC0Pi);
+  SetAutoProcessTH1(fMCFine_FGD1NuMuCC0Pi);
+  SetAutoProcessTH1(fMCFinePDG_FGD1NuMuCC0Pi);
 
   // Setup TTree to Save -------------------------------------------
   SetEmptyData();
 
-  fEventTree = new TTree("EventTree", "EventTree");
-  fEventTree->Branch("Enu", &fEnu, "Enu/D");
+  if (samplekey.Has("saveflattree")) {
+    fSaveEventTree = samplekey.GetI("saveflattree") > 0;
+  } else {
+    fSaveEventTree = false;
+  }
 
-  fEventTree->Branch("Tmu", &fTMu, "Tmu/D");
-  fEventTree->Branch("Cosmu", &fCosMu, "Cosmu/D");
 
-  fEventTree->Branch("Ppip", &fPPip, "Ppip/D");
-  fEventTree->Branch("Cospip", &fCosPip, "Cospip/D");
-  fEventTree->Branch("Ppim", &fPPim, "Ppim/D");
-  fEventTree->Branch("Cospim", &fCosPim, "Cospim/D");
-  fEventTree->Branch("Ppi0", &fPPi0, "Ppi0/D");
-  fEventTree->Branch("Cospi0", &fCosPi0, "Cospi0/D");
+  if (fSaveEventTree) {
+    fEventTree = new TTree("EventTree", "EventTree");
+    fEventTree->Branch("Enu", &fEnu, "Enu/D");
 
-  fEventTree->Branch("Mode", &fMode, "Mode/I");
-  fEventTree->Branch("NuPDG", &fNuPDG, "NuPDG/I");
-  fEventTree->Branch("ScaleFactor", &fScaleFactor, "ScaleFactor/D");
+    fEventTree->Branch("Tmu", &fTMu, "Tmu/D");
+    fEventTree->Branch("Cosmu", &fCosMu, "Cosmu/D");
 
-    // Final setup  ---------------------------------------------------
+    fEventTree->Branch("Ppip", &fPPip, "Ppip/D");
+    fEventTree->Branch("Cospip", &fCosPip, "Cospip/D");
+    fEventTree->Branch("Ppim", &fPPim, "Ppim/D");
+    fEventTree->Branch("Cospim", &fCosPim, "Cospim/D");
+    fEventTree->Branch("Ppi0", &fPPi0, "Ppi0/D");
+    fEventTree->Branch("Cospi0", &fCosPi0, "Cospi0/D");
+
+    fEventTree->Branch("Mode", &fMode, "Mode/I");
+    fEventTree->Branch("NuPDG", &fNuPDG, "NuPDG/I");
+    fEventTree->Branch("ScaleFactor", &fScaleFactor, "ScaleFactor/D");
+  }
+
+  // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
 };
@@ -105,8 +141,9 @@ void T2K2017_FakeData::FillEventVariables(FitEvent *event) {
   } else if (nu->fPID == -14) {
     muon = event->GetHMFSParticle(-13);
   }
-  fTMu = FitUtils::T(muon->fP);
+  fTMu = FitUtils::T(muon->fP) * 1.E3;
   fCosMu = cos(muon->fP.Vect().Angle(nu->fP.Vect()));
+
 
 
   // Get Pion+ Information
@@ -143,7 +180,17 @@ void T2K2017_FakeData::FillEventVariables(FitEvent *event) {
 //********************************************************************
 void T2K2017_FakeData::Write(std::string drawOpt) {
 //********************************************************************
-  fEventTree->Write();
+  if (fSaveEventTree) {
+    fEventTree->Write();
+  }
+
+  fMCHist_FGD1NuMuCC0Pi->Write();
+  fMCHistPDG_FGD1NuMuCC0Pi->Write();
+
+  fMCFine_FGD1NuMuCC0Pi->Write();
+  fMCFinePDG_FGD1NuMuCC0Pi->Write();
+
+
   return;
 }
 
@@ -163,32 +210,28 @@ bool T2K2017_FakeData::isSignal(FitEvent *event) {
   return true;
 };
 
-//********************************************************************
-void T2K2017_FakeData::ScaleEvents() {
-//********************************************************************
-  // Saving everything to a TTree so no scaling required
-  return;
-}
-
-//********************************************************************
-void T2K2017_FakeData::ApplyNormScale(float norm) {
-  //********************************************************************
-
-  // Saving everything to a TTree so no scaling required
-  this->fCurrentNorm = norm;
-  return;
-}
 
 //********************************************************************
 void T2K2017_FakeData::FillHistograms() {
 //********************************************************************
+
+  fMCHist_FGD1NuMuCC0Pi->Fill(fTMu, fCosMu, Weight);
+  fMCHistPDG_FGD1NuMuCC0Pi->Fill(Mode, fTMu, fCosMu, Weight);
+
+  fMCFine_FGD1NuMuCC0Pi->Fill(fTMu, fCosMu, Weight);
+  fMCFinePDG_FGD1NuMuCC0Pi->Fill(Mode, fTMu, fCosMu, Weight);
+
   return;
 }
 
 //********************************************************************
 void T2K2017_FakeData::ResetAll() {
   //********************************************************************
-  fEventTree->Reset();
+  Measurement1D::ResetAll();
+
+  if (fSaveEventTree) {
+    fEventTree->Reset();
+  }
   return;
 }
 

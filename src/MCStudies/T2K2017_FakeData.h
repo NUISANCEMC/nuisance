@@ -21,6 +21,7 @@
 #ifndef T2K2017_FakeData_H_SEEN
 #define T2K2017_FakeData_H_SEEN
 #include "Measurement1D.h"
+#include "StandardStacks.h"
 
 //********************************************************************
 class T2K2017_FakeData : public Measurement1D {
@@ -41,7 +42,7 @@ public:
   void ResetAll();
 
   //! Scale
-  void ScaleEvents();
+  // void ScaleEvents();
 
   //! Norm
   void ApplyNormScale(float norm);
@@ -76,6 +77,14 @@ public:
  	double fEnu;
  	int fMode;
  	int fNuPDG;
+
+ 	bool fSaveEventTree;
+
+	TH2D* fMCHist_FGD1NuMuCC0Pi;
+	TH2D* fMCFine_FGD1NuMuCC0Pi;
+	TrueModeStack* fMCFinePDG_FGD1NuMuCC0Pi;
+	TrueModeStack* fMCHistPDG_FGD1NuMuCC0Pi;
+
 
 
 };
