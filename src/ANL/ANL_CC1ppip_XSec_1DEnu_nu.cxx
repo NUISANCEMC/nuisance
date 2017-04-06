@@ -53,7 +53,7 @@ ANL_CC1ppip_XSec_1DEnu_nu::ANL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
 
   // User can specify "W14" for W < 1.4 GeV cut
   //                  "W16" for W < 1.6 GeV cut
-  //                  The default is W < 2.0
+  //                  The default is no W cut
   if (fSettings.Found("name", "W14Cut")) wTrueCut = 1.4;
   else if (fSettings.Found("name", "W16Cut")) wTrueCut = 1.6;
   else wTrueCut = 10.0;

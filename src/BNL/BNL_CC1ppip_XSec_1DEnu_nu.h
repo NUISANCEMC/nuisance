@@ -31,6 +31,7 @@ public:
   bool isSignal(FitEvent *event);
 
  private:
+  double wTrueCut;
   bool UseCorrectedData;
 };
   

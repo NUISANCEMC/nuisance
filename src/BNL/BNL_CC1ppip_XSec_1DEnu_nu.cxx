@@ -46,19 +46,33 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
   // User can specifiy to use uncorrected data
   UseCorrectedData = !fSettings.Found("name", "Uncorr");
 
+  // User can specify 1.4 or no W cut
+  if (fSettings.Found("name", "W14Cut")) wTrueCut = 1.4;
+  else wTrueCut = 10.0;
+
   // Now read in different data depending on what the user has specified
   std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/BNL/CC1pip_on_p/";
 
   // If we're using corrected data
   if (UseCorrectedData) {
-    DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
-    fSettings.SetEnuRange(0.0, 3.0);
-
-    // If we're using raw uncorrected data
+    if (wTrueCut == 1.4) {
+      DataLocation += "BNL_CC1pip_on_p_W14_1986_corr.txt";
+      fSettings.SetEnuRange(0.5, 3.0);
+    } else {
+      DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
+      fSettings.SetEnuRange(0.4, 4.0);
+    }
+  // If we're using raw uncorrected data
   } else {
-    DataLocation += "BNL_CC1pip_on_p_1986.txt";
-    fSettings.SetEnuRange(0.0, 6.0);
+    if (wTrueCut == 1.4) {
+      DataLocation += "BNL_CC1pip_on_p_W14_1986.txt";
+      fSettings.SetEnuRange(0.6, 3.0);
+    } else {
+      DataLocation += "BNL_CC1pip_on_p_1986.txt";
+      fSettings.SetEnuRange(0.5, 14.0);
+    }
   }
+
   fSettings.SetDataInput(DataLocation);
 
   FinaliseSampleSettings();
@@ -85,11 +99,13 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Include W < 1.4 GeV data sometime soon
-  //double hadMass = FitUtils::MpPi(Pp, Ppip);
+  double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
-  Enu = Pnu.E() / 1000.;
+  if (hadMass/1000. < wTrueCut) {
+    Enu = Pnu.E() / 1000.;
+  }
+
   fXVar = Enu;
 
   return;
