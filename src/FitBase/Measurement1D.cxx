@@ -97,6 +97,8 @@ Measurement1D::~Measurement1D(void) {
 void Measurement1D::FinaliseSampleSettings() {
 //********************************************************************
 
+  MeasurementBase::FinaliseSampleSettings();
+
   // Setup naming + renaming
   fName = fSettings.GetName();
   fSettings.SetS("originalname", fName);
@@ -859,7 +861,9 @@ void Measurement1D::ApplyNormScale(double norm) {
 //********************************************************************
 int Measurement1D::GetNDOF() {
   //********************************************************************
-  return fDataHist->GetNbinsX() - fMaskHist->Integral();
+  int ndof = fDataHist->GetNbinsX();
+  if (fMaskHist) ndof -= fMaskHist->Integral();
+  return ndof;
 }
 
 //********************************************************************

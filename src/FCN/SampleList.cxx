@@ -164,7 +164,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       BNL CC1ppip samples
     */
   } else if (!name.compare("BNL_CC1ppip_XSec_1DEnu_nu") ||
-             !name.compare("BNL_CC1ppip_XSec_1DEnu_nu_Uncorr")) {
+             !name.compare("BNL_CC1ppip_XSec_1DEnu_nu_Uncorr") ||
+             !name.compare("BNL_CC1ppip_XSec_1DEnu_nu_W14Cut") || 
+             !name.compare("BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr")) {
     return (new BNL_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC1ppip_Evt_1DQ2_nu") ||
              !name.compare("BNL_CC1ppip_Evt_1DQ2_nu_W14Cut")) {

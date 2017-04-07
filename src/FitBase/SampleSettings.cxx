@@ -49,12 +49,14 @@ void SampleSettings::SetAllowedTypes(std::string allowed, std::string defaulttyp
 };
 
 void SampleSettings::SetEnuRangeFromFlux(TH1D* fluxhist) {
+  std::cout << "Setting Enu frmo flux " << std::endl;
 	double enu_min = fluxhist->GetXaxis()->GetXmin();
 	double enu_max = fluxhist->GetXaxis()->GetXmax();
 	SetEnuRange(enu_min, enu_max);
 };
 
 void SampleSettings::SetEnuRange(double min, double max) {
+  std::cout << "Setting EnuRange = " << min << " " << max << std::endl;
 	SetDefault("enu_min", min);
 	SetDefault("enu_max", max);
 };
@@ -104,6 +106,7 @@ void SampleSettings::SetDefault(std::string name, std::string val) {
 };
 
 void SampleSettings::SetDefault(std::string name, double val ) {
+  std::cout << "SetDefault D = " << val << std::endl;
 	if (!fKeyValues.Has(name)) fKeyValues.AddD(name, val);
 };
 
@@ -138,6 +141,10 @@ std::string SampleSettings::GetFullTitles() {
 
 int SampleSettings::GetI(std::string name) {
 	return fKeyValues.GetI(name);
+}
+
+double SampleSettings::GetD(std::string name) {
+  return fKeyValues.GetD(name);
 }
 
 std::string SampleSettings::GetS(std::string name) {

@@ -160,6 +160,11 @@ SampleSettings MeasurementBase::LoadSampleSettings(std::string name, std::string
 
 void MeasurementBase::FinaliseSampleSettings() {
 
+  EnuMin = fSettings.GetD("enu_min");
+  EnuMax = fSettings.GetD("enu_max");
+
+  std::cout << "SetEnuMin = " << EnuMin << " "<< EnuMax << std::endl;
+
 }
 
 

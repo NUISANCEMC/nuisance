@@ -139,6 +139,8 @@ Measurement2D::~Measurement2D(void) {
 void Measurement2D::FinaliseSampleSettings() {
 //********************************************************************
 
+  MeasurementBase::FinaliseSampleSettings();
+
   // Setup naming + renaming
   fName = fSettings.GetName();
   fSettings.SetS("originalname", fName);

@@ -43,8 +43,6 @@ GaussianModeCorr::GaussianModeCorr() {
 	fGausVal_CC1pi[kPosPq3]  = 1.0;
 	fGausVal_CC1pi[kPosWq3]  = 1.0;
 
-	fAllowSuppression = false;
-
 	fDebugStatements = FitPar::Config().GetParB("GaussianModeCorr_DEBUG");
 
 }
@@ -117,15 +115,32 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 		rw_weight *= GetGausWeight(q0, q3, fGausVal_CC1pi);
 	}
 
-	if (!fAllowSuppression){
-	  if (rw_weight < 1.0) rw_weight = 1.0;
-	}
 
 	// if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
 	return rw_weight;
 }
 
 double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
+
+	// // CCQE Without Suppression
+	// double Norm = 4.82788679036;
+	// double Tilt = 2.3501416116;
+	// double Pq0  = 0.363964889702;
+	// double Wq0  = 0.133976806938;
+	// double Pq3  = 0.431769740224;
+	// double Wq3  = 0.207666663434;
+
+	// // Also add for CCQE at the end
+	// return (w > 1.0) ? w : 1.0;
+
+	// // 2p2h with suppression
+	// double Norm = 15.967;
+	// double Tilt = -0.455655;
+	// double Pq0  = 0.214598;
+	// double Wq0  = 0.0291061;
+	// double Pq3  = 0.480194;
+	// double Wq3  = 0.134588;
+
 
 
 	double Norm = vals[kPosNorm];
@@ -134,12 +149,6 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 	double Wq0  = vals[kPosWq0];
 	double Pq3  = vals[kPosPq3];
 	double Wq3  = vals[kPosWq3];
-
-	// double w = Norm;
-	// w *= TMath::Gaus(q0, Pq0, Wq0);
-	// w *= TMath::Gaus(q3, Pq3, Wq3);
-
-	// w = Norm * exp( -0.5 * ((x - [1])/[2])**2 - 0.5 *((y-[3])/[4])) );
 
 	double a = cos(Tilt) * cos(Tilt) / (2 * Wq0 * Wq0);
 	a += sin(Tilt) * sin(Tilt) / (2 * Wq3 * Wq3);
@@ -157,8 +166,8 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 
 	if (fDebugStatements) {
 
-		// std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " " << sin(Tilt) << std::endl;
-		// std::cout << "abc = " << a << " " << b << " " << c << std::endl;
+		std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " " << sin(Tilt) << std::endl;
+		std::cout << "abc = " << a << " " << b << " " << c << std::endl;
 		std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w << std::endl;
 
 	}
@@ -225,10 +234,6 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
 		}
 	}
 
-	if (curenum == kGaussianCorr_AllowSuppression){
-	  fAllowSuppression = bool(val);
-	}
-
 }
 
 bool GaussianModeCorr::IsHandled(int rwenum) {
@@ -265,7 +270,6 @@ bool GaussianModeCorr::IsHandled(int rwenum) {
 	case kGaussianCorr_CC1pi_Wq0:
 	case kGaussianCorr_CC1pi_Pq3:
 	case kGaussianCorr_CC1pi_Wq3:
-	case kGaussianCorr_AllowSuppression:
 
 		return true;
 	default:

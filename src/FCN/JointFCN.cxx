@@ -36,6 +36,9 @@ JointFCN::JointFCN(TFile* outfile) {
   std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
   LoadSamples(samplekeys);
 
+  std::vector<nuiskey> covarkeys =  Config::QueryKeys("covar");
+  LoadPulls(covarkeys);
+
   fCurIter = 0;
   fMCFilled = false;
 
@@ -346,6 +349,48 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
   }
 }
 
+void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
+
+  for (size_t i = 0; i < pullkeys.size(); i++) {
+    nuiskey key = pullkeys[i];
+
+    std::string pullname = key.GetS("name");
+    std::string pullfile = key.GetS("input");
+    std::string pulltype = key.GetS("type");
+
+    fOutputDir->cd();
+    fPulls.push_back(new ParamPull(pullname, pullfile, pulltype));
+
+  }
+
+  //     // Sample Inputs
+//     if (!samplevect[0].compare("covar") || !samplevect[0].compare("pulls") ||
+//         !samplevect[0].compare("throws")) {
+//       // Get all inputs
+//       std::string name = samplevect[1];
+//       std::string files = samplevect[2];
+//       std::string type = "DEFAULT";
+
+//       if (samplevect.size() > 3) {
+//         type = samplevect[3];
+//       } else if (!samplevect[0].compare("pull")) {
+//         type = "GAUSPULL";
+//       } else if (!samplevect[0].compare("throws")) {
+//         type = "GAUSTHROWS";
+//       }
+
+//       // Create Pull Class
+//       LOG(MIN) << "Loading up pull term: " << name << " << " << files << " ("
+//                << type << ")" << std::endl;
+//       std::string fakeData = "";
+//       fOutputDir->cd();
+//       fPulls.push_back(new ParamPull(name, files, type));
+//     }
+
+
+
+}
+
 
 // //***************************************************
 // void JointFCN::LoadSamples(std::string cardinput)
@@ -427,7 +472,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   int starttime = time(NULL);
   LOG(REC) << "Starting Reconfigure iter. " << this->fCurIter << endl;
-
+  // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled << std::endl;
   // Event Manager Reconf
   if (fUsingEventManager) {
     if (!fullconfig and fMCFilled)
@@ -545,8 +590,10 @@ void JointFCN::ReconfigureUsingManager() {
 
   // If we are siving signal, reset all containers.
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
-  if (savesignal) {
+  std::cout << " Save Signal = " << savesignal << std::endl;
+  sleep(5);
 
+  if (savesignal) {
     // Reset all of our event signal vectors
     fSignalEventBoxes.clear();
     fSignalEventFlags.clear();
@@ -576,7 +623,7 @@ void JointFCN::ReconfigureUsingManager() {
         curevent->fSplineRead->SetNeedsReconfigure(true);
       }
     }
-  } 
+  }
 
   // MAIN INPUT LOOP ====================
 
@@ -602,7 +649,7 @@ void JointFCN::ReconfigureUsingManager() {
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
       // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
-      
+
 
       // Logging
       if (LOG_LEVEL(REC)) {
@@ -701,11 +748,11 @@ void JointFCN::ReconfigureUsingManager() {
         fSignalEventSplines.push_back(coeff);
 
         // if (splinecount % 1000 == 0) {
-          // std::cout << "Pushed Back Coeff " << splinecount << " : ";
-          // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
-            // std::cout << " " << fSignalEventSplines[splinecount][l];
-          // }
-          // std::cout << std::endl;
+        // std::cout << "Pushed Back Coeff " << splinecount << " : ";
+        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
+        // std::cout << " " << fSignalEventSplines[splinecount][l];
+        // }
+        // std::cout << std::endl;
         // }
 
       }
@@ -771,6 +818,7 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Check for saved variables if not do a full reconfigure.
   if (fSignalEventFlags.empty()) {
+    ERR(WRN) << "Signal Flags Empty! Using normal manager." << std::endl;
     ReconfigureUsingManager();
     return;
   }
@@ -803,108 +851,123 @@ void JointFCN::ReconfigureFastUsingManager() {
   }
 
 
+  // Loop over all possible spline inputs
+  int coreeventcount = 0;
+  double* coreeventweights;
+  splinecount = 0;
+
+  if (fIsAllSplines) {
+    coreeventweights = new double[fSignalEventSplines.size()];
+    splinecount = 0;
+  }
+
+  inp_iter = fInputList.begin();
+  inpsig_iter = fSignalEventFlags.begin();
+  spline_iter = fSignalEventSplines.begin();
+
+
+  // Loop over all signal flags
+  // For each valid signal flag add one to splinecount
+  // Get Splines from that count and add to weight
+  // Add splinecount
+  int sigcount = 0;
+  splinecount = 0;
+
+  // #pragma omp parallel for shared(splinecount,sigcount)
+  for (int iinput = 0; iinput < fInputList.size(); iinput++) {
+
+    InputHandlerBase* curinput = fInputList[iinput];
+    BaseFitEvt* curevent = curinput->FirstBaseEvent();
+
+    for (int i = 0; i < curinput->GetNEvents(); i++) {
+
+      double rwweight = 0.0;
+      if (fSignalEventFlags[sigcount]) {
+
+        // Get Event Info
+        if (!fIsAllSplines) {
+          if (fFillNuisanceEvent) curinput->GetNuisanceEvent(i);
+          else curevent = curinput->GetBaseEvent(i);
+        } else {
+          curevent->fSplineCoeff = &fSignalEventSplines[splinecount][0];
+        }
+
+        curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
+        curevent->Weight = curevent->RWWeight * curevent->InputWeight;
+        rwweight = curevent->Weight;
+
+        // #pragma omp atomic
+        coreeventweights[splinecount] = rwweight;
+
+        if (splinecount % countwidth == 0) {
+          LOG(REC) << "Processed " << splinecount << " event weights." << std::endl;
+        }
+
+
+        // #pragma omp atomic
+        splinecount++;
+      }
+
+      // #pragma omp atomic
+      sigcount++;
+
+    }
+  }
+  LOG(SAM) << "Processed event weights." << std::endl;
+
+
+  // #pragma omp barrier
+
+  // Reset Iterators
+  inpsig_iter = fSignalEventFlags.begin();
+  spline_iter = fSignalEventSplines.begin();
+  box_iter = fSignalEventBoxes.begin();
+  samsig_iter = fSampleSignalFlags.begin();
+  int nsplineweights = splinecount;
+  splinecount = 0;
+
+
   // Start of Fast Event Loop ============================
 
   // Start input iterators
-  inp_iter = fInputList.begin();
+  // Loop over number of inputs
+  for (int ispline = 0; ispline < nsplineweights; ispline++) {
+    double rwweight = coreeventweights[ispline];
 
-  // Loop over all inputs
-  for (; inp_iter != fInputList.end(); inp_iter++) {
-    InputHandlerBase* curinput = (*inp_iter);
+    // Get iterators for this event
+    std::vector<bool>::iterator subsamsig_iter = (*samsig_iter).begin();
+    std::vector<MeasurementVariableBox*>::iterator subbox_iter = (*box_iter).begin();
 
-    // Get Only base event with RW info.
-    BaseFitEvt* curevent = curinput->FirstBaseEvent();
-    int i = 0;
+    // Loop over all sub measurements.
+    std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
+    for (; meas_iter != fSubSampleList.end(); meas_iter++, subsamsig_iter++) {
+      MeasurementBase* curmeas = (*meas_iter);
 
-    // Iterate over all events and signal flags.
-    while (curevent != 0 and (inpsig_iter != fSignalEventFlags.end())) {
+      // If event flagged as signal for this sample fill from the box.
+      if (*subsamsig_iter) {
+        curmeas->SetSignal(true);
+        curmeas->FillHistogramsFromBox((*subbox_iter), rwweight);
 
-      // Logging
-      if (LOG_LEVEL(REC)) {
-        if (i % countwidth == 0) {
-          LOG(REC) << "Processed " << i << " signal events.";
-        }
+        // Move onto next box if there is one.
+        subbox_iter++;
+        fillcount++;
       }
-
-      // If event has not been flagged as signal in vector skip it.
-      if (!(*inpsig_iter)) {
-
-        if (LOG_LEVEL(REC)) {
-          if (i % countwidth == 0) {
-            std::cout << std::endl;
-          }
-        }
-
-        inpsig_iter++;
-        i++;
-
-        continue;
-      }
-
-      // Get The Base Event
-      if (fFillNuisanceEvent) curinput->GetNuisanceEvent(i);
-      else curevent = curinput->GetBaseEvent(i);
-
-      // End iterator if NULL pointer at this entry..
-      if (!curevent) break;
-
-      // Setup signal splines pointer for this event if required.
-      if (fIsAllSplines) {
-        curevent->fSplineCoeff = &(*spline_iter)[0];
-      }
-
-      // Get Event Weight
-      curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-      curevent->Weight = curevent->RWWeight * curevent->InputWeight;
-      double rwweight = curevent->Weight;
-
-      // Weight Logging
-      if (LOG_LEVEL(REC)) {
-        if (i % countwidth == 0) {
-          std::cout << " W = " << rwweight << std::endl;
-        }
-      }
-
-      // Get iterators for this event
-      std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
-      std::vector<bool>::iterator subsamsig_iter = (*samsig_iter).begin();
-      std::vector<MeasurementVariableBox*>::iterator subbox_iter = (*box_iter).begin();
-
-      // Loop over all sub measurements.
-      for (; meas_iter != fSubSampleList.end(); meas_iter++, subsamsig_iter++) {
-        MeasurementBase* curmeas = (*meas_iter);
-
-        // If event flagged as signal for this sample fill from the box.
-        if (*subsamsig_iter) {
-          curmeas->SetSignal(true);
-          curmeas->FillHistogramsFromBox((*subbox_iter), rwweight);
-
-          // Move onto next box if there is one.
-          subbox_iter++;
-          fillcount++;
-        }
-      }
-
-      // if (splinecount % 1000 == 0) {
-        // std::cout << "Read Back Coeff " << splinecount << " : ";
-        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
-          // std::cout << " " << fSignalEventSplines[splinecount][l];
-        // }
-        // std::cout << std::endl;
-      // }
-
-      // Iterate over the main signal event containers.
-      samsig_iter++;
-      box_iter++;
-      spline_iter++;
-      splinecount++;
-      // iterate to next signal event
-      inpsig_iter++;
-      i++;
     }
-  }
 
+    if (ispline % countwidth == 0) {
+      LOG(REC) << "Filled " << ispline << " sample weights." << std::endl;
+    }
+
+    // Iterate over the main signal event containers.
+    samsig_iter++;
+    box_iter++;
+    spline_iter++;
+    splinecount++;
+
+  }
   // End of Fast Event Loop ===================
+
+  LOG(SAM) << "Filled sample distributions." << std::endl;
 
   // Now loop over all Measurements
   // Convert Binned events
@@ -912,6 +975,11 @@ void JointFCN::ReconfigureFastUsingManager() {
   for (; iterSam != fSamples.end(); iterSam++) {
     MeasurementBase* exp = (*iterSam);
     exp->ConvertEventRates();
+  }
+
+  // Cleanup coreeventweights
+  if (fIsAllSplines) {
+    delete coreeventweights;
   }
 
   // Print some reconfigure profiling.

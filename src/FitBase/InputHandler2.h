@@ -45,9 +45,11 @@ public:
   };
 
   //********************************************************************
-  inline double TotalIntegratedFlux(double low, double high,
-                                    std::string intOpt) {
+  inline double TotalIntegratedFlux(double low = -9999.9, double high = -9999.9,
+                                    std::string intOpt="") {
     //********************************************************************
+
+    std::cout << "Getting Total Integrated Flux Between : " << low << " - " << high << std::endl;
 
     Int_t minBin = fFluxHist->GetXaxis()->FindFixBin(low);
     Int_t maxBin = fFluxHist->GetXaxis()->FindFixBin(high);
@@ -60,9 +62,10 @@ public:
       maxBin = fFluxHist->GetXaxis()->GetNbins() + 1;
     }
 
-
+    std::cout << "Getting Between Bins " << minBin << " " << maxBin << std::endl;
     // If we are within a single bin
     if (minBin == maxBin) {
+      std::cout << "Getting minBin == maxBin " << std::endl;
       // Get the contained fraction of the single bin's width
       return ((high - low) / fFluxHist->GetXaxis()->GetBinWidth(minBin)) *
              fFluxHist->Integral(minBin, minBin, intOpt.c_str());
@@ -80,13 +83,16 @@ public:
 
     // If they are neighbouring bins
     if ((minBin + 1) == maxBin) {
+      std::cout << "Get lowfrac + highfrac" << std::endl;
       // Get the contained fraction of the two bin's width
       return lowBinfracIntegral + highBinfracIntegral;
     }
 
+    std::cout << "Returning highBinFracIntegral and LowBinFracIntegral " << std::endl;
     // If there are filled bins between them
     return lowBinfracIntegral + highBinfracIntegral +
            fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
+    // return fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
   }
 
 

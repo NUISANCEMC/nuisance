@@ -50,6 +50,7 @@ public:
 	std::string PlotTitles();
 	std::string GetS(std::string name);
 	int GetI(std::string name);
+	double GetD(std::string name);
 	std::string GetCovarInput();
 
 	std::vector<int> fAllowedTargets;

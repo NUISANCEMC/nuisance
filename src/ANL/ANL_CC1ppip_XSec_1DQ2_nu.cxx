@@ -51,6 +51,7 @@ ANL_CC1ppip_XSec_1DQ2_nu::ANL_CC1ppip_XSec_1DQ2_nu(nuiskey samplekey) {
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+      // this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.)*TotalIntegratedFlux("width"))*16./8.;
   fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / ((fNEvents + 0.) * TotalIntegratedFlux("width")) * 2. / 1.;
 
   // Plot Setup -------------------------------------------------------
@@ -87,6 +88,34 @@ void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool ANL_CC1ppip_XSec_1DQ2_nu::isSignal(FitEvent *event) {
+  // std::cout << "CC1ppip Enu " << EnuMin << " " << EnuMax << std::endl;
   return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
 }
 
+// void ANL_CC1ppip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
+// 46  
+// 47    if (event->NumFSParticle(2212) == 0 ||
+// 48        event->NumFSParticle(211) == 0 ||
+// 49        event->NumFSParticle(13) == 0)
+// 50      return;
+// 51  
+// 52    TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+// 53    TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
+// 54    TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+// 55    TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
+// 56  
+// 57    double hadMass = FitUtils::MpPi(Pp, Ppip);
+// 58    double q2CCpip = -1.0;
+// 59  
+// 60    // I use the W < 1.4GeV cut ANL data to isolate single pion
+// 61    // there is also a W < 1.6 GeV and an uncut spectrum ANL 1982
+// 62    if (hadMass < 1400) q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+// 63  
+// 64    fXVar = q2CCpip;
+// 65  
+// 66    return;
+// 67  };
+// 68  
+// 69  bool ANL_CC1ppip_XSec_1DQ2_nu::isSignal(FitEvent *event) {
+// 70    return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
+// 71  }

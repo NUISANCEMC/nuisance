@@ -32,7 +32,7 @@ std::string GeneralUtils::IntToStr(int val) {
   return ss.str();
 };
 
-std::string GeneralUtils::DblToStr(int val) {
+std::string GeneralUtils::DblToStr(double val) {
   std::ostringstream ss;
   ss << val;
   return ss.str();

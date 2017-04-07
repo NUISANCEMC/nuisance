@@ -33,14 +33,14 @@ ANL_CC1npip_Evt_1DcosmuStar_nu::ANL_CC1npip_Evt_1DcosmuStar_nu(nuiskey samplekey
   fSettings = LoadSampleSettings(samplekey);
 
   fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  // fSettings.SetDescription(descrip);
-  // fSettings.SetXTitle("cos(#theta*)");
-  // fSettings.SetYTitle("Number of events");
-  // fSettings.SetEnuRange(0.0, 1.5);
-  // fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  // fSettings.DefineAllowedTargets("D,H");
-  // fSettings.DefineAllowedSpecies("numu");
-  // fSettings.SetDataInput( FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_CC1npip_cosmuStar.csv" );
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("cos(#theta*)");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.DefineAllowedTargets("D,H");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput( FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_CC1npip_cosmuStar.csv" );
 
   FinaliseSampleSettings();
 

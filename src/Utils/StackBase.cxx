@@ -60,7 +60,7 @@ void StackBase::SetupStack(TH1* hist) {
 
 void StackBase::Scale(double sf, std::string opt) {
 	for (size_t i = 0; i < fAllLabels.size(); i++) {
-		std::cout << "Scaling Stack Hist " << i << " by " << sf << std::endl;
+		// std::cout << "Scaling Stack Hist " << i << " by " << sf << std::endl;
 		fAllHists[i]->Scale(sf, opt.c_str());
 	}
 };

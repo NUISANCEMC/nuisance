@@ -51,7 +51,8 @@ class JointFCN
 
   //! Create sample list from cardfile
   void LoadSamples(std::vector<nuiskey> samplekeys);
-
+  void LoadPulls(std::vector<nuiskey> pullkeys);
+  
   //! Main Likelihood evaluation FCN
   double DoEval(const double *x);
 

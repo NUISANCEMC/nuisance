@@ -72,7 +72,7 @@ std::string BoolToStr(bool val);
 
 std::string IntToStr(int val);
 
-std::string DblToStr(int val);
+std::string DblToStr(double val);
 
 
 //! Return the top level environmental variable for the fitter
