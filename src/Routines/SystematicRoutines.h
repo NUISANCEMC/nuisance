@@ -43,7 +43,6 @@
 #include "FitEvent.h"
 #include "JointFCN.h"
 #include "FitParameters.h"
-#include "ParserUtils.h"
 
 enum minstate {
   kErrorStatus = -1,
@@ -102,7 +101,6 @@ public:
   /*
     Setup Functions
   */
-void SetupSystematicsFromXML();
 
   //! Setup the configuration given the arguments passed at the commandline and card file
   void SetupConfig();
@@ -164,6 +162,10 @@ void SetupSystematicsFromXML();
   //! The FitPar config "error_throws" defines how many throws are needed.
   //! Currently only supports TH1D plots.
   void GenerateErrorBands();
+
+  void GenerateThrows();
+
+  void MergeThrows();
 
   //! Step through each parameter one by one and create folders containing the MC predictions at each step.
   //! Doesn't handle correlated parameters well
@@ -251,8 +253,8 @@ protected:
   std::vector <TH1D>        fInputDials; //!< Vector of Input Histograms
   std::vector <TMatrixDSym> fInputCovar; //!< Vector of Input Covariances  
 
-  nuiskey fCompKey;
-
+  std::vector<std::string> fThrowList;
+  std::string fThrowString;
 };
 
 /*! @} */
