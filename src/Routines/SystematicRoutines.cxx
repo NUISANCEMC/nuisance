@@ -46,10 +46,7 @@ void SystematicRoutines::Init(){
 
   fSampleFCN    = NULL;
 
-  fAllowedRoutines = ("ErrorBands,PlotLimits,ThrowErrors,MergeErrors");
-
-  fThrowString = "";
-  
+  fAllowedRoutines = ("ErrorBands,PlotLimits");
 
 };
 
@@ -65,113 +62,269 @@ SystematicRoutines::~SystematicRoutines(){
 SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
 //*************************************
 
-  // Set everything to defaults
+  // Initialise Defaults
   Init();
-  std::vector<std::string> configs_cmd;
-  std::string maxevents_flag = "";
-  int verbosity_flag = 0;
-  int error_flag = 0;
+  nuisconfig configuration = Config::Get();
 
-  // If No Arguments print commands
-  for (int i = 1; i< argc; ++i){
-    if (i+1 != argc){
+  // Default containers
+  std::string cardfile = "";
+  std::string maxevents = "-1";
+  int errorcount = 0;
+  int verbocount = 0;
+  std::vector<std::string> xmlcmds;
+  std::vector<std::string> configargs;
 
-      // Cardfile
-      if (!std::strcmp(argv[i], "-c"))      { fCardFile=argv[i+1]; ++i;}
-      else if (!std::strcmp(argv[i], "-o")) { fOutputFile=argv[i+1]; ++i;}
-      else if (!std::strcmp(argv[i], "-f")) { fStrategy=argv[i+1]; ++i;}
-      else if (!std::strcmp(argv[i], "-q")) { configs_cmd.push_back(argv[i+1]); ++i;}
-      else if (!std::strcmp(argv[i], "-n")) { maxevents_flag=argv[i+1]; ++i;}
-      else if (!std::strcmp(argv[i], "-v")) { verbosity_flag -= 1; }
-      else if (!std::strcmp(argv[i], "+v")) { verbosity_flag += 1; }
-      else if (!std::strcmp(argv[i], "-e")) { error_flag -= 1; }
-      else if (!std::strcmp(argv[i], "+e")) { error_flag += 1; }
-      else if (!std::strcmp(argv[i], "-i")) { fThrowString = argv[i+1]; ++i;}
-      else {
-	ERR(FTL) << "ERROR: unknown command line option given! - '"
-		 <<argv[i]<<" "<<argv[i+1]<<"'"<< std::endl;
-	throw;
-      }
-    }
-  }
+  // Make easier to handle arguments.
+  std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
+  ParserUtils::ParseArgument(args, "-c", fCardFile, true);
+  ParserUtils::ParseArgument(args, "-o", fOutputFile, false, false);
+  ParserUtils::ParseArgument(args, "-n", maxevents, false, false);
+  ParserUtils::ParseArgument(args, "-f", fStrategy, false, false);
+  ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
+  ParserUtils::ParseArgument(args, "-i", xmlcmds);
+  ParserUtils::ParseArgument(args, "-q", configargs);
+  ParserUtils::ParseCounter(args, "e", errorcount);
+  ParserUtils::ParseCounter(args, "v", verbocount);
+  ParserUtils::CheckBadArguments(args);
 
-  if (fCardFile.empty()){
-    ERR(FTL) << "ERROR: card file not specified."   << std::endl;
-    ERR(FTL) << "Run with '-h' to see options." << std::endl;
+  // Add extra defaults if none given
+  if (fCardFile.empty() and xmlcmds.empty()) {
+    ERR(FTL) << "No input supplied!" << std::endl;
     throw;
   }
 
-  if (fCardFile == fOutputFile) {
-    ERR(WRN) << "WARNING: output file and card file are the same file, "
-                "writing: "
-             << fCardFile << ".root" << std::endl;
+  if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
+    ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
+
+  } else if (fOutputFile.empty()) {
+    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
+    throw;
   }
 
-  if(fCardFile == fOutputFile){
-    std::cerr << "WARNING: output file and card file are the same file, "
-      "writing: " << fCardFile << ".root" << std::endl;
-    fOutputFile = fCardFile + ".root";
+  // Configuration Setup =============================
+
+  // Check no comp key is available
+  nuiskey fCompKey;
+  if (Config::Get().GetNodes("nuiscomp").empty()) {
+    fCompKey = Config::Get().CreateNode("nuiscomp");
+  } else {
+    fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  // Fill fit routines and check they are good
-  fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
-  for (UInt_t i = 0; i < fRoutines.size(); i++){
-    if (fAllowedRoutines.find(fRoutines[i]) == std::string::npos){
-      ERR(FTL) << "Unknown fit routine given! "
-	       << "Must be provided as a comma seperated list." << std::endl;
-      ERR(FTL) << "Allowed Routines: " << fAllowedRoutines << std::endl;
-      throw;
-    }
+  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+
+  // Load XML Cardfile
+  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
+
+  // Add CMD XML Structs
+  for (size_t i = 0; i < xmlcmds.size(); i++) {
+    configuration.AddXMLLine(xmlcmds[i]);
   }
 
-  // CONFIG
-  // ---------------------------
-  std::string par_dir =  GeneralUtils::GetTopLevelDir()+"/parameters/";
-  FitPar::Config().ReadParamFile( par_dir + "config.list.dat" );
-  FitPar::Config().ReadParamFile( fCardFile );
-
-  for (UInt_t iter = 0; iter < configs_cmd.size(); iter++){
-    FitPar::Config().ForceParam(configs_cmd[iter]);
+  // Add Config Args
+  for (size_t i = 0; i < configargs.size(); i++) {
+    configuration.OverrideConfig(configargs[i]);
+  }
+  if (maxevents.compare("-1")){
+    configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
 
-  if (!maxevents_flag.empty()){
-    FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
-  }
+  // Finish configuration XML
+  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
 
-  if (verbosity_flag != 0){
-    int curverb = FitPar::Config().GetParI("VERBOSITY");
-    FitPar::Config().SetParI("VERBOSITY", curverb + verbosity_flag);
-  }
+  // Add Error Verbo Lines
+  verbocount += Config::Get().GetParI("VERBOSITY");
+  errorcount += Config::Get().GetParI("ERROR");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  FitPar::log_verb = verbocount;
+  LOG_VERB(verbocount);
+  ERR_VERB(errorcount);
+  
+  // Proper Setup
+  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+  SetupSystematicsFromXML();
 
-  if (error_flag != 0){
-    int curwarn = FitPar::Config().GetParI("ERROR");
-    FitPar::Config().SetParI("ERROR", curwarn + error_flag);
-  }
-
-  LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
-  ERR_VERB(FitPar::Config().GetParI("ERROR"));
-
-  // CARD
-  // ---------------------------
-  // Parse Card Options
-  ReadCard(fCardFile);
-
-  // Outputs
-  // ---------------------------
-  // Save Configs to output file
-  fOutputRootFile = new TFile(fOutputFile.c_str(),"RECREATE");
-  FitPar::Config().Write();
-
-  // Starting Setup
-  // ---------------------------
   SetupCovariance();
+  SetupRWEngine();
   SetupFCN();
   GetCovarFromFCN();
-  SetupRWEngine();
 
   return;
 };
+
+void SystematicRoutines::SetupSystematicsFromXML(){
+
+  LOG(FIT) << "Setting up nuismin" << std::endl;
+
+  // Setup Parameters ------------------------------------------
+  std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
+  if (!parkeys.empty()) {
+    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+  }
+
+  for (size_t i = 0; i < parkeys.size(); i++) {
+    nuiskey key = parkeys.at(i);
+
+    // Check for type,name,nom
+    if (!key.Has("type")) {
+      ERR(FTL) << "No type given for parameter " << i << std::endl;
+      throw;
+    } else if (!key.Has("name")) {
+      ERR(FTL) << "No name given for parameter " << i << std::endl;
+      throw;
+    } else if (!key.Has("nominal")) {
+      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
+      throw;
+    }
+
+    // Get Inputs
+    std::string partype = key.GetS("type");
+    std::string parname = key.GetS("name");
+    double parnom  = key.GetD("nominal");
+    double parlow  = parnom - 1;
+    double parhigh = parnom + 1;
+    double parstep = 1;
+    std::string parstate = key.GetS("state");
+
+    // Extra limits
+    if (key.Has("low")) {
+      parlow  = key.GetD("low");
+      parhigh = key.GetD("high");
+      parstep = key.GetD("step");
+
+      LOG(FIT) << "Read " << partype << " : "
+               << parname << " = "
+               << parnom << " : "
+               << parlow << " < p < " << parhigh
+               << " : " << parstate << std::endl;
+    } else {
+      LOG(FIT) << "Read " << partype << " : "
+               << parname << " = "
+               << parnom << " : "
+               << parstate << std::endl;
+    }
+
+    // Run Parameter Conversion if needed
+    if (parstate.find("ABS") != std::string::npos) {
+      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+    } else if (parstate.find("FRAC") != std::string::npos) {
+      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+    }
+
+    // Push into vectors
+    fParams.push_back(parname);
+
+    fTypeVals[parname]  = FitBase::ConvDialType(partype);;
+    fStartVals[parname] = parnom;
+    fCurVals[parname]   = parnom;
+
+    fErrorVals[parname] = 0.0;
+
+    fStateVals[parname]    = parstate;
+    bool fixstate = parstate.find("FIX") != std::string::npos;
+    fFixVals[parname]      = fixstate;
+    fStartFixVals[parname] = fFixVals[parname];
+
+    fMinVals[parname]  = parlow;
+    fMaxVals[parname]  = parhigh;
+    fStepVals[parname] = parstep;
+
+  }
+
+  // Setup Samples ----------------------------------------------
+  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  if (!samplekeys.empty()) {
+    LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
+  }
+
+  for (size_t i = 0; i < samplekeys.size(); i++) {
+    nuiskey key = samplekeys.at(i);
+
+    // Get Sample Options
+    std::string samplename = key.GetS("name");
+    std::string samplefile = key.GetS("input");
+
+    std::string sampletype =
+      key.Has("type") ? key.GetS("type") : "DEFAULT";
+
+    double samplenorm =
+      key.Has("norm") ? key.GetD("norm") : 1.0;
+
+    // Print out
+    LOG(FIT) << "Read sample info " << i << " : "
+             << samplename << std::endl
+             << "\t\t input -> " << samplefile  << std::endl
+             << "\t\t state -> " << sampletype << std::endl
+             << "\t\t norm  -> " << samplenorm << std::endl;
+
+    // If FREE add to parameters otherwise continue
+    if (sampletype.find("FREE") == std::string::npos) {
+      continue;
+    }
+
+    // Form norm dial from samplename + sampletype + "_norm";
+    std::string normname = samplename + sampletype + "_norm";
+
+    // Check normname not already present
+    if (fTypeVals.find(normname) != fTypeVals.end()) {
+      continue;
+    }
+
+    // Add new norm dial to list if its passed above checks
+    fParams.push_back(normname);
+
+    fTypeVals[normname] = kNORM;
+    fStateVals[normname] = sampletype;
+    fCurVals[normname] = samplenorm;
+
+    fErrorVals[normname] = 0.0;
+
+    fMinVals[normname]  = 0.1;
+    fMaxVals[normname]  = 10.0;
+    fStepVals[normname] = 0.5;
+
+    bool state = sampletype.find("FREE") == std::string::npos;
+    fFixVals[normname]      = state;
+    fStartFixVals[normname] = state;
+  }
+
+  // Setup Fake Parameters -----------------------------
+  std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
+  if (!fakekeys.empty()) {
+    LOG(FIT) << "Number of fake parameters : " << fakekeys.size() << std::endl;
+  }
+
+  for (size_t i = 0; i < fakekeys.size(); i++) {
+    nuiskey key = fakekeys.at(i);
+
+    // Check for type,name,nom
+    if (!key.Has("name")) {
+      ERR(FTL) << "No name given for fakeparameter " << i << std::endl;
+      throw;
+    } else if (!key.Has("nom")) {
+      ERR(FTL) << "No nominal given for fakeparameter " << i << std::endl;
+      throw;
+    }
+
+    // Get Inputs
+    std::string parname = key.GetS("name");
+    double parnom  = key.GetD("nom");
+
+    // Push into vectors
+    fFakeVals[parname] = parnom;
+  }
+}
+
 
 //*************************************
 void SystematicRoutines::ReadCard(std::string cardfile){
@@ -273,18 +426,18 @@ int SystematicRoutines::ReadParameters(std::string parstring){
   std::string state = "FIX"; //[DEFAULT]
 
   // Check Type
-  ///if (FitBase::ConvDialType(partype) == kUNKNOWN and false){
-  // ERR(FTL) << "Unknown parameter type! " << partype << std::endl;
-  // std::cout << inputspec << std::endl;
-  // return kErrorStatus;
-  //}
+  if (FitBase::ConvDialType(partype) == kUNKNOWN){
+    ERR(FTL) << "Unknown parameter type! " << partype << std::endl;
+    std::cout << inputspec << std::endl;
+    return kErrorStatus;
+  }
 
   // Check Parameter Name
-  //if (FitBase::GetDialEnum(partype, parname) == -1){
-  // ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << std::endl;
-  // std::cout << inputspec << std::endl;
-  // return kErrorStatus;
-  //}
+  if (FitBase::GetDialEnum(partype, parname) == -1){
+    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << std::endl;
+    std::cout << inputspec << std::endl;
+    return kErrorStatus;
+  }
 
   // Option Extra (No Limits)
   if (strvct.size() == 4){
@@ -448,7 +601,14 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   double      samnorm = 1.0;
 
   // Optional Type
-  if (strvct.size() > 3) samtype = strvct[3];
+  if (strvct.size() > 3) {
+    samtype = strvct[3];
+    //    samname += "_"+samtype;
+    // Also get rid of the / and replace it with underscore because it might not be supported character
+    //    while (samname.find("/") != std::string::npos) {
+    //      samname.replace(samname.find("/"), 1, std::string("_"));
+    //    }
+  }
 
   // Optional Norm
   if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
@@ -508,7 +668,7 @@ void SystematicRoutines::SetupFCN(){
 
   LOG(FIT)<<"Making the jointFCN"<<std::endl;
   if (fSampleFCN) delete fSampleFCN;
-  fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
+  fSampleFCN = new JointFCN(fOutputRootFile);
   SetFakeData();
 
   return;
@@ -616,7 +776,7 @@ void SystematicRoutines::GetCovarFromFCN(){
 	       << fStartVals[syst] << ";"
 	       << fStepVals[syst];
 
-      std::string type = fTypeVals[syst] + "/GAUSTHROW";
+      std::string type = "GAUSTHROW/NEUT";
 
       // Push Back Pulls
       ParamPull* pull = new ParamPull( name, pullterm.str(), type );
@@ -678,31 +838,6 @@ void SystematicRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals
   }
 
   FitBase::GetRW()->Reconfigure();
-  return;
-}
-
-//*************************************
-void SystematicRoutines::Run(){
-//*************************************
-
-  for (UInt_t i = 0; i < fRoutines.size(); i++){
-
-    std::string routine = fRoutines.at(i);
-    int fitstate = kFitUnfinished;
-    LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
-
-    if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
-    else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    else if (routine.find("ThrowErrors") != std::string::npos) GenerateThrows();
-    else if (routine.find("MergeErrors") != std::string::npos) MergeThrows();
-
-    // If ending early break here
-    if (fitstate == kFitFinished || fitstate == kNoChange){
-      LOG(FIT) << "Ending fit routines loop." << std::endl;
-      break;
-    }
-  }
-
   return;
 }
 
@@ -771,7 +906,7 @@ void SystematicRoutines::PrintState(){
 
   LOG(FIT)<<"------------"<<std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT)<<"Likelihood for JointFCN == " << like << std::endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
   LOG(FIT)<<"------------"<<std::endl;
 }
 
@@ -924,22 +1059,10 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 
     for (int i = 0; i < dialhist.GetNbinsX(); i++){
       std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
-      if (fFixVals.find(name) != fFixVals.end()){
-	if (fFixVals.at(name)){
-	  LOG(FIT) << "Skipping throw for fixed " << name << std::endl;
-	  continue;
-	}
-      }
       if (fCurVals.find(name) != fCurVals.end()){
-	std::cout << i << " Setting found " << name << " bin label to " << dialhist.GetBinContent(i+1) << " : " << dialhist.GetXaxis()->GetBinLabel(i+1) << std::endl;
 	fThrownVals[name] = dialhist.GetBinContent(i+1);
-
-	if (fThrownVals[name] > fMaxVals[name]) fThrownVals[name] = fMaxVals[name];
-	if (fThrownVals[name] < fMinVals[name]) fThrownVals[name] = fMinVals[name];
       }
     }
-
-    
 
     // Reset throw incase pulls are calculated.
     pull->ResetToy();
@@ -948,6 +1071,145 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 
   return;
 };
+
+//*************************************
+void SystematicRoutines::PlotLimits(){
+//*************************************
+
+  TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
+  limfolder->cd();
+
+  // Set all parameters at their starting values
+  for (UInt_t i = 0; i < fParams.size(); i++){
+    fCurVals[fParams[i]] = fStartVals[fParams[i]];
+  }
+
+  TDirectory* nomfolder = (TDirectory*) limfolder->mkdir("nominal");
+  nomfolder->cd();
+
+  UpdateRWEngine(fCurVals);
+  fSampleFCN->ReconfigureAllEvents();
+  fSampleFCN->Write();
+
+  limfolder->cd();
+  std::vector<std::string> allfolders;
+
+
+  // Loop through each parameter
+  for (UInt_t i = 0; i < fParams.size(); i++){
+    std::string syst = fParams[i];
+    if (fFixVals[syst]) continue;
+
+    // Loop Downwards
+    while (fCurVals[syst] > fMinVals[syst]){
+      fCurVals[syst] = fCurVals[syst] - fStepVals[syst];
+
+      // Check Limit
+      if (fCurVals[syst] < fMinVals[syst])
+	fCurVals[syst] = fMinVals[syst];
+
+      // Check folder exists
+      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
+	break;
+
+      // Make new folder for variation
+      TDirectory* minfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      minfolder->cd();
+
+      allfolders.push_back(curvalstring);
+
+      // Update Iterations
+      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
+      fSampleFCN->DoEval( vals );
+      delete vals;
+
+      // Save to folder
+      fSampleFCN->Write();
+    }
+
+    // Reset before next loop
+    fCurVals[syst] = fStartVals[syst];
+
+    // Loop Upwards now
+    while (fCurVals[syst] < fMaxVals[syst]){
+      fCurVals[syst] = fCurVals[syst] + fStepVals[syst];
+
+      // Check Limit
+      if (fCurVals[syst] > fMaxVals[syst])
+	fCurVals[syst] = fMaxVals[syst];
+
+      // Check folder exists
+      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
+	break;
+
+      // Make new folder
+      TDirectory* maxfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
+      maxfolder->cd();
+
+      allfolders.push_back(curvalstring);
+
+      // Update Iterations
+      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
+      fSampleFCN->DoEval( vals );
+      delete vals;
+
+      // Save to file
+      fSampleFCN->Write();
+    }
+
+    // Reset before leaving
+    fCurVals[syst] = fStartVals[syst];
+    UpdateRWEngine(fCurVals);
+  }
+
+  return;
+}
+
+// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+*    This file is part of NUISANCE.
+*
+*    NUISANCE is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    NUISANCE is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+//*************************************
+void SystematicRoutines::Run(){
+//*************************************
+
+  for (UInt_t i = 0; i < fRoutines.size(); i++){
+
+    std::string routine = fRoutines.at(i);
+    int fitstate = kFitUnfinished;
+    LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
+
+    if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
+    else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
+    else if (routine.find("ThrowErrors") != std::string::npos) GenerateThrows();
+    else if (routine.find("MergeErrors") != std::string::npos) MergeThrows();
+
+    // If ending early break here
+    if (fitstate == kFitFinished || fitstate == kNoChange){
+      LOG(FIT) << "Ending fit routines loop." << std::endl;
+      break;
+    }
+  }
+
+  return;
+}
 
 void SystematicRoutines::GenerateErrorBands(){
   GenerateThrows();
@@ -1277,99 +1539,3 @@ void SystematicRoutines::MergeThrows(){
 
   return;
 };
-
-//*************************************
-void SystematicRoutines::PlotLimits(){
-//*************************************
-
-  TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
-  limfolder->cd();
-
-  // Set all parameters at their starting values
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    fCurVals[fParams[i]] = fStartVals[fParams[i]];
-  }
-
-  TDirectory* nomfolder = (TDirectory*) limfolder->mkdir("nominal");
-  nomfolder->cd();
-
-  UpdateRWEngine(fCurVals);
-  fSampleFCN->ReconfigureAllEvents();
-  fSampleFCN->Write();
-
-  limfolder->cd();
-  std::vector<std::string> allfolders;
-
-
-  // Loop through each parameter
-  for (UInt_t i = 0; i < fParams.size(); i++){
-    std::string syst = fParams[i];
-    if (fFixVals[syst]) continue;
-
-    // Loop Downwards
-    while (fCurVals[syst] > fMinVals[syst]){
-      fCurVals[syst] = fCurVals[syst] - fStepVals[syst];
-
-      // Check Limit
-      if (fCurVals[syst] < fMinVals[syst])
-	fCurVals[syst] = fMinVals[syst];
-
-      // Check folder exists
-      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
-      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
-	break;
-
-      // Make new folder for variation
-      TDirectory* minfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
-      minfolder->cd();
-
-      allfolders.push_back(curvalstring);
-
-      // Update Iterations
-      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-      fSampleFCN->DoEval( vals );
-      delete vals;
-
-      // Save to folder
-      fSampleFCN->Write();
-    }
-
-    // Reset before next loop
-    fCurVals[syst] = fStartVals[syst];
-
-    // Loop Upwards now
-    while (fCurVals[syst] < fMaxVals[syst]){
-      fCurVals[syst] = fCurVals[syst] + fStepVals[syst];
-
-      // Check Limit
-      if (fCurVals[syst] > fMaxVals[syst])
-	fCurVals[syst] = fMaxVals[syst];
-
-      // Check folder exists
-      std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
-      if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
-	break;
-
-      // Make new folder
-      TDirectory* maxfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
-      maxfolder->cd();
-
-      allfolders.push_back(curvalstring);
-
-      // Update Iterations
-      double *vals = FitUtils::GetArrayFromMap( fParams, fCurVals );
-      fSampleFCN->DoEval( vals );
-      delete vals;
-
-      // Save to file
-      fSampleFCN->Write();
-    }
-
-    // Reset before leaving
-    fCurVals[syst] = fStartVals[syst];
-    UpdateRWEngine(fCurVals);
-  }
-
-  return;
-}
-
