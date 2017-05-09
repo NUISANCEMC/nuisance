@@ -46,6 +46,7 @@ CustomVariableBoxes.h
 GeneratorInfoBase.h
 InputTypes.h
 GNUISANCEFlux.cxx
+GNUISANCEMCJDriver.cxx
 )
 
 set(HEADERFILES
@@ -69,6 +70,7 @@ MeasurementVariableBox1D.h
 CustomVariableBoxes.h
 GeneratorInfoBase.h
 GNUISANCEFlux.h
+GNUISANCEMCJDriver.h
 )
 
 set(LIBNAME FitBase)
@@ -82,6 +84,7 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${GENIE_INCLUDES}/Apps)
 include_directories(${GENIE_INCLUDES}/FluxDrivers)
+include_directories(${GENIE_INCLUDES}/EVGDrivers)
 include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)

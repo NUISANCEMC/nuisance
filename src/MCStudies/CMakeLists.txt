@@ -24,6 +24,7 @@ GenericFlux_Tester.cxx
 MCStudy_MuonValidation.cxx
 ElectronFlux_FlatTree.cxx
 T2K2017_FakeData.cxx
+MCStudy_CCQEHistograms.cxx
 )
 
 set(HEADERFILES
@@ -34,6 +35,7 @@ GenericFlux_Tester.h
 MCStudy_MuonValidation.h
 ElectronFlux_FlatTree.h
 T2K2017_FakeData.h
+MCStudy_CCQEHistograms.h
 )
 
 set(LIBNAME MCStudies)

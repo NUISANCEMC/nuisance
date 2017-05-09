@@ -604,6 +604,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("T2K2017_FakeData")) {
     return (new T2K2017_FakeData(samplekey));
 
+  } else if (!name.compare("MCStudy_CCQE")) {
+    return (new MCStudy_CCQEHistograms(name, file, rw, type, fkdt));
+
   } else if (!name.compare("ElectronFlux_FlatTree")) {
     return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));
 

@@ -215,6 +215,7 @@
 // MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
 #include "ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h"
+#include "MCStudy_CCQEHistograms.h"
 
 #include "GenericFlux_Tester.h"
 
