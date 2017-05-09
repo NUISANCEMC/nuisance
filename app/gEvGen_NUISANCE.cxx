@@ -139,7 +139,8 @@
 #include "EVGCore/EventRecord.h"
 #include "EVGDrivers/GFluxI.h"
 #include "EVGDrivers/GEVGDriver.h"
-#include "EVGDrivers/GMCJDriver.h"
+//#include "EVGDrivers/GMCJDriver.h"
+#include "GNUISANCEMCJDriver.h"
 #include "EVGDrivers/GMCJMonitor.h"
 #include "Interaction/Interaction.h"
 #include "Messenger/Messenger.h"
@@ -188,6 +189,10 @@ GeomAnalyzerI * GeomDriver              (void);
 GFluxI *        FluxDriver              (void);
 GFluxI *        MonoEnergeticFluxDriver (void);
 GFluxI *        TH1FluxDriver           (void);
+string          ConvertTargetIDs        (string);
+string          ConvertFluxIDs          (string);
+void            ListTargetIDs(void);
+void            ListFluxIDs(void);
 #endif
 
 void GenerateEventsAtFixedInitState (void);
@@ -214,7 +219,7 @@ string          gOptInpXSecFile;  // cross-section splines
 vector<int>     gOptNuPDGs;   // Beam PDGS
 vector<TH1D*>   gOptNuFluxs;  // Beam Fluxes
 vector<int>     gOptTgtPDGs;  // Target PDGS
-
+int             gOptNumberNucleons; // Total number of target nucleons
 
 //____________________________________________________________________________
 int main(int argc, char ** argv)
@@ -325,7 +330,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
   GeomAnalyzerI * geom_driver = GeomDriver();
 
   // Create the monte carlo job driver
-  GMCJDriver * mcj_driver = new GMCJDriver;
+  GNUISANCEMCJDriver * mcj_driver = new GNUISANCEMCJDriver;
   mcj_driver->SetEventGeneratorList(RunOpt::Instance()->EventGeneratorList());
   mcj_driver->SetUnphysEventMask(*RunOpt::Instance()->UnphysEventMask());
   mcj_driver->UseFluxDriver(flux_driver);
@@ -342,12 +347,14 @@ void GenerateEventsUsingFluxOrTgtMix(void)
   // Now Create flux histograms
   TH1D* totalflux = static_cast<GNUISANCEFlux*>(flux_driver)->GetTotalSpectrum();
   vector<TH1D*> fluxinputs = static_cast<GNUISANCEFlux*>(flux_driver)->GetSpectrum();
-  totalflux->Write();
+  totalflux->SetNameTitle("nuisance_flux","NUISANCE Total Flux");
 
   TH1D* totalxsec = (TH1D*)totalflux->Clone();
+  totalxsec->SetNameTitle("nuisance_xsec", "NUISANCE Total XSec");
   totalxsec->Reset();
 
   TH1D* totalevent = (TH1D*) totalflux->Clone();
+  totalevent->SetNameTitle("nuisance_events", "NUISANCE Total Events");
   totalevent->Reset();
 
   // Save the cross-section histograms
@@ -362,18 +369,17 @@ void GenerateEventsUsingFluxOrTgtMix(void)
 
       // Get Initial state driver
       InitialState init_state(tpdg, npdg);
-      GEVGDriver * evgdriver = new GEVGDriver;
-      evgdriver->SetEventGeneratorList(RunOpt::Instance()->EventGeneratorList()); // specify list of generators                                                            
-      evgdriver->Configure(init_state);
-      //evgdriver->UseSplines(); // check if all splines needed are loaded       
+      GEVGPool* gpool = mcj_driver->GetConfigPool();
+      GEVGDriver * evgdriver = gpool->FindDriver(init_state);
       const Spline * totxsecspl = evgdriver->XSecSumSpline();
 
       // make new empty xsec hist
       TH1D* xsechist = (TH1D*) totalflux->Clone();
-      xsechist->SetNameTitle(init_state.AsString().c_str(),init_state.AsString().c_str());
+      xsechist->SetNameTitle((init_state.AsString()+"_xsec").c_str(),init_state.AsString().c_str());
       xsechist->Reset();
 
       TH1D* eventhist = (TH1D*) totalflux->Clone();
+      eventhist->SetNameTitle((init_state.AsString()+"_events").c_str(),init_state.AsString().c_str());
       eventhist->Reset();
 
       // Fill xsec hist
@@ -390,22 +396,27 @@ void GenerateEventsUsingFluxOrTgtMix(void)
 
       // Add to totals
       totalxsec->Add(xsechist);
-      eventhist->Add(eventhist);
+      totalevent->Add(eventhist);
       
-      // Write our new xsec histto file
-      //  xsechist->Write();
-      //  eventhist->Write();
+      // Scale by nnucleons
+      xsechist->Scale(1.0 / double(gOptNumberNucleons));
+      eventhist->Scale(1.0 / double(gOptNumberNucleons));
 
+      // Write our new xsec histto file
+      fluxhist->SetNameTitle((init_state.AsString()+"_flux").c_str(),init_state.AsString().c_str());
+      fluxhist->Write();
+      xsechist->Write();
+      eventhist->Write();
 
       delete xsechist;
       delete eventhist;
 
     }
   }
-  
-  totalxsec->Write();
-  totalevent->Write();
 
+  totalxsec->Scale(double(gOptNumberNucleons));
+  totalevent->Scale(double(gOptNumberNucleons));
+  
   // Create an MC Job Monitor
   GMCJMonitor mcjmonitor(gOptRunNu);
   mcjmonitor.SetRefreshRate(RunOpt::Instance()->MCJobStatusRefreshRate());
@@ -564,8 +575,85 @@ GFluxI * TH1FluxDriver(void)
   GFluxI * flux_driver = dynamic_cast<GFluxI *>(flux);
   return flux_driver;
 }
+
+///____________________________________________________________________________ 
+void ListTargetIDs(){
+
+  // Keep in sync with ConvertTargetIDs
+  LOG("gevgen", pNOTICE) << "Possible Target IDs: \n" 
+			 << "\n H  : " << ConvertTargetIDs("H")
+                         << "\n C  : " << ConvertTargetIDs("C")
+			 << "\n CH  : " << ConvertTargetIDs("CH") 
+			 << "\n CH2 : " << ConvertTargetIDs("CH2")
+			 << "\n H2O : " << ConvertTargetIDs("H2O");
+
+}
+
+
+//____________________________________________________________________________
+string ConvertTargetIDs(string id){
+
+  if (!id.compare("H")) return "1000010010";
+  else if  (!id.compare("C")) return "1000060120";
+  else if  (!id.compare("CH"))  return "13,1000060120[0.9231],1000010010[0.0769]";
+  else if  (!id.compare("CH2")) return "14,1000060120[0.8571],1000010010[0.1429]";
+  else if  (!id.compare("H2O")) return "18,1000080160[0.8888],1000010010[0.1111]";
+  else return "";
+
+};
+
+///____________________________________________________________________________                                                                   
+void ListFluxIDs(){
+
+  // Keep in sync with ConvertTargetIDs                                                                                    
+  LOG("gevgen", pNOTICE) << "Possible Flux IDs: \n" 
+                         << "\n MINERvA_fhc_numu  : " << ConvertTargetIDs("MINERvA_fhc_numu") 
+			 << "\n MINERvA_fhc_numunumubar  : " << ConvertTargetIDs("MINERvA_fhc_numunumubar")
+                         << "\n MINERvA_fhc_nue  : " << ConvertTargetIDs("MINERvA_fhc_nue")
+                         << "\n MINERvA_fhc_nuenuebar  : " << ConvertTargetIDs("MINERvA_fhc_nuenuebar")
+			 << "\n MINERvA_fhc_all  : " << ConvertTargetIDs("MINERvA_fhc_all")
+
+			 << "\n MINERvA_rhc_numubar  : " << ConvertTargetIDs("MINERvA_rhc_numubar")
+			 << "\n MINERvA_rhc_numubarnumu  : " << ConvertTargetIDs("MINERvA_rhc_numubarnumu")
+			 << "\n MINERvA_rhc_nuebar  : " << ConvertTargetIDs("MINERvA_rhc_nuebar")
+			 << "\n MINERvA_rhc_nuebarnue  : " << ConvertTargetIDs("MINERvA_rhc_nuebarnue")
+			 << "\n MINERvA_rhc_all  : " << ConvertTargetIDs("MINERvA_rhc_all");
+
+}
+
+
+//____________________________________________________________________________
+string ConvertFluxIDs(string id){
+
+  char * const var = getenv("EXT_FIT");
+  if (!var) {
+    std::cout << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
+    exit(-1);
+  }
+  string topnuisancedir = string(var);
+  string fluxfolder = topnuisancedir + "/data/flux/";
+  if (!id.compare("MINERvA_fhc_numu")) return "minerva_flux.root,numu_fhc[14]";
+  else if (!id.compare("MINERvA_fhc_numunumubar")) return "minerva_flux.root,numu_fhc[14],numubar_fhc[-14]";
+  else if (!id.compare("MINERvA_fhc_numu")) return "minerva_flux.root,nue_fhc[12]";
+  else if (!id.compare("MINERvA_fhc_nuenuebar")) return "minerva_flux.root,nue_fhc[12],nuebar_fhc[-12]";
+  else if (!id.compare("MINERvA_fhc_all")) return "minerva_flux.root,numu_fhc[14],numubar_fhc[-14],nue_fhc[12],nuebar_fhc[-12]";
+
+  else if (!id.compare("MINERvA_rhc_numubar")) return "minerva_flux.root,numubar_rhc[-14]";
+  else if (!id.compare("MINERvA_rhc_numubarnumu")) return "minerva_flux.root,numubar_rhc[-14],numu_rhc[14]";
+  else if (!id.compare("MINERvA_rhc_nuebar")) return "minerva_flux.root,nuebar_rhc[-12]";
+  else if (!id.compare("MINERvA_rhc_nuebarnue")) return "minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
+  else if (!id.compare("MINERvA_rhc_all")) return "minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
+
+
+  else return "";
+
+};
+
+
+
 //............................................................................
 #endif
+
 
 //____________________________________________________________________________
 void GetCommandLineArgs(int argc, char ** argv)
@@ -611,6 +699,11 @@ void GetCommandLineArgs(int argc, char ** argv)
   if( parser.OptionExists('f') ) {
     LOG("gevgen", pINFO) << "Reading flux function";
     gOptFlux = parser.ArgAsString('f');
+
+    // Convert for known strings.
+    string fluxid = ConvertFluxIDs(gOptFlux);
+    if (!fluxid.empty()) gOptFlux = fluxid;
+
     using_flux = true;
   }
 
@@ -658,11 +751,11 @@ void GetCommandLineArgs(int argc, char ** argv)
   }
 
   // neutrino PDG code
-  if( parser.OptionExists('p') ) {
+  if( parser.OptionExists('p') && !parser.OptionExists('f')) {
     LOG("gevgen", pINFO) << "Reading neutrino PDG code";
     gOptNuPdgCode = parser.ArgAsInt('p');
-  } else {
-    LOG("gevgen", pFATAL) << "Unspecified neutrino PDG code - Exiting";
+  } else if (!parser.OptionExists('p') && !parser.OptionExists('f')){
+    LOG("gevgen", pFATAL) << "Unspecified neutrino PDG code or Flux Inputs - Exiting";
     PrintSyntax();
     exit(1);
   }
@@ -673,15 +766,34 @@ void GetCommandLineArgs(int argc, char ** argv)
     LOG("gevgen", pINFO) << "Reading target mix";
     string stgtmix = parser.ArgAsString('t');
     gOptTgtMix.clear();
+
+    // Check for ID Strings
+    string tgtids = ConvertTargetIDs(stgtmix);
+    if (!tgtids.empty()){
+      stgtmix = tgtids;
+    }
+
+    // Parse Targets
     vector<string> tgtmix = utils::str::Split(stgtmix,",");
     if(tgtmix.size()==1) {
          int    pdg = atoi(tgtmix[0].c_str());
          double wgt = 1.0;
 	 gOptTgtPDGs.push_back(pdg);
          gOptTgtMix.insert(map<int, double>::value_type(pdg, wgt));
+
+	 // For single target number of free nucleons
+	 // automatic
+	 gOptNumberNucleons = pdg % 1000/ 10;
+
     } else {
       using_tgtmix = true;
       vector<string>::const_iterator tgtmix_iter = tgtmix.begin();
+
+      // For multiple targets N nucleons must be specified first.
+      gOptNumberNucleons = atoi((*tgtmix_iter).c_str());
+      tgtmix_iter++;
+
+      // Now remainder is the full target list
       for( ; tgtmix_iter != tgtmix.end(); ++tgtmix_iter) {
          string tgt_with_wgt = *tgtmix_iter;
          string::size_type open_bracket  = tgt_with_wgt.find("[");
@@ -798,6 +910,10 @@ void PrintSyntax(void)
     << "\n              [--event-record-print-level level]"
     << "\n              [--mc-job-status-refresh-rate  rate]"
     << "\n              [--cache-file root_file]"
-    << "\n";
+    << "\n\n" ;
+  ListTargetIDs();
+  ListFluxIDs();
+
+  
 }
 //____________________________________________________________________________

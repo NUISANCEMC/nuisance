@@ -39,6 +39,7 @@ void SystematicRoutines::Init(){
 
   fStrategy = "ErrorBands";
   fRoutines.clear();
+  fRoutines.push_back("PlotLimits");
 
   fCardFile = "";
 
@@ -152,6 +153,8 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   SetupRWEngine();
   SetupFCN();
   GetCovarFromFCN();
+
+  //  Run();
 
   return;
 };
@@ -1075,7 +1078,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
 void SystematicRoutines::PlotLimits(){
 //*************************************
-
+  std::cout << "Plotting Limis" << std::endl;
   TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
   limfolder->cd();
 
@@ -1098,6 +1101,7 @@ void SystematicRoutines::PlotLimits(){
   // Loop through each parameter
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams[i];
+    std::cout << "Starting Param " << syst << std::endl;
     if (fFixVals[syst]) continue;
 
     // Loop Downwards
@@ -1190,16 +1194,20 @@ void SystematicRoutines::PlotLimits(){
 void SystematicRoutines::Run(){
 //*************************************
 
+  std::cout << "Running routines "<< std::endl;
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
     std::string routine = fRoutines.at(i);
     int fitstate = kFitUnfinished;
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
 
-    if (routine.find("PlotLimits") != std::string::npos) PlotLimits();
-    else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
-    else if (routine.find("ThrowErrors") != std::string::npos) GenerateThrows();
-    else if (routine.find("MergeErrors") != std::string::npos) MergeThrows();
+    if (routine.compare("PlotLimits") == 0) PlotLimits();
+    else if (routine.compare("ErrorBands") == 0) GenerateErrorBands();
+    else if (routine.compare("ThrowErrors") == 0) GenerateThrows();
+    else if (routine.compare("MergeErrors") == 0) MergeThrows();
+    else {
+      std::cout << "Unknown ROUTINE : " << routine << std::endl;
+    }
 
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange){
