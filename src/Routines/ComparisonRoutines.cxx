@@ -134,11 +134,13 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
   // Add Error Verbo Lines
   verbocount += Config::Get().GetParI("VERBOSITY");
   errorcount += Config::Get().GetParI("ERROR");
+  bool trace = Config::Get().GetParB("TRACE");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   FitPar::log_verb = verbocount;
   LOG_VERB(verbocount);
   ERR_VERB(errorcount);
+  SET_TRACE(trace);
 
   // Comparison Setup ========================================
 

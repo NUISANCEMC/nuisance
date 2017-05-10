@@ -6,9 +6,9 @@ do
     then
 	continue
     fi
-    line=${line//!name.compare(/}
-    line=${line//(/}
-    line=${line//)/}
+    line=${line//\!name\.compare\(/}
+    line=${line//\(/}
+    line=${line//\)/}
     line=${line//\"/}
 
     if [[ $line != *"$1"* ]];

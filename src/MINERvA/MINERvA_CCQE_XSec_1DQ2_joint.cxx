@@ -114,6 +114,10 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
   fSettings.SetCovarInput( basedir + covarfilename );
   fSettings.DefineAllowedSpecies("numu,numub");
 
+  std::cout << "Finalising sample settings for joint fit = " << fIsJoint << std::endl;
+  FinaliseSampleSettings();
+
+
   // Get parsed input files
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA Joint requires input files in format: antinu;nu" << std::endl;
   std::string inFileAntineutrino = fSubInFiles.at(0);
@@ -122,9 +126,6 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
   // Push classes back into list for processing loop
   fSubChain.push_back(MIN_anu);
   fSubChain.push_back(MIN_nu);
-
-
-  FinaliseSampleSettings();
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );

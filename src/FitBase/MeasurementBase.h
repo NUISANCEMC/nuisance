@@ -326,6 +326,8 @@ protected:
   int NSignal;
   // std::map<TH1*, bool[6] > fExtaStacks;
 
+  bool fIsJoint;
+
 };
 
 

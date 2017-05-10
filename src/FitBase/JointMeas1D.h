@@ -74,6 +74,10 @@ public:
     Setup Functions
   */
 
+
+  SampleSettings LoadSampleSettings(nuiskey samplekey);
+
+
   /// \brief Setup all configs once initialised
   ///
   /// Should be called after all configs have been setup inside fSettings container.

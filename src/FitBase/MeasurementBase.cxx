@@ -40,7 +40,7 @@ MeasurementBase::MeasurementBase(void) {
 
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
   fEventVariables = NULL;
-
+  fIsJoint = false;
 };
 
 void MeasurementBase::FinaliseMeasurement() {
@@ -141,7 +141,7 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
 
   // Used as an initial setup function incase we need to do anything here.
   LOG(SAM) << "Loading Sample : " << setting.GetName() << std::endl;
-  SetupInputs( setting.GetS("input") );
+  if (!fIsJoint) SetupInputs( setting.GetS("input") );
 
   return setting;
 }

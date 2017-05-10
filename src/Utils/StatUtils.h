@@ -29,7 +29,7 @@
 #include <sstream>
 #include <iomanip>
 #include <deque>
-
+#include "assert.h"
 
 // Root Includes
 #include "TH1D.h"

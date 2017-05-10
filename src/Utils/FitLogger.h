@@ -113,7 +113,12 @@ std::ostream& _LOG(int level, const char* filename, const char* funct, int line)
 
 
 //! Error Function. Use as a string stream.  e.g. ERR(FTL) << "The fit is completely buggered." << std::endl;
-std::ostream& ERR(int level);
+std::ostream& _ERR(int level, const char* filename, const char* funct, int line);
+#define ERR(level) _ERR(level, __FILENAME__, __FUNCTION__, __LINE__)
+
+
+
+
 
 void StopTalking();
 

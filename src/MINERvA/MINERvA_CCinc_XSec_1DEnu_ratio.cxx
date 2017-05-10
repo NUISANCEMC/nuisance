@@ -46,9 +46,9 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(nuiskey samplekey
   nBins = 8;
 
   target  = "";
-  if      (fSettings.Found("originalname", "C12")) target =   "C12";
-  else if (fSettings.Found("originalname", "Fe56")) target =   "Fe56";
-  else if (fSettings.Found("originalname", "Pb208")) target =   "Pb208";
+  if      (fSettings.Found("name", "C12")) target =   "C12";
+  else if (fSettings.Found("name", "Fe56")) target =   "Fe56";
+  else if (fSettings.Found("name", "Pb208")) target =   "Pb208";
   else {
     ERR(FTL) << "target " << target << " was not found!" << std::endl;
     exit(-1);
@@ -57,13 +57,12 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(nuiskey samplekey
   std::string basedir = FitPar::GetDataBase() + "/MINERvA/CCinc/";
   fSettings.SetDataInput(  basedir + "CCinc_" + target + "_CH_ratio_Enu_data.csv" );
   fSettings.SetCovarInput( basedir + "CCinc_" + target + "_CH_ratio_Enu_covar.csv" );
+  FinaliseSampleSettings();
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR" << std::endl;
   std::string inFileNUM = fSubInFiles.at(0);
   std::string inFileDEN = fSubInFiles.at(1);
-
-  FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // Ratio of sub classes so non needed
