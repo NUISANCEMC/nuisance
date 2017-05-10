@@ -229,8 +229,7 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
                gheprec->Summary()->InitState().ProbePdg()))
       return -2;
   } else {
-    return 0;
-    //    return utils::ghep::NeutReactionCode(gheprec);
+    return utils::ghep::NeutReactionCode(gheprec);
   }
   return 0;
 }
