@@ -74,8 +74,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
     fluxhist->SetBinContent(1, 1.0);
     
   
-
-
       // if (fluxvect[0] == '1.0') {
       //   fluxhist = new TH1D("fluxhist", "fluxhist", 40, GeneralUtils::StrToDbl(fluxvect[1]), GeneralUtils::StrToDbl(fluxvect[2]));
       //   for (int i = 0; i < fluxhist->GetNbinsX(); i++) {
@@ -154,7 +152,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
     // Fill total event hist
     eventhist->Fill(neu->E());
-    std::cout << "Electron Energy = " << neu->E() << std::endl;
 
     // Clear Event
     genientpl->Clear();
@@ -240,7 +237,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       TH1D* xsec = iter->second;
 
       if (targstr.find(targpdg) != std::string::npos) {
-        LOG(FIT) << "Adding target spline " << targstr << " : " << xsec->Integral("width") << std::endl;
+        LOG(FIT) << "Adding target spline " << targstr << " Integral = " << xsec->Integral("width") << std::endl;
         totalxsec->Add(xsec);
 
         int nucl = atoi( targpdg.c_str() );
@@ -263,12 +260,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
 
 
   LOG(FIT) << "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width") << std::endl;
-
-
-
-
-
-
+  std::cout << "XSec Hist Integral = " << xsechist->Integral("width") << std::endl;
 
   return;
 };

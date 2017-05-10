@@ -1,3 +1,4 @@
+#ifdef __GENIE_ENABLED__
 //____________________________________________________________________________
 /*
  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
@@ -300,3 +301,4 @@ TH1D* GNUISANCEFlux::GetTotalSpectrum(void){
   this->AddAllFluxes();
   return fTotSpectrum;
 }
+#endif

@@ -1,3 +1,4 @@
+#ifdef __GENIE_ENABLED__
 //____________________________________________________________________________
 /*!
 
@@ -136,6 +137,8 @@
 #include "Conventions/XmlParserStatus.h"
 #include "Conventions/GBuild.h"
 #include "Conventions/Controls.h"
+#include "Conventions/Units.h"
+
 #include "EVGCore/EventRecord.h"
 #include "EVGDrivers/GFluxI.h"
 #include "EVGDrivers/GEVGDriver.h"
@@ -349,13 +352,13 @@ void GenerateEventsUsingFluxOrTgtMix(void)
   vector<TH1D*> fluxinputs = static_cast<GNUISANCEFlux*>(flux_driver)->GetSpectrum();
   totalflux->SetNameTitle("nuisance_flux","NUISANCE Total Flux");
 
+  TH1D* totalevent = (TH1D*) totalflux->Clone();
+  totalevent->SetNameTitle("nuisance_events", "NUISANCE Total Events");
+  //  totalevent->Reset();  
+
   TH1D* totalxsec = (TH1D*)totalflux->Clone();
   totalxsec->SetNameTitle("nuisance_xsec", "NUISANCE Total XSec");
   totalxsec->Reset();
-
-  TH1D* totalevent = (TH1D*) totalflux->Clone();
-  totalevent->SetNameTitle("nuisance_events", "NUISANCE Total Events");
-  totalevent->Reset();
 
   // Save the cross-section histograms
   for (UInt_t i = 0; i < gOptNuPDGs.size(); i++){
@@ -365,8 +368,15 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       TH1D* fluxhist = gOptNuFluxs[i];
 
       int tpdg = gOptTgtPDGs[j];
-      double tfrac = gOptTgtMix[tpdg];
 
+      // Determine the total number of these targets by using the tgt ratios backwards
+      double mixfrac = gOptTgtMix[tpdg];
+
+      int tnucl = tpdg % 10000 / 10; // Total Single Target Nucleons
+      double enucl = double(mixfrac * double(gOptNumberNucleons)); // Expected nucleons from weight fractions
+
+      double tfrac = double(enucl) / double(tnucl); // Scaling factor.
+      
       // Get Initial state driver
       InitialState init_state(tpdg, npdg);
       GEVGPool* gpool = mcj_driver->GetConfigPool();
@@ -382,12 +392,24 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       eventhist->SetNameTitle((init_state.AsString()+"_events").c_str(),init_state.AsString().c_str());
       eventhist->Reset();
 
+      std::cout << "Total Frac for " << init_state.AsString() << " = " << tfrac << std::endl;
+      std::cout << "TNUCL = " << tnucl << std::endl;
+      std::cout << "ENUCL = " << enucl << std::endl;
+      std::cout << "MIXFRAC = " << mixfrac << std::endl;
+      std::cout << "TPDG = " << tpdg << std::endl;
+      
       // Fill xsec hist
       for (int k = 0; k < totalflux->GetNbinsX(); k++){
-	double E = fluxhist->GetXaxis()->GetBinCenter(k+1);
-	double xsec = totxsecspl->Evaluate( E );
-	xsechist->SetBinContent(k+1, xsec);
-	eventhist->SetBinContent(k+1, xsec * fluxhist->GetBinContent(k+1)); 
+	double avgxsec = 0.0;
+	int res = 100;
+	for (int l = 0; l < res; l++){
+	  double E = fluxhist->GetXaxis()->GetBinLowEdge(k+1) + (double(l)*fluxhist->GetXaxis()->GetBinWidth(k+1) / double(res));
+	  double xsec = totxsecspl->Evaluate( E ) / (1E-38 * genie::units::cm2);
+	  avgxsec += xsec;
+	}
+	avgxsec /= double(res);
+	xsechist->SetBinContent(k+1, avgxsec);
+	eventhist->SetBinContent(k+1, avgxsec * fluxhist->GetBinContent(k+1));
       }
       
       // Scale totals by target fractions
@@ -396,11 +418,13 @@ void GenerateEventsUsingFluxOrTgtMix(void)
 
       // Add to totals
       totalxsec->Add(xsechist);
-      totalevent->Add(eventhist);
+      //totalevent->Add(eventhist);
       
+      std::cout << "Total XSec Hist for " << init_state.AsString() << " = " << xsechist->Integral("width") << std::endl;
+
       // Scale by nnucleons
-      xsechist->Scale(1.0 / double(gOptNumberNucleons));
-      eventhist->Scale(1.0 / double(gOptNumberNucleons));
+      //      xsechist->Scale(1.0 / double(gOptNumberNucleons));
+      //      eventhist->Scale(1.0 / double(gOptNumberNucleons));
 
       // Write our new xsec histto file
       fluxhist->SetNameTitle((init_state.AsString()+"_flux").c_str(),init_state.AsString().c_str());
@@ -411,11 +435,21 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       delete xsechist;
       delete eventhist;
 
+      //      sleep(10);
     }
   }
 
-  totalxsec->Scale(double(gOptNumberNucleons));
-  totalevent->Scale(double(gOptNumberNucleons));
+  // Determine NUISANCE Style Histograms
+  totalevent->SetNameTitle("nuisance_events", "NUISANCE Total Events");
+  totalevent->Multiply(totalxsec);
+  totalevent->Scale(1.0 / double(gOptNumberNucleons));
+  std::cout << "GOPTNumberNucleons = " << gOptNumberNucleons << std::endl;
+  std::cout << "Inclusive XSec Per Nucleon = " << totalevent->Integral("width") * 1E-38 / totalflux->Integral("width") << std::endl;
+  std::cout << "XSec Hist Integral = " << totalxsec->Integral("width") << std::endl;
+  //  sleep(20);
+  
+  //  totalxsec->Scale(1.0/double(gOptNumberNucleons));
+  //  totalevent->Scale(1.0/double(gOptNumberNucleons));
   
   // Create an MC Job Monitor
   GMCJMonitor mcjmonitor(gOptRunNu);
@@ -548,12 +582,12 @@ GFluxI * TH1FluxDriver(void)
     TH1D* spectrum = (TH1D*)hst->Clone();
     spectrum->SetNameTitle("spectrum","neutrino_flux");
     spectrum->SetDirectory(0);
-    for(int ibin = 1; ibin <= hst->GetNbinsX(); ibin++) {
-      if(hst->GetBinLowEdge(ibin) + hst->GetBinWidth(ibin) > emax ||
-         hst->GetBinLowEdge(ibin) < emin) {
-        spectrum->SetBinContent(ibin, 0);
-      }
-    }
+    //    for(int ibin = 1; ibin <= hst->GetNbinsX(); ibin++) {
+    //      if(spectrum->GetBinCenter(ibin) > emax ||
+    //	 spectrum->GetBinCenter(ibin) < emin){
+    //        spectrum->SetBinContent(ibin, 0);
+    //      }
+    //}
 
     LOG("gevgen", pNOTICE) << spectrum->GetEntries();
 
@@ -585,8 +619,10 @@ void ListTargetIDs(){
                          << "\n C  : " << ConvertTargetIDs("C")
 			 << "\n CH  : " << ConvertTargetIDs("CH") 
 			 << "\n CH2 : " << ConvertTargetIDs("CH2")
-			 << "\n H2O : " << ConvertTargetIDs("H2O");
-
+			 << "\n H2O : " << ConvertTargetIDs("H2O")
+			 << "\n Fe  : " << ConvertTargetIDs("Fe") 
+			 << "\n Pb  : " << ConvertTargetIDs("Pb");
+  
 }
 
 
@@ -598,6 +634,8 @@ string ConvertTargetIDs(string id){
   else if  (!id.compare("CH"))  return "13,1000060120[0.9231],1000010010[0.0769]";
   else if  (!id.compare("CH2")) return "14,1000060120[0.8571],1000010010[0.1429]";
   else if  (!id.compare("H2O")) return "18,1000080160[0.8888],1000010010[0.1111]";
+  else if  (!id.compare("Fe"))  return "1000260560";
+  else if  (!id.compare("Pb"))  return "1000822070";
   else return "";
 
 };
@@ -632,20 +670,22 @@ string ConvertFluxIDs(string id){
   }
   string topnuisancedir = string(var);
   string fluxfolder = topnuisancedir + "/data/flux/";
-  if (!id.compare("MINERvA_fhc_numu")) return "minerva_flux.root,numu_fhc[14]";
-  else if (!id.compare("MINERvA_fhc_numunumubar")) return "minerva_flux.root,numu_fhc[14],numubar_fhc[-14]";
-  else if (!id.compare("MINERvA_fhc_numu")) return "minerva_flux.root,nue_fhc[12]";
-  else if (!id.compare("MINERvA_fhc_nuenuebar")) return "minerva_flux.root,nue_fhc[12],nuebar_fhc[-12]";
-  else if (!id.compare("MINERvA_fhc_all")) return "minerva_flux.root,numu_fhc[14],numubar_fhc[-14],nue_fhc[12],nuebar_fhc[-12]";
+  string inputs = "";
 
-  else if (!id.compare("MINERvA_rhc_numubar")) return "minerva_flux.root,numubar_rhc[-14]";
-  else if (!id.compare("MINERvA_rhc_numubarnumu")) return "minerva_flux.root,numubar_rhc[-14],numu_rhc[14]";
-  else if (!id.compare("MINERvA_rhc_nuebar")) return "minerva_flux.root,nuebar_rhc[-12]";
-  else if (!id.compare("MINERvA_rhc_nuebarnue")) return "minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
-  else if (!id.compare("MINERvA_rhc_all")) return "minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
+  if (!id.compare("MINERvA_fhc_numu")) inputs="minerva_flux.root,numu_fhc[14]";
+  else if (!id.compare("MINERvA_fhc_numunumubar")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14]";
+  else if (!id.compare("MINERvA_fhc_numu")) inputs="minerva_flux.root,nue_fhc[12]";
+  else if (!id.compare("MINERvA_fhc_nuenuebar")) inputs="minerva_flux.root,nue_fhc[12],nuebar_fhc[-12]";
+  else if (!id.compare("MINERvA_fhc_all")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14],nue_fhc[12],nuebar_fhc[-12]";
 
-
+  else if (!id.compare("MINERvA_rhc_numubar")) inputs="minerva_flux.root,numubar_rhc[-14]";
+  else if (!id.compare("MINERvA_rhc_numubarnumu")) inputs="minerva_flux.root,numubar_rhc[-14],numu_rhc[14]";
+  else if (!id.compare("MINERvA_rhc_nuebar")) inputs="minerva_flux.root,nuebar_rhc[-12]";
+  else if (!id.compare("MINERvA_rhc_nuebarnue")) inputs="minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
+  else if (!id.compare("MINERvA_rhc_all")) inputs="minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
   else return "";
+
+  return fluxfolder + inputs;
 
 };
 
@@ -783,7 +823,7 @@ void GetCommandLineArgs(int argc, char ** argv)
 
 	 // For single target number of free nucleons
 	 // automatic
-	 gOptNumberNucleons = pdg % 1000/ 10;
+	 gOptNumberNucleons = pdg % 10000/ 10;
 
     } else {
       using_tgtmix = true;
@@ -917,3 +957,4 @@ void PrintSyntax(void)
   
 }
 //____________________________________________________________________________
+#endif
