@@ -1,3 +1,4 @@
+#ifdef __GENIE_ENABLED__
 //____________________________________________________________________________
 /*
  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
@@ -1368,3 +1369,4 @@ double GNUISANCEMCJDriver::PreGenFluxInteractionProbability()
   return fBrFluxIntProb/fGlobPmax; 
 }
 //___________________________________________________________________________
+#endif

@@ -1,3 +1,4 @@
+#ifdef __GENIE_ENABLED__
 //____________________________________________________________________________
 /*!
 
@@ -99,3 +100,4 @@ private:
 } // genie namespace
 
 #endif // _G_TH1_CYLICDRICAL_FLUX_H_
+#endif

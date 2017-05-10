@@ -27,8 +27,8 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CCQE_XSec_1DQ2_nu sample. \n" \
                         "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Flux: MINERvA Forward Horn Current Numu \n" \
+                        "Signal: True CCQE/2p2h defined at the vertex level \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

@@ -20,6 +20,7 @@
 
 #ifndef _GENIE_NUISANCE_MC_JOB_DRIVER_H_
 #define _GENIE_NUISANCE_MC_JOB_DRIVER_H_
+#ifdef __GENIE_ENABLED__
 
 #include <string>
 #include <map>
@@ -141,3 +142,4 @@ public :
 
 }      // genie namespace
 #endif // _GENIE_MC_JOB_DRIVER_H_
+#endif
