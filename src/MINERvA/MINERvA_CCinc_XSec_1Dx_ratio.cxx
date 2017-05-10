@@ -56,12 +56,13 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
   fSettings.SetDataInput(  basedir + "CCinc_" + target + "_CH_ratio_x_data.csv" );
   fSettings.SetCovarInput( basedir + "CCinc_" + target + "_CH_ratio_x_covar.csv" );
 
+  FinaliseSampleSettings();
+
+
   // Get parsed input files
   if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR" << std::endl;
   std::string inFileNUM = fSubInFiles.at(0);
   std::string inFileDEN = fSubInFiles.at(1);
-
-  FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // Ratio of sub classes so non needed
@@ -104,6 +105,9 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
   // Now make the ratio histogram
   TH1D* NUM_MC = (TH1D*)this->NUM->GetMCList().at(0)->Clone();
   TH1D* DEN_MC = (TH1D*)this->DEN->GetMCList().at(0)->Clone();
+
+  std::cout << "MakingPlots CCINC X = " << NUM_MC->Integral() << " " << DEN_MC->Integral() << std::endl;
+  sleep(10);
 
   for (int i = 0; i < nBins; ++i) {
     double binVal = 0;
@@ -172,8 +176,11 @@ void MINERvA_CCinc_XSec_1Dx_ratio::Write(std::string drawOpt) {
 //********************************************************************
 
   LOG(SAM) << "Writing Normal Plots in MINERvA_CCinc_XSec_1Dx_ratio::Write()" << std::endl;
-  this->GetDataList().at(0)->Write();
-  this->GetMCList()  .at(0)->Write();
+  JointMeas1D::Write(drawOpt);
+  return;
+
+  //this->GetDataList().at(0)->Write();
+  //  this->GetMCList()  .at(0)->Write();
 
   if (this->fFullCovar) {
     TH2D cov = TH2D((*this->fFullCovar));

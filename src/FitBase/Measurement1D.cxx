@@ -133,8 +133,10 @@ void Measurement1D::FinaliseSampleSettings() {
     exit(-1);
   }
 
+  LOG(FIT) << "Sample isjoint = " << fIsJoint << std::endl;
+
   if (!fRW) fRW = FitBase::GetRW();
-  if (!fInput) SetupInputs(fSettings.GetS("input"));
+  if (!fInput and !fIsJoint) SetupInputs(fSettings.GetS("input"));
 
   // Setup options
   SetFitOptions(fDefaultTypes); // defaults
@@ -747,6 +749,7 @@ void Measurement1D::FillHistograms() {
   //********************************************************************
 
   if (Signal) {
+
     fMCHist->Fill(fXVar, Weight);
     fMCFine->Fill(fXVar, Weight);
     fMCStat->Fill(fXVar, 1.0);
@@ -1335,7 +1338,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
 
   fRW = rw;
 
-  if (!fInput) SetupInputs(inputfile);
+  if (!fInput and !fIsJoint) SetupInputs(inputfile);
 
   // Set Default Options
   SetFitOptions(fDefaultTypes);

@@ -49,8 +49,6 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
   if      (name.find("DEN")   != std::string::npos) target =   "CH";
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
-  // fSettings.SetSmearingInput( FitPar::GetDataBase() + "/MINERvA/CCinc/CCinc_"+target+"_x_smear.csv" );
-
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
@@ -59,7 +57,7 @@ MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::stri
 
   // Plot Setup -------------------------------------------------------
   double binsx[7] = {0, 0.1, 0.3, 0.7, 0.9, 1.1, 1.5};
-  CreateDataHistogram(7, binsx);
+  CreateDataHistogram(6, binsx);
 
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string smearfilename  = "CCinc_"+target+"_x_smear.csv";

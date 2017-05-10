@@ -1093,6 +1093,9 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
   if (dimx != -1 and dimy == -1) {
     dimy = dimx;
   }
+  std::cout << "DIM X DIM Y = "<< dimx<< " " << dimy << std::endl;
+  assert(dimy != -1);
+  assert("string is true");
 
   // Make new matrix
   TMatrixD* mat = new TMatrixD(dimx, dimy);
@@ -1108,11 +1111,13 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
          iter != entries.end(); iter++) {
 
       (*mat)(row, column) = (*iter);
-
+      std::cout << "COVAR Entry = " << (*iter) << std::endl;
       column++;
     }
     row++;
   }
+
+  std::cout << "DIM X DIM Y = " << dimx << " " << dimy << std::endl;
 
   return mat;
 }
@@ -1189,9 +1194,11 @@ TMatrixD* StatUtils::GetMatrixFromRootFile(std::string covfile, std::string hist
 TMatrixDSym* StatUtils::GetCovarFromTextFile(std::string covfile, int dim){
 //*******************************************************************
 
+  // Delete TempMat
   TMatrixD* tempmat = GetMatrixFromTextFile(covfile, dim, dim);
-  TMatrixDSym* newmat = new TMatrixDSym(dim);
 
+  // Make a symmetric covariance
+  TMatrixDSym* newmat = new TMatrixDSym(tempmat->GetNrows());
   for (int i = 0; i < tempmat->GetNrows(); i++){
     for (int j = 0; j < tempmat->GetNrows(); j++){
       (*newmat)(i,j) = (*tempmat)(i,j);

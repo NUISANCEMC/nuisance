@@ -121,7 +121,7 @@ namespace FitPar{
   bool use_colors = true; //!< Use BASH Terminal Colors Flag
   bool super_rainbow_mode = true; //!< For when fitting gets boring.
   unsigned int super_rainbow_mode_colour = 0;
-   bool showtrace = false;
+  bool showtrace = false;
   // For redirecting various print outs
   std::streambuf *default_cout = std::cout.rdbuf();
   std::streambuf *default_cerr = std::cerr.rdbuf();
@@ -271,12 +271,16 @@ std::ostream& _LOG(int level, const char* filename, const char* func, int line)
   }
 }
 //******************************************
-std::ostream& ERR(int level)
+std::ostream& _ERR(int level, const char* filename, const char* func, int line)
 //******************************************
 {
 
   if (FitPar::use_colors) std::cerr << RED;
   
+  if (FitPar::showtrace){
+    std::cout << filename << "::" << func << "[l. " << line << "] : ";
+  }
+
   switch(level){
   case FTL: std::cerr << "[ERR FATAL ]: "; break;
   case WRN: std::cerr << "[ERR WARN  ] : "; break;

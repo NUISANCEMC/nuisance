@@ -83,7 +83,9 @@ JointMeas1D::JointMeas1D(void) {
   // Flags for Joint Measurements
   fIsRatio = false;
   fIsSummed = false;
-  fSaveSubMeas = false;
+  fSaveSubMeas = true;
+
+  fIsJoint = true;
 
 }
 
@@ -155,6 +157,49 @@ JointMeas1D::~JointMeas1D(void) {
 
 
 
+}
+
+//********************************************************************                                                                                                                                                                     
+SampleSettings JointMeas1D::LoadSampleSettings(nuiskey samplekey){
+//********************************************************************                                                                                                                                                                      
+  SampleSettings s = MeasurementBase::LoadSampleSettings(samplekey);
+
+  // Parse Inputs                                                                                                                                                                                                                          
+  fSubInFiles.clear();
+
+  std::vector<std::string> entries = GeneralUtils::ParseToStr(s.GetS("input"), ";");
+
+  if (entries.size() < 2) {
+    ERR(FTL) << "Joint measurement expected to recieve at least two semi-colon "
+             "separated input files, but recieved: \""
+             << s.GetS("input") << "\"" << std::endl;
+    throw;
+  }
+
+  std::vector<std::string> first_file_descriptor =
+    GeneralUtils::ParseToStr(entries.front(), ":");
+
+  if (first_file_descriptor.size() != 2) {
+    ERR(FTL) << "Found Joint measurement where the input file had no type: \""
+             << s.GetS("input") << "\", expected \"INPUTTYPE:File.root;File2.root\"."
+             << std::endl;
+    throw;
+  }
+  std::string inpType = first_file_descriptor[0];
+
+
+  for (std::vector<string>::iterator iter = entries.begin();
+       iter != entries.end(); iter++) {
+    if (GeneralUtils::ParseToStr(*iter, ":").size() != 2) {
+      std::stringstream ss("");
+      ss << inpType << ":" << (*iter);
+      fSubInFiles.push_back(ss.str());
+    } else {
+      fSubInFiles.push_back(*iter);
+    }
+  }
+
+  return s;
 }
 
 //********************************************************************
@@ -246,6 +291,11 @@ void JointMeas1D::FinaliseSampleSettings() {
     }
   }
 
+  if (!fRW) fRW = FitBase::GetRW();
+
+
+  LOG(SAM) << "Finalised Sample Settings" << std::endl;
+
 }
 
 //********************************************************************
@@ -319,7 +369,9 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
+  LOG(SAM) << "Getting Invert" << std::endl;
   covar      = StatUtils::GetInvert(fFullCovar);
+  LOG(SAM) << "Getting Decomp" << std::endl;
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
 
 }
@@ -587,12 +639,14 @@ void JointMeas1D::FinaliseMeasurement() {
     SetBinMask(maskloc);
   }
 
+  /*
   if (fScaleFactor < 0) {
     ERR(FTL) << "I found a negative fScaleFactor in " << __FILE__ << ":" << __LINE__ << std::endl;
     ERR(FTL) << "fScaleFactor = " << fScaleFactor << std::endl;
     ERR(FTL) << "EXITING" << std::endl;
     throw;
   }
+  */
 
   // Create and fill Weighted Histogram
   if (!fMCWeighted) {
@@ -809,6 +863,8 @@ void JointMeas1D::FillHistograms() {
 //********************************************************************
 void JointMeas1D::ScaleEvents() {
 //********************************************************************
+
+  LOG(FIT) << "Scaling JointMeas1D" << std::endl;
 
   // Fill MCWeighted;
   for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
@@ -1499,6 +1555,15 @@ void JointMeas1D::Reconfigure() {
 //********************************************************************
 void JointMeas1D::ConvertEventRates() {
 //********************************************************************
+
+  // Apply Event Scaling                                                                                                                                                                                                                   
+  for (std::vector<MeasurementBase*>::const_iterator expIter =
+         fSubChain.begin();
+       expIter != fSubChain.end(); expIter++) {
+    MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
+    exp->ScaleEvents();
+  }
+
 
   // Joint function called by top level class
   MakePlots();
