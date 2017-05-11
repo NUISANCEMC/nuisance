@@ -73,6 +73,20 @@ if(NOT DEFINED LHAPDF_INC AND DEFINED ENV{LHAPDF_INC})
 endif()
 
 
+if(NOT DEFINED LHAPATH AND NOT DEFINED ENV{LHAPATH})
+
+  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. "
+    "The location of a the LHAPATH directory must be defined either as"
+    " $ cmake -DLHAPATH=/path/to/LHAPATH or as and environment variable"
+    " $ export LHAPATH=/path/to/LHAPATH")
+
+endif()
+
+if(NOT DEFINED LHAPATH AND DEFINED ENV{LHAPATH})
+  set(LHAPATH $ENV{LHAPATH})
+endif()
+
+
 ################################  LIBXML  ######################################
 if(NOT DEFINED LIBXML2_LIB AND NOT DEFINED ENV{LIBXML2_LIB})
 

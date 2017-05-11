@@ -805,6 +805,7 @@ void JointFCN::ReconfigureUsingManager() {
 void JointFCN::ReconfigureFastUsingManager() {
 //***************************************************
 
+  LOG(FIT) << " -> Doing FAST using manager"<< std::endl;
   // Get Start time for profilling
   int timestart = time(NULL);
 
@@ -812,7 +813,6 @@ void JointFCN::ReconfigureFastUsingManager() {
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
     MeasurementBase* exp = (*iterSam);
-
     exp->ResetAll();
   }
 
@@ -835,7 +835,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Setup stuff for logging
   int fillcount = 0;
   int nevents = fSignalEventFlags.size();
-  int countwidth = nevents / 5;
+  int countwidth = nevents / 500;
 
   // If All Splines tell splines they need a reconfigure.
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();

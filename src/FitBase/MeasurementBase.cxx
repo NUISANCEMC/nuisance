@@ -279,6 +279,7 @@ MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
   
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
+
   GetBox()->FillBoxFromEvent(event);
 
   GetBox()->SetX(fXVar);

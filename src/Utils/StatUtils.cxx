@@ -1093,9 +1093,7 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
   if (dimx != -1 and dimy == -1) {
     dimy = dimx;
   }
-  std::cout << "DIM X DIM Y = "<< dimx<< " " << dimy << std::endl;
-  assert(dimy != -1);
-  assert("string is true");
+  assert(dimy != -1 && " matrix dimy not set.");
 
   // Make new matrix
   TMatrixD* mat = new TMatrixD(dimx, dimy);
@@ -1110,14 +1108,16 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
     for (std::vector<double>::iterator iter = entries.begin();
          iter != entries.end(); iter++) {
 
+      // Check Rows
+      assert(row >= mat->GetNrows() && " covar rows doesn't match matrix rows.");
+      assert(column >= mat->GetNcols() && " covar cols doesn't match matrix cols.");
+
+      // Fill Matrix
       (*mat)(row, column) = (*iter);
-      std::cout << "COVAR Entry = " << (*iter) << std::endl;
       column++;
     }
     row++;
   }
-
-  std::cout << "DIM X DIM Y = " << dimx << " " << dimy << std::endl;
 
   return mat;
 }
