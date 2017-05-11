@@ -369,9 +369,7 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  LOG(SAM) << "Getting Invert" << std::endl;
   covar      = StatUtils::GetInvert(fFullCovar);
-  LOG(SAM) << "Getting Decomp" << std::endl;
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
 
 }
