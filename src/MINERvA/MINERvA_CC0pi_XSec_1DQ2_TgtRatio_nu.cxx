@@ -69,7 +69,7 @@ MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu::MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(nuiskey
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-  SetCovarFromTextFile(fSettings.GetCovarInput());
+  SetCorrelationFromTextFile(fSettings.GetCovarInput());
 
 
   // Setup Experiments  -------------------------------------------------------

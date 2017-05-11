@@ -83,7 +83,7 @@ JointMeas1D::JointMeas1D(void) {
   // Flags for Joint Measurements
   fIsRatio = false;
   fIsSummed = false;
-  fSaveSubMeas = true;
+  fSaveSubMeas = false;
 
   fIsJoint = true;
 
