@@ -512,7 +512,7 @@ void Measurement1D::FinaliseMeasurement() {
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack( (fSettings.GetName() + "_MODES").c_str(),
                                        ("True Channels"), fMCHist);
-    SetAutoProcessTH1(fMCHist_Modes);
+    SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
   // Setup bin masks using sample name
@@ -1390,7 +1390,7 @@ void Measurement1D::SetupDefaultHist() {
   }
 
   fMCHist_Modes = new TrueModeStack( (fName + "_MODES").c_str(), ("True Channels"), fMCHist);
-  SetAutoProcessTH1(fMCHist_Modes);
+  SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
 
   return;
 }

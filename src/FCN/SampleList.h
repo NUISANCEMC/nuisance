@@ -223,6 +223,7 @@
 #include "MCStudy_MuonValidation.h"
 #include "ElectronFlux_FlatTree.h"
 #include "ElectronScattering_DurhamData.h"
+#include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
 #include "T2K2017_FakeData.h"
 
 #include "FitWeight.h"
