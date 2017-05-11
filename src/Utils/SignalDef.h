@@ -85,8 +85,12 @@ bool isCCWithFS(FitEvent *event, int nuPDG, int const (&pdgs)[N],
   return true;
 }
 
+
+
 // Generic Signal Functions
 bool HasProtonKEAboveThreshold(FitEvent *event, double threshold);
+bool HasProtonMomAboveThreshold(FitEvent* event, double threshold);
+
 bool IsRestrictedAngle(FitEvent *event, int nuPDG, int otherPDG, double angle);
 bool IsEnuInRange(FitEvent *event, double emin, double emax);
 }

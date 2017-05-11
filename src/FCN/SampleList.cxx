@@ -406,6 +406,12 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 	     !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtPb_nu") ){
     return ( new MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(samplekey) );
   
+  } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioC_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu") ){
+    return ( new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey) );
+
+
     /*
       CC1pi+
     */

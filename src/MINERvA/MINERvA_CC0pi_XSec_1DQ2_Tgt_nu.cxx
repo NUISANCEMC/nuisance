@@ -29,9 +29,10 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
 
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+    "Target: Either C, CH, Fe, Pb \n"						    \
+    "Flux: MINERvA Forward Horn numu \n";
+    "Signal: Any event with 1 muon, 1 proton p>450, no pions";
+
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -44,9 +45,6 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
 
   // CCQELike plot information
   fSettings.SetTitle("MINERvA_CC0pi_XSec_1DQ2_Tgt_nu");
-  // no Data right now so we fake it
-  //fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_data.txt" );
-  //fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_covar.txt" );
   fSettings.DefineAllowedSpecies("numu");
 
 
@@ -54,15 +52,15 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
   if (fSettings.Found("name","_CH")){
     fTarget = 1; // kTargetCH;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_CH_data.txt");
-  } else if (fSettings.Found("name","_C")){
+  } else if (fSettings.Found("name","TgtC")){
     fTarget = 2; //kTargetC;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_C_data.txt");
     fSettings.SetCovarInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_C_covar.txt");
-  }  else if (fSettings.Found("name","_Fe")){
+  }  else if (fSettings.Found("name","TgtFe")){
     fTarget = 3; //kTargetFe;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Fe_data.txt");
     fSettings.SetCovarInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Fe_covar.txt");
-  } else if (fSettings.Found("name","_Pb")){
+  } else if (fSettings.Found("name","TgtPb")){
     fTarget = 4; //kTargetPb;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Pb_data.txt");
     fSettings.SetCovarInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Pb_covar.txt");
@@ -129,14 +127,12 @@ bool MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::isSignal(FitEvent *event){
   if (!event->HasFSMuon()) return false;
 
   // No Pions
-  
+  if (!SignalDef::isCC0pi(event, 14, EnuMin, EnuMax)) return false;
 
-  // Require 1 FS proton
-  if (!event->HasFSProton()) return false;
-
-  // Proton Momentum > 450
-  TLorentzVector pprot  = event->GetHMFSProton()->fP;
-  if (pprot.Vect().Mag() < 450.0) return false;
+  // Proton Threshold
+  if (!SignalDef::HasProtonMomAboveThreshold(event, 450.0)){
+    return false;
+  }
 
   return true;
 };

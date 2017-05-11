@@ -224,6 +224,8 @@
 #include "ElectronFlux_FlatTree.h"
 #include "ElectronScattering_DurhamData.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
+
+#include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "T2K2017_FakeData.h"
 
 #include "FitWeight.h"

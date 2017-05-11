@@ -427,7 +427,7 @@ void JointMeas1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   fFullCovar = new TMatrixDSym(dim);
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
+      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1) * 1.E76;
     }
   }
 
@@ -455,7 +455,7 @@ void JointMeas1D::SetCorrelationFromRootFile(std::string covfile, std::string hi
   fFullCovar = new TMatrixDSym(fDataHist->GetNbinsX());
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1);
+      (*fFullCovar)(i, j) = (*correlation)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1) * 1.E76;
     }
   }
 
