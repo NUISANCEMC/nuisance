@@ -1109,8 +1109,8 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
          iter != entries.end(); iter++) {
 
       // Check Rows
-      assert(row >= mat->GetNrows() && " covar rows doesn't match matrix rows.");
-      assert(column >= mat->GetNcols() && " covar cols doesn't match matrix cols.");
+      //assert(row > mat->GetNrows() && " covar rows doesn't match matrix rows.");
+      //assert(column > mat->GetNcols() && " covar cols doesn't match matrix cols.");
 
       // Fill Matrix
       (*mat)(row, column) = (*iter);
