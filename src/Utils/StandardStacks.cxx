@@ -67,8 +67,10 @@ TrueModeStack::TrueModeStack(std::string name, std::string title, TH1* hist) {
 	AddMode(24, "NCELonp", "NCEL on p", kBlack, 2, 3004);
 	AddMode(25, "NCELonn", "NCEL on n", kGray, 2, 3004);
 
+	AddMode(26, "NC2p2h", "NC 2p2h", kRed+1, 2, 3004);
+
 	// Undefined
-	AddMode(26, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
+	AddMode(27, "UNDEFINED", "Undefined", kRed + 1, 2, 3000);
 
 	StackBase::SetupStack(hist);
 };
@@ -103,7 +105,8 @@ int TrueModeStack::ConvertModeToIndex(int mode) {
 	case 46: return 23; // NCDIS
 	case 51: return 24; // NCEL on p
 	case 52: return 25; // NCEL on n
-	default: return 26; // Undefined
+	case 53: return 26; // NC 2p2h
+	default: return 27; // Undefined
 	}
 };
 

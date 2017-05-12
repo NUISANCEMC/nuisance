@@ -206,31 +206,48 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p, int mode) 
 int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
 
   // Electron Scattering
-  if (gheprec->Summary()->InitState().ProbePdg() == 11) {
-    if (gheprec->Summary()->ProcInfo().IsQuasiElastic()) return 1;
-    else if (gheprec->Summary()->ProcInfo().IsMEC()) return 2;
-    else if (gheprec->Summary()->ProcInfo().IsResonant()) return 13;
-    else if (gheprec->Summary()->ProcInfo().IsDeepInelastic()) return 26;
-    // else if (gheprec->Summary()->ProcInfo().InteractionTypeId() == 1 && gheprec->Summary()->ProcInfo().ScatteringTypeId() == 10) return 2;
-    else {
-      ERR(WRN) << "Unknown GENIE Electron Scattering Mode!" << std::endl
-               << "ScatteringTypeId = " << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
-               << "InteractionTypeId = " << gheprec->Summary()->ProcInfo().InteractionTypeId() << std::endl 
-               << genie::ScatteringType::AsString(gheprec->Summary()->ProcInfo().ScatteringTypeId()) << " " << genie::InteractionType::AsString(gheprec->Summary()->ProcInfo().InteractionTypeId()) << " " << gheprec->Summary()->ProcInfo().IsMEC() << std::endl;
-      return 0;
+  if (gheprec->Summary()->ProcInfo().IsEM()){
+    if (gheprec->Summary()->InitState().ProbePdg() == 11) {
+      if (gheprec->Summary()->ProcInfo().IsQuasiElastic()) return 1;
+      else if (gheprec->Summary()->ProcInfo().IsMEC()) return 2;
+      else if (gheprec->Summary()->ProcInfo().IsResonant()) return 13;
+      else if (gheprec->Summary()->ProcInfo().IsDeepInelastic()) return 26;
+      // else if (gheprec->Summary()->ProcInfo().InteractionTypeId() == 1 && gheprec->Summary()->ProcInfo().ScatteringTypeId() == 10) return 2;
+      else {
+	ERR(WRN) << "Unknown GENIE Electron Scattering Mode!" << std::endl
+		 << "ScatteringTypeId = " << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
+		 << "InteractionTypeId = " << gheprec->Summary()->ProcInfo().InteractionTypeId() << std::endl 
+		 << genie::ScatteringType::AsString(gheprec->Summary()->ProcInfo().ScatteringTypeId()) << " " << genie::InteractionType::AsString(gheprec->Summary()->ProcInfo().InteractionTypeId()) << " " << gheprec->Summary()->ProcInfo().IsMEC() << std::endl;
+	return 0;
+      }
+    }
+
+    // Weak CC
+  } else if (gheprec->Summary()->ProcInfo().IsWeakCC()){
+
+    // CC MEC
+    if (gheprec->Summary()->ProcInfo().IsMEC()) {
+      if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))  return 2;
+      else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))	return -2;
+
+    // CC OTHER
+    } else {
+      return utils::ghep::NeutReactionCode(gheprec);
+    }
+   
+    // Weak NC
+  } else if (gheprec->Summary()->ProcInfo().IsWeakNC()){
+    // NC MEC                                                                                                                                                                                                                              
+    if (gheprec->Summary()->ProcInfo().IsMEC()) {
+      if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))  return 32;
+      else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg())) return -32;
+
+      // NC OTHER                                                                                                                                                                                                                          
+    } else {
+      return utils::ghep::NeutReactionCode(gheprec);
     }
   }
 
-
-  if (gheprec->Summary()->ProcInfo().IsMEC()) {
-    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
-      return 2;
-    else if (pdg::IsAntiNeutrino(
-               gheprec->Summary()->InitState().ProbePdg()))
-      return -2;
-  } else {
-    return utils::ghep::NeutReactionCode(gheprec);
-  }
   return 0;
 }
 #endif
