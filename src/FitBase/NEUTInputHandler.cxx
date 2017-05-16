@@ -15,6 +15,13 @@ void NEUTGeneratorInfo::Reset() {
 	}
 }
 
+NEUTInputHandler::~NEUTInputHandler(){
+  fNEUTTreePerformance->Print();                                                                                                                                                                                            
+  fNEUTTreePerformance->Draw();
+  fNEUTTreePerformance->SaveAs("neutioperf.root");                                                                                                                                                                          
+};
+
+
 NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const& rawinputs) {
 
 	LOG(SAM) << "Creating NEUTInputHandler : " << handle << std::endl;
@@ -87,6 +94,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	}
 
 	// Setup NEvents and the FitEvent
+	//	gEnv->SetValue("TFile.AsyncPrefetching", 1);
 	fNEvents = fNEUTTree->GetEntries();
 	fEventType = kNEUT;
 	fNeutVect = NULL;
@@ -146,13 +154,25 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 		fNEvents = fMaxEvents;
 	}
 
+	fNEUTTree->SetCacheEntryRange(0,fNEvents);
+	fNEUTTree->AddBranchToCache("vectorbranch",1);
+	fNEUTTree->SetCacheSize(FitPar::Config().GetParI("CacheSize"));
+	fNEUTTreePerformance = new TTreePerfStats("ioperf",fNEUTTree);
+
+
 };
 
 
 FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry) {
 
 	// Catch too large entries
-	if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents){
+    fNEUTTreePerformance->Print();
+    fNEUTTreePerformance->Draw();
+    fNEUTTreePerformance->SaveAs("neutioperf.root");
+
+    return NULL;
+  }
 
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNEUTTree->GetEntry(entry);

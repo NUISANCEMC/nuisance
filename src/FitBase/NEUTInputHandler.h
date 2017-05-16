@@ -7,6 +7,7 @@
 #include "neutpart.h"
 #include "neutvect.h"
 #include "PlotUtils.h"
+#include "TTreePerfStats.h"
 
 
 /// NEUT Generator Container to save extra particle status codes.
@@ -38,7 +39,9 @@ public:
 
 	/// Main constructor. Can read in single or joint inputs.
 	NEUTInputHandler(std::string const& handle, std::string const& rawinputs);
-	~NEUTInputHandler(){};
+	~NEUTInputHandler();
+
+
 
 	/// Returns NUISANCE Format event from entry in fNEUTTree
 	FitEvent* GetNuisanceEvent(const UInt_t entry);
@@ -59,6 +62,7 @@ public:
 	TChain* fNEUTTree; ///< TTree for reading neut vectors.
 	NeutVect* fNeutVect;  ///< Neut vector format event.
 	NEUTGeneratorInfo* fNeutInfo; ///< NEUT Generator Info container.
+	TTreePerfStats* fNEUTTreePerformance;
 };
 #endif
 #endif

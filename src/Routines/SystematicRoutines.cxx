@@ -39,7 +39,7 @@ void SystematicRoutines::Init(){
 
   fStrategy = "ErrorBands";
   fRoutines.clear();
-  fRoutines.push_back("PlotLimits");
+  fRoutines.push_back("ErrorBands");
 
   fCardFile = "";
 
@@ -74,7 +74,9 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   int verbocount = 0;
   std::vector<std::string> xmlcmds;
   std::vector<std::string> configargs;
-
+  fNThrows = 250;
+  fStartThrows = 0;
+  fThrowString = "";
   // Make easier to handle arguments.
   std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
   ParserUtils::ParseArgument(args, "-c", fCardFile, true);
@@ -82,6 +84,9 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   ParserUtils::ParseArgument(args, "-n", maxevents, false, false);
   ParserUtils::ParseArgument(args, "-f", fStrategy, false, false);
   ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
+  ParserUtils::ParseArgument(args, "-s", fStartThrows, false, false);
+  ParserUtils::ParseArgument(args, "-t", fNThrows, false, false);
+  ParserUtils::ParseArgument(args, "-p", fThrowString, false, false);
   ParserUtils::ParseArgument(args, "-i", xmlcmds);
   ParserUtils::ParseArgument(args, "-q", configargs);
   ParserUtils::ParseCounter(args, "e", errorcount);
@@ -106,7 +111,6 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   // Configuration Setup =============================
 
   // Check no comp key is available
-  nuiskey fCompKey;
   if (Config::Get().GetNodes("nuiscomp").empty()) {
     fCompKey = Config::Get().CreateNode("nuiscomp");
   } else {
@@ -146,7 +150,12 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   ERR_VERB(errorcount);
   
   // Proper Setup
-  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+  if (fStrategy.find("ErrorBands") != std::string::npos ||
+      fStrategy.find("MergeErrors") != std::string::npos){
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");    
+  }
+
+  //  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
   SetupSystematicsFromXML();
 
   SetupCovariance();
@@ -921,6 +930,8 @@ void SystematicRoutines::PrintState(){
 //*************************************
 void SystematicRoutines::SaveResults(){
 //*************************************
+  if (!fOutputRootFile)
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");  
 
   fOutputRootFile->cd();
 
@@ -954,6 +965,8 @@ void SystematicRoutines::SaveCurrentState(std::string subdir){
 //*************************************
 void SystematicRoutines::SaveNominal(){
 //*************************************
+  if (!fOutputRootFile)
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
 
   fOutputRootFile->cd();
 
@@ -966,6 +979,8 @@ void SystematicRoutines::SaveNominal(){
 //*************************************
 void SystematicRoutines::SavePrefit(){
 //*************************************
+  if (!fOutputRootFile)
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
 
   fOutputRootFile->cd();
 
@@ -1078,7 +1093,10 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 //*************************************
 void SystematicRoutines::PlotLimits(){
 //*************************************
-  std::cout << "Plotting Limis" << std::endl;
+  std::cout << "Plotting Limits" << std::endl;
+  if (!fOutputRootFile)
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+
   TDirectory* limfolder = (TDirectory*) fOutputRootFile->mkdir("Limits");
   limfolder->cd();
 
@@ -1171,30 +1189,13 @@ void SystematicRoutines::PlotLimits(){
   return;
 }
 
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
-/*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
 //*************************************
 void SystematicRoutines::Run(){
 //*************************************
 
   std::cout << "Running routines "<< std::endl;
+  fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
+
   for (UInt_t i = 0; i < fRoutines.size(); i++){
 
     std::string routine = fRoutines.at(i);
@@ -1228,15 +1229,13 @@ void SystematicRoutines::GenerateErrorBands(){
 void SystematicRoutines::GenerateThrows(){
 //*************************************
 
-//  TDirectory* errorDIR = (TDirectory*) fOutputRootFile->mkdir("error_bands");
-//  errorDIR->cd();
 
   TFile* tempfile = new TFile((fOutputFile + ".throws.root").c_str(),"RECREATE");
   tempfile->cd();
 
-  int nthrows = FitPar::Config().GetParI("error_throws");
-  int startthrows = FitPar::Config().GetParI("error_start");
-  int endthrows = FitPar::Config().GetParI("error_end");
+  int nthrows = fNThrows;
+  int startthrows = fStartThrows;
+  int endthrows = startthrows + nthrows;
 
   if (nthrows < 0) nthrows = endthrows;
   if (startthrows < 0) startthrows = 0;
@@ -1261,16 +1260,10 @@ void SystematicRoutines::GenerateThrows(){
     fSampleFCN->Write();
   }
 
-  //  TDirectory* outnominal = (TDirectory*) fOutputRootFile->mkdir("nominal_throw");
-  //  outnominal->cd();
-  //  fSampleFCN->Write();
-
   LOG(SAM) << "nthrows = " << nthrows << std::endl;
   LOG(SAM) << "startthrows = " << startthrows << std::endl;
   LOG(SAM) << "endthrows = " << endthrows << std::endl;
 
-
-  fOutputRootFile->cd();
   TTree* parameterTree = new TTree("throws","throws");
   double chi2;
   for (UInt_t i = 0; i < fParams.size(); i++)
@@ -1306,7 +1299,6 @@ void SystematicRoutines::GenerateThrows(){
     parameterTree->Fill();
   }
 
-  //  fOutputRootFile->cd();
   fSampleFCN->WriteIterationTree();
 
   tempfile->Close();
@@ -1314,74 +1306,85 @@ void SystematicRoutines::GenerateThrows(){
 
 void SystematicRoutines::MergeThrows(){
 
+
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+    fOutputRootFile->cd();
+
+
+  // Make a container folder
   TDirectory* errorDIR = (TDirectory*) fOutputRootFile->mkdir("error_bands");
   errorDIR->cd();
-
-  TFile* tempfile = new TFile((fOutputFile + ".throws.root").c_str(),"READ");
-  tempfile->cd();
-  int nthrows = FitPar::Config().GetParI("error_throws");
 
   TDirectory* outnominal = (TDirectory*) fOutputRootFile->mkdir("nominal_throw");
   outnominal->cd();
 
-  // Add  part for if only one file
+  // Split Input Files
   if (!fThrowString.empty()) fThrowList = GeneralUtils::ParseToStr(fThrowString,",");
+
+  // Add default if no throwlist given
   if (fThrowList.size() < 1) fThrowList.push_back( fOutputFile + ".throws.root" ); 
+
+  /// Save location of file containing nominal
+  std::string nominalfile;
+  bool nominalfound;
+
+  // Loop over files and check they exist.
   for (int i = 0; i < fThrowList.size(); i++){
     std::string file = fThrowList[i];
+    bool found = false;
 
     // normal
+    std::string newfile = file;
     TFile* throwfile = new TFile(file.c_str(),"READ");
-    if (throwfile and !throwfile->IsZombie()) {
-      throwfile->Close();
-      delete throwfile;
-      continue;
+    if (throwfile and !throwfile->IsZombie()){ 
+        found = true;
     }
-    if (throwfile) throwfile->Close();
 
-    // normal.root.throws.root
-    throwfile = new TFile((file + ".throws.root").c_str(),"READ");
-    if (throwfile and !throwfile->IsZombie()) {
-      fThrowList[i] = file + ".throws.root";
-      throwfile->Close();
-      delete throwfile;
-      continue;
-    }
-    if (throwfile) throwfile->Close();
-
-    // normal_j.root
-    bool found = false;
-    for (int j = 0; j < nthrows; j++){
-      
-      // Replace .root with _i.root      
-      std::string newfile = file;
-      std::string replstr = Form("_%i.root.throws.root",j);
-      newfile.replace(file.size()-17,17,replstr);
-      
-      // Check its not already loaded
-      if (std::find(fThrowList.begin(), fThrowList.end(), newfile) != fThrowList.end()){
-	continue;
-      }
-
-      throwfile = new TFile((newfile).c_str(),"READ");
+    // normal.throws.root
+    if (!found){
+      newfile = file + ".throws.root";
+      throwfile = new TFile((file + ".throws.root").c_str(),"READ");
       if (throwfile and !throwfile->IsZombie()) {
-	fThrowList[i] = newfile;
-	throwfile->Close();
-	delete throwfile;
-	found = true;
-	break;
+        found = true;
       }
-      if (found) break;
     }
-    if (found) continue;
-    if (throwfile) throwfile->Close();
 
-    // Set to empty if none found
-    fThrowList[i] = "";
-    LOG(FIT) << "Cannot find inputs for throws file " << i << " : " 
-	     << file << std::endl;
+    // If its found save to throwlist, else save empty.
+    // Also search for nominal
+    if (found){
+      fThrowList[i] = newfile;
       
+      LOG(FIT) << "Throws File :" << newfile << std::endl;
+
+      // Find input which contains nominal
+      if (throwfile->Get("nominal")){
+        nominalfound = true;
+        nominalfile = newfile;
+      }
+
+      throwfile->Close();
+
+    } else {
+      fThrowList[i] = "";
+    }
+
+    delete throwfile;
   }
+
+  // Make sure we have a nominal file
+  if (!nominalfound or nominalfile.empty()){
+    ERR(FTL) << "No nominal found when mergining! Exiting!" << std::endl;
+    throw;  
+  }
+
+  
+
+    // Get the nominal throws file
+  TFile* tempfile = new TFile((nominalfile).c_str(),"READ");
+  tempfile->cd();
+  TDirectory* nominal = (TDirectory*)tempfile->Get("nominal");
+  int nthrows = FitPar::Config().GetParI("error_throws");
+  bool uniformly = FitPar::Config().GetParB("error_uniform");
 
   // Check percentage of bad files is okay.
   int badfilecount = 0;
@@ -1404,33 +1407,12 @@ void SystematicRoutines::MergeThrows(){
     sleep(5);
   }
 
-
-  bool uniformly = FitPar::Config().GetParB("error_uniform");
-  TDirectory* nominal = NULL;
-  TFile* nominalinputfile = NULL;
-  if (!nominal){
-    for (int i = 0; i < fThrowList[i].size(); i++){
-      nominalinputfile = new TFile(fThrowList[i].c_str(),"READ");
-      if (!nominalinputfile) continue;
-
-      nominal = (TDirectory*)nominalinputfile->Get("nominal");
-      if (!nominal) continue;
-      else break;
-    }
-  }
-
-  if (!nominal){
-    ERR(FTL) << "Cannot find nominal folder.! "<< std::endl;
-    throw;
-  }
-
   // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
   TIter next(nominal->GetListOfKeys());
   TKey *key;
   while ((key = (TKey*)next())) {
     TClass *cl = gROOT->GetClass(key->GetClassName());
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
-
     TH1* baseplot = (TH1D*)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
     LOG(FIT) << "Creating error bands for " << plotname;
@@ -1465,45 +1447,42 @@ void SystematicRoutines::MergeThrows(){
       bintree->Branch(Form("content_%i",i),&bincontents[i],Form("content_%i/D",i));
     }
 
-    // Setup Throw files
-    TFile* throwfile = new TFile(fThrowList[0].c_str(),"READ");
+    // Make new throw plot
+    TH1* newplot;
 
-    for (Int_t i = 0; i < nthrows; i++){
+    // Run Throw Merging.
+    for (UInt_t i = 0; i < fThrowList.size(); i++){
 
-      // Get Plot
-      TH1* newplot = (TH1*)throwfile->Get(Form(("throw_%i/" + plotname).c_str(),i));
+      TFile* throwfile = new TFile(fThrowList[i].c_str(), "READ");
 
-      // If plot not in this file change files
-      if (!newplot){
-	for (int j = 0; j < fThrowList.size(); j++){
-	  throwfile->Close();
-	  delete throwfile;
-	  throwfile = new TFile(fThrowList[j].c_str(),"READ");
-	  newplot = (TH1*)throwfile->Get(Form(("throw_%i/" + plotname).c_str(),i));
-	  if (newplot) break;
-	}
-	if (!newplot){
-	  ERR(WRN) << "Missing Throw " << i << " for " << plotname << std::endl;
-	  continue;
-	}
+      // Loop over all throws in a folder
+      TIter nextthrow(throwfile->GetListOfKeys());
+      TKey *throwkey;
+      while ((throwkey = (TKey*)nextthrow())) {
+        
+        // Skip non throw folders
+        if (std::string(throwkey->GetName()).find("throw_") == std::string::npos) continue;
+
+        // Get Throw DIR
+        TDirectory* throwdir = (TDirectory*)throwkey->ReadObj();
+
+        // Get Plot From Throw
+        newplot = (TH1*)throwdir->Get(plotname.c_str());
+        if (!newplot) continue;
+
+        // Loop Over Plot
+        for (Int_t j = 0; j < nbins; j++){
+          tprof->Fill(j+0.5, newplot->GetBinContent(j+1));
+          bincontents[j] = newplot->GetBinContent(j+1);
+
+          if (bincontents[j] < binlowest[j] or i == 0) binlowest[j] = bincontents[j];
+          if (bincontents[j] > binhighest[j] or i == 0) binhighest[j] = bincontents[j];
+        }
+
+        errorDIR->cd();
+        bintree->Fill();
       }
-	
-      for (Int_t j = 0; j < nbins; j++){
-	///	std::cout << " j +1 =  "<< j << " = " << newplot->GetBinContent(j+1) << std::endl;
-	tprof->Fill(j+0.5, newplot->GetBinContent(j+1));
-	bincontents[j] = newplot->GetBinContent(j+1);
-
-	if (bincontents[j] < binlowest[j] or i == 0) binlowest[j] = bincontents[j];
-	if (bincontents[j] > binhighest[j] or i == 0) binhighest[j] = bincontents[j];
-      }
-
-      errorDIR->cd();
-      bintree->Fill();
-
-      delete newplot;
     }
-    //    throwfile->Close();
-    //    delete throwfile;
 
     errorDIR->cd();
 

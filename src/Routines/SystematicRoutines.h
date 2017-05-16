@@ -256,6 +256,11 @@ protected:
   nuiskey fCompKey;
   std::vector<std::string> fThrowList;
   std::string fThrowString;
+
+  int fNThrows;
+  int fStartThrows;
+
+
 };
 
 /*! @} */
