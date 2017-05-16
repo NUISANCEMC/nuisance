@@ -392,7 +392,7 @@ void nuisconfig::WriteConfig(std::string outputname) {
   fXML->DocSetRootElement(newxmldoc, fMainNode);
 
   // Save document to file
-  fXML->SaveDoc(newxmldoc, outputname.c_str());
+  //  fXML->SaveDoc(newxmldoc, outputname.c_str());
 }
 
 

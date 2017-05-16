@@ -67,7 +67,7 @@
 <config input.regen_nuwro_plots='0'/>
 
 <!-- # DEVEL CONFIG OPTION, don't touch! -->
-<config cachesize='0'/>
+<config CacheSize='1000000'/>
 
 <!-- # ReWeighting Configuration Options -->
 <!-- # ###################################################### -->

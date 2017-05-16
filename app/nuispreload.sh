@@ -15,7 +15,13 @@ fi
 if [[ $opt == "-copy" ]]
 then
     
-    echo "Copying files across"
+    if [[ -e "$card" ]]
+    then
+        echo "Copying files across from $card"
+    else
+	echo "$card not found!"
+	return
+    fi
     
     # Copy File
     cp $card preload_${card}
@@ -79,6 +85,14 @@ fi
 if [[ $opt == "-clean" ]]
 then
     
+    if [[ -e "preload_${card}" ]] 
+    then
+	echo "Cleaning from preload_${card}"
+    else
+	echo "No preload card found!" 
+	return 0
+    fi
+
     # Strip out config replacers
     for obj in $(grep config $card);
     do
@@ -133,5 +147,7 @@ then
         done
     done
 
+    # Remove file
+    rm preload_${card}
 fi
 

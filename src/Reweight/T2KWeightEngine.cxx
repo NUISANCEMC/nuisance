@@ -30,6 +30,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 	
 #else	
 	ERR(FTL) << "T2K RW NOT ENABLED" << std::endl;
+	throw;
 #endif
 };
 

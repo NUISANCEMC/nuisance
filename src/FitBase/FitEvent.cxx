@@ -54,9 +54,10 @@ void FitEvent::ResetEvent() {
   fNParticles = 0;
 
   for (unsigned int i = 0; i < kMaxParticles; i++) {
-    FitParticle* fp = fParticleList[i];
-    if (fp) delete fp;
+    if (fParticleList[i]) delete fParticleList[i];
     fParticleList[i] = NULL;
+  
+    continue;
 
     fParticlePDG[i] = 0;
     fParticleState[i] = kUndefinedState;
@@ -191,6 +192,8 @@ FitParticle* FitEvent::PartInfo(UInt_t i) {
   }
 
   // Check particle has been formed
+  //  if (fParticleList[i]) delete fParticleList[i];
+
   if (!fParticleList[i]) {
     fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1],
                                        fParticleMom[i][2], fParticleMom[i][3],

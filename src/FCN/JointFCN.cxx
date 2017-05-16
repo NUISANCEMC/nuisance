@@ -591,7 +591,7 @@ void JointFCN::ReconfigureUsingManager() {
   // If we are siving signal, reset all containers.
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
   std::cout << " Save Signal = " << savesignal << std::endl;
-  sleep(5);
+  //  sleep(5);
 
   if (savesignal) {
     // Reset all of our event signal vectors

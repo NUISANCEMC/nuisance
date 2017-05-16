@@ -83,10 +83,14 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
     	scale /= double(jointindexhigh[i] - jointindexlow[i]);
 
     	jointindexscale .push_back(scale);
-	}
-
-	fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
-	fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+    }
+    
+    fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
+    fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+    
+    fFitEventTree->SetCacheEntryRange(0,fNEvents);
+    fFitEventTree->AddBranchToCache("*",1);
+    fFitEventTree->SetCacheSize(FitPar::Config().GetParI("CacheSize"));
 
 };
 

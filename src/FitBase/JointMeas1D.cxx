@@ -1454,7 +1454,6 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   if (FitPar::Config().GetParB("EventManager")) {
     ERR(FTL) << "Event Manager does not yet work with JointMeas1D Samples" << std::endl;
     ERR(FTL) << "If you want good predictions for " << fName << " then run with it turned off! (-q EventManager=0)" << std::endl;
-    sleep(2);
   }
 
   fSubInFiles.clear();
