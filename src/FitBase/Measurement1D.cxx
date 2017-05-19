@@ -903,6 +903,7 @@ double Measurement1D::GetLikelihood() {
     } else if (fIsDiag) {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);
     } else if (!fIsDiag and !fIsRawEvents) {
+      std::cout << "Getting likelihood from covariance " << std::endl;
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
     }
 

@@ -49,7 +49,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey){
   fScaleFactor = (fDataHist->Integral() / (fNEvents + 0.));
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromRootFile( fSettings.GetDataInput() );
+  SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------

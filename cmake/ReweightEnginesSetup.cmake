@@ -40,6 +40,13 @@ if(DEFINED USE_GENIE AND USE_GENIE)
 else()
   set(USE_GENIE 0)
 endif()
+
+if(DEFINED BUILD_GEVGEN AND BUILD_GEVGEN)
+	   cmessage(STATUS "Building custom gevgen.")
+else()
+set(BUILD_GEVGEN 0)
+endif()
+
 ##################################  NIWG  ######################################
 if(DEFINED USE_NIWG AND USE_NIWG)
   include(${CMAKE_SOURCE_DIR}/cmake/NIWGSetup.cmake)
@@ -54,6 +61,15 @@ if(DEFINED USE_T2K AND USE_T2K)
 else()
   set(USE_T2K 0)
 endif()
+################################# HEPMC ########################################
+if(DEFINED USE_HEPMC AND USE_HEPMC)
+  include(${CMAKE_SOURCE_DIR}/cmake/HepMC.cmake)
+  cmessage(STATUS "Using HepMC engine.")
+else()
+  set(USE_HEPMC 0)
+endif()
+
+
 
 cmessage(STATUS "Reweight engine include directories: ${RWENGINE_INCLUDE_DIRECTORIES}")
 

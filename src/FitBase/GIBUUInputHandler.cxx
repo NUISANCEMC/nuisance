@@ -107,6 +107,8 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle, std::string cons
 	Long64_t nevt = 0;
 	fNEvents = fGIBUUTree->GetEntries();
 	fFluxHist = NULL;
+	fNUISANCEEvent = new FitEvent();
+
 	while ((Found_nu != Found_nuMask) && (nevt < fNEvents)) {
 		if ((maskHW == 2) && fFluxHist) {  // If we have found the dominant one can
 			// now guess the other

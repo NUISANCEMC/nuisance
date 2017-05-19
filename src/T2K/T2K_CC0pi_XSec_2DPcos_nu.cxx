@@ -49,10 +49,6 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey) {
 
   // CCQELike plot information
   fSettings.SetTitle("T2K_CC0pi_XSec_2DPcos_nu");
-
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCEavq3/data_2D.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCEavq3/covar_2D.txt" );
-  fSettings.SetMapInput( FitPar::GetDataBase() + "/MINERvA/CCEavq3/map_2D.txt" );
   fSettings.DefineAllowedSpecies("numu");
 
   forwardgoing = (fSettings.GetS("type").find("REST") != std::string::npos);
@@ -63,19 +59,8 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey) {
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
 
-  // Plot Setup -------------------------------------------------------
-  Double_t binx[7] = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
-  Double_t biny[17] = {0.0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50, 0.60, 0.80};
-  CreateDataHistogram(7, binx, 17, biny);
-
-  SetDataValuesFromTextFile( fSettings.GetDataInput() );
-  ScaleData(1E-42);
-
-  SetMapValuesFromText( fSettings.GetMapInput() );
-
-  SetCholDecompFromTextFile( fSettings.GetCovarInput() );
-  ScaleCovar(1E-16);
-
+  // Setup Histograms
+  SetHistograms();
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
 
   // Final setup  ---------------------------------------------------

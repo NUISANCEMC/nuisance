@@ -47,6 +47,7 @@ GeneratorInfoBase.h
 InputTypes.h
 GNUISANCEFlux.cxx
 GNUISANCEMCJDriver.cxx
+HepMCTextInputHandler.cxx
 )
 
 set(HEADERFILES
@@ -56,6 +57,7 @@ BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
 EventManager.h  FitParticle.h      MeasurementBase.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
 InputUtils.h
 NEUTInputHandler.h
+HepMCTextInputHandler.h
 GENIEInputHandler.h
 NuWroInputHandler.h
 InputHandler2.h

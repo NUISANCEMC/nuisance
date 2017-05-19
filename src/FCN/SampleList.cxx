@@ -356,12 +356,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       MiniBooNE NCEL
     */
   } else if (!name.compare("MiniBooNE_NCEL_XSec_Treco_nu")) {
-    ERR(FTL)
-        << "MiniBooNE_NCEL_XSec_Treco_nu not implemented in current interface."
-        << std::endl;
-    throw 5;
-    // return (new MiniBooNE_NCEL_XSec_Treco_nu(file, rw, type,
-    // fkdt));
+    return (new MiniBooNE_NCEL_XSec_Treco_nu(samplekey));
 
     /*
     MINERvA Samples
@@ -525,6 +520,10 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
              !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
     return (new T2K_CC0pi_XSec_2DPcos_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_nonuniform")){
+
+    return (new T2K_CC0pi_XSec_2DPcos_nu_nonuniform(samplekey));
 
     /*
       T2K CC1pi+ CH samples

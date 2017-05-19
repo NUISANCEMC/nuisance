@@ -50,7 +50,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-if (USE_GENIE)
+if (BUILD_GEVGEN)
   add_executable(gevgen_nuisance gEvGen_NUISANCE.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};gevgen_nuisance)
   target_link_libraries(gevgen_nuisance ${MODULETargets})
