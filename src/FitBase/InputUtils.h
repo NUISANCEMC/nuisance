@@ -35,8 +35,8 @@ namespace InputUtils {
 
 enum InputType {
   kNEUT_Input = 0,
-  kNUWRO_Input,
-  kGENIE_Input,
+  kNUWRO_Input = 1,
+  kGENIE_Input = 2,
   kGiBUU_Input,
   kNUANCE_Input,
   kEVSPLN_Input,

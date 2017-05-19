@@ -18,6 +18,7 @@ enum generator_event_type {
   kNEWSPLINE = 13,
   kLIKEWEIGHT = 14,
   kSPLINEPARAMETER = 15,
+  kHEPMC = 16,
 };
 
 inline std::ostream& operator<<(std::ostream& os,
@@ -59,6 +60,9 @@ inline std::ostream& operator<<(std::ostream& os,
     case kMODENORM: {
       return os << "kMODENORM";
     }
+  case kHEPMC: {
+    return os << "kHEPMC";
+  }
     default: { return os << "kUNKNOWN"; }
   }
 }

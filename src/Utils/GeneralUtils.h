@@ -39,46 +39,48 @@
  *  @{
  */
 
-//! Functions which deal with basic string and file handling. They should have
-//! no dependence on the other NUISANCE files!
+/// Functions which deal with basic string and file handling. They should have
+/// no dependence on the other NUISANCE files!
 namespace GeneralUtils {
 
 /*!
   String handling and file parsing functions
 */
 
-//! Parse a string into a vector of doubles given a delimiter "del"
+/// Parse a string into a vector of doubles given a delimiter "del"
 std::vector<double> ParseToDbl(std::string str, const char* del);
 
-//! Parse a string into a vector of ints given a delimiter "del"
+/// Parse a string into a vector of ints given a delimiter "del"
 std::vector<int> ParseToInt(std::string str, const char* del);
 
-//! Parse a string into a vector of strings given a delimiter "del"
+/// Parse a string into a vector of strings given a delimiter "del"
 std::vector<std::string> ParseToStr(std::string str, const char* del);
 
-//! Parse text file into a vector of strings
+/// Parse text file into a vector of strings 
 std::vector<std::string> ParseFileToStr(std::string str, const char* del);
 
-//! Convert a string to a double
+/// Convert a string to a double
 double StrToDbl(std::string str);
 
-//! Convert a string to an int
+/// Convert a string to an int
 int StrToInt(std::string str);
 
-//! Convert a string to an bool
+/// Convert a string to an bool
 bool StrToBool(std::string str);
 
+/// Convert a bool to string
 std::string BoolToStr(bool val);
 
+/// Convert Int to string
 std::string IntToStr(int val);
 
+/// Convert Double to String
 std::string DblToStr(double val);
 
-
-//! Return the top level environmental variable for the fitter
+/// Return the top level environmental variable for the fitter
 std::string GetTopLevelDir();
 
-// //! A utility function to return a std::vector from an array
+// /// A utility function to return a std::vector from an array
 // template <typename T, size_t N>
 // std::vector<T> makeVector(const T (&data)[N]) {
 //   return std::vector<T>(data, data + N);
@@ -127,6 +129,8 @@ size_t IsSmallNum(T const& d) {
 }
 }
 
+
+/// namespace to contain all physical constants used by NUISANCE
 namespace PhysConst {
 const double mass_proton = 0.93827203;   // Proton mass in GeV
 const double mass_neutron = 0.93956536;  // Neutron mass in GeV

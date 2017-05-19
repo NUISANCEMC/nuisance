@@ -43,7 +43,16 @@ maphist = datahist.Clone("analysis1_map")
 maphist.SetTitle("analysis1_map")
            
 counthist = datahist.Clone("analysis1_entrycount")
-           
+
+datapoly = TH2Poly("datapoly","datapoly", 0.0,30.0, -1.0, 1.0)
+hist = None
+
+binedges = []
+histedgeslist = []
+xsecvals = []
+histxseclist = []
+
+binlimits = [3,8,15,22,30,39,47,58,67]
 with open("cross-section_analysisI.txt") as f:
     count = 0
     for line in f:
@@ -55,12 +64,25 @@ with open("cross-section_analysisI.txt") as f:
 
         ibin = int(   data[0]  ) + 1
         
-        xval = GetLowEdge( data[2] )
-        yval = GetLowEdge( data[1] )
-        xhig = GetHighEdge( data[2] )
-        yhig = GetHighEdge( data[1] )
+        xval = round(float(GetLowEdge( data[2] )),4)
+        yval = round(float(GetLowEdge( data[1] )),4)
+        xhig = round(float(GetHighEdge( data[2] )),4)
+        yhig = round(float(GetHighEdge( data[1] )),4)
         
         xsec = float( data[3]  ) * 1E-38
+
+        datapoly.AddBin( xval, yval, xhig, yhig )
+        datapoly.SetBinContent( datapoly.GetNumberOfBins(), xsec)
+
+        binedges.append( xval )
+        xsecvals.append( xsec )
+        if ibin in binlimits: 
+            binedges.append( xhig )
+            histedgeslist.append(binedges)
+            histxseclist.append(xsecvals)
+            binedges = []
+            xsecvals = []
+
 
         datahist.Fill(xval, yval, xsec)
         counthist.Fill(xval, yval, 1.0)
@@ -74,10 +96,94 @@ with open("cross-section_analysisI.txt") as f:
                     ycent > yval and ycent < yhig):
                     maphist.SetBinContent(i+1,j+1, ibin)
 
+data1D = TH1D("datahist","datahist", datapoly.GetNumberOfBins(), 0.0, float(datapoly.GetNumberOfBins()));
+for i in range(datapoly.GetNumberOfBins()):
+    data1D.SetBinContent(i+1, datapoly.GetBinContent(i+1));
+
 outfile.cd()
 datahist.Write()
 counthist.Write()
 maphist.Write()
+datapoly.Write()
+data1D.Write()
+
+for i, obj in enumerate(histedgeslist):
+    print obj
+
+    hist = TH1D("dataslice_" + str(i), "dataslice_" + str(i), len(obj)-1, array('f',obj))
+    for j in range(hist.GetNbinsX()):
+        hist.SetBinContent(j+1, histxseclist[i][j])
+
+    hist.GetXaxis().SetRangeUser(obj[0], obj[len(obj)-2])
+    hist.Draw("HIST")
+    gPad.Update()
+
+    hist.SetNameTitle("dataslice_" + str(i),"dataslice_" + str(i))
+    hist.Write()
+
+# Get N Bins                                                                                                                                                                                                                               
+nbins = 67
+print "NBins I = ", nbins
+
+# Get Covariances (keep in 1E-38 cm^2)                                                                                                                                                                                                      
+statcov = TH2D("analysis1_statcov","analysis1_statcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
+systcov = TH2D("analysis1_systcov","analysis1_systcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
+normcov = TH2D("analysis1_normcov","analysis1_normcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
+totcov = TH2D("analysis1_totcov","analysis1_totcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
+
+with open("covariance_statisticUncertainty_analysisI.txt") as f:
+    count = 0
+    for line in f:
+        count += 1
+
+        if (count < 4): continue
+        data = line.strip().split("|")
+        if (len(data) < 1): continue
+
+        xi, yi = GetIndex(data[0])
+        cov    = float(data[1])
+
+        statcov.SetBinContent(xi, yi, cov)
+
+with open("covariance_shapeSystematics_analysisI.txt") as f:
+    count = 0
+    for line in f:
+        count += 1
+
+        if (count < 4): continue
+        data = line.strip().split("|")
+        if (len(data) < 1): continue
+
+        xi, yi = GetIndex(data[0])
+        cov    = float(data[1])
+
+        systcov.SetBinContent(xi + 1, yi + 1, cov)
+
+with open("covariance_fluxNormalizationSystematics_analysisI.txt") as f:
+    count = 0
+    for line in f:
+        count += 1
+
+        if (count < 4): continue
+        data = line.strip().split("|")
+        if (len(data) < 1): continue
+
+        xi, yi = GetIndex(data[0])
+        cov    = float(data[1])
+
+        normcov.SetBinContent(xi + 1, yi + 1, cov)
+
+totcov.Add(systcov)
+totcov.Add(statcov)
+totcov.Add(normcov)
+
+outfile.cd()
+statcov.Write()
+systcov.Write()
+totcov.Write()
+normcov.Write()
+
+
 
 
 # ANALYSIS II
@@ -115,7 +221,7 @@ with open("rps_crossSection_analysis2.txt") as f:
            
         counthist.Fill(xval, yval, 1.0)
 
-        print ibin, "Map Value"
+     #   print ibin, "Map Value"
         
 # Get N Bins
 nbins = int(maphist.GetMaximum())
@@ -184,3 +290,5 @@ normcov.Write()
 
 
 
+
+#  LocalWords:  xval

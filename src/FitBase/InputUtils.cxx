@@ -39,6 +39,7 @@ InputType ParseInputType(std::string const &inp) {
 
   for (size_t i = 0; i < nInputTypes; i++) {
     if (inp == filetypes[i]) {
+      std::cout << "INPUT TYPE = " << inp << " " << i << std::endl;
       return InputType(i);
     }
   }
@@ -158,42 +159,44 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
 
   InputHandlerBase* input = NULL;
 
+  std::string newinputs = ExpandInputDirectories(inputs);
+
   switch (inpType) {
 
 
   case (kNEUT_Input):
 #ifdef __NEUT_ENABLED__
-    input = new NEUTInputHandler(handle, inputs);
+    input = new NEUTInputHandler(handle, newinputs);
     break;
 #endif
 
 
   case (kGENIE_Input):
 #ifdef __GENIE_ENABLED__
-    input = new GENIEInputHandler(handle, inputs);
-    break;
+    input = new GENIEInputHandler(handle, newinputs);
 #endif
+    break;
 
 
   case (kNUWRO_Input):
 #ifdef __NUWRO_ENABLED__
-    input = new NuWroInputHandler(handle, inputs);
-    break;
+    input = new NuWroInputHandler(handle, newinputs);
 #endif
+    break;
 
 
   case (kGiBUU_Input):
-#ifdef __GIBUU_ENABLED__
-    input = new GIBUUInputHandler(handle, inputs);
-    break;
+#ifdef __GiBUU_ENABLED__
+    input = new GIBUUInputHandler(handle, newinputs);
 #endif
+    break;
 
   case (kFEVENT_Input):
-    input = new FitEventInputHandler(handle, inputs);
+    input = new FitEventInputHandler(handle, newinputs);
     break;
 
   case (kEVSPLN_Input):
-    input = new SplineInputHandler(handle, inputs);
+    input = new SplineInputHandler(handle, newinputs);
     break;
 
   default:

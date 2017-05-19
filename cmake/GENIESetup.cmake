@@ -40,6 +40,11 @@ if(NOT DEFINED GENIE AND DEFINED ENV{GENIE})
   set(GENIE $ENV{GENIE})
 endif()
 
+if (DEFINED BUILD_GEVGEN AND BUILD_GEVGEN)
+  cmessage(STATUS "Building custom gevgen")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEVGEN_ENABLED__ ")
+endif()
+
 execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND genie-config

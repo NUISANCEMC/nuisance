@@ -34,6 +34,7 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu.cxx
 T2K_CC1pip_H2O_XSec_1Dpmu_nu.cxx
 T2K_CC1pip_H2O_XSec_1Dppi_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.cxx
+T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
 T2K_SignalDef.cxx
 )
 
@@ -55,6 +56,7 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu.h
 T2K_CC1pip_H2O_XSec_1Dpmu_nu.h
 T2K_CC1pip_H2O_XSec_1Dppi_nu.h
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.h
+T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h
 T2K_SignalDef.h
 )
 

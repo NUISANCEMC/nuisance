@@ -143,7 +143,7 @@
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
 
 // MiniBooNE NCEL
-// #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
+#include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 
 // MINERvA CCQE
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
@@ -224,6 +224,7 @@
 #include "ElectronFlux_FlatTree.h"
 #include "ElectronScattering_DurhamData.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "T2K2017_FakeData.h"
