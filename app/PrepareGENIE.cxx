@@ -138,6 +138,18 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   // Save each of the reconstructed splines to file
   std::map<std::string, TH1D*> modeavg;
 
+
+  // Loop over GENIE ID's and get MEC count                                                                                                                                     
+  int MECcount = 0;
+  bool MECcorrect = FitPar::Config().GetParB("CorrectGENIEMECNorm");
+  for (UInt_t i = 0; i < genieids.size(); i++) {
+    if (genieids[i].find("MEC") != std::string::npos){
+      MECcount++;
+    }
+  }
+  LOG(FIT) << "Found " << MECcount << " repeated MEC instances." << std::endl;
+
+
   
   TDirectory* inddir = (TDirectory*) outputfile->Get("IndividualGENIESplines");
   if (!inddir) inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
@@ -152,6 +164,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
     //Form extra avg xsec map -> Reconstructed spline
     modeavg[mode] = (TH1D*)modexsec[mode]->Clone();
     modeavg[mode]->Divide(modecount[mode]);
+
+    if (MECcorrect && (mode.find("MEC") != std::string::npos)){
+      modeavg[mode]->Scale(1.0 / double(MECcount) );
+    }
 
     modeavg[mode]->Write( (mode + "_rec_spline").c_str() , TObject::kOverwrite);
   }

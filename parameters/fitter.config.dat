@@ -150,3 +150,7 @@ config MINERvA_XSec_CCinc_2DEavq3_nu.hadron_cut    0
 config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true      0
 config Modes.split_PN_NN     0
 
+
+# GENIE MEC FIX for PrepareGENIE
+# ##################
+config CorrectGENIEMECNorm 1
