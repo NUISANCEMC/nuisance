@@ -179,6 +179,7 @@
 
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 
 // T2K CC1pi+ on CH
 #include "T2K_CC1pip_CH_XSec_1Dpmu_nu.h"

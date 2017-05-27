@@ -476,6 +476,9 @@ T2K Samples
 	     !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
     fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu(name, file, rw, type));
 
+  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_nonuniform")){
+    fChain->push_back(new T2K_CC0pi_XSec_2DPcos_nu_nonuniform(name, file, rw, type));
+  
     /*
       T2K CC1pi+ CH samples
     */
