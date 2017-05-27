@@ -69,9 +69,6 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
     if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
     else fEventHist->Add(eventhist);
 
-    // Remove file
-    //inp_file->Close();
-    //delete inp_file;
   }
 
   // Setup NEvents and the FitEvent
@@ -119,13 +116,11 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry) {
   fGENIETree->GetEntry(entry);
 
   // Setup Input scaling for joint inputs
-  fNUISANCEEvent->RWWeight = 1.0;
-  fNUISANCEEvent->InputWeight = 1.0;
-  // if (jointinput) {
-  //   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
-  // } else {
-  //   fNUISANCEEvent->InputWeight = 1.0;
-  // }
+  if (jointinput) {
+    fNUISANCEEvent->InputWeight = GetInputWeight(entry);
+  } else {
+    fNUISANCEEvent->InputWeight = 1.0;
+  }
 
   // Run NUISANCE Vector Filler
   CalcNUISANCEKinematics();
@@ -212,12 +207,13 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
       else if (gheprec->Summary()->ProcInfo().IsMEC()) return 2;
       else if (gheprec->Summary()->ProcInfo().IsResonant()) return 13;
       else if (gheprec->Summary()->ProcInfo().IsDeepInelastic()) return 26;
-      // else if (gheprec->Summary()->ProcInfo().InteractionTypeId() == 1 && gheprec->Summary()->ProcInfo().ScatteringTypeId() == 10) return 2;
       else {
 	ERR(WRN) << "Unknown GENIE Electron Scattering Mode!" << std::endl
 		 << "ScatteringTypeId = " << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
 		 << "InteractionTypeId = " << gheprec->Summary()->ProcInfo().InteractionTypeId() << std::endl 
-		 << genie::ScatteringType::AsString(gheprec->Summary()->ProcInfo().ScatteringTypeId()) << " " << genie::InteractionType::AsString(gheprec->Summary()->ProcInfo().InteractionTypeId()) << " " << gheprec->Summary()->ProcInfo().IsMEC() << std::endl;
+		 << genie::ScatteringType::AsString(gheprec->Summary()->ProcInfo().ScatteringTypeId()) << " " 
+		 << genie::InteractionType::AsString(gheprec->Summary()->ProcInfo().InteractionTypeId()) << " " 
+		 << gheprec->Summary()->ProcInfo().IsMEC() << std::endl;
 	return 0;
       }
     }
@@ -254,6 +250,7 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
 
 void GENIEInputHandler::CalcNUISANCEKinematics() {
 #ifdef __GENIE_ENABLED__
+
   // Reset all variables
   fNUISANCEEvent->ResetEvent();
 
@@ -332,8 +329,6 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
     // Fill extra information, NEUT Example Given
     // if (save_extra){
-    //  fNUISANCEEvent->fNEUT_ParticleStatusCode[curpart] = part->fStatus;
-    //  fNUISANCEEvent->fNEUT_ParticleStatusCode[curpart] = part->fIsAlive;
     // }
 
     // Add to N particle count
@@ -356,6 +351,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
 double GENIEInputHandler::GetInputWeight(int entry) {
 #ifdef __GENIE_ENABLED__
+
   // Find Switch Scale
   while ( entry < jointindexlow[jointindexswitch] ||
           entry >= jointindexhigh[jointindexswitch] ) {
@@ -366,6 +362,7 @@ double GENIEInputHandler::GetInputWeight(int entry) {
       jointindexswitch = 0;
     }
   }
+
   return jointindexscale[jointindexswitch];
 #endif
   return 0.0;

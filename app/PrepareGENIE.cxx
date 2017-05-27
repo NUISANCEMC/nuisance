@@ -178,6 +178,17 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
   if (!inddir) inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
   inddir->cd();
 
+  // Loop over GENIE ID's and get MEC count
+  int MECcount = 0;
+  bool MECcorrect = FitPar::Config().GetParB("CorrectGENIEMECNorm");
+  for (UInt_t i = 0; i < genieids.size(); i++) {
+    if (genieids[i].find("MEC") != std::string::npos){
+      MECcount++;
+    }
+  }
+  LOG(FIT) << "Found " << MECcount << " repeated MEC instances." << std::endl;
+
+
   for (UInt_t i = 0; i < genieids.size(); i++) {
     std::string mode = genieids[i];
 
@@ -187,6 +198,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
     //Form extra avg xsec map -> Reconstructed spline
     modeavg[mode] = (TH1D*)modexsec[mode]->Clone();
     modeavg[mode]->Divide(modecount[mode]);
+
+    if (MECcorrect && (mode.find("MEC") != std::string::npos)){
+      modeavg[mode]->Scale(1.0 / double(MECcount) );
+    }
 
     modeavg[mode]->Write( (mode + "_rec_spline").c_str() , TObject::kOverwrite);
   }
@@ -212,7 +227,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       if (mode.find(targ) != std::string::npos) {
 
         LOG(FIT) << "Mode " << mode << " contains " << targ << " target!" << std::endl;
-        modeavg[mode]->Write( (mode + "_cont_" + targ).c_str() , TObject::kOverwrite);
+	//        modeavg[mode]->Write( (mode + "_cont_" + targ).c_str() , TObject::kOverwrite);
         targetsplines[targ]->Add( modeavg[mode] );
         LOG(FIT) << "Finished with Mode " << mode << " "  << modeavg[mode]->Integral() << std::endl;
       }
@@ -246,6 +261,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target, st
       }
     }
   }
+
+  LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width") << std::endl;
 
   outputfile->cd();
   totalxsec->Write("nuisance_xsec", TObject::kOverwrite);

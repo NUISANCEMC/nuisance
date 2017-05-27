@@ -401,15 +401,22 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       // Fill xsec hist
       for (int k = 0; k < totalflux->GetNbinsX(); k++){
 	double avgxsec = 0.0;
-	int res = 100;
+
+	
+	int res = 1000;
 	for (int l = 0; l < res; l++){
 	  double E = fluxhist->GetXaxis()->GetBinLowEdge(k+1) + (double(l)*fluxhist->GetXaxis()->GetBinWidth(k+1) / double(res));
 	  double xsec = totxsecspl->Evaluate( E ) / (1E-38 * genie::units::cm2);
 	  avgxsec += xsec;
 	}
 	avgxsec /= double(res);
+
+	//	double E = fluxhist->GetXaxis()->GetBinCenter(k+1);
+	//	avgxsec = totxsecspl->Evaluate( E ) / (1E-38 * genie::units::cm2);
+
 	xsechist->SetBinContent(k+1, avgxsec);
 	eventhist->SetBinContent(k+1, avgxsec * fluxhist->GetBinContent(k+1));
+
       }
       
       // Scale totals by target fractions
@@ -582,12 +589,12 @@ GFluxI * TH1FluxDriver(void)
     TH1D* spectrum = (TH1D*)hst->Clone();
     spectrum->SetNameTitle("spectrum","neutrino_flux");
     spectrum->SetDirectory(0);
-    //    for(int ibin = 1; ibin <= hst->GetNbinsX(); ibin++) {
-    //      if(spectrum->GetBinCenter(ibin) > emax ||
-    //	 spectrum->GetBinCenter(ibin) < emin){
-    //        spectrum->SetBinContent(ibin, 0);
-    //      }
-    //}
+    for(int ibin = 1; ibin <= hst->GetNbinsX(); ibin++) {
+      if(spectrum->GetBinCenter(ibin) > emax ||
+    	 spectrum->GetBinCenter(ibin) < emin){
+	spectrum->SetBinContent(ibin, 0);
+      }
+    }
 
     LOG("gevgen", pNOTICE) << spectrum->GetEntries();
 

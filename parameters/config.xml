@@ -107,6 +107,8 @@
 <!-- # Save the shape scaling applied with option SHAPE into the main MC hist -->
 <config saveshapescaling='0'/>
 
+<config CorrectGENIEMECNorm='1'/>
+
 <!-- # Set style of 1D output histograms -->
 <config linecolour='1'/>
 <config linestyle='1'/>
