@@ -19,7 +19,6 @@
 set(IMPLFILES
 ComparisonRoutines.cxx
 SystematicRoutines.cxx
-BaseRoutines.cxx
 ParserUtils.cxx
 SplineRoutines.cxx
 )
@@ -31,7 +30,6 @@ endif()
 set(HEADERFILES
 ComparisonRoutines.h
 SystematicRoutines.h
-BaseRoutines.h
 ParserUtils.h
 SplineRoutines.h
 )

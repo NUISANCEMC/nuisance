@@ -16,9 +16,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "StatusMessage.h"
-
 #include "ComparisonRoutines.h"
 
 /*
@@ -42,11 +40,12 @@ void ComparisonRoutines::Init() {
   fSampleFCN = NULL;
 
   fAllowedRoutines = ("Compare");
+  
 };
 
 //*************************************
 ComparisonRoutines::~ComparisonRoutines() {
-  //*************************************
+//*************************************
 };
 
 

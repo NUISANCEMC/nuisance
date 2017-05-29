@@ -141,8 +141,6 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 	// double Pq3  = 0.480194;
 	// double Wq3  = 0.134588;
 
-
-
 	double Norm = vals[kPosNorm];
 	double Tilt = vals[kPosTilt];
 	double Pq0  = vals[kPosPq0];

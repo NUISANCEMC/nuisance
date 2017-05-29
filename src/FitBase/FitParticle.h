@@ -16,41 +16,17 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #ifndef FITPARTICLE_H_SEEN
 #define FITPARTICLE_H_SEEN
 
 #include "TLorentzVector.h"
-#include "TObject.h"
-
-#ifdef __NEUT_ENABLED__
-#include "neutpart.h"
-#include "neutfsipart.h"
-#endif
-
-#ifdef __NUWRO_ENABLED__
-#include "particle.h"
-#endif
-
-#ifdef __GENIE_ENABLED__
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepRecord.h"
-#include "Ntuple/NtpMCEventRecord.h"
-#include "GHEP/GHepParticle.h"
-#include "PDG/PDGCodes.h"
-#include "PDG/PDGUtils.h"
-#include "GHEP/GHepStatus.h"
-#include "GHEP/GHepFlags.h"
-#include "GHEP/GHepUtils.h"
-#endif
-
-#include "StdHepEvt.h"
 
 /*!
  *  \addtogroup FitBase
  *  @{
  */
 
+/// Partle state flags for its position in the event
 enum particle_state{
   kUndefinedState = 5,
   kInitialState   = 0,
@@ -60,34 +36,60 @@ enum particle_state{
   kNuclearRemnant = 4
 };
 
-//! Condensed FitParticle class which acts a common format between the generators
+/// Condensed FitParticle class which acts a common format between the generators
 class FitParticle {
-
   public:
-  FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
 
+  FitParticle(double x, double y, double z, double t, int pdg, Int_t state);
   FitParticle(){};
-  //! Virtual Destructor
   ~FitParticle(){};
 
- 
-  TLorentzVector fP; //!< Particle 4 Momentum
-  int fPID; //!< Particle PDG Code
-  int fIsAlive; //!< Whether the particle is alive at the end of the event (Yes 1, No 0, Other? -1)
-  int fNEUTStatusCode; //!< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
-  double fMass; //!< Particle Mass
- 
+  /// Used to change values after creation
+  void SetValues(double x, double y, double z, double t, int pdg, Int_t state);
 
+  /// Return Status Code according to particle_state enum
   inline int  Status (void) const { return fStatus; };
+
+  /// Get Particle PDF
   inline int  PDG    (void) const { return fPID;    };
+
+  /// Check if particle makes it to final state
   inline bool IsFinalState   (void) const { return (fStatus == kFinalState);   };
+
+  /// Was particle involved in intermediate state
   inline bool IsFSIState     (void) const { return (fStatus == kFSIState);     };
+
+  /// Was particle incoming
   inline bool IsInitialState (void) const { return (fStatus == kInitialState); };
 
- private:
-  int fStatus;
+  /// Get Mass
+  inline double M  (void){ return fP.Mag(); }; 
 
+  /// Get Kinetic Energy
+  inline double KE (void){ return fP.E() - fP.Mag(); }; 
 
+  /// Get Total Energy
+  inline double E  (void){ return fP.E(); };
+
+  /// Get 4 Momentum
+  inline TLorentzVector P4(void) {return fP;}; 
+
+  /// Get 3 Momentum
+  inline TVector3       P3(void) {return fP.Vect();}; 
+
+  /// Get 3 momentum magnitude
+  inline double         p(void) { return fP.Vect().Mag(); };
+
+  /// Get 3 momentum magnitude squared
+  inline double         p2(void) { return fP.Vect().Mag2(); };
+
+  /// Data Members
+  TLorentzVector fP;   ///< Particle 4 Momentum
+  int fPID;            ///< Particle PDG Code
+  int fIsAlive;        ///< Whether the particle is alive at the end of the event (Yes 1, No 0, Other? -1)
+  int fNEUTStatusCode; ///< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
+  double fMass;        ///< Particle Mass
+  int fStatus;         ///< State corresponding to particle_state enum
 };
 
 /*! @} */

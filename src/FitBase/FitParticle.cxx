@@ -16,17 +16,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "FitParticle.h"
 
-// NUANCE Particle
 FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t state){
 
-  // Set Momentum
-  this->fP = TLorentzVector(x,
-			    y,
-			    z,
-			    t);
+  fP = TLorentzVector(x, y, z, t);
   fPID = pdg;
   fStatus = state;
 
@@ -38,7 +32,20 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
   default: fIsAlive=0; fNEUTStatusCode=999; break; // Other?
   }
 
-  fMass = fP.Mag();
 };
 
+void FitParticle::SetValues(double x, double y, double z, double t, int pdg, Int_t state){
 
+  fP = TLorentzVector(x, y, z, t);
+  fPID = pdg;
+  fStatus = state;
+
+  // Set status manually from switch
+  switch(state){
+  case     kInitialState: fIsAlive= 0; fNEUTStatusCode=1; break; // Initial State
+  case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
+  case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
+  default: fIsAlive=0; fNEUTStatusCode=999; break; // Other?
+  }
+
+};

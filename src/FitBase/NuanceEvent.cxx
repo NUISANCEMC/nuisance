@@ -1,3 +1,4 @@
+#ifdef __NUANCE_ENABLED__
 #include "NuanceEvent.h"
 
 void NuanceEvent::SetBranchAddresses(TTree* tn) {
@@ -33,3 +34,4 @@ void NuanceEvent::SetBranchAddresses(TTree* tn) {
 	tn->SetBranchAddress("p_hadron", p_hadron);
 
 }
+#endif

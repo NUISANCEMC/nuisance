@@ -20,12 +20,6 @@
 #ifndef FITEVENTBASE_H_SEEN
 #define FITEVENTBASE_H_SEEN
 
-#include "TArrayD.h"
-#include "TLorentzVector.h"
-#include "TSpline.h"
-
-#include "FitParticle.h"
-
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
 #include "neutvect.h"
@@ -46,7 +40,6 @@ using namespace genie;
 #include "NuanceEvent.h"
 #endif
 
-#include "TArrayD.h"
 #include "SplineReader.h"
 #include "InputTypes.h"
 #include "GeneratorInfoBase.h"
@@ -56,61 +49,71 @@ using namespace genie;
  *  @{
  */
 
-//! Base Event Class used to store just the generator event pointers and flat
-//! variables
+/// Base Event Class used to store just the generator event pointers 
 class BaseFitEvt {
  public:
-  BaseFitEvt();
+
+  // Base Constructors
+  BaseFitEvt(void);
   ~BaseFitEvt();
   BaseFitEvt(const BaseFitEvt* obj);
 
+  /// Reset weight to 1.0
   void ResetWeight();
   double GetWeight();
 
   inline void SetType(int type){fType = type;};
   
-  int Mode;
-  double E;
+  // Global Event Variables/Weights
+  int Mode;  ///< True interaction mode
+  double E;  ///< True probe energy
   
-  double Weight;
-  double InputWeight;
-  double RWWeight;
-  double CustomWeight;
+  // Weighting Info
+  double Weight;        ///< Total Weight For Event
+  double InputWeight;   ///< Input Starting Weight (used for GiBUU)
+  double RWWeight;      ///< Saved RW from FitWeight
+  double CustomWeight;  ///< Extra custom weight that samples can set
+  double SavedRWWeight; ///< Saved RW value for FitEvents
 
+  // Spline Info Coefficients and Readers
+  float* fSplineCoeff; ///< ND Array of Spline Coefficients
+  SplineReader* fSplineRead; ///< Spline Interpretter
+
+
+  // Generator level pointers.
+  GeneratorInfoBase* fGenInfo;
   UInt_t fType;
 
-// NEUT : Default
 #ifdef __NEUT_ENABLED__
-  NeutVect* fNeutVect;  //!< Pointer to Neut Vector
+  void SetNeutVect(NeutVect* v);
+  NeutVect* fNeutVect;  ///< Pointer to Neut Vector
 #endif
 
-// NUWRO
 #ifdef __NUWRO_ENABLED__
-  event* fNuwroEvent;  //!< Pointer to Nuwro event
+  void SetNuwroEvent(event* e);
+  event* fNuwroEvent;  ///< Pointer to Nuwro event
 #endif
 
-// GENIE
 #ifdef __GENIE_ENABLED__
-  NtpMCEventRecord* genie_event;  //!< Pointer to NTuple Genie Event
-  GHepRecord* genie_record;  //!< Pointer to actually accessible Genie Record
+  void SetGenieEvent(NtpMCEventRecord* ntpl);
+  NtpMCEventRecord* genie_event;  ///< Pointer to NTuple Genie Event
+  GHepRecord* genie_record;  ///< Pointer to actually accessible Genie Record
 #endif
 
-
-// NUANCE
 #ifdef __NUANCE_ENABLED__
-  NuanceEvent* nuance_event;
+  void SetNuanceEvent(NuanceEvent* e);
+  NuanceEvent* nuance_event; ///< Pointer to Nuance reader
 #endif
 
-// GiBUU
 #ifdef __GiBUU_ENABLED__
-  GiBUUStdHepReader* GiRead;
+  void SetGiBUUReader(GiBUUStdHepReader* g);
+  GiBUUStdHepReader* GiRead; ///< Pointer to GiBUU reader
 #endif
 
-  GeneratorInfoBase* fGenInfo;
-  float* fSplineCoeff;
-  SplineReader* fSplineRead;
+  void SetInputFitEvent();
+  void SetInputFitSpline();
+  void SetInputHepMC();
 
-  double SavedRWWeight;
 };
 
 #endif
