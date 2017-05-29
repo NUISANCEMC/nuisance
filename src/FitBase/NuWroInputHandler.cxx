@@ -95,7 +95,8 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	fNuWroEvent = NULL;
 	fNuWroTree->SetBranchAddress("e", &fNuWroEvent);
 
-	fNUISANCEEvent = new FitEvent(fNuWroEvent);
+	fNUISANCEEvent = new FitEvent();
+	fNUISANCEEvent->SetNuwroEvent(fNuWroEvent);
 	fNUISANCEEvent->HardReset();
 
 	fBaseEvent = static_cast<BaseFitEvt*>(fNUISANCEEvent);

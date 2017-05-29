@@ -1,3 +1,4 @@
+#ifdef __GiBUU_ENABLED__
 #include "GIBUUInputHandler.h"
 
 GIBUUInputHandler::GIBUUInputHandler(std::string const& handle, std::string const& rawinputs) {
@@ -453,5 +454,5 @@ BaseFitEvt* GIBUUInputHandler::GetBaseEvent(const UInt_t entry) {
 }
 
 void GIBUUInputHandler::Print() {}
-
+#endif
 

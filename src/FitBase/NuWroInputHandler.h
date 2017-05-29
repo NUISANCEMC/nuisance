@@ -1,7 +1,7 @@
 #ifndef NuWroINPUTHANDLER_H
 #define NuWroINPUTHANDLER_H
 #ifdef __NUWRO_ENABLED__
-
+#include "GeneratorUtils.h"
 #include "InputHandler2.h"
 #include "PlotUtils.h"
 

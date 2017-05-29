@@ -59,15 +59,13 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
     	if (!fEventHist) fEventHist = (TH1D*) eventhist->Clone();
     	else fEventHist->Add(eventhist);
 
-    	// Remove file
-    	//inp_file->Close();
-    	//delete inp_file;
 	}
 
 	// Setup NEvents and the FitEvent
     fNEvents = fFitEventTree->GetEntries();
     fEventType = kINPUTFITEVENT;
-    fNUISANCEEvent = new FitEvent(kINPUTFITEVENT);
+    fNUISANCEEvent = new FitEvent();
+    fNUISANCEEvent->SetInputFitEvent();
     fNUISANCEEvent->HardReset();
     fNUISANCEEvent->SetBranchAddress(fFitEventTree);
 
@@ -105,11 +103,7 @@ FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry){
 
 	// Read NUISANCE Tree
 	fFitEventTree->GetEntry(entry);
-	// fNUISANCEEvent->eventid = entry;
-
-	// Run Initial, FSI, Final, Other ordering. 
-	// fNUISANCEEvent-> OrderStack();
-
+	
 	// Setup Input scaling for joint inputs
 	if (jointinput){
 		fNUISANCEEvent->InputWeight = fNUISANCEEvent->SavedRWWeight * fNUISANCEEvent->InputWeight * GetInputWeight(entry);

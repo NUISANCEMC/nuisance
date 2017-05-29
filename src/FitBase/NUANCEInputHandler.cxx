@@ -1,3 +1,4 @@
+#ifdef __NUANCE_ENABLED__
 #include "NUANCEInputHandler.h"
 
 NUANCEInputHandler::NUANCEInputHandler(std::string const& handle, std::string const& rawinputs) {
@@ -180,5 +181,5 @@ BaseFitEvt* NUANCEInputHandler::GetBaseEvent(const UInt_t entry) {
 }
 
 void NUANCEInputHandler::Print() {}
-
+#endif
 

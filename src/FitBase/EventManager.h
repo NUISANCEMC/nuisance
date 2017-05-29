@@ -53,8 +53,6 @@ class EventManager {
   std::map< int, std::vector< bool > > frwneeded;
   std::map< int, std::vector< double > > calc_rw;
 
-
-
 };
 
 
