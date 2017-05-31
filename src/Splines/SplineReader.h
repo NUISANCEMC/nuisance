@@ -3,6 +3,7 @@
 // #include "FitWeight.h"
 #include "Spline.h"
 #include "TTree.h"
+#include "FitLogger.h"
 // #include "GeneralUtils.h"
 
 class SplineReader {

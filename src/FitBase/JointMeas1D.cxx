@@ -285,8 +285,8 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fAddNormPen) {
     if (fNormError <= 0.0) {
-      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << endl;
-      ERR(WRN) << "If you want to use it please add fNormError=VAL" << endl;
+      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << std::endl;
+      ERR(WRN) << "If you want to use it please add fNormError=VAL" << std::endl;
       throw;
     }
   }
@@ -1795,7 +1795,7 @@ std::vector<TH1*> JointMeas1D::GetXSecList() {
 TH1D* JointMeas1D::GetCombinedFlux() {
   //********************************************************************
 
-  TH1D* newflux;
+  TH1D* newflux = NULL;
   int sample = 0;
 
   for (std::vector<MeasurementBase*>::const_iterator expIter =
@@ -1817,6 +1817,10 @@ TH1D* JointMeas1D::GetCombinedFlux() {
       newflux->Add((TH1D*)fluxVect.at(i));
       sample++;
     }
+  }
+
+  if (!newflux){
+    ERR(FTL) << "No combined flux setup in JointMeas1D" << std::endl;
   }
 
   return newflux;
@@ -1848,6 +1852,10 @@ TH1D* JointMeas1D::GetCombinedEventRate() {
       newflux->Add(fluxVect.at(i));
       sample++;
     }
+  }
+
+  if (!newflux){
+    ERR(FTL) << "No combined event rate setup in JointMeas1D" << std::endl;
   }
 
   return newflux;
@@ -2162,11 +2170,29 @@ void JointMeas1D::SetCovarFromDataFile(std::string covarFile,
 };
 
 
+// std::vector<TH1*> JointMeas1D::GetMCList(void){
+//   std::vector<TH1*> temp;
+//   return temp;
+// }
+
+
+// std::vector<TH1*> JointMeas1D::GetDataList(void){
+//  std::vector<TH1*> temp;
+//   return temp;
+// }
 
 
 
+// std::vector<TH1*> JointMeas1D::GetMaskList(void){
+//  std::vector<TH1*> temp;
+//   return temp;
+// }
 
 
+// std::vector<TH1*> JointMeas1D::GetFineList(void){
+//  std::vector<TH1*> temp;
+//   return temp;
+// }
 
 
 

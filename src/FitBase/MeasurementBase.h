@@ -56,7 +56,7 @@
 #include "GeneralUtils.h"
 #include "PlotUtils.h"
 #include "StatUtils.h"
-
+#include "InputFactory.h"
 #include "FitWeight.h"
 
 #include "TMultiDimFit.h"
@@ -67,7 +67,7 @@
 
 #include "EventManager.h"
 #include "TObject.h"
-#include "InputHandler2.h"
+#include "InputHandler.h"
 #include "NuisConfig.h"
 #include "NuisKey.h"
 #include "SampleSettings.h"

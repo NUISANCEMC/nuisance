@@ -36,6 +36,11 @@
 <config Electron_ThetaWidth='2.0' />
 <config Electron_EnergyWidth='0.10' />
 
+<config RemoveFSIParticles='0' />
+<config RemoveUndefParticles='0' />
+<config RemoveNuclearParticles='0'/>
+<config logging.FitEvent.cxx='1' />
+
 <!-- # Input Configs -->
 <!-- # ###################################################### -->
 
@@ -58,6 +63,7 @@
 <config GENIE_EVENT_DIR='/data2/stowell/NIWG/genie/fit_samples_R.2.10.0/'/>
 <config NUWRO_EVENT_DIR='/data2/stowell/NIWG/nuwro/fit_samples/'/>
 <config GIBUU_EVENT_DIR='/data/GIBUU/DIR/'/>
+<config SaveNuWroExtra='0' />
 
 <!-- # In PrepareGENIE the reconstructed splines can be saved into the file -->
 <config save_genie_splines='1'/>
@@ -67,7 +73,7 @@
 <config input.regen_nuwro_plots='0'/>
 
 <!-- # DEVEL CONFIG OPTION, don't touch! -->
-<config CacheSize='50000000'/>
+<config CacheSize='5000000'/>
 
 <!-- # ReWeighting Configuration Options -->
 <!-- # ###################################################### -->

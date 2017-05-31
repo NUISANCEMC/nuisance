@@ -16,7 +16,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#include "StatusMessage.h"
 #include "ComparisonRoutines.h"
 
 /*
@@ -486,12 +485,12 @@ void ComparisonRoutines::PrintState() {
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
 
-    LOG(FIT) << curparstring.str() << endl;
+    LOG(FIT) << curparstring.str() << std::endl;
   }
 
   LOG(FIT) << "------------" << std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << std::endl;
   LOG(FIT) << "------------" << std::endl;
 }
 

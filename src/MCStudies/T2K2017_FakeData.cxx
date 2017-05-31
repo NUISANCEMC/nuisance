@@ -135,7 +135,7 @@ void T2K2017_FakeData::FillEventVariables(FitEvent *event) {
   if ((event->NumFSParticle(13) +
        event->NumFSParticle(-13)) < 1) { return; }
 
-  FitParticle* muon;
+  FitParticle* muon = NULL;
   if (nu->fPID == 14) {
     muon = event->GetHMFSParticle(13);
   } else if (nu->fPID == -14) {

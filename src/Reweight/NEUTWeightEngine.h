@@ -19,7 +19,9 @@
 #include "NSystUncertainty.h"
 #include "neutpart.h"
 #include "neutvect.h"
+#include "NEUTInputHandler.h"
 #endif
+
 
 #include "GeneratorUtils.h"
 #include "WeightEngineBase.h"

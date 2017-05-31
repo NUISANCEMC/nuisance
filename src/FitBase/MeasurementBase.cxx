@@ -221,7 +221,7 @@ void MeasurementBase::Reconfigure() {
     // Print Out
     if (LOG_LEVEL(REC) && countwidth > 0 && !(i % countwidth)) {
       std::stringstream ss("");
-      ss.unsetf(ios_base::fixed);
+      ss.unsetf(std::ios_base::fixed);
       ss << std::setw(7) << std::right << i << "/" << fNEvents << " events ("
          << std::setw(2) << double(i) / double(fNEvents) * 100. << std::left
          << std::setw(5) << "%) "

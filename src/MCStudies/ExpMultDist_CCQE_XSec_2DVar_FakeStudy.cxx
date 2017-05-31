@@ -41,9 +41,12 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy::ExpMultDist_CCQE_XSec_2DVar_FakeStudy(std
   Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Use the name to define what variable to measure
-  int nbinsx, nbinsy;
-  double binlowx, binhighx;
-  double binlowy, binhighy;
+  int nbinsx = 0;
+  int nbinsy = 0;
+  double binlowx = 0.0;
+  double binhighx = 0.0;
+  double binlowy = 0.0;
+  double binhighy = 0.0;
 
   if (name.find("Q2vsTmu") != std::string::npos){
     plottype = 1; fPlotTitles = "";

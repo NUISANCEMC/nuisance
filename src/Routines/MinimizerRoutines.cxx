@@ -17,8 +17,6 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "StatusMessage.h"
-
 #include "MinimizerRoutines.h"
 
 /*
@@ -553,7 +551,7 @@ void MinimizerRoutines::Run() {
 
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange) {
-      LOG(FIT) << "Ending fit routines loop." << endl;
+      LOG(FIT) << "Ending fit routines loop." << std::endl;
       break;
     }
   }
@@ -585,7 +583,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine) {
            !routine.compare("GSLSimAn")) {
 
     if (fMinimizer->NFree() > 0) {
-      LOG(FIT) << StatusMessage(fMinimizer->Minimize()) << std::endl;
+      LOG(FIT) << fMinimizer->Minimize() << std::endl;
       GetMinimizerState();
     }
   }
@@ -658,12 +656,12 @@ void MinimizerRoutines::PrintState() {
                  << setw(8)  << convunits;
 
 
-    LOG(FIT) << curparstring.str() << endl;
+    LOG(FIT) << curparstring.str() << std::endl;
   }
 
   LOG(FIT) << "------------" << std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << std::endl;
   LOG(FIT) << "------------" << std::endl;
 }
 
@@ -765,7 +763,7 @@ void MinimizerRoutines::Create1DScans() {
 
     if (fFixVals[fParams[i]]) continue;
 
-    LOG(FIT) << "Running 1D Scan for " << fParams[i] << endl;
+    LOG(FIT) << "Running 1D Scan for " << fParams[i] << std::endl;
     fSampleFCN->CreateIterationTree(fParams[i] +
                                     "_scan1D_iterations",
                                     FitBase::GetRW());
@@ -854,7 +852,7 @@ void MinimizerRoutines::Chi2Scan2D() {
                                npoints_j, limlow_j, limhigh_j );
 
       // Begin Scan
-      LOG(FIT) << "Running scan for " << fParams[i] << " " << fParams[j] << endl;
+      LOG(FIT) << "Running scan for " << fParams[i] << " " << fParams[j] << std::endl;
 
       // Fill bins
       for (int x = 0; x < contour->GetNbinsX(); x++) {
@@ -900,7 +898,7 @@ void MinimizerRoutines::CreateContours() {
 //*************************************
 
   // Use MINUIT for this if possible
-  ERR(FTL) << " Contours not yet implemented as it is really slow!" << endl;
+  ERR(FTL) << " Contours not yet implemented as it is really slow!" << std::endl;
   throw;
 
   return;
@@ -933,7 +931,7 @@ int MinimizerRoutines::FixAtLimit() {
   }
 
   if (!fixedparam) {
-    LOG(FIT) << "No dials needed fixing!" << endl;
+    LOG(FIT) << "No dials needed fixing!" << std::endl;
     return kNoChange;
   } else return kStateChange;
 }
@@ -962,7 +960,7 @@ void MinimizerRoutines::SaveMinimizerState() {
 //*************************************
 
   if (!fMinimizer) {
-    ERR(FTL) << "Can't save minimizer state without min object" << endl;
+    ERR(FTL) << "Can't save minimizer state without min object" << std::endl;
     throw;
   }
 
@@ -1198,7 +1196,7 @@ void MinimizerRoutines::SetupCovariance() {
   if (fDecomp) delete fDecomp;
   if (fDecFree) delete fDecFree;
 
-  LOG(FIT) << "Building covariance matrix.." << endl;
+  LOG(FIT) << "Building covariance matrix.." << std::endl;
 
   int NFREE = 0;
   int NDIM = 0;
@@ -1216,7 +1214,7 @@ void MinimizerRoutines::SetupCovariance() {
   }
 
   if (NDIM == 0) return;
-  LOG(FIT) << "NFREE == " << NFREE << endl;
+  LOG(FIT) << "NFREE == " << NFREE << std::endl;
   fCovar = new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
   if (NFREE > 0) {
     fCovFree = new TH2D("covariance_free",

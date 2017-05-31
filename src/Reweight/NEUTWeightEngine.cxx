@@ -5,7 +5,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
 	fCalcName = name;
-	LOG(FIT) << "Setting up NEUT RW : " << fCalcName << endl;
+	LOG(FIT) << "Setting up NEUT RW : " << fCalcName << std::endl;
 
 	// Create RW Engine suppressing cout
 	StopTalking();
@@ -131,7 +131,7 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	StopTalking();
 
 	// Fill NEUT Common blocks
-	GeneratorUtils::FillNeutCommons(evt->fNeutVect);
+	NEUTUtils::FillNeutCommons(evt->fNeutVect);
 
 	// Call Weight calculation
 	rw_weight = fNeutRW->CalcWeight();

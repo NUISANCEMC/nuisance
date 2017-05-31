@@ -239,10 +239,10 @@ int FitBase::GetDialEnum(int type, std::string name) {
     size_t us_pos = name.find_first_of('_');
     std::string numstr = name.substr(us_pos + 1);
     int mode_num = std::atoi(numstr.c_str());
-    LOG(FTL) << "Getting mode num " << mode_num << endl;
+    LOG(FTL) << "Getting mode num " << mode_num << std::endl;
     if (!mode_num) {
       ERR(FTL) << "Attempting to parse dial name: \"" << name
-               << "\" as a mode norm dial but failed." << endl;
+               << "\" as a mode norm dial but failed." << std::endl;
       throw;
     }
     this_enum = 60 + mode_num + offset;
@@ -268,13 +268,13 @@ int FitBase::GetDialEnum(int type, std::string name) {
 
   // If Not Enabled
   if (this_enum == -2) {
-    ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type) << endl;
-    ERR(FTL) << "Check dial " << name << endl;
+    ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type) << std::endl;
+    ERR(FTL) << "Check dial " << name << std::endl;
   }
 
   // If Not Found
   if (this_enum == -1) {
-    ERR(FTL) << "Dial " << name << " not found." << endl;
+    ERR(FTL) << "Dial " << name << " not found." << std::endl;
   }
 
   return this_enum;
@@ -438,8 +438,8 @@ int Reweight::ConvDial(std::string name, int type, bool exceptions) {
   if (exceptions) {
     // If Not Enabled
     if (genenum == kGeneratorNotBuilt) {
-      ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type) << endl;
-      ERR(FTL) << "Check dial " << name << endl;
+      ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type) << std::endl;
+      ERR(FTL) << "Check dial " << name << std::endl;
       throw;
     }
 
@@ -451,7 +451,7 @@ int Reweight::ConvDial(std::string name, int type, bool exceptions) {
 
     // If Not Found
     if (genenum == kNoDialFound) {
-      ERR(FTL) << "Dial " << name << " not found." << endl;
+      ERR(FTL) << "Dial " << name << " not found." << std::endl;
       throw;
     }
   }

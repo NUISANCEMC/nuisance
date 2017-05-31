@@ -5,7 +5,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
 
 	// Setup the NUISANCE Reweight engine
 	fCalcName = name;
-	LOG(FIT) << "Setting up NUISANCE Custom RW : " << fCalcName << endl;
+	LOG(FIT) << "Setting up NUISANCE Custom RW : " << fCalcName << std::endl;
 
 	// Load in all Weight Calculations
 	fWeightCalculators.push_back( new GaussianModeCorr() );

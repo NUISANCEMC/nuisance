@@ -21,6 +21,7 @@ FitLogger.h
 FitParameters.h
 FitUtils.h
 GeneralUtils.h
+ParserUtils.h
 PlotUtils.h
 StatUtils.h
 SignalDef.h
@@ -47,6 +48,7 @@ NuisKey.cxx
 BeamUtils.cxx
 TargetUtils.cxx
 StackBase.cxx
+ParserUtils.cxx
 StandardStacks.cxx
 )
 
@@ -60,6 +62,7 @@ endif()
 
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/Splines)
+target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/InputHandler)
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/FitBase)
 target_include_directories(${LIBNAME} PUBLIC ${RWENGINE_INCLUDE_DIRECTORIES})
 
