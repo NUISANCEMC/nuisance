@@ -19,7 +19,6 @@
 set(IMPLFILES
 ComparisonRoutines.cxx
 SystematicRoutines.cxx
-ParserUtils.cxx
 SplineRoutines.cxx
 )
 
@@ -30,7 +29,6 @@ endif()
 set(HEADERFILES
 ComparisonRoutines.h
 SystematicRoutines.h
-ParserUtils.h
 SplineRoutines.h
 )
 
@@ -50,6 +48,8 @@ include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)

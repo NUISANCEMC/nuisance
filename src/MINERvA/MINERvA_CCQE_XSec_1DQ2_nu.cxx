@@ -135,6 +135,7 @@ void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // Set binning variable
   fXVar = q2qe;
+
   return;
 }
 

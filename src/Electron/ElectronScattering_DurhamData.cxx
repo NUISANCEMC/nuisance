@@ -187,7 +187,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
     i++;
   }
 
-  for (int i  = 0; i < pointx.size(); i++) {
+  for (uint i  = 0; i < pointx.size(); i++) {
     std::cout << "Q0 Point " << i << " = " << pointx[i] << std::endl;
   }
 
@@ -222,14 +222,14 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
 
 
-  for (int i  = 0; i < q0binedges.size(); i++) {
+  for (uint i  = 0; i < q0binedges.size(); i++) {
     std::cout << "Q0 Edge " << i << " = " << q0binedges[i] << std::endl;
   }
 
-  for (int i  = 0; i < ebinedges.size(); i++) {
+  for (uint i  = 0; i < ebinedges.size(); i++) {
     std::cout << "e Edge " << i << " = " << ebinedges[i] << std::endl;
   }
-  for (int i  = 0; i < thetabinedges.size(); i++) {
+  for (uint i  = 0; i < thetabinedges.size(); i++) {
     std::cout << "theta Edge " << i << " = " << thetabinedges[i] << std::endl;
   }
 

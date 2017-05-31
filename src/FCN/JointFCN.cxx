@@ -99,7 +99,7 @@ JointFCN::~JointFCN() {
 void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
   //***************************************************
 
-  LOG(FIT) << " Creating new iteration tree! " << endl;
+  LOG(FIT) << " Creating new iteration tree! " << std::endl;
   if (fIterationTree && !name.compare(fIterationTree->GetName())) {
     fIterationTree->Reset();
     return;
@@ -176,7 +176,7 @@ void JointFCN::WriteIterationTree() {
   //***************************************************
 
   if (!fIterationTree) {
-    ERR(FTL) << "Can't save empty iteration tree!" << endl;
+    ERR(FTL) << "Can't save empty iteration tree!" << std::endl;
     throw;
   }
   fIterationTree->Write();
@@ -187,7 +187,7 @@ void JointFCN::FillIterationTree(FitWeight* rw) {
   //***************************************************
 
   if (!fIterationTree) {
-    ERR(FTL) << "Trying to fill iteration_tree when it is NULL!" << endl;
+    ERR(FTL) << "Trying to fill iteration_tree when it is NULL!" << std::endl;
     throw;
   }
 
@@ -274,7 +274,7 @@ int JointFCN::GetNDOF() {
 double JointFCN::GetLikelihood() {
   //***************************************************
 
-  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..." << " : " << "-2logL" << endl;
+  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..." << " : " << "-2logL" << std::endl;
 
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
@@ -289,7 +289,7 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << endl;
+    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << std::endl;
 
     // Add Weight Scaling
     // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
@@ -341,7 +341,7 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
     if (!NewLoadedSample) {
       ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;
       ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx"
-               << endl;
+               << std::endl;
       throw;
     } else {
       fSamples.push_back(NewLoadedSample);
@@ -432,7 +432,7 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
 //       if (!NewLoadedSample) {
 //         ERR(FTL) << "Could not load sample provided: " << name << std::endl;
 //         ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx"
-//                  << endl;
+//                  << std::endl;
 //         throw;
 //       } else {
 //         fSamples.push_back(NewLoadedSample);
@@ -471,7 +471,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   //***************************************************
 
   int starttime = time(NULL);
-  LOG(REC) << "Starting Reconfigure iter. " << this->fCurIter << endl;
+  LOG(REC) << "Starting Reconfigure iter. " << this->fCurIter << std::endl;
   // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled << std::endl;
   // Event Manager Reconf
   if (fUsingEventManager) {
@@ -508,7 +508,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   fMCFilled = true;
   LOG(MIN) << "Finished Reconfigure iter. " << fCurIter << " in "
-           << time(NULL) - starttime << "s" << endl;
+           << time(NULL) - starttime << "s" << std::endl;
 
   fCurIter++;
 }
@@ -637,6 +637,8 @@ void JointFCN::ReconfigureUsingManager() {
 
     // Get event information
     FitEvent* curevent = curinput->FirstNuisanceEvent();
+    curinput->CreateCache();
+
     int i = 0;
     int nevents = curinput->GetNEvents();
     int countwidth = nevents / 20;
@@ -648,7 +650,7 @@ void JointFCN::ReconfigureUsingManager() {
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
-      // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
+         // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
 
 
       // Logging
@@ -744,7 +746,7 @@ void JointFCN::ReconfigureUsingManager() {
         }
 
         // Push back to signal event splines. Kept in sync with fSignalEventBoxes size.
-        int splinecount = fSignalEventSplines.size();
+        // int splinecount = fSignalEventSplines.size();
         fSignalEventSplines.push_back(coeff);
 
         // if (splinecount % 1000 == 0) {
@@ -765,6 +767,8 @@ void JointFCN::ReconfigureUsingManager() {
       curevent = curinput->NextNuisanceEvent();
       i++;
     }
+
+    curinput->RemoveCache();
 
     // Keep track of what input we are on.
     inputcount++;
@@ -805,7 +809,7 @@ void JointFCN::ReconfigureUsingManager() {
 void JointFCN::ReconfigureFastUsingManager() {
 //***************************************************
 
-  LOG(FIT) << " -> Doing FAST using manager"<< std::endl;
+  LOG(FIT) << " -> Doing FAST using manager" << std::endl;
   // Get Start time for profilling
   int timestart = time(NULL);
 
@@ -852,14 +856,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
 
   // Loop over all possible spline inputs
-  int coreeventcount = 0;
-  double* coreeventweights;
+  double* coreeventweights = new double[fSignalEventBoxes.size()];
   splinecount = 0;
-
-  if (fIsAllSplines) {
-    coreeventweights = new double[fSignalEventSplines.size()];
-    splinecount = 0;
-  }
 
   inp_iter = fInputList.begin();
   inpsig_iter = fSignalEventFlags.begin();
@@ -874,7 +872,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   splinecount = 0;
 
   // #pragma omp parallel for shared(splinecount,sigcount)
-  for (int iinput = 0; iinput < fInputList.size(); iinput++) {
+  for (uint iinput = 0; iinput < fInputList.size(); iinput++) {
 
     InputHandlerBase* curinput = fInputList[iinput];
     BaseFitEvt* curevent = curinput->FirstBaseEvent();
@@ -897,8 +895,9 @@ void JointFCN::ReconfigureFastUsingManager() {
         rwweight = curevent->Weight;
 
         // #pragma omp atomic
-        coreeventweights[splinecount] = rwweight;
-
+        if (fIsAllSplines) {
+          coreeventweights[splinecount] = rwweight;
+        }
         if (splinecount % countwidth == 0) {
           LOG(REC) << "Processed " << splinecount << " event weights." << std::endl;
         }
@@ -992,7 +991,7 @@ void JointFCN::Write() {
   //***************************************************
 
   // Loop over individual experiments and call Write
-  LOG(MIN) << "Writing each of the data classes..." << endl;
+  LOG(MIN) << "Writing each of the data classes..." << std::endl;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
     MeasurementBase* exp = *iter;
@@ -1024,7 +1023,7 @@ void JointFCN::Write() {
 void JointFCN::SetFakeData(std::string fakeinput) {
   //***************************************************
 
-  LOG(MIN) << "Setting fake data from " << fakeinput << endl;
+  LOG(MIN) << "Setting fake data from " << fakeinput << std::endl;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
     MeasurementBase* exp = *iter;

@@ -111,7 +111,9 @@ set(MINCODE
 
 set(CORE
   MCStudies
+  Genie
   FitBase
+  InputHandler
   Splines
   Reweight
   Utils
@@ -170,7 +172,11 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
 
+
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuiscardgen" DESTINATION
   bin)
 
+install(PROGRAMS
+  "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
+  bin)

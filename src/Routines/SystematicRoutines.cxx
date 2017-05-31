@@ -16,16 +16,9 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
-#include "StatusMessage.h"
 #include "SystematicRoutines.h"
 
-/*
-  Constructor/Destructor
-*/
-//************************
 void SystematicRoutines::Init(){
-//************************
 
   fInputFile = "";
   fInputRootFile = NULL;
@@ -51,17 +44,10 @@ void SystematicRoutines::Init(){
 
 };
 
-//*************************************
 SystematicRoutines::~SystematicRoutines(){
-//*************************************
 };
 
-/*
-  Input Functions
-*/
-//*************************************
 SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
-//*************************************
 
   // Initialise Defaults
   Init();
@@ -338,9 +324,7 @@ void SystematicRoutines::SetupSystematicsFromXML(){
 }
 
 
-//*************************************
 void SystematicRoutines::ReadCard(std::string cardfile){
-//*************************************
 
   // Read cardlines into vector
   std::vector<std::string> cardlines = GeneralUtils::ParseFileToStr(cardfile,"\n");
@@ -397,9 +381,7 @@ void SystematicRoutines::ReadCard(std::string cardfile){
   return;
 };
 
-//*****************************************
 int SystematicRoutines::ReadParameters(std::string parstring){
-//******************************************
 
   std::string inputspec = "RW Dial Inputs Syntax \n"
     "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
@@ -918,7 +900,7 @@ void SystematicRoutines::PrintState(){
 
   LOG(FIT)<<"------------"<<std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << std::endl;
   LOG(FIT)<<"------------"<<std::endl;
 }
 
@@ -1329,7 +1311,7 @@ void SystematicRoutines::MergeThrows(){
   bool nominalfound;
 
   // Loop over files and check they exist.
-  for (int i = 0; i < fThrowList.size(); i++){
+  for (uint i = 0; i < fThrowList.size(); i++){
     std::string file = fThrowList[i];
     bool found = false;
 
@@ -1383,12 +1365,12 @@ void SystematicRoutines::MergeThrows(){
   TFile* tempfile = new TFile((nominalfile).c_str(),"READ");
   tempfile->cd();
   TDirectory* nominal = (TDirectory*)tempfile->Get("nominal");
-  int nthrows = FitPar::Config().GetParI("error_throws");
+  // int nthrows = FitPar::Config().GetParI("error_throws");
   bool uniformly = FitPar::Config().GetParB("error_uniform");
 
   // Check percentage of bad files is okay.
   int badfilecount = 0;
-  for (int i = 0; i < fThrowList.size(); i++){
+  for (uint i = 0; i < fThrowList.size(); i++){
     if (!fThrowList[i].empty()){
       LOG(FIT) << "Loading Throws From File " << i << " : " 
 	       << fThrowList[i] << std::endl;
@@ -1398,7 +1380,7 @@ void SystematicRoutines::MergeThrows(){
   }
 
   // Check we have at least one good file
-  if (badfilecount == fThrowList.size()){
+  if ((uint)badfilecount == fThrowList.size()){
     ERR(FTL) << "Found no good throw files for MergeThrows" << std::endl;
     throw;
   } else if (badfilecount > fThrowList.size()*0.25){

@@ -18,61 +18,32 @@
 ################################################################################
 set(IMPLFILES
 ParamPull.cxx
-BaseFitEvt.cxx
-FitParticle.cxx
-Measurement1D.cxx
 EventManager.cxx
+Measurement1D.cxx
 Measurement2D.cxx
-FitEvent.cxx
 JointMeas1D.cxx
 MeasurementBase.cxx
-GeneratorUtils.cxx
-StdHepEvt.cxx
 TemplateMeas1D.cxx
-InputUtils.cxx
-NEUTInputHandler.cxx
-GENIEInputHandler.cxx
-NuWroInputHandler.cxx
-GIBUUInputHandler.cxx
-NUANCEInputHandler.cxx
-NuanceEvent.cxx
 SampleSettings.cxx
-FitEventInputHandler.cxx
-SplineInputHandler.cxx
 MeasurementVariableBox.cxx
 MeasurementVariableBox2D.cxx
 MeasurementVariableBox1D.cxx
 CustomVariableBoxes.h
-GeneratorInfoBase.h
-InputTypes.h
-GNUISANCEFlux.cxx
-GNUISANCEMCJDriver.cxx
-HepMCTextInputHandler.cxx
 )
 
 set(HEADERFILES
 ParamPull.h
-NuanceEvent.h
-BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h      MeasurementBase.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
-InputUtils.h
-NEUTInputHandler.h
-HepMCTextInputHandler.h
-GENIEInputHandler.h
-NuWroInputHandler.h
-InputHandler2.h
-GIBUUInputHandler.h
-NUANCEInputHandler.h
+JointMeas1D.h    
+Measurement2D.h
+EventManager.h
+MeasurementBase.h   
+Measurement1D.h 
+TemplateMeas1D.h
 SampleSettings.h
-FitEventInputHandler.h
-SplineInputHandler.h
 MeasurementVariableBox.h
 MeasurementVariableBox2D.h
 MeasurementVariableBox1D.h
 CustomVariableBoxes.h
-GeneratorInfoBase.h
-GNUISANCEFlux.h
-GNUISANCEMCJDriver.h
 )
 
 set(LIBNAME FitBase)
@@ -91,6 +62,7 @@ if (USE_GENIE)
    include_directories(${GENIE_INCLUDES}/EVGDrivers)
 endif()
 
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
 include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)

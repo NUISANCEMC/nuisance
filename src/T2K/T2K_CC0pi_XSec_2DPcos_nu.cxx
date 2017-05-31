@@ -201,7 +201,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   // Open file
   std::string infile = FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root";
   TFile* rootfile = new TFile(infile.c_str(), "READ");
-  TH2D* tempcov;
+  TH2D* tempcov = NULL;
 
   // ANALYSIS 2
   if (fAnalysis == 2){
@@ -241,12 +241,16 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   } else if (fAnalysis == 1){
 
     //TODO (P.Stowell) Add a TH2Poly Measurement class
-    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << endl;
-    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << endl;
+    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << std::endl;
+    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << std::endl;
     throw;
 
   }
 
+  if (!tempcov){
+    ERR(FTL) << "TEMPCOV NOT SET" << std::endl;
+    throw;
+  }
 
   // Setup Covar
   int nbins = tempcov->GetNbinsX();

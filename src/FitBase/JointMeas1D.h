@@ -429,28 +429,28 @@ public:
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  inline virtual std::vector<TH1*> GetMCList(void);
+  virtual std::vector<TH1*> GetMCList(void);
 
 
   /// \brief Returns a list of all Data histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  inline virtual std::vector<TH1*> GetDataList(void);
+  virtual std::vector<TH1*> GetDataList(void);
 
 
   /// \brief Returns a list of all Mask histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  inline virtual std::vector<TH1*> GetMaskList(void);
+  virtual std::vector<TH1*> GetMaskList(void);
 
 
   /// \brief Returns a list of all Fine histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  inline virtual std::vector<TH1*> GetFineList(void);
+virtual std::vector<TH1*> GetFineList(void);
 
   /*
     Write Functions

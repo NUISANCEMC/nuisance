@@ -187,8 +187,8 @@ void Measurement2D::FinaliseSampleSettings() {
 
   if (fAddNormPen) {
     if (fNormError <= 0.0) {
-      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << endl;
-      ERR(WRN) << "If you want to use it please add fNormError=VAL" << endl;
+      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << std::endl;
+      ERR(WRN) << "If you want to use it please add fNormError=VAL" << std::endl;
       throw;
     }
   }
@@ -975,7 +975,7 @@ double Measurement2D::GetLikelihood() {
   }
 
   // Get the chi2 from either covar or diagonals
-  double chi2;
+  double chi2 = 0.0;
 
   if (fIsChi2) {
     if (fIsDiag) {
@@ -1281,7 +1281,7 @@ void Measurement2D::Write(std::string drawOpt) {
   bool drawXSec = (drawOpt.find("XSEC") != std::string::npos);
   bool drawFine = (drawOpt.find("FINE") != std::string::npos);
   bool drawRatio = (drawOpt.find("RATIO") != std::string::npos);
-  bool drawModes = (drawOpt.find("MODES") != std::string::npos);
+  // bool drawModes = (drawOpt.find("MODES") != std::string::npos);
   bool drawShape = (drawOpt.find("SHAPE") != std::string::npos);
   bool residual = (drawOpt.find("RESIDUAL") != std::string::npos);
   bool drawMatrix = (drawOpt.find("MATRIX") != std::string::npos);

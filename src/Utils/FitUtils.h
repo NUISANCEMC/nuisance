@@ -45,6 +45,7 @@
 #include "FitEvent.h"
 #include "TGraph.h"
 #include "TH2Poly.h"
+#include "FitEvent.h"
 
 // Fit  includes
 #include "FitParameters.h"

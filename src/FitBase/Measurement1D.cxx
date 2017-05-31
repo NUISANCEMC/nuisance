@@ -147,8 +147,8 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if (fAddNormPen) {
     if (fNormError <= 0.0) {
-      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << endl;
-      ERR(WRN) << "If you want to use it please add fNormError=VAL" << endl;
+      ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << std::endl;
+      ERR(WRN) << "If you want to use it please add fNormError=VAL" << std::endl;
       throw;
     }
   }

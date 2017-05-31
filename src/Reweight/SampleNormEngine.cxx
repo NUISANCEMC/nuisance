@@ -4,7 +4,7 @@ SampleNormEngine::SampleNormEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
 	fCalcName = name;
-	LOG(FIT) << "Setting up Sample Norm RW : " << fCalcName << endl;
+	LOG(FIT) << "Setting up Sample Norm RW : " << fCalcName << std::endl;
 
 	// Set Abs Twk Config
 	fIsAbsTwk = true;

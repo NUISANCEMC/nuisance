@@ -5,7 +5,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
 	fCalcName = name;
-	LOG(FIT) << "Setting up GENIE RW : " << fCalcName << endl;
+	LOG(FIT) << "Setting up GENIE RW : " << fCalcName << std::endl;
 
 	// Create RW Engine suppressing cout
 	StopTalking();

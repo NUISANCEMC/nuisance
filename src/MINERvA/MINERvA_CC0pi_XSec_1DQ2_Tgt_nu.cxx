@@ -30,7 +30,7 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu sample. \n" \
     "Target: Either C, CH, Fe, Pb \n"						    \
-    "Flux: MINERvA Forward Horn numu \n";
+    "Flux: MINERvA Forward Horn numu \n"
     "Signal: Any event with 1 muon, 1 proton p>450, no pions";
 
 

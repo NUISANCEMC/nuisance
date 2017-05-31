@@ -19,6 +19,7 @@
 #include "TH1D.h"
 #include "Math/IFunction.h"
 #include "Math/IParamFunction.h"
+#include "FitLogger.h"
 
 // Spline Class
 class Spline : public  ROOT::Math::ParamFunctor { 

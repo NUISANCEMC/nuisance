@@ -8,6 +8,8 @@
 
 #ifdef __GENIE_ENABLED__
 #include "Conventions/Units.h"
+#include "GHEP/GHepParticle.h"
+#include "PDG/PDGUtils.h"
 #endif
 
 bool gFlagMerge = false;

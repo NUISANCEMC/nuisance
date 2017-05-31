@@ -20,10 +20,10 @@
 #ifndef EVENTMANAGER_H
 #define EVENTMANAGER_H
 
-#include "InputHandler2.h"
+#include "InputHandler.h"
 #include "FitWeight.h"
 #include "InputUtils.h"
-
+#include "InputFactory.h"
 // This class is menat to manage one input file for many distributions
 class EventManager {
  public:
