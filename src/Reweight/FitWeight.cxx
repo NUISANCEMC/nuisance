@@ -96,7 +96,7 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
 	// Conv dial type
 	int dialtype = int(nuisenum - (nuisenum % 1000)) / 1000;
 
-	if (fAllRW.find(dialtype)){
+	if (fAllRW.find(dialtype) == fAllRW.end()){
 		THROW("Cannot find RW Engine for dialtype = " << dialtype);
 	}
 
