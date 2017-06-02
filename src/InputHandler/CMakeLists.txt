@@ -57,6 +57,7 @@ FitEventInputHandler.h
 SplineInputHandler.h
 GeneratorInfoBase.h
 InputFactory.h
+InteractionModes.h
 )
 
 set(LIBNAME InputHandler)

@@ -34,12 +34,20 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
   case (kNEUT_Input):
 #ifdef __NEUT_ENABLED__
     input = new NEUTInputHandler(handle, newinputs);
+#else
+    ERROR(FTL, "Tried to create NEUTInputHandler : "
+        << handle << " " << inpType << " " << inputs);
+    THROW("NEUT is not enabled!");
 #endif
     break;
 
   case (kGENIE_Input):
 #ifdef __GENIE_ENABLED__
     input = new GENIEInputHandler(handle, newinputs);
+#else
+    ERROR(FTL, "Tried to create GENIEInputHandler : " 
+        << handle << " " << inpType << " " << inputs);
+    THROW("GENIE is not enabled!");
 #endif
     break;
 
@@ -47,13 +55,30 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
   case (kNUWRO_Input):
 #ifdef __NUWRO_ENABLED__
     input = new NuWroInputHandler(handle, newinputs);
+#else
+    ERROR(FTL, "Tried to create NuWroInputHandler : "
+        << handle << " " << inpType << " " << inputs);
+    THROW("NuWro is not enabled!");
 #endif
     break;
-
 
   case (kGiBUU_Input):
 #ifdef __GiBUU_ENABLED__
     input = new GIBUUInputHandler(handle, newinputs);
+#else
+    ERROR(FTL, "Tried to create GiBUUInputHandler : "
+        << handle << " " << inpType << " " << inputs);
+    THROW("GiBUU is not enabled!");
+#endif
+    break;
+
+  case (kNUANCE_Input):
+#ifdef __NUANCE_ENABLED__
+    input = new NUANCEInputHandler(handle, newinputs);
+#else
+    ERROR(FTL, "Tried to create NUANCEInputHandler : "
+        << handle << " " << inpType << " " << inputs);
+    THROW("NUANCE is not enabled!");
 #endif
     break;
 

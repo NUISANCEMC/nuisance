@@ -131,9 +131,7 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   errorcount += Config::Get().GetParI("ERROR");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
-  FitPar::log_verb = verbocount;
-  LOG_VERB(verbocount);
-  ERR_VERB(errorcount);
+  SETVERBOSITY(verbocount);
   
   // Proper Setup
   if (fStrategy.find("ErrorBands") != std::string::npos ||

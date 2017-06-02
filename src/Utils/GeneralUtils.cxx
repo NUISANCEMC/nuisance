@@ -16,9 +16,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "GeneralUtils.h"
-
 
 std::string GeneralUtils::BoolToStr(bool val) {
   std::ostringstream ss;
@@ -36,9 +34,7 @@ std::string GeneralUtils::DblToStr(double val) {
   std::ostringstream ss;
   ss << val;
   return ss.str();
-
 };
-
 
 std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc, char* argv[]){
   std::vector<std::string> vect;
@@ -47,9 +43,6 @@ std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc, char* argv[])
   }
   return vect;
 }
-
-
-
 
 std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del) {
 
@@ -60,12 +53,11 @@ std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* d
   while (std::getline(stream >> std::ws, temp_string, *del)) {
     if (temp_string.empty()) continue;
     vals.push_back(temp_string);
-
   }
 
   return vals;
-
 }
+
 std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
 
   std::istringstream stream(str);
@@ -81,7 +73,6 @@ std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
     vals.push_back(entry);
 
   }
-
   return vals;
 }
 
@@ -100,11 +91,9 @@ std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del) {
     vals.push_back(entry);
 
   }
-
   return vals;
 }
 
-// To stop rooku's skin from crawling :p
 double GeneralUtils::StrToDbl(std::string str) {
 
   std::istringstream stream(str);
@@ -126,12 +115,13 @@ int GeneralUtils::StrToInt(std::string str) {
 bool GeneralUtils::StrToBool(std::string str) {
 
   // convert result to lower case
-  // for (int i = 0; i < str.size(); i++) str[i] = tolower(str[i]);
+  for (int i = 0; i < str.size(); i++) str[i] = std::tolower(str[i]);
 
   // Test for true/false
   if      (!str.compare("false")) return false;
   else if (!str.compare("true") ) return true;
   if (str.empty()) return false;
+
   // Push into bool
   std::istringstream stream(str);
   bool val;
@@ -139,7 +129,6 @@ bool GeneralUtils::StrToBool(std::string str) {
 
   return val;
 }
-
 
 std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del) {
 
@@ -150,8 +139,7 @@ std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const cha
   read.open(str.c_str());
 
   if (!read.is_open()) {
-    ERR(FTL) << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
-    throw;
+    THROW("Cannot open file " << str << " in ParseFileToStr");
   }
 
   while ( std::getline(read >> std::ws, line, *del) ) {
@@ -171,8 +159,7 @@ std::string GeneralUtils::GetTopLevelDir() {
   if (first) {
     char * const var = getenv("EXT_FIT");
     if (!var) {
-      ERR(FTL) << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
-      exit(-1);
+      THROW("Cannot find top level directory! Set the EXT_FIT environmental variable");
     }
     topLevelVarVal = std::string(var);
     first = false;

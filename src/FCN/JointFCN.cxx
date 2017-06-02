@@ -590,8 +590,6 @@ void JointFCN::ReconfigureUsingManager() {
 
   // If we are siving signal, reset all containers.
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
-  std::cout << " Save Signal = " << savesignal << std::endl;
-  //  sleep(5);
 
   if (savesignal) {
     // Reset all of our event signal vectors
@@ -650,13 +648,17 @@ void JointFCN::ReconfigureUsingManager() {
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
-         // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
+      // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
 
 
       // Logging
-      if (LOG_LEVEL(REC)) {
+      // std::cout << CHECKLOG(1) << std::endl;
+      if (LOGGING(REC)) {
         if (i % countwidth == 0) {
-          LOG(REC) << "Processed " << i << " events. [M, W] = [" << curevent->Mode << ", " << rwweight << "]" << std::endl;
+          QLOG(REC, curinput->GetName() << " : Processed " << i
+               << " events. [M, W] = ["
+               << curevent->Mode << ", "
+               << rwweight << "]");
         }
       }
 

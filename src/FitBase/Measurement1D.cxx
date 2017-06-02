@@ -133,8 +133,6 @@ void Measurement1D::FinaliseSampleSettings() {
     exit(-1);
   }
 
-  LOG(FIT) << "Sample isjoint = " << fIsJoint << std::endl;
-
   if (!fRW) fRW = FitBase::GetRW();
   if (!fInput and !fIsJoint) SetupInputs(fSettings.GetS("input"));
 
@@ -649,10 +647,6 @@ void Measurement1D::SetFitOptions(std::string opt) {
   if (opt.find("ENU1D") != std::string::npos) fIsEnu1D = true;
   if (opt.find("NORM") != std::string::npos) fAddNormPen = true;
   if (opt.find("MASK") != std::string::npos) fIsMask = true;
-
-
-
-  std::cout << fSettings.fKeyValues.fNode << std::endl;
 
   return;
 };

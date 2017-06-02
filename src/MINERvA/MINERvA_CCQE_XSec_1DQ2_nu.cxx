@@ -108,7 +108,6 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 
   if (!isFluxFix or !fullphasespace){ 
     SetCorrelationFromTextFile( fSettings.GetCovarInput() );
-    ScaleCovar(1E76);
   } else {
     SetCovarFromTextFile( fSettings.GetCovarInput() );
   }

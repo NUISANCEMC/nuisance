@@ -1,0 +1,415 @@
+<sample_list>
+
+  <input eventcomment=' #### ' />
+  <input eventcomment='Replace the following file paths to point to your MC files of interest.' />
+  <input eventcomment='If you dont care about a specific set, then just remove that 
+input line, or leave the file path blank' />
+  <input eventcomment='Replace TYPE: with your generator type, e.g. "GENIE:"" ' />
+  <input eventcomment=' #### ' />
+
+  <input action='SKIP' />
+  <input comment='ANL SAMPLES' check='ANL'/>
+
+  <input eventcomment='ANL_FHC_NUMU_D2 : events generated with ANL forward horn current
+flux in muon neutrino mode on a deuterium target.' />
+
+  <input comment='ANL CCQE'    check='ANL_CCQE' />
+  <input sample="ANL_CCQE_XSec_1DEnu_nu"                  type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_XSec_1DEnu_nu_PRD26"            type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_XSec_1DEnu_nu_PRL31"            type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_XSec_1DEnu_nu_PRD16"            type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_Evt_1DQ2_nu"                    type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_Evt_1DQ2_nu_PRL31"              type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_Evt_1DQ2_nu_PRD26"              type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CCQE_Evt_1DQ2_nu_PRD16"              type="TYPE:ANL_FHC_NUMU_D2" />
+
+  <input comment='   ANL CC1PPIP' check='ANL_CC1ppip' />
+  <input sample="ANL_CC1ppip_XSec_1DEnu_nu"               type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_XSec_1DEnu_nu_W14Cut"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_XSec_1DEnu_nu_Uncorr"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr" type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_XSec_1DEnu_nu_W16Cut_Uncorr" type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_XSec_1DQ2_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1DQ2_nu"                 type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1DQ2_nu_W14Cut"          type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1Dppi_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1Dthpr_nu"               type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1DcosmuStar_nu"          type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1DcosthAdler_nu"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1ppip_Evt_1Dphi_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+
+  <input comment='   ANL CC1NPIP' check='ANL_CC1npip' />
+  <input sample="ANL_CC1npip_XSec_1DEnu_nu"               type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_XSec_1DEnu_nu_W14Cut"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_XSec_1DEnu_nu_Uncorr"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_XSec_1DEnu_nu_W14Cut_Uncorr" type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_XSec_1DEnu_nu_W16Cut_Uncorr" type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_Evt_1DQ2_nu"                 type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_Evt_1DQ2_nu_W14Cut"          type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_Evt_1Dppi_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1npip_Evt_1DcosmuStar_nu"          type="TYPE:ANL_FHC_NUMU_D2" />
+
+  <input comment='   ANL CC1PI0' check='ANL_CC1ppi0' />
+  <input sample="ANL_CC1pi0_XSec_1DEnu_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_XSec_1DEnu_nu_W14Cut"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_XSec_1DEnu_nu_Uncorr"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_XSec_1DEnu_nu_W14Cut_Uncorr"  type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_XSec_1DEnu_nu_W16Cut_Uncorr"  type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_Evt_1DQ2_nu"                  type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_Evt_1DQ2_nu_W14Cut"           type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC1pi0_Evt_1DcosmuStar_nu"           type="TYPE:ANL_FHC_NUMU_D2" />
+
+  <input comment='   ANL NC' check='ANL_NC' />
+  <input sample="ANL_NC1npip_Evt_1Dppi_nu"                type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_NC1ppim_XSec_1DEnu_nu"               type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_NC1ppim_Evt_1DcosmuStar_nu"          type="TYPE:ANL_FHC_NUMU_D2" />
+
+  <input comment='   ANL CC2PI' check='ANL_CC2pi' />
+  <input sample="ANL_CC2pi_1pim1pip_XSec_1DEnu_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pim1pip_Evt_1Dppip_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pim1pip_Evt_1Dppim_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu"       type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pip_XSec_1DEnu_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu"       type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu"    type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu"     type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu"         type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu"        type="TYPE:ANL_FHC_NUMU_D2" />
+  <input sample="ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu"       type="TYPE:ANL_FHC_NUMU_D2" />
+
+
+  <input action='SKIP' />
+  <input comment='ArgoNeuT SAMPLES' check='ArgoNeuT'/>
+  
+   <input eventcomment='ArgoNeuT_FHC_NUMU_AR : events generated with ArgoNeuT forward horn current
+flux in muon neutrino mode on Argon 40 target.' />
+   <input eventcomment='ArgoNeuT_RHC_NUMUB_AR : events generated with ArgoNeuT reverse horn current
+flux in muon antineutrino mode on Argon 40 target.' />
+
+  <input comment='   ArgoNeuT Neutrino' check='ArgoNeuT+_nu' />
+  <input sample="ArgoNeuT_CCInc_XSec_1Dpmu_nu"     type="TYPE:ArgoNeuT_FHC_NUMU_AR" />
+  <input sample="ArgoNeuT_CCInc_XSec_1Dthetamu_nu" type="TYPE:ArgoNeuT_FHC_NUMU_AR" />
+  
+  <input comment='   ArgoNeuT AntiNeutrino' check='ArgoNeuT+_antinu' />
+  <input sample="ArgoNeuT_CCInc_XSec_1Dpmu_antinu"     type="TYPE:ArgoNeuT_RHC_NUMUB_AR" />
+  <input sample="ArgoNeuT_CCInc_XSec_1Dthetamu_antinu" type="TYPE:ArgoNeuT_RHC_NUMUB_AR" />
+
+
+  <input action='SKIP' />
+  <input comment='BNL SAMPLES' check='BNL'/>
+
+    <input eventcomment='BNL_FHC_NUMU_D2 : events generated with BNL forward horn current
+flux in muon neutrino mode on a deuterium target.' />
+  
+  <input comment='   BNL CCQE' check='BNL+_CCQE' />
+  <input sample="BNL_CCQE_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CCQE_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  
+  <input comment='   BNL CC1ppip' check='BNL+_CC1ppip' />
+  <input sample="BNL_CC1ppip_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_XSec_1DEnu_nu_Uncorr" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_XSec_1DEnu_nu_W14Cut" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_Evt_1DQ2_nu_W14Cut" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_Evt_1DcosthAdler_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1ppip_Evt_1Dphi_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  
+  <input comment='   BNL CC1npip' check='BNL+_CC1npip' />
+  <input sample="BNL_CC1npip_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1npip_XSec_1DEnu_nu_Uncorr" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1npip_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  
+  <input comment='   BNL CC1ppip' check='BNL+_CC1pi0' />
+  <input sample="BNL_CC1pi0_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+  <input sample="BNL_CC1pi0_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
+
+
+  <input action='SKIP' />
+  <input comment='FNAL SAMPLES' check='FNAL'/>
+
+     <input eventcomment='FNAL_FHC_NUMU_D2 : events generated with FNAL forward horn current
+flux in muon neutrino mode on a deuterium target.' />
+
+  <input comment='   FNAL CCQE' check='FNAL+_CCQE' />
+  <input sample="FNAL_CCQE_Evt_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
+  
+  <input comment='   FNAL CC1ppip' check='FNAL+_CC1ppip' />
+  <input sample="FNAL_CC1ppip_XSec_1DEnu_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
+  <input sample="FNAL_CC1ppip_XSec_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
+  <input sample="FNAL_CC1ppip_Evt_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
+  
+  <input comment='   FNAL CC1ppim Antineutrino' check='FNAL+_CC1ppim+_antinu' />
+  <input sample="FNAL_CC1ppim_XSec_1DEnu_antinu" type="TYPE:FNAL_RHC_NUMUB_D2" />
+
+
+
+  <input action='SKIP' />
+  <input comment='BEBC SAMPLES' check='BEBC'/>
+  
+   <input eventcomment='BEBC_FHC_NUMU_D2 : events generated with BEBC forward horn current
+flux in muon neutrino mode on a deuterium target.' />
+   <input eventcomment='BEBC_RHC_NUMUB_D2 : events generated with BEBC reverse horn current
+flux in muon antineutrino mode on a deuterium target.' />
+
+  <input comment='   BEBC CCQE' check='BEBC+_CCQE' />
+  <input sample="BEBC_CCQE_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  
+  <input comment='   BEBC CC1ppip' check='BEBC+_CC1ppip' />
+  <input sample="BEBC_CC1ppip_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  <input sample="BEBC_CC1ppip_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  
+  <input comment='   BEBC CC1npip' check='BEBC+_CC1npip' />
+  <input sample="BEBC_CC1npip_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  <input sample="BEBC_CC1npip_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  
+  <input comment='   BEBC CC1pi0' check='BEBC+_CC1pi0' />
+  <input sample="BEBC_CC1pi0_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  <input sample="BEBC_CC1pi0_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
+  
+  <input comment='   BEBC CC1npim Antineutrino' check='BEBC+_CC1npim+_antinu' />
+  <input sample="BEBC_CC1npim_XSec_1DEnu_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
+  <input sample="BEBC_CC1npim_XSec_1DQ2_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
+  <input sample="BEBC_CC1ppim_XSec_1DEnu_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
+  <input sample="BEBC_CC1ppim_XSec_1DQ2_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
+
+
+
+  <input action='SKIP' />
+  <input comment='GGM SAMPLES' check='GGM'/>
+
+  <input eventcomment='GGM_FHC_NUMU_D2 : events generated with GGM forward horn current
+flux in muon neutrino mode on a deuterium target.' />
+
+  <input comment='   GGM CC1ppip' check='GGM+_CC1ppip' />
+  <input sample="GGM_CC1ppip_XSec_1DEnu_nu" type="TYPE:GGM_FHC_NUMU_D2" />
+  <input sample="GGM_CC1ppip_Evt_1DQ2_nu" type="TYPE:GGM_FHC_NUMU_D2" />
+
+
+
+
+  <input action='SKIP' />
+  <input comment='MiniBooNE SAMPLES' check='MiniBooNE'/>
+
+  <input eventcomment='MB_FHC_NUMU_CH2 : events generated with MiniBooNE forward horn current
+flux in muon neutrino mode on a CH2 target.' />
+  <input eventcomment='MB_FHC_NUMUB_CH2 : events generated with MiniBooNE forward horn current
+flux in muon antineutrino mode on a CH2 target.' />
+  <input eventcomment='MB_RHC_NUMUB_CH2 : events generated with MiniBooNE reverse horn current
+flux in muon antineutrino mode on a CH2 target.' />
+  <input eventcomment='MB_RHC_NUMU_CH2 : events generated with MiniBooNE reverse horn current
+flux in muon neutrino mode on a CH2 target.' />
+
+  <input eventcomment='MB_FHC_NUMUandNUMUBAR_CH2 : events generated with MiniBooNE forward horn current
+flux in muon neutrino mode AND muon antineutrino mode on a CH2 target. '/>
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+TYPE:(MB_FHC_NUMU_CH2,MB_FHC_NUMUB_CH2)' />
+
+  <input eventcomment='MB_RHC_NUMUBARandNUMU_CH2 : events generated with MiniBooNE reverse horn current
+flux in muon antineutrino mode AND muon neutrino mode on a CH2 target. '/>
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+TYPE:(MB_RHC_NUMUB_CH2,MB_RHC_NUMU_CH2)' />
+
+  <input comment='   MiniBooNE CCQELike NuMu' check='MiniBooNE+_CCQE' />
+  <input sample="MiniBooNE_CCQE_XSec_1DQ2_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CCQE_XSec_2DTcos_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+
+  <input comment='   MiniBooNE CC0PI NuMu' check='MiniBooNE+_CCQELike' />
+  <input sample="MiniBooNE_CCQELike_XSec_2DTcos_nu" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
+  <input sample="MiniBooNE_CCQELike_XSec_1DQ2_nu" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
+
+  <input comment='   MiniBooNE CCQELike AntiNuMu' check='MiniBooNE+_CCQE+_antinu' />
+  <input sample="MiniBooNE_CCQE_XSec_1DQ2_antinu" type="TYPE:MB_RHC_NUMUB_CH2" />
+  <input sample="MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu" type="TYPE:MB_RHC_NUMUB_CH2" />
+  <input sample="MiniBooNE_CCQE_XSec_2DTcos_antinu" type="TYPE:MB_RHC_NUMUB_CH2" />
+
+  <input comment='   MiniBooNE CC0PI AntiNuMu' check='MiniBooNE+_CCQELike+_antinu' />
+  <input sample="MiniBooNE_CCQELike_XSec_2DTcos_antinu" type="TYPE:MB_RHC_NUMUBARandNUMU_CH2" />
+  <input sample="MiniBooNE_CCQELike_XSec_1DQ2_antinu" type="TYPE:MB_RHC_NUMUBARandNUMU_CH2" />
+
+  <input comment='   MiniBooNE CC1PIP ' check='MiniBooNE+_CC1pip' />
+  <input sample="MiniBooNE_CC1pip_XSec_1DEnu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_1DQ2_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_1DTpi_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_1DTu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_2DQ2Enu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_2DTpiCospi_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_2DTpiEnu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_2DTuCosmu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pip_XSec_2DTuEnu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+
+  <input comment='   MiniBooNE CC1PI0 ' check='MiniBooNE+_CC1pi0' />
+  <input sample="MiniBooNE_CC1pi0_XSec_1DEnu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pi0_XSec_1DQ2_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pi0_XSec_1DTu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pi0_XSec_1Dcosmu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pi0_XSec_1Dcospi0_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CC1pi0_XSec_1Dppi0_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+
+  <input comment='   MiniBooNE NC1pi0 Neutrino ' check='MiniBooNE+_NC1pi0+_nu' />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dcospi0_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dppi0_nu"   type="TYPE:MB_FHC_NUMU_CH2" />
+
+  <input comment='   MiniBooNE NC1pi0 Antineutrino ' check='MiniBooNE+_NC1pi0+_antinu' />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu" type="TYPE:MB_RHC_NUMUB_CH2" />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dppi0_antinu" type="TYPE:MB_RHC_NUMUB_CH2"   />
+
+  <input comment='   MiniBooNE NC1pi0 FHC ' check='MiniBooNE+_NC1pi0+_fhc' />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dppi0_fhc" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
+
+  <input comment='   MiniBooNE NC1pi0 RHC ' check='MiniBooNE+_NC1pi0+_rhc' />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc" type="TYPE:MB_RHC_NUMUBARandNUMU_CH2" />
+  <input sample="MiniBooNE_NC1pi0_XSec_1Dppi0_rhc" type="TYPE:MB_RHC_NUMUBARandNUMU_CH2" />
+
+  <input comment='   MiniBooNE NCEL ' check='MiniBooNE+_NC1pi0+_NCEL' />
+  <input sample="MiniBooNE_NCEL_XSec_Treco_nu" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
+
+
+
+
+  <input action='SKIP' />
+  <input comment='MINERvA SAMPLES' check='MINERvA'/>
+
+ <input eventcomment='MIN_FHC_NUMU_CH : events generated with MINERvA forward horn current
+flux in muon neutrino mode on a CH target.' />
+ <input eventcomment='MIN_FHC_NUMU_C : events generated with MINERvA forward horn current
+flux in muon neutrino mode on a C target.' />
+ <input eventcomment='MIN_FHC_NUMU_Fe : events generated with MINERvA forward horn current
+flux in muon neutrino mode on a Fe target.' />
+ <input eventcomment='MIN_FHC_NUMU_Pb : events generated with MINERvA forward horn current
+flux in muon neutrino mode on a Pb target.' />
+ <input eventcomment='MIN_RHC_NUMUB_CH : events generated with MINERvA reverse horn current
+flux in muon antineutrino mode on a CH target.' />
+ <input eventcomment='MIN_FHC_NUEandNUEB_CH : events generated with MINERvA forward horn current
+flux in electorn neutrino mode AND electorn antineutrino mode on a CH target.' />
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+TYPE:(MB_FHC_NUE_CH,MB_FHC_NUEB_CH)' />
+
+ <input comment='   MINERvA CCQELike NUMU ' check='MINERvA+_CCQE+_nu' />
+<input sample="MINERvA_CCQE_XSec_1DQ2_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_nu_20deg" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_nu_oldflux" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux" type="TYPE:MIN_FHC_NUMU_CH" />
+
+ <input comment='   MINERvA CCQELike NUMUBAR ' check='MINERvA+_CCQE+_antinu' />
+<input sample="MINERvA_CCQE_XSec_1DQ2_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_antinu_20deg" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_antinu_oldflux" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_antinu_20deg_oldflux" type="TYPE:MIN_RHC_NUMUB_CH" />
+
+<input comment='   MINERvA CCQELike JOINT ' check='MINERvA+_CCQE+_joint' />
+<input sample="MINERvA_CCQE_XSec_1DQ2_joint_oldflux" type="TYPE:MIN_RHC_NUMUB_CH;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux" type="TYPE:MIN_RHC_NUMUB_CH;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_joint" type="TYPE:MIN_RHC_NUMUB_CH;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCQE_XSec_1DQ2_joint_20deg" type="TYPE:MIN_RHC_NUMUB_CH;TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA CC0PI JOINT ' check='MINERvA+_CC0pi+_nue' />
+<input sample="MINERvA_CC0pi_XSec_1DEe_nue" type="TYPE:MIN_FHC_NUEandNUEB_CH" />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_nue" type="TYPE:MIN_FHC_NUEandNUEB_CH" />
+<input sample="MINERvA_CC0pi_XSec_1DThetae_nue" type="TYPE:MIN_FHC_NUEandNUEB_CH" />
+
+<input comment='   MINERvA CC0PI1p ' check='MINERvA+_CC0pi+_nu_proton' />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_nu_proton" type="TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA CC1ppip ' check='MINERvA+_CC1ppip' />
+<input sample="MINERvA_CC1pip_XSec_1DTpi_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1DTpi_nu_20deg" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1DTpi_nu_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1DTpi_nu_20deg_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1Dth_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1Dth_nu_20deg" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1Dth_nu_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CC1pip_XSec_1Dth_nu_20deg_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA CCNpip ' check='MINERvA+_CCNpip' />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu_2015" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu_2016" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu_2015_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu_2015" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu_2016" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dthmu_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1Dpmu_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DQ2_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCNpip_XSec_1DEnu_nu" type="TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA CC1pi0 Antineutrino ' check='MINERvA+_CC1pi0+_antinu' />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu_2015" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu_2016" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu_fluxcorr" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dppi0_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dppi0_antinu_fluxcorr" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1DTpi0_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1DQ2_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dthmu_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1Dpmu_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CC1pi0_XSec_1DEnu_antinu" type="TYPE:MIN_RHC_NUMUB_CH" />
+<input sample="MINERvA_CCinc_XSec_2DEavq3_nu" type="TYPE:MIN_RHC_NUMUB_CH" />
+
+<input comment='   MINERvA Carbon targets ' check='MINERvA+_TgtC/MINERvA+_C12/MINERvA+_TgtRatioC' />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtC_nu" type="TYPE:MIN_FHC_NUMU_C" />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtRatioC_nu" type="TYPE:MIN_FHC_NUMU_C;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1Dx_ratio_C12_CH" type="TYPE:MIN_FHC_NUMU_C;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH" type="TYPE:MIN_FHC_NUMU_C;TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA Iron targets ' check='MINERvA+_TgtFe/MINERvA+_Fe56/MINERvA+_TgtRatioFe' />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtFe_nu" type="TYPE:MIN_FHC_NUMU_Fe" />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu" type="TYPE:MIN_FHC_NUMU_Fe;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH" type="TYPE:MIN_FHC_NUMU_Fe;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH" type="TYPE:MIN_FHC_NUMU_Fe;TYPE:MIN_FHC_NUMU_CH" />
+
+<input comment='   MINERvA Lead targets ' check='MINERvA+_TgtPb/MINERvA+_Pb208/MINERvA+_TgtRatioPb' />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtPb_nu" type="TYPE:MIN_FHC_NUMU_Pb" />
+<input sample="MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu" type="TYPE:MIN_FHC_NUMU_Pb;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH" type="TYPE:MIN_FHC_NUMU_Pb;TYPE:MIN_FHC_NUMU_CH" />
+<input sample="MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH" type="TYPE:MIN_FHC_NUMU_Pb;TYPE:MIN_FHC_NUMU_CH" />
+
+
+
+  <input action='SKIP' />
+  <input comment='T2K SAMPLES' check='T2K'/>
+
+   <input eventcomment='T2K_FHC_NUMU_CH : events generated with T2K forward horn current
+flux in muon neutrino mode on a CH target.' />
+   <input eventcomment='T2K_FHC_NUMU_H2O : events generated with T2K forward horn current
+flux in muon neutrino mode on a H2O target.' />
+
+  <input comment='   T2K CC0pi ' check='T2K+_CC0pi' />
+  <input sample="T2K_CC0pi_XSec_2DPcos_nu_II" type="TYPE:T2K_FHC_NUMU_CH" />
+  <input sample="T2K_CC0pi_XSec_2DPcos_nu_nonuniform" type="TYPE:T2K_FHC_NUMU_CH" />
+
+  <input comment='   T2K CC1pi H2O ' check='T2K+_CC1pip+H2O' />
+  <input sample="T2K_CC1pip_H2O_XSec_1DEnuDelta_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1DEnuMB_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1Dcosmu_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1Dcosmupi_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1Dcospi_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1Dpmu_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+  <input sample="T2K_CC1pip_H2O_XSec_1Dppi_nu" type="TYPE:T2K_FHC_NUMU_H2O" />
+
+
+
+
+  <input action='SKIP' />
+  <input comment='K2K SAMPLES' check='K2K'/>
+  <input eventcomment='K2K_FHC_NUMU_H2O : events generated with K2K forward horn current
+flux in muon neutrino mode on a H2O target.' />
+
+  <input comment='   K2K NC1pi0 H2O ' check='K2K+_NC1pi0+H2O' />
+  <input sample="K2K_NC1pi0_Evt_1Dppi0_nu" type="TYPE:K2K_FHC_NUMU_H2O" />
+
+</sample_list>

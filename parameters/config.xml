@@ -39,7 +39,8 @@
 <config RemoveFSIParticles='0' />
 <config RemoveUndefParticles='0' />
 <config RemoveNuclearParticles='0'/>
-<config logging.FitEvent.cxx='1' />
+<config logging.JointFCN.cxx='4'/>
+
 
 <!-- # Input Configs -->
 <!-- # ###################################################### -->
