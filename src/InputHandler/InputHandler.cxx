@@ -136,23 +136,6 @@ FitEvent* InputHandlerBase::FirstNuisanceEvent() {
 FitEvent* InputHandlerBase::NextNuisanceEvent() {
   fCurrentIndex++;
 
-  if (jointinput and fMaxEvents != -1) {
-    while ( fCurrentIndex < jointindexlow[jointindexswitch] ||
-            fCurrentIndex >= jointindexhigh[jointindexswitch] ) {
-      jointindexswitch++;
-
-      // Loop Around
-      if (jointindexswitch == jointindexlow.size()) {
-        jointindexswitch = 0;
-      }
-    }
-
-
-    if (fCurrentIndex > jointindexlow[jointindexswitch] + jointindexallowed[jointindexswitch]) {
-      fCurrentIndex = jointindexlow[jointindexswitch];
-    }
-  }
-
   return GetNuisanceEvent(fCurrentIndex);
 };
 
