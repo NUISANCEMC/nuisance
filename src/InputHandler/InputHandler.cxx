@@ -18,19 +18,6 @@
 *******************************************************************************/
 #include "InputHandler.h"
 
-std::vector<std::string> InputUtils::ParseInputFileList(std::string const& inpFile) {
-
-  std::vector<std::string> inputs = GeneralUtils::ParseToStr(inpFile, ",");
-  if (inputs.front()[0] == '(') {
-    inputs.front() = inputs.front().substr(1);
-  }
-  if (inputs.back()[inputs.back().size() - 1] == ')') {
-    inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
-  }
-  return inputs;
-
-}
-
 InputHandlerBase::InputHandlerBase() {
   fName = "";
   fFluxHist = NULL;
@@ -85,8 +72,6 @@ double InputHandlerBase::PredictedEventRate(double low, double high,
 double InputHandlerBase::TotalIntegratedFlux(double low, double high,
     std::string intOpt) {
 
-  std::cout << "Getting Total Integrated Flux Between : " << low << " - " << high << std::endl;
-
   Int_t minBin = fFluxHist->GetXaxis()->FindFixBin(low);
   Int_t maxBin = fFluxHist->GetXaxis()->FindFixBin(high);
 
@@ -98,10 +83,8 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
     maxBin = fFluxHist->GetXaxis()->GetNbins() + 1;
   }
 
-  std::cout << "Getting Between Bins " << minBin << " " << maxBin << std::endl;
   // If we are within a single bin
   if (minBin == maxBin) {
-    std::cout << "Getting minBin == maxBin " << std::endl;
     // Get the contained fraction of the single bin's width
     return ((high - low) / fFluxHist->GetXaxis()->GetBinWidth(minBin)) *
            fFluxHist->Integral(minBin, minBin, intOpt.c_str());
@@ -124,7 +107,6 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
     return lowBinfracIntegral + highBinfracIntegral;
   }
 
-  std::cout << "Returning highBinFracIntegral and LowBinFracIntegral " << std::endl;
   // If there are filled bins between them
   return lowBinfracIntegral + highBinfracIntegral +
          fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());

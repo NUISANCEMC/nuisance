@@ -26,6 +26,19 @@
 
 namespace InputUtils {
 
+std::vector<std::string> ParseInputFileList(std::string const& inpFile) {
+
+  std::vector<std::string> inputs = GeneralUtils::ParseToStr(inpFile, ",");
+  if (inputs.front()[0] == '(') {
+    inputs.front() = inputs.front().substr(1);
+  }
+  if (inputs.back()[inputs.back().size() - 1] == ')') {
+    inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
+  }
+  return inputs;
+
+}
+
 InputType ParseInputType(std::string const &inp) {
 
   // The hard-coded list of supported input generators
@@ -38,7 +51,6 @@ InputType ParseInputType(std::string const &inp) {
 
   for (size_t i = 0; i < nInputTypes; i++) {
     if (inp == filetypes[i]) {
-      std::cout << "INPUT TYPE = " << inp << " " << i << std::endl;
       return InputType(i);
     }
   }
@@ -153,18 +165,5 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
   }
   }
 }
-
-// std::vector<std::string> ParseInputFileList(std::string const& inpFile) {
-
-//   std::vector<std::string> inputs = GeneralUtils::ParseToStr(inpFile, ",");
-//   if (inputs.front()[0] == '(') {
-//     inputs.front() = inputs.front().substr(1);
-//   }
-//   if (inputs.back()[inputs.back().size() - 1] == ')') {
-//     inputs.back() = inputs.back().substr(0, inputs.back().size() - 1);
-//   }
-//   return inputs;
-
-// }
 
 }

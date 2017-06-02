@@ -21,229 +21,75 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-struct LetterBackronym {
-  LetterBackronym(size_t n, std::string const &b, float p = 1.0,
-                  std::string const &t = "") {
-    NUsed = n;
-    Backkie = b;
-    ProbAccept = p;
-    TagLine = t;
-  };
-  size_t NUsed;
-  float ProbAccept;
-  std::string Backkie;
-  std::string TagLine;
+
+namespace Logger {
+
+// Logger Variables
+uint log_verb   = 4;
+bool use_colors = true;
+bool showtrace  = false;
+std::ostream* __LOG_outstream(&std::cout);
+std::ofstream __LOG_nullstream;
+
+// Error Variables
+unsigned int err_verb = 0;
+std::ostream* __ERR_outstream(&std::cerr);
+
+// Extra Variables
+bool external_verb = false;
+
+bool super_rainbow_mode = true; //!< For when fitting gets boring.
+unsigned int super_rainbow_mode_colour = 0;
+
+std::streambuf *default_cout = std::cout.rdbuf();
+std::streambuf *default_cerr = std::cerr.rdbuf();
+std::ofstream redirect_stream("/dev/null");
+int silentfd = open("/dev/null", O_WRONLY);
+int savedstdoutfd = dup(fileno(stdout));
+int savedstderrfd = dup(fileno(stderr));
+
+int nloggercalls = 0;
+int timelastlog = 0;
+
+}
+
+
+
+// -------- Logging Functions --------- //
+
+
+bool LOGGING(int level) {
+  // std::cout << "LOGGING : " << __FILENAME__ << " " << __FUNCTION__ << std::endl;
+  return (Logger::log_verb >= (uint)__GETLOG_LEVEL(level, __FILENAME__, __FUNCTION__));
 };
 
-__attribute__((constructor)) void nuisance_init(void) {
-  std::vector<std::vector<LetterBackronym> > Letters;
+int __GETLOG_LEVEL(int level, const char* filename, const char* funct) {
 
-  for (size_t i = 0; i < 8; ++i) {
-    Letters.push_back(std::vector<LetterBackronym>());
+#ifdef __DEBUG__
+  int logfile = FitPar::Config().GetParI("logging." + std::string(filename));
+  if (logfile >= DEB and logfile <= EVT) {
+    level = logfile;
   }
 
-  Letters[0].push_back(LetterBackronym(2, "Neutrino"));
-  Letters[0].push_back(LetterBackronym(3, "NUIsance", 0.2));
-
-  Letters[2].push_back(LetterBackronym(1, "Interaction"));
-
-  Letters[3].push_back(LetterBackronym(1, "Systematics"));
-  Letters[3].push_back(LetterBackronym(
-      1, "Synthesiser", 0.2, "Playing on the comparisons you want to see"));
-
-  Letters[4].push_back(LetterBackronym(2, "ANalyser"));
-  Letters[4].push_back(LetterBackronym(1, "Aggregating", 0.5));
-  Letters[4].push_back(LetterBackronym(3, "from A-Neutrino sCattering", 1,
-                                       "You can always find a frame"));
-
-  Letters[5].push_back(
-      LetterBackronym(1, "New", 1, "The freshest comparisons"));
-
-  Letters[6].push_back(LetterBackronym(1, "by Comparing"));
-  Letters[6].push_back(LetterBackronym(1, "Constraints from"));
-
-  Letters[7].push_back(LetterBackronym(1, "Experiments"));
-
-  std::vector<std::string> TagLines;
-  TagLines.push_back("Fit and compare.");
-
-  std::stringstream back("");
-
-  TRandom3 tr;
-  tr.SetSeed();
-
-  for (size_t i = 0; i < 8;) {
-    LetterBackronym const &let = Letters[i][tr.Integer(Letters[i].size())];
-    if (tr.Uniform() > let.ProbAccept) {
-      continue;
-    }
-    back << let.Backkie << " ";
-    i += let.NUsed;
-    if (let.TagLine.length()) {
-      TagLines.push_back(let.TagLine);
-    }
+  int logfunc = FitPar::Config().GetParI("logging." + std::string(funct));
+  if (logfunc >= DEB and logfunc <= EVT) {
+    level = logfunc;
   }
+#endif
 
-  std::string Name = "Nuisance";
-  std::string TagL = TagLines[tr.Integer(TagLines.size())];
+  return level;
+};
 
-  std::vector<std::pair<std::string, std::pair<std::string, std::string> > >
-      OneBlob;
+std::ostream& __OUTLOG(int level, const char* filename, const char* funct, int line) {
 
-  OneBlob.push_back(
-      std::make_pair("NUISANCE", std::make_pair("", "FiXing your Neutrinos")));
+  if (Logger::log_verb < (unsigned int)level &&
+      Logger::log_verb != (unsigned int)DEB) {
+    return (Logger::__LOG_nullstream);
 
-  if (tr.Uniform() < 0.01) {
-    std::pair<std::string, std::pair<std::string, std::string> > const &blob =
-        OneBlob[tr.Integer(OneBlob.size())];
-    Name = blob.first;
-    back.str("");
-    back << blob.second.first;
-    TagL = blob.second.second;
-  }
-
-  std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-               "%%%%%%%%%%%%%%%"
-               "%%"
-            << std::endl
-            << "%%  Welcome to " << Name << ": \033[5m" << back.str()
-            << "\033[0m-- " << TagL << std::endl
-            << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-               "%%%%%%%%%%%%%%%"
-               "%%"
-            << std::endl;
-}
-
-
-namespace FitPar{
-  unsigned int log_verb = 4; //!< Current VERBOSITY
-  unsigned int err_verb = 0; //!< Current ERROR VERBOSITY
-  bool use_colors = true; //!< Use BASH Terminal Colors Flag
-  bool super_rainbow_mode = true; //!< For when fitting gets boring.
-  unsigned int super_rainbow_mode_colour = 0;
-  bool showtrace = false;
-  // For redirecting various print outs
-  std::streambuf *default_cout = std::cout.rdbuf();
-  std::streambuf *default_cerr = std::cerr.rdbuf();
-  std::ofstream redirect_stream("/dev/null");
-  int silentfd = open("/dev/null",O_WRONLY);
-  int savedstdoutfd = dup(fileno(stdout));
-  int savedstderrfd = dup(fileno(stderr));
-
-  int nloggercalls = 0;
-  int timelastlog = 0;
-
-}
-
-std::ostream* logStream(&std::cout);
-std::ostream* errStream(&std::cerr);
-std::ofstream nullStream;
-
-//******************************************
-void LOG_VERB(std::string verb){
-//******************************************
-
-  if      (!verb.compare("DEB")) FitPar::log_verb=-1;
-  else if (!verb.compare("QUIET")) FitPar::log_verb=0;
-  else if (!verb.compare("FIT"))  FitPar::log_verb=1;
-  else if (!verb.compare("MIN"))   FitPar::log_verb=2;
-  else if (!verb.compare("SAM"))   FitPar::log_verb=3;
-  else if (!verb.compare("REC"))   FitPar::log_verb=4;
-  else if (!verb.compare("SIG"))   FitPar::log_verb=5;
-  else if (!verb.compare("EVT"))   FitPar::log_verb=6;
-  else FitPar::log_verb = GeneralUtils::StrToInt(verb);
-  
-  std::cout << "Set logging verbosity to : " << FitPar::log_verb << std::endl;
-  return;
-}
-
-//******************************************
-void ERR_VERB(std::string verb){
-//******************************************
-  std::cout << "Setting ERROR VERB" << std::endl;
-
-  if    (!verb.compare("ERRQUIET")) FitPar::err_verb=0;
-  else if (!verb.compare("FTL")) FitPar::err_verb=1;
-  else if (!verb.compare("WRN")) FitPar::err_verb=2;
-  else FitPar::err_verb = GeneralUtils::StrToInt(verb);
-
-  std::cout << "Set error verbosity to : " << FitPar::err_verb << std::endl;
-  return;
-}
-
-//******************************************
-bool LOG_LEVEL(int level){
-//******************************************
-
-  if (FitPar::log_verb == (unsigned int) DEB){
-    return true;
-  }
-
-  if (FitPar::log_verb <  (unsigned int) level){
-    return false;
-  }
-
-  return true;
-}
-
-void SET_TRACE(bool val){
-  FitPar::showtrace = val;
-}
-
-
-// std::ostream& LOG(FIT){
-  // std::cout << "[ NUISANCE ]: ";
-  // return *logStream;
-// }
-
-//******************************************
-std::ostream& _LOG(int level, const char* filename, const char* func, int line)
-//******************************************
-{
-
-  if (FitPar::nloggercalls > 1000){
-    std::cout << "[WARNING] : Large number of logger calls being piped to LOGGER." << std::endl;
-    std::cout << "This is super inefficient. : " << FitPar::nloggercalls << std::endl;
-    std::cout << "Occuring at " << filename << "::" << func << "[l. " << line << "]" << std::endl;
-    FitPar::nloggercalls = -1;
-  }
-
-  if (abs(time(NULL) - FitPar::timelastlog) > 10){
-    FitPar::timelastlog = time(NULL);
-    FitPar::nloggercalls = 0;
-  }
-
-  if (FitPar::nloggercalls != -1){
-    FitPar::nloggercalls++;
-  }
-
-  
-
-  if (FitPar::log_verb < (unsigned int)level && 
-      FitPar::log_verb != (unsigned int)DEB){
-    return nullStream;
   } else {
 
-    if (FitPar::showtrace){
-      std::cout << filename << "::" << func << "[l. " << line << "] : ";
-    }
-
-    if (FitPar::super_rainbow_mode and FitPar::use_colors){
-      switch(FitPar::super_rainbow_mode_colour){
-      case 1:  std::cout<<RED;
-      case 2:  std::cout<<GREEN;
-      case 3:  std::cout<<YELLOW;
-      case 4:  std::cout<<BLUE;
-      case 5:  std::cout<<MAGENTA;
-      case 6:  std::cout<<CYAN;
-      default: FitPar::super_rainbow_mode_colour = 0;
-      }
-
-      FitPar::super_rainbow_mode_colour++;
-    }
-
-    if (FitPar::use_colors){
-      switch(level){
+    if (Logger::use_colors) {
+      switch (level) {
       case FIT: std::cout << BOLDGREEN; break;
       case MIN: std::cout << BOLDBLUE;  break;
       case SAM: std::cout << MAGENTA;   break;
@@ -254,64 +100,211 @@ std::ostream& _LOG(int level, const char* filename, const char* func, int line)
       }
     }
 
-    switch(level){
-    case FIT: std::cout << "[LOG Fitter]: "; break;
-    case MIN: std::cout << "[LOG Minmzr]: "; break;
-    case SAM: std::cout << "[LOG Sample]: - "; break;
-    case REC: std::cout << "[LOG Reconf]: -- "; break;
-    case SIG: std::cout << "[LOG Signal]: --- "; break;
-    case EVT: std::cout << "[LOG Event ]: ---- "; break;
-    case DEB: std::cout << "[LOG DEBUG ]: "; break;
-    default: std::cout << "Log : "; break;
+    switch (level) {
+    case FIT: std::cout << "[LOG Fitter]"; break;
+    case MIN: std::cout << "[LOG Minmzr]"; break;
+    case SAM: std::cout << "[LOG Sample]"; break;
+    case REC: std::cout << "[LOG Reconf]"; break;
+    case SIG: std::cout << "[LOG Signal]"; break;
+    case EVT: std::cout << "[LOG Event ]"; break;
+    case DEB: std::cout << "[LOG DEBUG ]"; break;
+    default:  std::cout << "[LOG INFO  ]"; break;
     }
 
-    if (FitPar::use_colors or FitPar::super_rainbow_mode) std::cout << RESET;
+    // Apply indent
+    if (true) {
+      switch (level) {
+      case FIT: std::cout << ": "; break;
+      case MIN: std::cout << ":- "; break;
+      case SAM: std::cout << ":-- "; break;
+      case REC: std::cout << ":--- "; break;
+      case SIG: std::cout << ":---- "; break;
+      case EVT: std::cout << ":----- "; break;
+      case DEB: std::cout << ":------ "; break;
+      default:  std::cout << " "; break;
+      }
+    }
 
-    return *logStream;
+    if (Logger::use_colors) std::cout << RESET;
+
+    if (Logger::showtrace) {
+      std::cout << " : " << filename << "::" << funct << "[l. " << line << "] : ";
+    }
+
+    return *(Logger::__LOG_outstream);
   }
 }
+
+void SETVERBOSITY(int level) {
+  Logger::log_verb = level;
+}
+
+void SETVERBOSITY(std::string verb) {
+  if      (!verb.compare("DEB"))   Logger::log_verb = -1;
+  else if (!verb.compare("QUIET")) Logger::log_verb = 0;
+  else if (!verb.compare("FIT"))   Logger::log_verb = 1;
+  else if (!verb.compare("MIN"))   Logger::log_verb = 2;
+  else if (!verb.compare("SAM"))   Logger::log_verb = 3;
+  else if (!verb.compare("REC"))   Logger::log_verb = 4;
+  else if (!verb.compare("SIG"))   Logger::log_verb = 5;
+  else if (!verb.compare("EVT"))   Logger::log_verb = 6;
+  else Logger::log_verb = std::atoi(verb.c_str());
+}
+
+/// Set Trace Option
+void SETTRACE(bool val) {
+  Logger::showtrace = val;
+}
+
+// ------ ERROR FUNCTIONS ---------- //
+std::ostream& __OUTERR(int level, const char* filename, const char* funct, int line) {
+  if (Logger::use_colors) std::cerr << RED;
+
+  switch (level) {
+  case FTL: std::cerr << "[ERR FATAL ]: "; break;
+  case WRN: std::cerr << "[ERR WARN  ]: "; break;
+  }
+
+  if (Logger::use_colors) std::cerr << RESET;
+
+  // Allows enable error debugging trace
+  if (true or Logger::showtrace) {
+    std::cout << filename << "::" << funct << "[l. " << line << "] : ";
+  }
+
+  return *(Logger::__ERR_outstream);
+}
+
+// ----------- External Logging ----------- //
+void SETEXTERNALVERBOSITY(int level) {
+  Logger::external_verb = (level > 0);
+}
+
+void StopTalking() {
+
+  // Check verbosity set correctly
+  if (!Logger::external_verb) return;
+
+  // Only redirect if we're not debugging
+  if (Logger::log_verb == (unsigned int)DEB) return;
+
+  std::cout.rdbuf(Logger::redirect_stream.rdbuf());
+  std::cerr.rdbuf(Logger::redirect_stream.rdbuf());
+  shhnuisancepythiaitokay_();
+  fflush(stdout);
+  fflush(stderr);
+  dup2(Logger::silentfd, fileno(stdout));
+  dup2(Logger::silentfd, fileno(stderr));
+}
+
+void StartTalking() {
+
+  // Check verbosity set correctly
+  if (!Logger::external_verb) return;
+
+  std::cout.rdbuf(Logger::default_cout);
+  std::cerr.rdbuf(Logger::default_cerr);
+  canihaznuisancepythia_();
+  fflush(stdout);
+  fflush(stderr);
+  dup2(Logger::savedstdoutfd, fileno(stdout));
+  dup2(Logger::savedstderrfd, fileno(stderr));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//******************************************
+void LOG_VERB(std::string verb) {
+//******************************************
+
+  if      (!verb.compare("DEB")) Logger::log_verb = -1;
+  else if (!verb.compare("QUIET")) Logger::log_verb = 0;
+  else if (!verb.compare("FIT"))  Logger::log_verb = 1;
+  else if (!verb.compare("MIN"))   Logger::log_verb = 2;
+  else if (!verb.compare("SAM"))   Logger::log_verb = 3;
+  else if (!verb.compare("REC"))   Logger::log_verb = 4;
+  else if (!verb.compare("SIG"))   Logger::log_verb = 5;
+  else if (!verb.compare("EVT"))   Logger::log_verb = 6;
+  // else Logger::log_verb = GeneralUtils::StrToInt(verb);
+
+  std::cout << "Set logging verbosity to : " << Logger::log_verb << std::endl;
+  return;
+}
+
+//******************************************
+void ERR_VERB(std::string verb) {
+//******************************************
+  std::cout << "Setting ERROR VERB" << std::endl;
+
+  if    (!verb.compare("ERRQUIET")) Logger::err_verb = 0;
+  else if (!verb.compare("FTL")) Logger::err_verb = 1;
+  else if (!verb.compare("WRN")) Logger::err_verb = 2;
+  // else Logger::err_verb = GeneralUtils::StrToInt(verb);
+
+  std::cout << "Set error verbosity to : " << Logger::err_verb << std::endl;
+  return;
+}
+
+//******************************************
+bool LOG_LEVEL(int level) {
+//******************************************
+
+  if (Logger::log_verb == (unsigned int) DEB) {
+    return true;
+  }
+
+  if (Logger::log_verb <  (unsigned int) level) {
+    return false;
+  }
+
+  return true;
+}
+
+void SET_TRACE(bool val) {
+  Logger::showtrace = val;
+}
+
+
+//******************************************
+std::ostream& _LOG(int level, const char* filename, const char* func, int line)
+//******************************************
+{
+  return __OUTLOG(level, filename, func, line);
+}
+
 //******************************************
 std::ostream& _ERR(int level, const char* filename, const char* func, int line)
 //******************************************
 {
 
-  if (FitPar::use_colors) std::cerr << RED;
-  
-  if (FitPar::showtrace){
+  if (Logger::use_colors) std::cerr << RED;
+
+  if (Logger::showtrace) {
     std::cout << filename << "::" << func << "[l. " << line << "] : ";
   }
 
-  switch(level){
+  switch (level) {
   case FTL: std::cerr << "[ERR FATAL ]: "; break;
   case WRN: std::cerr << "[ERR WARN  ] : "; break;
   }
 
-  if (FitPar::use_colors) std::cerr << RESET;
-  
-  return *errStream;
+  if (Logger::use_colors) std::cerr << RESET;
+
+  return *Logger::__ERR_outstream;
 }
 
-
-void StopTalking(){
-  return;
-  // Only redirect if we're not debugging
-  if (FitPar::log_verb == (unsigned int)DEB) return;
-  std::cout.rdbuf(FitPar::redirect_stream.rdbuf());
-  std::cerr.rdbuf(FitPar::redirect_stream.rdbuf());
-  shhnuisancepythiaitokay_();
-  fflush(stdout); 
-  fflush(stderr);
-  dup2(FitPar::silentfd, fileno(stdout));
-  dup2(FitPar::silentfd, fileno(stderr));
-}
-
-void StartTalking(){
-  std::cout.rdbuf(FitPar::default_cout);
-  std::cerr.rdbuf(FitPar::default_cerr);
-  canihaznuisancepythia_();
-  fflush(stdout); 
-  fflush(stderr);
-  dup2(FitPar::savedstdoutfd, fileno(stdout));
-  dup2(FitPar::savedstderrfd, fileno(stderr));
-}
 

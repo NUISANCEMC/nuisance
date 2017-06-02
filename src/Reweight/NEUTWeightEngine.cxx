@@ -56,7 +56,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 	StartTalking();
 
 #else
-	ERR(FTL) << "NEUT RW NOT ENABLED!" << std::endl;
+	THROW("NEUT RW NOT ENABLED!" );
 #endif
 
 };

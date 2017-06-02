@@ -22,73 +22,28 @@
 
 #include <string>
 #include "TFile.h"
-
+#include "InputTypes.h"
 
 namespace InputUtils {
 
-enum InputType {
-  kNEUT_Input = 0,
-  kNUWRO_Input = 1,
-  kGENIE_Input = 2,
-  kGiBUU_Input,
-  kNUANCE_Input,
-  kEVSPLN_Input,
-  kEMPTY_Input,
-  kFEVENT_Input,
-  kJOINT_Input, // Kept for backwards compatibility
-  kInvalid_Input,
-  kHIST_Input,   // Not sure if this are currently used.
-  kBNSPLN_Input  // Not sure if this are currently used.
-};
-
+/// Extract Input Type from start of filename
 InputType ParseInputType(std::string const &inp);
+
+/// Check for comma seperated joint input files
 bool IsJointInput(std::string const &inputs);
+
+/// Replace Input Event Diretory tags with Full Names from Config
 std::string ExpandInputDirectories(std::string const &inputs);
 
+/// Open ROOT file and guess what the file type is from the tree names
 InputType GuessInputTypeFromFile(TFile *inpF);
+
+/// Guess file input type and form an updated filename with it
 std::string PrependGuessedInputTypeToName(std::string const &inpFName);
 
-// std::vector<std::string> ParseInputFileList(std::string const& inpFile);
-
+/// Split file inputs by commas and remove brackets before putting into a vector
+std::vector<std::string> ParseInputFileList(std::string const& inpFile);
 
 }
-
-inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
-  switch (it) {
-    case InputUtils::kNEUT_Input: {
-      return os << "kNEUT_Input";
-    }
-    case InputUtils::kNUWRO_Input: {
-      return os << "kNUWRO_Input";
-    }
-    case InputUtils::kGENIE_Input: {
-      return os << "kGENIE_Input";
-    }
-    case InputUtils::kGiBUU_Input: {
-      return os << "kGiBUU_Input";
-    }
-    case InputUtils::kNUANCE_Input: {
-      return os << "kNUANCE_Input";
-    }
-    case InputUtils::kEVSPLN_Input: {
-      return os << "kEVSPLN_Input";
-    }
-    case InputUtils::kEMPTY_Input: {
-      return os << "kEMPTY_Input";
-    }
-    case InputUtils::kFEVENT_Input: {
-      return os << "kFEVENT_Input";
-    }
-    case InputUtils::kJOINT_Input: {
-      return os << "kJOINT_Input";
-    }
-    case InputUtils::kInvalid_Input:
-    case InputUtils::kHIST_Input:
-    case InputUtils::kBNSPLN_Input:
-    default: { return os << "kInvalid_Input"; }
-  }
-}
-
-
 
 #endif

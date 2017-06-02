@@ -67,7 +67,6 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey) 
   CreateDataHistogram(7, binx, 17, biny);
 
   SetDataValuesFromTextFile( fSettings.GetDataInput() );
-  std::cout << "Scaling Data" << std::endl;
   ScaleData(1E-42);
 
   SetMapValuesFromText( fSettings.GetMapInput() );

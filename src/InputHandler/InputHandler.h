@@ -26,12 +26,7 @@
 #include "FitEvent.h"
 #include "BaseFitEvt.h"
 #include "TTreePerfStats.h"
-
-/// Utils namespace for everything that supports InputHandler creation
-namespace InputUtils {
-  /// Parses a file list by commas and removes brackets
-  std::vector<std::string> ParseInputFileList(std::string const& inpFile);
-}
+#include "InputUtils.h"
 
 /// Base InputHandler class defining how events are requested and setup.
 class InputHandlerBase {

@@ -66,7 +66,7 @@ void FitParameters::ReadParamFile(std::string fileName) {
     std::string parEntry = inputlist[2];
     if (parameterMap_all.find(parName) == parameterMap_all.end())
       parameterMap_all.insert(
-			      std::map<std::string, std::string>::value_type(parName, parEntry));
+        std::map<std::string, std::string>::value_type(parName, parEntry));
     else
       parameterMap_all[parName] = parEntry;
 
@@ -81,11 +81,11 @@ void FitParameters::ForceParam(std::string parOption) {
   std::string parName = parOption.substr(0, first);
   std::string parEntry = parOption.substr(first + 1, parOption.size());
 
-  LOG(REC) << "Read in Parameter Override : " << parName << " = " << parEntry
-            << std::endl;
+  // LOG(REC) << "Read in Parameter Override : " << parName << " = " << parEntry
+  // << std::endl;
 
   parameterMap_all.insert(
-      std::map<std::string, std::string>::value_type(parName, parEntry));
+    std::map<std::string, std::string>::value_type(parName, parEntry));
   if (parameterMap_all.find(parName) == parameterMap_all.end())
     parameterMap_all.insert(
       std::map<std::string, std::string>::value_type(parName, parEntry));
@@ -111,7 +111,7 @@ void FitParameters::SetParD(std::string parName, double val) {
     parameterMap_double[parName] = val;
   } else {
     parameterMap_double.insert(
-       std::map<std::string, double>::value_type(parName, val));
+      std::map<std::string, double>::value_type(parName, val));
   }
   return;
 }
@@ -128,126 +128,33 @@ void FitParameters::SetParI(std::string parName, int val) {
 
 // Parameter fetch commands
 int FitParameters::GetParI(std::string parName) {
-    return Config::Get().ConfI(parName);
-  if (parName == "VERBOSITY") {
-    if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-      int tempVal = 1;
-      std::string verb = parameterMap_all.at(parName);
-
-      if (!verb.compare("DEB"))
-        tempVal = -1;
-      else if (!verb.compare("QUIET"))
-        tempVal = 0;
-      else if (!verb.compare("FIT"))
-        tempVal = 1;
-      else if (!verb.compare("MIN"))
-        tempVal = 2;
-      else if (!verb.compare("SAM"))
-        tempVal = 3;
-      else if (!verb.compare("REC"))
-        tempVal = 4;
-      else if (!verb.compare("SIG"))
-        tempVal = 5;
-      else if (!verb.compare("EVT"))
-        tempVal = 6;
-      else
-	tempVal = GeneralUtils::StrToInt(parameterMap_all[parName]);
-
-      // Convert.
-      parameterMap_int.insert(
-	std::map<std::string, int>::value_type(parName, tempVal));
-
-    } else {
-      return 1;  // If no parameter set for verbosity assume FIT
-    }
-  }
-
-  // Check if it is saved in int map
-  if (parameterMap_int.find(parName) != parameterMap_int.end()) {
-    return parameterMap_int[parName];
-
-    // Check if it is in the entire map
-  } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    int tempVal = GeneralUtils::StrToInt(parameterMap_all[parName]);
-
-    parameterMap_int.insert(
-	std::map<std::string, int>::value_type(parName, tempVal));
-    return tempVal;
-
-  } else {
-    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
-    return -999;
-  }
+  return Config::Get().ConfI(parName);
 };
 
 // Parameter fetch commands
 bool FitParameters::GetParB(std::string parName) {
   return Config::Get().ConfB(parName);
-
-
-  // Check if it is saved in bool map
-  if (parameterMap_bool.find(parName) != parameterMap_bool.end()) {
-    return parameterMap_bool[parName];
-
-    // Check if it is in the entire map
-  } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-
-    bool tempVal = GeneralUtils::StrToBool(parameterMap_all[parName]);
-
-    parameterMap_bool.insert(
-        std::map<std::string, bool>::value_type(parName, tempVal));
-    return tempVal;
-
-  } else {
-    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
-    parameterMap_bool.insert(
-	std::map<std::string, bool>::value_type(parName, false));
-    return false;
-  }
 };
 
 double FitParameters::GetParD(std::string parName) {
-    return Config::Get().ConfD(parName);
-  // Check if it is saved in int map
-  if (parameterMap_double.find(parName) != parameterMap_double.end()) {
-    return parameterMap_double[parName];
-
-    // Check if it is in the entire map
-  } else if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    double tempVal = GeneralUtils::StrToDbl(parameterMap_all[parName]);
-
-    parameterMap_double.insert(
-        std::map<std::string, double>::value_type(parName, tempVal));
-    return tempVal;
-
-  } else {
-    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
-    return -999.9;
-  }
+  return Config::Get().ConfD(parName);
 };
 
 std::string FitParameters::GetParS(std::string parName) {
-    return Config::Get().ConfS(parName);
-  // Check if it is saved in int map
-  if (parameterMap_all.find(parName) != parameterMap_all.end()) {
-    return parameterMap_all[parName];
-
-  } else {
-    LOG(DEB)<<"Parameter: "<<parName<<" not found in requirements file."<<std::endl;
-    return "";
-  }
+  return Config::Get().ConfS(parName);
 };
 
 
-std::string FitParameters::GetParDIR(std::string parName){
+std::string FitParameters::GetParDIR(std::string parName) {
 
   std::string outstr = this->GetParS(parName);
 
   // Make replacements in the string
   const int nfiletypes = 2;
-  const std::string filetypes[nfiletypes] = {"@data","@nuisance"};
+  const std::string filetypes[nfiletypes] = {"@data", "@nuisance"};
   std::string filerepl[nfiletypes] = { FitPar::GetDataBase(),
-				       FitPar::GetDataBase() + "/../" };
+                                       FitPar::GetDataBase() + "/../"
+                                     };
 
   for (int i = 0; i < nfiletypes; i++) {
     std::string findstring = filetypes[i];
@@ -298,7 +205,7 @@ void FitParameters::MakeParameterCard(std::string filename) {
   return;
 }
 
-void FitParameters::Write(){
+void FitParameters::Write() {
 
   // Loop through parameters
   /*  TTree* tr = new TTree("fit_header","fit_header");
@@ -320,5 +227,5 @@ namespace FitPar {
 //! e.g. FitPar::Config().GetParI("input.maxevents")
 FitParameters& Config() { return FitParameters::GetParams(); };
 
-  std::string GetDataBase(){ return GeneralUtils::GetTopLevelDir() + "/data/"; };
+std::string GetDataBase() { return GeneralUtils::GetTopLevelDir() + "/data/"; };
 }

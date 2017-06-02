@@ -32,6 +32,8 @@ TargetUtils.h
 StackBase.h
 StandardStacks.h
 OpenMPWrapper.h
+PhysConst.h
+Initialiser.h
 )
 
 set(IMPLFILES
@@ -50,6 +52,7 @@ TargetUtils.cxx
 StackBase.cxx
 ParserUtils.cxx
 StandardStacks.cxx
+Initialiser.cxx
 )
 
 set(LIBNAME Utils)

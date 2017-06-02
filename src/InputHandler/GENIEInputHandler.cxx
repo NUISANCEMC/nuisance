@@ -70,28 +70,36 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
 
     // Open File for histogram access
-    TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
+    TFile* inp_file = new TFile(InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      ERR(FTL) << "GENIE File IsZombie() at " << inputs[inp_it] << std::endl;
-      throw;
+      THROW( "GENIE File IsZombie() at : '" << inputs[inp_it] << "'" << std::endl
+             << "Check that your file paths are correct and the file exists!" << std::endl
+             << "$ ls -lh " << inputs[inp_it] );
     }
 
     // Get Flux/Event hist
     TH1D* fluxhist  = (TH1D*)inp_file->Get("nuisance_flux");
     TH1D* eventhist = (TH1D*)inp_file->Get("nuisance_events");
     if (!fluxhist or !eventhist) {
-      ERR(FTL) << "GENIE FILE doesn't contain flux/xsec info" << std::endl;
-      ERR(FTL) << "Run app/PrepareGENIE first on :" << inputs[inp_it] << std::endl;
-      throw;
+      ERROR(FTL, "Input File Contents: " << inputs[inp_it] );
+      inp_file->ls();
+      THROW( "GENIE FILE doesn't contain flux/xsec info." << std::endl
+              << "Try running the app PrepareGENIE first on :" << inputs[inp_it] << std::endl
+              << "$ PrepareGENIE -h" );
     }
 
     // Get N Events
     TTree* genietree = (TTree*)inp_file->Get("gtree");
     if (!genietree) {
-      ERR(FTL) << "gtree not located in GENIE file! " << inputs[inp_it] << std::endl;
+      ERROR(FTL, "gtree not located in GENIE file: " << inputs[inp_it]);
+      THROW("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = genietree->GetEntries();
+    if (nevents <= 0){
+      THROW("Trying to a TTree with " << nevents << " to TChain from : " << inputs[inp_it]);
+    }
+
 
     // Register input to form flux/event rate hists
     RegisterJointInput(inputs[inp_it], nevents, fluxhist, eventhist);
@@ -236,12 +244,12 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
       else if (gheprec->Summary()->ProcInfo().IsResonant()) return 13;
       else if (gheprec->Summary()->ProcInfo().IsDeepInelastic()) return 26;
       else {
-        ERR(WRN) << "Unknown GENIE Electron Scattering Mode!" << std::endl
+        ERROR(WRN, "Unknown GENIE Electron Scattering Mode!" << std::endl
                  << "ScatteringTypeId = " << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
                  << "InteractionTypeId = " << gheprec->Summary()->ProcInfo().InteractionTypeId() << std::endl
                  << genie::ScatteringType::AsString(gheprec->Summary()->ProcInfo().ScatteringTypeId()) << " "
                  << genie::InteractionType::AsString(gheprec->Summary()->ProcInfo().InteractionTypeId()) << " "
-                 << gheprec->Summary()->ProcInfo().IsMEC() << std::endl;
+                 << gheprec->Summary()->ProcInfo().IsMEC());
         return 0;
       }
     }
