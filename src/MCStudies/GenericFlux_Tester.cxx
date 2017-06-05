@@ -72,7 +72,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
-  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << endl;
+  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << std::endl;
 
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
@@ -92,7 +92,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding Event Variables" << endl;
+  LOG(SAM) << "Adding Event Variables" << std::endl;
   eventVariables->Branch("Mode", &Mode, "Mode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
@@ -195,7 +195,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding Samples" << endl;
+  LOG(SAM) << "Adding Samples" << std::endl;
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");

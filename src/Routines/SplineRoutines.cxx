@@ -284,7 +284,7 @@ void SplineRoutines::SaveEvents() {
     nuisevent->AddBranchesToTree(eventtree);
 
     // Loop over all events and fill the TTree
-    int i = 0;
+    int j = 0;
     // int countwidth = nevents / 5;
 
     while (nuisevent) {
@@ -298,15 +298,15 @@ void SplineRoutines::SaveEvents() {
       eventtree->Fill();
 
       // Logging
-      if (i % countwidth == 0) {
-        LOG(REC) << "Saved " << i << "/" << nevents
+      if (j % countwidth == 0) {
+        LOG(REC) << "Saved " << j << "/" << nevents
                  << " nuisance events. [M, W] = ["
                  << nuisevent->Mode << ", " << nuisevent->RWWeight << "]" << std::endl;
       }
 
       // iterate
       nuisevent = input->NextNuisanceEvent();
-      i++;
+      j++;
     }
 
     // Save flux and close file
@@ -1670,7 +1670,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
     }
 
     // Count
-    int i = 0;
+    //int i = 0;
     int nevents = input->GetNEvents();
     int lasttime = time(NULL);
 
@@ -2095,7 +2095,7 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     }
 
     // Count
-    int i = 0;
+    //int i = 0;
     int nevents = input->GetNEvents();
     int lasttime = time(NULL);
 

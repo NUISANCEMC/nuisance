@@ -2,9 +2,10 @@
 #define NUANCEINPUTHANDLER_H
 #include "InputHandler2.h"
 #ifdef __NUANCE_ENABLED__
-#endif
 
 #include "PlotUtils.h"
+
+class NuanceEvent;
 
 class NUANCEInputHandler : public InputHandlerBase {
 public:
@@ -30,4 +31,5 @@ public:
 	TChain* fNUANCETree;
 };
 
+#endif
 #endif
