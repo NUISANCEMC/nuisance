@@ -152,5 +152,7 @@ config Modes.split_PN_NN     0
 
 # SciBooNE specific
 config SciBarDensity  1.04
+#config SciBarDensity 2.00
 config SciBarRecoDist 10.0
 config PenetratingMuonEnergy 1.4
+config NumRangeSteps 50
