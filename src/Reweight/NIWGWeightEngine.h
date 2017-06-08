@@ -2,6 +2,7 @@
 #define WEIGHT_ENGINE_NIWG_H
 
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 #include "NIWGReWeight.h"
 #include "NIWGReWeight1piAngle.h"
 #include "NIWGReWeight2010a.h"
@@ -18,6 +19,23 @@
 #include "NIWGReWeightSplineEnu.h"
 #include "NIWGSyst.h"
 #include "NIWGSystUncertainty.h"
+#include "NReWeight.h"
+#include "NReWeightCasc.h"
+#include "NReWeightNuXSecCCQE.h"
+#include "NReWeightNuXSecCCRES.h"
+#include "NReWeightNuXSecCOH.h"
+#include "NReWeightNuXSecDIS.h"
+#include "NReWeightNuXSecNC.h"
+#include "NReWeightNuXSecNCEL.h"
+#include "NReWeightNuXSecNCRES.h"
+#include "NReWeightNuXSecRES.h"
+#include "NReWeightNuclPiless.h"
+#include "NSyst.h"
+#include "NSystUncertainty.h"
+#include "neutpart.h"
+#include "neutvect.h"
+#include "NEUTInputHandler.h"
+#endif
 #endif
 
 #include "FitLogger.h"
@@ -42,10 +60,12 @@ public:
 
 	inline bool NeedsEventReWeight() { return true; };
 
-
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 	std::vector<niwg::rew::NIWGSyst_t> fNIWGSysts;
+	niwg::rew::NIWGEvent* GetNIWGEventLocal(NeutVect* nvect);
 	niwg::rew::NIWGReWeight* fNIWGRW;
+#endif
 #endif
 };
 

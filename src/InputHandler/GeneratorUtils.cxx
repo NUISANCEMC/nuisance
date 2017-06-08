@@ -23,36 +23,38 @@
 #include "FitLogger.h"
 
 #ifdef __NIWG_ENABLED__
-niwg::rew::NIWGEvent * GeneratorUtils::GetNIWGEvent(NeutVect* nvect)
-{
-  niwg::rew::NIWGEvent * fDummyNIWGEvent = NULL;
+#ifdef __NEUT_ENABLED__
 
-  fDummyNIWGEvent = new niwg::rew::NIWGEvent();
-  fDummyNIWGEvent->detid = 1;   // MiniBooNE (apply CCQE LowE variations)
-  fDummyNIWGEvent->neutmode = nvect->Mode;
-  fDummyNIWGEvent->targetA = nvect->TargetA;
-  fDummyNIWGEvent->recenu_ccqe_sk = -1;
-  if (nvect->Ibound==0) fDummyNIWGEvent->targetA = 1;//RT: identifies as H, rather than O16
+// niwg::rew::NIWGEvent * GeneratorUtils::GetNIWGEventLocal(NeutVect* nvect)
+// {
+//   niwg::rew::NIWGEvent * fDummyNIWGEvent = NULL;
 
-  // Fill initial particle stack
-  for (int ip=0; ip<nvect->Npart(); ++ip) {
+//   fDummyNIWGEvent = new niwg::rew::NIWGEvent();
+//   fDummyNIWGEvent->detid = 1;   // MiniBooNE (apply CCQE LowE variations)
+//   fDummyNIWGEvent->neutmode = nvect->Mode;
+//   fDummyNIWGEvent->targetA = nvect->TargetA;
+//   fDummyNIWGEvent->recenu_ccqe_sk = -1;
+//   if (nvect->Ibound==0) fDummyNIWGEvent->targetA = 1;//RT: identifies as H, rather than O16
 
-    niwg::rew::NIWGPartStack fDummyPartStack;
+//   // Fill initial particle stack
+//   for (int ip=0; ip<nvect->Npart(); ++ip) {
 
-    fDummyPartStack.p = (nvect->PartInfo(ip)->fP)*0.001;  // Convert to GeV
+//     niwg::rew::NIWGPartStack fDummyPartStack;
 
-    fDummyPartStack.pdg = nvect->PartInfo(ip)->fPID;
-    fDummyPartStack.chase = nvect->PartInfo(ip)->fIsAlive;
-    fDummyPartStack.parent = nvect->ParentIdx(ip)-1;       // WARNING: this needs to be tested with a NeutRoot file
+//     fDummyPartStack.p = (nvect->PartInfo(ip)->fP)*0.001;  // Convert to GeV
 
-    fDummyNIWGEvent->part_stack.push_back(fDummyPartStack);
-  }
-  fDummyNIWGEvent->CalcKinematics();
+//     fDummyPartStack.pdg = nvect->PartInfo(ip)->fPID;
+//     fDummyPartStack.chase = nvect->PartInfo(ip)->fIsAlive;
+//     fDummyPartStack.parent = nvect->ParentIdx(ip)-1;       // WARNING: this needs to be tested with a NeutRoot file
 
-  return fDummyNIWGEvent;
-}
-#endif // neut enabled
+//     fDummyNIWGEvent->part_stack.push_back(fDummyPartStack);
+//   }
+//   fDummyNIWGEvent->CalcKinematics();
 
-// #endif
+//   return fDummyNIWGEvent;
+// }
+#endif 
+#endif
+
 
 
