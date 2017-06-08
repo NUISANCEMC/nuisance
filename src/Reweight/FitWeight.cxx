@@ -38,6 +38,9 @@ void FitWeight::AddRWEngine(int type) {
 	case kNIWG:
 		fAllRW[type] = new NIWGWeightEngine("niwgrw");
 		break;
+	default:
+	  THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
+	  break;
 	}
 
 }
@@ -52,6 +55,10 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
 
 	// Get the dial enum
 	int nuisenum = Reweight::ConvDial(name, dialtype);
+
+	if (nuisenum == -1){
+	  THROW("NUISENUM == " << nuisenum << " for " << name);
+	}
 
 	// Setup RW Engine Pointer
 	if (fAllRW.find(dialtype) == fAllRW.end()) {
@@ -97,7 +104,7 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
 	int dialtype = int(nuisenum - (nuisenum % 1000)) / 1000;
 
 	if (fAllRW.find(dialtype) == fAllRW.end()){
-		THROW("Cannot find RW Engine for dialtype = " << dialtype);
+	  THROW("Cannot find RW Engine for dialtype = " << dialtype << " " << nuisenum << " " << (nuisenum - (nuisenum % 1000)) / 1000);
 	}
 
 	// Get RW Engine for this dial

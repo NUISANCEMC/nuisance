@@ -36,7 +36,7 @@ MiniBooNE_CC1pip_XSec_1DEnu_nu::MiniBooNE_CC1pip_XSec_1DEnu_nu(nuiskey samplekey
   fSettings.SetXTitle("E_{#nu} (MeV)");
   fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX");
-  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
 
   // CCQELike plot information

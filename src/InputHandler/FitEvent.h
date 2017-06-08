@@ -445,7 +445,7 @@ public:
   inline int NumFSPiPlus       (void) const { return NumFSParticle(211);  };
   inline int NumFSPiMinus      (void) const { return NumFSParticle(-211); };
   inline int NumFSPhoton       (void) const { return NumFSParticle(22);   };
-  inline int NumFSLeptons      (void) const { return NumFSParticle(PhysConst::pdg_leptons);       };
+  int NumFSLeptons      (void) const; // { return NumFSParticle(PhysConst::pdg_leptons);       };
   inline int NumFSPions        (void) const { return NumFSParticle(PhysConst::pdg_pions);         };
   inline int NumFSChargePions  (void) const { return NumFSParticle(PhysConst::pdg_charged_pions); };
 

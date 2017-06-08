@@ -122,19 +122,19 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
 
   // Need the muon and the neutrino to check angles and W
 
-  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   // MINERvA released some data with restricted muon angle
   // Here the muon angle is < 20 degrees (seen in MINOS)
   if (isRestricted) {
 
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
-    if (th_nu_mu >= 20) return false;
+    if (th_nu_mu >= 20.) return false;
   }
 
   // Lastly check the W cut (always at 1.8 GeV)
   double Wrec = FitUtils::Wrec(pnu, pmu);
-  if (Wrec > 1800) return false;
+  if (Wrec > 1800.) return false;
 
 
   return true;

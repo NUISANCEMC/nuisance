@@ -28,6 +28,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
 	bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
 	bool xsec_nucqe = rw_engine_list.find("nuclear_qe") == std::string::npos;
+	bool xsec_qeaxial = rw_engine_list.find("xsec_ccqe_axial") == std::string::npos;
 
 	// Now actually add the RW Calcs
 	if (xsec_ncel)
@@ -53,6 +54,9 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	if (xsec_qevec)
 		fGenieRW->AdoptWghtCalc("xsec_ccqe_vec",
 		                        new genie::rew::GReWeightNuXSecCCQEvec);
+	if (xsec_qeaxial)
+	  fGenieRW->AdoptWghtCalc("xsec_ccqe_axial",
+				  new genie::rew::GReWeightNuXSecCCQEaxial);
 	if (xsec_dis)
 		fGenieRW->AdoptWghtCalc("xsec_dis", new genie::rew::GReWeightNuXSecDIS);
 	if (xsec_nc)
@@ -63,7 +67,6 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 		fGenieRW->AdoptWghtCalc("xsec_ncres", new genie::rew::GReWeightNuXSecNCRES);
 	if (xsec_nucqe)
 		fGenieRW->AdoptWghtCalc("nuclear_qe", new genie::rew::GReWeightFGM);
-
 
 	GReWeightNuXSecCCQE * rwccqe =
 	    dynamic_cast<GReWeightNuXSecCCQE *> (fGenieRW->WghtCalc("xsec_ccqe"));
@@ -114,6 +117,9 @@ void GENIEWeightEngine::IncludeDial(int nuisenum, double startval) {
 	// Initialize dial
 	fGenieRW->Systematics().Init( fGenieEnumSysts[nuisenum] );
 
+	// Add line to check dial is actually handled.
+	// if (fGenieRW->Systematics().IsHandled
+
 	// If Absolute
 	if (fIsAbsTwk) {
 		GSystUncertainty::Instance()->SetUncertainty( fGenieEnumSysts[nuisenum], 1.0, 1.0 );
@@ -159,6 +165,22 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	if (evt->fType != kGENIE) return 1.0;
 
 	// Make nom weight
+	if (!evt){
+	  THROW("evt not found : " << evt);
+	}
+
+	if (!(evt->genie_event)){
+	  THROW("evt->genie_event not found!" << evt->genie_event);
+	}
+
+	if (!(evt->genie_event->event)){
+	  THROW("evt->genie_event->event GHepRecord not found!" << (evt->genie_event->event));
+	}
+
+	if (!fGenieRW){
+	  THROW("GENIE RW Not Found!" << fGenieRW);
+	}
+
 	rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
 	//	std::cout << "Returning GENIE Weight for electron scattering = " << rw_weight << std::endl;
 #endif

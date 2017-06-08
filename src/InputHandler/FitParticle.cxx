@@ -30,6 +30,7 @@ FitParticle::FitParticle(double x, double y, double z, double t, int pdg, Int_t 
   case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
   case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
   default: fIsAlive=0; fNEUTStatusCode=999; break; // Other?
+  // default: fIsAlive=-1; fNEUTStatusCode=3; break;
   }
 
 };
@@ -46,6 +47,7 @@ void FitParticle::SetValues(double x, double y, double z, double t, int pdg, Int
   case     kFinalState:   fIsAlive= 1; fNEUTStatusCode=0; break; // Final State
   case     kFSIState:     fIsAlive= 0; fNEUTStatusCode=2; break; // Intermediate State
   default: fIsAlive=0; fNEUTStatusCode=999; break; // Other?
+  // default: fIsAlive=-1; fNEUTStatusCode=3; break;
   }
 
 };

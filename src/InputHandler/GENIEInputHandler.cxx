@@ -115,7 +115,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
   fEventType = kGENIE;
   fGenieNtpl = NULL;
   fGENIETree->SetBranchAddress("gmcrec", &fGenieNtpl);
-
+  fGENIETree->GetEntry(0);
+  
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
