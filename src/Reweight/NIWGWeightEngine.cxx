@@ -1,4 +1,4 @@
-#include "NEUTWeightEngine.h"
+#include "NIWGWeightEngine.h"
 
 NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 #ifdef __NIWG_ENABLED__
@@ -64,6 +64,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 
 void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 
 	// Get NEUT Syst.
 	niwg::rew::NIWGSyst_t gensyst = niwg::rew::NIWGSyst::FromString(name);
@@ -90,25 +91,31 @@ void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
 		SetDialValue(nuisenum, startval);
 	}
 #endif
+#endif
 }
 
 void NIWGWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 	fValues[fEnumIndex[nuisenum]] = val;
 	fNIWGRW->Systematics().Set(fNIWGSysts[fEnumIndex[nuisenum]], val);
+#endif
 #endif
 }
 
 void NIWGWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 	fValues[fNameIndex[name]] = val;
 	fNIWGRW->Systematics().Set(fNIWGSysts[fNameIndex[name]], val);
+#endif
 #endif
 }
 
 
 void NIWGWeightEngine::Reconfigure(bool silent) {
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 	// Hush now...
 	if (silent) StopTalking();
 
@@ -117,6 +124,7 @@ void NIWGWeightEngine::Reconfigure(bool silent) {
 
 	// Shout again
 	if (silent) StartTalking();
+#endif
 #endif
 }
 
@@ -133,7 +141,7 @@ double NIWGWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	// Hush now
 	StopTalking();
 
-	niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->fNeutVect);
+	niwg::rew::NIWGEvent* niwg_event = NIWGWeightEngine::GetNIWGEventLocal(evt->fNeutVect);
 	rw_weight *= fNIWGRW->CalcWeight(*niwg_event);
 	delete niwg_event;
 
@@ -149,9 +157,38 @@ double NIWGWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
 
 
+#ifdef __NEUT_ENABLED__
+#ifdef __NIWG_ENABLED__
+niwg::rew::NIWGEvent * NIWGWeightEngine::GetNIWGEventLocal(NeutVect* nvect)
+{
+  niwg::rew::NIWGEvent * fDummyNIWGEvent = NULL;
 
+  fDummyNIWGEvent = new niwg::rew::NIWGEvent();
+  fDummyNIWGEvent->detid = 1;   // MiniBooNE (apply CCQE LowE variations)
+  fDummyNIWGEvent->neutmode = nvect->Mode;
+  fDummyNIWGEvent->targetA = nvect->TargetA;
+  fDummyNIWGEvent->recenu_ccqe_sk = -1;
+  if (nvect->Ibound==0) fDummyNIWGEvent->targetA = 1;//RT: identifies as H, rather than O16
 
+  // Fill initial particle stack
+  for (int ip=0; ip<nvect->Npart(); ++ip) {
 
+    niwg::rew::NIWGPartStack fDummyPartStack;
+
+    fDummyPartStack.p = (nvect->PartInfo(ip)->fP)*0.001;  // Convert to GeV
+
+    fDummyPartStack.pdg = nvect->PartInfo(ip)->fPID;
+    fDummyPartStack.chase = nvect->PartInfo(ip)->fIsAlive;
+    fDummyPartStack.parent = nvect->ParentIdx(ip)-1;       // WARNING: this needs to be tested with a NeutRoot file
+
+    fDummyNIWGEvent->part_stack.push_back(fDummyPartStack);
+  }
+  fDummyNIWGEvent->CalcKinematics();
+
+  return fDummyNIWGEvent;
+}
+#endif
+#endif
 
 
 
