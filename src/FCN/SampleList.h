@@ -81,7 +81,7 @@
 #include "FNAL_CC1ppip_XSec_1DEnu_nu.h"
 #include "FNAL_CC1ppip_XSec_1DQ2_nu.h"
 // FNAL CC1ppim
-//#include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
+#include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
 
 // BEBC CCQE
 #include "BEBC_CCQE_XSec_1DQ2_nu.h"
@@ -131,16 +131,19 @@
 #include "MiniBooNE_CC1pi0_XSec_1Dcosmu_nu.h"
 #include "MiniBooNE_CC1pi0_XSec_1Dcospi0_nu.h"
 #include "MiniBooNE_CC1pi0_XSec_1Dppi0_nu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
+#include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
+
+
+
 
 // MiniBooNE NC1pi0
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
-#include "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h"
 
 // MiniBooNE NCEL
-// #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
+#include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 
 // MINERvA CCQE
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
@@ -222,23 +225,35 @@
 // MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
 #include "ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h"
+#include "MCStudy_CCQEHistograms.h"
 
 #include "GenericFlux_Tester.h"
 
 #include "MCStudy_KaonPreSelection.h"
 #include "MCStudy_MuonValidation.h"
+#include "ElectronFlux_FlatTree.h"
+#include "ElectronScattering_DurhamData.h"
+#include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
+
+#include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
+#include "T2K2017_FakeData.h"
 
 #include "FitWeight.h"
 
+#include "NuisConfig.h"
+#include "NuisKey.h"
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {
 
 //! Create a given sample given its name, file, type, fakdata(fkdt) file and the
 //! current rw engine and push it back into the list fChain.
-bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
+/*bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
                 std::string file, std::string type, std::string fkdt,
-                FitWeight* rw);
+                FitWeight* rw);*/
+MeasurementBase* CreateSample(std::string name, std::string file, std::string type, std::string fkdt, FitWeight* rw);
+MeasurementBase* CreateSample(nuiskey samplekey);
 }
 
 /*! @} */

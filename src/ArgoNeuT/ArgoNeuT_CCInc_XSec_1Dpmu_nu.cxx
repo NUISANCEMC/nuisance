@@ -18,30 +18,45 @@
 *******************************************************************************/
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
 
+
 //********************************************************************
-ArgoNeuT_CCInc_XSec_1Dpmu_nu::ArgoNeuT_CCInc_XSec_1Dpmu_nu(
-    std::string inputfile, FitWeight *rw, std::string type,
-    std::string fakeDataFile)
+ArgoNeuT_CCInc_XSec_1Dpmu_nu::ArgoNeuT_CCInc_XSec_1Dpmu_nu(nuiskey samplekey) {
 //********************************************************************
-{
-  fName = "ArgoNeuT_CCInc_XSec_1Dpmu_nu";
-  fDefaultTypes = "FIX/DIAG/CHI2";
-  fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2} Ar^{-1} GeV^{-1})";
-  EnuMin = 0;
-  EnuMax = 50;
-  fIsDiag = true;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  SetDataValues(GeneralUtils::GetTopLevelDir() +
-                "/data/ArgoNeuT/CCInc_dsig_dmumom_nu.dat");
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ArgoNeuT_CCInc_XSec_1Dpmu_nu sample. \n" \
+                        "Target: Ar40 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fDataHist->Scale(1E-38);
-  fDataTrue->Scale(1E-38);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#mu} (GeV)");
+  fSettings.SetYTitle("d#sigma/dp_{#mu} (cm^{2} Ar^{-1} GeV^{-1})");
+  fSettings.SetAllowedTypes("FIX/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 50.0);
+  fSettings.DefineAllowedTargets("Ar");
 
-  SetupDefaultHist();
+  // CCQELike plot information
+  fSettings.SetTitle("ArgoNeut CC-INC numu 1Dp_{#mu}");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ArgoNeuT/CCInc_dsig_dmumom_nu.dat" );
+  fSettings.DefineAllowedSpecies("numu");
 
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) *
-                (40.0 /*Data is /Ar */) / TotalIntegratedFlux("width");
+                 (40.0 /*Data is /Ar */) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  ScaleData(1E-38);
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 

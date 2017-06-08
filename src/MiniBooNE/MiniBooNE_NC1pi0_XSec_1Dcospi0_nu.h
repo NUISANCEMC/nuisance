@@ -25,7 +25,7 @@
 class MiniBooNE_NC1pi0_XSec_1Dcospi0_nu : public Measurement1D {
 public:
 
-  MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(nuiskey samplekey);
   virtual ~MiniBooNE_NC1pi0_XSec_1Dcospi0_nu() {};
 
   void FillEventVariables(FitEvent *event);

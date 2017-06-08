@@ -39,7 +39,7 @@ execute_process (COMMAND root-config
 
 set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
 
-set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;Geom;GenVector)
+set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;TreePlayer;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;Geom;GenVector;XMLIO)
 
 # Check GENIE requirements
 if(USE_GENIE)

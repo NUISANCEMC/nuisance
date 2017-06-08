@@ -18,50 +18,63 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
 
 //********************************************************************
-MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
 //********************************************************************
 
-  // Setup The Measurement
-  fName = name;
-  nBins = 6;
-  fPlotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
-  fIsRatio = true;
-  fIsDiag  = false;
-  target  = "";
-  SetupMeasurement(inputfiles, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCinc_XSec_1Dx_ratio sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  if      (name.find("C12")   != std::string::npos) target =   "C12";
-  else if (name.find("Fe56")  != std::string::npos) target =  "Fe56";
-  else if (name.find("Pb208") != std::string::npos) target = "Pb208";
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Reconstructed Bjorken x");
+  fSettings.SetYTitle("d#sigma/dx (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX/DIAG,FULL/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(0.0, 20.0);
+
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CCinc_XSec_1Dx_ratio");
+  fIsRatio = true;
+  nBins = 8;
+
+  target  = "";
+  if      (fSettings.Found("name", "C12")) target =   "C12";
+  else if (fSettings.Found("name", "Fe56")) target =   "Fe56";
+  else if (fSettings.Found("name", "Pb208")) target =   "Pb208";
   else {
     ERR(FTL) << "target " << target << " was not found!" << std::endl;
     exit(-1);
   }
 
+  std::string basedir = FitPar::GetDataBase() + "/MINERvA/CCinc/";
+  fSettings.SetDataInput(  basedir + "CCinc_" + target + "_CH_ratio_x_data.csv" );
+  fSettings.SetCovarInput( basedir + "CCinc_" + target + "_CH_ratio_x_covar.csv" );
+
+  FinaliseSampleSettings();
+
+
   // Get parsed input files
-  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR"<<std::endl;
+  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR" << std::endl;
   std::string inFileNUM = fSubInFiles.at(0);
   std::string inFileDEN = fSubInFiles.at(1);
 
-  // Push classes back into list for processing loop
-  // this->fSubChain.push_back(NUM);
-  // this->fSubChain.push_back(DEN);
+  // Scaling Setup ---------------------------------------------------
+  // Ratio of sub classes so non needed
 
-  // Setup the Data input
-  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
-  std::string datafilename  = "CCinc_"+target+"_CH_ratio_x_data.csv";
-  std::string covarfilename = "CCinc_"+target+"_CH_ratio_x_covar.csv";
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromTextFile(fSettings.GetCovarInput());
 
-  this->SetDataValues( basedir + datafilename );
-  this->SetCovarMatrixFromText( basedir + covarfilename, nBins);
-
-  // Setup Experiments
-  NUM  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_"+target+"_CH_NUM", inFileNUM, rw, type, fakeDataFile);
-  DEN  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_"+target+"_CH_DEN", inFileDEN, rw, type, fakeDataFile);
+  // Setup Experiments  -------------------------------------------------------
+  std::string type = samplekey.GetS("type");
+  NUM  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_" + target + "_CH_NUM", inFileNUM, type);
+  DEN  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_" + target + "_CH_DEN", inFileDEN, type);
   NUM  ->SetNoData();
   DEN  ->SetNoData();
 
@@ -70,17 +83,17 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(std::string name, std
   this->fSubChain.push_back(NUM);
   this->fSubChain.push_back(DEN);
 
-  // Setup Default MC Hists
-  this->SetupDefaultHist();
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots(){
+void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
 //********************************************************************
 
   UInt_t sample = 0;
-  for (std::vector<MeasurementBase*>::const_iterator expIter = this->fSubChain.begin(); expIter != this->fSubChain.end(); expIter++){
+  for (std::vector<MeasurementBase*>::const_iterator expIter = this->fSubChain.begin(); expIter != this->fSubChain.end(); expIter++) {
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
 
     if      (sample == 0) this->NUM = static_cast<MINERvA_CCinc_XSec_1Dx_nu*>(exp);
@@ -93,19 +106,22 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots(){
   TH1D* NUM_MC = (TH1D*)this->NUM->GetMCList().at(0)->Clone();
   TH1D* DEN_MC = (TH1D*)this->DEN->GetMCList().at(0)->Clone();
 
-  for (int i=0; i < nBins; ++i){
+  std::cout << "MakingPlots CCINC X = " << NUM_MC->Integral() << " " << DEN_MC->Integral() << std::endl;
+  sleep(10);
+
+  for (int i = 0; i < nBins; ++i) {
     double binVal = 0;
     double binErr = 0;
 
-    if (DEN_MC->GetBinContent(i+1) && NUM_MC->GetBinContent(i+1)) {
-      binVal = NUM_MC->GetBinContent(i+1)/DEN_MC->GetBinContent(i+1);
-      double fractErrNUM = NUM_MC->GetBinError(i+1)/NUM_MC->GetBinContent(i+1);
-      double fractErrDEN = DEN_MC->GetBinError(i+1)/DEN_MC->GetBinContent(i+1);
-      binErr = binVal*sqrt(fractErrNUM*fractErrNUM + fractErrDEN*fractErrDEN);
+    if (DEN_MC->GetBinContent(i + 1) && NUM_MC->GetBinContent(i + 1)) {
+      binVal = NUM_MC->GetBinContent(i + 1) / DEN_MC->GetBinContent(i + 1);
+      double fractErrNUM = NUM_MC->GetBinError(i + 1) / NUM_MC->GetBinContent(i + 1);
+      double fractErrDEN = DEN_MC->GetBinError(i + 1) / DEN_MC->GetBinContent(i + 1);
+      binErr = binVal * sqrt(fractErrNUM * fractErrNUM + fractErrDEN * fractErrDEN);
     }
 
-    this->fMCHist->SetBinContent(i+1, binVal);
-    this->fMCHist->SetBinError(i+1, binErr);
+    this->fMCHist->SetBinContent(i + 1, binVal);
+    this->fMCHist->SetBinError(i + 1, binErr);
   }
 
   return;
@@ -113,7 +129,7 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots(){
 
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile, int dim){
+void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile, int dim) {
 //********************************************************************
 
   // WARNING this reads in the data CORRELATIONS
@@ -121,23 +137,23 @@ void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile,
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(),ifstream::in);
+  std::ifstream covar(covarFile.c_str(), ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
   this->fFullCovar = new TMatrixDSym(dim);
-  if(covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
-  else ERR(FTL) <<"Covariance matrix provided is incorrect: "<<covarFile<<std::endl;
+  if (covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
+  else ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile << std::endl;
 
-  while(std::getline(covar >> std::ws, line, '\n')){
+  while (std::getline(covar >> std::ws, line, '\n')) {
     int column = 0;
 
     // Loop over entries and insert them into matrix
     // Multiply by the errors to get the covariance, rather than the correlation matrix
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++){
+         iter != entries.end(); iter++) {
 
-      double val = (*iter) * this->fDataHist->GetBinError(row+1)*this->fDataHist->GetBinError(column+1);
+      double val = (*iter) * this->fDataHist->GetBinError(row + 1) * this->fDataHist->GetBinError(column + 1);
 
       (*this->covar)(row, column) = val;
       (*this->fFullCovar)(row, column) = val;
@@ -156,22 +172,25 @@ void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile,
 
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::Write(std::string drawOpt){
+void MINERvA_CCinc_XSec_1Dx_ratio::Write(std::string drawOpt) {
 //********************************************************************
 
-  LOG(SAM)<<"Writing Normal Plots in MINERvA_CCinc_XSec_1Dx_ratio::Write()" <<std::endl;
-  this->GetDataList().at(0)->Write();
-  this->GetMCList()  .at(0)->Write();
+  LOG(SAM) << "Writing Normal Plots in MINERvA_CCinc_XSec_1Dx_ratio::Write()" << std::endl;
+  JointMeas1D::Write(drawOpt);
+  return;
 
-  if (this->fFullCovar){
+  //this->GetDataList().at(0)->Write();
+  //  this->GetMCList()  .at(0)->Write();
+
+  if (this->fFullCovar) {
     TH2D cov = TH2D((*this->fFullCovar));
-    cov.SetNameTitle((this->fName+"_cov").c_str(),(this->fName+"_cov;Bins; Bins;").c_str());
+    cov.SetNameTitle((this->fName + "_cov").c_str(), (this->fName + "_cov;Bins; Bins;").c_str());
     cov.Write();
   }
 
-  if (this->covar){
+  if (this->covar) {
     TH2D covinv = TH2D((*this->covar));
-    covinv.SetNameTitle((this->fName+"_covinv").c_str(),(this->fName+"_covinv;Bins; Bins;").c_str());
+    covinv.SetNameTitle((this->fName + "_covinv").c_str(), (this->fName + "_covinv;Bins; Bins;").c_str());
     covinv.Write();
   }
 

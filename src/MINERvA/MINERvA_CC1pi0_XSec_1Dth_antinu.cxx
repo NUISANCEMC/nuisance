@@ -21,31 +21,53 @@
 
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
 
-// The constructor
-MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  fName = name;
-  fPlotTitles = "; #theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
-  fUpdatedData = fName.find("2015") == std::string::npos;
-  EnuMin = 1.5;
-  EnuMax = 10;
+//********************************************************************
+MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CC1pi0_XSec_1Dth_antinu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  if (fUpdatedData){
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("d#sigma(E_{#nu}) (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fUpdatedData = !fSettings.Found("name", "2015");
+  fFluxCorrection = fSettings.Found("name","fluxcorr");
+  
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CC1pi0_XSec_1Dth_antinu");
+  fSettings.DefineAllowedSpecies("numu");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  if (fUpdatedData) {
 
     hadMassCut = 1800;
     fIsDiag = false;
 
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-angle.csv");
+    SetDataFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-pion-angle.csv");
 
     // Error is given as percentage of cross-section
     // Need to scale the bin error properly before we do correlation -> covariance conversion
-    for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-      fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinError(i + 1, fDataHist->GetBinContent(i + 1)*fDataHist->GetBinError(i + 1) / 100.);
     }
 
-    this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv", fDataHist->GetNbinsX());
+    SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv");
 
   } else {
 
@@ -56,24 +78,26 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(std::string nam
     // No hadronic mass cut on old publication
     hadMassCut = 99999;
 
-    this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2015/ccpi0_th.csv");
-    this->SetupDefaultHist();
+    SetDataFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2015/ccpi0_th.csv");
+    SetCovarFromDiagonal();
 
-    // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
-    // Please change when MINERvA releases new data!
-    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-      fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
-    }
 
-    fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-    covar     = StatUtils::GetInvert(fFullCovar);
   } // end special treatment depending on release year
 
-  this->SetupDefaultHist();
 
+  if (fFluxCorrection) {
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) * 1.11);
+    }
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  }
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
+
 
 void MINERvA_CC1pi0_XSec_1Dth_antinu::FillEventVariables(FitEvent *event) {
 
@@ -89,7 +113,7 @@ void MINERvA_CC1pi0_XSec_1Dth_antinu::FillEventVariables(FitEvent *event) {
   double th      = -999;
 
   if (hadMass < hadMassCut)
-    th = (180./M_PI)*FitUtils::th(Pnu, Ppi0);
+    th = (180. / M_PI) * FitUtils::th(Pnu, Ppi0);
 
   fXVar = th;
 

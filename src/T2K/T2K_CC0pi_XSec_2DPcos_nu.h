@@ -30,7 +30,7 @@ public:
   /// T2K_CC0pi_XSec_2DPcos_nu    -> T2K CC0PI Analysis 2
   /// T2K_CC0pi_XSec_2DPcos_nu_I  -> T2K CC0PI Analysis 1
   /// T2K_CC0pi_XSec_2DPcos_nu_II -> T2K CC0PI Analysis 2
-  T2K_CC0pi_XSec_2DPcos_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type);
+  T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey);
 
   /// Virtual Destructor
   ~T2K_CC0pi_XSec_2DPcos_nu() {};

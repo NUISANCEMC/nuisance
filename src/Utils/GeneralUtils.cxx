@@ -16,10 +16,35 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "GeneralUtils.h"
 
-std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del){
+std::string GeneralUtils::BoolToStr(bool val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+}
+
+std::string GeneralUtils::IntToStr(int val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+};
+
+std::string GeneralUtils::DblToStr(double val) {
+  std::ostringstream ss;
+  ss << val;
+  return ss.str();
+};
+
+std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc, char* argv[]){
+  std::vector<std::string> vect;
+  for (int i = 1; i < argc; i++){
+    vect.push_back( std::string(argv[i]) );
+  }
+  return vect;
+}
+
+std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -28,13 +53,12 @@ std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* d
   while (std::getline(stream >> std::ws, temp_string, *del)) {
     if (temp_string.empty()) continue;
     vals.push_back(temp_string);
-
   }
 
   return vals;
-
 }
-std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del){
+
+std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -49,11 +73,10 @@ std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del){
     vals.push_back(entry);
 
   }
-  
   return vals;
 }
 
-std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del){
+std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del) {
 
   std::istringstream stream(str);
   std::string temp_string;
@@ -68,13 +91,11 @@ std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del){
     vals.push_back(entry);
 
   }
-
   return vals;
 }
 
-// To stop rooku's skin from crawling :p
-double GeneralUtils::StrToDbl(std::string str){
-  
+double GeneralUtils::StrToDbl(std::string str) {
+
   std::istringstream stream(str);
   double val;
   stream >> val;
@@ -82,7 +103,7 @@ double GeneralUtils::StrToDbl(std::string str){
   return val;
 }
 
-int GeneralUtils::StrToInt(std::string str){
+int GeneralUtils::StrToInt(std::string str) {
 
   std::istringstream stream(str);
   int val;
@@ -91,8 +112,17 @@ int GeneralUtils::StrToInt(std::string str){
   return val;
 }
 
-bool GeneralUtils::StrToBool(std::string str){
+bool GeneralUtils::StrToBool(std::string str) {
 
+  // convert result to lower case
+  for (int i = 0; i < str.size(); i++) str[i] = std::tolower(str[i]);
+
+  // Test for true/false
+  if      (!str.compare("false")) return false;
+  else if (!str.compare("true") ) return true;
+  if (str.empty()) return false;
+
+  // Push into bool
   std::istringstream stream(str);
   bool val;
   stream >> val;
@@ -100,39 +130,36 @@ bool GeneralUtils::StrToBool(std::string str){
   return val;
 }
 
+std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del) {
 
-std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del){
-  
   std::vector<std::string> linevect;
   std::string line;
-  
+
   std::ifstream read;
   read.open(str.c_str());
-  
-  if (!read.is_open()){
-    ERR(FTL) << "Cannot open file " << str << " in ParseFileToStr" << std::endl;
-    throw;
+
+  if (!read.is_open()) {
+    THROW("Cannot open file " << str << " in ParseFileToStr");
   }
-  
-  while( std::getline(read >> std::ws, line, *del) ){
+
+  while ( std::getline(read >> std::ws, line, *del) ) {
     linevect.push_back(line);
   }
 
   read.close();
-  
+
   return linevect;
 }
 
-std::string GeneralUtils::GetTopLevelDir(){
+std::string GeneralUtils::GetTopLevelDir() {
 
   static bool first = true;
   static std::string topLevelVarVal;
-  
-  if(first){
+
+  if (first) {
     char * const var = getenv("EXT_FIT");
-    if(!var){ 
-      ERR(FTL) << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
-      exit(-1);
+    if (!var) {
+      THROW("Cannot find top level directory! Set the EXT_FIT environmental variable");
     }
     topLevelVarVal = std::string(var);
     first = false;

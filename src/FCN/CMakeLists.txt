@@ -38,9 +38,12 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/ANL)
 include_directories(${CMAKE_SOURCE_DIR}/src/BNL)
@@ -49,9 +52,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src/GGM)
 include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
 include_directories(${CMAKE_SOURCE_DIR}/src/MiniBooNE)
 include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
-
+include_directories(${CMAKE_SOURCE_DIR}/src/Electron)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
+
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")

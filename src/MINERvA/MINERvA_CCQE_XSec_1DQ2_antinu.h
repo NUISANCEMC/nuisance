@@ -26,7 +26,7 @@ class MINERvA_CCQE_XSec_1DQ2_antinu : public Measurement1D {
 //********************************************************************
 public:
 
-  MINERvA_CCQE_XSec_1DQ2_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCQE_XSec_1DQ2_antinu(nuiskey samplekey);
   virtual ~MINERvA_CCQE_XSec_1DQ2_antinu() {};
 
   // Functions for handling each neut event

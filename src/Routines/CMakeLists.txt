@@ -48,8 +48,11 @@ include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 

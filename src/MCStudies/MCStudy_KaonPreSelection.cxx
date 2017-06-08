@@ -75,7 +75,7 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
   // Create a new TTree and add Nuisance Events Branches
   FitPar::Config().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
-  GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
+  GetInput()->GetNuisanceEvent(0)->AddBranchesToTree(fEventTree);
 
   fEventTree->Branch("nlep",&nlep, "nlep/I");
   fEventTree->Branch("nkplus",&nkplus, "nkplus/I");
@@ -160,8 +160,8 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 
   // Fill If Signal
   if (isSignal(event)){
-
     fEventTree->Fill();
+
     if (fKaonLogging){
       int nstrangemesons = event->NumParticle(321);
       int nstrangefsmesons = event->NumFSParticle(321);
@@ -177,7 +177,6 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 
   return;
 };
-
 
 //********************************************************************
 void MCStudy_KaonPreSelection::Write(std::string drawOpt) {

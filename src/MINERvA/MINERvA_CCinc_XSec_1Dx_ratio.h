@@ -28,7 +28,7 @@
 class MINERvA_CCinc_XSec_1Dx_ratio : public JointMeas1D {
 public:
 
-  MINERvA_CCinc_XSec_1Dx_ratio(std::string name, std::string inputfiles, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey);
   virtual ~MINERvA_CCinc_XSec_1Dx_ratio() {};
 
   void MakePlots();

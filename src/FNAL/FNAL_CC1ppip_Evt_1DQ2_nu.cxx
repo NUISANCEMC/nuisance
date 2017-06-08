@@ -19,32 +19,46 @@
 
 #include "FNAL_CC1ppip_Evt_1DQ2_nu.h"
 
-// The constructor
-FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "FNAL_CC1ppip_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC1#pi} (GeV^{2}); Number of events";
-  EnuMin = 10;
-  EnuMax = 100;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/FNAL/CC1pip_on_p/FNAL_cc1ppip_nEvent_Q2_w14_bin_edit.txt");
-  this->SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "FNAL_CC1ppip_Evt_1DQ2_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC1#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(10.0, 100.0);
+  fSettings.DefineAllowedTargets("D,H");
 
+  // plot information
+  fSettings.SetTitle("FNAL_CC1ppip_Evt_1DQ2_nu");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "FNAL/CC1pip_on_p/FNAL_cc1ppip_nEvent_Q2_w14_bin_edit.txt");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  FinaliseSampleSettings();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
-};
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor for shape
+  fScaleFactor =  GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
+}
 
 
 void FNAL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {

@@ -24,14 +24,11 @@
 
 class BNL_CC1ppip_Evt_1DQ2_nu : public Measurement1D {
 public:
-  BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  BNL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey);
   virtual ~BNL_CC1ppip_Evt_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-
-  //void ScaleEvents();
-  //void FillHistograms();
 
  private:
   double HadCut; // Hadronic mass cut, specified by user (W < 1.4 or no W cut)

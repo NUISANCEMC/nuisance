@@ -21,30 +21,48 @@
 
 #include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
 
-// The constructor
-MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dpmu_antinu";
-  fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
-  EnuMin = 1.5;
-  EnuMax = 10;
-  fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-muon-momentum.csv");
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CC1pi0_XSec_1Dpmu_antinu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // Error is given as percentage of cross-section
-  // Need to scale the bin error properly before we do correlation -> covariance conversion
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#mu} (GeV)");
+  fSettings.SetYTitle("d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CC1pi0_XSec_1Dpmu_antinu");
+  fSettings.DefineAllowedSpecies("numu");
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2016/anu-cc1pi0-xsec-muon-momentum.csv");
   for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
     fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*fDataHist->GetBinError(i+1)/100.);
   }
 
-  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-muon-momentum.csv", fDataHist->GetNbinsX());
+  SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-muon-momentum.csv");
 
-  this->SetupDefaultHist();
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
+
 
 void MINERvA_CC1pi0_XSec_1Dpmu_antinu::FillEventVariables(FitEvent *event) {
 

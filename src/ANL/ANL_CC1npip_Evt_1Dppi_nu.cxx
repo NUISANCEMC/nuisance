@@ -19,33 +19,41 @@
 
 #include "ANL_CC1npip_Evt_1Dppi_nu.h"
 
-// The constructor
-ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+//********************************************************************
+ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC1npip_Evt_1Dppi_nu";
-  fPlotTitles = "; p_{#pi} (MeV); Number of events";
-  EnuMin = 0;
-  EnuMax = 1.5;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL_CC1npip_Evt_1Dppi_nu sample. \n" \
+                        "Dist   : Pion Momentum : p_{#pi} \n" \
+                        "Signal : numuCC1pi+1p : #nu_{#mu}-CC-1#pi^{+}-1p \n" \
+                        "Target : Deuterium : D2 \n" \
+                        "Flux   : ANL FHC numu \n";
 
-  // ANL ppi has Enu < 1.5 GeV, W < 1.4 GeV
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  // fSettings.SetDescription(descrip);
+  // fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  // fSettings.SetPlotTitles("p_{#pi} (MeV); Number of events");
+  // fSettings.SetAllowedTypes("EVT/SHAPE/DIAG");
+  // fSettings.SetDefaultTypes("EVT/SHAPE/DIAG");
+  // fSettings.SetAllowedTargets("D,H");
+  // fSettings.SetAllowedSpecies("numu");
+  // fSettings.SetEnergyRange(0.0, 1.5);
+  FinaliseSampleSettings();
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.) * 2. / 1.;
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( FitPar::GetDataBase() + "/ANL/CC1pip_on_n/ANL_ppi_CC1npip.csv" );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/double(fNEvents)*(16./8.);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
@@ -64,7 +72,7 @@ void ANL_CC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   double ppip;
 
   // This measurement has a 1.4 GeV M(Npi) constraint
-  if (hadMass < 1400) ppip = FitUtils::p(Ppip)*1000.;
+  if (hadMass < 1400) ppip = FitUtils::p(Ppip) * 1000.;
   else ppip = -1.0;
 
   fXVar = ppip;

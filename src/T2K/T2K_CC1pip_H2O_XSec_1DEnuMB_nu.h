@@ -6,7 +6,7 @@
 
 class T2K_CC1pip_H2O_XSec_1DEnuMB_nu : public Measurement1D {
 public:
-  T2K_CC1pip_H2O_XSec_1DEnuMB_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  T2K_CC1pip_H2O_XSec_1DEnuMB_nu(nuiskey samplekey);
   virtual ~T2K_CC1pip_H2O_XSec_1DEnuMB_nu() {};
 
   void FillEventVariables(FitEvent *event);

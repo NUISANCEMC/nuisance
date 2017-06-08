@@ -24,13 +24,11 @@
 
 class BEBC_CC1npip_XSec_1DEnu_nu : public Measurement1D {
 public:
-  BEBC_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  BEBC_CC1npip_XSec_1DEnu_nu(nuiskey samplekey);
   virtual ~BEBC_CC1npip_XSec_1DEnu_nu() {};
 
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
 
  private:
 

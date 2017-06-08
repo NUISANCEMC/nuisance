@@ -21,39 +21,50 @@
 
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
-T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(std::string name,
-						   std::string inputfile,
-						   FitWeight *rw,
-						   std::string type){
 
-  fName = name;
-  if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
+
+//********************************************************************
+T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey) {
+//********************************************************************
+
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "T2K_CC0pi_XSec_2DPcos_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Medium Energy FHC numu  \n" \
+                        "Signal: CC-inclusive with theta < 20deg \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("P_{#mu} (GeV)");
+  fSettings.SetYTitle("cos#theta_{#mu}");
+  fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
+  fSettings.SetEnuRange(0.0, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+
+ if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
   else fAnalysis = 2;
 
-  forwardgoing = (type.find("REST") != std::string::npos);
-  EnuMin = 0;
-  EnuMax = 10.0;
-  fBeamDistance = 0.280;
-  fDefaultTypes = "FIX";
-  fAllowedTypes = "DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV";
-  fNDataPointsX = 12;
-  fNDataPointsY = 10;
-  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  fIsSystCov = type.find("SYSTCOV") != std::string::npos;
-  fIsStatCov = type.find("STATCOV") != std::string::npos;
-  fIsNormCov = type.find("NORMCOV") != std::string::npos;
 
-  fPlotTitles = "; P_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
+  // CCQELike plot information
+  fSettings.SetTitle("T2K_CC0pi_XSec_2DPcos_nu");
+  fSettings.DefineAllowedSpecies("numu");
+
+  forwardgoing = (fSettings.GetS("type").find("REST") != std::string::npos);
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
+
+  // Setup Histograms
   SetHistograms();
-  SetupDefaultHist();
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
 
-  // Diagonal covar setup
-  if (!fIsShape) fAddNormPen = true;
-  fNormError = 0.089; // Set from covar mat instead...
-
-  // Get Scaling
-  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 /
-		  (TotalIntegratedFlux()));
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 
@@ -181,10 +192,16 @@ void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
 
 void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
+  fIsSystCov = fSettings.GetS("type").find("SYSTCOV") != std::string::npos;
+  fIsStatCov = fSettings.GetS("type").find("STATCOV") != std::string::npos;
+  fIsNormCov = fSettings.GetS("type").find("NORMCOV") != std::string::npos;
+  fNDataPointsX = 12;
+  fNDataPointsY = 10;
+
   // Open file
   std::string infile = FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root";
   TFile* rootfile = new TFile(infile.c_str(), "READ");
-  TH2D* tempcov;
+  TH2D* tempcov = NULL;
 
   // ANALYSIS 2
   if (fAnalysis == 2){
@@ -224,12 +241,16 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
   } else if (fAnalysis == 1){
 
     //TODO (P.Stowell) Add a TH2Poly Measurement class
-    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << endl;
-    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << endl;
+    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << std::endl;
+    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << std::endl;
     throw;
 
   }
 
+  if (!tempcov){
+    ERR(FTL) << "TEMPCOV NOT SET" << std::endl;
+    throw;
+  }
 
   // Setup Covar
   int nbins = tempcov->GetNbinsX();

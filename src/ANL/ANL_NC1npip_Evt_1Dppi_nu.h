@@ -29,17 +29,11 @@
 class ANL_NC1npip_Evt_1Dppi_nu : public Measurement1D {
  public:
   
-  ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
-  
+  ANL_NC1npip_Evt_1Dppi_nu(nuiskey samplekey);
   virtual ~ANL_NC1npip_Evt_1Dppi_nu() {};
   
-  //void ResetAll();
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  //void FillHistograms();
-  //void ScaleEvents(); 
-  //void ApplyNormScale(double norm);
-  //void Write();
 
  private:
 };

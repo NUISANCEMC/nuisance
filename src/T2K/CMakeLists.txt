@@ -34,6 +34,7 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu.cxx
 T2K_CC1pip_H2O_XSec_1Dpmu_nu.cxx
 T2K_CC1pip_H2O_XSec_1Dppi_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.cxx
+T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
 T2K_SignalDef.cxx
 )
 
@@ -55,6 +56,7 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu.h
 T2K_CC1pip_H2O_XSec_1Dpmu_nu.h
 T2K_CC1pip_H2O_XSec_1Dppi_nu.h
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.h
+T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h
 T2K_SignalDef.h
 )
 
@@ -69,7 +71,10 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION

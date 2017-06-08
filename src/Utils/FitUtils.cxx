@@ -16,13 +16,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #include "FitUtils.h"
 
 /*
   MISC Functions
 */
-
 
 //********************************************************************
 double *FitUtils::GetArrayFromMap(std::vector<std::string> invals,
@@ -166,18 +164,9 @@ double FitUtils::ProtonQ2QErec(double pE, double binding) {
 //********************************************************************
 double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
                           bool neutrino) {
-  //********************************************************************
+//********************************************************************
 
-  double momshift = 0.0;
-  double temp = FitPar::Config().GetParD("muon_momentum_shift");
-  if (temp != -999.9 and temp != 0.0) {
-    if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
-      momshift = temp;
-    else if (FitPar::Config().GetParI("muon_momentum_throw") == 1) {
-      momshift = gRandom->Gaus(0.0, 1.0) * temp;
-    }
-  }
-
+ 
   // Convert all values to GeV
   const double V = binding / 1000.;           // binding potential
   const double mn = PhysConst::mass_neutron;  // neutron mass
@@ -194,7 +183,6 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
-  pl += momshift;
 
   double rEnu =
       (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
@@ -205,20 +193,10 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
 
 double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
                          bool neutrino) {
-  double momshift = 0.0;
-  double temp = FitPar::Config().GetParD("muon_momentum_shift");
-  if (temp != -999.9 and temp != 0.0) {
-    if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
-      momshift = temp;
-    else if (FitPar::Config().GetParI("muon_momentum_throw") == 1) {
-      momshift = gRandom->Gaus(0.0, 1.0) * temp;
-    }
-  }
 
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
-  pl += momshift / 1000.;
 
   double rEnu = EnuQErec(pmu, costh, binding, neutrino);
   double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);

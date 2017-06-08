@@ -21,40 +21,49 @@
 
 #include "MINERvA_CCinc_XSec_1DEnu_nu.h"
 
+
 //********************************************************************
-MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type,
-						     std::string fakeDataFile){
+MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::string inputfile, std::string type){
 //********************************************************************
 
-  // Measurement Details
-  fName = name;
-  fPlotTitles = "; Neutrino energy (GeV); d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)";
-  EnuMin = 2.;
-  EnuMax = 20.;
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCinc_XSec_1DEnu_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(name, inputfile, type);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)");
+  fSettings.SetAllowedTypes("FIX/DIAG/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(2.0, 20.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetTitle("MINERvA_CCinc_XSec_1DEnu_nu");
+
   target = "";
-  fIsRawEvents = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
-  if      (name.find("C12")   != std::string::npos) target =   "C12";
+  if      (name.find("C12")  != std::string::npos) target =   "C12";
   else if (name.find("Fe56")  != std::string::npos) target =  "Fe56";
   else if (name.find("Pb208") != std::string::npos) target = "Pb208";
   if      (name.find("DEN")   != std::string::npos) target =   "CH";
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
-  // Setup the Data Plots
-  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
-  std::string smearfilename  = "CCinc_"+target+"_x_smear.csv";
-  int nbins = 8;
-  double bins[9] = {2, 3, 4, 5, 6, 8, 10, 15, 20};
+  // fSettings.SetSmearingInput( FitPar::GetDataBase() + "/MINERvA/CCinc/CCinc_"+target+"_x_smear.csv" );
 
-  // Make a dummy fDataHist so it is used to construct other histograms...
-  this->fDataHist = new TH1D(name.c_str(),(name+fPlotTitles).c_str(),nbins,bins);
+  FinaliseSampleSettings();
 
-  // Setup Default MC Histograms
-  this->SetupDefaultHist();
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
 
-  // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
+  // Plot Setup -------------------------------------------------------
+  double binsx[9] = {2, 3, 4, 5, 6, 8, 10, 15, 20};
+  CreateDataHistogram(8, binsx);
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 
@@ -74,7 +83,6 @@ void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
   fXVar   = Enu;
   return;
 }
-
 
 
 //********************************************************************

@@ -20,23 +20,40 @@
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 
 // The constructor
-K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey){
   
-  fName = "K2K_NC1pi0_Evt_1Dppi0_nu";
-  fPlotTitles = "; p_{#pi^{0}} (MeV/c); Number of events";
-  EnuMin = 0.;
-  EnuMax = 5.;
-  fIsDiag = true;
-  fNormError = 0.15;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+// Sample overview ---------------------------------------------------
+  std::string descrip = "K2K_NC1pi0_Evt_1Dppi0_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/K2K/nc1pi0/ppi0.csv");
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#pi^{0}} (MeV/c)");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
+  fSettings.SetEnuRange(0.0, 5.0);
+  fSettings.DefineAllowedTargets("H,O");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // plot information
+  fSettings.SetTitle("K2K_NC1pi0_Evt_1Dppi0_nu");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "K2K/nc1pi0/ppi0.csv");
 
-  this->fScaleFactor = 1; // No need to care about scaling factors for shape measurements
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor for shape
+  fScaleFactor = (fDataHist->Integral() / (fNEvents + 0.));
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 };
 
 void K2K_NC1pi0_Evt_1Dppi0_nu::FillEventVariables(FitEvent *event) {

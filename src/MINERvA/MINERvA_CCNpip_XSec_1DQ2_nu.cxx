@@ -20,34 +20,53 @@
 #include "MINERvA_SignalDef.h"
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
 
+
 //********************************************************************
-// The constructor
-MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+MINERvA_CCNpip_XSec_1DQ2_nu::MINERvA_CCNpip_XSec_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
-  fName = "MINERvA_CCNpip_XSec_1DQ2_nu";
-  fPlotTitles = "; Q^{2} (GeV^{2}); d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)";
-  EnuMin = 1.5;
-  EnuMax = 10;
-  fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCNpip_XSec_1DQ2_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-q2.csv");
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CCNpip_XSec_1DQ2_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-q2.csv" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-q2.csv");
+  fSettings.DefineAllowedSpecies("numu");
 
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
   // MINERvA has the error quoted as a percentage of the cross-section
   // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
-  for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-    fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
+  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+    fDataHist->SetBinError(i + 1, fDataHist->GetBinContent(i + 1) * (fDataHist->GetBinError(i + 1) / 100.));
   }
 
-  // This is a correlation matrix
-  this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-q2.csv", fDataHist->GetNbinsX());
+  SetCorrelationFromTextFile(fSettings.GetCovarInput() );
 
-  this->SetupDefaultHist();
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
+
 
 //********************************************************************
 void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
@@ -61,7 +80,7 @@ void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   // This Q2 defaults to calculating true Q2 (using true Enu instead of recon. Enu)
   // This agrees with what MINERvA used
   double q2 = -999;
-  if (hadMass < 1800) q2 = -1*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < 1800) q2 = -1 * (Pnu - Pmu).Mag2() / 1.E6;
 
   fXVar = q2;
 

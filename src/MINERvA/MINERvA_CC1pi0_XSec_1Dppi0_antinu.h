@@ -24,7 +24,7 @@
 
 class MINERvA_CC1pi0_XSec_1Dppi0_antinu : public Measurement1D {
 public:
-  MINERvA_CC1pi0_XSec_1Dppi0_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CC1pi0_XSec_1Dppi0_antinu(nuiskey samplekey);
   virtual ~MINERvA_CC1pi0_XSec_1Dppi0_antinu() {};
 
   void FillEventVariables(FitEvent *event);
@@ -32,6 +32,7 @@ public:
 
 private:
   bool fUpdatedData;
+  bool fFluxCorrected;
 };
 
 #endif

@@ -20,103 +20,122 @@
 #include "MINERvA_SignalDef.h"
 #include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 
+
 //********************************************************************
-// The constructor
-MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(nuiskey samplekey) {
 //********************************************************************
 
-  fName = name;
-  fPlotTitles = "; #theta_{#pi} (degrees); (1/T#Phi) dN_{#pi}/d#theta_{#pi} (cm^{2}/degrees/nucleon)";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCNpip_XSec_1Dth_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // If we have full phase space we won't find 20deg in name
-  fFullPhaseSpace = (fName.find("_20deg") == std::string::npos);
-  // If we have updated data we won't have 2015 in name
-  fUpdatedData = fName.find("2015") == std::string::npos;
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("#theta_{#pi} (degrees)");
+  fSettings.SetYTitle("(1/T#Phi) dN_{#pi}/d#theta_{#pi} (cm^{2}/degrees/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
 
-  EnuMin = 1.5;
-  EnuMax = 10;
-  fIsDiag = false;
+  fFullPhaseSpace = !fSettings.Found("name", "_20deg");
+  fFluxCorrection = fSettings.Found("name", "fluxcorr");
+  fUpdatedData    = !fSettings.Found("name", "2015");
+  fSettings.SetTitle("MINERvA_CCNpip_XSec_1Dth_nu");
+  
+  FinaliseSampleSettings();
 
-  // Reserve length 3 for the number of pions
-  // We fill once per pion found in the event, so can fill multiple times for one event
-  thVect.reserve(3);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
 
-  // So here is all the data we want to read in, pfoaw!
-  // Same W cut for all releases
-
+  // Plot Setup -------------------------------------------------------
   // Full Phase Space
   if (fFullPhaseSpace) {
 
     // 2016 release data
     if (fUpdatedData) {
 
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
+      SetDataFromTextFile( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2016/nu-ccNpi+-xsec-pion-angle.csv");
 
       // MINERvA has the error quoted as a percentage of the cross-section
       // Need to make this into an absolute error before we go from correlation matrix -> covariance matrix since it depends on the error in the ith bin
-      for (int i = 0; i < fDataHist->GetNbinsX()+1; i++) {
-        fDataHist->SetBinError(i+1, fDataHist->GetBinContent(i+1)*(fDataHist->GetBinError(i+1)/100.));
+      for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+        fDataHist->SetBinError(i + 1, fDataHist->GetBinContent(i + 1) * (fDataHist->GetBinError(i + 1) / 100.));
       }
 
       // This is a correlation matrix! but it's all fixed in SetCovarMatrixFromText
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv", fDataHist->GetNbinsX());
-    // 2015 release data
+      SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2016/nu-ccNpi+-correlation-pion-angle.csv");
+
+      // 2015 release data
     } else {
       // 2015 release allows for shape comparisons
 
       if (fIsShape) {
-        fName += "_shape";
-        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
-        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt", fDataHist->GetNbinsX());
+        SetDataFromTextFile( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape.txt");
+        SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_shape_cov.txt");
       } else {
-        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
-        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt", fDataHist->GetNbinsX());
+        SetDataFromTextFile( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th.txt");
+        SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_cov.txt");
       }
 
-      // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
-      // Please change when MINERvA releases new data!
-      for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-        fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
-      }
     }
 
-  // Restricted Phase Space Data
+    // Restricted Phase Space Data
   } else {
 
     // 2016 release data unfortunately not released in 20degree forward-going, revert to 2015 data
-    if (fUpdatedData){
-      LOG(SAM) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl;
-      fUpdatedData = false;
+    if (fUpdatedData) {
+      ERR(FTL) << fName << " has no updated 2016 data for restricted phase space! Using 2015 data." << std::endl;
+      throw;
     }
 
     // Only 2015 20deg data
     if (fIsShape) {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape.txt");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+
-        "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape_cov.txt", fDataHist->GetNbinsX());
+      SetDataFromTextFile( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape.txt");
+      SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_shape_cov.txt");
     } else {
-        this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg.txt");
-        this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+
-            "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_cov.txt", fDataHist->GetNbinsX());
+      SetDataFromTextFile( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg.txt");
+      SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCNpip/2015/MINERvA_CCNpi_th_20deg_cov.txt");
     }
   }
 
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-  Measurement1D::SetupDefaultHist();
+  // Scale the MINERvA data to account for the flux difference
+  // Adjust MINERvA data to flux correction; roughly a 11% normalisation increase in data
+  // Please change when MINERvA releases new data!
+  if (fFluxCorrection) {
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) * 1.11);
+    }
+  }
 
   // Make some auxillary helper plots
   onePions  = (TH1D*)(fDataHist->Clone());
+  onePions->SetNameTitle((fName + "_1pions").c_str(), (fName + "_1pions" + fPlotTitles).c_str());
+  SetAutoProcessTH1(onePions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
+
   twoPions  = (TH1D*)(fDataHist->Clone());
+  twoPions->SetNameTitle((fName + "_2pions").c_str(), (fName + "_2pions;" + fPlotTitles).c_str());
+  SetAutoProcessTH1(twoPions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
+
   threePions = (TH1D*)(fDataHist->Clone());
+  threePions->SetNameTitle((fName + "_3pions").c_str(), (fName + "_3pions" + fPlotTitles).c_str());
+  SetAutoProcessTH1(threePions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
+
   morePions = (TH1D*)(fDataHist->Clone());
+  morePions->SetNameTitle((fName + "_4pions").c_str(), (fName + "_4pions" + fPlotTitles).c_str());
+  SetAutoProcessTH1(morePions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
 
-  onePions->SetNameTitle((fName+"_1pions").c_str(), (fName+"_1pions"+fPlotTitles).c_str());
-  twoPions->SetNameTitle((fName+"_2pions").c_str(), (fName+"_2pions;"+fPlotTitles).c_str());
-  threePions->SetNameTitle((fName+"_3pions").c_str(), (fName+"_3pions"+fPlotTitles).c_str());
-  morePions->SetNameTitle((fName+"_4pions").c_str(), (fName+"_4pions"+fPlotTitles).c_str());
+  // Reserve length 3 for the number of pions
+  // We fill once per pion found in the event, so can fill multiple times for one event
+  thVect.reserve(3);
 
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
 
@@ -149,7 +168,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
       // Select highest momentum (energy) charged pion
       if (abs(PID) == 211) {
         Ppip = (event->PartInfo(j))->fP;
-        double th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
+        double th = (180. / M_PI) * FitUtils::th(Pnu, Ppip);
         thVect.push_back(th);
       }
     }
@@ -174,7 +193,7 @@ bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
   //********************************************************************
 
-  if (Signal){
+  if (Signal) {
 
     unsigned int nPions = thVect.size();
 
@@ -196,22 +215,10 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
         morePions->Fill(th, Weight);
       }
 
-      PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, th, Weight);
+      if (fMCHist_Modes) fMCHist_Modes->Fill(Mode, th, Weight);
+      // PlotUtils::FillNeutModeArray(fMCHist_PDG, Mode, th, Weight);
     }
   }
-
-  return;
-}
-
-//********************************************************************
-void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
-  //********************************************************************
-  Measurement1D::ScaleEvents();
-
-  onePions->Scale(this->fScaleFactor, "width");
-  twoPions->Scale(this->fScaleFactor, "width");
-  threePions->Scale(this->fScaleFactor, "width");
-  morePions->Scale(this->fScaleFactor, "width");
 
   return;
 }
@@ -242,7 +249,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
   //morePions->SetFillStyle(0);
   morePions->SetFillColor(morePions->GetLineColor());
 
-  THStack pionStack = THStack((fName+"_pionStack").c_str(), (fName+"_pionStack").c_str());
+  THStack pionStack = THStack((fName + "_pionStack").c_str(), (fName + "_pionStack").c_str());
 
   pionStack.Add(onePions);
   pionStack.Add(twoPions);

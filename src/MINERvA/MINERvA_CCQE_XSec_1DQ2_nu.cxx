@@ -18,35 +18,42 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CCQE_XSec_1DQ2_nu.h"
 
 //********************************************************************
-MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 //********************************************************************
 
-  // Measurement Defaults
-  fName = name;
-  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  isFluxFix      = name.find("_oldflux") == std::string::npos;
-  fullphasespace = name.find("_20deg")   == std::string::npos;
-  EnuMin = 1.5;
-  EnuMax = 10.;
-  fNormError = 0.101;
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG,FULL/NORM";
-  fDefaultTypes = "FIX/FULL";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCQE_XSec_1DQ2_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current Numu \n" \
+                        "Signal: True CCQE/2p2h defined at the vertex level \n";
 
-  // Setup the Data Plots
-  std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCQE/";
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+
+  isFluxFix      = !fSettings.Found("name", "_oldflux");
+  fullphasespace = !fSettings.Found("name", "_20deg");
+
+  // CCQELike plot information
+  fSettings.SetTitle("MINERvA_CCQE_XSec_1DQ2_nu");
+
+  std::string basedir = FitPar::GetDataBase() + "/MINERvA/CCQE/";
   std::string datafilename  = "";
   std::string covarfilename = "";
 
   // Full Phase Space
-  if (fullphasespace){
+  if (fullphasespace) {
 
-    if (isFluxFix){
-      if (fIsShape){
+    if (isFluxFix) {
+      if (fIsShape) {
         ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
                  << "datasets with fixed flux information. NUISANCE will scale MC to match "
                  << "data normalization but full covariance will be used. " << std::endl;
@@ -55,19 +62,19 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
       covarfilename = "Q2QE_numu_covar_fluxfix.txt";
 
     } else {
-      if (fIsShape){
-	datafilename  = "Q2QE_numu_data_SHAPE-extracted.txt";
-	covarfilename = "Q2QE_numu_covar_SHAPE-extracted.txt";
+      if (fIsShape) {
+        datafilename  = "Q2QE_numu_data_SHAPE-extracted.txt";
+        covarfilename = "Q2QE_numu_covar_SHAPE-extracted.txt";
       } else {
-	datafilename  = "Q2QE_numu_data.txt";
-	covarfilename = "Q2QE_numu_covar.txt";
+        datafilename  = "Q2QE_numu_data.txt";
+        covarfilename = "Q2QE_numu_covar.txt";
       }
     }
 
-  // Restricted Phase Space
+    // Restricted Phase Space
   } else {
-    if (isFluxFix){
-      if (fIsShape){
+    if (isFluxFix) {
+      if (fIsShape) {
         ERR(WRN) << "SHAPE likelihood comparison not available for MINERvA "
                  << "datasets with fixed flux information. NUISANCE will scale MC to match "
                  << "data normalization but full covariance will be used. " << std::endl;
@@ -76,42 +83,44 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::stri
       covarfilename = "20deg_Q2QE_numu_covar_fluxfix.txt";
 
     } else {
-      if (fIsShape){
-	datafilename  = "20deg_Q2QE_numu_data_SHAPE-extracted.txt";
-	covarfilename = "20deg_Q2QE_numu_covar_SHAPE-extracted.txt";
+      if (fIsShape) {
+        datafilename  = "20deg_Q2QE_numu_data_SHAPE-extracted.txt";
+        covarfilename = "20deg_Q2QE_numu_covar_SHAPE-extracted.txt";
       } else {
-	datafilename  = "20deg_Q2QE_numu_data.txt";
-	covarfilename = "20deg_Q2QE_numu_covar.txt";
+        datafilename  = "20deg_Q2QE_numu_data.txt";
+        covarfilename = "20deg_Q2QE_numu_covar.txt";
       }
     }
   }
 
-  this->SetDataValues( basedir + datafilename );
-  this->SetCovarMatrixFromText( basedir + covarfilename, 8 );
+  fSettings.SetDataInput(  basedir + datafilename );
+  fSettings.SetCovarInput( basedir + covarfilename );
+  fSettings.DefineAllowedSpecies("numu");
 
-  // Quick Fix for Correl/Covar Issues only for old data
-  if (!isFluxFix){
-    fCorrel = (TMatrixDSym*)fFullCovar->Clone();
-    delete fFullCovar;
-    delete covar;
-    delete fDecomp;
-    fFullCovar = StatUtils::GetCovarFromCorrel(fCorrel,fDataHist);
-    (*fFullCovar) *= 1E76;
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 * 13.0 / 6.0 / (fNEvents + 0.)) / TotalIntegratedFlux();
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+
+  if (!isFluxFix or !fullphasespace){ 
+    SetCorrelationFromTextFile( fSettings.GetCovarInput() );
+  } else {
+    SetCovarFromTextFile( fSettings.GetCovarInput() );
   }
 
-  covar = StatUtils::GetInvert(fFullCovar);
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
-
-  // Setup Default MC Histograms
-  this->SetupDefaultHist();
-
-  // Set Scale Factor (EventHist/nucleons) * NNucl / NNeutons
-  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38*13.0/6.0/(fNEvents+0.))/this->TotalIntegratedFlux();
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 
+
+
 //********************************************************************
-void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
+void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0)
@@ -121,17 +130,18 @@ void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double ThetaMu  = Pnu.Vect().Angle(Pmu.Vect());
-  double q2qe     = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 34.,true);
+  double q2qe     = FitUtils::Q2QErec(Pmu, cos(ThetaMu), 34., true);
 
   // Set binning variable
   fXVar = q2qe;
+
   return;
 }
 
 
 
 //********************************************************************
-bool MINERvA_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event){
+bool MINERvA_CCQE_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 //*******************************************************************
   return SignalDef::isCCQEnumu_MINERvA(event, EnuMin, EnuMax, fullphasespace);
 }

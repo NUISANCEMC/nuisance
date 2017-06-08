@@ -27,8 +27,10 @@ class MiniBooNE_NCEL_XSec_Treco_nu : public Measurement1D {
 //********************************************************************
 
 public:
+  void Write(std::string arg);
 
-  MiniBooNE_NCEL_XSec_Treco_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_NCEL_XSec_Treco_nu(nuiskey samplekey);
+
   virtual ~MiniBooNE_NCEL_XSec_Treco_nu() {};
 
   void FillEventVariables(FitEvent *event);
@@ -37,16 +39,16 @@ public:
 
   void ScaleEvents();
 
-  void SetDataValues(std::string inputFile);
+  void SetDataValues(std::string inputFile, double* arr_treco);
 
  private:
   void SetCovarMatrix(std::string covarFile, int dim);
 
-  void SetResponseMatrix(std::string responseFile, int dim);
+  void SetResponseMatrix(std::string responseFile, int dim, double* arr_treco);
 
-  // Because the Treco binning is irregular, store an array of bin edges...
-  double arr_treco[52];
+  void SetFluxHistogram(std::string dataFile);
 
+  TH1D *newFluxHist;
   TH1D *BKGD_other;
   TH1D *BKGD_irrid;
   TH2D *response_mat;

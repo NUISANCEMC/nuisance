@@ -31,7 +31,7 @@
 //*******************************
 void printInputCommands(){
 //*******************************
-  
+  /*
   std::cout<<"ExtFit_splines.exe -c cardFile -f [spline_routines] [-q config_name=config_val] \n";
   std::cout<<std::endl;
   std::cout<<"Arguments:"<<std::endl;
@@ -58,7 +58,7 @@ void printInputCommands(){
   std::cout<<"                                 example: -q verbosity=6 -q maxevents=10000 \n";
 
   exit(-1);
-
+*/
 };
 
 //*******************************
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]){
 
   // Program status;
   int status = 0;
+  
   
   // If No Arguments print commands
   if (argc == 1) printInputCommands();
@@ -89,7 +90,7 @@ int main(int argc, char* argv[]){
   LOG(FIT)<<"Spline Generation/Validation Finished."<<std::endl;
   LOG(FIT)<<"-------------------------------------"<<std::endl;
   
-  return status;
+  return 0;
 }
 
 

@@ -22,21 +22,24 @@
 
 #include "InputHandler.h"
 #include "FitWeight.h"
-
+#include "InputUtils.h"
+#include "InputFactory.h"
 // This class is menat to manage one input file for many distributions
 class EventManager {
  public:
   static EventManager& Get(void);
 
   FitWeight* GetRW();
-  InputHandler* GetInput(int id);
+  void SetRW(FitWeight* rw);
+
+  InputHandlerBase* GetInput(int id);
   FitEvent* GetEvent(int id, int i);
   double GetEventWeight(int id, int i);
-  InputHandler* AddInput(std::string handle, std::string infile);
+  InputHandlerBase* AddInput(std::string handle, std::string infile);
   void ResetWeightFlags();
   int GetInputID(std::string infile);
 
-  std::map< int, InputHandler* > GetInputs();
+  std::map< int, InputHandlerBase* > GetInputs();
 
  protected:
   EventManager();
@@ -46,11 +49,9 @@ class EventManager {
 
   FitWeight* fRW;
   std::map< std::string, int > fid;
-  std::map< int, InputHandler* > finputs;
+  std::map< int, InputHandlerBase* > finputs;
   std::map< int, std::vector< bool > > frwneeded;
   std::map< int, std::vector< double > > calc_rw;
-
-
 
 };
 
@@ -62,11 +63,13 @@ namespace FitBase {
   inline
   FitWeight* GetRW(){ return EvtManager().GetRW(); };
   inline
+  void SetRW(FitWeight* rw){ EvtManager().SetRW(rw); };
+  inline
   int GetInputID(std::string infile){ return EvtManager().GetInputID(infile); };
   inline
-  InputHandler* GetInput(int infile){ return EvtManager().GetInput(infile); };
+  InputHandlerBase* GetInput(int infile){ return EvtManager().GetInput(infile); };
   inline
-  InputHandler* AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
+  InputHandlerBase* AddInput(std::string handle, std::string infile){ return EvtManager().AddInput(handle, infile); };
 
 
 }

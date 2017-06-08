@@ -19,31 +19,45 @@
 
 #include "BNL_CC1ppip_Evt_1DcosthAdler_nu.h"
 
-// The constructor
-BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
 
-  fName = "BNL_CC1ppip_Evt_1DcosthAdler_nu";
-  fPlotTitles = "; cos#theta_{Adler}; Number of events";
-  EnuMin = 0.5;
-  EnuMax = 6.0;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fAllowedTypes += "EVT";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/BNL_CC1ppip_W14_cosThAdler.csv");
-  this->SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BNL_CC1ppip_Evt_1DcosthAdler_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("cos#theta_{Adler}");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // CCQELike plot information
+  fSettings.SetTitle("BNL_CC1ppip_Evt_1DcosthAdler_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/BNL/CC1pip_on_p/BNL_CC1ppip_W14_cosThAdler.csv" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.)*16./8.;
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =GetEventHistogram()->Integral("width")/(fNEvents+0.)*2./1.;
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 
@@ -93,26 +107,3 @@ bool BNL_CC1ppip_Evt_1DcosthAdler_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi3Prong(event, 14, 211, 2212,EnuMin,EnuMax);
 }
 
-/*
-void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void BNL_CC1ppip_Evt_1DcosthAdler_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

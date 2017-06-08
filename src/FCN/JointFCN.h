@@ -30,6 +30,11 @@
 #include "Math/Functor.h"
 #include "ParamPull.h"
 
+#include "NuisConfig.h"
+#include "NuisKey.h"
+#include "MeasurementVariableBox.h"
+#include "MeasurementVariableBox1D.h"
+
 using namespace FitUtils;
 using namespace FitBase;
 //! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
@@ -39,14 +44,15 @@ class JointFCN
 
   //! Constructor
   //! cardfile = Path to input card file listing samples
-  JointFCN(std::string cardfile, TFile *outfile);
-
+  JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile=NULL);
+  JointFCN(TFile* outfile=NULL); // Loads from global config
   //! Destructor
   ~JointFCN();
 
   //! Create sample list from cardfile
-  void LoadSamples(std::string cardFile);
-
+  void LoadSamples(std::vector<nuiskey> samplekeys);
+  void LoadPulls(std::vector<nuiskey> pullkeys);
+  
   //! Main Likelihood evaluation FCN
   double DoEval(const double *x);
 
@@ -111,6 +117,10 @@ class JointFCN
   //! Reconfigure Fast looping over duplicate inputs
   void ReconfigureFastUsingManager();
   
+
+std::vector<MeasurementBase*> GetSubSampleList(); 
+std::vector<InputHandlerBase*> GetInputList();
+
  private: 
 
   //! Append the experiments to include in the fit to this list
@@ -136,6 +146,15 @@ class JointFCN
   int *   fSampleNDOF;     //!< NDOF for each individual measurement in list
 
   bool fUsingEventManager; //!< Flag for doing joint comparisons
+  
+  std::vector< std::vector<float> > fSignalEventSplines;
+  std::vector< std::vector<MeasurementVariableBox*> > fSignalEventBoxes;
+  std::vector< bool > fSignalEventFlags;
+  std::vector< std::vector<bool> > fSampleSignalFlags;
+
+  std::vector<InputHandlerBase*> fInputList;
+  std::vector<MeasurementBase*> fSubSampleList;
+  bool fIsAllSplines;
   
 };
 

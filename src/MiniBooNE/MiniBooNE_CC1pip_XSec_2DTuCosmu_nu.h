@@ -25,7 +25,7 @@
 class MiniBooNE_CC1pip_XSec_2DTuCosmu_nu : public Measurement2D {
 public:
 
-  MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CC1pip_XSec_2DTuCosmu_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CC1pip_XSec_2DTuCosmu_nu() {};
 
   //void SetDataValues(std::string fileLocation);

@@ -71,6 +71,22 @@ include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
 ############################  Reweight Engines  ################################
 include(${CMAKE_SOURCE_DIR}/cmake/ReweightEnginesSetup.cmake)
 
+############################### GiBUU + NUANCE  ####################################
+
+if(DEFINED USE_EXP AND USE_EXP)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DINMEMORYEVENTCLASS")
+endif()
+
+if(DEFINED USE_GiBUU AND USE_GiBUU)
+  cmessage(STATUS "Included GiBUU")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
+  include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
+endif()
+
+if(DEFINED USE_NUANCE AND USE_NUANCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
+endif()
+
 #################################  Pythia6  ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
 
@@ -87,22 +103,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/gperfSetup.cmake)
 
 include(${CMAKE_SOURCE_DIR}/cmake/docsSetup.cmake)
 
-################################################################################
-
-if(DEFINED USE_EXP AND USE_EXP)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DINMEMORYEVENTCLASS")
-endif()
-
-if(DEFINED USE_GiBUU AND USE_GiBUU)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
-  include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
-endif()
-
-if(DEFINED USE_NUANCE AND USE_NUANCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
-endif()
-
-################################################################################
+###############################################################################
 
 set(MINCODE
   Routines
@@ -110,8 +111,11 @@ set(MINCODE
 
 set(CORE
   MCStudies
+  Genie
   FitBase
+  InputHandler
   Splines
+  Reweight
   Utils
   #Devel
   )
@@ -127,6 +131,7 @@ set(EXPERIMENTS
   ArgoNeuT
   BEBC
   BNL
+  Electron
   FNAL
   GGM
   K2K
@@ -168,7 +173,11 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
 
+
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuiscardgen" DESTINATION
   bin)
 
+install(PROGRAMS
+  "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
+  bin)

@@ -21,9 +21,19 @@ FitLogger.h
 FitParameters.h
 FitUtils.h
 GeneralUtils.h
+ParserUtils.h
 PlotUtils.h
 StatUtils.h
 SignalDef.h
+NuisConfig.h
+NuisKey.h
+BeamUtils.h
+TargetUtils.h
+StackBase.h
+StandardStacks.h
+OpenMPWrapper.h
+PhysConst.h
+Initialiser.h
 )
 
 set(IMPLFILES
@@ -35,6 +45,14 @@ GeneralUtils.cxx
 PlotUtils.cxx
 StatUtils.cxx
 SignalDef.cxx
+NuisConfig.cxx
+NuisKey.cxx
+BeamUtils.cxx
+TargetUtils.cxx
+StackBase.cxx
+ParserUtils.cxx
+StandardStacks.cxx
+Initialiser.cxx
 )
 
 set(LIBNAME Utils)
@@ -46,6 +64,8 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/Splines)
+target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/InputHandler)
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/FitBase)
 target_include_directories(${LIBNAME} PUBLIC ${RWENGINE_INCLUDE_DIRECTORIES})
 
@@ -67,12 +87,12 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 
-add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
+#add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
 
-target_link_libraries(DumpROOTClassesFromVector ${ROOT_LIBS})
-if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-  set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-endif()
-set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+#target_link_libraries(DumpROOTClassesFromVector ${ROOT_LIBS})
+#if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+#  set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+#endif()
+#set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
-install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
+#install(TARGETS DumpROOTClassesFromVector DESTINATION bin)

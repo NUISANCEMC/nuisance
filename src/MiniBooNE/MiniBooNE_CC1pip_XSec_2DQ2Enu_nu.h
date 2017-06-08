@@ -25,10 +25,8 @@
 class MiniBooNE_CC1pip_XSec_2DQ2Enu_nu : public Measurement2D {
 public:
 
-  MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CC1pip_XSec_2DQ2Enu_nu() {};
-
-  //void SetDataValues(std::string fileLocation);
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 

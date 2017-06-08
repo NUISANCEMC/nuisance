@@ -18,29 +18,32 @@
 ################################################################################
 set(IMPLFILES
 ParamPull.cxx
-BaseFitEvt.cxx
-FitParticle.cxx
-FitWeight.cxx
-Measurement1D.cxx
 EventManager.cxx
-InputHandler.cxx
+Measurement1D.cxx
 Measurement2D.cxx
-FitEvent.cxx
 JointMeas1D.cxx
 MeasurementBase.cxx
-GeneratorUtils.cxx
-StdHepEvt.cxx
 TemplateMeas1D.cxx
-InputUtils.cxx
+SampleSettings.cxx
+MeasurementVariableBox.cxx
+MeasurementVariableBox2D.cxx
+MeasurementVariableBox1D.cxx
+CustomVariableBoxes.h
 )
 
 set(HEADERFILES
 ParamPull.h
-NuanceEvent.h
-BaseFitEvt.h    FitEvent.h     JointMeas1D.h    Measurement2D.h
-EventManager.h  FitParticle.h  FitWeight.h      MeasurementBase.h
-InputHandler.h   Measurement1D.h GeneratorUtils.h StdHepEvt.h TemplateMeas1D.h
-InputUtils.h
+JointMeas1D.h    
+Measurement2D.h
+EventManager.h
+MeasurementBase.h   
+Measurement1D.h 
+TemplateMeas1D.h
+SampleSettings.h
+MeasurementVariableBox.h
+MeasurementVariableBox2D.h
+MeasurementVariableBox1D.h
+CustomVariableBoxes.h
 )
 
 set(LIBNAME FitBase)
@@ -53,6 +56,14 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
+if (USE_GENIE)
+   include_directories(${GENIE_INCLUDES}/Apps)
+   include_directories(${GENIE_INCLUDES}/FluxDrivers)
+   include_directories(${GENIE_INCLUDES}/EVGDrivers)
+endif()
+
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,0 +1,158 @@
+#include "NEUTWeightEngine.h"
+
+NIWGWeightEngine::NIWGWeightEngine(std::string name) {
+#ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
+	// Setup the NEUT Reweight engien
+	fCalcName = name;
+	LOG(FIT) << "Setting up NIWG RW : " << fCalcName << std::endl;
+
+	// Create RW Engine suppressing cout
+	StopTalking();
+	fNIWGRW = new niwg::rew::NIWGReWeight();
+
+	// Get List of Veto Calcs (For Debugging)
+	std::string rw_engine_list =
+	    FitPar::Config().GetParS("FitWeight.fNIWGRW_veto");
+	bool niwg_2012a = rw_engine_list.find("niwg_2012a") == std::string::npos;
+	bool niwg_2014a = rw_engine_list.find("niwg_2014a") == std::string::npos;
+	bool niwg_pimult = rw_engine_list.find("niwg_pimult") == std::string::npos;
+	bool niwg_mec = rw_engine_list.find("niwg_mec") == std::string::npos;
+	bool niwg_rpa = rw_engine_list.find("niwg_rpa") == std::string::npos;
+	bool niwg_eff_rpa = rw_engine_list.find("niwg_eff_rpa") == std::string::npos;
+	bool niwg_proton =
+	    rw_engine_list.find("niwg_protonFSIbug") == std::string::npos;
+	bool niwg_hadron =
+	    rw_engine_list.find("niwg_HadronMultSwitch") == std::string::npos;
+
+	// Add the RW Calcs
+	if (niwg_2012a)
+		fNIWGRW->AdoptWghtCalc("niwg_2012a", new niwg::rew::NIWGReWeight2012a);
+	if (niwg_2014a)
+		fNIWGRW->AdoptWghtCalc("niwg_2014a", new niwg::rew::NIWGReWeight2014a);
+	if (niwg_pimult)
+		fNIWGRW->AdoptWghtCalc("niwg_pimult", new niwg::rew::NIWGReWeightPiMult);
+	if (niwg_mec)
+		fNIWGRW->AdoptWghtCalc("niwg_mec", new niwg::rew::NIWGReWeightMEC);
+	if (niwg_rpa)
+		fNIWGRW->AdoptWghtCalc("niwg_rpa", new niwg::rew::NIWGReWeightRPA);
+	if (niwg_eff_rpa)
+		fNIWGRW->AdoptWghtCalc("niwg_eff_rpa",
+		                       new niwg::rew::NIWGReWeightEffectiveRPA);
+	if (niwg_proton)
+		fNIWGRW->AdoptWghtCalc("niwg_protonFSIbug",
+		                       new niwg::rew::NIWGReWeightProtonFSIbug);
+	if (niwg_hadron)
+		fNIWGRW->AdoptWghtCalc("niwg_HadronMultSwitch",
+		                       new niwg::rew::NIWGReWeightHadronMultSwitch);
+
+	fNIWGRW->Reconfigure();
+
+	// Set Abs Twk Config
+	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
+
+	// allow cout again
+	StartTalking();
+#else
+	ERR(FTL) << "NIWG RW Enabled but NEUT RW is not!" << std::endl;
+#endif
+#else
+	ERR(FTL) << "NIWG RW NOT ENABLED!" << std::endl;
+#endif
+
+};
+
+void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
+#ifdef __NIWG_ENABLED__
+
+	// Get NEUT Syst.
+	niwg::rew::NIWGSyst_t gensyst = niwg::rew::NIWGSyst::FromString(name);
+	int nuisenum = Reweight::ConvDial(name, kNIWG);
+
+	// Fill Maps
+	int index = fValues.size();
+	fValues.push_back(0.0);
+	fNIWGSysts.push_back(gensyst);
+
+	fEnumIndex[nuisenum] = index;
+	fNameIndex[name] = index;
+
+	// Initialize dial
+	fNIWGRW->Systematics().Init( fNIWGSysts[index] );
+
+	// If Absolute
+	if (fIsAbsTwk) {
+		niwg::rew::NIWGSystUncertainty::Instance()->SetUncertainty( fNIWGSysts[index], 1.0, 1.0 );
+	}
+
+	// Set Value if given
+	if (startval != -999.9) {
+		SetDialValue(nuisenum, startval);
+	}
+#endif
+}
+
+void NIWGWeightEngine::SetDialValue(int nuisenum, double val) {
+#ifdef __NIWG_ENABLED__
+	fValues[fEnumIndex[nuisenum]] = val;
+	fNIWGRW->Systematics().Set(fNIWGSysts[fEnumIndex[nuisenum]], val);
+#endif
+}
+
+void NIWGWeightEngine::SetDialValue(std::string name, double val) {
+#ifdef __NIWG_ENABLED__
+	fValues[fNameIndex[name]] = val;
+	fNIWGRW->Systematics().Set(fNIWGSysts[fNameIndex[name]], val);
+#endif
+}
+
+
+void NIWGWeightEngine::Reconfigure(bool silent) {
+#ifdef __NIWG_ENABLED__
+	// Hush now...
+	if (silent) StopTalking();
+
+	// Reconf
+	fNIWGRW->Reconfigure();
+
+	// Shout again
+	if (silent) StartTalking();
+#endif
+}
+
+
+double NIWGWeightEngine::CalcWeight(BaseFitEvt* evt) {
+	double rw_weight = 1.0;
+
+#ifdef __NEUT_ENABLED__
+#ifdef __NIWG_ENABLED__
+
+	// Skip Non GENIE
+	if (evt->fType != kNEUT) return 1.0;
+
+	// Hush now
+	StopTalking();
+
+	niwg::rew::NIWGEvent* niwg_event = GeneratorUtils::GetNIWGEvent(evt->fNeutVect);
+	rw_weight *= fNIWGRW->CalcWeight(*niwg_event);
+	delete niwg_event;
+
+	// Speak Now
+	StartTalking();
+
+#endif
+#endif
+
+	// Return rw_weight
+	return rw_weight;
+}
+
+
+
+
+
+
+
+
+
+

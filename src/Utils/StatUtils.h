@@ -29,7 +29,7 @@
 #include <sstream>
 #include <iomanip>
 #include <deque>
-
+#include "assert.h"
 
 // Root Includes
 #include "TH1D.h"
@@ -206,6 +206,46 @@ namespace StatUtils{
 
   //! Apply a map to a 2D mask convering it into a 1D mask.
   TH1I* MapToMask(TH2I* hist, TH2I* map);
+
+
+  /// \brief Read TMatrixD from a text file
+  ///
+  /// - covfile = full path to text file
+  /// - dimx = x dimensions of matrix
+  /// - dimy = y dimensions of matrix
+  ///
+  /// Format of textfile should be: \n
+  /// cov_11  cov_12 ...  cov_1N \n
+  /// cov_21  cov_22 ...  cov_2N \n
+  /// ...     ...    ...  ...    \n
+  /// cov_N1  ...    ...  cov_NN \n
+  ///
+  /// If no dimensions are given, dimx and dimy are determined from rows/columns
+  /// inside textfile.
+  ///
+  /// If only dimx is given a symmetric matrix is assumed.
+  TMatrixD* GetMatrixFromTextFile(std::string covfile, int dimx=-1, int dimy=-1);
+
+
+  /// \brief Read TMatrixD from a ROOT file
+  ///
+  /// - covfile = full path to root file (+';histogram')
+  /// - histname = histogram name
+  ///
+  /// If no histogram name is given function assumes it has been appended
+  /// covfile path as: \n
+  /// 'covfile.root;histname' 
+  ///
+  /// histname can point to a TMatrixD object, a TMatrixDSym object, or
+  /// a TH2D object.
+  TMatrixD* GetMatrixFromRootFile(std::string covfile, std::string histname="");
+
+  /// \brief Calls GetMatrixFromTextFile and turns it into a TMatrixDSym
+  TMatrixDSym* GetCovarFromTextFile(std::string covfile, int dim);
+
+  /// \brief Calls GetMatrixFromRootFile and turns it into a TMatrixDSym
+  TMatrixDSym* GetCovarFromRootFile(std::string covfile, std::string histname);
+
 
 };
 
