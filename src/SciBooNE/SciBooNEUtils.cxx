@@ -117,69 +117,69 @@ bool SciBooNEUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
 }
 
 
-void SciBooNEUtils::CreateModeArray(TH1* hist, TH1* modearray[]){
+// void SciBooNEUtils::CreateModeArray(TH1* hist, TH1* modearray[]){
 
-  std::string nameArr[] = {"CCCOH", "CCRES", "CCQE", "2p2h", "Other"};
-  for (int i = 0; i < 5; ++i)
-    modearray[i] = (TH1*)hist->Clone(Form("%s_%s",hist->GetName(),nameArr[i].c_str()));
-  return;
-};
+//   std::string nameArr[] = {"CCCOH", "CCRES", "CCQE", "2p2h", "Other"};
+//   for (int i = 0; i < 5; ++i)
+//     modearray[i] = (TH1*)hist->Clone(Form("%s_%s",hist->GetName(),nameArr[i].c_str()));
+//   return;
+// };
 
-void SciBooNEUtils::DeleteModeArray(TH1* modearray[]){
-  for (int i = 0; i < 5; ++i)
-    delete modearray[i];
-  return;
-};
+// void SciBooNEUtils::DeleteModeArray(TH1* modearray[]){
+//   for (int i = 0; i < 5; ++i)
+//     delete modearray[i];
+//   return;
+// };
 
 
-void SciBooNEUtils::FillModeArray(TH1* hist[], int mode, double xval, double weight){
+// void SciBooNEUtils::FillModeArray(TH1* hist[], int mode, double xval, double weight){
 
-  switch(abs(mode)) {
-  case 16: 
-    // CCCOH case
-    hist[0]->Fill(xval, weight);
-    break;
-  case 11:
-  case 12:
-  case 13:
-    // CCRES case
-    hist[1]->Fill(xval, weight);
-    break;
-  case 1:
-    hist[2]->Fill(xval, weight);
-    break;
-  case 2:
-    // CCQE-like case
-    hist[3]->Fill(xval, weight);
-    break;
-  default:
-    // Everything else
-    hist[4]->Fill(xval, weight);    
-  }
-  return;
-};
+//   switch(abs(mode)) {
+//   case 16: 
+//     // CCCOH case
+//     hist[0]->Fill(xval, weight);
+//     break;
+//   case 11:
+//   case 12:
+//   case 13:
+//     // CCRES case
+//     hist[1]->Fill(xval, weight);
+//     break;
+//   case 1:
+//     hist[2]->Fill(xval, weight);
+//     break;
+//   case 2:
+//     // CCQE-like case
+//     hist[3]->Fill(xval, weight);
+//     break;
+//   default:
+//     // Everything else
+//     hist[4]->Fill(xval, weight);    
+//   }
+//   return;
+// };
 
-void SciBooNEUtils::ScaleModeArray(TH1* hist[], double factor, std::string option){
+// void SciBooNEUtils::ScaleModeArray(TH1* hist[], double factor, std::string option){
   
-  for (int i = 0; i < 5; ++i)
-    if (hist[i]) hist[i]->Scale(factor,option.c_str());
-  return;
-};
+//   for (int i = 0; i < 5; ++i)
+//     if (hist[i]) hist[i]->Scale(factor,option.c_str());
+//   return;
+// };
 
-void SciBooNEUtils::ResetModeArray(TH1* hist[]){
+// void SciBooNEUtils::ResetModeArray(TH1* hist[]){
   
-  for (int i = 0; i < 5; ++i)
-    if (hist[i]) hist[i]->Reset();
-  return;
-};
+//   for (int i = 0; i < 5; ++i)
+//     if (hist[i]) hist[i]->Reset();
+//   return;
+// };
 
 
-void SciBooNEUtils::WriteModeArray(TH1* hist[]){
+// void SciBooNEUtils::WriteModeArray(TH1* hist[]){
 
-  for (int i = 0; i < 5; ++i)
-    if (hist[i]) hist[i]->Write();
-  return;
-};
+//   for (int i = 0; i < 5; ++i)
+//     if (hist[i]) hist[i]->Write();
+//   return;
+// };
 
 bool SciBooNEUtils::is1TRK(FitEvent *event){
   
@@ -382,3 +382,46 @@ double SciBooNEUtils::CalcThetaPi(FitEvent *event){
 // Function to return the MainTrk
 //bool SciBooNEUtils::MainTrk(FitEvent *event, bool penetrated){
 //}
+
+
+/// Functions to deal with the SB mode stacks
+SciBooNEUtils::ModeStack::ModeStack(std::string name, std::string title, TH1* hist) {
+  fName = name;
+  fTitle = title;
+
+  AddMode(0, "CCCOH",  "CCCOH", kGreen+2, 2, 3244);
+  AddMode(1, "CCRES",  "CCRES", kRed,     2, 3304);
+  AddMode(2, "CCQE",   "CCQE",  kGray+2,  2, 1001);
+  AddMode(3, "2o2h",   "2p2h",  kMagenta, 2, 1001);
+  AddMode(4, "Other",  "Other", kAzure+1, 2, 1001);
+  
+  StackBase::SetupStack(hist);
+};
+
+
+
+int SciBooNEUtils::ModeStack::ConvertModeToIndex(int mode){
+  switch (abs(mode)){
+  case 16: return 0; // CCCOH
+  case 11:
+  case 12:
+  case 13: return 1; // CCRES
+  case  1: return 2; // CCQE
+  case  2: return 3; // 2p2h
+  default: return 4; // Other
+  }
+};
+
+
+void SciBooNEUtils::ModeStack::Fill(int mode, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack::ConvertModeToIndex(mode), x, y, z, weight);
+};
+
+void SciBooNEUtils::ModeStack::Fill(FitEvent* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
+
+void SciBooNEUtils::ModeStack::Fill(BaseFitEvt* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
+

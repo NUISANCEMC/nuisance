@@ -442,7 +442,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 	return;
 }
 
-void NuWroInputHandler::AddNuWroParticle(FitEvent * evt, const particle & p, int state) {
+void NuWroInputHandler::AddNuWroParticle(FitEvent * evt, particle & p, int state) {
 
 	// Add Mom
 	evt->fParticleMom[evt->fNParticles][0] = p.p4().x;

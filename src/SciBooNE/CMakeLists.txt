@@ -16,29 +16,40 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
+# set(IMPLFILES
+# SciBooNE_CCCOH_STOP_NTrks_nu.cxx
+# SciBooNE_CCCOH_1TRK_1DQ2_nu.cxx
+# SciBooNE_CCCOH_MuPr_1DQ2_nu.cxx
+# SciBooNE_CCCOH_MuPiVA_1DQ2_nu.cxx
+# SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.cxx
+# SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.cxx
+# SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.cxx
+# SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.cxx
+# SciBooNEUtils.cxx
+# )
+
+# set(HEADERFILES
+# SciBooNE_CCCOH_STOP_NTrks_nu.h
+# SciBooNE_CCCOH_1TRK_1DQ2_nu.h
+# SciBooNE_CCCOH_MuPr_1DQ2_nu.h
+# SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h
+# SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h
+# SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h
+# SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h
+# SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h
+# SciBooNEUtils.h
+# )
+
 set(IMPLFILES
-SciBooNE_CCCOH_STOP_NTrks_nu.cxx
 SciBooNE_CCCOH_1TRK_1DQ2_nu.cxx
-SciBooNE_CCCOH_MuPr_1DQ2_nu.cxx
-SciBooNE_CCCOH_MuPiVA_1DQ2_nu.cxx
-SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.cxx
-SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.cxx
-SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.cxx
-SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.cxx
 SciBooNEUtils.cxx
 )
 
 set(HEADERFILES
-SciBooNE_CCCOH_STOP_NTrks_nu.h
 SciBooNE_CCCOH_1TRK_1DQ2_nu.h
-SciBooNE_CCCOH_MuPr_1DQ2_nu.h
-SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h
-SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h
-SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h
-SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h
-SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h
 SciBooNEUtils.h
 )
+
 
 set(LIBNAME expSciBooNE)
 
@@ -51,7 +62,10 @@ endif()
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION

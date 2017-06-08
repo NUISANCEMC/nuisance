@@ -22,7 +22,7 @@
 #include "GeneratorUtils.h"
 #include "FitLogger.h"
 
-#ifdef __NIWG_ENABLED__
+#if defined(__NIWG_ENABLED__) && defined(__NEUT_ENABLED__)
 niwg::rew::NIWGEvent * GeneratorUtils::GetNIWGEvent(NeutVect* nvect)
 {
   niwg::rew::NIWGEvent * fDummyNIWGEvent = NULL;

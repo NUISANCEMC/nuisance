@@ -28,8 +28,12 @@
 #include "NIWGSyst.h"
 #endif
 
+#ifdef __NEUT_ENABLED__
+#include "NEUTInputHandler.h"
+#endif
+
 namespace GeneratorUtils {
-#ifdef __NIWG_ENABLED__
+#if defined(__NIWG_ENABLED__) && defined(__NEUT_ENABLED__)
   niwg::rew::NIWGEvent* GetNIWGEvent(NeutVect* nvect);
 #endif
 

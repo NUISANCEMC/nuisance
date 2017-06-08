@@ -151,7 +151,7 @@ namespace PlotUtils{
   TH1D* GetTH1DFromFile(std::string dataFile, std::string title = "", std::string fPlotTitles="", std::string alt_name="");
 
   //! Grab a 1D Histrogram from a ROOT File
-  TH1* GetHistFromRootFile(std::string file, std::string name);
+  TH1D* GetTH1DFromRootFile(std::string file, std::string name);
 
   //! Grab a 2D Histrogram from a ROOT File
   TH2D* GetTH2DFromRootFile(std::string file, std::string name);

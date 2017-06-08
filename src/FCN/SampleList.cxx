@@ -587,22 +587,22 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
 
     // SciBooNE COH studies
-  } else if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_STOP_NTrks_nu(name, file, rw, type, fkdt));
+  // } else if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
+  //   return (new SciBooNE_CCCOH_STOP_NTrks_nu(samplekey));
   } else if (!name.compare("SciBooNE_CCCOH_1TRK_1DQ2_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_1TRK_1DQ2_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_MuPr_1DQ2_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(name, file, rw, type, fkdt));
-  } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
-    fChain->push_back(new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(name, file, rw, type, fkdt));
+    return (new SciBooNE_CCCOH_1TRK_1DQ2_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
+  //   return (new SciBooNE_CCCOH_MuPr_1DQ2_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
+  //   return (new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
+  //   return (new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu")) {
+  //   return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
+  //   return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(samplekey));
+  // } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
+  //   return (new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(samplekey));
 
     /*
     K2K Samples
@@ -641,9 +641,6 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
   } else if (name.find("ElectronData_") != std::string::npos) {
     return new ElectronScattering_DurhamData(samplekey);
-
-    //} else if (name.find("MCStudy_KaonPreSelection") != std::string::npos) {
-    //fChain->push_back(new MCStudy_KaonPreSelection(name, file, rw, type, fkdt));
 
   } else if (name.find("MuonValidation_") != std::string::npos) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
