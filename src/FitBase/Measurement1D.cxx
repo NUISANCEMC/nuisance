@@ -878,10 +878,11 @@ double Measurement1D::GetLikelihood() {
 
   // Sort Shape Scaling
   double scaleF = 0.0;
+  // TODO Include !fIsRawEvents
   if (fIsShape) {
     if (fMCHist->Integral(1, fMCHist->GetNbinsX(), "width")) {
       scaleF = fDataHist->Integral(1, fDataHist->GetNbinsX(), "width") /
-               fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
+      	fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
       fMCHist->Scale(scaleF);
       fMCFine->Scale(scaleF);
     }
@@ -912,7 +913,7 @@ double Measurement1D::GetLikelihood() {
   }
 
   // Return to normal scaling
-  if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")) {
+  if (fIsShape) { // and !FitPar::Config().GetParB("saveshapescaling")) {
     fMCHist->Scale(1. / scaleF);
     fMCFine->Scale(1. / scaleF);
   }

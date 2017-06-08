@@ -37,16 +37,16 @@ ANL_CC1ppip_Evt_1Dppi_nu::ANL_CC1ppip_Evt_1Dppi_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
+
+  fSettings.SetTitle("ANL #nu_mu CC1p#pi^{+}");
   fSettings.SetXTitle("p_{#pi} (MeV)");
   fSettings.SetYTitle("Number of events");
-  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG","EVT/SHAPE/DIAG");
   fSettings.DefineAllowedTargets("D,H");
-
-  // CCQELike plot information
-  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_ppi.csv" );
   fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetEnuRange(0.0, 1.5);
+
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC1pip_on_p/ANL_CC1pip_on_p_noEvents_ppi.csv" );
 
   FinaliseSampleSettings();
 
@@ -76,6 +76,8 @@ void ANL_CC1ppip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
+
+  // std::cout << "MASS NU P PIP MU = " << Pnu.Mag() << " " << Pp.Mag() << " " << Ppip.Mag() << " " << Pmu.Mag() << std::endl;
 
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double ppip    = -1.0;

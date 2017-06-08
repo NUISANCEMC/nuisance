@@ -430,4 +430,16 @@ int FitEvent::NumFSMesons() {
   return nMesons;
 }
 
+int FitEvent::NumFSLeptons(void) const{
 
+  int nLeptons = 0;
+ 
+  for (int i = 0; i < fNParticles; i++) {
+    if (fParticleState[i] != kFinalState) continue;
+    if (abs(fParticlePDG[i]) == 11 || abs(fParticlePDG[i]) == 13 ||
+      abs(fParticlePDG[i]) == 15)
+      nLeptons += 1;
+  }
+
+  return nLeptons;
+}

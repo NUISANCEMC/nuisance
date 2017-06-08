@@ -94,6 +94,7 @@ NUANCEInputHandler::NUANCEInputHandler(std::string const& handle, std::string co
 	// Setup Reader
 	fNuanceEvent = new NuanceEvent();
 	fNuanceEvent->SetBranchAddresses(fNUANCETree);
+	fNUANCETree->GetEntry(0);
 
 	// Setup Event in FitEvent
 	fNUISANCEEvent = new FitEvent();
