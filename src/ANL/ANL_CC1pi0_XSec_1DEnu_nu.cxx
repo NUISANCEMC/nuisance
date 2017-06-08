@@ -23,54 +23,51 @@
 
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
 
-// The constructor
-ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = "ANL_CC1pi0_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
-  EnuMin = 0.;
-  EnuMax = 1.5;
-  fIsDiag = true;
-  fNormError = 0.20;
-  fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR/CORR/W14/W16/NOW";
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1pi0 Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  // User can specify "UNCORR" for uncorrected data
-  // Default is to use correction
-  if (type.find("UNCORR") != std::string::npos) {
-    UseCorrectedData = false;
-  } else {
-    UseCorrectedData = true;
-  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma (cm^{2}/neutron)");
+  fSettings.SetAllowedTypes("FIX/DIAG", "FIX,FREE,SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.SetS("norm_error", "0.20");
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1#pi^{0}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // User can specifiy to use uncorrected data
+  UseCorrectedData = !fSettings.Found("name", "Uncorr");
 
   // User can specify "W14" for W < 1.4 GeV cut
   //                  "W16" for W < 1.6 GeV cut
-  //                  The default is no W cut (10 GeV)
-  if (type.find("W14") != std::string::npos) {
-    wTrueCut = 1.4;
-  } else if (type.find("W16") != std::string::npos) {
-    wTrueCut = 1.6;
-  } else {
-    wTrueCut = 10.0;
-  }
+  //                  The default is W < 2.0
+  if (fSettings.Found("name", "W14Cut")) wTrueCut = 1.4;
+  else if (fSettings.Found("name", "W16Cut")) wTrueCut = 1.6;
+  else wTrueCut = 10.0;
 
+
+  // Flag for bad combo
   if (UseCorrectedData && wTrueCut == 1.6) {
     ERR(FTL) << "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
     ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
     ERR(FTL) << "Reverting to using uncorrected data!" << std::endl;
     UseCorrectedData = false;
   }
-  // Get rid of the slashes in the type
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
-  }
-
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Now read in different data depending on what the user has specified
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pi0_on_n/";
+  std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/ANL/CC1pi0_on_n/";
 
   // If we're using corrected data
   if (UseCorrectedData) {
@@ -91,14 +88,21 @@ ANL_CC1pi0_XSec_1DEnu_nu::ANL_CC1pi0_XSec_1DEnu_nu(std::string inputfile, FitWei
       DataLocation += "anl82-numu-cc1pi0-noWcut.txt";
     }
   }
+  fSettings.SetDataInput(DataLocation);
 
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  FinaliseSampleSettings();
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 * 2.0 / 1.0 / (fNEvents + 0.));
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents+0.)*(16./8.);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 

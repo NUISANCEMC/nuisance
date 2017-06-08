@@ -18,45 +18,53 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
 #include "MINERvA_CCinc_XSec_1Dx_nu.h"
 
+
 //********************************************************************
-MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type,
-						     std::string fakeDataFile){
+MINERvA_CCinc_XSec_1Dx_nu::MINERvA_CCinc_XSec_1Dx_nu(std::string name, std::string inputfile, std::string type){
 //********************************************************************
 
-  // Measurement Details
-  fName = name;
-  fPlotTitles = "; Reconstructed Bjorken x; d#sigma/dx (cm^{2}/nucleon)";
-  EnuMin = 2.;
-  EnuMax = 20.;
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CCinc_XSec_1Dx_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(name, inputfile, type);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Reconstructed Bjorken x");
+  fSettings.SetYTitle("d#sigma/dx (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX/DIAG/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(2.0, 20.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetTitle("MINERvA_CCinc_XSec_1Dx_nu");
+
   target = "";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
-  if      (name.find("C12")   != std::string::npos) target =   "C12";
+  if      (name.find("C12")  != std::string::npos) target =   "C12";
   else if (name.find("Fe56")  != std::string::npos) target =  "Fe56";
   else if (name.find("Pb208") != std::string::npos) target = "Pb208";
   if      (name.find("DEN")   != std::string::npos) target =   "CH";
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
-  // Setup the Data Plots
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
+
+  // Plot Setup -------------------------------------------------------
+  double binsx[7] = {0, 0.1, 0.3, 0.7, 0.9, 1.1, 1.5};
+  CreateDataHistogram(6, binsx);
+
   std::string basedir = FitPar::GetDataBase()+"/MINERvA/CCinc/";
   std::string smearfilename  = "CCinc_"+target+"_x_smear.csv";
-  int nbins = 6;
-  double bins[7] = {0, 0.1, 0.3, 0.7, 0.9, 1.1, 1.5};
+  SetSmearingMatrix(basedir + smearfilename, 6, 7);
 
-  // Note that only the ratio is given, so I can't do this->SetDataValues or this->SetCovarMatrix
-  this->fDataHist = new TH1D(name.c_str(),(name+fPlotTitles).c_str(),nbins,bins);
-
-  // Setup Default MC Histograms
-  this->SetupDefaultHist();
-
-  // The smearing matrix is rectangular
-  this->SetSmearingMatrix(basedir + smearfilename, nbins, nbins+1);
-
-  // Set Scale Factor (EventHist/nucleons) so I don't need to know what the target is here
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux(); // NEUT
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 
 };
 
@@ -77,6 +85,8 @@ void MINERvA_CCinc_XSec_1Dx_nu::FillEventVariables(FitEvent *event){
   Enu_rec     = Emu + q0;
   double Q2   = 4*Enu_rec*Emu*sin(ThetaMu/2)*sin(ThetaMu/2);
   bjork_x     = Q2/2./q0/((PhysConst::mass_proton+PhysConst::mass_neutron)/2.); // Average nucleon masses
+
+  //  if (fIsNumerator)
 
   fXVar   = bjork_x;
   return;
@@ -107,9 +117,6 @@ void MINERvA_CCinc_XSec_1Dx_nu::ScaleEvents(){
   this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
   this->fDataHist->SetNameTitle((this->fName+"_unsmear").c_str(), (this->fName+"_unsmear"+this->fPlotTitles).c_str());
   this->ApplySmearingMatrix();
-
-  // Get rid of this because it causes odd behaviour
-  //Measurement1D::ScaleEvents();
 
   this->fMCHist->Scale(this->fScaleFactor, "width");
 

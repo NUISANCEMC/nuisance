@@ -24,7 +24,7 @@
 
 class ArgoNeuT_CCInc_XSec_1Dpmu_nu : public Measurement1D {
 public:
-  ArgoNeuT_CCInc_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  ArgoNeuT_CCInc_XSec_1Dpmu_nu(nuiskey samplekey);
   virtual ~ArgoNeuT_CCInc_XSec_1Dpmu_nu() {};
 
   void FillEventVariables(FitEvent *event);

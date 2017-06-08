@@ -16,9 +16,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
-#include "StatusMessage.h"
-
 #include "ComparisonRoutines.h"
 
 /*
@@ -26,15 +23,13 @@
 */
 //************************
 void ComparisonRoutines::Init() {
-  //************************
-
-  fInputFile = "";
-  fInputRootFile = NULL;
+//************************
 
   fOutputFile = "";
   fOutputRootFile = NULL;
 
   fStrategy = "Compare";
+
   fRoutines.clear();
 
   fCardFile = "";
@@ -44,132 +39,111 @@ void ComparisonRoutines::Init() {
   fSampleFCN = NULL;
 
   fAllowedRoutines = ("Compare");
+  
 };
 
 //*************************************
-ComparisonRoutines::~ComparisonRoutines(){
-    //*************************************
+ComparisonRoutines::~ComparisonRoutines() {
+//*************************************
 };
+
+
 
 /*
   Input Functions
 */
 //*************************************
 ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
-  //*************************************
+//*************************************
 
-  // Set everything to defaults
+  // Initialise Defaults
   Init();
-  std::vector<std::string> configs_cmd;
-  std::string maxevents_flag = "";
-  int verbosity_flag = 0;
-  int error_flag = 0;
+  nuisconfig configuration = Config::Get();
 
-  // If No Arguments print commands
-  for (int i = 1; i < argc; ++i) {
-    if (i + 1 != argc) {
-      // Cardfile
-      if (!std::strcmp(argv[i], "-c")) {
-        fCardFile = argv[i + 1];
-        ++i;
-      } else if (!std::strcmp(argv[i], "-o")) {
-        fOutputFile = argv[i + 1];
-        ++i;
-      } else if (!std::strcmp(argv[i], "-f")) {
-        fStrategy = argv[i + 1];
-        ++i;
-      } else if (!std::strcmp(argv[i], "-q")) {
-        configs_cmd.push_back(argv[i + 1]);
-        ++i;
-      } else if (!std::strcmp(argv[i], "-n")) {
-        maxevents_flag = argv[i + 1];
-        ++i;
-      } else if (!std::strcmp(argv[i], "-v")) {
-        verbosity_flag -= 1;
-      } else if (!std::strcmp(argv[i], "+v")) {
-        verbosity_flag += 1;
-      } else if (!std::strcmp(argv[i], "-e")) {
-        error_flag -= 1;
-      } else if (!std::strcmp(argv[i], "+e")) {
-        error_flag += 1;
-      } else {
-        ERR(FTL) << "ERROR: unknown command line option given! - '" << argv[i]
-                 << " " << argv[i + 1] << "'" << std::endl;
-        throw;
-      }
-    }
-  }
+  // Default containers
+  std::string cardfile = "";
+  std::string maxevents = "-1";
+  int errorcount = 0;
+  int verbocount = 0;
+  std::vector<std::string> xmlcmds;
+  std::vector<std::string> configargs;
 
-  if (fCardFile.empty()) {
-    ERR(FTL) << "ERROR: card file not specified." << std::endl;
-    ERR(FTL) << "Run with '-h' to see options." << std::endl;
+  // Make easier to handle arguments.
+  std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
+  ParserUtils::ParseArgument(args, "-c", fCardFile, true);
+  ParserUtils::ParseArgument(args, "-o", fOutputFile, false, false);
+  ParserUtils::ParseArgument(args, "-n", maxevents, false, false);
+  ParserUtils::ParseArgument(args, "-f", fStrategy, false, false);
+  ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
+  ParserUtils::ParseArgument(args, "-i", xmlcmds);
+  ParserUtils::ParseArgument(args, "-q", configargs);
+  ParserUtils::ParseCounter(args, "e", errorcount);
+  ParserUtils::ParseCounter(args, "v", verbocount);
+  ParserUtils::CheckBadArguments(args);
+
+  // Add extra defaults if none given
+  if (fCardFile.empty() and xmlcmds.empty()) {
+    ERR(FTL) << "No input supplied!" << std::endl;
     throw;
   }
 
-  if (fOutputFile.empty()) {
-    ERR(WRN) << "WARNING: output file not specified." << std::endl;
-    ERR(WRN) << "Using " << fCardFile << ".root" << std::endl;
+  if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
+    ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
+
+  } else if (fOutputFile.empty()) {
+    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
+    throw;
   }
 
-  if (fCardFile == fOutputFile) {
-    ERR(WRN) << "WARNING: output file and card file are the same file, "
-                "writing: "
-             << fCardFile << ".root" << std::endl;
-    fOutputFile = fCardFile + ".root";
+  // Configuration Setup =============================
+
+  // Check no comp key is available
+  nuiskey fCompKey;
+  if (Config::Get().GetNodes("nuiscomp").empty()) {
+    fCompKey = Config::Get().CreateNode("nuiscomp");
+  } else {
+    fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  // Fill fit routines and check they are good
-  fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
-  for (UInt_t i = 0; i < fRoutines.size(); i++) {
-    if (fAllowedRoutines.find(fRoutines[i]) == std::string::npos) {
-      ERR(FTL) << "Unknown fit routine given! "
-               << "Must be provided as a comma seperated list." << std::endl;
-      ERR(FTL) << "Allowed Routines: " << fAllowedRoutines << std::endl;
-      throw;
-    }
+  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+
+  // Load XML Cardfile
+  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
+
+  // Add CMD XML Structs
+  for (size_t i = 0; i < xmlcmds.size(); i++) {
+    configuration.AddXMLLine(xmlcmds[i]);
   }
 
-  // CONFIG
-  // ---------------------------
-  std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
-  FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
-  FitPar::Config().ReadParamFile(fCardFile);
-
-  for (UInt_t iter = 0; iter < configs_cmd.size(); iter++) {
-    FitPar::Config().ForceParam(configs_cmd[iter]);
+  // Add Config Args
+  for (size_t i = 0; i < configargs.size(); i++) {
+    configuration.OverrideConfig(configargs[i]);
+  }
+  if (maxevents.compare("-1")){
+    configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
 
-  if (!maxevents_flag.empty()) {
-    FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
-  }
+  // Finish configuration XML
+  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
 
-  if (verbosity_flag != 0) {
-    int curverb = FitPar::Config().GetParI("VERBOSITY");
-    FitPar::Config().SetParI("VERBOSITY", curverb + verbosity_flag);
-  }
+  // Add Error Verbo Lines
+  verbocount += Config::Get().GetParI("VERBOSITY");
+  errorcount += Config::Get().GetParI("ERROR");
+  bool trace = Config::Get().GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  SETVERBOSITY(verbocount);
+  SETTRACE(trace);
 
-  if (error_flag != 0) {
-    int curwarn = FitPar::Config().GetParI("ERROR");
-    FitPar::Config().SetParI("ERROR", curwarn + error_flag);
-  }
+  // Comparison Setup ========================================
 
-  LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
-  ERR_VERB(FitPar::Config().GetParI("ERROR"));
+  // Proper Setup
+  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+  SetupComparisonsFromXML();
 
-  // CARD
-  // ---------------------------
-  // Parse Card Options
-  ReadCard(fCardFile);
-
-  // Outputs
-  // ---------------------------
-  // Save Configs to output file
-  fOutputRootFile = new TFile(fOutputFile.c_str(), "RECREATE");
-  FitPar::Config().Write();
-
-  // Starting Setup
-  // ---------------------------
   SetupRWEngine();
   SetupFCN();
 
@@ -177,282 +151,174 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
 };
 
 //*************************************
-void ComparisonRoutines::ReadCard(std::string cardfile) {
-  //*************************************
+void ComparisonRoutines::SetupComparisonsFromXML() {
+//*************************************
 
-  // Read cardlines into vector
-  std::vector<std::string> cardlines =
-      GeneralUtils::ParseFileToStr(cardfile, "\n");
-  FitPar::Config().cardLines = cardlines;
+  LOG(FIT) << "Setting up nuiscomp" << std::endl;
 
-  // Read Samples first (norm params can be overridden)
-  int linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++) {
-    std::string line = (*iter);
-    linecount++;
+  // Setup Parameters ------------------------------------------
+  std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
+  if (!parkeys.empty()) {
+    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+  }
 
-    // Skip Comments
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
+  for (size_t i = 0; i < parkeys.size(); i++) {
+    nuiskey key = parkeys.at(i);
 
-    // Read Valid Samples
-    int samstatus = ReadSamples(line);
-
-    // Show line if bad to help user
-    if (samstatus == kErrorStatus) {
-      ERR(FTL) << "Bad Input in cardfile " << fCardFile << " at line "
-               << linecount << "!" << endl;
-      ERR(FTL) << line << endl;
+    // Check for type,name,nom
+    if (!key.Has("type")) {
+      ERR(FTL) << "No type given for parameter " << i << std::endl;
+      ERR(FTL) << "type='PARAMETER_TYPE'" << std::endl;
+      throw;
+    } else if (!key.Has("name")) {
+      ERR(FTL) << "No name given for parameter " << i << std::endl;
+      ERR(FTL) << "name='SAMPLE_NAME'" << std::endl;
+      throw;
+    } else if (!key.Has("nominal")) {
+      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
+      ERR(FTL) << "nominal='NOMINAL_VALUE'" << std::endl;
       throw;
     }
-  }
 
-  // Read Parameters second
-  linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++) {
-    std::string line = (*iter);
-    linecount++;
+    // Get Inputs
+    std::string partype = key.GetS("type");
+    std::string parname = key.GetS("name");
+    double parnom  = key.GetD("nominal");
+    double parlow  = parnom - 1;
+    double parhigh = parnom + 1;
+    double parstep = 1;
+    std::string parstate = key.GetS("state");
 
-    // Skip Comments
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
+    // Check for incomplete limtis
+    int limdef = ((int)key.Has("low")  +
+                  (int)key.Has("high") +
+                  (int)key.Has("step"));
 
-    // Try Parameter Reads
-    int parstatus = ReadParameters(line);
-    int fakstatus = ReadFakeDataPars(line);
-
-    // Show line if bad to help user
-    if (parstatus == kErrorStatus || fakstatus == kErrorStatus) {
-      ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile << " at line "
-               << linecount << "!" << endl;
-      ERR(FTL) << line << endl;
+    if (limdef > 0 and limdef < 3){
+      ERR(FTL) << "Incomplete limit set given for parameter : " << parname << std::endl;
+      ERR(FTL) << "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' " << std::endl;
       throw;
     }
+
+    // Extra limits
+    if (key.Has("low")) {
+
+      parlow  = key.GetD("low");
+      parhigh = key.GetD("high");
+      parstep = key.GetD("step");
+
+      LOG(FIT) << "Read " << partype << " : "
+               << parname << " = "
+               << parnom << " : "
+               << parlow << " < p < " << parhigh
+               << " : " << parstate << std::endl;
+    } else {
+      LOG(FIT) << "Read " << partype << " : "
+               << parname << " = "
+               << parnom << " : "
+               << parstate << std::endl;
+    }
+
+    // Convert if required
+    if (parstate.find("ABS") != std::string::npos) {
+      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+    } else if (parstate.find("FRAC") != std::string::npos) {
+      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
+      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
+      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
+      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+    }
+
+    // Push into vectors
+    fParams.push_back(parname);
+
+    fTypeVals[parname]  = FitBase::ConvDialType(partype);;
+    fCurVals[parname]   = parnom;
+    fStateVals[parname] = parstate;
+
   }
 
-  return;
-};
-
-//*****************************************
-int ComparisonRoutines::ReadParameters(std::string parstring) {
-  //******************************************
-
-  std::string inputspec =
-      "RW Dial Inputs Syntax \n"
-      "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
-      "fix  input: TYPE  NAME  VALUE  [STATE] \n"
-      "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-      "Allowed Types: \n"
-      "neut_parameter,niwg_parameter,t2k_parameter,"
-      "nuwro_parameter,gibuu_parameter";
-
-  // Check sample input
-  if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0].find("parameter") == std::string::npos) {
-    return kGoodStatus;
+  // Setup Samples ----------------------------------------------
+  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  if (!samplekeys.empty()) {
+    LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
   }
 
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "Input rw dials need to provide at least 3 inputs."
-             << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
+  for (size_t i = 0; i < samplekeys.size(); i++) {
+    nuiskey key = samplekeys.at(i);
+
+    // Get Sample Options
+    std::string samplename = key.GetS("name");
+    std::string samplefile = key.GetS("input");
+
+    std::string sampletype =
+      key.Has("type") ? key.GetS("type") : "DEFAULT";
+
+    double samplenorm =
+      key.Has("norm") ? key.GetD("norm") : 1.0;
+
+    // Print out
+    LOG(FIT) << "Read Sample " << i << ". : "
+             << samplename << " (" << sampletype << ") [Norm=" << samplenorm<<"]"<< std::endl
+             << "                                -> input='" << samplefile  << "'" << std::endl;
+
+    // If FREE add to parameters otherwise continue
+    if (sampletype.find("FREE") == std::string::npos) {
+      continue;
+    }
+
+    // Form norm dial from samplename + sampletype + "_norm";
+    std::string normname = samplename + sampletype + "_norm";
+
+    // Check normname not already present
+    if (fTypeVals.find("normname") != fTypeVals.end()) {
+      continue;
+    }
+
+    // Add new norm dial to list if its passed above checks
+    fParams.push_back(normname);
+
+    fTypeVals[normname] = kNORM;
+    fStateVals[normname] = sampletype;
+    fCurVals[normname] = samplenorm;
+
   }
 
-  // Setup default inputs
-  std::string partype = strvct[0];
-  std::string parname = strvct[1];
-  double parval = GeneralUtils::StrToDbl(strvct[2]);
-  std::string state = "FIX";  //[DEFAULT]
-
-  // Check Type
-  if (FitBase::ConvDialType(partype) == kUNKNOWN) {
-    ERR(FTL) << "Unknown parameter type! " << partype << endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
+  // Setup Fake Parameters -----------------------------
+  std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
+  if (!fakekeys.empty()) {
+    LOG(FIT) << "Number of fake parameters : " << fakekeys.size() << std::endl;
   }
 
-  // Check Parameter Name
-  if (FitBase::GetDialEnum(partype, parname) == -1) {
-    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
+  for (size_t i = 0; i < fakekeys.size(); i++) {
+    nuiskey key = fakekeys.at(i);
+
+    // Check for type,name,nom
+    if (!key.Has("name")) {
+      ERR(FTL) << "No name given for fakeparameter " << i << std::endl;
+      throw;
+    } else if (!key.Has("nominal")) {
+      ERR(FTL) << "No nominal given for fakeparameter " << i << std::endl;
+      throw;
+    }
+
+    // Get Inputs
+    std::string parname = key.GetS("name");
+    double parnom  = key.GetD("nominal");
+
+    // Push into vectors
+    fFakeVals[parname] = parnom;
   }
-
-  // Option Extra (No Limits)
-  if (strvct.size() == 4) {
-    state = strvct[3];
-  }
-
-  // Run Parameter Conversion if needed
-  if (state.find("ABS") != std::string::npos) {
-    parval = FitBase::RWAbsToSigma(partype, parname, parval);
-  } else if (state.find("FRAC") != std::string::npos) {
-    parval = FitBase::RWFracToSigma(partype, parname, parval);
-  }
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), parname) != fParams.end()) {
-    ERR(FTL) << "Duplicate parameter names given for " << parname << endl;
-    throw;
-  }
-
-  // Setup Containers
-  fParams.push_back(parname);
-
-  fTypeVals[parname] = FitBase::ConvDialType(partype);
-  fCurVals[parname] = parval;
-  fStateVals[parname] = state;
-
-  // Print the parameter
-  LOG(MIN) << "Read Parameter " << parname << " " << parval << " " << state
-           << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
 }
 
-//*******************************************
-int ComparisonRoutines::ReadFakeDataPars(std::string parstring) {
-  //******************************************
-
-  std::string inputspec =
-      "Fake Data Dial Inputs Syntax \n"
-      "fake value: fake_parameter  NAME  VALUE  \n"
-      "Name should match dialnames given in actual dial specification.";
-
-  // Check sample input
-  if (parstring.find("fake_parameter") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' || strvct[0] == "fake_parameter") {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "Fake dials need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Read Inputs
-  std::string parname = strvct[1];
-  double parval = GeneralUtils::StrToDbl(strvct[2]);
-
-  // Setup Container
-  fFakeVals[parname] = parval;
-
-  // Print the fake parameter
-  LOG(MIN) << "Read Fake Parameter " << parname << " " << parval << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//******************************************
-int ComparisonRoutines::ReadSamples(std::string samstring) {
-  //******************************************
-
-  const static std::string inputspec =
-      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
-      "[norm]\nsample_name: Name "
-      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
-      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
-      "optional sample options.\nnorm: Additional, optional sample "
-      "normalisation factor.";
-
-  // Check sample input
-  if (samstring.find("sample") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' || strvct[0] != "sample") {
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3) {
-    ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string samname = strvct[1];
-  std::string samfile = strvct[2];
-
-  if (samfile == "FIX") {
-    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
-                "in the input card file. Line:\'"
-             << samstring << "\'" << std::endl;
-    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
-             << std::endl;
-
-    throw;
-  }
-
-  std::string samtype = "DEFAULT";
-  double samnorm = 1.0;
-
-  // Optional Type
-  if (strvct.size() > 3) {
-    samtype = strvct[3];
-    // Append the sample type to the normalsiation name
-    //    samname += "_"+samtype;
-    // Also get rid of the / and replace it with underscore because it might not be supported character
-    //    while (samname.find("/") != std::string::npos) {
-    //      samname.replace(samname.find("/"), 1, std::string("_"));
-    //    }
-  }
-
-  // Optional Norm
-  if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
-
-  // Add Sample Names as Norm Dials
-  std::string normname = samname + "_norm";
-
-  // Now match and check there are no repeated parameter names
-  if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()) {
-    ERR(FTL) << "Duplicate samples given for " << samname << endl;
-    throw;
-  }
-
-  fParams.push_back(normname);
-
-  fTypeVals[normname] = kNORM;
-  fStateVals[normname] = samtype;
-  fCurVals[normname] = samnorm;
-
-  // Print read in
-  LOG(MIN) << "Read sample " << samname << " " << samfile << " " << samtype
-           << " " << samnorm << endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-/*
-  Setup Functions
-*/
 //*************************************
 void ComparisonRoutines::SetupRWEngine() {
-  //*************************************
+//*************************************
 
+  LOG(FIT) << "Setting up FitWeight Engine" << std::endl;
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
     FitBase::GetRW()->IncludeDial(name, fTypeVals.at(name));
@@ -465,9 +331,11 @@ void ComparisonRoutines::SetupRWEngine() {
 void ComparisonRoutines::SetupFCN() {
   //*************************************
 
-  LOG(FIT) << "Making the jointFCN" << std::endl;
+  LOG(FIT) << "Building the SampleFCN" << std::endl;
   if (fSampleFCN) delete fSampleFCN;
-  fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
+  FitPar::Config().out = fOutputRootFile;
+  fOutputRootFile->cd();
+  fSampleFCN = new JointFCN(fOutputRootFile);
   SetFakeData();
 
   return;
@@ -475,7 +343,7 @@ void ComparisonRoutines::SetupFCN() {
 
 //*************************************
 void ComparisonRoutines::SetFakeData() {
-  //*************************************
+//*************************************
 
   if (fFakeDataInput.empty()) return;
 
@@ -491,6 +359,7 @@ void ComparisonRoutines::SetFakeData() {
 
     LOG(FIT) << "Set all data to fake MC predictions." << std::endl;
   } else {
+    LOG(FIT) << "Setting fake data from: " << fFakeDataInput << std::endl;
     fSampleFCN->SetFakeData(fFakeDataInput);
   }
 
@@ -502,7 +371,7 @@ void ComparisonRoutines::SetFakeData() {
 */
 //*************************************
 void ComparisonRoutines::UpdateRWEngine(
-    std::map<std::string, double>& updateVals) {
+  std::map<std::string, double>& updateVals) {
   //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -518,19 +387,34 @@ void ComparisonRoutines::UpdateRWEngine(
 
 //*************************************
 void ComparisonRoutines::Run() {
-  //*************************************
+//*************************************
+
+  LOG(FIT) << "Running ComparisonRoutines : " << fStrategy << std::endl;
+
+  if (FitPar::Config().GetParB("save_nominal")) {
+    SaveNominal();
+  }
+
+  // Parse given routines
+  fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
+  if (fRoutines.empty()) {
+    ERR(FTL) << "Trying to run ComparisonRoutines with no routines given!" << std::endl;
+    throw;
+  }
 
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
     std::string routine = fRoutines.at(i);
-    // int fitstate = kFitUnfinished;
 
-    LOG(FIT) << "Running Routine: " << routine << std::endl;
-    if (routine == "Compare") {
+    LOG(FIT) << "Routine: " << routine << std::endl;
+    if (!routine.compare("Compare")) {
       UpdateRWEngine(fCurVals);
       GenerateComparison();
       PrintState();
+      SaveCurrentState();
     }
   }
+
+
 
   return;
 }
@@ -538,74 +422,11 @@ void ComparisonRoutines::Run() {
 //*************************************
 void ComparisonRoutines::GenerateComparison() {
   //*************************************
-
+  LOG(FIT) << "Generating Comparison." << std::endl;
   // Main Event Loop from event Manager
-  bool using_evtmanager = FitPar::Config().GetParB("EventManager");
+  fSampleFCN->ReconfigureAllEvents();
+  return;
 
-  if (using_evtmanager and false) {
-    LOG(FIT) << "Using Comparison Routines Event Manager" << endl;
-
-    std::list<MeasurementBase*> samchain = fSampleFCN->GetSampleList();
-    std::list<MeasurementBase*>::const_iterator iterSam = samchain.begin();
-
-    std::map<int, InputHandler*> fInputs = FitBase::EvtManager().GetInputs();
-    std::map<int, InputHandler*>::const_iterator iterInp = fInputs.begin();
-
-    int timestart = time(NULL);
-
-    for (; iterInp != fInputs.end(); iterInp++) {
-      int input_id = (iterInp->first);
-      InputHandler* cur_input = (iterInp->second);
-      FitEvent* cust_event = cur_input->GetEventPointer();
-      int fNEvents = cur_input->GetNEvents();
-      int countwidth = (fNEvents / 10);
-
-      // MAIN EVENT LOOP
-      for (int i = 0; i < fNEvents; i++) {
-        // Get Event from input list
-        cust_event = FitBase::EvtManager().GetEvent(input_id, i);
-
-        // Get Weight
-        double Weight = (FitBase::GetRW()->CalcWeight(cust_event) *
-                         cust_event->InputWeight);
-
-        // Skip if dodgy weight
-        if (fabs(cust_event->Mode) > 60 || cust_event->Mode == 0 ||
-            Weight > 200.0 || Weight <= 0.0)
-          continue;
-
-        // Loop over samples and fill histograms
-        iterSam = samchain.begin();
-        for (; iterSam != samchain.end(); iterSam++) {
-          MeasurementBase* exp = (*iterSam);
-          if (exp->GetInputID() != input_id) continue;
-
-          exp->FillEventVariables(cust_event);
-          exp->SetMode(cust_event->Mode);
-          exp->SetSignal(cust_event);
-          exp->SetWeight(Weight);
-          exp->FillHistograms();
-        }
-
-        // Print Out
-        if (LOG_LEVEL(REC) and i % countwidth == 0)
-          LOG(REC) << "Reconfigured " << i << " total events. W=" << Weight
-                   << std::endl;
-      }
-    }
-
-    // Convert Binned events
-    iterSam = samchain.begin();
-    for (; iterSam != samchain.end(); iterSam++) {
-      MeasurementBase* exp = (*iterSam);
-      exp->ConvertEventRates();
-    }
-
-    LOG(FIT) << "Time Taken = " << time(NULL) - timestart << std::endl;
-    LOG(FIT) << "Finished reconfiguring all events" << std::endl;
-  } else {
-    fSampleFCN->ReconfigureAllEvents();
-  }
 }
 
 //*************************************
@@ -662,12 +483,12 @@ void ComparisonRoutines::PrintState() {
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
 
-    LOG(FIT) << curparstring.str() << endl;
+    LOG(FIT) << curparstring.str() << std::endl;
   }
 
   LOG(FIT) << "------------" << std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << std::endl;
   LOG(FIT) << "------------" << std::endl;
 }
 
@@ -676,7 +497,7 @@ void ComparisonRoutines::PrintState() {
 */
 //*************************************
 void ComparisonRoutines::SaveCurrentState(std::string subdir) {
-  //*************************************
+//*************************************
 
   LOG(FIT) << "Saving current full FCN predictions" << std::endl;
 
@@ -707,12 +528,4 @@ void ComparisonRoutines::SaveNominal() {
   SaveCurrentState("nominal");
 };
 
-/*
-  MISC Functions
-*/
-//*************************************
-int ComparisonRoutines::GetStatus() {
-  //*************************************
 
-  return 0;
-}

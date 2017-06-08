@@ -17,45 +17,49 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/** 
+/**
  * Radecky et al. Phys Rev D, 3rd series, volume 25, number 5, 1 March 1982, p 1161-1173
 */
 
 #include "ANL_CC1npip_XSec_1DEnu_nu.h"
 
-// The constructor
-ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) : wTrueCut(2.0), UseCorrectedData(true) {
 
-  // Measurement Details
-  fName = "ANL_CC1npip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma (cm^{2}/nucleon)";
-  EnuMin = 0.;
-  EnuMax = 1.5;
-  fIsDiag = true;
-  fNormError = 0.20;
-  fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR/CORR/W14/W16/NOW";
-  
-  // User can specify "UNCORR" for uncorrected data
-  // Default is to use correction
-  if (type.find("UNCORR") != std::string::npos) {
-    UseCorrectedData = false;
-  } else {
-    UseCorrectedData = true;
-  }
+//********************************************************************
+ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
+
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL CC1npip Event Rate 1DQ2 nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX/DIAG", "FIX,FREE,SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 1.5);
+  fSettings.SetS("norm_error", "0.20");
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // User can specifiy to use uncorrected data
+  UseCorrectedData = !fSettings.Found("name", "Uncorr");
 
   // User can specify "W14" for W < 1.4 GeV cut
   //                  "W16" for W < 1.6 GeV cut
   //                  The default is W < 2.0
-  if (type.find("W14") != std::string::npos) {
-    wTrueCut = 1.4;
-  } else if (type.find("W16") != std::string::npos) {
-    wTrueCut = 1.6;
-  } else {
-    // In the case 
-    wTrueCut = 10.0;
-  }
+  if (fSettings.Found("name", "W14Cut")) wTrueCut = 1.4;
+  else if (fSettings.Found("name", "W16Cut")) wTrueCut = 1.6;
+  else wTrueCut = 10.0;
 
+
+  // Flag for bad combo
   if (UseCorrectedData && wTrueCut == 1.6) {
     ERR(FTL) << "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
     ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
@@ -63,17 +67,8 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
     UseCorrectedData = false;
   }
 
-  // Get rid of the slashes in the type
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
-  }
-
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
-
   // Now read in different data depending on what the user has specified
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/ANL/CC1pip_on_n/";
+  std::string DataLocation = GeneralUtils::GetTopLevelDir() + "/data/ANL/CC1pip_on_n/";
 
   // If we're using corrected data
   if (UseCorrectedData) {
@@ -84,7 +79,7 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
       DataLocation += "anl82corr-numu-n-to-mu-n-piplus-noW_edges.txt";
     }
 
-  // If we're using raw uncorrected data
+    // If we're using raw uncorrected data
   } else {
 
     if (wTrueCut == 1.4) {
@@ -95,17 +90,24 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
       DataLocation += "anl82-numu-cc1npip-noWcut.txt";
     }
   }
+  fSettings.SetDataInput(DataLocation);
 
-  // Setup Plots
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
 
-  // Setup Covariance
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  FinaliseSampleSettings();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 * 2.0 / 1.0 / (fNEvents + 0.));
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
@@ -120,11 +122,11 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 
   double hadMass = FitUtils::MpPi(Pn, Ppip);
   double Enu     = -1.0;
-    
+
   // ANL has a W cuts at 1.4, 1.6 and no w cut
   // This is set by user, or defaults to 2.0
-  if (hadMass < wTrueCut*1000.) {
-    Enu = Pnu.E()/1.E3;
+  if (hadMass < wTrueCut * 1000.) {
+    Enu = Pnu.E() / 1.E3;
   }
 
   fXVar = Enu;

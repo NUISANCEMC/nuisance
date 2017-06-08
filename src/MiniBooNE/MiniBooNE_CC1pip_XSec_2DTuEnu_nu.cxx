@@ -19,39 +19,46 @@
 
 #include "MiniBooNE_CC1pip_XSec_2DTuEnu_nu.h"
 
-// The constructor
-MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
 
-  fName = "MiniBooNE_CC1pip_XSec_2DTuEnu_nu";
-  fPlotTitles = "; E_{#nu} (MeV); T_{#mu} (MeV); d#sigma(E_{#nu})/dT_{#mu} (cm^{2}/MeV)";
-  fIsDiag = true;
-  fNormError = 0.107;
-  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+MiniBooNE_CC1pip_XSec_2DTuEnu_nu::MiniBooNE_CC1pip_XSec_2DTuEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MiniBooNE/CC1pip/ccpipXSecs.root", std::string("MUKEVENUXSec"));//data comes in .root file, yes!
-  this->SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE_CC1pip_XSec_2DTuEnu_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (MeV)");
+  fSettings.SetYTitle("T_{#mu} (MeV)");
+  fSettings.SetZTitle("d#sigma(E_{#nu})/dT_{#mu} (cm^{2}/MeV)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetNormError(0.107);
+  fSettings.DefineAllowedTargets("C,H");
 
-  // Calculates a flux averaged cross-section from (Evt("width")/Flux("width")) * 14.08/6.0
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
+  fSettings.SetTitle("MiniBooNE_CC1pip_XSec_2DTuEnu_nu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/CC1pip/ccpipXSecs.root;MUKEVENUXSec" );
+  fSettings.DefineAllowedSpecies("numu");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(14.08);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromRootFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
-
-/*
-void MiniBooNE_CC1pip_XSec_2DTuEnu_nu::SetDataValues(std::string fileLocation) {
-  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
-
-  fDataHist = (TH2D*)(dataFile->Get("MUKEVENUXSec")->Clone());
-
-  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
-
-  dataFile->Close();
-  delete dataFile;
-};
-*/
 
 void MiniBooNE_CC1pip_XSec_2DTuEnu_nu::FillEventVariables(FitEvent *event) {
 

@@ -39,7 +39,7 @@ public:
   ///\n 2. MINERvA_CCQE_XSec_1DQ2_nu_20deg - Latest update restricted phase space
   ///\n 3. MINERvA_CCQE_XSec_1DQ2_nu_oldflux - Old flux from original release, full phase space
   ///\n 4. MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux - Old flux from original release, restricted phase space
-  MINERvA_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
   virtual ~MINERvA_CCQE_XSec_1DQ2_nu() {};
 
   ///\brief Signal is True CCQE+2p2h

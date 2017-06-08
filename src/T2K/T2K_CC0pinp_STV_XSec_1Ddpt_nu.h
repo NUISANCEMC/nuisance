@@ -24,7 +24,7 @@
 
 class T2K_CC0pinp_STV_XSec_1Ddpt_nu : public Measurement1D {
 public:
-  T2K_CC0pinp_STV_XSec_1Ddpt_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey);
   virtual ~T2K_CC0pinp_STV_XSec_1Ddpt_nu() {};
 
   void FillEventVariables(FitEvent *event);

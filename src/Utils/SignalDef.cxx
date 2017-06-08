@@ -245,11 +245,27 @@ bool SignalDef::isNCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
 
 bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 
-  double pe = -1.0;
-  if (event->HasFSProton()) pe = FitUtils::T(event->GetHMFSProton()->fP);
+  for (int i = 0; i < event->Npart(); i++){
+    FitParticle* p = event->PartInfo(i);
+    if (!p->IsFinalState()) continue;
+    if (p->fPID != 2212) continue;
 
-  return pe > threshold / 1000.0;
+    if (FitUtils::T(p->fP) > threshold / 1000.0) return true;
+  }
+  return false;
 
+}
+
+bool SignalDef::HasProtonMomAboveThreshold(FitEvent* event, double threshold){
+
+  for (int i = 0; i < event->Npart(); i++){
+    FitParticle* p = event->PartInfo(i);
+    if (!p->IsFinalState()) continue;
+    if (p->fPID != 2212) continue;
+
+    if (p->fP.Vect().Mag() > threshold) return true;
+  }
+  return false;
 }
 
 // Calculate the angle between the neutrino and an outgoing particle, apply a cut

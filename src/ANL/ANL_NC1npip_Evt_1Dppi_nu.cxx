@@ -18,34 +18,48 @@
 *******************************************************************************/
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 
+
 /**
   * M. Derrick et al., "Study of single-pion production by weak neutral currents in low-energy \nu d interactions", Physical Review D, Volume 23, Number 3, 569, 1 February 1981
 */
+//********************************************************************
+ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
+//********************************************************************
 
-ANL_NC1npip_Evt_1Dppi_nu::ANL_NC1npip_Evt_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "ANL_NC1npip_Evt_1Dppi_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fName = "ANL_NC1npip_Evt_1Dppi_nu";
-  fPlotTitles = "; p_{#pi} (MeV); Number of events";
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes="EVT/SHAPE/DIAG";
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#pi} (MeV)");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.0, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  // There are two different measurements here; _weight and _unweight
-  // See publication for information
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
-  //this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv");
-  this->SetupDefaultHist();
+  // CCQELike plot information
+  fSettings.SetTitle("ANL #nu_mu NC1n#pi^{+}");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/NC1npip/ANL_ppi_NC1npip_weight.csv" );
+  fSettings.DefineAllowedSpecies("numu");
 
-  // set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  FinaliseSampleSettings();
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.)*GetFluxHistogram()->Integral("width"))*(2./1.);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")/((fNEvents+0.)*GetFluxHistogram()->Integral("width"))*(16./8.);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 void ANL_NC1npip_Evt_1Dppi_nu::FillEventVariables(FitEvent *event) {

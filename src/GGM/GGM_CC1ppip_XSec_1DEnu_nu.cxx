@@ -19,25 +19,45 @@
 
 #include "GGM_CC1ppip_XSec_1DEnu_nu.h"
 
-// The constructor
-GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "GGM_CC1ppip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/proton)";
-  EnuMin = 1.;
-  EnuMax = 10.0;
-  fIsDiag = true;
-  fNormError = 0.20;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+GGM_CC1ppip_XSec_1DEnu_nu::GGM_CC1ppip_XSec_1DEnu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/GGM/CC1pip_on_p/Gargamelle78-numu-p-to-mu-p-piplus-lowW_EDGES.txt");
-  this->SetupDefaultHist();
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "GGM_CC1ppip_XSec_1DEnu_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("E_{#nu} (GeV)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/proton)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG", "FIX/DIAG");
+  fSettings.SetEnuRange(1.0, 10.0);
+  fSettings.DefineAllowedTargets("D,H");
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
-};
+  // plot information
+  fSettings.SetTitle("GGM_CC1ppip_XSec_1DEnu_nu");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "GGM/CC1pip_on_p/Gargamelle78-numu-p-to-mu-p-piplus-lowW_EDGES.txt");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor for shape
+  fScaleFactor =  GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(2./1.);
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
+}
 
 void GGM_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 

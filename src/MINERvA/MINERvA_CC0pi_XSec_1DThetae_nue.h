@@ -28,7 +28,7 @@ class MINERvA_CC0pi_XSec_1DThetae_nue : public Measurement1D {
 
 public:
 
-  MINERvA_CC0pi_XSec_1DThetae_nue(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CC0pi_XSec_1DThetae_nue(nuiskey samplekey);
   virtual ~MINERvA_CC0pi_XSec_1DThetae_nue() {};
 
   // Functions for handling each neut event

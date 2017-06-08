@@ -25,11 +25,10 @@
 class BEBC_CC1ppim_XSec_1DQ2_antinu : public Measurement1D {
 
 public:
-  BEBC_CC1ppim_XSec_1DQ2_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  BEBC_CC1ppim_XSec_1DQ2_antinu(nuiskey samplekey);
   virtual ~BEBC_CC1ppim_XSec_1DQ2_antinu() {};
   
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
   void FillHistograms();
   void Write(std::string drawOpts);

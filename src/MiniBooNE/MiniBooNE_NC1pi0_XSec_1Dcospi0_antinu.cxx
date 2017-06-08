@@ -19,41 +19,55 @@
 
 #include "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h"
 
-// The constructor
-MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+//********************************************************************
+MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(nuiskey samplekey) {
+//********************************************************************
 
-  fName = name;
-  fPlotTitles = "; cos#theta_{#pi^{0}}; d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/nucleon)";
-  // (CP) I don't know what these energies should be, setting EnuMin to 5 for
-  // now. You made this life choice based upon Fig 29 in arxiv:0806.1449v2
-  EnuMin = 0.;
-  EnuMax = 5.0;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
 
-  std::string data_filename = "";
-  std::string covar_filename = "";
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("cos#theta_{#pi^{0}}");
+  fSettings.SetYTitle("d#sigma/dcos#theta_{#pi^{0}} (cm^{2}/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(0.0, 5.0);
+  fSettings.DefineAllowedTargets("C,H");
 
-  nunubar_mode = fName.find("combined") != std::string::npos;
+  fSettings.SetTitle("MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu");
+  nunubar_mode = fSettings.Found("name", "combined");
   if (!nunubar_mode) {
-    data_filename = "/data/MiniBooNE/NC1pi0/nubarcosthetapi0xsec_edit.txt";
-    covar_filename = "/data/MiniBooNE/NC1pi0/nubarcosthetapi0xsecerrormatrix.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nubarcosthetapi0xsec_edit.txt" );
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nubarcosthetapi0xsecerrormatrix.txt" );
+    fSettings.DefineAllowedSpecies("numub");
+
   } else {
-    data_filename = "/data/MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsec_edit.txt";
-    covar_filename = "/data/MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsecerrormatrix.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsec_edit.txt");
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsecerrormatrix.txt");
+    fSettings.DefineAllowedSpecies("numu,numub");
+
   }
 
-  SetDataValues(GeneralUtils::GetTopLevelDir() + data_filename);
+  FinaliseSampleSettings();
 
-  SetCovarMatrixFromText(GeneralUtils::GetTopLevelDir() + covar_filename, 10,1.E-5);
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
 
-  SetupDefaultHist();
-  StatUtils::SetDataErrorFromCov(fDataHist,fFullCovar,1E-38);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCovarFromTextFile( fSettings.GetCovarInput() );
+  ScaleCovar(1.E-5);
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
-  // (CP) setting my scale factor, the paper reports in cm^2/nucleon so I
-  // apparently don't need to faff with any other numbers.
-  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 void MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::FillEventVariables(FitEvent *event) {
 
@@ -64,7 +78,7 @@ void MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::FillEventVariables(FitEvent *event) 
     return;
   }
 
-  if (abs(event->NumFSParticle(13)) == 1 || abs(event->NumFSParticle(11)) == 1 || abs(event->NumFSParticle(15)) == 1 || abs(event->NumFSParticle(17)) == 1) return; 
+  if (abs(event->NumFSParticle(13)) == 1 || abs(event->NumFSParticle(11)) == 1 || abs(event->NumFSParticle(15)) == 1 || abs(event->NumFSParticle(17)) == 1) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
@@ -79,10 +93,10 @@ void MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::FillEventVariables(FitEvent *event) 
 //********************************************************************
 bool MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::isSignal(FitEvent *event) {
 //********************************************************************
-  if (nunubar_mode){
+  if (nunubar_mode) {
     return (SignalDef::isNC1pi(event, 14, 111, EnuMin, EnuMax) ||
-	    SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax));
+            SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax));
   } else {
-      return SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax);
+    return SignalDef::isNC1pi(event, -14, 111, EnuMin, EnuMax);
   }
 }

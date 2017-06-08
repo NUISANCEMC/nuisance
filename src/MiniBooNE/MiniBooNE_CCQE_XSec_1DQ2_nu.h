@@ -22,30 +22,29 @@
 
 #include "Measurement1D.h"
 
-//******************************************************************** 
+//********************************************************************
 class MiniBooNE_CCQE_XSec_1DQ2_nu : public Measurement1D {
-//******************************************************************** 
+//********************************************************************
 
 public:
 
-  MiniBooNE_CCQE_XSec_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  MiniBooNE_CCQE_XSec_1DQ2_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CCQE_XSec_1DQ2_nu() {};
-  
+
+  // Multiple Constrictuors.
+  void Setup_MiniBooNE_CCQE_XSec_1DQ2_nu();
+  void Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu();
+
   void FillEventVariables(FitEvent *event);
-  void FillHistograms();
-  void Write(std::string drawOpt);
   bool isSignal(FitEvent *event);
-  void ScaleEvents();
-  void ApplyNormScale(double norm);
-  void ResetAll();
-
-  TH1D* fMCHist_CCQELIKE[61]; ///<! Plots in CCQELike mode to tag PDG of the background
-
- private:
+  void FillExtraHistograms(MeasurementVariableBox* vars, double weight = 1.0);
+  
+private:
   double q2qe; ///<! X_Variable
   bool bad_particle; ///<! Used in CCQELike mode to tag events without nucleons, muons or photons.
   bool ccqelike; ///<! Flag for running in CCQELike mode
   TH1D* fDataHist_CCQELIKE; ///<! CCQELike data contribution
+  TrueModeStack* fMCHist_CCQELIKE;
 };
-  
+
 #endif

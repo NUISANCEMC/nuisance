@@ -19,68 +19,63 @@
 
 /**
  * Kitagaki et al. Phys Rev D, Volume 34, Number 9, 1 November 1986, p2254-2565
- * K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints. 
+ * K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints.
  * KEK Preprint 2003-48, RCNS-03-01, September 2003
 */
 
 #include "BNL_CC1ppip_Evt_1DQ2_nu.h"
 
-// The constructor
-BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile) {
-
-  fName = "BNL_CC1ppip_Evt_1DQ2_nu";
-  fPlotTitles = "; Q^{2}_{CC#pi} (GeV^{2}); Number of events";
-  EnuMin = 0.5;
-  EnuMax = 6.;
-  fIsDiag = true;
-  fIsRawEvents = true;
-  fDefaultTypes="EVT/SHAPE/DIAG";
-  fAllowedTypes = "EVT/SHAPE/DIAG/W14/NOW";
-
-  // Look if user has specified a W cut
-  if (type.find("W14") != std::string::npos) {
-    HadCut = 1.4;
-  } else {
-    HadCut = 10.0;
-    EnuMin = 0.0;
-    EnuMax = 10.0;
-  }
-  if (!type.empty() && type != "DEFAULT") {
-    std::string temp_type = type;
-    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
-    fName += "_"+temp_type;
-  }
-
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
 
-  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/";
+//********************************************************************
+BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
+//********************************************************************
 
-  // If W < 1.4 GeV cut
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "BNL_CC1ppip_Evt_1DQ2_nu sample. \n" \
+                        "Target: D2 \n" \
+                        "Flux:  \n" \
+                        "Signal:  \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.DefineAllowedTargets("D,H");
+
+  // plot information
+  fSettings.SetTitle("BNL #nu_mu CC1n#pi^{+}");
+  fSettings.DefineAllowedSpecies("numu");
+
+  // Hadronic Cut Info
+  HadCut = fSettings.Found("name", "W14Cut") ? 1.4 : 10.0;
   if (HadCut == 1.4) {
-    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_firstQ2rem.txt";
-  // If W < 2.0 GeV
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_w14_enu05to6_firstQ2rem.txt" );
   } else {
-    // No Enu cuts on full W space
-    //DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_firstQ2rem.txt";
-    DataLocation += "BNL_CC1pip_on_p_noEvents_q2_noWcut_HighQ2Gone.txt";
+    fSettings.SetDataInput(  FitPar::GetDataBase()
+                             + "/BNL/CC1pip_on_p/BNL_CC1pip_on_p_noEvents_q2_noWcut_HighQ2Gone.txt");
+    fSettings.SetEnuRange(0.0, 10.0);
   }
 
-  SetDataValues(DataLocation);
-  SetupDefaultHist();
+  FinaliseSampleSettings();
 
-  // Set Poisson errors on fDataHist (scanned does not have this)
-  // Simple counting experiment here
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinError(i+1, sqrt(fDataHist->GetBinContent(i+1)));
-  }
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.);
 
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetPoissonErrors();
+  SetCovarFromDiagonal();
 
-  fScaleFactor = GetEventHistogram()->Integral("width")/(fNEvents+0.);
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
-
 
 void BNL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
@@ -96,11 +91,11 @@ void BNL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::MpPi(Pp, Ppip);
   double q2CCpip = -1.0;
 
-  // BNL has a M(pi, p) < 1.4 GeV cut and no W cut. 
+  // BNL has a M(pi, p) < 1.4 GeV cut and no W cut.
   // This should be specified by user in "type" field
   // Reverts to 10 GeV (essentially no W cut!)
-  if (hadMass < HadCut*1000.) {
-    q2CCpip = -1*(Pnu-Pmu).Mag2()/1.E6;
+  if (hadMass < HadCut * 1000.) {
+    q2CCpip = -1 * (Pnu - Pmu).Mag2() / 1.E6;
   }
 
   fXVar = q2CCpip;
@@ -110,29 +105,6 @@ void BNL_CC1ppip_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
 
 bool BNL_CC1ppip_Evt_1DQ2_nu::isSignal(FitEvent *event) {
-  return SignalDef::isCC1pi3Prong(event, 14, 211, 2212,EnuMin,EnuMax);
+  return SignalDef::isCC1pi3Prong(event, 14, 211, 2212, EnuMin, EnuMax);
 }
 
-/*
-void BNL_CC1ppip_Evt_1DQ2_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void BNL_CC1ppip_Evt_1DQ2_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

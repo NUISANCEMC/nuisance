@@ -45,7 +45,13 @@
 #include "FitParameters.h"
 #include "FitLogger.h"
 #include "BaseFitEvt.h"
-
+#include "NuisConfig.h"
+#include "NuisKey.h"
+#include "SplineReader.h"
+#include "SplineWriter.h"
+#include "SplineMerger.h"
+#include "ParserUtils.h"
+#include "OpenMPWrapper.h"
 enum minstate {
   kErrorStatus = -1,
   kGoodStatus,
@@ -82,29 +88,6 @@ public:
 
   //! Splits the arguments ready for initial setup
   void ParseArgs(int argc, char* argv[]);
-
-  //! Sorts out configuration and verbosity right at the very start.
-  //! Calls readCard to set everything else up.
-  void InitialSetup();
-
-  //! Loops through each line of the card file and passes it to other read functions
-  void ReadCard(std::string cardfile);
-
-  //! Check for parameter string in the line and assign the correct type.
-  //! Fills maps for each of the parameters
-  int ReadParameters(std::string parstring);
-
-  //! Read in the samples so we can set up the free normalisation dials if required
-  int ReadSamples(std::string sampleString);
-
-  //! Read Generic Inputs
-  int ReadGenericInputs(std::string sampleString);
-
-  //! Read Event Splines
-  int ReadEventSplines(std::string splstring);
-
-  //! Read Bin Splines
-  int ReadBinSplines(std::string binstring){ return kGoodStatus; };
   
   /*
     Setup Functions
@@ -116,22 +99,37 @@ public:
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void SetupRWEngine();
 
-  //! Setups up the jointFCN and uses it to grab samples.
-  void SetupSamples();
-
-  void SetupGenericInputs();
-
+  void Run();
   void SaveEvents();
+  void TestEvents();
+  void GenerateEventSplines();
+  void GenerateEventWeights();
+  void GenerateEventWeightChunks(int procchunk = -1);
+  void BuildEventSplines(int procchunk = -1);
+  void MergeEventSplinesChunks();
+  /* 
+    Testing Functions
+  */
+  
+  /// Scan parameter space in 1D at finer resolution than points. Compare Raw/Spline on an event by event basis.
+  void TestSplines_1DEventScan();
 
-  void SaveEventSplines();
+  /// Scan parameter space in 1D at finer resolution than points. Compare likelihoods for all testsamples.
+  void TestSplines_1DLikelihoodScan();
 
-  void TestEventSplines();
+  /// Randomly throw in parameter space. For each throw, calc average weight difference.
+  void TestSplines_NDEventThrow();
+
+  /// Randomly thow in parameter space. For each throw, calc likelihood difference for each sample.
+  void TestSplines_NDLikelihoodThrow();
+
+
+  /// Generate a set of spline vs weight canvases and save to file
+  void SaveSplinePlots();
+
   /*
     Fitting Functions
   */
-
-  //! Main function to actually start iterating over the different required fit routines
-  void Run();
 
   //! Given a new map change the values that the RW engine is currently set to
   void UpdateRWEngine(std::map<std::string,double>& updateVals);
@@ -142,6 +140,8 @@ public:
 
   //! Get previous fit status from a file
   Int_t GetStatus();
+
+  void MergeSplines();
 
 protected:
 
@@ -182,12 +182,13 @@ protected:
   std::map<std::string, std::string> fGenericInputFiles;
   std::map<std::string, std::string> fGenericOutputFiles;
   std::map<std::string, std::string> fGenericOutputTypes;
-  std::map<std::string, InputHandler*> fGenericInputs;
+  std::map<std::string, InputHandlerBase*> fGenericInputs;
 
 
   std::vector<std::string> fSplineNames;
   std::map<std::string, std::string> fSplineTypes;
   std::map<std::string, std::string> fSplinePoints;
+    nuiskey fCompKey;
   
   
 };

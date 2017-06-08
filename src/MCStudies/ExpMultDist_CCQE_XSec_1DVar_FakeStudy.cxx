@@ -42,8 +42,9 @@ ExpMultDist_CCQE_XSec_1DVar_FakeStudy::ExpMultDist_CCQE_XSec_1DVar_FakeStudy(std
 
 
   // Use the name to define what variable to measure
-  int nbins;
-  double binlow, binhigh;
+  int nbins = 0;
+  double binlow = 0.0;
+  double binhigh = 0.0;
 
   if (name.find("1DQ2") != std::string::npos){
     plottype = 1; fPlotTitles = "";

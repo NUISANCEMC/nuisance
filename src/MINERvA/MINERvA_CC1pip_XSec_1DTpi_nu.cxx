@@ -21,45 +21,72 @@
 
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 
-// The constructor
-MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(std::string name, std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
-  fName = name;
-  fPlotTitles = "; T_{#pi} (MeV); d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)";
-  fFullPhaseSpace = fName.find("_20deg") == std::string::npos;
-  EnuMin = 1.5;
-  EnuMax = 10;
-  fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+MINERvA_CC1pip_XSec_1DTpi_nu::MINERvA_CC1pip_XSec_1DTpi_nu(nuiskey samplekey) {
+//********************************************************************
 
-  if (fFullPhaseSpace){
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MINERvA_CC1pip_XSec_1DTpi_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("T_{#pi} (MeV)");
+  fSettings.SetYTitle("d#sigma/dT_{#pi} (cm^{2}/MeV/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(1.5, 10.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
+
+  fFullPhaseSpace = !fSettings.Found("name", "_20deg");
+  fFluxCorrection = fSettings.Found("name","fluxcorr");
+  fSettings.SetTitle("MINERvA_CC1pip_XSec_1DTpi_nu");
+  fIsShape = fSettings.Found("type","shape");
+
+  if (fFullPhaseSpace) {
     if (fIsShape) {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv", fDataHist->GetNbinsX());
+      fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_shape.csv");
+      fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_cov_shape.csv");
     } else {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi.csv");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv", fDataHist->GetNbinsX());
+      fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi.csv");
+      fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_cov.csv");
     }
   } else {
-     if (this->fIsShape) {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_shape.csv");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov_shape.csv", fDataHist->GetNbinsX());
+    if (fIsShape) {
+      fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_20_shape.csv");
+      fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_20_cov_shape.csv");
     } else {
-      this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20.csv");
-      this->SetCovarMatrixFromCorrText(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/ccpip_Tpi_20_cov.csv", fDataHist->GetNbinsX());
+      fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_20.csv");
+      fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pip/ccpip_Tpi_20_cov.csv");
     }
   }
 
-  this->SetupDefaultHist();
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromTextFile( fSettings.GetDataInput() );
+  SetCorrelationFromTextFile( fSettings.GetCovarInput() );
 
   // Scale the MINERvA data to account for the flux difference
-  for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
-    fDataHist->SetBinContent(i+1, fDataHist->GetBinContent(i+1)*1.11);
+  if (fFluxCorrection) {
+    for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
+      fDataHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) * 1.11);
+    }
   }
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
-  std::cout << "SF: " << fScaleFactor << std::endl;
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
 
 void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
@@ -75,7 +102,7 @@ void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   double Tpi = -999;
 
   if (hadMass > 100 && hadMass < 1400)
-    Tpi = FitUtils::T(Ppip)*1000.;
+    Tpi = FitUtils::T(Ppip) * 1000.;
 
   fXVar = Tpi;
 

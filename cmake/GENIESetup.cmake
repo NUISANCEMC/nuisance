@@ -40,6 +40,11 @@ if(NOT DEFINED GENIE AND DEFINED ENV{GENIE})
   set(GENIE $ENV{GENIE})
 endif()
 
+if (DEFINED BUILD_GEVGEN AND BUILD_GEVGEN)
+  cmessage(STATUS "Building custom gevgen")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEVGEN_ENABLED__ ")
+endif()
+
 execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND genie-config
@@ -70,6 +75,20 @@ endif()
 
 if(NOT DEFINED LHAPDF_INC AND DEFINED ENV{LHAPDF_INC})
   set(LHAPDF_INC $ENV{LHAPDF_INC})
+endif()
+
+
+if(NOT DEFINED LHAPATH AND NOT DEFINED ENV{LHAPATH})
+
+  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. "
+    "The location of a the LHAPATH directory must be defined either as"
+    " $ cmake -DLHAPATH=/path/to/LHAPATH or as and environment variable"
+    " $ export LHAPATH=/path/to/LHAPATH")
+
+endif()
+
+if(NOT DEFINED LHAPATH AND DEFINED ENV{LHAPATH})
+  set(LHAPATH $ENV{LHAPATH})
 endif()
 
 

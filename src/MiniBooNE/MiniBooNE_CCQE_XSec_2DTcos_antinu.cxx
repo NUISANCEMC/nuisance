@@ -19,59 +19,71 @@
 
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 
+
+
 //********************************************************************
-MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile){
+MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(nuiskey samplekey) {
 //********************************************************************
 
-  // Measurement Details
-  fName = name;
-  fPlotTitles = "; Q^{2}_{QE} (GeV^{2}); d#sigma/dQ_{QE}^{2} (cm^{2}/GeV^{2})";
-  EnuMin = 0.;
-  EnuMax = 3.;
-  fNormError = 0.130;
-  fDefaultTypes="FIX/DIAG";
-  fAllowedTypes="FIX,FREE,SHAPE/DIAG/NORM";
-  Measurement2D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "MiniBooNE_CCQE_XSec_2DTcos_antinu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // Setup Plots
-  fPlotTitles = "; T_{#mu} (GeV); cos#theta_{#mu}; d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)";
-  ccqelike = name.find("CCQELike") != std::string::npos;
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("T_{#mu} (GeV)");
+  fSettings.SetYTitle("cos#theta_{#mu}");
+  fSettings.SetZTitle("d^{2}#sigma/dT_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetNormError(0.130);
+  fSettings.DefineAllowedTargets("C,H");
 
-  if(ccqelike){
-    fMeasurementSpeciesType = kNumuWithWrongSignMeasurement;
-  }
+  // CCQELike plot information
+  fSettings.SetTitle("MiniBooNE_CCQE_XSec_2DTcos_antinu");
 
-  // Define Bin Edges
-  fNDataPointsX = 19;
-  fNDataPointsY = 21;
-  Double_t tempx[19] = { 0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0};
-  Double_t tempy[21] = {-1.0, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-  fXBins = tempx;
-  fYBins = tempy;
+  ccqelike = fSettings.Found("name", "CCQELike");
+  if (!ccqelike) {
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_con.txt" );
+    fSettings.SetErrorInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_err.txt" );
+    fSettings.DefineAllowedSpecies("numub");
 
-  // Setup Data Plots
-  if (!ccqelike){
-    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_con.txt", 1E-41,
-		  FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
   } else {
-    SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_like.txt", 1E-41,
-		  FitPar::GetDataBase()+"/MiniBooNE/anti-ccqe/aski_err.txt", 1E-42);
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_like.txt" );
+    fSettings.SetErrorInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_err.txt" );
+    fMeasurementSpeciesType = kNumuWithWrongSignMeasurement;
+    fSettings.DefineAllowedSpecies("numu,numub");
   }
-  this->SetupDefaultHist();
 
-  // Setup Covariances
-  fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar     = StatUtils::GetInvert(fFullCovar);
-  fIsDiag    = true;
+  FinaliseSampleSettings();
 
-  // Set Scaling for Differential Cross-section
-  fScaleFactor = ((GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))
-		 *(14.08/8.)
-		 /TotalIntegratedFlux());
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = ((GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) * (14.08 / 8.) / TotalIntegratedFlux());
+
+  // Plot Setup -------------------------------------------------------
+  Double_t binx[19] = { 0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0};
+  Double_t biny[21] = { -1.0, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+  CreateDataHistogram(19, binx, 21, biny);
+
+  SetDataValuesFromTextFile( fSettings.GetDataInput() );
+  ScaleData(1E-41);
+
+  SetDataErrorsFromTextFile( fSettings.GetErrorInput() );
+  ScaleDataErrors(1E-42);
+
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
 
 //********************************************************************
-void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
+void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   if (event->NumFSParticle(PhysConst::pdg_muons) == 0)
@@ -84,7 +96,7 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
   TLorentzVector Pmu = event->GetHMFSParticle(PhysConst::pdg_muons)->fP;
 
   // Now find the kinematic values and fill the histogram
-  Ekmu     = Pmu.E()/1000.0 - PhysConst::mass_muon;
+  Ekmu     = Pmu.E() / 1000.0 - PhysConst::mass_muon;
   costheta = cos(Pnu.Vect().Angle(Pmu.Vect()));
 
   // Set X Variables
@@ -95,7 +107,7 @@ void  MiniBooNE_CCQE_XSec_2DTcos_antinu::FillEventVariables(FitEvent *event){
 };
 
 //********************************************************************
-bool MiniBooNE_CCQE_XSec_2DTcos_antinu::isSignal(FitEvent *event){
+bool MiniBooNE_CCQE_XSec_2DTcos_antinu::isSignal(FitEvent *event) {
 //********************************************************************
 
   // If CC0pi, include both charges

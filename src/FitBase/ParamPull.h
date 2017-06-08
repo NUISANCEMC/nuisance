@@ -31,6 +31,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <list>
+#include <vector>
 
 // ROOT includes
 #include <TROOT.h>

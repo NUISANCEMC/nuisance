@@ -25,13 +25,16 @@
 class MiniBooNE_CC1pi0_XSec_1Dppi0_nu : public Measurement1D {
 public:
 
-  MiniBooNE_CC1pi0_XSec_1Dppi0_nu(std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+MiniBooNE_CC1pi0_XSec_1Dppi0_nu(nuiskey samplekey);
   virtual ~MiniBooNE_CC1pi0_XSec_1Dppi0_nu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
+  void FillExtraHistograms(MeasurementVariableBox* box, double weight);
 
 private:
+	int fTargetPDG;
+	TargetTypeStack* fTargetStack;
 };
 
 #endif

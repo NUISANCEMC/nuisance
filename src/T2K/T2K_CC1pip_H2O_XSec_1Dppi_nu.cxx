@@ -3,27 +3,44 @@
 // The momentum of the (positive) pion
 
 //********************************************************************
-T2K_CC1pip_H2O_XSec_1Dppi_nu::T2K_CC1pip_H2O_XSec_1Dppi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+T2K_CC1pip_H2O_XSec_1Dppi_nu::T2K_CC1pip_H2O_XSec_1Dppi_nu(nuiskey samplekey) {
 //********************************************************************
 
-  fName = "T2K_CC1pip_H2O_XSec_1Dppi_nu";
-  fPlotTitles = "; p_{#pi^{+}} (GeV/c); d#sigma/dp_{#pi^{+}} (cm^{2}/(GeV/c)/nucleon)";
-  EnuMin = 0.;
-  EnuMax = 100.;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "T2K_CC1pip_H2O_XSec_1Dppi_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: T2k Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  // Data comes in ROOT file
-  // hResultTot is cross-section with all errors
-  // hResultStat is cross-section with stats-only errors
-  // hTruthNEUT is the NEUT cross-section given by experimenter
-  // hTruthGENIE is the GENIE cross-section given by experimenter
-  SetDataFromFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root","PosPionMom/hResultTot");
-  SetCovarFromDataFile(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root", "PosPionMom/TotalCovariance", true);
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetTitle("T2K_CC1pip_H2O_XSec_1Dppi_nu");
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#pi^{+}} (GeV/c)");
+  fSettings.SetYTitle("d#sigma/dp_{#pi^{+}} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
+  fSettings.SetEnuRange(0.0, 100.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
 
-  SetupDefaultHist();
+  fSettings.SetDataInput(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root;PosPionMom/hResultTot");
+  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/H2O/nd280data-numu-cc1pi-xs-on-h2o-2015.root;PosPionMom/TotalCovariance");
 
-  fScaleFactor = GetEventHistogram()->Integral("width")*1E-38/double(fNEvents)/TotalIntegratedFlux("width");
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromRootFile(  fSettings.GetDataInput() );
+  SetCovarFromRootFile( fSettings.GetCovarInput() );
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
 
 //********************************************************************
 // Find the momentum of the (positively charged) pion

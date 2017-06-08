@@ -34,7 +34,7 @@ public:
   ///
   ///\n Valid Sample Names:
   ///\n 1. MINERvA_CC0pi_XSec_1DQ2_nu_proton - Main analysis
-  MINERvA_CC0pi_XSec_1DQ2_nu_proton(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile);
+  MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey samplekey);
   virtual ~MINERvA_CC0pi_XSec_1DQ2_nu_proton() {};
 
   ///\brief Signal is CC0pi1p
@@ -50,9 +50,6 @@ public:
 
   ///\brief Calculate Extra Weight (Not necessary)
   inline double CalcSampleWeight(FitEvent* event){ return 1.0; }
-
-  ///\brief Handling setup for extra histograms
-  bool SortExtraPlots(int state);
 
  private:
 

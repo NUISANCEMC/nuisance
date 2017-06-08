@@ -1,25 +1,47 @@
 #include "T2K_CC1pip_CH_XSec_1Dpmu_nu.h"
 #include <iomanip>
 
-// The constructor
-T2K_CC1pip_CH_XSec_1Dpmu_nu::T2K_CC1pip_CH_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "T2K_CC1pip_CH_XSec_1Dpmu_nu";
-  fPlotTitles = "; p_{#mu} (GeV/c); d#sigma/dp_{#mu} (cm^{2}/(GeV/c)/nucleon)";
-  EnuMin = 0.;
-  EnuMax = 100.;
-  fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+//********************************************************************
+T2K_CC1pip_CH_XSec_1Dpmu_nu::T2K_CC1pip_CH_XSec_1Dpmu_nu(nuiskey samplekey) {
+//********************************************************************
 
-  // Currently the data is given in individual root files
-  // This will likely change when results become official
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root");
-  this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root");
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "T2K_CC1pip_CH_XSec_1Dpmu_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: T2k Forward Horn Current nue + nuebar \n" \
+                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
 
-  this->SetupDefaultHist();
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#mu} (GeV/c)");
+  fSettings.SetYTitle("d#sigma/dp_{#mu} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 100.0);
+  fSettings.DefineAllowedTargets("C,H");
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+  // CCQELike plot information
+  fSettings.SetTitle("T2K_CC1pip_CH_XSec_1Dpmu_nu");
+  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root" );
+  fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Pmu.root" );
+  fSettings.DefineAllowedSpecies("numu");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataValues(  fSettings.GetDataInput() );
+  SetCovarMatrix( fSettings.GetCovarInput() );
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
+
 };
+
 
 // Override this for now
 // Should really have Measurement1D do this properly though

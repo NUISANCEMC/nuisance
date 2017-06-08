@@ -22,6 +22,9 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
 GenericFlux_Tester.cxx
 #MCStudy_KaonPreSelection.cxx
 MCStudy_MuonValidation.cxx
+ElectronFlux_FlatTree.cxx
+T2K2017_FakeData.cxx
+MCStudy_CCQEHistograms.cxx
 )
 
 set(HEADERFILES
@@ -30,6 +33,9 @@ ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
 GenericFlux_Tester.h
 #MCStudy_KaonPreSelection.h
 MCStudy_MuonValidation.h
+ElectronFlux_FlatTree.h
+T2K2017_FakeData.h
+MCStudy_CCQEHistograms.h
 )
 
 set(LIBNAME MCStudies)
@@ -42,7 +48,10 @@ endif()
 
 include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
+include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
+include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
 include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
+include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 
 # Needed for experiment specific signal flags
