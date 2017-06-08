@@ -36,7 +36,7 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(nuiskey samplekey) {
   fSettings.SetXTitle("Q^{2}_{e} (GeV)");
   fSettings.SetYTitle("d#sigma/dQ^{2}_{e} (cm^{2}/GeV)^{2}");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
-  fSettings.SetEnuRange(0.0, 20.0);
+  fSettings.SetEnuRange(0.0, 10.0);
   fSettings.DefineAllowedTargets("C,H");
 
   // CCQELike plot information
@@ -64,19 +64,24 @@ MINERvA_CC0pi_XSec_1DQ2_nue::MINERvA_CC0pi_XSec_1DQ2_nue(nuiskey samplekey) {
 //********************************************************************
 void MINERvA_CC0pi_XSec_1DQ2_nue::FillEventVariables(FitEvent *event){
 //********************************************************************
+  
+  int PDGnu = event->GetNeutrinoIn()->fPID;
+  int PDGe = 0;
+  if (PDGnu == 12) PDGe= 11;
+  else if (PDGnu == -12) PDGe = -11;
 
-  if (event->NumFSParticle(11) == 0)
+  if (event->NumFSParticle(PDGe) == 0)
     return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pe   = event->GetHMFSParticle(11)->fP;
+  TLorentzVector Pe   = event->GetHMFSParticle(PDGe)->fP;
 
   Thetae   = Pnu.Vect().Angle(Pe.Vect());
-  Enu_rec  = FitUtils::EnuQErec(Pe, cos(Thetae), 34.,true);
-  Q2QEe    = FitUtils::Q2QErec(Pe, cos(Thetae), 34.,true);
-  Ee       = Pe.E()/1000.0;
+  Q2QEe    = FitUtils::Q2QErec(Pe, cos(Thetae), 34., true);
+  Ee       = Pe.E() / 1000.0;
 
   fXVar = Q2QEe;
+
   return;
 }
 
@@ -87,7 +92,8 @@ bool MINERvA_CC0pi_XSec_1DQ2_nue::isSignal(FitEvent *event){
 //*******************************************************************
 
   // Check that this is a nue CC0pi event
-  if (!SignalDef::isCC0pi(event, 12, EnuMin, EnuMax)) return false;
+  if (!(SignalDef::isCC0pi(event, 12, EnuMin, EnuMax)) and
+      !(SignalDef::isCC0pi(event, -12, EnuMin, EnuMax))) return false;
 
   // Restrct Ee
   if (Ee < 0.5) return false;

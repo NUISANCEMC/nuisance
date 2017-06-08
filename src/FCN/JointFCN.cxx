@@ -701,7 +701,7 @@ void JointFCN::ReconfigureUsingManager() {
 
         bool signal = curmeas->isSignal(curevent);
         curmeas->SetSignal(signal);
-        curmeas->FillHistograms(rwweight);
+        curmeas->FillHistograms(curevent->Weight);
 
         // If its Signal tally up fills
         if (signal) {

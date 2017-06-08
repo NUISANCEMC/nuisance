@@ -20,6 +20,7 @@
 #include "ReWeight/GReWeightNonResonanceBkg.h"
 #include "ReWeight/GReWeightNuXSecCCQE.h"
 #include "ReWeight/GReWeightNuXSecCCQEvec.h"
+#include "ReWeight/GReWeightNuXSecCCQEaxial.h"
 #include "ReWeight/GReWeightNuXSecCCRES.h"
 #include "ReWeight/GReWeightNuXSecCOH.h"
 #include "ReWeight/GReWeightNuXSecDIS.h"

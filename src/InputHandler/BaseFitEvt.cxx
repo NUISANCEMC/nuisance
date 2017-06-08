@@ -146,7 +146,7 @@ void BaseFitEvt::SetNuwroEvent(event* e){
 #ifdef __GENIE_ENABLED__
 void BaseFitEvt::SetGenieEvent(NtpMCEventRecord* ntpl){
   fType = kGENIE;
-  genie_event = ntpl;
+  this->genie_event = ntpl;
 }
 #endif
 

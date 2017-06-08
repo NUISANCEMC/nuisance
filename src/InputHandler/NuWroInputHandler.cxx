@@ -91,6 +91,7 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle, std::string cons
 	// Setup Events
 	fNuWroEvent = NULL;
 	fNuWroTree->SetBranchAddress("e", &fNuWroEvent);
+	fNuWroTree->GetEntry(0);
 
 	fNUISANCEEvent = new FitEvent();
 	fNUISANCEEvent->SetNuwroEvent(fNuWroEvent);
@@ -109,14 +110,14 @@ NuWroInputHandler::~NuWroInputHandler(){
 
 void NuWroInputHandler::CreateCache() {
 	// fNuWroTree->SetCacheEntryRange(0, fNEvents);
-	fNuWroTree->AddBranchToCache("*", 1);
-	fNuWroTree->SetCacheSize(fCacheSize);
+  //	fNuWroTree->AddBranchToCache("*", 1);
+  //	fNuWroTree->SetCacheSize(fCacheSize);
 }
 
 void NuWroInputHandler::RemoveCache() {
 	// fNuWroTree->SetCacheEntryRange(0, fNEvents);
-	fNuWroTree->AddBranchToCache("*", 0);
-	fNuWroTree->SetCacheSize(0);
+  //	fNuWroTree->AddBranchToCache("*", 0);
+  //	fNuWroTree->SetCacheSize(0);
 }
 
 void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {
@@ -393,7 +394,13 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 
 	// Sort Event Info
 	evt->fMode = ConvertNuwroMode(fNuWroEvent);
-	if (abs(evt->fMode) > 60) evt->fMode = 0;
+
+	if (abs(evt->fMode) > 60) {
+		evt->fMode = 0;
+
+		// Remove failed mode converts
+		// return;
+	}
 
 	evt->Mode = evt->fMode;
 	evt->fEventNo = 0.0;
@@ -425,9 +432,9 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 	}
 
 	// FSI State
-	for (size_t i = 0; i < npart_in; i++ ) {
-		AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState);
-	}
+	// for (size_t i = 0; i < npart_in; i++ ) {
+	// 	AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState);
+	// }
 
 	// Final State
 	for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end(); p_iter++) {
