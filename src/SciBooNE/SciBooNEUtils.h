@@ -38,6 +38,7 @@
 #include "FitParticle.h"
 #include "FitEvent.h"
 #include "FitLogger.h"
+#include "StandardStacks.h"
 
 /*!
  *  \addtogroup Utils
@@ -61,12 +62,12 @@ namespace SciBooNEUtils {
   bool PassesDistanceCut(FitParticle* beam, FitParticle* particle);
 
   // Functions to break the plots into modes
-  void CreateModeArray(TH1* hist, TH1* modearray[]);
-  void FillModeArray(TH1* hist[], int mode, double xval, double weight = 1.0);
-  void ResetModeArray(TH1* hist[]);
-  void ScaleModeArray(TH1* hist[], double factor, std::string option = "");
-  void DeleteModeArray(TH1* modearray[]);
-  void WriteModeArray(TH1* hist[]);
+  /* void CreateModeArray(TH1* hist, TH1* modearray[]); */
+  /* void FillModeArray(TH1* hist[], int mode, double xval, double weight = 1.0); */
+  /* void ResetModeArray(TH1* hist[]); */
+  /* void ScaleModeArray(TH1* hist[], double factor, std::string option = ""); */
+  /* void DeleteModeArray(TH1* modearray[]); */
+  /* void WriteModeArray(TH1* hist[]); */
 
   // Default to being agnostic about VA
   bool isMuPi(FitEvent *event, int VA=0);
@@ -78,6 +79,28 @@ namespace SciBooNEUtils {
   double CalcThetaPr(FitEvent *event, bool penetrated=false);
   double CalcThetaPi(FitEvent *event);
   FitParticle* GetSecondaryTrack(FitEvent *event);
+
+  /// Break down the plots as in the SciBooNE papers
+  class ModeStack : public StackBase {
+  public:
+
+    /// Main constructor listing true mode categories.                                                                                                                                                          
+    ModeStack(std::string name, std::string title, TH1* hist);
+
+    /// List to convert Modes to Index.                                                                                                                                                                         
+    /// Should be kept in sync with constructor.                                                                                                                                                                
+    int ConvertModeToIndex(int mode);
+
+    /// Fill from given mode integer                                                                                                                                                                             
+    void Fill(int mode, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+    /// Extracts Mode from FitEvent and fills                                                                                                                                                                   
+    void Fill(FitEvent* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+    /// Extracts Mode from BaseFitEvt                                                                                                                                                                           
+    void Fill(BaseFitEvt* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+  };
 
 }
 #endif

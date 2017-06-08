@@ -31,20 +31,21 @@ class SciBooNE_CCCOH_1TRK_1DQ2_nu : public Measurement1D {
 
 public:
 
-  SciBooNE_CCCOH_1TRK_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey);
   virtual ~SciBooNE_CCCOH_1TRK_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  
-  // These functions are overridden to make the mode plots... probably a better way to do this
-  void ScaleEvents();
-  void FillHistograms();
-  void Write(std::string drawOpt);
-  void ApplyNormScale(double norm);
-  void ResetAll();
+  void FillExtraHistograms(MeasurementVariableBox* vars, double weight);
 
-  TH1D *fMCHist_modes[5];
+  // These functions are overridden to make the mode plots... probably a better way to do this
+  /* void ScaleEvents(); */
+  /* void FillHistograms(); */
+  /* void Write(std::string drawOpt); */
+  /* void ApplyNormScale(double norm); */
+  /* void ResetAll(); */
+
+  SciBooNEUtils::ModeStack *fMCStack;
 
  private:
   double q2qe; ///<! X_Variable

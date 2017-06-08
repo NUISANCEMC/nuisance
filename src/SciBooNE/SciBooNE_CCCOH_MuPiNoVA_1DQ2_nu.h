@@ -31,7 +31,7 @@ class SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu : public Measurement1D {
 
 public:
 
-  SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
+  SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(nuiskey samplekey);
   virtual ~SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
