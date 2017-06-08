@@ -38,7 +38,8 @@ T2K_CC1pip_H2O_XSec_1DEnuMB_nu::T2K_CC1pip_H2O_XSec_1DEnuMB_nu(nuiskey samplekey
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(  fSettings.GetDataInput() );
   SetCovarFromRootFile( fSettings.GetCovarInput() );
-
+  ScaleCovar(1E76);
+  
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 

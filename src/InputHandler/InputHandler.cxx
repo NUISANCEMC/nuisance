@@ -29,27 +29,27 @@ InputHandlerBase::InputHandlerBase() {
   kRemoveFSIParticles = FitPar::Config().GetParB("RemoveFSIParticles");
   kRemoveNuclearParticles = FitPar::Config().GetParB("RemoveNuclearParticles");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
-  fTTreePerformance= NULL;
+  fTTreePerformance = NULL;
 
 };
 
 InputHandlerBase::~InputHandlerBase() {
 
-    if (fFluxHist) delete fFluxHist;
-    if (fEventHist) delete fEventHist;
-    if (fXSecHist) delete fXSecHist;
-    if (fNUISANCEEvent) delete fNUISANCEEvent;
-    jointfluxinputs.clear();
-    jointeventinputs.clear();
-    jointindexlow.clear();
-    jointindexhigh.clear();
-    jointindexallowed.clear();
-    jointindexscale.clear();
-    
-    if (fTTreePerformance){
-      fTTreePerformance->SaveAs(("ttreeperfstats_" + fName + ".root").c_str());
-    }
+  if (fFluxHist) delete fFluxHist;
+  if (fEventHist) delete fEventHist;
+  if (fXSecHist) delete fXSecHist;
+  if (fNUISANCEEvent) delete fNUISANCEEvent;
+  jointfluxinputs.clear();
+  jointeventinputs.clear();
+  jointindexlow.clear();
+  jointindexhigh.clear();
+  jointindexallowed.clear();
+  jointindexscale.clear();
+
+  if (fTTreePerformance) {
+    fTTreePerformance->SaveAs(("ttreeperfstats_" + fName + ".root").c_str());
   }
+}
 
 void InputHandlerBase::Print() {
 };
@@ -171,8 +171,9 @@ BaseFitEvt* InputHandlerBase::NextBaseEvent() {
 
 void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D* f, TH1D* e) {
 
-  if (jointfluxinputs.size() == 0){
+  if (jointfluxinputs.size() == 0) {
     jointindexswitch = 0;
+    fNEvents = 0;
   }
 
   // Push into individual input vectors
@@ -195,11 +196,12 @@ void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D* f, TH1
 
 void InputHandlerBase::SetupJointInputs() {
 
-    if (jointeventinputs.size() == 1){
-      jointinput = false;
-    } else {
-      jointinput= true;
-    }
+  if (jointeventinputs.size() <= 1) {
+    jointinput = false;
+  } else if (jointeventinputs.size() > 1) {
+    jointinput = true;
+    jointindexswitch = 0;
+  }
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
   for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -248,7 +250,7 @@ double InputHandlerBase::GetInputWeight(int entry) {
     jointindexswitch++;
 
     // Loop Around
-    if (jointindexswitch == jointindexlow.size()) {
+    if (jointindexswitch >= jointindexlow.size()) {
       jointindexswitch = 0;
     }
   }

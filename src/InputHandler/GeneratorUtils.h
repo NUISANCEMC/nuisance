@@ -24,19 +24,45 @@
  */
 
 #ifdef __NIWG_ENABLED__
+#ifdef __NEUT_ENABLED__
 #include "NIWGEvent.h"
 #include "NIWGSyst.h"
+#include "InputHandler.h"
+#include "TargetUtils.h"
+#include "neutpart.h"
+#include "neutvect.h"
+#include "PlotUtils.h"
+#include "TTreePerfStats.h"
+#include "nefillverC.h"
+#include "necardC.h"
+#include "neutmodelC.h"
+#include "neutparamsC.h"
+#include "neworkC.h"
+#include "fsihistC.h"
+#include "neutcrsC.h"
+#include "neutvect.h"
+#include "neutpart.h"
+#include "neutfsipart.h"
+#include "neutfsivert.h"
+#include "neutrootTreeSingleton.h"
+#include "NModeDefn.h"
+#include "NSyst.h"
+#include "NFortFns.h" // Contains all the NEUT common blocks                                                                                                                                                                                
+#ifdef __NEUT_NUCFSI_ENABLED__
+#include "nucleonfsihistC.h"
+#include "neutnucfsivert.h"
+#include "neutnucfsistep.h"
 #endif
 
-#ifdef __NEUT_ENABLED__
-#include "NEUTInputHandler.h"
+#endif
 #endif
 
-namespace GeneratorUtils {
-#if defined(__NIWG_ENABLED__) && defined(__NEUT_ENABLED__)
-  niwg::rew::NIWGEvent* GetNIWGEvent(NeutVect* nvect);
-#endif
-
-};
+// namespace GeneratorUtils {
+// #ifdef __NIWG_ENABLED__
+// #ifdef __NEUT_ENABLED__
+//   niwg::rew::NIWGEvent* GetNIWGEventLocal(NeutVect* nvect);
+// #endif
+// #endif
+// };
 /*! @} */
 #endif

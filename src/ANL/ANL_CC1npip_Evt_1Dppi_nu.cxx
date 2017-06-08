@@ -32,14 +32,13 @@ ANL_CC1npip_Evt_1Dppi_nu::ANL_CC1npip_Evt_1Dppi_nu(nuiskey samplekey) {
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
-  // fSettings.SetDescription(descrip);
-  // fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
-  // fSettings.SetPlotTitles("p_{#pi} (MeV); Number of events");
-  // fSettings.SetAllowedTypes("EVT/SHAPE/DIAG");
-  // fSettings.SetDefaultTypes("EVT/SHAPE/DIAG");
-  // fSettings.SetAllowedTargets("D,H");
-  // fSettings.SetAllowedSpecies("numu");
-  // fSettings.SetEnergyRange(0.0, 1.5);
+  fSettings.SetTitle("ANL #nu_mu CC1p#pi^{+}");
+  fSettings.SetXTitle("p_{#pi} (MeV)");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG","EVT/SHAPE/DIAG");
+  fSettings.DefineAllowedTargets("D,H");
+  fSettings.DefineAllowedSpecies("numu");
+  fSettings.SetEnuRange(0.0, 1.5);
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------

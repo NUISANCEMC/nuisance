@@ -36,7 +36,7 @@ MiniBooNE_CC1pip_XSec_1DQ2_nu::MiniBooNE_CC1pip_XSec_1DQ2_nu(nuiskey samplekey) 
   fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
   fSettings.SetYTitle("d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/MeV^{2}/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetEnuRange(0.0, 100.0); // No energy range given in v1r0
   fSettings.DefineAllowedTargets("C,H");
 
   // CCQELike plot information

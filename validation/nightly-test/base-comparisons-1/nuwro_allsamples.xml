@@ -1,0 +1,266 @@
+<nuisance>
+  
+  <!-- ANL SAMPLES --> 
+  <!-- ANL CCQE --> 
+  <sample name="ANL_CCQE_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_XSec_1DEnu_nu_PRD26"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_XSec_1DEnu_nu_PRL31"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_XSec_1DEnu_nu_PRD16"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_Evt_1DQ2_nu_PRL31"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_Evt_1DQ2_nu_PRD26"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CCQE_Evt_1DQ2_nu_PRD16"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <!--    ANL CC1PPIP --> 
+  <sample name="ANL_CC1ppip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_XSec_1DEnu_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_XSec_1DEnu_nu_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_XSec_1DEnu_nu_W16Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1DQ2_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1Dppi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1Dthpr_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1DcosmuStar_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1DcosthAdler_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1ppip_Evt_1Dphi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <!--    ANL CC1NPIP --> 
+  <sample name="ANL_CC1npip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_XSec_1DEnu_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_XSec_1DEnu_nu_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_XSec_1DEnu_nu_W14Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_XSec_1DEnu_nu_W16Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_Evt_1DQ2_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_Evt_1Dppi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1npip_Evt_1DcosmuStar_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_XSec_1DEnu_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_XSec_1DEnu_nu_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_XSec_1DEnu_nu_W14Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_XSec_1DEnu_nu_W16Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_Evt_1DQ2_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC1pi0_Evt_1DcosmuStar_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <!--    ANL NC --> 
+  <sample name="ANL_NC1npip_Evt_1Dppi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_NC1ppim_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_NC1ppim_Evt_1DcosmuStar_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <!--    ANL CC2PI --> 
+  <sample name="ANL_CC2pi_1pim1pip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pim1pip_Evt_1Dppip_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pim1pip_Evt_1Dppim_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  <sample name="ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_ANL_fhc_numu_D2.root" /> 
+  
+  <!-- ArgoNeuT SAMPLES --> 
+  <!--    ArgoNeuT Neutrino --> 
+  <sample name="ArgoNeuT_CCInc_XSec_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ArgoNeuT_fhcnumu_Ar_25E5_raw.root" /> 
+  <sample name="ArgoNeuT_CCInc_XSec_1Dthetamu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ArgoNeuT_fhcnumu_Ar_25E5_raw.root" /> 
+  <!--    ArgoNeuT AntiNeutrino --> 
+  <sample name="ArgoNeuT_CCInc_XSec_1Dpmu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ArgoNeuT_rhcnumub_Ar_25E5_raw.root" /> 
+  <sample name="ArgoNeuT_CCInc_XSec_1Dthetamu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ArgoNeuT_rhcnumub_Ar_25E5_raw.root" /> 
+  
+  <!-- BNL SAMPLES --> 
+  <!--    BNL CCQE --> 
+  <sample name="BNL_CCQE_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CCQE_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BNL CC1ppip --> 
+  <sample name="BNL_CC1ppip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_XSec_1DEnu_nu_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_XSec_1DEnu_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_Evt_1DQ2_nu_W14Cut"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_Evt_1DcosthAdler_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1ppip_Evt_1Dphi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BNL CC1npip --> 
+  <sample name="BNL_CC1npip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1npip_XSec_1DEnu_nu_Uncorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1npip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BNL CC1ppip --> 
+  <sample name="BNL_CC1pi0_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BNL_CC1pi0_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BNL_fhcnumu_D2_25E5_raw.root" /> 
+  
+  <!-- FNAL SAMPLES --> 
+  <!--    FNAL CCQE --> 
+  <sample name="FNAL_CCQE_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_FNAL_fhc_numu_D2.root" /> 
+  <!--    FNAL CC1ppip --> 
+  <sample name="FNAL_CC1ppip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_FNAL_fhc_numu_D2.root" /> 
+  <sample name="FNAL_CC1ppip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_FNAL_fhc_numu_D2.root" /> 
+  <sample name="FNAL_CC1ppip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_FNAL_fhc_numu_D2.root" /> 
+  <!--    FNAL CC1ppim Antineutrino --> 
+  <sample name="FNAL_CC1ppim_XSec_1DEnu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/freenucleons_dipole_nuwrolp_head_NUISANCE_FNAL_fhc_numu_D2.root" /> 
+  
+  <!-- BEBC SAMPLES --> 
+  <!--    BEBC CCQE --> 
+  <sample name="BEBC_CCQE_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BEBC CC1ppip --> 
+  <sample name="BEBC_CC1ppip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1ppip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BEBC CC1npip --> 
+  <sample name="BEBC_CC1npip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1npip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BEBC CC1pi0 --> 
+  <sample name="BEBC_CC1pi0_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1pi0_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_fhcnumu_D2_25E5_raw.root" /> 
+  <!--    BEBC CC1npim Antineutrino --> 
+  <sample name="BEBC_CC1npim_XSec_1DEnu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_rhcnumub_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1npim_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_rhcnumub_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1ppim_XSec_1DEnu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_rhcnumub_D2_25E5_raw.root" /> 
+  <sample name="BEBC_CC1ppim_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_BEBC_rhcnumub_D2_25E5_raw.root" /> 
+  
+  <!-- GGM SAMPLES --> 
+  <!--    GGM CC1ppip --> 
+  <sample name="GGM_CC1ppip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_GGM_fhcnumu_D2_25E5_raw.root" /> 
+  <sample name="GGM_CC1ppip_Evt_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_GGM_fhcnumu_D2_25E5_raw.root" /> 
+  
+  <!-- MiniBooNE SAMPLES --> 
+  <!--    MiniBooNE CCQELike NuMu --> 
+  <sample name="MiniBooNE_CCQE_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CCQE_XSec_2DTcos_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE CC0PI NuMu --> 
+  <sample name="MiniBooNE_CCQELike_XSec_2DTcos_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CCQELike_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE CCQELike AntiNuMu --> 
+  <sample name="MiniBooNE_CCQE_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CCQE_XSec_2DTcos_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE CC0PI AntiNuMu --> 
+  <sample name="MiniBooNE_CCQELike_XSec_2DTcos_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CCQELike_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE CC1PIP  --> 
+  <sample name="MiniBooNE_CC1pip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_1DTpi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_1DTu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_2DQ2Enu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_2DTpiCospi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_2DTpiEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_2DTuCosmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pip_XSec_2DTuEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE CC1PI0  --> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1DTu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dcosmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dcospi0_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dppi0_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE NC1pi0 Neutrino  --> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE NC1pi0 Antineutrino  --> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE NC1pi0 FHC  --> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_fhc"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE NC1pi0 RHC  --> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_rhc"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_rhcnumubnumu_CH2_25E5_raw.root" /> 
+  <!--    MiniBooNE NCEL  --> 
+  <sample name="MiniBooNE_NCEL_XSec_Treco_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MiniBooNE_fhcnumu_CH2_25E5_raw.root" /> 
+  
+  <!-- MINERvA SAMPLES --> 
+  <!--    MINERvA CCQELike NUMU  --> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_nu_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_nu_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA CCQELike NUMUBAR  --> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_antinu_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_antinu_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_antinu_20deg_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <!--    MINERvA CCQELike JOINT  --> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_joint_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_joint_20deg_oldflux"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_joint"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCQE_XSec_1DQ2_joint_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA CC0PI JOINT  --> 
+  <sample name="MINERvA_CC0pi_XSec_1DEe_nue"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MINERvA_fhcnuenueb_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_nue"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MINERvA_fhcnuenueb_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC0pi_XSec_1DThetae_nue"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MINERvA_fhcnuenueb_CH_25E5_raw.root" /> 
+  <!--    MINERvA CC0PI1p  --> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_nu_proton"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA CC1ppip  --> 
+  <sample name="MINERvA_CC1pip_XSec_1DTpi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1DTpi_nu_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1DTpi_nu_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1DTpi_nu_20deg_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1Dth_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1Dth_nu_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1Dth_nu_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pip_XSec_1Dth_nu_20deg_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA CCNpip  --> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu_2015"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu_2016"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu_2015_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu_2015_20deg_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu_2015"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu_2016"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dthmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DQ2_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCNpip_XSec_1DEnu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA CC1pi0 Antineutrino  --> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu_2015"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu_2016"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu_2015_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu_2016_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dppi0_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dppi0_antinu_fluxcorr"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1DTpi0_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1DQ2_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dthmu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1Dpmu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CC1pi0_XSec_1DEnu_antinu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_2DEavq3_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_rhcnumub_CH_25E5_raw.root" /> 
+  <!--    MINERvA Carbon targets  --> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtC_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_C_25E5_raw.root" /> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtRatioC_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_C_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1Dx_ratio_C12_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_C_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_C_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA Iron targets  --> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtFe_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Fe_25E5_raw.root" /> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Fe_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1Dx_ratio_Fe56_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Fe_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Fe_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    MINERvA Lead targets  --> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtPb_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Pb_25E5_raw.root" /> 
+  <sample name="MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Pb_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1Dx_ratio_Pb208_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Pb_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_Pb_25E5_raw.root;NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_MIN_fhcnumu_CH_25E5_raw.root" /> 
+  
+  <!-- T2K SAMPLES --> 
+  <!--    T2K CC0pi  --> 
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu_II"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_CH_25E5_raw.root" /> 
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu_nonuniform"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_CH_25E5_raw.root" /> 
+  <!--    T2K CC1pi H2O  --> 
+  <sample name="T2K_CC1pip_H2O_XSec_1DEnuDelta_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1DEnuMB_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcosmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcosmupi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcospi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1Dpmu_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  <sample name="T2K_CC1pip_H2O_XSec_1Dppi_nu"  input="NUWRO:/data/stowell/NIWG/NuisanceEvents/Winter2016/nuwro/nuwrov12_lfgvalrpa_211216_ND280_fhcnumu_H2O_25E5_raw.root" /> 
+  
+</nuisance>

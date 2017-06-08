@@ -23,7 +23,7 @@
 <!-- # 1 FATAL -->
 <!-- # 2 WARN -->
 <config ERROR='2'/>
-<config TRACE='1'/>
+<config TRACE='0'/>
 
 <config cores='2' />
 <config spline_test_throws='50' />

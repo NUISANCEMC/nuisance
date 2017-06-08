@@ -110,6 +110,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 	fEventType = kNEUT;
 	fNeutVect = NULL;
 	fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
+	fNEUTTree->GetEntry(0);
 
 	// Create Fit Event
 	fNUISANCEEvent = new FitEvent();
