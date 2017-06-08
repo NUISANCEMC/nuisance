@@ -23,6 +23,9 @@ public:
   virtual void SetZ(double z){};
   virtual void SetMode(int m){};
 
+  inline virtual void SetSampleWeight(double w){fSampleWeight = w;};
+  inline virtual double GetSampleWeight(){return fSampleWeight;};
+  double fSampleWeight;
 };
 
 #endif

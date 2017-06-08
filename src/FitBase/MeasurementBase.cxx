@@ -264,7 +264,7 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double 
 }
 
 void MeasurementBase::FillHistograms(double weight){
-  Weight = weight;
+  Weight = weight * GetBox()->GetSampleWeight();
   FillHistograms();
   FillExtraHistograms(GetBox(), Weight);
 }
@@ -274,16 +274,18 @@ MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
 
   GetBox()->Reset();
   Mode = event->Mode;
-  
+  Weight = 1.0; //event->Weight;
+
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
 
   GetBox()->FillBoxFromEvent(event);
-
+  
   GetBox()->SetX(fXVar);
   GetBox()->SetY(fYVar);
   GetBox()->SetZ(fZVar);
   GetBox()->SetMode(event->Mode);
+  GetBox()->SetSampleWeight(Weight);
   // GetBox()->fSignal = Signal;
 
   return GetBox();
