@@ -26,7 +26,7 @@
 MINERvA_CCNpip_XSec_1Dpmu_nu::MINERvA_CCNpip_XSec_1Dpmu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 //********************************************************************
 
-  fName = "MINERvA_CCNpip_XSec_1Dpmu_nu_2016";
+  fName = "MINERvA_CCNpip_XSec_1Dpmu_nu";
   fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
@@ -58,13 +58,16 @@ void MINERvA_CCNpip_XSec_1Dpmu_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0) return;
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double pmu = FitUtils::p(Pmu);
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+
+  double pmu = -999;
+  if (hadMass < 1800) pmu = Pmu.Vect().Mag()/1000.;
 
   fXVar = pmu;
 
-  return;
 };
 
 //********************************************************************

@@ -28,11 +28,13 @@ public:
   virtual ~BNL_CC1ppip_Evt_1DQ2_nu() {};
   
   void FillEventVariables(FitEvent *event);
-  //void ScaleEvents();
   bool isSignal(FitEvent *event);
+
+  //void ScaleEvents();
   //void FillHistograms();
 
  private:
+  double HadCut; // Hadronic mass cut, specified by user (W < 1.4 or no W cut)
 };
   
 #endif

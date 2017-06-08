@@ -20,7 +20,7 @@ set(IMPLFILES
 ExpMultDist_CCQE_XSec_1DVar_FakeStudy.cxx
 ExpMultDist_CCQE_XSec_2DVar_FakeStudy.cxx
 GenericFlux_Tester.cxx
-MCStudy_KaonPreSelection.cxx
+#MCStudy_KaonPreSelection.cxx
 MCStudy_MuonValidation.cxx
 )
 
@@ -28,7 +28,7 @@ set(HEADERFILES
 ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h
 ExpMultDist_CCQE_XSec_2DVar_FakeStudy.h
 GenericFlux_Tester.h
-MCStudy_KaonPreSelection.h
+#MCStudy_KaonPreSelection.h
 MCStudy_MuonValidation.h
 )
 
@@ -52,7 +52,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
 set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-
+if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
+  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
+endif()
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
 #install(FILES ${HEADERFILES} DESTINATION include)

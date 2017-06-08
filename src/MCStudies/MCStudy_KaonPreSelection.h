@@ -48,6 +48,7 @@ public:
   int nkaon;
   double kplusmom;
   double kaonmom;
+  bool fKaonLogging;
 };
 
 #endif

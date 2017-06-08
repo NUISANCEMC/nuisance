@@ -37,7 +37,10 @@ MiniBooNE_CCQE_XSec_2DTcos_nu.cxx
 MiniBooNE_CC1pip_XSec_1DTu_nu.cxx
 # MiniBooNE_NCEL_XSec_Treco_nu.cxx
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu.cxx
-MiniBooNE_NCpi0_XSec_1Dppi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dppi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.cxx
+MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.cxx
+MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.cxx
 )
 
 set(HEADERFILES
@@ -61,7 +64,10 @@ MiniBooNE_CCQE_XSec_2DTcos_nu.h
 MiniBooNE_CC1pip_XSec_1DTu_nu.h
 # MiniBooNE_NCEL_XSec_Treco_nu.h
 MiniBooNE_CC1pip_XSec_2DQ2Enu_nu.h
-MiniBooNE_NCpi0_XSec_1Dppi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dcospi0_nu.h
+MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h
+MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu.h
 )
 
 set(LIBNAME expMiniBooNE)
@@ -81,6 +87,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
 set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
+  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
+endif()
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?

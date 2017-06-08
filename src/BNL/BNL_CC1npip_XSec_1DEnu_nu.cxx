@@ -20,7 +20,7 @@
 #include "BNL_CC1npip_XSec_1DEnu_nu.h"
 
 // The constructor
-BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile) {
 
   fName = "BNL_CC1npip_XSec_1DEnu_nu";
   fPlotTitles = "; E_{#nu} (GeV); #sigma(E_{#nu}) (cm^{2}/neutron)";
@@ -28,15 +28,39 @@ BNL_CC1npip_XSec_1DEnu_nu::BNL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMax = 3.0;
   fIsDiag = true;
   fNormError = 0.15;
+  fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR";
+
+  // User can give option of corrected BNL data or not
+  // The correction follows Wilkinson & Rodriguez et al.
+  if (type.find("UNCORR") != std::string::npos) {
+    UseCorrectedData = false;
+  } else {
+    UseCorrectedData = true;
+  }
+
+  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/";
+
+  if (UseCorrectedData) {
+    DataLocation += "BNL_CC1pip_on_n_1986_corr.txt";
+  } else {
+    DataLocation += "BNL_CC1pip_on_n_1986.txt";
+  }
+  if (!type.empty() && type != "DEFAULT") {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
+  }
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_n/BNL_CC1pip_on_n_1986.txt");
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
 };
 
 

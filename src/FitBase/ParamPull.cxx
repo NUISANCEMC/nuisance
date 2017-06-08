@@ -33,6 +33,7 @@ ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, 
   
   // Set the pull type
   SetType(fType);
+  std::cout << fType << std::endl;
   
   // Setup Histograms from input file
   SetupHistograms(fInput);    
@@ -44,7 +45,7 @@ void ParamPull::SetType(std::string type){
 
   fType = type;
   // Assume Default if empty
-  if (type.empty()){
+  if (type.empty() || type == "DEFAULT"){
     ERR(WRN) << "No type specified for ParmPull class " << fName << std::endl;
     ERR(WRN) << "Assuming GAUSTHROW/GAUSPULL" << std::endl;
 

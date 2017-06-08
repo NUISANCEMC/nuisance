@@ -149,6 +149,8 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/F");
   eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/F");
 
+  eventVariables->Branch("Nother", &Nother, "Nother/I");
+
   eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");
   eventVariables->Branch("q0_true", &q0_true, "q0_true/F");
   eventVariables->Branch("q3_true", &q3_true, "q3_true/F");
@@ -284,7 +286,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++) {
     // Skip particles that weren't in the final state
-    bool part_alive = event->PartInfo(i)->fIsAlive;
+    bool part_alive = event->PartInfo(i)->fIsAlive and event->PartInfo(i)->Status() == kFinalState;
     if (!part_alive) continue;
 
     // PDG Particle
@@ -400,6 +402,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
         (*ppi0) = part_4mom;
       }
+    } else {
+      Nother++;
     }
   }
 

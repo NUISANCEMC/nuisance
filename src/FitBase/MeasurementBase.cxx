@@ -367,7 +367,15 @@ void MeasurementBase::ConvertEventRates() {
   //***********************************************
 
   this->ScaleEvents();
-  this->ApplyNormScale(FitBase::GetRW()->GetSampleNorm(this->fName));
+  double normval = FitBase::GetRW()->GetSampleNorm(this->fName);
+  if (normval < 0.01 or normval > 10.0){
+    ERR(WRN) << "Norm Value inside MeasurementBase::ConvertEventRates() looks off!" << std::endl;
+    ERR(WRN) << "It could have become out of sync with the minimizer norm list." << std::endl;
+    ERR(WRN) << "Setting it to 1.0" << std::endl;
+    normval = 1.0;
+  }
+
+  this->ApplyNormScale(normval);
 }
 
 //***********************************************

@@ -24,7 +24,7 @@
 // The constructor
 MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
 
-  fName = "MINERvA_CC1pi0_XSec_1Dpmu_nubar_2016";
+  fName = "MINERvA_CC1pi0_XSec_1Dpmu_antinu";
   fPlotTitles = "; p_{#mu} (GeV); d#sigma/dp_{#mu} (cm^{2}/GeV/nucleon)";
   EnuMin = 1.5;
   EnuMax = 10;
@@ -48,18 +48,15 @@ MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(std::string i
 
 void MINERvA_CC1pi0_XSec_1Dpmu_antinu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(111) == 0 ||
-      event->NumFSParticle(-13) == 0)
-    return;
+  if (event->NumFSParticle(-13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(-13)->fP;
 
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double pmu     = -999;
 
-  if (hadMass > 100 && hadMass < 1800)
+  if (hadMass < 1800)
     pmu = FitUtils::p(Pmu);
 
   fXVar = pmu;

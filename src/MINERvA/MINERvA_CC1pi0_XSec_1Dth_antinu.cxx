@@ -88,7 +88,7 @@ void MINERvA_CC1pi0_XSec_1Dth_antinu::FillEventVariables(FitEvent *event) {
   double hadMass = FitUtils::Wrec(Pnu, Pmu);
   double th      = -999;
 
-  if (hadMass > 100 && hadMass < hadMassCut)
+  if (hadMass < hadMassCut)
     th = (180./M_PI)*FitUtils::th(Pnu, Ppi0);
 
   fXVar = th;

@@ -65,11 +65,11 @@ cmessage(STATUS "CMAKE_BUILD_TYPE: \"${CMAKE_BUILD_TYPE}\"")
 #                            Check Dependencies
 ################################################################################
 
-############################  Reweight Engines  ################################
-include(${CMAKE_SOURCE_DIR}/cmake/ReweightEnginesSetup.cmake)
-
 ##################################  ROOT  ######################################
 include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
+
+############################  Reweight Engines  ################################
+include(${CMAKE_SOURCE_DIR}/cmake/ReweightEnginesSetup.cmake)
 
 #################################  Pythia6  ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)

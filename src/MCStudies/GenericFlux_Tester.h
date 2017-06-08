@@ -153,6 +153,7 @@ public:
 
   int Nparticles;
   int Nleptons;
+  int Nother;
 
   float Erecoil_true;
   float Erecoil_charged;

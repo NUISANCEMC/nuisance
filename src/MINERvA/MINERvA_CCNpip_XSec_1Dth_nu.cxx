@@ -36,7 +36,6 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
   EnuMin = 1.5;
   EnuMax = 10;
   fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Reserve length 3 for the number of pions
   // We fill once per pion found in the event, so can fill multiple times for one event
@@ -102,7 +101,8 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(std::string name, std::
     }
   }
 
-  this->SetupDefaultHist();
+  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  Measurement1D::SetupDefaultHist();
 
   // Make some auxillary helper plots
   onePions  = (TH1D*)(fDataHist->Clone());
@@ -129,21 +129,29 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   thVect.clear();
 
   if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
+  if (event->NumFSParticle(13) == 0) return;
+
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip;
+  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  // Loop over the particle stack
-  for (unsigned int j = 2; j < event->Npart(); ++j) {
+  double hadMass = FitUtils::Wrec(Pnu, Pmu);
 
-    // Only include alive particles
-    if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
+  if (hadMass < 1800) {
 
-    int PID = (event->PartInfo(j))->fPID;
-    // Select highest momentum (energy) charged pion
-    if (abs(PID) == 211) {
-      Ppip = (event->PartInfo(j))->fP;
-      double th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
-      thVect.push_back(th);
+    TLorentzVector Ppip;
+    // Loop over the particle stack
+    for (unsigned int j = 2; j < event->Npart(); ++j) {
+
+      // Only include alive particles
+      if (!(event->PartInfo(j))->fIsAlive && (event->PartInfo(j))->fNEUTStatusCode != 0) continue;
+
+      int PID = (event->PartInfo(j))->fPID;
+      // Select highest momentum (energy) charged pion
+      if (abs(PID) == 211) {
+        Ppip = (event->PartInfo(j))->fP;
+        double th = (180./M_PI)*FitUtils::th(Pnu, Ppip);
+        thVect.push_back(th);
+      }
     }
   }
 
@@ -156,7 +164,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 // The signal definition for MINERvA CCNpi+
 // Last bool refers to if we're selecting on the full phase space or not
 bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
-//********************************************************************
+  //********************************************************************
   return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
 }
 
@@ -164,14 +172,14 @@ bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
 //********************************************************************
 // Need to override FillHistograms() here because we fill the histogram N_pion times
 void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
-//********************************************************************
+  //********************************************************************
 
   if (Signal){
 
-    int nPions = thVect.size();
+    unsigned int nPions = thVect.size();
 
-    // Need to loop over all the pions in the sample
-    for (size_t k = 0; k < thVect.size(); ++k) {
+    // Need to loop over all the pions in the event
+    for (size_t k = 0; k < nPions; ++k) {
 
       double th = thVect[k];
       this->fMCHist->Fill(th, Weight);
@@ -197,7 +205,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
 //********************************************************************
 void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
-//********************************************************************
+  //********************************************************************
   Measurement1D::ScaleEvents();
 
   onePions->Scale(this->fScaleFactor, "width");
@@ -210,7 +218,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::ScaleEvents() {
 
 //********************************************************************
 void MINERvA_CCNpip_XSec_1Dth_nu::Write(std::string drawOpts) {
-//********************************************************************
+  //********************************************************************
   Measurement1D::Write(drawOpts);
 
   // Draw the npions stack

@@ -29,11 +29,10 @@ public:
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  bool fUpdatedData;
 
 private:
-  bool isNew;
   double hadMassCut;
+  bool fUpdatedData;
 
 };
 

@@ -31,7 +31,6 @@ public:
   bool isSignal(FitEvent *event);
 
 private:
-  bool isNew;
 };
 
 #endif

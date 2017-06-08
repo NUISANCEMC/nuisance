@@ -118,8 +118,9 @@ int main(int argc, char* argv[]) {
     }
 
     fChain.front()->Reconfigure();
+    fChain.front()->Write();
 
-    FitPar::Config().out->Write();
+    //    FitPar::Config().out->Write();
     FitPar::Config().out->Close();
   }
 

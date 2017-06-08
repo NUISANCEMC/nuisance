@@ -29,6 +29,13 @@
 void printInputCommands(){
 //*******************************
   
+  std::cout<<"nuissyst.exe -c cardFile -o outFile [-f fitStategy] [-d fakeDataFile] [-i inputFile] [-q config_name=config_val] \n";
+  std::cout<<std::endl;
+  std::cout<<"Arguments:"<<std::endl;
+  std::cout<<"     -c cardFile:   Path to card file that defines fit samples, free parameters, and config overrides \n";
+  std::cout<<"     -o outFile:    Path to root file that will be created to save output file.\n";
+  std::cout<<"     -f Strategy:   ErrorBands (default) or PlotLimits\n" << std::endl;
+
   exit(-1);
 
 };

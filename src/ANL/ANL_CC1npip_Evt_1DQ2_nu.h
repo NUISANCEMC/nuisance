@@ -34,6 +34,7 @@ public:
   bool isSignal(FitEvent *event);
 
  private:
+  double HadCut;
 };
   
 #endif

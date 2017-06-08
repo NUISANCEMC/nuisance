@@ -28,22 +28,20 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
 
   // Measurement Details
   fName = "ANL_CC1npip_XSec_1DEnu_nu";
-  fPlotTitles = "; E_{#nu} (GeV^{2}); #sigma (cm^{2}/nucleon)";
+  fPlotTitles = "; E_{#nu} (GeV); #sigma (cm^{2}/nucleon)";
   EnuMin = 0.;
   EnuMax = 1.5;
   fIsDiag = true;
   fNormError = 0.20;
   fDefaultTypes = "FIX/DIAG";
-  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR/W14/W16/NOW";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR/CORR/W14/W16/NOW";
   
   // User can specify "UNCORR" for uncorrected data
   // Default is to use correction
   if (type.find("UNCORR") != std::string::npos) {
     UseCorrectedData = false;
-    fName += "_uncorr";
   } else {
     UseCorrectedData = true;
-    fName += "_corr";
   }
 
   // User can specify "W14" for W < 1.4 GeV cut
@@ -51,14 +49,25 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   //                  The default is W < 2.0
   if (type.find("W14") != std::string::npos) {
     wTrueCut = 1.4;
-    fName += "_w14";
   } else if (type.find("W16") != std::string::npos) {
     wTrueCut = 1.6;
-    fName += "_w16";
   } else {
     // In the case 
     wTrueCut = 10.0;
-    fName += "_noW";
+  }
+
+  if (UseCorrectedData && wTrueCut == 1.6) {
+    ERR(FTL) << "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
+    ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
+    ERR(FTL) << "Reverting to using uncorrected data!" << std::endl;
+    UseCorrectedData = false;
+  }
+
+  // Get rid of the slashes in the type
+  if (!type.empty() && type != "DEFAULT") {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
   }
 
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile); 
@@ -70,12 +79,9 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
   if (UseCorrectedData) {
     if (wTrueCut == 1.4) {
       DataLocation += "anl82corr-numu-n-to-mu-n-piplus-lowW_edges.txt";
-    } else if (wTrueCut == 10.0) {
-      DataLocation += "anl82corr-numu-n-to-mu-n-piplus-noW_edges.txt";
+      // No W cut
     } else {
-      ERR(FTL) << "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because the data DOES NOT EXIST" << std::endl;
-      ERR(FTL) << "Correction exists for W < 1.4 GeV and no W cut data ONLY" << std::endl;
-      exit(-1);
+      DataLocation += "anl82corr-numu-n-to-mu-n-piplus-noW_edges.txt";
     }
 
   // If we're using raw uncorrected data
@@ -87,22 +93,18 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(std::string inputfile, FitW
       DataLocation += "anl82-numu-cc1npip-16Wcut.txt";
     } else if (wTrueCut == 10.0) {
       DataLocation += "anl82-numu-cc1npip-noWcut.txt";
-    } else {
-      ERR(FTL) << "Can only run W = 1.4, 1.6 and no W cut" << std::endl;
-      ERR(FTL) << "You specified: " << wTrueCut << std::endl;
-      exit(-1);
     }
   }
 
   // Setup Plots
-  this->SetDataValues(DataLocation);
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   // Setup Covariance
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.); // NEUT (16./8. from /nucleus -> /nucleon scaling for nucleon interactions)
+  fScaleFactor = GetEventHistogram()->Integral("width")*double(1E-38)/double(fNEvents)*(16./8.);
 };
 
 void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -121,9 +123,11 @@ void ANL_CC1npip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
     
   // ANL has a W cuts at 1.4, 1.6 and no w cut
   // This is set by user, or defaults to 2.0
-  if (hadMass/1000. < wTrueCut) {
+  if (hadMass < wTrueCut*1000.) {
     Enu = Pnu.E()/1.E3;
   }
+
+  fXVar = Enu;
 
   return;
 };

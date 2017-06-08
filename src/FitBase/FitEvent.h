@@ -30,6 +30,7 @@
 #include "FitParticle.h"
 #include "TLorentzVector.h"
 #include "TSpline.h"
+#include "FitParameters.h"
 
 #ifdef __NEUT_ENABLED__
 #include "neutpart.h"
@@ -329,6 +330,7 @@ class FitEvent : public BaseFitEvt {
   void AddBranchesToTree(TTree* tn);
 
   void Print();
+  void PrintChris();
 
  protected:
   // Event Information
@@ -349,6 +351,11 @@ class FitEvent : public BaseFitEvt {
   UInt_t fParticleState[kMaxParticles];
   int fParticlePDG[kMaxParticles];
   FitParticle* fParticleList[kMaxParticles];
+
+  bool save_neut_status;
+  int fParticleNEUTStatus[kMaxParticles];
+  int fParticleNEUTAlive[kMaxParticles];
+
 };
 
 /*! @} */

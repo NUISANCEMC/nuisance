@@ -79,9 +79,9 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
 
   fEventTree->Branch("nlep",&nlep, "nlep/I");
   fEventTree->Branch("nkplus",&nkplus, "nkplus/I");
-  fEventTree->Branch("nkaon",&nkaon, "nkaon/I");
+  //fEventTree->Branch("nkaon",&nkaon, "nkaon/I");
   fEventTree->Branch("kplus_mom", &kplusmom, "kplus_mom/D");
-  fEventTree->Branch("kaon_mom", &kaonmom, "kaon_mom/D");
+  //  fEventTree->Branch("kaon_mom", &kaonmom, "kaon_mom/D");
 
   // Add Event Scaling Information
   // This scale factor is used to get the predicted event rate for this sample given
@@ -131,63 +131,57 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
     tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
   */
 
+  // Logging Flag
+  fKaonLogging = FitPar::Config().GetParB("KaonLogging");
+
   return;
 }
 
 //********************************************************************
 void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
-
+  
+  // Reset
   kplusmom = -999.9;
-  kaonmom = -999.9;
 
   // Save Some Extra Information
-  nkplus = event->NumParticle(PhysConst::pdg_kplus);
-  nkaon  = event->NumParticle(PhysConst::pdg_strangemesons) + event->NumParticle(PhysConst::pdg_antistrangemesons);
+  nkplus = event->NumFSParticle(PhysConst::pdg_kplus);
 
   // Nmuons
   nlep = event->NumFSParticle(13) + event->NumFSParticle(-13);
 
   // Leading K+ Mom
-  if (event->GetHMParticle(PhysConst::pdg_kplus)){
-
-    kplusmom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_kplus)->fP)*1000.0;
-
+  if (event->GetHMFSParticle(PhysConst::pdg_kplus)){
+    kplusmom = FitUtils::T(event->GetHMFSParticle(PhysConst::pdg_kplus)->fP)*1000.0;
   }
 
-  double strangemom = 0.0;
-  if (event->GetHMParticle(PhysConst::pdg_strangemesons)){
-
-    if (event->GetHMParticle(PhysConst::pdg_strangemesons)){
-      strangemom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_strangemesons)->fP)*1000.0;
-    }
-
-  }
-
-  double antistrangemom = 0.0;
-  if (event->GetHMParticle(PhysConst::pdg_antistrangemesons)){
-
-    if (event->GetHMParticle(PhysConst::pdg_antistrangemesons)){
-      antistrangemom = FitUtils::T(event->GetHMParticle(PhysConst::pdg_antistrangemesons)->fP)*1000.0;
-    }
-
-  }
-
-  kaonmom = TMath::Max(strangemom, antistrangemom);
-
+  // Fill XVar
   fXVar = kplusmom / 1.E3;
 
+  // Fill If Signal
   if (isSignal(event)){
+
     fEventTree->Fill();
+    if (fKaonLogging){
+      int nstrangemesons = event->NumParticle(321);
+      int nstrangefsmesons = event->NumFSParticle(321);
+      
+      if (nstrangemesons > 0){
+	std::cout << "New Event ----------------------------" << std::endl;
+	std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;
+	event->PrintChris();
+	event->fNeutVect->Dump();
+      }
+    }
   }
 
   return;
 };
 
+
 //********************************************************************
 void MCStudy_KaonPreSelection::Write(std::string drawOpt) {
 //********************************************************************
-//  Measurement1D::Write(drawOpt);
 
   // Save the event ttree
   fEventTree->Write();
@@ -204,6 +198,9 @@ void MCStudy_KaonPreSelection::Write(std::string drawOpt) {
 /// Select only events with final state Kaons
 bool MCStudy_KaonPreSelection::isSignal(FitEvent *event) {
 //********************************************************************
+
+  // Update to include all events
+  return true;
 
   // Apply a Kaon Pre-selection
   // Search for Strange Mesons (included full list from MC PDG)

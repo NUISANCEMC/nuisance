@@ -79,7 +79,9 @@ void FitEvent::ResetEvent() {
 #ifdef __NEUT_ENABLED__
 //***************************************************
 void FitEvent::SetEventAddress(NeutVect** tempevent) {
-  //***************************************************
+//***************************************************
+
+  save_neut_status = FitPar::Config().GetParB("save_neut_status");
   fType = kNEUT;
   fNeutVect = *tempevent;
 }
@@ -88,6 +90,7 @@ void FitEvent::SetEventAddress(NeutVect** tempevent) {
 void FitEvent::NeutKinematics() {
   //***************************************************
   ResetEvent();
+
 
   // Get Event Info
   fMode = fNeutVect->Mode;
@@ -166,13 +169,18 @@ void FitEvent::NeutKinematics() {
     fParticleMom[fNParticles][2] = part->fP.Z();
     fParticleMom[fNParticles][3] = part->fP.T();
 
+    //    if (save_neut_status){
+    fParticleNEUTStatus[fNParticles] = part->fStatus;
+    fParticleNEUTAlive[fNParticles] = part->fIsAlive;;
+      //    }
+
     // PDG
     fParticlePDG[fNParticles] = part->fPID;
 
     fNParticles++;
   }
 
-  OrderStack();
+  //  OrderStack();
 
   return;
 };
@@ -702,7 +710,11 @@ void FitEvent::AddBranchesToTree(TTree* tn) {
   tn->Branch("ParticlePDG", fParticlePDG, "ParticlePDG[NParticles]/I");
   tn->Branch("ParticleMom", fParticleMom, "ParticleMom[NParticles][4]/D");
 
-  tn->SetAlias("Enu", "ParticleMom[0][4]");
+  if (save_neut_status){
+    tn->Branch("ParticleNEUTStatus", fParticleNEUTStatus, "ParticleNEUTStatus[NParticles]/I");
+    tn->Branch("ParticleNEUTAlive", fParticleNEUTAlive, "ParticleNEUTAlive[NParticles]/I");
+  }
+
 }
 
 /* Event Access Functions */
@@ -870,6 +882,9 @@ FitParticle* FitEvent::GetHMParticle(std::vector<int> pdg, int state) {
 }
 
 void FitEvent::Print() {
+
+
+
   LOG(EVT) << "FitEvent print" << std::endl;
   LOG(EVT) << "Mode: " << fMode << std::endl;
   LOG(EVT) << "Particles: " << fNParticles << std::endl;
@@ -882,4 +897,16 @@ void FitEvent::Print() {
              << std::endl;
   }
   return;
+}
+
+void FitEvent::PrintChris(){
+
+  std::cout << "FitEvent print ---- " << std::endl;
+  for (int i = 0; i < fNParticles; i++){
+    std::cout << PartInfo(i)->fPID
+	      << " state " << fParticleState[i]
+	      << " status " <<fParticleNEUTStatus[i]
+	      << " alive " << fParticleNEUTAlive[i] << std::endl;
+  }
+  std::cout << " " << std::endl;
 }

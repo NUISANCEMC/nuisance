@@ -114,13 +114,18 @@ bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
   // Require a numu CC0pi event
   if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
 
-  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
-  double CosThetaMu = pnu.Vect().Angle(pmu.Vect());
+  double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
+  double p_mu = Pmu.Vect().Mag();
 
-  // restricted phase space
-  if (forwardgoing and CosThetaMu < 0.0) return false;
+  // If we're doing a restricted phase space, Analysis II asks for:
+  // Cos(theta_mu) > 0.0 and p_mu > 200 MeV
+  if (forwardgoing) {
+    if (CosThetaMu < 0.0 || p_mu < 200) return false;
+  }
+
   return true;
 }
 
@@ -137,16 +142,19 @@ bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
 
-  // mu phase space
-  if ((pmu.Vect().Mag() < 250) || (pnu.Vect().Angle(pmu.Vect()) < -0.6)) {
+  // Muon phase space
+  // Pmu > 250 MeV, cos(theta_mu) > -0.6 (Sweet phase space!)
+  if ((pmu.Vect().Mag() < 250) || cos(pnu.Vect().Angle(pmu.Vect())) < -0.6) {
     return false;
   }
 
-  // p phase space
-  if ((pp.Vect().Mag() < 250) || (pp.Vect().Mag() > 1E3) ||
-      (pnu.Vect().Angle(pp.Vect()) < 0.4)) {
+  // Proton phase space
+  // Pprot > 450 MeV, cos(theta_proton) > 0.4
+  if ((pp.Vect().Mag() < 450) || (pp.Vect().Mag() > 1E3) ||
+      (cos(pnu.Vect().Angle(pp.Vect())) < 0.4)) {
     return false;
   }
+
   return true;
 }
 

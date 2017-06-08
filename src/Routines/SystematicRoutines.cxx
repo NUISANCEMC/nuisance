@@ -446,11 +446,11 @@ int SystematicRoutines::ReadSamples(std::string samstring){
   // Optional Type
   if (strvct.size() > 3) {
     samtype = strvct[3];
-    samname += "_"+samtype;
+    //    samname += "_"+samtype;
     // Also get rid of the / and replace it with underscore because it might not be supported character
-    while (samname.find("/") != std::string::npos) {
-      samname.replace(samname.find("/"), 1, std::string("_"));
-    }
+    //    while (samname.find("/") != std::string::npos) {
+    //      samname.replace(samname.find("/"), 1, std::string("_"));
+    //    }
   }
 
   // Optional Norm
@@ -772,7 +772,7 @@ void SystematicRoutines::PrintState(){
 
   LOG(FIT)<<"------------"<<std::endl;
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT)<<"Likelihood for JointFCN == " << like << std::endl;
+  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << endl;
   LOG(FIT)<<"------------"<<std::endl;
 }
 
@@ -945,7 +945,12 @@ void SystematicRoutines::GenerateErrorBands(){
   TDirectory* errorDIR = (TDirectory*) fOutputRootFile->mkdir("error_bands");
   errorDIR->cd();
 
-  TFile* tempfile = new TFile((fOutputFile + ".throws.root").c_str(),"RECREATE");
+  // Make a second file to store throws
+  std::string tempFileName = fOutputFile;
+  if (tempFileName.find(".root") != std::string::npos) tempFileName.erase(tempFileName.find(".root"), 5);
+  tempFileName += ".throws.root";
+  TFile* tempfile = new TFile(tempFileName.c_str(),"RECREATE");
+
   tempfile->cd();
   int nthrows = FitPar::Config().GetParI("error_throws");
 
@@ -988,7 +993,6 @@ void SystematicRoutines::GenerateErrorBands(){
 
     // Save the FCN
     fSampleFCN->Write();
-
     parameterTree->Fill();
   }
 
@@ -997,9 +1001,9 @@ void SystematicRoutines::GenerateErrorBands(){
 
   //  fDecompFree->Write();
   //  fCovarFree->Write();
-  //  parameterTree->Write();
+  parameterTree->Write();
 
-  //  delete parameterTree;
+  delete parameterTree;
 
   // Now go through the keys in the temporary file and look for TH1D, and TH2D plots
   TIter next(nominal->GetListOfKeys());

@@ -28,16 +28,42 @@ BNL_CC1ppip_XSec_1DEnu_nu::BNL_CC1ppip_XSec_1DEnu_nu(std::string inputfile, FitW
   EnuMax = 3.0;
   fIsDiag = true;
   fNormError = 0.15;
+  fDefaultTypes = "FIX/DIAG";
+  fAllowedTypes = "FIX,FREE,SHAPE/DIAG/UNCORR";
+
+  // User can give option of corrected BNL data or not
+  // The correction follows Wilkinson & Rodriguez et al.
+  // Currently I've only implemented no W cut data but will implement the W < 1.4
+  if (type.find("UNCORR") != std::string::npos) {
+    UseCorrectedData = false;
+  } else {
+    UseCorrectedData = true;
+  }
+
+  std::string DataLocation = GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/";
+
+  if (UseCorrectedData) {
+    DataLocation += "BNL_CC1pip_on_p_1986_corr.txt";
+    EnuMax = 6.0;
+  } else {
+    DataLocation += "BNL_CC1pip_on_p_1986.txt";
+    EnuMax = 3.0;
+  }
+  if (!type.empty() && type != "DEFAULT") {
+    std::string temp_type = type;
+    std::replace(temp_type.begin(), temp_type.end(), '/', '_');
+    fName += "_"+temp_type;
+  }
+
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/BNL/CC1pip_on_p/BNL_CC1pip_on_p_W14_1986_corr_edges.txt");
-  this->SetupDefaultHist();
+  SetDataValues(DataLocation);
+  SetupDefaultHist();
 
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar     = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
-  // D2 = 1 proton, 1 neutron
+  fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/((fNEvents+0.))*16./8.;
 };
 
 void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
@@ -49,11 +75,11 @@ void BNL_CC1ppip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::MpPi(Pp, Ppip);
+  // Include W < 1.4 GeV data sometime soon
+  //double hadMass = FitUtils::MpPi(Pp, Ppip);
   double Enu     = -1.0;
 
-  // Found a corrected one but only reliable to ~3GeV
-  if (hadMass < 1400) Enu = Pnu.E()/1000.;
+  Enu = Pnu.E()/1000.;
   fXVar = Enu;
 
   return;
