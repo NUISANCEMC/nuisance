@@ -54,9 +54,17 @@ void SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu::FillEventVariables(FitEvent *event){
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
   FitParticle *nu   = event->GetNeutrinoIn();
 
-  
-  thetapr = SciBooNEUtils::CalcThetaPr(event);
 
+  // if (SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon) >
+  //     SciBooNEUtils::PenetratedEfficiency(nu, muon)){
+  //   this->Weight *= SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon);
+  //   thetapr = SciBooNEUtils::CalcThetaPr(event);
+  // } else {
+  //   this->Weight *= SciBooNEUtils::PenetratedEfficiency(nu, muon);
+  //   thetapr = SciBooNEUtils::CalcThetaPr(event, true);
+  // }
+
+  thetapr = SciBooNEUtils::CalcThetaPr(event);
   if (thetapr < 0) return;
 
   // Note that this is the stopped sample only!

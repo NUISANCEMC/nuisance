@@ -37,7 +37,7 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(std::string name, std::
 
   PlotUtils::CreateNeutModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_PDG);
   PlotUtils::ResetNeutModeArray((TH1**)this->fMCHist_PDG);
-
+  
   SciBooNEUtils::CreateModeArray((TH1D*)this->fMCHist,(TH1**)this->fMCHist_modes);
   SciBooNEUtils::ResetModeArray((TH1**)this->fMCHist_modes);
 
@@ -54,13 +54,18 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
   FitParticle *muon = event->GetHMFSParticle(PhysConst::pdg_muons);
   FitParticle *nu   = event->GetNeutrinoIn();
 
-  q2qe = FitUtils::Q2QErec(muon->fP,cos(nu->fP.Vect().Angle(muon->fP.Vect())), 27., true);
+  // Need to figure out if this is the best place to set weights long term... but...
+  if (SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon) > 
+      SciBooNEUtils::PenetratedEfficiency(nu, muon)){
+    this->Weight *= SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon);
+    q2qe = FitUtils::Q2QErec(FitUtils::p(muon),cos(FitUtils::th(nu,muon)), 27., true);
+  } else {
+    this->Weight *= SciBooNEUtils::PenetratedEfficiency(nu, muon);
+    q2qe = FitUtils::Q2QErec(FitPar::PenetratingMuonE,cos(FitUtils::th(nu,muon)), 27., true);
+  }
 
   if (q2qe < 0) return;
 
-  // Need to figure out if this is the best place to set weights long term... but...
-  this->Weight *= SciBooNEUtils::CalcEfficiency(this->muonStopEff, nu, muon);
-  
   // Set X Variables
   fXVar = q2qe;
   return;
@@ -68,34 +73,7 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
-
-  int nCharged = 0;
-
-  // For now, require a muon
-  if (event->NumFSParticle(PhysConst::pdg_muons) != 1)
-    return false;
-
-  // For one track, require a single FS particle.
-  for (UInt_t j = 2; j < event->Npart(); j++){
-
-    if (!(event->PartInfo(j))->fIsAlive) continue;
-    if (event->PartInfo(j)->fNEUTStatusCode != 0) continue;
-
-    int PID = event->PartInfo(j)->fPID;
-
-    // Look for pions, protons
-    if (abs(PID) == 211 || PID == 2212){
-      
-      // Must be reconstructed as a track in SciBooNE
-      if (!SciBooNEUtils::DistanceInScintillator(event->PartInfo(0), event->PartInfo(j))) continue;
-      nCharged += 1;
-    }
-  } // end loop over particle stack
-
-  // This is the 1 track sample
-  if (nCharged != 0) return false;
-  return true;
-
+  return SciBooNEUtils::is1TRK(event);
 };
 
 void SciBooNE_CCCOH_1TRK_1DQ2_nu::ScaleEvents(){

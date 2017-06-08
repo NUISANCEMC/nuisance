@@ -203,12 +203,14 @@
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
 // SciBooNE COH studies
+#include "SciBooNE_CCCOH_STOP_NTrks_nu.h"
 #include "SciBooNE_CCCOH_1TRK_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPr_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
+#include "SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h"
 
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"

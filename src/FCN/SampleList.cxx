@@ -540,6 +540,8 @@ T2K Samples
     /*
       SciBooNE COH studies
     */
+  } else if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_STOP_NTrks_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("SciBooNE_CCCOH_1TRK_1DQ2_nu")) {
     fChain->push_back(new SciBooNE_CCCOH_1TRK_1DQ2_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
@@ -552,6 +554,8 @@ T2K Samples
     fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(name, file, rw, type, fkdt));
   } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
     fChain->push_back(new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(name, file, rw, type, fkdt));
+  } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
+    fChain->push_back(new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(name, file, rw, type, fkdt));
 
     /*
 K2K Samples
