@@ -32,7 +32,7 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey){
   fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("Entries/0.05 (GeV^{2})");
   fSettings.SetAllowedTypes("EVT");
-  fSettings.SetEnuRange(0.0, 5.0);
+  fSettings.SetEnuRange(0.0, 10.0);
   fSettings.DefineAllowedTargets("C,H");
 
   fSettings.SetTitle("SciBooNE CCCOH 1TRK");
@@ -40,6 +40,7 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey){
   fSettings.SetHasExtraHistograms(true);
   fSettings.DefineAllowedSpecies("numu");
 
+  SetDataFromTextFile(fSettings.GetDataInput());
   FinaliseSampleSettings();
 
   // Setup Plots
@@ -47,9 +48,8 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey){
 		    FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
 
   this->fMCStack  = new SciBooNEUtils::ModeStack(fSettings.Name() + "_Stack",
-					  "Mode breakdown" + fSettings.PlotTitles(),
-					  PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
-  
+						 "Mode breakdown" + fSettings.PlotTitles(),
+						 PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));  
   SetAutoProcessTH1(fMCStack);
   
   // Estimate the number of CH molecules in SciBooNE...
@@ -71,13 +71,10 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
       SciBooNEUtils::PenetratedEfficiency(nu, muon)){
     this->Weight *= SciBooNEUtils::StoppedEfficiency(this->muonStopEff, nu, muon);
     q2qe = FitUtils::Q2QErec(FitUtils::p(muon),cos(FitUtils::th(nu,muon)), 27., true);
-  } else {
-    this->Weight *= SciBooNEUtils::PenetratedEfficiency(nu, muon);
-    q2qe = FitUtils::Q2QErec(FitPar::PenetratingMuonE,cos(FitUtils::th(nu,muon)), 27., true);
-  }
+  } 
 
   if (q2qe < 0) return;
-
+  
   // Set X Variables
   fXVar = q2qe;
   return;
@@ -85,6 +82,7 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 
 
 bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
+  if (fXVar == 0) return false;
   return SciBooNEUtils::is1TRK(event);
 };
 
