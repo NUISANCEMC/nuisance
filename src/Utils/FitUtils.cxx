@@ -210,16 +210,6 @@ double FitUtils::EnuQErec(double pl, double costh, double binding,
 
   if (pl < 0) return 0.; // Make sure nobody is silly
 
-  double momshift = 0.0;
-  double temp = FitPar::Config().GetParD("muon_momentum_shift");
-  if (temp != -999.9 and temp != 0.0) {
-    if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
-      momshift = temp;
-    else if (FitPar::Config().GetParI("muon_momentum_throw") == 1) {
-      momshift = gRandom->Gaus(0.0, 1.0) * temp;
-    }
-  }
-
   double mN_eff = PhysConst::mass_neutron - binding/1000.;
   double mN_oth = PhysConst::mass_proton;
 
@@ -229,7 +219,6 @@ double FitUtils::EnuQErec(double pl, double costh, double binding,
   }
   double ml = PhysConst::mass_muon;
   double el = sqrt(pl*pl + ml*ml);
-  pl += momshift;
 
   double rEnu =
     (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
@@ -243,20 +232,8 @@ double FitUtils::Q2QErec(double pl, double costh, double binding,
 
   if (pl < 0) return 0.; // Make sure nobody is silly
 
-  double momshift = 0.0;
-  double temp = FitPar::Config().GetParD("muon_momentum_shift");
-  if (temp != -999.9 and temp != 0.0) {
-    if (FitPar::Config().GetParI("muon_momentum_throw") == 0)
-      momshift = temp;
-    else if (FitPar::Config().GetParI("muon_momentum_throw") == 1) {
-      momshift = gRandom->Gaus(0.0, 1.0) * temp;
-    }
-  }
-
   double ml = PhysConst::mass_muon;
   double el = sqrt(pl*pl + ml*ml);
-
-  pl += momshift / 1000.;
 
   double rEnu = EnuQErec(pl, costh, binding, neutrino);
   double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);

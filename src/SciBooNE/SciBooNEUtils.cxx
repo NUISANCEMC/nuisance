@@ -111,6 +111,8 @@ bool SciBooNEUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
   //double test = SciBooNEUtils::BetheBlochCH(particle);
   double dist  = SciBooNEUtils::RangeInScintillator(particle, FitPar::NumRangeSteps);
   double zdist = dist*cos(FitUtils::th(beam, particle));
+  
+  std::cout << "zdist = " << zdist << "; RecoDist = " << FitPar::SciBarRecoDist << std::endl;
 
   if (abs(zdist) < FitPar::SciBarRecoDist) return false;
   return true;
@@ -203,7 +205,7 @@ bool SciBooNEUtils::is1TRK(FitEvent *event){
       // Must be reconstructed as a track in SciBooNE
       if (!SciBooNEUtils::PassesDistanceCut(event->PartInfo(0), event->PartInfo(j))) continue;
       nCharged += 1;
-
+      std::cout << " nCharged += 1; " <<std::endl;
     }
   } // end loop over particle stack
 
