@@ -35,7 +35,7 @@ MiniBooNE_CC1pip_XSec_1DTu_nu::MiniBooNE_CC1pip_XSec_1DTu_nu(nuiskey samplekey) 
   fSettings.SetXTitle("T_{#mu} (MeV)");
   fSettings.SetYTitle("d#sigma/dT_{#mu} (cm^{2}/MeV/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetEnuRange(0.0, 100.0);
   fSettings.SetNormError(0.107);
   fSettings.DefineAllowedTargets("C,H");
 

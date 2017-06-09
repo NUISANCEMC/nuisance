@@ -103,6 +103,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
                          fSettings.GetName() + "_CCQELIKE_data" );
     fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG").c_str(),
                                       ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
+    fDataHist->Add(fDataHist_CCQELIKE);
     SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
     // CCQELike MC

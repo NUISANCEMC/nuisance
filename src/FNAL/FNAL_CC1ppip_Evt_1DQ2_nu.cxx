@@ -35,9 +35,11 @@ FNAL_CC1ppip_Evt_1DQ2_nu::FNAL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Q^{2}_{CC1#pi} (GeV^{2})");
   fSettings.SetYTitle("Number of events");
-  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  //fSettings.SetAllowedTypes("EVT/DIAG", "EVT/DIAG");
   fSettings.SetEnuRange(10.0, 100.0);
-  fSettings.DefineAllowedTargets("D,H");
+   fSettings.DefineAllowedTargets("D,H");
+  fIsDiag = true;
+  fIsRawEvents = true;
 
   // plot information
   fSettings.SetTitle("FNAL_CC1ppip_Evt_1DQ2_nu");

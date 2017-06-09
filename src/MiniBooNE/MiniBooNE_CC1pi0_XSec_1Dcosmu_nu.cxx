@@ -53,7 +53,7 @@ MiniBooNE_CC1pi0_XSec_1Dcosmu_nu::MiniBooNE_CC1pi0_XSec_1Dcosmu_nu(nuiskey sampl
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-  SetCovarFromTextFile( fSettings.GetCovarInput() );
+  SetCorrelationFromTextFile( fSettings.GetCovarInput() );
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
