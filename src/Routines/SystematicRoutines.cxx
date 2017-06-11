@@ -269,7 +269,7 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     }
 
     // Form norm dial from samplename + sampletype + "_norm";
-    std::string normname = samplename + sampletype + "_norm";
+    std::string normname = samplename + "_norm";
 
     // Check normname not already present
     if (fTypeVals.find(normname) != fTypeVals.end()) {

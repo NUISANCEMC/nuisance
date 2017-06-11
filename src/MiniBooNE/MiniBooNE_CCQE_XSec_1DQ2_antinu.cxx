@@ -54,7 +54,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(nuiskey samplek
 
     // CCQELike plot information
     fSettings.SetTitle("MiniBooNE #nu_#mu CCQE on CH");
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_like.txt" );
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_con.txt" );
     fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_diagcovar" );
     fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_bkg_ccqe.txt" );
     fSettings.SetDefault( "ccpimbkg_input", FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/asqq_bkg_ccpim.txt" );
