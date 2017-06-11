@@ -219,8 +219,6 @@ bool FitWeight::NeedsEventReWeight(const double* x) {
 double FitWeight::GetSampleNorm(std::string name) {
 	if (name.empty()) return 1.0;
 
-	std::cout << "Requesting sample norm with name = " << name + "_norm" << std::endl;
-
 	// Find norm dial
 	if (fAllEnums.find(name + "_norm") != fAllEnums.end()) {
 	  if (fAllValues.find(fAllEnums[name+"_norm"]) != fAllValues.end()){
