@@ -37,18 +37,12 @@ public:
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
   void FillExtraHistograms(MeasurementVariableBox* vars, double weight);
-
-  // These functions are overridden to make the mode plots... probably a better way to do this
-  /* void ScaleEvents(); */
-  /* void FillHistograms(); */
-  /* void Write(std::string drawOpt); */
-  /* void ApplyNormScale(double norm); */
-  /* void ResetAll(); */
-
   SciBooNEUtils::ModeStack *fMCStack;
 
  private:
   double q2qe; ///<! X_Variable
+  int nProtons, nPiMus, nVertex, mainIndex;
+  FitParticle *mainTrack, *secondTrack;
   TH2D *muonStopEff;
 };
   
