@@ -94,7 +94,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu() {
 
   // CCQELike plot information
   fSettings.SetTitle("MiniBooNE #nu_#mu CCQE");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_con.txt" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_like.txt" );
   fSettings.SetCovarInput( FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_diagcovar" );
   fSettings.SetDefault( "ccqelikebkg_input", FitPar::GetDataBase() + "/MiniBooNE/ccqe/asqq_bkg.txt" );
   fSettings.SetHasExtraHistograms(true);
@@ -118,7 +118,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu() {
                        fSettings.GetName() + "_CCQELIKEBKG_data" );
   fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
                                     ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
-  fDataHist->Add(fDataHist_CCQELIKE);
+  //  fDataHist->Add(fDataHist_CCQELIKE);
   SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
   // Make MC Clone
