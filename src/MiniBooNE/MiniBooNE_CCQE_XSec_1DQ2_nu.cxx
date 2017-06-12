@@ -118,6 +118,7 @@ void MiniBooNE_CCQE_XSec_1DQ2_nu::Setup_MiniBooNE_CCQELike_XSec_1DQ2_nu() {
                        fSettings.GetName() + "_CCQELIKEBKG_data" );
   fDataHist_CCQELIKE->SetNameTitle( (fSettings.Name() + "_CCQELIKE_BKG_data").c_str(),
                                     ("MiniBooNE #nu_#mu CCQE-Like Backgrounds" + fSettings.PlotTitles()).c_str() );
+  //  fDataHist->Add(fDataHist_CCQELIKE);
   SetAutoProcessTH1(fDataHist_CCQELIKE, kCMD_Write);
 
   // Make MC Clone

@@ -284,6 +284,6 @@ bool SignalDef::IsRestrictedAngle(FitEvent* event, int nuPDG, int otherPDG, doub
 }
 
 bool SignalDef::IsEnuInRange(FitEvent* event, double emin, double emax){
-  return (event->PartInfo(0)->fP.E() > emin &&
-	  event->PartInfo(0)->fP.E() < emax);
+  return (event->GetNeutrinoIn()->fP.E() > emin &&
+	  event->GetNeutrinoIn()->fP.E() < emax);
 }
