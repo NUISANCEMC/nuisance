@@ -304,6 +304,7 @@ protected:
   bool fMCFilled;    //!< flag whether MC plots have been filled (For
   //! ApplyNormalisation)
   bool fNoData;      //!< flag whether data plots do not exist (for ratios)
+  bool fIsNoWidth;    ///< Flag : Don't scale by bin width
 
   // TEMP OBJECTS TO HANDLE MERGE
   double fXVar, fYVar, fZVar, Mode, Weight;
