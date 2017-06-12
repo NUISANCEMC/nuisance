@@ -245,7 +245,7 @@ bool SignalDef::isNCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
 
 bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 
-  for (int i = 0; i < event->Npart(); i++){
+  for (uint i = 0; i < event->Npart(); i++){
     FitParticle* p = event->PartInfo(i);
     if (!p->IsFinalState()) continue;
     if (p->fPID != 2212) continue;
@@ -258,7 +258,7 @@ bool SignalDef::HasProtonKEAboveThreshold(FitEvent* event, double threshold){
 
 bool SignalDef::HasProtonMomAboveThreshold(FitEvent* event, double threshold){
 
-  for (int i = 0; i < event->Npart(); i++){
+  for (uint i = 0; i < event->Npart(); i++){
     FitParticle* p = event->PartInfo(i);
     if (!p->IsFinalState()) continue;
     if (p->fPID != 2212) continue;
