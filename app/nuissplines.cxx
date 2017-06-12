@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
 //*******************************
 
   // Program status;
-  int status = 0;
+  //int status = 0;
   
   
   // If No Arguments print commands

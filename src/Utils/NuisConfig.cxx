@@ -553,7 +553,7 @@ bool nuisconfig::Has(XMLNodePointer_t node, std::string name) {
 
   // Get Attribute from child with name
   SXmlNode_t* snode = (SXmlNode_t*) node;
-  SXmlAttr_t* sattr = snode->fAttr;
+  //SXmlAttr_t* sattr = snode->fAttr;
 
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
   

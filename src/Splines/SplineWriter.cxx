@@ -92,7 +92,7 @@ void SplineWriter::SetupSplineSet() {
   }
 
   fWeightList = new double[fValList.size()];
-  for (int i = 0; i < fValList.size(); i++) {
+  for (uint i = 0; i < fValList.size(); i++) {
     fWeightList[i] = 1.0;
   }
 
@@ -184,7 +184,7 @@ double SplineWriter::GetWeightForThisSet(FitEvent* event, int iset){
 }
 
 void SplineWriter::SetWeights(double* weights){
-  for (int i = 0; i < fParVect.size(); i++){
+  for (uint i = 0; i < fParVect.size(); i++){
     fWeightList[i] = weights[i];
   }
 }
@@ -502,7 +502,7 @@ double SplineFCN::DoEval(const double * x) const {
 }
 
 void SplineFCN::UpdateWeights(std::vector<double>& w) {
-  for (int i = 0; i < w.size(); i++) {
+  for (uint i = 0; i < w.size(); i++) {
     fWeight[i] = w[i];
   }
 }
