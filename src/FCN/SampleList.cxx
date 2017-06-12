@@ -587,22 +587,22 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
 
     // SciBooNE COH studies
-  // } else if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
-  //   return (new SciBooNE_CCCOH_STOP_NTrks_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
+    return (new SciBooNE_CCCOH_STOP_NTrks_nu(samplekey));
   } else if (!name.compare("SciBooNE_CCCOH_1TRK_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_1TRK_1DQ2_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
-  //   return (new SciBooNE_CCCOH_MuPr_1DQ2_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
-  //   return (new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
-  //   return (new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu")) {
-  //   return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
-  //   return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(samplekey));
-  // } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
-  //   return (new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
+    return (new SciBooNE_CCCOH_MuPr_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
+     return (new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
+    return (new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu")) {
+    return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
+    return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
+    return (new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(samplekey));
 
     /*
     K2K Samples
