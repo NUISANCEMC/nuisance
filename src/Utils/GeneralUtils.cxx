@@ -115,7 +115,7 @@ int GeneralUtils::StrToInt(std::string str) {
 bool GeneralUtils::StrToBool(std::string str) {
 
   // convert result to lower case
-  for (int i = 0; i < str.size(); i++) str[i] = std::tolower(str[i]);
+  for (uint i = 0; i < str.size(); i++) str[i] = std::tolower(str[i]);
 
   // Test for true/false
   if      (!str.compare("false")) return false;
