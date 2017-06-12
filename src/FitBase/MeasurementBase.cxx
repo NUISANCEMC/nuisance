@@ -509,7 +509,11 @@ void MeasurementBase::AutoScaleExtraTH1() {
        iter != fExtraTH1s.end(); iter++) {
 
     if (!((*iter).second)[kCMD_Scale]) continue;
-    (*iter).first->Scale(fScaleFactor, "width");
+    if (fIsNoWidth){
+      (*iter).first->Scale(fScaleFactor);
+    } else {
+      (*iter).first->Scale(fScaleFactor, "width");
+    }
   }
 };
 

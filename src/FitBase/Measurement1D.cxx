@@ -52,7 +52,7 @@ Measurement1D::Measurement1D(void) {
   // Options
   fDefaultTypes = "FIX/FULL/CHI2";
   fAllowedTypes =
-    "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/MASK";
+    "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/MASK/NOWIDTH";
 
   fIsFix = false;
   fIsShape = false;
@@ -63,6 +63,7 @@ Measurement1D::Measurement1D(void) {
   fIsMask = false;
   fIsChi2SVD = false;
   fIsRawEvents = false;
+  fIsNoWidth = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
 
@@ -643,6 +644,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
 
   // EXTRAS
   if (opt.find("RAW") != std::string::npos) fIsRawEvents = true;
+  if (opt.find("NOWIDTH") != std::string::npos) fIsNoWidth = true;
   if (opt.find("DIF") != std::string::npos) fIsDifXSec = true;
   if (opt.find("ENU1D") != std::string::npos) fIsEnu1D = true;
   if (opt.find("NORM") != std::string::npos) fAddNormPen = true;
@@ -811,6 +813,10 @@ void Measurement1D::ScaleEvents() {
     // fNEvents);
     // }
 
+  } else if (fIsNoWidth) {
+    fMCHist->Scale(fScaleFactor);
+    fMCFine->Scale(fScaleFactor);
+    if (fMCHist_Modes) fMCHist_Modes->Scale(fScaleFactor);
     // Any other differential scaling
   } else {
     fMCHist->Scale(fScaleFactor, "width");
