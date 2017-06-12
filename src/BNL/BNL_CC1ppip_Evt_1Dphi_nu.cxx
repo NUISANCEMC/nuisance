@@ -36,7 +36,7 @@ BNL_CC1ppip_Evt_1Dphi_nu::BNL_CC1ppip_Evt_1Dphi_nu(nuiskey samplekey) {
   fSettings.SetXTitle("#phi_{Adler}");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.SetEnuRange(0.0, 6.0);
   fSettings.DefineAllowedTargets("D,H");
 
   // CCQELike plot information

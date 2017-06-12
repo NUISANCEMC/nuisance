@@ -220,9 +220,9 @@ double FitWeight::GetSampleNorm(std::string name) {
 	if (name.empty()) return 1.0;
 
 	// Find norm dial
-	if (fAllEnums.find(name) != fAllEnums.end()) {
-	  if (fAllValues.find(fAllEnums[name]) != fAllValues.end()){
-	    return fAllValues[ fAllEnums[name] ];
+	if (fAllEnums.find(name + "_norm") != fAllEnums.end()) {
+	  if (fAllValues.find(fAllEnums[name+"_norm"]) != fAllValues.end()){
+	    return fAllValues[ fAllEnums[name+"_norm"] ];
 	  } else {
 	    return 1.0;
 	  }

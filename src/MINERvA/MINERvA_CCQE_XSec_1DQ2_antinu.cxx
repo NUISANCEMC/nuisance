@@ -61,15 +61,15 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(nuiskey samplekey) 
                  << "data normalization but full covariance will be used. " << std::endl;
       }
       datafilename  = "Q2QE_numubar_data_fluxfix.txt";
-      covarfilename = "Q2QE_numubar_covar_fluxfix.txt";
+      covarfilename = "Q2QE_numubar_covar_fluxfix.txt"; // Correlation Matrix
 
     } else {
       if (fIsShape) {
         datafilename  = "Q2QE_numubar_data_SHAPE-extracted.txt";
-        covarfilename = "Q2QE_numubar_covar_SHAPE-extracted.txt";
+        covarfilename = "Q2QE_numubar_covar_SHAPE-extracted.txt"; // correlation
       } else {
         datafilename  = "Q2QE_numubar_data.txt";
-        covarfilename = "Q2QE_numubar_covar.txt";
+        covarfilename = "Q2QE_numubar_covar.txt"; // Correlation
       }
     }
 
@@ -82,15 +82,15 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(nuiskey samplekey) 
                  << "data normalization but full covariance will be used. " << std::endl;
       }
       datafilename  = "20deg_Q2QE_numubar_data_fluxfix.txt";
-      covarfilename = "20deg_Q2QE_numubar_covar_fluxfix.txt";
+      covarfilename = "20deg_Q2QE_numubar_covar_fluxfix.txt"; // Correlation
 
     } else {
       if (fIsShape) {
         datafilename  = "20deg_Q2QE_numubar_data_SHAPE-extracted.txt";
-        covarfilename = "20deg_Q2QE_numubar_covar_SHAPE-extracted.txt";
+        covarfilename = "20deg_Q2QE_numubar_covar_SHAPE-extracted.txt"; // Correlation
       } else {
         datafilename  = "20deg_Q2QE_numubar_data.txt";
-        covarfilename = "20deg_Q2QE_numubar_covar.txt";
+        covarfilename = "20deg_Q2QE_numubar_covar.txt"; // Correlation
       }
     }
   }
@@ -107,14 +107,8 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(nuiskey samplekey) 
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-
-  if (!isFluxFix or !fullphasespace) {
-    SetCorrelationFromTextFile( fSettings.GetCovarInput() );
-    ScaleCovar(1E76);
-  } else {
-    SetCovarFromTextFile( fSettings.GetCovarInput() );
-  }
-
+  SetCorrelationFromTextFile( fSettings.GetCovarInput() );
+  
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 

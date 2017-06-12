@@ -83,6 +83,10 @@ if(DEFINED USE_GiBUU AND USE_GiBUU)
   include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
 endif()
 
+if(NOT DEFINED BUILD_GiBUU)
+  set(BUILD_GiBUU 0)
+endif()
+
 if(DEFINED USE_NUANCE AND USE_NUANCE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
 endif()
