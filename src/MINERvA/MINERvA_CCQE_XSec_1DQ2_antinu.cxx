@@ -108,7 +108,6 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(nuiskey samplekey) 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCorrelationFromTextFile( fSettings.GetCovarInput() );
-  ScaleCovar(1E76);
   
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
