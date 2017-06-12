@@ -61,24 +61,11 @@ namespace SciBooNEUtils {
 
   bool PassesDistanceCut(FitParticle* beam, FitParticle* particle);
 
-  // Functions to break the plots into modes
-  /* void CreateModeArray(TH1* hist, TH1* modearray[]); */
-  /* void FillModeArray(TH1* hist[], int mode, double xval, double weight = 1.0); */
-  /* void ResetModeArray(TH1* hist[]); */
-  /* void ScaleModeArray(TH1* hist[], double factor, std::string option = ""); */
-  /* void DeleteModeArray(TH1* modearray[]); */
-  /* void WriteModeArray(TH1* hist[]); */
+  int GetMainTrack(FitEvent *event, TH2D *effHist, FitParticle*& mainTrk, double& weight, bool penetrated=false);
+  void GetOtherTrackInfo(FitEvent *event, int mainIndex, int& nProtons, int& nPiMus, int& nVertex, FitParticle*& secondTrk);
 
-  // Default to being agnostic about VA
-  bool isMuPi(FitEvent *event, int VA=0);
-  bool isMuPr(FitEvent *event, int VA=0);
-  bool is1TRK(FitEvent *event);
-  
-  int GetNTracks(FitEvent *event);
-
-  double CalcThetaPr(FitEvent *event, bool penetrated=false);
-  double CalcThetaPi(FitEvent *event);
-  FitParticle* GetSecondaryTrack(FitEvent *event);
+  double CalcThetaPr(FitEvent *event, FitParticle *main, FitParticle *second, bool penetrated=false);
+  double CalcThetaPi(FitEvent *event, FitParticle *second);
 
   /// Break down the plots as in the SciBooNE papers
   class ModeStack : public StackBase {
