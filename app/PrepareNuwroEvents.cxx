@@ -64,6 +64,9 @@ void CreateRateHistograms(std::string inputs, bool force_out){
   std::map<int, int> nevtlist;
   std::map<int, double> intxseclist;
 
+  // Did the input file have a mono-energetic flux?
+  bool isMono = false;
+
   nevtlist[0] = 0.0;
   intxseclist[0] = 0.0;
   
@@ -73,23 +76,38 @@ void CreateRateHistograms(std::string inputs, bool force_out){
   if (fluxtype == 0){
     
     std::string fluxstring = evt->par.beam_energy;
-    std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxstring, " ");
+    std::vector<double> fluxvals = GeneralUtils::ParseToDbl(fluxstring, " ");
+
     int pdg = evt->par.beam_particle;
     double Elow  = double(fluxvals[0])/1000.0;
     double Ehigh = double(fluxvals[1])/1000.0;
-
-    LOG(FIT) << " - Adding new nuwro flux "
-	     << "pdg: " << pdg
-	     << "Elow: " << Elow
-	     << "Ehigh: " << Ehigh
-	     << std::endl;
+    TH1D* fluxplot = NULL;
     
-    TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
-    for (int j = 2; j < fluxvals.size(); j++){
-      LOG(DEB) << j <<" "<<fluxvals[j]<<endl;
-      fluxplot->SetBinContent(j-1, fluxvals[j]);
-    }
+    if (Elow > Ehigh) isMono = true;
 
+    // For files produced with a flux distribution
+    if (!isMono) {
+      
+      LOG(FIT) << "Adding new nuwro flux "
+	       << "pdg: " << pdg
+	       << " Elow: " << Elow
+	       << " Ehigh: " << Ehigh
+	       << std::endl;
+      
+      fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
+      for (uint j = 2; j < fluxvals.size(); j++){
+	LOG(DEB) << j <<" "<<fluxvals[j]<<endl;
+	fluxplot->SetBinContent(j-1, fluxvals[j]);
+      }
+    } else { // For monoenergetic fluxes
+      LOG(FIT) << "Adding mono-energetic nuwro flux "
+               << "pdg: " << pdg
+               << " E: " << Elow
+               << std::endl;
+
+      fluxplot = new TH1D("fluxplot", "fluxplot", 100, 0, Elow*2);
+      fluxplot->SetBinContent(fluxplot->FindBin(Elow), 1);
+    }
   
     // Setup total flux
     fluxlist[0] = (TH1D*) fluxplot->Clone();
@@ -121,24 +139,24 @@ void CreateRateHistograms(std::string inputs, bool force_out){
     std::string fluxstring = evt->par.beam_content;
     
     std::vector<std::string> fluxlines = GeneralUtils::ParseToStr(fluxstring, "\n");
-    for (int  i = 0; i < fluxlines.size(); i++){
+    for (uint  i = 0; i < fluxlines.size(); i++){
       
-      std::vector<double> fluxvals = PlotUtils::FillVectorDFromString(fluxlines[i], " ");
+      std::vector<double> fluxvals = GeneralUtils::ParseToDbl(fluxlines[i], " ");
 
       int pdg = int(fluxvals[0]);
       double pctg = double(fluxvals[1])/100.0;
       double Elow  = double(fluxvals[2])/1000.0;
       double Ehigh = double(fluxvals[3])/1000.0;
 
-      LOG(FIT) << " - Adding new nuwro flux "
+      LOG(FIT) << "Adding new nuwro flux "
 	       << "pdg: " << pdg
-	       << "pctg: " << pctg
-	       << "Elow: " << Elow
-	       << "Ehigh: " << Ehigh
+	       << " pctg: " << pctg
+	       << " Elow: " << Elow
+	       << " Ehigh: " << Ehigh
 	       << std::endl;
       
       TH1D* fluxplot = new TH1D("fluxplot","fluxplot", fluxvals.size()-4, Elow, Ehigh);
-      for (int j = 4; j < fluxvals.size(); j++){
+      for (uint j = 4; j < fluxvals.size(); j++){
 	fluxplot->SetBinContent(j+1, fluxvals[j]);
       }
    
@@ -183,8 +201,8 @@ void CreateRateHistograms(std::string inputs, bool force_out){
   int nevents = nuwrotree->GetEntries();
   double Enu = 0.0;
   double TotXSec = 0.0;
-  double totaleventmode = 0.0;
-  double totalevents = 0.0;
+  //double totaleventmode = 0.0;
+  //double totalevents = 0.0;
   int pdg = 0;
   int countwidth = nevents/50.0;
   
@@ -217,7 +235,7 @@ void CreateRateHistograms(std::string inputs, bool force_out){
   TH1D* zeroevents = (TH1D*) eventlist[0]->Clone();
   
   // Loop over eventlist
-  for (int i = 0; i < allpdg.size(); i++){
+  for (uint i = 0; i < allpdg.size(); i++){
 
     int pdg = allpdg[i];
     double AvgXSec = intxseclist[0] * 1E38 / double(nevtlist[0]);
@@ -225,11 +243,18 @@ void CreateRateHistograms(std::string inputs, bool force_out){
     LOG(FIT) << pdg << " Avg XSec = " << AvgXSec << endl;
     LOG(FIT) << pdg << " nevents = " << double(nevtlist[pdg]) << endl;
     
-    // Convert events to PDF
-    eventlist[pdg] -> Scale(1.0 / zeroevents->Integral("width"));
-
-    // Multiply by total predicted event rate
-    eventlist[pdg] -> Scale( fluxlist[0]->Integral("width") * AvgXSec );
+    if (!isMono){
+      // Convert events to PDF
+      eventlist[pdg] -> Scale(1.0 / zeroevents->Integral("width"));
+      
+      // Multiply by total predicted event rate
+      eventlist[pdg] -> Scale( fluxlist[0]->Integral("width") * AvgXSec );
+    } else {
+      // If a mono-energetic flux was used, width should not be used
+      // The output is (now) forced to be flux = 1, evtrt = xsec (in 1E38 * nb cm^2)
+      eventlist[pdg] -> Scale(1.0 / zeroevents->Integral());
+      eventlist[pdg] -> Scale( fluxlist[0]->Integral()*AvgXSec );
+    }
 
     // Save everything
     fluxlist[pdg]  -> Write("",TObject::kOverwrite);
