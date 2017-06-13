@@ -35,12 +35,12 @@ ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) 
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
   fSettings.SetXTitle("q0");
   fSettings.SetYTitle("#sigma");
-  // fIsRawEvents = true;
+  fIsNoWidth = true;
 
   FinaliseSampleSettings();
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromName(fSettings.GetS("name"));
+  SetDataFromName(fSettings.GetS("originalname"));
   SetCovarFromDiagonal();
 
   // Scaling Setup ---------------------------------------------------
