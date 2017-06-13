@@ -35,8 +35,6 @@ double SciBooNEUtils::StoppedEfficiency(TH2D *effHist, FitParticle *nu, FitParti
   if (!effHist) return eff;
   eff = effHist->GetBinContent(effHist->FindBin(FitUtils::p(muon), FitUtils::th(nu, muon)/TMath::Pi()*180.));
 
-  if (eff == 1) std::cout << "p = " << FitUtils::p(muon) << " th = " << FitUtils::th(nu, muon)/TMath::Pi()*180. << " eff = " << eff << std::endl;
-
   return eff;
 }
 
@@ -105,12 +103,9 @@ double SciBooNEUtils::RangeInScintillator(FitParticle* particle, int nsteps){
 // Function to calculate the distance the particle travels in scintillator
 bool SciBooNEUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
 
-  int PID     = particle->fPID;
-
-  //double test = SciBooNEUtils::BetheBlochCH(particle);
   double dist  = SciBooNEUtils::RangeInScintillator(particle, FitPar::NumRangeSteps);
   double zdist = dist*cos(FitUtils::th(beam, particle));
-  
+
   if (abs(zdist) < FitPar::SciBarRecoDist) return false;
   return true;
 }
