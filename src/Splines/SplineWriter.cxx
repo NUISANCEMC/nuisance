@@ -405,13 +405,14 @@ void SplineWriter::FitCoeff(Spline * spl, std::vector< std::vector<double> >& v,
     break;
   }
 
+#ifdef __MINUIT2_ENABLED__
   if (fDrawSplines){
     fSplineFCNs[spl] = new SplineFCN(spl, v, w);
     fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
     sleep(1);
     delete fSplineFCNs[spl];
   }
-
+#endif
 }
 
 void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, float * coeff, bool draw) {
@@ -653,6 +654,7 @@ void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, 
 
 
 void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float * coeff, bool draw) {
+#ifdef __MINUIT2_ENABLED__
 
   if (fSplineFunctors.find(spl) != fSplineFunctors.end()) {
     delete fSplineFunctors[spl];
@@ -734,6 +736,7 @@ void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double
 
   // delete values;
   // delete minimizer;
+#endif
 }
 
 
