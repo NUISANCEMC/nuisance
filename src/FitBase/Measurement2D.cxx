@@ -1003,6 +1003,8 @@ double Measurement2D::GetLikelihood() {
     fMCFine->Scale(1. / scaleF);
   }
 
+  fLikelihood = chi2;
+
   return chi2;
 }
 
@@ -1193,6 +1195,14 @@ void Measurement2D::Write(std::string drawOpt) {
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
+
+  // Write Settigns                                                                                                                                                                                                                        
+  if (drawOpt.find("SETTINGS") != std::string::npos){
+    fSettings.Set("#chi^{2}",fLikelihood);
+    fSettings.Set("NDOF", this->GetNDOF() );
+    fSettings.Set("#chi^{2}/NDOF", fLikelihood / this->GetNDOF() );
+    fSettings.Write();
+  }
 
   // Write Data/MC
   GetDataList().at(0)->Write();

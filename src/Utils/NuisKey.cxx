@@ -193,3 +193,6 @@ void nuiskey::ChangeB(std::string name, bool newval){
 
 
 
+std::vector<std::string> nuiskey::GetAllKeys(){
+  return Config::Get().GetAllKeysForNode(fNode);
+}

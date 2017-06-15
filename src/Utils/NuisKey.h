@@ -42,6 +42,9 @@ class nuiskey{
 
   bool Has(std::string name);
 
+  std::vector<std::string> GetAllKeys();
+
+
   XMLNodePointer_t fNode; ///< XML Node in Config::Get().fXML for this key                                                   
 };
 

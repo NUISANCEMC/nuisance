@@ -924,6 +924,8 @@ double Measurement1D::GetLikelihood() {
     fMCFine->Scale(1. / scaleF);
   }
 
+  fLikelihood = stat;
+
   return stat;
 }
 
@@ -1110,9 +1112,18 @@ void Measurement1D::Write(std::string drawOpt) {
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
 
+  // Write Settigns
+  if (drawOpt.find("SETTINGS") != std::string::npos){
+    fSettings.Set("#chi^{2}",fLikelihood);
+    fSettings.Set("NDOF", this->GetNDOF() );
+    fSettings.Set("#chi^{2}/NDOF", fLikelihood / this->GetNDOF() );
+    fSettings.Write();
+  }
+
   // Write Data/MC
   GetDataList().at(0)->Write();
   GetMCList().at(0)->Write();
+
 
   // Write Fine Histogram
   if (drawOpt.find("FINE") != std::string::npos)
