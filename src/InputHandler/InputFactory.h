@@ -31,6 +31,7 @@
 #include "NUANCEInputHandler.h"
 #include "FitEventInputHandler.h"
 #include "SplineInputHandler.h"
+#include "SigmaQ0HistogramInputHandler.h"
 
 namespace InputUtils {
 
