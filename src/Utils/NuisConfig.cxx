@@ -856,3 +856,22 @@ void nuisconfig::ExpandAllTags() {
 
 
 
+std::vector<std::string> nuisconfig::GetAllKeysForNode(XMLNodePointer_t node){
+
+  bool matching = true;
+  XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
+  std::vector<std::string> keys;
+  while ( attr != 0 ) {
+    if (!std::string(fXML->GetAttrName(attr)).empty()){
+      keys.push_back( std::string(fXML->GetAttrName(attr)) );
+      //      std::cout << "Pushing Back : " << std::string(fXML->GetAttrName(attr)) << std::endl;
+    }
+    attr = fXML->GetNextAttr(attr);
+  }
+
+  //  for (int i = 0; i < keys.size(); i++){
+    //    std::cout << "Got Key: " << keys[i] << std::endl;
+    //  }
+
+  return keys;
+}

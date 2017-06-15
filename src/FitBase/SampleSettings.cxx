@@ -59,6 +59,20 @@ void SampleSettings::SetEnuRange(double min, double max) {
 	SetDefault("enu_max", max);
 };
 
+void SampleSettings::Set(std::string name, double d){
+  SetDefault(name, d);
+}
+
+void SampleSettings::Set(std::string name, int i){
+  SetDefault(name, i);
+}
+
+void SampleSettings::Set(std::string name, std::string s){
+  SetDefault(name, s);
+}
+
+
+
 void SampleSettings::DefineAllowedTargets(std::string targ) {
 	// fAllowedTargets = TargetUtils::ParseTargetsToIntVect(targ);
 };
@@ -156,3 +170,44 @@ void SampleSettings::SetDescription(std::string str) {
 	SetS("description", str);
 }
 
+void SampleSettings::Write(std::string name){
+
+  if (name.empty()) name = this->GetS("name") + "_settings";
+
+  // Make a new canvas
+  TCanvas* c1 = new TCanvas( name.c_str(), name.c_str(), 800, 600 );
+  c1->cd();
+
+  // Make new TPaveText
+  TPaveText pttitle = TPaveText(0.05,0.85,0.95,0.95);
+  pttitle.AddText( name.c_str() );
+  pttitle.SetTextAlign(11);
+  pttitle.SetTextSize(15);
+  pttitle.Draw();
+
+
+  TPaveText pt = TPaveText(0.05,0.05,0.95,0.80);
+  std::vector<std::string> keys = fKeyValues.GetAllKeys();
+  for (int i = 0; i < keys.size(); i++){
+
+    std::string keyval = fKeyValues.GetS(keys[i]);
+    std::vector<std::string> lines = GeneralUtils::ParseToStr(keyval,"\n");
+
+    if (lines.size() == 1){
+      pt.AddText( ("#bullet #bf{" + keys[i] + "} : " + fKeyValues.GetS(keys[i])).c_str() );
+    } else {
+      pt.AddText( ("#bullet #bf{" + keys[i] + "} : ").c_str() );
+      for (int j = 0; j < lines.size(); j++){
+	pt.AddText(("   |-->  " + lines[j]).c_str() );
+      }
+    }
+  }
+
+  pt.SetTextAlign(11);
+  pt.SetTextSize(14);
+  pt.Draw("SAME");
+
+
+  c1->Write();
+  delete c1;
+}

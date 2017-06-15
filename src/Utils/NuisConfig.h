@@ -50,9 +50,9 @@ public:
   /// Save the config to file
   void WriteConfig(std::string filename);
 
-void OverrideConfig(std::string conf);
-
-XMLNodePointer_t GetConfigNode(std::string name);
+  void OverrideConfig(std::string conf);
+  
+  XMLNodePointer_t GetConfigNode(std::string name);
 
 
 
@@ -144,9 +144,16 @@ XMLNodePointer_t GetConfigNode(std::string name);
 
   void RemoveEmptyNodes();
   void RemoveIdenticalNodes();
+
+  
+  std::vector<std::string> GetAllKeysForNode(XMLNodePointer_t node);
+ 
+
   bool MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2);
   void PrintNode(XMLNodePointer_t node);
   void RemoveNode(XMLNodePointer_t node);
+
+
 
   std::string GetTag(std::string name);
   void ExpandAllTags();

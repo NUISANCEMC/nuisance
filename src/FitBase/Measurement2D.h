@@ -588,6 +588,8 @@ protected:
   double fCovDet;           //!< covariance deteriminant
   double fNormError;        //!< Normalisation on the error on the data
 
+  double fLikelihood; //!< Likelihood value
+
   Double_t* fXBins;     //!< X Bin Edges
   Double_t* fYBins;     //!< Y Bin Edges
   Int_t fNDataPointsX;  //!< Number of X data points
