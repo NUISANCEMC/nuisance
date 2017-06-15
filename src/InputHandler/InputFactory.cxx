@@ -36,7 +36,7 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     input = new NEUTInputHandler(handle, newinputs);
 #else
     ERROR(FTL, "Tried to create NEUTInputHandler : "
-        << handle << " " << inpType << " " << inputs);
+          << handle << " " << inpType << " " << inputs);
     THROW("NEUT is not enabled!");
 #endif
     break;
@@ -45,8 +45,8 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
 #ifdef __GENIE_ENABLED__
     input = new GENIEInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create GENIEInputHandler : " 
-        << handle << " " << inpType << " " << inputs);
+    ERROR(FTL, "Tried to create GENIEInputHandler : "
+          << handle << " " << inpType << " " << inputs);
     THROW("GENIE is not enabled!");
 #endif
     break;
@@ -57,7 +57,7 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     input = new NuWroInputHandler(handle, newinputs);
 #else
     ERROR(FTL, "Tried to create NuWroInputHandler : "
-        << handle << " " << inpType << " " << inputs);
+          << handle << " " << inpType << " " << inputs);
     THROW("NuWro is not enabled!");
 #endif
     break;
@@ -67,7 +67,7 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     input = new GIBUUInputHandler(handle, newinputs);
 #else
     ERROR(FTL, "Tried to create GiBUUInputHandler : "
-        << handle << " " << inpType << " " << inputs);
+          << handle << " " << inpType << " " << inputs);
     THROW("GiBUU is not enabled!");
 #endif
     break;
@@ -77,7 +77,7 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     input = new NUANCEInputHandler(handle, newinputs);
 #else
     ERROR(FTL, "Tried to create NUANCEInputHandler : "
-        << handle << " " << inpType << " " << inputs);
+          << handle << " " << inpType << " " << inputs);
     THROW("NUANCE is not enabled!");
 #endif
     break;
@@ -88,6 +88,10 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
 
   case (kEVSPLN_Input):
     input = new SplineInputHandler(handle, newinputs);
+    break;
+
+  case (kSIGMAQ0HIST_Input):
+    input = new SigmaQ0HistogramInputHandler(handle, newinputs);
     break;
 
   default:
