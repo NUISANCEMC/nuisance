@@ -102,7 +102,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 	LOG(FIT) << "Set E energy" << std::endl;
 
 	// Now parse the lines in our input file.
-	fApplyInterpolation = true;
+	fApplyInterpolation = FitPar::Config().GetParB("InterpolateSigmaQ0Histogram");
 	double interpolation_res = 100.0;
 
 	// Create a TGraph of Points

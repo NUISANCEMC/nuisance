@@ -58,7 +58,6 @@ ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) 
   std::cout << "Flux Integral = " << TotalIntegratedFlux() << std::endl;
   std::cout << "FNEvents = " << fNEvents << std::endl;
   std::cout << "Z Limits = " << fZLowLim << " " << fZHighLim << std::endl;
-  std::cout << "DAngle = " << dangle << std::endl;
   std::cout << "sigscale = " << sigscale << std::endl;
   std::cout << "fZCenter = " << fZCenter << std::endl;
   std::cout << "ScaleFactor = " << fScaleFactor << std::endl;
