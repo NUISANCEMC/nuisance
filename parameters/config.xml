@@ -111,6 +111,8 @@
 <!-- #config drawopts DATA/MC -->
 <config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/>
 
+<config InterpolateSigmaQ0Histogram='0' />
+
 <!-- # Save the shape scaling applied with option SHAPE into the main MC hist -->
 <config saveshapescaling='0'/>
 
