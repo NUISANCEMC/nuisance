@@ -20,7 +20,6 @@
 #include "ReWeight/GReWeightNonResonanceBkg.h"
 #include "ReWeight/GReWeightNuXSecCCQE.h"
 #include "ReWeight/GReWeightNuXSecCCQEvec.h"
-#include "ReWeight/GReWeightNuXSecCCQEaxial.h"
 #include "ReWeight/GReWeightNuXSecCCRES.h"
 #include "ReWeight/GReWeightNuXSecCOH.h"
 #include "ReWeight/GReWeightNuXSecDIS.h"
@@ -28,6 +27,11 @@
 #include "ReWeight/GReWeightNuXSecNCEL.h"
 #include "ReWeight/GReWeightNuXSecNCRES.h"
 #include "ReWeight/GReWeightResonanceDecay.h"
+
+#if __GENIE_VERSION__ >= 212
+#include "ReWeight/GReWeightNuXSecCCQEaxial.h"
+#endif
+
 using namespace genie;
 using namespace genie::rew;
 #endif

@@ -1,34 +1,10 @@
 #ifndef SigmaQ0HistogramInputHandler_H
 #define SigmaQ0HistogramInputHandler_H
 
-#ifdef __NEUT_ENABLED__
 #include "InputHandler.h"
 #include "TargetUtils.h"
-#include "neutpart.h"
-#include "neutvect.h"
 #include "PlotUtils.h"
-#include "TTreePerfStats.h"
-#include "nefillverC.h"
-#include "necardC.h"
-#include "neutmodelC.h"
-#include "neutparamsC.h"
-#include "neworkC.h"
-#include "fsihistC.h"
-#include "neutcrsC.h"
-#include "neutvect.h"
-#include "neutpart.h"
-#include "neutfsipart.h"
-#include "neutfsivert.h"
-#include "neutrootTreeSingleton.h"
-#include "NModeDefn.h"
-#include "NSyst.h"
-#include "NFortFns.h" // Contains all the NEUT common blocks
-
-#ifdef __NEUT_NUCFSI_ENABLED__
-#include "nucleonfsihistC.h"
-#include "neutnucfsivert.h"
-#include "neutnucfsistep.h"
-#endif
+#include "TRandom3.h"
 
 class SigmaQ0HistogramInputHandler : public InputHandlerBase {
 public:
@@ -41,7 +17,9 @@ public:
 	FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight);
 
 	/// eads fNeutVect and fills into fNUISANCEEvent.
-	FitEvent CreateNuisanceEvent(double q0, double sig);
+	void FillNuisanceEvent(double q0, double sig);
+
+	double ThrowQ0();
 
 	double fEnergy;
 	double fTheta;
@@ -56,8 +34,13 @@ public:
 	bool fApplyInterpolation;
 	TGraph* fInputGraph;
 	FitEvent fCurEvent;
+	bool fUseAcceptReject;
+	TRandom3 fRandom;
+	double fMaxValue;
+	double fMinX;
+	double fMaxX;
+
 
 };
 
-#endif
 #endif

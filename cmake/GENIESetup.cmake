@@ -49,6 +49,13 @@ execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND genie-config
+  --libdir OUTPUT_VARIABLE GENIE_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+################################################################################
+# Extract GENIE VERSION
+execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh
+  OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ################################  LHAPDF  ######################################
 if(NOT DEFINED LHAPDF_LIB AND NOT DEFINED ENV{LHAPDF_LIB})
@@ -148,7 +155,7 @@ if(NOT DEFINED LOG4CPP_INC AND DEFINED ENV{LOG4CPP_INC})
 endif()
 ################################################################################
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GENIE_ENABLED__ ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION}")
 
 set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES}
   ${GENIE_INCLUDES}
