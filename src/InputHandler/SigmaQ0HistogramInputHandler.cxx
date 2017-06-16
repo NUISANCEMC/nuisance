@@ -103,7 +103,10 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 
 	// Now parse the lines in our input file.
 	fApplyInterpolation = FitPar::Config().GetParB("InterpolateSigmaQ0Histogram");
-	double interpolation_res = 100.0;
+	double interpolation_res = FitPar::Config().GetParD("InterpolateSigmaQ0HistogramRes");
+	fMaxValue = 0.0;
+	fMaxX = 0.0;
+	fMinX = 1.E10;
 
 	// Create a TGraph of Points
 	TGraph* gr = new TGraph();
@@ -113,6 +116,9 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 	  double q0 = splitline[fQ0Column];
 	  double sig = splitline[fSigmaColumn];
 	  gr->SetPoint(gr->GetN(), q0, sig);
+	  if (sig > fMaxValue) fMaxValue = sig;
+	  if (q0 > fMaxX) fMaxX = q0;
+	  if (q0 < fMinX) fMinX = q0;
 	}
 
 	fInputGraph = new TGraph();
@@ -142,6 +148,18 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 	if (fApplyInterpolation){
 	  fEventHist->Scale(1.0 / interpolation_res);
 	}
+	
+	fUseAcceptReject = FitPar::Config().GetParB("InterpolateSigmaQ0HistogramThrow");
+	if (fUseAcceptReject){
+	  std::cout << "USING ACCEPT REJECT" << std::endl;
+	  fEventHist->Scale( fMaxValue / double(fNEvents) );
+	  fNEvents = FitPar::Config().GetParI("InterpolateSigmaQ0HistogramNTHROWS");
+	  std::cout << "NEvents = " << fNEvents << std::endl;
+	  sleep(1);
+	}
+
+	fNUISANCEEvent = new FitEvent();
+	
 
 };
 
@@ -154,74 +172,87 @@ FitEvent* SigmaQ0HistogramInputHandler::GetNuisanceEvent(const UInt_t entry, con
 	if (entry >= (UInt_t)fNEvents) return NULL;
 
 	// Evaluate Graph to Create an Event
-	double q0 = fInputGraph->GetX()[entry];
-	double sig = fInputGraph->GetY()[entry];
-	fCurEvent = CreateNuisanceEvent(q0, sig);
-
-	// Get Event From Preloaded List
-	fNUISANCEEvent = &(fCurEvent);
+	if (!fUseAcceptReject){
+	  double q0 = fInputGraph->GetX()[entry];
+	  double sig = fInputGraph->GetY()[entry];
+	  FillNuisanceEvent(q0, sig);
+	} else {
+	  double q0 = ThrowQ0();
+	  FillNuisanceEvent(q0, 1.0);
+	}
 
 	// Return event pointer
 	return fNUISANCEEvent;
 }
 
+double SigmaQ0HistogramInputHandler::ThrowQ0(){
 
-FitEvent SigmaQ0HistogramInputHandler::CreateNuisanceEvent(double q0, double sig) {
+  // Use input graph to Throw Q0.
+  int count = 0;
+  while (count < 1E7){
+    double x = fRandom.Uniform(fMinX,fMaxX);
+    if (fRandom.Uniform(0.0,1.0) <= fInputGraph->Eval(x) / fMaxValue){ return x; };
+    std::cout << "THROW " << count << " : " << x << std::endl;
+  }
+  return 0.0;
+}
+    
+void SigmaQ0HistogramInputHandler::FillNuisanceEvent(double q0, double sig) {
+  
+  // Reset all variables
+  
+  fNUISANCEEvent->ResetEvent();
+  
+  // Fill Globals
+  fNUISANCEEvent->fMode    = 1; // Assume CCQE for now...
+  fNUISANCEEvent->Mode     = 1;
 
-	// Reset all variables
-	FitEvent nuisevent = FitEvent();
-	nuisevent.ResetEvent();
+  fNUISANCEEvent->fEventNo = 0;
+	fNUISANCEEvent->fTargetA = 0;  // Should the User Specify these?
+	fNUISANCEEvent->fTargetZ = 0;  // Should the User Specify these?
+	fNUISANCEEvent->fTargetH = 0; // Should the User Specify these?
+	fNUISANCEEvent->fBound   = 1; // Should the User Specify these?
 
-	// Fill Globals
-	nuisevent.fMode    = 1; // Assume CCQE for now...
-	nuisevent.Mode     = 1;
-
-	nuisevent.fEventNo = 0;
-	nuisevent.fTargetA = 0;  // Should the User Specify these?
-	nuisevent.fTargetZ = 0;  // Should the User Specify these?
-	nuisevent.fTargetH = 0; // Should the User Specify these?
-	nuisevent.fBound   = 1; // Should the User Specify these?
-
-	nuisevent.InputWeight = sig;
+	fNUISANCEEvent->InputWeight = sig;
 
 	// Add incoming beam particle along Z with energy E and outgoing with theta
 	if (fBeamPDG == 11) {
 
 		// Initial Beam
-		nuisevent.fParticleState[0] = kInitialState;
-		nuisevent.fParticlePDG[0] = 11;
+		fNUISANCEEvent->fParticleState[0] = kInitialState;
+		fNUISANCEEvent->fParticlePDG[0] = 11;
 		double mass = 0.511;
 
 		// Get Momentum of Electron moving along Z
-		nuisevent.fParticleMom[0][0] = 0.0;
-		nuisevent.fParticleMom[0][1] = 0.0;
+		fNUISANCEEvent->fParticleMom[0][0] = 0.0;
+		fNUISANCEEvent->fParticleMom[0][1] = 0.0;
 		LOG(FIT) << "Setting Energy = " << fEnergy << std::endl;
-		nuisevent.fParticleMom[0][2] = sqrt(fEnergy * fEnergy - mass * mass);
-		nuisevent.fParticleMom[0][3] = fEnergy;
+		fNUISANCEEvent->fParticleMom[0][2] = sqrt(fEnergy * fEnergy - mass * mass);
+		fNUISANCEEvent->fParticleMom[0][3] = fEnergy;
 
 		// Outgoing particle
-		nuisevent.fParticleState[1] = kFinalState;
-		nuisevent.fParticlePDG[1] = 11;
+		fNUISANCEEvent->fParticleState[1] = kFinalState;
+		fNUISANCEEvent->fParticlePDG[1] = 11;
 
 		// Get Momentum of Electron outgoing minus q0
 		double oute = fEnergy - q0;
 		double outp = sqrt(oute * oute - mass * mass);
-		nuisevent.fParticleMom[1][0] = 0.0;
-		nuisevent.fParticleMom[1][1] = sin(fTheta) * outp;
-		nuisevent.fParticleMom[1][2] = cos(fTheta) * outp;
-		nuisevent.fParticleMom[1][3] = oute;
+		fNUISANCEEvent->fParticleMom[1][0] = 0.0;
+		fNUISANCEEvent->fParticleMom[1][1] = sin(fTheta) * outp;
+		fNUISANCEEvent->fParticleMom[1][2] = cos(fTheta) * outp;
+		fNUISANCEEvent->fParticleMom[1][3] = oute;
 
 	}
 
 	// Update Particles
-	nuisevent.fNParticles = 2;
+	fNUISANCEEvent->fNParticles = 2;
 
 	// Run Initial, FSI, Final, Other ordering.
-	nuisevent. OrderStack();
+	fNUISANCEEvent-> OrderStack();
 
 	// Check Q0
-	//	FitParticle* ein  = nuisevent.PartInfo(0);
-	//	FitParticle* eout = nuisevent.GetHMFSParticle(11);
+	//	FitParticle* ein  = fNUISANCEEvent->PartInfo(0);
+	//	FitParticle* eout = fNUISANCEEvent->GetHMFSParticle(11);
 
 	//	double newq0    = fabs(ein->fP.E() - eout->fP.E()) / 1000.0;
 	//	double E     = ein->fP.E() / 1000.0;
@@ -229,6 +260,6 @@ FitEvent SigmaQ0HistogramInputHandler::CreateNuisanceEvent(double q0, double sig
 
 	//	LOG(FIT) << "Extracted event from line: theirs-" << q0/1.E3 << " ours-" << newq0 << " E-" << fEnergy << " T-" << theta << " X-" << sig << std::endl;
 
-	return nuisevent;
+	return;
 }
 
