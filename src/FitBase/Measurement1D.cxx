@@ -495,7 +495,7 @@ void Measurement1D::FinaliseMeasurement() {
   fMCHist->Reset();
 
   // Setup fMCFine
-  fMCFine = new TH1D("mcfine", "mcfine", fDataHist->GetNbinsX(),
+  fMCFine = new TH1D("mcfine", "mcfine", fDataHist->GetNbinsX() * 8,
                      fMCHist->GetBinLowEdge(1),
                      fMCHist->GetBinLowEdge(fDataHist->GetNbinsX() + 1));
   fMCFine->SetNameTitle((fSettings.GetName() + "_MC_FINE").c_str(),
