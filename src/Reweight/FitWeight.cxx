@@ -93,6 +93,8 @@ void FitWeight::Reconfigure(bool silent) {
 }
 
 void FitWeight::SetDialValue(std::string name, double val) {
+
+  // Add extra check, if name not found look for one with name in it.
 	int nuisenum = fAllEnums[name];
 	SetDialValue(nuisenum, val);
 }
@@ -130,6 +132,8 @@ void FitWeight::SetAllDials(const double* x, int n) {
 
 
 double FitWeight::GetDialValue(std::string name) {
+
+  // Add extra check, if name not found look for one with name in it.
 	int nuisenum = fAllEnums[name];
 	return GetDialValue(nuisenum);
 }

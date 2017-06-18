@@ -359,6 +359,8 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
     std::string pulltype = key.GetS("type");
 
     fOutputDir->cd();
+    std::cout << "Creating Pull Term : " << std::endl;
+    sleep(1);
     fPulls.push_back(new ParamPull(pullname, pullfile, pulltype));
 
   }

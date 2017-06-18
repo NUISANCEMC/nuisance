@@ -44,23 +44,31 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
 
 	// Get RW Enum and name
-	nuwro::rew::NuwroSyst_t gensyst = nuwro::rew::NuwroSyst::FromString(name);
 	int nuisenum = Reweight::ConvDial(name, kNUWRO);
 
-	// Fill Maps
-	int index = fValues.size();
-	fValues.push_back(0.0);
-	fNUWROSysts.push_back(gensyst);
+	// Initialise new vector
+	fEnumIndex[nuisenum];
+	fNameIndex[name];
 
-	fEnumIndex[nuisenum] = index;
-	fNameIndex[name] = index;
+	// Split by commas
+	std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
+	for (uint i = 0; i < allnames.size(); i++) {
+		std::string singlename = allnames[i];
 
-	// Initialise Dial
-	fNuwroRW->Systematics().Add( fNUWROSysts[index] );
+		// Get Syst
+		nuwro::rew::NuwroSyst_t gensyst = nuwro::rew::NuwroSyst::FromString(name);
 
-	// If Absolute
-	if (fIsAbsTwk) {
-		nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty( fNUWROSysts[index], 1.0, 1.0 );
+		// Fill Maps
+		int index = fValues.size();
+		fValues.push_back(0.0);
+		fNUWROSysts.push_back(gensyst);
+
+		// Initialise Dial
+		fNuwroRW->Systematics().Add( fNUWROSysts[index] );
+
+		if (fIsAbsTwk) {
+			nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty( fNUWROSysts[index], 1.0, 1.0 );
+		}
 	}
 
 	// Set Value if given
@@ -73,15 +81,21 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
 
 void NuWroWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
-	fValues[fEnumIndex[nuisenum]] = val;
-	fNuwroRW->Systematics().SetSystVal(fNUWROSysts[fEnumIndex[nuisenum]], val);
+	std::vector<size_t> indices = fEnumIndex[nuisenum];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		fNuwroRW->Systematics().SetSystVal(fNUWROSysts[indices[i]], val);
+	}
 #endif
 }
 
 void NuWroWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
-	fValues[fNameIndex[name]] = val;
-	fNuwroRW->Systematics().SetSystVal(fNUWROSysts[fNameIndex[name]], val);
+	std::vector<size_t> indices = fNameIndex[name];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		fNuwroRW->Systematics().SetSystVal(fNUWROSysts[indices[i]], val);
+	}
 #endif
 }
 
