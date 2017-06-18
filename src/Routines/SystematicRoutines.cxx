@@ -184,6 +184,13 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     double parlow  = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
+
+
+    // Override if state not given
+    if (!key.Has("state")){
+      key.SetS("state","FIX");
+    }
+
     std::string parstate = key.GetS("state");
 
     // Extra limits
