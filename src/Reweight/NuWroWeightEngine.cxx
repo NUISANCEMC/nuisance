@@ -64,11 +64,17 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
 		fNUWROSysts.push_back(gensyst);
 
 		// Initialise Dial
+		LOG(FIT) << "Adding NuWro Syst " << fNUWROSysts[index] << std::endl;
 		fNuwroRW->Systematics().Add( fNUWROSysts[index] );
 
 		if (fIsAbsTwk) {
 			nuwro::rew::NuwroSystUncertainty::Instance()->SetUncertainty( fNUWROSysts[index], 1.0, 1.0 );
 		}
+
+		// Setup index                                                                                                                                                                                                             
+                fEnumIndex[nuisenum].push_back(index);
+                fNameIndex[name].push_back(index);
+
 	}
 
 	// Set Value if given
@@ -83,8 +89,8 @@ void NuWroWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
 	std::vector<size_t> indices = fEnumIndex[nuisenum];
 	for (uint i = 0; i < indices.size(); i++) {
-		fValues[indices[i]] = val;
-		fNuwroRW->Systematics().SetSystVal(fNUWROSysts[indices[i]], val);
+	  fValues[indices[i]] = val;
+	  fNuwroRW->Systematics().SetSystVal(fNUWROSysts[indices[i]], val);
 	}
 #endif
 }
