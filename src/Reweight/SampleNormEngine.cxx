@@ -4,7 +4,7 @@ SampleNormEngine::SampleNormEngine(std::string name) {
 
 	// Setup the NEUT Reweight engien
 	fCalcName = name;
-	LOG(FIT) << "Setting up Sample Norm RW : " << fCalcName << std::endl;
+	LOG(FIT) << "Setting up Likelihood Weight RW : " << fCalcName << std::endl;
 
 	// Set Abs Twk Config
 	fIsAbsTwk = true;
@@ -14,33 +14,69 @@ SampleNormEngine::SampleNormEngine(std::string name) {
 
 void SampleNormEngine::IncludeDial(std::string name, double startval) {
 
-	// Get NUISANCE Enum
-	int nuisenum = Reweight::ConvDial(name, kNORM);
+  // Get NUISANCE Enum
+  int nuisenum = Reweight::ConvDial(name, kNORM);
 
-	// Fill Maps
-	int index = fValues.size();
-	fValues.push_back(1.0);
+  // Setup Maps
+  fEnumIndex[nuisenum];// = std::vector<size_t>(0);
+  fNameIndex[name]; // = std::vector<size_t>(0);
 
-	fEnumIndex[nuisenum] = index;
-	fNameIndex[name] = index;
+  // Split by commas
+  std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
+  for (uint i = 0; i < allnames.size(); i++){
+    std::string singlename = allnames[i];
+  
+    // Fill Maps
+    int index = fValues.size();
+    fValues.push_back(1.0);
+  
+    fEnumIndex[nuisenum].push_back(index);
+    fNameIndex[name].push_back(index);
+  }
 
-	// Set Value if given
-	if (startval != -999.9) {
-		SetDialValue(name, startval);
-	}
+  // Set Value if given
+  if (startval != -999.9) {
+    SetDialValue(name, startval);
+  }
 };
 
 
 void SampleNormEngine::SetDialValue(int nuisenum, double val) {
-	fValues[fEnumIndex[nuisenum]] = val;
+  std::vector<size_t> indices = fEnumIndex[nuisenum];
+  for (uint i = 0; i < indices.size(); i++){
+    fValues[indices[i]] = val;
+  }
 }
 
 void SampleNormEngine::SetDialValue(std::string name, double val){
-	fValues[fNameIndex[name]] = val;
+  std::vector<size_t> indices = fNameIndex[name];
+  for (uint i = 0; i < indices.size(); i++){
+    fValues[indices[i]] = val;
+  }
+}
+
+double SampleNormEngine::GetDialValue(std::string name){
+
+  // Check for exact dial names
+  if (fNameIndex.find(name) != fNameIndex.end()){
+    return fValues[ fNameIndex[name][0] ];
+
+    // If not iterate and check entry in one of the keys
+  } else { 
+    for (std::map<std::string, std::vector<size_t> >::iterator iter = fNameIndex.begin();
+	 iter != fNameIndex.end(); iter++){
+      std::string keyname = iter->first;
+      if (keyname.find(name) != std::string::npos){
+	return fValues[ iter->second[0] ];
+      }
+    }
+  }
+
+  return -1.0;
 }
 
 void SampleNormEngine::Reconfigure(bool silent) {
-	// Empty placeholder incase we want print statements...
+  // Empty placeholder incase we want print statements...
 }
 
 

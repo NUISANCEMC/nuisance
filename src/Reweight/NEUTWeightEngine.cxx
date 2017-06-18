@@ -64,44 +64,71 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __NEUT_ENABLED__
 
-	// Get NEUT Syst.
-	neut::rew::NSyst_t gensyst = NSyst::FromString(name);
+	// Get First enum
 	int nuisenum = Reweight::ConvDial(name, kNEUT);
 
-	// Fill Maps
-	int index = fValues.size();
-	fValues.push_back(0.0);
-	fNEUTSysts.push_back(gensyst);
+	// Setup Maps
+	fEnumIndex[nuisenum];// = std::vector<size_t>(0);
+	fNameIndex[name]; // = std::vector<size_t>(0);
 
-	fEnumIndex[nuisenum] = index;
-	fNameIndex[name] = index;
+	// Split by commas
+	std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
+	for (uint i = 0; i < allnames.size(); i++) {
+		std::string singlename = allnames[i];
 
-	// Initialize dial
-	fNeutRW->Systematics().Init( fNEUTSysts[index] );
+		// Get Syst
+		neut::rew::NSyst_t gensyst = NSyst::FromString(singlename);
 
-	// If Absolute
-	if (fIsAbsTwk) {
-		NSystUncertainty::Instance()->SetUncertainty( fNEUTSysts[index], 1.0, 1.0 );
+		// Fill Maps
+		int index = fValues.size();
+		fValues.push_back(0.0);
+		fNEUTSysts.push_back(gensyst);
+
+		// Initialize dial
+		LOG(FIT) << "Registering " << singlename << " dial." << std::endl;
+		fNeutRW->Systematics().Init( fNEUTSysts[index] );
+
+		// If Absolute
+		if (fIsAbsTwk) {
+			NSystUncertainty::Instance()->SetUncertainty( fNEUTSysts[index], 1.0, 1.0 );
+		}
+
+		// Setup index
+		fEnumIndex[nuisenum].push_back(index);
+		fNameIndex[name].push_back(index);
 	}
 
 	// Set Value if given
 	if (startval != -999.9) {
 		SetDialValue(nuisenum, startval);
 	}
+
 #endif
 }
 
 void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __NEUT_ENABLED__
-	fValues[fEnumIndex[nuisenum]] = val;
-	fNeutRW->Systematics().Set(fNEUTSysts[fEnumIndex[nuisenum]], val);
+	std::vector<size_t> indices = fEnumIndex[nuisenum];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		std::cout << "Setting Dial Value = " << nuisenum << " "
+		          << i << " " << indices[i] << " " << fValues[indices[i]]
+		          << " Enum=" << fNEUTSysts[indices[i]] << std::endl;
+		fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
+	}
 #endif
 }
 
 void NEUTWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __NEUT_ENABLED__
-	fValues[fNameIndex[name]] = val;
-	fNeutRW->Systematics().Set(fNEUTSysts[fNameIndex[name]], val);
+	std::vector<size_t> indices = fNameIndex[name];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		std::cout << "Setting Dial Value = " << name << " = "
+		          << i << " " << indices[i] << " " << fValues[indices[i]]
+		          << "  Enum=" << fNEUTSysts[indices[i]] << std::endl;
+		fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
+	}
 #endif
 }
 
@@ -114,6 +141,10 @@ void NEUTWeightEngine::Reconfigure(bool silent) {
 	// Reconf
 	fNeutRW->Reconfigure();
 
+	//if (LOG_LEVEL(DEB)){
+	fNeutRW->Print();
+	//	}
+
 	// Shout again
 	if (silent) StartTalking();
 #endif
@@ -124,7 +155,7 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	double rw_weight = 1.0;
 
 #ifdef __NEUT_ENABLED__
-	// Skip Non GENIE
+	// Skip Non NEUT
 	if (evt->fType != kNEUT) return 1.0;
 
 	// Hush now

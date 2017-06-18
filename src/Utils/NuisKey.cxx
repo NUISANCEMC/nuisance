@@ -105,7 +105,7 @@ bool nuiskey::Has(const std::string name){
 }
 
 nuiskey Config::CreatePullKeyFromLine(const std::string line){
-  nuiskey pullkey = Config::CreateKey("pull");
+  nuiskey pullkey = Config::CreateKey("covar");
 
   // Parse
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");

@@ -46,15 +46,16 @@ public:
 	GENIEWeightEngine(std::string name);
 	~GENIEWeightEngine() {};
 
-	void IncludeDial(int nuisenum, double startval);
+	void IncludeDial(std::string name, double startval);
 	void SetDialValue(int rwenum, double val);
+	void SetDialValue(std::string name, double val);
+
 	void Reconfigure(bool silent = false);
 	double CalcWeight(BaseFitEvt* evt);
 	inline bool NeedsEventReWeight() { return true; };
 
 #ifdef __GENIE_ENABLED__
-	std::map<std::string, genie::rew::GSyst_t> fGenieNameSysts;
-	std::map<int, genie::rew::GSyst_t> fGenieEnumSysts;
+	std::vector<genie::rew::GSyst_t> fGENIESysts;
 	genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
 #endif
 

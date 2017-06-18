@@ -19,6 +19,8 @@ class SplineWeightEngine : public WeightEngineBase {
 		inline bool NeedsEventReWeight(){ return true; };
 
 		std::map< std::string, double > fSplineValueMap;
+		std::vector<int> fSingleEnums;
+		std::vector<std::string> fSingleNames;
 };
 
 #endif

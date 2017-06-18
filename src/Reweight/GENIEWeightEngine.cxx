@@ -56,8 +56,8 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 		                        new genie::rew::GReWeightNuXSecCCQEvec);
 #if __GENIE_VERSION__ >= 212
 	if (xsec_qeaxial)
-	  fGenieRW->AdoptWghtCalc("xsec_ccqe_axial",
-				  new genie::rew::GReWeightNuXSecCCQEaxial);
+		fGenieRW->AdoptWghtCalc("xsec_ccqe_axial",
+		                        new genie::rew::GReWeightNuXSecCCQEaxial);
 #endif
 
 	if (xsec_dis)
@@ -105,46 +105,74 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 };
 
 
-void GENIEWeightEngine::IncludeDial(int nuisenum, double startval) {
+void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __GENIE_ENABLED__
 
-	// Get RW Enum and name
-	int rwenum = (nuisenum % 1000);
-	genie::rew::GSyst_t rwsyst = static_cast<genie::rew::GSyst_t>(rwenum);
-	std::string name = GSyst::AsString(rwsyst);
+	// Get First enum
+	int nuisenum = Reweight::ConvDial(name, kGENIE);
 
-	// Fill Maps
-	fGenieNameSysts[name]     = rwsyst;
-	fGenieEnumSysts[nuisenum] = rwsyst;
+	// Setup Maps
+	fEnumIndex[nuisenum];// = std::vector<size_t>(0);
+	fNameIndex[name]; // = std::vector<size_t>(0);
 
-	// Initialize dial
-	fGenieRW->Systematics().Init( fGenieEnumSysts[nuisenum] );
+	// Split by commas
+	std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
+	for (uint i = 0; i < allnames.size(); i++) {
+		std::string singlename = allnames[i];
 
-	// Add line to check dial is actually handled.
-	// if (fGenieRW->Systematics().IsHandled
+		// Get RW
+		genie::rew::GSyst_t rwsyst = GSyst::FromString(singlename);
 
-	// If Absolute
-	if (fIsAbsTwk) {
-		GSystUncertainty::Instance()->SetUncertainty( fGenieEnumSysts[nuisenum], 1.0, 1.0 );
+		// Fill Maps
+		int index = fValues.size();
+		fValues.push_back(0.0);
+		fGENIESysts.push_back(rwsyst);
+
+		// Initialize dial
+		std::cout << "Registering " << singlename << " from " << name << std::endl;
+		fGenieRW->Systematics().Init( fGENIESysts[index] );
+
+		// If Absolute
+		if (fIsAbsTwk) {
+			GSystUncertainty::Instance()->SetUncertainty( rwsyst, 1.0, 1.0 );
+		}
+
+		// Setup index
+		fEnumIndex[nuisenum].push_back(index);
+		fNameIndex[name].push_back(index);
+
 	}
 
 	// Set Value if given
 	if (startval != -999.9) {
 		SetDialValue(nuisenum, startval);
 	}
-
 #endif
 };
 
 
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __GENIE_ENABLED__
-	// Set RW engine values
-	int rwenum = (nuisenum % 1000);
-	fGenieRW->Systematics().Set(static_cast<genie::rew::GSyst_t>(rwenum), val);
+	std::vector<size_t> indices = fEnumIndex[nuisenum];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		std::cout << "Setting GENIE Dial Value "
+		          << i << " " << indices[i] << " "
+		          << fGENIESysts[indices[i]] << std::endl;
+		fGenieRW->Systematics().Set( fGENIESysts[indices[i]], val);
+	}
 #endif
 }
 
+void GENIEWeightEngine::SetDialValue(std::string name, double val) {
+#ifdef __GENIE_ENABLED__
+	std::vector<size_t> indices = fNameIndex[name];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		fGenieRW->Systematics().Set(fGENIESysts[indices[i]], val);
+	}
+#endif
+}
 
 void GENIEWeightEngine::Reconfigure(bool silent) {
 #ifdef __GENIE_ENABLED__
@@ -153,7 +181,8 @@ void GENIEWeightEngine::Reconfigure(bool silent) {
 
 	// Reconf
 	fGenieRW->Reconfigure();
-
+	fGenieRW->Print();
+	
 	// Shout again
 	if (silent) StartTalking();
 #endif
@@ -162,26 +191,26 @@ void GENIEWeightEngine::Reconfigure(bool silent) {
 
 double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
 	double rw_weight = 1.0;
-	
+
 #ifdef __GENIE_ENABLED__
 	// Skip Non GENIE
 	if (evt->fType != kGENIE) return 1.0;
 
 	// Make nom weight
-	if (!evt){
-	  THROW("evt not found : " << evt);
+	if (!evt) {
+		THROW("evt not found : " << evt);
 	}
 
-	if (!(evt->genie_event)){
-	  THROW("evt->genie_event not found!" << evt->genie_event);
+	if (!(evt->genie_event)) {
+		THROW("evt->genie_event not found!" << evt->genie_event);
 	}
 
-	if (!(evt->genie_event->event)){
-	  THROW("evt->genie_event->event GHepRecord not found!" << (evt->genie_event->event));
+	if (!(evt->genie_event->event)) {
+		THROW("evt->genie_event->event GHepRecord not found!" << (evt->genie_event->event));
 	}
 
-	if (!fGenieRW){
-	  THROW("GENIE RW Not Found!" << fGenieRW);
+	if (!fGenieRW) {
+		THROW("GENIE RW Not Found!" << fGenieRW);
 	}
 
 	rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));

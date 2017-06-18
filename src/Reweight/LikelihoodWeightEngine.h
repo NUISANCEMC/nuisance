@@ -20,6 +20,7 @@ class LikelihoodWeightEngine : public WeightEngineBase {
 		inline double CalcWeight(BaseFitEvt* evt) {return 1.0;};
 		inline bool NeedsEventReWeight(){ return false; };
 
+		double GetDialValue(std::string name);
 };
 
 #endif
