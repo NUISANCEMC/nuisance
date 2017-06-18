@@ -62,17 +62,14 @@ MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(nuiskey samplekey) 
 
 void MiniBooNE_CC1pi0_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(111) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppi0 = event->GetHMFSParticle(111)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double q2CCpi0 = FitUtils::Q2CC1pi0rec(Pnu, Pmu, Ppi0);
+  double q2 = -1*(Pnu-Pmu).Mag2()/(1.E6);
 
-  fXVar = q2CCpi0;
+  fXVar = q2;
 
   return;
 };
