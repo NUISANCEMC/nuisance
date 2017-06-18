@@ -95,6 +95,8 @@ nuiskey Config::CreateParameterKeyFromLine(const std::string line){
     parameterkey.AddS("state",strvct[6]);
   } else if (strvct.size() == 3){
     parameterkey.AddS("state","FIX");
+  } else if (strvct.size() == 4){
+    parameterkey.AddS("state", strvct[3]);
   }
 
   return parameterkey;
