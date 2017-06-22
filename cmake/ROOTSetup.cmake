@@ -44,6 +44,7 @@ LIST(APPEND ROOT_LIBS
   Core
   Cint
   RIO
+  XMLIO
   Net
   Hist
   Graf

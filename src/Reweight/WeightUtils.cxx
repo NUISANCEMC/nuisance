@@ -10,7 +10,7 @@ TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
   double high = 10000.0;
   if (parType.find("parameter") == std::string::npos) parType += "_parameter";
 
-  string line;
+  std::string line;
   ifstream card(
     (GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card").c_str(),
     ifstream::in);
