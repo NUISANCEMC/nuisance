@@ -159,12 +159,12 @@ JointMeas1D::~JointMeas1D(void) {
 
 }
 
-//********************************************************************                                                                                                                                                                     
+//********************************************************************
 SampleSettings JointMeas1D::LoadSampleSettings(nuiskey samplekey){
-//********************************************************************                                                                                                                                                                      
+//********************************************************************
   SampleSettings s = MeasurementBase::LoadSampleSettings(samplekey);
 
-  // Parse Inputs                                                                                                                                                                                                                          
+  // Parse Inputs
   fSubInFiles.clear();
 
   std::vector<std::string> entries = GeneralUtils::ParseToStr(s.GetS("input"), ";");
@@ -188,7 +188,7 @@ SampleSettings JointMeas1D::LoadSampleSettings(nuiskey samplekey){
   std::string inpType = first_file_descriptor[0];
 
 
-  for (std::vector<string>::iterator iter = entries.begin();
+  for (std::vector<std::string>::iterator iter = entries.begin();
        iter != entries.end(); iter++) {
     if (GeneralUtils::ParseToStr(*iter, ":").size() != 2) {
       std::stringstream ss("");
@@ -264,7 +264,7 @@ void JointMeas1D::FinaliseSampleSettings() {
   std::string inpType = first_file_descriptor[0];
 
 
-  for (std::vector<string>::iterator iter = entries.begin();
+  for (std::vector<std::string>::iterator iter = entries.begin();
        iter != entries.end(); iter++) {
     if (GeneralUtils::ParseToStr(*iter, ":").size() != 2) {
       std::stringstream ss("");
@@ -1479,7 +1479,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   std::string inpType = first_file_descriptor[0];
 
 
-  for (std::vector<string>::iterator iter = entries.begin();
+  for (std::vector<std::string>::iterator iter = entries.begin();
        iter != entries.end(); iter++) {
     if (GeneralUtils::ParseToStr(*iter, ":").size() != 2) {
       std::stringstream ss("");
@@ -1553,7 +1553,7 @@ void JointMeas1D::Reconfigure() {
 void JointMeas1D::ConvertEventRates() {
 //********************************************************************
 
-  // Apply Event Scaling                                                                                                                                                                                                                   
+  // Apply Event Scaling
   for (std::vector<MeasurementBase*>::const_iterator expIter =
          fSubChain.begin();
        expIter != fSubChain.end(); expIter++) {

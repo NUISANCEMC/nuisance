@@ -40,11 +40,11 @@ InputFactory.cxx
 
 set(HEADERFILES
 NuanceEvent.h
-BaseFitEvt.h    
-FitEvent.h   
-FitParticle.h     
-GeneratorUtils.h 
-StdHepEvt.h 
+BaseFitEvt.h
+FitEvent.h
+FitParticle.h
+GeneratorUtils.h
+StdHepEvt.h
 InputUtils.h
 NEUTInputHandler.h
 HepMCTextInputHandler.h
@@ -68,25 +68,18 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
   add_library(${LIBNAME} SHARED ${IMPLFILES})
 endif()
 
-include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
-if (USE_GENIE)
-   include_directories(${GENIE_INCLUDES}/Apps)
-   include_directories(${GENIE_INCLUDES}/FluxDrivers)
-   include_directories(${GENIE_INCLUDES}/EVGDrivers)
-endif()
-
-include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
-include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
-include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
-set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
   add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
+endif()
+
+if(HEPMC_USED_EP)
+  add_dependencies(${LIBNAME} HepMC)
 endif()
 
 install(TARGETS ${LIBNAME} DESTINATION lib)

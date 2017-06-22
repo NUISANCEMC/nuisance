@@ -2,10 +2,11 @@
 #define HEPMCINPUTHANDLER_H
 
 #ifdef __HEPMC_ENABLED__
-#include "SimpleVector.h"
-#include "Flow.h"
-#include "GenParticle.h"
-#include "GenEvent.h"
+#include "HepMC/SimpleVector.h"
+#include "HepMC/Flow.h"
+#include "HepMC/GenParticle.h"
+#include "HepMC/GenEvent.h"
+
 #include "InputHandler.h"
 #include "TargetUtils.h"
 #include "PlotUtils.h"

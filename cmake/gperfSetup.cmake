@@ -17,8 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(DEFINED USE_GPERFTOOLS AND USE_GPERFTOOLS)
-  include(ExternalProject)
+if(USE_GPERFTOOLS)
 
   ExternalProject_Add(libunwind
     PREFIX "${CMAKE_BINARY_DIR}/Ext"
@@ -42,8 +41,19 @@ if(DEFINED USE_GPERFTOOLS AND USE_GPERFTOOLS)
 
   add_dependencies(gperftools libunwind)
 
-  set(CMAKE_CXX_FLAGS "-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free ${CMAKE_CXX_FLAGS}")
-  set(CMAKE_LINK_FLAGS "-L${CMAKE_INSTALL_PREFIX}/lib -ltcmalloc_and_profiler ${CMAKE_LINK_FLAGS}")
+  LIST(APPEND EXTRA_CXX_FLAGS
+    -fno-builtin-malloc
+    -fno-builtin-calloc
+    -fno-builtin-realloc
+    -fno-builtin-free)
+
+
+  LIST(APPEND EXTRA_LINK_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
+
+  ##Want to prepend them
+  LIST(REVERSE EXTRA_LIBS)
+  LIST(APPEND EXTRA_LIBS tcmalloc_and_profiler)
+  LIST(REVERSE EXTRA_LIBS)
 
   cmessage(STATUS "Using google performance libraries")
 endif()

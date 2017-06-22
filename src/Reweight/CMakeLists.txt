@@ -36,7 +36,7 @@ NIWGWeightEngine.cxx
 
 set(HEADERFILES
 GlobalDialList.h
-FitWeight.h    
+FitWeight.h
 WeightEngineBase.h
 NEUTWeightEngine.h
 NuWroWeightEngine.h
@@ -60,18 +60,11 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
   add_library(${LIBNAME} SHARED ${IMPLFILES})
 endif()
 
-include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
-include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
-include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
-include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
-include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
-set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
   add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})

@@ -33,11 +33,11 @@ CustomVariableBoxes.h
 
 set(HEADERFILES
 ParamPull.h
-JointMeas1D.h    
+JointMeas1D.h
 Measurement2D.h
 EventManager.h
-MeasurementBase.h   
-Measurement1D.h 
+MeasurementBase.h
+Measurement1D.h
 TemplateMeas1D.h
 SampleSettings.h
 MeasurementVariableBox.h
@@ -54,23 +54,12 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
   add_library(${LIBNAME} SHARED ${IMPLFILES})
 endif()
 
-include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-
-if (USE_GENIE)
-   include_directories(${GENIE_INCLUDES}/Apps)
-   include_directories(${GENIE_INCLUDES}/FluxDrivers)
-   include_directories(${GENIE_INCLUDES}/EVGDrivers)
-endif()
-
-include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
-include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
-include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
-include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
+cmessage(DEBUG "FitBase includes: ${MINIMUM_INCLUDE_DIRECTORIES}")
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
-set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
+#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
   add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})

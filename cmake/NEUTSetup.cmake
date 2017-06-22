@@ -18,42 +18,88 @@
 ################################################################################
 
 
-if(NOT DEFINED ENV{NEUT_ROOT} OR $ENV{NEUT_ROOT} STREQUAL "")
+if(NOT NEUT_ROOT)
+  if(NOT DEFINED ENV{NEUT_ROOT} OR $ENV{NEUT_ROOT} STREQUAL "")
 
-  cmessage(FATAL_ERROR "Environment variable NEUT_ROOT is not defined. "
-    "This must be set to point to a prebuilt NEUT instance.")
+    cmessage(FATAL_ERROR "Environment variable NEUT_ROOT is not defined. "
+      "This must be set to point to a prebuilt NEUT instance.")
 
+  endif()
+  set(NEUT_ROOT $ENV{NEUT_ROOT})
 endif()
 
-if(NOT DEFINED ENV{CERN} OR $ENV{CERN} STREQUAL "")
+if(NOT NEUT_CERN)
+  if(NOT DEFINED ENV{CERN} OR $ENV{CERN} STREQUAL "")
 
-  cmessage(FATAL_ERROR "Environment variable CERN is not defined. "
-    "This must be set to point to a prebuilt CERNLIB instance.")
+    cmessage(FATAL_ERROR "Environment variable CERN is not defined. "
+      "This must be set to point to a prebuilt CERNLIB instance.")
 
+  endif()
+  set(NEUT_CERN $ENV{CERN})
 endif()
 
-if(NOT DEFINED ENV{CERN_LEVEL} OR $ENV{CERN_LEVEL} STREQUAL "")
+if(NOT NEUT_CERN_LEVEL)
+  if(NOT DEFINED ENV{CERN_LEVEL} OR $ENV{CERN_LEVEL} STREQUAL "")
 
-  cmessage(FATAL_ERROR "Environment variable CERN_LEVEL is not defined. "
-    "This must be set correctly for a prebuilt CERNLIB instance.")
+    cmessage(FATAL_ERROR "Environment variable CERN_LEVEL is not defined. "
+      "This must be set correctly for a prebuilt CERNLIB instance.")
 
+  endif()
+  set(NEUT_CERN_LEVEL $ENV{CERN_LEVEL})
 endif()
 
-set(NEUT_ROOT $ENV{NEUT_ROOT})
 set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
-set(CERN $ENV{CERN})
-set(CERN_LEVEL $ENV{CERN_LEVEL})
 set(NEUT_CLASS ${NEUT_ROOT}/src/neutclass)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NEUT_ENABLED__ ")
+LIST(APPEND EXTRA_CXX_FLAGS -D__NEUT_ENABLED__ )
 
-set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES} ${NEUT_ROOT}/include ${NEUT_ROOT}/src/neutclass ${NEUT_ROOT}/src/reweight)
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+  ${NEUT_ROOT}/include
+  ${NEUT_ROOT}/src/neutclass
+  ${NEUT_ROOT}/src/reweight)
 
-set(RWENGINE_LINKER_FLAGS "-L${NEUT_ROOT}/lib/Linux_pc  -lNReWeight -L${CERN}/${CERN_LEVEL}/lib -ljetset74 -lpdflib804 -lmathlib -lpacklib -lpawlib ${NEUT_CLASS}/neutctrl.so ${NEUT_CLASS}/neutfsivert.so ${NEUT_CLASS}/neutrootTreeSingleton.so ${NEUT_CLASS}/neutvtx.so ${NEUT_CLASS}/neutfsipart.so  ${NEUT_CLASS}/neutpart.so ${NEUT_CLASS}/neutvect.so -L${NEUT_ROOT}/lib/Linux_pc  -lneutcore -lnuccorrspl -lnuceff -lpartnuck -lskmcsvc -ltauola -L${NEUT_ROOT}/src/reweight -lNReWeight")
 
-# Check for old versions of NEUT without NUCLEON FSI
+
+LIST(APPEND EXTRA_LINK_DIRS
+  ${NEUT_ROOT}/lib/Linux_pc
+  ${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib)
+LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
+
+
+LIST(APPEND RWENGINE_LINKER_FLAGS
+  -L${NEUT_ROOT}/lib/Linux_pc
+    -lNReWeight
+  -L${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib
+    -ljetset74
+    -lpdflib804
+    -lmathlib
+    -lpacklib
+    -lpawlib
+  ${NEUT_CLASS}/neutctrl.so
+  ${NEUT_CLASS}/neutfsivert.so)
+
+# Check for new versions of NEUT with NUCLEON FSI
 if(EXISTS "${NEUT_CLASS}/neutnucfsistep.so")
   set(NEUT_NUCFSI 1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NEUT_NUCFSI_ENABLED__ ")
-  set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} ${NEUT_CLASS}/neutnucfsistep.so ${NEUT_CLASS}/neutnucfsivert.so")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NEUT_NUCFSI_ENABLED__ )
+
+  LIST(APPEND RWENGINE_LINKER_FLAGS
+    ${NEUT_CLASS}/neutnucfsistep.so ${NEUT_CLASS}/neutnucfsivert.so
+    )
+  set(RWENGINE_LINKER_FLAGS "")
 endif()
+
+LIST(APPEND RWENGINE_LINKER_FLAGS
+  ${NEUT_CLASS}/neutrootTreeSingleton.so
+  ${NEUT_CLASS}/neutvtx.so ${NEUT_CLASS}/neutfsipart.so
+  ${NEUT_CLASS}/neutpart.so
+  ${NEUT_CLASS}/neutvect.so
+  -L${NEUT_ROOT}/lib/Linux_pc
+    -lneutcore
+    -lnuccorrspl
+    -lnuceff
+    -lpartnuck
+    -lskmcsvc
+    -ltauola
+  -L${NEUT_ROOT}/src/reweight
+    -lNReWeight)

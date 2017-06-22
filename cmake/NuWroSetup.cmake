@@ -17,17 +17,17 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(DEFINED BUILD_NuWro_FROM_FILE)
+if(INPUT_NuWro_FILE)
 
-  if(NOT EXISTS ${BUILD_NuWro_FROM_FILE})
-    cmessage(FATAL_ERROR "Expected -DBUILD_NuWro_FROM_FILE to point to a valid input file. Cannot find: '${BUILD_NuWro_FROM_FILE}'")
+  if(NOT EXISTS ${INPUT_NuWro_FILE})
+    cmessage(FATAL_ERROR "Expected -DBUILD_NuWro_FROM_FILE to point to a valid input file. Cannot find: '${INPUT_NuWro_FILE}'")
   endif()
 
   if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    BuildROOTProject(NuWro_event1 ${BUILD_NuWro_FROM_FILE} "event,vec,vect,particle,flags,params,line" STATIC)
+    BuildROOTProject(NuWro_event1 ${INPUT_NuWro_FILE} "event,vec,vect,particle,flags,params,line" STATIC)
     SET(ROOTLIBNAME "libNuWro_event1.a")
   else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-    BuildROOTProject(NuWro_event1 ${BUILD_NuWro_FROM_FILE} "event,vec,vect,particle,flags,params,line" SHARED)
+    BuildROOTProject(NuWro_event1 ${INPUT_NuWro_FILE} "event,vec,vect,particle,flags,params,line" SHARED)
     SET(ROOTLIBNAME "libNuWro_event1.so")
   endif()
 
@@ -37,49 +37,49 @@ if(DEFINED BUILD_NuWro_FROM_FILE)
     ${CMAKE_BINARY_DIR}/NuWro_event1/event1.h
     DEPENDS NuWro_event1)
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUWRO_ENABLED__ ")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
 
   LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/NuWro_event1)
 
-  set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${ROOTLIBNAME}")
+  LIST(APPEND RWENGINE_LINKER_FLAGS ${CMAKE_CURRENT_BINARY_DIR}/${ROOTLIBNAME})
 
   LIST(APPEND PROJECTWIDE_EXTRA_DEPENDENCIES NuWro_event1HeaderLink)
 
   install(TARGETS NuWro_event1 DESTINATION lib)
 
-  SET(NUWRO_BUILT_FROM_FILE 1)
+  SET(NUWRO_BUILT_FROM_FILE TRUE)
+
 else()
-  SET(NUWRO_BUILT_FROM_FILE 0)
 
-  if(NOT DEFINED ENV{NUWRO})
+  if(NOT NUWRO)
+    if(NOT DEFINED ENV{NUWRO})
 
-    cmessage(FATAL_ERROR "Environment variable NUWRO is not defined. "
-      "This must be set to point to a prebuilt NuWro instance.")
+      cmessage(FATAL_ERROR "Environment variable NUWRO is not defined. "
+        "This must be set to point to a prebuilt NuWro instance.")
 
+    endif()
+    set(NUWRO $ENV{NUWRO})
   endif()
 
-  set(NUWRO $ENV{NUWRO})
+  # If you are using a version of NuWro without reweighting use this to compile.
+  if(NO_NuWro_RW)
 
-# If you are using a version of NuWro without reweighting use this to compile.
-  if(DEFINED NO_NuWro_RW AND NO_NuWro_RW)
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUWRO_ENABLED__ ")
+    LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
 
     LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO}/src)
 
-    set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} ${NUWRO}/bin/event1.so")
+    LIST(APPEND RWENGINE_LINKER_FLAGS ${NUWRO}/bin/event1.so)
 
   else()
 
-    if(DEFINED USE_EXP AND USE_EXP)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNW_READHISTFROMINP")
-    endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__ ")
+    LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__)
 
     LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES  ${NUWRO}/src ${NUWRO}/src/reweight ${NUWRO}/build/src)
 
-    set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} -L${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib -lreweight -levent")
+    LIST(APPEND RWENGINE_LINKER_FLAGS
+      -L${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib
+        -lreweight
+        -levent)
 
   endif()
 

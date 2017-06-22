@@ -1,64 +1,45 @@
+# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
-project(ExternalDataFitter)
+project(NUISANCE)
+
+include(ExternalProject)
 
 enable_language(Fortran)
 
-set (ExtFit_VERSION_MAJOR 1)
-set (ExtFit_VERSION_MINOR 0) #The q+1'th letter of the alphabet
-set (ExtFit_VERSION_REVISION 0)
+set (NUISANCE_VERSION_MAJOR 1)
+set (NUISANCE_VERSION_MINOR 0)
+set (NUISANCE_VERSION_REVISION 0)
 
-set (ExtFit_VERSION_STRING "v${ExtFit_VERSION_MAJOR}r${ExtFit_VERSION_MINOR}")
-if(${ExtFit_VERSION_REVISION} STRGREATER "0")
-  set (ExtFit_VERSION_STRING "${ExtFit_VERSION_STRING}p${ExtFit_VERSION_REVISION}")
+set (NUISANCE_VERSION_STRING "v${NUISANCE_VERSION_MAJOR}r${NUISANCE_VERSION_MINOR}")
+if(${NUISANCE_VERSION_REVISION} STRGREATER "0")
+  set (NUISANCE_VERSION_STRING "${NUISANCE_VERSION_STRING}p${NUISANCE_VERSION_REVISION}")
 endif()
 
-set (VERBOSE TRUE)
-
-set (CMAKE_SKIP_BUILD_RPATH TRUE)
-
-if(NOT DEFINED NOTEST OR NOT NOTEST)
-  enable_testing()
-endif()
-
+#Set this to TRUE to enable build debugging messages
+set(BUILD_DEBUG_MSGS TRUE)
 include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
 
-if(NOT DEFINED USE_NEUT AND
-  NOT DEFINED USE_NuWro AND
-  NOT DEFINED USE_GENIE AND
-  NOT DEFINED USE_T2K AND
-  NOT DEFINED USE_NIWG AND
-  NOT DEFINED USE_GiBUU AND
-  NOT DEFINED USE_NUANCE)
-  cmessage(FATAL_ERROR "No reweight engines requested. Configure with at least "
-    "one of -DUSE_{NEUT,NuWro,GENIE,NIWG,T2K,GiBUU,NUANCE}.")
-else()
-  cmessage(STATUS "Generator Input Support:
-  		  NEUT:${USE_NEUT},
-  		  NuWro:${USE_NuWro},
-		  GENIE:${USE_GENIE},
-		  NIWG:${USE_NIWG},
-  		  GiBUU:${USE_GiBUU},
-		  NUANCE:${USE_NUANCE}")
-endif()
-
-#Changes default install path to be a subdirectory of the build dir.
-#Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
-if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
-  "/usr/local")
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}")
-elseif(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}")
-endif()
+include(${CMAKE_SOURCE_DIR}/cmake/cacheVariables.cmake)
 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
-
-if(CMAKE_BUILD_TYPE STREQUAL "")
-  set(CMAKE_BUILD_TYPE DEBUG)
-elseif(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE DEBUG)
-endif()
-
 cmessage(STATUS "CMAKE_BUILD_TYPE: \"${CMAKE_BUILD_TYPE}\"")
 
 ################################################################################
@@ -68,42 +49,49 @@ cmessage(STATUS "CMAKE_BUILD_TYPE: \"${CMAKE_BUILD_TYPE}\"")
 ##################################  ROOT  ######################################
 include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
 
+#################################  HEPMC  ######################################
+include(${CMAKE_SOURCE_DIR}/cmake/HepMC.cmake)
+
 ############################  Reweight Engines  ################################
 include(${CMAKE_SOURCE_DIR}/cmake/ReweightEnginesSetup.cmake)
 
-############################### GiBUU + NUANCE  ####################################
+############################  Other Generators  ################################
 
-if(DEFINED USE_EXP AND USE_EXP)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DINMEMORYEVENTCLASS")
-endif()
+include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
 
-if(DEFINED USE_GiBUU AND USE_GiBUU)
-  cmessage(STATUS "Included GiBUU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GiBUU_ENABLED__")
-  include(${CMAKE_SOURCE_DIR}/cmake/GiBUUSetup.cmake)
-endif()
-
-if(DEFINED USE_NUANCE AND USE_NUANCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUANCE_ENABLED__")
+if(USE_NUANCE)
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NUANCE_ENABLED__)
 endif()
 
 #################################  Pythia6  ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
 
-################################## COMPILER ####################################
-include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
-
-################################################################################
-
 ################################# gperftools ###################################
 
 include(${CMAKE_SOURCE_DIR}/cmake/gperfSetup.cmake)
+
+################################## COMPILER ####################################
+include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 
 ################################### doxygen ###################################
 
 include(${CMAKE_SOURCE_DIR}/cmake/docsSetup.cmake)
 
-###############################################################################
+################################################################################
+
+if(NOT NOTEST)
+  enable_testing()
+endif()
+
+SET(GENERATOR_SUPPORT)
+
+foreach(gen NEUT;NuWro;GENIE;GiBUU;NUANCE)
+  if(USE_${gen})
+    SET(GENERATOR_SUPPORT "${GENERATOR_SUPPORT}${gen} ")
+  endif()
+endforeach(gen)
+
+cmessage(STATUS "Generator Input Support: ${GENERATOR_SUPPORT}")
 
 set(MINCODE
   Routines
@@ -120,13 +108,12 @@ set(CORE
   #Devel
   )
 
-
 ###############
 # Allow compilation against single experiment folder
 # Add later..
 ##############
 
-set(EXPERIMENTS
+LIST(APPEND ALLEXPERIMENTS
   ANL
   ArgoNeuT
   BEBC
@@ -139,29 +126,47 @@ set(EXPERIMENTS
   MiniBooNE
   T2K)
 
+foreach(exp ${ALLEXPERIMENTS})
+  if(NOT NO_${exp})
+    LIST(APPEND EXPERIMENTS_TO_BUILD ${exp})
+  endif()
+endforeach()
+
+set(MINIMUM_INCLUDE_DIRECTORIES)
+LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
+  ${RWENGINE_INCLUDE_DIRECTORIES}
+  ${CMAKE_SOURCE_DIR}/src/FitBase
+  ${CMAKE_SOURCE_DIR}/src/Reweight
+  ${CMAKE_SOURCE_DIR}/src/InputHandler
+  ${CMAKE_SOURCE_DIR}/src/Splines
+  ${CMAKE_SOURCE_DIR}/src/Utils
+  ${CMAKE_SOURCE_DIR}/src/Genie)
+
+cmessage(DEBUG "Base include directories: ${MINIMUM_INCLUDE_DIRECTORIES}")
+
 set(EXP_INCLUDE_DIRECTORIES)
 
-foreach(edir ${EXPERIMENTS})
-  set(EXP_INCLUDE_DIRECTORIES ${EXP_INCLUDE_DIRECTORIES};${CMAKE_SOURCE_DIR}/src/${edir})
+foreach(edir ${ALLEXPERIMENTS})
+  LIST(APPEND EXP_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/${edir})
 endforeach()
-cmessage(STATUS "Included experiments: ${EXP_INCLUDE_DIRECTORIES}")
+cmessage(DEBUG "Included experiments: ${EXP_INCLUDE_DIRECTORIES}")
 
 foreach(mdir ${MINCODE})
-  cmessage (STATUS "Configuring directory: src/${mdir}")
+  cmessage (DEBUG "Configuring directory: src/${mdir}")
   add_subdirectory(src/${mdir})
 endforeach()
 
-foreach(edir ${EXPERIMENTS})
-  cmessage (STATUS "Configuring directory: src/${edir}")
+foreach(edir ${EXPERIMENTS_TO_BUILD})
+  cmessage (DEBUG "Configuring directory: src/${edir}")
   add_subdirectory(src/${edir})
 endforeach()
 
 foreach(cdir ${CORE})
-  cmessage (STATUS "Configuring directory: src/${cdir}")
+  cmessage (DEBUG "Configuring directory: src/${cdir}")
   add_subdirectory(src/${cdir})
 endforeach()
 
-cmessage(STATUS "Module targets:  ${MODULETargets}")
+cmessage(DEBUG "Module targets: ${MODULETargets}")
 
 add_subdirectory(app)
 add_subdirectory(src/Tests)

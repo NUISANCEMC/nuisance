@@ -17,17 +17,20 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(NOT DEFINED ENV{NIWG} OR $ENV{NIWG} STREQUAL "")
+if(NOT NIWG)
+  if(NOT DEFINED ENV{NIWG} OR $ENV{NIWG} STREQUAL "")
 
-    cmessage(FATAL_ERROR "Environment variable NIWG is not defined. "
-    "This must be set to point to a prebuilt NIWGReWeight instance.")
+      cmessage(FATAL_ERROR "Environment variable NIWG is not defined. "
+      "This must be set to point to a prebuilt NIWGReWeight instance.")
 
+  endif()
+  set(NIWG $ENV{NIWG})
 endif()
 
-set(NIWG $ENV{NIWG})
+LIST(APPEND EXTRA_CXX_FLAGS -D__NIWG_ENABLED__)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NIWG_ENABLED__ ")
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NIWG})
 
-set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES} ${NIWG})
-
-set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} -L${NIWG} -lNIWGReWeight")
+LIST(APPEND RWENGINE_LINKER_FLAGS
+  -L${NIWG}
+    -lNIWGReWeight)

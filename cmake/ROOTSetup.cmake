@@ -18,7 +18,7 @@
 ################################################################################
 
 if ( NOT DEFINED ENV{ROOTSYS} )
-  cmessage (FATAL_ERROR "$ROOTSYS is not defined, please set up root first.")
+  cmessage (FATAL_ERROR "$ROOTSYS is not defined, please set up ROOT first.")
 else()
   cmessage(STATUS "Using ROOT installed at $ENV{ROOTSYS}")
   set(CMAKE_ROOTSYS $ENV{ROOTSYS})
@@ -26,7 +26,8 @@ endif()
 
 # Get cflags from ROOT
 execute_process (COMMAND root-config
-  --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
+string(REPLACE " " ";" ROOT_CXX_FLAGS "${ROOT_CXX_FLAGS_RAW}")
 # Get libdir from ROOT
 execute_process (COMMAND root-config
   --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -37,64 +38,64 @@ execute_process (COMMAND root-config
 execute_process (COMMAND root-config
   --features OUTPUT_VARIABLE ROOT_FEATURES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set(ROOT_LD_FLAGS "-L${ROOT_LIBDIR}")
+LIST(APPEND EXTRA_LINK_DIRS ${ROOT_LIBDIR})
 
-set(ROOT_LIBS Core;Cint;RIO;Net;Hist;Graf;Graf3d;Gpad;Tree;TreePlayer;Rint;Postscript;Matrix;Physics;MathCore;Thread;EG;Geom;GenVector;XMLIO)
+LIST(APPEND ROOT_LIBS
+  Core
+  Cint
+  RIO
+  Net
+  Hist
+  Graf
+  Graf3d
+  Gpad
+  Tree
+  Rint
+  Postscript
+  Matrix
+  Physics
+  MathCore
+  Thread
+  EG
+  Geom
+  GenVector)
 
-# Check GENIE requirements
-if(USE_GENIE)
-  cmessage(STATUS "GENIE requires eve generation libraries")
-  set(ROOT_LIBS Eve;EG;TreePlayer;Geom;Ged;Gui;${ROOT_LIBS})
-endif()
-
-# Check if we have Minuit2 enabled
-if(NOT DEFINED USE_MINIMIZER)
+if(USE_MINIMIZER)
   if("${ROOT_FEATURES}" MATCHES "minuit2")
     cmessage(STATUS "ROOT built with MINUIT2 support")
-    set(USE_MINIMIZER 1)
   else()
-    cmessage(STATUS "ROOT built without MINUIT2 support, minimizer functionality will be disabled.")
-    set(USE_MINIMIZER 0)
+    cmessage(FATAL_ERROR "ROOT built without MINUIT2 support but minimizer functionality requested. Either configure with -DUSE_MINIMIZER=FALSE or use a version of ROOT with MINUIT2 support.")
   endif()
-endif()
 
-# Check ROOT version is 5.34/34 or 5.34/36
-string(REGEX MATCH "5.34/([0-9]+)" ROOTVERSMATCH ${ROOT_VERSION})
-if( NOT ROOTVERSMATCH OR  ${CMAKE_MATCH_1} LESS "19")
-  cmessage(WARNING "ROOT Version: ${ROOT_VERSION} has out of date minimizer interface. Disabling minimizer, please update to 5.34/19 or greater to enable minimization features.")
-  set(USE_MINIMIZER 0)
-endif()
+  string(REGEX MATCH "5.34/([0-9]+)" ROOTVERSMATCH ${ROOT_VERSION})
+  if( NOT ROOTVERSMATCH OR ${CMAKE_MATCH_1} LESS "19")
+    cmessage(FATAL_ERROR "ROOT Version: ${ROOT_VERSION} has out of date minimizer interface, but minimizer functionality requested. Please configure with -DUSE_MINIMIZER=FALSE or update to 5.34/19 or greater to enable minimization features.")
+  endif()
 
-
-if("${ROOT_VERSION}" MATCHES "5.34/34" OR "${ROOT_VERSION}" MATCHES "5.34/36" OR "${ROOT_VERSION}" MATCHES "5.34/32")
-  cmessage(STATUS "Found valid ROOT version ${ROOT_VERSION}")
-else()
-  cmessage(STATUS "You've supplied an invalid ROOT version! NUISANCE only support 5.34/34 and 5.34/36: turning minimizer OFF")
-  set(USE_MINIMIZER 0)
 endif()
 
 if("${ROOT_FEATURES}" MATCHES "opengl")
   cmessage(STATUS "ROOT built with OpenGL support")
-  set(ROOT_LIBS ${ROOT_LIBS};RGL)
+  LIST(APPEND ROOT_LIBS RGL)
 endif()
 
 if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
-  set(ROOT_LIBS ${ROOT_LIBS};EGPythia6;Pythia6)
+  LIST(APPEND ROOT_LIBS EGPythia6 Pythia6)
 endif()
 
-cmessage ( STATUS "[ROOT]: root-config --version: " ${ROOT_VERSION})
-cmessage ( STATUS "[ROOT]: root-config --cflags: " ${ROOT_CXX_FLAGS} )
-cmessage ( STATUS "[ROOT]: root-config --libs: " ${ROOT_LD_FLAGS} )
+cmessage ( STATUS "[ROOT]: root-config --version: ${ROOT_VERSION} ")
+cmessage ( STATUS "[ROOT]: root-config --cflags : ${ROOT_CXX_FLAGS} ")
+cmessage ( STATUS "[ROOT]: root-config --libs   : ${ROOT_LD_FLAGS} ")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
-
+LIST(APPEND EXTRA_CXX_FLAGS ${ROOT_CXX_FLAGS})
+LIST(APPEND EXTRA_LIBS ${ROOT_LIBS})
 
 #Helper functions for building dictionaries
 function(GenROOTDictionary OutputDictName Header LinkDef)
 
   get_directory_property(incdirs INCLUDE_DIRECTORIES)
   string(REPLACE ";" ";-I" LISTDIRINCLUDES "-I${incdirs}")
-  string(REPLACE " " ";" LISTCPPFLAGS "${CMAKE_CXX_FLAGS}")
+  string(REPLACE " " ";" LISTCPPFLAGS "${EXTRA_CXX_FLAGS}")
 
   #ROOT5 CINT cannot handle it.
   list(REMOVE_ITEM LISTCPPFLAGS "-std=c++11")
