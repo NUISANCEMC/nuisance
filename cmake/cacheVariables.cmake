@@ -73,12 +73,11 @@ elseif(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 
-
+CheckAndSetDefaultCache(USE_HEPMC FALSE BOOL "Whether to enable HepMC input support. <FALSE>")
 CheckAndSetDefaultEnv(HEPMC "" PATH "Path to HepMC source tree root directory. Overrides environment variable \$HEPMC <>" HEPMC)
 CheckAndSetDefaultCache(HEPMC_MOMUNIT "GEV" STRING "HepMC momentum units [MEV|GEV]. <GEV>")
 CheckAndSetDefaultCache(HEPMC_LENUNIT "CM" STRING "HepMC momentum units [MM|CM]. <CM>")
 CheckAndSetDefaultCache(HEPMC_USED_EP FALSE INTERNAL "Whether the we built HepMC or not. <FALSE>")
-
 
 CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
