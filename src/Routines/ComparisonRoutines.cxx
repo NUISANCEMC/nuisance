@@ -187,6 +187,12 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     double parlow  = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
+
+    // override if state not given
+    if (!key.Has("state")){
+      key.SetS("state","FIX");
+    }
+
     std::string parstate = key.GetS("state");
 
     // Check for incomplete limtis
@@ -271,7 +277,7 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     }
 
     // Form norm dial from samplename + sampletype + "_norm";
-    std::string normname = samplename + sampletype + "_norm";
+    std::string normname = samplename + "_norm";
 
     // Check normname not already present
     if (fTypeVals.find("normname") != fTypeVals.end()) {

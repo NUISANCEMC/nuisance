@@ -95,6 +95,8 @@ nuiskey Config::CreateParameterKeyFromLine(const std::string line){
     parameterkey.AddS("state",strvct[6]);
   } else if (strvct.size() == 3){
     parameterkey.AddS("state","FIX");
+  } else if (strvct.size() == 4){
+    parameterkey.AddS("state", strvct[3]);
   }
 
   return parameterkey;
@@ -105,7 +107,7 @@ bool nuiskey::Has(const std::string name){
 }
 
 nuiskey Config::CreatePullKeyFromLine(const std::string line){
-  nuiskey pullkey = Config::CreateKey("pull");
+  nuiskey pullkey = Config::CreateKey("covar");
 
   // Parse
   std::vector<std::string> strvct = GeneralUtils::ParseToStr(line, " ");
@@ -193,3 +195,6 @@ void nuiskey::ChangeB(std::string name, bool newval){
 
 
 
+std::vector<std::string> nuiskey::GetAllKeys(){
+  return Config::Get().GetAllKeysForNode(fNode);
+}

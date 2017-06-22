@@ -47,7 +47,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(nuiskey sam
 
   ccqelike = fSettings.Found("name", "CCQELike");
   if (!ccqelike) {
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_con.txt" );
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_like.txt" );
     fSettings.SetErrorInput( FitPar::GetDataBase() + "/MiniBooNE/anti-ccqe/aski_err.txt" );
     fSettings.DefineAllowedSpecies("numub");
 

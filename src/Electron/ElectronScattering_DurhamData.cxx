@@ -32,15 +32,15 @@ ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) 
   fSettings.SetDescription(descrip);
   fSettings.DefineAllowedSpecies("electron");
   fSettings.SetTitle("Electron");
-  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
+  fSettings.SetAllowedTypes("FIX/DIAG", "FIX,FREE,SHAPE/DIAG/NORM/MASK");
   fSettings.SetXTitle("q0");
   fSettings.SetYTitle("#sigma");
-  // fIsRawEvents = true;
+  fIsNoWidth = true;
 
   FinaliseSampleSettings();
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromName(fSettings.GetS("name"));
+  SetDataFromName(fSettings.GetS("originalname"));
   SetCovarFromDiagonal();
 
   // Scaling Setup ---------------------------------------------------
@@ -50,15 +50,17 @@ ElectronScattering_DurhamData::ElectronScattering_DurhamData(nuiskey samplekey) 
   EnuMax = fZHighLim;
 
   double sigscale = GetEventHistogram()->Integral() * 1E-38 / double(fNEvents) / TotalIntegratedFlux();
-  double dangle = 2 * M_PI * fabs((1. - cos(fYLowLim * M_PI / 180.)) - (1. - cos(fYHighLim * M_PI / 180.)));
-  fScaleFactor = sigscale / dangle / fZCenter;
+  //  double dangle = 2 * M_PI * fabs((1. - cos(fYLowLim * M_PI / 180.)) - (1. - cos(fYHighLim * M_PI / 180.)));
+  //  fScaleFactor = sigscale / dangle / fZCenter;
+  fScaleFactor = sigscale;
 
-
-  std::cout << "Event Integral = " << GetEventHistogram()->Integral("width") << std::endl;
-  std::cout << "Flux Integral = " << TotalIntegratedFlux("width") << " " << fZLowLim << " " << fZHighLim << std::endl;
-  std::cout << "DAngle = " << dangle << std::endl;
+  std::cout << "Event Integral = " << GetEventHistogram()->Integral() << std::endl;
+  std::cout << "Flux Integral = " << TotalIntegratedFlux() << std::endl;
+  std::cout << "FNEvents = " << fNEvents << std::endl;
+  std::cout << "Z Limits = " << fZLowLim << " " << fZHighLim << std::endl;
   std::cout << "sigscale = " << sigscale << std::endl;
   std::cout << "fZCenter = " << fZCenter << std::endl;
+  std::cout << "ScaleFactor = " << fScaleFactor << std::endl;
 
   // Finish up
   FinaliseMeasurement();
@@ -135,8 +137,8 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
     if (tstring.compare(lineentries[3])) continue;
     if (sstring.compare(lineentries[7])) continue;
 
-    std::cout << "Registering data point : " << line << std::endl;
-    std::cout << "Adding Graph Point : " <<  GeneralUtils::StrToDbl(lineentries[4]) << " " << GeneralUtils::StrToDbl(lineentries[5]) << std::endl;
+    // std::cout << "Registering data point : " << line << std::endl;
+    // std::cout << "Adding Graph Point : " <<  GeneralUtils::StrToDbl(lineentries[4]) << " " << GeneralUtils::StrToDbl(lineentries[5]) << std::endl;
 
     // Loop through x and y points and find a place to insert
     if (pointx.empty()) {
@@ -149,7 +151,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
       for (size_t j = 0; j < pointx.size(); j++) {
 
         if (GeneralUtils::StrToDbl(lineentries[4]) < pointx[j] && j == 0) {
-          std::cout << "Inserting at start point iterator " << std::endl;
+          // std::cout << "Inserting at start point iterator " << std::endl;
           pointx.insert(pointx.begin() + j, GeneralUtils::StrToDbl(lineentries[4]));
           errorx.insert(errorx.begin() + j, 0.0);
           pointy.insert(pointy.begin() + j, GeneralUtils::StrToDbl(lineentries[5]) * scalef);
@@ -157,7 +159,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
           break;
 
         } else if (GeneralUtils::StrToDbl(lineentries[4]) > pointx[j] && j == pointx.size() - 1) {
-          std::cout << "Pushing back data point " << std::endl;
+          // std::cout << "Pushing back data point " << std::endl;
           pointx.push_back(GeneralUtils::StrToDbl(lineentries[4]));
           errorx.push_back(0.0);
           pointy.push_back(GeneralUtils::StrToDbl(lineentries[5]) * scalef);
@@ -165,7 +167,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
           break;
 
         } else if (GeneralUtils::StrToDbl(lineentries[4]) > pointx[j - 1] && GeneralUtils::StrToDbl(lineentries[4]) < pointx[j]) {
-          std::cout << "Inserting at point iterator = " << j << std::endl;
+          // std::cout << "Inserting at point iterator = " << j << std::endl;
 
           pointx.insert(pointx.begin() + j, GeneralUtils::StrToDbl(lineentries[4]));
           errorx.insert(errorx.begin() + j, 0.0);
@@ -187,9 +189,9 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
     i++;
   }
 
-  for (uint i  = 0; i < pointx.size(); i++) {
-    std::cout << "Q0 Point " << i << " = " << pointx[i] << std::endl;
-  }
+  // for (uint i  = 0; i < pointx.size(); i++) {
+  //   std::cout << "Q0 Point " << i << " = " << pointx[i] << std::endl;
+  // }
 
 
   fDataGraph = new TGraphErrors(pointx.size(), &pointx[0], &pointy[0], &errorx[0], &errory[0]);
@@ -202,7 +204,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
 // Loop over graph and get mid way point between each data point.
   for (int i = 0; i < fDataGraph->GetN(); i++) {
-    std::cout << "X Point = " << x[i] << std::endl;
+    // std::cout << "X Point = " << x[i] << std::endl;
 
     if (i == 0) {
       // First point set lower width as half distance to point above
@@ -222,16 +224,16 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
 
 
-  for (uint i  = 0; i < q0binedges.size(); i++) {
-    std::cout << "Q0 Edge " << i << " = " << q0binedges[i] << std::endl;
-  }
+  // for (uint i  = 0; i < q0binedges.size(); i++) {
+  //   std::cout << "Q0 Edge " << i << " = " << q0binedges[i] << std::endl;
+  // }
 
-  for (uint i  = 0; i < ebinedges.size(); i++) {
-    std::cout << "e Edge " << i << " = " << ebinedges[i] << std::endl;
-  }
-  for (uint i  = 0; i < thetabinedges.size(); i++) {
-    std::cout << "theta Edge " << i << " = " << thetabinedges[i] << std::endl;
-  }
+  // for (uint i  = 0; i < ebinedges.size(); i++) {
+  //   std::cout << "e Edge " << i << " = " << ebinedges[i] << std::endl;
+  // }
+  // for (uint i  = 0; i < thetabinedges.size(); i++) {
+  //   std::cout << "theta Edge " << i << " = " << thetabinedges[i] << std::endl;
+  // }
 
 // Form the data hist, mchist, etc
   fDataHist = new TH1D((fName + "_data").c_str(), (fName + "_data").c_str(),
@@ -241,7 +243,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
   const double* y = fDataGraph->GetY();
   const double* ey = fDataGraph->GetEY();
   for (int i = 0; i < fDataGraph->GetN(); i++) {
-    std::cout << "Setting Data Bin " << i + 1 << " to " << y[i] << " +- " << ey[i] << std::endl;
+    // std::cout << "Setting Data Bin " << i + 1 << " to " << y[i] << " +- " << ey[i] << std::endl;
     fDataHist->SetBinContent(i + 1, y[i]);
     fDataHist->SetBinError(i + 1, ey[i]);
 
@@ -295,7 +297,7 @@ void  ElectronScattering_DurhamData::FillEventVariables(FitEvent * event) {
   fYVar = theta;
   fZVar = E;
 
-  // std::cout << "Got Event " << q0 << " " << theta << " " << E << std::endl;
+
 
   return;
 };

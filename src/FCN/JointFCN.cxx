@@ -359,6 +359,8 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
     std::string pulltype = key.GetS("type");
 
     fOutputDir->cd();
+    std::cout << "Creating Pull Term : " << std::endl;
+    sleep(1);
     fPulls.push_back(new ParamPull(pullname, pullfile, pulltype));
 
   }
@@ -639,7 +641,7 @@ void JointFCN::ReconfigureUsingManager() {
 
     int i = 0;
     int nevents = curinput->GetNEvents();
-    int countwidth = nevents / 20;
+    int countwidth = nevents / 5;
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
@@ -701,7 +703,7 @@ void JointFCN::ReconfigureUsingManager() {
 
         bool signal = curmeas->isSignal(curevent);
         curmeas->SetSignal(signal);
-        curmeas->FillHistograms(rwweight);
+        curmeas->FillHistograms(curevent->Weight);
 
         // If its Signal tally up fills
         if (signal) {
@@ -841,7 +843,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Setup stuff for logging
   int fillcount = 0;
   int nevents = fSignalEventFlags.size();
-  int countwidth = nevents / 500;
+  int countwidth = nevents / 20;
 
   // If All Splines tell splines they need a reconfigure.
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
@@ -896,14 +898,10 @@ void JointFCN::ReconfigureFastUsingManager() {
         curevent->Weight = curevent->RWWeight * curevent->InputWeight;
         rwweight = curevent->Weight;
 
-        // #pragma omp atomic
-        if (fIsAllSplines) {
-          coreeventweights[splinecount] = rwweight;
-        }
+	coreeventweights[splinecount] = rwweight;
         if (splinecount % countwidth == 0) {
-          LOG(REC) << "Processed " << splinecount << " event weights." << std::endl;
+          LOG(REC) << "Processed " << splinecount << " event weights. W = " << rwweight << std::endl;
         }
-
 
         // #pragma omp atomic
         splinecount++;

@@ -198,6 +198,12 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     double parlow  = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
+
+    // Override state if none given
+    if (!key.Has("state")){
+      key.SetS("state","FIX");
+    }
+
     std::string parstate = key.GetS("state");
 
     // Extra limits
@@ -283,7 +289,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     }
 
     // Form norm dial from samplename + sampletype + "_norm";
-    std::string normname = samplename + sampletype + "_norm";
+    std::string normname = samplename + "_norm";
 
     // Check normname not already present
     if (fTypeVals.find(normname) != fTypeVals.end()) {
@@ -295,6 +301,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     fTypeVals[normname] = kNORM;
     fStateVals[normname] = sampletype;
+    fStartVals[normname] = samplenorm;
     fCurVals[normname] = samplenorm;
 
     fErrorVals[normname] = 0.0;
@@ -306,6 +313,9 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     bool state = sampletype.find("FREE") == std::string::npos;
     fFixVals[normname]      = state;
     fStartFixVals[normname] = state;
+
+
+
   }
 
   // Setup Fake Parameters -----------------------------
@@ -689,6 +699,7 @@ void MinimizerRoutines::GetMinimizerState() {
   if (fMinimizer->CovMatrixStatus() > 0) {
 
     // Fill Full Covar
+    std::cout << "Filling covariance" << std::endl;
     for (int i = 0; i < fCovar->GetNbinsX(); i++) {
       for (int j = 0; j < fCovar->GetNbinsY(); j++) {
         fCovar->SetBinContent(i + 1, j + 1, fMinimizer->CovMatrix(i, j));
@@ -718,6 +729,7 @@ void MinimizerRoutines::GetMinimizerState() {
     }
   }
 
+  std::cout << "Got STATE" << std::endl;
 
   return;
 };
@@ -959,6 +971,7 @@ void MinimizerRoutines::SaveResults() {
 void MinimizerRoutines::SaveMinimizerState() {
 //*************************************
 
+  std::cout << "Saving Minimizer State" << std::endl;
   if (!fMinimizer) {
     ERR(FTL) << "Can't save minimizer state without min object" << std::endl;
     throw;
@@ -966,7 +979,7 @@ void MinimizerRoutines::SaveMinimizerState() {
 
   // Save main fit tree
   fSampleFCN->WriteIterationTree();
-
+  
   // Get Vals and Errors
   GetMinimizerState();
 
@@ -987,16 +1000,20 @@ void MinimizerRoutines::SaveMinimizerState() {
   // Dial Vals
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams.at(i);
-
     nameVect    .push_back( name );
 
     valVect     .push_back( fCurVals.at(name)   );
+
     errVect     .push_back( fErrorVals.at(name) );
+
     minVect     .push_back( fMinVals.at(name)   );
+
     maxVect     .push_back( fMaxVals.at(name)   );
 
     startVect   .push_back( fStartVals.at(name) );
+
     endfixVect  .push_back( fFixVals.at(name)      );
+
     startfixVect.push_back( fStartFixVals.at(name) );
 
     ipar++;
@@ -1204,11 +1221,14 @@ void MinimizerRoutines::SetupCovariance() {
 
   // Get NFREE from min or from vals (for cases when doing throws)
   if (fMinimizer) {
+    std::cout << "NFREE FROM MINIMIZER" << std::endl;
     NFREE = fMinimizer->NFree();
     NDIM  = fMinimizer->NDim();
   } else {
     NDIM = fParams.size();
     for (UInt_t i = 0; i < fParams.size(); i++) {
+      std::cout << "Getting Param " << fParams[i] << std::endl;
+
       if (!fFixVals[fParams[i]]) NFREE++;
     }
   }
@@ -1230,6 +1250,9 @@ void MinimizerRoutines::SetupCovariance() {
   int countfree = 0;
   for (UInt_t i = 0; i < fParams.size(); i++) {
 
+    std::cout << "Getting Param " << i << std::endl;
+    std::cout << "ParamI = " << fParams[i] << std::endl;
+
     fCovar->GetXaxis()->SetBinLabel(countall + 1, fParams[i].c_str());
     fCovar->GetYaxis()->SetBinLabel(countall + 1, fParams[i].c_str());
     countall++;
@@ -1240,6 +1263,8 @@ void MinimizerRoutines::SetupCovariance() {
       countfree++;
     }
   }
+
+  std::cout << "Filling Matrices" << std::endl;
 
   fCorrel = PlotUtils::GetCorrelationPlot(fCovar, "correlation");
   fDecomp = PlotUtils::GetDecompPlot(fCovar, "decomposition");
@@ -1252,6 +1277,7 @@ void MinimizerRoutines::SetupCovariance() {
     fDecFree = NULL;
   }
 
+  std::cout << " Set the covariance" << std::endl;
   return;
 };
 

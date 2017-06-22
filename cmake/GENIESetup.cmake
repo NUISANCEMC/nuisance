@@ -45,6 +45,11 @@ string(REPLACE " " ";" GENIE_LD_FLAGS "${GENIE_LD_FLAGS_RAW}")
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+################################################################################
+# Extract GENIE VERSION
+execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh
+  OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 ################################  LHAPDF  ######################################
 if(LHAPDF_LIB STREQUAL "")
   cmessage(FATAL_ERROR "Variable LHAPDF_LIB is not defined. "
@@ -97,7 +102,7 @@ if(LOG4CPP_INC}  STREQUAL "")
 endif()
 ################################################################################
 
-LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__)
+LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION})
 
 LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
   ${GENIE_INCLUDES_DIR}

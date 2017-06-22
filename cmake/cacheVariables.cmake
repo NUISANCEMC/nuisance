@@ -141,3 +141,4 @@ CheckAndSetDefaultCache(NO_K2K ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build K2
 CheckAndSetDefaultCache(NO_MINERvA ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build MINERvA samples. <-DNO_EXPERIMENTS=FALSE>")
 CheckAndSetDefaultCache(NO_MiniBooNE ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build MiniBooNE samples. <-DNO_EXPERIMENTS=FALSE>")
 CheckAndSetDefaultCache(NO_T2K ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build T2K samples. <-DNO_EXPERIMENTS=FALSE>")
+CheckAndSetDefaultCache(NO_SciBooNE ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build SciBooNE samples. <-DNO_EXPERIMENTS=FALSE>")

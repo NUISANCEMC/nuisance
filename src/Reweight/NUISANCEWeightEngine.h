@@ -25,6 +25,8 @@ public:
 	inline bool NeedsEventReWeight() { return true; };
 
 	std::vector<NUISANCEWeightCalc*> fWeightCalculators;
+	std::vector<int> fNUISANCEEnums;
+
 };
 
 

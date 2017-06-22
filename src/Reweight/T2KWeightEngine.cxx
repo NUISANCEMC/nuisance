@@ -27,8 +27,8 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 
 	// Set Abs Twk Config
 	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
-	
-#else	
+
+#else
 	ERR(FTL) << "T2K RW NOT ENABLED" << std::endl;
 	throw;
 #endif
@@ -36,24 +36,41 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 
 void T2KWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __T2KREW_ENABLED__
-	// Get NEUT Syst.
-	t2krew::T2KSyst_t gensyst = t2krew::T2KSyst::FromString(name);
+
+
+	// Get First enum
 	int nuisenum = Reweight::ConvDial(name, kT2K);
 
-	// Fill Maps
-	int index = fValues.size();
-	fValues.push_back(0.0);
-	fT2KSysts.push_back(gensyst);
+	// Setup Maps
+	fEnumIndex[nuisenum];// = std::vector<size_t>(0);
+	fNameIndex[name]; // = std::vector<size_t>(0);
 
-	fEnumIndex[nuisenum] = index;
-	fNameIndex[name] = index;
+	// Split by commas
+	std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
+	for (uint i = 0; i < allnames.size(); i++) {
+		std::string singlename = allnames[i];
 
-	// Initialize dial
-	fT2KRW->Systematics().Include(gensyst);
+		// Get RW
+		t2krew::T2KSyst_t gensyst = t2krew::T2KSyst::FromString(name);
 
-	// If Absolute
-	if (fIsAbsTwk) {
-		fT2KRW->Systematics().SetAbsTwk(gensyst);
+		// Fill Maps
+		int index = fValues.size();
+		fValues.push_back(0.0);
+		fT2KSysts.push_back(gensyst);
+
+		// Initialize dial
+		std::cout << "Registering " << singlename << " from " << name << std::endl;
+		fT2KRW->Systematics().Include(gensyst);
+
+		// If Absolute
+		if (fIsAbsTwk) {
+			fT2KRW->Systematics().SetAbsTwk(gensyst);
+		}
+
+		// Setup index
+		fEnumIndex[nuisenum].push_back(index);
+		fNameIndex[name].push_back(index);
+
 	}
 
 	// Set Value if given
@@ -65,15 +82,21 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
 
 void T2KWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __T2KREW_ENABLED__
-	fValues[fEnumIndex[nuisenum]] = val;
-	fT2KRW->Systematics().SetTwkDial(fT2KSysts[fEnumIndex[nuisenum]], val);
+	std::vector<size_t> indices = fEnumIndex[nuisenum];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		fT2KRW->Systematics().SetTwkDial(fT2KSysts[indices[i]], val);
+	}
 #endif
 }
 
 void T2KWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __T2KREW_ENABLED__
-	fValues[fNameIndex[name]] = val;
-	fT2KRW->Systematics().SetTwkDial(fT2KSysts[fNameIndex[name]], val);
+	std::vector<size_t> indices = fNameIndex[name];
+	for (uint i = 0; i < indices.size(); i++) {
+		fValues[indices[i]] = val;
+		fT2KRW->Systematics().SetTwkDial(fT2KSysts[indices[i]], val);
+	}
 #endif
 }
 

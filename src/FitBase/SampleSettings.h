@@ -4,6 +4,9 @@
 #include "NuisKey.h"
 #include "TH1D.h"
 #include "BeamUtils.h"
+#include "TPaveText.h"
+#include "TCanvas.h"
+
 class SampleSettings {
 public:
 	SampleSettings();
@@ -42,6 +45,8 @@ public:
 	void SetSuggestedFlux(std::string str);
 	void SetDescription(std::string str);
 
+	void Write(std::string name="");
+
 	std::string GetFullTitles();
 	
 	bool Has(std::string name){return fKeyValues.Has(name);};
@@ -52,6 +57,10 @@ public:
 	int GetI(std::string name);
 	double GetD(std::string name);
 	std::string GetCovarInput();
+
+	void Set(std::string name, int i);
+	void Set(std::string name, std::string s);
+	void Set(std::string name, double d);
 
 	std::vector<int> fAllowedTargets;
 	std::vector<int> fAllowedSpecies;

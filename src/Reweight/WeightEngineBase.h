@@ -49,9 +49,10 @@ public:
 	bool fHasChanged;
 	bool fIsAbsTwk;
 
-	std::vector<double> fValues;
-	std::map<int, size_t> fEnumIndex;
-	std::map<std::string, size_t> fNameIndex;
+	std::vector< double > fValues;
+	std::map<int,  std::vector<size_t> > fEnumIndex;
+	std::map<std::string, std::vector<size_t> > fNameIndex;
+
 	std::string fCalcName;
 };
 

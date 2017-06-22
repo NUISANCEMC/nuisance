@@ -23,7 +23,7 @@
 <!-- # 1 FATAL -->
 <!-- # 2 WARN -->
 <config ERROR='2'/>
-<config TRACE='1'/>
+<config TRACE='0'/>
 
 <config cores='2' />
 <config spline_test_throws='50' />
@@ -33,7 +33,7 @@
 
 <config Electron_NThetaBins='4' />
 <config Electron_NEnergyBins='4' />
-<config Electron_ThetaWidth='2.0' />
+<config Electron_ThetaWidth='1.0' />
 <config Electron_EnergyWidth='0.10' />
 
 <config RemoveFSIParticles='0' />
@@ -109,7 +109,12 @@
 <!-- # See src/FitBase/Measurement1D::Write for more info -->
 <!-- #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP -->
 <!-- #config drawopts DATA/MC -->
-<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC'/>
+<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/>
+
+<config InterpolateSigmaQ0Histogram='1' />
+<config InterpolateSigmaQ0HistogramRes='100' />
+<config InterpolateSigmaQ0HistogramThrow='1' />
+<config InterpolateSigmaQ0HistogramNTHROWS='100000' />
 
 <!-- # Save the shape scaling applied with option SHAPE into the main MC hist -->
 <config saveshapescaling='0'/>
@@ -172,5 +177,11 @@
 <config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true='0'/>
 <config Modes.split_PN_NN='0'/>
 <config SignalReconfigures='0'/>
+
+<!-- # SciBooNE specific -->
+<config SciBarDensity='1.04'/>
+<config SciBarRecoDist='10.0'/>
+<config PenetratingMuonEnergy='1.4'/>
+<config NumRangeSteps='50'/>
 
 </nuisance>

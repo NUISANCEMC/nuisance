@@ -63,6 +63,7 @@ LIST(APPEND ROOT_LIBS
 if(USE_MINIMIZER)
   if("${ROOT_FEATURES}" MATCHES "minuit2")
     cmessage(STATUS "ROOT built with MINUIT2 support")
+    LIST(APPEND EXTRA_CXX_FLAGS -D__MINUIT2_ENABLED__)
   else()
     cmessage(FATAL_ERROR "ROOT built without MINUIT2 support but minimizer functionality requested. Either configure with -DUSE_MINIMIZER=FALSE or use a version of ROOT with MINUIT2 support.")
   endif()

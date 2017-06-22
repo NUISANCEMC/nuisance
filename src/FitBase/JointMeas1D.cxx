@@ -1830,7 +1830,7 @@ TH1D* JointMeas1D::GetCombinedFlux() {
 TH1D* JointMeas1D::GetCombinedEventRate() {
   //********************************************************************
 
-  TH1D* newflux;
+  TH1D* newflux = NULL;
   int sample = 0;
 
   for (std::vector<MeasurementBase*>::const_iterator expIter =
