@@ -20,9 +20,9 @@
 function(CheckAndSetDefaultEnv VARNAME DEFAULT CACHETYPE DOCSTRING ENVNAME)
   cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
   if(NOT DEFINED ${VARNAME})
-    if(DEFINED ENV{ENVNAME} AND NOT $ENV{ENVNAME} STREQUAL "")
-      set(${VARNAME} $ENV{ENVNAME} CACHE ${CACHETYPE} ${DOCSTRING})
-      cmessage(DEBUG "    Read ${VARNAME} from ENVVAR ${ENVNAME} as $ENV{ENVNAME}.")
+    if(DEFINED ENV{${ENVNAME}} AND NOT $ENV{${ENVNAME}} STREQUAL "")
+      set(${VARNAME} $ENV{${ENVNAME}} CACHE ${CACHETYPE} ${DOCSTRING})
+      cmessage(DEBUG "    Read ${VARNAME} from ENVVAR ${ENVNAME} as $ENV{${ENVNAME}}.")
     else()
       set(${VARNAME} ${DEFAULT} CACHE ${CACHETYPE} ${DOCSTRING})
     endif()
@@ -71,7 +71,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
 elseif(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE DEBUG)
 endif()
-
 
 CheckAndSetDefaultCache(USE_HEPMC FALSE BOOL "Whether to enable HepMC input support. <FALSE>")
 CheckAndSetDefaultEnv(HEPMC "" PATH "Path to HepMC source tree root directory. Overrides environment variable \$HEPMC <>" HEPMC)
@@ -141,3 +140,55 @@ CheckAndSetDefaultCache(NO_MINERvA ${NO_EXPERIMENTS} BOOL "Whether to *NOT* buil
 CheckAndSetDefaultCache(NO_MiniBooNE ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build MiniBooNE samples. <-DNO_EXPERIMENTS=FALSE>")
 CheckAndSetDefaultCache(NO_T2K ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build T2K samples. <-DNO_EXPERIMENTS=FALSE>")
 CheckAndSetDefaultCache(NO_SciBooNE ${NO_EXPERIMENTS} BOOL "Whether to *NOT* build SciBooNE samples. <-DNO_EXPERIMENTS=FALSE>")
+
+
+function(SAYVARS)
+
+LIST(APPEND VARS
+  USE_HEPMC
+  HEPMC
+  HEPMC_MOMUNIT
+  HEPMC_LENUNIT
+  HEPMC_USED_EP
+  USE_NEUT
+  NEUT_ROOT
+  NEUT_CERN
+  NEUT_CERN_LEVEL
+  USE_NuWro
+  NUWRO_ROOT
+  NUWRO_INPUT_FILE
+  NUWRO_BUILT_FROM_FILE
+  USE_GENIE
+  GENIE_ROOT
+  GENIE_LHAPDF_LIB
+  GENIE_LHAPDF_INC
+  GENIE_LIBXML2_LIB
+  GENIE_LIBXML2_INC
+  GENIE_LOG4CPP_LIB
+  GENIE_LOG4CPP_INC
+  USE_T2K
+  USE_NIWG
+  USE_GiBUU
+  BUILD_GiBUU
+  USE_NUANCE
+  NO_EXTERNAL_UPDATE
+  USE_GPERFTOOLS
+  NO_ANL
+  NO_ArgoNeuT
+  NO_BEBC
+  NO_BNL
+  NO_FNAL
+  NO_GGM
+  NO_K2K
+  NO_MINERvA
+  NO_MiniBooNE
+  NO_T2K
+  NO_SciBooNE)
+
+  foreach(v ${VARS})
+    if(DEFINED ${v})
+      cmessage(DEBUG "VARIABLE: \"${v}\" = \"${${v}}\"")
+    endif()
+  endforeach(v)
+
+endfunction()
