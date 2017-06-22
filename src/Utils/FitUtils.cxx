@@ -60,12 +60,21 @@ double FitUtils::p(TLorentzVector part) {
   return p_part;
 };
 
+double FitUtils::p(FitParticle* part) {
+  return FitUtils::p(part->fP);
+};
+
+
 //********************************************************************
 // Returns the angle between two particles in radians
 double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
   //********************************************************************
   double th = part1.Vect().Angle(part2.Vect());
   return th;
+};
+
+double FitUtils::th(FitParticle* part1, FitParticle* part2) {
+  return FitUtils::th(part1->fP, part2->fP);
 };
 
 // T2K CC1pi+ helper functions
@@ -194,6 +203,44 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
 
   return q2;
 };
+
+
+double FitUtils::EnuQErec(double pl, double costh, double binding,
+                          bool neutrino) {
+
+  if (pl < 0) return 0.; // Make sure nobody is silly
+
+  double mN_eff = PhysConst::mass_neutron - binding/1000.;
+  double mN_oth = PhysConst::mass_proton;
+
+  if (!neutrino) {
+    mN_eff = PhysConst::mass_proton - binding/1000.;
+    mN_oth = PhysConst::mass_neutron;
+  }
+  double ml = PhysConst::mass_muon;
+  double el = sqrt(pl*pl + ml*ml);
+
+  double rEnu =
+    (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
+    (2 * (mN_eff - el + pl * costh));
+
+  return rEnu;
+};
+
+double FitUtils::Q2QErec(double pl, double costh, double binding,
+                         bool neutrino) {
+
+  if (pl < 0) return 0.; // Make sure nobody is silly
+
+  double ml = PhysConst::mass_muon;
+  double el = sqrt(pl*pl + ml*ml);
+
+  double rEnu = EnuQErec(pl, costh, binding, neutrino);
+  double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);
+
+  return q2;
+};
+
 
 //********************************************************************
 // Reconstructs Enu for CC1pi0

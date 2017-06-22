@@ -13,7 +13,7 @@ double WeightEngineBase::GetDialValue(std::string name) {
 		ERR(FTL) << "Dial " << name
 		         << " not included in " << fCalcName << std::endl;
 	}
-	return fValues[fNameIndex[name]];
+	return fValues[fNameIndex[name][0]];
 }
 
 double WeightEngineBase::GetDialValue(int nuisenum) {
@@ -21,5 +21,6 @@ double WeightEngineBase::GetDialValue(int nuisenum) {
 		ERR(FTL) << "Dial Enum " << nuisenum
 		         << " not included in " << fCalcName << std::endl;
 	}
-	return fValues[fEnumIndex[nuisenum]];
+	return fValues[fEnumIndex[nuisenum][0]];
 }
+

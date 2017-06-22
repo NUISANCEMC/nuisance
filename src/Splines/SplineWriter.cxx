@@ -92,7 +92,7 @@ void SplineWriter::SetupSplineSet() {
   }
 
   fWeightList = new double[fValList.size()];
-  for (int i = 0; i < fValList.size(); i++) {
+  for (uint i = 0; i < fValList.size(); i++) {
     fWeightList[i] = 1.0;
   }
 
@@ -184,7 +184,7 @@ double SplineWriter::GetWeightForThisSet(FitEvent* event, int iset){
 }
 
 void SplineWriter::SetWeights(double* weights){
-  for (int i = 0; i < fParVect.size(); i++){
+  for (uint i = 0; i < fParVect.size(); i++){
     fWeightList[i] = weights[i];
   }
 }
@@ -405,13 +405,14 @@ void SplineWriter::FitCoeff(Spline * spl, std::vector< std::vector<double> >& v,
     break;
   }
 
+#ifdef __MINUIT2_ENABLED__
   if (fDrawSplines){
     fSplineFCNs[spl] = new SplineFCN(spl, v, w);
     fSplineFCNs[spl]->SaveAs("mysplinetest_" + spl->GetName() + ".pdf", coeff);
     sleep(1);
     delete fSplineFCNs[spl];
   }
-
+#endif
 }
 
 void SplineWriter::FitCoeff1DGraph(Spline * spl, int n, double * x, double * y, float * coeff, bool draw) {
@@ -502,7 +503,7 @@ double SplineFCN::DoEval(const double * x) const {
 }
 
 void SplineFCN::UpdateWeights(std::vector<double>& w) {
-  for (int i = 0; i < w.size(); i++) {
+  for (uint i = 0; i < w.size(); i++) {
     fWeight[i] = w[i];
   }
 }
@@ -653,6 +654,7 @@ void SplineWriter::FitCoeff2DGraph(Spline * spl, int n, double * x, double * y, 
 
 
 void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double> >& v, std::vector<double>& w, float * coeff, bool draw) {
+#ifdef __MINUIT2_ENABLED__
 
   if (fSplineFunctors.find(spl) != fSplineFunctors.end()) {
     delete fSplineFunctors[spl];
@@ -734,6 +736,7 @@ void SplineWriter::FitCoeffNDGraph(Spline * spl, std::vector< std::vector<double
 
   // delete values;
   // delete minimizer;
+#endif
 }
 
 

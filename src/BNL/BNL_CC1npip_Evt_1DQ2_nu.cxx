@@ -36,7 +36,7 @@ BNL_CC1npip_Evt_1DQ2_nu::BNL_CC1npip_Evt_1DQ2_nu(nuiskey samplekey) {
   fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
-  fSettings.SetEnuRange(0.5, 6.0);
+  fSettings.SetEnuRange(0.0, 3.0);
   fSettings.DefineAllowedTargets("D,H");
 
   // CCQELike plot information

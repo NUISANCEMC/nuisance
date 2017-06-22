@@ -161,7 +161,10 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 
     // Loop over the particle stack
     for (unsigned int j = 2; j < event->Npart(); ++j) {
+
       // Only include alive particles
+      // if (event->GetParticleState(j) != kFinalState) continue;
+
       if (!(event->PartInfo(j))->fIsAlive &&
           (event->PartInfo(j))->fNEUTStatusCode != 0)
         continue;

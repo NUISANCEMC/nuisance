@@ -388,7 +388,9 @@ int Reweight::ConvDial(std::string name, std::string type, bool exceptions) {
   return Reweight::ConvDial( name, Reweight::ConvDialType(type), exceptions );
 }
 
-int Reweight::ConvDial(std::string name, int type, bool exceptions) {
+int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
+
+  std::string name = GeneralUtils::ParseToStr(fullname,",")[0]; // Only use first dial given
 
   // Produce offset seperating each type.
   int offset   = type * 1000;

@@ -61,7 +61,7 @@ public:
 	int ConvertNuwroMode (event * e);
 
 	/// Adds a new particle to NUISANCE stack for given NuWro particle
-	void AddNuWroParticle(FitEvent* evt, const particle& p, int state);
+	void AddNuWroParticle(FitEvent* evt, particle& p, int state);
 
 	event* fNuWroEvent;  ///< Pointer to NuWro Format Events
 

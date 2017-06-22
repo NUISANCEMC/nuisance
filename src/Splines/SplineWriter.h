@@ -4,7 +4,9 @@
 #include "Spline.h"
 #include "FitParameters.h"
 #include "SplineUtils.h"
+#ifdef __MINUIT2_ENABLED__
 #include "TFitterMinuit.h"
+#endif
 
 class SplineFCN {
 public:
@@ -66,9 +68,12 @@ public:
   std::vector<TH1D*> fAllDrawnHists;
   std::vector<TGraph*> fAllDrawnGraphs;
 
+#ifdef __MINUIT2_ENABLED__
   std::map<Spline*, SplineFCN*> fSplineFCNs;
   std::map<Spline*, ROOT::Math::Functor*> fSplineFunctors;
   std::map<Spline*, ROOT::Math::Minimizer*> fSplineMinimizers;
+#endif
+
   //  Spline* gSpline;
 
   // Available Fitting Functions

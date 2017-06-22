@@ -184,6 +184,13 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     double parlow  = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
+
+
+    // Override if state not given
+    if (!key.Has("state")){
+      key.SetS("state","FIX");
+    }
+
     std::string parstate = key.GetS("state");
 
     // Extra limits
@@ -269,7 +276,7 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     }
 
     // Form norm dial from samplename + sampletype + "_norm";
-    std::string normname = samplename + sampletype + "_norm";
+    std::string normname = samplename + "_norm";
 
     // Check normname not already present
     if (fTypeVals.find(normname) != fTypeVals.end()) {

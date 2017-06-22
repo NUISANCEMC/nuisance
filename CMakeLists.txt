@@ -124,6 +124,7 @@ LIST(APPEND ALLEXPERIMENTS
   K2K
   MINERvA
   MiniBooNE
+  SciBooNE
   T2K)
 
 foreach(exp ${ALLEXPERIMENTS})

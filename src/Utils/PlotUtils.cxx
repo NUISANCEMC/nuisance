@@ -64,7 +64,7 @@ std::string PlotUtils::GetObjectWithName(TFile *inFile, std::string substring) {
 
   TIter nextkey(inFile->GetListOfKeys());
   TKey *key;
-  std::string output = "NULL";
+  std::string output="";
 
   while ( (key = (TKey*)nextkey()) ) {
     std::string test(key->GetName());
@@ -561,8 +561,12 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title, std::s
     tempPlot = new TH1D(title.c_str(), title.c_str(), npoints - 1, bins);
 
     for (int i = 0; i < npoints; ++i) {
-      tempPlot->SetBinContent(i + 1, values[i]);
-      tempPlot->SetBinError(i + 1, errors[i]);
+      tempPlot->SetBinContent(i+1, values[i]);
+
+      // If only two columns are present in the input file, use the sqrt(values) as the error
+      // equivalent to assuming that the error is statistical
+      if (!errors[i]) tempPlot->SetBinError(i+1, sqrt(values[i]));
+      else tempPlot->SetBinError(i+1, errors[i]);
     }
 
     delete gr;

@@ -40,6 +40,8 @@ enum generator_event_type {
   kLIKEWEIGHT = 14,
   kSPLINEPARAMETER = 15,
   kHEPMC = 16,
+  kHISTEVENT = 17,
+  kSIGMAQ0HIST = 18,
 };
 
 namespace InputUtils {
@@ -53,10 +55,11 @@ enum InputType {
   kEVSPLN_Input,
   kEMPTY_Input,
   kFEVENT_Input,
-  kJOINT_Input, // Kept for backwards compatibility
+  kJOINT_Input, 
+  kSIGMAQ0HIST_Input,
   kInvalid_Input,
   kHIST_Input,   // Not sure if this are currently used.
-  kBNSPLN_Input  // Not sure if this are currently used.
+  kBNSPLN_Input,  // Not sure if this are currently used.
 };
 
 }
@@ -103,6 +106,9 @@ inline std::ostream& operator<<(std::ostream& os,
   case kHEPMC: {
     return os << "kHEPMC";
   }
+  case kSIGMAQ0HIST: {
+    return os << "kSIGMAQ0HIST";
+  }
   default: { return os << "kUNKNOWN"; }
   }
 }
@@ -136,6 +142,9 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
   }
   case InputUtils::kJOINT_Input: {
     return os << "kJOINT_Input";
+  }
+  case InputUtils::kSIGMAQ0HIST_Input: {
+    return os << "kSIGMAQ0HIST_Input";
   }
   case InputUtils::kInvalid_Input:
   case InputUtils::kHIST_Input:

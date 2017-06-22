@@ -36,7 +36,7 @@ MiniBooNE_CC1pip_XSec_1DQ2_nu::MiniBooNE_CC1pip_XSec_1DQ2_nu(nuiskey samplekey) 
   fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
   fSettings.SetYTitle("d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/MeV^{2}/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(0.0, 3.0);
+  fSettings.SetEnuRange(0.0, 100.0); // No energy range given in v1r0
   fSettings.DefineAllowedTargets("C,H");
 
   // CCQELike plot information
@@ -64,18 +64,15 @@ MiniBooNE_CC1pip_XSec_1DQ2_nu::MiniBooNE_CC1pip_XSec_1DQ2_nu(nuiskey samplekey) 
 void  MiniBooNE_CC1pip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
-  if (event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   // No W cut on MiniBooNE CC1pi+
-  double Q2CC1pip = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip);
+  double q2 = -1*(Pnu-Pmu).Mag2();
 
-  fXVar = Q2CC1pip;
+  fXVar = q2;
 
   return;
 };

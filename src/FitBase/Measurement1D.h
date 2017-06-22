@@ -586,6 +586,7 @@ protected:
 
   double fNormError;        ///< Sample norm error
 
+  double fLikelihood; ///< Likelihood value
 
   // Fake Data
   bool fIsFakeData;            ///< Flag: is the current data fake from MC
