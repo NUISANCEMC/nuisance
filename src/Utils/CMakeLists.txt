@@ -63,24 +63,17 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
   add_library(${LIBNAME} SHARED ${IMPLFILES})
 endif()
 
-target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/Splines)
-target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/InputHandler)
-target_include_directories(${LIBNAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/FitBase)
-target_include_directories(${LIBNAME} PUBLIC ${RWENGINE_INCLUDE_DIRECTORIES})
-
-# if(USE_NuWro AND NUWRO_BUILT_FROM_FILE)
-#   target_include_directories(${LIBNAME} PUBLIC ${CMAKE_BINARY_DIR}/NuWro_event1)
-# endif()
+include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
+  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
 
-set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
   add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
 endif()
+
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
 #install(FILES ${HEADERFILES} DESTINATION include)

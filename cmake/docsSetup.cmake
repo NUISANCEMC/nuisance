@@ -39,5 +39,5 @@ if(DOXYGEN_FOUND)
   add_dependencies(docs doc_generate)
   install(FILES ${CMAKE_BINARY_DIR}/doc/latex/refman.pdf
     DESTINATION ${CMAKE_BINARY_DIR}/doc
-    RENAME ExtFit_${ExtFit_VERSION_STRING}.pdf OPTIONAL)
+    RENAME ExtFit_${NUISANCE_VERSION_STRING}.pdf OPTIONAL)
 endif(DOXYGEN_FOUND)

@@ -17,30 +17,28 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(DEFINED BUILD_GiBUU AND BUILD_GiBUU)
+if(USE_GiBUU)
+  LIST(APPEND EXTRA_CXX_FLAGS -D__GiBUU_ENABLED__)
 
-  if (DEFINED NO_EXTERNAL_UPDATE AND NO_EXTERNAL_UPDATE)
-      set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                   PROPERTY EP_UPDATE_DISCONNECTED 1)
-      cmessage(STATUS "Will not attempt to update third party GiBUU tools for each build.")
-    else()
-      set(NO_EXTERNAL_UPDATE 0)
+  if(BUILD_GiBUU)
+    if (NO_EXTERNAL_UPDATE)
+        set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                     PROPERTY EP_UPDATE_DISCONNECTED 1)
+        cmessage(STATUS "Will not attempt to update third party GiBUU tools for each build.")
+    endif()
+
+    ExternalProject_Add(GiBUUTools
+    PREFIX "${PROJECT_BINARY_DIR}/GiBUUTools"
+    GIT_REPOSITORY https://github.com/luketpickering/GiBUU-t2k-dev.git
+    CMAKE_ARGS
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DUSE_GiBUU=1
+    -DFORCECPP03=1
+    -DNO_EXTERNAL_UPDATE=${NO_EXTERNAL_UPDATE})
+
+    cmessage(STATUS "Building GiBUU and GiBUUTools")
+    set(BUILD_GiBUU TRUE)
   endif()
 
-  include(ExternalProject)
-
-  ExternalProject_Add(GiBUUTools
-  PREFIX "${PROJECT_BINARY_DIR}/GiBUUTools"
-  GIT_REPOSITORY https://github.com/luketpickering/GiBUU-t2k-dev.git
-  CMAKE_ARGS
-  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-  -DUSE_GiBUU=1
-  -DFORCECPP03=1
-  -DNO_EXTERNAL_UPDATE=${NO_EXTERNAL_UPDATE})
-
-  cmessage(STATUS "Building GiBUU and GiBUUTools")
-  set(BUILD_GiBUU 1)
-else()
-  set(BUILD_GiBUU 0)
 endif()

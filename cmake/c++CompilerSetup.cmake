@@ -17,15 +17,18 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(CXX_WARNINGS "-Wall ") #-Wextra")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_WARNINGS}")
-
-if(DEFINED USE_EXP AND USE_EXP)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+if(USE_OMP)
+  LIST(APPEND EXTRA_CXX_FLAGS -fopenmp)
 endif()
 
+set(CXX_WARNINGS -Wall )
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
+cmessage(DEBUG "EXTRA_CXX_FLAGS: ${EXTRA_CXX_FLAGS}")
+string(REPLACE ";" " " STR_EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STR_EXTRA_CXX_FLAGS} ${CXX_WARNINGS}")
+
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3")
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -36,36 +39,46 @@ else()
   cmessage(FATAL_ERROR "[ERROR]: Unknown CMAKE_BUILD_TYPE (\"${CMAKE_BUILD_TYPE}\"): Should be \"DEBUG\" or \"RELEASE\".")
 endif()
 
-set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ")
-set(CMAKE_DEPENDLIB_FLAGS "${ROOT_LD_FLAGS}")
 
-if(NOT ${RWENGINE_LINKER_FLAGS} STREQUAL "")
-  set(CMAKE_DEPENDLIB_FLAGS "${CMAKE_DEPENDLIB_FLAGS} ${RWENGINE_LINKER_FLAGS}")
+SET(STR_EXTRA_LINK_DIRS)
+if(NOT EXTRA_LINK_DIRS STREQUAL "")
+  string(REPLACE ";" " -L" STR_EXTRA_LINK_DIRS "-L${EXTRA_LINK_DIRS}")
+endif()
+SET(STR_EXTRA_LIBS)
+if(NOT EXTRA_LIBS STREQUAL "")
+  string(REPLACE ";" " -l" STR_EXTRA_LIBS "-l${EXTRA_LIBS}")
+endif()
+SET(STR_EXTRA_LINK_FLAGS)
+if(NOT EXTRA_LINK_FLAGS STREQUAL "")
+  string(REPLACE ";" " " STR_EXTRA_LINK_FLAGS "${EXTRA_LINK_FLAGS}")
 endif()
 
-if (DEFINED USE_MYPERFTOOLS AND USE_MYPERFTOOLS)
-#  add_dependencies(gperftools libunwind)
-  set(CMAKE_CXX_FLAGS "-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free ${CMAKE_CXX_FLAGS}")
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -ltcmalloc_and_profiler")
-  cmessage(STATUS "Using google performance libraries")
+cmessage(DEBUG "EXTRA_LINK_DIRS: ${STR_EXTRA_LINK_DIRS}")
+cmessage(DEBUG "EXTRA_LIBS: ${STR_EXTRA_LIBS}")
+cmessage(DEBUG "EXTRA_LINK_FLAGS: ${STR_EXTRA_LINK_FLAGS}")
+
+if(NOT STR_EXTRA_LINK_DIRS STREQUAL "" AND NOT STR_EXTRA_LIBS STREQUAL "")
+  SET(CMAKE_DEPENDLIB_FLAGS "${STR_EXTRA_LINK_DIRS} ${STR_EXTRA_LIBS}")
 endif()
 
-if(DEFINED USE_EXP AND USE_EXP)
-  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS}")
+if(NOT EXTRA_LINK_FLAGS STREQUAL "")
+  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
+    SET(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${EXTRA_LINK_FLAGS}")
+  else()
+    SET(CMAKE_LINK_FLAGS "${EXTRA_LINK_FLAGS}")
+  endif()
 endif()
 
-if(DEFINED USE_OPENMP AND USE_OPENMP)
-  set(CMAKE_C_FLAGS "-fopenmp ${CMAKE_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "-fopenmp ${CMAKE_CXX_FLAGS} -D__USE_OPENMP__")
-  set(CMAKE_DEPENDLIB_FLAGS "-lgomp ${CMAKE_DEPENDLIB_FLAGS}")
+if(USE_OMP)
+  cmessage(FATAL_ERROR "No OMP features currently enabled so this is a FATAL_ERROR to let you know that you don't gain anything with this declaration.")
 endif()
 
 
 if (VERBOSE)
-  cmessage (STATUS "C++ Compiler      : " ${CXX_COMPILER_NAME})
-  cmessage (STATUS "    flags         : " ${CMAKE_CXX_FLAGS})
-  cmessage (STATUS "    Release flags : " ${CMAKE_CXX_FLAGS_RELEASE})
-  cmessage (STATUS "    Debug flags   : " ${CMAKE_CXX_FLAGS_DEBUG})
-  cmessage (STATUS "    Link Flags    : " ${CMAKE_LINK_FLAGS})
-  cmessage (STATUS "    Lib Flags     : " ${CMAKE_DEPENDLIB_FLAGS})
+  cmessage (STATUS "C++ Compiler      : ${CXX_COMPILER_NAME}")
+  cmessage (STATUS "    flags         : ${CMAKE_CXX_FLAGS}")
+  cmessage (STATUS "    Release flags : ${CMAKE_CXX_FLAGS_RELEASE}")
+  cmessage (STATUS "    Debug flags   : ${CMAKE_CXX_FLAGS_DEBUG}")
+  cmessage (STATUS "    Link Flags    : ${CMAKE_LINK_FLAGS}")
+  cmessage (STATUS "    Lib Flags     : ${CMAKE_DEPENDLIB_FLAGS}")
 endif()
