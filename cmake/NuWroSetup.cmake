@@ -60,9 +60,15 @@ else()
 
   set(NUWRO $ENV{NUWRO})
 
+  if(NOT DEFINED NO_NuWro_RW)
+    cmessage(STATUS "NO_NuWro_RW not defined, setting to false")
+    SET(NO_NuWro_RW 1)
+  endif()
+
 # If you are using a version of NuWro without reweighting use this to compile.
   if(DEFINED NO_NuWro_RW AND NO_NuWro_RW)
 
+    cmessage(STATUS "Compiling NuWro WITHOUT ReWeight")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__NUWRO_ENABLED__ ")
 
     LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO}/src)
@@ -70,6 +76,8 @@ else()
     set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} ${NUWRO}/bin/event1.so")
 
   else()
+
+    cmessage(STATUS "Compiling NuWro WITH ReWeight")
 
     if(DEFINED USE_EXP AND USE_EXP)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNW_READHISTFROMINP")
