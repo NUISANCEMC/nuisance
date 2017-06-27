@@ -628,7 +628,10 @@ void ListTargetIDs(){
 			 << "\n CH2 : " << ConvertTargetIDs("CH2")
 			 << "\n H2O : " << ConvertTargetIDs("H2O")
 			 << "\n Fe  : " << ConvertTargetIDs("Fe") 
-			 << "\n Pb  : " << ConvertTargetIDs("Pb");
+			 << "\n Pb  : " << ConvertTargetIDs("Pb")
+			 << "\n D2  : " << ConvertTargetIDs("D2")
+			 << "\n D2-free : " << ConvertTargetIDs("D2-free");
+  
   
 }
 
@@ -643,6 +646,8 @@ string ConvertTargetIDs(string id){
   else if  (!id.compare("H2O")) return "18,1000080160[0.8888],1000010010[0.1111]";
   else if  (!id.compare("Fe"))  return "1000260560";
   else if  (!id.compare("Pb"))  return "1000822070";
+  else if  (!id.compare("D2"))  return "1000010020";
+  else if  (!id.compare("D2-free")) return "2,1000010010[0.5],1000000010[0.5]";
   else return "";
 
 };
@@ -652,18 +657,20 @@ void ListFluxIDs(){
 
   // Keep in sync with ConvertTargetIDs                                                                                    
   LOG("gevgen", pNOTICE) << "Possible Flux IDs: \n" 
-                         << "\n MINERvA_fhc_numu  : " << ConvertTargetIDs("MINERvA_fhc_numu") 
-			 << "\n MINERvA_fhc_numunumubar  : " << ConvertTargetIDs("MINERvA_fhc_numunumubar")
-                         << "\n MINERvA_fhc_nue  : " << ConvertTargetIDs("MINERvA_fhc_nue")
-                         << "\n MINERvA_fhc_nuenuebar  : " << ConvertTargetIDs("MINERvA_fhc_nuenuebar")
-			 << "\n MINERvA_fhc_all  : " << ConvertTargetIDs("MINERvA_fhc_all")
+                         << "\n MINERvA_fhc_numu  : " << ConvertFluxIDs("MINERvA_fhc_numu") 
+			 << "\n MINERvA_fhc_numunumubar  : " << ConvertFluxIDs("MINERvA_fhc_numunumubar")
+                         << "\n MINERvA_fhc_nue  : " << ConvertFluxIDs("MINERvA_fhc_nue")
+                         << "\n MINERvA_fhc_nuenuebar  : " << ConvertFluxIDs("MINERvA_fhc_nuenuebar")
+			 << "\n MINERvA_fhc_all  : " << ConvertFluxIDs("MINERvA_fhc_all")
 
-			 << "\n MINERvA_rhc_numubar  : " << ConvertTargetIDs("MINERvA_rhc_numubar")
-			 << "\n MINERvA_rhc_numubarnumu  : " << ConvertTargetIDs("MINERvA_rhc_numubarnumu")
-			 << "\n MINERvA_rhc_nuebar  : " << ConvertTargetIDs("MINERvA_rhc_nuebar")
-			 << "\n MINERvA_rhc_nuebarnue  : " << ConvertTargetIDs("MINERvA_rhc_nuebarnue")
-			 << "\n MINERvA_rhc_all  : " << ConvertTargetIDs("MINERvA_rhc_all");
-
+			 << "\n MINERvA_rhc_numubar  : " << ConvertFluxIDs("MINERvA_rhc_numubar")
+			 << "\n MINERvA_rhc_numubarnumu  : " << ConvertFluxIDs("MINERvA_rhc_numubarnumu")
+			 << "\n MINERvA_rhc_nuebar  : " << ConvertFluxIDs("MINERvA_rhc_nuebar")
+			 << "\n MINERvA_rhc_nuebarnue  : " << ConvertFluxIDs("MINERvA_rhc_nuebarnue")
+			 << "\n MINERvA_rhc_all  : " << ConvertFluxIDs("MINERvA_rhc_all")
+			 << "\n ANL_fhc_numu : " << ConvertFluxIDs("ANL_fhc_numu")
+			 << "\n BNL_fhc_numu : " << ConvertFluxIDs("BNL_fhc_numu");
+  
 }
 
 
@@ -690,6 +697,10 @@ string ConvertFluxIDs(string id){
   else if (!id.compare("MINERvA_rhc_nuebar")) inputs="minerva_flux.root,nuebar_rhc[-12]";
   else if (!id.compare("MINERvA_rhc_nuebarnue")) inputs="minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
   else if (!id.compare("MINERvA_rhc_all")) inputs="minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
+
+  else if (!id.compare("ANL_fhc_numu")) inputs="ANL_1977_2horn_rescan.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu")) inputs="BNL_NuInt02_rescan.root,numu_flux[14]";
+
   else return "";
 
   return fluxfolder + inputs;

@@ -10,6 +10,7 @@
 
 using namespace Reweight;
 
+
  class NUISANCEWeightCalc {
 public:
 	NUISANCEWeightCalc() {};
@@ -28,6 +29,20 @@ public:
 
 	std::string fName;
 };
+
+class ModeNormCalc : public NUISANCEWeightCalc {
+ public:
+  ModeNormCalc();
+  ~ModeNormCalc(){};
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  double fNormRES;
+ };
+
 
 
 class GaussianModeCorr : public NUISANCEWeightCalc {
