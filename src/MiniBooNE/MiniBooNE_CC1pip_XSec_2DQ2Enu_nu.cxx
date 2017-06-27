@@ -64,16 +64,13 @@ MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(nuiskey sampl
 void MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  if (event->NumFSParticle(211) == 0 ||
-      event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double Enu = FitUtils::EnuCC1piprec(Pnu, Pmu, Ppip) * 1000.;
-  double Q2 = FitUtils::Q2CC1piprec(Pnu, Pmu, Ppip) * 1E6;
+  double Enu = Pnu.E();
+  double Q2 = -1*(Pnu-Pmu).Mag2();
 
   fXVar = Enu;
   fYVar = Q2;
