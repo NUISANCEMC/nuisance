@@ -291,7 +291,7 @@ void SplineRoutines::SaveEvents() {
 
       // iterate
       nuisevent = input->NextNuisanceEvent();
-      i++;
+      icount++;
     }
 
     // Save flux and close file

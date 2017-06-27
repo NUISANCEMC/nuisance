@@ -240,10 +240,13 @@ void FitEvent::SetBranchAddress(TChain* tn) {
   tn->SetBranchAddress("RWWeight",    &SavedRWWeight);
   tn->SetBranchAddress("InputWeight", &InputWeight);
 
-  tn->SetBranchAddress("NParticles",    &fNParticles);
-  tn->SetBranchAddress("ParticleState", fParticleState);
-  tn->SetBranchAddress("ParticlePDG",   fParticlePDG);
-  tn->SetBranchAddress("ParticleMom",   fParticleMom);
+
+
+  // This has to be setup by the handler now :(
+  //  tn->SetBranchAddress("NParticles",    &fNParticles);
+  //  tn->SetBranchAddress("ParticleState", &fParticleState);
+  //  tn->SetBranchAddress("ParticlePDG",   &fParticlePDG);
+  //  tn->SetBranchAddress("ParticleMom",   &fParticleMom);
 
 }
 

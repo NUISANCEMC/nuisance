@@ -9,7 +9,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
 
   // Load in all Weight Calculations
   fWeightCalculators.push_back( new GaussianModeCorr() );
-
+  fWeightCalculators.push_back( new ModeNormCalc() );
   // Set Abs Twk Config
   fIsAbsTwk = true;
 
