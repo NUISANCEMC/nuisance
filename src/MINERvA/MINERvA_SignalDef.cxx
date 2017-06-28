@@ -211,4 +211,30 @@ bool isCC0pi1p_MINERvA(FitEvent *event, double enumin, double enumax) {
 
   return signal;
 }
+
+// 2015 analysis just asks for 1pi0 and no pi+/pi-
+bool isCC1pi0_MINERvA_2015(FitEvent *event, double EnuMin, double EnuMax) {
+  bool CC1pi0_anu = SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
+  return CC1pi0_anu;
+}
+
+// 2016 analysis just asks for 1pi0 and no other charged tracks
+bool isCC1pi0_MINERvA_2016(FitEvent *event, double EnuMin, double EnuMax) {
+  bool CC1pi0_anu = SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
+  // Additionally look for charged proton track
+  bool HasProton = event->HasFSParticle(2212);
+
+  if (CC1pi0_anu) {
+    if (!HasProton) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+
+  return false;
+}
+
 }
