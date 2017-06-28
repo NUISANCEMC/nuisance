@@ -29,8 +29,8 @@ MINERvA_CC1pi0_XSec_1Dpmu_antinu::MINERvA_CC1pi0_XSec_1Dpmu_antinu(nuiskey sampl
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC1pi0_XSec_1Dpmu_antinu sample. \n" \
                         "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Flux: MINERvA Forward Horn Current numubarr \n" \
+                        "Signal: Any event with 1 muon, 1 pion, no other tracks \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

@@ -29,14 +29,14 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC1pi0_XSec_1Dth_antinu sample. \n" \
                         "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Flux: MINERvA Forward Horn Current numubar \n" \
+                        "Signal: Any event with 1 muon, 1 pion, no other tracks \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("d#sigma(E_{#nu}) (cm^{2}/nucleon)");
+  fSettings.SetXTitle("#theta_{#pi} (degrees)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#pi}) (cm^{2}/nucleon/degree)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(1.5, 10.0);
   fSettings.DefineAllowedTargets("C,H");
