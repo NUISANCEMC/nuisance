@@ -99,10 +99,10 @@ void MINERvA_CC1pi0_XSec_1DEnu_antinu::FillEventVariables(FitEvent *event) {
 //                Exactly one positive muon
 //                Exactly one observed pi0
 //                No other mesons
-//                No restriction on number of nucleons
+//                No other charged tracks (means no protons)
 //
 //********************************************************************
 bool MINERvA_CC1pi0_XSec_1DEnu_antinu::isSignal(FitEvent *event) {
 //********************************************************************
-  return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
+  return SignalDef::isCC1pi0_MINERvA_2016(event, EnuMin, EnuMax);
 }
