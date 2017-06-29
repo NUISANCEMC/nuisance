@@ -307,9 +307,9 @@ double StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask) {
     double dt = calc_data->GetBinContent(i + 1);
     double mc = calc_mc->GetBinContent(i + 1);
 
-    if (mc == 0) continue;
+    if (mc <= 0) continue;
 
-    if (dt == 0) {
+    if (dt <= 0) {
       // Only add difference
       chi2 += 2 * (mc - dt);
     } else {
@@ -594,8 +594,9 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
         correl_val += rand_val[j] * (*decomp_cov)(j, i) ;
       }
 
+      //      std::cout << "Throwing val " << calc_hist->GetBinContent(i+1) << " -> " << calc_hist->GetBinContent(i+1) + correl_val*1E-38 << std::endl;
       calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
-                                       correl_val) * 1E-38);
+                                       correl_val * 1E-38));
     }
   }
 

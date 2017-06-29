@@ -21,9 +21,9 @@
 #include "FitParameters.h"
 #include "FitUtils.h"
 
-namespace FitPar{
-  double SciBarDensity    = FitPar::Config().GetParD("SciBarDensity");
-  double SciBarRecoDist   = FitPar::Config().GetParD("SciBarRecoDist");
+namespace MINERvAPar{
+  double MINERvADensity    = FitPar::Config().GetParD("MINERvADensity");
+  double MINERvARecoDist   = FitPar::Config().GetParD("MINERvARecoDist");
   double PenetratingMuonE = FitPar::Config().GetParD("PenetratingMuonEnergy");
   double NumRangeSteps    = FitPar::Config().GetParI("NumRangeSteps");
 }
@@ -93,20 +93,61 @@ double MINERvAUtils::RangeInScintillator(FitParticle* particle, int nsteps){
   }
 
   // Account for density of polystyrene
-  range /= FitPar::SciBarDensity;
+  range /= MINERvAPar::MINERvADensity;
 
   // Range estimate is in cm
   return range;
 }
 
+double MINERvAUtils::GetEDepositOutsideRangeInScintillator(FitParticle* particle, double rangelimit){
+
+  // The particle energy
+  double E  = particle->fP.E();
+  double M  = particle->fP.M();
+  double Ek = E - M;
+
+  int nsteps = MINERvAPar::NumRangeSteps;
+  double step_size = Ek/float(nsteps+1);
+  double range = 0;
+  double Ekinside = 0.0;
+  double Ekstart = Ek;
+
+  // Add an offset to make the integral a touch more accurate
+  Ek -= step_size/2.;
+  for (int i = 0; i < nsteps; ++i){
+    
+    double dEdx = MINERvAUtils::BetheBlochCH(Ek+M, M);
+    
+    Ek -= step_size;
+    // dEdx is -ve
+    range -= step_size/dEdx;
+    if (range / MINERvAPar::MINERvADensity < rangelimit){
+      Ekinside = Ek;
+    }
+  }
+
+  // Range estimate is in cm
+  return Ekstart - Ekinside;
+} 
+
+double MINERvAUtils::GetEDepositInsideRangeInScintillator(FitParticle* particle, double rangelimit){
+  // The particle energy
+  double E  = particle->fP.E();
+  double M  = particle->fP.M();
+  double Ek = E - M;
+
+  return Ek - GetEDepositOutsideRangeInScintillator(particle, rangelimit);
+}
+
+
 
 // Function to calculate the distance the particle travels in scintillator
 bool MINERvAUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
 
-  double dist  = MINERvAUtils::RangeInScintillator(particle, FitPar::NumRangeSteps);
+  double dist  = MINERvAUtils::RangeInScintillator(particle, MINERvAPar::NumRangeSteps);
   double zdist = dist*cos(FitUtils::th(beam, particle));
 
-  if (abs(zdist) < FitPar::SciBarRecoDist) return false;
+  if (abs(zdist) < MINERvAPar::MINERvARecoDist) return false;
   return true;
 }
 

@@ -20,6 +20,7 @@
 #define MINERVA_1DQ2_nu_H_SEEN
 
 #include "Measurement1D.h"
+#include "MINERvAUtils.h"
 
 ///\brief MINERvA CCQE+2p2h Analysis : Q2 Distribution
 ///
@@ -56,6 +57,10 @@ public:
 
   bool isFluxFix; /// Flag for using updated flux
   bool fullphasespace; /// Flag for restricting phase space
+
+  TH2D* fExtra_EavQ2;
+  TrueModeStack* fExtra_EavQ2_MODES;
+
 
 };
 

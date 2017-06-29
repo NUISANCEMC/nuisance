@@ -410,6 +410,12 @@ public:
   /// Call ResetFakeData or ResetData to return to values before the throw.
   virtual void ThrowCovariance(void);
 
+  /// \brief Throw the data by its assigned errors and assign this to MC          
+  ///           
+  /// Used when creating data toys by assign the MC to this thrown data           
+  /// so that the likelihood is calculated between data and thrown data           
+  virtual void ThrowDataToy(void);
+
 
   /*
     Access Functions
@@ -523,7 +529,7 @@ public:
 
   /// OLD FUNCTION
   virtual void SetupMeasurement(std::string input, std::string type,
-                                FitWeight* rw, std::string fkdt);
+          FitWeight* rw, std::string fkdt);
 
   /// OLD FUNCTION
   virtual void SetupDefaultHist(void);
@@ -535,20 +541,20 @@ public:
   virtual void SetDataFromFile(std::string inhistfile, std::string histname);
   /// OLD FUNCTION
   virtual void SetDataFromDatabase(std::string inhistfile,
-                                   std::string histname);
+             std::string histname);
 
   /// OLD FUNCTION
   virtual void SetCovarMatrix(std::string covarFile);
   /// OLD FUNCTION
   virtual void SetCovarMatrixFromText(std::string covarFile, int dim,
-                                      double scale = 1.0);
+                double scale = 1.0);
   /// OLD FUNCTION
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
 
 
   /// OLD FUNCTION
   virtual void SetCovarFromDataFile(std::string covarFile, std::string covName,
-                                    bool FullUnits = false);
+				    bool FullUnits = false);
 
 
   /// OLD FUNCTION

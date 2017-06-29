@@ -45,9 +45,9 @@
  *  @{
  */
 
-namespace FitPar {
-  extern double SciBarDensity;
-  extern double SciBarRecoDist;
+namespace MINERvAPar {
+  extern double MINERvADensity;
+  extern double MINERvARecoDist;
   extern double PenetratingMuonE;
   extern double NumRangeSteps;
 }
@@ -58,7 +58,8 @@ namespace MINERvAUtils {
   double PenetratedEfficiency(FitParticle *nu, FitParticle *muon);
   double BetheBlochCH(double beta, double mass);
   double RangeInScintillator(FitParticle* particle, int nsteps=50);
-
+  double GetEDepositOutsideRangeInScintillator(FitParticle* particle, double rangelimit);
+  double GetEDepositInsideRangeInScintillator(FitParticle* particle, double rangelimit);
   bool PassesDistanceCut(FitParticle* beam, FitParticle* particle);
 
   int GetMainTrack(FitEvent *event, TH2D *effHist, FitParticle*& mainTrk, double& weight, bool penetrated=false);

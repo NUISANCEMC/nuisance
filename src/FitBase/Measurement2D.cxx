@@ -557,6 +557,7 @@ void Measurement2D::FinaliseMeasurement() {
 
   // Make sure covariances are setup
   if (!fFullCovar) {
+    fIsDiag = true;
     SetCovarFromDiagonal(fDataHist);
   }
 
@@ -1123,6 +1124,15 @@ void Measurement2D::ThrowCovariance() {
   return;
 };
 
+//********************************************************************             
+void Measurement2D::ThrowDataToy(){
+  //********************************************************************             
+  if (!fDataTrue) fDataTrue = (TH2D*) fDataHist->Clone();
+  if (fMCHist) delete fMCHist;
+  fMCHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
+}
+
+
 /*
    Access Functions
 */
@@ -1196,7 +1206,7 @@ void Measurement2D::Write(std::string drawOpt) {
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
 
-  // Write Settigns                                                                                                                                                                                                                        
+  // Write Settigns                                              
   if (drawOpt.find("SETTINGS") != std::string::npos){
     fSettings.Set("#chi^{2}",fLikelihood);
     fSettings.Set("NDOF", this->GetNDOF() );
