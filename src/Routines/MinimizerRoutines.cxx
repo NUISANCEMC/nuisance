@@ -56,7 +56,8 @@ void MinimizerRoutines::Init() {
                       "Brute,Fumili,ConjugateFR,"
                       "ConjugatePR,BFGS,BFGS2,"
                       "SteepDesc,GSLSimAn,FixAtLim,FixAtLimBreak"
-                      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands");
+                      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands",
+		      "DataToys");
 };
 
 //*************************************
@@ -555,6 +556,7 @@ void MinimizerRoutines::Run() {
     else if (routine == "FixAtLim")  FixAtLimit();
     else if (routine == "FixAtLimBreak") fitstate = FixAtLimit();
     else if (routine.find("ErrorBands") != std::string::npos) GenerateErrorBands();
+    else if (routine.find("DataToys") != std::string::npos) ThrowDataToys();
     else if (!routine.compare("Chi2Scan1D")) Create1DScans();
     else if (!routine.compare("Chi2Scan2D")) Chi2Scan2D();
     else fitstate = RunFitRoutine(routine);
@@ -1474,3 +1476,35 @@ void MinimizerRoutines::GenerateErrorBands() {
 
   return;
 };
+
+
+void MinimizerRoutines::ThrowDataToys(){
+  LOG(FIT) << "Generating Toy Data Throws" << std::endl;
+  int verb = Config::Get().GetParI("VERBOSITY");
+  SETVERBOSITY(FIT);
+
+  int nthrows = FitPar::Config().GetParI("NToyThrows");
+  double maxlike = -1.0;
+  double minlike = -1.0;
+  std::vector<double> values;
+  for (int i = 0; i < 1.E4; i++){
+    fSampleFCN->ThrowDataToy();
+    double like = fSampleFCN->GetLikelihood();
+    values.push_back(like);
+    if (maxlike == -1.0 or like > maxlike) maxlike = like;
+    if (minlike == -1.0 or like < minlike) minlike = like;
+  }
+  SETVERBOSITY(verb);
+
+
+  // Fill Histogram
+  TH1D* likes =new TH1D("toydatalikelihood","toydatalikelihood",int(sqrt(nthrows)),minlike,maxlike);
+  for (size_t i = 0; i < values.size(); i++){
+    likes->Fill(values[i]);
+  }
+
+  // Save to file
+  LOG(FIT) << "Writing toy data throws" << std::endl;
+  fOutputRootFile->cd();
+  likes->Write();
+}

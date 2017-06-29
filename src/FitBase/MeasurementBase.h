@@ -136,6 +136,7 @@ public:
   virtual double GetLikelihood(void) { return 0.0; };
   virtual int GetNDOF(void) { return 0; };
   virtual void ThrowCovariance(void) = 0;
+  virtual void ThrowDataToy(void) = 0;
   virtual void SetFakeDataValues(std::string fkdt) = 0;
 
   //! Get the total integrated flux between this samples energy range

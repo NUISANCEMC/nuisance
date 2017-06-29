@@ -395,6 +395,12 @@ public:
   virtual void ThrowCovariance(void);
 
 
+  /// \brief Throw the data by its assigned errors and assign this to MC
+  ///
+  /// Used when creating data toys by assign the MC to this thrown data
+  /// so that the likelihood is calculated between data and thrown data
+  virtual void ThrowDataToy(void);
+
   /*
     Access Functions
   */

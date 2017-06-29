@@ -188,5 +188,7 @@
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
 <config  GENIEInputHandler.SavePrimary="0" />
 
+<config NToyThrows='100000' />
+
 </nuisance>
 

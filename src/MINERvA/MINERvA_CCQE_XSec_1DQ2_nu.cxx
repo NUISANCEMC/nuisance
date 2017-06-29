@@ -112,6 +112,12 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
     SetCovarFromTextFile( fSettings.GetCovarInput() );
   }
 
+
+  fExtra_EavQ2 = new TH2D("EavQ2","EavQ2",20,0.0,2.0,20,0.0,2.0);
+  fExtra_EavQ2_MODES = new TrueModeStack("EavQ2MODES","EavQ2MODES", fExtra_EavQ2);
+  SetAutoProcessTH1(fExtra_EavQ2);
+  SetAutoProcessTH1(fExtra_EavQ2_MODES);
+
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -134,6 +140,24 @@ void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 
   // Set binning variable
   fXVar = q2qe;
+
+  // List of extra plots to make... Energy deposited as a function of particle PDG.
+  if (Signal){
+
+    double Eav = 0.0;
+    for (int i = 0; i < event->NParticles(); i++){
+      if (event->GetParticleState(i) != kFinalState) continue;
+      int pid = event->GetParticlePDG(i);
+      if (pid != 2112 and pid != 22){
+	Eav += MINERvAUtils::GetEDepositOutsideRangeInScintillator(event->GetParticle(i), 30.0) / 1.E3;
+      } else if (pid == 22){
+	Eav += event->GetParticle(i)->fP.E()/1.E3;
+      }
+    }
+
+    fExtra_EavQ2->Fill(q2qe,Eav);
+    fExtra_EavQ2_MODES->Fill( event->Mode, q2qe, Eav );
+  }
 
   return;
 }

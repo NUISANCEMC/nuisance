@@ -1032,3 +1032,18 @@ void JointFCN::SetFakeData(std::string fakeinput) {
 
   return;
 }
+
+
+//***************************************************                                                                                                                                                                                      
+void JointFCN::ThrowDataToy() {
+//***************************************************                                                                                                                                                                                     
+
+  for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
+       iter++) {
+    MeasurementBase* exp = *iter;
+    exp->ThrowDataToy();
+  }
+
+  return;
+}
+
