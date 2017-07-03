@@ -94,5 +94,16 @@ class FitParticle {
   int fStatus;         ///< State corresponding to particle_state enum
 
 };
+
+inline std::ostream& operator<<(std::ostream& os, FitParticle const& p){
+
+  return os << " Particle[pdgc:" << p.fPID
+	    << ", stat:"<<p.fStatus
+	    << ", 4mom:("<< p.fP.X() << "," << p.fP.Y() << "," << p.fP.Z() << "," << p.fP.T() << ")]";
+  
+}
+
+
+
 /*! @} */
 #endif
