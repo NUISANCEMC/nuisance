@@ -21,6 +21,7 @@
 #define MINERVA_CCQE_XSec_1DQ2_antinu_H_SEEN
 
 #include "Measurement1D.h"
+#include "MINERvAUtils.h"
 //********************************************************************
 class MINERvA_CCQE_XSec_1DQ2_antinu : public Measurement1D {
 //********************************************************************
@@ -36,6 +37,13 @@ public:
  private:
 
   bool isFluxFix, fullphasespace;
+
+  TH1D* fExtra_Eav;
+  MINERvAUtils::ModeStack* fExtra_Eav_MODES;
+  TH2D* fExtra_EavQ2;
+  MINERvAUtils::ModeStack* fExtra_EavQ2_MODES;
+  TF1* fEavQ2Cut;
+
 
 };
 

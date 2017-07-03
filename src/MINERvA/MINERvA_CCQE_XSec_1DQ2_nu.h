@@ -58,9 +58,11 @@ public:
   bool isFluxFix; /// Flag for using updated flux
   bool fullphasespace; /// Flag for restricting phase space
 
+  TH1D* fExtra_Eav;
+  MINERvAUtils::ModeStack* fExtra_Eav_MODES;
   TH2D* fExtra_EavQ2;
-  TrueModeStack* fExtra_EavQ2_MODES;
-
+  MINERvAUtils::ModeStack* fExtra_EavQ2_MODES;
+  TF1* fEavQ2Cut;
 
 };
 
