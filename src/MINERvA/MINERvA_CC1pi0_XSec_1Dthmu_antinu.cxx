@@ -29,8 +29,8 @@ MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(nuiskey sam
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC1pi0_XSec_1Dthmu_antinu sample. \n" \
                         "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Flux: MINERvA Forward Horn Current numubar \n" \
+                        "Signal: Any event with 1 muon, 1 pion, no other tracks \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -86,5 +86,5 @@ void MINERvA_CC1pi0_XSec_1Dthmu_antinu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool MINERvA_CC1pi0_XSec_1Dthmu_antinu::isSignal(FitEvent *event) {
 //********************************************************************
-  return SignalDef::isCC1pi(event, -14, 111, EnuMin, EnuMax);
+  return SignalDef::isCC1pi0_MINERvA_2016(event, EnuMin, EnuMax);
 }
