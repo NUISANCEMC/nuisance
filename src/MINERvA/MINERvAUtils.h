@@ -68,5 +68,24 @@ namespace MINERvAUtils {
   double CalcThetaPr(FitEvent *event, FitParticle *main, FitParticle *second, bool penetrated=false);
   double CalcThetaPi(FitEvent *event, FitParticle *second);
 
+  /// Break down the plots as in the MINERvA CCQE Papers
+  class ModeStack : public StackBase {
+  public:
+
+    /// Main constructor listing true mode categories.  
+    ModeStack(std::string name, std::string title, TH1* hist);
+
+    /// List to convert Modes to Index.      
+    /// Should be kept in sync with constructor.        
+    int ConvertModeToIndex(int mode);
+    /// Fill from given mode integer         
+    void Fill(int mode, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+    /// Extracts Mode from FitEvent and fills
+    void Fill(FitEvent* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+    /// Extracts Mode from BaseFitEvt        
+    void Fill(BaseFitEvt* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+  };
+
 }
 #endif
