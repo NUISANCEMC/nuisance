@@ -209,13 +209,13 @@ void FitEvent::OrderStack() {
 
 void FitEvent::Print() {
 
-  if (LOG_LEVEL(EVT)) {
-    LOG(EVT) << "EVTEvent print" << std::endl;
-    LOG(EVT) << "Mode: " << fMode << std::endl;
-    LOG(EVT) << "Particles: " << fNParticles << std::endl;
-    LOG(EVT) << " -> Particle Stack " << std::endl;
+  if (LOG_LEVEL(FIT)) {
+    LOG(FIT) << "FITEvent print" << std::endl;
+    LOG(FIT) << "Mode: " << fMode << std::endl;
+    LOG(FIT) << "Particles: " << fNParticles << std::endl;
+    LOG(FIT) << " -> Particle Stack " << std::endl;
     for (int i = 0; i < fNParticles; i++) {
-      LOG(EVT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
+      LOG(FIT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
                << fParticleState[i] << " "
                << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
                << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
@@ -332,10 +332,20 @@ FitParticle* FitEvent::GetParticle (int const i) {
   }
 
   if (!fParticleList[i]) {
+    /*
+    std::cout << "Creating particle with values i " << i << " ";
+    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "; 
+    std::cout << fParticlePDG[i] << " " << fParticleState[i] << std::endl;
+    */
     fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1],
                                        fParticleMom[i][2], fParticleMom[i][3],
                                        fParticlePDG[i], fParticleState[i]);
   } else {
+    /*
+    std::cout << "Filling particle with values i " << i << " ";
+    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
+    std::cout << fParticlePDG[i] << " "<< fParticleState[i] <<std::endl;
+    */
     fParticleList[i]->SetValues(fParticleMom[i][0], fParticleMom[i][1],
                                 fParticleMom[i][2], fParticleMom[i][3],
                                 fParticlePDG[i], fParticleState[i]);
@@ -398,6 +408,7 @@ int FitEvent::GetHMParticleIndex (int const pdg, int const state) const {
       }
     }
   }
+
   return maxind;
 }
 
