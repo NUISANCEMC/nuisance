@@ -54,8 +54,9 @@ double MINERvAUtils::BetheBlochCH(double E, double mass){
   double gamma = 1./sqrt(1-beta2);
   double mass_ratio = PhysConst::mass_electron*1000./mass;
   // Argh, have to remember to convert to MeV or you'll hate yourself!
-  double I2 = 68.7e-6*68.7e-6;
+  double I2 = 68.7e-6*68.7e-6; // mean excitation potential I
 
+  
   double w_max = 2*PhysConst::mass_electron*1000.*beta2*gamma*gamma;
   w_max /= 1 + 2*gamma*mass_ratio + mass_ratio*mass_ratio;
 
@@ -96,7 +97,7 @@ double MINERvAUtils::RangeInScintillator(FitParticle* particle, int nsteps){
   range /= MINERvAPar::MINERvADensity;
 
   // Range estimate is in cm
-  return range;
+  return fabs(range);
 }
 
 double MINERvAUtils::GetEDepositOutsideRangeInScintillator(FitParticle* particle, double rangelimit){
@@ -121,7 +122,7 @@ double MINERvAUtils::GetEDepositOutsideRangeInScintillator(FitParticle* particle
     Ek -= step_size;
     // dEdx is -ve
     range -= step_size/dEdx;
-    if (range / MINERvAPar::MINERvADensity < rangelimit){
+    if (fabs(range) / MINERvAPar::MINERvADensity < rangelimit){
       Ekinside = Ek;
     }
   }
@@ -271,3 +272,41 @@ double MINERvAUtils::CalcThetaPi(FitEvent *event, FitParticle *second){
   return thetapi;
 }
 
+/// Functions to deal with the SB mode stacks
+MINERvAUtils::ModeStack::ModeStack(std::string name, std::string title, TH1* hist) {
+  fName = name;
+  fTitle = title;
+
+  AddMode(0, "Other",   "Other", kGreen+2, 2, 3244);
+  AddMode(1, "CCDIS",   "#nu_{#mu} CC DIS", kRed,     2, 3304);
+  AddMode(2, "CCRES",   "#nu_{#mu} CC Resonant",  kGray+2,  2, 1001);
+  AddMode(3, "CCQE",    "#nu_{#mu} CC QE",  kMagenta, 2, 1001);
+  AddMode(4, "CC2P2H",  "#nu_{#mu} CC 2p2h", kAzure+1, 2, 1001);
+
+  StackBase::SetupStack(hist);
+};
+
+int MINERvAUtils::ModeStack::ConvertModeToIndex(int mode){
+  switch (abs(mode)){
+  case 1: return 3;
+  case 2: return 4;
+  case 11:
+  case 12:
+  case 13: return 2;
+  case 26: return 1;
+  default: return 0;
+  }
+};
+
+
+void MINERvAUtils::ModeStack::Fill(int mode, double x, double y, double z, double weight) {
+  StackBase::FillStack(MINERvAUtils::ModeStack::ConvertModeToIndex(mode), x, y, z, weight);
+};
+
+void MINERvAUtils::ModeStack::Fill(FitEvent* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(MINERvAUtils::ModeStack::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
+
+void MINERvAUtils::ModeStack::Fill(BaseFitEvt* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(MINERvAUtils::ModeStack::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
