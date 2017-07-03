@@ -184,6 +184,12 @@
 <config PenetratingMuonEnergy='1.4'/>
 <config NumRangeSteps='50'/>
 
+<config MINERvADensity='1.04'/>
+<config MINERvARecoDist='10.0'/>
+<config PenetratingMuonEnergy='1.4'/>
+<config NumRangeSteps='50'/>
+
+
 
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
 <config  GENIEInputHandler.SavePrimary="0" />
