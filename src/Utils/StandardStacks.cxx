@@ -3,31 +3,68 @@
 
 /// Fake stack functions
 FakeStack::FakeStack(TH1* hist) {
-	fTemplate =  (TH1*)hist;
-	fNDim = fTemplate->GetDimension();
+  fTemplate =  (TH1*)hist;
+  fNDim = fTemplate->GetDimension();
+  fFakeType = "TH1";
+  fTGraphObject = NULL;
+  fTF1Object = NULL;
+}
+
+
+FakeStack::FakeStack(TF1* f){
+  fTemplate = NULL;
+  fNDim = 1;
+  fTF1Object = f;
+  fFakeType = "TF1";
+  fTGraphObject = NULL;
+}
+
+FakeStack::FakeStack(TGraph* gr){
+  fTemplate = NULL;
+  fNDim = 1;
+  fTGraphObject = gr;
+  fFakeType = "TGRAPH";
+  fTF1Object = NULL;
 }
 
 FakeStack::~FakeStack() {
-	fTemplate = NULL;
-	fNDim = 0;
+  fTemplate = NULL;
+  fNDim = 0;
+  fFakeType = "NULL";
+  fTF1Object = NULL;
+  fTGraphObject = NULL;
 }
 
 void FakeStack::Fill(double x, double y, double z, double weight) {
+  if (fTemplate){
 	if (fNDim == 1)      fTemplate->Fill(x, y);
 	else if (fNDim == 2) ((TH2*)fTemplate)->Fill(x, y, z);
 	else if (fNDim == 3) ((TH3*)fTemplate)->Fill(x, y, z, weight);
+  }
+  if (fTGraphObject){
+    fTGraphObject->SetPoint( fTGraphObject->GetN(), x, y);
+  }
 }
 
 void FakeStack::Scale(double norm, std::string opt) {
-	fTemplate->Scale(norm, opt.c_str());
+  if (fTemplate){ fTemplate->Scale(norm, opt.c_str()); } 
+  if (fTGraphObject){
+    for (int i = 0; i < fTGraphObject->GetN(); i++){
+      const double* x = fTGraphObject->GetX();
+      const double* y = fTGraphObject->GetY();
+      fTGraphObject->SetPoint(i, x[i], y[i] * norm);
+    }
+  }
 }
 
 void FakeStack::Reset() {
-	fTemplate->Reset();
+  if (fTemplate){ fTemplate->Reset(); }
 }
 
 void FakeStack::Write() {
-	fTemplate->Write();
+  if (fTemplate){ fTemplate->Write(); }
+  if (fTF1Object){ fTF1Object->Write(); }
+  if (fTGraphObject){ fTGraphObject->Write(); }
 }
 
 
