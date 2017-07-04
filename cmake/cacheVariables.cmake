@@ -103,7 +103,10 @@ CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevge
 
 
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultEnv(T2KREWEIGHT_ROOT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
+
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
 
 
 CheckAndSetDefaultCache(USE_GiBUU TRUE BOOL "Whether to enable GiBUU event support. <TRUE>")
@@ -159,6 +162,7 @@ LIST(APPEND VARS
   NEUT_CERN_LEVEL
   USE_NuWro
   NUWRO_ROOT
+  NUWRO_INCLUDES
   NUWRO_INPUT_FILE
   NUWRO_BUILT_FROM_FILE
   USE_GENIE
@@ -169,6 +173,7 @@ LIST(APPEND VARS
   GENIE_LIBXML2_INC
   GENIE_LOG4CPP_LIB
   GENIE_LOG4CPP_INC
+  BUILD_GEVGEN
   USE_T2K
   USE_NIWG
   USE_GiBUU
