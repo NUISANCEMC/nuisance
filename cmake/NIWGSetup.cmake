@@ -17,20 +17,13 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(NOT NIWG)
-  if(NOT DEFINED ENV{NIWG} OR $ENV{NIWG} STREQUAL "")
-
-      cmessage(FATAL_ERROR "Environment variable NIWG is not defined. "
-      "This must be set to point to a prebuilt NIWGReWeight instance.")
-
-  endif()
-  set(NIWG $ENV{NIWG})
+if(NIWG_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable NIWG_ROOT is not defined. Either configure with -DNIWG_ROOT or \"\$ export NIWG=/path/to/NIWGReWeight\". This must be set to point to a prebuilt NIWGReWeight instance.")
 endif()
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__NIWG_ENABLED__)
 
-LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NIWG})
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NIWG_ROOT})
 
-LIST(APPEND RWENGINE_LINKER_FLAGS
-  -L${NIWG}
-    -lNIWGReWeight)
+LIST(APPEND EXTRA_LINK_DIRS ${NIWG_ROOT})
+LIST(APPEND EXTRA_LIBS NIWGReWeight)

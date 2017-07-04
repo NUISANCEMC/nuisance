@@ -17,17 +17,13 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(NOT DEFINED ENV{T2KREWEIGHT} OR $ENV{T2KREWEIGHT} STREQUAL "")
-
-    cmessage(FATAL_ERROR "Environment variable T2KREWEIGHT is not defined. "
-    "This must be set to point to a prebuilt T2KReWeight instance.")
-
+if(T2KREWEIGHT_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable T2KREWEIGHT_ROOT is not defined. Either configure with -DT2KREWEIGHT_ROOT or \"\$ export T2KREWEIGHT=/path/to/T2KReWeight\". This must be set to point to a prebuilt T2KReWeight instance.")
 endif()
-
-set(T2KREWEIGHT $ENV{T2KREWEIGHT})
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__T2KREW_ENABLED__ )
 
-set(RWENGINE_INCLUDE_DIRECTORIES ${RWENGINE_INCLUDE_DIRECTORIES} ${T2KREWEIGHT}/src/)
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KREWEIGHT}/src/)
 
-set(RWENGINE_LINKER_FLAGS "${RWENGINE_LINKER_FLAGS} -L${T2KREWEIGHT}/lib -lT2KReWeight")
+LIST(APPEND EXTRA_LINK_DIRS ${T2KREWEIGHT}/lib)
+LIST(APPEND EXTRA_LIBS T2KReWeight)
