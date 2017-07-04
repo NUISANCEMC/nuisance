@@ -422,6 +422,12 @@ public:
   /// Call ResetFakeData or ResetData to return to values before the throw.
   virtual void ThrowCovariance(void);
 
+  /// \brief Throw the data by its assigned errors and assign this to MC    
+  ///           
+  /// Used when creating data toys by assign the MC to this thrown data     
+  /// so that the likelihood is calculated between data and thrown data     
+  virtual void ThrowDataToy(void);
+
 
 
 
@@ -530,14 +536,14 @@ public:
   //! Intial setup of common measurement variables. Parse input files, types,
   //! etc.
   virtual void SetupMeasurement(std::string input, std::string type,
-                                FitWeight* rw, std::string fkdt);
+            FitWeight* rw, std::string fkdt);
 
   //! Setup the default mc Hist given a data histogram
   virtual void SetupDefaultHist();
 
   //! Set the data values and errors from two files
   virtual void SetDataValues(std::string dataFile, double dataNorm,
-                             std::string errorFile, double errorNorm);
+			     std::string errorFile, double errorNorm);
   virtual void SetDataValues(std::string dataFile, std::string TH2Dname);
 
   //! Set the data values only from a text file

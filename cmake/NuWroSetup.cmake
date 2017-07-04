@@ -51,36 +51,34 @@ if(INPUT_NuWro_FILE)
 
 else()
 
-  if(NOT NUWRO)
-    if(NOT DEFINED ENV{NUWRO})
-
-      cmessage(FATAL_ERROR "Environment variable NUWRO is not defined. "
-        "This must be set to point to a prebuilt NuWro instance.")
-
-    endif()
-    set(NUWRO $ENV{NUWRO})
+  if(NUWRO_ROOT STREQUAL "")
+    cmessage(FATAL_ERROR "Variable NUWRO_ROOT is not defined. "
+      "This must be set to point to a prebuilt NuWro instance.")
+  endif()
+  if(NUWRO_INCLUDES STREQUAL "")
+    cmessage(FATAL_ERROR "Variable NUWRO_INCLUDES is not defined. "
+      "This must be set to point to an installed NuWro instance.")
   endif()
 
   # If you are using a version of NuWro without reweighting use this to compile.
-  if(NO_NuWro_RW)
-
-    LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
-
-    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO}/src)
-
-    LIST(APPEND RWENGINE_LINKER_FLAGS ${NUWRO}/bin/event1.so)
-
-  else()
+  if(USE_NuWro_RW)
 
     LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__)
 
-    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES  ${NUWRO}/src ${NUWRO}/src/reweight ${NUWRO}/build/src)
+    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+      ${NUWRO_ROOT}/src
+      ${NUWRO_ROOT}/src/reweight
+      ${NUWRO_INCLUDES}/nuwro)
 
-    LIST(APPEND RWENGINE_LINKER_FLAGS
-      -L${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib
-        -lreweight
-        -levent)
+    LIST(APPEND EXTRA_LINK_DIRS ${NUWRO_ROOT}/build/${CMAKE_SYSTEM_NAME}/lib)
+    LIST(APPEND EXTRA_LIBS reweight event)
 
+  else ()
+    LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
+
+    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO_ROOT}/src)
+
+    LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO_ROOT}/bin/event1.so)
   endif()
 
   set(NEED_PYTHIA6 TRUE)

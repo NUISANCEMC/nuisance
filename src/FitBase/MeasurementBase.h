@@ -136,6 +136,7 @@ public:
   virtual double GetLikelihood(void) { return 0.0; };
   virtual int GetNDOF(void) { return 0; };
   virtual void ThrowCovariance(void) = 0;
+  virtual void ThrowDataToy(void) = 0;
   virtual void SetFakeDataValues(std::string fkdt) = 0;
 
   //! Get the total integrated flux between this samples energy range
@@ -263,6 +264,18 @@ public:
   void SetAutoProcessTH1(TH1* hist,  int c1 = -1,
                          int c2 = -1, int c3 = -1,
                          int c4 = -1, int c5 = -1);
+  void SetAutoProcess(TH1* hist,  int c1 = -1,
+		      int c2 = -1, int c3 = -1,
+		      int c4 = -1, int c5 = -1);
+  void SetAutoProcess(TGraph* g,  int c1 = -1,
+                      int c2 = -1, int c3 = -1,
+                      int c4 = -1, int c5 = -1);
+  void SetAutoProcess(TF1* f,  int c1 = -1,
+                      int c2 = -1, int c3 = -1,
+                      int c4 = -1, int c5 = -1);
+  void SetAutoProcess(StackBase* hist, int c1 = -1,
+		      int c2 = -1, int c3 = -1,
+		      int c4 = -1, int c5 = -1);
   void SetAutoProcessTH1(StackBase* hist, int c1 = -1,
                          int c2 = -1, int c3 = -1,
                          int c4 = -1, int c5 = -1);

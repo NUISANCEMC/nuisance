@@ -32,7 +32,7 @@ if [[ ! "${ROOTSYS}" ]]; then
 fi
 
 
-if [[ "@USE_NEUT@" != "0" ]]; then
+if [[ "@USE_NEUT@" != "FALSE" ]]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
   export NEUT_ROOT=@NEUT_ROOT@
   export CERN=@CERN@
@@ -45,7 +45,7 @@ if [[ "@USE_NEUT@" != "0" ]]; then
   fi
 fi
 
-if [[ "@USE_NuWro@" != "0" ]]; then
+if [[ "@USE_NuWro@" != "FALSE" ]]; then
   echo "[INFO]: Adding NuWro library paths to the environment."
   export NUWRO="@NUWRO@"
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
@@ -53,7 +53,7 @@ if [[ "@USE_NuWro@" != "0" ]]; then
   fi
 fi
 
-if [[ "@NEED_PYTHIA6@" != "0" ]]; then
+if [[ "@NEED_PYTHIA6@" != "FALSE" ]]; then
   echo "[INFO]: Adding PYTHIA6 library paths to the environment."
   export PYTHIA6="@PYTHIA6@"
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@PYTHIA6@:"* ]]; then
@@ -61,7 +61,7 @@ if [[ "@NEED_PYTHIA6@" != "0" ]]; then
   fi
 fi
 
-if [[ "@USE_GENIE@" != "0" ]]; then
+if [[ "@USE_GENIE@" != "FALSE" ]]; then
   echo "[INFO]: Adding GENIE paths to the environment."
 
   export GENIE="@GENIE@"
@@ -94,7 +94,7 @@ if [[ "@USE_GENIE@" != "0" ]]; then
   fi
 fi
 
-if [[ "@USE_NIWG@" != "0" ]]; then
+if [[ "@USE_NIWG@" != "FALSE" ]]; then
   echo "[INFO]: Adding NIWG paths to the environment."
   export NIWG=@NIWG@
   export NIWGREWEIGHT_INPUTS=@NIWG@/inputs
@@ -104,7 +104,7 @@ if [[ "@USE_NIWG@" != "0" ]]; then
 
 fi
 
-if [[ "@USE_T2K@" != "0" ]]; then
+if [[ "@USE_T2K@" != "FALSE" ]]; then
   echo "[INFO]: Adding T2K paths to the environment."
   export T2KREWEIGHT=@T2KREWEIGHT@
   if ! [[ ":$LD_LIBRARY_PATH:" == *":@T2KREWEIGHT@/lib:"* ]]; then
@@ -112,9 +112,9 @@ if [[ "@USE_T2K@" != "0" ]]; then
   fi
 fi
 
-if [[ "@BUILD_GiBUU@" != "0" ]]; then
+if [[ "@BUILD_GiBUU@" != "FALSE" ]]; then
   echo "[INFO]: Sourcing GiBUU tools."
   source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
 fi
 
-export EXT_FIT="@CMAKE_SOURCE_DIR@"
+export NUISANCE="@CMAKE_SOURCE_DIR@"

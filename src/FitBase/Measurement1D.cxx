@@ -477,6 +477,7 @@ void Measurement1D::FinaliseMeasurement() {
 
   // Make sure covariances are setup
   if (!fFullCovar) {
+    fIsDiag = true;
     SetCovarFromDiagonal(fDataHist);
   }
 
@@ -904,7 +905,6 @@ double Measurement1D::GetLikelihood() {
     } else if (fIsDiag) {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);
     } else if (!fIsDiag and !fIsRawEvents) {
-      std::cout << "Getting likelihood from covariance " << std::endl;
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
     }
 
@@ -1032,12 +1032,22 @@ void Measurement1D::ThrowCovariance() {
 
   // Take a fDecomposition and use it to throw the current dataset.
   // Requires fDataTrue also be set incase used repeatedly.
-
+  
+  if (!fDataTrue) fDataTrue = (TH1D*) fDataHist->Clone();
   if (fDataHist) delete fDataHist;
   fDataHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
 
   return;
 };
+
+
+//********************************************************************
+void Measurement1D::ThrowDataToy(){
+//******************************************************************** 
+  if (!fDataTrue) fDataTrue = (TH1D*) fDataHist->Clone();
+  if (fMCHist) delete fMCHist;
+  fMCHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
+}
 
 /*
    Access Functions

@@ -21,22 +21,19 @@
 if(USE_NEUT)
   include(${CMAKE_SOURCE_DIR}/cmake/NEUTSetup.cmake)
   cmessage(STATUS "Using NEUT Reweight engine.")
+  set(USE_NEUT TRUE CACHE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>" FORCE)
 endif()
 #################################  NuWro  ######################################
 if(USE_NuWro)
   include(${CMAKE_SOURCE_DIR}/cmake/NuWroSetup.cmake)
   cmessage(STATUS "Using NuWro Reweight engine.")
+  set(USE_NuWro TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
 endif()
 ##################################  GENIE  #####################################
 if(USE_GENIE)
   include(${CMAKE_SOURCE_DIR}/cmake/GENIESetup.cmake)
   cmessage(STATUS "Using GENIE Reweight engine.")
-endif()
-
-if(DEFINED BUILD_GEVGEN AND BUILD_GEVGEN)
-	   cmessage(STATUS "Building custom gevgen.")
-else()
-set(BUILD_GEVGEN 0)
+  set(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)
 endif()
 
 ##################################  NIWG  ######################################

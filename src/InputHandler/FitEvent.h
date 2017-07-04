@@ -187,16 +187,18 @@ public:
   template <size_t N>
   inline int GetHMParticleIndex (int const (&pdgs)[N], int const state = -1) const {
 
-    double mom = 0.0;
+    double mom = -999.9;
     int rtnindex = -1;
 
     for (size_t i = 0; i < N; ++i) {
       // Use ParticleMom as doesn't require Particle Mem alloc
       int pindex = GetHMParticleIndex(pdgs[i], state);
-      double momnew = GetParticleMom2(pindex);
-      if (momnew > 0.0 && (momnew > mom)) {
-        rtnindex = pindex;
-        mom = momnew;
+      if (pindex != -1){
+	double momnew = GetParticleMom2(pindex);
+	if (momnew > mom) {
+	  rtnindex = pindex;
+	  mom = momnew;
+	}
       }
     }
     return rtnindex;

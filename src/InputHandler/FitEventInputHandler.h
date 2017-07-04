@@ -32,6 +32,12 @@ public:
 	void Print();
 
 	TChain* fFitEventTree; ///< TTree from FitEvent file.
+
+	int fReadNParticles;
+	double fReadParticleMom[400][4];
+	UInt_t fReadParticleState[400];
+	int fReadParticlePDG[400];
+
 };
 /*! @} */
 #endif

@@ -579,6 +579,7 @@ void JointMeas1D::FinaliseMeasurement() {
 
   // Make sure covariances are setup
   if (!fFullCovar) {
+    fIsDiag = true;
     SetCovarFromDiagonal(fDataHist);
   }
 
@@ -1133,6 +1134,15 @@ void JointMeas1D::ThrowCovariance() {
   return;
 };
 
+//********************************************************************
+void JointMeas1D::ThrowDataToy(){
+//********************************************************************
+  if (!fDataTrue) fDataTrue = (TH1D*) fDataHist->Clone();
+  if (fMCHist) delete fMCHist;
+  fMCHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
+}
+
+
 /*
    Access Functions
 */
@@ -1445,7 +1455,7 @@ void JointMeas1D::WriteShapeRatioPlot() {
 */
 //********************************************************************
 void JointMeas1D::SetupMeasurement(std::string input, std::string type,
-                                   FitWeight* rw, std::string fkdt) {
+              FitWeight* rw, std::string fkdt) {
   //********************************************************************
 
   // For joint samples, input files are given as a semi-colon seperated list.
@@ -1505,7 +1515,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
 */
 //********************************************************************
 double JointMeas1D::TotalIntegratedFlux(std::string intOpt, double low,
-                                        double high) {
+                   double high) {
 //********************************************************************
 
   double totalflux = 0.0;

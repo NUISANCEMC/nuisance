@@ -116,7 +116,10 @@ class JointFCN
 
   //! Reconfigure Fast looping over duplicate inputs
   void ReconfigureFastUsingManager();
-  
+
+
+  /// Throws data according to current stats
+  void ThrowDataToy();
 
 std::vector<MeasurementBase*> GetSubSampleList(); 
 std::vector<InputHandlerBase*> GetInputList();

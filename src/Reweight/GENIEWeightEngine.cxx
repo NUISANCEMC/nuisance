@@ -78,7 +78,12 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	// Default to include shape and normalization changes for CCRES (can be changed downstream if desired)
 	GReWeightNuXSecCCRES * rwccres =
 	    dynamic_cast<GReWeightNuXSecCCRES *> (fGenieRW->WghtCalc("xsec_ccres"));
-	rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
+	std::string marestype = FitPar::Config().GetParS("GENIEWeightEngine_CCRESMode");
+	if (!marestype.compare("kModeNormAndMaMvShape")){ rwccres->SetMode(GReWeightNuXSecCCRES::kModeNormAndMaMvShape); }
+	else if (!marestype.compare("kModeMaMv")){ rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv); }
+	else {
+	  THROW("Unkown MARES Mode in GENIE Weight Engine : " << marestype );
+	}
 
 	// Default to include shape and normalization changes for NCRES (can be changed downstream if desired)
 	GReWeightNuXSecNCRES * rwncres =

@@ -307,9 +307,9 @@ double StatUtils::GetChi2FromEventRate(TH1D* data, TH1D* mc, TH1I* mask) {
     double dt = calc_data->GetBinContent(i + 1);
     double mc = calc_mc->GetBinContent(i + 1);
 
-    if (mc == 0) continue;
+    if (mc <= 0) continue;
 
-    if (dt == 0) {
+    if (dt <= 0) {
       // Only add difference
       chi2 += 2 * (mc - dt);
     } else {
@@ -581,10 +581,10 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
   for (int i = 0; i < hist->GetNbinsX(); i++) {
 
     // By Default the errors on the histogram are thrown uncorrelated to the other errors
-    if (throwdiag) {
-      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
-                                       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
-    }
+    //    if (throwdiag) {
+    //      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
+				       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
+      //    }
 
     // If a covariance is provided that is also thrown
     if (cov) {
@@ -592,10 +592,8 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
 
       for (int j = 0; j < hist->GetNbinsX(); j++) {
         correl_val += rand_val[j] * (*decomp_cov)(j, i) ;
-      }
-
-      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
-                                       correl_val) * 1E-38);
+      }      
+      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + correl_val * 1E-38));
     }
   }
 

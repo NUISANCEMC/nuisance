@@ -52,7 +52,18 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle, std::strin
     fNUISANCEEvent = new FitEvent();
     fNUISANCEEvent->HardReset();
     fNUISANCEEvent->SetBranchAddress(fFitEventTree);
+    
+    fFitEventTree->SetBranchAddress("NParticles", &fReadNParticles);
+    fFitEventTree->SetBranchAddress("ParticleState", &fReadParticleState);
+    fFitEventTree->SetBranchAddress("ParticlePDG",   &fReadParticlePDG);
+    fFitEventTree->SetBranchAddress("ParticleMom",   &fReadParticleMom);
 
+
+    fFitEventTree->Show(0);
+    fNUISANCEEvent = GetNuisanceEvent(0);
+    std::cout << "NParticles = " << fNUISANCEEvent->Npart() << std::endl;
+    std::cout << "Event Info " << fNUISANCEEvent->PartInfo(0)->fPID << std::endl;
+    
 }
 
 FitEventInputHandler::~FitEventInputHandler(){
@@ -60,15 +71,15 @@ FitEventInputHandler::~FitEventInputHandler(){
 }
 
 void FitEventInputHandler::CreateCache() {
-    fFitEventTree->SetCacheEntryRange(0, fNEvents);
-    fFitEventTree->AddBranchToCache("*", 1);
-    fFitEventTree->SetCacheSize(fCacheSize);
+  //    fFitEventTree->SetCacheEntryRange(0, fNEvents);
+    //    fFitEventTree->AddBranchToCache("*", 1);
+    //    fFitEventTree->SetCacheSize(fCacheSize);
 }
 
 void FitEventInputHandler::RemoveCache() {
-    fFitEventTree->SetCacheEntryRange(0, fNEvents);
-    fFitEventTree->AddBranchToCache("*", 0);
-    fFitEventTree->SetCacheSize(0);
+  //fFitEventTree->SetCacheEntryRange(0, fNEvents);
+  //    fFitEventTree->AddBranchToCache("*", 0);
+  //    fFitEventTree->SetCacheSize(0);
 }
 
 FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry, const bool lightweight) {
@@ -81,6 +92,25 @@ FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry, const bool 
 
     // Read NUISANCE Tree
     fFitEventTree->GetEntry(entry);
+
+    // Fill Stack
+    fNUISANCEEvent->fNParticles = 0;
+    for (size_t i = 0; i < fReadNParticles; i++){
+      size_t curpart = fNUISANCEEvent->fNParticles;
+      fNUISANCEEvent->fParticleState[curpart] = fReadParticleState[i];
+
+      // Mom
+      fNUISANCEEvent->fParticleMom[curpart][0] = fReadParticleMom[i][0];
+      fNUISANCEEvent->fParticleMom[curpart][1] = fReadParticleMom[i][1];
+      fNUISANCEEvent->fParticleMom[curpart][2] = fReadParticleMom[i][2];
+      fNUISANCEEvent->fParticleMom[curpart][3] = fReadParticleMom[i][3];
+
+      // PDG
+      fNUISANCEEvent->fParticlePDG[curpart] = fReadParticlePDG[i];
+
+      // Add to N particle count
+      fNUISANCEEvent->fNParticles++;
+    }
 
     // Setup Input scaling for joint inputs
     fNUISANCEEvent->InputWeight = GetInputWeight(entry);
