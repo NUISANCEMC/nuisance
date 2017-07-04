@@ -11,6 +11,12 @@ public:
 	/// Sets Template to exact pointer to hist without cloning.
 	FakeStack(TH1* hist) ;
 
+	/// Sets NULL template and saves TF1 object instead
+	FakeStack(TF1* f);
+
+	/// Sets NULL template and saves TGraph object instead
+	FakeStack(TGraph* gr);
+
 	/// Unlinks pointer to original histogram
 	~FakeStack();
 
@@ -25,6 +31,10 @@ public:
 
 	/// Writes the normal fTemplate histogram
 	void Write();
+
+	std::string fFakeType;
+	TGraph* fTGraphObject;
+	TF1* fTF1Object;
 };
 
 

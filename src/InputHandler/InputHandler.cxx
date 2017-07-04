@@ -37,8 +37,8 @@ InputHandlerBase::~InputHandlerBase() {
 
   if (fFluxHist) delete fFluxHist;
   if (fEventHist) delete fEventHist;
-  if (fXSecHist) delete fXSecHist;
-  if (fNUISANCEEvent) delete fNUISANCEEvent;
+  //  if (fXSecHist) delete fXSecHist;
+  //  if (fNUISANCEEvent) delete fNUISANCEEvent;
   jointfluxinputs.clear();
   jointeventinputs.clear();
   jointindexlow.clear();
@@ -46,9 +46,9 @@ InputHandlerBase::~InputHandlerBase() {
   jointindexallowed.clear();
   jointindexscale.clear();
 
-  if (fTTreePerformance) {
-    fTTreePerformance->SaveAs(("ttreeperfstats_" + fName + ".root").c_str());
-  }
+  //  if (fTTreePerformance) {
+  //    fTTreePerformance->SaveAs(("ttreeperfstats_" + fName + ".root").c_str());
+    //  }
 }
 
 void InputHandlerBase::Print() {

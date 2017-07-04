@@ -200,6 +200,9 @@ void SetupMinimizerFromXML();
   //! Get previous fit status from a file
   Int_t GetStatus();
 
+  /// Makes a histogram of likelihoods when throwing the data according to its statistics
+  void ThrowDataToys();
+
 protected:
 
   //! Our Custom ReWeight Object

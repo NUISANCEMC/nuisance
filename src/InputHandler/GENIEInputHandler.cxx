@@ -64,6 +64,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
   fGENIETree = new TChain("gtree");
   fSaveExtra = FitPar::Config().GetParB("SaveExtraGenie");
   fCacheSize = FitPar::Config().GetParI("CacheSize");
+  fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
   // Loop over all inputs and grab flux, eventhist, and nevents
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);

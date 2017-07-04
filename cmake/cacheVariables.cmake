@@ -85,6 +85,7 @@ CheckAndSetDefaultEnv(NEUT_CERN_LEVEL "" STRING "CERNLIB Library version. Overri
 
 CheckAndSetDefaultCache(USE_NuWro FALSE BOOL "Whether to enable NuWro support. <FALSE>")
 CheckAndSetDefaultEnv(NUWRO_ROOT "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
+CheckAndSetDefaultEnv(NUWRO_INCLUDES "" PATH "Path to installed NuWro headers (must include params_all.h). Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
 CheckAndSetDefaultCache(NUWRO_INPUT_FILE "" FILEPATH "Path to an input NuWro event vector, which can be used to build NuWro i/o libraries. <>")
 CheckAndSetDefaultCache(NUWRO_BUILT_FROM_FILE FALSE INTERNAL "Whether the NuWro libraries were built by NUISANCE. <FALSE>")
 
@@ -97,6 +98,8 @@ CheckAndSetDefaultEnv(GENIE_LIBXML2_LIB "" PATH "Path to pre-built LIBXML2 libra
 CheckAndSetDefaultEnv(GENIE_LIBXML2_INC "" PATH "Path to installed LIBXML2 headers. Overrides environment variable \$LIBXML2_INC. <>" LIBXML2_INC)
 CheckAndSetDefaultEnv(GENIE_LOG4CPP_LIB "" PATH "Path to pre-built LOG4CPP libraries. Overrides environment variable \$LOG4CPP_LIB. <>" LOG4CPP_LIB)
 CheckAndSetDefaultEnv(GENIE_LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Overrides environment variable \$LOG4CPP_INC. <>" LOG4CPP_INC)
+
+CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevgen app.")
 
 
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")

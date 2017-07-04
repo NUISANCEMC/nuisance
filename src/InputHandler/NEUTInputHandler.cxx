@@ -125,9 +125,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle, std::string const&
 };
 
 NEUTInputHandler::~NEUTInputHandler() {
-	if (fNEUTTree) delete fNEUTTree;
-	if (fNeutVect) delete fNeutVect;
-	if (fNeutInfo) delete fNeutInfo;
+  //	if (fNEUTTree) delete fNEUTTree;
+	//	if (fNeutVect) delete fNeutVect;
+	//	if (fNeutInfo) delete fNeutInfo;
 };
 
 void NEUTInputHandler::CreateCache() {

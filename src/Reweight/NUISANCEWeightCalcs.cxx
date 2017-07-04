@@ -1,5 +1,49 @@
 #include "NUISANCEWeightCalcs.h"
 
+ModeNormCalc::ModeNormCalc(){
+  fNormRES = 1.0;
+}
+
+double ModeNormCalc::CalcWeight(BaseFitEvt* evt) {
+  FitEvent* fevt = static_cast<FitEvent*>(evt);
+  int mode = abs(fevt->Mode);
+  double w = 1.0;
+  
+  if (mode == 11 or mode == 12 or mode == 13){
+    w *= fNormRES;
+  } 
+
+  return w;
+}
+
+void ModeNormCalc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void ModeNormCalc::SetDialValue(int rwenum, double val) {
+
+  int curenum = rwenum % 1000;
+
+  // Check Handled                                                                                                                                                                                                                    
+  if (!IsHandled(curenum)) return;
+  if (curenum == kModeNorm_NormRES) fNormRES = val;
+}
+
+bool ModeNormCalc::IsHandled(int rwenum) {
+
+  int curenum = rwenum % 1000;
+  switch (curenum) {
+  case kModeNorm_NormRES: return true;
+  default:  return false;
+  }
+}
+
+
+
+
+
+
+
 GaussianModeCorr::GaussianModeCorr() {
 
 	// Init
@@ -53,7 +97,13 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 	double rw_weight = 1.0;
 
 	// Get Neutrino
+	if (!fevt->Npart()){
+	  THROW("NO particles found in stack!");
+	}
 	FitParticle* pnu = fevt->PartInfo(0);
+	if (!pnu){
+	  THROW("NO Starting particle found in stack!");
+	}
 	int pdgnu = pnu->fPID;
 
 	FitParticle* plep = fevt->GetHMFSParticle(abs(pdgnu) - 1);
@@ -92,7 +142,9 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 // Apply weighting
 	if (fApply_CCQE and abs(fevt->Mode) == 1) {
 		if (fDebugStatements) std::cout << "Getting CCQE Weight" << std::endl;
-		rw_weight *= GetGausWeight(q0, q3, fGausVal_CCQE);
+		double g = GetGausWeight(q0, q3, fGausVal_CCQE);
+		if (g < 1.0) g = 1.0;
+		rw_weight *= g;
 	}
 
 	if (fApply_2p2h and abs(fevt->Mode) == 2) {
@@ -140,6 +192,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 	// double Wq0  = 0.0291061;
 	// double Pq3  = 0.480194;
 	// double Wq3  = 0.134588;
+
 
 	double Norm = vals[kPosNorm];
 	double Tilt = vals[kPosTilt];
