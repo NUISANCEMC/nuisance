@@ -70,7 +70,7 @@ if(USE_MINIMIZER)
   endif()
 
   string(REGEX MATCH "5.34/([0-9]+)" ROOTVERSMATCH ${ROOT_VERSION})
-  if( NOT ROOTVERSMATCH OR ${CMAKE_MATCH_1} LESS "19")
+  if(NOT ROOTVERSMATCH OR ${CMAKE_MATCH_1} LESS "19")
     cmessage(FATAL_ERROR "ROOT Version: ${ROOT_VERSION} has out of date minimizer interface, but minimizer functionality requested. Please configure with -DUSE_MINIMIZER=FALSE or update to 5.34/19 or greater to enable minimization features.")
   endif()
 
@@ -90,7 +90,6 @@ cmessage ( STATUS "[ROOT]: root-config --cflags : ${ROOT_CXX_FLAGS} ")
 cmessage ( STATUS "[ROOT]: root-config --libs   : ${ROOT_LD_FLAGS} ")
 
 LIST(APPEND EXTRA_CXX_FLAGS ${ROOT_CXX_FLAGS})
-LIST(APPEND EXTRA_LIBS ${ROOT_LIBS})
 
 #Helper functions for building dictionaries
 function(GenROOTDictionary OutputDictName Header LinkDef)

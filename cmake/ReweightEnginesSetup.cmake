@@ -72,3 +72,6 @@ if(NEED_ROOTPYTHIA6)
     EGPythia6
     Pythia6)
 endif()
+
+
+LIST(APPEND EXTRA_LIBS ${ROOT_LIBS})

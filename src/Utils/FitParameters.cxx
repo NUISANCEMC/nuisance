@@ -35,8 +35,8 @@ FitParameters::~FitParameters() { parameterMap_all.clear(); };
 FitParameters::FitParameters() {
   this->iteration = 0;
 
-  std::string ext_fit_dir = GeneralUtils::GetTopLevelDir();
-  this->ReadParamFile( ext_fit_dir + "/parameters/fitter.config.dat" );
+  std::string NUISANCE_dir = GeneralUtils::GetTopLevelDir();
+  this->ReadParamFile( NUISANCE_dir + "/parameters/fitter.config.dat" );
 };
 
 void FitParameters::SetParamFile(std::string fileName) {

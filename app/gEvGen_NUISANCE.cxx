@@ -9,27 +9,27 @@
 	 It handles:
  	 a) event generation for a fixed init state (v+A) at fixed energy, or
          b) event generation for simple fluxes (specified either via some
-            functional form, tabular text file or a ROOT histogram) and for 
+            functional form, tabular text file or a ROOT histogram) and for
             simple 'geometries' (a target mix with its corresponding weights)
 
-         See the GENIE manual for other apps handling experiment-specific 
-         event generation cases using the outputs of detailed neutrino flux 
+         See the GENIE manual for other apps handling experiment-specific
+         event generation cases using the outputs of detailed neutrino flux
          simulations and realistic detector geometry descriptions.
 
          Syntax :
-           gevgen [-h] 
-                  [-r run#] 
-                   -n nev 
-                   -e energy (or energy range) 
-                   -p neutrino_pdg 
-                   -t target_pdg 
-                  [-f flux_description] 
-                  [-w] 
-                  [--seed random_number_seed] 
+           gevgen [-h]
+                  [-r run#]
+                   -n nev
+                   -e energy (or energy range)
+                   -p neutrino_pdg
+                   -t target_pdg
+                  [-f flux_description]
+                  [-w]
+                  [--seed random_number_seed]
                   [--cross-sections xml_file]
                   [--event-generator-list list_name]
                   [--tune genie_tune]
-                  [--message-thresholds xml_file]          
+                  [--message-thresholds xml_file]
                   [--unphysical-event-mask mask]
                   [--event-record-print-level level]
                   [--mc-job-status-refresh-rate  rate]
@@ -37,37 +37,37 @@
 
          Options :
            [] Denotes an optional argument.
-           -h 
+           -h
               Prints-out help on using gevgen and exits.
-           -n 
+           -n
               Specifies the number of events to generate.
-           -r 
+           -r
               Specifies the MC run number.
-           -e 
+           -e
               Specifies the neutrino energy.
 	      If what follows the -e option is a comma separated pair of values
               it will be interpreted as an energy range for the flux specified
               via the -f option (see below).
-           -p 
+           -p
               Specifies the neutrino PDG code.
-           -t 
+           -t
               Specifies the target PDG code (pdg format: 10LZZZAAAI) _or_ a target
-              mix (pdg codes with corresponding weights) typed as a comma-separated 
-              list of pdg codes with the corresponding weight fractions in brackets, 
-              eg code1[fraction1],code2[fraction2],... 
-              For example, to use a target mix of 95% O16 and 5% H type: 
+              mix (pdg codes with corresponding weights) typed as a comma-separated
+              list of pdg codes with the corresponding weight fractions in brackets,
+              eg code1[fraction1],code2[fraction2],...
+              For example, to use a target mix of 95% O16 and 5% H type:
               `-t 1000080160[0.95],1000010010[0.05]'.
-           -f 
+           -f
               Specifies the neutrino flux spectrum.
               It can be any of:
 	      -- A function:
-                 eg ` -f x*x+4*exp(-x)' 
+                 eg ` -f x*x+4*exp(-x)'
               -- A vector file:
-                 The vector file should contain 2 columns corresponding to 
-                 energy,flux (see $GENIE/data/flux/ for few examples). 
+                 The vector file should contain 2 columns corresponding to
+                 energy,flux (see $GENIE/data/flux/ for few examples).
               -- A 1-D ROOT histogram (TH1D):
                  The general syntax is `-f /full/path/file.root,object_name'
-           -w 
+           -w
               Forces generation of weighted events.
               This option is relevant only if a neutrino flux is specified.
               Note that 'weighted' refers to the selection of the primary
@@ -80,26 +80,26 @@
            --cross-sections
               Name (incl. full path) of an XML file with pre-computed
               cross-section values used for constructing splines.
-           --event-generator-list            
+           --event-generator-list
               List of event generators to load in event generation drivers.
               [default: "Default"].
            --tune
               Specifies a GENIE comprehensive neutrino interaction model tune.
               [default: "Default"].
-           --message-thresholds           
+           --message-thresholds
               Allows users to customize the message stream thresholds.
               The thresholds are specified using an XML file.
               See $GENIE/config/Messenger.xml for the XML schema.
-           --unphysical-event-mask       
+           --unphysical-event-mask
               Allows users to specify a 16-bit mask to allow certain types of
               unphysical events to be written in the output file.
               [default: all unphysical events are rejected]
            --event-record-print-level
               Allows users to set the level of information shown when the event
-              record is printed in the screen. See GHepRecord::Print().              
-           --mc-job-status-refresh-rate   
+              record is printed in the screen. See GHepRecord::Print().
+           --mc-job-status-refresh-rate
               Allows users to customize the refresh rate of the status file.
-           --cache-file                  
+           --cache-file
               Allows users to specify a cache file so that the cache can be
               re-used in subsequent MC jobs.
 
@@ -213,7 +213,7 @@ int             gOptNuPdgCode;    // neutrino PDG code
 map<int,double> gOptTgtMix;       // target mix (each with its relative weight)
 Long_t          gOptRunNu;        // run number
 string          gOptFlux;         //
-bool            gOptWeighted;     // 
+bool            gOptWeighted;     //
 bool            gOptUsingFluxOrTgtMix = false;
 long int        gOptRanSeed;      // random number seed
 string          gOptInpXSecFile;  // cross-section splines
@@ -242,9 +242,9 @@ int main(int argc, char ** argv)
 #ifdef __CAN_GENERATE_EVENTS_USING_A_FLUX_OR_TGTMIX__
 	GenerateEventsUsingFluxOrTgtMix();
 #else
-  LOG("gevgen", pERROR) 
-    << "\n   To be able to generate neutrino events from a flux and/or a target mix" 
-    << "\n   you need to add the following config options at your GENIE installation:" 
+  LOG("gevgen", pERROR)
+    << "\n   To be able to generate neutrino events from a flux and/or a target mix"
+    << "\n   you need to add the following config options at your GENIE installation:"
     << "\n   --enable-flux-drivers  --enable-geom-drivers \n" ;
 #endif
   } else {
@@ -255,7 +255,7 @@ int main(int argc, char ** argv)
 //____________________________________________________________________________
 void Initialize()
 {
-  // Initialization of random number generators, cross-section table, 
+  // Initialization of random number generators, cross-section table,
   // messenger thresholds, cache file
   utils::app_init::MesgThresholds(RunOpt::Instance()->MesgThresholdFiles());
   utils::app_init::CacheFile(RunOpt::Instance()->CacheFile());
@@ -276,7 +276,7 @@ void GenerateEventsAtFixedInitState(void)
   // Create init state
   InitialState init_state(target, neutrino);
 
-  // Create/config event generation driver 
+  // Create/config event generation driver
   GEVGDriver evg_driver;
   evg_driver.SetEventGeneratorList(RunOpt::Instance()->EventGeneratorList());
   evg_driver.SetUnphysEventMask(*RunOpt::Instance()->UnphysEventMask());
@@ -290,26 +290,26 @@ void GenerateEventsAtFixedInitState(void)
   GMCJMonitor mcjmonitor(gOptRunNu);
   mcjmonitor.SetRefreshRate(RunOpt::Instance()->MCJobStatusRefreshRate());
 
-  LOG("gevgen", pNOTICE) 
-    << "\n ** Will generate " << gOptNevents << " events for \n" 
+  LOG("gevgen", pNOTICE)
+    << "\n ** Will generate " << gOptNevents << " events for \n"
     << init_state << " at Ev = " << Ev << " GeV";
 
   // Generate events / print the GHEP record / add it to the ntuple
   int ievent = 0;
   while (ievent < gOptNevents) {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
         << " *** Generating event............ " << ievent;
 
      // generate a single event
      EventRecord * event = evg_driver.GenerateEvent(nu_p4);
 
      if(!event) {
-        LOG("gevgen", pNOTICE) 
+        LOG("gevgen", pNOTICE)
           << "Last attempt failed. Re-trying....";
         continue;
      }
 
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
 	<< "Generated Event GHEP Record: " << *event;
 
      // add event at the output ntuple, refresh the mc job monitor & clean up
@@ -340,7 +340,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
   mcj_driver->UseGeomAnalyzer(geom_driver);
   mcj_driver->Configure();
   mcj_driver->UseSplines();
-  if(!gOptWeighted) 
+  if(!gOptWeighted)
 	mcj_driver->ForceSingleProbScale();
 
   // Initialize an Ntuple Writer to save GHEP records into a TTree
@@ -354,7 +354,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
 
   TH1D* totalevent = (TH1D*) totalflux->Clone();
   totalevent->SetNameTitle("nuisance_events", "NUISANCE Total Events");
-  //  totalevent->Reset();  
+  //  totalevent->Reset();
 
   TH1D* totalxsec = (TH1D*)totalflux->Clone();
   totalxsec->SetNameTitle("nuisance_xsec", "NUISANCE Total XSec");
@@ -376,7 +376,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       double enucl = double(mixfrac * double(gOptNumberNucleons)); // Expected nucleons from weight fractions
 
       double tfrac = double(enucl) / double(tnucl); // Scaling factor.
-      
+
       // Get Initial state driver
       InitialState init_state(tpdg, npdg);
       GEVGPool* gpool = mcj_driver->GetConfigPool();
@@ -397,12 +397,12 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       std::cout << "ENUCL = " << enucl << std::endl;
       std::cout << "MIXFRAC = " << mixfrac << std::endl;
       std::cout << "TPDG = " << tpdg << std::endl;
-      
+
       // Fill xsec hist
       for (int k = 0; k < totalflux->GetNbinsX(); k++){
 	double avgxsec = 0.0;
 
-	
+
 	int res = 1000;
 	for (int l = 0; l < res; l++){
 	  double E = fluxhist->GetXaxis()->GetBinLowEdge(k+1) + (double(l)*fluxhist->GetXaxis()->GetBinWidth(k+1) / double(res));
@@ -418,7 +418,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
 	eventhist->SetBinContent(k+1, avgxsec * fluxhist->GetBinContent(k+1));
 
       }
-      
+
       // Scale totals by target fractions
       xsechist->Scale(tfrac);
       eventhist->Scale(tfrac);
@@ -426,7 +426,7 @@ void GenerateEventsUsingFluxOrTgtMix(void)
       // Add to totals
       totalxsec->Add(xsechist);
       //totalevent->Add(eventhist);
-      
+
       std::cout << "Total XSec Hist for " << init_state.AsString() << " = " << xsechist->Integral("width") << std::endl;
 
       // Scale by nnucleons
@@ -454,10 +454,10 @@ void GenerateEventsUsingFluxOrTgtMix(void)
   std::cout << "Inclusive XSec Per Nucleon = " << totalevent->Integral("width") * 1E-38 / totalflux->Integral("width") << std::endl;
   std::cout << "XSec Hist Integral = " << totalxsec->Integral("width") << std::endl;
   //  sleep(20);
-  
+
   //  totalxsec->Scale(1.0/double(gOptNumberNucleons));
   //  totalevent->Scale(1.0/double(gOptNumberNucleons));
-  
+
   // Create an MC Job Monitor
   GMCJMonitor mcjmonitor(gOptRunNu);
   mcjmonitor.SetRefreshRate(RunOpt::Instance()->MCJobStatusRefreshRate());
@@ -513,7 +513,7 @@ GFluxI * MonoEnergeticFluxDriver(void)
 {
 //
 //
-  flux::GMonoEnergeticFlux * flux = 
+  flux::GMonoEnergeticFlux * flux =
               new flux::GMonoEnergeticFlux(gOptNuEnergy, gOptNuPdgCode);
   GFluxI * flux_driver = dynamic_cast<GFluxI *>(flux);
   return flux_driver;
@@ -553,7 +553,7 @@ GFluxI * TH1FluxDriver(void)
   // ** extract specified flux histogram from the input root file
   //
   vector<string> fv = utils::str::Split(gOptFlux,",");
-  
+
   assert(fv.size()>=2);
   assert( !gSystem->AccessPathName(fv[0].c_str()) );
 
@@ -573,7 +573,7 @@ GFluxI * TH1FluxDriver(void)
     string::size_type iend = open_bracket;
     string::size_type jbeg = open_bracket+1;
     string::size_type jend = close_bracket-1;
-    
+
     string fluxname = flux_with_pdg.substr(ibeg,iend);
     int    fluxpdg  = atoi(flux_with_pdg.substr(jbeg,jend).c_str());
 
@@ -585,7 +585,7 @@ GFluxI * TH1FluxDriver(void)
     LOG("gevgen", pNOTICE) << hst->GetEntries();
 
 
-    // Copy in the flux histogram from the root file and remove bins outside the emin,emax range  
+    // Copy in the flux histogram from the root file and remove bins outside the emin,emax range
     TH1D* spectrum = (TH1D*)hst->Clone();
     spectrum->SetNameTitle("spectrum","neutrino_flux");
     spectrum->SetDirectory(0);
@@ -598,7 +598,7 @@ GFluxI * TH1FluxDriver(void)
 
     LOG("gevgen", pNOTICE) << spectrum->GetEntries();
 
- 
+
     // Add energy spectrum to the flux driver.
     flux->AddEnergySpectrum( fluxpdg, spectrum );
 
@@ -617,22 +617,20 @@ GFluxI * TH1FluxDriver(void)
   return flux_driver;
 }
 
-///____________________________________________________________________________ 
+///____________________________________________________________________________
 void ListTargetIDs(){
 
   // Keep in sync with ConvertTargetIDs
-  LOG("gevgen", pNOTICE) << "Possible Target IDs: \n" 
+  LOG("gevgen", pNOTICE) << "Possible Target IDs: \n"
 			 << "\n H  : " << ConvertTargetIDs("H")
                          << "\n C  : " << ConvertTargetIDs("C")
-			 << "\n CH  : " << ConvertTargetIDs("CH") 
+			 << "\n CH  : " << ConvertTargetIDs("CH")
 			 << "\n CH2 : " << ConvertTargetIDs("CH2")
 			 << "\n H2O : " << ConvertTargetIDs("H2O")
-			 << "\n Fe  : " << ConvertTargetIDs("Fe") 
+			 << "\n Fe  : " << ConvertTargetIDs("Fe")
 			 << "\n Pb  : " << ConvertTargetIDs("Pb")
 			 << "\n D2  : " << ConvertTargetIDs("D2")
 			 << "\n D2-free : " << ConvertTargetIDs("D2-free");
-  
-  
 }
 
 
@@ -652,12 +650,12 @@ string ConvertTargetIDs(string id){
 
 };
 
-///____________________________________________________________________________                                                                   
+///____________________________________________________________________________
 void ListFluxIDs(){
 
-  // Keep in sync with ConvertTargetIDs                                                                                    
-  LOG("gevgen", pNOTICE) << "Possible Flux IDs: \n" 
-                         << "\n MINERvA_fhc_numu  : " << ConvertFluxIDs("MINERvA_fhc_numu") 
+  // Keep in sync with ConvertTargetIDs
+  LOG("gevgen", pNOTICE) << "Possible Flux IDs: \n"
+                         << "\n MINERvA_fhc_numu  : " << ConvertFluxIDs("MINERvA_fhc_numu")
 			 << "\n MINERvA_fhc_numunumubar  : " << ConvertFluxIDs("MINERvA_fhc_numunumubar")
                          << "\n MINERvA_fhc_nue  : " << ConvertFluxIDs("MINERvA_fhc_nue")
                          << "\n MINERvA_fhc_nuenuebar  : " << ConvertFluxIDs("MINERvA_fhc_nuenuebar")
@@ -670,16 +668,15 @@ void ListFluxIDs(){
 			 << "\n MINERvA_rhc_all  : " << ConvertFluxIDs("MINERvA_rhc_all")
 			 << "\n ANL_fhc_numu : " << ConvertFluxIDs("ANL_fhc_numu")
 			 << "\n BNL_fhc_numu : " << ConvertFluxIDs("BNL_fhc_numu");
-  
 }
 
 
 //____________________________________________________________________________
 string ConvertFluxIDs(string id){
 
-  char * const var = getenv("EXT_FIT");
+  char * const var = getenv("NUISANCE");
   if (!var) {
-    std::cout << "Cannot find top level directory! Set the EXT_FIT environmental variable" << std::endl;
+    std::cout << "Cannot find top level directory! Set the NUISANCE environmental variable" << std::endl;
     exit(-1);
   }
   string topnuisancedir = string(var);
@@ -766,7 +763,7 @@ void GetCommandLineArgs(int argc, char ** argv)
   }
 
   if(parser.OptionExists('s')) {
-    LOG("gevgen", pWARN) 
+    LOG("gevgen", pWARN)
       << "-s option no longer available. Please read the revised code documentation";
     gAbortingInErr = true;
     exit(1);
@@ -785,16 +782,16 @@ void GetCommandLineArgs(int argc, char ** argv)
     if(nue.find(",") != string::npos) {
        // split the comma separated list
        vector<string> nurange = utils::str::Split(nue, ",");
-       assert(nurange.size() == 2);   
+       assert(nurange.size() == 2);
        double emin = atof(nurange[0].c_str());
        double emax = atof(nurange[1].c_str());
        assert(emax>emin && emin>=0);
        gOptNuEnergy      = emin;
        gOptNuEnergyRange = emax-emin;
        if(!using_flux) {
-          LOG("gevgen", pWARN) 
+          LOG("gevgen", pWARN)
              << "No flux was specified but an energy range was input!";
-          LOG("gevgen", pWARN) 
+          LOG("gevgen", pWARN)
 	     << "Events will be generated at fixed E = " << gOptNuEnergy << " GeV";
 	  gOptNuEnergyRange = -1;
        }
@@ -898,48 +895,48 @@ void GetCommandLineArgs(int argc, char ** argv)
   //
   // print-out the command line options
   //
-  LOG("gevgen", pNOTICE) 
-     << "\n" 
+  LOG("gevgen", pNOTICE)
+     << "\n"
      << utils::print::PrintFramedMesg("gevgen job configuration");
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
      << "MC Run Number: " << gOptRunNu;
   if(gOptRanSeed != -1) {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
        << "Random number seed: " << gOptRanSeed;
   } else {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
        << "Random number seed was not set, using default";
   }
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
        << "Number of events requested: " << gOptNevents;
   if(gOptInpXSecFile.size() > 0) {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
        << "Using cross-section splines read from: " << gOptInpXSecFile;
   } else {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
        << "No input cross-section spline file";
   }
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
        << "Flux: " << gOptFlux;
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
        << "Generate weighted events? " << gOptWeighted;
   if(gOptNuEnergyRange>0) {
-     LOG("gevgen", pNOTICE) 
-        << "Neutrino energy: [" 
+     LOG("gevgen", pNOTICE)
+        << "Neutrino energy: ["
         << gOptNuEnergy << ", " << gOptNuEnergy+gOptNuEnergyRange << "]";
   } else {
-     LOG("gevgen", pNOTICE) 
+     LOG("gevgen", pNOTICE)
         << "Neutrino energy: " << gOptNuEnergy;
   }
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
       << "Neutrino code (PDG): " << gOptNuPdgCode;
-  LOG("gevgen", pNOTICE) 
+  LOG("gevgen", pNOTICE)
       << "Target code (PDG) & weight fraction (in case of multiple targets): ";
   map<int,double>::const_iterator iter;
   for(iter = gOptTgtMix.begin(); iter != gOptTgtMix.end(); ++iter) {
       int    tgtpdgc = iter->first;
       double wgt     = iter->second;
-      LOG("gevgen", pNOTICE) 
+      LOG("gevgen", pNOTICE)
           << " >> " <<  tgtpdgc << " (weight fraction = " << wgt << ")";
   }
   LOG("gevgen", pNOTICE) << "\n";
@@ -956,7 +953,7 @@ void PrintSyntax(void)
     << "\n              [-r run#]"
     << "\n               -n nev"
     << "\n               -e energy (or energy range) "
-    << "\n               -p neutrino_pdg" 
+    << "\n               -p neutrino_pdg"
     << "\n               -t target_pdg "
     << "\n              [-f flux_description]"
     << "\n              [-w]"
@@ -972,7 +969,7 @@ void PrintSyntax(void)
   ListTargetIDs();
   ListFluxIDs();
 
-  
+
 }
 //____________________________________________________________________________
 #endif

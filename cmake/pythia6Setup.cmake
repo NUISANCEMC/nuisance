@@ -18,25 +18,14 @@
 ################################################################################
 
 if(NEED_PYTHIA6)
-
-  if(NOT PYTHIA6)
-    if(NOT DEFINED ENV{PYTHIA6} AND NOT DEFINED ENV{PYTHIA6_LIB})
-
-      cmessage(FATAL_ERROR "Environment variable PYTHIA6/PYTHIA6_LIB is not defined. "
-        "This must be set to point to a prebuilt PYTHIA6 instance.")
-
-    endif()
-
-    if(DEFINED ENV{PYTHIA6})
-      set(PYTHIA6 $ENV{PYTHIA6})
-    elseif(DEFINED ENV{PYTHIA6_LIB})
-      set(PYTHIA6 $ENV{PYTHIA6_LIB})
-    endif()
+  if(PYTHIA6 STREQUAL "")
+    cmessage(FATAL_ERROR "Variable PYTHIA6 is not defined. This must be set to point to a prebuilt PYTHIA6 instance, please set the \$PYTHIA6 environment variable or configure with -DPYTHIA6=/path/to/pythia6.")
   endif()
 
-  LIST(APPEND CMAKE_LINK_FLAGS
-    -L${PYTHIA6}
-      -lPythia6
-      -lgfortran)
+  LIST(APPEND EXTRA_LINK_DIRS ${PYTHIA6})
+
+  LIST(REVERSE EXTRA_LIBS)
+  LIST(APPEND EXTRA_LIBS Pythia6 gfortran)
+  LIST(REVERSE EXTRA_LIBS)
 
 endif()

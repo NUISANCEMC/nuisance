@@ -38,7 +38,8 @@ if(USE_GiBUU)
     -DNO_EXTERNAL_UPDATE=${NO_EXTERNAL_UPDATE})
 
     cmessage(STATUS "Building GiBUU and GiBUUTools")
-    set(BUILD_GiBUU TRUE)
+    SET(BUILD_GiBUU TRUE CACHE BOOL "Whether to build supporting GiBUU event tools along with a patched version of GiBUU. <FALSE>" FORCE)
   endif()
 
+  SET(USE_GiBUU TRUE CACHE BOOL "Whether to enable GiBUU event support. <TRUE>" FORCE)
 endif()
