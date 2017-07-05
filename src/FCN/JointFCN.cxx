@@ -283,13 +283,13 @@ double JointFCN::GetLikelihood() {
        iter++) {
     MeasurementBase* exp = *iter;
     double newlike = exp->GetLikelihood();
-
+    int ndof = exp->GetNDOF();
     // Save seperate likelihoods
     if (fIterationTree) {
       fSampleLikes[count] = newlike;
     }
 
-    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << std::endl;
+    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << "/" << ndof << std::endl;
 
     // Add Weight Scaling
     // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
