@@ -19,7 +19,7 @@ def PrintCard():
       if filetype and filename:
          filegen  = filename.split(":")[0]
          filename = filename.split(":")[1]
- 
+
          if not filename: continue
 
          inputlist[filetype] = filename
@@ -28,7 +28,7 @@ def PrintCard():
    e = ET.parse('sample_list.xml')
    for atype in e.findall('input'):
 
-      
+
       samplename = atype.get('sample')
       sampletype = atype.get('type')
       newgen = ""
@@ -42,7 +42,7 @@ def PrintCard():
          if newobj in inputlist:
             sampletype = sampletype.replace(newobj, inputlist[newobj])
             sampletype = sampletype.replace("TYPE", inputtype[newobj])
-            
+
             newf += 1
       if newf != oldf: continue
 
@@ -68,7 +68,7 @@ xmlformat = True
 def CreateBlankInputXML(outputcard):
 
    # Parse Sample List
-   samplelist    = str(os.environ['EXT_FIT']) + '/src/FCN/sample_list.xml'
+   samplelist    = str(os.environ['NUISANCE']) + '/src/FCN/sample_list.xml'
    samplelistxml = ET.parse(samplelist)
 
     # Keep track of unique ids
@@ -77,7 +77,7 @@ def CreateBlankInputXML(outputcard):
 
    # Loop over all samples and find unique ids
    for sample in samplelistxml.findall('input'):
-      
+
       # Read Comments
       comment = sample.get('eventcomment')
       if (comment):
@@ -88,7 +88,7 @@ def CreateBlankInputXML(outputcard):
       inputid = sample.get('type')
       if (inputid):
          inputid = inputid.replace("TYPE:","").replace("(","").replace(")","")
-   
+
          # Get all unique ids after split
          inputsplit = inputid.replace(",",";").split(";")
          for id in inputsplit:
@@ -140,7 +140,7 @@ def GenerateCardXML(inputs, outputs):
    # Parse our input card first
    inputlistxml = ET.parse(inputs)
    for inputfile in inputlistxml.findall('input'):
-      
+
       # Get type and file
       filetype = inputfile.get('type')
       filename = inputfile.get('file')
@@ -161,7 +161,7 @@ def GenerateCardXML(inputs, outputs):
    print inputfiles
 
    # Parse Sample List
-   samplelist    = str(os.environ['EXT_FIT']) + '/src/FCN/sample_list.xml'
+   samplelist    = str(os.environ['NUISANCE']) + '/src/FCN/sample_list.xml'
    samplelistxml = ET.parse(samplelist)
 
    # container for output lines
@@ -173,7 +173,7 @@ def GenerateCardXML(inputs, outputs):
 
       # Allow for actions + comments
       if (sample.get('comment')):
-         
+
          # Add to list
          sampleoutputs.append( ['@COMMENT', sample.get('comment'), sample.get('check')] )
          continue
@@ -209,7 +209,7 @@ def GenerateCardXML(inputs, outputs):
          sampletype = sampletype.replace("TYPE",    inputtypes[parseduid])
 
          # Count how many uids replaced
-         endlength += 1 
+         endlength += 1
 
       # If not all uids caught, skip
       if startlength != endlength: continue
@@ -218,9 +218,9 @@ def GenerateCardXML(inputs, outputs):
 
    # Setup outputs
    outputfile = outputs
-   if not outputfile: 
+   if not outputfile:
       outputfile = inputs.replace(".xml","") + ".nuisance.xml"
-      
+
    if os.path.isfile(outputfile) and not forceful:
       print "File:", outputfile, "already exists. Use -f flag to overwrite."
       sys.exit(-1)
@@ -240,7 +240,7 @@ def GenerateCardXML(inputs, outputs):
       # Comments
       if id[0] == '@COMMENT':
          if id[2] and not CheckComment(id[2],allsamples): continue
-            
+
          f.write( '  <!-- ' + id[1] + ' --> \n')
          continue
 
@@ -250,7 +250,7 @@ def GenerateCardXML(inputs, outputs):
 
 
    sys.exit(0)
-      
+
 if __name__ == '__main__':
 
    searchdescrip = "Set of tools used to generate nuisance card files"
@@ -271,10 +271,10 @@ if __name__ == '__main__':
       elif args.format == "txt": xmlformat = False
 
    if (xmlformat):
-      if (args.blankinput): 
+      if (args.blankinput):
          CreateBlankInputXML(args.blankinput)
-         
+
       if (args.generate):
          GenerateCardXML(args.generate, args.output)
 
-   
+

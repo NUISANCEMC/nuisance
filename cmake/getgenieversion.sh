@@ -1,5 +1,5 @@
 #!/bin/bash
-LIBNAME=$(ls ${GENIE}/lib/libGAlgorithm-*.so)
+LIBNAME=$(ls ${1}/lib/libGAlgorithm-*.so)
 BASENAME="${LIBNAME##*-}"
 BASENAME="${BASENAME//.so/}"
 BASENAME="${BASENAME/./}"

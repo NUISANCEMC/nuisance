@@ -38,7 +38,7 @@ public:
   /// Removes flux/event rate histograms
   virtual ~InputHandlerBase();
 
-  /// Return NUISANCE FitEvent Class from given event entry. 
+  /// Return NUISANCE FitEvent Class from given event entry.
   /// Must be overriden by GeneratorInputHandler. Lightweight allows a faster option
   /// to be given where only RW information is needed.
   virtual FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight=false) = 0;

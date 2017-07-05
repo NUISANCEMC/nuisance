@@ -27,10 +27,10 @@
 ################################################################################
 
 #################################  GENIE  ######################################
-if(GENIE STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE is not defined. "
+if(GENIE_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable GENIE_ROOT is not defined. "
     "The location of a pre-built GENIE install must be defined either as"
-    " $ cmake -DGENIE=/path/to/GENIE or as and environment vairable"
+    " $ cmake -DGENIE_ROOT=/path/to/GENIE or as and environment vairable"
     " $ export GENIE=/path/to/GENIE")
 endif()
 
@@ -40,7 +40,7 @@ if (BUILD_GEVGEN)
 endif()
 
 # Extract GENIE VERSION
-execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh
+execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh ${GENIE_ROOT}
   OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (COMMAND genie-config
@@ -130,7 +130,11 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
 
 SAYVARS()
 
-LIST(APPEND EXTRA_LINK_DIRS ${GENIE_LIB_DIR} ${GENIE_LHAPDF_LIB} ${GENIE_LIBXML2_LIB} ${GENIE_LOG4CPP_LIB})
+LIST(APPEND EXTRA_LINK_DIRS
+  ${GENIE_LIB_DIR}
+  ${GENIE_LHAPDF_LIB}
+  ${GENIE_LIBXML2_LIB}
+  ${GENIE_LOG4CPP_LIB})
 
 LIST(REVERSE EXTRA_LIBS)
 LIST(REVERSE GENIE_LIBS_LIST)
@@ -142,3 +146,5 @@ LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 set(NEED_PYTHIA6 TRUE)
 set(NEED_ROOTPYTHIA6 TRUE)
 set(NEED_ROOTEVEGEN TRUE)
+
+SET(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)

@@ -4,7 +4,7 @@
 PROFILEOUT=$1
 PROGRAM=$(which $2)
 ARGUMENTS=${@:3}
-PPROF=$EXT_FIT/build/Ext/src/gperftools/src/pprof
+PPROF=$NUISANCE/build/Ext/src/gperftools/src/pprof
 
 # Log
 echo "Profiling : $PROGRAM"

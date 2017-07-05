@@ -1,17 +1,17 @@
 Author  Luke Pickering,
 	Patrick Stowell,
 	Callum Wilkinson,
-	Clarence Wret,
+	Clarence Wret
 
 Package Manager: (p.stowell@sheffield.ac.uk)
 
-NUISANCE Package v1r0
+NUISANCE Package v2r2
 
 README
 20/07/2016
 
 --- Compilation
-The following instructions should be used to build the fitter after checking out from scratch. 
+The following instructions should be used to build the fitter after checking out from scratch.
 
 1. Make sure environmental variables required for the generators you wish to build against are set.
 2. In the top nuisance directory make a new build directory: "$mkdir build && cd build"
@@ -25,11 +25,14 @@ The following instructions should be used to build the fitter after checking out
    "$ make install"
 7. Source the setup script
    "$ source Linux/setup.sh"
-   
+
+If you prefer, most configure variables can be entered through a cmake UI, such as
+ccmake. e.g. "$ mkdir build && cd build && ccmake ../"
+
 --- Adding Classes
     The fitter is designed to be easily extended by adding new measurement classes whilst keeping the input convertors and tuning functionality the same.
     The Devel module folder is setup with some examples of how to add new classes into the framework. Feel free to email me if there are difficulties adding new measurements.
 
 --- Running Fits
-    Whilst running fits is relatively quick and simple, there are now a large range of possible options. Doxygen Documentation is being added to the $EXT_FIT/doc/html folder.
-    Refer thre for guidance on how to properly formulate a card file. 
+    Whilst running fits is relatively quick and simple, there are now a large range of possible options. Doxygen Documentation is being added to the $NUISANCE/doc/html folder.
+    Refer thre for guidance on how to properly formulate a card file.

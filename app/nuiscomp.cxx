@@ -71,7 +71,7 @@ void printInputCommands() {
             << "                                                         fake data. \n"
             << " \n"
             << "           -q config=val      : Overrides default configurations provided in the cardfile and in \n"
-            << "                                '$EXT_FIT/parameters/config.xml\'. Any config parameter can be set. \n"
+            << "                                '$NUISANCE/parameters/config.xml\'. Any config parameter can be set. \n"
             << "                                Examples : \n"
             << "                                \'-q VERBOSITY=4\' \n"
             << "                                \'-q EventManager=1\' \n"

@@ -17,35 +17,16 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-
-if(NOT NEUT_ROOT)
-  if(NOT DEFINED ENV{NEUT_ROOT} OR $ENV{NEUT_ROOT} STREQUAL "")
-
-    cmessage(FATAL_ERROR "Environment variable NEUT_ROOT is not defined. "
-      "This must be set to point to a prebuilt NEUT instance.")
-
-  endif()
-  set(NEUT_ROOT $ENV{NEUT_ROOT})
+if(NEUT_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable NEUT_ROOT is not defined. Please export environment variable NEUT_ROOT or configure with -DNEUT_ROOT=/path/to/NEUT. This must be set to point to a prebuilt NEUT instance.")
 endif()
 
-if(NOT NEUT_CERN)
-  if(NOT DEFINED ENV{CERN} OR $ENV{CERN} STREQUAL "")
-
-    cmessage(FATAL_ERROR "Environment variable CERN is not defined. "
-      "This must be set to point to a prebuilt CERNLIB instance.")
-
-  endif()
-  set(NEUT_CERN $ENV{CERN})
+if(NEUT_CERN STREQUAL "")
+  cmessage(FATAL_ERROR "Variable NEUT_CERN is not defined. Please export environment variable CERN or configure with -DNEUT_CERN=/path/to/CERNLIB. This must be set to point to a prebuilt CERNLIB instance.")
 endif()
 
-if(NOT NEUT_CERN_LEVEL)
-  if(NOT DEFINED ENV{CERN_LEVEL} OR $ENV{CERN_LEVEL} STREQUAL "")
-
-    cmessage(FATAL_ERROR "Environment variable CERN_LEVEL is not defined. "
-      "This must be set correctly for a prebuilt CERNLIB instance.")
-
-  endif()
-  set(NEUT_CERN_LEVEL $ENV{CERN_LEVEL})
+if(NEUT_CERN_LEVEL STREQUAL "")
+    cmessage(FATAL_ERROR "Variable NEUT_CERN_LEVEL is not defined. Please export environment variable CERN_LEVEL or configure with -DNEUT_CERN_LEVEL=XXXX (likely to be 2005).")
 endif()
 
 set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
@@ -59,22 +40,26 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
   ${NEUT_ROOT}/src/reweight)
 
 
-
 LIST(APPEND EXTRA_LINK_DIRS
   ${NEUT_ROOT}/lib/Linux_pc
-  ${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib)
-LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
+  ${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib
+  ${NEUT_ROOT}/src/reweight)
 
+LIST(APPEND EXTRA_LIBS
+  NReWeight
+  neutcore
+  nuccorrspl
+  nuceff
+  partnuck
+  skmcsvc
+  tauola
+  jetset74
+  pdflib804
+  mathlib
+  packlib
+  pawlib)
 
-LIST(APPEND RWENGINE_LINKER_FLAGS
-  -L${NEUT_ROOT}/lib/Linux_pc
-    -lNReWeight
-  -L${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib
-    -ljetset74
-    -lpdflib804
-    -lmathlib
-    -lpacklib
-    -lpawlib
+LIST(APPEND EXTRA_SHAREDOBJS
   ${NEUT_CLASS}/neutctrl.so
   ${NEUT_CLASS}/neutfsivert.so)
 
@@ -83,23 +68,16 @@ if(EXISTS "${NEUT_CLASS}/neutnucfsistep.so")
   set(NEUT_NUCFSI 1)
   LIST(APPEND EXTRA_CXX_FLAGS -D__NEUT_NUCFSI_ENABLED__ )
 
-  LIST(APPEND RWENGINE_LINKER_FLAGS
-    ${NEUT_CLASS}/neutnucfsistep.so ${NEUT_CLASS}/neutnucfsivert.so
+  LIST(APPEND EXTRA_SHAREDOBJS
+    ${NEUT_CLASS}/neutnucfsistep.so
+    ${NEUT_CLASS}/neutnucfsivert.so
     )
-  set(RWENGINE_LINKER_FLAGS "")
 endif()
 
-LIST(APPEND RWENGINE_LINKER_FLAGS
+LIST(APPEND EXTRA_SHAREDOBJS
   ${NEUT_CLASS}/neutrootTreeSingleton.so
-  ${NEUT_CLASS}/neutvtx.so ${NEUT_CLASS}/neutfsipart.so
+  ${NEUT_CLASS}/neutvtx.so
+  ${NEUT_CLASS}/neutfsipart.so
   ${NEUT_CLASS}/neutpart.so
   ${NEUT_CLASS}/neutvect.so
-  -L${NEUT_ROOT}/lib/Linux_pc
-    -lneutcore
-    -lnuccorrspl
-    -lnuceff
-    -lpartnuck
-    -lskmcsvc
-    -ltauola
-  -L${NEUT_ROOT}/src/reweight
-    -lNReWeight)
+  )

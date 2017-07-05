@@ -157,9 +157,9 @@ std::string GeneralUtils::GetTopLevelDir() {
   static std::string topLevelVarVal;
 
   if (first) {
-    char * const var = getenv("EXT_FIT");
+    char * const var = getenv("NUISANCE");
     if (!var) {
-      THROW("Cannot find top level directory! Set the EXT_FIT environmental variable");
+      THROW("Cannot find top level directory! Set the NUISANCE environmental variable");
     }
     topLevelVarVal = std::string(var);
     first = false;
