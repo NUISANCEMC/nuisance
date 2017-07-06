@@ -31,9 +31,9 @@ int TargetUtils::GetTargetPDGFromZA(int Z, int A){
 }
 
 int TargetUtils::GetTargetAFromPDG(int PDG){
-	return ((PDG%1000000000) - (PDG%10000))/10;
+  return ((PDG%10000))/10;
 }
 
 int TargetUtils::GetTargetZFromPDG(int PDG){
-	return ((PDG%1000000000) - (GetTargetAFromPDG(PDG)))/10000;
+  return (PDG%1000000000 - PDG%10000)/10000;
 }

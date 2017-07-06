@@ -666,8 +666,16 @@ void ListFluxIDs(){
 			 << "\n MINERvA_rhc_nuebar  : " << ConvertFluxIDs("MINERvA_rhc_nuebar")
 			 << "\n MINERvA_rhc_nuebarnue  : " << ConvertFluxIDs("MINERvA_rhc_nuebarnue")
 			 << "\n MINERvA_rhc_all  : " << ConvertFluxIDs("MINERvA_rhc_all")
+
 			 << "\n ANL_fhc_numu : " << ConvertFluxIDs("ANL_fhc_numu")
-			 << "\n BNL_fhc_numu : " << ConvertFluxIDs("BNL_fhc_numu");
+			 << "\n BNL_fhc_numu : " << ConvertFluxIDs("BNL_fhc_numu")
+			 << "\n BNL_fhc_numu_ALT1986 : " << ConvertFluxIDs("BNL_fhc_numu_ALT1986")
+			 << "\n BNL_fhc_numu_ALT1981 : " << ConvertFluxIDs("BNL_fhc_numu_ALT1981")
+			 << "\n BEBC_fhc_numu : " << ConvertFluxIDs("BEBC_fhc_numu")
+			 << "\n FNAL_fhc_numu : " << ConvertFluxIDs("FNAL_fhc_numu")
+			 << "\n FNAL_rhc_numub : " << ConvertFluxIDs("FNAL_rhc_numub")
+			 << "\n GGM_fhc_numu : " << ConvertFluxIDs("GGM_fhc_numu");
+    
 }
 
 
@@ -695,9 +703,15 @@ string ConvertFluxIDs(string id){
   else if (!id.compare("MINERvA_rhc_nuebarnue")) inputs="minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
   else if (!id.compare("MINERvA_rhc_all")) inputs="minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
 
-  else if (!id.compare("ANL_fhc_numu")) inputs="ANL_1977_2horn_rescan.root,numu_flux[14]";
-  else if (!id.compare("BNL_fhc_numu")) inputs="BNL_NuInt02_rescan.root,numu_flux[14]";
+  else if (!id.compare("ANL_fhc_numu"))         inputs="ANL_1977_2horn_rescan.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu"))         inputs="BNL_NuInt02_rescan.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu_ALT1986")) inputs="BNL_1986_flux-ALTERNATIVE.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu_ALT1981")) inputs="BNL_CCQE_1981_rescan-ALTERNATIVE.root,numu_flux[14]";
 
+  else if (!id.compare("BEBC_fhc_numu"))   inputs="BEBC_Wachsmuth_numubar_table.root,numu_flux[14]";
+  else if (!id.compare("FNAL_fhc_numu"))   inputs="FNAL_CCinc_1982_nu_MCadj.root,numu_flux[14]";
+  else if (!id.compare("FNAL_rhc_numub"))  inputs="FNAL_coh_1993_anu.root,numu_flux[-14]";
+  else if (!id.compare("GGM_fhc_numu"))    inputs="GGM_nu_flux_1979_rescan.root,numu_flux[14]";
   else return "";
 
   return fluxfolder + inputs;
