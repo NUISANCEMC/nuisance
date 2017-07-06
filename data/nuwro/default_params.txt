@@ -1,0 +1,258 @@
+################################################################
+#
+# Example input for NuWro neutrino interactions simulation software
+#
+################################################################
+
+
+# The number of events used to calculate the cross sections: 
+
+number_of_test_events = 1000000
+
+# The number of equally weighted events to be saved:
+
+number_of_events   = 100000
+ 
+# Control the random seed persistence:
+
+random_seed= 0   // 0 - use time(NULL) as a seed for random number generator
+#random_seed= 1   // 1 - read state from file "random_seed"  or use seed=time(NULL) if file not found
+#random_seed=12312 // other values - use given number as the seed for the generator
+
+################################################################
+#
+# Beam specification 
+#
+################################################################
+
+# It is convenient to include one of the predefined beam specifications
+# with the @ char
+# or modify them as needed
+
+#@beam/ANL.txt
+#@beam/ND280.txt
+#@beam/nomad.txt
+#@beam/newMB.txt
+
+################################################################
+#
+# Target specification
+#
+################################################################
+
+#@target/proton.txt
+@target/C.txt
+
+#@target/ND280_975.txt
+#@target/proton.txt
+#@target/neutron.txt
+#@target/CH2.txt
+
+################################################################
+#
+# Specify which dynamics channels should be used 
+#
+################################################################
+
+dyn_qel_cc =1      // Quasi elastic charged current
+dyn_qel_nc =1      // Quasi elastic neutral current
+dyn_res_cc =1      // Resonant charged current 
+dyn_res_nc =1      // Resonant neutral current
+dyn_dis_cc =1      // Deep inelastic charged current 
+dyn_dis_nc =1      // Deep inelastic neutral current 
+dyn_coh_cc =1      // Coherent charged current  
+dyn_coh_nc =1      // Coherent neutral current  
+dyn_mec_cc =0      // Meson exchange charged current  
+dyn_mec_nc =0      // Meson exchange neutral current  
+
+
+################################################################
+# Dynamics details and form factor parameters
+# the names of the parameters start with the dynamics prefix:
+# qel , res, dis, or coh
+################################################################
+
+################################################################
+#   QEL
+################################################################
+
+#electromagnetic Form factors:
+#qel_vector_ff_set = 1 // dipole, dipole electric form factor G_E^V
+ qel_vector_ff_set = 2 // BBBA05, hep-ex/0602017 BBBA05 for Q2<18 GeV	
+#qel_vector_ff_set = 3 // BBA03, hep-ex/0308005 BBA-2003 for Q2<6 GeV
+#qel_vector_ff_set = 4 // JLab, PHYSICAL REVIEW C, VOLUME 65, 051001(R)
+#qel_vector_ff_set = 5 // Kgraczyk
+#qel_vector_ff_set = 6 // (1990:) parametryzacja JS z old qelcc
+
+ qel_axial_ff_set = 1 // dipole,
+#qel_axial_ff_set = 2 // 2-fold parabolic modification of axial FF
+#qel_axial_ff_set = 3 // 3-fold parabolic modification of axial FF
+#qel_axial_ff_set = 4 // 4-fold parabolic modification of axial FF
+
+#qel_strange=0   // don't use the strangenes
+qel_strange=1    //  use the strangenes in the axial ff
+qel_strangeEM=0  //  dont use the strangenes in the vector ff
+delta_s       =-0.15  // 
+
+qel_cc_axial_mass= 1200   //[MeV] axial mass
+qel_nc_axial_mass= 1350   //[MeV] axial mass
+qel_s_axial_mass= 1200  //[MeV] axial mass used in the strange dipole ff
+
+#################################################################
+##use te below values to recowed old nc behaviour
+#################################################################
+#qel_strange     = 1     // use the strangeness corrections in the axial factors
+#qel_strangeEM   = 1     // use the strangeness corrections in the vector factors
+#delta_s         =-0.21  // 
+#qel_s_axial_mass= 1012  //[MeV] axial mass used in the strange dipole ff
+#################################################################
+
+flux_correction = 0 // no flux correction
+#flux_correction = 1 // 
+
+# options below are currently not used
+# For certain nuclei (C12, O16, Ar40, Ca40, Fe56)
+# it is possible to use the spectral function model
+# instead of the Fermi gas model in the quasi ellastic events.
+# For other nuclei the parameter is ignored.
+ 
+sf_method = 0 // don't use spectral function
+#sf_method = 1 // use grid spectral function: (C12, O16, Ar40, Fe56)
+#sf_method = 2 // use factorized spectral function: (O16, Ar40, Ca40)
+
+
+# A little performace gain in the QEL channel 
+# can be obtained by using: cc_smoothing=1
+cc_smoothing=0 
+#cc_smoothing=1 // dont't try impossible qel reaction: nu+n
+
+# The default
+# qel_kinematics   = 0  // relativistic (default)
+# qel_kinematics   = 1  //
+# qel_kinematics   = 2  //
+# qel_kinematics   = 3  // momentum dependent kinematics
+# qel_kinematics   = 4  // momentum dependent kinematics with outgoing nucleon energy edjustment
+#   The choice of the kinematics for the qel interaction vertex  
+#   	0 - relativistic  
+#       1 - 
+#       2 - bodek 
+#       3 - momentum dependent potential
+#       4 - Fermi gas with 
+
+
+  qel_rpa = 0    // Don't use rpa
+# qel_rpa = 1    // Use rpa without effective mass of nucleon
+# qel_rpa = 2    // Use effectove mass without rpa (test only)
+# qel_rpa = 3    // Use rpa with effective mass of nucleon (test only) 
+
+
+################################################################
+#   RES
+################################################################
+
+
+# The choice of Delta production FF:
+
+# The dipole delta FF with pion_axial_mass=0.94 and pion_C5A=1.19
+# is our (Graczyk&JS) preferred choice
+
+delta_FF_set = 1       // Dipole delta form factors
+pion_axial_mass = 0.94 // in GeV units
+pion_C5A = 1.19 
+
+# Other possibilites are:
+# delta_FF_set = 1 // (default) dipole with 2 parameters: pion_axial_mass and pion_C5A; Graczyk&JS preferred choices are: MA=0.94 and C5A=1.19
+# delta_FF_set = 2 // Paschos Lalakulich 2.12 MA=1.05 BNL fit
+# delta_FF_set = 3 // Paschos Lalakulich 2.12 MA=0.84 ANL fit
+# delta_FF_set = 4 //  Paschos Lalakulich page 4, bottom right
+# delta_FF_set = 5 // Paschos Lalakulich page 5, top left
+# delta_FF_set = 6 // Eq.(13), L. Alvarez-Ruso, S. K. Singh, M. J. Vincente Vascas, Phys. Rev. C 57, (1998) 2693
+# delta_FF_set = 7 // taken from Bariquila-Cano.et al (chiral quark model)
+
+################################################################
+#   RES - DIS boundary
+################################################################
+
+# recommended value is  500, this controls the precision in RES-DIS boundary region
+spp_precision= 500
+res_dis_cut = 1600	//res dis boundary in MeV, should be 1600
+bkgrscaling = 0.0  //non-resonant background scaling; should be from -1.3 ... +1.3; default value is 0.0
+
+
+################################################################
+#   COH
+################################################################
+
+
+coh_mass_correction = 1  //Rein Sehgal correction to CC coherent single pion production
+
+
+################################################################
+#   MEC
+################################################################
+
+mec_kind = 1  // TEM model
+#mec_kind = 2  // Marteau model
+#mec_kind = 3  // Nieves model
+
+mec_ratio_pp = 0.9
+mec_ratio_ppp = 0.8
+
+mec_central_motion = 100.0 //motion of correlated pairs, sigma in gaussian distribution; default 0.0
+mec_back_to_back_smearing = 0.15 //smearing of originally back-to-back correlated pair nucleons momenta; default 0.0
+MEC_pauli_blocking = 1 //switch on/off Pauli blocking for nucleons from MEC dynamics; default 1 (on)
+mec_pb_trials = 25 //how many times configuration satisfying Pauli blocking is searched for; default 25
+MEC_cm_direction = 0.0 //in CM frame prefered directions along (>0.0) or perpendicular (<0.0) wrt momentum transfer; | | cannot be larger than 1
+
+################################################################
+#
+# Final state interaction parameters
+#
+################################################################
+
+# Models for the description of nucleus in the cascade
+#nucleus_model       = 0  //"flatnucleus" ball with constant density
+nucleus_model       = 1  //"anynucleus" i.e. realistic density profile
+
+
+# options below are kept only for historical reasons
+nucleus_E_b         =  34   // [MeV] binding energy 
+# used in qelevent.cc, target.h as Eb
+nucleus_kf          = 220   // [MeV] Fermi momentum, used in Fermi gas model and in Pauli blocking
+
+# Models for the description of nucleus as a target:
+# nucleus_target = 0 // free target; 
+# nucleus_target = 1 // Fermi gas; 
+# nucleus_target = 2 // local Fermi gas; 
+# nucleus_target = 3 // Bodek-Ritchie; 
+# nucleus_target = 4 // "effective" spectral function (carbon or oxygen); 
+# nucleus_target = 5 // deuterium; 
+# nucleus_target = 6 // deuterium with constant binding energy nucleus_E_b (for tests only!)
+
+
+kaskada_on 	 = 1      // use (1) or not (0) the cascade 
+
+kaskada_writeall = 0 // store all intermedate cascade particles in the event.all vector
+tau = 8.0            // 
+first_step = 1       // use (1) or not (0) formation zone for primary particles
+step = 0.2           // length of one step in cascade
+
+xsec = 1 //model of cross sections in cascade: 0 - metropolis, 1 - oset
+kaskada_w = 7
+
+  formation_zone = fz
+# formation_zone = nofz   //
+# formation_zone = fz     //
+# formation_zone = trans  //
+# formation_zone = skat8  //
+# formation_zone = cohl   //
+# formation_zone = cosyn  //
+# formation_zone = ranft  //
+# formation_zone = rl     //
+# formation_zone = delta  //
+# formation_zone = const  //
+
+formation_length = 1 // formation length in fm for formation_zone = const
+
+pauli_blocking   = 1 // enable (1) or not (0) Pauli blocking
+
