@@ -145,6 +145,8 @@ public:
   /// If no dimensions are given, it is assumed from the number
   /// entries in the first line of covfile.
   virtual void SetCovarFromTextFile(std::string covfile, int dim = -1);
+  
+  virtual void SetCovarFromMultipleTextFiles(std::string covfiles, int dim = -1);
 
   /// \brief Read the data covariance from a ROOT file.
   ///
