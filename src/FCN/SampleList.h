@@ -184,6 +184,14 @@
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
 
+// MINERvA CCCOH pion
+#include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEpi_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_antinu.h"
+
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
