@@ -174,7 +174,6 @@ void Measurement1D::SetDataFromTextFile(std::string datafile) {
   fDataHist = PlotUtils::GetTH1DFromFile(datafile,
                                          fSettings.GetName() + "_data",
                                          fSettings.GetFullTitles());
-
 }
 
 //********************************************************************
@@ -252,6 +251,28 @@ void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
 
 }
+
+//********************************************************************
+void Measurement1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
+//********************************************************************
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
+
+  std::vector<std::string> covList = GeneralUtils::ParseToStr(covfiles, ";");
+  
+  fFullCovar = new TMatrixDSym(dim);
+  for (uint i = 0; i < covList.size(); ++i){
+    LOG(SAM) << "Reading covariance from text file: " << covList[i] << std::endl;
+    TMatrixDSym* temp_cov = StatUtils::GetCovarFromTextFile(covList[i], dim);
+    (*fFullCovar) += (*temp_cov);
+    delete temp_cov;
+  }
+  covar      = StatUtils::GetInvert(fFullCovar);
+  fDecomp    = StatUtils::GetDecomp(fFullCovar);
+
+}
+
 
 //********************************************************************
 void Measurement1D::SetCovarFromRootFile(std::string covfile, std::string histname) {
