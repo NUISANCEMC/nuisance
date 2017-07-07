@@ -513,6 +513,21 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
 
     /*
+      CC-COH
+    */
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEnu_nu")) {
+    return (new MINERvA_CCCOHPI_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEpi_nu")) {
+    return (new MINERvA_CCCOHPI_XSec_1DEpi_nu(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1Dth_nu")) {
+    return (new MINERvA_CCCOHPI_XSec_1Dth_nu(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEnu_antinu")) {
+    return (new MINERvA_CCCOHPI_XSec_1DEnu_antinu(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEpi_antinu")) {
+    return (new MINERvA_CCCOHPI_XSec_1DEpi_antinu(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1Dth_antinu")) {
+    return (new MINERvA_CCCOHPI_XSec_1Dth_antinu(samplekey));
+    /*
     T2K Samples
     */
 
