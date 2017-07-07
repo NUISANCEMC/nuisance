@@ -94,7 +94,8 @@ Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc,
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
-                                   TMatrixDSym* invcov, TH1I* mask) {
+                                   TMatrixDSym* invcov, TH1I* mask, 
+				   double datascale, double covarscale) {
 //*******************************************************************
 
   Double_t Chi2 = 0.0;
@@ -118,7 +119,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
     // Add MC err to diag
     for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
-      double mcerr = calc_mc->GetBinError(i + 1) * 1E38;
+      double mcerr = calc_mc->GetBinError(i + 1) * datascale;
       double oldval = (*newcov)(i, i);
 
       (*newcov)(i, i) = oldval + mcerr * mcerr;
@@ -157,13 +158,14 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
         LOG(DEB) << "Cont chi2 = " \
                  << ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) \
                       * (*calc_cov)(i, j) \
-                      * 1E76 \
-                      *   ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) )
+                      * covarscale \
+                      *   ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1)))
                  << " " << Chi2 << std::endl;
 
-        Chi2 += ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) * \
-                  (*calc_cov)(i, j) * 1E76        * \
-                  ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) );
+        Chi2 += ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) \
+		  * (*calc_cov)(i, j)					\
+		  * covarscale						\
+		  * ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) );  
 
       } else {
 
@@ -583,9 +585,9 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
     // By Default the errors on the histogram are thrown uncorrelated to the other errors
     //    if (throwdiag) {
     //      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
-				       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
-      //    }
-
+    //				       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
+    //    }
+    
     // If a covariance is provided that is also thrown
     if (cov) {
       correl_val = 0.0;
@@ -1076,6 +1078,11 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
       int column = 0;
 
       std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+
+      if (entries.size() <= 1) {
+	ERR(WRN) << "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
+	  "entries on this line: " << row << std::endl;
+      }
       for (std::vector<double>::iterator iter = entries.begin();
            iter != entries.end(); iter++) {
         column++;
@@ -1103,6 +1110,10 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
     int column = 0;
 
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    if (entries.size() <= 1) {
+      ERR(WRN) << "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
+	"entries on this line: " << row << std::endl;
+    }
     for (std::vector<double>::iterator iter = entries.begin();
          iter != entries.end(); iter++) {
 
