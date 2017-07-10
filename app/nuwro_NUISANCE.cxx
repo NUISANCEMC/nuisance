@@ -39,7 +39,19 @@ std::string GetDynamicModes(std::string list){
     modes["dyn_coh_nc"] = 1;  // Coherent neutral current
     modes["dyn_mec_cc"] = 0;  // Meson exchange charged current
     modes["dyn_mec_nc"] = 0;  // Meson exchange neutral current
-  
+
+  } else if (!list.compare("DefaultFree")){
+    modes["dyn_qel_cc"] = 1;  // Quasi elastic charged current       
+    modes["dyn_qel_nc"] = 1;  // Quasi elastic neutral current       
+    modes["dyn_res_cc"] = 1;  // Resonant charged current            
+    modes["dyn_res_nc"] = 1;  // Resonant neutral current            
+    modes["dyn_dis_cc"] = 1;  // Deep inelastic charged current      
+    modes["dyn_dis_nc"] = 1;  // Deep inelastic neutral current      
+    modes["dyn_coh_cc"] = 0;  // Coherent charged current            
+    modes["dyn_coh_nc"] = 0;  // Coherent neutral current            
+    modes["dyn_mec_cc"] = 0;  // Meson exchange charged current      
+    modes["dyn_mec_nc"] = 0;  // Meson exchange neutral current       
+
   } else if (!list.compare("Default+MEC")){
     modes["dyn_qel_cc"] = 1;  // Quasi elastic charged current
     modes["dyn_qel_nc"] = 1;  // Quasi elastic neutral current
@@ -231,7 +243,7 @@ std::string GetEventAndSeedDefinition(int nevents, int ntestevents, int seed){
   LOG(FIT) << "Event Definition: " << std::endl;
   std::cout << " -> number_of_events      : " << nevents << std::endl;
   std::cout << " -> number_of_test_events : " << ntestevents << std::endl;
-  std::cout << " -> seed                  : " << seed << std::endl;
+  std::cout << " -> seed    : " << seed << std::endl;
 
   return eventdef;
 }
