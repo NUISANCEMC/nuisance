@@ -1,4 +1,4 @@
-#ifdef __NUWRO_ENABLED__
+#ifdef __NEUT_ENABLED__
 #include "ComparisonRoutines.h"
 #include "ParserUtils.h"
 
