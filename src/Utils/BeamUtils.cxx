@@ -45,3 +45,73 @@ std::vector<int> BeamUtils::ParseSpeciesToIntVect(std::string spc){
   
   return convspc;
 }
+
+
+///____________________________________________________________________________
+void BeamUtils::ListFluxIDs(){
+
+  // Keep in sync with ConvertTargetIDs
+  LOG(FIT) << "Possible Flux IDs: \n"
+	   << "\n MINERvA_fhc_numu  : " << BeamUtils::ConvertFluxIDs("MINERvA_fhc_numu")
+	   << "\n MINERvA_fhc_numunumubar  : " << BeamUtils::ConvertFluxIDs("MINERvA_fhc_numunumubar")
+	   << "\n MINERvA_fhc_nue  : " << BeamUtils::ConvertFluxIDs("MINERvA_fhc_nue")
+	   << "\n MINERvA_fhc_nuenuebar  : " << BeamUtils::ConvertFluxIDs("MINERvA_fhc_nuenuebar")
+	   << "\n MINERvA_fhc_all  : " << BeamUtils::ConvertFluxIDs("MINERvA_fhc_all")
+
+	   << "\n MINERvA_rhc_numubar  : " << BeamUtils::ConvertFluxIDs("MINERvA_rhc_numubar")
+	   << "\n MINERvA_rhc_numubarnumu  : " << BeamUtils::ConvertFluxIDs("MINERvA_rhc_numubarnumu")
+	   << "\n MINERvA_rhc_nuebar  : " << BeamUtils::ConvertFluxIDs("MINERvA_rhc_nuebar")
+	   << "\n MINERvA_rhc_nuebarnue  : " << BeamUtils::ConvertFluxIDs("MINERvA_rhc_nuebarnue")
+	   << "\n MINERvA_rhc_all  : " << BeamUtils::ConvertFluxIDs("MINERvA_rhc_all")
+
+	   << "\n ANL_fhc_numu : " << BeamUtils::ConvertFluxIDs("ANL_fhc_numu")
+	   << "\n BNL_fhc_numu : " << BeamUtils::ConvertFluxIDs("BNL_fhc_numu")
+	   << "\n BNL_fhc_numu_ALT1986 : " << BeamUtils::ConvertFluxIDs("BNL_fhc_numu_ALT1986")
+	   << "\n BNL_fhc_numu_ALT1981 : " << BeamUtils::ConvertFluxIDs("BNL_fhc_numu_ALT1981")
+	   << "\n BEBC_fhc_numu : " << BeamUtils::ConvertFluxIDs("BEBC_fhc_numu")
+	   << "\n FNAL_fhc_numu : " << BeamUtils::ConvertFluxIDs("FNAL_fhc_numu")
+	   << "\n FNAL_rhc_numub : " << BeamUtils::ConvertFluxIDs("FNAL_rhc_numub")
+	   << "\n GGM_fhc_numu : " << BeamUtils::ConvertFluxIDs("GGM_fhc_numu") 
+	   << std::endl;
+    
+}
+
+
+//____________________________________________________________________________
+std::string BeamUtils::ConvertFluxIDs(std::string id){
+
+  char * const var = getenv("NUISANCE");
+  if (!var) {
+    std::cout << "Cannot find top level directory! Set the NUISANCE environmental variable" << std::endl;
+    exit(-1);
+  }
+  std::string topnuisancedir = std::string(var);
+  std::string fluxfolder = topnuisancedir + "/data/flux/";
+  std::string inputs = "";
+
+  if (!id.compare("MINERvA_fhc_numu")) inputs="minerva_flux.root,numu_fhc[14]";
+  else if (!id.compare("MINERvA_fhc_numunumubar")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14]";
+  else if (!id.compare("MINERvA_fhc_nue")) inputs="minerva_flux.root,nue_fhc[12]";
+  else if (!id.compare("MINERvA_fhc_nuenuebar")) inputs="minerva_flux.root,nue_fhc[12],nuebar_fhc[-12]";
+  else if (!id.compare("MINERvA_fhc_all")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14],nue_fhc[12],nuebar_fhc[-12]";
+
+  else if (!id.compare("MINERvA_rhc_numubar")) inputs="minerva_flux.root,numubar_rhc[-14]";
+  else if (!id.compare("MINERvA_rhc_numubarnumu")) inputs="minerva_flux.root,numubar_rhc[-14],numu_rhc[14]";
+  else if (!id.compare("MINERvA_rhc_nuebar")) inputs="minerva_flux.root,nuebar_rhc[-12]";
+  else if (!id.compare("MINERvA_rhc_nuebarnue")) inputs="minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
+  else if (!id.compare("MINERvA_rhc_all")) inputs="minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
+
+  else if (!id.compare("ANL_fhc_numu"))         inputs="ANL_1977_2horn_rescan.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu"))         inputs="BNL_NuInt02_rescan.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu_ALT1986")) inputs="BNL_1986_flux-ALTERNATIVE.root,numu_flux[14]";
+  else if (!id.compare("BNL_fhc_numu_ALT1981")) inputs="BNL_CCQE_1981_rescan-ALTERNATIVE.root,numu_flux[14]";
+
+  else if (!id.compare("BEBC_fhc_numu"))   inputs="BEBC_Wachsmuth_numu_table.root,numu_flux[14]";
+  else if (!id.compare("FNAL_fhc_numu"))   inputs="FNAL_CCinc_1982_nu_MCadj.root,numu_flux[14]";
+  else if (!id.compare("FNAL_rhc_numub"))  inputs="FNAL_coh_1993_anu.root,numu_flux[-14]";
+  else if (!id.compare("GGM_fhc_numu"))    inputs="GGM_nu_flux_1979_rescan.root,numu_flux[14]";
+  else return "";
+
+  return fluxfolder + inputs;
+
+};

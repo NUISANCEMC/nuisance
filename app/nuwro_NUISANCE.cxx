@@ -18,11 +18,6 @@ int gOptRunNumber = -1;
 void GetCommandLineArgs (int argc, char ** argv);
 void PrintSyntax        (void);
 
-string          ConvertTargetIDs        (string);
-string          ConvertFluxIDs          (string);
-void            ListTargetIDs(void);
-void            ListFluxIDs(void);
-
 std::string GetDynamicModes(std::string list){
 
   LOG(FIT) << "Using " << list << " to define interaction modes." << std::endl;
@@ -285,107 +280,6 @@ int main(int argc, char ** argv)
   return 0;
 }
 
-///____________________________________________________________________________
-void ListTargetIDs(){
-
-  // Keep in sync with ConvertTargetIDs
-  LOG(FIT) << "Possible Target IDs: \n"
-			 << "\n H  : " << ConvertTargetIDs("H")
-                         << "\n C  : " << ConvertTargetIDs("C")
-			 << "\n CH  : " << ConvertTargetIDs("CH")
-			 << "\n CH2 : " << ConvertTargetIDs("CH2")
-			 << "\n H2O : " << ConvertTargetIDs("H2O")
-			 << "\n Fe  : " << ConvertTargetIDs("Fe")
-			 << "\n Pb  : " << ConvertTargetIDs("Pb")
-			 << "\n D2  : " << ConvertTargetIDs("D2")
-			 << "\n D2-free : " << ConvertTargetIDs("D2-free");
-}
-
-
-//____________________________________________________________________________
-string ConvertTargetIDs(string id){
-
-  if (!id.compare("H")) return "1000010010";
-  else if  (!id.compare("C")) return "1000060120";
-  else if  (!id.compare("CH"))  return "13,1000060120[0.9231],1000010010[0.0769]";
-  else if  (!id.compare("CH2")) return "14,1000060120[0.8571],1000010010[0.1429]";
-  else if  (!id.compare("H2O")) return "18,1000080160[0.8888],1000010010[0.1111]";
-  else if  (!id.compare("Fe"))  return "1000260560";
-  else if  (!id.compare("Pb"))  return "1000822070";
-  else if  (!id.compare("D2"))  return "1000010020";
-  else if  (!id.compare("D2-free")) return "2,1000010010[0.5],1000000010[0.5]";
-  else return "";
-
-};
-
-///____________________________________________________________________________
-void ListFluxIDs(){
-
-  // Keep in sync with ConvertTargetIDs
-  LOG(FIT) << "Possible Flux IDs: \n"
-                         << "\n MINERvA_fhc_numu  : " << ConvertFluxIDs("MINERvA_fhc_numu")
-			 << "\n MINERvA_fhc_numunumubar  : " << ConvertFluxIDs("MINERvA_fhc_numunumubar")
-                         << "\n MINERvA_fhc_nue  : " << ConvertFluxIDs("MINERvA_fhc_nue")
-                         << "\n MINERvA_fhc_nuenuebar  : " << ConvertFluxIDs("MINERvA_fhc_nuenuebar")
-			 << "\n MINERvA_fhc_all  : " << ConvertFluxIDs("MINERvA_fhc_all")
-
-			 << "\n MINERvA_rhc_numubar  : " << ConvertFluxIDs("MINERvA_rhc_numubar")
-			 << "\n MINERvA_rhc_numubarnumu  : " << ConvertFluxIDs("MINERvA_rhc_numubarnumu")
-			 << "\n MINERvA_rhc_nuebar  : " << ConvertFluxIDs("MINERvA_rhc_nuebar")
-			 << "\n MINERvA_rhc_nuebarnue  : " << ConvertFluxIDs("MINERvA_rhc_nuebarnue")
-			 << "\n MINERvA_rhc_all  : " << ConvertFluxIDs("MINERvA_rhc_all")
-
-			 << "\n ANL_fhc_numu : " << ConvertFluxIDs("ANL_fhc_numu")
-			 << "\n BNL_fhc_numu : " << ConvertFluxIDs("BNL_fhc_numu")
-			 << "\n BNL_fhc_numu_ALT1986 : " << ConvertFluxIDs("BNL_fhc_numu_ALT1986")
-			 << "\n BNL_fhc_numu_ALT1981 : " << ConvertFluxIDs("BNL_fhc_numu_ALT1981")
-			 << "\n BEBC_fhc_numu : " << ConvertFluxIDs("BEBC_fhc_numu")
-			 << "\n FNAL_fhc_numu : " << ConvertFluxIDs("FNAL_fhc_numu")
-			 << "\n FNAL_rhc_numub : " << ConvertFluxIDs("FNAL_rhc_numub")
-			 << "\n GGM_fhc_numu : " << ConvertFluxIDs("GGM_fhc_numu");
-    
-}
-
-
-//____________________________________________________________________________
-string ConvertFluxIDs(string id){
-
-  char * const var = getenv("NUISANCE");
-  if (!var) {
-    std::cout << "Cannot find top level directory! Set the NUISANCE environmental variable" << std::endl;
-    exit(-1);
-  }
-  string topnuisancedir = string(var);
-  string fluxfolder = topnuisancedir + "/data/flux/";
-  string inputs = "";
-
-  if (!id.compare("MINERvA_fhc_numu")) inputs="minerva_flux.root,numu_fhc[14]";
-  else if (!id.compare("MINERvA_fhc_numunumubar")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14]";
-  else if (!id.compare("MINERvA_fhc_numu")) inputs="minerva_flux.root,nue_fhc[12]";
-  else if (!id.compare("MINERvA_fhc_nuenuebar")) inputs="minerva_flux.root,nue_fhc[12],nuebar_fhc[-12]";
-  else if (!id.compare("MINERvA_fhc_all")) inputs="minerva_flux.root,numu_fhc[14],numubar_fhc[-14],nue_fhc[12],nuebar_fhc[-12]";
-
-  else if (!id.compare("MINERvA_rhc_numubar")) inputs="minerva_flux.root,numubar_rhc[-14]";
-  else if (!id.compare("MINERvA_rhc_numubarnumu")) inputs="minerva_flux.root,numubar_rhc[-14],numu_rhc[14]";
-  else if (!id.compare("MINERvA_rhc_nuebar")) inputs="minerva_flux.root,nuebar_rhc[-12]";
-  else if (!id.compare("MINERvA_rhc_nuebarnue")) inputs="minerva_flux.root,nuebar_rhc[-12],nue_rhc[12]";
-  else if (!id.compare("MINERvA_rhc_all")) inputs="minerva_flux.root,numu_rhc[14],numubar_rhc[-14],nue_rhc[12],nuebar_rhc[-12]";
-
-  else if (!id.compare("ANL_fhc_numu"))         inputs="ANL_1977_2horn_rescan.root,numu_flux[14]";
-  else if (!id.compare("BNL_fhc_numu"))         inputs="BNL_NuInt02_rescan.root,numu_flux[14]";
-  else if (!id.compare("BNL_fhc_numu_ALT1986")) inputs="BNL_1986_flux-ALTERNATIVE.root,numu_flux[14]";
-  else if (!id.compare("BNL_fhc_numu_ALT1981")) inputs="BNL_CCQE_1981_rescan-ALTERNATIVE.root,numu_flux[14]";
-
-  else if (!id.compare("BEBC_fhc_numu"))   inputs="BEBC_Wachsmuth_numubar_table.root,numu_flux[14]";
-  else if (!id.compare("FNAL_fhc_numu"))   inputs="FNAL_CCinc_1982_nu_MCadj.root,numu_flux[14]";
-  else if (!id.compare("FNAL_rhc_numub"))  inputs="FNAL_coh_1993_anu.root,numu_flux[-14]";
-  else if (!id.compare("GGM_fhc_numu"))    inputs="GGM_nu_flux_1979_rescan.root,numu_flux[14]";
-  else return "";
-
-  return fluxfolder + inputs;
-
-};
-
 //____________________________________________________________________________
 void GetCommandLineArgs(int argc, char ** argv)
 {
@@ -420,7 +314,7 @@ void GetCommandLineArgs(int argc, char ** argv)
 
   } else if (!gOptFluxDef.empty()){
     // Try to convert the flux definition if possible.
-    std::string convflux = ConvertFluxIDs(gOptFluxDef);
+    std::string convflux = BeamUtils::ConvertFluxIDs(gOptFluxDef);
     if (!convflux.empty()) gOptFluxDef = convflux;
 
   } else {
@@ -431,7 +325,7 @@ void GetCommandLineArgs(int argc, char ** argv)
   if (gOptTargetDef.empty()){
     THROW("No Target passed to nuwro_nuisance! use the '-t' argument.");
   } else {
-    std::string convtarget = ConvertTargetIDs(gOptTargetDef);
+    std::string convtarget = TargetUtils::ConvertTargetIDs(gOptTargetDef);
     if (!convtarget.empty()) gOptTargetDef = convtarget;
   }
 
@@ -459,7 +353,7 @@ void GetCommandLineArgs(int argc, char ** argv)
       exit(-1);
     }  
     std::string topnuisancedir = string(var);
-    gOptCrossSections = topnuisancedir + "/nuwro/default_params.txt";
+    gOptCrossSections = topnuisancedir + "/nuwro/Default_params.txt";
   }
   
   ParserUtils::ParseArgument(args, "--event-generator-list", gOptGeneratorList, false);
@@ -490,25 +384,101 @@ void PrintSyntax(void)
 {
   LOG(FIT) 
     << "\n\n" << "Syntax:" << "\n"
-    << "\n      gevgen [-h]"
-    << "\n              [-r run#]"
+    << "\n      nuwro_nuisance [-h]"
     << "\n               -n nev"
-    << "\n               -e energy (or energy range) "
-    << "\n               -p neutrino_pdg"
-    << "\n               -t target_pdg "
-    << "\n              [-f flux_description]"
-    << "\n              [-w]"
-    << "\n              [--seed random_number_seed]"
-    << "\n              [--cross-sections xml_file]"
-    << "\n              [--event-generator-list list_name]"
-    << "\n              [--message-thresholds xml_file]"
-    << "\n              [--unphysical-event-mask mask]"
-    << "\n              [--event-record-print-level level]"
-    << "\n              [--mc-job-status-refresh-rate  rate]"
-    << "\n              [--cache-file root_file]"
-    << "\n\n" ;
-  ListTargetIDs();
-  ListFluxIDs();
+    << "\n               -f flux_description"
+    << "\n               -t target_description"
+    << "\n              [ -r run_number ]"
+    << "\n              [ -o output_file ]"
+    << "\n              [ --cross-section /path/to/params.txt ]"
+    << "\n              [ --event-generator-list mode_definition ]"
+    << "\n              [ --seed seed_value ]"
+    << "\n              [ --test-events ntest ]"
+    << "\n \n";
+
+  LOG(FIT)
+    << "\n\n Arguments:" << "\n"
+    << "\n -n nev"
+    << "\n    -> Total number of events to generate (e.g. 2500000)"
+    << "\n"
+    << "\n -f flux_description"
+    << "\n    Definition of the flux to be read in from a ROOT file."
+    << "\n"
+    << "\n    Multiple histograms can be read in from the same file using"
+    << "\n    the format '-f file.root,hist1[pdg1],hist2[pdg2]"
+    << "\n    e.g. \'-f ./flux/myfluxfile.root,numu_flux[14],numubar_flux[-14]\'"
+    << "\n"
+    << "\n    When passing in multiple histograms, the nuwro_nuisance will"
+    << "\n    generate a single file containing both sets of events with the"
+    << "\n    correct ratios for each set."
+    << "\n"
+    << "\n    A flux can also be given according to any of the flux IDs shown"
+    << "\n    at the end of this help message."
+    << "\n    e.g. \' -f MINERvA_fhc_numu\' "
+    << "\n"
+    << "\n -t target_description"
+    << "\n    Definition of the target to be used. Multiple targets can be given."
+    << "\n"
+    << "\n    To pass a single target just provide the target PDG"
+    << "\n    e.g. \' -t 1000060120 \'"
+    << "\n"
+    << "\n    To pass a combined target provide a list containing the following"
+    << "\n    \' -t TotalNucleons,Target1[Weight1],Target2[Weight2],.. where the "
+    << "\n    TotalNucleons is the total nucleons combined, Target1 is the PDG "
+    << "\n    of the first target, and Weight1 is the fractional weight of the "
+    << "\n    first target."
+    << "\n    e.g. \' -t 13,1000060120[0.9231],1000010010[0.0769] \'"
+    << "\n"
+    << "\n    Target can also be specified by the target IDs given at the end of"
+    << "\n    this help message."
+    << "\n    e.g. \' -t CH2 \'"
+    << "\n"
+    << "\n -r run_number"
+    << "\n    run number ID that can be used when generating large samples in small "
+    << "\n    jobs. Must be an integer. When given nuwro_nuisance will update the "
+    << "\n    output file from 'output.root' to 'output.root.run_number.root'"
+    << "\n"
+    << "\n -o output_file"
+    << "\n    Path to the output_file you want to save events to."
+    << "\n"
+    << "\n    If this is not given but '-r' is then events will be saved to "
+    << "\n    the file 'nuwrogen.run_number.events.root'"
+    << "\n"
+    << "\n    If a run number is given alongside '-o' then events will be saved "
+    << "\n    to 'output.root.run_number.root'"
+    << "\n"
+    << "\n --cross-section /path/to/params.txt"
+    << "\n    Path to the nuwro model definition. If this is not given, then this "
+    << "\n    will default to $NUISANCE/data/nuwro/Default_params.txt"
+    << "\n"
+    << "\n    Look in $NUISANCE/data/nuwro/Default_params.txt for examples when "
+    << "\n    writing your own card files."
+    << "\n"
+    << "\n --event-generator-list mode_definition"
+    << "\n    Name of modes to run. This sets the dynamic mode settings in nuwro."
+    << "\n    e.g. --event-generator-list Default+MEC"
+    << "\n"
+    << "\n    Allowed mode_definitions are given at the end of this help message."
+    << "\n"
+    << "\n --seed seed_value "
+    << "\n    Value to use as the seed. If seed isn't given, time(NULL) is used."
+    << "\n"
+    << "\n --test-events ntest "
+    << "\n    Sets the number of test events for Nuwro to use. If this option "
+    << "\n    isn't given then we assume 5E6 test events by default."
+    << "\n\n";
+    
+  std::cout << "-----------------"<<std::endl;
+  TargetUtils::ListTargetIDs();
+  std::cout << "-----------------" << std::endl;
+  BeamUtils::ListFluxIDs();
+  std::cout << "-----------------" << std::endl;
+  LOG(FIT) << "Allowed Mode Definitions:" << std::endl
+	   << " - Default : Default CC+NC modes, no MEC" << std::endl
+	   << " - Default+MEC : Default CC+NC modes + 2p2h MEC " << std::endl
+	   << " - DefaultFree : Default CC+NC modes, no Coherent or MEC " << std::endl;
+  std::cout << "----------------" << std::endl;
+
   exit(0);
 }
 //____________________________________________________________________________
