@@ -141,6 +141,26 @@ C  28:    2p2h            2p2h
     modes["crsmode_NCDIS_highW"] = 1;
     modes["crsmode_NCGAMMA"] = 1;
 
+  } else if (!list.compare("DefaultFree")){
+
+    modes["crsmode_CCQE"] = 1;
+    modes["crsmode_CC2P2H"] = 0;
+    modes["crsmode_CC1pi"] = 1;
+    modes["crsmode_CCDIS_lowW"] = 1;
+    modes["crsmode_CCCOH"] = 0;
+    modes["crsmode_CCETA"] = 1;
+    modes["crsmode_CCKAON"] = 1;
+    modes["crsmode_CCDIS_highW"] = 1;
+    modes["crsmode_CCGAMMA"] = 1;
+    modes["crsmode_NC1pi"] = 1;
+    modes["crsmode_NCDIS_lowW"] = 1;
+    modes["crsmode_NCEL"] = 1;
+    modes["crsmode_NCCOH"] = 0;
+    modes["crsmode_NCETA"] = 1;
+    modes["crsmode_NCKAON"] = 1;
+    modes["crsmode_NCDIS_highW"] = 1;
+    modes["crsmode_NCGAMMA"] = 1;
+
   } else if (!list.compare("Default+MEC")){
 
     modes["crsmode_CCQE"] = 1;
