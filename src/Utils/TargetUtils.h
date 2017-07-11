@@ -41,6 +41,14 @@ namespace TargetUtils {
 
 	/// Get TargetA code from the full PDG
 	int GetTargetAFromPDG(int PDG);
+
+	/// Convert target ids to target that can be used by gen_nuisance
+	std::string          ConvertTargetIDs        (std::string);
+
+	/// Lists all possible target IDS, should be kept in sync with convert function
+	void            ListTargetIDs(void);
+
+
 }
 
 
