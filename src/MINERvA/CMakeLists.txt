@@ -54,6 +54,7 @@ MINERvA_CCinc_XSec_1DEnu_nu.cxx
 
 MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.cxx
 MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.cxx
+MINERvA_CC1pip_XSec_1D_2017Update.cxx
 
 MINERvAUtils.cxx
 MINERvA_SignalDef.cxx
@@ -97,6 +98,7 @@ MINERvA_CCinc_XSec_1DEnu_nu.h
 
 MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h
 MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h
+MINERvA_CC1pip_XSec_1D_2017Update.h
 
 MINERvAUtils.h
 MINERvA_SignalDef.h
