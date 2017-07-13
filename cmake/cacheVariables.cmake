@@ -18,7 +18,7 @@
 ################################################################################
 
 function(CheckAndSetDefaultEnv VARNAME DEFAULT CACHETYPE DOCSTRING ENVNAME)
-  cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
+  #cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
   if(NOT DEFINED ${VARNAME})
     if(DEFINED ENV{${ENVNAME}} AND NOT $ENV{${ENVNAME}} STREQUAL "")
       set(${VARNAME} $ENV{${ENVNAME}} CACHE ${CACHETYPE} ${DOCSTRING})
@@ -30,27 +30,27 @@ function(CheckAndSetDefaultEnv VARNAME DEFAULT CACHETYPE DOCSTRING ENVNAME)
     set(${VARNAME} ${${VARNAME}} CACHE ${CACHETYPE} ${DOCSTRING})
     unset(${VARNAME})
   endif()
-  cmessage(DEBUG "--Set cache variable: \"${VARNAME}\" to \"${${VARNAME}}\", in cache ${CACHETYPE}.")
+  cmessage(CACHE "--Set cache variable: \"${VARNAME}\" to \"${${VARNAME}}\", in cache ${CACHETYPE}.")
 endfunction()
 
 function(CheckAndSetDefaultCache VARNAME DEFAULT CACHETYPE DOCSTRING)
-  cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
+#  cmessage(DEBUG "Trying to assign variable ${VARNAME} into the cache.")
   if(NOT DEFINED ${VARNAME})
     set(${VARNAME} ${DEFAULT} CACHE ${CACHETYPE} ${DOCSTRING})
   else()
     set(${VARNAME} ${${VARNAME}} CACHE ${CACHETYPE} ${DOCSTRING})
     unset(${VARNAME})
   endif()
-  cmessage(DEBUG "--Set cache variable: \"${VARNAME}\" to \"${${VARNAME}}\", in cache ${CACHETYPE}.")
+  cmessage(CACHE "--Set cache variable: \"${VARNAME}\" to \"${${VARNAME}}\", in cache ${CACHETYPE}.")
 endfunction()
 
 function(CheckAndSetDefault VARNAME DEFAULT)
-  cmessage(DEBUG "Trying to assign variable ${VARNAME}.")
+#  cmessage(DEBUG "Trying to assign variable ${VARNAME}.")
   if(NOT DEFINED ${VARNAME})
     set(${VARNAME} ${DEFAULT} PARENT_SCOPE)
     set(${VARNAME} ${DEFAULT})
   endif()
-  cmessage(DEBUG "--Set variable: \"${VARNAME}\" to \"${${VARNAME}}\".")
+  cmessage(CACHE "--Set variable: \"${VARNAME}\" to \"${${VARNAME}}\".")
 endfunction()
 
 CheckAndSetDefaultCache(VERBOSE TRUE BOOL "Whether to configure loudly.")
@@ -80,30 +80,30 @@ CheckAndSetDefaultCache(HEPMC_USED_EP FALSE INTERNAL "Whether the we built HepMC
 
 CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
-CheckAndSetDefaultEnv(NEUT_CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
-CheckAndSetDefaultEnv(NEUT_CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
+CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
+CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
 
 CheckAndSetDefaultCache(USE_NuWro FALSE BOOL "Whether to enable NuWro support. <FALSE>")
-CheckAndSetDefaultEnv(NUWRO_ROOT "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
-CheckAndSetDefaultEnv(NUWRO_INCLUDES "" PATH "Path to NuWro installed includes directory, needs to contain \"params_all.h\". Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
+CheckAndSetDefaultEnv(NUWRO "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
+CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes directory, needs to contain \"params_all.h\". Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
 CheckAndSetDefaultCache(NUWRO_INPUT_FILE "" FILEPATH "Path to an input NuWro event vector, which can be used to build NuWro i/o libraries. <>")
 CheckAndSetDefaultCache(NUWRO_BUILT_FROM_FILE FALSE INTERNAL "Whether the NuWro libraries were built by NUISANCE. <FALSE>")
 CheckAndSetDefaultCache(USE_NuWro_RW FALSE BOOL "Whether to try and build support for NuWro reweighting. <FALSE>")
 
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
-CheckAndSetDefaultEnv(GENIE_ROOT "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
-CheckAndSetDefaultEnv(GENIE_LHAPDF_LIB "" PATH "Path to pre-built LHAPDF libraries. Overrides environment variable \$LHAPDF_LIB. <>" LHAPDF_LIB)
-CheckAndSetDefaultEnv(GENIE_LHAPDF_INC "" PATH "Path to installed LHAPDF headers. Overrides environment variable \$LHAPDF_INC. <>" LHAPDF_INC)
-CheckAndSetDefaultEnv(GENIE_LHAPATH "" PATH "Path to LHA PDF inputs. Overrides environment variable \$LHAPATH. <>" LHAPATH)
-CheckAndSetDefaultEnv(GENIE_LIBXML2_LIB "" PATH "Path to pre-built LIBXML2 libraries. Overrides environment variable \$LIBXML2_LIB. <>" LIBXML2_LIB)
-CheckAndSetDefaultEnv(GENIE_LIBXML2_INC "" PATH "Path to installed LIBXML2 headers. Overrides environment variable \$LIBXML2_INC. <>" LIBXML2_INC)
-CheckAndSetDefaultEnv(GENIE_LOG4CPP_LIB "" PATH "Path to pre-built LOG4CPP libraries. Overrides environment variable \$LOG4CPP_LIB. <>" LOG4CPP_LIB)
+CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
+CheckAndSetDefaultEnv(LHAPDF_LIB "" PATH "Path to pre-built LHAPDF libraries. Overrides environment variable \$LHAPDF_LIB. <>" LHAPDF_LIB)
+CheckAndSetDefaultEnv(LHAPDF_INC "" PATH "Path to installed LHAPDF headers. Overrides environment variable \$LHAPDF_INC. <>" LHAPDF_INC)
+CheckAndSetDefaultEnv(LHAPATH "" PATH "Path to LHA PDF inputs. Overrides environment variable \$LHAPATH. <>" LHAPATH)
+CheckAndSetDefaultEnv(LIBXML2_LIB "" PATH "Path to pre-built LIBXML2 libraries. Overrides environment variable \$LIBXML2_LIB. <>" LIBXML2_LIB)
+CheckAndSetDefaultEnv(LIBXML2_INC "" PATH "Path to installed LIBXML2 headers. Overrides environment variable \$LIBXML2_INC. <>" LIBXML2_INC)
+CheckAndSetDefaultEnv(LOG4CPP_LIB "" PATH "Path to pre-built LOG4CPP libraries. Overrides environment variable \$LOG4CPP_LIB. <>" LOG4CPP_LIB)
 CheckAndSetDefaultEnv(GENIE_LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Overrides environment variable \$LOG4CPP_INC. <>" LOG4CPP_INC)
 
 CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevgen app.")
 
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
-CheckAndSetDefaultEnv(T2KREWEIGHT_ROOT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
+CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
 
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
@@ -153,20 +153,20 @@ LIST(APPEND VARS
   HEPMC_USED_EP
   USE_NEUT
   NEUT_ROOT
-  NEUT_CERN
-  NEUT_CERN_LEVEL
+  CERN
+  CERN_LEVEL
   USE_NuWro
-  NUWRO_ROOT
-  NUWRO_INCLUDES
+  NUWRO
+  NUWRO_INC
   NUWRO_INPUT_FILE
   NUWRO_BUILT_FROM_FILE
   USE_GENIE
-  GENIE_ROOT
-  GENIE_LHAPDF_LIB
-  GENIE_LHAPDF_INC
-  GENIE_LIBXML2_LIB
-  GENIE_LIBXML2_INC
-  GENIE_LOG4CPP_LIB
+  GENIE
+  LHAPDF_LIB
+  LHAPDF_INC
+  LIBXML2_LIB
+  LIBXML2_INC
+  LOG4CPP_LIB
   GENIE_LOG4CPP_INC
   BUILD_GEVGEN
   USE_T2K

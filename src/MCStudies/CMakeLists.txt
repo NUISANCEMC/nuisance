@@ -25,6 +25,7 @@ MCStudy_MuonValidation.cxx
 ElectronFlux_FlatTree.cxx
 T2K2017_FakeData.cxx
 MCStudy_CCQEHistograms.cxx
+OfficialNIWGPlots.cxx
 )
 
 set(HEADERFILES
@@ -36,6 +37,7 @@ MCStudy_MuonValidation.h
 ElectronFlux_FlatTree.h
 T2K2017_FakeData.h
 MCStudy_CCQEHistograms.h
+OfficialNIWGPlots.h
 )
 
 set(LIBNAME MCStudies)
