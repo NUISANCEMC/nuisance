@@ -21,12 +21,12 @@ if(NEUT_ROOT STREQUAL "")
   cmessage(FATAL_ERROR "Variable NEUT_ROOT is not defined. Please export environment variable NEUT_ROOT or configure with -DNEUT_ROOT=/path/to/NEUT. This must be set to point to a prebuilt NEUT instance.")
 endif()
 
-if(NEUT_CERN STREQUAL "")
-  cmessage(FATAL_ERROR "Variable NEUT_CERN is not defined. Please export environment variable CERN or configure with -DNEUT_CERN=/path/to/CERNLIB. This must be set to point to a prebuilt CERNLIB instance.")
+if(CERN STREQUAL "")
+  cmessage(FATAL_ERROR "Variable CERN is not defined. Please export environment variable CERN or configure with -DCERN=/path/to/CERNLIB. This must be set to point to a prebuilt CERNLIB instance.")
 endif()
 
-if(NEUT_CERN_LEVEL STREQUAL "")
-    cmessage(FATAL_ERROR "Variable NEUT_CERN_LEVEL is not defined. Please export environment variable CERN_LEVEL or configure with -DNEUT_CERN_LEVEL=XXXX (likely to be 2005).")
+if(CERN_LEVEL STREQUAL "")
+    cmessage(FATAL_ERROR "Variable CERN_LEVEL is not defined. Please export environment variable CERN_LEVEL or configure with -DCERN_LEVEL=XXXX (likely to be 2005).")
 endif()
 
 set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
@@ -42,7 +42,7 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
 
 LIST(APPEND EXTRA_LINK_DIRS
   ${NEUT_ROOT}/lib/Linux_pc
-  ${NEUT_CERN}/${NEUT_CERN_LEVEL}/lib
+  ${CERN}/${CERN_LEVEL}/lib
   ${NEUT_ROOT}/src/reweight)
 
 LIST(APPEND EXTRA_LIBS

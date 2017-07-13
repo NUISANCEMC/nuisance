@@ -57,6 +57,8 @@ public:
 	int GetI(std::string name);
 	double GetD(std::string name);
 	std::string GetCovarInput();
+	void SetOnlyMC(bool state=true);
+	bool GetB(std::string name);
 
 	void Set(std::string name, int i);
 	void Set(std::string name, std::string s);

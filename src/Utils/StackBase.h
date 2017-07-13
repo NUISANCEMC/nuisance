@@ -11,6 +11,7 @@
 #include "TH2.h"
 #include "TH3.h"
 #include "FitParameters.h"
+#include "PlotUtils.h"
 
 class StackBase {
 public:
@@ -27,6 +28,7 @@ public:
 	
 	virtual void SetupStack(TH1* hist);
 	virtual void Scale(double sf, std::string opt = "");
+	virtual void FluxUnfold(TH1D* flux, TH1D* events, double scalefactor);
 	virtual void Reset();
 	virtual void FillStack(int index, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
 	virtual void Write();

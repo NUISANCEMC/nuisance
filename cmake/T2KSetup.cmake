@@ -17,15 +17,15 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(T2KREWEIGHT_ROOT STREQUAL "")
-  cmessage(FATAL_ERROR "Variable T2KREWEIGHT_ROOT is not defined. Either configure with -DT2KREWEIGHT_ROOT or \"\$ export T2KREWEIGHT=/path/to/T2KReWeight\". This must be set to point to a prebuilt T2KReWeight instance.")
+if(T2KREWEIGHT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable T2KREWEIGHT is not defined. Either configure with -DT2KREWEIGHT or \"\$ export T2KREWEIGHT=/path/to/T2KReWeight\". This must be set to point to a prebuilt T2KReWeight instance.")
 endif()
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__T2KREW_ENABLED__ )
 
-LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KREWEIGHT_ROOT}/src/)
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KREWEIGHT}/src/)
 
-LIST(APPEND EXTRA_LINK_DIRS ${T2KREWEIGHT_ROOT}/lib)
+LIST(APPEND EXTRA_LINK_DIRS ${T2KREWEIGHT}/lib)
 LIST(APPEND EXTRA_LIBS T2KReWeight)
 
 
