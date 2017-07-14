@@ -39,6 +39,10 @@ void SampleSettings::SetNormError(double norm) {
 	SetDefault("norm_error", GeneralUtils::DblToStr(norm));
 };
 
+double SampleSettings::GetNormError() {
+  return GetD("norm_error");
+};
+
 std::string SampleSettings::GetCovarInput() {
 	return GetS("covar");
 }
