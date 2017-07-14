@@ -186,6 +186,7 @@ void Measurement2D::FinaliseSampleSettings() {
   EnuMax = GeneralUtils::StrToDbl(fSettings.GetS("enu_max"));
 
   if (fAddNormPen) {
+    fNormError = fSettings.GetNormError();
     if (fNormError <= 0.0) {
       ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << std::endl;
       ERR(WRN) << "If you want to use it please add fNormError=VAL" << std::endl;
@@ -924,7 +925,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
   // not data points
   for (int xBin = 0; xBin < fDataHist->GetNbinsX() + 1; ++xBin) {
     for (int yBin = 0; yBin < fDataHist->GetNbinsY() + 1; ++yBin) {
-      if (fDataHist->GetBinContent(xBin, yBin) != 0)
+      if (fDataHist->GetBinError(xBin, yBin) != 0)
         ++nDOF;
     }
   }
@@ -938,7 +939,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
           if (fMaskHist->GetBinContent(xBin, yBin) > 0.5) ++nMasked;
 
   // Take away those masked DOF
-  if (applymasking) {
+  if (fIsMask) {
     nDOF -= nMasked;
   }
 

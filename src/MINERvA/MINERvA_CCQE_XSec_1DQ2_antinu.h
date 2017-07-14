@@ -38,6 +38,7 @@ public:
 
   bool isFluxFix, fullphasespace;
 
+  bool fSaveExtra;
   TH1D* fExtra_Eav;
   MINERvAUtils::ModeStack* fExtra_Eav_MODES;
   TH2D* fExtra_EavQ2;

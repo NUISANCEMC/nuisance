@@ -19,6 +19,7 @@ public:
 	void SetYTitle(std::string name);
 	void SetZTitle(std::string name);
 	void SetNormError(double norm);
+	double GetNormError();
 
 	void SetAllowedTypes(std::string allowed, std::string defaulttype="FIX");
 	void SetEnuRangeFromFlux(TH1D* fluxhist);

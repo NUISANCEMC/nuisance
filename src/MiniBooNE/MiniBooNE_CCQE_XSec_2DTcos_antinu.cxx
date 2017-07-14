@@ -73,7 +73,7 @@ MiniBooNE_CCQE_XSec_2DTcos_antinu::MiniBooNE_CCQE_XSec_2DTcos_antinu(nuiskey sam
   ScaleData(1E-41);
 
   SetDataErrorsFromTextFile( fSettings.GetErrorInput() );
-  ScaleDataErrors(1E-42);
+  ScaleDataErrors(1E-41);
 
   SetCovarFromDiagonal();
 

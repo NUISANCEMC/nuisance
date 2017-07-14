@@ -83,25 +83,85 @@ private:
   double fScaleFactorDifXSec;
   double fScaleFactorEnuXSec;
 
-  TH1D* fHist_Enu;
-  MCStudies::OfficialNIWGStack* fHist_Enu_Modes;
-  MCStudies::OfficialPionStack* fHist_Enu_Pions;
+  TH1D* fHist_NuMu_Enu;
+  MCStudies::OfficialNIWGStack* fHist_NuMu_Enu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMu_Enu_Pions;
 
-  TH1D* fHist_EnuRates;
-  MCStudies::OfficialNIWGStack* fHist_EnuRates_Modes;
-  MCStudies::OfficialPionStack* fHist_EnuRates_Pions;
+  TH1D* fHist_NuMu_EnuRates;
+  MCStudies::OfficialNIWGStack* fHist_NuMu_EnuRates_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMu_EnuRates_Pions;
 
-  TH1D* fHist_Q2;
-  MCStudies::OfficialNIWGStack* fHist_Q2_Modes;
-  MCStudies::OfficialPionStack* fHist_Q2_Pions;
+  TH1D* fHist_NuMu_Q2;
+  MCStudies::OfficialNIWGStack* fHist_NuMu_Q2_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMu_Q2_Pions;
 
-  TH1D* fHist_Pmu;
-  MCStudies::OfficialNIWGStack* fHist_Pmu_Modes;
-  MCStudies::OfficialPionStack* fHist_Pmu_Pions;
+  TH1D* fHist_NuMu_Pmu;
+  MCStudies::OfficialNIWGStack* fHist_NuMu_Pmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMu_Pmu_Pions;
 
-  TH1D* fHist_Cosmu;
-  MCStudies::OfficialNIWGStack* fHist_Cosmu_Modes;
-  MCStudies::OfficialPionStack* fHist_Cosmu_Pions;
+  TH1D* fHist_NuMu_Cosmu;
+  MCStudies::OfficialNIWGStack* fHist_NuMu_Cosmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMu_Cosmu_Pions;
+
+  TH1D* fHist_NuMuBar_Enu;
+  MCStudies::OfficialNIWGStack* fHist_NuMuBar_Enu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMuBar_Enu_Pions;
+
+  TH1D* fHist_NuMuBar_EnuRates;
+  MCStudies::OfficialNIWGStack* fHist_NuMuBar_EnuRates_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMuBar_EnuRates_Pions;
+
+  TH1D* fHist_NuMuBar_Q2;
+  MCStudies::OfficialNIWGStack* fHist_NuMuBar_Q2_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMuBar_Q2_Pions;
+
+  TH1D* fHist_NuMuBar_Pmu;
+  MCStudies::OfficialNIWGStack* fHist_NuMuBar_Pmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMuBar_Pmu_Pions;
+
+  TH1D* fHist_NuMuBar_Cosmu;
+  MCStudies::OfficialNIWGStack* fHist_NuMuBar_Cosmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NuMuBar_Cosmu_Pions;
+
+  TH1D* fHist_Nue_Enu;
+  MCStudies::OfficialNIWGStack* fHist_Nue_Enu_Modes;
+  MCStudies::OfficialPionStack* fHist_Nue_Enu_Pions;
+
+  TH1D* fHist_Nue_EnuRates;
+  MCStudies::OfficialNIWGStack* fHist_Nue_EnuRates_Modes;
+  MCStudies::OfficialPionStack* fHist_Nue_EnuRates_Pions;
+
+  TH1D* fHist_Nue_Q2;
+  MCStudies::OfficialNIWGStack* fHist_Nue_Q2_Modes;
+  MCStudies::OfficialPionStack* fHist_Nue_Q2_Pions;
+
+  TH1D* fHist_Nue_Pmu;
+  MCStudies::OfficialNIWGStack* fHist_Nue_Pmu_Modes;
+  MCStudies::OfficialPionStack* fHist_Nue_Pmu_Pions;
+
+  TH1D* fHist_Nue_Cosmu;
+  MCStudies::OfficialNIWGStack* fHist_Nue_Cosmu_Modes;
+  MCStudies::OfficialPionStack* fHist_Nue_Cosmu_Pions;
+
+  TH1D* fHist_NueBar_Enu;
+  MCStudies::OfficialNIWGStack* fHist_NueBar_Enu_Modes;
+  MCStudies::OfficialPionStack* fHist_NueBar_Enu_Pions;
+
+  TH1D* fHist_NueBar_EnuRates;
+  MCStudies::OfficialNIWGStack* fHist_NueBar_EnuRates_Modes;
+  MCStudies::OfficialPionStack* fHist_NueBar_EnuRates_Pions;
+
+  TH1D* fHist_NueBar_Q2;
+  MCStudies::OfficialNIWGStack* fHist_NueBar_Q2_Modes;
+  MCStudies::OfficialPionStack* fHist_NueBar_Q2_Pions;
+
+  TH1D* fHist_NueBar_Pmu;
+  MCStudies::OfficialNIWGStack* fHist_NueBar_Pmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NueBar_Pmu_Pions;
+
+  TH1D* fHist_NueBar_Cosmu;
+  MCStudies::OfficialNIWGStack* fHist_NueBar_Cosmu_Modes;
+  MCStudies::OfficialPionStack* fHist_NueBar_Cosmu_Pions;
 
 
 };
