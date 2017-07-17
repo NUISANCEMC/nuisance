@@ -167,7 +167,7 @@ std::string BeamUtils::ConvertFluxIDs(std::string id) {
 	else if (!id.compare("ND280_fhc_numu")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_numu[14]";
 	else if (!id.compare("ND280_fhc_numubar")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_numub[-14]";
 	else if (!id.compare("ND280_fhc_numunumubar")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_numu[14],enu_nd280_numub[-14]";
-	else if (!id.compare("ND280_fhc_nue")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_numue[12]";
+	else if (!id.compare("ND280_fhc_nue")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_nue[12]";
 	else if (!id.compare("ND280_fhc_nuebar")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_nueb[-12]";
 	else if (!id.compare("ND280_fhc_nuenuebar")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_nue[12],enu_nd280_nueb[-12]";
 	else if (!id.compare("ND280_fhc_all")) inputs = "t2kflux_2016_plus250kA.root,enu_nd280_numu[14],enu_nd280_numub[-14],enu_nd280_nue[12],enu_nd280_nueb[-12]";
@@ -183,7 +183,7 @@ std::string BeamUtils::ConvertFluxIDs(std::string id) {
 	else if (!id.compare("SK_fhc_numu")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_numu[14]";
 	else if (!id.compare("SK_fhc_numubar")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_numub[-14]";
 	else if (!id.compare("SK_fhc_numunumubar")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_numu[14],enu_sk_numub[-14]";
-	else if (!id.compare("SK_fhc_nue")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_numue[12]";
+	else if (!id.compare("SK_fhc_nue")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_nue[12]";
 	else if (!id.compare("SK_fhc_nuebar")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_nueb[-12]";
 	else if (!id.compare("SK_fhc_nuenuebar")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_nue[12],enu_sk_nueb[-12]";
 	else if (!id.compare("SK_fhc_all")) inputs = "t2kflux_2016_plus250kA.root,enu_sk_numu[14],enu_sk_numub[-14],enu_sk_nue[12],enu_sk_nueb[-12]";
