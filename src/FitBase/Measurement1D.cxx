@@ -1159,7 +1159,7 @@ void Measurement1D::Write(std::string drawOpt) {
       GetEventHistogram()->Write();
 
     if (drawOpt.find("XSEC") != std::string::npos && GetEventHistogram())
-      GetEventHistogram()->Write();
+      GetXSecHistogram()->Write();
 
   }
 
