@@ -487,8 +487,6 @@ int main(int argc, char ** argv)
   std::string neutroot = std::string(getenv("NEUT_ROOT")) + "/src/neutsmpl/";
 
   // Calculate the dynamic modes definition
-  bool neutrino = true;
-  std::string dynparamsdef = GetDynamicModes(gOptGeneratorList, neutrino);
 
   // Read Target string
   std::string targetparamsdef = GetTargetDefinition(gOptTargetDef);
@@ -499,7 +497,12 @@ int main(int argc, char ** argv)
 
   // NEUT doesn't let us do combined flux inputs so have to loop over each flux.
   std::map<std::string,std::string> newfluxdef = MakeNewFluxFile(gOptFluxDef,gOptOutputFile);
-  
+
+  // Quick fix to make flux also save to pid_time.root.flux.root
+  std::stringstream ss;
+  ss << getpid() << "_" << time(NULL) << ".root";
+  newfluxdef = MakeNewFluxFile(gOptFluxDef,ss.str());
+
   // Copy this file to the NEUT working directory
   LOG(FIT) << "Copying flux to NEUT working directory" << std::endl;
   system(("cp -v " + newfluxdef["beam_inputroot"] + " " + neutroot + "/").c_str());
@@ -543,6 +546,10 @@ int main(int argc, char ** argv)
     std::cout << "NEVENTS = " << gOptNumberEvents << " " << fluxfractions[i] <<" " << totintflux << " " << nevents << std::endl;
     std::string eventparamsdef = GetEventAndSeedDefinition(nevents,
 							   gOptSeed);
+
+    bool neutrino = true;
+    if (possiblefluxids[i].find("b") != std::string::npos) neutrino = false;
+    std::string dynparamsdef = GetDynamicModes(gOptGeneratorList, neutrino);
 
     std::string fluxparamsdef = GetFluxDefinition( newfluxdef["beam_inputroot"],
 						   newfluxdef["beam_inputroot_" + possiblefluxids[i]],
@@ -591,7 +598,7 @@ int main(int argc, char ** argv)
     std::string cardfile   =  ExpandPath(gOptOutputFile + "." + possiblefluxids[i] + ".par");
     std::string outputfile =  ExpandPath(gOptOutputFile + "." + possiblefluxids[i] + ".root");
     std::string basecardfile = GetBaseName(cardfile);
-    std::string baseoutputfile = GetBaseName(outputfile);
+    std::string baseoutputfile = ss.str();
 
     std::cout << "CARDFILE = " << cardfile << " : " << basecardfile << std::endl;
     std::cout << "OUTPUTFILE = " << outputfile << " : " << baseoutputfile << std::endl;
@@ -602,30 +609,30 @@ int main(int argc, char ** argv)
     chdir(neutroot.c_str());
 
     int attempts = 0;
-    while(true){
+    //    while(true){
 
       // Break if too many attempts
-      attempts++;
-      if (attempts > 20) continue;
+    //      attempts++;
+    //      if (attempts > 20) continue;
 
       // Actually run neutroot2
       system(("./neutroot2 " + basecardfile + " " + baseoutputfile).c_str());
 
       // Check the output is valid, sometimes NEUT aborts mid run.
-      TFile* f = new TFile(baseoutputfile.c_str(),"READ");
-      if (!f or f->IsZombie()) continue;
+      //      TFile* f = new TFile(baseoutputfile.c_str(),"READ");
+      //      if (!f or f->IsZombie()) continue;
       
       // Check neutttree is there and filled correctly.
-      TTree* tn = (TTree*) f->Get("neuttree");
-      if (!tn) continue;
-      if (tn->GetEntries() < nevents * 0.9) continue;
+      //      TTree* tn = (TTree*) f->Get("neuttree");
+      //      if (!tn) continue;
+      //      if (tn->GetEntries() < nevents * 0.9) continue;
 
-      break;
-    }
+      //      break;
+      //    }
 
     // Move the finished file back and clean this directory of card files
-    system(("echo mv " + baseoutputfile + " " + outputfile).c_str());
-    system(("echo rm " + basecardfile).c_str());
+    system(("mv -v " + baseoutputfile + " " + outputfile).c_str());
+    system(("rm -v " + basecardfile).c_str());
     chdir(cwd.c_str());
 
   }
