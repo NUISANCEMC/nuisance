@@ -123,7 +123,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
     // Add MC err to diag
     for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
-      double mcerr = calc_mc->GetBinError(i + 1) * data_scale;
+      double mcerr = calc_mc->GetBinError(i + 1) * sqrt(covar_scale);
       double oldval = (*newcov)(i, i);
 
       (*newcov)(i, i) = oldval + mcerr * mcerr;
