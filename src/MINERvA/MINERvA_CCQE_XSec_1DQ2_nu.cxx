@@ -41,6 +41,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 
   isFluxFix      = !fSettings.Found("name", "_oldflux");
   fullphasespace = !fSettings.Found("name", "_20deg");
+  fSaveExtra = FitPar::Config().GetParB("MINERvASaveExtraCCQE");
 
   // CCQELike plot information
   fSettings.SetTitle("MINERvA_CCQE_XSec_1DQ2_nu");
@@ -112,21 +113,22 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
     SetCovarFromTextFile( fSettings.GetCovarInput() );
   }
 
-  fExtra_Eav = new TH1D((fSettings.GetName() + "Eav").c_str(),"Eav",30, 0.0, 1.0);
-  fExtra_Eav_MODES = new MINERvAUtils::ModeStack((fSettings.GetName() + "EavMODES").c_str(),"EavMODES", fExtra_Eav);
-  //  fExtra_Eav_MODES->SetReverseStack();
-  SetAutoProcess(fExtra_Eav);
-  SetAutoProcess(fExtra_Eav_MODES);
-
-  fExtra_EavQ2 = new TH2D((fSettings.GetName() + "EavQ2").c_str(),"EavQ2",12,0.0,2.0,50,0.0,1.0);
-  fExtra_EavQ2_MODES = new MINERvAUtils::ModeStack((fSettings.GetName() + "EavQ2MODES").c_str(),"EavQ2MODES", fExtra_EavQ2);
-  //  fExtra_EavQ2_MODES->SetReverseStack();
-  SetAutoProcess(fExtra_EavQ2);
-  SetAutoProcess(fExtra_EavQ2_MODES);
-
-  fEavQ2Cut = new TF1((fSettings.GetName() + "f1").c_str(),"0.03 + 0.3*x",0.0,2.0);
-  SetAutoProcess(fEavQ2Cut);
-
+  if (fSaveExtra){
+    fExtra_Eav = new TH1D((fSettings.GetName() + "Eav").c_str(),"Eav",30, 0.0, 1.0);
+    fExtra_Eav_MODES = new MINERvAUtils::ModeStack((fSettings.GetName() + "EavMODES").c_str(),"EavMODES", fExtra_Eav);
+    //  fExtra_Eav_MODES->SetReverseStack();
+    SetAutoProcess(fExtra_Eav);
+    SetAutoProcess(fExtra_Eav_MODES);
+    
+    fExtra_EavQ2 = new TH2D((fSettings.GetName() + "EavQ2").c_str(),"EavQ2",12,0.0,2.0,50,0.0,1.0);
+    fExtra_EavQ2_MODES = new MINERvAUtils::ModeStack((fSettings.GetName() + "EavQ2MODES").c_str(),"EavQ2MODES", fExtra_EavQ2);
+    //  fExtra_EavQ2_MODES->SetReverseStack();
+    SetAutoProcess(fExtra_EavQ2);
+    SetAutoProcess(fExtra_EavQ2_MODES);
+    
+    fEavQ2Cut = new TF1((fSettings.GetName() + "f1").c_str(),"0.03 + 0.3*x",0.0,2.0);
+    SetAutoProcess(fEavQ2Cut);
+  }
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -151,37 +153,38 @@ void MINERvA_CCQE_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   fXVar = q2qe;
 
   // Calculate from scratch the vertex size
-  double pm = 938.2720813;
-  double pe = pm + 120.0;
-  FitParticle* fakeproton = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 2212, kFinalState);
-  double range = MINERvAUtils::RangeInScintillator(fakeproton, 100);
+  if (fSaveExtra){
+    double pm = 938.2720813;
+    double pe = pm + 120.0;
+    FitParticle* fakeproton = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 2212, kFinalState);
+    double range = MINERvAUtils::RangeInScintillator(fakeproton, 100);
   
-  pm = 139.57018;
-  pe = pm + 65;
-  FitParticle* fakepion = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 211, kFinalState);
-  double pionrange = MINERvAUtils::RangeInScintillator(fakepion, 100);
+    pm = 139.57018;
+    pe = pm + 65;
+    FitParticle* fakepion = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 211, kFinalState);
+    double pionrange = MINERvAUtils::RangeInScintillator(fakepion, 100);
 
-  double Eav = 0.0;
-  for (int i = 0; i < event->NParticles(); i++){
-    if (event->GetParticleState(i) != kFinalState) continue;
-    int pid = event->GetParticlePDG(i);
-    double ParticleEav = 0.0;
-    if (pid == 13) continue;
-    if (pid != 2112 and pid != 22 and pid != 111){
-      ParticleEav = MINERvAUtils::GetEDepositOutsideRangeInScintillator(event->GetParticle(i), range) / 1.E3;
-    } else if (pid == 22 or pid == 111){
-      ParticleEav = event->GetParticle(i)->fP.E()/1.E3;
-    }
+    double Eav = 0.0;
+    for (int i = 0; i < event->NParticles(); i++){
+      if (event->GetParticleState(i) != kFinalState) continue;
+      int pid = event->GetParticlePDG(i);
+      double ParticleEav = 0.0;
+      if (pid == 13) continue;
+      if (pid != 2112 and pid != 22 and pid != 111){
+	ParticleEav = MINERvAUtils::GetEDepositOutsideRangeInScintillator(event->GetParticle(i), range) / 1.E3;
+      } else if (pid == 22 or pid == 111){
+	ParticleEav = event->GetParticle(i)->fP.E()/1.E3;
+      }
     
-    Eav += ParticleEav;
-  }
+      Eav += ParticleEav;
+    }
   
-  fExtra_Eav->Fill(Eav);
-  fExtra_Eav_MODES->Fill( event->Mode, Eav );
+    fExtra_Eav->Fill(Eav);
+    fExtra_Eav_MODES->Fill( event->Mode, Eav );
 
-  fExtra_EavQ2->Fill(q2qe,Eav);
-  fExtra_EavQ2_MODES->Fill( event->Mode, q2qe, Eav );
-  
+    fExtra_EavQ2->Fill(q2qe,Eav);
+    fExtra_EavQ2_MODES->Fill( event->Mode, q2qe, Eav );
+  }
 
   return;
 }

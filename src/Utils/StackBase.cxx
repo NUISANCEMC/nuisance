@@ -16,6 +16,21 @@ void StackBase::AddMode(std::string name, std::string title,
 	fAllStyles.push_back(temp);
 }
 
+void StackBase::FluxUnfold(TH1D* flux, TH1D* events, double scalefactor) {
+
+
+
+	for (size_t i = 0; i < fAllLabels.size(); i++) {
+		if (fNDim == 1) {
+			PlotUtils::FluxUnfoldedScaling((TH1D*) fAllHists[i], flux, events, scalefactor);
+		} else if (fNDim == 2) {
+			PlotUtils::FluxUnfoldedScaling((TH2D*) fAllHists[i], flux, events, scalefactor);
+
+		}
+	}
+}
+
+
 void StackBase::AddMode(int index, std::string name, std::string title,
                         int linecolor, int linewidth, int fillstyle) {
 
@@ -36,7 +51,7 @@ void StackBase::AddMode(int index, std::string name, std::string title,
 	fAllStyles[index] = temp;
 }
 
-bool StackBase::IncludeInStack(TH1* hist){
+bool StackBase::IncludeInStack(TH1* hist) {
 	if (!FitPar::Config().GetParB("includeemptystackhists") and
 	        hist->Integral() == 0.0) return false;
 	return true;

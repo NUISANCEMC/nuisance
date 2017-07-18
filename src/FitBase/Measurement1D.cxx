@@ -490,6 +490,11 @@ void Measurement1D::FinaliseMeasurement() {
 
   LOG(SAM) << "Finalising Measurement: " << fName << std::endl;
 
+  if (fSettings.GetB("onlymc")){
+    if (fDataHist) delete fDataHist;
+    fDataHist = new TH1D("empty_data","empty_data",1,0.0,1.0);
+  }
+
   // Make sure data is setup
   if (!fDataHist) {
     ERR(FTL) << "No data has been setup inside " << fName << " constructor!" << std::endl;
@@ -1175,7 +1180,7 @@ void Measurement1D::Write(std::string drawOpt) {
       GetEventHistogram()->Write();
 
     if (drawOpt.find("XSEC") != std::string::npos && GetEventHistogram())
-      GetEventHistogram()->Write();
+      GetXSecHistogram()->Write();
 
   }
 

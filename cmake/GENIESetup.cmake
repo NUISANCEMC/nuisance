@@ -27,10 +27,10 @@
 ################################################################################
 
 #################################  GENIE  ######################################
-if(GENIE_ROOT STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_ROOT is not defined. "
+if(GENIE STREQUAL "")
+  cmessage(FATAL_ERROR "Variable GENIE is not defined. "
     "The location of a pre-built GENIE install must be defined either as"
-    " $ cmake -DGENIE_ROOT=/path/to/GENIE or as and environment vairable"
+    " $ cmake -DGENIE=/path/to/GENIE or as and environment vairable"
     " $ export GENIE=/path/to/GENIE")
 endif()
 
@@ -40,7 +40,7 @@ if (BUILD_GEVGEN)
 endif()
 
 # Extract GENIE VERSION
-execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh ${GENIE_ROOT}
+execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh ${GENIE}
   OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (COMMAND genie-config
@@ -84,29 +84,29 @@ cmessage(DEBUG "genie-config --libs -- libs stripped: ${GENIE_LIBS_STRIPED}")
 cmessage(DEBUG "genie-config --libs -- libs list: ${GENIE_LIBS_LIST}")
 
 ################################  LHAPDF  ######################################
-if(GENIE_LHAPDF_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LHAPDF_LIB is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DGENIE_LHAPDF_LIB=/path/to/LHAPDF_libraries or as and environment vairable $ export LHAPDF_LIB=/path/to/LHAPDF_libraries")
+if(LHAPDF_LIB STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LHAPDF_LIB is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_LIB=/path/to/LHAPDF_libraries or as and environment vairable $ export LHAPDF_LIB=/path/to/LHAPDF_libraries")
 endif()
 
-if(GENIE_LHAPDF_INC STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LHAPDF_INC is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DGENIE_LHAPDF_INC=/path/to/LHAPDF_includes or as and environment vairable $ export LHAPDF_INC=/path/to/LHAPDF_includes")
+if(LHAPDF_INC STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LHAPDF_INC is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_INC=/path/to/LHAPDF_includes or as and environment vairable $ export LHAPDF_INC=/path/to/LHAPDF_includes")
 endif()
 
-if(GENIE_LHAPATH STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LHAPATH is not defined. The location of a the LHAPATH directory must be defined either as $ cmake -DGENIE_LHAPATH=/path/to/LHAPATH or as and environment variable $ export LHAPATH=/path/to/LHAPATH")
+if(LHAPATH STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. The location of a the LHAPATH directory must be defined either as $ cmake -DLHAPATH=/path/to/LHAPATH or as and environment variable $ export LHAPATH=/path/to/LHAPATH")
 endif()
 
 ################################  LIBXML  ######################################
-if(GENIE_LIBXML2_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LIBXML2_LIB is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DGENIE_LIBXML2_LIB=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_LIB=/path/to/LIBXML2_libraries")
+if(LIBXML2_LIB STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LIBXML2_LIB is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_LIB=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_LIB=/path/to/LIBXML2_libraries")
 endif()
 
-if(GENIE_LIBXML2_INC STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LIBXML2_INC is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DGENIE_LIBXML2_INC=/path/to/LIBXML2_includes or as and environment vairable $ export LIBXML2_INC=/path/to/LIBXML2_includes")
+if(LIBXML2_INC STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LIBXML2_INC is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_INC=/path/to/LIBXML2_includes or as and environment vairable $ export LIBXML2_INC=/path/to/LIBXML2_includes")
 endif()
 ###############################  log4cpp  ######################################
-if(GENIE_LOG4CPP_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
+if(LOG4CPP_LIB STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
 endif()
 
 if(GENIE_LOG4CPP_INC  STREQUAL "")
@@ -124,22 +124,22 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
   ${GENIE_INCLUDES_DIR}/Apps
   ${GENIE_INCLUDES_DIR}/FluxDrivers
   ${GENIE_INCLUDES_DIR}/EVGDrivers
-  ${GENIE_LHAPDF_INC}
-  ${GENIE_LIBXML2_INC}
+  ${LHAPDF_INC}
+  ${LIBXML2_INC}
   ${GENIE_LOG4CPP_INC})
 
 SAYVARS()
 
 LIST(APPEND EXTRA_LINK_DIRS
   ${GENIE_LIB_DIR}
-  ${GENIE_LHAPDF_LIB}
-  ${GENIE_LIBXML2_LIB}
-  ${GENIE_LOG4CPP_LIB})
+  ${LHAPDF_LIB}
+  ${LIBXML2_LIB}
+  ${LOG4CPP_LIB})
 
-LIST(REVERSE EXTRA_LIBS)
-LIST(REVERSE GENIE_LIBS_LIST)
+#LIST(REVERSE EXTRA_LIBS)
+#LIST(REVERSE GENIE_LIBS_LIST)
 LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
-LIST(REVERSE EXTRA_LIBS)
+#LIST(REVERSE EXTRA_LIBS)
 
 LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 

@@ -424,6 +424,13 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC1pip_XSec_1Dth_nu_20deg_fluxcorr")) {
     return (new MINERvA_CC1pip_XSec_1Dth_nu(samplekey));
 
+  } else if (!name.compare("MINERvA_CC1pip_XSec_1DTpi_nu_2017") ||
+	     !name.compare("MINERvA_CC1pip_XSec_1Dth_nu_2017") ||
+	     !name.compare("MINERvA_CC1pip_XSec_1Dpmu_nu_2017") ||
+	     !name.compare("MINERvA_CC1pip_XSec_1Dthmu_nu_2017") ||
+	     !name.compare("MINERvA_CC1pip_XSec_1DQ2_nu_2017") ||
+	     !name.compare("MINERvA_CC1pip_XSec_1DEnu_nu_2017")){
+    return (new MINERvA_CC1pip_XSec_1D_2017Update(samplekey));
     /*
       CCNpi+
     */
@@ -659,6 +666,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
   } else if (name.find("MuonValidation_") != std::string::npos) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
+
+  } else if (!name.compare("NIWGOfficialPlots")){
+    return (new OfficialNIWGPlots(samplekey));
 
   } else {
     ERR(FTL) << "Error: No such sample: " << name << std::endl;

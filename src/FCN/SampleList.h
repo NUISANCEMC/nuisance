@@ -245,7 +245,10 @@
 #include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
+#include "MINERvA_CC1pip_XSec_1D_2017Update.h"
+
 #include "T2K2017_FakeData.h"
+#include "OfficialNIWGPlots.h"
 
 #include "FitWeight.h"
 

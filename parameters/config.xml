@@ -40,7 +40,7 @@
 <config RemoveUndefParticles='0' />
 <config RemoveNuclearParticles='0'/>
 <config logging.JointFCN.cxx='4'/>
-
+<config MINERvASaveExtraCCQE='0' />
 
 <!-- # Input Configs -->
 <!-- # ###################################################### -->
@@ -74,7 +74,7 @@
 <config input.regen_nuwro_plots='0'/>
 
 <!-- # DEVEL CONFIG OPTION, don't touch! -->
-<config CacheSize='0'/>
+<config CacheSize='10000000'/>
 
 <!-- # ReWeighting Configuration Options -->
 <!-- # ###################################################### -->

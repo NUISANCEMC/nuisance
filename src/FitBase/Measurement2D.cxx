@@ -186,6 +186,7 @@ void Measurement2D::FinaliseSampleSettings() {
   EnuMax = GeneralUtils::StrToDbl(fSettings.GetS("enu_max"));
 
   if (fAddNormPen) {
+    fNormError = fSettings.GetNormError();
     if (fNormError <= 0.0) {
       ERR(WRN) << "Norm error for class " << fName << " is 0.0!" << std::endl;
       ERR(WRN) << "If you want to use it please add fNormError=VAL" << std::endl;
@@ -223,7 +224,7 @@ void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D* hist) {
   valhist->Reset();
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0, true);
 
- LOG(SAM) << " -> Filling values from read hist." << std::endl;
+  LOG(SAM) << " -> Filling values from read hist." << std::endl;
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinContent(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
@@ -243,7 +244,7 @@ void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D* hist) {
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0);
 
   // Fill Errors
- LOG(SAM) << " -> Filling errors from read hist." << std::endl;
+  LOG(SAM) << " -> Filling errors from read hist." << std::endl;
 
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
@@ -261,12 +262,12 @@ void Measurement2D::SetMapValuesFromText(std::string dataFile) {
   std::vector<double> edgex;
   std::vector<double> edgey;
 
-  for (int i = 0; i <= hist->GetNbinsX(); i++) edgex.push_back(hist->GetXaxis()->GetBinLowEdge(i+1));
-  for (int i = 0; i <= hist->GetNbinsY(); i++) edgey.push_back(hist->GetYaxis()->GetBinLowEdge(i+1));
+  for (int i = 0; i <= hist->GetNbinsX(); i++) edgex.push_back(hist->GetXaxis()->GetBinLowEdge(i + 1));
+  for (int i = 0; i <= hist->GetNbinsY(); i++) edgey.push_back(hist->GetYaxis()->GetBinLowEdge(i + 1));
 
 
   fMapHist = new TH2I((fName + "_map").c_str(), (fName + fPlotTitles).c_str(),
-                      edgex.size()-1, &edgex[0], edgey.size()-1, &edgey[0]);
+                      edgex.size() - 1, &edgex[0], edgey.size() - 1, &edgey[0]);
 
   LOG(SAM) << "Reading map from: " << dataFile << std::endl;
   PlotUtils::Set2DHistFromText(dataFile, fMapHist, 1.0);
@@ -548,7 +549,10 @@ void Measurement2D::FinaliseMeasurement() {
 //********************************************************************
 
   LOG(SAM) << "Finalising Measurement: " << fName << std::endl;
-
+  if (fSettings.GetB("onlymc")) {
+    if (fDataHist) delete fDataHist;
+    fDataHist = new TH2D("empty_data", "empty_data", 1, 0.0, 1.0,1,0.0,1.0);
+  }
   // Make sure data is setup
   if (!fDataHist) {
     ERR(FTL) << "No data has been setup inside " << fName << " constructor!" << std::endl;
@@ -921,7 +925,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
   // not data points
   for (int xBin = 0; xBin < fDataHist->GetNbinsX() + 1; ++xBin) {
     for (int yBin = 0; yBin < fDataHist->GetNbinsY() + 1; ++yBin) {
-      if (fDataHist->GetBinContent(xBin, yBin) != 0)
+      if (fDataHist->GetBinError(xBin, yBin) != 0)
         ++nDOF;
     }
   }
@@ -935,7 +939,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
           if (fMaskHist->GetBinContent(xBin, yBin) > 0.5) ++nMasked;
 
   // Take away those masked DOF
-  if (applymasking) {
+  if (fIsMask) {
     nDOF -= nMasked;
   }
 
@@ -1124,9 +1128,9 @@ void Measurement2D::ThrowCovariance() {
   return;
 };
 
-//********************************************************************             
-void Measurement2D::ThrowDataToy(){
-  //********************************************************************             
+//********************************************************************
+void Measurement2D::ThrowDataToy() {
+  //********************************************************************
   if (!fDataTrue) fDataTrue = (TH2D*) fDataHist->Clone();
   if (fMCHist) delete fMCHist;
   fMCHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
@@ -1206,9 +1210,9 @@ void Measurement2D::Write(std::string drawOpt) {
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
 
-  // Write Settigns                                              
-  if (drawOpt.find("SETTINGS") != std::string::npos){
-    fSettings.Set("#chi^{2}",fLikelihood);
+  // Write Settigns
+  if (drawOpt.find("SETTINGS") != std::string::npos) {
+    fSettings.Set("#chi^{2}", fLikelihood);
     fSettings.Set("NDOF", this->GetNDOF() );
     fSettings.Set("#chi^{2}/NDOF", fLikelihood / this->GetNDOF() );
     fSettings.Write();

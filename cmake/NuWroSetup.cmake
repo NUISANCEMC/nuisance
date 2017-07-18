@@ -51,12 +51,12 @@ if(INPUT_NuWro_FILE)
 
 else()
 
-  if(NUWRO_ROOT STREQUAL "")
-    cmessage(FATAL_ERROR "Variable NUWRO_ROOT is not defined. "
+  if(NUWRO STREQUAL "")
+    cmessage(FATAL_ERROR "Variable NUWRO is not defined. "
       "This must be set to point to a prebuilt NuWro instance.")
   endif()
-  if(NUWRO_INCLUDES STREQUAL "")
-    cmessage(FATAL_ERROR "Variable NUWRO_INCLUDES is not defined. "
+  if(NUWRO_INC STREQUAL "")
+    cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
       "This must be set to point to an installed NuWro instance.")
   endif()
 
@@ -66,19 +66,19 @@ else()
     LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__)
 
     LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
-      ${NUWRO_ROOT}/src
-      ${NUWRO_ROOT}/src/reweight
-      ${NUWRO_INCLUDES}/nuwro)
+      ${NUWRO}/src
+      ${NUWRO}/src/reweight
+      ${NUWRO_INC}/nuwro)
 
-    LIST(APPEND EXTRA_LINK_DIRS ${NUWRO_ROOT}/build/${CMAKE_SYSTEM_NAME}/lib)
+    LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
     LIST(APPEND EXTRA_LIBS reweight event)
 
   else ()
     LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
 
-    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO_ROOT}/src)
+    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO}/src)
 
-    LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO_ROOT}/bin/event1.so)
+    LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO}/bin/event1.so)
   endif()
 
   set(NEED_PYTHIA6 TRUE)

@@ -965,7 +965,9 @@ void JointMeas1D::ApplyNormScale(double norm) {
 //********************************************************************
 int JointMeas1D::GetNDOF() {
   //********************************************************************
-  return fDataHist->GetNbinsX() - fMaskHist->Integral();
+  int ndof = fDataHist->GetNbinsX();
+  if (fMaskHist) ndof -= fMaskHist->Integral();
+  return ndof;
 }
 
 //********************************************************************
