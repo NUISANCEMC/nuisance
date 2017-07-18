@@ -60,7 +60,6 @@ MINERvA_CCCOHPI_XSec_1DEpi_nu::MINERvA_CCCOHPI_XSec_1DEpi_nu(nuiskey samplekey) 
 
   // Apply scalings based on the data release
   ScaleData(1E-39);
-  ScaleCovar(1E-79);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -87,6 +86,6 @@ bool MINERvA_CCCOHPI_XSec_1DEpi_nu::isSignal(FitEvent *event) {
 
 
 double MINERvA_CCCOHPI_XSec_1DEpi_nu::GetLikelihood(){
-  double chi2 = StatUtils::GetChi2FromCov(this->fDataHist, this->fMCHist, this->covar, NULL, 1, 1E-79);
+  double chi2 = StatUtils::GetChi2FromCov(this->fDataHist, this->fMCHist, this->covar, NULL, 1E39, 10);
   return chi2;
 }
