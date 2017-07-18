@@ -33,7 +33,10 @@ double SciBooNEUtils::StoppedEfficiency(TH2D *effHist, FitParticle *nu, FitParti
   double eff = 0.;
 
   if (!effHist) return eff;
-  eff = effHist->GetBinContent(effHist->FindBin(FitUtils::p(muon), FitUtils::th(nu, muon)/TMath::Pi()*180.));
+  // For Morgan's efficiencies
+  // eff = effHist->GetBinContent(effHist->FindBin(FitUtils::p(muon), FitUtils::th(nu, muon)/TMath::Pi()*180.));
+  // For Zack's efficiencies
+  eff = effHist->GetBinContent(effHist->FindBin(FitUtils::th(nu, muon)/TMath::Pi()*180., FitUtils::p(muon)*1000.));
 
   return eff;
 }
@@ -115,8 +118,9 @@ bool SciBooNEUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
 int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *effHist, FitParticle*& mainTrk, double& weight, bool penetrated){
 
   FitParticle *nu   = event->GetNeutrinoIn();
-  double highestMom = 0;
   int index = 0;
+  double thisWeight = 0;
+  double highWeight = 0;
   mainTrk = NULL;
 
   // Loop over particles
@@ -131,16 +135,17 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *effHist, FitParticle*& ma
     // Only consider pions, muons for now
     if (abs(PID) != 211 && abs(PID) != 13) continue;
 
-    // Ignore if higher momentum tracks available
-    if (FitUtils::p(event->PartInfo(j)) < highestMom) continue;
-
-    // Okay, now this is highest momentum
-    highestMom = FitUtils::p(event->PartInfo(j));
-    weight  *= SciBooNEUtils::StoppedEfficiency(effHist, nu, event->PartInfo(j));
-    index   = j;
-    mainTrk = event->PartInfo(j);
+    // Get the track with the highest weight
+    thisWeight = SciBooNEUtils::StoppedEfficiency(effHist, nu, event->PartInfo(j));
+    if (thisWeight < highWeight) continue;
+    highWeight = thisWeight;
+    index      = j;
+    mainTrk    = event->PartInfo(j);
   } // end loop over particle stack
   
+  // Pass the weight back (don't want to apply a weight twice by accident)
+  weight *= highWeight;
+
   return index;
 }
 
