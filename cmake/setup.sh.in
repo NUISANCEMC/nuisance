@@ -64,39 +64,39 @@ fi
 if [[ "@USE_GENIE@" != "FALSE" ]]; then
   echo "[INFO]: Adding GENIE paths to the environment."
 
-  export GENIE="@GENIE_ROOT@"
+  export GENIE="@GENIE@"
 
-  export LHAPDF_LIB="@GENIE_LHAPDF_LIB@"
-  export LHAPDF_INC="@GENIE_LHAPDF_INC@"
+  export LHAPDF_LIB="@LHAPDF_LIB@"
+  export LHAPDF_INC="@LHAPDF_INC@"
 
-  export LIBXML2_LIB="@GENIE_LIBXML2_LIB@"
-  export LIBXML2_INC="@GENIE_LIBXML2_INC@"
+  export LIBXML2_LIB="@LIBXML2_LIB@"
+  export LIBXML2_INC="@LIBXML2_INC@"
 
-  export LOG4CPP_LIB="@GENIE_LOG4CPP_LIB@"
+  export LOG4CPP_LIB="@LOG4CPP_LIB@"
   export LOG4CPP_INC="@GENIE_LOG4CPP_INC@"
 
-  if [[ "@GENIE_LHAPATH@" ]]; then
-    export LHAPATH="@GENIE_LHAPATH@"
+  if [[ "@LHAPATH@" ]]; then
+    export LHAPATH="@LHAPATH@"
   fi
 
-  if ! [[ ":$PATH:" == *":@GENIE_ROOT@/bin:"* ]]; then
-    export PATH=@GENIE_ROOT@/bin:$PATH
+  if ! [[ ":$PATH:" == *":@GENIE@/bin:"* ]]; then
+    export PATH=@GENIE@/bin:$PATH
   fi
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE_ROOT@/lib:"* ]]; then
-    export LD_LIBRARY_PATH=@GENIE_ROOT@/lib:$LD_LIBRARY_PATH
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE@/lib:"* ]]; then
+    export LD_LIBRARY_PATH=@GENIE@/lib:$LD_LIBRARY_PATH
   fi
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE_LHAPDF_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@GENIE_LHAPDF_LIB@:$LD_LIBRARY_PATH
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LHAPDF_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LHAPDF_LIB@:$LD_LIBRARY_PATH
   fi
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE_LIBXML2_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@GENIE_LIBXML2_LIB@:$LD_LIBRARY_PATH
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LIBXML2_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LIBXML2_LIB@:$LD_LIBRARY_PATH
   fi
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE_LOG4CPP_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@GENIE_LOG4CPP_LIB@:$LD_LIBRARY_PATH
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LOG4CPP_LIB@:"* ]]; then
+    export LD_LIBRARY_PATH=@LOG4CPP_LIB@:$LD_LIBRARY_PATH
   fi
 fi
 
@@ -112,8 +112,8 @@ fi
 
 if [[ "@USE_T2K@" != "FALSE" ]]; then
   echo "[INFO]: Adding T2K paths to the environment."
-  export T2KREWEIGHT=@T2KREWEIGHT_ROOT@
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@T2KREWEIGHT_ROOT@/lib:"* ]]; then
+  export T2KREWEIGHT=@T2KREWEIGHT@
+  if ! [[ ":$LD_LIBRARY_PATH:" == *":@T2KREWEIGHT@/lib:"* ]]; then
     export LD_LIBRARY_PATH=${T2KREWEIGHT}/lib:${LD_LIBRARY_PATH}
   fi
 fi

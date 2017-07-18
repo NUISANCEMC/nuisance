@@ -35,6 +35,13 @@ namespace BeamUtils{
   /// 
   /// e.g. 'numu,nue,numub,e,16' = <14,12,-14,11,16>
   std::vector<int> ParseSpeciesToIntVect(std::string spc);
+
+
+  /// @brief Convert flux ID to a flux definition for use in gen_nuisance
+  std::string  ConvertFluxIDs (std::string);
+
+  /// @brief Lists all possible flux ids, should be kept in sync with convert function.
+  void         ListFluxIDs    (void);
 }
 /*! @} */
 #endif

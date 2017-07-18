@@ -19,6 +19,7 @@ public:
 	void SetYTitle(std::string name);
 	void SetZTitle(std::string name);
 	void SetNormError(double norm);
+	double GetNormError();
 
 	void SetAllowedTypes(std::string allowed, std::string defaulttype="FIX");
 	void SetEnuRangeFromFlux(TH1D* fluxhist);
@@ -57,6 +58,8 @@ public:
 	int GetI(std::string name);
 	double GetD(std::string name);
 	std::string GetCovarInput();
+	void SetOnlyMC(bool state=true);
+	bool GetB(std::string name);
 
 	void Set(std::string name, int i);
 	void Set(std::string name, std::string s);
