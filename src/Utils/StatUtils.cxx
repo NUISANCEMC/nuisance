@@ -95,13 +95,17 @@ Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc,
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
                                    TMatrixDSym* invcov, TH1I* mask, 
-				   double datascale, double covarscale) {
+				   double data_scale, double covar_scale) {
 //*******************************************************************
 
   Double_t Chi2 = 0.0;
   TMatrixDSym* calc_cov = (TMatrixDSym*) invcov->Clone();
   TH1D* calc_data = (TH1D*) data->Clone();
   TH1D* calc_mc   = (TH1D*) mc->Clone();
+
+  calc_data->Scale(data_scale);
+  calc_mc  ->Scale(data_scale);
+  (*calc_cov) *= covar_scale;
 
   // If a mask if applied we need to apply it before the matrix is inverted
   if (mask) {
@@ -119,7 +123,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
     // Add MC err to diag
     for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
-      double mcerr = calc_mc->GetBinError(i + 1) * datascale;
+      double mcerr = calc_mc->GetBinError(i + 1) * data_scale;
       double oldval = (*newcov)(i, i);
 
       (*newcov)(i, i) = oldval + mcerr * mcerr;
@@ -158,13 +162,11 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
         LOG(DEB) << "Cont chi2 = " \
                  << ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) \
                       * (*calc_cov)(i, j) \
-                      * covarscale \
                       *   ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1)))
                  << " " << Chi2 << std::endl;
 
         Chi2 += ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) \
 		  * (*calc_cov)(i, j)					\
-		  * covarscale						\
 		  * ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) );  
 
       } else {
