@@ -17,17 +17,17 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(INPUT_NuWro_FILE)
+if(NOT NUWRO_INPUT_FILE STREQUAL "")
 
-  if(NOT EXISTS ${INPUT_NuWro_FILE})
-    cmessage(FATAL_ERROR "Expected -DBUILD_NuWro_FROM_FILE to point to a valid input file. Cannot find: '${INPUT_NuWro_FILE}'")
+  if(NOT EXISTS ${NUWRO_INPUT_FILE})
+    cmessage(FATAL_ERROR "Expected -DNUWRO_INPUT_FILE to point to a valid input file. Cannot find: '${NUWRO_INPUT_FILE}'")
   endif()
 
   if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    BuildROOTProject(NuWro_event1 ${INPUT_NuWro_FILE} "event,vec,vect,particle,flags,params,line" STATIC)
+    BuildROOTProject(NuWro_event1 ${NUWRO_INPUT_FILE} "event,vec,vect,particle,flags,params,line" STATIC)
     SET(ROOTLIBNAME "libNuWro_event1.a")
   else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-    BuildROOTProject(NuWro_event1 ${INPUT_NuWro_FILE} "event,vec,vect,particle,flags,params,line" SHARED)
+    BuildROOTProject(NuWro_event1 ${NUWRO_INPUT_FILE} "event,vec,vect,particle,flags,params,line" SHARED)
     SET(ROOTLIBNAME "libNuWro_event1.so")
   endif()
 
@@ -41,9 +41,11 @@ if(INPUT_NuWro_FILE)
 
   LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/NuWro_event1)
 
-  LIST(APPEND RWENGINE_LINKER_FLAGS ${CMAKE_CURRENT_BINARY_DIR}/${ROOTLIBNAME})
+  LIST(APPEND EXTRA_LINK_DIRS ${CMAKE_BINARY_DIR})
 
-  LIST(APPEND PROJECTWIDE_EXTRA_DEPENDENCIES NuWro_event1HeaderLink)
+  LIST(APPEND EXTRA_LIBS NuWro_event1)
+
+  LIST(APPEND PROJECTWIDE_EXTRA_DEPENDENCIES NuWro_event1HeaderLink )
 
   install(TARGETS NuWro_event1 DESTINATION lib)
 

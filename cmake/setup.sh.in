@@ -46,10 +46,14 @@ if [[ "@USE_NEUT@" != "FALSE" ]]; then
 fi
 
 if [[ "@USE_NuWro@" != "FALSE" ]]; then
-  echo "[INFO]: Adding NuWro library paths to the environment."
-  export NUWRO="@NUWRO@"
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
-    export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
+  if [[ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]]; then
+    echo "[INFO]: Adding NuWro library paths to the environment."
+    export NUWRO="@NUWRO@"
+    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
+      export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
+    fi
+  else
+    echo "[INFO]: NuWro support included from input event file."
   fi
 fi
 
@@ -73,7 +77,7 @@ if [[ "@USE_GENIE@" != "FALSE" ]]; then
   export LIBXML2_INC="@LIBXML2_INC@"
 
   export LOG4CPP_LIB="@LOG4CPP_LIB@"
-  export LOG4CPP_INC="@GENIE_LOG4CPP_INC@"
+  export LOG4CPP_INC="@LOG4CPP_INC@"
 
   if [[ "@LHAPATH@" ]]; then
     export LHAPATH="@LHAPATH@"
