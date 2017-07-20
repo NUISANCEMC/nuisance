@@ -131,13 +131,13 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry, const bool lig
 	// Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
 	fNuWroTree->GetEntry(entry);
 
-	// Setup Input scaling for joint inputs
-	fNUISANCEEvent->InputWeight = GetInputWeight(entry);
-
 	// Run NUISANCE Vector Filler
 	if (!lightweight) {
 		CalcNUISANCEKinematics();
 	}
+
+	// Setup Input scaling for joint inputs
+        fNUISANCEEvent->InputWeight = GetInputWeight(entry);
 	
 	return fNUISANCEEvent;
 }
