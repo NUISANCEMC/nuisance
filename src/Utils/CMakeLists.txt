@@ -80,12 +80,11 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 
-#add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
+add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
 
-#target_link_libraries(DumpROOTClassesFromVector ${ROOT_LIBS})
-#if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-#  set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-#endif()
-#set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+  target_link_libraries(DumpROOTClassesFromVector ${CMAKE_DEPENDLIB_FLAGS})
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
 
-#install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
+install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
