@@ -95,12 +95,10 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
     const Interaction * interaction = ghep->Summary();
     const Kinematics &   kine       = interaction->Kine();
     double Ws  = kine.W (true);
-    std::cout << "Ws = " << Ws << std::endl;
-    hadMass = Ws;
+    hadMass = Ws * 1000.0;
   }
 #endif
-  
-  if (hadMass < 1400.0) return false;
+  if (hadMass > 1400.0 || hadMass < 0.0) return false;
 
   return true;
 };
@@ -159,10 +157,10 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
     const Interaction * interaction = ghep->Summary();
     const Kinematics &   kine       = interaction->Kine();
     double Ws  = kine.W (true);
-    Wrec = Ws; // Say Wrec is Ws
+    Wrec = Ws * 1000.0; // Say Wrec is Ws
   }
 #endif
-  if (Wrec > 1800.) return false;
+  if (Wrec > 1800. || Wrec < 0.0) return false;
 
 
   return true;
