@@ -87,5 +87,21 @@ namespace MINERvAUtils {
 
   };
 
+  /// Break down the plots in terms of 1-N pion contributions
+  class PionStack : public StackBase {
+  public:
+
+    /// Main constructor listing true mode categories.
+    PionStack(std::string name, std::string title, TH1* hist);
+
+    /// List to convert Pions to Index.
+    /// Should be kept in sync with constructor.
+    int ConvertNPionsToIndex(int npions);
+
+    /// Fill from given mode integer
+    void Fill(int npions, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+  };
+  
+
 }
 #endif

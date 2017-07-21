@@ -77,13 +77,30 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 
   // MINERvA released another CC1pi+ xsec without muon unfolding!
   // here the muon angle is < 20 degrees (seen in MINOS)
-  if (isRestricted) {
-    TLorentzVector pnu = event->GetHMISParticle(14)->fP;
-    TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
+  if (isRestricted) {
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
     if (th_nu_mu >= 20) return false;
   }
+
+  // Extract Hadronic Mass
+  double hadMass = FitUtils::Wrec(pnu, pmu);
+
+  // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
+#ifdef __GENIE_ENABLED__
+  if (event->fType == kGENIE){
+    GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
+    const Interaction * interaction = ghep->Summary();
+    const Kinematics &   kine       = interaction->Kine();
+    double Ws  = kine.W (true);
+    std::cout << "Ws = " << Ws << std::endl;
+    hadMass = Ws;
+  }
+#endif
+  
+  if (hadMass < 1400.0) return false;
 
   return true;
 };
@@ -133,7 +150,18 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
   }
 
   // Lastly check the W cut (always at 1.8 GeV)
-  double Wrec = FitUtils::Wrec(pnu, pmu);
+  double Wrec = FitUtils::Wrec(pnu, pmu) + 0.;
+
+  // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
+#ifdef __GENIE_ENABLED__
+  if (event->fType == kGENIE){
+    GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
+    const Interaction * interaction = ghep->Summary();
+    const Kinematics &   kine       = interaction->Kine();
+    double Ws  = kine.W (true);
+    Wrec = Ws; // Say Wrec is Ws
+  }
+#endif
   if (Wrec > 1800.) return false;
 
 

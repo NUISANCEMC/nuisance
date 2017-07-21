@@ -129,10 +129,6 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(nuiskey samplekey) {
   morePions->SetNameTitle((fName + "_4pions").c_str(), (fName + "_4pions" + fPlotTitles).c_str());
   SetAutoProcessTH1(morePions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
 
-  // Reserve length 3 for the number of pions
-  // We fill once per pion found in the event, so can fill multiple times for one event
-  thVect.reserve(3);
-
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -145,11 +141,10 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(nuiskey samplekey) {
 void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 // ********************************************
 
-  thVect.clear();
-
   if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
   if (event->NumFSParticle(13) == 0) return;
 
+  GetBox()->Reset();
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
@@ -170,7 +165,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
       if (abs(PID) == 211) {
         Ppip = (event->PartInfo(j))->fP;
         double th = (180. / M_PI) * FitUtils::th(Pnu, Ppip);
-        thVect.push_back(th);
+        GetPionBox()->fthpiVect.push_back(th);
       }
     }
   }
@@ -196,12 +191,12 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillHistograms() {
 
   if (Signal) {
 
-    unsigned int nPions = thVect.size();
+    unsigned int nPions = GetPionBox()->fthpiVect.size();
 
     // Need to loop over all the pions in the event
     for (size_t k = 0; k < nPions; ++k) {
 
-      double th = thVect[k];
+      double th = GetPionBox()->fthpiVect[k];
       this->fMCHist->Fill(th, Weight);
       this->fMCFine->Fill(th, Weight);
       this->fMCStat->Fill(th, 1.0);

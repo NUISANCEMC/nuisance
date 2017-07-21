@@ -76,11 +76,7 @@ void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   if (event->NumFSParticle(13) == 0) return;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-
-  double Enu = -999;
-  if (hadMass < 1800) Enu = Pnu.E()/1000.;
+  double Enu = Pnu.E()/1000.;
 
   fXVar = Enu;
 

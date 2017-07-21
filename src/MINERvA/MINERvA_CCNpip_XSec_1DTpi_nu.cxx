@@ -133,10 +133,6 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(nuiskey samplekey) {
   morePions->SetNameTitle((fName + "_4pions").c_str(), (fName + "_4pions" + fPlotTitles).c_str());
   SetAutoProcessTH1(morePions, kCMD_Reset, kCMD_Scale, kCMD_Norm);
 
-  // Reserve length 3 for the number of pions
-  // We fill once per pion found in the event, so can fill multiple times for one event
-  TpiVect.reserve(3);
-
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -150,33 +146,27 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   if (event->NumFSParticle(211) == 0 && event->NumFSParticle(-211) == 0) return;
   if (event->NumFSParticle(13) == 0) return;
 
+  // Need to make this use event boxes
+
   // Clear out the vectors
-  TpiVect.clear();
+  GetPionBox()->Reset();
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
+  // Loop over the particle stack
+  for (unsigned int j = 2; j < event->Npart(); ++j) {
+    
+    // Only include alive particles
+    if (event->GetParticleState(j) != kFinalState) continue;
 
-  if (hadMass < 1800) {
-
-    // Loop over the particle stack
-    for (unsigned int j = 2; j < event->Npart(); ++j) {
-
-      // Only include alive particles
-      // if (event->GetParticleState(j) != kFinalState) continue;
-
-      if (!(event->PartInfo(j))->fIsAlive &&
-          (event->PartInfo(j))->fNEUTStatusCode != 0)
-        continue;
-
-      int PID = (event->PartInfo(j))->fPID;
-      // Pick up the charged pions in the event
-      if (abs(PID) == 211) {
+    int PID = (event->PartInfo(j))->fPID;
+    // Pick up the charged pions in the event
+    if (abs(PID) == 211) {
         double ppi = FitUtils::T(event->PartInfo(j)->fP) * 1000.;
-        TpiVect.push_back(ppi);
-      }
+	GetPionBox()->fTpiVect.push_back(ppi);
     }
   }
+  
 
   fXVar = 0;
 
@@ -186,7 +176,7 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 // The last bool refers to if we're using restricted phase space or not
 bool MINERvA_CCNpip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
-  //********************************************************************
+//********************************************************************
   // Last false refers to that this is NOT the restricted MINERvA phase space,
   // in which only forward-going muons are accepted
   return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
@@ -196,14 +186,14 @@ bool MINERvA_CCNpip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
 // Need to override FillHistograms() here because we fill the histogram N_pion
 // times
 void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
-  //********************************************************************
+//********************************************************************
 
   if (Signal) {
-    unsigned int nPions = TpiVect.size();
+    unsigned int nPions = GetPionBox()->fTpiVect.size();
 
     // Need to loop over all the pions in the sample
     for (size_t k = 0; k < nPions; ++k) {
-      double tpi = TpiVect[k];
+      double tpi = GetPionBox()->fTpiVect[k];
       this->fMCHist->Fill(tpi, Weight);
       this->fMCFine->Fill(tpi, Weight);
       this->fMCStat->Fill(tpi, 1.0);
@@ -238,9 +228,10 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::ScaleEvents() {
 
 //********************************************************************
 void MINERvA_CCNpip_XSec_1DTpi_nu::Write(std::string drawOpts) {
-  //********************************************************************
+//********************************************************************
   Measurement1D::Write(drawOpts);
 
+  // Make an auto processed pion stack
   // Draw the npions stack
   onePions->SetTitle("1#pi");
   onePions->SetLineColor(kBlack);
