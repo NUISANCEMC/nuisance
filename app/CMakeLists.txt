@@ -52,7 +52,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-if (USE_NuWro)
+if (USE_NuWro AND NOT NUWRO_BUILT_FROM_FILE)
   add_executable(nuwro_nuisance nuwro_NUISANCE.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuwro_nuisance)
   target_link_libraries(nuwro_nuisance ${MODULETargets})

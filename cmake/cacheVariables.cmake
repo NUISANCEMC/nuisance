@@ -98,7 +98,7 @@ CheckAndSetDefaultEnv(LHAPATH "" PATH "Path to LHA PDF inputs. Overrides environ
 CheckAndSetDefaultEnv(LIBXML2_LIB "" PATH "Path to pre-built LIBXML2 libraries. Overrides environment variable \$LIBXML2_LIB. <>" LIBXML2_LIB)
 CheckAndSetDefaultEnv(LIBXML2_INC "" PATH "Path to installed LIBXML2 headers. Overrides environment variable \$LIBXML2_INC. <>" LIBXML2_INC)
 CheckAndSetDefaultEnv(LOG4CPP_LIB "" PATH "Path to pre-built LOG4CPP libraries. Overrides environment variable \$LOG4CPP_LIB. <>" LOG4CPP_LIB)
-CheckAndSetDefaultEnv(GENIE_LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Overrides environment variable \$LOG4CPP_INC. <>" LOG4CPP_INC)
+CheckAndSetDefaultEnv(LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Overrides environment variable \$LOG4CPP_INC. <>" LOG4CPP_INC)
 
 CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevgen app.")
 
