@@ -21,6 +21,7 @@
 #define MINERVA_CCNPIP_XSEC_1DTPI_NU_H_SEEN
 
 #include "Measurement1D.h"
+#include "MINERvAVariableBoxes.h"
 
 class MINERvA_CCNpip_XSec_1DTpi_nu : public Measurement1D {
 public:
@@ -32,12 +33,18 @@ public:
   bool isSignal(FitEvent *event);
   void ScaleEvents();
   void Write(std::string drawOpts);
+  
+  /// \brief Use Tpi Box to save all pion info on signal events
+  inline NTpiVariableBox1D* GetPionBox(){ return static_cast<NTpiVariableBox1D*>(GetBox()); };
+
+  /// \brief Create Tpi Box for this sample
+  inline MeasurementVariableBox* CreateBox(){ return new NTpiVariableBox1D(); };
+
   bool fFullPhaseSpace;
   bool fUpdatedData;
   bool fFluxCorrection;
   
 private:
-  std::vector<double> TpiVect;
 
   TH1D *onePions;
   TH1D *twoPions;

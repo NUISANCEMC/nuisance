@@ -116,6 +116,7 @@ MINERvA_CCCOHPI_XSec_1Dth_antinu.h
 
 MINERvAUtils.h
 MINERvA_SignalDef.h
+MINERvAVariableBoxes.h
 )
 
 set(LIBNAME expMINERvA)

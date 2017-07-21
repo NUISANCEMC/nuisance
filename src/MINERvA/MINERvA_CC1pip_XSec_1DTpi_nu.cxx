@@ -97,12 +97,7 @@ void MINERvA_CC1pip_XSec_1DTpi_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  double Tpi = -999;
-
-  if (hadMass > 100 && hadMass < 1400)
-    Tpi = FitUtils::T(Ppip) * 1000.;
+  double Tpi = FitUtils::T(Ppip) * 1000.;
 
   fXVar = Tpi;
 

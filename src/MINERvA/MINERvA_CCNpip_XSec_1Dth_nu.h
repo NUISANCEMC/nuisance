@@ -21,7 +21,7 @@
 #define MINERVA_CCNPIP_XSEC_1DTH_NU_H_SEEN
 
 #include "Measurement1D.h"
-
+#include "MINERvAVariableBoxes.h"
 class MINERvA_CCNpip_XSec_1Dth_nu : public Measurement1D {
 public:
   MINERvA_CCNpip_XSec_1Dth_nu(nuiskey samplekey);
@@ -35,6 +35,13 @@ public:
   bool fUpdatedData;
   bool fFluxCorrection;
 
+  /// \brief Use thpi Box to save all pion info on signal events
+  inline NthpiVariableBox1D* GetPionBox(){ return static_cast<NthpiVariableBox1D*>(GetBox()); };
+
+  /// \brief Create thpi Box for this sample
+  inline MeasurementVariableBox* CreateBox(){ return new NthpiVariableBox1D(); };
+
+
 private:
   bool isNew;
 
@@ -43,7 +50,6 @@ private:
   TH1D *threePions;
   TH1D *morePions;
 
-  std::vector<double> thVect;
 };
 
 #endif

@@ -75,12 +75,7 @@ void MINERvA_CCNpip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
   if (event->NumFSParticle(13) == 0) return;
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  // This Q2 defaults to calculating true Q2 (using true Enu instead of recon. Enu)
-  // This agrees with what MINERvA used
-  double q2 = -999;
-  if (hadMass < 1800) q2 = -1 * (Pnu - Pmu).Mag2() / 1.E6;
+  double q2 = -1 * (Pnu - Pmu).Mag2() / 1.E6;
 
   fXVar = q2;
 
