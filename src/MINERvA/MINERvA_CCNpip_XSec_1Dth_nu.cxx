@@ -147,28 +147,23 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
   GetBox()->Reset();
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-
-  if (hadMass < 1800) {
-
-    TLorentzVector Ppip;
-    // Loop over the particle stack
-    for (unsigned int j = 2; j < event->Npart(); ++j) {
-
-      // Only include alive particles
-      if ((event->PartInfo(j))->fIsAlive <= 0) continue;
-      if ((event->PartInfo(j))->fNEUTStatusCode != 0) continue;
-
-      int PID = (event->PartInfo(j))->fPID;
-      // Select highest momentum (energy) charged pion
-      if (abs(PID) == 211) {
-        Ppip = (event->PartInfo(j))->fP;
-        double th = (180. / M_PI) * FitUtils::th(Pnu, Ppip);
-        GetPionBox()->fthpiVect.push_back(th);
-      }
+  TLorentzVector Ppip;
+  // Loop over the particle stack
+  for (unsigned int j = 2; j < event->Npart(); ++j) {
+    
+    // Only include alive particles
+    if ((event->PartInfo(j))->fIsAlive <= 0) continue;
+    if ((event->PartInfo(j))->fNEUTStatusCode != 0) continue;
+    
+    int PID = (event->PartInfo(j))->fPID;
+    // Select highest momentum (energy) charged pion
+    if (abs(PID) == 211) {
+      Ppip = (event->PartInfo(j))->fP;
+      double th = (180. / M_PI) * FitUtils::th(Pnu, Ppip);
+      GetPionBox()->fthpiVect.push_back(th);
     }
   }
+
 
   fXVar = 0;
 
