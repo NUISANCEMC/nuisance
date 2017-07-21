@@ -91,14 +91,15 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
 #ifdef __GENIE_ENABLED__
   if (event->fType == kGENIE){
-    GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
-    const Interaction * interaction = ghep->Summary();
+    EventRecord *  gevent      = static_cast<EventRecord*>(event->genie_event->event);
+    const Interaction * interaction = gevent->Summary();
     const Kinematics &   kine       = interaction->Kine();
     double Ws  = kine.W (true);
+    //    std::cout << "Ws versus WRec = " << Ws << " vs " << hadMass << " " << kine.W(false) << std::endl;
     hadMass = Ws * 1000.0;
   }
 #endif
-  if (hadMass > 1400.0 || hadMass < 0.0) return false;
+  if (hadMass > 1400.0) return false;
 
   return true;
 };
