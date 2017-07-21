@@ -17,196 +17,147 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 #include "InputUtils.h"
-
 #include "ComparisonRoutines.h"
 
+// Global Arguments
+std::string gOptInputFile = "";
+std::string gOptFormat = "";
+std::string gOptOutputFile = "";
+std::string gOptType = "DEFAULT";
+std::string gOptNumberEvents = "NULL";
+
 //*******************************
-void printInputCommands() {
-  //*******************************
+void PrintSyntax() {
+//*******************************
 
-  std::cout << "nuisflat [-c cardfile] -o outfile [-q configname=configval] \n";
-  std::cout << "\n Arguments : \n";
-  std::cout
-      << "   -i inputvector: Path to input vector of events to flatten \n";
-  std::cout
-      << "   -c cardfile: Path to NUISANCE card file defining fit samples \n";
-  std::cout << "    -o outFile:    Path to root file that will be created to "
-               "save output file.\n";
-  std::cout << "    -q config_name=config_val : Allows any config parameter to "
-               "be overridden from the command line.\n";
-  std::cout << "                                This will take priority over "
-               "those given in the default, or cardFile. \n";
-  std::cout << "                                example: -q verbosity=6 -q "
-               "maxevents=10000 \n"
-            << std::endl;
+	std::cout << "nuisflat -i input -f format [-o outfile] [-n nevents] [-t options] [-q con=val] \n";
+	std::cout << "\n Arguments : "
+	          << "\n\t -i input   : Path to input vector of events to flatten"
+	          << "\n\t"
+	          << "\n\t              This should be given in the same format a normal input file"
+	          << "\n\t              is given to NUISANCE. (examples below)."
+	          << "\n\t"
+	          << "\n\t -f format  : FlatTree format to output (examples below)"
+	          << "\n\t "
+	          << "\n\t[-o outfile]: Optional output file path. "
+	          << "\n\t "
+	          << "\n\t              If none given, input.format.root is chosen."
+	          << "\n\t"
+	          << "\n\t[-n nevents]: Optional choice of Nevents to run over. Default is all."
+	          << "\n\t"
+	          << "\n\t[-t options]: Pass OPTION to the FlatTree sample. "
+	          << "\n\t              Similar to type field in comparison xml configs."
+	          << "\n\t"
+	          << "\n\t[-q con=val]: Configuration overrides."
+	          << std::endl;
 
-  exit(-1);
+	exit(-1);
 };
+
+
+
+
+
+
+
+//____________________________________________________________________________
+void GetCommandLineArgs(int argc, char ** argv)
+{
+
+	// Check for -h flag.
+	for (int i = 0; i < argc; i++) {
+		if (!std::string(argv[i]).compare("-h")) PrintSyntax();
+	}
+
+	// Format is nuwro -r run_number -n n events
+	std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
+
+	// Parse input file
+	ParserUtils::ParseArgument(args, "-i", gOptInputFile, false);
+	if (gOptInputFile == "") {
+		THROW("Need to provide a valid input file to nuisflat using -i flag!");
+	} else {
+		LOG(FIT) << "Reading Input File = " << gOptInputFile << std::endl;
+	}
+
+	// Get Output Format
+	ParserUtils::ParseArgument(args, "-f", gOptFormat, false);
+	if (gOptFormat == "") {
+		THROW("Need to provide a valid output format to nuisflat!");
+	} else {
+		LOG(FIT) << "Saving flattree in format = " << gOptFormat << std::endl;
+	}
+
+	// Get Output File
+	ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
+	if (gOptOutputFile == "") {
+		gOptOutputFile = gOptInputFile + "." + gOptFormat + ".root";
+		LOG(FIT) << "No output file given so saving nuisflat output to:"
+		         << gOptOutputFile << std::endl;
+	} else {
+		LOG(FIT) << "Saving nuisflat output to " << gOptOutputFile << std::endl;
+	}
+
+	// Get N Events and Configs
+	nuisconfig configuration = Config::Get();
+
+	ParserUtils::ParseArgument(args, "-n", gOptNumberEvents, false);
+	if (gOptNumberEvents.compare("NULL")) {
+		configuration.OverrideConfig("MAXEVENTS=" + gOptNumberEvents);
+	}
+
+	std::vector<std::string> configargs;
+	ParserUtils::ParseArgument(args, "-q", configargs);
+	for (size_t i = 0; i < configargs.size(); i++) {
+		configuration.OverrideConfig(configargs[i]);
+	}
+
+	return;
+}
 
 //*******************************
 int main(int argc, char* argv[]) {
-  //*******************************
+//*******************************
 
-  //<<<<<<< HEAD
-  // // Program status;
-  // int status = 0;
+	// Parse
+	GetCommandLineArgs(argc, argv);
 
-  // std::string inpFileName = "";
-  // std::string OutputFile = "";
-  // std::string maxevents_flag = "";
+	// Make output file
+	TFile* f = new TFile(gOptOutputFile.c_str(),"RECREATE");
+	if (f->IsZombie()){
+		THROW("Cannot create output file!");
+	}
+	f->cd();
+    FitPar::Config().out = f;
 
-  // // If No Arguments print commands
-  // if (argc == 1) printInputCommands();
+	// Create a new measurementbase class depending on the Format
+	MeasurementBase* flattreecreator = NULL;
 
-  // for (int i = 1; i < argc; ++i) {
-  //   if (!std::strcmp(argv[i], "-h")) {
-  //     printInputCommands();
-  //   } else if (!std::strcmp(argv[i], "-i")) {
-  //     inpFileName = argv[++i];
-  //   } else if (!std::strcmp(argv[i], "-n")) {
-  //     maxevents_flag = argv[++i];
-  //   } else if (!std::strcmp(argv[i], "-o")) {
-  //     OutputFile = argv[++i];
-  //   }
-  // }
+	// Make a new sample key for the format of interest.
+	nuiskey samplekey = Config::CreateKey("sample");
+	if (!gOptFormat.compare("GenericFlux")) {
 
-  // // Read input arguments such as card file, parameter arguments, and fit
-  // // routines
-  // LOG(FIT) << "Starting nuisflat.exe" << std::endl;
+		samplekey.AddS("name", "FlatTree");
+		samplekey.AddS("input", gOptInputFile);
+		samplekey.AddS("type", gOptType);
+		flattreecreator = new GenericFlux_Tester("FlatTree",gOptInputFile, FitBase::GetRW(), gOptType, "");
 
-  // if (!inpFileName.length()) {  // Run with card file
-  //   // Make minimizer class and run fit
-  //   ComparisonRoutines* flat = new ComparisonRoutines(argc, argv);
+	} else {
+		ERR(FTL) << "Unknown FlatTree format!" << std::endl;
+	}
 
-  //   // Run the fit rotines
-  //   flat->Run();
-  //   flat->SaveCurrentState();
-  // } else {  // Run standalone
 
-  //   if (!OutputFile.length()) {
-  //     OutputFile = inpFileName + ".root";
-  //     ERR(WRN) << "Didn't recieve outputfile name. Using \"" << OutputFile
-  //              << "\" instead." << std::endl;
-  //   }
+	// Make the FlatTree reconfigure 
+	flattreecreator->Reconfigure();
+	f->cd();
+	flattreecreator->Write();
+	f->Close();
 
-  //   std::string fullInputName =
-  //       InputUtils::PrependGuessedInputTypeToName(inpFileName);
-  //   std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
-  //   FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
 
-  //   if (!maxevents_flag.empty()) {
-  //     FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
-  //   }
+	// Show Final Status
+	LOG(FIT) << "-------------------------------------" << std::endl;
+	LOG(FIT) << "Flattree Generation Complete." << std::endl;
+	LOG(FIT) << "-------------------------------------" << std::endl;
 
-  //   LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
-  //   ERR_VERB(FitPar::Config().GetParI("ERROR"));
-  //   // Outputs
-  //   // ---------------------------
-  //   // Save Configs to output file
-  //   FitPar::Config().out = new TFile(OutputFile.c_str(), "RECREATE");
-  //   FitPar::Config().out->cd();
-  //   FitPar::Config().Write();
-
-  //   std::list<MeasurementBase*> fChain;
-  //   bool LoadedSample =
-  //       SampleUtils::LoadSample(&fChain, "GenericFlux_", fullInputName,
-  //                               "DEFAULT", "", FitBase::GetRW());
-
-  //   if (!LoadedSample) {
-  //     ERR(FTL) << "Could not Flattener sample. Please report this as a bug."
-  //              << std::endl;
-  //     throw;
-  //   }
-
-  //   fChain.front()->Reconfigure();
-
-  //   FitPar::Config().out->Write();
-  //   FitPar::Config().out->Close();
-  // }
-
-    /*
-  // Program status;
-  int status = 0;
-
-  std::string inpFileName = "";
-  std::string OutputFile = "";
-  std::string maxevents_flag = "";
-
-  // If No Arguments print commands
-  if (argc == 1) printInputCommands();
-
-  for (int i = 1; i < argc; ++i) {
-    if (!std::strcmp(argv[i], "-h")) {
-      printInputCommands();
-    } else if (!std::strcmp(argv[i], "-i")) {
-      inpFileName = argv[++i];
-    } else if (!std::strcmp(argv[i], "-n")) {
-      maxevents_flag = argv[++i];
-    } else if (!std::strcmp(argv[i], "-o")) {
-      OutputFile = argv[++i];
-    }
-  }
-
-  // Read input arguments such as card file, parameter arguments, and fit
-  // routines
-  LOG(FIT) << "Starting nuisflat.exe" << std::endl;
-
-  if (!inpFileName.length()) {  // Run with card file
-    // Make minimizer class and run fit
-    ComparisonRoutines* flat = new ComparisonRoutines(argc, argv);
-
-    // Run the fit rotines
-    flat->Run();
-    flat->SaveCurrentState();
-  } else {  // Run standalone
-
-    if (!OutputFile.length()) {
-      OutputFile = inpFileName + ".root";
-      ERR(WRN) << "Didn't recieve outputfile name. Using \"" << OutputFile
-               << "\" instead." << std::endl;
-    }
-
-    std::string fullInputName =
-        InputUtils::PrependGuessedInputTypeToName(inpFileName);
-    std::string par_dir = GeneralUtils::GetTopLevelDir() + "/parameters/";
-    FitPar::Config().ReadParamFile(par_dir + "config.list.dat");
-
-    if (!maxevents_flag.empty()) {
-      FitPar::Config().SetParI("input.maxevents", atoi(maxevents_flag.c_str()));
-    }
-
-    LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
-    ERR_VERB(FitPar::Config().GetParI("ERROR"));
-    // Outputs
-    // ---------------------------
-    // Save Configs to output file
-    FitPar::Config().out = new TFile(OutputFile.c_str(), "RECREATE");
-    FitPar::Config().out->cd();
-    FitPar::Config().Write();
-
-    std::list<MeasurementBase*> fChain;
-    bool LoadedSample =
-        SampleUtils::LoadSample(&fChain, "GenericFlux_", fullInputName,
-                                "DEFAULT", "", FitBase::GetRW());
-
-    if (!LoadedSample) {
-      ERR(FTL) << "Could not Flattener sample. Please report this as a bug."
-               << std::endl;
-      throw;
-    }
-
-    fChain.front()->Reconfigure();
-    fChain.front()->Write();
-
-    //    FitPar::Config().out->Write();
-    FitPar::Config().out->Close();
-  }
-
-  */
-  // Show Final Status
-  LOG(FIT) << "-------------------------------------" << std::endl;
-  LOG(FIT) << "Flattree Generation Complete." << std::endl;
-  LOG(FIT) << "-------------------------------------" << std::endl;
-
-  return 0;
+	return 0;
 }
