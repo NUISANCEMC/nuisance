@@ -80,12 +80,14 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 
-#add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
+add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
 
-#target_link_libraries(DumpROOTClassesFromVector ${ROOT_LIBS})
-#if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-#  set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-#endif()
-#set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
+  #Strip out -lNuWro_event1
+  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${CMAKE_DEPENDLIB_FLAGS})
+  cmessage(DEBUG "Attempted to strip out nuwro library: \"${CMAKE_DEPENDLIB_FLAGS}\" -> \"${NWEVSTRIPPED_CDF}\"")
+  target_link_libraries(DumpROOTClassesFromVector ${NWEVSTRIPPED_CDF})
+  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
+    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
 
-#install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
+install(TARGETS DumpROOTClassesFromVector DESTINATION bin)

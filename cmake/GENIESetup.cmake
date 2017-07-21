@@ -109,8 +109,8 @@ if(LOG4CPP_LIB STREQUAL "")
   cmessage(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
 endif()
 
-if(GENIE_LOG4CPP_INC  STREQUAL "")
-  cmessage(FATAL_ERROR "Variable GENIE_LOG4CPP_INC is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_INC=/path/to/LOG4CPP_includes or as and environment vairable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
+if(LOG4CPP_INC  STREQUAL "")
+  cmessage(FATAL_ERROR "Variable LOG4CPP_INC is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_INC=/path/to/LOG4CPP_includes or as and environment vairable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
 endif()
 ################################################################################
 
@@ -126,7 +126,7 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
   ${GENIE_INCLUDES_DIR}/EVGDrivers
   ${LHAPDF_INC}
   ${LIBXML2_INC}
-  ${GENIE_LOG4CPP_INC})
+  ${LOG4CPP_INC})
 
 SAYVARS()
 
