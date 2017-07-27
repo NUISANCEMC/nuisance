@@ -264,6 +264,7 @@
 #include "MCStudy_CCQEHistograms.h"
 
 #include "GenericFlux_Tester.h"
+#include "GenericFlux_Vectors.h"
 
 #include "ElectronFlux_FlatTree.h"
 #include "ElectronScattering_DurhamData.h"
