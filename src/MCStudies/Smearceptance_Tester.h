@@ -24,6 +24,10 @@
 
 #include "ISmearcepter.h"
 
+#ifdef __PROB3PP_ENABLED__
+#include "OscWeightEngine.h"
+#endif
+
 //********************************************************************
 class Smearceptance_Tester : public Measurement1D {
   //********************************************************************
@@ -61,6 +65,11 @@ class Smearceptance_Tester : public Measurement1D {
 
  private:
   ISmearcepter *smearceptor;
+#ifdef __PROB3PP_ENABLED__
+  OscWeightEngine *OscWeighter;
+  float OscWeight;
+#endif
+
   TTree *eventVariables;
 
   float Omega_true;
