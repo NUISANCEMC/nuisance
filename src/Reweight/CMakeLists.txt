@@ -32,6 +32,7 @@ T2KWeightEngine.cxx
 NUISANCEWeightEngine.cxx
 NUISANCEWeightCalcs.cxx
 NIWGWeightEngine.cxx
+OscWeightEngine.cxx
 )
 
 set(HEADERFILES
@@ -50,6 +51,7 @@ T2KWeightEngine.h
 NUISANCEWeightEngine.h
 NUISANCEWeightCalcs.h
 NIWGWeightEngine.h
+OscWeightEngine.h
 )
 
 set(LIBNAME Reweight)

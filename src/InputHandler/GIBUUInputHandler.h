@@ -39,6 +39,8 @@ public:
 	// int fNEUTParticleN; ///< Number of particles
 };
 
+/// Convert GiBUU Code to NUISANCE Event Code
+int GetGIBUUParticleStatus(int status, int pdg);
 
 /// GiBUU Handler to read in Luke's formatted GiBUU events
 class GIBUUInputHandler : public InputHandlerBase {
@@ -50,9 +52,6 @@ public:
 
 	/// Returns NUISANCE Format Event from GiReader
 	FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight = false);
-
-	/// Convert GiBUU Code to NUISANCE Event Code
-	int GetGIBUUParticleStatus(int status, int pdg);
 
 	/// Fill NUISANCE Particle Stack
 	void CalcNUISANCEKinematics();

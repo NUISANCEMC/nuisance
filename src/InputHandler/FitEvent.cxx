@@ -334,7 +334,7 @@ FitParticle* FitEvent::GetParticle (int const i) {
   if (!fParticleList[i]) {
     /*
     std::cout << "Creating particle with values i " << i << " ";
-    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " "; 
+    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
     std::cout << fParticlePDG[i] << " " << fParticleState[i] << std::endl;
     */
     fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1],
@@ -447,7 +447,7 @@ int FitEvent::NumFSMesons() {
 int FitEvent::NumFSLeptons(void) const{
 
   int nLeptons = 0;
- 
+
   for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kFinalState) continue;
     if (abs(fParticlePDG[i]) == 11 || abs(fParticlePDG[i]) == 13 ||

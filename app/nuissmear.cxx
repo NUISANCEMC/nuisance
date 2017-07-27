@@ -23,7 +23,6 @@
 
 // Global Arguments
 std::string gOptInputFile = "";
-std::string gOptFormat = "";
 std::string gOptOutputFile = "";
 std::string gOptType = "DEFAULT";
 std::string gOptNumberEvents = "NULL";
@@ -44,19 +43,17 @@ void PrintSyntax() {
          "input file"
       << "\n\t              is given to NUISANCE. {e.g. NUWRO:eventsout.root}."
       << "\n\t"
-      << "\n\t -f format  : FlatTree format to output:"
-      << "\n\t\t GenericFlux   : Standard event summary format."
-      << "\n\t "
-      << "\n\t[-c crd.xml]: Input card file to override configs or set dial values."
+      << "\n\t[-c crd.xml]: Input card file to override configs or define "
+         "smearcepters."
       << "\n\t "
       << "\n\t[-o outfile]: Optional output file path. "
       << "\n\t "
-      << "\n\t              If none given, input.format.root is chosen."
+      << "\n\t              If none given, input.smear.root is chosen."
       << "\n\t"
       << "\n\t[-n nevents]: Optional choice of Nevents to run over. Default is "
          "all."
       << "\n\t"
-      << "\n\t[-t options]: Pass OPTION to the FlatTree sample. "
+      << "\n\t[-t options]: Pass OPTION to the smearception sample. "
       << "\n\t              Similar to type field in comparison xml configs."
       << "\n\t"
       << "\n\t[-q con=val]: Configuration overrides." << std::endl;
@@ -85,18 +82,10 @@ void GetCommandLineArgs(int argc, char** argv) {
     LOG(FIT) << "Reading Input File = " << gOptInputFile << std::endl;
   }
 
-  // Get Output Format
-  ParserUtils::ParseArgument(args, "-f", gOptFormat, false);
-  if (gOptFormat == "") {
-    THROW("Need to provide a valid output format to nuisflat!");
-  } else {
-    LOG(FIT) << "Saving flattree in format = " << gOptFormat << std::endl;
-  }
-
   // Get Output File
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile == "") {
-    gOptOutputFile = gOptInputFile + "." + gOptFormat + ".root";
+    gOptOutputFile = gOptInputFile + ".smear.root";
     LOG(FIT) << "No output file given so saving nuisflat output to:"
              << gOptOutputFile << std::endl;
   } else {
@@ -150,16 +139,23 @@ int main(int argc, char* argv[]) {
 
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
-  if (!gOptFormat.compare("GenericFlux")) {
-    samplekey.AddS("name", "FlatTree");
-    samplekey.AddS("input", gOptInputFile);
-    samplekey.AddS("type", gOptType);
-    flattreecreator = new GenericFlux_Tester("FlatTree", gOptInputFile,
-                                             FitBase::GetRW(), gOptType, "");
 
-  } else {
-    ERR(FTL) << "Unknown FlatTree format!" << std::endl;
+  samplekey.AddS("name", "FlatTree");
+  samplekey.AddS("input", gOptInputFile);
+  samplekey.AddS("type", gOptType);
+  if (gOptOptions == "") {
+    THROW(
+        "Attempting to flatten with Smearceptor, but no Smearceptor given. "
+        "Please supply a -t option.");
   }
+  if (gOptCardInput == "") {
+    THROW(
+        "Attempting to flatten with Smearceptor, but no card passed with "
+        "Smearceptors configured. Please supply a -c option.");
+  }
+  flattreecreator =
+      new Smearceptance_Tester(std::string("FlatTree_") + gOptOptions,
+                               gOptInputFile, FitBase::GetRW(), gOptType, "");
 
   // Make the FlatTree reconfigure
   flattreecreator->Reconfigure();

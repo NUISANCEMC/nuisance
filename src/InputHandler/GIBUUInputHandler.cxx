@@ -419,7 +419,7 @@ FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
   return fNUISANCEEvent;
 }
 
-int GIBUUInputHandler::GetGIBUUParticleStatus(int status, int pdg) {
+int GetGIBUUParticleStatus(int status, int pdg) {
   int state = kUndefinedState;
   switch (status) {
     case 0:   // Incoming
@@ -498,6 +498,14 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
+
+  FitParticle* ISNeutralLepton =
+      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
+  if (ISNeutralLepton) {
+    fNUISANCEEvent->probe_E = ISNeutralLepton->E();
+    fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
+  }
+
   return;
 }
 

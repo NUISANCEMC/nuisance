@@ -117,7 +117,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
   fGenieNtpl = NULL;
   fGENIETree->SetBranchAddress("gmcrec", &fGenieNtpl);
   fGENIETree->GetEntry(0);
-  
+
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
@@ -371,6 +371,13 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent-> OrderStack();
+
+  FitParticle* ISNeutralLepton =
+      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
+  if (ISNeutralLepton) {
+    fNUISANCEEvent->probe_E = ISNeutralLepton->E();
+    fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
+  }
 
   return;
 }

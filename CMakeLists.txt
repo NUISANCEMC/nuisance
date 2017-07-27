@@ -70,15 +70,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
 
 include(${CMAKE_SOURCE_DIR}/cmake/gperfSetup.cmake)
 
-################################## COMPILER ####################################
-include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
-
-################################### doxygen ###################################
-
-include(${CMAKE_SOURCE_DIR}/cmake/docsSetup.cmake)
-
-################################################################################
-
 if(NOT NOTEST)
   enable_testing()
 endif()
@@ -109,11 +100,6 @@ set(CORE
   Smearceptance
   )
 
-###############
-# Allow compilation against single experiment folder
-# Add later..
-##############
-
 LIST(APPEND ALLEXPERIMENTS
   ANL
   ArgoNeuT
@@ -131,8 +117,22 @@ LIST(APPEND ALLEXPERIMENTS
 foreach(exp ${ALLEXPERIMENTS})
   if(NOT NO_${exp})
     LIST(APPEND EXPERIMENTS_TO_BUILD ${exp})
+  else()
+    LIST(REVERSE EXTRA_CXX_FLAGS)
+    LIST(APPEND EXTRA_CXX_FLAGS -D__NO_${exp}__)
+    LIST(REVERSE EXTRA_CXX_FLAGS)
   endif()
 endforeach()
+
+################################## COMPILER ####################################
+include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
+
+################################### doxygen ###################################
+
+include(${CMAKE_SOURCE_DIR}/cmake/docsSetup.cmake)
+
+################################################################################
+
 
 set(MINIMUM_INCLUDE_DIRECTORIES)
 LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
@@ -148,7 +148,7 @@ cmessage(DEBUG "Base include directories: ${MINIMUM_INCLUDE_DIRECTORIES}")
 
 set(EXP_INCLUDE_DIRECTORIES)
 
-foreach(edir ${ALLEXPERIMENTS})
+foreach(edir ${EXPERIMENTS_TO_BUILD})
   LIST(APPEND EXP_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/${edir})
 endforeach()
 cmessage(DEBUG "Included experiments: ${EXP_INCLUDE_DIRECTORIES}")

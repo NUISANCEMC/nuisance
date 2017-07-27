@@ -6,6 +6,7 @@
  *  @{
  */
 
+#ifndef __NO_ANL__
 #include "ANL_CCQE_Evt_1DQ2_nu.h"
 #include "ANL_CCQE_XSec_1DEnu_nu.h"
 
@@ -31,33 +32,37 @@
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 // ANL NC1ppim (mm, exotic!)
-#include "ANL_NC1ppim_XSec_1DEnu_nu.h"
 #include "ANL_NC1ppim_Evt_1DcosmuStar_nu.h"
+#include "ANL_NC1ppim_XSec_1DEnu_nu.h"
 // ANL CC2pi 1pim1pip (mm, even more exotic!)
-#include "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.h"
 #include "ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu.h"
-#include "ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pim1pip_Evt_1Dppim_nu.h"
+#include "ANL_CC2pi_1pim1pip_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu.h"
+#include "ANL_CC2pi_1pim1pip_XSec_1DEnu_nu.h"
 // ANL CC2pi 1pip1pip (mm, even more exotic!)
-#include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.h"
 #include "ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h"
+#include "ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h"
 // ANL CC2pi 1pip1pi0 (mm, even more exotic!)
-#include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu.h"
-#include "ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu.h"
+#include "ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu.h"
 #include "ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu.h"
+#include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
+#endif
 
+#ifndef __NO_ArgoNeuT__
 // ArgoNeuT CC-inclusive
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dthetamu_nu.h"
+#endif
 
+#ifndef __NO_BNL__
 // BNL CCQE
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
 #include "BNL_CCQE_XSec_1DEnu_nu.h"
@@ -73,7 +78,9 @@
 // BNL CC1pi0
 #include "BNL_CC1pi0_Evt_1DQ2_nu.h"
 #include "BNL_CC1pi0_XSec_1DEnu_nu.h"
+#endif
 
+#ifndef __NO_FNAL__
 // FNAL CCQE
 #include "FNAL_CCQE_Evt_1DQ2_nu.h"
 // FNAL CC1ppip
@@ -82,7 +89,9 @@
 #include "FNAL_CC1ppip_XSec_1DQ2_nu.h"
 // FNAL CC1ppim
 #include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
+#endif
 
+#ifndef __NO_BEBC__
 // BEBC CCQE
 #include "BEBC_CCQE_XSec_1DQ2_nu.h"
 // BEBC CC1ppip
@@ -100,14 +109,18 @@
 // BEBC CC1ppim
 #include "BEBC_CC1ppim_XSec_1DEnu_antinu.h"
 #include "BEBC_CC1ppim_XSec_1DQ2_antinu.h"
+#endif
 
+#ifndef __NO_GGM__
 // GGM CC1ppip
 #include "GGM_CC1ppip_Evt_1DQ2_nu.h"
 #include "GGM_CC1ppip_XSec_1DEnu_nu.h"
+#endif
 
+#ifndef __NO_MiniBooNE__
 // MiniBooNE CCQE
-#include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 #include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
+#include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_nu.h"
@@ -136,15 +149,14 @@
 #include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
 #include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
 
-
-
-
 // MiniBooNE NC1pi0
 //#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
 
 // MiniBooNE NCEL
 #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
+#endif
 
+#ifndef __NO_MINERvA__
 // MINERvA CCQE
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
 #include "MINERvA_CCQE_XSec_1DQ2_joint.h"
@@ -163,47 +175,54 @@
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 
 // MINERvA CCNpi+
-#include "MINERvA_CCNpip_XSec_1Dth_nu.h"
+#include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
+#include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
 #include "MINERvA_CCNpip_XSec_1DTpi_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dpmu_nu.h"
+#include "MINERvA_CCNpip_XSec_1Dth_nu.h"
 #include "MINERvA_CCNpip_XSec_1Dthmu_nu.h"
-#include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
-#include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
 
 // MINERvA CC1pi0
-#include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
-#include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
-#include "MINERvA_CC1pi0_XSec_1DTpi0_antinu.h"
-#include "MINERvA_CC1pi0_XSec_1Dthmu_antinu.h"
-#include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
-#include "MINERvA_CC1pi0_XSec_1DQ2_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1DEnu_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DQ2_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1DTpi0_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dpmu_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dppi0_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
+#include "MINERvA_CC1pi0_XSec_1Dthmu_antinu.h"
 
 // MINERvA CCINC
-#include "MINERvA_CCinc_XSec_2DEavq3_nu.h"
-#include "MINERvA_CCinc_XSec_1Dx_ratio.h"
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
+#include "MINERvA_CCinc_XSec_1Dx_ratio.h"
+#include "MINERvA_CCinc_XSec_2DEavq3_nu.h"
 
 // MINERvA CCCOH pion
-#include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEpi_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1Dth_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 
+#include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
+#include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
+#include "MINERvA_CC1pip_XSec_1D_2017Update.h"
+
+#endif
+
+#ifndef __NO_T2K__
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 
 // T2K CC1pi+ on CH
+#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
+#include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
 
 // T2K CC1pi+ on H2O
 #include "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h"
@@ -217,18 +236,27 @@
 // T2K STV CC0pi
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 
-// SciBooNE COH studies
-#include "SciBooNE_CCCOH_STOP_NTrks_nu.h"
-#include "SciBooNE_CCCOH_1TRK_1DQ2_nu.h"
-#include "SciBooNE_CCCOH_MuPr_1DQ2_nu.h"
-#include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
-#include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
-#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
-#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
-#include "SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 
+#endif
+
+#ifndef __NO_SciBooNE__
+
+// SciBooNE COH studies
+#include "SciBooNE_CCCOH_1TRK_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
+#include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPr_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_STOP_NTrks_nu.h"
+#endif
+
+#ifndef __NO_K2K__
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
+#endif
 
 // MC Studies
 #include "ExpMultDist_CCQE_XSec_1DVar_FakeStudy.h"
@@ -237,18 +265,15 @@
 
 #include "GenericFlux_Tester.h"
 
-#include "MCStudy_KaonPreSelection.h"
-#include "MCStudy_MuonValidation.h"
 #include "ElectronFlux_FlatTree.h"
 #include "ElectronScattering_DurhamData.h"
-#include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
-#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
+#include "MCStudy_KaonPreSelection.h"
+#include "MCStudy_MuonValidation.h"
 
-#include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
-#include "MINERvA_CC1pip_XSec_1D_2017Update.h"
-
-#include "T2K2017_FakeData.h"
 #include "OfficialNIWGPlots.h"
+#include "T2K2017_FakeData.h"
+
+#include "Simple_Osc.h"
 
 #include "FitWeight.h"
 
@@ -263,7 +288,9 @@ namespace SampleUtils {
 /*bool LoadSample(std::list<MeasurementBase*>* fChain, std::string name,
                 std::string file, std::string type, std::string fkdt,
                 FitWeight* rw);*/
-MeasurementBase* CreateSample(std::string name, std::string file, std::string type, std::string fkdt, FitWeight* rw);
+MeasurementBase* CreateSample(std::string name, std::string file,
+                              std::string type, std::string fkdt,
+                              FitWeight* rw);
 MeasurementBase* CreateSample(nuiskey samplekey);
 }
 
