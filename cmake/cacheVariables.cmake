@@ -117,6 +117,8 @@ CheckAndSetDefaultCache(BUILD_GiBUU FALSE BOOL "Whether to build supporting GiBU
 
 CheckAndSetDefaultCache(USE_NUANCE TRUE BOOL "Whether to enable NUANCE event support. <TRUE>")
 
+CheckAndSetDefaultCache(USE_PROB3PP FALSE BOOL "Whether to download and compile in Prob3++ support. <FALSE>")
+
 CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE TRUE BOOL "Whether to perform the update target for external dependencies. <TRUE>")
 
 CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <TRUE>")

@@ -63,6 +63,11 @@ set_target_properties(${LIBNAME} PROPERTIES VERSION
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
   add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
 endif()
+
+if(USE_PROB3PP)
+  add_dependencies(${LIBNAME} prob3pp)
+endif()
+
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
 #install(FILES ${HEADERFILES} DESTINATION include)

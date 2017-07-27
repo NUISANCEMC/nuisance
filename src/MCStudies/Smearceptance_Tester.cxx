@@ -30,7 +30,6 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
   //********************************************************************
 
   // Measurement Details
-
   std::vector<std::string> splitName = GeneralUtils::ParseToStr(name, "_");
   size_t firstUS = name.find_first_of("_");
 
@@ -78,6 +77,12 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
   this->AddEventVariablesToTree();
 
   smearceptor = &Smearcepterton::Get().GetSmearcepter(smearceptorName);
+
+#ifdef __PROB3PP_ENABLED__
+  OscWeighter = new OscWeightEngine();
+  OscWeighter->Config();
+#endif
+
 }
 
 void Smearceptance_Tester::AddEventVariablesToTree() {
@@ -192,6 +197,11 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 
   eventVariables->Branch("flagCCINC_rec", &flagCCINC_rec, "flagCCINC_rec/O");
   eventVariables->Branch("flagCC0Pi_rec", &flagCC0Pi_rec, "flagCC0Pi_rec/O");
+
+#ifdef __PROB3PP_ENABLED__
+  eventVariables->Branch("OscWeight", &OscWeight, "OscWeight/F");
+#endif
+
 }
 
 template <size_t N>
@@ -432,6 +442,9 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   flagCCINC_rec = FSCLep_seen && PDGFSLep_true & 1;
   flagCC0Pi_rec = ((Ncpi_seen + Npi0_seen) == 0) && flagCCINC_rec;
 
+#ifdef __PROB3PP_ENABLED__
+  OscWeight = OscWeighter->CalcWeight(event);
+#endif
   // Fill the eventVariables Tree
   eventVariables->Fill();
   return;

@@ -51,6 +51,11 @@ endif()
 
 ################################################################################
 
+################################  Prob3++   ####################################
+include(${CMAKE_SOURCE_DIR}/cmake/Prob3++Setup.cmake)
+################################################################################
+
+
 cmessage(STATUS "Reweight engine include directories: ${RWENGINE_INCLUDE_DIRECTORIES}")
 
 if(NEED_ROOTEVEGEN)
