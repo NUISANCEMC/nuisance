@@ -46,11 +46,6 @@ void PrintSyntax() {
       << "\n\t"
       << "\n\t -f format  : FlatTree format to output:"
       << "\n\t\t GenericFlux   : Standard event summary format."
-      << "\n\t\t Smearceptance : True and FastMC reco event summary format."
-      << "\n\t\t                  An option (-t) should be passed which "
-         "corresponds "
-      << "\n\t\t                  to a smearcepter defined in the passed card "
-         "file."
       << "\n\t "
       << "\n\t[-c crd.xml]: Input card file to override configs or define "
          "smearcepters."
@@ -163,23 +158,6 @@ int main(int argc, char* argv[]) {
     flattreecreator = new GenericFlux_Tester("FlatTree", gOptInputFile,
                                              FitBase::GetRW(), gOptType, "");
 
-  } else if (!gOptFormat.compare("Smearceptance")) {
-    samplekey.AddS("name", "FlatTree");
-    samplekey.AddS("input", gOptInputFile);
-    samplekey.AddS("type", gOptType);
-    if (gOptOptions == "") {
-      THROW(
-          "Attempting to flatten with Smearceptor, but no Smearceptor given. "
-          "Please supply a -t option.");
-    }
-    if (gOptCardInput == "") {
-      THROW(
-          "Attempting to flatten with Smearceptor, but no card passed with "
-          "Smearceptors configured. Please supply a -c option.");
-    }
-    flattreecreator =
-        new Smearceptance_Tester(std::string("FlatTree_") + gOptOptions,
-                                 gOptInputFile, FitBase::GetRW(), gOptType, "");
   } else {
     ERR(FTL) << "Unknown FlatTree format!" << std::endl;
   }
