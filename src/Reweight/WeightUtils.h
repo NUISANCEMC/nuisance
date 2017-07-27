@@ -1,9 +1,9 @@
 #ifndef WEIGHTUTILS_H
 #define WEIGHTUTILS_H
 
+#include "FitEvent.h"
 #include "FitLogger.h"
 #include "FitParameters.h"
-#include "FitEvent.h"
 #include "TF1.h"
 
 #ifdef __T2KREW_ENABLED__
@@ -92,8 +92,11 @@ using namespace t2krew;
 using namespace genie;
 using namespace genie::rew;
 #endif
-#include "NUISANCESyst.h"
+
 #include "GlobalDialList.h"
+#include "NUISANCESyst.h"
+
+enum extra_reweight_types { kOSCILLATION = kLast_generator_event_type };
 
 namespace FitBase {
 
@@ -105,39 +108,37 @@ double RWSigmaToAbs(std::string type, std::string name, double val);
 double RWAbsToSigma(std::string type, std::string name, double val);
 double RWFracToSigma(std::string type, std::string name, double val);
 
- int ConvDialType(std::string type);
- std::string ConvDialType(int type);
- int GetDialEnum(std::string type, std::string name);
- int GetDialEnum(int type, std::string name);
- static std::map<std::string, int> gNormEnums;
- static std::map<std::string, int> gLikeWeightEnums;
- static std::map<std::string, int> gSplineParameterEnums;
+int ConvDialType(std::string type);
+std::string ConvDialType(int type);
+int GetDialEnum(std::string type, std::string name);
+int GetDialEnum(int type, std::string name);
+static std::map<std::string, int> gNormEnums;
+static std::map<std::string, int> gLikeWeightEnums;
+static std::map<std::string, int> gSplineParameterEnums;
 }
-
 
 namespace Reweight {
 
-	int ConvDial(std::string name, std::string type, bool exceptions=false);
-	int ConvDial(std::string name, int type, bool exceptions=false);
-	std::string ConvDial(int nuisenum);
+int ConvDial(std::string name, std::string type, bool exceptions = false);
+int ConvDial(std::string name, int type, bool exceptions = false);
+std::string ConvDial(int nuisenum);
 
-    int ConvDialType(std::string type);
-    std::string ConvDialType(int type);
+int ConvDialType(std::string type);
+std::string ConvDialType(int type);
 
-	int NEUTEnumFromName(std::string name);
-	int NIWGEnumFromName(std::string name);
-	int NUWROEnumFromName(std::string name);
-	int T2KEnumFromName(std::string name);
-	int GENIEEnumFromName(std::string name);
-	int CustomEnumFromName(std::string name); 
-	
-	int NUISANCEEnumFromName(std::string name, int type);
+int NEUTEnumFromName(std::string name);
+int NIWGEnumFromName(std::string name);
+int NUWROEnumFromName(std::string name);
+int T2KEnumFromName(std::string name);
+int GENIEEnumFromName(std::string name);
+int CustomEnumFromName(std::string name);
 
-	static const int kNoDialFound       = -1;
-	static const int kNoTypeFound       = -2;
-	static const int kGeneratorNotBuilt = -3;
+int NUISANCEEnumFromName(std::string name, int type);
+int OscillationEnumFromName(std::string name);
+
+static const int kNoDialFound = -1;
+static const int kNoTypeFound = -2;
+static const int kGeneratorNotBuilt = -3;
 }
-
-
 
 #endif

@@ -416,16 +416,24 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
+
+  FitParticle* ISNeutralLepton =
+      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
+  if (ISNeutralLepton) {
+    fNUISANCEEvent->probe_E = ISNeutralLepton->E();
+    fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
+  }
+
   return;
 }
 
 void NuWroInputHandler::AddNuWroParticle(FitEvent* evt, particle& p,
                                          int state) {
   // Add Mom
-  evt->fParticleMom[evt->fNParticles][0] = static_cast<vect &>(p).x;
-  evt->fParticleMom[evt->fNParticles][1] = static_cast<vect &>(p).y;
-  evt->fParticleMom[evt->fNParticles][2] = static_cast<vect &>(p).z;
-  evt->fParticleMom[evt->fNParticles][3] = static_cast<vect &>(p).t;
+  evt->fParticleMom[evt->fNParticles][0] = static_cast<vect&>(p).x;
+  evt->fParticleMom[evt->fNParticles][1] = static_cast<vect&>(p).y;
+  evt->fParticleMom[evt->fNParticles][2] = static_cast<vect&>(p).z;
+  evt->fParticleMom[evt->fNParticles][3] = static_cast<vect&>(p).t;
 
   // Status/PDG
   evt->fParticleState[evt->fNParticles] = state;

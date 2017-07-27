@@ -48,7 +48,7 @@ using namespace genie;
 #include "InputTypes.h"
 #include "GeneratorInfoBase.h"
 
-/// Base Event Class used to store just the generator event pointers 
+/// Base Event Class used to store just the generator event pointers
 class BaseFitEvt {
  public:
 
@@ -67,11 +67,12 @@ class BaseFitEvt {
 
   /// Manually set event type
   inline void SetType(int type){fType = type;};
-  
+
   // Global Event Variables/Weights
   int Mode;  ///< True interaction mode
-  double E;  ///< True probe energy
-  
+  double probe_E;  ///< True probe energy
+  double probe_pdg;
+
   // Weighting Info
   double Weight;        ///< Total Weight For Event
   double InputWeight;   ///< Input Starting Weight (used for GiBUU)

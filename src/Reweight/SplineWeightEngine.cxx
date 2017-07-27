@@ -1,3 +1,5 @@
+#include "WeightUtils.h"
+
 #include "SplineWeightEngine.h"
 
 SplineWeightEngine::SplineWeightEngine(std::string name) {
@@ -5,10 +7,10 @@ SplineWeightEngine::SplineWeightEngine(std::string name) {
   // Setup the Reweight engien
   fCalcName = name;
   LOG(FIT) << "Setting up Spline RW : " << fCalcName << std::endl;
-  
+
   // Set Abs Twk Config
   fIsAbsTwk = true;
-	
+
 };
 
 
@@ -72,11 +74,11 @@ void SplineWeightEngine::Reconfigure(bool silent) {
 double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
 
   if (!evt->fSplineRead) return 1.0;
-  
+
   if (evt->fSplineRead->NeedsReconfigure()) {
     evt->fSplineRead->Reconfigure(fSplineValueMap);
   }
-  
+
   double rw_weight = evt->fSplineRead->CalcWeight( evt->fSplineCoeff );
   if (rw_weight < 0.0) rw_weight = 0.0;
 

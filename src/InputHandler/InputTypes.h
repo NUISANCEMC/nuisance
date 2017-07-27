@@ -42,6 +42,7 @@ enum generator_event_type {
   kHEPMC = 16,
   kHISTEVENT = 17,
   kSIGMAQ0HIST = 18,
+  kLast_generator_event_type
 };
 
 namespace InputUtils {
@@ -55,7 +56,7 @@ enum InputType {
   kEVSPLN_Input,
   kEMPTY_Input,
   kFEVENT_Input,
-  kJOINT_Input, 
+  kJOINT_Input,
   kSIGMAQ0HIST_Input,
   kInvalid_Input,
   kHIST_Input,   // Not sure if this are currently used.

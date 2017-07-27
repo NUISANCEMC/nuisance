@@ -1,3 +1,5 @@
+#include "WeightUtils.h"
+
 #include "LikelihoodWeightEngine.h"
 
 LikelihoodWeightEngine::LikelihoodWeightEngine(std::string name) {
@@ -25,11 +27,11 @@ void LikelihoodWeightEngine::IncludeDial(std::string name, double startval) {
   std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
   for (uint i = 0; i < allnames.size(); i++){
     std::string singlename = allnames[i];
-  
+
     // Fill Maps
     int index = fValues.size();
     fValues.push_back(1.0);
-  
+
     fEnumIndex[nuisenum].push_back(index);
     fNameIndex[name].push_back(index);
   }
@@ -62,11 +64,11 @@ double LikelihoodWeightEngine::GetDialValue(std::string name){
     return fValues[ fNameIndex[name][0] ];
 
     // If not iterate and check entry in one of the keys
-  } else { 
+  } else {
     for (std::map<std::string, std::vector<size_t> >::iterator iter = fNameIndex.begin();
 	 iter != fNameIndex.end(); iter++){
       std::string keyname = iter->first;
-      
+
       if ( keyname.find(name) != std::string::npos){
 	return fValues[ iter->second[0] ];
       }

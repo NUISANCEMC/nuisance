@@ -27,6 +27,7 @@ T2K2017_FakeData.cxx
 MCStudy_CCQEHistograms.cxx
 OfficialNIWGPlots.cxx
 Smearceptance_Tester.cxx
+Simple_Osc.cxx
 )
 
 set(HEADERFILES
@@ -40,6 +41,7 @@ T2K2017_FakeData.h
 MCStudy_CCQEHistograms.h
 OfficialNIWGPlots.h
 Smearceptance_Tester.h
+Simple_Osc.h
 )
 
 set(LIBNAME MCStudies)
