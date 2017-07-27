@@ -111,16 +111,26 @@ class OscWeightEngine {
       return;
     }
 
-    if (OscParam[0].Has("baseline") && OscParam[0].Has("matter_density")) {
+    if (OscParam[0].Has("baseline")) {
       LengthParamIsZenith = false;
       LengthParam = OscParam[0].GetD("baseline");
-      constant_density = OscParam[0].GetD("matter_density");
+      constant_density = OscParam[0].Has("matter_density")
+                             ? OscParam[0].GetD("matter_density")
+                             : 0xdeadbeef;
+
     } else if (OscParam[0].Has("detection_zenith_deg")) {
       LengthParamIsZenith = true;
       static const double deg2rad = asin(1) / 90.0;
       LengthParam = cos(OscParam[0].GetD("detection_zenith_deg") * deg2rad);
     } else {
-      constant_density = 0xdeadbeef;
+      ERROR(WRN,
+            "It appeared that you wanted to set up an oscillation weight "
+            "branch, but it was not correctly configured. You need to specify "
+            "either: detection_zenith_deg or baseline attributes on the "
+            "OscParam element, and if baseline is specified, you can "
+            "optionally also set matter_density for oscillations through a "
+            "constant matter density.");
+      return;
     }
     DoOsc = true;
 
