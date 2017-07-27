@@ -44,6 +44,7 @@ const double mass_electron = 0.000510998928; // Electron mass in GeV
  const int pdg_neutrinos[] = {12, -12, 14, -14 /*, 16, -16*/};
  const int pdg_muons[] = {13, -13};
  const int pdg_leptons[] = {11, -11, 13, -13, 15, -15};
+ const int pdg_all_leptons[] = {11, -11, 13, -13, 15, -15, 12, -12, 14, -14, 16, -16};
 
 const int pdg_pions[] = {211, -211, 111};
 const int pdg_charged_pions[] = {211, -211};

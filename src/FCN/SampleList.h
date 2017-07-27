@@ -236,6 +236,7 @@
 #include "MCStudy_CCQEHistograms.h"
 
 #include "GenericFlux_Tester.h"
+#include "GenericFlux_Vectors.h"
 
 #include "MCStudy_KaonPreSelection.h"
 #include "MCStudy_MuonValidation.h"
