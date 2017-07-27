@@ -106,6 +106,7 @@ set(CORE
   Reweight
   Utils
   #Devel
+  Smearceptance
   )
 
 ###############

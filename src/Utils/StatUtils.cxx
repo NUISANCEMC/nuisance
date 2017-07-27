@@ -94,7 +94,7 @@ Double_t StatUtils::GetChi2FromDiag(TH2D* data, TH2D* mc,
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
-                                   TMatrixDSym* invcov, TH1I* mask, 
+                                   TMatrixDSym* invcov, TH1I* mask,
 				   double data_scale, double covar_scale) {
 //*******************************************************************
 
@@ -167,7 +167,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
 
         Chi2 += ( ( calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1) ) \
 		  * (*calc_cov)(i, j)					\
-		  * ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) );  
+		  * ( calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1) ) );
 
       } else {
 
@@ -589,14 +589,14 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag, TH
     //      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
     //				       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
     //    }
-    
+
     // If a covariance is provided that is also thrown
     if (cov) {
       correl_val = 0.0;
 
       for (int j = 0; j < hist->GetNbinsX(); j++) {
         correl_val += rand_val[j] * (*decomp_cov)(j, i) ;
-      }      
+      }
       calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + correl_val * 1E-38));
     }
   }
@@ -1073,7 +1073,7 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
   // Determine dim
   if (dimx == -1 and dimy == -1) {
     std::string line;
-    std::ifstream covar(covfile.c_str(), ifstream::in);
+    std::ifstream covar(covfile.c_str(), std::ifstream::in);
 
     int row = 0;
     while (std::getline(covar >> std::ws, line, '\n')) {
@@ -1105,7 +1105,7 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx, int di
   // Make new matrix
   TMatrixD* mat = new TMatrixD(dimx, dimy);
   std::string line;
-  std::ifstream covar(covfile.c_str(), ifstream::in);
+  std::ifstream covar(covfile.c_str(), std::ifstream::in);
 
   int row = 0;
   while (std::getline(covar >> std::ws, line, '\n')) {
@@ -1197,7 +1197,7 @@ TMatrixD* StatUtils::GetMatrixFromRootFile(std::string covfile, std::string hist
 
     return newmat;
   }
-  
+
   return NULL;
 }
 

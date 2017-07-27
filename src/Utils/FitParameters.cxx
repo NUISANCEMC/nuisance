@@ -47,7 +47,7 @@ void FitParameters::SetParamFile(std::string fileName) {
 // Parameter File Parser
 void FitParameters::ReadParamFile(std::string fileName) {
   std::string line;
-  std::ifstream card(fileName.c_str(), ifstream::in);
+  std::ifstream card(fileName.c_str(), std::ifstream::in);
 
   while (std::getline(card >> std::ws, line, '\n')) {
 
@@ -181,7 +181,7 @@ std::string FitParameters::GetAllParametersArg() {
 }
 
 void FitParameters::MakeParameterCard(std::string filename) {
-  ofstream parcard;
+  std::ofstream parcard;
   parcard.open((filename).c_str(), std::ios::out);
   std::map<std::string, std::string>::iterator mystr = parameterMap_all.begin();
 

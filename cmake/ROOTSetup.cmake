@@ -62,6 +62,7 @@ LIST(APPEND ROOT_LIBS
   GenVector)
 
 if(USE_MINIMIZER)
+
   if("${ROOT_FEATURES}" MATCHES "minuit2")
     cmessage(STATUS "ROOT built with MINUIT2 support")
     LIST(APPEND EXTRA_CXX_FLAGS -D__MINUIT2_ENABLED__)

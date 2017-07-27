@@ -563,9 +563,9 @@ void ParamPull::Reconfigure() {
 
 
       std::vector<std::string> splitbinname = GeneralUtils::ParseToStr(binname, ",");
-      for (int l = 0; l < splitbinname.size(); l++) {
+      for (size_t l = 0; l < splitbinname.size(); l++) {
         std::string singlebinname = splitbinname[l];
-        for (int k = 0; k < allsyst.size(); k++) {
+        for (size_t k = 0; k < allsyst.size(); k++) {
           if (!allsyst[k].compare(singlebinname.c_str())) {
             fMCHist->SetBinContent(j + 1, systval);
           }

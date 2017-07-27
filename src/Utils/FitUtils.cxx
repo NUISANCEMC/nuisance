@@ -60,10 +60,7 @@ double FitUtils::p(TLorentzVector part) {
   return p_part;
 };
 
-double FitUtils::p(FitParticle* part) {
-  return FitUtils::p(part->fP);
-};
-
+double FitUtils::p(FitParticle *part) { return FitUtils::p(part->fP); };
 
 //********************************************************************
 // Returns the angle between two particles in radians
@@ -73,7 +70,7 @@ double FitUtils::th(TLorentzVector part1, TLorentzVector part2) {
   return th;
 };
 
-double FitUtils::th(FitParticle* part1, FitParticle* part2) {
+double FitUtils::th(FitParticle *part1, FitParticle *part2) {
   return FitUtils::th(part1->fP, part2->fP);
 };
 
@@ -127,7 +124,6 @@ double FitUtils::q3_CC1pip_T2K(TLorentzVector pnu, TLorentzVector pmu,
   return q3;
 }
 
-
 //********************************************************************
 // Returns the W reconstruction from Raquel CC1pi+ CH thesis
 // Uses the MiniBooNE formula Enu
@@ -164,9 +160,8 @@ double FitUtils::ProtonQ2QErec(double pE, double binding) {
 //********************************************************************
 double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
                           bool neutrino) {
-//********************************************************************
+  //********************************************************************
 
- 
   // Convert all values to GeV
   const double V = binding / 1000.;           // binding potential
   const double mn = PhysConst::mass_neutron;  // neutron mass
@@ -193,7 +188,6 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
 
 double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
                          bool neutrino) {
-
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
@@ -204,43 +198,39 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
   return q2;
 };
 
-
 double FitUtils::EnuQErec(double pl, double costh, double binding,
                           bool neutrino) {
+  if (pl < 0) return 0.;  // Make sure nobody is silly
 
-  if (pl < 0) return 0.; // Make sure nobody is silly
-
-  double mN_eff = PhysConst::mass_neutron - binding/1000.;
+  double mN_eff = PhysConst::mass_neutron - binding / 1000.;
   double mN_oth = PhysConst::mass_proton;
 
   if (!neutrino) {
-    mN_eff = PhysConst::mass_proton - binding/1000.;
+    mN_eff = PhysConst::mass_proton - binding / 1000.;
     mN_oth = PhysConst::mass_neutron;
   }
   double ml = PhysConst::mass_muon;
-  double el = sqrt(pl*pl + ml*ml);
+  double el = sqrt(pl * pl + ml * ml);
 
   double rEnu =
-    (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
-    (2 * (mN_eff - el + pl * costh));
+      (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
+      (2 * (mN_eff - el + pl * costh));
 
   return rEnu;
 };
 
 double FitUtils::Q2QErec(double pl, double costh, double binding,
                          bool neutrino) {
-
-  if (pl < 0) return 0.; // Make sure nobody is silly
+  if (pl < 0) return 0.;  // Make sure nobody is silly
 
   double ml = PhysConst::mass_muon;
-  double el = sqrt(pl*pl + ml*ml);
+  double el = sqrt(pl * pl + ml * ml);
 
   double rEnu = EnuQErec(pl, costh, binding, neutrino);
   double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);
 
   return q2;
 };
-
 
 //********************************************************************
 // Reconstructs Enu for CC1pi0
@@ -547,6 +537,21 @@ double FitUtils::Wtrue(TLorentzVector pnu, TLorentzVector pmu,
 
   return w_rec;
 };
+
+double FitUtils::SumKE_PartVect(std::vector<FitParticle *> const fps) {
+  double sum = 0.0;
+  for (size_t p_it = 0; p_it < fps.size(); ++p_it) {
+    sum += fps[p_it]->KE();
+  }
+  return sum;
+}
+double FitUtils::SumTE_PartVect(std::vector<FitParticle *> const fps) {
+  double sum = 0.0;
+  for (size_t p_it = 0; p_it < fps.size(); ++p_it) {
+    sum += fps[p_it]->E();
+  }
+  return sum;
+}
 
 /*
   E Recoil
