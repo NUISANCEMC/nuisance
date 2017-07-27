@@ -139,7 +139,7 @@ public:
 
   /// Return a vector of FitParticles given a particle pdg and state.
   /// This is memory intensive and slow than GetAllParticleIndices,
-  /// but is slightly easier to use. 
+  /// but is slightly easier to use.
   std::vector<FitParticle*> GetAllParticle (int const pdg = -1, int const state = -1);
 
   template <size_t N>
@@ -344,13 +344,14 @@ public:
   inline FitParticle* GetHMISElectron   (void) { return GetHMISParticle(11);   };
   inline FitParticle* GetHMISMuon       (void) { return GetHMISParticle(13);   };
   inline FitParticle* GetHMISTau        (void) { return GetHMISParticle(15);   };
+  inline FitParticle* GetHMISNuOrChargedLeptons (void) { return GetHMISParticle(PhysConst::pdg_nu_or_charged_leptons);   };
   inline FitParticle* GetHMISProton     (void) { return GetHMISParticle(2212); };
   inline FitParticle* GetHMISNeutron    (void) { return GetHMISParticle(2112); };
   inline FitParticle* GetHMISPiZero     (void) { return GetHMISParticle(111);  };
   inline FitParticle* GetHMISPiPlus     (void) { return GetHMISParticle(211);  };
   inline FitParticle* GetHMISPiMinus    (void) { return GetHMISParticle(-211); };
   inline FitParticle* GetHMISPhoton     (void) { return GetHMISParticle(22);   };
-  inline FitParticle* GetHMISLeptons    (void) { return GetHMISParticle(PhysConst::pdg_leptons);       };
+  inline FitParticle* GetHMISLepton    (void) { return GetHMISParticle(PhysConst::pdg_leptons);       };
   inline FitParticle* GetHMISPions      (void) { return GetHMISParticle(PhysConst::pdg_pions);         };
   inline FitParticle* GetHMISChargePions(void) { return GetHMISParticle(PhysConst::pdg_charged_pions); };
 
@@ -489,13 +490,14 @@ public:
   inline FitParticle* GetHMFSElectron   (void) { return GetHMFSParticle(11);   };
   inline FitParticle* GetHMFSMuon       (void) { return GetHMFSParticle(13);   };
   inline FitParticle* GetHMFSTau        (void) { return GetHMFSParticle(15);   };
+  inline FitParticle* GetHMFSNuOrChargedLeptons (void) { return GetHMFSParticle(PhysConst::pdg_nu_or_charged_leptons);   };
   inline FitParticle* GetHMFSProton     (void) { return GetHMFSParticle(2212); };
   inline FitParticle* GetHMFSNeutron    (void) { return GetHMFSParticle(2112); };
   inline FitParticle* GetHMFSPiZero     (void) { return GetHMFSParticle(111);  };
   inline FitParticle* GetHMFSPiPlus     (void) { return GetHMFSParticle(211);  };
   inline FitParticle* GetHMFSPiMinus    (void) { return GetHMFSParticle(-211); };
   inline FitParticle* GetHMFSPhoton     (void) { return GetHMFSParticle(22);   };
-  inline FitParticle* GetHMFSLeptons    (void) { return GetHMFSParticle(PhysConst::pdg_leptons);       };
+  inline FitParticle* GetHMFSLepton    (void) { return GetHMFSParticle(PhysConst::pdg_leptons);       };
   inline FitParticle* GetHMFSPions      (void) { return GetHMFSParticle(PhysConst::pdg_pions);         };
   inline FitParticle* GetHMFSChargePions(void) { return GetHMFSParticle(PhysConst::pdg_charged_pions); };
 
@@ -511,7 +513,7 @@ public:
   inline int GetHMFSPiPlusIndex     (void) const { return GetHMFSParticleIndex(211);  };
   inline int GetHMFSPiMinusIndex    (void) const { return GetHMFSParticleIndex(-211); };
   inline int GetHMFSPhotonIndex     (void) const { return GetHMFSParticleIndex(22);   };
-  inline int GetHMFSLeptonsIndex    (void) const { return GetHMFSParticleIndex(PhysConst::pdg_leptons);       };
+  inline int GetHMFSLeptonIndex    (void) const { return GetHMFSParticleIndex(PhysConst::pdg_leptons);       };
   inline int GetHMFSPionsIndex      (void) const { return GetHMFSParticleIndex(PhysConst::pdg_pions);         };
   inline int GetHMFSChargePionsIndex(void) const { return GetHMFSParticleIndex(PhysConst::pdg_charged_pions); };
 

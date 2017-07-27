@@ -50,6 +50,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
 include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
+include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
 if (USE_NuWro AND NOT NUWRO_BUILT_FROM_FILE)

@@ -19,15 +19,17 @@
 
 #ifndef NUISCONFIG_H_SEEN
 #define NUISCONFIG_H_SEEN
-#include "TXMLEngine.h"
-#include "GeneralUtils.h"
+
 #include <algorithm>
 #include <map>
 
+#include "TXMLEngine.h"
+
+#include "GeneralUtils.h"
+
 // New NUISANCE Config Class
 class nuisconfig {
-public:
-
+ public:
   /// Singleton Get Function
   static nuisconfig& GetConfig(void);
 
@@ -51,10 +53,8 @@ public:
   void WriteConfig(std::string filename);
 
   void OverrideConfig(std::string conf);
-  
+
   XMLNodePointer_t GetConfigNode(std::string name);
-
-
 
   /// Request a string config key
   std::string SetConfS(const std::string name, std::string val);
@@ -83,8 +83,12 @@ public:
   /// Node Functions
   void CheckCallCount(std::string name);
 
-  // Get List of nodes
-  std::vector<XMLNodePointer_t> GetNodes(std::string type="");
+  /// Get list of child nodes of given element
+  std::vector<XMLNodePointer_t> GetChildNodes(XMLNodePointer_t node,
+                                              const std::string type);
+
+  // Get List of child nodes of nuisance element
+  std::vector<XMLNodePointer_t> GetNodes(std::string type = "");
 
   /// Get String from a given node
   std::string GetS(XMLNodePointer_t node, std::string name);
@@ -97,7 +101,7 @@ public:
 
   /// Get double from given node
   double GetD(XMLNodePointer_t node, std::string name);
-  
+
   // Add Children to root node
   XMLNodePointer_t CreateNode(std::string name);
 
@@ -124,7 +128,6 @@ public:
   void ChangeI(XMLNodePointer_t node, std::string name, int val);
   void ChangeD(XMLNodePointer_t node, std::string name, double val);
 
-
   // Check has element
   bool Has(XMLNodePointer_t node, std::string name);
 
@@ -132,54 +135,50 @@ public:
   void Reconfigure(){};
 
   /// OLD Wrapper Functions for GetParI,etc
-  inline std::string GetParS(std::string name){ return ConfS(name); };
-  inline int GetParI(std::string name){ return ConfI(name); };
-  inline double GetParD(std::string name){ return ConfD(name); };
-  inline bool GetParB(std::string name){ return ConfB(name); };
+  inline std::string GetParS(std::string name) { return ConfS(name); };
+  inline int GetParI(std::string name) { return ConfI(name); };
+  inline double GetParD(std::string name) { return ConfD(name); };
+  inline bool GetParB(std::string name) { return ConfB(name); };
 
   // Get Vectors
-  std::vector<std::string> GetVS(XMLNodePointer_t node, std::string name, const char* del);
-  std::vector<int> GetVI(XMLNodePointer_t node, std::string name, const char* del);
-  std::vector<double> GetVD(XMLNodePointer_t node, std::string name, const char* del);
+  std::vector<std::string> GetVS(XMLNodePointer_t node, std::string name,
+                                 const char* del);
+  std::vector<int> GetVI(XMLNodePointer_t node, std::string name,
+                         const char* del);
+  std::vector<double> GetVD(XMLNodePointer_t node, std::string name,
+                            const char* del);
 
   void RemoveEmptyNodes();
   void RemoveIdenticalNodes();
 
-  
   std::vector<std::string> GetAllKeysForNode(XMLNodePointer_t node);
- 
 
   bool MatchingNodes(XMLNodePointer_t node1, XMLNodePointer_t node2);
   void PrintNode(XMLNodePointer_t node);
   void RemoveNode(XMLNodePointer_t node);
 
-
-
   std::string GetTag(std::string name);
+
+  std::string GetElementName(XMLNodePointer_t node){ return fXML->GetNodeName(node); }
   void ExpandAllTags();
 
  private:
+  XMLNodePointer_t fMainNode;             ///< Main XML Parent Node
+  TXMLEngine* fXML;                       ///< ROOT XML Engine
+  std::vector<XMLDocPointer_t> fXMLDocs;  ///< List of all XML document inputs
 
-  XMLNodePointer_t fMainNode; ///< Main XML Parent Node
-  TXMLEngine* fXML; ///< ROOT XML Engine
-  std::vector<XMLDocPointer_t> fXMLDocs; ///< List of all XML document inputs
+  int fCurrentTime;  ///< Unix time for inefficiency checking
+  std::map<std::string, int> fConfigCallCount;  ///< To check for inefficiency.
+  std::map<std::string, bool> fConfigCallWarning;  ///< Only print warning once.
 
-  int fCurrentTime; ///< Unix time for inefficiency checking
-  std::map<std::string, int> fConfigCallCount; ///< To check for inefficiency.
-  std::map<std::string, bool> fConfigCallWarning; ///< Only print warning once.
-
-protected:
+ protected:
   static nuisconfig* m_nuisconfigInstance;
 };
 
 // Get Function for Singleton
 namespace Config {
-  nuisconfig& Get();
-
+nuisconfig& Get();
 }
-
 
 /*! @} */
 #endif
-
-

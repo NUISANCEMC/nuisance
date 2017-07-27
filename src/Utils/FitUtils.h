@@ -77,6 +77,9 @@ double Wrec(TLorentzVector pnu, TLorentzVector pmu);
 /// FSI vectors aren't not saved and we for some reasons need W_true
 double Wtrue(TLorentzVector pnu, TLorentzVector pmu, TLorentzVector pnuc);
 
+double SumKE_PartVect(std::vector<FitParticle *> const fps);
+double SumTE_PartVect(std::vector<FitParticle *> const fps);
+
 /// Return E Hadronic for all FS Particles in Hadronic System
 double GetErecoil_TRUE(FitEvent *event);
 

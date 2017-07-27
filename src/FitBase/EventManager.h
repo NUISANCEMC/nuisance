@@ -24,7 +24,7 @@
 #include "FitWeight.h"
 #include "InputUtils.h"
 #include "InputFactory.h"
-// This class is menat to manage one input file for many distributions
+// This class is meant to manage one input file for many distributions
 class EventManager {
  public:
   static EventManager& Get(void);

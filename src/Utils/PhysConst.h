@@ -26,8 +26,8 @@
 #include <fstream>
 #include <iostream>
 #include <iostream>
-#include <numeric>
 #include <limits>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -35,15 +35,21 @@
 
 /// namespace to contain all physical constants used by NUISANCE
 namespace PhysConst {
-const double mass_proton = 0.93827203;   // Proton mass in GeV
-const double mass_neutron = 0.93956536;  // Neutron mass in GeV
-const double mass_delta = 1.232;         // Delta mass in GeV
-const double mass_muon = 0.10565837;     // Muon mass in GeV
-const double mass_electron = 0.000510998928; // Electron mass in GeV
+const double mass_proton = 0.93827203;        // Proton mass in GeV
+const double mass_neutron = 0.93956536;       // Neutron mass in GeV
+const double mass_delta = 1.232;              // Delta mass in GeV
+const double mass_muon = 0.10565837;          // Muon mass in GeV
+const double mass_electron = 0.000510998928;  // Electron mass in GeV
+const double mass_cpi = 0.13957;              // charged pion mass in GeV
+const double mass_pi0 = 0.13498;              // neutral pion mass in GeV
 
- const int pdg_neutrinos[] = {12, -12, 14, -14 /*, 16, -16*/};
- const int pdg_muons[] = {13, -13};
- const int pdg_leptons[] = {11, -11, 13, -13, 15, -15};
+const double mass_MeV = 1000; // MeV/GeV
+
+const int pdg_neutrinos[] = {12, -12, 14, -14 /*, 16, -16*/};
+const int pdg_muons[] = {13, -13};
+const int pdg_leptons[] = {11, -11, 13, -13, 15, -15};
+const int pdg_nu_or_charged_leptons[] = {12,  -12, 14,  -14, 11,
+                                         -11, 13,  -13, 15,  -15};
 
 const int pdg_pions[] = {211, -211, 111};
 const int pdg_charged_pions[] = {211, -211};
@@ -65,8 +71,6 @@ const int pdg_antistrangemesons[] = {
     -9000315, -9000325, -10315,   -10325,   -20315,   -20325,   -9010315,
     -9010325, -9020315, -9020325, -317,     -327,     -9010317, -9010327};
 }
-
-
 
 /*! @} */
 #endif

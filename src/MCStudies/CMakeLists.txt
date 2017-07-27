@@ -26,6 +26,7 @@ ElectronFlux_FlatTree.cxx
 T2K2017_FakeData.cxx
 MCStudy_CCQEHistograms.cxx
 OfficialNIWGPlots.cxx
+Smearceptance_Tester.cxx
 )
 
 set(HEADERFILES
@@ -38,6 +39,7 @@ ElectronFlux_FlatTree.h
 T2K2017_FakeData.h
 MCStudy_CCQEHistograms.h
 OfficialNIWGPlots.h
+Smearceptance_Tester.h
 )
 
 set(LIBNAME MCStudies)
@@ -53,6 +55,7 @@ include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 # Needed for experiment specific signal flags
 include_directories(${CMAKE_SOURCE_DIR}/src/T2K)
 include_directories(${CMAKE_SOURCE_DIR}/src/MINERvA)
+include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
