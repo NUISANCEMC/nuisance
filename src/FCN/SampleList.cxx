@@ -676,6 +676,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (name.find("GenericFlux_") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
 
+  } else if (name.find("GenericVectors_") != std::string::npos) {
+    return (new GenericFlux_Vectors(name, file, rw, type, fkdt));
+
   } else if (!name.compare("T2K2017_FakeData")) {
     return (new T2K2017_FakeData(samplekey));
 
