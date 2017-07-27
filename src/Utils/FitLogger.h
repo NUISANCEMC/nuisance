@@ -51,8 +51,8 @@
 
 
 namespace Logger {
-extern unsigned int log_verb; //!< Current VERBOSITY
-extern unsigned int err_verb; //!< Current ERROR VERBOSITY
+extern int log_verb; //!< Current VERBOSITY
+extern int err_verb; //!< Current ERROR VERBOSITY
 extern bool external_verb;
 extern bool use_colors; //!< Use BASH Terminal Colors Flag
 extern bool super_rainbow_mode; //!< For when fitting gets boring.
@@ -203,5 +203,5 @@ std::ostream& _ERR(int level, const char* filename, const char* funct, int line)
 
 
 /*! @} */
-#endif 
+#endif
 

@@ -25,14 +25,14 @@
 namespace Logger {
 
 // Logger Variables
-uint log_verb   = 4;
+int log_verb   = 4;
 bool use_colors = true;
 bool showtrace  = false;
 std::ostream* __LOG_outstream(&std::cout);
 std::ofstream __LOG_nullstream;
 
 // Error Variables
-unsigned int err_verb = 0;
+int err_verb = 0;
 std::ostream* __ERR_outstream(&std::cerr);
 
 // Extra Variables
