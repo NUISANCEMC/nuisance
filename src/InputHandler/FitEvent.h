@@ -496,6 +496,7 @@ public:
   inline FitParticle* GetHMFSPiMinus    (void) { return GetHMFSParticle(-211); };
   inline FitParticle* GetHMFSPhoton     (void) { return GetHMFSParticle(22);   };
   inline FitParticle* GetHMFSLeptons    (void) { return GetHMFSParticle(PhysConst::pdg_leptons);       };
+  inline FitParticle* GetHMFSAnyLepton  (void) { return GetHMFSParticle(PhysConst::pdg_all_leptons);   };
   inline FitParticle* GetHMFSPions      (void) { return GetHMFSParticle(PhysConst::pdg_pions);         };
   inline FitParticle* GetHMFSChargePions(void) { return GetHMFSParticle(PhysConst::pdg_charged_pions); };
 
@@ -512,6 +513,7 @@ public:
   inline int GetHMFSPiMinusIndex    (void) const { return GetHMFSParticleIndex(-211); };
   inline int GetHMFSPhotonIndex     (void) const { return GetHMFSParticleIndex(22);   };
   inline int GetHMFSLeptonsIndex    (void) const { return GetHMFSParticleIndex(PhysConst::pdg_leptons);       };
+  inline int GetHMFSAnyLeptonIndex  (void) const { return GetHMFSParticleIndex(PhysConst::pdg_all_leptons);       };
   inline int GetHMFSPionsIndex      (void) const { return GetHMFSParticleIndex(PhysConst::pdg_pions);         };
   inline int GetHMFSChargePionsIndex(void) const { return GetHMFSParticleIndex(PhysConst::pdg_charged_pions); };
 
