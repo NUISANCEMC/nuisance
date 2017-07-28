@@ -143,6 +143,18 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
 
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  if(!rwEvs.size()){
+    fNuwroParams = fNuWroEvent->par;
+  }
+  if (entry >= rwEvs.size()) {
+    rwEvs.push_back(BaseFitEvt());
+    rwEvs.back().SetNuwroEvent(fNuWroEvent);
+    rwEvs.back().fNuwroEvent = NULL;
+    rwEvs.back().fNuwroParams = &fNuwroParams;
+  }
+#endif
+
   return fNUISANCEEvent;
 }
 

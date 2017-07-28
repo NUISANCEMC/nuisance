@@ -29,7 +29,11 @@
 #endif
 
 #ifdef __NUWRO_ENABLED__
+#ifdef __USE_NUWRO_SRW_EVENTS__
+#include "NuwroReWeightSimpleEvent.h"
+#else
 #include "event1.h"
+#endif
 #endif
 
 #ifdef __GENIE_ENABLED__
@@ -58,6 +62,8 @@ class BaseFitEvt {
 
   /// Copy base fit event pointers
   BaseFitEvt(const BaseFitEvt* obj);
+  BaseFitEvt(BaseFitEvt const &);
+  BaseFitEvt operator=(BaseFitEvt const &);
 
   /// Reset weight to 1.0
   void ResetWeight();
@@ -96,6 +102,10 @@ class BaseFitEvt {
 
 #ifdef __NUWRO_ENABLED__
   /// Setup Event Reading from NuWro Event
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  SRW::SRWEvent fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  params * fNuwroParams;
+#endif
   void SetNuwroEvent(event* e);
   event* fNuwroEvent;  ///< Pointer to Nuwro event
 #endif

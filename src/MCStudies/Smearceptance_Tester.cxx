@@ -82,7 +82,6 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
   OscWeighter = new OscWeightEngine();
   OscWeighter->Config();
 #endif
-
 }
 
 void Smearceptance_Tester::AddEventVariablesToTree() {
@@ -201,7 +200,6 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 #ifdef __PROB3PP_ENABLED__
   eventVariables->Branch("OscWeight", &OscWeight, "OscWeight/F");
 #endif
-
 }
 
 template <size_t N>
@@ -337,14 +335,13 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   RecoInfo *ri = smearceptor->Smearcept(event);
 
   TLorentzVector FourMomentumTransfer =
-      (event->GetHMISNuOrChargedLeptons()->P4() -
-       event->GetHMFSNuOrChargedLeptons()->P4());
+      (event->GetHMISAnyLeptons()->P4() - event->GetHMFSAnyLeptons()->P4());
 
   Omega_true = FourMomentumTransfer.E();
   Q2_true = -1 * FourMomentumTransfer.Mag2();
   Mode_true = event->Mode;
 
-  EISLep_true = event->GetHMISNuOrChargedLeptons()->E();
+  EISLep_true = event->GetHMISAnyLeptons()->E();
   KEFSHad_cpip_true = FitUtils::SumTE_PartVect(event->GetAllFSPiPlus());
   KEFSHad_cpim_true = FitUtils::SumTE_PartVect(event->GetAllFSPiMinus());
   KEFSHad_cpi_true = KEFSHad_cpip_true + KEFSHad_cpim_true;
@@ -355,11 +352,11 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
       KEFSHad_cpi_true + TEFSHad_pi0_true + KEFSHad_p_true + KEFSHad_n_true;
   EFSChargedEMHad_true = KEFSHad_cpi_true + TEFSHad_pi0_true + KEFSHad_p_true;
 
-  EFSLep_true = event->GetHMFSLepton()->E();
+  EFSLep_true = event->GetHMFSAnyLeptons()->E();
   EFSgamma_true = FitUtils::SumTE_PartVect(event->GetAllFSPhoton());
 
-  PDGISLep_true = event->GetHMISNuOrChargedLeptons()->PDG();
-  PDGFSLep_true = event->GetHMFSNuOrChargedLeptons()->PDG();
+  PDGISLep_true = event->GetHMISAnyLeptons()->PDG();
+  PDGFSLep_true = event->GetHMFSAnyLeptons()->PDG();
 
   Nprotons_true = event->GetAllFSProton().size();
   Nneutrons_true = event->GetAllFSNeutron().size();
@@ -368,19 +365,24 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   Ncpi_true = Ncpiplus_true + Ncpiminus_true;
   Npi0_true = event->GetAllFSPiZero().size();
 
-  KEFSHad_cpip_rec = SumKE_RecoInfo(*ri, cpipPDG, PhysConst::mass_cpi*PhysConst::mass_MeV);
-  KEFSHad_cpim_rec = SumKE_RecoInfo(*ri, cpimPDG, PhysConst::mass_cpi*PhysConst::mass_MeV);
+  KEFSHad_cpip_rec =
+      SumKE_RecoInfo(*ri, cpipPDG, PhysConst::mass_cpi * PhysConst::mass_MeV);
+  KEFSHad_cpim_rec =
+      SumKE_RecoInfo(*ri, cpimPDG, PhysConst::mass_cpi * PhysConst::mass_MeV);
   KEFSHad_cpi_rec = KEFSHad_cpip_rec + KEFSHad_cpim_rec;
-  TEFSHad_pi0_rec = SumTE_RecoInfo(*ri, pi0PDG, PhysConst::mass_pi0*PhysConst::mass_MeV);
-  KEFSHad_p_rec = SumKE_RecoInfo(*ri, ProtonPDG, PhysConst::mass_proton*PhysConst::mass_MeV);
-  KEFSHad_n_rec = SumKE_RecoInfo(*ri, NeutronPDG, PhysConst::mass_neutron*PhysConst::mass_MeV);
+  TEFSHad_pi0_rec =
+      SumTE_RecoInfo(*ri, pi0PDG, PhysConst::mass_pi0 * PhysConst::mass_MeV);
+  KEFSHad_p_rec = SumKE_RecoInfo(*ri, ProtonPDG,
+                                 PhysConst::mass_proton * PhysConst::mass_MeV);
+  KEFSHad_n_rec = SumKE_RecoInfo(*ri, NeutronPDG,
+                                 PhysConst::mass_neutron * PhysConst::mass_MeV);
   EFSHad_rec =
       KEFSHad_cpi_rec + TEFSHad_pi0_rec + KEFSHad_p_rec + KEFSHad_n_rec;
 
   TVector3 FSLepMom_rec(0, 0, 0);
-  if (event->GetHMFSLepton()) {
-    double massLep = event->GetHMFSLepton()->M();
-    FSLepMom_rec = GetHMFSRecParticles(*ri, event->GetHMFSLepton()->PDG());
+  if (event->GetHMFSAnyLeptons()) {
+    double massLep = event->GetHMFSAnyLeptons()->M();
+    FSLepMom_rec = GetHMFSRecParticles(*ri, event->GetHMFSAnyLeptons()->PDG());
     EFSLep_rec = (FSLepMom_rec.Mag() > 1E-5)
                      ? sqrt(FSLepMom_rec * FSLepMom_rec + massLep * massLep)
                      : 0;
