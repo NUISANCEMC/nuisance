@@ -43,7 +43,9 @@ BaseFitEvt::BaseFitEvt() {
 #endif
 
 #ifdef __NUWRO_ENABLED__
+#ifndef __USE_NUWRO_SRW_EVENTS__
   fNuwroEvent = NULL;
+#endif
 #endif
 
 #ifdef __GENIE_ENABLED__
@@ -66,7 +68,9 @@ BaseFitEvt::~BaseFitEvt() {
 #endif
 
 #ifdef __NUWRO_ENABLED__
+#ifndef __USE_NUWRO_SRW_EVENTS__
   if (fNuwroEvent) delete fNuwroEvent;
+#endif
 #endif
 
 #ifdef __GENIE_ENABLED__
@@ -120,6 +124,91 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
 #endif
 };
 
+BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
+  Mode = other.Mode;
+  probe_E = other.probe_E;
+  probe_pdg = other.probe_pdg;
+
+  Weight = other.Weight;
+  InputWeight = other.InputWeight;
+  RWWeight = other.RWWeight;
+  CustomWeight = other.CustomWeight;
+  SavedRWWeight = other.SavedRWWeight;
+
+  fSplineCoeff = other.fSplineCoeff;
+  fSplineRead = other.fSplineRead;
+
+  fGenInfo = other.fGenInfo;
+  fType = other.fType;
+
+#ifdef __NEUT_ENABLED__
+  fNeutVect = other.fNeutVect;
+#endif
+
+#ifdef __NUWRO_ENABLED__
+  fNuwroEvent = other.fNuwroEvent;
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroParams = other.fNuwroParams;
+#endif
+#endif
+
+#ifdef __GENIE_ENABLED__
+  genie_event = other.genie_event;
+#endif
+
+#ifdef __NUANCE_ENABLED__
+  nuance_event = other.nuance_event;
+#endif
+
+#ifdef __GiBUU_ENABLED__
+  GiRead = other.GiRead;
+#endif
+};
+
+BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
+  Mode = other.Mode;
+  probe_E = other.probe_E;
+  probe_pdg = other.probe_pdg;
+
+  Weight = other.Weight;
+  InputWeight = other.InputWeight;
+  RWWeight = other.RWWeight;
+  CustomWeight = other.CustomWeight;
+  SavedRWWeight = other.SavedRWWeight;
+
+  fSplineCoeff = other.fSplineCoeff;
+  fSplineRead = other.fSplineRead;
+
+  fGenInfo = other.fGenInfo;
+  fType = other.fType;
+
+#ifdef __NEUT_ENABLED__
+  fNeutVect = other.fNeutVect;
+#endif
+
+#ifdef __NUWRO_ENABLED__
+  fNuwroEvent = other.fNuwroEvent;
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroParams = other.fNuwroParams;
+#endif
+#endif
+
+#ifdef __GENIE_ENABLED__
+  genie_event = other.genie_event;
+#endif
+
+#ifdef __NUANCE_ENABLED__
+  nuance_event = other.nuance_event;
+#endif
+
+#ifdef __GiBUU_ENABLED__
+  GiRead = other.GiRead;
+#endif
+  return *this;
+}
+
 void BaseFitEvt::ResetWeight() { InputWeight = 1.0; }
 
 double BaseFitEvt::GetWeight() {
@@ -149,11 +238,19 @@ void BaseFitEvt::SetNeutVect(NeutVect* v) {
 #endif
 
 #ifdef __NUWRO_ENABLED__
+
 void BaseFitEvt::SetNuwroEvent(event* e) {
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  fNuwroSRWEvent = SRW::SRWEvent(*e);
+  probe_E = fNuwroSRWEvent.NeutrinoEnergy;
+  probe_pdg = fNuwroSRWEvent.NeutrinoPDG;
+  fNuwroParams = NULL;
+#endif
   fType = kNUWRO;
   fNuwroEvent = e;
 
 #ifdef __PROB3PP_ENABLED__
+#ifndef __USE_NUWRO_SRW_EVENTS__
   for (size_t i = 0; i < fNuwroEvent->in.size(); i++) {
     if (std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
                    fNuwroEvent->in[i].pdg)) {
@@ -162,6 +259,7 @@ void BaseFitEvt::SetNuwroEvent(event* e) {
       break;
     }
   }
+#endif
 #endif
 }
 #endif

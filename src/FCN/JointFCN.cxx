@@ -26,17 +26,14 @@
 //   fOutputDir->cd();
 // };
 
-
 JointFCN::JointFCN(TFile* outfile) {
-
   fOutputDir = gDirectory;
-  if (outfile)
-    FitPar::Config().out = outfile;
+  if (outfile) FitPar::Config().out = outfile;
 
-  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   LoadSamples(samplekeys);
 
-  std::vector<nuiskey> covarkeys =  Config::QueryKeys("covar");
+  std::vector<nuiskey> covarkeys = Config::QueryKeys("covar");
   LoadPulls(covarkeys);
 
   fCurIter = 0;
@@ -48,14 +45,11 @@ JointFCN::JointFCN(TFile* outfile) {
 
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
-
 }
 
 JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile) {
-
   fOutputDir = gDirectory;
-  if (outfile)
-    FitPar::Config().out = outfile;
+  if (outfile) FitPar::Config().out = outfile;
 
   LoadSamples(samplekeys);
 
@@ -70,7 +64,6 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile) {
 
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
-
 }
 
 //***************************************************
@@ -274,7 +267,9 @@ int JointFCN::GetNDOF() {
 double JointFCN::GetLikelihood() {
   //***************************************************
 
-  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..." << " : " << "-2logL" << std::endl;
+  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..."
+           << " : "
+           << "-2logL" << std::endl;
 
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
@@ -289,7 +284,8 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : " << newlike << "/" << ndof << std::endl;
+    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+             << newlike << "/" << ndof << std::endl;
 
     // Add Weight Scaling
     // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
@@ -321,7 +317,6 @@ double JointFCN::GetLikelihood() {
 };
 
 void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
-
   LOG(MIN) << "Loading Samples : " << samplekeys.size() << std::endl;
   for (size_t i = 0; i < samplekeys.size(); i++) {
     nuiskey key = samplekeys[i];
@@ -335,8 +330,7 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
     LOG(MIN) << "Loading Sample : " << samplename << std::endl;
 
     fOutputDir->cd();
-    MeasurementBase* NewLoadedSample
-      = SampleUtils::CreateSample(key);
+    MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(key);
 
     if (!NewLoadedSample) {
       ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;
@@ -350,7 +344,6 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
 }
 
 void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
-
   for (size_t i = 0; i < pullkeys.size(); i++) {
     nuiskey key = pullkeys[i];
 
@@ -362,37 +355,34 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
     std::cout << "Creating Pull Term : " << std::endl;
     sleep(1);
     fPulls.push_back(new ParamPull(pullname, pullfile, pulltype));
-
   }
 
   //     // Sample Inputs
-//     if (!samplevect[0].compare("covar") || !samplevect[0].compare("pulls") ||
-//         !samplevect[0].compare("throws")) {
-//       // Get all inputs
-//       std::string name = samplevect[1];
-//       std::string files = samplevect[2];
-//       std::string type = "DEFAULT";
+  //     if (!samplevect[0].compare("covar") || !samplevect[0].compare("pulls")
+  //     ||
+  //         !samplevect[0].compare("throws")) {
+  //       // Get all inputs
+  //       std::string name = samplevect[1];
+  //       std::string files = samplevect[2];
+  //       std::string type = "DEFAULT";
 
-//       if (samplevect.size() > 3) {
-//         type = samplevect[3];
-//       } else if (!samplevect[0].compare("pull")) {
-//         type = "GAUSPULL";
-//       } else if (!samplevect[0].compare("throws")) {
-//         type = "GAUSTHROWS";
-//       }
+  //       if (samplevect.size() > 3) {
+  //         type = samplevect[3];
+  //       } else if (!samplevect[0].compare("pull")) {
+  //         type = "GAUSPULL";
+  //       } else if (!samplevect[0].compare("throws")) {
+  //         type = "GAUSTHROWS";
+  //       }
 
-//       // Create Pull Class
-//       LOG(MIN) << "Loading up pull term: " << name << " << " << files << " ("
-//                << type << ")" << std::endl;
-//       std::string fakeData = "";
-//       fOutputDir->cd();
-//       fPulls.push_back(new ParamPull(name, files, type));
-//     }
-
-
-
+  //       // Create Pull Class
+  //       LOG(MIN) << "Loading up pull term: " << name << " << " << files << "
+  //       ("
+  //                << type << ")" << std::endl;
+  //       std::string fakeData = "";
+  //       fOutputDir->cd();
+  //       fPulls.push_back(new ParamPull(name, files, type));
+  //     }
 }
-
 
 // //***************************************************
 // void JointFCN::LoadSamples(std::string cardinput)
@@ -413,7 +403,8 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
 //     if (line.empty()) continue;
 
 //     // Parse line
-//     std::vector<std::string> samplevect = GeneralUtils::ParseToStr(line, " ");
+//     std::vector<std::string> samplevect = GeneralUtils::ParseToStr(line, "
+//     ");
 
 //     // Sample Inputs
 //     if (!samplevect[0].compare("sample")) {
@@ -428,7 +419,8 @@ void JointFCN::LoadPulls(std::vector<nuiskey> pullkeys) {
 //                << type << ")" << std::endl;
 //       std::string fakeData = "";
 //       fOutputDir->cd();
-//       MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(name, files, type,
+//       MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(name,
+//       files, type,
 //                                          fakeData, FitBase::GetRW());
 
 //       if (!NewLoadedSample) {
@@ -474,7 +466,8 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   int starttime = time(NULL);
   LOG(REC) << "Starting Reconfigure iter. " << this->fCurIter << std::endl;
-  // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled << std::endl;
+  // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled <<
+  // std::endl;
   // Event Manager Reconf
   if (fUsingEventManager) {
     if (!fullconfig and fMCFilled)
@@ -530,7 +523,6 @@ void JointFCN::ReconfigureAllEvents() {
 }
 
 std::vector<InputHandlerBase*> JointFCN::GetInputList() {
-
   std::vector<InputHandlerBase*> InputList;
   fIsAllSplines = true;
 
@@ -540,25 +532,21 @@ std::vector<InputHandlerBase*> JointFCN::GetInputList() {
 
     std::vector<MeasurementBase*> subsamples = exp->GetSubSamples();
     for (size_t i = 0; i < subsamples.size(); i++) {
-
       InputHandlerBase* inp = subsamples[i]->GetInput();
-      if (std::find(InputList.begin(), InputList.end(), inp) ==  InputList.end()) {
-
-        if (subsamples[i]->GetInput()->GetType() != kSPLINEPARAMETER) fIsAllSplines = false;
+      if (std::find(InputList.begin(), InputList.end(), inp) ==
+          InputList.end()) {
+        if (subsamples[i]->GetInput()->GetType() != kSPLINEPARAMETER)
+          fIsAllSplines = false;
 
         InputList.push_back(subsamples[i]->GetInput());
-
       }
     }
   }
-
-
 
   return InputList;
 }
 
 std::vector<MeasurementBase*> JointFCN::GetSubSampleList() {
-
   std::vector<MeasurementBase*> SampleList;
 
   MeasListConstIter iterSam = fSamples.begin();
@@ -574,10 +562,9 @@ std::vector<MeasurementBase*> JointFCN::GetSubSampleList() {
   return SampleList;
 }
 
-
 //***************************************************
 void JointFCN::ReconfigureUsingManager() {
-//***************************************************
+  //***************************************************
 
   // 'Slow' Event Manager Reconfigure
   LOG(REC) << "Event Manager Reconfigure" << std::endl;
@@ -599,7 +586,6 @@ void JointFCN::ReconfigureUsingManager() {
     fSignalEventFlags.clear();
     fSampleSignalFlags.clear();
     fSignalEventSplines.clear();
-
   }
 
   // Make sure we have a list of inputs
@@ -607,7 +593,6 @@ void JointFCN::ReconfigureUsingManager() {
     fInputList = GetInputList();
     fSubSampleList = GetSubSampleList();
   }
-
 
   // If all inputs are splines make sure the readers are told
   // they need to be reconfigured.
@@ -645,22 +630,20 @@ void JointFCN::ReconfigureUsingManager() {
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
-
       // Get Event Weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       curevent->Weight = curevent->RWWeight * curevent->InputWeight;
       double rwweight = curevent->Weight;
-      // std::cout << "RWWeight = " << curevent->RWWeight  << " " << curevent->InputWeight << std::endl;
-
+      // std::cout << "RWWeight = " << curevent->RWWeight  << " " <<
+      // curevent->InputWeight << std::endl;
 
       // Logging
       // std::cout << CHECKLOG(1) << std::endl;
       if (LOGGING(REC)) {
         if (i % countwidth == 0) {
-          QLOG(REC, curinput->GetName() << " : Processed " << i
-               << " events. [M, W] = ["
-               << curevent->Mode << ", "
-               << rwweight << "]");
+          QLOG(REC, curinput->GetName()
+                        << " : Processed " << i << " events. [M, W] = ["
+                        << curevent->Mode << ", " << rwweight << "]");
         }
       }
 
@@ -675,7 +658,8 @@ void JointFCN::ReconfigureUsingManager() {
 
       // Start measurement iterator
       size_t measitercount = 0;
-      std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
+      std::vector<MeasurementBase*>::iterator meas_iter =
+          fSubSampleList.begin();
 
       // Loop over all subsamples (sub in JointMeas)
       for (; meas_iter != fSubSampleList.end(); meas_iter++) {
@@ -684,7 +668,6 @@ void JointFCN::ReconfigureUsingManager() {
         // Compare input pointers, to current input, skip if not.
         // Pointer tells us if it matches without doing ID checks.
         if (curinput != curmeas->GetInput()) {
-
           if (savesignal) {
             // Set bit to 0 as definitely not signal
             signalbitset[measitercount] = 0;
@@ -696,7 +679,6 @@ void JointFCN::ReconfigureUsingManager() {
           // Skip sample as input not signal.
           continue;
         }
-
 
         // Fill events for matching inputs.
         MeasurementVariableBox* box = curmeas->FillVariableBox(curevent);
@@ -718,13 +700,12 @@ void JointFCN::ReconfigureUsingManager() {
         // If signal save a clone of the event box for use later.
         if (savesignal and signal) {
           foundsignal = true;
-          signalboxes.push_back( box->CloneSignalBox() );
+          signalboxes.push_back(box->CloneSignalBox());
         }
 
         // Keep track of Measurement we are on.
         measitercount++;
       }
-
 
       // Once we've filled the measurements, if saving signal
       // push back if any sample flagged this event as signal
@@ -738,29 +719,28 @@ void JointFCN::ReconfigureUsingManager() {
         fSampleSignalFlags.push_back(signalbitset);
       }
 
-
       // If all inputs are splines we can save the spline coefficients
       // for fast in memory reconfigures later.
       if (fIsAllSplines and savesignal and foundsignal) {
-
         // Make temp vector to push back with
         std::vector<float> coeff;
         for (size_t l = 0; l < (UInt_t)curevent->fSplineRead->GetNPar(); l++) {
-          coeff.push_back( curevent->fSplineCoeff[l] );
+          coeff.push_back(curevent->fSplineCoeff[l]);
         }
 
-        // Push back to signal event splines. Kept in sync with fSignalEventBoxes size.
+        // Push back to signal event splines. Kept in sync with
+        // fSignalEventBoxes size.
         // int splinecount = fSignalEventSplines.size();
         fSignalEventSplines.push_back(coeff);
 
         // if (splinecount % 1000 == 0) {
         // std::cout << "Pushed Back Coeff " << splinecount << " : ";
-        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++) {
+        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++)
+        // {
         // std::cout << " " << fSignalEventSplines[splinecount][l];
         // }
         // std::cout << std::endl;
         // }
-
       }
 
       // Clean up vectors once done with this event
@@ -780,7 +760,6 @@ void JointFCN::ReconfigureUsingManager() {
 
   // End of Event Loop ===============================
 
-
   // Now event loop is finished loop over all Measurements
   // Converting Binned events to XSec Distributions
   iterSam = fSamples.begin();
@@ -792,26 +771,33 @@ void JointFCN::ReconfigureUsingManager() {
   // Print out statements on approximate memory usage for profiling.
   LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
   if (savesignal) {
-    int mem = ( //sizeof(fSignalEventBoxes) +
-                // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
-                sizeof(MeasurementVariableBox1D) * fillcount) * 1E-6;
-    LOG(REC) << " -> Saved " << fillcount << " signal boxes for faster access. (~" << mem << " MB)" << std::endl;
+    int mem =
+        (  // sizeof(fSignalEventBoxes) +
+            // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
+            sizeof(MeasurementVariableBox1D) * fillcount) *
+        1E-6;
+    LOG(REC) << " -> Saved " << fillcount
+             << " signal boxes for faster access. (~" << mem << " MB)"
+             << std::endl;
     if (fIsAllSplines and !fSignalEventSplines.empty()) {
-      int splmem = sizeof(float) * fSignalEventSplines.size() * fSignalEventSplines[0].size() * 1E-6;
-      LOG(REC) << " -> Saved " << fillcount << " " << fSignalEventSplines.size() << " spline sets into memory. (~" << splmem << " MB)" << std::endl;
+      int splmem = sizeof(float) * fSignalEventSplines.size() *
+                   fSignalEventSplines[0].size() * 1E-6;
+      LOG(REC) << " -> Saved " << fillcount << " " << fSignalEventSplines.size()
+               << " spline sets into memory. (~" << splmem << " MB)"
+               << std::endl;
     }
   }
 
-  LOG(REC) << "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart << std::endl;
+  LOG(REC) << "Time taken ReconfigureUsingManager() : "
+           << time(NULL) - timestart << std::endl;
 
   // End of reconfigure
   return;
 };
 
-
 //***************************************************
 void JointFCN::ReconfigureFastUsingManager() {
-//***************************************************
+  //***************************************************
 
   LOG(FIT) << " -> Doing FAST using manager" << std::endl;
   // Get Start time for profilling
@@ -831,13 +817,17 @@ void JointFCN::ReconfigureFastUsingManager() {
     return;
   }
 
-  bool fFillNuisanceEvent = FitPar::Config().GetParB("FullEventOnSignalReconfigure");
+  bool fFillNuisanceEvent =
+      FitPar::Config().GetParB("FullEventOnSignalReconfigure");
 
   // Setup fast vector iterators.
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
-  std::vector< std::vector<MeasurementVariableBox*> >::iterator box_iter = fSignalEventBoxes.begin();
-  std::vector< std::vector<float> >::iterator spline_iter = fSignalEventSplines.begin();
-  std::vector< std::vector<bool> >::iterator samsig_iter = fSampleSignalFlags.begin();
+  std::vector<std::vector<MeasurementVariableBox*> >::iterator box_iter =
+      fSignalEventBoxes.begin();
+  std::vector<std::vector<float> >::iterator spline_iter =
+      fSignalEventSplines.begin();
+  std::vector<std::vector<bool> >::iterator samsig_iter =
+      fSampleSignalFlags.begin();
   int splinecount = 0;
 
   // Setup stuff for logging
@@ -854,10 +844,10 @@ void JointFCN::ReconfigureFastUsingManager() {
 
       // Tell each fSplineRead in BaseFitEvent to reconf next weight calc
       BaseFitEvt* curevent = curinput->FirstBaseEvent();
-      if (curevent->fSplineRead) curevent->fSplineRead->SetNeedsReconfigure(true);
+      if (curevent->fSplineRead)
+        curevent->fSplineRead->SetNeedsReconfigure(true);
     }
   }
-
 
   // Loop over all possible spline inputs
   double* coreeventweights = new double[fSignalEventBoxes.size()];
@@ -866,7 +856,6 @@ void JointFCN::ReconfigureFastUsingManager() {
   inp_iter = fInputList.begin();
   inpsig_iter = fSignalEventFlags.begin();
   spline_iter = fSignalEventSplines.begin();
-
 
   // Loop over all signal flags
   // For each valid signal flag add one to splinecount
@@ -877,19 +866,18 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // #pragma omp parallel for shared(splinecount,sigcount)
   for (uint iinput = 0; iinput < fInputList.size(); iinput++) {
-
     InputHandlerBase* curinput = fInputList[iinput];
     BaseFitEvt* curevent = curinput->FirstBaseEvent();
 
     for (int i = 0; i < curinput->GetNEvents(); i++) {
-
       double rwweight = 0.0;
       if (fSignalEventFlags[sigcount]) {
-
         // Get Event Info
         if (!fIsAllSplines) {
-          if (fFillNuisanceEvent) curinput->GetNuisanceEvent(i);
-          else curevent = curinput->GetBaseEvent(i);
+          if (fFillNuisanceEvent)
+            curinput->GetNuisanceEvent(i);
+          else
+            curevent = curinput->GetBaseEvent(i);
         } else {
           curevent->fSplineCoeff = &fSignalEventSplines[splinecount][0];
         }
@@ -898,9 +886,10 @@ void JointFCN::ReconfigureFastUsingManager() {
         curevent->Weight = curevent->RWWeight * curevent->InputWeight;
         rwweight = curevent->Weight;
 
-	coreeventweights[splinecount] = rwweight;
+        coreeventweights[splinecount] = rwweight;
         if (splinecount % countwidth == 0) {
-          LOG(REC) << "Processed " << splinecount << " event weights. W = " << rwweight << std::endl;
+          LOG(REC) << "Processed " << splinecount
+                   << " event weights. W = " << rwweight << std::endl;
         }
 
         // #pragma omp atomic
@@ -909,11 +898,9 @@ void JointFCN::ReconfigureFastUsingManager() {
 
       // #pragma omp atomic
       sigcount++;
-
     }
   }
   LOG(SAM) << "Processed event weights." << std::endl;
-
 
   // #pragma omp barrier
 
@@ -925,7 +912,6 @@ void JointFCN::ReconfigureFastUsingManager() {
   int nsplineweights = splinecount;
   splinecount = 0;
 
-
   // Start of Fast Event Loop ============================
 
   // Start input iterators
@@ -935,7 +921,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
     // Get iterators for this event
     std::vector<bool>::iterator subsamsig_iter = (*samsig_iter).begin();
-    std::vector<MeasurementVariableBox*>::iterator subbox_iter = (*box_iter).begin();
+    std::vector<MeasurementVariableBox*>::iterator subbox_iter =
+        (*box_iter).begin();
 
     // Loop over all sub measurements.
     std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
@@ -962,7 +949,6 @@ void JointFCN::ReconfigureFastUsingManager() {
     box_iter++;
     spline_iter++;
     splinecount++;
-
   }
   // End of Fast Event Loop ===================
 
@@ -983,7 +969,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Print some reconfigure profiling.
   LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
-  LOG(REC) << "Time taken ReconfigureFastUsingManager() : " << time(NULL) - timestart << std::endl;
+  LOG(REC) << "Time taken ReconfigureFastUsingManager() : "
+           << time(NULL) - timestart << std::endl;
 }
 
 //***************************************************
@@ -1006,7 +993,8 @@ void JointFCN::Write() {
 
   if (FitPar::Config().GetParB("EventManager")) {
     // Get list of inputs
-    std::map<int, InputHandlerBase*> fInputs = FitBase::EvtManager().GetInputs();
+    std::map<int, InputHandlerBase*> fInputs =
+        FitBase::EvtManager().GetInputs();
     std::map<int, InputHandlerBase*>::const_iterator iterInp;
 
     for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
@@ -1033,10 +1021,9 @@ void JointFCN::SetFakeData(std::string fakeinput) {
   return;
 }
 
-
-//***************************************************                                                                                                                                                                                      
+//***************************************************
 void JointFCN::ThrowDataToy() {
-//***************************************************                                                                                                                                                                                     
+  //***************************************************
 
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
@@ -1046,4 +1033,3 @@ void JointFCN::ThrowDataToy() {
 
   return;
 }
-

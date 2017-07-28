@@ -7,71 +7,88 @@
 
 /// NuWro Generator Container to save extra particle status codes.
 class NuWroGeneratorInfo : public GeneratorInfoBase {
-public:
-	NuWroGeneratorInfo() {};
-	virtual ~NuWroGeneratorInfo();
+ public:
+  NuWroGeneratorInfo(){};
+  virtual ~NuWroGeneratorInfo();
 
-	/// Assigns information to branches
-	void AddBranchesToTree(TTree* tn);
+  /// Assigns information to branches
+  void AddBranchesToTree(TTree* tn);
 
-	/// Setup reading information from branches
-	void SetBranchesFromTree(TTree* tn);
+  /// Setup reading information from branches
+  void SetBranchesFromTree(TTree* tn);
 
-	/// Allocate any dynamic arrays for a new particle stack size
-	void AllocateParticleStack(int stacksize);
+  /// Allocate any dynamic arrays for a new particle stack size
+  void AllocateParticleStack(int stacksize);
 
-	/// Clear any dynamic arrays
-	void DeallocateParticleStack();
+  /// Clear any dynamic arrays
+  void DeallocateParticleStack();
 
-	/// Read extra genie information from the event
-	void FillGeneratorInfo(event* e);
+  /// Read extra genie information from the event
+  void FillGeneratorInfo(event* e);
 
-	/// Reset extra information to default/empty values
-	void Reset();
+  /// Reset extra information to default/empty values
+  void Reset();
 
-	int  kMaxParticles; ///< Number of particles in stack
-	int* fNuWroParticlePDGs; ///< NuWro Particle PDGs (example)
+  int kMaxParticles;        ///< Number of particles in stack
+  int* fNuWroParticlePDGs;  ///< NuWro Particle PDGs (example)
 };
 
-/// Main NuWro Input Reader. Requires events have flux and xsec TH1Ds saved into them.
+/// Main NuWro Input Reader. Requires events have flux and xsec TH1Ds saved into
+/// them.
 class NuWroInputHandler : public InputHandlerBase {
-public:
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  params fNuwroParams;
+  std::vector<BaseFitEvt> rwEvs;
+#endif
 
-	/// Constructor. Can handle single and joint inputs.
-	NuWroInputHandler(std::string const& handle, std::string const& rawinputs);
-	~NuWroInputHandler();
+ public:
+  /// Constructor. Can handle single and joint inputs.
+  NuWroInputHandler(std::string const& handle, std::string const& rawinputs);
+  ~NuWroInputHandler();
 
-	/// Create a TTree Cache to speed up file read
-	void CreateCache();
+  /// Create a TTree Cache to speed up file read
+  void CreateCache();
 
-	/// Remove TTree Cache to save memory
-	void RemoveCache();
+  /// Remove TTree Cache to save memory
+  void RemoveCache();
 
-	/// Returns filled NUISANCEEvent for given entry.
-	FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight = false);
+  /// Returns filled NUISANCEEvent for given entry.
+  FitEvent* GetNuisanceEvent(const UInt_t entry,
+                             const bool lightweight = false);
 
-	/// Fills fNUISANCEEvent from fNuWroEvent
-	void CalcNUISANCEKinematics();
+#ifdef __USE_NUWRO_SRW_EVENTS__
+  // Returns filled BaseFitEvent for a given entry;
+  BaseFitEvt* GetBaseEvent(const UInt_t entry) {
+    if (rwEvs.size() <= entry) {
+      THROW("Tried to get cached BaseFitEv[" << entry << "], but only have "
+                                             << rwEvs.size()
+                                             << " in the cache.");
+    }
+    return &rwEvs[entry];
+  }
+#endif
 
-	/// (LEGACY) Automatically creates nuwro flux/event histograms that
-	/// nuisance needs to normalise events.
-	void ProcessNuWroInputFlux(const std::string file);
+  /// Fills fNUISANCEEvent from fNuWroEvent
+  void CalcNUISANCEKinematics();
 
-	/// Calculates a True Interaction code for NuWro events
-	int ConvertNuwroMode (event * e);
+  /// (LEGACY) Automatically creates nuwro flux/event histograms that
+  /// nuisance needs to normalise events.
+  void ProcessNuWroInputFlux(const std::string file);
 
-	/// Adds a new particle to NUISANCE stack for given NuWro particle
-	void AddNuWroParticle(FitEvent* evt, particle& p, int state);
+  /// Calculates a True Interaction code for NuWro events
+  int ConvertNuwroMode(event* e);
 
-	event* fNuWroEvent;  ///< Pointer to NuWro Format Events
+  /// Adds a new particle to NUISANCE stack for given NuWro particle
+  void AddNuWroParticle(FitEvent* evt, particle& p, int state);
 
-	/// Print Event Information
-	void Print();
+  event* fNuWroEvent;  ///< Pointer to NuWro Format Events
 
-	TChain* fNuWroTree; ///< TTree for reading NuWro event vectors
-	bool fSaveExtra;    ///< Save Extra NuWro info into Nuisance Event
-	NuWroGeneratorInfo *fNuWroInfo; ///< Extra NuWro Generator Info
+  /// Print Event Information
+  void Print();
 
+  TChain* fNuWroTree;  ///< TTree for reading NuWro event vectors
+  bool fSaveExtra;     ///< Save Extra NuWro info into Nuisance Event
+  NuWroGeneratorInfo* fNuWroInfo;  ///< Extra NuWro Generator Info
 };
 /*! @} */
 #endif

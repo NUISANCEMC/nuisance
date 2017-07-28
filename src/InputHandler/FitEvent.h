@@ -344,7 +344,7 @@ public:
   inline FitParticle* GetHMISElectron   (void) { return GetHMISParticle(11);   };
   inline FitParticle* GetHMISMuon       (void) { return GetHMISParticle(13);   };
   inline FitParticle* GetHMISTau        (void) { return GetHMISParticle(15);   };
-  inline FitParticle* GetHMISNuOrChargedLeptons (void) { return GetHMISParticle(PhysConst::pdg_nu_or_charged_leptons);   };
+  inline FitParticle* GetHMISAnyLeptons (void) { return GetHMISParticle(PhysConst::pdg_all_leptons);   };
   inline FitParticle* GetHMISProton     (void) { return GetHMISParticle(2212); };
   inline FitParticle* GetHMISNeutron    (void) { return GetHMISParticle(2112); };
   inline FitParticle* GetHMISPiZero     (void) { return GetHMISParticle(111);  };
@@ -490,7 +490,7 @@ public:
   inline FitParticle* GetHMFSElectron   (void) { return GetHMFSParticle(11);   };
   inline FitParticle* GetHMFSMuon       (void) { return GetHMFSParticle(13);   };
   inline FitParticle* GetHMFSTau        (void) { return GetHMFSParticle(15);   };
-  inline FitParticle* GetHMFSNuOrChargedLeptons (void) { return GetHMFSParticle(PhysConst::pdg_nu_or_charged_leptons);   };
+  inline FitParticle* GetHMFSAnyLeptons (void) { return GetHMFSParticle(PhysConst::pdg_all_leptons);   };
   inline FitParticle* GetHMFSProton     (void) { return GetHMFSParticle(2212); };
   inline FitParticle* GetHMFSNeutron    (void) { return GetHMFSParticle(2112); };
   inline FitParticle* GetHMFSPiZero     (void) { return GetHMFSParticle(111);  };

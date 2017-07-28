@@ -91,6 +91,7 @@ CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes direct
 CheckAndSetDefaultCache(NUWRO_INPUT_FILE "" FILEPATH "Path to an input NuWro event vector, which can be used to build NuWro i/o libraries. <>")
 CheckAndSetDefaultCache(NUWRO_BUILT_FROM_FILE FALSE INTERNAL "Whether the NuWro libraries were built by NUISANCE. <FALSE>")
 CheckAndSetDefaultCache(USE_NuWro_RW FALSE BOOL "Whether to try and build support for NuWro reweighting. <FALSE>")
+CheckAndSetDefaultCache(USE_NuWro_SRW_Event FALSE BOOL "Whether to use cut down NuWro reweight event format. Requires NuWro reweight. <FALSE>")
 
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)

@@ -1,8 +1,8 @@
 #ifndef _JOINT_FCN_H_
 #define _JOINT_FCN_H_
-/*!                                                                                                                                                                                                   
- *  \addtogroup FCN                                                                                                                                                                                 
- *  @{                                                                                                                                                                                                
+/*!
+ *  \addtogroup FCN
+ *  @{
  */
 
 #include <iostream>
@@ -38,7 +38,7 @@
 using namespace FitUtils;
 using namespace FitBase;
 //! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
-class JointFCN 
+class JointFCN
 {
  public:
 
@@ -52,7 +52,7 @@ class JointFCN
   //! Create sample list from cardfile
   void LoadSamples(std::vector<nuiskey> samplekeys);
   void LoadPulls(std::vector<nuiskey> pullkeys);
-  
+
   //! Main Likelihood evaluation FCN
   double DoEval(const double *x);
 
@@ -66,7 +66,7 @@ class JointFCN
   inline double operator() (const double *x) {
     return this->DoEval(x);
   };
-  
+
   //! Create a TTree to save all dial value iterations for this FCN
   void CreateIterationTree(std::string name, FitWeight* rw);
 
@@ -84,7 +84,7 @@ class JointFCN
 
   //! Return NDOF wrapper
   inline unsigned int NDim() {return this->GetNDOF();};
-  
+
   //! Reconfigure samples where we force all events to be looped over.
   void ReconfigureAllEvents() ;
 
@@ -104,7 +104,7 @@ class JointFCN
 
   //! Return list of pointers to all the pulls
   inline std::list<ParamPull*> GetPullList(){ return fPulls; };
-  
+
   //! Write all samples to output DIR
   void Write();
 
@@ -121,17 +121,17 @@ class JointFCN
   /// Throws data according to current stats
   void ThrowDataToy();
 
-std::vector<MeasurementBase*> GetSubSampleList(); 
+std::vector<MeasurementBase*> GetSubSampleList();
 std::vector<InputHandlerBase*> GetInputList();
 
- private: 
+ private:
 
   //! Append the experiments to include in the fit to this list
   std::list<MeasurementBase*> fSamples;
 
   //! Append parameter pull terms to include penalties in the fit to this list
   std::list<ParamPull*> fPulls;
-  
+
   TDirectory *fOutputDir; //!< Directory to save contents
 
   std::string fCardFile; //!< Input Card text file
@@ -149,7 +149,7 @@ std::vector<InputHandlerBase*> GetInputList();
   int *   fSampleNDOF;     //!< NDOF for each individual measurement in list
 
   bool fUsingEventManager; //!< Flag for doing joint comparisons
-  
+
   std::vector< std::vector<float> > fSignalEventSplines;
   std::vector< std::vector<MeasurementVariableBox*> > fSignalEventBoxes;
   std::vector< bool > fSignalEventFlags;
@@ -158,7 +158,7 @@ std::vector<InputHandlerBase*> GetInputList();
   std::vector<InputHandlerBase*> fInputList;
   std::vector<MeasurementBase*> fSubSampleList;
   bool fIsAllSplines;
-  
+
 };
 
 /*! @} */
