@@ -306,7 +306,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       ELep = (part_4mom.E());
       MLep = (part_4mom.Mag());
       CosLep = cos(part_4mom.Vect().Angle(nu_4mom->Vect()));
-      pmu = &part_4mom;
+      (*pmu) = part_4mom;
 
       Q2_true = -1 * (part_4mom - (*nu_4mom)).Mag2();
 
