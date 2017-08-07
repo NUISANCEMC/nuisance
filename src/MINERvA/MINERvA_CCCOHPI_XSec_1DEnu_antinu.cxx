@@ -35,7 +35,7 @@ MINERvA_CCCOHPI_XSec_1DEnu_antinu::MINERvA_CCCOHPI_XSec_1DEnu_antinu(nuiskey sam
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("E_{#nu} (MeV)");
+  fSettings.SetXTitle("E_{#nu} (GeV)");
   fSettings.SetYTitle("d#sigma/dE_{#nu} (cm^{2}/GeV/C^{12})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(1.5, 20.0);
