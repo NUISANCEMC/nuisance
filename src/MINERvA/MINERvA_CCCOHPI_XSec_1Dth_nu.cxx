@@ -35,8 +35,8 @@ MINERvA_CCCOHPI_XSec_1Dth_nu::MINERvA_CCCOHPI_XSec_1Dth_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("E_{#nu} (MeV)");
-  fSettings.SetYTitle("d#sigma/dE_{#nu} (cm^{2}/GeV/C^{12})");
+  fSettings.SetXTitle("#theta_{#pi} (deg.)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#pi} (cm^{2}/deg./C^{12})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(1.5, 20.0);
   fSettings.DefineAllowedTargets("C,H");
