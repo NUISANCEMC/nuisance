@@ -63,7 +63,6 @@ MINERvA_CCCOHPI_XSec_1DEnu_nu::MINERvA_CCCOHPI_XSec_1DEnu_nu(nuiskey samplekey) 
 
 
 void MINERvA_CCCOHPI_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
-
   fXVar = event->GetNeutrinoIn()->fP.E()/1000.;
   return;
 };

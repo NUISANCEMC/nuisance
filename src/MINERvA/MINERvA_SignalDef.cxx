@@ -104,6 +104,37 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   return true;
 };
 
+
+  // Updated MINERvA 2017 Signal using Wexp and no restriction on angle
+bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax){
+
+  // Signal is both pi+ and pi-
+  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
+  // First, make sure it's CCINC
+  if (!isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Allow pi+/pi-
+  int piPDG[] = {211, -211};
+  int nLeptons = event->NumFSLeptons();
+  int nPion = event->NumFSParticle(piPDG);
+
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1) return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
+
+  // Get Muon and Lepton Kinematics
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+
+  // Extract Hadronic Mass
+  double hadMass = FitUtils::Wrec(pnu, pmu);
+  if (hadMass > 1400.0) return false;
+
+  return true;
+};
+
 // *********************************
 // MINERvA CCNpi+/- signal definition from 2016 publication
 // Different to CC1pi+/- listed above; additional has W < 1.8 GeV
