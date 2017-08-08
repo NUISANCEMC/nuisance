@@ -43,10 +43,8 @@ MINERvA_CCCOHPI_XSec_1Dth_antinu::MINERvA_CCCOHPI_XSec_1Dth_antinu(nuiskey sampl
   fSettings.DefineAllowedSpecies("numub");
   fSettings.SetTitle("MINERvA_CCCOHPI_XSec_1Dth_antinu");
 
-  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/th_antinu_XSec.csv");
-  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/th_antinu_Covar_stat.csv;" +
-			  GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/th_antinu_Covar_flux.csv;" +
-			  GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/th_antinu_Covar_sys.csv");
+  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Thpi_nubar_data.csv");
+  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Thpi_nubar_cov.csv");
 			   
   FinaliseSampleSettings();
 
@@ -57,9 +55,6 @@ MINERvA_CCCOHPI_XSec_1Dth_antinu::MINERvA_CCCOHPI_XSec_1Dth_antinu(nuiskey sampl
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
-
-  // Apply scalings based on the data release
-  ScaleData(1E-39);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -85,8 +80,3 @@ bool MINERvA_CCCOHPI_XSec_1Dth_antinu::isSignal(FitEvent *event) {
   return SignalDef::isCCCOH(event, -14, -211, EnuMin, EnuMax);
 }
 
-
-double MINERvA_CCCOHPI_XSec_1Dth_antinu::GetLikelihood(){
-  double chi2 = StatUtils::GetChi2FromCov(this->fDataHist, this->fMCHist, this->covar, NULL, 1E39, 10);
-  return chi2;
-}
