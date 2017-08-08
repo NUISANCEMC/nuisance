@@ -56,7 +56,7 @@ MINERvA_CC0pi_XSec_1DThetae_nue::MINERvA_CC0pi_XSec_1DThetae_nue(nuiskey samplek
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile( fSettings.GetDataInput() );
   SetCovarFromRootFile(fSettings.GetCovarInput() );
-  ScaleCovar(1.0 / 100.0);
+  ScaleCovar(1.0 / 1000.0);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

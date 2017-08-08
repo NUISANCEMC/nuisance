@@ -58,6 +58,8 @@ namespace SignalDef {
 /// only data + covariance
 bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
                       bool isRestricted = false);
+bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax);
+
 // *********************************
 /// MINERvA CCNpi+/- signal definition from 2016 publication
 /// Different to CC1pi+/- listed above; additional has W < 1.8 GeV

@@ -43,8 +43,8 @@ MINERvA_CCCOHPI_XSec_1DEpi_antinu::MINERvA_CCCOHPI_XSec_1DEpi_antinu(nuiskey sam
   fSettings.DefineAllowedSpecies("numub");
   fSettings.SetTitle("MINERvA_CCCOHPI_XSec_1DEpi_antinu");
 
-  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Epi_nu_data.csv");
-  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Epi_nu_cov.csv");
+  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Epi_nubar_data.csv");
+  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Epi_nubar_cov.csv");
 			   
   FinaliseSampleSettings();
 
