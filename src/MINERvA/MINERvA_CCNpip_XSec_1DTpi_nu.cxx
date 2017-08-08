@@ -179,7 +179,7 @@ bool MINERvA_CCNpip_XSec_1DTpi_nu::isSignal(FitEvent *event) {
 //********************************************************************
   // Last false refers to that this is NOT the restricted MINERvA phase space,
   // in which only forward-going muons are accepted
-  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace, !fUpdatedData);
 }
 
 //********************************************************************

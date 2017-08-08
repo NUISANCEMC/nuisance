@@ -118,7 +118,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 //
 // Also writes number of pions (nPions) if studies on this want to be done...
 bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
-                      double EnuMax, bool isRestricted) {
+                      double EnuMax, bool isRestricted, bool isWtrue) {
   // *********************************
 
   // First, make sure it's CCINC
@@ -152,15 +152,18 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
   double Wrec = FitUtils::Wrec(pnu, pmu) + 0.;
 
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
+  if (isWtrue){
 #ifdef __GENIE_ENABLED__
-  if (event->fType == kGENIE){
-    GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
-    const Interaction * interaction = ghep->Summary();
-    const Kinematics &   kine       = interaction->Kine();
-    double Ws  = kine.W (true);
-    Wrec = Ws * 1000.0; // Say Wrec is Ws
-  }
+    if (event->fType == kGENIE){
+      GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
+      const Interaction * interaction = ghep->Summary();
+      const Kinematics &   kine       = interaction->Kine();
+      double Ws  = kine.W (true);
+      Wrec = Ws * 1000.0; // Say Wrec is Ws
+    }
 #endif
+  }
+
   if (Wrec > 1800. || Wrec < 0.0) return false;
 
 

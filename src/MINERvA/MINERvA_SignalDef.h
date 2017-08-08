@@ -73,7 +73,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 ///
 /// Also writes number of pions (nPions) if studies on this want to be done...
 bool isCCNpip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
-                      bool isRestricted = false);
+                      bool isRestricted = false, bool isWtrue=false);
 
 bool isCCQEnumu_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
                         bool fullphasespace = true);
