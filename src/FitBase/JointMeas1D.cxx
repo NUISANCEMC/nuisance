@@ -1219,8 +1219,8 @@ void JointMeas1D::Write(std::string drawOpt) {
   drawOpt = FitPar::Config().GetParS("drawopts");
 
   // Write Data/MC
-  GetDataList().at(0)->Write();
-  GetMCList().at(0)->Write();
+  GetDataHistogram()->Write();
+  GetMCHistogram()->Write();
 
   // Write Fine Histogram
   if (drawOpt.find("FINE") != std::string::npos)
