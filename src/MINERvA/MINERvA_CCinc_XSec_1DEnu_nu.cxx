@@ -89,17 +89,10 @@ void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 bool MINERvA_CCinc_XSec_1DEnu_nu::isSignal(FitEvent *event){
 //*******************************************************************
 
-  // Throw away NC events
-  if (event->Mode > 30) return false;
-
-  // Only look at numu events
-  if ((event->PartInfo(0))->fPID != 14) return false;
+  if (!SignalDef::isCCINC(event, 14, this->EnuMin, this->EnuMax)) return false;
 
   // Restrict the phase space to theta < 17 degrees
   if (ThetaMu > 0.296706) return false;
-
-  // restrict energy range
-  if (Enu < this->EnuMin || Enu > this->EnuMax) return false;
 
   return true;
 };

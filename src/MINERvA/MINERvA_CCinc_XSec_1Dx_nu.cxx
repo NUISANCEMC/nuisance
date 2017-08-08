@@ -104,9 +104,6 @@ bool MINERvA_CCinc_XSec_1Dx_nu::isSignal(FitEvent *event){
   // Restrict the phase space to theta < 17 degrees
   if (ThetaMu > 0.296706) return false;
 
-  // restrict energy range
-  if (Enu_rec < this->EnuMin || Enu_rec > this->EnuMax) return false;
-
   return true;
 };
 
