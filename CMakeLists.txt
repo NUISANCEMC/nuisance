@@ -63,8 +63,9 @@ if(USE_NUANCE)
   LIST(APPEND EXTRA_CXX_FLAGS -D__NUANCE_ENABLED__)
 endif()
 
-#################################  Pythia6  ####################################
+#################################  Pythia6/8  ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/pythia8Setup.cmake)
 
 ################################# gperftools ###################################
 
