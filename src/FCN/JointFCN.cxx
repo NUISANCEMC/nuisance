@@ -791,6 +791,23 @@ void JointFCN::ReconfigureUsingManager() {
   LOG(REC) << "Time taken ReconfigureUsingManager() : "
            << time(NULL) - timestart << std::endl;
 
+  // Check SignalReconfigures works for all samples
+  if (savesignal){
+    double likefull = GetLikelihood();
+    ReconfigureFastUsingManager();
+    double likefast = GetLikelihood();
+    
+    if (fabs(likefull - likefast) > 0.0001)
+      {
+	ERROR(FTL,"Fast and Full Likelihoods DIFFER! : " << likefull << " : " << likefast);
+	ERROR(FTL,"This means some samples you are using are not setup to use SignalReconfigures=1");
+	ERROR(FTL,"Please turn OFF signal reconfigures.");
+	throw;
+      } else {
+      LOG(FIT) << "Likelihoods for FULL and FAST match. Will use FAST next time." << std::endl;
+    }
+  }
+
   // End of reconfigure
   return;
 };

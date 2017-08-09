@@ -104,6 +104,37 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
   return true;
 };
 
+
+  // Updated MINERvA 2017 Signal using Wexp and no restriction on angle
+bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax){
+
+  // Signal is both pi+ and pi-
+  // WARNING: PI- CONTAMINATION IS FULLY GENIE BECAUSE THE MICHEL TAG
+  // First, make sure it's CCINC
+  if (!isCCINC(event, 14, EnuMin, EnuMax)) return false;
+
+  // Allow pi+/pi-
+  int piPDG[] = {211, -211};
+  int nLeptons = event->NumFSLeptons();
+  int nPion = event->NumFSParticle(piPDG);
+
+  // Check that the desired pion exists and is the only meson
+  if (nPion != 1) return false;
+
+  // Check that there is only one final state lepton
+  if (nLeptons != 1) return false;
+
+  // Get Muon and Lepton Kinematics
+  TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+
+  // Extract Hadronic Mass
+  double hadMass = FitUtils::Wrec(pnu, pmu);
+  if (hadMass > 1400.0) return false;
+
+  return true;
+};
+
 // *********************************
 // MINERvA CCNpi+/- signal definition from 2016 publication
 // Different to CC1pi+/- listed above; additional has W < 1.8 GeV
@@ -118,7 +149,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
 //
 // Also writes number of pions (nPions) if studies on this want to be done...
 bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
-                      double EnuMax, bool isRestricted) {
+                      double EnuMax, bool isRestricted, bool isWtrue) {
   // *********************************
 
   // First, make sure it's CCINC
@@ -152,15 +183,18 @@ bool isCCNpip_MINERvA(FitEvent *event, double EnuMin,
   double Wrec = FitUtils::Wrec(pnu, pmu) + 0.;
 
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
+  if (isWtrue){
 #ifdef __GENIE_ENABLED__
-  if (event->fType == kGENIE){
-    GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
-    const Interaction * interaction = ghep->Summary();
-    const Kinematics &   kine       = interaction->Kine();
-    double Ws  = kine.W (true);
-    Wrec = Ws * 1000.0; // Say Wrec is Ws
-  }
+    if (event->fType == kGENIE){
+      GHepRecord* ghep = static_cast<GHepRecord*>(event->genie_event->event);
+      const Interaction * interaction = ghep->Summary();
+      const Kinematics &   kine       = interaction->Kine();
+      double Ws  = kine.W (true);
+      Wrec = Ws * 1000.0; // Say Wrec is Ws
+    }
 #endif
+  }
+
   if (Wrec > 1800. || Wrec < 0.0) return false;
 
 

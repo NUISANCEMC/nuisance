@@ -29,7 +29,6 @@ public:
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-  double GetLikelihood();
 
   private:
 };

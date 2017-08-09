@@ -86,5 +86,5 @@ void MINERvA_CCNpip_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 // The false refers to that this cross-section uses the full phase space
 bool MINERvA_CCNpip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, false);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, false, true);
 }

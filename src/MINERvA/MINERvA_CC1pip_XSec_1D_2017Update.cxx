@@ -25,8 +25,6 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
 
   // Set Distribution
   std::string name = fSettings.GetS("name");
-  std::cout << "Parsing NAME " << name << std::endl;
-  sleep(5);
   if      (!name.compare("MINERvA_CC1pip_XSec_1DTpi_nu_2017"))  fDist = kTpi;
   else if (!name.compare("MINERvA_CC1pip_XSec_1Dth_nu_2017"))   fDist= kth;
   else if (!name.compare("MINERvA_CC1pip_XSec_1Dpmu_nu_2017"))  fDist= kpmu;
@@ -35,14 +33,6 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
   else if (!name.compare("MINERvA_CC1pip_XSec_1DEnu_nu_2017"))  fDist= kEnu;
   
   // Define what files to use from the dist
-  /*
-    ls [stowell@hep22 MINERvA]$ ls ../../data/MINERvA/CC1pip/070717/
-cc1pip_updated_1DEnu_data.txt      cc1pip_updated_1Dpmu_shapecov.txt  cc1pip_updated_1Dthmu_data.txt      cc1pip_updated_1DTpi_data.txt
-cc1pip_updated_1DEnu_ratecov.txt   cc1pip_updated_1DQ2_data.txt       cc1pip_updated_1Dthmu_ratecov.txt   cc1pip_updated_1DTpi_ratecov.txt
-cc1pip_updated_1DEnu_shapecov.txt  cc1pip_updated_1DQ2_ratecov.txt    cc1pip_updated_1Dthmu_shapecov.txt  cc1pip_updated_1DTpi_shapecov.txt
-cc1pip_updated_1Dpmu_data.txt      cc1pip_updated_1DQ2_shapecov.txt   cc1pip_updated_1Dth_ratecov.txt     README
-cc1pip_updated_1Dpmu_ratecov.txt   cc1pip_updated_1Dth_data.txt       cc1pip_updated_1Dth_shapecov.txt
-  */
   std::string datafile = "";
   std::string covarfile = "";
   std::string titles = "";
@@ -149,25 +139,23 @@ void MINERvA_CC1pip_XSec_1D_2017Update::FillEventVariables(FitEvent *event) {
   TLorentzVector Ppip = event->GetHMFSParticle(PhysConst::pdg_charged_pions)->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  double Tpi     = FitUtils::T(Ppip); // MeV
+  double Tpi     = Ppip.E() - Ppip.Mag();
   double th      = (180./M_PI)*FitUtils::th(Pnu, Ppip);
   double pmu     = Pmu.Vect().Mag()/1.E3; // GeV
   double thmu    = (180.0/M_PI)*FitUtils::th(Pnu, Pmu);
   double Q2      = fabs((Pmu - Pnu).Mag2()) / 1.E6;  // Using true here?
   double Enu     = Pnu.E() / 1.E3;
 
-  double hadMass = FitUtils::Wrec(Pnu, Pmu);
-  if (hadMass < 1400){
-    switch(fDist){
-    case kTpi:  fXVar = Tpi;  break;
-    case kth:   fXVar = th;   break;
-    case kpmu:  fXVar = pmu;  break;
-    case kthmu: fXVar = thmu; break;
-    case kQ2:   fXVar = Q2;   break;
-    case kEnu:  fXVar = Enu;  break;
-    default:
-      THROW("DIST NOT FOUND : " << fDist);
-    }
+
+  switch(fDist){
+  case kTpi:  fXVar = Tpi;  break;
+  case kth:   fXVar = th;   break;
+  case kpmu:  fXVar = pmu;  break;
+  case kthmu: fXVar = thmu; break;
+  case kQ2:   fXVar = Q2;   break;
+  case kEnu:  fXVar = Enu;  break;
+  default:
+    THROW("DIST NOT FOUND : " << fDist);
   }
   
   return;
@@ -177,5 +165,5 @@ void MINERvA_CC1pip_XSec_1D_2017Update::FillEventVariables(FitEvent *event) {
 bool MINERvA_CC1pip_XSec_1D_2017Update::isSignal(FitEvent *event) {
 //********************************************************************
   // Only seem to release full phase space
-  return SignalDef::isCC1pip_MINERvA(event, EnuMin, EnuMax, false);
+  return SignalDef::isCC1pip_MINERvA_2017(event, EnuMin, EnuMax);
 }
