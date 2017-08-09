@@ -369,10 +369,34 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
+  
   covar      = StatUtils::GetInvert(fFullCovar);
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
 
 }
+
+//********************************************************************
+void JointMeas1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
+//********************************************************************
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
+
+  std::vector<std::string> covList = GeneralUtils::ParseToStr(covfiles, ";");
+
+  fFullCovar = new TMatrixDSym(dim);
+  for (uint i = 0; i < covList.size(); ++i){
+    LOG(SAM) << "Reading covariance from text file: " << covList[i] << std::endl;
+    TMatrixDSym* temp_cov = StatUtils::GetCovarFromTextFile(covList[i], dim);
+    (*fFullCovar) += (*temp_cov);
+    delete temp_cov;
+  }
+  covar      = StatUtils::GetInvert(fFullCovar);
+  fDecomp    = StatUtils::GetDecomp(fFullCovar);
+
+}
+
 
 //********************************************************************
 void JointMeas1D::SetCovarFromRootFile(std::string covfile, std::string histname) {
@@ -435,6 +459,38 @@ void JointMeas1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   delete correlation;
 }
+
+//********************************************************************
+void JointMeas1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles, int dim) {
+//********************************************************************
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
+
+  std::vector<std::string> corrList = GeneralUtils::ParseToStr(corrfiles, ";");
+
+  fFullCovar = new TMatrixDSym(dim);
+  for (uint i = 0; i < corrList.size(); ++i){
+    LOG(SAM) << "Reading covariance from text file: " << corrList[i] << std::endl;
+    TMatrixDSym* temp_cov = StatUtils::GetCovarFromTextFile(corrList[i], dim);
+
+    for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+      for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
+	// Note that there is a factor of 1E76 here. It is very silly indeed.
+	// However, if you remove it, you also need to fix the factors of 1E38 added to the chi2 calculations!
+        (*temp_cov)(i, j) = (*temp_cov)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1) * 1E76;
+      }
+    }
+
+    (*fFullCovar) += (*temp_cov);
+    delete temp_cov;
+  }
+  covar      = StatUtils::GetInvert(fFullCovar);
+  fDecomp    = StatUtils::GetDecomp(fFullCovar);
+
+}
+
 
 //********************************************************************
 void JointMeas1D::SetCorrelationFromRootFile(std::string covfile, std::string histname) {
@@ -590,6 +646,10 @@ void JointMeas1D::FinaliseMeasurement() {
   if (!fDecomp) {
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   }
+
+  // Push the diagonals of fFullCovar onto the data histogram
+  // Comment out until scaling is used consistently...
+  // StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
 
   // Setup fMCHist from data
   fMCHist = (TH1D*)fDataHist->Clone();
