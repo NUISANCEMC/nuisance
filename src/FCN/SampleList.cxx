@@ -413,6 +413,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CC0pi_XSec_1DQ2_nu_proton(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtC_nu") ||
+	     !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtFe_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(samplekey));

@@ -994,6 +994,33 @@ void JointFCN::ReconfigureFastUsingManager() {
 void JointFCN::Write() {
   //***************************************************
 
+  // Save a likelihood/ndof plot
+  LOG(MIN) << "Writing likelihood plot.." << std::endl;
+  std::vector<double> likes;
+  std::vector<double> ndofs;
+  for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
+       iter++){
+    MeasurementBase* exp = *iter;
+    likes.push_back(exp->GetLikelihood());
+    ndofs.push_back(exp->GetNDOF());
+  }
+  TH1D likehist = TH1D("likelihood_hist","likelihood_hist",
+		       likes.size(), 0.0, double(likes.size()));
+  TH1D ndofhist  = TH1D("ndof_hist","ndof_hist",
+			ndofs.size(), 0.0, double(ndofs.size()));
+  TH1D divhist   = TH1D("likedivndof_hist","likedivndof_hist",
+			likes.size(), 0.0, double(likes.size()));
+  for (size_t i = 0; i < likehist.GetNbinsX(); i++){
+    likehist.SetBinContent(i+1, likes[i]);
+    ndofhist.SetBinContent(i+1, ndofs[i]);
+    if (ndofs[i] != 0.0){
+      divhist.SetBinContent(i+1, likes[i]/ndofs[i]);
+    }
+  }
+  likehist.Write();
+  ndofhist.Write();
+  divhist.Write();
+
   // Loop over individual experiments and call Write
   LOG(MIN) << "Writing each of the data classes..." << std::endl;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
