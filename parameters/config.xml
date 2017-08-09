@@ -25,10 +25,10 @@
 <config ERROR='2'/>
 <config TRACE='0'/>
 
-<config cores='2' />
+<config cores='1' />
 <config spline_test_throws='50' />
-<config spline_cores='6' />
-<config spline_chunks='10' />
+<config spline_cores='1' />
+<config spline_chunks='20' />
 <config spline_procchunk='-1' />
 
 <config Electron_NThetaBins='4' />

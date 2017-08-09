@@ -132,8 +132,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
 };
 
 GENIEInputHandler::~GENIEInputHandler() {
-  if (fGenieGHep) delete fGenieGHep;
-  if (fGenieNtpl) delete fGenieNtpl;
+  //if (fGenieGHep) delete fGenieGHep;
+   if (fGenieNtpl) delete fGenieNtpl;
   if (fGENIETree) delete fGENIETree;
   if (fGenieInfo) delete fGenieInfo;
 }

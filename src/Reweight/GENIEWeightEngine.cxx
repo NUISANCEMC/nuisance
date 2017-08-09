@@ -161,9 +161,6 @@ void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 	std::vector<size_t> indices = fEnumIndex[nuisenum];
 	for (uint i = 0; i < indices.size(); i++) {
 		fValues[indices[i]] = val;
-		std::cout << "Setting GENIE Dial Value "
-		          << i << " " << indices[i] << " "
-		          << fGENIESysts[indices[i]] << std::endl;
 		fGenieRW->Systematics().Set( fGENIESysts[indices[i]], val);
 	}
 #endif
