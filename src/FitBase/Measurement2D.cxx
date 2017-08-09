@@ -320,7 +320,7 @@ void Measurement2D::SetCovarFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = this->GetNDOF(false);
+    dim = this->GetNDOF();
   }
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
@@ -346,7 +346,7 @@ void Measurement2D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = this->GetNDOF(false);
+    dim = this->GetNDOF();
   }
 
   LOG(SAM) << "Reading inverted covariance from text file: " << covfile << std::endl;
@@ -371,7 +371,7 @@ void Measurement2D::SetCovarInvertFromRootFile(std::string covfile, std::string 
 void Measurement2D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
-  if (dim == -1) dim = this->GetNDOF(false);
+  if (dim == -1) dim = this->GetNDOF();
   LOG(SAM) << "Reading data correlations from text file: " << covfile << ";" << dim << std::endl;
   TMatrixDSym* correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
@@ -430,7 +430,7 @@ void Measurement2D::SetCholDecompFromTextFile(std::string covfile, int dim) {
 //********************************************************************
 
   if (dim == -1) {
-    dim = this->GetNDOF(false);
+    dim = this->GetNDOF();
   }
 
   LOG(SAM) << "Reading cholesky from text file: " << covfile << " " << dim << std::endl;
@@ -912,12 +912,12 @@ void Measurement2D::ApplyNormScale(double norm) {
 */
 
 //********************************************************************
-int Measurement2D::GetNDOF(bool applymasking) {
-  //********************************************************************
-  // return fDataHist->GetNbinsX() - fMaskHist->Integral();
+int Measurement2D::GetNDOF() {
+//********************************************************************
 
+  
   // Just incase it has gone...
-  if (!fDataHist) return 0;
+  if (!fDataHist) return -1;
 
   int nDOF = 0;
 
@@ -929,7 +929,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
         ++nDOF;
     }
   }
-
+  
   // Account for possible bin masking
   int nMasked = 0;
   if (fMaskHist and fIsMask)
@@ -942,7 +942,7 @@ int Measurement2D::GetNDOF(bool applymasking) {
   if (fIsMask) {
     nDOF -= nMasked;
   }
-
+  
   return nDOF;
 }
 
