@@ -43,10 +43,8 @@ MINERvA_CCCOHPI_XSec_1DEnu_nu::MINERvA_CCCOHPI_XSec_1DEnu_nu(nuiskey samplekey) 
   fSettings.DefineAllowedSpecies("numu");
   fSettings.SetTitle("MINERvA_CCCOHPI_XSec_1DEnu_nu");
 
-  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_XSec.csv");
-  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_Covar_stat.csv;" +
-			  GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_Covar_flux.csv;" +
-			  GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_Covar_sys.csv");
+  fSettings.SetDataInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_data.csv");
+  fSettings.SetCovarInput(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCcoh/Enu_nu_cov.csv");
 			   
   FinaliseSampleSettings();
 
@@ -58,9 +56,6 @@ MINERvA_CCCOHPI_XSec_1DEnu_nu::MINERvA_CCCOHPI_XSec_1DEnu_nu(nuiskey samplekey) 
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
 
-  // Apply scalings based on the data release
-  ScaleData(1E-39);
-
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -68,7 +63,6 @@ MINERvA_CCCOHPI_XSec_1DEnu_nu::MINERvA_CCCOHPI_XSec_1DEnu_nu(nuiskey samplekey) 
 
 
 void MINERvA_CCCOHPI_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
-
   fXVar = event->GetNeutrinoIn()->fP.E()/1000.;
   return;
 };
@@ -80,8 +74,3 @@ bool MINERvA_CCCOHPI_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   return SignalDef::isCCCOH(event, 14, 211, EnuMin, EnuMax);
 }
 
-
-double MINERvA_CCCOHPI_XSec_1DEnu_nu::GetLikelihood(){
-  double chi2 = StatUtils::GetChi2FromCov(this->fDataHist, this->fMCHist, this->covar, NULL, 1E39, 10);
-  return chi2;
-}

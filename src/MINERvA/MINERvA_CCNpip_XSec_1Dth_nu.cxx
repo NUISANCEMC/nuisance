@@ -175,7 +175,7 @@ void MINERvA_CCNpip_XSec_1Dth_nu::FillEventVariables(FitEvent *event) {
 // Last bool refers to if we're selecting on the full phase space or not
 bool MINERvA_CCNpip_XSec_1Dth_nu::isSignal(FitEvent *event) {
   //********************************************************************
-  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace);
+  return SignalDef::isCCNpip_MINERvA(event, EnuMin, EnuMax, !fFullPhaseSpace, !fUpdatedData);
 }
 
 

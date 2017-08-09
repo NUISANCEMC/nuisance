@@ -113,6 +113,9 @@ CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrid
 
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)
 
+CheckAndSetDefaultEnv(PYTHIA8 "" PATH "Path to directory containing libPythia8.so. Overrides environment variable \$PYTHIA8 <>" PYTHIA8)
+CheckAndSetDefaultCache(USE_PYTHIA8 FALSE BOOL "Whether to enable PYTHIA8 event support. <FALSE>")
+
 CheckAndSetDefaultCache(USE_GiBUU TRUE BOOL "Whether to enable GiBUU event support. <TRUE>")
 CheckAndSetDefaultCache(BUILD_GiBUU FALSE BOOL "Whether to build supporting GiBUU event tools along with a patched version of GiBUU. <FALSE>")
 
@@ -125,6 +128,7 @@ CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE TRUE BOOL "Whether to perform the upd
 CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <TRUE>")
 
 CheckAndSetDefault(NEED_PYTHIA6 FALSE)
+CheckAndSetDefault(NEED_PYTHIA8 FALSE)
 
 CheckAndSetDefault(NEED_ROOTEVEGEN FALSE)
 CheckAndSetDefault(NEED_ROOTPYTHIA6 FALSE)
