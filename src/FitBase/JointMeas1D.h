@@ -662,6 +662,8 @@ protected:
   bool fSaveSubMeas;  //!< Flag: Save each of the histograms from the sub
   //! samples as well as this joint samples plots
 
+
+  double   fLikelihood;
 };
 
 
