@@ -998,11 +998,16 @@ void JointFCN::Write() {
   LOG(MIN) << "Writing likelihood plot.." << std::endl;
   std::vector<double> likes;
   std::vector<double> ndofs;
+  std::vector<std::string> names;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++){
     MeasurementBase* exp = *iter;
-    likes.push_back(exp->GetLikelihood());
-    ndofs.push_back(exp->GetNDOF());
+    double like = exp->GetLikelihood();
+    double ndof = exp->GetNDOF();
+    std::string name = exp->GetName();
+    likes.push_back(like);
+    ndofs.push_back(ndof);
+    names.push_back(name);
   }
   TH1D likehist = TH1D("likelihood_hist","likelihood_hist",
 		       likes.size(), 0.0, double(likes.size()));
@@ -1016,6 +1021,9 @@ void JointFCN::Write() {
     if (ndofs[i] != 0.0){
       divhist.SetBinContent(i+1, likes[i]/ndofs[i]);
     }
+    likehist.GetXaxis()->SetBinLabel(i+1, names[i].c_str());
+    ndofhist.GetXaxis()->SetBinLabel(i+1, names[i].c_str());
+    divhist.GetXaxis()->SetBinLabel(i+1, names[i].c_str());
   }
   likehist.Write();
   ndofhist.Write();

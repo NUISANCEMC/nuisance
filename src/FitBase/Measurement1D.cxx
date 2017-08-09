@@ -928,7 +928,7 @@ void Measurement1D::ApplyNormScale(double norm) {
 int Measurement1D::GetNDOF() {
   //********************************************************************
   int ndof = fDataHist->GetNbinsX();
-  if (fMaskHist) ndof -= fMaskHist->Integral();
+  if (fMaskHist and fIsMask) ndof -= fMaskHist->Integral();
   return ndof;
 }
 
