@@ -18,19 +18,15 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-
-#include "MINERvA_CCinc_XSec_1DEnu_nu.h"
+#include "MINERvA_CCDIS_XSec_1DEnu_nu.h"
 
 
 //********************************************************************
-MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::string inputfile, std::string type){
+MINERvA_CCDIS_XSec_1DEnu_nu::MINERvA_CCDIS_XSec_1DEnu_nu(std::string name, std::string inputfile, std::string type){
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MINERvA_CCinc_XSec_1DEnu_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 muon, any nucleons, and no other FS particles \n";
+  std::string descrip = "MINERvA_CCDIS_XSec_1DEnu_nu sample.";
 
   // Setup common settings
   fSettings = LoadSampleSettings(name, inputfile, type);
@@ -38,10 +34,10 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   fSettings.SetXTitle("E_{#nu} (GeV)");
   fSettings.SetYTitle("d#sigma/dE_{#nu} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FIX/DIAG/MASK", "FIX/DIAG");
-  fSettings.SetEnuRange(2.0, 20.0);
-  fSettings.DefineAllowedTargets("C,H");
+  fSettings.SetEnuRange(5.0, 50.0);
+  fSettings.DefineAllowedTargets("Pb,Fe,C,H");
   fSettings.DefineAllowedSpecies("numu");
-  fSettings.SetTitle("MINERvA_CCinc_XSec_1DEnu_nu");
+  fSettings.SetTitle("MINERvA_CCDIS_XSec_1DEnu_nu");
 
   target = "";
   if      (name.find("C12")  != std::string::npos) target =   "C12";
@@ -50,8 +46,6 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   if      (name.find("DEN")   != std::string::npos) target =   "CH";
   if (target == "") ERR(WRN) << "target " << target << " was not found!" << std::endl;
 
-  // fSettings.SetSmearingInput( FitPar::GetDataBase() + "/MINERvA/CCinc/CCinc_"+target+"_x_smear.csv" );
-
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
@@ -59,8 +53,8 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
   fScaleFactor =  (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))/this->TotalIntegratedFlux();
 
   // Plot Setup -------------------------------------------------------
-  double binsx[9] = {2, 3, 4, 5, 6, 8, 10, 15, 20};
-  CreateDataHistogram(8, binsx);
+  double binsx[8] = {5.00, 10.00, 15.00, 20.00, 25.00, 30.00, 40.00, 50.00};
+  CreateDataHistogram(7, binsx);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -68,7 +62,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::
 };
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
+void MINERvA_CCDIS_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
 //********************************************************************
 
   if (event->NumFSParticle(13) == 0)
@@ -77,36 +71,46 @@ void MINERvA_CCinc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event){
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
-  fXVar   = Pnu.E()/1000.;
-  ThetaMu = Pnu.Vect().Angle(Pmu.Vect());
+  // Need to calculate Q2 and W using the MINERvA method
+  double Enu   = Pnu.E()/1000.;
+  double Emu   = Pmu.E()/1000.;
+  double theta = FitUtils::th(Pnu, Pmu);
+
+  Q2    = 4*Enu*Emu*sin(theta/2.)*sin(theta/2.);
+  W     = sqrt(PhysConst::mass_nucleon*PhysConst::mass_nucleon + 2*PhysConst::mass_nucleon*(Enu-Emu) - Q2);
+  fXVar = Enu;
+
   return;
 }
 
 
 //********************************************************************
-bool MINERvA_CCinc_XSec_1DEnu_nu::isSignal(FitEvent *event){
+bool MINERvA_CCDIS_XSec_1DEnu_nu::isSignal(FitEvent *event){
 //*******************************************************************
 
   if (!SignalDef::isCCINC(event, 14, this->EnuMin, this->EnuMax)) return false;
 
   // Restrict the phase space to theta < 17 degrees
-  if (ThetaMu > 0.296706) return false;
+  if (!SignalDef::IsRestrictedAngle(event, 14, 13, 17)) return false;
+
+  if (Q2 < 1.0) return false;
+  if ( W < 2.0) return false;
 
   return true;
 };
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1DEnu_nu::ScaleEvents(){
+void MINERvA_CCDIS_XSec_1DEnu_nu::ScaleEvents(){
 //********************************************************************
 
   // Get rid of this because it causes odd behaviour
   Measurement1D::ScaleEvents();
 
   // this->fMCHist->Scale(this->fScaleFactor, "width");
-
+  
   // // Proper error scaling - ROOT Freaks out with xsec weights sometimes
   // for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
-
+    
   //   if (this->fMCStat->GetBinContent(i+1) != 0)
   //     this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
   //   else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());

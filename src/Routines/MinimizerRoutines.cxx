@@ -55,8 +55,8 @@ void MinimizerRoutines::Init() {
   fAllowedRoutines = ("Migrad,Simplex,Combined,"
                       "Brute,Fumili,ConjugateFR,"
                       "ConjugatePR,BFGS,BFGS2,"
-                      "SteepDesc,GSLSimAn,FixAtLim,FixAtLimBreak"
-                      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands",
+                      "SteepDesc,GSLSimAn,FixAtLim,FixAtLimBreak,"
+                      "Chi2Scan1D,Chi2Scan2D,Contours,ErrorBands,"
 		      "DataToys");
 };
 

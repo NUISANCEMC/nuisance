@@ -18,17 +18,14 @@
 *******************************************************************************/
 
 #include "MINERvA_SignalDef.h"
-#include "MINERvA_CCinc_XSec_1Dx_ratio.h"
+#include "MINERvA_CCDIS_XSec_1Dx_ratio.h"
 
 //********************************************************************
-MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
+MINERvA_CCDIS_XSec_1Dx_ratio::MINERvA_CCDIS_XSec_1Dx_ratio(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MINERvA_CCinc_XSec_1Dx_ratio sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+  std::string descrip = "MINERvA_CCDIS_XSec_1Dx_ratio sample.";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -36,31 +33,30 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
   fSettings.SetXTitle("Reconstructed Bjorken x");
   fSettings.SetYTitle("d#sigma/dx (cm^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX/DIAG,FULL/MASK", "FIX/FULL");
-  fSettings.SetEnuRange(0.0, 20.0);
+  fSettings.SetEnuRange(5.0, 50.0);
 
   // CCQELike plot information
-  fSettings.SetTitle("MINERvA_CCinc_XSec_1Dx_ratio");
+  fSettings.SetTitle("MINERvA_CCDIS_XSec_1Dx_ratio");
   fIsRatio = true;
-  nBins = 8;
+  nBins = 5;
 
   target  = "";
-  if      (fSettings.Found("name", "C12")) target =   "C12";
-  else if (fSettings.Found("name", "Fe56")) target =   "Fe56";
+  if      (fSettings.Found("name", "C12"))   target =   "C12";
+  else if (fSettings.Found("name", "Fe56"))  target =   "Fe56";
   else if (fSettings.Found("name", "Pb208")) target =   "Pb208";
   else {
     ERR(FTL) << "target " << target << " was not found!" << std::endl;
     exit(-1);
   }
 
-  std::string basedir = FitPar::GetDataBase() + "/MINERvA/CCinc/";
-  fSettings.SetDataInput(  basedir + "CCinc_" + target + "_CH_ratio_x_data.csv" );
-  fSettings.SetCovarInput( basedir + "CCinc_" + target + "_CH_ratio_x_covar.csv" );
-
+  fSettings.SetDataInput(  GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCDIS/CCDIS_"+target+"_CH_ratio_x_data.csv" );
+  fSettings.SetCovarInput( GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCDIS/CCDIS_"+target+"_CH_ratio_x_stat.csv;" +
+                           GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CCDIS/CCDIS_"+target+"_CH_ratio_x_syst.csv");
   FinaliseSampleSettings();
 
 
   // Get parsed input files
-  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCinc ratio requires input files in format: NUMERATOR;DENOMINATOR" << std::endl;
+  if (fSubInFiles.size() != 2) ERR(FTL) << "MINERvA CCDIS ratio requires input files in format: NUMERATOR;DENOMINATOR" << std::endl;
   std::string inFileNUM = fSubInFiles.at(0);
   std::string inFileDEN = fSubInFiles.at(1);
 
@@ -69,15 +65,19 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-  // This function forces in a factor of 1E76 to the covariance.
-  // This cancels with the factor of 1E38 which is added to the data in the chi2 calculation...
-  // Who said two wrongs don't make a right?
-  SetCorrelationFromTextFile(fSettings.GetCovarInput());
+  SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
+
+  // Need to overlay the sqrt covariance diagonals (*1E-38) onto the data histogram
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+
+  // Need to scale the covariance by 1E-76... this cancels with the factor of 1E76 introduced in StatUtils::GetChi2FromCov
+  // Who says two wrongs don't make a right
+  ScaleCovar(1E76);
 
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
-  NUM  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_" + target + "_CH_NUM", inFileNUM, type);
-  DEN  = new MINERvA_CCinc_XSec_1Dx_nu("MINERvA_CCinc_XSec_1Dx_" + target + "_CH_DEN", inFileDEN, type);
+  NUM  = new MINERvA_CCDIS_XSec_1Dx_nu("MINERvA_CCDIS_XSec_1Dx_" + target + "_CH_NUM", inFileNUM, type);
+  DEN  = new MINERvA_CCDIS_XSec_1Dx_nu("MINERvA_CCDIS_XSec_1Dx_" + target + "_CH_DEN", inFileDEN, type);
   NUM  ->SetNoData();
   DEN  ->SetNoData();
 
@@ -92,15 +92,15 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
 };
 
 //********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
+void MINERvA_CCDIS_XSec_1Dx_ratio::MakePlots() {
 //********************************************************************
 
   UInt_t sample = 0;
   for (std::vector<MeasurementBase*>::const_iterator expIter = this->fSubChain.begin(); expIter != this->fSubChain.end(); expIter++) {
     MeasurementBase* exp = static_cast<MeasurementBase*>(*expIter);
 
-    if      (sample == 0) this->NUM = static_cast<MINERvA_CCinc_XSec_1Dx_nu*>(exp);
-    else if (sample == 1) this->DEN = static_cast<MINERvA_CCinc_XSec_1Dx_nu*>(exp);
+    if      (sample == 0) this->NUM = static_cast<MINERvA_CCDIS_XSec_1Dx_nu*>(exp);
+    else if (sample == 1) this->DEN = static_cast<MINERvA_CCDIS_XSec_1Dx_nu*>(exp);
     else break;
     sample++;
   }

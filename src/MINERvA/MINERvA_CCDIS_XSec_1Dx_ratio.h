@@ -17,33 +17,36 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CCinc_1DEnu_nu_H_SEEN
-#define MINERVA_CCinc_1DEnu_nu_H_SEEN
+#ifndef MINERVA_CCDIS_XSec_1Dx_ratio_H_SEEN
+#define MINERVA_CCDIS_XSec_1Dx_ratio_H_SEEN
 
-#include "Measurement1D.h"
+// Fit Includes
+#include "MeasurementBase.h"
+#include "JointMeas1D.h"
+#include "MINERvA_CCDIS_XSec_1Dx_nu.h"
 
-//********************************************************************
-class MINERvA_CCinc_XSec_1DEnu_nu : public Measurement1D {
-//********************************************************************
-
+class MINERvA_CCDIS_XSec_1Dx_ratio : public JointMeas1D {
 public:
 
-  MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::string inputfile, std::string  type);
-  virtual ~MINERvA_CCinc_XSec_1DEnu_nu() {};
+  MINERvA_CCDIS_XSec_1Dx_ratio(nuiskey samplekey);
+  virtual ~MINERvA_CCDIS_XSec_1Dx_ratio() {};
 
-  // Functions for handling each neut event
-  void FillEventVariables(FitEvent *event);
+  void MakePlots();
 
-  bool isSignal(FitEvent *event);
-
-  void ScaleEvents();
-
-  double GetChi2(){return 0.0;};
+  // This is a dummy function as it is not required for the ratio (and does bad bad things)
+  void ScaleEvents(){return;};
 
  private:
 
-  double ThetaMu;
-  std::string target;
-};
+  // This is a dummy, the signal is defined separately for each sample!
+  bool isSignal(){return false;};  
 
+  // Need to have the distributions for the numerator and denominator stored separately
+  MINERvA_CCDIS_XSec_1Dx_nu * NUM;
+  MINERvA_CCDIS_XSec_1Dx_nu * DEN;
+  Int_t nBins;
+  std::string target;
+
+};
+  
 #endif
