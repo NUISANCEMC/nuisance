@@ -69,7 +69,10 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-  SetCovarFromTextFile(fSettings.GetCovarInput());
+  // This function forces in a factor of 1E76 to the covariance.
+  // This cancels with the factor of 1E38 which is added to the data in the chi2 calculation...
+  // Who said two wrongs don't make a right?
+  SetCorrelationFromTextFile(fSettings.GetCovarInput());
 
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
@@ -106,9 +109,6 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
   TH1D* NUM_MC = (TH1D*)this->NUM->GetMCList().at(0)->Clone();
   TH1D* DEN_MC = (TH1D*)this->DEN->GetMCList().at(0)->Clone();
 
-  std::cout << "MakingPlots CCINC X = " << NUM_MC->Integral() << " " << DEN_MC->Integral() << std::endl;
-  sleep(10);
-
   for (int i = 0; i < nBins; ++i) {
     double binVal = 0;
     double binErr = 0;
@@ -122,76 +122,6 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
 
     this->fMCHist->SetBinContent(i + 1, binVal);
     this->fMCHist->SetBinError(i + 1, binErr);
-  }
-
-  return;
-}
-
-
-//********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::SetCovarMatrixFromText(std::string covarFile, int dim) {
-//********************************************************************
-
-  // WARNING this reads in the data CORRELATIONS
-  // Make a counter to track the line number
-  int row = 0;
-
-  std::string line;
-  std::ifstream covar(covarFile.c_str(), ifstream::in);
-
-  this->covar = new TMatrixDSym(dim);
-  this->fFullCovar = new TMatrixDSym(dim);
-  if (covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
-  else ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile << std::endl;
-
-  while (std::getline(covar >> std::ws, line, '\n')) {
-    int column = 0;
-
-    // Loop over entries and insert them into matrix
-    // Multiply by the errors to get the covariance, rather than the correlation matrix
-    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
-    for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
-
-      double val = (*iter) * this->fDataHist->GetBinError(row + 1) * this->fDataHist->GetBinError(column + 1);
-
-      (*this->covar)(row, column) = val;
-      (*this->fFullCovar)(row, column) = val;
-      column++;
-    }
-    row++;
-  }
-
-  // Robust matrix inversion method
-  TDecompSVD LU = TDecompSVD(*this->covar);
-  this->covar = new TMatrixDSym(dim, LU .Invert().GetMatrixArray(), "");
-
-  return;
-};
-
-
-
-//********************************************************************
-void MINERvA_CCinc_XSec_1Dx_ratio::Write(std::string drawOpt) {
-//********************************************************************
-
-  LOG(SAM) << "Writing Normal Plots in MINERvA_CCinc_XSec_1Dx_ratio::Write()" << std::endl;
-  JointMeas1D::Write(drawOpt);
-  return;
-
-  //this->GetDataList().at(0)->Write();
-  //  this->GetMCList()  .at(0)->Write();
-
-  if (this->fFullCovar) {
-    TH2D cov = TH2D((*this->fFullCovar));
-    cov.SetNameTitle((this->fName + "_cov").c_str(), (this->fName + "_cov;Bins; Bins;").c_str());
-    cov.Write();
-  }
-
-  if (this->covar) {
-    TH2D covinv = TH2D((*this->covar));
-    covinv.SetNameTitle((this->fName + "_covinv").c_str(), (this->fName + "_covinv;Bins; Bins;").c_str());
-    covinv.Write();
   }
 
   return;

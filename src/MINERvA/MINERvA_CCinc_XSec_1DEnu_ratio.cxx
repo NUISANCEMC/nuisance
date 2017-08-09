@@ -69,8 +69,10 @@ MINERvA_CCinc_XSec_1DEnu_ratio::MINERvA_CCinc_XSec_1DEnu_ratio(nuiskey samplekey
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
-  SetCovarFromTextFile(fSettings.GetCovarInput());
-
+  // This function forces in a factor of 1E76 to the covariance.
+  // This cancels with the factor of 1E38 which is added to the data in the chi2 calculation...
+  // Who said two wrongs don't make a right?
+  SetCorrelationFromTextFile(fSettings.GetCovarInput());
 
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
@@ -124,44 +126,4 @@ void MINERvA_CCinc_XSec_1DEnu_ratio::MakePlots() {
 
   return;
 }
-
-
-//********************************************************************
-void MINERvA_CCinc_XSec_1DEnu_ratio::SetCovarMatrixFromText(std::string covarFile, int dim) {
-//********************************************************************
-
-  // WARNING this reads in the data CORRELATIONS
-  // Make a counter to track the line number
-  int row = 0;
-
-  std::string line;
-  std::ifstream covar(covarFile.c_str(), ifstream::in);
-
-  this->fFullCovar = new TMatrixDSym(dim);
-  if (covar.is_open()) LOG(SAM) << "Reading covariance matrix from file: " << covarFile << std::endl;
-  else ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile << std::endl;
-
-  while (std::getline(covar >> std::ws, line, '\n')) {
-    int column = 0;
-
-    // Loop over entries and insert them into matrix
-    // Multiply by the errors to get the covariance, rather than the correlation matrix
-    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
-    for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
-
-      double val = (*iter) * this->fDataHist->GetBinError(row + 1) * this->fDataHist->GetBinError(column + 1);
-
-      (*this->fFullCovar)(row, column) = val;
-      column++;
-    }
-    row++;
-  }
-
-  // Robust matrix inversion method
-  this->covar = StatUtils::GetInvert(fFullCovar);
-
-  return;
-};
-
 
