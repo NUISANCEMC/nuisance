@@ -135,6 +135,8 @@ public:
   /// entries in the first line of covfile.
   virtual void SetCovarFromTextFile(std::string covfile, int dim = -1);
 
+  virtual void SetCovarFromMultipleTextFiles(std::string covfiles, int dim = -1);
+
   /// \brief Read the data covariance from a ROOT file.
   ///
   /// - covfile specifies the full path to the file
@@ -177,6 +179,17 @@ public:
   /// If no dimensions are given, it is assumed from the number
   /// entries in the first line of covfile.
   virtual void SetCorrelationFromTextFile(std::string covfile, int dim = -1);
+
+  /// \brief Read the data correlations from multiple text files.
+  ///
+  /// \warning REQUIRES DATA HISTOGRAM TO BE SET FIRST
+  ///
+  /// Inputfile should have similar format to that shown
+  /// in SetCovarFromTextFile.
+  ///
+  /// If no dimensions are given, it is assumed from the number
+  /// entries in the first line of first covfile.
+  virtual void SetCorrelationFromMultipleTextFiles(std::string corrfiles, int dim = -1);
 
   /// \brief Read the data correlations from a ROOT file.
   ///

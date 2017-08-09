@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P caltowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This ile is part of NUISANCE.
@@ -546,6 +546,10 @@ void Measurement1D::FinaliseMeasurement() {
   if (!fDecomp) {
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   }
+
+  // Push the diagonals of fFullCovar onto the data histogram
+  // Comment this out until the covariance/data scaling is consistent!
+  // StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
 
   // Setup fMCHist from data
   fMCHist = (TH1D*)fDataHist->Clone();
