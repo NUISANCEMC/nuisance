@@ -17,8 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_1DEnu_nu_H_SEEN
-#define MINERVA_1DEnu_nu_H_SEEN
+#ifndef MINERVA_CCinc_1DEnu_nu_H_SEEN
+#define MINERVA_CCinc_1DEnu_nu_H_SEEN
 
 #include "Measurement1D.h"
 
@@ -42,7 +42,7 @@ public:
 
  private:
 
-  double Enu, ThetaMu;
+  double ThetaMu;
   std::string target;
 };
 
