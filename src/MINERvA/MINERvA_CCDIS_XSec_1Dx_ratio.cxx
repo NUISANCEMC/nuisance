@@ -67,6 +67,13 @@ MINERvA_CCDIS_XSec_1Dx_ratio::MINERvA_CCDIS_XSec_1Dx_ratio(nuiskey samplekey) {
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
 
+  // Need to overlay the sqrt covariance diagonals (*1E-38) onto the data histogram
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+
+  // Need to scale the covariance by 1E-76... this cancels with the factor of 1E76 introduced in StatUtils::GetChi2FromCov
+  // Who says two wrongs don't make a right
+  ScaleCovar(1E76);
+
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
   NUM  = new MINERvA_CCDIS_XSec_1Dx_nu("MINERvA_CCDIS_XSec_1Dx_" + target + "_CH_NUM", inFileNUM, type);

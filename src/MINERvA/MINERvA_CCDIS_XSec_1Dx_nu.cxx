@@ -104,17 +104,17 @@ bool MINERvA_CCDIS_XSec_1Dx_nu::isSignal(FitEvent *event){
 void MINERvA_CCDIS_XSec_1Dx_nu::ScaleEvents(){
 //********************************************************************
 
-  //Measurement1D::ScaleEvents();
-  this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
+  Measurement1D::ScaleEvents();
+  // this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
   
-  this->fMCHist->Scale(this->fScaleFactor, "width");
+  // this->fMCHist->Scale(this->fScaleFactor, "width");
   
-  // Proper error scaling - ROOT Freaks out with xsec weights sometimes
-  for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
+  // // Proper error scaling - ROOT Freaks out with xsec weights sometimes
+  // for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
     
-    if (this->fMCStat->GetBinContent(i+1) != 0)
-      this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
-    else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
-  }
+  //   if (this->fMCStat->GetBinContent(i+1) != 0)
+  //     this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) * this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
+  //   else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
+  // }
 
 }

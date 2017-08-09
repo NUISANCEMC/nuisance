@@ -67,6 +67,13 @@ MINERvA_CCDIS_XSec_1DEnu_ratio::MINERvA_CCDIS_XSec_1DEnu_ratio(nuiskey samplekey
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
+  
+  // Need to overlay the sqrt covariance diagonals onto the data histogram
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+
+  // Need to scale the covariance by 1E-76... this cancels with the factor of 1E76 introduced in StatUtils::GetChi2FromCov
+  // Who says two wrongs don't make a right
+  ScaleCovar(1E76);
 
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
