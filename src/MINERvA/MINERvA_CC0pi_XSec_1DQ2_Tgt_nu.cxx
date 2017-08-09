@@ -52,6 +52,7 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
   if (fSettings.Found("name","_CH")){
     fTarget = 1; // kTargetCH;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_CH_data.txt");
+    fSettings.SetCovarInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_CH_covar.txt");
   } else if (fSettings.Found("name","TgtC")){
     fTarget = 2; //kTargetC;
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_C_data.txt");
