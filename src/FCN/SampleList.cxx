@@ -529,9 +529,21 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCinc_XSec_1Dx_ratio(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
-             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
+	     !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
              !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
-    return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
+	return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
+    /*
+      CCDIS
+    */
+  } else if (!name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_C12_CH") ||
+	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Fe56_CH") ||
+	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Pb208_CH")) {
+	return (new MINERvA_CCDIS_XSec_1Dx_ratio(samplekey));
+	
+  } else if (!name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_C12_CH") ||
+	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Fe56_CH") ||
+	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Pb208_CH")) {
+	return (new MINERvA_CCDIS_XSec_1DEnu_ratio(samplekey));
 
     /*
       CC-COH

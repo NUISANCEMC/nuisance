@@ -37,6 +37,7 @@
 namespace PhysConst {
 const double mass_proton = 0.93827203;        // Proton mass in GeV
 const double mass_neutron = 0.93956536;       // Neutron mass in GeV
+const double mass_nucleon = (mass_proton + mass_neutron)/2.;
 const double mass_delta = 1.232;              // Delta mass in GeV
 const double mass_muon = 0.10565837;          // Muon mass in GeV
 const double mass_electron = 0.000510998928;  // Electron mass in GeV

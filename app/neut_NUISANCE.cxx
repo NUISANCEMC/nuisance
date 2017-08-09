@@ -608,7 +608,7 @@ int main(int argc, char ** argv)
     std::string cwd = GETCWD();
     chdir(neutroot.c_str());
 
-    int attempts = 0;
+    // int attempts = 0;
     //    while(true){
 
       // Break if too many attempts

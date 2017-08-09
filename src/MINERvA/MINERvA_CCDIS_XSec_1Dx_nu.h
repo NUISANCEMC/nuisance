@@ -17,19 +17,18 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CCinc_1DEnu_nu_H_SEEN
-#define MINERVA_CCinc_1DEnu_nu_H_SEEN
+#ifndef MINERVA_CCDIS_1Dx_nu_H_SEEN
+#define MINERVA_CCDIS_1Dx_nu_H_SEEN
 
 #include "Measurement1D.h"
-
 //********************************************************************
-class MINERvA_CCinc_XSec_1DEnu_nu : public Measurement1D {
+class MINERvA_CCDIS_XSec_1Dx_nu : public Measurement1D {
 //********************************************************************
 
 public:
 
-  MINERvA_CCinc_XSec_1DEnu_nu(std::string name, std::string inputfile, std::string  type);
-  virtual ~MINERvA_CCinc_XSec_1DEnu_nu() {};
+  MINERvA_CCDIS_XSec_1Dx_nu(std::string name, std::string inputfile, std::string type);
+  virtual ~MINERvA_CCDIS_XSec_1Dx_nu() {};
 
   // Functions for handling each neut event
   void FillEventVariables(FitEvent *event);
@@ -42,7 +41,7 @@ public:
 
  private:
 
-  double ThetaMu;
+  double Q2, W;
   std::string target;
 };
 

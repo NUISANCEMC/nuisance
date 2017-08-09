@@ -36,11 +36,6 @@ public:
   // This is a dummy function as it is not required for the ratio (and does bad bad things)
   void ScaleEvents(){return;};;
 
-  void SetCovarMatrixFromText(std::string covarFile, int dim);
-
-  // Custom write function because the ratio has much more limited information available than normal.
-  void Write(std::string drawOpt);
-
  private:
 
   // This is a dummy, the signal is defined separately for each sample!

@@ -196,6 +196,10 @@
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
 #include "MINERvA_CCinc_XSec_2DEavq3_nu.h"
 
+// MINERvA CCDIS
+#include "MINERvA_CCDIS_XSec_1DEnu_ratio.h"
+#include "MINERvA_CCDIS_XSec_1Dx_ratio.h"
+
 // MINERvA CCCOH pion
 #include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"

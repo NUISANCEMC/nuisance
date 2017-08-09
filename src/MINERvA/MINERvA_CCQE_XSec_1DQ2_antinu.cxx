@@ -157,11 +157,11 @@ void MINERvA_CCQE_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
     
     pm = 139.57018;
     pe = pm + 65;
-    FitParticle* fakepion = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 211, kFinalState);
-    double pionrange = MINERvAUtils::RangeInScintillator(fakepion, 100);
+    // FitParticle* fakepion = new FitParticle(0.0,0.0,sqrt(pe*pe-pm*pm), pe, 211, kFinalState);
+    // double pionrange = MINERvAUtils::RangeInScintillator(fakepion, 100);
     
     double Eav = 0.0;
-    for (int i = 0; i < event->NParticles(); i++){
+    for (uint i = 0; i < event->NParticles(); i++){
       if (event->GetParticleState(i) != kFinalState) continue;
       int pid = event->GetParticlePDG(i);
       double ParticleEav = 0.0;

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P caltowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This ile is part of NUISANCE.
@@ -252,15 +252,17 @@ void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
 }
 
+
 //********************************************************************
 void Measurement1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
 //********************************************************************
+
   if (dim == -1) {
     dim = fDataHist->GetNbinsX();
   }
 
   std::vector<std::string> covList = GeneralUtils::ParseToStr(covfiles, ";");
-  
+
   fFullCovar = new TMatrixDSym(dim);
   for (uint i = 0; i < covList.size(); ++i){
     LOG(SAM) << "Reading covariance from text file: " << covList[i] << std::endl;
@@ -339,6 +341,36 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   delete correlation;
 }
+
+//********************************************************************
+void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles, int dim) {
+//********************************************************************  
+
+  if (dim == -1) {
+    dim = fDataHist->GetNbinsX();
+  }
+
+  std::vector<std::string> corrList = GeneralUtils::ParseToStr(corrfiles, ";");
+
+  fFullCovar = new TMatrixDSym(dim);
+  for (uint i = 0; i < corrList.size(); ++i){
+    LOG(SAM) << "Reading covariance from text file: " << corrList[i] << std::endl;
+    TMatrixDSym* temp_cov = StatUtils::GetCovarFromTextFile(corrList[i], dim);
+    
+    for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
+      for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
+	(*temp_cov)(i, j) = (*temp_cov)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1) * 1.E76;
+      }
+    }
+
+    (*fFullCovar) += (*temp_cov);
+    delete temp_cov;
+  }
+  covar      = StatUtils::GetInvert(fFullCovar);
+  fDecomp    = StatUtils::GetDecomp(fFullCovar);
+
+}
+
 
 //********************************************************************
 void Measurement1D::SetCorrelationFromRootFile(std::string covfile, std::string histname) {
@@ -514,6 +546,10 @@ void Measurement1D::FinaliseMeasurement() {
   if (!fDecomp) {
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   }
+
+  // Push the diagonals of fFullCovar onto the data histogram
+  // Comment this out until the covariance/data scaling is consistent!
+  // StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
 
   // Setup fMCHist from data
   fMCHist = (TH1D*)fDataHist->Clone();
