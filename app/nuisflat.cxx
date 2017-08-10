@@ -18,7 +18,8 @@
 *******************************************************************************/
 #include "ComparisonRoutines.h"
 #include "InputUtils.h"
-
+#include "MeasurementBase.h"
+#include "GenericFlux_Tester.h"
 #include "Smearceptance_Tester.h"
 
 // Global Arguments
