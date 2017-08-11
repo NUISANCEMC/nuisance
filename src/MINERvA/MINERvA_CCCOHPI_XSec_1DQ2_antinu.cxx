@@ -62,7 +62,9 @@ MINERvA_CCCOHPI_XSec_1DQ2_antinu::MINERvA_CCCOHPI_XSec_1DQ2_antinu(nuiskey sampl
 
 void MINERvA_CCCOHPI_XSec_1DQ2_antinu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(-211) == 0) return;
+  if (event->NumFSParticle(-211) == 0 ||
+      event->NumISParticle(-14) == 0 ||
+      event->NumFSParticle(-13) == 0) return;
 
   TLorentzVector Ppi = event->GetHMFSParticle(-211)->fP;
   TLorentzVector Pnu = event->GetHMISParticle(-14)->fP;
