@@ -1485,7 +1485,8 @@ void SystematicRoutines::MergeThrows(){
 //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1)) < 1.0) {
 	  //	  baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2) + pow(baseplot->GetBinError(j+1),2)));
 	//	} else {
-	  baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
+	baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
+	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
 	  //	}
       } else {
       	baseplot->SetBinContent(j+1, 0.0);//(binlowest[j] + binhighest[j]) / 2.0);
