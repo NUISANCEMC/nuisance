@@ -95,9 +95,6 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	    dynamic_cast<GReWeightNuXSecDIS *> (fGenieRW->WghtCalc("xsec_dis"));
 	rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
 
-	// Final Reconfigure
-	fGenieRW->Reconfigure();
-
 	// Set Abs Twk Config
 	fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
 
