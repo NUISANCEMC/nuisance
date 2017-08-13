@@ -38,6 +38,7 @@ public:
 	std::string GetMapInput();
 	void SetMapInput(std::string val);
 	void SetCovarInput(std::string val);
+	void SetShapeCovarInput(std::string val);
 
 	void SetDefault(std::string name, std::string val);
 	void SetDefault(std::string name, double val);
@@ -64,6 +65,8 @@ public:
 	void Set(std::string name, int i);
 	void Set(std::string name, std::string s);
 	void Set(std::string name, double d);
+
+	
 
 	std::vector<int> fAllowedTargets;
 	std::vector<int> fAllowedSpecies;
