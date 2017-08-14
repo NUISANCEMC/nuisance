@@ -111,6 +111,8 @@ CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
 
+CheckAndSetDefaultCache(USE_MINERvA_RW FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
+
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)
 
 CheckAndSetDefaultEnv(PYTHIA8 "" PATH "Path to directory containing libPythia8.so. Overrides environment variable \$PYTHIA8 <>" PYTHIA8)
