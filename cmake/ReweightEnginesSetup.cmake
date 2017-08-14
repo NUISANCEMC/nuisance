@@ -48,7 +48,12 @@ if(USE_T2K)
   cmessage(STATUS "Using T2K Reweight engine.")
   set(USE_T2K TRUE CACHE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>" FORCE)
 endif()
-
+##################################  MINERvA   ######################################
+if(USE_MINERvA_RW)
+  include(${CMAKE_SOURCE_DIR}/cmake/MINERvASetup.cmake)
+  cmessage(STATUS "Using MINERvA Reweight engine.")
+  set(USE_MINERvA_RW TRUE CACHE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>" FORCE)
+endif()
 ################################################################################
 
 ################################  Prob3++   ####################################

@@ -1,29 +1,41 @@
 #include "NUISANCEWeightEngine.h"
 #include "NUISANCEWeightCalcs.h"
 
-NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
+#ifdef __MINERVA_RW_ENABLED__
+#ifdef __GENIE_ENABLED__
+#include "MINERvAWeightCalcs.h"
+#endif
+#endif
 
+
+NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   // Setup the NUISANCE Reweight engine
   fCalcName = name;
   LOG(FIT) << "Setting up NUISANCE Custom RW : " << fCalcName << std::endl;
 
   // Load in all Weight Calculations
-  fWeightCalculators.push_back( new GaussianModeCorr() );
-  fWeightCalculators.push_back( new ModeNormCalc() );
+  fWeightCalculators.push_back(new GaussianModeCorr());
+  fWeightCalculators.push_back(new ModeNormCalc());
+
+#ifdef __MINERVA_RW_ENABLED__
+#ifdef __GENIE_ENABLED__
+  fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_MEC());
+  fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_RES());
+  fWeightCalculators.push_back(new nuisance::reweight::RikRPA());
+#endif
+#endif
+
   // Set Abs Twk Config
   fIsAbsTwk = true;
-
 };
 
-
 void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
-
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kCUSTOM);
 
   // Setup Maps
-  fEnumIndex[nuisenum];// = std::vector<size_t>(0);
-  fNameIndex[name]; // = std::vector<size_t>(0);
+  fEnumIndex[nuisenum];  // = std::vector<size_t>(0);
+  fNameIndex[name];      // = std::vector<size_t>(0);
 
   // Split by commas
   std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
@@ -31,7 +43,7 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
     std::string singlename = allnames[i];
 
     // Get RW
-    int singleenum =  Reweight::ConvDial(singlename, kCUSTOM);
+    int singleenum = Reweight::ConvDial(singlename, kCUSTOM);
 
     // Fill Maps
     int index = fValues.size();
@@ -52,7 +64,6 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
   }
 };
 
-
 void NUISANCEWeightEngine::SetDialValue(int nuisenum, double val) {
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
@@ -68,13 +79,12 @@ void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
 }
 
 void NUISANCEWeightEngine::Reconfigure(bool silent) {
-
   for (size_t i = 0; i < fNUISANCEEnums.size(); i++) {
-
-    for (std::vector<NUISANCEWeightCalc*>::iterator calciter = fWeightCalculators.begin();
+    for (std::vector<NUISANCEWeightCalc*>::iterator calciter =
+             fWeightCalculators.begin();
          calciter != fWeightCalculators.end(); calciter++) {
-
-      NUISANCEWeightCalc* nuiscalc = static_cast<NUISANCEWeightCalc*>(*calciter);
+      NUISANCEWeightCalc* nuiscalc =
+          static_cast<NUISANCEWeightCalc*>(*calciter);
 
       if (nuiscalc->IsHandled(fNUISANCEEnums[i])) {
         nuiscalc->SetDialValue(fNUISANCEEnums[i], fValues[i]);
@@ -83,13 +93,12 @@ void NUISANCEWeightEngine::Reconfigure(bool silent) {
   }
 }
 
-
-
-double NUISANCEWeightEngine::CalcWeight(BaseFitEvt * evt) {
+double NUISANCEWeightEngine::CalcWeight(BaseFitEvt* evt) {
   double rw_weight = 1.0;
 
   // Cast as usable class
-  for (std::vector<NUISANCEWeightCalc*>::iterator iter = fWeightCalculators.begin();
+  for (std::vector<NUISANCEWeightCalc*>::iterator iter =
+           fWeightCalculators.begin();
        iter != fWeightCalculators.end(); iter++) {
     NUISANCEWeightCalc* nuiscalc = static_cast<NUISANCEWeightCalc*>(*iter);
 
@@ -99,31 +108,3 @@ double NUISANCEWeightEngine::CalcWeight(BaseFitEvt * evt) {
   // Return rw_weight
   return rw_weight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
