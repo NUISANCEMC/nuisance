@@ -63,7 +63,8 @@ enum FitPullTypes {
 enum FitThrowTypes {
   kUnknownThrow = -1,
   kNoThrow = 0,
-  kGausThrow = 1
+  kGausThrow = 1,
+  kFlatThrow = 2
 };
   
 //! Used to produce gaussian penalty terms in the fit.
@@ -147,6 +148,8 @@ class ParamPull {
   inline TH1D GetMaxHist   (void) const { return *fMaxHist;  };
   inline TH1D GetMinHist   (void) const { return *fMinHist;  };
   inline TH1I GetDialTypes (void) const { return *fTypeHist; };
+  inline TH1D GetLimitHist  (void) const { return *fLimitHist; };
+
 
  private:
 
@@ -175,6 +178,8 @@ class ParamPull {
   TMatrixDSym* fCovar;    //!< Covariance
   TMatrixDSym* fInvCovar; //!< Inverted Covariance
   TMatrixDSym* fDecomp;   //!< Decomposition
+
+  TH1D* fLimitHist;
   
 };
 
