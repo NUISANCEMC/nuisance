@@ -339,7 +339,7 @@ double JointFCN::GetLikelihood() {
   // Set Data Variable
   fLikelihood = like;
   if (fIterationTree){
-    fSampleLikts[count] = fLikelihood;
+    fSampleLikes[count] = fLikelihood;
   }
 
   return like;
