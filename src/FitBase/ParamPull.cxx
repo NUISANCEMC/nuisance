@@ -329,6 +329,11 @@ void ParamPull::ReadRootFile(std::string input) {
 
   // Read File
   TFile* tempfile = new TFile(filename.c_str(), "READ");
+  if (tempfile->IsZombie()){
+    LOG(FIT) << "Looking for ParamPull input inside database" << std::endl;
+    filename = FitPar::GetDataBase() + "/" + filename;
+    tempfile = new TFile(filename.c_str(), "READ");
+  }
   if (tempfile->IsZombie()) {
     ERR(FTL) << "Can't find file in " << fName << std::endl;
     ERR(FTL) << "location = " << filename << std::endl;
