@@ -11,6 +11,11 @@ def ConvertToGENIEDial(name, val, err):
         converr = (err / 100.0)/0.5
         return "NonRESBGvnCC1pi,NonRESBGvpCC1pi,NonRESBGvbarnCC1pi,NonRESBGvbarpCC1pi", convval, converr
 
+#    elif name == "DISNorm":
+#        convval = ((val - 100.0) / 100.0)/0.5
+#        converr = (err / 100.0)/0.5
+#        return "NonRESBGvnCC1pi,NonRESBGvpCC1pi", convval, converr
+
     elif name == "RESNorm":
         convval = ((val - 100.0)/100.0)
         converr = err / 100.0
