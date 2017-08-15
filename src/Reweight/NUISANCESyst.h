@@ -40,6 +40,14 @@ enum NUISANCESyst {
 
 	kModeNorm_NormRES,
 
+	kMINERvARW_NormCCQE,
+	kMINERvARW_NormCCMEC,
+	kMINERvARW_NormCCRES,
+
+	kMINERvARW_RikRPA_ApplyRPA,
+    kMINERvARW_RikRPA_LowQ2,
+    kMINERvARW_RikRPA_HighQ2,
+
 	kNUISANCEDial_LAST
 };
 
