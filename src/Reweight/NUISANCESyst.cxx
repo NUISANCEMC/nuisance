@@ -44,7 +44,15 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 	case kGaussianCorr_CC1pi_Pq3:             { return "GaussianCorr_CC1pi_Pq3";   }
 	case kGaussianCorr_CC1pi_Wq3:             { return "GaussianCorr_CC1pi_Wq3";   }
 	case kGaussianCorr_AllowSuppression:      { return "GaussianCorr_AllowSuppression";   }
+
 	case kModeNorm_NormRES:                   { return "NormRES"; }
+
+	case kMINERvARW_NormCCMEC:                { return "MINERvARW_NormCCMEC"; }
+	case kMINERvARW_NormCCRES:                { return "MINERvARW_NormCCRES"; }
+
+	case kMINERvARW_RikRPA_ApplyRPA:            { return "MINERvARW_RikRPA_ApplyRPA"; }
+    case kMINERvARW_RikRPA_LowQ2:               { return "MINERvARW_RikRPA_LowQ2"; }
+    case kMINERvARW_RikRPA_HighQ2:              { return "MINERvARW_RikRPA_HighQ2"; }
 
 	default: return "unknown_nuisance_dial";
 	}

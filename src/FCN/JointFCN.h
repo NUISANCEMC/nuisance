@@ -140,7 +140,7 @@ std::vector<InputHandlerBase*> GetInputList();
   UInt_t  fCurIter;   //!< Counter for how many times reconfigure called
   bool    fMCFilled;  //!< Check MC has at least been filled once
 
-  TTree*  fIterationTree;  //!< Tree to save RW values on each function call
+  bool  fIterationTree;  //!< Tree to save RW values on each function call
   int     fNDials;         //!< Number of RW Dials in FitWeight
   double* fDialVals;       //!< Current Values of RW Dials
   double  fLikelihood;     //!< Current likelihood for joint sample likelihood
@@ -158,6 +158,17 @@ std::vector<InputHandlerBase*> GetInputList();
   std::vector<InputHandlerBase*> fInputList;
   std::vector<MeasurementBase*> fSubSampleList;
   bool fIsAllSplines;
+
+
+  std::vector< int > fIterationCount;
+  std::vector< double > fCurrentValues;
+  std::vector< std::string > fNameValues;
+  std::vector< std::vector<double> > fIterationValues;
+  int fSampleN;
+  std::string fIterationTreeName;
+
+
+
 
 };
 
