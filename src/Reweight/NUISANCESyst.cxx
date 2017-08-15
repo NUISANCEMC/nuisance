@@ -47,6 +47,7 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 
 	case kModeNorm_NormRES:                   { return "NormRES"; }
 
+	case kMINERvARW_NormCCQE:                { return "MINERvARW_NormCCQE"; }
 	case kMINERvARW_NormCCMEC:                { return "MINERvARW_NormCCMEC"; }
 	case kMINERvARW_NormCCRES:                { return "MINERvARW_NormCCRES"; }
 
