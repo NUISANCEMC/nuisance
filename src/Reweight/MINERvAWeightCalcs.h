@@ -27,6 +27,25 @@ namespace nuisance {
 namespace reweight {
 
 // MEC Dials
+class MINERvAReWeight_QE : public NUISANCEWeightCalc {
+ public:
+  MINERvAReWeight_QE();
+  virtual ~MINERvAReWeight_QE();
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  double fTwk_NormCCQE;
+  double fCur_NormCCQE;
+  double fDef_NormCCQE;
+    bool fTweaked;
+
+};
+
+
+// MEC Dials
 class MINERvAReWeight_MEC : public NUISANCEWeightCalc {
  public:
   MINERvAReWeight_MEC();

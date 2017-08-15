@@ -7,6 +7,72 @@
 namespace nuisance {
 namespace reweight {
 
+
+//*******************************************************
+MINERvAReWeight_QE::MINERvAReWeight_QE() {
+  //*******************************************************
+  fTwk_NormCCQE = 0.0;
+  fDef_NormCCQE = 1.0;
+  fCur_NormCCQE = fDef_NormCCQE;
+}
+
+MINERvAReWeight_QE::~MINERvAReWeight_QE(){};
+
+double MINERvAReWeight_QE::CalcWeight(BaseFitEvt* evt) {
+  // Check GENIE
+  if (evt->fType != kGENIE) return 1.0;
+
+  // Extract the GENIE Record
+  GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
+  const Interaction* interaction = ghep->Summary();
+  const InitialState& init_state = interaction->InitState();
+  const ProcessInfo& proc_info = interaction->ProcInfo();
+  const Target& tgt = init_state.Tgt();
+
+  // If the event is not QE this Calc doesn't handle it
+  if (!proc_info.IsQuasiElastic()) return 1.0;
+
+  // WEIGHT CALCULATIONS -------------
+  double w = 1.0;
+
+  // CCQE Dial
+  if (!proc_info.IsWeakCC()) w *= fCur_NormCCQE;
+
+  // Return Combined Weight
+  return w;
+}
+
+void MINERvAReWeight_QE::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void MINERvAReWeight_QE::SetDialValue(int rwenum, double val) {
+  // Check Handled
+  int curenum = rwenum % 1000;
+  if (!IsHandled(curenum)) return;
+
+  // Set Values
+  if (curenum == kMINERvARW_NormCCQE) {
+    fTwk_NormCCQE = val;
+    fCur_NormCCQE = fDef_NormCCQE + fTwk_NormCCQE;
+  }
+
+  // Define Tweaked
+  fTweaked = ((fTwk_NormCCQE != 0.0));
+}
+
+bool MINERvAReWeight_QE::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+
+  switch (curenum) {
+    case kMINERvARW_NormCCQE:
+      return true;
+    default:
+      return false;
+  }
+}
+
+
 //*******************************************************
 MINERvAReWeight_MEC::MINERvAReWeight_MEC() {
   //*******************************************************

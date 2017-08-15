@@ -40,6 +40,7 @@ enum NUISANCESyst {
 
 	kModeNorm_NormRES,
 
+	kMINERvARW_NormCCQE,
 	kMINERvARW_NormCCMEC,
 	kMINERvARW_NormCCRES,
 
