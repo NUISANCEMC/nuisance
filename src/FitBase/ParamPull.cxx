@@ -26,6 +26,7 @@ ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, 
   fMaxHist = NULL;
   fTypeHist = NULL;
   fDialSelection = dials;
+  fLimitHist = NULL;
 
   fName  = name;
   fInput = inputfile;
@@ -75,6 +76,7 @@ void ParamPull::SetType(std::string type) {
   else fCalcType = kNoPull;
 
   if (type.find("GAUSTHROW") != std::string::npos) fThrowType = kGausThrow;
+  else if (type.find("FLATTHROW") != std::string::npos) fThrowType = kFlatThrow;
   else fThrowType = kNoThrow;
 
   // Extra check to see if throws or pulls are turned off
@@ -459,6 +461,15 @@ void ParamPull::ReadDialInput(std::string input) {
   fDataHist->SetBinError(1, err);
   fDataHist->GetXaxis()->SetBinLabel(1, dialname.c_str());
 
+
+  fLimitHist = new TH1D( (fName + "_limits").c_str(),
+                         (fName + "_limits" + fPlotTitles).c_str(), 1, 0, 1);
+  fLimitHist->Reset();
+  if (inputvals.size() > 4) {
+    fLimitHist->SetBinContent(1, (inputvals[3] + inputvals[4]) / 2.0);
+    fLimitHist->SetBinError(1, (inputvals[4] - inputvals[3]) / 2.0);
+  }
+
   fCovar = NULL;
 }
 
@@ -678,7 +689,7 @@ int ParamPull::GetNDOF() {
   int ndof = 0;
 
   if (fCalcType != kNoThrow) {
-    ndof += fDataHist->GetNbinsX();
+    ndof = fDataHist->GetNbinsX();
   }
 
   return ndof;
@@ -691,7 +702,7 @@ void ParamPull::ThrowCovariance() {
 
   // Reset toy for throw
   ResetToy();
-  LOG(DEB) << "Toy Reset " << std::endl;
+  LOG(FIT) << "Creating new toy dataset" << std::endl;
 
   // Generate random Gaussian throws
   std::vector<double> randthrows;
@@ -703,6 +714,14 @@ void ParamPull::ThrowCovariance() {
     // Gaussian Throws
     case kGausThrow:
       randtemp = gRandom->Gaus(0.0, 1.0);
+      break;
+
+    // Uniform Throws
+    case kFlatThrow:
+      randtemp = gRandom->Uniform(0.0, 1.0);
+      if (fLimitHist) {
+        randtemp = fLimitHist->GetBinContent(i + 1) + fLimitHist->GetBinError(i + 1) * ( randtemp * 2 - 1 );
+      }
       break;
 
     // No Throws (DEFAULT)
@@ -719,10 +738,15 @@ void ParamPull::ThrowCovariance() {
 
     // Calc Bin Mod
     double binmod  = 0.0;
-    for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-      //      std::cout << "DECOMP " << j << " " << i << " " << randthrows.at(j) << std::endl;
-      binmod += (*fDecomp)(j, i) * randthrows.at(j);
+
+    if (fThrowType == kGausThrow) {
+      for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
+        binmod += (*fDecomp)(j, i) * randthrows.at(j);
+      }
+    } else if (fThrowType == kFlatThrow) {
+      binmod = randthrows.at(i) - fDataHist->GetBinContent(i + 1);
     }
+
 
     // Add up fraction dif
     totalres += binmod;
@@ -735,9 +759,17 @@ void ParamPull::ThrowCovariance() {
   fDataHist->SetNameTitle( (fName + "_data").c_str(),
                            (fName + " toydata" + fPlotTitles).c_str() );
 
-  // Print Status
-  LOG(REC) << "Created new toy histogram. Total Dif = "
-           << totalres << std::endl;
+  // Check Limits
+  if (fLimitHist) {
+    for (int i = 0; i < fLimitHist->GetNbinsX(); i++) {
+      if (fLimitHist->GetBinError(i + 1) == 0.0) continue;
+      if (fDataHist->GetBinContent(i + 1) > fLimitHist->GetBinContent(i + 1) + fLimitHist->GetBinError(i + 1) ||
+          fDataHist->GetBinContent(i + 1) < fLimitHist->GetBinContent(i + 1) - fLimitHist->GetBinError(i + 1)) {
+        this->ThrowCovariance();
+      }
+    }
+  }
+
   return;
 };
 
@@ -800,7 +832,9 @@ void ParamPull::Write(std::string writeoptt) {
 
   fDataHist->Write();
   fMCHist->Write();
-
+  if (fLimitHist) {
+    fLimitHist->Write();
+  }
   GetCovar().Write();
   GetFullCovar().Write();
   GetDecompCovar().Write();
