@@ -33,6 +33,7 @@ NUISANCEWeightEngine.cxx
 NUISANCEWeightCalcs.cxx
 NIWGWeightEngine.cxx
 OscWeightEngine.cxx
+MINERvAWeightCalcs.cxx
 )
 
 set(HEADERFILES
@@ -52,6 +53,7 @@ NUISANCEWeightEngine.h
 NUISANCEWeightCalcs.h
 NIWGWeightEngine.h
 OscWeightEngine.h
+MINERvAWeightCalcs.h
 )
 
 set(LIBNAME Reweight)

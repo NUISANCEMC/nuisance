@@ -1286,6 +1286,7 @@ void SystematicRoutines::GenerateThrows(){
     parameterTree->Fill();
   }
 
+  tempfile->cd();
   fSampleFCN->WriteIterationTree();
 
   tempfile->Close();

@@ -117,6 +117,11 @@ void SampleSettings::SetCovarInput(std::string val) {
 	SetDefault("covar", val);
 };
 
+void SampleSettings::SetShapeCovarInput(std::string val) {
+  SetDefault("shapecovar", val);
+};
+
+
 void SampleSettings::SetDefault(std::string name, std::string val) {
 	if (!fKeyValues.Has(name)) fKeyValues.AddS(name, val);
 };
