@@ -204,6 +204,8 @@ public:
   /// will also work.
   virtual void SetCorrelationFromRootFile(std::string covfile, std::string histname);
 
+  /// \brief Try to extract a shape-only matrix from the existing covariance
+  virtual void SetShapeCovar();
 
   /// \brief Read the cholesky decomposed covariance from a text file and turn it into a covariance
   ///
@@ -617,6 +619,7 @@ protected:
   TMatrixDSym* fFullCovar;  ///< Full Covariance
   TMatrixDSym* fDecomp;     ///< Decomposed Covariance
   TMatrixDSym* fCorrel;     ///< Correlation Matrix
+  TMatrixDSym* fShapeCovar;  ///< Shape-only covariance
 
   TMatrixDSym* fCovar;    ///< New FullCovar
   TMatrixDSym* fInvert;   ///< New covar

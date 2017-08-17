@@ -520,6 +520,19 @@ void JointMeas1D::SetCorrelationFromRootFile(std::string covfile, std::string hi
   delete correlation;
 }
 
+void JointMeas1D::SetShapeCovar(){
+
+  // Return if this is missing any pre-requisites
+  if (!fFullCovar) return;
+  if (!fDataHist) return;
+
+  // Also return if it's bloody stupid under the circumstances
+  if (fIsDiag) return;
+
+  fShapeCovar = StatUtils::ExtractShapeOnlyCovar(fFullCovar, fDataHist);
+  return;
+}
+
 
 //********************************************************************
 void JointMeas1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
@@ -649,7 +662,7 @@ void JointMeas1D::FinaliseMeasurement() {
 
   // Push the diagonals of fFullCovar onto the data histogram
   // Comment out until scaling is used consistently...
-  // StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   // Setup fMCHist from data
   fMCHist = (TH1D*)fDataHist->Clone();
