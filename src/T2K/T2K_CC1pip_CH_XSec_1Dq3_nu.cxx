@@ -16,7 +16,7 @@ T2K_CC1pip_CH_XSec_1Dq3_nu::T2K_CC1pip_CH_XSec_1Dq3_nu(std::string inputfile, Fi
 
   this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q3.root");
   this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Q3.root");
-
+  SetShapeCovar();
   this->SetupDefaultHist();
 
   this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
@@ -31,9 +31,9 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetDataValues(std::string fileLocation) {
   // Don't want the last bin of dataCopy
   TH1D *dataCopy = (TH1D*)(dataFile->Get("hResult_sliced_0_1"))->Clone();
 
-  double *binEdges = new double[dataCopy->GetNbinsX()-1];
+  double *binEdges = new double[dataCopy->GetNbinsX()-2];
   LOG(DEB) << dataCopy->GetNbinsX() << std::endl;
-  for (int i = 1; i < dataCopy->GetNbinsX(); i++) {
+  for (int i = 1; i < dataCopy->GetNbinsX()-1; i++) {
     binEdges[i-1] = dataCopy->GetBinLowEdge(i+1);
     LOG(DEB) << i-1 << " " << binEdges[i-1] << " from binLowEdge " << i+1 << std::endl;
   }
@@ -66,23 +66,19 @@ void T2K_CC1pip_CH_XSec_1Dq3_nu::SetCovarMatrix(std::string fileLocation) {
 
   if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
-  this->covar = new TMatrixDSym(nBinsX-2);
-  this->fFullCovar = new TMatrixDSym(nBinsX-2);
+  this->fFullCovar = new TMatrixDSym(nBinsX-3);
 
   // First two entries are BS
   // Last entry is BS
   for (int i = 2; i < nBinsX-1; i++) {
     for (int j = 2; j < nBinsY-1; j++) {
-      (*this->covar)(i-2, j-2) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
       (*this->fFullCovar)(i-2, j-2) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
-      LOG(DEB) << "covar(" << i-2 << ", " << j-2 << ") = " << (*this->covar)(i-2,j-2) << std::endl;
+      LOG(DEB) << "fFullCovar(" << i-2 << ", " << j-2 << ") = " << (*this->fFullCovar)(i-2,j-2) << std::endl;
     }
   } //should now have set covariance, I hope
 
-  TDecompChol tempMat = TDecompChol(*this->covar);
-  this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  //  *this->covar *= 1E-38*1E-38;
-
+  this->fDecomp = StatUtils::GetDecomp(this->fFullCovar);
+  this->covar   = StatUtils::GetInvert(this->fFullCovar);
   return;
 };
 

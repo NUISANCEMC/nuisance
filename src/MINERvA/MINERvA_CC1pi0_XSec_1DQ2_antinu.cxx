@@ -58,6 +58,7 @@ MINERvA_CC1pi0_XSec_1DQ2_antinu::MINERvA_CC1pi0_XSec_1DQ2_antinu(nuiskey samplek
   }
 
   SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-q2.csv");
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

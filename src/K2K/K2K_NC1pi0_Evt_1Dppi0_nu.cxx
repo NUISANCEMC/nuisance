@@ -44,13 +44,12 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey){
 
   FinaliseSampleSettings();
 
-  // Scaling Setup ---------------------------------------------------
-  // ScaleFactor for shape
-  fScaleFactor = (fDataHist->Integral() / (fNEvents + 0.));
-
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCovarFromDiagonal();
+
+  // Scale for shape
+  fScaleFactor = fDataHist->Integral()/double(fNEvents);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

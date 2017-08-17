@@ -52,6 +52,10 @@ if [[ "@USE_NuWro@" != "FALSE" ]]; then
     if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
       export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
     fi
+
+    if [[ "@NUWRO_INC@" ]]; then
+      export NUWRO_INC=@NUWRO_INC@
+    fi
   else
     echo "[INFO]: NuWro support included from input event file."
   fi

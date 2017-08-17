@@ -64,6 +64,7 @@ MiniBooNE_NC1pi0_XSec_1Dppi0_nu::MiniBooNE_NC1pi0_XSec_1Dppi0_nu(nuiskey samplek
   SetCovarFromTextFile( fSettings.GetCovarInput() );
   ScaleCovar(1.E-5);
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

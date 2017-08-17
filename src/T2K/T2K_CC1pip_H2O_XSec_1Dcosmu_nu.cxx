@@ -37,6 +37,7 @@ T2K_CC1pip_H2O_XSec_1Dcosmu_nu::T2K_CC1pip_H2O_XSec_1Dcosmu_nu(nuiskey samplekey
   SetDataFromRootFile(  fSettings.GetDataInput() );
   SetCovarFromRootFile( fSettings.GetCovarInput() );
   ScaleCovar(1E76);
+  SetShapeCovar();
   
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

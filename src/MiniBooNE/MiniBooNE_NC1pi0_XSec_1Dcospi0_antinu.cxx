@@ -51,7 +51,7 @@ MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(nui
     fSettings.DefineAllowedSpecies("numu,numub");
 
   }
-
+  
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
@@ -63,6 +63,7 @@ MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu::MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu(nui
   SetCovarFromTextFile( fSettings.GetCovarInput() );
   ScaleCovar(1.E-5);
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
