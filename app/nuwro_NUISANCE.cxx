@@ -198,11 +198,12 @@ std::string GetTargetDefinition(std::string target){
 
       // extract Z N
       int Z = TargetUtils::GetTargetZFromPDG(PDG);
+      int A =  TargetUtils::GetTargetAFromPDG(PDG);
       int N = TargetUtils::GetTargetAFromPDG(PDG) - Z;
       std::cout << "Target " << PDG << " Z" << Z << " N" << N << std::endl;
 
       // extract weight
-      int TOTAL = int(double(NUCLEONS)*W);
+      int TOTAL = round(double(NUCLEONS)*W / A);
 
       if (i == 1){
 	targetstring += (" -p \"target_content="
