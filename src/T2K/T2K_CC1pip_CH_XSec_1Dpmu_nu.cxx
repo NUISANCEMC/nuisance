@@ -37,6 +37,8 @@ T2K_CC1pip_CH_XSec_1Dpmu_nu::T2K_CC1pip_CH_XSec_1Dpmu_nu(nuiskey samplekey) {
   SetDataValues(  fSettings.GetDataInput() );
   SetCovarMatrix( fSettings.GetCovarInput() );
 
+  SetShapeCovar();
+
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
@@ -91,23 +93,19 @@ void T2K_CC1pip_CH_XSec_1Dpmu_nu::SetCovarMatrix(std::string fileLocation) {
 
   if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
-  this->covar = new TMatrixDSym(nBinsX-2);
   this->fFullCovar = new TMatrixDSym(nBinsX-2);
 
   // First two entries are BS
   // Last entry is BS
   for (int i = 1; i < nBinsX-1; i++) {
     for (int j = 1; j < nBinsY-1; j++) {
-      (*this->covar)(i-1, j-1) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
       (*this->fFullCovar)(i-1, j-1) = covarMatrix->GetBinContent(i+1, j+1); //adds syst+stat covariances
-      LOG(DEB) << "covar(" << i-1 << ", " << j-1 << ") = " << (*this->covar)(i-1,j-1) << std::endl;
+      LOG(DEB) << "fFullCovar(" << i-1 << ", " << j-1 << ") = " << (*this->fFullCovar)(i-1,j-1) << std::endl;
     }
   } //should now have set covariance, I hope
 
-  TDecompChol tempMat = TDecompChol(*this->covar);
-  this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  //  *this->covar *= 1E-38*1E-38;
-
+  this->fDecomp = StatUtils::GetDecomp(this->fFullCovar);
+  this->covar   = StatUtils::GetInvert(this->fFullCovar);
   return;
 };
 

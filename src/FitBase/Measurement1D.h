@@ -237,6 +237,8 @@ public:
   /// will also work.
   virtual void SetCholDecompFromRootFile(std::string covfile, std::string histname="");
 
+  /// \brief Try to extract a shape-only matrix from the existing covariance
+  virtual void SetShapeCovar();
 
   /// \brief Scale the data by some scale factor
   virtual void ScaleData(double scale);
@@ -599,6 +601,9 @@ protected:
   TMatrixDSym* fFullCovar;  ///< Full Covariance
   TMatrixDSym* fDecomp;     ///< Decomposed Covariance
   TMatrixDSym* fCorrel;     ///< Correlation Matrix
+
+  TMatrixDSym* fShapeCovar;  ///< Shape-only covariance
+  TMatrixDSym* fShapeDecomp; ///< Decomposed shape-only covariance
 
   TMatrixDSym* fCovar;    ///< New FullCovar
   TMatrixDSym* fInvert;   ///< New covar
