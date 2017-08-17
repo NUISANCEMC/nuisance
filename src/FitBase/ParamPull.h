@@ -42,6 +42,7 @@
 #include <TMatrixDSym.h>
 #include <TDecompSVD.h>
 #include <TVectorD.h>
+#include "TRandom3.h"
 
 // Fit Includes
 #include "PlotUtils.h"
