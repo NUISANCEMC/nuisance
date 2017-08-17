@@ -189,8 +189,8 @@ void MINERvA_CCNpip_XSec_1DTpi_nu::FillHistograms() {
 //********************************************************************
 
   if (Signal) {
-    unsigned int nPions = GetPionBox()->fTpiVect.size();
 
+    unsigned int nPions = GetPionBox()->fTpiVect.size();
     // Need to loop over all the pions in the sample
     for (size_t k = 0; k < nPions; ++k) {
       double tpi = GetPionBox()->fTpiVect[k];
