@@ -946,7 +946,6 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
 
   // Create map if required
   if (!map) map = StatUtils::GenerateMap(data);
-  std::cout << data << " " << cov <<  " " << map <<  " " << scale << std::endl;
 
   // Set Bin Errors from cov diag
   int count = 0;
@@ -963,6 +962,68 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
 
   return;
 }
+
+
+TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar, TH1* data_hist, double data_scale){
+
+  int nbins = full_covar->GetNrows();
+  TMatrixDSym* shape_covar = new TMatrixDSym(nbins);
+
+  // Check nobody is being silly
+  if (data_hist->GetNbinsX() != nbins){
+    ERR(WRN) << "Inconsistent matrix and data histogram passed to StatUtils::ExtractShapeOnlyCovar!" << std::endl;
+    ERR(WRN) << "data_hist has " << data_hist->GetNbinsX() << " matrix has " << nbins << std::endl;
+    int err_bins = data_hist->GetNbinsX();
+    if (nbins > err_bins) err_bins = nbins;
+    for (int i = 0; i < err_bins; ++i){
+      ERR(FTL) << "Matrix diag. = " << (*full_covar)(i, i) << " data = " << data_hist->GetBinContent(i+1) << std::endl;
+    }
+    return NULL;
+  }
+
+  double total_data  = 0;
+  double total_covar = 0;
+  
+  // Initial loop to calculate some constants
+  for (int i = 0; i < nbins; ++i) {
+    total_data += data_hist->GetBinContent(i+1)*data_scale;
+    for (int j = 0; j < nbins; ++j) {
+      total_covar += (*full_covar)(i,j);
+    }
+  }
+  
+  if (total_data == 0 || total_covar == 0){
+    ERR(WRN) << "Stupid matrix or data histogram passed to StatUtils::ExtractShapeOnlyCovar! Ignoring..." << std::endl;
+    return NULL;
+  }
+
+  LOG(SAM) << "Norm error = " << sqrt(total_covar)/total_data << std::endl;
+  
+  // Now loop over and calculate the shape-only matrix
+  for (int i = 0; i < nbins; ++i) {
+    double data_i = data_hist->GetBinContent(i+1)*data_scale;
+
+    for (int j = 0; j < nbins; ++j) {
+      double data_j = data_hist->GetBinContent(j+1)*data_scale;
+	
+      double norm_term = data_i*data_j*total_covar/total_data/total_data;
+      double mix_sum1 = 0;
+      double mix_sum2 = 0;
+      
+      for (int k = 0; k < nbins; ++k){
+	mix_sum1 += (*full_covar)(k,j);
+	mix_sum2 += (*full_covar)(i,k);
+      }
+
+      double mix_term1 = data_i*(mix_sum1/total_data - total_covar*data_j/total_data/total_data);
+      double mix_term2 = data_j*(mix_sum2/total_data - total_covar*data_i/total_data/total_data);
+      
+      (*shape_covar)(i, j) = (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
+    }
+  }
+  return shape_covar;
+}
+
 
 //*******************************************************************
 TH2I* StatUtils::GenerateMap(TH2D* hist) {
