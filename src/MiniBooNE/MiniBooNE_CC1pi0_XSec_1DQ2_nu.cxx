@@ -54,6 +54,7 @@ MiniBooNE_CC1pi0_XSec_1DQ2_nu::MiniBooNE_CC1pi0_XSec_1DQ2_nu(nuiskey samplekey) 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCorrelationFromTextFile( fSettings.GetCovarInput() );
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

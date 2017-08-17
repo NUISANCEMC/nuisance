@@ -45,6 +45,7 @@ MiniBooNE_CC1pi0_XSec_1Dppi0_nu::MiniBooNE_CC1pi0_XSec_1Dppi0_nu(nuiskey confkey
   // 3. Plot Setup -------------------------------------------------------
   SetDataValues( fSettings.GetDataInput() );
   SetCovarMatrixFromCorrText( fSettings.GetCovarInput(), fDataHist->GetNbinsX() );
+  SetShapeCovar();
 
   // Create a Target Species Stack copying data
   fTargetStack = new TargetTypeStack( fSettings.Name() + "_TGT", 

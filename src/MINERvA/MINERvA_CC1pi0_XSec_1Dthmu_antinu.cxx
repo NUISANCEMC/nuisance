@@ -58,6 +58,7 @@ MINERvA_CC1pi0_XSec_1Dthmu_antinu::MINERvA_CC1pi0_XSec_1Dthmu_antinu(nuiskey sam
   }
 
   SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-muon-angle.csv");
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
