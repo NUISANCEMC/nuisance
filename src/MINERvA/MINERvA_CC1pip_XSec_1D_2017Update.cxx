@@ -120,6 +120,7 @@ MINERvA_CC1pip_XSec_1D_2017Update::MINERvA_CC1pip_XSec_1D_2017Update(nuiskey sam
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   SetCorrelationFromTextFile( fSettings.GetCovarInput() );
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

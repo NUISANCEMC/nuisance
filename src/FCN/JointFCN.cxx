@@ -283,8 +283,9 @@ int JointFCN::GetNDOF() {
   }
 
   // Set Data Variable
+  if (fIterationTree){
   fSampleNDOF[count] = totaldof;
-
+  }
   return totaldof;
 }
 
@@ -337,6 +338,9 @@ double JointFCN::GetLikelihood() {
 
   // Set Data Variable
   fLikelihood = like;
+  if (fIterationTree){
+    fSampleLikes[count] = fLikelihood;
+  }
 
   return like;
 };
