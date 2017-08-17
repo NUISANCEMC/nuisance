@@ -57,13 +57,14 @@ else()
     cmessage(FATAL_ERROR "Variable NUWRO is not defined. "
       "This must be set to point to a prebuilt NuWro instance.")
   endif()
-  if(NUWRO_INC STREQUAL "")
-    cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
-      "This must be set to point to an installed NuWro instance.")
-  endif()
 
   # If you are using a version of NuWro without reweighting use this to compile.
   if(USE_NuWro_RW)
+
+    if(NUWRO_INC STREQUAL "")
+      cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
+        "This must be set to point to an installed NuWro instance.")
+    endif()
 
     LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__)
 
@@ -84,7 +85,25 @@ else()
 
     LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO}/src)
 
-    LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO}/bin/event1.so)
+    if(NOT EXISTS ${NUWRO}/bin/event1.so)
+      if(EXISTS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
+
+        if(NUWRO_INC STREQUAL "")
+          cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
+            "This must be set to point to an installed NuWro instance.")
+        endif()
+
+        LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUWRO_INC}/nuwro)
+
+        LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
+        LIST(APPEND EXTRA_LIBS event)
+      else()
+        cmessage(FATAL_ERROR "Expected to find the NuWro event library in: ${NUWRO}/bin/event1.so, or if using NuWro with reweight support: ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib/libevent.a. Is NuWro built?")
+      endif()
+    else()
+      LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO}/bin/event1.so)
+    endif()
+
   endif()
 
   set(NEED_PYTHIA6 TRUE)
