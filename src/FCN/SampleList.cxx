@@ -209,7 +209,8 @@
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
 #include "MINERvA_CC1pip_XSec_1D_2017Update.h"
 
-
+#include "MINERvA_CC0pi_XSec_2Dptpx_nu.h"
+#include "MINERvA_CC0pi_XSec_2Dptpx_antinu.h"
 
 #endif
 
@@ -708,6 +709,12 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
+    
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_nu")){
+	return (new MINERvA_CC0pi_XSec_2Dptpx_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")){
+	return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
 
     /*
       CC1pi+

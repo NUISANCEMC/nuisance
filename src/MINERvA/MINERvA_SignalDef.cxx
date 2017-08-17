@@ -301,5 +301,84 @@ bool isCC1pi0_MINERvA_2016(FitEvent *event, double EnuMin, double EnuMax) {
 
   return CC1pi0_anu;
 }
+  //********************************************************************
+  bool isCC0pi_MINERvAPTPZ(FitEvent* event, int nuPDG, double emin, double emax){
+    //********************************************************************
+    // Check it's CCINC
+    if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
+
+    // Make Angle Cut > 20.0
+    TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+    TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+    double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+    if (th_nu_mu >= 20.0) return false;
+
+    int genie_n_muons         = 0;
+    int genie_n_mesons        = 0;
+    int genie_n_heavy_baryons_plus_pi0s = 0;
+    int genie_n_photons       = 0;
+
+    for(int i = 0; i < event->NParticles(); ++i) {
+      FitParticle* p = event->GetParticle(i);
+      if (p->Status() != kFinalState) continue;
+
+      int pdg =  p->fPID;
+      double energy = p->fP.E();
+
+      if( abs(pdg) == 13 )
+	genie_n_muons++;
+      else if( pdg == 22 && energy > 10.0 )
+	genie_n_photons++;
+      else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311 || pdg == 313 )
+	genie_n_mesons++;
+      else if( pdg == 3112 || pdg == 3122 || pdg == 3212 || pdg == 3222 || pdg == 4112 ||
+	       pdg == 4122 || pdg == 4212 || pdg == 4222 || pdg == 411  || pdg == 421  || pdg == 111 )
+	genie_n_heavy_baryons_plus_pi0s++;
+    }
+
+    if( genie_n_muons         == 1 &&
+      genie_n_mesons        == 0 &&
+      genie_n_heavy_baryons_plus_pi0s == 0 &&
+	genie_n_photons       == 0 ) return true;
+    return false;
+  }
+
+  bool isCC0pi_anti_MINERvAPTPZ(FitEvent* event, int nuPDG, double emin, double emax){
+
+    // Check it's CCINC
+    if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
+    // Make Angle Cut > 20.0
+    TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
+    TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
+    double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
+    if (th_nu_mu >= 20.0) return false;
+    int genie_n_muons         = 0;
+    int genie_n_mesons        = 0;
+    int genie_n_heavy_baryons_plus_pi0s = 0;
+    int genie_n_photons       = 0;
+
+    for(int i = 0; i < event->NParticles(); ++i) {
+      FitParticle* p = event->GetParticle(i);
+      if (p->Status() != kFinalState) continue;
+
+      int pdg =  p->fPID;
+      double energy = p->fP.E();
+
+      if( abs(pdg) == 13 )
+        genie_n_muons++;
+      else if( pdg == 22 && energy > 10.0 )
+        genie_n_photons++;
+      else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || abs(pdg) == 111 || abs(pdg) == 130 || abs(pdg) == 310 || abs(pdg) == 311 || abs(pdg) == 313 )
+        genie_n_mesons++;
+      else if( abs(pdg) == 3112 || abs(pdg) == 3122 || abs(pdg) == 3212 || abs(pdg) == 3222 || abs(pdg) == 4112 ||
+	       abs(pdg) == 4122 || abs(pdg) == 4212 || abs(pdg) == 4222 || abs(pdg) == 411  || abs(pdg) == 421  ||
+	       abs(pdg) == 111 )
+        genie_n_heavy_baryons_plus_pi0s++;
+    }
+    
+    if( genie_n_muons == 1 && genie_n_mesons == 0 && genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons       == 0 )
+      return true;
+    return false;
+  }
 
 }
