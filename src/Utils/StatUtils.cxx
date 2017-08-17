@@ -976,7 +976,7 @@ TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar, TH1* data
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins) err_bins = nbins;
     for (int i = 0; i < err_bins; ++i){
-      ERR(FTL) << "Matrix diag. = " << (*full_covar)(i, i) << " data = " << data_hist->GetBinContent(i+1) << std::endl;
+      ERR(WRN) << "Matrix diag. = " << (*full_covar)(i, i) << " data = " << data_hist->GetBinContent(i+1) << std::endl;
     }
     return NULL;
   }
