@@ -23,7 +23,7 @@
 #include "TH2.h"
 #include "TH3.h"
 
-// #define DEBUG_EFFAPP
+//#define DEBUG_EFFAPP
 
 EfficiencyApplicator::DependVar GetVarType(std::string const &axisvar) {
   if (axisvar == "kMomentum") {
@@ -300,6 +300,11 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
   }
 #ifdef DEBUG_EFFAPP
   std::cout << std::endl;
+#endif
+
+#ifdef DEBUG_EFFAPP
+  std::cout << "Reconstructed " << ri->RecObjMom.size() << " particles. "
+            << std::endl;
 #endif
   return ri;
 }
