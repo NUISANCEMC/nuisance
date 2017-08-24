@@ -23,7 +23,7 @@
 #include "TH2.h"
 #include "TH3.h"
 
-#define DEBUG_EFFAPP
+// #define DEBUG_EFFAPP
 
 EfficiencyApplicator::DependVar GetVarType(std::string const &axisvar) {
   if (axisvar == "kMomentum") {
