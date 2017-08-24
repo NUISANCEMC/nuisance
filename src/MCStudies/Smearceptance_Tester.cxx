@@ -423,6 +423,7 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   KEFSHad_cpim_rec =
       SumKE_RecoInfo(*ri, cpimPDG, PhysConst::mass_cpi * PhysConst::mass_MeV);
   KEFSHad_cpi_rec = KEFSHad_cpip_rec + KEFSHad_cpim_rec;
+
   TEFSHad_pi0_rec =
       SumTE_RecoInfo(*ri, pi0PDG, PhysConst::mass_pi0 * PhysConst::mass_MeV);
   KEFSHad_p_rec = SumKE_RecoInfo(*ri, ProtonPDG,

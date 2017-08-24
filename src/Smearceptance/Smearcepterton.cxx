@@ -54,7 +54,7 @@ void Smearcepterton::InitialiserSmearcepters() {
        ++smearB_it) {
     std::vector<nuiskey> smearcepters =
         smearcepterBlocks[smearB_it].GetListOfChildNodes();
-    for (size_t smear_it = 0; smear_it < smearcepterBlocks.size(); ++smear_it) {
+    for (size_t smear_it = 0; smear_it < smearcepters.size(); ++smear_it) {
       std::string const& smearType = smearcepters[smear_it].GetElementName();
 
       if (!factories.count(smearType)) {
