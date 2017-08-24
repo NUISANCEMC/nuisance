@@ -22,6 +22,7 @@ public:
 
   // Add a new RW engine given type
   void AddRWEngine(int rwtype);
+  WeightEngineBase* GetRWEngine(int type);
 
   // Includes
   void IncludeDial(std::string name, std::string type, double val = -9999.9);
@@ -35,7 +36,7 @@ public:
 
   double GetDialValue(std::string name);
   double GetDialValue(int rwenum);
-  
+
   int GetDialPos(std::string name);
   int GetDialPos(int rwenum);
 

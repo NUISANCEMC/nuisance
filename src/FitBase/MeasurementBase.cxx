@@ -32,6 +32,7 @@ MeasurementBase::MeasurementBase(void) {
   fMCFilled = false;
   fNoData = false;
   fInput = NULL;
+  NSignal = 0;
 
   // Set the default values
   // After-wards this gets set in SetupMeasurement
@@ -169,7 +170,7 @@ void MeasurementBase::FinaliseSampleSettings() {
 //***********************************************
 void MeasurementBase::Reconfigure() {
 //***********************************************
-  
+
   LOG(REC) << " Reconfiguring sample " << fName << std::endl;
 
   // Reset Histograms
@@ -281,7 +282,7 @@ MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
   Signal = this->isSignal(event);
 
   GetBox()->FillBoxFromEvent(event);
-  
+
   GetBox()->SetX(fXVar);
   GetBox()->SetY(fYVar);
   GetBox()->SetZ(fZVar);
@@ -438,17 +439,17 @@ void MeasurementBase::SetAutoProcessTH1(TH1* hist, int c1, int c2, int c3, int c
 
 void MeasurementBase::SetAutoProcess(TH1* hist, int c1, int c2, int c3, int c4, int c5) {
   FakeStack* fake = new FakeStack(hist);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!                                                                                                                                                            
+  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
 }
 
 void MeasurementBase::SetAutoProcess(TGraph* g, int c1, int c2, int c3, int c4, int c5) {
   FakeStack* fake = new FakeStack(g);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!                                                                                                                                                            
+  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
 }
 
 void MeasurementBase::SetAutoProcess(TF1* f, int c1, int c2, int c3, int c4, int c5) {
   FakeStack* fake = new FakeStack(f);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!                                                                                                                                                            
+  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
 }
 
 void MeasurementBase::SetAutoProcess(StackBase* hist,  int c1, int c2, int c3, int c4, int c5){

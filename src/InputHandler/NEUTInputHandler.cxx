@@ -157,6 +157,23 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
+#ifdef __PROB3PP_ENABLED__
+  else {
+
+    for (size_t i = 0; i < npart; i++) {
+      NeutPart* part = fNUISANCEEvent->fNeutVect->PartInfo(i);
+      if ((part->fIsAlive == false) && (part->fStatus == -1) &&
+          std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
+                     part->fPID)) {
+        fNUISANCEEvent->probe_E = part->fP.T();
+        fNUISANCEEvent->probe_pdg = part->fPID;
+        break;
+      } else {
+        continue;
+      }
+    }
+  }
+#endif
 
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);

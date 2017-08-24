@@ -17,20 +17,37 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef SIMPLE_OSC_H_SEEN
-#define SIMPLE_OSC_H_SEEN
+#ifndef EFFICIENCYAPPLICATOR_HXX_SEEN
+#define EFFICIENCYAPPLICATOR_HXX_SEEN
 
-#include "Measurement1D.h"
+#include "ISmearcepter.h"
 
-class Simple_Osc : public Measurement1D {
+#include "TRandom3.h"
+
+#include <map>
+
+class EfficiencyApplicator : public ISmearcepter {
 public:
-  Simple_Osc(nuiskey samplekey);
+  enum DependVar { kMomentum, kKE, kTheta, kCosTheta, kPhi, kNoAxis };
+private:
+  struct EffMap {
+    TH1D *EffCurve;
+    bool Interpolate;
+    // Need to work out how best to apply this.
+    //bool ApplyAsWeight;
+    int NDims;
+    EfficiencyApplicator::DependVar DependVars[3];
+    double AxisScales[3];
+  };
+  std::map<int, EffMap> Efficiencies;
 
-  virtual ~Simple_Osc() {};
+  void SpecifcSetup(nuiskey &);
 
-  void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
+  TRandom3 rand;
 
+ public:
+  RecoInfo *Smearcept(FitEvent *);
+  ~EfficiencyApplicator();
 };
 
 #endif

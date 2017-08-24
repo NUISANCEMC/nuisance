@@ -31,6 +31,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "FitLogger.h"
 
 /// namespace to contain all physical constants used by NUISANCE
@@ -43,6 +44,30 @@ const double mass_muon = 0.10565837;          // Muon mass in GeV
 const double mass_electron = 0.000510998928;  // Electron mass in GeV
 const double mass_cpi = 0.13957;              // charged pion mass in GeV
 const double mass_pi0 = 0.13498;              // neutral pion mass in GeV
+
+inline double GetMass(int pdg) {
+  switch (pdg) {
+    case 11:
+      return mass_electron;
+    case 13:
+      return mass_muon;
+    case 111:
+      return mass_pi0;
+    case 211:
+    case -211:
+      return mass_cpi;
+    case 2112:
+      return mass_neutron;
+    case 2212:
+      return mass_proton;
+    default: {
+      ERROR(WRN, "Attempted to get mass for PDG: "
+                     << pdg << ", but it is not catered for. Please add it to "
+                               "src/Utils/PhysConst.h");
+      return -1;
+    }
+  }
+}
 
 const double mass_MeV = 1000;  // MeV/GeV
 

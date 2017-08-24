@@ -17,20 +17,24 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef SIMPLE_OSC_H_SEEN
-#define SIMPLE_OSC_H_SEEN
+#ifndef MetaSimpleSmearcepter_HXX_SEEN
+#define MetaSimpleSmearcepter_HXX_SEEN
 
-#include "Measurement1D.h"
+#include "ISmearcepter.h"
 
-class Simple_Osc : public Measurement1D {
-public:
-  Simple_Osc(nuiskey samplekey);
+#include <map>
 
-  virtual ~Simple_Osc() {};
+class MetaSimpleSmearcepter : public ISmearcepter {
 
-  void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
+ private:
 
+  size_t NSmearcepters;
+  std::vector<ISmearcepter *> Smearcepters;
+
+  void SpecifcSetup(nuiskey &);
+
+ public:
+  RecoInfo *Smearcept(FitEvent *);
 };
 
 #endif

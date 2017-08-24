@@ -17,20 +17,39 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef SIMPLE_OSC_H_SEEN
-#define SIMPLE_OSC_H_SEEN
+#ifndef GAUSSIANSMEARER_HXX_SEEN
+#define GAUSSIANSMEARER_HXX_SEEN
 
-#include "Measurement1D.h"
+#include "ISmearcepter.h"
 
-class Simple_Osc : public Measurement1D {
-public:
-  Simple_Osc(nuiskey samplekey);
+#include <map>
 
-  virtual ~Simple_Osc() {};
+class GaussianSmearer : public ISmearcepter {
+ public:
+  enum GSmearType { kAbsolute, kFractional, kFunction, kNoType };
+  enum DependVar { kMomentum, kKE, kKEVis, kTEVis, kCosTheta, kTheta, kNoVar };
 
-  void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
+ private:
+  struct GSmear {
+    GSmearType type;
+    DependVar smearVar;
+    double width;
+    TF1 *func;
+    ~GSmear() { delete func; }
+  };
 
+  std::map<int, std::vector<GSmear> > TrackedGausSmears;
+  std::map<int, GSmear> VisGausSmears;
+
+  TRandom3 rand;
+
+  void SpecifcSetup(nuiskey &);
+
+ public:
+  RecoInfo *Smearcept(FitEvent *);
+  /// Helper method for using this class as a component in a more complex
+  /// smearer
+  void SmearRecoInfo(RecoInfo *);
 };
 
 #endif

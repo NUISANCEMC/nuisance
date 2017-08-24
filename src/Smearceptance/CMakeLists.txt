@@ -20,14 +20,26 @@ set(HEADERFILES
 ISmearcepter.h
 Smearcepterton.h
 
+EfficiencyApplicator.h
 ThresholdAccepter.h
+TrackedMomentumMatrixSmearer.h
+GaussianSmearer.h
+
+MetaSimpleSmearcepter.h
+SmearceptanceUtils.h
 )
 
 set(IMPLFILES
 ISmearcepter.cxx
 Smearcepterton.cxx
 
+EfficiencyApplicator.cxx
 ThresholdAccepter.cxx
+TrackedMomentumMatrixSmearer.cxx
+GaussianSmearer.cxx
+
+MetaSimpleSmearcepter.cxx
+SmearceptanceUtils.cxx
 )
 
 set(LIBNAME Smearceptance)

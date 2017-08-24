@@ -135,6 +135,9 @@ FitEvent* InputHandlerBase::FirstNuisanceEvent() {
 
 FitEvent* InputHandlerBase::NextNuisanceEvent() {
   fCurrentIndex++;
+  if((fMaxEvents != -1) && (fCurrentIndex > fMaxEvents)){
+    return NULL;
+  }
 
   return GetNuisanceEvent(fCurrentIndex);
 };
@@ -206,7 +209,7 @@ void InputHandlerBase::SetupJointInputs() {
   if (fMaxEvents != -1 and jointeventinputs.size() > 1){
     THROW("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
-  
+
   for (size_t i = 0; i < jointeventinputs.size(); i++) {
     TH1D* eventhist = (TH1D*) jointeventinputs.at(i)->Clone();
 

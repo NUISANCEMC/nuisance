@@ -28,6 +28,8 @@
 #include "OscWeightEngine.h"
 #endif
 
+#define DEBUG_SMEARTESTER
+
 //********************************************************************
 class Smearceptance_Tester : public Measurement1D {
   //********************************************************************
@@ -65,10 +67,6 @@ class Smearceptance_Tester : public Measurement1D {
 
  private:
   ISmearcepter *smearceptor;
-#ifdef __PROB3PP_ENABLED__
-  OscWeightEngine *OscWeighter;
-  float OscWeight;
-#endif
 
   TTree *eventVariables;
 
@@ -147,6 +145,7 @@ class Smearceptance_Tester : public Measurement1D {
   float RWWeight;
   float InputWeight;
   float FluxWeight;
+  float EffWeight;
 
   float xsecScaling;
 
@@ -155,6 +154,18 @@ class Smearceptance_Tester : public Measurement1D {
 
   bool flagCCINC_rec;
   bool flagCC0Pi_rec;
+
+#ifdef DEBUG_SMEARTESTER
+  TVector3 FSMuon_True;
+  TVector3 FSMuon_Smeared;
+#endif
+
+  int SVDTruncation;
+
+  TH2D *RecoSmear;
+  TH1D *ETrueDistrib;
+  TH1D *ERecDistrib;
+
 };
 
 #endif

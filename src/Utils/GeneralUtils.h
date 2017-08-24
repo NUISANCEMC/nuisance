@@ -32,7 +32,6 @@
 #include <string>
 #include <vector>
 #include "FitLogger.h"
-#include "PhysConst.h"
 
 /*!
  *  \addtogroup Utils
@@ -56,7 +55,7 @@ std::vector<int> ParseToInt(std::string str, const char* del);
 /// Parse a string into a vector of strings given a delimiter "del"
 std::vector<std::string> ParseToStr(std::string str, const char* del);
 
-/// Parse text file into a vector of strings 
+/// Parse text file into a vector of strings
 std::vector<std::string> ParseFileToStr(std::string str, const char* del);
 
 /// Convert a string to a double
@@ -126,6 +125,10 @@ size_t IsSmallNum(T const& d) {
   return (((d > 0) && (d < std::numeric_limits<T>::epsilon())) ||
           ((d < 0) && (d > -std::numeric_limits<T>::epsilon())));
 }
+
+std::string ReplaceAll(std::string const &inp, std::string const &from,
+                    std::string const &to);
+
 }
 
 /*! @} */

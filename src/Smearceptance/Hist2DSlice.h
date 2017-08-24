@@ -17,20 +17,27 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef SIMPLE_OSC_H_SEEN
-#define SIMPLE_OSC_H_SEEN
+#ifndef HIST2DSLICE_HXX_SEEN
+#define HIST2DSLICE_HXX_SEEN
 
-#include "Measurement1D.h"
+class Hist2DSlice {
+  TH1D *Slice;
 
-class Simple_Osc : public Measurement1D {
-public:
-  Simple_Osc(nuiskey samplekey);
+  bool IsSparse;
+  std::vector<std::pair<Int_t, double> > SparseBins;
+  double Max;
+  Int_t NOrigBinsX;
 
-  virtual ~Simple_Osc() {};
+  Int_t GetNbinsX();
+  double GetBinContent_Index(size_t i);
+  double GetBinNumber_Index(size_t i);
+  double GetBinContent_BinNum(Int_t i);
+  double GetMaximum();
 
-  void FillEventVariables(FitEvent *event);
-  bool isSignal(FitEvent *event);
-
+ public:
+  Hist2DSlice(TH2D const *Hist, Int_t YBinNum);
+  Int_t ThrowBin(TRandom3 *);
+  double ThrowXValue(TRandom3 *);
 };
 
 #endif
