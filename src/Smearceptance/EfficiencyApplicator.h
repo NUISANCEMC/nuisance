@@ -31,7 +31,7 @@ public:
   enum DependVar { kMomentum, kKE, kTheta, kCosTheta, kPhi, kNoAxis };
 private:
   struct EffMap {
-    TH1D *EffCurve;
+    TH1 *EffCurve;
     bool Interpolate;
     // Need to work out how best to apply this.
     //bool ApplyAsWeight;

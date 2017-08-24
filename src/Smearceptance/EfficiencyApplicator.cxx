@@ -20,8 +20,10 @@
 #include "EfficiencyApplicator.h"
 
 #include "TEfficiency.h"
+#include "TH2.h"
+#include "TH3.h"
 
-//#define DEBUG_EFFAPP
+#define DEBUG_EFFAPP
 
 EfficiencyApplicator::DependVar GetVarType(std::string const &axisvar) {
   if (axisvar == "kMomentum") {
@@ -38,8 +40,8 @@ EfficiencyApplicator::DependVar GetVarType(std::string const &axisvar) {
   return EfficiencyApplicator::kNoAxis;
 }
 
-TH1D *GetEffHist(TFile *inputFile, std::string const &HistName) {
-  TH1D *hist = dynamic_cast<TH1D *>(inputFile->Get(HistName.c_str()));
+TH1 *GetEffHist(TFile *inputFile, std::string const &HistName) {
+  TH1 *hist = dynamic_cast<TH1 *>(inputFile->Get(HistName.c_str()));
   if (hist) {
     return hist;
   }
@@ -92,7 +94,7 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
       THROW("Couldn't open specified input root file: " << inputFileName);
     }
 
-    TH1D *inpHist = GetEffHist(&inputFile, HistName);
+    TH1 *inpHist = GetEffHist(&inputFile, HistName);
     if (!inpHist) {
       THROW("Couldn't get TH1D named: " << HistName << " from input root file: "
                                         << inputFileName);
@@ -140,7 +142,7 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
       }
 
       EffMap em;
-      em.EffCurve = static_cast<TH1D *>(inpHist->Clone());
+      em.EffCurve = static_cast<TH1 *>(inpHist->Clone());
       em.EffCurve->SetDirectory(NULL);
       em.Interpolate = Interpolate;
       // em.ApplyAsWeight = ApplyAsWeight;
@@ -220,50 +222,60 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
 
     switch (em.NDims) {
       case 1: {
+        TH1 *hist = em.EffCurve;
         if (em.Interpolate &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(
-                 em.EffCurve->GetXaxis()->GetNbins()) > kineProps[0])) {
-          effProb = em.EffCurve->Interpolate(kineProps[0]);
+            (hist->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
+            (hist->GetXaxis()->GetBinCenter(hist->GetXaxis()->GetNbins()) >
+             kineProps[0])) {
+          effProb = hist->Interpolate(kineProps[0]);
         } else {
-          Int_t xbin = em.EffCurve->GetXaxis()->FindFixBin(kineProps[0]);
-          effProb = em.EffCurve->GetBinContent(xbin);
+          Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
+          effProb = hist->GetBinContent(xbin);
         }
         break;
       }
       case 2: {
+        TH2 *hist = static_cast<TH2 *>(em.EffCurve);
+
         if (em.Interpolate &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(
-                 em.EffCurve->GetXaxis()->GetNbins()) > kineProps[0]) &&
-            (em.EffCurve->GetYaxis()->GetBinCenter(1) < kineProps[1]) &&
-            (em.EffCurve->GetYaxis()->GetBinCenter(
-                 em.EffCurve->GetYaxis()->GetNbins()) > kineProps[1])) {
-          effProb = em.EffCurve->Interpolate(kineProps[0], kineProps[1]);
+            (hist->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
+            (hist->GetXaxis()->GetBinCenter(hist->GetXaxis()->GetNbins()) >
+             kineProps[0]) &&
+            (hist->GetYaxis()->GetBinCenter(1) < kineProps[1]) &&
+            (hist->GetYaxis()->GetBinCenter(hist->GetYaxis()->GetNbins()) >
+             kineProps[1])) {
+          effProb = hist->Interpolate(kineProps[0], kineProps[1]);
         } else {
-          Int_t xbin = em.EffCurve->GetXaxis()->FindFixBin(kineProps[0]);
-          Int_t ybin = em.EffCurve->GetYaxis()->FindFixBin(kineProps[1]);
-          effProb = em.EffCurve->GetBinContent(xbin, ybin);
+          Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
+          Int_t ybin = hist->GetYaxis()->FindFixBin(kineProps[1]);
+          effProb = hist->GetBinContent(xbin, ybin);
+
+#ifdef DEBUG_EFFAPP
+          std::cout << "\t\t: XProp: " << kineProps[0]
+                    << ", YProp: " << kineProps[1] << " x/y bins: " << xbin
+                    << "/" << ybin << ". Prop ? " << effProb << std::endl;
+#endif
         }
         break;
       }
       case 3: {
+        TH3 *hist = static_cast<TH3 *>(em.EffCurve);
+
         if (em.Interpolate &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
-            (em.EffCurve->GetXaxis()->GetBinCenter(
-                 em.EffCurve->GetXaxis()->GetNbins()) > kineProps[0]) &&
-            (em.EffCurve->GetYaxis()->GetBinCenter(1) < kineProps[1]) &&
-            (em.EffCurve->GetYaxis()->GetBinCenter(
-                 em.EffCurve->GetYaxis()->GetNbins()) > kineProps[2]) &&
-            (em.EffCurve->GetZaxis()->GetBinCenter(
-                 em.EffCurve->GetZaxis()->GetNbins()) > kineProps[2])) {
-          effProb = em.EffCurve->Interpolate(kineProps[0], kineProps[1],
-                                             kineProps[2]);
+            (hist->GetXaxis()->GetBinCenter(1) < kineProps[0]) &&
+            (hist->GetXaxis()->GetBinCenter(hist->GetXaxis()->GetNbins()) >
+             kineProps[0]) &&
+            (hist->GetYaxis()->GetBinCenter(1) < kineProps[1]) &&
+            (hist->GetYaxis()->GetBinCenter(hist->GetYaxis()->GetNbins()) >
+             kineProps[2]) &&
+            (hist->GetZaxis()->GetBinCenter(hist->GetZaxis()->GetNbins()) >
+             kineProps[2])) {
+          effProb = hist->Interpolate(kineProps[0], kineProps[1], kineProps[2]);
         } else {
-          Int_t xbin = em.EffCurve->GetXaxis()->FindFixBin(kineProps[0]);
-          Int_t ybin = em.EffCurve->GetYaxis()->FindFixBin(kineProps[1]);
-          Int_t zbin = em.EffCurve->GetZaxis()->FindFixBin(kineProps[2]);
-          effProb = em.EffCurve->GetBinContent(xbin, ybin, zbin);
+          Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
+          Int_t ybin = hist->GetYaxis()->FindFixBin(kineProps[1]);
+          Int_t zbin = hist->GetZaxis()->FindFixBin(kineProps[2]);
+          effProb = hist->GetBinContent(xbin, ybin, zbin);
         }
         break;
       }
