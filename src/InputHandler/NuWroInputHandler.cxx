@@ -100,7 +100,9 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle,
   fNuWroTree->GetEntry(0);
 
   fNUISANCEEvent = new FitEvent();
-  fNUISANCEEvent->SetNuwroEvent(fNuWroEvent);
+  fNUISANCEEvent->fType = kNUWRO;
+  fNUISANCEEvent->fNuwroEvent = fNuWroEvent;
+
   fNUISANCEEvent->HardReset();
 
   if (fSaveExtra) {
@@ -139,19 +141,32 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
-
+#ifdef __PROB3PP_ENABLED__
+  for (size_t i = 0; i < fNUISANCEEvent->fNuwroEvent->in.size(); i++) {
+    if (std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
+                   fNUISANCEEvent->fNuwroEvent->in[i].pdg)) {
+      fNUISANCEEvent->probe_E = fNUISANCEEvent->fNuwroEvent->in[i].t;
+      fNUISANCEEvent->probe_pdg = fNUISANCEEvent->fNuwroEvent->in[i].pdg;
+      break;
+    }
+  }
+#endif
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
 
 #ifdef __USE_NUWRO_SRW_EVENTS__
-  if(!rwEvs.size()){
+  if (!rwEvs.size()) {
     fNuwroParams = fNuWroEvent->par;
   }
+
+
   if (entry >= rwEvs.size()) {
     rwEvs.push_back(BaseFitEvt());
-    rwEvs.back().SetNuwroEvent(fNuWroEvent);
+    rwEvs.back().fNuwroSRWEvent = SRW::SRWEvent(*fNuWroEvent);
     rwEvs.back().fNuwroEvent = NULL;
     rwEvs.back().fNuwroParams = &fNuwroParams;
+    rwEvs.back().probe_E = rwEvs.back().fNuwroSRWEvent.NeutrinoEnergy;
+    rwEvs.back().probe_pdg = rwEvs.back().fNuwroSRWEvent.NeutrinoPDG;
   }
 #endif
 

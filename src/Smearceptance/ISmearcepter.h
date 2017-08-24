@@ -35,7 +35,8 @@ struct RecoInfo {
       : RecObjMom(),
         RecObjClass(),
         RecVisibleEnergy(0),
-        TrueContribPDGs(){};
+        TrueContribPDGs(),
+        Weight(1){};
   /// Reconstructed 3-momentum
   std::vector<TVector3> RecObjMom;
   ///\brief 'Class' of a reconstructed object. Might be a PDG particle code, or
@@ -47,6 +48,8 @@ struct RecoInfo {
 
   /// The true pdgs of particles that contributed to the visible energy
   std::vector<int> TrueContribPDGs;
+
+  double Weight;
 };
 
 class ISmearcepter {
@@ -62,6 +65,23 @@ class ISmearcepter {
   std::string GetElementName() { return ElementName; }
 
   virtual RecoInfo *Smearcept(FitEvent *) = 0;
+  /// Helper method for using this class as a component in a more complex
+  /// smearer
+  virtual void SmearRecoInfo(RecoInfo *) {
+    THROW("Smearcepter: " << ElementName
+                          << " doesn't implement SmearRecoInfo.");
+    ;
+  }
 };
+
+template <typename T>
+ISmearcepter* BuildSmearcepter(nuiskey& nk) {
+  ISmearcepter* rtn = new T();
+  rtn->Setup(nk);
+  return rtn;
+}
+
+typedef ISmearcepter* (*SmearceptionFactory_fcn)(nuiskey&);
+
 
 #endif

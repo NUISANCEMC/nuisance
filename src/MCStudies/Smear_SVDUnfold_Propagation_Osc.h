@@ -17,20 +17,31 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef SIMPLE_OSC_H_SEEN
-#define SIMPLE_OSC_H_SEEN
+#ifndef Smear_SVDUnfold_Propagation_Osc_H_SEEN
+#define Smear_SVDUnfold_Propagation_Osc_H_SEEN
 
 #include "Measurement1D.h"
 
-class Simple_Osc : public Measurement1D {
-public:
-  Simple_Osc(nuiskey samplekey);
+class Smear_SVDUnfold_Propagation_Osc : public Measurement1D {
+ public:
+  Smear_SVDUnfold_Propagation_Osc(nuiskey samplekey);
 
-  virtual ~Simple_Osc() {};
+  virtual ~Smear_SVDUnfold_Propagation_Osc(){};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 
+  void ConvertEventRates(void);
+
+  TH1D *NDDataHist;
+  TH1D *FDDataHist;
+
+  TH2D *NDToSpectrumSmearingMatrix;
+
+  TMatrixD NDToSpectrumResponseMatrix;
+  TMatrixD SpectrumToFDResponseMatrix;
+
+  Int_t TruncateUpTo;
 };
 
 #endif

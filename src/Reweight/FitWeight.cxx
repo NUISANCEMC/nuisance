@@ -48,6 +48,52 @@ void FitWeight::AddRWEngine(int type) {
   }
 }
 
+WeightEngineBase* FitWeight::GetRWEngine(int type) {
+  switch (type) {
+    case kNEUT:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kNUWRO:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kGENIE:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kNORM:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kLIKEWEIGHT:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kT2K:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kCUSTOM:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kSPLINEPARAMETER:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kNIWG:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    case kOSCILLATION:
+      if (fAllRW.count(type)) {
+        return fAllRW[type];
+      }
+    default: { THROW("CANNOT get RW Engine for dial type: " << type); }
+  }
+}
+
 void FitWeight::IncludeDial(std::string name, std::string type, double val) {
   // Should register the dial here.
   int typeenum = Reweight::ConvDialType(type);

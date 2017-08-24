@@ -36,6 +36,8 @@
 #include "TTree.h"
 #include "TChain.h"
 
+#include "PhysConst.h"
+
 /// Common container for event particles
 class FitEvent : public BaseFitEvt {
 public:

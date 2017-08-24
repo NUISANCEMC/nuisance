@@ -19,6 +19,8 @@
 
 #include "Smearceptance_Tester.h"
 
+#include "SmearceptanceUtils.h"
+
 #include "Smearcepterton.h"
 
 //********************************************************************
@@ -78,10 +80,48 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
 
   smearceptor = &Smearcepterton::Get().GetSmearcepter(smearceptorName);
 
-#ifdef __PROB3PP_ENABLED__
-  OscWeighter = new OscWeightEngine();
-  OscWeighter->Config();
-#endif
+  Int_t RecNBins = 20, TrueNBins = 20;
+  double RecBinL = 0, TrueBinL = 0, RecBinH = 10, TrueBinH = 10;
+
+  if (Config::Get().GetConfigNode("smear.reconstructed.binning")) {
+    std::vector<std::string> args = GeneralUtils::ParseToStr(
+        Config::Get().ConfS("smear.reconstructed.binning"), ",");
+    RecNBins = GeneralUtils::StrToInt(args[0]);
+    RecBinL = GeneralUtils::StrToDbl(args[1]);
+    RecBinH = GeneralUtils::StrToDbl(args[2]);
+    TrueNBins = RecNBins;
+    TrueBinL = RecBinL;
+    TrueBinH = RecBinH;
+  }
+
+  if (Config::Get().GetConfigNode("smear.true.binning")) {
+    std::vector<std::string> args = GeneralUtils::ParseToStr(
+        Config::Get().ConfS("smear.true.binning"), ",");
+    TrueNBins = GeneralUtils::StrToInt(args[0]);
+    TrueBinL = GeneralUtils::StrToDbl(args[1]);
+    TrueBinH = GeneralUtils::StrToDbl(args[2]);
+  }
+  SVDTruncation = 0;
+  if (Config::Get().GetConfigNode("smear.true.binning")) {
+    SVDTruncation = Config::Get().ConfI("smear.SVD.truncation");
+    QLOG(SAM, "Applying SVD truncation of: " << SVDTruncation)
+  }
+
+  QLOG(SAM, "Using binning True: " << TrueNBins << ", [" << TrueBinL << " -- "
+                                   << TrueBinH << "], Rec: " << RecNBins
+                                   << ", [" << RecBinL << " -- " << RecBinH
+                                   << "]");
+
+  ETrueDistrib = new TH1D("ELep_rate", ";True E_{#nu};Count", TrueNBins,
+                          TrueBinL, TrueBinH);
+  ERecDistrib = new TH1D("ELepRec_rate", ";Rec E_{#nu};Count", RecNBins,
+                         RecBinL, RecBinH);
+  ETrueDistrib->Sumw2();
+  ERecDistrib->Sumw2();
+
+  RecoSmear =
+      new TH2D("ELepHadVis_Recon", ";Recon. E_{#nu};True E_{#nu}", RecNBins,
+               RecBinL, RecBinH, TrueNBins, TrueBinL, TrueBinH);
 }
 
 void Smearceptance_Tester::AddEventVariablesToTree() {
@@ -188,6 +228,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/F");
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
+  eventVariables->Branch("EffWeight", &EffWeight, "EffWeight/F");
 
   eventVariables->Branch("xsecScaling", &xsecScaling, "xsecScaling/F");
 
@@ -197,8 +238,9 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("flagCCINC_rec", &flagCCINC_rec, "flagCCINC_rec/O");
   eventVariables->Branch("flagCC0Pi_rec", &flagCC0Pi_rec, "flagCC0Pi_rec/O");
 
-#ifdef __PROB3PP_ENABLED__
-  eventVariables->Branch("OscWeight", &OscWeight, "OscWeight/F");
+#ifdef DEBUG_SMEARTESTER
+  eventVariables->Branch("FSMuon_True", &FSMuon_True);
+  eventVariables->Branch("FSMuon_Smeared", &FSMuon_Smeared);
 #endif
 }
 
@@ -334,6 +376,17 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
 
   RecoInfo *ri = smearceptor->Smearcept(event);
 
+#ifdef DEBUG_SMEARTESTER
+
+  FSMuon_True = TVector3(0, 0, 0);
+  FSMuon_Smeared = TVector3(0, 0, 0);
+  FitParticle *fsMu = event->GetHMFSMuon();
+  if (fsMu) {
+    FSMuon_True = fsMu->P3();
+    FSMuon_Smeared = GetHMFSRecParticles(*ri, 13);
+  }
+#endif
+
   TLorentzVector FourMomentumTransfer =
       (event->GetHMISAnyLeptons()->P4() - event->GetHMFSAnyLeptons()->P4());
 
@@ -411,9 +464,10 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   Nothers_seen = CountNNotPdgsSeen(*ri, ExplicitPDGs);
 
   if (FSCLep_seen && (FSLepMom_rec.Mag() > 1E-8)) {
-    EISLep_QE_rec = FSCLep_seen && FitUtils::EnuQErec(FSLepMom_rec.Mag(),
-                                                      FSLepMom_rec.Unit().Z(),
-                                                      34, PDGFSLep_true > 0);
+    EISLep_QE_rec =
+        FitUtils::EnuQErec(FSLepMom_rec.Mag() / 1000.0, FSLepMom_rec.CosTheta(),
+                           34, PDGFSLep_true > 0) *
+        1000.0;
   } else {
     EISLep_QE_rec = 0;
   }
@@ -435,6 +489,7 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   FluxWeight = GetFluxHistogram()->GetBinContent(
                    GetFluxHistogram()->FindBin(EISLep_true)) /
                GetFluxHistogram()->Integral();
+  EffWeight = ri->Weight;
 
   xsecScaling = fScaleFactor;
 
@@ -444,11 +499,15 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   flagCCINC_rec = FSCLep_seen && PDGFSLep_true & 1;
   flagCC0Pi_rec = ((Ncpi_seen + Npi0_seen) == 0) && flagCCINC_rec;
 
-#ifdef __PROB3PP_ENABLED__
-  OscWeight = OscWeighter->CalcWeight(event);
-#endif
   // Fill the eventVariables Tree
   eventVariables->Fill();
+
+  RecoSmear->Fill(flagCCINC_rec ? EISLep_LepHadVis_rec / 1000.0 : -1,
+                  EISLep_true / 1000.0, Weight);
+  ETrueDistrib->Fill(EISLep_true / 1000.0, flagCCINC_true ? Weight : 0);
+
+  ERecDistrib->Fill(EISLep_LepHadVis_rec / 1000.0, flagCCINC_rec ? Weight : 0);
+
   return;
 };
 
@@ -463,7 +522,77 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
   GetInput()->GetFluxHistogram()->Write();
   GetInput()->GetEventHistogram()->Write();
 
-  return;
+  TH2D *SmearMatrix_ev =
+      static_cast<TH2D *>(RecoSmear->Clone("ELepHadVis_Smear_ev"));
+
+  for (Int_t trueAxis_it = 1;
+       trueAxis_it < RecoSmear->GetYaxis()->GetNbins() + 1; ++trueAxis_it) {
+    double NEISLep = ETrueDistrib->GetBinContent(trueAxis_it);
+
+    for (Int_t recoAxis_it = 1;
+         recoAxis_it < RecoSmear->GetXaxis()->GetNbins() + 1; ++recoAxis_it) {
+      if (NEISLep > std::numeric_limits<double>::epsilon()) {
+        SmearMatrix_ev->SetBinContent(
+            recoAxis_it, trueAxis_it,
+            SmearMatrix_ev->GetBinContent(recoAxis_it, trueAxis_it) / NEISLep);
+      }
+    }
+  }
+
+  ETrueDistrib->Write();
+  ERecDistrib->Write();
+
+  RecoSmear->Write();
+
+  SmearMatrix_ev->Write();
+
+  TH2D *ResponseMatrix_ev =
+      SmearceptanceUtils::SVDGetInverse(SmearMatrix_ev, SVDTruncation);
+  ResponseMatrix_ev = SmearceptanceUtils::SwapXYTH2D(ResponseMatrix_ev);
+  ResponseMatrix_ev->SetName("ResponseMatrix_ev");
+  ResponseMatrix_ev->Write();
+
+#ifdef DEBUG_SMEARTESTER
+
+  TMatrixD SmearMatrix_ev_md = SmearceptanceUtils::GetMatrix(
+      SmearceptanceUtils::SwapXYTH2D(SmearMatrix_ev));
+
+  TH1D *SmearedEvt = static_cast<TH1D *>(ERecDistrib->Clone());
+  SmearedEvt->SetNameTitle("SmearedEvt", ";Rec E_{#nu}; count");
+
+  SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
+      ETrueDistrib, SmearedEvt, SmearMatrix_ev_md, 5000, false);
+
+  SmearedEvt->Write();
+
+  SmearedEvt->Scale(1, "width");
+  SmearedEvt->SetName("SmearedEvt_bw");
+  SmearedEvt->Write();
+
+#endif
+
+  TMatrixD ResponseMatrix_evt_md =
+      SmearceptanceUtils::GetMatrix(ResponseMatrix_ev);
+
+  TH1D *Unfolded_enu_obs = static_cast<TH1D *>(ETrueDistrib->Clone());
+  Unfolded_enu_obs->SetNameTitle("UnfoldedENu_evt", ";True E_{#nu};count");
+
+  SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
+      ERecDistrib, Unfolded_enu_obs, ResponseMatrix_evt_md, 5000, false);
+
+  Unfolded_enu_obs->Write();
+
+  Unfolded_enu_obs->Scale(1, "width");
+  Unfolded_enu_obs->SetName("UnfoldedENu_evt_bw");
+  Unfolded_enu_obs->Write();
+
+  ETrueDistrib->Scale(1, "width");
+  ETrueDistrib->SetName("ELep_rate_bw");
+  ETrueDistrib->Write();
+
+  ERecDistrib->Scale(1, "width");
+  ERecDistrib->SetName("ELepRec_rate_bw");
+  ERecDistrib->Write();
 }
 
 // -------------------------------------------------------------------

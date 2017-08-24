@@ -279,6 +279,7 @@
 #include "T2K2017_FakeData.h"
 
 #include "Simple_Osc.h"
+#include "Smear_SVDUnfold_Propagation_Osc.h"
 
 #include "FitWeight.h"
 
@@ -833,7 +834,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Fe56_CH") ||
 	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Pb208_CH")) {
 	return (new MINERvA_CCDIS_XSec_1Dx_ratio(samplekey));
-	
+
   } else if (!name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_C12_CH") ||
 	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Fe56_CH") ||
 	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Pb208_CH")) {
@@ -1011,7 +1012,11 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   }else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
 
-  } else {
+  }else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
+    return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
+
+  }
+   else {
     ERR(FTL) << "Error: No such sample: " << name << std::endl;
     exit(-1);
     return NULL;

@@ -11,10 +11,10 @@ int main(int argc, char const *argv[]) {
   LOG(FIT) << "***************************************************"
            << std::endl;
 
-  FitPar::Config().ForceParam("NEUT_DIR=/var/test/NEUT");
-  FitPar::Config().ForceParam("NUWRO_DIR=/var/test/NUWRO");
-  FitPar::Config().ForceParam("GENIE_DIR=/var/test/GENIE");
-  FitPar::Config().ForceParam("GIBUU_DIR=/var/test/GIBUU");
+  Config::Get().OverrideConfig("NEUT_DIR=/var/test/NEUT");
+  Config::Get().OverrideConfig("NUWRO_DIR=/var/test/NUWRO");
+  Config::Get().OverrideConfig("GENIE_DIR=/var/test/GENIE");
+  Config::Get().OverrideConfig("GIBUU_DIR=/var/test/GIBUU");
 
   std::string NEUTInp = "NEUT:@NEUT_DIR/file.root";
   InputUtils::InputType NEUTInpt =
@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]) {
   std::string ExpandNEUTJoint_MissFSlash = InputUtils::ExpandInputDirectories(
       GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]);
 
-  FitPar::Config().ForceParam("NEUT_DIR=/var/test/NEUT/");
+  Config::Get().OverrideConfig("NEUT_DIR=/var/test/NEUT/");
   std::string NEUTJointInp_DoubleFSlash =
       "NEUT:(@NEUT_DIR/file1.root,@NEUT_DIR/file2.root)";
   std::string ExpandNEUTJoint_DoubleFSlash = InputUtils::ExpandInputDirectories(

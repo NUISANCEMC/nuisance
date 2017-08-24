@@ -32,7 +32,7 @@ Simple_Osc::Simple_Osc(nuiskey samplekey) {
 
   fSettings.SetTitle("Osc Studies");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos(#theta*)");
+  fSettings.SetXTitle("XXX");
   fSettings.SetYTitle("Number of events");
   fSettings.SetEnuRange(0.0, 50);
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
@@ -51,7 +51,7 @@ Simple_Osc::Simple_Osc(nuiskey samplekey) {
                         (fSettings.GetName() + "_MC").c_str());
   } else {
     fDataHist = new TH1D((fSettings.GetName() + "_data").c_str(),
-                         fSettings.GetFullTitles().c_str(), 50, 0, 3);
+                         fSettings.GetFullTitles().c_str(), 200, 0, 3);
   }
   SetCovarFromDiagonal();
 

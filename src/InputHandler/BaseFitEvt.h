@@ -101,12 +101,10 @@ class BaseFitEvt {
 #endif
 
 #ifdef __NUWRO_ENABLED__
-  /// Setup Event Reading from NuWro Event
 #ifdef __USE_NUWRO_SRW_EVENTS__
   SRW::SRWEvent fNuwroSRWEvent;  ///< Pointer to Nuwro event
   params * fNuwroParams;
 #endif
-  void SetNuwroEvent(event* e);
   event* fNuwroEvent;  ///< Pointer to Nuwro event
 #endif
 
@@ -124,8 +122,6 @@ class BaseFitEvt {
 #endif
 
 #ifdef __GiBUU_ENABLED__
-  /// Setup Event Reading from GIBUU Event
-  void SetGiBUUReader(GiBUUStdHepReader* g);
   GiBUUStdHepReader* GiRead; ///< Pointer to GiBUU reader
 #endif
 

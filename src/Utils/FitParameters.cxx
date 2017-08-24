@@ -36,7 +36,7 @@ FitParameters::FitParameters() {
   this->iteration = 0;
 
   std::string NUISANCE_dir = GeneralUtils::GetTopLevelDir();
-  this->ReadParamFile( NUISANCE_dir + "/parameters/fitter.config.dat" );
+  this->ReadParamFile(NUISANCE_dir + "/parameters/fitter.config.dat");
 };
 
 void FitParameters::SetParamFile(std::string fileName) {
@@ -50,7 +50,6 @@ void FitParameters::ReadParamFile(std::string fileName) {
   std::ifstream card(fileName.c_str(), std::ifstream::in);
 
   while (std::getline(card >> std::ws, line, '\n')) {
-
     std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
 
     // Check the line length
@@ -62,14 +61,13 @@ void FitParameters::ReadParamFile(std::string fileName) {
     // Check whether this is a relevant line
     if (inputlist[0].compare("config") != 0) continue;
 
-    std::string parName  = inputlist[1];
+    std::string parName = inputlist[1];
     std::string parEntry = inputlist[2];
     if (parameterMap_all.find(parName) == parameterMap_all.end())
       parameterMap_all.insert(
-        std::map<std::string, std::string>::value_type(parName, parEntry));
+          std::map<std::string, std::string>::value_type(parName, parEntry));
     else
       parameterMap_all[parName] = parEntry;
-
   }
   card.close();
   return;
@@ -81,14 +79,13 @@ void FitParameters::ForceParam(std::string parOption) {
   std::string parName = parOption.substr(0, first);
   std::string parEntry = parOption.substr(first + 1, parOption.size());
 
-  // LOG(REC) << "Read in Parameter Override : " << parName << " = " << parEntry
-  // << std::endl;
+  QLOG(REC,"Read in Parameter Override : " << parName << " = " << parEntry);
 
   parameterMap_all.insert(
-    std::map<std::string, std::string>::value_type(parName, parEntry));
+      std::map<std::string, std::string>::value_type(parName, parEntry));
   if (parameterMap_all.find(parName) == parameterMap_all.end())
     parameterMap_all.insert(
-      std::map<std::string, std::string>::value_type(parName, parEntry));
+        std::map<std::string, std::string>::value_type(parName, parEntry));
   else
     parameterMap_all[parName] = parEntry;
 
@@ -99,7 +96,8 @@ void FitParameters::SetParB(std::string parName, bool val) {
   if (parameterMap_bool.find(parName) != parameterMap_bool.end()) {
     parameterMap_bool[parName] = val;
   } else {
-    parameterMap_bool.insert(std::map<std::string, bool>::value_type(parName, val));
+    parameterMap_bool.insert(
+        std::map<std::string, bool>::value_type(parName, val));
   }
 
   return;
@@ -111,7 +109,7 @@ void FitParameters::SetParD(std::string parName, double val) {
     parameterMap_double[parName] = val;
   } else {
     parameterMap_double.insert(
-      std::map<std::string, double>::value_type(parName, val));
+        std::map<std::string, double>::value_type(parName, val));
   }
   return;
 }
@@ -121,7 +119,8 @@ void FitParameters::SetParI(std::string parName, int val) {
   if (parameterMap_int.find(parName) != parameterMap_int.end()) {
     parameterMap_int[parName] = val;
   } else {
-    parameterMap_int.insert(std::map<std::string, int>::value_type(parName, val));
+    parameterMap_int.insert(
+        std::map<std::string, int>::value_type(parName, val));
   }
   return;
 }
@@ -144,17 +143,14 @@ std::string FitParameters::GetParS(std::string parName) {
   return Config::Get().ConfS(parName);
 };
 
-
 std::string FitParameters::GetParDIR(std::string parName) {
-
   std::string outstr = this->GetParS(parName);
 
   // Make replacements in the string
   const int nfiletypes = 2;
   const std::string filetypes[nfiletypes] = {"@data", "@nuisance"};
-  std::string filerepl[nfiletypes] = { FitPar::GetDataBase(),
-                                       FitPar::GetDataBase() + "/../"
-                                     };
+  std::string filerepl[nfiletypes] = {FitPar::GetDataBase(),
+                                      FitPar::GetDataBase() + "/../"};
 
   for (int i = 0; i < nfiletypes; i++) {
     std::string findstring = filetypes[i];
@@ -167,7 +163,6 @@ std::string FitParameters::GetParDIR(std::string parName) {
 
   return outstr;
 };
-
 
 std::string FitParameters::GetAllParametersArg() {
   std::map<std::string, std::string>::iterator mystr = parameterMap_all.begin();
@@ -206,7 +201,6 @@ void FitParameters::MakeParameterCard(std::string filename) {
 }
 
 void FitParameters::Write() {
-
   // Loop through parameters
   /*  TTree* tr = new TTree("fit_header","fit_header");
   tr->Branch("par_name",  &parNames);

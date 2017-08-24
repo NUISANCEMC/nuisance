@@ -21,9 +21,10 @@ include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR}/src/Routines)
 include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
 include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
+include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-SET(TESTAPPS SignalDefTests ParserTests)
+SET(TESTAPPS SignalDefTests ParserTests SmearceptanceTests)
 
 foreach(appimpl ${TESTAPPS})
   add_executable(${appimpl} ${appimpl}.cxx)

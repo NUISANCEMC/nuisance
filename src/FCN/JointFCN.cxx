@@ -119,7 +119,7 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
   fNameValues.push_back("total_ndof");
   fCurrentValues.push_back(0.0);
 
-  // Setup Containers 
+  // Setup Containers
   fSampleN     = fSamples.size() + fPulls.size();
   fSampleLikes = new double[fSampleN];
   fSampleNDOF  = new int[fSampleN];
@@ -131,11 +131,11 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
     fCurrentValues.push_back( 0.0 );
   }
   fNDials   = dials.size();
-  fDialVals = new double[fNDials];  
+  fDialVals = new double[fNDials];
 
   // Set IterationTree Flag
   fIterationTree = true;
- 
+
 }
 
 //***************************************************
@@ -233,7 +233,7 @@ double JointFCN::DoEval(const double* x) {
   // GET TEST STAT
   fLikelihood = GetLikelihood();
   fNDOF       = GetNDOF();
-  
+
   // PRINT PROGRESS
   LOG(FIT) << "Current Stat (iter. " << this->fCurIter << ") = " << fLikelihood
            << std::endl;
@@ -831,7 +831,7 @@ void JointFCN::ReconfigureFastUsingManager() {
         rwweight = curevent->Weight;
 
         coreeventweights[splinecount] = rwweight;
-        if (splinecount % countwidth == 0) {
+        if (countwidth && ((splinecount % countwidth) == 0)) {
           LOG(REC) << "Processed " << splinecount
                    << " event weights. W = " << rwweight << std::endl;
         }

@@ -20,17 +20,12 @@
 #include "Smearcepterton.h"
 
 #include "ThresholdAccepter.h"
+#include "EfficiencyApplicator.h"
+#include "GaussianSmearer.h"
+#include "TrackedMomentumMatrixSmearer.h"
+#include "MetaSimpleSmearcepter.h"
 
 #include <vector>
-
-template <typename T>
-ISmearcepter* BuildSmearcepter(nuiskey& nk) {
-  ISmearcepter* rtn = new T();
-  rtn->Setup(nk);
-  return rtn;
-}
-
-typedef ISmearcepter* (*SmearceptionFactory_fcn)(nuiskey&);
 
 Smearcepterton* Smearcepterton::_inst = NULL;
 Smearcepterton& Smearcepterton::Get() {
@@ -48,6 +43,10 @@ void Smearcepterton::InitialiserSmearcepters() {
   std::map<std::string, SmearceptionFactory_fcn> factories;
 
   factories["ThresholdAccepter"] = &BuildSmearcepter<ThresholdAccepter>;
+  factories["EfficiencyApplicator"] = &BuildSmearcepter<EfficiencyApplicator>;
+  factories["GaussianSmearer"] = &BuildSmearcepter<GaussianSmearer>;
+  factories["TrackedMomentumMatrixSmearer"] = &BuildSmearcepter<TrackedMomentumMatrixSmearer>;
+  factories["MetaSimpleSmearcepter"] = &BuildSmearcepter<MetaSimpleSmearcepter>;
 
   std::vector<nuiskey> smearcepterBlocks = Config::QueryKeys("smearcepters");
 

@@ -40,8 +40,14 @@ class Smearcepterton {
  public:
   static Smearcepterton &Get();
 
-  ISmearcepter &GetSmearcepter(std::string const & name) {
+  ISmearcepter &GetSmearcepter(std::string const &name) {
     if (!Smearcepters.count(name) || !Smearcepters[name]) {
+      ERROR(FTL, "Known smearcepters:");
+      for (std::map<std::string, ISmearcepter *>::iterator sm_it =
+               Smearcepters.begin();
+           sm_it != Smearcepters.end(); ++sm_it) {
+        ERROR(FTL, "\t" << sm_it->first);
+      }
       THROW("No smearcepter named: \"" << name << "\" defined.");
     }
     return *Smearcepters[name];

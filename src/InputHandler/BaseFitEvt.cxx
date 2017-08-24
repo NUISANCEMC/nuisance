@@ -219,48 +219,6 @@ double BaseFitEvt::GetWeight() {
 void BaseFitEvt::SetNeutVect(NeutVect* v) {
   fType = kNEUT;
   fNeutVect = v;
-
-#ifdef __PROB3PP_ENABLED__
-  for (size_t i = 0; i < npart; i++) {
-    NeutPart* part = fNeutVect->PartInfo(i);
-    if ((part->fIsAlive == false) && (part->fStatus == -1) &&
-        std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
-                   part->fPID)) {
-      probe_E = part->fP.T();
-      probe_pdg = part->fPID;
-      break;
-    } else {
-      continue;
-    }
-  }
-#endif
-}
-#endif
-
-#ifdef __NUWRO_ENABLED__
-
-void BaseFitEvt::SetNuwroEvent(event* e) {
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = SRW::SRWEvent(*e);
-  probe_E = fNuwroSRWEvent.NeutrinoEnergy;
-  probe_pdg = fNuwroSRWEvent.NeutrinoPDG;
-  fNuwroParams = NULL;
-#endif
-  fType = kNUWRO;
-  fNuwroEvent = e;
-
-#ifdef __PROB3PP_ENABLED__
-#ifndef __USE_NUWRO_SRW_EVENTS__
-  for (size_t i = 0; i < fNuwroEvent->in.size(); i++) {
-    if (std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
-                   fNuwroEvent->in[i].pdg)) {
-      probe_E = fNuwroEvent->in[i].t;
-      probe_pdg = fNuwroEvent->in[i].pdg;
-      break;
-    }
-  }
-#endif
-#endif
 }
 #endif
 
@@ -268,26 +226,6 @@ void BaseFitEvt::SetNuwroEvent(event* e) {
 void BaseFitEvt::SetGenieEvent(NtpMCEventRecord* ntpl) {
   fType = kGENIE;
   genie_event = ntpl;
-
-#ifdef __PROB3PP_ENABLED__
-  GHepRecord* GenieGHep = static_cast<GHepRecord*>(fGenieNtpl->event);
-  if (!GenieGHep) return;
-  TObjArrayIter iter(GenieGHep);
-  while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
-    if (!p) {
-      continue;
-    }
-
-    // Get Status
-    int state = GetGENIEParticleStatus(p, fNUISANCEEvent->fMode);
-    if (state != genie::kIStInitialState) {
-      continue;
-    }
-    probe_E = p->E() * 1.E3;
-    probe_pdg = p->Pdg();
-    break;
-  }
-#endif
 }
 #endif
 
@@ -295,29 +233,6 @@ void BaseFitEvt::SetGenieEvent(NtpMCEventRecord* ntpl) {
 void BaseFitEvt::SetNuanceEvent(NuanceEvent* e) {
   fType = kNUANCE;
   nuance_event = e;
-}
-#endif
-
-#ifdef __GiBUU_ENABLED__
-void BaseFitEvt::SetGiBUUReader(GiBUUStdHepReader* g) {
-  fType = kGiBUU;
-  GiRead = g;
-
-#ifdef __PROB3PP_ENABLED__
-  for (int i = 0; i < GiRead->StdHepN; i++) {
-    int state =
-        GetGIBUUParticleStatus(GiRead->StdHepStatus[i], GiRead->StdHepPdg[i]);
-    if (state != kInitialState) {
-      continue;
-    }
-    if (std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
-                   GiRead->StdHepPdg[i])) {
-      probe_E = GiRead->StdHepP4[i][3] * 1.E3;
-      probe_pdg = GiRead->StdHepPdg[i];
-      break;
-    }
-  }
-#endif
 }
 #endif
 

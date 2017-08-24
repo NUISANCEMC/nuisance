@@ -214,9 +214,6 @@ bool OscWeightEngine::NeedsEventReWeight() {
 }
 
 double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
-  if (LengthParam == 0xdeadbeef) {  // not configured.
-    return 1;
-  }
   static bool Warned = false;
   if (evt->probe_E == 0xdeadbeef) {
     if (!Warned) {
@@ -228,11 +225,19 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
     }
     return 1;
   }
+
+  return CalcWeight(evt->probe_E * 1E-3, evt->probe_pdg);
+}
+
+double OscWeightEngine::CalcWeight(double ENu, int PDGNu) {
+  if (LengthParam == 0xdeadbeef) {  // not configured.
+    return 1;
+  }
 #ifdef __PROB3PP_ENABLED__
-  int NuType = GetNuType(evt->probe_pdg);
+  int NuType = GetNuType(PDGNu);
   bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
-            params[dm12_idx], params[dm23_idx], params[dcp_idx],
-            evt->probe_E * 1E-3, true, NuType);
+            params[dm12_idx], params[dm23_idx], params[dcp_idx], ENu,
+            true, NuType);
 
   int pmt = 0;
   double prob_weight = 1;
@@ -251,7 +256,7 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
       pmt = 2;
       prob_weight =
           bp.GetVacuumProb(NuType, TargetNuType ? TargetNuType : NuType,
-                           evt->probe_E * 1E-3, LengthParam);
+                           ENu * 1E-3, LengthParam);
     }
   }
 #ifdef DEBUG_OSC_WE
