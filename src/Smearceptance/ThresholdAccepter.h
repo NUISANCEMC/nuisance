@@ -20,11 +20,14 @@
 #ifndef THRESHOLDACCEPTER_HXX_SEEN
 #define THRESHOLDACCEPTER_HXX_SEEN
 
+#define DEBUG_THRESACCEPT
+
 #include "ISmearcepter.h"
 
 #include <map>
 
 class ThresholdAccepter : public ISmearcepter {
+
  public:
   enum KineVar {
     kMomentum,
@@ -42,6 +45,7 @@ class ThresholdAccepter : public ISmearcepter {
   };
   struct VisThresh : public Thresh {
     bool UseKE;
+    double Fraction;
   };
 
  private:
@@ -51,6 +55,11 @@ class ThresholdAccepter : public ISmearcepter {
   void SpecifcSetup(nuiskey &);
 
  public:
+  void SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
+#ifdef DEBUG_THRESACCEPT
+  , size_t p_it
+#endif
+    );
   RecoInfo *Smearcept(FitEvent *);
 };
 
