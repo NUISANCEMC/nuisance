@@ -77,6 +77,9 @@ TH1 *GetEffHist(TFile *inputFile, std::string const &HistName) {
 ///   <EfficiencyCurve PDG="211,-211" InputFile="effs.root"
 ///   HistName="cpion_eff_mom_ctheta" NDims="2" XAxis="kMomentum"
 ///   YAxis="kCosTheta" Interpolate="false" />
+/// <!-- Can also contain ThresholdAccepter elements as below-->
+///   <RecoThreshold PDG="2212" RecoThresholdAbsCosTheta_Min="0" />
+///   <VisThreshold PDG="2212" VisThresholdKE_MeV="10" Contrib="K" />
 /// </EfficiencyApplicator>
 void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
   rand.~TRandom3();
@@ -110,27 +113,27 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
 
     EfficiencyApplicator::DependVar XVar =
         GetVarType(effDescriptors[t_it].GetS("XAxis"));
-    double XAxisScale = effDescriptors[t_it].Has("XAxisScaleToMeV")
-                            ? effDescriptors[t_it].GetD("XAxisScaleToMeV")
+    double XAxisScale = effDescriptors[t_it].Has("XAxisScaleToInternal")
+                            ? effDescriptors[t_it].GetD("XAxisScaleToInternal")
                             : 1;
     EfficiencyApplicator::DependVar YVar =
         NDims > 1 ? GetVarType(effDescriptors[t_it].GetS("YAxis"))
                   : EfficiencyApplicator::kNoAxis;
-    double YAxisScale = effDescriptors[t_it].Has("YAxisScaleToMeV")
-                            ? effDescriptors[t_it].GetD("YAxisScaleToMeV")
+    double YAxisScale = effDescriptors[t_it].Has("YAxisScaleToInternal")
+                            ? effDescriptors[t_it].GetD("YAxisScaleToInternal")
                             : 1;
     EfficiencyApplicator::DependVar ZVar =
         NDims > 2 ? GetVarType(effDescriptors[t_it].GetS("ZAxis"))
                   : EfficiencyApplicator::kNoAxis;
-    double ZAxisScale = effDescriptors[t_it].Has("ZAxisScaleToMeV")
-                            ? effDescriptors[t_it].GetD("ZAxisScaleToMeV")
+    double ZAxisScale = effDescriptors[t_it].Has("ZAxisScaleToInternal")
+                            ? effDescriptors[t_it].GetD("ZAxisScaleToInternal")
                             : 1;
 
     bool Interpolate = effDescriptors[t_it].Has("Interpolate") &&
                        effDescriptors[t_it].GetI("Interpolate");
 
-    bool ApplyAsWeight = effDescriptors[t_it].Has("Interpolate") &&
-                         effDescriptors[t_it].GetI("Interpolate");
+    // bool ApplyAsWeight = effDescriptors[t_it].Has("ApplyAsWeight") &&
+    //                      effDescriptors[t_it].GetI("ApplyAsWeight");
 
     std::string pdgs_s = effDescriptors[t_it].GetS("PDG");
     std::vector<int> pdgs_i = GeneralUtils::ParseToInt(pdgs_s, ",");
@@ -160,6 +163,8 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
            "Added reconstruction efficiency curve for PDG: " << pdgs_i[pdg_it]);
     }
   }
+
+  SlaveTA.Setup(nk);
 }
 
 RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
@@ -182,9 +187,12 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
     }
 
     if (!Efficiencies.count(fp->PDG())) {
-#ifdef DEBUG_EFFAPP
-      std::cout << " -- Undetectable." << std::flush;
+      SlaveTA.SmearceptOneParticle(ri, fp
+#ifdef DEBUG_THRESACCEPT
+                                   ,
+                                   p_it
 #endif
+                                   );
       continue;
     }
 
@@ -297,6 +305,13 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
 #ifdef DEBUG_EFFAPP
     std::cout << " -- Rejected with probability: " << effProb << std::flush;
 #endif
+
+    SlaveTA.SmearceptOneParticle(ri, fp
+#ifdef DEBUG_THRESACCEPT
+                                 ,
+                                 p_it
+#endif
+                                 );
   }
 #ifdef DEBUG_EFFAPP
   std::cout << std::endl;

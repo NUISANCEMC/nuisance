@@ -21,6 +21,7 @@
 #define EFFICIENCYAPPLICATOR_HXX_SEEN
 
 #include "ISmearcepter.h"
+#include "ThresholdAccepter.h"
 
 #include "TRandom3.h"
 
@@ -44,6 +45,8 @@ private:
   void SpecifcSetup(nuiskey &);
 
   TRandom3 rand;
+
+  ThresholdAccepter SlaveTA;
 
  public:
   RecoInfo *Smearcept(FitEvent *);

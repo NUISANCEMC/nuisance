@@ -19,8 +19,6 @@
 
 #include "ThresholdAccepter.h"
 
-// #define DEBUG_THRESACCEPT
-
 namespace {
 ThresholdAccepter::KineVar GetKineType(nuiskey &nk) {
   if (nk.Has("RecoThresholdMomentum_MeV")) {
@@ -124,7 +122,7 @@ bool PassesThreshold(FitParticle *fp, ThresholdAccepter::Thresh &rt) {
 /// <ThresholdAccepter Name="D00N_ND_LAr">
 ///   <RecoThreshold PDG="211,-211" RecoThresholdKE_MeV="30" />
 ///   <RecoThreshold PDG="211,-211" RecoThresholdCosTheta_Max="1" />
-///   <RecoThreshold PDG="2212" RecoThresholdMom_MeV="350" />
+///   <RecoThreshold PDG="2212" RecoThresholdMomentum_MeV="350" />
 ///   <RecoThreshold PDG="2212" RecoThresholdAbsCosTheta_Min="0" />
 ///   <VisThreshold PDG="2212" VisThresholdKE_MeV="10" Contrib="K" />
 ///   <VisThreshold PDG="22" VisThresholdKE_MeV="10" Contrib="T" />
@@ -167,16 +165,22 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
                                   << pdgs_i[pdg_it]);
       }
       VisThresh vt;
+      vt.UseKE = visThresholdDescriptors[t_it].Has("Contrib")
+                     ? (visThresholdDescriptors[t_it].GetS("Contrib") == "K")
+                     : false;
+      vt.Fraction = visThresholdDescriptors[t_it].Has("Fraction")
+                        ? visThresholdDescriptors[t_it].GetD("Fraction")
+                        : 1;
       if (visThresholdDescriptors[t_it].Has("VisThresholdKE_MeV")) {
         vt.ThresholdType = ThresholdAccepter::kKE;
         vt.ThresholdVal =
             visThresholdDescriptors[t_it].GetD("VisThresholdKE_MeV");
-        vt.UseKE = (visThresholdDescriptors[t_it].GetS("Contrib") == "K");
-      } else if (visThresholdDescriptors[t_it].Has("VisThresholdMom_MeV")) {
+      } else if (visThresholdDescriptors[t_it].Has(
+                     "VisThresholdMomentum_MeV")) {
         vt.ThresholdType = ThresholdAccepter::kMomentum;
         vt.ThresholdVal =
-            visThresholdDescriptors[t_it].GetD("VisThresholdMom_MeV");
-        vt.UseKE = (visThresholdDescriptors[t_it].GetS("Contrib") == "K");
+            visThresholdDescriptors[t_it].GetD("VisThresholdMomentum_MeV");
+        ;
       } else {
         ERROR(WRN, "Smearceptor "
                        << ElementName << ":" << InstanceName
@@ -198,113 +202,126 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
   }
 }
 
+void ThresholdAccepter::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
+#ifdef DEBUG_THRESACCEPT
+                                             ,
+                                             size_t p_it
+#endif
+                                             ) {
+#ifdef DEBUG_THRESACCEPT
+  std::cout << std::endl;
+  std::cout << "[" << p_it << "]: " << fp->PDG() << ", " << fp->Status() << ", "
+            << fp->E() << " -- KE:" << fp->KE() << " Mom: " << fp->P3().Mag()
+            << std::flush;
+#endif
+
+  if (fp->Status() != kFinalState) {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Not final state." << std::flush;
+#endif
+    return;
+  }
+
+  if ((ReconThresholds.count(fp->PDG()) + VisThresholds.count(fp->PDG())) ==
+      0) {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Undetectable." << std::flush;
+#endif
+    return;
+  }
+
+  // If no reco thresholds it should fall through to EVis
+  bool Passes = ReconThresholds[fp->PDG()].size();
+  bool FailEnergyThresh = !ReconThresholds[fp->PDG()].size();
+  for (size_t rt_it = 0; rt_it < ReconThresholds[fp->PDG()].size(); ++rt_it) {
+    bool Passed = PassesThreshold(fp, ReconThresholds[fp->PDG()][rt_it]);
+    if (!Passed) {
+#ifdef DEBUG_THRESACCEPT
+      std::cout << "\n\t -- Rejected. ("
+                << GetKineTypeName(
+                       ReconThresholds[fp->PDG()][rt_it].ThresholdType)
+                << " Threshold: "
+                << ReconThresholds[fp->PDG()][rt_it].ThresholdVal << " | "
+                << GetKineVal(fp, ReconThresholds[fp->PDG()][rt_it]) << ")"
+                << std::flush;
+      if ((ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
+           ThresholdAccepter::kMomentum) ||
+          (ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
+           ThresholdAccepter::kKE)) {
+        FailEnergyThresh = true;
+      }
+#endif
+    } else {
+#ifdef DEBUG_THRESACCEPT
+      std::cout << "\n\t -- Accepted. ("
+                << GetKineTypeName(
+                       ReconThresholds[fp->PDG()][rt_it].ThresholdType)
+                << " Threshold: "
+                << ReconThresholds[fp->PDG()][rt_it].ThresholdVal << " | "
+                << GetKineVal(fp, ReconThresholds[fp->PDG()][rt_it]) << ")"
+                << std::flush;
+#endif
+    }
+    Passes = Passes && Passed;
+  }
+
+  if (Passes) {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Reconstructed." << std::flush;
+#endif
+    ri->RecObjMom.push_back(fp->P3());
+    ri->RecObjClass.push_back(fp->PDG());
+
+    return;
+  } else if (!FailEnergyThresh) {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Failed non-Energy threshold, no chance for EVis."
+              << std::flush;
+#endif
+    return;
+  }
+
+  if (((VisThresholds[fp->PDG()].ThresholdType == ThresholdAccepter::kKE) &&
+       (VisThresholds[fp->PDG()].ThresholdVal <
+        fp->KE()))  // Above KE-style threshold
+      || ((VisThresholds[fp->PDG()].ThresholdType ==
+           ThresholdAccepter::kMomentum) &&
+          (VisThresholds[fp->PDG()].ThresholdVal <
+           fp->P3().Mag()))  // Above mom-style threshold
+      ) {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Contributed to VisE. ("
+              << GetKineTypeName(VisThresholds[fp->PDG()].ThresholdType) << ": "
+              << VisThresholds[fp->PDG()].ThresholdVal << ")" << std::flush;
+#endif
+
+    ri->RecVisibleEnergy.push_back(
+        VisThresholds[fp->PDG()].Fraction *
+        (VisThresholds[fp->PDG()].UseKE ? fp->KE() : fp->E()));
+    ri->TrueContribPDGs.push_back(fp->PDG());
+
+    return;
+  } else {
+#ifdef DEBUG_THRESACCEPT
+    std::cout << " -- Rejected. "
+              << " Vis: ("
+              << GetKineTypeName(VisThresholds[fp->PDG()].ThresholdType) << ": "
+              << VisThresholds[fp->PDG()].ThresholdVal << ")" << std::flush;
+#endif
+  }
+}
+
 RecoInfo *ThresholdAccepter::Smearcept(FitEvent *fe) {
   RecoInfo *ri = new RecoInfo();
 
   for (size_t p_it = 0; p_it < fe->NParticles(); ++p_it) {
     FitParticle *fp = fe->GetParticle(p_it);
+    SmearceptOneParticle(ri, fp
 #ifdef DEBUG_THRESACCEPT
-    std::cout << std::endl;
-    std::cout << "[" << p_it << "]: " << fp->PDG() << ", " << fp->Status()
-              << ", " << fp->E() << " -- KE:" << fp->KE()
-              << " Mom: " << fp->P3().Mag() << std::flush;
+                         ,
+                         p_it
 #endif
-
-    if (fp->Status() != kFinalState) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Not final state." << std::flush;
-#endif
-      continue;
-    }
-
-    if ((ReconThresholds.count(fp->PDG()) + VisThresholds.count(fp->PDG())) ==
-        0) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Undetectable." << std::flush;
-#endif
-      continue;
-    }
-
-    //If no reco thresholds it should fall through to EVis
-    bool Passes = ReconThresholds[fp->PDG()].size();
-    bool FailEnergyThresh = !ReconThresholds[fp->PDG()].size();
-    for (size_t rt_it = 0; rt_it < ReconThresholds[fp->PDG()].size(); ++rt_it) {
-      bool Passed = PassesThreshold(fp, ReconThresholds[fp->PDG()][rt_it]);
-      if (!Passed) {
-#ifdef DEBUG_THRESACCEPT
-        std::cout << "\n\t -- Rejected. ("
-                  << GetKineTypeName(
-                         ReconThresholds[fp->PDG()][rt_it].ThresholdType)
-                  << " Threshold: "
-                  << ReconThresholds[fp->PDG()][rt_it].ThresholdVal << " | "
-                  << GetKineVal(fp, ReconThresholds[fp->PDG()][rt_it]) << ")"
-                  << std::flush;
-        if ((ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
-             ThresholdAccepter::kMomentum) ||
-            (ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
-             ThresholdAccepter::kKE)) {
-          FailEnergyThresh = true;
-        }
-#endif
-      } else {
-#ifdef DEBUG_THRESACCEPT
-        std::cout << "\n\t -- Accepted. ("
-                  << GetKineTypeName(
-                         ReconThresholds[fp->PDG()][rt_it].ThresholdType)
-                  << " Threshold: "
-                  << ReconThresholds[fp->PDG()][rt_it].ThresholdVal << " | "
-                  << GetKineVal(fp, ReconThresholds[fp->PDG()][rt_it]) << ")"
-                  << std::flush;
-#endif
-      }
-      Passes = Passes && Passed;
-    }
-
-    if (Passes) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Reconstructed." << std::flush;
-#endif
-      ri->RecObjMom.push_back(fp->P3());
-      ri->RecObjClass.push_back(fp->PDG());
-
-      continue;
-    } else if (!FailEnergyThresh) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Failed non-Energy threshold, no chance for EVis."
-                << std::flush;
-#endif
-      continue;
-    }
-
-    if (((VisThresholds[fp->PDG()].ThresholdType == ThresholdAccepter::kKE) &&
-         (VisThresholds[fp->PDG()].ThresholdVal <
-          fp->KE()))  // Above KE-style threshold
-        || ((VisThresholds[fp->PDG()].ThresholdType ==
-             ThresholdAccepter::kMomentum) &&
-            (VisThresholds[fp->PDG()].ThresholdVal <
-             fp->P3().Mag()))  // Above mom-style threshold
-        ) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Contributed to VisE. ("
-                << GetKineTypeName(VisThresholds[fp->PDG()].ThresholdType)
-                << ": " << VisThresholds[fp->PDG()].ThresholdVal << ")"
-                << std::flush;
-#endif
-
-      ri->RecVisibleEnergy.push_back(VisThresholds[fp->PDG()].UseKE ? fp->KE()
-                                                                    : fp->E());
-      ri->TrueContribPDGs.push_back(fp->PDG());
-
-      continue;
-    } else {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Rejected. "
-                << " Vis: ("
-                << GetKineTypeName(VisThresholds[fp->PDG()].ThresholdType)
-                << ": " << VisThresholds[fp->PDG()].ThresholdVal << ")"
-                << std::flush;
-#endif
-    }
+                         );
   }
 #ifdef DEBUG_THRESACCEPT
   std::cout << std::endl;
