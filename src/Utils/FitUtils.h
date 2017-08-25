@@ -168,6 +168,9 @@ double Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi);
 double Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi);
 /// Gets delta alpha T as defined in Phys.Rev. C94 (2016) no.1, 015503
 double Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi);
+
+double CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
+double PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
 }
 
 /*! @} */
