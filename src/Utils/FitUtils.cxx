@@ -762,3 +762,69 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
   }
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }
+
+// Get Cos theta with Adler angles
+double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
+  // Get the "resonance" lorentz vector (pion proton system)
+  TLorentzVector Pres = Pprot + Ppi;
+  // Boost the particles into the resonance rest frame so we can define the x,y,z axis
+  Pnu.Boost(Pres.BoostVector());
+  Pmu.Boost(-Pres.BoostVector());
+  Ppi.Boost(-Pres.BoostVector());
+
+  // The z-axis is defined as the axis of three-momentum transfer, \vec{k}
+  // Also unit normalise the axis
+  TVector3 zAxis = (Pnu.Vect()-Pmu.Vect())*(1.0/((Pnu.Vect()-Pmu.Vect()).Mag()));
+
+  // Then the angle between the pion in the "resonance" rest-frame and the z-axis is the theta Adler angle
+  double costhAdler = cos(Ppi.Vect().Angle(zAxis));
+
+  return costhAdler;
+}
+
+// Get phi with Adler angles, a bit more complicated...
+double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
+
+  // Get the "resonance" lorentz vector (pion proton system)
+  TLorentzVector Pres = Pprot + Ppi;
+  // Boost the particles into the resonance rest frame so we can define the x,y,z axis
+  Pnu.Boost(Pres.BoostVector());
+  Pmu.Boost(-Pres.BoostVector());
+  Ppi.Boost(-Pres.BoostVector());
+
+  // The z-axis is defined as the axis of three-momentum transfer, \vec{k}
+  // Also unit normalise the axis
+  TVector3 zAxis = (Pnu.Vect()-Pmu.Vect())*(1.0/((Pnu.Vect()-Pmu.Vect()).Mag()));
+
+  // The y-axis is then defined perpendicular to z and muon momentum in the resonance frame
+  TVector3 yAxis = Pnu.Vect().Cross(Pmu.Vect());
+  yAxis *= 1.0/double(yAxis.Mag());
+
+  // And the x-axis is then simply perpendicular to z and x
+  TVector3 xAxis = yAxis.Cross(zAxis);
+  xAxis *= 1.0/double(xAxis.Mag());
+
+  // Get the project of the pion momentum on to the zaxis
+  TVector3 PiVectZ = zAxis*Ppi.Vect().Dot(zAxis);
+  // The subtract the projection off the pion vector to get to get the plane
+  TVector3 PiPlane = Ppi.Vect() - PiVectZ;
+
+  // Then finally construct phi as the angle between pion projection and x axis
+  double phi = -999.99;
+
+  if (PiPlane.Y() > 0) {
+    phi = (180./M_PI)*PiPlane.Angle(xAxis);
+  } else if (PiPlane.Y() < 0) {
+    phi = (180./M_PI)*(2*M_PI-PiPlane.Angle(xAxis));
+  } else if (PiPlane.Y() == 0) {
+    TRandom3 rand;
+    double randNo = rand.Rndm();
+    if (randNo > 0.5) {
+      phi = (180./M_PI)*PiPlane.Angle(xAxis);
+    } else {
+      phi = (180./M_PI)*(2*M_PI-PiPlane.Angle(xAxis));
+    }
+  }
+
+  return phi;
+}
