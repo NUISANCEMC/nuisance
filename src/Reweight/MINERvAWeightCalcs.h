@@ -18,7 +18,7 @@
 #include "Ntuple/NtpMCEventRecord.h"
 #include "PDG/PDGUtils.h"
 #include "WeightUtils.h"
-// #include "weightRPA.h"
+#include "weightRPA.h"
 using namespace genie;
 class BaseFitEvt;
 
@@ -124,7 +124,7 @@ public:
 		kNuMuBarCa40,
 		kNuMuBarFe56
 	};
-	// weightRPA* fRPACalculators[kMaxCalculators];
+	weightRPA* fRPACalculators[kMaxCalculators];
 };
 
 };  // namespace reweight
