@@ -323,7 +323,7 @@ void Measurement2D::SetCovarFromTextFile(std::string covfile, int dim) {
     dim = this->GetNDOF();
   }
 
-  LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
+  LOG(SAM) << "Reading covariance from text file: " << covfile << " " << dim << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
   covar      = StatUtils::GetInvert(fFullCovar);
   fDecomp    = StatUtils::GetDecomp(fFullCovar);

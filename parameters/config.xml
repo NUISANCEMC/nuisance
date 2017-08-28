@@ -196,5 +196,7 @@
 
 <config NToyThrows='100000' />
 
+<config UseShapeCovar="0" />
+
 </nuisance>
 

@@ -20,7 +20,7 @@
 #!/bin/sh
 
 ### Adapted from https://unix.stackexchange.com/questions/4965/keep-duplicates-out-of-path-on-source
-add_to_PATH () {
+function add_to_PATH () {
   for d; do
 
     d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
@@ -40,7 +40,7 @@ add_to_PATH () {
   done
 }
 
-add_to_LD_LIBRARY_PATH () {
+function add_to_LD_LIBRARY_PATH () {
   for d; do
 
     d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
