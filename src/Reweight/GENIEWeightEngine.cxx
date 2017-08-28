@@ -33,10 +33,17 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	// Now actually add the RW Calcs
 	if (xsec_ncel)
 		fGenieRW->AdoptWghtCalc("xsec_ncel", new genie::rew::GReWeightNuXSecNCEL);
-	if (xsec_ccqe)
-		fGenieRW->AdoptWghtCalc("xsec_ccqe", new genie::rew::GReWeightNuXSecCCQE);
-	if (xsec_coh)
-		fGenieRW->AdoptWghtCalc("xsec_coh", new genie::rew::GReWeightNuXSecCOH);
+	if (xsec_ccqe){
+	  fGenieRW->AdoptWghtCalc("xsec_ccqe", new genie::rew::GReWeightNuXSecCCQE);
+	  //	  (dynamic_cast<GReWeightNuXSecCCQE*> (fGenieRW->WghtCalc("xsec_ccqe")))
+	  //	    ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCCQE") );
+	}
+	if (xsec_coh){
+	  fGenieRW->AdoptWghtCalc("xsec_coh", new genie::rew::GReWeightNuXSecCOH());
+	  //	  (dynamic_cast<GReWeightNuXSecCOH*> (fGenieRW->WghtCalc("xsec_coh")))
+	  //	    ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCOH") );
+	}
+
 	if (xsec_nnres)
 		fGenieRW->AdoptWghtCalc("xsec_nonresbkg",
 		                        new genie::rew::GReWeightNonResonanceBkg);
@@ -64,8 +71,12 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 		fGenieRW->AdoptWghtCalc("xsec_dis", new genie::rew::GReWeightNuXSecDIS);
 	if (xsec_nc)
 		fGenieRW->AdoptWghtCalc("xsec_nc", new genie::rew::GReWeightNuXSecNC);
-	if (xsec_ccres)
+	if (xsec_ccres){
 		fGenieRW->AdoptWghtCalc("xsec_ccres", new genie::rew::GReWeightNuXSecCCRES);
+		//		(dynamic_cast<GReWeightNuXSecCCRES*> (fGenieRW->WghtCalc("xsec_ccres")))
+		//		  ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCCRES") );
+	}
+
 	if (xsec_ncres)
 		fGenieRW->AdoptWghtCalc("xsec_ncres", new genie::rew::GReWeightNuXSecNCRES);
 	if (xsec_nucqe)
