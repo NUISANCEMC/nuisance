@@ -566,7 +566,7 @@ void Measurement1D::FinaliseMeasurement() {
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
-  if (fIsShape && fShapeCovar and FitPar::GetParB("UseShapeCovar")){    
+  if (fIsShape && fShapeCovar and FitPar::Config().GetParB("UseShapeCovar")){    
     if (covar) delete covar;
     covar = StatUtils::GetInvert(fShapeCovar);
     if (fDecomp) delete fDecomp;
