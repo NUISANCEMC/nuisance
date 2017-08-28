@@ -234,19 +234,19 @@ RikRPA::RikRPA() {
   fEventWeights = new double[5];
 
   for (size_t i = 0; i < kMaxCalculators; i++) {
-    // fRPACalculators[i] = NULL;
+    fRPACalculators[i] = NULL;
   }
 
   fTweaked = false;
 }
 
 RikRPA::~RikRPA() {
-  delete fEventWeights;
+  //  delete fEventWeights;
 
-  for (size_t i = 0; i < kMaxCalculators; i++) {
-    // if (fRPACalculators[i]) delete fRPACalculators[i];
-    // fRPACalculators[i] = NULL;
-  }
+  //  for (size_t i = 0; i < kMaxCalculators; i++) {
+  //    if (fRPACalculators[i]) delete fRPACalculators[i];
+  //    fRPACalculators[i] = NULL;
+  //  }
 }
 
 double RikRPA::CalcWeight(BaseFitEvt* evt) {
@@ -285,11 +285,11 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
 
   // Check we have the RPA Calc setup for this enum
   // if not, set it up at that point
-  // if (!fRPACalculators[calcenum]) SetupRPACalculator(calcenum);
-  // weightRPA* rpacalc = fRPACalculators[calcenum];
-  // if (!rpacalc) {
-  // THROW("Failed to grab the RPA Calculator : " << calcenum);
-  // }
+  if (!fRPACalculators[calcenum]) SetupRPACalculator(calcenum);
+  weightRPA* rpacalc = fRPACalculators[calcenum];
+  if (!rpacalc) {
+    THROW("Failed to grab the RPA Calculator : " << calcenum);
+  }
 
   // Extract Q0-Q3
   GHepParticle* fsl = ghep->FinalStatePrimaryLepton();
@@ -297,10 +297,11 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   const TLorentzVector& k2 = *(fsl->P4());
   double q0 = fabs((k1 - k2).E());
   double q3 = fabs((k1 - k2).Vect().Mag());
+  double Q2 = fabs((k1 - k2).Mag2());
 
   // Now use q0-q3 and RPA Calculator to fill fWeights
-  // LOG(FIT) << "Getting Weights = " << q0 << " " << q3 << std::endl;
-  // rpacalc->getWeight(q0, q3, fEventWeights);
+  //LOG(FIT) << "Getting Weights = " << q0 << " " << q3 << std::endl;
+  rpacalc->getWeight(q0, q3, fEventWeights);
 
   // Apply Interpolation (for the time being simple linear)
 
@@ -309,20 +310,21 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
     w *= fEventWeights[0];  // CV
   }
 
+  /*
   LOG(FIT) << " fCurDial_RPALowQ2  = " << fCurDial_RPALowQ2
            << " fCurDial_RPAHighQ2 = " << fCurDial_RPAHighQ2 << " Weights "
            << fEventWeights[0] << " " << fEventWeights[1] << " "
            << fEventWeights[2] << " " << fEventWeights[3] << " "
            << fEventWeights[4] << std::endl;
-
+  */
   // Syst Application : kMINERvA_RikRPA_LowQ2
   if (fabs(fCurDial_RPALowQ2) > 0.0) {
     double interpw = fEventWeights[0];
 
-    if (fCurDial_RPALowQ2 > 0.0) {
+    if (fCurDial_RPALowQ2 > 0.0 && Q2 < 2.0) {
       interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[1]) *
                                        fCurDial_RPALowQ2;  // WLow+    } else if
-    } else if (fCurDial_RPALowQ2 < 0.0) {
+    } else if (fCurDial_RPALowQ2 < 0.0 && Q2 < 2.0) {
       interpw = fEventWeights[0] - (fEventWeights[2] - fEventWeights[0]) *
                                        fCurDial_RPALowQ2;  // WLow-
     }
@@ -332,15 +334,16 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   // Syst Application : kMINERvA_RikRPA_HighQ2
   if (fabs(fCurDial_RPAHighQ2) > 0.0) {
     double interpw = fEventWeights[0];
+
     if (fCurDial_RPAHighQ2 > 0.0) {
       interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[3]) *
-                                       fCurDial_RPAHighQ2;  // WHigh+    } else
-      if (fCurDial_RPAHighQ2 < 0.0) {
+                                       fCurDial_RPAHighQ2;  // WHigh+   
+
+    } else if (fCurDial_RPAHighQ2 < 0.0) {
         interpw = fEventWeights[0] - (fEventWeights[4] - fEventWeights[0]) *
                                          fCurDial_RPAHighQ2;  // WHigh-
-      }
-      w *= interpw / fEventWeights[0];  // Div by CV again
     }
+    w *= interpw / fEventWeights[0];  // Div by CV again
   }
 
   // LOG(FIT) << "RPA Weight = " << w << std::endl;
@@ -429,7 +432,13 @@ void RikRPA::SetupRPACalculator(int calcenum) {
   LOG(FIT) << "Loading RPA CALC : " << fidir << std::endl;
   TDirectory* olddir = gDirectory;
 
-  // fRPACalculators[calcenum] = new weightRPA(rwdir + "/" + fidir);
+  std::cout << "***********************************************" << std::endl;
+  std::cout << "Loading a new weightRPA calculator" << std::endl;
+  std::cout << "Authors:  Rik Gran, Heidi Schellman" << std::endl;
+  std::cout << "Citation: arXiv:1705.02932 [hep-ex]" << std::endl;
+  std::cout << "***********************************************" << std::endl;
+
+  fRPACalculators[calcenum] = new weightRPA(rwdir + "/" + fidir);
   olddir->cd();
   return;
 }
