@@ -75,6 +75,8 @@ MINERvA_CCCOHPI_XSec_1DEpi_antinu.cxx
 MINERvA_CCCOHPI_XSec_1Dth_antinu.cxx
 MINERvA_CCCOHPI_XSec_1DQ2_antinu.cxx
 
+MINERvA_CCCOHPI_XSec_joint.cxx
+
 MINERvAUtils.cxx
 MINERvA_SignalDef.cxx
 )
@@ -131,9 +133,14 @@ MINERvA_CC1pip_XSec_1D_2017Update.h
 MINERvA_CCCOHPI_XSec_1DEnu_nu.h
 MINERvA_CCCOHPI_XSec_1DEpi_nu.h
 MINERvA_CCCOHPI_XSec_1Dth_nu.h
+MINERvA_CCCOHPI_XSec_1DQ2_nu.h
+
 MINERvA_CCCOHPI_XSec_1DEnu_antinu.h
 MINERvA_CCCOHPI_XSec_1DEpi_antinu.h
 MINERvA_CCCOHPI_XSec_1Dth_antinu.h
+MINERvA_CCCOHPI_XSec_1DQ2_antinu.h
+
+MINERvA_CCCOHPI_XSec_joint.h
 
 MINERvAUtils.h
 MINERvA_SignalDef.h
