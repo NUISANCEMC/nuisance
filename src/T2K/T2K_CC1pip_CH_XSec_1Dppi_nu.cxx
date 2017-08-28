@@ -38,10 +38,12 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
     SetCovarMatrix(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/Ppi.root");
   } else {
     useMichel = false;
-    fName += "_kin";
+    //    fName += "_kin";
     SetDataValues(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/Ppi_noME.root");
     SetCovarMatrix(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/Ppi_noME.root");
   }
+  
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -93,23 +95,19 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::SetCovarMatrix(std::string fileLocation) {
 
   if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
-  this->covar = new TMatrixDSym(nBinsX - 2);
-  this->fFullCovar = new TMatrixDSym(nBinsX - 2);
+  this->fFullCovar = new TMatrixDSym(nBinsX - 3);
 
   // First two entries are BS
   // Last entry is BS
-  for (int i = 1; i < nBinsX - 1; i++) {
-    for (int j = 1; j < nBinsY - 1; j++) {
+  for (int i = 2; i < nBinsX-1; i++) {
+    for (int j = 2; j < nBinsY-1; j++) {
       LOG(DEB) << "(" << i << ", " << j << ") = " << covarMatrix->GetBinContent(i + 1, j + 1) << std::endl;
-      (*this->covar)(i - 1, j - 1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
-      (*this->fFullCovar)(i - 1, j - 1) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
+      (*this->fFullCovar)(i - 2, j - 2) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
     }
   } //should now have set covariance, I hope
 
-  TDecompChol tempMat = TDecompChol(*this->covar);
-  this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  //  *this->covar *= 1E-38*1E-38;
-
+  this->fDecomp = StatUtils::GetDecomp(this->fFullCovar);
+  this->covar   = StatUtils::GetInvert(this->fFullCovar);
   return;
 };
 

@@ -18,54 +18,90 @@
 ################################################################################
 
 #!/bin/sh
-if ! [[ ":$PATH:" == *":@CMAKE_INSTALL_PREFIX@/bin:"* ]]; then
-  export PATH=@CMAKE_INSTALL_PREFIX@/bin:$PATH
-fi
 
-if ! [[ ":$LD_LIBRARY_PATH:" == *":@CMAKE_INSTALL_PREFIX@/lib:"* ]]; then
-  export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/lib:$LD_LIBRARY_PATH
-fi
+### Adapted from https://unix.stackexchange.com/questions/4965/keep-duplicates-out-of-path-on-source
+function add_to_PATH () {
+  for d; do
 
-if [[ ! "${ROOTSYS}" ]]; then
+    d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
+    if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
+
+    if [ "$d" == "/usr/bin" ] || [ "$d" == "/usr/bin64" ] || [ "$d" == "/usr/local/bin" ] || [ "$d" == "/usr/local/bin64" ]; then
+      case ":$PATH:" in
+        *":$d:"*) :;;
+        *) export PATH=$PATH:$d;;
+      esac
+    else
+      case ":$PATH:" in
+        *":$d:"*) :;;
+        *) export PATH=$d:$PATH;;
+      esac
+    fi
+  done
+}
+
+function add_to_LD_LIBRARY_PATH () {
+  for d; do
+
+    d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
+    if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
+
+    if [ "$d" == "/usr/lib" ] || [ "$d" == "/usr/lib64" ] || [ "$d" == "/usr/local/lib" ] || [ "$d" == "/usr/local/lib64" ]; then
+      case ":$LD_LIBRARY_PATH:" in
+        *":$d:"*) :;;
+        *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$d;;
+      esac
+    else
+      case ":$LD_LIBRARY_PATH:" in
+        *":$d:"*) :;;
+        *) export LD_LIBRARY_PATH=$d:$LD_LIBRARY_PATH;;
+      esac
+    fi
+  done
+}
+
+add_to_PATH "@CMAKE_INSTALL_PREFIX@/bin"
+
+add_to_LD_LIBRARY_PATH "@CMAKE_INSTALL_PREFIX@/lib"
+
+if [ ! "${ROOTSYS}" ]; then
   echo "[INFO]: Sourcing ROOT from: @CMAKE_ROOTSYS@"
   source "@CMAKE_ROOTSYS@/bin/thisroot.sh"
 fi
 
-
-if [[ "@USE_NEUT@" != "FALSE" ]]; then
+if [ "@USE_NEUT@" != "FALSE" ]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
   export NEUT_ROOT=@NEUT_ROOT@
   export CERN=@CERN@
   export CERN_LEVEL=@CERN_LEVEL@
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/lib/Linux_pc:"* ]]; then
-    export LD_LIBRARY_PATH=${NEUT_ROOT}/lib/Linux_pc:$LD_LIBRARY_PATH
-  fi
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":${NEUT_ROOT}/src/reweight:"* ]]; then
-    export LD_LIBRARY_PATH=${NEUT_ROOT}/src/reweight:$LD_LIBRARY_PATH
-  fi
+  add_to_LD_LIBRARY_PATH "${NEUT_ROOT}/lib/Linux_pc" "${NEUT_ROOT}/src/reweight"
 fi
 
-if [[ "@USE_NuWro@" != "FALSE" ]]; then
-  if [[ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]]; then
+if [ "@USE_NuWro@" != "FALSE" ]; then
+  if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
     echo "[INFO]: Adding NuWro library paths to the environment."
     export NUWRO="@NUWRO@"
-    if ! [[ ":$LD_LIBRARY_PATH:" == *":@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:"* ]]; then
-      export LD_LIBRARY_PATH=@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib:$LD_LIBRARY_PATH
+
+    add_to_PATH "@NUWRO@/bin"
+    add_to_LD_LIBRARY_PATH "@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib"
+
+    if [ "@NUWRO_INC@" ]; then
+      export NUWRO_INC=@NUWRO_INC@
     fi
+
   else
     echo "[INFO]: NuWro support included from input event file."
   fi
 fi
 
-if [[ "@NEED_PYTHIA6@" != "FALSE" ]]; then
+if [ "@NEED_PYTHIA6@" != "FALSE" ]; then
   echo "[INFO]: Adding PYTHIA6 library paths to the environment."
   export PYTHIA6="@PYTHIA6@"
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@PYTHIA6@:"* ]]; then
-    export LD_LIBRARY_PATH=@PYTHIA6@:$LD_LIBRARY_PATH
-  fi
+
+  add_to_LD_LIBRARY_PATH "@PYTHIA6@"
 fi
 
-if [[ "@USE_GENIE@" != "FALSE" ]]; then
+if [ "@USE_GENIE@" != "FALSE" ]; then
   echo "[INFO]: Adding GENIE paths to the environment."
 
   export GENIE="@GENIE@"
@@ -79,50 +115,30 @@ if [[ "@USE_GENIE@" != "FALSE" ]]; then
   export LOG4CPP_LIB="@LOG4CPP_LIB@"
   export LOG4CPP_INC="@LOG4CPP_INC@"
 
-  if [[ "@LHAPATH@" ]]; then
+  if [ "@LHAPATH@" ]; then
     export LHAPATH="@LHAPATH@"
   fi
 
-  if ! [[ ":$PATH:" == *":@GENIE@/bin:"* ]]; then
-    export PATH=@GENIE@/bin:$PATH
-  fi
+  add_to_PATH "@GENIE@/bin"
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@GENIE@/lib:"* ]]; then
-    export LD_LIBRARY_PATH=@GENIE@/lib:$LD_LIBRARY_PATH
-  fi
+  add_to_LD_LIBRARY_PATH "@GENIE@/lib" "@LHAPDF_LIB@" "@LIBXML2_LIB@" "@LOG4CPP_LIB@"
 
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LHAPDF_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@LHAPDF_LIB@:$LD_LIBRARY_PATH
-  fi
-
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LIBXML2_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@LIBXML2_LIB@:$LD_LIBRARY_PATH
-  fi
-
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@LOG4CPP_LIB@:"* ]]; then
-    export LD_LIBRARY_PATH=@LOG4CPP_LIB@:$LD_LIBRARY_PATH
-  fi
 fi
 
-if [[ "@USE_NIWG@" != "FALSE" ]]; then
+if [ "@USE_NIWG@" != "FALSE" ]; then
   echo "[INFO]: Adding NIWG paths to the environment."
   export NIWG=@NIWG_ROOT@
   export NIWGREWEIGHT_INPUTS=@NIWG_ROOT@/inputs
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@NIWG_ROOT@:"* ]]; then
-    export LD_LIBRARY_PATH=${NIWG}:${LD_LIBRARY_PATH}
-  fi
-
+  add_to_LD_LIBRARY_PATH "@NIWG_ROOT@"
 fi
 
-if [[ "@USE_T2K@" != "FALSE" ]]; then
+if [ "@USE_T2K@" != "FALSE" ]; then
   echo "[INFO]: Adding T2K paths to the environment."
   export T2KREWEIGHT=@T2KREWEIGHT@
-  if ! [[ ":$LD_LIBRARY_PATH:" == *":@T2KREWEIGHT@/lib:"* ]]; then
-    export LD_LIBRARY_PATH=${T2KREWEIGHT}/lib:${LD_LIBRARY_PATH}
-  fi
+  add_to_LD_LIBRARY_PATH "@T2KREWEIGHT@/lib"
 fi
 
-if [[ "@BUILD_GiBUU@" != "FALSE" ]]; then
+if [ "@BUILD_GiBUU@" != "FALSE" ]; then
   echo "[INFO]: Sourcing GiBUU tools."
   source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
 fi

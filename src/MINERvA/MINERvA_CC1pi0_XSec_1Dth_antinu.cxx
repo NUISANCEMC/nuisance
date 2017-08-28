@@ -68,6 +68,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
     }
 
     SetCorrelationFromTextFile(GeneralUtils::GetTopLevelDir() + "/data/MINERvA/CC1pi0/2016/anu-cc1pi0-correlation-pion-angle.csv");
+    SetShapeCovar();
 
   } else {
 
