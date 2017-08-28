@@ -67,6 +67,8 @@ ANL_CC1ppip_Evt_1Dphi_nu::ANL_CC1ppip_Evt_1Dphi_nu(nuiskey samplekey) {
 
 void ANL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
 
+  fXVar = -999.99;
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -79,60 +81,11 @@ void ANL_CC1ppip_Evt_1Dphi_nu::FillEventVariables(FitEvent *event) {
 
   // Get the hadronic mass
   double hadMass = FitUtils::MpPi(Pp, Ppip);
-  // Need to boost pion and muon into resonance rest-frame to get phi (e.g. see F. Sanchez arxiv 1511.00501v2)
-  //
-  // Get the resonance 4-vector
-  TLorentzVector Pres = Ppip + Pp;
-  // Boost the outgoing and incoming particles into the resonance frame
-  Pnu.Boost(Pres.BoostVector());
-  Pmu.Boost(-Pres.BoostVector());
-  Ppip.Boost(-Pres.BoostVector());
+  if (hadMass > 1400) return;
 
-  // Get the vectors from the 4-vector
-  TVector3 PmuVect = Pmu.Vect();
-  TVector3 PnuVect = Pnu.Vect();
-  TVector3 PresVect = Pres.Vect();
-  TVector3 PpipVect = Ppip.Vect();
-
-  // Define the z-direction
-  TVector3 zVect = (PnuVect-PmuVect);
-  zVect *= 1/double(zVect.Mag());
-  // Define y direction as being z (resonance direction) x pmu*
-  TVector3 yVect = zVect.Cross(PmuVect);
-  // Normalise yVector
-  yVect *= 1/double(yVect.Mag());
-  // define x direction as being y X z
-  TVector3 xVect = yVect.Cross(zVect);
-  // Normalise zVector
-  xVect *= 1/double(xVect.Mag());
-
-  // Project pion onto z axis
-  TVector3 PpipVectZ = zVect * PpipVect.Dot(zVect);
-  // Then subtract this vector off the pion vector
-  TVector3 PpipVectPlane = PpipVect - PpipVectZ;
-
-  // Then finally construct phi as the angle between pion projection and x axis
-  double phi = -999;
-
-  // ANL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) {
-    if (PpipVectPlane.Y() > 0) {
-      phi = (180./M_PI)*PpipVectPlane.Angle(xVect);
-    } else if (PpipVectPlane.Y() < 0) {
-      phi = (180./M_PI)*(2*M_PI-PpipVectPlane.Angle(xVect));
-    } else if (PpipVectPlane.Y() == 0) {
-      double randNo = rand.Rndm();
-      if (randNo > 0.5) {
-        phi = (180./M_PI)*PpipVectPlane.Angle(xVect);
-      } else {
-        phi = (180./M_PI)*(2*M_PI-PpipVectPlane.Angle(xVect));
-      }
-    }
-  }
-
+  // Get phi Adler
+  double phi = FitUtils::PhiAdler(Pnu, Pmu, Ppip, Pp);
   fXVar = phi;
-
-  return;
 };
 
 bool ANL_CC1ppip_Evt_1Dphi_nu::isSignal(FitEvent *event) {
