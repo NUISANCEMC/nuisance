@@ -231,8 +231,35 @@ RikRPA::RikRPA() {
   fCurDial_RPAHighQ2 = fDefDial_RPAHighQ2;
   fErrDial_RPAHighQ2 = 1.0;
 
-  fEventWeights = new double[5];
+  
 
+  // - Syst : kMINERvA_RikRESRPA_ApplyRPA
+  // - Type : Binary
+  // - Limits : 0.0 (false) -> 1.0 (true)
+  // - Default : 0.0
+  fApplyDial_RESRPACorrection = false;
+
+  // - Syst : kMINERvA_RikRESRPA_LowQ2
+  // - Type : Absolute
+  // - Limits : 1.0 -> 1.0
+  // - Default : 0.0
+  // - Frac Error : 100%
+  fDefDial_RESRPALowQ2 = 0.0;
+  fCurDial_RESRPALowQ2 = fDefDial_RESRPALowQ2;
+  fErrDial_RESRPALowQ2 = 0.0;
+
+  // - Syst : kMINERvA_RikRESRPA_HighQ2
+  // - Type : Absolute
+  // - Limits : 1.0 -> 1.0
+  // - Default : 0.0
+  // - Frac Error : 100%
+  fDefDial_RESRPAHighQ2 = 0.0;
+  fCurDial_RESRPAHighQ2 = fDefDial_RESRPAHighQ2;
+  fErrDial_RESRPAHighQ2 = 1.0;
+
+
+  // Setup Calculators
+  fEventWeights = new double[5];
   for (size_t i = 0; i < kMaxCalculators; i++) {
     fRPACalculators[i] = NULL;
   }
@@ -269,7 +296,7 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   // LOG(FIT) << "RikRPA : Event QE = " << proc_info.IsQuasiElastic() <<
   // std::endl;
   if (!tgt.IsNucleus()) return 1.0;
-  if (!proc_info.IsQuasiElastic()) return 1.0;
+  if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
 
   // Extract Beam and Target PDG
   GHepParticle* neutrino = ghep->Probe();
@@ -299,51 +326,87 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   double q3 = fabs((k1 - k2).Vect().Mag());
   double Q2 = fabs((k1 - k2).Mag2());
 
-  // Now use q0-q3 and RPA Calculator to fill fWeights
-  //LOG(FIT) << "Getting Weights = " << q0 << " " << q3 << std::endl;
-  rpacalc->getWeight(q0, q3, fEventWeights);
+  // Quasielastic
+  if (proc_info.IsQuasiElastic()){
 
-  // Apply Interpolation (for the time being simple linear)
+    // Now use q0-q3 and RPA Calculator to fill fWeights
+    rpacalc->getWeight(q0, q3, fEventWeights);
 
-  // Syst Application : kMINERvA_RikRPA_ApplyRPA
-  if (fApplyDial_RPACorrection) {
-    w *= fEventWeights[0];  // CV
-  }
-
-  /*
-  LOG(FIT) << " fCurDial_RPALowQ2  = " << fCurDial_RPALowQ2
-           << " fCurDial_RPAHighQ2 = " << fCurDial_RPAHighQ2 << " Weights "
-           << fEventWeights[0] << " " << fEventWeights[1] << " "
-           << fEventWeights[2] << " " << fEventWeights[3] << " "
-           << fEventWeights[4] << std::endl;
-  */
-  // Syst Application : kMINERvA_RikRPA_LowQ2
-  if (fabs(fCurDial_RPALowQ2) > 0.0) {
-    double interpw = fEventWeights[0];
-
-    if (fCurDial_RPALowQ2 > 0.0 && Q2 < 2.0) {
-      interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[1]) *
-                                       fCurDial_RPALowQ2;  // WLow+    } else if
-    } else if (fCurDial_RPALowQ2 < 0.0 && Q2 < 2.0) {
-      interpw = fEventWeights[0] - (fEventWeights[2] - fEventWeights[0]) *
-                                       fCurDial_RPALowQ2;  // WLow-
+    if (fApplyDial_RPACorrection) {
+      w *= fEventWeights[0];  // CV
     }
-    w *= interpw / fEventWeights[0];  // Div by CV again
-  }
 
-  // Syst Application : kMINERvA_RikRPA_HighQ2
-  if (fabs(fCurDial_RPAHighQ2) > 0.0) {
-    double interpw = fEventWeights[0];
-
-    if (fCurDial_RPAHighQ2 > 0.0) {
-      interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[3]) *
-                                       fCurDial_RPAHighQ2;  // WHigh+   
-
-    } else if (fCurDial_RPAHighQ2 < 0.0) {
+    // Syst Application : kMINERvA_RikRPA_LowQ2
+    if (fabs(fCurDial_RPALowQ2) > 0.0) {
+      double interpw = fEventWeights[0];
+      
+      if (fCurDial_RPALowQ2 > 0.0 && Q2 < 2.0) {
+	interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[1]) *
+	  fCurDial_RPALowQ2;  // WLow+    } else if
+      } else if (fCurDial_RPALowQ2 < 0.0 && Q2 < 2.0) {
+	interpw = fEventWeights[0] - (fEventWeights[2] - fEventWeights[0]) *
+	  fCurDial_RPALowQ2;  // WLow-
+      }
+      w *= interpw / fEventWeights[0];  // Div by CV again
+    }
+    
+    // Syst Application : kMINERvA_RikRPA_HighQ2
+    if (fabs(fCurDial_RPAHighQ2) > 0.0) {
+      double interpw = fEventWeights[0];
+      
+      if (fCurDial_RPAHighQ2 > 0.0) {
+	interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[3]) *
+	  fCurDial_RPAHighQ2;  // WHigh+   
+	
+      } else if (fCurDial_RPAHighQ2 < 0.0) {
         interpw = fEventWeights[0] - (fEventWeights[4] - fEventWeights[0]) *
-                                         fCurDial_RPAHighQ2;  // WHigh-
+	  fCurDial_RPAHighQ2;  // WHigh-
+      }
+      w *= interpw / fEventWeights[0];  // Div by CV again
     }
-    w *= interpw / fEventWeights[0];  // Div by CV again
+  }
+
+  // Resonant Events
+  if (proc_info.IsResonant()){
+
+    // Now use Q2 and RESRPA Calculator to fill fWeights
+    double CV = rpacalc->getWeight(Q2);
+
+    if (fApplyDial_RESRPACorrection) {
+      w *= CV; //fEventWeights[0];  // CVa
+    }
+
+    /*
+    // Syst Application : kMINERvA_RikRESRPA_LowQ2
+    if (fabs(fCurDial_RESRPAHighQ2) > 0.0) {
+      double interpw = fEventWeights[0];
+      
+      if (fCurDial_RESRPAHighQ2 > 0.0) {
+	interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[3]) *
+	  fCurDial_RESRPAHighQ2;  // WHigh+
+	
+      } else if (fCurDial_RESRPAHighQ2 < 0.0) {
+	interpw = fEventWeights[0] - (fEventWeights[4] - fEventWeights[0]) *
+	  fCurDial_RESRPAHighQ2;  // WHigh-
+      }
+      w *= interpw / fEventWeights[0];  // Div by CV again
+    }
+
+    // Syst Application : kMINERvA_RikRESRPA_HighQ2
+    if (fabs(fCurDial_RESRPAHighQ2) > 0.0) {
+      double interpw = fEventWeights[0];
+
+      if (fCurDial_RESRPAHighQ2 > 0.0) {
+        interpw = fEventWeights[0] - (fEventWeights[0] - fEventWeights[3]) *
+          fCurDial_RESRPAHighQ2;  // WHigh+
+
+      } else if (fCurDial_RESRPAHighQ2 < 0.0) {
+        interpw = fEventWeights[0] - (fEventWeights[4] - fEventWeights[0]) *
+          fCurDial_RESRPAHighQ2;  // WHigh-
+      }
+      w *= interpw / fEventWeights[0];  // Div by CV again
+    }
+    */
   }
 
   // LOG(FIT) << "RPA Weight = " << w << std::endl;
@@ -359,28 +422,41 @@ void RikRPA::SetDialValue(int rwenum, double val) {
 
   // Check Handled
   if (!IsHandled(curenum)) return;
-  if (curenum == kMINERvARW_RikRPA_ApplyRPA)
-    fApplyDial_RPACorrection = (val > 0.5);
-  if (curenum == kMINERvARW_RikRPA_LowQ2) fCurDial_RPALowQ2 = val;
-  if (curenum == kMINERvARW_RikRPA_HighQ2) fCurDial_RPAHighQ2 = val;
+  if (curenum == kMINERvARW_RikRPA_ApplyRPA) fApplyDial_RPACorrection = (val > 0.5);
+  if (curenum == kMINERvARW_RikRPA_LowQ2)    fCurDial_RPALowQ2 = val;
+  if (curenum == kMINERvARW_RikRPA_HighQ2)   fCurDial_RPAHighQ2 = val;
+  if (curenum == kMINERvARW_RikRESRPA_ApplyRPA) fApplyDial_RESRPACorrection = (val > 0.5);
+  if (curenum == kMINERvARW_RikRESRPA_LowQ2)    fCurDial_RESRPALowQ2 = val;
+  if (curenum == kMINERvARW_RikRESRPA_HighQ2)   fCurDial_RESRPAHighQ2 = val;
+  
 
   // Assign flag to say stuff has changed
   fTweaked = (fApplyDial_RPACorrection ||
               fabs(fCurDial_RPAHighQ2 - fDefDial_RPAHighQ2) > 0.0 ||
-              fabs(fCurDial_RPALowQ2 - fDefDial_RPALowQ2) > 0.0);
+              fabs(fCurDial_RPALowQ2 - fDefDial_RPALowQ2) > 0.0 ||
+	      fApplyDial_RESRPACorrection ||
+	      fabs(fCurDial_RESRPAHighQ2 - fDefDial_RESRPAHighQ2) > 0.0 ||
+	      fabs(fCurDial_RESRPALowQ2 - fDefDial_RESRPALowQ2) > 0.0);
+  
 }
 
 bool RikRPA::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kMINERvARW_RikRPA_ApplyRPA:
-      return true;
-    case kMINERvARW_RikRPA_LowQ2:
-      return true;
-    case kMINERvARW_RikRPA_HighQ2:
-      return true;
-    default:
-      return false;
+  case kMINERvARW_RikRESRPA_ApplyRPA:
+    return true;
+  case kMINERvARW_RikRESRPA_LowQ2:
+    return true;
+  case kMINERvARW_RikRESRPA_HighQ2:
+    return true;
+  case kMINERvARW_RikRPA_ApplyRPA:
+    return true;
+  case kMINERvARW_RikRPA_LowQ2:
+    return true;
+  case kMINERvARW_RikRPA_HighQ2:
+    return true;
+  default:
+    return false;
   }
 }
 

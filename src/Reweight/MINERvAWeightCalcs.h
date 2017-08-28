@@ -107,6 +107,18 @@ public:
 	double fDefDial_RPAHighQ2;
 	double fCurDial_RPAHighQ2;
 	double fErrDial_RPAHighQ2;
+	
+	bool   fApplyDial_RESRPACorrection;
+
+        double fTwkDial_RESRPALowQ2;
+        double fDefDial_RESRPALowQ2;
+        double fCurDial_RESRPALowQ2;
+        double fErrDial_RESRPALowQ2;
+
+        double fTwkDial_RESRPAHighQ2;
+        double fDefDial_RESRPAHighQ2;
+        double fCurDial_RESRPAHighQ2;
+        double fErrDial_RESRPAHighQ2;
 
 	double* fEventWeights;
 	bool fTweaked;
