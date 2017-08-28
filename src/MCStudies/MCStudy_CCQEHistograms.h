@@ -62,6 +62,7 @@ public:
   float q0    ;
   TH1D* hist_q3;
   float q3    ;
+  TH2D* hist_q0q3;
 
   TH1D* hist_Total;
   

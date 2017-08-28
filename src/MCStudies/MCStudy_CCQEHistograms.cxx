@@ -69,13 +69,15 @@ MCStudy_CCQEHistograms::MCStudy_CCQEHistograms(std::string name, std::string inp
   hist_Enu = new TH1D("MCStudy_CCQE_Enu","MCStudy_CCQE_Enu",30,0.0,2.0);
   hist_TLep = new TH1D("MCStudy_CCQE_TLep","MCStudy_CCQE_TLep",30,0.0,4.0);
   hist_CosLep = new TH1D("MCStudy_CCQE_CosLep","MCStudy_CCQE_CosLep",30,-1.0,1.0);
-  hist_Q2 = new TH1D("MCStudy_CCQE_Q2","MCStudy_CCQE_Q2",30,0.0,2.0);
-  hist_Q2QE = new TH1D("MCStudy_CCQE_Q2QE","MCStudy_CCQE_Q2QE",30,0.0,2.0);
+  hist_Q2 = new TH1D("MCStudy_CCQE_Q2;Q^{2} (GeV^{2});d#sigma/dQ^{2} (cm^{2}/nucleon/GeV^{2})","MCStudy_CCQE_Q2",30,0.0,3.0);
+  hist_Q2QE = new TH1D("MCStudy_CCQE_Q2QE","MCStudy_CCQE_Q2QE",30,0.0,3.0);
   hist_EQE = new TH1D("MCStudy_CCQE_EQE","MCStudy_CCQE_EQE",30,0.0,5.0);
   hist_q0 = new TH1D("MCStudy_CCQE_q0","MCStudy_CCQE_q0",30,0.0,2.0);
   hist_q3 = new TH1D("MCStudy_CCQE_q3","MCStudy_CCQE_q3",30,0.0,2.0);
   hist_TLepCosLep = new TH2D("MCStudy_CCQE_TLepCosLep","MCStudy_CCQE_TLepCosLep",15,0.0,5.0,15,-1.0,1.0);
   hist_Total = new TH1D("MCStudy_CCQE_TotalXSec","MXStudy_CCQE_TotalXSec",1,0.0,1.0);
+
+  hist_q0q3 = new TH2D("MCStudy_CCQE_q0q3","MCStudy_CCQE_q0q3;q_{3} (GeV); q_{0} (GeV); d#sigma/dq_{0}dq_{3} (cm^{2}/nucleon/GeV^{2})",40,0.0,2.0,40,0.0,2.0);
 
   return;
 }
@@ -85,9 +87,9 @@ void MCStudy_CCQEHistograms::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
 //  std::cout << "Event fBound = " << event->fBound << " " << event->Mode << std::endl;
-  if (event->fBound > 0) return;
+//  if (event->fBound > 0) return;
   if (abs(event->Mode) != 1) return;
-  std::cout << "Event fBound = " << event->fBound << " " << event->Mode << "-> Signal " << std::endl;
+  //  std::cout << "Event fBound = " << event->fBound << " " << event->Mode << "-> Signal " << std::endl;
 
 
   FitParticle* muon = NULL;
@@ -139,7 +141,7 @@ void MCStudy_CCQEHistograms::FillEventVariables(FitEvent *event) {
     hist_q0->Fill(q0,event->Weight);
     hist_q3->Fill(q3,event->Weight);
     hist_TLepCosLep->Fill(TLep,CosLep,event->Weight);
-
+    hist_q0q3->Fill(q3,q0,event->Weight);
     hist_Total->Fill(0.5,event->Weight);
     
     fXVar = Q2;
@@ -164,6 +166,7 @@ void MCStudy_CCQEHistograms::Write(std::string drawOpt) {
   hist_q0->Write();
   hist_q3->Write();
   hist_TLepCosLep->Write();
+  hist_q0q3->Write();
   hist_Total->Write();
 
   return;
@@ -180,6 +183,7 @@ void MCStudy_CCQEHistograms::ResetAll(){
   hist_EQE->Reset();
   hist_q0->Reset();
   hist_q3->Reset();
+  hist_q0q3->Reset();
   hist_TLepCosLep->Reset();
   hist_Total->Reset();
 
@@ -199,6 +203,7 @@ void MCStudy_CCQEHistograms::ScaleEvents(){
   hist_EQE->Scale(fScaleFactor,"width");
   hist_q0->Scale(fScaleFactor,"width");
   hist_q3->Scale(fScaleFactor,"width");
+  hist_q0q3->Scale(fScaleFactor,"width");
   hist_TLepCosLep->Scale(fScaleFactor,"width");
   hist_Total->Scale(fScaleFactor,"width");
 
@@ -214,7 +219,7 @@ bool MCStudy_CCQEHistograms::isSignal(FitEvent *event) {
 
 
   if (abs(event->Mode) != 1) return false;
-  if (event->fBound > 0) return false;
+  //if (event->fBound > 0) return false;
   //  if (!event->HasFSMuon()) return false;
   
   // Do we want any other signal?

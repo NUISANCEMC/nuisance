@@ -196,5 +196,15 @@
 
 <config NToyThrows='100000' />
 
+<config GENIEXSecModelCCRES="genie::ReinSehgalRESPXSec" />
+<config GENIEXSecModelCOH="genie::ReinSehgalCOHPiPXSec" />
+<config GENIEXSecModelCCQE="genie::LwlynSmithQELCCPXSec" />
+
+<!--
+<config GENIEXSecModelCCQE="genie::NievesQELCCPXSec" />
+<config GENIEXSecModelCCRES="genie::BergerSehgalRESPXSec2014" />
+<config GENIEXSecModelCOH="genie::BergerSehgalCOHPiPXSec2015" />
+-->
+
 </nuisance>
 
