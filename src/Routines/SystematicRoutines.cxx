@@ -1228,8 +1228,15 @@ void SystematicRoutines::GenerateThrows(){
   if (startthrows < 0) startthrows = 0;
   if (endthrows < 0) endthrows = startthrows + nthrows;
 
-  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL) + int(getpid()) );
+  // Setting Seed
+  // Matteo Mazzanti's Fix
+  struct timeval mytime;
+  gettimeofday(&mytime, NULL);
+  Double_t seed = time(NULL) + int(getpid())+ (mytime.tv_sec * 1000.) + (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
+
+  //  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL) + int(getpid()) );
+  //  gRandom->SetSeed(seed);
   LOG(FIT) << "Using Seed : " << seed << std::endl;
   LOG(FIT) << "nthrows = " << nthrows << std::endl;
   LOG(FIT) << "startthrows = " << startthrows << std::endl;
