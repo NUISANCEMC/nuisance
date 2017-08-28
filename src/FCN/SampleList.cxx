@@ -167,6 +167,8 @@
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
+// 2017 data update
+#include "MINERvA_CC1pip_XSec_1D_2017Update.h"
 
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
@@ -185,6 +187,9 @@
 #include "MINERvA_CC1pi0_XSec_1Dth_antinu.h"
 #include "MINERvA_CC1pi0_XSec_1Dthmu_antinu.h"
 
+// MINERvA CC1pi0 neutrino
+#include "MINERvA_CC1pi0_XSec_1D_nu.h"
+
 // MINERvA CCINC
 #include "MINERvA_CCinc_XSec_1DEnu_ratio.h"
 #include "MINERvA_CCinc_XSec_1Dx_ratio.h"
@@ -196,20 +201,22 @@
 
 // MINERvA CCCOH pion
 #include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
-#include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEpi_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_antinu.h"
 
 #include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_nu.h"
 
+#include "MINERvA_CCCOHPI_XSec_joint.h"
+
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
-#include "MINERvA_CC1pip_XSec_1D_2017Update.h"
 
-
+#include "MINERvA_CC0pi_XSec_2Dptpx_nu.h"
+#include "MINERvA_CC0pi_XSec_2Dptpx_antinu.h"
 
 #endif
 
@@ -708,6 +715,12 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
+    
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_nu")){
+	return (new MINERvA_CC0pi_XSec_2Dptpx_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")){
+	return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
 
     /*
       CC1pi+
@@ -770,7 +783,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCNpip_XSec_1DEnu_nu(samplekey));
 
     /*
-      CC1pi0
+      MINERvA CC1pi0 anti-nu
     */
     // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1Dth_antinu") ||
@@ -803,6 +816,20 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     // Done
   } else if (!name.compare("MINERvA_CC1pi0_XSec_1DEnu_antinu")) {
     return (new MINERvA_CC1pi0_XSec_1DEnu_antinu(samplekey));
+
+    // MINERvA CC1pi0 nu
+  } else if (!name.compare("MINERvA_CC1pi0_XSec_1DTpi_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dth_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dpmu_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1Dthmu_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DQ2_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DEnu_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DWexp_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DPPi0Mass_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DPPi0MassDelta_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DCosAdler_nu") ||
+             !name.compare("MINERvA_CC1pi0_XSec_1DPhiAdler_nu")) {
+    return (new MINERvA_CC1pi0_XSec_1D_nu(samplekey));
 
     /*
       CCINC
@@ -851,6 +878,15 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCCOHPI_XSec_1Dth_antinu(samplekey));
   } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_antinu")) {
     return (new MINERvA_CCCOHPI_XSec_1DQ2_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEnu_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEpi_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1Dth_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
 
     /*
     T2K Samples

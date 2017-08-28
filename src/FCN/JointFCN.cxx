@@ -679,7 +679,7 @@ void JointFCN::ReconfigureUsingManager() {
       i++;
     }
 
-    curinput->RemoveCache();
+    //    curinput->RemoveCache();
 
     // Keep track of what input we are on.
     inputcount++;

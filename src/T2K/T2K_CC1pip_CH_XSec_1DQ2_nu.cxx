@@ -50,9 +50,10 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(std::string inputfile, Fi
     ERR(FTL) << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
+  SetShapeCovar();
 
   this->SetupDefaultHist();
-
+  
   this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
 };
 
@@ -107,23 +108,19 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::SetCovarMatrix(std::string fileLocation) {
 
   if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
 
-  this->covar = new TMatrixDSym(nBinsX-7);
   this->fFullCovar = new TMatrixDSym(nBinsX-7);
 
   // First two entries are BS
   // Last entry is BS
   for (int i = 0; i < nBinsX-7; i++) {
     for (int j = 0; j < nBinsY-7; j++) {
-      (*this->covar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
       (*this->fFullCovar)(i, j) = covarMatrix->GetBinContent(i+3, j+3); //adds syst+stat covariances
-      LOG(DEB) << "covar(" << i << ", " << j << ") = " << (*this->covar)(i,j) << std::endl;
+      LOG(DEB) << "fFullCovar(" << i << ", " << j << ") = " << (*this->fFullCovar)(i,j) << std::endl;
     }
   } //should now have set covariance, I hope
 
-  TDecompChol tempMat = TDecompChol(*this->covar);
-  this->covar = new TMatrixDSym(nBinsX, tempMat.Invert().GetMatrixArray(), "");
-  //  *this->covar *= 1E-38*1E-38;
-
+  this->fDecomp = StatUtils::GetDecomp(this->fFullCovar);
+  this->covar   = StatUtils::GetInvert(this->fFullCovar);
   return;
 };
 

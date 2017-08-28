@@ -40,11 +40,12 @@ Measurement1D::Measurement1D(void) {
   // Covar
   covar = NULL;
   fFullCovar = NULL;
-
+  fShapeCovar = NULL;
+  
   fCovar  = NULL;
   fInvert = NULL;
   fDecomp = NULL;
-
+  
   // Fake Data
   fFakeDataInput = "";
   fFakeDataFile  = NULL;
@@ -88,6 +89,7 @@ Measurement1D::~Measurement1D(void) {
   if (fMaskHist)   delete fMaskHist;
   if (covar)       delete covar;
   if (fFullCovar)  delete fFullCovar;
+  if (fShapeCovar) delete fShapeCovar;
   if (fCovar)      delete fCovar;
   if (fInvert)     delete fInvert;
   if (fDecomp)     delete fDecomp;
@@ -444,6 +446,18 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile, std::string h
   delete trans;
 }
 
+void Measurement1D::SetShapeCovar(){
+  
+  // Return if this is missing any pre-requisites
+  if (!fFullCovar) return;
+  if (!fDataHist) return;
+
+  // Also return if it's bloody stupid under the circumstances
+  if (fIsDiag) return;
+  
+  fShapeCovar = StatUtils::ExtractShapeOnlyCovar(fFullCovar, fDataHist);
+  return;
+}
 
 //********************************************************************
 void Measurement1D::ScaleData(double scale) {
@@ -549,7 +563,15 @@ void Measurement1D::FinaliseMeasurement() {
 
   // Push the diagonals of fFullCovar onto the data histogram
   // Comment this out until the covariance/data scaling is consistent!
-  // StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
+
+  // If shape only, set covar and fDecomp using the shape-only matrix (if set)
+  if (fIsShape && fShapeCovar and FitPar::GetParB("UseShapeCovar")){    
+    if (covar) delete covar;
+    covar = StatUtils::GetInvert(fShapeCovar);
+    if (fDecomp) delete fDecomp;
+    fDecomp = StatUtils::GetDecomp(fFullCovar);
+  }
 
   // Setup fMCHist from data
   fMCHist = (TH1D*)fDataHist->Clone();
@@ -1312,6 +1334,9 @@ void Measurement1D::WriteShapePlot() {
 
   TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
+  TH1D* dataShape = (TH1D*)fDataHist->Clone((fName + "_data_SHAPE").c_str());
+  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38);
+
   double shapeScale = 1.0;
   if (fIsRawEvents) {
     shapeScale = fDataHist->Integral() / fMCHist->Integral();
@@ -1329,6 +1354,7 @@ void Measurement1D::WriteShapePlot() {
   mcShape->SetLineStyle(7);
 
   mcShape->Write();
+  dataShape->Write();
 
   delete mcShape;
 
@@ -1382,12 +1408,12 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   //********************************************************************
 
 
-  //nuiskey samplekey = Config::CreateKey("sample");
-//  samplekey.AddS("name", fName);
-//  samplekey.AddS("type",type);
-//  samplekey.AddS("input",inputfile);
-//  fSettings = LoadSampleSettings(samplekey);
-
+  nuiskey samplekey = Config::CreateKey("sample");
+  samplekey.AddS("name", fName);
+  samplekey.AddS("type",type);
+  samplekey.AddS("input",inputfile);
+  fSettings = LoadSampleSettings(samplekey);
+  
   // Reset everything to NULL
   // Init();
 

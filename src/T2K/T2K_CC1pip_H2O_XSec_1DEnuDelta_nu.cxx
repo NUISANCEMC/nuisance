@@ -39,6 +39,7 @@ T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(nuiskey sam
   SetDataFromRootFile(  fSettings.GetDataInput() );
   SetCovarFromRootFile( fSettings.GetCovarInput() );
   ScaleCovar(1E76);
+  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();

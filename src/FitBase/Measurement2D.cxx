@@ -323,7 +323,7 @@ void Measurement2D::SetCovarFromTextFile(std::string covfile, int dim) {
     dim = this->GetNDOF();
   }
 
-  LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
+  LOG(SAM) << "Reading covariance from text file: " << covfile << " " << dim << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
   covar      = StatUtils::GetInvert(fFullCovar);
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
@@ -972,7 +972,7 @@ double Measurement2D::GetLikelihood() {
   if (fIsShape) {
     fMCHist->Scale(scaleF);
     fMCFine->Scale(scaleF);
-    PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
+    //PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
   }
 
   if (!fMapHist) {
@@ -1665,7 +1665,7 @@ void Measurement2D::SetupDefaultHist() {
 
 
   // Setup the NEUT Mode Array
-  PlotUtils::CreateNeutModeArray(fMCHist, (TH1**)fMCHist_PDG);
+  //PlotUtils::CreateNeutModeArray(fMCHist, (TH1**)fMCHist_PDG);
 
   // Setup bin masks using sample name
   if (fIsMask) {
