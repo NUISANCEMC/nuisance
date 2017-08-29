@@ -72,9 +72,11 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	if (xsec_nc)
 		fGenieRW->AdoptWghtCalc("xsec_nc", new genie::rew::GReWeightNuXSecNC);
 	if (xsec_ccres){
+#if __GENIE_VERSION__ < 213
 		fGenieRW->AdoptWghtCalc("xsec_ccres", new genie::rew::GReWeightNuXSecCCRES);
-		//		(dynamic_cast<GReWeightNuXSecCCRES*> (fGenieRW->WghtCalc("xsec_ccres")))
-		//		  ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCCRES") );
+#else
+		fGenieRW->AdoptWghtCalc("xsec_ccres", new genie::rew::GReWeightNuXSecCCRES( FitPar::Config().GetParS("GENIEXSecModelCCRES"), "Default"));
+#endif
 	}
 
 	if (xsec_ncres)
