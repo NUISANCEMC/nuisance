@@ -1477,6 +1477,9 @@ void SystematicRoutines::MergeThrows(){
         errorDIR->cd();
         bintree->Fill();
       }
+
+      throwfile->Close();
+      delete throwfile;
     }
 
     errorDIR->cd();
