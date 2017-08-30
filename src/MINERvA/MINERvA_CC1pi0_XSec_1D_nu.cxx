@@ -47,10 +47,11 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
   std::string corrfile = "";
   std::string titles = "";
   std::string distdescript = "";
-  // Set the default to essentially not be a cut
+  // Set the default to essentially not be a cut on proton kinetic energy
   // The Adler angles and reconstructed p,pi0 invariant mass have cuts on these
-  WexpCut = 100;
   ProtonCut = 100;
+  // W exp is 1.8 GeV or lower (dealt with below)
+  WexpCut = 1.8;
 
   // Load up the data
   switch (fDist) {
@@ -58,13 +59,13 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
     case (kTpi):
       datafile  = "data/XSec_Table_pi0_KE_xsec.csv";
       corrfile = "corr/Correlation_Table_pi0_KE_xsec.csv";
-      titles    = "CC1#pi^{0};T_{#pi} (MeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/MeV)";
+      titles    = "CC1#pi^{0};T_{#pi} (GeV);d#sigma/dT_{#pi} (cm^{2}/nucleon/GeV)";
       break;
 
     case (kth):
       datafile  = "data/XSec_Table_pi0_theta_xsec.csv";
       corrfile = "corr/Correlation_Table_pi0_theta_xsec.csv";
-      titles    = "CC1#pi^{0};#theta_{#pi};d#sigma/d#theta_{#pi} (cm^{2}/nucleon)";
+      titles    = "CC1#pi^{0};#theta_{#pi} (degrees); d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)";
       break;
 
     case (kpmu):
@@ -76,7 +77,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
     case (kthmu):
       datafile  = "data/XSec_Table_muon_theta_xsec.csv";
       corrfile = "corr/Correlation_Table_muon_theta_xsec.csv";
-      titles    = "CC1#pi^{0};#theta_{#mu};d#sigma/d#theta_{#mu} (cm^{2}/nucleon)";
+      titles    = "CC1#pi^{0};#theta_{#mu} (degrees);d#sigma/d#theta_{#mu} (cm^{2}/nucleon/degree)";
       break;
 
     case (kQ2):
@@ -106,7 +107,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
     case (kPPi0MassDelta):
       datafile  = "data/XSec_Table_deltaInvMass_xsec_DeltaRich.csv";
       corrfile = "corr/Correlation_Table_deltaInvMass_xsec_DeltaRich.csv";
-      titles    = "CC1#pi^{0}; M_{p#pi^{0}} (GeV) #Delta; d#sigma/dM_{p#pi^{0}} (cm^{2}/nucleon/GeV)";
+      titles    = "CC1#pi^{0}; M_{p#pi^{0}} W_{exp} < 1.4 (GeV); d#sigma/dM_{p#pi^{0}} (cm^{2}/nucleon/GeV)";
       break;
 
     case (kCosAdler):
@@ -118,7 +119,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
     case (kPhiAdler):
       datafile  = "data/XSec_Table_Delta_pi_phi_xsec.csv";
       corrfile = "corr/Correlation_Table_Delta_pi_phi_xsec.csv";
-      titles    = "CC1#pi^{0}; #phi_{Adler}; d#sigma/d#phi_{Adler} (cm^{2}/nucleon/deg)";
+      titles    = "CC1#pi^{0}; #phi_{Adler} (degrees); d#sigma/d#phi_{Adler} (cm^{2}/nucleon/degree)";
       break;
 
     default:
@@ -126,20 +127,14 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
   }
 
   // Set the Wexp and proton kinetic energy cuts depending on sample
-  // for Ppi0Mass distributions and Adler angles we require a proton
+  // for Ppi0Mass distributions and Adler angles we require a proton of at least 100 MeV kinetic energy
   if (fDist >= kPPi0Mass) {
     ProtonCut = 0.1;
     // 0.1 GeV proton kinetic energy cut
-    // Some distributions have a Wexp cut too to isolate delta production
+    // Some distributions have a Wexp cut at 1.4 GeV which attempts to isolate delta production
     if (fDist >= kPPi0MassDelta) {
       WexpCut = 1.4;
-    // Else set to something madly high
-    } else {
-      WexpCut = 100.0;
     }
-  } else {
-    ProtonCut = 100.0;
-    WexpCut = 100.0;
   }
 
   // Only have xsec covariance (not shape only)
