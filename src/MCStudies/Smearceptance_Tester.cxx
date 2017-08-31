@@ -140,6 +140,12 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 
   eventVariables->Branch("EISLep_true", &EISLep_true, "EISLep_true/F");
 
+  eventVariables->Branch("HMFS_mu_true", &HMFS_mu_true);
+  eventVariables->Branch("HMFS_pip_true", &HMFS_pip_true);
+  eventVariables->Branch("HMFS_pim_true", &HMFS_pim_true);
+  eventVariables->Branch("HMFS_cpi_true", &HMFS_cpi_true);
+  eventVariables->Branch("HMFS_p_true", &HMFS_p_true);
+
   eventVariables->Branch("KEFSHad_cpip_true", &KEFSHad_cpip_true,
                          "KEFSHad_cpip_true/F");
   eventVariables->Branch("KEFSHad_cpim_true", &KEFSHad_cpim_true,
@@ -167,6 +173,12 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Ncpiminus_true", &Ncpiminus_true, "Ncpiminus_true/I");
   eventVariables->Branch("Ncpi_true", &Ncpi_true, "Ncpi_true/I");
   eventVariables->Branch("Npi0_true", &Npi0_true, "Npi0_true/I");
+
+  eventVariables->Branch("HMFS_mu_rec", &HMFS_mu_rec);
+  eventVariables->Branch("HMFS_pip_rec", &HMFS_pip_rec);
+  eventVariables->Branch("HMFS_pim_rec", &HMFS_pim_rec);
+  eventVariables->Branch("HMFS_cpi_rec", &HMFS_cpi_rec);
+  eventVariables->Branch("HMFS_p_rec", &HMFS_p_rec);
 
   eventVariables->Branch("KEFSHad_cpip_rec", &KEFSHad_cpip_rec,
                          "KEFSHad_cpip_rec/F");
@@ -237,15 +249,10 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 
   eventVariables->Branch("flagCCINC_rec", &flagCCINC_rec, "flagCCINC_rec/O");
   eventVariables->Branch("flagCC0Pi_rec", &flagCC0Pi_rec, "flagCC0Pi_rec/O");
-
-#ifdef DEBUG_SMEARTESTER
-  eventVariables->Branch("FSMuon_True", &FSMuon_True);
-  eventVariables->Branch("FSMuon_Smeared", &FSMuon_Smeared);
-#endif
 }
 
 template <size_t N>
-int CountNPdgsSeen(RecoInfo ri, int (&pdgs)[N]) {
+int CountNPdgsSeen(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
   for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
     sum +=
@@ -255,7 +262,7 @@ int CountNPdgsSeen(RecoInfo ri, int (&pdgs)[N]) {
 }
 
 template <size_t N>
-int CountNNotPdgsSeen(RecoInfo ri, int (&pdgs)[N]) {
+int CountNNotPdgsSeen(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
   for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
     sum +=
@@ -267,7 +274,7 @@ int CountNNotPdgsSeen(RecoInfo ri, int (&pdgs)[N]) {
 }
 
 template <size_t N>
-int CountNPdgsContributed(RecoInfo ri, int (&pdgs)[N]) {
+int CountNPdgsContributed(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
   for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
     sum += std::count(ri.TrueContribPDGs.begin(), ri.TrueContribPDGs.end(),
@@ -277,7 +284,7 @@ int CountNPdgsContributed(RecoInfo ri, int (&pdgs)[N]) {
 }
 
 template <size_t N>
-int CountNNotPdgsContributed(RecoInfo ri, int (&pdgs)[N]) {
+int CountNNotPdgsContributed(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
   for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
     sum += (std::count(ri.TrueContribPDGs.begin(), ri.TrueContribPDGs.end(),
@@ -288,19 +295,21 @@ int CountNNotPdgsContributed(RecoInfo ri, int (&pdgs)[N]) {
   return sum;
 }
 
-TVector3 GetHMFSRecParticles(RecoInfo ri, int pdg) {
-  TVector3 mom(0, 0, 0);
+TLorentzVector GetHMFSRecParticles(RecoInfo ri, int pdg) {
+  TLorentzVector mom(0, 0, 0, 0);
   for (size_t p_it = 0; p_it < ri.RecObjMom.size(); ++p_it) {
     if ((ri.RecObjClass[p_it] == pdg) &&
         (mom.Mag() < ri.RecObjMom[p_it].Mag())) {
-      mom = ri.RecObjMom[p_it];
+      mom.SetXYZM(ri.RecObjMom[p_it].X(), ri.RecObjMom[p_it].Y(),
+                  ri.RecObjMom[p_it].Z(),
+                  PhysConst::GetMass(ri.RecObjClass[p_it]) * 1.0E3);
     }
   }
   return mom;
 }
 
 template <size_t N>
-double SumKE_RecoInfo(RecoInfo ri, int (&pdgs)[N], double mass) {
+double SumKE_RecoInfo(RecoInfo ri, int const (&pdgs)[N], double mass) {
   double sum = 0;
   for (size_t p_it = 0; p_it < ri.RecObjMom.size(); ++p_it) {
     if (!std::count(pdgs, pdgs + N,
@@ -315,7 +324,7 @@ double SumKE_RecoInfo(RecoInfo ri, int (&pdgs)[N], double mass) {
 }
 
 template <size_t N>
-double SumTE_RecoInfo(RecoInfo ri, int (&pdgs)[N], double mass) {
+double SumTE_RecoInfo(RecoInfo ri, int const (&pdgs)[N], double mass) {
   double sum = 0;
   for (size_t p_it = 0; p_it < ri.RecObjMom.size(); ++p_it) {
     if (!std::count(pdgs, pdgs + N,
@@ -330,7 +339,7 @@ double SumTE_RecoInfo(RecoInfo ri, int (&pdgs)[N], double mass) {
 }
 
 template <size_t N>
-double SumVisE_RecoInfo(RecoInfo ri, int (&pdgs)[N]) {
+double SumVisE_RecoInfo(RecoInfo ri, int const (&pdgs)[N]) {
   double sum = 0;
 
   for (size_t p_it = 0; p_it < ri.RecVisibleEnergy.size(); ++p_it) {
@@ -346,7 +355,7 @@ double SumVisE_RecoInfo(RecoInfo ri, int (&pdgs)[N]) {
 }
 
 template <size_t N>
-double SumVisE_RecoInfo_NotPdgs(RecoInfo ri, int (&pdgs)[N]) {
+double SumVisE_RecoInfo_NotPdgs(RecoInfo ri, int const (&pdgs)[N]) {
   double sum = 0;
 
   for (size_t p_it = 0; p_it < ri.RecVisibleEnergy.size(); ++p_it) {
@@ -365,27 +374,65 @@ double SumVisE_RecoInfo_NotPdgs(RecoInfo ri, int (&pdgs)[N]) {
 void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   //********************************************************************
 
-  int cpipPDG[] = {211};
-  int cpimPDG[] = {-211};
-  int pi0PDG[] = {111};
-  int ProtonPDG[] = {2212};
-  int NeutronPDG[] = {2112};
-  int GammaPDG[] = {22};
-  int CLeptonPDGs[] = {11, 13, 15};
-  int ExplicitPDGs[] = {211, -211, 11, 2212, 2112, 22, 11, 13, 15, 12, 14, 16};
+  static int const cpipPDG[] = {211};
+  static int const cpimPDG[] = {-211};
+  static int const pi0PDG[] = {111};
+  static int const ProtonPDG[] = {2212};
+  static int const NeutronPDG[] = {2112};
+  static int const GammaPDG[] = {22};
+  static int const CLeptonPDGs[] = {11, 13, 15};
+  static int const ExplicitPDGs[] = {211, -211, 11, 2212, 2112, 22,
+                                     11,  13,   15, 12,   14,   16};
 
   RecoInfo *ri = smearceptor->Smearcept(event);
 
-#ifdef DEBUG_SMEARTESTER
-
-  FSMuon_True = TVector3(0, 0, 0);
-  FSMuon_Smeared = TVector3(0, 0, 0);
+  HMFS_mu_true = TLorentzVector(0, 0, 0, 0);
+  HMFS_mu_rec = TLorentzVector(0, 0, 0, 0);
   FitParticle *fsMu = event->GetHMFSMuon();
   if (fsMu) {
-    FSMuon_True = fsMu->P3();
-    FSMuon_Smeared = GetHMFSRecParticles(*ri, 13);
+    HMFS_mu_true = fsMu->P4();
+    HMFS_mu_rec = GetHMFSRecParticles(*ri, 13);
   }
-#endif
+
+  HMFS_pip_true = TLorentzVector(0, 0, 0, 0);
+  HMFS_pip_rec = TLorentzVector(0, 0, 0, 0);
+  FitParticle *fsPip = event->GetHMFSPiPlus();
+  if (fsPip) {
+    HMFS_pip_true = fsPip->P4();
+    HMFS_pip_rec = GetHMFSRecParticles(*ri, 211);
+  }
+
+  HMFS_pim_true = TLorentzVector(0, 0, 0, 0);
+  HMFS_pim_rec = TLorentzVector(0, 0, 0, 0);
+  FitParticle *fsPim = event->GetHMFSPiMinus();
+  if (fsPim) {
+    HMFS_pim_true = fsPim->P4();
+    HMFS_pim_rec = GetHMFSRecParticles(*ri, -211);
+  }
+
+  HMFS_cpi_true = TLorentzVector(0, 0, 0, 0);
+  HMFS_cpi_rec = TLorentzVector(0, 0, 0, 0);
+  if (fsPip || fsPim) {
+    if (!fsPip) {
+      HMFS_cpi_true = HMFS_pim_true;
+      HMFS_cpi_rec = HMFS_pim_rec;
+    } else if (!fsPim) {
+      HMFS_cpi_true = HMFS_pip_true;
+      HMFS_cpi_rec = HMFS_pip_rec;
+    } else {
+      HMFS_cpi_true =
+          (fsPip->p2() > fsPim->p2()) ? HMFS_pip_true : HMFS_pim_true;
+      HMFS_cpi_rec = (fsPip->p2() > fsPim->p2()) ? HMFS_pip_rec : HMFS_pim_rec;
+    }
+  }
+
+  HMFS_p_true = TLorentzVector(0, 0, 0, 0);
+  HMFS_p_rec = TLorentzVector(0, 0, 0, 0);
+  FitParticle *fsP = event->GetHMFSProton();
+  if (fsP) {
+    HMFS_p_true = fsP->P4();
+    HMFS_p_rec = GetHMFSRecParticles(*ri, 2212);
+  }
 
   TLorentzVector FourMomentumTransfer =
       (event->GetHMISAnyLeptons()->P4() - event->GetHMFSAnyLeptons()->P4());
@@ -433,13 +480,10 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   EFSHad_rec =
       KEFSHad_cpi_rec + TEFSHad_pi0_rec + KEFSHad_p_rec + KEFSHad_n_rec;
 
-  TVector3 FSLepMom_rec(0, 0, 0);
+  TLorentzVector FSLepMom_rec(0, 0, 0, 0);
   if (event->GetHMFSAnyLeptons()) {
-    double massLep = event->GetHMFSAnyLeptons()->M();
     FSLepMom_rec = GetHMFSRecParticles(*ri, event->GetHMFSAnyLeptons()->PDG());
-    EFSLep_rec = (FSLepMom_rec.Mag() > 1E-5)
-                     ? sqrt(FSLepMom_rec * FSLepMom_rec + massLep * massLep)
-                     : 0;
+    EFSLep_rec = FSLepMom_rec.E();
   } else {
     EFSLep_rec = 0;
   }

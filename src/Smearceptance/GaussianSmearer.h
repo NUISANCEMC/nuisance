@@ -24,6 +24,8 @@
 
 #include <map>
 
+// #define DEBUG_GAUSSSMEAR
+
 class GaussianSmearer : public ISmearcepter {
  public:
   enum GSmearType { kAbsolute, kFractional, kFunction, kNoType };
@@ -35,7 +37,6 @@ class GaussianSmearer : public ISmearcepter {
     DependVar smearVar;
     double width;
     TF1 *func;
-    ~GSmear() { delete func; }
   };
 
   std::map<int, std::vector<GSmear> > TrackedGausSmears;
@@ -47,9 +48,20 @@ class GaussianSmearer : public ISmearcepter {
 
  public:
   RecoInfo *Smearcept(FitEvent *);
+
+  void SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
+#ifdef DEBUG_GAUSSSMEAR
+                            ,
+                            size_t p_it
+#endif
+                            );
   /// Helper method for using this class as a component in a more complex
   /// smearer
   void SmearRecoInfo(RecoInfo *);
+
+  void SmearceptOneParticle(TVector3 &RecObjMom, int RecObjClass);
+
+  void SmearceptOneParticle(double &RecVisibleEnergy, int TrueContribPDGs);
 };
 
 #endif
