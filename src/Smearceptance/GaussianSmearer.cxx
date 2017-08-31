@@ -19,8 +19,6 @@
 
 #include "GaussianSmearer.h"
 
-// #define DEBUG_THRESACCEPT
-
 namespace {
 GaussianSmearer::GSmearType GetVarType(std::string const &type) {
   if (type == "Absolute") {
@@ -77,13 +75,14 @@ std::string GetKineTypeName(GaussianSmearer::DependVar dv) {
 
 /// Nodes look like:
 /// Function attribute is given to a TF1, where any "V"s are replaced with the
-/// selected kinematic property on an event-by-event basis. e.g Function="V +
-/// gaus(0.2*V),..." should give the same result as Type="kFractional"
-/// Width="0.2".
+/// selected kinematic property on an event-by-event basis. e.g Function="{V} +
+/// gaus({P1}),..." with P1="0.2", should give the same result as
+/// Type="kFractional" and Width="0.2".
 /// <GaussianSmearer Name="D00N_ND_LAr">
-///   <Smear PDG="211" Type="[kAbsolute,kFractional,kFunction]"
-///   Width="2" Kinematics="[KE|Momentum|VisKE|VisTE]" Function="V +
-///   gaus(1/V),<lowlim>,<highlim>" />
+///   <Smear PDG="211" Type="[Absolute|Fractional|Function]"
+///   Kinematics="[KE|Momentum|VisKE|VisTE|CosTheta|Theta]" (Width="2")
+///   (Function="V +
+///   gaus(1/{V}),<lowlim>,<highlim>") (AllowNeg="0") />
 /// </GaussianSmearer>
 void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
   rand.~TRandom3();
@@ -114,14 +113,38 @@ void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
                                        : "";
       if (funcDescriptor.size()) {
         std::vector<std::string> funcP =
-            GeneralUtils::ParseToStr(funcDescriptor, ",");
+            GeneralUtils::ParseToStr(funcDescriptor, "$");
         if (funcP.size() != 3) {
           THROW(
               "Expected Function attribute to contain 3 comma separated "
-              "entries. e.g. Function=\"1/x,<low lim>,<high lim>\". ");
+              "entries. e.g. Function=\"1/{V}$<low lim>$<high lim>\". ");
         }
-        funcP[0] = GeneralUtils::ReplaceAll(funcP[0], "V", "[0]");
-        QLOG(FIT, "Added smearing func: " << funcP[0]);
+        bool FoundParam;
+        int pCtr = 1;
+        std::map<std::string, std::string> PVals;
+        do {
+          std::stringstream pv_str("");
+          pv_str << "P" << pCtr++;
+          if (smearDescriptors[t_it].Has(pv_str.str())) {
+            PVals.insert(
+                std::make_pair(std::string("{") + pv_str.str() + "}",
+                               smearDescriptors[t_it].GetS(pv_str.str())));
+            FoundParam = true;
+          } else {
+            FoundParam = false;
+          }
+        } while (FoundParam);
+
+        for (std::map<std::string, std::string>::iterator v_it = PVals.begin();
+             v_it != PVals.end(); ++v_it) {
+          funcP[0] =
+              GeneralUtils::ReplaceAll(funcP[0], v_it->first, v_it->second);
+        }
+
+        funcP[0] = GeneralUtils::ReplaceAll(funcP[0], "{V}", "[0]");
+        QLOG(FIT, "Added smearing func: "
+                      << funcP[0] << ", [" << GeneralUtils::StrToDbl(funcP[1])
+                      << " -- " << GeneralUtils::StrToDbl(funcP[2]) << "].");
         sf = new TF1("smear_dummy", funcP[0].c_str(),
                      GeneralUtils::StrToDbl(funcP[1]),
                      GeneralUtils::StrToDbl(funcP[2]));
@@ -168,227 +191,74 @@ void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
   }
 }
 
-RecoInfo *GaussianSmearer::Smearcept(FitEvent *fe) {
-  RecoInfo *ri = new RecoInfo();
-
-  for (size_t p_it = 0; p_it < fe->NParticles(); ++p_it) {
-    FitParticle *fp = fe->GetParticle(p_it);
-#ifdef DEBUG_THRESACCEPT
-    std::cout << std::endl;
-    std::cout << "[" << p_it << "]: " << fp->PDG() << ", " << fp->Status()
-              << ", " << fp->E() << " -- KE:" << fp->KE()
-              << " Mom: " << fp->P3().Mag() << std::flush;
+void GaussianSmearer::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
+#ifdef DEBUG_GAUSSSMEAR
+                                           ,
+                                           size_t p_it
+#endif
+                                           ) {
+#ifdef DEBUG_GAUSSSMEAR
+  std::cout << std::endl;
+  std::cout << "[" << p_it << "]: " << fp->PDG() << ", " << fp->Status() << ", "
+            << fp->E() << " -- KE:" << fp->KE() << " Mom: " << fp->P3().Mag()
+            << std::flush;
 #endif
 
-    if (fp->Status() != kFinalState) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Not final state." << std::flush;
+  if (fp->Status() != kFinalState) {
+#ifdef DEBUG_GAUSSSMEAR
+    std::cout << " -- Not final state." << std::flush;
 #endif
-      continue;
-    }
-
-    if ((TrackedGausSmears.count(fp->PDG()) + VisGausSmears.count(fp->PDG())) ==
-        0) {
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Undetectable." << std::flush;
-#endif
-      continue;
-    }
-
-    if (TrackedGausSmears.count(fp->PDG())) {
-      TVector3 ThreeMom = fp->P3();
-      for (size_t sm_it = 0; sm_it < TrackedGausSmears[fp->PDG()].size();
-           ++sm_it) {
-        GSmear &sm = TrackedGausSmears[fp->PDG()][sm_it];
-
-        double kineProp = 0;
-
-        switch (sm.smearVar) {
-          case GaussianSmearer::kMomentum: {
-            kineProp = fp->P3().Mag();
-            break;
-          }
-          case GaussianSmearer::kKE: {
-            kineProp = fp->KE();
-            break;
-          }
-          case GaussianSmearer::kCosTheta: {
-            kineProp = fp->P3().CosTheta();
-            break;
-          }
-          case GaussianSmearer::kTheta: {
-            kineProp = fp->P3().Theta();
-            break;
-          }
-          default: { THROW("Trying to find particle value for a kNoVar."); }
-        }
-
-        double Smeared;
-        bool ok = false;
-        while (!ok) {
-          if (sm.type == GaussianSmearer::kFunction) {
-            sm.func->SetParameter(0, kineProp);
-            Smeared = sm.func->GetRandom();
-          } else {
-            double sThrow =
-                rand.Gaus(0, sm.width * ((sm.type == GaussianSmearer::kAbsolute)
-                                             ? 1
-                                             : kineProp));
-            Smeared = kineProp + sThrow;
-          }
-          switch (
-              sm.smearVar) {  // Different kinematics have different truncation.
-            case GaussianSmearer::kMomentum:
-            case GaussianSmearer::kKE: {
-              ok = (Smeared > 0);
-              break;
-            }
-            case GaussianSmearer::kCosTheta: {
-              ok = ((Smeared >= -1) && (Smeared <= 1));
-              break;
-            }
-            case GaussianSmearer::kTheta: {
-              ok = true;
-              break;
-            }
-
-            default: { THROW("SHOULDN'T BE HERE."); }
-          }
-        }
-
-        switch (sm.smearVar) {
-          case GaussianSmearer::kMomentum: {
-            ThreeMom = (ThreeMom.Unit() * Smeared);
-            break;
-          }
-          case GaussianSmearer::kKE: {
-            double mass = fp->P4().M();
-            double TE = mass + Smeared;
-            double magP = sqrt(TE * TE - mass * mass);
-            ThreeMom = (ThreeMom.Unit() * magP);
-            break;
-          }
-          case GaussianSmearer::kCosTheta: {
-            ThreeMom.SetTheta(acos(Smeared));
-            break;
-          }
-          case GaussianSmearer::kTheta: {
-            ThreeMom.SetTheta(Smeared);
-            break;
-          }
-          default: {}
-        }
-      }
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- momentum reconstructed as Mom: "
-                << ri->RecObjMom.back().Mag()
-                << ", CT: " << ri->RecObjMom.back().CosTheta() << " from "
-                << ThreeMom.Mag() << ", " << fp->P3().CosTheta() << " true."
-                << std::endl;
-#endif
-      ri->RecObjMom.push_back(ThreeMom);
-      ri->RecObjClass.push_back(fp->PDG());
-    } else {  // Smear to EVis
-
-      GSmear &sm = VisGausSmears[fp->PDG()];
-
-      double kineProp = 0;
-
-      switch (sm.smearVar) {
-        case GaussianSmearer::kKEVis: {
-          kineProp = fp->KE();
-          break;
-        }
-        case GaussianSmearer::kTEVis: {
-          kineProp = fp->E();
-          break;
-        }
-        default: { THROW("Trying to find particle value for a kNoVar."); }
-      }
-
-      double Smeared;
-      if (sm.type == GaussianSmearer::kFunction) {
-        sm.func->SetParameter(0, kineProp);
-        Smeared = sm.func->GetRandom();
-      } else {
-        double sThrow = rand.Gaus(
-            0, sm.width *
-                   ((sm.type == GaussianSmearer::kAbsolute) ? 1.0 : kineProp));
-        Smeared = kineProp + sThrow;
-      }
-      Smeared = (Smeared < 0) ? 0 : Smeared;
-#ifdef DEBUG_THRESACCEPT
-      std::cout << " -- Saw " << Smeared << " visible energy from " << kineProp
-                << " available. [PDG: " << fp->PDG() << "]" << std::endl;
-#endif
-
-      ri->RecVisibleEnergy.push_back(Smeared);
-      ri->TrueContribPDGs.push_back(fp->PDG());
-    }
-#ifdef DEBUG_THRESACCEPT
-    std::cout << std::endl;
-#endif
+    return;
   }
 
-  return ri;
-}
+  if ((TrackedGausSmears.count(fp->PDG()) + VisGausSmears.count(fp->PDG())) ==
+      0) {
+#ifdef DEBUG_GAUSSSMEAR
+    std::cout << " -- Undetectable." << std::flush;
+#endif
+    return;
+  }
 
-void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
-  // Smear tracked particles
-  for (size_t p_it = 0; p_it < ri->RecObjMom.size(); ++p_it) {
-    if (!TrackedGausSmears.count(ri->RecObjClass[p_it])) {
-      continue;
-    }
-    TVector3 ThreeMom = ri->RecObjMom[p_it];
-    TVector3 OriginalKP = ThreeMom;
-    for (size_t sm_it = 0;
-         sm_it < TrackedGausSmears[ri->RecObjClass[p_it]].size(); ++sm_it) {
-      GSmear &sm = TrackedGausSmears[ri->RecObjClass[p_it]][sm_it];
+  if (TrackedGausSmears.count(fp->PDG())) {
+    TVector3 ThreeMom = fp->P3();
+    for (size_t sm_it = 0; sm_it < TrackedGausSmears[fp->PDG()].size();
+         ++sm_it) {
+      GSmear &sm = TrackedGausSmears[fp->PDG()][sm_it];
 
       double kineProp = 0;
 
       switch (sm.smearVar) {
         case GaussianSmearer::kMomentum: {
-          kineProp = ri->RecObjMom[p_it].Mag();
+          kineProp = fp->P3().Mag();
           break;
         }
         case GaussianSmearer::kKE: {
-          double mass = PhysConst::GetMass(ri->RecObjClass[p_it]) * 1.0E3;
-          kineProp = sqrt(ri->RecObjMom[p_it].Mag2() + mass * mass) - mass;
+          kineProp = fp->KE();
           break;
         }
         case GaussianSmearer::kCosTheta: {
-          kineProp = OriginalKP.CosTheta();
+          kineProp = fp->P3().CosTheta();
           break;
         }
         case GaussianSmearer::kTheta: {
-          kineProp = OriginalKP.Theta();
+          kineProp = fp->P3().Theta();
           break;
         }
         default: { THROW("Trying to find particle value for a kNoVar."); }
       }
 
       double Smeared;
+      size_t attempt = 0;
       bool ok = false;
-      int attempt = 0;
       while (!ok) {
         if (sm.type == GaussianSmearer::kFunction) {
           sm.func->SetParameter(0, kineProp);
           Smeared = sm.func->GetRandom();
         } else {
-          double sThrow =
-              rand.Gaus(0, sm.width * ((sm.type == GaussianSmearer::kAbsolute)
-                                           ? 1.0
-                                           : kineProp));
+          double sThrow = rand.Gaus(
+              0, sm.width *
+                     ((sm.type == GaussianSmearer::kAbsolute) ? 1 : kineProp));
           Smeared = kineProp + sThrow;
-#ifdef DEBUG_THRESACCEPT
-          std::cout << "*** [" << attempt << "] Gaus(0,"
-                    << (sm.width * (sm.type == GaussianSmearer::kAbsolute)
-                            ? 1
-                            : kineProp)
-                    << "[" << sm.width << "]) = " << sThrow << ": " << kineProp
-                    << " -> " << Smeared << std::endl;
-#endif
         }
         switch (
             sm.smearVar) {  // Different kinematics have different truncation.
@@ -405,9 +275,14 @@ void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
             ok = true;
             break;
           }
+
           default: { THROW("SHOULDN'T BE HERE."); }
         }
         attempt++;
+        if (attempt > 1000) {
+          THROW("Didn't get a good smeared value after " << attempt
+                                                         << " attempts.");
+        }
       }
 
       switch (sm.smearVar) {
@@ -416,7 +291,7 @@ void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
           break;
         }
         case GaussianSmearer::kKE: {
-          double mass = PhysConst::GetMass(ri->RecObjClass[p_it]) * 1.0E3;
+          double mass = fp->P4().M();
           double TE = mass + Smeared;
           double magP = sqrt(TE * TE - mass * mass);
           ThreeMom = (ThreeMom.Unit() * magP);
@@ -433,23 +308,32 @@ void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
         default: {}
       }
     }
-    ri->RecObjMom[p_it] = ThreeMom;
-
-#ifdef DEBUG_THRESACCEPT
+#ifdef DEBUG_GAUSSSMEAR
     std::cout << " -- momentum reconstructed as Mom: "
-              << ri->RecObjMom[p_it].Mag()
-              << ", CT: " << ri->RecObjMom[p_it].CosTheta() << " from "
-              << OriginalKP.Mag() << ", " << OriginalKP.CosTheta() << " true."
+              << ri->RecObjMom.back().Mag()
+              << ", CT: " << ri->RecObjMom.back().CosTheta() << " from "
+              << ThreeMom.Mag() << ", " << fp->P3().CosTheta() << " true."
               << std::endl;
 #endif
-  }
+    ri->RecObjMom.push_back(ThreeMom);
+    ri->RecObjClass.push_back(fp->PDG());
+  } else {  // Smear to EVis
 
-  for (size_t ve_it = 0; ve_it < ri->RecVisibleEnergy.size(); ++ve_it) {
-    if (!VisGausSmears.count(ri->TrueContribPDGs[ve_it])) {
-      continue;
+    GSmear &sm = VisGausSmears[fp->PDG()];
+
+    double kineProp = 0;
+
+    switch (sm.smearVar) {
+      case GaussianSmearer::kKEVis: {
+        kineProp = fp->KE();
+        break;
+      }
+      case GaussianSmearer::kTEVis: {
+        kineProp = fp->E();
+        break;
+      }
+      default: { THROW("Trying to find particle value for a kNoVar."); }
     }
-    GSmear &sm = VisGausSmears[ri->TrueContribPDGs[ve_it]];
-    double kineProp = ri->RecVisibleEnergy[ve_it];
 
     double Smeared;
     if (sm.type == GaussianSmearer::kFunction) {
@@ -462,16 +346,184 @@ void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
       Smeared = kineProp + sThrow;
     }
     Smeared = (Smeared < 0) ? 0 : Smeared;
-#ifdef DEBUG_THRESACCEPT
+#ifdef DEBUG_GAUSSSMEAR
     std::cout << " -- Saw " << Smeared << " visible energy from " << kineProp
-              << " available. [PDG: " << ri->TrueContribPDGs[ve_it] << "]"
-              << std::endl;
+              << " available. [PDG: " << fp->PDG() << "]" << std::endl;
 #endif
 
-    ri->RecVisibleEnergy[ve_it] = Smeared;
+    ri->RecVisibleEnergy.push_back(Smeared);
+    ri->TrueContribPDGs.push_back(fp->PDG());
+  }
+#ifdef DEBUG_GAUSSSMEAR
+  std::cout << std::endl;
+#endif
+}
+
+RecoInfo *GaussianSmearer::Smearcept(FitEvent *fe) {
+  RecoInfo *ri = new RecoInfo();
+
+  for (size_t p_it = 0; p_it < fe->NParticles(); ++p_it) {
+    FitParticle *fp = fe->GetParticle(p_it);
+    SmearceptOneParticle(ri, fp
+#ifdef DEBUG_GAUSSSMEAR
+                         ,
+                         p_it
+#endif
+                         );
   }
 
-#ifdef DEBUG_THRESACCEPT
+  return ri;
+}
+
+void GaussianSmearer::SmearceptOneParticle(TVector3 &RecObjMom,
+                                           int RecObjClass) {
+  if (!TrackedGausSmears.count(RecObjClass)) {
+    return;
+  }
+  TVector3 ThreeMom = RecObjMom;
+  TVector3 OriginalKP = ThreeMom;
+  for (size_t sm_it = 0; sm_it < TrackedGausSmears[RecObjClass].size();
+       ++sm_it) {
+    GSmear &sm = TrackedGausSmears[RecObjClass][sm_it];
+
+    double kineProp = 0;
+
+    switch (sm.smearVar) {
+      case GaussianSmearer::kMomentum: {
+        kineProp = RecObjMom.Mag();
+        break;
+      }
+      case GaussianSmearer::kKE: {
+        double mass = PhysConst::GetMass(RecObjClass) * 1.0E3;
+        kineProp = sqrt(RecObjMom.Mag2() + mass * mass) - mass;
+        break;
+      }
+      case GaussianSmearer::kCosTheta: {
+        kineProp = OriginalKP.CosTheta();
+        break;
+      }
+      case GaussianSmearer::kTheta: {
+        kineProp = OriginalKP.Theta();
+        break;
+      }
+      default: { THROW("Trying to find particle value for a kNoVar."); }
+    }
+
+    double Smeared;
+    bool ok = false;
+    int attempt = 0;
+    while (!ok) {
+      if (sm.type == GaussianSmearer::kFunction) {
+        sm.func->SetParameter(0, kineProp);
+        Smeared = sm.func->GetRandom();
+      } else {
+        double sThrow = rand.Gaus(
+            0, sm.width *
+                   ((sm.type == GaussianSmearer::kAbsolute) ? 1.0 : kineProp));
+        Smeared = kineProp + sThrow;
+#ifdef DEBUG_GAUSSSMEAR
+        std::cout << "*** [" << attempt << "] Gaus(0,"
+                  << (sm.width * (sm.type == GaussianSmearer::kAbsolute)
+                          ? 1
+                          : kineProp)
+                  << "[" << sm.width << "]) = " << sThrow << ": " << kineProp
+                  << " -> " << Smeared << std::endl;
+#endif
+      }
+      switch (sm.smearVar) {  // Different kinematics have different truncation.
+        case GaussianSmearer::kMomentum:
+        case GaussianSmearer::kKE: {
+          ok = (Smeared > 0);
+          break;
+        }
+        case GaussianSmearer::kCosTheta: {
+          ok = ((Smeared >= -1) && (Smeared <= 1));
+          break;
+        }
+        case GaussianSmearer::kTheta: {
+          ok = true;
+          break;
+        }
+        default: { THROW("SHOULDN'T BE HERE."); }
+      }
+      attempt++;
+      if (attempt > 1000) {
+        THROW("Didn't get a good smeared value after " << attempt
+                                                       << " attempts.");
+      }
+    }
+
+    switch (sm.smearVar) {
+      case GaussianSmearer::kMomentum: {
+        ThreeMom = (ThreeMom.Unit() * Smeared);
+        break;
+      }
+      case GaussianSmearer::kKE: {
+        double mass = PhysConst::GetMass(RecObjClass) * 1.0E3;
+        double TE = mass + Smeared;
+        double magP = sqrt(TE * TE - mass * mass);
+        ThreeMom = (ThreeMom.Unit() * magP);
+        break;
+      }
+      case GaussianSmearer::kCosTheta: {
+        ThreeMom.SetTheta(acos(Smeared));
+        break;
+      }
+      case GaussianSmearer::kTheta: {
+        ThreeMom.SetTheta(Smeared);
+        break;
+      }
+      default: {}
+    }
+  }
+  RecObjMom = ThreeMom;
+
+#ifdef DEBUG_GAUSSSMEAR
+  std::cout << " -- momentum reconstructed as Mom: " << RecObjMom.Mag()
+            << ", CT: " << RecObjMom.CosTheta() << " from " << OriginalKP.Mag()
+            << ", " << OriginalKP.CosTheta() << " true." << std::endl;
+#endif
+}
+
+void GaussianSmearer::SmearceptOneParticle(double &RecVisibleEnergy,
+                                           int TrueContribPDG) {
+  if (!VisGausSmears.count(TrueContribPDG)) {
+    return;
+  }
+  GSmear &sm = VisGausSmears[TrueContribPDG];
+  double kineProp = RecVisibleEnergy;
+
+  double Smeared;
+  if (sm.type == GaussianSmearer::kFunction) {
+    sm.func->SetParameter(0, kineProp);
+    Smeared = sm.func->GetRandom();
+  } else {
+    double sThrow = rand.Gaus(
+        0,
+        sm.width * ((sm.type == GaussianSmearer::kAbsolute) ? 1.0 : kineProp));
+    Smeared = kineProp + sThrow;
+  }
+  Smeared = (Smeared < 0) ? 0 : Smeared;
+#ifdef DEBUG_GAUSSSMEAR
+  std::cout << " -- Saw " << Smeared << " visible energy from " << kineProp
+            << " available. [PDG: " << TrueContribPDG << "]" << std::endl;
+#endif
+
+  RecVisibleEnergy = Smeared;
+}
+
+void GaussianSmearer::SmearRecoInfo(RecoInfo *ri) {
+  // Smear tracked particles
+  for (size_t p_it = 0; p_it < ri->RecObjMom.size(); ++p_it) {
+    SmearceptOneParticle(ri->RecObjMom[p_it], ri->RecObjClass[p_it]);
+  }
+
+  for (size_t ve_it = 0; ve_it < ri->RecVisibleEnergy.size(); ++ve_it) {
+    SmearceptOneParticle(ri->RecVisibleEnergy[ve_it],
+                         ri->TrueContribPDGs[ve_it]);
+  }
+
+#ifdef DEBUG_GAUSSSMEAR
   std::cout << std::endl;
 #endif
 }

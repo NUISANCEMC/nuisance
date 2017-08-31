@@ -238,6 +238,17 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           effProb = hist->Interpolate(kineProps[0]);
         } else {
           Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
+
+          if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
+            ERROR(WRN, "Tried to apply effiency but XBin: "
+                           << xbin << " is outside range (/"
+                           << hist->GetXaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetXaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetXaxis()->GetBinUpEdge(
+                                  hist->GetXaxis()->GetNbins()));
+          }
+
           effProb = hist->GetBinContent(xbin);
         }
         break;
@@ -256,6 +267,27 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
         } else {
           Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
           Int_t ybin = hist->GetYaxis()->FindFixBin(kineProps[1]);
+
+          if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
+            ERROR(WRN, "Tried to apply effiency but XBin: "
+                           << xbin << " is outside range (/"
+                           << hist->GetXaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetXaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetXaxis()->GetBinUpEdge(
+                                  hist->GetXaxis()->GetNbins()));
+          }
+
+          if (!ybin || ((hist->GetYaxis()->GetNbins() + 1) == ybin)) {
+            ERROR(WRN, "Tried to apply effiency but XBin: "
+                           << ybin << " is outside range (/"
+                           << hist->GetYaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetYaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetYaxis()->GetBinUpEdge(
+                                  hist->GetYaxis()->GetNbins()));
+          }
+
           effProb = hist->GetBinContent(xbin, ybin);
 
 #ifdef DEBUG_EFFAPP
@@ -283,6 +315,37 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
           Int_t ybin = hist->GetYaxis()->FindFixBin(kineProps[1]);
           Int_t zbin = hist->GetZaxis()->FindFixBin(kineProps[2]);
+
+          if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
+            ERROR(WRN, "Tried to apply effiency but XBin: "
+                           << xbin << " is outside range (/"
+                           << hist->GetXaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetXaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetXaxis()->GetBinUpEdge(
+                                  hist->GetXaxis()->GetNbins()));
+          }
+
+          if (!ybin || ((hist->GetYaxis()->GetNbins() + 1) == ybin)) {
+            ERROR(WRN, "Tried to apply effiency but XBin: "
+                           << ybin << " is outside range (/"
+                           << hist->GetYaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetYaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetYaxis()->GetBinUpEdge(
+                                  hist->GetYaxis()->GetNbins()));
+          }
+
+          if (!zbin || ((hist->GetZaxis()->GetNbins() + 1) == zbin)) {
+            ERROR(WRN, "Tried to apply effiency but ZBin: "
+                           << zbin << " is outside range (/"
+                           << hist->GetZaxis()->GetNbins() << "): Prop "
+                           << kineProps[0] << ", ["
+                           << hist->GetZaxis()->GetBinLowEdge(1) << " -- "
+                           << hist->GetZaxis()->GetBinUpEdge(
+                                  hist->GetZaxis()->GetNbins()));
+          }
+
           effProb = hist->GetBinContent(xbin, ybin, zbin);
         }
         break;

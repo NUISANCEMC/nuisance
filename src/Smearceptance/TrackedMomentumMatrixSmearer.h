@@ -22,6 +22,8 @@
 
 #include "ISmearcepter.h"
 
+#include "GaussianSmearer.h"
+
 #include "TRandom3.h"
 #include "TH2D.h"
 #include "TH1D.h"
@@ -29,9 +31,11 @@
 #include <vector>
 #include <utility>
 
+// #define DEBUG_MATSMEAR
+
 class TrackedMomentumMatrixSmearer : public ISmearcepter {
  public:
-  enum DependVar { kMomentum, kKE, kNoVar };
+  enum DependVar { kMomentum, kKE, kTE, kNoVar };
 
  private:
   class SmearMap {
@@ -51,6 +55,8 @@ class TrackedMomentumMatrixSmearer : public ISmearcepter {
     double UnitsScale;
   };
   std::map<int, SmearMap> ParticleMappings;
+
+  GaussianSmearer SlaveGS;
 
   void SpecifcSetup(nuiskey &);
 

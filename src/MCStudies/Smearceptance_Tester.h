@@ -28,8 +28,6 @@
 #include "OscWeightEngine.h"
 #endif
 
-#define DEBUG_SMEARTESTER
-
 //********************************************************************
 class Smearceptance_Tester : public Measurement1D {
   //********************************************************************
@@ -76,6 +74,12 @@ class Smearceptance_Tester : public Measurement1D {
 
   float EISLep_true;
 
+  TLorentzVector HMFS_mu_true;
+  TLorentzVector HMFS_pip_true;
+  TLorentzVector HMFS_pim_true;
+  TLorentzVector HMFS_cpi_true;
+  TLorentzVector HMFS_p_true;
+
   float KEFSHad_cpip_true;
   float KEFSHad_cpim_true;
   float KEFSHad_cpi_true;
@@ -98,6 +102,12 @@ class Smearceptance_Tester : public Measurement1D {
   int Ncpiminus_true;
   int Ncpi_true;
   int Npi0_true;
+
+  TLorentzVector HMFS_mu_rec;
+  TLorentzVector HMFS_pip_rec;
+  TLorentzVector HMFS_pim_rec;
+  TLorentzVector HMFS_cpi_rec;
+  TLorentzVector HMFS_p_rec;
 
   float KEFSHad_cpip_rec;
   float KEFSHad_cpim_rec;
@@ -155,17 +165,12 @@ class Smearceptance_Tester : public Measurement1D {
   bool flagCCINC_rec;
   bool flagCC0Pi_rec;
 
-#ifdef DEBUG_SMEARTESTER
-  TVector3 FSMuon_True;
-  TVector3 FSMuon_Smeared;
-#endif
 
   int SVDTruncation;
 
   TH2D *RecoSmear;
   TH1D *ETrueDistrib;
   TH1D *ERecDistrib;
-
 };
 
 #endif
