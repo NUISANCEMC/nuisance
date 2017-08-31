@@ -43,30 +43,13 @@ TH1D const *TrackedMomentumMatrixSmearer::SmearMap::GetRecoSlice(double val) {
   }
 
   int L = 0, U = RecoSlices.size();
-#ifdef DEBUG_MATSMEAR
-  std::cout << "\nBin search for " << val
-            << " within: " << RecoSlices.front().first.first << " -- "
-            << RecoSlices.back().first.second << std::endl;
-#endif
+
   while (true) {
-#ifdef DEBUG_MATSMEAR
-    std::cout << "\t\t U:" << U << ", L: " << L << " (/" << RecoSlices.size()
-              << ")" << std::endl;
-#endif
     if (U == L) {
-#ifdef DEBUG_MATSMEAR
-      std::cout << "Found: " << L << std::endl;
-#endif
       return RecoSlices[L].second;
     }
     int R = (U - L);
     int m = L + (R / 2);
-
-#ifdef DEBUG_MATSMEAR
-    std::cout << "Bin: " << m << "[ " << RecoSlices[m].first.first << " -- "
-              << RecoSlices[m].first.second << "] (Search: " << val << ")"
-              << std::endl;
-#endif
 
     if (val <= RecoSlices[m].first.first) {
       U = m - 1;
@@ -78,9 +61,6 @@ TH1D const *TrackedMomentumMatrixSmearer::SmearMap::GetRecoSlice(double val) {
     }
     if ((val > RecoSlices[m].first.first) &&
         (val <= RecoSlices[m].first.second)) {
-#ifdef DEBUG_MATSMEAR
-      std::cout << "Found: " << m << std::endl;
-#endif
       return RecoSlices[m].second;
     }
     THROW("Binary smearing search failed. Check logic.");
@@ -221,7 +201,7 @@ void TrackedMomentumMatrixSmearer::SpecifcSetup(nuiskey &nk) {
 
       ParticleMappings[pdgs_i[pdg_it]] = sm;
 
-      QLOG(SAM, "Added smearing map for PDG: " << pdgs_i[pdg_it]);
+      QLOG(FIT, "Added smearing map for PDG: " << pdgs_i[pdg_it]);
     }
   }
   SlaveGS.Setup(nk);

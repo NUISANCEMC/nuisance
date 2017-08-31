@@ -19,11 +19,12 @@
 
 #include "Smearcepterton.h"
 
-#include "ThresholdAccepter.h"
 #include "EfficiencyApplicator.h"
 #include "GaussianSmearer.h"
-#include "TrackedMomentumMatrixSmearer.h"
 #include "MetaSimpleSmearcepter.h"
+#include "ThresholdAccepter.h"
+#include "TrackedMomentumMatrixSmearer.h"
+#include "VisECoalescer.h"
 
 #include <vector>
 
@@ -45,10 +46,10 @@ void Smearcepterton::InitialiserSmearcepters() {
   factories["ThresholdAccepter"] = &BuildSmearcepter<ThresholdAccepter>;
   factories["EfficiencyApplicator"] = &BuildSmearcepter<EfficiencyApplicator>;
   factories["GaussianSmearer"] = &BuildSmearcepter<GaussianSmearer>;
-  factories["TrackedMomentumMatrixSmearer"] = &BuildSmearcepter<TrackedMomentumMatrixSmearer>;
+  factories["TrackedMomentumMatrixSmearer"] =
+      &BuildSmearcepter<TrackedMomentumMatrixSmearer>;
   factories["VisECoalescer"] = &BuildSmearcepter<VisECoalescer>;
   factories["MetaSimpleSmearcepter"] = &BuildSmearcepter<MetaSimpleSmearcepter>;
-
 
   std::vector<nuiskey> smearcepterBlocks = Config::QueryKeys("smearcepters");
 

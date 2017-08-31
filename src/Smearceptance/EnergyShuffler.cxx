@@ -89,7 +89,8 @@ void EnergyShuffler::DoTheShuffle(FitEvent *fe) {
                 << fp << ") with " << fp->KE() << " (mom: " << fp->p() << ")."
                 << std::endl;
 #endif
-      fp->RemoveKE(KETaken);
+      fe->RemoveKE(p_it, KETaken);
+      fp = fe->GetParticle(p_it);
 #ifdef DEBUG_ESHUFFLER
       std::cout << "\t->" << fp->KE() << " (mom: " << fp->p() << ") => "
                 << sh_it << "." << std::endl;
@@ -139,7 +140,8 @@ void EnergyShuffler::DoTheShuffle(FitEvent *fe) {
       std::cout << "Giving " << EToGive << " KE to " << fp->PDG() << " with "
                 << fp->KE() << " (mom: " << fp->p() << ")." << std::endl;
 #endif
-      fp->GiveKE(EToGive);
+      fe->GiveKE(p_it, EToGive);
+      fp = fe->GetParticle(p_it);
 #ifdef DEBUG_ESHUFFLER
       std::cout << "\t->" << fp->KE() << " (mom: " << fp->p() << ")."
                 << std::endl;

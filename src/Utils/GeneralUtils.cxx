@@ -36,16 +36,17 @@ std::string GeneralUtils::DblToStr(double val) {
   return ss.str();
 };
 
-std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc, char* argv[]){
+std::vector<std::string> GeneralUtils::LoadCharToVectStr(int argc,
+                                                         char* argv[]) {
   std::vector<std::string> vect;
-  for (int i = 1; i < argc; i++){
-    vect.push_back( std::string(argv[i]) );
+  for (int i = 1; i < argc; i++) {
+    vect.push_back(std::string(argv[i]));
   }
   return vect;
 }
 
-std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* del) {
-
+std::vector<std::string> GeneralUtils::ParseToStr(std::string str,
+                                                  const char* del) {
   std::istringstream stream(str);
   std::string temp_string;
   std::vector<std::string> vals;
@@ -59,7 +60,6 @@ std::vector<std::string> GeneralUtils::ParseToStr(std::string str, const char* d
 }
 
 std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
-
   std::istringstream stream(str);
   std::string temp_string;
   std::vector<double> vals;
@@ -71,13 +71,11 @@ std::vector<double> GeneralUtils::ParseToDbl(std::string str, const char* del) {
     stream >> entry;
 
     vals.push_back(entry);
-
   }
   return vals;
 }
 
 std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del) {
-
   std::istringstream stream(str);
   std::string temp_string;
   std::vector<int> vals;
@@ -89,13 +87,11 @@ std::vector<int> GeneralUtils::ParseToInt(std::string str, const char* del) {
     stream >> entry;
 
     vals.push_back(entry);
-
   }
   return vals;
 }
 
 double GeneralUtils::StrToDbl(std::string str) {
-
   std::istringstream stream(str);
   double val;
   stream >> val;
@@ -104,7 +100,6 @@ double GeneralUtils::StrToDbl(std::string str) {
 }
 
 int GeneralUtils::StrToInt(std::string str) {
-
   std::istringstream stream(str);
   int val;
   stream >> val;
@@ -113,13 +108,14 @@ int GeneralUtils::StrToInt(std::string str) {
 }
 
 bool GeneralUtils::StrToBool(std::string str) {
-
   // convert result to lower case
   for (uint i = 0; i < str.size(); i++) str[i] = std::tolower(str[i]);
 
   // Test for true/false
-  if      (!str.compare("false")) return false;
-  else if (!str.compare("true") ) return true;
+  if (!str.compare("false"))
+    return false;
+  else if (!str.compare("true"))
+    return true;
   if (str.empty()) return false;
 
   // Push into bool
@@ -130,8 +126,8 @@ bool GeneralUtils::StrToBool(std::string str) {
   return val;
 }
 
-std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const char* del) {
-
+std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str,
+                                                      const char* del) {
   std::vector<std::string> linevect;
   std::string line;
 
@@ -139,10 +135,11 @@ std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const cha
   read.open(str.c_str());
 
   if (!read.is_open()) {
-    THROW("Cannot open file " << str << " in ParseFileToStr");
+    ERROR(FTL, "Cannot open file " << str << " in ParseFileToStr");
+    throw;
   }
 
-  while ( std::getline(read >> std::ws, line, *del) ) {
+  while (std::getline(read >> std::ws, line, *del)) {
     linevect.push_back(line);
   }
 
@@ -152,14 +149,16 @@ std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str, const cha
 }
 
 std::string GeneralUtils::GetTopLevelDir() {
-
   static bool first = true;
   static std::string topLevelVarVal;
 
   if (first) {
-    char * const var = getenv("NUISANCE");
+    char* const var = getenv("NUISANCE");
     if (!var) {
-      THROW("Cannot find top level directory! Set the NUISANCE environmental variable");
+      ERROR(FTL,
+            "Cannot find top level directory! Set the NUISANCE environmental "
+            "variable");
+      throw;
     }
     topLevelVarVal = std::string(var);
     first = false;
@@ -168,9 +167,9 @@ std::string GeneralUtils::GetTopLevelDir() {
   return topLevelVarVal;
 }
 
-
-std::string GeneralUtils::ReplaceAll(std::string const &inp, std::string const &from,
-                    std::string const &to) {
+std::string GeneralUtils::ReplaceAll(std::string const& inp,
+                                     std::string const& from,
+                                     std::string const& to) {
   std::stringstream ss("");
 
   size_t nextOccurence = 0;

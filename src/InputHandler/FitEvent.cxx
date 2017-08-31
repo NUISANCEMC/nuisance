@@ -346,9 +346,9 @@ FitParticle* FitEvent::GetParticle (int const i) {
     std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
     std::cout << fParticlePDG[i] << " "<< fParticleState[i] <<std::endl;
     */
-    // fParticleList[i]->SetValues(fParticleMom[i][0], fParticleMom[i][1],
-    //                             fParticleMom[i][2], fParticleMom[i][3],
-    //                             fParticlePDG[i], fParticleState[i]);
+    fParticleList[i]->SetValues(fParticleMom[i][0], fParticleMom[i][1],
+                                fParticleMom[i][2], fParticleMom[i][3],
+                                fParticlePDG[i], fParticleState[i]);
 
   }
 

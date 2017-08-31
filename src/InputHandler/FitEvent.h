@@ -92,6 +92,31 @@ public:
   int            GetParticlePDG   (int index) const;
 
 
+  /// Allows the removal of KE up to total KE.
+  inline void RemoveKE(int index, double KE){
+
+    FitParticle *fp = GetParticle(index);
+
+    double mass = fp->M();
+    double oKE = fp->KE();
+    double nE = mass + (oKE - KE);
+    if(nE < mass){ // Can't take more KE than it has
+      nE = mass;
+    }
+    double n3Mom = sqrt(nE*nE - mass*mass);
+    TVector3 np3 = fp->P3().Unit()*n3Mom;
+
+    fParticleMom[index][0] = np3[0];
+    fParticleMom[index][1] = np3[1];
+    fParticleMom[index][2] = np3[2];
+    fParticleMom[index][3] = nE;
+
+  }
+
+  /// Allows the removal of KE up to total KE.
+  inline void GiveKE(int index, double KE){
+    RemoveKE(index,-KE);
+  }
   /// Return Particle for given index in particle stack
   FitParticle* GetParticle(int const index);
   /// Get Total Number of Particles in stack

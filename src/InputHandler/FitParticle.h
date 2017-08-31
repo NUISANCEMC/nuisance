@@ -70,24 +70,6 @@ class FitParticle {
   /// Get Kinetic Energy
   inline double KE (void){ return fP.E() - fP.Mag(); };
 
-  /// Allows the removal of KE up to total KE.
-  inline void RemoveKE(double KE){
-    double mass = M();
-    double oKE = this->KE();
-    double nE = mass + (oKE - KE);
-    if(nE < mass){ // Can't take more KE than it has
-      nE = mass;
-    }
-    double n3Mom = sqrt(nE*nE - mass*mass);
-    TVector3 np3 = P3().Unit()*n3Mom;
-    fP.SetXYZT(np3[0],np3[1],np3[2],nE);
-  }
-
-/// Allows the removal of KE up to total KE.
-  inline void GiveKE(double KE){
-    RemoveKE(-KE);
-  }
-
   /// Get Total Energy
   inline double E  (void){ return fP.E(); };
 

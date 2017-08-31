@@ -36,12 +36,22 @@ class Smear_SVDUnfold_Propagation_Osc : public Measurement1D {
   TH1D *NDDataHist;
   TH1D *FDDataHist;
 
+  TH1D *ND_Unfolded_Spectrum_Hist;
+  TH1D *NDFD_Corrected_Spectrum_Hist;
+  TH1D *FD_Propagated_Spectrum_Hist;
+
+  TH1D *ND_True_Spectrum_Hist;
+  TH1D *FD_True_Spectrum_Hist;
+
   TH2D *NDToSpectrumSmearingMatrix;
 
   TMatrixD NDToSpectrumResponseMatrix;
   TMatrixD SpectrumToFDResponseMatrix;
 
+  Int_t TruncateStart;
   Int_t TruncateUpTo;
+  double FitRegion_Min;
+  double FitRegion_Max;
 };
 
 #endif
