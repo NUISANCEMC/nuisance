@@ -46,7 +46,9 @@ void Smearcepterton::InitialiserSmearcepters() {
   factories["EfficiencyApplicator"] = &BuildSmearcepter<EfficiencyApplicator>;
   factories["GaussianSmearer"] = &BuildSmearcepter<GaussianSmearer>;
   factories["TrackedMomentumMatrixSmearer"] = &BuildSmearcepter<TrackedMomentumMatrixSmearer>;
+  factories["VisECoalescer"] = &BuildSmearcepter<VisECoalescer>;
   factories["MetaSimpleSmearcepter"] = &BuildSmearcepter<MetaSimpleSmearcepter>;
+
 
   std::vector<nuiskey> smearcepterBlocks = Config::QueryKeys("smearcepters");
 

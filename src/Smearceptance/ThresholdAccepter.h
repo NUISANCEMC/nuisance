@@ -20,7 +20,7 @@
 #ifndef THRESHOLDACCEPTER_HXX_SEEN
 #define THRESHOLDACCEPTER_HXX_SEEN
 
-#define DEBUG_THRESACCEPT
+// #define DEBUG_THRESACCEPT
 
 #include "ISmearcepter.h"
 
