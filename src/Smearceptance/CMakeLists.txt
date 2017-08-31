@@ -25,6 +25,8 @@ ThresholdAccepter.h
 TrackedMomentumMatrixSmearer.h
 GaussianSmearer.h
 
+EnergyShuffler.h
+
 MetaSimpleSmearcepter.h
 SmearceptanceUtils.h
 )
@@ -37,6 +39,8 @@ EfficiencyApplicator.cxx
 ThresholdAccepter.cxx
 TrackedMomentumMatrixSmearer.cxx
 GaussianSmearer.cxx
+
+EnergyShuffler.cxx
 
 MetaSimpleSmearcepter.cxx
 SmearceptanceUtils.cxx

@@ -29,12 +29,19 @@ void MetaSimpleSmearcepter::SpecifcSetup(nuiskey &nk) {
   factories["ThresholdAccepter"] = &BuildSmearcepter<ThresholdAccepter>;
   factories["EfficiencyApplicator"] = &BuildSmearcepter<EfficiencyApplicator>;
   factories["GaussianSmearer"] = &BuildSmearcepter<GaussianSmearer>;
+  factories["VisECoalescer"] = &BuildSmearcepter<VisECoalescer>;
   factories["TrackedMomentumMatrixSmearer"] =
       &BuildSmearcepter<TrackedMomentumMatrixSmearer>;
 
   std::vector<nuiskey> smearcepters = nk.GetListOfChildNodes();
   for (size_t smear_it = 0; smear_it < smearcepters.size(); ++smear_it) {
     std::string const &smearType = smearcepters[smear_it].GetElementName();
+
+    if (smearType == "EnergyShuffler") {
+      ES = new EnergyShuffler();
+      ES->Setup(smearcepters[smear_it]);
+      continue;
+    }
 
     if (!factories.count(smearType)) {
       ERROR(WRN, "No known smearer accepts elements named: \"" << smearType
@@ -51,6 +58,9 @@ void MetaSimpleSmearcepter::SpecifcSetup(nuiskey &nk) {
   NSmearcepters = Smearcepters.size();
 }
 RecoInfo *MetaSimpleSmearcepter::Smearcept(FitEvent *fe) {
+  if (ES) {
+    ES->DoTheShuffle(fe);
+  }
   RecoInfo *ri = NULL;
   for (size_t sm_it = 0; sm_it < NSmearcepters; ++sm_it) {
     if (!sm_it) {

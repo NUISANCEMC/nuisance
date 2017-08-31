@@ -65,19 +65,37 @@ class FitParticle {
   inline bool IsInitialState (void) const { return (fStatus == kInitialState); };
 
   /// Get Mass
-  inline double M  (void){ return fP.Mag(); }; 
+  inline double M  (void){ return fP.Mag(); };
 
   /// Get Kinetic Energy
-  inline double KE (void){ return fP.E() - fP.Mag(); }; 
+  inline double KE (void){ return fP.E() - fP.Mag(); };
+
+  /// Allows the removal of KE up to total KE.
+  inline void RemoveKE(double KE){
+    double mass = M();
+    double oKE = this->KE();
+    double nE = mass + (oKE - KE);
+    if(nE < mass){ // Can't take more KE than it has
+      nE = mass;
+    }
+    double n3Mom = sqrt(nE*nE - mass*mass);
+    TVector3 np3 = P3().Unit()*n3Mom;
+    fP.SetXYZT(np3[0],np3[1],np3[2],nE);
+  }
+
+/// Allows the removal of KE up to total KE.
+  inline void GiveKE(double KE){
+    RemoveKE(-KE);
+  }
 
   /// Get Total Energy
   inline double E  (void){ return fP.E(); };
 
   /// Get 4 Momentum
-  inline TLorentzVector P4(void) {return fP;}; 
+  inline TLorentzVector P4(void) {return fP;};
 
   /// Get 3 Momentum
-  inline TVector3       P3(void) {return fP.Vect();}; 
+  inline TVector3       P3(void) {return fP.Vect();};
 
   /// Get 3 momentum magnitude
   inline double         p(void) { return fP.Vect().Mag(); };
@@ -100,7 +118,7 @@ inline std::ostream& operator<<(std::ostream& os, FitParticle const& p){
   return os << " Particle[pdgc:" << p.fPID
 	    << ", stat:"<<p.fStatus
 	    << ", 4mom:("<< p.fP.X() << "," << p.fP.Y() << "," << p.fP.Z() << "," << p.fP.T() << ")]";
-  
+
 }
 
 

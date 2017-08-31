@@ -210,9 +210,9 @@ void ThresholdAccepter::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
                                              ) {
 #ifdef DEBUG_THRESACCEPT
   std::cout << std::endl;
-  std::cout << "[" << p_it << "]: " << fp->PDG() << ", " << fp->Status() << ", "
-            << fp->E() << " -- KE:" << fp->KE() << " Mom: " << fp->P3().Mag()
-            << std::flush;
+  std::cout << "[" << p_it << " = " << fp << "]: " << fp->PDG() << ", "
+            << fp->Status() << ", " << fp->E() << " -- KE:" << fp->KE()
+            << " Mom: " << fp->P3().Mag() << std::flush;
 #endif
 
   if (fp->Status() != kFinalState) {

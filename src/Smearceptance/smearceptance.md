@@ -260,3 +260,14 @@ The `<TrackedMomentummatrixSmearer>` element can also contain any number of `<Sm
 ```
 
 Documentation to follow. Sorry.
+
+
+EnergyShufflers takes energy before it is given. e.g.
+
+```xml
+  <Shuffler From="-211" To="" Fraction="1" />
+  <Shuffler From="211" To="-211" Fraction="0.5" />
+```
+
+will result in all piminus energy being ignored, but half the pi+ energy in
+an event would be given to any pi-.

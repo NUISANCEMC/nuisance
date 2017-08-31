@@ -17,27 +17,33 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MetaSimpleSmearcepter_HXX_SEEN
-#define MetaSimpleSmearcepter_HXX_SEEN
+#ifndef ENERGYSHUFFLER_HXX_SEEN
+#define ENERGYSHUFFLER_HXX_SEEN
 
 #include "ISmearcepter.h"
 
-#include "EnergyShuffler.h"
-
 #include <map>
 
-class MetaSimpleSmearcepter : public ISmearcepter {
+// #define DEBUG_ESHUFFLER
+
+/// Tool for shuffles KE between systems.
+/// Because it needs to run before an accepter has a chance to throw away
+/// particles it should not be an ISmearcepter and instead built into other
+/// smearcepters.
+class EnergyShuffler {
 
  private:
-  size_t NSmearcepters;
-  std::vector<ISmearcepter *> Smearcepters;
+  struct ShuffleDescriptor {
+    std::vector<Int_t> ToPDGs;
+    double EFraction;
+  };
 
-  EnergyShuffler *ES;
-
-  void SpecifcSetup(nuiskey &);
+  std::vector< std::pair<Int_t, ShuffleDescriptor> > ShufflersDescriptors;
 
  public:
-  RecoInfo *Smearcept(FitEvent *);
+  void Setup(nuiskey &);
+
+  void DoTheShuffle(FitEvent *);
 };
 
 #endif
