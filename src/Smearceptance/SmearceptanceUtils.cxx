@@ -75,7 +75,7 @@ TH2D *SVDGetInverse(TH2D *mapping, int NToTruncate) {
                                 << " matrix.");
   }
 
-  TH2D *inverse = SwapXYTH2D(mapping);
+  TH2D *inverse = dynamic_cast<TH2D *>(mapping->Clone());
   inverse->SetName("inverse");
   inverse->Reset();
 
@@ -174,6 +174,7 @@ TH1D *GetTH1FromVector(TVectorD const &inp, TH1D *templ) {
   } else {
     hist = new TH1D("vectHist", "", inp.GetNrows(), 0, inp.GetNrows());
   }
+  hist->SetDirectory(NULL);
 
   for (Int_t xb_it = 0; xb_it < inp.GetNrows(); ++xb_it) {
     hist->SetBinContent(xb_it + 1, inp[xb_it]);
@@ -192,6 +193,8 @@ TH2D *GetTH2FromMatrix(TMatrixD const &inp, TH2D *templ) {
     hist = new TH2D("matHist", "", inp.GetNcols(), 0, inp.GetNcols(),
                     inp.GetNrows(), 0, inp.GetNrows());
   }
+  hist->SetDirectory(NULL);
+
   for (Int_t xb_it = 0; xb_it < inp.GetNcols(); ++xb_it) {
     for (Int_t yb_it = 0; yb_it < inp.GetNrows(); ++yb_it) {
       hist->SetBinContent(xb_it + 1, yb_it + 1, inp[yb_it][xb_it]);
@@ -254,12 +257,15 @@ void PushTH1ThroughMatrixWithErrors(TH1D *inp, TH1D *oup, TMatrixD &response,
   }
 }
 
-TH2D *SwapXYTH2D(TH2D *templ) {
+TH2D * SwapXYTH2D(TH2D *templ) {
   TH2D *Swapped = new TH2D(
       (std::string(templ->GetName()) + "_c").c_str(), "",
       templ->GetYaxis()->GetNbins(), templ->GetYaxis()->GetXbins()->GetArray(),
       templ->GetXaxis()->GetNbins(), templ->GetXaxis()->GetXbins()->GetArray());
   Swapped->Reset();
+
+  Swapped->SetDirectory(NULL);
+
 
   std::string title = ";";
   title += templ->GetYaxis()->GetTitle();

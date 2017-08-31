@@ -23,6 +23,8 @@
 
 #include "Smearcepterton.h"
 
+#define DEBUG_SMEARTESTER
+
 //********************************************************************
 /// @brief Class to perform smearceptance MC Studies on a custom measurement
 Smearceptance_Tester::Smearceptance_Tester(std::string name,
@@ -120,8 +122,9 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
   ERecDistrib->Sumw2();
 
   RecoSmear =
-      new TH2D("ELepHadVis_Recon", ";Recon. E_{#nu};True E_{#nu}", RecNBins,
+      new TH2D("ELepHadVis_Recon", ";True E_{#nu};Recon. E_{#nu}", RecNBins,
                RecBinL, RecBinH, TrueNBins, TrueBinL, TrueBinH);
+  RecoSmear->Sumw2();
 }
 
 void Smearceptance_Tester::AddEventVariablesToTree() {
@@ -381,8 +384,8 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   static int const NeutronPDG[] = {2112};
   static int const GammaPDG[] = {22};
   static int const CLeptonPDGs[] = {11, 13, 15};
-  static int const ExplicitPDGs[] = {211, -211, 11, 2212, 2112, 22,
-                                     11,  13,   15, 12,   14,   16};
+  static int const ExplicitPDGs[] = {211, -211, 111, 2212, 2112, 22,
+                                     11,  13,   15,  12,   14,   16};
 
   RecoInfo *ri = smearceptor->Smearcept(event);
 
@@ -496,8 +499,7 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   EFSVis_n = SumVisE_RecoInfo(*ri, NeutronPDG);
   EFSVis_gamma = SumVisE_RecoInfo(*ri, GammaPDG);
   EFSVis_other = SumVisE_RecoInfo_NotPdgs(*ri, ExplicitPDGs);
-  EFSVis = EFSVis_cpip + EFSVis_cpim + EFSVis_cpi + EFSVis_pi0 + EFSVis_p +
-           EFSVis_n + EFSVis_gamma;
+  EFSVis = EFSVis_cpi + EFSVis_pi0 + EFSVis_p + EFSVis_n + EFSVis_gamma;
 
   FSCLep_seen = CountNPdgsSeen(*ri, CLeptonPDGs);
   Nprotons_seen = CountNPdgsSeen(*ri, ProtonPDG);
@@ -547,8 +549,8 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
   // Fill the eventVariables Tree
   eventVariables->Fill();
 
-  RecoSmear->Fill(flagCCINC_rec ? EISLep_LepHadVis_rec / 1000.0 : -1,
-                  EISLep_true / 1000.0, Weight);
+  RecoSmear->Fill(EISLep_true / 1000.0,
+                  flagCCINC_rec ? EISLep_LepHadVis_rec / 1000.0 : -1, Weight);
   ETrueDistrib->Fill(EISLep_true / 1000.0, flagCCINC_true ? Weight : 0);
 
   ERecDistrib->Fill(EISLep_LepHadVis_rec / 1000.0, flagCCINC_rec ? Weight : 0);
@@ -571,15 +573,15 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
       static_cast<TH2D *>(RecoSmear->Clone("ELepHadVis_Smear_ev"));
 
   for (Int_t trueAxis_it = 1;
-       trueAxis_it < RecoSmear->GetYaxis()->GetNbins() + 1; ++trueAxis_it) {
+       trueAxis_it < RecoSmear->GetXaxis()->GetNbins() + 1; ++trueAxis_it) {
     double NEISLep = ETrueDistrib->GetBinContent(trueAxis_it);
 
     for (Int_t recoAxis_it = 1;
-         recoAxis_it < RecoSmear->GetXaxis()->GetNbins() + 1; ++recoAxis_it) {
+         recoAxis_it < RecoSmear->GetYaxis()->GetNbins() + 1; ++recoAxis_it) {
       if (NEISLep > std::numeric_limits<double>::epsilon()) {
         SmearMatrix_ev->SetBinContent(
-            recoAxis_it, trueAxis_it,
-            SmearMatrix_ev->GetBinContent(recoAxis_it, trueAxis_it) / NEISLep);
+            trueAxis_it, recoAxis_it,
+            SmearMatrix_ev->GetBinContent(trueAxis_it, recoAxis_it) / NEISLep);
       }
     }
   }
@@ -593,14 +595,12 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
 
   TH2D *ResponseMatrix_ev =
       SmearceptanceUtils::SVDGetInverse(SmearMatrix_ev, SVDTruncation);
-  ResponseMatrix_ev = SmearceptanceUtils::SwapXYTH2D(ResponseMatrix_ev);
   ResponseMatrix_ev->SetName("ResponseMatrix_ev");
   ResponseMatrix_ev->Write();
 
 #ifdef DEBUG_SMEARTESTER
 
-  TMatrixD SmearMatrix_ev_md = SmearceptanceUtils::GetMatrix(
-      SmearceptanceUtils::SwapXYTH2D(SmearMatrix_ev));
+  TMatrixD SmearMatrix_ev_md = SmearceptanceUtils::GetMatrix(SmearMatrix_ev);
 
   TH1D *SmearedEvt = static_cast<TH1D *>(ERecDistrib->Clone());
   SmearedEvt->SetNameTitle("SmearedEvt", ";Rec E_{#nu}; count");

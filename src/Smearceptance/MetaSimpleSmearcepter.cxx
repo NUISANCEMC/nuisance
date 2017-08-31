@@ -20,6 +20,7 @@
 #include "GaussianSmearer.h"
 #include "ThresholdAccepter.h"
 #include "TrackedMomentumMatrixSmearer.h"
+#include "VisECoalescer.h"
 
 #include "MetaSimpleSmearcepter.h"
 

@@ -159,7 +159,7 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
 
       Efficiencies[pdgs_i[pdg_it]] = em;
 
-      QLOG(SAM,
+      QLOG(FIT,
            "Added reconstruction efficiency curve for PDG: " << pdgs_i[pdg_it]);
     }
   }

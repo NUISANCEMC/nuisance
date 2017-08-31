@@ -142,7 +142,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
       ReconThresholds[pdgs_i[pdg_it]].push_back(t);
 
-      QLOG(SAM, "Added reconstruction threshold of type: "
+      QLOG(FIT, "Added reconstruction threshold of type: "
                     << ReconThresholds[pdgs_i[pdg_it]].back().ThresholdVal
                     << " "
                     << GetKineTypeName(
@@ -191,7 +191,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
       VisThresholds[pdgs_i[pdg_it]] = vt;
 
-      QLOG(SAM,
+      QLOG(FIT,
            "Added visibility threshold of MeV "
                << VisThresholds[pdgs_i[pdg_it]].ThresholdVal << " "
                << GetKineTypeName(VisThresholds[pdgs_i[pdg_it]].ThresholdType)
