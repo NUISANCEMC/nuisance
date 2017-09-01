@@ -208,6 +208,7 @@
 -->
 
 <config UseShapeCovar="0" />
+<config CC0piNBINS="156" />
 
 </nuisance>
 
