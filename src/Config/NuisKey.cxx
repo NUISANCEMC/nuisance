@@ -1,4 +1,6 @@
 #include "NuisKey.h"
+#include "NuisConfig.h"
+#include "GeneralUtils.h"
 
 nuiskey::nuiskey(std::string name){
   fNode = Config::Get().CreateNode(name);
@@ -78,7 +80,7 @@ std::vector<nuiskey> Config::QueryKeys(const std::string type,
                                        const std::string test1) {
   // Get Vector of nodes
   std::vector<XMLNodePointer_t> nodelist = Config::Get().GetNodes(type);
-  std::cout << "Got " << nodelist.size() << " " << type << std::endl;
+
   // Convert List into a key list for easier access
   std::vector<nuiskey> keylist;
   for (std::vector<XMLNodePointer_t>::const_iterator iter = nodelist.begin();
