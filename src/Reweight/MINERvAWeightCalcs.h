@@ -8,7 +8,7 @@
 #include "Conventions/Units.h"
 #include "EVGCore/EventRecord.h"
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "GHEP/GHepParticle.h"
 #include "GHEP/GHepRecord.h"
 #include "GHEP/GHepUtils.h"

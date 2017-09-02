@@ -121,7 +121,7 @@ void GetCommandLineArgs(int argc, char** argv) {
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
     QLOG(FIT, "Reading cardfile: " << gOptCardInput);
-    configuration.LoadConfig(gOptCardInput, "");
+    configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
@@ -152,9 +152,9 @@ int main(int argc, char* argv[]) {
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
   if (!gOptFormat.compare("GenericFlux")) {
-    samplekey.AddS("name", "FlatTree");
-    samplekey.AddS("input", gOptInputFile);
-    samplekey.AddS("type", gOptType);
+    samplekey.Set("name", "FlatTree");
+    samplekey.Set("input", gOptInputFile);
+    samplekey.Set("type", gOptType);
     flattreecreator = new GenericFlux_Tester("FlatTree", gOptInputFile,
                                              FitBase::GetRW(), gOptType, "");
 

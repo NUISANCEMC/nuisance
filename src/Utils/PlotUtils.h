@@ -68,7 +68,7 @@
 
 // Fit includes
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "FitLogger.h"
 #include "StatUtils.h"
 #include "GeneralUtils.h"

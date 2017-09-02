@@ -45,7 +45,7 @@
 
 
 // Fit Includes
-#include "FitParameters.h"
+
 #include "FitLogger.h"
 
 /*!

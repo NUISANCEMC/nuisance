@@ -29,7 +29,7 @@
 #include "FitParticle.h"
 #include "TLorentzVector.h"
 #include "TSpline.h"
-#include "FitParameters.h"
+
 #include "BaseFitEvt.h"
 #include "FitLogger.h"
 #include "TArrayD.h"

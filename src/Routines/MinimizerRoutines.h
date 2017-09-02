@@ -45,7 +45,7 @@
 #include "FitEvent.h"
 #include "JointFCN.h"
 #include "MinimizerFCN.h"
-#include "FitParameters.h"
+
 
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"

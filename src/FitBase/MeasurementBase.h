@@ -51,7 +51,7 @@
 
 // External data fit includes
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "FitUtils.h"
 #include "GeneralUtils.h"
 #include "PlotUtils.h"

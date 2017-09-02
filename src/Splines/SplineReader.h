@@ -4,6 +4,9 @@
 #include "Spline.h"
 #include "TTree.h"
 #include "FitLogger.h"
+#include "NuisConfig.h"
+#include "NuisKey.h"
+
 // #include "GeneralUtils.h"
 
 class SplineReader {

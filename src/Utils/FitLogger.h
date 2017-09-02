@@ -28,7 +28,7 @@
 #include <fstream>
 #include <sstream>
 #include "Initialiser.h"
-#include "FitParameters.h"
+
 #include "TRandom3.h"
 
 #define RESET   "\033[0m"
