@@ -232,6 +232,8 @@ void BayesianRoutines::SetupSystematicsFromXML() {
   std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
     LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
+  } else {
+    ERR(WRN) <<  "NO SAMPLES LOADED" << std::endl;
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {

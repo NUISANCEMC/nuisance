@@ -116,19 +116,20 @@ void nuisconfig::LoadSettings(std::string filename, std::string state) {
 void nuisconfig::LoadXMLSettings(std::string filename, std::string state = "") {
   std::cout << "[ NUISANCE ]: Loading XML settings from : " << filename;
 
-  // Here we manually load all the children from the card file into our root node
-
   // Add new file to xml docs list
-  XMLNodePointer_t docroot = fXML->ParseFile(filename.c_str(), 1000000);
-  if (!docroot) {
-    THROW("Cannot open XML settings file");
-  }
-
-  // Save to doc list
   fXMLDocs.push_back(fXML->ParseFile(filename.c_str(), 1000000));
 
-  // Loop over children in the new document
-  XMLNodePointer_t child = fXML->GetChild(docroot);
+  // Get New Doc ROOT
+  int nxml = fXMLDocs.size();
+  XMLNodePointer_t newdocroot = fXML->DocGetRootElement(fXMLDocs[nxml - 1]);
+
+  // Loop over children and add
+  XMLNodePointer_t child = fXML->GetChild(newdocroot);
+
+  // // Here we manually load all the children from the card file into our root node
+  if (!child){
+    THROW("CANNOT Find child inside settings file!");
+  }
   while (child != 0) {
 
     // SPECIAL CONFIG CASE
@@ -306,10 +307,11 @@ XMLNodePointer_t nuisconfig::CreateOldConfigNodeFromLine(const std::string line)
 void nuisconfig::FinaliseSettings(std::string name) {
   std::cout << "[ NUISANCE ]: Finalising run settings";
 
+  WriteSettings(name);
+
   // Save full config to file
   RemoveEmptyNodes();
   RemoveIdenticalNodes();
-  WriteSettings(name);
 
   std::cout << " -> DONE." << std::endl;
 }
