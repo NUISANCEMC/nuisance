@@ -44,7 +44,7 @@
 #include "TH2Poly.h"
 #include "FitEvent.h"
 
-#include "FitParameters.h"
+
 #include "FitLogger.h"
 
 /*!

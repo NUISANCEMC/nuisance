@@ -18,7 +18,7 @@
 *******************************************************************************/
 
 #include "MINERvAUtils.h"
-#include "FitParameters.h"
+
 #include "FitUtils.h"
 
 namespace MINERvAPar{

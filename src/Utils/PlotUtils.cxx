@@ -19,7 +19,7 @@
 
 #include "PlotUtils.h"
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 
 // MOVE TO MB UTILS!
 // This function is intended to be modified to enforce a consistent masking for all models.

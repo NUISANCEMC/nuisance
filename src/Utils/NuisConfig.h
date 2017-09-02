@@ -16,7 +16,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-
 #ifndef NUISCONFIG_H_SEEN
 #define NUISCONFIG_H_SEEN
 
@@ -24,12 +23,14 @@
 #include <map>
 
 #include "TXMLEngine.h"
-
 #include "GeneralUtils.h"
+#include "TFile.h"
 
-// New NUISANCE Config Class
+
+// NUISANCE Global Settings Class
 class nuisconfig {
  public:
+
   /// Singleton Get Function
   static nuisconfig& GetConfig(void);
 
@@ -41,44 +42,58 @@ class nuisconfig {
   virtual ~nuisconfig();
 
   /// Adds a new configuration list
-  void LoadConfig(std::string filename, std::string state);
+  void LoadSettings(std::string filename, std::string state);
 
   /// Adds a new config from new xml file format
-  void LoadXMLConfig(std::string filename, std::string state);
+  void LoadXMLSettings(std::string filename, std::string state);
 
   /// Adds a new config from old card file format
-  void LoadCardConfig(std::string filename, std::string state);
+  void LoadCardSettings(std::string filename, std::string state);
 
   /// Save the config to file
-  void WriteConfig(std::string filename);
+  void WriteSettings(std::string filename);
+
+
+  void RemoveEmptyNodes();
+  void RemoveIdenticalNodes();
+
+
 
   void OverrideConfig(std::string conf);
 
   XMLNodePointer_t GetConfigNode(std::string name);
+  XMLNodePointer_t CreateNode(XMLNodePointer_t node, std::string name);
 
   /// Request a string config key
-  std::string SetConfS(const std::string name, std::string val);
+  void SetConfig(std::string name, std::string val);
+  void SetConfig(std::string name, bool val);
+  void SetConfig(std::string name, int val);
+  void SetConfig(std::string name, float val);
+  void SetConfig(std::string name, double val);
 
-  /// Get SetConfig Bool
-  bool SetConfB(const std::string name, bool val);
-
-  /// Get SetConfig Int
-  int SetConfI(const std::string name, int val);
-
-  /// Get SetConfig Double
-  double SetConfD(const std::string name, double val);
+  void SetParS(std::string name, std::string val);
+  void SetParB(std::string name, bool val);
+  void SetParI(std::string name, int val);
+  void SetParD(std::string name, double val);
 
   // Set config
-  std::string ConfS(const std::string name);
+  std::string GetConfig(const std::string name);
+  std::string GetConfigS(const std::string name);
+  bool GetConfigB(const std::string name);
+  int GetConfigI(const std::string name);
+  float GetConfigF(const std::string name);
+  double GetConfigD(const std::string name);
 
-  /// Get Config Bool
-  bool ConfB(const std::string name);
+  std::string GetPar(const std::string name) { return GetConfig(name); };
+  std::string GetParS(const std::string name){ return GetConfigS(name); };
+  bool GetParB(const std::string name){ return GetConfigB(name); };
+  int GetParI(const std::string name){ return GetConfigI(name); };
+  double GetParD(const std::string name){return GetConfigD(name); };
 
-  /// Get Config Int
-  int ConfI(const std::string name);
-
-  /// Get Config Double
-  double ConfD(const std::string name);
+XMLNodePointer_t CreateSampleNodeFromLine(const std::string line);
+XMLNodePointer_t CreateParameterNodeFromLine(const std::string line);
+XMLNodePointer_t CreatePullNodeFromLine(const std::string line);
+XMLNodePointer_t CreateOldConfigNodeFromLine(const std::string line);
 
   /// Node Functions
   void CheckCallCount(std::string name);
@@ -89,56 +104,39 @@ class nuisconfig {
 
   // Get List of child nodes of nuisance element
   std::vector<XMLNodePointer_t> GetNodes(std::string type = "");
+  std::vector<XMLNodePointer_t> GetNodes(XMLNodePointer_t node, std::string type = "");
+
+  XMLNodePointer_t GetNode(std::string type = "");
+  XMLNodePointer_t GetNode(XMLNodePointer_t node, std::string type = "");
 
   /// Get String from a given node
+  std::string Get(XMLNodePointer_t node, std::string name);
   std::string GetS(XMLNodePointer_t node, std::string name);
-
-  /// Get Bools from a given node
   bool GetB(XMLNodePointer_t node, std::string name);
-
-  /// Get int from given node
   int GetI(XMLNodePointer_t node, std::string name);
-
-  /// Get double from given node
+  float GetF(XMLNodePointer_t node, std::string name);
   double GetD(XMLNodePointer_t node, std::string name);
 
   // Add Children to root node
   XMLNodePointer_t CreateNode(std::string name);
 
-  // Add line
-  void AddXMLLine(std::string line);
-
-  std::string ConvertSampleLineToXML(std::string line);
-  std::string ConvertParameterLineToXML(std::string line);
-  void FinaliseConfig(std::string name);
+  void FinaliseSettings(std::string name);
 
   // Add attribute to node
-  void AddS(XMLNodePointer_t node, std::string name, std::string val);
-  void AddB(XMLNodePointer_t node, std::string name, bool val);
-  void AddI(XMLNodePointer_t node, std::string name, int val);
-  void AddD(XMLNodePointer_t node, std::string name, double val);
+  void Set(XMLNodePointer_t node, std::string name, std::string val);
+  void Set(XMLNodePointer_t node, std::string name, bool val);
+  void Set(XMLNodePointer_t node, std::string name, int val);
+  void Set(XMLNodePointer_t node, std::string name, float val);
+  void Set(XMLNodePointer_t node, std::string name, double val);
 
   void SetS(XMLNodePointer_t node, std::string name, std::string val);
   void SetB(XMLNodePointer_t node, std::string name, bool val);
   void SetI(XMLNodePointer_t node, std::string name, int val);
+  void SetF(XMLNodePointer_t node, std::string name, float val);
   void SetD(XMLNodePointer_t node, std::string name, double val);
-
-  void ChangeS(XMLNodePointer_t node, std::string name, std::string val);
-  void ChangeB(XMLNodePointer_t node, std::string name, bool val);
-  void ChangeI(XMLNodePointer_t node, std::string name, int val);
-  void ChangeD(XMLNodePointer_t node, std::string name, double val);
 
   // Check has element
   bool Has(XMLNodePointer_t node, std::string name);
-
-  // Reconfigure (sorts overrides, logger, etc)
-  void Reconfigure(){};
-
-  /// OLD Wrapper Functions for GetParI,etc
-  inline std::string GetParS(std::string name) { return ConfS(name); };
-  inline int GetParI(std::string name) { return ConfI(name); };
-  inline double GetParD(std::string name) { return ConfD(name); };
-  inline bool GetParB(std::string name) { return ConfB(name); };
 
   // Get Vectors
   std::vector<std::string> GetVS(XMLNodePointer_t node, std::string name,
@@ -148,8 +146,6 @@ class nuisconfig {
   std::vector<double> GetVD(XMLNodePointer_t node, std::string name,
                             const char* del);
 
-  void RemoveEmptyNodes();
-  void RemoveIdenticalNodes();
 
   std::vector<std::string> GetAllKeysForNode(XMLNodePointer_t node);
 
@@ -157,10 +153,12 @@ class nuisconfig {
   void PrintNode(XMLNodePointer_t node);
   void RemoveNode(XMLNodePointer_t node);
 
-  std::string GetTag(std::string name);
-
   std::string GetElementName(XMLNodePointer_t node){ return fXML->GetNodeName(node); }
-  void ExpandAllTags();
+
+  std::string GetParDIR(std::string parName);
+
+
+  TFile* out;
 
  private:
   XMLNodePointer_t fMainNode;             ///< Main XML Parent Node
@@ -171,6 +169,7 @@ class nuisconfig {
   std::map<std::string, int> fConfigCallCount;  ///< To check for inefficiency.
   std::map<std::string, bool> fConfigCallWarning;  ///< Only print warning once.
 
+
  protected:
   static nuisconfig* m_nuisconfigInstance;
 };
@@ -178,6 +177,25 @@ class nuisconfig {
 // Get Function for Singleton
 namespace Config {
 nuisconfig& Get();
+
+std::string GetPar(std::string name);
+std::string GetParS(std::string name);
+int GetParI(std::string name);
+bool GetParB(std::string name);
+double GetParD(std::string name);
+
+void SetPar(std::string name, std::string val);
+void SetPar(std::string name, bool val);
+void SetPar(std::string name, int val);
+void SetPar(std::string name, float val);
+void SetPar(std::string name, double val);
+
+}
+
+namespace FitPar {
+  nuisconfig& Config();
+  std::string GetDataBase();
+
 }
 
 /*! @} */

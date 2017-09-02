@@ -42,7 +42,7 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-#include "FitParameters.h"
+
 #include "ParserUtils.h"
 
 enum minstate {

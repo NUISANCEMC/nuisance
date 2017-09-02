@@ -3,7 +3,7 @@
 
 #include "FitEvent.h"
 #include "FitLogger.h"
-#include "FitParameters.h"
+
 #include "TF1.h"
 
 #ifdef __T2KREW_ENABLED__

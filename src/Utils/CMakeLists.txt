@@ -18,7 +18,6 @@
 ################################################################################
 set(HEADERFILES
 FitLogger.h
-FitParameters.h
 FitUtils.h
 GeneralUtils.h
 ParserUtils.h
@@ -39,7 +38,6 @@ Initialiser.h
 set(IMPLFILES
 PythiaQuiet.f
 FitLogger.cxx
-FitParameters.cxx
 FitUtils.cxx
 GeneralUtils.cxx
 PlotUtils.cxx
