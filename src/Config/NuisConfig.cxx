@@ -21,11 +21,12 @@
 #include "TXMLEngine.h"
 #include "GeneralUtils.h"
 #include "FitLogger.h"
-#include "GeneralUtils.h"
 
 namespace Config {
-nuisconfig& Get() { return nuisconfig::GetConfig(); };
 
+nuisconfig& Get() { 
+  return nuisconfig::GetConfig(); 
+};
 std::string GetPar(std::string name) {
   return Get().GetConfig(name);
 }
@@ -34,6 +35,9 @@ int GetParI(std::string name) {
 }
 bool GetParB(std::string name) {
   return Get().GetConfigB(name);
+}
+float GetParF(std::string name) {
+  return Get().GetConfigF(name);
 }
 double GetParD(std::string name) {
   return Get().GetConfigD(name);
@@ -53,8 +57,13 @@ void SetPar(std::string name, float val) {
 void SetPar(std::string name, double val) {
   Get().SetConfig(name, val);
 }
+
 }
 
+namespace FitPar {
+  std::string GetDataBase() { return GeneralUtils::GetTopLevelDir() + "/data/"; };
+  nuisconfig& Config()  { return Config::Get(); };
+}
 
 nuisconfig* nuisconfig::m_nuisconfigInstance = NULL;
 nuisconfig& nuisconfig::GetConfig(void) {
@@ -328,11 +337,6 @@ void nuisconfig::WriteSettings(std::string outputname) {
   }
 
 }
-
-
-
-
-
 
 XMLNodePointer_t nuisconfig::CreateNode(std::string name) {
   return fXML->NewChild(fMainNode, 0, name.c_str());
@@ -775,14 +779,5 @@ std::string nuisconfig::GetParDIR(std::string parName) {
 
   return outstr;
 };
-
-
-
-
-
-namespace FitPar {
-  std::string GetDataBase() { return GeneralUtils::GetTopLevelDir() + "/data/"; };
-  nuisconfig& Config()  { return Config::Get(); };
-}
 
 

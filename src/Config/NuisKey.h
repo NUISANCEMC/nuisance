@@ -1,18 +1,20 @@
 #ifndef NUISKEY_H
 #define NUISKEY_H
 
-#include <vector>
+#include <algorithm>
+#include <map>
 
-#include "NuisConfig.h"
+#include "TXMLEngine.h"
+#include "TFile.h"
 
 class nuiskey {
- public:
-  nuiskey(){};
+public:
+  nuiskey() {};
 
   nuiskey(XMLNodePointer_t node) { fNode = node; };
   nuiskey(std::string name);
 
-  ~nuiskey(){};
+  ~nuiskey() {};
 
   std::string GetS(std::string name);
   int GetI(std::string name);
@@ -52,11 +54,8 @@ std::vector<nuiskey> QueryKeys(const std::string name,
 nuiskey QueryFirstKey(const std::string name, const std::string test1 = "");
 nuiskey QueryLastKey(const std::string name, const std::string test1 = "");
 
-// Create a new global config entry
 nuiskey CreateKey(const std::string name);
 
-// void ConvertAndLoadCardToXMLFormat(const std::string cardfile);
 
-// Backwards compatible sample key options
 }
 #endif

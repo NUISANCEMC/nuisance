@@ -93,9 +93,12 @@ set(CORE
   MCStudies
   Genie
   FitBase
+  Config
+  Logger
+  Statistical
   InputHandler
   Splines
-  Reweight
+  Reweight	
   Utils
   #Devel
   Smearceptance
@@ -141,6 +144,9 @@ LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
   ${CMAKE_SOURCE_DIR}/src/FitBase
   ${CMAKE_SOURCE_DIR}/src/Reweight
   ${CMAKE_SOURCE_DIR}/src/InputHandler
+  ${CMAKE_SOURCE_DIR}/src/Config
+  ${CMAKE_SOURCE_DIR}/src/Logger
+  ${CMAKE_SOURCE_DIR}/src/Statistical
   ${CMAKE_SOURCE_DIR}/src/Splines
   ${CMAKE_SOURCE_DIR}/src/Utils
   ${CMAKE_SOURCE_DIR}/src/Genie)
