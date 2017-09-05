@@ -762,8 +762,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare(
-                 "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
     // Done
