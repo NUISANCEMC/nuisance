@@ -1409,9 +1409,9 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
 
 
   nuiskey samplekey = Config::CreateKey("sample");
-  samplekey.AddS("name", fName);
-  samplekey.AddS("type",type);
-  samplekey.AddS("input",inputfile);
+  samplekey.Set("name", fName);
+  samplekey.Set("type",type);
+  samplekey.Set("input",inputfile);
   fSettings = LoadSampleSettings(samplekey);
   
   // Reset everything to NULL

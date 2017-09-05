@@ -85,17 +85,12 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
-  fCompKey.AddS("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
-
-  // Add CMD XML Structs
-  for (size_t i = 0; i < xmlcmds.size(); i++) {
-    configuration.AddXMLLine(xmlcmds[i]);
-  }
+  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -107,11 +102,11 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
   }
 
   // Finish configuration XML
-  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
+  configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
   // Add Error Verbo Lines
-  verbocount += Config::Get().GetParI("VERBOSITY");
-  errorcount += Config::Get().GetParI("ERROR");
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   // FitPar::log_verb = verbocount;

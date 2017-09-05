@@ -75,15 +75,15 @@ MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu::MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(nuiskey
   // Setup Experiments  -------------------------------------------------------
   std::string type = samplekey.GetS("type");
 
-  nuiskey samplekey_num = Config::CreateKey("sample");
-  samplekey_num.AddS("name", "MINERvA_CC0pi_XSec_1DQ2_Tgt" + target + "_nu");
-  samplekey_num.AddS("input", inFileNUM);
-  samplekey_num.AddS("type", type);
+  nuiskey samplekey_num = nuiskey("sample");
+  samplekey_num.Set("name", "MINERvA_CC0pi_XSec_1DQ2_Tgt" + target + "_nu");
+  samplekey_num.Set("input", inFileNUM);
+  samplekey_num.Set("type", type);
 
-  nuiskey samplekey_den = Config::CreateKey("sample");
-  samplekey_den.AddS("name", "MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu");
-  samplekey_den.AddS("input", inFileDEN);
-  samplekey_den.AddS("type", type);
+  nuiskey samplekey_den = nuiskey("sample");
+  samplekey_den.Set("name", "MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu");
+  samplekey_den.Set("input", inFileDEN);
+  samplekey_den.Set("type", type);
 
   NUM  = new MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(samplekey_num);
   DEN  = new MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(samplekey_den);

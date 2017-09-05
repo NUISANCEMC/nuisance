@@ -19,6 +19,8 @@
 
 #include "TH1D.h"
 #include "StatUtils.h"
+#include "NuisConfig.h"
+#include "GeneralUtils.h"
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask) {

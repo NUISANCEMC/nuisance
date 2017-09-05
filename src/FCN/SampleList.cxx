@@ -302,9 +302,9 @@ MeasurementBase* CreateSample(std::string name, std::string file,
                               std::string type, std::string fkdt,
                               FitWeight* rw) {
   nuiskey samplekey = Config::CreateKey("sample");
-  samplekey.AddS("name", name);
-  samplekey.AddS("input", file);
-  samplekey.AddS("type", type);
+  samplekey.Set("name", name);
+  samplekey.Set("input", file);
+  samplekey.Set("type", type);
 
   return CreateSample(samplekey);
 }

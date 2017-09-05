@@ -17,28 +17,17 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(HEADERFILES
-FitUtils.h
-GeneralUtils.h
-ParserUtils.h
-PlotUtils.h
-SignalDef.h
-BeamUtils.h
-TargetUtils.h
-OpenMPWrapper.h
-PhysConst.h
+FitLogger.h
+Initialiser.h
 )
 
 set(IMPLFILES
-FitUtils.cxx
-GeneralUtils.cxx
-PlotUtils.cxx
-SignalDef.cxx
-BeamUtils.cxx
-TargetUtils.cxx
-ParserUtils.cxx
+PythiaQuiet.f
+FitLogger.cxx
+Initialiser.cxx
 )
 
-set(LIBNAME Utils)
+set(LIBNAME Logger)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(${LIBNAME} STATIC ${IMPLFILES})
@@ -47,7 +36,6 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-include_directories(${CMAKE_SOURCE_DIR}/src/Logger)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
@@ -64,13 +52,3 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 
-#add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
-#
-#  #Strip out -lNuWro_event1
-#  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${CMAKE_DEPENDLIB_FLAGS})
-#  cmessage(DEBUG "Attempted to strip out nuwro library: \"${CMAKE_DEPENDLIB_FLAGS}\" -> \"${NWEVSTRIPPED_CDF}\"")
-#  target_link_libraries(DumpROOTClassesFromVector ${NWEVSTRIPPED_CDF})
-#  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
-#    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-#  endif()
-#install(TARGETS DumpROOTClassesFromVector DESTINATION bin)

@@ -17,8 +17,8 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINIMIZER_ROUTINES_H
-#define MINIMIZER_ROUTINES_H
+#ifndef BAYESIAN_ROUTINES_H
+#define BAYESIAN_ROUTINES_H
 
 /*!
  *  \addtogroup Minimizer
@@ -29,13 +29,11 @@
 #include "TF1.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
 
-
+#include <sys/time.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -44,13 +42,7 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-#include "MinimizerFCN.h"
 
-
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
-#include "FitLogger.h"
 #include "ParserUtils.h"
 
 enum minstate {
@@ -65,7 +57,7 @@ enum minstate {
 
 //*************************************
 //! Collects all possible fit routines into a single class to avoid repeated code
-class MinimizerRoutines{
+class BayesianRoutines{
 //*************************************
 
 public:
@@ -75,10 +67,10 @@ public:
   */
 
   //! Constructor reads in arguments given at the command line for the fit here.
-  MinimizerRoutines(int argc, char* argv[]);
+  BayesianRoutines(int argc, char* argv[]);
     
   //! Default destructor
-  ~MinimizerRoutines();
+  ~BayesianRoutines();
 
   //! Reset everything to default/NULL
   void Init();
@@ -94,42 +86,16 @@ public:
   //! Calls readCard to set everything else up.
   void InitialSetup();
 
-  //! Loops through each line of the card file and passes it to other read functions
-  void ReadCard(std::string cardfile);
-
-  //! Check for parameter string in the line and assign the correct type.
-  //! Fills maps for each of the parameters
-  int ReadParameters(std::string parstring);
-
-  //! Reads in fake parameters and assigns them (Requires the parameter to be included as a normal parameter as well)
-  int ReadFakeDataPars(std::string parstring);
-
-  //! Read in the samples so we can set up the free normalisation dials if required
-  int ReadSamples(std::string sampleString);
-void SetupMinimizerFromXML();
-
   /*
     Setup Functions
   */
-
-  //! Setup the configuration given the arguments passed at the commandline and card file
-  void SetupConfig();
+  void SetupSystematicsFromXML();
 
   //! Setups up our custom RW engine with all the parameters passed in the card file
   void SetupRWEngine();
 
   //! Setups up the jointFCN.
   void SetupFCN();
-
-  //! Sets up the minimizerObj for ROOT. there are cases where this is called repeatedly, e.g. If you are using a brute force scan before using Migrad.
-  void SetupFitter(std::string routine);
-
-  //! Set the current data histograms in each sample to the fake data.
-  void SetFakeData();
-
-  //! Setup the covariances with the correct dimensions. At the start this is either uncorrelated or merged given all the input covariances.
-  //! At the end of the fit this produces the blank covariances which can then be filled by the minimizerObj with best fit covariances.
-  void SetupCovariance();
 
   /*
     Fitting Functions
@@ -144,65 +110,13 @@ void SetupMinimizerFromXML();
   //! Given a single routine (see tutorial for options) run that fit routine now.
   int RunFitRoutine(std::string routine);
 
-  //! Get the current state of minimizerObj and fill it into currentVals and currentNorms
-  void GetMinimizerState();
-
-  //! Print current value
-  void PrintState();
-  
-  //! Performs a fit routine where the input.maxevents is set to a much lower value to try and move closer to the best fit minimum.
-  void LowStatRoutine(std::string routine);
-
-  //! Perform a chi2 scan in 1D around the current point
-  void Create1DScans();
-
-  //! Perform a chi2 scan in 2D around the current point
-  void Chi2Scan2D();
-
-  //! Currently a placeholder NEEDS UPDATING
-  void CreateContours();
-
-  //! If any currentVals are close to the limits set them to the limit and fix them
-  int FixAtLimit();
-
   //! Throw the current covariance of dial values we have, and fill the thrownVals and thrownNorms maps.
   //! If uniformly is true parameters will be thrown uniformly between their upper and lower limits.
-  void ThrowCovariance(bool uniformly);
+  void ThrowParameters();
 
-  //! Given the covariance we currently have generate error bands by throwing the covariance.
-  //! The FitPar config "error_uniform" defines whether to throw using the covariance or uniformly.
-  //! The FitPar config "error_throws" defines how many throws are needed.
-  //! Currently only supports TH1D plots.
-  void GenerateErrorBands();
-
-  /*
-    Write Functions
-  */
-
-  //! Write plots and TTrees listing the minimizerObj result of the fit to file
-  void SaveMinimizerState();
-
-  //! Save the sample plots for current MC
-  //! dir if not empty forces plots to be saved in a subdirectory of outputfile
-  void SaveCurrentState(std::string subdir="");
-
-  //! Save starting predictions into a seperate folder
-  void SaveNominal();
-
-  //! Save predictions before the fit is ran into a seperate folder
-  void SavePrefit();
-
-  void SaveResults();
-  /*
-    MISC Functions
-  */
-
-  //! Get previous fit status from a file
-  Int_t GetStatus();
-
-  /// Makes a histogram of likelihoods when throwing the data according to its statistics
-  void ThrowDataToys();
-
+  //! Run Throws   
+  void GenerateThrows();
+ 
 protected:
 
   //! Our Custom ReWeight Object
@@ -218,11 +132,7 @@ protected:
   bool fitContinue;
 
   //! Minimizer Object for handling roots different minimizer methods
-  ROOT::Math::Minimizer* fMinimizer;
-
   JointFCN* fSampleFCN;
-  MinimizerFCN* fMinimizerFCN;
-  ROOT::Math::Functor* fCallFunctor;
 
   int nfreepars;
 
@@ -254,15 +164,18 @@ protected:
   //! Map of thrown parameter names and values (After ThrowCovariance)
   std::map<std::string,double> fThrownVals;
 
-  TH2D* fCorrel;
-  TH2D* fDecomp;
-  TH2D* fCovar;
-  
-  TH2D* fCorFree;
-  TH2D* fDecFree;
-  TH2D* fCovFree;
 
-    nuiskey fCompKey;
+  std::list   <ParamPull*>  fInputThrows; //!< Pointers to pull terms
+  std::vector <TH1D>        fInputDials; //!< Vector of Input Histograms
+  std::vector <TMatrixDSym> fInputCovar; //!< Vector of Input Covariances  
+
+  nuiskey fCompKey;
+  std::vector<std::string> fThrowList;
+  std::string fThrowString;
+
+  int fNThrows;
+  int fStartThrows;
+
 
 };
 
