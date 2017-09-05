@@ -21,7 +21,7 @@
 #define SPLINES_HEAD_H
 
 #include "TObject.h"
-#include "FitParameters.h"
+
 #include "PlotUtils.h"
 #include "FitUtils.h"
 #include "stdint.h"

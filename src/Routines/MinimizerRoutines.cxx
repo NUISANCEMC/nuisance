@@ -122,17 +122,12 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
-  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
-
-  // Add CMD XML Structs
-  for (size_t i = 0; i < xmlcmds.size(); i++) {
-    configuration.AddXMLLine(xmlcmds[i]);
-  }
+  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -143,11 +138,11 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   }
 
   // Finish configuration XML
-  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
+  configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
   // Add Error Verbo Lines
-  verbocount += Config::Get().GetParI("VERBOSITY");
-  errorcount += Config::Get().GetParI("ERROR");
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   // FitPar::log_verb = verbocount;
@@ -751,16 +746,16 @@ void MinimizerRoutines::LowStatRoutine(std::string routine) {
                      substring.length() );
 
   // Set MAX EVENTS=1000
-  FitPar::Config().SetParI("input.maxevents", lowstatsevents);
-  FitPar::Config().SetParI("VERBOSITY", 3);
+  Config::SetPar("input.maxevents", lowstatsevents);
+  Config::SetPar("VERBOSITY", 3);
   SetupFCN();
 
   RunFitRoutine(trueroutine);
 
-  FitPar::Config().SetParI("input.maxevents", maxevents);
+  Config::SetPar("input.maxevents", maxevents);
   SetupFCN();
 
-  FitPar::Config().SetParI("VERBOSITY", verbosity);
+  Config::SetPar("VERBOSITY", verbosity);
   return;
 }
 
@@ -1480,7 +1475,7 @@ void MinimizerRoutines::GenerateErrorBands() {
 
 void MinimizerRoutines::ThrowDataToys(){
   LOG(FIT) << "Generating Toy Data Throws" << std::endl;
-  int verb = Config::Get().GetParI("VERBOSITY");
+  int verb = Config::GetParI("VERBOSITY");
   SETVERBOSITY(FIT);
 
   int nthrows = FitPar::Config().GetParI("NToyThrows");

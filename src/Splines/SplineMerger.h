@@ -3,7 +3,7 @@
 
 #include "FitWeight.h"
 #include "Spline.h"
-#include "FitParameters.h"
+
 #include "SplineReader.h"
 
 class SplineMerger : public SplineReader {

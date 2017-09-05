@@ -20,6 +20,7 @@ set(IMPLFILES
 ComparisonRoutines.cxx
 SystematicRoutines.cxx
 SplineRoutines.cxx
+BayesianRoutines.cxx
 )
 
 if(USE_MINIMIZER)
@@ -29,6 +30,7 @@ endif()
 set(HEADERFILES
 ComparisonRoutines.h
 SystematicRoutines.h
+BayesianRoutines.h
 SplineRoutines.h
 )
 
