@@ -31,7 +31,9 @@ class Smear_SVDUnfold_Propagation_Osc : public Measurement1D {
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
 
+  void UnfoldToNDETrueSpectrum(void);
   void ConvertEventRates(void);
+  void Write(std::string drawOpt);
 
   TH1D *NDDataHist;
   TH1D *FDDataHist;
@@ -52,6 +54,8 @@ class Smear_SVDUnfold_Propagation_Osc : public Measurement1D {
   Int_t TruncateUpTo;
   double FitRegion_Min;
   double FitRegion_Max;
+
+  double NDFDRatio;
 };
 
 #endif
