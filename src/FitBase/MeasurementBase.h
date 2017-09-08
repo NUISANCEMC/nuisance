@@ -342,6 +342,11 @@ protected:
 
   bool fIsJoint;
 
+
+
+  double fNPOT, fFluxIntegralOverride, fTargetVolume, fTargetMaterialDensity;
+  double fEvtRateScaleFactor;
+
 };
 
 

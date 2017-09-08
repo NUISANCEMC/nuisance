@@ -190,8 +190,8 @@ Smear_SVDUnfold_Propagation_Osc::Smear_SVDUnfold_Propagation_Osc(
   }
 
   NDFDRatio = 1;
-  if (Config::Get().GetConfigNode("Osc.NDFDRatio")) {
-    NDFDRatio = Config::Get().ConfD("Osc.NDFDRatio");
+  if (samplekey.Has("FDNDRatio")) {
+    NDFDRatio = samplekey.GetD("FDNDRatio");
   }
 
   UnfoldToNDETrueSpectrum();
@@ -376,4 +376,5 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
   }
 
   POsc.Write("POsc", TObject::kOverwrite);
+  Measurement1D::Write(drawOpt);
 }

@@ -27,47 +27,60 @@
 
 //********************************************************************
 /// @brief Class to perform smearceptance MC Studies on a custom measurement
-Smearceptance_Tester::Smearceptance_Tester(std::string name,
-                                           std::string inputfile, FitWeight *rw,
-                                           std::string type,
-                                           std::string fakeDataFile) {
+Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   //********************************************************************
 
+  // Sample overview ---------------------------------------------------
+  std::string descrip =
+      "Simple measurement class for producing an event summary tree of smeared "
+      "events.\n";
+
+  if (Config::Get().GetConfigNode("NPOT")) {
+    samplekey.SetS("NPOT", Config::Get().ConfS("NPOT"));
+  }
+  if (Config::Get().GetConfigNode("FluxIntegralOverride")) {
+    samplekey.SetS("FluxIntegralOverride",
+                   Config::Get().ConfS("FluxIntegralOverride"));
+  }
+  if (Config::Get().GetConfigNode("TargetVolume")) {
+    samplekey.SetS("TargetVolume", Config::Get().ConfS("TargetVolume"));
+  }
+  if (Config::Get().GetConfigNode("TargetMaterialDensity")) {
+    samplekey.SetS("TargetMaterialDensity",
+                   Config::Get().ConfS("TargetMaterialDensity"));
+  }
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+
+  fSettings.SetTitle("Smearceptance Studies");
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("XXX");
+  fSettings.SetYTitle("Number of events");
+  fSettings.SetEnuRange(0.0, 1E5);
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
+  fSettings.DefineAllowedTargets("*");
+  fSettings.DefineAllowedSpecies("*");
+
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =
+      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+      TotalIntegratedFlux();
+
   // Measurement Details
-  std::vector<std::string> splitName = GeneralUtils::ParseToStr(name, "_");
-  size_t firstUS = name.find_first_of("_");
+  std::vector<std::string> splitName = GeneralUtils::ParseToStr(fName, "_");
+  size_t firstUS = fName.find_first_of("_");
 
-  std::string smearceptorName = name.substr(firstUS + 1);
+  std::string smearceptorName = fName.substr(firstUS + 1);
 
-  fName = name.substr(0, firstUS);
-  eventVariables = NULL;
-
-  // Define our energy range for flux calcs
-  EnuMin = 0.;
-  EnuMax = 100.;  // Arbritrarily high energy limit
-
-  // Set default fitter flags
-  fIsDiag = true;
-  fIsShape = false;
-  fIsRawEvents = false;
-
-  // This function will sort out the input files automatically and parse all the
-  // inputs,flags,etc.
-  // There may be complex cases where you have to do this by hand, but usually
-  // this will do.
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
-
-  eventVariables = NULL;
-
-  // Setup fDataHist as a placeholder
-  this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
-  this->SetupDefaultHist();
+  fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
+  SetupDefaultHist();
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
   covar = StatUtils::GetInvert(fFullCovar);
 
-  this->fScaleFactor =
-      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
-      this->TotalIntegratedFlux();
+  eventVariables = NULL;
 
   LOG(SAM) << "Smearceptance Flux Scaling Factor = " << fScaleFactor
            << std::endl;
@@ -78,7 +91,7 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
   }
 
   // Setup our TTrees
-  this->AddEventVariablesToTree();
+  AddEventVariablesToTree();
 
   smearceptor = &Smearcepterton::Get().GetSmearcepter(smearceptorName);
 
@@ -125,14 +138,17 @@ Smearceptance_Tester::Smearceptance_Tester(std::string name,
       new TH2D("ELepHadVis_Recon", ";True E_{#nu};Recon. E_{#nu}", RecNBins,
                RecBinL, RecBinH, TrueNBins, TrueBinL, TrueBinH);
   RecoSmear->Sumw2();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 }
 
 void Smearceptance_Tester::AddEventVariablesToTree() {
   // Setup the TTree to save everything
   if (!eventVariables) {
     FitPar::Config().out->cd();
-    eventVariables = new TTree((this->fName + "_VARS").c_str(),
-                               (this->fName + "_VARS").c_str());
+    eventVariables =
+        new TTree((fName + "_VARS").c_str(), (fName + "_VARS").c_str());
   }
 
   LOG(SAM) << "Adding Event Variables" << std::endl;
@@ -245,6 +261,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("FluxWeight", &FluxWeight, "FluxWeight/F");
   eventVariables->Branch("EffWeight", &EffWeight, "EffWeight/F");
 
+  xsecScaling = fScaleFactor;
   eventVariables->Branch("xsecScaling", &xsecScaling, "xsecScaling/F");
 
   eventVariables->Branch("flagCCINC_true", &flagCCINC_true, "flagCCINC_true/O");
@@ -252,6 +269,12 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 
   eventVariables->Branch("flagCCINC_rec", &flagCCINC_rec, "flagCCINC_rec/O");
   eventVariables->Branch("flagCC0Pi_rec", &flagCC0Pi_rec, "flagCC0Pi_rec/O");
+
+  if (fEvtRateScaleFactor != 0xdeadbeef) {
+    eventVariables->Branch("PredEvtRateWeight", &PredEvtRateWeight,
+                           "PredEvtRateWeight/F");
+    PredEvtRateWeight = fScaleFactor * fEvtRateScaleFactor;
+  }
 }
 
 template <size_t N>
@@ -538,8 +561,6 @@ void Smearceptance_Tester::FillEventVariables(FitEvent *event) {
                GetFluxHistogram()->Integral();
   EffWeight = ri->Weight;
 
-  xsecScaling = fScaleFactor;
-
   flagCCINC_true = PDGFSLep_true & 1;
   flagCC0Pi_true = (Ncpi_true + Npi0_true) == 0;
 
@@ -664,7 +685,7 @@ void Smearceptance_Tester::ApplyNormScale(float norm) {
   //********************************************************************
 
   // Saving everything to a TTree so no scaling required
-  this->fCurrentNorm = norm;
+  fCurrentNorm = norm;
   return;
 }
 

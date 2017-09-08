@@ -41,11 +41,11 @@ Measurement1D::Measurement1D(void) {
   covar = NULL;
   fFullCovar = NULL;
   fShapeCovar = NULL;
-  
+
   fCovar  = NULL;
   fInvert = NULL;
   fDecomp = NULL;
-  
+
   // Fake Data
   fFakeDataInput = "";
   fFakeDataFile  = NULL;
@@ -346,7 +346,7 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
 //********************************************************************
 void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles, int dim) {
-//********************************************************************  
+//********************************************************************
 
   if (dim == -1) {
     dim = fDataHist->GetNbinsX();
@@ -358,7 +358,7 @@ void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles, i
   for (uint i = 0; i < corrList.size(); ++i){
     LOG(SAM) << "Reading covariance from text file: " << corrList[i] << std::endl;
     TMatrixDSym* temp_cov = StatUtils::GetCovarFromTextFile(corrList[i], dim);
-    
+
     for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
       for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
 	(*temp_cov)(i, j) = (*temp_cov)(i, j) * fDataHist->GetBinError(i + 1) * fDataHist->GetBinError(j + 1) * 1.E76;
@@ -447,14 +447,14 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile, std::string h
 }
 
 void Measurement1D::SetShapeCovar(){
-  
+
   // Return if this is missing any pre-requisites
   if (!fFullCovar) return;
   if (!fDataHist) return;
 
   // Also return if it's bloody stupid under the circumstances
   if (fIsDiag) return;
-  
+
   fShapeCovar = StatUtils::ExtractShapeOnlyCovar(fFullCovar, fDataHist);
   return;
 }
@@ -1116,7 +1116,7 @@ void Measurement1D::ThrowCovariance() {
 
   // Take a fDecomposition and use it to throw the current dataset.
   // Requires fDataTrue also be set incase used repeatedly.
-  
+
   if (!fDataTrue) fDataTrue = (TH1D*) fDataHist->Clone();
   if (fDataHist) delete fDataHist;
   fDataHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
@@ -1127,7 +1127,7 @@ void Measurement1D::ThrowCovariance() {
 
 //********************************************************************
 void Measurement1D::ThrowDataToy(){
-//******************************************************************** 
+//********************************************************************
   if (!fDataTrue) fDataTrue = (TH1D*) fDataHist->Clone();
   if (fMCHist) delete fMCHist;
   fMCHist = StatUtils::ThrowHistogram(fDataTrue, fFullCovar);
@@ -1217,6 +1217,13 @@ void Measurement1D::Write(std::string drawOpt) {
   // Write Data/MC
   GetDataList().at(0)->Write();
   GetMCList().at(0)->Write();
+
+  if(fEvtRateScaleFactor != 0xdeadbeef){
+    TH1D * PredictedEvtRate = static_cast<TH1D *>(GetMCList().at(0)->Clone());
+    PredictedEvtRate->Scale(fEvtRateScaleFactor);
+    PredictedEvtRate->GetYaxis()->SetTitle("Predicted event rate");
+    PredictedEvtRate->Write();
+  }
 
 
   // Write Fine Histogram
@@ -1413,7 +1420,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   samplekey.AddS("type",type);
   samplekey.AddS("input",inputfile);
   fSettings = LoadSampleSettings(samplekey);
-  
+
   // Reset everything to NULL
   // Init();
 

@@ -33,8 +33,7 @@ class Smearceptance_Tester : public Measurement1D {
   //********************************************************************
 
  public:
-  Smearceptance_Tester(std::string name, std::string inputfile, FitWeight *rw,
-                       std::string type, std::string fakeDataFile);
+  Smearceptance_Tester(nuiskey samplekey);
   virtual ~Smearceptance_Tester(){};
 
   //! Grab info from event
@@ -156,6 +155,7 @@ class Smearceptance_Tester : public Measurement1D {
   float InputWeight;
   float FluxWeight;
   float EffWeight;
+  float PredEvtRateWeight;
 
   float xsecScaling;
 

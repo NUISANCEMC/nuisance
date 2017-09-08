@@ -188,9 +188,10 @@ int main(int argc, char* argv[]) {
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
 
-  samplekey.AddS("name", "FlatTree");
-  samplekey.AddS("input", gOptInputFile);
-  samplekey.AddS("type", gOptType);
+  samplekey.SetS("name", std::string("FlatTree_") + gOptOptions);
+  samplekey.SetS("input", gOptInputFile);
+  samplekey.SetS("type", gOptType);
+
   if (gOptOptions == "") {
     THROW(
         "Attempting to flatten with Smearceptor, but no Smearceptor given. "
@@ -204,9 +205,7 @@ int main(int argc, char* argv[]) {
 
   SetupRW();
 
-  flattreecreator =
-      new Smearceptance_Tester(std::string("FlatTree_") + gOptOptions,
-                               gOptInputFile, FitBase::GetRW(), gOptType, "");
+  flattreecreator = new Smearceptance_Tester(samplekey);
 
   // Make the FlatTree reconfigure
   flattreecreator->Reconfigure();
