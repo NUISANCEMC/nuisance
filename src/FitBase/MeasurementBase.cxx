@@ -42,27 +42,29 @@ MeasurementBase::MeasurementBase(void) {
   fMeasurementSpeciesType = kSingleSpeciesMeasurement;
   fEventVariables = NULL;
   fIsJoint = false;
+
+  fNPOT = 0xdeadbeef;
+  fFluxIntegralOverride = 0xdeadbeef;
+  fTargetVolume = 0xdeadbeef;
+  fTargetMaterialDensity = 0xdeadbeef;
+  fEvtRateScaleFactor = 0xdeadbeef;
 };
 
 void MeasurementBase::FinaliseMeasurement() {
-
   // Used to setup default data hists, covars, etc.
-
-
-
 }
 
 //********************************************************************
 // 2nd Level Destructor (Inherits From MeasurementBase.h)
-MeasurementBase::~MeasurementBase() {
-  //********************************************************************
+MeasurementBase::~MeasurementBase(){
+    //********************************************************************
 
 };
 
 //********************************************************************
 double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low,
-    double high) {
-//********************************************************************
+                                            double high) {
+  //********************************************************************
 
   // Set Energy Limits
   if (low == -9999.9) low = this->EnuMin;
@@ -72,7 +74,7 @@ double MeasurementBase::TotalIntegratedFlux(std::string intOpt, double low,
 
 //********************************************************************
 double MeasurementBase::PredictedEventRate(std::string intOpt, double low,
-    double high) {
+                                           double high) {
   //********************************************************************
 
   // Set Energy Limits
@@ -86,30 +88,28 @@ double MeasurementBase::PredictedEventRate(std::string intOpt, double low,
 void MeasurementBase::SetupInputs(std::string inputfile) {
   //********************************************************************
 
-
   // Add this infile to the global manager
   if (FitPar::Config().GetParB("EventManager")) {
     fInput = FitBase::AddInput(fName, inputfile);
   } else {
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfile, ":");
+        GeneralUtils::ParseToStr(inputfile, ":");
     if (file_descriptor.size() != 2) {
       ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfile
                << "\". expected \"FILETYPE:file.root\"" << std::endl;
       throw;
     }
     InputUtils::InputType inpType =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
     fInput = InputUtils::CreateInputHandler(fName, inpType, file_descriptor[1]);
   }
-
 
   fNEvents = fInput->GetNEvents();
 
   // Expect INPUTTYPE:FileLocation(s)
   std::vector<std::string> file_descriptor =
-    GeneralUtils::ParseToStr(inputfile, ":");
+      GeneralUtils::ParseToStr(inputfile, ":");
   if (file_descriptor.size() != 2) {
     ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfile
              << "\". expected \"FILETYPE:file.root\"" << std::endl;
@@ -121,7 +121,7 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
   if (EnuMin == 0 && EnuMax == 1.E5) {
     EnuMin = fInput->GetFluxHistogram()->GetBinLowEdge(1);
     EnuMax = fInput->GetFluxHistogram()->GetBinLowEdge(
-               fInput->GetFluxHistogram()->GetNbinsX() + 1);
+        fInput->GetFluxHistogram()->GetNbinsX() + 1);
   }
 
   fFluxHist = fInput->GetFluxHistogram();
@@ -130,46 +130,80 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
 
 //***********************************************
 int MeasurementBase::GetInputID() {
-//***********************************************
+  //***********************************************
   return FitBase::GetInputID(fInputFileName);
 }
 
 //***********************************************
 SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
-//***********************************************
+  //***********************************************
   SampleSettings setting = SampleSettings(samplekey);
   fName = setting.GetS("name");
 
   // Used as an initial setup function incase we need to do anything here.
   LOG(SAM) << "Loading Sample : " << setting.GetName() << std::endl;
-  if (!fIsJoint) SetupInputs( setting.GetS("input") );
+
+  fEvtRateScaleFactor = 0xdeadbeef;
+
+  if (!fIsJoint) {
+    SetupInputs(setting.GetS("input"));
+
+    fNPOT = samplekey.Has("NPOT") ? samplekey.GetD("NPOT") : 1;
+    fFluxIntegralOverride = samplekey.Has("FluxIntegralOverride")
+                                ? samplekey.GetD("FluxIntegralOverride")
+                                : 0xdeadbeef;
+    fTargetVolume = samplekey.Has("TargetVolume")
+                        ? samplekey.GetD("TargetVolume")
+                        : 0xdeadbeef;
+    fTargetMaterialDensity = samplekey.Has("TargetMaterialDensity")
+                                 ? samplekey.GetD("TargetMaterialDensity")
+                                 : 0xdeadbeef;
+    if ((fTargetVolume != 0xdeadbeef) &&
+        (fTargetMaterialDensity != 0xdeadbeef)) {
+      double TargetMass_kg = fTargetVolume * fTargetMaterialDensity;
+      double NNucleons = TargetMass_kg / PhysConst::mass_nucleon_kg;
+      double NNeutrinos =
+          ((fFluxIntegralOverride == 0xdeadbeef) ? TotalIntegratedFlux()
+                                                 : fFluxIntegralOverride) *
+          fNPOT;
+      fEvtRateScaleFactor = NNeutrinos * NNucleons;
+
+      QLOG(SAM, "\tEvent rate prediction : ");
+      QLOG(SAM, "\t\tTarget volume : " << fTargetVolume << " m^3");
+      QLOG(SAM, "\t\tTarget density : " << fTargetMaterialDensity << " kg/m^3");
+      QLOG(SAM, "\t\tTarget mass : " << TargetMass_kg << " kg");
+      QLOG(SAM, "\t\tNTarget Nucleons : " << NNucleons);
+      QLOG(SAM, "\t\tNNeutrinos : " << NNeutrinos
+                                    << ((fNPOT == 1) ? "/cm^2" : "/POT /cm^2"));
+      QLOG(SAM, "\t\tXSec -> EvtRate scale factor : " << fEvtRateScaleFactor);
+    }
+  }
 
   return setting;
 }
 
 //***********************************************
-SampleSettings MeasurementBase::LoadSampleSettings(std::string name, std::string input, std::string type) {
-//***********************************************
+SampleSettings MeasurementBase::LoadSampleSettings(std::string name,
+                                                   std::string input,
+                                                   std::string type) {
+  //***********************************************
 
   nuiskey samplekey = Config::CreateKey("sample");
-  samplekey.SetS("name",name);
-  samplekey.SetS("input",input);
-  samplekey.SetS("type",type);
+  samplekey.SetS("name", name);
+  samplekey.SetS("input", input);
+  samplekey.SetS("type", type);
 
   return LoadSampleSettings(samplekey);
 }
 
 void MeasurementBase::FinaliseSampleSettings() {
-
   EnuMin = fSettings.GetD("enu_min");
   EnuMax = fSettings.GetD("enu_max");
-
 }
-
 
 //***********************************************
 void MeasurementBase::Reconfigure() {
-//***********************************************
+  //***********************************************
 
   LOG(REC) << " Reconfiguring sample " << fName << std::endl;
 
@@ -182,13 +216,11 @@ void MeasurementBase::Reconfigure() {
   int fNEvents = fInput->GetNEvents();
   int countwidth = (fNEvents / 5);
 
-
   // MAIN EVENT LOOP
   FitEvent* cust_event = fInput->FirstNuisanceEvent();
   int i = 0;
   int npassed = 0;
-  while(cust_event){
-
+  while (cust_event) {
     cust_event->RWWeight = fRW->CalcWeight(cust_event);
     cust_event->Weight = cust_event->RWWeight * cust_event->InputWeight;
 
@@ -241,20 +273,19 @@ void MeasurementBase::Reconfigure() {
   if (npassed == 0) {
     LOG(SAM) << "WARNING: NO EVENTS PASSED SELECTION!" << std::endl;
   }
-  LOG(REC) << std::setw(10) << std::right << NSignal << "/"
-           << fNEvents << " events passed selection + binning after reweight"
-           << std::endl;
+  LOG(REC) << std::setw(10) << std::right << NSignal << "/" << fNEvents
+           << " events passed selection + binning after reweight" << std::endl;
 
   // Finalise Histograms
   fMCFilled = true;
   this->ConvertEventRates();
 }
 
-void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double weight) {
-
-  fXVar  = var->GetX();
-  fYVar  = var->GetY();
-  fZVar  = var->GetZ();
+void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var,
+                                            double weight) {
+  fXVar = var->GetX();
+  fYVar = var->GetY();
+  fZVar = var->GetZ();
   // Signal = var->fSignal;
   // Mode   = var->fMode;
   Weight = weight;
@@ -262,21 +293,18 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var, double 
 
   FillHistograms();
   FillExtraHistograms(var, weight);
-
 }
 
-void MeasurementBase::FillHistograms(double weight){
+void MeasurementBase::FillHistograms(double weight) {
   Weight = weight * GetBox()->GetSampleWeight();
   FillHistograms();
   FillExtraHistograms(GetBox(), Weight);
 }
 
-
 MeasurementVariableBox* MeasurementBase::FillVariableBox(FitEvent* event) {
-
   GetBox()->Reset();
   Mode = event->Mode;
-  Weight = 1.0; //event->Weight;
+  Weight = 1.0;  // event->Weight;
 
   this->FillEventVariables(event);
   Signal = this->isSignal(event);
@@ -313,16 +341,18 @@ void MeasurementBase::ConvertEventRates() {
   this->ScaleEvents();
 
   double normval = fRW->GetSampleNorm(this->fName);
-  if (normval < 0.01 or normval > 10.0){
-    ERR(WRN) << "Norm Value inside MeasurementBase::ConvertEventRates() looks off!" << std::endl;
-    ERR(WRN) << "It could have become out of sync with the minimizer norm list." << std::endl;
+  if (normval < 0.01 or normval > 10.0) {
+    ERR(WRN)
+        << "Norm Value inside MeasurementBase::ConvertEventRates() looks off!"
+        << std::endl;
+    ERR(WRN) << "It could have become out of sync with the minimizer norm list."
+             << std::endl;
     ERR(WRN) << "Setting it to 1.0" << std::endl;
     normval = 1.0;
   }
   AutoNormExtraTH1(normval);
   NormExtraHistograms(GetBox(), normval);
   this->ApplyNormScale(normval);
-
 }
 
 //***********************************************
@@ -331,8 +361,8 @@ InputHandlerBase* MeasurementBase::GetInput() {
 
   if (!fInput) {
     ERR(FTL) << "MeasurementBase::fInput not set. Please submit your command "
-             "line options and input cardfile with a bug report to: "
-             "nuisance@projects.hepforge.org"
+                "line options and input cardfile with a bug report to: "
+                "nuisance@projects.hepforge.org"
              << std::endl;
     throw;
   }
@@ -404,17 +434,16 @@ std::vector<TH1*> MeasurementBase::GetXSecList() {
   return GetInput()->GetXSecList();
 }
 
-
 void MeasurementBase::ProcessExtraHistograms(int cmd,
-    MeasurementVariableBox* vars,
-    double weight) {
+                                             MeasurementVariableBox* vars,
+                                             double weight) {
   // This should be overriden if we have extra histograms!!!
   // Add a flag to tell user this...
   return;
 }
 
 void MeasurementBase::FillExtraHistograms(MeasurementVariableBox* vars,
-    double weight) {
+                                          double weight) {
   ProcessExtraHistograms(kCMD_Fill, vars, weight);
 }
 
@@ -425,39 +454,48 @@ void MeasurementBase::ResetExtraHistograms() {
   ProcessExtraHistograms(kCMD_Reset, NULL, 1.0);
 }
 void MeasurementBase::NormExtraHistograms(MeasurementVariableBox* vars,
-    double norm) {
+                                          double norm) {
   ProcessExtraHistograms(kCMD_Norm, vars, norm);
 }
 void MeasurementBase::WriteExtraHistograms() {
   ProcessExtraHistograms(kCMD_Write, NULL, 1.00);
 }
 
-void MeasurementBase::SetAutoProcessTH1(TH1* hist, int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcessTH1(TH1* hist, int c1, int c2, int c3,
+                                        int c4, int c5) {
   FakeStack* fake = new FakeStack(hist);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
+  SetAutoProcessTH1(fake, c1, c2, c3, c4,
+                    c5);  // Need to add a destroy command!
 }
 
-void MeasurementBase::SetAutoProcess(TH1* hist, int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcess(TH1* hist, int c1, int c2, int c3, int c4,
+                                     int c5) {
   FakeStack* fake = new FakeStack(hist);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
+  SetAutoProcessTH1(fake, c1, c2, c3, c4,
+                    c5);  // Need to add a destroy command!
 }
 
-void MeasurementBase::SetAutoProcess(TGraph* g, int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcess(TGraph* g, int c1, int c2, int c3, int c4,
+                                     int c5) {
   FakeStack* fake = new FakeStack(g);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
+  SetAutoProcessTH1(fake, c1, c2, c3, c4,
+                    c5);  // Need to add a destroy command!
 }
 
-void MeasurementBase::SetAutoProcess(TF1* f, int c1, int c2, int c3, int c4, int c5) {
+void MeasurementBase::SetAutoProcess(TF1* f, int c1, int c2, int c3, int c4,
+                                     int c5) {
   FakeStack* fake = new FakeStack(f);
-  SetAutoProcessTH1(fake, c1, c2, c3, c4, c5); // Need to add a destroy command!
+  SetAutoProcessTH1(fake, c1, c2, c3, c4,
+                    c5);  // Need to add a destroy command!
 }
 
-void MeasurementBase::SetAutoProcess(StackBase* hist,  int c1, int c2, int c3, int c4, int c5){
+void MeasurementBase::SetAutoProcess(StackBase* hist, int c1, int c2, int c3,
+                                     int c4, int c5) {
   SetAutoProcessTH1(hist, c1, c2, c3, c4, c5);
 }
 
-void MeasurementBase::SetAutoProcessTH1(StackBase* hist,  int c1, int c2, int c3, int c4, int c5) {
-
+void MeasurementBase::SetAutoProcessTH1(StackBase* hist, int c1, int c2, int c3,
+                                        int c4, int c5) {
   // Set Defaults
   // int ncommands = kCMD_extraplotflags;
   bool autoflags[5];
@@ -473,10 +511,10 @@ void MeasurementBase::SetAutoProcessTH1(StackBase* hist,  int c1, int c2, int c3
   givenflags[2] = c3;
   givenflags[3] = c4;
   givenflags[4] = c5;
-  fExtraTH1s[hist] = std::vector<int>(5,0);
+  fExtraTH1s[hist] = std::vector<int>(5, 0);
 
   // Setup a default one.
-  if (c1 == -1 && c2 == -1 && c3 == -1 && c4 == -1 && c5 == -1){
+  if (c1 == -1 && c2 == -1 && c3 == -1 && c4 == -1 && c5 == -1) {
     fExtraTH1s[hist][kCMD_Reset] = 1;
     fExtraTH1s[hist][kCMD_Scale] = 1;
     fExtraTH1s[hist][kCMD_Norm] = 1;
@@ -485,25 +523,24 @@ void MeasurementBase::SetAutoProcessTH1(StackBase* hist,  int c1, int c2, int c3
 
   for (int i = 0; i < 5; i++) {
     switch (givenflags[i]) {
+      // Skip over...
+      case -1:
+        break;
 
-    // Skip over...
-    case -1:
-      break;
+      case kCMD_Reset:
+      case kCMD_Scale:
+      case kCMD_Norm:
+      case kCMD_Write:
+        fExtraTH1s[hist][givenflags[i]] = 1;
+        break;
 
-    case kCMD_Reset:
-    case kCMD_Scale:
-    case kCMD_Norm:
-    case kCMD_Write:
-      fExtraTH1s[hist][givenflags[i]] = 1;
-      break;
+      case kCMD_Fill:
+        ERR(FTL) << "Can't auto fill yet!" << std::endl;
+        autoflags[givenflags[i]] = 1;
+        break;
 
-    case kCMD_Fill:
-      ERR(FTL) << "Can't auto fill yet!" << std::endl;
-      autoflags[givenflags[i]] = 1;
-      break;
-
-    default:
-      break;
+      default:
+        break;
     }
   }
 
@@ -516,21 +553,20 @@ void MeasurementBase::AutoFillExtraTH1() {
 }
 
 void MeasurementBase::AutoResetExtraTH1() {
-
-  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter =
+           fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
-
     if (!((*iter).second)[kCMD_Reset]) continue;
     (*iter).first->Reset();
   }
 };
 
 void MeasurementBase::AutoScaleExtraTH1() {
-  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter =
+           fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
-
     if (!((*iter).second)[kCMD_Scale]) continue;
-    if (fIsNoWidth){
+    if (fIsNoWidth) {
       (*iter).first->Scale(fScaleFactor);
     } else {
       (*iter).first->Scale(fScaleFactor, "width");
@@ -542,22 +578,19 @@ void MeasurementBase::AutoNormExtraTH1(double norm) {
   double sfactor = 0.0;
   if (norm != 0.0) sfactor = 1.0 / norm;
 
-  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter =
+           fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
-
     if (!((*iter).second)[kCMD_Norm]) continue;
     (*iter).first->Scale(sfactor);
   }
 };
 
 void MeasurementBase::AutoWriteExtraTH1() {
-  for (std::map<StackBase*, std::vector<int> >::iterator iter = fExtraTH1s.begin();
+  for (std::map<StackBase*, std::vector<int> >::iterator iter =
+           fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
-
     if (!(((*iter).second)[kCMD_Write])) continue;
     (*iter).first->Write();
   }
 };
-
-
-
