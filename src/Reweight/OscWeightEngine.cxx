@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#define DEBUG_OSC_WE
+//#define DEBUG_OSC_WE
 
 #include "OscWeightEngine.h"
 
