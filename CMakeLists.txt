@@ -95,11 +95,11 @@ set(CORE
   FitBase
   Config
   Logger
-  Statistical
   InputHandler
   Splines
   Reweight	
   Utils
+  Statistical
   #Devel
   Smearceptance
   )
