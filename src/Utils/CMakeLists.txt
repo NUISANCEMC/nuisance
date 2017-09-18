@@ -48,6 +48,7 @@ endif()
 
 include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR}/src/Logger)
+include_directories(${CMAKE_SOURCE_DIR}/src/Statistical)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
