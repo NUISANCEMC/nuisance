@@ -63,6 +63,8 @@ BNL_CC1ppip_Evt_1DcosthAdler_nu::BNL_CC1ppip_Evt_1DcosthAdler_nu(nuiskey samplek
 
 void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
 
+  fXVar = -999.99;
+
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(13) == 0)
@@ -75,32 +77,11 @@ void BNL_CC1ppip_Evt_1DcosthAdler_nu::FillEventVariables(FitEvent *event) {
 
   // Get the hadronic mass
   double hadMass = FitUtils::MpPi(Pp, Ppip);
-  // Need to boost pion and muon into resonance rest-frame to get phi (e.g. see F. Sanchez arxiv 1511.00501v2)
-  //
-  // Get the resonance 4-vector
-  TLorentzVector Pres = Ppip + Pp;
-  Ppip.Boost(-Pres.BoostVector());
-  Pmu.Boost(-Pres.BoostVector());
-  Pnu.Boost(Pres.BoostVector());
-  // Define the vectors
-  TVector3 PpipVect = Ppip.Vect();
-  TVector3 PnuVect = Pnu.Vect();
-  TVector3 PmuVect = Pmu.Vect();
-  // Define the z-direction; should be same as Pres
-  TVector3 zVect = (PnuVect-PmuVect);
-  zVect *= 1/double(zVect.Mag());
+  if (hadMass > 1400) return;
 
-  // Then finally construct phi as the angle between pion projection and x axis
-  double cosThAdler = -999;
-
-  // BNL has a M(pi, p) < 1.4 GeV cut imposed
-  if (hadMass < 1400) {
-    cosThAdler = cos(PpipVect.Angle(zVect));
-  }
-
+  // Get Adler cos theta
+  double cosThAdler = FitUtils::CosThAdler(Pnu, Pmu, Ppip, Pp);
   fXVar = cosThAdler;
-
-  return;
 };
 
 bool BNL_CC1ppip_Evt_1DcosthAdler_nu::isSignal(FitEvent *event) {
