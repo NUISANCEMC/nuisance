@@ -384,6 +384,11 @@ void TrackedMomentumMatrixSmearer::SmearRecoInfo(RecoInfo *ri) {
       continue;
     }
 
+    if (recoDistrib->Integral() == 0) {
+      ERROR(WRN, "True slice has no reconstructed events. Not smearing.")
+      continue;
+    }
+
     double Smeared = recoDistrib->GetRandom() * sm.UnitsScale;
 
     switch (sm.SmearVar) {

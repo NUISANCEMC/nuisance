@@ -1,5 +1,7 @@
 #ifdef __NEUT_ENABLED__
 #include "NEUTInputHandler.h"
+#include "InputUtils.h"
+
 
 NEUTGeneratorInfo::~NEUTGeneratorInfo() { DeallocateParticleStack(); }
 

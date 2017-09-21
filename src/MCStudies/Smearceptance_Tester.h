@@ -161,16 +161,21 @@ class Smearceptance_Tester : public Measurement1D {
 
   bool flagCCINC_true;
   bool flagCC0Pi_true;
+  bool flagCC1Pi_true;
 
   bool flagCCINC_rec;
   bool flagCC0Pi_rec;
+  bool flagCC1Pi_rec;
 
+  bool OutputSummaryTree;
 
   int SVDTruncation;
 
   TH2D *RecoSmear;
   TH1D *ETrueDistrib;
+  TH1D *ETrueDistrib_noweight;
   TH1D *ERecDistrib;
+
 };
 
 #endif

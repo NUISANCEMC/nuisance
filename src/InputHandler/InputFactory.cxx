@@ -17,8 +17,19 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
+#include "FitEventInputHandler.h"
+#include "GENIEInputHandler.h"
+#include "GIBUUInputHandler.h"
+#include "HistogramInputHandler.h"
+#include "NEUTInputHandler.h"
+#include "NUANCEInputHandler.h"
+#include "NuWroInputHandler.h"
+#include "SigmaQ0HistogramInputHandler.h"
+#include "SplineInputHandler.h"
+
 #include "InputFactory.h"
 
+#include "TFile.h"
 
 namespace InputUtils {
 
@@ -29,73 +40,74 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
   std::string newinputs = InputUtils::ExpandInputDirectories(inputs);
 
   switch (inpType) {
-
-
-  case (kNEUT_Input):
+    case (kNEUT_Input):
 #ifdef __NEUT_ENABLED__
-    input = new NEUTInputHandler(handle, newinputs);
+      input = new NEUTInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create NEUTInputHandler : "
-          << handle << " " << inpType << " " << inputs);
-    THROW("NEUT is not enabled!");
+      ERROR(FTL, "Tried to create NEUTInputHandler : "
+                     << handle << " " << inpType << " " << inputs);
+      THROW("NEUT is not enabled!");
 #endif
-    break;
+      break;
 
-  case (kGENIE_Input):
+    case (kGENIE_Input):
 #ifdef __GENIE_ENABLED__
-    input = new GENIEInputHandler(handle, newinputs);
+      input = new GENIEInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create GENIEInputHandler : "
-          << handle << " " << inpType << " " << inputs);
-    THROW("GENIE is not enabled!");
+      ERROR(FTL, "Tried to create GENIEInputHandler : "
+                     << handle << " " << inpType << " " << inputs);
+      THROW("GENIE is not enabled!");
 #endif
-    break;
+      break;
 
-
-  case (kNUWRO_Input):
+    case (kNUWRO_Input):
 #ifdef __NUWRO_ENABLED__
-    input = new NuWroInputHandler(handle, newinputs);
+      input = new NuWroInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create NuWroInputHandler : "
-          << handle << " " << inpType << " " << inputs);
-    THROW("NuWro is not enabled!");
+      ERROR(FTL, "Tried to create NuWroInputHandler : "
+                     << handle << " " << inpType << " " << inputs);
+      THROW("NuWro is not enabled!");
 #endif
-    break;
+      break;
 
-  case (kGiBUU_Input):
+    case (kGiBUU_Input):
 #ifdef __GiBUU_ENABLED__
-    input = new GIBUUInputHandler(handle, newinputs);
+      input = new GIBUUInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create GiBUUInputHandler : "
-          << handle << " " << inpType << " " << inputs);
-    THROW("GiBUU is not enabled!");
+      ERROR(FTL, "Tried to create GiBUUInputHandler : "
+                     << handle << " " << inpType << " " << inputs);
+      THROW("GiBUU is not enabled!");
 #endif
-    break;
+      break;
 
-  case (kNUANCE_Input):
+    case (kNUANCE_Input):
 #ifdef __NUANCE_ENABLED__
-    input = new NUANCEInputHandler(handle, newinputs);
+      input = new NUANCEInputHandler(handle, newinputs);
 #else
-    ERROR(FTL, "Tried to create NUANCEInputHandler : "
-          << handle << " " << inpType << " " << inputs);
-    THROW("NUANCE is not enabled!");
+      ERROR(FTL, "Tried to create NUANCEInputHandler : "
+                     << handle << " " << inpType << " " << inputs);
+      THROW("NUANCE is not enabled!");
 #endif
-    break;
+      break;
 
-  case (kFEVENT_Input):
-    input = new FitEventInputHandler(handle, newinputs);
-    break;
+    case (kFEVENT_Input):
+      input = new FitEventInputHandler(handle, newinputs);
+      break;
 
-  case (kEVSPLN_Input):
-    input = new SplineInputHandler(handle, newinputs);
-    break;
+    case (kEVSPLN_Input):
+      input = new SplineInputHandler(handle, newinputs);
+      break;
 
-  case (kSIGMAQ0HIST_Input):
-    input = new SigmaQ0HistogramInputHandler(handle, newinputs);
-    break;
+    case (kSIGMAQ0HIST_Input):
+      input = new SigmaQ0HistogramInputHandler(handle, newinputs);
+      break;
 
-  default:
-    break;
+    case (kHISTO_Input):
+      input = new HistoInputHandler(handle, newinputs);
+      break;
+
+    default:
+      break;
   }
 
   /// Input failed
@@ -104,7 +116,6 @@ InputHandlerBase* CreateInputHandler(std::string const& handle,
     std::cout << "Generator Type " << inpType << " not enabled!" << std::endl;
     throw;
   }
-
 
   return input;
 };

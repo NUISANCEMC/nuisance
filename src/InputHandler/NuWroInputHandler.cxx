@@ -1,5 +1,6 @@
 #ifdef __NUWRO_ENABLED__
 #include "NuWroInputHandler.h"
+#include "InputUtils.h"
 
 NuWroGeneratorInfo::~NuWroGeneratorInfo() { delete fNuWroParticlePDGs; }
 
