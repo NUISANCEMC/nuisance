@@ -145,7 +145,7 @@ public:
   /// If no dimensions are given, it is assumed from the number
   /// entries in the first line of covfile.
   virtual void SetCovarFromTextFile(std::string covfile, int dim = -1);
-  
+
   virtual void SetCovarFromMultipleTextFiles(std::string covfiles, int dim = -1);
 
   /// \brief Read the data covariance from a ROOT file.
@@ -196,7 +196,7 @@ public:
   /// \warning REQUIRES DATA HISTOGRAM TO BE SET FIRST
   ///
   /// Inputfile should have similar format to that shown
-  /// in SetCovarFromTextFile. 
+  /// in SetCovarFromTextFile.
   ///
   /// If no dimensions are given, it is assumed from the number
   /// entries in the first line of the first corrfile.
@@ -275,7 +275,7 @@ public:
   /// - "data/masks/" + fName + ".mask";
   virtual void SetBinMask(std::string maskfile);
 
-  
+
   /// \brief Set the current fit options from a string.
   ///
   /// This is called twice for each sample, once to set the default
@@ -425,10 +425,10 @@ public:
   /// Call ResetFakeData or ResetData to return to values before the throw.
   virtual void ThrowCovariance(void);
 
-  /// \brief Throw the data by its assigned errors and assign this to MC          
-  ///           
-  /// Used when creating data toys by assign the MC to this thrown data           
-  /// so that the likelihood is calculated between data and thrown data           
+  /// \brief Throw the data by its assigned errors and assign this to MC
+  ///
+  /// Used when creating data toys by assign the MC to this thrown data
+  /// so that the likelihood is calculated between data and thrown data
   virtual void ThrowDataToy(void);
 
 

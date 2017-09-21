@@ -1,5 +1,7 @@
 #ifdef __GiBUU_ENABLED__
 #include "GIBUUInputHandler.h"
+#include "InputUtils.h"
+
 
 GIBUUGeneratorInfo::~GIBUUGeneratorInfo() { DeallocateParticleStack(); }
 
@@ -139,8 +141,8 @@ FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
 #ifdef __PROB3PP_ENABLED__
   else {
     for (int i = 0; i < fGiReader->StdHepN; i++) {
-      int state =
-          GetGIBUUParticleStatus(fGiReader->StdHepStatus[i], fGiReader->StdHepPdg[i]);
+      int state = GetGIBUUParticleStatus(fGiReader->StdHepStatus[i],
+                                         fGiReader->StdHepPdg[i]);
       if (state != kInitialState) {
         continue;
       }
@@ -153,6 +155,8 @@ FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
     }
   }
 #endif
+
+  fNUISANCEEvent->InputWeight *= GetInputWeight(entry);
 
   return fNUISANCEEvent;
 }
@@ -248,4 +252,50 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
 }
 
 void GIBUUInputHandler::Print() {}
+
+void GIBUUInputHandler::SetupJointInputs() {
+  if (jointeventinputs.size() <= 1) {
+    jointinput = false;
+  } else if (jointeventinputs.size() > 1) {
+    jointinput = true;
+    jointindexswitch = 0;
+  }
+  fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
+  if (fMaxEvents != -1 and jointeventinputs.size() > 1) {
+    THROW("Can only handle joint inputs when config MAXEVENTS = -1!");
+  }
+
+  for (size_t i = 0; i < jointeventinputs.size(); i++) {
+    double scale = double(fNEvents) / fEventHist->Integral("width");
+    scale *= jointfluxinputs.at(i)->Integral("width");
+
+    jointindexscale.push_back(scale);
+  }
+
+  fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
+  fFluxHist->SetNameTitle((fName + "_FLUX").c_str(), (fName + "_FLUX").c_str());
+
+  // Setup Max Events
+  if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
+    if (LOG_LEVEL(SAM)) {
+      std::cout << "\t\t|-> Read Max Entries : " << fMaxEvents << std::endl;
+    }
+    fNEvents = fMaxEvents;
+  }
+
+  // Print out Status
+  if (LOG_LEVEL(SAM)) {
+    std::cout << "\t\t|-> Total Entries    : " << fNEvents << std::endl
+              << "\t\t|-> Event Integral   : "
+              << fEventHist->Integral("width") * 1.E-38 << " events/nucleon"
+              << std::endl
+              << "\t\t|-> Flux Integral    : " << fFluxHist->Integral("width")
+              << " /cm2" << std::endl
+              << "\t\t|-> Event/Flux       : "
+              << fEventHist->Integral("width") * 1.E-38 /
+                     fFluxHist->Integral("width")
+              << " cm2/nucleon" << std::endl;
+  }
+}
+
 #endif

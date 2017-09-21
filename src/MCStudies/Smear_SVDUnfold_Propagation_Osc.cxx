@@ -23,6 +23,450 @@
 
 #include "OscWeightEngine.h"
 
+#include "HistogramInputHandler.h"
+
+void Smear_SVDUnfold_Propagation_Osc::AddNDInputs(nuiskey &samplekey) {
+  NDSample nds;
+
+  // Plot Setup -------------------------------------------------------
+  // Check that we have the relevant near detector histograms specified.
+
+  if (!NDSamples.size()) {  // If this is the first ND sample, take from the
+                            // sample input
+    InputHandlerBase *InputBase = GetInput();
+    if (InputBase->GetType() != kHISTO) {
+      THROW(
+          "Smear_SVDUnfold_Propagation_Osc expects a Histogram input that "
+          "contains the ND observed spectrum.");
+    }
+    HistoInputHandler *HInput = dynamic_cast<HistoInputHandler *>(InputBase);
+    if (!HInput) {
+      THROW(
+          "Smear_SVDUnfold_Propagation_Osc expects a Histogram input that "
+          "contains the ND observed spectrum.");
+    }
+    if (HInput->NHistograms() != 2) {
+      THROW(
+          "Input expected to contain 2 histograms. "
+          "HISTO:input.root[NDObs_TH1D,NDSmear_TH2D]");
+    }
+    nds.NDDataHist = dynamic_cast<TH1D *>(HInput->GetHistogram(0));
+    nds.NDToSpectrumSmearingMatrix =
+        dynamic_cast<TH2D *>(HInput->GetHistogram(1));
+
+    if (!nds.NDDataHist) {
+      THROW("Expected a valid TH1D input for the ND observed spectrum.");
+    }
+
+    if (!nds.NDToSpectrumSmearingMatrix) {
+      THROW("Expected a valid TH2D input for the ND observed smearing.");
+    }
+  } else {
+    std::vector<TH1 *> NDObsInputs =
+        PlotUtils::GetTH1sFromRootFile(samplekey.GetS("ObsInput"));
+    if (NDObsInputs.size() < 2) {
+      THROW(
+          "Near detector sample must contain the observed ERec spectrum and "
+          "the "
+          "ND ETrue/ERec smearing matrix. e.g. "
+          "ObsInput=\"input.root[NDObs_species,NDSmearing_species]\"");
+    }
+
+    nds.NDDataHist = dynamic_cast<TH1D *>(NDObsInputs[0]);
+    if (!nds.NDDataHist) {
+      ERROR(FTL,
+            "First histogram from ObsInput attribute was not a TH1D containing "
+            "the near detector observed ERec spectrum ("
+                << samplekey.GetS("ObsInput") << ").");
+      THROW(
+          "Near detector sample must contain the observed ERec spectrum and "
+          "the "
+          "ND ETrue/ERec smearing matrix. e.g. "
+          "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
+    }
+
+    nds.NDToSpectrumSmearingMatrix = dynamic_cast<TH2D *>(NDObsInputs[1]);
+    if (!nds.NDToSpectrumSmearingMatrix) {
+      ERROR(
+          FTL,
+          "Second histogram from ObsInput attribute was not a TH2D containing "
+          "the near detector ETrue/ERec smearing matrix ("
+              << samplekey.GetS("ObsInput") << ").");
+      THROW(
+          "Near detector sample must contain the observed ERec spectrum and "
+          "the "
+          "ND ETrue/ERec smearing matrix. e.g. "
+          "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
+    }
+  }
+
+  nds.NDDataHist->Scale(ScalePOT);
+
+  if (UseRateErrors) {
+    for (Int_t bi_it = 1; bi_it < nds.NDDataHist->GetXaxis()->GetNbins() + 1;
+         ++bi_it) {
+      nds.NDDataHist->SetBinError(bi_it,
+                                  sqrt(nds.NDDataHist->GetBinContent(bi_it)));
+    }
+  }
+
+  nds.TruncateStart = 0;
+  if (samplekey.Has("TruncateStart")) {
+    nds.TruncateStart = samplekey.GetI("TruncateStart");
+  }
+
+  nds.TruncateUpTo = 0;
+  if (samplekey.Has("TruncateUpTo")) {
+    nds.TruncateUpTo = samplekey.GetI("TruncateUpTo");
+    QLOG(SAM, "\tAllowed to truncate unfolding matrix by up to "
+                  << nds.TruncateUpTo
+                  << " singular values to limit negative ENu spectra.");
+  }
+  nds.NuPDG = 14;
+  if (samplekey.Has("NuPDG")) {
+    nds.NuPDG = samplekey.GetI("NuPDG");
+  }
+
+  NDSamples.push_back(nds);
+}
+
+void Smear_SVDUnfold_Propagation_Osc::SetupNDInputs() {
+  for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+    NDSample &nds = NDSamples[nd_it];
+
+    TMatrixD NDToSpectrumResponseMatrix_l = SmearceptanceUtils::GetMatrix(
+        SmearceptanceUtils::SVDGetInverse(nds.NDToSpectrumSmearingMatrix));
+
+    nds.NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
+    nds.NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
+
+    if (nds.TruncateStart != 0) {
+      TMatrixD NDToSpectrumResponseMatrix_l =
+          SmearceptanceUtils::GetMatrix(SmearceptanceUtils::SVDGetInverse(
+              nds.NDToSpectrumSmearingMatrix, nds.TruncateStart));
+
+      nds.NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
+      nds.NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
+    }
+
+    if (nds.TruncateStart >= nds.TruncateUpTo) {
+      nds.TruncateUpTo = nds.TruncateStart + 1;
+    }
+
+    UnfoldToNDETrueSpectrum(nd_it);
+  }
+}
+
+void Smear_SVDUnfold_Propagation_Osc::ReadExtraConfig(nuiskey &samplekey) {
+  UseRateErrors = false;
+  if (samplekey.Has("SetErrorsFromRate")) {
+    UseRateErrors = samplekey.GetI("SetErrorsFromRate");
+  }
+
+  NDetectorInfo.first = 0xdeadbeef;
+  if (samplekey.Has("DetectorVolume") && samplekey.Has("DetectorDensity")) {
+    NDetectorInfo.first = samplekey.GetD("DetectorVolume");
+    NDetectorInfo.second = samplekey.GetD("DetectorDensity");
+
+    double TargetMass_kg = NDetectorInfo.first * NDetectorInfo.second;
+
+    QLOG(SAM, "\tND sample detector mass : ");
+    QLOG(SAM, "\t\tTarget volume : " << NDetectorInfo.first);
+    QLOG(SAM, "\t\tTarget density : " << NDetectorInfo.second);
+    QLOG(SAM, "\t\tTarget mass : " << TargetMass_kg << " kg");
+  }
+
+  ScalePOT = 1;
+  if (samplekey.Has("ScalePOT")) {
+    ScalePOT = samplekey.GetD("ScalePOT");
+  }
+}
+
+void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
+  FDSample fds;
+
+  fds.FitRegion_Min = 0xdeadbeef;
+  if (nk.Has("FitRegion_Min")) {
+    fds.FitRegion_Min = nk.GetD("FitRegion_Min");
+  }
+  if ((FitRegion_Min == 0xdeadbeef) || FitRegion_Min > fds.FitRegion_Min) {
+    FitRegion_Min = fds.FitRegion_Min;
+  }
+
+  fds.FitRegion_Max = 0xdeadbeef;
+  if (nk.Has("FitRegion_Max")) {
+    fds.FitRegion_Max = nk.GetD("FitRegion_Max");
+  }
+  if ((FitRegion_Max == 0xdeadbeef) || FitRegion_Max < fds.FitRegion_Max) {
+    FitRegion_Max = fds.FitRegion_Max;
+  }
+
+  fds.OscillateToPDG = 0;
+  if (nk.Has("OscillateToPDG")) {
+    fds.OscillateToPDG = nk.GetD("OscillateToPDG");
+  }
+
+  std::vector<nuiskey> FDNDRatioElements = nk.GetListOfChildNodes("FDNDRatio");
+  for (size_t fdnd_it = 0; fdnd_it < FDNDRatioElements.size(); ++fdnd_it) {
+    nuiskey &fnr = FDNDRatioElements[fdnd_it];
+    if (fnr.Has("FromPDG") && fnr.Has("DivergenceFactor")) {
+      fds.FDNDRatios[fnr.GetI("FromPDG")] = fnr.GetD("DivergenceFactor");
+      QLOG(SAM, "FDND DivergenceFactor for far detector sample index: "
+                    << FDSamples.size() << " for PDG: " << fnr.GetI("FromPDG")
+                    << " -> " << fds.OscillateToPDG << " = "
+                    << fnr.GetD("DivergenceFactor"));
+    } else {
+      THROW(
+          "Far detector sample contained FDNDRatio element, but couldn't find "
+          "both FromPDG and Factor attributes.");
+    }
+  }
+
+  fds.FDNDMassRatio = 1;
+  if (NDetectorInfo.first != 0xdeadbeef) {
+    if ((!nk.Has("DetectorVolume")) || (!nk.Has("DetectorDensity"))) {
+      THROW(
+          "Near detector sample has specified volume but FD doesn't. This is "
+          "needed to scale the predicted event rate by the mass ratio.");
+    }
+    fds.DetectorInfo.first = nk.GetD("DetectorVolume");
+    fds.DetectorInfo.second = nk.GetD("DetectorDensity");
+    double TargetMass_kg = fds.DetectorInfo.first * fds.DetectorInfo.second;
+
+    fds.FDNDMassRatio =
+        TargetMass_kg / (NDetectorInfo.first * NDetectorInfo.second);
+
+    QLOG(SAM, "\tFD[" << FDSamples.size() << "] Event rate prediction : ");
+    QLOG(SAM, "\t\tTarget volume : " << fds.DetectorInfo.first);
+    QLOG(SAM, "\t\tTarget density : " << fds.DetectorInfo.second);
+    QLOG(SAM, "\t\tFD/ND mass : " << fds.FDNDMassRatio);
+  }
+
+  if (!nk.Has("ObsInput")) {
+    THROW("Far detector sample must specify at least ObsInput.");
+  }
+
+  std::vector<TH1 *> FDObsInputs =
+      PlotUtils::GetTH1sFromRootFile(nk.GetS("ObsInput"));
+  if (FDObsInputs.size() < 2) {
+    THROW(
+        "Far detector sample must contain the observed ERec spectrum and the "
+        "FD ETrue/ERec smearing matrix. "
+        "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
+  }
+
+  fds.FDDataHist = NULL;
+  for (size_t hist_it = 0; hist_it < FDObsInputs.size() - 1; ++hist_it) {
+    if (!dynamic_cast<TH1D *>(FDObsInputs[hist_it])) {
+      ERROR(FTL, "Input spectrum index "
+                     << hist_it
+                     << " from ObsInput attribute was not a TH1D containing "
+                        "a far detector observed ERec spectrum ("
+                     << nk.GetS("ObsInput") << ").");
+      THROW(
+          "Far detector sample must contain the observed ERec spectrum and the "
+          "FD ETrue/ERec smearing matrix. "
+          "ObsInput=\"input.root[FDObs_species,(FDObs_species2),FDSmearing_"
+          "species]\"");
+    }
+    FDObsInputs[hist_it]->Scale(ScalePOT);
+    if (!fds.FDDataHist) {
+      fds.FDDataHist = dynamic_cast<TH1D *>(FDObsInputs[hist_it]);
+    } else {
+      fds.FDDataHist->Add(dynamic_cast<TH1D *>(FDObsInputs[hist_it]));
+    }
+    QLOG(SAM, "Added " << (FDObsInputs.size() - 1)
+                       << " far detector component spectra to form Observed "
+                          "spectra for sample index "
+                       << FDSamples.size() << ".");
+  }
+
+  fds.SpectrumToFDSmearingMatrix_TH2 = dynamic_cast<TH2D *>(FDObsInputs.back());
+  if (!fds.SpectrumToFDSmearingMatrix_TH2) {
+    ERROR(FTL,
+          "last histogram from ObsInput attribute was not a TH2D containing "
+          "the far detector ETrue/ERec smearing matrix ("
+              << nk.GetS("ObsInput") << ").");
+    THROW(
+        "Far detector sample must contain the observed ERec spectrum and the "
+        "FD ETrue/ERec smearing matrix. "
+        "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
+  }
+
+  TMatrixD SpectrumToFDSmearingMatrix_l =
+      SmearceptanceUtils::GetMatrix(fds.SpectrumToFDSmearingMatrix_TH2);
+
+  fds.SpectrumToFDSmearingMatrix.ResizeTo(SpectrumToFDSmearingMatrix_l);
+  fds.SpectrumToFDSmearingMatrix = SpectrumToFDSmearingMatrix_l;
+
+  FDSamples.push_back(fds);
+}
+
+void Smear_SVDUnfold_Propagation_Osc::FinaliseFDSamples() {
+  std::stringstream ss("");
+
+  for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
+    FDSample &fds = FDSamples[fds_it];
+    // Set up FD histograms.
+    // ==============================
+
+    for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+      NDSample &nds = NDSamples[nd_it];
+
+      TH1D *sampleHist =
+          static_cast<TH1D *>(nds.ND_Unfolded_Spectrum_Hist->Clone());
+      sampleHist->Reset();
+      ss.str("");
+      ss << "FD_Propagated_Spectrum_Hist_" << fds_it << "_NDSample_" << nd_it;
+      sampleHist->SetName(ss.str().c_str());
+
+      fds.FD_Propagated_Spectrum_Hist_NDSamples.push_back(sampleHist);
+    }
+
+    fds.FD_Propagated_Spectrum_Hist = static_cast<TH1D *>(
+        fds.FD_Propagated_Spectrum_Hist_NDSamples[0]->Clone());
+    fds.FD_Propagated_Spectrum_Hist->Reset();
+    ss.str("");
+    ss << "FD_Propagated_Spectrum_Hist_" << fds_it;
+
+    fds.FD_Propagated_Spectrum_Hist->SetName(ss.str().c_str());
+
+    for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+      NDSample &nds = NDSamples[nd_it];
+
+      TH1D *sampleHist =
+          static_cast<TH1D *>(fds.FD_Propagated_Spectrum_Hist->Clone());
+      sampleHist->Reset();
+      ss.str("");
+      ss << "NDFD_Corrected_Spectrum_Hist_" << fds_it << "_NDSample_" << nd_it;
+      sampleHist->SetName(ss.str().c_str());
+
+      fds.NDFD_Corrected_Spectrum_Hist_NDSamples.push_back(sampleHist);
+    }
+
+    fds.NDFD_Corrected_Spectrum_Hist =
+        static_cast<TH1D *>(fds.FD_Propagated_Spectrum_Hist->Clone());
+    fds.NDFD_Corrected_Spectrum_Hist->Reset();
+    ss.str("");
+    ss << "NDFD_Corrected_Spectrum_Hist_" << fds_it;
+
+    fds.NDFD_Corrected_Spectrum_Hist->SetName(ss.str().c_str());
+
+    fds.FD_Smeared_Spectrum_Hist =
+        new TH1D(*fds.SpectrumToFDSmearingMatrix_TH2->ProjectionX());
+    fds.FD_Smeared_Spectrum_Hist->SetDirectory(NULL);
+    fds.FD_Smeared_Spectrum_Hist->Reset();
+    ss.str("");
+    ss << "FD_Smeared_Spectrum_Hist_" << fds_it;
+
+    fds.FD_Smeared_Spectrum_Hist->SetName(ss.str().c_str());
+
+    for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+      NDSample &nds = NDSamples[nd_it];
+
+      if (!fds.FDNDRatios.count(nds.NuPDG)) {
+        ERROR(WRN, "Have an ND sample that provides PDG:"
+                       << nds.NuPDG
+                       << " neutrinos but far detector sample index " << fds_it
+                       << " doesn't have an NDFD ratio for this sample. "
+                          "Setting to 0 (contribution from sample ignored.)");
+        fds.FDNDRatios[nds.NuPDG] = 0;
+      }
+    }
+  }
+}
+
+Int_t Smear_SVDUnfold_Propagation_Osc::GetFDSampleNAnalysisBins(size_t fds_it) {
+  if (fds_it >= FDSamples.size()) {
+    THROW("Requested FD sample index " << fds_it << " but only initialised "
+                                       << FDSamples.size());
+  }
+  FDSample &fds = FDSamples[fds_it];
+  Int_t NAnalysisBins = 0;
+  for (Int_t bi_it = 1; bi_it < fds.FDDataHist->GetXaxis()->GetNbins() + 1;
+       ++bi_it) {
+    if ((fds.FitRegion_Min != 0xdeadbeef) &&
+        (fds.FDDataHist->GetXaxis()->GetBinUpEdge(bi_it) <=
+         fds.FitRegion_Min)) {
+      continue;
+    }
+    if ((fds.FitRegion_Max != 0xdeadbeef) &&
+        (fds.FDDataHist->GetXaxis()->GetBinLowEdge(bi_it) >
+         fds.FitRegion_Max)) {
+      continue;
+    }
+    NAnalysisBins++;
+  }
+  return NAnalysisBins;
+}
+
+void Smear_SVDUnfold_Propagation_Osc::SetupChi2Hists() {
+  fDataHist =
+      new TH1D("SmearSVDUnfold", "", NFDAnalysisBins, 0, NFDAnalysisBins);
+  fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(),
+                          (fSettings.GetFullTitles()).c_str());
+
+  Int_t CurrAnalysisBin = 1;
+  for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
+    FDSample &fds = FDSamples[fds_it];
+    for (Int_t bi_it = 1; bi_it < fds.FDDataHist->GetXaxis()->GetNbins() + 1;
+         ++bi_it) {
+      if ((fds.FitRegion_Min != 0xdeadbeef) &&
+          (fds.FDDataHist->GetXaxis()->GetBinUpEdge(bi_it) <=
+           fds.FitRegion_Min)) {
+        continue;
+      }
+      if ((fds.FitRegion_Max != 0xdeadbeef) &&
+          (fds.FDDataHist->GetXaxis()->GetBinLowEdge(bi_it) >
+           fds.FitRegion_Max)) {
+        continue;
+      }
+      fDataHist->SetBinContent(CurrAnalysisBin,
+                               fds.FDDataHist->GetBinContent(bi_it));
+      if (UseRateErrors) {
+        fDataHist->SetBinError(CurrAnalysisBin,
+                               sqrt(fds.FDDataHist->GetBinContent(bi_it)));
+      } else {
+        fDataHist->SetBinError(CurrAnalysisBin,
+                               fds.FDDataHist->GetBinError(bi_it));
+      }
+      CurrAnalysisBin++;
+    }
+  }
+
+  fMCHist = static_cast<TH1D *>(fDataHist->Clone());
+  fMCHist->SetNameTitle((fSettings.GetName() + "_MC").c_str(),
+                        (fSettings.GetFullTitles()).c_str());
+  fMCHist->Reset();
+}
+
+void Smear_SVDUnfold_Propagation_Osc::UpdateChi2Hists() {
+  Int_t CurrAnalysisBin = 1;
+  for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
+    FDSample &fds = FDSamples[fds_it];
+    for (Int_t bi_it = 1;
+         bi_it < fds.FD_Smeared_Spectrum_Hist->GetXaxis()->GetNbins() + 1;
+         ++bi_it) {
+      if ((fds.FitRegion_Min != 0xdeadbeef) &&
+          (fds.FD_Smeared_Spectrum_Hist->GetXaxis()->GetBinUpEdge(bi_it) <=
+           fds.FitRegion_Min)) {
+        continue;
+      }
+      if ((fds.FitRegion_Max != 0xdeadbeef) &&
+          (fds.FD_Smeared_Spectrum_Hist->GetXaxis()->GetBinLowEdge(bi_it) >
+           fds.FitRegion_Max)) {
+        continue;
+      }
+      fMCHist->SetBinContent(
+          CurrAnalysisBin, fds.FD_Smeared_Spectrum_Hist->GetBinContent(bi_it));
+
+      fMCHist->SetBinError(CurrAnalysisBin,
+                           fds.FD_Smeared_Spectrum_Hist->GetBinError(bi_it));
+      CurrAnalysisBin++;
+    }
+  }
+}
+
 //********************************************************************
 Smear_SVDUnfold_Propagation_Osc::Smear_SVDUnfold_Propagation_Osc(
     nuiskey samplekey) {
@@ -50,151 +494,40 @@ Smear_SVDUnfold_Propagation_Osc::Smear_SVDUnfold_Propagation_Osc(
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = GetEventHistogram()->Integral("width") / (fNEvents + 0.);
 
-  // Plot Setup -------------------------------------------------------
-  // Check that we have the relevant histograms specified.
-  if (!samplekey.Has("NDDataHist") || !samplekey.Has("FDDataHist") ||
-      !samplekey.Has("NDToSpectrumSmearingMatrix")) {
-    THROW(
-        "Expected to attributes named: NDDataHist, FDDataHist, "
-        "NDToSpectrumSmearingMatrix on the Smear_SVDUnfold_Propagation_Osc "
-        "sample "
-        "tag.");
-  }
-
-  NDDataHist = NULL;
-  FDDataHist = NULL;
-  NDToSpectrumSmearingMatrix = NULL;
   fMCHist = NULL;
   fDataHist = NULL;
 
-  std::vector<std::string> NDHistDescriptor =
-      GeneralUtils::ParseToStr(samplekey.GetS("NDDataHist"), ",");
-  if (NDHistDescriptor.size() == 2) {
-    NDDataHist = PlotUtils::GetTH1DFromRootFile(NDHistDescriptor[0],
-                                                NDHistDescriptor[1]);
-    ND_True_Spectrum_Hist =
-        PlotUtils::GetTH1DFromRootFile(NDHistDescriptor[0], "ELep_rate");
+  ReadExtraConfig(samplekey);
+
+  AddNDInputs(samplekey);
+  std::vector<nuiskey> NDTargets = samplekey.GetListOfChildNodes("NDObs");
+  for (size_t nd_it = 0; nd_it < NDTargets.size(); ++nd_it) {
+    AddNDInputs(NDTargets[nd_it]);
   }
 
-  if (!NDDataHist) {
-    THROW("Attempted to load NDDataHist from the descriptor: \""
-          << samplekey.GetS("NDDataHist")
-          << "\", but failed. Does it look correct? \"<ROOTFILE>,<HISTNAME>\"");
+  std::vector<nuiskey> FDTargets = samplekey.GetListOfChildNodes("FDObs");
+  NFDAnalysisBins = 0;
+  if (!FDTargets.size()) {  // If no child elements, assume that everything is
+                            // contained on the sample element
+    AddFDTarget(samplekey);
+  } else {
+    for (size_t fd_it = 0; fd_it < FDTargets.size(); ++fd_it) {
+      AddFDTarget(FDTargets[fd_it]);
+      NFDAnalysisBins += GetFDSampleNAnalysisBins(fd_it);
+    }
   }
 
-  std::vector<std::string> FDHistDescriptor =
-      GeneralUtils::ParseToStr(samplekey.GetS("FDDataHist"), ",");
-  if (FDHistDescriptor.size() == 2) {
-    FDDataHist = PlotUtils::GetTH1DFromRootFile(FDHistDescriptor[0],
-                                                FDHistDescriptor[1]);
+  SetupNDInputs();
 
-    FD_True_Spectrum_Hist =
-        PlotUtils::GetTH1DFromRootFile(FDHistDescriptor[0], "ELep_rate");
-  }
+  FinaliseFDSamples();
 
-  if (!FDDataHist) {
-    THROW("Attempted to load FDDataHist from the descriptor: \""
-          << samplekey.GetS("FDDataHist")
-          << "\", but failed. Does it look correct? \"<ROOTFILE>,<HISTNAME>\"");
-  }
+  QLOG(SAM, "Set up " << FDSamples.size()
+                      << " samples for oscillation analysis with "
+                      << NFDAnalysisBins << " analysis bins.");
 
-  std::vector<std::string> NDToEvSmearingDescriptor = GeneralUtils::ParseToStr(
-      samplekey.GetS("NDToSpectrumSmearingMatrix"), ",");
-  if (NDToEvSmearingDescriptor.size() == 2) {
-    NDToSpectrumSmearingMatrix = PlotUtils::GetTH2DFromRootFile(
-        NDToEvSmearingDescriptor[0], NDToEvSmearingDescriptor[1]);
-  }
-
-  if (!NDToSpectrumSmearingMatrix) {
-    THROW("Attempted to load NDToSpectrumSmearingMatrix from the descriptor: \""
-          << samplekey.GetS("NDToSpectrumSmearingMatrix")
-          << "\", but failed. Does it look correct? \"<ROOTFILE>,<HISTNAME>\"");
-  }
-
-  TMatrixD NDToSpectrumResponseMatrix_l = SmearceptanceUtils::GetMatrix(
-      SmearceptanceUtils::SVDGetInverse(NDToSpectrumSmearingMatrix));
-
-  NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
-  NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
-
-  TMatrixD SpectrumToFDResponseMatrix_l =
-      SmearceptanceUtils::GetMatrix(NDToSpectrumSmearingMatrix);
-
-  SpectrumToFDResponseMatrix.ResizeTo(SpectrumToFDResponseMatrix_l);
-  SpectrumToFDResponseMatrix = SpectrumToFDResponseMatrix_l;
-
-  fDataHist = static_cast<TH1D *>(FDDataHist->Clone());
-  fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(),
-                          (fSettings.GetFullTitles()).c_str());
-
-  fMCHist = static_cast<TH1D *>(FDDataHist->Clone());
-  fMCHist->SetNameTitle((fSettings.GetName() + "_MC").c_str(),
-                        (fSettings.GetFullTitles()).c_str());
+  SetupChi2Hists();
 
   SetCovarFromDiagonal();
-
-  TruncateUpTo = 0;
-  if (samplekey.Has("TruncateUpTo")) {
-    TruncateUpTo = samplekey.GetI("TruncateUpTo");
-    QLOG(SAM, "Allowed to truncate unfolding matrix by up to "
-                  << TruncateUpTo
-                  << " singular values to limit negative ENu spectra.");
-  }
-
-  if (samplekey.Has("FitRegion_Min")) {
-    FitRegion_Min = samplekey.GetD("FitRegion_Min");
-  } else {
-    FitRegion_Min = 0xdeadbeef;
-  }
-  if (samplekey.Has("FitRegion_Max")) {
-    FitRegion_Max = samplekey.GetD("FitRegion_Max");
-  } else {
-    FitRegion_Max = 0xdeadbeef;
-  }
-
-  //----------------------------
-  // Mask data hist if needed
-  fDataHist->SetBinContent(0, 0);
-  fDataHist->SetBinError(0, 0);
-  fDataHist->SetBinContent(fDataHist->GetXaxis()->GetNbins() + 1, 0);
-  fDataHist->SetBinError(fDataHist->GetXaxis()->GetNbins() + 1, 0);
-
-  for (Int_t bi_it = 1; bi_it < fDataHist->GetXaxis()->GetNbins() + 1;
-       ++bi_it) {
-    if ((FitRegion_Min != 0xdeadbeef) &&
-        (fDataHist->GetXaxis()->GetBinUpEdge(bi_it) <= FitRegion_Min)) {
-      fDataHist->SetBinContent(bi_it, 0);
-      fDataHist->SetBinError(bi_it, 0);
-    }
-    if ((FitRegion_Max != 0xdeadbeef) &&
-        (fDataHist->GetXaxis()->GetBinLowEdge(bi_it) > FitRegion_Max)) {
-      fDataHist->SetBinContent(bi_it, 0);
-      fDataHist->SetBinError(bi_it, 0);
-    }
-  }
-
-  TruncateStart = 0;
-  if (Config::Get().GetConfigNode("smear.SVD.truncation")) {
-    TruncateStart = Config::Get().ConfI("smear.SVD.truncation");
-
-    TMatrixD NDToSpectrumResponseMatrix_l =
-        SmearceptanceUtils::GetMatrix(SmearceptanceUtils::SVDGetInverse(
-            NDToSpectrumSmearingMatrix, TruncateStart));
-
-    NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
-    NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
-  }
-
-  if (TruncateStart >= TruncateUpTo) {
-    TruncateUpTo = TruncateStart + 1;
-  }
-
-  NDFDRatio = 1;
-  if (samplekey.Has("FDNDRatio")) {
-    NDFDRatio = samplekey.GetD("FDNDRatio");
-  }
-
-  UnfoldToNDETrueSpectrum();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -206,15 +539,26 @@ bool Smear_SVDUnfold_Propagation_Osc::isSignal(FitEvent *event) {
   return false;
 }
 
-void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(void) {
-  ND_Unfolded_Spectrum_Hist = NDToSpectrumSmearingMatrix->ProjectionY();
-  ND_Unfolded_Spectrum_Hist->Clear();
-  ND_Unfolded_Spectrum_Hist->SetName("ND_Unfolded_Spectrum_Hist");
+void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
+  if (nd_it >= NDSamples.size()) {
+    THROW("Attempting to unfold ND sample index "
+          << nd_it << " but only have " << NDSamples.size() << " ND samples.");
+  }
+
+  NDSample &nds = NDSamples[nd_it];
+
+  nds.ND_Unfolded_Spectrum_Hist =
+      new TH1D(*nds.NDToSpectrumSmearingMatrix->ProjectionY());
+  nds.ND_Unfolded_Spectrum_Hist->SetDirectory(NULL);
+  nds.ND_Unfolded_Spectrum_Hist->Clear();
+  std::stringstream ss("");
+  ss << "ND_Unfolded_Spectrum_Hist_" << nd_it;
+  nds.ND_Unfolded_Spectrum_Hist->SetName(ss.str().c_str());
 
   bool HasNegValue = false;
-  int truncations = TruncateStart;
+  int truncations = nds.TruncateStart;
   do {
-    if (truncations >= TruncateUpTo) {
+    if (truncations >= nds.TruncateUpTo) {
       THROW("Unfolded enu spectrum had negative values even after "
             << truncations << " SVD singular value truncations.");
     }
@@ -222,26 +566,26 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(void) {
     // Unfold ND ERec -> Enu spectrum
     // ------------------------------
     SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
-        NDDataHist, ND_Unfolded_Spectrum_Hist, NDToSpectrumResponseMatrix, 1000,
-        false);
+        nds.NDDataHist, nds.ND_Unfolded_Spectrum_Hist,
+        nds.NDToSpectrumResponseMatrix, 1000, false);
 
     HasNegValue = false;
 
     for (Int_t bi_it = 1;
-         bi_it < ND_Unfolded_Spectrum_Hist->GetXaxis()->GetNbins() + 1;
+         bi_it < nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetNbins() + 1;
          ++bi_it) {
       if ((FitRegion_Min != 0xdeadbeef) &&
-          (ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinUpEdge(bi_it) <=
+          (nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinUpEdge(bi_it) <=
            FitRegion_Min)) {
         continue;
       }
       if ((FitRegion_Max != 0xdeadbeef) &&
-          (ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(bi_it) >
+          (nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(bi_it) >
            FitRegion_Max)) {
         continue;
       }
 
-      if (ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it) < 0) {
+      if (nds.ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it) < 0) {
         HasNegValue = true;
         break;
       }
@@ -250,36 +594,23 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(void) {
     if (HasNegValue) {
       TMatrixD NDToSpectrumResponseMatrix_l =
           SmearceptanceUtils::GetMatrix(SmearceptanceUtils::SVDGetInverse(
-              NDToSpectrumSmearingMatrix, truncations));
+              nds.NDToSpectrumSmearingMatrix, truncations));
 
-      NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
-      NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
+      nds.NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_l);
+      nds.NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_l;
     }
 
     truncations++;
   } while (HasNegValue);
-
-  NDFD_Corrected_Spectrum_Hist =
-      static_cast<TH1D *>(ND_Unfolded_Spectrum_Hist->Clone());
-  NDFD_Corrected_Spectrum_Hist->Clear();
-  NDFD_Corrected_Spectrum_Hist->SetName("NDFD_Corrected_Spectrum_Hist");
-  FD_Propagated_Spectrum_Hist =
-      static_cast<TH1D *>(ND_Unfolded_Spectrum_Hist->Clone());
-  FD_Propagated_Spectrum_Hist->Clear();
-  FD_Propagated_Spectrum_Hist->SetName("FD_Propagated_Spectrum_Hist");
-
-  // Apply FD/ND weights
-  // ------------------------------
-  for (Int_t bi_it = 1;
-       bi_it < ND_Unfolded_Spectrum_Hist->GetXaxis()->GetNbins() + 1; ++bi_it) {
-    NDFD_Corrected_Spectrum_Hist->SetBinContent(
-        bi_it, ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it) * NDFDRatio);
-    NDFD_Corrected_Spectrum_Hist->SetBinError(
-        bi_it, ND_Unfolded_Spectrum_Hist->GetBinError(bi_it) * NDFDRatio);
-  }
 }
 
-void Smear_SVDUnfold_Propagation_Osc::ConvertEventRates(void) {
+void Smear_SVDUnfold_Propagation_Osc::PropagateFDSample(size_t fds_it) {
+  if (fds_it >= FDSamples.size()) {
+    THROW("Requested FD sample index " << fds_it << " but only initialised "
+                                       << FDSamples.size());
+  }
+  FDSample &fds = FDSamples[fds_it];
+
   // Apply Oscillations
   // ------------------------------
   FitWeight *fw = FitBase::GetRW();
@@ -293,59 +624,73 @@ void Smear_SVDUnfold_Propagation_Osc::ConvertEventRates(void) {
   }
 
   for (Int_t bi_it = 1;
-       bi_it < NDFD_Corrected_Spectrum_Hist->GetXaxis()->GetNbins() + 1;
+       bi_it < fds.NDFD_Corrected_Spectrum_Hist->GetXaxis()->GetNbins() + 1;
        ++bi_it) {
-    double oscWeight = oscWE->CalcWeight(
-        NDFD_Corrected_Spectrum_Hist->GetXaxis()->GetBinCenter(bi_it), 14);
-    FD_Propagated_Spectrum_Hist->SetBinContent(
-        bi_it, NDFD_Corrected_Spectrum_Hist->GetBinContent(bi_it) * oscWeight);
-    FD_Propagated_Spectrum_Hist->SetBinError(
-        bi_it, NDFD_Corrected_Spectrum_Hist->GetBinError(bi_it) * oscWeight);
+    double content_osc = 0;
+    double error_osc = 0;
+    double content_fdnd = 0;
+    double error_fdnd = 0;
+    // Oscillate each ND sample to FD neutrino
+    for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+      NDSample &nds = NDSamples[nd_it];
+
+      double oscWeight = oscWE->CalcWeight(
+          nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinCenter(bi_it),
+          nds.NuPDG, fds.OscillateToPDG);
+
+      double sample_content_osc =
+          nds.ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it) * oscWeight;
+      double sample_error_osc =
+          nds.ND_Unfolded_Spectrum_Hist->GetBinError(bi_it) * oscWeight;
+
+      fds.FD_Propagated_Spectrum_Hist_NDSamples[nd_it]->SetBinContent(
+          bi_it, sample_content_osc);
+      fds.FD_Propagated_Spectrum_Hist_NDSamples[nd_it]->SetBinError(
+          bi_it, sample_error_osc);
+
+      double sample_content_fdnd =
+          sample_content_osc * fds.FDNDRatios[nds.NuPDG] * fds.FDNDMassRatio;
+      double sample_error_fdnd =
+          sample_error_osc * fds.FDNDRatios[nds.NuPDG] * fds.FDNDMassRatio;
+
+      fds.NDFD_Corrected_Spectrum_Hist_NDSamples[nd_it]->SetBinContent(
+          bi_it, sample_content_fdnd);
+      fds.NDFD_Corrected_Spectrum_Hist_NDSamples[nd_it]->SetBinError(
+          bi_it, sample_error_fdnd);
+
+      content_osc += sample_content_osc;
+      error_osc += sample_error_osc * sample_error_osc;
+
+      content_fdnd += sample_content_fdnd;
+      error_fdnd += sample_error_fdnd * sample_error_fdnd;
+    }
+
+    fds.FD_Propagated_Spectrum_Hist->SetBinContent(bi_it, content_osc);
+    fds.FD_Propagated_Spectrum_Hist->SetBinError(bi_it, sqrt(error_osc));
+
+    fds.NDFD_Corrected_Spectrum_Hist->SetBinContent(bi_it, content_fdnd);
+    fds.NDFD_Corrected_Spectrum_Hist->SetBinError(bi_it, sqrt(error_fdnd));
   }
 
   // Forward fold Spectrum -> ERec FD
   // ------------------------------
-
   SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
-      FD_Propagated_Spectrum_Hist, fMCHist, SpectrumToFDResponseMatrix, 1000,
-      true);
+      fds.NDFD_Corrected_Spectrum_Hist, fds.FD_Smeared_Spectrum_Hist,
+      fds.SpectrumToFDSmearingMatrix, 1000, true);
+}
 
-  fMCHist->SetBinContent(0, 0);
-  fMCHist->SetBinError(0, 0);
-
-  fMCHist->SetBinContent(fMCHist->GetXaxis()->GetNbins() + 1, 0);
-  fMCHist->SetBinError(fMCHist->GetXaxis()->GetNbins() + 1, 0);
-  for (Int_t bi_it = 1; bi_it < fMCHist->GetXaxis()->GetNbins() + 1; ++bi_it) {
-    if ((FitRegion_Min != 0xdeadbeef) &&
-        (fMCHist->GetXaxis()->GetBinUpEdge(bi_it) <= FitRegion_Min)) {
-      fMCHist->SetBinContent(bi_it, 0);
-      fMCHist->SetBinError(bi_it, 0);
-    }
-    if ((FitRegion_Max != 0xdeadbeef) &&
-        (fMCHist->GetXaxis()->GetBinLowEdge(bi_it) > FitRegion_Max)) {
-      fMCHist->SetBinContent(bi_it, 0);
-      fMCHist->SetBinError(bi_it, 0);
-    }
+void Smear_SVDUnfold_Propagation_Osc::ConvertEventRates(void) {
+  for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
+    PropagateFDSample(fds_it);
   }
+  UpdateChi2Hists();
 }
 
 void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
-  NDToSpectrumSmearingMatrix->Write("SmearingMatrix_ND", TObject::kOverwrite);
+  TDirectory *ogDir = gDirectory;
 
-  NDDataHist->Write("Obs_ND", TObject::kOverwrite);
+  ConvertEventRates();
 
-  ND_Unfolded_Spectrum_Hist->Write(ND_Unfolded_Spectrum_Hist->GetName(),
-                                   TObject::kOverwrite);
-  NDFD_Corrected_Spectrum_Hist->Write(NDFD_Corrected_Spectrum_Hist->GetName(),
-                                      TObject::kOverwrite);
-  FD_Propagated_Spectrum_Hist->Write(FD_Propagated_Spectrum_Hist->GetName(),
-                                     TObject::kOverwrite);
-
-  fMCHist->Write("Pred_FD", TObject::kOverwrite);
-  fDataHist->Write("Obs_FD", TObject::kOverwrite);
-
-  // Apply Oscillations
-  // ------------------------------
   FitWeight *fw = FitBase::GetRW();
   OscWeightEngine *oscWE =
       dynamic_cast<OscWeightEngine *>(fw->GetRWEngine(kOSCILLATION));
@@ -355,26 +700,124 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
         "Couldn't load oscillation weight engine for sample: "
         "Smear_SVDUnfold_Propagation_Osc.");
   }
+  oscWE->Print();
 
-  TGraph POsc;
-
-  POsc.Set(1E4 - 1);
-
-  double min = ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(1);
-  double step = (ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinUpEdge(
-                     ND_Unfolded_Spectrum_Hist->GetXaxis()->GetNbins()) -
-                 ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(1)) /
-                double(1E4);
-
-  for (size_t i = 1; i < 1E4; ++i) {
-    double enu = min + i * step;
-    double ow = oscWE->CalcWeight(enu, 14);
-    if (ow != ow) {
-      std::cout << "Bad osc weight for ENu: " << enu << std::endl;
+  // Write ND samples
+  //----------------
+  for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+    NDSample &nds = NDSamples[nd_it];
+    std::stringstream ss("");
+    ss << "Smear_SVDUnfold_Propagation_Osc_NDSample_" << nd_it;
+    if (ogDir) {
+      ogDir->mkdir(ss.str().c_str());
+      ogDir->cd(ss.str().c_str());
+    } else {
+      FitPar::Config().out->mkdir(ss.str().c_str());
+      FitPar::Config().out->cd(ss.str().c_str());
     }
-    POsc.SetPoint(i - 1, enu, ow);
+
+    nds.NDToSpectrumSmearingMatrix->Write("SmearingMatrix_ND",
+                                          TObject::kOverwrite);
+    nds.NDDataHist->Write("Obs_ND", TObject::kOverwrite);
+
+    nds.ND_Unfolded_Spectrum_Hist->Write(
+        nds.ND_Unfolded_Spectrum_Hist->GetName(), TObject::kOverwrite);
+
+    if (ogDir) {
+      ogDir->cd();
+    } else {
+      FitPar::Config().out->cd();
+    }
   }
 
-  POsc.Write("POsc", TObject::kOverwrite);
+  // Write FD samples
+  //----------------
+  for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
+    FDSample &fds = FDSamples[fds_it];
+
+    std::stringstream ss("");
+    ss << "Smear_SVDUnfold_Propagation_Osc_FDSample_" << fds_it;
+    if (ogDir) {
+      ogDir->mkdir(ss.str().c_str());
+      ogDir->cd(ss.str().c_str());
+    } else {
+      FitPar::Config().out->mkdir(ss.str().c_str());
+      FitPar::Config().out->cd(ss.str().c_str());
+    }
+
+    // Calc oscillation probability
+    // ------------------------------
+    FitWeight *fw = FitBase::GetRW();
+    OscWeightEngine *oscWE =
+        dynamic_cast<OscWeightEngine *>(fw->GetRWEngine(kOSCILLATION));
+
+    if (!oscWE) {
+      THROW(
+          "Couldn't load oscillation weight engine for sample: "
+          "Smear_SVDUnfold_Propagation_Osc.");
+    }
+
+    for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
+      NDSample &nds = NDSamples[nd_it];
+      ss.str("");
+      ss << "NDSample_" << nd_it << "_contribution";
+      fds.FD_Propagated_Spectrum_Hist_NDSamples[nd_it]->Write(
+          ss.str().c_str(), TObject::kOverwrite);
+      ss.str("");
+
+      ss << "NDSample_" << nd_it << "_FDNDCorrected_contribution";
+      fds.NDFD_Corrected_Spectrum_Hist_NDSamples[nd_it]->Write(
+          ss.str().c_str(), TObject::kOverwrite);
+
+      ss.str("");
+      ss << "NDSample_" << nd_it << "_OscillationProb";
+
+      TGraph POsc;
+
+      POsc.Set(1E4 - 1);
+
+      double min = nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(1);
+      double step =
+          (nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinUpEdge(
+               nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetNbins()) -
+           nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(1)) /
+          double(1E4);
+
+      for (size_t i = 1; i < 1E4; ++i) {
+        double enu = min + i * step;
+        double ow = oscWE->CalcWeight(enu, nds.NuPDG, fds.OscillateToPDG);
+        if (ow != ow) {
+          std::cout << "Bad osc weight for ENu: " << enu << std::endl;
+        }
+        POsc.SetPoint(i - 1, enu, ow);
+      }
+
+      POsc.Write(ss.str().c_str(), TObject::kOverwrite);
+    }
+
+    fds.FDDataHist->Write("Obs_FD", TObject::kOverwrite);
+
+    fds.FD_Propagated_Spectrum_Hist->Write(
+        fds.FD_Propagated_Spectrum_Hist->GetName(), TObject::kOverwrite);
+
+    fds.NDFD_Corrected_Spectrum_Hist->Write(
+        fds.NDFD_Corrected_Spectrum_Hist->GetName(), TObject::kOverwrite);
+
+    fds.SpectrumToFDSmearingMatrix_TH2->Write("SmearingMatrix_FD",
+                                              TObject::kOverwrite);
+
+    fds.FD_Smeared_Spectrum_Hist->Write(fds.FD_Smeared_Spectrum_Hist->GetName(),
+                                        TObject::kOverwrite);
+
+    if (ogDir) {
+      ogDir->cd();
+    } else {
+      FitPar::Config().out->cd();
+    }
+  }
+
+  fMCHist->Write("Pred_FD", TObject::kOverwrite);
+  fDataHist->Write("Obs_FD", TObject::kOverwrite);
+
   Measurement1D::Write(drawOpt);
 }

@@ -1,5 +1,7 @@
 #ifdef __NUANCE_ENABLED__
 #include "NUANCEInputHandler.h"
+#include "InputUtils.h"
+
 
 
 NUANCEGeneratorInfo::~NUANCEGeneratorInfo() {

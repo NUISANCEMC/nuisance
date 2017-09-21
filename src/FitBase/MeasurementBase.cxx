@@ -173,8 +173,11 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
       QLOG(SAM, "\t\tTarget density : " << fTargetMaterialDensity << " kg/m^3");
       QLOG(SAM, "\t\tTarget mass : " << TargetMass_kg << " kg");
       QLOG(SAM, "\t\tNTarget Nucleons : " << NNucleons);
+      if ((fNPOT != 1)) {
+        QLOG(SAM, "\t\tTotal POT : " << fNPOT);
+      }
       QLOG(SAM, "\t\tNNeutrinos : " << NNeutrinos
-                                    << ((fNPOT == 1) ? "/cm^2" : "/POT /cm^2"));
+                                    << ((fNPOT != 1) ? " /cm^2" : " /POT /cm^2"));
       QLOG(SAM, "\t\tXSec -> EvtRate scale factor : " << fEvtRateScaleFactor);
     }
   }

@@ -138,9 +138,9 @@ passed in as input.
 #### Full example
 ```xml
       <EfficiencyApplicator Name="SimpleLArLike">
-        <EfficiencyCurve PDG="13" InputFile="uBooNEEffs.root" HistName="Tracking/Muon/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
-        <EfficiencyCurve PDG="211,-211" InputFile="uBooNEEffs.root" HistName="Tracking/Pion/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
-        <EfficiencyCurve PDG="2212" InputFile="uBooNEEffs.root" HistName="Tracking/Proton/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
+        <EfficiencyCurve PDG="13" InputFile="uBooNEEffs.root" HistName="Tracking/Muon/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
+        <EfficiencyCurve PDG="211,-211" InputFile="uBooNEEffs.root" HistName="Tracking/Pion/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
+        <EfficiencyCurve PDG="2212" InputFile="uBooNEEffs.root" HistName="Tracking/Proton/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
 
         <VisThreshold PDG="2212" VisThresholdKE_MeV="10" Contrib="K" />
         <VisThreshold PDG="211,-211" VisThresholdKE_MeV="30" Contrib="K" />
@@ -236,9 +236,9 @@ The `<TrackedMomentummatrixSmearer>` element can also contain any number of `<Sm
 ```xml
 <MetaSimpleSmearcepter Name="D00N_ND_LAr">
   <EfficiencyApplicator>
-    <EfficiencyCurve PDG="13" InputFile="uBooNEEffs.root" HistName="Tracking/Muon/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
-    <EfficiencyCurve PDG="211,-211" InputFile="uBooNEEffs.root" HistName="Tracking/Pion/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
-    <EfficiencyCurve PDG="2212" InputFile="uBooNEEffs.root" HistName="Tracking/Proton/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToMeV="1E3" />
+    <EfficiencyCurve PDG="13" InputFile="uBooNEEffs.root" HistName="Tracking/Muon/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
+    <EfficiencyCurve PDG="211,-211" InputFile="uBooNEEffs.root" HistName="Tracking/Pion/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
+    <EfficiencyCurve PDG="2212" InputFile="uBooNEEffs.root" HistName="Tracking/Proton/p_costheta" NDims="2" XAxis="kMomentum" YAxis="kCosTheta" Interpolate="false" XAxisScaleToInternal="1E3" />
 
     <VisThreshold PDG="2212" VisThresholdKE_MeV="10" Contrib="K" />
     <VisThreshold PDG="211,-211" VisThresholdKE_MeV="30" Contrib="K" />
