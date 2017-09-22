@@ -201,14 +201,16 @@
 
 // MINERvA CCCOH pion
 #include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
-#include "MINERvA_CCCOHPI_XSec_1DEnu_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEpi_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_antinu.h"
 
 #include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_antinu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_nu.h"
+
+#include "MINERvA_CCCOHPI_XSec_joint.h"
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
@@ -301,9 +303,9 @@ MeasurementBase* CreateSample(std::string name, std::string file,
                               std::string type, std::string fkdt,
                               FitWeight* rw) {
   nuiskey samplekey = Config::CreateKey("sample");
-  samplekey.AddS("name", name);
-  samplekey.AddS("input", file);
-  samplekey.AddS("type", type);
+  samplekey.Set("name", name);
+  samplekey.Set("input", file);
+  samplekey.Set("type", type);
 
   return CreateSample(samplekey);
 }
@@ -761,8 +763,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare(
-                 "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
     // Done
@@ -877,6 +878,15 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCCOHPI_XSec_1Dth_antinu(samplekey));
   } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_antinu")) {
     return (new MINERvA_CCCOHPI_XSec_1DQ2_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEnu_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DEpi_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1Dth_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
+  } else if (!name.compare("MINERvA_CCCOHPI_XSec_1DQ2_joint")) {
+    return (new MINERvA_CCCOHPI_XSec_joint(samplekey));
 
     /*
     T2K Samples

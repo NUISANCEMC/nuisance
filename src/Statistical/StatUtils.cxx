@@ -19,6 +19,8 @@
 
 #include "TH1D.h"
 #include "StatUtils.h"
+#include "NuisConfig.h"
+#include "GeneralUtils.h"
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask) {
@@ -103,10 +105,6 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
   TH1D* calc_data = (TH1D*) data->Clone();
   TH1D* calc_mc   = (TH1D*) mc->Clone();
 
-  calc_data->Scale(data_scale);
-  calc_mc  ->Scale(data_scale);
-  (*calc_cov) *= covar_scale;
-
   // If a mask if applied we need to apply it before the matrix is inverted
   if (mask) {
     calc_cov  = ApplyInvertedMatrixMasking(invcov, mask);
@@ -126,6 +124,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
       double mcerr = calc_mc->GetBinError(i + 1) * sqrt(covar_scale);
       double oldval = (*newcov)(i, i);
 
+      std::cout << "Adding cov stat " << mcerr*mcerr << " to " << (*newcov)(i,i) << std::endl;
       (*newcov)(i, i) = oldval + mcerr * mcerr;
     }
 
@@ -136,6 +135,10 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
     // Delete the tempcov
     delete newcov;
   }
+
+  calc_data->Scale(data_scale);
+  calc_mc  ->Scale(data_scale);
+  (*calc_cov) *= covar_scale;
 
   // iterate over bins in X (i,j)
   for (int i = 0; i < calc_data->GetNbinsX(); i++) {

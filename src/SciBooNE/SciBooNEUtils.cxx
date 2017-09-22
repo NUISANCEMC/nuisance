@@ -18,7 +18,7 @@
 *******************************************************************************/
 
 #include "SciBooNEUtils.h"
-#include "FitParameters.h"
+
 #include "FitUtils.h"
 
 namespace FitPar{

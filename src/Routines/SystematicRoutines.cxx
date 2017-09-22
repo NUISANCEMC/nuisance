@@ -103,17 +103,12 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
-  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
-
-  // Add CMD XML Structs
-  for (size_t i = 0; i < xmlcmds.size(); i++) {
-    configuration.AddXMLLine(xmlcmds[i]);
-  }
+  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -124,11 +119,11 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   }
 
   // Finish configuration XML
-  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
+  configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
   // Add Error Verbo Lines
-  verbocount += Config::Get().GetParI("VERBOSITY");
-  errorcount += Config::Get().GetParI("ERROR");
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   SETVERBOSITY(verbocount);
@@ -328,322 +323,6 @@ void SystematicRoutines::SetupSystematicsFromXML(){
   }
 }
 
-
-void SystematicRoutines::ReadCard(std::string cardfile){
-
-  // Read cardlines into vector
-  std::vector<std::string> cardlines = GeneralUtils::ParseFileToStr(cardfile,"\n");
-  FitPar::Config().cardLines = cardlines;
-
-  // Read Samples first (norm params can be overridden)
-  int linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++){
-    std::string line = (*iter);
-    linecount++;
-
-    // Skip Empties
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
-
-    // Read Valid Samples
-    int samstatus = ReadSamples(line);
-
-    // Show line if bad to help user
-    if (samstatus == kErrorStatus) {
-      ERR(FTL) << "Bad Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << std::endl;
-      LOG(FIT) << line << std::endl;
-      throw;
-    }
-  }
-
-  // Read Parameters second
-  linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++){
-    std::string line = (*iter);
-    linecount++;
-
-    // Skip Empties
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
-
-    // Try Parameter Reads
-    int parstatus = ReadParameters(line);
-    int fakstatus = ReadFakeDataPars(line);
-
-    // Show line if bad to help user
-    if (parstatus == kErrorStatus ||
-	fakstatus == kErrorStatus ){
-      ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << std::endl;
-      LOG(FIT) << line << std::endl;
-      throw;
-    }
-  }
-
-  return;
-};
-
-int SystematicRoutines::ReadParameters(std::string parstring){
-
-  std::string inputspec = "RW Dial Inputs Syntax \n"
-    "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
-    "fix  input: TYPE  NAME  VALUE  [STATE] \n"
-    "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-    "Allowed Types: \n"
-    "neut_parameter,niwg_parameter,t2k_parameter,"
-    "nuwro_parameter,gibuu_parameter";
-
-  // Check sample input
-  if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0].find("parameter") == std::string::npos){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Input rw dials need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string partype = strvct[0];
-  std::string parname = strvct[1];
-  double parval  = GeneralUtils::StrToDbl(strvct[2]);
-  double minval  = parval - 1.0;
-  double maxval  = parval + 1.0;
-  double stepval = 1.0;
-  std::string state = "FIX"; //[DEFAULT]
-
-  // Check Type
-  if (FitBase::ConvDialType(partype) == kUNKNOWN){
-    ERR(FTL) << "Unknown parameter type! " << partype << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Check Parameter Name
-  if (FitBase::GetDialEnum(partype, parname) == -1){
-    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (No Limits)
-  if (strvct.size() == 4){
-    state = strvct[3];
-  }
-
-  // Check for weirder inputs
-  if (strvct.size() > 4 && strvct.size() < 6){
-    ERR(FTL) << "Provided incomplete limits for " << parname << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (With limits and steps)
-  if (strvct.size() >= 6){
-    minval  = GeneralUtils::StrToDbl(strvct[3]);
-    maxval  = GeneralUtils::StrToDbl(strvct[4]);
-    stepval = GeneralUtils::StrToDbl(strvct[5]);
-  }
-
-  // Option Extra (dial state after limits)
-  if (strvct.size() == 7){
-    state = strvct[6];
-  }
-
-  // Run Parameter Conversion if needed
-  if (state.find("ABS") != std::string::npos){
-    parval  = FitBase::RWAbsToSigma( partype, parname, parval  );
-    minval  = FitBase::RWAbsToSigma( partype, parname, minval  );
-    maxval  = FitBase::RWAbsToSigma( partype, parname, maxval  );
-    stepval = FitBase::RWAbsToSigma( partype, parname, stepval );
-  } else if (state.find("FRAC") != std::string::npos){
-    parval  = FitBase::RWFracToSigma( partype, parname, parval  );
-    minval  = FitBase::RWFracToSigma( partype, parname, minval  );
-    maxval  = FitBase::RWFracToSigma( partype, parname, maxval  );
-    stepval = FitBase::RWFracToSigma( partype, parname, stepval );
-  }
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), parname) != fParams.end()){
-    ERR(FTL) << "Duplicate parameter names given for " << parname << std::endl;
-    throw;
-  }
-
-  // Setup Containers
-  fParams.push_back(parname);
-
-  fTypeVals[parname]  = FitBase::ConvDialType(partype);
-
-  fStartVals[parname] = parval;
-  fCurVals[parname]   = fStartVals[parname];
-
-  fErrorVals[parname] = 0.0;
-
-  fStateVals[parname] = state;
-
-  bool fixstate = state.find("FIX") != std::string::npos;
-  fFixVals[parname]      = fixstate;
-  fStartFixVals[parname] = fFixVals[parname];
-
-  fMinVals[parname]  = minval;
-  fMaxVals[parname]  = maxval;
-  fStepVals[parname] = stepval;
-
-  // Print the parameter
-  LOG(MIN) << "Read Parameter " << parname << " " << parval << " "
-	   << minval << " " << maxval << " "
-	   << stepval << " " << state << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//*******************************************
-int SystematicRoutines::ReadFakeDataPars(std::string parstring){
-//******************************************
-
-  std::string inputspec = "Fake Data Dial Inputs Syntax \n"
-    "fake value: fake_parameter  NAME  VALUE  \n"
-    "Name should match dialnames given in actual dial specification.";
-
-  // Check sample input
-  if (parstring.find("fake_parameter") == std::string::npos)
-    return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0] == "fake_parameter"){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Fake dials need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Read Inputs
-  std::string parname = strvct[1];
-  double      parval  = GeneralUtils::StrToDbl(strvct[2]);
-
-  // Setup Container
-  fFakeVals[parname] = parval;
-
-  // Print the fake parameter
-  LOG(MIN) << "Read Fake Parameter " << parname << " " << parval << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//******************************************
-int SystematicRoutines::ReadSamples(std::string samstring){
-//******************************************
-  const static std::string inputspec =
-      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
-      "[norm]\nsample_name: Name "
-      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
-      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
-      "optional sample options.\nnorm: Additional, optional sample "
-      "normalisation factor.";
-
-  // Check sample input
-  if (samstring.find("sample") == std::string::npos)
-    return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0] != "sample"){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string samname = strvct[1];
-  std::string samfile = strvct[2];
-
-  if (samfile == "FIX") {
-    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
-                "in the input card file. Line:\'"
-             << samstring << "\'" << std::endl;
-    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
-             << std::endl;
-
-    throw;
-  }
-
-  std::string samtype = "DEFAULT";
-  double      samnorm = 1.0;
-
-  // Optional Type
-  if (strvct.size() > 3) {
-    samtype = strvct[3];
-    //    samname += "_"+samtype;
-    // Also get rid of the / and replace it with underscore because it might not be supported character
-    //    while (samname.find("/") != std::string::npos) {
-    //      samname.replace(samname.find("/"), 1, std::string("_"));
-    //    }
-  }
-
-  // Optional Norm
-  if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
-
-  // Add Sample Names as Norm Dials
-  std::string normname = samname + "_norm";
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()){
-    ERR(FTL) << "Duplicate samples given for " << samname << std::endl;
-    throw;
-  }
-
-  fParams.push_back(normname);
-
-  fTypeVals[normname]  = kNORM;
-  fStartVals[normname] = samnorm;
-  fCurVals[normname]   = fStartVals[normname];
-  fErrorVals[normname] = 0.0;
-
-  fMinVals[normname]  = 0.1;
-  fMaxVals[normname]  = 10.0;
-  fStepVals[normname] = 0.5;
-
-  bool state = samtype.find("FREE") == std::string::npos;
-  fFixVals[normname]      = state;
-  fStartFixVals[normname] = state;
-
-  // Print read in
-  LOG(MIN) << "Read sample " << samname << " "
-	   << samfile << " " << samtype << " "
-	   << samnorm << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
 
 /*
   Setup Functions
@@ -1228,8 +907,15 @@ void SystematicRoutines::GenerateThrows(){
   if (startthrows < 0) startthrows = 0;
   if (endthrows < 0) endthrows = startthrows + nthrows;
 
-  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL) + int(getpid()) );
+  // Setting Seed
+  // Matteo Mazzanti's Fix
+  struct timeval mytime;
+  gettimeofday(&mytime, NULL);
+  Double_t seed = time(NULL) + int(getpid())+ (mytime.tv_sec * 1000.) + (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
+
+  //  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL) + int(getpid()) );
+  //  gRandom->SetSeed(seed);
   LOG(FIT) << "Using Seed : " << seed << std::endl;
   LOG(FIT) << "nthrows = " << nthrows << std::endl;
   LOG(FIT) << "startthrows = " << startthrows << std::endl;
@@ -1470,6 +1156,9 @@ void SystematicRoutines::MergeThrows(){
         errorDIR->cd();
         bintree->Fill();
       }
+
+      throwfile->Close();
+      delete throwfile;
     }
 
     errorDIR->cd();

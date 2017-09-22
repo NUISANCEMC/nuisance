@@ -712,8 +712,8 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
       ogDir->mkdir(ss.str().c_str());
       ogDir->cd(ss.str().c_str());
     } else {
-      FitPar::Config().out->mkdir(ss.str().c_str());
-      FitPar::Config().out->cd(ss.str().c_str());
+      Config::Get().out->mkdir(ss.str().c_str());
+      Config::Get().out->cd(ss.str().c_str());
     }
 
     nds.NDToSpectrumSmearingMatrix->Write("SmearingMatrix_ND",
@@ -726,7 +726,7 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
     if (ogDir) {
       ogDir->cd();
     } else {
-      FitPar::Config().out->cd();
+      Config::Get().out->cd();
     }
   }
 
@@ -741,8 +741,8 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
       ogDir->mkdir(ss.str().c_str());
       ogDir->cd(ss.str().c_str());
     } else {
-      FitPar::Config().out->mkdir(ss.str().c_str());
-      FitPar::Config().out->cd(ss.str().c_str());
+      Config::Get().out->mkdir(ss.str().c_str());
+      Config::Get().out->cd(ss.str().c_str());
     }
 
     // Calc oscillation probability
@@ -812,7 +812,7 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
     if (ogDir) {
       ogDir->cd();
     } else {
-      FitPar::Config().out->cd();
+      Config::Get().out->cd();
     }
   }
 

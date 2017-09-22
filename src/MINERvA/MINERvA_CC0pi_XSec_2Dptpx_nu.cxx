@@ -42,8 +42,8 @@ MINERvA_CC0pi_XSec_2Dptpx_nu::MINERvA_CC0pi_XSec_2Dptpx_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{z} (GeV)");
-  fSettings.SetYTitle("p_{t} (GeV)");
+  fSettings.SetYTitle("p_{z} (GeV)");
+  fSettings.SetZTitle("p_{t} (GeV)");
   fSettings.SetZTitle("d^{2}#sigma/dP_{t}dP_{z} (cm^{2}/GeV^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.0, 100.0);
@@ -52,28 +52,28 @@ MINERvA_CC0pi_XSec_2Dptpx_nu::MINERvA_CC0pi_XSec_2Dptpx_nu(nuiskey samplekey) {
   // CCQELike plot information
   fSettings.SetTitle("MINERvA_CC0pi_XSec_2Dptpx_nu");
 
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "MINERvA/CC0pi/CCQE_Neutrino_CV_Result.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "MINERvA/CC0pi/covar_2D.txt" );
-  fSettings.SetMapInput( FitPar::GetDataBase() + "MINERvA/CC0pi/map_2D.txt" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "MINERvA/CC0pi_ptpz_nu/data2D.txt");
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "MINERvA/CC0pi_ptpz_nu/covar.txt");
+  fSettings.SetMapInput( FitPar::GetDataBase() + "MINERvA/CC0pi_ptpz_nu/map2D.txt" );
   fSettings.DefineAllowedSpecies("numu");
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-37 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
+  //  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-37 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
 
   // Plot Setup -------------------------------------------------------
   Double_t P_t[14] = {0,0.075,0.15,0.25,0.325,0.4,0.475,0.55,0.7,0.85,1.0,1.25,1.5,2.5};
   Double_t P_z[13] = {1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,6.0,8.0,10.0,15.0,20.0};
-  CreateDataHistogram(13, P_z, 14, P_t);
+  CreateDataHistogram(14, P_t, 13, P_z);
+  
   SetDataValuesFromTextFile( fSettings.GetDataInput() );
-  ScaleData(1E-41);
+  //  fDataHist->Scale(1.0, "width");
 
   SetMapValuesFromText( fSettings.GetMapInput() );
-
-  SetCholDecompFromTextFile( fSettings.GetCovarInput() );
-  ScaleCovar(1E-16);
-
+  SetCovarFromTextFile( fSettings.GetCovarInput(), FitPar::Config().GetParI("CC0piNBINS") );
+  
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
 
   // Final setup  ---------------------------------------------------
@@ -95,9 +95,9 @@ void MINERvA_CC0pi_XSec_2Dptpx_nu::FillEventVariables(FitEvent *event) {
   Double_t pz = Pmu.Z()/1000;
   Double_t pt = sqrt(px*px+py*py);
 
-// Set Hist Variables
-  fYVar = pt;
-  fXVar = pz;
+  // Set Hist Variables
+  fYVar = pz;
+  fXVar = pt;
 
   return;
 };

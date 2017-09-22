@@ -30,29 +30,31 @@
 Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   //********************************************************************
 
+  samplekey.Print();
+
   // Sample overview ---------------------------------------------------
   std::string descrip =
       "Simple measurement class for producing an event summary tree of smeared "
       "events.\n";
 
-  if (Config::Get().GetConfigNode("NPOT")) {
-    samplekey.SetS("NPOT", Config::Get().ConfS("NPOT"));
+  if (Config::HasPar("NPOT")) {
+    samplekey.SetS("NPOT", Config::GetParS("NPOT"));
   }
-  if (Config::Get().GetConfigNode("FluxIntegralOverride")) {
+  if (Config::HasPar("FluxIntegralOverride")) {
     samplekey.SetS("FluxIntegralOverride",
-                   Config::Get().ConfS("FluxIntegralOverride"));
+                   Config::GetParS("FluxIntegralOverride"));
   }
-  if (Config::Get().GetConfigNode("TargetVolume")) {
-    samplekey.SetS("TargetVolume", Config::Get().ConfS("TargetVolume"));
+  if (Config::HasPar("TargetVolume")) {
+    samplekey.SetS("TargetVolume", Config::GetParS("TargetVolume"));
   }
-  if (Config::Get().GetConfigNode("TargetMaterialDensity")) {
+  if (Config::HasPar("TargetMaterialDensity")) {
     samplekey.SetS("TargetMaterialDensity",
-                   Config::Get().ConfS("TargetMaterialDensity"));
+                   Config::GetParS("TargetMaterialDensity"));
   }
 
   OutputSummaryTree = true;
-  if (Config::Get().GetConfigNode("smear.OutputSummaryTree")) {
-    OutputSummaryTree = Config::Get().ConfI("smear.OutputSummaryTree");
+  if (Config::HasPar("smear.OutputSummaryTree")) {
+    OutputSummaryTree = Config::GetParI("smear.OutputSummaryTree");
   }
 
   // Setup common settings
@@ -79,7 +81,9 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   std::vector<std::string> splitName = GeneralUtils::ParseToStr(fName, "_");
   size_t firstUS = fName.find_first_of("_");
 
-  std::string smearceptorName = fName.substr(firstUS + 1);
+  std::string smearceptorName = samplekey.GetS("smearceptor");
+  QLOG(SAM, "Using smearceptor: " << smearceptorName
+                                  << " (parsed from: " << fName << ").");
 
   fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
   SetupDefaultHist();
@@ -88,11 +92,10 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
 
   eventVariables = NULL;
 
-  LOG(SAM) << "Smearceptance Flux Scaling Factor = " << fScaleFactor
-           << std::endl;
+  QLOG(SAM, "Smearceptance Flux Scaling Factor = " << fScaleFactor);
 
   if (fScaleFactor <= 0.0) {
-    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
+    ERROR(WRN, "SCALE FACTOR TOO LOW ");
     sleep(20);
   }
 
@@ -104,9 +107,9 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   Int_t RecNBins = 20, TrueNBins = 20;
   double RecBinL = 0xdeadbeef, TrueBinL = 0, RecBinH = 10, TrueBinH = 10;
 
-  if (Config::Get().GetConfigNode("smear.reconstructed.binning")) {
+  if (Config::HasPar("smear.reconstructed.binning")) {
     std::vector<std::string> args = GeneralUtils::ParseToStr(
-        Config::Get().ConfS("smear.reconstructed.binning"), ",");
+        Config::GetParS("smear.reconstructed.binning"), ",");
     RecNBins = GeneralUtils::StrToInt(args[0]);
     RecBinL = GeneralUtils::StrToDbl(args[1]);
     RecBinH = GeneralUtils::StrToDbl(args[2]);
@@ -115,16 +118,16 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
     TrueBinH = RecBinH;
   }
 
-  if (Config::Get().GetConfigNode("smear.true.binning")) {
-    std::vector<std::string> args = GeneralUtils::ParseToStr(
-        Config::Get().ConfS("smear.true.binning"), ",");
+  if (Config::HasPar("smear.true.binning")) {
+    std::vector<std::string> args =
+        GeneralUtils::ParseToStr(Config::GetParS("smear.true.binning"), ",");
     TrueNBins = GeneralUtils::StrToInt(args[0]);
     TrueBinL = GeneralUtils::StrToDbl(args[1]);
     TrueBinH = GeneralUtils::StrToDbl(args[2]);
   }
   SVDTruncation = 0;
-  if (Config::Get().GetConfigNode("smear.true.binning")) {
-    SVDTruncation = Config::Get().ConfI("smear.SVD.truncation");
+  if (Config::HasPar("smear.true.binning")) {
+    SVDTruncation = Config::GetParI("smear.SVD.truncation");
     QLOG(SAM, "Applying SVD truncation of: " << SVDTruncation)
   }
 
@@ -162,7 +165,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
   if (OutputSummaryTree) {
     // Setup the TTree to save everything
     if (!eventVariables) {
-      FitPar::Config().out->cd();
+      Config::Get().out->cd();
       eventVariables =
           new TTree((fName + "_VARS").c_str(), (fName + "_VARS").c_str());
     }

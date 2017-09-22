@@ -40,12 +40,12 @@ using namespace FitBase;
 //! Main FCN Class which ROOT's joint function needs to evaulate the chi2 at each stage of the fit.
 class JointFCN
 {
- public:
+public:
 
   //! Constructor
   //! cardfile = Path to input card file listing samples
-  JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile=NULL);
-  JointFCN(TFile* outfile=NULL); // Loads from global config
+  JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile = NULL);
+  JointFCN(TFile* outfile = NULL); // Loads from global config
   //! Destructor
   ~JointFCN();
 
@@ -100,10 +100,10 @@ class JointFCN
   double GetLikelihood();
 
   //! Returns list of pointers to the samples
-  inline std::list<MeasurementBase*> GetSampleList(){ return fSamples; }
+  inline std::list<MeasurementBase*> GetSampleList() { return fSamples; }
 
   //! Return list of pointers to all the pulls
-  inline std::list<ParamPull*> GetPullList(){ return fPulls; };
+  inline std::list<ParamPull*> GetPullList() { return fPulls; };
 
   //! Write all samples to output DIR
   void Write();
@@ -121,10 +121,14 @@ class JointFCN
   /// Throws data according to current stats
   void ThrowDataToy();
 
-std::vector<MeasurementBase*> GetSubSampleList();
-std::vector<InputHandlerBase*> GetInputList();
+  std::vector<MeasurementBase*> GetSubSampleList();
+  std::vector<InputHandlerBase*> GetInputList();
 
- private:
+  std::vector<std::string> GetAllNames();
+  std::vector<double> GetAllLikelihoods();
+  std::vector<int> GetAllNDOF();
+
+private:
 
   //! Append the experiments to include in the fit to this list
   std::list<MeasurementBase*> fSamples;

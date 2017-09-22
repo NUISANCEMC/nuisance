@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "FitParameters.h"
+
 #include "GeneralUtils.h"
 
 #include "InputHandler.h"

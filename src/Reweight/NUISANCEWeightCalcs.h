@@ -6,7 +6,7 @@
 #include "BaseFitEvt.h"
 #include "WeightUtils.h"
 #include "NUISANCESyst.h"
-#include "FitParameters.h"
+
 
 using namespace Reweight;
 

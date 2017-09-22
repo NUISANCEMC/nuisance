@@ -5,7 +5,7 @@ SampleSettings::SampleSettings() {
 
 SampleSettings::SampleSettings(nuiskey key) {
 	fKeyValues = key;
-	if (!key.Has("type")) key.AddS("type", "DEFAULT");
+	if (!key.Has("type")) key.Set("type", "DEFAULT");
 }
 
 std::string SampleSettings::GetName() {
@@ -123,11 +123,11 @@ void SampleSettings::SetShapeCovarInput(std::string val) {
 
 
 void SampleSettings::SetDefault(std::string name, std::string val) {
-	if (!fKeyValues.Has(name)) fKeyValues.AddS(name, val);
+	if (!fKeyValues.Has(name)) fKeyValues.Set(name, val);
 };
 
 void SampleSettings::SetDefault(std::string name, double val ) {
-	if (!fKeyValues.Has(name)) fKeyValues.AddD(name, val);
+	if (!fKeyValues.Has(name)) fKeyValues.Set(name, val);
 };
 
 void SampleSettings::SetHasExtraHistograms(bool opt) {

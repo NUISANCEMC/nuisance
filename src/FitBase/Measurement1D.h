@@ -50,7 +50,7 @@
 
 // External data fit includes
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "FitUtils.h"
 #include "MeasurementBase.h"
 #include "PlotUtils.h"
@@ -604,6 +604,7 @@ protected:
 
   TMatrixDSym* fShapeCovar;  ///< Shape-only covariance
   TMatrixDSym* fShapeDecomp; ///< Decomposed shape-only covariance
+  TMatrixDSym* fShapeInvert; ///< Inverted shape-only covariance
 
   TMatrixDSym* fCovar;    ///< New FullCovar
   TMatrixDSym* fInvert;   ///< New covar

@@ -110,7 +110,7 @@ void GetCommandLineArgs(int argc, char** argv) {
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
     QLOG(FIT, "Reading cardfile: " << gOptCardInput);
-    configuration.LoadConfig(gOptCardInput, "");
+    configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
     THROW("Cannot create output file!");
   }
   f->cd();
-  FitPar::Config().out = f;
+  Config::Get().out = f;
 
   // Create a new measurementbase class depending on the Format
   MeasurementBase* flattreecreator = NULL;
@@ -188,9 +188,10 @@ int main(int argc, char* argv[]) {
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
 
-  samplekey.SetS("name", std::string("FlatTree_") + gOptOptions);
-  samplekey.SetS("input", gOptInputFile);
-  samplekey.SetS("type", gOptType);
+  samplekey.Set("name", "FlatTree");
+  samplekey.Set("smearceptor", gOptOptions);
+  samplekey.Set("input", gOptInputFile);
+  samplekey.Set("type", gOptType);
 
   if (gOptOptions == "") {
     THROW(

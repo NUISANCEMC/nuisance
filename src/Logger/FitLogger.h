@@ -27,9 +27,12 @@
 #include <iosfwd>
 #include <iostream>
 #include <sstream>
-#include "FitParameters.h"
-#include "Initialiser.h"
+
 #include "TRandom3.h"
+
+#include "Initialiser.h"
+
+#include "NuisConfig.h"
 
 #define RESET "\033[0m"
 #define BLACK "\033[30m"              /* Black */
@@ -163,9 +166,9 @@ std::ostream& __OUTERR(int level, const char* filename, const char* funct,
                                                         << std::endl;   \
     __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__)                 \
         << "Attempting to save output file." << std::endl;              \
-    if (FitPar::Config().out && FitPar::Config().out->IsOpen()) {       \
-      FitPar::Config().out->Write();                                    \
-      FitPar::Config().out->Close();                                    \
+    if (Config::Get().out && Config::Get().out->IsOpen()) {       \
+      Config::Get().out->Write();                                    \
+      Config::Get().out->Close();                                    \
       __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__) << "Done."    \
                                                           << std::endl; \
     } else {                                                            \
