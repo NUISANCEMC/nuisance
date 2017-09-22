@@ -185,12 +185,17 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
     CalcNUISANCEKinematics();
   }
 #ifdef __PROB3PP_ENABLED__
-
   else {
-    GHepRecord* GenieGHep =
-        static_cast<GHepRecord*>(fNUISANCEEvent->fGenieNtpl->event);
-    if (!GenieGHep) return;
-    TObjArrayIter iter(GenieGHep);
+    // Check for GENIE Event
+    if (!fGenieNtpl) return NULL;
+    if (!fGenieNtpl->event) return NULL;
+
+    // Cast Event Record
+    fGenieGHep = static_cast<GHepRecord*>(fGenieNtpl->event);
+    if (!fGenieGHep) return NULL;
+
+    TObjArrayIter iter(fGenieGHep);
+    genie::GHepParticle* p;
     while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
       if (!p) {
         continue;
