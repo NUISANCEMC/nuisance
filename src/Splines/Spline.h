@@ -2,7 +2,7 @@
 #define SPLINE_H
 #include <vector>
 #include "TObject.h"
-#include "FitParameters.h"
+
 #include "stdint.h"
 #include "stdlib.h"
 #include "TCanvas.h"

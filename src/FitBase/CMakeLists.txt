@@ -29,6 +29,8 @@ MeasurementVariableBox.cxx
 MeasurementVariableBox2D.cxx
 MeasurementVariableBox1D.cxx
 CustomVariableBoxes.h
+StandardStacks.cxx
+StackBase.cxx
 )
 
 set(HEADERFILES
@@ -44,6 +46,8 @@ MeasurementVariableBox.h
 MeasurementVariableBox2D.h
 MeasurementVariableBox1D.h
 CustomVariableBoxes.h
+StandardStacks.h
+StackBase.h
 )
 
 set(LIBNAME FitBase)

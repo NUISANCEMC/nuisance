@@ -8,7 +8,7 @@ JointFCN::JointFCN(TFile* outfile) {
 //***************************************************
 
   fOutputDir = gDirectory;
-  if (outfile) FitPar::Config().out = outfile;
+  if (outfile) Config::Get().out = outfile;
 
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   LoadSamples(samplekeys);
@@ -32,7 +32,7 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile) {
 //***************************************************
 
   fOutputDir = gDirectory;
-  if (outfile) FitPar::Config().out = outfile;
+  if (outfile) Config::Get().out = outfile;
 
   LoadSamples(samplekeys);
 
@@ -126,7 +126,7 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
 
   // Add Dials
   std::vector<std::string> dials = rw->GetDialNames();
-  for (size_t i = 0; i < dials.size(); i++){
+  for (size_t i = 0; i < dials.size(); i++) {
     fNameValues.push_back( dials[i] );
     fCurrentValues.push_back( 0.0 );
   }
@@ -161,7 +161,7 @@ void JointFCN::WriteIterationTree() {
   double* vals = new double[fNameValues.size()];
   int count = 0;
 
-  itree->Branch("iteration",&count,"Iteration/I");
+  itree->Branch("iteration", &count, "Iteration/I");
   for (int i = 0; i < fNameValues.size(); i++) {
     itree->Branch( fNameValues[i].c_str(),
                    &vals[i],
@@ -169,12 +169,12 @@ void JointFCN::WriteIterationTree() {
   }
 
   // Fill Iterations
-  for (size_t i = 0; i < fIterationValues.size(); i++){
+  for (size_t i = 0; i < fIterationValues.size(); i++) {
     std::vector<double> itervals = fIterationValues[i];
 
     // Fill iteration state
     count = fIterationCount[i];
-    for (size_t j = 0; j < itervals.size(); j++){
+    for (size_t j = 0; j < itervals.size(); j++) {
       vals[j] = itervals[j];
     }
 
@@ -192,7 +192,7 @@ void JointFCN::FillIterationTree(FitWeight* rw) {
 
   // Loop over samples count
   int count = 0;
-  for (int i = 0; i < fSampleN; i++){
+  for (int i = 0; i < fSampleN; i++) {
     fCurrentValues[count++] = fSampleLikes[i];
     fCurrentValues[count++] = double(fSampleNDOF[i]);
   }
@@ -203,7 +203,7 @@ void JointFCN::FillIterationTree(FitWeight* rw) {
 
   // Loop Over Parameter Counts
   rw->GetAllDials(fDialVals, fNDials);
-  for (int i = 0; i < fNDials; i++){
+  for (int i = 0; i < fNDials; i++) {
     fCurrentValues[count++] = double(fDialVals[i]);
   }
 
@@ -283,8 +283,8 @@ int JointFCN::GetNDOF() {
   }
 
   // Set Data Variable
-  if (fIterationTree){
-  fSampleNDOF[count] = totaldof;
+  if (fIterationTree) {
+    fSampleNDOF[count] = totaldof;
   }
   return totaldof;
 }
@@ -338,7 +338,7 @@ double JointFCN::GetLikelihood() {
 
   // Set Data Variable
   fLikelihood = like;
-  if (fIterationTree){
+  if (fIterationTree) {
     fSampleLikes[count] = fLikelihood;
   }
 
@@ -679,7 +679,7 @@ void JointFCN::ReconfigureUsingManager() {
       i++;
     }
 
-    curinput->RemoveCache();
+    //    curinput->RemoveCache();
 
     // Keep track of what input we are on.
     inputcount++;
@@ -1011,4 +1011,126 @@ void JointFCN::ThrowDataToy() {
   }
 
   return;
+}
+
+//***************************************************
+std::vector<std::string> JointFCN::GetAllNames() {
+//***************************************************
+
+  // Vect of all likelihoods and total
+  std::vector<std::string> namevect;
+
+  // Loop over samples first
+  for (MeasListConstIter iter = fSamples.begin();
+       iter != fSamples.end();
+       iter++) {
+    MeasurementBase* exp = *iter;
+
+    // Get Likelihoods and push to vector
+    namevect.push_back(exp->GetName());
+  }
+
+
+  // Loop over pulls second
+  for (PullListConstIter iter = fPulls.begin();
+       iter != fPulls.end();
+       iter++) {
+    ParamPull* pull = *iter;
+
+    // Push back to vector
+    namevect.push_back(pull->GetName());
+  }
+
+  // Finally add the total
+  namevect.push_back("total");
+
+  return namevect;
+}
+
+//***************************************************
+std::vector<double> JointFCN::GetAllLikelihoods() {
+//***************************************************
+
+  // Vect of all likelihoods and total
+  std::vector<double> likevect;
+  double total_likelihood = 0.0;
+  LOG(MIN) << "Likelihoods : " << std::endl;
+
+  // Loop over samples first
+  for (MeasListConstIter iter = fSamples.begin();
+       iter != fSamples.end();
+       iter++) {
+    MeasurementBase* exp = *iter;
+
+    // Get Likelihoods and push to vector
+    double singlelike = exp->GetLikelihood();
+    likevect.push_back(singlelike);
+    total_likelihood += singlelike;
+
+    // Print Out
+    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+             << singlelike << std::endl;
+  }
+
+
+  // Loop over pulls second
+  for (PullListConstIter iter = fPulls.begin();
+       iter != fPulls.end();
+       iter++) {
+    ParamPull* pull = *iter;
+
+    // Push back to vector
+    double singlelike = pull->GetLikelihood();
+    likevect.push_back(singlelike);
+    total_likelihood += singlelike;
+
+    // Print Out
+    LOG(MIN) << "-> " << std::left << std::setw(40) << pull->GetName() << " : "
+             << singlelike << std::endl;
+
+  }
+
+  // Finally add the total likelihood
+  likevect.push_back(total_likelihood);
+
+  return likevect;
+}
+
+//***************************************************
+std::vector<int> JointFCN::GetAllNDOF() {
+//***************************************************
+
+  // Vect of all ndof and total
+  std::vector<int> ndofvect;
+  int total_ndof = 0;
+
+  // Loop over samples first
+  for (MeasListConstIter iter = fSamples.begin();
+       iter != fSamples.end();
+       iter++) {
+    MeasurementBase* exp = *iter;
+
+    // Get Likelihoods and push to vector
+    int singlendof = exp->GetNDOF();
+    ndofvect.push_back(singlendof);
+    total_ndof += singlendof;
+  }
+
+
+  // Loop over pulls second
+  for (PullListConstIter iter = fPulls.begin();
+       iter != fPulls.end();
+       iter++) {
+    ParamPull* pull = *iter;
+
+    // Push back to vector
+    int singlendof = pull->GetNDOF();
+    ndofvect.push_back(singlendof);
+    total_ndof += singlendof;
+  }
+
+  // Finally add the total ndof
+  ndofvect.push_back(total_ndof);
+
+  return ndofvect;
 }

@@ -17,42 +17,25 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(HEADERFILES
-FitLogger.h
-FitParameters.h
 FitUtils.h
 GeneralUtils.h
 ParserUtils.h
 PlotUtils.h
-StatUtils.h
 SignalDef.h
-NuisConfig.h
-NuisKey.h
 BeamUtils.h
 TargetUtils.h
-StackBase.h
-StandardStacks.h
 OpenMPWrapper.h
 PhysConst.h
-Initialiser.h
 )
 
 set(IMPLFILES
-PythiaQuiet.f
-FitLogger.cxx
-FitParameters.cxx
 FitUtils.cxx
 GeneralUtils.cxx
 PlotUtils.cxx
-StatUtils.cxx
 SignalDef.cxx
-NuisConfig.cxx
-NuisKey.cxx
 BeamUtils.cxx
 TargetUtils.cxx
-StackBase.cxx
 ParserUtils.cxx
-StandardStacks.cxx
-Initialiser.cxx
 )
 
 set(LIBNAME Utils)
@@ -64,6 +47,8 @@ else(CMAKE_BUILD_TYPE MATCHES RELEASE)
 endif()
 
 include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
+include_directories(${CMAKE_SOURCE_DIR}/src/Logger)
+include_directories(${CMAKE_SOURCE_DIR}/src/Statistical)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
   "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
@@ -80,14 +65,13 @@ install(TARGETS ${LIBNAME} DESTINATION lib)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 
-add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
-
-  #Strip out -lNuWro_event1
-  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${CMAKE_DEPENDLIB_FLAGS})
-  cmessage(DEBUG "Attempted to strip out nuwro library: \"${CMAKE_DEPENDLIB_FLAGS}\" -> \"${NWEVSTRIPPED_CDF}\"")
-  target_link_libraries(DumpROOTClassesFromVector ${NWEVSTRIPPED_CDF})
-  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
-    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-  endif()
-
-install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
+#add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
+#
+#  #Strip out -lNuWro_event1
+#  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${CMAKE_DEPENDLIB_FLAGS})
+#  cmessage(DEBUG "Attempted to strip out nuwro library: \"${CMAKE_DEPENDLIB_FLAGS}\" -> \"${NWEVSTRIPPED_CDF}\"")
+#  target_link_libraries(DumpROOTClassesFromVector ${NWEVSTRIPPED_CDF})
+#  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
+#    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+#  endif()
+#install(TARGETS DumpROOTClassesFromVector DESTINATION bin)

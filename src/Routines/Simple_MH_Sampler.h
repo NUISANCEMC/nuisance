@@ -60,9 +60,9 @@ class Simple_MH_Sampler : public Minimizer {
 
  public:
   Simple_MH_Sampler() : Minimizer(), RNJesus(), trace() {
-    thin = Config::Get().ConfI("MCMC.thin");
+    thin = Config::GetParI("MCMC.thin");
     thin_ctr = 0;
-    discard = Config::Get().ConfI("MCMC.BurnInSteps");
+    discard = Config::GetParI("MCMC.BurnInSteps");
   }
 
   void SetFunction(ROOT::Math::IMultiGenFunction const &func) { FCN = &func; }
@@ -179,8 +179,8 @@ class Simple_MH_Sampler : public Minimizer {
 
   void AddBranches() {
     TFile *ogf = gFile;
-    if (FitPar::Config().out && FitPar::Config().out->IsOpen()) {
-      FitPar::Config().out->cd();
+    if (Config::Get().out && Config::Get().out->IsOpen()) {
+      Config::Get().out->cd();
     }
 
     StepTree = new TTree("MCMChain", "");

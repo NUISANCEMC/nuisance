@@ -66,7 +66,7 @@ MCStudy_MuonValidation::MCStudy_MuonValidation(std::string name, std::string inp
     this->TotalIntegratedFlux();
 
   // Create a new TTree and add Nuisance Events Branches
-  FitPar::Config().out->cd();
+  Config::Get().out->cd();
   fEventTree = new TTree((fName + "_EVENTS").c_str(),(fName + "_EVENTS").c_str());
 
   fEventTree->Branch("ScaleFactor", &fScaleFactor, "ScaleFactor/D");

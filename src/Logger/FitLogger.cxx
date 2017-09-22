@@ -26,7 +26,9 @@ namespace Logger {
 // Logger Variables
 int log_verb = 4;
 bool use_colors = true;
-bool showtrace = false;
+
+bool showtrace  = true;
+
 std::ostream* __LOG_outstream(&std::cout);
 std::ofstream __LOG_nullstream;
 

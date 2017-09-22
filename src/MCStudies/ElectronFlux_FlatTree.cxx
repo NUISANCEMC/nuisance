@@ -87,7 +87,7 @@ ElectronFlux_FlatTree::ElectronFlux_FlatTree(std::string name, std::string input
 void ElectronFlux_FlatTree::AddEventVariablesToTree() {
   // Setup the TTree to save everything
   if (!eventVariables) {
-    FitPar::Config().out->cd();
+    Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }
@@ -190,7 +190,7 @@ void ElectronFlux_FlatTree::AddEventVariablesToTree() {
 
 void ElectronFlux_FlatTree::AddSignalFlagsToTree() {
   if (!eventVariables) {
-    FitPar::Config().out->cd();
+    Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }

@@ -87,7 +87,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 void GenericFlux_Tester::AddEventVariablesToTree() {
   // Setup the TTree to save everything
   if (!eventVariables) {
-    FitPar::Config().out->cd();
+    Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }
@@ -190,7 +190,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
 
 void GenericFlux_Tester::AddSignalFlagsToTree() {
   if (!eventVariables) {
-    FitPar::Config().out->cd();
+    Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }

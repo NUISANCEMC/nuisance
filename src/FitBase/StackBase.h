@@ -10,7 +10,7 @@
 #include "THStack.h"
 #include "TH2.h"
 #include "TH3.h"
-#include "FitParameters.h"
+
 #include "PlotUtils.h"
 
 class StackBase {

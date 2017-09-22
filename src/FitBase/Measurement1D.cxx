@@ -566,7 +566,7 @@ void Measurement1D::FinaliseMeasurement() {
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
-  if (fIsShape && fShapeCovar){
+  if (fIsShape && fShapeCovar and FitPar::Config().GetParB("UseShapeCovar")){    
     if (covar) delete covar;
     covar = StatUtils::GetInvert(fShapeCovar);
     if (fDecomp) delete fDecomp;
@@ -1416,9 +1416,9 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
 
 
   nuiskey samplekey = Config::CreateKey("sample");
-  samplekey.AddS("name", fName);
-  samplekey.AddS("type",type);
-  samplekey.AddS("input",inputfile);
+  samplekey.Set("name", fName);
+  samplekey.Set("type",type);
+  samplekey.Set("input",inputfile);
   fSettings = LoadSampleSettings(samplekey);
 
   // Reset everything to NULL

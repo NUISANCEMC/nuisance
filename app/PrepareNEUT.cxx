@@ -4,6 +4,7 @@
 #include "TH1D.h"
 #include "TTree.h"
 #include "PlotUtils.h"
+#include "StatUtils.h"
 #include "FitLogger.h"
 
 // If you don't have NEUT enabled, you shouldn't compile this...

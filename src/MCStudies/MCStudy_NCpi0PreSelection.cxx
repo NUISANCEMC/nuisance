@@ -73,7 +73,7 @@ MCStudy_NCpi0PreSelection::MCStudy_NCpi0PreSelection(std::string name, std::stri
     this->TotalIntegratedFlux();
 
   // Create a new TTree and add Nuisance Events Branches
-  FitPar::Config().out->cd();
+  Config::Get().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
   GetInput()->GetEventPointer()->AddBranchesToTree(fEventTree);
 
@@ -140,7 +140,7 @@ MCStudy_NCpi0PreSelection::MCStudy_NCpi0PreSelection(std::string name, std::stri
 //********************************************************************
 void MCStudy_NCpi0PreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
-  
+
   // Reset
   kplusmom = -999.9;
 
@@ -165,7 +165,7 @@ void MCStudy_NCpi0PreSelection::FillEventVariables(FitEvent *event) {
     if (fNCpi0Logging){
       int nstrangemesons = event->NumParticle(321);
       int nstrangefsmesons = event->NumFSParticle(321);
-      
+
       if (nstrangemesons > 0){
 	std::cout << "New Event ----------------------------" << std::endl;
 	std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;
@@ -205,7 +205,7 @@ bool MCStudy_NCpi0PreSelection::isSignal(FitEvent *event) {
   if (npi0 <= 0) return false;
 
 
-  int nlep = (event->NumFSParticle(11) + event->NumFSParticle(13) + event->NumFSParticle(15) + 
+  int nlep = (event->NumFSParticle(11) + event->NumFSParticle(13) + event->NumFSParticle(15) +
 	      event->NumFSParticle(-11) + event->NumFSParticle(-13) + event->NumFSParticle(-15));
   if (nlep > 0) return false;
 
