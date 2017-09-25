@@ -162,6 +162,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
 #ifdef __PROB3PP_ENABLED__
   else {
 
+    UInt_t npart = fNeutVect->Npart();
     for (size_t i = 0; i < npart; i++) {
       NeutPart* part = fNUISANCEEvent->fNeutVect->PartInfo(i);
       if ((part->fIsAlive == false) && (part->fStatus == -1) &&
