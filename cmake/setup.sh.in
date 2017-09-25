@@ -60,6 +60,15 @@ function add_to_LD_LIBRARY_PATH () {
   done
 }
 
+if [ "@EXTRA_SETUP_SCRIPT@" ]; then
+  if [ ! -e @EXTRA_SETUP_SCRIPT@ ]; then
+      echo "[WARN]: Extra setup script \"@EXTRA_SETUP_SCRIPT@\" requested, but could not be found. Skipping..."
+  else
+    echo "[INFO]: Sourcing extra setup from \"@EXTRA_SETUP_SCRIPT@\"."
+    . @EXTRA_SETUP_SCRIPT@
+  fi
+fi
+
 add_to_PATH "@CMAKE_INSTALL_PREFIX@/bin"
 
 add_to_LD_LIBRARY_PATH "@CMAKE_INSTALL_PREFIX@/lib"
