@@ -72,7 +72,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
-  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << std::endl;
+  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
+           << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
+           << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
+           << std::endl;
 
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
@@ -286,7 +289,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   UInt_t npart = event->Npart();
   for (UInt_t i = 0; i < npart; i++) {
     // Skip particles that weren't in the final state
-    bool part_alive = event->PartInfo(i)->fIsAlive and event->PartInfo(i)->Status() == kFinalState;
+    bool part_alive = event->PartInfo(i)->fIsAlive and
+                      event->PartInfo(i)->Status() == kFinalState;
     if (!part_alive) continue;
 
     // PDG Particle
@@ -455,7 +459,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   RWWeight = event->RWWeight;
   InputWeight = event->InputWeight;
   FluxWeight =
-      GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) / GetFluxHistogram()->Integral();
+      GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) /
+      GetFluxHistogram()->Integral();
 
   xsecScaling = fScaleFactor;
 

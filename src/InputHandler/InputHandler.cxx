@@ -104,9 +104,10 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
     return lowBinfracIntegral + highBinfracIntegral;
   }
 
+  double ContainedIntegral =
+      fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
   // If there are filled bins between them
-  return lowBinfracIntegral + highBinfracIntegral +
-         fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
+  return lowBinfracIntegral + highBinfracIntegral + ContainedIntegral;
   // return fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
 }
 
