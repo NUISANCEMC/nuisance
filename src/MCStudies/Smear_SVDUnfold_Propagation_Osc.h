@@ -39,6 +39,7 @@
 ///   DetectorVolume="" DetectorDensity=""/>
 /// </sample>
 class Smear_SVDUnfold_Propagation_Osc : public Measurement1D {
+public:
   struct FDSample {
     TH1D *FDDataHist;
 

@@ -19,13 +19,13 @@ This simple module allows the construction of simple NOvA-style unfold/propagate
 
    <sample name="Smear_SVDUnfold_Propagation_Osc" input="HISTO:NDObs_numu.root[ELepRec_rate|ELepHadVis_Smear_ev]" NuPDG="14" TruncateStart="0" TruncateUpTo="10" DetectorVolume="36" DetectorDensity="1.395E3" SetErrorsFromRate="1" ScalePOT="10">
 
-      <NDObs ObsInput="NDObs_nue.root[ELepRec_rate|ELepHadVis_Smear_ev]" FitRegion_max="6.99" NuPDG="12" TruncateStart="0" TruncateUpTo="10" />
+      <NDObs ObsInput="NDObs_nue.root[ELepRec_rate|ELepHadVis_Smear_ev]" FitRegion_Max="6.99" NuPDG="12" TruncateStart="0" TruncateUpTo="10" />
 
-      <FDObs ObsInput="FDObs_numu.root[ELepRec_rate],NDObs_numu.root[ELepHadVis_Smear_ev]" FitRegion_max="6.99" OscillateToPDG="14" DetectorVolume="1" DetectorDensity="40E6" >
+      <FDObs ObsInput="FDObs_numu.root[ELepRec_rate],NDObs_numu.root[ELepHadVis_Smear_ev]" FitRegion_Max="6.99" OscillateToPDG="14" DetectorVolume="1" DetectorDensity="40E6" >
          <FDNDRatio FromPDG="14" DivergenceFactor="1.50926829E-7" />
       </FDObs>
 
-      <FDObs ObsInput="FDObs_nue.root[ELepRec_rate],FDObs_nue_intrinsic.root[ELepRec_rate],NDObs_nue.root[ELepHadVis_Smear_ev]" FitRegion_max="6.99" OscillateToPDG="12" DetectorVolume="1" DetectorDensity="40E6" >
+      <FDObs ObsInput="FDObs_nue.root[ELepRec_rate],FDObs_nue_intrinsic.root[ELepRec_rate],NDObs_nue.root[ELepHadVis_Smear_ev]" FitRegion_Max="6.99" OscillateToPDG="12" DetectorVolume="1" DetectorDensity="40E6" >
          <FDNDRatio FromPDG="12" DivergenceFactor="1.26826492E-7" />
          <FDNDRatio FromPDG="14" DivergenceFactor="1.50926829E-7" />
       </FDObs>
@@ -127,7 +127,7 @@ The `TruncateStart` and `TruncateUpTo` attributes specify the number of singular
 ### FD sample descriptors
 
 ```xml
-      <FDObs ObsInput="FDObs_nue.root[ELepRec_rate],FDObs_nue_intrinsic.root[ELepRec_rate],NDObs_nue.root[ELepHadVis_Smear_ev]" FitRegion_max="6.99" OscillateToPDG="12" DetectorVolume="1" DetectorDensity="40E6" >
+      <FDObs ObsInput="FDObs_nue.root[ELepRec_rate],FDObs_nue_intrinsic.root[ELepRec_rate],NDObs_nue.root[ELepHadVis_Smear_ev]" FitRegion_Max="6.99" OscillateToPDG="12" DetectorVolume="1" DetectorDensity="40E6" >
          <FDNDRatio FromPDG="12" DivergenceFactor="1.26826492E-7" />
          <FDNDRatio FromPDG="14" DivergenceFactor="1.50926829E-7" />
       </FDObs>
@@ -135,7 +135,7 @@ The `TruncateStart` and `TruncateUpTo` attributes specify the number of singular
 
 Each far detector sample has the same inputs as each near detector sample, an observed histogram (correctly normalised) and a migration matrix. For the far detector samples, the migration matrix is not inverted, but used to forward-fold the true spectrum prediction at the far detector.
 
-The two elements `FitRegion_min` and `FitRegion_max` are used to specify the range of the observation histogram that is included in the Chi2 calculation. These ranges are also used to inform the regularisation of the SVD inversion used ont he near detector samples.
+The two elements `FitRegion_Min` and `FitRegion_Max` are used to specify the range of the observation histogram that is included in the Chi2 calculation. These ranges are also used to inform the regularisation of the SVD inversion used ont he near detector samples.
 
 Each far detector sample receives contributions from every near detector sample, these may well be 0, but the extrapolation is performed independently for each far detector sample. Therefore, each far detector sample element must set up its detector mass, even if they are all the same. In the example shown above the far detector is set up to have a 40 kilotonne fiducial mass.
 
