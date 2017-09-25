@@ -23,7 +23,7 @@
 
 #include "Smearcepterton.h"
 
-#define DEBUG_SMEARTESTER
+//#define DEBUG_SMEARTESTER
 
 //********************************************************************
 /// @brief Class to perform smearceptance MC Studies on a custom measurement
