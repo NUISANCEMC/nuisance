@@ -188,14 +188,19 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
   fds.FitRegion_Min = 0xdeadbeef;
   if (nk.Has("FitRegion_Min")) {
     fds.FitRegion_Min = nk.GetD("FitRegion_Min");
+    QLOG(SAM, "FD Sample [" << FDSamples.size() << "] imposes FitRegion E_nu > "
+                            << fds.FitRegion_Min);
   }
   if ((FitRegion_Min == 0xdeadbeef) || FitRegion_Min > fds.FitRegion_Min) {
     FitRegion_Min = fds.FitRegion_Min;
   }
 
+  nk.Print();
   fds.FitRegion_Max = 0xdeadbeef;
   if (nk.Has("FitRegion_Max")) {
     fds.FitRegion_Max = nk.GetD("FitRegion_Max");
+    QLOG(SAM, "FD Sample [" << FDSamples.size() << "] imposes FitRegion E_nu < "
+                            << fds.FitRegion_Max);
   }
   if ((FitRegion_Max == 0xdeadbeef) || FitRegion_Max < fds.FitRegion_Max) {
     FitRegion_Max = fds.FitRegion_Max;
@@ -517,6 +522,16 @@ Smear_SVDUnfold_Propagation_Osc::Smear_SVDUnfold_Propagation_Osc(
     }
   }
 
+  if ((FitRegion_Min != 0xdeadbeef) || (FitRegion_Max != 0xdeadbeef)) {
+    QLOG(SAM, "When unfolding, interested region limited to:");
+    if (FitRegion_Min != 0xdeadbeef) {
+      QLOG(SAM, "\tE_nu > " << FitRegion_Min);
+    }
+    if (FitRegion_Max != 0xdeadbeef) {
+      QLOG(SAM, "\tE_nu < " << FitRegion_Max);
+    }
+  }
+
   SetupNDInputs();
 
   FinaliseFDSamples();
@@ -539,6 +554,69 @@ bool Smear_SVDUnfold_Propagation_Osc::isSignal(FitEvent *event) {
   return false;
 }
 
+void DumpUnfoldDebugInfo(Smear_SVDUnfold_Propagation_Osc::NDSample &nds,
+                         size_t nd_it, size_t truncations) {
+  TDirectory *ogDir = gDirectory;
+  std::stringstream ss;
+  ss.str("");
+  ss << "DEBUG_FailedInvert_NDSample_" << nd_it;
+
+  Config::Get().out->mkdir(ss.str().c_str());
+  Config::Get().out->cd(ss.str().c_str());
+
+  ss.str("");
+  ss << "ND_Smearing_Matrix_" << nd_it;
+  nds.NDToSpectrumSmearingMatrix->Write(ss.str().c_str(), TObject::kOverwrite);
+  ss.str("");
+  ss << "ND_Inverse_Smearing_Matrix_" << nd_it;
+  SmearceptanceUtils::SVDGetInverse(nds.NDToSpectrumSmearingMatrix, 0)
+      ->Write(ss.str().c_str(), TObject::kOverwrite);
+
+  ss.str("");
+  ss << "ND_Inverse_Smearing_Matrix_" << nd_it << "_Trunc_" << truncations;
+  SmearceptanceUtils::SVDGetInverse(nds.NDToSpectrumSmearingMatrix, truncations)
+      ->Write(ss.str().c_str(), TObject::kOverwrite);
+
+  ss.str("");
+  ss << "ND_Obs_" << nd_it;
+  nds.NDDataHist->Write(ss.str().c_str(), TObject::kOverwrite);
+
+  TMatrixD NDToSpectrumResponseMatrix_notrunc = SmearceptanceUtils::GetMatrix(
+      SmearceptanceUtils::SVDGetInverse(nds.NDToSpectrumSmearingMatrix, 0));
+
+  nds.NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_notrunc);
+  nds.NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_notrunc;
+
+  SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
+      nds.NDDataHist, nds.ND_Unfolded_Spectrum_Hist,
+      nds.NDToSpectrumResponseMatrix, 1000, false);
+
+  ss.str("");
+  ss << "ND_Unfolded_" << nd_it;
+  nds.ND_Unfolded_Spectrum_Hist->Write(ss.str().c_str(), TObject::kOverwrite);
+
+  TMatrixD NDToSpectrumResponseMatrix_trunc =
+      SmearceptanceUtils::GetMatrix(SmearceptanceUtils::SVDGetInverse(
+          nds.NDToSpectrumSmearingMatrix, truncations));
+
+  nds.NDToSpectrumResponseMatrix.ResizeTo(NDToSpectrumResponseMatrix_trunc);
+  nds.NDToSpectrumResponseMatrix = NDToSpectrumResponseMatrix_trunc;
+
+  SmearceptanceUtils::PushTH1ThroughMatrixWithErrors(
+      nds.NDDataHist, nds.ND_Unfolded_Spectrum_Hist,
+      nds.NDToSpectrumResponseMatrix, 1000, false);
+
+  ss.str("");
+  ss << "ND_Unfolded_" << nd_it << "_Trunc_" << truncations;
+  nds.ND_Unfolded_Spectrum_Hist->Write(ss.str().c_str(), TObject::kOverwrite);
+
+  if (ogDir) {
+    ogDir->cd();
+  } else {
+    Config::Get().out->cd();
+  }
+}
+
 void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
   if (nd_it >= NDSamples.size()) {
     THROW("Attempting to unfold ND sample index "
@@ -559,6 +637,8 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
   int truncations = nds.TruncateStart;
   do {
     if (truncations >= nds.TruncateUpTo) {
+      DumpUnfoldDebugInfo(nds, nd_it, truncations);
+
       THROW("Unfolded enu spectrum had negative values even after "
             << truncations << " SVD singular value truncations.");
     }
@@ -587,6 +667,16 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
 
       if (nds.ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it) < 0) {
         HasNegValue = true;
+        QLOG(SAM,
+             "After "
+                 << truncations << " truncations, bin " << (bi_it - 1) << " ["
+                 << nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinLowEdge(
+                        bi_it)
+                 << " -- "
+                 << nds.ND_Unfolded_Spectrum_Hist->GetXaxis()->GetBinUpEdge(
+                        bi_it)
+                 << " ] has value: "
+                 << nds.ND_Unfolded_Spectrum_Hist->GetBinContent(bi_it));
         break;
       }
     }
