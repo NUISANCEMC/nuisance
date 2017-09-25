@@ -686,6 +686,7 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
 
 #endif
 
+#ifdef __PROB3PP_ENABLED__
   FitWeight *fw = FitBase::GetRW();
   if (fw->HasRWEngine(kOSCILLATION)) {
     OscWeightEngine *oscWE =
@@ -711,6 +712,7 @@ void Smearceptance_Tester::Write(std::string drawOpt) {
 
     POsc.Write("POsc", TObject::kOverwrite);
   }
+#endif
 
   TMatrixD ResponseMatrix_evt_md =
       SmearceptanceUtils::GetMatrix(ResponseMatrix_ev);

@@ -154,11 +154,13 @@ void OscWeightEngine::Config() {
     QLOG(FIT, "\tForceFromNuPDG: " << ForceFromNuPDG);
   }
 
+#ifdef __PROB3PP_ENABLED__
   bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
             params[dm12_idx], params[dm23_idx], params[dcp_idx], 1, true, 2);
   bp.DefinePath(LengthParam, 0);
 
   QLOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
+#endif
 }
 
 void OscWeightEngine::IncludeDial(std::string name, double startval) {
