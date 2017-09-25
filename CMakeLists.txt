@@ -97,7 +97,7 @@ set(CORE
   Logger
   InputHandler
   Splines
-  Reweight	
+  Reweight
   Utils
   Statistical
   #Devel
@@ -186,6 +186,14 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
 
+if(USE_DYNSAMPLES)
+  string(REPLACE ";" " -I" ALL_INCLUDES_STR "${MINIMUM_INCLUDE_DIRECTORIES}")
+  configure_file(cmake/BuildDynamicSample.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" @ONLY)
+  install(FILES
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" DESTINATION
+    bin)
+endif()
 
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuiscardgen" DESTINATION

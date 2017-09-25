@@ -138,6 +138,8 @@ CheckAndSetDefault(NEED_ROOTPYTHIA6 FALSE)
 
 CheckAndSetDefaultCache(USE_OMP FALSE BOOL "Whether to enable multicore features (there currently are none...). <FALSE>")
 
+CheckAndSetDefaultCache(USE_DYNSAMPLES FALSE BOOL "Whether to enable the dynamic sample loader. <FALSE>")
+
 CheckAndSetDefault(NO_EXPERIMENTS FALSE)
 
 cmessage(STATUS "NO_EXPERIMENTS: ${NO_EXPERIMENTS}")

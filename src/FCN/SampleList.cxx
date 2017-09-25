@@ -206,17 +206,17 @@
 #include "MINERvA_CCCOHPI_XSec_1DQ2_antinu.h"
 
 #include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
+#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 
 #include "MINERvA_CCCOHPI_XSec_joint.h"
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
 
-#include "MINERvA_CC0pi_XSec_2Dptpx_nu.h"
 #include "MINERvA_CC0pi_XSec_2Dptpx_antinu.h"
+#include "MINERvA_CC0pi_XSec_2Dptpx_nu.h"
 
 #endif
 
@@ -292,7 +292,246 @@
 #include "NuisConfig.h"
 #include "NuisKey.h"
 
+#ifdef __USE_DYNSAMPLES__
 
+#include "TRegexp.h"
+
+#include <dirent.h>
+
+// linux
+#include <dlfcn.h>
+
+DynamicSampleFactory::DynamicSampleFactory() : NSamples(0), NManifests(0) {
+  LoadPlugins();
+  QLOG(FIT, "Loaded " << NSamples << " from " << NManifests
+                      << " shared object libraries.");
+}
+DynamicSampleFactory* DynamicSampleFactory::glblDSF = NULL;
+DynamicSampleFactory::PluginManifest::~PluginManifest() {
+  for (size_t i_it = 0; i_it < Instances.size(); ++i_it) {
+    (*(DSF_DestroySample))(Instances[i_it]);
+  }
+}
+std::string EnsureTrailingSlash(std::string const& inp) {
+  if (!inp.length()) {
+    return "/";
+  }
+  if (inp[inp.length() - 1] == '/') {
+    return inp;
+  }
+  return inp + "/";
+}
+void DynamicSampleFactory::LoadPlugins() {
+  std::vector<std::string> SearchDirectories;
+
+  if (Config::HasPar("dynamic_sample.path")) {
+    SearchDirectories =
+        GeneralUtils::ParseToStr(Config::GetParS("dynamic_sample.path"), ":");
+  }
+
+  char const* envPath = getenv("NUISANCE_DS_PATH");
+  if (envPath) {
+    std::vector<std::string> envPaths = GeneralUtils::ParseToStr(envPath, ":");
+    for (size_t ep_it = 0; ep_it < envPaths.size(); ++ep_it) {
+      SearchDirectories.push_back(envPaths[ep_it]);
+    }
+  }
+
+  if (!SearchDirectories.size()) {
+    char const* pwdPath = getenv("PWD");
+    if (pwdPath) {
+      SearchDirectories.push_back(pwdPath);
+    }
+  }
+
+  for (size_t sp_it = 0; sp_it < SearchDirectories.size(); ++sp_it) {
+    std::string dirpath = EnsureTrailingSlash(SearchDirectories[sp_it]);
+
+    QLOG(FIT, "Searching for dynamic sample manifests in: " << dirpath);
+
+    Ssiz_t len = 0;
+    DIR* dir;
+    struct dirent* ent;
+    dir = opendir(dirpath.c_str());
+    if (dir != NULL) {
+      TRegexp matchExp("*.so", true);
+      while ((ent = readdir(dir)) != NULL) {
+        if (matchExp.Index(TString(ent->d_name), &len) != Ssiz_t(-1)) {
+          QLOG(FIT, "\tFound shared object: "
+                        << ent->d_name << " checking for relevant methods...");
+
+          void* dlobj =
+              dlopen((dirpath + ent->d_name).c_str(), RTLD_NOW | RTLD_GLOBAL);
+          char const* dlerr_cstr = dlerror();
+          std::string dlerr;
+          if (dlerr_cstr) {
+            dlerr = dlerr_cstr;
+          }
+
+          if (dlerr.length()) {
+            ERROR(WRN, "\tDL Load Error: " << dlerr);
+            continue;
+          }
+
+          PluginManifest plgManif;
+          plgManif.dllib = dlobj;
+          plgManif.soloc = (dirpath + ent->d_name);
+
+          plgManif.DSF_NSamples =
+              reinterpret_cast<DSF_NSamples_ptr>(dlsym(dlobj, "DSF_NSamples"));
+
+          dlerr = "";
+          dlerr_cstr = dlerror();
+          if (dlerr_cstr) {
+            dlerr = dlerr_cstr;
+          }
+
+          if (dlerr.length()) {
+            ERROR(WRN, "\tFailed to load symbol \"DSF_NSamples\" from "
+                           << (dirpath + ent->d_name) << ": " << dlerr);
+            dlclose(dlobj);
+            continue;
+          }
+
+          plgManif.DSF_GetSampleName = reinterpret_cast<DSF_GetSampleName_ptr>(
+              dlsym(dlobj, "DSF_GetSampleName"));
+
+          dlerr = "";
+          dlerr_cstr = dlerror();
+          if (dlerr_cstr) {
+            dlerr = dlerr_cstr;
+          }
+
+          if (dlerr.length()) {
+            ERROR(WRN, "\tFailed to load symbol \"DSF_GetSampleName\" from "
+                           << (dirpath + ent->d_name) << ": " << dlerr);
+            dlclose(dlobj);
+            continue;
+          }
+
+          plgManif.DSF_GetSample = reinterpret_cast<DSF_GetSample_ptr>(
+              dlsym(dlobj, "DSF_GetSample"));
+
+          dlerr = "";
+          dlerr_cstr = dlerror();
+          if (dlerr_cstr) {
+            dlerr = dlerr_cstr;
+          }
+
+          if (dlerr.length()) {
+            ERROR(WRN, "\tFailed to load symbol \"DSF_GetSample\" from "
+                           << (dirpath + ent->d_name) << ": " << dlerr);
+            dlclose(dlobj);
+            continue;
+          }
+
+          plgManif.DSF_DestroySample = reinterpret_cast<DSF_DestroySample_ptr>(
+              dlsym(dlobj, "DSF_DestroySample"));
+
+          dlerr = "";
+          dlerr_cstr = dlerror();
+          if (dlerr_cstr) {
+            dlerr = dlerr_cstr;
+          }
+
+          if (dlerr.length()) {
+            ERROR(WRN, "Failed to load symbol \"DSF_DestroySample\" from "
+                           << (dirpath + ent->d_name) << ": " << dlerr);
+            dlclose(dlobj);
+            continue;
+          }
+
+          plgManif.NSamples = (*(plgManif.DSF_NSamples))();
+          QLOG(FIT, "\tSuccessfully loaded dynamic sample manifest: "
+                        << plgManif.soloc << ". Contains " << plgManif.NSamples
+                        << " samples.");
+
+          for (size_t smp_it = 0; smp_it < plgManif.NSamples; ++smp_it) {
+            char const* smp_name = (*(plgManif.DSF_GetSampleName))(smp_it);
+            if (!smp_name) {
+              THROW("Could not load sample " << smp_it << " / "
+                                             << plgManif.NSamples << " from "
+                                             << plgManif.soloc);
+            }
+
+            if (Samples.count(smp_name)) {
+              ERROR(WRN, "Already loaded a sample named: \""
+                             << smp_name << "\". cannot load duplciates. This "
+                                            "sample will be skipped.");
+              continue;
+            }
+
+            plgManif.SamplesProvided.push_back(smp_name);
+            Samples[smp_name] = std::make_pair(plgManif.soloc, smp_it);
+            QLOG(FIT, "\t\t" << smp_name);
+          }
+
+          if (plgManif.SamplesProvided.size()) {
+            Manifests[plgManif.soloc] = plgManif;
+
+            NSamples += plgManif.SamplesProvided.size();
+            NManifests++;
+          } else {
+            dlclose(dlobj);
+          }
+        }
+      }
+      closedir(dir);
+    } else {
+      ERROR(WRN, "Tried to open non-existant directory.");
+    }
+  }
+}
+DynamicSampleFactory& DynamicSampleFactory::Get() {
+  if (!glblDSF) {
+    glblDSF = new DynamicSampleFactory();
+  }
+  return *glblDSF;
+}
+void DynamicSampleFactory::Print() {
+  std::map<std::string, std::vector<std::string> > ManifestSamples;
+
+  for (std::map<std::string, std::pair<std::string, int> >::iterator smp_it =
+           Samples.begin();
+       smp_it != Samples.end(); ++smp_it) {
+    if (!ManifestSamples.count(smp_it->second.first)) {
+      ManifestSamples[smp_it->second.first] = std::vector<std::string>();
+    }
+    ManifestSamples[smp_it->second.first].push_back(smp_it->first);
+  }
+
+  QLOG(FIT, "Dynamic sample manifest: ");
+  for (std::map<std::string, std::vector<std::string> >::iterator m_it =
+           ManifestSamples.begin();
+       m_it != ManifestSamples.end(); ++m_it) {
+    QLOG(FIT, "\tLibrary " << m_it->first << " contains: ");
+    for (size_t s_it = 0; s_it < m_it->second.size(); ++s_it) {
+      QLOG(FIT, "\t\t" << m_it->second[s_it]);
+    }
+  }
+}
+bool DynamicSampleFactory::HasSample(std::string const& name) {
+  return Samples.count(name);
+}
+bool DynamicSampleFactory::HasSample(nuiskey& samplekey) {
+  return HasSample(samplekey.GetS("name"));
+}
+MeasurementBase* DynamicSampleFactory::CreateSample(nuiskey& samplekey) {
+  if (!HasSample(samplekey)) {
+    ERROR(WRN, "Asked to load unknown sample: \"" << samplekey.GetS("name")
+                                                  << "\".");
+    return NULL;
+  }
+
+  std::pair<std::string, int> sample = Samples[samplekey.GetS("name")];
+  QLOG(SAM, "\tLoading sample " << sample.second << " from " << sample.first);
+
+  return (*(Manifests[sample.first].DSF_GetSample))(sample.second, &samplekey);
+}
+
+DynamicSampleFactory::~DynamicSampleFactory() { Manifests.clear(); }
+
+#endif
 
 //! Functions to make it easier for samples to be created and handled.
 namespace SampleUtils {
@@ -311,6 +550,19 @@ MeasurementBase* CreateSample(std::string name, std::string file,
 }
 
 MeasurementBase* CreateSample(nuiskey samplekey) {
+#ifdef __USE_DYNSAMPLES__
+  if (DynamicSampleFactory::Get().HasSample(samplekey)) {
+    QLOG(SAM, "Instantiating dynamic sample...");
+
+    MeasurementBase* ds = DynamicSampleFactory::Get().CreateSample(samplekey);
+    if (ds) {
+      QLOG(SAM, "Done.");
+      return ds;
+    }
+    THROW("Failed to instantiate dynamic sample.");
+  }
+#endif
+
   FitWeight* rw = FitBase::GetRW();
   std::string name = samplekey.GetS("name");
   std::string file = samplekey.GetS("input");
@@ -707,7 +959,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CC0pi_XSec_1DQ2_nu_proton(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtC_nu") ||
-	     !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtCH_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtFe_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(samplekey));
@@ -716,12 +968,12 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioFe_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
-    
-  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_nu")){
-	return (new MINERvA_CC0pi_XSec_2Dptpx_nu(samplekey));
 
-  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")){
-	return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_nu")) {
+    return (new MINERvA_CC0pi_XSec_2Dptpx_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")) {
+    return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
 
     /*
       CC1pi+
@@ -763,7 +1015,8 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
+             !name.compare(
+                 "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
     // Done
@@ -843,21 +1096,21 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CCinc_XSec_1Dx_ratio(samplekey));
 
   } else if (!name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_C12_CH") ||
-	     !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Fe56_CH") ||
              !name.compare("MINERvA_CCinc_XSec_1DEnu_ratio_Pb208_CH")) {
-	return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
+    return (new MINERvA_CCinc_XSec_1DEnu_ratio(samplekey));
     /*
       CCDIS
     */
   } else if (!name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_C12_CH") ||
-	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Fe56_CH") ||
-	     !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Pb208_CH")) {
-	return (new MINERvA_CCDIS_XSec_1Dx_ratio(samplekey));
+             !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCDIS_XSec_1Dx_ratio_Pb208_CH")) {
+    return (new MINERvA_CCDIS_XSec_1Dx_ratio(samplekey));
 
   } else if (!name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_C12_CH") ||
-	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Fe56_CH") ||
-	     !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Pb208_CH")) {
-	return (new MINERvA_CCDIS_XSec_1DEnu_ratio(samplekey));
+             !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Fe56_CH") ||
+             !name.compare("MINERvA_CCDIS_XSec_1DEnu_ratio_Pb208_CH")) {
+    return (new MINERvA_CCDIS_XSec_1DEnu_ratio(samplekey));
 
     /*
       CC-COH
@@ -1037,14 +1290,13 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else if (!name.compare("NIWGOfficialPlots")) {
     return (new OfficialNIWGPlots(samplekey));
 
-  }else if (!name.compare("Simple_Osc")) {
+  } else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
 
-  }else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
+  } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
 
-  }
-   else {
+  } else {
     ERR(FTL) << "Error: No such sample: " << name << std::endl;
     exit(-1);
     return NULL;
