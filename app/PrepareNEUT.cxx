@@ -73,7 +73,7 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
 
   TH1D* fluxHist = new TH1D("flux", "flux", 1000, 0, fFluxInGeV ? 10 : 10000);
   fluxHist->Fill(MonoE);
-  fluxHist->Scale(1,"width");
+  fluxHist->Scale(1, "width");
   // Make Event Hist
   TH1D* xsecHist = (TH1D*)fluxHist->Clone();
   xsecHist->Reset();
@@ -368,14 +368,6 @@ void ParseOptions(int argc, char* argv[]) {
     if (!std::strcmp(argv[i], "-h")) {
       flagopt = true;
       break;
-    } else if (!std::strcmp(argv[i], "-G")) {
-      fFluxInGeV = true;
-      continue;
-    } else if (!std::strcmp(argv[i], "-m")) {
-      fIsMonoEFlux = true;
-      fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
-      ++i;
-      continue;
     }
     if (i + 1 != argc) {
       // Cardfile
@@ -390,6 +382,12 @@ void ParseOptions(int argc, char* argv[]) {
         ++i;
       } else if (!std::strcmp(argv[i], "-f")) {
         fFluxFile = argv[i + 1];
+        ++i;
+      } else if (!std::strcmp(argv[i], "-G")) {
+        fFluxInGeV = true;
+      } else if (!std::strcmp(argv[i], "-m")) {
+        fIsMonoEFlux = true;
+        fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
         ++i;
       } else {
         ERR(FTL) << "ERROR: unknown command line option given! - '" << argv[i]
