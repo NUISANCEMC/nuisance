@@ -47,7 +47,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
   TH1D *fluxhist = new TH1D("flux", "flux", 1000, 0, 10);
   fluxhist->Fill(MonoEnergy);
-  fluxHist->Scale(1, "width");
+  fluxhist->Scale(1, "width");
 
   // Make Event Hist
   TH1D* eventhist = (TH1D*)fluxhist->Clone();
@@ -214,7 +214,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   outputfile->cd();
   totalxsec->Write("nuisance_Xsec", TObject::kOverwrite);
   eventhist = (TH1D*)totalxsec->Clone();
-  eventhist->Multiply(fluxHist);
+  eventhist->Multiply(fluxhist);
 
   eventhist->Write("nuisance_events", TObject::kOverwrite);
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
