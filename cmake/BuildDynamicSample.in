@@ -20,14 +20,18 @@
 #!/bin/bash
 
 if [ ! "${1}" ] || [ ! -e ${1} ] || [ ! "${2}" ]; then
-  echo "[USAGE]: ${0} input.cxx outputLibName.so"
+  echo "[USAGE]: ${0} input.cxx outputLibName.so [classname]"
   exit 1
 fi
 
-CN=$(grep "class .*" $1 | sed "s/^class \([0-9a-zA-Z]\+\).*$/\1/g")
+if [ ! "${3}" ]; then
+  CN=$(grep "class .*" $1 | sed "s/^class \([0-9a-zA-Z]\+\).*$/\1/g")
+else
+  CN=${3}
+fi
 
 if [ ! "${CN}" ]; then
-  echo "[ERROR]: Couldn't find class name -- Expected to find a line like: \"class XXXX : public Measurement1D\" in \"$1\"."
+  echo "[ERROR]: Couldn't find class name -- Expected to find a line like: \"class XXXX : public Measurement1D\" in \"$1\". You can also forcibly specify your classes name by passing a third argument to this script."
   exit 1
 fi
 
@@ -73,9 +77,9 @@ echo -e "static char const * SampleNames[] = {\"${CN}\"};\n"\
 "void DSF_DestroySample(MeasurementBase* mb) { delete mb; }\n"\
 "}" >> compile.tmp/$1
 
-echo "g++ compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I@ALL_INCLUDES_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@"
+echo "g++ compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@"
 
-if ! g++ compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I@ALL_INCLUDES_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@; then
+if ! g++ compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@; then
   echo "[ERROR]: Failed to compile $1. Generated code can be found in ./compile.tmp/$1"
 else
   rm -r compile.tmp
