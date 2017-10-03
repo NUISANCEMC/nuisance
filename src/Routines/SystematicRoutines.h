@@ -42,7 +42,7 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-
+#include "TMatrixDSymEigen.h"
 #include "ParserUtils.h"
 
 enum minstate {
@@ -170,6 +170,8 @@ void SetupSystematicsFromXML();
   //! Step through each parameter one by one and create folders containing the MC predictions at each step.
   //! Doesn't handle correlated parameters well
   void PlotLimits();
+
+  void EigenErrors();
   
   /*
     Write Functions
