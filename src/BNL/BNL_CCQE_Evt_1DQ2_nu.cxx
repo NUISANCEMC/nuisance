@@ -48,7 +48,7 @@ BNL_CCQE_Evt_1DQ2_nu::BNL_CCQE_Evt_1DQ2_nu(nuiskey samplekey) {
   applyQ2correction = fSettings.Found("type", "Q2CORR");
   if (applyQ2correction) {
     fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "ANL/ANL_CCQE_Data_PRL31_844.root");
-    fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
+    fSettings.SetS("q2correction_hist", "ANL_1DQ2_Correction");
   }
 
   FinaliseSampleSettings();
