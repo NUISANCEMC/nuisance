@@ -1176,7 +1176,7 @@ void SystematicRoutines::MergeThrows(){
 //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1)) < 1.0) {
 	  //	  baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2) + pow(baseplot->GetBinError(j+1),2)));
 	//	} else {
-	baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
+	//baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
 	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
 	  //	}
       } else {
@@ -1295,7 +1295,6 @@ void SystematicRoutines::EigenErrors(){
   // Produce all error throws.
   for (int i = 0; i < eigenVect.GetNrows(); i++){
 
-
     TDirectory* throwfolder = (TDirectory*)throwsdir->mkdir(Form("throw_%i",count));
     throwfolder->cd();
 
@@ -1338,6 +1337,12 @@ void SystematicRoutines::EigenErrors(){
     
   }
 
+  fOutputRootFile->Close();  
+  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "UPDATE");
+  fOutputRootFile->cd();
+  throwsdir = (TDirectory*) fOutputRootFile->Get("throws");
+  outnominal = (TDirectory*) fOutputRootFile->Get("nominal");
+
   // Loop through Error DIR
   TDirectory* outerr = (TDirectory*) fOutputRootFile->mkdir("errors");
   outerr->cd();
@@ -1348,9 +1353,13 @@ void SystematicRoutines::EigenErrors(){
     TClass *cl = gROOT->GetClass(key->GetClassName());
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
     
-
     LOG(FIT) << "Creating error bands for " << key->GetName() << std::endl;
     std::string plotname = std::string(key->GetName());
+
+    if (plotname.find("_EVT") != std::string::npos) continue;
+    if (plotname.find("_FLUX") != std::string::npos) continue;
+    if (plotname.find("_FLX") != std::string::npos) continue;
+
     TH1* baseplot = (TH1D*)key->ReadObj()->Clone(Form("%s_ORIGINAL",key->GetName()));
     TH1* errorplot_upper = (TH1D*)baseplot->Clone(Form("%s_ERROR_UPPER",key->GetName()));
     TH1* errorplot_lower = (TH1D*)baseplot->Clone(Form("%s_ERROR_LOWER", key->GetName()));
@@ -1386,16 +1395,26 @@ void SystematicRoutines::EigenErrors(){
 	ERR(WRN) << "This plot will not have the correct errors!" << std::endl;
 	continue;
       }
+      newplot->SetDirectory(0);
+      nbins = newplot->GetNbinsX();
+    
       for (int j = 0; j < nbins; j++){
 	if (i % 2 == 0){
+	  //	  std::cout << plotname<< " : upper " << errorplot_upper->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " <<newplot->GetBinContent(j+1) << std::endl;
 	  errorplot_upper->SetBinContent(j+1, errorplot_upper->GetBinContent(j+1) + 
 					 pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
 	} else {
+	  //	  std::cout << plotname << " : lower " << errorplot_lower->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " << newplot->GetBinContent(j+1) << std::endl;
 	  errorplot_lower->SetBinContent(j+1, errorplot_lower->GetBinContent(j+1) +
                                          pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
 	}
 	meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1) + baseplot->GetBinContent(j+1));
       }
+      delete newplot;
       addcount++;
     }
     
