@@ -566,7 +566,7 @@ void Measurement1D::FinaliseMeasurement() {
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
-  if (fIsShape && fShapeCovar and FitPar::Config().GetParB("UseShapeCovar")){    
+  if (fIsShape && fShapeCovar and FitPar::Config().GetParB("UseShapeCovar")){
     if (covar) delete covar;
     covar = StatUtils::GetInvert(fShapeCovar);
     if (fDecomp) delete fDecomp;
@@ -1218,7 +1218,7 @@ void Measurement1D::Write(std::string drawOpt) {
   GetDataList().at(0)->Write();
   GetMCList().at(0)->Write();
 
-  if(fEvtRateScaleFactor != 0xdeadbeef){
+  if((fEvtRateScaleFactor != 0xdeadbeef) && GetMCList().at(0)){
     TH1D * PredictedEvtRate = static_cast<TH1D *>(GetMCList().at(0)->Clone());
     PredictedEvtRate->Scale(fEvtRateScaleFactor);
     PredictedEvtRate->GetYaxis()->SetTitle("Predicted event rate");
