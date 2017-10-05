@@ -872,6 +872,7 @@ void SystematicRoutines::Run(){
     else if (routine.compare("ErrorBands") == 0) GenerateErrorBands();
     else if (routine.compare("ThrowErrors") == 0) GenerateThrows();
     else if (routine.compare("MergeErrors") == 0) MergeThrows();
+    else if (routine.compare("EigenErrors") == 0) EigenErrors();
     else {
       std::cout << "Unknown ROUTINE : " << routine << std::endl;
     }
@@ -1175,7 +1176,7 @@ void SystematicRoutines::MergeThrows(){
 //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1)) < 1.0) {
 	  //	  baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2) + pow(baseplot->GetBinError(j+1),2)));
 	//	} else {
-	baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
+	//baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
 	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
 	  //	}
       } else {
@@ -1204,3 +1205,253 @@ void SystematicRoutines::MergeThrows(){
 
   return;
 };
+
+void SystematicRoutines::EigenErrors(){
+
+
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+    fOutputRootFile->cd();
+
+  // Make Covariance
+  TMatrixDSym* fullcovar = new TMatrixDSym( fParams.size() );
+
+  // Extract covariance from all loaded ParamPulls
+  for (PullListConstIter iter = fInputThrows.begin();
+       iter != fInputThrows.end(); iter++){
+    ParamPull* pull = *iter;
+
+    // Check pull is actualyl Gaussian
+    std::string pulltype = pull->GetType();
+    if (pulltype.find("GAUSTHROW") == std::string::npos){
+      THROW("Can only calculate EigenErrors for Gaussian pulls!");
+    }
+
+    // Get data and covariances
+    TH1D dialhist = pull->GetDataHist();
+    TH2D covhist  = pull->GetFullCovar();
+
+    // Loop over all dials and compare names
+    for (int pari = 0; pari < fParams.size(); pari++){
+      for (int parj = 0; parj < fParams.size(); parj++){
+	
+	std::string name_pari = fParams[pari];
+	std::string name_parj = fParams[parj];
+
+	// Compare names to those in the pull
+	for (int pulli = 0; pulli < dialhist.GetNbinsX(); pulli++){
+	  for (int pullj = 0; pullj < dialhist.GetNbinsX(); pullj++){
+	    
+	    std::string name_pulli = dialhist.GetXaxis()->GetBinLabel(pulli+1);
+	    std::string name_pullj = dialhist.GetXaxis()->GetBinLabel(pullj+1);
+
+	    if (name_pulli == name_pari && name_pullj == name_parj){
+	      (*fullcovar)[pari][parj] = covhist.GetBinContent(pulli+1, pullj+1);
+	      fCurVals[name_pari] = dialhist.GetBinContent(pulli+1);
+	      fCurVals[name_parj] = dialhist.GetBinContent(pullj+1);
+	    }
+	    
+	  }
+	}
+	
+      }
+    }
+  }
+
+  /*
+  TFile* test = new TFile("testingcovar.root","RECREATE");
+  test->cd();
+  TH2D* joinedcov = new TH2D("COVAR","COVAR",
+			     fullcovar->GetNrows(), 0.0, float(fullcovar->GetNrows()), 
+			     fullcovar->GetNrows(), 0.0, float(fullcovar->GetNrows()));
+  for (int i = 0; i < fullcovar->GetNrows(); i++){
+    for (int j = 0; j < fullcovar->GetNcols(); j++){
+      joinedcov->SetBinContent(i+1, j+1, (*fullcovar)[i][j]);
+    }
+  }
+  joinedcov->Write("COVAR");
+  test->Close();
+  */
+
+  // Calculator all EigenVectors and EigenValues
+  TMatrixDSymEigen* eigen = new TMatrixDSymEigen(*fullcovar);
+  const TVectorD eigenVals = eigen->GetEigenValues();
+  const TMatrixD eigenVect = eigen->GetEigenVectors();
+  eigenVals.Print();
+  eigenVect.Print();
+
+  TDirectory* outnominal = (TDirectory*) fOutputRootFile->mkdir("nominal");
+  outnominal->cd();
+
+  double *valst = FitUtils::GetArrayFromMap( fParams, fCurVals );
+  double chi2 = fSampleFCN->DoEval( valst );
+  delete valst;
+  fSampleFCN->Write();
+
+  // Loop over all throws
+  TDirectory* throwsdir = (TDirectory*) fOutputRootFile->mkdir("throws");
+  throwsdir->cd();
+
+  int count = 0;
+  // Produce all error throws.
+  for (int i = 0; i < eigenVect.GetNrows(); i++){
+
+    TDirectory* throwfolder = (TDirectory*)throwsdir->mkdir(Form("throw_%i",count));
+    throwfolder->cd();
+
+    // Get New Parameter Vector
+    LOG(FIT) << "Parameter Set " << count << std::endl;
+    for (int j = 0; j < eigenVect.GetNrows(); j++){
+      std::string param = fParams[j];
+      LOG(FIT) << " " << j << ". " << param << " : " << fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i] << std::endl;
+      fThrownVals[param] = fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i];
+    }
+
+    // Run Eval
+    double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
+    double chi2 = fSampleFCN->DoEval( vals );
+    delete vals;
+    count++;
+
+    fSampleFCN->Write();
+
+    
+    throwfolder = (TDirectory*)throwsdir->mkdir(Form("throw_%i",count));
+    throwfolder->cd();
+
+    // Get New Parameter Vector
+    LOG(FIT) << "Parameter Set " << count << std::endl;
+    for (int j = 0; j < eigenVect.GetNrows(); j++){
+      std::string param = fParams[j];
+      LOG(FIT) << " " << j << ". " << param << " : " <<fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i] << std::endl;
+      fThrownVals[param] = fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i];
+    }
+
+    // Run Eval
+    double *vals2 = FitUtils::GetArrayFromMap( fParams, fThrownVals );
+    chi2 = fSampleFCN->DoEval( vals2 );
+    delete vals2;
+    count++;
+    
+    // Save the FCN
+    fSampleFCN->Write();
+    
+  }
+
+  fOutputRootFile->Close();  
+  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "UPDATE");
+  fOutputRootFile->cd();
+  throwsdir = (TDirectory*) fOutputRootFile->Get("throws");
+  outnominal = (TDirectory*) fOutputRootFile->Get("nominal");
+
+  // Loop through Error DIR
+  TDirectory* outerr = (TDirectory*) fOutputRootFile->mkdir("errors");
+  outerr->cd();
+  TIter next(outnominal->GetListOfKeys());
+  TKey *key;
+  while ((key = (TKey*)next())) {
+    
+    TClass *cl = gROOT->GetClass(key->GetClassName());
+    if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
+    
+    LOG(FIT) << "Creating error bands for " << key->GetName() << std::endl;
+    std::string plotname = std::string(key->GetName());
+
+    if (plotname.find("_EVT") != std::string::npos) continue;
+    if (plotname.find("_FLUX") != std::string::npos) continue;
+    if (plotname.find("_FLX") != std::string::npos) continue;
+
+    TH1* baseplot = (TH1D*)key->ReadObj()->Clone(Form("%s_ORIGINAL",key->GetName()));
+    TH1* errorplot_upper = (TH1D*)baseplot->Clone(Form("%s_ERROR_UPPER",key->GetName()));
+    TH1* errorplot_lower = (TH1D*)baseplot->Clone(Form("%s_ERROR_LOWER", key->GetName()));
+    TH1* meanplot = (TH1D*)baseplot->Clone(Form("%s_SET_MEAN", key->GetName()));
+    TH1* systplot = (TH1D*)baseplot->Clone(Form("%s_SYST", key->GetName()));
+    TH1* statplot = (TH1D*)baseplot->Clone(Form("%s_STAT", key->GetName()));
+    TH1* totlplot = (TH1D*)baseplot->Clone(Form("%s_TOTAL", key->GetName()));
+
+    int nbins = 0;
+    if (cl->InheritsFrom("TH1D")) nbins = ((TH1D*)baseplot)->GetNbinsX();
+    else nbins = ((TH1D*)baseplot)->GetNbinsX()* ((TH1D*)baseplot)->GetNbinsY();
+
+    meanplot->Reset();
+    errorplot_upper->Reset();
+    errorplot_lower->Reset();
+
+    for (int j = 0; j < nbins; j++){
+      errorplot_upper->SetBinError(j+1, 0.0);
+      errorplot_lower->SetBinError(j+1, 0.0);
+    }
+
+    // Loop over throws and calculate mean and error for +- throws
+    int addcount = 0;
+
+    // Add baseplot first to slightly bias to central value
+    meanplot->Add(baseplot);
+    addcount++;
+
+    for (int i = 0; i < count; i++){
+      TH1* newplot = (TH1D*) throwsdir->Get(Form("throw_%i/%s",i,plotname.c_str()));
+      if (!newplot){
+	ERR(WRN) << "Cannot find new plot : " << Form("throw_%i/%s",i,plotname.c_str()) << std::endl;
+	ERR(WRN) << "This plot will not have the correct errors!" << std::endl;
+	continue;
+      }
+      newplot->SetDirectory(0);
+      nbins = newplot->GetNbinsX();
+    
+      for (int j = 0; j < nbins; j++){
+	if (i % 2 == 0){
+	  //	  std::cout << plotname<< " : upper " << errorplot_upper->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " <<newplot->GetBinContent(j+1) << std::endl;
+	  errorplot_upper->SetBinContent(j+1, errorplot_upper->GetBinContent(j+1) + 
+					 pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
+	} else {
+	  //	  std::cout << plotname << " : lower " << errorplot_lower->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " << newplot->GetBinContent(j+1) << std::endl;
+	  errorplot_lower->SetBinContent(j+1, errorplot_lower->GetBinContent(j+1) +
+                                         pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
+	}
+	meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1) + baseplot->GetBinContent(j+1));
+      }
+      delete newplot;
+      addcount++;
+    }
+    
+    // Get mean Average
+    for (int j = 0; j < nbins; j++){
+      meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1)/double(addcount));
+    }
+
+    for (int j = 0; j < nbins; j++){
+      errorplot_upper->SetBinContent(j+1, sqrt(errorplot_upper->GetBinContent(j+1)));
+      errorplot_lower->SetBinContent(j+1, sqrt(errorplot_lower->GetBinContent(j+1)));
+      
+      statplot->SetBinError(j+1, baseplot->GetBinError(j+1) );
+      systplot->SetBinError(j+1, (errorplot_upper->GetBinContent(j+1) + errorplot_lower->GetBinContent(j+1))/2.0);
+      totlplot->SetBinError(j+1, sqrt( pow(statplot->GetBinError(j+1),2) + pow(systplot->GetBinError(j+1),2) ) );
+
+      meanplot->SetBinError(j+1, sqrt( pow(statplot->GetBinError(j+1),2) + pow(systplot->GetBinError(j+1),2) ) );
+     
+    }
+
+    outerr->cd();
+    errorplot_upper->Write();
+    errorplot_lower->Write();
+    baseplot->Write();
+    meanplot->Write();
+
+    statplot->Write();
+    systplot->Write();
+    totlplot->Write();
+
+    delete errorplot_upper;
+    delete errorplot_lower;
+    delete baseplot;
+    delete meanplot;
+    delete statplot;
+    delete systplot;
+    delete totlplot;
+  }
+
+}

@@ -55,10 +55,8 @@ ANL_CCQE_XSec_1DEnu_nu::ANL_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 
   // is Q2 Correction applied
   applyQ2correction = fSettings.Found("type", "Q2CORR");
-  if (applyQ2correction) {
-    fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/ANL/ANL_CCQE_Data_PRL31_844.root");
-    fSettings.SetS("q2correction_hist", "ANL_XSec_1DQ2_Correction");
-  }
+  fSettings.SetS("q2correction_file",  FitPar::GetDataBase() + "/ANL/ANL_CCQE_Data_PRL31_844.root");
+  fSettings.SetS("q2correction_hist", "ANL_1DQ2_Correction");
 
   FinaliseSampleSettings();
 

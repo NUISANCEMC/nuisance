@@ -48,7 +48,7 @@ public:
   void FillEventVariables(FitEvent* customEvent);
 
   /// Have to do a weird event scaling for analysis 1
-  void ConvertEventRates();
+  //  void ConvertEventRates();
 
  private:
 
