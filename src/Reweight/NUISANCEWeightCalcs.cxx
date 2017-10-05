@@ -87,6 +87,8 @@ GaussianModeCorr::GaussianModeCorr() {
 	fGausVal_CC1pi[kPosPq3]  = 1.0;
 	fGausVal_CC1pi[kPosWq3]  = 1.0;
 
+	fAllowSuppression = false;
+
 	fDebugStatements = FitPar::Config().GetParB("GaussianModeCorr_DEBUG");
 
 }
@@ -168,6 +170,8 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 	}
 
 
+
+
 	// if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
 	return rw_weight;
 }
@@ -224,6 +228,17 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 	}
 
 
+	//	if (w != w || isnan(w)){
+	//          w = 0.0;
+	//	}
+
+	if (w < 1.0){
+	  //std::cout << "REMOVING SUPRPESSION" << std::endl;
+	  w = 1.0;
+	} //else {
+	  //	  std::cout << "W = " << w << std::endl;
+	//	}
+	
 	return w;
 }
 
@@ -285,6 +300,10 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
 		}
 	}
 
+	if (curenum == kGaussianCorr_AllowSuppression){
+	  fAllowSuppression = (val > 0.5);
+	}
+
 }
 
 bool GaussianModeCorr::IsHandled(int rwenum) {
@@ -321,6 +340,7 @@ bool GaussianModeCorr::IsHandled(int rwenum) {
 	case kGaussianCorr_CC1pi_Wq0:
 	case kGaussianCorr_CC1pi_Pq3:
 	case kGaussianCorr_CC1pi_Wq3:
+	case kGaussianCorr_AllowSuppression:
 
 		return true;
 	default:

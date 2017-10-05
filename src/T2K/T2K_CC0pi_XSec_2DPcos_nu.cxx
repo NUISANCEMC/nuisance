@@ -61,7 +61,6 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey) {
 
   // Setup Histograms
   SetHistograms();
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -89,106 +88,6 @@ void T2K_CC0pi_XSec_2DPcos_nu::FillEventVariables(FitEvent* event){
 
   return;
 };
-
-// Modification is needed after the full reconfigure to move bins around
-// Otherwise this would need to be replaced by a TH2Poly which is too awkward.
-void T2K_CC0pi_XSec_2DPcos_nu::ConvertEventRates(){
-
-  // Do standard conversion.
-  Measurement2D::ConvertEventRates();
-
-  if (fAnalysis == 1){
-
-    // Following code handles weird ND280 Binning
-    int nbins = this->fMCHist->GetNbinsX() + 1;
-    double total = 0.0;
-
-    // Y = 1
-    total = 0.0;
-    for (int i = 3; i < nbins; i++){
-
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(1);
-      total += this->fMCHist->GetBinContent(i, 1) * width;
-      this->fMCHist->SetBinContent(i,1,0);
-    }
-    this->fMCHist->SetBinContent(3, 1, total / (1.0 * 29.6));
-
-    // Y = 2
-    total = 0.0;
-    for (int i = 5; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(2);
-      total += this->fMCHist->GetBinContent(i, 2)* width;
-      this->fMCHist->SetBinContent(i,2,0);
-    }
-    this->fMCHist->SetBinContent(5, 2, total / (0.6 *29.4));
-
-    // Y = 3
-    total = 0.0;
-    for (int i = 7; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(3);
-      total += this->fMCHist->GetBinContent(i, 3)* width;
-      this->fMCHist->SetBinContent(i, 3,0);
-    }
-    this->fMCHist->SetBinContent(7, 3, total/ (0.1 * 29.2));
-
-    // Y = 4
-    total = 0.0;
-    for (int i = 7; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(4);
-      total += this->fMCHist->GetBinContent(i, 4)* width;
-      this->fMCHist->SetBinContent(i, 4,0);
-    }
-    this->fMCHist->SetBinContent(7, 4, total / (0.1 * 29.2));
-
-    // Y = 5
-    total = 0.0;
-    for (int i = 8; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(5);
-      total += this->fMCHist->GetBinContent(i, 5)* width;
-      this->fMCHist->SetBinContent(i,5,0);
-    }
-    this->fMCHist->SetBinContent(8, 5, total / (0.05 * 29.0));
-
-    // Y = 6
-    total = 0.0;
-    for (int i = 9; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(6);
-      total += this->fMCHist->GetBinContent(i, 6)* width;
-      this->fMCHist->SetBinContent(i, 6,0);
-    }
-    this->fMCHist->SetBinContent(9, 6, total / (0.05 * 28.5));
-
-    // Y = 7
-    total = 0.0;
-    for (int i = 8; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(7);
-      total += this->fMCHist->GetBinContent(i, 7)* width;
-      this->fMCHist->SetBinContent(i, 7,0);
-    }
-    this->fMCHist->SetBinContent(8, 7, total/ (0.04 * 28.0));
-
-    // Y = 8
-    total = 0.0;
-    for (int i = 11; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(8);
-      total += this->fMCHist->GetBinContent(i, 8)* width;
-      this->fMCHist->SetBinContent(i, 8,0);
-    }
-    this->fMCHist->SetBinContent(11, 8, total / (0.4 * 27.0));
-
-    // Y = 9
-    total = 0.0;
-    for (int i = 9; i < nbins; i++){
-      double width = this->fMCHist->GetXaxis()->GetBinWidth(i) * this->fMCHist->GetYaxis()->GetBinWidth(9);
-      total += this->fMCHist->GetBinContent(i, 9)* width;
-      this->fMCHist->SetBinContent(i,9,0);
-    }
-    this->fMCHist->SetBinContent(9, 9, total / (0.02 * 25.0));
-  }
-
-  return;
-}
-
 
 void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
@@ -236,16 +135,8 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
       tempcov->Add(tempstat);
       tempcov->Add(tempnorm);
     }
-
-    // SARAS ANALYSIS
-  } else if (fAnalysis == 1){
-
-    //TODO (P.Stowell) Add a TH2Poly Measurement class
-    ERR(FTL) << "T2K CC0Pi Analysis 1 is not yet available due to its awkward binning!" << std::endl;
-    ERR(FTL) << "If you want to use it, add a TH2Poly Class!" << std::endl;
-    throw;
-
   }
+
 
   if (!tempcov){
     ERR(FTL) << "TEMPCOV NOT SET" << std::endl;
@@ -258,9 +149,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
   for (int i = 0; i < nbins; i++){
     for (int j = 0; j < nbins; j++){
-
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1);
-
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);

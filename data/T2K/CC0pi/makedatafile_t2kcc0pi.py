@@ -96,36 +96,10 @@ with open("cross-section_analysisI.txt") as f:
                     ycent > yval and ycent < yhig):
                     maphist.SetBinContent(i+1,j+1, ibin)
 
-data1D = TH1D("datahist","datahist", datapoly.GetNumberOfBins(), 0.0, float(datapoly.GetNumberOfBins()));
-for i in range(datapoly.GetNumberOfBins()):
-    data1D.SetBinContent(i+1, datapoly.GetBinContent(i+1));
 
-outfile.cd()
-datahist.Write()
-counthist.Write()
-maphist.Write()
-datapoly.Write()
-data1D.Write()
-
-for i, obj in enumerate(histedgeslist):
-    print obj
-
-    hist = TH1D("dataslice_" + str(i), "dataslice_" + str(i), len(obj)-1, array('f',obj))
-    for j in range(hist.GetNbinsX()):
-        hist.SetBinContent(j+1, histxseclist[i][j])
-
-    hist.GetXaxis().SetRangeUser(obj[0], obj[len(obj)-2])
-    hist.Draw("HIST")
-    gPad.Update()
-
-    hist.SetNameTitle("dataslice_" + str(i),"dataslice_" + str(i))
-    hist.Write()
-
-# Get N Bins                                                                                                                                                                                                                               
+# Get Covariances (keep in 1E-38 cm^2)                 \
 nbins = 67
-print "NBins I = ", nbins
 
-# Get Covariances (keep in 1E-38 cm^2)                                                                                                                                                                                                      
 statcov = TH2D("analysis1_statcov","analysis1_statcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
 systcov = TH2D("analysis1_systcov","analysis1_systcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
 normcov = TH2D("analysis1_normcov","analysis1_normcov", nbins, 0.0, float(nbins), nbins, 0.0, float(nbins));
@@ -143,7 +117,7 @@ with open("covariance_statisticUncertainty_analysisI.txt") as f:
         xi, yi = GetIndex(data[0])
         cov    = float(data[1])
 
-        statcov.SetBinContent(xi, yi, cov)
+        statcov.SetBinContent(xi + 1, yi + 1, cov)
 
 with open("covariance_shapeSystematics_analysisI.txt") as f:
     count = 0
@@ -177,7 +151,35 @@ totcov.Add(systcov)
 totcov.Add(statcov)
 totcov.Add(normcov)
 
+
+data1D = TH1D("datahist","datahist", datapoly.GetNumberOfBins(), 0.0, float(datapoly.GetNumberOfBins()));
+for i in range(datapoly.GetNumberOfBins()):
+    data1D.SetBinContent(i+1, datapoly.GetBinContent(i+1));
+    data1D.SetBinError(i+1, sqrt(totcov.GetBinContent(i+1,i+1))*1E-38)
+
 outfile.cd()
+
+for i, obj in enumerate(histedgeslist):
+    print obj
+
+    hist = TH1D("dataslice_" + str(i), "dataslice_" + str(i), len(obj)-1, array('f',obj))
+    for j in range(hist.GetNbinsX()):
+        hist.SetBinContent(j+1, histxseclist[i][j])
+
+    hist.GetXaxis().SetRangeUser(obj[0], obj[len(obj)-2])
+    hist.Draw("HIST")
+    gPad.Update()
+
+    hist.SetNameTitle("dataslice_" + str(i),"dataslice_" + str(i))
+    hist.Write()
+
+
+outfile.cd()
+datahist.Write()
+counthist.Write()
+maphist.Write()
+datapoly.Write()
+data1D.Write()
 statcov.Write()
 systcov.Write()
 totcov.Write()
@@ -245,7 +247,7 @@ with open("rps_statsCov_analysis2.txt") as f:
         xi, yi = GetIndex(data[0])
         cov    = float(data[1])
 
-        statcov.SetBinContent(xi, yi, cov)
+        statcov.SetBinContent(xi + 1, yi + 1, cov)
 
 with open("rps_systCov_analysis2.txt") as f:
     count = 0
