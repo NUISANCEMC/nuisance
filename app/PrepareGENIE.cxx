@@ -45,7 +45,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   NtpMCEventRecord* genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
-  TH1D *fluxhist = new TH1D("flux", "flux", 1000, 0, 10);
+  TH1D* fluxhist = new TH1D("flux", "flux", 1000, 0, 10);
   fluxhist->Fill(MonoEnergy);
   fluxhist->Scale(1, "width");
 
@@ -238,7 +238,12 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   if (fluxvect.size() > 1) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
-      fluxhist = (TH1D*)fluxfile->Get(fluxvect[1].c_str());
+      fluxhist = dynamic_cast<TH1D*>(fluxfile->Get(fluxvect[1].c_str()));
+      if (!fluxhist) {
+        ERR(FTL) << "Couldn't find histogram named: \"" << fluxvect[1]
+                 << "\" in file: \"" << fluxvect[0] << std::endl;
+        throw;
+      }
       fluxhist->SetDirectory(0);
     } else {
       // Function with EnuRange
