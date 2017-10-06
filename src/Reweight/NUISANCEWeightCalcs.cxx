@@ -228,17 +228,14 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 	}
 
 
-	//	if (w != w || isnan(w)){
-	//          w = 0.0;
-	//	}
+	if (w != w || isnan(w) || w < 0.0){
+	  w = 0.0;
+	}
 
-	if (w < 1.0){
-	  //std::cout << "REMOVING SUPRPESSION" << std::endl;
+	if (w < 1.0 and !fAllowSuppression){
 	  w = 1.0;
-	} //else {
-	  //	  std::cout << "W = " << w << std::endl;
-	//	}
-	
+	} 
+
 	return w;
 }
 
