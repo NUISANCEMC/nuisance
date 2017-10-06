@@ -373,6 +373,9 @@ void ParseOptions(int argc, char* argv[]) {
     if (!std::strcmp(argv[i], "-h")) {
       flagopt = true;
       break;
+    } else if (!std::strcmp(argv[i], "-G")) {
+      fFluxInGeV = true;
+      continue;
     }
     if (i + 1 != argc) {
       // Cardfile
@@ -388,8 +391,6 @@ void ParseOptions(int argc, char* argv[]) {
       } else if (!std::strcmp(argv[i], "-f")) {
         fFluxFile = argv[i + 1];
         ++i;
-      } else if (!std::strcmp(argv[i], "-G")) {
-        fFluxInGeV = true;
       } else if (!std::strcmp(argv[i], "-m")) {
         fIsMonoEFlux = true;
         fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
