@@ -81,6 +81,7 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   // Make a total cross section hist for shits and giggles
   TH1D* entryHist = (TH1D*)xsecHist->Clone();
 
+  double MeanE = 0;
   for (int i = 0; i < nevts; ++i) {
     tn->GetEntry(i);
     NeutPart* part = fNeutVect->PartInfo(0);
@@ -92,12 +93,14 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
 
     xsecHist->Fill(E, xsec);
     entryHist->Fill(E);
+    MeanE += E;
 
     if (i % (nevts / 20) == 0) {
       LOG(FIT) << "Processed " << i << "/" << nevts << " NEUT events."
                << std::endl;
     }
   }
+  MeanE /= double(nevts);
   LOG(FIT) << "Processed all events" << std::endl;
 
   xsecHist->Divide(entryHist);
@@ -114,8 +117,10 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
       evtHist->Integral(0, -1) == 0) {
     ERR(WRN) << "The input file and flux histogram provided do not match... "
              << std::endl;
-    ERR(WRN) << "Are the units correct? Did you provide the correct flux file?"
-             << std::endl;
+    ERR(WRN) << "Are the units correct (MeanE = " << MeanE
+             << ", FluxHistoUpperLim: "
+             << fluxHist->GetXaxis()->GetBinUpEdge(1000)
+             << ")? Did you provide the correct flux file?" << std::endl;
     ERR(WRN) << "Use output with caution..." << std::endl;
   }
 
