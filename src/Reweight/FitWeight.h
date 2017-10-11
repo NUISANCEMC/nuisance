@@ -3,15 +3,6 @@
 
 #include "WeightUtils.h"
 #include "WeightEngineBase.h"
-#include "NEUTWeightEngine.h"
-#include "GENIEWeightEngine.h"
-#include "NuWroWeightEngine.h"
-#include "SampleNormEngine.h"
-#include "LikelihoodWeightEngine.h"
-#include "SplineWeightEngine.h"
-#include "NUISANCEWeightEngine.h"
-#include "T2KWeightEngine.h"
-#include "NIWGWeightEngine.h"
 
 #include <map>
 #include <vector>
@@ -46,7 +37,7 @@ public:
 
   double CalcWeight(BaseFitEvt* evt);
   bool HasRWDialChanged(const double* x) { return true; };
-  bool NeedsEventReWeight(const double* x);
+  // bool NeedsEventReWeight(const double* x);
 
   void SetAllDials(const double* x, int n);
 
