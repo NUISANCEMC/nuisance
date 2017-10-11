@@ -30,8 +30,8 @@ void GlobalDialList::RegisterDialEnum(std::string name, int type,
     return;
   }
 
-  LOG(FIT) << "Registed Dial Enum : " << name << " " << type << " " << nuisenum
-           << std::endl;
+  LOG(FIT) << "Registered Dial Enum : " << name << " " << type << " "
+           << nuisenum << std::endl;
   fAllDialNames.push_back(name);
   fAllDialTypes.push_back(type);
   fAllDialEnums.push_back(nuisenum);
