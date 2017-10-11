@@ -63,7 +63,7 @@ public:
 
   // ---- HELPER/ACCESS FUNCTIONS ---- //
   /// Return True Interaction ID
-  inline int GetMode    (void) const { return fMode;    };
+  inline int GetMode    (void) const { return Mode;    };
   /// Return Target Atomic Number
   inline int GetTargetA (void) const { return fTargetA; };
   /// Return Target Nuclear Charge
@@ -72,9 +72,9 @@ public:
   inline int GetTotCrs  (void) const { return fTotCrs;  };
 
   /// Is Event Charged Current?
-  inline bool IsCC() const { return (abs(fMode) <= 30); };
+  inline bool IsCC() const { return (abs(Mode) <= 30); };
   /// Is Event Neutral Current?
-  inline bool IsNC() const { return (abs(fMode) > 30);  };
+  inline bool IsNC() const { return (abs(Mode) > 30);  };
 
   /// Return Particle 4-momentum for given index in particle stack
   TLorentzVector GetParticleP4    (int index) const;
@@ -600,10 +600,6 @@ public:
 
 
   // Event Information
-  double weight;  // need for silly reason
-  int Mode;  // Public access needed
-
-  int fMode;
   UInt_t fEventNo;
   double fTotCrs;
   int fTargetA;

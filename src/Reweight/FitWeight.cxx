@@ -54,6 +54,7 @@ void FitWeight::AddRWEngine(int type) {
       break;
     case kMODENORM:
       fAllRW[type] = new ModeNormEngine();
+      break;
     default:
       THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
       break;

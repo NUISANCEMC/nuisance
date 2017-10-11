@@ -389,16 +389,12 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   FitEvent* evt = fNUISANCEEvent;
 
   // Sort Event Info
-  evt->fMode = ConvertNuwroMode(fNuWroEvent);
+  evt->Mode = ConvertNuwroMode(fNuWroEvent);
 
-  if (abs(evt->fMode) > 60) {
-    evt->fMode = 0;
-
-    // Remove failed mode converts
-    // return;
+  if (abs(evt->Mode) > 60) {
+    evt->Mode = 0;
   }
 
-  evt->Mode = evt->fMode;
   evt->fEventNo = 0.0;
   evt->fTotCrs = 0.0;
   evt->fTargetA = fNuWroEvent->par.nucleus_p + fNuWroEvent->par.nucleus_n;
