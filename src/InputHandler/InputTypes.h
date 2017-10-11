@@ -33,15 +33,14 @@ enum generator_event_type {
   kNUANCE = 7,
   kGiBUU = 8,
   kNORM = 9,
-  kMODENORM = 10,
-  kEMPTY = 11,
-  kINPUTFITEVENT = 12,
-  kNEWSPLINE = 13,
-  kLIKEWEIGHT = 14,
-  kSPLINEPARAMETER = 15,
-  kHEPMC = 16,
-  kHISTO = 17,
-  kSIGMAQ0HIST = 18,
+  kEMPTY = 10,
+  kINPUTFITEVENT = 11,
+  kNEWSPLINE = 12,
+  kLIKEWEIGHT = 13,
+  kSPLINEPARAMETER = 14,
+  kHEPMC = 15,
+  kHISTO = 16,
+  kSIGMAQ0HIST = 17,
   kLast_generator_event_type
 };
 
@@ -100,9 +99,6 @@ inline std::ostream& operator<<(std::ostream& os,
   }
   case kNORM: {
     return os << "kNORM";
-  }
-  case kMODENORM: {
-    return os << "kMODENORM";
   }
   case kHEPMC: {
     return os << "kHEPMC";

@@ -1,6 +1,16 @@
 #include "FitWeight.h"
 
+#include "GENIEWeightEngine.h"
+#include "LikelihoodWeightEngine.h"
+#include "ModeNormEngine.h"
+#include "NEUTWeightEngine.h"
+#include "NIWGWeightEngine.h"
+#include "NUISANCEWeightEngine.h"
+#include "NuWroWeightEngine.h"
 #include "OscWeightEngine.h"
+#include "SampleNormEngine.h"
+#include "SplineWeightEngine.h"
+#include "T2KWeightEngine.h"
 
 void FitWeight::AddRWEngine(int type) {
   switch (type) {
@@ -42,6 +52,8 @@ void FitWeight::AddRWEngine(int type) {
     case kOSCILLATION:
       fAllRW[type] = new OscWeightEngine();
       break;
+    case kMODENORM:
+      fAllRW[type] = new ModeNormEngine();
     default:
       THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
       break;
@@ -49,53 +61,14 @@ void FitWeight::AddRWEngine(int type) {
 }
 
 WeightEngineBase* FitWeight::GetRWEngine(int type) {
-  switch (type) {
-    case kNEUT:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kNUWRO:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kGENIE:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kNORM:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kLIKEWEIGHT:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kT2K:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kCUSTOM:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kSPLINEPARAMETER:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kNIWG:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    case kOSCILLATION:
-      if (fAllRW.count(type)) {
-        return fAllRW[type];
-      }
-    default: { THROW("CANNOT get RW Engine for dial type: " << type); }
+  if (HasRWEngine(type)) {
+    return fAllRW[type];
   }
+  THROW("CANNOT get RW Engine for dial type: " << type);
 }
 
-bool FitWeight::HasRWEngine(int type){
-switch (type) {
+bool FitWeight::HasRWEngine(int type) {
+  switch (type) {
     case kNEUT:
     case kNUWRO:
     case kGENIE:
@@ -105,7 +78,7 @@ switch (type) {
     case kCUSTOM:
     case kSPLINEPARAMETER:
     case kNIWG:
-    case kOSCILLATION:{
+    case kOSCILLATION: {
       return fAllRW.count(type);
     }
     default: { THROW("CANNOT get RW Engine for dial type: " << type); }
@@ -167,12 +140,11 @@ void FitWeight::SetDialValue(std::string name, double val) {
 // Allow for name aswell using GlobalList to determine sample name.
 void FitWeight::SetDialValue(int nuisenum, double val) {
   // Conv dial type
-  int dialtype = int(nuisenum - (nuisenum % 1000)) / 1000;
+  int dialtype = Reweight::GetDialType(nuisenum);
 
   if (fAllRW.find(dialtype) == fAllRW.end()) {
     THROW("Cannot find RW Engine for dialtype = "
-          << dialtype << " " << nuisenum << " "
-          << (nuisenum - (nuisenum % 1000)) / 1000);
+          << dialtype << ", " << Reweight::RemoveDialType(nuisenum));
   }
 
   // Get RW Engine for this dial
@@ -232,8 +204,6 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
   for (std::map<int, WeightEngineBase*>::iterator iter = fAllRW.begin();
        iter != fAllRW.end(); iter++) {
     double w = (*iter).second->CalcWeight(evt);
-    // LOG(FIT) << "Iter " << (*iter).second->fCalcName << " = " << w <<
-    // std::endl;
     rwweight *= w;
   }
   return rwweight;
@@ -254,30 +224,30 @@ void FitWeight::GetAllDials(double* x, int n) {
   }
 }
 
-bool FitWeight::NeedsEventReWeight(const double* x) {
-  bool haschange = false;
-  size_t count = 0;
+// bool FitWeight::NeedsEventReWeight(const double* x) {
+//   bool haschange = false;
+//   size_t count = 0;
 
-  // Compare old to new and decide if RW needed.
-  for (std::vector<int>::iterator iter = fEnumList.begin();
-       iter != fEnumList.end(); iter++) {
-    int nuisenum = (*iter);
-    int type = (nuisenum / 1000) - (nuisenum % 1000);
+//   // Compare old to new and decide if RW needed.
+//   for (std::vector<int>::iterator iter = fEnumList.begin();
+//        iter != fEnumList.end(); iter++) {
+//     int nuisenum = (*iter);
+//     int type = (nuisenum / 1000) - (nuisenum % 1000);
 
-    // Compare old to new
-    double oldval = GetDialValue(nuisenum);
-    double newval = x[count];
-    if (oldval != newval) {
-      if (fAllRW[type]->NeedsEventReWeight()) {
-        haschange = true;
-      }
-    }
+//     // Compare old to new
+//     double oldval = GetDialValue(nuisenum);
+//     double newval = x[count];
+//     if (oldval != newval) {
+//       if (fAllRW[type]->NeedsEventReWeight()) {
+//         haschange = true;
+//       }
+//     }
 
-    count++;
-  }
+//     count++;
+//   }
 
-  return haschange;
-}
+//   return haschange;
+// }
 
 double FitWeight::GetSampleNorm(std::string name) {
   if (name.empty()) return 1.0;
