@@ -202,7 +202,7 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
       }
 
       // Get Status
-      int state = GetGENIEParticleStatus(p, fNUISANCEEvent->fMode);
+      int state = GetGENIEParticleStatus(p, fNUISANCEEvent->Mode);
       if (state != genie::kIStInitialState) {
         continue;
       }
@@ -362,10 +362,9 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   if (!fGenieGHep) return;
 
   // Convert GENIE Reaction Code
-  fNUISANCEEvent->fMode = ConvertGENIEReactionCode(fGenieGHep);
+  fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
 
   // Set Event Info
-  fNUISANCEEvent->Mode = fNUISANCEEvent->fMode;
   fNUISANCEEvent->fEventNo = 0.0;
   fNUISANCEEvent->fTotCrs = fGenieGHep->XSec();
   fNUISANCEEvent->fTargetA = 0.0;
@@ -393,7 +392,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
     if (!p) continue;
 
     // Get Status
-    int state = GetGENIEParticleStatus(p, fNUISANCEEvent->fMode);
+    int state = GetGENIEParticleStatus(p, fNUISANCEEvent->Mode);
 
     // Remove Undefined
     if (kRemoveUndefParticles && state == kUndefinedState) continue;

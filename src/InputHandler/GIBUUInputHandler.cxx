@@ -194,8 +194,7 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
   // Reset all variables
   fNUISANCEEvent->ResetEvent();
   FitEvent* evt = fNUISANCEEvent;
-  evt->fMode = fGiReader->GiBUU2NeutCode;
-  evt->Mode = evt->fMode;
+  evt->Mode = fGiReader->GiBUU2NeutCode;
   evt->fEventNo = 0.0;
   evt->fTotCrs = 0;
   evt->fTargetA = 0.0;  // Change to get these from nuclear remnant.

@@ -160,8 +160,7 @@ void NUANCEInputHandler::CalcNUISANCEKinematics() {
 	FitEvent* evt = fNUISANCEEvent;
 
 	// Fill Global
-	evt->fMode = ConvertNuanceMode(fNuanceEvent);
-	evt->Mode = evt->fMode;
+	evt->Mode = ConvertNuanceMode(fNuanceEvent);
 	evt->fEventNo = 0.0;
 	evt->fTotCrs = 1.0;
 	evt->fTargetA = 0.0;

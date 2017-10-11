@@ -232,7 +232,6 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->ResetEvent();
 
   // Fill Globals
-  fNUISANCEEvent->fMode = fNeutVect->Mode;
   fNUISANCEEvent->Mode = fNeutVect->Mode;
   fNUISANCEEvent->fEventNo = fNeutVect->EventNo;
   fNUISANCEEvent->fTargetA = fNeutVect->TargetA;

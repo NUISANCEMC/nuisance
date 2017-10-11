@@ -289,8 +289,6 @@ void MeasurementBase::FillHistogramsFromBox(MeasurementVariableBox* var,
   fXVar = var->GetX();
   fYVar = var->GetY();
   fZVar = var->GetZ();
-  // Signal = var->fSignal;
-  // Mode   = var->fMode;
   Weight = weight;
   fEventVariables = var;
 

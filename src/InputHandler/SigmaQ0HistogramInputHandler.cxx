@@ -204,7 +204,6 @@ void SigmaQ0HistogramInputHandler::FillNuisanceEvent(double q0, double sig) {
   fNUISANCEEvent->ResetEvent();
 
   // Fill Globals
-  fNUISANCEEvent->fMode    = 1; // Assume CCQE for now...
   fNUISANCEEvent->Mode     = 1;
 
   fNUISANCEEvent->fEventNo = 0;

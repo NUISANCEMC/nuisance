@@ -185,6 +185,9 @@ double FitBase::RWAbsToSigma(std::string const &type, std::string const &name,
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.GetX(val);
   if (fabs(conv_val) < 1E-10) conv_val = 0.0;
+
+  std::cout << "AbsToSigma(" << name << ") = " << val << " -> " << conv_val
+            << std::endl;
   return conv_val;
 }
 
@@ -439,9 +442,7 @@ int Reweight::GetDialType(int type) {
   int t = (type / 1000);
   return t > kMODENORM ? Reweight::kNoDialFound : t;
 }
-int Reweight::RemoveDialType(int type){
-  return (type%1000);
-}
+int Reweight::RemoveDialType(int type) { return (type % 1000); }
 
 int Reweight::NEUTEnumFromName(std::string const &name) {
 #ifdef __NEUT_ENABLED__
