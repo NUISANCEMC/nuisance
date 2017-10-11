@@ -7,7 +7,7 @@
 
 class ModeNormEngine : public WeightEngineBase {
  public:
-  ModeNormEngine(std::string name="ModeNormEngine") : fName(name){};
+  ModeNormEngine(std::string name = "ModeNormEngine") : fName(name){};
   ~ModeNormEngine(){};
 
   void IncludeDial(std::string name, double startval) {
@@ -34,8 +34,11 @@ class ModeNormEngine : public WeightEngineBase {
   }
 
   void Reconfigure(bool silent = false) { (void)silent; }
+
+  static int ModeToDial(int mode) { return 60 + mode; }
+
   double CalcWeight(BaseFitEvt* evt) {
-    int mode = abs(evt->Mode);
+    int mode = ModeToDial(abs(evt->Mode));
     if (!fDialEnumIndex.count(mode)) {
       return 1;
     }
@@ -67,7 +70,7 @@ class ModeNormEngine : public WeightEngineBase {
                << "\" as a mode norm dial but failed." << std::endl;
       throw;
     }
-    return 60 + mode_num;
+    return ModeToDial(mode_num);
   }
 
   std::map<int, int> fDialEnumIndex;
