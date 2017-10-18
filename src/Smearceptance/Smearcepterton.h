@@ -27,6 +27,61 @@
 #include <map>
 #include <string>
 
+
+#ifdef __USE_DYNSAMPLES__
+/// Expect each .so containing smearceptors to supply 4 c-style methods.
+/// int DSF_NSmearceptors();
+/// char const * DSF_GetSmearceptorName(int);
+/// ISmearcepter* DSF_GetSmearceptor(int, nuiskey *);
+/// void DSF_DestroySmearceptor(ISmearcepter *);
+class DynamicSmearceptorFactory {
+  size_t NSmearceptors;
+  size_t NManifests;
+
+  DynamicSmearceptorFactory();
+
+  static DynamicSmearceptorFactory* glblDSF;
+
+  typedef int (*DSF_NSmearceptors_ptr)(void);
+  typedef char const* (*DSF_GetSmearceptorName_ptr)(int);
+  typedef ISmearcepter* (*DSF_GetSmearceptor_ptr)(int, nuiskey *);
+  typedef void (*DSF_DestroySmearceptor_ptr)(ISmearcepter*);
+
+  struct PluginManifest {
+    void* dllib;
+
+    DSF_NSmearceptors_ptr DSF_NSmearceptors;
+    DSF_GetSmearceptorName_ptr DSF_GetSmearceptorName;
+    DSF_GetSmearceptor_ptr DSF_GetSmearceptor;
+    DSF_DestroySmearceptor_ptr DSF_DestroySmearceptor;
+
+    std::string soloc;
+    std::vector<ISmearcepter*> Instances;
+    std::vector<std::string> SmearceptorsProvided;
+    size_t NSmearceptors;
+    ~PluginManifest();
+  };
+
+  std::map<std::string, PluginManifest> Manifests;
+  std::map<std::string, std::pair<std::string, int> > Smearceptors;
+
+  void LoadPlugins();
+
+ public:
+  static DynamicSmearceptorFactory& Get();
+
+  void Print();
+
+  bool HasSmearceptor(std::string const& name);
+  bool HasSmearceptor(nuiskey& smearceptorkey);
+
+  ISmearcepter* CreateSmearceptor(nuiskey& smearceptorkey);
+
+  ~DynamicSmearceptorFactory();
+};
+
+#endif
+
 /// Singleton handling the loading and configuring of known smearcepters.
 class Smearcepterton {
   Smearcepterton();

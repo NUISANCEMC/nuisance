@@ -1,0 +1,88 @@
+# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#!/bin/bash
+
+if [ ! "${1}" ] || [ ! -e ${1} ] || [ ! "${2}" ]; then
+  echo "[USAGE]: ${0} input.cxx outputLibName.so [classname]"
+  exit 1
+fi
+
+if [ ! "${3}" ]; then
+  CN=$(grep "class .*" $1 | sed "s/^class \([0-9a-zA-Z]\+\).*$/\1/g")
+else
+  CN=${3}
+fi
+
+if [ ! "${CN}" ]; then
+  echo "[ERROR]: Couldn't find class name -- Expected to find a line like: \"class XXXX : public ISmearcepter\" in \"$1\". You can also forcibly specify your classes name by passing a third argument to this script."
+  exit 1
+fi
+
+if [ ! -e compile.tmp ]; then
+  mkdir compile.tmp
+fi
+
+cat $1 > compile.tmp/$1
+
+echo -e "static char const * SmearceptorNames[] = {\"${CN}\"};\n"\
+"static int const NSmearceptors = 1;\n"\
+"\n"\
+"extern \"C\" {\n"\
+"int DSF_NSmearceptors() { return NSmearceptors; }\n"\
+"char const* DSF_GetSmearceptorName(int i) {\n"\
+"  if (i < NSmearceptors) {\n"\
+"    return SmearceptorNames[i];\n"\
+"  }\n"\
+"  return 0;\n"\
+"}\n"\
+"ISmearcepter* DSF_GetSmearceptor(int i, void* smearceptorkey) {\n"\
+"  nuiskey* sk = reinterpret_cast<nuiskey *>(smearceptorkey);\n"\
+"  if (!sk) {\n"\
+"    return 0;\n"\
+"  }\n"\
+"\n"\
+"  if (sk->GetS(\"name\") != DSF_GetSmearceptorName(i)) {\n"\
+"    std::cout\n"\
+"        << \"[ERROR]: When instantiating dynamic smearceptor. Smearceptorkey named: \"\n"\
+"        << sk->GetS(\"name\") << \", but requested smearceptor named: \"\n"\
+"        << DSF_GetSmearceptorName(i)\n"\
+"        << \". It is possible that the nuiskey object is lost in translation. \"\n"\
+"           \"Was NUISANCE and this dynamic smearceptor manifest built with the same \"\n"\
+"           \"environment and compiler?\"\n"\
+"        << std::endl;\n"\
+"  }\n"\
+"\n"\
+"  if (i == 0) {\n"\
+"    ISmearcepter* sm = new ${CN}();\n"\
+"    sm->Setup(*sk);\n"\
+"  }\n"\
+"  return 0;\n"\
+"}\n"\
+"void DSF_DestroySmearceptor(ISmearcepter* mb) { delete mb; }\n"\
+"}" >> compile.tmp/$1
+
+echo "g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@"
+
+if ! g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@; then
+  echo "[ERROR]: Failed to compile $1. Generated code can be found in ./compile.tmp/$1"
+else
+  rm -r compile.tmp
+  echo "Successfully build: $2."
+fi
