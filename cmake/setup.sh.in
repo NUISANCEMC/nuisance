@@ -78,6 +78,19 @@ if [ ! "${ROOTSYS}" ]; then
   source "@CMAKE_ROOTSYS@/bin/thisroot.sh"
 fi
 
+if [ "@USE_T2K@" != "FALSE" ]; then
+  echo "[INFO]: Adding T2K paths to the environment."
+  export T2KREWEIGHT=@T2KREWEIGHT@
+  add_to_LD_LIBRARY_PATH "@T2KREWEIGHT@/lib"
+fi
+
+if [ "@USE_NIWG@" != "FALSE" ]; then
+  echo "[INFO]: Adding NIWG paths to the environment."
+  export NIWG=@NIWG_ROOT@
+  export NIWGREWEIGHT_INPUTS=@NIWG_ROOT@/inputs
+  add_to_LD_LIBRARY_PATH "@NIWG_ROOT@"
+fi
+
 if [ "@USE_NEUT@" != "FALSE" ]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
   export NEUT_ROOT=@NEUT_ROOT@
@@ -132,19 +145,6 @@ if [ "@USE_GENIE@" != "FALSE" ]; then
 
   add_to_LD_LIBRARY_PATH "@GENIE@/lib" "@LHAPDF_LIB@" "@LIBXML2_LIB@" "@LOG4CPP_LIB@"
 
-fi
-
-if [ "@USE_NIWG@" != "FALSE" ]; then
-  echo "[INFO]: Adding NIWG paths to the environment."
-  export NIWG=@NIWG_ROOT@
-  export NIWGREWEIGHT_INPUTS=@NIWG_ROOT@/inputs
-  add_to_LD_LIBRARY_PATH "@NIWG_ROOT@"
-fi
-
-if [ "@USE_T2K@" != "FALSE" ]; then
-  echo "[INFO]: Adding T2K paths to the environment."
-  export T2KREWEIGHT=@T2KREWEIGHT@
-  add_to_LD_LIBRARY_PATH "@T2KREWEIGHT@/lib"
 fi
 
 if [ "@BUILD_GiBUU@" != "FALSE" ]; then
