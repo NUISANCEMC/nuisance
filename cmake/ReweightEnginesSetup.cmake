@@ -17,6 +17,24 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+##################################  T2K   ######################################
+if(USE_T2K)
+  include(${CMAKE_SOURCE_DIR}/cmake/T2KSetup.cmake)
+  cmessage(STATUS "Using T2K Reweight engine.")
+  set(USE_T2K TRUE CACHE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>" FORCE)
+endif()
+##################################  NIWG  ######################################
+if(USE_NIWG)
+  include(${CMAKE_SOURCE_DIR}/cmake/NIWGSetup.cmake)
+  cmessage(STATUS "Using NIWG Reweight engine.")
+  set(USE_NIWG TRUE CACHE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>" FORCE)
+endif()
+##################################  MINERvA   ######################################
+if(USE_MINERvA_RW)
+  include(${CMAKE_SOURCE_DIR}/cmake/MINERvASetup.cmake)
+  cmessage(STATUS "Using MINERvA Reweight engine.")
+  set(USE_MINERvA_RW TRUE CACHE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>" FORCE)
+endif()
 ##################################  NEUT  ######################################
 if(USE_NEUT)
   include(${CMAKE_SOURCE_DIR}/cmake/NEUTSetup.cmake)
@@ -36,24 +54,6 @@ if(USE_GENIE)
   set(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)
 endif()
 
-##################################  NIWG  ######################################
-if(USE_NIWG)
-  include(${CMAKE_SOURCE_DIR}/cmake/NIWGSetup.cmake)
-  cmessage(STATUS "Using NIWG Reweight engine.")
-  set(USE_NIWG TRUE CACHE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>" FORCE)
-endif()
-##################################  T2K   ######################################
-if(USE_T2K)
-  include(${CMAKE_SOURCE_DIR}/cmake/T2KSetup.cmake)
-  cmessage(STATUS "Using T2K Reweight engine.")
-  set(USE_T2K TRUE CACHE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>" FORCE)
-endif()
-##################################  MINERvA   ######################################
-if(USE_MINERvA_RW)
-  include(${CMAKE_SOURCE_DIR}/cmake/MINERvASetup.cmake)
-  cmessage(STATUS "Using MINERvA Reweight engine.")
-  set(USE_MINERvA_RW TRUE CACHE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>" FORCE)
-endif()
 ################################################################################
 
 ################################  Prob3++   ####################################

@@ -200,6 +200,12 @@ if(USE_DYNSAMPLES)
   install(PROGRAMS
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" DESTINATION
     bin)
+
+  configure_file(cmake/BuildDynamicSmearcepter.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" @ONLY)
+  install(PROGRAMS
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" DESTINATION
+    bin)
 endif()
 
 install(PROGRAMS
