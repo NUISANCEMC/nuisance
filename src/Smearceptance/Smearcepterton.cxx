@@ -255,18 +255,18 @@ bool DynamicSmearceptorFactory::HasSmearceptor(std::string const& name) {
   return Smearceptors.count(name);
 }
 bool DynamicSmearceptorFactory::HasSmearceptor(nuiskey& smearceptorkey) {
-  return HasSmearceptor(smearceptorkey.GetS("name"));
+  return HasSmearceptor(smearceptorkey.GetElementName());
 }
 ISmearcepter* DynamicSmearceptorFactory::CreateSmearceptor(
     nuiskey& smearceptorkey) {
   if (!HasSmearceptor(smearceptorkey)) {
     ERROR(WRN, "Asked to load unknown smearceptor: \""
-                   << smearceptorkey.GetS("name") << "\".");
+                   << smearceptorkey.GetElementName() << "\".");
     return NULL;
   }
 
   std::pair<std::string, int> smearceptor =
-      Smearceptors[smearceptorkey.GetS("name")];
+      Smearceptors[smearceptorkey.GetElementName()];
   QLOG(SAM, "\tLoading smearceptor " << smearceptor.second << " from "
                                      << smearceptor.first);
 
@@ -322,6 +322,10 @@ void Smearcepterton::InitialiserSmearcepters() {
           continue;
         }
         smearer = factories[smearType](smearcepters[smear_it]);
+      }
+
+      if(!smearer){
+        THROW("Failed to load smearceptor.");
       }
 
       Smearcepters[smearer->GetName()] = smearer;
