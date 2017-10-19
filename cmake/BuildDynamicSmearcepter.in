@@ -72,6 +72,7 @@ echo -e "static char const * SmearceptorNames[] = {\"${CN}\"};\n"\
 "  if (i == 0) {\n"\
 "    ISmearcepter* sm = new ${CN}();\n"\
 "    sm->Setup(*sk);\n"\
+"    return sm;\n"\
 "  }\n"\
 "  return 0;\n"\
 "}\n"\
