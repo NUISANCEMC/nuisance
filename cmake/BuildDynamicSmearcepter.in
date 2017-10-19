@@ -58,10 +58,10 @@ echo -e "static char const * SmearceptorNames[] = {\"${CN}\"};\n"\
 "    return 0;\n"\
 "  }\n"\
 "\n"\
-"  if (sk->GetS(\"name\") != DSF_GetSmearceptorName(i)) {\n"\
+"  if (sk->GetElementName() != DSF_GetSmearceptorName(i)) {\n"\
 "    std::cout\n"\
 "        << \"[ERROR]: When instantiating dynamic smearceptor. Smearceptorkey named: \"\n"\
-"        << sk->GetS(\"name\") << \", but requested smearceptor named: \"\n"\
+"        << sk->GetElementName() << \", but requested smearceptor named: \"\n"\
 "        << DSF_GetSmearceptorName(i)\n"\
 "        << \". It is possible that the nuiskey object is lost in translation. \"\n"\
 "           \"Was NUISANCE and this dynamic smearceptor manifest built with the same \"\n"\
