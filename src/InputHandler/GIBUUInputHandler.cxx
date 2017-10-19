@@ -71,7 +71,8 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle,
     int NFluxes = bool(dynamic_cast<TH1D*>(inp_file->Get("numu_flux"))) +
                   bool(dynamic_cast<TH1D*>(inp_file->Get("numub_flux"))) +
                   bool(dynamic_cast<TH1D*>(inp_file->Get("nue_flux"))) +
-                  bool(dynamic_cast<TH1D*>(inp_file->Get("nueb_flux")));
+                  bool(dynamic_cast<TH1D*>(inp_file->Get("nueb_flux"))) +
+                  bool(dynamic_cast<TH1D*>(inp_file->Get("e_flux")));
 
     if (NFluxes != 1) {
       THROW("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
