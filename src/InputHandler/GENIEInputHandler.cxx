@@ -116,7 +116,11 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle, std::string cons
   fEventType = kGENIE;
   fGenieNtpl = NULL;
   fGENIETree->SetBranchAddress("gmcrec", &fGenieNtpl);
+
+  // Libraries should be seen but not heard...
+  StopTalking();
   fGENIETree->GetEntry(0);
+  StartTalking();
 
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
