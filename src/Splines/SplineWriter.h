@@ -2,7 +2,7 @@
 #define SPLINEWRITER_H
 #include "FitWeight.h"
 #include "Spline.h"
-#include "FitParameters.h"
+
 #include "SplineUtils.h"
 #ifdef __MINUIT2_ENABLED__
 #include "TFitterMinuit.h"

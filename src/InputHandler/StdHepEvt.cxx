@@ -76,24 +76,6 @@ bool GiBUUStdHepReader::SetBranchAddresses(TChain *chain) {
     ERR(WRN) << "Failed to set branch address for \"EvtWght\": " << SBAStatus
              << std::endl;
   }
-  SBAStatus = chain->SetBranchAddress("SpeciesWght_numu", &SpeciesWght_numu);
-  ok = ok && (SBAStatus || SBAStatus == 5);
-  if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"SpeciesWght_numu\": "
-             << SBAStatus << std::endl;
-  }
-  SBAStatus = chain->SetBranchAddress("SpeciesWght_nue", &SpeciesWght_nue);
-  ok = ok && (SBAStatus || SBAStatus == 5);
-  if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"SpeciesWght_nue\": "
-             << SBAStatus << std::endl;
-  }
-  SBAStatus = chain->SetBranchAddress("SpeciesWght", &SpeciesWght);
-  ok = ok && (SBAStatus || SBAStatus == 5);
-  if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"SpeciesWght\": "
-             << SBAStatus << std::endl;
-  }
   return ok;
 }
 

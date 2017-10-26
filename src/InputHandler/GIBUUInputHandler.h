@@ -53,6 +53,9 @@ public:
 	/// Returns NUISANCE Format Event from GiReader
 	FitEvent* GetNuisanceEvent(const UInt_t entry, const bool lightweight = false);
 
+	/// Override to handle the fact that GiBUU already averages over nevents.
+	void SetupJointInputs();
+
 	/// Fill NUISANCE Particle Stack
 	void CalcNUISANCEKinematics();
 

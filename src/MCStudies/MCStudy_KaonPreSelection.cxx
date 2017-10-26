@@ -73,7 +73,7 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
     this->TotalIntegratedFlux();
 
   // Create a new TTree and add Nuisance Events Branches
-  FitPar::Config().out->cd();
+  Config::Get().out->cd();
   fEventTree = new TTree("nuisance_events","nuisance_events");
   GetInput()->GetNuisanceEvent(0)->AddBranchesToTree(fEventTree);
 
@@ -140,7 +140,7 @@ MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string
 //********************************************************************
 void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
 //********************************************************************
-  
+
   // Reset
   kplusmom = -999.9;
 
@@ -165,7 +165,7 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
     if (fKaonLogging){
       int nstrangemesons = event->NumParticle(321);
       int nstrangefsmesons = event->NumFSParticle(321);
-      
+
       if (nstrangemesons > 0){
 	std::cout << "New Event ----------------------------" << std::endl;
 	std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;

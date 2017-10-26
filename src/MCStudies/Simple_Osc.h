@@ -22,11 +22,6 @@
 
 #include "Measurement1D.h"
 
-/// A simple MCStudy measurement for making and fitting fake EnuRecQE data.
-///
-/// Run as a normal sample to generate fake data.
-/// Include extra attribute Target_Simple_Osc_File in the sample xml element
-// whose value points to a nuiscomp output file to use as fake data for a fit.
 class Simple_Osc : public Measurement1D {
 public:
   Simple_Osc(nuiskey samplekey);

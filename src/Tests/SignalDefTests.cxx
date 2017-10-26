@@ -18,13 +18,10 @@ struct ConstructibleFitEvent : public FitEvent {
     fParticlePDG[fNParticles] = PDG;
     fNParticles++;
   }
-  void SetMode(int mode) {
-    fMode = mode;
-    Mode = mode;
-  }
+  void SetMode(int mode) { Mode = mode; }
   std::string ToString() {
     std::stringstream ss("");
-    ss << "Mode: " << fMode << std::endl;
+    ss << "Mode: " << Mode << std::endl;
     ss << "Particles: " << fNParticles << std::endl;
     ss << " -> Particle Stack " << std::endl;
     for (int i = 0; i < fNParticles; i++) {
@@ -67,8 +64,7 @@ ConstructibleFitEvent MakePDGStackEvent(int (&ISpdgs)[N], int (&FSpdgs)[M],
 }
 
 int main(int argc, char const *argv[]) {
-
-  bool FailOnFail = (argc>1);
+  bool FailOnFail = (argc > 1);
   LOG_VERB(SAM);
 
   LOG(FIT) << "*            Running SignalDef Tests" << std::endl;
@@ -254,7 +250,7 @@ int main(int argc, char const *argv[]) {
   isCCQELike_PassExpectations[&fe_CC0pi_2] = true;    // numu CC0pi (2p2h)
   isCCQELike_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
   isCCQELike_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isCCQELike_PassExpectations[&fe_CC1pip_1] = true;  // numu CC1pip (2p2h)
+  isCCQELike_PassExpectations[&fe_CC1pip_1] = true;   // numu CC1pip (2p2h)
   isCCQELike_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
   isCCQELike_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
   isCCQELike_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
@@ -382,7 +378,7 @@ int main(int argc, char const *argv[]) {
   isCC1pi_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
   isCC1pi_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
   isCC1pi_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCC1pi_PassExpectations[&fe_CCCOH_1] = true;   // numu CC COH pi
+  isCC1pi_PassExpectations[&fe_CCCOH_1] = true;    // numu CC COH pi
   isCC1pi_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
   isCC1pi_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
   isCC1pi_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi

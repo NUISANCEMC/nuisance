@@ -36,7 +36,7 @@
 
 #include "FitEvent.h"
 #include "JointFCN.h"
-#include "FitParameters.h"
+
 #include "GeneralUtils.h"
 #include "NuisConfig.h"
 #include "NuisKey.h"

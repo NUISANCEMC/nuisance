@@ -20,25 +20,46 @@
 #ifndef THRESHOLDACCEPTER_HXX_SEEN
 #define THRESHOLDACCEPTER_HXX_SEEN
 
+// #define DEBUG_THRESACCEPT
+
 #include "ISmearcepter.h"
 
 #include <map>
 
 class ThresholdAccepter : public ISmearcepter {
+
+ public:
+  enum KineVar {
+    kMomentum,
+    kKE,
+    kCosTheta_Max,
+    kCosTheta_Min,
+    kAbsCosTheta_Max,
+    kAbsCosTheta_Min,
+    kNoVar
+  };
+
   struct Thresh {
-    bool ThresholdIsKE;
+    KineVar ThresholdType;
     double ThresholdVal;
   };
   struct VisThresh : public Thresh {
     bool UseKE;
+    double Fraction;
   };
 
-  std::map<int, Thresh> ReconThresholds;
+ private:
+  std::map<int, std::vector<Thresh> > ReconThresholds;
   std::map<int, VisThresh> VisThresholds;
 
   void SpecifcSetup(nuiskey &);
 
  public:
+  void SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
+#ifdef DEBUG_THRESACCEPT
+  , size_t p_it
+#endif
+    );
   RecoInfo *Smearcept(FitEvent *);
 };
 

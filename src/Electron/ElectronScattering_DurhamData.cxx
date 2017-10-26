@@ -354,20 +354,21 @@ bool ElectronScattering_DurhamData::isSignal(FitEvent* event) {
   // std::endl;
   // std::cout << "fZVar = " << fZVar << " " << fZLowLim << " " << fZHighLim <<
   // std::endl;
+  // std::cout << "iWeight: " << event->InputWeight << std::endl;
 
   if (fXVar < fXLowLim or fXVar > fXHighLim) {
-    // std::cout << "Ev Cut due to X lims: " << fYLowLim << " -- " << fXHighLim
-              // << " !<> " << fXVar << std::endl;
+    // std::cout << "Ev Cut due to X lims: " << fXLowLim << " -- " << fXHighLim
+    //           << " !<> " << fXVar << std::endl;
     return false;
   }
   if (fYVar < fYLowLim or fYVar > fYHighLim) {
-    // std::cout << "Ev Cut due to Y lims: " << fYLowLim << " -- " << fXHighLim
-              // << " !<> " << fXVar << std::endl;
+    // std::cout << "Ev Cut due to Y lims: " << fYLowLim << " -- " << fYHighLim
+    //           << " !<> " << fXVar << std::endl;
     return false;
   }
   if (fZVar < fZLowLim or fZVar > fZHighLim) {
-    // std::cout << "Ev Cut due to Z lims: " << fYLowLim << " -- " << fXHighLim
-              // << " !<> " << fXVar << std::endl;
+    // std::cout << "Ev Cut due to Z lims: " << fZLowLim << " -- " << fZHighLim
+    //           << " !<> " << fXVar << std::endl;
     return false;
   }
 

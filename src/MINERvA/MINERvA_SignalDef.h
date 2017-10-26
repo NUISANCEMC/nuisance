@@ -88,6 +88,11 @@ bool isCC0pi1p_MINERvA(FitEvent *event, double enumin, double enumax);
 
 bool isCC1pi0_MINERvA_2015(FitEvent *event, double EnuMin, double EnuMax);
 bool isCC1pi0_MINERvA_2016(FitEvent *event, double EnuMin, double EnuMax);
+bool isCC1pi0_MINERvA_nu(FitEvent *event, double EnuMin, double EnuMax);
+
+
+ bool isCC0pi_MINERvAPTPZ(FitEvent *event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
+ bool isCC0pi_anti_MINERvAPTPZ(FitEvent* event, int nuPDG, double EnuMin = 0, double EnuMax = 0);
 
 }
 

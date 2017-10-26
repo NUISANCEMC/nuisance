@@ -21,7 +21,7 @@
 #define FIT_SPLINE_H
 
 #include "TObject.h"
-#include "FitParameters.h"
+
 
 #include "PlotUtils.h"
 #include "FitUtils.h"

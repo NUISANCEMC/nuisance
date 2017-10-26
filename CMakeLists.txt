@@ -24,8 +24,8 @@ include(ExternalProject)
 
 enable_language(Fortran)
 
-set (NUISANCE_VERSION_MAJOR 1)
-set (NUISANCE_VERSION_MINOR 0)
+set (NUISANCE_VERSION_MAJOR 2)
+set (NUISANCE_VERSION_MINOR 7)
 set (NUISANCE_VERSION_REVISION 0)
 
 set (NUISANCE_VERSION_STRING "v${NUISANCE_VERSION_MAJOR}r${NUISANCE_VERSION_MINOR}")
@@ -93,10 +93,13 @@ set(CORE
   MCStudies
   Genie
   FitBase
+  Config
+  Logger
   InputHandler
   Splines
   Reweight
   Utils
+  Statistical
   #Devel
   Smearceptance
   )
@@ -141,6 +144,9 @@ LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
   ${CMAKE_SOURCE_DIR}/src/FitBase
   ${CMAKE_SOURCE_DIR}/src/Reweight
   ${CMAKE_SOURCE_DIR}/src/InputHandler
+  ${CMAKE_SOURCE_DIR}/src/Config
+  ${CMAKE_SOURCE_DIR}/src/Logger
+  ${CMAKE_SOURCE_DIR}/src/Statistical
   ${CMAKE_SOURCE_DIR}/src/Splines
   ${CMAKE_SOURCE_DIR}/src/Utils
   ${CMAKE_SOURCE_DIR}/src/Genie)
@@ -180,6 +186,27 @@ install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
   ${CMAKE_INSTALL_PREFIX})
 
+if(USE_DYNSAMPLES)
+  SET(ALL_INCLUDES ${MINIMUM_INCLUDE_DIRECTORIES})
+  LIST(APPEND ALL_INCLUDES ${CMAKE_SOURCE_DIR}/src/Smearceptance)
+  LIST(APPEND ALL_INCLUDES ${EXP_INCLUDE_DIRECTORIES})
+
+  string(REPLACE ";" " -I" ALL_INCLUDES_STR "${ALL_INCLUDES}")
+
+  string(REPLACE ";" " -l" ALL_MODULETARGETS_STR "${MODULETargets}")
+
+  configure_file(cmake/BuildDynamicSample.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" @ONLY)
+  install(PROGRAMS
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" DESTINATION
+    bin)
+
+  configure_file(cmake/BuildDynamicSmearcepter.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" @ONLY)
+  install(PROGRAMS
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSmearcepter" DESTINATION
+    bin)
+endif()
 
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuiscardgen" DESTINATION

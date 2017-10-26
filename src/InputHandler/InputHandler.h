@@ -26,7 +26,6 @@
 #include "FitEvent.h"
 #include "BaseFitEvt.h"
 #include "TTreePerfStats.h"
-#include "InputUtils.h"
 
 /// Base InputHandler class defining how events are requested and setup.
 class InputHandlerBase {

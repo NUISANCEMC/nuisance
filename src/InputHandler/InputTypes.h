@@ -33,15 +33,14 @@ enum generator_event_type {
   kNUANCE = 7,
   kGiBUU = 8,
   kNORM = 9,
-  kMODENORM = 10,
-  kEMPTY = 11,
-  kINPUTFITEVENT = 12,
-  kNEWSPLINE = 13,
-  kLIKEWEIGHT = 14,
-  kSPLINEPARAMETER = 15,
-  kHEPMC = 16,
-  kHISTEVENT = 17,
-  kSIGMAQ0HIST = 18,
+  kEMPTY = 10,
+  kINPUTFITEVENT = 11,
+  kNEWSPLINE = 12,
+  kLIKEWEIGHT = 13,
+  kSPLINEPARAMETER = 14,
+  kHEPMC = 15,
+  kHISTO = 16,
+  kSIGMAQ0HIST = 17,
   kLast_generator_event_type
 };
 
@@ -58,8 +57,8 @@ enum InputType {
   kFEVENT_Input,
   kJOINT_Input,
   kSIGMAQ0HIST_Input,
+  kHISTO_Input,
   kInvalid_Input,
-  kHIST_Input,   // Not sure if this are currently used.
   kBNSPLN_Input,  // Not sure if this are currently used.
 };
 
@@ -101,14 +100,14 @@ inline std::ostream& operator<<(std::ostream& os,
   case kNORM: {
     return os << "kNORM";
   }
-  case kMODENORM: {
-    return os << "kMODENORM";
-  }
   case kHEPMC: {
     return os << "kHEPMC";
   }
   case kSIGMAQ0HIST: {
     return os << "kSIGMAQ0HIST";
+  }
+  case kHISTO: {
+    return os << "kHISTO";
   }
   default: { return os << "kUNKNOWN"; }
   }
@@ -147,8 +146,10 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
   case InputUtils::kSIGMAQ0HIST_Input: {
     return os << "kSIGMAQ0HIST_Input";
   }
+  case InputUtils::kHISTO_Input: {
+    return os << "kHISTO_Input";
+  }
   case InputUtils::kInvalid_Input:
-  case InputUtils::kHIST_Input:
   case InputUtils::kBNSPLN_Input:
   default: { return os << "kInvalid_Input"; }
   }

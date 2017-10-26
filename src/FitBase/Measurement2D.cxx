@@ -323,7 +323,7 @@ void Measurement2D::SetCovarFromTextFile(std::string covfile, int dim) {
     dim = this->GetNDOF();
   }
 
-  LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
+  LOG(SAM) << "Reading covariance from text file: " << covfile << " " << dim << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
   covar      = StatUtils::GetInvert(fFullCovar);
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
@@ -915,7 +915,7 @@ void Measurement2D::ApplyNormScale(double norm) {
 int Measurement2D::GetNDOF() {
 //********************************************************************
 
-  
+
   // Just incase it has gone...
   if (!fDataHist) return -1;
 
@@ -929,7 +929,7 @@ int Measurement2D::GetNDOF() {
         ++nDOF;
     }
   }
-  
+
   // Account for possible bin masking
   int nMasked = 0;
   if (fMaskHist and fIsMask)
@@ -942,7 +942,7 @@ int Measurement2D::GetNDOF() {
   if (fIsMask) {
     nDOF -= nMasked;
   }
-  
+
   return nDOF;
 }
 
@@ -1295,7 +1295,7 @@ void Measurement2D::Write(std::string drawOpt) {
     return;
   }
 
-  //  FitPar::Config().out->cd();
+  //  Config::Get().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");

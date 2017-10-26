@@ -1,9 +1,101 @@
 #include "WeightUtils.h"
 
+#include "FitLogger.h"
+#ifdef __T2KREW_ENABLED__
+#include "T2KGenieReWeight.h"
+#include "T2KNIWGReWeight.h"
+#include "T2KNIWGUtils.h"
+#include "T2KNeutReWeight.h"
+#include "T2KNeutUtils.h"
+#include "T2KReWeight.h"
+using namespace t2krew;
+#endif
+
+#ifdef __NIWG_ENABLED__
+#include "NIWGReWeight.h"
+#include "NIWGReWeight1piAngle.h"
+#include "NIWGReWeight2010a.h"
+#include "NIWGReWeight2012a.h"
+#include "NIWGReWeight2014a.h"
+#include "NIWGReWeightDeltaMass.h"
+#include "NIWGReWeightEffectiveRPA.h"
+#include "NIWGReWeightHadronMultSwitch.h"
+#include "NIWGReWeightMEC.h"
+#include "NIWGReWeightPiMult.h"
+#include "NIWGReWeightProtonFSIbug.h"
+#include "NIWGReWeightRPA.h"
+#include "NIWGReWeightSpectralFunc.h"
+#include "NIWGReWeightSplineEnu.h"
+#include "NIWGSyst.h"
+#include "NIWGSystUncertainty.h"
+#endif
+
+#ifdef __NEUT_ENABLED__
+#include "NReWeight.h"
+#include "NReWeightCasc.h"
+#include "NReWeightNuXSecCCQE.h"
+#include "NReWeightNuXSecCCRES.h"
+#include "NReWeightNuXSecCOH.h"
+#include "NReWeightNuXSecDIS.h"
+#include "NReWeightNuXSecNC.h"
+#include "NReWeightNuXSecNCEL.h"
+#include "NReWeightNuXSecNCRES.h"
+#include "NReWeightNuXSecRES.h"
+#include "NReWeightNuclPiless.h"
+#include "NSyst.h"
+#include "NSystUncertainty.h"
+#include "neutpart.h"
+#include "neutvect.h"
+#endif
+
+#ifdef __NUWRO_ENABLED__
+#include "event1.h"
+#endif
+
+#ifdef __NUWRO_REWEIGHT_ENABLED__
+#include "NuwroReWeight.h"
+#include "NuwroReWeight_FlagNorm.h"
+#include "NuwroReWeight_QEL.h"
+#include "NuwroReWeight_SPP.h"
+#include "NuwroSyst.h"
+#include "NuwroSystUncertainty.h"
+#endif
+
+#ifdef __GENIE_ENABLED__
+#include "EVGCore/EventRecord.h"
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepRecord.h"
+#include "GSyst.h"
+#include "GSystUncertainty.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#include "ReWeight/GReWeight.h"
+#include "ReWeight/GReWeightAGKY.h"
+#include "ReWeight/GReWeightDISNuclMod.h"
+#include "ReWeight/GReWeightFGM.h"
+#include "ReWeight/GReWeightFZone.h"
+#include "ReWeight/GReWeightINuke.h"
+#include "ReWeight/GReWeightNonResonanceBkg.h"
+#include "ReWeight/GReWeightNuXSecCCQE.h"
+#include "ReWeight/GReWeightNuXSecCCQEvec.h"
+#include "ReWeight/GReWeightNuXSecCCRES.h"
+#include "ReWeight/GReWeightNuXSecCOH.h"
+#include "ReWeight/GReWeightNuXSecDIS.h"
+#include "ReWeight/GReWeightNuXSecNC.h"
+#include "ReWeight/GReWeightNuXSecNCEL.h"
+#include "ReWeight/GReWeightNuXSecNCRES.h"
+#include "ReWeight/GReWeightResonanceDecay.h"
+using namespace genie;
+using namespace genie::rew;
+#endif
+
+#include "GlobalDialList.h"
+#include "ModeNormEngine.h"
+#include "NUISANCESyst.h"
 #include "OscWeightEngine.h"
 
 //********************************************************************
-TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
+TF1 FitBase::GetRWConvFunction(std::string const &type,
+                               std::string const &name) {
   //********************************************************************
 
   std::string dialfunc = "x";
@@ -47,7 +139,8 @@ TF1 FitBase::GetRWConvFunction(std::string type, std::string name) {
 }
 
 //********************************************************************
-std::string FitBase::GetRWUnits(std::string type, std::string name) {
+std::string FitBase::GetRWUnits(std::string const &type,
+                                std::string const &name) {
   //********************************************************************
 
   std::string unit = "sig.";
@@ -86,16 +179,21 @@ std::string FitBase::GetRWUnits(std::string type, std::string name) {
 }
 
 //********************************************************************
-double FitBase::RWAbsToSigma(std::string type, std::string name, double val) {
+double FitBase::RWAbsToSigma(std::string const &type, std::string const &name,
+                             double val) {
   //********************************************************************
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.GetX(val);
   if (fabs(conv_val) < 1E-10) conv_val = 0.0;
+
+  std::cout << "AbsToSigma(" << name << ") = " << val << " -> " << conv_val
+            << std::endl;
   return conv_val;
 }
 
 //********************************************************************
-double FitBase::RWSigmaToAbs(std::string type, std::string name, double val) {
+double FitBase::RWSigmaToAbs(std::string const &type, std::string const &name,
+                             double val) {
   //********************************************************************
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.Eval(val);
@@ -103,7 +201,8 @@ double FitBase::RWSigmaToAbs(std::string type, std::string name, double val) {
 }
 
 //********************************************************************
-double FitBase::RWFracToSigma(std::string type, std::string name, double val) {
+double FitBase::RWFracToSigma(std::string const &type, std::string const &name,
+                              double val) {
   //********************************************************************
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.GetX((val * f1.Eval(0.0)));
@@ -112,14 +211,15 @@ double FitBase::RWFracToSigma(std::string type, std::string name, double val) {
 }
 
 //********************************************************************
-double FitBase::RWSigmaToFrac(std::string type, std::string name, double val) {
+double FitBase::RWSigmaToFrac(std::string const &type, std::string const &name,
+                              double val) {
   //********************************************************************
   TF1 f1 = GetRWConvFunction(type, name);
   double conv_val = f1.Eval(val) / f1.Eval(0.0);
   return conv_val;
 }
 
-int FitBase::ConvDialType(std::string type) {
+int FitBase::ConvDialType(std::string const &type) {
   if (!type.compare("neut_parameter"))
     return kNEUT;
   else if (!type.compare("niwg_parameter"))
@@ -134,14 +234,14 @@ int FitBase::ConvDialType(std::string type) {
     return kCUSTOM;
   else if (!type.compare("norm_parameter"))
     return kNORM;
-  else if (!type.compare("modenorm_parameter"))
-    return kMODENORM;
   else if (!type.compare("likeweight_parameter"))
     return kLIKEWEIGHT;
   else if (!type.compare("spline_parameter"))
     return kSPLINEPARAMETER;
   else if (!type.compare("osc_parameter"))
     return kOSCILLATION;
+  else if (!type.compare("modenorm_parameter"))
+    return kMODENORM;
   else
     return kUNKNOWN;
 }
@@ -169,9 +269,6 @@ std::string FitBase::ConvDialType(int type) {
     case kCUSTOM: {
       return "custom_parameter";
     }
-    case kMODENORM: {
-      return "modenorm_parameter";
-    }
     case kLIKEWEIGHT: {
       return "likeweight_parameter";
     }
@@ -181,18 +278,21 @@ std::string FitBase::ConvDialType(int type) {
     case kOSCILLATION: {
       return "osc_parameter";
     }
+    case kMODENORM: {
+      return "modenorm_parameter";
+    }
     default:
       return "unknown_parameter";
   }
 }
 
-int FitBase::GetDialEnum(std::string type, std::string name) {
+int FitBase::GetDialEnum(std::string const &type, std::string const &name) {
   return FitBase::GetDialEnum(FitBase::ConvDialType(type), name);
 }
 
-int FitBase::GetDialEnum(int type, std::string name) {
+int FitBase::GetDialEnum(int type, std::string const &name) {
   int offset = type * 1000;
-  int this_enum = -1;  // Not Found
+  int this_enum = Reweight::kNoDialFound;  // Not Found
 
   std::cout << "Getting dial enum " << type << " " << name << std::endl;
   // Select Types
@@ -205,7 +305,7 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = neut_enum + offset;
       }
 #else
-      this_enum = -2;  // Not enabled
+      this_enum = Reweight::kNoTypeFound;  // Not enabled
 #endif
       break;
     }
@@ -218,7 +318,7 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = niwg_enum + offset;
       }
 #else
-      this_enum = -2;
+      this_enum = Reweight::kNoTypeFound;
 #endif
       break;
     }
@@ -231,7 +331,7 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = nuwro_enum + offset;
       }
 #else
-      this_enum = -2;
+      this_enum = Reweight::kNoTypeFound;
 #endif
     }
 
@@ -243,7 +343,7 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = genie_enum + offset;
       }
 #else
-      this_enum = -2;
+      this_enum = Reweight::kNoTypeFound;
 #endif
       break;
     }
@@ -262,7 +362,7 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = t2k_enum + offset;
       }
 #else
-      this_enum = -2;
+      this_enum = Reweight::kNoTypeFound;
 #endif
       break;
     }
@@ -272,20 +372,6 @@ int FitBase::GetDialEnum(int type, std::string name) {
         gNormEnums[name] = gNormEnums.size() + 1 + offset;
       }
       this_enum = gNormEnums[name];
-      break;
-    }
-
-    case kMODENORM: {
-      size_t us_pos = name.find_first_of('_');
-      std::string numstr = name.substr(us_pos + 1);
-      int mode_num = std::atoi(numstr.c_str());
-      LOG(FTL) << "Getting mode num " << mode_num << std::endl;
-      if (!mode_num) {
-        ERR(FTL) << "Attempting to parse dial name: \"" << name
-                 << "\" as a mode norm dial but failed." << std::endl;
-        throw;
-      }
-      this_enum = 60 + mode_num + offset;
       break;
     }
 
@@ -311,170 +397,129 @@ int FitBase::GetDialEnum(int type, std::string name) {
         this_enum = oscEnum + offset;
       }
 #else
-      this_enum = -2;  // Not enabled
+      this_enum = Reweight::kNoTypeFound;  // Not enabled
 #endif
+    }
+    case kMODENORM: {
+      size_t us_pos = name.find_first_of('_');
+      std::string numstr = name.substr(us_pos + 1);
+      int mode_num = std::atoi(numstr.c_str());
+      LOG(FTL) << "Getting mode num " << mode_num << std::endl;
+      if (!mode_num) {
+        ERR(FTL) << "Attempting to parse dial name: \"" << name
+                 << "\" as a mode norm dial but failed." << std::endl;
+        throw;
+      }
+      this_enum = 60 + mode_num + offset;
+      break;
     }
   }
 
   // If Not Enabled
-  if (this_enum == -2) {
+  if (this_enum == Reweight::kNoTypeFound) {
     ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type)
              << std::endl;
     ERR(FTL) << "Check dial " << name << std::endl;
   }
 
   // If Not Found
-  if (this_enum == -1) {
+  if (this_enum == Reweight::kNoDialFound) {
     ERR(FTL) << "Dial " << name << " not found." << std::endl;
   }
 
   return this_enum;
 }
 
-int Reweight::ConvDialType(std::string type) {
-  if (!type.compare("neut_parameter"))
-    return kNEUT;
-  else if (!type.compare("niwg_parameter"))
-    return kNIWG;
-  else if (!type.compare("nuwro_parameter"))
-    return kNUWRO;
-  else if (!type.compare("t2k_parameter"))
-    return kT2K;
-  else if (!type.compare("genie_parameter"))
-    return kGENIE;
-  else if (!type.compare("norm_parameter"))
-    return kNORM;
-  else if (!type.compare("modenorm_parameter"))
-    return kMODENORM;
-  else if (!type.compare("custom_parameter"))
-    return kCUSTOM;
-  else if (!type.compare("likeweight_parameter"))
-    return kLIKEWEIGHT;
-  else if (!type.compare("spline_parameter"))
-    return kSPLINEPARAMETER;
-  else if (!type.compare("osc_parameter"))
-    return kOSCILLATION;
-  else
-    return kUNKNOWN;
+int Reweight::ConvDialType(std::string const &type) {
+  return FitBase::ConvDialType(type);
 }
 
 std::string Reweight::ConvDialType(int type) {
-  switch (type) {
-    case kNEUT: {
-      return "neut_parameter";
-    }
-    case kNIWG: {
-      return "niwg_parameter";
-    }
-    case kNUWRO: {
-      return "nuwro_parameter";
-    }
-    case kT2K: {
-      return "t2k_parameter";
-    }
-    case kGENIE: {
-      return "genie_parameter";
-    }
-    case kNORM: {
-      return "norm_parameter";
-    }
-    case kCUSTOM: {
-      return "custom_parameter";
-    }
-
-    case kMODENORM: {
-      return "modenorm_parameter";
-    }
-    case kLIKEWEIGHT: {
-      return "likeweight_parameter";
-    }
-    case kSPLINEPARAMETER: {
-      return "spline_parameter";
-    }
-
-    case kOSCILLATION: {
-      return "spline_parameter";
-    }
-    default:
-      return "unknown_parameter";
-  }
+  return FitBase::ConvDialType(type);
 }
 
-int Reweight::NEUTEnumFromName(std::string name) {
+int Reweight::GetDialType(int type) {
+  int t = (type / 1000);
+  return t > kMODENORM ? Reweight::kNoDialFound : t;
+}
+int Reweight::RemoveDialType(int type) { return (type % 1000); }
+
+int Reweight::NEUTEnumFromName(std::string const &name) {
 #ifdef __NEUT_ENABLED__
   int neutenum = (int)neut::rew::NSyst::FromString(name);
-  return (neutenum > 0) ? neutenum : kNoDialFound;
+  return (neutenum > 0) ? neutenum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::NIWGEnumFromName(std::string name) {
+int Reweight::NIWGEnumFromName(std::string const &name) {
 #ifdef __NIWG_ENABLED__
   int niwgenum = (int)niwg::rew::NIWGSyst::FromString(name);
-  return (niwgenum != 0) ? niwgenum : kNoDialFound;
+  return (niwgenum != 0) ? niwgenum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::NUWROEnumFromName(std::string name) {
+int Reweight::NUWROEnumFromName(std::string const &name) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
   int nuwroenum = (int)nuwro::rew::NuwroSyst::FromString(name);
-  return (nuwroenum > 0) ? nuwroenum : kNoDialFound;
+  return (nuwroenum > 0) ? nuwroenum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::GENIEEnumFromName(std::string name) {
+int Reweight::GENIEEnumFromName(std::string const &name) {
 #ifdef __GENIE_ENABLED__
   int genieenum = (int)genie::rew::GSyst::FromString(name);
-  return (genieenum > 0) ? genieenum : kNoDialFound;
+  return (genieenum > 0) ? genieenum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::T2KEnumFromName(std::string name) {
+int Reweight::T2KEnumFromName(std::string const &name) {
 #ifdef __T2KREW_ENABLED__
   int t2kenum = (int)t2krew::T2KSyst::FromString(name);
-  return (t2kenum > 0) ? t2kenum : kNoDialFound;
+  return (t2kenum > 0) ? t2kenum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::OscillationEnumFromName(std::string name) {
+int Reweight::OscillationEnumFromName(std::string const &name) {
 #ifdef __PROB3PP_ENABLED__
   int oscEnum = OscWeightEngine::SystEnumFromString(name);
-  return (oscEnum > 0) ? oscEnum : kNoDialFound;
+  return (oscEnum > 0) ? oscEnum : Reweight::kNoDialFound;
 #else
-  return kGeneratorNotBuilt;
+  return Reweight::kGeneratorNotBuilt;
 #endif
 }
 
-int Reweight::NUISANCEEnumFromName(std::string name, int type) {
+int Reweight::NUISANCEEnumFromName(std::string const &name, int type) {
   int nuisenum = Reweight::DialList().EnumFromNameAndType(name, type);
   return nuisenum;
 }
 
-int Reweight::CustomEnumFromName(std::string name) {
+int Reweight::CustomEnumFromName(std::string const &name) {
   int custenum = Reweight::ConvertNUISANCEDial(name);
   return custenum;
 }
 
-int Reweight::ConvDial(std::string name, std::string type, bool exceptions) {
+int Reweight::ConvDial(std::string const &name, std::string const &type,
+                       bool exceptions) {
   return Reweight::ConvDial(name, Reweight::ConvDialType(type), exceptions);
 }
 
-int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
+int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
   std::string name =
       GeneralUtils::ParseToStr(fullname, ",")[0];  // Only use first dial given
 
   // Produce offset seperating each type.
   int offset = type * 1000;
-  int genenum = kNoDialFound;
+  int genenum = Reweight::kNoDialFound;
 
   switch (type) {
     case kNEUT:
@@ -502,7 +547,6 @@ int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
       break;
 
     case kNORM:
-    case kMODENORM:
     case kLIKEWEIGHT:
     case kSPLINEPARAMETER:
     case kNEWSPLINE:
@@ -513,15 +557,19 @@ int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
       genenum = OscillationEnumFromName(name);
       break;
 
+    case kMODENORM:
+      genenum = ModeNormEngine::SystEnumFromString(name);
+      break;
+
     default:
-      genenum = kNoTypeFound;
+      genenum = Reweight::kNoTypeFound;
       break;
   }
 
   // Throw if required.
   if (exceptions) {
     // If Not Enabled
-    if (genenum == kGeneratorNotBuilt) {
+    if (genenum == Reweight::kGeneratorNotBuilt) {
       ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type)
                << std::endl;
       ERR(FTL) << "Check dial " << name << std::endl;
@@ -529,13 +577,13 @@ int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
     }
 
     // If no type enabled
-    if (genenum == kNoTypeFound) {
+    if (genenum == Reweight::kNoTypeFound) {
       ERR(FTL) << "Type mismatch inside ConvDialEnum" << std::endl;
       throw;
     }
 
     // If Not Found
-    if (genenum == kNoDialFound) {
+    if (genenum == Reweight::kNoDialFound) {
       ERR(FTL) << "Dial " << name << " not found." << std::endl;
       throw;
     }
@@ -543,20 +591,19 @@ int Reweight::ConvDial(std::string fullname, int type, bool exceptions) {
 
   // Add offset if no issue
   int nuisenum = genenum;
-  if (genenum != kGeneratorNotBuilt and genenum != kNoTypeFound and
-      genenum != kNoDialFound) {
+  if ((genenum != Reweight::kGeneratorNotBuilt) &&
+      (genenum != Reweight::kNoTypeFound) &&
+      (genenum != Reweight::kNoDialFound)) {
     nuisenum += offset;
   }
 
   // Now register dial
-  // std::cout << "Returning " << nuisenum << std::endl;
   Reweight::DialList().RegisterDialEnum(name, type, nuisenum);
 
   return nuisenum;
 }
 
 std::string Reweight::ConvDial(int nuisenum) {
-  // GlobalDialList* temp;
   for (size_t i = 0; i < Reweight::DialList().fAllDialEnums.size(); i++) {
     if (Reweight::DialList().fAllDialEnums[i] == nuisenum) {
       return Reweight::DialList().fAllDialNames[i];

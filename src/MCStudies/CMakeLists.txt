@@ -29,6 +29,7 @@ MCStudy_CCQEHistograms.cxx
 OfficialNIWGPlots.cxx
 Smearceptance_Tester.cxx
 Simple_Osc.cxx
+Smear_SVDUnfold_Propagation_Osc.cxx
 )
 
 set(HEADERFILES
@@ -44,6 +45,7 @@ MCStudy_CCQEHistograms.h
 OfficialNIWGPlots.h
 Smearceptance_Tester.h
 Simple_Osc.h
+Smear_SVDUnfold_Propagation_Osc.h
 )
 
 set(LIBNAME MCStudies)

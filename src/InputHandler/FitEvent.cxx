@@ -21,15 +21,12 @@
 #include "TObjArray.h"
 
 FitEvent::FitEvent() {
-
   fGenInfo = NULL;
   kRemoveFSIParticles = true;
   kRemoveUndefParticles = true;
 
   AllocateParticleStack(400);
-
 };
-
 
 void FitEvent::AddGeneratorInfo(GeneratorInfoBase* gen) {
   fGenInfo = gen;
@@ -40,24 +37,23 @@ void FitEvent::AllocateParticleStack(int stacksize) {
   LOG(DEB) << "Allocating particle stack of size: " << stacksize << std::endl;
   kMaxParticles = stacksize;
 
-  fParticleList  = new FitParticle*[kMaxParticles];
+  fParticleList = new FitParticle*[kMaxParticles];
 
-  fParticleMom   = new double*[kMaxParticles];
+  fParticleMom = new double*[kMaxParticles];
   fParticleState = new UInt_t[kMaxParticles];
-  fParticlePDG   = new int[kMaxParticles];
+  fParticlePDG = new int[kMaxParticles];
 
-  fOrigParticleMom   = new double*[kMaxParticles];
+  fOrigParticleMom = new double*[kMaxParticles];
   fOrigParticleState = new UInt_t[kMaxParticles];
-  fOrigParticlePDG   = new int[kMaxParticles];
+  fOrigParticlePDG = new int[kMaxParticles];
 
   for (size_t i = 0; i < kMaxParticles; i++) {
-    fParticleList[i]    = NULL;
-    fParticleMom[i]     = new double[4];
+    fParticleList[i] = NULL;
+    fParticleMom[i] = new double[4];
     fOrigParticleMom[i] = new double[4];
   }
 
   if (fGenInfo) fGenInfo->AllocateParticleStack(kMaxParticles);
-
 }
 
 void FitEvent::ExpandParticleStack(int stacksize) {
@@ -66,7 +62,6 @@ void FitEvent::ExpandParticleStack(int stacksize) {
 }
 
 void FitEvent::DeallocateParticleStack() {
-
   for (size_t i = 0; i < kMaxParticles; i++) {
     if (fParticleList[i]) delete fParticleList[i];
     delete fParticleMom[i];
@@ -83,10 +78,9 @@ void FitEvent::DeallocateParticleStack() {
   delete fOrigParticleState;
   delete fOrigParticlePDG;
 
-  if (fGenInfo) fGenInfo -> DeallocateParticleStack();
+  if (fGenInfo) fGenInfo->DeallocateParticleStack();
 
   kMaxParticles = 0;
-
 }
 
 void FitEvent::ClearFitParticles() {
@@ -118,8 +112,6 @@ void FitEvent::HardReset() {
 }
 
 void FitEvent::ResetEvent() {
-
-  fMode = 9999;
   Mode = 9999;
   fEventNo = -1;
   fTotCrs = -1.0;
@@ -151,17 +143,15 @@ void FitEvent::ResetEvent() {
     fOrigParticleMom[i][2] = 0.0;
     fOrigParticleMom[i][3] = 0.0;
   }
-
 }
 
 void FitEvent::OrderStack() {
-
   // Copy current stack
   int npart = fNParticles;
 
   for (int i = 0; i < npart; i++) {
-    fOrigParticlePDG[i]    = fParticlePDG[i];
-    fOrigParticleState[i]  = fParticleState[i];
+    fOrigParticlePDG[i] = fParticlePDG[i];
+    fOrigParticleState[i] = fParticleState[i];
     fOrigParticleMom[i][0] = fParticleMom[i][0];
     fOrigParticleMom[i][1] = fParticleMom[i][1];
     fOrigParticleMom[i][2] = fParticleMom[i][2];
@@ -171,15 +161,14 @@ void FitEvent::OrderStack() {
   // Now run loops for each particle
   fNParticles = 0;
   int stateorder[6] = {kInitialState,   kFinalState,     kFSIState,
-                       kNuclearInitial, kNuclearRemnant, kUndefinedState
-                      };
+                       kNuclearInitial, kNuclearRemnant, kUndefinedState};
 
   for (int s = 0; s < 6; s++) {
     for (int i = 0; i < npart; i++) {
       if ((UInt_t)fOrigParticleState[i] != (UInt_t)stateorder[s]) continue;
 
-      fParticlePDG[fNParticles]    = fOrigParticlePDG[i];
-      fParticleState[fNParticles]  = fOrigParticleState[i];
+      fParticlePDG[fNParticles] = fOrigParticlePDG[i];
+      fParticleState[fNParticles] = fOrigParticleState[i];
       fParticleMom[fNParticles][0] = fOrigParticleMom[i][0];
       fParticleMom[fNParticles][1] = fOrigParticleMom[i][1];
       fParticleMom[fNParticles][2] = fOrigParticleMom[i][2];
@@ -206,20 +195,18 @@ void FitEvent::OrderStack() {
   return;
 }
 
-
 void FitEvent::Print() {
-
   if (LOG_LEVEL(FIT)) {
     LOG(FIT) << "FITEvent print" << std::endl;
-    LOG(FIT) << "Mode: " << fMode << std::endl;
+    LOG(FIT) << "Mode: " << Mode << std::endl;
     LOG(FIT) << "Particles: " << fNParticles << std::endl;
     LOG(FIT) << " -> Particle Stack " << std::endl;
     for (int i = 0; i < fNParticles; i++) {
       LOG(FIT) << " -> -> " << i << ". " << fParticlePDG[i] << " "
                << fParticleState[i] << " "
                << "  Mom(" << fParticleMom[i][0] << ", " << fParticleMom[i][1]
-               << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3] << ")."
-               << std::endl;
+               << ", " << fParticleMom[i][2] << ", " << fParticleMom[i][3]
+               << ")." << std::endl;
     }
   }
   return;
@@ -227,99 +214,82 @@ void FitEvent::Print() {
 
 /* Read/Write own event class */
 void FitEvent::SetBranchAddress(TChain* tn) {
-
-  tn->SetBranchAddress("Mode",    &fMode);
-  tn->SetBranchAddress("Mode",    &Mode);
+  tn->SetBranchAddress("Mode", &Mode);
 
   tn->SetBranchAddress("EventNo", &fEventNo);
-  tn->SetBranchAddress("TotCrs",  &fTotCrs);
+  tn->SetBranchAddress("TotCrs", &fTotCrs);
   tn->SetBranchAddress("TargetA", &fTargetA);
   tn->SetBranchAddress("TargetH", &fTargetH);
-  tn->SetBranchAddress("Bound",   &fBound);
+  tn->SetBranchAddress("Bound", &fBound);
 
-  tn->SetBranchAddress("RWWeight",    &SavedRWWeight);
+  tn->SetBranchAddress("RWWeight", &SavedRWWeight);
   tn->SetBranchAddress("InputWeight", &InputWeight);
-
-
-
-  // This has to be setup by the handler now :(
-  //  tn->SetBranchAddress("NParticles",    &fNParticles);
-  //  tn->SetBranchAddress("ParticleState", &fParticleState);
-  //  tn->SetBranchAddress("ParticlePDG",   &fParticlePDG);
-  //  tn->SetBranchAddress("ParticleMom",   &fParticleMom);
-
 }
 
 void FitEvent::AddBranchesToTree(TTree* tn) {
-
   tn->Branch("Mode", &Mode, "Mode/I");
 
   tn->Branch("EventNo", &fEventNo, "EventNo/i");
-  tn->Branch("TotCrs",  &fTotCrs,  "TotCrs/D");
+  tn->Branch("TotCrs", &fTotCrs, "TotCrs/D");
   tn->Branch("TargetA", &fTargetA, "TargetA/I");
   tn->Branch("TargetH", &fTargetH, "TargetH/I");
-  tn->Branch("Bound",   &fBound,   "Bound/O");
+  tn->Branch("Bound", &fBound, "Bound/O");
 
-  tn->Branch("RWWeight",    &RWWeight,    "RWWeight/D");
+  tn->Branch("RWWeight", &RWWeight, "RWWeight/D");
   tn->Branch("InputWeight", &InputWeight, "InputWeight/D");
 
-  tn->Branch("NParticles",    &fNParticles,       "NParticles/I");
-  tn->Branch("ParticleState", fOrigParticleState, "ParticleState[NParticles]/i");
-  tn->Branch("ParticlePDG",   fOrigParticlePDG,   "ParticlePDG[NParticles]/I");
-  tn->Branch("ParticleMom",   fOrigParticleMom,   "ParticleMom[NParticles][4]/D");
-
+  tn->Branch("NParticles", &fNParticles, "NParticles/I");
+  tn->Branch("ParticleState", fOrigParticleState,
+             "ParticleState[NParticles]/i");
+  tn->Branch("ParticlePDG", fOrigParticlePDG, "ParticlePDG[NParticles]/I");
+  tn->Branch("ParticleMom", fOrigParticleMom, "ParticleMom[NParticles][4]/D");
 }
-
 
 // ------- EVENT ACCESS FUNCTION --------- //
-TLorentzVector FitEvent::GetParticleP4 (int index) const {
+TLorentzVector FitEvent::GetParticleP4(int index) const {
   if (index == -1 or index >= fNParticles) return TLorentzVector();
-  return TLorentzVector( fParticleMom[index][0],
-                         fParticleMom[index][1],
-                         fParticleMom[index][2],
-                         fParticleMom[index][3] );
+  return TLorentzVector(fParticleMom[index][0], fParticleMom[index][1],
+                        fParticleMom[index][2], fParticleMom[index][3]);
 }
 
-TVector3  FitEvent::GetParticleP3 (int index) const {
+TVector3 FitEvent::GetParticleP3(int index) const {
   if (index == -1 or index >= fNParticles) return TVector3();
-  return TVector3( fParticleMom[index][0],
-                   fParticleMom[index][1],
-                   fParticleMom[index][2] );
+  return TVector3(fParticleMom[index][0], fParticleMom[index][1],
+                  fParticleMom[index][2]);
 }
 
-double FitEvent::GetParticleMom (int index) const {
+double FitEvent::GetParticleMom(int index) const {
   if (index == -1 or index >= fNParticles) return 0.0;
   return sqrt(fParticleMom[index][0] * fParticleMom[index][0] +
               fParticleMom[index][1] * fParticleMom[index][1] +
               fParticleMom[index][2] * fParticleMom[index][2]);
 }
 
-double FitEvent::GetParticleMom2 (int index) const {
+double FitEvent::GetParticleMom2(int index) const {
   if (index == -1 or index >= fNParticles) return 0.0;
   return fabs((fParticleMom[index][0] * fParticleMom[index][0] +
                fParticleMom[index][1] * fParticleMom[index][1] +
                fParticleMom[index][2] * fParticleMom[index][2]));
 }
 
-double FitEvent::GetParticleE (int index) const {
+double FitEvent::GetParticleE(int index) const {
   if (index == -1 or index >= fNParticles) return 0.0;
   return fParticleMom[index][3];
 }
 
-int FitEvent::GetParticleState (int index) const {
+int FitEvent::GetParticleState(int index) const {
   if (index == -1 or index >= fNParticles) return kUndefinedState;
   return (fParticleState[index]);
 }
 
-int FitEvent::GetParticlePDG (int index) const {
+int FitEvent::GetParticlePDG(int index) const {
   if (index == -1 or index >= fNParticles) return 0;
   return (fParticlePDG[index]);
 }
 
-FitParticle* FitEvent::GetParticle (int const i) {
-
+FitParticle* FitEvent::GetParticle(int const i) {
   // Check Valid Index
-  if (i == -1){
+  if (i == -1) {
     return NULL;
   }
 
@@ -327,14 +297,15 @@ FitParticle* FitEvent::GetParticle (int const i) {
   if (i > fNParticles) {
     ERR(FTL) << "Requesting particle beyond stack!" << std::endl
              << "i = " << i << " N = " << fNParticles << std::endl
-             << "Mode = " << fMode << std::endl;
+             << "Mode = " << Mode << std::endl;
     throw;
   }
 
   if (!fParticleList[i]) {
     /*
     std::cout << "Creating particle with values i " << i << " ";
-    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
+    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " <<
+    fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
     std::cout << fParticlePDG[i] << " " << fParticleState[i] << std::endl;
     */
     fParticleList[i] = new FitParticle(fParticleMom[i][0], fParticleMom[i][1],
@@ -343,13 +314,13 @@ FitParticle* FitEvent::GetParticle (int const i) {
   } else {
     /*
     std::cout << "Filling particle with values i " << i << " ";
-    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " << fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
+    std::cout << fParticleMom[i][0] << " " << fParticleMom[i][1] <<  " " <<
+    fParticleMom[i][2] << " " << fParticleMom[i][3] << " ";
     std::cout << fParticlePDG[i] << " "<< fParticleState[i] <<std::endl;
     */
     fParticleList[i]->SetValues(fParticleMom[i][0], fParticleMom[i][1],
                                 fParticleMom[i][2], fParticleMom[i][3],
                                 fParticlePDG[i], fParticleState[i]);
-
   }
 
   return fParticleList[i];
@@ -373,7 +344,8 @@ int FitEvent::NumParticle(int const pdg, int const state) const {
   return nfound;
 }
 
-std::vector<int> FitEvent::GetAllParticleIndices (int const pdg, int const state) const {
+std::vector<int> FitEvent::GetAllParticleIndices(int const pdg,
+                                                 int const state) const {
   std::vector<int> indexlist;
   for (int i = 0; i < fNParticles; i++) {
     if (state != -1 and fParticleState[i] != (uint)state) continue;
@@ -384,23 +356,23 @@ std::vector<int> FitEvent::GetAllParticleIndices (int const pdg, int const state
   return indexlist;
 }
 
-std::vector<FitParticle*> FitEvent::GetAllParticle(int const pdg, int const state) {
+std::vector<FitParticle*> FitEvent::GetAllParticle(int const pdg,
+                                                   int const state) {
   std::vector<int> indexlist = GetAllParticleIndices(pdg, state);
   std::vector<FitParticle*> plist;
   for (std::vector<int>::iterator iter = indexlist.begin();
        iter != indexlist.end(); iter++) {
-    plist.push_back( GetParticle((*iter)) );
+    plist.push_back(GetParticle((*iter)));
   }
   return plist;
 }
 
-int FitEvent::GetHMParticleIndex (int const pdg, int const state) const {
+int FitEvent::GetHMParticleIndex(int const pdg, int const state) const {
   double maxmom2 = -9999999.9;
   int maxind = -1;
   for (int i = 0; i < fNParticles; i++) {
     if (state != -1 and fParticleState[i] != (uint)state) continue;
     if (pdg == 0 or fParticlePDG[i] == pdg) {
-
       double newmom2 = GetParticleMom2(i);
       if (newmom2 > maxmom2) {
         maxind = i;
@@ -412,24 +384,23 @@ int FitEvent::GetHMParticleIndex (int const pdg, int const state) const {
   return maxind;
 }
 
-int FitEvent::GetBeamNeutrinoIndex   (void) const {
-  for (int i = 0; i < fNParticles; i++){
+int FitEvent::GetBeamNeutrinoIndex(void) const {
+  for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kInitialState) continue;
     int pdg = abs(fParticlePDG[i]);
-    if (pdg == 12 or pdg == 14 or pdg == 16){
+    if (pdg == 12 or pdg == 14 or pdg == 16) {
       return i;
     }
   }
   return 0;
 }
 
-
-int FitEvent::GetBeamElectronIndex   (void) const {
-  return GetHMISParticleIndex( 11 );
+int FitEvent::GetBeamElectronIndex(void) const {
+  return GetHMISParticleIndex(11);
 }
 
-int FitEvent::GetBeamPionIndex   (void) const {
-  return GetHMISParticleIndex( PhysConst::pdg_pions );
+int FitEvent::GetBeamPionIndex(void) const {
+  return GetHMISParticleIndex(PhysConst::pdg_pions);
 }
 
 int FitEvent::NumFSMesons() {
@@ -444,14 +415,13 @@ int FitEvent::NumFSMesons() {
   return nMesons;
 }
 
-int FitEvent::NumFSLeptons(void) const{
-
+int FitEvent::NumFSLeptons(void) const {
   int nLeptons = 0;
 
   for (int i = 0; i < fNParticles; i++) {
     if (fParticleState[i] != kFinalState) continue;
     if (abs(fParticlePDG[i]) == 11 || abs(fParticlePDG[i]) == 13 ||
-      abs(fParticlePDG[i]) == 15)
+        abs(fParticlePDG[i]) == 15)
       nLeptons += 1;
   }
 

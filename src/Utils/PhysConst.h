@@ -31,18 +31,53 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "FitLogger.h"
 
 /// namespace to contain all physical constants used by NUISANCE
 namespace PhysConst {
-const double mass_proton = 0.93827203;        // Proton mass in GeV
-const double mass_neutron = 0.93956536;       // Neutron mass in GeV
-const double mass_nucleon = (mass_proton + mass_neutron)/2.;
+const double mass_proton = 0.93827203;   // Proton mass in GeV
+const double mass_neutron = 0.93956536;  // Neutron mass in GeV
+const double mass_nucleon = (mass_proton + mass_neutron) / 2.;
+const double mass_proton_kg = 1.6727E-27;   // Proton mass in kg
+const double mass_neutron_kg = 1.6750E-27;  // Neutron mass in kg
+const double mass_nucleon_kg = (mass_proton_kg + mass_neutron_kg) / 2.;
 const double mass_delta = 1.232;              // Delta mass in GeV
 const double mass_muon = 0.10565837;          // Muon mass in GeV
 const double mass_electron = 0.000510998928;  // Electron mass in GeV
 const double mass_cpi = 0.13957;              // charged pion mass in GeV
 const double mass_pi0 = 0.13498;              // neutral pion mass in GeV
+const double mass_cK = 0.493677;              // charged kaon mass in GeV
+const double mass_K0 = 0.497611;              // neutral kaon mass in GeV
+
+inline double GetMass(int pdg) {
+  switch (abs(pdg)) {
+    case 11:
+      return mass_electron;
+    case 13:
+      return mass_muon;
+    case 111:
+      return mass_pi0;
+    case 211:
+      return mass_cpi;
+    case 321:
+      return mass_cK;
+    case 311:
+    case 310:
+    case 130:
+      return mass_K0;
+    case 2112:
+      return mass_neutron;
+    case 2212:
+      return mass_proton;
+    default: {
+      ERROR(WRN, "Attempted to get mass for PDG: "
+                     << pdg << ", but it is not catered for. Please add it to "
+                               "src/Utils/PhysConst.h");
+      return -1;
+    }
+  }
+}
 
 const double mass_MeV = 1000;  // MeV/GeV
 

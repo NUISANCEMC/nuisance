@@ -1,5 +1,7 @@
 #ifdef __NEUT_ENABLED__
 #include "NEUTInputHandler.h"
+#include "InputUtils.h"
+
 
 NEUTGeneratorInfo::~NEUTGeneratorInfo() { DeallocateParticleStack(); }
 
@@ -157,6 +159,24 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
+#ifdef __PROB3PP_ENABLED__
+  else {
+
+    UInt_t npart = fNeutVect->Npart();
+    for (size_t i = 0; i < npart; i++) {
+      NeutPart* part = fNUISANCEEvent->fNeutVect->PartInfo(i);
+      if ((part->fIsAlive == false) && (part->fStatus == -1) &&
+          std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
+                     part->fPID)) {
+        fNUISANCEEvent->probe_E = part->fP.T();
+        fNUISANCEEvent->probe_pdg = part->fPID;
+        break;
+      } else {
+        continue;
+      }
+    }
+  }
+#endif
 
   // Setup Input scaling for joint inputs
   fNUISANCEEvent->InputWeight = GetInputWeight(entry);
@@ -212,7 +232,6 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->ResetEvent();
 
   // Fill Globals
-  fNUISANCEEvent->fMode = fNeutVect->Mode;
   fNUISANCEEvent->Mode = fNeutVect->Mode;
   fNUISANCEEvent->fEventNo = fNeutVect->EventNo;
   fNUISANCEEvent->fTargetA = fNeutVect->TargetA;
