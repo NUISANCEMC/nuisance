@@ -8,7 +8,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 	fName = handle;
 
 	// Assign to hist event format
-	fEventType = kHISTEVENT;
+	fEventType = kSIGMAQ0HIST;
 
 
 	// Parse our input file
@@ -142,13 +142,13 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 
 	delete gr;
 
-	  
+
         fFluxHist->Scale(1.0 / fFluxHist->Integral("width") );
         fEventHist->Scale( fScaling * double(fNEvents) / fEventHist->Integral() );
 	if (fApplyInterpolation){
 	  fEventHist->Scale(1.0 / interpolation_res);
 	}
-	
+
 	fUseAcceptReject = FitPar::Config().GetParB("InterpolateSigmaQ0HistogramThrow");
 	if (fUseAcceptReject){
 	  std::cout << "USING ACCEPT REJECT" << std::endl;
@@ -159,7 +159,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(std::string const& ha
 	}
 
 	fNUISANCEEvent = new FitEvent();
-	
+
 
 };
 
@@ -196,15 +196,14 @@ double SigmaQ0HistogramInputHandler::ThrowQ0(){
   }
   return 0.0;
 }
-    
+
 void SigmaQ0HistogramInputHandler::FillNuisanceEvent(double q0, double sig) {
-  
+
   // Reset all variables
-  
+
   fNUISANCEEvent->ResetEvent();
-  
+
   // Fill Globals
-  fNUISANCEEvent->fMode    = 1; // Assume CCQE for now...
   fNUISANCEEvent->Mode     = 1;
 
   fNUISANCEEvent->fEventNo = 0;

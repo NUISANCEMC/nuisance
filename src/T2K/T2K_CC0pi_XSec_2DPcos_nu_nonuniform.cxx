@@ -104,6 +104,10 @@ void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::FillHistograms(){
 // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
 void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::ConvertEventRates(){
 
+  for (int i = 0; i < 9; i++){
+    fMCHist_Slices[i]->GetSumw2();
+  }
+
   // Do standard conversion.
   Measurement1D::ConvertEventRates();
 
@@ -125,6 +129,7 @@ void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::ConvertEventRates(){
   for (int i = 0; i < 9; i++){
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fMCHist->SetBinContent(bincount+1, fMCHist_Slices[i]->GetBinContent(j+1));
+      fMCHist->SetBinError(bincount+1, fMCHist_Slices[i]->GetBinError(j+1));
       bincount++;
     }
   }

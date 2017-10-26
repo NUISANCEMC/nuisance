@@ -51,7 +51,7 @@
 
 // External data fit includes
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "FitUtils.h"
 #include "GeneralUtils.h"
 #include "PlotUtils.h"
@@ -341,6 +341,11 @@ protected:
   // std::map<TH1*, bool[6] > fExtaStacks;
 
   bool fIsJoint;
+
+
+
+  double fNPOT, fFluxIntegralOverride, fTargetVolume, fTargetMaterialDensity;
+  double fEvtRateScaleFactor;
 
 };
 

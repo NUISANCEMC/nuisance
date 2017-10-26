@@ -8,7 +8,7 @@
 #include "Conventions/Units.h"
 #include "EVGCore/EventRecord.h"
 #include "FitEvent.h"
-#include "FitParameters.h"
+
 #include "GHEP/GHepParticle.h"
 #include "GHEP/GHepRecord.h"
 #include "GHEP/GHepUtils.h"
@@ -18,7 +18,7 @@
 #include "Ntuple/NtpMCEventRecord.h"
 #include "PDG/PDGUtils.h"
 #include "WeightUtils.h"
-// #include "weightRPA.h"
+#include "weightRPA.h"
 using namespace genie;
 class BaseFitEvt;
 
@@ -107,6 +107,18 @@ public:
 	double fDefDial_RPAHighQ2;
 	double fCurDial_RPAHighQ2;
 	double fErrDial_RPAHighQ2;
+	
+	bool   fApplyDial_RESRPACorrection;
+
+        double fTwkDial_RESRPALowQ2;
+        double fDefDial_RESRPALowQ2;
+        double fCurDial_RESRPALowQ2;
+        double fErrDial_RESRPALowQ2;
+
+        double fTwkDial_RESRPAHighQ2;
+        double fDefDial_RESRPAHighQ2;
+        double fCurDial_RESRPAHighQ2;
+        double fErrDial_RESRPAHighQ2;
 
 	double* fEventWeights;
 	bool fTweaked;
@@ -124,7 +136,7 @@ public:
 		kNuMuBarCa40,
 		kNuMuBarFe56
 	};
-	// weightRPA* fRPACalculators[kMaxCalculators];
+	weightRPA* fRPACalculators[kMaxCalculators];
 };
 
 };  // namespace reweight

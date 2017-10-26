@@ -20,58 +20,56 @@
 #ifndef PLOTUTILS_H_SEEN
 #define PLOTUTILS_H_SEEN
 
-
-#include "TH1.h"
 #include "TF1.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "TSystem.h"
 #include "TFile.h"
+#include "TH1.h"
+#include "TMatrixD.h"
 #include "TProfile.h"
+#include "TSystem.h"
+#include "TVectorD.h"
 
-#include <vector>
-#include <string>
+#include <cstring>
 #include <iostream>
 #include <sstream>
-#include <cstring>
+#include <string>
+#include <vector>
 
 // C Includes
-#include <stdlib.h>
-#include <numeric>
 #include <math.h>
-#include <iostream>
+#include <stdlib.h>
 #include <unistd.h>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
 #include <cstring>
+#include <iostream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // ROOT includes
-#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
 #include <TH1D.h>
 #include <TH2D.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TLorentzVector.h>
-#include <TList.h>
-#include <TKey.h>
 #include <THStack.h>
+#include <TKey.h>
 #include <TLegend.h>
+#include <TList.h>
+#include <TLorentzVector.h>
 #include <TObjArray.h>
+#include <TROOT.h>
 #include <TRandom3.h>
-#include<ctime>
-#include "TH2Poly.h"
+#include <TTree.h>
+#include <ctime>
 #include "TGraphErrors.h"
+#include "TH2Poly.h"
 #include "TMatrixDSym.h"
 
 // Fit includes
 #include "FitEvent.h"
-#include "FitParameters.h"
 #include "FitLogger.h"
-#include "StatUtils.h"
 #include "GeneralUtils.h"
+#include "StatUtils.h"
 
 /*!
  *  \addtogroup Utils
@@ -79,151 +77,163 @@
  */
 
 //! Functions to handle different TH1s and TFiles
-namespace PlotUtils{
+namespace PlotUtils {
 
-  /*!
-    MISC Functions
-  */
-  
-  //! Check the root file has an object containing the given substring in its name
-  bool CheckObjectWithName(TFile *inFile, std::string substring);
-  
-  //! Get object in a TFile that has  a matching substring in its name
-  std::string GetObjectWithName(TFile *inFile, std::string substring);
+/*!
+  MISC Functions
+*/
 
-  /*!
-    Interaction Mode Histogram Handling
-  */
+//! Check the root file has an object containing the given substring in its name
+bool CheckObjectWithName(TFile* inFile, std::string substring);
 
-  //! Fill the Histogram Array with 61 new histograms for interaction channels.
-  void CreateNeutModeArray(TH1* hist, TH1* neutarray[]);
+//! Get object in a TFile that has  a matching substring in its name
+std::string GetObjectWithName(TFile* inFile, std::string substring);
 
-  //! Call Fill on the relevent Mode 1D Histogram
-  void FillNeutModeArray(TH1D* hist[], int mode, double xval, double weight = 1.0);
+/*!
+  Interaction Mode Histogram Handling
+*/
 
-  //! Call Fill on the relevant Mode 2D Histogram 
-  void FillNeutModeArray(TH2D* hist[], int mode, double xval, double yval, double weight = 1.0);
+//! Fill the Histogram Array with 61 new histograms for interaction channels.
+void CreateNeutModeArray(TH1* hist, TH1* neutarray[]);
 
-  //! Given two arrays of histograms for the NEUT interaction mode, hist1 = hist1 + scale*hist2
-  void AddNeutModeArray(TH1D* hist1[], TH1D* hist2[], double scaling = 1.0);
-  
-  //! Generate a legend for the THStack
-  TLegend GenerateStackLegend(THStack stack, int xlow, int ylow, int xhigh, int yhigh);
+//! Call Fill on the relevent Mode 1D Histogram
+void FillNeutModeArray(TH1D* hist[], int mode, double xval,
+                       double weight = 1.0);
 
-  //! Turn the array of TH1 histograms into a stack of Modes
-  THStack GetNeutModeStack(std::string title,TH1* ModeStack[], int option);
+//! Call Fill on the relevant Mode 2D Histogram
+void FillNeutModeArray(TH2D* hist[], int mode, double xval, double yval,
+                       double weight = 1.0);
 
-  //! Reset each histogram in the mode array
-  void ResetNeutModeArray(TH1* hist[]);
+//! Given two arrays of histograms for the NEUT interaction mode, hist1 = hist1
+//! + scale*hist2
+void AddNeutModeArray(TH1D* hist1[], TH1D* hist2[], double scaling = 1.0);
 
-  //! Scale each histogram in the mode array by a single scaling factor, option can be used to define "width" scaling.
-  void ScaleNeutModeArray(TH1* hist[], double factor, std::string option = "");
-  
-  //! Free up the memory used by each of the 61 mode histograms
-  void DeleteNeutModeArray(TH1* neutarray[]);
+//! Generate a legend for the THStack
+TLegend GenerateStackLegend(THStack stack, int xlow, int ylow, int xhigh,
+                            int yhigh);
 
+//! Turn the array of TH1 histograms into a stack of Modes
+THStack GetNeutModeStack(std::string title, TH1* ModeStack[], int option);
 
-  /*!
-    Handling Functions
-  */
+//! Reset each histogram in the mode array
+void ResetNeutModeArray(TH1* hist[]);
 
-  //! Fill a mask histogram from a text file
-  TH2D* SetMaskHist(std::string type, TH2D* data);
+//! Scale each histogram in the mode array by a single scaling factor, option
+//! can be used to define "width" scaling.
+void ScaleNeutModeArray(TH1* hist[], double factor, std::string option = "");
 
-  //! Divide by the flux histogram for Enu Histograms
-  void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
+//! Free up the memory used by each of the 61 mode histograms
+void DeleteNeutModeArray(TH1* neutarray[]);
 
-  TH1D* InterpolateFineHistogram(TH1D* hist, int res, std::string opt);
+/*!
+  Handling Functions
+*/
 
-  //! Flux unfolded scaling, like DivideByFlux but uses interpolation.
-  void FluxUnfoldedScaling(TH1D* plot, TH1D* flux, TH1D* events=NULL, double scalefactor=1.0, int nevents=1);
+//! Fill a mask histogram from a text file
+TH2D* SetMaskHist(std::string type, TH2D* data);
 
-  //! Flux unfolded scaling for 2D histograms
-  void FluxUnfoldedScaling(TH2D* plot, TH1D* flux, TH1D* events=NULL, double scalefactor=1.0);
-  
-  //! Fill a 2D Histogram from a text file
-  void Set2DHistFromText(std::string dataFile, TH2* hist, double norm, bool skipbins=false);
+//! Divide by the flux histogram for Enu Histograms
+void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
 
-  //! Fill a 2D Poly Histogram from a text file
-  void Set2PolyHistFromText(std::string dataFile, TH2Poly* hist, double norm, bool skipbins=false);
+TH1D* InterpolateFineHistogram(TH1D* hist, int res, std::string opt);
 
-  //! Fill a 1D Histogram from a text file
-  TH1D* GetTH1DFromFile(std::string dataFile, std::string title = "", std::string fPlotTitles="", std::string alt_name="");
+//! Flux unfolded scaling, like DivideByFlux but uses interpolation.
+void FluxUnfoldedScaling(TH1D* plot, TH1D* flux, TH1D* events = NULL,
+                         double scalefactor = 1.0, int nevents = 1);
 
-  //! Grab a 1D Histrogram from a ROOT File
-  TH1D* GetTH1DFromRootFile(std::string file, std::string name);
+//! Flux unfolded scaling for 2D histograms
+void FluxUnfoldedScaling(TH2D* plot, TH1D* flux, TH1D* events = NULL,
+                         double scalefactor = 1.0);
 
-  //! Grab a 2D Histrogram from a ROOT File
-  TH2D* GetTH2DFromRootFile(std::string file, std::string name);
+//! Fill a 2D Histogram from a text file
+void Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
+                       bool skipbins = false);
 
-   //! Grab a 2D Histrogram from a ROOT File
-  TH2D* GetTH2DFromTextFile(std::string file);
+//! Fill a 2D Poly Histogram from a text file
+void Set2PolyHistFromText(std::string dataFile, TH2Poly* hist, double norm,
+                          bool skipbins = false);
 
+//! Fill a 1D Histogram from a text file
+TH1D* GetTH1DFromFile(std::string dataFile, std::string title = "",
+                      std::string fPlotTitles = "", std::string alt_name = "");
 
-  //! Scale mc to match data considering empty and masked bins
-  void ScaleToData(TH1D* data, TH1D* mc, TH1I* mask);
+TH1* GetTH1FromRootFile(std::string file, std::string name);
 
-  //! Apply bin masking (More cosmetic)
-  void MaskBins(TH1D* hist, TH1I* mask);
+std::vector<TH1*> GetTH1sFromRootFile(std::string const& descriptor);
 
-  //! Apply bin masking (More cosmetic)                                                                            
-  void MaskBins(TH2D* hist, TH2I* mask);
+//! Grab a 1D Histrogram from a ROOT File
+TH1D* GetTH1DFromRootFile(std::string file, std::string name);
 
-  //! Get the data MC ratio considering empty and masked bins
-  double GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask=NULL);
+//! Grab a 2D Histrogram from a ROOT File
+TH2D* GetTH2DFromRootFile(std::string file, std::string name);
 
-  
-  /*!
-    Formatting Plot Utils
-  */
+//! Grab a 2D Histrogram from a ROOT File
+TH2D* GetTH2DFromTextFile(std::string file);
 
-  //! Create new ratio plot. hist3 = hist1/hist2
-  TH1D* GetRatioPlot(TH1D* hist1,   TH1D* hist2);
+//! Scale mc to match data considering empty and masked bins
+void ScaleToData(TH1D* data, TH1D* mc, TH1I* mask);
 
-  //! Create new plot of hist2 normalised to hist1. hist2 = hist1 * (Integral(hist1)/Integral(hist2))
-  TH1D* GetRenormalisedPlot(TH1D* hist1,   TH1D* hist2);
+//! Apply bin masking (More cosmetic)
+void MaskBins(TH1D* hist, TH1I* mask);
 
-  //! Normalise histogram to area of unity.
-  TH1D* GetShapePlot(TH1D* hist1);
+//! Apply bin masking (More cosmetic)
+void MaskBins(TH2D* hist, TH2I* mask);
 
-  //! Normalise hist1 and hist2 to unity, before creating a new plot of their ratio.
-  TH1D* GetShapeRatio(TH1D* hist1,   TH1D* hist2);
+//! Get the data MC ratio considering empty and masked bins
+double GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask = NULL);
 
-  //! Create a covariance histogram from a TMatrixDSym and add titles given.
-  TH2D* GetCovarPlot(TMatrixDSym* cov, std::string name, std::string title);
+/*!
+  Formatting Plot Utils
+*/
 
-  //! Wrapper function to create full covariance plot
-  TH2D* GetFullCovarPlot(TMatrixDSym* cov, std::string name);
+//! Create new ratio plot. hist3 = hist1/hist2
+TH1D* GetRatioPlot(TH1D* hist1, TH1D* hist2);
 
-  //! Wrapper function to create inverted covariance plot
-  TH2D* GetInvCovarPlot(TMatrixDSym* cov, std::string name);
+//! Create new plot of hist2 normalised to hist1. hist2 = hist1 *
+//! (Integral(hist1)/Integral(hist2))
+TH1D* GetRenormalisedPlot(TH1D* hist1, TH1D* hist2);
 
-  //! Wrapper function to create decomposed covariance plot
-  TH2D* GetDecompCovarPlot(TMatrixDSym* cov, std::string name);
+//! Normalise histogram to area of unity.
+TH1D* GetShapePlot(TH1D* hist1);
 
-  //! Given a covariance histogram, divide by errors to form a correlation plot.
-  TH2D* GetCorrelationPlot(TH2D* cov, std::string name);
+//! Normalise hist1 and hist2 to unity, before creating a new plot of their
+//! ratio.
+TH1D* GetShapeRatio(TH1D* hist1, TH1D* hist2);
 
-  //! Given a covariance histogram, calculate the decomposed matrix to form a decomposed plot.
-  TH2D* GetDecompPlot(TH2D* cov, std::string name);
+//! Create a covariance histogram from a TMatrixDSym and add titles given.
+TH2D* GetCovarPlot(TMatrixDSym* cov, std::string name, std::string title);
 
-  //! Given two 1D histograms create a 2D histogram which uses their bin edges to define both axes.
-  TH2D* MergeIntoTH2D(TH1D* xhist, TH1D* yhist, std::string zname="");
+//! Wrapper function to create full covariance plot
+TH2D* GetFullCovarPlot(TMatrixDSym* cov, std::string name);
 
-  //! Given a 1D Histogram, set any empty bins in Data to empty bins in MC
-  void MatchEmptyBins(TH1D* data, TH1D* mc);
-  
-  //! Given a 2D Histogram, set any empty bins in Data to empty bins in MC  
-  void MatchEmptyBins(TH2D* data, TH2D* mc);
+//! Wrapper function to create inverted covariance plot
+TH2D* GetInvCovarPlot(TMatrixDSym* cov, std::string name);
 
-  //! Return a projection of a 2D Histogram onto X accounting for bin masking 
-  TH1D* GetProjectionX(TH2D* hist, TH2I* mask);
-  
-  //! Return a projection of a 2D Histogram onto Y accounting for bin masking
-  TH1D* GetProjectionY(TH2D* hist, TH2I* mask);
+//! Wrapper function to create decomposed covariance plot
+TH2D* GetDecompCovarPlot(TMatrixDSym* cov, std::string name);
 
+//! Given a covariance histogram, divide by errors to form a correlation plot.
+TH2D* GetCorrelationPlot(TH2D* cov, std::string name);
 
-  
+//! Given a covariance histogram, calculate the decomposed matrix to form a
+//! decomposed plot.
+TH2D* GetDecompPlot(TH2D* cov, std::string name);
+
+//! Given two 1D histograms create a 2D histogram which uses their bin edges to
+//! define both axes.
+TH2D* MergeIntoTH2D(TH1D* xhist, TH1D* yhist, std::string zname = "");
+
+//! Given a 1D Histogram, set any empty bins in Data to empty bins in MC
+void MatchEmptyBins(TH1D* data, TH1D* mc);
+
+//! Given a 2D Histogram, set any empty bins in Data to empty bins in MC
+void MatchEmptyBins(TH2D* data, TH2D* mc);
+
+//! Return a projection of a 2D Histogram onto X accounting for bin masking
+TH1D* GetProjectionX(TH2D* hist, TH2I* mask);
+
+//! Return a projection of a 2D Histogram onto Y accounting for bin masking
+TH1D* GetProjectionY(TH2D* hist, TH2I* mask);
 }
 
 /*! @} */

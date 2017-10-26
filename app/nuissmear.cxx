@@ -33,7 +33,7 @@ std::string gOptOptions = "";
 void PrintSyntax() {
   //*******************************
 
-  std::cout << "nuisflat -i input -f format [-o outfile] [-n nevents] [-t "
+  std::cout << "nuisflat -i input [-o outfile] [-n nevents] [-t "
                "options] [-q con=val] \n";
   std::cout
       << "\n Arguments : "
@@ -80,6 +80,7 @@ void GetCommandLineArgs(int argc, char** argv) {
     THROW("Need to provide a valid input file to nuisflat using -i flag!");
   } else {
     LOG(FIT) << "Reading Input File = " << gOptInputFile << std::endl;
+    gOptInputFile = InputUtils::PrependGuessedInputTypeToName(gOptInputFile);
   }
 
   // Get Output File
@@ -109,7 +110,7 @@ void GetCommandLineArgs(int argc, char** argv) {
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
     QLOG(FIT, "Reading cardfile: " << gOptCardInput);
-    configuration.LoadConfig(gOptCardInput, "");
+    configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
@@ -117,6 +118,53 @@ void GetCommandLineArgs(int argc, char** argv) {
     QLOG(FIT, "Read options: \"" << gOptOptions << "\'");
   }
   return;
+}
+
+void SetupRW() {
+  std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
+  if (!parkeys.empty()) {
+    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+  }
+
+  std::vector<std::string> Params;
+  std::map<std::string, int> TypeVals;
+  std::map<std::string, double> CurrVals;
+  for (size_t i = 0; i < parkeys.size(); i++) {
+    nuiskey key = parkeys.at(i);
+
+    // Check for type,name,nom
+    if (!key.Has("type")) {
+      ERR(FTL) << "No type given for parameter " << i << std::endl;
+      ERR(FTL) << "type='PARAMETER_TYPE'" << std::endl;
+      throw;
+    } else if (!key.Has("name")) {
+      ERR(FTL) << "No name given for parameter " << i << std::endl;
+      ERR(FTL) << "name='SAMPLE_NAME'" << std::endl;
+      throw;
+    } else if (!key.Has("nominal")) {
+      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
+      ERR(FTL) << "nominal='NOMINAL_VALUE'" << std::endl;
+      throw;
+    }
+
+    // Get Inputs
+    std::string partype = key.GetS("type");
+    std::string parname = key.GetS("name");
+    double parnom = key.GetD("nominal");
+
+    // Push into vectors
+    Params.push_back(parname);
+
+    TypeVals[parname] = FitBase::ConvDialType(partype);
+    CurrVals[parname] = parnom;
+  }
+
+  for (UInt_t i = 0; i < Params.size(); i++) {
+    FitBase::GetRW()->IncludeDial(Params[i], TypeVals[Params[i]]);
+    FitBase::GetRW()->SetDialValue(Params[i], CurrVals[Params[i]]);
+  }
+
+  FitBase::GetRW()->Reconfigure();
 }
 
 //*******************************
@@ -132,7 +180,7 @@ int main(int argc, char* argv[]) {
     THROW("Cannot create output file!");
   }
   f->cd();
-  FitPar::Config().out = f;
+  Config::Get().out = f;
 
   // Create a new measurementbase class depending on the Format
   MeasurementBase* flattreecreator = NULL;
@@ -140,9 +188,11 @@ int main(int argc, char* argv[]) {
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
 
-  samplekey.AddS("name", "FlatTree");
-  samplekey.AddS("input", gOptInputFile);
-  samplekey.AddS("type", gOptType);
+  samplekey.Set("name", "FlatTree");
+  samplekey.Set("smearceptor", gOptOptions);
+  samplekey.Set("input", gOptInputFile);
+  samplekey.Set("type", gOptType);
+
   if (gOptOptions == "") {
     THROW(
         "Attempting to flatten with Smearceptor, but no Smearceptor given. "
@@ -153,9 +203,10 @@ int main(int argc, char* argv[]) {
         "Attempting to flatten with Smearceptor, but no card passed with "
         "Smearceptors configured. Please supply a -c option.");
   }
-  flattreecreator =
-      new Smearceptance_Tester(std::string("FlatTree_") + gOptOptions,
-                               gOptInputFile, FitBase::GetRW(), gOptType, "");
+
+  SetupRW();
+
+  flattreecreator = new Smearceptance_Tester(samplekey);
 
   // Make the FlatTree reconfigure
   flattreecreator->Reconfigure();

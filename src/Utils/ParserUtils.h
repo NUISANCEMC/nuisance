@@ -1,8 +1,19 @@
 #ifndef PARSER_UTILS_H
 #define PARSER_UTILS_H
-#include "FitParameters.h"
-#include "GeneralUtils.h"
+
+#include <math.h>
+#include <stdlib.h>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <numeric>
+#include <sstream>
+#include <sstream>
+#include <string>
 #include <vector>
+#include <algorithm>
+#include "GeneralUtils.h"
 
 /// All functions used to parse input arguments.
 namespace ParserUtils {

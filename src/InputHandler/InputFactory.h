@@ -21,21 +21,12 @@
 #define INPUT_FACTORY_H
 
 #include <string>
-#include "TFile.h"
 #include "InputUtils.h"
 #include "InputHandler.h"
-#include "NEUTInputHandler.h"
-#include "GENIEInputHandler.h"
-#include "NuWroInputHandler.h"
-#include "GIBUUInputHandler.h"
-#include "NUANCEInputHandler.h"
-#include "FitEventInputHandler.h"
-#include "SplineInputHandler.h"
-#include "SigmaQ0HistogramInputHandler.h"
 
 namespace InputUtils {
 
-InputHandlerBase* CreateInputHandler(std::string const& handle, 
+InputHandlerBase* CreateInputHandler(std::string const& handle,
                                      InputUtils::InputType inpType,
                                      std::string const& inputs);
 

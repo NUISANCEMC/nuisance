@@ -17,7 +17,7 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#define DEBUG_OSC_WE
+//#define DEBUG_OSC_WE
 
 #include "OscWeightEngine.h"
 
@@ -62,7 +62,8 @@ OscWeightEngine::OscWeightEngine()
       dm23(2.5e-3),
       dcp(0.0),
       LengthParam(0xdeadbeef),
-      TargetNuType(0) {
+      TargetNuType(0),
+      ForceFromNuPDG(0) {
   Config();
 }
 
@@ -114,6 +115,9 @@ void OscWeightEngine::Config() {
   TargetNuType = OscParam[0].Has("TargetNuPDG")
                      ? GetNuType(OscParam[0].GetI("TargetNuPDG"))
                      : 0;
+  ForceFromNuPDG = OscParam[0].Has("ForceFromNuPDG")
+                       ? GetNuType(OscParam[0].GetI("ForceFromNuPDG"))
+                       : 0;
 
   QLOG(FIT, "Configured oscillation weighter:");
 
@@ -143,6 +147,20 @@ void OscWeightEngine::Config() {
   QLOG(FIT, "\tdm12   : " << params[3]);
   QLOG(FIT, "\tsinsq_theta12: " << params[4]);
   QLOG(FIT, "\tdcp   : " << params[5]);
+  if (TargetNuType) {
+    QLOG(FIT, "\tTargetNuType: " << TargetNuType);
+  }
+  if (ForceFromNuPDG) {
+    QLOG(FIT, "\tForceFromNuPDG: " << ForceFromNuPDG);
+  }
+
+#ifdef __PROB3PP_ENABLED__
+  bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
+            params[dm12_idx], params[dm23_idx], params[dcp_idx], 1, true, 2);
+  bp.DefinePath(LengthParam, 0);
+
+  QLOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
+#endif
 }
 
 void OscWeightEngine::IncludeDial(std::string name, double startval) {
@@ -214,9 +232,6 @@ bool OscWeightEngine::NeedsEventReWeight() {
 }
 
 double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
-  if (LengthParam == 0xdeadbeef) {  // not configured.
-    return 1;
-  }
   static bool Warned = false;
   if (evt->probe_E == 0xdeadbeef) {
     if (!Warned) {
@@ -228,38 +243,55 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
     }
     return 1;
   }
+
+  return CalcWeight(evt->probe_E * 1E-3, evt->probe_pdg);
+}
+
+double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
+  if (LengthParam == 0xdeadbeef) {  // not configured.
+    return 1;
+  }
 #ifdef __PROB3PP_ENABLED__
-  int NuType = GetNuType(evt->probe_pdg);
+  int NuType = (ForceFromNuPDG != 0) ? ForceFromNuPDG : GetNuType(PDGNu);
   bp.SetMNS(params[theta12_idx], params[theta13_idx], params[theta23_idx],
-            params[dm12_idx], params[dm23_idx], params[dcp_idx],
-            evt->probe_E * 1E-3, true, NuType);
+            params[dm12_idx], params[dm23_idx], params[dcp_idx], ENu, true,
+            NuType);
 
   int pmt = 0;
   double prob_weight = 1;
+  TargetPDGNu = (TargetPDGNu == -1) ? (TargetNuType ? TargetNuType : NuType)
+                                    : GetNuType(TargetPDGNu);
 
   if (LengthParamIsZenith) {  // Use earth density
     bp.DefinePath(LengthParam, 0);
     bp.propagate(NuType);
     pmt = 0;
-    prob_weight = bp.GetProb(NuType, TargetNuType ? TargetNuType : NuType);
+    prob_weight = bp.GetProb(NuType, TargetPDGNu);
   } else {
     if (constant_density != 0xdeadbeef) {
       bp.propagateLinear(NuType, LengthParam, constant_density);
       pmt = 1;
-      prob_weight = bp.GetProb(NuType, TargetNuType ? TargetNuType : NuType);
+      prob_weight = bp.GetProb(NuType, TargetPDGNu);
     } else {
       pmt = 2;
       prob_weight =
-          bp.GetVacuumProb(NuType, TargetNuType ? TargetNuType : NuType,
-                           evt->probe_E * 1E-3, LengthParam);
+          bp.GetVacuumProb(NuType, TargetPDGNu, ENu * 1E-3, LengthParam);
     }
   }
 #ifdef DEBUG_OSC_WE
   if (prob_weight != prob_weight) {
-    THROW("Calculated bad prob weight: "
-          << prob_weight << "(Osc Type: " << pmt << " -- " << NuType << " -> "
-          << (TargetNuType ? TargetNuType : NuType) << ")");
+    THROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+                                         << " -- " << NuType << " -> "
+                                         << TargetPDGNu << ")");
   }
+  if (prob_weight > 1) {
+    THROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+                                         << " -- " << NuType << " -> "
+                                         << TargetPDGNu << ")");
+  }
+
+  std::cout << NuType << " -> " << TargetPDGNu << ": " << ENu << " = "
+            << prob_weight << "%%." << std::endl;
 #endif
   return prob_weight;
 #else
@@ -283,4 +315,15 @@ int OscWeightEngine::SystEnumFromString(std::string const& name) {
   } else {
     return 0;
   }
+}
+
+void OscWeightEngine::Print() {
+  std::cout << "OscWeightEngine: " << std::endl;
+
+  std::cout << "\t theta12: " << params[theta12_idx] << std::endl;
+  std::cout << "\t theta13: " << params[theta13_idx] << std::endl;
+  std::cout << "\t theta23: " << params[theta23_idx] << std::endl;
+  std::cout << "\t dm12: " << params[dm12_idx] << std::endl;
+  std::cout << "\t dm23: " << params[dm23_idx] << std::endl;
+  std::cout << "\t dcp: " << params[dcp_idx] << std::endl;
 }

@@ -71,7 +71,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey) 
 
   SetMapValuesFromText( fSettings.GetMapInput() );
 
-  SetCholDecompFromTextFile( fSettings.GetCovarInput() );
+  SetCholDecompFromTextFile( fSettings.GetCovarInput(), 67);
   ScaleCovar(1E-16);
 
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);

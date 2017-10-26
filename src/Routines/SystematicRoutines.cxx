@@ -103,17 +103,12 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.AddS("cardfile", fCardFile);
-  if (!fOutputFile.empty()) fCompKey.AddS("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.AddS("strategy", fStrategy);
+  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadConfig( fCompKey.GetS("cardfile"), "");
-
-  // Add CMD XML Structs
-  for (size_t i = 0; i < xmlcmds.size(); i++) {
-    configuration.AddXMLLine(xmlcmds[i]);
-  }
+  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -124,11 +119,11 @@ SystematicRoutines::SystematicRoutines(int argc, char* argv[]){
   }
 
   // Finish configuration XML
-  configuration.FinaliseConfig(fCompKey.GetS("outputfile") + ".xml");
+  configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
   // Add Error Verbo Lines
-  verbocount += Config::Get().GetParI("VERBOSITY");
-  errorcount += Config::Get().GetParI("ERROR");
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
   std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
   std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   SETVERBOSITY(verbocount);
@@ -328,322 +323,6 @@ void SystematicRoutines::SetupSystematicsFromXML(){
   }
 }
 
-
-void SystematicRoutines::ReadCard(std::string cardfile){
-
-  // Read cardlines into vector
-  std::vector<std::string> cardlines = GeneralUtils::ParseFileToStr(cardfile,"\n");
-  FitPar::Config().cardLines = cardlines;
-
-  // Read Samples first (norm params can be overridden)
-  int linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++){
-    std::string line = (*iter);
-    linecount++;
-
-    // Skip Empties
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
-
-    // Read Valid Samples
-    int samstatus = ReadSamples(line);
-
-    // Show line if bad to help user
-    if (samstatus == kErrorStatus) {
-      ERR(FTL) << "Bad Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << std::endl;
-      LOG(FIT) << line << std::endl;
-      throw;
-    }
-  }
-
-  // Read Parameters second
-  linecount = 0;
-  for (std::vector<std::string>::iterator iter = cardlines.begin();
-       iter != cardlines.end(); iter++){
-    std::string line = (*iter);
-    linecount++;
-
-    // Skip Empties
-    if (line.empty()) continue;
-    if (line.c_str()[0] == '#') continue;
-
-    // Try Parameter Reads
-    int parstatus = ReadParameters(line);
-    int fakstatus = ReadFakeDataPars(line);
-
-    // Show line if bad to help user
-    if (parstatus == kErrorStatus ||
-	fakstatus == kErrorStatus ){
-      ERR(FTL) << "Bad Parameter Input in cardfile " << fCardFile
-	       << " at line " << linecount << "!" << std::endl;
-      LOG(FIT) << line << std::endl;
-      throw;
-    }
-  }
-
-  return;
-};
-
-int SystematicRoutines::ReadParameters(std::string parstring){
-
-  std::string inputspec = "RW Dial Inputs Syntax \n"
-    "free input w/ limits: TYPE  NAME  START  MIN  MAX  STEP  [STATE] \n"
-    "fix  input: TYPE  NAME  VALUE  [STATE] \n"
-    "free input w/o limits: TYPE  NAME  START  FREE,[STATE] \n"
-    "Allowed Types: \n"
-    "neut_parameter,niwg_parameter,t2k_parameter,"
-    "nuwro_parameter,gibuu_parameter";
-
-  // Check sample input
-  if (parstring.find("parameter") == std::string::npos) return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0].find("parameter") == std::string::npos){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Input rw dials need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string partype = strvct[0];
-  std::string parname = strvct[1];
-  double parval  = GeneralUtils::StrToDbl(strvct[2]);
-  double minval  = parval - 1.0;
-  double maxval  = parval + 1.0;
-  double stepval = 1.0;
-  std::string state = "FIX"; //[DEFAULT]
-
-  // Check Type
-  if (FitBase::ConvDialType(partype) == kUNKNOWN){
-    ERR(FTL) << "Unknown parameter type! " << partype << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Check Parameter Name
-  if (FitBase::GetDialEnum(partype, parname) == -1){
-    ERR(FTL) << "Bad RW parameter name! " << partype << " " << parname << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (No Limits)
-  if (strvct.size() == 4){
-    state = strvct[3];
-  }
-
-  // Check for weirder inputs
-  if (strvct.size() > 4 && strvct.size() < 6){
-    ERR(FTL) << "Provided incomplete limits for " << parname << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Option Extra (With limits and steps)
-  if (strvct.size() >= 6){
-    minval  = GeneralUtils::StrToDbl(strvct[3]);
-    maxval  = GeneralUtils::StrToDbl(strvct[4]);
-    stepval = GeneralUtils::StrToDbl(strvct[5]);
-  }
-
-  // Option Extra (dial state after limits)
-  if (strvct.size() == 7){
-    state = strvct[6];
-  }
-
-  // Run Parameter Conversion if needed
-  if (state.find("ABS") != std::string::npos){
-    parval  = FitBase::RWAbsToSigma( partype, parname, parval  );
-    minval  = FitBase::RWAbsToSigma( partype, parname, minval  );
-    maxval  = FitBase::RWAbsToSigma( partype, parname, maxval  );
-    stepval = FitBase::RWAbsToSigma( partype, parname, stepval );
-  } else if (state.find("FRAC") != std::string::npos){
-    parval  = FitBase::RWFracToSigma( partype, parname, parval  );
-    minval  = FitBase::RWFracToSigma( partype, parname, minval  );
-    maxval  = FitBase::RWFracToSigma( partype, parname, maxval  );
-    stepval = FitBase::RWFracToSigma( partype, parname, stepval );
-  }
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), parname) != fParams.end()){
-    ERR(FTL) << "Duplicate parameter names given for " << parname << std::endl;
-    throw;
-  }
-
-  // Setup Containers
-  fParams.push_back(parname);
-
-  fTypeVals[parname]  = FitBase::ConvDialType(partype);
-
-  fStartVals[parname] = parval;
-  fCurVals[parname]   = fStartVals[parname];
-
-  fErrorVals[parname] = 0.0;
-
-  fStateVals[parname] = state;
-
-  bool fixstate = state.find("FIX") != std::string::npos;
-  fFixVals[parname]      = fixstate;
-  fStartFixVals[parname] = fFixVals[parname];
-
-  fMinVals[parname]  = minval;
-  fMaxVals[parname]  = maxval;
-  fStepVals[parname] = stepval;
-
-  // Print the parameter
-  LOG(MIN) << "Read Parameter " << parname << " " << parval << " "
-	   << minval << " " << maxval << " "
-	   << stepval << " " << state << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//*******************************************
-int SystematicRoutines::ReadFakeDataPars(std::string parstring){
-//******************************************
-
-  std::string inputspec = "Fake Data Dial Inputs Syntax \n"
-    "fake value: fake_parameter  NAME  VALUE  \n"
-    "Name should match dialnames given in actual dial specification.";
-
-  // Check sample input
-  if (parstring.find("fake_parameter") == std::string::npos)
-    return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(parstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0] == "fake_parameter"){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Fake dials need to provide at least 3 inputs." << std::endl;
-    std::cout << inputspec << std::endl;
-    return kErrorStatus;
-  }
-
-  // Read Inputs
-  std::string parname = strvct[1];
-  double      parval  = GeneralUtils::StrToDbl(strvct[2]);
-
-  // Setup Container
-  fFakeVals[parname] = parval;
-
-  // Print the fake parameter
-  LOG(MIN) << "Read Fake Parameter " << parname << " " << parval << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
-
-//******************************************
-int SystematicRoutines::ReadSamples(std::string samstring){
-//******************************************
-  const static std::string inputspec =
-      "\tsample <sample_name> <input_type>:inputfile.root [OPTS] "
-      "[norm]\nsample_name: Name "
-      "of sample to include. e.g. MiniBooNE_CCQE_XSec_1DQ2_nu\ninput_type: The "
-      "input event format. e.g. NEUT, GENIE, EVSPLN, ...\nOPTS: Additional, "
-      "optional sample options.\nnorm: Additional, optional sample "
-      "normalisation factor.";
-
-  // Check sample input
-  if (samstring.find("sample") == std::string::npos)
-    return kGoodStatus;
-
-  // Parse inputs
-  std::vector<std::string> strvct = GeneralUtils::ParseToStr(samstring, " ");
-
-  // Skip if comment or parameter somewhere later in line
-  if (strvct[0].c_str()[0] == '#' ||
-      strvct[0] != "sample"){
-    return kGoodStatus;
-  }
-
-  // Check length
-  if (strvct.size() < 3){
-    ERR(FTL) << "Sample need to provide at least 3 inputs." << std::endl;
-    return kErrorStatus;
-  }
-
-  // Setup default inputs
-  std::string samname = strvct[1];
-  std::string samfile = strvct[2];
-
-  if (samfile == "FIX") {
-    ERR(FTL) << "Input filename was \"FIX\", this line is probably malformed "
-                "in the input card file. Line:\'"
-             << samstring << "\'" << std::endl;
-    ERR(FTL) << "Expect sample lines to look like:\n\t" << inputspec
-             << std::endl;
-
-    throw;
-  }
-
-  std::string samtype = "DEFAULT";
-  double      samnorm = 1.0;
-
-  // Optional Type
-  if (strvct.size() > 3) {
-    samtype = strvct[3];
-    //    samname += "_"+samtype;
-    // Also get rid of the / and replace it with underscore because it might not be supported character
-    //    while (samname.find("/") != std::string::npos) {
-    //      samname.replace(samname.find("/"), 1, std::string("_"));
-    //    }
-  }
-
-  // Optional Norm
-  if (strvct.size() > 4) samnorm = GeneralUtils::StrToDbl(strvct[4]);
-
-  // Add Sample Names as Norm Dials
-  std::string normname = samname + "_norm";
-
-  // Check no repeat params
-  if (std::find(fParams.begin(), fParams.end(), normname) != fParams.end()){
-    ERR(FTL) << "Duplicate samples given for " << samname << std::endl;
-    throw;
-  }
-
-  fParams.push_back(normname);
-
-  fTypeVals[normname]  = kNORM;
-  fStartVals[normname] = samnorm;
-  fCurVals[normname]   = fStartVals[normname];
-  fErrorVals[normname] = 0.0;
-
-  fMinVals[normname]  = 0.1;
-  fMaxVals[normname]  = 10.0;
-  fStepVals[normname] = 0.5;
-
-  bool state = samtype.find("FREE") == std::string::npos;
-  fFixVals[normname]      = state;
-  fStartFixVals[normname] = state;
-
-  // Print read in
-  LOG(MIN) << "Read sample " << samname << " "
-	   << samfile << " " << samtype << " "
-	   << samnorm << std::endl;
-
-  // Tell reader its all good
-  return kGoodStatus;
-}
 
 /*
   Setup Functions
@@ -1193,6 +872,7 @@ void SystematicRoutines::Run(){
     else if (routine.compare("ErrorBands") == 0) GenerateErrorBands();
     else if (routine.compare("ThrowErrors") == 0) GenerateThrows();
     else if (routine.compare("MergeErrors") == 0) MergeThrows();
+    else if (routine.compare("EigenErrors") == 0) EigenErrors();
     else {
       std::cout << "Unknown ROUTINE : " << routine << std::endl;
     }
@@ -1228,8 +908,15 @@ void SystematicRoutines::GenerateThrows(){
   if (startthrows < 0) startthrows = 0;
   if (endthrows < 0) endthrows = startthrows + nthrows;
 
-  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL))/35;
+  // Setting Seed
+  // Matteo Mazzanti's Fix
+  struct timeval mytime;
+  gettimeofday(&mytime, NULL);
+  Double_t seed = time(NULL) + int(getpid())+ (mytime.tv_sec * 1000.) + (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
+
+  //  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows + endthrows) + time(NULL) + int(getpid()) );
+  //  gRandom->SetSeed(seed);
   LOG(FIT) << "Using Seed : " << seed << std::endl;
   LOG(FIT) << "nthrows = " << nthrows << std::endl;
   LOG(FIT) << "startthrows = " << startthrows << std::endl;
@@ -1470,6 +1157,9 @@ void SystematicRoutines::MergeThrows(){
         errorDIR->cd();
         bintree->Fill();
       }
+
+      throwfile->Close();
+      delete throwfile;
     }
 
     errorDIR->cd();
@@ -1486,7 +1176,7 @@ void SystematicRoutines::MergeThrows(){
 //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1)) < 1.0) {
 	  //	  baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2) + pow(baseplot->GetBinError(j+1),2)));
 	//	} else {
-	baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
+	//baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
 	baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
 	  //	}
       } else {
@@ -1515,3 +1205,253 @@ void SystematicRoutines::MergeThrows(){
 
   return;
 };
+
+void SystematicRoutines::EigenErrors(){
+
+
+    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+    fOutputRootFile->cd();
+
+  // Make Covariance
+  TMatrixDSym* fullcovar = new TMatrixDSym( fParams.size() );
+
+  // Extract covariance from all loaded ParamPulls
+  for (PullListConstIter iter = fInputThrows.begin();
+       iter != fInputThrows.end(); iter++){
+    ParamPull* pull = *iter;
+
+    // Check pull is actualyl Gaussian
+    std::string pulltype = pull->GetType();
+    if (pulltype.find("GAUSTHROW") == std::string::npos){
+      THROW("Can only calculate EigenErrors for Gaussian pulls!");
+    }
+
+    // Get data and covariances
+    TH1D dialhist = pull->GetDataHist();
+    TH2D covhist  = pull->GetFullCovar();
+
+    // Loop over all dials and compare names
+    for (int pari = 0; pari < fParams.size(); pari++){
+      for (int parj = 0; parj < fParams.size(); parj++){
+	
+	std::string name_pari = fParams[pari];
+	std::string name_parj = fParams[parj];
+
+	// Compare names to those in the pull
+	for (int pulli = 0; pulli < dialhist.GetNbinsX(); pulli++){
+	  for (int pullj = 0; pullj < dialhist.GetNbinsX(); pullj++){
+	    
+	    std::string name_pulli = dialhist.GetXaxis()->GetBinLabel(pulli+1);
+	    std::string name_pullj = dialhist.GetXaxis()->GetBinLabel(pullj+1);
+
+	    if (name_pulli == name_pari && name_pullj == name_parj){
+	      (*fullcovar)[pari][parj] = covhist.GetBinContent(pulli+1, pullj+1);
+	      fCurVals[name_pari] = dialhist.GetBinContent(pulli+1);
+	      fCurVals[name_parj] = dialhist.GetBinContent(pullj+1);
+	    }
+	    
+	  }
+	}
+	
+      }
+    }
+  }
+
+  /*
+  TFile* test = new TFile("testingcovar.root","RECREATE");
+  test->cd();
+  TH2D* joinedcov = new TH2D("COVAR","COVAR",
+			     fullcovar->GetNrows(), 0.0, float(fullcovar->GetNrows()), 
+			     fullcovar->GetNrows(), 0.0, float(fullcovar->GetNrows()));
+  for (int i = 0; i < fullcovar->GetNrows(); i++){
+    for (int j = 0; j < fullcovar->GetNcols(); j++){
+      joinedcov->SetBinContent(i+1, j+1, (*fullcovar)[i][j]);
+    }
+  }
+  joinedcov->Write("COVAR");
+  test->Close();
+  */
+
+  // Calculator all EigenVectors and EigenValues
+  TMatrixDSymEigen* eigen = new TMatrixDSymEigen(*fullcovar);
+  const TVectorD eigenVals = eigen->GetEigenValues();
+  const TMatrixD eigenVect = eigen->GetEigenVectors();
+  eigenVals.Print();
+  eigenVect.Print();
+
+  TDirectory* outnominal = (TDirectory*) fOutputRootFile->mkdir("nominal");
+  outnominal->cd();
+
+  double *valst = FitUtils::GetArrayFromMap( fParams, fCurVals );
+  double chi2 = fSampleFCN->DoEval( valst );
+  delete valst;
+  fSampleFCN->Write();
+
+  // Loop over all throws
+  TDirectory* throwsdir = (TDirectory*) fOutputRootFile->mkdir("throws");
+  throwsdir->cd();
+
+  int count = 0;
+  // Produce all error throws.
+  for (int i = 0; i < eigenVect.GetNrows(); i++){
+
+    TDirectory* throwfolder = (TDirectory*)throwsdir->mkdir(Form("throw_%i",count));
+    throwfolder->cd();
+
+    // Get New Parameter Vector
+    LOG(FIT) << "Parameter Set " << count << std::endl;
+    for (int j = 0; j < eigenVect.GetNrows(); j++){
+      std::string param = fParams[j];
+      LOG(FIT) << " " << j << ". " << param << " : " << fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i] << std::endl;
+      fThrownVals[param] = fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i];
+    }
+
+    // Run Eval
+    double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
+    double chi2 = fSampleFCN->DoEval( vals );
+    delete vals;
+    count++;
+
+    fSampleFCN->Write();
+
+    
+    throwfolder = (TDirectory*)throwsdir->mkdir(Form("throw_%i",count));
+    throwfolder->cd();
+
+    // Get New Parameter Vector
+    LOG(FIT) << "Parameter Set " << count << std::endl;
+    for (int j = 0; j < eigenVect.GetNrows(); j++){
+      std::string param = fParams[j];
+      LOG(FIT) << " " << j << ". " << param << " : " <<fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i] << std::endl;
+      fThrownVals[param] = fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i];
+    }
+
+    // Run Eval
+    double *vals2 = FitUtils::GetArrayFromMap( fParams, fThrownVals );
+    chi2 = fSampleFCN->DoEval( vals2 );
+    delete vals2;
+    count++;
+    
+    // Save the FCN
+    fSampleFCN->Write();
+    
+  }
+
+  fOutputRootFile->Close();  
+  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "UPDATE");
+  fOutputRootFile->cd();
+  throwsdir = (TDirectory*) fOutputRootFile->Get("throws");
+  outnominal = (TDirectory*) fOutputRootFile->Get("nominal");
+
+  // Loop through Error DIR
+  TDirectory* outerr = (TDirectory*) fOutputRootFile->mkdir("errors");
+  outerr->cd();
+  TIter next(outnominal->GetListOfKeys());
+  TKey *key;
+  while ((key = (TKey*)next())) {
+    
+    TClass *cl = gROOT->GetClass(key->GetClassName());
+    if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
+    
+    LOG(FIT) << "Creating error bands for " << key->GetName() << std::endl;
+    std::string plotname = std::string(key->GetName());
+
+    if (plotname.find("_EVT") != std::string::npos) continue;
+    if (plotname.find("_FLUX") != std::string::npos) continue;
+    if (plotname.find("_FLX") != std::string::npos) continue;
+
+    TH1* baseplot = (TH1D*)key->ReadObj()->Clone(Form("%s_ORIGINAL",key->GetName()));
+    TH1* errorplot_upper = (TH1D*)baseplot->Clone(Form("%s_ERROR_UPPER",key->GetName()));
+    TH1* errorplot_lower = (TH1D*)baseplot->Clone(Form("%s_ERROR_LOWER", key->GetName()));
+    TH1* meanplot = (TH1D*)baseplot->Clone(Form("%s_SET_MEAN", key->GetName()));
+    TH1* systplot = (TH1D*)baseplot->Clone(Form("%s_SYST", key->GetName()));
+    TH1* statplot = (TH1D*)baseplot->Clone(Form("%s_STAT", key->GetName()));
+    TH1* totlplot = (TH1D*)baseplot->Clone(Form("%s_TOTAL", key->GetName()));
+
+    int nbins = 0;
+    if (cl->InheritsFrom("TH1D")) nbins = ((TH1D*)baseplot)->GetNbinsX();
+    else nbins = ((TH1D*)baseplot)->GetNbinsX()* ((TH1D*)baseplot)->GetNbinsY();
+
+    meanplot->Reset();
+    errorplot_upper->Reset();
+    errorplot_lower->Reset();
+
+    for (int j = 0; j < nbins; j++){
+      errorplot_upper->SetBinError(j+1, 0.0);
+      errorplot_lower->SetBinError(j+1, 0.0);
+    }
+
+    // Loop over throws and calculate mean and error for +- throws
+    int addcount = 0;
+
+    // Add baseplot first to slightly bias to central value
+    meanplot->Add(baseplot);
+    addcount++;
+
+    for (int i = 0; i < count; i++){
+      TH1* newplot = (TH1D*) throwsdir->Get(Form("throw_%i/%s",i,plotname.c_str()));
+      if (!newplot){
+	ERR(WRN) << "Cannot find new plot : " << Form("throw_%i/%s",i,plotname.c_str()) << std::endl;
+	ERR(WRN) << "This plot will not have the correct errors!" << std::endl;
+	continue;
+      }
+      newplot->SetDirectory(0);
+      nbins = newplot->GetNbinsX();
+    
+      for (int j = 0; j < nbins; j++){
+	if (i % 2 == 0){
+	  //	  std::cout << plotname<< " : upper " << errorplot_upper->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " <<newplot->GetBinContent(j+1) << std::endl;
+	  errorplot_upper->SetBinContent(j+1, errorplot_upper->GetBinContent(j+1) + 
+					 pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
+	} else {
+	  //	  std::cout << plotname << " : lower " << errorplot_lower->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
+	  //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " << newplot->GetBinContent(j+1) << std::endl;
+	  errorplot_lower->SetBinContent(j+1, errorplot_lower->GetBinContent(j+1) +
+                                         pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
+	  //	  newplot->Print();
+	}
+	meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1) + baseplot->GetBinContent(j+1));
+      }
+      delete newplot;
+      addcount++;
+    }
+    
+    // Get mean Average
+    for (int j = 0; j < nbins; j++){
+      meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1)/double(addcount));
+    }
+
+    for (int j = 0; j < nbins; j++){
+      errorplot_upper->SetBinContent(j+1, sqrt(errorplot_upper->GetBinContent(j+1)));
+      errorplot_lower->SetBinContent(j+1, sqrt(errorplot_lower->GetBinContent(j+1)));
+      
+      statplot->SetBinError(j+1, baseplot->GetBinError(j+1) );
+      systplot->SetBinError(j+1, (errorplot_upper->GetBinContent(j+1) + errorplot_lower->GetBinContent(j+1))/2.0);
+      totlplot->SetBinError(j+1, sqrt( pow(statplot->GetBinError(j+1),2) + pow(systplot->GetBinError(j+1),2) ) );
+
+      meanplot->SetBinError(j+1, sqrt( pow(statplot->GetBinError(j+1),2) + pow(systplot->GetBinError(j+1),2) ) );
+     
+    }
+
+    outerr->cd();
+    errorplot_upper->Write();
+    errorplot_lower->Write();
+    baseplot->Write();
+    meanplot->Write();
+
+    statplot->Write();
+    systplot->Write();
+    totlplot->Write();
+
+    delete errorplot_upper;
+    delete errorplot_lower;
+    delete baseplot;
+    delete meanplot;
+    delete statplot;
+    delete systplot;
+    delete totlplot;
+  }
+
+}

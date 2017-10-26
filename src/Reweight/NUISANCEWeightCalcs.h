@@ -1,15 +1,7 @@
 #ifndef NUISANCE_WEIGHT_CALCS
 #define NUISANCE_WEIGHT_CALCS
 
-#include "FitEvent.h"
-#include "GeneralUtils.h"
 #include "BaseFitEvt.h"
-#include "WeightUtils.h"
-#include "NUISANCESyst.h"
-#include "FitParameters.h"
-
-using namespace Reweight;
-
 
  class NUISANCEWeightCalc {
 public:
@@ -42,8 +34,6 @@ class ModeNormCalc : public NUISANCEWeightCalc {
 
   double fNormRES;
  };
-
-
 
 class GaussianModeCorr : public NUISANCEWeightCalc {
 public:

@@ -72,7 +72,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name, std::string inputfile
 void GenericFlux_Vectors::AddEventVariablesToTree() {
   // Setup the TTree to save everything
   if (!eventVariables) {
-    FitPar::Config().out->cd();
+    Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
                                (this->fName + "_VARS").c_str());
   }
@@ -128,7 +128,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
     pdg[i] = 0;
-  } 
+  }
 
   Weight = InputWeight = RWWeight = 0;
 
@@ -141,7 +141,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   // Get the incoming neutrino and outgoing lepton
   FitParticle *nu  = event->GetNeutrinoIn();
   FitParticle *lep = event->GetHMFSAnyLepton();
-  
+
   PDGnu = nu->fPID;
   Enu = nu->fP.E()/1E3;
   tgt = event->fTargetPDG;
@@ -154,7 +154,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   q0 = (nu->fP - lep->fP).E()/1E3;
   q3 = (nu->fP - lep->fP).Vect().Mag()/1E3;
 
-  // Get W_true with assumption of initial state nucleon at rest                                                                                                           
+  // Get W_true with assumption of initial state nucleon at rest
   float m_n = (float)PhysConst::mass_proton;
   W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
   W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);

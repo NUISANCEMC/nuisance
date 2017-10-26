@@ -65,19 +65,19 @@ class FitParticle {
   inline bool IsInitialState (void) const { return (fStatus == kInitialState); };
 
   /// Get Mass
-  inline double M  (void){ return fP.Mag(); }; 
+  inline double M  (void){ return fP.Mag(); };
 
   /// Get Kinetic Energy
-  inline double KE (void){ return fP.E() - fP.Mag(); }; 
+  inline double KE (void){ return fP.E() - fP.Mag(); };
 
   /// Get Total Energy
   inline double E  (void){ return fP.E(); };
 
   /// Get 4 Momentum
-  inline TLorentzVector P4(void) {return fP;}; 
+  inline TLorentzVector P4(void) {return fP;};
 
   /// Get 3 Momentum
-  inline TVector3       P3(void) {return fP.Vect();}; 
+  inline TVector3       P3(void) {return fP.Vect();};
 
   /// Get 3 momentum magnitude
   inline double         p(void) { return fP.Vect().Mag(); };
@@ -100,7 +100,7 @@ inline std::ostream& operator<<(std::ostream& os, FitParticle const& p){
   return os << " Particle[pdgc:" << p.fPID
 	    << ", stat:"<<p.fStatus
 	    << ", 4mom:("<< p.fP.X() << "," << p.fP.Y() << "," << p.fP.Z() << "," << p.fP.T() << ")]";
-  
+
 }
 
 

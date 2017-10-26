@@ -31,6 +31,14 @@
 
 #include <cmath>
 
+#ifdef __PROB3PP_ENABLED__
+class BG : public BargerPropagator {
+ public:
+  BG() : BargerPropagator(){};
+  double GetBaseline() { return Earth->get_Pathlength(); }
+};
+#endif
+
 class OscWeightEngine : public WeightEngineBase {
   enum params {
 
@@ -44,7 +52,7 @@ class OscWeightEngine : public WeightEngineBase {
   };
 
 #ifdef __PROB3PP_ENABLED__
-  BargerPropagator bp;
+  BG bp;
 #endif
 
   //******************************* Osc params ******************************
@@ -84,6 +92,12 @@ class OscWeightEngine : public WeightEngineBase {
   /// disappearance probability.
   int TargetNuType;
 
+  /// The initial neutrino species
+  ///
+  /// If unspecified in the <OscParam /> element, it will be determined by
+  /// the incoming events.
+  int ForceFromNuPDG;
+
  public:
   OscWeightEngine();
 
@@ -121,6 +135,9 @@ class OscWeightEngine : public WeightEngineBase {
   bool NeedsEventReWeight();
 
   double CalcWeight(BaseFitEvt* evt);
+  double CalcWeight(double ENu, int PDGNu, int TargetPDGNu = -1);
 
   static int SystEnumFromString(std::string const& name);
+
+  void Print();
 };

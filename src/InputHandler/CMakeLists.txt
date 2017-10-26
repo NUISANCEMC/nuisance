@@ -37,6 +37,7 @@ InputTypes.h
 HepMCTextInputHandler.cxx
 InputFactory.cxx
 SigmaQ0HistogramInputHandler.cxx
+HistogramInputHandler.cxx
 )
 
 set(HEADERFILES
@@ -60,6 +61,7 @@ GeneratorInfoBase.h
 InputFactory.h
 InteractionModes.h
 SigmaQ0HistogramInputHandler.h
+HistogramInputHandler.h
 )
 
 set(LIBNAME InputHandler)
