@@ -5,7 +5,7 @@ void ISmearcepter::Setup(nuiskey& nk) {
   ElementName = nk.GetElementName();
 
   QLOG(SAM, "Setting up smearcepter (Type:" << ElementName << ", InstanceName: "
-                                            << InstanceName);
+                                            << InstanceName << ").");
 
   SpecifcSetup(nk);
 }

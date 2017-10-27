@@ -270,7 +270,7 @@ ISmearcepter* DynamicSmearceptorFactory::CreateSmearceptor(
   QLOG(SAM, "\tLoading smearceptor " << smearceptor.second << " from "
                                      << smearceptor.first);
 
-  ISmearcepter* smear =  (*(Manifests[smearceptor.first].DSF_GetSmearceptor))(
+  ISmearcepter* smear = (*(Manifests[smearceptor.first].DSF_GetSmearceptor))(
       smearceptor.second, &smearceptorkey);
   return smear;
 }
@@ -324,8 +324,12 @@ void Smearcepterton::InitialiserSmearcepters() {
         smearer = factories[smearType](smearcepters[smear_it]);
       }
 
-      if(!smearer){
+      if (!smearer) {
         THROW("Failed to load smearceptor.");
+      }
+      if (!smearer->GetName().length()) {
+        THROW("Smearcepter type " << smearer->GetElementName()
+                                  << " had no instance name.");
       }
 
       Smearcepters[smearer->GetName()] = smearer;
