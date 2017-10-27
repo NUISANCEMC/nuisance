@@ -770,6 +770,17 @@ void Smear_SVDUnfold_Propagation_Osc::PropagateFDSample(size_t fds_it) {
 }
 
 void Smear_SVDUnfold_Propagation_Osc::ConvertEventRates(void) {
+
+  /// Get topology weights
+  /// for each ND sample
+  /// /// Build NDSample::NDToSpectrumSmearingMatrix from sum of topology smearing histos scaled by topology weights
+  ///
+  /// SetupNDInputs();
+  ///
+  /// for each FD sample
+  /// /// Build FDSample::SpectrumToFDSmearingMatrix_TH2 as above.
+  /// /// Convert to TMatrixD, FDSample::SpectrumToFDSmearingMatrix
+
   for (size_t fds_it = 0; fds_it < FDSamples.size(); ++fds_it) {
     PropagateFDSample(fds_it);
   }
