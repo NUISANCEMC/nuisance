@@ -312,10 +312,13 @@ void Smearcepterton::InitialiserSmearcepters() {
       std::string const& smearType = smearcepters[smear_it].GetElementName();
 
       ISmearcepter* smearer = NULL;
+#ifdef __USE_DYNSAMPLES__
       if (DynamicSmearceptorFactory::Get().HasSmearceptor(smearType)) {
         smearer = DynamicSmearceptorFactory::Get().CreateSmearceptor(
             smearcepters[smear_it]);
-      } else {
+      } else
+#endif
+      {
         if (!factories.count(smearType)) {
           ERROR(WRN, "No known smearer accepts elements named: \"" << smearType
                                                                    << "\"");
