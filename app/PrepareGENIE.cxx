@@ -357,13 +357,14 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Fill total event hist
     eventhist->Fill(neu->E());
 
+    if (i % (nevt / 20) == 0) {
+      LOG(FIT) << "Processed " << i << "/" << nevt
+               << " GENIE events (Last event: { E: " << neu->E()
+               << ", xsec: " << xsec << " }." << std::endl;
+    }
+
     // Clear Event
     genientpl->Clear();
-
-    if (i % (nevt / 20) == 0) {
-      LOG(FIT) << "Processed " << i << "/" << nevt << " GENIE events."
-               << std::endl;
-    }
   }
   LOG(FIT) << "Processed all events" << std::endl;
 
@@ -379,9 +380,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
     outputfile->cd();
 
+    QLOG(FIT, "Cloning input vector to output file: " << gOutputFile);
     TTree* cloneTree = tn->CloneTree();
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
+    QLOG(FIT, "Done.");
   }
 
   LOG(FIT) << "Getting splines " << std::endl;
