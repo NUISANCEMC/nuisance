@@ -244,10 +244,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     to = from + step * nstep;
 
     QLOG(FIT, "Generating flat flux histogram from "
-                  << from << " to " << to << " with bins " << step << " wide.");
+                  << from << " to " << to << " with bins " << step
+                  << " wide (NBins = " << nstep << ").");
 
     fluxhist =
-        new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", step, from, to);
+        new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
     fluxhist->SetDirectory(0);
   } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
