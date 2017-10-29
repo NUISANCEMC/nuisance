@@ -235,7 +235,17 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
   TH1D* fluxhist = NULL;
-  if (fluxvect.size() > 1) {
+  if (fluxvect.size() == 3) {
+    double from = GeneralUtils::StrToDbl(fluxvect[0]);
+    double to = GeneralUtils::StrToDbl(fluxvect[1]);
+    int step = GeneralUtils::StrToInt(fluxvect[2]);
+
+    QLOG(FIT, "Generating flat flux histogram from "
+                  << from << " to " << to << " with bins " << step << " wide.");
+    fluxhist =
+        new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", step, from, to);
+    fluxhist->SetDirectory(0);
+  } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
       fluxhist = dynamic_cast<TH1D*>(fluxfile->Get(fluxvect[1].c_str()));
@@ -245,20 +255,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
         throw;
       }
       fluxhist->SetDirectory(0);
-    } else {
-      // Function with EnuRange
-      if (fluxvect.size() == 3) {
-        ERR(FTL) << "FUNCTION WITH ENU RANGE NOT SUPPORTED SORRY!" << std::endl;
-        throw;
-      }
     }
-
   } else if (fluxvect.size() == 1) {
     MonoEnergy = GeneralUtils::StrToDbl(fluxvect[0]);
     RunGENIEPrepareMono(input, target, output);
     return;
   } else {
-    LOG(FTL) << "NO FLUX SPECIFIED" << std::endl;
+    LOG(FTL) << "Bad flux specification: \"" << flux << "\"." << std::endl;
     throw;
   }
 
@@ -485,6 +488,9 @@ void PrintOptions() {
                "with."
             << " A simple method is to point this to the flux histogram genie "
                "generatrs '-f /path/to/events/input-flux.root,spectrum'. "
+            << std::endl;
+  std::cout << " [ -f elow,ehigh,estep ] : Energy range specification when no "
+               "flux file was used."
             << std::endl;
   std::cout << " [ -t target ] : Target that GHepRecords were generated with. "
                "Comma seperated list. E.g. for CH2 "
