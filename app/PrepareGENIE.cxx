@@ -272,9 +272,27 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   // Setup TTree
   TChain* tn = new TChain("gtree");
-  tn->AddFile(input.c_str());
+
+  if (input.find_first_of(',') != std::string::npos) {
+    std::vector<std::string> inputvect = GeneralUtils::ParseToStr(input, ",");
+
+    for (size_t iv_it = 0; iv_it < inputvect.size(); ++iv_it) {
+      tn->AddFile(inputvect[iv_it].c_str());
+      QLOG(FIT, "Added input file: " << inputvect[iv_it]);
+    }
+  } else { // The Add form can accept wildcards.
+    tn->Add(input.c_str());
+  }
 
   int nevt = tn->GetEntries();
+
+  if (!nevt) {
+    THROW("Couldn't load any events from input specification: \""
+          << input.c_str() << "\"");
+  } else {
+    QLOG(FIT, "Found " << nevt << " input entries.");
+  }
+
   NtpMCEventRecord* genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
