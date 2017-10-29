@@ -369,8 +369,20 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   // Once event loop is done we can start saving stuff into the file
 
-  TFile* outputfile = new TFile(input.c_str(), "UPDATE");
-  outputfile->cd();
+  TFile* outputfile;
+
+  if (!gOutputFile.length()) {
+    tn->GetEntry(0);
+    outputfile = tn->GetFile();
+    outputfile->cd();
+  } else {
+    outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
+    outputfile->cd();
+
+    TTree* cloneTree = tn->CloneTree();
+    cloneTree->SetDirectory(outputfile);
+    cloneTree->Write();
+  }
 
   LOG(FIT) << "Getting splines " << std::endl;
 
@@ -485,6 +497,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
            << std::endl;
   std::cout << "XSec Hist Integral = " << xsechist->Integral("width")
             << std::endl;
+
+  outputfile->Write();
+  outputfile->Close();
+  delete outputfile;
 
   return;
 };
