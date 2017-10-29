@@ -249,6 +249,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
     fluxhist =
         new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
+
+    for (Int_t bi_it = 1; bi_it < fluxhist->GetXaxis()->GetNbins(); ++bi_it) {
+      fluxhist->SetBinContent(bi_it, 1.0 / double(step * nstep));
+    }
     fluxhist->SetDirectory(0);
   } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
@@ -280,7 +284,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       tn->AddFile(inputvect[iv_it].c_str());
       QLOG(FIT, "Added input file: " << inputvect[iv_it]);
     }
-  } else { // The Add form can accept wildcards.
+  } else {  // The Add form can accept wildcards.
     tn->Add(input.c_str());
   }
 
