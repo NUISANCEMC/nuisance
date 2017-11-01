@@ -55,7 +55,7 @@ echo "cat \$NUISANCE/root/bin/thisroot.sh_tmp | sed \"s:__INST_ROOT__:\$NUISANCE
 cat root/bin/thisroot.csh | sed 's:@CMAKE_ROOTSYS@:__INST_ROOT__:g' > root/bin/thisroot.csh_tmp
 rm root/bin/thisroot.csh
 
-echo "cat \$NUISANCE/root/bin/thisroot.csh_tmp | sed \"s:__INST_ROOT__:\$NUISANCE/root:g\" > \$NUISANCE/root/bin/thisroot.csh" >> setup.csh
+echo "cat \$NUISANCE/root/bin/thisroot.csh_tmp | sed \"s:__INST_ROOT__:\$NUISANCE/root:g\" > \$NUISANCE/root/bin/thisroot.csh" >> setup.sh
 
 echo "source \$NUISANCE/root/bin/thisroot.sh" >> setup.sh
 
@@ -82,7 +82,8 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
   mkdir exes/neut
 
   echo "[INFO]: Copying NEUT libraries from @NEUT_ROOT@"
-  cp @NEUT_ROOT@/src/reweight/*.so deps/neut
+  cp @NEUT_ROOT@/src/reweight/*.so* deps/neut
+  cp @NEUT_ROOT@/src/neutclass/*.so* deps/neut
 
   cp @NEUT_ROOT@/src/neutsmpl/neutroot2 exes/neut
 
