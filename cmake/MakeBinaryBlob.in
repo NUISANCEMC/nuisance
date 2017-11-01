@@ -1,0 +1,172 @@
+# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#!/bin/sh
+
+if [ ! ${NUISANCE} ]; then
+  echo "[ERROR]; NUISANCE envrionment variable is not defined, please source NUSIANCE before trying to make a binary blob."
+  exit 1
+fi
+
+mkdir BinBlob
+cd BinBlob
+
+echo "#!/bin/sh" > setup.sh
+
+cat @PROJECT_SOURCE_DIR@/cmake/BinBlobSetup.header >> setup.sh
+
+mkdir deps exes
+
+mkdir root
+
+mkdir -p root/lib/root
+echo "[INFO]: Copying ROOT libraries from @CMAKE_ROOTSYS@/lib/root"
+cp @CMAKE_ROOTSYS@/lib/root/*.so* root/lib/root/
+
+mkdir root/bin
+echo "[INFO]: Copying ROOT binary from @CMAKE_ROOTSYS@/bin"
+cp @CMAKE_ROOTSYS@/bin/* root/bin
+
+mkdir -p root/share/man/man1
+echo "[INFO]: Copying ROOT man pages from @CMAKE_ROOTSYS@/share/man/man1"
+cp -r @CMAKE_ROOTSYS@/share/man/man1 root/share/man/man1
+
+cat root/bin/thisroot.sh | sed 's:@CMAKE_ROOTSYS@:__INST_ROOT__:g' > root/bin/thisroot.sh_tmp
+rm root/bin/thisroot.sh
+
+echo "cat \$NUISANCE/root/bin/thisroot.sh_tmp | sed \"s:__INST_ROOT__:\$NUISANCE/root:g\" > \$NUISANCE/root/bin/thisroot.sh" >> setup.sh
+
+cat root/bin/thisroot.csh | sed 's:@CMAKE_ROOTSYS@:__INST_ROOT__:g' > root/bin/thisroot.csh_tmp
+rm root/bin/thisroot.csh
+
+echo "cat \$NUISANCE/root/bin/thisroot.csh_tmp | sed \"s:__INST_ROOT__:\$NUISANCE/root:g\" > \$NUISANCE/root/bin/thisroot.csh" >> setup.csh
+
+echo "source \$NUISANCE/root/bin/thisroot.sh" >> setup.sh
+
+if [ "@USE_T2K@" != "FALSE" ]; then
+  mkdir deps/t2k
+
+  echo "[INFO]: Copying T2K libraries from @T2KREWEIGHT@"
+  cp @T2KREWEIGHT@/lib/*.so deps/t2k/
+
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/t2k" >> setup.sh
+fi
+
+
+if [ "@USE_NIWG@" != "FALSE" ]; then
+  mkdir deps/niwg
+  echo "[INFO]: Copying NIWG libraries from @NIWG@"
+  cp @NIWG@/lib/*.so deps/niwg/
+
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/niwg" >> setup.sh
+fi
+
+if [ "@USE_NEUT@" != "FALSE" ]; then
+  mkdir deps/neut
+  mkdir exes/neut
+
+  echo "[INFO]: Copying NEUT libraries from @NEUT_ROOT@"
+  cp @NEUT_ROOT@/src/reweight/*.so deps/neut
+
+  cp @NEUT_ROOT@/src/neutsmpl/neutroot2 exes/neut
+
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/neut" >> setup.sh
+fi
+
+if [ "@USE_NuWro@" != "FALSE" ]; then
+  if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
+    mkdir deps/nuwro
+    mkdir exes/nuwro
+    mkdir data
+    mkdir data/nuwro
+
+    echo "[INFO]: Copying NuWro libraries from @NUWRO@"
+
+    cp @NUWRO@/lib/*.so deps/nuwro
+
+    cp @NUWRO@/bin/nuwro exes/nuwro/
+    cp -r @NUWRO@/data data/nuwro
+
+    echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/nuwro" >> setup.sh
+    echo "export NUWRO=\$NUISANCE/data/nuwro" >> setup.sh
+
+  else
+    echo "[INFO]: NuWro support included from input event file."
+  fi
+fi
+
+if [ "@NEED_PYTHIA6@" != "FALSE" ]; then
+  mkdir deps/pythia
+  echo "[INFO]: Copying PYTHIA libraries from @PYTHIA6@"
+  cp @PYTHIA6@/*.so deps/pythia/
+
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/pythia" >> setup.sh
+fi
+
+if [ "@USE_GENIE@" != "FALSE" ]; then
+  mkdir -p deps/genie/{,libxml2,lhapdf,log4cpp}
+  mkdir exes/genie
+
+  echo "[INFO]: Copying LHAPDF libraries from @LHAPDF_LIB@"
+  cp @LHAPDF_LIB@/libLHAPDF.so* deps/genie/lhapdf
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/genie/lhapdf" >> setup.sh
+
+  echo "[INFO]: Copying LIBXML2 libraries from @LIBXML2_LIB@"
+  cp @LIBXML2_LIB@/libxml2.so* deps/genie/libxml2
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/genie/libxml2" >> setup.sh
+
+  echo "[INFO]: Copying LOG4CPP libraries from @LOG4CPP_LIB@"
+  cp @LOG4CPP_LIB@/liblog4cpp.so* deps/genie/log4cpp
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/genie/log4cpp" >> setup.sh
+
+
+  if [ "@LHAPATH@" ]; then
+    mkdir -p data/genie/lhapdf
+    cp @LHAPATH@/*.LHgrid data/genie/lhapdf/
+    echo "export LHAPATH=\"\$NUISANCE/data/genie/lhapdf\"" >> setup.sh
+  fi
+
+  echo "[INFO]: Copying GENIE libraries from @GENIE@/lib"
+  cp @GENIE@/lib/*.so* deps/genie/
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/genie" >> setup.sh
+
+  echo "[INFO]: Copying GENIE binaries from @GENIE@/bin"
+  cp @GENIE@/bin/* exes/genie/
+  echo "add_to_PATH \$NUISANCE/exes/genie" >> setup.sh
+
+fi
+
+mkdir exes/nuisance
+cp @CMAKE_INSTALL_PREFIX@/bin/* exes/nuisance/
+echo "add_to_PATH \$NUISANCE/exes/nuisance" >> setup.sh
+
+rm exes/nuisance/BuildDynamic*
+
+if [ @CMAKE_BUILD_TYPE@ == "RELEASE" ]; then
+  mkdir deps/nuisance
+  echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/nuisance" >> setup.sh
+  cp @CMAKE_INSTALL_PREFIX@/lib/*.so deps/nuisance/
+fi
+
+if [ -e data ]; then
+  tar -zcvf nuisblob.tar.gz setup.sh exes/* deps/* root/* data/*
+else
+  tar -zcvf nuisblob.tar.gz setup.sh exes/* deps/* root/*
+fi
+cd ../
