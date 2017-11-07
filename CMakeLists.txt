@@ -199,6 +199,11 @@ if(USE_DYNSAMPLES)
 
   string(REPLACE ";" " -I" ALL_INCLUDES_STR "${ALL_INCLUDES}")
 
+  cmessage(DEBUG ${CMAKE_DEPENDLIB_FLAGS})
+  string(REPLACE "-levent " "" CMAKE_DEPENDLIB_FLAGS_NEW ${CMAKE_DEPENDLIB_FLAGS})
+  set(CMAKE_DEPENDLIB_FLAGS ${CMAKE_DEPENDLIB_FLAGS_NEW})
+  cmessage(DEBUG ${CMAKE_DEPENDLIB_FLAGS})
+
   string(REPLACE ";" " -l" ALL_MODULETARGETS_STR "${MODULETargets}")
 
   configure_file(cmake/BuildDynamicSample.in
