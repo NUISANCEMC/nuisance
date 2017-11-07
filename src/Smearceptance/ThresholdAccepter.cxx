@@ -244,13 +244,13 @@ void ThresholdAccepter::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
                 << ReconThresholds[fp->PDG()][rt_it].ThresholdVal << " | "
                 << GetKineVal(fp, ReconThresholds[fp->PDG()][rt_it]) << ")"
                 << std::flush;
+#endif
       if ((ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
            ThresholdAccepter::kMomentum) ||
           (ReconThresholds[fp->PDG()][rt_it].ThresholdType ==
            ThresholdAccepter::kKE)) {
         FailEnergyThresh = true;
       }
-#endif
     } else {
 #ifdef DEBUG_THRESACCEPT
       std::cout << "\n\t -- Accepted. ("

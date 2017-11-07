@@ -1160,7 +1160,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       T2K CC1pi+ CH samples
     */
     // Comment these out for now because we don't have the proper data
-    
+
 
     } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dpmu_nu")) {
 	return (new T2K_CC1pip_CH_XSec_1Dpmu_nu(samplekey));
