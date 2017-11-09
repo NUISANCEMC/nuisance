@@ -49,8 +49,12 @@ enum NUISANCESyst {
 	kMINERvARW_RikRPA_HighQ2,
 
 	kMINERvARW_RikRESRPA_ApplyRPA,
-        kMINERvARW_RikRESRPA_LowQ2,
+    kMINERvARW_RikRESRPA_LowQ2,
 	kMINERvARW_RikRESRPA_HighQ2,
+
+    kSBLOsc_Distance,
+    kSBLOsc_MassSplitting,
+    kSBLOsc_Sin2Theta,
 
 	kNUISANCEDial_LAST
 };

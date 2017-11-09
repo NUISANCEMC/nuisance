@@ -55,6 +55,10 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kMINERvARW_RikRPA_LowQ2:               { return "MINERvARW_RikRPA_LowQ2"; }
     case kMINERvARW_RikRPA_HighQ2:              { return "MINERvARW_RikRPA_HighQ2"; }
 
+    case kSBLOsc_Distance: { return "SBLOsc_Distance"; }
+    case kSBLOsc_MassSplitting: { return "SBLOsc_MassSplitting"; }
+    case kSBLOsc_Sin2Theta: { return "SBLOsc_Sin2Theta"; }
+
 	default: return "unknown_nuisance_dial";
 	}
 
