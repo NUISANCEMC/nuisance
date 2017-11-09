@@ -16,6 +16,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   // Load in all Weight Calculations
   fWeightCalculators.push_back(new GaussianModeCorr());
   fWeightCalculators.push_back(new ModeNormCalc());
+  fWeightCalculators.push_back(new SBLOscWeightCalc());
 
 #ifdef __MINERVA_RW_ENABLED__
 #ifdef __GENIE_ENABLED__
