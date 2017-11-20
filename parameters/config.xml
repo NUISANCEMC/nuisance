@@ -39,7 +39,6 @@
 <config RemoveFSIParticles='0' />
 <config RemoveUndefParticles='0' />
 <config RemoveNuclearParticles='0'/>
-<config logging.JointFCN.cxx='4'/>
 <config MINERvASaveExtraCCQE='0' />
 
 <!-- # Input Configs -->
@@ -47,14 +46,11 @@
 
 <!-- # Default Requirements file for the externalDataFitter Package -->
 <!-- # MAX Events : -1 is no cut. Events will be scaled automatically to give good xsec predictions. -->
-<config input.maxevents='-1'/>
 <config MAXEVENTS='-1'/>
-<config input.MAXEVENTS='-1'/>
 <config includeemptystackhists='0'/>
 <!-- # Turn on/off event manager -->
 <!-- # EventManager enables us to only loop number of events once for multiple projections of the same measurements -->
 <!-- # e.g. MiniBooNE CC1pi+ Q2 and MiniBooNE CC1pi+ Tmu would ordinarily require 2 reconfigures, but with this enabled it requires only one -->
-<config input.eventmanager='1'/>
 <config EventManager='1'/>
 
 <!-- # Event Directories -->
@@ -71,7 +67,6 @@
 
 <!-- # In InputHandler the option to regenerate NuWro flux/xsec plots is available -->
 <!-- # Going to move this to its own app soon -->
-<config input.regen_nuwro_plots='0'/>
 
 <!-- # DEVEL CONFIG OPTION, don't touch! -->
 <config CacheSize='0'/>
@@ -79,21 +74,15 @@
 <!-- # ReWeighting Configuration Options -->
 <!-- # ###################################################### -->
 
-<!-- # Set absolute twkdial for parameters -->
-<config params.setabstwk='0'/>
-
 <!-- # Convert Dials in output statements using dial conversion card -->
 <config convert_dials='0'/>
 
-<!-- # Make RW Calculations be quiet -->
-<config params.silentweighting='0'/>
-
 <!-- # Vetos can be used to specify RW dials NOT to be loaded in -->
 <!-- # Useful if one specific one has an issue -->
-<config FitWeight.fNIWGRW_veto=''/>
-<config FitWeight.fNuwroRW_veto=''/>
-<config FitWeight.fNeutRW_veto=''/>
-<config FitWeight.fGenieRW_veto=''/>
+<config FitWeight_fNIWGRW_veto=''/>
+<config FitWeight_fNuwroRW_veto=''/>
+<config FitWeight_fNeutRW_veto=''/>
+<config FitWeight_fGenieRW_veto=''/>
 
 
 <!-- # Output Options -->
@@ -133,17 +122,17 @@
 <!-- # ###################################################### -->
 
 <!-- # Add MC Statistical error to likelihoods -->
-<config statutils.addmcerror='0'/>
+<config addmcerror='0'/>
 
 <!-- # NUISMIN Configurations -->
 <!-- # ###################################################### -->
 
-<config minimizer.maxcalls='1000000'/>
-<config minimizer.maxiterations='1000000'/>
-<config minimizer.tolerance='0.001'/>
+<config MAXCALLS='1000000'/>
+<config MAXITERATIONS='1000000'/>
+<config TOLERANCE='0.001'/>
 
 <!-- # Number of events required in low stats routines -->
-<config minimizer.lowstatevents='25000'/>
+<config LOWSTATEVENTS='25000'/>
 
 
 <!-- # Error band generator configs -->
@@ -173,9 +162,9 @@
 <config muon_momentum_throw='0'/>
 
 <!-- # MINERvA Specific Configs -->
-<config MINERvA_XSec_CCinc_2DEavq3_nu.hadron_cut='0'/>
-<config MINERvA_CCinc_XSec_2DEavq3_nu.useq3true='0'/>
-<config Modes.split_PN_NN='0'/>
+<config MINERvA_XSec_CCinc_2DEavq3_nu_hadron_cut='0'/>
+<config MINERvA_CCinc_XSec_2DEavq3_nu_useq3true='0'/>
+<config Modes_split_PN_NN='0'/>
 <config SignalReconfigures='0'/>
 
 <!-- # SciBooNE specific -->
@@ -192,7 +181,6 @@
 
 
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
-<config  GENIEInputHandler.SavePrimary="0" />
 
 <config NToyThrows='100000' />
 
