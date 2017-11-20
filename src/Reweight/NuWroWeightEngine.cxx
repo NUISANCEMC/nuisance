@@ -15,7 +15,7 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
 
   // Get List of Veto Calcs (For Debugging)
   std::string rw_engine_list =
-      FitPar::Config().GetParS("FitWeight.fNuwroRW_veto");
+      FitPar::Config().GetParS("FitWeight_fNuwroRW_veto");
   bool xsec_qel = rw_engine_list.find("nuwro_QEL") == std::string::npos;
   bool xsec_flag = rw_engine_list.find("nuwro_FlagNorm") == std::string::npos;
   bool xsec_res = rw_engine_list.find("nuwro_RES") == std::string::npos;
