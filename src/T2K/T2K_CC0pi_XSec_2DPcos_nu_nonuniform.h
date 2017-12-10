@@ -21,6 +21,7 @@
 
 #include "Measurement1D.h"
 #include "TH2Poly.h"
+#include "MeasurementVariableBox2D.h"
 
 class T2K_CC0pi_XSec_2DPcos_nu_nonuniform : public Measurement1D {
 public:
@@ -53,6 +54,9 @@ public:
 
   /// Have to do a weird event scaling for analysis 1
   void ConvertEventRates();
+
+  /// \brief Create Q2 Box to save correction info
+  inline MeasurementVariableBox* CreateBox(){ return new MeasurementVariableBox2D(); };
 
  private:
 
