@@ -50,7 +50,7 @@
 <config input.maxevents='-1'/>
 <config MAXEVENTS='-1'/>
 <config input.MAXEVENTS='-1'/>
-<config includeemptystackhists='0'/>
+<config includeemptystackhists='1'/>
 <!-- # Turn on/off event manager -->
 <!-- # EventManager enables us to only loop number of events once for multiple projections of the same measurements -->
 <!-- # e.g. MiniBooNE CC1pi+ Q2 and MiniBooNE CC1pi+ Tmu would ordinarily require 2 reconfigures, but with this enabled it requires only one -->
@@ -180,16 +180,15 @@
 
 <!-- # SciBooNE specific -->
 <config SciBarDensity='1.04'/>
-<config SciBarRecoDist='10.0'/>
+<config SciBarRecoDist='12.0'/>
 <config PenetratingMuonEnergy='1.4'/>
+<config FlatEfficiency='1.0'/>
 <config NumRangeSteps='50'/>
+<config UseProton='true'/>
+<config UseZackEff='false'/>
 
 <config MINERvADensity='1.04'/>
 <config MINERvARecoDist='10.0'/>
-<config PenetratingMuonEnergy='1.4'/>
-<config NumRangeSteps='50'/>
-
-
 
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
 <config  GENIEInputHandler.SavePrimary="0" />
