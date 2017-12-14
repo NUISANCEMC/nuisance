@@ -167,6 +167,9 @@ TH1D* GetTH1DFromRootFile(std::string file, std::string name);
 //! Grab a 2D Histrogram from a ROOT File
 TH2D* GetTH2DFromRootFile(std::string file, std::string name);
 
+//! Get a TGraph from a ROOT file 
+TGraph* GetTGraphFromRootFile(std::string file, std::string name);
+
 //! Grab a 2D Histrogram from a ROOT File
 TH2D* GetTH2DFromTextFile(std::string file);
 

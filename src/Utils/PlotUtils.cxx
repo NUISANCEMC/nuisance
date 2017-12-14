@@ -757,6 +757,34 @@ TH1* PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   return tempHist;
 }
 
+TGraph* PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
+  if (name.empty()) {
+    std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
+    file = tempfile[0];
+    name = tempfile[1];
+  }
+
+  TDirectory* olddir = gDirectory;
+
+  TFile* rootHistFile = new TFile(file.c_str(), "READ");
+  if (!rootHistFile || rootHistFile->IsZombie()) {
+    THROW("Couldn't open root file: \"" << file << "\".");
+  }
+  TDirectory* newdir = gDirectory;
+
+  TGraph* temp = dynamic_cast<TGraph*>(rootHistFile->Get(name.c_str())->Clone());
+  if (!temp) {
+    THROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
+	  << "\".");
+  }
+  newdir->Remove(temp);
+  olddir->Append(temp);
+  rootHistFile->Close();
+  olddir->cd();
+  return temp;
+}
+
+
 /// Returns a vector of named TH1*s found in a single input file.
 ///
 /// Expects a descriptor like: file.root[hist1|hist2|...]
