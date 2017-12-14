@@ -38,12 +38,14 @@ public:
   bool isSignal(FitEvent *event);
   void FillExtraHistograms(MeasurementVariableBox* vars, double weight);
   SciBooNEUtils::ModeStack *fMCStack;
+  SciBooNEUtils::MainPIDStack *fPIDStack;
 
  private:
   double thetapi; ///<! X_Variable
   int nProtons, nPiMus, nVertex, mainIndex;
   FitParticle *mainTrack, *secondTrack;
   TH2D *muonStopEff;
+  TH2D *protonEff;
 };
   
 #endif

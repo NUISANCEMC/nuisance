@@ -44,13 +44,19 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey){
   FinaliseSampleSettings();
 
   // Setup Plots
-  this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
+  if (SciBooNEUtils::GetUseZackEff()) 
+    this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu_ZACK.root", "Ratio2DBSCC");
+  else this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
+  this->protonEff   = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_proton_nu.root", "Ratio2DRS");
 
   this->fMCStack  = new SciBooNEUtils::ModeStack(fSettings.Name() + "_Stack",
 						 "Mode breakdown" + fSettings.PlotTitles(),
 						 PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));  
+  this->fPIDStack  = new SciBooNEUtils::MainPIDStack(fSettings.Name() + "_MainPID",
+						     "Main PID" + fSettings.PlotTitles(),
+						     PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
   SetAutoProcessTH1(fMCStack);
-
+  SetAutoProcessTH1(fPIDStack);
   
   // Estimate the number of CH molecules in SciBooNE...
   double nTargets = 10.6E6/13.*6.022E23;
@@ -63,7 +69,7 @@ SciBooNE_CCCOH_1TRK_1DQ2_nu::SciBooNE_CCCOH_1TRK_1DQ2_nu(nuiskey samplekey){
 void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
 
   q2qe = 0;
-  this->mainIndex = SciBooNEUtils::GetMainTrack(event, this->muonStopEff, this->mainTrack, this->Weight);
+  this->mainIndex = SciBooNEUtils::GetMainTrack(event, this->muonStopEff, this->protonEff, this->mainTrack, this->Weight);
   SciBooNEUtils::GetOtherTrackInfo(event, this->mainIndex, this->nProtons, this->nPiMus, this->nVertex, this->secondTrack);
   FitParticle *nu   = event->GetNeutrinoIn();
 
@@ -71,7 +77,7 @@ void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillEventVariables(FitEvent *event){
     q2qe = FitUtils::Q2QErec(FitUtils::p(this->mainTrack),cos(FitUtils::th(nu,this->mainTrack)), 27., true);
   }
   if (q2qe < 0) return;
-  
+
   // Set X Variables
   fXVar = q2qe;
   return;
@@ -86,6 +92,9 @@ bool SciBooNE_CCCOH_1TRK_1DQ2_nu::isSignal(FitEvent *event){
 
 void SciBooNE_CCCOH_1TRK_1DQ2_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
   
-  if (Signal) fMCStack->Fill(Mode, fXVar, weight);
+  if (Signal){
+    fMCStack->Fill(Mode, fXVar, weight);
+    fPIDStack->Fill(this->mainTrack->fPID, fXVar, weight);
+  }
   return;
 }

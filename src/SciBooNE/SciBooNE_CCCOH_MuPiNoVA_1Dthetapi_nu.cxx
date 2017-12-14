@@ -44,13 +44,20 @@ SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(nuisk
   FinaliseSampleSettings();
 
   // Setup Plots
-  this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
+  if (SciBooNEUtils::GetUseZackEff()) 
+    this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu_ZACK.root", "Ratio2DBSCC");
+  else this->muonStopEff = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_stopped_muon_eff_nu.root", "stopped_muon_eff");
+  this->protonEff   = PlotUtils::GetTH2DFromRootFile(FitPar::GetDataBase()+"/SciBooNE/SciBooNE_proton_nu.root", "Ratio2DRS");
 
   this->fMCStack  = new SciBooNEUtils::ModeStack(fSettings.Name() + "_Stack",
                                                  "Mode breakdown" + fSettings.PlotTitles(),
                                                  PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
-  SetAutoProcessTH1(fMCStack);
+  this->fPIDStack  = new SciBooNEUtils::MainPIDStack(fSettings.Name() + "_MainPID",
+						     "Main PID" + fSettings.PlotTitles(),
+						     PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
 
+  SetAutoProcessTH1(fMCStack);
+  SetAutoProcessTH1(fPIDStack);
 
   double nTargets = 10.6E6/13.*6.022E23;
   this->fScaleFactor = GetEventHistogram()->Integral()*13.*1E-38/double(fNEvents)*nTargets;
@@ -61,7 +68,7 @@ SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(nuisk
 
 void SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::FillEventVariables(FitEvent *event){
 
-  this->mainIndex = SciBooNEUtils::GetMainTrack(event, this->muonStopEff, this->mainTrack, this->Weight);
+  this->mainIndex = SciBooNEUtils::GetMainTrack(event, this->muonStopEff, this->protonEff, this->mainTrack, this->Weight);
   SciBooNEUtils::GetOtherTrackInfo(event, this->mainIndex, this->nProtons, this->nPiMus, this->nVertex, this->secondTrack);
   
   thetapi = SciBooNEUtils::CalcThetaPi(event, this->secondTrack);
@@ -82,14 +89,21 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::isSignal(FitEvent *event){
 
   // Require dth_proton > 20
   if (SciBooNEUtils::CalcThetaPr(event, this->mainTrack, this->secondTrack) < 20) return false;
+  double misIDProb = SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->secondTrack));
 
-  if (this->nProtons == 1) this->Weight *= 0.1;
+  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= 0.1;
+  if (this->nProtons == 1) this->Weight *= misIDProb;
+  if (this->nPiMus == 1) this->Weight *= (1-misIDProb);
+
   return true;
 };
 
 
 void SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::FillExtraHistograms(MeasurementVariableBox* vars, double weight){
 
-  if (Signal) fMCStack->Fill(Mode, fXVar, weight);
+  if (Signal){
+    fMCStack->Fill(Mode, fXVar, weight);
+    fPIDStack->Fill(this->mainTrack->fPID, fXVar, weight);
+  }
   return;
 };
