@@ -21,6 +21,10 @@
 #define GenericFlux_Tester_H_SEEN
 #include "Measurement1D.h"
 
+#ifndef __BAD__FLOAT__
+#define __BAD_FLOAT__ -999.99
+#endif
+
 //********************************************************************
 class GenericFlux_Tester : public Measurement1D {
 //********************************************************************
@@ -29,6 +33,9 @@ public:
 
   GenericFlux_Tester(std::string name, std::string inputfile, FitWeight *rw, std::string type, std::string fakeDataFile);
   virtual ~GenericFlux_Tester() {};
+
+  //! Clear private variables
+  inline void ResetVariables();
 
   //! Grab info from event
   void FillEventVariables(FitEvent *event);
@@ -80,20 +87,32 @@ public:
   float Enu_QE;
   int PDGnu;
 
+  // Auxillairies
   float Q2_true;
   float Q2_QE;
   float W_nuc_rest;
   float bjorken_x;
   float bjorken_y;
+  float q0_true;
+  float q3_true;
+  float Erecoil_true;
+  float Erecoil_charged;
+  float Erecoil_minerva;
 
+  // Interaction mode
   int Mode;
 
+  // Particle counters
+  int Nparticles;
+  int Nleptons;
+  int Nother;
   int Nprotons;
   int Nneutrons;
   int Npiplus;
   int Npineg;
   int Npi0;
 
+  // Lepton variables
   int PDGLep;
   float TLep;
   float CosLep;
@@ -101,25 +120,28 @@ public:
   float PLep;
   float MLep;
 
+  // Proton variables
   float PPr;  //!< Highest Mom Proton
   float CosPr; //!< Highest Mom Proton
   float EPr;
   float TPr;
   float MPr;
 
-
+  // Neutron variables
   float PNe;
   float CosNe;
   float ENe;
   float TNe;
   float MNe;
 
+  // Pi+ variables
   float PPiP;
   float CosPiP;
   float EPiP;
   float TPiP;
   float MPiP;
 
+  // Pi- variables
   float PPiN;
   float CosPiN;
   float EPiN;
@@ -132,6 +154,7 @@ public:
   float TPi0;
   float MPi0;
 
+  // Angular variables
   float CosPmuPpip;
   float CosPmuPpim;
   float CosPmuPpi0;
@@ -148,17 +171,7 @@ public:
   float CosPi0Pneut;
   float CosPprotPneut;
 
-  float q0_true;
-  float q3_true;
-
-  int Nparticles;
-  int Nleptons;
-  int Nother;
-
-  float Erecoil_true;
-  float Erecoil_charged;
-  float Erecoil_minerva;
-
+  // Weights
   float Weight;
   float RWWeight;
   float InputWeight;

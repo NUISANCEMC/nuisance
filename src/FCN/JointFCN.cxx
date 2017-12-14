@@ -819,7 +819,7 @@ void JointFCN::ReconfigureFastUsingManager() {
         // Get Event Info
         if (!fIsAllSplines) {
           if (fFillNuisanceEvent)
-            curinput->GetNuisanceEvent(i);
+            curevent = curinput->GetNuisanceEvent(i);
           else
             curevent = curinput->GetBaseEvent(i);
         } else {

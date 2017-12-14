@@ -314,8 +314,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
 
     eventVariables->Branch("flagCCINC_true", &flagCCINC_true,
                            "flagCCINC_true/O");
-    eventVariables->Branch("flagCC0K_true", &flagCC0K_true,
-                           "flagCC0K_true/O");
+    eventVariables->Branch("flagCC0K_true", &flagCC0K_true, "flagCC0K_true/O");
     eventVariables->Branch("flagCC0Pi_true", &flagCC0Pi_true,
                            "flagCC0Pi_true/O");
     eventVariables->Branch("flagCC1Pi_true", &flagCC1Pi_true,
@@ -350,11 +349,10 @@ int CountNPdgsSeen(RecoInfo ri, int const (&pdgs)[N]) {
 template <size_t N>
 int CountNNotPdgsSeen(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
-  for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
-    sum +=
-        (std::count(ri.RecObjClass.begin(), ri.RecObjClass.end(), pdgs[pdg_it])
-             ? 0
-             : 1);
+  for (size_t p_it = 0; p_it < ri.RecObjClass.size(); ++p_it) {
+    if (!std::count(pdgs, pdgs + N, ri.RecObjClass[p_it])) {
+      sum++;
+    }
   }
   return sum;
 }
@@ -372,11 +370,10 @@ int CountNPdgsContributed(RecoInfo ri, int const (&pdgs)[N]) {
 template <size_t N>
 int CountNNotPdgsContributed(RecoInfo ri, int const (&pdgs)[N]) {
   int sum = 0;
-  for (size_t pdg_it = 0; pdg_it < N; ++pdg_it) {
-    sum += (std::count(ri.TrueContribPDGs.begin(), ri.TrueContribPDGs.end(),
-                       pdgs[pdg_it])
-                ? 0
-                : 1);
+  for (size_t p_it = 0; p_it < ri.TrueContribPDGs.size(); ++p_it) {
+    if (!std::count(pdgs, pdgs + N, ri.TrueContribPDGs[p_it])) {
+      sum++;
+    }
   }
   return sum;
 }

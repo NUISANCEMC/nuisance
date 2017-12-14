@@ -302,7 +302,14 @@ void Smearcepterton::InitialiserSmearcepters() {
   factories["VisECoalescer"] = &BuildSmearcepter<VisECoalescer>;
   factories["MetaSimpleSmearcepter"] = &BuildSmearcepter<MetaSimpleSmearcepter>;
 
+  Config::Get().PrintXML(NULL);
+
   std::vector<nuiskey> smearcepterBlocks = Config::QueryKeys("smearcepters");
+
+  // std::cout << "[INFO]: " << nodelist.size() << " smearcepter nodes." << std::endl;
+  // for(size_t i = 0; i < nodelist.size(); ++i){
+  //   Config::Get().PrintXML(nodelist[i]);
+  // }
 
   for (size_t smearB_it = 0; smearB_it < smearcepterBlocks.size();
        ++smearB_it) {
