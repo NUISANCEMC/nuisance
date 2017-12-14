@@ -35,6 +35,24 @@ class ModeNormCalc : public NUISANCEWeightCalc {
   double fNormRES;
  };
 
+class SBLOscWeightCalc : public NUISANCEWeightCalc {
+ public:
+  SBLOscWeightCalc();
+  ~SBLOscWeightCalc(){};
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  double GetSBLOscWeight(double E);
+
+  double fDistance;
+  double fMassSplitting;
+  double fSin2Theta;
+
+ };
+ 
 class GaussianModeCorr : public NUISANCEWeightCalc {
 public:
 

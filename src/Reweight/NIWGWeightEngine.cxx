@@ -13,7 +13,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 
 	// Get List of Veto Calcs (For Debugging)
 	std::string rw_engine_list =
-	    FitPar::Config().GetParS("FitWeight.fNIWGRW_veto");
+	    FitPar::Config().GetParS("FitWeight_fNIWGRW_veto");
 	bool niwg_2012a = rw_engine_list.find("niwg_2012a") == std::string::npos;
 	bool niwg_2014a = rw_engine_list.find("niwg_2014a") == std::string::npos;
 	bool niwg_pimult = rw_engine_list.find("niwg_pimult") == std::string::npos;

@@ -31,7 +31,7 @@ Double_t StatUtils::GetChi2FromDiag(TH1D* data, TH1D* mc, TH1I* mask) {
   TH1D* calc_mc   = (TH1D*)mc->Clone();
 
   // Add MC Error to data if required
-  if (FitPar::Config().GetParB("statutils.addmcerror")) {
+  if (FitPar::Config().GetParB("addmcerror")) {
     for (int i = 0; i < calc_data->GetNbinsX(); i++) {
 
       double dterr = calc_data->GetBinError(i + 1);
@@ -113,7 +113,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc,
   }
 
   // Add MC Error to data if required
-  if (FitPar::Config().GetParB("statutils.addmcerror")) {
+  if (FitPar::Config().GetParB("addmcerror")) {
 
     // Make temp cov
     TMatrixDSym* newcov = StatUtils::GetInvert(calc_cov);

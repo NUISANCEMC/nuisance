@@ -429,7 +429,7 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
   }
 
   fMinimizer->SetMaxFunctionCalls(
-      FitPar::Config().GetParI("minimizer.maxcalls"));
+      FitPar::Config().GetParI("MAXCALLS"));
 
   if (!routine.compare("Brute")) {
     fMinimizer->SetMaxFunctionCalls(fParams.size() * fParams.size() * 4);
@@ -437,9 +437,9 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
   }
 
   fMinimizer->SetMaxIterations(
-      FitPar::Config().GetParI("minimizer.maxiterations"));
-  fMinimizer->SetTolerance(FitPar::Config().GetParD("minimizer.tolerance"));
-  fMinimizer->SetStrategy(FitPar::Config().GetParI("minimizer.strategy"));
+      FitPar::Config().GetParI("MAXITERATIONS"));
+  fMinimizer->SetTolerance(FitPar::Config().GetParD("TOLERANCE"));
+  fMinimizer->SetStrategy(FitPar::Config().GetParI("STRATEGY"));
   fMinimizer->SetFunction(*fCallFunctor);
 
   int ipar = 0;
@@ -747,8 +747,8 @@ void MinimizerRoutines::LowStatRoutine(std::string routine) {
   //*************************************
 
   LOG(FIT) << "Running Low Statistics Routine: " << routine << std::endl;
-  int lowstatsevents = FitPar::Config().GetParI("minimizer.lowstatevents");
-  int maxevents = FitPar::Config().GetParI("input.maxevents");
+  int lowstatsevents = FitPar::Config().GetParI("LOWSTATEVENTS");
+  int maxevents = FitPar::Config().GetParI("MAXEVENTS");
   int verbosity = FitPar::Config().GetParI("VERBOSITY");
 
   std::string trueroutine = routine;
@@ -756,13 +756,13 @@ void MinimizerRoutines::LowStatRoutine(std::string routine) {
   trueroutine.erase(trueroutine.find(substring), substring.length());
 
   // Set MAX EVENTS=1000
-  Config::SetPar("input.maxevents", lowstatsevents);
+  Config::SetPar("MAXEVENTS", lowstatsevents);
   Config::SetPar("VERBOSITY", 3);
   SetupFCN();
 
   RunFitRoutine(trueroutine);
 
-  Config::SetPar("input.maxevents", maxevents);
+  Config::SetPar("MAXEVENTS", maxevents);
   SetupFCN();
 
   Config::SetPar("VERBOSITY", verbosity);

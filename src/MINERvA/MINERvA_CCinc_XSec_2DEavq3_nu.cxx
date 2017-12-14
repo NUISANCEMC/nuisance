@@ -51,9 +51,9 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey) 
   fSettings.SetMapInput( FitPar::GetDataBase() + "/MINERvA/CCEavq3/map_2D.txt" );
   fSettings.DefineAllowedSpecies("numu");
 
-  hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.hadron_cut");
-  useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu.useq3true");
-  splitMEC_PN_NN = FitPar::Config().GetParB("Modes.split_PN_NN");
+  hadroncut = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu_hadron_cut");
+  useq3true = FitPar::Config().GetParB("MINERvA_CCinc_XSec_2DEavq3_nu_useq3true");
+  splitMEC_PN_NN = FitPar::Config().GetParB("Modes_split_PN_NN");
 
   FinaliseSampleSettings();
 

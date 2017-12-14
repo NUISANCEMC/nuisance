@@ -20,6 +20,7 @@
 #include "InputUtils.h"
 #include "MeasurementBase.h"
 #include "GenericFlux_Tester.h"
+#include "GenericFlux_Vectors.h"
 #include "Smearceptance_Tester.h"
 
 // Global Arguments
@@ -35,7 +36,7 @@ std::string gOptOptions = "";
 void PrintSyntax() {
   //*******************************
 
-  std::cout << "nuisflat -i input -f format [-o outfile] [-n nevents] [-t "
+  std::cout << "nuisflat -i input [-f format]  [-o outfile] [-n nevents] [-t "
                "options] [-q con=val] \n";
   std::cout
       << "\n Arguments : "
@@ -45,8 +46,9 @@ void PrintSyntax() {
          "input file"
       << "\n\t              is given to NUISANCE. {e.g. NUWRO:eventsout.root}."
       << "\n\t"
-      << "\n\t -f format  : FlatTree format to output:"
-      << "\n\t\t GenericFlux   : Standard event summary format."
+      << "\n\t -f format  : FlatTree format to output. If none given GenericVectors used."
+      << "\n\t\t GenericFlux   : Flat event summary format."
+      << "\n\t\t GenericVectors   : Standard event summary format with particle vectors."
       << "\n\t "
       << "\n\t[-c crd.xml]: Input card file to override configs or set dial values."
       << "\n\t "
@@ -89,7 +91,8 @@ void GetCommandLineArgs(int argc, char** argv) {
   // Get Output Format
   ParserUtils::ParseArgument(args, "-f", gOptFormat, false);
   if (gOptFormat == "") {
-    THROW("Need to provide a valid output format to nuisflat!");
+    gOptFormat = "GenericVectors";
+    LOG(FIT) << "Saving flattree in default format = " << gOptFormat << std::endl;
   } else {
     LOG(FIT) << "Saving flattree in format = " << gOptFormat << std::endl;
   }
@@ -157,6 +160,13 @@ int main(int argc, char* argv[]) {
     samplekey.Set("type", gOptType);
     flattreecreator = new GenericFlux_Tester("FlatTree", gOptInputFile,
                                              FitBase::GetRW(), gOptType, "");
+
+  } else if (!gOptFormat.compare("GenericVectors")) {
+    samplekey.Set("name", "FlatTree");
+    samplekey.Set("input", gOptInputFile);
+    samplekey.Set("type", gOptType);
+    flattreecreator = new GenericFlux_Vectors("FlatTree", gOptInputFile,
+					      FitBase::GetRW(), gOptType, "");
 
   } else {
     ERR(FTL) << "Unknown FlatTree format!" << std::endl;

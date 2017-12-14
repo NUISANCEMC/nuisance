@@ -12,7 +12,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 	fGenieRW = new genie::rew::GReWeight();
 
 	// Get List of Vetos (Just for debugging)
-	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight.fGenieRW_veto");
+	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight_fGenieRW_veto");
 	bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
 	bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
 	bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;

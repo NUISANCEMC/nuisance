@@ -113,7 +113,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
     case (kCosAdler):
       datafile  = "data/XSec_Table_Delta_pi_theta_xsec.csv";
       corrfile = "corr/Correlation_Table_Delta_pi_theta_xsec.csv";
-      titles    = "CC1#pi^{0}; cos#theta_{Adler}; d#sigma/dcos#thtea_{Adler} (cm^{2}/nucleon/0.1)";
+      titles    = "CC1#pi^{0}; cos#theta_{Adler}; d#sigma/dcos#theta_{Adler} (cm^{2}/nucleon/0.1)";
       break;
 
     case (kPhiAdler):

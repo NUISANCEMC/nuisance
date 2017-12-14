@@ -44,6 +44,54 @@ bool ModeNormCalc::IsHandled(int rwenum) {
   }
 }
 
+
+
+SBLOscWeightCalc::SBLOscWeightCalc(){
+  fDistance = 0.0;
+  fMassSplitting = 0.0;
+  fSin2Theta = 0.0;
+}
+
+double SBLOscWeightCalc::CalcWeight(BaseFitEvt* evt) {
+  FitEvent* fevt = static_cast<FitEvent*>(evt);
+
+  FitParticle* pnu = fevt->PartInfo(0);
+  double E = pnu->fP.E() / 1.E3;
+
+  // Extract energy
+  return GetSBLOscWeight(E);
+}
+
+void SBLOscWeightCalc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
+
+  int curenum = rwenum % 1000;
+  if (!IsHandled(curenum)) return;
+  if (curenum == kSBLOsc_Distance)      fDistance      = val;
+  if (curenum == kSBLOsc_MassSplitting) fMassSplitting = val;
+  if (curenum == kSBLOsc_Sin2Theta)     fSin2Theta     = val;
+}
+
+bool SBLOscWeightCalc::IsHandled(int rwenum) {
+
+  int curenum = rwenum % 1000;
+  switch (curenum) {
+  case kSBLOsc_Distance: return true;
+  case kSBLOsc_MassSplitting: return true;
+  case kSBLOsc_Sin2Theta: return true;
+  default:  return false;
+  }
+}
+
+double SBLOscWeightCalc::GetSBLOscWeight(double E){
+  if (E <= 0.0) return 1.0 - 0.5 * fSin2Theta;
+  return 1.0 - fSin2Theta * pow( sin(1.267 * fMassSplitting * fDistance / E ), 2);
+}
+
+
 GaussianModeCorr::GaussianModeCorr() {
 
 	// Init

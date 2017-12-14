@@ -13,7 +13,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 	TDirectory* olddir = gDirectory;
 
 	// get list of vetoed calc engines (just for debug really)
-	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight.fNeutRW_veto");
+	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight_fNeutRW_veto");
 	bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
 	bool xsec_res = rw_engine_list.find("xsec_res") == std::string::npos;
 	bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;

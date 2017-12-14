@@ -159,8 +159,14 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
 
     XMLNodePointer_t copyNode = fXML->ReadSingleNode(nodeStr.Data());
 
+    // std::cout << "copying node..." << std::endl;
+    // PrintXML(copyNode);
+
     // Add this child to the main config list
     fXML->AddChild(fMainNode, copyNode);
+
+    // std::cout << "Done, was it added?" << std::endl;
+    // PrintXML(fMainNode);
 
     // Get Next Child
     child = fXML->GetNext(child);
@@ -322,6 +328,10 @@ void nuisconfig::WriteSettings(std::string const &outputname) {
 }
 
 void nuisconfig::PrintXML(XMLNodePointer_t node, int indent) {
+  if (!node) {
+    node = fMainNode;
+  }
+
   std::stringstream ss("");
   for (int i = 0; i < indent; ++i) {
     ss << " ";
@@ -381,6 +391,9 @@ void nuisconfig::RemoveEmptyNodes() {
   std::vector<XMLNodePointer_t> nodelist = Config::Get().GetNodes();
   for (size_t i = 0; i < nodelist.size(); i++) {
     if (fXML->IsEmptyNode(nodelist[i])) {
+      std::cout << "Removing empty node: " << fXML->GetNodeName(nodelist[i])
+                << ", with child ?" << bool(fXML->GetChild(nodelist[i]))
+                << std::endl;
       RemoveNode(nodelist[i]);
     }
   }
@@ -436,6 +449,8 @@ void nuisconfig::RemoveIdenticalNodes() {
 }
 
 void nuisconfig::RemoveNode(XMLNodePointer_t node) {
+  std::cout << "[INFO]: Removing node: " << fXML->GetNodeName(node)
+            << std::endl;
   fXML->FreeAllAttr(node);
   fXML->CleanNode(node);
   fXML->FreeNode(node);

@@ -102,8 +102,10 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
 
   eventVariables->Branch("Nleptons", &Nleptons, "Nleptons/I");
+// all sensible
   eventVariables->Branch("MLep", &MLep, "MLep/F");
   eventVariables->Branch("ELep", &ELep, "ELep/F");
+// negative -999
   eventVariables->Branch("TLep", &TLep, "TLep/F");
   eventVariables->Branch("CosLep", &CosLep, "CosLep/F");
   eventVariables->Branch("CosPmuPpip", &CosPmuPpip, "CosPmuPpip/F");
@@ -218,6 +220,45 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
   eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
 };
 
+
+//********************************************************************
+void GenericFlux_Tester::ResetVariables() {
+//********************************************************************
+  // Reset neutrino PDG
+  PDGnu = 0;
+  // Reset energies
+  Enu_true = Enu_QE = __BAD_FLOAT__;
+
+  // Reset auxillaries
+  Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true = Erecoil_true = Erecoil_charged = Erecoil_minerva = __BAD_FLOAT__;
+
+  // Reset particle counters
+  Nparticles = Nleptons = Nother = Nprotons = Nneutrons = Npiplus = Npineg = Npi0 = 0;
+
+  // Reset Lepton PDG
+  PDGLep = 0;
+  // Reset Lepton variables
+  TLep = CosLep = ELep = PLep = MLep  = __BAD_FLOAT__;
+
+  // Rset proton variables
+  PPr = CosPr = EPr = TPr = MPr       = __BAD_FLOAT__;
+
+  // Reset neutron variables
+  PNe = CosNe = ENe = TNe = MNe       = __BAD_FLOAT__;
+
+  // Reset pi+ variables
+  PPiP = CosPiP = EPiP = TPiP = MPiP  = __BAD_FLOAT__;
+
+  // Reset pi- variables
+  PPiN = CosPiN = EPiN = TPiN = MPiN  = __BAD_FLOAT__;
+
+  // Reset pi0 variables
+  PPi0 = CosPi0  = EPi0 = TPi0 = MPi0 = __BAD_FLOAT__;
+
+  // Reset the cos angles
+  CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut = CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot = CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut = CosPprotPneut = __BAD_FLOAT__;
+}
+
 //********************************************************************
 void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   //********************************************************************
@@ -225,42 +266,19 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   // Fill Signal Variables
   FillSignalFlags(event);
   LOG(DEB) << "Filling signal" << std::endl;
+
+  // Reset the private variables (see header)
+  ResetVariables();
+
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
-  Nleptons = 0;
-  Nparticles = 0;
-  PDGnu = 0;
-  PDGLep = 0;
 
-  Enu_true = Enu_QE = Q2_true = Q2_QE = TLep = TPr = TNe = TPiP = TPiN = TPi0 =
-      -999.9;
-
-  Nprotons = 0;
-  PPr = EPr = MPr = CosPr = -999.9;
-
-  Nneutrons = 0;
-  PNe = ENe = MNe = CosNe = -999.9;
-
-  Npiplus = 0;
-  PPiP = EPiP = MPiP = CosPiP = -999.9;
-
-  Npineg = 0;
-  PPiN = EPiN = MPiN = CosPiN = -999.9;
-
-  Npi0 = 0;
-  PPi0 = EPi0 = MPi0 = CosPi0 = -999.9;
-
-  // All of the angles Clarence added
-  CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut =
-      CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot =
-          CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut =
-              CosPprotPneut = -999.9;
-
-  float proton_highmom = -999.9;
-  float neutron_highmom = -999.9;
-  float piplus_highmom = -999.9;
-  float pineg_highmom = -999.9;
-  float pi0_highmom = -999.9;
+  // Reset the highest momentum variables
+  float proton_highmom = __BAD_FLOAT__;
+  float neutron_highmom = __BAD_FLOAT__;
+  float piplus_highmom = __BAD_FLOAT__;
+  float pineg_highmom = __BAD_FLOAT__;
+  float pi0_highmom = __BAD_FLOAT__;
 
   (*nu_4mom) = event->PartInfo(0)->fP;
 
