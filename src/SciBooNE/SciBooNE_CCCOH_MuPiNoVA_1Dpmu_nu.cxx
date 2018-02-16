@@ -36,7 +36,7 @@ SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu::SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu(nuiskey sampl
   fSettings.DefineAllowedTargets("C,H");
 
   fSettings.SetTitle("SciBooNE CCCOH");
-  fSettings.SetDataInput(  FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig7.30_pmu.csv");
+  fSettings.SetDataInput(  FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig7.30d_pmu.csv");
   fSettings.SetHasExtraHistograms(true);
   fSettings.DefineAllowedSpecies("numu");
 
@@ -90,7 +90,7 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu::isSignal(FitEvent *event){
 
   double misIDProb = SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->secondTrack));
 
-  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= 0.1;
+  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->mainTrack));
   if (this->nProtons == 1) this->Weight *= misIDProb;
   if (this->nPiMus == 1)   this->Weight *= (1 - misIDProb);
   return true;

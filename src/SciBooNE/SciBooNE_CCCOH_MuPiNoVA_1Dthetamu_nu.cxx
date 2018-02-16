@@ -36,7 +36,7 @@ SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu::SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu(nuisk
   fSettings.DefineAllowedTargets("C,H");
 
   fSettings.SetTitle("SciBooNE CCCOH proton");
-  fSettings.SetDataInput(  FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig7.30_thetamu.csv");
+  fSettings.SetDataInput(  FitPar::GetDataBase()+"/SciBooNE/SB_COH_Fig7.30d_thetamu.csv");
   fSettings.SetHasExtraHistograms(true);
   fSettings.DefineAllowedSpecies("numu");
 
@@ -91,7 +91,7 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu::isSignal(FitEvent *event){
 
   double misIDProb = SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->secondTrack));
 
-  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= 0.1;
+  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->mainTrack));
   if (this->nProtons == 1) this->Weight *= misIDProb;
   if (this->nPiMus == 1)   this->Weight *= (1 - misIDProb);
   return true;
