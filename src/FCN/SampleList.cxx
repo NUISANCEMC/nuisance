@@ -254,11 +254,19 @@
 
 // SciBooNE COH studies
 #include "SciBooNE_CCCOH_1TRK_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_1TRK_1Dpmu_nu.h"
+#include "SciBooNE_CCCOH_1TRK_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPiVA_1Dpmu_nu.h"
+#include "SciBooNE_CCCOH_MuPiVA_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_MuPr_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPr_1Dpmu_nu.h"
+#include "SciBooNE_CCCOH_MuPr_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_STOP_NTrks_nu.h"
 #endif
@@ -1222,18 +1230,39 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 #ifndef __NO_SciBooNE__
       if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
     return (new SciBooNE_CCCOH_STOP_NTrks_nu(samplekey));
+
   } else if (!name.compare("SciBooNE_CCCOH_1TRK_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_1TRK_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_1TRK_1Dpmu_nu")) {
+    return (new SciBooNE_CCCOH_1TRK_1Dpmu_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_1TRK_1Dthetamu_nu")) {
+    return (new SciBooNE_CCCOH_1TRK_1Dthetamu_nu(samplekey));
+
   } else if (!name.compare("SciBooNE_CCCOH_MuPr_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_MuPr_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPr_1Dpmu_nu")) {
+    return (new SciBooNE_CCCOH_MuPr_1Dpmu_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPr_1Dthetamu_nu")) {
+    return (new SciBooNE_CCCOH_MuPr_1Dthetamu_nu(samplekey));
+
   } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_MuPiVA_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1Dpmu_nu")) {
+    return (new SciBooNE_CCCOH_MuPiVA_1Dpmu_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiVA_1Dthetamu_nu")) {
+    return (new SciBooNE_CCCOH_MuPiVA_1Dthetamu_nu(samplekey));
+
   } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu(samplekey));
   } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu")) {
     return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu(samplekey));
   } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu")) {
     return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu")) {
+    return (new SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu")) {
+    return (new SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu(samplekey));
+
   } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(samplekey));
 
