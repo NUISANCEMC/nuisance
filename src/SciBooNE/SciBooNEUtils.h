@@ -59,6 +59,11 @@ namespace SciBooNEUtils {
   double PionReinteractionProb(double energy, double thickness);
   bool ThrowAcceptReject(double test_value, double ceiling=1.0);
 
+  double apply_smear(double central, double width);
+  double smear_p(FitParticle* track, double smear=0.10); // smearing in GeV
+  double smear_th(FitParticle* track1, FitParticle* track2, double smear=2); // smearing in degrees
+
+
   int isProton(FitParticle* track);
 
   double ProtonMisIDProb(double mom);
@@ -97,6 +102,28 @@ namespace SciBooNEUtils {
     /// Extracts Mode from BaseFitEvt
     void Fill(BaseFitEvt* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
   };
+
+  /// Break down the plots as in the SciBooNE thesis
+  class ModeStack2 : public StackBase {
+  public:
+
+    /// Main constructor listing true mode categories.
+    ModeStack2(std::string name, std::string title, TH1* hist);
+
+    /// List to convert Modes to Index.
+    /// Should be kept in sync with constructor.
+    int ConvertModeToIndex(int mode);
+
+    /// Fill from given mode integer
+    void Fill(int mode, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+    /// Extracts Mode from FitEvent and fills
+    void Fill(FitEvent* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+
+    /// Extracts Mode from BaseFitEvt
+    void Fill(BaseFitEvt* evt, double x, double y = 1.0, double z = 1.0, double weight = 1.0);
+  };
+
 
   class MainPIDStack : public StackBase {
   public:
