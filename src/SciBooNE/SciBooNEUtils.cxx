@@ -92,7 +92,7 @@ double SciBooNEUtils::GetFlatEfficiency(){
 
 // Obtained from a simple fit to test beam data 1 < p < 2 GeV
 double SciBooNEUtils::ProtonMisIDProb(double mom){
-  //return 0.1;
+  return 0.1;
   double prob = 0.10;
   if (mom < 1) return prob;
   if (mom > 2) mom = 2;
@@ -145,7 +145,6 @@ double SciBooNEUtils::StoppedEfficiency(TH2D *effHist, FitParticle *nu, FitParti
   // For Zack's efficiencies
   else eff = effHist->GetBinContent(effHist->GetXaxis()->FindBin(FitUtils::th(nu, muon)/TMath::Pi()*180.), 
 				    effHist->GetYaxis()->FindBin(FitUtils::p(muon)*1000.));
-
   return eff;
 }
 
@@ -200,7 +199,6 @@ double SciBooNEUtils::RangeInScintillator(FitParticle* particle, int nsteps){
 
   double step_size = Ek/float(nsteps+1);
   double range = 0;
-  //double total_prob = 1;
 
   // Add an offset to make the integral a touch more accurate
   Ek -= step_size/2.;
@@ -213,16 +211,14 @@ double SciBooNEUtils::RangeInScintillator(FitParticle* particle, int nsteps){
     range -= step_size/dEdx;
 
     // If the particle is a pion. Also consider the reinteraction probability
-    if (particle->fPID == 211){
+    if (abs(particle->fPID) == 211){
       double prob = SciBooNEUtils::PionReinteractionProb(Ek, step_size/dEdx/SciBooNEUtils::GetSciBarDensity());
-      //total_prob -= total_prob*prob;
       if (!SciBooNEUtils::ThrowAcceptReject(prob)) break;
     }
   }
 
   // Account for density of polystyrene
   range /= SciBooNEUtils::GetSciBarDensity();
-  //if (particle->fPID == 211) std::cout << "Total reinteraction probability was: " << 1-total_prob << std::endl;
 
   // Range estimate is in cm
   return range;
@@ -233,11 +229,14 @@ double SciBooNEUtils::RangeInScintillator(FitParticle* particle, int nsteps){
 bool SciBooNEUtils::PassesDistanceCut(FitParticle* beam, FitParticle* particle){
 
   // First apply some basic thresholds (from K2K SciBar description)
-  //if (FitUtils::p(particle) < 0.15) return false;
-  //if (particle->fPID == 2212 && FitUtils::p(particle) < 0.45) return false;
+  if (FitUtils::p(particle) < 0.15) return false;
+  if (particle->fPID == 2212 && FitUtils::p(particle) < 0.45) return false;
 
   double dist  = SciBooNEUtils::RangeInScintillator(particle, SciBooNEUtils::GetNumRangeSteps());
   double zdist = dist*cos(FitUtils::th(beam, particle));
+
+  // Allow for vertex migration for backward tracks
+  //if (zdist < 0) zdist -= 2;
 
   if (abs(zdist) < SciBooNEUtils::GetSciBarRecoDist()) return false;
   return true;
@@ -251,13 +250,14 @@ int SciBooNEUtils::isProton(FitParticle* track){
 // Function to return the MainTrk
 int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHist, FitParticle*& mainTrk, double& weight, bool penetrated){
 
-  FitParticle *nu   = event->GetNeutrinoIn();
-  int index   = 0;
-  int indexPr = 0;
-  double highMom    = 0;
-  double highWeight = 0;
-  double highMomPr  = 0;
+  FitParticle *nu     = event->GetNeutrinoIn();
+  int index           = 0;
+  int indexPr         = 0;
+  double highMom      = 0;
+  double highWeight   = 0;
+  double highMomPr    = 0;
   double highWeightPr = 0;
+  double runningWeight= 0;
   mainTrk = NULL;
 
   // Loop over particles
@@ -279,19 +279,28 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
 
     if (PID == 2212) {
       thisWeight = SciBooNEUtils::ProtonEfficiency(protonHist, nu, event->PartInfo(j));
-      if (thisWeight == 0 || thisMom < highMomPr) continue;      
+      if (thisWeight == 0) continue;
+
+      if (runningWeight == 0) runningWeight = thisWeight;
+      else runningWeight += (1 - runningWeight)*thisWeight;
+      
+      if (thisWeight < highWeightPr) continue;      
       highMomPr = thisMom;
       highWeightPr = thisWeight;
       indexPr = j;
-
+      
     } else {
       thisWeight = SciBooNEUtils::StoppedEfficiency(mupiHist, nu, event->PartInfo(j));
-      if (thisWeight == 0 || thisMom < highMom) continue;
+      if (thisWeight == 0) continue;
+
+      if (runningWeight == 0) runningWeight = thisWeight;
+      else runningWeight += (1 - runningWeight)*thisWeight;
+
+      if (thisWeight < highWeight) continue;
 
       // Add a range calculation for pi+
-      if (PID == 211){
+      if (abs(PID) == 211){
 	double range = SciBooNEUtils::RangeInScintillator(event->PartInfo(j));
-	// std::cout << "Pion range = " << range << "; Ek = " << event->PartInfo(j)->fP.E() -event->PartInfo(j)->fP.M() << "; weight = " << thisWeight << std::endl;
 	if (abs(range) < SciBooNEUtils::GetMainPionRange()) continue;
       }
       highMom = thisMom;
@@ -309,6 +318,8 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
   // Pass the weight back (don't want to apply a weight twice by accident)
   mainTrk = event->PartInfo(index);
   weight *= highWeight;
+  //weight *= runningWeight;
+  //std::cout << "High weight = " << highWeight << "; running weight = " << runningWeight << std::endl;
 
   return index;
 }
@@ -352,13 +363,62 @@ void SciBooNEUtils::GetOtherTrackInfo(FitEvent *event, int mainIndex, int& nProt
 
       if (PID == 2212) nProtons += 1;
       else nPiMus  += 1;
-      // Add a new option to simply not reconstruct everything as vertex energy
-    } else if ( (event->PartInfo(j)->fP.E() - event->PartInfo(j)->fP.M()) > 0.1)
+      // Ignore backward tracks for VA
+    } else if ( FitUtils::th(event->PartInfo(0), event->PartInfo(j))/TMath::Pi() < 0.5)
       nVertex += 1;
 
   } // end loop over particle stack
 
   return;
+}
+
+double SciBooNEUtils::apply_smear(double central, double width){
+  static TRandom3 *rand = 0;
+  
+  if (!rand){
+    rand = new TRandom3(0);
+  }
+  double output = rand->Gaus(central, width);
+  return output;
+}
+
+// double SciBooNEUtils::apply_double_gaus_smear(double central1, double width1, double central2, double width2){
+//   static TF1 *func = new TF1("double_gaus", "exp(-0.5*((x)/1.)**2) + 0.1*exp(-0.5*((x)/5.)**2", -20, 20);
+//   return func->GetRandom();  
+//}
+
+double SciBooNEUtils::smear_p(FitParticle* track, double smear){
+  static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -0.8, 0.8);
+  static bool set_pars = false;
+  if (!set_pars){
+    f1->SetParameter(0, 1275.87);
+    f1->SetParameter(1, -0.0160104);
+    f1->SetParameter(2, 0.0424547);
+    f1->SetParameter(3, 116.157);
+    f1->SetParameter(4, -0.0287358);
+    f1->SetParameter(5, 0.157022);
+    set_pars = true;
+  }
+
+  double mod_mom = FitUtils::p(track) + f1->GetRandom();
+  return mod_mom;
+}
+
+double SciBooNEUtils::smear_th(FitParticle* track1, FitParticle* track2, double smear){
+  static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -15, 15);
+  static bool set_pars = false;
+  if (!set_pars){
+    f1->SetParameter(0, 1878.41);
+    f1->SetParameter(1, 0.0622622);
+    f1->SetParameter(2, 0.869508);
+    f1->SetParameter(3, 616.559);
+    f1->SetParameter(4, 0.138734);
+    f1->SetParameter(5, 1.96287);
+    set_pars = true;
+  }
+
+  double mod_th = FitUtils::th(track1, track2) + f1->GetRandom()*TMath::Pi()/180;
+  return mod_th;
 }
 
 
@@ -375,9 +435,11 @@ double SciBooNEUtils::CalcThetaPr(FitEvent *event, FitParticle *main, FitParticl
   double pmu   = main->fP.Vect().Mag();
   double pmu_x = main->fP.Vect().X();
   double pmu_y = main->fP.Vect().Y();
-
-  double Enuqe = FitUtils::EnuQErec(pmu/1000.,cos(FitUtils::th(nu, main)), 27., true)*1000.;
-  double p_pr_z = Enuqe - pmu*cos(FitUtils::th(nu, main));
+  
+  double theta_s = cos(FitUtils::th(nu, main));
+  
+  double Enuqe = FitUtils::EnuQErec(pmu/1000.,theta_s, 27., true)*1000.;
+  double p_pr_z = Enuqe - pmu*theta_s;
 
   TVector3 p_pr  = TVector3(-pmu_x, -pmu_y, p_pr_z);
   double thetapr = p_pr.Angle(second->fP.Vect())/TMath::Pi()*180.;
@@ -442,7 +504,7 @@ SciBooNEUtils::MainPIDStack::MainPIDStack(std::string name, std::string title, T
   AddMode(1, "pip",  "#pi^{+}", kRed,     2, 3304);
   AddMode(2, "pim",  "#pi^{-}",  kGray+2,  2, 1001);
   AddMode(3, "proton",   "p",  kMagenta, 2, 1001);
-  AddMode(4, "Other",  "Other", kAzure+1, 2, 1001);  
+  AddMode(4, "Other",  "Other", kAzure+1, 2, 1001);
   StackBase::SetupStack(hist);
 };
 
@@ -459,3 +521,50 @@ int SciBooNEUtils::MainPIDStack::ConvertPIDToIndex(int PID){
 void SciBooNEUtils::MainPIDStack::Fill(int PID, double x, double y, double z, double weight) {
   StackBase::FillStack(SciBooNEUtils::MainPIDStack::ConvertPIDToIndex(PID), x, y, z, weight);
 };
+
+
+// Functions to deal with second type of mode breakdown (from the thesis)
+SciBooNEUtils::ModeStack2::ModeStack2(std::string name, std::string title, TH1* hist) {
+  fName = name;
+  fTitle = title;
+
+  AddMode(0, "CCCOH",  "#nu CC coh. #pi", kGreen+2, 2, 3244);
+  AddMode(1, "CCRES", "#nu CC res. #pi", kRed,     2, 3304);
+  AddMode(2, "ANTINU", "#bar{#nu} BG",  kMagenta,  2, 1001);
+  AddMode(3, "NC", "#nu NC",  kYellow, 2, 1001);
+  AddMode(4, "CCOTHER", "#nu CC other", kBlue+2, 2, 1001);
+  AddMode(5, "CCQE", "#nu CCQE", kBlack, 2, 1001);
+  AddMode(6, "2p2h", "#nu 2p2h", kGray+1, 2, 1001);
+  StackBase::SetupStack(hist);
+};
+
+int SciBooNEUtils::ModeStack2::ConvertModeToIndex(int mode){
+
+  // Catch wrong sign contribution
+  if (mode < 0) return 2;
+  // Catch NC contributions
+  if (mode > 30) return 3;
+  switch (abs(mode)){
+  case 16: return 0; // CCCOH
+  case 11:
+  case 12:
+  case 13: return 1; // CCRES
+  case  1: return 5; // CCQE
+  case  2: return 6; // 2p2h
+  default: return 4; // Other
+  }
+};
+
+void SciBooNEUtils::ModeStack2::Fill(int mode, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack2::ConvertModeToIndex(mode), x, y, z, weight);
+};
+
+void SciBooNEUtils::ModeStack2::Fill(FitEvent* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack2::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
+
+void SciBooNEUtils::ModeStack2::Fill(BaseFitEvt* evt, double x, double y, double z, double weight) {
+  StackBase::FillStack(SciBooNEUtils::ModeStack2::ConvertModeToIndex(evt->Mode), x, y, z, weight);
+};
+
+
