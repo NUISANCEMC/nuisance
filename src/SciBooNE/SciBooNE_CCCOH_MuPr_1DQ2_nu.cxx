@@ -73,10 +73,10 @@ void SciBooNE_CCCOH_MuPr_1DQ2_nu::FillEventVariables(FitEvent *event){
   FitParticle *nu   = event->GetNeutrinoIn();
 
   if (this->mainTrack){
-    q2qe = FitUtils::Q2QErec(FitUtils::p(this->mainTrack),cos(FitUtils::th(nu,this->mainTrack)), 27., true);
+    q2qe = FitUtils::Q2QErec(SciBooNEUtils::smear_p(this->mainTrack),cos(SciBooNEUtils::smear_th(nu,this->mainTrack)), 27., true);
   }
 
-  if (q2qe < 0) return;  
+  if (q2qe < 0) q2qe = 0; //return;  
   // Set X Variables
   fXVar = q2qe;
   return;
@@ -86,8 +86,6 @@ void SciBooNE_CCCOH_MuPr_1DQ2_nu::FillEventVariables(FitEvent *event){
 bool SciBooNE_CCCOH_MuPr_1DQ2_nu::isSignal(FitEvent *event){
 
   if (!this->mainTrack) return false;
-  // if (this->nPiMus != 0) return false;
-  // if (this->nProtons != 1) return false;
   if (this->nPiMus + this->nProtons != 1) return false;
 
   double misIDProb = SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->secondTrack));

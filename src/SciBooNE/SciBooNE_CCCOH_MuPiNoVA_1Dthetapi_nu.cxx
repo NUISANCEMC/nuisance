@@ -91,7 +91,7 @@ bool SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu::isSignal(FitEvent *event){
   if (SciBooNEUtils::CalcThetaPr(event, this->mainTrack, this->secondTrack) < 20) return false;
   double misIDProb = SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->secondTrack));
 
-  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= 0.1;
+  if (SciBooNEUtils::isProton(this->mainTrack)) this->Weight *= SciBooNEUtils::ProtonMisIDProb(FitUtils::p(this->mainTrack));
   if (this->nProtons == 1) this->Weight *= misIDProb;
   if (this->nPiMus == 1) this->Weight *= (1-misIDProb);
 
