@@ -369,7 +369,7 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   LOG(SAM) << "Reading covariance from text file: " << covfile << std::endl;
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  
+
   covar      = StatUtils::GetInvert(fFullCovar);
   fDecomp    = StatUtils::GetDecomp(fFullCovar);
 
@@ -602,7 +602,7 @@ void JointMeas1D::SetBinMask(std::string maskfile) {
     new TH1I((fSettings.GetName() + "_BINMASK").c_str(),
              (fSettings.GetName() + "_BINMASK; Bin; Mask?").c_str(), nbins, 0, nbins);
   std::string line;
-  std::ifstream mask(maskfile.c_str(), ifstream::in);
+  std::ifstream mask(maskfile.c_str(), std::ifstream::in);
 
   if (!mask.is_open()) {
     LOG(FTL) << " Cannot find mask file." << std::endl;
@@ -842,7 +842,7 @@ void JointMeas1D::SetSmearingMatrix(std::string smearfile, int truedim,
   int row = 0;
 
   std::string line;
-  std::ifstream smear(smearfile.c_str(), ifstream::in);
+  std::ifstream smear(smearfile.c_str(), std::ifstream::in);
 
   // Note that the smearing matrix may be rectangular.
   fSmearMatrix = new TMatrixD(truedim, recodim);
@@ -2109,7 +2109,7 @@ void JointMeas1D::SetCovarMatrixFromText(std::string covarFile, int dim,
   int row = 0;
 
   std::string line;
-  std::ifstream covarread(covarFile.c_str(), ifstream::in);
+  std::ifstream covarread(covarFile.c_str(), std::ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
@@ -2169,7 +2169,7 @@ void JointMeas1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
   int row = 0;
 
   std::string line;
-  std::ifstream corr(corrFile.c_str(), ifstream::in);
+  std::ifstream corr(corrFile.c_str(), std::ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
   this->fFullCovar = new TMatrixDSym(dim);

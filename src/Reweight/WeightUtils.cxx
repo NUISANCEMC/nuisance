@@ -105,10 +105,10 @@ TF1 FitBase::GetRWConvFunction(std::string const &type,
   if (parType.find("parameter") == std::string::npos) parType += "_parameter";
 
   std::string line;
-  ifstream card(
+  std::ifstream card(
       (GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card")
           .c_str(),
-      ifstream::in);
+      std::ifstream::in);
 
   while (std::getline(card >> std::ws, line, '\n')) {
     std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
@@ -154,7 +154,7 @@ std::string FitBase::GetRWUnits(std::string const &type,
   std::ifstream card(
       (GeneralUtils::GetTopLevelDir() + "/parameters/dial_conversion.card")
           .c_str(),
-      ifstream::in);
+      std::ifstream::in);
 
   while (std::getline(card >> std::ws, line, '\n')) {
     std::vector<std::string> inputlist = GeneralUtils::ParseToStr(line, " ");
