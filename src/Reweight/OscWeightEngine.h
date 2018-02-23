@@ -135,6 +135,7 @@ class OscWeightEngine : public WeightEngineBase {
   bool NeedsEventReWeight();
 
   double CalcWeight(BaseFitEvt* evt);
+  /// ENu [GeV]
   double CalcWeight(double ENu, int PDGNu, int TargetPDGNu = -1);
 
   static int SystEnumFromString(std::string const& name);

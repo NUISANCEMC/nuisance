@@ -126,12 +126,12 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  if (!fCardFile.empty()) fCompKey.Set("cardfile", fCardFile);
   if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
+  if (!fStrategy.empty()) fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
+  configuration.LoadSettings(fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -222,10 +222,15 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     // Run Parameter Conversion if needed
     if (parstate.find("ABS") != std::string::npos) {
+      double opnom = parnom;
+      double oparstep = parstep;
       parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
       parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
       parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
-      parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
+      parstep =
+          FitBase::RWAbsToSigma(partype, parname, opnom + parstep) - parnom;
+      std::cout << "ParStep: " << parstep << " (" << oparstep << ")."
+                << std::endl;
     } else if (parstate.find("FRAC") != std::string::npos) {
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
