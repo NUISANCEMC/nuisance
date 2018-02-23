@@ -1,8 +1,6 @@
 #include "Initialiser.h"
 
-void RunNuisance(){
-  std::cout << "Starting NUISANCE" << std::endl;
-}
+void RunNuisance() { std::cout << "Starting NUISANCE" << std::endl; }
 
 struct LetterBackronym {
   LetterBackronym(size_t n, std::string const &b, float p = 1.0,
@@ -18,7 +16,9 @@ struct LetterBackronym {
   std::string TagLine;
 };
 
-__attribute__((constructor)) void nuisance_init(void) {
+__attribute__((constructor)) void constructor(void) { nuisance_init(); }
+
+void nuisance_init(void) {
   std::vector<std::vector<LetterBackronym> > Letters;
 
   for (size_t i = 0; i < 8; ++i) {
@@ -32,7 +32,7 @@ __attribute__((constructor)) void nuisance_init(void) {
 
   Letters[3].push_back(LetterBackronym(1, "Systematics"));
   Letters[3].push_back(LetterBackronym(
-                         1, "Synthesiser", 0.2, "Playing on the comparisons you want to see"));
+      1, "Synthesiser", 0.2, "Playing on the comparisons you want to see"));
 
   Letters[4].push_back(LetterBackronym(2, "ANalyser"));
   Letters[4].push_back(LetterBackronym(1, "Aggregating", 0.5));
@@ -40,7 +40,7 @@ __attribute__((constructor)) void nuisance_init(void) {
                                        "You can always find a frame"));
 
   Letters[5].push_back(
-    LetterBackronym(1, "New", 1, "The freshest comparisons"));
+      LetterBackronym(1, "New", 1, "The freshest comparisons"));
 
   Letters[6].push_back(LetterBackronym(1, "by Comparing"));
   Letters[6].push_back(LetterBackronym(1, "Constraints from"));
@@ -71,28 +71,31 @@ __attribute__((constructor)) void nuisance_init(void) {
   std::string TagL = TagLines[tr.Integer(TagLines.size())];
 
   std::vector<std::pair<std::string, std::pair<std::string, std::string> > >
-  OneBlob;
+      OneBlob;
 
   OneBlob.push_back(
-    std::make_pair("NUISANCE", std::make_pair("", "FiXing your Neutrinos")));
+      std::make_pair("NUISANCE", std::make_pair("", "FiXing your Neutrinos")));
 
   if (tr.Uniform() < 0.01) {
     std::pair<std::string, std::pair<std::string, std::string> > const &blob =
-      OneBlob[tr.Integer(OneBlob.size())];
+        OneBlob[tr.Integer(OneBlob.size())];
     Name = blob.first;
     back.str("");
     back << blob.second.first;
     TagL = blob.second.second;
   }
 
-  std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-            "%%%%%%%%%%%%%%%"
-            "%%"
-            << std::endl
-            << "%%  Welcome to " << Name << ": \033[5m" << back.str()
-            << "\033[0m-- " << TagL << std::endl
-            << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-            "%%%%%%%%%%%%%%%"
-            "%%"
-            << std::endl;
+  // std::cout <<
+  // "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+  //           "%%%%%%%%%%%%%%%"
+  //           "%%"
+  //           << std::endl
+  //           << "%%  Welcome to " << Name << ": \033[5m" << back.str()
+  //           << "\033[0m-- " << TagL << std::endl
+  //           <<
+  //           "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+  //           "%%%%%%%%%%%%%%%"
+  //           "%%"
+  //           << std::endl;
+  std::cout << Name << ": " << back.str() << " -- " << TagL << std::endl;
 }

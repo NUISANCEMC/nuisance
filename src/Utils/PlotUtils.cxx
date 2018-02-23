@@ -730,6 +730,7 @@ TH2D* PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
+  delete rootHistFile;
 
   return tempHist;
 }
@@ -753,6 +754,7 @@ TH1* PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
+  delete rootHistFile;
 
   return tempHist;
 }
