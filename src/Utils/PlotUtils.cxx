@@ -522,7 +522,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
   //********************************************************************
 
   std::string line;
-  std::ifstream data(dataFile.c_str(), ifstream::in);
+  std::ifstream data(dataFile.c_str(), std::ifstream::in);
 
   int yBin = 0;
   while (std::getline(data >> std::ws, line, '\n')) {

@@ -29,8 +29,14 @@
 #include "TF1.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
+
+#ifdef ROOT6_USE_FIT_FITTER_INTERFACE
+#include "Fit/Fitter.h"
+#else
 #include "Minuit2/FCNBase.h"
 #include "TFitterMinuit.h"
+#endif
+
 #include "TSystem.h"
 #include "TFile.h"
 #include "TProfile.h"
@@ -76,13 +82,13 @@ public:
 
   //! Constructor reads in arguments given at the command line for the fit here.
   MinimizerRoutines(int argc, char* argv[]);
-    
+
   //! Default destructor
   ~MinimizerRoutines();
 
   //! Reset everything to default/NULL
   void Init();
-  
+
   /*
     Input Functions
   */
@@ -149,7 +155,7 @@ void SetupMinimizerFromXML();
 
   //! Print current value
   void PrintState();
-  
+
   //! Performs a fit routine where the input.maxevents is set to a much lower value to try and move closer to the best fit minimum.
   void LowStatRoutine(std::string routine);
 
@@ -231,7 +237,7 @@ protected:
   std::string fStrategy;
   std::vector<std::string> fRoutines;
   std::string fAllowedRoutines;
-  
+
   std::string fFakeDataInput;
 
   // Input Dial Vals
@@ -257,7 +263,7 @@ protected:
   TH2D* fCorrel;
   TH2D* fDecomp;
   TH2D* fCovar;
-  
+
   TH2D* fCorFree;
   TH2D* fDecFree;
   TH2D* fCovFree;
