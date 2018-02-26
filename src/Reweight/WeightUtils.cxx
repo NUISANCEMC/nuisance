@@ -186,8 +186,7 @@ double FitBase::RWAbsToSigma(std::string const &type, std::string const &name,
   double conv_val = f1.GetX(val);
   if (fabs(conv_val) < 1E-10) conv_val = 0.0;
 
-  std::cout << "AbsToSigma(" << name << ") = " << val << " -> " << conv_val
-            << std::endl;
+  QLOG(FIT, "AbsToSigma(" << name << ") = " << val << " -> " << conv_val);
   return conv_val;
 }
 
@@ -294,7 +293,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   int offset = type * 1000;
   int this_enum = Reweight::kNoDialFound;  // Not Found
 
-  std::cout << "Getting dial enum " << type << " " << name << std::endl;
+  QLOG(DEB, "Getting dial enum " << type << " " << name);
   // Select Types
   switch (type) {
     // NEUT DIAL TYPE

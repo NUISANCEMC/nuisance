@@ -198,7 +198,7 @@ void FitEvent::OrderStack() {
 void FitEvent::Print() {
   if (LOG_LEVEL(FIT)) {
     LOG(FIT) << "FITEvent print" << std::endl;
-    LOG(FIT) << "Mode: " << Mode << std::endl;
+    LOG(FIT) << "Mode: " << Mode << ", Weight: " << InputWeight << std::endl;
     LOG(FIT) << "Particles: " << fNParticles << std::endl;
     LOG(FIT) << " -> Particle Stack " << std::endl;
     for (int i = 0; i < fNParticles; i++) {

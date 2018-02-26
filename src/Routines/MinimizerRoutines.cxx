@@ -72,6 +72,12 @@ MinimizerRoutines::~MinimizerRoutines(){
   Input Functions
 */
 //*************************************
+MinimizerRoutines::MinimizerRoutines() {
+//*************************************
+  Init();
+}
+
+//*************************************
 MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   //*************************************
 
@@ -242,7 +248,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     fParams.push_back(parname);
 
     fTypeVals[parname] = FitBase::ConvDialType(partype);
-    ;
+
     fStartVals[parname] = parnom;
     fCurVals[parname] = parnom;
 

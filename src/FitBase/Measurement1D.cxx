@@ -831,6 +831,8 @@ void Measurement1D::FillHistograms() {
 
   if (Signal) {
 
+    QLOG(DEB, "Fill MCHist: " << fXVar << ", " << Weight);
+
     fMCHist->Fill(fXVar, Weight);
     fMCFine->Fill(fXVar, Weight);
     fMCStat->Fill(fXVar, 1.0);

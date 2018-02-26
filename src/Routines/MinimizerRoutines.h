@@ -80,6 +80,8 @@ public:
     Constructor/Destructor
   */
 
+  MinimizerRoutines();
+
   //! Constructor reads in arguments given at the command line for the fit here.
   MinimizerRoutines(int argc, char* argv[]);
 
