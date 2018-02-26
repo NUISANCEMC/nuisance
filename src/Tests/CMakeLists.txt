@@ -24,7 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-SET(TESTAPPS SignalDefTests ParserTests SmearceptanceTests)
+SET(TESTAPPS SignalDefTests ParserTests SmearceptanceTests FitMechanicsTest)
 
 foreach(appimpl ${TESTAPPS})
   add_executable(${appimpl} ${appimpl}.cxx)
@@ -38,3 +38,14 @@ foreach(appimpl ${TESTAPPS})
   install(TARGETS ${appimpl} DESTINATION tests)
   add_test(${appimpl} ${appimpl} 1)
 endforeach()
+
+add_library(DummySample SHARED DummySample.cxx)
+target_link_libraries(DummySample ${MODULETargets})
+target_link_libraries(DummySample ${CMAKE_DEPENDLIB_FLAGS})
+target_link_libraries(DummySample ${ROOT_LIBS})
+
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(DummySample PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
+
+install(TARGETS DummySample DESTINATION tests)
