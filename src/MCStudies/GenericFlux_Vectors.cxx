@@ -55,7 +55,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name, std::string inputfile
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  this->fScaleFactor =
+  fScaleFactor =
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
@@ -82,6 +82,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("Mode",   &Mode,   "Mode/I"  );
   eventVariables->Branch("cc",     &cc,     "cc/B"    );
   eventVariables->Branch("PDGnu",  &PDGnu,  "PDGnu/I" );
+  eventVariables->Branch("Enu",    &Enu,    "Enu/F" );
   eventVariables->Branch("tgt",    &tgt,    "tgt/I"   );
   eventVariables->Branch("PDGLep", &PDGLep, "PDGLep/I");
   eventVariables->Branch("ELep",   &ELep,   "ELep/F"  );
@@ -154,16 +155,16 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   q0 = (nu->fP - lep->fP).E()/1E3;
   q3 = (nu->fP - lep->fP).Vect().Mag()/1E3;
 
+  // These assume C12 binding from MINERvA... not ideal
+  Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
+  Q2_QE  = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
+
   // Get W_true with assumption of initial state nucleon at rest
   float m_n = (float)PhysConst::mass_proton;
   W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
   W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
   x = Q2/(2 * m_n * q0);
   y = 1 - ELep/Enu;
-
-  // These assume C12 binding from MINERvA... not ideal
-  Q2_QE  = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
-  Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
 
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
