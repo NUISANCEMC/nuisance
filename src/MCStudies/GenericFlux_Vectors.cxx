@@ -82,7 +82,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("Mode",   &Mode,   "Mode/I"  );
   eventVariables->Branch("cc",     &cc,     "cc/B"    );
   eventVariables->Branch("PDGnu",  &PDGnu,  "PDGnu/I" );
-  eventVariables->Branch("Enu",    &Enu,    "Enu/F" );
+  eventVariables->Branch("Enu_true",    &Enu_true,    "Enu_true/F" );
   eventVariables->Branch("tgt",    &tgt,    "tgt/I"   );
   eventVariables->Branch("PDGLep", &PDGLep, "PDGLep/I");
   eventVariables->Branch("ELep",   &ELep,   "ELep/F"  );
@@ -120,10 +120,9 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
 void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Reset all Function used to extract any variables of interest to the event
-  PDGnu = tgt = PDGLep = 0;
+  Mode = PDGnu = tgt = PDGLep = 0;
 
-  Enu = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y =
-      -999.9;
+  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = -999.9;
 
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){
@@ -144,27 +143,29 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   FitParticle *lep = event->GetHMFSAnyLepton();
 
   PDGnu = nu->fPID;
-  Enu = nu->fP.E()/1E3;
+  Enu_true = nu->fP.E()/1E3;
   tgt = event->fTargetPDG;
-  PDGLep = lep->fPID;
-  ELep = lep->fP.E()/1E3;
-  CosLep = cos(nu->fP.Vect().Angle(lep->fP.Vect()));
+  if (lep != NULL) {
+    PDGLep = lep->fPID;
+    ELep = lep->fP.E()/1E3;
+    CosLep = cos(nu->fP.Vect().Angle(lep->fP.Vect()));
 
-  // Basic interaction kinematics
-  Q2 = -1*(nu->fP - lep->fP).Mag2()/1E6;
-  q0 = (nu->fP - lep->fP).E()/1E3;
-  q3 = (nu->fP - lep->fP).Vect().Mag()/1E3;
+    // Basic interaction kinematics
+    Q2 = -1*(nu->fP - lep->fP).Mag2()/1E6;
+    q0 = (nu->fP - lep->fP).E()/1E3;
+    q3 = (nu->fP - lep->fP).Vect().Mag()/1E3;
 
-  // These assume C12 binding from MINERvA... not ideal
-  Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
-  Q2_QE  = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
+    // These assume C12 binding from MINERvA... not ideal
+    Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
+    Q2_QE  = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
-  // Get W_true with assumption of initial state nucleon at rest
-  float m_n = (float)PhysConst::mass_proton;
-  W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
-  W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
-  x = Q2/(2 * m_n * q0);
-  y = 1 - ELep/Enu;
+    // Get W_true with assumption of initial state nucleon at rest
+    float m_n = (float)PhysConst::mass_proton;
+    W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
+    W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
+    x = Q2/(2 * m_n * q0);
+    y = 1 - ELep/Enu_true;
+  }
 
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
