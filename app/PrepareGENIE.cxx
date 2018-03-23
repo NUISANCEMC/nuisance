@@ -37,6 +37,8 @@ int main(int argc, char* argv[]) {
 
 void RunGENIEPrepareMono(std::string input, std::string target,
                          std::string output) {
+
+  std::cout << "Running in mono" << std::endl;
   // Setup TTree
   TChain* tn = new TChain("gtree");
   tn->AddFile(input.c_str());
@@ -119,7 +121,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   TFile* outputfile = new TFile(input.c_str(), "UPDATE");
   outputfile->cd();
 
-  LOG(FIT) << "Getting splines " << std::endl;
+  LOG(FIT) << "Getting splines in mono" << std::endl;
 
   // Save each of the reconstructed splines to file
   std::map<std::string, TH1D*> modeavg;
@@ -231,6 +233,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
                      std::string output) {
   LOG(FIT) << "Running GENIE Prepare" << std::endl;
+  std::cout << "Running in prepare" << std::endl;
 
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
@@ -592,7 +595,7 @@ void ParseOptions(int argc, char* argv[]) {
     flagopt = true;
   }
 
-  if (gFluxFile == "" && !flagopt) {
+  if (gFluxFile == "" && !flagopt && !IsMonoE) {
     ERR(FTL) << "No flux input specified for Prepare Mode" << std::endl;
     flagopt = true;
   }

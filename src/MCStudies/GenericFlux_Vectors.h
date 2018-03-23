@@ -62,7 +62,6 @@ public:
   int Mode;
   bool cc;
   int PDGnu;
-  float Enu;
   int tgt;
   int PDGLep;
   float ELep;
@@ -73,6 +72,7 @@ public:
   float q0;
   float q3;
   float Enu_QE;
+  float Enu_true;
   float Q2_QE;
   float W_nuc_rest;
   float W;
