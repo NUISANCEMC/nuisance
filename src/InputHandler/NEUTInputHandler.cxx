@@ -185,12 +185,33 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
   return fNUISANCEEvent;
 }
 
+// From NEUT neutclass/neutpart.h
+//          Bool_t         fIsAlive; // Particle should be tracked or not
+//                          ( in the detector simulator )
+//
+//         Int_t          fStatus;  // Status flag of this particle
+//                            -2: Non existing particle
+//                            -1: Initial state particle
+//                             0: Normal
+//                             1: Decayed to the other particle
+//                             2: Escaped from the detector
+//                             3: Absorped
+//                             4: Charge exchanged
+//                             5: Pauli blocked
+//                             6: N/A
+//                             7: Produced child particles
+//                             8: Inelastically scattered
+//
 int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
   // State
   int state = kUndefinedState;
 
+  // Remove Pauli blocked events, probably just single pion events
+  if (part->fStatus == 5) {
+    state = kFSIState;
+
   // fStatus == -1 means initial  state
-  if (part->fIsAlive == false && part->fStatus == -1) {
+  } else if (part->fIsAlive == false && part->fStatus == -1) {
     state = kInitialState;
 
     // NEUT has a bit of a strange convention for fIsAlive and fStatus
@@ -204,25 +225,44 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
     // not alive. Remaining particles with status 2 are FSI particles that
     // reinteracted
     if (abs(fNeutVect->Mode) > 30 &&
-        (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+        (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
       state = kFinalState;
       // The usual CC case
     } else if (part->fIsAlive == true) {
       state = kFSIState;
     }
+
   } else if (part->fIsAlive == true && part->fStatus == 2 &&
-             (abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
-    state = kFinalState;
+      (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+        state = kFinalState;
 
   } else if (part->fIsAlive == true && part->fStatus == 0) {
     state = kFinalState;
 
+  } else if (!part->fIsAlive && (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4 || part->fStatus == 7 || part->fStatus == 8)) {
+    state = kFSIState;
+
+    // There's one hyper weird case where fStatus = -3. This apparently corresponds to a nucleon being ejected via pion FSI when there is "data available"
+  } else if (!part->fIsAlive && (part->fStatus == -3)) {
+    state = kUndefinedState;
+    // NC neutrino outgoing
+  } else if (!part->fIsAlive && part->fStatus == 0 && (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+    state = kFinalState;
+
+  // Warn if we still find alive particles without classifying them
   } else if (part->fIsAlive == true) {
     ERR(WRN) << "Undefined NEUT state "
-             << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-             << " PDG: " << part->fPID << std::endl;
+      << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+      << " PDG: " << part->fPID << std::endl;
+    throw;
+    // Warn if we find dead particles that we haven't classified
+  } else {
+    ERR(WRN) << "Undefined NEUT state "
+      << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+      << " PDG: " << part->fPID << std::endl;
     throw;
   }
+
 
   return state;
 }
@@ -302,7 +342,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->OrderStack();
 
   FitParticle* ISNeutralLepton =
-      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
+    fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
   if (ISNeutralLepton) {
     fNUISANCEEvent->probe_E = ISNeutralLepton->E();
     fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
@@ -393,11 +433,11 @@ void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
   for (int i = 0; i < nework_.numne; i++) {
     nework_.ipne[i] = nvect->PartInfo(i)->fPID;
     nework_.pne[i][0] =
-        (float)nvect->PartInfo(i)->fP.X() / 1000;  // VC(NE)WORK in M(G)eV
+      (float)nvect->PartInfo(i)->fP.X() / 1000;  // VC(NE)WORK in M(G)eV
     nework_.pne[i][1] =
-        (float)nvect->PartInfo(i)->fP.Y() / 1000;  // VC(NE)WORK in M(G)eV
+      (float)nvect->PartInfo(i)->fP.Y() / 1000;  // VC(NE)WORK in M(G)eV
     nework_.pne[i][2] =
-        (float)nvect->PartInfo(i)->fP.Z() / 1000;  // VC(NE)WORK in M(G)eV
+      (float)nvect->PartInfo(i)->fP.Z() / 1000;  // VC(NE)WORK in M(G)eV
   }
   // fsihist.h
 
