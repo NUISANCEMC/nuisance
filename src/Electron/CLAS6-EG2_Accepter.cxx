@@ -35,7 +35,8 @@ struct EffMap {
     Accepted->SetDirectory(NULL);
   }
 
-  double GetAccRatio(double p_GeV, double costheta, double phi_deg) {
+  double GetAccRatio(double p_GeV, double costheta, double phi_deg,
+                     double defaultAccRatio = 0) const {
     // For a bin in phase space defined by p, cost, phi:
     // Find number of generated events
     Int_t pbin = Generated->GetXaxis()->FindBin(p_GeV);
@@ -51,6 +52,9 @@ struct EffMap {
     }
 
     double num_gen = Generated->GetBinContent(pbin, tbin, phibin);
+    if (num_gen == 0) {
+      return defaultAccRatio;
+    }
     // Find number of accepted events
     pbin = Accepted->GetXaxis()->FindBin(p_GeV);
     tbin = Accepted->GetYaxis()->FindBin(costheta);
@@ -91,15 +95,17 @@ class CLASAccepter : public ISmearcepter {
   // Maps a particle PDG to the relevant generated and accepted histograms from
   // the input map.
   std::map<int, EffMap> Acceptance;
+  double DefaultAccRatio;
 
- public:
-  CLASAccepter() { ElementName = "CLASAccepter"; }
+public:
+  CLASAccepter() :  DefaultAccRatio(0) { ElementName = "CLASAccepter"; }
 
   void SpecifcSetup(nuiskey &nk) {
     rand.~TRandom3();
     new (&rand) TRandom3();
 
     InstanceName = nk.GetS("name");
+    DefaultAccRatio = nk.GetD("DefaultAccRatio");
 
     std::string const &mapfile = nk.GetS("map");
 
@@ -193,9 +199,9 @@ class CLASAccepter : public ISmearcepter {
         continue;
       }
 
-      EffMap eff = Acceptance[PDG];
+      EffMap const &eff = Acceptance[PDG];
 
-      double acc_ratio = eff.GetAccRatio(p, cost, phi);
+      double acc_ratio = eff.GetAccRatio(p, cost, phi, DefaultAccRatio);
 
       bool accepted = (rand.Uniform() < acc_ratio);
       if (accepted) {
