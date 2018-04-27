@@ -16,7 +16,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
+
+#Use the compilers found in the path
+find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
+find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
 project(NUISANCE)
 

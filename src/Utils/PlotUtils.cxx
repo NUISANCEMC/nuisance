@@ -522,7 +522,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
   //********************************************************************
 
   std::string line;
-  std::ifstream data(dataFile.c_str(), ifstream::in);
+  std::ifstream data(dataFile.c_str(), std::ifstream::in);
 
   int yBin = 0;
   while (std::getline(data >> std::ws, line, '\n')) {
@@ -730,6 +730,7 @@ TH2D* PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
+  delete rootHistFile;
 
   return tempHist;
 }
@@ -753,6 +754,7 @@ TH1* PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
+  delete rootHistFile;
 
   return tempHist;
 }

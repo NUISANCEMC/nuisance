@@ -511,7 +511,7 @@ void Measurement2D::SetBinMask(std::string maskfile) {
     new TH2I((fSettings.GetName() + "_BINMASK").c_str(),
              (fSettings.GetName() + "_BINMASK; Bin; Mask?").c_str(), nbinsx, 0, nbinsx, nbinxy, 0, nbinxy);
   std::string line;
-  std::ifstream mask(maskfile.c_str(), ifstream::in);
+  std::ifstream mask(maskfile.c_str(), std::ifstream::in);
 
   if (!mask.is_open()) {
     LOG(FTL) << " Cannot find mask file." << std::endl;
@@ -1716,7 +1716,7 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm,
   int yBin = 0;
 
   std::string line;
-  std::ifstream data(dataFile.c_str(), ifstream::in);
+  std::ifstream data(dataFile.c_str(), std::ifstream::in);
 
   fDataHist = new TH2D((fName + "_data").c_str(), (fName + fPlotTitles).c_str(),
                        fNDataPointsX - 1, fXBins, fNDataPointsY - 1, fYBins);
@@ -1738,7 +1738,7 @@ void Measurement2D::SetDataValues(std::string dataFile, double dataNorm,
   }
 
   yBin = 0;
-  std::ifstream error(errorFile.c_str(), ifstream::in);
+  std::ifstream error(errorFile.c_str(), std::ifstream::in);
 
   if (error.is_open())
     LOG(SAM) << "Reading errors from: " << errorFile.c_str() << std::endl;
@@ -1861,7 +1861,7 @@ void Measurement2D::SetCovarMatrixFromText(std::string covarFile, int dim) {
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(), ifstream::in);
+  std::ifstream covar(covarFile.c_str(), std::ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
@@ -1904,7 +1904,7 @@ void Measurement2D::SetCovarMatrixFromChol(std::string covarFile, int dim) {
   int row = 0;
 
   std::string line;
-  std::ifstream covarread(covarFile.c_str(), ifstream::in);
+  std::ifstream covarread(covarFile.c_str(), std::ifstream::in);
 
   TMatrixD* newcov = new TMatrixD(dim, dim);
 

@@ -128,9 +128,9 @@ CheckAndSetDefaultCache(USE_NUANCE TRUE BOOL "Whether to enable NUANCE event sup
 
 CheckAndSetDefaultCache(USE_PROB3PP FALSE BOOL "Whether to download and compile in Prob3++ support. <FALSE>")
 
-CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE TRUE BOOL "Whether to perform the update target for external dependencies. <TRUE>")
+CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE FALSE BOOL "Whether to perform the update target for external dependencies. Note this may produce errors for CMake < 3.8 where a bug was fixed for the feature that this option invokes. <FALSE>")
 
-CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <TRUE>")
+CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <FALSE>")
 
 CheckAndSetDefault(NEED_PYTHIA6 FALSE)
 CheckAndSetDefault(NEED_PYTHIA8 FALSE)
@@ -140,7 +140,7 @@ CheckAndSetDefault(NEED_ROOTPYTHIA6 FALSE)
 
 CheckAndSetDefaultCache(USE_OMP FALSE BOOL "Whether to enable multicore features (there currently are none...). <FALSE>")
 
-CheckAndSetDefaultCache(USE_DYNSAMPLES FALSE BOOL "Whether to enable the dynamic sample loader. <FALSE>")
+CheckAndSetDefaultCache(USE_DYNSAMPLES TRUE BOOL "Whether to enable the dynamic sample loader. <TRUE>")
 
 CheckAndSetDefault(NO_EXPERIMENTS FALSE)
 

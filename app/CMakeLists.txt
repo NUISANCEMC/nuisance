@@ -201,6 +201,14 @@ if(USE_NuWro)
   endif()
 endif()
 
+add_executable(nuisbac nuisbac.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisbac)
+target_link_libraries(nuisbac ${MODULETargets})
+target_link_libraries(nuisbac ${CMAKE_DEPENDLIB_FLAGS})
+if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+  set_target_properties(nuisbac PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+endif()
+
 install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
 
 #add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx)

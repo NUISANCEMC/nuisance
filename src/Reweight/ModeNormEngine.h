@@ -27,6 +27,8 @@ class ModeNormEngine : public WeightEngineBase {
       THROW("Mode dial: " << mode
                           << " has not been included. Cannot set value.");
     }
+    QLOG(DEB, "[INFO]: ModeNormEngine ObsMode: " << mode << " weight " << val
+                                                 << ", rwenum = " << rwenum);
     fDialValues[fDialEnumIndex[mode]] = val;
   }
   void SetDialValue(std::string name, double val) {
@@ -42,6 +44,9 @@ class ModeNormEngine : public WeightEngineBase {
     if (!fDialEnumIndex.count(mode)) {
       return 1;
     }
+    QLOG(DEB, "[INFO]: Ev mode "
+                  << evt->Mode << ", ObsMode: " << mode
+                  << ", weight = " << fDialValues[fDialEnumIndex[mode]]);
     return fDialValues[fDialEnumIndex[mode]];
   };
   bool NeedsEventReWeight() { return false; };
