@@ -158,6 +158,7 @@ FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
 #endif
 
   fNUISANCEEvent->InputWeight *= GetInputWeight(entry);
+  fNUISANCEEvent->GiRead = fGiReader;
 
   return fNUISANCEEvent;
 }

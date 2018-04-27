@@ -130,7 +130,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
   std::string line;
   std::ifstream mask((FitPar::GetDataBase() + "/Electron/" + target).c_str(),
-                     ifstream::in);
+                     std::ifstream::in);
 
   if (!mask.good()) {
     ERR(FTL) << "Failed to open e-scattering database file: "

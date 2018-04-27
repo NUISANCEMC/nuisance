@@ -5,7 +5,13 @@
 
 #include "SplineUtils.h"
 #ifdef __MINUIT2_ENABLED__
+
+#ifdef ROOT6_USE_FIT_FITTER_INTERFACE
+#include "Fit/Fitter.h"
+#else
 #include "TFitterMinuit.h"
+#endif
+
 #endif
 
 class SplineFCN {

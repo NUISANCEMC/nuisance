@@ -96,7 +96,7 @@ extern std::ostream* __LOG_outstream;
 /// 6 EVT - Output during every event.
 /// -1 DEB - Will print only debugging info wherever a LOG(DEB) statement was
 /// made
-enum __LOG_levels { DEB = -1, QUIET, FIT, MIN, SAM, REC, SIG, EVT };
+enum __LOG_levels { QUIET = 0, FIT, MIN, SAM, REC, SIG, EVT, DEB };
 
 /// Returns log level for a given file/function
 int __GETLOG_LEVEL(int level, const char* filename, const char* funct);
@@ -166,9 +166,9 @@ std::ostream& __OUTERR(int level, const char* filename, const char* funct,
                                                         << std::endl;   \
     __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__)                 \
         << "Attempting to save output file." << std::endl;              \
-    if (Config::Get().out && Config::Get().out->IsOpen()) {       \
-      Config::Get().out->Write();                                    \
-      Config::Get().out->Close();                                    \
+    if (Config::Get().out && Config::Get().out->IsOpen()) {             \
+      Config::Get().out->Write();                                       \
+      Config::Get().out->Close();                                       \
       __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__) << "Done."    \
                                                           << std::endl; \
     } else {                                                            \
