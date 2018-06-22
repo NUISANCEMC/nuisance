@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "FitLogger.h"
 #include "PlotUtils.h"
 #include "StatUtils.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TTree.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // If you don't have NEUT enabled, you shouldn't compile this...
 #include "neutpart.h"
@@ -19,14 +19,14 @@ bool fIsMonoEFlux = false;
 double fMonoEEnergy = 0xdeadbeef;
 
 void PrintOptions();
-void ParseOptions(int argc, char* argv[]);
+void ParseOptions(int argc, char *argv[]);
 void AddMonoRateHistogram(std::string inputList, double MonoE,
                           std::string output);
 void CreateRateHistogram(std::string inputList, std::string flux,
                          std::string output);
 
 //*******************************
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   //*******************************
 
   LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 void AddMonoRateHistogram(std::string inputList, double MonoE,
                           std::string output) {
   // Need to allow for more than one file... will do soon
-  TChain* tn = new TChain("neuttree");
+  TChain *tn = new TChain("neuttree");
 
   std::vector<std::string> inputs = GeneralUtils::ParseToStr(inputList, ",");
   for (std::vector<std::string>::iterator it = inputs.begin();
@@ -68,28 +68,29 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     throw;
   }
 
-  NeutVect* fNeutVect = NULL;
+  NeutVect *fNeutVect = NULL;
   tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
-  TH1D* fluxHist = new TH1D("flux", "flux", 1000, 0, fFluxInGeV ? 10 : 10000);
+  TH1D *fluxHist = new TH1D("flux", "flux", 1000, 0, fFluxInGeV ? 10 : 10000);
   fluxHist->Fill(MonoE);
   fluxHist->Scale(1, "width");
   // Make Event Hist
-  TH1D* xsecHist = (TH1D*)fluxHist->Clone();
+  TH1D *xsecHist = (TH1D *)fluxHist->Clone();
   xsecHist->Reset();
 
   // Make a total cross section hist for shits and giggles
-  TH1D* entryHist = (TH1D*)xsecHist->Clone();
+  TH1D *entryHist = (TH1D *)xsecHist->Clone();
 
   double MeanE = 0;
   for (int i = 0; i < nevts; ++i) {
     tn->GetEntry(i);
-    NeutPart* part = fNeutVect->PartInfo(0);
+    NeutPart *part = fNeutVect->PartInfo(0);
     double E = part->fP.E();
     double xsec = fNeutVect->Totcrs;
 
     // Unit conversion
-    if (fFluxInGeV) E *= 1E-3;
+    if (fFluxInGeV)
+      E *= 1E-3;
 
     xsecHist->Fill(E, xsec);
     entryHist->Fill(E);
@@ -106,7 +107,7 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   xsecHist->Divide(entryHist);
 
   // This will be the evtrt histogram
-  TH1D* evtHist = (TH1D*)xsecHist->Clone();
+  TH1D *evtHist = (TH1D *)xsecHist->Clone();
   evtHist->Multiply(fluxHist);
 
   // Check whether the overflow is empty. If not, advise that either the wrong
@@ -115,8 +116,8 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   // this may be benign
   if (evtHist->Integral(0, -1) != evtHist->Integral() ||
       evtHist->Integral(0, -1) == 0) {
-    ERR(WRN) << "The input file and flux histogram provided do not match... "
-             << std::endl;
+    ERR(WRN) << "The input file(" << evtHist->Integral(0, -1)
+             << ") and flux histogram provided do not match... " << std::endl;
     ERR(WRN) << "Are the units correct (MeanE = " << MeanE
              << ", FluxHistoUpperLim: "
              << fluxHist->GetXaxis()->GetBinUpEdge(1000)
@@ -125,7 +126,7 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   }
 
   // Pick where the output should go
-  TFile* outFile = NULL;
+  TFile *outFile = NULL;
   if (!output.empty()) {
     LOG(FIT) << "Saving histograms in " << output << std::endl;
     outFile = new TFile(output.c_str(), "RECREATE");
@@ -161,7 +162,7 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   } else {
     LOG(FIT) << "Cloning neuttree into output file." << std::endl;
     StopTalking();
-    TTree* newtree = (TTree*)tn->CloneTree(-1, "fast");
+    TTree *newtree = (TTree *)tn->CloneTree(-1, "fast");
     StartTalking();
     newtree->Write();
   }
@@ -179,7 +180,7 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   //*******************************
 
   // Need to allow for more than one file... will do soon
-  TChain* tn = new TChain("neuttree");
+  TChain *tn = new TChain("neuttree");
 
   std::vector<std::string> inputs = GeneralUtils::ParseToStr(inputList, ",");
   for (std::vector<std::string>::iterator it = inputs.begin();
@@ -203,15 +204,15 @@ void CreateRateHistogram(std::string inputList, std::string flux,
     throw;
   }
 
-  NeutVect* fNeutVect = NULL;
+  NeutVect *fNeutVect = NULL;
   tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
-  TH1D* fluxHist = NULL;
+  TH1D *fluxHist = NULL;
   if (fluxvect.size() > 1) {
-    TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
-    fluxHist = (TH1D*)fluxfile->Get(fluxvect[1].c_str());
+    TFile *fluxfile = new TFile(fluxvect[0].c_str(), "READ");
+    fluxHist = (TH1D *)fluxfile->Get(fluxvect[1].c_str());
     fluxHist->SetDirectory(0);
   } else {
     ERR(FTL) << "NO FLUX SPECIFIED" << std::endl;
@@ -225,27 +226,28 @@ void CreateRateHistogram(std::string inputList, std::string flux,
     LOG(FIT) << "Assuming flux histogram is in MeV" << std::endl;
 
   // Make Event Hist
-  TH1D* xsecHist = (TH1D*)fluxHist->Clone();
+  TH1D *xsecHist = (TH1D *)fluxHist->Clone();
   xsecHist->Reset();
 
   // Make a total cross section hist for shits and giggles
-  TH1D* entryHist = (TH1D*)xsecHist->Clone();
+  TH1D *entryHist = (TH1D *)xsecHist->Clone();
 
   for (int i = 0; i < nevts; ++i) {
     tn->GetEntry(i);
-    NeutPart* part = fNeutVect->PartInfo(0);
+    NeutPart *part = fNeutVect->PartInfo(0);
     double E = part->fP.E();
     double xsec = fNeutVect->Totcrs;
 
     // Unit conversion
-    if (fFluxInGeV) E *= 1E-3;
+    if (fFluxInGeV)
+      E *= 1E-3;
 
     xsecHist->Fill(E, xsec);
     entryHist->Fill(E);
 
     if (i % (nevts / 20) == 0) {
       LOG(FIT) << "Processed " << i << "/" << nevts << " NEUT events."
-               << std::endl;
+               << "(Enu = " << E << ", xsec = " << xsec << ") " << std::endl;
     }
   }
   LOG(FIT) << "Processed all events" << std::endl;
@@ -253,19 +255,19 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   xsecHist->Divide(entryHist);
 
   // This will be the evtrt histogram
-  TH1D* evtHist = NULL;
+  TH1D *evtHist = NULL;
 
   // If the integral of xsecHist is 0 the input file used a really old version
   // of NEUT without Totcrs
   if (!xsecHist->Integral(0, -1)) {
     ERR(WRN) << "Old NEUT input file: events will not be correctly normalized"
              << std::endl;
-    evtHist = (TH1D*)entryHist->Clone();
+    evtHist = (TH1D *)entryHist->Clone();
 
     if (evtHist->Integral() != 0)
       evtHist->Scale(fluxHist->Integral() / float(evtHist->Integral()));
   } else {
-    evtHist = (TH1D*)xsecHist->Clone();
+    evtHist = (TH1D *)xsecHist->Clone();
     evtHist->Multiply(fluxHist);
   }
 
@@ -275,15 +277,15 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   // this may be benign
   if (evtHist->Integral(0, -1) != evtHist->Integral() ||
       evtHist->Integral(0, -1) == 0) {
-    ERR(WRN) << "The input file and flux histogram provided do not match... "
-             << std::endl;
+    ERR(WRN) << "The input file(" << evtHist->Integral(0, -1)
+             << ") and flux histogram provided do not match... " << std::endl;
     ERR(WRN) << "Are the units correct? Did you provide the correct flux file?"
              << std::endl;
     ERR(WRN) << "Use output with caution..." << std::endl;
   }
 
   // Pick where the output should go
-  TFile* outFile = NULL;
+  TFile *outFile = NULL;
   if (!output.empty()) {
     LOG(FIT) << "Saving histograms in " << output << std::endl;
     outFile = new TFile(output.c_str(), "RECREATE");
@@ -319,7 +321,7 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   } else {
     LOG(FIT) << "Cloning neuttree into output file." << std::endl;
     StopTalking();
-    TTree* newtree = (TTree*)tn->CloneTree(-1, "fast");
+    TTree *newtree = (TTree *)tn->CloneTree(-1, "fast");
     StartTalking();
     newtree->Write();
   }
@@ -365,7 +367,7 @@ void PrintOptions() {
             << std::endl;
 }
 
-void ParseOptions(int argc, char* argv[]) {
+void ParseOptions(int argc, char *argv[]) {
   bool flagopt = false;
 
   // If No Arguments print commands

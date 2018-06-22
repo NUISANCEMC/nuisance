@@ -29,7 +29,11 @@ if(CERN_LEVEL STREQUAL "")
     cmessage(FATAL_ERROR "Variable CERN_LEVEL is not defined. Please export environment variable CERN_LEVEL or configure with -DCERN_LEVEL=XXXX (likely to be 2005).")
 endif()
 
-set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
+if(NOT IS_NEUT_54)
+  set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
+else()
+  set(NEUT_LIB_DIR ${NEUT_ROOT}/lib)
+endif()
 set(NEUT_CLASS ${NEUT_ROOT}/src/neutclass)
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__NEUT_ENABLED__ )
@@ -39,27 +43,46 @@ LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
   ${NEUT_ROOT}/src/neutclass
   ${NEUT_ROOT}/src/reweight)
 
-
 LIST(APPEND EXTRA_LINK_DIRS
-  ${NEUT_ROOT}/lib/Linux_pc
+  ${NEUT_LIB_DIR}
   ${CERN}/${CERN_LEVEL}/lib
   ${NEUT_ROOT}/src/reweight)
 
-LIST(APPEND EXTRA_LIBS
-  NReWeight
-  neutcore
-  nuccorrspl
-  nuceff
-  partnuck
-  skmcsvc
-  tauola
-  jetset74
-  pdflib804
-  mathlib
-  packlib
-  pawlib)
+if(NOT IS_NEUT_54)
+  LIST(APPEND EXTRA_LIBS
+    NReWeight
+    neutcore
+    nuccorrspl
+    nuceff
+    partnuck
+    skmcsvc
+    tauola
+    jetset74
+    pdflib804
+    mathlib
+    packlib
+    pawlib)
+else()
+  LIST(APPEND EXTRA_LIBS
+    NReWeight
+    neutcore_5.4.0
+    nuccorspl_5.4.0 #typo in NEUT, may hopefully disappear
+    nuceff_5.4.0
+    partnuck_5.4.0
+    skmcsvc_5.4.0
+    tauola_5.4.0
+    HT2p2h_5.4.0
+    N1p1h_5.4.0
+    jetset74
+    pdflib804
+    mathlib
+    packlib
+    pawlib)
+endif()
 
-LIST(APPEND EXTRA_SHAREDOBJS
+set(NEUT_ROOT_LIBS)
+
+LIST(APPEND NEUT_ROOT_LIBS
   ${NEUT_CLASS}/neutctrl.so
   ${NEUT_CLASS}/neutfsivert.so)
 
@@ -68,16 +91,24 @@ if(EXISTS "${NEUT_CLASS}/neutnucfsistep.so")
   set(NEUT_NUCFSI 1)
   LIST(APPEND EXTRA_CXX_FLAGS -D__NEUT_NUCFSI_ENABLED__ )
 
-  LIST(APPEND EXTRA_SHAREDOBJS
+  LIST(APPEND NEUT_ROOT_LIBS
     ${NEUT_CLASS}/neutnucfsistep.so
     ${NEUT_CLASS}/neutnucfsivert.so
     )
 endif()
 
-LIST(APPEND EXTRA_SHAREDOBJS
-  ${NEUT_CLASS}/neutrootTreeSingleton.so
+if(NOT IS_NEUT_54)
+  LIST(APPEND NEUT_ROOT_LIBS
+    ${NEUT_CLASS}/neutrootTreeSingleton.so)
+endif()
+
+LIST(APPEND NEUT_ROOT_LIBS
   ${NEUT_CLASS}/neutvtx.so
   ${NEUT_CLASS}/neutfsipart.so
   ${NEUT_CLASS}/neutpart.so
   ${NEUT_CLASS}/neutvect.so
   )
+
+foreach(OBJ ${NEUT_ROOT_LIBS})
+  LIST(APPEND EXTRA_SHAREDOBJS ${OBJ})
+endforeach()
