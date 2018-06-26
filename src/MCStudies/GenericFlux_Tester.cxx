@@ -54,7 +54,15 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   eventVariables = NULL;
-  liteMode = FitPar::Config().GetParB("isLiteMode");
+  liteMode = Config::Get().GetParB("isLiteMode");
+
+  if(Config::HasPar("EnuMin")){
+    EnuMin = Config::GetParD("EnuMin");
+  }
+
+  if(Config::HasPar("EnuMax")){
+    EnuMax = Config::GetParD("EnuMax");
+  }
 
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
@@ -69,7 +77,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
   this->fScaleFactor =
-      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+      (this->PredictedEventRate("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
