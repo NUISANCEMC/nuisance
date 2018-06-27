@@ -30,6 +30,14 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name, std::string inputfile
   EnuMin = 0.;
   EnuMax = 100.;  // Arbritrarily high energy limit
 
+  if(Config::HasPar("EnuMin")){
+    EnuMin = Config::GetParD("EnuMin");
+  }
+
+  if(Config::HasPar("EnuMax")){
+    EnuMax = Config::GetParD("EnuMax");
+  }
+
   // Set default fitter flags
   fIsDiag = true;
   fIsShape = false;
@@ -55,9 +63,10 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name, std::string inputfile
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
-  fScaleFactor =
-      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+  this->fScaleFactor =
+      (this->PredictedEventRate("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
+
 
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << std::endl;
 
