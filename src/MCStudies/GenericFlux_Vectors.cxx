@@ -70,6 +70,9 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   // correctly.
   this->fScaleFactor = (this->PredictedEventRate("width") / double(fNEvents)) /
                        this->TotalIntegratedFlux();
+  this->fScaleFactor_alttest =
+      (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
+      this->TotalIntegratedFlux();
 
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << std::endl;
 
@@ -124,6 +127,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/D");
   eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/D");
   eventVariables->Branch("fScaleFactor", &fScaleFactor, "fScaleFactor/D");
+  eventVariables->Branch("fScaleFactor_alttest", &fScaleFactor_alttest, "fScaleFactor_alttest/D");
 
   return;
 }
