@@ -68,9 +68,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   // often included here in other classes that directly integrate the event
   // histogram. This method is used here as it now respects EnuMin and EnuMax
   // correctly.
-  this->fScaleFactor = (this->PredictedEventRate("width") / double(fNEvents)) /
-                       this->TotalIntegratedFlux();
-  this->fScaleFactor_alttest =
+  this->fScaleFactor =
       (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
       this->TotalIntegratedFlux();
 
@@ -127,7 +125,6 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/D");
   eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/D");
   eventVariables->Branch("fScaleFactor", &fScaleFactor, "fScaleFactor/D");
-  eventVariables->Branch("fScaleFactor_alttest", &fScaleFactor_alttest, "fScaleFactor_alttest/D");
 
   return;
 }

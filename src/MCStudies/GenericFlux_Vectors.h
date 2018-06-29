@@ -93,7 +93,6 @@ public:
   double InputWeight;
   double RWWeight;
   double fScaleFactor;
-  double fScaleFactor_alttest;
 };
 
 #endif
