@@ -80,8 +80,9 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   // often included here in other classes that directly integrate the event
   // histogram. This method is used here as it now respects EnuMin and EnuMax
   // correctly.
-  this->fScaleFactor = (this->PredictedEventRate("width") / (fNEvents + 0.)) /
-                       this->TotalIntegratedFlux();
+  this->fScaleFactor =
+      (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
+      this->TotalIntegratedFlux();
 
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
