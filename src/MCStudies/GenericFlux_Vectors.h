@@ -78,7 +78,7 @@ public:
   float W;
   float x;
   float y;
-  
+
   // Save outgoing particle vectors
   int nfsp;
   static const int kMAX = 200;
@@ -87,12 +87,12 @@ public:
   float pz[kMAX];
   float E[kMAX];
   int pdg[kMAX];
-  
+
   // Basic event info
-  float Weight;
-  float InputWeight;
-  float RWWeight;
-  float fScaleFactor;
+  double Weight;
+  double InputWeight;
+  double RWWeight;
+  double fScaleFactor;
 };
 
 #endif

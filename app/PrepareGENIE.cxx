@@ -111,7 +111,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     // Clear Event
     genientpl->Clear();
 
-    if (i % (nevt / 20) == 0) {
+    size_t freq = nevt / 20;
+    if (freq && !(i % freq)) {
       LOG(FIT) << "Processed " << i << "/" << nevt << " GENIE events."
                << std::endl;
     }

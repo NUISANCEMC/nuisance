@@ -103,8 +103,8 @@ public:
   /// Returns the total predicted event rate for this input given the
   /// low and high energy ranges. intOpt specifies the option the ROOT
   /// TH1D integral should use. e.g. "" or "width"
-  double PredictedEventRate(double low, double high,
-                            std::string intOpt);
+  double PredictedEventRate(double low = -9999.9, double high = -9999.9,
+                             std::string intOpt = "");
 
   /// Returns the total generated flux for this input given the
   /// low and high energy ranges. intOpt specifies the option the ROOT
