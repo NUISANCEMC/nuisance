@@ -79,7 +79,7 @@ if(NOT WASMATCHED)
   cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
 endif()
 
-string(REPLACE " " ";" GENIE_LIBS_LIST "${GENIE_LIBS_STRIPED}")
+string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
 cmessage(DEBUG "genie-config --libs -- MATCH1: ${CMAKE_MATCH_1}")
 cmessage(DEBUG "genie-config --libs -- MATCH2: ${CMAKE_MATCH_2}")
 cmessage(DEBUG "genie-config --libs -- libs stripped: ${GENIE_LIBS_STRIPED}")
@@ -108,11 +108,23 @@ if(LIBXML2_INC STREQUAL "")
 endif()
 ###############################  log4cpp  ######################################
 if(LOG4CPP_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
+  find_program(LOG4CPPCFG log4cpp-config)
+  if(NOT LOG4CPPCFG STREQUAL "LOG4CPPCFG-NOTFOUND")
+    execute_process (COMMAND ${LOG4CPPCFG}
+    --pkglibdir OUTPUT_VARIABLE LOG4CPP_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
+  else()
+    message(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
+  endif()
 endif()
 
 if(LOG4CPP_INC  STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LOG4CPP_INC is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_INC=/path/to/LOG4CPP_includes or as and environment vairable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
+  find_program(LOG4CPPCFG log4cpp-config)
+  if(NOT LOG4CPPCFG STREQUAL "LOG4CPPCFG-NOTFOUND")
+    execute_process (COMMAND ${LOG4CPPCFG}
+    --pkgincludedir OUTPUT_VARIABLE LOG4CPP_INC OUTPUT_STRIP_TRAILING_WHITESPACE)
+  else()
+    message(FATAL_ERROR "Variable LOG4CPP_INC is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_INC=/path/to/LOG4CPP_includes or as and environment vairable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
+  endif()
 endif()
 ################################################################################
 
@@ -138,10 +150,7 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${LIBXML2_LIB}
   ${LOG4CPP_LIB})
 
-#LIST(REVERSE EXTRA_LIBS)
-#LIST(REVERSE GENIE_LIBS_LIST)
 LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
-#LIST(REVERSE EXTRA_LIBS)
 
 LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 
