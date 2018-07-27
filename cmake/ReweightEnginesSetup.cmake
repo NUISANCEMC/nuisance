@@ -29,6 +29,12 @@ if(USE_NIWG)
   cmessage(STATUS "Using NIWG Reweight engine.")
   set(USE_NIWG TRUE CACHE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>" FORCE)
 endif()
+##################################  NIWG  ######################################
+if(USE_DUNERWT)
+  include(${CMAKE_SOURCE_DIR}/cmake/DUNERwtSetup.cmake)
+  cmessage(STATUS "Using DUNE Reweight engine.")
+  set(USE_DUNERWT TRUE CACHE BOOL "Whether to enable DUNE ReWeight support. Requires external libraries. <FALSE>" FORCE)
+endif()
 ##################################  MINERvA   ######################################
 if(USE_MINERvA_RW)
   include(${CMAKE_SOURCE_DIR}/cmake/MINERvASetup.cmake)

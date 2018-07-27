@@ -1,33 +1,41 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #ifdef __GENIE_ENABLED__
 #include "GENIEInputHandler.h"
 
 #include "InputUtils.h"
 
+#ifdef __DUNERWT_ENABLED__
+
+#include "systematicstools/utility/ParameterAndProviderConfigurationUtility.hh"
+
+#include "fhiclcpp/make_ParameterSet.h"
+
+#endif
+
 GENIEGeneratorInfo::~GENIEGeneratorInfo() { DeallocateParticleStack(); }
 
-void GENIEGeneratorInfo::AddBranchesToTree(TTree* tn) {
+void GENIEGeneratorInfo::AddBranchesToTree(TTree *tn) {
   tn->Branch("GenieParticlePDGs", &fGenieParticlePDGs, "GenieParticlePDGs/I");
 }
 
-void GENIEGeneratorInfo::SetBranchesFromTree(TTree* tn) {
+void GENIEGeneratorInfo::SetBranchesFromTree(TTree *tn) {
   tn->SetBranchAddress("GenieParticlePDGs", &fGenieParticlePDGs);
 }
 
@@ -39,25 +47,29 @@ void GENIEGeneratorInfo::DeallocateParticleStack() {
   delete fGenieParticlePDGs;
 }
 
-void GENIEGeneratorInfo::FillGeneratorInfo(NtpMCEventRecord* ntpl) {
+void GENIEGeneratorInfo::FillGeneratorInfo(NtpMCEventRecord *ntpl) {
   Reset();
 
   // Check for GENIE Event
-  if (!ntpl) return;
-  if (!ntpl->event) return;
+  if (!ntpl)
+    return;
+  if (!ntpl->event)
+    return;
 
   // Cast Event Record
-  GHepRecord* ghep = static_cast<GHepRecord*>(ntpl->event);
-  if (!ghep) return;
+  GHepRecord *ghep = static_cast<GHepRecord *>(ntpl->event);
+  if (!ghep)
+    return;
 
   // Fill Particle Stack
-  GHepParticle* p = 0;
+  GHepParticle *p = 0;
   TObjArrayIter iter(ghep);
 
   // Loop over all particles
   int i = 0;
-  while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
-    if (!p) continue;
+  while ((p = (dynamic_cast<genie::GHepParticle *>((iter).Next())))) {
+    if (!p)
+      continue;
 
     // Get PDG
     fGenieParticlePDGs[i] = p->Pdg();
@@ -71,8 +83,8 @@ void GENIEGeneratorInfo::Reset() {
   }
 }
 
-GENIEInputHandler::GENIEInputHandler(std::string const& handle,
-                                     std::string const& rawinputs) {
+GENIEInputHandler::GENIEInputHandler(std::string const &handle,
+                                     std::string const &rawinputs) {
   LOG(SAM) << "Creating GENIEInputHandler : " << handle << std::endl;
 
   // Run a joint input handling
@@ -88,7 +100,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    TFile* inp_file = new TFile(
+    TFile *inp_file = new TFile(
         InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
       THROW("GENIE File IsZombie() at : '"
@@ -99,8 +111,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
     }
 
     // Get Flux/Event hist
-    TH1D* fluxhist = (TH1D*)inp_file->Get("nuisance_flux");
-    TH1D* eventhist = (TH1D*)inp_file->Get("nuisance_events");
+    TH1D *fluxhist = (TH1D *)inp_file->Get("nuisance_flux");
+    TH1D *eventhist = (TH1D *)inp_file->Get("nuisance_events");
     if (!fluxhist or !eventhist) {
       ERROR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
@@ -112,7 +124,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
     }
 
     // Get N Events
-    TTree* genietree = (TTree*)inp_file->Get("gtree");
+    TTree *genietree = (TTree *)inp_file->Get("gtree");
     if (!genietree) {
       ERROR(FTL, "gtree not located in GENIE file: " << inputs[inp_it]);
       THROW("Check your inputs, they may need to be completely regenerated!");
@@ -144,6 +156,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   fGENIETree->GetEntry(0);
   StartTalking();
 
+#ifndef __DUNERWT_ENABLED__
   // Create Fit Event
   fNUISANCEEvent = new FitEvent();
   fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
@@ -154,6 +167,49 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   }
 
   fNUISANCEEvent->HardReset();
+#else
+  std::vector<nuiskey> HandlerOpts = Config::QueryKeys("GENIEInputHandler");
+  fUseCache = HandlerOpts.size() && HandlerOpts.front().Has("UseCache") &&
+              HandlerOpts.front().GetB("UseCache");
+
+  DUNERwtCachedResponseReader = nullptr;
+  HaveCachedResponseReader = false;
+  if (fUseCache && (inputs.size() == 1)) {
+    std::vector<nuiskey> DuneRwtCacheParams =
+        Config::QueryKeys("DUNERwtResponseCache");
+    for (nuiskey &key : DuneRwtCacheParams) {
+      if (key.Has("Input") && (key.GetS("Input") == inputs.front()) &&
+          key.Has("CacheFile") && key.Has("ParameterFHiCL")) {
+
+        fhicl::ParameterSet ps =
+            fhicl::make_ParameterSet(key.GetS("ParameterFHiCL"));
+
+        fhicl::ParameterSet syst_providers = ps.get<fhicl::ParameterSet>(
+            "generated_systematic_provider_configuration");
+
+        systtools::param_header_map_t configuredParameterHeaders =
+            systtools::BuildParameterHeaders(syst_providers);
+
+        DUNERwtCachedResponseReader =
+            std::make_unique<systtools::PrecalculatedResponseReader<5>>(
+                key.GetS("CacheFile"), "resp_tree",
+                configuredParameterHeaders.size());
+        HaveCachedResponseReader = true;
+        break;
+      }
+    }
+  } else {
+    fNUISANCEEvent = new FitEvent();
+    fNUISANCEEvent->SetGenieEvent(fGenieNtpl);
+
+    if (fSaveExtra) {
+      fGenieInfo = new GENIEGeneratorInfo();
+      fNUISANCEEvent->AddGeneratorInfo(fGenieInfo);
+    }
+
+    fNUISANCEEvent->HardReset();
+  }
+#endif
 };
 
 GENIEInputHandler::~GENIEInputHandler() {
@@ -177,12 +233,33 @@ void GENIEInputHandler::RemoveCache() {
   fGENIETree->SetCacheSize(0);
 }
 
-FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
                                               const bool lightweight) {
-  if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents)
+    return NULL;
+
+  // Reduce memory pressure from the cache by clearing out the last entry each
+  // time.
+  if (entry && rwEvs[entry - 1].NParticles()) {
+    rwEvs[entry - 1].DeallocateParticleStack();
+  }
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);
+
+#ifdef __DUNERWT_ENABLED__
+  if (entry >= rwEvs.size()) {
+    rwEvs.push_back(FitEvent());
+    if (HaveCachedResponseReader) {
+      rwEvs.back().DUNERwtPolyResponses =
+          DUNERwtCachedResponseReader->GetEventResponse(entry);
+      rwEvs.back().HasDUNERwtPolyResponses = true;
+    }
+  }
+  rwEvs[entry].SetGenieEvent(fGenieNtpl);
+
+  fNUISANCEEvent = &rwEvs[entry];
+#endif
 
   // Run NUISANCE Vector Filler
   if (!lightweight) {
@@ -191,16 +268,19 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
 #ifdef __PROB3PP_ENABLED__
   else {
     // Check for GENIE Event
-    if (!fGenieNtpl) return NULL;
-    if (!fGenieNtpl->event) return NULL;
+    if (!fGenieNtpl)
+      return NULL;
+    if (!fGenieNtpl->event)
+      return NULL;
 
     // Cast Event Record
-    fGenieGHep = static_cast<GHepRecord*>(fGenieNtpl->event);
-    if (!fGenieGHep) return NULL;
+    fGenieGHep = fGenieNtpl->event;
+    if (!fGenieGHep)
+      return NULL;
 
     TObjArrayIter iter(fGenieGHep);
-    genie::GHepParticle* p;
-    while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
+    genie::GHepParticle *p;
+    while ((p = (dynamic_cast<genie::GHepParticle *>((iter).Next())))) {
       if (!p) {
         continue;
       }
@@ -223,7 +303,7 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
   return fNUISANCEEvent;
 }
 
-int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p,
+int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
                                               int mode) {
   /*
     kIStUndefined                  = -1,
@@ -236,8 +316,8 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p,
     kIStNucleonTarget              = 11,
     kIStDISPreFragmHadronicState   = 12,
     kIStPreDecayResonantState      = 13,
-    kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus: marked
-    for hadron transport modules to act on /
+    kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus:
+    marked for hadron transport modules to act on /
     kIStFinalStateNuclearRemnant   = 15,   / low energy nuclear fragments
     entering the record collectively as a 'hadronic blob' pseudo-particle /
     kIStNucleonClusterTarget       = 16,   // for composite nucleons before
@@ -246,35 +326,35 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p,
 
   int state = kUndefinedState;
   switch (p->Status()) {
-    case genie::kIStNucleonTarget:
-    case genie::kIStInitialState:
-    case genie::kIStCorrelatedNucleon:
-    case genie::kIStNucleonClusterTarget:
+  case genie::kIStNucleonTarget:
+  case genie::kIStInitialState:
+  case genie::kIStCorrelatedNucleon:
+  case genie::kIStNucleonClusterTarget:
+    state = kInitialState;
+    break;
+
+  case genie::kIStStableFinalState:
+    state = kFinalState;
+    break;
+
+  case genie::kIStHadronInTheNucleus:
+    if (abs(mode) == 2)
       state = kInitialState;
-      break;
-
-    case genie::kIStStableFinalState:
-      state = kFinalState;
-      break;
-
-    case genie::kIStHadronInTheNucleus:
-      if (abs(mode) == 2)
-        state = kInitialState;
-      else
-        state = kFSIState;
-      break;
-
-    case genie::kIStPreDecayResonantState:
-    case genie::kIStDISPreFragmHadronicState:
-    case genie::kIStIntermediateState:
+    else
       state = kFSIState;
-      break;
+    break;
 
-    case genie::kIStFinalStateNuclearRemnant:
-    case genie::kIStUndefined:
-    case genie::kIStDecayedState:
-    default:
-      break;
+  case genie::kIStPreDecayResonantState:
+  case genie::kIStDISPreFragmHadronicState:
+  case genie::kIStIntermediateState:
+    state = kFSIState;
+    break;
+
+  case genie::kIStFinalStateNuclearRemnant:
+  case genie::kIStUndefined:
+  case genie::kIStDecayedState:
+  default:
+    break;
   }
 
   // Flag to remove nuclear part in genie
@@ -290,7 +370,7 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p,
 #endif
 
 #ifdef __GENIE_ENABLED__
-int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
+int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
   // Electron Scattering
   if (gheprec->Summary()->ProcInfo().IsEM()) {
     if (gheprec->Summary()->InitState().ProbePdg() == 11) {
@@ -358,12 +438,15 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->ResetEvent();
 
   // Check for GENIE Event
-  if (!fGenieNtpl) return;
-  if (!fGenieNtpl->event) return;
+  if (!fGenieNtpl)
+    return;
+  if (!fGenieNtpl->event)
+    return;
 
   // Cast Event Record
-  fGenieGHep = static_cast<GHepRecord*>(fGenieNtpl->event);
-  if (!fGenieGHep) return;
+  fGenieGHep = fGenieNtpl->event;
+  if (!fGenieGHep)
+    return;
 
   // Convert GENIE Reaction Code
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
@@ -376,33 +459,35 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fTargetH = 0;
   fNUISANCEEvent->fBound = 0.0;
   fNUISANCEEvent->InputWeight =
-      1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
+      1.0; //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
   // Get N Particle Stack
   unsigned int npart = fGenieGHep->GetEntries();
   unsigned int kmax = fNUISANCEEvent->kMaxParticles;
   if (npart > kmax) {
-    ERR(WRN) << "GENIE has too many particles, expanding stack." << std::endl;
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
   // Fill Particle Stack
-  GHepParticle* p = 0;
+  GHepParticle *p = 0;
   TObjArrayIter iter(fGenieGHep);
   fNUISANCEEvent->fNParticles = 0;
 
   // Loop over all particles
-  while ((p = (dynamic_cast<genie::GHepParticle*>((iter).Next())))) {
-    if (!p) continue;
+  while ((p = (dynamic_cast<genie::GHepParticle *>((iter).Next())))) {
+    if (!p)
+      continue;
 
     // Get Status
     int state = GetGENIEParticleStatus(p, fNUISANCEEvent->Mode);
 
     // Remove Undefined
-    if (kRemoveUndefParticles && state == kUndefinedState) continue;
+    if (kRemoveUndefParticles && state == kUndefinedState)
+      continue;
 
     // Remove FSI
-    if (kRemoveFSIParticles && state == kFSIState) continue;
+    if (kRemoveFSIParticles && state == kFSIState)
+      continue;
 
     if (kRemoveNuclearParticles &&
         (state == kNuclearInitial || state == kNuclearRemnant))
@@ -434,12 +519,13 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   }
 
   // Fill Extra Stack
-  if (fSaveExtra) fGenieInfo->FillGeneratorInfo(fGenieNtpl);
+  if (fSaveExtra)
+    fGenieInfo->FillGeneratorInfo(fGenieNtpl);
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
 
-  FitParticle* ISNeutralLepton =
+  FitParticle *ISNeutralLepton =
       fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
   if (ISNeutralLepton) {
     fNUISANCEEvent->probe_E = ISNeutralLepton->E();

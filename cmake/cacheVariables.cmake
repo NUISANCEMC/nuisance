@@ -117,6 +117,10 @@ CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
 
+CheckAndSetDefaultCache(USE_DUNERWT FALSE BOOL "Whether to enable DUNE ReWeight support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultEnv(NUSYST_ROOT "" PATH "Path to installed NuSystematics. Overrides environment variable \$NUSYST_ROOT. <>" DUNERWT_ROOT)
+CheckAndSetDefaultEnv(SYSTTOOLS_ROOT "" PATH "Path to installed ART Systematics Tools. Overrides environment variable \$SYSTTOOLS_ROOT. <>" SYSTTOOLS_ROOT)
+
 CheckAndSetDefaultCache(USE_MINERvA_RW FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
 
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)

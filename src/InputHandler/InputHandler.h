@@ -48,7 +48,6 @@ public:
   /// Print current event information
   virtual void Print();
 
-
   /// Return handler ID
   inline std::string GetName (void) {return fName;     };
   /// Return Handler Event Type Index

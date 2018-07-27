@@ -150,9 +150,10 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${LIBXML2_LIB}
   ${LOG4CPP_LIB})
 
-LIST(APPEND EXTRA_LIBS -Wl,--start-group)
+#-Wl,--no-as-needed used to ensuring dynamic linking of GENIE algorithm libraries so that TClass::GetClass has access to the dictionaries at runtime
+LIST(APPEND EXTRA_LIBS -Wl,--no-as-needed -Wl,--start-group)
 LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
-LIST(APPEND EXTRA_LIBS -Wl,--end-group)
+LIST(APPEND EXTRA_LIBS -Wl,--end-group -Wl,-as-needed)
 
 LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 

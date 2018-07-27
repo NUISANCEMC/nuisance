@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "BaseFitEvt.h"
 
 #include "FitParticle.h"
@@ -50,7 +50,10 @@ BaseFitEvt::BaseFitEvt() {
 
 #ifdef __GENIE_ENABLED__
   genie_event = NULL;
-  genie_record = NULL;
+  #ifdef __DUNERWT_ENABLED__
+    HasDUNERwtPolyResponses = false;
+    HasDUNERwtResponses = false;
+  #endif
 #endif
 
 #ifdef __NUANCE_ENABLED__
@@ -62,31 +65,9 @@ BaseFitEvt::BaseFitEvt() {
 #endif
 };
 
-BaseFitEvt::~BaseFitEvt() {
-#ifdef __NEUT_ENABLED__
-  if (fNeutVect) delete fNeutVect;
-#endif
+BaseFitEvt::~BaseFitEvt(){};
 
-#ifdef __NUWRO_ENABLED__
-#ifndef __USE_NUWRO_SRW_EVENTS__
-  if (fNuwroEvent) delete fNuwroEvent;
-#endif
-#endif
-
-#ifdef __GENIE_ENABLED__
-  if (genie_event) delete genie_event;
-#endif
-
-#ifdef __NUANCE_ENABLED__
-  if (nuance_event) delete nuance_event;
-#endif
-
-#ifdef __GiBUU_ENABLED__
-  if (GiRead) delete GiRead;
-#endif
-};
-
-BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
+BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
   Mode = obj->Mode;
   probe_E = obj->probe_E;
   probe_pdg = obj->probe_pdg;
@@ -113,6 +94,12 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
 
 #ifdef __GENIE_ENABLED__
   genie_event = obj->genie_event;
+#ifdef __DUNERWT_ENABLED__
+  HasDUNERwtPolyResponses = obj->HasDUNERwtPolyResponses;
+  DUNERwtPolyResponses = obj->DUNERwtPolyResponses;
+  HasDUNERwtResponses = obj->HasDUNERwtResponses;
+  DUNERwtResponses = obj->DUNERwtResponses;
+#endif
 #endif
 
 #ifdef __NUANCE_ENABLED__
@@ -124,7 +111,7 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
 #endif
 };
 
-BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
+BaseFitEvt::BaseFitEvt(BaseFitEvt const &other) {
   Mode = other.Mode;
   probe_E = other.probe_E;
   probe_pdg = other.probe_pdg;
@@ -148,13 +135,19 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
 #ifdef __NUWRO_ENABLED__
   fNuwroEvent = other.fNuwroEvent;
 #ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
   fNuwroParams = other.fNuwroParams;
 #endif
 #endif
 
 #ifdef __GENIE_ENABLED__
   genie_event = other.genie_event;
+#ifdef __DUNERWT_ENABLED__
+  HasDUNERwtPolyResponses = other.HasDUNERwtPolyResponses;
+  DUNERwtPolyResponses = other.DUNERwtPolyResponses;
+  HasDUNERwtResponses = other.HasDUNERwtResponses;
+  DUNERwtResponses = other.DUNERwtResponses;
+#endif
 #endif
 
 #ifdef __NUANCE_ENABLED__
@@ -166,7 +159,7 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
 #endif
 };
 
-BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
+BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const &other) {
   Mode = other.Mode;
   probe_E = other.probe_E;
   probe_pdg = other.probe_pdg;
@@ -190,13 +183,19 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
 #ifdef __NUWRO_ENABLED__
   fNuwroEvent = other.fNuwroEvent;
 #ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
   fNuwroParams = other.fNuwroParams;
 #endif
 #endif
 
 #ifdef __GENIE_ENABLED__
   genie_event = other.genie_event;
+#ifdef __DUNERWT_ENABLED__
+  HasDUNERwtPolyResponses = other.HasDUNERwtPolyResponses;
+  DUNERwtPolyResponses = other.DUNERwtPolyResponses;
+  HasDUNERwtResponses = other.HasDUNERwtResponses;
+  DUNERwtResponses = other.DUNERwtResponses;
+#endif
 #endif
 
 #ifdef __NUANCE_ENABLED__
@@ -216,21 +215,21 @@ double BaseFitEvt::GetWeight() {
 };
 
 #ifdef __NEUT_ENABLED__
-void BaseFitEvt::SetNeutVect(NeutVect* v) {
+void BaseFitEvt::SetNeutVect(NeutVect *v) {
   fType = kNEUT;
   fNeutVect = v;
 }
 #endif
 
 #ifdef __GENIE_ENABLED__
-void BaseFitEvt::SetGenieEvent(NtpMCEventRecord* ntpl) {
+void BaseFitEvt::SetGenieEvent(NtpMCEventRecord *ntpl) {
   fType = kGENIE;
   genie_event = ntpl;
 }
 #endif
 
 #ifdef __NUANCE_ENABLED__
-void BaseFitEvt::SetNuanceEvent(NuanceEvent* e) {
+void BaseFitEvt::SetNuanceEvent(NuanceEvent *e) {
   fType = kNUANCE;
   nuance_event = e;
 }

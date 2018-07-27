@@ -7,7 +7,8 @@
 
 enum extra_reweight_types {
   kOSCILLATION = kLast_generator_event_type,
-  kMODENORM
+  kMODENORM,
+  kDUNERwt
 };
 
 namespace FitBase {

@@ -181,6 +181,8 @@ endforeach()
 
 cmessage(DEBUG "Module targets: ${MODULETargets}")
 
+set(MODULETargets "-Wl,--start-group;${MODULETargets};-Wl,--start-group")
+
 add_subdirectory(app)
 add_subdirectory(src/Tests)
 
@@ -207,8 +209,6 @@ if(USE_DYNSAMPLES)
   string(REPLACE "-levent " "" CMAKE_DEPENDLIB_FLAGS_NEW ${CMAKE_DEPENDLIB_FLAGS})
   set(CMAKE_DEPENDLIB_FLAGS ${CMAKE_DEPENDLIB_FLAGS_NEW})
   cmessage(DEBUG ${CMAKE_DEPENDLIB_FLAGS})
-
-  string(REPLACE ";" " -l" ALL_MODULETARGETS_STR "${MODULETargets}")
 
   configure_file(cmake/BuildDynamicSample.in
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" @ONLY)
