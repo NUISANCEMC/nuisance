@@ -125,9 +125,6 @@ double DUNERwtWeightEngine::CalcWeight(BaseFitEvt *evt) {
                                                EnabledParams[i].pid)
                       .resp.eval(EnabledParams[i].val);
 
-        evt->DUNERwtResponses =
-            DUNErwt.GetEventResponses(*evt->genie_event->event);
-
       } else {
         if (!evt->HasDUNERwtResponses) {
           evt->DUNERwtResponses =

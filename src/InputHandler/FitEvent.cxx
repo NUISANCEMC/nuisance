@@ -25,7 +25,7 @@ FitEvent::FitEvent() {
   kRemoveFSIParticles = true;
   kRemoveUndefParticles = true;
 
-  AllocateParticleStack(25);
+  AllocateParticleStack(50);
 };
 
 void FitEvent::AddGeneratorInfo(GeneratorInfoBase *gen) {

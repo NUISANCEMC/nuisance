@@ -152,4 +152,8 @@ if [ "@BUILD_GiBUU@" != "FALSE" ]; then
   source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
 fi
 
+if [ "@NUSYST_ROOT@" != "" ]; then
+  source @NUSYST_ROOT@/setup.sh
+fi
+
 export NUISANCE="@CMAKE_SOURCE_DIR@"

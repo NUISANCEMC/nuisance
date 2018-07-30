@@ -511,7 +511,10 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
     // Extra Check incase GENIE fails.
     if ((UInt_t)fNUISANCEEvent->fNParticles == kmax) {
-      ERR(WRN) << "Number of GENIE Particles exceeds maximum!" << std::endl;
+      ERR(WRN) << "Number of GENIE Particles exceeds maximum (Max: " << kmax
+               << ", GHEP: " << fGenieGHep->GetEntries()
+               << ", Added: " << fNUISANCEEvent->fNParticles << ")!"
+               << std::endl;
       ERR(WRN) << "Extend kMax, or run without including FSI particles!"
                << std::endl;
       break;
