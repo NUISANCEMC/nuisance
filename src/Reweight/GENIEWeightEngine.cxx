@@ -2,10 +2,15 @@
 
 #ifdef __GENIE_EMP_MECRW_ENABLED
 #include "ReWeight/GReWeightXSecEmpiricalMEC.h"
+#include "Messenger/Messenger.h"
 #endif
 
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_ENABLED__
+
+
+  genie::Messenger::Instance().SetPriorityLevel("ReW",pFATAL);
+  genie::Messenger::Instance().SetPriorityLevel("GHepUtils",pFATAL);
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
