@@ -39,12 +39,12 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(nuiskey samplekey) {
   fSettings.DefineAllowedTargets("C,H");
   fSettings.DefineAllowedSpecies("numu");
   fSettings.SetEnuRange(0.0, 10.0);
-  
+
   double arr_treco[52] = {40.0, 52.0, 63.9, 75.9, 87.8, 99.8, 111.8, 123.7, 135.7, 147.6, 159.6, 171.6, 183.5, 195.5, \
 	       207.5, 219.4, 231.4, 243.3, 255.3, 267.3, 279.2, 291.2, 303.1, 315.1, 327.1, 339.0, 351.0, 362.9, 374.9, 386.9, \
 	       398.8, 410.8, 422.7, 434.7, 446.7, 458.6, 470.6, 482.5, 494.5, 506.5, 518.4, 530.4, 542.4, 554.3, 566.3, 578.2, \
-	       590.2, 602.2, 614.1, 626.1, 638.0, 650.0}; 
-  
+	       590.2, 602.2, 614.1, 626.1, 638.0, 650.0};
+
   SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/ncqe/input_data.txt", arr_treco);
   SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/ErrorMatrix.tab",   51);
   SetResponseMatrix(FitPar::GetDataBase()+"/MiniBooNE/ncqe/response_mat.txt", 51, arr_treco);
@@ -156,7 +156,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(),ifstream::in);
+  std::ifstream covar(covarFile.c_str(),std::ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
 
@@ -188,7 +188,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
 void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile, double* arr_treco){
 
   std::string line;
-  std::ifstream input(inputFile.c_str(),ifstream::in);
+  std::ifstream input(inputFile.c_str(),std::ifstream::in);
 
   if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
 
@@ -240,7 +240,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
   int xBin = 0;
 
   std::string line;
-  std::ifstream response(responseFile.c_str(),ifstream::in);
+  std::ifstream response(responseFile.c_str(),std::ifstream::in);
 
    // Response matrix: x axis is Ttrue, y axis is Treco
   this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->fPlotTitles).c_str(),

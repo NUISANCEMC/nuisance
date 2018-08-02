@@ -139,7 +139,7 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetCovarMatrix(std::string covarFile, int d
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(), ifstream::in);
+  std::ifstream covar(covarFile.c_str(), std::ifstream::in);
 
   this->tempCovar = new TMatrixDSym(dim);
 
@@ -168,4 +168,3 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetCovarMatrix(std::string covarFile, int d
 
   return;
 };
-
