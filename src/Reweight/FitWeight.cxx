@@ -1,6 +1,8 @@
 #include "FitWeight.h"
 
+#ifdef __DUNERWT_ENABLED__
 #include "DUNERwtWeightEngine.h"
+#endif
 #include "GENIEWeightEngine.h"
 #include "LikelihoodWeightEngine.h"
 #include "ModeNormEngine.h"
@@ -56,9 +58,11 @@ void FitWeight::AddRWEngine(int type) {
   case kMODENORM:
     fAllRW[type] = new ModeNormEngine();
     break;
+#ifdef __DUNERWT_ENABLED__
   case kDUNERwt:
     fAllRW[type] = new DUNERwtWeightEngine();
     break;
+#endif
   default:
     THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
     break;
@@ -84,7 +88,10 @@ bool FitWeight::HasRWEngine(int type) {
   case kSPLINEPARAMETER:
   case kNIWG:
   case kOSCILLATION:
-  case kDUNERwt: {
+#ifdef __DUNERWT_ENABLED__
+  case kDUNERwt:
+#endif
+  {
     return fAllRW.count(type);
   }
   default: { THROW("CANNOT get RW Engine for dial type: " << type); }
@@ -112,9 +119,9 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
 #ifdef __DUNERWT_ENABLED__
     DUNERwtWeightEngine *drw =
         static_cast<DUNERwtWeightEngine *>(fAllRW[kDUNERwt]);
-    nuisenum = drw->ConvDial(name) + dialtype*1000;
+    nuisenum = drw->ConvDial(name) + dialtype * 1000;
 #else
-    THROW("[ERROR]: Not built with DUNEReWeight support but ")
+    THROW("[ERROR]: Not built with DUNEReWeight support.");
 #endif
   }
 

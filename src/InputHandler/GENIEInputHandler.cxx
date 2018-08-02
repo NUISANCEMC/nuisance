@@ -238,11 +238,13 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
   if (entry >= (UInt_t)fNEvents)
     return NULL;
 
+#ifdef __DUNERWT_ENABLED__
   // Reduce memory pressure from the cache by clearing out the last entry each
   // time.
   if (entry && rwEvs[entry - 1].NParticles()) {
     rwEvs[entry - 1].DeallocateParticleStack();
   }
+#endif
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);

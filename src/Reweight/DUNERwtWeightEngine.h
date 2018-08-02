@@ -1,5 +1,6 @@
 #ifndef DUNERWTWEIGHTENGINE_SEEN
 #define DUNERWTWEIGHTENGINE_SEEN
+#ifdef __DUNERWT_ENABLED__
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
@@ -61,4 +62,5 @@ class DUNERwtWeightEngine : public WeightEngineBase {
   void Print();
 };
 
+#endif
 #endif

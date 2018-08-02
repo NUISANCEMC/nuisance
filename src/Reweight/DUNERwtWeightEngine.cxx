@@ -1,5 +1,5 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
-
+#ifdef __DUNERWT_ENABLED__
 /*******************************************************************************
  *    This file is part of NUISANCE.
  *
@@ -162,3 +162,4 @@ double DUNERwtWeightEngine::CalcWeight(BaseFitEvt *evt) {
 void DUNERwtWeightEngine::Print() {
   std::cout << "DUNERwtWeightEngine: " << std::endl;
 }
+#endif
