@@ -103,38 +103,46 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   if (xsec_nucqe)
     fGenieRW->AdoptWghtCalc("nuclear_qe", new genie::rew::GReWeightFGM);
 
-  GReWeightNuXSecCCQE *rwccqe =
-      dynamic_cast<GReWeightNuXSecCCQE *>(fGenieRW->WghtCalc("xsec_ccqe"));
-  rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
-
-  // Default to include shape and normalization changes for CCRES (can be
-  // changed downstream if desired)
-  GReWeightNuXSecCCRES *rwccres =
-      dynamic_cast<GReWeightNuXSecCCRES *>(fGenieRW->WghtCalc("xsec_ccres"));
-  std::string marestype =
-      FitPar::Config().GetParS("GENIEWeightEngine_CCRESMode");
-  if (!marestype.compare("kModeNormAndMaMvShape")) {
-    rwccres->SetMode(GReWeightNuXSecCCRES::kModeNormAndMaMvShape);
-  } else if (!marestype.compare("kModeMaMv")) {
-    rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
-  } else {
-    THROW("Unkown MARES Mode in GENIE Weight Engine : " << marestype);
+  if (xsec_ccqe) {
+    GReWeightNuXSecCCQE *rwccqe =
+        dynamic_cast<GReWeightNuXSecCCQE *>(fGenieRW->WghtCalc("xsec_ccqe"));
+    rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
   }
 
-  // Default to include shape and normalization changes for NCRES (can be
-  // changed downstream if desired)
-  GReWeightNuXSecNCRES *rwncres =
-      dynamic_cast<GReWeightNuXSecNCRES *>(fGenieRW->WghtCalc("xsec_ncres"));
-  rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
+  if (xsec_ccres) {
+    // Default to include shape and normalization changes for CCRES (can be
+    // changed downstream if desired)
+    GReWeightNuXSecCCRES *rwccres =
+        dynamic_cast<GReWeightNuXSecCCRES *>(fGenieRW->WghtCalc("xsec_ccres"));
 
-  // Default to include shape and normalization changes for DIS (can be changed
-  // downstream if desired)
-  GReWeightNuXSecDIS *rwdis =
-      dynamic_cast<GReWeightNuXSecDIS *>(fGenieRW->WghtCalc("xsec_dis"));
-  rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
+    std::string marestype =
+        FitPar::Config().GetParS("GENIEWeightEngine_CCRESMode");
+    if (!marestype.compare("kModeNormAndMaMvShape")) {
+      rwccres->SetMode(GReWeightNuXSecCCRES::kModeNormAndMaMvShape);
+    } else if (!marestype.compare("kModeMaMv")) {
+      rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
+    } else {
+      THROW("Unkown MARES Mode in GENIE Weight Engine : " << marestype);
+    }
+  }
+  if (xsec_ncres) {
+    // Default to include shape and normalization changes for NCRES (can be
+    // changed downstream if desired)
+    GReWeightNuXSecNCRES *rwncres =
+        dynamic_cast<GReWeightNuXSecNCRES *>(fGenieRW->WghtCalc("xsec_ncres"));
+    rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
+  }
 
-  // Set Abs Twk Config
-  fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
+  if (xsec_dis) {
+    // Default to include shape and normalization changes for DIS (can be
+    // changed downstream if desired)
+    GReWeightNuXSecDIS *rwdis =
+        dynamic_cast<GReWeightNuXSecDIS *>(fGenieRW->WghtCalc("xsec_dis"));
+    rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
+
+    // Set Abs Twk Config
+    fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
+  }
 
   // allow cout again
   StartTalking();
