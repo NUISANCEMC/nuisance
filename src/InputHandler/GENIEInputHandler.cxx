@@ -192,8 +192,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
 
         DUNERwtCachedResponseReader =
             std::make_unique<systtools::PrecalculatedResponseReader<5>>(
-                key.GetS("CacheFile"), "resp_tree",
-                configuredParameterHeaders.size());
+                InputUtils::ExpandInputDirectories(key.GetS("CacheFile")),
+                "resp_tree", configuredParameterHeaders.size());
         HaveCachedResponseReader = true;
         break;
       }
