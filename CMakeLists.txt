@@ -181,7 +181,7 @@ endforeach()
 
 cmessage(DEBUG "Module targets: ${MODULETargets}")
 
-set(MODULETargets "-Wl,--start-group;${MODULETargets};-Wl,--start-group")
+set(MODULETargets "${MODULETargets}")
 
 add_subdirectory(app)
 add_subdirectory(src/Tests)
