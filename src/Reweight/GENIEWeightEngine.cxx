@@ -2,15 +2,25 @@
 
 #ifdef __GENIE_EMP_MECRW_ENABLED
 #include "ReWeight/GReWeightXSecEmpiricalMEC.h"
+#endif
+
+#ifdef __GENIE_ENABLED__
+#pragma push_macro("ERROR")
+#pragma push_macro("LOG")
+#undef ERROR
+#undef LOG
 #include "Messenger/Messenger.h"
+#undef ERROR
+#undef LOG
+#pragma pop_macro("LOG")
+#pragma pop_macro("ERROR")
 #endif
 
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_ENABLED__
 
-
-  genie::Messenger::Instance().SetPriorityLevel("ReW",pFATAL);
-  genie::Messenger::Instance().SetPriorityLevel("GHepUtils",pFATAL);
+  genie::Messenger::Instance()->SetPriorityLevel("ReW",pFATAL);
+  genie::Messenger::Instance()->SetPriorityLevel("GHepUtils",pFATAL);
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
