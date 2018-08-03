@@ -29,6 +29,18 @@
 
 #endif
 
+#ifdef __GENIE_ENABLED__
+#pragma push_macro("ERROR")
+#pragma push_macro("LOG")
+#undef ERROR
+#undef LOG
+#include "Messenger/Messenger.h"
+#undef ERROR
+#undef LOG
+#pragma pop_macro("LOG")
+#pragma pop_macro("ERROR")
+#endif
+
 GENIEGeneratorInfo::~GENIEGeneratorInfo() { DeallocateParticleStack(); }
 
 void GENIEGeneratorInfo::AddBranchesToTree(TTree *tn) {
@@ -86,6 +98,9 @@ void GENIEGeneratorInfo::Reset() {
 GENIEInputHandler::GENIEInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
   LOG(SAM) << "Creating GENIEInputHandler : " << handle << std::endl;
+
+  genie::Messenger::Instance()->SetPriorityLevel("ReW",pFATAL);
+  genie::Messenger::Instance()->SetPriorityLevel("GHepUtils",pFATAL);
 
   // Run a joint input handling
   fName = handle;
