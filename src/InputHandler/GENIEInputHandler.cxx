@@ -196,7 +196,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
       bool has_input = key.Has("Input");
       bool has_cachefile = key.Has("CacheFile");
       bool has_paramheaders = key.Has("ParameterFHiCL");
-      std::string input = key.GetS("Input");
+      std::string input = InputUtils::ExpandInputDirectories(key.GetS("Input"));
       std::cout << "[INFO]: Checking Input " << inputs.front()
                 << " against cache input: " << input << std::endl;
       if (has_input && (input == inputs.front()) && has_cachefile &&
