@@ -99,8 +99,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
   LOG(SAM) << "Creating GENIEInputHandler : " << handle << std::endl;
 
-  genie::Messenger::Instance()->SetPriorityLevel("ReW",pFATAL);
-  genie::Messenger::Instance()->SetPriorityLevel("GHepUtils",pFATAL);
+  genie::Messenger::Instance()->SetPriorityLevel("ReW", pFATAL);
+  genie::Messenger::Instance()->SetPriorityLevel("GHepUtils", pFATAL);
 
   // Run a joint input handling
   fName = handle;
@@ -193,8 +193,14 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     std::vector<nuiskey> DuneRwtCacheParams =
         Config::QueryKeys("DUNERwtResponseCache");
     for (nuiskey &key : DuneRwtCacheParams) {
-      if (key.Has("Input") && (key.GetS("Input") == inputs.front()) &&
-          key.Has("CacheFile") && key.Has("ParameterFHiCL")) {
+      bool has_input = key.Has("Input");
+      bool has_cachefile = key.Has("CacheFile");
+      bool has_paramheaders = key.Has("ParameterFHiCL");
+      std::string input = key.GetS("Input");
+      std::cout << "[INFO]: Checking Input " << inputs.front()
+                << " against cache input: " << input << std::endl;
+      if (has_input && (input == inputs.front()) && has_cachefile &&
+          has_paramheaders) {
 
         fhicl::ParameterSet ps =
             fhicl::make_ParameterSet(key.GetS("ParameterFHiCL"));
