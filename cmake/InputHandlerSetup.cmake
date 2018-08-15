@@ -1,0 +1,48 @@
+# Copyright 2018 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#################################  NuWro  ######################################
+if(USE_NuWro)
+  include(${CMAKE_SOURCE_DIR}/cmake/NuWroSetup.cmake)
+  cmessage(STATUS "Using NuWro Reweight engine.")
+  set(USE_NuWro TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
+endif()
+
+if(NEED_ROOTEVEGEN)
+  cmessage(STATUS "Require ROOT eve generation libraries")
+  LIST(REVERSE ROOT_LIBS)
+  LIST(APPEND ROOT_LIBS
+    Gui
+    Ged
+    Geom
+    TreePlayer
+    EG
+    Eve)
+  LIST(REVERSE ROOT_LIBS)
+endif()
+
+if(NEED_ROOTPYTHIA6)
+  cmessage(STATUS "Require ROOT Pythia6 libraries")
+  LIST(APPEND ROOT_LIBS
+    EGPythia6
+    Pythia6)
+endif()
+
+
+LIST(APPEND EXTRA_LIBS ${ROOT_LIBS})
