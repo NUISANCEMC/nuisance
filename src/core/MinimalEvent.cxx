@@ -3,7 +3,8 @@
 namespace nuis {
 namespace core {
 MinimalEvent::MinimalEvent()
-    : mode(0), probe_E(0), probe_pdg(0), XSecWeight(1), RWWeight(1) {
+    : mode(Channel_t::kUndefined), probe_E(0), probe_pdg(0), XSecWeight(1),
+      RWWeight(1) {
 #ifdef __NUWRO_ENABLED__
   fNuWroEvent = nullptr;
 #endif

@@ -28,14 +28,19 @@ namespace nuis {
 namespace core {
 class Particle {
 public:
-  enum class Status_t {
-    kNuclearLeaving = 0,
-    kPrimaryInitialState,
-    kPrimaryFinalState,
-    kIntermediate,
-    kUnknown,
-    kNParticleStatus
-  };
+#define STATUS_LIST                                                            \
+  X(kNuclearLeaving, 0)                                                        \
+  X(kPrimaryInitialState, 1)                                                   \
+  X(kPrimaryFinalState, 2)                                                     \
+  X(kIntermediate, 3)                                                          \
+  X(kUnknown, 4)                                                               \
+  X(kBlocked, 5)                                                               \
+  X(kNParticleStatus, 6)
+
+#define X(A, B) A = B,
+  enum class Status_t { STATUS_LIST };
+#undef X
+
   Particle();
   Particle(Particle const &);
 
@@ -45,4 +50,18 @@ public:
 };
 } // namespace core
 } // namespace nuis
+
+#define X(A, B)                                                                \
+  case nuis::core::Particle::Status_t::A: {                                    \
+    return os << #A;                                                           \
+  }
+
+inline std::ostream &operator<<(std::ostream &os,
+                                nuis::core::Particle::Status_t te) {
+  switch (te) { STATUS_LIST }
+  return os;
+}
+#undef X
+#undef STATUS_LIST
+
 #endif

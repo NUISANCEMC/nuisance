@@ -20,9 +20,17 @@
 #################################  NuWro  ######################################
 if(USE_NuWro)
   include(${CMAKE_SOURCE_DIR}/cmake/NuWroSetup.cmake)
-  cmessage(STATUS "Using NuWro Reweight engine.")
+  cmessage(STATUS "Using NuWro.")
   set(USE_NuWro TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
 endif()
+
+#################################  NEUT  #######################################
+if(USE_NEUT)
+  include(${CMAKE_SOURCE_DIR}/cmake/NEUTSetup.cmake)
+  cmessage(STATUS "Using NEUT.")
+  set(USE_NEUT TRUE CACHE BOOL "Whether to enable NEUT support. <FALSE>" FORCE)
+endif()
+
 
 if(NEED_ROOTEVEGEN)
   cmessage(STATUS "Require ROOT eve generation libraries")

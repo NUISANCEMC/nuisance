@@ -23,7 +23,7 @@ if(NUWRO STREQUAL "")
     "This must be set to point to a prebuilt NuWro instance.")
 endif()
 
-LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__)
+LIST(APPEND EXTRA_CXX_FLAGS -DNUWRO_ENABLED)
 
 LIST(APPEND EXTRA_CXX_FLAGS -I${NUWRO}/src)
 

@@ -20,8 +20,13 @@
 #ifndef CORE_MINIMALEVENT_HXX_SEEN
 #define CORE_MINIMALEVENT_HXX_SEEN
 
-#ifdef __NUWRO_ENABLED__
+#ifdef NUWRO_ENABLED
 #include "event1.h"
+#endif
+
+#ifdef NEUT_ENABLED
+#include "neutpart.h"
+#include "neutvect.h"
 #endif
 
 #include "core/types.hxx"
@@ -43,12 +48,14 @@ public:
   /// True probe particle code
   PDG_t probe_pdg;
 
+  PDG_t target_pdg;
+
   /// Event-weight that can be used to scale to a cross-section prediction
   double XSecWeight;
   /// Event weight incurred from current reweight engine state.
   double RWWeight;
 
-#ifdef __NUWRO_ENABLED__
+#ifdef NUWRO_ENABLED
   ///\brief Pointer to Nuwro event
   ///
   /// This will usually be tied to a TTree and so we are not responsible for
@@ -56,8 +63,9 @@ public:
   event *fNuWroEvent;
 #endif
 
-  // Use this to check if
-  bool operator!() { return mode == 0; }
+#ifdef NEUT_ENABLED
+  NeutVect *fNeutVect;
+#endif
 };
 } // namespace core
 } // namespace nuis

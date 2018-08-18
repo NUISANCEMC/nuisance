@@ -8,11 +8,11 @@
 
 using namespace nuis::core;
 
-class NuisToNuWro : public ISample {
+class VerboseEventSummary : public ISample {
 public:
   InputManager::Input_id_t fIH_id;
 
-  NuisToNuWro()
+  VerboseEventSummary()
       : fIH_id(std::numeric_limits<InputManager::Input_id_t>::max()) {}
 
   void Initialize(fhicl::ParameterSet const &ps) {
@@ -20,7 +20,20 @@ public:
   }
 
   void ProcessEvent(FullEvent const &ps) {
-    std::cout << ps.fNuWroEvent->dyn << std::endl;
+    std::cout << "Event: Interaction mode = " << ps.mode
+              << ", probe: { PDG: " << ps.probe_pdg
+              << ", Energy: " << ps.probe_E << "}." << std::endl;
+    for (auto &status_stack : ps.ParticleStack) {
+      std::cout << "\t[" << status_stack.status << "]" << std::endl;
+
+      for (nuis::core::Particle const &part : status_stack.particles) {
+        std::cout << "\t\t{ PDG: " << part.pdg << ", P3: [ " << part.P4[0]
+                  << ", " << part.P4[1] << ", " << part.P4[2]
+                  << "], E: " << part.P4[3] << ", M: " << part.P4.M()
+                  << std::endl
+                  << std::endl;
+      }
+    }
   }
 
   void ProcessSample(size_t nmax) {
@@ -39,7 +52,7 @@ public:
   }
 
   void Write() {}
-  std::string Name() { return "NuisToNuWro"; }
+  std::string Name() { return "VerboseEventSummary"; }
 };
 
-DECLARE_PLUGIN(ISample, NuisToNuWro);
+DECLARE_PLUGIN(ISample, VerboseEventSummary);

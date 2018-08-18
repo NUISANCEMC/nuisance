@@ -1,0 +1,81 @@
+#ifndef GENERATOR_NEUTUTILITY_HXX_SEEN
+#define GENERATOR_NEUTUTILITY_HXX_SEEN
+
+#include "core/Particle.hxx"
+
+#include "utility/ChannelUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+
+#include "exception/exception.hxx"
+
+#include "neutpart.h"
+#include "neutvect.h"
+
+NEW_NUIS_EXCEPT(unexpected_NEUT_particle_state);
+
+inline nuis::core::Particle::Status_t
+GetNeutParticleStatus(NeutPart const &part, nuis::core::Channel_t mode) {
+  // Remove Pauli blocked events, probably just single pion events
+  if (part.fStatus == 5) {
+    return nuis::core::Particle::Status_t::kBlocked;
+
+    // fStatus == -1 means initial  state
+  } else if (part.fIsAlive == false && part.fStatus == -1) {
+    return nuis::core::Particle::Status_t::kPrimaryInitialState;
+
+    // NEUT has a bit of a strange convention for fIsAlive and fStatus
+    // combinations
+    // for NC and neutrino particle isAlive true/false and status 2 means
+    // final state particle
+    // for other particles in NC status 2 means it's an FSI particle
+    // for CC it means it was an FSI particle
+  } else if (part.fStatus == 2) {
+    // NC case is a little strange... The outgoing neutrino might be alive or
+    // not alive. Remaining particles with status 2 are FSI particles that
+    // reinteracted
+    if (nuis::utility::IsNC(mode) &&
+        nuis::utility::IsNeutralLepton(part.fPID)) {
+      return nuis::core::Particle::Status_t::kNuclearLeaving;
+      // The usual CC case
+    } else if (part.fIsAlive == true) {
+      return nuis::core::Particle::Status_t::kIntermediate;
+    }
+
+  } else if ((part.fIsAlive == true) && (part.fStatus == 2) &&
+             nuis::utility::IsNeutralLepton(part.fPID)) {
+    return nuis::core::Particle::Status_t::kNuclearLeaving;
+
+  } else if ((part.fIsAlive == true) && (part.fStatus == 0)) {
+    return nuis::core::Particle::Status_t::kNuclearLeaving;
+
+  } else if (!part.fIsAlive && ((part.fStatus == 1) || (part.fStatus == 3) ||
+                                (part.fStatus == 4) || (part.fStatus == 7) ||
+                                (part.fStatus == 8))) {
+    return nuis::core::Particle::Status_t::kIntermediate;
+
+    // There's one hyper weird case where fStatus = -3. This apparently
+    // corresponds to a nucleon being ejected via pion FSI when there is "data
+    // available"
+  } else if (!part.fIsAlive && (part.fStatus == -3)) {
+    return nuis::core::Particle::Status_t::kUnknown;
+    // NC neutrino outgoing
+  } else if (!part.fIsAlive && part.fStatus == 0 &&
+             (abs(part.fPID) == 16 || abs(part.fPID) == 14 ||
+              abs(part.fPID) == 12)) {
+    return nuis::core::Particle::Status_t::kNuclearLeaving;
+
+    // Warn if we still find alive particles without classifying them
+  } else if (part.fIsAlive == true) {
+    throw unexpected_NEUT_particle_state()
+        << "[ERROR]: Undefined NEUT state "
+        << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
+        << " PDG: " << part.fPID;
+  }
+  // Warn if we find dead particles that we haven't classified
+  throw unexpected_NEUT_particle_state()
+      << "[ERROR]: Undefined NEUT state "
+      << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
+      << " PDG: " << part.fPID;
+}
+
+#endif

@@ -39,6 +39,8 @@ public:
   FullEvent(FullEvent const&) = delete;
   FullEvent(FullEvent&&);
   std::vector<StatusParticles> ParticleStack;
+
+  void ClearParticleStack();
 };
 
 } // namespace core

@@ -72,16 +72,26 @@ elseif(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE DEBUG)
 endif()
 
+# Misc
 CheckAndSetDefaultCache(EXTRA_SETUP_SCRIPT "" PATH "The path to an extra script to inject into the NUISANCE setup script. <>")
 
 CheckAndSetDefaultCache(USE_MINIMIZER TRUE INTERNAL "Whether we are using the ROOT minimization libraries. <TRUE>")
 
 CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
 
+# NuWro
 CheckAndSetDefaultCache(USE_NuWro FALSE BOOL "Whether to enable NuWro support. <FALSE>")
 CheckAndSetDefaultEnv(NUWRO "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
 CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes directory, needs to contain \"params_all.h\". Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
 
+# NEUT
+CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultCache(IS_NEUT_54 FALSE BOOL "Whether to enabled NEUT is version 5.4 or greater. <FALSE>")
+CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
+CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
+CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
+
+# Pythia
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)
 CheckAndSetDefault(NEED_PYTHIA6 FALSE)
 

@@ -17,15 +17,13 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef SAMPLES_ISAMPLE_HXX_SEEN
-#define SAMPLES_ISAMPLE_HXX_SEEN
+#ifndef GENERATOR_NEUTINPUTHANDLER_HXX_SEEN
+#define GENERATOR_NEUTINPUTHANDLER_HXX_SEEN
 
-#include "plugins/traits.hxx"
+#include "core/IInputHandler.hxx"
+#include "core/FullEvent.hxx"
 
-#include "exception/exception.hxx"
-
-#include <string>
-#include <limits>
+#include <memory>
 
 namespace fhicl {
 class ParameterSet;
@@ -33,33 +31,26 @@ class ParameterSet;
 
 namespace nuis {
 namespace core {
-class FullEvent;
 class MinimalEvent;
 } // namespace core
+namespace utility {
+class TreeFile;
+}
 } // namespace nuis
 
-class ISample {
+class NEUTInputHandler : public IInputHandler {
+  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
+  mutable nuis::core::FullEvent fReaderEvent;
+
 public:
-  NEW_NUIS_EXCEPT(uninitialized_ISample);
-  NEW_NUIS_EXCEPT(unimplemented_ISample_optional_method);
+  NEUTInputHandler();
+  NEUTInputHandler(NEUTInputHandler const &) = delete;
+  NEUTInputHandler(NEUTInputHandler &&);
 
-  virtual void Initialize(fhicl::ParameterSet const &) = 0;
-
-  virtual void ProcessEvent(nuis::core::FullEvent const &) {
-    throw unimplemented_ISample_optional_method()
-        << "[ERROR]: ISample " << Name() << " does not implement ProcessEvent.";
-  }
-
-  virtual void
-  ProcessSample(size_t nmax = std::numeric_limits<size_t>::max()) = 0;
-
-  virtual void Write() = 0;
-
-  virtual std::string Name() = 0;
-
-  virtual ~ISample() {}
+  void Initialize(fhicl::ParameterSet const &);
+  nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
+  nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const;
+  size_t GetNEvents() const;
 };
-
-DECLARE_PLUGIN_INTERFACE(ISample);
 
 #endif
