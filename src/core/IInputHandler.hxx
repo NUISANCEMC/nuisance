@@ -24,6 +24,8 @@
 
 #include "exception/exception.hxx"
 
+#include <iterator>
+
 namespace fhicl {
 class ParameterSet;
 }
@@ -37,6 +39,48 @@ class FullEvent;
 
 class IInputHandler {
 public:
+  struct FullEvent_const_iterator
+      : public std::iterator<
+            std::input_iterator_tag, nuis::core::FullEvent const, size_t,
+            nuis::core::FullEvent const *, nuis::core::FullEvent const &> {
+
+    FullEvent_const_iterator(size_t _idx, IInputHandler const *_ih) {
+      idx = _idx;
+      ih = _ih;
+    }
+    FullEvent_const_iterator(FullEvent_const_iterator const &other) {
+      idx = other.idx;
+      ih = other.ih;
+    }
+    FullEvent_const_iterator operator=(FullEvent_const_iterator const &other) {
+      idx = other.idx;
+      ih = other.ih;
+      return (*this);
+    }
+
+    bool operator==(FullEvent_const_iterator const &other) {
+      return (idx == other.idx);
+    }
+    bool operator!=(FullEvent_const_iterator const &other) {
+      return !(*this == other);
+    }
+    nuis::core::FullEvent const &operator*() { return ih->GetFullEvent(idx); }
+    nuis::core::FullEvent const *operator->() { return &ih->GetFullEvent(idx); }
+
+    FullEvent_const_iterator operator++() {
+      idx++;
+      return *this;
+    }
+    FullEvent_const_iterator operator++(int) {
+      FullEvent_const_iterator tmp(*this);
+      idx++;
+      return tmp;
+    }
+
+  private:
+    size_t idx;
+    IInputHandler const *ih;
+  };
 
   NEW_NUIS_EXCEPT(invalid_input_file);
   NEW_NUIS_EXCEPT(invalid_entry);
@@ -44,12 +88,20 @@ public:
   typedef size_t ev_index_t;
 
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
-  virtual nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) = 0;
-  virtual nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) = 0;
+  virtual nuis::core::MinimalEvent const &
+  GetMinimalEvent(ev_index_t idx) const = 0;
+  virtual nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;
 
-  virtual size_t GetNEvents() = 0;
+  virtual size_t GetNEvents() const = 0;
 
-  virtual ~IInputHandler(){}
+  FullEvent_const_iterator begin() const {
+    return FullEvent_const_iterator(0, this);
+  }
+  FullEvent_const_iterator end() const {
+    return FullEvent_const_iterator(GetNEvents(), this);
+  }
+
+  virtual ~IInputHandler() {}
 };
 
 DECLARE_PLUGIN_INTERFACE(IInputHandler);

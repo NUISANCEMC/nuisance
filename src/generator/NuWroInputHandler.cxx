@@ -21,7 +21,7 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fReaderEvent.fNuWroEvent = nullptr;
   fInputTree->tree->SetBranchAddress("e", &fReaderEvent.fNuWroEvent);
 }
-MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) {
+MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
   if (idx >= GetNEvents()) {
     throw IInputHandler::invalid_entry()
         << "[ERROR]: Attempted to get entry " << idx
@@ -31,12 +31,14 @@ MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) {
   return fReaderEvent;
 }
 
-FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) {
+FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
   (void)GetMinimalEvent(idx);
-  //Fill particle stack
+  // Fill particle stack
   return fReaderEvent;
 }
 
-size_t NuWroInputHandler::GetNEvents() { return fInputTree->tree->GetEntries(); }
+size_t NuWroInputHandler::GetNEvents() const {
+  return fInputTree->tree->GetEntries();
+}
 
-DECLARE_PLUGIN(IInputHandler,NuWroInputHandler);
+DECLARE_PLUGIN(IInputHandler, NuWroInputHandler);

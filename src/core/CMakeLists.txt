@@ -1,12 +1,12 @@
 set(core_implementation_files
 FullEvent.cxx
-# InputManager.cxx
+InputManager.cxx
 MinimalEvent.cxx
 Particle.cxx)
 
 set(core_header_files
 FullEvent.hxx
-# InputManager.hxx
+InputManager.hxx
 MinimalEvent.hxx
 Particle.hxx
 IInputHandler.hxx

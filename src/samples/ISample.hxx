@@ -17,13 +17,12 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
-#define GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
+#ifndef SAMPLES_ISAMPLE_HXX_SEEN
+#define SAMPLES_ISAMPLE_HXX_SEEN
 
-#include "core/IInputHandler.hxx"
-#include "core/FullEvent.hxx"
+#include "plugins/traits.hxx"
 
-#include <memory>
+#include "exception/exception.hxx"
 
 namespace fhicl {
 class ParameterSet;
@@ -31,26 +30,24 @@ class ParameterSet;
 
 namespace nuis {
 namespace core {
+class FullEvent;
 class MinimalEvent;
 } // namespace core
-namespace utility {
-class TreeFile;
-}
 } // namespace nuis
 
-class NuWroInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
-  mutable nuis::core::FullEvent fReaderEvent;
-
+class ISample {
 public:
-  NuWroInputHandler();
-  NuWroInputHandler(NuWroInputHandler const &) = delete;
-  NuWroInputHandler(NuWroInputHandler &&);
+  NEW_NUIS_EXCEPT(uninitialized_ISample);
 
-  void Initialize(fhicl::ParameterSet const &);
-  nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
-  nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const;
-  size_t GetNEvents() const;
+  virtual void Initialize(fhicl::ParameterSet const &) = 0;
+
+  virtual void ProcessSample() = 0;
+
+  virtual void Write() = 0;
+
+  virtual ~ISample(){}
 };
+
+DECLARE_PLUGIN_INTERFACE(ISample);
 
 #endif

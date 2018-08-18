@@ -4,6 +4,8 @@
 #include "core/IInputHandler.hxx"
 #include "core/MinimalEvent.hxx"
 
+#include "samples/ISample.hxx"
+
 #include "plugins/Instantiate.hxx"
 
 #include "fhiclcpp/make_ParameterSet.h"
@@ -15,13 +17,18 @@ int main() {
 
   fhicl::ParameterSet ps = fhicl::make_ParameterSet("./test.fcl");
 
-  nuis::plugins::plugin_traits<IInputHandler>::unique_ptr_t IH =
-      nuis::plugins::Instantiate<IInputHandler>(
-          ps.get<std::string>("sample.InputHandler"));
+  for (fhicl::ParameterSet const &samp_config :
+       ps.get<std::vector<fhicl::ParameterSet>>("samples")) {
 
-  IH->Initialize(ps.get<fhicl::ParameterSet>("sample"));
+    std::cout << "[INFO]: Reading sample: "
+              << samp_config.get<std::string>("name") << std::endl;
 
-  for(IInputHandler::ev_index_t ev_it = 0; ev_it < IH->GetNEvents(); ++ev_it){
-    nuis::core::MinimalEvent const &ev = IH->GetMinimalEvent(ev_it);
+    nuis::plugins::plugin_traits<ISample>::unique_ptr_t sample =
+        nuis::plugins::Instantiate<ISample>(
+            samp_config.get<std::string>("name"));
+            
+
+    sample->Initialize(samp_config);
+    sample->ProcessSample();
   }
 }

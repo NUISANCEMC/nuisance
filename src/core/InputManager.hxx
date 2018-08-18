@@ -20,31 +20,43 @@
 #ifndef CORE_INPUTMANAGER_HXX_SEEN
 #define CORE_INPUTMANAGER_HXX_SEEN
 
-#include <memory>
+#include "core/IInputHandler.hxx"
+
+#include "plugins/traits.hxx"
+
+#include "exception/exception.hxx"
+
 #include <string>
 #include <vector>
 
-namespace nuis {
-namespace core {
-class IInputHandler;
+namespace fhicl {
+class ParameterSet;
 }
-} // namespace nuis
 
 namespace nuis {
 namespace core {
 class InputManager {
   struct NamedInputHandler {
+    NamedInputHandler(std::string const &,
+                      plugins::plugin_traits<IInputHandler>::unique_ptr_t &&);
     std::string name;
-    std::unique_ptr<IInputHandler> handler;
+    plugins::plugin_traits<IInputHandler>::unique_ptr_t handler;
   };
   std::vector<NamedInputHandler> Inputs;
 
+  InputManager();
+
+  static InputManager *_global_inst;
 public:
+
+  static InputManager &Get();
+
+  NEW_NUIS_EXCEPT(unknown_input);
   typedef size_t Input_id_t;
 
-  Input_id_t EnsureInputLoaded(std::string const &file_name);
-  Input_id_t GetInputId(std::string const &file_name);
-  IInputHandler &GetInputHandler(Input_id_t id);
+  Input_id_t EnsureInputLoaded(fhicl::ParameterSet const &);
+  Input_id_t GetInputId(std::string const &) const;
+  IInputHandler const &GetInputHandler(Input_id_t) const;
 };
 } // namespace core
 } // namespace nuis

@@ -17,40 +17,16 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
-#define GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
+#ifndef SAMPLES_IDATACOMPARISON_HXX_SEEN
+#define SAMPLES_IDATACOMPARISON_HXX_SEEN
 
-#include "core/IInputHandler.hxx"
-#include "core/FullEvent.hxx"
+#include "samples/ISample.hxx"
 
-#include <memory>
+class IDataComparison : public ISample {
 
-namespace fhicl {
-class ParameterSet;
-}
-
-namespace nuis {
-namespace core {
-class MinimalEvent;
-} // namespace core
-namespace utility {
-class TreeFile;
-}
-} // namespace nuis
-
-class NuWroInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
-  mutable nuis::core::FullEvent fReaderEvent;
-
-public:
-  NuWroInputHandler();
-  NuWroInputHandler(NuWroInputHandler const &) = delete;
-  NuWroInputHandler(NuWroInputHandler &&);
-
-  void Initialize(fhicl::ParameterSet const &);
-  nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
-  nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const;
-  size_t GetNEvents() const;
+  double GetGOF() = 0;
 };
+
+DECLARE_PLUGIN_INTERFACE(IDataComparison);
 
 #endif
