@@ -78,19 +78,6 @@ if [ ! "${ROOTSYS}" ]; then
   source "@CMAKE_ROOTSYS@/bin/thisroot.sh"
 fi
 
-if [ "@USE_T2K@" != "FALSE" ]; then
-  echo "[INFO]: Adding T2K paths to the environment."
-  export T2KREWEIGHT=@T2KREWEIGHT@
-  add_to_LD_LIBRARY_PATH "@T2KREWEIGHT@/lib"
-fi
-
-if [ "@USE_NIWG@" != "FALSE" ]; then
-  echo "[INFO]: Adding NIWG paths to the environment."
-  export NIWG=@NIWG_ROOT@
-  export NIWGREWEIGHT_INPUTS=@NIWG_ROOT@/inputs
-  add_to_LD_LIBRARY_PATH "@NIWG_ROOT@"
-fi
-
 if [ "@USE_NEUT@" != "FALSE" ]; then
   echo "[INFO]: Adding NEUT library paths to the environment."
   export NEUT_ROOT=@NEUT_ROOT@
@@ -100,19 +87,14 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
 fi
 
 if [ "@USE_NuWro@" != "FALSE" ]; then
-  if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
-    echo "[INFO]: Adding NuWro library paths to the environment."
-    export NUWRO="@NUWRO@"
+  echo "[INFO]: Adding NuWro library paths to the environment."
+  export NUWRO="@NUWRO@"
 
-    add_to_PATH "@NUWRO@/bin"
-    add_to_LD_LIBRARY_PATH "@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib"
+  add_to_PATH "@NUWRO@/bin"
+  add_to_LD_LIBRARY_PATH "@NUWRO@/build/@CMAKE_SYSTEM_NAME@/lib"
 
-    if [ "@NUWRO_INC@" ]; then
-      export NUWRO_INC=@NUWRO_INC@
-    fi
-
-  else
-    echo "[INFO]: NuWro support included from input event file."
+  if [ "@NUWRO_INC@" ]; then
+    export NUWRO_INC=@NUWRO_INC@
   fi
 fi
 
@@ -123,37 +105,8 @@ if [ "@NEED_PYTHIA6@" != "FALSE" ]; then
   add_to_LD_LIBRARY_PATH "@PYTHIA6@"
 fi
 
-if [ "@USE_GENIE@" != "FALSE" ]; then
-  echo "[INFO]: Adding GENIE paths to the environment."
+source @CMAKE_INSTALL_PREFIX@/fhiclcpp.setup.sh
 
-  export GENIE="@GENIE@"
-
-  export LHAPDF_LIB="@LHAPDF_LIB@"
-  export LHAPDF_INC="@LHAPDF_INC@"
-
-  export LIBXML2_LIB="@LIBXML2_LIB@"
-  export LIBXML2_INC="@LIBXML2_INC@"
-
-  export LOG4CPP_LIB="@LOG4CPP_LIB@"
-  export LOG4CPP_INC="@LOG4CPP_INC@"
-
-  if [ "@LHAPATH@" ]; then
-    export LHAPATH="@LHAPATH@"
-  fi
-
-  add_to_PATH "@GENIE@/bin"
-
-  add_to_LD_LIBRARY_PATH "@GENIE@/lib" "@LHAPDF_LIB@" "@LIBXML2_LIB@" "@LOG4CPP_LIB@"
-
-fi
-
-if [ "@BUILD_GiBUU@" != "FALSE" ]; then
-  echo "[INFO]: Sourcing GiBUU tools."
-  source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
-fi
-
-if [ "@NUSYST_ROOT@" != "" ]; then
-  source @NUSYST_ROOT@/setup.sh
-fi
+add_to_FHICL_FILE_PATH @CMAKE_INSTALL_PREFIX@/fcl
 
 export NUISANCE="@CMAKE_SOURCE_DIR@"

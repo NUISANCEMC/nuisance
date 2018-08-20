@@ -31,7 +31,7 @@ class ParameterSet;
 }
 
 namespace nuis {
-namespace core {
+namespace event {
 class MinimalEvent;
 class FullEvent;
 } // namespace core
@@ -41,8 +41,8 @@ class IInputHandler {
 public:
   struct FullEvent_const_iterator
       : public std::iterator<
-            std::input_iterator_tag, nuis::core::FullEvent const, size_t,
-            nuis::core::FullEvent const *, nuis::core::FullEvent const &> {
+            std::input_iterator_tag, nuis::event::FullEvent const, size_t,
+            nuis::event::FullEvent const *, nuis::event::FullEvent const &> {
 
     FullEvent_const_iterator(size_t _idx, IInputHandler const *_ih) {
       idx = _idx;
@@ -64,8 +64,8 @@ public:
     bool operator!=(FullEvent_const_iterator const &other) {
       return !(*this == other);
     }
-    nuis::core::FullEvent const &operator*() { return ih->GetFullEvent(idx); }
-    nuis::core::FullEvent const *operator->() { return &ih->GetFullEvent(idx); }
+    nuis::event::FullEvent const &operator*() { return ih->GetFullEvent(idx); }
+    nuis::event::FullEvent const *operator->() { return &ih->GetFullEvent(idx); }
 
     FullEvent_const_iterator operator++() {
       idx++;
@@ -88,9 +88,11 @@ public:
   typedef size_t ev_index_t;
 
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
-  virtual nuis::core::MinimalEvent const &
+  virtual nuis::event::MinimalEvent const &
   GetMinimalEvent(ev_index_t idx) const = 0;
-  virtual nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;
+  virtual nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;
+  virtual void RecalculateEventWeights(){};
+  virtual double GetEventWeight(ev_index_t idx) const {};
 
   virtual size_t GetNEvents() const = 0;
 

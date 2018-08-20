@@ -1,12 +1,14 @@
 #include "samples/ISample.hxx"
 
-#include "core/FullEvent.hxx"
-#include "core/InputManager.hxx"
+#include "event/FullEvent.hxx"
+
+#include "input/InputManager.hxx"
 
 #include <iostream>
 #include <limits>
 
-using namespace nuis::core;
+using namespace nuis::event;
+using namespace nuis::input;
 
 class VerboseEventSummary : public ISample {
 public:
@@ -22,18 +24,18 @@ public:
   void ProcessEvent(FullEvent const &ps) {
     std::cout << "Event: Interaction mode = " << ps.mode
               << ", probe: { PDG: " << ps.probe_pdg
-              << ", Energy: " << ps.probe_E << "}." << std::endl;
+              << ", Energy: " << ps.probe_E << " MeV }." << std::endl;
     for (auto &status_stack : ps.ParticleStack) {
       std::cout << "\t[" << status_stack.status << "]" << std::endl;
 
-      for (nuis::core::Particle const &part : status_stack.particles) {
+      for (Particle const &part : status_stack.particles) {
         std::cout << "\t\t{ PDG: " << part.pdg << ", P3: [ " << part.P4[0]
                   << ", " << part.P4[1] << ", " << part.P4[2]
                   << "], E: " << part.P4[3] << ", M: " << part.P4.M()
-                  << std::endl
-                  << std::endl;
+                  << " }" << std::endl;
       }
     }
+      std::cout << std::endl;
   }
 
   void ProcessSample(size_t nmax) {

@@ -1,27 +1,32 @@
-#ifndef GENERATOR_NEUTUTILITY_HXX_SEEN
-#define GENERATOR_NEUTUTILITY_HXX_SEEN
-
-#include "core/Particle.hxx"
-
-#include "utility/ChannelUtility.hxx"
-#include "utility/PDGCodeUtility.hxx"
+#include "generator/utility/NEUTUtility.hxx"
 
 #include "exception/exception.hxx"
 
+#include "utility/InteractionChannelUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+
 #include "neutpart.h"
-#include "neutvect.h"
+
+using namespace nuis::event;
+using namespace nuis::utility;
 
 NEW_NUIS_EXCEPT(unexpected_NEUT_particle_state);
 
-inline nuis::core::Particle::Status_t
-GetNeutParticleStatus(NeutPart const &part, nuis::core::Channel_t mode) {
+Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
+
+#ifdef DEBUG_NEUT_UTILITY
+  std::cout << "[DEBUG]: Mode: " << mode << ", Part: { Status: " << part.fStatus
+            << ", IsAlive: " << part.fIsAlive << ", PDG: " << part.fPID << " }."
+            << std::endl;
+#endif
+
   // Remove Pauli blocked events, probably just single pion events
   if (part.fStatus == 5) {
-    return nuis::core::Particle::Status_t::kBlocked;
+    return Particle::Status_t::kBlocked;
 
     // fStatus == -1 means initial  state
   } else if (part.fIsAlive == false && part.fStatus == -1) {
-    return nuis::core::Particle::Status_t::kPrimaryInitialState;
+    return Particle::Status_t::kPrimaryInitialState;
 
     // NEUT has a bit of a strange convention for fIsAlive and fStatus
     // combinations
@@ -33,36 +38,38 @@ GetNeutParticleStatus(NeutPart const &part, nuis::core::Channel_t mode) {
     // NC case is a little strange... The outgoing neutrino might be alive or
     // not alive. Remaining particles with status 2 are FSI particles that
     // reinteracted
-    if (nuis::utility::IsNC(mode) &&
-        nuis::utility::IsNeutralLepton(part.fPID)) {
-      return nuis::core::Particle::Status_t::kNuclearLeaving;
+    if (IsNC(mode) && IsNeutralLepton(part.fPID)) {
+      return Particle::Status_t::kNuclearLeaving;
       // The usual CC case
     } else if (part.fIsAlive == true) {
-      return nuis::core::Particle::Status_t::kIntermediate;
+      // return Particle::Status_t::kIntermediate;
+      throw unexpected_NEUT_particle_state()
+          << "[ERROR] Found unexpected NEUT particle in neutvect stack: Mode: "
+          << mode << ", Part: { Status: " << part.fStatus
+          << ", IsAlive: " << part.fIsAlive << ", PDG: " << part.fPID << " }.";
     }
 
   } else if ((part.fIsAlive == true) && (part.fStatus == 2) &&
-             nuis::utility::IsNeutralLepton(part.fPID)) {
-    return nuis::core::Particle::Status_t::kNuclearLeaving;
+             IsNeutralLepton(part.fPID)) {
+    return Particle::Status_t::kNuclearLeaving;
 
   } else if ((part.fIsAlive == true) && (part.fStatus == 0)) {
-    return nuis::core::Particle::Status_t::kNuclearLeaving;
+    return Particle::Status_t::kNuclearLeaving;
 
   } else if (!part.fIsAlive && ((part.fStatus == 1) || (part.fStatus == 3) ||
                                 (part.fStatus == 4) || (part.fStatus == 7) ||
                                 (part.fStatus == 8))) {
-    return nuis::core::Particle::Status_t::kIntermediate;
+    return Particle::Status_t::kIntermediate;
 
     // There's one hyper weird case where fStatus = -3. This apparently
     // corresponds to a nucleon being ejected via pion FSI when there is "data
     // available"
   } else if (!part.fIsAlive && (part.fStatus == -3)) {
-    return nuis::core::Particle::Status_t::kUnknown;
+    return Particle::Status_t::kUnknown;
     // NC neutrino outgoing
   } else if (!part.fIsAlive && part.fStatus == 0 &&
-             (abs(part.fPID) == 16 || abs(part.fPID) == 14 ||
-              abs(part.fPID) == 12)) {
-    return nuis::core::Particle::Status_t::kNuclearLeaving;
+             IsNeutralLepton(part.fPID)) {
+    return Particle::Status_t::kNuclearLeaving;
 
     // Warn if we still find alive particles without classifying them
   } else if (part.fIsAlive == true) {
@@ -77,5 +84,3 @@ GetNeutParticleStatus(NeutPart const &part, nuis::core::Channel_t mode) {
       << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
       << " PDG: " << part.fPID;
 }
-
-#endif

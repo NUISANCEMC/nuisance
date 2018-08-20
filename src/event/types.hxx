@@ -16,13 +16,13 @@
  *    You should have received a copy of the GNU General Public License
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-#ifndef CORE_TYPES_HXX_SEEN
-#define CORE_TYPES_HXX_SEEN
+#ifndef EVENT_TYPES_HXX_SEEN
+#define EVENT_TYPES_HXX_SEEN
 
 #include "exception/exception.hxx"
 
 namespace nuis {
-namespace core {
+namespace event {
 
 #define NUIS_INTERACTION_CHANNEL_LIST                                          \
   X(kCCQE, 1)                                                                  \
@@ -79,8 +79,8 @@ namespace core {
   X(kNCResKp_nub, -45)                                                         \
   X(kNCDIS_nub, -46)                                                           \
   X(kNCELP_nub, -51)                                                           \
-  X(kNCELN_nub, -52)\
-  \
+  X(kNCELN_nub, -52)                                                           \
+                                                                               \
   X(kUndefined, 0)
 
 #define X(A, B) A = B,
@@ -88,15 +88,15 @@ enum class Channel_t { NUIS_INTERACTION_CHANNEL_LIST };
 #undef X
 
 typedef long PDG_t;
-} // namespace core
+} // namespace event
 } // namespace nuis
 
 #define X(A, B)                                                                \
-  case nuis::core::Channel_t::A: {                                             \
+  case nuis::event::Channel_t::A: {                                            \
     return os << #A;                                                           \
   }
 
-inline std::ostream &operator<<(std::ostream &os, nuis::core::Channel_t te) {
+inline std::ostream &operator<<(std::ostream &os, nuis::event::Channel_t te) {
   switch (te) { NUIS_INTERACTION_CHANNEL_LIST }
   return os;
 }

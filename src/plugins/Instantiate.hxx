@@ -41,6 +41,8 @@
 #include <string>
 #include <vector>
 
+// #define DEBUG_INSTANTIATE
+
 namespace nuis {
 namespace plugins {
 
@@ -81,13 +83,14 @@ template <typename T> struct PluginInstantiator {
   }
 
   typename plugin_traits<T>::unique_ptr_t Instantiate() {
-    std::cout << (void *)Deleter << std::endl;
     T *inst = reinterpret_cast<T *>((*Instantiator)());
     dltr_fcn dltr = Deleter;
     std::string cln = Classname;
     std::function<void(T *)> deleter = [=](T *inst) {
+#ifdef DEBUG_INSTANTIATE
       std::cout << "[INFO]: Deleting instance of " << cln << " with "
                 << (void *)dltr << std::endl;
+#endif
       (*dltr)(inst);
     };
     return typename plugin_traits<T>::unique_ptr_t(inst, deleter);
@@ -106,8 +109,10 @@ struct NamedSO {
 
   ~NamedSO() {
     if (dllib) {
+#ifdef DEBUG_INSTANTIATE
       std::cout << "[INFO]: dlclose on shared object: " << std::quoted(name)
                 << std::endl;
+#endif
       dlclose(dllib);
     }
   }
@@ -137,7 +142,9 @@ NamedSO &GetSharedObject(std::string const &FQPath) {
         << "[INFO]: Failed to load shared object: " << FQPath
         << " with dlerror: " << dlerr;
   } else {
+#ifdef DEBUG_INSTANTIATE
     std::cout << "[INFO]: Loaded shared object " << FQPath << std::endl;
+#endif
   }
 
   LoadedSharedObjects.push_back(std::move(so));
@@ -150,7 +157,23 @@ Instantiate(std::string const &classname) {
 
   static std::vector<PluginInstantiator<T>> LoadedPlugins;
 
-  std::vector<std::string> plugin_search_dirs = config::GetDocument().get<std::vector<std::string>>("plugin_search_path");
+  fhicl::ParameterSet const &plugins =
+      config::GetDocument().get<fhicl::ParameterSet>("plugins");
+  fhicl::ParameterSet const &search_paths =
+      plugins.get<fhicl::ParameterSet>("search_paths");
+
+  std::vector<std::string> plugin_search_dirs;
+  // Look for plugin search paths in sequence elements of the
+  // plugins.search_paths table
+  for (std::string const &key : search_paths.get_names()) {
+    if (!search_paths.is_key_to_sequence(key)) {
+      continue;
+    }
+    for (std::string const &path :
+         search_paths.get<std::vector<std::string>>(key)) {
+      plugin_search_dirs.push_back(path);
+    }
+  }
 
   for (std::string path : plugin_search_dirs) {
     path = utility::EnsureTrailingSlash(path);
@@ -161,8 +184,10 @@ Instantiate(std::string const &classname) {
         if (plugin.FQ_so_path == (path + so_name) &&
             (plugin.Base_classname == plugin_traits<T>::interface_name()) &&
             (plugin.Classname == classname)) {
+#ifdef DEBUG_INSTANTIATE
           std::cout << "[INFO]: Using already loaded PluginInstantiator"
                     << std::endl;
+#endif
           return plugin.Instantiate();
         }
       }
@@ -186,21 +211,23 @@ Instantiate(std::string const &classname) {
       }
 
       if (dlerr_cstr) {
+#ifdef DEBUG_INSTANTIATE
         std::cout << "[INFO]: Failed to load appropriate instantiator method: "
                   << plugin_traits<T>::instantiator_function_name(classname)
                   << " from shared object " << plugin.FQ_so_path;
+#endif
         continue;
       } else {
+#ifdef DEBUG_INSTANTIATE
         std::cout << "[INFO]: Loaded instantiator method: "
                   << plugin_traits<T>::instantiator_function_name(classname)
                   << " from shared object " << plugin.FQ_so_path << std::endl;
+#endif
       }
 
       plugin.Deleter = reinterpret_cast<dltr_fcn>(
           dlsym(plugin.dllib,
                 plugin_traits<T>::deleter_function_name(classname).c_str()));
-
-      std::cout << (void *)plugin.Deleter << std::endl;
 
       dlerr_cstr = dlerror();
       if (dlerr_cstr) {
@@ -214,16 +241,20 @@ Instantiate(std::string const &classname) {
             << " from shared object " << plugin.FQ_so_path
             << " with error:  " << std::quoted(dlerr);
       } else {
+#ifdef DEBUG_INSTANTIATE
         std::cout << "[INFO]: Loaded deleter method: "
                   << plugin_traits<T>::deleter_function_name(classname)
                   << " from shared object " << plugin.FQ_so_path << std::endl;
+#endif
       }
 
+#ifdef DEBUG_INSTANTIATE
       std::cout << "[INFO]: Checking if shared object "
                 << std::quoted(plugin.FQ_so_path)
                 << " knows how to instantiate class " << std::quoted(classname)
                 << " via interface "
                 << std::quoted(plugin_traits<T>::interface_name()) << std::endl;
+#endif
 
       LoadedPlugins.push_back(std::move(plugin));
       return LoadedPlugins.back().Instantiate();

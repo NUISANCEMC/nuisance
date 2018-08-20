@@ -1,0 +1,12 @@
+plugins: {
+  search_paths: {
+    #Default plugin install directory
+    installed_plugins: [ @CMAKE_INSTALL_PREFIX@/plugins ]
+  }
+}
+
+data_dir: @CMAKE_INSTALL_PREFIX@/data
+
+persistency: {
+  default_output_file: nuis.out.root
+}

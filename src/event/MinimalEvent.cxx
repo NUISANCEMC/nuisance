@@ -1,7 +1,7 @@
-#include "core/MinimalEvent.hxx"
+#include "event/MinimalEvent.hxx"
 
 namespace nuis {
-namespace core {
+namespace event {
 MinimalEvent::MinimalEvent()
     : mode(Channel_t::kUndefined), probe_E(0), probe_pdg(0), XSecWeight(1),
       RWWeight(1) {

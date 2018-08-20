@@ -17,40 +17,31 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_NEUTINPUTHANDLER_HXX_SEEN
-#define GENERATOR_NEUTINPUTHANDLER_HXX_SEEN
+#ifndef EVENT_FULLEVENT_HXX_SEEN
+#define EVENT_FULLEVENT_HXX_SEEN
 
-#include "core/IInputHandler.hxx"
-#include "core/FullEvent.hxx"
-
-#include <memory>
-
-namespace fhicl {
-class ParameterSet;
-}
+#include "event/MinimalEvent.hxx"
+#include "event/Particle.hxx"
 
 namespace nuis {
-namespace core {
-class MinimalEvent;
-} // namespace core
-namespace utility {
-class TreeFile;
-}
-} // namespace nuis
+namespace event {
 
-class NEUTInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
-  mutable nuis::core::FullEvent fReaderEvent;
-
+///\brief The full, internal event format.
+class FullEvent : public MinimalEvent {
 public:
-  NEUTInputHandler();
-  NEUTInputHandler(NEUTInputHandler const &) = delete;
-  NEUTInputHandler(NEUTInputHandler &&);
+  struct StatusParticles {
+    Particle::Status_t status;
+    std::vector<Particle> particles;
+  };
 
-  void Initialize(fhicl::ParameterSet const &);
-  nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
-  nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const;
-  size_t GetNEvents() const;
+  FullEvent();
+  FullEvent(FullEvent const&) = delete;
+  FullEvent(FullEvent&&);
+  std::vector<StatusParticles> ParticleStack;
+
+  void ClearParticleStack();
 };
 
+} // namespace core
+} // namespace nuis
 #endif

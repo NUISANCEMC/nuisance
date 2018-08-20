@@ -1,14 +1,14 @@
-#include "NEUTInputHandler.hxx"
-
-#include "core/FullEvent.hxx"
+#include "generator/input/NEUTInputHandler.hxx"
 
 #include "utility/ROOTUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+#include "utility/InteractionChannelUtility.hxx"
 
-#include "generator/NEUTUtility.hxx"
+#include "generator/utility/NEUTUtility.hxx"
 
 #include "fhiclcpp/ParameterSet.h"
 
-using namespace nuis::core;
+using namespace nuis::event;
 using namespace nuis::utility;
 
 NEUTInputHandler::NEUTInputHandler() : fInputTree(nullptr) {}
@@ -61,18 +61,39 @@ FullEvent const &NEUTInputHandler::GetFullEvent(ev_index_t idx) const {
   }
 
   size_t NPart = fReaderEvent.fNeutVect->Npart();
+  bool FoundIntermediateStateParticle = false;
   for (size_t part_it = 0; part_it < NPart; part_it++) {
     NeutPart const &part = (*fReaderEvent.fNeutVect->PartInfo(part_it));
 
-    nuis::core::Particle nuis_part;
+    Particle nuis_part;
     nuis_part.pdg = part.fPID;
-    nuis_part.status = GetNeutParticleStatus(part, fReaderEvent.mode);
     nuis_part.P4 = part.fP;
 
-    size_t state_int = static_cast<size_t>(nuis_part.status);
+    Particle::Status_t state = GetNeutParticleStatus(part, fReaderEvent.mode);
+    size_t state_int = static_cast<size_t>(state);
 
-    fReaderEvent.ParticleStack[state_int].particles.push_back(
-        std::move(nuis_part));
+    if ((!FoundIntermediateStateParticle) &&
+        (state == Particle::Status_t::kIntermediate)) {
+      FoundIntermediateStateParticle = true;
+    }
+
+    // Add status == 0 particles as pre-FSI particles until we find an
+    // intermediate state particle
+    if (!IsCoh(fReaderEvent.mode) && (part_it > 1) && (state_int == 0) &&
+        (!FoundIntermediateStateParticle)) {
+      fReaderEvent
+          .ParticleStack[static_cast<size_t>(
+              Particle::Status_t::kPrimaryFinalState)]
+          .particles.push_back(nuis_part);
+    }
+
+    // Intermediate particles should be pushed onto the primary final state
+    // stack for NEUT
+    if (state == Particle::Status_t::kIntermediate) {
+      state_int = static_cast<size_t>(Particle::Status_t::kPrimaryFinalState);
+    }
+
+    fReaderEvent.ParticleStack[state_int].particles.push_back(nuis_part);
   }
 
   return fReaderEvent;

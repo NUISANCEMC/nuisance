@@ -1,12 +1,10 @@
-#include "NuWroInputHandler.hxx"
-
-#include "core/FullEvent.hxx"
+#include "generator/input/NuWroInputHandler.hxx"
 
 #include "utility/ROOTUtility.hxx"
 
 #include "fhiclcpp/ParameterSet.h"
 
-using namespace nuis::core;
+using namespace nuis::event;
 using namespace nuis::utility;
 
 NuWroInputHandler::NuWroInputHandler() : fInputTree(nullptr) {}

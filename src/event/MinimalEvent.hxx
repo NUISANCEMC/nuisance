@@ -17,11 +17,12 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef CORE_MINIMALEVENT_HXX_SEEN
-#define CORE_MINIMALEVENT_HXX_SEEN
+#ifndef EVENT_MINIMALEVENT_HXX_SEEN
+#define EVENT_MINIMALEVENT_HXX_SEEN
 
 #ifdef NUWRO_ENABLED
 #include "event1.h"
+typedef ::event NuWroEvent;
 #endif
 
 #ifdef NEUT_ENABLED
@@ -29,10 +30,10 @@
 #include "neutvect.h"
 #endif
 
-#include "core/types.hxx"
+#include "event/types.hxx"
 
 namespace nuis {
-namespace core {
+namespace event {
 ///\brief The minimal event information needed to perform reweights.
 ///
 /// Most often, event selections cannot be applied using this reduced format.
@@ -60,7 +61,7 @@ public:
   ///
   /// This will usually be tied to a TTree and so we are not responsible for
   /// deleting it
-  event *fNuWroEvent;
+  NuWroEvent *fNuWroEvent;
 #endif
 
 #ifdef NEUT_ENABLED

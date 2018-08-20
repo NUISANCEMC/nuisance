@@ -1,4 +1,4 @@
-#include "core/InputManager.hxx"
+#include "input/InputManager.hxx"
 
 #include "plugins/Instantiate.hxx"
 
@@ -7,7 +7,7 @@
 #include <iomanip>
 
 namespace nuis {
-namespace core {
+namespace input {
 
 InputManager *InputManager::_global_inst = nullptr;
 
@@ -61,5 +61,5 @@ InputManager::GetInputHandler(InputManager::Input_id_t id) const {
   }
   return *Inputs[id].handler.get();
 }
-} // namespace core
+} // namespace input
 } // namespace nuis

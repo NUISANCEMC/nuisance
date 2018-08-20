@@ -1,9 +1,13 @@
-add_executable(DumpEventInfo DumpEventInfo.cxx)
-target_link_libraries(DumpEventInfo nuis_core nuis_config)
-target_link_libraries(DumpEventInfo ${CMAKE_DEPENDLIB_FLAGS})
+SET(APPS nuissamples DumpEventInfo)
 
-if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
-  set_target_properties(DumpEventInfo PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
-endif()
+foreach(a ${APPS})
+  add_executable(${a} ${a}.cxx)
+  target_link_libraries(${a} nuis_event nuis_input nuis_utility nuis_config nuis_persistency)
+  target_link_libraries(${a} ${CMAKE_DEPENDLIB_FLAGS})
 
-install(TARGETS DumpEventInfo DESTINATION bin)
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(${a} PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+
+  install(TARGETS ${a} DESTINATION bin)
+endforeach()

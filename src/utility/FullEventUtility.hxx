@@ -20,128 +20,59 @@
 #ifndef UTILITY_FULLEVENTUTILITY_HXX_SEEN
 #define UTILITY_FULLEVENTUTILITY_HXX_SEEN
 
+#include "event/types.hxx"
+#include "event/Particle.hxx"
+
+#include <vector>
+
+namespace nuis {
+namespace event {
+class FullEvent;
+} // namespace event
+} // namespace nuis
+
 namespace nuis {
 namespace utility {
 
-template <size_t N>
-std::vector<Particle>
-GetParticles(FullEvent const &ev, std::vector<PDG_t> const &pdgs,
-             Particle::Status_t status = Particle::Status_t::kNuclearLeaving,
-             bool include_matching_pdg = true) {
-  std::vector<Particle> selected_particles;
-  for (StatusParticles const &parts : ev.ParticleStack) {
-    if (parts.status != status) {
-      continue;
-    }
-    for (Particle const &part : parts.particles) {
-      bool matched_pdg = false;
-      for (pdg : pdgs) {
-        matched_pdg = matched_pdg || (part.pdg == pdg);
-      }
-      bool keep = ((include_matching_pdg && matched_pdg) ||
-                   (!include_matching_pdg && !matched_pdg));
-      if (!matched_pdg) {
-        continue;
-      }
-      selected_particles.push_back(part);
-    }
-  }
-  return selected_particles;
-}
+std::vector<event::Particle>
+GetParticles(event::FullEvent const &, std::vector<event::PDG_t> const &,
+             event::Particle::Status_t status =
+                 event::Particle::Status_t::kNuclearLeaving,
+             bool include_matching_pdg = true);
 
-template <size_t N>
-Particle
-GetHMParticle(FullEvent const &ev, std::vector<PDG_t> const &pdgs,
-              Particle::Status_t status = Particle::Status_t::kNuclearLeaving,
-              bool include_matching_pdg = true) {
-  Particle HMParticle;
-  for (StatusParticles const &parts : ev.ParticleStack) {
-    if (parts.status != status) {
-      continue;
-    }
-    for (Particle const &part : parts.particles) {
-      bool matched_pdg = false;
-      for (pdg : pdgs) {
-        matched_pdg = matched_pdg || (part.pdg == pdg);
-      }
-      bool keep = ((include_matching_pdg && matched_pdg) ||
-                   (!include_matching_pdg && !matched_pdg));
-      if (!matched_pdg) {
-        continue;
-      }
-      if (part.P4.Vect().Mag() > HMParticle.P4.Vect().Mag()) {
-        HMParticle = part;
-      }
-    }
-  }
-  return HMParticle;
-}
+std::vector<event::Particle> const &GetISParticles(event::FullEvent const &);
+std::vector<event::Particle> const &
+GetPrimaryFSParticles(event::FullEvent const &);
+std::vector<event::Particle> const &
+GetNuclearLeavingParticles(event::FullEvent const &);
 
-std::vector<Particle> GetFSChargedLeptons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::ChargedLeptons);
-}
-std::vector<Particle> GetFSNeutralLeptons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::NeutralLeptons);
-}
-std::vector<Particle> GetISNeutralLeptons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::NeutralLeptons,
-                      Particle::Status_t::kPrimaryInitialState);
-}
-std::vector<Particle> GetFSChargedPions(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::ChargedPions);
-}
-std::vector<Particle> GetFSNeutralPions(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::NeutralPions);
-}
-std::vector<Particle> GetFSPions(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::Pions);
-}
-std::vector<Particle> GetFSProtons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::Protons);
-}
-std::vector<Particle> GetFSNeutrons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::Neutron);
-}
-std::vector<Particle> GetFSNucleons(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::Nucleons);
-}
-std::vector<Particle> GetFSOthers(FullEvent const &ev) {
-  return GetParticles(ev, pdgcodes::CommonParticles,
-                      Particle::Status_t::kNuclearLeaving, false);
-}
+event::Particle GetHMParticle(event::FullEvent const &,
+                              std::vector<event::PDG_t> const &,
+                              event::Particle::Status_t status =
+                                  event::Particle::Status_t::kNuclearLeaving,
+                              bool include_matching_pdg = true);
 
-Particle GetFSChargedLepton(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::ChargedLeptons);
-}
-Particle GetFSNeutralLepton(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::NeutralLeptons);
-}
-Particle GetISNeutralLepton(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::NeutralLeptons,
-                       Particle::Status_t::kPrimaryInitialState);
-}
-Particle GetFSChargedPion(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::ChargedPions);
-}
-Particle GetFSNeutralPion(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::NeutralPions);
-}
-Particle GetFSPion(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::Pions);
-}
-Particle GetFSProton(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::Protons);
-}
-Particle GetFSNeutron(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::Neutron);
-}
-Particle GetFSNucleon(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::Nucleons);
-}
-Particle GetFSOther(FullEvent const &ev) {
-  return GetHMParticle(ev, pdgcodes::CommonParticles,
-                       Particle::Status_t::kNuclearLeaving, false);
-}
+std::vector<event::Particle> GetFSChargedLeptons(event::FullEvent const &);
+std::vector<event::Particle> GetFSNeutralLeptons(event::FullEvent const &);
+std::vector<event::Particle> GetISNeutralLeptons(event::FullEvent const &);
+std::vector<event::Particle> GetFSChargedPions(event::FullEvent const &);
+std::vector<event::Particle> GetFSNeutralPions(event::FullEvent const &);
+std::vector<event::Particle> GetFSPions(event::FullEvent const &);
+std::vector<event::Particle> GetFSProtons(event::FullEvent const &);
+std::vector<event::Particle> GetFSNeutrons(event::FullEvent const &);
+std::vector<event::Particle> GetFSNucleons(event::FullEvent const &);
+std::vector<event::Particle> GetFSOthers(event::FullEvent const &);
+
+event::Particle GetFSChargedLepton(event::FullEvent const &);
+event::Particle GetFSNeutralLepton(event::FullEvent const &);
+event::Particle GetISNeutralLepton(event::FullEvent const &);
+event::Particle GetFSChargedPion(event::FullEvent const &);
+event::Particle GetFSNeutralPion(event::FullEvent const &);
+event::Particle GetFSPion(event::FullEvent const &);
+event::Particle GetFSProton(event::FullEvent const &);
+event::Particle GetFSNeutron(event::FullEvent const &);
+event::Particle GetFSNucleon(event::FullEvent const &);
+event::Particle GetFSOther(event::FullEvent const &);
 
 } // namespace utility
 } // namespace nuis

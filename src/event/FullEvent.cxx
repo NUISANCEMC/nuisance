@@ -1,7 +1,7 @@
-#include "core/FullEvent.hxx"
+#include "event/FullEvent.hxx"
 
 namespace nuis {
-namespace core {
+namespace event {
 FullEvent::FullEvent() : MinimalEvent() {
 
   for (size_t status_it = 0;

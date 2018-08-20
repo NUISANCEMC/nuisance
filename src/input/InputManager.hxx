@@ -17,40 +17,48 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
-#define GENERATOR_NUWROINPUTHANDLER_HXX_SEEN
+#ifndef CORE_INPUTMANAGER_HXX_SEEN
+#define CORE_INPUTMANAGER_HXX_SEEN
 
-#include "core/IInputHandler.hxx"
-#include "core/FullEvent.hxx"
+#include "input/IInputHandler.hxx"
 
-#include <memory>
+#include "plugins/traits.hxx"
+
+#include "exception/exception.hxx"
+
+#include <string>
+#include <vector>
 
 namespace fhicl {
 class ParameterSet;
 }
 
 namespace nuis {
-namespace core {
-class MinimalEvent;
-} // namespace core
-namespace utility {
-class TreeFile;
-}
-} // namespace nuis
+namespace input {
+class InputManager {
+  struct NamedInputHandler {
+    NamedInputHandler(std::string const &,
+                      plugins::plugin_traits<IInputHandler>::unique_ptr_t &&);
+    std::string name;
+    plugins::plugin_traits<IInputHandler>::unique_ptr_t handler;
+  };
+  std::vector<NamedInputHandler> Inputs;
 
-class NuWroInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
-  mutable nuis::core::FullEvent fReaderEvent;
+  InputManager();
 
+  static InputManager *_global_inst;
 public:
-  NuWroInputHandler();
-  NuWroInputHandler(NuWroInputHandler const &) = delete;
-  NuWroInputHandler(NuWroInputHandler &&);
 
-  void Initialize(fhicl::ParameterSet const &);
-  nuis::core::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
-  nuis::core::FullEvent const &GetFullEvent(ev_index_t idx) const;
-  size_t GetNEvents() const;
+  static InputManager &Get();
+
+  NEW_NUIS_EXCEPT(unknown_input);
+  typedef size_t Input_id_t;
+
+  Input_id_t EnsureInputLoaded(fhicl::ParameterSet const &);
+  Input_id_t GetInputId(std::string const &) const;
+  IInputHandler const &GetInputHandler(Input_id_t) const;
 };
+} // namespace input
+} // namespace nuis
 
 #endif

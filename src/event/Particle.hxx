@@ -17,15 +17,15 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef CORE_PARTICLE_HXX_SEEN
-#define CORE_PARTICLE_HXX_SEEN
+#ifndef EVENT_PARTICLE_HXX_SEEN
+#define EVENT_PARTICLE_HXX_SEEN
 
-#include "core/types.hxx"
+#include "event/types.hxx"
 
 #include "TLorentzVector.h"
 
 namespace nuis {
-namespace core {
+namespace event {
 class Particle {
 public:
 #define STATUS_LIST                                                            \
@@ -45,19 +45,20 @@ public:
   Particle(Particle const &);
 
   PDG_t pdg;
-  Status_t status;
   TLorentzVector P4;
+
+  bool operator!() { return (pdg == std::numeric_limits<PDG_t>::max()); }
 };
-} // namespace core
+} // namespace event
 } // namespace nuis
 
 #define X(A, B)                                                                \
-  case nuis::core::Particle::Status_t::A: {                                    \
+  case nuis::event::Particle::Status_t::A: {                                    \
     return os << #A;                                                           \
   }
 
 inline std::ostream &operator<<(std::ostream &os,
-                                nuis::core::Particle::Status_t te) {
+                                nuis::event::Particle::Status_t te) {
   switch (te) { STATUS_LIST }
   return os;
 }

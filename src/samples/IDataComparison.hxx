@@ -22,9 +22,49 @@
 
 #include "samples/ISample.hxx"
 
-class IDataComparison : public ISample {
+#include "fhiclcpp/ParameterSet.h"
 
-  double GetGOF() = 0;
+#include <iomanip>
+#include <sstream>
+
+class IDataComparison : public ISample {
+public:
+  virtual double GetGOF() = 0;
+
+  virtual std::string GetJournalReference() {
+    std::stringstream ss("");
+    ss << "Unknown Journal Ref. for IDataComparison: " << std::quoted(Name());
+    return ss.str();
+  }
+
+  virtual std::string GetTargetMaterial() {
+    std::stringstream ss("");
+    ss << "Unknown Target material for IDataComparison: " << std::quoted(Name());
+    return ss.str();
+  }
+
+  virtual std::string GetFluxDescription() {
+    std::stringstream ss("");
+    ss << "Unknown Flux description for IDataComparison: " << std::quoted(Name());
+    return ss.str();
+  }
+
+  virtual std::string GetSignalDescription() {
+    std::stringstream ss("");
+    ss << "Unknown Signal description for IDataComparison: " << std::quoted(
+        Name());
+    return ss.str();
+  }
+
+  virtual std::string GetDocumentation() {
+    std::stringstream ss("");
+    ss << "No documentation provided for IDataComparison: " << std::quoted(Name());
+    return ss.str();
+  }
+
+  virtual fhicl::ParameterSet GetExampleConfiguration() {
+    return fhicl::ParameterSet();
+  }
 };
 
 DECLARE_PLUGIN_INTERFACE(IDataComparison);
