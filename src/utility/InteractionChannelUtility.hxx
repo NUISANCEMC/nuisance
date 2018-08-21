@@ -47,6 +47,8 @@ inline int ChannelToInt(event::Channel_t mode) {
   }
 }
 
+#undef X
+
 inline bool IsNC(event::Channel_t mode) { return abs(ChannelToInt(mode) > 30); }
 inline bool IsCC(event::Channel_t mode) { return !IsNC(mode); }
 inline bool IsNu(event::Channel_t mode) { return ChannelToInt(mode) > 0; }

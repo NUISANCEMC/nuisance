@@ -63,16 +63,16 @@ std::vector<event::Particle> GetFSNeutrons(event::FullEvent const &);
 std::vector<event::Particle> GetFSNucleons(event::FullEvent const &);
 std::vector<event::Particle> GetFSOthers(event::FullEvent const &);
 
-event::Particle GetFSChargedLepton(event::FullEvent const &);
-event::Particle GetFSNeutralLepton(event::FullEvent const &);
-event::Particle GetISNeutralLepton(event::FullEvent const &);
-event::Particle GetFSChargedPion(event::FullEvent const &);
-event::Particle GetFSNeutralPion(event::FullEvent const &);
-event::Particle GetFSPion(event::FullEvent const &);
-event::Particle GetFSProton(event::FullEvent const &);
-event::Particle GetFSNeutron(event::FullEvent const &);
-event::Particle GetFSNucleon(event::FullEvent const &);
-event::Particle GetFSOther(event::FullEvent const &);
+event::Particle GetHMFSChargedLepton(event::FullEvent const &);
+event::Particle GetHMFSNeutralLepton(event::FullEvent const &);
+event::Particle GetHMISNeutralLepton(event::FullEvent const &);
+event::Particle GetHMFSChargedPion(event::FullEvent const &);
+event::Particle GetHMFSNeutralPion(event::FullEvent const &);
+event::Particle GetHMFSPion(event::FullEvent const &);
+event::Particle GetHMFSProton(event::FullEvent const &);
+event::Particle GetHMFSNeutron(event::FullEvent const &);
+event::Particle GetHMFSNucleon(event::FullEvent const &);
+event::Particle GetHMFSOther(event::FullEvent const &);
 
 } // namespace utility
 } // namespace nuis

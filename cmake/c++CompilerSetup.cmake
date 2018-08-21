@@ -19,7 +19,7 @@
 
 set(CXX_WARNINGS -Wall )
 
-LIST(APPEND EXTRA_CXX_FLAGS -std=c++1y -fPIC)
+LIST(APPEND EXTRA_CXX_FLAGS -std=c++1y -fPIC "-D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
 
 cmessage(DEBUG "EXTRA_CXX_FLAGS: ${EXTRA_CXX_FLAGS}")
 string(REPLACE ";" " " STR_EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS}")

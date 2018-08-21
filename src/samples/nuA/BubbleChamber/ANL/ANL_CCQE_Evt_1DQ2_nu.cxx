@@ -19,28 +19,16 @@
 
 //********************************************************************
 
-#include "samples/IDataComparison.hxx"
+#include "samples/SimpleDataComparison.hxx"
 
-#include "event/FullEvent.hxx"
-
-#include "input/InputManager.hxx"
-
-#include "persistency/ROOTOutput.hxx"
-
-#include "utility/FileSystemUtility.hxx"
 #include "utility/FullEventUtility.hxx"
 #include "utility/KinematicUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
-#include "utility/ROOTUtility.hxx"
-
-#include "TH1D.h"
 
 using namespace nuis::event;
-using namespace nuis::input;
 using namespace nuis::utility;
-using namespace nuis::persistency;
 
-class ANL_CCQE_Evt_1DQ2_nu : public IDataComparison {
+class ANL_CCQE_Evt_1DQ2_nu : public SimpleDataComparison_1D {
 
 public:
   NEW_NUIS_EXCEPT(invalid_publication_specifier);
@@ -50,26 +38,10 @@ public:
   std::string Pub_str;
   bool UseD2Corr;
 
-  InputManager::Input_id_t fIH_id;
-  std::string write_directory;
-
-  std::unique_ptr<TH1D> fData;
-  std::unique_ptr<TH1D> fPrediction;
-
-  std::pair<double, double> EnuRange;
-
-  ANL_CCQE_Evt_1DQ2_nu()
-      : Pub(kPRD26), Pub_str(""), UseD2Corr(false),
-        fIH_id(std::numeric_limits<InputManager::Input_id_t>::max()),
-        write_directory("ANL_CCQE_Evt_1DQ2_nu"), fData(nullptr),
-        fPrediction(nullptr) {}
-
-  std::string GetJournalReference() {
-    return "PRL 31 844 / PRD 16 3103 / PRD 26 537";
+  ANL_CCQE_Evt_1DQ2_nu() : Pub(kPRD26), Pub_str(""), UseD2Corr(false) {
+    ReadGlobalConfigDefaults();
   }
-  std::string GetTargetMaterial() { return "D2"; }
-  std::string GetFluxDescription() { return "ANL Muon Neutrino"; }
-  std::string GetSignalDescription() { return "True CCQE"; }
+
   std::string GetDocumentation() {
     return "Can specify \"publication: <PUB>\", where <PUB> is one of [ PRL31, "
            "PRD16, PRD26 ] to clarify a publication for comparison. Defaults "
@@ -78,159 +50,109 @@ public:
            "\"use_D2_correction: true\"";
   }
   fhicl::ParameterSet GetExampleConfiguration() {
-    fhicl::ParameterSet exps;
+    fhicl::ParameterSet exps =
+        SimpleDataComparison_1D::GetExampleConfiguration();
 
-    exps.put<std::string>("name", "ANL_CCQE_Evt_1DQ2_nu");
-    exps.put<std::string>("input_type", "Generator");
-    exps.put<std::string>("file", "ANL_Events.root");
-    exps.put<std::string>("write_directory", "ANL_CCQE_Evt_1DQ2_nu_Generator");
     exps.put<std::string>("publication", "PRD26");
-    exps.put<bool>("use_D2_correction", true);
-
-    fhicl::ParameterSet fd;
-    fd.put<std::string>("file", "ANL_fake_data.root");
-    fd.put<std::string>("histogram_name", "fake_data");
-
-    exps.put("fake_data", fd);
+    exps.put<bool>("use_D2_correction", false);
 
     return exps;
   }
 
   void Initialize(fhicl::ParameterSet const &ps) {
 
-    if (!ps.has_key("publication")) {
-      std::string publication = ps.get<std::string>("publication");
-      if (publication == "PRL31") {
-        Pub = kPRL31;
-      } else if (publication == "PRD16") {
-        Pub = kPRD16;
-      } else if (publication == "PRD26") {
-        Pub = kPRD26;
-      } else {
-        throw invalid_publication_specifier()
-            << "[ERROR]: Found unexpected publication specifier "
-            << std::quoted(publication)
-            << ". Expected one of [ PRL31, PRD16, PRD26 ]";
-      }
+    if (ps.has_key("verbosity")) {
+      SetSampleVerbosity(ps.get<std::string>("verbosity"));
+    }
+
+    std::string publication = ps.get<std::string>("publication", "PRD26");
+    if (publication == "PRL31") {
+      Pub = kPRL31;
+    } else if (publication == "PRD16") {
+      Pub = kPRD16;
+    } else if (publication == "PRD26") {
+      Pub = kPRD26;
+    } else {
+      throw invalid_publication_specifier()
+          << "[ERROR]: Found unexpected publication specifier "
+          << std::quoted(publication)
+          << ". Expected one of [ PRL31, PRD16, PRD26 ]";
     }
 
     switch (Pub) {
     case kPRL31: {
       Pub_str = "PRL31_844";
-      EnuRange = std::pair<double, double>{0.0, 3.0};
+      EnuRange = std::pair<double, double>{0, 3E3};
+      ISAMPLE_INFO("Sample " << Name()
+                             << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD16: {
       Pub_str = "PRD16_3103";
-      EnuRange = std::pair<double, double>{0.0, 6.0};
+      EnuRange = std::pair<double, double>{0, 6E3};
+      ISAMPLE_INFO("Sample " << Name()
+                             << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD26: {
       Pub_str = "PRD26_537";
-      EnuRange = std::pair<double, double>{0.0, 6.0};
+      EnuRange = std::pair<double, double>{0, 6E3};
+      ISAMPLE_INFO("Sample " << Name()
+                             << " specialized for publication: " << Pub_str);
       break;
     }
     }
 
-    if (ps.has_key("use_D2_correction")) {
-      UseD2Corr = ps.get<bool>("use_D2_correction");
-    }
+    fhicl::ParameterSet const &global_sample_configuration =
+        nuis::config::GetDocument().get<fhicl::ParameterSet>(
+            std::string("global.sample_configuration.") + Name(),
+            fhicl::ParameterSet());
 
-    if (ps.has_key("use_D2_correction")) {
-      UseD2Corr = ps.get<bool>("use_D2_correction");
-    }
+    UseD2Corr = ps.get<bool>(
+        "use_D2_correction",
+        global_sample_configuration.get<bool>("use_D2_correction", false));
 
-    if (ps.has_key("write_directory")) {
-      write_directory = ps.get<std::string>("write_directory");
-    }
+    SetData(GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/ANL_CCQE_Data_" +
+            Pub_str + ".root;ANL_1DQ2_Data");
 
-    fIH_id = InputManager::Get().EnsureInputLoaded(ps);
+    SimpleDataComparison_1D::Initialize(ps);
 
-    if (ps.has_key("fake_data")) {
-      fhicl::ParameterSet const &fd = ps.get<fhicl::ParameterSet>("fake_data");
-      fData = GetHistogramFromROOTFile<TH1D>(
-          fd.get<std::string>("file"), fd.get<std::string>("histogram_name"));
-    } else {
-      fData = GetHistogramFromROOTFile<TH1D>(
-          GetDataDir() + "nuA/BubbleChamber/ANL/ANL_CCQE_Data_" + Pub_str +
-              ".root",
-          "ANL_1DQ2_Data");
-    }
-    fPrediction = CloneHistogram(fData, true);
-  }
-
-  std::vector<bool> fIsSignal;
-  std::vector<double> fQ2;
-
-  void ProcessEvent(FullEvent const &fev) {
-    fQ2.push_back(GetNeutrinoQ2QERec(fev));
-  }
-
-  bool IsSignal(FullEvent const &fev) {
-
-    if (fev.mode != Channel_t::kCCQE) {
-      return false;
-    }
-
-    Particle ISNumu = GetISNeutralLepton(fev);
-
-    if (!ISNumu) {
-      return false;
-    }
-
-    if (ISNumu.pdg != pdgcodes::kNuMu) {
-      return false;
-    }
-
-    if ((ISNumu.P4.E() < EnuRange.first) || (ISNumu.P4.E() > EnuRange.second)) {
-      return false;
-    }
-
-    double Q2 = GetNeutrinoQ2QERec(fev);
-    if (Q2 <= 0) {
-      return false;
-    }
-
-    return true;
-  }
-
-  void ProcessSample(size_t nmax) {
-    if (fIH_id == std::numeric_limits<InputManager::Input_id_t>::max()) {
-      throw uninitialized_ISample();
-    }
-    IInputHandler const &IH = InputManager::Get().GetInputHandler(fIH_id);
-
-    size_t NEvsToProcess = std::min(nmax, IH.GetNEvents());
-    IInputHandler::ev_index_t ev_idx = 0;
-    size_t NSigEvents = 0;
-
-    bool DetermineSignalEvents = !fIsSignal.size();
-
-    while (ev_idx < NEvsToProcess) {
-      if (DetermineSignalEvents) {
-        FullEvent const &fev = IH.GetFullEvent(ev_idx);
-        bool is_sig = IsSignal(fev);
-        fIsSignal.push_back(is_sig);
-        if (is_sig) {
-          ProcessEvent(fev);
-        }
+    // Signal selection function
+    IsSigFunc = [&](FullEvent const &fev) -> bool {
+      if (fev.mode != Channel_t::kCCQE) {
+        return false;
       }
 
-      if (fIsSignal[ev_idx]) {
-        fPrediction->Fill(fQ2[NSigEvents++], IH.GetEventWeight(ev_idx));
+      Particle ISNumu = GetHMISNeutralLepton(fev);
+
+      if (!ISNumu) {
+        return false;
       }
 
-      ev_idx++;
-    }
-  }
-  void Write() {
+      if (ISNumu.pdg != pdgcodes::kNuMu) {
+        return false;
+      }
 
-    WriteToOutputFile<TH1D>(fData.get(), "Data", write_directory);
-    WriteToOutputFile<TH1D>(fPrediction.get(), "Prediction", write_directory);
+      if ((ISNumu.P4.E() < EnuRange.first) ||
+          (ISNumu.P4.E() > EnuRange.second)) {
+        return false;
+      }
+
+      double Q2 = GetNeutrinoQ2QERec(fev, 0);
+      if (Q2 <= 0) {
+        return false;
+      }
+
+      return true;
+    };
+    // 1D Projection function
+    CompProjFunc = [](FullEvent const &fev) -> std::array<double, 1> {
+      return {{GetNeutrinoQ2QERec(fev, 0)}};
+    };
   }
+
   std::string Name() { return "ANL_CCQE_Evt_1DQ2_nu"; }
-
-  double GetGOF() { return 0; /*CalcChi2(fData, fPrediction);*/ }
 };
 
 DECLARE_PLUGIN(IDataComparison, ANL_CCQE_Evt_1DQ2_nu);
+DECLARE_PLUGIN(ISample, ANL_CCQE_Evt_1DQ2_nu);

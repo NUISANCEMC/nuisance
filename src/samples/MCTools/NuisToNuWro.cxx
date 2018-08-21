@@ -9,12 +9,15 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
+#include "generator/utility/NuWroUtility.hxx"
+
 #include <iostream>
 #include <limits>
 
 using namespace nuis::event;
 using namespace nuis::input;
 using namespace nuis::utility;
+using namespace nuis::nuwrotools;
 
 class NuisToNuWro : public ISample {
 public:
@@ -22,7 +25,7 @@ public:
 
   std::unique_ptr<TreeFile> fOutputTree;
 
-  event *fOutputEvent;
+  NuWroEvent *fOutputEvent;
 
   NuisToNuWro()
       : fIH_id(std::numeric_limits<InputManager::Input_id_t>::max()),
@@ -37,9 +40,15 @@ public:
   }
 
   void ProcessEvent(FullEvent const &ps) {
+
     fOutputEvent->in.clear();
     fOutputEvent->out.clear();
     fOutputEvent->post.clear();
+
+    std::pair<NuWroFlags, int> NuMode = GetFlagsDynEquivalent(ps.mode);
+
+    fOutputEvent->flag = NuMode.first;
+    fOutputEvent->dyn = NuMode.second;
 
     for (Particle const &part : GetISParticles(ps)) {
       particle nuwro_part(part.pdg, part.P4.M());
@@ -68,18 +77,26 @@ public:
     }
 
     IInputHandler const &IH = InputManager::Get().GetInputHandler(fIH_id);
+
+    size_t NEvsToProcess = std::min(nmax, IH.GetNEvents());
+    size_t NToShout = NEvsToProcess / 10;
+    std::cout << "[INFO]: Processing " << NEvsToProcess
+              << " input events to NuWro format." << std::endl;
+
     size_t n = 0;
     for (auto const &fe : IH) {
-      if (++n > nmax) {
+      if (++n > NEvsToProcess) {
         break;
+      }
+      if (NToShout && !(n % NToShout)) {
+        std::cout << "[INFO]: Processed " << n << "/" << NEvsToProcess
+                  << " events." << std::endl;
       }
       ProcessEvent(fe);
     }
   }
 
-  void Write() {
-    fOutputTree->file->Write();
-  }
+  void Write() { fOutputTree->file->Write(); }
   std::string Name() { return "NuisToNuWro"; }
 };
 

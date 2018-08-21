@@ -6,6 +6,10 @@
 
 class NeutPart;
 
-nuis::event::Particle::Status_t
-GetNeutParticleStatus(NeutPart const &, nuis::event::Channel_t);
+namespace nuis {
+namespace neuttools {
+nuis::event::Particle::Status_t GetNeutParticleStatus(NeutPart const &,
+                                                      nuis::event::Channel_t);
+}
+} // namespace nuis
 #endif

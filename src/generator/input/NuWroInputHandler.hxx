@@ -24,6 +24,8 @@
 
 #include "input/IInputHandler.hxx"
 
+#include "exception/exception.hxx"
+
 #include <memory>
 
 namespace fhicl {
@@ -39,8 +41,14 @@ class TreeFile;
 class NuWroInputHandler : public IInputHandler {
   mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
   mutable nuis::event::FullEvent fReaderEvent;
+  mutable std::vector<double> fWeightCache;
+
+  bool fKeepIntermediates;
 
 public:
+
+  NEW_NUIS_EXCEPT(weight_cache_miss);
+
   NuWroInputHandler();
   NuWroInputHandler(NuWroInputHandler const &) = delete;
   NuWroInputHandler(NuWroInputHandler &&);
@@ -48,6 +56,7 @@ public:
   void Initialize(fhicl::ParameterSet const &);
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
+  double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
 };
 

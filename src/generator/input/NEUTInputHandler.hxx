@@ -40,6 +40,8 @@ class NEUTInputHandler : public IInputHandler {
   mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
   mutable nuis::event::FullEvent fReaderEvent;
 
+  bool fKeepIntermediates;
+
 public:
   NEUTInputHandler();
   NEUTInputHandler(NEUTInputHandler const &) = delete;

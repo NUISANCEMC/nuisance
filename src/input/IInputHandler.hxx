@@ -34,7 +34,7 @@ namespace nuis {
 namespace event {
 class MinimalEvent;
 class FullEvent;
-} // namespace core
+} // namespace event
 } // namespace nuis
 
 class IInputHandler {
@@ -65,7 +65,9 @@ public:
       return !(*this == other);
     }
     nuis::event::FullEvent const &operator*() { return ih->GetFullEvent(idx); }
-    nuis::event::FullEvent const *operator->() { return &ih->GetFullEvent(idx); }
+    nuis::event::FullEvent const *operator->() {
+      return &ih->GetFullEvent(idx);
+    }
 
     FullEvent_const_iterator operator++() {
       idx++;
@@ -92,7 +94,7 @@ public:
   GetMinimalEvent(ev_index_t idx) const = 0;
   virtual nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;
   virtual void RecalculateEventWeights(){};
-  virtual double GetEventWeight(ev_index_t idx) const {};
+  virtual double GetEventWeight(ev_index_t idx) const { return 1; };
 
   virtual size_t GetNEvents() const = 0;
 

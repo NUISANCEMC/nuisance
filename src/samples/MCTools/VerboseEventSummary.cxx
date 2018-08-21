@@ -22,20 +22,7 @@ public:
   }
 
   void ProcessEvent(FullEvent const &ps) {
-    std::cout << "Event: Interaction mode = " << ps.mode
-              << ", probe: { PDG: " << ps.probe_pdg
-              << ", Energy: " << ps.probe_E << " MeV }." << std::endl;
-    for (auto &status_stack : ps.ParticleStack) {
-      std::cout << "\t[" << status_stack.status << "]" << std::endl;
-
-      for (Particle const &part : status_stack.particles) {
-        std::cout << "\t\t{ PDG: " << part.pdg << ", P3: [ " << part.P4[0]
-                  << ", " << part.P4[1] << ", " << part.P4[2]
-                  << "], E: " << part.P4[3] << ", M: " << part.P4.M()
-                  << " }" << std::endl;
-      }
-    }
-      std::cout << std::endl;
+    std::cout << ps.to_string() << std::endl;
   }
 
   void ProcessSample(size_t nmax) {
@@ -44,10 +31,19 @@ public:
     }
 
     IInputHandler const &IH = InputManager::Get().GetInputHandler(fIH_id);
+    size_t NEvsToProcess = std::min(nmax, IH.GetNEvents());
+    size_t NToShout = NEvsToProcess / 10;
+    std::cout << "[INFO]: Processing " << NEvsToProcess << " input events."
+              << std::endl;
+
     size_t n = 0;
     for (auto const &fe : IH) {
       if (++n > nmax) {
         break;
+      }
+      if (NToShout && !(n % NToShout)) {
+        std::cout << "[INFO]: Processed " << n << "/" << NEvsToProcess
+                  << " events." << std::endl;
       }
       ProcessEvent(fe);
     }

@@ -23,13 +23,13 @@ int main() {
 
       nuis::plugins::plugin_traits<IDataComparison>::unique_ptr_t sample =
           nuis::plugins::Instantiate<IDataComparison>(sample_name);
-      //
-      // std::cout << sample->Name() << std::endl;
-      // std::cout << "\tJournal: " << sample->GetJournalReference() << std::endl;
-      // std::cout << "\tTarget: " << sample->GetTargetMaterial() << std::endl;
-      // std::cout << "\tFlux: " << sample->GetFluxDescription() << std::endl;
-      // std::cout << "\tSignal: " << sample->GetSignalDescription() << std::endl;
-      // std::cout << "\tDocs: " << sample->GetDocumentation() << std::endl;
+      
+      std::cout << sample->Name() << std::endl;
+      std::cout << "\tJournal: " << sample->GetJournalReference() << std::endl;
+      std::cout << "\tTarget: " << sample->GetTargetMaterial() << std::endl;
+      std::cout << "\tFlux: " << sample->GetFluxDescription() << std::endl;
+      std::cout << "\tSignal: " << sample->GetSignalDescription() << std::endl;
+      std::cout << "\tDocs: " << sample->GetDocumentation() << std::endl;
 
     }
   }

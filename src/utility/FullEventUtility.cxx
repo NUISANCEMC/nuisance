@@ -110,35 +110,35 @@ std::vector<Particle> GetFSOthers(FullEvent const &ev) {
                       Particle::Status_t::kNuclearLeaving, false);
 }
 
-Particle GetFSChargedLepton(FullEvent const &ev) {
+Particle GetHMFSChargedLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::ChargedLeptons);
 }
-Particle GetFSNeutralLepton(FullEvent const &ev) {
+Particle GetHMFSNeutralLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralLeptons);
 }
-Particle GetISNeutralLepton(FullEvent const &ev) {
+Particle GetHMISNeutralLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralLeptons,
                        Particle::Status_t::kPrimaryInitialState);
 }
-Particle GetFSChargedPion(FullEvent const &ev) {
+Particle GetHMFSChargedPion(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::ChargedPions);
 }
-Particle GetFSNeutralPion(FullEvent const &ev) {
+Particle GetHMFSNeutralPion(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralPions);
 }
-Particle GetFSPion(FullEvent const &ev) {
+Particle GetHMFSPion(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::Pions);
 }
-Particle GetFSProton(FullEvent const &ev) {
+Particle GetHMFSProton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::Protons);
 }
-Particle GetFSNeutron(FullEvent const &ev) {
+Particle GetHMFSNeutron(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::Neutron);
 }
-Particle GetFSNucleon(FullEvent const &ev) {
+Particle GetHMFSNucleon(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::Nucleons);
 }
-Particle GetFSOther(FullEvent const &ev) {
+Particle GetHMFSOther(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::CommonParticles,
                        Particle::Status_t::kNuclearLeaving, false);
 }

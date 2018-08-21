@@ -30,6 +30,7 @@
 class IDataComparison : public ISample {
 public:
   virtual double GetGOF() = 0;
+  virtual double GetNDOGuess() = 0;
 
   virtual std::string GetJournalReference() {
     std::stringstream ss("");

@@ -24,28 +24,73 @@
 
 #include "exception/exception.hxx"
 
-#include <string>
-#include <limits>
+#include "config/GlobalConfiguration.hxx"
 
-namespace fhicl {
-class ParameterSet;
-}
+#include "fhiclcpp/ParameterSet.h"
+
+#include <iomanip>
+#include <limits>
+#include <string>
 
 namespace nuis {
 namespace event {
 class FullEvent;
 class MinimalEvent;
-} // namespace core
+} // namespace event
 } // namespace nuis
 
+#define ISAMPLE_DEBUG(v)                                                       \
+  if (verb > 2) {                                                              \
+    std::cout << "[DEBUG]: " << v << std::endl;                                \
+  }
+#define ISAMPLE_INFO(v)                                                        \
+  if (verb > 1) {                                                              \
+    std::cout << "[INFO]: " << v << std::endl;                                 \
+  }
+#define ISAMPLE_WARN(v)                                                        \
+  if (verb > 0) {                                                              \
+    std::cout << "[WARN] " << __FILENAME__ << ":" << __LINE__ << " : " << v    \
+              << std::endl;                                                    \
+  }
+
 class ISample {
+protected:
+  NEW_NUIS_EXCEPT(unknown_ISample_verbosity);
+
+  enum sample_verbosity { kSilent = 0, kWarn = 1, kReticent = 2, kVerbose = 3 };
+  sample_verbosity verb;
+
+  void SetSampleVerbosity(std::string v) {
+    v = nuis::config::GetDocument().get<std::string>(
+        "global.sample.verbosity_override", v);
+
+    if (v == "Silent") {
+      verb = kSilent;
+    } else if (v == "Warn") {
+      verb = kWarn;
+    } else if (v == "Reticent") {
+      verb = kReticent;
+    } else if (v == "Verbose") {
+      verb = kVerbose;
+    } else {
+      throw unknown_ISample_verbosity()
+          << "[ERROR]: Failed to parse ISample verbosity setting from: "
+          << std::quoted(v);
+    }
+  }
+
 public:
   NEW_NUIS_EXCEPT(uninitialized_ISample);
   NEW_NUIS_EXCEPT(unimplemented_ISample_optional_method);
 
+  ISample() {
+    SetSampleVerbosity(nuis::config::GetDocument().get<std::string>(
+        "global.sample.verbosity_default", "Silent"));
+  }
+
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
 
-  //Interface for processing a single, external event
+  // Interface for processing a single, external event
   //
   // ISamples are not required to implement processing events from 'outside'.
   virtual void ProcessEvent(nuis::event::FullEvent const &) {

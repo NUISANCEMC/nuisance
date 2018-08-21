@@ -18,6 +18,7 @@ NEW_NUIS_EXCEPT(invalid_cli_arguments);
 
 int main(int argc, char const *argv[]) {
   nuis::config::EnsureConfigurationRead("nuis.global.config.fcl");
+  nuis::config::EnsureConfigurationRead("nuis.datacomparisons.fcl");
 
   if (argc != 2) {
     throw invalid_cli_arguments()
@@ -27,16 +28,14 @@ int main(int argc, char const *argv[]) {
         << argv[0] << " ./myconf.fcl\".";
   }
 
-  fhicl::ParameterSet ps = fhicl::make_ParameterSet(argv[1]);
+  nuis::config::EnsureConfigurationRead(argv[1]);
 
-  size_t NMax = std::numeric_limits<size_t>::max();
-
-  if (ps.has_key("nmax")) {
-    NMax = ps.get<size_t>("nmax");
-  }
+  size_t NMax = nuis::config::GetDocument().get<size_t>(
+      "nmax", std::numeric_limits<size_t>::max());
 
   for (fhicl::ParameterSet const &samp_config :
-       ps.get<std::vector<fhicl::ParameterSet>>("samples")) {
+       nuis::config::GetDocument().get<std::vector<fhicl::ParameterSet>>(
+           "samples")) {
 
     std::cout << "[INFO]: Reading sample: "
               << samp_config.get<std::string>("name") << std::endl;

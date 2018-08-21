@@ -1,5 +1,7 @@
 set(samples_header_files
-ISample.hxx)
+  ISample.hxx
+  IDataComparison.hxx
+  SimpleDataComparison.hxx)
 
 install(FILES ${samples_header_files} DESTINATION include/samples)
 
@@ -15,3 +17,4 @@ if(NOT IDataComparisons STREQUAL "")
 endif()
 
 SET(INuADataComparisons_List ${INuADataComparisons_List} PARENT_SCOPE)
+SET(INuADataComparisons_FHiCL ${INuADataComparisons_FHiCL} PARENT_SCOPE)

@@ -1,3 +1,5 @@
+@INuADataComparisons_FHiCL_Includes@
+
 data_comparisons: {
   nuA: [@INuADataComparisons_List@]
   eA: []

@@ -1,0 +1,9 @@
+global.sample_configuration.ANL_CCQE_Evt_1DQ2_nu: {
+  journal_reference: "PRL 31 844 / PRD 16 3103 / PRD 26 537"
+  target_material: "D2"
+  flux_description: "ANL Muon Neutrino"
+  signal_description: "True CCQE"
+  shape_only: true
+  flux_unfolded: false
+  use_D2_correction: false
+}

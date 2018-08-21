@@ -1,4 +1,4 @@
-SET(APPS nuissamples DumpEventInfo)
+SET(APPS nuissamples nuiscomp nuisevsum)
 
 foreach(a ${APPS})
   add_executable(${a} ${a}.cxx)

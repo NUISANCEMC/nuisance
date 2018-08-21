@@ -20,22 +20,19 @@
 #ifndef UTILITY_ROOTUTILITY_HXX_SEEN
 #define UTILITY_ROOTUTILITY_HXX_SEEN
 
-#include "TFile.h"
-#include "TTree.h"
-
 #include "exception/exception.hxx"
+
+#include "TFile.h"
+#include "TH1D.h"
+#include "TH1F.h"
+#include "TH2D.h"
+#include "TH2F.h"
+#include "TTree.h"
 
 #include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
-
-class TH1;
-class TH1D;
-class TH1F;
-class TH2;
-class TH2D;
-class TH2F;
 
 namespace nuis {
 namespace utility {
@@ -105,22 +102,46 @@ inline std::unique_ptr<TreeFile> MakeNewTTree(std::string const &fname,
 template <typename HT> struct TH_traits {};
 
 template <> struct TH_traits<TH1> {
+  static size_t const NDims = 1;
   static std::string name() { return "TH1"; }
+  static Int_t NbinsIncludeFlow(TH1 *const h) {
+    return h->GetXaxis()->GetNbins() + 2;
+  }
 };
 template <> struct TH_traits<TH1D> {
+  static size_t const NDims = 1;
   static std::string name() { return "TH1D"; }
+  static Int_t NbinsIncludeFlow(TH1D *const h) {
+    return h->GetXaxis()->GetNbins() + 2;
+  }
 };
 template <> struct TH_traits<TH1F> {
+  static size_t const NDims = 1;
   static std::string name() { return "TH1F"; }
+  static Int_t NbinsIncludeFlow(TH1F *const h) {
+    return h->GetXaxis()->GetNbins() + 2;
+  }
 };
 template <> struct TH_traits<TH2> {
+  static size_t const NDims = 2;
   static std::string name() { return "TH2"; }
+  static Int_t NbinsIncludeFlow(TH2 *const h) {
+    return (h->GetXaxis()->GetNbins() + 2) * (h->GetYaxis()->GetNbins() + 2);
+  }
 };
 template <> struct TH_traits<TH2D> {
+  static size_t const NDims = 2;
   static std::string name() { return "TH2D"; }
+  static Int_t NbinsIncludeFlow(TH2D *const h) {
+    return (h->GetXaxis()->GetNbins() + 2) * (h->GetYaxis()->GetNbins() + 2);
+  }
 };
 template <> struct TH_traits<TH2F> {
+  static size_t const NDims = 2;
   static std::string name() { return "TH2F"; }
+  static Int_t NbinsIncludeFlow(TH2F *const h) {
+    return (h->GetXaxis()->GetNbins() + 2) * (h->GetYaxis()->GetNbins() + 2);
+  }
 };
 
 template <typename HT>
@@ -142,9 +163,33 @@ inline std::unique_ptr<HT> GetHistogramFromROOTFile(std::string const &fname,
   return clone;
 }
 
+template <typename HT> void Clear(HT *h) {
+  for (Int_t bin_it = 0; bin_it < TH_traits<HT>::NbinsIncludeFlow(h);
+       ++bin_it) {
+    h->SetBinContent(bin_it, 0);
+    h->SetBinError(bin_it, 0);
+  }
+}
+
+// Fill for 1D histograms uses type system to enforce correct number of
+// dimensions
+template <typename HT, typename T>
+typename std::enable_if<TH_traits<HT>::NDims == 1, void>::type
+Fill(HT *h, std::array<T, TH_traits<HT>::NDims> const &val, double weight = 1) {
+  h->Fill(val[0], weight);
+}
+
+/// Fill for 2D histograms uses type system to enforce correct number of
+/// dimensions
+template <typename HT, typename T>
+typename std::enable_if<TH_traits<HT>::NDims == 2, void>::type
+Fill(HT *h, std::array<T, TH_traits<HT>::NDims> const &val, double weight = 1) {
+  h->Fill(val[0], val[1], weight);
+}
+
 template <typename HT>
-inline std::unique_ptr<HT> CloneHistogram(std::unique_ptr<HT> const &source,
-                                          bool clear = false) {
+inline std::unique_ptr<HT> Clone(std::unique_ptr<HT> const &source,
+                                 bool clear = false) {
   std::unique_ptr<HT> target(dynamic_cast<HT *>(source->Clone()));
   if (!target) {
     throw failed_to_clone()
@@ -154,7 +199,7 @@ inline std::unique_ptr<HT> CloneHistogram(std::unique_ptr<HT> const &source,
   target->SetDirectory(nullptr);
 
   if (clear) {
-    target->Clear();
+    Clear(target.get());
   }
 
   return target;

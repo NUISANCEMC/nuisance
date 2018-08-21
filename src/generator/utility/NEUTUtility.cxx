@@ -10,6 +10,8 @@
 using namespace nuis::event;
 using namespace nuis::utility;
 
+namespace nuis {
+namespace neuttools {
 NEW_NUIS_EXCEPT(unexpected_NEUT_particle_state);
 
 Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
@@ -55,7 +57,6 @@ Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
 
   } else if ((part.fIsAlive == true) && (part.fStatus == 0)) {
     return Particle::Status_t::kNuclearLeaving;
-
   } else if (!part.fIsAlive && ((part.fStatus == 1) || (part.fStatus == 3) ||
                                 (part.fStatus == 4) || (part.fStatus == 7) ||
                                 (part.fStatus == 8))) {
@@ -84,3 +85,6 @@ Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
       << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
       << " PDG: " << part.fPID;
 }
+
+} // namespace neuttools
+} // namespace nuis

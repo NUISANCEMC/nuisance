@@ -80,3 +80,4 @@ install(FILES
   ${CMAKE_INSTALL_PREFIX})
 
 add_subdirectory(config)
+add_subdirectory(data)

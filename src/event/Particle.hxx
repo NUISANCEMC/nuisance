@@ -28,6 +28,8 @@ namespace nuis {
 namespace event {
 class Particle {
 public:
+  NEW_NUIS_EXCEPT(invalid_particle);
+
 #define STATUS_LIST                                                            \
   X(kNuclearLeaving, 0)                                                        \
   X(kPrimaryInitialState, 1)                                                   \
@@ -47,13 +49,20 @@ public:
   PDG_t pdg;
   TLorentzVector P4;
 
-  bool operator!() { return (pdg == std::numeric_limits<PDG_t>::max()); }
+  bool operator!() const { return (pdg == std::numeric_limits<PDG_t>::max()); }
+
+  double E() const { return P4.E(); }
+  double P() const { return P4.Vect().Mag(); }
+  TVector3 P3() const { return P4.Vect(); }
+  double M() const { return P4.M(); }
+  double Theta() const { return P4.Vect().Theta(); }
+  double CosTheta() const { return P4.Vect().Theta(); }
 };
 } // namespace event
 } // namespace nuis
 
 #define X(A, B)                                                                \
-  case nuis::event::Particle::Status_t::A: {                                    \
+  case nuis::event::Particle::Status_t::A: {                                   \
     return os << #A;                                                           \
   }
 

@@ -10,3 +10,9 @@ data_dir: @CMAKE_INSTALL_PREFIX@/data
 persistency: {
   default_output_file: nuis.out.root
 }
+
+global: {
+  sample: {
+    verbosity_default: Reticent
+  }
+}

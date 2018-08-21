@@ -1,8 +1,8 @@
 #include "generator/input/NEUTInputHandler.hxx"
 
-#include "utility/ROOTUtility.hxx"
-#include "utility/PDGCodeUtility.hxx"
 #include "utility/InteractionChannelUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+#include "utility/ROOTUtility.hxx"
 
 #include "generator/utility/NEUTUtility.hxx"
 
@@ -10,6 +10,7 @@
 
 using namespace nuis::event;
 using namespace nuis::utility;
+using namespace nuis::neuttools;
 
 NEUTInputHandler::NEUTInputHandler() : fInputTree(nullptr) {}
 NEUTInputHandler::NEUTInputHandler(NEUTInputHandler &&other)
@@ -22,6 +23,8 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fReaderEvent.fNeutVect = nullptr;
   fInputTree->tree->SetBranchAddress("vectorbranch", &fReaderEvent.fNeutVect);
+
+  fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 }
 
 MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
@@ -61,7 +64,7 @@ FullEvent const &NEUTInputHandler::GetFullEvent(ev_index_t idx) const {
   }
 
   size_t NPart = fReaderEvent.fNeutVect->Npart();
-  bool FoundIntermediateStateParticle = false;
+  size_t NPrimary = fReaderEvent.fNeutVect->Nprimary();
   for (size_t part_it = 0; part_it < NPart; part_it++) {
     NeutPart const &part = (*fReaderEvent.fNeutVect->PartInfo(part_it));
 
@@ -70,27 +73,21 @@ FullEvent const &NEUTInputHandler::GetFullEvent(ev_index_t idx) const {
     nuis_part.P4 = part.fP;
 
     Particle::Status_t state = GetNeutParticleStatus(part, fReaderEvent.mode);
-    size_t state_int = static_cast<size_t>(state);
 
-    if ((!FoundIntermediateStateParticle) &&
-        (state == Particle::Status_t::kIntermediate)) {
-      FoundIntermediateStateParticle = true;
+    if (!fKeepIntermediates && (state == Particle::Status_t::kIntermediate)) {
+      continue;
     }
+
+    size_t state_int = static_cast<size_t>(state);
 
     // Add status == 0 particles as pre-FSI particles until we find an
     // intermediate state particle
-    if (!IsCoh(fReaderEvent.mode) && (part_it > 1) && (state_int == 0) &&
-        (!FoundIntermediateStateParticle)) {
+    if ((part_it < NPrimary) &&
+        (state != Particle::Status_t::kPrimaryInitialState)) {
       fReaderEvent
           .ParticleStack[static_cast<size_t>(
               Particle::Status_t::kPrimaryFinalState)]
           .particles.push_back(nuis_part);
-    }
-
-    // Intermediate particles should be pushed onto the primary final state
-    // stack for NEUT
-    if (state == Particle::Status_t::kIntermediate) {
-      state_int = static_cast<size_t>(Particle::Status_t::kPrimaryFinalState);
     }
 
     fReaderEvent.ParticleStack[state_int].particles.push_back(nuis_part);

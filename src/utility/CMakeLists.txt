@@ -1,7 +1,8 @@
 set(utility_implementation_files
   FileSystemUtility.cxx
   FullEventUtility.cxx
-  KinematicUtility.cxx)
+  KinematicUtility.cxx
+  PDGCodeUtility.cxx)
 
 set(utility_header_files
   FileSystemUtility.hxx
@@ -9,7 +10,8 @@ set(utility_header_files
   InteractionChannelUtility.hxx
   KinematicUtility.hxx
   PDGCodeUtility.hxx
-  ROOTUtility.hxx)
+  ROOTUtility.hxx
+  HistogramUtility.hxx)
 
 add_library(nuis_utility SHARED ${utility_implementation_files})
 target_link_libraries(nuis_utility)

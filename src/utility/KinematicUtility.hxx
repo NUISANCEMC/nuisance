@@ -20,13 +20,19 @@
 #ifndef UTILITY_KINEMATICUTILITY_HXX_SEEN
 #define UTILITY_KINEMATICUTILITY_HXX_SEEN
 
-#include "event/FullEvent.hxx"
-#include "event/Particle.hxx"
+namespace nuis {
+namespace event {
+class FullEvent;
+}
+} // namespace nuis
 
 namespace nuis {
 namespace utility {
 
-double GetNeutrinoQ2QERec(event::FullEvent const &fev);
+double GetNeutrinoEQERec(event::FullEvent const &fev,
+                         double SeparationEnergy_MeV);
+double GetNeutrinoQ2QERec(event::FullEvent const &fev,
+                          double SeparationEnergy_MeV);
 
 } // namespace utility
 } // namespace nuis
