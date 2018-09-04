@@ -34,33 +34,26 @@ class ParameterSet;
 }
 
 namespace nuis {
-namespace input {
+namespace variation {
 class VariationManager {
-  struct NamedVariationProvider {
-    NamedVariationProvider(
+public:
+  typedef size_t VarProv_id_t;
+
+private:
+  struct NamedWeightProvider {
+    NamedWeightProvider(
         std::string const &,
         plugins::plugin_traits<IWeightProvider>::unique_ptr_t &&);
     std::string name;
     plugins::plugin_traits<IWeightProvider>::unique_ptr_t handler;
   };
-  std::vector<NamedVariationProvider> VarProvs;
+  std::vector<NamedWeightProvider> VarProvs;
 
   VariationManager();
 
   static VariationManager *_global_inst;
 
 public:
-  typedef size_t VarProv_id_t;
-  typedef size_t paramId_t;
-
-  struct VariationProviderParameter {
-    std::string name;
-    VarProv_id_t providerId;
-    IVariationProvider::paramId_t providerParameterId;
-  };
-
-  std::vector<VariationProviderParameter> VarParams;
-
 
   static VariationManager &Get();
 
@@ -68,9 +61,9 @@ public:
   void SetParameterValue(paramId_t, double);
   void GetParameterPull(paramId_t);
 
-  double GetEventWeight();
+  double GetEventWeight(nuis::event::MinimalEvent const &);
 };
-} // namespace input
+} // namespace variation
 } // namespace nuis
 
 #endif

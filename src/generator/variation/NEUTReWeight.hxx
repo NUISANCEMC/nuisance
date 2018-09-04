@@ -17,25 +17,19 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef VARIATION_IWEIGHTPROVIDER_HXX_SEEN
-#define VARIATION_IWEIGHTPROVIDER_HXX_SEEN
+#ifndef GENERATOR_VARIATION_NEUTREWEIGHT_HXX_SEEN
+#define GENERATOR_VARIATION_NEUTREWEIGHT_HXX_SEEN
 
-#include "variation/IVariationProvider.hxx"
+#include "variation/IWeightProvider.hxx"
 
-class IWeightProvider : public IVariationProvider {
+class NEUTReWeight : public IWeightProvider {
 public:
-  virtual double GetEventWeight(nuis::event::MinimalEvent const &) = 0;
-
-  /// For weight providers, the full variation is just the application of the reweight_weight.
-  nuis::event::FullEvent VaryFullEvent(nuis::event::FullEvent const &fe) {
-    nuis::event::FullEvent fe_clone = fe.clone();
-    fe_clone.RWWeight = GetEventWeight(fe_clone);
-    return fe_clone;
-  }
-
-  virtual ~IWeightProvider() {}
+  double GetEventWeight(nuis::event::MinimalEvent const &);
+  void Initialize(fhicl::ParameterSet const &);
+  paramId_t GetParameterId(std::string const &);
+  void SetParameterValue(paramId_t, double);
+  bool ParametersVaried();
+  void Reconfigure();
 };
-
-DECLARE_PLUGIN_INTERFACE(IWeightProvider);
 
 #endif

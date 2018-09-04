@@ -22,7 +22,7 @@
 
 #include "plugins/traits.hxx"
 
-#include "exception/exception.hxx"
+#include "parameters/ParameterManager.hxx"
 
 namespace fhicl {
 class ParameterSet;
@@ -31,26 +31,26 @@ class ParameterSet;
 namespace nuis {
 namespace event {
 class MinimalEvent;
+class FullEvent;
 } // namespace event
 } // namespace nuis
 
 class IVariationProvider {
 public:
-  typedef int paramId_t;
-  static paramId_t const kParamUnhandled =
-      std::numeric_limits<paramId_t>::max();
-
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
 
-  paramId_t GetParameterId(std::string const &) = 0;
+  virtual nuis::params::paramId_t GetParameterId(std::string const &) = 0;
 
   bool HandlesParameter(std::string const &param_name) {
-    return (GetParameterId(param_name) != kParamUnhandled);
+    return (GetParameterId(param_name) != nuis::params::kParamUnhandled);
   }
 
-  void SetParameterValue() = 0;
-  bool ParametersVaried() = 0;
-  void Reconfigure() = 0;
+  virtual void SetParameterValue(nuis::params::paramId_t, double) = 0;
+  virtual bool ParametersVaried() = 0;
+  virtual void Reconfigure() = 0;
+
+  virtual nuis::event::FullEvent
+  VaryFullEvent(nuis::event::FullEvent const &) = 0;
 
   virtual ~IVariationProvider() {}
 };
