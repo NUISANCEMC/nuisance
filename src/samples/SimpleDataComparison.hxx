@@ -31,6 +31,7 @@
 #include "utility/FileSystemUtility.hxx"
 #include "utility/HistogramUtility.hxx"
 #include "utility/ROOTUtility.hxx"
+#include "utility/StatsUtility.hxx"
 
 #include <array>
 #include <functional>
@@ -45,6 +46,7 @@ template <> struct TH_dim_helper<2> { typedef TH2D type; };
 template <size_t NDim> class SimpleDataComparison : public IDataComparison {
 
   NEW_NUIS_EXCEPT(invalid_SimpleDataComparison_initialization);
+  NEW_NUIS_EXCEPT(SimpleDataComparison_already_finalized);
 
 protected:
   nuis::input::InputManager::Input_id_t fIH_id;
@@ -58,6 +60,8 @@ protected:
 
   std::string fDataInputDescriptor;
   std::unique_ptr<typename TH_dim_helper<NDim>::type> fData;
+  std::string fMaskInputDescriptor;
+  std::unique_ptr<typename TH_dim_helper<NDim>::type> fMask;
   std::string fCovarianceInputDescriptor;
   std::unique_ptr<TH2D> fCovariance;
   std::unique_ptr<typename TH_dim_helper<NDim>::type> fPrediction;
@@ -84,6 +88,8 @@ public:
     NMaxSample_override = std::numeric_limits<size_t>::max();
     fDataInputDescriptor = "";
     fData = nullptr;
+    fMaskInputDescriptor = "";
+    fMask = nullptr;
     fCovarianceInputDescriptor = "";
     fCovariance = nullptr;
     fPrediction = nullptr;
@@ -161,6 +167,10 @@ public:
     fDataInputDescriptor = data_descriptor;
   }
 
+  void SetMask(std::string const &mask_descriptor) {
+    fMaskInputDescriptor = mask_descriptor;
+  }
+
   void SetCovariance(std::string const &cov_descriptor) {
     fCovarianceInputDescriptor = cov_descriptor;
   }
@@ -171,6 +181,12 @@ public:
   }
 
   virtual void FinalizeComparison() {
+    if (fComparisonFinalized) {
+      throw SimpleDataComparison_already_finalized()
+          << "[ERROR]: Attempted to re-finalize a comparison for "
+             "IDataComparison: "
+          << std::quoted(Name());
+    }
     fPrediction_xsec = nuis::utility::Clone(fPrediction);
     fPrediction_xsec->Scale(1.0, "width");
     fPrediction_shape = nuis::utility::Clone(fPrediction_xsec);
@@ -237,6 +253,14 @@ public:
       fCovariance = nuis::utility::GetHistogram<TH2D>(
           global_sample_configuration.get<std::string>(
               "covariance_descriptor"));
+    }
+
+    if (fMaskInputDescriptor.length()) {
+      fMask = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
+          fMaskInputDescriptor);
+    } else if (global_sample_configuration.has_key("mask_descriptor")) {
+      fMask = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
+          global_sample_configuration.get<std::string>("mask_descriptor"));
     }
 
     if (ps.has_key("verbosity")) {
@@ -319,7 +343,12 @@ public:
     }
   }
 
-  double GetGOF() { return 1; }
+  double GetGOF() {
+    if (!fComparisonFinalized) {
+      FinalizeComparison();
+    }
+    return nuis::utility::GetChi2(fData.get(), fPrediction_comparison.get());
+  }
   double GetNDOGuess() {
     if (fData) {
       return nuis::utility::TH_traits<

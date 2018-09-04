@@ -17,8 +17,8 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef CORE_IINPUTHANDLER_HXX_SEEN
-#define CORE_IINPUTHANDLER_HXX_SEEN
+#ifndef INPUT_IINPUTHANDLER_HXX_SEEN
+#define INPUT_IINPUTHANDLER_HXX_SEEN
 
 #include "plugins/traits.hxx"
 

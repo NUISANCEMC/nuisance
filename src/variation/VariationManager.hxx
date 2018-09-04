@@ -17,10 +17,10 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef INPUT_INPUTMANAGER_HXX_SEEN
-#define INPUT_INPUTMANAGER_HXX_SEEN
+#ifndef VARIATION_VARIATIONMANAGER_HXX_SEEN
+#define VARIATION_VARIATIONMANAGER_HXX_SEEN
 
-#include "input/IInputHandler.hxx"
+#include "variation/IWeightProvider.hxx"
 
 #include "plugins/traits.hxx"
 
@@ -35,28 +35,40 @@ class ParameterSet;
 
 namespace nuis {
 namespace input {
-class InputManager {
-  struct NamedInputHandler {
-    NamedInputHandler(std::string const &,
-                      plugins::plugin_traits<IInputHandler>::unique_ptr_t &&);
+class VariationManager {
+  struct NamedVariationProvider {
+    NamedVariationProvider(
+        std::string const &,
+        plugins::plugin_traits<IWeightProvider>::unique_ptr_t &&);
     std::string name;
-    plugins::plugin_traits<IInputHandler>::unique_ptr_t handler;
+    plugins::plugin_traits<IWeightProvider>::unique_ptr_t handler;
   };
-  std::vector<NamedInputHandler> Inputs;
+  std::vector<NamedVariationProvider> VarProvs;
 
-  InputManager();
+  VariationManager();
 
-  static InputManager *_global_inst;
+  static VariationManager *_global_inst;
+
 public:
+  typedef size_t VarProv_id_t;
+  typedef size_t paramId_t;
 
-  static InputManager &Get();
+  struct VariationProviderParameter {
+    std::string name;
+    VarProv_id_t providerId;
+    IVariationProvider::paramId_t providerParameterId;
+  };
 
-  NEW_NUIS_EXCEPT(unknown_input);
-  typedef size_t Input_id_t;
+  std::vector<VariationProviderParameter> VarParams;
 
-  Input_id_t EnsureInputLoaded(fhicl::ParameterSet const &);
-  Input_id_t GetInputId(std::string const &) const;
-  IInputHandler const &GetInputHandler(Input_id_t) const;
+
+  static VariationManager &Get();
+
+  paramId_t EnsureParameterHandled(fhicl::ParameterSet const &);
+  void SetParameterValue(paramId_t, double);
+  void GetParameterPull(paramId_t);
+
+  double GetEventWeight();
 };
 } // namespace input
 } // namespace nuis

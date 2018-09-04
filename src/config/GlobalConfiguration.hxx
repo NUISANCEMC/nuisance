@@ -31,6 +31,7 @@ namespace config {
 fhicl::ParameterSet const &GetDocument(std::string const &name = "global");
 bool EnsureConfigurationRead(std::string const &fhicl_file,
                              std::string const &name = "global");
+
 } // namespace config
 } // namespace nuis
 

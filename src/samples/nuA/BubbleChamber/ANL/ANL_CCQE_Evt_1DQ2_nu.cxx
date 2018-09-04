@@ -37,8 +37,11 @@ public:
   Publication Pub;
   std::string Pub_str;
   bool UseD2Corr;
+  std::unique_ptr<TH1D> fD2CorrHist;
+  std::unique_ptr<TH1D> fPrediction_Uncorr;
 
-  ANL_CCQE_Evt_1DQ2_nu() : Pub(kPRD26), Pub_str(""), UseD2Corr(false) {
+  ANL_CCQE_Evt_1DQ2_nu()
+      : Pub(kPRD26), Pub_str(""), UseD2Corr(false), fD2CorrHist(nullptr) {
     ReadGlobalConfigDefaults();
   }
 
@@ -108,14 +111,21 @@ public:
             std::string("global.sample_configuration.") + Name(),
             fhicl::ParameterSet());
 
-    UseD2Corr = ps.get<bool>(
-        "use_D2_correction",
-        global_sample_configuration.get<bool>("use_D2_correction", false));
-
     SetData(GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/ANL_CCQE_Data_" +
             Pub_str + ".root;ANL_1DQ2_Data");
 
     SimpleDataComparison_1D::Initialize(ps);
+
+    UseD2Corr = ps.get<bool>(
+        "use_D2_correction",
+        global_sample_configuration.get<bool>("use_D2_correction", false));
+
+    if (UseD2Corr) {
+      fD2CorrHist = nuis::utility::GetHistogram<TH1D>(
+          GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/"
+                         "ANL_CCQE_Data_PRL31_844.root;ANL_1DQ2_Correction");
+      fPrediction_Uncorr = Clone(fPrediction, true);
+    }
 
     // Signal selection function
     IsSigFunc = [&](FullEvent const &fev) -> bool {
@@ -149,6 +159,30 @@ public:
     CompProjFunc = [](FullEvent const &fev) -> std::array<double, 1> {
       return {{GetNeutrinoQ2QERec(fev, 0)}};
     };
+  }
+
+  // Used to apply D2 correction if requested
+  virtual void FillProjection(std::array<double, 1> const &proj,
+                              double event_weight) {
+
+    if (UseD2Corr) {
+      nuis::utility::Fill(fPrediction_Uncorr.get(), proj, event_weight);
+      event_weight *= fD2CorrHist->Interpolate(proj[0]);
+    }
+    nuis::utility::Fill(fPrediction.get(), proj, event_weight);
+  }
+
+  void FinalizeComparison() {
+    SimpleDataComparison_1D::FinalizeComparison();
+    fPrediction_Uncorr->Scale(1.0, "width");
+  }
+
+  void Write() {
+    SimpleDataComparison_1D::Write();
+    if (UseD2Corr) {
+      nuis::persistency::WriteToOutputFile<TH1D>(
+          fPrediction_Uncorr.get(), "Prediction_Uncorr", write_directory);
+    }
   }
 
   std::string Name() { return "ANL_CCQE_Evt_1DQ2_nu"; }

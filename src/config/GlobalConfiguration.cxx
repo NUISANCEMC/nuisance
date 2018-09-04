@@ -36,5 +36,6 @@ bool EnsureConfigurationRead(std::string const &fhicl_file,
   doc.document.splice(fhicl::make_ParameterSet(fhicl_file));
   return true;
 }
+
 } // namespace config
 } // namespace nuis
