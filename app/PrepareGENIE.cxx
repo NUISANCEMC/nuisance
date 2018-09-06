@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 void RunGENIEPrepareMono(std::string input, std::string target,
                          std::string output) {
 
-  LOG(FIT) << "Running in mono energetic with E = " << MonoEnergy << std::endl;
+  LOG(FIT) << "Running in mono energetic with E = " << MonoEnergy << " GeV" << std::endl;
   // Setup TTree
   TChain* tn = new TChain("gtree");
   tn->AddFile(input.c_str());
@@ -47,7 +47,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   NtpMCEventRecord* genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
-  TH1D* fluxhist = new TH1D("flux", "flux", 1000, 0, 10);
+  // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
+  TH1D* fluxhist = new TH1D("flux", "flux", 1000, MonoEnergy/2., MonoEnergy*2.);
   fluxhist->Fill(MonoEnergy);
   fluxhist->Scale(1, "width");
 
@@ -226,11 +227,15 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       }
     }
   }
+  LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width") << std::endl;
 
   outputfile->cd();
-  totalxsec->Write("nuisance_Xsec", TObject::kOverwrite);
+  totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
   eventhist = (TH1D*)totalxsec->Clone();
   eventhist->Multiply(fluxhist);
+
+  LOG(FIT) << "Dividing by Total Nucl = " << totalnucl << std::endl;
+  eventhist->Scale(1.0 / double(totalnucl));
 
   eventhist->Write("nuisance_events", TObject::kOverwrite);
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
@@ -240,6 +245,9 @@ void RunGENIEPrepareMono(std::string input, std::string target,
            << std::endl;
   LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width")
             << std::endl;
+
+  outputfile->Write();
+  outputfile->Close();
 
   return;
 }
@@ -498,8 +506,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       }
     }
   }
-  LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width")
-           << std::endl;
+  LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width") << std::endl;
 
   outputfile->cd();
   totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
@@ -520,7 +527,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   outputfile->Write();
   outputfile->Close();
-  delete outputfile;
 
   return;
 };
