@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 void RunGENIEPrepareMono(std::string input, std::string target,
                          std::string output) {
 
-  std::cout << "Running in mono" << std::endl;
+  LOG(FIT) << "Running in mono energetic with E = " << MonoEnergy << std::endl;
   // Setup TTree
   TChain* tn = new TChain("gtree");
   tn->AddFile(input.c_str());
@@ -118,10 +118,24 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   }
   LOG(FIT) << "Processed all events" << std::endl;
 
-  TFile* outputfile = new TFile(input.c_str(), "UPDATE");
-  outputfile->cd();
+  TFile* outputfile;
 
-  LOG(FIT) << "Getting splines in mono" << std::endl;
+  if (!gOutputFile.length()) {
+    tn->GetEntry(0);
+    outputfile = tn->GetFile();
+    outputfile->cd();
+  } else {
+    outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
+    outputfile->cd();
+
+    QLOG(FIT, "Cloning input vector to output file: " << gOutputFile);
+    TTree* cloneTree = tn->CloneTree();
+    cloneTree->SetDirectory(outputfile);
+    cloneTree->Write();
+    QLOG(FIT, "Done.");
+  }
+
+  LOG(FIT) << "Getting splines in mono-energetic..." << std::endl;
 
   // Save each of the reconstructed splines to file
   std::map<std::string, TH1D*> modeavg;
@@ -224,7 +238,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   LOG(FIT) << "Inclusive XSec Per Nucleon = "
            << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width")
            << std::endl;
-  std::cout << "XSec Hist Integral = " << xsechist->Integral("width")
+  LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width")
             << std::endl;
 
   return;
@@ -233,7 +247,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
                      std::string output) {
   LOG(FIT) << "Running GENIE Prepare" << std::endl;
-  std::cout << "Running in prepare" << std::endl;
+  LOG(FIT) << "Running in prepare" << std::endl;
 
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
@@ -501,7 +515,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   LOG(FIT) << "Inclusive XSec Per Nucleon = "
            << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width")
            << std::endl;
-  std::cout << "XSec Hist Integral = " << xsechist->Integral("width")
+  LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width")
             << std::endl;
 
   outputfile->Write();
