@@ -53,6 +53,7 @@ public:
   float GetChi2();
 
   void AddEventVariablesToTree();
+  void AddSignalFlagsToTree();
 
  private:
 
@@ -92,7 +93,23 @@ public:
   float Weight;
   float InputWeight;
   float RWWeight;
-  float fScaleFactor;
+  double fScaleFactor;
+  // Generic signal flags
+  bool flagCCINC;
+  bool flagNCINC;
+  bool flagCCQE;
+  bool flagCC0pi;
+  bool flagCCQELike;
+  bool flagNCEL;
+  bool flagNC0pi;
+  bool flagCCcoh;
+  bool flagNCcoh;
+  bool flagCC1pip;
+  bool flagNC1pip;
+  bool flagCC1pim;
+  bool flagNC1pim;
+  bool flagCC1pi0;
+  bool flagNC1pi0;
 };
 
 #endif

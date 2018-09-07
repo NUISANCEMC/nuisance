@@ -32,7 +32,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
-  EnuMax = 100.;  // Arbritrarily high energy limit
+  EnuMax = 1E10;  // Arbritrarily high energy limit
 
   // Set default fitter flags
   fIsDiag = true;
@@ -72,6 +72,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
+  std::cout << EnuMin << " = " << EnuMax << std::endl;
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
            << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
@@ -79,7 +80,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    sleep(20);
+    throw;
   }
 
   // Setup our TTrees
@@ -200,7 +201,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding Samples" << std::endl;
+  LOG(SAM) << "Adding signal flags" << std::endl;
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
@@ -480,11 +481,9 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) /
       GetFluxHistogram()->Integral();
 
-  xsecScaling = fScaleFactor;
-
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    sleep(20);
+    throw;
   }
 
   // Fill the eventVariables Tree
