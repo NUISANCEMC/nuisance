@@ -17,6 +17,7 @@ std::string gOutputFile = "";
 std::string gFluxFile = "";
 std::string gTarget = "";
 double MonoEnergy;
+int gNEvents = -999;
 bool IsMonoE = false;
 
 void PrintOptions();
@@ -38,12 +39,16 @@ int main(int argc, char* argv[]) {
 void RunGENIEPrepareMono(std::string input, std::string target,
                          std::string output) {
 
-  LOG(FIT) << "Running in mono energetic with E = " << MonoEnergy << " GeV" << std::endl;
+  LOG(FIT) << "Running GENIE Prepare in mono energetic with E = " << MonoEnergy << " GeV" << std::endl;
   // Setup TTree
   TChain* tn = new TChain("gtree");
   tn->AddFile(input.c_str());
 
   int nevt = tn->GetEntries();
+  if (gNEvents != -999) {
+    LOG(FIT) << "Overriding number of events by user from " << nevt << " to " << gNEvents << std::endl;
+    nevt = gNEvents;
+  }
   NtpMCEventRecord* genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
@@ -100,6 +105,9 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
       modexsec[mode] = (TH1D*)xsechist->Clone();
       modecount[mode] = (TH1D*)xsechist->Clone();
+
+      modexsec[mode]->GetYaxis()->SetTitle("d#sigma/dE_{#nu} #times 10^{-38} (events weighted by #sigma)");
+      modecount[mode]->GetYaxis()->SetTitle("Number of events in file");
     }
 
     // Fill XSec Histograms
@@ -109,13 +117,13 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     // Fill total event hist
     eventhist->Fill(neu->E());
 
-    // Clear Event
-    genientpl->Clear();
-
     if (i % (nevt / 20) == 0) {
       LOG(FIT) << "Processed " << i << "/" << nevt << " GENIE events."
                << std::endl;
     }
+
+    // Clear Event
+    genientpl->Clear();
   }
   LOG(FIT) << "Processed all events" << std::endl;
 
@@ -142,8 +150,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   std::map<std::string, TH1D*> modeavg;
 
   TDirectory* inddir = (TDirectory*)outputfile->Get("IndividualGENIESplines");
-  if (!inddir)
-    inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
+  if (!inddir) inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
   inddir->cd();
 
   // Loop over GENIE ID's and get MEC count
@@ -164,6 +171,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
     // Form extra avg xsec map -> Reconstructed spline
     modeavg[mode] = (TH1D*)modexsec[mode]->Clone();
+    modeavg[mode]->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
     modeavg[mode]->Divide(modecount[mode]);
 
     if (MECcorrect && (mode.find("MEC") != std::string::npos)) {
@@ -178,34 +186,34 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   targdir->cd();
 
   LOG(FIT) << "Getting Target Splines" << std::endl;
+
   // For each target save a total spline
   std::map<std::string, TH1D*> targetsplines;
 
   for (uint i = 0; i < targetids.size(); i++) {
-    LOG(FIT) << "Getting target " << i << std::endl;
     std::string targ = targetids[i];
+    LOG(FIT) << "Getting target " << i << ": " << targ << std::endl;
     targetsplines[targ] = (TH1D*)xsechist->Clone();
+    targetsplines[targ]->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
     LOG(FIT) << "Created target spline for " << targ << std::endl;
 
     for (uint j = 0; j < genieids.size(); j++) {
       std::string mode = genieids[j];
 
       if (mode.find(targ) != std::string::npos) {
-        LOG(FIT) << "Mode " << mode << " contains " << targ << " target!"
-                 << std::endl;
+        LOG(FIT) << "    Mode " << mode << " contains " << targ << " target" << std::endl;
         targetsplines[targ]->Add(modeavg[mode]);
-        LOG(FIT) << "Finished with Mode " << mode << " "
-                 << modeavg[mode]->Integral() << std::endl;
       }
     }
 
     LOG(FIT) << "Saving target spline:" << targ << std::endl;
-    targetsplines[targ]->Write(("Total" + targ).c_str(), TObject::kOverwrite);
+    targetsplines[targ]->Write(("Total_" + targ).c_str(), TObject::kOverwrite);
   }
 
   LOG(FIT) << "Getting total splines" << std::endl;
   // Now we have each of the targets we need to create a total cross-section.
   int totalnucl = 0;
+  // Get the targets specified by the user, separated by commas
   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target, ",");
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
@@ -218,18 +226,24 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       TH1D* xsec = iter->second;
 
       if (targstr.find(targpdg) != std::string::npos) {
-        LOG(FIT) << "Adding target spline " << targstr
-                 << " Integral = " << xsec->Integral("width") << std::endl;
+        LOG(FIT) << "Adding target spline " << targstr << " Integral = " << xsec->Integral("width") << std::endl;
         totalxsec->Add(xsec);
 
         int nucl = atoi(targpdg.c_str());
         totalnucl += int((nucl % 10000) / 10);
+      } else {
+        ERR(WRN) << "Didn't find " << targpdg << " in the list of targets recorded by GENIE" << std::endl;
+        ERR(WRN) << "  The full list inputted is: " << std::endl;
+        for (uint i = 0; i < targprs.size(); ++i) ERR(WRN) << "    " << targprs[i] << std::endl;
+        ERR(WRN) << "  The full list of found targets is: " << std::endl;
+        for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin(); iter != targetsplines.end(); iter++) ERR(WRN) << "    " << iter->first<< std::endl;
       }
     }
   }
   LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width") << std::endl;
 
   outputfile->cd();
+  totalxsec->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
   totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
   eventhist = (TH1D*)totalxsec->Clone();
   eventhist->Multiply(fluxhist);
@@ -246,7 +260,6 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width")
             << std::endl;
 
-  outputfile->Write();
   outputfile->Close();
 
   return;
@@ -254,8 +267,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
                      std::string output) {
-  LOG(FIT) << "Running GENIE Prepare" << std::endl;
-  LOG(FIT) << "Running in prepare" << std::endl;
+  LOG(FIT) << "Running GENIE Prepare with flux..." << std::endl;
 
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
@@ -282,7 +294,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
-      fluxhist = dynamic_cast<TH1D*>(fluxfile->Get(fluxvect[1].c_str()));
+      fluxhist = (TH1D*)(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
         ERR(FTL) << "Couldn't find histogram named: \"" << fluxvect[1]
                  << "\" in file: \"" << fluxvect[0] << std::endl;
@@ -314,6 +326,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   }
 
   int nevt = tn->GetEntries();
+  if (gNEvents != -999) {
+    LOG(FIT) << "Overriding number of events by user from " << nevt << " to " << gNEvents << std::endl;
+    nevt = gNEvents;
+  }
 
   if (!nevt) {
     THROW("Couldn't load any events from input specification: \""
@@ -325,10 +341,9 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   NtpMCEventRecord* genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
-  // Make Event Hist
+  // Make Event and xsec Hist
   TH1D* eventhist = (TH1D*)fluxhist->Clone();
   eventhist->Reset();
-
   TH1D* xsechist = (TH1D*)eventhist->Clone();
 
   // Create maps
@@ -342,12 +357,16 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   for (int i = 0; i < nevt; i++) {
     tn->GetEntry(i);
 
+    // Hussssch GENIE
     StopTalking();
+    // Get the event
     EventRecord& event = *(genientpl->event);
+    // Get the neutrino
     GHepParticle* neu = event.Probe();
     StartTalking();
 
     // Get XSec From Spline
+    // Get the GHepRecord
     GHepRecord genie_record = static_cast<GHepRecord>(event);
     double xsec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
 
@@ -357,12 +376,17 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     std::string targ = (modevec[0] + ";" + modevec[1]);
     std::string inter = mode;
 
-    // Fill lists of Unique IDS
-    if (std::find(targetids.begin(), targetids.end(), targ) ==
-        targetids.end()) {
+    // Get target nucleus
+    // Alternative ways of getting the summaries
+    //GHepParticle *target = genie_record.TargetNucleus();
+    //int pdg = target->Pdg();
+
+    // Fill lists of Unique IDS (neutrino and target)
+    if (std::find(targetids.begin(), targetids.end(), targ) == targetids.end()) {
       targetids.push_back(targ);
     }
 
+    // The full interaction list
     if (std::find(interids.begin(), interids.end(), inter) == interids.end()) {
       interids.push_back(inter);
     }
@@ -373,6 +397,9 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
       modexsec[mode] = (TH1D*)xsechist->Clone();
       modecount[mode] = (TH1D*)xsechist->Clone();
+
+      modexsec[mode]->GetYaxis()->SetTitle("d#sigma/dE_{#nu} #times 10^{-38} (events weighted by #sigma)");
+      modecount[mode]->GetYaxis()->SetTitle("Number of events in file");
     }
 
     // Fill XSec Histograms
@@ -412,14 +439,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     QLOG(FIT, "Done.");
   }
 
-  LOG(FIT) << "Getting splines " << std::endl;
+  LOG(FIT) << "Getting splines..." << std::endl;
 
   // Save each of the reconstructed splines to file
   std::map<std::string, TH1D*> modeavg;
 
   TDirectory* inddir = (TDirectory*)outputfile->Get("IndividualGENIESplines");
-  if (!inddir)
-    inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
+  if (!inddir) inddir = (TDirectory*)outputfile->mkdir("IndividualGENIESplines");
   inddir->cd();
 
   // Loop over GENIE ID's and get MEC count
@@ -440,6 +466,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
     // Form extra avg xsec map -> Reconstructed spline
     modeavg[mode] = (TH1D*)modexsec[mode]->Clone();
+    modeavg[mode]->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
     modeavg[mode]->Divide(modecount[mode]);
 
     if (MECcorrect && (mode.find("MEC") != std::string::npos)) {
@@ -454,13 +481,15 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   targdir->cd();
 
   LOG(FIT) << "Getting Target Splines" << std::endl;
+
   // For each target save a total spline
   std::map<std::string, TH1D*> targetsplines;
 
   for (uint i = 0; i < targetids.size(); i++) {
-    LOG(FIT) << "Getting target " << i << std::endl;
     std::string targ = targetids[i];
+    LOG(FIT) << "Getting target " << i << ": " << targ << std::endl;
     targetsplines[targ] = (TH1D*)xsechist->Clone();
+    targetsplines[targ]->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon)");
     LOG(FIT) << "Created target spline for " << targ << std::endl;
 
     for (uint j = 0; j < genieids.size(); j++) {
@@ -468,18 +497,12 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
       // Look at all matching modes/targets
       if (mode.find(targ) != std::string::npos) {
-        LOG(FIT) << "Mode " << mode << " contains " << targ << " target!"
-                 << std::endl;
-        //        modeavg[mode]->Write( (mode + "_cont_" + targ).c_str() ,
-        //        TObject::kOverwrite);
+        LOG(FIT) << "    Mode " << mode << " contains " << targ << " target" << std::endl;
         targetsplines[targ]->Add(modeavg[mode]);
-        LOG(FIT) << "Finished with Mode " << mode << " "
-                 << modeavg[mode]->Integral() << std::endl;
       }
     }
-
-    LOG(FIT) << "Saving target spline:" << targ << std::endl;
-    targetsplines[targ]->Write(("Total" + targ).c_str(), TObject::kOverwrite);
+    LOG(FIT) << "Saving target spline: " << targ << std::endl;
+    targetsplines[targ]->Write(("Total_" + targ).c_str(), TObject::kOverwrite);
   }
 
   LOG(FIT) << "Getting total splines" << std::endl;
@@ -488,27 +511,34 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target, ",");
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
+  // Loop over the specified targets by the user
   for (uint i = 0; i < targprs.size(); i++) {
     std::string targpdg = targprs[i];
 
-    for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin();
-         iter != targetsplines.end(); iter++) {
+    for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin(); iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D* xsec = iter->second;
 
+      // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
-        LOG(FIT) << "Adding target spline " << targstr
-                 << " Integral = " << xsec->Integral("width") << std::endl;
+        LOG(FIT) << "Adding target spline " << targstr << " Integral = " << xsec->Integral("width") << std::endl;
         totalxsec->Add(xsec);
 
         int nucl = atoi(targpdg.c_str());
         totalnucl += int((nucl % 10000) / 10);
+      } else {
+        ERR(WRN) << "Didn't find " << targpdg << " in the list of targets recorded by GENIE" << std::endl;
+        ERR(WRN) << "  The full list inputted is: " << std::endl;
+        for (uint i = 0; i < targprs.size(); ++i) ERR(WRN) << "    " << targprs[i] << std::endl;
+        ERR(WRN) << "  The full list of found targets is: " << std::endl;
+        for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin(); iter != targetsplines.end(); iter++) ERR(WRN) << "    " << iter->first<< std::endl;
       }
     }
   }
   LOG(FIT) << "Total XSec Integral = " << totalxsec->Integral("width") << std::endl;
 
   outputfile->cd();
+  totalxsec->GetYaxis()->SetTitle("#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/nucleon) ");
   totalxsec->Write("nuisance_xsec", TObject::kOverwrite);
   eventhist = (TH1D*)fluxhist->Clone();
   eventhist->Multiply(totalxsec);
@@ -519,27 +549,25 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   eventhist->Write("nuisance_events", TObject::kOverwrite);
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
 
-  LOG(FIT) << "Inclusive XSec Per Nucleon = "
-           << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width")
-           << std::endl;
-  LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width")
-            << std::endl;
+  LOG(FIT) << "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") * 1E-38 / fluxhist->Integral("width") << std::endl;
+  LOG(FIT) << "XSec Hist Integral = " << xsechist->Integral("width") << std::endl; 
 
-  outputfile->Write();
   outputfile->Close();
 
   return;
 };
 
 void PrintOptions() {
+
   std::cout << "PrepareGENIEEvents NUISANCE app. " << std::endl
             << "Takes GHep Outputs and prepares events for NUISANCE."
             << std::endl
             << std::endl
-            << "PrepareGENIEEvents  [-h,-help,--h,--help] [-i "
+            << "PrepareGENIE [-h,-help,--h,--help] [-i "
                "inputfile1.root,inputfile2.root,inputfile3.root,...] "
             << "[-f flux_root_file.root,flux_hist_name] [-t "
                "target1[frac1],target2[frac2],...]"
+            << "[-n number_of_events (experimental)]"
             << std::endl
             << std::endl;
 
@@ -567,7 +595,9 @@ void PrintOptions() {
             << std::endl;
   std::cout << " [ -o outputfile.root ] : File to write prepared input file to."
             << std::endl;
-  std::cout << " [ -m Mono_E_nu_GeV ] : Run in mono-energetic mode."
+  std::cout << " [ -m Mono_E_nu_GeV ] : Run in mono-energetic mode with m GeV neutrino energy."
+            << std::endl;
+  std::cout << " [ -n number_of_evt ] : Run with a reduced number of events for debugging purposes"
             << std::endl;
 }
 
@@ -596,6 +626,9 @@ void ParseOptions(int argc, char* argv[]) {
         ++i;
       } else if (!std::strcmp(argv[i], "-t")) {
         gTarget = argv[i + 1];
+        ++i;
+      } else if (!std::strcmp(argv[i], "-n")) {
+        gNEvents = GeneralUtils::StrToInt(argv[i + 1]);
         ++i;
       } else if (!std::strcmp(argv[i], "-m")) {
         MonoEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
