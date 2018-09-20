@@ -31,6 +31,11 @@ public:
   //! Grab info from event
   void FillEventVariables(FitEvent *event);
 
+  //! Fill signal flags
+  void FillSignalFlags(FitEvent *event);
+
+  void ResetVariables();
+
   //! Fill Custom Histograms
   void FillHistograms();
 
@@ -94,6 +99,11 @@ public:
   float InputWeight;
   float RWWeight;
   double fScaleFactor;
+
+  // Custom weights
+  float CustomWeight;
+  float CustomWeightArray[6];
+
   // Generic signal flags
   bool flagCCINC;
   bool flagNCINC;
