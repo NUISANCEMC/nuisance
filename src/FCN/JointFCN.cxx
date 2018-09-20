@@ -818,10 +818,11 @@ void JointFCN::ReconfigureFastUsingManager() {
       if (fSignalEventFlags[sigcount]) {
         // Get Event Info
         if (!fIsAllSplines) {
-          if (fFillNuisanceEvent)
+          if (fFillNuisanceEvent) {
             curevent = curinput->GetNuisanceEvent(i);
-          else
+          } else {
             curevent = curinput->GetBaseEvent(i);
+          }
         } else {
           curevent->fSplineCoeff = &fSignalEventSplines[splinecount][0];
         }
@@ -829,6 +830,8 @@ void JointFCN::ReconfigureFastUsingManager() {
         curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
         curevent->Weight = curevent->RWWeight * curevent->InputWeight;
         rwweight = curevent->Weight;
+        // Custom weights
+        rwweight *= curevent->CustomWeight;
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
