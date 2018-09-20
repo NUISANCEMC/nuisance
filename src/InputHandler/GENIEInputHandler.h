@@ -102,6 +102,15 @@ public:
 	TChain* fGENIETree;             ///< Main GENIE Event TTree
 	bool fSaveExtra;    ///< Flag to save Extra GENIE info into Nuisance Event
 	GENIEGeneratorInfo* fGenieInfo; ///< Extra GENIE Generator Info Writer
+
+        // Extra weights from Jeremgy
+        double MAQEw;
+        double NonResw;
+        double RPAQEw;
+        double RPARESw;
+        double MECw;
+        double DISw;
+        double NOVAw;
 };
 /*! @} */
 #endif
