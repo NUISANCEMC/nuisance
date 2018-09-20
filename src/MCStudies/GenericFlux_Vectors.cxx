@@ -120,26 +120,21 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/F");
   eventVariables->Branch("fScaleFactor", &fScaleFactor, "fScaleFactor/D");
 
+  // The customs
+  eventVariables->Branch("CustomWeight", &CustomWeight, "CustomWeight/F");
+  eventVariables->Branch("CustomWeightArray", CustomWeightArray, "CustomWeightArray[6]/F");
+
   return;
 }
 
 
 void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
-  // Reset all Function used to extract any variables of interest to the event
-  Mode = PDGnu = tgt = PDGLep = 0;
+  ResetVariables();
 
-  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = -999.9;
-
-  nfsp = 0;
-  for (int i = 0; i < kMAX; ++i){
-    px[i] = py[i] = pz[i] = E[i] = -999;
-    pdg[i] = 0;
-  }
-
-  Weight = InputWeight = RWWeight = 0;
-
-  partList.clear();
+  // Fill Signal Variables
+  FillSignalFlags(event);
+  LOG(DEB) << "Filling signal" << std::endl;
 
   // Now fill the information
   Mode = event->Mode;
@@ -168,7 +163,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
     // Get W_true with assumption of initial state nucleon at rest
     float m_n = (float)PhysConst::mass_proton;
+    // Q2 assuming nucleon at rest
     W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
+    // True Q2
     W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
     x = Q2/(2 * m_n * q0);
     y = 1 - ELep/Enu_true;
@@ -198,11 +195,69 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   Weight = event->RWWeight * event->InputWeight;
   RWWeight = event->RWWeight;
   InputWeight = event->InputWeight;
+  // And the Customs
+  CustomWeight = event->CustomWeight;
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = event->CustomWeightArray[i];
+  }
 
   // Fill the eventVariables Tree
   eventVariables->Fill();
   return;
 };
+
+//********************************************************************
+void GenericFlux_Vectors::ResetVariables() {
+//********************************************************************
+
+  cc = false;
+
+  // Reset all Function used to extract any variables of interest to the event
+  Mode = PDGnu = tgt = PDGLep = 0;
+
+  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = -999.9;
+
+  nfsp = 0;
+  for (int i = 0; i < kMAX; ++i){
+    px[i] = py[i] = pz[i] = E[i] = -999;
+    pdg[i] = 0;
+  }
+
+  Weight = InputWeight = RWWeight = 0.0;
+
+  CustomWeight = 0.0;
+  for (int i = 0; i < 6; ++i) CustomWeightArray[i] = 0.0;
+
+  partList.clear();
+
+  flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL = flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim = flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
+}
+
+//********************************************************************
+void GenericFlux_Vectors::FillSignalFlags(FitEvent *event) {
+  //********************************************************************
+
+  // Some example flags are given from SignalDef.
+  // See src/Utils/SignalDef.cxx for more.
+  int nuPDG = event->PartInfo(0)->fPID;
+
+  // Generic signal flags
+  flagCCINC = SignalDef::isCCINC(event, nuPDG);
+  flagNCINC = SignalDef::isNCINC(event, nuPDG);
+  flagCCQE = SignalDef::isCCQE(event, nuPDG);
+  flagCCQELike = SignalDef::isCCQELike(event, nuPDG);
+  flagCC0pi = SignalDef::isCC0pi(event, nuPDG);
+  flagNCEL = SignalDef::isNCEL(event, nuPDG);
+  flagNC0pi = SignalDef::isNC0pi(event, nuPDG);
+  flagCCcoh = SignalDef::isCCCOH(event, nuPDG, 211);
+  flagNCcoh = SignalDef::isNCCOH(event, nuPDG, 111);
+  flagCC1pip = SignalDef::isCC1pi(event, nuPDG, 211);
+  flagNC1pip = SignalDef::isNC1pi(event, nuPDG, 211);
+  flagCC1pim = SignalDef::isCC1pi(event, nuPDG, -211);
+  flagNC1pim = SignalDef::isNC1pi(event, nuPDG, -211);
+  flagCC1pi0 = SignalDef::isCC1pi(event, nuPDG, 111);
+  flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
+}
 
 void GenericFlux_Vectors::AddSignalFlagsToTree() {
   if (!eventVariables) {
