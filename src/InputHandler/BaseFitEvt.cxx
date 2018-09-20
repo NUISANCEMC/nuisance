@@ -31,6 +31,9 @@ BaseFitEvt::BaseFitEvt() {
   RWWeight = 1.0;
   CustomWeight = 1.0;
   SavedRWWeight = 1.0;
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = 1.0;
+  }
 
   fSplineCoeff = NULL;
   fSplineRead = NULL;
@@ -94,8 +97,11 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
   Weight = obj->Weight;
   InputWeight = obj->InputWeight;
   RWWeight = obj->RWWeight;
-  CustomWeight = obj->CustomWeight;
   SavedRWWeight = obj->SavedRWWeight;
+  CustomWeight = obj->CustomWeight;
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = obj->CustomWeightArray[i];
+  }
 
   fSplineCoeff = obj->fSplineCoeff;
   fSplineRead = obj->fSplineRead;
@@ -134,6 +140,10 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
   RWWeight = other.RWWeight;
   CustomWeight = other.CustomWeight;
   SavedRWWeight = other.SavedRWWeight;
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = other.CustomWeightArray[i];
+  }
+
 
   fSplineCoeff = other.fSplineCoeff;
   fSplineRead = other.fSplineRead;
@@ -177,6 +187,9 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
   CustomWeight = other.CustomWeight;
   SavedRWWeight = other.SavedRWWeight;
 
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = other.CustomWeightArray[i];
+  }
   fSplineCoeff = other.fSplineCoeff;
   fSplineRead = other.fSplineRead;
 
@@ -209,7 +222,14 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
   return *this;
 }
 
-void BaseFitEvt::ResetWeight() { InputWeight = 1.0; }
+void BaseFitEvt::ResetWeight() { 
+  InputWeight = 1.0; 
+#ifdef __GENIE_ENABLED__
+  for (int i = 0; i < 6; ++i) {
+    CustomWeightArray[i] = 1.0;
+  }
+#endif
+}
 
 double BaseFitEvt::GetWeight() {
   return InputWeight * RWWeight * CustomWeight;

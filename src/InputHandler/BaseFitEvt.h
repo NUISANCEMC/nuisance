@@ -86,6 +86,8 @@ class BaseFitEvt {
   double CustomWeight;  ///< Extra custom weight that samples can set
   double SavedRWWeight; ///< Saved RW value for FitEvents
 
+  double CustomWeightArray[6]; ///< For custom tuning using arrays, e.g. NOvA MINERvA WS
+
   // Spline Info Coefficients and Readers
   float* fSplineCoeff; ///< ND Array of Spline Coefficients
   SplineReader* fSplineRead; ///< Spline Interpretter
