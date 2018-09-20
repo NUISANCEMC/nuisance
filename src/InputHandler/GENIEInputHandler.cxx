@@ -84,13 +84,24 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
+
+  // Are we running with NOvA weights
+  bool nova_wgt = true;
+  MAQEw = 1.0;
+  NonResw = 1.0;
+  RPAQEw = 1.0;
+  RPARESw = 1.0;
+  MECw = 1.0;
+  DISw = 1.0;
+  NOVAw = 1.0;
+
   // Loop over all inputs and grab flux, eventhist, and nevents
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
-    // Open File for histogram access
-    TFile* inp_file = new TFile(
-        InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
-    if (!inp_file or inp_file->IsZombie()) {
+  // Open File for histogram access
+  TFile* inp_file = new TFile(
+      InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
+  if (!inp_file or inp_file->IsZombie()) {
       THROW("GENIE File IsZombie() at : '"
             << inputs[inp_it] << "'" << std::endl
             << "Check that your file paths are correct and the file exists!"
@@ -118,10 +129,21 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
       THROW("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
+    
     int nevents = genietree->GetEntries();
     if (nevents <= 0) {
       THROW("Trying to a TTree with "
             << nevents << " to TChain from : " << inputs[inp_it]);
+    }
+
+    // Check for precomputed weights
+    TTree *weighttree = (TTree*)inp_file->Get("nova_wgts");
+    if (!weighttree) {
+      LOG(FIT) << "Did not find nova_wgts tree in file " << inputs[inp_it] << std::endl;
+      nova_wgt = false;
+    } else {
+      LOG(FIT) << "Found nova_wgts tree in file " << inputs[inp_it] << std::endl;
+      nova_wgt = true;
     }
 
     // Register input to form flux/event rate hists
@@ -129,6 +151,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
 
     // Add To TChain
     fGENIETree->AddFile(inputs[inp_it].c_str());
+    if (weighttree != NULL) fGENIETree->AddFriend(weighttree);
   }
 
   // Registor all our file inputs
@@ -138,6 +161,17 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   fEventType = kGENIE;
   fGenieNtpl = NULL;
   fGENIETree->SetBranchAddress("gmcrec", &fGenieNtpl);
+
+  // Set up the custom weights
+  if (nova_wgt) {
+    fGENIETree->SetBranchAddress("MAQEwgt", &MAQEw);
+    fGENIETree->SetBranchAddress("nonResNormWgt", &NonResw);
+    fGENIETree->SetBranchAddress("RPAQEWgt", &RPAQEw);
+    fGENIETree->SetBranchAddress("RPARESWgt", &RPARESw);
+    fGENIETree->SetBranchAddress("MECWgt", &MECw);
+    fGENIETree->SetBranchAddress("DISWgt", &DISw);
+    fGENIETree->SetBranchAddress("nova2018CVWgt", &NOVAw);
+  }
 
   // Libraries should be seen but not heard...
   StopTalking();
@@ -177,8 +211,7 @@ void GENIEInputHandler::RemoveCache() {
   fGENIETree->SetCacheSize(0);
 }
 
-FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
-                                              const bool lightweight) {
+FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry, const bool lightweight) {
   if (entry >= (UInt_t)fNEvents) return NULL;
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
@@ -223,26 +256,25 @@ FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
   return fNUISANCEEvent;
 }
 
-int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p,
-                                              int mode) {
+int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle* p, int mode) {
   /*
-    kIStUndefined                  = -1,
-    kIStInitialState               =  0,   / generator-level initial state /
-    kIStStableFinalState           =  1,   / generator-level final state:
-    particles to be tracked by detector-level MC /
-    kIStIntermediateState          =  2,
-    kIStDecayedState               =  3,
-    kIStCorrelatedNucleon          = 10,
-    kIStNucleonTarget              = 11,
-    kIStDISPreFragmHadronicState   = 12,
-    kIStPreDecayResonantState      = 13,
-    kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus: marked
-    for hadron transport modules to act on /
-    kIStFinalStateNuclearRemnant   = 15,   / low energy nuclear fragments
-    entering the record collectively as a 'hadronic blob' pseudo-particle /
-    kIStNucleonClusterTarget       = 16,   // for composite nucleons before
-    phase space decay
-  */
+     kIStUndefined                  = -1,
+     kIStInitialState               =  0,   / generator-level initial state /
+     kIStStableFinalState           =  1,   / generator-level final state:
+     particles to be tracked by detector-level MC /
+     kIStIntermediateState          =  2,
+     kIStDecayedState               =  3,
+     kIStCorrelatedNucleon          = 10,
+     kIStNucleonTarget              = 11,
+     kIStDISPreFragmHadronicState   = 12,
+     kIStPreDecayResonantState      = 13,
+     kIStHadronInTheNucleus         = 14,   / hadrons inside the nucleus: marked
+     for hadron transport modules to act on /
+     kIStFinalStateNuclearRemnant   = 15,   / low energy nuclear fragments
+     entering the record collectively as a 'hadronic blob' pseudo-particle /
+     kIStNucleonClusterTarget       = 16,   // for composite nucleons before
+     phase space decay
+     */
 
   int state = kUndefinedState;
   switch (p->Status()) {
@@ -304,19 +336,19 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord* gheprec) {
         return 26;
       else {
         ERROR(WRN,
-              "Unknown GENIE Electron Scattering Mode!"
-                  << std::endl
-                  << "ScatteringTypeId = "
-                  << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
-                  << "InteractionTypeId = "
-                  << gheprec->Summary()->ProcInfo().InteractionTypeId()
-                  << std::endl
-                  << genie::ScatteringType::AsString(
-                         gheprec->Summary()->ProcInfo().ScatteringTypeId())
-                  << " "
-                  << genie::InteractionType::AsString(
-                         gheprec->Summary()->ProcInfo().InteractionTypeId())
-                  << " " << gheprec->Summary()->ProcInfo().IsMEC());
+            "Unknown GENIE Electron Scattering Mode!"
+            << std::endl
+            << "ScatteringTypeId = "
+            << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
+            << "InteractionTypeId = "
+            << gheprec->Summary()->ProcInfo().InteractionTypeId()
+            << std::endl
+            << genie::ScatteringType::AsString(
+              gheprec->Summary()->ProcInfo().ScatteringTypeId())
+            << " "
+            << genie::InteractionType::AsString(
+              gheprec->Summary()->ProcInfo().InteractionTypeId())
+            << " " << gheprec->Summary()->ProcInfo().IsMEC());
         return 0;
       }
     }
@@ -375,8 +407,17 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fTargetZ = 0.0;
   fNUISANCEEvent->fTargetH = 0;
   fNUISANCEEvent->fBound = 0.0;
-  fNUISANCEEvent->InputWeight =
-      1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
+  fNUISANCEEvent->InputWeight = 1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
+
+
+  // And the custom weights
+  fNUISANCEEvent->CustomWeight = NOVAw;
+  fNUISANCEEvent->CustomWeightArray[0] = MAQEw;
+  fNUISANCEEvent->CustomWeightArray[1] = NonResw;
+  fNUISANCEEvent->CustomWeightArray[2] = RPAQEw;
+  fNUISANCEEvent->CustomWeightArray[3] = RPARESw;
+  fNUISANCEEvent->CustomWeightArray[4] = MECw;
+  fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
 
   // Get N Particle Stack
   unsigned int npart = fGenieGHep->GetEntries();
@@ -428,7 +469,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
     if ((UInt_t)fNUISANCEEvent->fNParticles == kmax) {
       ERR(WRN) << "Number of GENIE Particles exceeds maximum!" << std::endl;
       ERR(WRN) << "Extend kMax, or run without including FSI particles!"
-               << std::endl;
+        << std::endl;
       break;
     }
   }
@@ -440,7 +481,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->OrderStack();
 
   FitParticle* ISNeutralLepton =
-      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
+    fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
   if (ISNeutralLepton) {
     fNUISANCEEvent->probe_E = ISNeutralLepton->E();
     fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
