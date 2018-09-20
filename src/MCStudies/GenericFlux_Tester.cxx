@@ -71,17 +71,16 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   this->fScaleFactor =
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
+  if (fScaleFactor <= 0.0) {
+    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
+    throw;
+  }
 
   std::cout << EnuMin << " = " << EnuMax << std::endl;
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
            << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
            << std::endl;
-
-  if (fScaleFactor <= 0.0) {
-    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    throw;
-  }
 
   // Setup our TTrees
   this->AddEventVariablesToTree();
@@ -481,10 +480,6 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) /
       GetFluxHistogram()->Integral();
 
-  if (fScaleFactor <= 0.0) {
-    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    throw;
-  }
 
   // Fill the eventVariables Tree
   eventVariables->Fill();
