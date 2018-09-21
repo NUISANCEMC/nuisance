@@ -59,10 +59,10 @@ T2K_CC0pinp_ifk_XSec_3Dinfip_nu::T2K_CC0pinp_ifk_XSec_3Dinfip_nu(nuiskey samplek
   fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) / (TotalIntegratedFlux()));
   //fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 10 / (TotalIntegratedFlux()));
 
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/infkResults_origBin.root;result_tp" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root;result_tp" );
   SetDataFromRootFile( fSettings.GetDataInput() );
 
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/infkResults_origBin.root;cor_tp" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root;cor_tp" );
   SetCorrelationFromRootFile(fSettings.GetCovarInput() );
   //SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/infkResults_origBin.root", "cov_tp" );              
 
@@ -172,8 +172,8 @@ void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::FillMCSlice(double x, double y, double z, 
 void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::SetHistograms(){
 
   // Read in 1D Data Histograms
-  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/infkResults_origBin.root").c_str(),"READ");
-  fInputFile->ls();
+  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root").c_str(),"READ");
+  //fInputFile->ls();
   
   // Read in 1D Data
   fDataHist = (TH1D*) fInputFile->Get("result_tp");
@@ -183,7 +183,7 @@ void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::SetHistograms(){
   // Read in 2D Data Slices and Make MC Slices
   for (int i = 0; i < 7; i++){ //both y and z slices  
     // Get Data Histogram
-    fInputFile->ls();
+    //fInputFile->ls();
     fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("resultBin%i_tp",i))->Clone());
     fDataHist_Slices[i]->SetNameTitle(Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data_Slice%i",i), (Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data_Slice%i",i)));
     // Make MC Clones
