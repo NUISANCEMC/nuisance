@@ -30,9 +30,9 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(nuiskey samplekey) 
   std::string descrip = "T2K_CC0pinp_STV_XSec_1Ddat_nu sample. \n" \
                         "Target: CH \n" \
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n" \
-                        "Signal: CC0piNp (N>=1) with 450M eV < p_p < 1 GeV \n";
-                        "                            p_mu > 250 MeV \n";
-                        "                            cth_p >  0.6 \n";
+                        "Signal: CC0piNp (N>=1) with 450M eV < p_p < 1 GeV \n" \
+                        "                            p_mu > 250 MeV \n" \
+                        "                            cth_p >  0.6 \n" \
                         "                            cth_mu > -0.4 \n";
 
   // Setup common settings
@@ -48,8 +48,8 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(nuiskey samplekey) 
   fSettings.SetTitle("T2K_CC0pinp_STV_XSec_1Ddat_nu");
  // fSettings.SetDataInput(  GeneralUtils::GetTopLevelDir() + "/data/T2K/T2K_CC0pinp_STV_XSec_1Ddat_nu.dat");
 
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/datResults.root;Result" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/datResults.root;Correlation_Matrix" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/STV/datResults.root;Result" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/STV/datResults.root;Correlation_Matrix" );
 
   fSettings.DefineAllowedSpecies("numu");
 

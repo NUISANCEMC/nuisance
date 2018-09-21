@@ -155,7 +155,7 @@ void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::SetHistograms(){
 
   // Read in 1D Data Histograms
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root").c_str(),"READ");
-  fInputFile->ls();
+  //fInputFile->ls();
   
   // Read in 1D Data
   fDataHist = (TH1D*) fInputFile->Get("datahist");
@@ -185,7 +185,7 @@ void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::SetHistograms(){
   for (int i = 0; i < 9; i++){
   
     // Get Data Histogram
-    fInputFile->ls();
+    //fInputFile->ls();
     fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
     fDataHist_Slices[i]->SetNameTitle(Form("T2K_CC0pi_XSec_2DPcos_nu_nonuniform_data_Slice%i",i),
 				      (Form("T2K_CC0pi_XSec_2DPcos_nu_nonuniform_data_Slice%i",i)));
@@ -194,7 +194,7 @@ void T2K_CC0pi_XSec_2DPcos_nu_nonuniform::SetHistograms(){
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fDataHist_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount)) * 1E-38);
 
-      std::cout << "Setting data hist " <<  fDataHist_Slices[i]->GetBinContent(j+1) << " " << fDataHist_Slices[i]->GetBinError(j+1) << std::endl;
+      //std::cout << "Setting data hist " <<  fDataHist_Slices[i]->GetBinContent(j+1) << " " << fDataHist_Slices[i]->GetBinError(j+1) << std::endl;
       fDataHist->SetBinContent(bincount+1, fDataHist_Slices[i]->GetBinContent(j+1) );
       fDataHist->SetBinError(bincount+1, fDataHist_Slices[i]->GetBinError(j+1) );
 

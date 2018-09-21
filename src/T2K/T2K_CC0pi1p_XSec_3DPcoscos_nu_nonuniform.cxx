@@ -80,7 +80,7 @@ void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::FillEventVariables(FitEvent* even
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector Pp  = event->GetHMFSParticle(2212)->fP;
 
-  double pmu = Pmu.Vect().Mag()/1000.;
+  //double pmu = Pmu.Vect().Mag()/1000.;
   double pp = Pp.Vect().Mag()/1000.;
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
   double CosThetaP = cos(Pnu.Vect().Angle(Pp.Vect()));
@@ -148,8 +148,8 @@ void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::FillMCSlice(double x, double y, d
 void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::SetHistograms(){
 
   // Read in 1D Data Histograms
-  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/multidif_3D_pcoscos.root").c_str(),"READ");
-  fInputFile->ls();
+  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/STV/multidif_3D_pcoscos.root").c_str(),"READ");
+  //fInputFile->ls();
   
   // Read in 1D Data
   fDataHist = (TH1D*) fInputFile->Get("LinResult");
@@ -165,8 +165,9 @@ void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::SetHistograms(){
       //(*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1);
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1,j+1)*fDataHist->GetBinContent(i+1)*fDataHist->GetBinContent(j+1);
       if(i==j) fDataHist->SetBinError(i+1,sqrt((*fFullCovar)(i,j)));
-      if(i==j) std::cout << "For bin " << i+1 << ", relative covariance was " << tempcov->GetBinContent(i+1,j+1);
-      if(i==j) std::cout << ". Absolute covariance is now " << (*fFullCovar)(i,j) << ", linear xsec is: " << fDataHist->GetBinContent(i+1) << std::endl;    }
+      //if(i==j) std::cout << "For bin " << i+1 << ", relative covariance was " << tempcov->GetBinContent(i+1,j+1);
+      //if(i==j) std::cout << ". Absolute covariance is now " << (*fFullCovar)(i,j) << ", linear xsec is: " << fDataHist->GetBinContent(i+1) << std::endl;
+    }
   }
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -174,22 +175,22 @@ void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::SetHistograms(){
   TH1D* linearResult = new TH1D(*fDataHist);
   linearResult->SetNameTitle("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_data" ,"T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_data");
   SetAutoProcessTH1(linearResult, kCMD_Write);
-  
+
   // Read in 3D Data
-//  for (int c = 0; c < 4; c++){
-//    fDataPoly[c] = (TH2Poly*) fInputFile->Get(Form("dataslice_%i",c));
-//    fDataPoly[c]->SetNameTitle(Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_datapoly_%i",c),Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_datapoly_%i",c));
-//    SetAutoProcessTH1(fDataPoly[c], kCMD_Write);
-//    fDataHist->Reset();
-//  }
-  
+  //  for (int c = 0; c < 4; c++){
+  //    fDataPoly[c] = (TH2Poly*) fInputFile->Get(Form("dataslice_%i",c));
+  //    fDataPoly[c]->SetNameTitle(Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_datapoly_%i",c),Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_datapoly_%i",c));
+  //    SetAutoProcessTH1(fDataPoly[c], kCMD_Write);
+  //    fDataHist->Reset();
+  //  }
+
   // Read in 2D Data Slices and Make MC Slices
   fDataHist->Reset();
   int bincount = 0;
   for (int i = 0; i < 4; i++){ //both y and z slices
-  
+
     // Get Data Histogram
-    fInputFile->ls();
+    //fInputFile->ls();
     fDataHist_Slices.push_back((TH2Poly*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
     fDataHist_Slices[i]->SetNameTitle(Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_data_Slice%i",i), (Form("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform_data_Slice%i",i)));
 
@@ -201,17 +202,17 @@ void T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform::SetHistograms(){
     }
 
     // Loop over nbins and set errors from covar
-//    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
-//      for (int k = 0; k < fDataHist_Slices[i]->GetNbinsY(); k++){
-//        fDataHist_Slices[i]->SetBinError(j+1, k+1, sqrt((*fFullCovar)(bincount,bincount)) * 1E-38);
-//
-//        std::cout << "Setting data hist " <<  fDataHist_Slices[i]->GetBinContent(j+1,k+1) << " " << fDataHist_Slices[i]->GetBinError(j+1,k+1) << std::endl;
-//        fDataHist->SetBinContent(bincount+1, fDataHist_Slices[i]->GetBinContent(j+1,k+1) );
-//        fDataHist->SetBinError(bincount+1, fDataHist_Slices[i]->GetBinError(j+1,k+1) );
-//
-//        bincount++;
-//      }
-//    }
+    //    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
+    //      for (int k = 0; k < fDataHist_Slices[i]->GetNbinsY(); k++){
+    //        fDataHist_Slices[i]->SetBinError(j+1, k+1, sqrt((*fFullCovar)(bincount,bincount)) * 1E-38);
+    //
+    //        std::cout << "Setting data hist " <<  fDataHist_Slices[i]->GetBinContent(j+1,k+1) << " " << fDataHist_Slices[i]->GetBinError(j+1,k+1) << std::endl;
+    //        fDataHist->SetBinContent(bincount+1, fDataHist_Slices[i]->GetBinContent(j+1,k+1) );
+    //        fDataHist->SetBinError(bincount+1, fDataHist_Slices[i]->GetBinError(j+1,k+1) );
+    //
+    //        bincount++;
+    //      }
+    //    }
 
     // Make MC Clones
     fMCHist_Slices.push_back((TH2Poly*) fDataHist_Slices[i]->Clone());

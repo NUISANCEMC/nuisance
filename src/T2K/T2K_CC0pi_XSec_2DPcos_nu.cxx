@@ -43,7 +43,7 @@ T2K_CC0pi_XSec_2DPcos_nu::T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey) {
   fSettings.SetEnuRange(0.0, 10.0);
   fSettings.DefineAllowedTargets("C,H");
 
- if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
+  if (fName == "T2K_CC0pi_XSec_2DPcos_nu_I") fAnalysis = 1;
   else fAnalysis = 2;
 
 
@@ -109,13 +109,13 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     fDataHist = (TH2D*) rootfile->Get("analysis2_data");
     fDataHist->SetDirectory(0);
     fDataHist->SetNameTitle((fName + "_data").c_str(),
-			    (fName + "_data" + fPlotTitles).c_str());
+        (fName + "_data" + fPlotTitles).c_str());
 
     // Get Map
     fMapHist = (TH2I*) rootfile->Get("analysis2_map");
     fMapHist->SetDirectory(0);
     fMapHist->SetNameTitle((fName + "_map").c_str(),
-			    (fName + "_map" + fPlotTitles).c_str());
+        (fName + "_map" + fPlotTitles).c_str());
 
     // Get Syst/Stat Covar
     TH2D* tempsyst = (TH2D*) rootfile->Get("analysis2_systcov");
