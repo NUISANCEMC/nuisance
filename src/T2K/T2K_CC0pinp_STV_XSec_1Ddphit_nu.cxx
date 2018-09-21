@@ -19,15 +19,15 @@
 
 #include "T2K_SignalDef.h"
 
-#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
 
 
 //********************************************************************
-T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey) {
+T2K_CC0pinp_STV_XSec_1Ddphit_nu::T2K_CC0pinp_STV_XSec_1Ddphit_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC0pinp_STV_XSec_1Ddpt_nu sample. \n" \
+  std::string descrip = "T2K_CC0pinp_STV_XSec_1Ddphit_nu sample. \n" \
                         "Target: CH \n" \
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n" \
                         "Signal: CC0piNp (N>=1) with 450M eV < p_p < 1 GeV \n";
@@ -38,20 +38,18 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey) 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#delta#it{p}_{T} (GeV c^{-1})");
-  fSettings.SetYTitle("#frac{d#sigma}{d#delta#it{p}_{T}} (cm^{2} nucleon^{-1} GeV^{-1} c)");
+  fSettings.SetXTitle("#delta#it{#phi}_{T} (GeV c^{-1})");
+  fSettings.SetYTitle("#frac{d#sigma}{d#delta#it{#phi}_{T}} (cm^{2} nucleon^{-1} rads^{-1})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 50.0);
   fSettings.DefineAllowedTargets("C,H");
 
   // CCQELike plot information
-  fSettings.SetTitle("T2K_CC0pinp_STV_XSec_1Ddpt_nu");
-  //fSettings.SetDataInput(  GeneralUtils::GetTopLevelDir() + "/data/T2K/T2K_CC0pinp_STV_XSec_1Ddpt_nu.dat");
+  fSettings.SetTitle("T2K_CC0pinp_STV_XSec_1Ddphit_nu");
+  //fSettings.SetDataInput(  GeneralUtils::GetTopLevelDir() + "/data/T2K/T2K_CC0pinp_STV_XSec_1Ddphit_nu.dat");
 
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/dptResults.root;Result" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/dptResults.root;Correlation_Matrix" );
-
-
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/dphitResults.root;Result" );
+  fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/dphitResults.root;Correlation_Matrix" );
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
@@ -63,14 +61,11 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey) 
 
   // Plot Setup -------------------------------------------------------
   //SetDataFromTextFile( fSettings.GetDataInput() );
-  //SetCovarFromDiagonal();
   //ScaleData(1E-38);
-
+  //SetCovarFromDiagonal();
 
   SetDataFromRootFile( fSettings.GetDataInput() );
-  SetCorrelationFromRootFile(fSettings.GetCovarInput() );              
-  //SetCovarianceFromRootFile(fSettings.GetCovarInput() );              
-
+  SetCorrelationFromRootFile(fSettings.GetCovarInput() ); 
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -80,13 +75,13 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey) 
 
 
 
-void T2K_CC0pinp_STV_XSec_1Ddpt_nu::FillEventVariables(FitEvent *event) {
-  fXVar = FitUtils::Get_STV_dpt(event, 14, true) / 1000.0;
+void T2K_CC0pinp_STV_XSec_1Ddphit_nu::FillEventVariables(FitEvent *event) {
+  fXVar = FitUtils::Get_STV_dphit(event, 14, true);
   return;
 };
 
 //********************************************************************
-bool T2K_CC0pinp_STV_XSec_1Ddpt_nu::isSignal(FitEvent *event)
+bool T2K_CC0pinp_STV_XSec_1Ddphit_nu::isSignal(FitEvent *event)
 //********************************************************************
 {
   return SignalDef::isT2K_CC0pi_STV(event, EnuMin, EnuMax);

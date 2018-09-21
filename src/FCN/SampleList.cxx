@@ -223,6 +223,16 @@
 #ifndef __NO_T2K__
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
+// T2K STV CC0pi
+#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddat_nu.h"
+#include "T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h"
+#include "T2K_CC0pinp_ifk_XSec_3Dinfp_nu.h"
+#include "T2K_CC0pinp_ifk_XSec_3Dinfa_nu.h"
+#include "T2K_CC0pinp_ifk_XSec_3Dinfip_nu.h"
 
 // T2K CC1pi+ on CH
 #include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
@@ -243,10 +253,6 @@
 #include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
 
-// T2K STV CC0pi
-#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
-
-#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 
 #endif
 
@@ -1223,6 +1229,28 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
     return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
+    return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddphit_nu")) {
+    return (new T2K_CC0pinp_STV_XSec_1Ddphit_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddat_nu")) {
+    return (new T2K_CC0pinp_STV_XSec_1Ddat_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform")) {
+    return (new T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfp_nu")) {
+    return (new T2K_CC0pinp_ifk_XSec_3Dinfp_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfa_nu")) {
+    return (new T2K_CC0pinp_ifk_XSec_3Dinfa_nu(samplekey));
+
+  } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfip_nu")) {
+    return (new T2K_CC0pinp_ifk_XSec_3Dinfip_nu(samplekey));
+
 
     // SciBooNE COH studies
   } else
