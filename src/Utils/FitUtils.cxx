@@ -186,8 +186,7 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   return rEnu;
 };
 
-double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
-                         bool neutrino) {
+double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool neutrino) {
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
   double ml = sqrt(el * el - pl * pl);     // lepton mass
@@ -197,6 +196,11 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
 
   return q2;
 };
+
+double FitUtils::Q2QErec(TLorentzVector Pmu, TLorentzVector Pnu, double binding, bool neutrino) {
+  double q2qe = Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), binding, neutrino);
+  return q2qe;
+}
 
 double FitUtils::EnuQErec(double pl, double costh, double binding,
                           bool neutrino) {
@@ -763,6 +767,76 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }
 
+// As defined in PhysRevC.95.065501
+// Using prescription from arXiv 1805.05486 
+double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
+
+  const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton;   // proton mass
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(ISPDG) == 0) {
+    return -9999;
+  }
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1)) == 0) {
+    return -9999;
+  }
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
+  TVector3 const &LeptonP =
+      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
+  TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
+
+  double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
+  double const eh = event->GetHMFSParticle(2212)->E()/1000.;
+
+  if (!Is0pi) {
+    if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
+      return -9999;
+    }
+    //TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    //HadronP += pp.Vect();
+  }
+  TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
+  double dptMag = dpt.Mag()/1000.;
+
+  double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from PhysRevC.95.065501)
+  double map = ma - mn + 0.02713; // reminant mass
+
+  double pmul = LeptonP.Dot(NuP.Unit())/1000.;
+  double phl = HadronP.Dot(NuP.Unit())/1000.;
+
+  //double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
+  //double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
+
+  double R = ma + pmul + phl - el - eh;
+
+  double dpl = 0.5*R - (map*map + dptMag*dptMag)/(2*R);
+  //double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in PhysRevC.95.065501 - gives same result
+
+  double pn_reco = sqrt((dptMag*dptMag) + (dpl*dpl));
+
+  //std::cout << "Diagnostics: " << std::endl;
+  //std::cout << "mn: " << mn << std::endl;
+  //std::cout << "ma: " << ma << std::endl;
+  //std::cout << "map: " << map << std::endl;
+  //std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
+  //std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
+  //std::cout << "pmul: " << pmul << std::endl;
+  //std::cout << "phl: " << phl << std::endl;
+  //std::cout << "el: " << el << std::endl;
+  //std::cout << "eh: " << eh << std::endl;
+  //std::cout << "R: " << R << std::endl;
+  //std::cout << "dptMag: " << dptMag << std::endl;
+  //std::cout << "dpl: " << dpl << std::endl;
+  //std::cout << "pn_reco: " << pn_reco << std::endl;
+
+  return pn_reco;
+}
+
 // Get Cos theta with Adler angles
 double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
   // Get the "resonance" lorentz vector (pion proton system)
@@ -804,14 +878,21 @@ double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector
   TVector3 xAxis = yAxis.Cross(zAxis);
   xAxis *= 1.0/double(xAxis.Mag());
 
+  double x = Ppi.Vect().Dot(xAxis);
+  double y = Ppi.Vect().Dot(yAxis);
+  //double z = Ppi.Vect().Dot(zAxis);
+
+  double newphi = atan2(y, x);
+
+  // Old silly method before atan2
+  /*
+  // Then finally construct phi as the angle between pion projection and x axis
   // Get the project of the pion momentum on to the zaxis
   TVector3 PiVectZ = zAxis*Ppi.Vect().Dot(zAxis);
   // The subtract the projection off the pion vector to get to get the plane
   TVector3 PiPlane = Ppi.Vect() - PiVectZ;
 
-  // Then finally construct phi as the angle between pion projection and x axis
   double phi = -999.99;
-
   if (PiPlane.Y() > 0) {
     phi = (180./M_PI)*PiPlane.Angle(xAxis);
   } else if (PiPlane.Y() < 0) {
@@ -825,6 +906,70 @@ double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector
       phi = (180./M_PI)*(2*M_PI-PiPlane.Angle(xAxis));
     }
   }
+  */
 
-  return phi;
+  return newphi;
 }
+
+
+//********************************************************************
+double FitUtils::ppInfK(TLorentzVector pmu, double costh, double binding,
+                          bool neutrino) {
+  //********************************************************************
+
+  // Convert all values to GeV
+  //const double V = binding / 1000.;           // binding potential
+  //const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton;   // proton mass
+  double el = pmu.E() / 1000.;
+  //double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
+
+  double enu = EnuQErec(pmu, costh, binding, neutrino);
+
+  double ep_inf = enu - el + mp;
+  double pp_inf = sqrt(ep_inf * ep_inf - mp * mp);
+
+  return pp_inf;
+};
+
+//********************************************************************
+TVector3 FitUtils::tppInfK(TLorentzVector pmu, double costh, double binding,
+                          bool neutrino) {
+  //********************************************************************
+
+  // Convert all values to GeV
+  //const double V = binding / 1000.;           // binding potential
+  //const double mn = PhysConst::mass_neutron;  // neutron mass
+  //const double mp = PhysConst::mass_proton;   // proton mass
+  double pl_x = pmu.X() / 1000.;
+  double pl_y = pmu.Y() / 1000.;
+  double pl_z= pmu.Z() / 1000.;
+
+  double enu = EnuQErec(pmu, costh, binding, neutrino);
+
+  TVector3 tpp_inf(-pl_x, -pl_y, -pl_z+enu);
+
+  return tpp_inf;
+};
+
+//********************************************************************
+double FitUtils::cthpInfK(TLorentzVector pmu, double costh, double binding,
+                          bool neutrino) {
+  //********************************************************************
+
+  // Convert all values to GeV
+  //const double V = binding / 1000.;           // binding potential
+  //const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton;   // proton mass
+  double el = pmu.E() / 1000.;
+  double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
+
+  double enu = EnuQErec(pmu, costh, binding, neutrino);
+
+  double ep_inf = enu - el + mp;
+  double pp_inf = sqrt(ep_inf * ep_inf - mp * mp);
+
+  double cth_inf = (enu*enu + pp_inf*pp_inf - pl*pl)/(2*enu*pp_inf);
+
+  return cth_inf;
+};

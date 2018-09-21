@@ -22,7 +22,7 @@ public:
         box->fSampleWeight = this->fSampleWeight;
 
         box->fTpiVect.clear();
-        for (int i = 0; i < this->fTpiVect.size(); i++){
+        for (unsigned int i = 0; i < this->fTpiVect.size(); i++){
             box->fTpiVect.push_back( this->fTpiVect[i] );
         }
         return box;
@@ -45,7 +45,7 @@ class NthpiVariableBox1D : public MeasurementVariableBox1D {
         box->fSampleWeight = this->fSampleWeight;
 
         box->fthpiVect.clear();
-        for (int i = 0; i < this->fthpiVect.size(); i++){
+        for (unsigned int i = 0; i < this->fthpiVect.size(); i++){
             box->fthpiVect.push_back( this->fthpiVect[i] );
         }
         return box;

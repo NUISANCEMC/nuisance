@@ -44,7 +44,6 @@
 #include "TH2Poly.h"
 #include "FitEvent.h"
 
-
 #include "FitLogger.h"
 
 /*!
@@ -100,6 +99,9 @@ double EnuQErec(TLorentzVector pmu, double costh, double binding,
 //! Function to calculate the reconstructed Q^{2}_{QE}
 double Q2QErec(double pl, double costh, double binding,
 	       bool neutrino = true);
+
+//! Function to calculate the reconstructed Q^{2}_{QE}
+double Q2QErec(TLorentzVector Pmu, TLorentzVector Pnu, double binding, bool neutrino);
 
 //! Function returns the reconstructed E_{nu} values
 double EnuQErec(double pl, double costh, double binding,
@@ -168,6 +170,15 @@ double Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi);
 double Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi);
 /// Gets delta alpha T as defined in Phys.Rev. C94 (2016) no.1, 015503
 double Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi);
+
+// As defined in PhysRevC.95.065501
+// Using prescription from arXiv 1805.05486 
+double Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi);
+
+//For T2K inferred kinematics analyis - variables defined as on page 7 of T2K TN287v11 (and now arXiv 1802.05078)
+double ppInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
+TVector3 tppInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
+double cthpInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
 
 double CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
 double PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
