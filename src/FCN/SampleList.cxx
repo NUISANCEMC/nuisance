@@ -224,7 +224,6 @@
 // T2K CC0pi
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
 // T2K STV CC0pi
-#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 #include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
@@ -1227,9 +1226,6 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     /*
       T2K CC0pi + np CH samples
     */
-  } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
-    return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
-
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddpt_nu")) {
     return (new T2K_CC0pinp_STV_XSec_1Ddpt_nu(samplekey));
 
