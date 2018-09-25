@@ -15,7 +15,7 @@
 <!-- # 4 Reconfigure Loops -->
 <!-- # 5 Every Event print out (SHOUT) -->
 <!-- # -1 DEBUGGING -->
-<config VERBOSITY='5'/>
+<config VERBOSITY='4'/>
 
 <!-- # ERROR goes from -->
 <!-- # 0 NONE -->
@@ -83,7 +83,6 @@
 <config FitWeight_fNuwroRW_veto=''/>
 <config FitWeight_fNeutRW_veto=''/>
 <config FitWeight_fGenieRW_veto=''/>
-
 
 <!-- # Output Options -->
 <!-- # ###################################################### -->
@@ -162,7 +161,7 @@
 <config muon_momentum_throw='0'/>
 
 <!-- # MINERvA Specific Configs -->
-<config MINERvA_XSec_CCinc_2DEavq3_nu_hadron_cut='0'/>
+<config MINERvA_CCinc_XSec_2DEavq3_nu_hadron_cut='0'/>
 <config MINERvA_CCinc_XSec_2DEavq3_nu_useq3true='0'/>
 <config Modes_split_PN_NN='0'/>
 <config SignalReconfigures='0'/>
@@ -179,14 +178,25 @@
 <config MINERvADensity='1.04'/>
 <config MINERvARecoDist='10.0'/>
 
+<!-- Different way of reweighting in GENIE -->
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
+<!--
+<config GENIEWeightEngine_CCQEMode="kModeMa"/>
+-->
+<!-- CCQE/2p2h/1pi Gaussian enhancement method -->
+<!-- Apply tilt-shift weights or normal Gaussian parameters-->
+<config Gaussian_Enhancement="Normal" />
+<!--
+<config Gaussian_Enhancement="Tilt-Shift" />
+-->
 
 <config NToyThrows='100000' />
 
-
+<!--
 <config GENIEXSecModelCCRES="genie::ReinSehgalRESPXSec" />
 <config GENIEXSecModelCOH="genie::ReinSehgalCOHPiPXSec" />
 <config GENIEXSecModelCCQE="genie::LwlynSmithQELCCPXSec" />
+-->
 
 <!--
 <config GENIEXSecModelCCQE="genie::NievesQELCCPXSec" />
