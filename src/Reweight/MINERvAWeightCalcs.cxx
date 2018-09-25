@@ -16,18 +16,22 @@ MINERvAReWeight_QE::MINERvAReWeight_QE() {
   fCur_NormCCQE = fDef_NormCCQE;
 }
 
+//*******************************************************
 MINERvAReWeight_QE::~MINERvAReWeight_QE(){};
+//*******************************************************
 
+//*******************************************************
 double MINERvAReWeight_QE::CalcWeight(BaseFitEvt* evt) {
+//*******************************************************
   // Check GENIE
   if (evt->fType != kGENIE) return 1.0;
 
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
-  const InitialState& init_state = interaction->InitState();
+  //const InitialState& init_state = interaction->InitState();
   const ProcessInfo& proc_info = interaction->ProcInfo();
-  const Target& tgt = init_state.Tgt();
+  //const Target& tgt = init_state.Tgt();
 
   // If the event is not QE this Calc doesn't handle it
   if (!proc_info.IsQuasiElastic()) return 1.0;
@@ -42,17 +46,21 @@ double MINERvAReWeight_QE::CalcWeight(BaseFitEvt* evt) {
   return w;
 }
 
+//*******************************************************
 void MINERvAReWeight_QE::SetDialValue(std::string name, double val) {
+//*******************************************************
   SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
 }
 
+//*******************************************************
 void MINERvAReWeight_QE::SetDialValue(int rwenum, double val) {
+//*******************************************************
   // Check Handled
   int curenum = rwenum % 1000;
   if (!IsHandled(curenum)) return;
 
   // Set Values
-  if (curenum == kMINERvARW_NormCCQE) {
+  if (curenum == Reweight::kMINERvARW_NormCCQE) {
     fTwk_NormCCQE = val;
     fCur_NormCCQE = fDef_NormCCQE + fTwk_NormCCQE;
   }
@@ -61,11 +69,13 @@ void MINERvAReWeight_QE::SetDialValue(int rwenum, double val) {
   fTweaked = ((fTwk_NormCCQE != 0.0));
 }
 
+//*******************************************************
 bool MINERvAReWeight_QE::IsHandled(int rwenum) {
+//*******************************************************
   int curenum = rwenum % 1000;
 
   switch (curenum) {
-    case kMINERvARW_NormCCQE:
+    case Reweight::kMINERvARW_NormCCQE:
       return true;
     default:
       return false;
@@ -81,18 +91,22 @@ MINERvAReWeight_MEC::MINERvAReWeight_MEC() {
   fCur_NormCCMEC = fDef_NormCCMEC;
 }
 
+//*******************************************************
 MINERvAReWeight_MEC::~MINERvAReWeight_MEC(){};
+//*******************************************************
 
+//*******************************************************
 double MINERvAReWeight_MEC::CalcWeight(BaseFitEvt* evt) {
+//*******************************************************
   // Check GENIE
   if (evt->fType != kGENIE) return 1.0;
 
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
-  const InitialState& init_state = interaction->InitState();
+  //const InitialState& init_state = interaction->InitState();
   const ProcessInfo& proc_info = interaction->ProcInfo();
-  const Target& tgt = init_state.Tgt();
+  //const Target& tgt = init_state.Tgt();
 
   // If the event is not MEC this Calc doesn't handle it
   if (!proc_info.IsMEC()) return 1.0;
@@ -107,17 +121,21 @@ double MINERvAReWeight_MEC::CalcWeight(BaseFitEvt* evt) {
   return w;
 }
 
+//*******************************************************
 void MINERvAReWeight_MEC::SetDialValue(std::string name, double val) {
+//*******************************************************
   SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
 }
 
+//*******************************************************
 void MINERvAReWeight_MEC::SetDialValue(int rwenum, double val) {
+//*******************************************************
   // Check Handled
   int curenum = rwenum % 1000;
   if (!IsHandled(curenum)) return;
 
   // Set Values
-  if (curenum == kMINERvARW_NormCCMEC) {
+  if (curenum == Reweight::kMINERvARW_NormCCMEC) {
     fTwk_NormCCMEC = val;
     fCur_NormCCMEC = fDef_NormCCMEC + fTwk_NormCCMEC;
   }
@@ -126,11 +144,13 @@ void MINERvAReWeight_MEC::SetDialValue(int rwenum, double val) {
   fTweaked = ((fTwk_NormCCMEC != 0.0));
 }
 
+//*******************************************************
 bool MINERvAReWeight_MEC::IsHandled(int rwenum) {
+//*******************************************************
   int curenum = rwenum % 1000;
 
   switch (curenum) {
-    case kMINERvARW_NormCCMEC:
+    case Reweight::kMINERvARW_NormCCMEC:
       return true;
     default:
       return false;
@@ -145,9 +165,13 @@ MINERvAReWeight_RES::MINERvAReWeight_RES() {
   fCur_NormCCRES = fDef_NormCCRES;
 }
 
+//*******************************************************
 MINERvAReWeight_RES::~MINERvAReWeight_RES(){};
+//*******************************************************
 
+//*******************************************************
 double MINERvAReWeight_RES::CalcWeight(BaseFitEvt* evt) {
+//*******************************************************
 
   // std::cout << "Caculating RES" << std::endl;
   // Check GENIE
@@ -156,9 +180,9 @@ double MINERvAReWeight_RES::CalcWeight(BaseFitEvt* evt) {
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
-  const InitialState& init_state = interaction->InitState();
+  //const InitialState& init_state = interaction->InitState();
   const ProcessInfo& proc_info = interaction->ProcInfo();
-  const Target& tgt = init_state.Tgt();
+  //const Target& tgt = init_state.Tgt();
 
   // If the event is not RES this Calc doesn't handle it
   if (!proc_info.IsResonant()) return 1.0;
@@ -173,17 +197,21 @@ double MINERvAReWeight_RES::CalcWeight(BaseFitEvt* evt) {
   return w;
 }
 
+//*******************************************************
 void MINERvAReWeight_RES::SetDialValue(std::string name, double val) {
+//*******************************************************
   SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
 }
 
+//*******************************************************
 void MINERvAReWeight_RES::SetDialValue(int rwenum, double val) {
+//*******************************************************
   // Check Handled
   int curenum = rwenum % 1000;
   if (!IsHandled(curenum)) return;
 
   // Set Values
-  if (curenum == kMINERvARW_NormCCRES) {
+  if (curenum == Reweight::kMINERvARW_NormCCRES) {
     fTwk_NormCCRES = val;
     fCur_NormCCRES = fDef_NormCCRES + fTwk_NormCCRES;
   }
@@ -192,11 +220,13 @@ void MINERvAReWeight_RES::SetDialValue(int rwenum, double val) {
   fTweaked = ((fTwk_NormCCRES != 0.0));
 }
 
+//*******************************************************
 bool MINERvAReWeight_RES::IsHandled(int rwenum) {
+//*******************************************************
   int curenum = rwenum % 1000;
 
   switch (curenum) {
-    case kMINERvARW_NormCCRES:
+    case Reweight::kMINERvARW_NormCCRES:
       return true;
     default:
       return false;
@@ -230,8 +260,6 @@ RikRPA::RikRPA() {
   fDefDial_RPAHighQ2 = 0.0;
   fCurDial_RPAHighQ2 = fDefDial_RPAHighQ2;
   fErrDial_RPAHighQ2 = 1.0;
-
-  
 
   // - Syst : kMINERvA_RikRESRPA_ApplyRPA
   // - Type : Binary
@@ -267,7 +295,9 @@ RikRPA::RikRPA() {
   fTweaked = false;
 }
 
+//*******************************************************
 RikRPA::~RikRPA() {
+//*******************************************************
   //  delete fEventWeights;
 
   //  for (size_t i = 0; i < kMaxCalculators; i++) {
@@ -276,7 +306,9 @@ RikRPA::~RikRPA() {
   //  }
 }
 
+//*******************************************************
 double RikRPA::CalcWeight(BaseFitEvt* evt) {
+//*******************************************************
   // LOG(FIT) << "Calculating RikRPA" << std::endl;
   // Return 1.0 if not tweaked
   if (!fTweaked) return 1.0;
@@ -413,23 +445,26 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   return w;
 }  // namespace reweight
 
+//*******************************************************
 void RikRPA::SetDialValue(std::string name, double val) {
+//*******************************************************
   SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
 }
 
+//*******************************************************
 void RikRPA::SetDialValue(int rwenum, double val) {
+//*******************************************************
   int curenum = rwenum % 1000;
 
   // Check Handled
   if (!IsHandled(curenum)) return;
-  if (curenum == kMINERvARW_RikRPA_ApplyRPA) fApplyDial_RPACorrection = (val > 0.5);
-  if (curenum == kMINERvARW_RikRPA_LowQ2)    fCurDial_RPALowQ2 = val;
-  if (curenum == kMINERvARW_RikRPA_HighQ2)   fCurDial_RPAHighQ2 = val;
-  if (curenum == kMINERvARW_RikRESRPA_ApplyRPA) fApplyDial_RESRPACorrection = (val > 0.5);
-  if (curenum == kMINERvARW_RikRESRPA_LowQ2)    fCurDial_RESRPALowQ2 = val;
-  if (curenum == kMINERvARW_RikRESRPA_HighQ2)   fCurDial_RESRPAHighQ2 = val;
+  if (curenum == Reweight::kMINERvARW_RikRPA_ApplyRPA) fApplyDial_RPACorrection = (val > 0.5);
+  if (curenum == Reweight::kMINERvARW_RikRPA_LowQ2)    fCurDial_RPALowQ2 = val;
+  if (curenum == Reweight::kMINERvARW_RikRPA_HighQ2)   fCurDial_RPAHighQ2 = val;
+  if (curenum == Reweight::kMINERvARW_RikRESRPA_ApplyRPA) fApplyDial_RESRPACorrection = (val > 0.5);
+  if (curenum == Reweight::kMINERvARW_RikRESRPA_LowQ2)    fCurDial_RESRPALowQ2 = val;
+  if (curenum == Reweight::kMINERvARW_RikRESRPA_HighQ2)   fCurDial_RESRPAHighQ2 = val;
   
-
   // Assign flag to say stuff has changed
   fTweaked = (fApplyDial_RPACorrection ||
               fabs(fCurDial_RPAHighQ2 - fDefDial_RPAHighQ2) > 0.0 ||
@@ -437,30 +472,33 @@ void RikRPA::SetDialValue(int rwenum, double val) {
 	      fApplyDial_RESRPACorrection ||
 	      fabs(fCurDial_RESRPAHighQ2 - fDefDial_RESRPAHighQ2) > 0.0 ||
 	      fabs(fCurDial_RESRPALowQ2 - fDefDial_RESRPALowQ2) > 0.0);
-  
 }
 
+//*******************************************************
 bool RikRPA::IsHandled(int rwenum) {
+//*******************************************************
   int curenum = rwenum % 1000;
   switch (curenum) {
-  case kMINERvARW_RikRESRPA_ApplyRPA:
+  case Reweight::kMINERvARW_RikRESRPA_ApplyRPA:
     return true;
-  case kMINERvARW_RikRESRPA_LowQ2:
+  case Reweight::kMINERvARW_RikRESRPA_LowQ2:
     return true;
-  case kMINERvARW_RikRESRPA_HighQ2:
+  case Reweight::kMINERvARW_RikRESRPA_HighQ2:
     return true;
-  case kMINERvARW_RikRPA_ApplyRPA:
+  case Reweight::kMINERvARW_RikRPA_ApplyRPA:
     return true;
-  case kMINERvARW_RikRPA_LowQ2:
+  case Reweight::kMINERvARW_RikRPA_LowQ2:
     return true;
-  case kMINERvARW_RikRPA_HighQ2:
+  case Reweight::kMINERvARW_RikRPA_HighQ2:
     return true;
   default:
     return false;
   }
 }
 
+//*******************************************************
 void RikRPA::SetupRPACalculator(int calcenum) {
+//*******************************************************
   std::string rwdir = FitPar::GetDataBase() + "/reweight/MINERvA/RikRPA/";
   std::string fidir = "";
   switch (calcenum) {
@@ -519,7 +557,9 @@ void RikRPA::SetupRPACalculator(int calcenum) {
   return;
 }
 
+//*******************************************************
 int RikRPA::GetRPACalcEnum(int bpdg, int tpdg) {
+//*******************************************************
   if (bpdg == 14 && tpdg == 1000060120)
     return kNuMuC12;
   else if (bpdg == 14 && tpdg == 1000080160)
@@ -541,8 +581,8 @@ int RikRPA::GetRPACalcEnum(int bpdg, int tpdg) {
   else if (bpdg == -14 && tpdg == 1000280560)
     return kNuMuBarFe56;
   else {
-    ERROR(WRN, "Unknown beam and target combination for RPA Calcs! "
-                   << bpdg << " " << tpdg);
+    //ERROR(WRN, "Unknown beam and target combination for RPA Calcs! "
+                   //<< bpdg << " " << tpdg);
   }
 
   return -1;
