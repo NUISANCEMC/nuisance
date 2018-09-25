@@ -105,12 +105,9 @@ void weightRPA::read(const TString  f)
     rpapolynonrel = TADrpapolynonrel->GetArray();
     hRPArelratio->Print();
     std::cout << "have read in ratios from file " << f <<std::endl;
-    
-  }
-  else{
+  } else {
     //File could not be read
     std::cout << "File could not be read" << std::endl;
-    
   }
 }
 
@@ -409,6 +406,4 @@ double weightRPA::getWeightHighQ2(const double mc_q0, const double mc_q3, int si
 
 
 #endif
-
-
 
