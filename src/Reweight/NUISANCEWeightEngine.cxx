@@ -14,7 +14,17 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   LOG(FIT) << "Setting up NUISANCE Custom RW : " << fCalcName << std::endl;
 
   // Load in all Weight Calculations
-  fWeightCalculators.push_back(new GaussianModeCorr());
+  GaussianModeCorr* GaussianMode = new GaussianModeCorr();
+  std::string Gaussian_Method = FitPar::Config().GetParS("Gaussian_Enhancement");
+  if (Gaussian_Method == "Tilt-Shift") {
+    GaussianMode->SetMethod(true);
+  } else if (Gaussian_Method == "Normal") {
+    GaussianMode->SetMethod(false);
+  } else {
+    ERR(FTL) << "I do not recognise method " << Gaussian_Method << " for the Gaussian enhancement, so will die now..." << std::endl;
+    throw;
+  }
+  fWeightCalculators.push_back(GaussianMode);
   fWeightCalculators.push_back(new ModeNormCalc());
   fWeightCalculators.push_back(new SBLOscWeightCalc());
 
@@ -52,7 +62,7 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
     fNUISANCEEnums.push_back(singleenum);
 
     // Initialize dial
-    std::cout << "Registering " << singlename << " from " << name << std::endl;
+    LOG(FIT) << "Registering " << singlename << " from " << name << std::endl;
 
     // Setup index
     fEnumIndex[nuisenum].push_back(index);
@@ -81,11 +91,8 @@ void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
 
 void NUISANCEWeightEngine::Reconfigure(bool silent) {
   for (size_t i = 0; i < fNUISANCEEnums.size(); i++) {
-    for (std::vector<NUISANCEWeightCalc*>::iterator calciter =
-             fWeightCalculators.begin();
-         calciter != fWeightCalculators.end(); calciter++) {
-      NUISANCEWeightCalc* nuiscalc =
-          static_cast<NUISANCEWeightCalc*>(*calciter);
+    for (std::vector<NUISANCEWeightCalc*>::iterator calciter = fWeightCalculators.begin(); calciter != fWeightCalculators.end(); calciter++) {
+      NUISANCEWeightCalc* nuiscalc = static_cast<NUISANCEWeightCalc*>(*calciter);
 
       if (nuiscalc->IsHandled(fNUISANCEEnums[i])) {
         nuiscalc->SetDialValue(fNUISANCEEnums[i], fValues[i]);
