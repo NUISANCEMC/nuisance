@@ -160,15 +160,21 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
     fNuwroParams = fNuWroEvent->par;
   }
 
-
   if (entry >= rwEvs.size()) {
     rwEvs.push_back(BaseFitEvt());
+    rwEvs.back().fType = kNUWRO;
+    rwEvs.back().Mode = fNUISANCEEvent->Mode;
     rwEvs.back().fNuwroSRWEvent = SRW::SRWEvent(*fNuWroEvent);
     rwEvs.back().fNuwroEvent = NULL;
     rwEvs.back().fNuwroParams = &fNuwroParams;
     rwEvs.back().probe_E = rwEvs.back().fNuwroSRWEvent.NeutrinoEnergy;
     rwEvs.back().probe_pdg = rwEvs.back().fNuwroSRWEvent.NeutrinoPDG;
   }
+
+  fNUISANCEEvent->fNuwroSRWEvent = SRW::SRWEvent(*fNuWroEvent);
+  fNUISANCEEvent->fNuwroParams = &fNuwroParams;
+  fNUISANCEEvent->probe_E = fNUISANCEEvent->fNuwroSRWEvent.NeutrinoEnergy;
+  fNUISANCEEvent->probe_pdg = fNUISANCEEvent->fNuwroSRWEvent.NeutrinoPDG;
 #endif
 
   return fNUISANCEEvent;

@@ -76,6 +76,8 @@ CheckAndSetDefaultCache(EXTRA_SETUP_SCRIPT "" PATH "The path to an extra script 
 
 CheckAndSetDefaultCache(USE_MINIMIZER TRUE INTERNAL "Whether we are using the ROOT minimization libraries. <TRUE>")
 
+CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
+
 CheckAndSetDefaultCache(USE_HEPMC FALSE BOOL "Whether to enable HepMC input support. <FALSE>")
 CheckAndSetDefaultEnv(HEPMC "" PATH "Path to HepMC source tree root directory. Overrides environment variable \$HEPMC <>" HEPMC)
 CheckAndSetDefaultCache(HEPMC_MOMUNIT "GEV" STRING "HepMC momentum units [MEV|GEV]. <GEV>")
@@ -83,6 +85,7 @@ CheckAndSetDefaultCache(HEPMC_LENUNIT "CM" STRING "HepMC momentum units [MM|CM].
 CheckAndSetDefaultCache(HEPMC_USED_EP FALSE INTERNAL "Whether we built HepMC or not. <FALSE>")
 
 CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultCache(IS_NEUT_54 FALSE BOOL "Whether to enabled NEUT is version 5.4 or greater. <FALSE>")
 CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
 CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
 CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
@@ -128,9 +131,9 @@ CheckAndSetDefaultCache(USE_NUANCE TRUE BOOL "Whether to enable NUANCE event sup
 
 CheckAndSetDefaultCache(USE_PROB3PP FALSE BOOL "Whether to download and compile in Prob3++ support. <FALSE>")
 
-CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE TRUE BOOL "Whether to perform the update target for external dependencies. <TRUE>")
+CheckAndSetDefaultCache(NO_EXTERNAL_UPDATE FALSE BOOL "Whether to perform the update target for external dependencies. Note this may produce errors for CMake < 3.8 where a bug was fixed for the feature that this option invokes. <FALSE>")
 
-CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <TRUE>")
+CheckAndSetDefaultCache(USE_GPERFTOOLS FALSE BOOL "Whether to compile in google performance tools. <FALSE>")
 
 CheckAndSetDefault(NEED_PYTHIA6 FALSE)
 CheckAndSetDefault(NEED_PYTHIA8 FALSE)
@@ -140,7 +143,7 @@ CheckAndSetDefault(NEED_ROOTPYTHIA6 FALSE)
 
 CheckAndSetDefaultCache(USE_OMP FALSE BOOL "Whether to enable multicore features (there currently are none...). <FALSE>")
 
-CheckAndSetDefaultCache(USE_DYNSAMPLES FALSE BOOL "Whether to enable the dynamic sample loader. <FALSE>")
+CheckAndSetDefaultCache(USE_DYNSAMPLES TRUE BOOL "Whether to enable the dynamic sample loader. <TRUE>")
 
 CheckAndSetDefault(NO_EXPERIMENTS FALSE)
 

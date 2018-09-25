@@ -229,7 +229,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::FillEventVariables(FitEvent *event) {
 
   // Some distributions require the final state proton: check that it exists
   if (fDist >= kPPi0Mass && event->NumFSParticle(2212) == 0) return;
-
+  
   // Fill the variables depending on the enums
   switch (fDist) {
     case kTpi:

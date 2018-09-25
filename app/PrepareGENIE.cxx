@@ -117,14 +117,15 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     // Fill total event hist
     eventhist->Fill(neu->E());
 
-    if (i % (nevt / 20) == 0) {
+    // Clear Event
+    genientpl->Clear();
+
+    size_t freq = nevt / 20;
+    if (freq && !(i % freq)) {
       LOG(FIT) << "Processed " << i << "/" << nevt
                << " GENIE events (E: " << neu->E()
                << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)" << std::endl;
     }
-
-    // Clear Event
-    genientpl->Clear();
   }
   LOG(FIT) << "Processed all events" << std::endl;
 
@@ -145,6 +146,9 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     cloneTree->Write();
 
     QLOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+    // ***********************************
+    // ***********************************
+    // FUDGE FOR NOVA MINERVA WORKSHOP
     //  Also check for the nova_wgts tree from Jeremy
     TChain *nova_chain = new TChain("nova_wgts");
     nova_chain->AddFile(input.c_str());
@@ -221,6 +225,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       if (mode.find(targ) != std::string::npos) {
         LOG(FIT) << "    Mode " << mode << " contains " << targ << " target" << std::endl;
         targetsplines[targ]->Add(modeavg[mode]);
+        LOG(FIT) << "Finished with Mode " << mode << " " << modeavg[mode]->Integral() << std::endl;
       }
     }
 
@@ -293,7 +298,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   // Get Flux Hist
   std::vector<std::string> fluxvect = GeneralUtils::ParseToStr(flux, ",");
-  TH1D* fluxhist = NULL;
+  TH1* fluxhist = NULL;
   if (fluxvect.size() == 3) {
     double from = GeneralUtils::StrToDbl(fluxvect[0]);
     double to = GeneralUtils::StrToDbl(fluxvect[1]);
@@ -315,7 +320,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
-      fluxhist = (TH1D*)(fluxfile->Get(fluxvect[1].c_str()));
+      fluxhist = dynamic_cast<TH1D*>(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
         ERR(FTL) << "Couldn't find histogram named: \"" << fluxvect[1]
                  << "\" in file: \"" << fluxvect[0] << std::endl;
@@ -359,9 +364,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     QLOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
-  StopTalking();
   NtpMCEventRecord* genientpl = NULL;
-  StartTalking();
   tn->SetBranchAddress("gmcrec", &genientpl);
 
   // Make Event and xsec Hist
@@ -375,7 +378,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::vector<std::string> genieids;
   std::vector<std::string> targetids;
   std::vector<std::string> interids;
-
 
   // Loop over all events
   for (int i = 0; i < nevt; i++) {
@@ -461,6 +463,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
+    // ********************************
+    // CLUDGE KLUDGE KLUDGE FOR NOVA
     QLOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
     //  Also check for the nova_wgts tree from Jeremy
     TChain *nova_chain = new TChain("nova_wgts");
@@ -518,7 +522,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   targdir->cd();
 
   LOG(FIT) << "Getting Target Splines" << std::endl;
-
   // For each target save a total spline
   std::map<std::string, TH1D*> targetsplines;
 
@@ -536,6 +539,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       if (mode.find(targ) != std::string::npos) {
         LOG(FIT) << "    Mode " << mode << " contains " << targ << " target" << std::endl;
         targetsplines[targ]->Add(modeavg[mode]);
+        LOG(FIT) << "Finished with Mode " << mode << " " << modeavg[mode]->Integral() << std::endl;
       }
     }
     LOG(FIT) << "Saving target spline: " << targ << std::endl;
@@ -570,18 +574,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       } else {
         targ_list.push_back(*jt);
       }
-      std::cout << "    " << *jt << std::endl;
     }
   }
 
   targprs = targ_list;
 
-  std::cout << "Target list: " << std::endl;
-  for (std::vector<std::string>::iterator it = targ_list.begin(); it != targ_list.end(); it++) {
-    std::cout << "  " << *it << std::endl;
-  }
-
-  std::cout << "Fraction list: " << std::endl;
   std::vector<double> targ_fractions;
   double minimum = 1.0;
   for (std::vector<std::string>::iterator it = frac_list.begin(); it != frac_list.end(); it++) {
@@ -591,8 +588,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     if (frac < minimum) minimum = frac;
   }
 
-  std::cout << "minimum target ratio: " << minimum << std::endl;
-  std::cout << "Fraction list rescaled: " << std::endl;
   std::vector<double>::iterator it = targ_fractions.begin();
   std::vector<std::string>::iterator jt = targ_list.begin();
   double scaling = 0;
@@ -606,32 +601,15 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     //(*it) *= (double(nucl)/(*it));
     double tempscaling = double(nucl)/(*it);
     if (tempscaling > scaling) scaling=tempscaling;
-    std::cout << "  " << "scaled by smallest: " << *it << std::endl;
-    std::cout << "  " << "scaling: " << tempscaling << std::endl;
   }
-  std::cout << "scaling: " << int(scaling+0.5) << std::endl;
   it = targ_fractions.begin();
   for (; it != targ_fractions.end(); it++) {
-    std::cout << "before scaling and rounding: " << *it << std::endl;
     // Round the scaling to nearest integer and multiply
     *it *= int(scaling+0.5);
     // Round to nearest integer
     *it = int(*it+0.5);
-    std::cout << "after scaling and rounding: " << *it << std::endl;
     totalnucl += *it;
   }
-
-  std::cout << "total number of nucleons in one target: " << totalnucl << std::endl;
-
-  it = targ_fractions.begin();
-  jt = targ_list.begin();
-  for (; it != targ_fractions.end(); it++, jt++) {
-    int nucl = atoi((*jt).c_str());
-    nucl = (nucl%10000)/10;
-    std::cout << "final fraction: " << *jt << ": " << *it << "/" << totalnucl << "=" << *it / totalnucl << " or " << *it / nucl << " copies of element " << *jt << std::endl;
-  }
-
-  // Now count the total number of nucleons
 
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
@@ -689,7 +667,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 };
 
 void PrintOptions() {
-
   std::cout << "PrepareGENIEEvents NUISANCE app. " << std::endl
     << "Takes GHep Outputs and prepares events for NUISANCE."
     << std::endl

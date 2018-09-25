@@ -18,3 +18,4 @@
 #include "TRandom3.h"
 
 void RunNuisance();
+void nuisance_init(void) ;

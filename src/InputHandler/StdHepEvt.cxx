@@ -70,6 +70,12 @@ bool GiBUUStdHepReader::SetBranchAddresses(TChain *chain) {
     ERR(WRN) << "Failed to set branch address for \"GiBUU2NeutCode\": "
              << SBAStatus << std::endl;
   }
+  SBAStatus = chain->SetBranchAddress("GiBUUReactionCode", &GiBUUReactionCode);
+  ok = ok && (SBAStatus || SBAStatus == 5);
+  if (!(!SBAStatus || SBAStatus == 5)) {
+    ERR(WRN) << "Failed to set branch address for \"GiBUUReactionCode\": "
+             << SBAStatus << std::endl;
+  }
   SBAStatus = chain->SetBranchAddress("EvtWght", &EvtWght);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
