@@ -96,7 +96,7 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
   export NEUT_ROOT=@NEUT_ROOT@
   export CERN=@CERN@
   export CERN_LEVEL=@CERN_LEVEL@
-  add_to_LD_LIBRARY_PATH "${NEUT_ROOT}/lib/Linux_pc" "${NEUT_ROOT}/src/reweight"
+  add_to_LD_LIBRARY_PATH "${NEUT_LIB_DIR}" "${NEUT_ROOT}/src/reweight"
 fi
 
 if [ "@USE_NuWro@" != "FALSE" ]; then

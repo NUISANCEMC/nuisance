@@ -61,10 +61,45 @@ TH1D* InputHandlerBase::GetXSecHistogram(void) {
 
 double InputHandlerBase::PredictedEventRate(double low, double high,
                                             std::string intOpt) {
-  int minBin = fFluxHist->GetXaxis()->FindBin(low);
-  int maxBin = fFluxHist->GetXaxis()->FindBin(high);
+  Int_t minBin = fEventHist->GetXaxis()->FindFixBin(low);
+  Int_t maxBin = fEventHist->GetXaxis()->FindFixBin(high);
 
-  return fEventHist->Integral(minBin, maxBin + 1, intOpt.c_str());
+  if ((fEventHist->IsBinOverflow(minBin) && (low != -9999.9))) {
+    minBin = 1;
+  }
+
+  if ((fEventHist->IsBinOverflow(maxBin) && (high != -9999.9))) {
+    maxBin = fEventHist->GetXaxis()->GetNbins() + 1;
+  }
+
+  // If we are within a single bin
+  if (minBin == maxBin) {
+    // Get the contained fraction of the single bin's width
+    return ((high - low) / fEventHist->GetXaxis()->GetBinWidth(minBin)) *
+           fEventHist->Integral(minBin, minBin, intOpt.c_str());
+  }
+
+  double lowBinUpEdge = fEventHist->GetXaxis()->GetBinUpEdge(minBin);
+  double highBinLowEdge = fEventHist->GetXaxis()->GetBinLowEdge(maxBin);
+
+  double lowBinfracIntegral =
+      ((lowBinUpEdge - low) / fEventHist->GetXaxis()->GetBinWidth(minBin)) *
+      fEventHist->Integral(minBin, minBin, intOpt.c_str());
+  double highBinfracIntegral =
+      ((high - highBinLowEdge) / fEventHist->GetXaxis()->GetBinWidth(maxBin)) *
+      fEventHist->Integral(maxBin, maxBin, intOpt.c_str());
+
+  // If they are neighbouring bins
+  if ((minBin + 1) == maxBin) {
+    std::cout << "Get lowfrac + highfrac" << std::endl;
+    // Get the contained fraction of the two bin's width
+    return lowBinfracIntegral + highBinfracIntegral;
+  }
+
+  double ContainedIntegral =
+      fEventHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
+  // If there are filled bins between them
+  return lowBinfracIntegral + highBinfracIntegral + ContainedIntegral;
 };
 
 double InputHandlerBase::TotalIntegratedFlux(double low, double high,
@@ -108,7 +143,6 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
       fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
   // If there are filled bins between them
   return lowBinfracIntegral + highBinfracIntegral + ContainedIntegral;
-  // return fFluxHist->Integral(minBin + 1, maxBin - 1, intOpt.c_str());
 }
 
 std::vector<TH1*> InputHandlerBase::GetFluxList(void) {

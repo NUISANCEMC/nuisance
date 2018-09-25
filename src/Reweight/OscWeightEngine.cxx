@@ -159,7 +159,9 @@ void OscWeightEngine::Config() {
             params[dm12_idx], params[dm23_idx], params[dcp_idx], 1, true, 2);
   bp.DefinePath(LengthParam, 0);
 
-  QLOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
+  if (LengthParamIsZenith) {
+    QLOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
+  }
 #endif
 }
 
