@@ -59,6 +59,11 @@ struct StdHepReader {
 struct GiBUUStdHepReader : public StdHepReader {
   GiBUUStdHepReader() : StdHepReader(){};
 
+  ///\brief GiBUU interaction code
+  ///
+  /// See https://gibuu.hepforge.org/trac/wiki/LesHouches for details
+  Int_t GiBUUReactionCode;
+
   ///\brief NEUT equivalent reaction code.
   /// CC:
   /// * 1 : QE

@@ -7,9 +7,7 @@
 
 using namespace Reweight;
 
-ModeNormCalc::ModeNormCalc(){
-  fNormRES = 1.0;
-}
+ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
 
 double ModeNormCalc::CalcWeight(BaseFitEvt* evt) {
   int mode = abs(evt->Mode);
@@ -35,7 +33,6 @@ void ModeNormCalc::SetDialValue(int rwenum, double val) {
 }
 
 bool ModeNormCalc::IsHandled(int rwenum) {
-
   int curenum = rwenum % 1000;
   switch (curenum) {
     case kModeNorm_NormRES:
@@ -68,27 +65,29 @@ void SBLOscWeightCalc::SetDialValue(std::string name, double val) {
 void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
   if (!IsHandled(curenum)) return;
-  if (curenum == kSBLOsc_Distance)      fDistance      = val;
+  if (curenum == kSBLOsc_Distance) fDistance = val;
   if (curenum == kSBLOsc_MassSplitting) fMassSplitting = val;
-  if (curenum == kSBLOsc_Sin2Theta)     fSin2Theta     = val;
+  if (curenum == kSBLOsc_Sin2Theta) fSin2Theta = val;
 }
 
 bool SBLOscWeightCalc::IsHandled(int rwenum) {
-
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kSBLOsc_Distance: return true;
-    case kSBLOsc_MassSplitting: return true;
-    case kSBLOsc_Sin2Theta: return true;
-    default:  return false;
+    case kSBLOsc_Distance:
+      return true;
+    case kSBLOsc_MassSplitting:
+      return true;
+    case kSBLOsc_Sin2Theta:
+      return true;
+    default:
+      return false;
   }
 }
 
-double SBLOscWeightCalc::GetSBLOscWeight(double E){
+double SBLOscWeightCalc::GetSBLOscWeight(double E) {
   if (E <= 0.0) return 1.0 - 0.5 * fSin2Theta;
-  return 1.0 - fSin2Theta * pow( sin(1.267 * fMassSplitting * fDistance / E ), 2);
+  return 1.0 - fSin2Theta * pow(sin(1.267 * fMassSplitting * fDistance / E), 2);
 }
-
 
 GaussianModeCorr::GaussianModeCorr() {
 
@@ -175,60 +174,57 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 
   int initialstate = -1; // Undef
   if (abs(fevt->Mode) == 2) {
-
     int npr = 0;
     int nne = 0;
 
     for (UInt_t j = 0; j < fevt->Npart(); j++) {
       if ((fevt->PartInfo(j))->fIsAlive) continue;
 
-      if (fevt->PartInfo(j)->fPID == 2212) npr++;
-      else if (fevt->PartInfo(j)->fPID == 2112) nne++;
+      if (fevt->PartInfo(j)->fPID == 2212) 
+        npr++;
+      else if (fevt->PartInfo(j)->fPID == 2112) 
+        nne++;
     }
-    // std::cout << "PN State = " << npr << " " << nne << std::endl;
 
-    if (fevt->Mode == 2 and npr == 1 and nne == 1) {
+    if (fevt->Mode == 2 && npr == 1 && nne == 1) {
       initialstate = 2;
 
-    } else if (fevt->Mode == 2 and ((npr == 0 and nne == 2) or (npr == 2 and nne == 0)))  {
+    } else if (fevt->Mode == 2 && ((npr == 0 && nne == 2) || (npr == 2 && nne == 0)))  {
       initialstate = 1;
     }
   }
 
-  // std::cout << "Got q0 q3 = " << q0 << " " << q3 << std::endl;
+  if (fDebugStatements) std::cout << "Got q0 q3 = " << q0 << " " << q3 << std::endl;
 
   // Apply weighting
-  if (fApply_CCQE and abs(fevt->Mode) == 1) {
+  if (fApply_CCQE && abs(fevt->Mode) == 1) {
     if (fDebugStatements) std::cout << "Getting CCQE Weight" << std::endl;
     double g = GetGausWeight(q0, q3, fGausVal_CCQE);
     if (g < 1.0) g = 1.0;
     rw_weight *= g;
   }
 
-  if (fApply_2p2h and abs(fevt->Mode) == 2) {
+  if (fApply_2p2h && abs(fevt->Mode) == 2) {
     if (fDebugStatements) std::cout << "Getting 2p2h Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h);
   }
 
-  if (fApply_2p2h_PPandNN and abs(fevt->Mode) == 2 and initialstate == 1) {
+  if (fApply_2p2h_PPandNN && abs(fevt->Mode) == 2 && initialstate == 1) {
     if (fDebugStatements) std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_PPandNN);
   }
 
-  if (fApply_2p2h_NP and abs(fevt->Mode) == 2 and initialstate == 2) {
+  if (fApply_2p2h_NP && abs(fevt->Mode) == 2 && initialstate == 2) {
     if (fDebugStatements) std::cout << "Getting 2p2h NP Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_NP);
   }
 
-  if (fApply_CC1pi and abs(fevt->Mode) >= 11 and abs(fevt->Mode) <= 13) {
+  if (fApply_CC1pi && abs(fevt->Mode) >= 11 && abs(fevt->Mode) <= 13) {
     if (fDebugStatements) std::cout << "Getting CC1pi Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_CC1pi);
   }
 
-
-
-
-  // if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
+  if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
   return rw_weight;
 }
 

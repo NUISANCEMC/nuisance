@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include "GenericFlux_Tester.h"
 
@@ -54,7 +54,15 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   eventVariables = NULL;
-  liteMode = FitPar::Config().GetParB("isLiteMode");
+  liteMode = Config::Get().GetParB("isLiteMode");
+
+  if (Config::HasPar("EnuMin")) {
+    EnuMin = Config::GetParD("EnuMin");
+  }
+
+  if (Config::HasPar("EnuMax")) {
+    EnuMax = Config::GetParD("EnuMax");
+  }
 
   // Setup fDataHist as a placeholder
   this->fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
@@ -68,15 +76,18 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   //    Example to get a "per neutron" measurement on carbon
   //    which we do here, we have to multiple by the number of nucleons 12 and
   //    divide by the number of neutrons 6.
+  // N.B. MeasurementBase::PredictedEventRate includes the 1E-38 factor that is
+  // often included here in other classes that directly integrate the event
+  // histogram. This method is used here as it now respects EnuMin and EnuMax
+  // correctly.
   this->fScaleFactor =
-      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+      (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
       this->TotalIntegratedFlux();
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
     throw;
   }
 
-  std::cout << EnuMin << " = " << EnuMax << std::endl;
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
            << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
@@ -102,10 +113,10 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
 
   eventVariables->Branch("Nleptons", &Nleptons, "Nleptons/I");
-// all sensible
+  // all sensible
   eventVariables->Branch("MLep", &MLep, "MLep/F");
   eventVariables->Branch("ELep", &ELep, "ELep/F");
-// negative -999
+  // negative -999
   eventVariables->Branch("TLep", &TLep, "TLep/F");
   eventVariables->Branch("CosLep", &CosLep, "CosLep/F");
   eventVariables->Branch("CosPmuPpip", &CosPmuPpip, "CosPmuPpip/F");
@@ -220,43 +231,47 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
   eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
 };
 
-
 //********************************************************************
 void GenericFlux_Tester::ResetVariables() {
-//********************************************************************
+  //********************************************************************
   // Reset neutrino PDG
   PDGnu = 0;
   // Reset energies
   Enu_true = Enu_QE = __BAD_FLOAT__;
 
   // Reset auxillaries
-  Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true = Erecoil_true = Erecoil_charged = Erecoil_minerva = __BAD_FLOAT__;
+  Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true =
+      Erecoil_true = Erecoil_charged = Erecoil_minerva = __BAD_FLOAT__;
 
   // Reset particle counters
-  Nparticles = Nleptons = Nother = Nprotons = Nneutrons = Npiplus = Npineg = Npi0 = 0;
+  Nparticles = Nleptons = Nother = Nprotons = Nneutrons = Npiplus = Npineg =
+      Npi0 = 0;
 
   // Reset Lepton PDG
   PDGLep = 0;
   // Reset Lepton variables
-  TLep = CosLep = ELep = PLep = MLep  = __BAD_FLOAT__;
+  TLep = CosLep = ELep = PLep = MLep = __BAD_FLOAT__;
 
   // Rset proton variables
-  PPr = CosPr = EPr = TPr = MPr       = __BAD_FLOAT__;
+  PPr = CosPr = EPr = TPr = MPr = __BAD_FLOAT__;
 
   // Reset neutron variables
-  PNe = CosNe = ENe = TNe = MNe       = __BAD_FLOAT__;
+  PNe = CosNe = ENe = TNe = MNe = __BAD_FLOAT__;
 
   // Reset pi+ variables
-  PPiP = CosPiP = EPiP = TPiP = MPiP  = __BAD_FLOAT__;
+  PPiP = CosPiP = EPiP = TPiP = MPiP = __BAD_FLOAT__;
 
   // Reset pi- variables
-  PPiN = CosPiN = EPiN = TPiN = MPiN  = __BAD_FLOAT__;
+  PPiN = CosPiN = EPiN = TPiN = MPiN = __BAD_FLOAT__;
 
   // Reset pi0 variables
-  PPi0 = CosPi0  = EPi0 = TPi0 = MPi0 = __BAD_FLOAT__;
+  PPi0 = CosPi0 = EPi0 = TPi0 = MPi0 = __BAD_FLOAT__;
 
   // Reset the cos angles
-  CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut = CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot = CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut = CosPprotPneut = __BAD_FLOAT__;
+  CosPmuPpip = CosPmuPpim = CosPmuPpi0 = CosPmuPprot = CosPmuPneut =
+      CosPpipPprot = CosPpipPneut = CosPpipPpim = CosPpipPpi0 = CosPpimPprot =
+          CosPpimPneut = CosPpimPpi0 = CosPi0Pprot = CosPi0Pneut =
+              CosPprotPneut = __BAD_FLOAT__;
 }
 
 //********************************************************************
