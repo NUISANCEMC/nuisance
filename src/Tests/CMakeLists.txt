@@ -26,6 +26,10 @@ include_directories(${EXP_INCLUDE_DIRECTORIES})
 
 SET(TESTAPPS SignalDefTests ParserTests SmearceptanceTests)
 
+if(USE_MINIMIZER)
+  # LIST(APPEND TESTAPPS FitMechanicsTests)
+endif()
+
 foreach(appimpl ${TESTAPPS})
   add_executable(${appimpl} ${appimpl}.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};${appimpl})
@@ -38,3 +42,17 @@ foreach(appimpl ${TESTAPPS})
   install(TARGETS ${appimpl} DESTINATION tests)
   add_test(${appimpl} ${appimpl} 1)
 endforeach()
+
+list (FIND TESTAPPS FitMechanicsTests _index)
+if (${_index} GREATER -1)
+  add_library(DummySample SHARED DummySample.cxx)
+  target_link_libraries(DummySample ${MODULETargets})
+  target_link_libraries(DummySample ${CMAKE_DEPENDLIB_FLAGS})
+  target_link_libraries(DummySample ${ROOT_LIBS})
+
+  if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(DummySample PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
+  endif()
+
+  install(TARGETS DummySample DESTINATION tests)
+endif()
