@@ -59,7 +59,6 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name, std::string inputfile
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
-  std::cout << EnuMin << " = " << EnuMax << std::endl;
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
            << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
