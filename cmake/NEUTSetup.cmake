@@ -133,7 +133,6 @@ LIST(APPEND NEUT_ROOT_LIBS
   ${NEUT_CLASS}/neutfsipart.so
   ${NEUT_CLASS}/neutpart.so
   ${NEUT_CLASS}/neutvect.so
-  -Wl,--as-needed
   )
 
 foreach(OBJ ${NEUT_ROOT_LIBS})
