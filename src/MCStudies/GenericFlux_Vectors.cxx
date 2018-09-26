@@ -29,7 +29,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
-  EnuMax = 100.; // Arbritrarily high energy limit
+  EnuMax = 1E10;  // Arbritrarily high energy limit
 
   if (Config::HasPar("EnuMin")) {
     EnuMin = Config::GetParD("EnuMin");
@@ -69,17 +69,23 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   // histogram. This method is used here as it now respects EnuMin and EnuMax
   // correctly.
   this->fScaleFactor =
-      (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
+      (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
       this->TotalIntegratedFlux();
 
-  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor << std::endl;
+  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
+           << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
+           << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
+           << std::endl;
+
 
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
+    throw;
   }
 
   // Setup our TTrees
   this->AddEventVariablesToTree();
+  this->AddSignalFlagsToTree();
 }
 
 void GenericFlux_Vectors::AddEventVariablesToTree() {
@@ -121,9 +127,10 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("pdg", pdg, "pdg[nfsp]/I");
 
   // Event Scaling Information
-  eventVariables->Branch("Weight", &Weight, "Weight/D");
-  eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/D");
-  eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/D");
+  eventVariables->Branch("Weight", &Weight, "Weight/F");
+  eventVariables->Branch("InputWeight", &InputWeight, "InputWeight/F");
+  eventVariables->Branch("RWWeight", &RWWeight, "RWWeight/F");
+  // Should be a double because may be 1E-39 and less
   eventVariables->Branch("fScaleFactor", &fScaleFactor, "fScaleFactor/D");
 
   return;
@@ -183,10 +190,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
 
-    bool part_alive = event->PartInfo(i)->fIsAlive and
+    bool part_alive = event->PartInfo(i)->fIsAlive &&
                       event->PartInfo(i)->Status() == kFinalState;
-    if (!part_alive)
-      continue;
+    if (!part_alive) continue;
 
     partList.push_back(event->PartInfo(i));
   }
@@ -210,6 +216,33 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   // Fill the eventVariables Tree
   eventVariables->Fill();
   return;
+};
+
+void GenericFlux_Vectors::AddSignalFlagsToTree() {
+  if (!eventVariables) {
+    Config::Get().out->cd();
+    eventVariables = new TTree((this->fName + "_VARS").c_str(),
+                               (this->fName + "_VARS").c_str());
+  }
+
+  LOG(SAM) << "Adding signal flags" << std::endl;
+
+  // Signal Definitions from SignalDef.cxx
+  eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
+  eventVariables->Branch("flagNCINC", &flagNCINC, "flagNCINC/O");
+  eventVariables->Branch("flagCCQE", &flagCCQE, "flagCCQE/O");
+  eventVariables->Branch("flagCC0pi", &flagCC0pi, "flagCC0pi/O");
+  eventVariables->Branch("flagCCQELike", &flagCCQELike, "flagCCQELike/O");
+  eventVariables->Branch("flagNCEL", &flagNCEL, "flagNCEL/O");
+  eventVariables->Branch("flagNC0pi", &flagNC0pi, "flagNC0pi/O");
+  eventVariables->Branch("flagCCcoh", &flagCCcoh, "flagCCcoh/O");
+  eventVariables->Branch("flagNCcoh", &flagNCcoh, "flagNCcoh/O");
+  eventVariables->Branch("flagCC1pip", &flagCC1pip, "flagCC1pip/O");
+  eventVariables->Branch("flagNC1pip", &flagNC1pip, "flagNC1pip/O");
+  eventVariables->Branch("flagCC1pim", &flagCC1pim, "flagCC1pim/O");
+  eventVariables->Branch("flagNC1pim", &flagNC1pim, "flagNC1pim/O");
+  eventVariables->Branch("flagCC1pi0", &flagCC1pi0, "flagCC1pi0/O");
+  eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
 };
 
 void GenericFlux_Vectors::Write(std::string drawOpt) {

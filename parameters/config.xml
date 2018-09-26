@@ -15,7 +15,6 @@
 <!-- # 4 Reconfigure Loops -->
 <!-- # 5 Every Event print out (SHOUT) -->
 <!-- # -1 DEBUGGING -->
-<config verbosity='5'/>
 <config VERBOSITY='5'/>
 
 <!-- # ERROR goes from -->
