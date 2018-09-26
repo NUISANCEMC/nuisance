@@ -194,8 +194,6 @@ public:
   bool flagCC1pi0;
   bool flagNC1pi0;
 
-  float xsecScaling;
-
 };
 
 #endif
