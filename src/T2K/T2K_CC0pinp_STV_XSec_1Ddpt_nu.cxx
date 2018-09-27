@@ -76,10 +76,6 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(nuiskey samplekey) 
   FinaliseMeasurement();
 
 };
-
-
-
-
 void T2K_CC0pinp_STV_XSec_1Ddpt_nu::FillEventVariables(FitEvent *event) {
   fXVar = FitUtils::Get_STV_dpt(event, 14, true) / 1000.0;
   return;

@@ -74,9 +74,6 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(nuiskey samplekey) 
 
 };
 
-
-
-
 void T2K_CC0pinp_STV_XSec_1Ddat_nu::FillEventVariables(FitEvent *event) {
   fXVar = FitUtils::Get_STV_dalphat(event, 14, true);
   return;

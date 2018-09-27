@@ -153,7 +153,6 @@ void Measurement1D::FinaliseSampleSettings() {
       throw;
     }
   }
-
 }
 
 //********************************************************************
