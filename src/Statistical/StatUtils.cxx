@@ -588,12 +588,13 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag,
 
   // iterate over bins
   for (int i = 0; i < hist->GetNbinsX(); i++) {
-    // By Default the errors on the histogram are thrown uncorrelated to the
-    // other errors
-    //    if (throwdiag) {
-    //      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
-    //				       gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
-    //    }
+    // By Default the errors on the histogram are thrown uncorrelated to the other errors
+    /*
+    if (throwdiag) {
+      calc_hist->SetBinContent(i + 1, (calc_hist->GetBinContent(i + 1) + \
+           gRandom->Gaus(0.0, 1.0) * calc_hist->GetBinError(i + 1)) );
+    }
+    */
 
     // If a covariance is provided that is also thrown
     if (cov) {
@@ -923,13 +924,36 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
 
   // Check
   if (cov->GetNrows() != data->GetNbinsX()) {
-    ERR(WRN) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov"
-             << std::endl;
+    ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
+    ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
+    ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
+    //throw;
   }
 
   // Set bin errors form cov diag
+  // Check if the errors are set
+  bool ErrorsSet = false;
   for (int i = 0; i < data->GetNbinsX(); i++) {
-    data->SetBinError(i + 1, sqrt((*cov)(i, i)) * scale);
+    if (ErrorsSet == true) break;
+    if (data->GetBinError(i+1) != 0) ErrorsSet = true;
+  }
+
+  // Now loop over
+  if (ErrorsSet) {
+    for (int i = 0; i < data->GetNbinsX(); i++) {
+      double dataerr = data->GetBinError(i + 1);
+      double coverr = sqrt((*cov)(i, i))*scale;
+      if (fabs(dataerr-coverr) > 1E-44) {
+        ERR(FTL) << "Data error does not match covariance error for bin " << i+1 << " (" << data->GetXaxis()->GetBinLowEdge(i+1) << "-" << data->GetXaxis()->GetBinLowEdge(i+2) << ")" << std::endl;
+        ERR(FTL) << "Data error: " << dataerr << std::endl;
+        ERR(FTL) << "Cov error:  " << coverr << std::endl;
+      }
+    }
+    // Else blindly trust the covariance
+  } else {
+    for (int i = 0; i < data->GetNbinsX(); i++) {
+      data->SetBinError(i+1, sqrt((*cov)(i,i))*scale);
+    }
   }
 
   return;
@@ -937,7 +961,7 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
 
 //*******************************************************************
 void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map,
-                                    double scale) {
+    double scale) {
   //*******************************************************************
 
   // Create map if required
@@ -958,23 +982,23 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map,
 }
 
 TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
-                                              TH1* data_hist,
-                                              double data_scale) {
+    TH1* data_hist,
+    double data_scale) {
   int nbins = full_covar->GetNrows();
   TMatrixDSym* shape_covar = new TMatrixDSym(nbins);
 
   // Check nobody is being silly
   if (data_hist->GetNbinsX() != nbins) {
     ERR(WRN) << "Inconsistent matrix and data histogram passed to "
-                "StatUtils::ExtractShapeOnlyCovar!"
-             << std::endl;
+      "StatUtils::ExtractShapeOnlyCovar!"
+      << std::endl;
     ERR(WRN) << "data_hist has " << data_hist->GetNbinsX() << " matrix has "
-             << nbins << std::endl;
+      << nbins << std::endl;
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins) err_bins = nbins;
     for (int i = 0; i < err_bins; ++i) {
       ERR(WRN) << "Matrix diag. = " << (*full_covar)(i, i)
-               << " data = " << data_hist->GetBinContent(i + 1) << std::endl;
+        << " data = " << data_hist->GetBinContent(i + 1) << std::endl;
     }
     return NULL;
   }
@@ -992,8 +1016,8 @@ TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
 
   if (total_data == 0 || total_covar == 0) {
     ERR(WRN) << "Stupid matrix or data histogram passed to "
-                "StatUtils::ExtractShapeOnlyCovar! Ignoring..."
-             << std::endl;
+      "StatUtils::ExtractShapeOnlyCovar! Ignoring..."
+      << std::endl;
     return NULL;
   }
 
@@ -1007,7 +1031,7 @@ TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
       double data_j = data_hist->GetBinContent(j + 1) * data_scale;
 
       double norm_term =
-          data_i * data_j * total_covar / total_data / total_data;
+        data_i * data_j * total_covar / total_data / total_data;
       double mix_sum1 = 0;
       double mix_sum2 = 0;
 
@@ -1017,14 +1041,14 @@ TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
       }
 
       double mix_term1 =
-          data_i * (mix_sum1 / total_data -
-                    total_covar * data_j / total_data / total_data);
+        data_i * (mix_sum1 / total_data -
+            total_covar * data_j / total_data / total_data);
       double mix_term2 =
-          data_j * (mix_sum2 / total_data -
-                    total_covar * data_i / total_data / total_data);
+        data_j * (mix_sum2 / total_data -
+            total_covar * data_i / total_data / total_data);
 
       (*shape_covar)(i, j) =
-          (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
+        (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
     }
   }
   return shape_covar;
@@ -1037,8 +1061,8 @@ TH2I* StatUtils::GenerateMap(TH2D* hist) {
   std::string maptitle = std::string(hist->GetName()) + "_MAP";
 
   TH2I* map =
-      new TH2I(maptitle.c_str(), maptitle.c_str(), hist->GetNbinsX(), 0,
-               hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
+    new TH2I(maptitle.c_str(), maptitle.c_str(), hist->GetNbinsX(), 0,
+        hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
 
   Int_t index = 1;
 
@@ -1076,9 +1100,9 @@ TH1D* StatUtils::MapToTH1D(TH2D* hist, TH2I* map) {
       if (map->GetBinContent(i + 1, j + 1) == 0) continue;
 
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
-                             hist->GetBinContent(i + 1, j + 1));
+          hist->GetBinContent(i + 1, j + 1));
       newhist->SetBinError(map->GetBinContent(i + 1, j + 1),
-                           hist->GetBinError(i + 1, j + 1));
+          hist->GetBinError(i + 1, j + 1));
     }
   }
 
@@ -1106,7 +1130,7 @@ TH1I* StatUtils::MapToMask(TH2I* hist, TH2I* map) {
       if (map->GetBinContent(i + 1, j + 1) == 0) continue;
 
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
-                             hist->GetBinContent(i + 1, j + 1));
+          hist->GetBinContent(i + 1, j + 1));
     }
   }
 
@@ -1121,7 +1145,7 @@ TMatrixDSym* StatUtils::GetCovarFromCorrel(TMatrixDSym* correl, TH1D* data) {
   for (int i = 0; i < nbins; i++) {
     for (int j = 0; j < nbins; j++) {
       (*covar)(i, j) =
-          (*correl)(i, j) * data->GetBinError(i + 1) * data->GetBinError(j + 1);
+        (*correl)(i, j) * data->GetBinError(i + 1) * data->GetBinError(j + 1);
     }
   }
 
@@ -1130,7 +1154,7 @@ TMatrixDSym* StatUtils::GetCovarFromCorrel(TMatrixDSym* correl, TH1D* data) {
 
 //*******************************************************************
 TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
-                                           int dimy) {
+    int dimy) {
   //*******************************************************************
 
   // Determine dim
@@ -1146,11 +1170,11 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
       if (entries.size() <= 1) {
         ERR(WRN) << "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                    "entries on this line: "
-                 << row << std::endl;
+          "entries on this line: "
+          << row << std::endl;
       }
       for (std::vector<double>::iterator iter = entries.begin();
-           iter != entries.end(); iter++) {
+          iter != entries.end(); iter++) {
         column++;
 
         if (column > dimx) dimx = column;
@@ -1178,11 +1202,11 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     if (entries.size() <= 1) {
       ERR(WRN) << "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                  "entries on this line: "
-               << row << std::endl;
+        "entries on this line: "
+        << row << std::endl;
     }
     for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
+        iter != entries.end(); iter++) {
       // Check Rows
       // assert(row > mat->GetNrows() && " covar rows doesn't match matrix
       // rows.");
@@ -1201,7 +1225,7 @@ TMatrixD* StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
 //*******************************************************************
 TMatrixD* StatUtils::GetMatrixFromRootFile(std::string covfile,
-                                           std::string histname) {
+    std::string histname) {
   //*******************************************************************
 
   std::string inputfile = covfile + ";" + histname;
@@ -1287,7 +1311,7 @@ TMatrixDSym* StatUtils::GetCovarFromTextFile(std::string covfile, int dim) {
 
 //*******************************************************************
 TMatrixDSym* StatUtils::GetCovarFromRootFile(std::string covfile,
-                                             std::string histname) {
+    std::string histname) {
   //*******************************************************************
 
   TMatrixD* tempmat = GetMatrixFromRootFile(covfile, histname);

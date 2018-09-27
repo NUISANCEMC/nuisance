@@ -711,6 +711,10 @@ TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
 
   TFile* rootHistFile = new TFile(file.c_str(), "READ");
   TH1D* tempHist = (TH1D*)rootHistFile->Get(name.c_str())->Clone();
+  if (tempHist == NULL) {
+    ERR(FTL) << "Could not find distribution " << name << " in file " << file << std::endl;
+    throw;
+  }
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();

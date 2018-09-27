@@ -195,7 +195,6 @@ bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
 
-
   // Proton phase space
   if (pp.Vect().Mag() < 500) {
     return false;

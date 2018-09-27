@@ -66,8 +66,6 @@ public:
 	void Set(std::string name, std::string s);
 	void Set(std::string name, double d);
 
-	
-
 	std::vector<int> fAllowedTargets;
 	std::vector<int> fAllowedSpecies;
   	nuiskey fKeyValues;
