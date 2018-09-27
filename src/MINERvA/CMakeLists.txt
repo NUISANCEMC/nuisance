@@ -26,6 +26,8 @@ MINERvA_CC0pi_XSec_1DQ2_nue.cxx
 MINERvA_CC0pi_XSec_1DQ2_nu_proton.cxx
 MINERvA_CC0pi_XSec_1DThetae_nue.cxx
 
+MINERvA_CC0pinp_STV_XSec_1D_nu.cxx
+
 MINERvA_CC1pi0_XSec_1DEnu_antinu.cxx
 MINERvA_CC1pi0_XSec_1DQ2_antinu.cxx
 MINERvA_CC1pi0_XSec_1Dpmu_antinu.cxx
@@ -93,6 +95,8 @@ MINERvA_CC0pi_XSec_1DEe_nue.h
 MINERvA_CC0pi_XSec_1DQ2_nue.h
 MINERvA_CC0pi_XSec_1DQ2_nu_proton.h
 MINERvA_CC0pi_XSec_1DThetae_nue.h
+
+MINERvA_CC0pinp_STV_XSec_1D_nu.h
 
 MINERvA_CC1pi0_XSec_1DEnu_antinu.h
 MINERvA_CC1pi0_XSec_1DQ2_antinu.h

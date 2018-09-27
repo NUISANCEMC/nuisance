@@ -285,6 +285,7 @@ namespace SignalDef {
 
     /*
     // Additionally look for charged proton track
+    // Comment: This is _NOT_ in the signal definition but was tested
     bool HasProton = event->HasFSParticle(2212);
 
     if (CC1pi0_anu) {
@@ -324,7 +325,7 @@ namespace SignalDef {
     int genie_n_heavy_baryons_plus_pi0s = 0;
     int genie_n_photons       = 0;
 
-    for(int i = 0; i < event->NParticles(); ++i) {
+    for(unsigned int i = 0; i < event->NParticles(); ++i) {
       FitParticle* p = event->GetParticle(i);
       if (p->Status() != kFinalState) continue;
 
@@ -363,7 +364,7 @@ namespace SignalDef {
     int genie_n_heavy_baryons_plus_pi0s = 0;
     int genie_n_photons       = 0;
 
-    for(int i = 0; i < event->NParticles(); ++i) {
+    for(unsigned int i = 0; i < event->NParticles(); ++i) {
       FitParticle* p = event->GetParticle(i);
       if (p->Status() != kFinalState) continue;
 
@@ -382,9 +383,34 @@ namespace SignalDef {
         genie_n_heavy_baryons_plus_pi0s++;
     }
 
-    if( genie_n_muons == 1 && genie_n_mesons == 0 && genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons       == 0 )
-      return true;
+    if( genie_n_muons == 1 && genie_n_mesons == 0 && genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons       == 0 ) return true;
     return false;
   }
+
+  // MINERvA CC0pi transverse variables signal defintion
+  bool isCC0piNp_MINERvA_STV(FitEvent *event, double EnuMin, double EnuMax) {
+
+    // Require a numu CC0pi event
+    if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+
+    // Require at least one FS proton
+    if (event->NumFSParticle(2212) == 0) return false;
+
+    TLorentzVector pnu = event->GetHMISParticle(14)->fP;
+    TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
+    TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+
+    // Muon momentum cuts
+    if (pmu.Vect().Mag() < 1500 || pmu.Vect().Mag() > 10000) return false;
+    // Muon angle cuts
+    if (pmu.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*20.0) return false;
+
+    // Proton momentum cuts
+    if (pp.Vect().Mag() < 450 || pp.Vect().Mag() > 1200) return false;
+    // Proton angle cuts
+    if (pp.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*70) return false;
+
+    return true;
+  };
 
 }
