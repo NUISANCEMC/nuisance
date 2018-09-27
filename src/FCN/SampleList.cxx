@@ -162,6 +162,9 @@
 #include "MINERvA_CC0pi_XSec_1DQ2_nue.h"
 #include "MINERvA_CC0pi_XSec_1DThetae_nue.h"
 
+// 2018 MINERvA CC0pi
+#include "MINERvA_CC0pinp_STV_XSec_1D_nu.h"
+
 // MINERvA CC1pi+
 #include "MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
@@ -967,6 +970,17 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DThetae_nue")) {
     return (new MINERvA_CC0pi_XSec_1DThetae_nue(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pinp_STV_XSec_1Dpmu_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpprot_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthprot_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu")) {
+    return (new MINERvA_CC0pinp_STV_XSec_1D_nu(samplekey));
+
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nu_proton")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_nu_proton(samplekey));

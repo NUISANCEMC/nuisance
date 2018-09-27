@@ -704,10 +704,12 @@ double FitUtils::Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi) {
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
   TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
 
+  // If we don't have a CC0pi signal definition we also add in pion momentum
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
+    // Count up pion momentum
     TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
     HadronP += pp.Vect();
   }
@@ -769,6 +771,7 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
 
 // As defined in PhysRevC.95.065501
 // Using prescription from arXiv 1805.05486 
+// Returns in GeV
 double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
 
   const double mn = PhysConst::mass_neutron;  // neutron mass
