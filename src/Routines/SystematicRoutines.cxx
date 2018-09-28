@@ -1231,8 +1231,8 @@ void SystematicRoutines::EigenErrors(){
     TH2D covhist  = pull->GetFullCovar();
 
     // Loop over all dials and compare names
-    for (int pari = 0; pari < fParams.size(); pari++){
-      for (int parj = 0; parj < fParams.size(); parj++){
+    for (size_t pari = 0; pari < fParams.size(); pari++){
+      for (size_t parj = 0; parj < fParams.size(); parj++){
 	
 	std::string name_pari = fParams[pari];
 	std::string name_parj = fParams[parj];
@@ -1283,7 +1283,7 @@ void SystematicRoutines::EigenErrors(){
   outnominal->cd();
 
   double *valst = FitUtils::GetArrayFromMap( fParams, fCurVals );
-  double chi2 = fSampleFCN->DoEval( valst );
+  //double chi2 = fSampleFCN->DoEval( valst );
   delete valst;
   fSampleFCN->Write();
 
