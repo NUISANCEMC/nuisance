@@ -337,7 +337,7 @@ void Smear_SVDUnfold_Propagation_Osc::FinaliseFDSamples() {
     fds.FD_Propagated_Spectrum_Hist->SetName(ss.str().c_str());
 
     for (size_t nd_it = 0; nd_it < NDSamples.size(); ++nd_it) {
-      NDSample &nds = NDSamples[nd_it];
+      //NDSample &nds = NDSamples[nd_it];
 
       TH1D *sampleHist =
           static_cast<TH1D *>(fds.FD_Propagated_Spectrum_Hist->Clone());
