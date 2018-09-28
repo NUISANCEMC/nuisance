@@ -155,7 +155,7 @@ void JointFCN::WriteIterationTree() {
   int count = 0;
 
   itree->Branch("iteration", &count, "Iteration/I");
-  for (int i = 0; i < fNameValues.size(); i++) {
+  for (size_t i = 0; i < fNameValues.size(); i++) {
     itree->Branch(fNameValues[i].c_str(), &vals[i],
                   (fNameValues[i] + "/D").c_str());
   }
@@ -941,7 +941,7 @@ void JointFCN::Write() {
       TH1D("ndof_hist", "ndof_hist", ndofs.size(), 0.0, double(ndofs.size()));
   TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist", likes.size(), 0.0,
                       double(likes.size()));
-  for (size_t i = 0; i < likehist.GetNbinsX(); i++) {
+  for (int i = 0; i < likehist.GetNbinsX(); i++) {
     likehist.SetBinContent(i + 1, likes[i]);
     ndofhist.SetBinContent(i + 1, ndofs[i]);
     if (ndofs[i] != 0.0) {
