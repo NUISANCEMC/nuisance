@@ -50,46 +50,65 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
   // Data release is a single file
   std::string rootfile = "MINERvA_1805.05486.root";
 
+  fMin = -999;
+  fMax = 999;
+
   switch (fDist) {
     case (kMuonMom):
       titles += "pmu";
       foldername = "muonmomentum";
       distdescript = "Muon momentum in lab frame";
+      fMin = 2.0;
+      fMax = 6.0;
       break;
     case (kMuonTh):
       titles += "thmu";
       foldername = "muontheta";
       distdescript = "Muon angle relative neutrino in lab frame";
+      fMin = 0.0;
+      fMax = 20.0;
       break;
     case (kPrMom):
       titles += "pprot";
       foldername = "protonmomentum";
       distdescript = "Proton momentum in lab frame";
+      fMin = 0.5;
+      fMax = 1.2;
       break;
     case (kPrTh):
       titles += "thprot";
       foldername = "protontheta";
       distdescript = "Proton angle relative neutrino in lab frame";
+      fMin = 0.0;
+      fMax = 70.0;
       break;
     case (kNeMom):
       titles += "pnreco";
       foldername = "neutronmomentum";
       distdescript = "Neutron momentum in lab frame";
+      fMin = 0.0;
+      fMax = 0.9;
       break;
     case (kDalphaT):
       foldername = "dalphat";
       titles += foldername;
       distdescript = "Delta Alpha_T";
+      fMin = 0.0;
+      fMax = 170;
       break;
     case (kDpT):
       foldername = "dpt";
       titles += foldername;
       distdescript = "Delta p_T";
+      fMin = 0.0;
+      fMax = 170;
       break;
     case (kDphiT):
       foldername = "dphit";
       titles += foldername;
       distdescript = "Delta phi_T";
+      fMin = 0.0;
+      fMax = 60.0;
       break;
     default:
       ERR(FTL) << "Did not find your specified distribution implemented, exiting" << std::endl;
@@ -140,10 +159,9 @@ MINERvA_CC0pinp_STV_XSec_1D_nu::MINERvA_CC0pinp_STV_XSec_1D_nu(nuiskey samplekey
 
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   // No Enu cut
-  fSettings.SetEnuRange(0.0, 50.0);
+  fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
   fSettings.DefineAllowedSpecies("numu");
-
 
   // Finalise the settings
   FinaliseSampleSettings();
@@ -154,8 +172,8 @@ MINERvA_CC0pinp_STV_XSec_1D_nu::MINERvA_CC0pinp_STV_XSec_1D_nu(nuiskey samplekey
                 (double(fNEvents) * TotalIntegratedFlux("width"));
 
   // Set the data and covariance matrix
-  SetCovarianceFromRootFile(fSettings.GetCovarInput() ); 
   SetDataFromRootFile( fSettings.GetDataInput() );
+  SetCovarianceFromRootFile(fSettings.GetCovarInput() ); 
 
   fSettings.SetXTitle(fDataHist->GetXaxis()->GetTitle());
   fSettings.SetYTitle(fDataHist->GetYaxis()->GetTitle());
@@ -179,17 +197,22 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetDataFromRootFile(std::string filename) {
   std::vector<double> CrossSection;
   std::vector<double> Error;
   std::vector<double> BinEdges;
-  for (int i = 0; i < temp->GetXaxis()->GetNbins()+1; ++i) {
-    if (temp->GetBinContent(i+1) > 0) {
+  int lastbin = 0;
+  startbin = 0;
+  for (int i = 0; i < temp->GetXaxis()->GetNbins()+2; ++i) {
+    if (temp->GetBinContent(i+1) > 0 && temp->GetBinLowEdge(i+1) > fMin && temp->GetBinLowEdge(i+1) < fMax) {
+      if (startbin == 0) startbin = i;
+      lastbin = i;
       CrossSection.push_back(temp->GetBinContent(i+1));
       BinEdges.push_back(temp->GetXaxis()->GetBinLowEdge(i+1));
       Error.push_back(temp->GetBinError(i+1));
     }
   }
+  BinEdges.push_back(temp->GetXaxis()->GetBinLowEdge(lastbin+2));
 
   fDataHist = new TH1D((fSettings.GetName()+"_data").c_str(), (fSettings.GetFullTitles()).c_str(), BinEdges.size()-1, &BinEdges[0]);
   fDataHist->SetDirectory(0);
-  for (unsigned int i = 0; i < BinEdges.size(); ++i) {
+  for (unsigned int i = 0; i < BinEdges.size()-1; ++i) {
     fDataHist->SetBinContent(i+1, CrossSection[i]);
     fDataHist->SetBinError(i+1, Error[i]);
   }
@@ -209,27 +232,26 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetCovarianceFromRootFile(std::string filen
   TFile *File = new TFile(tempfile[0].c_str(), "READ");
   // First object is the data, second is data with statistical error only, third is the covariance matrix
   TMatrixDSym *tempcov = (TMatrixDSym*)((TList*)File->Get(tempfile[1].c_str()))->At(2);
-  // Strip out the first two and last two columns
-  int nbins = tempcov->GetNrows();
   // Count the number of zero entries
   int ngood = 0;
   int nstart = -1;
   int nend = -1;
   // Scan through the middle bin and look for entries
   int middle = tempcov->GetNrows()/2;
+  int nbinsdata = fDataHist->GetXaxis()->GetNbins();
+
   for (int j = 0; j < tempcov->GetNrows(); ++j) {
-    if ((*tempcov)(middle,j) > 0) {
+    if ((*tempcov)(middle,j) > 0 && ngood < nbinsdata) {
       ngood++;
       if (nstart == -1) nstart = j;
       if (j > nend) nend = j;
     }
   }
-  ngood--;
 
   fFullCovar = new TMatrixDSym(ngood);
   for (int i = 0; i < fFullCovar->GetNrows(); ++i) {
     for (int j = 0; j < fFullCovar->GetNrows(); ++j) {
-      (*fFullCovar)(i,j) = (*tempcov)(i+nstart, j+nstart);
+      (*fFullCovar)(i,j) = (*tempcov)(i+nstart+startbin-1, j+nstart+startbin-1);
     }
   }
   (*fFullCovar) *= 1E38*1E38;
@@ -251,7 +273,21 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
 
   switch (fDist) {
     case (kMuonMom):

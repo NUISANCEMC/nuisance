@@ -48,6 +48,11 @@ public:
   } MINERvA_CC0pi_STV_DataDistributions;
 
   DataDistribution fDist;
+
+  // For truncating
+  double fMin;
+  double fMax;
+  int startbin;
 };
 
 #endif
