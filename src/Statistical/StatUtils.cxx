@@ -121,7 +121,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D* data, TH1D* mc, TMatrixDSym* invcov,
       double mcerr = calc_mc->GetBinError(i + 1) * sqrt(covar_scale);
       double oldval = (*newcov)(i, i);
 
-      std::cout << "Adding cov stat " << mcerr * mcerr << " to "
+      LOG(FIT) << "Adding cov stat " << mcerr * mcerr << " to "
                 << (*newcov)(i, i) << std::endl;
       (*newcov)(i, i) = oldval + mcerr * mcerr;
     }
@@ -943,7 +943,8 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
     for (int i = 0; i < data->GetNbinsX(); i++) {
       double dataerr = data->GetBinError(i + 1);
       double coverr = sqrt((*cov)(i, i))*scale;
-      if (fabs(dataerr-coverr) > 1E-44) {
+      // Check that the errors are within 1% of eachother
+      if (fabs(dataerr-coverr)/dataerr > 0.01) {
         ERR(FTL) << "Data error does not match covariance error for bin " << i+1 << " (" << data->GetXaxis()->GetBinLowEdge(i+1) << "-" << data->GetXaxis()->GetBinLowEdge(i+2) << ")" << std::endl;
         ERR(FTL) << "Data error: " << dataerr << std::endl;
         ERR(FTL) << "Cov error:  " << coverr << std::endl;
