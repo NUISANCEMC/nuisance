@@ -112,7 +112,7 @@ FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry,
 
   // Fill Stack
   fNUISANCEEvent->fNParticles = 0;
-  for (size_t i = 0; i < fReadNParticles; i++) {
+  for (int i = 0; i < fReadNParticles; i++) {
     size_t curpart = fNUISANCEEvent->fNParticles;
     fNUISANCEEvent->fParticleState[curpart] = fReadParticleState[i];
 
