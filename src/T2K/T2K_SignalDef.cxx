@@ -150,7 +150,7 @@ bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax) {
   //Need exactly one proton with 500 MeV or more momentum
   std::vector<FitParticle*> protons = event->GetAllFSProton();
   int nProtonsAboveThresh=0;
-  for(int i=0; i<protons.size(); i++){
+  for(size_t i=0; i<protons.size(); i++){
     if(protons[i]->p()>500) nProtonsAboveThresh++;
   }
   if(nProtonsAboveThresh!=1) return false;
@@ -203,7 +203,7 @@ bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
   //Need exactly one proton with 500 MeV or more momentum
   std::vector<FitParticle*> protons = event->GetAllFSProton();
   int nProtonsAboveThresh=0;
-  for(int i=0; i<protons.size(); i++){
+  for(size_t i=0; i<protons.size(); i++){
     if(protons[i]->p()>500) nProtonsAboveThresh++;
   }
   if(nProtonsAboveThresh<2) return false;

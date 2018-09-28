@@ -89,9 +89,8 @@ void T2K_CC0pinp_ifk_XSec_3Dinfp_nu::FillEventVariables(FitEvent* event){
   TLorentzVector Pp  = event->GetHMFSParticle(2212)->fP;
 
   double pmu = Pmu.Vect().Mag()/1000.;
-  double pp = Pp.Vect().Mag()/1000.;
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
-  double delta_p = pp-FitUtils::ppInfK(Pmu, CosThetaMu, 25, true);
+  double delta_p = Pp.Vect().Mag()/1000. - FitUtils::ppInfK(Pmu, CosThetaMu, 25, true);
 
   fXVar = delta_p;
   fYVar = pmu;
