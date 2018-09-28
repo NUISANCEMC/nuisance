@@ -79,7 +79,7 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
 
   // Measurement Details
   std::vector<std::string> splitName = GeneralUtils::ParseToStr(fName, "_");
-  size_t firstUS = fName.find_first_of("_");
+  //size_t firstUS = fName.find_first_of("_");
 
   std::string smearceptorName = samplekey.GetS("smearceptor");
   QLOG(SAM, "Using smearceptor: " << smearceptorName
