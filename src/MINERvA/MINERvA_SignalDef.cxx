@@ -398,17 +398,26 @@ namespace SignalDef {
 
     TLorentzVector pnu = event->GetHMISParticle(14)->fP;
     TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-    TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
 
     // Muon momentum cuts
     if (pmu.Vect().Mag() < 1500 || pmu.Vect().Mag() > 10000) return false;
     // Muon angle cuts
     if (pmu.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*20.0) return false;
 
+    // Since there are emany protons allowed we can't just use the highest proton momentum candidate and place cuts on it
+    // Get the stack of protons
+    std::vector<FitParticle*> Protons = event->GetAllFSProton();
+    // Count how many protons pass the threshold
+    int nProtonsAboveThreshold = 0;
+    for (size_t i = 0; i < Protons.size(); ++i) {
+      if (Protons[i]->p() > 450 && Protons[i]->p() < 1200 && Protons[i]->P3().Angle(pnu.Vect()) < (M_PI/180.0)*70.0) nProtonsAboveThreshold++;
+    }
+
     // Proton momentum cuts
-    if (pp.Vect().Mag() < 450 || pp.Vect().Mag() > 1200) return false;
+    //if (pp.Vect().Mag() < 450 || pp.Vect().Mag() > 1200) return false;
     // Proton angle cuts
-    if (pp.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*70) return false;
+    //if (pp.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*70) return false;
+    if (nProtonsAboveThreshold == 0) return false;
 
     return true;
   };

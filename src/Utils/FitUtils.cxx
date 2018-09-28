@@ -702,7 +702,24 @@ double FitUtils::Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi) {
   TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  // Get highest momentum proton in allowed proton range
+  TVector3 HadronP = Pprot.Vect();
 
   // If we don't have a CC0pi signal definition we also add in pion momentum
   if (!Is0pi) {
@@ -731,8 +748,25 @@ double FitUtils::Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi) {
   TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
 
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  // Get highest momentum proton in allowed proton range
+  TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
@@ -742,6 +776,7 @@ double FitUtils::Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi) {
   }
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
 }
+
 double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
@@ -757,8 +792,25 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
   TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
 
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  // Get highest momentum proton in allowed proton range
+  TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
@@ -791,23 +843,41 @@ double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
   TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
+
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  // Get highest momentum proton in allowed proton range
+  TVector3 HadronP = Pprot.Vect();
 
   double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
-  double const eh = event->GetHMFSParticle(2212)->E()/1000.;
+  double const eh = Pprot.E();
 
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
-    //TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    //HadronP += pp.Vect();
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += pp.Vect();
   }
   TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
   double dptMag = dpt.Mag()/1000.;
 
   double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from PhysRevC.95.065501)
-  double map = ma - mn + 0.02713; // reminant mass
+  double map = ma - mn + 0.02713; // remnant mass
 
   double pmul = LeptonP.Dot(NuP.Unit())/1000.;
   double phl = HadronP.Dot(NuP.Unit())/1000.;
