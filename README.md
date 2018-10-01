@@ -9,6 +9,8 @@ Talk is available on [FNAL DocDB](https://minerva-docdb.fnal.gov/cgi-bin/private
 
 Requires GENIE 2.8.4 and above and the generated GENIE files. 
 
+Please read the known issues!
+
 ----
 ## Instructions
 Follow the usual instructions to install NUISANCE.
@@ -87,6 +89,8 @@ These are far from perfect and exclude some known problems with some data distri
 The cross section scaling variable `fScaleFactor` does not play well with the NOvA target. Will be fixed.
 
 Some of the data distributions have broken in moving beyond v2r7. E.g. MiniBooNE CCQE Q2 seems to have issues under some ROOT versions (e.g. 5.34/36). Will be fixed.
+
+The ``${NUISANCE}/data/reweight`` directory does not exist. This is because the RikRPA files are very heavy (beyond git recommendations), so have to be added manually. Email us below to sort this out.
 
 ----
 ## Contact
