@@ -26,6 +26,12 @@ In a nutshell:
 7. `${NUISANCE}/build/app/PrepareGENIE` prepares GENIE output files for NUISANCE use. It converts the GHep format into something more manageable and produces cross-sections per target and per process. Its syntax is found by `./PrepareGENIE --help`
 
 ----
+## Generated GENIE files
+The GENIE files used are located [on the box](https://imperialcollegelondon.box.com/s/by59v4sxm1vjjdkvvdhr7lx1stwlwmro). The file naming is `EXPERIMENT_FluxAndTarget_WithTUNEModel*.root`, where `EXPERIMENT` is the experiment whose flux and target generated the events, and `TUNE` is the NOvA or MINERvA tune.
+
+The `WithNOvAModel` files should have an additional `TTree` called `nova_wgts`, which are the weights provided by Jeremy Wolcott (Tufts). See below for the meaning of these weights.
+
+----
 ## Running flat-tree converters, external data comparisons, and producing plots
 The folder `${NUISANCE}/MINERvA_NOvA_WS` contains `xml` cardfiles for NUISANCE to produce external data comparison plots. It also contains a file `minerva_tune.xml` which is used to apply the MINERvA tune.
 
@@ -49,7 +55,7 @@ fNUISANCEEvent->CustomWeightArray[3] = RPARESw;
 fNUISANCEEvent->CustomWeightArray[4] = MECw;
 fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
 ```
-For the MINERvA tune the `CustomWeight` and `CustomWeightArray` are all 1.0.
+For the MINERvA tune the `CustomWeight` and `CustomWeightArray` are all 1.0. These are all set in `${NUISANCE}/src/InputHandler/GENIEInputHandler.cxx`.
 
 To scale from the event rates to cross sections apply `fScaleFactor` to your distributions. All entries have their own `fScaleFactor` but for GENIE they are all the same, so doing `double scale = tree->GetMinimum("fScaleFactor")` and applying that to a given histogram provides the scaling.
 
