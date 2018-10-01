@@ -1,0 +1,149 @@
+<nuisance>
+
+  <!-- MINERvA CC0pi STV -->
+
+  <!-- MINERvA CCinc -->
+  <sample name="MINERvA_CCinc_XSec_2DEavq3_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+
+  <!-- MINERvA CC1pi+ -->
+  <sample name="MINERvA_CC1pip_XSec_1DTpi_nu_2017" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pip_XSec_1Dth_nu_2017" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pip_XSec_1Dpmu_nu_2017" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pip_XSec_1Dthmu_nu_2017" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <!-- We don't want the Q2 Enu
+  MINERvA_CC1pip_XSec_1DQ2_nu_2017
+  MINERvA_CC1pip_XSec_1DEnu_nu_2017
+  -->
+
+  <!-- MINERvA CC1pi0 nu -->
+  <sample name="MINERvA_CC1pi0_XSec_1DTpi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1Dpmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1Dthmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DWexp_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DPPi0Mass_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DPPi0MassDelta_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DCosAdler_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DPhiAdler_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <!-- 
+  MINERvA_CC1pi0_XSec_1DQ2_nu
+  MINERvA_CC1pi0_XSec_1DEnu_nu
+  -->
+
+  <!-- MINERvA CC1pi0 nubar -->
+  <sample name="MINERvA_CC1pi0_XSec_1Dthmu_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1Dpmu_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1DTpi0_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CC1pi0_XSec_1Dth_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <!-- The ppi0 is the 2015 measurement -->
+  <!-- MINERvA_CC1pi0_XSec_1Dppi0_antinu -->
+
+  <!-- MINERvA CCNpi+ -->
+  <sample name="MINERvA_CCNpip_XSec_1Dth_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CCNpip_XSec_1DTpi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CCNpip_XSec_1Dthmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <sample name="MINERvA_CCNpip_XSec_1Dpmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MINERvA_CH_Dipole_Nieves2p2h_NoMEC_Fix_merge_Prepared.root" />
+  <!-- Don't want Q2 Enu
+  MINERvA_CCNpip_XSec_1DQ2_nu
+  MINERvA_CCNpip_XSec_1DEnu_nu
+  -->
+
+  <!-- ################# MiniBooNE MEASUREMENTS ############# -->
+  <!-- MiniBooNE CCQE nu -->
+  <sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CCQE_XSec_2DTcos_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE CCQE anti-nu -->
+  <sample name="MiniBooNE_CCQE_XSec_1DQ2_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CCQE_XSec_2DTcos_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE CCQE-like nu -->
+  <sample name="MiniBooNE_CCQELike_XSec_1DQ2_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CCQELike_XSec_2DTcos_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE CCQE-like anti-nu -->
+  <sample name="MiniBooNE_CCQELike_XSec_1DQ2_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CCQELike_XSec_2DTcos_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE CC1pi+ -->
+  <sample name="MiniBooNE_CC1pip_XSec_1DTpi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pip_XSec_1DTu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pip_XSec_2DTpiCospi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pip_XSec_2DTuCosmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- Enu Q2 not useful
+  MiniBooNE_CC1pip_XSec_1DEnu_nu
+  MiniBooNE_CC1pip_XSec_1DQ2_nu
+  MiniBooNE_CC1pip_XSec_2DQ2Enu_nu
+  MiniBooNE_CC1pip_XSec_2DTpiEnu_nu
+  MiniBooNE_CC1pip_XSec_2DTuEnu_nu
+  -->
+
+  <!-- MiniBooNE CC1pi0 -->
+  <sample name="MiniBooNE_CC1pi0_XSec_1DTu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dcosmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dppi0_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_CC1pi0_XSec_1Dcospi0_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <!-- Enu Q2 not useful
+  MiniBooNE_CC1pi0_XSec_1DEnu_nu
+  MiniBooNE_CC1pi0_XSec_1DQ2_nu
+  -->
+
+  <!-- MiniBooNE NC1pi0 nu -->
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE NC1pi0 anti-nu -->
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_antinu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE NC1pi0 fhc -->
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_fhc" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_fhc" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- MiniBooNE NC1pi0 rhc -->
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="MiniBooNE_NC1pi0_XSec_1Dppi0_rhc" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/MiniBooNE_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+
+  <!-- ################# T2K MEASUREMENTS ############# -->
+  <!-- T2K STV -->
+  <sample name="T2K_CC0pinp_STV_XSec_1Ddpt_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pinp_STV_XSec_1Ddphit_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pinp_STV_XSec_1Ddat_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pinp_ifk_XSec_3Dinfp_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pinp_ifk_XSec_3Dinfa_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pinp_ifk_XSec_3Dinfip_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <sample name="T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- T2K CC0pi -->
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu_nonuniform" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <!--
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu_I" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu_II" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  -->
+  <sample name="T2K_CC0pi_XSec_2DPcos_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+
+
+  <!-- T2K CC1pi H2O -->
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcosmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcosmupi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_H2O_XSec_1Dcospi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_H2O_XSec_1Dpmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_H2O_XSec_1Dppi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+
+  <!-- T2K CC1pip CH -->
+  <!--
+  <sample name="T2K_CC1pip_CH_XSec_1Dpmu_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1Dppi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1DQ2_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1Dq3_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1Dthmupi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1Dthpi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1Dthq3pi_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  <sample name="T2K_CC1pip_CH_XSec_1DWrec_nu" input="GENIE:/vols/t2k/users/cvw09/software/GENIE_output/MINERvA_NOvA_WS/Prepared/T2K_FluxAndTarget_WithMINERvAModel_3000000_merge_Prepared.root" />
+  -->
+
+</nuisance>
