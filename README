@@ -17,29 +17,28 @@ Follow the usual instructions to install NUISANCE.
 
 In a nutshell:
 
-1. Install GENIE to some directory, export that directory as ``${GENIE}``
-2. Source the ``environment_setup.sh`` file for GENIE, setting up all its dependencies
-3. Get NUISANCE, get this branch, set the ``${NUISANCE}`` environment variable to the nuisance folder
-4. Source ``${NUISANCE}/myenv.sh`` which sets up all your environment variables (e.g. ROOT) and generator dependencies (e.g. GENIE) — an example file is provided
-5. Source ``${NUISANCE}/freshbuild.sh``, making sure it contains ``-DUSE_MINERvA_RW=1`` (for parts of the MINERvA tune), and ``-DUSE_GENIE=1`` (for GENIE event libraries and linking), with any other generators you want included
-6. NUISANCE should now be built in ``${NUISANCE}/build`` with executables in ``${NUISANCE}/build/app``
-7. ``${NUISANCE}/build/app/PrepareGENIE`` prepares GENIE output files for NUISANCE use. It converts the GHep format into something more manageable and produces cross-sections per target and per process. Its syntax is found by ``./PrepareGENIE --help``
+1. Install GENIE to some directory, export that directory as `${GENIE}`
+2. Source the `environment_setup.sh` file for GENIE, setting up all its dependencies
+3. Get NUISANCE, get this branch, set the `${NUISANCE}` environment variable to the nuisance folder
+4. Source `${NUISANCE}/myenv.sh` which sets up all your environment variables (e.g. ROOT) and generator dependencies (e.g. GENIE) — an example file is provided
+5. Source `${NUISANCE}/freshbuild.sh`, making sure it contains `-DUSE_MINERvA_RW=1` (for parts of the MINERvA tune), and `-DUSE_GENIE=1` (for GENIE event libraries and linking), with any other generators you want included
+6. NUISANCE should now be built in `${NUISANCE}/build` with executables in `${NUISANCE}/build/app`
+7. `${NUISANCE}/build/app/PrepareGENIE` prepares GENIE output files for NUISANCE use. It converts the GHep format into something more manageable and produces cross-sections per target and per process. Its syntax is found by `./PrepareGENIE --help`
 
 ----
 ## Running flat-tree converters, external data comparisons, and producing plots
-The folder ``${NUISANCE}/MINERvA_NOvA_WS`` contains ``xml`` cardfiles for NUISANCE to produce external data comparison plots. It also contains a file ``minerva_tune.xml`` which is used to apply the MINERvA tune.
+The folder `${NUISANCE}/MINERvA_NOvA_WS` contains `xml` cardfiles for NUISANCE to produce external data comparison plots. It also contains a file `minerva_tune.xml` which is used to apply the MINERvA tune.
 
-The NOvA tune is applied by the code looking for the ``nova_wgts`` branch in the GENIE file. If it can't find it it moves on, if it does it applies the total weight from that file as a reweight.
+The NOvA tune is applied by the code looking for the `nova_wgts` branch in the GENIE file. If it can't find it it moves on, if it does it applies the total weight from that file as a reweight.
 
-All the below assumes your raw GENIE file has been converted using ``PrepareGENIE``, outlined in step 7 above.
+All the below assumes your raw GENIE file has been converted using `PrepareGENIE`, outlined in step 7 above.
 
 ### To run the flat-tree converter:
-Do ``./nuisflat -i "GENIE:${GENIE_PREPARED_FILE}" -o "${GENIE_PREPARED_FILE%%.root}_FlatTree_Tune.root"
-`` Add ``-c minerva_tune.xml`` if you want to apply the MINERvA tune.
+Do `./nuisflat -i "GENIE:${GENIE_PREPARED_FILE}" -o "${GENIE_PREPARED_FILE%%.root}_FlatTree_Tune.root"` Add `-c minerva_tune.xml` if you want to apply the MINERvA tune.
 
-The flat-tree variables are intuitively named, and their meaning can be found in ``${NUISANCE}/src/MCStudies/GenericFlux_Vectors.cxx``.
+The flat-tree variables are intuitively named, and their meaning can be found in `${NUISANCE}/src/MCStudies/GenericFlux_Vectors.cxx`.
 
-To apply the tunings use the tree entries ``Weight`` for the MINERvA tune and ``CustomWeight`` for the NOvA tune. The ``CustomWeightArray[6]`` contains the different parts of the NOvA tune and are ordered as
+To apply the tunings use the tree entries `Weight` for the MINERvA tune and `CustomWeight` for the NOvA tune. The `CustomWeightArray[6]` contains the different parts of the NOvA tune and are ordered as
 
 ```
 fNUISANCEEvent->CustomWeight = NOVAw;
@@ -52,15 +51,15 @@ fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
 ```
 For the MINERvA tune the `CustomWeight` and `CustomWeightArray` are all 1.0.
 
-To scale from the event rates to cross sections apply `fScaleFactor` to your distributions. All entries have their own ``fScaleFactor`` but for GENIE they are all the same, so doing ``double scale = tree->GetMinimum("fScaleFactor")`` and applying that to a given histogram provides the scaling.
+To scale from the event rates to cross sections apply `fScaleFactor` to your distributions. All entries have their own `fScaleFactor` but for GENIE they are all the same, so doing `double scale = tree->GetMinimum("fScaleFactor")` and applying that to a given histogram provides the scaling.
 
 
 ### To compare against external data:
-Do ``./nuiscomp -c cardfile.xml -o GENIE_FILE.root`` where the `cardfile.xml` provides NUISANCE with what experiments you want to run and where the generated events live.
+Do `./nuiscomp -c cardfile.xml -o GENIE_FILE.root` where the `cardfile.xml` provides NUISANCE with what experiments you want to run and where the generated events live.
 
-The example cardfile ``${NUISANCE}/MINERvA_NOvA_WS/exp_list.xml`` provides the general structure of the `xml` cardfiles.
+The example cardfile `${NUISANCE}/MINERvA_NOvA_WS/exp_list.xml` provides the general structure of the `xml` cardfiles.
 
-To find all supported experiments run ``${NUISANCE}/scripts/nuissamples``
+To find all supported experiments run `${NUISANCE}/scripts/nuissamples`
 
 ### Producing plots:
 #### Flat-tree
@@ -73,7 +72,7 @@ root -b -q -l 'FlatAnalysis.cc("MINERvA_FlatTree.root", "NOvA_FlatTree.root")'
 where `MINERvA_FlatTree.root` is the flat-tree produced with the MINERvA tuning. `NOvA_FlatTree.root` is the equivalent for the NOvA tuning.
 
 #### Data comparisons
-``${NUISANCE}/MINERvA_NOvA_WS/plotscript.cc`` takes four arguments: 
+`${NUISANCE}/MINERvA_NOvA_WS/plotscript.cc` takes four arguments: 
 
 ```
 root -b -q -l 'plotscript.cc("MINERvA_untuned.root", "MINERvA_tuned.root", "NOvA_untuned.root", "NOvA_tuned.root")'
@@ -90,7 +89,7 @@ The cross section scaling variable `fScaleFactor` does not play well with the NO
 
 Some of the data distributions have broken in moving beyond v2r7. E.g. MiniBooNE CCQE Q2 seems to have issues under some ROOT versions (e.g. 5.34/36). Will be fixed.
 
-The ``${NUISANCE}/data/reweight`` directory does not exist. This is because the RikRPA files are very heavy (beyond git recommendations), so have to be added manually. Email us below to sort this out.
+The `${NUISANCE}/data/reweight` directory does not exist. This is because the RikRPA files are very heavy (beyond git recommendations), so have to be added manually. Email us below to sort this out.
 
 ----
 ## Contact
