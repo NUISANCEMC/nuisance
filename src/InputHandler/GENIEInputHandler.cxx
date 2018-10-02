@@ -409,7 +409,6 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fBound = 0.0;
   fNUISANCEEvent->InputWeight = 1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
-
   // And the custom weights
   fNUISANCEEvent->CustomWeight = NOVAw;
   fNUISANCEEvent->CustomWeightArray[0] = MAQEw;
@@ -418,6 +417,16 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->CustomWeightArray[3] = RPARESw;
   fNUISANCEEvent->CustomWeightArray[4] = MECw;
   fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
+
+  /*
+  fNUISANCEEvent->CustomWeight = 1.0;
+  fNUISANCEEvent->CustomWeightArray[0] = 1.0;
+  fNUISANCEEvent->CustomWeightArray[1] = 1.0;
+  fNUISANCEEvent->CustomWeightArray[2] = 1.0;
+  fNUISANCEEvent->CustomWeightArray[3] = 1.0;
+  fNUISANCEEvent->CustomWeightArray[4] = 1.0;
+  fNUISANCEEvent->CustomWeightArray[5] = 1.0;
+  */
 
   // Get N Particle Stack
   unsigned int npart = fGenieGHep->GetEntries();
