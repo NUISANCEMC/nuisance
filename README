@@ -27,7 +27,7 @@ In a nutshell:
 
 ----
 ## Generated GENIE files
-The GENIE files used are located [on the box](https://imperialcollegelondon.box.com/s/by59v4sxm1vjjdkvvdhr7lx1stwlwmro). The file naming is `EXPERIMENT_FluxAndTarget_WithTUNEModel*.root`, where `EXPERIMENT` is the experiment whose flux and target generated the events, and `TUNE` is the NOvA or MINERvA tune.
+The GENIE files used are located [on the box](https://imperialcollegelondon.box.com/s/ouh114hhxnpyurl5bw2qs4vyhfppt4yp). The file naming is `EXPERIMENT_FluxAndTarget_WithTUNEModel*.root`, where `EXPERIMENT` is the experiment whose flux and target generated the events, and `TUNE` is the NOvA or MINERvA tune.
 
 The `WithNOvAModel` files should have an additional `TTree` called `nova_wgts`, which are the weights provided by Jeremy Wolcott (Tufts). See below for the meaning of these weights.
 
