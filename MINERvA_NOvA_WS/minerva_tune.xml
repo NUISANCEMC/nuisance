@@ -25,13 +25,14 @@
        Single pion non-resonant scaling
   -->
   <parameter name="NonRESBGvpCC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-  <parameter name="NonRESBGvpCC2pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-  <parameter name="NonRESBGvpNC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-  <parameter name="NonRESBGvpNC2pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-
   <parameter name="NonRESBGvnCC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-  <parameter name="NonRESBGvnCC2pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
+  <parameter name="NonRESBGvpNC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
   <parameter name="NonRESBGvnNC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
-  <parameter name="NonRESBGvnNC2pi" nominal="-1.14" type="genie_parameter" state="FIX"/>
+
+  <!-- Scale by 0.50 with 0.50 uncertainity -->
+  <parameter name="NonRESBGvbarpCC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/>
+  <parameter name="NonRESBGvbarnCC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/>
+  <parameter name="NonRESBGvbarpNC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/>
+  <parameter name="NonRESBGvbarnNC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/>
 
 </nuisance>
