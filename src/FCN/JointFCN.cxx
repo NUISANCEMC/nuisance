@@ -545,14 +545,16 @@ void JointFCN::ReconfigureUsingManager() {
 
     int i = 0;
     int nevents = curinput->GetNEvents();
-    int countwidth = nevents / 5;
+    int countwidth = nevents / 10;
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
       // Get Event Weight
+      // The reweighting weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-      curevent->Weight = curevent->RWWeight * curevent->InputWeight;
-      double rwweight = curevent->Weight;
+      // The Custom weight and reweight
+      curevent->Weight = curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+      //double rwweight = curevent->Weight;
       // std::cout << "RWWeight = " << curevent->RWWeight  << " " <<
       // curevent->InputWeight << std::endl;
 
@@ -562,7 +564,7 @@ void JointFCN::ReconfigureUsingManager() {
         if (countwidth && (i % countwidth == 0)) {
           QLOG(REC, curinput->GetName()
                         << " : Processed " << i << " events. [M, W] = ["
-                        << curevent->Mode << ", " << rwweight << "]");
+                        << curevent->Mode << ", " << curevent->Weight << "]");
         }
       }
 
@@ -773,7 +775,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Setup stuff for logging
   int fillcount = 0;
   int nevents = fSignalEventFlags.size();
-  int countwidth = nevents / 20;
+  int countwidth = nevents / 10;
 
   // If All Splines tell splines they need a reconfigure.
   std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
@@ -824,10 +826,8 @@ void JointFCN::ReconfigureFastUsingManager() {
         }
 
         curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-        curevent->Weight = curevent->RWWeight * curevent->InputWeight;
+        curevent->Weight = curevent->RWWeight * curevent->InputWeight*curevent->CustomWeight;
         rwweight = curevent->Weight;
-        // Custom weights
-        rwweight *= curevent->CustomWeight;
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
