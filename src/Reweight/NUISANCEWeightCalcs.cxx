@@ -139,6 +139,7 @@ GaussianModeCorr::GaussianModeCorr() {
   fAllowSuppression = false;
 
   fDebugStatements = FitPar::Config().GetParB("GaussianModeCorr_DEBUG");
+  //fDebugStatements = true;
 }
 
 double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
@@ -194,7 +195,6 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
     }
   }
 
-  if (fDebugStatements) std::cout << "Got q0 q3 = " << q0 << " " << q3 << std::endl;
 
   // Apply weighting
   if (fApply_CCQE && abs(fevt->Mode) == 1) {
@@ -206,7 +206,9 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 
   if (fApply_2p2h && abs(fevt->Mode) == 2) {
     if (fDebugStatements) std::cout << "Getting 2p2h Weight" << std::endl;
+    if (fDebugStatements) std::cout << "Got q0 q3 = " << q0 << " " << q3 << " mode = " << fevt->Mode << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h);
+    if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
   }
 
   if (fApply_2p2h_PPandNN && abs(fevt->Mode) == 2 && initialstate == 1) {
@@ -224,7 +226,6 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
     rw_weight *= GetGausWeight(q0, q3, fGausVal_CC1pi);
   }
 
-  if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
   return rw_weight;
 }
 
