@@ -862,9 +862,10 @@ double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
   TLorentzVector Pprot = Protons[HMFSProton]->fP;
   // Get highest momentum proton in allowed proton range
   TVector3 HadronP = Pprot.Vect();
+  //TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
 
   double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
-  double const eh = Pprot.E();
+  double const eh = Pprot.E()/1000.;
 
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
