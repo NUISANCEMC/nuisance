@@ -320,7 +320,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   } else if (fluxvect.size() == 2) {
     TFile* fluxfile = new TFile(fluxvect[0].c_str(), "READ");
     if (!fluxfile->IsZombie()) {
-      fluxhist = dynamic_cast<TH1D*>(fluxfile->Get(fluxvect[1].c_str()));
+      fluxhist = dynamic_cast<TH1*>(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
         ERR(FTL) << "Couldn't find histogram named: \"" << fluxvect[1]
                  << "\" in file: \"" << fluxvect[0] << std::endl;
