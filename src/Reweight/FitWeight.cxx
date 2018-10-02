@@ -13,6 +13,7 @@
 #include "T2KWeightEngine.h"
 
 void FitWeight::AddRWEngine(int type) {
+  LOG(FIT) << "Adding reweight engine " << type << std::endl;
   switch (type) {
     case kNEUT:
       fAllRW[type] = new NEUTWeightEngine("neutrw");
