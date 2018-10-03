@@ -670,7 +670,7 @@ std::vector<double> nuisconfig::GetVD(XMLNodePointer_t node,
 }
 
 std::vector<std::string> nuisconfig::GetAllKeysForNode(XMLNodePointer_t node) {
-  bool matching = true;
+  //bool matching = true;
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
   std::vector<std::string> keys;
   while (attr != 0) {

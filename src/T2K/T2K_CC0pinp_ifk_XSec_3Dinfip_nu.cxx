@@ -89,7 +89,7 @@ void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::FillEventVariables(FitEvent* event){
   TLorentzVector Pp  = event->GetHMFSParticle(2212)->fP;
 
   double pmu = Pmu.Vect().Mag()/1000.;
-  double pp = Pp.Vect().Mag()/1000.;
+  //double pp = Pp.Vect().Mag()/1000.;
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
   TVector3 tp_inf = FitUtils::tppInfK(Pmu, CosThetaMu, 25, true);
 

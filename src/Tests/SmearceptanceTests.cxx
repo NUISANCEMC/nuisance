@@ -37,7 +37,7 @@ int main(int argc, char const *argv[]) {
 
   bool similar = true;
 
-  for (size_t i = 0; i < A.GetNrows(); ++i) {
+  for (int i = 0; i < A.GetNrows(); ++i) {
     if (fabs(X[i] - ForwardSolve[i]) > numerTol) {
       ERROR(FTL, "Element " << i << " was not multiplied as expected: " << X[i]
                             << " != " << ForwardSolve[i]
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
 
   similar = true;
 
-  for (size_t i = 0; i < A.GetNrows(); ++i) {
+  for (int i = 0; i < A.GetNrows(); ++i) {
     if (fabs(A[i] - SVDSolve[i]) > numerTol) {
       ERROR(FTL, "Element " << i << " was not solved as expected: " << A[i]
                             << " != " << SVDSolve[i]

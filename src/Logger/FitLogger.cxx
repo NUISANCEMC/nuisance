@@ -59,7 +59,7 @@ bool LOGGING(int level) {
   // std::cout << "LOGGING : " << __FILENAME__ << " " << __FUNCTION__ <<
   // std::endl;
   return (Logger::log_verb >=
-          (uint)__GETLOG_LEVEL(level, __FILENAME__, __FUNCTION__));
+          (int)__GETLOG_LEVEL(level, __FILENAME__, __FUNCTION__));
 };
 
 int __GETLOG_LEVEL(int level, const char* filename, const char* funct) {
@@ -80,8 +80,8 @@ int __GETLOG_LEVEL(int level, const char* filename, const char* funct) {
 
 std::ostream& __OUTLOG(int level, const char* filename, const char* funct,
                        int line) {
-  if (Logger::log_verb < (unsigned int)level &&
-      Logger::log_verb != (unsigned int)DEB) {
+  if (Logger::log_verb < (int)level &&
+      Logger::log_verb != (int)DEB) {
     return (Logger::__LOG_nullstream);
 
   } else {
@@ -311,7 +311,7 @@ bool LOG_LEVEL(int level) {
     return true;
   }
 
-  if (Logger::log_verb < (unsigned int)level) {
+  if (Logger::log_verb < (int)level) {
     return false;
   }
 
