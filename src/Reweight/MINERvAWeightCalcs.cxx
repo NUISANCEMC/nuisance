@@ -288,7 +288,7 @@ RikRPA::RikRPA() {
 
   // Setup Calculators
   fEventWeights = new double[5];
-  for (size_t i = 0; i < kMaxCalculators; i++) {
+  for (int i = 0; i < kMaxCalculators; i++) {
     fRPACalculators[i] = NULL;
   }
 
