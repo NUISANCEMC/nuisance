@@ -100,18 +100,33 @@ endif()
 
 ################################  LIBXML  ######################################
 if(LIBXML2_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LIBXML2_LIB is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_LIB=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_LIB=/path/to/LIBXML2_libraries")
+  # Check for xml2-config
+  find_program(LIBXMLCFGLIBS xml2-config)
+  if(NOT LIBXMLCFGLIBS STREQUAL "LIBXMLLIBS-NOTFOUND")
+    execute_process (COMMAND ${LIBXMLCFGLIBS} --libs
+      OUTPUT_VARIABLE LIBXML2_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
+  else()
+    message(FATAL_ERROR "Variable LIBXML2_LIB is not defined and could not find xml2-config. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_LIB=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_LIB=/path/to/LIBXML2_libraries")
+  endif()
 endif()
 
 if(LIBXML2_INC STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LIBXML2_INC is not defined. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_INC=/path/to/LIBXML2_includes or as and environment vairable $ export LIBXML2_INC=/path/to/LIBXML2_includes")
+  # Check for xml2-config
+  find_program(LIBXMLCFGINCS xml2-config)
+  if(NOT LIBXMLCFGINCS STREQUAL "LIBXMLINCS-NOTFOUND")
+    execute_process (COMMAND ${LIBXMLCFGINCS} --cflags
+      OUTPUT_VARIABLE LIBXML2_INC OUTPUT_STRIP_TRAILING_WHITESPACE)
+  else()
+    message(FATAL_ERROR "Variable LIBXML2_INC is not defined and could not find xml2-config. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_INC=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_INC=/path/to/LIBXML2_libraries")
+  endif()
 endif()
+
 ###############################  log4cpp  ######################################
 if(LOG4CPP_LIB STREQUAL "")
   find_program(LOG4CPPCFG log4cpp-config)
   if(NOT LOG4CPPCFG STREQUAL "LOG4CPPCFG-NOTFOUND")
     execute_process (COMMAND ${LOG4CPPCFG}
-    --pkglibdir OUTPUT_VARIABLE LOG4CPP_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
+      --pkglibdir OUTPUT_VARIABLE LOG4CPP_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
   else()
     message(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
   endif()
