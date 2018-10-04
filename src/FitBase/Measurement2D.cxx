@@ -211,7 +211,10 @@ void Measurement2D::SetDataFromTextFile(std::string datfile) {
 }
 
 void Measurement2D::SetDataFromRootFile(std::string datfile, std::string histname) {
+  LOG(SAM) << "Reading data from root file: " << datafile << ";" << histname << std::endl;
   fDataHist = PlotUtils::GetTH2DFromRootFile(datfile, histname);
+  fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(),
+                          (fSettings.GetFullTitles()).c_str());
 }
 
 void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D* hist) {
