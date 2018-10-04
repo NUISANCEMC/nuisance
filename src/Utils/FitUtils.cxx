@@ -956,7 +956,7 @@ double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector
   double y = Ppi.Vect().Dot(yAxis);
   //double z = Ppi.Vect().Dot(zAxis);
 
-  double newphi = atan2(y, x);
+  double newphi = atan2(y, x)*(180./M_PI);
 
   // Old silly method before atan2
   /*
