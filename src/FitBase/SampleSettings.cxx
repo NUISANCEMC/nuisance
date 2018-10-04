@@ -187,43 +187,39 @@ void SampleSettings::SetDescription(std::string str) {
 void SampleSettings::Write(std::string name) {
 
   if (name.empty()) name = this->GetS("name") + "_settings";
-
   // Make a new canvas
   TCanvas* c1 = new TCanvas( name.c_str(), name.c_str(), 800, 600 );
   c1->cd();
 
-  // Make new TPaveText
-  TPaveText pttitle = TPaveText(0.05, 0.85, 0.95, 0.95);
-  pttitle.AddText( name.c_str() );
-  pttitle.SetTextAlign(11);
-  pttitle.SetTextSize(15);
-  pttitle.Draw();
+  TPaveText *pttitle = new TPaveText(0.01, 0.90, 0.99, 0.99, "NDC");
+  pttitle->AddText( name.c_str() );
+  pttitle->Draw();
 
+  TPaveText *pt = new TPaveText(0.01, 0.01, 0.99, 0.89, "NDC");
+  pt->Draw("same");
 
-  TPaveText pt = TPaveText(0.05, 0.05, 0.95, 0.80);
   std::vector<std::string> keys = fKeyValues.GetAllKeys();
   for (size_t i = 0; i < keys.size(); i++) {
-
     std::string keyval = fKeyValues.GetS(keys[i]);
     std::vector<std::string> lines = GeneralUtils::ParseToStr(keyval, "\n");
-
     if (lines.size() == 1) {
-      pt.AddText( ("#bullet #bf{" + keys[i] + "} : " + fKeyValues.GetS(keys[i])).c_str() );
+      pt->AddText( ("#bullet #bf{" + keys[i] + "} : " + fKeyValues.GetS(keys[i])).c_str() );
     } else {
-      pt.AddText( ("#bullet #bf{" + keys[i] + "} : ").c_str() );
+      pt->AddText( ("#bullet #bf{" + keys[i] + "} : ").c_str() );
       for (size_t j = 0; j < lines.size(); j++) {
-        pt.AddText(("   |-->  " + lines[j]).c_str() );
+        pt->AddText(("   |-->  " + lines[j]).c_str() );
       }
     }
   }
 
-  pt.SetTextAlign(11);
-  pt.SetTextSize(14);
-  pt.Draw("SAME");
+  pt->SetTextAlign(11);
+  //pt->SetTextSize(14);
 
-
+  c1->Modified();
   c1->Write();
   delete c1;
+  delete pt;
+  delete pttitle;
 }
 
 void SampleSettings::SetOnlyMC(bool state) {
