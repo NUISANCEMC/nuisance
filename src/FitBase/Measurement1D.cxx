@@ -1216,16 +1216,16 @@ void Measurement1D::Write(std::string drawOpt) {
   }
 
   // Write Data/MC
-  GetDataList().at(0)->Write();
-  GetMCList().at(0)->Write();
-
-  if((fEvtRateScaleFactor != 0xdeadbeef) && GetMCList().at(0)){
-    TH1D * PredictedEvtRate = static_cast<TH1D *>(GetMCList().at(0)->Clone());
-    PredictedEvtRate->Scale(fEvtRateScaleFactor);
-    PredictedEvtRate->GetYaxis()->SetTitle("Predicted event rate");
-    PredictedEvtRate->Write();
+  if (drawOpt.find("DATA") != std::string::npos) GetDataList().at(0)->Write();
+  if (drawOpt.find("MC") != std::string::npos) { 
+    GetMCList().at(0)->Write();
+    if((fEvtRateScaleFactor != 0xdeadbeef) && GetMCList().at(0)){
+      TH1D * PredictedEvtRate = static_cast<TH1D *>(GetMCList().at(0)->Clone());
+      PredictedEvtRate->Scale(fEvtRateScaleFactor);
+      PredictedEvtRate->GetYaxis()->SetTitle("Predicted event rate");
+      PredictedEvtRate->Write();
+    }
   }
-
 
   // Write Fine Histogram
   if (drawOpt.find("FINE") != std::string::npos)
@@ -1238,7 +1238,6 @@ void Measurement1D::Write(std::string drawOpt) {
 
   // Save Flux/Evt if no event manager
   if (!FitPar::Config().GetParB("EventManager")) {
-
     if (drawOpt.find("FLUX") != std::string::npos && GetFluxHistogram())
       GetFluxHistogram()->Write();
 
@@ -1247,14 +1246,12 @@ void Measurement1D::Write(std::string drawOpt) {
 
     if (drawOpt.find("XSEC") != std::string::npos && GetEventHistogram())
       GetXSecHistogram()->Write();
-
   }
 
   // Write Mask
   if (fIsMask && (drawOpt.find("MASK") != std::string::npos)) {
     fMaskHist->Write();
   }
-
 
   // Write Covariances
   if (drawOpt.find("COV") != std::string::npos && fFullCovar) {
@@ -1310,7 +1307,7 @@ void Measurement1D::Write(std::string drawOpt) {
 
 //********************************************************************
 void Measurement1D::WriteRatioPlot() {
-//********************************************************************
+  //********************************************************************
 
   // Setup mc data ratios
   TH1D* dataRatio = (TH1D*)fDataHist->Clone((fName + "_data_RATIO").c_str());
@@ -1338,7 +1335,7 @@ void Measurement1D::WriteRatioPlot() {
 
 //********************************************************************
 void Measurement1D::WriteShapePlot() {
-//********************************************************************
+  //********************************************************************
 
   TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
@@ -1370,7 +1367,7 @@ void Measurement1D::WriteShapePlot() {
 
 //********************************************************************
 void Measurement1D::WriteShapeRatioPlot() {
-//********************************************************************
+  //********************************************************************
 
   // Get a mcshape histogram
   TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
@@ -1401,7 +1398,6 @@ void Measurement1D::WriteShapeRatioPlot() {
 
   delete mcShapeRatio;
   delete dataShapeRatio;
-
 }
 
 
@@ -1412,7 +1408,7 @@ void Measurement1D::WriteShapeRatioPlot() {
 
 //********************************************************************
 void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
-                                     FitWeight * rw, std::string fkdt) {
+    FitWeight * rw, std::string fkdt) {
   //********************************************************************
 
 
@@ -1431,9 +1427,9 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
     fIsRawEvents = true;
     LOG(SAM) << "Found event rate measurement but fIsRawEvents == false!"
-             << std::endl;
+      << std::endl;
     LOG(SAM) << "Overriding this and setting fIsRawEvents == true!"
-             << std::endl;
+      << std::endl;
   }
 
   fIsEnu1D = false;
@@ -1441,16 +1437,16 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
     fIsEnu1D = true;
     LOG(SAM) << "::" << fName << "::" << std::endl;
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
-             "not flux averaged!"
-             << std::endl;
+      "not flux averaged!"
+      << std::endl;
   }
 
   if (fIsEnu1D && fIsRawEvents) {
     LOG(SAM) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
-             "really correct?!"
-             << std::endl;
+      "really correct?!"
+      << std::endl;
     LOG(SAM) << "Check experiment constructor for " << fName
-             << " and correct this!" << std::endl;
+      << " and correct this!" << std::endl;
     LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
     exit(-1);
   }
@@ -1480,13 +1476,13 @@ void Measurement1D::SetupDefaultHist() {
   // Setup fMCHist
   fMCHist = (TH1D*)fDataHist->Clone();
   fMCHist->SetNameTitle((fName + "_MC").c_str(),
-                        (fName + "_MC" + fPlotTitles).c_str());
+      (fName + "_MC" + fPlotTitles).c_str());
 
   // Setup fMCFine
   Int_t nBins = fMCHist->GetNbinsX();
   fMCFine = new TH1D(
-    (fName + "_MC_FINE").c_str(), (fName + "_MC_FINE" + fPlotTitles).c_str(),
-    nBins * 6, fMCHist->GetBinLowEdge(1), fMCHist->GetBinLowEdge(nBins + 1));
+      (fName + "_MC_FINE").c_str(), (fName + "_MC_FINE" + fPlotTitles).c_str(),
+      nBins * 6, fMCHist->GetBinLowEdge(1), fMCHist->GetBinLowEdge(nBins + 1));
 
   fMCStat = (TH1D*)fMCHist->Clone();
   fMCStat->Reset();
@@ -1540,13 +1536,13 @@ void Measurement1D::SetDataValues(std::string dataFile) {
 
 //********************************************************************
 void Measurement1D::SetDataFromDatabase(std::string inhistfile,
-                                        std::string histname) {
+    std::string histname) {
   //********************************************************************
 
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
-           << std::endl;
+    << std::endl;
   fDataHist = PlotUtils::GetTH1DFromRootFile(
-                (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
+      (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
   return;
@@ -1554,11 +1550,11 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile,
 
 //********************************************************************
 void Measurement1D::SetDataFromFile(std::string inhistfile,
-                                    std::string histname) {
+    std::string histname) {
   //********************************************************************
 
   LOG(SAM) << "Filling histogram from " << inhistfile << "->" << histname
-           << std::endl;
+    << std::endl;
   fDataHist = PlotUtils::GetTH1DFromRootFile((inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
@@ -1595,7 +1591,7 @@ void Measurement1D::SetCovarMatrix(std::string covarFile) {
     fFullCovarPlot = (TH2D*)tempFile->Get("fullcov");
   else
     ERR(WRN) << "Incorrect thrown_covariance option in parameters."
-             << std::endl;
+      << std::endl;
 
   int dim = int(fDataHist->GetNbinsX());  //-this->masked->Integral());
   int covdim = int(fDataHist->GetNbinsX());
@@ -1654,10 +1650,10 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim,
   fFullCovar = new TMatrixDSym(dim);
   if (covarread.is_open())
     LOG(SAM) << "Reading covariance matrix from file: " << covarFile
-             << std::endl;
+      << std::endl;
   else
     ERR(FTL) << "Covariance matrix provided is incorrect: " << covarFile
-             << std::endl;
+      << std::endl;
 
   // Loop over the lines in the file
   while (std::getline(covarread >> std::ws, line, '\n')) {
@@ -1668,12 +1664,12 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim,
 
     if (entries.size() <= 1) {
       ERR(WRN) << "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
-               "entries on this line: "
-               << row << std::endl;
+        "entries on this line: "
+        << row << std::endl;
     }
 
     for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
+        iter != entries.end(); iter++) {
       (*covar)(row, column) = *iter;
       (*fFullCovar)(row, column) = *iter;
 
@@ -1714,10 +1710,10 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
   this->fFullCovar = new TMatrixDSym(dim);
   if (corr.is_open())
     LOG(SAM) << "Reading and converting correlation matrix from file: "
-             << corrFile << std::endl;
+      << corrFile << std::endl;
   else {
     ERR(FTL) << "Correlation matrix provided is incorrect: " << corrFile
-             << std::endl;
+      << std::endl;
     exit(-1);
   }
 
@@ -1729,13 +1725,13 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
     // matrix
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
+        iter != entries.end(); iter++) {
       double val = (*iter) * this->fDataHist->GetBinError(row + 1) * 1E38 *
-                   this->fDataHist->GetBinError(column + 1) * 1E38;
+        this->fDataHist->GetBinError(column + 1) * 1E38;
       if (val == 0) {
         ERR(FTL) << "Found a zero value in the covariance matrix, assuming "
-                 "this is an error!"
-                 << std::endl;
+          "this is an error!"
+          << std::endl;
         exit(-1);
       }
 
@@ -1770,7 +1766,7 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile,
   //********************************************************************
 
   LOG(SAM) << "Getting covariance from " << covarFile << "->" << covName
-           << std::endl;
+    << std::endl;
 
   TFile* tempFile = new TFile(covarFile.c_str(), "READ");
   TH2D* covPlot = (TH2D*)tempFile->Get(covName.c_str());
