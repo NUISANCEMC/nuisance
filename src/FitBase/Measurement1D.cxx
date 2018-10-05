@@ -1340,7 +1340,8 @@ void Measurement1D::WriteShapePlot() {
   TH1D* mcShape = (TH1D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
   TH1D* dataShape = (TH1D*)fDataHist->Clone((fName + "_data_SHAPE").c_str());
-  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38);
+  // Don't check error
+  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
 
   double shapeScale = 1.0;
   if (fIsRawEvents) {
