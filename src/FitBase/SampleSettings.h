@@ -27,9 +27,9 @@ public:
 	std::string Title();
 	void DefineAllowedTargets(std::string targ);
 
-	void FoundFill(std::string name, std::string substr, bool& cont, bool def);
+	void FoundFill(std::string name, std::string substring, bool& cont, bool def);
 	// void FoundFill(std::string name, std::string substr, double& val, double )
-	bool Found(std::string name, std::string substr);
+	bool Found(std::string name, std::string substring);
 	void SetTitle(std::string val);
 	void SetDataInput(std::string val);
 	void SetErrorInput(std::string val);

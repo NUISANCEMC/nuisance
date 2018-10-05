@@ -16,9 +16,9 @@ void SampleSettings::SetS(std::string name, std::string val) {
   fKeyValues.SetS(name, val);
 };
 
-bool SampleSettings::Found(std::string name, std::string substr) {
+bool SampleSettings::Found(std::string name, std::string substring) {
   std::string compstring = fKeyValues.GetS(name);
-  return compstring.find(substr) != std::string::npos;
+  return compstring.find(substring) != std::string::npos;
 }
 
 
@@ -82,9 +82,9 @@ void SampleSettings::DefineAllowedTargets(std::string targ) {
 };
 
 
-void SampleSettings::FoundFill(std::string name, std::string substr, bool& cont, bool def) {
+void SampleSettings::FoundFill(std::string name, std::string substring, bool& cont, bool def) {
   std::string compstring = fKeyValues.GetS(name);
-  if (compstring.find(substr) != std::string::npos) {
+  if (compstring.find(substring) != std::string::npos) {
     cont = def;
   } else {
     cont = !def;
