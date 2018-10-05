@@ -957,6 +957,8 @@ double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector
   //double z = Ppi.Vect().Dot(zAxis);
 
   double newphi = atan2(y, x)*(180./M_PI);
+  // Convert negative angles to positive
+  if (newphi < 0.0) newphi += 360.0;
 
   // Old silly method before atan2
   /*
