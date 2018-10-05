@@ -611,6 +611,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     totalnucl += *it;
   }
 
+  if (totalnucl == 0) {
+    THROW("Didn't find any nucleons in input file. Did you really specify the target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]" << std::endl);
+  }
+
+
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
   // Loop over the specified targets by the user
@@ -763,6 +768,12 @@ void ParseOptions(int argc, char* argv[]) {
 
   if (gTarget == "" && !flagopt) {
     ERR(FTL) << "No target specified for Prepare Mode" << std::endl;
+    flagopt = true;
+  }
+
+  if (gTarget.find("[") == std::string::npos || gTarget.find("]") == std::string::npos) {
+    ERR(FTL) << "Didn't specify target ratios in Prepare Mode" << std::endl;
+    ERR(FTL) << "Are you sure you gave it as -t \"TARGET1[fraction1],TARGET2[fraction]\"?" << std::endl;
     flagopt = true;
   }
 
