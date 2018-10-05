@@ -559,7 +559,7 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     // Make a TGraph Errors
     TGraphErrors* gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
     if (gr->IsZombie()) {
-      exit(-1);
+      THROW(dataFile << " is a zombie and could not be read. Are you sure it exists?" << std::endl);
     }
     double* bins = gr->GetX();
     double* values = gr->GetY();
@@ -572,13 +572,13 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     for (int i = 0; i < npoints; ++i) {
       tempPlot->SetBinContent(i + 1, values[i]);
 
-      // If only two columns are present in the input file, use the sqrt(values)
-      // as the error
-      // equivalent to assuming that the error is statistical
-      if (!errors[i])
+      // If only two columns are present in the input file, use the sqrt(values) as the error
+      // equivalent to assuming that the error is statistical. Also check that we're looking at an event rate rather than a cross section
+      if (!errors[i] && values[i] > 1E-30) {
         tempPlot->SetBinError(i + 1, sqrt(values[i]));
-      else
+      } else {
         tempPlot->SetBinError(i + 1, errors[i]);
+      }
     }
 
     delete gr;
