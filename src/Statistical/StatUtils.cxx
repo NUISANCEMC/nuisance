@@ -919,7 +919,7 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map,
 
 //*******************************************************************
 void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
-                                    double scale) {
+                                    double scale, bool ErrorCheck) {
   //*******************************************************************
 
   // Check
@@ -927,7 +927,7 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
     ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
     ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
     ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
-    //throw;
+    throw;
   }
 
   // Set bin errors form cov diag
@@ -939,7 +939,7 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
   }
 
   // Now loop over
-  if (ErrorsSet) {
+  if (ErrorsSet && ErrorCheck) {
     for (int i = 0; i < data->GetNbinsX(); i++) {
       double dataerr = data->GetBinError(i + 1);
       double coverr = sqrt((*cov)(i, i))*scale;
@@ -961,9 +961,26 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
 }
 
 //*******************************************************************
-void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map,
-    double scale) {
+void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, double scale, bool ErrorCheck) {
   //*******************************************************************
+
+  // Check
+  if (cov->GetNrows() != data->GetNbinsX()*data->GetNbinsY()) {
+    ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
+    ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
+    ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
+    throw;
+  }
+
+  // Set bin errors form cov diag
+  // Check if the errors are set
+  bool ErrorsSet = false;
+  for (int i = 0; i < data->GetNbinsX(); i++) {
+    for (int j = 0; j < data->GetNbinsX(); j++) {
+      if (ErrorsSet == true) break;
+      if (data->GetBinError(i+1, j+1) != 0) ErrorsSet = true;
+    }
+  }
 
   // Create map if required
   if (!map) map = StatUtils::GenerateMap(data);
@@ -974,8 +991,20 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map,
     for (int j = 0; j < data->GetNbinsY(); j++) {
       if (data->GetBinContent(i + 1, j + 1) == 0.0) continue;
 
+      // Get the entry in the cov matrix
       count = map->GetBinContent(i + 1, j + 1) - 1;
-      data->SetBinError(i + 1, j + 1, sqrt((*cov)(count, count)) * scale);
+      double dataerr = data->GetBinError(i+1, j+1);
+      double coverr = sqrt((*cov)(count,count))*scale;
+      // Check that the errors are within 1% of eachother
+      if (ErrorsSet && ErrorCheck) {
+        if (fabs(dataerr-coverr)/dataerr > 0.01) {
+          ERR(FTL) << "Data error does not match covariance error for bin " << i+1 << " (" << data->GetXaxis()->GetBinLowEdge(i+1) << "-" << data->GetXaxis()->GetBinLowEdge(i+2) << ")" << std::endl;
+          ERR(FTL) << "Data error: " << dataerr << std::endl;
+          ERR(FTL) << "Cov error:  " << coverr << std::endl;
+        }
+      } else {
+        data->SetBinError(i + 1, j + 1, sqrt((*cov)(count, count)) * scale);
+      }
     }
   }
 

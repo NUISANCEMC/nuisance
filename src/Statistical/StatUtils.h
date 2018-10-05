@@ -188,10 +188,10 @@ namespace StatUtils{
   TMatrixDSym* MakeDiagonalCovarMatrix(TH2D* data, TH2I* map=NULL, double scaleF=1E38);
 
   //! Given a covariance set the errors in each bin on the data from the covariance diagonals.
-  void SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale=1.0);
+  void SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov, double scale=1.0, bool ErrorCheck = true);
 
   //! Given a covariance set the errors in each bin on the data from the covariance diagonals.
-  void SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map=NULL, double scale=1.0);
+  void SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map=NULL, double scale=1.0, bool ErrorCheck = true);
 
   //! Given a covariance, extracts the shape-only matrix using the method from the MiniBooNE TN
   TMatrixDSym* ExtractShapeOnlyCovar(TMatrixDSym* full_covar, TH1* data_hist, double data_scale=1E38);
