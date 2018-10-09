@@ -926,9 +926,9 @@ int Measurement2D::GetNDOF() {
 
   // If datahist has no errors make sure we don't include those bins as they are
   // not data points
-  for (int xBin = 0; xBin < fDataHist->GetNbinsX() + 1; ++xBin) {
-    for (int yBin = 0; yBin < fDataHist->GetNbinsY() + 1; ++yBin) {
-      if (fDataHist->GetBinError(xBin, yBin) != 0)
+  for (int xBin = 0; xBin < fDataHist->GetNbinsX(); ++xBin) {
+    for (int yBin = 0; yBin < fDataHist->GetNbinsY(); ++yBin) {
+      if (fDataHist->GetBinError(xBin+1, yBin+1) != 0)
         ++nDOF;
     }
   }
