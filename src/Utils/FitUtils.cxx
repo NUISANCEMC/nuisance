@@ -713,6 +713,7 @@ double FitUtils::Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi) {
         Protons[i]->p() < 1200 && 
         Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
         Protons[i]->p() > HighestMomentum) {
+      HighestMomentum = Protons[i]->p();
       HMFSProton = i;
     }
   }
@@ -760,6 +761,7 @@ double FitUtils::Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi) {
         Protons[i]->p() < 1200 && 
         Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
         Protons[i]->p() > HighestMomentum) {
+      HighestMomentum = Protons[i]->p();
       HMFSProton = i;
     }
   }
@@ -804,6 +806,7 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
         Protons[i]->p() < 1200 && 
         Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
         Protons[i]->p() > HighestMomentum) {
+      HighestMomentum = Protons[i]->p();
       HMFSProton = i;
     }
   }
@@ -851,10 +854,12 @@ double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
   // Get the stack of protons
   std::vector<FitParticle*> Protons = event->GetAllFSProton();
   for (size_t i = 0; i < Protons.size(); ++i) {
+    // Update the highest momentum particle
     if (Protons[i]->p() > 450 && 
         Protons[i]->p() < 1200 && 
         Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
         Protons[i]->p() > HighestMomentum) {
+      HighestMomentum = Protons[i]->p();
       HMFSProton = i;
     }
   }
