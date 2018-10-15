@@ -1050,19 +1050,15 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
                  "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
-    // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
     return (new MINERvA_CCNpip_XSec_1Dthmu_nu(samplekey));
 
-    // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dpmu_nu")) {
     return (new MINERvA_CCNpip_XSec_1Dpmu_nu(samplekey));
 
-    // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DQ2_nu")) {
     return (new MINERvA_CCNpip_XSec_1DQ2_nu(samplekey));
 
-    // Done
   } else if (!name.compare("MINERvA_CCNpip_XSec_1DEnu_nu")) {
     return (new MINERvA_CCNpip_XSec_1DEnu_nu(samplekey));
 
@@ -1367,9 +1363,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
 
   } else {
-    ERR(FTL) << "Error: No such sample: " << name << std::endl;
-    exit(-1);
-    return NULL;
+    THROW("Error: No such sample: " << name << std::endl);
   }
 
   // Return NULL if no sample loaded.
