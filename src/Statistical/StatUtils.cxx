@@ -923,11 +923,13 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
   //*******************************************************************
 
   // Check
-  if (cov->GetNrows() != data->GetNbinsX()) {
-    ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
-    ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
-    ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
-    throw;
+  if (ErrorCheck) {
+    if (cov->GetNrows() != data->GetNbinsX()) {
+      ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
+      ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
+      ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
+      throw;
+    }
   }
 
   // Set bin errors form cov diag
@@ -965,11 +967,13 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
   //*******************************************************************
 
   // Check
-  if (cov->GetNrows() != data->GetNbinsX()*data->GetNbinsY()) {
-    ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
-    ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
-    ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
-    throw;
+  if (ErrorCheck) {
+    if (cov->GetNrows() != data->GetNbinsX()*data->GetNbinsY()) {
+      ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
+      ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
+      ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
+      throw;
+    }
   }
 
   // Set bin errors form cov diag
