@@ -411,7 +411,11 @@ namespace SignalDef {
     // Count how many protons pass the threshold
     int nProtonsAboveThreshold = 0;
     for (size_t i = 0; i < Protons.size(); ++i) {
-      if (Protons[i]->p() > 450 && Protons[i]->p() < 1200 && Protons[i]->P3().Angle(pnu.Vect()) < (M_PI/180.0)*70.0) nProtonsAboveThreshold++;
+      if (Protons[i]->p() > 450 && 
+          Protons[i]->p() < 1200 && 
+          Protons[i]->P3().Angle(pnu.Vect()) < (M_PI/180.0)*70.0) {
+        nProtonsAboveThreshold++;
+      }
     }
 
     // Proton momentum cuts
