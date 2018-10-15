@@ -327,14 +327,16 @@ double RikRPA::CalcWeight(BaseFitEvt* evt) {
   // If not QE return 1.0
   // LOG(FIT) << "RikRPA : Event QE = " << proc_info.IsQuasiElastic() <<
   // std::endl;
-  if (!tgt.IsNucleus()) return 1.0;
+  if (!tgt.IsNucleus()) {
+    return 1.0;
+  }
   if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
 
   // Extract Beam and Target PDG
   GHepParticle* neutrino = ghep->Probe();
   int bpdg = neutrino->Pdg();
 
-  GHepParticle* target = ghep->Particle(1);
+  GHepParticle* target = ghep->TargetNucleus();
   assert(target);
   int tpdg = target->Pdg();
 
