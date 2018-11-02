@@ -422,9 +422,9 @@ TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res,
 
   fine->Scale(hist->Integral(1, hist->GetNbinsX() + 1) /
               fine->Integral(1, fine->GetNbinsX() + 1));
-  std::cout << "Interpolation Difference = "
-            << fine->Integral(1, fine->GetNbinsX() + 1) << "/"
-            << hist->Integral(1, hist->GetNbinsX() + 1) << std::endl;
+  //std::cout << "Interpolation Difference = "
+            //<< fine->Integral(1, fine->GetNbinsX() + 1) << "/"
+            //<< hist->Integral(1, hist->GetNbinsX() + 1) << std::endl;
 
   return fine;
 }

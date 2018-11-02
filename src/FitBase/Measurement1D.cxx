@@ -893,11 +893,13 @@ void Measurement1D::ScaleEvents() {
                                    fNEvents);
 
 
-    // if (fMCHist_Modes) {
-    // PlotUtils::FluxUnfoldedScaling(fMCHist_Modes, GetFluxHistogram(),
-    // GetEventHistogram(), fScaleFactor,
-    // fNEvents);
-    // }
+    if (fMCHist_Modes) {
+      // Loop over the modes
+      fMCHist_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactor, fNEvents);
+      //PlotUtils::FluxUnfoldedScaling(fMCHist_Modes, GetFluxHistogram(),
+                                     //GetEventHistogram(), fScaleFactor,
+                                     //fNEvents);
+    }
 
   } else if (fIsNoWidth) {
     fMCHist->Scale(fScaleFactor);
@@ -1449,7 +1451,7 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
     LOG(SAM) << "Check experiment constructor for " << fName
       << " and correct this!" << std::endl;
     LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
-    exit(-1);
+    throw;
   }
 
   fRW = rw;
