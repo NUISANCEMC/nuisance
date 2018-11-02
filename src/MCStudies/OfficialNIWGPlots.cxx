@@ -517,8 +517,8 @@ void OfficialNIWGPlots::ScaleEvents() {
 	fHist_NuMu_EnuRates_Pions->Scale(fScaleFactorEnuXSec);
 
 	PlotUtils::FluxUnfoldedScaling(fHist_NuMu_Enu, GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
-	fHist_NuMu_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
-	fHist_NuMu_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
+	fHist_NuMu_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
+	fHist_NuMu_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
 
 	fHist_NuMu_Q2->Scale(fScaleFactor, "width");
 	fHist_NuMu_Q2_Modes->Scale(fScaleFactor, "width");
@@ -537,8 +537,8 @@ void OfficialNIWGPlots::ScaleEvents() {
 	fHist_NuMu_EnuRates_Pions->Scale(fScaleFactorEnuXSec);
 
 	PlotUtils::FluxUnfoldedScaling(fHist_NuMuBar_Enu, GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
-	fHist_NuMuBar_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
-	fHist_NuMuBar_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
+	fHist_NuMuBar_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
+	fHist_NuMuBar_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
 
 	fHist_NuMuBar_Q2->Scale(fScaleFactor, "width");
 	fHist_NuMuBar_Q2_Modes->Scale(fScaleFactor, "width");
@@ -558,8 +558,8 @@ void OfficialNIWGPlots::ScaleEvents() {
 	fHist_Nue_EnuRates_Pions->Scale(fScaleFactorEnuXSec);
 
 	PlotUtils::FluxUnfoldedScaling(fHist_Nue_Enu, GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
-	fHist_Nue_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
-	fHist_Nue_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
+	fHist_Nue_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
+	fHist_Nue_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
 
 	fHist_Nue_Q2->Scale(fScaleFactor, "width");
 	fHist_Nue_Q2_Modes->Scale(fScaleFactor, "width");
@@ -578,8 +578,8 @@ void OfficialNIWGPlots::ScaleEvents() {
 	fHist_Nue_EnuRates_Pions->Scale(fScaleFactorEnuXSec);
 
 	PlotUtils::FluxUnfoldedScaling(fHist_NueBar_Enu, GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
-	fHist_NueBar_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
-	fHist_NueBar_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec);
+	fHist_NueBar_Enu_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
+	fHist_NueBar_Enu_Pions->FluxUnfold(GetFluxHistogram(), GetEventHistogram(), fScaleFactorEnuXSec, fNEvents);
 
 	fHist_NueBar_Q2->Scale(fScaleFactor, "width");
 	fHist_NueBar_Q2_Modes->Scale(fScaleFactor, "width");
