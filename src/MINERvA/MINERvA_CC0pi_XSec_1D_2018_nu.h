@@ -17,51 +17,25 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CC0PI_XSEC_2D_NU_H_SEEN
-#define MINERVA_CC0PI_XSEC_2D_NU_H_SEEN
+#ifndef MINERVA_CC0PI_XSEC_1D_NU_H_SEEN
+#define MINERVA_CC0PI_XSEC_1D_NU_H_SEEN
 
-#include "Measurement2D.h"
+#include "Measurement1D.h"
 
 //********************************************************************  
-class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
+class MINERvA_CC0pi_XSec_1D_2018_nu : public Measurement1D {
 //********************************************************************  
 
  public:
 
   // Constructor
- MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey);
-
-  // Destructor
-  virtual ~MINERvA_CC0pi_XSec_2D_nu() {
-
-    // Remove all the content histograms                     *
-    //    for (int i = 0; i < 9; i++)  
-      // delete this->fMCHist_content[i];   
-
-    // delete everything
-    /* delete difHist; */
-    /* delete evtsignalHist; */
-    /* delete fluxsignalHist; */				
-    /* delete fMapHist; */
-    /* delete status; */
-    /* delete PDGHistogram; */
-    
-    /* // Delete MODE histograms */
-    /* for (int i = 0; i < 60; i++) */
-    /*   delete fMCHist_PDG[i]; */			     
-
-    return;
-  };
+ MINERvA_CC0pi_XSec_1D_2018_nu(nuiskey samplekey);
 
   // Required functions
   bool isSignal(FitEvent *nvect);
   void FillEventVariables(FitEvent *event);
   
  protected:
-  // Converted covariance matrix to provide global binning method in GetLikelihood
-  TH2D* covar_th2d;
-  double GetLikelihood();
-
   // Set up settings based on distribution
   void SetupDataSettings();
 
@@ -70,8 +44,8 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
   int fDist;
   enum Distribution {
     // Pt Pz
-    kPtPz,
     kQ2QE,
+    kEnuQE,
     kPt,
     kPz
   };
