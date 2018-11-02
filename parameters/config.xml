@@ -46,7 +46,8 @@
 <!-- # Default Requirements file for the externalDataFitter Package -->
 <!-- # MAX Events : -1 is no cut. Events will be scaled automatically to give good xsec predictions. -->
 <config MAXEVENTS='-1'/>
-<config includeemptystackhists='1'/>
+<!-- Include empty stacks in the THStack -->
+<config includeemptystackhists='0'/>
 
 <!-- # Turn on/off event manager -->
 <!-- # EventManager enables us to only loop number of events once for multiple projections of the same measurements -->
@@ -94,10 +95,10 @@
 <config saveprefit='0'/>
 
 <!-- # Here's the full list of drawing options -->
-<!-- # See src/FitBase/Measurement1D::Write for more info -->
+<!-- DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/WGHT/WEIGHTS/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/>
 <!-- #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP -->
 <!-- #config drawopts DATA/MC -->
-<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/>
+<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/WEIGHTS/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/>
 
 <config InterpolateSigmaQ0Histogram='1' />
 <config InterpolateSigmaQ0HistogramRes='100' />
