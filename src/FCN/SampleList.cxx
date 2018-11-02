@@ -167,6 +167,7 @@
 
 // 2018 MINERvA CC0pi 2D
 #include "MINERvA_CC0pi_XSec_2D_nu.h"
+#include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
 
 // MINERvA CC1pi+
 #include "MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h"
@@ -999,10 +1000,19 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC0pi_XSec_1DQ2_TgtRatioPb_nu")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
 
-  } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu") ||
-              !name.compare("MINERvA_CC0pi_XSec_2DptQ2_nu")) {
+    // Dan Ruterbories measurements of late 2018
+  } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
+              //!name.compare("MINERvA_CC0pi_XSec_2DptQ2_nu")) {
     return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
+  } else if ( !name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
+              !name.compare("MINERvA_CC0pi_XSec_1Dpz_nu") ||
+              !name.compare("MINERvA_CC0pi_XSec_1DQ2QE_nu") ||
+              !name.compare("MINERvA_CC0pi_XSec_1DEnuQE_nu")) {
+    return (new MINERvA_CC0pi_XSec_1D_2018_nu(samplekey));
+
+
+    // C. Patrick's early 2018 measurements
   //} else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")) {
     //return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
 

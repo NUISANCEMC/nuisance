@@ -23,16 +23,19 @@
 */
 
 #include "MINERvA_SignalDef.h"
-#include "MINERvA_CC0pi_XSec_2D_nu.h"
+#include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
 
 //********************************************************************
-void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
+void MINERvA_CC0pi_XSec_1D_2018_nu::SetupDataSettings() {
 //********************************************************************
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
   // Have two distributions as of summer 2018
-  if      (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) fDist = kPtPz;
+  if (!name.compare("MINERvA_CC0pi_XSec_1Dpt_nu"))          fDist = kPt;
+  else if (!name.compare("MINERvA_CC0pi_XSec_1Dpz_nu"))     fDist = kPz;
+  else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2QE_nu"))   fDist = kQ2QE;
+  else if (!name.compare("MINERvA_CC0pi_XSec_1DEnuQE_nu"))  fDist = kEnuQE;
 
   // Define what files to use from the dist
   std::string datafile = "";
@@ -42,12 +45,33 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   std::string histname = "";
 
   switch (fDist) {
-    case (kPtPz):
-      datafile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
-      corrfile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
-      titles    = "MINERvA CC0#pi #nu_{#mu} p_{t} p_{z};p_{z} (GeV);p_{t} (GeV);d^{2}#sigma/dP_{t}dP_{z} (cm^{2}/GeV^{2}/nucleon)";
-      distdescript = "MINERvA_CC0pi_XSec_2Dptpz_nu sample";
-      histname = "pt_pl_cross_section";
+    case (kPt):
+      datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_ptmu_qelike.root";
+      corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_ptmu_qelike.root";
+      titles    = "MINERvA CC0#pi #nu_{#mu} p_{t};p_{t} (GeV);d#sigma/dP_{t} (cm^{2}/GeV/nucleon)";
+      distdescript = "MINERvA_CC0pi_XSec_1Dpt_nu sample";
+      histname = "ptmu_cross_section";
+      break;
+    case (kPz):
+      datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_pzmu_qelike.root";
+      corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_pzmu_qelike.root";
+      titles    = "MINERvA CC0#pi #nu_{#mu} p_{z};p_{z} (GeV);d#sigma/dP_{z} (cm^{2}/GeV/nucleon)";
+      distdescript = "MINERvA_CC0pi_XSec_1Dpz_nu sample";
+      histname = "pzmu_cross_section";
+      break;
+    case (kQ2QE):
+      datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_q2qe_qelike.root";
+      corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_q2qe_qelike.root";
+      titles    = "MINERvA CC0#pi #nu_{#mu} Q^{2}_{QE};Q^{2}_{QE} (GeV^{2});d#sigma/dQ^{2}_{QE} cm^{2}/GeV^{2}/nucleon)";
+      distdescript = "MINERvA_CC0pi_XSec_1DQ2QE_nu sample";
+      histname = "q2qe_cross_section";
+      break;
+    case (kEnuQE):
+      datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_enuqe_qelike.root";
+      corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_enuqe_qelike.root";
+      titles    = "MINERvA CC0#pi #nu_{#mu} E_{#nu}^{QE}; E_{#nu}^{QE} (GeV);d#sigma/dE_{#nu}^{QE} (cm^{2}/GeV/nucleon)";
+      distdescript = "MINERvA_CC0pi_XSec_1DEnuQE_nu sample";
+      histname = "enuqe_cross_section";
       break;
     default:
       THROW("Unknown Analysis Distribution : " << fDist);
@@ -56,7 +80,6 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
   fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
   fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
-  fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[3] );
 
   // Sample overview ---------------------------------------------------
   std::string descrip = distdescript + "\n"\
@@ -70,10 +93,11 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   fSettings.SetCovarInput( FitPar::GetDataBase() + corrfile);
 
   // Set the data file
-  SetDataValues(fSettings.GetDataInput(), histname);
-}
+  SetDataFromRootFile(fSettings.GetDataInput(), histname);
+};
+
 //********************************************************************
-MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
+MINERvA_CC0pi_XSec_1D_2018_nu::MINERvA_CC0pi_XSec_1D_2018_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Setup common settings
@@ -86,12 +110,19 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
   SetupDataSettings();
   FinaliseSampleSettings();
 
-  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
+  // If EnuQE distribution we apply the bin by bin flux integrated scaling (so don't divide scalefactor by integrated flux yet)
+  if (fDist == kEnuQE) {
+    fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.));
+  } else {
+    fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) / this->TotalIntegratedFlux();
+  }
 
   TMatrixDSym* tempmat = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(), "TotalCovariance");
+  // Scale up up up!
+  (*tempmat) *= 1E38*1E38;
   fFullCovar = tempmat;
   // Decomposition is stable for entries that aren't E-xxx
-  double ScalingFactor = 1E38*1E38;
+  double ScalingFactor = 1E38;
   (*fFullCovar) *= ScalingFactor;
 
   // Just check that the data error and covariance are the same
@@ -137,7 +168,7 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
 };
 
 //********************************************************************
-void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
+void MINERvA_CC0pi_XSec_1D_2018_nu::FillEventVariables(FitEvent *event) {
   //********************************************************************
   // Checking to see if there is a Muon
   if (event->NumFSParticle(13) == 0) return;
@@ -146,22 +177,32 @@ void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
 
-  Double_t px = Pmu.X()/1000;
-  Double_t py = Pmu.Y()/1000;
-  Double_t pt = sqrt(px*px+py*py);
-
-  // y-axis is transverse momentum for both measurements
-  fYVar = pt;
-
   // Now we set the x-axis
   switch (fDist) {
-    case kPtPz:
+    case (kPt):
       {
-        // Don't want to assume the event generators all have neutrino coming along z
-        // pz is muon momentum projected onto the neutrino direction
+        Double_t px = Pmu.X()/1000.;
+        Double_t py = Pmu.Y()/1000.;
+        Double_t pt = sqrt(px*px+py*py);
+        fXVar = pt;
+        break;
+      }
+    case (kPz):
+      {
         Double_t pz = Pmu.Vect().Dot(Pnu.Vect()*(1.0/Pnu.Vect().Mag()))/1000.;
-        // Set Hist Variables
         fXVar = pz;
+        break;
+      }
+    case (kQ2QE):
+      {
+        Double_t q2qe = FitUtils::Q2QErec(Pmu, Pnu, 34.);
+        fXVar = q2qe;
+        break;
+      }
+    case (kEnuQE):
+      {
+        Double_t enuqe = FitUtils::EnuQErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), 34.);
+        fXVar = enuqe;
         break;
       }
     default:
@@ -169,73 +210,11 @@ void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
       break;
   }
 
+  return;
 };
 
 //********************************************************************
-bool MINERvA_CC0pi_XSec_2D_nu::isSignal(FitEvent *event) {
+bool MINERvA_CC0pi_XSec_1D_2018_nu::isSignal(FitEvent *event) {
   //********************************************************************
   return SignalDef::isCC0pi_MINERvAPTPZ(event, 14, EnuMin, EnuMax);
-};
-
-//********************************************************************
-// Custom likelihood calculator because binning of covariance matrix
-double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
-  //********************************************************************
-
-  // The calculated chi2
-  double chi2 = 0.0;
-
-  // Support shape comparisons
-  double scaleF = fDataHist->Integral() / fMCHist->Integral();
-  if (fIsShape) {
-    fMCHist->Scale(scaleF);
-    fMCFine->Scale(scaleF);
-  }
-
-  // Even though this chi2 calculation looks ugly it is _EXACTLY_ what MINERvA used for their measurement
-  // Can be prettified in due time but for now keep
-  bool chi2_use_overflow_err = false;
-  //const int lowBin  = chi2_use_overflow_err?0:1; // Either they both use underflow, or neither of them does
-
-  int nbinsx=fMCHist->GetNbinsX();
-  int nbinsy=fMCHist->GetNbinsY();
-  Int_t Nbins = nbinsx*nbinsy;
-
-  // Loop over the covariance matrix bins
-  for (int i = 0; i < Nbins; ++i) {
-    int xbin = i%nbinsx+1;
-    int ybin = i/nbinsx+1;
-    double datax = fDataHist->GetBinContent(xbin,ybin);
-    double mcx = fMCHist->GetBinContent(xbin,ybin);
-    for (int j = 0; j < Nbins; ++j) {
-      int xbin2 = j%nbinsx+1;
-      int ybin2 = j/nbinsx+1;
-
-      double datay = fDataHist->GetBinContent(xbin2,ybin2);
-      double mcy = fMCHist->GetBinContent(xbin2,ybin2);
-
-      double chi2_xy = (datax-mcx)*(*covar)(i,j)*(datay-mcy);
-      chi2 += chi2_xy;
-    }
-  }
-
-  // Normalisation penalty term if included
-  if (fAddNormPen) {
-    chi2 +=
-      (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    LOG(REC) << "Norm penalty = "
-      << (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
-      (fNormError * fNormError)
-      << std::endl;
-  }
-
-  // Adjust the shape back to where it was.
-  if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")) {
-    fMCHist->Scale(1. / scaleF);
-    fMCFine->Scale(1. / scaleF);
-  }
-
-  fLikelihood = chi2;
-
-  return chi2;
 };
