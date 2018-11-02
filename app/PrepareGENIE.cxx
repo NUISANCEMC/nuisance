@@ -43,6 +43,12 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   // Setup TTree
   TChain* tn = new TChain("gtree");
   tn->AddFile(input.c_str());
+  if (tn->GetFile() == NULL) {
+    tn->Print();
+    ERROR(FTL, "gtree not located in GENIE file: " << input);
+    THROW("Check your inputs, they may need to be completely regenerated!");
+    throw;
+  }
 
   int nevt = tn->GetEntries();
   if (gNEvents != -999) {
@@ -123,8 +129,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     size_t freq = nevt / 20;
     if (freq && !(i % freq)) {
       LOG(FIT) << "Processed " << i << "/" << nevt
-               << " GENIE events (E: " << neu->E()
-               << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)" << std::endl;
+        << " GENIE events (E: " << neu->E()
+        << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)" << std::endl;
     }
   }
   LOG(FIT) << "Processed all events" << std::endl;
@@ -246,7 +252,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     bool FoundTarget = false;
 
     for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin();
-         iter != targetsplines.end(); iter++) {
+        iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D* xsec = iter->second;
 
@@ -293,7 +299,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 }
 
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
-                     std::string output) {
+    std::string output) {
   LOG(FIT) << "Running GENIE Prepare with flux..." << std::endl;
 
   // Get Flux Hist
@@ -308,8 +314,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     to = from + step * nstep;
 
     QLOG(FIT, "Generating flat flux histogram from "
-                  << from << " to " << to << " with bins " << step
-                  << " wide (NBins = " << nstep << ").");
+        << from << " to " << to << " with bins " << step
+        << " wide (NBins = " << nstep << ").");
 
     fluxhist = new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
 
@@ -323,7 +329,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       fluxhist = dynamic_cast<TH1*>(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
         ERR(FTL) << "Couldn't find histogram named: \"" << fluxvect[1]
-                 << "\" in file: \"" << fluxvect[0] << std::endl;
+          << "\" in file: \"" << fluxvect[0] << std::endl;
         throw;
       }
       fluxhist->SetDirectory(0);
@@ -351,6 +357,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     tn->Add(input.c_str());
   }
 
+  if (tn->GetFile() == NULL) {
+    tn->Print();
+    ERROR(FTL, "gtree not located in GENIE file: " << input);
+    THROW("Check your inputs, they may need to be completely regenerated!");
+    throw;
+  }
+
   int nevt = tn->GetEntries();
   if (gNEvents != -999) {
     LOG(FIT) << "Overriding number of events by user from " << nevt << " to " << gNEvents << std::endl;
@@ -359,7 +372,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   if (!nevt) {
     THROW("Couldn't load any events from input specification: \""
-          << input.c_str() << "\"");
+        << input.c_str() << "\"");
   } else {
     QLOG(FIT, "Found " << nevt << " input entries in " << input);
   }
@@ -437,8 +450,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
     if (i % (nevt / 20) == 0) {
       LOG(FIT) << "Processed " << i << "/" << nevt
-               << " GENIE events (E: " << neu->E()
-               << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)" << std::endl;
+        << " GENIE events (E: " << neu->E()
+        << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)" << std::endl;
     }
 
     // Clear Event
@@ -558,19 +571,19 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   // Chop up the target string which has format TARGET1[fraction1],TARGET2[fraction2]
 
-  std::cout << "Targets: " << std::endl;
+  //std::cout << "Targets: " << std::endl;
   // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
   for (std::vector<std::string>::iterator it = targprs.begin(); it != targprs.end(); ++it) {
     // Cut into "TARGET1" and "fraction1]"
     std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
-    std::cout << "  " << *it << std::endl;
+    //std::cout << "  " << *it << std::endl;
     // Cut into "TARGET1" and "fraction1"
     for (std::vector<std::string>::iterator jt = targind.begin(); jt != targind.end(); ++jt) {
       if ((*jt).find("]") != std::string::npos) {
         (*jt) = (*jt).substr(0, (*jt).find("]"));
         //*jt = "hello";
         frac_list.push_back(*jt);
-      // Won't find bracket for target
+        // Won't find bracket for target
       } else {
         targ_list.push_back(*jt);
       }
@@ -582,7 +595,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::vector<double> targ_fractions;
   double minimum = 1.0;
   for (std::vector<std::string>::iterator it = frac_list.begin(); it != frac_list.end(); it++) {
-    std::cout << "  " << *it << std::endl;
+    //std::cout << "  " << *it << std::endl;
     double frac = std::atof((*it).c_str());
     targ_fractions.push_back(frac);
     if (frac < minimum) minimum = frac;
