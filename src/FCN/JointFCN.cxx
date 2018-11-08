@@ -1,13 +1,14 @@
 #include "JointFCN.h"
-#include <stdio.h>
 #include "FitUtils.h"
+#include <stdio.h>
 
 //***************************************************
-JointFCN::JointFCN(TFile* outfile) {
+JointFCN::JointFCN(TFile *outfile) {
   //***************************************************
 
   fOutputDir = gDirectory;
-  if (outfile) Config::Get().out = outfile;
+  if (outfile)
+    Config::Get().out = outfile;
 
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   LoadSamples(samplekeys);
@@ -27,11 +28,12 @@ JointFCN::JointFCN(TFile* outfile) {
 }
 
 //***************************************************
-JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile* outfile) {
+JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile *outfile) {
   //***************************************************
 
   fOutputDir = gDirectory;
-  if (outfile) Config::Get().out = outfile;
+  if (outfile)
+    Config::Get().out = outfile;
 
   LoadSamples(samplekeys);
 
@@ -55,23 +57,26 @@ JointFCN::~JointFCN() {
   // Delete Samples
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     delete exp;
   }
 
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     delete pull;
   }
 
   // Sort Tree
-  if (fIterationTree) DestroyIterationTree();
-  if (fDialVals) delete fDialVals;
-  if (fSampleLikes) delete fSampleLikes;
+  if (fIterationTree)
+    DestroyIterationTree();
+  if (fDialVals)
+    delete fDialVals;
+  if (fSampleLikes)
+    delete fSampleLikes;
 };
 
 //***************************************************
-void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
+void JointFCN::CreateIterationTree(std::string name, FitWeight *rw) {
   //***************************************************
 
   LOG(FIT) << " Creating new iteration container! " << std::endl;
@@ -81,7 +86,7 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
   // Add sample likelihoods and ndof
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     std::string name = exp->GetName();
 
     std::string liketag = name + "_likelihood";
@@ -95,7 +100,7 @@ void JointFCN::CreateIterationTree(std::string name, FitWeight* rw) {
 
   // Add Pull terms
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     std::string name = pull->GetName();
 
     std::string liketag = name + "_likelihood";
@@ -148,10 +153,10 @@ void JointFCN::WriteIterationTree() {
   LOG(FIT) << "Writing iteration tree" << std::endl;
 
   // Make a new TTree
-  TTree* itree =
+  TTree *itree =
       new TTree(fIterationTreeName.c_str(), fIterationTreeName.c_str());
 
-  double* vals = new double[fNameValues.size()];
+  double *vals = new double[fNameValues.size()];
   int count = 0;
 
   itree->Branch("iteration", &count, "Iteration/I");
@@ -179,7 +184,7 @@ void JointFCN::WriteIterationTree() {
 }
 
 //***************************************************
-void JointFCN::FillIterationTree(FitWeight* rw) {
+void JointFCN::FillIterationTree(FitWeight *rw) {
   //***************************************************
 
   // Loop over samples count
@@ -205,7 +210,7 @@ void JointFCN::FillIterationTree(FitWeight* rw) {
 }
 
 //***************************************************
-double JointFCN::DoEval(const double* x) {
+double JointFCN::DoEval(const double *x) {
   //***************************************************
 
   // WEIGHT ENGINE
@@ -231,7 +236,8 @@ double JointFCN::DoEval(const double* x) {
            << std::endl;
 
   // UPDATE TREE
-  if (fIterationTree) FillIterationTree(FitBase::GetRW());
+  if (fIterationTree)
+    FillIterationTree(FitBase::GetRW());
 
   return fLikelihood;
 }
@@ -246,7 +252,7 @@ int JointFCN::GetNDOF() {
   // Total number of Free bins in each MC prediction
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     int dof = exp->GetNDOF();
 
     // Save Seperate DOF
@@ -261,7 +267,7 @@ int JointFCN::GetNDOF() {
 
   // Loop over pulls
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     double dof = pull->GetLikelihood();
 
     // Save seperate DOF
@@ -294,7 +300,7 @@ double JointFCN::GetLikelihood() {
   int count = 0;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     double newlike = exp->GetLikelihood();
     int ndof = exp->GetNDOF();
     // Save seperate likelihoods
@@ -315,7 +321,7 @@ double JointFCN::GetLikelihood() {
 
   // Loop over pulls
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     double newlike = pull->GetLikelihood();
 
     // Save seperate likelihoods
@@ -351,7 +357,7 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
     LOG(MIN) << "Loading Sample : " << samplename << std::endl;
 
     fOutputDir->cd();
-    MeasurementBase* NewLoadedSample = SampleUtils::CreateSample(key);
+    MeasurementBase *NewLoadedSample = SampleUtils::CreateSample(key);
 
     if (!NewLoadedSample) {
       ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;
@@ -398,7 +404,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
     // Loop over all Measurement Classes
     for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
          iter++) {
-      MeasurementBase* exp = *iter;
+      MeasurementBase *exp = *iter;
 
       // If RW Either do signal or full reconfigure.
       if (fDialChanged or !fMCFilled or fullconfig) {
@@ -416,7 +422,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   // Loop over pulls and update
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     pull->Reconfigure();
   }
 
@@ -441,17 +447,17 @@ void JointFCN::ReconfigureAllEvents() {
   ReconfigureSamples(true);
 }
 
-std::vector<InputHandlerBase*> JointFCN::GetInputList() {
-  std::vector<InputHandlerBase*> InputList;
+std::vector<InputHandlerBase *> JointFCN::GetInputList() {
+  std::vector<InputHandlerBase *> InputList;
   fIsAllSplines = true;
 
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
 
-    std::vector<MeasurementBase*> subsamples = exp->GetSubSamples();
+    std::vector<MeasurementBase *> subsamples = exp->GetSubSamples();
     for (size_t i = 0; i < subsamples.size(); i++) {
-      InputHandlerBase* inp = subsamples[i]->GetInput();
+      InputHandlerBase *inp = subsamples[i]->GetInput();
       if (std::find(InputList.begin(), InputList.end(), inp) ==
           InputList.end()) {
         if (subsamples[i]->GetInput()->GetType() != kSPLINEPARAMETER)
@@ -465,14 +471,14 @@ std::vector<InputHandlerBase*> JointFCN::GetInputList() {
   return InputList;
 }
 
-std::vector<MeasurementBase*> JointFCN::GetSubSampleList() {
-  std::vector<MeasurementBase*> SampleList;
+std::vector<MeasurementBase *> JointFCN::GetSubSampleList() {
+  std::vector<MeasurementBase *> SampleList;
 
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
 
-    std::vector<MeasurementBase*> subsamples = exp->GetSubSamples();
+    std::vector<MeasurementBase *> subsamples = exp->GetSubSamples();
     for (size_t i = 0; i < subsamples.size(); i++) {
       SampleList.push_back(subsamples[i]);
     }
@@ -492,7 +498,7 @@ void JointFCN::ReconfigureUsingManager() {
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
     exp->ResetAll();
   }
 
@@ -515,14 +521,14 @@ void JointFCN::ReconfigureUsingManager() {
 
   // If all inputs are splines make sure the readers are told
   // they need to be reconfigured.
-  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  std::vector<InputHandlerBase *>::iterator inp_iter = fInputList.begin();
 
   if (fIsAllSplines) {
     for (; inp_iter != fInputList.end(); inp_iter++) {
-      InputHandlerBase* curinput = (*inp_iter);
+      InputHandlerBase *curinput = (*inp_iter);
 
       // Tell reader in each BaseEvent it needs a Reconfigure next weight calc.
-      BaseFitEvt* curevent = curinput->FirstBaseEvent();
+      BaseFitEvt *curevent = curinput->FirstBaseEvent();
       if (curevent->fSplineRead) {
         curevent->fSplineRead->SetNeedsReconfigure(true);
       }
@@ -537,10 +543,10 @@ void JointFCN::ReconfigureUsingManager() {
 
   // Loop over each input in manager
   for (; inp_iter != fInputList.end(); inp_iter++) {
-    InputHandlerBase* curinput = (*inp_iter);
+    InputHandlerBase *curinput = (*inp_iter);
 
     // Get event information
-    FitEvent* curevent = curinput->FirstNuisanceEvent();
+    FitEvent *curevent = curinput->FirstNuisanceEvent();
     curinput->CreateCache();
 
     int i = 0;
@@ -553,8 +559,9 @@ void JointFCN::ReconfigureUsingManager() {
       // The reweighting weight
       curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
       // The Custom weight and reweight
-      curevent->Weight = curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
-      //double rwweight = curevent->Weight;
+      curevent->Weight =
+          curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+      // double rwweight = curevent->Weight;
       // std::cout << "RWWeight = " << curevent->RWWeight  << " " <<
       // curevent->InputWeight << std::endl;
 
@@ -575,16 +582,16 @@ void JointFCN::ReconfigureUsingManager() {
       std::vector<bool> signalbitset(fSubSampleList.size());
 
       // Create a new signal box vector for this event
-      std::vector<MeasurementVariableBox*> signalboxes;
+      std::vector<MeasurementVariableBox *> signalboxes;
 
       // Start measurement iterator
       size_t measitercount = 0;
-      std::vector<MeasurementBase*>::iterator meas_iter =
+      std::vector<MeasurementBase *>::iterator meas_iter =
           fSubSampleList.begin();
 
       // Loop over all subsamples (sub in JointMeas)
       for (; meas_iter != fSubSampleList.end(); meas_iter++) {
-        MeasurementBase* curmeas = (*meas_iter);
+        MeasurementBase *curmeas = (*meas_iter);
 
         // Compare input pointers, to current input, skip if not.
         // Pointer tells us if it matches without doing ID checks.
@@ -602,7 +609,7 @@ void JointFCN::ReconfigureUsingManager() {
         }
 
         // Fill events for matching inputs.
-        MeasurementVariableBox* box = curmeas->FillVariableBox(curevent);
+        MeasurementVariableBox *box = curmeas->FillVariableBox(curevent);
 
         bool signal = curmeas->isSignal(curevent);
         curmeas->SetSignal(signal);
@@ -685,18 +692,17 @@ void JointFCN::ReconfigureUsingManager() {
   // Converting Binned events to XSec Distributions
   iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
     exp->ConvertEventRates();
   }
 
   // Print out statements on approximate memory usage for profiling.
   LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
   if (savesignal) {
-    int mem =
-        (  // sizeof(fSignalEventBoxes) +
-            // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
-            sizeof(MeasurementVariableBox1D) * fillcount) *
-        1E-6;
+    int mem = ( // sizeof(fSignalEventBoxes) +
+                // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
+                  sizeof(MeasurementVariableBox1D) * fillcount) *
+              1E-6;
     LOG(REC) << " -> Saved " << fillcount
              << " signal boxes for faster access. (~" << mem << " MB)"
              << std::endl;
@@ -721,9 +727,8 @@ void JointFCN::ReconfigureUsingManager() {
     if (fabs(likefull - likefast) > 0.0001) {
       ERROR(FTL, "Fast and Full Likelihoods DIFFER! : " << likefull << " : "
                                                         << likefast);
-      ERROR(FTL,
-            "This means some samples you are using are not setup to use "
-            "SignalReconfigures=1");
+      ERROR(FTL, "This means some samples you are using are not setup to use "
+                 "SignalReconfigures=1");
       ERROR(FTL, "Please turn OFF signal reconfigures.");
       throw;
     } else {
@@ -748,7 +753,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
     exp->ResetAll();
   }
 
@@ -764,11 +769,11 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Setup fast vector iterators.
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
-  std::vector<std::vector<MeasurementVariableBox*> >::iterator box_iter =
+  std::vector<std::vector<MeasurementVariableBox *>>::iterator box_iter =
       fSignalEventBoxes.begin();
-  std::vector<std::vector<float> >::iterator spline_iter =
+  std::vector<std::vector<float>>::iterator spline_iter =
       fSignalEventSplines.begin();
-  std::vector<std::vector<bool> >::iterator samsig_iter =
+  std::vector<std::vector<bool>>::iterator samsig_iter =
       fSampleSignalFlags.begin();
   int splinecount = 0;
 
@@ -778,21 +783,21 @@ void JointFCN::ReconfigureFastUsingManager() {
   int countwidth = nevents / 10;
 
   // If All Splines tell splines they need a reconfigure.
-  std::vector<InputHandlerBase*>::iterator inp_iter = fInputList.begin();
+  std::vector<InputHandlerBase *>::iterator inp_iter = fInputList.begin();
   if (fIsAllSplines) {
     LOG(REC) << "All Spline Inputs so using fast spline loop." << std::endl;
     for (; inp_iter != fInputList.end(); inp_iter++) {
-      InputHandlerBase* curinput = (*inp_iter);
+      InputHandlerBase *curinput = (*inp_iter);
 
       // Tell each fSplineRead in BaseFitEvent to reconf next weight calc
-      BaseFitEvt* curevent = curinput->FirstBaseEvent();
+      BaseFitEvt *curevent = curinput->FirstBaseEvent();
       if (curevent->fSplineRead)
         curevent->fSplineRead->SetNeedsReconfigure(true);
     }
   }
 
   // Loop over all possible spline inputs
-  double* coreeventweights = new double[fSignalEventBoxes.size()];
+  double *coreeventweights = new double[fSignalEventBoxes.size()];
   splinecount = 0;
 
   inp_iter = fInputList.begin();
@@ -808,8 +813,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // #pragma omp parallel for shared(splinecount,sigcount)
   for (uint iinput = 0; iinput < fInputList.size(); iinput++) {
-    InputHandlerBase* curinput = fInputList[iinput];
-    BaseFitEvt* curevent = curinput->FirstBaseEvent();
+    InputHandlerBase *curinput = fInputList[iinput];
+    BaseFitEvt *curevent = curinput->FirstBaseEvent();
 
     for (int i = 0; i < curinput->GetNEvents(); i++) {
       double rwweight = 0.0;
@@ -826,7 +831,8 @@ void JointFCN::ReconfigureFastUsingManager() {
         }
 
         curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-        curevent->Weight = curevent->RWWeight * curevent->InputWeight*curevent->CustomWeight;
+        curevent->Weight =
+            curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
         rwweight = curevent->Weight;
 
         coreeventweights[splinecount] = rwweight;
@@ -864,13 +870,13 @@ void JointFCN::ReconfigureFastUsingManager() {
 
     // Get iterators for this event
     std::vector<bool>::iterator subsamsig_iter = (*samsig_iter).begin();
-    std::vector<MeasurementVariableBox*>::iterator subbox_iter =
+    std::vector<MeasurementVariableBox *>::iterator subbox_iter =
         (*box_iter).begin();
 
     // Loop over all sub measurements.
-    std::vector<MeasurementBase*>::iterator meas_iter = fSubSampleList.begin();
+    std::vector<MeasurementBase *>::iterator meas_iter = fSubSampleList.begin();
     for (; meas_iter != fSubSampleList.end(); meas_iter++, subsamsig_iter++) {
-      MeasurementBase* curmeas = (*meas_iter);
+      MeasurementBase *curmeas = (*meas_iter);
 
       // If event flagged as signal for this sample fill from the box.
       if (*subsamsig_iter) {
@@ -901,7 +907,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Convert Binned events
   iterSam = fSamples.begin();
   for (; iterSam != fSamples.end(); iterSam++) {
-    MeasurementBase* exp = (*iterSam);
+    MeasurementBase *exp = (*iterSam);
     exp->ConvertEventRates();
   }
 
@@ -927,7 +933,7 @@ void JointFCN::Write() {
   std::vector<std::string> names;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     double like = exp->GetLikelihood();
     double ndof = exp->GetNDOF();
     std::string name = exp->GetName();
@@ -935,48 +941,50 @@ void JointFCN::Write() {
     ndofs.push_back(ndof);
     names.push_back(name);
   }
-  TH1D likehist = TH1D("likelihood_hist", "likelihood_hist", likes.size(), 0.0,
-                       double(likes.size()));
-  TH1D ndofhist =
-      TH1D("ndof_hist", "ndof_hist", ndofs.size(), 0.0, double(ndofs.size()));
-  TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist", likes.size(), 0.0,
-                      double(likes.size()));
-  for (int i = 0; i < likehist.GetNbinsX(); i++) {
-    likehist.SetBinContent(i + 1, likes[i]);
-    ndofhist.SetBinContent(i + 1, ndofs[i]);
-    if (ndofs[i] != 0.0) {
-      divhist.SetBinContent(i + 1, likes[i] / ndofs[i]);
+  if (likes.size()) {
+    TH1D likehist = TH1D("likelihood_hist", "likelihood_hist", likes.size(),
+                         0.0, double(likes.size()));
+    TH1D ndofhist =
+        TH1D("ndof_hist", "ndof_hist", ndofs.size(), 0.0, double(ndofs.size()));
+    TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist", likes.size(),
+                        0.0, double(likes.size()));
+    for (int i = 0; i < likehist.GetNbinsX(); i++) {
+      likehist.SetBinContent(i + 1, likes[i]);
+      ndofhist.SetBinContent(i + 1, ndofs[i]);
+      if (ndofs[i] != 0.0) {
+        divhist.SetBinContent(i + 1, likes[i] / ndofs[i]);
+      }
+      likehist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
+      ndofhist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
+      divhist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
     }
-    likehist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
-    ndofhist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
-    divhist.GetXaxis()->SetBinLabel(i + 1, names[i].c_str());
+    likehist.Write();
+    ndofhist.Write();
+    divhist.Write();
   }
-  likehist.Write();
-  ndofhist.Write();
-  divhist.Write();
 
   // Loop over individual experiments and call Write
   LOG(MIN) << "Writing each of the data classes..." << std::endl;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     exp->Write();
   }
 
   // Save Pull Terms
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     pull->Write();
   }
 
   if (FitPar::Config().GetParB("EventManager")) {
     // Get list of inputs
-    std::map<int, InputHandlerBase*> fInputs =
+    std::map<int, InputHandlerBase *> fInputs =
         FitBase::EvtManager().GetInputs();
-    std::map<int, InputHandlerBase*>::const_iterator iterInp;
+    std::map<int, InputHandlerBase *>::const_iterator iterInp;
 
     for (iterInp = fInputs.begin(); iterInp != fInputs.end(); iterInp++) {
-      InputHandlerBase* input = (iterInp->second);
+      InputHandlerBase *input = (iterInp->second);
 
       input->GetFluxHistogram()->Write();
       input->GetXSecHistogram()->Write();
@@ -992,7 +1000,7 @@ void JointFCN::SetFakeData(std::string fakeinput) {
   LOG(MIN) << "Setting fake data from " << fakeinput << std::endl;
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     exp->SetFakeDataValues(fakeinput);
   }
 
@@ -1005,7 +1013,7 @@ void JointFCN::ThrowDataToy() {
 
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
     exp->ThrowDataToy();
   }
 
@@ -1022,7 +1030,7 @@ std::vector<std::string> JointFCN::GetAllNames() {
   // Loop over samples first
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
 
     // Get Likelihoods and push to vector
     namevect.push_back(exp->GetName());
@@ -1030,7 +1038,7 @@ std::vector<std::string> JointFCN::GetAllNames() {
 
   // Loop over pulls second
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
 
     // Push back to vector
     namevect.push_back(pull->GetName());
@@ -1054,7 +1062,7 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
   // Loop over samples first
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
 
     // Get Likelihoods and push to vector
     double singlelike = exp->GetLikelihood();
@@ -1068,7 +1076,7 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
 
   // Loop over pulls second
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
 
     // Push back to vector
     double singlelike = pull->GetLikelihood();
@@ -1097,7 +1105,7 @@ std::vector<int> JointFCN::GetAllNDOF() {
   // Loop over samples first
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
-    MeasurementBase* exp = *iter;
+    MeasurementBase *exp = *iter;
 
     // Get Likelihoods and push to vector
     int singlendof = exp->GetNDOF();
@@ -1107,7 +1115,7 @@ std::vector<int> JointFCN::GetAllNDOF() {
 
   // Loop over pulls second
   for (PullListConstIter iter = fPulls.begin(); iter != fPulls.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
 
     // Push back to vector
     int singlendof = pull->GetNDOF();
