@@ -1,8 +1,11 @@
 #include "GENIEWeightEngine.h"
 
+#ifdef __GENIE_EMP_MECRW_ENABLED
+#include "ReWeight/GReWeightXSecEmpiricalMEC.h"
+#endif
+
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_ENABLED__
-
   // Setup the NEUT Reweight engien
   fCalcName = name;
   LOG(FIT) << "Setting up GENIE RW : " << fCalcName << std::endl;
@@ -12,13 +15,15 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   fGenieRW = new genie::rew::GReWeight();
 
   // Get List of Vetos (Just for debugging)
-  std::string rw_engine_list = FitPar::Config().GetParS("FitWeight_fGenieRW_veto");
+  std::string rw_engine_list =
+      FitPar::Config().GetParS("FitWeight_fGenieRW_veto");
   bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
   bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
   bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
   bool xsec_nnres = rw_engine_list.find("xsec_nonresbkg") == std::string::npos;
   bool xsec_nudis = rw_engine_list.find("nuclear_dis") == std::string::npos;
-  bool xsec_resdec = rw_engine_list.find("hadro_res_decay") == std::string::npos;
+  bool xsec_resdec =
+      rw_engine_list.find("hadro_res_decay") == std::string::npos;
   bool xsec_fzone = rw_engine_list.find("hadro_intranuke") == std::string::npos;
   bool xsec_intra = rw_engine_list.find("hadro_fzone") == std::string::npos;
   bool xsec_agky = rw_engine_list.find("hadro_agky") == std::string::npos;
@@ -28,17 +33,27 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
   bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
   bool xsec_nucqe = rw_engine_list.find("nuclear_qe") == std::string::npos;
-  bool xsec_qeaxial = rw_engine_list.find("xsec_ccqe_axial") == std::string::npos;
+  bool xsec_qeaxial =
+      rw_engine_list.find("xsec_ccqe_axial") == std::string::npos;
+#ifdef __GENIE_EMP_MECRW_ENABLED
+  bool xsec_empMEC = rw_engine_list.find("xsec_empMEC") == std::string::npos;
+#endif
 
   // Now actually add the RW Calcs
   if (xsec_ncel)
     fGenieRW->AdoptWghtCalc("xsec_ncel", new genie::rew::GReWeightNuXSecNCEL);
-  if (xsec_ccqe){
+  if (xsec_ccqe) {
     fGenieRW->AdoptWghtCalc("xsec_ccqe", new genie::rew::GReWeightNuXSecCCQE);
     //	  (dynamic_cast<GReWeightNuXSecCCQE*> (fGenieRW->WghtCalc("xsec_ccqe")))
     //	    ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCCQE") );
   }
-  if (xsec_coh){
+#ifdef __GENIE_EMP_MECRW_ENABLED
+  if (xsec_empMEC) {
+    fGenieRW->AdoptWghtCalc("xsec_empMEC",
+                            new genie::rew::GReWeightXSecEmpiricalMEC);
+  }
+#endif
+  if (xsec_coh) {
     fGenieRW->AdoptWghtCalc("xsec_coh", new genie::rew::GReWeightNuXSecCOH());
     //	  (dynamic_cast<GReWeightNuXSecCOH*> (fGenieRW->WghtCalc("xsec_coh")))
     //	    ->SetXSecModel( FitPar::Config().GetParS("GENIEXSecModelCOH") );
@@ -46,12 +61,12 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 
   if (xsec_nnres)
     fGenieRW->AdoptWghtCalc("xsec_nonresbkg",
-        new genie::rew::GReWeightNonResonanceBkg);
+                            new genie::rew::GReWeightNonResonanceBkg);
   if (xsec_nudis)
     fGenieRW->AdoptWghtCalc("nuclear_dis", new genie::rew::GReWeightDISNuclMod);
   if (xsec_resdec)
     fGenieRW->AdoptWghtCalc("hadro_res_decay",
-        new genie::rew::GReWeightResonanceDecay);
+                            new genie::rew::GReWeightResonanceDecay);
   if (xsec_fzone)
     fGenieRW->AdoptWghtCalc("hadro_fzone", new genie::rew::GReWeightFZone);
   if (xsec_intra)
@@ -60,22 +75,25 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
     fGenieRW->AdoptWghtCalc("hadro_agky", new genie::rew::GReWeightAGKY);
   if (xsec_qevec)
     fGenieRW->AdoptWghtCalc("xsec_ccqe_vec",
-        new genie::rew::GReWeightNuXSecCCQEvec);
+                            new genie::rew::GReWeightNuXSecCCQEvec);
 #if __GENIE_VERSION__ >= 212
   if (xsec_qeaxial)
     fGenieRW->AdoptWghtCalc("xsec_ccqe_axial",
-        new genie::rew::GReWeightNuXSecCCQEaxial);
+                            new genie::rew::GReWeightNuXSecCCQEaxial);
 #endif
 
   if (xsec_dis)
     fGenieRW->AdoptWghtCalc("xsec_dis", new genie::rew::GReWeightNuXSecDIS);
   if (xsec_nc)
     fGenieRW->AdoptWghtCalc("xsec_nc", new genie::rew::GReWeightNuXSecNC);
-  if (xsec_ccres){
+  if (xsec_ccres) {
 #if __GENIE_VERSION__ < 213
     fGenieRW->AdoptWghtCalc("xsec_ccres", new genie::rew::GReWeightNuXSecCCRES);
 #else
-    fGenieRW->AdoptWghtCalc("xsec_ccres", new genie::rew::GReWeightNuXSecCCRES( FitPar::Config().GetParS("GENIEXSecModelCCRES"), "Default"));
+    fGenieRW->AdoptWghtCalc(
+        "xsec_ccres",
+        new genie::rew::GReWeightNuXSecCCRES(
+            FitPar::Config().GetParS("GENIEXSecModelCCRES"), "Default"));
 #endif
   }
 
@@ -84,37 +102,45 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   if (xsec_nucqe)
     fGenieRW->AdoptWghtCalc("nuclear_qe", new genie::rew::GReWeightFGM);
 
-  GReWeightNuXSecCCQE * rwccqe =
-    dynamic_cast<GReWeightNuXSecCCQE *> (fGenieRW->WghtCalc("xsec_ccqe"));
-  rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
-
-  // Default to include shape and normalization changes for CCRES (can be changed downstream if desired)
-  GReWeightNuXSecCCRES * rwccres = dynamic_cast<GReWeightNuXSecCCRES *> (fGenieRW->WghtCalc("xsec_ccres"));
-  std::string marestype = FitPar::Config().GetParS("GENIEWeightEngine_CCRESMode");
-  if (!marestype.compare("kModeNormAndMaMvShape")){
-    LOG(FIT) << "Setting GENIE ReWeight CCRES to kModeNormAndMaMvShape" << std::endl;
-    rwccres->SetMode(GReWeightNuXSecCCRES::kModeNormAndMaMvShape);
-  } else if (!marestype.compare("kModeMaMv")) {
-    LOG(FIT) << "Setting GENIE ReWeight CCRES to kModeMaMv" << std::endl;
-    rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
-  } else {
-    THROW("Unkown MARES Mode in GENIE Weight Engine : " << marestype );
+  if (xsec_ccqe) {
+    GReWeightNuXSecCCQE *rwccqe =
+        dynamic_cast<GReWeightNuXSecCCQE *>(fGenieRW->WghtCalc("xsec_ccqe"));
+    rwccqe->SetMode(GReWeightNuXSecCCQE::kModeMa);
   }
 
-  // Default to include shape and normalization changes for NCRES (can be changed downstream if desired)
-  GReWeightNuXSecNCRES * rwncres = dynamic_cast<GReWeightNuXSecNCRES *> (fGenieRW->WghtCalc("xsec_ncres"));
-  rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
+  if (xsec_ccres) {
+    // Default to include shape and normalization changes for CCRES (can be
+    // changed downstream if desired)
+    GReWeightNuXSecCCRES *rwccres =
+        dynamic_cast<GReWeightNuXSecCCRES *>(fGenieRW->WghtCalc("xsec_ccres"));
 
-  // Default to include shape and normalization changes for DIS (can be changed downstream if desired)
-  GReWeightNuXSecDIS * rwdis = dynamic_cast<GReWeightNuXSecDIS *> (fGenieRW->WghtCalc("xsec_dis"));
-  rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
+    std::string marestype =
+        FitPar::Config().GetParS("GENIEWeightEngine_CCRESMode");
+    if (!marestype.compare("kModeNormAndMaMvShape")) {
+      rwccres->SetMode(GReWeightNuXSecCCRES::kModeNormAndMaMvShape);
+    } else if (!marestype.compare("kModeMaMv")) {
+      rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
+    } else {
+      THROW("Unkown MARES Mode in GENIE Weight Engine : " << marestype);
+    }
+  }
+  if (xsec_ncres) {
+    // Default to include shape and normalization changes for NCRES (can be
+    // changed downstream if desired)
+    GReWeightNuXSecNCRES *rwncres =
+        dynamic_cast<GReWeightNuXSecNCRES *>(fGenieRW->WghtCalc("xsec_ncres"));
+    rwncres->SetMode(GReWeightNuXSecNCRES::kModeMaMv);
+  }
 
-  // Set Abs Twk Config
-  fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
-  if (fIsAbsTwk) {
-    LOG(FIT) << "GENIE ReWeight values are ABSOLUTE tweak dials" << std::endl;
-  } else {
-    LOG(FIT) << "GENIE ReWeight values are RELATIVE tweak dials" << std::endl;
+  if (xsec_dis) {
+    // Default to include shape and normalization changes for DIS (can be
+    // changed downstream if desired)
+    GReWeightNuXSecDIS *rwdis =
+        dynamic_cast<GReWeightNuXSecDIS *>(fGenieRW->WghtCalc("xsec_dis"));
+    rwdis->SetMode(GReWeightNuXSecDIS::kModeABCV12u);
+
+    // Set Abs Twk Config
+    fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
   }
 
   // allow cout again
@@ -125,7 +151,6 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #endif
 };
 
-
 void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __GENIE_ENABLED__
 
@@ -133,8 +158,8 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
   int nuisenum = Reweight::ConvDial(name, kGENIE);
 
   // Setup Maps
-  fEnumIndex[nuisenum];// = std::vector<size_t>(0);
-  fNameIndex[name]; // = std::vector<size_t>(0);
+  fEnumIndex[nuisenum]; // = std::vector<size_t>(0);
+  fNameIndex[name];     // = std::vector<size_t>(0);
 
   // Split by commas
   std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
@@ -150,18 +175,17 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
     fGENIESysts.push_back(rwsyst);
 
     // Initialize dial
-    LOG(FIT) << "Registering " << singlename << " from " << name << std::endl;
-    fGenieRW->Systematics().Init( fGENIESysts[index] );
+    std::cout << "Registering " << singlename << " from " << name << std::endl;
+    fGenieRW->Systematics().Init(fGENIESysts[index]);
 
     // If Absolute
     if (fIsAbsTwk) {
-      GSystUncertainty::Instance()->SetUncertainty( rwsyst, 1.0, 1.0 );
+      GSystUncertainty::Instance()->SetUncertainty(rwsyst, 1.0, 1.0);
     }
 
     // Setup index
     fEnumIndex[nuisenum].push_back(index);
     fNameIndex[name].push_back(index);
-
   }
 
   // Set Value if given
@@ -171,13 +195,12 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 #endif
 };
 
-
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __GENIE_ENABLED__
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
-    fGenieRW->Systematics().Set( fGENIESysts[indices[i]], val);
+    fGenieRW->Systematics().Set(fGENIESysts[indices[i]], val);
   }
 #endif
 }
@@ -195,25 +218,26 @@ void GENIEWeightEngine::SetDialValue(std::string name, double val) {
 void GENIEWeightEngine::Reconfigure(bool silent) {
 #ifdef __GENIE_ENABLED__
   // Hush now...
-  LOG(MIN) << "Reconfiguring" << std::endl;
-  if (silent) StopTalking();
+  if (silent)
+    StopTalking();
 
   // Reconf
   fGenieRW->Reconfigure();
   fGenieRW->Print();
 
   // Shout again
-  if (silent) StartTalking();
+  if (silent)
+    StartTalking();
 #endif
 }
 
-
-double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
+double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __GENIE_ENABLED__
   // Skip Non GENIE
-  if (evt->fType != kGENIE) return 1.0;
+  if (evt->fType != kGENIE)
+    return 1.0;
 
   // Make nom weight
   if (!evt) {
@@ -225,7 +249,8 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
   }
 
   if (!(evt->genie_event->event)) {
-    THROW("evt->genie_event->event GHepRecord not found!" << (evt->genie_event->event));
+    THROW("evt->genie_event->event GHepRecord not found!"
+          << (evt->genie_event->event));
   }
 
   if (!fGenieRW) {
@@ -233,19 +258,10 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt* evt) {
   }
 
   rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
-  //	std::cout << "Returning GENIE Weight for electron scattering = " << rw_weight << std::endl;
+  //	std::cout << "Returning GENIE Weight for electron scattering = " <<
+  // rw_weight << std::endl;
 #endif
 
   // Return rw_weight
   return rw_weight;
 }
-
-
-
-
-
-
-
-
-
-
