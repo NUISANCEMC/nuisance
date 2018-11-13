@@ -154,7 +154,6 @@ double weightRPA::getWeightInternal(const double mc_q0, const double mc_q3,  dou
 #else 
   Int_t q0offsetValenciaGENIE = 10;
 #endif
-  std::cout << "q0offsetValenciaGENIE: " << q0offsetValenciaGENIE << std::endl;
 
 
   if(mc_q0 < 0.018) q0bin = 18+q0offsetValenciaGENIE;
