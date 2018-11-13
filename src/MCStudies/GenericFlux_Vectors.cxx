@@ -118,6 +118,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("x", &x, "x/F");
   eventVariables->Branch("y", &y, "y/F");
   eventVariables->Branch("Eav", &Eav, "Eav/F");
+  eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
 
   // Save outgoing particle vectors
   eventVariables->Branch("nfsp", &nfsp, "nfsp/I");
@@ -175,6 +176,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     Q2_QE = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
     Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event)/1.E3;
+    EavAlt = FitUtils::Eavailable(event)/1.E3;
 
     // Get W_true with assumption of initial state nucleon at rest
     float m_n = (float)PhysConst::mass_proton;
@@ -231,7 +233,7 @@ void GenericFlux_Vectors::ResetVariables() {
   // Reset all Function used to extract any variables of interest to the event
   Mode = PDGnu = tgt = PDGLep = 0;
 
-  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = Eav = -999.9;
+  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = Eav = EavAlt = -999.9;
 
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){

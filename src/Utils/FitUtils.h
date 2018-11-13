@@ -84,6 +84,7 @@ double GetErecoil_TRUE(FitEvent *event);
 
 /// Return E Hadronic for all Charged FS Particles in Hadronic System
 double GetErecoil_CHARGED(FitEvent *event);
+double Eavailable(FitEvent *event);
 
 /*
   CCQE MiniBooNE/MINERvA

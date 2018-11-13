@@ -193,6 +193,9 @@
 
 <config NToyThrows='100000' />
 
+<!-- Use NOvA Weights or not -->
+<config NOvA_Weights="false" />
+
 <!--
 <config GENIEXSecModelCCRES="genie::ReinSehgalRESPXSec" />
 <config GENIEXSecModelCOH="genie::ReinSehgalCOHPiPXSec" />
