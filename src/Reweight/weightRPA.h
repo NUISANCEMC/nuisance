@@ -146,7 +146,17 @@ double weightRPA::getWeightInternal(const double mc_q0, const double mc_q3,  dou
   // It actually shouldn't happen for real GENIE events,
   // but this protection does something that doesn't suck, just in case.
   // you would see the artifact in a plot for sure, but better than writing 1.0.
+ 
+  // CWret after talking to Rik in Nov 2018 at MINERvA CM
+  // 2.12.8 sets this to 27 because change of Q definition: need to offset GENIE and Nieves Eb even more
+#if __GENIE_VERSION__ >= 210
+  Int_t q0offsetValenciaGENIE = 27;
+#else 
   Int_t q0offsetValenciaGENIE = 10;
+#endif
+  std::cout << "q0offsetValenciaGENIE: " << q0offsetValenciaGENIE << std::endl;
+
+
   if(mc_q0 < 0.018) q0bin = 18+q0offsetValenciaGENIE;
   Double_t thisrwtemp = hRPArelratio->GetBinContent(q3bin,q0bin-q0offsetValenciaGENIE);
   

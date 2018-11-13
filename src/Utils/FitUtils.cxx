@@ -648,6 +648,36 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   return Erecoil;
 }
 
+// MOVE TO MINERVA Utils!
+// The alternative Eavailble definition takes true q0 and subtracts the kinetic energy of neutrons and pion masses
+// returns in MeV
+double FitUtils::Eavailable(FitEvent *event) {
+  double Eav = 0.0;
+
+  // Now take q0 and subtract Eav
+  double q0 = event->GetNeutrinoIn()->fP.E();
+  if (event->GetHMFSMuon()) q0 -= event->GetHMFSMuon()->fP.E();
+  else if (!event->GetHMFSNuMuon()) q0 -= event->GetHMFSNuMuon()->fP.E();
+
+  for (unsigned int i = 2; i < event->Npart(); i++) {
+    // Only final state
+    if (!event->PartInfo(i)->fIsAlive) continue;
+    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
+    int PID = event->PartInfo(i)->fPID;
+
+    // Neutrons
+    if (PID == 2112) {
+      // Adding kinetic energy of neutron
+      Eav += FitUtils::T(event->PartInfo(i)->fP)*1000.;
+      // All pion masses
+    } else if (abs(PID) == 211 || PID == 111) {
+      Eav += event->PartInfo(i)->fP.M();
+    }
+  }
+
+  return q0-Eav;
+}
+
 TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal) {
   TVector3 pnUnit = planarNormal.Unit();
   double inpProjectPN = inp.Dot(pnUnit);
