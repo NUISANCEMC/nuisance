@@ -84,9 +84,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
-
   // Are we running with NOvA weights
-  bool nova_wgt = true;
+  fNOvAWeights = FitPar::Config().GetParB("NOvA_Weights");
   MAQEw = 1.0;
   NonResw = 1.0;
   RPAQEw = 1.0;
@@ -138,12 +137,12 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
 
     // Check for precomputed weights
     TTree *weighttree = (TTree*)inp_file->Get("nova_wgts");
-    if (!weighttree) {
-      LOG(FIT) << "Did not find nova_wgts tree in file " << inputs[inp_it] << std::endl;
-      nova_wgt = false;
-    } else {
-      LOG(FIT) << "Found nova_wgts tree in file " << inputs[inp_it] << std::endl;
-      nova_wgt = true;
+    if (fNOvAWeights) {
+      if (!weighttree) {
+        THROW("Did not find nova_wgts tree in file " << inputs[inp_it] << " but you specified it" << std::endl);
+      } else {
+        LOG(FIT) << "Found nova_wgts tree in file " << inputs[inp_it] << std::endl;
+      }
     }
 
     // Register input to form flux/event rate hists
@@ -163,7 +162,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
   fGENIETree->SetBranchAddress("gmcrec", &fGenieNtpl);
 
   // Set up the custom weights
-  if (nova_wgt) {
+  if (fNOvAWeights) {
     fGENIETree->SetBranchAddress("MAQEwgt", &MAQEw);
     fGENIETree->SetBranchAddress("nonResNormWgt", &NonResw);
     fGENIETree->SetBranchAddress("RPAQEWgt", &RPAQEw);
@@ -410,23 +409,23 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->InputWeight = 1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
   // And the custom weights
-  fNUISANCEEvent->CustomWeight = NOVAw;
-  fNUISANCEEvent->CustomWeightArray[0] = MAQEw;
-  fNUISANCEEvent->CustomWeightArray[1] = NonResw;
-  fNUISANCEEvent->CustomWeightArray[2] = RPAQEw;
-  fNUISANCEEvent->CustomWeightArray[3] = RPARESw;
-  fNUISANCEEvent->CustomWeightArray[4] = MECw;
-  fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
-
-  /*
-  fNUISANCEEvent->CustomWeight = 1.0;
-  fNUISANCEEvent->CustomWeightArray[0] = 1.0;
-  fNUISANCEEvent->CustomWeightArray[1] = 1.0;
-  fNUISANCEEvent->CustomWeightArray[2] = 1.0;
-  fNUISANCEEvent->CustomWeightArray[3] = 1.0;
-  fNUISANCEEvent->CustomWeightArray[4] = 1.0;
-  fNUISANCEEvent->CustomWeightArray[5] = 1.0;
-  */
+  if (fNOvAWeights) {
+    fNUISANCEEvent->CustomWeight = NOVAw;
+    fNUISANCEEvent->CustomWeightArray[0] = MAQEw;
+    fNUISANCEEvent->CustomWeightArray[1] = NonResw;
+    fNUISANCEEvent->CustomWeightArray[2] = RPAQEw;
+    fNUISANCEEvent->CustomWeightArray[3] = RPARESw;
+    fNUISANCEEvent->CustomWeightArray[4] = MECw;
+    fNUISANCEEvent->CustomWeightArray[5] = NOVAw;
+  } else {
+    fNUISANCEEvent->CustomWeight = 1.0;
+    fNUISANCEEvent->CustomWeightArray[0] = 1.0;
+    fNUISANCEEvent->CustomWeightArray[1] = 1.0;
+    fNUISANCEEvent->CustomWeightArray[2] = 1.0;
+    fNUISANCEEvent->CustomWeightArray[3] = 1.0;
+    fNUISANCEEvent->CustomWeightArray[4] = 1.0;
+    fNUISANCEEvent->CustomWeightArray[5] = 1.0;
+  }
 
   // Get N Particle Stack
   unsigned int npart = fGenieGHep->GetEntries();
