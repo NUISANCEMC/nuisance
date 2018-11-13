@@ -85,6 +85,7 @@ public:
   float x;
   float y;
   float Eav;
+  float EavAlt;
 
   // Save outgoing particle vectors
   int nfsp;
