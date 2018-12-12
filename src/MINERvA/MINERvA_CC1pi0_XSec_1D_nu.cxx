@@ -143,7 +143,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
   std::string descrip =  distdescript + \
                          "Target: CH \n"				       \
                          "Flux: MINERvA Forward Horn Current numu ONLY \n"  \
-                         "Signal: Any event with 1 muon, and 1pi0 in FS, no mesons, any nucleon(s). W < 1.8" \
+                         "Signal: Any event with 1 muon with #theta_{#mu,#nu}<25#degree, and 1pi0 in FS, no mesons, any nucleon(s). W < 1.8" \
                          "Alt Signal: Add in requirement of 1 proton with 100 MeV and sometimes W < 1.4";
 
   fSettings.SetDescription(descrip);
@@ -227,6 +227,9 @@ void MINERvA_CC1pi0_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   // N.B. the Adler angles and PPi0 mass requires this to be 1400
   if (Wexp > WexpCut) return;
 
+  // There's a theta mu cut of 25 degrees
+  if (thmu > 25) return;
+
   // Some distributions require the final state proton: check that it exists
   if (fDist >= kPPi0Mass && event->NumFSParticle(2212) == 0) return;
   
@@ -240,13 +243,10 @@ void MINERvA_CC1pi0_XSec_1D_nu::FillEventVariables(FitEvent *event) {
       break;
     case kpmu:
       // Pmu has a theta_mu < 25degree cut
-      if (thmu > 25) return;
-      else fXVar = pmu;
+      fXVar = pmu;
       break;
     case kthmu:
       // thmu has a theta_mu < 25degree cut
-      if (thmu > 25) return;
-      else fXVar = pmu;
       fXVar = thmu;
       break;
     case kQ2:
