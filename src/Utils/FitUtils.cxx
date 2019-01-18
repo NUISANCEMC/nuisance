@@ -656,8 +656,17 @@ double FitUtils::Eavailable(FitEvent *event) {
 
   // Now take q0 and subtract Eav
   double q0 = event->GetNeutrinoIn()->fP.E();
-  if (event->GetHMFSMuon()) q0 -= event->GetHMFSMuon()->fP.E();
-  else if (!event->GetHMFSNuMuon()) q0 -= event->GetHMFSNuMuon()->fP.E();
+  if (event->GetHMFSParticle(13)) {
+    q0 -= event->GetHMFSParticle(13)->fP.E();
+  } else if (event->GetHMFSParticle(-13)) {
+    q0 -= event->GetHMFSParticle(-13)->fP.E();
+  } else if (event->GetHMFSParticle(14)) {
+    q0 -= event->GetHMFSParticle(14)->fP.E();
+  } else if (event->GetHMFSParticle(-14)) {
+    q0 -= event->GetHMFSParticle(-14)->fP.E();
+  }else {
+    std::cerr << "Found no Muon or Muon Neutrino" << std::endl;
+  }
 
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
