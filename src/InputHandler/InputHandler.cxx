@@ -112,7 +112,8 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
   }
 
   if ((fFluxHist->IsBinOverflow(maxBin) && (high != -9999.9))) {
-    maxBin = fFluxHist->GetXaxis()->GetNbins() + 1;
+    maxBin = fFluxHist->GetXaxis()->GetNbins();
+    high = fFluxHist->GetXaxis()->GetBinLowEdge(maxBin+1);
   }
 
   // If we are within a single bin
