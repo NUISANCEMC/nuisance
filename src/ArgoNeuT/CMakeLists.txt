@@ -17,6 +17,12 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
+ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.cxx
+ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.cxx
+ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu.cxx
+ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu.cxx
+ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu.cxx
+ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.cxx
 ArgoNeuT_CCInc_XSec_1Dpmu_antinu.cxx
 ArgoNeuT_CCInc_XSec_1Dpmu_nu.cxx
 ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.cxx
@@ -24,6 +30,12 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_nu.cxx
 )
 
 set(HEADERFILES
+ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h
+ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h
+ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu.h
+ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu.h
+ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu.h
+ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.h
 ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h
 ArgoNeuT_CCInc_XSec_1Dpmu_nu.h
 ArgoNeuT_CCInc_XSec_1Dthetamu_antinu.h
