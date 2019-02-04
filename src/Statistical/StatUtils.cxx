@@ -575,7 +575,7 @@ TH1D* StatUtils::ThrowHistogram(TH1D* hist, TMatrixDSym* cov, bool throwdiag,
 
   // If a covariance is provided we need a preset random vector and a decomp
   std::vector<Double_t> rand_val;
-  TMatrixDSym* decomp_cov;
+  TMatrixDSym* decomp_cov = NULL;
 
   if (cov) {
     for (int i = 0; i < hist->GetNbinsX(); i++) {
@@ -854,7 +854,7 @@ TMatrixDSym* StatUtils::GetDecomp(TMatrixDSym* mat) {
 }
 
 //*******************************************************************
-void StatUtils::ForceNormIntoCovar(TMatrixDSym* mat, TH1D* hist, double norm) {
+void StatUtils::ForceNormIntoCovar(TMatrixDSym*& mat, TH1D* hist, double norm) {
   //*******************************************************************
 
   if (!mat) mat = MakeDiagonalCovarMatrix(hist);

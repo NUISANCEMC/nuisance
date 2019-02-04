@@ -235,14 +235,14 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __GENIE_ENABLED__
-  // Skip Non GENIE
-  if (evt->fType != kGENIE)
-    return 1.0;
-
   // Make nom weight
   if (!evt) {
     THROW("evt not found : " << evt);
   }
+
+  // Skip Non GENIE
+  if (evt->fType != kGENIE)
+    return 1.0;
 
   if (!(evt->genie_event)) {
     THROW("evt->genie_event not found!" << evt->genie_event);
