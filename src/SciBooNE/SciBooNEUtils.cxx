@@ -253,9 +253,7 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
   FitParticle *nu     = event->GetNeutrinoIn();
   int index           = 0;
   int indexPr         = 0;
-  double highMom      = 0;
   double highWeight   = 0;
-  double highMomPr    = 0;
   double highWeightPr = 0;
   double runningWeight= 0;
   mainTrk = NULL;
@@ -275,7 +273,6 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
 
     // Get the track with the highest weight
     double thisWeight = 0;
-    double thisMom    = FitUtils::p(event->PartInfo(j));
 
     if (PID == 2212) {
       thisWeight = SciBooNEUtils::ProtonEfficiency(protonHist, nu, event->PartInfo(j));
@@ -285,7 +282,6 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
       else runningWeight += (1 - runningWeight)*thisWeight;
       
       if (thisWeight < highWeightPr) continue;      
-      highMomPr = thisMom;
       highWeightPr = thisWeight;
       indexPr = j;
       
@@ -303,7 +299,6 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
 	double range = SciBooNEUtils::RangeInScintillator(event->PartInfo(j));
 	if (abs(range) < SciBooNEUtils::GetMainPionRange()) continue;
       }
-      highMom = thisMom;
       highWeight = thisWeight;
       index   = j;
     }
