@@ -56,6 +56,8 @@
 #include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu.h"
 // ArgoNeuT CC-inclusive
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
@@ -739,6 +741,10 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu")) {
     return (new ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu(samplekey));
 
     /*
       BNL Samples
