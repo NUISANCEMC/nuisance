@@ -50,6 +50,20 @@ if (GENIE_VERSION STREQUAL "AUTO")
    OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
+execute_process(COMMAND genie-config --version
+OUTPUT_VARIABLE GENIE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
+cmessage(STATUS "genie_ver: ${GENIE_VER}")
+if(GENIE_VER VERSION_GREATER 3.0.0)
+  set(GENIE_POST_R3 1)
+  string(REPLACE "." "" GENIE_VERSION ${GENIE_VER})
+  cmessage(STATUS "set genie_post_r3")
+endif()
+
+if(NOT GENIE_POST_R3)
+LIST(APPEND EXTRA_CXX_FLAGS -DGENIE_PRE_R3)
+cmessage(STATUS "setting genie_pre_r3 ${EXTRA_CXX_FLAGS}")
+endif()
+
 execute_process (COMMAND genie-config
   --libs OUTPUT_VARIABLE GENIE_LD_FLAGS_STR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process (COMMAND genie-config
@@ -63,7 +77,12 @@ if(NOT PARSE_GENIE_LIBS_MATCH)
   cmessage(FATAL_ERROR "Expected to be able to parse the result of genie-config --libs to a lib directory and a list of libraries to include, but got: \"${GENIE_LD_FLAGS_STR}\"")
 endif()
 
-set(GENIE_LIB_DIR ${CMAKE_MATCH_1})
+if(${CMAKE_MATCH_1})
+  set(GENIE_LIB_DIR ${CMAKE_MATCH_1})
+else()
+  set(GENIE_LIB_DIR $ENV{GENIE_LIB})
+endif()
+
 set(GENIE_LIBS_RAW ${CMAKE_MATCH_2})
 string(REPLACE "-l" "" GENIE_LIBS_STRIPED "${GENIE_LIBS_RAW}")
 
@@ -78,10 +97,18 @@ if(WASMATCHED AND GENIE_VERSION STREQUAL "210")
   cmessage(DEBUG "Fixed inconsistency in library naming: ${GENIE_LIBS_STRIPED}")
 endif()
 
-string(REGEX MATCH "ReWeight" WASMATCHED ${GENIE_LIBS_STRIPED})
-if(NOT WASMATCHED)
-  set(GENIE_LIBS_STRIPED "GReWeight ${GENIE_LIBS_STRIPED}")
-  cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
+if(NOT GENIE_POST_R3)
+  string(REGEX MATCH "ReWeight" WASMATCHED ${GENIE_LIBS_STRIPED})
+  if(NOT WASMATCHED)
+    set(GENIE_LIBS_STRIPED "GReWeight ${GENIE_LIBS_STRIPED}")
+    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
+  endif()
+else()
+  string(REGEX MATCH "RwFwk" WASMATCHED ${GENIE_LIBS_STRIPED})
+  if(NOT WASMATCHED)
+    set(GENIE_LIBS_STRIPED "GRwClc GRwFwk GRwIO ${GENIE_LIBS_STRIPED}")
+    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
+  endif()
 endif()
 
 string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
@@ -126,6 +153,8 @@ if(LIBXML2_INC STREQUAL "")
   endif()
 endif()
 
+string(REPLACE "-llzma" "" LIBXML2_LIB ${LIBXML2_LIB})
+
 ###############################  log4cpp  ######################################
 if(LOG4CPP_LIB STREQUAL "")
   find_program(LOG4CPPCFG log4cpp-config)
@@ -150,19 +179,9 @@ endif()
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION})
 
-LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
-  ${GENIE_INCLUDES_DIR}
-  ${GENIE_INCLUDES_DIR}/GHEP
-  ${GENIE_INCLUDES_DIR}/Ntuple
-  ${GENIE_INCLUDES_DIR}/ReWeight
-  ${GENIE_INCLUDES_DIR}/Apps
-  ${GENIE_INCLUDES_DIR}/FluxDrivers
-  ${GENIE_INCLUDES_DIR}/EVGDrivers
-  ${LHAPDF_INC}
-  ${LIBXML2_INC}
-  ${LOG4CPP_INC})
+LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
 
-SAYVARS()
+LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 
 LIST(APPEND EXTRA_LINK_DIRS
   ${GENIE_LIB_DIR}
@@ -170,9 +189,31 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${LIBXML2_LIB}
   ${LOG4CPP_LIB})
 
-LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
+if(NOT GENIE_POST_R3)
+  LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+    ${GENIE_INCLUDES_DIR}
+    ${GENIE_INCLUDES_DIR}/GHEP
+    ${GENIE_INCLUDES_DIR}/Ntuple
+    ${GENIE_INCLUDES_DIR}/ReWeight
+    ${GENIE_INCLUDES_DIR}/Apps
+    ${GENIE_INCLUDES_DIR}/FluxDrivers
+    ${GENIE_INCLUDES_DIR}/EVGDrivers
+    ${LHAPDF_INC}
+    ${LIBXML2_INC}
+    ${LOG4CPP_INC})
+else()
+  LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+    ${GENIE_INCLUDES_DIR}
+    $ENV{GENIE_REWEIGHT}/src
+    ${GSL_INC}
+    ${LHAPDF_INC}
+    ${LIBXML2_INC}
+    ${LOG4CPP_INC})
+  LIST(APPEND EXTRA_LINK_DIRS $ENV{GSL_LIB})
+  LIST(APPEND EXTRA_LIBS gsl gslcblas)
+endif()
 
-LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
+SAYVARS()
 
 if(USE_PYTHIA8)
   set(NEED_PYTHIA8 TRUE)
