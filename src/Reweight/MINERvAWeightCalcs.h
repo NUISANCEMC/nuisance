@@ -5,18 +5,28 @@
 
 #ifdef __MINERVA_RW_ENABLED__
 #ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
 #include "Conventions/Units.h"
 #include "EVGCore/EventRecord.h"
-#include "FitEvent.h"
-
 #include "GHEP/GHepParticle.h"
 #include "GHEP/GHepRecord.h"
 #include "GHEP/GHepUtils.h"
-#include "GeneralUtils.h"
-#include "NUISANCESyst.h"
-#include "NUISANCEWeightCalcs.h"
 #include "Ntuple/NtpMCEventRecord.h"
 #include "PDG/PDGUtils.h"
+#else
+#include "Framework/Conventions/Units.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#endif
+
+#include "NUISANCEWeightCalcs.h"
+#include "GeneralUtils.h"
+#include "NUISANCESyst.h"
+#include "FitEvent.h"
 #include "WeightUtils.h"
 #include "weightRPA.h"
 using namespace genie;
