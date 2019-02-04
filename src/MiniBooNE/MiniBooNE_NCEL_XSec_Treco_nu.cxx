@@ -156,7 +156,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
   int row = 0;
 
   std::string line;
-  std::ifstream covar(covarFile.c_str(),ifstream::in);
+  std::ifstream covar(covarFile.c_str(),std::ifstream::in);
 
   this->covar = new TMatrixDSym(dim);
 
@@ -188,7 +188,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile, int dim
 void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile, double* arr_treco){
 
   std::string line;
-  std::ifstream input(inputFile.c_str(),ifstream::in);
+  std::ifstream input(inputFile.c_str(),std::ifstream::in);
 
   if(input.is_open()) LOG(DEB) << "Reading data from file: " << inputFile << std::endl;
 
@@ -240,7 +240,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile, i
   int xBin = 0;
 
   std::string line;
-  std::ifstream response(responseFile.c_str(),ifstream::in);
+  std::ifstream response(responseFile.c_str(),std::ifstream::in);
 
    // Response matrix: x axis is Ttrue, y axis is Treco
   this->response_mat = new TH2D((this->fName+"_RESPONSE_MATRIX").c_str(), (this->fName+this->fPlotTitles).c_str(),
