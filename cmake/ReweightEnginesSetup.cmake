@@ -79,8 +79,7 @@ endif()
 if(NEED_ROOTPYTHIA6)
   cmessage(STATUS "Require ROOT Pythia6 libraries")
   LIST(APPEND ROOT_LIBS
-    EGPythia6
-    Pythia6)
+    EGPythia6)
 endif()
 
 
