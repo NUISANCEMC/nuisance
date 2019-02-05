@@ -107,6 +107,8 @@ if(USE_OMP)
 endif()
 
 
+STRING(REGEX REPLACE " $" "" CMAKE_DEPENDLIB_FLAGS "${CMAKE_DEPENDLIB_FLAGS}")
+
 if (VERBOSE)
   cmessage (STATUS "C++ Compiler      : ${CXX_COMPILER_NAME}")
   cmessage (STATUS "    flags         : ${CMAKE_CXX_FLAGS}")
