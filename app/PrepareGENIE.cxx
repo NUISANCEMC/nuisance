@@ -7,9 +7,15 @@
 #include "TTree.h"
 
 #ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
 #include "Conventions/Units.h"
 #include "GHEP/GHepParticle.h"
 #include "PDG/PDGUtils.h"
+#else
+#include "Framework/Conventions/Units.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#endif
 #endif
 
 std::string gInputFiles = "";

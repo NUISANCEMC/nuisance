@@ -39,6 +39,16 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   bool xsec_empMEC = rw_engine_list.find("xsec_empMEC") == std::string::npos;
 #endif
 
+#ifndef GENIE_PRE_R3
+  genie::RunOpt* grunopt = genie::RunOpt::Instance();
+  grunopt->EnableBareXSecPreCalc(true);
+  grunopt->SetEventGeneratorList(Config::GetParS("GENIEEventGeneratorList"));
+  grunopt->SetTuneName(Config::GetParS("GENIETune"));
+  grunopt->BuildTune();
+  std::string genv = std::string(getenv("GENIE")) + "/config/Messenger_laconic.xml";
+  genie::utils::app_init::MesgThresholds(genv);
+#endif
+
   // Now actually add the RW Calcs
   if (xsec_ncel)
     fGenieRW->AdoptWghtCalc("xsec_ncel", new genie::rew::GReWeightNuXSecNCEL);
