@@ -62,11 +62,11 @@ using namespace t2krew;
 #endif
 
 #ifdef __GENIE_ENABLED__
-#include "EVGCore/EventRecord.h"
+#ifdef GENIE_PRE_R3
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
-#include "GSyst.h"
-#include "GSystUncertainty.h"
+#include "ReWeight/GSyst.h"
+#include "ReWeight/GSystUncertainty.h"
 #include "Ntuple/NtpMCEventRecord.h"
 #include "ReWeight/GReWeight.h"
 #include "ReWeight/GReWeightAGKY.h"
@@ -84,6 +84,29 @@ using namespace t2krew;
 #include "ReWeight/GReWeightNuXSecNCEL.h"
 #include "ReWeight/GReWeightNuXSecNCRES.h"
 #include "ReWeight/GReWeightResonanceDecay.h"
+#else
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "RwFramework/GSyst.h"
+#include "RwFramework/GSystUncertainty.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "RwFramework/GReWeight.h"
+#include "RwCalculators/GReWeightAGKY.h"
+#include "RwCalculators/GReWeightDISNuclMod.h"
+#include "RwCalculators/GReWeightFGM.h"
+#include "RwCalculators/GReWeightFZone.h"
+#include "RwCalculators/GReWeightINuke.h"
+#include "RwCalculators/GReWeightNonResonanceBkg.h"
+#include "RwCalculators/GReWeightNuXSecCCQE.h"
+#include "RwCalculators/GReWeightNuXSecCCQEvec.h"
+#include "RwCalculators/GReWeightNuXSecCCRES.h"
+#include "RwCalculators/GReWeightNuXSecCOH.h"
+#include "RwCalculators/GReWeightNuXSecDIS.h"
+#include "RwCalculators/GReWeightNuXSecNC.h"
+#include "RwCalculators/GReWeightNuXSecNCEL.h"
+#include "RwCalculators/GReWeightNuXSecNCRES.h"
+#include "RwCalculators/GReWeightResonanceDecay.h"
+#endif
 using namespace genie;
 using namespace genie::rew;
 #endif
