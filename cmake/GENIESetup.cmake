@@ -84,7 +84,7 @@ if(NOT WASMATCHED)
   cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
 endif()
 
-string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
+string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--no-as-needed -Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
 cmessage(DEBUG "genie-config --libs -- MATCH1: ${CMAKE_MATCH_1}")
 cmessage(DEBUG "genie-config --libs -- MATCH2: ${CMAKE_MATCH_2}")
 cmessage(DEBUG "genie-config --libs -- libs stripped: ${GENIE_LIBS_STRIPED}")
