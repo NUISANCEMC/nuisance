@@ -2035,8 +2035,6 @@ void JointMeas1D::SetCovarMatrix(std::string covarFile) {
   TFile* tempFile = new TFile(covarFile.c_str(), "READ");
 
   TH2D* covarPlot = new TH2D();
-  //  TH2D* decmpPlot = new TH2D();
-  TH2D* covarInvPlot = new TH2D();
   TH2D* fFullCovarPlot = new TH2D();
   std::string covName = "";
   std::string covOption = FitPar::Config().GetParS("thrown_covariance");
@@ -2048,7 +2046,6 @@ void JointMeas1D::SetCovarMatrix(std::string covarFile) {
     covName += "full";
 
   covarPlot = (TH2D*)tempFile->Get((covName + "cov").c_str());
-  covarInvPlot = (TH2D*)tempFile->Get((covName + "covinv").c_str());
 
   if (!covOption.compare("SUB"))
     fFullCovarPlot = (TH2D*)tempFile->Get((covName + "cov").c_str());

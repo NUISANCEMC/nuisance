@@ -912,9 +912,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   }
 
   // Cleanup coreeventweights
-  if (fIsAllSplines) {
-    delete coreeventweights;
-  }
+  delete coreeventweights;
 
   // Print some reconfigure profiling.
   LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
