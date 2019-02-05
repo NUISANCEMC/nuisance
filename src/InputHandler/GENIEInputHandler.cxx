@@ -213,6 +213,11 @@ void GENIEInputHandler::RemoveCache() {
 FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry, const bool lightweight) {
   if (entry >= (UInt_t)fNEvents) return NULL;
 
+  // Clear the previous event (See Note 1 in ROOT TClonesArray documentation)
+  if (fGenieNtpl) {
+    fGenieNtpl->Clear();
+  }
+
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);
 
