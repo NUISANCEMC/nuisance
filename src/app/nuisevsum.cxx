@@ -4,7 +4,7 @@
 
 #include "event/MinimalEvent.hxx"
 
-#include "samples/ISample.hxx"
+#include "samples/IEventProcessor.hxx"
 
 #include "plugins/Instantiate.hxx"
 
@@ -71,8 +71,8 @@ int main(int argc, char const *argv[]) {
   sample_config.put("input_type", input_type);
   sample_config.put("file", input_file);
 
-  nuis::plugins::plugin_traits<ISample>::unique_ptr_t VerboseEventSummary =
-      nuis::plugins::Instantiate<ISample>("VerboseEventSummary");
+  nuis::plugins::plugin_traits<IEventProcessor>::unique_ptr_t VerboseEventSummary =
+      nuis::plugins::Instantiate<IEventProcessor>("VerboseEventSummary");
 
   VerboseEventSummary->Initialize(sample_config);
   VerboseEventSummary->ProcessSample(NMax);

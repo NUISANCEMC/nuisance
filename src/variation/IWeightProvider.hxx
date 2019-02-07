@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef VARIATION_IWEIGHTPROVIDER_HXX_SEEN
-#define VARIATION_IWEIGHTPROVIDER_HXX_SEEN
+#pragma once
 
 #include "variation/IVariationProvider.hxx"
 
@@ -27,15 +26,9 @@ public:
   virtual double GetEventWeight(nuis::event::MinimalEvent const &) = 0;
 
   /// For weight providers, the full variation is just the application of the reweight_weight.
-  nuis::event::FullEvent VaryFullEvent(nuis::event::FullEvent const &fe) {
-    nuis::event::FullEvent fe_clone = fe.clone();
-    fe_clone.RWWeight = GetEventWeight(fe_clone);
-    return fe_clone;
-  }
+  nuis::event::FullEvent VaryFullEvent(nuis::event::FullEvent const &);
 
   virtual ~IWeightProvider() {}
 };
 
 DECLARE_PLUGIN_INTERFACE(IWeightProvider);
-
-#endif

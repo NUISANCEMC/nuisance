@@ -20,14 +20,14 @@
 #ifndef SAMPLES_IDATACOMPARISON_HXX_SEEN
 #define SAMPLES_IDATACOMPARISON_HXX_SEEN
 
-#include "samples/ISample.hxx"
+#include "samples/IEventProcessor.hxx"
 
 #include "fhiclcpp/ParameterSet.h"
 
 #include <iomanip>
 #include <sstream>
 
-class IDataComparison : public ISample {
+class IDataComparison : public IEventProcessor {
 public:
   virtual double GetGOF() = 0;
   virtual double GetNDOGuess() = 0;

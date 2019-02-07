@@ -12,19 +12,35 @@ using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::neuttools;
 
-NEUTInputHandler::NEUTInputHandler() : fInputTree(nullptr) {}
+NEUTInputHandler::NEUTInputHandler() : fInputTreeFile(nullptr) {}
 NEUTInputHandler::NEUTInputHandler(NEUTInputHandler &&other)
-    : fInputTree(std::move(other.fInputTree)),
+    : fInputTreeFile(std::move(other.fInputTreeFile)),
       fReaderEvent(std::move(other.fReaderEvent)) {}
 
 void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
-  fInputTree = CheckGetTTree(ps.get<std::string>("file"), "neuttree");
+  fInputTreeFile = CheckGetTTree(ps.get<std::string>("file"), "neuttree");
 
   fReaderEvent.fNeutVect = nullptr;
-  fInputTree->tree->SetBranchAddress("vectorbranch", &fReaderEvent.fNeutVect);
+  fInputTreeFile->tree->SetBranchAddress("vectorbranch",
+                                         &fReaderEvent.fNeutVect);
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
+}
+
+double NEUTInputHandler::GetXSecScaleFactor(std::pair<double, double> const &) const {
+  // check input file for histograms
+  std::unique_ptr<TH1> flux =
+      GetHistogramFromROOTFile<TH1>(fInputTreeFile->file, "flux_numu");
+  std::unique_ptr<TH1> evtrt =
+      GetHistogramFromROOTFile<TH1>(fInputTreeFile->file, "evtrt_numu");
+
+  if (flux && evtrt) {
+    return evtrt->Integral() / (flux->Integral() * double(GetNEvents()));
+  }
+
+  // try and build them
+  throw;
 }
 
 MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
@@ -33,7 +49,7 @@ MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
         << "[ERROR]: Attempted to get entry " << idx
         << " from an InputHandler with only " << GetNEvents();
   }
-  fInputTree->tree->GetEntry(idx);
+  fInputTreeFile->tree->GetEntry(idx);
 
   fReaderEvent.mode = IntToChannel(fReaderEvent.fNeutVect->Mode);
 
@@ -97,7 +113,7 @@ FullEvent const &NEUTInputHandler::GetFullEvent(ev_index_t idx) const {
 }
 
 size_t NEUTInputHandler::GetNEvents() const {
-  return fInputTree->tree->GetEntries();
+  return fInputTreeFile->tree->GetEntries();
 }
 
 DECLARE_PLUGIN(IInputHandler, NEUTInputHandler);

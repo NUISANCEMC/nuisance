@@ -20,6 +20,7 @@
 #ifndef PLUGINS_PLUGINMANAGER_HXX_SEEN
 #define PLUGINS_PLUGINMANAGER_HXX_SEEN
 
+#include "plugins/NamedSO.hxx"
 #include "plugins/traits.hxx"
 
 #include "config/GlobalConfiguration.hxx"
@@ -45,6 +46,8 @@
 
 namespace nuis {
 namespace plugins {
+
+extern std::vector<NamedSO> LoadedSharedObjects;
 
 NEW_NUIS_EXCEPT(failed_to_find_instantiator);
 NEW_NUIS_EXCEPT(malformed_plugin_interface);
@@ -97,29 +100,7 @@ template <typename T> struct PluginInstantiator {
   }
 };
 
-struct NamedSO {
-  std::string name;
-  void *dllib;
-
-  NamedSO() : name(""), dllib(nullptr) {}
-  NamedSO(NamedSO const &) = delete;
-  NamedSO(NamedSO &&other) : name(std::move(other.name)), dllib(other.dllib) {
-    other.dllib = nullptr;
-  }
-
-  ~NamedSO() {
-    if (dllib) {
-#ifdef DEBUG_INSTANTIATE
-      std::cout << "[INFO]: dlclose on shared object: " << std::quoted(name)
-                << std::endl;
-#endif
-      dlclose(dllib);
-    }
-  }
-};
-
 NamedSO &GetSharedObject(std::string const &FQPath) {
-  static std::vector<NamedSO> LoadedSharedObjects;
 
   for (NamedSO &so : LoadedSharedObjects) {
     if (so.name == FQPath) {

@@ -86,7 +86,7 @@ CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes direct
 
 # NEUT
 CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
-CheckAndSetDefaultCache(IS_NEUT_54 FALSE BOOL "Whether to enabled NEUT is version 5.4 or greater. <FALSE>")
+CheckAndSetDefaultEnv(NEUT_VERSION FALSE STRING "NEUT version string, e.g. 5.4.0. <5.4.0>" NEUT_VERSION)
 CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
 CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
 CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)

@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef UTILITY_FULLEVENTUTILITY_HXX_SEEN
-#define UTILITY_FULLEVENTUTILITY_HXX_SEEN
+#pragma once
 
 #include "event/types.hxx"
 #include "event/Particle.hxx"
@@ -33,6 +32,8 @@ class FullEvent;
 
 namespace nuis {
 namespace utility {
+
+event::Particle GetHMParticle(std::vector<event::Particle>);
 
 std::vector<event::Particle>
 GetParticles(event::FullEvent const &, std::vector<event::PDG_t> const &,
@@ -51,6 +52,11 @@ event::Particle GetHMParticle(event::FullEvent const &,
                               event::Particle::Status_t status =
                                   event::Particle::Status_t::kNuclearLeaving,
                               bool include_matching_pdg = true);
+
+event::Particle GetHMISParticle(event::FullEvent const &,
+                              std::vector<event::PDG_t> const &);
+event::Particle GetHMFSParticle(event::FullEvent const &,
+                              std::vector<event::PDG_t> const &);
 
 std::vector<event::Particle> GetFSChargedLeptons(event::FullEvent const &);
 std::vector<event::Particle> GetFSNeutralLeptons(event::FullEvent const &);
@@ -76,5 +82,3 @@ event::Particle GetHMFSOther(event::FullEvent const &);
 
 } // namespace utility
 } // namespace nuis
-
-#endif

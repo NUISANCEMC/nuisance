@@ -10,6 +10,8 @@
 
 #include "exception/exception.hxx"
 
+#include "persistency/ROOTOutput.hxx"
+
 #include "fhiclcpp/make_ParameterSet.h"
 
 #include <string>
@@ -50,4 +52,6 @@ int main(int argc, char const *argv[]) {
               << sample->GetNDOGuess() << std::endl;
     sample->Write();
   }
+
+  nuis::persistency::CloseOpenTFiles();
 }

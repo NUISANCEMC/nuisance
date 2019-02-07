@@ -1,4 +1,4 @@
-#include "samples/ISample.hxx"
+#include "samples/IEventProcessor.hxx"
 
 #include "event/FullEvent.hxx"
 
@@ -19,24 +19,24 @@ using namespace nuis::input;
 using namespace nuis::utility;
 using namespace nuis::nuwrotools;
 
-class NuisToNuWro : public ISample {
+class NuisToNuWro : public IEventProcessor {
 public:
   InputManager::Input_id_t fIH_id;
 
-  std::unique_ptr<TreeFile> fOutputTree;
+  TreeFile fOutputTree;
 
   NuWroEvent *fOutputEvent;
 
   NuisToNuWro()
       : fIH_id(std::numeric_limits<InputManager::Input_id_t>::max()),
-        fOutputTree(nullptr), fOutputEvent(nullptr) {}
+        fOutputTree(), fOutputEvent(nullptr) {}
 
   void Initialize(fhicl::ParameterSet const &ps) {
     fIH_id = InputManager::Get().EnsureInputLoaded(ps);
 
     fOutputTree =
         MakeNewTTree(ps.get<std::string>("output_file"), "treeout", "RECREATE");
-    fOutputTree->tree->Branch("e", &fOutputEvent);
+    fOutputTree.tree->Branch("e", &fOutputEvent);
   }
 
   void ProcessEvent(FullEvent const &ps) {
@@ -68,12 +68,12 @@ public:
       fOutputEvent->post.push_back(nuwro_part);
     }
 
-    fOutputTree->tree->Fill();
+    fOutputTree.tree->Fill();
   }
 
   void ProcessSample(size_t nmax) {
     if (fIH_id == std::numeric_limits<InputManager::Input_id_t>::max()) {
-      throw uninitialized_ISample();
+      throw uninitialized_IEventProcessor();
     }
 
     IInputHandler const &IH = InputManager::Get().GetInputHandler(fIH_id);
@@ -96,8 +96,8 @@ public:
     }
   }
 
-  void Write() { fOutputTree->file->Write(); }
+  void Write() { fOutputTree.file->Write(); }
   std::string Name() { return "NuisToNuWro"; }
 };
 
-DECLARE_PLUGIN(ISample, NuisToNuWro);
+DECLARE_PLUGIN(IEventProcessor, NuisToNuWro);

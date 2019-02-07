@@ -30,6 +30,7 @@
 
 #include "utility/FileSystemUtility.hxx"
 #include "utility/HistogramUtility.hxx"
+#include "utility/KinematicUtility.hxx"
 #include "utility/ROOTUtility.hxx"
 #include "utility/StatsUtility.hxx"
 
@@ -39,16 +40,17 @@
 #include <memory>
 #include <vector>
 
-template <size_t> struct TH_dim_helper {};
-template <> struct TH_dim_helper<1> { typedef TH1D type; };
-template <> struct TH_dim_helper<2> { typedef TH2D type; };
-
-template <size_t NDim> class SimpleDataComparison : public IDataComparison {
+template <size_t NDim, typename NumericT = double,
+          typename HT = typename nuis::utility::HType_Helper<NDim, void>::type>
+class SimpleDataComparison : public IDataComparison {
 
   NEW_NUIS_EXCEPT(invalid_SimpleDataComparison_initialization);
   NEW_NUIS_EXCEPT(SimpleDataComparison_already_finalized);
 
 protected:
+  using HistType = HT;
+  using TH_Help = typename nuis::utility::TH_Helper<HistType>;
+
   nuis::input::InputManager::Input_id_t fIH_id;
   std::string write_directory;
   size_t NMaxSample_override;
@@ -56,18 +58,18 @@ protected:
   int fIsFluxUnfolded;
 
   std::vector<bool> fSignalCache;
-  std::vector<std::array<double, NDim>> fProjectionCache;
+  std::vector<std::array<NumericT, NDim>> fProjectionCache;
 
   std::string fDataInputDescriptor;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fData;
+  std::unique_ptr<HistType> fData;
   std::string fMaskInputDescriptor;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fMask;
+  std::unique_ptr<HistType> fMask;
   std::string fCovarianceInputDescriptor;
-  std::unique_ptr<TH2D> fCovariance;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fPrediction;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fPrediction_xsec;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fPrediction_shape;
-  std::unique_ptr<typename TH_dim_helper<NDim>::type> fPrediction_comparison;
+  std::unique_ptr<TH2> fCovariance;
+  std::unique_ptr<HistType> fPrediction;
+  std::unique_ptr<HistType> fPrediction_xsec;
+  std::unique_ptr<HistType> fPrediction_shape;
+  std::unique_ptr<HistType> fPrediction_comparison;
   bool fComparisonFinalized;
 
   std::string fJournalReference;
@@ -75,11 +77,16 @@ protected:
   std::string fFluxDescription;
   std::string fSignalDescription;
 
-  std::pair<double, double> EnuRange;
+  nuis::utility::ENuRange energy_cut;
 
   std::function<bool(nuis::event::FullEvent const &)> IsSigFunc;
-  std::function<std::array<double, NDim>(nuis::event::FullEvent const &)>
+  std::function<std::array<NumericT, NDim>(nuis::event::FullEvent const &)>
       CompProjFunc;
+
+  // If assigned by subclass will be called on for all events, bool signifies
+  // whether the event was selected.
+  std::function<void(nuis::event::FullEvent const &, bool, double)>
+      ProcessExtraFunc;
 
 public:
   SimpleDataComparison() {
@@ -99,13 +106,16 @@ public:
     fComparisonFinalized = false;
     IsSigFunc = [](nuis::event::FullEvent const &) -> bool { return true; };
     CompProjFunc =
-        [](nuis::event::FullEvent const &) -> std::array<double, NDim> {
-      std::array<double, NDim> arr;
-      for (double &el : arr) {
+        [](nuis::event::FullEvent const &) -> std::array<NumericT, NDim> {
+      std::array<NumericT, NDim> arr;
+      for (NumericT &el : arr) {
         el = 0;
       }
       return arr;
     };
+
+    ProcessExtraFunc =
+        std::function<void(nuis::event::FullEvent const &, bool, double)>();
 
     fJournalReference = "";
     fTargetMaterial = "";
@@ -113,45 +123,46 @@ public:
     fSignalDescription = "";
     fIsShapeOnly = -1;
     fIsFluxUnfolded = -1;
-    EnuRange = std::pair<double, double>{std::numeric_limits<double>::max(),
+
+    energy_cut = nuis::utility::ENuRange{std::numeric_limits<double>::max(),
                                          std::numeric_limits<double>::max()};
   }
 
+  fhicl::ParameterSet fGlobalConfig;
+  fhicl::ParameterSet fInstanceConfig;
+
   void ReadGlobalConfigDefaults() {
-    fhicl::ParameterSet const &global_sample_configuration =
-        nuis::config::GetDocument().get<fhicl::ParameterSet>(
-            std::string("global.sample_configuration.") + Name(),
-            fhicl::ParameterSet());
+    fGlobalConfig = nuis::config::GetDocument().get<fhicl::ParameterSet>(
+        std::string("global.sample_configuration.") + Name(),
+        fhicl::ParameterSet());
 
     if (!fJournalReference.length()) {
-      fJournalReference = global_sample_configuration.get<std::string>(
-          "journal_reference", fJournalReference);
+      fJournalReference = fGlobalConfig.get<std::string>("journal_reference",
+                                                         fJournalReference);
     }
     if (!fTargetMaterial.length()) {
-      fTargetMaterial = global_sample_configuration.get<std::string>(
-          "target_material", fTargetMaterial);
+      fTargetMaterial =
+          fGlobalConfig.get<std::string>("target_material", fTargetMaterial);
     }
     if (!fFluxDescription.length()) {
-      fFluxDescription = global_sample_configuration.get<std::string>(
-          "flux_description", fFluxDescription);
+      fFluxDescription =
+          fGlobalConfig.get<std::string>("flux_description", fFluxDescription);
     }
     if (!fSignalDescription.length()) {
-      fSignalDescription = global_sample_configuration.get<std::string>(
-          "signal_description", fSignalDescription);
+      fSignalDescription = fGlobalConfig.get<std::string>("signal_description",
+                                                          fSignalDescription);
     }
 
     if (fIsShapeOnly == -1) {
-      fIsShapeOnly = global_sample_configuration.get<bool>("shape_only", false);
+      fIsShapeOnly = fGlobalConfig.get<bool>("shape_only", false);
     }
     if (fIsFluxUnfolded == -1) {
-      fIsFluxUnfolded =
-          global_sample_configuration.get<bool>("flux_unfolded", false);
+      fIsFluxUnfolded = fGlobalConfig.get<bool>("flux_unfolded", false);
     }
 
-    if ((EnuRange.first == std::numeric_limits<double>::max()) &&
-        (global_sample_configuration.has_key("enu_range"))) {
-      EnuRange = global_sample_configuration.get<std::pair<double, double>>(
-          "enu_range");
+    if ((energy_cut.first == std::numeric_limits<double>::max()) &&
+        (fGlobalConfig.has_key("enu_range"))) {
+      energy_cut = fGlobalConfig.get<std::pair<double, double>>("enu_range");
     }
   }
 
@@ -175,59 +186,76 @@ public:
     fCovarianceInputDescriptor = cov_descriptor;
   }
 
-  virtual void FillProjection(std::array<double, NDim> const &proj,
-                              double event_weight) {
-    nuis::utility::Fill(fPrediction.get(), proj, event_weight);
+  virtual void FillProjection(std::array<NumericT, NDim> const &proj,
+                              NumericT event_weight) {
+    TH_Help::Fill(fPrediction, proj, event_weight);
   }
 
   virtual void FinalizeComparison() {
     if (fComparisonFinalized) {
       throw SimpleDataComparison_already_finalized()
           << "[ERROR]: Attempted to re-finalize a comparison for "
-             "IDataComparison: "
+             "SimpleDataComparison: "
           << std::quoted(Name());
     }
-    fPrediction_xsec = nuis::utility::Clone(fPrediction);
-    fPrediction_xsec->Scale(1.0, "width");
-    fPrediction_shape = nuis::utility::Clone(fPrediction_xsec);
+    fPrediction_xsec =
+        nuis::utility::Clone(fPrediction, false, "Prediction_xsec");
+
+    IInputHandler const &IH =
+        nuis::input::InputManager::Get().GetInputHandler(fIH_id);
+
+    TH_Help::Scale(fPrediction_xsec, 1.0, "width");
+
+    // If we have a flux cut
+    if (energy_cut.first != std::numeric_limits<double>::max()) {
+      TH_Help::Scale(fPrediction_xsec, IH.GetXSecScaleFactor(energy_cut));
+    }
+
+    fPrediction_shape =
+        nuis::utility::Clone(fPrediction_xsec, false, "Prediction_shape");
     if (fData) {
-      fPrediction_shape->Scale(fData->Integral() /
-                               fPrediction_shape->Integral());
+      TH_Help::Scale(fPrediction_shape,
+                     TH_Help::Integral(fData, "width") /
+                         TH_Help::Integral(fPrediction_shape, "width"));
+
     } else {
-      ISAMPLE_WARN("When Finalizing comparison, no Data histogram available.");
+      IEventProcessor_WARN(
+          "When Finalizing comparison, no Data histogram available.");
     }
 
     if (fIsFluxUnfolded) {
       // fPrediction_comparison
     } else if (fIsShapeOnly) {
-      fPrediction_comparison = nuis::utility::Clone(fPrediction_shape);
+      fPrediction_comparison = nuis::utility::Clone(fPrediction_shape, false,
+                                                    "Prediction_comparison");
     } else {
-      fPrediction_comparison = nuis::utility::Clone(fPrediction_xsec);
+      fPrediction_comparison = nuis::utility::Clone(fPrediction_xsec, false,
+                                                    "Prediction_comparison");
     }
     fComparisonFinalized = true;
   }
 
-  void Initialize(fhicl::ParameterSet const &ps) {
+  void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    if (ps.has_key("verbosity")) {
-      SetSampleVerbosity(ps.get<std::string>("verbosity"));
+    fInstanceConfig = instance_sample_configuration;
+
+    if (fInstanceConfig.has_key("verbosity")) {
+      SetSampleVerbosity(fInstanceConfig.get<std::string>("verbosity"));
     } else {
       SetSampleVerbosity("Reticent");
     }
 
     ReadGlobalConfigDefaults();
 
-    fhicl::ParameterSet const &global_sample_configuration =
-        nuis::config::GetDocument().get<fhicl::ParameterSet>(
-            std::string("global.sample_configuration.") + Name(),
-            fhicl::ParameterSet());
-
-    if (ps.has_key("fake_data")) {
-      fData = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
-          ps.get<std::string>("fake_data_histogram"));
+    if (fInstanceConfig.has_key("fake_data")) {
+      fData = nuis::utility::GetHistogram<HistType>(
+          fInstanceConfig.get<std::string>("fake_data_histogram"));
+    } else if (!fGlobalConfig.get<bool>("has_data", true) ||
+               !fInstanceConfig.get<bool>("has_data", true)) {
+      // Explicitly not expecting data
     } else {
       if (!fDataInputDescriptor.length()) {
-        if (!global_sample_configuration.has_key("data_descriptor")) {
+        if (!fGlobalConfig.has_key("data_descriptor")) {
           throw invalid_SimpleDataComparison_initialization()
               << "[ERROR]: SimpleDataComparison::Initialize for "
                  "IDataComparison: "
@@ -238,46 +266,60 @@ public:
                  "configuration.";
         }
         fDataInputDescriptor =
-            global_sample_configuration.get<std::string>("data_descriptor");
+            fGlobalConfig.get<std::string>("data_descriptor");
       }
-      fData = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
-          fDataInputDescriptor);
+      fData = nuis::utility::GetHistogram<HistType>(fDataInputDescriptor);
     }
 
-    fPrediction = nuis::utility::Clone(fData, true);
+    if (!fPrediction) {
+      if (!fData) {
+        throw invalid_SimpleDataComparison_initialization()
+            << "[ERROR]: SimpleDataComparison::Initialize for "
+               "IDataComparison: "
+            << std::quoted(Name())
+            << " failed. As `has_data: false` was set in the configuration  "
+               "(global: "
+            << (!fGlobalConfig.get<bool>("has_data", true))
+            << ", instance: " << !fInstanceConfig.get<bool>("has_data", true)
+            << "), the instance constructor must supply the fPrediction "
+               "binning, and it wasn't.";
+      }
+      fPrediction = nuis::utility::Clone(fData, true, "Prediction");
+    }
 
     if (fCovarianceInputDescriptor.length()) {
       fCovariance =
           nuis::utility::GetHistogram<TH2D>(fCovarianceInputDescriptor);
-    } else if (global_sample_configuration.has_key("covariance_descriptor")) {
+    } else if (fGlobalConfig.has_key("covariance_descriptor")) {
       fCovariance = nuis::utility::GetHistogram<TH2D>(
-          global_sample_configuration.get<std::string>(
-              "covariance_descriptor"));
+          fGlobalConfig.get<std::string>("covariance_descriptor"));
     }
 
     if (fMaskInputDescriptor.length()) {
-      fMask = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
-          fMaskInputDescriptor);
-    } else if (global_sample_configuration.has_key("mask_descriptor")) {
-      fMask = nuis::utility::GetHistogram<typename TH_dim_helper<NDim>::type>(
-          global_sample_configuration.get<std::string>("mask_descriptor"));
+      fMask = nuis::utility::GetHistogram<HistType>(fMaskInputDescriptor);
+    } else if (fGlobalConfig.has_key("mask_descriptor")) {
+      fMask = nuis::utility::GetHistogram<HistType>(
+          fGlobalConfig.get<std::string>("mask_descriptor"));
     }
 
-    if (ps.has_key("verbosity")) {
-      SetSampleVerbosity(ps.get<std::string>("verbosity"));
+    if (fInstanceConfig.has_key("verbosity")) {
+      SetSampleVerbosity(fInstanceConfig.get<std::string>("verbosity"));
     }
 
     NMaxSample_override =
-        ps.get<size_t>("nmax", std::numeric_limits<size_t>::max());
+        fInstanceConfig.get<size_t>("nmax", std::numeric_limits<size_t>::max());
 
-    write_directory = ps.get<std::string>("write_directory", "");
+    write_directory =
+        fInstanceConfig.get<std::string>("write_directory", Name());
 
-    fIH_id = nuis::input::InputManager::Get().EnsureInputLoaded(ps);
+    fIH_id =
+        nuis::input::InputManager::Get().EnsureInputLoaded(fInstanceConfig);
   }
+
   void ProcessSample(size_t nmax = std::numeric_limits<size_t>::max()) {
     if (fIH_id ==
         std::numeric_limits<nuis::input::InputManager::Input_id_t>::max()) {
-      throw uninitialized_ISample();
+      throw uninitialized_IEventProcessor();
     }
     IInputHandler const &IH =
         nuis::input::InputManager::Get().GetInputHandler(fIH_id);
@@ -289,16 +331,17 @@ public:
     double nmax_scaling = double(IH.GetNEvents()) / double(NEvsToProcess);
 
     size_t NToShout = NEvsToProcess / 10;
-    ISAMPLE_INFO("Sample " << std::quoted(Name()) << " processing "
-                           << NEvsToProcess << " events.");
+    IEventProcessor_INFO("Sample " << std::quoted(Name()) << " processing "
+                                   << NEvsToProcess << " events.");
 
     IInputHandler::ev_index_t ev_idx = 0;
-    size_t NSigEvents = 0;
 
     bool DetermineSignalEvents = !fSignalCache.size();
 
-    nuis::utility::Clear(fPrediction.get());
+    nuis::utility::Clear<HistType>(*fPrediction);
     fComparisonFinalized = false;
+
+    size_t cache_ctr = 0;
 
     while (ev_idx < NEvsToProcess) {
       if (DetermineSignalEvents) {
@@ -308,38 +351,42 @@ public:
         if (is_sig) {
           fProjectionCache.push_back(CompProjFunc(fev));
         }
+        if (ProcessExtraFunc) {
+          ProcessExtraFunc(fev, is_sig,
+                           IH.GetEventWeight(ev_idx) * nmax_scaling);
+        }
       }
 
       if (NToShout && !(ev_idx % NToShout)) {
-        ISAMPLE_INFO("\tProcessed " << ev_idx << "/" << NEvsToProcess
-                                    << " events.");
+        IEventProcessor_INFO("\tProcessed " << ev_idx << "/" << NEvsToProcess
+                                            << " events.");
       }
 
       if (fSignalCache[ev_idx]) {
-        FillProjection(fProjectionCache[ev_idx],
+        FillProjection(fProjectionCache[cache_ctr++],
                        IH.GetEventWeight(ev_idx) * nmax_scaling);
       }
 
       ev_idx++;
     }
-    ISAMPLE_INFO("\t" << fProjectionCache.size() << "/" << NEvsToProcess
-                      << " events passed selection.");
+    IEventProcessor_INFO("\t" << fProjectionCache.size() << "/" << NEvsToProcess
+                              << " events passed selection.");
   }
   void Write() {
     if (!fComparisonFinalized) {
       FinalizeComparison();
     }
 
-    nuis::persistency::WriteToOutputFile<typename TH_dim_helper<NDim>::type>(
-        fPrediction_comparison.get(), "Prediction", write_directory);
-    nuis::persistency::WriteToOutputFile<typename TH_dim_helper<NDim>::type>(
-        fPrediction_xsec.get(), "Prediction_xsec", write_directory);
+    nuis::persistency::WriteToOutputFile<HistType>(
+        fPrediction_comparison, "Prediction", write_directory);
+    nuis::persistency::WriteToOutputFile<HistType>(
+        fPrediction_xsec, "Prediction_xsec", write_directory);
 
     if (fData) {
-      nuis::persistency::WriteToOutputFile<typename TH_dim_helper<NDim>::type>(
-          fData.get(), "Data", write_directory);
-      nuis::persistency::WriteToOutputFile<typename TH_dim_helper<NDim>::type>(
-          fPrediction_shape.get(), "Prediction_shape", write_directory);
+      nuis::persistency::WriteToOutputFile<HistType>(fData, "Data",
+                                                     write_directory);
+      nuis::persistency::WriteToOutputFile<HistType>(
+          fPrediction_shape, "Prediction_shape", write_directory);
     }
   }
 
@@ -347,12 +394,14 @@ public:
     if (!fComparisonFinalized) {
       FinalizeComparison();
     }
-    return nuis::utility::GetChi2(fData.get(), fPrediction_comparison.get());
+    if (fData && fPrediction_comparison) {
+      return nuis::utility::GetChi2(fData, fPrediction_comparison);
+    } else
+      return std::numeric_limits<double>::max();
   }
   double GetNDOGuess() {
     if (fData) {
-      return nuis::utility::TH_traits<
-          typename TH_dim_helper<NDim>::type>::NbinsIncludeFlow(fData.get());
+      return TH_Help::Nbins(fData);
     }
     return 0;
   }

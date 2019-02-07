@@ -19,7 +19,7 @@ NamedDoc &GetDocument_modifyable(std::string const &name) {
       return doc;
     }
   }
-  Configurations.push_back(NamedDoc{name, fhicl::ParameterSet()});
+  Configurations.push_back(NamedDoc{name, fhicl::ParameterSet(), {}});
   return GetDocument_modifyable(name);
 }
 fhicl::ParameterSet const &GetDocument(std::string const &name) {

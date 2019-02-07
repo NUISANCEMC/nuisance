@@ -22,14 +22,40 @@
 
 #include "variation/IWeightProvider.hxx"
 
-class NEUTReWeight : public IWeightProvider {
+#include "exception/exception.hxx"
+
+#include "parameters/ParameterManager.hxx"
+
+#include "NSyst.h"
+
+#include <memory>
+#include <vector>
+
+namespace neut {
+namespace rew {
+class NReWeight;
+}
+} // namespace neut
+
+class NEUTWeightEngine : public IWeightProvider {
+
+  struct NEUTSystParam {
+    nuis::params::paramId_t pid;
+    neut::rew::NSyst_t nsyst;
+  };
+
+  std::vector<NEUTSystParam> fNEUTSysts;
+  std::unique_ptr<neut::rew::NReWeight> fNeutRW;
+
 public:
-  double GetEventWeight(nuis::event::MinimalEvent const &);
+  NEW_NUIS_EXCEPT(invalid_NEUT_syst_name);
+
   void Initialize(fhicl::ParameterSet const &);
-  paramId_t GetParameterId(std::string const &);
-  void SetParameterValue(paramId_t, double);
-  bool ParametersVaried();
   void Reconfigure();
+  double GetEventWeight(nuis::event::MinimalEvent const &);
+  std::string GetName();
+  std::string GetDocumentation();
+  fhicl::ParameterSet GetExampleConfiguration();
 };
 
 #endif

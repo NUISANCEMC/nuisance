@@ -37,8 +37,8 @@ public:
   Publication Pub;
   std::string Pub_str;
   bool UseD2Corr;
-  std::unique_ptr<TH1D> fD2CorrHist;
-  std::unique_ptr<TH1D> fPrediction_Uncorr;
+  std::unique_ptr<TH> fD2CorrHist;
+  std::unique_ptr<TH> fPrediction_Uncorr;
 
   ANL_CCQE_Evt_1DQ2_nu()
       : Pub(kPRD26), Pub_str(""), UseD2Corr(false), fD2CorrHist(nullptr) {
@@ -62,13 +62,15 @@ public:
     return exps;
   }
 
-  void Initialize(fhicl::ParameterSet const &ps) {
+  void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    if (ps.has_key("verbosity")) {
-      SetSampleVerbosity(ps.get<std::string>("verbosity"));
+    if (instance_sample_configuration.has_key("verbosity")) {
+      SetSampleVerbosity(
+          instance_sample_configuration.get<std::string>("verbosity"));
     }
 
-    std::string publication = ps.get<std::string>("publication", "PRD26");
+    std::string publication =
+        instance_sample_configuration.get<std::string>("publication", "PRD26");
     if (publication == "PRL31") {
       Pub = kPRL31;
     } else if (publication == "PRD16") {
@@ -85,23 +87,23 @@ public:
     switch (Pub) {
     case kPRL31: {
       Pub_str = "PRL31_844";
-      EnuRange = std::pair<double, double>{0, 3E3};
-      ISAMPLE_INFO("Sample " << Name()
-                             << " specialized for publication: " << Pub_str);
+      energy_cut = std::pair<double, double>{0, 3E3};
+      IEventProcessor_INFO(
+          "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD16: {
       Pub_str = "PRD16_3103";
-      EnuRange = std::pair<double, double>{0, 6E3};
-      ISAMPLE_INFO("Sample " << Name()
-                             << " specialized for publication: " << Pub_str);
+      energy_cut = std::pair<double, double>{0, 6E3};
+      IEventProcessor_INFO(
+          "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD26: {
       Pub_str = "PRD26_537";
-      EnuRange = std::pair<double, double>{0, 6E3};
-      ISAMPLE_INFO("Sample " << Name()
-                             << " specialized for publication: " << Pub_str);
+      energy_cut = std::pair<double, double>{0, 6E3};
+      IEventProcessor_INFO(
+          "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
     }
     }
@@ -114,14 +116,14 @@ public:
     SetData(GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/ANL_CCQE_Data_" +
             Pub_str + ".root;ANL_1DQ2_Data");
 
-    SimpleDataComparison_1D::Initialize(ps);
+    SimpleDataComparison_1D::Initialize(instance_sample_configuration);
 
-    UseD2Corr = ps.get<bool>(
+    UseD2Corr = instance_sample_configuration.get<bool>(
         "use_D2_correction",
         global_sample_configuration.get<bool>("use_D2_correction", false));
 
     if (UseD2Corr) {
-      fD2CorrHist = nuis::utility::GetHistogram<TH1D>(
+      fD2CorrHist = nuis::utility::GetHistogram<TH>(
           GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/"
                          "ANL_CCQE_Data_PRL31_844.root;ANL_1DQ2_Correction");
       fPrediction_Uncorr = Clone(fPrediction, true);
@@ -143,8 +145,7 @@ public:
         return false;
       }
 
-      if ((ISNumu.P4.E() < EnuRange.first) ||
-          (ISNumu.P4.E() > EnuRange.second)) {
+      if (!energy_cut.IsInRange(ISNumu.P4.E())) {
         return false;
       }
 
@@ -157,7 +158,7 @@ public:
     };
     // 1D Projection function
     CompProjFunc = [](FullEvent const &fev) -> std::array<double, 1> {
-      return {{GetNeutrinoQ2QERec(fev, 0)}};
+      return {GetNeutrinoQ2QERec(fev, 0)};
     };
   }
 
@@ -166,22 +167,24 @@ public:
                               double event_weight) {
 
     if (UseD2Corr) {
-      nuis::utility::Fill(fPrediction_Uncorr.get(), proj, event_weight);
+      TH_Help::Fill(fPrediction_Uncorr, proj, event_weight);
       event_weight *= fD2CorrHist->Interpolate(proj[0]);
     }
-    nuis::utility::Fill(fPrediction.get(), proj, event_weight);
+    TH_Help::Fill(fPrediction, proj, event_weight);
   }
 
   void FinalizeComparison() {
     SimpleDataComparison_1D::FinalizeComparison();
-    fPrediction_Uncorr->Scale(1.0, "width");
+    if (UseD2Corr) {
+      fPrediction_Uncorr->Scale(1.0, "width");
+    }
   }
 
   void Write() {
     SimpleDataComparison_1D::Write();
     if (UseD2Corr) {
-      nuis::persistency::WriteToOutputFile<TH1D>(
-          fPrediction_Uncorr.get(), "Prediction_Uncorr", write_directory);
+      nuis::persistency::WriteToOutputFile<TH>(
+          fPrediction_Uncorr, "Prediction_Uncorr", write_directory);
     }
   }
 
@@ -189,4 +192,4 @@ public:
 };
 
 DECLARE_PLUGIN(IDataComparison, ANL_CCQE_Evt_1DQ2_nu);
-DECLARE_PLUGIN(ISample, ANL_CCQE_Evt_1DQ2_nu);
+DECLARE_PLUGIN(IEventProcessor, ANL_CCQE_Evt_1DQ2_nu);

@@ -29,14 +29,19 @@ if(CERN_LEVEL STREQUAL "")
     cmessage(FATAL_ERROR "Variable CERN_LEVEL is not defined. Please export environment variable CERN_LEVEL or configure with -DCERN_LEVEL=XXXX (likely to be 2005).")
 endif()
 
-if(NOT IS_NEUT_54)
+if(${NEUT_VERSION} VERSION_LESS 5.4.0)
   set(NEUT_LIB_DIR ${NEUT_ROOT}/lib/Linux_pc)
 else()
   set(NEUT_LIB_DIR ${NEUT_ROOT}/lib)
 endif()
+
 set(NEUT_CLASS ${NEUT_ROOT}/src/neutclass)
 
-LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_ENABLED )
+LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_ENABLED -DNEUT_VERSION=${NEUT_VERSION})
+
+if(${NEUT_VERSION} VERSION_GREATER 5.4.0)
+  LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_COMMON_QEAV)
+endif()
 
 LIST(APPEND EXTRA_CXX_FLAGS
   -I${NEUT_ROOT}/include
@@ -48,7 +53,20 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${CERN}/${CERN_LEVEL}/lib
   ${NEUT_ROOT}/src/reweight)
 
-if(IS_NEUT_54)
+LIST(APPEND EXTRA_LIBS NReWeight)
+
+if(${NEUT_VERSION} VERSION_EQUAL 5.4.2)
+  LIST(APPEND EXTRA_LIBS
+    neutcore_5.4.2
+    nuccorspl_5.4.2 #typo in NEUT, may hopefully disappear
+    nuceff_5.4.2
+    partnuck_5.4.2
+    skmcsvc_5.4.2
+    tauola_5.4.2
+    HT2p2h_5.4.0
+    N1p1h_5.4.0)
+  LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_COMMON_QEAV)
+elseif(${NEUT_VERSION} VERSION_EQUAL 5.4.0)
   LIST(APPEND EXTRA_LIBS
     NReWeight
     neutcore_5.4.0
@@ -58,12 +76,7 @@ if(IS_NEUT_54)
     skmcsvc_5.4.0
     tauola_5.4.0
     HT2p2h_5.4.0
-    N1p1h_5.4.0
-    jetset74
-    pdflib804
-    mathlib
-    packlib
-    pawlib)
+    N1p1h_5.4.0)
 else()
   LIST(APPEND EXTRA_LIBS
     NReWeight
@@ -72,13 +85,16 @@ else()
     nuceff
     partnuck
     skmcsvc
-    tauola
-    jetset74
-    pdflib804
-    mathlib
-    packlib
-    pawlib)
+    tauola)
 endif()
+
+LIST(APPEND EXTRA_LIBS
+  jetset74
+  pdflib804
+  mathlib
+  packlib
+  pawlib
+  gfortran)
 
 set(NEUT_ROOT_LIBS)
 
@@ -97,7 +113,7 @@ if(EXISTS "${NEUT_CLASS}/neutnucfsistep.so")
     )
 endif()
 
-if(NOT IS_NEUT_54)
+if(${NEUT_VERSION} VERSION_LESS 5.4.0)
   LIST(APPEND NEUT_ROOT_LIBS
     ${NEUT_CLASS}/neutrootTreeSingleton.so)
 endif()

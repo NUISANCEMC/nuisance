@@ -42,6 +42,11 @@ public:
   MinimalEvent();
   MinimalEvent(MinimalEvent const &) = delete;
   MinimalEvent(MinimalEvent &&);
+  MinimalEvent &operator=(MinimalEvent &&);
+
+  /// Make a clone of this MinimalEvent
+  MinimalEvent Clone() const;
+
   /// True interaction mode
   Channel_t mode;
   /// True probe energy

@@ -1,4 +1,4 @@
-#include "samples/ISample.hxx"
+#include "samples/IEventProcessor.hxx"
 
 #include "event/FullEvent.hxx"
 
@@ -10,7 +10,7 @@
 using namespace nuis::event;
 using namespace nuis::input;
 
-class VerboseEventSummary : public ISample {
+class VerboseEventSummary : public IEventProcessor {
 public:
   InputManager::Input_id_t fIH_id;
 
@@ -27,7 +27,7 @@ public:
 
   void ProcessSample(size_t nmax) {
     if (fIH_id == std::numeric_limits<InputManager::Input_id_t>::max()) {
-      throw uninitialized_ISample();
+      throw uninitialized_IEventProcessor();
     }
 
     IInputHandler const &IH = InputManager::Get().GetInputHandler(fIH_id);
@@ -53,4 +53,4 @@ public:
   std::string Name() { return "VerboseEventSummary"; }
 };
 
-DECLARE_PLUGIN(ISample, VerboseEventSummary);
+DECLARE_PLUGIN(IEventProcessor, VerboseEventSummary);

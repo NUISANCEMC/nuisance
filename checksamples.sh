@@ -22,7 +22,7 @@ do
 	parsed=${parsed/'"'/}
 	parsed=${parsed/'("'/}
 	parsed=${parsed/'")'/}
-	echo "MultiSample: $line"
+	echo "MultIEventProcessor: $line"
     fi
    	
     

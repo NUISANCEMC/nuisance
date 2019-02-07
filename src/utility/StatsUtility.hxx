@@ -1,6 +1,8 @@
 #ifndef UTILITY_STATSUTILITY_HXX_SEEN
 #define UTILITY_STATSUTILITY_HXX_SEEN
 
+#include "utility/HistogramUtility.hxx"
+
 namespace nuis {
 namespace utility {
 
@@ -8,8 +10,10 @@ NEW_NUIS_EXCEPT(unimplemented_covariance_usage);
 NEW_NUIS_EXCEPT(Mismatched_NBins);
 
 template <typename HT>
-typename std::enable_if<TH_traits<HT>::NDims == 1, double>::type
-GetChi2(HT const *a, HT const *b, TH2D const *Covariance = nullptr) {
+double GetChi2(typename std::enable_if<HType_traits<HT>::NDim == 1,
+                                       std::unique_ptr<HT>>::type const &a,
+               std::unique_ptr<HT> const &b,
+               std::unique_ptr<TH2> const &Covariance = nullptr) {
   if (Covariance) {
     throw unimplemented_covariance_usage()
         << "[ERROR]: Using a covariance in the Chi2 evaluation is not yet "
@@ -39,6 +43,23 @@ GetChi2(HT const *a, HT const *b, TH2D const *Covariance = nullptr) {
   }
   return chi2;
 }
+
+template <typename HT>
+double GetChi2(typename std::enable_if<HType_traits<HT>::NDim == 2,
+                                       std::unique_ptr<HT>>::type const &a,
+               std::unique_ptr<HT> const &b,
+               std::unique_ptr<TH2> const &Covariance = nullptr) {
+  return std::numeric_limits<double>::max();
+}
+
+template <typename HT>
+double GetChi2(typename std::enable_if<std::is_same<HT, TH2Poly>::value,
+                                       std::unique_ptr<HT>>::type const &a,
+               std::unique_ptr<HT> const &b,
+               std::unique_ptr<TH2> const &Covariance = nullptr) {
+  return std::numeric_limits<double>::max();
+}
+
 } // namespace utility
 } // namespace nuis
 

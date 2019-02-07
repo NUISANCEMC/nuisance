@@ -37,7 +37,7 @@ class TreeFile;
 } // namespace nuis
 
 class NEUTInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
+  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTreeFile;
   mutable nuis::event::FullEvent fReaderEvent;
 
   bool fKeepIntermediates;
@@ -51,6 +51,8 @@ public:
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
   size_t GetNEvents() const;
+  double GetXSecScaleFactor(
+      std::pair<double, double> const &EnuRange) const;
 };
 
 #endif

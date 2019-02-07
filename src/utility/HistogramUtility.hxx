@@ -26,16 +26,369 @@
 
 #include "string_parsers/from_string.hxx"
 
+#include "TAxis.h"
+#include "TH1D.h"
+#include "TH1F.h"
+#include "TH2D.h"
+#include "TH2F.h"
+#include "TH2Poly.h"
+
+#include <iomanip>
 #include <memory>
 #include <string>
 #include <vector>
-#include <iomanip>
 
 namespace nuis {
 namespace utility {
 
 NEW_NUIS_EXCEPT(unimplemented_GetHistogram_method);
 NEW_NUIS_EXCEPT(invalid_histogram_descriptor);
+NEW_NUIS_EXCEPT(invalid_histogram_name);
+NEW_NUIS_EXCEPT(failed_to_clone);
+
+inline bool IsFlowBin(TAxis const &ax, Int_t bin_it) {
+  return ((bin_it <= 0) || (bin_it >= (ax.GetNbins() + 1)));
+}
+
+inline bool IsInHistogramRange(TAxis const &ax, double v) {
+  Int_t bin_it = ax.FindFixBin(v);
+  return !IsFlowBin(ax, bin_it);
+}
+
+template <typename HT> struct HType_traits {};
+template <> struct HType_traits<TH1> {
+  using type = TH1;
+  static size_t const NDim = 1;
+  using NumericT = double;
+  static std::string name() { return "TH1"; }
+};
+template <> struct HType_traits<TH1D> {
+  using type = TH1D;
+  static size_t const NDim = 1;
+  using NumericT = double;
+  static std::string name() { return "TH1D"; }
+};
+template <> struct HType_traits<TH1F> {
+  using type = TH1F;
+  static size_t const NDim = 1;
+  using NumericT = float;
+  static std::string name() { return "TH1F"; }
+};
+template <> struct HType_traits<TH2> {
+  using type = TH2;
+  static size_t const NDim = 2;
+  using NumericT = double;
+  static std::string name() { return "TH2"; }
+};
+template <> struct HType_traits<TH2D> {
+  using type = TH2D;
+  static size_t const NDim = 2;
+  using NumericT = double;
+  static std::string name() { return "TH2D"; }
+};
+template <> struct HType_traits<TH2F> {
+  using type = TH2F;
+  static size_t const NDim = 2;
+  using NumericT = float;
+  static std::string name() { return "TH2F"; }
+};
+template <> struct HType_traits<TH2Poly> {
+  using type = TH2Poly;
+  static size_t const NDim = 0;
+  using NumericT = double;
+  static std::string name() { return "TH2Poly"; }
+};
+
+template <size_t, typename T = double> struct HType_Helper {};
+template <> struct HType_Helper<1, void> {
+  using type = TH1;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+template <> struct HType_Helper<1, double> {
+  using type = TH1D;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+template <> struct HType_Helper<1, float> {
+  using type = TH1F;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+template <> struct HType_Helper<2, void> {
+  using type = TH2;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+template <> struct HType_Helper<2, double> {
+  using type = TH2D;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+template <> struct HType_Helper<2, float> {
+  using type = TH2F;
+  static size_t const NDim = HType_traits<type>::NDim;
+  using NumericT = HType_traits<type>::NumericT;
+  static std::string name() { return HType_traits<type>::name(); }
+};
+
+template <typename HT, typename Enable = void> struct TH_Helper {};
+
+template <typename HT>
+struct TH_Helper<HT,
+                 typename std::enable_if<HType_traits<HT>::NDim == 1>::type> {
+  static size_t const NDim = HType_traits<HT>::NDim;
+  using NumericT = typename HType_traits<HT>::NumericT;
+  static std::string name() { return HType_traits<HT>::name(); }
+
+  static Int_t NbinsIncludeFlow(HT const &h) {
+    return h.GetXaxis()->GetNbins() + 2;
+  }
+  static Int_t Nbins(HT const &h) { return h.GetXaxis()->GetNbins(); }
+
+  static bool IsFlowBin(HT const &h, Int_t bin_it) {
+    return nuis::utility::IsFlowBin(*h.GetXaxis(), bin_it);
+  }
+
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
+    h.Fill(v[0], w);
+  }
+
+  static void Scale(HT &h, NumericT SF, char const *opt = "") {
+    h.Scale(SF, opt);
+  }
+
+  static double Integral(HT const &h, char const *opt = "") {
+    return h.Integral(opt);
+  }
+
+  static Int_t NbinsIncludeFlow(std::unique_ptr<HT> const &h) {
+    return NbinsIncludeFlow(*h);
+  }
+  static Int_t Nbins(std::unique_ptr<HT> const &h) { return Nbins(*h); }
+
+  static bool IsFlowBin(std::unique_ptr<HT> const &h, Int_t bin_it) {
+    return IsFlowBin(*h, bin_it);
+  }
+
+  static void Fill(std::unique_ptr<HT> &h,
+                   std::array<NumericT, NDim> const &v, double w = 1) {
+    Fill(*h, v, w);
+  }
+
+  static void Scale(std::unique_ptr<HT> &h, NumericT SF, char const *opt = "") {
+    Scale(*h, SF, opt);
+  }
+
+  static double Integral(std::unique_ptr<HT> const &h, char const *opt = "") {
+    return Integral(*h, opt);
+  }
+};
+
+template <typename HT>
+struct TH_Helper<HT,
+                 typename std::enable_if<HType_traits<HT>::NDim == 2>::type> {
+  static size_t const NDim = HType_traits<HT>::NDim;
+  using NumericT = typename HType_traits<HT>::NumericT;
+  static std::string name() { return HType_traits<HT>::name(); }
+
+  // TH2 ***************************************************************
+  static Int_t NbinsIncludeFlow(HT const &h) {
+    return (h.GetXaxis()->GetNbins() + 2) * (h.GetYaxis()->GetNbins() + 2);
+  }
+  static Int_t Nbins(HT const &h) {
+    return (h.GetXaxis()->GetNbins()) * (h.GetYaxis()->GetNbins());
+  }
+
+  static bool IsFlowBin(HT const &h, Int_t xbin_it, Int_t ybin_it) {
+    return nuis::utility::IsFlowBin(*h.GetXaxis(), xbin_it) ||
+           nuis::utility::IsFlowBin(*h.GetYaxis(), ybin_it);
+  }
+
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
+    h.Fill(v[0], v[1], w);
+  }
+
+  static void Scale(HT &h, NumericT SF, char const *opt = "") {
+    h.Scale(SF, opt);
+  }
+
+  static double Integral(HT const &h, char const *opt = "") {
+    return h.Integral(opt);
+  }
+
+  static Int_t NbinsIncludeFlow(std::unique_ptr<HT> const &h) {
+    return NbinsIncludeFlow(*h);
+  }
+  static Int_t Nbins(std::unique_ptr<HT> const &h) { return Nbins(*h); }
+
+  static bool IsFlowBin(std::unique_ptr<HT> const &h, Int_t xbin_it,
+                        Int_t ybin_it) {
+    return IsFlowBin(*h, xbin_it, ybin_it);
+  }
+
+  static void Fill(std::unique_ptr<HT> &h,
+                   std::array<NumericT, NDim> const &v, double w = 1) {
+    Fill(*h, v, w);
+  }
+
+  static void Scale(std::unique_ptr<HT> &h, NumericT SF, char const *opt = "") {
+    Scale(*h, SF, opt);
+  }
+
+  static double Integral(std::unique_ptr<HT> const &h, char const *opt = "") {
+    return Integral(*h, opt);
+  }
+};
+
+template <typename HT>
+struct TH_Helper<
+    HT, typename std::enable_if<std::is_same<HT, TH2Poly>::value>::type> {
+  static size_t const NDim = 2;
+  using NumericT = typename HType_traits<HT>::NumericT;
+  static std::string name() { return HType_traits<HT>::name(); }
+
+  // TH2Poly ***************************************************************
+  static Int_t NbinsIncludeFlow(HT const &h) { return h.GetNumberOfBins() + 9; }
+  static Int_t Nbins(HT const &h) { return h.GetNumberOfBins(); }
+
+  static bool IsFlowBin(HT const &h, Int_t bin_it) { return (bin_it < 0); }
+
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
+    h.Fill(v[0], v[1], w);
+  }
+
+  static void Scale(HT &h, NumericT SF, char const *opt = "") {
+
+    bool width = (std::string(opt).find("width") != std::string::npos);
+    size_t nbins = Nbins(h);
+    for (size_t bin_it = 0; bin_it < nbins; ++bin_it) {
+      double bin_area = 1;
+
+      if (width) {
+        TH2PolyBin *poly_bin =
+            dynamic_cast<TH2PolyBin *>(h.GetBins()->At(bin_it));
+
+        bin_area = poly_bin->GetArea();
+      }
+
+      h.SetBinContent(bin_it + 1,
+                      h.GetBinContent(bin_it + 1) * (SF / bin_area));
+      h.SetBinError(bin_it + 1, h.GetBinError(bin_it + 1) * (SF / bin_area));
+    }
+  }
+
+  static double Integral(HT &h, char const *opt = "") {
+    bool width = (std::string(opt).find("width") != std::string::npos);
+    size_t nbins = Nbins(h);
+    double integral = 0;
+    for (size_t bin_it = 0; bin_it < nbins; ++bin_it) {
+      double bin_area = 1;
+
+      if (width) {
+        TH2PolyBin *poly_bin =
+            dynamic_cast<TH2PolyBin *>(h.GetBins()->At(bin_it));
+
+        bin_area = poly_bin->GetArea();
+      }
+
+      integral += h.GetBinContent(bin_it + 1) * bin_area;
+    }
+    return integral;
+  }
+
+  static Int_t NbinsIncludeFlow(std::unique_ptr<HT> const &h) {
+    return NbinsIncludeFlow(*h);
+  }
+  static Int_t Nbins(std::unique_ptr<HT> const &h) { return Nbins(*h); }
+
+  static bool IsFlowBin(std::unique_ptr<HT> const &h, Int_t bin_it) {
+    return IsFlowBin(*h, bin_it);
+  }
+
+  static void Fill(std::unique_ptr<HT> &h,
+                   std::array<NumericT, NDim> const &v, double w = 1) {
+    Fill(*h, v, w);
+  }
+
+  static void Scale(std::unique_ptr<HT> &h, NumericT SF, char const *opt = "") {
+    Scale(*h, SF, opt);
+  }
+
+  static double Integral(std::unique_ptr<HT> &h, char const *opt = "") {
+    return Integral(*h, opt);
+  }
+};
+
+template <typename HT>
+void Clear(typename std::enable_if<HType_traits<HT>::NDim != 0, HT>::type &h) {
+  for (Int_t bin_it = 0; bin_it < TH_Helper<HT>::NbinsIncludeFlow(h);
+       ++bin_it) {
+    h.SetBinContent(bin_it, 0);
+    h.SetBinError(bin_it, 0);
+  }
+}
+
+template <typename HT>
+void Clear(
+    typename std::enable_if<std::is_same<HT, TH2Poly>::value, HT>::type &h) {
+  h.ClearBinContents();
+}
+
+template <typename HT>
+inline std::unique_ptr<HT> Clone(HT const &source, bool clear = false,
+                                 std::string const &clone_name = "") {
+  std::unique_ptr<HT> target(dynamic_cast<HT *>(
+      source.Clone(clone_name.size() ? clone_name.c_str() : "")));
+  if (!target) {
+    throw failed_to_clone()
+        << "[ERROR]: Failed to clone a " << TH_Helper<HT>::name() << ".";
+  }
+  target->SetDirectory(nullptr);
+
+  if (clear) {
+    Clear<HT>(*target);
+  }
+
+  return target;
+}
+template <typename HT>
+inline std::unique_ptr<HT> Clone(std::unique_ptr<HT> const &source,
+                                 bool clear = false,
+                                 std::string const &clone_name = "") {
+  return Clone(*source, clear, clone_name);
+}
+
+template <typename HT>
+inline std::unique_ptr<HT> GetHistogramFromROOTFile(TFile_ptr &f,
+                                                    std::string const &hname) {
+
+  f->Get(hname.c_str());
+  HT *h = dynamic_cast<HT *>(f->Get(hname.c_str()));
+  if (!h) {
+    throw invalid_histogram_name()
+        << "[ERROR]: Failed to get " << TH_Helper<HT>::name() << " named "
+        << std::quoted(hname) << " from input file "
+        << std::quoted(f->GetName());
+  }
+  std::unique_ptr<HT> clone = Clone<HT>(*h);
+  return clone;
+}
+
+template <typename HT>
+inline std::unique_ptr<HT> GetHistogramFromROOTFile(std::string const &fname,
+                                                    std::string const &hname) {
+  TFile_ptr temp = CheckOpenTFile(fname, "READ");
+  return GetHistogramFromROOTFile<HT>(temp, hname);
+}
 
 template <typename HT>
 std::unique_ptr<HT> GetHistogram(std::string const &input_descriptor) {
@@ -54,6 +407,111 @@ std::unique_ptr<HT> GetHistogram(std::string const &input_descriptor) {
         << std::quoted(input_descriptor)
         << " as an input histogram (Text/ROOT).";
   }
+}
+
+NEW_NUIS_EXCEPT(invalid_TH2Poly);
+NEW_NUIS_EXCEPT(invalid_PolyBinSpecifierList);
+
+// List of bins to put in a row, X/Y
+struct PolyBinSpecifier {
+  double X, Y;
+  bool UseXAxis;
+};
+
+constexpr PolyBinSpecifier XPolyBinSpec(double X, double Y) {
+  return PolyBinSpecifier{X + std::numeric_limits<double>::epsilon() * 1E2,
+                          Y + std::numeric_limits<double>::epsilon() * 1E2,
+                          true};
+}
+
+constexpr PolyBinSpecifier YPolyBinSpec(double X, double Y) {
+  return PolyBinSpecifier{X + std::numeric_limits<double>::epsilon() * 1E2,
+                          Y + std::numeric_limits<double>::epsilon() * 1E2,
+                          false};
+}
+
+std::vector<std::unique_ptr<TH1>> GetTH2PolySlices(
+    std::unique_ptr<TH2Poly> &hinp,
+    std::vector<std::vector<PolyBinSpecifier>> const &BinsSpecifiers) {
+
+  std::vector<std::unique_ptr<TH1>> slices;
+
+  size_t sl_it = 0;
+  for (auto &slice_spec : BinsSpecifiers) {
+    std::vector<double> Binning;
+    std::vector<double> BinContent;
+    std::vector<double> BinError;
+    bool UseXAxis = false;
+    size_t bin_ctr = 0;
+    for (auto poly_bin_spec : slice_spec) {
+      Int_t bin_it = hinp->FindBin(poly_bin_spec.X, poly_bin_spec.Y);
+      if (bin_it < 1) {
+        std::cout << "[WARN]: When searching for matching bin: { X: "
+                  << poly_bin_spec.X << ", Y: " << poly_bin_spec.Y
+                  << "} got flow bin: " << bin_it << std::endl;
+        continue;
+      }
+      TH2PolyBin *poly_bin =
+          dynamic_cast<TH2PolyBin *>(hinp->GetBins()->At(bin_it - 1));
+
+      if (!bin_ctr) {
+        UseXAxis = poly_bin_spec.UseXAxis;
+      } else if (UseXAxis != poly_bin_spec.UseXAxis) {
+        throw invalid_PolyBinSpecifierList()
+            << "[ERROR]: For slice: " << sl_it
+            << " of TH2Poly: " << std::quoted(hinp->GetName())
+            << " bin specifier: " << bin_ctr << " was set to use the "
+            << (poly_bin_spec.UseXAxis ? "X" : "Y")
+            << " axis as the dependent axis of the slice, but previous bins "
+               "were set to use the "
+            << (poly_bin_spec.UseXAxis ? "X" : "Y") << " axis.";
+      }
+
+      if ((poly_bin_spec.X < poly_bin->GetXMin()) ||
+          (poly_bin_spec.X >= poly_bin->GetXMax()) ||
+          (poly_bin_spec.Y < poly_bin->GetYMin()) ||
+          (poly_bin_spec.Y >= poly_bin->GetYMax())) {
+        std::cout
+            << "[WARN]: Found bin doesn't seem to contain expected point: { X: "
+            << poly_bin_spec.X << ", Y: " << poly_bin_spec.Y
+            << "}, got bin_it = " << bin_it
+            << " which had x_low: " << poly_bin->GetXMin()
+            << ", and x_up: " << poly_bin->GetXMax()
+            << ", y_low: " << poly_bin->GetYMin()
+            << ", y_up: " << poly_bin->GetYMax() << std::endl;
+      }
+
+      double low = UseXAxis ? poly_bin->GetXMin() : poly_bin->GetYMin();
+      double up = UseXAxis ? poly_bin->GetXMax() : poly_bin->GetYMax();
+
+      if (!Binning.size()) { // Add low edge
+        Binning.push_back(low);
+      } else if (std::abs(Binning.back() - low) >
+                 (std::numeric_limits<double>::epsilon() * 1E2)) {
+        BinContent.push_back(0);
+        BinError.push_back(0);
+        Binning.push_back(low);
+      }
+
+      BinContent.push_back(hinp->GetBinContent(bin_it));
+      BinError.push_back(hinp->GetBinError(bin_it));
+      Binning.push_back(up);
+    }
+    slices.emplace_back(new TH1D(
+        (std::string(hinp->GetName()) + "_slice" + std::to_string(sl_it++))
+            .c_str(),
+        (std::string(";") +
+         (UseXAxis ? hinp->GetXaxis() : hinp->GetYaxis())->GetTitle() + ";" +
+         hinp->GetZaxis()->GetTitle())
+            .c_str(),
+        Binning.size() - 1, Binning.data()));
+
+    for (size_t bin_it = 0; bin_it < BinContent.size(); ++bin_it) {
+      slices.back()->SetBinContent(bin_it + 1, BinContent[bin_it]);
+      slices.back()->SetBinError(bin_it + 1, BinError[bin_it]);
+    }
+  }
+  return slices;
 }
 
 } // namespace utility

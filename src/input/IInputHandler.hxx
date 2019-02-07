@@ -17,14 +17,14 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef INPUT_IINPUTHANDLER_HXX_SEEN
-#define INPUT_IINPUTHANDLER_HXX_SEEN
+#pragma once
 
 #include "plugins/traits.hxx"
 
 #include "exception/exception.hxx"
 
 #include <iterator>
+#include <limits>
 
 namespace fhicl {
 class ParameterSet;
@@ -86,6 +86,7 @@ public:
 
   NEW_NUIS_EXCEPT(invalid_input_file);
   NEW_NUIS_EXCEPT(invalid_entry);
+  NEW_NUIS_EXCEPT(input_handler_feature_unimplemented);
 
   typedef size_t ev_index_t;
 
@@ -94,7 +95,13 @@ public:
   GetMinimalEvent(ev_index_t idx) const = 0;
   virtual nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;
   virtual void RecalculateEventWeights(){};
-  virtual double GetEventWeight(ev_index_t idx) const { return 1; };
+  virtual double GetEventWeight(ev_index_t) const { return 1; };
+
+  /// Allows samples that implement flux cuts to request an appropriate
+  virtual double GetXSecScaleFactor(
+      std::pair<double, double> const &EnuRange = std::pair<double, double>{
+          std::numeric_limits<double>::max(),
+          std::numeric_limits<double>::max()}) const = 0;
 
   virtual size_t GetNEvents() const = 0;
 
@@ -109,5 +116,3 @@ public:
 };
 
 DECLARE_PLUGIN_INTERFACE(IInputHandler);
-
-#endif

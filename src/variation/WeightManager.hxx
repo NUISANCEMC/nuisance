@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef VARIATION_VARIATIONMANAGER_HXX_SEEN
-#define VARIATION_VARIATIONMANAGER_HXX_SEEN
+#pragma once
 
 #include "variation/IWeightProvider.hxx"
 
@@ -35,35 +34,35 @@ class ParameterSet;
 
 namespace nuis {
 namespace variation {
-class VariationManager {
+
+///\brief Provides event-weight responses for reweighting tools
+class WeightManager {
 public:
-  typedef size_t VarProv_id_t;
+  typedef size_t WeightProv_id_t;
 
 private:
   struct NamedWeightProvider {
     NamedWeightProvider(
         std::string const &,
         plugins::plugin_traits<IWeightProvider>::unique_ptr_t &&);
+    NamedWeightProvider(NamedWeightProvider const &) = delete;
+    NamedWeightProvider(NamedWeightProvider &&);
     std::string name;
     plugins::plugin_traits<IWeightProvider>::unique_ptr_t handler;
   };
-  std::vector<NamedWeightProvider> VarProvs;
+  std::vector<NamedWeightProvider> WeightEngines;
 
-  VariationManager();
+  WeightManager();
 
-  static VariationManager *_global_inst;
+  static WeightManager *_global_inst;
 
 public:
+  static WeightManager &Get();
 
-  static VariationManager &Get();
-
-  paramId_t EnsureParameterHandled(fhicl::ParameterSet const &);
-  void SetParameterValue(paramId_t, double);
-  void GetParameterPull(paramId_t);
-
+  WeightProv_id_t EnsureWeightProviderLoaded(fhicl::ParameterSet const &);
   double GetEventWeight(nuis::event::MinimalEvent const &);
+
+  void ReconfigureWeightEngines();
 };
 } // namespace variation
 } // namespace nuis
-
-#endif

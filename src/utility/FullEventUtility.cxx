@@ -9,6 +9,18 @@ using namespace nuis::event;
 namespace nuis {
 namespace utility {
 
+event::Particle GetHMParticle(std::vector<event::Particle> const &parts) {
+  if (parts.size()) {
+    return event::Particle();
+  }
+
+  return *std::max_element(
+      parts.begin(), parts.end(),
+      [](event::Particle const &l, event::Particle const &r) {
+        return l.P() < r.P();
+      });
+}
+
 std::vector<Particle> GetParticles(FullEvent const &ev,
                                    std::vector<PDG_t> const &pdgs,
                                    Particle::Status_t status,
@@ -69,12 +81,22 @@ Particle GetHMParticle(FullEvent const &ev, std::vector<PDG_t> const &pdgs,
       if (!keep) {
         continue;
       }
-      if (part.P4.Vect().Mag() > HMParticle.P4.Vect().Mag()) {
+      if (part.P() > HMParticle.P()) {
         HMParticle = part;
       }
     }
   }
   return HMParticle;
+}
+
+event::Particle GetHMISParticle(event::FullEvent const &ev,
+                                std::vector<event::PDG_t> const &pdgs) {
+  return GetHMParticle(ev, pdgs, Particle::Status_t::kPrimaryInitialState);
+}
+
+event::Particle GetHMFSParticle(event::FullEvent const &ev,
+                                std::vector<event::PDG_t> const &pdgs) {
+  return GetHMParticle(ev, pdgs);
 }
 
 std::vector<Particle> GetFSChargedLeptons(FullEvent const &ev) {

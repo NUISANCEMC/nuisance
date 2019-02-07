@@ -19,20 +19,20 @@ NEW_NUIS_EXCEPT(WriteToOutputFile_nullptr);
 /// The named streams will be used to configure the file name and open mode from
 /// the global config element persistency.<name>: {file: output.root opts:
 /// CREATE}
-std::shared_ptr<TFile> GetOutputFile(std::string const &name = "default");
+std::unique_ptr<TFile> &GetOutputFile(std::string const &name = "default");
 
 template <typename T>
 inline void WriteToOutputFile(T *object, std::string const &object_name,
-                       std::string dir_name = "",
-                       std::string const &file_name = "default") {
+                              std::string dir_name = "",
+                              std::string const &file_name = "default") {
 
-if(!object){
-  throw WriteToOutputFile_nullptr();
-}
+  if (!object) {
+    throw WriteToOutputFile_nullptr();
+  }
 
   TDirectory *ogdir = gDirectory;
 
-  std::shared_ptr<TFile> f = GetOutputFile(file_name);
+  std::unique_ptr<TFile> &f = GetOutputFile(file_name);
 
   TDirectory *d = f.get();
   while (dir_name.length()) {
@@ -60,6 +60,16 @@ if(!object){
     ogdir->cd();
   }
 }
+
+template <typename T>
+inline void WriteToOutputFile(std::unique_ptr<T> &object,
+                              std::string const &object_name,
+                              std::string dir_name = "",
+                              std::string const &file_name = "default") {
+  return WriteToOutputFile(object.get(), object_name, dir_name, file_name);
+}
+
+void CloseOpenTFiles();
 } // namespace persistency
 } // namespace nuis
 

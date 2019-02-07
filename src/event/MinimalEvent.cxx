@@ -18,5 +18,32 @@ MinimalEvent::MinimalEvent(MinimalEvent &&other)
   other.fNuWroEvent = nullptr;
 #endif
 }
-} // namespace core
+
+MinimalEvent &MinimalEvent::operator=(MinimalEvent &&other) {
+  mode = other.mode;
+  probe_E = other.probe_E;
+  probe_pdg = other.probe_pdg;
+  XSecWeight = other.XSecWeight;
+  RWWeight = other.RWWeight;
+#ifdef __NUWRO_ENABLED__
+  fNuWroEvent = other.fNuWroEvent;
+  other.fNuWroEvent = nullptr;
+#endif
+  return *this;
+}
+
+MinimalEvent MinimalEvent::Clone() const {
+  MinimalEvent clone;
+  clone.mode = mode;
+  clone.probe_E = probe_E;
+  clone.probe_pdg = probe_pdg;
+  clone.XSecWeight = XSecWeight;
+  clone.RWWeight = RWWeight;
+#ifdef __NUWRO_ENABLED__
+  clone.fNuWroEvent = fNuWroEvent;
+#endif
+
+  return clone;
+}
+} // namespace event
 } // namespace nuis

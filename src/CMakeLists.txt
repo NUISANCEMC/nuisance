@@ -5,6 +5,8 @@ add_subdirectory(plugins)
 add_subdirectory(utility)
 add_subdirectory(generator)
 add_subdirectory(persistency)
+add_subdirectory(parameters)
+add_subdirectory(variation)
 
 add_subdirectory(samples)
 SET(INuADataComparisons_List ${INuADataComparisons_List} PARENT_SCOPE)

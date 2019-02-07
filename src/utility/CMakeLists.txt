@@ -3,7 +3,8 @@ set(utility_implementation_files
   FullEventUtility.cxx
   KinematicUtility.cxx
   PDGCodeUtility.cxx
-  StringUtility.cxx)
+  StringUtility.cxx
+  EventTopologyUtility.cxx)
 
 set(utility_header_files
   FileSystemUtility.hxx
@@ -15,7 +16,8 @@ set(utility_header_files
   HistogramUtility.hxx
   StringUtility.hxx
   TerminalUtility.hxx
-  StatsUtility.hxx)
+  StatsUtility.hxx
+  EventTopologyUtility.hxx)
 
 add_library(nuis_utility SHARED ${utility_implementation_files})
 target_link_libraries(nuis_utility)

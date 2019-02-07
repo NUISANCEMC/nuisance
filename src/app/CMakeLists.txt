@@ -2,7 +2,7 @@ SET(APPS nuissamples nuiscomp nuisevsum)
 
 foreach(a ${APPS})
   add_executable(${a} ${a}.cxx)
-  target_link_libraries(${a} nuis_event nuis_input nuis_utility nuis_config nuis_persistency)
+  target_link_libraries(${a} nuis_event nuis_input nuis_utility nuis_config nuis_persistency nuis_plugins nuis_params nuis_variation)
   target_link_libraries(${a} ${CMAKE_DEPENDLIB_FLAGS})
 
   if(NOT "${CMAKE_LINK_FLAGS}" STREQUAL "")

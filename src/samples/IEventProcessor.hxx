@@ -17,8 +17,8 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef SAMPLES_ISAMPLE_HXX_SEEN
-#define SAMPLES_ISAMPLE_HXX_SEEN
+#ifndef SAMPLES_IEventProcessor_HXX_SEEN
+#define SAMPLES_IEventProcessor_HXX_SEEN
 
 #include "plugins/traits.hxx"
 
@@ -27,6 +27,8 @@
 #include "config/GlobalConfiguration.hxx"
 
 #include "fhiclcpp/ParameterSet.h"
+
+#include "TH1.h"
 
 #include <iomanip>
 #include <limits>
@@ -39,23 +41,23 @@ class MinimalEvent;
 } // namespace event
 } // namespace nuis
 
-#define ISAMPLE_DEBUG(v)                                                       \
+#define IEventProcessor_DEBUG(v)                                               \
   if (verb > 2) {                                                              \
     std::cout << "[DEBUG]: " << v << std::endl;                                \
   }
-#define ISAMPLE_INFO(v)                                                        \
+#define IEventProcessor_INFO(v)                                                \
   if (verb > 1) {                                                              \
     std::cout << "[INFO]: " << v << std::endl;                                 \
   }
-#define ISAMPLE_WARN(v)                                                        \
+#define IEventProcessor_WARN(v)                                                \
   if (verb > 0) {                                                              \
     std::cout << "[WARN] " << __FILENAME__ << ":" << __LINE__ << " : " << v    \
               << std::endl;                                                    \
   }
 
-class ISample {
+class IEventProcessor {
 protected:
-  NEW_NUIS_EXCEPT(unknown_ISample_verbosity);
+  NEW_NUIS_EXCEPT(unknown_IEventProcessor_verbosity);
 
   enum sample_verbosity { kSilent = 0, kWarn = 1, kReticent = 2, kVerbose = 3 };
   sample_verbosity verb;
@@ -73,29 +75,33 @@ protected:
     } else if (v == "Verbose") {
       verb = kVerbose;
     } else {
-      throw unknown_ISample_verbosity()
-          << "[ERROR]: Failed to parse ISample verbosity setting from: "
+      throw unknown_IEventProcessor_verbosity()
+          << "[ERROR]: Failed to parse IEventProcessor verbosity setting from: "
           << std::quoted(v);
     }
   }
 
 public:
-  NEW_NUIS_EXCEPT(uninitialized_ISample);
-  NEW_NUIS_EXCEPT(unimplemented_ISample_optional_method);
+  NEW_NUIS_EXCEPT(uninitialized_IEventProcessor);
+  NEW_NUIS_EXCEPT(unimplemented_IEventProcessor_optional_method);
 
-  ISample() {
+  IEventProcessor() {
     SetSampleVerbosity(nuis::config::GetDocument().get<std::string>(
         "global.sample.verbosity_default", "Silent"));
+
+    TH1::SetDefaultSumw2();
   }
 
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
 
   // Interface for processing a single, external event
   //
-  // ISamples are not required to implement processing events from 'outside'.
+  // IEventProcessors are not required to implement processing events from
+  // 'outside'.
   virtual void ProcessEvent(nuis::event::FullEvent const &) {
-    throw unimplemented_ISample_optional_method()
-        << "[ERROR]: ISample " << Name() << " does not implement ProcessEvent.";
+    throw unimplemented_IEventProcessor_optional_method()
+        << "[ERROR]: IEventProcessor " << Name()
+        << " does not implement ProcessEvent.";
   }
 
   virtual void
@@ -105,9 +111,9 @@ public:
 
   virtual std::string Name() = 0;
 
-  virtual ~ISample() {}
+  virtual ~IEventProcessor() {}
 };
 
-DECLARE_PLUGIN_INTERFACE(ISample);
+DECLARE_PLUGIN_INTERFACE(IEventProcessor);
 
 #endif

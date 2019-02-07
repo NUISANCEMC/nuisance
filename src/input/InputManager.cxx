@@ -36,11 +36,12 @@ InputManager::EnsureInputLoaded(fhicl::ParameterSet const &ps) {
     }
   }
 
+  Input_id_t iid = Inputs.size();
   Inputs.emplace_back(file_name,
                       nuis::plugins::Instantiate<IInputHandler>(
                           ps.get<std::string>("input_type") + "InputHandler"));
   Inputs.back().handler->Initialize(ps);
-  return (Inputs.size() - 1);
+  return iid;
 }
 InputManager::Input_id_t
 InputManager::GetInputId(std::string const &file_name) const {

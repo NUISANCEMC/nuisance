@@ -89,9 +89,13 @@ int main(int argc, char const *argv[]) {
                 << nuis::utility::indent_apply_width(sample->GetDocumentation(),
                                                      10)
                 << std::endl;
-      std::cout << "Config: "
-                << sample->GetExampleConfiguration().to_indented_string()
+      std::cout << "\tExample_Config: {\n"
+                << nuis::utility::indent_apply_width(
+                       sample->GetExampleConfiguration().to_indented_string(),
+                       12)
+                << "\n\t}\n"
                 << std::endl;
+      ;
       example_sample_configs.push_back(sample->GetExampleConfiguration());
     }
   }

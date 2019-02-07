@@ -17,12 +17,9 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef VARIATION_IVARIATIONPROVIDER_HXX_SEEN
-#define VARIATION_IVARIATIONPROVIDER_HXX_SEEN
+#pragma once
 
 #include "plugins/traits.hxx"
-
-#include "parameters/ParameterManager.hxx"
 
 namespace fhicl {
 class ParameterSet;
@@ -39,22 +36,20 @@ class IVariationProvider {
 public:
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
 
-  virtual nuis::params::paramId_t GetParameterId(std::string const &) = 0;
-
-  bool HandlesParameter(std::string const &param_name) {
-    return (GetParameterId(param_name) != nuis::params::kParamUnhandled);
-  }
-
-  virtual void SetParameterValue(nuis::params::paramId_t, double) = 0;
-  virtual bool ParametersVaried() = 0;
   virtual void Reconfigure() = 0;
 
   virtual nuis::event::FullEvent
   VaryFullEvent(nuis::event::FullEvent const &) = 0;
 
+  virtual std::string GetName() = 0;
+
+  virtual std::string GetDocumentation() {
+    return "No documentation for IVariationProvider: " + GetName();
+  }
+
+  virtual fhicl::ParameterSet GetExampleConfiguration() = 0;
+
   virtual ~IVariationProvider() {}
 };
 
 DECLARE_PLUGIN_INTERFACE(IVariationProvider);
-
-#endif

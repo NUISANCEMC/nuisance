@@ -56,7 +56,7 @@ public:
   TVector3 P3() const { return P4.Vect(); }
   double M() const { return P4.M(); }
   double Theta() const { return P4.Vect().Theta(); }
-  double CosTheta() const { return P4.Vect().Theta(); }
+  double CosTheta() const { return P4.Vect().CosTheta(); }
 };
 } // namespace event
 } // namespace nuis

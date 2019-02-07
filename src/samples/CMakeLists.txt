@@ -1,5 +1,5 @@
 set(samples_header_files
-  ISample.hxx
+  IEventProcessor.hxx
   IDataComparison.hxx
   SimpleDataComparison.hxx)
 
@@ -13,8 +13,11 @@ cmessage(DEBUG "INuADataComparisons: ${INuADataComparisons}")
 
 SET(INuADataComparisons_List)
 if(NOT IDataComparisons STREQUAL "")
-  string(REPLACE ";" "," INuADataComparisons_List ${INuADataComparisons})
+  string(REPLACE ";" ", " INuADataComparisons_List "${INuADataComparisons}")
 endif()
+
+cmessage(DEBUG "INuADataComparisons_List: ${INuADataComparisons_List}")
+
 
 SET(INuADataComparisons_List ${INuADataComparisons_List} PARENT_SCOPE)
 SET(INuADataComparisons_FHiCL ${INuADataComparisons_FHiCL} PARENT_SCOPE)

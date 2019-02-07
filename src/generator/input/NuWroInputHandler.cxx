@@ -7,13 +7,13 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "particle.h"
-typedef ::particle NuWroParticle;
+using NuWroParticle = ::particle;
 
 using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::nuwrotools;
 
-NuWroInputHandler::NuWroInputHandler() : fInputTree(nullptr) {}
+NuWroInputHandler::NuWroInputHandler() : fInputTree() {}
 NuWroInputHandler::NuWroInputHandler(NuWroInputHandler &&other)
     : fInputTree(std::move(other.fInputTree)),
       fReaderEvent(std::move(other.fReaderEvent)) {}
@@ -23,7 +23,7 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fInputTree = CheckGetTTree(ps.get<std::string>("file"), "treeout");
 
   fReaderEvent.fNuWroEvent = nullptr;
-  fInputTree->tree->SetBranchAddress("e", &fReaderEvent.fNuWroEvent);
+  fInputTree.tree->SetBranchAddress("e", &fReaderEvent.fNuWroEvent);
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 }
@@ -34,7 +34,7 @@ MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
         << " from an InputHandler with only " << GetNEvents();
   }
 
-  fInputTree->tree->GetEntry(idx);
+  fInputTree.tree->GetEntry(idx);
 
   fReaderEvent.mode = NuWroEventChannel(*fReaderEvent.fNuWroEvent);
   fReaderEvent.probe_E = fReaderEvent.fNuWroEvent->in[0].E();
@@ -108,8 +108,14 @@ double NuWroInputHandler::GetEventWeight(ev_index_t idx) const {
   return fWeightCache[idx];
 }
 
+double NuWroInputHandler::GetXSecScaleFactor(
+    std::pair<double, double> const &EnuRange) const {
+  throw input_handler_feature_unimplemented()
+      << "[ERROR]: Flux cuts not yet implemented for NuWro input handler.";
+}
+
 size_t NuWroInputHandler::GetNEvents() const {
-  return fInputTree->tree->GetEntries();
+  return fInputTree.tree->GetEntries();
 }
 
 DECLARE_PLUGIN(IInputHandler, NuWroInputHandler);

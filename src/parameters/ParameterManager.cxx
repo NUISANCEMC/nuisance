@@ -1,7 +1,19 @@
 #include "parameters/ParameterManager.hxx"
 
+#include "fhiclcpp/ParameterSet.h"
+
 namespace nuis {
 namespace params {
+
+ParameterManager::NamedParameter::NamedParameter()
+    : name(""), type(""), value(kDefaultValue), start(kDefaultValue),
+      min(kDefaultValue), max(kDefaultValue), step(kDefaultValue),
+      Penalty([](double) -> double { return 0; }) {}
+
+ParameterManager::NamedParameter::NamedParameter(NamedParameter &&other)
+    : name(std::move(other.name)), type(std::move(other.type)),
+      value(other.value), start(other.start), min(other.min), max(other.max),
+      step(other.step), Penalty(std::move(other.Penalty)) {}
 
 ParameterManager *ParameterManager::_global_inst = nullptr;
 
@@ -51,7 +63,7 @@ ParameterManager::EnsureParameterRegistered(fhicl::ParameterSet const &ps) {
   np.step = ps.get<double>("step");
 
   pid = Parameters.size();
-  Parameters.push_back(np);
+  Parameters.emplace_back(std::move(np));
 
   return pid;
 }
@@ -84,9 +96,10 @@ void ParameterManager::SetParameterValue(paramId_t pid, double val) {
 
   if (!IsValidParameterValue(pid, val)) {
     throw param_value_out_of_bounds()
-        << "[ERROR]: Attempting to set parameter  { PID: " << pid ", name: "
-        << Parameters[pid].name << ", type: " << Parameters[pid].type
-        << " } to " << val << ", but this is out of the allowed range ["
+        << "[ERROR]: Attempting to set parameter  { PID: " << pid
+        << ", name: " << Parameters[pid].name
+        << ", type: " << Parameters[pid].type << " } to " << val
+        << ", but this is out of the allowed range ["
         << ((Parameters[pid].min == kDefaultLimit)
                 ? "unbounded"
                 : std::to_string(Parameters[pid].min))

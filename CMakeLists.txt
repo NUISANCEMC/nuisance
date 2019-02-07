@@ -58,14 +58,11 @@ include(${CMAKE_SOURCE_DIR}/cmake/InputHandlerSetup.cmake)
 #################################  Pythia6/8 ###################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
 
+#Want this before fhiclcpp which will add the install directory
+LIST(APPEND EXTRA_CXX_FLAGS -I${CMAKE_SOURCE_DIR}/src)
+
 ################################## FHICLCPP ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/fhiclcppSetup.cmake)
-
-#Need this to be at the front
-LIST(REVERSE EXTRA_CXX_FLAGS)
-LIST(APPEND EXTRA_CXX_FLAGS -I${CMAKE_SOURCE_DIR}/src)
-LIST(REVERSE EXTRA_CXX_FLAGS)
-
 ################################## COMPILER ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 

@@ -25,6 +25,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace fhicl {
 class ParameterSet;
@@ -36,9 +37,13 @@ namespace params {
 typedef size_t paramId_t;
 static paramId_t const kParamUnhandled = std::numeric_limits<paramId_t>::max();
 static double const kDefaultLimit = 0xdeadbeef;
+static double const kDefaultValue = 0xdeadbeef;
 
 class ParameterManager {
   struct NamedParameter {
+    NamedParameter();
+    NamedParameter(NamedParameter const &) = delete;
+    NamedParameter(NamedParameter &&);
     std::string name;
     std::string type;
     double value;
@@ -46,6 +51,7 @@ class ParameterManager {
     double min;
     double max;
     double step;
+    std::function<double(double)> Penalty;
   };
   std::vector<NamedParameter> Parameters;
   // TMatrixD describing parameter covariance.

@@ -1,0 +1,9 @@
+global.sample_configuration.T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar: {
+  journal_reference: "Not yet published"
+  target_material: "H20"
+  flux_description: "ND280 FHC anti-muon neutrino"
+  signal_description: "CC0Pi"
+  shape_only: false
+  flux_unfolded: false
+  #has_data: false
+}

@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_INPUT_NUWROINPUTHANDLER_HXX_SEEN
-#define GENERATOR_INPUT_NUWROINPUTHANDLER_HXX_SEEN
+#pragma once
 
 #include "event/FullEvent.hxx"
 
@@ -26,20 +25,16 @@
 
 #include "exception/exception.hxx"
 
+#include "utility/ROOTUtility.hxx"
+
 #include <memory>
 
 namespace fhicl {
 class ParameterSet;
 }
 
-namespace nuis {
-namespace utility {
-class TreeFile;
-}
-} // namespace nuis
-
 class NuWroInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTree;
+  mutable nuis::utility::TreeFile fInputTree;
   mutable nuis::event::FullEvent fReaderEvent;
   mutable std::vector<double> fWeightCache;
 
@@ -58,6 +53,7 @@ public:
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
   double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
-};
 
-#endif
+    double GetXSecScaleFactor(
+        std::pair<double, double> const &EnuRange) const;
+};

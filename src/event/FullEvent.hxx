@@ -41,27 +41,15 @@ public:
   FullEvent();
   FullEvent(FullEvent const &) = delete;
   FullEvent(FullEvent &&);
+  FullEvent& operator=(FullEvent &&);
+
+  FullEvent Clone() const;
+
   std::vector<StatusParticles> ParticleStack;
 
   void ClearParticleStack();
 
-  std::string to_string() const {
-    std::stringstream ss("");
-    ss << "Event: Interaction mode = " << mode
-       << ", probe: { PDG: " << probe_pdg << ", Energy: " << probe_E
-       << " MeV }." << std::endl;
-    for (auto &status_stack : ParticleStack) {
-      ss << "\t[" << status_stack.status << "]" << std::endl;
-
-      for (Particle const &part : status_stack.particles) {
-        ss << "\t\t{ PDG: " << part.pdg << ", P3: [ " << part.P4[0] << ", "
-           << part.P4[1] << ", " << part.P4[2] << "], E: " << part.P4[3]
-           << ", M: " << part.P4.M() << " }" << std::endl;
-      }
-    }
-    ss << std::endl;
-    return ss.str();
-  }
+  std::string to_string() const;
 };
 
 } // namespace event

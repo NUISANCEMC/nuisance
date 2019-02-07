@@ -20,6 +20,9 @@
 #ifndef UTILITY_KINEMATICUTILITY_HXX_SEEN
 #define UTILITY_KINEMATICUTILITY_HXX_SEEN
 
+#include <limits>
+#include <utility>
+
 namespace nuis {
 namespace event {
 class FullEvent;
@@ -33,6 +36,16 @@ double GetNeutrinoEQERec(event::FullEvent const &fev,
                          double SeparationEnergy_MeV);
 double GetNeutrinoQ2QERec(event::FullEvent const &fev,
                           double SeparationEnergy_MeV);
+
+struct ENuRange : public std::pair<double, double> {
+  using std::pair<double, double>::pair;
+  using std::pair<double, double>::operator=;
+
+  ENuRange()
+      : std::pair<double, double>(0, std::numeric_limits<double>::max()) {}
+
+  bool IsInRange(double enu) { return (enu > second) || (enu < first); }
+};
 
 } // namespace utility
 } // namespace nuis
