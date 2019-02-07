@@ -69,12 +69,10 @@ execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 #Allows for external override in the case where genie-config lies.
-cmessage(WARNING "GENIE_LIB_DIR: ${GENIE_LIB_DIR}")
 if(NOT DEFINED GENIE_LIB_DIR OR GENIE_LIB_DIR STREQUAL "")
   GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
 endif()
 GETLIBS(genie-config --libs GENIE_LIBS)
-cmessage(FATAL_ERROR "GENIE_LIB_DIR: ${GENIE_LIB_DIR}")
 
 cmessage(STATUS "GENIE version : ${GENIE_VERSION}")
 cmessage(STATUS "GENIE libdir  : ${GENIE_LIB_DIR}")
