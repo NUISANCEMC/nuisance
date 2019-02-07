@@ -70,7 +70,10 @@ GETLIBDIR(genie-config --libs GENIE_LIB_DIR)
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
+#Allows for external override in the case where genie-config lies.
+if(NOT DEFINED GENIE_LIB_DIR OR GENIE_LIB_DIR STREQUAL "")
+  GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
+endif()
 GETLIBS(genie-config --libs GENIE_LIBS)
 
 cmessage(STATUS "GENIE version : ${GENIE_VERSION}")
