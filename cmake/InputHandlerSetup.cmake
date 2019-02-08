@@ -31,6 +31,13 @@ if(USE_NEUT)
   set(USE_NEUT TRUE CACHE BOOL "Whether to enable NEUT support. <FALSE>" FORCE)
 endif()
 
+################################  GENIE  #######################################
+if(USE_GENIE)
+  include(${CMAKE_SOURCE_DIR}/cmake/GENIESetup.cmake)
+  cmessage(STATUS "Using GENIE.")
+  set(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE support. <FALSE>" FORCE)
+endif()
+
 
 if(NEED_ROOTEVEGEN)
   cmessage(STATUS "Require ROOT eve generation libraries")

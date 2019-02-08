@@ -39,8 +39,9 @@ endif()
 set(BUILD_DEBUG_MSGS TRUE)
 
 include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
-
 include(${CMAKE_SOURCE_DIR}/cmake/cacheVariables.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/parseConfigApp.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/StringAndListUtils.cmake)
 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 cmessage(STATUS "CMAKE_BUILD_TYPE: \"${CMAKE_BUILD_TYPE}\"")
@@ -58,11 +59,12 @@ include(${CMAKE_SOURCE_DIR}/cmake/InputHandlerSetup.cmake)
 #################################  Pythia6/8 ###################################
 include(${CMAKE_SOURCE_DIR}/cmake/pythia6Setup.cmake)
 
-#Want this before fhiclcpp which will add the install directory
-LIST(APPEND EXTRA_CXX_FLAGS -I${CMAKE_SOURCE_DIR}/src)
-
 ################################## FHICLCPP ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/fhiclcppSetup.cmake)
+
+#Want this after fhiclcpp which will add the install directory
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 ################################## COMPILER ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 

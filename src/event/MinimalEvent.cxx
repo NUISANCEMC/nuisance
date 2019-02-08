@@ -4,20 +4,11 @@ namespace nuis {
 namespace event {
 MinimalEvent::MinimalEvent()
     : mode(Channel_t::kUndefined), probe_E(0), probe_pdg(0), XSecWeight(1),
-      RWWeight(1) {
-#ifdef __NUWRO_ENABLED__
-  fNuWroEvent = nullptr;
-#endif
-}
+      RWWeight(1) {}
 
 MinimalEvent::MinimalEvent(MinimalEvent &&other)
     : mode(other.mode), probe_E(other.probe_E), probe_pdg(other.probe_pdg),
-      XSecWeight(other.XSecWeight), RWWeight(other.RWWeight) {
-#ifdef __NUWRO_ENABLED__
-  fNuWroEvent = other.fNuWroEvent;
-  other.fNuWroEvent = nullptr;
-#endif
-}
+      XSecWeight(other.XSecWeight), RWWeight(other.RWWeight) {}
 
 MinimalEvent &MinimalEvent::operator=(MinimalEvent &&other) {
   mode = other.mode;
@@ -25,10 +16,7 @@ MinimalEvent &MinimalEvent::operator=(MinimalEvent &&other) {
   probe_pdg = other.probe_pdg;
   XSecWeight = other.XSecWeight;
   RWWeight = other.RWWeight;
-#ifdef __NUWRO_ENABLED__
-  fNuWroEvent = other.fNuWroEvent;
-  other.fNuWroEvent = nullptr;
-#endif
+
   return *this;
 }
 
@@ -39,9 +27,6 @@ MinimalEvent MinimalEvent::Clone() const {
   clone.probe_pdg = probe_pdg;
   clone.XSecWeight = XSecWeight;
   clone.RWWeight = RWWeight;
-#ifdef __NUWRO_ENABLED__
-  clone.fNuWroEvent = fNuWroEvent;
-#endif
 
   return clone;
 }

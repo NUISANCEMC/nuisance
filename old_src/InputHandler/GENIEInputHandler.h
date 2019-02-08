@@ -110,7 +110,7 @@ public:
   void Print();
 
   /// Converts GENIE particle status codes into NUISANCE status codes.
-  int GetGENIEParticleStatus(genie::GHepParticle *part, int mode = 0);
+  int GetGetParticleStatus(genie::GHepParticle *part, int mode = 0);
 
   /// Converts GENIE event reaction codes into NUISANCE reaction codes.
   int ConvertGENIEReactionCode(GHepRecord *gheprec);

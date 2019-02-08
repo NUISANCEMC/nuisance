@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef UTILITY_PDGCODEUTILITY_HXX_SEEN
-#define UTILITY_PDGCODEUTILITY_HXX_SEEN
+#pragma once
 
 #include "event/types.hxx"
 
@@ -40,6 +39,9 @@ static event::PDG_t const kNuMuBar = -14;
 static event::PDG_t const kMu = 13;
 static event::PDG_t const kMuPlus = -13;
 
+static event::PDG_t const kElectron = 11;
+static event::PDG_t const kPositron = -11;
+
 static event::PDG_t const kNue = 12;
 static event::PDG_t const kNueBar = 12;
 
@@ -50,17 +52,18 @@ static event::PDG_t const kPi0 = 111;
 static event::PDG_t const kProton = 2212;
 static event::PDG_t const kNeutron = 2112;
 
-static std::vector<event::PDG_t> const ChargedLeptons{11,  kMu,     15,
-                                                     -11, kMuPlus, -15};
-static std::vector<event::PDG_t> const ChargedLeptons_matter{11, kMu, 15};
-static std::vector<event::PDG_t> const ChargedLeptons_antimatter{-11, kMuPlus,
-                                                                -15};
+static std::vector<event::PDG_t> const ChargedLeptons{kElectron, kMu,     15,
+                                                      kPositron, kMuPlus, -15};
+static std::vector<event::PDG_t> const ChargedLeptons_matter{kElectron, kMu,
+                                                             15};
+static std::vector<event::PDG_t> const ChargedLeptons_antimatter{kPositron,
+                                                                 kMuPlus, -15};
 
 static std::vector<event::PDG_t> const NeutralLeptons{kNue,    kNuMu,    16,
-                                                     kNueBar, kNuMuBar, -16};
+                                                      kNueBar, kNuMuBar, -16};
 static std::vector<event::PDG_t> const NeutralLeptons_matter{kNue, kNuMu, 16};
 static std::vector<event::PDG_t> const NeutralLeptons_antimatter{kNueBar,
-                                                                kNuMuBar, -16};
+                                                                 kNuMuBar, -16};
 
 static std::vector<event::PDG_t> const ChargedPions{kPiPlus, kPiMinus};
 static std::vector<event::PDG_t> const NeutralPions{kPi0};
@@ -74,8 +77,8 @@ static std::vector<event::PDG_t> const Nucleons_matter{kProton, kNeutron};
 static std::vector<event::PDG_t> const Nucleons_antimatter{-kProton, kNeutron};
 
 static std::vector<event::PDG_t> const CommonParticles{
-    11,      kMu,      15,  -11,     kMuPlus,  -15,  kNue,    kNuMu,   16,
-    kNueBar, kNuMuBar, -16, kPiPlus, kPiMinus, kPi0, kProton, kNeutron};
+    kElectron, kMu,      15,  kPositron, kMuPlus,  -15,  kNue,    kNuMu,   16,
+    kNueBar,   kNuMuBar, -16, kPiPlus,   kPiMinus, kPi0, kProton, kNeutron};
 } // namespace pdgcodes
 
 namespace pdgmasses {
@@ -107,6 +110,7 @@ bool IsChargedLepton(event::PDG_t pdg,
                      pdgcodes::MatterType type = pdgcodes::kMatterAntimatter);
 bool IsProton(event::PDG_t pdg,
               pdgcodes::MatterType type = pdgcodes::kMatterAntimatter);
+
 bool IsNeutron(event::PDG_t pdg);
 bool IsChargedPion(event::PDG_t pdg);
 bool IsNeutralPion(event::PDG_t pdg);
@@ -116,6 +120,8 @@ bool IsOther(event::PDG_t pdg);
 bool IsMatter(event::PDG_t pdg);
 bool IsAntiMatter(event::PDG_t pdg);
 
+bool IsNuclearPDG(event::PDG_t pdg);
+
 event::PDG_t MakeNuclearPDG(size_t A, size_t Z);
 
 size_t GetA(event::PDG_t);
@@ -123,5 +129,3 @@ size_t GetZ(event::PDG_t);
 
 } // namespace utility
 } // namespace nuis
-
-#endif

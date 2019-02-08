@@ -17,67 +17,42 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(CXX_WARNINGS -Wall )
+set(CXX_WARNINGS -Wall -Wextra)
 
-LIST(APPEND EXTRA_CXX_FLAGS -Wall -Wextra -Werror -Wno-delete-non-virtual-dtor -Wno-unused "-D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
+LIST(APPEND EXTRA_CXX_FLAGS ${CXX_WARNINGS} -Werror -Wno-delete-non-virtual-dtor -Wno-unused "-D__FILENAME__=\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"")
 
-cmessage(DEBUG "EXTRA_CXX_FLAGS: ${EXTRA_CXX_FLAGS}")
-string(REPLACE ";" " " STR_EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STR_EXTRA_CXX_FLAGS} ${CXX_WARNINGS}")
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-
-SET(STR_EXTRA_LINK_DIRS)
-if(NOT EXTRA_LINK_DIRS STREQUAL "")
-  string(REPLACE ";" " -L" STR_EXTRA_LINK_DIRS "-L${EXTRA_LINK_DIRS}")
-endif()
+BuildFlagString(NUISANCE_LINK_DIRS "-L" ${EXTRA_LINK_DIRS})
 
 LIST(APPEND EXTRA_LIBS dl)
+BuildLibraryFlagString(STR_EXTRA_LIBS ${EXTRA_LIBS})
+BuildFlagString(STR_EXTRA_SHAREDOBJS " " ${EXTRA_SHAREDOBJS})
 
-SET(STR_EXTRA_LIBS)
-if(NOT EXTRA_LIBS STREQUAL "")
-  SET(STR_EXTRA_LIBS_NO_SCRUB_LINKOPTS)
-  string(REPLACE ";" " -l" STR_EXTRA_LIBS_NO_SCRUB_LINKOPTS "-l${EXTRA_LIBS}")
-  string(REPLACE "-l-" "-" STR_EXTRA_LIBS ${STR_EXTRA_LIBS_NO_SCRUB_LINKOPTS})
-endif()
-
-SET(STR_EXTRA_SHAREDOBJS)
-if(NOT EXTRA_SHAREDOBJS STREQUAL "")
-  string(REPLACE ";" " " STR_EXTRA_SHAREDOBJS "${EXTRA_SHAREDOBJS}")
-endif()
+#This ends up holding all of the libraries and search paths for extenal dependencies
+CatStringsIfNotEmpty(NUISANCE_DEPEND_LIBS
+  ${STR_EXTRA_SHAREDOBJS}
+  ${STR_EXTRA_LIBS})
 
 LIST(APPEND EXTRA_LINK_FLAGS -Wl,--no-as-needed)
-SET(STR_EXTRA_LINK_FLAGS)
-if(NOT EXTRA_LINK_FLAGS STREQUAL "")
-  string(REPLACE ";" " " STR_EXTRA_LINK_FLAGS "${EXTRA_LINK_FLAGS}")
-endif()
+BuildFlagString(STR_EXTRA_LINK_FLAGS " " ${EXTRA_LINK_FLAGS})
 
-cmessage(DEBUG "EXTRA_LINK_DIRS: ${STR_EXTRA_LINK_DIRS}")
-cmessage(DEBUG "EXTRA_LIBS: ${STR_EXTRA_LIBS}")
-cmessage(DEBUG "EXTRA_SHAREDOBJS: ${STR_EXTRA_SHAREDOBJS}")
-cmessage(DEBUG "EXTRA_LINK_FLAGS: ${STR_EXTRA_LINK_FLAGS}")
+CatStringsIfNotEmpty(CMAKE_LINK_FLAGS
+  ${CMAKE_LINK_FLAGS}
+  ${STR_EXTRA_LINK_FLAGS})
 
-if(NOT STR_EXTRA_LINK_DIRS STREQUAL "" AND NOT STR_EXTRA_LIBS STREQUAL "")
-  SET(CMAKE_DEPENDLIB_FLAGS "${STR_EXTRA_LINK_DIRS} ${STR_EXTRA_LIBS}")
-endif()
-if(NOT STR_EXTRA_SHAREDOBJS STREQUAL "")
-  SET(CMAKE_DEPENDLIB_FLAGS "${CMAKE_DEPENDLIB_FLAGS} ${STR_EXTRA_SHAREDOBJS}")
-endif()
+get_directory_property(NUISANCE_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
-if(NOT EXTRA_LINK_FLAGS STREQUAL "")
-  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
-    SET(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} ${STR_EXTRA_LINK_FLAGS}")
-  else()
-    SET(CMAKE_LINK_FLAGS "${STR_EXTRA_LINK_FLAGS}")
-  endif()
-endif()
+BuildFlagString(NUISANCE_CXX_FLAGS " " ${EXTRA_CXX_FLAGS})
+CatStringsIfNotEmpty(NUISANCE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${NUISANCE_CXX_FLAGS} )
 
 if (VERBOSE)
   cmessage (STATUS "C++ Compiler      : ${CXX_COMPILER_NAME}")
-  cmessage (STATUS "    flags         : ${CMAKE_CXX_FLAGS}")
-  cmessage (STATUS "    Release flags : ${CMAKE_CXX_FLAGS_RELEASE}")
-  cmessage (STATUS "    Debug flags   : ${CMAKE_CXX_FLAGS_DEBUG}")
-  cmessage (STATUS "    Link Flags    : ${CMAKE_LINK_FLAGS}")
-  cmessage (STATUS "    Lib Flags     : ${CMAKE_DEPENDLIB_FLAGS}")
+  cmessage (STATUS "    Flags         : ${NUISANCE_CXX_FLAGS}")
+  cmessage (STATUS "    Release Flags : ${CMAKE_CXX_FLAGS_RELEASE}")
+  cmessage (STATUS "    Debug Flags   : ${CMAKE_CXX_FLAGS_DEBUG}")
+  cmessage (STATUS "    Include Dris  : ${NUISANCE_INCLUDE_DIRS}")
+  cmessage (STATUS "    Linker Flags  : ${CMAKE_LINK_FLAGS}")
+  cmessage (STATUS "    Link Dirs     : ${NUISANCE_LINK_DIRS}")
+  cmessage (STATUS "    Lib Flags     : ${NUISANCE_DEPEND_LIBS}")
 endif()
+
+add_compile_options(${EXTRA_CXX_FLAGS})

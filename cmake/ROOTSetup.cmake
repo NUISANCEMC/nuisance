@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if ( NOT DEFINED ENV{ROOTSYS} )
+if (NOT DEFINED ENV{ROOTSYS})
   cmessage (FATAL_ERROR "$ROOTSYS is not defined, please set up ROOT first.")
 else()
   cmessage(STATUS "Using ROOT installed at $ENV{ROOTSYS}")

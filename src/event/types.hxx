@@ -24,6 +24,7 @@
 namespace nuis {
 namespace event {
 
+// Modelled off the NEUT interaction codes.
 #define NUIS_INTERACTION_CHANNEL_LIST                                          \
   X(kCCQE, 1)                                                                  \
   X(kCC2p2h, 2)                                                                \
@@ -52,6 +53,7 @@ namespace event {
   X(kNCDIS, 46)                                                                \
   X(kNCELP, 51)                                                                \
   X(kNCELN, 52)                                                                \
+  X(kNC2p2h, 53)                                                               \
                                                                                \
   X(kCCQE_nub, -1)                                                             \
   X(kCC2p2h_nub, -2)                                                           \
@@ -80,6 +82,7 @@ namespace event {
   X(kNCDIS_nub, -46)                                                           \
   X(kNCELP_nub, -51)                                                           \
   X(kNCELN_nub, -52)                                                           \
+  X(kNC2p2h_nub, -53)                                                          \
                                                                                \
   X(kUndefined, 0)
 
@@ -87,7 +90,25 @@ namespace event {
 enum class Channel_t { NUIS_INTERACTION_CHANNEL_LIST };
 #undef X
 
-typedef long PDG_t;
+#define X(A, B)                                                                \
+  case B: {                                                                    \
+    return Channel_t::A;                                                       \
+  }
+inline Channel_t FromNEUTCode(int nc) {
+  switch (nc) {
+    NUIS_INTERACTION_CHANNEL_LIST
+  default: { return Channel_t::kUndefined; }
+  }
+}
+#undef X
+
+using PDG_t = long;
+
+inline bool Is2p2h(Channel_t chan) {
+  return ((chan == Channel_t::kCC2p2h) || (chan == Channel_t::kNC2p2h) ||
+          (chan == Channel_t::kCC2p2h_nub) || (chan == Channel_t::kNC2p2h_nub));
+}
+
 } // namespace event
 } // namespace nuis
 

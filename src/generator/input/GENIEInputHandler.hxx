@@ -27,8 +27,11 @@
 
 #include "utility/ROOTUtility.hxx"
 
-#include "event1.h"
-using NuWroEvent = ::event;
+#ifdef GENIE_V3_INTERFACE
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#else
+#include "Ntuple/NtpMCEventRecord.h"
+#endif
 
 #include <memory>
 
@@ -36,28 +39,26 @@ namespace fhicl {
 class ParameterSet;
 }
 
-class NuWroInputHandler : public IInputHandler {
+class GENIEInputHandler : public IInputHandler {
   mutable nuis::utility::TreeFile fInputTree;
   mutable nuis::event::FullEvent fReaderEvent;
   mutable std::vector<double> fWeightCache;
-  mutable NuWroEvent *fTreeEvent;
+	mutable genie::NtpMCEventRecord* fGenieNtpl;
 
   bool fKeepIntermediates;
+  bool fKeepNuclearParticles;
 
 public:
 
   NEW_NUIS_EXCEPT(weight_cache_miss);
 
-  NuWroInputHandler();
-  NuWroInputHandler(NuWroInputHandler const &) = delete;
-  NuWroInputHandler(NuWroInputHandler &&);
+  GENIEInputHandler();
+  GENIEInputHandler(GENIEInputHandler const &) = delete;
+  GENIEInputHandler(GENIEInputHandler &&);
 
   void Initialize(fhicl::ParameterSet const &);
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
-
-  NuWroEvent const &GetNuWroEvent(ev_index_t idx) const;
-
   double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
 

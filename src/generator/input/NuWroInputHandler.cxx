@@ -2,8 +2,6 @@
 
 #include "generator/utility/NuWroUtility.hxx"
 
-#include "utility/ROOTUtility.hxx"
-
 #include "fhiclcpp/ParameterSet.h"
 
 #include "particle.h"
@@ -13,17 +11,18 @@ using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::nuwrotools;
 
-NuWroInputHandler::NuWroInputHandler() : fInputTree() {}
+NuWroInputHandler::NuWroInputHandler() : fInputTree(), fTreeEvent(nullptr) {}
 NuWroInputHandler::NuWroInputHandler(NuWroInputHandler &&other)
     : fInputTree(std::move(other.fInputTree)),
-      fReaderEvent(std::move(other.fReaderEvent)) {}
+      fReaderEvent(std::move(other.fReaderEvent)),
+      fTreeEvent(other.fTreeEvent) {}
 
 void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fInputTree = CheckGetTTree(ps.get<std::string>("file"), "treeout");
 
-  fReaderEvent.fNuWroEvent = nullptr;
-  fInputTree.tree->SetBranchAddress("e", &fReaderEvent.fNuWroEvent);
+  fTreeEvent = nullptr;
+  fInputTree.tree->SetBranchAddress("e", &fTreeEvent);
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 }
@@ -36,11 +35,10 @@ MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
 
   fInputTree.tree->GetEntry(idx);
 
-  fReaderEvent.mode = NuWroEventChannel(*fReaderEvent.fNuWroEvent);
-  fReaderEvent.probe_E = fReaderEvent.fNuWroEvent->in[0].E();
-  fReaderEvent.probe_pdg = fReaderEvent.fNuWroEvent->in[0].pdg;
-  fReaderEvent.XSecWeight =
-      fReaderEvent.fNuWroEvent->weight / double(GetNEvents());
+  fReaderEvent.mode = NuWroEventChannel(*fTreeEvent);
+  fReaderEvent.probe_E = fTreeEvent->in[0].E();
+  fReaderEvent.probe_pdg = fTreeEvent->in[0].pdg;
+  fReaderEvent.XSecWeight = fTreeEvent->weight / double(GetNEvents());
 
   if (fWeightCache.size() <= idx) {
     fWeightCache.push_back(fReaderEvent.XSecWeight);
@@ -54,8 +52,8 @@ FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
 
   fReaderEvent.ClearParticleStack();
 
-  for (size_t p_it = 0; p_it < fReaderEvent.fNuWroEvent->in.size(); ++p_it) {
-    NuWroParticle &part = fReaderEvent.fNuWroEvent->in[p_it];
+  for (size_t p_it = 0; p_it < fTreeEvent->in.size(); ++p_it) {
+    NuWroParticle &part = fTreeEvent->in[p_it];
 
     Particle nuis_part;
 
@@ -68,10 +66,9 @@ FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
         .particles.push_back(nuis_part);
   }
 
-  for (size_t p_it = 0;
-       p_it < fKeepIntermediates && fReaderEvent.fNuWroEvent->out.size();
+  for (size_t p_it = 0; p_it < fKeepIntermediates && fTreeEvent->out.size();
        ++p_it) {
-    NuWroParticle &part = fReaderEvent.fNuWroEvent->out[p_it];
+    NuWroParticle &part = fTreeEvent->out[p_it];
 
     Particle nuis_part;
 
@@ -83,9 +80,8 @@ FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
             Particle::Status_t::kPrimaryFinalState)]
         .particles.push_back(nuis_part);
   }
-  for (size_t p_it = 0; (p_it < fReaderEvent.fNuWroEvent->post.size());
-       ++p_it) {
-    NuWroParticle &part = fReaderEvent.fNuWroEvent->post[p_it];
+  for (size_t p_it = 0; (p_it < fTreeEvent->post.size()); ++p_it) {
+    NuWroParticle &part = fTreeEvent->post[p_it];
 
     Particle nuis_part;
 
@@ -98,6 +94,11 @@ FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
   }
 
   return fReaderEvent;
+}
+
+NuWroEvent const &NuWroInputHandler::GetNuWroEvent(ev_index_t idx) const {
+  (void)GetMinimalEvent(idx);
+  return *fTreeEvent;
 }
 
 double NuWroInputHandler::GetEventWeight(ev_index_t idx) const {

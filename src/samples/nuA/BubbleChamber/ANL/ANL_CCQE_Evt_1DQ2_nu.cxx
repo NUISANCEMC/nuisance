@@ -37,8 +37,8 @@ public:
   Publication Pub;
   std::string Pub_str;
   bool UseD2Corr;
-  std::unique_ptr<TH> fD2CorrHist;
-  std::unique_ptr<TH> fPrediction_Uncorr;
+  std::unique_ptr<HistType> fD2CorrHist;
+  std::unique_ptr<HistType> fPrediction_Uncorr;
 
   ANL_CCQE_Evt_1DQ2_nu()
       : Pub(kPRD26), Pub_str(""), UseD2Corr(false), fD2CorrHist(nullptr) {
@@ -123,7 +123,7 @@ public:
         global_sample_configuration.get<bool>("use_D2_correction", false));
 
     if (UseD2Corr) {
-      fD2CorrHist = nuis::utility::GetHistogram<TH>(
+      fD2CorrHist = nuis::utility::GetHistogram<HistType>(
           GetDataDir() + "nuA/BubbleChamber/ANL/CCQE/"
                          "ANL_CCQE_Data_PRL31_844.root;ANL_1DQ2_Correction");
       fPrediction_Uncorr = Clone(fPrediction, true);
@@ -183,7 +183,7 @@ public:
   void Write() {
     SimpleDataComparison_1D::Write();
     if (UseD2Corr) {
-      nuis::persistency::WriteToOutputFile<TH>(
+      nuis::persistency::WriteToOutputFile<HistType>(
           fPrediction_Uncorr, "Prediction_Uncorr", write_directory);
     }
   }

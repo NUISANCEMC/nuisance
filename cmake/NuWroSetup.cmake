@@ -23,9 +23,9 @@ if(NUWRO STREQUAL "")
     "This must be set to point to a prebuilt NuWro instance.")
 endif()
 
-LIST(APPEND EXTRA_CXX_FLAGS -DNUWRO_ENABLED -Wno-sign-compare -Wno-unused-variable -Wno-reorder)
+LIST(APPEND EXTRA_CXX_FLAGS -DUSE_NUWRO -Wno-sign-compare -Wno-unused-variable -Wno-reorder)
 
-LIST(APPEND EXTRA_CXX_FLAGS -I${NUWRO}/src)
+include_directories(${NUWRO}/src)
 
 if(NOT EXISTS ${NUWRO}/bin/event1.so)
   if(EXISTS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)

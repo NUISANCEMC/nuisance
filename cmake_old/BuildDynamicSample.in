@@ -77,9 +77,9 @@ echo -e "static char const * SampleNames[] = {\"${CN}\"};\n"\
 "void DSF_DestroySample(MeasurementBase* mb) { delete mb; }\n"\
 "}" >> compile.tmp/$1
 
-echo "g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@"
+echo "g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @NUISANCE_DEPEND_LIBS@"
 
-if ! g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @CMAKE_DEPENDLIB_FLAGS@; then
+if ! g++ ${DYNSAMPLE_EXTRA_BUILD_FLAGS} compile.tmp/$1 -shared -o $2 -fPIC @CMAKE_CXX_FLAGS@ -I. -I@ALL_INCLUDES_STR@ -L@CMAKE_INSTALL_PREFIX@/lib -l@ALL_MODULETARGETS_STR@ @CMAKE_LINK_FLAGS@ @NUISANCE_DEPEND_LIBS@; then
   echo "[ERROR]: Failed to compile $1. Generated code can be found in ./compile.tmp/$1"
 else
   rm -r compile.tmp

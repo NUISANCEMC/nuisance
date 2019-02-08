@@ -13,4 +13,4 @@ ExternalProject_Add(fhiclcpp-simple
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
   -DSETUPFILENAME=fhiclcpp.setup.sh)
 
-LIST(APPEND EXTRA_CXX_FLAGS -I${CMAKE_INSTALL_PREFIX}/include)
+include_directories(${CMAKE_INSTALL_PREFIX}/include)

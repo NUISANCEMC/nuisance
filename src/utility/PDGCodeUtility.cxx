@@ -105,6 +105,8 @@ bool IsAntiMatter(PDG_t pdg) {
   return (pdg < 0);
 }
 
+bool IsNuclearPDG(event::PDG_t pdg) { return (pdg > 1000000000); }
+
 PDG_t MakeNuclearPDG(size_t A, size_t Z) {
   return 1000 * Z + 10 * A + 1000000000;
 }

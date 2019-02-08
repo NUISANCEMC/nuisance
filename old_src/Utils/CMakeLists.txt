@@ -68,8 +68,8 @@ set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
 #add_executable(DumpROOTClassesFromVector DumpROOTClassesFromVector.cxx GeneralUtils.cxx FitLogger.cxx PythiaQuiet.f)
 #
 #  #Strip out -lNuWro_event1
-#  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${CMAKE_DEPENDLIB_FLAGS})
-#  cmessage(DEBUG "Attempted to strip out nuwro library: \"${CMAKE_DEPENDLIB_FLAGS}\" -> \"${NWEVSTRIPPED_CDF}\"")
+#  string(REPLACE "-lNuWro_event1" "" NWEVSTRIPPED_CDF ${NUISANCE_DEPEND_LIBS})
+#  cmessage(DEBUG "Attempted to strip out nuwro library: \"${NUISANCE_DEPEND_LIBS}\" -> \"${NWEVSTRIPPED_CDF}\"")
 #  target_link_libraries(DumpROOTClassesFromVector ${NWEVSTRIPPED_CDF})
 #  if(NOT CMAKE_LINK_FLAGS STREQUAL "")
 #    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})

@@ -17,40 +17,31 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef EVENT_MINIMALEVENT_HXX_SEEN
-#define EVENT_MINIMALEVENT_HXX_SEEN
+#pragma once
+
+#include "event/Particle.hxx"
 
 #include "event/types.hxx"
 
+class TGraph;
+
+namespace genie {
+class GHepRecord;
+class GHepParticle;
+} // namespace genie
+
 namespace nuis {
-namespace event {
-///\brief The minimal event information needed to perform reweights.
-///
-/// Most often, event selections cannot be applied using this reduced format.
-class MinimalEvent {
-public:
-  MinimalEvent();
-  MinimalEvent(MinimalEvent const &) = delete;
-  MinimalEvent(MinimalEvent &&);
-  MinimalEvent &operator=(MinimalEvent &&);
+namespace genietools {
 
-  /// Make a clone of this MinimalEvent
-  MinimalEvent Clone() const;
+NEW_NUIS_EXCEPT(invalid_GENIE_event);
 
-  /// True interaction mode
-  Channel_t mode;
-  /// True probe energy
-  double probe_E;
-  /// True probe particle code
-  PDG_t probe_pdg;
+TGraph const &GetGENIESpline(std::string const &SplineFile,
+                             std::string const &SplineIdentifier);
 
-  PDG_t target_pdg;
+event::Channel_t GetEventChannel(genie::GHepRecord const &);
 
-  /// Event-weight that can be used to scale to a cross-section prediction
-  double XSecWeight;
-  /// Event weight incurred from current reweight engine state.
-  double RWWeight;
-};
-} // namespace core
+event::Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
+                                              event::Channel_t chan);
+
+} // namespace genietools
 } // namespace nuis
-#endif
