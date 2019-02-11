@@ -72,11 +72,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 
 add_subdirectory(src)
 
-configure_file(cmake/setup.sh.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
-  ${CMAKE_INSTALL_PREFIX})
+add_subdirectory(scripts)
 
 add_subdirectory(config)
 add_subdirectory(data)

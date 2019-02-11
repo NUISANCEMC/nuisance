@@ -1,0 +1,180 @@
+// Copyright 2018 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
+
+//********************************************************************
+
+#include "samples/SimpleDataComparison.hxx"
+
+#include "utility/EventTopologyUtility.hxx"
+#include "utility/FullEventUtility.hxx"
+#include "utility/KinematicUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+
+using namespace nuis::event;
+using namespace nuis::utility;
+
+class __SAMPLE_NAME__ : public __SDC_TYPE__ {
+
+  //! Add any extra plots that you want to fill as data members of the
+  //! comparisons class.
+  // std::unique_ptr<TH1> Extra_plot;
+
+public:
+  __SAMPLE_NAME__() { ReadGlobalConfigDefaults(); }
+
+  std::string GetDocumentation() { return ""; }
+  fhicl::ParameterSet GetExampleConfiguration() {
+    fhicl::ParameterSet exps = __SDC_TYPE__::GetExampleConfiguration();
+
+    return exps;
+  }
+
+  void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
+
+    //! Set the verbosity of the sample logging macros.
+    if (instance_sample_configuration.has_key("verbosity")) {
+      SetSampleVerbosity(
+          instance_sample_configuration.get<std::string>("verbosity"));
+
+      //! Use these macros within member functions to log to the terminal
+      //! See src/samples/IEventProcessor.hxx for more details.
+      IEventProcessor_INFO(
+          "Verbosity set: "
+          << instance_sample_configuration.get<std::string>("verbosity"));
+    }
+
+    // Get the global configuration for this sample, if it exists.
+    fhicl::ParameterSet const &global_sample_configuration =
+        nuis::config::GetDocument().get<fhicl::ParameterSet>(
+            std::string("global.sample_configuration.") + Name(),
+            fhicl::ParameterSet());
+
+    //! This will automatically set the data histogram to be loaded.
+    // SetData(
+    //     GetDataDir() +
+    //     "path/to/data;histname");
+
+    //! Instantiate any extra plots that you want to fill
+    // Extra_plot = std::unique_ptr<TH1D>(
+    //     new TH1D("Extra_plot",
+    //              "title;xlabel;ylabel",
+    //              nbinsx,xlow,xhigh));
+
+    // Perform any per-sample configuration in the base class
+    __SDC_TYPE__::Initialize(instance_sample_configuration);
+
+    //! Define your event signal here.
+    IsSigFunc = [](FullEvent const &fev) -> bool {
+      //! See src/utility/EventTopologyUtility.hxx for more pre-defined
+      //! topological signals.
+      // if (!IsCC0Pi(fev)) {
+      //   return false;
+      // }
+
+      //! See src/event/FullEvent.hxx for the full event class definition.
+      //! See src/utility/FullEventUtility.hxx for more helper methods for
+      //! interacting with the event class.
+
+      //! Get the initial state anti-muon neutrino
+      // Particle ISNumuBar = GetHMISParticle(fev, {pdgcodes::kNuMuBar});
+      //! An nuis::event::Particle that return true for !part is invalid and
+      //! does not exist on the particle stack. i.e. here, the selection fails
+      //! if the event didn't have an initial state numubar.
+      // if (!ISNumuBar) {
+      //   return false;
+      // }
+
+      //! Get the final state anti-muon
+      // Particle FSMuPlus = GetHMFSParticle(fev, {pdgcodes::kMuPlus});
+      // if (!FSMuPlus) {
+      //   return false;
+      // }
+
+      //! Cut on kinematic properties of the true final state.
+      // if (FSMuPlus.CosTheta() < 0.84) {
+      //   return false;
+      // }
+
+      //! Select the event!
+      return true;
+    };
+
+    //! 1D Projection function
+    //! This function takes selected events and returns an array of size, the
+    //! dimensionality of the comparisons (__SDC_TYPE__::NDim)
+    CompProjFunc =
+        [](FullEvent const &fev) -> std::array<double, __SDC_TYPE__::NDim> {
+      // Particle FSMuPlus = GetHMFSParticle(fev, {pdgcodes::kMuPlus});
+      // return {FSMuPlus.P()};
+      return {
+          1,
+      };
+    };
+
+    //! Here you fill any custom histograms or TTrees that your sample handles.
+    //! Note the [&] means that the generated closure object will take a
+    //! reference to any in scope variables that are used within the lambda
+    //! body. As this method is then called outside of the scope of this
+    //! Initialize method, you should not use any method-locals within the
+    //! ProcessExtraFunc body. Class members are fine as this will only be
+    //! called when the same instance of this class is alive.
+    ProcessExtraFunc = [&](FullEvent const &fev, bool isSel,
+                           double weight) -> void {
+      //! Whether this event passed the selection function. (Saves you manually
+      //! reselecting events with the IsSigFunc)
+      if (isSel) {
+        // Particle FSMuPlus = GetHMFSParticle(fev, {pdgcodes::kMuPlus});
+        //! The TH_Helper class provides some templated helper methods for
+        //! filling histogram types that are decided at compile time, these are
+        //! used by the SimpleDataComparison base class to provide a dimension
+        //! and precision agnostic interface, but they can also be used by user
+        //! classes if you see fit. See src/utility/HistogramUtility.hxx for
+        //! more details.
+        // TH_Helper<TH1>::Fill(Extra_plot, {FSMuPlus.CosTheta()}, weight);
+      }
+    };
+  }
+
+  std::string Name() { return "__SAMPLE_NAME__"; }
+
+  //! Here you can write any custom histograms to TTrees that your sample has
+  //! been handling.
+  void Write() {
+    //! The base class writes the default MC and data histograms to the output
+    //! directory automatically, so you only have to include logic to write any
+    //! custom histograms or TTrees out here.
+    __SDC_TYPE__::Write();
+
+    //! The nuis::persistency helper methods will help write your objects to the
+    //! correct place and in a TFile that will be closed before the program
+    //! exits.
+    //! They will write a copy of the TObject that is passed, so you do not need
+    //! to release/worry about double freeing any histograms passed.
+    //! write_directory is set up by the baseclass and is configurable in the
+    //! instance configuration.
+    // nuis::persistency::WriteToOutputFile<TH1>(Extra_plot,
+    // Extra_plot->GetName(),
+    //                                           write_directory);
+    //! It probably isn't a good idea to write a TTree with the above method, instead, try using nuis::persistency::GetOutputFile() to get the TFile and then manually writing/giving ownership of your TTree to the output file.
+  }
+};
+
+//! These declarations allow your class to be loaded dynamically by NUISANCE
+DECLARE_PLUGIN(IDataComparison, __SAMPLE_NAME__);
+DECLARE_PLUGIN(IEventProcessor, __SAMPLE_NAME__);

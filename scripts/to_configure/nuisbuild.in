@@ -1,0 +1,101 @@
+# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#!/bin/bash
+
+EXTRA_COMPILE_FLAGS=""
+EXTRA_LINK_FLAGS=""
+INPUT_FILE_NAME=""
+OUTPUT_LIB_NAME=""
+
+SCRIPTNAME=${0}
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+      -i|--implementation-file)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      INPUT_FILE_NAME="$2"
+      echo "[OPT]: Reading event processor implementation from: ${INPUT_FILE_NAME}"
+      shift # past argument
+      ;;
+
+      --compile-flags)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      EXTRA_COMPILE_FLAGS="$2"
+      echo "[OPT]: Including extra compile flags: ${EXTRA_COMPILE_FLAGS}"
+      shift # past argument
+      ;;
+
+      --link-flags)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      EXTRA_LINK_FLAGS="$2"
+      echo "[OPT]: Including extra linker flags: ${EXTRA_LINK_FLAGS}"
+      shift # past argument
+      ;;
+
+      -?|--help)
+
+      echo "[RUNLIKE] ${SCRIPTNAME}"
+      echo -e "\t-i|--implementation-file   : Path to IEventProcessor subclass to build into dynamically loadable shared object."
+      echo -e "\t--compile-flags            : Extra compile flags to pass to the compiler."
+      echo -e "\t--link-flags               : Extra linker flags to pass to the linker."
+      echo -e "\t-?|--help                  : Print this message."
+      exit 0
+      ;;
+
+      *)
+              # unknown option
+      echo "Unknown option $1"
+      exit 1
+      ;;
+
+  esac
+  shift
+done
+
+OUTPUT_LIB_NAME=${INPUT_FILE_NAME%.*}.so
+
+#Removes the NUISANCE filename descriptor that uses a gmake trick to insert the file name into the compiler options
+NUISANCE_CXX_FLAGS_GMAKE_SCRUB=$(echo '@NUISANCE_CXX_FLAGS@' | sed s/-D__FILENAME__=\".*\"//g)
+
+echo "@CMAKE_CXX_COMPILER@ ${INPUT_FILE_NAME} -shared -fPIC -o ${OUTPUT_LIB_NAME} ${NUISANCE_CXX_FLAGS_GMAKE_SCRUB} ${EXTRA_COMPILE_FLAGS} -D__FILENAME__=\"${INPUT_FILE_NAME##*/}\" -I. -I@CMAKE_INSTALL_PREFIX@/include  @CMAKE_LINK_FLAGS@ ${EXTRA_LINK_FLAGS} -L@CMAKE_INSTALL_PREFIX@/lib @NUISANCE_LINK_DIRS@  @NUISANCE_DEPEND_LIBS@"
+
+if ! @CMAKE_CXX_COMPILER@ ${INPUT_FILE_NAME} -shared -fPIC -o ${OUTPUT_LIB_NAME} ${NUISANCE_CXX_FLAGS_GMAKE_SCRUB} ${EXTRA_COMPILE_FLAGS} -D__FILENAME__=\"${INPUT_FILE_NAME##*/}\" -I. -I@CMAKE_INSTALL_PREFIX@/include  @CMAKE_LINK_FLAGS@ ${EXTRA_LINK_FLAGS} -L@CMAKE_INSTALL_PREFIX@/lib @NUISANCE_LINK_DIRS@  @NUISANCE_DEPEND_LIBS@; then
+  echo "[ERROR]: Failed to compile ${INPUT_FILE_NAME} -> ${OUTPUT_LIB_NAME}"
+else
+  echo "[INFO]: Successfully build: ${OUTPUT_LIB_NAME}."
+fi

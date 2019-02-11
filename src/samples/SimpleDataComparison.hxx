@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef SAMPLES_SIMPLEDATACOMPARISON_HXX_SEEN
-#define SAMPLES_SIMPLEDATACOMPARISON_HXX_SEEN
+#pragma once
 
 #include "samples/IDataComparison.hxx"
 
@@ -40,8 +39,8 @@
 #include <memory>
 #include <vector>
 
-template <size_t NDim, typename NumericT = double,
-          typename HT = typename nuis::utility::HType_Helper<NDim, void>::type>
+template <size_t nd, typename NumericT = double,
+          typename HT = typename nuis::utility::HType_Helper<nd, void>::type>
 class SimpleDataComparison : public IDataComparison {
 
   NEW_NUIS_EXCEPT(invalid_SimpleDataComparison_initialization);
@@ -50,6 +49,8 @@ class SimpleDataComparison : public IDataComparison {
 protected:
   using HistType = HT;
   using TH_Help = typename nuis::utility::TH_Helper<HistType>;
+
+  static size_t const NDim = nd;
 
   nuis::input::InputManager::Input_id_t fIH_id;
   std::string write_directory;
@@ -418,7 +419,8 @@ public:
   }
 };
 
-typedef SimpleDataComparison<1> SimpleDataComparison_1D;
-typedef SimpleDataComparison<2> SimpleDataComparison_2D;
-
-#endif
+typedef SimpleDataComparison<1, double, TH1D> SimpleDataComparison_1D;
+typedef SimpleDataComparison<2, double, TH2D> SimpleDataComparison_2D;
+typedef SimpleDataComparison<1, float, TH1F> SimpleDataComparison_1F;
+typedef SimpleDataComparison<2, float, TH2F> SimpleDataComparison_2F;
+typedef SimpleDataComparison<2, double, TH2Poly> SimpleDataComparison_2DPoly;

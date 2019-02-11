@@ -1,0 +1,117 @@
+// Copyright 2018 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+/*******************************************************************************
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
+
+//********************************************************************
+
+#include "samples/SimpleMCStudy.hxx"
+
+#include "utility/EventTopologyUtility.hxx"
+#include "utility/FullEventUtility.hxx"
+#include "utility/KinematicUtility.hxx"
+#include "utility/PDGCodeUtility.hxx"
+
+using namespace nuis::event;
+using namespace nuis::utility;
+
+class __SAMPLE_NAME__ : public SimpleMCStudy {
+
+  //! Add any plots that you want to fill as data members of the
+  //! comparisons class.
+  // std::unique_ptr<TH1> myPlot;
+
+public:
+  __SAMPLE_NAME__() { ReadGlobalConfigDefaults(); }
+
+  void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
+
+    //! Set the verbosity of the sample logging macros.
+    if (instance_sample_configuration.has_key("verbosity")) {
+      SetSampleVerbosity(
+          instance_sample_configuration.get<std::string>("verbosity"));
+
+      //! Use these macros within member functions to log to the terminal
+      //! See src/samples/IEventProcessor.hxx for more details.
+      IEventProcessor_INFO(
+          "Verbosity set: "
+          << instance_sample_configuration.get<std::string>("verbosity"));
+    }
+
+    // Get the global configuration for this sample, if it exists.
+    fhicl::ParameterSet const &global_sample_configuration =
+        nuis::config::GetDocument().get<fhicl::ParameterSet>(
+            std::string("global.sample_configuration.") + Name(),
+            fhicl::ParameterSet());
+
+    //! Instantiate any plots that you want to fill
+    // myPlot = std::unique_ptr<TH1D>(
+    //     new TH1D("myPlot",
+    //              "title;xlabel;ylabel",
+    //              nbinsx,xlow,xhigh));
+
+    // Perform any per-sample configuration in the base class
+    SimpleMCStudy::Initialize(instance_sample_configuration);
+
+    //! Here you do whatever you want to do on a per-event basis.
+    //! This method will be run for every event given by the input handler, the
+    //! weight allows differential xsecs to be plotted easily and also contains
+    //! any requested reweightable parameter variations.
+    ProcessEventFunction = [&](nuis::event::FullEvent const &ev,
+                               double weight) -> void {
+      //! Select events
+      //! See src/utility/EventTopologyUtility.hxx for more pre-defined
+      //! topological signals.
+      // if (!IsCC0Pi(fev)) {
+      //   return false;
+      // }
+
+      //! Build composite variables
+      //! See src/event/FullEvent.hxx for the full event class definition.
+      //! See src/utility/FullEventUtility.hxx for more helper methods for
+      //! interacting with the event class.
+      // Particle FSMuPlus = GetHMFSParticle(fev, {pdgcodes::kMuPlus});
+
+      //! Fill your histograms!
+      // myPlot->Fill(FSMuPlus.CosTheta(), weight);
+    };
+  }
+
+  std::string Name() { return "__SAMPLE_NAME__"; }
+
+  //! Here you can write any custom histograms to TTrees that your sample has
+  //! been handling.
+  void Write() {
+    //! The nuis::persistency helper methods will help write your objects to the
+    //! correct place and in a TFile that will be closed before the program
+    //! exits.
+    //! They will write a copy of the TObject that is passed, so you do not need
+    //! to release/worry about double freeing any histograms passed.
+    //! write_directory is set up by the baseclass and is configurable in the
+    //! instance configuration.
+    // nuis::persistency::WriteToOutputFile<TH1>(Extra_plot,
+    // Extra_plot->GetName(),
+    //                                           write_directory);
+    //! It probably isn't a good idea to write a TTree with the above method,
+    //! instead, try using nuis::persistency::GetOutputFile() to get the TFile
+    //! and then manually writing/giving ownership of your TTree to the output
+    //! file.
+  }
+};
+
+//! These declarations allow your class to be loaded dynamically by NUISANCE
+DECLARE_PLUGIN(IEventProcessor, __SAMPLE_NAME__);

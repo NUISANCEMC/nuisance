@@ -1,0 +1,131 @@
+# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+
+################################################################################
+#    This file is part of NUISANCE.
+#
+#    NUISANCE is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    NUISANCE is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+#!/bin/bash
+
+CLASS_NAME=""
+NDIMS="0"
+INPUT_FILE_NAME=""
+USE_POLY="0"
+SDC_TYPE=""
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+      -c|--class-name)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      CLASS_NAME="$2"
+      echo "[OPT]: Generating class named: ${CLASS_NAME} in implementation file: ${CLASS_NAME}.cxx"
+      shift # past argument
+      ;;
+
+      --MC)
+
+      INPUT_FILE_NAME="SimpleMCStudy.cxx.in"
+      echo "[OPT]: Generating simple MC study stub class."
+      ;;
+
+      --data)
+
+      INPUT_FILE_NAME="SimpleDataComparison.cxx.in"
+      echo "[OPT]: Generating data comparison stub class."
+      NDIMS="1"
+      ;;
+
+      -n|--n-dimensions)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      NDIMS="${2}"
+      echo "[OPT]: Using a ${NDIMS} dimensional comparison"
+      shift # past argument
+      ;;
+
+      --poly)
+
+      USE_POLY="1"
+      echo "[OPT]: Using a TH2Poly comparion."
+      ;;
+
+      -?|--help)
+
+      echo "[RUNLIKE] ${SCRIPTNAME}"
+      echo -e "\t-c|--class-name            : Name of generated event processor"
+      echo -e "\t                             class."
+      echo -e "\t--MC                       : Generate a simple MC study shell."
+      echo -e "\t--data                     : Generate a 'sample' shell."
+      echo -e "\t-n|--n-dimensions          : Dimension of the data comparison"
+      echo -e "\t                             <default = 1>. Only valid for"
+      echo -e "\t                             --data (Currently can only be 1"
+      echo -e "\t                             or 2)."
+      echo -e "\t--poly                     : Build data comparison using"
+      echo -e "\t                             TH2Poly. Only valid for --data "
+      echo -e "\t                             -n 2"
+      echo -e "\t-?|--help                  : Print this message."
+      exit 0
+      ;;
+
+      *)
+              # unknown option
+      echo "Unknown option $1"
+      exit 1
+      ;;
+
+  esac
+  shift
+done
+
+if [ ${INPUT_FILE_NAME} == "SimpleDataComparison.cxx.in" ]; then
+  if [ ${NDIMS} == "1" ]; then
+    SDC_TYPE=SimpleDataComparison_1D
+  elif [ ${NDIMS} == "2" ]; then
+    if [ ${USE_POLY} == "1" ]; then
+      SDC_TYPE=SimpleDataComparison_2DPoly
+    else
+      SDC_TYPE=SimpleDataComparison_2D
+    fi
+  else
+    echo "[ERROR]: Can only currently set dimensionality to 1 or 2 dimensions."
+    exit 1
+  fi
+fi
+
+if [ -e ${CLASS_NAME}.cxx ]; then
+  echo "[ERROR]: ${CLASS_NAME}.cxx already exists, not overwriting. Please use a different class name."
+  exit 2
+fi
+
+cp @CMAKE_INSTALL_PREFIX@/file_stubs/${INPUT_FILE_NAME} ${CLASS_NAME}.cxx
+
+sed -i "s/__SAMPLE_NAME__/${CLASS_NAME}/g" ${CLASS_NAME}.cxx
+if [ ! -z ${SDC_TYPE} ]; then
+  sed -i "s/__SDC_TYPE__/${SDC_TYPE}/g" ${CLASS_NAME}.cxx
+fi
+
+echo "[INFO]: Generated ${CLASS_NAME}.cxx"
