@@ -26,6 +26,11 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fInputTree.tree->SetBranchAddress("e", &fTreeEvent);
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
+
+  if(GetNEvents()){
+    fInputTree.tree->GetEntry(0);
+    std::cout << "[INFO]: Average NuWro XSec weight: " << (fTreeEvent->weight / double(GetNEvents())) << std::endl;
+  }
 }
 MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
   if (idx >= GetNEvents()) {

@@ -46,15 +46,23 @@ class NEUTInputHandler : public IInputHandler {
 
   bool fKeepIntermediates;
 
+  double GetMonoEXSecWeight();
+
 public:
+  NEW_NUIS_EXCEPT(weight_cache_miss);
+
   NEUTInputHandler();
   NEUTInputHandler(NEUTInputHandler const &) = delete;
   NEUTInputHandler(NEUTInputHandler &&);
 
   void Initialize(fhicl::ParameterSet const &);
+  NeutVect *GetNeutEvent(ev_index_t) const;
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
+
+  double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
+
   double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
 
   nuis::GeneratorManager::Generator_id_t GetGeneratorId();

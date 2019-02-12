@@ -42,7 +42,8 @@ public:
     write_directory = "";
     NMaxSample_override = std::numeric_limits<size_t>::max();
 
-    ProcessEventFunction = std::function<void(nuis::event::FullEvent const &, double)>();
+    ProcessEventFunction =
+        std::function<void(nuis::event::FullEvent const &, double)>();
   }
 
   fhicl::ParameterSet fGlobalConfig;
@@ -58,11 +59,9 @@ public:
 
     fInstanceConfig = instance_sample_configuration;
 
-    if (fInstanceConfig.has_key("verbosity")) {
-      SetSampleVerbosity(fInstanceConfig.get<std::string>("verbosity"));
-    } else {
-      SetSampleVerbosity("Reticent");
-    }
+    SetSampleVerbosity(fInstanceConfig.get<std::string>(
+        "verbosity", nuis::config::GetDocument().get<std::string>(
+                         "global.sample.verbosity_default", "Reticent")));
 
     ReadGlobalConfigDefaults();
 
@@ -97,6 +96,10 @@ public:
     IInputHandler::ev_index_t ev_idx = 0;
 
     while (ev_idx < NEvsToProcess) {
+      if (NToShout && !(ev_idx % NToShout)) {
+        IEventProcessor_INFO("\t\t Done " << ev_idx << "/" << NEvsToProcess
+                                          << " events.");
+      }
       nuis::event::FullEvent const &fev = IH.GetFullEvent(ev_idx);
       ProcessEventFunction(fev, IH.GetEventWeight(ev_idx) * nmax_scaling);
       ev_idx++;

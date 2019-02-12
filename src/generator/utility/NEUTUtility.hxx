@@ -1,8 +1,11 @@
-#ifndef GENERATOR_UTILITY_NEUTUTILITY_HXX_SEEN
-#define GENERATOR_UTILITY_NEUTUTILITY_HXX_SEEN
+#pragma once
 
 #include "event/Particle.hxx"
 #include "event/types.hxx"
+
+#include "exception/exception.hxx"
+
+#include <memory>
 
 class NeutPart;
 
@@ -12,4 +15,3 @@ nuis::event::Particle::Status_t GetNeutParticleStatus(NeutPart const &,
                                                       nuis::event::Channel_t);
 }
 } // namespace nuis
-#endif

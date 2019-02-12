@@ -1,11 +1,14 @@
 #include "generator/utility/NEUTUtility.hxx"
 
+#include "generator/input/NEUTInputHandler.hxx"
+
 #include "exception/exception.hxx"
 
 #include "utility/InteractionChannelUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
 
 #include "neutpart.h"
+#include "neutvect.h"
 
 using namespace nuis::event;
 using namespace nuis::utility;

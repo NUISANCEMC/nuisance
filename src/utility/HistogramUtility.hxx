@@ -155,8 +155,7 @@ struct TH_Helper<HT,
     return nuis::utility::IsFlowBin(*h.GetXaxis(), bin_it);
   }
 
-  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
-                   double w = 1) {
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v, double w = 1) {
     h.Fill(v[0], w);
   }
 
@@ -177,8 +176,8 @@ struct TH_Helper<HT,
     return IsFlowBin(*h, bin_it);
   }
 
-  static void Fill(std::unique_ptr<HT> &h,
-                   std::array<NumericT, NDim> const &v, double w = 1) {
+  static void Fill(std::unique_ptr<HT> &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
     Fill(*h, v, w);
   }
 
@@ -211,8 +210,7 @@ struct TH_Helper<HT,
            nuis::utility::IsFlowBin(*h.GetYaxis(), ybin_it);
   }
 
-  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
-                   double w = 1) {
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v, double w = 1) {
     h.Fill(v[0], v[1], w);
   }
 
@@ -234,8 +232,8 @@ struct TH_Helper<HT,
     return IsFlowBin(*h, xbin_it, ybin_it);
   }
 
-  static void Fill(std::unique_ptr<HT> &h,
-                   std::array<NumericT, NDim> const &v, double w = 1) {
+  static void Fill(std::unique_ptr<HT> &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
     Fill(*h, v, w);
   }
 
@@ -261,8 +259,7 @@ struct TH_Helper<
 
   static bool IsFlowBin(HT const &h, Int_t bin_it) { return (bin_it < 0); }
 
-  static void Fill(HT &h, std::array<NumericT, NDim> const &v,
-                   double w = 1) {
+  static void Fill(HT &h, std::array<NumericT, NDim> const &v, double w = 1) {
     h.Fill(v[0], v[1], w);
   }
 
@@ -314,8 +311,8 @@ struct TH_Helper<
     return IsFlowBin(*h, bin_it);
   }
 
-  static void Fill(std::unique_ptr<HT> &h,
-                   std::array<NumericT, NDim> const &v, double w = 1) {
+  static void Fill(std::unique_ptr<HT> &h, std::array<NumericT, NDim> const &v,
+                   double w = 1) {
     Fill(*h, v, w);
   }
 
@@ -368,26 +365,32 @@ inline std::unique_ptr<HT> Clone(std::unique_ptr<HT> const &source,
 }
 
 template <typename HT>
-inline std::unique_ptr<HT> GetHistogramFromROOTFile(TFile_ptr &f,
-                                                    std::string const &hname) {
+inline std::unique_ptr<HT>
+GetHistogramFromROOTFile(TFile_ptr &f, std::string const &hname,
+                         bool ThrowIfMissing = true) {
 
   f->Get(hname.c_str());
   HT *h = dynamic_cast<HT *>(f->Get(hname.c_str()));
   if (!h) {
-    throw invalid_histogram_name()
-        << "[ERROR]: Failed to get " << TH_Helper<HT>::name() << " named "
-        << std::quoted(hname) << " from input file "
-        << std::quoted(f->GetName());
+    if (ThrowIfMissing) {
+      throw invalid_histogram_name()
+          << "[ERROR]: Failed to get " << TH_Helper<HT>::name() << " named "
+          << std::quoted(hname) << " from input file "
+          << std::quoted(f->GetName());
+    } else {
+      return nullptr;
+    }
   }
   std::unique_ptr<HT> clone = Clone<HT>(*h);
   return clone;
 }
 
 template <typename HT>
-inline std::unique_ptr<HT> GetHistogramFromROOTFile(std::string const &fname,
-                                                    std::string const &hname) {
+inline std::unique_ptr<HT>
+GetHistogramFromROOTFile(std::string const &fname, std::string const &hname,
+                         bool ThrowIfMissing = true) {
   TFile_ptr temp = CheckOpenTFile(fname, "READ");
-  return GetHistogramFromROOTFile<HT>(temp, hname);
+  return GetHistogramFromROOTFile<HT>(temp, hname, ThrowIfMissing);
 }
 
 template <typename HT>
