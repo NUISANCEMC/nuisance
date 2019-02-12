@@ -59,7 +59,7 @@ else()
   endif()
 
   # If you are using a version of NuWro without reweighting use this to compile.
-  if(USE_NuWro_RW)
+  if(USE_NUWRO_RW)
 
     if(NUWRO_INC STREQUAL "")
       cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
@@ -68,7 +68,7 @@ else()
 
     LIST(APPEND EXTRA_CXX_FLAGS -D__NUWRO_ENABLED__ -D__NUWRO_REWEIGHT_ENABLED__)
 
-    if(USE_NuWro_SRW_Event)
+    if(USE_NUWRO_SRW_Event)
           LIST(APPEND EXTRA_CXX_FLAGS -D__USE_NUWRO_SRW_EVENTS__)
     endif()
 

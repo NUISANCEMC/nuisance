@@ -1,11 +1,10 @@
-#ifndef GENERATOR_VARIATION_FILLENEUTCOMMONS_HXX_SEEN
-#define GENERATOR_VARIATION_FILLENEUTCOMMONS_HXX_SEEN
+#pragma once
 
 #include "NFortFns.h" // Contains all the NEUT common blocks
 
 namespace NEUTUtils {
 
-inline void FillNeutCommons(NeutVect *nvect) {
+inline void FillNeutCommons(NeutVect const *nvect_const) {
   // WARNING: This has only been implemented for a neuttree and not GENIE
   // This should be kept in sync with T2KNIWGUtils::GetNIWGEvent(TTree)
 
@@ -15,6 +14,11 @@ inline void FillNeutCommons(NeutVect *nvect) {
   // neutversion_.nuccv  =   nvect->NUCCVer;
 
   // Documentation: See nework.h
+
+  // Dangerous... but hoping that these methods don't actually modify the
+  // vector.
+  NeutVect *nvect = const_cast<NeutVect *>(nvect_const);
+
   nework_.modene = nvect->Mode;
   nework_.numne = nvect->Npart();
 
@@ -155,5 +159,3 @@ inline void FillNeutCommons(NeutVect *nvect) {
 }
 
 } // namespace NEUTUtils
-
-#endif

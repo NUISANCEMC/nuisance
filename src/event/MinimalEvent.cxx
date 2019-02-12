@@ -4,11 +4,11 @@ namespace nuis {
 namespace event {
 MinimalEvent::MinimalEvent()
     : mode(Channel_t::kUndefined), probe_E(0), probe_pdg(0), XSecWeight(1),
-      RWWeight(1) {}
+      RWWeight(1), fGenEvent(nullptr) {}
 
 MinimalEvent::MinimalEvent(MinimalEvent &&other)
     : mode(other.mode), probe_E(other.probe_E), probe_pdg(other.probe_pdg),
-      XSecWeight(other.XSecWeight), RWWeight(other.RWWeight) {}
+      XSecWeight(other.XSecWeight), RWWeight(other.RWWeight), fGenEvent(other.fGenEvent) {}
 
 MinimalEvent &MinimalEvent::operator=(MinimalEvent &&other) {
   mode = other.mode;
@@ -16,6 +16,7 @@ MinimalEvent &MinimalEvent::operator=(MinimalEvent &&other) {
   probe_pdg = other.probe_pdg;
   XSecWeight = other.XSecWeight;
   RWWeight = other.RWWeight;
+  fGenEvent = other.fGenEvent;
 
   return *this;
 }
@@ -27,6 +28,7 @@ MinimalEvent MinimalEvent::Clone() const {
   clone.probe_pdg = probe_pdg;
   clone.XSecWeight = XSecWeight;
   clone.RWWeight = RWWeight;
+  clone.fGenEvent = fGenEvent;
 
   return clone;
 }

@@ -36,7 +36,7 @@ namespace utility {
 NEW_NUIS_EXCEPT(failed_to_open_TFile);
 NEW_NUIS_EXCEPT(failed_to_get_TTree);
 
-void CloseTFile(TFile *f = nullptr) {
+inline void CloseTFile(TFile *f = nullptr) {
   if (f) {
     std::cout << "[INFO]: Shutting TFile: " << f->GetName() << ", " << f
               << std::endl;
@@ -134,7 +134,7 @@ inline TreeFile MakeNewTTree(std::string const &fname, std::string const &tname,
   return tf;
 }
 
-std::string SanitizeROOTObjectName(std::string name) { return name; }
+inline std::string SanitizeROOTObjectName(std::string name) { return name; }
 
 } // namespace utility
 } // namespace nuis

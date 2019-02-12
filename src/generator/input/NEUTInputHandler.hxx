@@ -17,28 +17,32 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_INPUT_NEUTINPUTHANDLER_HXX_SEEN
-#define GENERATOR_INPUT_NEUTINPUTHANDLER_HXX_SEEN
+#pragma once
 
 #include "event/FullEvent.hxx"
 
 #include "input/IInputHandler.hxx"
 
+#include "utility/ROOTUtility.hxx"
+
 #include <memory>
+
+class NeutVect;
+class TH1;
 
 namespace fhicl {
 class ParameterSet;
 }
 
-namespace nuis {
-namespace utility {
-class TreeFile;
-}
-} // namespace nuis
-
 class NEUTInputHandler : public IInputHandler {
-  mutable std::unique_ptr<nuis::utility::TreeFile> fInputTreeFile;
+  mutable nuis::utility::TreeFile fInputTreeFile;
   mutable nuis::event::FullEvent fReaderEvent;
+  mutable NeutVect *fNeutVect;
+  mutable std::vector<double> fWeightCache;
+
+  std::unique_ptr<TH1> fFlux;
+  std::unique_ptr<TH1> fEvtrt;
+  double fFileWeight;
 
   bool fKeepIntermediates;
 
@@ -51,8 +55,7 @@ public:
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
   size_t GetNEvents() const;
-  double GetXSecScaleFactor(
-      std::pair<double, double> const &EnuRange) const;
-};
+  double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
 
-#endif
+  nuis::GeneratorManager::Generator_id_t GetGeneratorId();
+};

@@ -4,7 +4,7 @@
 
 #include "event/MinimalEvent.hxx"
 
-#include "samples/IDataComparison.hxx"
+#include "samples/IEventProcessor.hxx"
 
 #include "plugins/Instantiate.hxx"
 
@@ -43,14 +43,12 @@ int main(int argc, char const *argv[]) {
     std::cout << "[INFO]: Reading sample: "
               << samp_config.get<std::string>("name") << std::endl;
 
-    nuis::plugins::plugin_traits<IDataComparison>::unique_ptr_t sample =
-        nuis::plugins::Instantiate<IDataComparison>(
+    nuis::plugins::plugin_traits<IEventProcessor>::unique_ptr_t sample =
+        nuis::plugins::Instantiate<IEventProcessor>(
             samp_config.get<std::string>("name"));
 
     sample->Initialize(samp_config);
     sample->ProcessSample(NMax);
-    std::cout << "[INFO]:\t Sample GOF = " << sample->GetGOF() << " / "
-              << sample->GetNDOGuess() << std::endl;
     sample->Write();
   }
 

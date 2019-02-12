@@ -82,7 +82,7 @@ CheckAndSetDefaultCache(USE_GENERATOR_REWEIGHT TRUE BOOL "Whether we are using t
 CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
 
 # NuWro
-CheckAndSetDefaultCache(USE_NuWro FALSE BOOL "Whether to enable NuWro support. <FALSE>")
+CheckAndSetDefaultCache(USE_NUWRO FALSE BOOL "Whether to enable NuWro support. <FALSE>")
 CheckAndSetDefaultEnv(NUWRO "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
 CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes directory, needs to contain \"params_all.h\". Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
 

@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef PLUGINS_TRAITS_HXX_SEEN
-#define PLUGINS_TRAITS_HXX_SEEN
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -72,5 +71,3 @@ template <typename T> struct plugin_traits {};
     delete reinterpret_cast<PLUGIN_CLASS_NAME *>(instance);                    \
   }                                                                            \
   }
-
-#endif

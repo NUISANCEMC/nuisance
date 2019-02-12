@@ -52,6 +52,7 @@ public:
   bool operator!() const { return (pdg == std::numeric_limits<PDG_t>::max()); }
 
   double E() const { return P4.E(); }
+  double KE() const { return P4.E() - P4.M(); }
   double P() const { return P4.Vect().Mag(); }
   TVector3 P3() const { return P4.Vect(); }
   double M() const { return P4.M(); }

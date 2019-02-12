@@ -90,7 +90,7 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
   echo "add_to_LD_LIBRARY_PATH \$NUISANCE/deps/neut" >> setup.sh
 fi
 
-if [ "@USE_NuWro@" != "FALSE" ]; then
+if [ "@USE_NUWRO@" != "FALSE" ]; then
   if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
     mkdir deps/nuwro
     mkdir exes/nuwro

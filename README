@@ -16,7 +16,7 @@ The following instructions should be used to build the fitter after checking out
 1. Make sure environmental variables required for the generators you wish to build against are set.
 2. In the top nuisance directory make a new build directory: "$mkdir build && cd build"
 3. Run CMAKE with compiler flags for which generators are required
-   "$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=0 ../"
+   "$ cmake -DUSE_NUWRO=1 -DUSE_NEUT=1 -DUSE_GENIE=0 ../"
 4. Build the fitter
    "$ make -j"
 5. Build documentation

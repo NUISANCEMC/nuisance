@@ -17,46 +17,40 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef GENERATOR_VARIATION_NEUTREWEIGHT_HXX_SEEN
-#define GENERATOR_VARIATION_NEUTREWEIGHT_HXX_SEEN
-
-#include "variation/IWeightProvider.hxx"
+#pragma once
 
 #include "exception/exception.hxx"
 
-#include "parameters/ParameterManager.hxx"
-
-#include "NSyst.h"
-
-#include <memory>
+#include <string>
 #include <vector>
 
-namespace neut {
-namespace rew {
-class NReWeight;
-}
-} // namespace neut
+namespace nuis {
+/// Singleton class used to register generator compatibilty by string.
+///
+/// Used for
+class GeneratorManager {
 
-class NEUTWeightEngine : public IWeightProvider {
+  GeneratorManager();
 
-  struct NEUTSystParam {
-    nuis::params::paramId_t pid;
-    neut::rew::NSyst_t nsyst;
-  };
+  static GeneratorManager *_global_inst;
 
-  std::vector<NEUTSystParam> fNEUTSysts;
-  std::unique_ptr<neut::rew::NReWeight> fNeutRW;
+  std::vector<std::string> Generators;
 
 public:
-  NEW_NUIS_EXCEPT(invalid_NEUT_syst_name);
+  static GeneratorManager &Get();
 
-  void Initialize(fhicl::ParameterSet const &);
-  void Reconfigure();
-  double GetEventWeight(nuis::event::MinimalEvent const &);
-  std::string GetName();
-  std::string GetDocumentation();
-  fhicl::ParameterSet GetExampleConfiguration();
-  nuis::GeneratorManager::Generator_id_t GetGeneratorId();
+  NEW_NUIS_EXCEPT(unknown_generator);
+  using Generator_id_t = size_t;
+
+  static Generator_id_t const kAll = std::numeric_limits<Generator_id_t>::max();
+
+  Generator_id_t EnsureGeneratorRegistered(std::string const &);
+  Generator_id_t GetGeneratorId(std::string const &) const;
+  /// Checks whether two generator ids are compatible
+  ///
+  /// Generator id's are compatible if either one is equal to kAll (i.e. that an
+  /// event plugin doesn't need any generator-specific information) or they are
+  /// equal.
+  static bool AreCompatible(Generator_id_t, Generator_id_t);
 };
-
-#endif
+} // namespace nuis

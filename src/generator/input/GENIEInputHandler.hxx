@@ -43,13 +43,12 @@ class GENIEInputHandler : public IInputHandler {
   mutable nuis::utility::TreeFile fInputTree;
   mutable nuis::event::FullEvent fReaderEvent;
   mutable std::vector<double> fWeightCache;
-	mutable genie::NtpMCEventRecord* fGenieNtpl;
+  mutable genie::NtpMCEventRecord *fGenieNtpl;
 
   bool fKeepIntermediates;
   bool fKeepNuclearParticles;
 
 public:
-
   NEW_NUIS_EXCEPT(weight_cache_miss);
 
   GENIEInputHandler();
@@ -62,6 +61,7 @@ public:
   double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
 
-    double GetXSecScaleFactor(
-        std::pair<double, double> const &EnuRange) const;
+  double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
+
+  nuis::GeneratorManager::Generator_id_t GetGeneratorId();
 };

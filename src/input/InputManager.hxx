@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef INPUT_INPUTMANAGER_HXX_SEEN
-#define INPUT_INPUTMANAGER_HXX_SEEN
+#pragma once
 
 #include "input/IInputHandler.hxx"
 
@@ -47,12 +46,13 @@ class InputManager {
   InputManager();
 
   static InputManager *_global_inst;
-public:
 
+public:
   static InputManager &Get();
 
   NEW_NUIS_EXCEPT(unknown_input);
-  typedef size_t Input_id_t;
+  NEW_NUIS_EXCEPT(unsupported_input_type);
+  using Input_id_t = size_t;
 
   Input_id_t EnsureInputLoaded(fhicl::ParameterSet const &);
   Input_id_t GetInputId(std::string const &) const;
@@ -60,5 +60,3 @@ public:
 };
 } // namespace input
 } // namespace nuis
-
-#endif

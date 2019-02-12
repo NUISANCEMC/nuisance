@@ -45,7 +45,6 @@ class NuWroInputHandler : public IInputHandler {
   bool fKeepIntermediates;
 
 public:
-
   NEW_NUIS_EXCEPT(weight_cache_miss);
 
   NuWroInputHandler();
@@ -61,6 +60,7 @@ public:
   double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
 
-    double GetXSecScaleFactor(
-        std::pair<double, double> const &EnuRange) const;
+  double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
+
+  nuis::GeneratorManager::Generator_id_t GetGeneratorId();
 };

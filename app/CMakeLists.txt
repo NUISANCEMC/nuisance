@@ -56,7 +56,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
 include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
 include_directories(${EXP_INCLUDE_DIRECTORIES})
 
-if (USE_NuWro AND NOT NUWRO_BUILT_FROM_FILE)
+if (USE_NUWRO)
   add_executable(nuwro_nuisance nuwro_NUISANCE.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuwro_nuisance)
   target_link_libraries(nuwro_nuisance ${MODULETargets})
@@ -190,7 +190,7 @@ endif()
 
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
-if(USE_NuWro)
+if(USE_NUWRO)
   add_executable(PrepareNuwro PrepareNuwroEvents.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNuwro)
   target_link_libraries(PrepareNuwro ${MODULETargets})
@@ -222,4 +222,3 @@ install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
 #    set_target_properties(DumpROOTClassesFromVector PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS})
 #  endif()
 #install(TARGETS DumpROOTClassesFromVector DESTINATION bin)
-

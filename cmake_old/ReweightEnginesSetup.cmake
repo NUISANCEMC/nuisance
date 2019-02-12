@@ -48,10 +48,10 @@ if(USE_NEUT)
   set(USE_NEUT TRUE CACHE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>" FORCE)
 endif()
 #################################  NuWro  ######################################
-if(USE_NuWro)
+if(USE_NUWRO)
   include(${CMAKE_SOURCE_DIR}/cmake/NuWroSetup.cmake)
   cmessage(STATUS "Using NuWro Reweight engine.")
-  set(USE_NuWro TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
+  set(USE_NUWRO TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
 endif()
 ##################################  GENIE  #####################################
 if(USE_GENIE)

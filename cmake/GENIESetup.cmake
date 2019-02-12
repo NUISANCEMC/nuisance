@@ -174,15 +174,14 @@ else()
     ${LOG4CPP_INC})
 endif(GENIE_VERSION VERSION_GREATER 2.12.999)
 
-BuildFlagString(GENIE_CXX_FLAGS " " ${GENIE_CXX_FLAGS})
-BuildFlagString(GENIE_LINK_DIRS "-L" ${GENIE_LINK_DIRS})
+PrefixList(GENIE_LINK_DIRS "-L" ${GENIE_LINK_DIRS})
 
 set(NEED_PYTHIA6 TRUE)
 set(NEED_ROOTPYTHIA6 TRUE)
 
 set(NEED_ROOTEVEGEN TRUE)
 
-SET(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)
+SET(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE support. Requires external libraries. <FALSE>" FORCE)
 
 cmessage(STATUS "GENIE")
 cmessage(STATUS "     Version   : ${GENIE_VERSION}")

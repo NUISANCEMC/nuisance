@@ -82,5 +82,25 @@ double GetNeutrinoQ2QERec(FullEvent const &fev, double SeparationEnergy_MeV) {
                                 (el_GeV - pl_GeV * cos(Theta_nu_mu));
 }
 
+TLorentzVector GetEnergyMomentumTransfer(event::FullEvent const &fev) {
+  Particle const &neutrino = GetHMISNeutralLepton(fev);
+  if (!neutrino) {
+    throw Particle::invalid_particle()
+        << "[ERROR]: In GetEnergyMomentumTransfer, expected to be able to get "
+           "IS neutral lepton, but found none: \n"
+        << fev.to_string();
+  }
+
+  Particle const &charged_lepton = GetHMFSChargedLepton(fev);
+  if (!charged_lepton) {
+    throw Particle::invalid_particle()
+        << "[ERROR]: In GetEnergyMomentumTransfer, expected to be able to get "
+           "FS charged lepton, but found none: \n"
+        << fev.to_string();
+  }
+
+    return (neutrino.P4 - charged_lepton.P4);
+}
+
 } // namespace utility
 } // namespace nuis

@@ -20,6 +20,8 @@
 #ifndef UTILITY_KINEMATICUTILITY_HXX_SEEN
 #define UTILITY_KINEMATICUTILITY_HXX_SEEN
 
+#include "TLorentzVector.h"
+
 #include <limits>
 #include <utility>
 
@@ -36,6 +38,8 @@ double GetNeutrinoEQERec(event::FullEvent const &fev,
                          double SeparationEnergy_MeV);
 double GetNeutrinoQ2QERec(event::FullEvent const &fev,
                           double SeparationEnergy_MeV);
+
+TLorentzVector GetEnergyMomentumTransfer(event::FullEvent const &fev);
 
 struct ENuRange : public std::pair<double, double> {
   using std::pair<double, double>::pair;

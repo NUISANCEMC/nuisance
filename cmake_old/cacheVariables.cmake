@@ -90,13 +90,13 @@ CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory
 CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
 CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
 
-CheckAndSetDefaultCache(USE_NuWro FALSE BOOL "Whether to enable NuWro support. <FALSE>")
+CheckAndSetDefaultCache(USE_NUWRO FALSE BOOL "Whether to enable NuWro support. <FALSE>")
 CheckAndSetDefaultEnv(NUWRO "" PATH "Path to NuWro source tree root directory. Overrides environment variable \$NUWRO <>" NUWRO)
 CheckAndSetDefaultEnv(NUWRO_INC "" PATH "Path to NuWro installed includes directory, needs to contain \"params_all.h\". Overrides environment variable \$NUWRO_INC <>" NUWRO_INC)
 CheckAndSetDefaultCache(NUWRO_INPUT_FILE "" FILEPATH "Path to an input NuWro event vector, which can be used to build NuWro i/o libraries. <>")
 CheckAndSetDefaultCache(NUWRO_BUILT_FROM_FILE FALSE INTERNAL "Whether the NuWro libraries were built by NUISANCE. <FALSE>")
-CheckAndSetDefaultCache(USE_NuWro_RW FALSE BOOL "Whether to try and build support for NuWro reweighting. <FALSE>")
-CheckAndSetDefaultCache(USE_NuWro_SRW_Event FALSE BOOL "Whether to use cut down NuWro reweight event format. Requires NuWro reweight. <FALSE>")
+CheckAndSetDefaultCache(USE_NUWRO_RW FALSE BOOL "Whether to try and build support for NuWro reweighting. <FALSE>")
+CheckAndSetDefaultCache(USE_NUWRO_SRW_Event FALSE BOOL "Whether to use cut down NuWro reweight event format. Requires NuWro reweight. <FALSE>")
 
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")
@@ -178,7 +178,7 @@ LIST(APPEND VARS
   NEUT_ROOT
   CERN
   CERN_LEVEL
-  USE_NuWro
+  USE_NUWRO
   NUWRO
   NUWRO_INC
   NUWRO_INPUT_FILE

@@ -16,6 +16,7 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
+using namespace nuis;
 using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::genietools;
@@ -139,6 +140,10 @@ double GENIEInputHandler::GetXSecScaleFactor(
 
 size_t GENIEInputHandler::GetNEvents() const {
   return fInputTree.tree->GetEntries();
+}
+
+GeneratorManager::Generator_id_t GENIEInputHandler::GetGeneratorId() {
+  return GeneratorManager::Get().EnsureGeneratorRegistered("GENIE");
 }
 
 DECLARE_PLUGIN(IInputHandler, GENIEInputHandler);

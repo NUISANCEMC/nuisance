@@ -21,6 +21,8 @@
 
 #include "plugins/traits.hxx"
 
+#include "generator/GeneratorManager.hxx"
+
 namespace fhicl {
 class ParameterSet;
 }
@@ -48,6 +50,9 @@ public:
   }
 
   virtual fhicl::ParameterSet GetExampleConfiguration() = 0;
+
+  /// Plugins must signify if they only interact with certain generator
+  virtual nuis::GeneratorManager::Generator_id_t GetGeneratorId() = 0;
 
   virtual ~IVariationProvider() {}
 };

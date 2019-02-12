@@ -7,6 +7,7 @@
 #include "particle.h"
 using NuWroParticle = ::particle;
 
+using namespace nuis;
 using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::nuwrotools;
@@ -117,6 +118,10 @@ double NuWroInputHandler::GetXSecScaleFactor(
 
 size_t NuWroInputHandler::GetNEvents() const {
   return fInputTree.tree->GetEntries();
+}
+
+GeneratorManager::Generator_id_t NuWroInputHandler::GetGeneratorId(){
+  return GeneratorManager::Get().EnsureGeneratorRegistered("NuWro");
 }
 
 DECLARE_PLUGIN(IInputHandler, NuWroInputHandler);

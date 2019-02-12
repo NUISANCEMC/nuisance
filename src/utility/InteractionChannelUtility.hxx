@@ -14,7 +14,7 @@ NEW_NUIS_EXCEPT(invalid_channel_conversion);
 
 #define X(A, B)                                                                \
   case B: {                                                                    \
-    return nuis::event::Channel_t::A;                                           \
+    return nuis::event::Channel_t::A;                                          \
   }
 
 inline event::Channel_t IntToChannel(int mode) {
@@ -31,7 +31,7 @@ inline event::Channel_t IntToChannel(int mode) {
 #undef X
 
 #define X(A, B)                                                                \
-  case event::Channel_t::A: {                                                   \
+  case event::Channel_t::A: {                                                  \
     return B;                                                                  \
   }
 
@@ -58,6 +58,14 @@ inline bool IsCoh(event::Channel_t mode) {
           (mode == event::Channel_t::kNCCohPi) ||
           (mode == event::Channel_t::kCCCohPi_nub) ||
           (mode == event::Channel_t::kNCCohPi_nub));
+}
+inline bool IsQE(event::Channel_t mode) {
+  return ((mode == event::Channel_t::kCCQE) ||
+          (mode == event::Channel_t::kNCELP) ||
+          (mode == event::Channel_t::kNCELN) ||
+          (mode == event::Channel_t::kCCQE_nub) ||
+          (mode == event::Channel_t::kNCELP_nub) ||
+          (mode == event::Channel_t::kNCELN_nub));
 }
 
 } // namespace utility

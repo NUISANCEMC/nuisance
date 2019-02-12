@@ -1,5 +1,4 @@
-#ifndef PLUGINS_NAMEDSO_HXX_SEEN
-#define PLUGINS_NAMEDSO_HXX_SEEN
+#pragma once
 
 // linux
 #include <dlfcn.h>
@@ -28,5 +27,3 @@ struct NamedSO {
     }
   }
 };
-
-#endif

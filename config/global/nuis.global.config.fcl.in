@@ -1,7 +1,8 @@
 plugins: {
   search_paths: {
     #Default plugin install directory
-    installed_plugins: [ @CMAKE_INSTALL_PREFIX@/plugins ]
+    installed_plugins: [ "@CMAKE_INSTALL_PREFIX@/plugins" ]
+    local_plugins: [ "./" ]
   }
 }
 

@@ -23,6 +23,8 @@
 
 #include "exception/exception.hxx"
 
+#include "generator/GeneratorManager.hxx"
+
 #include <iterator>
 #include <limits>
 
@@ -113,6 +115,8 @@ public:
   }
 
   virtual ~IInputHandler() {}
+
+  virtual nuis::GeneratorManager::Generator_id_t GetGeneratorId() = 0;
 };
 
 DECLARE_PLUGIN_INTERFACE(IInputHandler);

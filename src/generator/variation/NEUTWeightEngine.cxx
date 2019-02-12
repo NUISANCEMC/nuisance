@@ -54,8 +54,9 @@ void NEUTWeightEngine::Initialize(fhicl::ParameterSet const &ps) {
     nsp.nsyst = neut::rew::NSyst::FromString(param_name);
 
     if (nsp.nsyst == neut::rew::kNullSystematic) {
-      throw invalid_NEUT_syst_name() << "[ERROR]: NReWeight failed to parse "
-                                     << std::quoted(param_name) << " as a NEUT dial.";
+      throw invalid_NEUT_syst_name()
+          << "[ERROR]: NReWeight failed to parse " << std::quoted(param_name)
+          << " as a NEUT dial.";
     }
     fNeutRW->Systematics().Init(nsp.nsyst);
 
@@ -76,10 +77,11 @@ void NEUTWeightEngine::Reconfigure() {
   fNeutRW->Reconfigure();
 }
 double NEUTWeightEngine::GetEventWeight(nuis::event::MinimalEvent const &ev) {
-  if (!ev.fNeutVect) {
+  NeutVect const *nv = static_cast<NeutVect const *>(ev.fGenEvent);
+  if (!nv) {
     return 1.0;
   }
-  NEUTUtils::FillNeutCommons(ev.fNeutVect);
+  NEUTUtils::FillNeutCommons(nv);
   return fNeutRW->CalcWeight();
 }
 
@@ -109,6 +111,10 @@ fhicl::ParameterSet NEUTWeightEngine::GetExampleConfiguration() {
       "parameters", std::vector<fhicl::ParameterSet>{{dial_maqe, dial_mares}});
 
   return ps;
+}
+
+GeneratorManager::Generator_id_t NEUTWeightEngine::GetGeneratorId(){
+  return GeneratorManager::Get().EnsureGeneratorRegistered("NEUT");
 }
 
 DECLARE_PLUGIN(IWeightProvider, NEUTWeightEngine);

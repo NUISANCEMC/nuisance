@@ -17,32 +17,23 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-
 if(NUWRO STREQUAL "")
   cmessage(FATAL_ERROR "Variable NUWRO is not defined. "
     "This must be set to point to a prebuilt NuWro instance.")
 endif()
 
-LIST(APPEND EXTRA_CXX_FLAGS -DUSE_NUWRO -Wno-sign-compare -Wno-unused-variable -Wno-reorder)
+LIST(APPEND NUWRO_CXX_FLAGS -DUSE_NUWRO -Wno-sign-compare -Wno-unused-variable -Wno-reorder)
 
-include_directories(${NUWRO}/src)
+LIST(APPEND NUWRO_INCLUDE_DIRS ${NUWRO}/src)
 
-if(NOT EXISTS ${NUWRO}/bin/event1.so)
-  if(EXISTS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
-
-    if(NUWRO_INC STREQUAL "")
-      cmessage(FATAL_ERROR "Variable NUWRO_INC is not defined. "
-        "This must be set to point to an installed NuWro instance.")
-    endif()
-
-    LIST(APPEND EXTRA_LINK_DIRS ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib)
-    LIST(APPEND EXTRA_LIBS event)
-  else()
-    cmessage(FATAL_ERROR "Expected to find the NuWro event library in: ${NUWRO}/bin/event1.so, or if using NuWro with reweight support: ${NUWRO}/build/${CMAKE_SYSTEM_NAME}/lib/libevent.a. Is NuWro built?")
-  endif()
-else()
-  LIST(APPEND EXTRA_SHAREDOBJS ${NUWRO}/bin/event1.so)
-endif()
+add_library(NuWro_event1 SHARED IMPORTED)
+set_property(TARGET NuWro_event1 PROPERTY IMPORTED_LOCATION ${NUWRO}/bin/event1.so)
+LIST(APPEND NUWRO_IMPORTED_TARGETS NuWro_event1)
 
 set(NEED_PYTHIA6 TRUE)
 set(NEED_ROOTPYTHIA6 TRUE)
+
+cmessage(STATUS "NuWro")
+cmessage(STATUS "     Flags     : ${NUWRO_CXX_FLAGS}")
+cmessage(STATUS "     Includes  : ${NUWRO_INCLUDE_DIRS}")
+cmessage(STATUS "     SOs       : ${NUWRO_IMPORTED_TARGETS}")

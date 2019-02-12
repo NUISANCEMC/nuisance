@@ -50,7 +50,12 @@ public:
   double XSecWeight;
   /// Event weight incurred from current reweight engine state.
   double RWWeight;
+
+  /// Pointer to the generator event
+  ///
+  /// This is quite dangerous, but the results of getting it wrong should be garbage, so, we'll live with it. Generator-dependent code can static_cast this to an assumed type. The GeneratorManager can be used to check if a given input handler should pass events to a given reweighter.
+  void const *fGenEvent;
 };
-} // namespace core
+} // namespace event
 } // namespace nuis
 #endif

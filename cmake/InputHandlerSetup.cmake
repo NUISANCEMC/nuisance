@@ -18,10 +18,10 @@
 ################################################################################
 
 #################################  NuWro  ######################################
-if(USE_NuWro)
+if(USE_NUWRO)
   include(${CMAKE_SOURCE_DIR}/cmake/NuWroSetup.cmake)
   cmessage(STATUS "Using NuWro.")
-  set(USE_NuWro TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
+  set(USE_NUWRO TRUE CACHE BOOL "Whether to enable NuWro support. <FALSE>" FORCE)
 endif()
 
 #################################  NEUT  #######################################

@@ -99,7 +99,7 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
   add_to_LD_LIBRARY_PATH "${NEUT_LIB_DIR}" "${NEUT_ROOT}/src/reweight"
 fi
 
-if [ "@USE_NuWro@" != "FALSE" ]; then
+if [ "@USE_NUWRO@" != "FALSE" ]; then
   if [ "@NUWRO_BUILT_FROM_FILE@" == "FALSE" ]; then
     echo "[INFO]: Adding NuWro library paths to the environment."
     export NUWRO="@NUWRO@"

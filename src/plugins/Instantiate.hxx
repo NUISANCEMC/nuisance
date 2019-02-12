@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef PLUGINS_PLUGINMANAGER_HXX_SEEN
-#define PLUGINS_PLUGINMANAGER_HXX_SEEN
+#pragma once
 
 #include "plugins/NamedSO.hxx"
 #include "plugins/traits.hxx"
@@ -195,7 +194,7 @@ Instantiate(std::string const &classname) {
 #ifdef DEBUG_INSTANTIATE
         std::cout << "[INFO]: Failed to load appropriate instantiator method: "
                   << plugin_traits<T>::instantiator_function_name(classname)
-                  << " from shared object " << plugin.FQ_so_path;
+                  << " from shared object " << plugin.FQ_so_path << std::endl;
 #endif
         continue;
       } else {
@@ -251,4 +250,3 @@ Instantiate(std::string const &classname) {
 }
 } // namespace plugins
 } // namespace nuis
-#endif

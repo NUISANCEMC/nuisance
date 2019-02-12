@@ -37,9 +37,15 @@ InputManager::EnsureInputLoaded(fhicl::ParameterSet const &ps) {
   }
 
   Input_id_t iid = Inputs.size();
-  Inputs.emplace_back(file_name,
-                      nuis::plugins::Instantiate<IInputHandler>(
-                          ps.get<std::string>("input_type") + "InputHandler"));
+  try {
+    Inputs.emplace_back(
+        file_name, nuis::plugins::Instantiate<IInputHandler>(
+                       ps.get<std::string>("input_type") + "InputHandler"));
+  } catch (plugins::failed_to_find_instantiator const &ex) {
+    throw unsupported_input_type()
+        << "Failed to find input handler support for: \"" << ps.get<std::string>("input_type")
+        << "\", does the plugin definitely exist?";
+  }
   Inputs.back().handler->Initialize(ps);
   return iid;
 }
