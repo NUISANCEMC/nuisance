@@ -145,6 +145,11 @@ if [ "@USE_GENIE@" != "FALSE" ]; then
 
   add_to_LD_LIBRARY_PATH "@GENIE@/lib" "@LHAPDF_LIB@" "@LIBXML2_LIB@" "@LOG4CPP_LIB@"
 
+  if [ "@GENIE_REWEIGHT@" ]; then
+    export GENIE_REWEIGHT="@GENIE_REWEIGHT@"
+    add_to_LD_LIBRARY_PATH "@GENIE_REWEIGHT@/lib"
+  fi
+
 fi
 
 if [ "@BUILD_GiBUU@" != "FALSE" ]; then
