@@ -170,17 +170,13 @@ if(GENIE_POST_R3)
     endif()
   endif()
 
-  #cmessage(WARNING "GSL_LIB: ${GSL_LIB}, GSL_LIB_LIST: ${GSL_LIB_LIST}")
   GETLIBS(gsl-config --libs GSL_LIB_LIST)
-  #cmessage(AUTHOR_WARNING "GSL_LIB: ${GSL_LIB}, GSL_LIB_LIST: ${GSL_LIB_LIST}")
 
   if(GENIE_REWEIGHT STREQUAL "")
     message(FATAL_ERROR "Variable GENIE_REWEIGHT is not defined. When using GENIE v3+, we require the reweight product to be built and accessible via the environment variable GENIE_REWEIGHT")
   endif()
 endif()
 ################################################################################
-
-#cmessage(FATAL_ERROR "GSL_LIB: ${GSL_LIB}, GSL_LIB_LIST: ${GSL_LIB_LIST}")
 
 LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 
