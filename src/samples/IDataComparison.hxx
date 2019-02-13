@@ -37,29 +37,40 @@ public:
     ss << "Unknown Journal Ref. for IDataComparison: " << std::quoted(Name());
     return ss.str();
   }
-
-  virtual std::string GetTargetMaterial() {
+  virtual std::string GetDOI() {
     std::stringstream ss("");
-    ss << "Unknown Target material for IDataComparison: " << std::quoted(Name());
+    ss << "Unknown DOI for IDataComparison: " << std::quoted(Name());
     return ss.str();
   }
-
+  virtual std::string GetYear() {
+    std::stringstream ss("");
+    ss << "Unknown Year for IDataComparison: " << std::quoted(Name());
+    return ss.str();
+  }
+  virtual std::string GetTargetMaterial() {
+    std::stringstream ss("");
+    ss << "Unknown Target material for IDataComparison: "
+       << std::quoted(Name());
+    return ss.str();
+  }
   virtual std::string GetFluxDescription() {
     std::stringstream ss("");
-    ss << "Unknown Flux description for IDataComparison: " << std::quoted(Name());
+    ss << "Unknown Flux description for IDataComparison: "
+       << std::quoted(Name());
     return ss.str();
   }
 
   virtual std::string GetSignalDescription() {
     std::stringstream ss("");
-    ss << "Unknown Signal description for IDataComparison: " << std::quoted(
-        Name());
+    ss << "Unknown Signal description for IDataComparison: "
+       << std::quoted(Name());
     return ss.str();
   }
 
   virtual std::string GetDocumentation() {
     std::stringstream ss("");
-    ss << "No documentation provided for IDataComparison: " << std::quoted(Name());
+    ss << "No documentation provided for IDataComparison: "
+       << std::quoted(Name());
     return ss.str();
   }
 

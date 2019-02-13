@@ -45,9 +45,26 @@ std::unique_ptr<TFile> &GetOutputFile(std::string const &name) {
   ntf.name = name;
   ntf.file = std::make_unique<TFile>(file_name.c_str(), open_opts.c_str());
   if (!ntf.file || !ntf.file->IsOpen()) {
-    throw utility::failed_to_open_TFile()
-        << "[ERROR]: Failed to open output file: " << std::quoted(file_name)
-        << " in write mode with opts = " << std::quoted(open_opts);
+    if ((name == "default") && (open_opts == "CREATE")) {
+      std::cout
+          << "[WARN]: It appears the default file cannot be opened because it "
+             "exists already, to stop you wasting processing time, the default "
+             "output stream will be written to nuis.default.tmp.root in the "
+             "current director in RECREATE mode."
+          << std::endl;
+      file_name = "nuis.default.tmp.root";
+      open_opts = "RECREATE";
+      ntf.file = std::make_unique<TFile>(file_name.c_str(), open_opts.c_str());
+      if (!ntf.file || !ntf.file->IsOpen()) {
+        throw utility::failed_to_open_TFile()
+            << "[ERROR]: Failed to open output file: " << std::quoted(file_name)
+            << " in write mode with opts = " << std::quoted(open_opts);
+      }
+    } else {
+      throw utility::failed_to_open_TFile()
+          << "[ERROR]: Failed to open output file: " << std::quoted(file_name)
+          << " in write mode with opts = " << std::quoted(open_opts);
+    }
   }
   Files.push_back(std::move(ntf));
   return Files.back().file;

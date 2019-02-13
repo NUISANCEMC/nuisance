@@ -30,20 +30,37 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 
-  fFlux =
-      GetHistogramFromROOTFile<TH1>(fInputTreeFile.file, "flux_numu", false);
-  if (fFlux) {
-    fEvtrt = GetHistogramFromROOTFile<TH1>(fInputTreeFile.file, "evtrt_numu");
+  std::string flux_name = ps.get<std::string>("flux_hist_name", "flux_numu");
+  std::string evtrt_name = ps.get<std::string>("evtrt_hist_name", "evtrt_numu");
 
-    fFileWeight =
-        fEvtrt->Integral() / (fFlux->Integral() * double(GetNEvents()));
+  std::string override_flux_file =
+      ps.get<std::string>("override_flux_file", "");
+
+  if (override_flux_file.size()) {
+    fFlux = GetHistogramFromROOTFile<TH1>(override_flux_file, flux_name);
+    RebuildEventRate();
+  } else {
+    fFlux =
+        GetHistogramFromROOTFile<TH1>(fInputTreeFile.file, flux_name, false);
+  }
+
+  if (fFlux) {
+    if (!fEvtrt) {
+      fEvtrt = GetHistogramFromROOTFile<TH1>(fInputTreeFile.file, evtrt_name);
+    }
+
+    fFileWeight = fEvtrt->Integral() * 1.0E-38 /
+                  (fFlux->Integral() * double(GetNEvents()));
+    std::cout << "[INFO]: Average NEUT XSecWeight = " << fFileWeight << ""
+              << std::endl;
   } else {
     std::cout
         << "[INFO]: Input NEUT file doesn't have flux information, assuming "
            "mono energetic and calculating average cross-section..."
         << std::endl;
     fFileWeight = GetMonoEXSecWeight() / double(GetNEvents());
-    std::cout << "[INFO]: Done (Average NEUT XSecWeight = " << fFileWeight << ")!" << std::endl;
+    std::cout << "[INFO]: Done (Average NEUT XSecWeight = " << fFileWeight
+              << ")!" << std::endl;
   }
 }
 
@@ -83,7 +100,42 @@ double NEUTInputHandler::GetMonoEXSecWeight() {
   std::cout << "\r[INFO]: Read " << NEvents << "/" << NEvents << " NEUT events."
             << std::endl;
 
-  return (xsec / count)*1E-38;
+  return (xsec / count) * 1E-38;
+}
+
+void NEUTInputHandler::RebuildEventRate() {
+  auto XSec = Clone(fFlux, true, "xsec");
+  auto Entry = Clone(fFlux, true, "entry");
+
+  std::cout << "[INFO]: Rebuilding total cross-section prediction..."
+            << std::endl;
+  size_t NEvents = GetNEvents();
+  size_t ShoutEvery = NEvents / 100;
+  std::cout << "[INFO]: Read " << 0 << "/" << NEvents << " NEUT events."
+            << std::flush;
+
+  for (size_t nev_it = 0; nev_it < NEvents; ++nev_it) {
+    if (ShoutEvery && !(nev_it % ShoutEvery)) {
+      std::cout << "\r[INFO]: Read " << nev_it << "/" << NEvents
+                << " NEUT events." << std::flush;
+    }
+
+    fInputTreeFile.tree->GetEntry(nev_it);
+
+    NeutPart *part = fNeutVect->PartInfo(0);
+    double E = part->fP.E();
+
+    XSec->Fill(E, fNeutVect->Totcrs);
+    Entry->Fill(E);
+  }
+  std::cout << std::endl << "[INFO]: Done!" << std::endl;
+
+  // Binned total xsec
+  XSec->Divide(Entry.get());
+
+  fEvtrt = Clone(XSec, false, "evtrt");
+  // Event rate prediction
+  fEvtrt->Multiply(fFlux.get());
 }
 
 double

@@ -64,11 +64,6 @@ public:
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    if (instance_sample_configuration.has_key("verbosity")) {
-      SetSampleVerbosity(
-          instance_sample_configuration.get<std::string>("verbosity"));
-    }
-
     std::string publication =
         instance_sample_configuration.get<std::string>("publication", "PRD26");
     if (publication == "PRL31") {

@@ -1,8 +1,19 @@
 global.sample_configuration.T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar: {
   journal_reference: "Not yet published"
   target_material: "H20"
-  flux_description: "ND280 FHC anti-muon neutrino"
+  flux_description: "ND280 RHC anti-muon neutrino"
   signal_description: "CC0Pi"
+  shape_only: false
+  flux_unfolded: false
+  #has_data: false
+}
+
+global.sample_configuration.T2K_CC0PiNProt_CH_xsec_STV_nu: {
+  journal_reference: "Phys. Rev. D 98, 032003"
+  doi: "https://doi.org/10.1103/PhysRevD.98.032003"
+  target_material: "CH"
+  flux_description: "ND280 FHC muon neutrino"
+  signal_description: "CC0Pi + N protons"
   shape_only: false
   flux_unfolded: false
   #has_data: false

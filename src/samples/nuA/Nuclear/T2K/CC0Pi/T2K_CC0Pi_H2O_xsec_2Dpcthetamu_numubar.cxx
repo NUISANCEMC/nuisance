@@ -29,8 +29,6 @@
 using namespace nuis::event;
 using namespace nuis::utility;
 
-using SimpleDataComparison_2DPoly = SimpleDataComparison<2, double, TH2Poly>;
-
 class T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar
     : public SimpleDataComparison_2DPoly {
 
@@ -52,16 +50,6 @@ public:
   }
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
-
-    if (instance_sample_configuration.has_key("verbosity")) {
-      SetSampleVerbosity(
-          instance_sample_configuration.get<std::string>("verbosity"));
-    }
-
-    fhicl::ParameterSet const &global_sample_configuration =
-        nuis::config::GetDocument().get<fhicl::ParameterSet>(
-            std::string("global.sample_configuration.") + Name(),
-            fhicl::ParameterSet());
 
     SetData(
         GetDataDir() +

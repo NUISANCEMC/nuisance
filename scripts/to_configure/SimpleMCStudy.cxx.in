@@ -40,7 +40,9 @@ public:
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    //! Set the verbosity of the sample logging macros.
+    //! This is also done by SimpleMCStudy::Initialize so can be removed here,
+    //! but left to demonstrate the simpel logging features. Set the verbosity
+    //! of the sample logging macros.
     if (instance_sample_configuration.has_key("verbosity")) {
       SetSampleVerbosity(
           instance_sample_configuration.get<std::string>("verbosity"));
@@ -52,7 +54,9 @@ public:
           << instance_sample_configuration.get<std::string>("verbosity"));
     }
 
-    // Get the global configuration for this sample, if it exists.
+    //! If your sample doesn't need any global configuration, this can be
+    //! removed.
+    //! Get the global configuration for this sample, if it exists.
     fhicl::ParameterSet const &global_sample_configuration =
         nuis::config::GetDocument().get<fhicl::ParameterSet>(
             std::string("global.sample_configuration.") + Name(),

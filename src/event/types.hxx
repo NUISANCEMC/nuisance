@@ -31,6 +31,7 @@ namespace event {
   X(kCCSPP_PPip, 11)                                                           \
   X(kCCSPP_PPi0, 12)                                                           \
   X(kCCSPP_NPip, 13)                                                           \
+  X(kCCDiffPP, 15)                                                             \
   X(kCCCohPi, 16)                                                              \
   X(kCCResGamma, 17)                                                           \
   X(kCCTransitionMPi, 21)                                                      \
@@ -42,6 +43,7 @@ namespace event {
   X(kNCSPP_PPi0, 32)                                                           \
   X(kNCSPP_PPim, 33)                                                           \
   X(kNCSPP_NPip, 34)                                                           \
+  X(kNCDiffPP, 35)                                                             \
   X(kNCCohPi, 36)                                                              \
   X(kNCResNGamma, 38)                                                          \
   X(kNCResPGamma, 39)                                                          \
@@ -60,6 +62,7 @@ namespace event {
   X(kCCSPP_NPim_nub, -11)                                                      \
   X(kCCSPP_NPi0_nub, -12)                                                      \
   X(kCCSPP_PPim_nub, -13)                                                      \
+  X(kCCDiffPP_nub, -15)                                                        \
   X(kCCCohPi_nub, -16)                                                         \
   X(kCCResGamma_nub, -17)                                                      \
   X(kCCTransitionMPi_nub, -21)                                                 \
@@ -71,6 +74,7 @@ namespace event {
   X(kNCSPP_PPi0_nub, -32)                                                      \
   X(kNCSPP_PPim_nub, -33)                                                      \
   X(kNCSPP_NPip_nub, -34)                                                      \
+  X(kNCDiffPP_nub, -35)                                                        \
   X(kNCCohPi_nub, -36)                                                         \
   X(kNCResNGamma_nub, -38)                                                     \
   X(kNCResPGamma_nub, -39)                                                     \

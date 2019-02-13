@@ -33,6 +33,8 @@ NEW_NUIS_EXCEPT(unhandled_pdg_code);
 
 enum MatterType { kMatter = 1, kMatterAntimatter = 0, kAntimatter = -1 };
 
+static event::PDG_t const kDefault = 0;
+
 static event::PDG_t const kNuMu = 14;
 static event::PDG_t const kNuMuBar = -14;
 

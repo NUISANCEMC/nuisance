@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef UTILITY_HISTOGRAMUTILITY_HXX_SEEN
-#define UTILITY_HISTOGRAMUTILITY_HXX_SEEN
+#pragma once
 
 #include "utility/ROOTUtility.hxx"
 
@@ -46,14 +45,9 @@ NEW_NUIS_EXCEPT(invalid_histogram_descriptor);
 NEW_NUIS_EXCEPT(invalid_histogram_name);
 NEW_NUIS_EXCEPT(failed_to_clone);
 
-inline bool IsFlowBin(TAxis const &ax, Int_t bin_it) {
-  return ((bin_it <= 0) || (bin_it >= (ax.GetNbins() + 1)));
-}
+bool IsFlowBin(TAxis const &ax, Int_t bin_it);
 
-inline bool IsInHistogramRange(TAxis const &ax, double v) {
-  Int_t bin_it = ax.FindFixBin(v);
-  return !IsFlowBin(ax, bin_it);
-}
+bool IsInHistogramRange(TAxis const &ax, double v);
 
 template <typename HT> struct HType_traits {};
 template <> struct HType_traits<TH1> {
@@ -412,10 +406,6 @@ std::unique_ptr<HT> GetHistogram(std::string const &input_descriptor) {
   }
 }
 
-NEW_NUIS_EXCEPT(invalid_TH2Poly);
-NEW_NUIS_EXCEPT(invalid_PolyBinSpecifierList);
-
-// List of bins to put in a row, X/Y
 struct PolyBinSpecifier {
   double X, Y;
   bool UseXAxis;
@@ -435,88 +425,6 @@ constexpr PolyBinSpecifier YPolyBinSpec(double X, double Y) {
 
 std::vector<std::unique_ptr<TH1>> GetTH2PolySlices(
     std::unique_ptr<TH2Poly> &hinp,
-    std::vector<std::vector<PolyBinSpecifier>> const &BinsSpecifiers) {
-
-  std::vector<std::unique_ptr<TH1>> slices;
-
-  size_t sl_it = 0;
-  for (auto &slice_spec : BinsSpecifiers) {
-    std::vector<double> Binning;
-    std::vector<double> BinContent;
-    std::vector<double> BinError;
-    bool UseXAxis = false;
-    size_t bin_ctr = 0;
-    for (auto poly_bin_spec : slice_spec) {
-      Int_t bin_it = hinp->FindBin(poly_bin_spec.X, poly_bin_spec.Y);
-      if (bin_it < 1) {
-        std::cout << "[WARN]: When searching for matching bin: { X: "
-                  << poly_bin_spec.X << ", Y: " << poly_bin_spec.Y
-                  << "} got flow bin: " << bin_it << std::endl;
-        continue;
-      }
-      TH2PolyBin *poly_bin =
-          dynamic_cast<TH2PolyBin *>(hinp->GetBins()->At(bin_it - 1));
-
-      if (!bin_ctr) {
-        UseXAxis = poly_bin_spec.UseXAxis;
-      } else if (UseXAxis != poly_bin_spec.UseXAxis) {
-        throw invalid_PolyBinSpecifierList()
-            << "[ERROR]: For slice: " << sl_it
-            << " of TH2Poly: " << std::quoted(hinp->GetName())
-            << " bin specifier: " << bin_ctr << " was set to use the "
-            << (poly_bin_spec.UseXAxis ? "X" : "Y")
-            << " axis as the dependent axis of the slice, but previous bins "
-               "were set to use the "
-            << (poly_bin_spec.UseXAxis ? "X" : "Y") << " axis.";
-      }
-
-      if ((poly_bin_spec.X < poly_bin->GetXMin()) ||
-          (poly_bin_spec.X >= poly_bin->GetXMax()) ||
-          (poly_bin_spec.Y < poly_bin->GetYMin()) ||
-          (poly_bin_spec.Y >= poly_bin->GetYMax())) {
-        std::cout
-            << "[WARN]: Found bin doesn't seem to contain expected point: { X: "
-            << poly_bin_spec.X << ", Y: " << poly_bin_spec.Y
-            << "}, got bin_it = " << bin_it
-            << " which had x_low: " << poly_bin->GetXMin()
-            << ", and x_up: " << poly_bin->GetXMax()
-            << ", y_low: " << poly_bin->GetYMin()
-            << ", y_up: " << poly_bin->GetYMax() << std::endl;
-      }
-
-      double low = UseXAxis ? poly_bin->GetXMin() : poly_bin->GetYMin();
-      double up = UseXAxis ? poly_bin->GetXMax() : poly_bin->GetYMax();
-
-      if (!Binning.size()) { // Add low edge
-        Binning.push_back(low);
-      } else if (std::abs(Binning.back() - low) >
-                 (std::numeric_limits<double>::epsilon() * 1E2)) {
-        BinContent.push_back(0);
-        BinError.push_back(0);
-        Binning.push_back(low);
-      }
-
-      BinContent.push_back(hinp->GetBinContent(bin_it));
-      BinError.push_back(hinp->GetBinError(bin_it));
-      Binning.push_back(up);
-    }
-    slices.emplace_back(new TH1D(
-        (std::string(hinp->GetName()) + "_slice" + std::to_string(sl_it++))
-            .c_str(),
-        (std::string(";") +
-         (UseXAxis ? hinp->GetXaxis() : hinp->GetYaxis())->GetTitle() + ";" +
-         hinp->GetZaxis()->GetTitle())
-            .c_str(),
-        Binning.size() - 1, Binning.data()));
-
-    for (size_t bin_it = 0; bin_it < BinContent.size(); ++bin_it) {
-      slices.back()->SetBinContent(bin_it + 1, BinContent[bin_it]);
-      slices.back()->SetBinError(bin_it + 1, BinError[bin_it]);
-    }
-  }
-  return slices;
-}
-
+    std::vector<std::vector<PolyBinSpecifier>> const &BinsSpecifiers);
 } // namespace utility
 } // namespace nuis
-#endif

@@ -20,7 +20,10 @@
 #ifndef UTILITY_KINEMATICUTILITY_HXX_SEEN
 #define UTILITY_KINEMATICUTILITY_HXX_SEEN
 
+#include "utility/PDGCodeUtility.hxx"
+
 #include "TLorentzVector.h"
+#include "TVector3.h"
 
 #include <limits>
 #include <utility>
@@ -38,6 +41,32 @@ double GetNeutrinoEQERec(event::FullEvent const &fev,
                          double SeparationEnergy_MeV);
 double GetNeutrinoQ2QERec(event::FullEvent const &fev,
                           double SeparationEnergy_MeV);
+
+TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal);
+TVector3 GetUnitVectorInTPlane(const TVector3 &inp,
+                               const TVector3 &planarNormal);
+double GetDeltaPhiT(TVector3 const &V_lepton, TVector3 const &V_other,
+                    TVector3 const &Normal, bool PiMinus = false);
+TVector3 GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
+                    TVector3 const &Normal);
+double GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
+                      TVector3 const &Normal, bool PiMinus = false);
+
+TVector3
+GetDeltaPT_CC0PiN(event::FullEvent const &fev,
+                  event::PDG_t islep_pdg = nuis::utility::pdgcodes::kNuMu,
+                  event::PDG_t fslep_pdg = nuis::utility::pdgcodes::kDefault,
+                  event::PDG_t fsnuc_pdg = nuis::utility::pdgcodes::kDefault);
+double
+GetDeltaPhiT_CC0PiN(event::FullEvent const &fev,
+                    event::PDG_t islep_pdg = nuis::utility::pdgcodes::kNuMu,
+                    event::PDG_t fslep_pdg = nuis::utility::pdgcodes::kDefault,
+                    event::PDG_t fsnuc_pdg = nuis::utility::pdgcodes::kDefault);
+double GetDeltaAlphaT_CC0PiN(
+    event::FullEvent const &fev,
+    event::PDG_t islep_pdg = nuis::utility::pdgcodes::kNuMu,
+    event::PDG_t fslep_pdg = nuis::utility::pdgcodes::kDefault,
+    event::PDG_t fsnuc_pdg = nuis::utility::pdgcodes::kDefault);
 
 TLorentzVector GetEnergyMomentumTransfer(event::FullEvent const &fev);
 

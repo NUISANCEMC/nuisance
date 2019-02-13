@@ -47,6 +47,7 @@ class NEUTInputHandler : public IInputHandler {
   bool fKeepIntermediates;
 
   double GetMonoEXSecWeight();
+  void RebuildEventRate();
 
 public:
   NEW_NUIS_EXCEPT(weight_cache_miss);

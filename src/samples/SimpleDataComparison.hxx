@@ -74,6 +74,8 @@ protected:
   bool fComparisonFinalized;
 
   std::string fJournalReference;
+  std::string fDOI;
+  std::string fYear;
   std::string fTargetMaterial;
   std::string fFluxDescription;
   std::string fSignalDescription;
@@ -119,6 +121,8 @@ public:
         std::function<void(nuis::event::FullEvent const &, bool, double)>();
 
     fJournalReference = "";
+    fDOI = "";
+    fYear = "";
     fTargetMaterial = "";
     fFluxDescription = "";
     fSignalDescription = "";
@@ -139,19 +143,26 @@ public:
 
     if (!fJournalReference.length()) {
       fJournalReference = fGlobalConfig.get<std::string>("journal_reference",
-                                                         fJournalReference);
+                                                         "Not yet published");
     }
+    if (!fDOI.length()) {
+      fDOI = fGlobalConfig.get<std::string>("DOI", "Unknown DOI");
+    }
+    if (!fYear.length()) {
+      fYear = fGlobalConfig.get<std::string>("year", "Unknown year");
+    }
+
     if (!fTargetMaterial.length()) {
-      fTargetMaterial =
-          fGlobalConfig.get<std::string>("target_material", fTargetMaterial);
+      fTargetMaterial = fGlobalConfig.get<std::string>(
+          "target_material", "Unknown target material");
     }
     if (!fFluxDescription.length()) {
       fFluxDescription =
-          fGlobalConfig.get<std::string>("flux_description", fFluxDescription);
+          fGlobalConfig.get<std::string>("flux_description", "Unknown flux");
     }
     if (!fSignalDescription.length()) {
       fSignalDescription = fGlobalConfig.get<std::string>("signal_description",
-                                                          fSignalDescription);
+                                                          "Unknown Signal");
     }
 
     if (fIsShapeOnly == -1) {
@@ -168,6 +179,8 @@ public:
   }
 
   virtual std::string GetJournalReference() { return fJournalReference; }
+  virtual std::string GetDOI() { return fDOI; }
+  virtual std::string GetYear() { return fYear; }
   virtual std::string GetTargetMaterial() { return fTargetMaterial; }
   virtual std::string GetFluxDescription() { return fFluxDescription; }
   virtual std::string GetSignalDescription() { return fSignalDescription; }
@@ -240,11 +253,9 @@ public:
 
     fInstanceConfig = instance_sample_configuration;
 
-    if (fInstanceConfig.has_key("verbosity")) {
-      SetSampleVerbosity(fInstanceConfig.get<std::string>("verbosity"));
-    } else {
-      SetSampleVerbosity("Reticent");
-    }
+    SetSampleVerbosity(fInstanceConfig.get<std::string>(
+        "verbosity", nuis::config::GetDocument().get<std::string>(
+                         "global.sample.verbosity_default", "Reticent")));
 
     ReadGlobalConfigDefaults();
 
@@ -410,11 +421,9 @@ public:
   fhicl::ParameterSet GetExampleConfiguration() {
     fhicl::ParameterSet exps;
     exps.put<std::string>("name", Name());
-    exps.put<std::string>("input_type", "Generator");
-    exps.put<std::string>("file", "Events.root");
+    exps.put<std::string>("input_type", "NuWro/NEUT/GENIE");
+    exps.put<std::string>("file", "input_events.root");
     exps.put<std::string>("write_directory", Name());
-    exps.put<std::string>("fake_data_histogram", "/path/to/file.root;h_name");
-
     return exps;
   }
 };

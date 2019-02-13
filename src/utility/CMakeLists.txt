@@ -4,7 +4,8 @@ set(utility_implementation_files
   KinematicUtility.cxx
   PDGCodeUtility.cxx
   StringUtility.cxx
-  EventTopologyUtility.cxx)
+  EventTopologyUtility.cxx
+  HistogramUtility.cxx)
 
 set(utility_header_files
   FileSystemUtility.hxx
