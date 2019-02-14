@@ -25,6 +25,8 @@
 
 #include "string_parsers/from_string.hxx"
 
+#include "fhiclcpp/ParameterSet.h"
+
 #include "TAxis.h"
 #include "TH1D.h"
 #include "TH1F.h"
@@ -426,5 +428,34 @@ constexpr PolyBinSpecifier YPolyBinSpec(double X, double Y) {
 std::vector<std::unique_ptr<TH1>> GetTH2PolySlices(
     std::unique_ptr<TH2Poly> &hinp,
     std::vector<std::vector<PolyBinSpecifier>> const &BinsSpecifiers);
+
+template <typename HT>
+inline typename std::enable_if<HType_traits<HT>::NDim == 1,
+                               std::unique_ptr<TH1>>::type
+BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
+  std::array<double, 3> xaxis =
+      ps.get<std::array<double, 3>>("xaxis_descriptor");
+  std::unique_ptr<TH1> rtn = std::make_unique<TH1D>(
+      ps.get<std::string>("name", "").c_str(),
+      ps.get<std::string>("title", "").c_str(), xaxis[0], xaxis[1], xaxis[2]);
+  rtn->SetDirectory(nullptr);
+  return rtn;
+}
+
+template <typename HT>
+inline typename std::enable_if<HType_traits<HT>::NDim == 2,
+                               std::unique_ptr<TH2>>::type
+BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
+  std::array<double, 3> xaxis =
+      ps.get<std::array<double, 3>>("xaxis_descriptor");
+  std::array<double, 3> yaxis =
+      ps.get<std::array<double, 3>>("yaxis_descriptor");
+  std::unique_ptr<TH2> rtn =
+      std::make_unique<TH2D>(ps.get<std::string>("name", "").c_str(),
+                             ps.get<std::string>("title", "").c_str(), xaxis[0],
+                             xaxis[1], xaxis[2], yaxis[0], yaxis[1], yaxis[2]);
+  rtn->SetDirectory(nullptr);
+  return rtn;
+}
 } // namespace utility
 } // namespace nuis

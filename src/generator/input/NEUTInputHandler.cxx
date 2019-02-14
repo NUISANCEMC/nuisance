@@ -1,5 +1,7 @@
 #include "generator/input/NEUTInputHandler.hxx"
 
+#include "persistency/ROOTOutput.hxx"
+
 #include "utility/HistogramUtility.hxx"
 #include "utility/InteractionChannelUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
@@ -38,7 +40,7 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   if (override_flux_file.size()) {
     fFlux = GetHistogramFromROOTFile<TH1>(override_flux_file, flux_name);
-    RebuildEventRate();
+    RebuildEventRate(!ps.get<bool>("flux_hist_in_MeV", false));
   } else {
     fFlux =
         GetHistogramFromROOTFile<TH1>(fInputTreeFile.file, flux_name, false);
@@ -103,7 +105,7 @@ double NEUTInputHandler::GetMonoEXSecWeight() {
   return (xsec / count) * 1E-38;
 }
 
-void NEUTInputHandler::RebuildEventRate() {
+void NEUTInputHandler::RebuildEventRate(bool FluxInGeV) {
   auto XSec = Clone(fFlux, true, "xsec");
   auto Entry = Clone(fFlux, true, "entry");
 
@@ -123,7 +125,7 @@ void NEUTInputHandler::RebuildEventRate() {
     fInputTreeFile.tree->GetEntry(nev_it);
 
     NeutPart *part = fNeutVect->PartInfo(0);
-    double E = part->fP.E();
+    double E = part->fP.E() * (FluxInGeV ? 1E-3 : 1);
 
     XSec->Fill(E, fNeutVect->Totcrs);
     Entry->Fill(E);

@@ -50,7 +50,7 @@ std::unique_ptr<TFile> &GetOutputFile(std::string const &name) {
           << "[WARN]: It appears the default file cannot be opened because it "
              "exists already, to stop you wasting processing time, the default "
              "output stream will be written to nuis.default.tmp.root in the "
-             "current director in RECREATE mode."
+             "current directory in RECREATE mode."
           << std::endl;
       file_name = "nuis.default.tmp.root";
       open_opts = "RECREATE";

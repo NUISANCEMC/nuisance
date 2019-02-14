@@ -60,6 +60,7 @@ protected:
 
   std::vector<bool> fSignalCache;
   std::vector<std::array<NumericT, NDim>> fProjectionCache;
+  bool fUseCache;
 
   std::string fDataInputDescriptor;
   std::unique_ptr<HistType> fData;
@@ -94,6 +95,7 @@ protected:
 public:
   SimpleDataComparison() {
     fIH_id = std::numeric_limits<nuis::input::InputManager::Input_id_t>::max();
+    fUseCache = false;
     write_directory = "";
     NMaxSample_override = std::numeric_limits<size_t>::max();
     fDataInputDescriptor = "";
@@ -131,6 +133,14 @@ public:
 
     energy_cut = nuis::utility::ENuRange{std::numeric_limits<double>::max(),
                                          std::numeric_limits<double>::max()};
+  }
+
+  void SetUseCache(bool uc = true) {
+    fUseCache = uc;
+    if (!uc) {
+      fSignalCache.resize(0);
+      fProjectionCache.resize(0);
+    }
   }
 
   fhicl::ParameterSet fGlobalConfig;
@@ -348,7 +358,7 @@ public:
 
     IInputHandler::ev_index_t ev_idx = 0;
 
-    bool DetermineSignalEvents = !fSignalCache.size();
+    bool DetermineSignalEvents = !fSignalCache.size() || !fUseCache;
 
     nuis::utility::Clear<HistType>(*fPrediction);
     fComparisonFinalized = false;
@@ -356,17 +366,24 @@ public:
     size_t cache_ctr = 0;
 
     while (ev_idx < NEvsToProcess) {
+      bool is_sig = false;
+      std::array<NumericT, NDim> proj;
+
       if (DetermineSignalEvents) {
         nuis::event::FullEvent const &fev = IH.GetFullEvent(ev_idx);
-        bool is_sig = IsSigFunc(fev);
+        is_sig = IsSigFunc(fev);
         fSignalCache.push_back(is_sig);
         if (is_sig) {
-          fProjectionCache.push_back(CompProjFunc(fev));
+          proj = CompProjFunc(fev);
+          fProjectionCache.push_back(proj);
         }
         if (ProcessExtraFunc) {
           ProcessExtraFunc(fev, is_sig,
                            IH.GetEventWeight(ev_idx) * nmax_scaling);
         }
+      } else {
+        is_sig = fSignalCache[ev_idx];
+        proj = fProjectionCache[cache_ctr++];
       }
 
       if (NToShout && !(ev_idx % NToShout)) {
@@ -374,9 +391,8 @@ public:
                                             << " events.");
       }
 
-      if (fSignalCache[ev_idx]) {
-        FillProjection(fProjectionCache[cache_ctr++],
-                       IH.GetEventWeight(ev_idx) * nmax_scaling);
+      if (is_sig) {
+        FillProjection(proj, IH.GetEventWeight(ev_idx) * nmax_scaling);
       }
 
       ev_idx++;

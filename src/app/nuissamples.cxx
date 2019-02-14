@@ -26,18 +26,19 @@ std::string config_out_filename = "";
 bool NameOnly = false;
 
 void SayUsage(char const *argv[]) {
-  std::stringstream ss("");
-  ss << "[USAGE]: " << argv[0]
+  std::cout << "[USAGE]: " << argv[0]
      << "\n"
         "\t-n,-N,-t,-T,-y <search regex> : Filters known IDataComparisons by "
-        "the search term (-n: Name, -t: Target, -y: Year). Capitalized "
-        "versions filter on exact match."
+        "the search term \n"
+        "\t                                (-n: Name, -t: Target, -y: Year). Capitalized versions \n"
+        "\t                                filter on exact match.\n"
         "\t-o <output_file>              : Dump example sample configuration "
-        "file for matching samples.\n"
+        "file for matching \n"
+        "\t                                samples.\n"
         "\t--name-only                   : Only write out matching sample "
-        "names. (Still applies all search terms)\n";
+        "names. \n"
+        "\t                                (Still applies all search terms)\n" << std::endl;
 
-  std::cout << nuis::utility::indent_apply_width(ss.str()) << std::endl;
 }
 
 void handleOpts(int argc, char const *argv[]) {
@@ -47,9 +48,9 @@ void handleOpts(int argc, char const *argv[]) {
         (std::string(argv[opt]) == "--help")) {
       SayUsage(argv);
       exit(0);
-    } else if (std::string(argv[opt]) == "-s") {
+    } else if (std::string(argv[opt]) == "-n") {
       name_search_term = argv[++opt];
-    } else if (std::string(argv[opt]) == "-S") {
+    } else if (std::string(argv[opt]) == "-N") {
       strict_name_regex = true;
       name_search_term = argv[++opt];
     } else if (std::string(argv[opt]) == "-t") {
