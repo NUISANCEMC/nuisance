@@ -457,5 +457,11 @@ BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
   rtn->SetDirectory(nullptr);
   return rtn;
 }
+
+static bool const kYSlice = true;
+static bool const kXSlice = false;
+void SliceNorm(std::unique_ptr<TH2> &hist, bool AlongY = kYSlice,
+               char const *opt = "");
+
 } // namespace utility
 } // namespace nuis

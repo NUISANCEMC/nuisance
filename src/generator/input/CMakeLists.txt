@@ -1,13 +1,16 @@
 if(USE_NUWRO)
   LIST(APPEND INPUT_HANDLERS_IMPL NuWroInputHandler.cxx)
+  LIST(APPEND INPUT_HANDLERS_HDRS NuWroInputHandler.hxx)
 endif(USE_NUWRO)
 
 if(USE_NEUT)
   LIST(APPEND INPUT_HANDLERS_IMPL NEUTInputHandler.cxx)
+  LIST(APPEND INPUT_HANDLERS_HDRS NEUTInputHandler.hxx)
 endif(USE_NEUT)
 
 if(USE_GENIE)
   LIST(APPEND INPUT_HANDLERS_IMPL GENIEInputHandler.cxx)
+  LIST(APPEND INPUT_HANDLERS_HDRS GENIEInputHandler.hxx)
 endif(USE_GENIE)
 
 if(INPUT_HANDLERS_IMPL)
@@ -43,4 +46,6 @@ if(INPUT_HANDLERS_IMPL)
   target_link_libraries(InputHandlers -L${ROOT_LIBDIR} ${ROOT_LIBS})
 
   install(TARGETS InputHandlers DESTINATION plugins)
+
+  install(FILES ${INPUT_HANDLERS_HDRS} DESTINATION include/generator/input)
 endif()

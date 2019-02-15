@@ -1,5 +1,8 @@
 #include "utility/HistogramUtility.hxx"
 
+#include <algorithm>
+#include <cctype>
+
 namespace nuis {
 namespace utility {
 bool IsFlowBin(TAxis const &ax, Int_t bin_it) {
@@ -96,6 +99,53 @@ std::vector<std::unique_ptr<TH1>> GetTH2PolySlices(
     }
   }
   return slices;
+}
+
+void SliceNorm(std::unique_ptr<TH2> &hist, bool AlongY, char const *opt) {
+  std::string opt_str = opt;
+  std::transform(opt_str.begin(), opt_str.end(), opt_str.begin(), ::tolower);
+  bool width = (opt_str.find("width") != std::string::npos);
+  for (int slice_it = 0;
+       slice_it < (AlongY ? hist->GetXaxis() : hist->GetYaxis())->GetNbins();
+       ++slice_it) {
+    int xl = AlongY ? slice_it + 1 : 1;
+    int xu = AlongY ? slice_it + 1 : hist->GetXaxis()->GetNbins();
+
+    int yl = AlongY ? 1 : slice_it + 1;
+    int yu = AlongY ? hist->GetYaxis()->GetNbins() : slice_it + 1;
+
+    double integral = hist->Integral(xl, xu, yl, yu, opt);
+
+    if (integral < std::numeric_limits<double>::epsilon()) {
+      continue;
+    }
+
+    for (int bin_it = 0;
+         bin_it < (AlongY ? hist->GetYaxis() : hist->GetXaxis())->GetNbins();
+         ++bin_it) {
+      double s = 1.0 / integral;
+      if (width) {
+        if (AlongY) {
+          s /= (hist->GetXaxis()->GetBinWidth(slice_it + 1) *
+                hist->GetYaxis()->GetBinWidth(bin_it + 1));
+        } else {
+          s /= (hist->GetYaxis()->GetBinWidth(slice_it + 1) *
+                hist->GetXaxis()->GetBinWidth(bin_it + 1));
+        }
+      }
+      if (AlongY) {
+        hist->SetBinContent(slice_it + 1, bin_it + 1,
+                            hist->GetBinContent(slice_it + 1, bin_it + 1) * s);
+        hist->SetBinContent(slice_it + 1, bin_it + 1,
+                            hist->GetBinContent(slice_it + 1, bin_it + 1) * s);
+      } else {
+        hist->SetBinContent(bin_it + 1, slice_it + 1,
+                            hist->GetBinContent(bin_it + 1, slice_it + 1) * s);
+        hist->SetBinContent(bin_it + 1, slice_it + 1,
+                            hist->GetBinContent(bin_it + 1, slice_it + 1) * s);
+      }
+    }
+  }
 }
 
 } // namespace utility

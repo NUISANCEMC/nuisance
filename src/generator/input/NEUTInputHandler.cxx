@@ -185,6 +185,8 @@ MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
     fWeightCache.push_back(fReaderEvent.XSecWeight);
   }
 
+  fReaderEvent.fGenEvent = fNeutVect;
+
   return fReaderEvent;
 }
 
@@ -245,7 +247,7 @@ size_t NEUTInputHandler::GetNEvents() const {
   return fInputTreeFile.tree->GetEntries();
 }
 
-GeneratorManager::Generator_id_t NEUTInputHandler::GetGeneratorId() {
+GeneratorManager::Generator_id_t NEUTInputHandler::GetGeneratorId() const {
   return GeneratorManager::Get().EnsureGeneratorRegistered("NEUT");
 }
 

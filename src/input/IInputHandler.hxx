@@ -116,7 +116,7 @@ public:
 
   virtual ~IInputHandler() {}
 
-  virtual nuis::GeneratorManager::Generator_id_t GetGeneratorId() = 0;
+  virtual nuis::GeneratorManager::Generator_id_t GetGeneratorId() const = 0;
 };
 
 DECLARE_PLUGIN_INTERFACE(IInputHandler);

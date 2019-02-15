@@ -50,8 +50,10 @@ Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
       // return Particle::Status_t::kIntermediate;
       throw unexpected_NEUT_particle_state()
           << "[ERROR] Found unexpected NEUT particle in neutvect stack: Mode: "
-          << mode << ", Part: { Status: " << part.fStatus
-          << ", IsAlive: " << part.fIsAlive << ", PDG: " << part.fPID << " }.";
+          << mode << " (IsNC: " << IsNC(mode)
+          << "), Part: { Status: " << part.fStatus
+          << ", IsAlive: " << part.fIsAlive << ", PDG: " << part.fPID
+          << ", IsNeutralLepton: " << IsNeutralLepton(part.fPID) << " }.";
     }
 
   } else if ((part.fIsAlive == true) && (part.fStatus == 2) &&

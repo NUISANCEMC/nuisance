@@ -142,7 +142,7 @@ size_t GENIEInputHandler::GetNEvents() const {
   return fInputTree.tree->GetEntries();
 }
 
-GeneratorManager::Generator_id_t GENIEInputHandler::GetGeneratorId() {
+GeneratorManager::Generator_id_t GENIEInputHandler::GetGeneratorId() const {
   return GeneratorManager::Get().EnsureGeneratorRegistered("GENIE");
 }
 

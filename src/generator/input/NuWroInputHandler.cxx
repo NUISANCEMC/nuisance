@@ -99,6 +99,8 @@ FullEvent const &NuWroInputHandler::GetFullEvent(ev_index_t idx) const {
         .particles.push_back(nuis_part);
   }
 
+  fReaderEvent.fGenEvent = fTreeEvent;
+
   return fReaderEvent;
 }
 
@@ -125,7 +127,7 @@ size_t NuWroInputHandler::GetNEvents() const {
   return fInputTree.tree->GetEntries();
 }
 
-GeneratorManager::Generator_id_t NuWroInputHandler::GetGeneratorId(){
+GeneratorManager::Generator_id_t NuWroInputHandler::GetGeneratorId() const {
   return GeneratorManager::Get().EnsureGeneratorRegistered("NuWro");
 }
 

@@ -66,5 +66,5 @@ public:
 
   double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
 
-  nuis::GeneratorManager::Generator_id_t GetGeneratorId();
+  nuis::GeneratorManager::Generator_id_t GetGeneratorId() const;
 };
