@@ -364,7 +364,11 @@ void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
   nework_.modene = nvect->Mode;
   nework_.numne = nvect->Npart();
 
+#ifdef NEUT_COMMON_QEAV
+  nemdls_.mdlqeaf = nvect->QEAVForm;
+#else
   nemdls_.mdlqeaf = nvect->QEVForm;
+#endif
   nemdls_.mdlqe = nvect->QEModel;
   nemdls_.mdlspi = nvect->SPIModel;
   nemdls_.mdldis = nvect->DISModel;
