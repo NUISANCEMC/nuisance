@@ -58,8 +58,12 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
       titles += "pmu";
       foldername = "muonmomentum";
       distdescript = "Muon momentum in lab frame";
+      /*
       fMin = 2.0;
       fMax = 6.0;
+      */
+      fMin = 1.5;
+      fMax = 10.0;
       break;
     case (kMuonTh):
       titles += "thmu";
@@ -72,7 +76,8 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
       titles += "pprot";
       foldername = "protonmomentum";
       distdescript = "Proton momentum in lab frame";
-      fMin = 0.5;
+      //fMin = 0.5;
+      fMin = 0.45;
       fMax = 1.2;
       break;
     case (kPrTh):
@@ -87,28 +92,31 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
       foldername = "neutronmomentum";
       distdescript = "Neutron momentum in lab frame";
       fMin = 0.0;
-      fMax = 0.9;
+      //fMax = 0.9;
+      fMax = 2.0;
       break;
     case (kDalphaT):
       foldername = "dalphat";
       titles += foldername;
       distdescript = "Delta Alpha_T";
       fMin = 0.0;
-      fMax = 170;
+      //fMax = 170;
+      fMax = 180;
       break;
     case (kDpT):
       foldername = "dpt";
       titles += foldername;
       distdescript = "Delta p_T";
       fMin = 0.0;
-      fMax = 170;
+      fMax = 2.0;
       break;
     case (kDphiT):
       foldername = "dphit";
       titles += foldername;
       distdescript = "Delta phi_T";
       fMin = 0.0;
-      fMax = 60.0;
+      //fMax = 60.0;
+      fMax = 180.0;
       break;
     default:
       ERR(FTL) << "Did not find your specified distribution implemented, exiting" << std::endl;
@@ -200,7 +208,7 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetDataFromRootFile(std::string filename) {
   int lastbin = 0;
   startbin = 0;
   for (int i = 0; i < temp->GetXaxis()->GetNbins()+2; ++i) {
-    if (temp->GetBinContent(i+1) > 0 && temp->GetBinLowEdge(i+1) > fMin && temp->GetBinLowEdge(i+1) < fMax) {
+    if (temp->GetBinContent(i+1) > 0 && temp->GetBinLowEdge(i+1) >= fMin && temp->GetBinLowEdge(i+1) <= fMax) {
       if (startbin == 0) startbin = i;
       lastbin = i;
       CrossSection.push_back(temp->GetBinContent(i+1));
