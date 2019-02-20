@@ -101,6 +101,7 @@ CheckAndSetDefaultCache(USE_NuWro_SRW_Event FALSE BOOL "Whether to use cut down 
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")
 CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
+CheckAndSetDefaultCache(GENIE_EMPMEC_REWEIGHT FALSE BOOL "Whether to use GENIE EMP MEC reweight (requires custom GENIE) <FALSE>")
 CheckAndSetDefaultEnv(LHAPDF_LIB "" PATH "Path to pre-built LHAPDF libraries. Overrides environment variable \$LHAPDF_LIB. <>" LHAPDF_LIB)
 CheckAndSetDefaultEnv(LHAPDF_INC "" PATH "Path to installed LHAPDF headers. Overrides environment variable \$LHAPDF_INC. <>" LHAPDF_INC)
 CheckAndSetDefaultEnv(LHAPATH "" PATH "Path to LHA PDF inputs. Overrides environment variable \$LHAPATH. <>" LHAPATH)

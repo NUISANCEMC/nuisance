@@ -1230,7 +1230,7 @@ TH1D* JointMeas1D::GetMCHistogram() {
   if (!fMCHist) return fMCHist;
 
   std::ostringstream chi2;
-  chi2 << std::setprecision(5) << this->GetLikelihood();
+  chi2 << "#chi^{2}=" << std::setprecision(5) << this->GetLikelihood();
 
   int linecolor = kRed;
   int linestyle = 1;
@@ -1439,7 +1439,7 @@ void JointMeas1D::WriteShapePlot() {
   mcShape->Scale(shapeScale);
 
   std::stringstream ss;
-  ss << shapeScale;
+  ss << "Scale=" << shapeScale;
   mcShape->SetTitle(ss.str().c_str());
 
   mcShape->SetLineWidth(3);

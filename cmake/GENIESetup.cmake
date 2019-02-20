@@ -39,6 +39,11 @@ if (BUILD_GEVGEN)
   LIST(APPEND EXTRA_CXX_FLAGS -D__GEVGEN_ENABLED__)
 endif()
 
+if(GENIE_EMPMEC_REWEIGHT)
+  cmessage(STATUS "Enable EMPMEC dials")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_EMP_MECRW_ENABLED)
+endif()
+
 # Extract GENIE VERSION
 if (GENIE_VERSION STREQUAL "AUTO")
    execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh ${GENIE}
@@ -79,7 +84,7 @@ if(NOT WASMATCHED)
   cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
 endif()
 
-string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
+string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--no-as-needed -Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
 cmessage(DEBUG "genie-config --libs -- MATCH1: ${CMAKE_MATCH_1}")
 cmessage(DEBUG "genie-config --libs -- MATCH2: ${CMAKE_MATCH_2}")
 cmessage(DEBUG "genie-config --libs -- libs stripped: ${GENIE_LIBS_STRIPED}")

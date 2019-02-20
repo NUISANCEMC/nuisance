@@ -243,26 +243,89 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   // Now we have each of the targets we need to create a total cross-section.
   int totalnucl = 0;
   // Get the targets specified by the user, separated by commas
+  // This has structure target1[fraction1], target2[fraction2]
   std::vector<std::string> targprs = GeneralUtils::ParseToStr(target, ",");
+
+  std::vector<std::string> targ_list;
+  std::vector<std::string> frac_list;
+
+  // Chop up the target string which has format TARGET1[fraction1],TARGET2[fraction2]
+
+  //std::cout << "Targets: " << std::endl;
+  // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
+  for (std::vector<std::string>::iterator it = targprs.begin(); it != targprs.end(); ++it) {
+    // Cut into "TARGET1" and "fraction1]"
+    std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
+    //std::cout << "  " << *it << std::endl;
+    // Cut into "TARGET1" and "fraction1"
+    for (std::vector<std::string>::iterator jt = targind.begin(); jt != targind.end(); ++jt) {
+      if ((*jt).find("]") != std::string::npos) {
+        (*jt) = (*jt).substr(0, (*jt).find("]"));
+        //*jt = "hello";
+        frac_list.push_back(*jt);
+        // Won't find bracket for target
+      } else {
+        targ_list.push_back(*jt);
+      }
+    }
+  }
+
+  targprs = targ_list;
+
+  std::vector<double> targ_fractions;
+  double minimum = 1.0;
+  for (std::vector<std::string>::iterator it = frac_list.begin(); it != frac_list.end(); it++) {
+    //std::cout << "  " << *it << std::endl;
+    double frac = std::atof((*it).c_str());
+    targ_fractions.push_back(frac);
+    if (frac < minimum) minimum = frac;
+  }
+
+  std::vector<double>::iterator it = targ_fractions.begin();
+  std::vector<std::string>::iterator jt = targ_list.begin();
+  double scaling = 0;
+  for (; it != targ_fractions.end(); it++, jt++) {
+    // First get the mass number from the targ_list
+    int nucl = atoi((*jt).c_str());
+    nucl = (nucl%10000)/10;
+    // Gets the relative portions right
+    *it = (*it)/minimum;
+    // Scale relative the atomic mass
+    //(*it) *= (double(nucl)/(*it));
+    double tempscaling = double(nucl)/(*it);
+    if (tempscaling > scaling) scaling=tempscaling;
+  }
+  it = targ_fractions.begin();
+  for (; it != targ_fractions.end(); it++) {
+    // Round the scaling to nearest integer and multiply
+    *it *= int(scaling+0.5);
+    // Round to nearest integer
+    *it = int(*it+0.5);
+    totalnucl += *it;
+  }
+
+  if (totalnucl == 0) {
+    THROW("Didn't find any nucleons in input file. Did you really specify the target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]" << std::endl);
+  }
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
   for (uint i = 0; i < targprs.size(); i++) {
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
-
     for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin();
         iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D* xsec = iter->second;
 
+      // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
         LOG(FIT) << "Adding target spline " << targstr << " Integral = " << xsec->Integral("width") << std::endl;
         totalxsec->Add(xsec);
 
-        int nucl = atoi(targpdg.c_str());
-        totalnucl += int((nucl % 10000) / 10);
+        //int nucl = atoi(targpdg.c_str());
+        //totalnucl += int((nucl % 10000) / 10);
       } 
     }
 
@@ -628,7 +691,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     THROW("Didn't find any nucleons in input file. Did you really specify the target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]" << std::endl);
   }
 
-
   TH1D* totalxsec = (TH1D*)xsechist->Clone();
 
   // Loop over the specified targets by the user
@@ -636,7 +698,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
-
     for (std::map<std::string, TH1D*>::iterator iter = targetsplines.begin(); iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D* xsec = iter->second;

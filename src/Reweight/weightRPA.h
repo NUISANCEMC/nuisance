@@ -155,7 +155,6 @@ double weightRPA::getWeightInternal(const double mc_q0, const double mc_q3,  dou
   Int_t q0offsetValenciaGENIE = 10;
 #endif
 
-
   if(mc_q0 < 0.018) q0bin = 18+q0offsetValenciaGENIE;
   Double_t thisrwtemp = hRPArelratio->GetBinContent(q3bin,q0bin-q0offsetValenciaGENIE);
   
