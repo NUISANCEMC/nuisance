@@ -13,8 +13,14 @@
 #include "NOvARwgt/rwgt/genie/DIS/HighWDISWeight.h"
 #include "NOvARwgt/rwgt/genie/DIS/Nonres1piWeights.h"
 
+#include "NOvARwgt/rwgt/tunes/Tunes2017.h"
+#include "NOvARwgt/rwgt/tunes/Tunes2018.h"
+#include "NOvARwgt/rwgt/tunes/Tunes2019.h"
+#include "NOvARwgt/rwgt/tunes/TunesSA.h"
+
 #include "NOvARwgt/rwgt/EventRecord.h"
 #include "NOvARwgt/rwgt/IWeightGenerator.h"
+#include "NOvARwgt/rwgt/Tune.h"
 
 static size_t const kRPAWeightCCQESA = 0;
 static size_t const kRPAWeightCCQE_2017 = 1;
@@ -35,6 +41,11 @@ static size_t const kMEC2018RPAFix_QElike_Wgt = 15;
 static size_t const kMEC2018RPAFix_RESlike_Wgt = 16;
 static size_t const kNonres1PiWgt = 17;
 static size_t const kHighWDISWgt_2018 = 18;
+static size_t const kTuneSeparator = 100;
+static size_t const kTune2017 = kTuneSeparator + 1;
+static size_t const kTune2018 = kTuneSeparator + 2;
+static size_t const kTune2019 = kTuneSeparator + 3;
+static size_t const kTuneSA = kTuneSeparator + 4;
 static size_t const kNoSuchWeightEngine = std::numeric_limits<size_t>::max();
 
 size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
@@ -77,6 +88,14 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     return kNonres1PiWgt;
   } else if (strname == "HighWDISWgt_2018") {
     return kHighWDISWgt_2018;
+  } else if (strname == "Tune2017") {
+    return kTune2017;
+  } else if (strname == "Tune2018") {
+    return kTune2018;
+  } else if (strname == "Tune2019") {
+    return kTune2019;
+  } else if (strname == "TuneSA") {
+    return kTuneSA;
   }
   return kNoSuchWeightEngine;
 }
@@ -140,32 +159,69 @@ novarwgt::IWeightGenerator *IWeightGeneratorFactory(size_t e) {
   case kHighWDISWgt_2018: {
     return new novarwgt::HighWDISWgt_2018();
   }
-  default: { return nullptr; }
+  default: { return NULL; }
+  }
+}
+
+novarwgt::Tune const *TuneFactory(size_t e) {
+  switch (e) {
+  case kTune2017: {
+    return &novarwgt::kCVTune2017;
+  }
+  case kTune2018: {
+    return &novarwgt::kCVTune2018;
+  }
+  case kTune2019: {
+    return &novarwgt::kCVTune2019;
+  }
+  case kTuneSA: {
+    return &novarwgt::kCVTuneSA;
+  }
+  default: { return NULL; }
   }
 }
 
 void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
-  size_t e = GetWeightGeneratorIndex(name);
-  if (e == kNoSuchWeightEngine) {
+  size_t we_e = GetWeightGeneratorIndex(name);
+  if (we_e == kNoSuchWeightEngine) {
     THROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  if (fWeightEngineEnums.find(e) != fWeightEngineEnums.end()) {
-    THROW("[ERROR]: NOvARwgt Engine name: " << name << " already included.");
+  if (we_e < kTuneSeparator) {
+    if (fWeightEngineEnums.find(we_e) != fWeightEngineEnums.end()) {
+      THROW("[ERROR]: NOvARwgt Engine name: " << name << " already included.");
+    }
+    fWeightEngineEnums[we_e] = fWeightEngines.size();
+    fWeightEngines.push_back(IWeightGeneratorFactory(we_e));
+    fWeightEngineValues.push_back(startval);
+  } else {
+    if (fTuneEnums.find(we_e) != fTuneEnums.end()) {
+      THROW("[ERROR]: NOvARwgt Tune name: " << name << " already included.");
+    }
+    fTuneEnums[we_e] = fTunes.size();
+    fTunes.push_back(TuneFactory(we_e));
+    fTuneValues.push_back(startval);
   }
-  fWeightEngineEnums[e] = fWeightEngines.size();
-  fWeightEngines.push_back(IWeightGeneratorFactory(e));
-  fWeightEngineValues.push_back(startval);
 };
 
 void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
   size_t we_indx = (nuisenum % 1000);
-  if (!fWeightEngineEnums.count(we_indx)) {
-    THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
-          << we_indx << " but that engine hasn't been included yet.");
-  }
-  size_t engine_index = fWeightEngineEnums[we_indx];
+  if (we_indx < kTuneSeparator) {
+    if (!fWeightEngineEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that engine hasn't been included yet.");
+    }
+    size_t engine_index = fWeightEngineEnums[we_indx];
 
-  fWeightEngineValues[engine_index] = val;
+    fWeightEngineValues[engine_index] = val;
+  } else {
+    if (!fTuneEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that tune hasn't been included yet.");
+    }
+    size_t engine_index = fTuneEnums[we_indx];
+
+    fTuneValues[engine_index] = val;
+  }
 }
 
 void NOvARwgtEngine::SetDialValue(std::string name, double val) {
@@ -173,13 +229,23 @@ void NOvARwgtEngine::SetDialValue(std::string name, double val) {
   if (we_indx == kNoSuchWeightEngine) {
     THROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  if (!fWeightEngineEnums.count(we_indx)) {
-    THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
-          << we_indx << " but that engine hasn't been included yet.");
-  }
-  size_t engine_index = fWeightEngineEnums[we_indx];
+  if (we_indx < kTuneSeparator) {
+    if (!fWeightEngineEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that engine hasn't been included yet.");
+    }
+    size_t engine_index = fWeightEngineEnums[we_indx];
 
-  fWeightEngineValues[engine_index] = val;
+    fWeightEngineValues[engine_index] = val;
+  } else {
+    if (!fTuneEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that tune hasn't been included yet.");
+    }
+    size_t engine_index = fTuneEnums[we_indx];
+
+    fTuneValues[engine_index] = val;
+  }
 }
 
 bool NOvARwgtEngine::IsDialIncluded(std::string name) {
@@ -187,11 +253,19 @@ bool NOvARwgtEngine::IsDialIncluded(std::string name) {
   if (we_indx == kNoSuchWeightEngine) {
     THROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  return fWeightEngineEnums.count(we_indx);
+  if (we_indx < kTuneSeparator) {
+    return fWeightEngineEnums.count(we_indx);
+  } else {
+    return fTuneEnums.count(we_indx);
+  }
 }
 bool NOvARwgtEngine::IsDialIncluded(int nuisenum) {
   size_t we_indx = (nuisenum % 1000);
-  return fWeightEngineEnums.count(we_indx);
+  if (we_indx < kTuneSeparator) {
+    return fWeightEngineEnums.count(we_indx);
+  } else {
+    return fTuneEnums.count(we_indx);
+  }
 }
 
 double NOvARwgtEngine::GetDialValue(std::string name) {
@@ -199,11 +273,19 @@ double NOvARwgtEngine::GetDialValue(std::string name) {
   if (we_indx == kNoSuchWeightEngine) {
     THROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  if (!fWeightEngineEnums.count(we_indx)) {
-    THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
-          << we_indx << " but that engine hasn't been included yet.");
+  if (we_indx < kTuneSeparator) {
+    if (!fWeightEngineEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that engine hasn't been included yet.");
+    }
+    return fWeightEngineValues[fWeightEngineEnums[we_indx]];
+  } else {
+    if (!fTuneEnums.count(we_indx)) {
+      THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+            << we_indx << " but that tune hasn't been included yet.");
+    }
+    return fTuneValues[fTuneEnums[we_indx]];
   }
-  return fWeightEngineValues[fWeightEngineEnums[we_indx]];
 }
 double NOvARwgtEngine::GetDialValue(int nuisenum) {
   size_t we_indx = (nuisenum % 1000);
@@ -211,7 +293,11 @@ double NOvARwgtEngine::GetDialValue(int nuisenum) {
     THROW("[ERROR]: SetDialValue for NOvARwgt dial: "
           << we_indx << " but that engine hasn't been included yet.");
   }
-  return fWeightEngineValues[fWeightEngineEnums[we_indx]];
+  if (we_indx < kTuneSeparator) {
+    return fWeightEngineValues[fWeightEngineEnums[we_indx]];
+  } else {
+    return fTuneValues[fTuneEnums[we_indx]];
+  }
 }
 
 double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
@@ -246,6 +332,14 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
       continue;
     }
     rw_weight *= fWeightEngines[w_it]->GetWeight(rcd, dummyparams);
+  }
+
+  for (size_t w_it = 0; w_it < fTunes.size(); ++w_it) {
+    if (fTuneValues[w_it] ==
+        0) { // if a dial is set to 0, don't include its weight
+      continue;
+    }
+    rw_weight *= fTunes[w_it]->EventWeight(rcd);
   }
 
   return rw_weight;
