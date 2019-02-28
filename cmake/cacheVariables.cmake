@@ -123,6 +123,11 @@ CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrid
 
 CheckAndSetDefaultCache(USE_MINERvA_RW FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
 
+CheckAndSetDefaultCache(USE_NOvARwgt FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
+
+CheckAndSetDefaultEnv(NOVARWGT "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$NOVARWGT <>" NOVARWGT)
+
+
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)
 
 CheckAndSetDefaultEnv(PYTHIA8 "" PATH "Path to directory containing libPythia8.so. Overrides environment variable \$PYTHIA8 <>" PYTHIA8)

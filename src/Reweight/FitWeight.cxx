@@ -12,57 +12,64 @@
 #include "SplineWeightEngine.h"
 #include "T2KWeightEngine.h"
 
+#ifdef __NOVA_ENABLED__
+#include "NOvARwgtEngine.h"
+#endif
+
 void FitWeight::AddRWEngine(int type) {
   LOG(FIT) << "Adding reweight engine " << type << std::endl;
   switch (type) {
-    case kNEUT:
-      fAllRW[type] = new NEUTWeightEngine("neutrw");
-      break;
+  case kNEUT:
+    fAllRW[type] = new NEUTWeightEngine("neutrw");
+    break;
 
-    case kNUWRO:
-      fAllRW[type] = new NuWroWeightEngine("nuwrorw");
-      break;
+  case kNUWRO:
+    fAllRW[type] = new NuWroWeightEngine("nuwrorw");
+    break;
 
-    case kGENIE:
-      fAllRW[type] = new GENIEWeightEngine("genierw");
-      break;
+  case kGENIE:
+    fAllRW[type] = new GENIEWeightEngine("genierw");
+    break;
 
-    case kNORM:
-      fAllRW[type] = new SampleNormEngine("normrw");
-      break;
+  case kNORM:
+    fAllRW[type] = new SampleNormEngine("normrw");
+    break;
 
-    case kLIKEWEIGHT:
-      fAllRW[type] = new LikelihoodWeightEngine("likerw");
-      break;
+  case kLIKEWEIGHT:
+    fAllRW[type] = new LikelihoodWeightEngine("likerw");
+    break;
 
-    case kT2K:
-      fAllRW[type] = new T2KWeightEngine("t2krw");
-      break;
+  case kT2K:
+    fAllRW[type] = new T2KWeightEngine("t2krw");
+    break;
 
-    case kCUSTOM:
-      fAllRW[type] = new NUISANCEWeightEngine("nuisrw");
-      break;
+  case kCUSTOM:
+    fAllRW[type] = new NUISANCEWeightEngine("nuisrw");
+    break;
 
-    case kSPLINEPARAMETER:
-      fAllRW[type] = new SplineWeightEngine("splinerw");
-      break;
+  case kSPLINEPARAMETER:
+    fAllRW[type] = new SplineWeightEngine("splinerw");
+    break;
 
-    case kNIWG:
-      fAllRW[type] = new NIWGWeightEngine("niwgrw");
-      break;
-    case kOSCILLATION:
-      fAllRW[type] = new OscWeightEngine();
-      break;
-    case kMODENORM:
-      fAllRW[type] = new ModeNormEngine();
-      break;
-    default:
-      THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
-      break;
+  case kNIWG:
+    fAllRW[type] = new NIWGWeightEngine("niwgrw");
+    break;
+  case kOSCILLATION:
+    fAllRW[type] = new OscWeightEngine();
+    break;
+  case kMODENORM:
+    fAllRW[type] = new ModeNormEngine();
+    break;
+  case kNOvARWGT:
+    fAllRW[type] = new NOvARwgtEngine();
+    break;
+  default:
+    THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
+    break;
   }
 }
 
-WeightEngineBase* FitWeight::GetRWEngine(int type) {
+WeightEngineBase *FitWeight::GetRWEngine(int type) {
   if (HasRWEngine(type)) {
     return fAllRW[type];
   }
@@ -71,19 +78,20 @@ WeightEngineBase* FitWeight::GetRWEngine(int type) {
 
 bool FitWeight::HasRWEngine(int type) {
   switch (type) {
-    case kNEUT:
-    case kNUWRO:
-    case kGENIE:
-    case kNORM:
-    case kLIKEWEIGHT:
-    case kT2K:
-    case kCUSTOM:
-    case kSPLINEPARAMETER:
-    case kNIWG:
-    case kOSCILLATION: {
-      return fAllRW.count(type);
-    }
-    default: { THROW("CANNOT get RW Engine for dial type: " << type); }
+  case kNEUT:
+  case kNUWRO:
+  case kGENIE:
+  case kNORM:
+  case kLIKEWEIGHT:
+  case kT2K:
+  case kCUSTOM:
+  case kSPLINEPARAMETER:
+  case kNIWG:
+  case kOSCILLATION:
+  case kNOvARWGT: {
+    return fAllRW.count(type);
+  }
+  default: { THROW("CANNOT get RW Engine for dial type: " << type); }
   }
 }
 
@@ -105,7 +113,7 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
   if (fAllRW.find(dialtype) == fAllRW.end()) {
     AddRWEngine(dialtype);
   }
-  WeightEngineBase* rw = fAllRW[dialtype];
+  WeightEngineBase *rw = fAllRW[dialtype];
 
   // Include the dial
   rw->IncludeDial(name, val);
@@ -127,7 +135,7 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
 
 void FitWeight::Reconfigure(bool silent) {
   // Reconfigure all added RW engines
-  for (std::map<int, WeightEngineBase*>::iterator iter = fAllRW.begin();
+  for (std::map<int, WeightEngineBase *>::iterator iter = fAllRW.begin();
        iter != fAllRW.end(); iter++) {
     (*iter).second->Reconfigure(silent);
   }
@@ -161,7 +169,7 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
   }
 }
 
-void FitWeight::SetAllDials(const double* x, int n) {
+void FitWeight::SetAllDials(const double *x, int n) {
   for (size_t i = 0; i < (UInt_t)n; i++) {
     int rwenum = fEnumList[i];
     SetDialValue(rwenum, x[i]);
@@ -201,9 +209,9 @@ bool FitWeight::DialIncluded(int rwenum) {
   return (fAllValues.find(rwenum) != fAllValues.end());
 }
 
-double FitWeight::CalcWeight(BaseFitEvt* evt) {
+double FitWeight::CalcWeight(BaseFitEvt *evt) {
   double rwweight = 1.0;
-  for (std::map<int, WeightEngineBase*>::iterator iter = fAllRW.begin();
+  for (std::map<int, WeightEngineBase *>::iterator iter = fAllRW.begin();
        iter != fAllRW.end(); iter++) {
     double w = (*iter).second->CalcWeight(evt);
     rwweight *= w;
@@ -211,7 +219,7 @@ double FitWeight::CalcWeight(BaseFitEvt* evt) {
   return rwweight;
 }
 
-void FitWeight::UpdateWeightEngine(const double* x) {
+void FitWeight::UpdateWeightEngine(const double *x) {
   size_t count = 0;
   for (std::vector<int>::iterator iter = fEnumList.begin();
        iter != fEnumList.end(); iter++) {
@@ -220,7 +228,7 @@ void FitWeight::UpdateWeightEngine(const double* x) {
   }
 }
 
-void FitWeight::GetAllDials(double* x, int n) {
+void FitWeight::GetAllDials(double *x, int n) {
   for (int i = 0; i < n; i++) {
     x[i] = GetDialValue(fEnumList[i]);
   }
@@ -252,7 +260,8 @@ void FitWeight::GetAllDials(double* x, int n) {
 // }
 
 double FitWeight::GetSampleNorm(std::string name) {
-  if (name.empty()) return 1.0;
+  if (name.empty())
+    return 1.0;
 
   // Find norm dial
   if (fAllEnums.find(name + "_norm") != fAllEnums.end()) {

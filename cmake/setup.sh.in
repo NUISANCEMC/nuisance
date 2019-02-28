@@ -157,4 +157,9 @@ if [ "@BUILD_GiBUU@" != "FALSE" ]; then
   source @CMAKE_BINARY_DIR@/GiBUUTools/src/GiBUUTools-build/Linux/setup.sh
 fi
 
+if [ "@USE_NOvARwgt@" != "FALSE" ]; then
+  export NOVARWGT=@NOVARWGT@
+  add_to_LD_LIBRARY_PATH @NOVARWGT@/lib
+fi
+
 export NUISANCE="@CMAKE_SOURCE_DIR@"
