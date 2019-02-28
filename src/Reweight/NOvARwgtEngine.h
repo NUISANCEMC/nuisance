@@ -4,6 +4,7 @@
 
 namespace novarwgt {
 class IWeightGenerator;
+class Tune;
 }
 
 class NOvARwgtEngine : public WeightEngineBase {
@@ -33,4 +34,8 @@ public:
   std::map<size_t, size_t> fWeightEngineEnums;
   std::vector<novarwgt::IWeightGenerator *> fWeightEngines;
   std::vector<double> fWeightEngineValues;
+
+  std::map<size_t, size_t> fTuneEnums;
+  std::vector<novarwgt::Tune const *> fTunes;
+  std::vector<double> fTuneValues;
 };
