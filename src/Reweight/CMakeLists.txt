@@ -37,6 +37,10 @@ MINERvAWeightCalcs.cxx
 weightRPA.h
 )
 
+if(USE_NOvARwgt)
+  LIST(APPEND IMPLFILES NOvARwgtEngine.cxx)
+endif()
+
 set(HEADERFILES
 GlobalDialList.h
 FitWeight.h
@@ -57,6 +61,10 @@ OscWeightEngine.h
 MINERvAWeightCalcs.h
 weightRPA.h
 )
+
+if(USE_NOvARwgt)
+  LIST(APPEND HEADERFILES NOvARwgtEngine.h)
+endif()
 
 set(LIBNAME Reweight)
 
