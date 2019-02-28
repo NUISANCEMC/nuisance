@@ -194,8 +194,6 @@ double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
 
   // Even though this chi2 calculation looks ugly it is _EXACTLY_ what MINERvA used for their measurement
   // Can be prettified in due time but for now keep
-  bool chi2_use_overflow_err = false;
-  //const int lowBin  = chi2_use_overflow_err?0:1; // Either they both use underflow, or neither of them does
 
   int nbinsx=fMCHist->GetNbinsX();
   int nbinsy=fMCHist->GetNbinsY();

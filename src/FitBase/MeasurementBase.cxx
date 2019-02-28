@@ -499,13 +499,6 @@ void MeasurementBase::SetAutoProcessTH1(StackBase* hist, int c1, int c2, int c3,
                                         int c4, int c5) {
   // Set Defaults
   // int ncommands = kCMD_extraplotflags;
-  bool autoflags[5];
-  autoflags[0] = false;
-  autoflags[1] = false;
-  autoflags[2] = false;
-  autoflags[3] = false;
-  autoflags[4] = false;
-
   int givenflags[5];
   givenflags[0] = c1;
   givenflags[1] = c2;
@@ -537,7 +530,6 @@ void MeasurementBase::SetAutoProcessTH1(StackBase* hist, int c1, int c2, int c3,
 
       case kCMD_Fill:
         ERR(FTL) << "Can't auto fill yet!" << std::endl;
-        autoflags[givenflags[i]] = 1;
         break;
 
       default:
