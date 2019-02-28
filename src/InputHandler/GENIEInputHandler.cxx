@@ -19,6 +19,19 @@
 #ifdef __GENIE_ENABLED__
 #include "GENIEInputHandler.h"
 
+#pragma push_macro("LOG")
+#undef LOG
+#pragma push_macro("ERROR")
+#undef ERROR
+#ifdef GENIE_PRE_R3
+#include "Messenger/Messenger.h"
+#else
+#include "Framework/Messenger/Messenger.h"
+#endif
+#pragma pop_macro("LOG")
+#pragma pop_macro("ERROR")
+
+
 #include "InputUtils.h"
 
 GENIEGeneratorInfo::~GENIEGeneratorInfo() { DeallocateParticleStack(); }
@@ -75,6 +88,8 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
                                      std::string const& rawinputs) {
   LOG(SAM) << "Creating GENIEInputHandler : " << handle << std::endl;
 
+  genie::Messenger::Instance()->SetPriorityLevel("GHepUtils", pFATAL);
+
   // Run a joint input handling
   fName = handle;
 
@@ -128,7 +143,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const& handle,
       THROW("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
-    
+
     int nevents = genietree->GetEntries();
     if (nevents <= 0) {
       THROW("Trying to a TTree with "
@@ -212,6 +227,11 @@ void GENIEInputHandler::RemoveCache() {
 
 FitEvent* GENIEInputHandler::GetNuisanceEvent(const UInt_t entry, const bool lightweight) {
   if (entry >= (UInt_t)fNEvents) return NULL;
+
+  // Clear the previous event (See Note 1 in ROOT TClonesArray documentation)
+  if (fGenieNtpl) {
+    fGenieNtpl->Clear();
+  }
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGENIETree->GetEntry(entry);

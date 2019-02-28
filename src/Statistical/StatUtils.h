@@ -175,7 +175,7 @@ namespace StatUtils{
   TMatrixDSym* GetCovarFromCorrel(TMatrixDSym* correl, TH1D* data);
 
   //! Given a normalisation factor for a dataset add in a new normalisation term to the covariance.
-  void ForceNormIntoCovar(TMatrixDSym* mat, TH1D* data, double norm);
+  void ForceNormIntoCovar(TMatrixDSym*& mat, TH1D* data, double norm);
 
   //! Given a normalisation factor for a dataset add in a new normalisation term to the covariance.
   //! Convertes 2D to 1D, before using 1D ForceNormIntoCovar

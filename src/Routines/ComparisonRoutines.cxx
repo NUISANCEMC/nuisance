@@ -45,6 +45,7 @@ void ComparisonRoutines::Init() {
 //*************************************
 ComparisonRoutines::~ComparisonRoutines() {
 //*************************************
+delete fOutputRootFile;
 };
 
 
@@ -528,5 +529,3 @@ void ComparisonRoutines::SaveNominal() {
   GenerateComparison();
   SaveCurrentState("nominal");
 };
-
-

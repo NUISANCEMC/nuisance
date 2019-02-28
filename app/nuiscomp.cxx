@@ -215,6 +215,7 @@ int main(int argc, char* argv[]) {
   // Make minimizer class and run fit
   ComparisonRoutines* comp = new ComparisonRoutines(argc, argv);
   comp->Run();
+  delete comp;
 
   // Show Final Status
   LOG(FIT) << "------------------------------------ -" << std::endl;
@@ -223,6 +224,3 @@ int main(int argc, char* argv[]) {
 
   return status;
 }
-
-
-

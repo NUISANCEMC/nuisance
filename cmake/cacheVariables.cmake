@@ -101,6 +101,7 @@ CheckAndSetDefaultCache(USE_NuWro_SRW_Event FALSE BOOL "Whether to use cut down 
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")
 CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
+CheckAndSetDefaultEnv(GENIE_REWEIGHT "" PATH "Path to GENIE ReWeight directory. Only relevant for GENIE v3+. Overrides environment variable \$GENIE_REWEIGHT <>" GENIE_REWEIGHT)
 CheckAndSetDefaultCache(GENIE_EMPMEC_REWEIGHT FALSE BOOL "Whether to use GENIE EMP MEC reweight (requires custom GENIE) <FALSE>")
 CheckAndSetDefaultEnv(LHAPDF_LIB "" PATH "Path to pre-built LHAPDF libraries. Overrides environment variable \$LHAPDF_LIB. <>" LHAPDF_LIB)
 CheckAndSetDefaultEnv(LHAPDF_INC "" PATH "Path to installed LHAPDF headers. Overrides environment variable \$LHAPDF_INC. <>" LHAPDF_INC)
@@ -109,6 +110,8 @@ CheckAndSetDefaultEnv(LIBXML2_LIB "" PATH "Path to pre-built LIBXML2 libraries. 
 CheckAndSetDefaultEnv(LIBXML2_INC "" PATH "Path to installed LIBXML2 headers. Overrides environment variable \$LIBXML2_INC. <>" LIBXML2_INC)
 CheckAndSetDefaultEnv(LOG4CPP_LIB "" PATH "Path to pre-built LOG4CPP libraries. Overrides environment variable \$LOG4CPP_LIB. <>" LOG4CPP_LIB)
 CheckAndSetDefaultEnv(LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Overrides environment variable \$LOG4CPP_INC. <>" LOG4CPP_INC)
+CheckAndSetDefaultEnv(GSL_LIB "" PATH "Path to pre-built gsl libraries. Overrides environment variable \$GSL_LIB. <>" GSL_LIB)
+CheckAndSetDefaultEnv(GSL_INC "" PATH "Path to installed gsl headers. Overrides environment variable \$GSL_INC. <>" GSL_INC)
 
 CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevgen app.")
 
@@ -119,6 +122,11 @@ CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeig
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
 
 CheckAndSetDefaultCache(USE_MINERvA_RW FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
+
+CheckAndSetDefaultCache(USE_NOvARwgt FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
+
+CheckAndSetDefaultEnv(NOVARWGT "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$NOVARWGT <>" NOVARWGT)
+
 
 CheckAndSetDefaultEnv(PYTHIA6 "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" PYTHIA6)
 

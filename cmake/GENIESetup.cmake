@@ -22,6 +22,7 @@
 # check whether we need the includes
 # check if we can use a subset of the GENIE libraries
 
+include(${CMAKE_SOURCE_DIR}/cmake/parseConfigApp.cmake)
 ################################################################################
 #                            Check Dependencies
 ################################################################################
@@ -30,7 +31,7 @@
 if(GENIE STREQUAL "")
   cmessage(FATAL_ERROR "Variable GENIE is not defined. "
     "The location of a pre-built GENIE install must be defined either as"
-    " $ cmake -DGENIE=/path/to/GENIE or as and environment vairable"
+    " $ cmake -DGENIE=/path/to/GENIE or as an environment variable"
     " $ export GENIE=/path/to/GENIE")
 endif()
 
@@ -50,129 +51,174 @@ if (GENIE_VERSION STREQUAL "AUTO")
    OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
-execute_process (COMMAND genie-config
-  --libs OUTPUT_VARIABLE GENIE_LD_FLAGS_STR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND genie-config --version
+OUTPUT_VARIABLE GENIE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
+cmessage(STATUS "genie_ver: ${GENIE_VER}")
+if(GENIE_VER VERSION_GREATER 3.0.0)
+  set(GENIE_POST_R3 1)
+  string(REPLACE "." "" GENIE_VERSION ${GENIE_VER})
+  cmessage(STATUS "set genie_post_r3")
+endif()
+
+if(NOT GENIE_POST_R3)
+LIST(APPEND EXTRA_CXX_FLAGS -DGENIE_PRE_R3)
+cmessage(STATUS "setting genie_pre_r3 ${EXTRA_CXX_FLAGS}")
+endif()
+
 execute_process (COMMAND genie-config
   --topsrcdir OUTPUT_VARIABLE GENIE_INCLUDES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-string(REGEX MATCH "-L\([^ ]+\) \(.*\)$" PARSE_GENIE_LIBS_MATCH ${GENIE_LD_FLAGS_STR})
-
-cmessage(DEBUG "genie-config --libs: ${GENIE_LD_FLAGS_STR}")
-
-if(NOT PARSE_GENIE_LIBS_MATCH)
-  cmessage(FATAL_ERROR "Expected to be able to parse the result of genie-config --libs to a lib directory and a list of libraries to include, but got: \"${GENIE_LD_FLAGS_STR}\"")
+#Allows for external override in the case where genie-config lies.
+if(NOT DEFINED GENIE_LIB_DIR OR GENIE_LIB_DIR STREQUAL "")
+  GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
 endif()
-
-set(GENIE_LIB_DIR ${CMAKE_MATCH_1})
-set(GENIE_LIBS_RAW ${CMAKE_MATCH_2})
-string(REPLACE "-l" "" GENIE_LIBS_STRIPED "${GENIE_LIBS_RAW}")
+GETLIBS(genie-config --libs GENIE_LIBS)
 
 cmessage(STATUS "GENIE version : ${GENIE_VERSION}")
 cmessage(STATUS "GENIE libdir  : ${GENIE_LIB_DIR}")
-cmessage(STATUS "GENIE libs    : ${GENIE_LIBS_STRIPED}")
+cmessage(STATUS "GENIE libs    : ${GENIE_LIBS}")
 
-string(REGEX MATCH "ReinSeghal" WASMATCHED ${GENIE_LIBS_STRIPED})
+string(REGEX MATCH "ReinSeghal" WASMATCHED ${GENIE_LIBS})
 if(WASMATCHED AND GENIE_VERSION STREQUAL "210")
-  set(GENIE_SEHGAL ${GENIE_LIBS_STRIPED})
-  STRING(REPLACE "ReinSeghal" "ReinSehgal" GENIE_LIBS_STRIPED ${GENIE_SEHGAL})
-  cmessage(DEBUG "Fixed inconsistency in library naming: ${GENIE_LIBS_STRIPED}")
+  set(GENIE_SEHGAL ${GENIE_LIBS})
+  STRING(REPLACE "ReinSeghal" "ReinSehgal" GENIE_LIBS ${GENIE_SEHGAL})
+  cmessage(DEBUG "Fixed inconsistency in library naming: ${GENIE_LIBS}")
 endif()
 
-string(REGEX MATCH "ReWeight" WASMATCHED ${GENIE_LIBS_STRIPED})
-if(NOT WASMATCHED)
-  set(GENIE_LIBS_STRIPED "GReWeight ${GENIE_LIBS_STRIPED}")
-  cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS_STRIPED}")
+if(NOT GENIE_POST_R3)
+  LIST(FIND GENIE_LIBS GReWeight WAS_FOUND)
+  if(WAS_FOUND STREQUAL "-1")
+    LIST(APPEND GENIE_LIBS GReWeight)
+    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS}")
+  endif()
+else()
+  LIST(FIND GENIE_LIBS GRwFwk WAS_FOUND)
+  if(WAS_FOUND STREQUAL "-1")
+    LIST(APPEND GENIE_LIBS GRwClc GRwFwk GRwIO)
+    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS}")
+  endif()
 endif()
 
-string(REPLACE " " ";" GENIE_LIBS_LIST "-Wl,--no-as-needed -Wl,--start-group ${GENIE_LIBS_STRIPED} -Wl,--end-group")
-cmessage(DEBUG "genie-config --libs -- MATCH1: ${CMAKE_MATCH_1}")
-cmessage(DEBUG "genie-config --libs -- MATCH2: ${CMAKE_MATCH_2}")
-cmessage(DEBUG "genie-config --libs -- libs stripped: ${GENIE_LIBS_STRIPED}")
-cmessage(DEBUG "genie-config --libs -- libs list: ${GENIE_LIBS_LIST}")
+LIST(APPEND GENIE_LIBS -Wl,--end-group )
+LIST(REVERSE GENIE_LIBS)
+LIST(APPEND GENIE_LIBS -Wl,--start-group -Wl,--no-as-needed )
+LIST(REVERSE GENIE_LIBS)
+
+cmessage(DEBUG "GENIE_LIBS: ${GENIE_LIBS}")
 
 ################################  LHAPDF  ######################################
 if(LHAPDF_LIB STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LHAPDF_LIB is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_LIB=/path/to/LHAPDF_libraries or as and environment vairable $ export LHAPDF_LIB=/path/to/LHAPDF_libraries")
+  cmessage(FATAL_ERROR "Variable LHAPDF_LIB is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_LIB=/path/to/LHAPDF_libraries or as an environment variable $ export LHAPDF_LIB=/path/to/LHAPDF_libraries")
 endif()
 
 if(LHAPDF_INC STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LHAPDF_INC is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_INC=/path/to/LHAPDF_includes or as and environment vairable $ export LHAPDF_INC=/path/to/LHAPDF_includes")
+  cmessage(FATAL_ERROR "Variable LHAPDF_INC is not defined. The location of a pre-built lhapdf install must be defined either as $ cmake -DLHAPDF_INC=/path/to/LHAPDF_includes or as an environment variable $ export LHAPDF_INC=/path/to/LHAPDF_includes")
 endif()
 
 if(LHAPATH STREQUAL "")
-  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. The location of a the LHAPATH directory must be defined either as $ cmake -DLHAPATH=/path/to/LHAPATH or as and environment variable $ export LHAPATH=/path/to/LHAPATH")
+  cmessage(FATAL_ERROR "Variable LHAPATH is not defined. The location of a the LHAPATH directory must be defined either as $ cmake -DLHAPATH=/path/to/LHAPATH or as an environment variable $ export LHAPATH=/path/to/LHAPATH")
 endif()
 
 ################################  LIBXML  ######################################
 if(LIBXML2_LIB STREQUAL "")
-  # Check for xml2-config
-  find_program(LIBXMLCFGLIBS xml2-config)
-  if(NOT LIBXMLCFGLIBS STREQUAL "LIBXMLLIBS-NOTFOUND")
-    execute_process (COMMAND ${LIBXMLCFGLIBS} --libs
-      OUTPUT_VARIABLE LIBXML2_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
-  else()
-    message(FATAL_ERROR "Variable LIBXML2_LIB is not defined and could not find xml2-config. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_LIB=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_LIB=/path/to/LIBXML2_libraries")
+  GETLIBDIR(xml2-config --libs LIBXML2_LIB IGNORE_EMPTY_RESPONSE)
+  if(LIBXML2_LIB STREQUAL "")
+    message(WARNING "Variable LIBXML2_LIB is not defined, as xml2-config was found and didn't report a library include path, it is likely that libxml2.so can be found in the standard system location, lets hope so.")
   endif()
 endif()
 
 if(LIBXML2_INC STREQUAL "")
-  # Check for xml2-config
-  find_program(LIBXMLCFGINCS xml2-config)
-  if(NOT LIBXMLCFGINCS STREQUAL "LIBXMLINCS-NOTFOUND")
-    execute_process (COMMAND ${LIBXMLCFGINCS} --cflags
-      OUTPUT_VARIABLE LIBXML2_INC OUTPUT_STRIP_TRAILING_WHITESPACE)
-  else()
-    message(FATAL_ERROR "Variable LIBXML2_INC is not defined and could not find xml2-config. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_INC=/path/to/LIBXML2_libraries or as and environment vairable $ export LIBXML2_INC=/path/to/LIBXML2_libraries")
+  GETINCDIR(xml2-config --cflags LIBXML2_INC)
+  if(LIBXML2_INC STREQUAL "")
+    message(FATAL_ERROR "Variable LIBXML2_INC is not defined and could not be found with xml2-config. The location of a pre-built libxml2 install must be defined either as $ cmake -DLIBXML2_INC=/path/to/LIBXML2_includes or as an environment variable $ export LIBXML2_INC=/path/to/LIBXML2_includes")
   endif()
 endif()
 
 ###############################  log4cpp  ######################################
 if(LOG4CPP_LIB STREQUAL "")
-  find_program(LOG4CPPCFG log4cpp-config)
-  if(NOT LOG4CPPCFG STREQUAL "LOG4CPPCFG-NOTFOUND")
-    execute_process (COMMAND ${LOG4CPPCFG}
-      --pkglibdir OUTPUT_VARIABLE LOG4CPP_LIB OUTPUT_STRIP_TRAILING_WHITESPACE)
-  else()
-    message(FATAL_ERROR "Variable LOG4CPP_LIB is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as and environment vairable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
+  GETLIBDIR(log4cpp-config --libs LOG4CPP_LIB)
+  if(LOG4CPP_LIB STREQUAL "")
+    message(FATAL_ERROR "Variable LOG4CPP_LIB is not defined and could not be found with log4cpp-config. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as an environment variable $ export LOG4CPP_LIB=/path/to/LOG4CPP_libraries")
   endif()
 endif()
 
-if(LOG4CPP_INC  STREQUAL "")
-  find_program(LOG4CPPCFG log4cpp-config)
-  if(NOT LOG4CPPCFG STREQUAL "LOG4CPPCFG-NOTFOUND")
-    execute_process (COMMAND ${LOG4CPPCFG}
-    --pkgincludedir OUTPUT_VARIABLE LOG4CPP_INC OUTPUT_STRIP_TRAILING_WHITESPACE)
-  else()
-    message(FATAL_ERROR "Variable LOG4CPP_INC is not defined. The location of a pre-built log4cpp install must be defined either as $ cmake -DGENIE_LOG4CPP_INC=/path/to/LOG4CPP_includes or as and environment vairable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
+if(LOG4CPP_INC STREQUAL "")
+  GETINCDIR(log4cpp-config --cflags LOG4CPP_INC)
+  if(LOG4CPP_INC STREQUAL "")
+    message(FATAL_ERROR "Variable LOG4CPP_INC is not defined and could not be found with log4cpp-config. The location of a pre-built log4cpp install must be defined either as $ cmake -DLOG4CPP_INC=/path/to/LOG4CPP_includes or as an environment variable $ export LOG4CPP_INC=/path/to/LOG4CPP_includes")
   endif()
 endif()
 ################################################################################
 
 LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION})
 
-LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
-  ${GENIE_INCLUDES_DIR}
-  ${GENIE_INCLUDES_DIR}/GHEP
-  ${GENIE_INCLUDES_DIR}/Ntuple
-  ${GENIE_INCLUDES_DIR}/ReWeight
-  ${GENIE_INCLUDES_DIR}/Apps
-  ${GENIE_INCLUDES_DIR}/FluxDrivers
-  ${GENIE_INCLUDES_DIR}/EVGDrivers
-  ${LHAPDF_INC}
-  ${LIBXML2_INC}
-  ${LOG4CPP_INC})
+LIST(APPEND EXTRA_LIBS ${GENIE_LIBS})
 
-SAYVARS()
+###############################  GSL  ######################################
+if(GENIE_POST_R3)
+  if(GSL_LIB STREQUAL "")
+    GETLIBDIR(gsl-config --libs GSL_LIB)
+    if(GSL_LIB STREQUAL "")
+      message(FATAL_ERROR "Variable GSL_LIB is not defined and could not be found with gsl-config. The location of a pre-built gsl install must be defined either as $ cmake -DGSL_LIB=/path/to/GSL_libraries or as an environment variable $ export GSL_LIB=/path/to/GSL_libraries")
+    endif()
+  endif()
+
+  if(GSL_INC STREQUAL "")
+    GETINCDIR(gsl-config --cflags GSL_INC)
+    if(GSL_INC STREQUAL "")
+      message(FATAL_ERROR "Variable GSL_INC is not defined and could not be found with gsl-config. The location of a pre-built gsl install must be defined either as $ cmake -DGSL_INC=/path/to/GSL_includes or as an environment variable $ export GSL_INC=/path/to/GSL_includes")
+    endif()
+  endif()
+
+  GETLIBS(gsl-config --libs GSL_LIB_LIST)
+
+  if(GENIE_REWEIGHT STREQUAL "")
+    message(FATAL_ERROR "Variable GENIE_REWEIGHT is not defined. When using GENIE v3+, we require the reweight product to be built and accessible via the environment variable GENIE_REWEIGHT")
+  endif()
+endif()
+################################################################################
+
+LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
 
 LIST(APPEND EXTRA_LINK_DIRS
   ${GENIE_LIB_DIR}
   ${LHAPDF_LIB}
-  ${LIBXML2_LIB}
   ${LOG4CPP_LIB})
 
-LIST(APPEND EXTRA_LIBS ${GENIE_LIBS_LIST})
+if(NOT GENIE_POST_R3)
+  LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+    ${GENIE_INCLUDES_DIR}
+    ${GENIE_INCLUDES_DIR}/GHEP
+    ${GENIE_INCLUDES_DIR}/Ntuple
+    ${GENIE_INCLUDES_DIR}/ReWeight
+    ${GENIE_INCLUDES_DIR}/Apps
+    ${GENIE_INCLUDES_DIR}/FluxDrivers
+    ${GENIE_INCLUDES_DIR}/EVGDrivers
+    ${LHAPDF_INC}
+    ${LIBXML2_INC}
+    ${LOG4CPP_INC})
+else()
+  LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+    ${GENIE_INCLUDES_DIR}
+    ${GENIE_REWEIGHT}/src
+    ${GSL_INC}
+    ${LHAPDF_INC}
+    ${LIBXML2_INC}
+    ${LOG4CPP_INC})
 
-LIST(APPEND EXTRA_LIBS LHAPDF xml2 log4cpp)
+    LIST(APPEND EXTRA_LINK_DIRS
+      ${GENIE_REWEIGHT}/lib
+      ${GSL_LIB}
+    )
+
+    LIST(APPEND EXTRA_LIBS ${GSL_LIB_LIST})
+
+endif()
+
+cmessage(WARNING ${EXTRA_LINK_DIRS})
+cmessage(WARNING ${EXTRA_LIBS})
+
+SAYVARS()
 
 if(USE_PYTHIA8)
   set(NEED_PYTHIA8 TRUE)
