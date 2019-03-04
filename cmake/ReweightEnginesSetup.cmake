@@ -55,11 +55,18 @@ if(USE_GENIE)
 endif()
 
 ################################################################################
+################################  NOvARwgt  ####################################
+if(USE_NOvARwgt)
+  include(${CMAKE_SOURCE_DIR}/cmake/NOvARwgtSetup.cmake)
+  cmessage(STATUS "Using NOvARwgt Reweight engine.")
+  set(USE_NOvARwgt TRUE CACHE BOOL "Whether to enable NOvARwgt (reweight) support. Requires external libraries. <FALSE>" FORCE)
+endif()
+
+################################################################################
 
 ################################  Prob3++   ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/Prob3++Setup.cmake)
 ################################################################################
-
 
 cmessage(STATUS "Reweight engine include directories: ${RWENGINE_INCLUDE_DIRECTORIES}")
 
@@ -79,8 +86,7 @@ endif()
 if(NEED_ROOTPYTHIA6)
   cmessage(STATUS "Require ROOT Pythia6 libraries")
   LIST(APPEND ROOT_LIBS
-    EGPythia6
-    Pythia6)
+    EGPythia6)
 endif()
 
 

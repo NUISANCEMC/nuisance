@@ -1257,7 +1257,6 @@ void Measurement2D::Write(std::string drawOpt) {
   bool drawData = (drawOpt.find("DATA") != std::string::npos);
   bool drawNormal = (drawOpt.find("MC") != std::string::npos);
   bool drawEvents = (drawOpt.find("EVT") != std::string::npos);
-  bool drawXSec = (drawOpt.find("XSEC") != std::string::npos);
   bool drawFine = (drawOpt.find("FINE") != std::string::npos);
   bool drawRatio = (drawOpt.find("RATIO") != std::string::npos);
   // bool drawModes = (drawOpt.find("MODES") != std::string::npos);
@@ -1275,7 +1274,6 @@ void Measurement2D::Write(std::string drawOpt) {
 
   if (FitPar::Config().GetParB("EventManager")) {
     drawFlux = false;
-    drawXSec = false;
     drawEvents = false;
   }
 
@@ -1743,8 +1741,6 @@ void Measurement2D::SetCovarMatrix(std::string covarFile) {
 
   // Make plots that we want
   TH2D* covarPlot = new TH2D();
-  //  TH2D* decmpPlot = new TH2D();
-  TH2D* covarInvPlot = new TH2D();
   TH2D* fFullCovarPlot = new TH2D();
 
   // Get covariance options for fake data studies
@@ -1759,7 +1755,6 @@ void Measurement2D::SetCovarMatrix(std::string covarFile) {
     covName += "full";
 
   covarPlot = (TH2D*)tempFile->Get((covName + "cov").c_str());
-  covarInvPlot = (TH2D*)tempFile->Get((covName + "covinv").c_str());
 
   // Throw either the sub matrix or the full matrix
   if (!covOption.compare("SUB"))

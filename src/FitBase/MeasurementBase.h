@@ -62,7 +62,11 @@
 #include "TMultiDimFit.h"
 
 #ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
 #include "Conventions/Units.h"
+#else
+#include "Framework/Conventions/Units.h"
+#endif
 #endif
 
 #include "EventManager.h"

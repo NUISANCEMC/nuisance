@@ -91,7 +91,7 @@ int main(int argc, char* argv[]){
   if (FitPar::Config().GetParB("savenominal")) min->SaveNominal();
   if (FitPar::Config().GetParB("saveprefit"))  min->SavePrefit();
 
-  // Run the fit rotines
+  // Run the fit routines
   min->Run();
 
   // Save by default
