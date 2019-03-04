@@ -56,6 +56,7 @@ NIWGWeightEngine.h
 OscWeightEngine.h
 MINERvAWeightCalcs.h
 weightRPA.h
+BeRPA.h
 )
 
 set(LIBNAME Reweight)

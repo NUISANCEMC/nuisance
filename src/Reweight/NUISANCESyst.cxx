@@ -49,6 +49,12 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kGaussianCorr_CC1pi_Wq3:             { return "GaussianCorr_CC1pi_Wq3";   }
     case kGaussianCorr_AllowSuppression:      { return "GaussianCorr_AllowSuppression";   }
 
+    case kBeRPA_A:             { return "BeRPA_A";   }
+    case kBeRPA_B:             { return "BeRPA_B";   }
+    case kBeRPA_D:             { return "BeRPA_D";   }
+    case kBeRPA_E:             { return "BeRPA_E";   }
+    case kBeRPA_U:             { return "BeRPA_U";   }
+
     case kModeNorm_NormRES:                   { return "NormRES"; }
 
     case kMINERvARW_NormCCQE:                { return "MINERvARW_NormCCQE"; }
