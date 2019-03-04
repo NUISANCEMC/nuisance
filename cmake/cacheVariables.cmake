@@ -123,7 +123,7 @@ CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrid
 
 CheckAndSetDefaultCache(USE_MINERvA_RW FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
 
-CheckAndSetDefaultCache(USE_NOvARwgt FALSE BOOL "Whether to enable MINERvA ReWeight support. <FALSE>")
+CheckAndSetDefaultCache(USE_NOvARwgt FALSE BOOL "Whether to enable NOvA ReWeight support. <FALSE>")
 
 CheckAndSetDefaultEnv(NOVARWGT "" PATH "Path to directory containing libPythia6.so. Overrides environment variable \$NOVARWGT <>" NOVARWGT)
 
@@ -180,6 +180,7 @@ LIST(APPEND VARS
   HEPMC_LENUNIT
   HEPMC_USED_EP
   USE_NEUT
+  NEUT_VERSION
   NEUT_ROOT
   CERN
   CERN_LEVEL
@@ -189,21 +190,36 @@ LIST(APPEND VARS
   NUWRO_INPUT_FILE
   NUWRO_BUILT_FROM_FILE
   USE_GENIE
+  GENIE_VERSION
   GENIE
+  GENIE_REWEIGHT
   LHAPDF_LIB
   LHAPDF_INC
+  LHAPATH
   LIBXML2_LIB
   LIBXML2_INC
   LOG4CPP_LIB
-  GENIE_LOG4CPP_INC
+  LOG4CPP_INC
+  GSL_LIB
+  GSL_INC
+  PYTHIA6
+  PYTHIA8
+  USE_PYTHIA8
   BUILD_GEVGEN
   USE_T2K
+  T2KREWEIGHT
   USE_NIWG
+  NIWG_ROOT
+  USE_MINERvA_RW
+  USE_NOvARwgt
+  NOVARWGT
   USE_GiBUU
   BUILD_GiBUU
   USE_NUANCE
+  USE_PROB3PP
   NO_EXTERNAL_UPDATE
   USE_GPERFTOOLS
+  NO_EXPERIMENTS
   NO_ANL
   NO_ArgoNeuT
   NO_BEBC

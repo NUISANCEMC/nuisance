@@ -27,6 +27,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   fWeightCalculators.push_back(GaussianMode);
   fWeightCalculators.push_back(new ModeNormCalc());
   fWeightCalculators.push_back(new SBLOscWeightCalc());
+  fWeightCalculators.push_back(new BeRPACalc());
 
 #ifdef __MINERVA_RW_ENABLED__
 #ifdef __GENIE_ENABLED__

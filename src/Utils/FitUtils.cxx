@@ -955,6 +955,97 @@ double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
   return pn_reco;
 }
 
+double FitUtils::Get_pn_reco_Ar(FitEvent *event, int ISPDG, bool Is0pi) {
+
+  const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton;   // proton mass
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(ISPDG) == 0) {
+    return -9999;
+  }
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1)) == 0) {
+    return -9999;
+  }
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
+  TVector3 const &LeptonP =
+      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
+
+  // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
+  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  int HMFSProton = 0;
+  double HighestMomentum = 0.0;
+  // Get the stack of protons
+  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  for (size_t i = 0; i < Protons.size(); ++i) {
+    // Update the highest momentum particle
+    if (Protons[i]->p() > 450 && 
+        Protons[i]->p() < 1200 && 
+        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI/180.0)*70.0 &&
+        Protons[i]->p() > HighestMomentum) {
+      HighestMomentum = Protons[i]->p();
+      HMFSProton = i;
+    }
+  }
+  // Now get the proton
+  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  // Get highest momentum proton in allowed proton range
+  TVector3 HadronP = Pprot.Vect();
+  //TVector3 HadronP = event->GetHMFSParticle(2212)->fP.Vect();
+
+  double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
+  double const eh = Pprot.E()/1000.;
+
+  if (!Is0pi) {
+    if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
+      return -9999;
+    }
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += pp.Vect();
+  }
+  TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
+  double dptMag = dpt.Mag()/1000.;
+
+  //double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from PhysRevC.95.065501)
+  //double map = ma - mn + 0.02713; // remnant mass
+  double ma = 6*mn + 6*mp - 0.34381; // target mass (E is from PhysRevC.95.065501)
+  double map = ma - mn + 0.02713; // remnant mass
+
+  double pmul = LeptonP.Dot(NuP.Unit())/1000.;
+  double phl = HadronP.Dot(NuP.Unit())/1000.;
+
+  //double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
+  //double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
+
+  double R = ma + pmul + phl - el - eh;
+
+  double dpl = 0.5*R - (map*map + dptMag*dptMag)/(2*R);
+  //double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in PhysRevC.95.065501 - gives same result
+
+  double pn_reco = sqrt((dptMag*dptMag) + (dpl*dpl));
+
+  //std::cout << "Diagnostics: " << std::endl;
+  //std::cout << "mn: " << mn << std::endl;
+  //std::cout << "ma: " << ma << std::endl;
+  //std::cout << "map: " << map << std::endl;
+  //std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
+  //std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
+  //std::cout << "pmul: " << pmul << std::endl;
+  //std::cout << "phl: " << phl << std::endl;
+  //std::cout << "el: " << el << std::endl;
+  //std::cout << "eh: " << eh << std::endl;
+  //std::cout << "R: " << R << std::endl;
+  //std::cout << "dptMag: " << dptMag << std::endl;
+  //std::cout << "dpl: " << dpl << std::endl;
+  //std::cout << "pn_reco: " << pn_reco << std::endl;
+
+  return pn_reco;
+}
+
 // Get Cos theta with Adler angles
 double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
   // Get the "resonance" lorentz vector (pion proton system)

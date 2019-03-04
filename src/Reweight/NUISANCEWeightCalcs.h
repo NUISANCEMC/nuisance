@@ -2,6 +2,7 @@
 #define NUISANCE_WEIGHT_CALCS
 
 #include "BaseFitEvt.h"
+#include "BeRPA.h"
 
 class NUISANCEWeightCalc {
   public:
@@ -33,6 +34,28 @@ class ModeNormCalc : public NUISANCEWeightCalc {
     bool IsHandled(int rwenum);
 
     double fNormRES;
+};
+
+class BeRPACalc : public NUISANCEWeightCalc {
+  public:
+    BeRPACalc();
+    ~BeRPACalc(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+  private:
+    // Parameter values
+    double fBeRPA_A;
+    double fBeRPA_B;
+    double fBeRPA_D;
+    double fBeRPA_E;
+    double fBeRPA_U;
+    // Counts of enabled parameters
+    int nParams;
+
 };
 
 class SBLOscWeightCalc : public NUISANCEWeightCalc {

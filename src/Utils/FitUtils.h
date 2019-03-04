@@ -172,6 +172,7 @@ double Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi);
 // As defined in PhysRevC.95.065501
 // Using prescription from arXiv 1805.05486 
 double Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi);
+double Get_pn_reco_Ar(FitEvent *event, int ISPDG, bool Is0pi);
 
 //For T2K inferred kinematics analyis - variables defined as on page 7 of T2K TN287v11 (and now arXiv 1802.05078)
 double ppInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
