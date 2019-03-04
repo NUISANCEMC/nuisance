@@ -1,14 +1,14 @@
 # par Name Units Nominal FracErr ConvFunc
-neut_parameter   MaCCQE             GeV     1.21*(1.0+x*0.16)
+neut_parameter MaCCQE GeV 1.21*(1.0+x*0.16)
 neut_parameter MaNFFRES GeV 0.95*(1.0+x*0.157894737)
 neut_parameter CA5RES x 1.01*(1.0+x*0.247524752)
 neut_parameter BgSclRES x 1.30*(1.0+x*0.153846154)
 
 neut_parameter FrAbs_pi x 1.1*(1.0+x*0.5)
-neut_parameter FrInelLow_pi x 1*(1.0+x*0.5)
+neut_parameter FrInelLow_pi x 1.0+x*0.5
 neut_parameter FrInelHigh_pi x 1.8*(1.0+x*0.3)
-neut_parameter FrPiProd_pi x 1*(1.0+x*0.5)
-neut_parameter FrCExLow_pi x 1*(1.0+x*0.5)
+neut_parameter FrPiProd_pi x 1.0+x*0.5
+neut_parameter FrCExLow_pi x 1.0+x*0.5
 neut_parameter FrCExHigh_pi x 1.8*(1.0+x*0.3)
 
 niwg_parameter   NIWGMEC_Norm_C12   %       100.0*(1.0+x)
@@ -20,11 +20,19 @@ t2k_parameter NIWG2014a_pF_O16 MeV 225*(1.0+x*0.071111)
 t2k_parameter NIWGMEC_PDDWeight_C12 x 0.5*(1.0+x*1.0)
 t2k_parameter NIWGMEC_PDDWeight_O16 x 0.5*(1.0+x*1.0)
 
-t2k_parameter NXSec_MaCCQE GeV 1.21*(1.0+x*0.165289256)
+t2k_parameter NIWG2012a_dismpishp x 1.0*(1.0+x*0.4)
 
+t2k_parameter NXSec_MaCCQE GeV 1.21*(1.0+x*0.165289256)
 t2k_parameter NXSec_MaNFFRES GeV 0.95*(1.0+x*0.157894737)
 t2k_parameter NXSec_CA5RES x 1.01*(1.0+x*0.247524752)
-t2k_parameter NXSec_BgSclCCRES x 1.30*(1.0+x*0.153846154)
+t2k_parameter NXSec_BgSclRES x 1.30*(1.0+x*0.153846154)
+
+t2k_parameter NCasc_FrAbs_pi x 1.1*(1.0+x*0.5)
+t2k_parameter NCasc_FrInelLow_pi x 1.0+x*0.5
+t2k_parameter NCasc_FrInelHigh_pi x 1.8*(1.0+x*0.3)
+t2k_parameter NCasc_FrPiProd_pi x 1.0+x*0.5
+t2k_parameter NCasc_FrCExLow_pi x 1.0+x*0.5
+t2k_parameter NCasc_FrCExHigh_pi x 1.8*(1.0+x*0.3)
 
 t2k_parameter NIWG_Effective_rpaCCQE_A x 1.0*(1.0 + x*0.1)
 t2k_parameter NIWG_Effective_rpaCCQE_B x 1.0*(1.0 + x*0.1)

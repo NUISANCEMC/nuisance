@@ -20,6 +20,7 @@
 #ifndef GenericFlux_Vectors_H_SEEN
 #define GenericFlux_Vectors_H_SEEN
 #include "Measurement1D.h"
+#include "FitEvent.h"
 
 class GenericFlux_Vectors : public Measurement1D {
 
@@ -86,6 +87,11 @@ public:
   float y;
   float Eav;
   float EavAlt;
+  float dalphat;
+  float W_genie;
+  float dpt;
+  float dphit;
+  float pnreco_C;
 
   // Save outgoing particle vectors
   int nfsp;
