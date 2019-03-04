@@ -60,9 +60,11 @@ void FitWeight::AddRWEngine(int type) {
   case kMODENORM:
     fAllRW[type] = new ModeNormEngine();
     break;
+#ifdef __NOVA_ENABLED__
   case kNOvARWGT:
     fAllRW[type] = new NOvARwgtEngine();
     break;
+#endif
   default:
     THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
     break;
@@ -88,9 +90,11 @@ bool FitWeight::HasRWEngine(int type) {
   case kSPLINEPARAMETER:
   case kNIWG:
   case kOSCILLATION:
+#ifdef __NOVA_ENABLED__
   case kNOvARWGT: {
     return fAllRW.count(type);
   }
+#endif
   default: { THROW("CANNOT get RW Engine for dial type: " << type); }
   }
 }

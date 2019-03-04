@@ -60,6 +60,7 @@ NIWGWeightEngine.h
 OscWeightEngine.h
 MINERvAWeightCalcs.h
 weightRPA.h
+BeRPA.h
 )
 
 if(USE_NOvARwgt)
