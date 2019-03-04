@@ -42,6 +42,65 @@ bool ModeNormCalc::IsHandled(int rwenum) {
   }
 }
 
+BeRPACalc::BeRPACalc() : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_E(0.88), fBeRPA_U(1.2), nParams(0) { 
+  // A = 0.59 +/- 20%
+  // B = 1.05 +/- 20%
+  // D = 1.13 +/- 15%
+  // E = 0.88 +/- 40%
+  // U = 1.2
+}
+
+double BeRPACalc::CalcWeight(BaseFitEvt* evt) {
+  FitEvent* fevt = static_cast<FitEvent*>(evt);
+  int mode = abs(evt->Mode);
+  double w = 1.0;
+  if (nParams == 0) {
+    return w;
+  }
+
+  // Get Q2
+  // Get final state lepton
+  if (mode == 1) {
+    double Q2 = -1.0*(fevt->GetHMFSAnyLeptons()->P4()-fevt->GetNeutrinoIn()->P4())*(fevt->GetHMFSAnyLeptons()->P4()-fevt->GetNeutrinoIn()->P4())/1.E6;
+  // Only CCQE events
+    w *= calcRPA(Q2, fBeRPA_A, fBeRPA_B, fBeRPA_D, fBeRPA_E, fBeRPA_U);
+  }
+
+  return w;
+}
+
+void BeRPACalc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void BeRPACalc::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum)) return;
+  // Need 4 or 5 reconfigures
+  if      (curenum == kBeRPA_A) fBeRPA_A = val;
+  else if (curenum == kBeRPA_B) fBeRPA_B = val;
+  else if (curenum == kBeRPA_D) fBeRPA_D = val;
+  else if (curenum == kBeRPA_E) fBeRPA_E = val;
+  else if (curenum == kBeRPA_U) fBeRPA_U = val;
+  nParams++;
+}
+
+bool BeRPACalc::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+  switch (curenum) {
+    case kBeRPA_A:
+    case kBeRPA_B:
+    case kBeRPA_D:
+    case kBeRPA_E:
+    case kBeRPA_U:
+      return true;
+    default:
+      return false;
+  }
+}
+
 SBLOscWeightCalc::SBLOscWeightCalc() {
   fDistance = 0.0;
   fMassSplitting = 0.0;

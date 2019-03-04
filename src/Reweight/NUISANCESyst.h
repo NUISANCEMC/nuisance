@@ -44,6 +44,12 @@ namespace Reweight {
     kGaussianCorr_CC1pi_Wq3,
     kGaussianCorr_AllowSuppression,
 
+    kBeRPA_A,
+    kBeRPA_B,
+    kBeRPA_D,
+    kBeRPA_E,
+    kBeRPA_U,
+
     kModeNorm_NormRES,
 
     kMINERvARW_NormCCQE,
@@ -68,6 +74,5 @@ namespace Reweight {
 
   int ConvertNUISANCEDial(std::string type);
   std::string ConvNUISANCEDial(int type);
-
 };
 #endif
