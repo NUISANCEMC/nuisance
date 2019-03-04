@@ -70,13 +70,12 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   // correctly.
   this->fScaleFactor =
       (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
-      this->TotalIntegratedFlux();
+      this->TotalIntegratedFlux("width");
 
   LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
            << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
-           << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
+           << (fNEvents + 0.) << "*" << TotalIntegratedFlux("width") << ")]"
            << std::endl;
-
 
   if (fScaleFactor <= 0.0) {
     ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
@@ -115,10 +114,16 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("Q2_QE", &Q2_QE, "Q2_QE/F");
   eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/F");
   eventVariables->Branch("W", &W, "W/F");
+  eventVariables->Branch("W_genie", &W_genie, "W_genie/F");
   eventVariables->Branch("x", &x, "x/F");
   eventVariables->Branch("y", &y, "y/F");
   eventVariables->Branch("Eav", &Eav, "Eav/F");
   eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
+
+  eventVariables->Branch("dalphat", &dalphat, "dalphat/F");
+  eventVariables->Branch("dpt", &dpt, "dpt/F");
+  eventVariables->Branch("dphit", &dphit, "dphit/F");
+  eventVariables->Branch("pnreco_C", &pnreco_C, "pnreco_C/F");
 
   // Save outgoing particle vectors
   eventVariables->Branch("nfsp", &nfsp, "nfsp/I");
@@ -186,13 +191,18 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
+
+    dalphat = FitUtils::Get_STV_dalphat(event, PDGnu, true);
+    dpt = FitUtils::Get_STV_dpt(event, PDGnu, true);
+    dphit = FitUtils::Get_STV_dphit(event, PDGnu, true);
+    pnreco_C = FitUtils::Get_pn_reco_C(event, PDGnu, true);
   }
 
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
 
     bool part_alive = event->PartInfo(i)->fIsAlive &&
-                      event->PartInfo(i)->Status() == kFinalState;
+      event->PartInfo(i)->Status() == kFinalState;
     if (!part_alive) continue;
 
     partList.push_back(event->PartInfo(i));
@@ -208,6 +218,15 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
   }
+
+#ifdef __GENIE_ENABLED__
+  if (event->fType == kGENIE) {
+    EventRecord *  gevent      = static_cast<EventRecord*>(event->genie_event->event);
+    const Interaction * interaction = gevent->Summary();
+    const Kinematics &   kine       = interaction->Kine();
+    double W_genie  = kine.W();
+  }
+#endif
 
   // Fill event weights
   Weight = event->RWWeight * event->InputWeight;
@@ -226,7 +245,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
 //********************************************************************
 void GenericFlux_Vectors::ResetVariables() {
-//********************************************************************
+  //********************************************************************
 
   cc = false;
 
@@ -234,6 +253,11 @@ void GenericFlux_Vectors::ResetVariables() {
   Mode = PDGnu = tgt = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = Eav = EavAlt = -999.9;
+
+  W_genie = -999;
+  // Other fun variables
+  // MINERvA-like ones
+  dalphat = dpt = dphit = pnreco_C = -999.99;
 
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){
@@ -281,7 +305,7 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
   if (!eventVariables) {
     Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
-                               (this->fName + "_VARS").c_str());
+        (this->fName + "_VARS").c_str());
   }
 
   LOG(SAM) << "Adding signal flags" << std::endl;
