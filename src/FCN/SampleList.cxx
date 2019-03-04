@@ -49,6 +49,15 @@
 #endif
 
 #ifndef __NO_ArgoNeuT__
+// ArgoNeuT CC1Pi
+#include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu.h"
 // ArgoNeuT CC-inclusive
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
@@ -712,7 +721,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else
 #endif
 #ifndef __NO_ArgoNeuT__
-      if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
+  if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(samplekey));
@@ -720,6 +729,22 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_nu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dthetamu_nu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dpmu_nu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dpmu_nu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu(samplekey));
+  } else if (!name.compare("ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu")) {
+    return (new ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu(samplekey));
 
     /*
       BNL Samples

@@ -27,6 +27,7 @@
 #include "InputUtils.h"
 #include "PlotUtils.h"
 
+#ifdef GENIE_PRE_R3
 #include "GHEP/GHepParticle.h"
 #include "PDG/PDGUtils.h"
 #include "GHEP/GHepUtils.h"
@@ -34,6 +35,16 @@
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "Ntuple/NtpMCEventRecord.h"
+#else
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Conventions/Units.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#endif
+
 using namespace genie;
 
 /// GENIE Generator Container to save extra particle status codes.

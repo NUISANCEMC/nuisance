@@ -37,9 +37,15 @@
 #endif
 
 #ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "Ntuple/NtpMCEventRecord.h"
+#else
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#endif
 using namespace genie;
 #endif
 
