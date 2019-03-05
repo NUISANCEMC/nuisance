@@ -19,7 +19,7 @@ std::pair<NuWroFlags, int> GetFlagsDynEquivalent(Channel_t chan) {
   NuMode.first.dis = false;
   NuMode.first.coh = false;
   NuMode.first.mec = false;
-  NuMode.first.hip = false;
+//  NuMode.first.hip = false;
   NuMode.first.nc = false;
   NuMode.first.cc = false;
   NuMode.first.anty = false;

@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace nuis {
 /// Singleton class used to register generator compatibilty by string.
