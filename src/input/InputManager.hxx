@@ -57,6 +57,8 @@ public:
   Input_id_t EnsureInputLoaded(fhicl::ParameterSet const &);
   Input_id_t GetInputId(std::string const &) const;
   IInputHandler const &GetInputHandler(Input_id_t) const;
+
+  void Clear() { Inputs.clear(); }
 };
 } // namespace input
 } // namespace nuis

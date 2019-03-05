@@ -34,6 +34,7 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   std::string flux_name = ps.get<std::string>("flux_hist_name", "flux_numu");
   std::string evtrt_name = ps.get<std::string>("evtrt_hist_name", "evtrt_numu");
+  fXSecRescaleFactor = ps.get<double>("xsec_rescale_factor",1);
 
   std::string override_flux_file =
       ps.get<std::string>("override_flux_file", "");
@@ -64,6 +65,8 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
     std::cout << "[INFO]: Done (Average NEUT XSecWeight = " << fFileWeight
               << ")!" << std::endl;
   }
+
+  fFileWeight *= fXSecRescaleFactor;
 }
 
 NEW_NUIS_EXCEPT(non_mono_energetic_input_file);

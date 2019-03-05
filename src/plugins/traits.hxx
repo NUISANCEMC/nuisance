@@ -43,12 +43,6 @@ template <typename T> struct plugin_traits {};
              plugin_traits<INTERFACE_CLASS_NAME>::interface_name() + "_" +     \
              classname + "_instantiator";                                      \
     }                                                                          \
-    static std::string                                                         \
-    check_manifest_function_name(std::string const &classname) {               \
-      return std::string("nuis_plugins_") +                                    \
-             plugin_traits<INTERFACE_CLASS_NAME>::interface_name() + "_" +     \
-             classname + "_check_manifest";                                    \
-    }                                                                          \
     static std::string deleter_function_name(std::string const &classname) {   \
       return std::string("nuis_plugins_") +                                    \
              plugin_traits<INTERFACE_CLASS_NAME>::interface_name() + "_" +     \

@@ -1,6 +1,6 @@
 #include "config/GlobalConfiguration.hxx"
 
-#include "input/IInputHandler.hxx"
+#include "input/InputManager.hxx"
 
 #include "event/MinimalEvent.hxx"
 
@@ -50,6 +50,9 @@ int main(int argc, char const *argv[]) {
     sample->Initialize(samp_config);
     sample->ProcessSample(NMax);
     sample->Write();
+
+    //Ensures no re-use of samples but cleans up the memory.
+    nuis::input::InputManager::Get().Clear();
   }
 
   nuis::persistency::CloseOpenTFiles();

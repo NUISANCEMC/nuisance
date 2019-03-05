@@ -39,6 +39,7 @@ class NEUTInputHandler : public IInputHandler {
   mutable nuis::event::FullEvent fReaderEvent;
   mutable NeutVect *fNeutVect;
   mutable std::vector<double> fWeightCache;
+  double fXSecRescaleFactor;
 
   std::unique_ptr<TH1> fFlux;
   std::unique_ptr<TH1> fEvtrt;

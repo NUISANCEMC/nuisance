@@ -116,10 +116,11 @@ void SliceNorm(std::unique_ptr<TH2> &hist, bool AlongY, char const *opt) {
 
     double integral = hist->Integral(xl, xu, yl, yu, opt);
 
-    if (integral < std::numeric_limits<double>::epsilon()) {
+    if (integral <= 0) {
       continue;
     }
 
+    double integ_check= 0;
     for (int bin_it = 0;
          bin_it < (AlongY ? hist->GetYaxis() : hist->GetXaxis())->GetNbins();
          ++bin_it) {
@@ -136,15 +137,16 @@ void SliceNorm(std::unique_ptr<TH2> &hist, bool AlongY, char const *opt) {
       if (AlongY) {
         hist->SetBinContent(slice_it + 1, bin_it + 1,
                             hist->GetBinContent(slice_it + 1, bin_it + 1) * s);
-        hist->SetBinContent(slice_it + 1, bin_it + 1,
-                            hist->GetBinContent(slice_it + 1, bin_it + 1) * s);
+        hist->SetBinError(slice_it + 1, bin_it + 1,
+                            hist->GetBinError(slice_it + 1, bin_it + 1) * s);
       } else {
         hist->SetBinContent(bin_it + 1, slice_it + 1,
                             hist->GetBinContent(bin_it + 1, slice_it + 1) * s);
-        hist->SetBinContent(bin_it + 1, slice_it + 1,
-                            hist->GetBinContent(bin_it + 1, slice_it + 1) * s);
+        hist->SetBinError(bin_it + 1, slice_it + 1,
+                            hist->GetBinError(bin_it + 1, slice_it + 1) * s);
       }
     }
+
   }
 }
 
