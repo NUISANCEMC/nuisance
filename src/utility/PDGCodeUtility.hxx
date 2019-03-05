@@ -51,8 +51,16 @@ static event::PDG_t const kPiPlus = 211;
 static event::PDG_t const kPiMinus = -211;
 static event::PDG_t const kPi0 = 111;
 
+static event::PDG_t const kK0Long = 130;
+static event::PDG_t const kK0Short = 130;
+static event::PDG_t const kK0 = 311;
+static event::PDG_t const kKPlus = 321;
+static event::PDG_t const kKMinus = -321;
+
 static event::PDG_t const kProton = 2212;
 static event::PDG_t const kNeutron = 2112;
+
+static event::PDG_t const kGamma = 22;
 
 static std::vector<event::PDG_t> const ChargedLeptons{kElectron, kMu,     15,
                                                       kPositron, kMuPlus, -15};
@@ -66,10 +74,17 @@ static std::vector<event::PDG_t> const NeutralLeptons{kNue,    kNuMu,    16,
 static std::vector<event::PDG_t> const NeutralLeptons_matter{kNue, kNuMu, 16};
 static std::vector<event::PDG_t> const NeutralLeptons_antimatter{kNueBar,
                                                                  kNuMuBar, -16};
+static std::vector<event::PDG_t> const Leptons{
+    kElectron, kMu,   15, kPositron, kMuPlus,  -15,
+    kNue,      kNuMu, 16, kNueBar,   kNuMuBar, -16};
 
 static std::vector<event::PDG_t> const ChargedPions{kPiPlus, kPiMinus};
 static std::vector<event::PDG_t> const NeutralPions{kPi0};
 static std::vector<event::PDG_t> const Pions{kPiPlus, kPiMinus, kPi0};
+static std::vector<event::PDG_t> const ChargedKaons{kKPlus, kKMinus};
+static std::vector<event::PDG_t> const NeutralKaons{kK0, kK0Long, kK0Short};
+static std::vector<event::PDG_t> const Kaons{kKPlus, kKMinus, kK0, kK0Long,
+                                             kK0Short};
 static std::vector<event::PDG_t> const Protons{kProton, -kProton};
 static std::vector<event::PDG_t> const Proton_matter{kProton};
 static std::vector<event::PDG_t> const Proton_antimatter{-kProton};
@@ -99,6 +114,7 @@ static double const kPi0Mass_MeV = 134.97;
 
 static double const kNeutronMass_MeV = 939.56;
 static double const kProtonMass_MeV = 938.27;
+static double const kNucleonAverageMass_MeV = 938.27;
 } // namespace pdgmasses
 
 double GetPDGMass(event::PDG_t);
@@ -115,8 +131,16 @@ bool IsProton(event::PDG_t pdg,
 
 bool IsNeutron(event::PDG_t pdg);
 bool IsChargedPion(event::PDG_t pdg);
+bool IsPositivePion(event::PDG_t pdg);
+bool IsNegativePion(event::PDG_t pdg);
 bool IsNeutralPion(event::PDG_t pdg);
 bool IsPion(event::PDG_t pdg);
+bool IsChargedKaon(event::PDG_t pdg);
+bool IsPositiveKaon(event::PDG_t pdg);
+bool IsNegativeKaon(event::PDG_t pdg);
+bool IsNeutralKaon(event::PDG_t pdg);
+bool IsKaon(event::PDG_t pdg);
+bool IsGamma(event::PDG_t pdg);
 bool IsOther(event::PDG_t pdg);
 
 bool IsMatter(event::PDG_t pdg);

@@ -71,6 +71,7 @@ std::vector<event::Particle> GetFSOthers(event::FullEvent const &);
 
 event::Particle GetHMFSChargedLepton(event::FullEvent const &);
 event::Particle GetHMFSNeutralLepton(event::FullEvent const &);
+event::Particle GetHMFSLepton(event::FullEvent const &);
 event::Particle GetHMISNeutralLepton(event::FullEvent const &);
 event::Particle GetHMFSChargedPion(event::FullEvent const &);
 event::Particle GetHMFSNeutralPion(event::FullEvent const &);

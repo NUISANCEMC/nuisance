@@ -60,10 +60,20 @@ bool IsNeutron(PDG_t pdg) { return pdg == Neutron[0]; }
 bool IsChargedPion(PDG_t pdg) {
   return std::count(ChargedPions.begin(), ChargedPions.end(), pdg);
 }
-bool IsNeutralPion(PDG_t pdg) {
-  return std::count(NeutralPions.begin(), NeutralPions.end(), pdg);
-}
+bool IsNeutralPion(PDG_t pdg) { return (pdg == kPi0); }
+bool IsPositivePion(PDG_t pdg) { return (pdg == kPiPlus); }
+bool IsNegativePion(PDG_t pdg) { return (pdg == kPiMinus); }
 bool IsPion(PDG_t pdg) { return std::count(Pions.begin(), Pions.end(), pdg); }
+bool IsChargedKaon(PDG_t pdg) {
+  return std::count(ChargedKaons.begin(), ChargedKaons.end(), pdg);
+}
+bool IsNeutralKaon(PDG_t pdg) {
+  return std::count(NeutralKaons.begin(), NeutralKaons.end(), pdg);
+}
+bool IsPositiveKaon(PDG_t pdg) { return (pdg == kKPlus); }
+bool IsNegativeKaon(PDG_t pdg) { return (pdg == kKMinus); }
+bool IsKaon(PDG_t pdg) { return std::count(Kaons.begin(), Kaons.end(), pdg); }
+bool IsGamma(PDG_t pdg) { return (pdg == kGamma); }
 bool IsOther(PDG_t pdg) {
   return !std::count(CommonParticles.begin(), CommonParticles.end(), pdg);
 }

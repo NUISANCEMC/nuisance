@@ -94,6 +94,9 @@ struct TreeFile {
     other.tree = nullptr;
     other.file_owned = false;
   }
+
+  TTree *operator->() { return tree; }
+
   ~TreeFile() {
     if (!file_owned) {
       file.release();
@@ -131,6 +134,16 @@ inline TreeFile MakeNewTTree(std::string const &fname, std::string const &tname,
   tf.tree = new TTree(tname.c_str(), "");
   tf.tree->SetDirectory(tf.file.get());
   tf.file_owned = true;
+  return tf;
+}
+
+inline TreeFile AddNewTTreeToFile(TFile *f, std::string const &tname) {
+  TreeFile tf;
+  // This is pretty dumb...
+  tf.file = make_unique_TFile(f);
+  tf.tree = new TTree(tname.c_str(), "");
+  tf.tree->SetDirectory(tf.file.get());
+  tf.file_owned = false;
   return tf;
 }
 

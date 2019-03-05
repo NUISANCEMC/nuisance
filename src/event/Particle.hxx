@@ -17,8 +17,7 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef EVENT_PARTICLE_HXX_SEEN
-#define EVENT_PARTICLE_HXX_SEEN
+#pragma once
 
 #include "event/types.hxx"
 
@@ -55,6 +54,7 @@ public:
   double KE() const { return P4.E() - P4.M(); }
   double P() const { return P4.Vect().Mag(); }
   TVector3 P3() const { return P4.Vect(); }
+  TVector3 Dir() const { return P3().Unit(); }
   double M() const { return P4.M(); }
   double Theta() const { return P4.Vect().Theta(); }
   double CosTheta() const { return P4.Vect().CosTheta(); }
@@ -75,4 +75,15 @@ inline std::ostream &operator<<(std::ostream &os,
 #undef X
 #undef STATUS_LIST
 
-#endif
+inline bool operator==(nuis::event::Particle const &l,
+                       nuis::event::Particle const &r) {
+  if (l.pdg != r.pdg) {
+    return false;
+  }
+  for (size_t i = 0; i < 4; ++i) {
+    if (l.P4[i] != r.P4[i]) {
+      return false;
+    }
+  }
+  return true;
+}

@@ -138,6 +138,9 @@ Particle GetHMFSChargedLepton(FullEvent const &ev) {
 Particle GetHMFSNeutralLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralLeptons);
 }
+Particle GetHMFSLepton(event::FullEvent const &ev) {
+  return GetHMParticle(ev, pdgcodes::Leptons);
+}
 Particle GetHMISNeutralLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralLeptons,
                        Particle::Status_t::kPrimaryInitialState);

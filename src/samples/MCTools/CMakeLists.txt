@@ -2,7 +2,7 @@ if(USE_NUWRO)
   LIST(APPEND MC_TOOL_IMPL NuisToNuWro.cxx)
 endif(USE_NUWRO)
 
-LIST(APPEND MC_TOOL_IMPL VerboseEventSummary.cxx)
+LIST(APPEND MC_TOOL_IMPL VerboseEventSummary.cxx NuisToCAFTruth)
 
 add_library(MCTools SHARED ${MC_TOOL_IMPL})
 target_link_libraries(MCTools ${SAMPLES_MCTOOLS_LIBS})

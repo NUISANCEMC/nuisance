@@ -213,15 +213,15 @@ TLorentzVector GetEnergyMomentumTransfer(event::FullEvent const &fev) {
         << fev.to_string();
   }
 
-  Particle const &charged_lepton = GetHMFSChargedLepton(fev);
-  if (!charged_lepton) {
+  Particle const &fs_lepton = GetHMFSLepton(fev);
+  if (!fs_lepton) {
     throw Particle::invalid_particle()
         << "[ERROR]: In GetEnergyMomentumTransfer, expected to be able to get "
-           "FS charged lepton, but found none: \n"
+           "FS lepton, but found none: \n"
         << fev.to_string();
   }
 
-  return (neutrino.P4 - charged_lepton.P4);
+  return (neutrino.P4 - fs_lepton.P4);
 }
 
 } // namespace utility
