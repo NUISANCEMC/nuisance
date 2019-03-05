@@ -45,9 +45,13 @@ if(GENERATOR_UTILS_IMPL)
   endif()
   target_link_libraries(nuis_generator_utility -L${ROOT_LIBDIR} ${ROOT_LIBS})
 
-  install(TARGETS nuis_generator_utility DESTINATION plugins)
+  install(TARGETS nuis_generator_utility DESTINATION lib)
 endif()
 
 if(GENERATOR_UTILS_HDR)
   install(FILES ${GENERATOR_UTILS_HDR} DESTINATION include/generator/utility)
 endif()
+
+LIST(APPEND GENERATOR_DEPENDENT_TARGETS nuis_generator_utility)
+
+SET(GENERATOR_DEPENDENT_TARGETS ${GENERATOR_DEPENDENT_TARGETS} PARENT_SCOPE)

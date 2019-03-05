@@ -13,4 +13,6 @@ add_subdirectory(variation)
 SET(INuADataComparisons_List ${INuADataComparisons_List} PARENT_SCOPE)
 SET(INuADataComparisons_FHiCL ${INuADataComparisons_FHiCL} PARENT_SCOPE)
 
+SET(GENERATOR_DEPENDENT_TARGETS ${GENERATOR_DEPENDENT_TARGETS} PARENT_SCOPE)
+
 add_subdirectory(app)
