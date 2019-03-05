@@ -45,7 +45,7 @@ static event::PDG_t const kElectron = 11;
 static event::PDG_t const kPositron = -11;
 
 static event::PDG_t const kNue = 12;
-static event::PDG_t const kNueBar = 12;
+static event::PDG_t const kNueBar = -12;
 
 static event::PDG_t const kPiPlus = 211;
 static event::PDG_t const kPiMinus = -211;
