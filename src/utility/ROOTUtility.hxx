@@ -137,12 +137,21 @@ inline TreeFile MakeNewTTree(std::string const &fname, std::string const &tname,
   return tf;
 }
 
-inline TreeFile AddNewTTreeToFile(TFile *f, std::string const &tname) {
+inline TreeFile AddNewTTreeToFile(TFile *f, std::string const &tname,
+                                  std::string const &dirname = "") {
   TreeFile tf;
   // This is pretty dumb...
   tf.file = make_unique_TFile(f);
   tf.tree = new TTree(tname.c_str(), "");
-  tf.tree->SetDirectory(tf.file.get());
+  if (dirname.size()) {
+    TDirectory *dir = tf.file->GetDirectory(dirname.c_str());
+    if (!dir) {
+      dir = tf.file->mkdir(dirname.c_str());
+    }
+    tf.tree->SetDirectory(dir);
+  } else {
+    tf.tree->SetDirectory(tf.file.get());
+  }
   tf.file_owned = false;
   return tf;
 }

@@ -90,15 +90,15 @@ public:
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    outputTree = AddNewTTreeToFile(nuis::persistency::GetOutputFile().get(),
-                                   "cafTruthTree");
-
     isFD = instance_sample_configuration.get<bool>("is_fd", false);
     isFHC = instance_sample_configuration.get<bool>("is_numode", true);
     isOscSwap = instance_sample_configuration.get<bool>("is_nueswap", false);
 
     // Perform any per-sample configuration in the base class
     SimpleMCStudy::Initialize(instance_sample_configuration);
+
+    outputTree = AddNewTTreeToFile(nuis::persistency::GetOutputFile().get(),
+                                   "cafTruthTree", write_directory);
 
     // outputTree->Branch("mode", &mode, "mode/I");
     outputTree->Branch("isFD", &isFD, "isFD/I");
