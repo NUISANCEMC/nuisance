@@ -18,27 +18,65 @@
 
 NEW_NUIS_EXCEPT(invalid_cli_arguments);
 
+void SayUsage(char const *argv[]) {
+  std::cout << "[USAGE]: " << argv[0]
+            << "\n"
+               "\t-c <config.fcl>             : FHiCL file containing study "
+               "configuration. \n"
+               "\t-s <sample name>            : FHiCL key of a single sample "
+               "to run from the -c argument. \n"
+            << std::endl;
+}
+
+std::string fhicl_file = "";
+std::string named_sample = "";
+
+void handleOpts(int argc, char const *argv[]) {
+  int opt = 1;
+  while (opt < argc) {
+    if ((std::string(argv[opt]) == "-?") ||
+        (std::string(argv[opt]) == "--help")) {
+      SayUsage(argv);
+      exit(0);
+    } else if (std::string(argv[opt]) == "-c") {
+      fhicl_file = argv[++opt];
+    } else if (std::string(argv[opt]) == "-s") {
+      named_sample = argv[++opt];
+    } else {
+      std::cout << "[ERROR]: Unknown option: " << argv[opt] << std::endl;
+      SayUsage(argv);
+      exit(1);
+    }
+    opt++;
+  }
+}
+
 int main(int argc, char const *argv[]) {
   nuis::config::EnsureConfigurationRead("nuis.global.config.fcl");
   nuis::config::EnsureConfigurationRead("nuis.datacomparisons.fcl");
 
-  if (argc != 2 || (std::string(argv[1]) == "-?") ||
-      (std::string(argv[1]) == "--help")) {
-    throw invalid_cli_arguments()
-        << "[ERROR]: Expected to be passed a single FHiCL file name or "
-           "absolute or relative path. N.B. Files in the local directory must "
-           "be fully qualified like \"$ "
-        << argv[0] << " ./myconf.fcl\".";
+  handleOpts(argc, argv);
+
+  if (!fhicl_file.size()) {
+    SayUsage(argv);
+    throw invalid_cli_arguments();
   }
 
-  nuis::config::EnsureConfigurationRead(argv[1]);
+  nuis::config::EnsureConfigurationRead(fhicl_file);
 
   size_t NMax = nuis::config::GetDocument().get<size_t>(
       "nmax", std::numeric_limits<size_t>::max());
 
-  for (fhicl::ParameterSet const &samp_config :
-       nuis::config::GetDocument().get<std::vector<fhicl::ParameterSet>>(
-           "samples")) {
+  std::vector<fhicl::ParameterSet> samples;
+  if (named_sample.size()) {
+    samples.push_back(
+        nuis::config::GetDocument().get<fhicl::ParameterSet>(named_sample));
+  } else {
+    samples = nuis::config::GetDocument().get<std::vector<fhicl::ParameterSet>>(
+        "samples");
+  }
+
+  for (fhicl::ParameterSet const &samp_config : samples) {
 
     std::cout << "[INFO]: Reading sample: "
               << samp_config.get<std::string>("name") << std::endl;
@@ -51,7 +89,7 @@ int main(int argc, char const *argv[]) {
     sample->ProcessSample(NMax);
     sample->Write();
 
-    //Ensures no re-use of samples but cleans up the memory.
+    // Ensures no re-use of samples but cleans up the memory.
     nuis::input::InputManager::Get().Clear();
   }
 
