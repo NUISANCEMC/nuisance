@@ -6,6 +6,7 @@
 
 #ifdef __GENIE_ENABLED__
 #ifdef GENIE_PRE_R3
+#include "Algorithm/AlgConfigPool.h"
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "ReWeight/GSyst.h"
