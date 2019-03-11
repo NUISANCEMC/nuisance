@@ -153,8 +153,8 @@ MinimizerRoutines::MinimizerRoutines(int argc, char* argv[]) {
   // Add Error Verbo Lines
   verbocount += Config::GetParI("VERBOSITY");
   errorcount += Config::GetParI("ERROR");
-  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
-  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  LOG(FIT) << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  LOG(FIT) << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   // FitPar::log_verb = verbocount;
   SETVERBOSITY(verbocount);
   // ERR_VERB(errorcount);
@@ -235,7 +235,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
       parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
       parstep =
           FitBase::RWAbsToSigma(partype, parname, opnom + parstep) - parnom;
-      std::cout << "ParStep: " << parstep << " (" << oparstep << ")."
+      LOG(FIT)<< "ParStep: " << parstep << " (" << oparstep << ")."
                 << std::endl;
     } else if (parstate.find("FRAC") != std::string::npos) {
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
@@ -717,7 +717,7 @@ void MinimizerRoutines::GetMinimizerState() {
   SetupCovariance();
   if (fMinimizer->CovMatrixStatus() > 0) {
     // Fill Full Covar
-    std::cout << "Filling covariance" << std::endl;
+    LOG(FIT) << "Filling covariance" << std::endl;
     for (int i = 0; i < fCovar->GetNbinsX(); i++) {
       for (int j = 0; j < fCovar->GetNbinsY(); j++) {
         fCovar->SetBinContent(i + 1, j + 1, fMinimizer->CovMatrix(i, j));
@@ -748,7 +748,6 @@ void MinimizerRoutines::GetMinimizerState() {
     }
   }
 
-  std::cout << "Got STATE" << std::endl;
 
   return;
 };
@@ -984,7 +983,7 @@ void MinimizerRoutines::SaveResults() {
 void MinimizerRoutines::SaveMinimizerState() {
   //*************************************
 
-  std::cout << "Saving Minimizer State" << std::endl;
+  LOG(FIT) << "Saving Minimizer State" << std::endl;
   if (!fMinimizer) {
     ERR(FTL) << "Can't save minimizer state without min object" << std::endl;
     throw;
@@ -1228,13 +1227,12 @@ void MinimizerRoutines::SetupCovariance() {
 
   // Get NFREE from min or from vals (for cases when doing throws)
   if (fMinimizer) {
-    std::cout << "NFREE FROM MINIMIZER" << std::endl;
     NFREE = fMinimizer->NFree();
     NDIM = fMinimizer->NDim();
   } else {
     NDIM = fParams.size();
     for (UInt_t i = 0; i < fParams.size(); i++) {
-      std::cout << "Getting Param " << fParams[i] << std::endl;
+      LOG(FIT) << "Getting Param " << fParams[i] << std::endl;
 
       if (!fFixVals[fParams[i]]) NFREE++;
     }
@@ -1254,9 +1252,6 @@ void MinimizerRoutines::SetupCovariance() {
   int countall = 0;
   int countfree = 0;
   for (UInt_t i = 0; i < fParams.size(); i++) {
-    std::cout << "Getting Param " << i << std::endl;
-    std::cout << "ParamI = " << fParams[i] << std::endl;
-
     fCovar->GetXaxis()->SetBinLabel(countall + 1, fParams[i].c_str());
     fCovar->GetYaxis()->SetBinLabel(countall + 1, fParams[i].c_str());
     countall++;
@@ -1267,8 +1262,6 @@ void MinimizerRoutines::SetupCovariance() {
       countfree++;
     }
   }
-
-  std::cout << "Filling Matrices" << std::endl;
 
   fCorrel = PlotUtils::GetCorrelationPlot(fCovar, "correlation");
   fDecomp = PlotUtils::GetDecompPlot(fCovar, "decomposition");
@@ -1281,7 +1274,6 @@ void MinimizerRoutines::SetupCovariance() {
     fDecFree = NULL;
   }
 
-  std::cout << " Set the covariance" << std::endl;
   return;
 };
 
