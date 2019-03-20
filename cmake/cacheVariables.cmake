@@ -98,7 +98,7 @@ CheckAndSetDefaultCache(NUWRO_BUILT_FROM_FILE FALSE INTERNAL "Whether the NuWro 
 CheckAndSetDefaultCache(USE_NuWro_RW FALSE BOOL "Whether to try and build support for NuWro reweighting. <FALSE>")
 CheckAndSetDefaultCache(USE_NuWro_SRW_Event FALSE BOOL "Whether to use cut down NuWro reweight event format. Requires NuWro reweight. <FALSE>")
 
-CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")
 CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
 CheckAndSetDefaultEnv(GENIE_REWEIGHT "" PATH "Path to GENIE ReWeight directory. Only relevant for GENIE v3+. Overrides environment variable \$GENIE_REWEIGHT <>" GENIE_REWEIGHT)

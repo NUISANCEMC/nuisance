@@ -50,8 +50,8 @@ endif()
 ##################################  GENIE  #####################################
 if(USE_GENIE)
   include(${CMAKE_SOURCE_DIR}/cmake/GENIESetup.cmake)
-  cmessage(STATUS "Using GENIE Reweight engine.")
-  set(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)
+  cmessage(STATUS "Using GENIE.")
+  set(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE support. Requires external libraries. <FALSE>" FORCE)
 endif()
 
 ################################################################################
