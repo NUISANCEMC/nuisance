@@ -61,7 +61,7 @@ LIST(APPEND ROOT_LIBS
   Geom
   GenVector)
 
-string(REGEX MATCH "6.*" ROOTVERSIXMATCH ${ROOT_VERSION})
+string(REGEX MATCH "^6.*" ROOTVERSIXMATCH ${ROOT_VERSION})
 if(ROOTVERSIXMATCH)
   cmessage(STATUS "Using ROOT6, We are essentially flying blind here.")
   LIST(REMOVE_ITEM ROOT_LIBS Cint)
