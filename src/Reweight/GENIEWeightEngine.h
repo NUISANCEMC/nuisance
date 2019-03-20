@@ -80,8 +80,10 @@ public:
 	inline bool NeedsEventReWeight() { return true; };
 
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
 	std::vector<genie::rew::GSyst_t> fGENIESysts;
 	genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
+#endif
 #endif
 
 };

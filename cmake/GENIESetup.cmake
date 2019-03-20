@@ -86,16 +86,15 @@ if(WASMATCHED AND GENIE_VERSION STREQUAL "210")
 endif()
 
 if(NOT GENIE_POST_R3)
-  LIST(FIND GENIE_LIBS GReWeight WAS_FOUND)
-  if(WAS_FOUND STREQUAL "-1")
-    LIST(APPEND GENIE_LIBS GReWeight)
-    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS}")
+  LIST(FIND GENIE_LIBS GReWeight FOUND_GENIE_RW)
+  if(FOUND_GENIE_RW EQUAL -1)
+    cmessage(DEBUG "Did NOT find ReWeight library. Here are libs: ${GENIE_LIBS}")
   endif()
 else()
   LIST(FIND GENIE_LIBS GRwFwk WAS_FOUND)
   if(WAS_FOUND STREQUAL "-1")
     LIST(APPEND GENIE_LIBS GRwClc GRwFwk GRwIO)
-    cmessage(DEBUG "Force added ReWeight library: ${GENIE_LIBS}")
+    cmessage(DEBUG "Force added ReWeight library. Here are libs: ${GENIE_LIBS}")
   endif()
 endif()
 
@@ -150,7 +149,14 @@ if(LOG4CPP_INC STREQUAL "")
 endif()
 ################################################################################
 
+# Set the compiler defines
 LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION})
+
+# If we've compiled without reweight, look in the GENIE_LIBS list
+if(${FOUND_GENIE_RW} EQUAL -1)
+  cmessage(DEBUG "Didn't find GReWeight: defining -D__NO_GENIE_REWEIGHT__")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NO_GENIE_REWEIGHT__)
+endif()
 
 LIST(APPEND EXTRA_LIBS ${GENIE_LIBS})
 
@@ -185,7 +191,8 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${LHAPDF_LIB}
   ${LOG4CPP_LIB})
 
-if(NOT GENIE_POST_R3)
+# Append only if we have found GENIE ReWeight
+if(NOT GENIE_POST_R3 AND FOUND_GENIE_RW GREATER -1)
   LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
     ${GENIE_INCLUDES_DIR}
     ${GENIE_INCLUDES_DIR}/GHEP
