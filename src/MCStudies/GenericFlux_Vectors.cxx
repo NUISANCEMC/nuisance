@@ -102,6 +102,8 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
   eventVariables->Branch("tgt", &tgt, "tgt/I");
+  eventVariables->Branch("tgta", &tgta, "tgta/I");
+  eventVariables->Branch("tgtz", &tgtz, "tgtz/I");
   eventVariables->Branch("PDGLep", &PDGLep, "PDGLep/I");
   eventVariables->Branch("ELep", &ELep, "ELep/F");
   eventVariables->Branch("CosLep", &CosLep, "CosLep/F");
@@ -166,6 +168,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   PDGnu = nu->fPID;
   Enu_true = nu->fP.E() / 1E3;
   tgt = event->fTargetPDG;
+  tgta = event->fTargetA;
+  tgtz = event->fTargetZ;
+
   if (lep != NULL) {
     PDGLep = lep->fPID;
     ELep = lep->fP.E() / 1E3;
@@ -250,7 +255,7 @@ void GenericFlux_Vectors::ResetVariables() {
   cc = false;
 
   // Reset all Function used to extract any variables of interest to the event
-  Mode = PDGnu = tgt = PDGLep = 0;
+  Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = Eav = EavAlt = -999.9;
 
