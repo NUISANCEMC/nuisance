@@ -70,6 +70,8 @@ public:
   bool cc;
   int PDGnu;
   int tgt;
+  int tgta;
+  int tgtz;
   int PDGLep;
   float ELep;
   float CosLep;

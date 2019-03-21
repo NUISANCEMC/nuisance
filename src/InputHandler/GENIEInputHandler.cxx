@@ -422,10 +422,13 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   // Set Event Info
   fNUISANCEEvent->fEventNo = 0.0;
   fNUISANCEEvent->fTotCrs = fGenieGHep->XSec();
-  fNUISANCEEvent->fTargetA = 0.0;
-  fNUISANCEEvent->fTargetZ = 0.0;
+  // Set the TargetPDG
+  fNUISANCEEvent->fTargetPDG = fGenieGHep->TargetNucleus()->Pdg();
+  // Set the A and Z and H from the target PDG
+  fNUISANCEEvent->fTargetA = TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
+  fNUISANCEEvent->fTargetZ = TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
   fNUISANCEEvent->fTargetH = 0;
-  fNUISANCEEvent->fBound = 0.0;
+  fNUISANCEEvent->fBound = (fNUISANCEEvent->fTargetA != 1);
   fNUISANCEEvent->InputWeight = 1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
   // And the custom weights
