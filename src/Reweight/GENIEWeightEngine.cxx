@@ -6,6 +6,7 @@
 
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
   // Setup the NEUT Reweight engien
   fCalcName = name;
   LOG(FIT) << "Setting up GENIE RW : " << fCalcName << std::endl;
@@ -210,12 +211,18 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   StartTalking();
 
 #else
-  ERR(FTL) << "GENIE RW NOT ENABLED" << std::endl;
+  ERR(FTL) << "GENIE ReWeight is __NOT ENABLED__ in GENIE and you're trying to run NUISANCE with it enabled" << std::endl;
+  ERR(FTL) << "Check your genie-config --libs for reweighting" << std::endl;
+  ERR(FTL) << "If not present you need to recompile GENIE" << std::endl;
+  ERR(FTL) << "If present you need to contact NUISANCE authors" << std::endl;
+  throw;
+#endif
 #endif
 };
 
 void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
 
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kGENIE);
@@ -274,41 +281,46 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
     SetDialValue(nuisenum, startval);
   }
 #endif
+#endif
 };
 
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
     fGenieRW->Systematics().Set(fGENIESysts[indices[i]], val);
   }
 #endif
+#endif
 }
 
 void GENIEWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
     fGenieRW->Systematics().Set(fGENIESysts[indices[i]], val);
   }
 #endif
+#endif
 }
 
 void GENIEWeightEngine::Reconfigure(bool silent) {
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
   // Hush now...
-  if (silent)
-    StopTalking();
+  if (silent) StopTalking();
 
   // Reconf
   fGenieRW->Reconfigure();
   fGenieRW->Print();
 
   // Shout again
-  if (silent)
-    StartTalking();
+  if (silent) StartTalking();
+#endif
 #endif
 }
 
@@ -316,6 +328,7 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __GENIE_ENABLED__
+#ifndef __NO_GENIE_REWEIGHT__
   // Make nom weight
   if (!evt) {
     THROW("evt not found : " << evt);
@@ -341,6 +354,8 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   rw_weight = fGenieRW->CalcWeight(*(evt->genie_event->event));
   //	std::cout << "Returning GENIE Weight for electron scattering = " <<
   // rw_weight << std::endl;
+  //if (rw_weight != 1.0 )std::cout << "mode=" << evt->Mode << " rw_weight = " << rw_weight << std::endl;
+#endif
 #endif
 
   // Return rw_weight
