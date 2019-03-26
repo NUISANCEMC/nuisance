@@ -405,8 +405,9 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   evt->fTotCrs = 0.0;
   evt->fTargetA = fNuWroEvent->par.nucleus_p + fNuWroEvent->par.nucleus_n;
   evt->fTargetZ = fNuWroEvent->par.nucleus_p;
+  evt->fTargetPDG = TargetUtils::GetTargetPDGFromZA(evt->fTargetZ, evt->fTargetA);
   evt->fTargetH = 0;
-  evt->fBound = (evt->fTargetA) == 1;
+  evt->fBound = (evt->fTargetA != 1);
 
   // Check Particle Stack
   UInt_t npart_in = fNuWroEvent->in.size();
