@@ -51,6 +51,7 @@ LIST(APPEND EXTRA_LINK_DIRS
 
 if(${NEUT_VERSION} VERSION_EQUAL 5.4.2)
   LIST(APPEND EXTRA_LIBS
+    -Wl,--as-needed
     NReWeight
     -Wl,--start-group
     neutcore_5.4.2
@@ -71,6 +72,7 @@ if(${NEUT_VERSION} VERSION_EQUAL 5.4.2)
   LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_COMMON_QEAV)
 elseif(${NEUT_VERSION} VERSION_EQUAL 5.4.0)
   LIST(APPEND EXTRA_LIBS
+    -Wl,--as-needed
     NReWeight
     -Wl,--start-group
     neutcore_5.4.0
@@ -81,6 +83,9 @@ elseif(${NEUT_VERSION} VERSION_EQUAL 5.4.0)
     tauola_5.4.0
     HT2p2h_5.4.0
     N1p1h_5.4.0
+    specfunc_5.4.0
+    radcorr_5.4.0
+    gfortran
     -Wl,--end-group
     jetset74
     pdflib804
@@ -89,6 +94,7 @@ elseif(${NEUT_VERSION} VERSION_EQUAL 5.4.0)
     pawlib)
 else()
   LIST(APPEND EXTRA_LIBS
+    -Wl,--as-needed
     NReWeight
     -Wl,--start-group
     neutcore
@@ -108,7 +114,6 @@ endif()
 set(NEUT_ROOT_LIBS)
 
 LIST(APPEND NEUT_ROOT_LIBS
-  -Wl,--no-as-needed
   ${NEUT_CLASS}/neutctrl.so
   ${NEUT_CLASS}/neutfsivert.so)
 
