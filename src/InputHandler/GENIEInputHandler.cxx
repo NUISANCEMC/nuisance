@@ -423,7 +423,29 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->fEventNo = 0.0;
   fNUISANCEEvent->fTotCrs = fGenieGHep->XSec();
   // Set the TargetPDG
-  fNUISANCEEvent->fTargetPDG = fGenieGHep->TargetNucleus()->Pdg();
+  if (fGenieGHep->TargetNucleus() != NULL) {
+    fNUISANCEEvent->fTargetPDG = fGenieGHep->TargetNucleus()->Pdg();
+  // Sometimes GENIE scatters off free nucleons electrons
+  } else {
+    // Check the particle is an initial state particle (GHepRecord::TargetNucleusPosition but doesn't do check on pdg::IsIon)
+    GHepParticle *p = fGenieGHep->Particle(1);
+    if (!p) {
+      ERR(FTL) << "Can't find particle 1 for GHepRecord" << std::endl;
+      throw;
+    }
+    if (!pdg::IsIon(p->Pdg()) && 
+        p->Status() == kIStInitialState) {
+      fNUISANCEEvent->fTargetPDG = p->Pdg();
+    } else {
+      if (pdg::IsIon(p->Pdg())) {
+        ERR(FTL) << "Particle 1 in GHepRecord stack is an ion but isn't an initial state particle" << std::endl;
+        throw;
+      } else {
+        ERR(FTL) << "Particle 1 in GHepRecord stack is not an ion but is an initial state particle" << std::endl;
+        throw;
+      }
+    }
+  }
   // Set the A and Z and H from the target PDG
   fNUISANCEEvent->fTargetA = TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
   fNUISANCEEvent->fTargetZ = TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
