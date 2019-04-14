@@ -2,32 +2,32 @@
 
 std::vector<int> TargetUtils::ParseTargetsToIntVect(std::string targets) {
 
-	std::vector<std::string> splittgt = GeneralUtils::ParseToStr(targets, ",");
-	std::vector<int> convtgt;
+  std::vector<std::string> splittgt = GeneralUtils::ParseToStr(targets, ",");
+  std::vector<int> convtgt;
 
-	for (size_t i = 0; i < splittgt.size(); i++) {
-		std::string type = splittgt[i];
-		convtgt.push_back( GetTargetPDGFromString( type ) );
-	}
+  for (size_t i = 0; i < splittgt.size(); i++) {
+    std::string type = splittgt[i];
+    convtgt.push_back( GetTargetPDGFromString( type ) );
+  }
 
-	return convtgt;
+  return convtgt;
 }
 
 
 int TargetUtils::GetTargetPDGFromString(std::string target){
 
-	if      (!target.compare("H")) return 1000010010;
-	else if (!target.compare("C")) return 1000060120;
-	else if (!target.compare("O")) return 1000080160;
-	else {
-		int conv = GeneralUtils::StrToInt(target);
-		if (abs(conv) > 1) return conv;
-	}
-	return 0;
+  if      (!target.compare("H")) return 1000010010;
+  else if (!target.compare("C")) return 1000060120;
+  else if (!target.compare("O")) return 1000080160;
+  else {
+    int conv = GeneralUtils::StrToInt(target);
+    if (abs(conv) > 1) return conv;
+  }
+  return 0;
 }
 
 int TargetUtils::GetTargetPDGFromZA(int Z, int A){
-	return 1000000000 + A*10 + Z*10000;
+  return 1000000000 + A*10 + Z*10000;
 }
 
 int TargetUtils::GetTargetAFromPDG(int PDG){
@@ -44,15 +44,15 @@ void TargetUtils::ListTargetIDs(){
 
   // Keep in sync with ConvertTargetIDs
   LOG(FIT) << "Possible Target IDs: \n"
-			 << "\n H  : " << TargetUtils::ConvertTargetIDs("H")
-                         << "\n C  : " << TargetUtils::ConvertTargetIDs("C")
-			 << "\n CH  : " << TargetUtils::ConvertTargetIDs("CH")
-			 << "\n CH2 : " << TargetUtils::ConvertTargetIDs("CH2")
-			 << "\n H2O : " << TargetUtils::ConvertTargetIDs("H2O")
-			 << "\n Fe  : " << TargetUtils::ConvertTargetIDs("Fe")
-			 << "\n Pb  : " << TargetUtils::ConvertTargetIDs("Pb")
-			 << "\n D2  : " << TargetUtils::ConvertTargetIDs("D2")
-			 << "\n D2-free : " << TargetUtils::ConvertTargetIDs("D2-free");
+    << "\n H  : " << TargetUtils::ConvertTargetIDs("H")
+    << "\n C  : " << TargetUtils::ConvertTargetIDs("C")
+    << "\n CH  : " << TargetUtils::ConvertTargetIDs("CH")
+    << "\n CH2 : " << TargetUtils::ConvertTargetIDs("CH2")
+    << "\n H2O : " << TargetUtils::ConvertTargetIDs("H2O")
+    << "\n Fe  : " << TargetUtils::ConvertTargetIDs("Fe")
+    << "\n Pb  : " << TargetUtils::ConvertTargetIDs("Pb")
+    << "\n D2  : " << TargetUtils::ConvertTargetIDs("D2")
+    << "\n D2-free : " << TargetUtils::ConvertTargetIDs("D2-free");
 }
 
 

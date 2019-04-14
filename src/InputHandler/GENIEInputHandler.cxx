@@ -422,20 +422,32 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   // Set Event Info
   fNUISANCEEvent->fEventNo = 0.0;
   fNUISANCEEvent->fTotCrs = fGenieGHep->XSec();
+  // Have a bool storing if interaction happened on free or bound nucleon
+  bool IsFree = false;
   // Set the TargetPDG
   if (fGenieGHep->TargetNucleus() != NULL) {
     fNUISANCEEvent->fTargetPDG = fGenieGHep->TargetNucleus()->Pdg();
-  // Sometimes GENIE scatters off free nucleons electrons
+    IsFree = false;
+  // Sometimes GENIE scatters off free nucleons, electrons, photons 
+  // In which TargetNucleus is NULL and we need to find the initial state particle
   } else {
-    // Check the particle is an initial state particle (GHepRecord::TargetNucleusPosition but doesn't do check on pdg::IsIon)
+    // Check the particle is an initial state particle 
+    // Follows GHepRecord::TargetNucleusPosition but doesn't do check on pdg::IsIon
     GHepParticle *p = fGenieGHep->Particle(1);
+    // Check that particle 1 actually exists
     if (!p) {
       ERR(FTL) << "Can't find particle 1 for GHepRecord" << std::endl;
       throw;
     }
+    // If not an ion but is an initial state particle
     if (!pdg::IsIon(p->Pdg()) && 
         p->Status() == kIStInitialState) {
+      IsFree = true;
       fNUISANCEEvent->fTargetPDG = p->Pdg();
+    // Catch if something strange happens: 
+    // Here particle 1 is not an initial state particle OR
+    // particle 1 is an ion OR
+    // both
     } else {
       if (pdg::IsIon(p->Pdg())) {
         ERR(FTL) << "Particle 1 in GHepRecord stack is an ion but isn't an initial state particle" << std::endl;
@@ -447,10 +459,30 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
     }
   }
   // Set the A and Z and H from the target PDG
-  fNUISANCEEvent->fTargetA = TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
-  fNUISANCEEvent->fTargetZ = TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
-  fNUISANCEEvent->fTargetH = 0;
-  fNUISANCEEvent->fBound = (fNUISANCEEvent->fTargetA != 1);
+  // Depends on if we scattered off a free or bound nucleon
+  if (!IsFree) {
+    fNUISANCEEvent->fTargetA = TargetUtils::GetTargetAFromPDG(fNUISANCEEvent->fTargetPDG);
+    fNUISANCEEvent->fTargetZ = TargetUtils::GetTargetZFromPDG(fNUISANCEEvent->fTargetPDG);
+    fNUISANCEEvent->fTargetH = 0;
+  } else {
+    // If free proton scattering
+    if (fNUISANCEEvent->fTargetPDG == 2212) {
+      fNUISANCEEvent->fTargetA = 1;
+      fNUISANCEEvent->fTargetZ = 1;
+      fNUISANCEEvent->fTargetH = 1;
+      // If free neutron scattering
+    } else if (fNUISANCEEvent->fTargetPDG == 2112) {
+      fNUISANCEEvent->fTargetA = 0;
+      fNUISANCEEvent->fTargetZ = 1;
+      fNUISANCEEvent->fTargetH = 0;
+      // If neither
+    } else {
+      fNUISANCEEvent->fTargetA = 0;
+      fNUISANCEEvent->fTargetZ = 0;
+      fNUISANCEEvent->fTargetH = 0;
+    }
+  }
+  fNUISANCEEvent->fBound = !IsFree;
   fNUISANCEEvent->InputWeight = 1.0;  //(1E+38 / genie::units::cm2) * fGenieGHep->XSec();
 
   // And the custom weights
