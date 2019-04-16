@@ -484,8 +484,9 @@ std::string Reweight::ConvDialType(int type) {
 
 int Reweight::GetDialType(int type) {
   int t = (type / 1000);
-  return t > kMODENORM ? Reweight::kNoDialFound : t;
+  return t > kNOvARWGT ? Reweight::kNoDialFound : t;
 }
+
 int Reweight::RemoveDialType(int type) { return (type % 1000); }
 
 int Reweight::NEUTEnumFromName(std::string const &name) {
