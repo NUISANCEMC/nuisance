@@ -289,6 +289,11 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
+      if (samplenorm != 1.0) {
+        ERR(FTL) << "You provided a sample normalisation but did not specify that the sample is free" << std::endl;
+        ERR(FTL) << "Change so sample contains type=\"FREE\" and re-run" << std::endl;
+        throw;
+      }
       continue;
     }
 
