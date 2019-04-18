@@ -87,7 +87,7 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
   std::string descrip =  distdescript + \
     "Target: CH \n"				       \
     "Flux: MINERvA Forward Horn Current numu ONLY \n"  \
-    "Signal: Any event with 1 muon, and 1pi+ or 1pi- in FS. W < 1.4";
+    "Signal: Any event with 1 muon, and 1pi+ or 1pi- in FS. W < 1.8";
 
   fSettings.SetDescription(descrip);
   fSettings.SetDataInput( GeneralUtils::GetTopLevelDir()+"/data/MINERvA/CC1pip/070717/" + datafile + "_data.txt" );
@@ -149,22 +149,20 @@ void MINERvA_CC1pip_XSec_1D_2017Update::FillEventVariables(FitEvent *event) {
 
 
   switch(fDist){
-  case kTpi:  fXVar = Tpi;  break;
-  case kth:   fXVar = th;   break;
-  case kpmu:  fXVar = pmu;  break;
-  case kthmu: fXVar = thmu; break;
-  case kQ2:   fXVar = Q2;   break;
-  case kEnu:  fXVar = Enu;  break;
-  default:
-    THROW("DIST NOT FOUND : " << fDist);
+    case kTpi:  fXVar = Tpi;  break;
+    case kth:   fXVar = th;   break;
+    case kpmu:  fXVar = pmu;  break;
+    case kthmu: fXVar = thmu; break;
+    case kQ2:   fXVar = Q2;   break;
+    case kEnu:  fXVar = Enu;  break;
+    default: THROW("DIST NOT FOUND : " << fDist);
   }
-  
-  return;
+
 };
 
 //********************************************************************
 bool MINERvA_CC1pip_XSec_1D_2017Update::isSignal(FitEvent *event) {
-//********************************************************************
+  //********************************************************************
   // Only seem to release full phase space
   return SignalDef::isCC1pip_MINERvA_2017(event, EnuMin, EnuMax);
 }
