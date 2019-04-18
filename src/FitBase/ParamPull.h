@@ -154,6 +154,7 @@ class ParamPull {
 
  private:
 
+  void CheckHist(TH1D*);
   TH1D RemoveBinsNotInString(TH1D hist, std::string mystr);
   TH1I RemoveBinsNotInString(TH1I hist, std::string mystr);
   

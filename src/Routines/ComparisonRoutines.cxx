@@ -237,7 +237,7 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     // Push into vectors
     fParams.push_back(parname);
 
-    fTypeVals[parname]  = FitBase::ConvDialType(partype);;
+    fTypeVals[parname]  = FitBase::ConvDialType(partype);
     fCurVals[parname]   = parnom;
     fStateVals[parname] = parstate;
 

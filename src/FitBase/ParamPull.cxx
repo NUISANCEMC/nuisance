@@ -34,7 +34,6 @@ ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, 
 
   // Set the pull type
   SetType(fType);
-  std::cout << fType << std::endl;
 
   // Setup Histograms from input file
   SetupHistograms(fInput);
@@ -110,11 +109,15 @@ void ParamPull::SetupHistograms(std::string input) {
   else if (!fFileType.compare("DIAL")) ReadDialInput(input);
   else {
     ERR(FTL) << "Unknown ParamPull Type: " << input << std::endl;
+    ERR(FTL) << "Need FIT, ROOT, VECT or DIAL" << std::endl;
     throw;
   }
 
   // Check Dials are all good
-  CheckDialsValid();
+  if (!CheckDialsValid()) {
+    ERR(FTL) << "DIALS NOT VALID" << std::endl;
+    throw;
+  }
 
   // Setup MC Histogram
   fMCHist = (TH1D*) fDataHist->Clone();
@@ -129,6 +132,7 @@ void ParamPull::SetupHistograms(std::string input) {
 
   // If no types or limits are provided give them a default option
   if (!fMinHist) {
+    LOG(FIT) << "No minimum histogram found for pull parameters, setting to be content - 1E6..." << std::endl;
     fMinHist = (TH1D*) fDataHist->Clone();
     fMinHist->SetNameTitle( (fName + "_min").c_str(),
                             (fName + " min" + fPlotTitles).c_str() );
@@ -139,6 +143,7 @@ void ParamPull::SetupHistograms(std::string input) {
   }
 
   if (!fMaxHist) {
+    LOG(FIT) << "No maximum histogram found for pull parameters, setting to be content - 1E6..." << std::endl;
     fMaxHist = (TH1D*) fDataHist->Clone();
     fMaxHist->SetNameTitle( (fName + "_min").c_str(),
                             (fName + " min" + fPlotTitles).c_str() );
@@ -148,8 +153,8 @@ void ParamPull::SetupHistograms(std::string input) {
   }
 
   // Set types from state, or to unknown
+  // Not really sure when or if this is ever used
   if (!fTypeHist) {
-
     int deftype = -1;
     if (fType.find("T2K")        != std::string::npos) { deftype = kT2K;   }
     else if (fType.find("NEUT")  != std::string::npos) { deftype = kNEUT;  }
@@ -184,9 +189,6 @@ void ParamPull::SetupHistograms(std::string input) {
   // Select only dials we want
   if (!fDialSelection.empty()) {
     (*fDataHist) = RemoveBinsNotInString(*fDataHist, fDialSelection);
-
-
-
   }
 
 }
@@ -271,17 +273,22 @@ void ParamPull::ReadFitFile(std::string input) {
 
   // Read Data
   fDataHist = (TH1D*) tempfile->Get("fit_dials_free");
-  if (!fDataHist) {
-    ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << std::endl;
-    ERR(FTL) << "File Entries:" << std::endl;
-    tempfile->ls();
-
-    throw;
-  }
-
+  CheckHist(fDataHist);
   fDataHist->SetDirectory(0);
   fDataHist->SetNameTitle( (fName + "_data").c_str(),
                            (fName + " data" + fPlotTitles).c_str() );
+
+  fMinHist = (TH1D*)tempfile->Get("min_dials_free");
+  CheckHist(fMinHist);
+  fMinHist->SetDirectory(0);
+  fMinHist->SetNameTitle( (fName + "_min").c_str(),
+                           (fName + " min" + fPlotTitles).c_str() );
+
+  fMaxHist = (TH1D*)tempfile->Get("max_dials_free");
+  CheckHist(fMaxHist);
+  fMaxHist->SetDirectory(0);
+  fMaxHist->SetNameTitle( (fName + "_max").c_str(),
+                           (fName + " max" + fPlotTitles).c_str() );
 
   // Read Covar
   TH2D* tempcov = (TH2D*) tempfile->Get("covariance_free");
@@ -322,10 +329,7 @@ void ParamPull::ReadRootFile(std::string input) {
 
   // Get Entries
   std::string filename  = inputlist[0];
-  LOG(DEB) << filename << std::endl;
   std::string histname  = inputlist[1];
-  LOG(DEB) << histname << std::endl;
-  LOG(DEB) << input << std::endl;
 
   // Read File
   TFile* tempfile = new TFile(filename.c_str(), "READ");
@@ -481,18 +485,12 @@ void ParamPull::ReadDialInput(std::string input) {
 //*******************************************************************************
 std::map<std::string, int> ParamPull::GetAllDials() {
 //*******************************************************************************
-
   std::map<std::string, int> dialtypemap;
-
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-
     std::string name = fDataHist->GetXaxis()->GetBinLabel(i + 1);
     int type = fTypeHist->GetBinContent(i + 1);
-
     dialtypemap[name] = type;
-
   }
-
   return dialtypemap;
 }
 
@@ -501,14 +499,16 @@ std::map<std::string, int> ParamPull::GetAllDials() {
 bool ParamPull::CheckDialsValid() {
 //*******************************************************************************
 
-  return true;
   std::string helpstring = "";
 
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     std::string name = std::string(fDataHist->GetXaxis()->GetBinLabel(i + 1));
 
     // If dial exists its all good
-    if (FitBase::GetRW()->DialIncluded(name)) continue;
+    if (FitBase::GetRW()->DialIncluded(name)) {
+      LOG(DEB) << "Found dial " << name << " in covariance " << fInput << " and matched to reweight engine " << std::endl;
+      continue;
+    }
 
     // If it doesn't but its a sample norm also continue
     if (name.find("_norm") != std::string::npos) {
@@ -532,17 +532,18 @@ bool ParamPull::CheckDialsValid() {
   // Show statement before failing
   if (!helpstring.empty()) {
 
-    ERR(WRN) << "Dial(s) included in covar but not set in FitWeight." << std::endl
-             << "ParamPulls needs to know how you want it to be treated." << std::endl
-             << "Include the following lines into your card:" << std::endl;
+    ERR(FTL) << "Dial(s) included in covar but not set in FitWeight." << std::endl;
+    ERR(FTL) << "ParamPulls needs to know how you want it to be treated." << std::endl;
+    ERR(FTL) << "Include the following lines into your card to throw UNCORRELATED:" << std::endl
 
-    ERR(WRN) << helpstring << std::endl;
+    << helpstring << std::endl;
     throw;
     return false;
   } else {
     return true;
   }
 
+  return false;
 }
 
 
@@ -752,7 +753,6 @@ void ParamPull::ThrowCovariance() {
       binmod = randthrows.at(i) - fDataHist->GetBinContent(i + 1);
     }
 
-
     // Add up fraction dif
     totalres += binmod;
 
@@ -770,12 +770,11 @@ void ParamPull::ThrowCovariance() {
       if (fLimitHist->GetBinError(i + 1) == 0.0) continue;
       if (fDataHist->GetBinContent(i + 1) > fLimitHist->GetBinContent(i + 1) + fLimitHist->GetBinError(i + 1) ||
           fDataHist->GetBinContent(i + 1) < fLimitHist->GetBinContent(i + 1) - fLimitHist->GetBinError(i + 1)) {
-        this->ThrowCovariance();
+        LOG(FIT) << "Threw outside allowed region, rethrowing..." << std::endl;
+        ThrowCovariance();
       }
     }
   }
-
-  return;
 };
 
 
@@ -817,7 +816,7 @@ TH2D ParamPull::GetFullCovar() {
 TH2D ParamPull::GetDecompCovar() {
 //*******************************************************************************
 
-  TH2D tempCov = TH2D(*fCovar);
+  TH2D tempCov = TH2D(*fDecomp);
 
   for (int i = 0; i < tempCov.GetNbinsX(); i++) {
     tempCov.GetXaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
@@ -847,3 +846,12 @@ void ParamPull::Write(std::string writeoptt) {
   return;
 };
 
+void ParamPull::CheckHist(TH1D* hist) {
+  if (!hist) {
+    ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << std::endl;
+    ERR(FTL) << "File Entries:" << std::endl;
+    TFile *temp = new TFile(fInput.c_str(), "open");
+    temp->ls();
+    throw;
+  }
+}
