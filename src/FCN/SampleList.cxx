@@ -230,10 +230,6 @@
 
 #include "MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
-
-//#include "MINERvA_CC0pi_XSec_2Dptpx_antinu.h"
-//#include "MINERvA_CC0pi_XSec_2Dptpx_nu.h"
-
 #endif
 
 #ifndef __NO_T2K__
@@ -1027,7 +1023,6 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
     // Dan Ruterbories measurements of late 2018
   } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
-              //!name.compare("MINERvA_CC0pi_XSec_2DptQ2_nu")) {
     return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
   } else if ( !name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
