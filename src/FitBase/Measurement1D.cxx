@@ -969,7 +969,6 @@ double Measurement1D::GetLikelihood() {
     PlotUtils::MaskBins(fMCHist, fMaskHist);
   }
 
-
   // Sort Shape Scaling
   double scaleF = 0.0;
   // TODO Include !fIsRawEvents

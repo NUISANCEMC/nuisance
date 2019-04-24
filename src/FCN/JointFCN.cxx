@@ -236,8 +236,7 @@ double JointFCN::DoEval(const double *x) {
            << std::endl;
 
   // UPDATE TREE
-  if (fIterationTree)
-    FillIterationTree(FitBase::GetRW());
+  if (fIterationTree) FillIterationTree(FitBase::GetRW());
 
   return fLikelihood;
 }
@@ -395,7 +394,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   // std::endl;
   // Event Manager Reconf
   if (fUsingEventManager) {
-    if (!fullconfig and fMCFilled)
+    if (!fullconfig && fMCFilled)
       ReconfigureFastUsingManager();
     else
       ReconfigureUsingManager();
@@ -561,12 +560,7 @@ void JointFCN::ReconfigureUsingManager() {
       // The Custom weight and reweight
       curevent->Weight =
           curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
-      // double rwweight = curevent->Weight;
-      // std::cout << "RWWeight = " << curevent->RWWeight  << " " <<
-      // curevent->InputWeight << std::endl;
 
-      // Logging
-      // std::cout << CHECKLOG(1) << std::endl;
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
           QLOG(REC, curinput->GetName()
@@ -642,14 +636,14 @@ void JointFCN::ReconfigureUsingManager() {
       }
 
       // Save the vector of signal boxes for this event
-      if (savesignal and foundsignal) {
+      if (savesignal && foundsignal) {
         fSignalEventBoxes.push_back(signalboxes);
         fSampleSignalFlags.push_back(signalbitset);
       }
 
       // If all inputs are splines we can save the spline coefficients
       // for fast in memory reconfigures later.
-      if (fIsAllSplines and savesignal and foundsignal) {
+      if (fIsAllSplines && savesignal && foundsignal) {
         // Make temp vector to push back with
         std::vector<float> coeff;
         for (size_t l = 0; l < (UInt_t)curevent->fSplineRead->GetNPar(); l++) {
@@ -737,9 +731,6 @@ void JointFCN::ReconfigureUsingManager() {
           << std::endl;
     }
   }
-
-  // End of reconfigure
-  return;
 };
 
 //***************************************************
@@ -779,7 +770,10 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Setup stuff for logging
   int fillcount = 0;
-  int nevents = fSignalEventFlags.size();
+  // This is just the total number of events
+  //int nevents = fSignalEventFlags.size();
+  // This is the number of events that are signal
+  int nevents = fSignalEventBoxes.size();
   int countwidth = nevents / 10;
 
   // If All Splines tell splines they need a reconfigure.
@@ -809,15 +803,17 @@ void JointFCN::ReconfigureFastUsingManager() {
   // Get Splines from that count and add to weight
   // Add splinecount
   int sigcount = 0;
-  splinecount = 0;
 
   // #pragma omp parallel for shared(splinecount,sigcount)
   for (uint iinput = 0; iinput < fInputList.size(); iinput++) {
     InputHandlerBase *curinput = fInputList[iinput];
     BaseFitEvt *curevent = curinput->FirstBaseEvent();
 
+    // Loop over the events in each input
     for (int i = 0; i < curinput->GetNEvents(); i++) {
       double rwweight = 0.0;
+
+      // If the event is a signal event
       if (fSignalEventFlags[sigcount]) {
         // Get Event Info
         if (!fIsAllSplines) {
@@ -837,8 +833,9 @@ void JointFCN::ReconfigureFastUsingManager() {
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
-          LOG(REC) << "Processed " << splinecount
-                   << " event weights. W = " << rwweight << std::endl;
+          QLOG(REC, curinput->GetName()
+                        << " : Processed " << i << " events. W = "
+                        << curevent->Weight << std::endl);
         }
 
         // #pragma omp atomic
@@ -849,6 +846,7 @@ void JointFCN::ReconfigureFastUsingManager() {
       sigcount++;
     }
   }
+
   LOG(SAM) << "Processed event weights." << std::endl;
 
   // #pragma omp barrier

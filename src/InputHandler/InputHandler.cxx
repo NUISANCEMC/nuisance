@@ -277,6 +277,7 @@ void InputHandlerBase::SetupJointInputs() {
 }
 
 BaseFitEvt* InputHandlerBase::GetBaseEvent(const UInt_t entry) {
+  // Do some light processing: don't calculate the kinematics
   return static_cast<BaseFitEvt*>(GetNuisanceEvent(entry, true));
 }
 

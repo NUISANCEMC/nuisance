@@ -235,7 +235,6 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     fMinVals[parname]  = parlow;
     fMaxVals[parname]  = parhigh;
     fStepVals[parname] = parstep;
-
   }
 
   // Setup Samples ----------------------------------------------
@@ -320,7 +319,6 @@ void SystematicRoutines::SetupSystematicsFromXML(){
     // Push into vectors
     fFakeVals[parname] = parnom;
   }
-
 }
 
 
@@ -379,7 +377,8 @@ void SystematicRoutines::SetFakeData(){
 }
 
 //*****************************************
-void SystematicRoutines::GetCovarFromFCN(){
+// Setup the parameter covariances from the FCN
+void SystematicRoutines::GetCovarFromFCN() {
 //*****************************************
   LOG(FIT) << "Loading ParamPull objects from FCN to build covariance..." << std::endl;
 
@@ -411,25 +410,28 @@ void SystematicRoutines::GetCovarFromFCN(){
       std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
       dialthrowhandle[name] = pull->GetName();
 
+      // Add to Containers
+      // Set the starting values etc to the postfit
+      fParams.push_back(name);
+      fCurVals[name]      = dialhist.GetBinContent(i+1);
+      // Set the starting values to be nominal MC
+      fStartVals[name]    = 0.0;
+      fMinVals[name]      = minhist.GetBinContent(i+1);
+      fMaxVals[name]      = maxhist.GetBinContent(i+1);
+      fStepVals[name]     = 1.0;
+      fFixVals[name]      = false;
+      fStartFixVals[name] = false;
+      fTypeVals[name]     = typehist.GetBinContent(i+1);
+      fStateVals[name]    = "FREE," + pull->GetType();
+
+
+      // If we find the string
       if (fCurVals.find(name) == fCurVals.end()){
-
-      	// Add to Containers
-      	fParams.push_back(name);
-      	fCurVals[name]      = dialhist.GetBinContent(i+1);
-      	fStartVals[name]    = dialhist.GetBinContent(i+1);
-      	fMinVals[name]      = minhist.GetBinContent(i+1);
-      	fMaxVals[name]      = maxhist.GetBinContent(i+1);
-      	fStepVals[name]     = 1.0;
-      	fFixVals[name]      = false;
-      	fStartFixVals[name] = false;
-      	fTypeVals[name]     = typehist.GetBinContent(i+1);
-      	fStateVals[name]    = "FREE" + pull->GetType();
-
-      	// Maker Helper
-      	helperstr << std::string(16, ' ' ) << FitBase::ConvDialType(fTypeVals[name]) << " "
-      		  << name << " " << fMinVals[name] << " "
-      		  << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name]
-		  << std::endl;
+        // Maker Helper
+        helperstr << std::string(16, ' ' ) << FitBase::ConvDialType(fTypeVals[name]) << " "
+          << name << " " << fMinVals[name] << " "
+          << fMaxVals[name] << " " << fStepVals[name] << " " << fStateVals[name]
+          << std::endl;
       }
     }
   }
@@ -449,8 +451,8 @@ void SystematicRoutines::GetCovarFromFCN(){
 
       std::ostringstream pullterm;
       pullterm << "DIAL:" << syst << ";"
-	       << fStartVals[syst] << ";"
-	       << fStepVals[syst];
+        << fStartVals[syst] << ";"
+        << fStepVals[syst];
 
       std::string type = "GAUSTHROW/NEUT";
 
@@ -479,47 +481,36 @@ void SystematicRoutines::GetCovarFromFCN(){
     sleep(2);
   }
 
-
-
   // Print Throw State
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string syst = fParams[i];
     if (dialthrowhandle.find(syst) != dialthrowhandle.end()){
-      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = THROWING with " << dialthrowhandle[syst] << std::endl;
+      LOG(FIT) << "Dial " << i << ". " << setw(20) << syst << " = THROWing with " << dialthrowhandle[syst] << std::endl;
     } else {
-      LOG(FIT) << "Dial " << i << ". " << setw(40) << syst << " = FIXED" << std::endl;
+      LOG(FIT) << "Dial " << i << ". " << setw(20) << syst << " = is FIXED" << std::endl;
     }
   }
-
-  // Pause anyway
-  sleep(1);
-  return;
 }
 
-
-
-
 /*
-  Fitting Functions
-*/
+   Fitting Functions
+   */
 //*************************************
 void SystematicRoutines::UpdateRWEngine(std::map<std::string,double>& updateVals){
-//*************************************
+  //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++){
     std::string name = fParams[i];
-
     if (updateVals.find(name) == updateVals.end()) continue;
     FitBase::GetRW()->SetDialValue(name,updateVals.at(name));
   }
 
   FitBase::GetRW()->Reconfigure();
-  return;
 }
 
 //*************************************
 void SystematicRoutines::PrintState(){
-//*************************************
+  //*************************************
   LOG(FIT)<<"------------"<<std::endl;
 
   // Count max size
@@ -530,13 +521,13 @@ void SystematicRoutines::PrintState(){
 
   // Header
   LOG(FIT) << " #    " << left << setw(maxcount) << "Parameter "
-	   << " = "
-	   << setw(10) << "Value"     << " +- "
-	   << setw(10) << "Error"     << " "
-	   << setw(8)  << "(Units)"   << " "
-	   << setw(10) << "Conv. Val" << " +- "
-	   << setw(10) << "Conv. Err" << " "
-	   << setw(8)  << "(Units)"   << std::endl;
+    << " = "
+    << setw(10) << "Value"     << " +- "
+    << setw(10) << "Error"     << " "
+    << setw(8)  << "(Units)"   << " "
+    << setw(10) << "Conv. Val" << " +- "
+    << setw(10) << "Conv. Err" << " "
+    << setw(8)  << "(Units)"   << std::endl;
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++){
@@ -550,31 +541,31 @@ void SystematicRoutines::PrintState(){
     if (fStateVals[syst].find("ABS") != std::string::npos){
       curval = FitBase::RWSigmaToAbs(typestr, syst, curval);
       curerr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-		FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+          FitBase::RWSigmaToAbs(typestr, syst, 0.0));
       curunits = "(Abs.)";
     } else if (fStateVals[syst].find("FRAC") != std::string::npos){
       curval = FitBase::RWSigmaToFrac(typestr, syst, curval);
       curerr = (FitBase::RWSigmaToFrac(typestr, syst, curerr) -
-		FitBase::RWSigmaToFrac(typestr, syst, 0.0));
+          FitBase::RWSigmaToFrac(typestr, syst, 0.0));
       curunits = "(Frac)";
     }
 
     std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
     double      convval   = FitBase::RWSigmaToAbs(typestr, syst, curval);
     double      converr   = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-			     FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+        FitBase::RWSigmaToAbs(typestr, syst, 0.0));
 
     std::ostringstream curparstring;
 
     curparstring << " " << setw(3) << left
-		 << i << ". "
-		 << setw(maxcount) << syst << " = "
-		 << setw(10) << curval     << " +- "
-		 << setw(10) << curerr     << " "
-		 << setw(8)  << curunits   << " "
-                 << setw(10) << convval    << " +- "
-                 << setw(10) << converr    << " "
-                 << setw(8)  << convunits;
+      << i << ". "
+      << setw(maxcount) << syst << " = "
+      << setw(10) << curval     << " +- "
+      << setw(10) << curerr     << " "
+      << setw(8)  << curunits   << " "
+      << setw(10) << convval    << " +- "
+      << setw(10) << converr    << " "
+      << setw(8)  << convunits;
 
 
     LOG(FIT) << curparstring.str() << std::endl;
@@ -589,11 +580,11 @@ void SystematicRoutines::PrintState(){
 
 
 /*
-  Write Functions
-*/
+   Write Functions
+   */
 //*************************************
 void SystematicRoutines::SaveResults(){
-//*************************************
+  //*************************************
   if (!fOutputRootFile)
     fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");  
 
@@ -605,7 +596,7 @@ void SystematicRoutines::SaveResults(){
 
 //*************************************
 void SystematicRoutines::SaveCurrentState(std::string subdir){
-//*************************************
+  //*************************************
 
   LOG(FIT)<<"Saving current full FCN predictions" <<std::endl;
 
@@ -628,7 +619,7 @@ void SystematicRoutines::SaveCurrentState(std::string subdir){
 
 //*************************************
 void SystematicRoutines::SaveNominal(){
-//*************************************
+  //*************************************
   if (!fOutputRootFile)
     fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
 
@@ -637,12 +628,11 @@ void SystematicRoutines::SaveNominal(){
   LOG(FIT)<<"Saving Nominal Predictions (be cautious with this)" <<std::endl;
   FitBase::GetRW()->Reconfigure();
   SaveCurrentState("nominal");
-
 };
 
 //*************************************
 void SystematicRoutines::SavePrefit(){
-//*************************************
+  //*************************************
   if (!fOutputRootFile)
     fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
 
@@ -652,23 +642,22 @@ void SystematicRoutines::SavePrefit(){
   UpdateRWEngine(fStartVals);
   SaveCurrentState("prefit");
   UpdateRWEngine(fCurVals);
-
 };
 
 
 /*
-  MISC Functions
-*/
+   MISC Functions
+   */
 //*************************************
 int SystematicRoutines::GetStatus(){
-//*************************************
+  //*************************************
 
   return 0;
 }
 
 //*************************************
 void SystematicRoutines::SetupCovariance(){
-//*************************************
+  //*************************************
 
   // Remove covares if they exist
   if (fCovar) delete fCovar;
@@ -692,9 +681,9 @@ void SystematicRoutines::SetupCovariance(){
   fCovar = new TH2D("covariance","covariance",NDIM,0,NDIM,NDIM,0,NDIM);
   if (NFREE > 0){
     fCovarFree = new TH2D("covariance_free",
-			      "covariance_free",
-			      NFREE,0,NFREE,
-			      NFREE,0,NFREE);
+        "covariance_free",
+        NFREE,0,NFREE,
+        NFREE,0,NFREE);
   }
 
   // Set Bin Labels
@@ -724,7 +713,7 @@ void SystematicRoutines::SetupCovariance(){
 
 //*************************************
 void SystematicRoutines::ThrowCovariance(bool uniformly){
-//*************************************
+  //*************************************
 
   // Set fThrownVals to all values in currentVals
   for (UInt_t i = 0; i < fParams.size(); i++){
@@ -733,7 +722,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
   }
 
   for (PullListConstIter iter = fInputThrows.begin();
-       iter != fInputThrows.end(); iter++){
+      iter != fInputThrows.end(); iter++){
     ParamPull* pull = *iter;
 
     pull->ThrowCovariance();
@@ -742,7 +731,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
     for (int i = 0; i < dialhist.GetNbinsX(); i++){
       std::string name = std::string(dialhist.GetXaxis()->GetBinLabel(i+1));
       if (fCurVals.find(name) != fCurVals.end()){
-	fThrownVals[name] = dialhist.GetBinContent(i+1);
+        fThrownVals[name] = dialhist.GetBinContent(i+1);
       }
     }
 
@@ -753,7 +742,7 @@ void SystematicRoutines::ThrowCovariance(bool uniformly){
 
 //*************************************
 void SystematicRoutines::PlotLimits(){
-//*************************************
+  //*************************************
   std::cout << "Plotting Limits" << std::endl;
   if (!fOutputRootFile)
     fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
@@ -789,12 +778,12 @@ void SystematicRoutines::PlotLimits(){
 
       // Check Limit
       if (fCurVals[syst] < fMinVals[syst])
-	fCurVals[syst] = fMinVals[syst];
+        fCurVals[syst] = fMinVals[syst];
 
       // Check folder exists
       std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
       if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
-	break;
+        break;
 
       // Make new folder for variation
       TDirectory* minfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
@@ -820,12 +809,12 @@ void SystematicRoutines::PlotLimits(){
 
       // Check Limit
       if (fCurVals[syst] > fMaxVals[syst])
-	fCurVals[syst] = fMaxVals[syst];
+        fCurVals[syst] = fMaxVals[syst];
 
       // Check folder exists
       std::string curvalstring = std::string( Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
       if (std::find(allfolders.begin(), allfolders.end(), curvalstring) != allfolders.end())
-	break;
+        break;
 
       // Make new folder
       TDirectory* maxfolder = (TDirectory*) limfolder->mkdir(Form( (syst + "_%f").c_str(), fCurVals[syst] ) );
@@ -852,9 +841,8 @@ void SystematicRoutines::PlotLimits(){
 
 //*************************************
 void SystematicRoutines::Run(){
-//*************************************
+  //*************************************
 
-  std::cout << "Running routines "<< std::endl;
   fRoutines = GeneralUtils::ParseToStr(fStrategy,",");
 
   for (UInt_t i = 0; i < fRoutines.size(); i++){
@@ -863,13 +851,14 @@ void SystematicRoutines::Run(){
     int fitstate = kFitUnfinished;
     LOG(FIT)<<"Running Routine: "<<routine<<std::endl;
 
-    if (routine.compare("PlotLimits") == 0) PlotLimits();
+    if      (routine.compare("PlotLimits") == 0) PlotLimits();
     else if (routine.compare("ErrorBands") == 0) GenerateErrorBands();
     else if (routine.compare("ThrowErrors") == 0) GenerateThrows();
     else if (routine.compare("MergeErrors") == 0) MergeThrows();
     else if (routine.compare("EigenErrors") == 0) EigenErrors();
     else {
-      std::cout << "Unknown ROUTINE : " << routine << std::endl;
+      ERR(FTL) << "Unknown ROUTINE : " << routine << std::endl;
+      throw;
     }
 
     // If ending early break here
@@ -878,8 +867,6 @@ void SystematicRoutines::Run(){
       break;
     }
   }
-
-  return;
 }
 
 void SystematicRoutines::GenerateErrorBands(){
@@ -889,7 +876,7 @@ void SystematicRoutines::GenerateErrorBands(){
 
 //*************************************
 void SystematicRoutines::GenerateThrows() {
-//*************************************
+  //*************************************
 
   TFile* tempfile = new TFile((fOutputFile + ".throws.root").c_str(),"RECREATE");
   tempfile->cd();
@@ -917,21 +904,26 @@ void SystematicRoutines::GenerateThrows() {
   LOG(FIT) << "startthrows = " << startthrows << std::endl;
   LOG(FIT) << "endthrows = " << endthrows << std::endl;
 
-  UpdateRWEngine(fCurVals);
+  UpdateRWEngine(fStartVals);
   fSampleFCN->ReconfigureAllEvents();
 
-  if (startthrows == 0){
+  // Make the nominal
+  if (startthrows == 0) {
     LOG(FIT) << "Making nominal " << std::endl;
     TDirectory* nominal = (TDirectory*) tempfile->mkdir("nominal");
     nominal->cd();
     fSampleFCN->Write();
+
+    // Make the postfit reading from the pull
+    LOG(FIT) << "Making postfit " << std::endl;
+    TDirectory* postfit = (TDirectory*) tempfile->mkdir("postfit");
+    postfit->cd();
+    UpdateRWEngine(fCurVals);
+    fSampleFCN->ReconfigureSignal();
+    fSampleFCN->Write();
   }
 
-  TTree* parameterTree = new TTree("throws","throws");
-  double chi2;
-  for (UInt_t i = 0; i < fParams.size(); i++)
-    parameterTree->Branch(fParams[i].c_str(), &fThrownVals[fParams[i]], (fParams[i] + "/D").c_str());
-  parameterTree->Branch("chi2",&chi2,"chi2/D");
+
   fSampleFCN->CreateIterationTree("error_iterations", FitBase::GetRW());
 
   // Would anybody actually want to do uniform throws of any parameter??
@@ -940,25 +932,22 @@ void SystematicRoutines::GenerateThrows() {
   // Run Throws and save
   for (Int_t i = 0; i < endthrows+1; i++){
 
+    // Generate Random Parameter Throw
     ThrowCovariance(uniformly);
     if (i < startthrows) continue;
     if (i == 0) continue;
     LOG(FIT) << "Throw " << i << "/" << endthrows << " ================================" << std::endl;
-    // Generate Random Parameter Throw
-    //    ThrowCovariance(uniformly);
 
     TDirectory* throwfolder = (TDirectory*)tempfile->mkdir(Form("throw_%i",i));
     throwfolder->cd();
 
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap( fParams, fThrownVals );
-    chi2 = fSampleFCN->DoEval( vals );
+    fSampleFCN->DoEval( vals );
     delete vals;
 
     // Save the FCN
     fSampleFCN->Write();
-
-    parameterTree->Fill();
   }
 
   tempfile->cd();
@@ -967,6 +956,7 @@ void SystematicRoutines::GenerateThrows() {
   tempfile->Close();
 }
 
+// Merge throws together into one summary
 void SystematicRoutines::MergeThrows() {
 
   fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
@@ -1156,8 +1146,8 @@ void SystematicRoutines::MergeThrows() {
         //	if ((baseplot->GetBinError(j+1)/baseplot->GetBinContent(j+1)) < 1.0) {
         //	  baseplot->SetBinError(j+1,sqrt(pow(tprof->GetBinError(j+1),2) + pow(baseplot->GetBinError(j+1),2)));
         //	} else {
-        //baseplot->SetBinContent(j+1,tprof->GetBinContent(j+1));
-        baseplot->SetBinError(j+1,tprof->GetBinError(j+1));
+        baseplot->SetBinContent(j+1, tprof->GetBinContent(j+1));
+        baseplot->SetBinError(j+1, tprof->GetBinError(j+1));
         //	}
       } else {
         baseplot->SetBinContent(j+1, 0.0);//(binlowest[j] + binhighest[j]) / 2.0);
@@ -1182,12 +1172,9 @@ void SystematicRoutines::MergeThrows() {
     delete bintree;
     delete [] bincontents;
   }
-
-  return;
 };
 
 void SystematicRoutines::EigenErrors() {
-
 
   fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
   fOutputRootFile->cd();
@@ -1380,17 +1367,11 @@ void SystematicRoutines::EigenErrors() {
 
       for (int j = 0; j < nbins; j++){
         if (i % 2 == 0){
-          //	  std::cout << plotname<< " : upper " << errorplot_upper->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
-          //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " <<newplot->GetBinContent(j+1) << std::endl;
           errorplot_upper->SetBinContent(j+1, errorplot_upper->GetBinContent(j+1) + 
               pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
-          //	  newplot->Print();
         } else {
-          //	  std::cout << plotname << " : lower " << errorplot_lower->GetBinContent(j+1) << " adding " << pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2) << std::endl;
-          //	  std::cout << " -> " << baseplot->GetBinContent(j+1) << " " << newplot->GetBinContent(j+1) << std::endl;
           errorplot_lower->SetBinContent(j+1, errorplot_lower->GetBinContent(j+1) +
               pow(baseplot->GetBinContent(j+1) - newplot->GetBinContent(j+1),2));
-          //	  newplot->Print();
         }
         meanplot->SetBinContent(j+1, meanplot->GetBinContent(j+1) + baseplot->GetBinContent(j+1));
       }

@@ -140,7 +140,7 @@
 
 <!-- # For -f ErrorBands creates error bands for given measurements -->
 <!-- # How many throws do we want (The higher the better precision) -->
-<config error_throws='250'/>
+<config error_throws='500'/>
 
 <!-- # Are we throwing uniform or according to Gaussian? -->
 <!-- # Only use uniform if wanting to study the limits of a dial. -->
@@ -165,7 +165,10 @@
 <config MINERvA_CCinc_XSec_2DEavq3_nu_hadron_cut='0'/>
 <config MINERvA_CCinc_XSec_2DEavq3_nu_useq3true='0'/>
 <config Modes_split_PN_NN='0'/>
-<config SignalReconfigures='0'/>
+
+<!-- Use only signal events when reconfiguring -->
+<config SignalReconfigures='false'/>
+<config FullEventOnSignalReconfigure="true"/>
 
 <!-- # SciBooNE specific -->
 <config SciBarDensity='1.04'/>
@@ -184,7 +187,7 @@
 <!--
 <config GENIEWeightEngine_CCRESMode="kModeMa"/>
 -->
-<config GENIEWeightEngine_CCQEMode="kModeMa"/>
+<config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
 <!--
 <config GENIEWeightEngine_CCQEMode="kModeMa"/> Normal MAQE Llewelyn-Smith
 <config GENIEWeightEngine_CCQEMode="kModeNormAndMaShape"/> Taking shape into account (don't really use this...)
@@ -222,5 +225,5 @@
 <config UseShapeCovar="0" />
 <config CC0piNBINS="156" />
 
-</nuisance>
 
+</nuisance>
