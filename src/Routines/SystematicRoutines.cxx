@@ -1155,6 +1155,7 @@ void SystematicRoutines::MergeThrows() {
       }
     }
 
+    baseplot->SetTitle("Profiled throws");
     errorDIR->cd();
     baseplot->Write();
     tprof->Write();
