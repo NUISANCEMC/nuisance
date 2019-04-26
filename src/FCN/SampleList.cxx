@@ -233,9 +233,13 @@
 #endif
 
 #ifndef __NO_T2K__
-// T2K CC0pi
+// T2K CC0pi 2016
 #include "T2K_CC0pi_XSec_2DPcos_nu.h"
-// T2K STV CC0pi
+
+// T2K CC-inclusive with full acceptance 2018
+#include "T2K_CCinc_XSec_2DPcos_nu_nonuniform.h"
+
+// T2K STV CC0pi 2018
 #include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
@@ -1212,6 +1216,9 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_nonuniform")) {
     return (new T2K_CC0pi_XSec_2DPcos_nu_nonuniform(samplekey));
+
+  } else if (!name.compare("T2K_CCinc_XSec_2DPcos_nu_nonuniform")) {
+    return (new T2K_CCinc_XSec_2DPcos_nu_nonuniform(samplekey));
 
     /*
       T2K CC1pi+ CH samples

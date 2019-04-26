@@ -1,0 +1,19 @@
+This data release contains information from the following publication:
+
+K.Abe et al. [T2K Collaboration], "Measurement of inclusive double-differential $\nu_\mu$ charged-current cross section in the T2K off-axis near detector", arXiv: 
+
++ The "flux.txt" file contain the flux prediction at the near detector of the T2K experiment (obtained by summing the flux for each run period weighted by the PoT collected in each of them)..
+
++ covariance_matrix_neut(genie).txt files contain the covariance matrix for the measured cross section when the data is unfolded with NEUT(GENIE). The binning starts with the first momentum bin of the first costheta range and it loops over all the momentum bins of that range then it moves to the second angular range and so on.
+
++ The "data_unfold_with_neut(genie).txt" files contain the measured flux-integrated double differential cross section as a function of muon momentum for different muon angular ranges. Different results are obtained depending on the prior MC used for the unfolding procedure (either NEUT or GENIE).
+
++ The "histograms.root" file contain several histograms related to the double-differential cross section.
+
+  - hflux -> 1D histogram with the flux prediction at the near detector of the T2K experiment (obtained by summing the flux for each run period weighted by the PoT collected in each of them).
+
+  - covariance_matrix_neut(genie) -> 2D histogram with the covariance matrix for the measured cross section when the data is unfolded with NEUT(GENIE). The binning starts with the first momentum bin of the first costheta range and it loops over all the momentum bins of that range then it moves to the second angular range and so on.
+
+  - hist_xsec_data_prior_neut(genie)_cthbin% -> 1D histogram with the measured flux-integrated double differential cross section as a function of muon momentum for each muon angular ranges. Different results are obtained depending on the prior MC used for the unfolding procedure (either NEUT or GENIE).
+
+  - hist_xsec_neut(genie)_cthbin% -> 1D histogram with the predicted flux-integrated double differential cross section in NEUT 5.3.2 (GENIE 2.8.0) as a function of muon momentum for each muon angular ranges.
