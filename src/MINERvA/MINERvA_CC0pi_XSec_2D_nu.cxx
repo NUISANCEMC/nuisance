@@ -50,7 +50,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
       histname = "pt_pl_cross_section";
       break;
     default:
-      THROW("Unknown Analysis Distribution : " << fDist);
+      THROW("Unknown Analysis Distribution : " << name);
   }
 
   fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
