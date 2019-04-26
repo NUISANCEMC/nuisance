@@ -19,6 +19,7 @@
 set(IMPLFILES
 T2K_CC0pi_XSec_2DPcos_nu.cxx
 T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
+T2K_CCinc_XSec_2DPcos_nu_nonuniform.cxx
 T2K_CC1pip_CH_XSec_1DQ2_nu.cxx
 T2K_CC1pip_CH_XSec_1DWrec_nu.cxx
 T2K_CC1pip_CH_XSec_1Dpmu_nu.cxx
@@ -47,6 +48,7 @@ T2K_SignalDef.cxx
 set(HEADERFILES
 T2K_CC0pi_XSec_2DPcos_nu.h
 T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
+T2K_CCinc_XSec_2DPcos_nu_nonuniform.cxx
 T2K_CC1pip_CH_XSec_1DQ2_nu.h
 T2K_CC1pip_CH_XSec_1DWrec_nu.h
 T2K_CC1pip_CH_XSec_1Dpmu_nu.h

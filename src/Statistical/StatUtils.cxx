@@ -918,16 +918,16 @@ TMatrixDSym* StatUtils::MakeDiagonalCovarMatrix(TH2D* data, TH2I* map,
 };
 
 //*******************************************************************
-void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
+void StatUtils::SetDataErrorFromCov(TH1D* DataHist, TMatrixDSym* cov,
                                     double scale, bool ErrorCheck) {
   //*******************************************************************
 
   // Check
   if (ErrorCheck) {
-    if (cov->GetNrows() != data->GetNbinsX()) {
-      ERR(FTL) << "Nrows in cov don't match nbins in data for SetDataErrorFromCov" << std::endl;
+    if (cov->GetNrows() != DataHist->GetNbinsX()) {
+      ERR(FTL) << "Nrows in cov don't match nbins in DataHist for SetDataErrorFromCov" << std::endl;
       ERR(FTL) << "Nrows = " << cov->GetNrows() << std::endl;
-      ERR(FTL) << "Nbins = " << data->GetNbinsX() << std::endl;
+      ERR(FTL) << "Nbins = " << DataHist->GetNbinsX() << std::endl;
       throw;
     }
   }
@@ -935,27 +935,27 @@ void StatUtils::SetDataErrorFromCov(TH1D* data, TMatrixDSym* cov,
   // Set bin errors form cov diag
   // Check if the errors are set
   bool ErrorsSet = false;
-  for (int i = 0; i < data->GetNbinsX(); i++) {
+  for (int i = 0; i < DataHist->GetNbinsX(); i++) {
     if (ErrorsSet == true) break;
-    if (data->GetBinError(i+1) != 0) ErrorsSet = true;
+    if (DataHist->GetBinError(i+1) != 0 && DataHist->GetBinContent(i+1) > 0) ErrorsSet = true;
   }
 
   // Now loop over
   if (ErrorsSet && ErrorCheck) {
-    for (int i = 0; i < data->GetNbinsX(); i++) {
-      double dataerr = data->GetBinError(i + 1);
+    for (int i = 0; i < DataHist->GetNbinsX(); i++) {
+      double DataHisterr = DataHist->GetBinError(i + 1);
       double coverr = sqrt((*cov)(i, i))*scale;
       // Check that the errors are within 1% of eachother
-      if (fabs(dataerr-coverr)/dataerr > 0.01) {
-        ERR(FTL) << "Data error does not match covariance error for bin " << i+1 << " (" << data->GetXaxis()->GetBinLowEdge(i+1) << "-" << data->GetXaxis()->GetBinLowEdge(i+2) << ")" << std::endl;
-        ERR(FTL) << "Data error: " << dataerr << std::endl;
+      if (fabs(DataHisterr-coverr)/DataHisterr > 0.01) {
+        ERR(FTL) << "Data error does not match covariance error for bin " << i+1 << " (" << DataHist->GetXaxis()->GetBinLowEdge(i+1) << "-" << DataHist->GetXaxis()->GetBinLowEdge(i+2) << ")" << std::endl;
+        ERR(FTL) << "Data error: " << DataHisterr << std::endl;
         ERR(FTL) << "Cov error:  " << coverr << std::endl;
       }
     }
     // Else blindly trust the covariance
   } else {
-    for (int i = 0; i < data->GetNbinsX(); i++) {
-      data->SetBinError(i+1, sqrt((*cov)(i,i))*scale);
+    for (int i = 0; i < DataHist->GetNbinsX(); i++) {
+      DataHist->SetBinError(i+1, sqrt((*cov)(i,i))*scale);
     }
   }
 
