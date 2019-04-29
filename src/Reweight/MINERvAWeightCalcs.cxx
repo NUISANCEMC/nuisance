@@ -501,7 +501,7 @@ bool RikRPA::IsHandled(int rwenum) {
 //*******************************************************
 void RikRPA::SetupRPACalculator(int calcenum) {
 //*******************************************************
-  std::string rwdir = FitPar::GetDataBase() + "/reweight/MINERvA/RikRPA/";
+  std::string rwdir = FitPar::GetDataBase() + "reweight/MINERvA/RikRPA/";
   std::string fidir = "";
   switch (calcenum) {
     case kNuMuC12:
@@ -548,13 +548,25 @@ void RikRPA::SetupRPACalculator(int calcenum) {
   LOG(FIT) << "Loading RPA CALC : " << fidir << std::endl;
   TDirectory* olddir = gDirectory;
 
-  std::cout << "***********************************************" << std::endl;
-  std::cout << "Loading a new weightRPA calculator" << std::endl;
-  std::cout << "Authors:  Rik Gran, Heidi Schellman" << std::endl;
-  std::cout << "Citation: arXiv:1705.02932 [hep-ex]" << std::endl;
-  std::cout << "***********************************************" << std::endl;
+  LOG(FIT) << "***********************************************" << std::endl;
+  LOG(FIT) << "Loading a new weightRPA calculator" << std::endl;
+  LOG(FIT) << "Authors:  Rik Gran, Heidi Schellman" << std::endl;
+  LOG(FIT) << "Citation: arXiv:1705.02932 [hep-ex]" << std::endl;
+  LOG(FIT) << "***********************************************" << std::endl;
 
-  fRPACalculators[calcenum] = new weightRPA(rwdir + "/" + fidir);
+  // Test the file exists
+  std::ifstream infile((rwdir+fidir).c_str());
+  if (!infile.good()) {
+    ERR(FTL) << "*** ERROR ***" << std::endl;
+    ERR(FTL) << "RikRPA file " << rwdir+fidir<< " does not exist!" << std::endl;
+    ERR(FTL) << "These can be found at https://nuisance.hepforge.org/files/RikRPA/" << std::endl;
+    ERR(FTL) << "Please run: wget -r -nH --cut-dirs=2 -np -e robots=off -R \"index.html*\" https://nuisance.hepforge.org/files/RikRPA/ -P " << rwdir << std::endl;
+    ERR(FTL) << "And try again" << std::endl;
+    ERR(FTL) << "*************" << std::endl;
+    throw;
+  }
+
+  fRPACalculators[calcenum] = new weightRPA(rwdir + fidir);
   olddir->cd();
   return;
 }
