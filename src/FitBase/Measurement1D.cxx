@@ -127,13 +127,13 @@ void Measurement1D::FinaliseSampleSettings() {
   }
 
   if (fIsEnu1D && fIsRawEvents) {
-    LOG(SAM) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    ERR(FTL) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
              "really correct?!"
              << std::endl;
-    LOG(SAM) << "Check experiment constructor for " << fName
+    ERR(FTL) << "Check experiment constructor for " << fName
              << " and correct this!" << std::endl;
-    LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
-    exit(-1);
+    ERR(FTL) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
   }
 
   if (!fRW) fRW = FitBase::GetRW();
@@ -1531,9 +1531,6 @@ void Measurement1D::SetDataValues(std::string dataFile) {
 
   return;
 };
-
-
-
 
 
 //********************************************************************
