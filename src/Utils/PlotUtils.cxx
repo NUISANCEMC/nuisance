@@ -327,9 +327,9 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
   // Find which axis is the Enu axis
   bool EnuOnXaxis = false;
   std::string xaxis = fMCHist->GetXaxis()->GetTitle();
-  if (xaxis.find("E") != std::string::npos && xaxis.find("nu" != std::string::npos)) EnuOnXaxis = true;
+  if (xaxis.find("E") != std::string::npos && xaxis.find("nu") != std::string::npos) EnuOnXaxis = true;
   std::string yaxis = fMCHist->GetYaxis()->GetTitle();
-  if (yaxis.find("E") != std::string::npos && xaxis.find("nu" != std::string::npos)) {
+  if (yaxis.find("E") != std::string::npos && xaxis.find("nu") != std::string::npos) {
     // First check that xaxis didn't also find Enu
     if (EnuOnXaxis) {
       ERR(FTL) << fMCHist->GetTitle() << " error:" << std::endl;
