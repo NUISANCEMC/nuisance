@@ -130,8 +130,8 @@ namespace SignalDef {
 
     // Extract Hadronic Mass
     double hadMass = FitUtils::Wrec(pnu, pmu);
-    // Cut on 2017 data is 1.8 GeV
-    if (hadMass > 1800.0) return false;
+    // Cut on 2017 data is still 1.4 GeV
+    if (hadMass > 1400.0) return false;
 
     return true;
   };
