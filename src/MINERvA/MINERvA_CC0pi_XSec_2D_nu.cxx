@@ -31,7 +31,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   // Set Distribution
   // See header file for enum and some descriptions
   std::string name = fSettings.GetS("name");
-  // Have two distributions as of summer 2018
+  // Have one distribution as of summer 2018
   if      (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) fDist = kPtPz;
 
   // Define what files to use from the dist
@@ -56,7 +56,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );
   fSettings.SetXTitle( GeneralUtils::ParseToStr(titles,";")[1] );
   fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[2] );
-  fSettings.SetYTitle( GeneralUtils::ParseToStr(titles,";")[3] );
+  fSettings.SetZTitle( GeneralUtils::ParseToStr(titles,";")[3] );
 
   // Sample overview ---------------------------------------------------
   std::string descrip = distdescript + "\n"\
@@ -72,6 +72,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   // Set the data file
   SetDataValues(fSettings.GetDataInput(), histname);
 }
+
 //********************************************************************
 MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
 //********************************************************************
