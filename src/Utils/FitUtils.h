@@ -95,6 +95,9 @@ double Q2QErec(TLorentzVector pmu, double costh, double binding, bool neutrino =
 /// Function returns the reconstructed E_{nu} values
 double EnuQErec(TLorentzVector pmu, double costh, double binding, bool neutrino = true);
 
+/// Function returns the reconstructed E_{nu} values
+double EnuQErec(TLorentzVector pmu, TLorentzVector pnu, double binding, bool neutrino = true);
+
 //! Function to calculate the reconstructed Q^{2}_{QE}
 double Q2QErec(double pl, double costh, double binding, bool neutrino = true);
 

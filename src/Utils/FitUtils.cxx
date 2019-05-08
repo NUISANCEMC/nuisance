@@ -186,6 +186,11 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   return rEnu;
 };
 
+// Another good old helper function
+double FitUtils::EnuQErec(TLorentzVector pmu, TLorentzVector pnu, double binding, bool neutrino) {
+  return EnuQErec(pmu, cos(pnu.Vect().Angle(pmu.Vect())), binding, neutrino);
+}
+
 double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool neutrino) {
   double el = pmu.E() / 1000.;
   double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
