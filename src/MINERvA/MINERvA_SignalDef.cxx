@@ -352,20 +352,51 @@ namespace SignalDef {
     return false;
   }
 
+  // **************************************************
+  // Section VI Event Selection of https://journals.aps.org/prd/pdf/10.1103/PhysRevD.97.052002
+  // Anti-neutrino charged-current
+  // Post-FSI final states without 
+  //                              mesons, 
+  //                              prompt photons above nuclear deexcitation energies
+  //                              heavy baryons
+  //                              protons above kinetic energy of 120 MeV
+  // Muon-neutrino angle of 20 degrees
+  // Parallel muon momentum: 1.5 GeV < P|| < 15 GeV --- N.B. APPARENTLY NOT INCLUDED, see below
+  // Transverse muon momentum: pT < 1.5 GeV --- N.B. APPARENTLY NOT INCLUDED, see below
   bool isCC0pi_anti_MINERvAPTPZ(FitEvent* event, int nuPDG, double emin, double emax){
+  // **************************************************
 
     // Check it's CCINC
     if (!SignalDef::isCCINC(event, nuPDG, emin, emax)) return false;
-    // Make Angle Cut > 20.0
-    TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
+    TLorentzVector pnu = event->GetNeutrinoIn()->fP;
     TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
+    // Make Angle Cut > 20.0
     double th_nu_mu = FitUtils::th(pmu, pnu) * 180. / M_PI;
     if (th_nu_mu >= 20.0) return false;
+
+    // Heidi Schellman (schellmh@science.oregonstate.edu) assured me that the p_t and p_z (or p_||) cuts aren't actually implemented as a signal definition: they're only implemented in the binning for p_t and p_z (but not Q2QE and EnuQE)
+    /*
+    // Cut on pT and pZ
+    Double_t px = pmu.X()/1.E3;
+    Double_t py = pmu.Y()/1.E3;
+    Double_t pt = sqrt(px*px+py*py);
+
+    // Don't want to assume the event generators all have neutrino coming along z
+    // pz is muon momentum projected onto the neutrino direction
+    Double_t pz = pmu.Vect().Dot(pnu.Vect()*(1.0/pnu.Vect().Mag()))/1.E3;
+    if (pz > 15 || pz < 1.5) return false;
+    if (pt > 1.5) return false;
+    */
+
+    // Find if there are any protons above 120 MeV kinetic energy
+    if (HasProtonKEAboveThreshold(event, 120.0)) return false;
+
+    // Particle counters
     int genie_n_muons         = 0;
     int genie_n_mesons        = 0;
     int genie_n_heavy_baryons_plus_pi0s = 0;
     int genie_n_photons       = 0;
-
+    // Loop over the particles in the event and count them up
     for(unsigned int i = 0; i < event->NParticles(); ++i) {
       FitParticle* p = event->GetParticle(i);
       if (p->Status() != kFinalState) continue;
@@ -373,18 +404,24 @@ namespace SignalDef {
       int pdg =  p->fPID;
       double energy = p->fP.E();
 
-      if( abs(pdg) == 13 )
+      // Any charged muons
+      if( abs(pdg) == 13 ) {
         genie_n_muons++;
-      else if( pdg == 22 && energy > 10.0 )
+        // De-excitation photons
+      } else if( pdg == 22 && energy > 10.0 ) {
         genie_n_photons++;
-      else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || abs(pdg) == 111 || abs(pdg) == 130 || abs(pdg) == 310 || abs(pdg) == 311 || abs(pdg) == 313 )
+        // Mesons
+      } else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || abs(pdg) == 111 || abs(pdg) == 130 || abs(pdg) == 310 || abs(pdg) == 311 || abs(pdg) == 313 ) {
         genie_n_mesons++;
-      else if( abs(pdg) == 3112 || abs(pdg) == 3122 || abs(pdg) == 3212 || abs(pdg) == 3222 || abs(pdg) == 4112 ||
+        // Heavy baryons and pi0s
+      } else if( abs(pdg) == 3112 || abs(pdg) == 3122 || abs(pdg) == 3212 || abs(pdg) == 3222 || abs(pdg) == 4112 || 
           abs(pdg) == 4122 || abs(pdg) == 4212 || abs(pdg) == 4222 || abs(pdg) == 411  || abs(pdg) == 421  ||
-          abs(pdg) == 111 )
+          abs(pdg) == 111 ) {
         genie_n_heavy_baryons_plus_pi0s++;
+      }
     }
 
+    // Look for one muon with no mesons, heavy baryons or deexcitation photons
     if( genie_n_muons == 1 && genie_n_mesons == 0 && genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons       == 0 ) return true;
     return false;
   }
