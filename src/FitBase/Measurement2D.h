@@ -96,7 +96,7 @@ public:
   /// x_low_2  y_low_2  cont_22  err_22 \n
   /// x_low_2  y_low_3  cont_23  err_23 \n
   /// x_low_3  y_low_2  cont_32  err_32 \n
-  virtual void SetDataFromTextFile(std::string datfile);
+  virtual void SetDataFromTextFile(std::string data, std::string binx, std::string biny);
 
 
   /// \brief Set Data Histogram from a TH2D in a file
