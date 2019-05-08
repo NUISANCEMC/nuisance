@@ -994,11 +994,10 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
   for (int i = 0; i < data->GetNbinsX(); i++) {
     for (int j = 0; j < data->GetNbinsY(); j++) {
       if (data->GetBinContent(i + 1, j + 1) == 0.0) continue;
-
-      // Get the entry in the cov matrix
+      // If we have errors on our histogram the map is good
       count = map->GetBinContent(i + 1, j + 1) - 1;
       double dataerr = data->GetBinError(i+1, j+1);
-      double coverr = sqrt((*cov)(count,count))*scale;
+      double coverr = sqrt((*cov)(count, count))*scale;
       // Check that the errors are within 1% of eachother
       if (ErrorsSet && ErrorCheck) {
         if (fabs(dataerr-coverr)/dataerr > 0.01) {
@@ -1011,8 +1010,6 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
       }
     }
   }
-
-  return;
 }
 
 TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
@@ -1102,8 +1099,7 @@ TH2I* StatUtils::GenerateMap(TH2D* hist) {
 
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     for (int j = 0; j < hist->GetNbinsY(); j++) {
-      if (hist->GetBinContent(i + 1, j + 1) > 0 &&
-          hist->GetBinError(i + 1, j + 1) > 0) {
+      if (hist->GetBinContent(i + 1, j + 1) > 0) { 
         map->SetBinContent(i + 1, j + 1, index);
         index++;
       } else {
