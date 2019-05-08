@@ -1010,6 +1010,8 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
       }
     }
   }
+  // Delete the map now that we don't need it
+  map->Delete();
 }
 
 TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
