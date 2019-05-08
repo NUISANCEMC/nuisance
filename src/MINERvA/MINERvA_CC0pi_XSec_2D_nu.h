@@ -29,29 +29,10 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
  public:
 
   // Constructor
- MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey);
+  MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey);
 
   // Destructor
-  virtual ~MINERvA_CC0pi_XSec_2D_nu() {
-
-    // Remove all the content histograms                     *
-    //    for (int i = 0; i < 9; i++)  
-      // delete this->fMCHist_content[i];   
-
-    // delete everything
-    /* delete difHist; */
-    /* delete evtsignalHist; */
-    /* delete fluxsignalHist; */				
-    /* delete fMapHist; */
-    /* delete status; */
-    /* delete PDGHistogram; */
-    
-    /* // Delete MODE histograms */
-    /* for (int i = 0; i < 60; i++) */
-    /*   delete fMCHist_PDG[i]; */			     
-
-    return;
-  };
+  virtual ~MINERvA_CC0pi_XSec_2D_nu() {};
 
   // Required functions
   bool isSignal(FitEvent *nvect);
@@ -59,13 +40,11 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
   
  protected:
   // Converted covariance matrix to provide global binning method in GetLikelihood
-  TH2D* covar_th2d;
   double GetLikelihood();
 
   // Set up settings based on distribution
   void SetupDataSettings();
 
- private:
   // The distribution privates
   int fDist;
   enum Distribution {
@@ -75,7 +54,6 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
     kPt,
     kPz
   };
-  
 };
   
 #endif
