@@ -115,6 +115,11 @@ TLegend GenerateStackLegend(THStack stack, int xlow, int ylow, int xhigh,
 //! Turn the array of TH1 histograms into a stack of Modes
 THStack GetNeutModeStack(std::string title, TH1* ModeStack[], int option);
 
+//! Get a slice in Y of a TH2D
+TH1D* GetSliceY(TH2D*, int);
+//! Get a slice in X of a TH2D
+TH1D* GetSliceX(TH2D*, int);
+
 //! Reset each histogram in the mode array
 void ResetNeutModeArray(TH1* hist[]);
 
@@ -171,7 +176,10 @@ TH2D* GetTH2DFromRootFile(std::string file, std::string name);
 TGraph* GetTGraphFromRootFile(std::string file, std::string name);
 
 //! Grab a 2D Histrogram from a ROOT File
-TH2D* GetTH2DFromTextFile(std::string file);
+TH2D* GetTH2DFromTextFile(std::string data, std::string binx, std::string biny);
+
+std::vector<double> GetArrayFromTextFile(std::string file);
+std::vector<std::vector<double> > Get2DArrayFromTextFile(std::string file);
 
 //! Scale mc to match data considering empty and masked bins
 void ScaleToData(TH1D* data, TH1D* mc, TH1I* mask);
