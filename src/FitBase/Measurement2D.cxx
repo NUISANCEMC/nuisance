@@ -158,7 +158,7 @@ void Measurement2D::FinaliseSampleSettings() {
              << std::endl;
   }
 
-  if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
+  if (fSettings.GetS("originalname").find("Enu") != std::string::npos) {
     fIsEnu1D = true;
     LOG(SAM) << "::" << fName << "::" << std::endl;
     LOG(SAM) << "Found XSec Enu measurement, applying flux integrated scaling, "
@@ -166,13 +166,13 @@ void Measurement2D::FinaliseSampleSettings() {
   }
 
   if (fIsEnu1D && fIsRawEvents) {
-    LOG(SAM) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    ERR(FTL) << "Found 2D Enu XSec distribution AND fIsRawEvents, is this "
              "really correct?!"
              << std::endl;
-    LOG(SAM) << "Check experiment constructor for " << fName
+    ERR(FTL) << "Check experiment constructor for " << fName
              << " and correct this!" << std::endl;
-    LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
-    exit(-1);
+    ERR(FTL) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
   }
 
   if (!fRW) fRW = FitBase::GetRW();
@@ -193,7 +193,6 @@ void Measurement2D::FinaliseSampleSettings() {
       throw;
     }
   }
-
 }
 
 void Measurement2D::CreateDataHistogram(int dimx, double* binx, int dimy, double* biny) {
@@ -206,8 +205,12 @@ void Measurement2D::CreateDataHistogram(int dimx, double* binx, int dimy, double
 
 }
 
-void Measurement2D::SetDataFromTextFile(std::string datfile) {
-  // fDataHist = PlotUtils::GetTH2DFromTextFile(datfile,"");
+void Measurement2D::SetDataFromTextFile(std::string data, std::string binx, std::string biny) {
+  // Get the data hist
+  fDataHist = PlotUtils::GetTH2DFromTextFile(data, binx, biny);
+  // Set the name properly
+  fDataHist->SetName((fSettings.GetName()+"_data").c_str());
+  fDataHist->SetTitle(fSettings.GetFullTitles().c_str());
 }
 
 void Measurement2D::SetDataFromRootFile(std::string datfile, std::string histname) {
@@ -541,7 +544,6 @@ void Measurement2D::SetBinMask(std::string maskfile) {
   // Apply masking by setting masked data bins to zero
   PlotUtils::MaskBins(fDataHist, fMaskHist);
 
-
   return;
 }
 
@@ -644,6 +646,7 @@ void Measurement2D::FinaliseMeasurement() {
 
   }
 
+  if (!fMapHist) fMapHist = StatUtils::GenerateMap(fDataHist);
 
 }
 
@@ -978,9 +981,7 @@ double Measurement2D::GetLikelihood() {
     //PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
   }
 
-  if (!fMapHist) {
-    fMapHist = StatUtils::GenerateMap(fDataHist);
-  }
+  if (!fMapHist) fMapHist = StatUtils::GenerateMap(fDataHist);
 
   // Get the chi2 from either covar or diagonals
   double chi2 = 0.0;
@@ -1200,7 +1201,6 @@ TH2D* Measurement2D::GetDataHistogram() {
   return fDataHist;
 };
 
-
 /*
    Write Functions
 */
@@ -1223,9 +1223,9 @@ void Measurement2D::Write(std::string drawOpt) {
 
 
   // // Likelihood residual plots
-  // if (drawOpt.find("RESIDUAL") != std::string::npos) {
-  //   WriteResidualPlots();
-  // }
+  //if (drawOpt.find("RESIDUAL") != std::string::npos) {
+     //WriteResidualPlots();
+  //}
 
 
   // // RATIO
@@ -1269,7 +1269,7 @@ void Measurement2D::Write(std::string drawOpt) {
   bool drawProj = (drawOpt.find("PROJ") != std::string::npos);
   // bool drawCanvPDG = (drawOpt.find("CANVPDG") != std::string::npos);
   bool drawCov = (drawOpt.find("COV") != std::string::npos);
-  bool drawSliceCanvYMC = (drawOpt.find("CANVYMC") != std::string::npos);
+  bool drawSliceMC = (drawOpt.find("CANVSLICEMC") != std::string::npos);
   bool drawWeighted = (drawOpt.find("WEIGHTS") != std::string::npos && fMCWeighted);
 
   if (FitPar::Config().GetParB("EventManager")) {
@@ -1291,6 +1291,7 @@ void Measurement2D::Write(std::string drawOpt) {
     GetMCList().at(0)->Write();
     if (!fMapHist) fMapHist = StatUtils::GenerateMap(fDataHist);
     TH1D* mc_1D = StatUtils::MapToTH1D(fMCHist, fMapHist);
+    mc_1D->SetLineColor(kRed);
     mc_1D->Write();
     delete mc_1D;
   }
@@ -1305,8 +1306,6 @@ void Measurement2D::Write(std::string drawOpt) {
   if (drawOpt.find("INVCOV") != std::string::npos) {
     TH2D(*covar).Write((fName + "_INVCOV").c_str());
   }
-
-
 
   // Save only mc and data if splines
   if (fEventType == 4 or fEventType == 3) {
@@ -1461,7 +1460,7 @@ void Measurement2D::Write(std::string drawOpt) {
   if (residual) {
   }
 
-  if (fIsProjFitX or fIsProjFitY or drawProj) {
+  if (fIsProjFitX || fIsProjFitY || drawProj) {
     // If not already made, make the projections
     if (!fMCHist_X) {
       PlotUtils::MatchEmptyBins(fDataHist, fMCHist);
@@ -1472,11 +1471,12 @@ void Measurement2D::Write(std::string drawOpt) {
       fDataHist_X = PlotUtils::GetProjectionX(fDataHist, fMaskHist);
       fDataHist_Y = PlotUtils::GetProjectionY(fDataHist, fMaskHist);
 
-      double chi2X = StatUtils::GetChi2FromDiag(fDataHist_X, fMCHist_X);
-      double chi2Y = StatUtils::GetChi2FromDiag(fDataHist_Y, fMCHist_Y);
+      // This is not the correct way of doing it
+      //double chi2X = StatUtils::GetChi2FromDiag(fDataHist_X, fMCHist_X);
+      //double chi2Y = StatUtils::GetChi2FromDiag(fDataHist_Y, fMCHist_Y);
 
-      fMCHist_X->SetTitle(Form("%f", chi2X));
-      fMCHist_Y->SetTitle(Form("%f", chi2Y));
+      //fMCHist_X->SetTitle(Form("%f", chi2X));
+      //fMCHist_Y->SetTitle(Form("%f", chi2Y));
     }
 
     // Save the histograms
@@ -1487,12 +1487,11 @@ void Measurement2D::Write(std::string drawOpt) {
     fMCHist_Y->Write();
   }
 
-  if (drawSliceCanvYMC or true) {
+  if (drawSliceMC) {
     TCanvas* c1 = new TCanvas((fName + "_MC_CANV_Y").c_str(),
-        (fName + "_MC_CANV_Y").c_str(), 800, 600);
+        (fName + "_MC_CANV_Y").c_str(), 1024, 1024);
 
-    c1->Divide(int(sqrt(fDataHist->GetNbinsY() + 1)),
-        int(sqrt(fDataHist->GetNbinsY() + 1)));
+    c1->Divide(2, int(fDataHist->GetNbinsY()/3.+1));
     TH2D* mcShape = (TH2D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
     double shapeScale =
       fDataHist->Integral("width") / fMCHist->Integral("width");
@@ -1500,28 +1499,71 @@ void Measurement2D::Write(std::string drawOpt) {
     mcShape->SetLineStyle(7);
 
     c1->cd(1);
-    TLegend* leg = new TLegend(0.6, 0.6, 0.9, 0.9);
-    leg->AddEntry(fDataHist, (fName + " Data").c_str(), "ep");
+    TLegend* leg = new TLegend(0.0, 0.0, 1.0, 1.0);
+    leg->AddEntry(fDataHist, (fName + " Data").c_str(), "lep");
     leg->AddEntry(fMCHist, (fName + " MC").c_str(), "l");
     leg->AddEntry(mcShape, (fName + " Shape").c_str(), "l");
+    leg->SetLineColor(0);
+    leg->SetLineStyle(0);
+    leg->SetFillColor(0);
+    leg->SetLineStyle(0);
     leg->Draw("SAME");
 
-    /*
     // Make Y slices
-    for (int i = 0; i < fDataHist->GetNbinY(); i++){
+    for (int i = 1; i < fDataHist->GetNbinsY()+1; i++){
+      c1->cd(i+1);
+      TH1D* fDataHist_SliceY = PlotUtils::GetSliceY(fDataHist, i);
+      fDataHist_SliceY->Draw("E1");
 
-    c1->cd(i+2);
-    TH1D* fDataHist_SliceY = PlotUtils::GetSliceY(fDataHist, i);
-    fDataHist_SliceY->Draw("E1");
+      TH1D* fMCHist_SliceY = PlotUtils::GetSliceY(fMCHist, i);
+      fMCHist_SliceY->Draw("SAME");
 
-    TH1D* fMCHist_SliceY = PlotUtils::GetSliceY(fMCHist, i);
-    fMCHist_SliceY->Draw("SAME HIST C");
-
-    TH1D* mcShape_SliceY = PlotUtils::GetSliceY(mcShape, i);
-    mcShape_SliceY->Draw("SAME HIST C");
+      TH1D* mcShape_SliceY = PlotUtils::GetSliceY(mcShape, i);
+      mcShape_SliceY->Draw("SAME");
+      mcShape_SliceY->SetLineStyle(mcShape->GetLineStyle());
     }
-    */
     c1->Write();
+    delete c1;
+    delete leg;
+
+    TCanvas* c2 = new TCanvas((fName + "_MC_CANV_X").c_str(),
+        (fName + "_MC_CANV_X").c_str(), 1024, 1024);
+
+    c2->Divide(2, int(fDataHist->GetNbinsX()/3.+1));
+    mcShape = (TH2D*)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
+    shapeScale =
+      fDataHist->Integral("width") / fMCHist->Integral("width");
+    mcShape->Scale(shapeScale);
+    mcShape->SetLineStyle(7);
+
+    c2->cd(1);
+    TLegend* leg2 = new TLegend(0.0, 0.0, 1.0, 1.0);
+    leg2->AddEntry(fDataHist, (fName + " Data").c_str(), "lep");
+    leg2->AddEntry(fMCHist, (fName + " MC").c_str(), "l");
+    leg2->AddEntry(mcShape, (fName + " Shape").c_str(), "l");
+    leg2->SetLineColor(0);
+    leg2->SetLineStyle(0);
+    leg2->SetFillColor(0);
+    leg2->SetLineStyle(0);
+    leg2->Draw("SAME");
+
+    // Make Y slices
+    for (int i = 1; i < fDataHist->GetNbinsX()+1; i++){
+      c2->cd(i+1);
+      TH1D* fDataHist_SliceX = PlotUtils::GetSliceX(fDataHist, i);
+      fDataHist_SliceX->Draw("E1");
+
+      TH1D* fMCHist_SliceX = PlotUtils::GetSliceX(fMCHist, i);
+      fMCHist_SliceX->Draw("SAME");
+
+      TH1D* mcShape_SliceX = PlotUtils::GetSliceX(mcShape, i);
+      mcShape_SliceX->Draw("SAME");
+      mcShape_SliceX->SetLineStyle(mcShape->GetLineStyle());
+    }
+
+    c2->Write();
+    delete c2;
+    delete leg2;
   }
 
   // Write Extra Histograms
@@ -1573,17 +1615,18 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
         "series mode (-q EventManager=0)"
         << std::endl;
       sleep(2);
+      throw;
     }
   }
 
   if (fIsEnu && fIsRawEvents) {
-    LOG(SAM) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    ERR(FTL) << "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
       "really correct?!"
       << std::endl;
-    LOG(SAM) << "Check experiment constructor for " << fName
+    ERR(FTL) << "Check experiment constructor for " << fName
       << " and correct this!" << std::endl;
-    LOG(SAM) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
-    exit(-1);
+    ERR(FTL) << "I live in " << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
   }
 
   // Reset everything to NULL
@@ -1650,7 +1693,7 @@ void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
       "CC1pi+ 2D), but implementing .txt should be dirt easy"
       << std::endl;
     ERR(FTL) << "See me at " << __FILE__ << ":" << __LINE__ << std::endl;
-    exit(-1);
+    throw;
 
   } else {
     TFile* inFile = new TFile(dataFile.c_str(), "READ");
