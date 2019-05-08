@@ -178,6 +178,9 @@
 #include "MINERvA_CC0pi_XSec_2D_nu.h"
 #include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
 
+// 2018 MINERvA CC0pi 2D antinu
+#include "MINERvA_CC0pi_XSec_2D_antinu.h"
+
 // MINERvA CC1pi+
 #include "MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h"
 #include "MINERvA_CC1pip_XSec_1DTpi_nu.h"
@@ -1037,8 +1040,10 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
 
     // C. Patrick's early 2018 measurements
-  //} else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpx_antinu")) {
-    //return (new MINERvA_CC0pi_XSec_2Dptpx_antinu(samplekey));
+  } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu") ||
+              !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu") ||
+              !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
+    return (new MINERvA_CC0pi_XSec_2D_antinu(samplekey));
 
     /*
       CC1pi+
