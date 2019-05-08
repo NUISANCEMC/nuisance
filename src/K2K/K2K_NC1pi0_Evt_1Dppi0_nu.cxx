@@ -33,7 +33,7 @@ K2K_NC1pi0_Evt_1Dppi0_nu::K2K_NC1pi0_Evt_1Dppi0_nu(nuiskey samplekey){
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("p_{#pi^{0}} (MeV/c)");
   fSettings.SetYTitle("Number of events");
-  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/Q2CORR/MASK");
+  fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG/MASK");
   fSettings.SetEnuRange(0.0, 5.0);
   fSettings.DefineAllowedTargets("H,O");
 
