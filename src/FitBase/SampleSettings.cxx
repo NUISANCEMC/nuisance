@@ -152,7 +152,13 @@ std::string SampleSettings::GetErrorInput() {
 };
 
 std::string SampleSettings::PlotTitles() {
-  return ";" + GetS("xtitle") + ";" + GetS("ytitle");
+  std::string returnstring = ";";
+  if (!(GetS("xtitle").empty())) returnstring += GetS("xtitle")+";";
+  if (!(GetS("ytitle").empty())) returnstring += GetS("ytitle")+";";
+  if (!(GetS("ztitle").empty())) returnstring += GetS("ztitle")+";";
+  // Cut out the last ; symbol
+  returnstring = returnstring.substr(0, returnstring.find_last_of(";"));
+  return returnstring;
 };
 
 std::string SampleSettings::GetFullTitles() {
