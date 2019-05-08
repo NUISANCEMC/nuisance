@@ -324,14 +324,37 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
   // Scale fMCHist by eventhist integral
   fMCHist->Scale(eventhist->Integral(1, eventhist->GetNbinsX() + 1));
 
+  // Find which axis is the Enu axis
+  bool EnuOnXaxis = false;
+  std::string xaxis = fMCHist->GetXaxis()->GetTitle();
+  if (xaxis.find("E") != std::string::npos && xaxis.find("nu" != std::string::npos)) EnuOnXaxis = true;
+  std::string yaxis = fMCHist->GetYaxis()->GetTitle();
+  if (yaxis.find("E") != std::string::npos && xaxis.find("nu" != std::string::npos)) {
+    // First check that xaxis didn't also find Enu
+    if (EnuOnXaxis) {
+      ERR(FTL) << fMCHist->GetTitle() << " error:" << std::endl;
+      ERR(FTL) << "Found Enu in xaxis title: " << xaxis << std::endl;
+      ERR(FTL) << "AND" << std::endl;
+      ERR(FTL) << "Found Enu in yaxis title: " << yaxis << std::endl;
+      ERR(FTL) << "Enu on x and Enu on y flux unfolded scaling isn't implemented, please modify " << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }
+    EnuOnXaxis = false;
+  }
+
   // Now Get a flux PDF assuming X axis is Enu
-  TH1D* pdfflux = (TH1D*)fMCHist->ProjectionX()->Clone();
+  TH1D* pdfflux = NULL;
+
+  // If xaxis is Enu
+  if (EnuOnXaxis) pdfflux = (TH1D*)fMCHist->ProjectionX()->Clone();
+  // If yaxis is Enu
+  else pdfflux = (TH1D*)fMCHist->ProjectionY()->Clone();
   //  pdfflux->Write( (std::string(fMCHist->GetName()) + "_PROJX").c_str());
   pdfflux->Reset();
 
   // Awful MiniBooNE Check for the time being
-  bool ismb =
-      std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
+  // Needed because the flux is in GeV whereas the measurement is in MeV
+  bool ismb = std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
 
   for (int i = 0; i < pdfflux->GetNbinsX(); i++) {
     double Ml = pdfflux->GetXaxis()->GetBinLowEdge(i + 1);
@@ -367,29 +390,43 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
         continue;
       }
     }
-
     pdfflux->SetBinContent(i + 1, fluxint);
   }
 
+  // Then finally divide by the bin-width in 
   for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
     for (int j = 0; j < fMCHist->GetNbinsY(); j++) {
       if (pdfflux->GetBinContent(i + 1) == 0.0) continue;
 
-      double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j + 2) -
-                        fMCHist->GetYaxis()->GetBinLowEdge(j + 1);
+      // Different scaling depending on if Enu is on x or y axis
+      double scaling = 1.0;
+      // If Enu is on the x-axis, we want the ith entry of the flux
+      // And to divide by the bin width of the jth bin
+      if (EnuOnXaxis) {
+        double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j + 2) -
+                   fMCHist->GetYaxis()->GetBinLowEdge(j + 1);
+        scaling = pdfflux->GetBinContent(i+1)*binWidth;
+      } else {
+        double binWidth = fMCHist->GetXaxis()->GetBinLowEdge(i + 2) -
+                   fMCHist->GetXaxis()->GetBinLowEdge(i + 1);
+        scaling = pdfflux->GetBinContent(j+1)*binWidth;
+      }
+      //fMCHist->SetBinContent(i + 1, j + 1,
+                             //fMCHist->GetBinContent(i + 1, j + 1) /
+                                 //pdfflux->GetBinContent(i + 1) / binWidth);
+      //fMCHist->SetBinError(i + 1, j + 1, fMCHist->GetBinError(i + 1, j + 1) /
+                                             //pdfflux->GetBinContent(i + 1) /
+                                             //binWidth);
       fMCHist->SetBinContent(i + 1, j + 1,
                              fMCHist->GetBinContent(i + 1, j + 1) /
-                                 pdfflux->GetBinContent(i + 1) / binWidth);
+                                 scaling);
       fMCHist->SetBinError(i + 1, j + 1, fMCHist->GetBinError(i + 1, j + 1) /
-                                             pdfflux->GetBinContent(i + 1) /
-                                             binWidth);
+                                         scaling);
     }
   }
 
   delete eventhist;
   delete fFluxHist;
-
-  return;
 };
 
 TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res,
@@ -511,8 +548,6 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
 
   delete eventhist;
   delete fFluxHist;
-
-  return;
 };
 
 // MOVE TO GENERAL UTILS
@@ -530,7 +565,7 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
 
     // Loop over entries and insert them into the histogram
     for (uint xBin = 0; xBin < entries.size(); xBin++) {
-      if (!skipbins or entries[xBin] != -1.0)
+      if (!skipbins || entries[xBin] != -1.0)
         hist->SetBinContent(xBin + 1, yBin + 1, entries[xBin] * norm);
     }
     yBin++;
@@ -843,11 +878,103 @@ std::vector<TH1*> PlotUtils::GetTH1sFromRootFile(
   return hists;
 }
 
-TH2D* PlotUtils::GetTH2DFromTextFile(std::string file) {
-  /// Contents should be
-  /// Low Edfe
+// Create an array from an input file
+std::vector<double> PlotUtils::GetArrayFromTextFile(std::string DataFile) {
+  std::string line;
+  std::ifstream data(DataFile.c_str(), std::ifstream::in);
+  // Get first line
+  std::getline(data >> std::ws, line, '\n');
+  // Convert from a string into a vector of double
+  std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+  return entries;
+}
 
-  return NULL;
+// Get a 2D array from a text file
+std::vector<std::vector<double> > PlotUtils::Get2DArrayFromTextFile(std::string DataFile) {
+  std::string line;
+  std::vector<std::vector<double> > DataArray;
+  std::ifstream data(DataFile.c_str(), std::ifstream::in);
+  while (std::getline(data >> std::ws, line, '\n')) {
+    std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
+    DataArray.push_back(entries);
+  }
+  return DataArray;
+}
+
+TH2D* PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx, std::string biny) {
+
+  // First read in the binning
+  // Array of x binning
+  std::vector<double> xbins = GetArrayFromTextFile(binx);
+
+  // Array of y binning
+  std::vector<double> ybins = GetArrayFromTextFile(biny);
+
+  // Read in the data
+  std::vector<std::vector<double> > Data = Get2DArrayFromTextFile(data);
+
+  // And finally fill the data
+  TH2D* DataPlot = new TH2D("TempHist", "TempHist", xbins.size()-1, &xbins[0], ybins.size()-1, &ybins[0]);
+  int nBinsX = 0;
+  int nBinsY = 0;
+  for (std::vector<std::vector<double> >::iterator it = Data.begin(); 
+      it != Data.end(); ++it) {
+    nBinsX++;
+    // Get the inner vector
+    std::vector<double> temp = *it;
+
+    // Save the previous number[of bins to make sure it's uniform binning
+    int oldBinsY = nBinsY;
+    // Reset the counter
+    nBinsY = 0;
+    for (std::vector<double>::iterator jt = temp.begin(); 
+        jt != temp.end(); ++jt) {
+      nBinsY++;
+      DataPlot->SetBinContent(nBinsX, nBinsY, *jt);
+      DataPlot->SetBinError(nBinsX, nBinsY, 0.0);
+    }
+    if (oldBinsY > 0 && oldBinsY != nBinsY) {
+      ERR(FTL) << "Found non-uniform y-binning in " << data << std::endl;
+      ERR(FTL) << "Previous slice: " << oldBinsY << std::endl;
+      ERR(FTL) << "Current slice: " << nBinsY << std::endl;
+      ERR(FTL) << "Non-uniform binning is not supported in PlotUtils::GetTH2DFromTextFile" << std::endl;
+      throw;
+    }
+  }
+
+  // Check x bins
+  if (size_t(nBinsX+1) != xbins.size()) {
+    ERR(FTL) << "Number of x bins in data histogram does not match the binning histogram!" << std::endl;
+    ERR(FTL) << "Are they the wrong way around (i.e. xbinning should be ybinning)?" << std::endl;
+    ERR(FTL) << "Data: " << nBinsX << std::endl;
+    ERR(FTL) << "From " << binx << " binning: " << xbins.size() << std::endl;
+    throw;
+  }
+
+  // Check y bins
+  if (size_t(nBinsY+1) != ybins.size()) {
+    ERR(FTL) << "Number of y bins in data histogram does not match the binning histogram!" << std::endl;
+    ERR(FTL) << "Are they the wrong way around (i.e. xbinning should be ybinning)?" << std::endl;
+    ERR(FTL) << "Data: " << nBinsY << std::endl;
+    ERR(FTL) << "From " << biny << " binning: " << ybins.size() << std::endl;
+    throw;
+  }
+
+  return DataPlot;
+}
+
+TH1D* PlotUtils::GetSliceY(TH2D *Hist, int SliceNo) {
+  TH1D *Slice = Hist->ProjectionX(Form("%s_SLICEY%i", Hist->GetName(), SliceNo), SliceNo, SliceNo, "e");
+  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetYaxis()->GetTitle(), Hist->GetYaxis()->GetBinLowEdge(SliceNo), Hist->GetYaxis()->GetBinLowEdge(SliceNo+1)));
+  Slice->GetYaxis()->SetTitle(Hist->GetZaxis()->GetTitle());
+  return Slice;
+}
+
+TH1D* PlotUtils::GetSliceX(TH2D *Hist, int SliceNo) {
+  TH1D *Slice = Hist->ProjectionY(Form("%s_SLICEX%i", Hist->GetName(), SliceNo), SliceNo, SliceNo, "e");
+  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetXaxis()->GetTitle(), Hist->GetXaxis()->GetBinLowEdge(SliceNo), Hist->GetXaxis()->GetBinLowEdge(SliceNo+1)));
+  Slice->GetYaxis()->SetTitle(Hist->GetZaxis()->GetTitle());
+  return Slice;
 }
 
 void PlotUtils::AddNeutModeArray(TH1D* hist1[], TH1D* hist2[], double scaling) {
@@ -1014,6 +1141,7 @@ TH1D* PlotUtils::GetProjectionX(TH2D* hist, TH2I* mask) {
 
   TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
+  // This includes the underflow/overflow
   TH1D* hist_X = maskedhist->ProjectionX();
 
   delete maskedhist;
@@ -1026,6 +1154,7 @@ TH1D* PlotUtils::GetProjectionY(TH2D* hist, TH2I* mask) {
 
   TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
+  // This includes the underflow/overflow
   TH1D* hist_Y = maskedhist->ProjectionY();
 
   delete maskedhist;
