@@ -743,7 +743,7 @@ double FitUtils::Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi) {
   }
 
   // Now get the TVector3s for each particle
-  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
+  TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
   // Find the highest momentum proton in the event between 450 and 1200 MeV with theta_p < 70
@@ -887,7 +887,7 @@ double FitUtils::Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
   }
 
   // Now get the TVector3s for each particle
-  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
+  TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
@@ -976,7 +976,7 @@ double FitUtils::Get_pn_reco_Ar(FitEvent *event, int ISPDG, bool Is0pi) {
   }
 
   // Now get the TVector3s for each particle
-  TVector3 const &NuP = event->GetHMISParticle(14)->fP.Vect();
+  TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
