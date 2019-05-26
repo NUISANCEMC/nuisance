@@ -110,7 +110,10 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
   int nuisenum = Reweight::ConvDial(name, dialtype);
 
   if (nuisenum == -1) {
-    THROW("NUISENUM == " << nuisenum << " for " << name);
+    ERR(FTL) << "Could not include dial " << name << std::endl;
+    ERR(FTL) << "With dialtype: " << dialtype << std::endl;
+    ERR(FTL) << "With value: " << val << std::endl;
+    THROW("With nuisenum: " << nuisenum);
   }
 
   // Setup RW Engine Pointer
@@ -157,8 +160,9 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
   int dialtype = Reweight::GetDialType(nuisenum);
 
   if (fAllRW.find(dialtype) == fAllRW.end()) {
-    THROW("Cannot find RW Engine for dialtype = "
-          << dialtype << ", " << Reweight::RemoveDialType(nuisenum));
+    ERR(FTL) << "Can't find RW engine for parameter " << fNameList[dialtype] << std::endl;
+    ERR(FTL) << "With dialtype " << dialtype << ", " << Reweight::RemoveDialType(nuisenum) << std::endl;
+    THROW("Are you sure you enabled the right engines?");
   }
 
   // Get RW Engine for this dial

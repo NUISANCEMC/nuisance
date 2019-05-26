@@ -257,7 +257,7 @@ void MeasurementBase::Reconfigure() {
       std::stringstream ss("");
       ss.unsetf(std::ios_base::fixed);
       ss << std::setw(7) << std::right << i << "/" << fNEvents << " events ("
-         << std::setw(2) << double(i) / double(fNEvents) * 100. << std::left
+         << std::setw(2) << int(double(i) / double(fNEvents) * 100.)+1 << std::left
          << std::setw(5) << "%) "
          << "[S,X,Y,Z,M,W] = [" << std::fixed << std::setprecision(2)
          << std::right << Signal << ", " << std::setw(5) << fXVar << ", "
