@@ -111,9 +111,9 @@ void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
 	std::vector<size_t> indices = fEnumIndex[nuisenum];
 	for (uint i = 0; i < indices.size(); i++) {
 		fValues[indices[i]] = val;
-		std::cout << "Setting Dial Value = " << nuisenum << " "
+		LOG(FIT) << "Setting Dial Value for " << nuisenum << " "
 		          << i << " " << indices[i] << " " << fValues[indices[i]]
-		          << " Enum=" << fNEUTSysts[indices[i]] << std::endl;
+		          << " Enum: " << fNEUTSysts[indices[i]] << std::endl;
 		fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
 	}
 #endif
@@ -124,9 +124,9 @@ void NEUTWeightEngine::SetDialValue(std::string name, double val) {
 	std::vector<size_t> indices = fNameIndex[name];
 	for (uint i = 0; i < indices.size(); i++) {
 		fValues[indices[i]] = val;
-		std::cout << "Setting Dial Value = " << name << " = "
+		LOG(FIT) << "Setting Dial Value for " << name << " = "
 		          << i << " " << indices[i] << " " << fValues[indices[i]]
-		          << "  Enum=" << fNEUTSysts[indices[i]] << std::endl;
+		          << "  Enum: " << fNEUTSysts[indices[i]] << std::endl;
 		fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
 	}
 #endif
