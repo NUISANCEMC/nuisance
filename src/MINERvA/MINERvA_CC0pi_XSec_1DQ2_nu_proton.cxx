@@ -23,6 +23,9 @@
 #include "MINERvA_SignalDef.h"
 #include "MINERvA_CC0pi_XSec_1DQ2_nu_proton.h"
 
+// https://arxiv.org/abs/1409.4497
+// DOI: 10.1103/PhysRevD.91.071301
+
 //********************************************************************
 MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey samplekey) {
 //********************************************************************
@@ -30,8 +33,8 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey sam
   // Sample overview ---------------------------------------------------
   std::string descrip = "MINERvA_CC0pi_XSec_1DQ2_nu_proton sample. \n" \
                         "Target: CH \n" \
-                        "Flux: MINERvA Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+                        "Flux: MINERvA Forward Horn Current numu \n" \
+                        "Signal: Any event with 1 muon, at least one proton in range, and no other FS particles \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -44,8 +47,13 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey sam
 
   // CCQELike plot information
   fSettings.SetTitle("MINERvA_CC0pi_XSec_1DQ2_nu_proton");
-  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_data.txt" );
-  fSettings.SetCovarInput( FitPar::GetDataBase() + "/MINERvA/CCQE/proton_Q2QE_nu_covar.txt" );
+  fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/proton_2014/proton_Q2QE_nu_data.txt" );
+  // Have a shape covariance
+  fIsShape = fSettings.Found("type","SHAPE");
+  std::string covid = FitPar::GetDataBase() + "/MINERvA/CC0pi/proton_2014/proton_Q2QE_nu_covar";
+  if (fIsShape) covid += "_shape";
+  covid += ".txt";
+  fSettings.SetCovarInput(covid);
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
@@ -60,7 +68,6 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey sam
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
-
 };
 
 void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
@@ -68,7 +75,7 @@ void MINERvA_CC0pi_XSec_1DQ2_nu_proton::FillEventVariables(FitEvent *event){
   // Has NuMuCC1p
   if (event->HasISNuMuon() &&
       event->HasFSMuon() &&
-      event->HasFSProton()){
+      event->HasFSProton()) {
 
     TLorentzVector pnu    = event->GetHMISNuMuon()->fP;
     TLorentzVector pprot  = event->GetHMFSProton()->fP;
