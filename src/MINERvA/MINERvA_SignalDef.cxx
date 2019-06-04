@@ -266,10 +266,18 @@ namespace SignalDef {
     return true;
   }
 
+
+  // Used in 2014 muon+proton analysis
+  // Events with muon angles up to 70 degrees
+  // One right sign muon, at least one proton, no pions
+  // proton kinetic energies greater than 100 MeV
   bool isCC0pi1p_MINERvA(FitEvent *event, double enumin, double enumax) {
-    // Require numu CC0pi event with a proton above threshold
-    bool signal = (isCC0pi(event, 14, enumin, enumax) &&
-        HasProtonKEAboveThreshold(event, 110.0));
+    bool signal = (
+        isCC0pi(event, 14, enumin, enumax) && // Require numu CC0pi event
+        HasProtonKEAboveThreshold(event, 110.0) && // With proton above threshold
+        (event->GetHMFSMuon())->P3().Angle(
+          (event->GetNeutrinoIn())->P3())*180./M_PI < 70 // And muon within production angle
+        );
 
     return signal;
   }
