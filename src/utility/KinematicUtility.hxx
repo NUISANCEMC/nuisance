@@ -41,6 +41,8 @@ double GetNeutrinoEQERec(event::FullEvent const &fev,
                          double SeparationEnergy_MeV);
 double GetNeutrinoQ2QERec(event::FullEvent const &fev,
                           double SeparationEnergy_MeV);
+double GetNeutrinoWRec(event::FullEvent const &fev);
+double GetEAvailProxy(event::FullEvent const &fev);
 
 TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal);
 TVector3 GetUnitVectorInTPlane(const TVector3 &inp,
@@ -70,14 +72,21 @@ double GetDeltaAlphaT_CC0PiN(
 
 TLorentzVector GetEnergyMomentumTransfer(event::FullEvent const &fev);
 
-struct ENuRange : public std::pair<double, double> {
+struct KinematicRange : public std::pair<double, double> {
   using std::pair<double, double>::pair;
   using std::pair<double, double>::operator=;
 
-  ENuRange()
+  KinematicRange()
       : std::pair<double, double>(0, std::numeric_limits<double>::max()) {}
 
-  bool IsInRange(double enu) { return (enu > second) || (enu < first); }
+  // Not sure why something like this isn't being inherited...
+  KinematicRange(std::pair<double, double> const &o)
+      : std::pair<double, double>(std::min(o.first, o.second),
+                                  std::max(o.first, o.second)) {}
+
+  bool IsInRange(double val) const {
+    return !((val > second) || (val < first));
+  }
 };
 
 } // namespace utility

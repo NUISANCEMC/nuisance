@@ -8,7 +8,31 @@ namespace nuis {
 namespace utility {
 
 bool IsCC0Pi(event::FullEvent const &ev) {
+  if (!IsCCInc(ev)) {
+    return false;
+  }
 
+  if (GetNFSPions(ev) || GetNFSOthers(ev)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool IsCC1Pi(event::FullEvent const &ev, std::vector<event::PDG_t> PionPDGs) {
+  if (!IsCCInc(ev)) {
+    return false;
+  }
+
+  size_t NChosenPi = GetNParticles(ev, PionPDGs);
+  if ((NChosenPi != 1) || (NChosenPi != GetNFSPions(ev)) || GetNFSOthers(ev)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool IsCCInc(event::FullEvent const &ev) {
   event::Particle ISNu = GetHMISNeutralLepton(ev);
   if (!ISNu) {
     return false;
@@ -16,13 +40,7 @@ bool IsCC0Pi(event::FullEvent const &ev) {
 
   event::PDG_t expected_fslep_pdg = ISNu.pdg > 0 ? ISNu.pdg - 1 : ISNu.pdg + 1;
 
-
-  event::Particle FSLep = GetHMFSParticle(ev, {expected_fslep_pdg});
-  if (!FSLep) {
-    return false;
-  }
-
-  if (GetFSPions(ev).size() || GetFSOthers(ev).size()) {
+  if (GetNParticles(ev, {expected_fslep_pdg}) != GetNFSLeptons(ev)) {
     return false;
   }
 

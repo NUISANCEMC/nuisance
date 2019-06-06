@@ -1,0 +1,3 @@
+SET(DATA_INSTALL_DIR ${DATA_INSTALL_DIR}/MINERvA)
+
+add_subdirectory(CC0Pi)

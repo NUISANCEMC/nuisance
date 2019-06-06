@@ -87,6 +87,9 @@ double NEUTInputHandler::GetMonoEXSecWeight() {
 
     fInputTreeFile.tree->GetEntry(nev_it);
     xsec += fNeutVect->Totcrs;
+    //Assume monoE.
+    return xsec * 1E-38;
+
     count++;
     if (E_first == std::numeric_limits<double>::max()) {
       NeutPart *part = fNeutVect->PartInfo(0);

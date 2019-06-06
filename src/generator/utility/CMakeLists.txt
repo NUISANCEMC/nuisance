@@ -9,8 +9,14 @@ if(USE_NEUT)
 endif(USE_NEUT)
 
 if(USE_GENIE)
-  LIST(APPEND GENERATOR_UTILS_IMPL GENIEUtility.cxx)
-  LIST(APPEND GENERATOR_UTILS_HDR GENIEUtility.hxx)
+  LIST(APPEND GENERATOR_UTILS_IMPL
+    GENIEUtility.cxx
+    GENIESplineReader.cxx
+  )
+  LIST(APPEND GENERATOR_UTILS_HDR
+    GENIEUtility.hxx
+    GENIESplineReader.hxx
+  )
 endif(USE_GENIE)
 
 

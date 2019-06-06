@@ -79,16 +79,16 @@ Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
 
     // Warn if we still find alive particles without classifying them
   } else if (part.fIsAlive == true) {
-    throw unexpected_NEUT_particle_state()
-        << "[ERROR]: Undefined NEUT state "
-        << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
-        << " PDG: " << part.fPID;
+    std::cout << "[WARN]: Undefined NEUT state "
+              << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
+              << " PDG: " << part.fPID << std::endl;
+    return Particle::Status_t::kUnknown;
   }
   // Warn if we find dead particles that we haven't classified
-  throw unexpected_NEUT_particle_state()
-      << "[ERROR]: Undefined NEUT state "
-      << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
-      << " PDG: " << part.fPID;
+  std::cout << "[WARN]: Undefined NEUT state "
+            << " Alive: " << part.fIsAlive << " Status: " << part.fStatus
+            << " PDG: " << part.fPID << std::endl;
+  return Particle::Status_t::kUnknown;
 }
 
 } // namespace neuttools

@@ -5,7 +5,8 @@ set(utility_implementation_files
   PDGCodeUtility.cxx
   StringUtility.cxx
   EventTopologyUtility.cxx
-  HistogramUtility.cxx)
+  HistogramUtility.cxx
+  PhaseSpaceRestriction.cxx)
 
 set(utility_header_files
   FileSystemUtility.hxx
@@ -18,7 +19,8 @@ set(utility_header_files
   StringUtility.hxx
   TerminalUtility.hxx
   StatsUtility.hxx
-  EventTopologyUtility.hxx)
+  EventTopologyUtility.hxx
+  PhaseSpaceRestriction.cxx)
 
 add_library(nuis_utility SHARED ${utility_implementation_files})
 target_link_libraries(nuis_utility)
@@ -26,3 +28,5 @@ target_link_libraries(nuis_utility)
 install(TARGETS nuis_utility DESTINATION lib)
 
 install(FILES ${utility_header_files} DESTINATION include/utility)
+
+add_subdirectory(experimental)

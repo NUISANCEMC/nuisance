@@ -25,6 +25,7 @@
 #include "config/GlobalConfiguration.hxx"
 
 #include "utility/FileSystemUtility.hxx"
+#include "utility/StringUtility.hxx"
 
 #include "exception/exception.hxx"
 

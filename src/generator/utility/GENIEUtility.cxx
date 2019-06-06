@@ -18,7 +18,11 @@
  *******************************************************************************/
 
 #include "generator/utility/GENIEUtility.hxx"
+#include "generator/utility/GENIESplineReader.hxx"
+#include "utility/HistogramUtility.hxx"
+#include "utility/StringUtility.hxx"
 
+#include "utility/InteractionChannelUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
 
 #ifdef GENIE_V3_INTERFACE
@@ -32,6 +36,10 @@
 #include "GHEP/GHepUtils.h"
 #include "PDG/PDGCodes.h"
 #endif
+
+#include "fhiclcpp/ParameterSet.h"
+
+#include "string_parsers/from_string.hxx"
 
 #include "TGraph.h"
 
@@ -230,7 +238,7 @@ Channel_t GetEventChannel(genie::GHepRecord const &gev) {
 }
 
 Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
-                                       Channel_t chan) {
+                                     Channel_t chan) {
   /*
      kIStUndefined                  = -1,
      kIStInitialState               =  0,   / generator-level initial state /
@@ -266,8 +274,8 @@ Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
   }
 
   case genie::kIStHadronInTheNucleus: {
-    state = Is2p2h(chan) ? Particle::Status_t::kPrimaryInitialState
-                         : Particle::Status_t::kIntermediate;
+    state = utility::Is2p2h(chan) ? Particle::Status_t::kPrimaryInitialState
+                                  : Particle::Status_t::kIntermediate;
     break;
   }
 
@@ -292,6 +300,165 @@ Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
     }
   }
   return state;
+}
+
+struct TargetSplineBlob {
+  double MolecularWeight;
+  size_t NNucleons;
+  std::string search_term;
+  TGraph TotSpline;
+};
+
+NEW_NUIS_EXCEPT(Invalid_target_specifier);
+
+double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
+  double mec_scale = xsecinfo.get<double>("mec_scale", 1);
+  double EMin = xsecinfo.get<double>("EMin", 0);
+  double EMax = xsecinfo.get<double>("EMax", 10);
+  size_t NKnots = xsecinfo.get<size_t>("NKnots", 100);
+
+  std::vector<TargetSplineBlob> TargetSplines;
+  int probe = xsecinfo.get<int>("nu_pdg");
+
+  for (std::string const &target :
+       xsecinfo.get<std::vector<std::string>>("target")) {
+    std::vector<std::string> splits = nuis::utility::split(target, ";");
+    if (splits.size() != 1 && splits.size() != 2) {
+      throw Invalid_target_specifier()
+          << "Expected to find 100ZZZAAA0;<MolecularWeight>, e.g. "
+             "1000060120;1, "
+             "but found: \""
+          << target << "\"";
+    }
+    std::stringstream ss;
+    ss << ".*nu:" << probe << ";tgt:" << splits[0] << ".*";
+
+    size_t nuc_pdg = fhicl::string_parsers::str2T<size_t>(splits[0]);
+
+    double molwght = splits.size() == 2
+                         ? fhicl::string_parsers::str2T<double>(splits[1])
+                         : 1;
+
+    TargetSplines.push_back(
+        {molwght, (nuc_pdg % 1000) / 10, ss.str(), TGraph()});
+
+    std::cout << "[INFO]:\tGetting splines that match: \"" << ss.str()
+              << "\" with A = " << TargetSplines.back().NNucleons
+              << " and multiplied by "
+              << molwght / double(TargetSplines.back().NNucleons) << std::endl;
+  }
+
+  size_t NTotNucleons = 0;
+  std::vector<std::string> spline_patterns;
+  for (auto const &spb : TargetSplines) {
+    spline_patterns.push_back(spb.search_term);
+    NTotNucleons += spb.MolecularWeight * spb.NNucleons;
+  }
+  double WeightToPerNucleon = 1.0 / double(NTotNucleons);
+
+  // Read the spline file
+  std::cout << "[INFO]: Reading input file: "
+            << xsecinfo.get<std::string>("spline_file")
+            << ", this may take a while..." << std::endl;
+  GENIESplineGetter spg(spline_patterns);
+  spg.ParseFile(xsecinfo.get<std::string>("spline_file").c_str());
+  std::vector<std::vector<TGraph>> all_splines = spg.GetTGraphs();
+
+  double step = (EMax - EMin) / double(NKnots);
+
+  // Sum each targets-worth of interaction splines together, weighting for
+  // molecular fraction and possibly fixing the MEC spline oddity
+  for (size_t ts_it = 0; ts_it < TargetSplines.size(); ++ts_it) {
+
+    TargetSplines[ts_it].TotSpline = TGraph(NKnots);
+
+    for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+      TargetSplines[ts_it].TotSpline.SetPoint(p_it, EMin + p_it * step, 0);
+    }
+
+    double target_weight = (TargetSplines[ts_it].MolecularWeight /
+                            double(TargetSplines[ts_it].NNucleons));
+    for (size_t c_it = 0; c_it < all_splines[ts_it].size(); ++c_it) {
+      double weight = target_weight;
+      if (std::string(all_splines[ts_it][c_it].GetName()).find("MEC") !=
+          std::string::npos) {
+        if (mec_scale != 1) {
+          std::cout << "[INFO]: Weighting MEC splines by " << mec_scale
+                    << std::endl;
+          weight *= mec_scale;
+        }
+      }
+      for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+        double E, XSec;
+        TargetSplines[ts_it].TotSpline.GetPoint(p_it, E, XSec);
+
+        // Copied from GENIE/Convents/Units.h
+        static const double gigaelectronvolt = 1.;
+        static const double GeV = gigaelectronvolt;
+        static const double meter = 5.07e+15 / GeV;
+        static const double centimeter = 0.01 * meter;
+        static const double centimeter2 = centimeter * centimeter;
+
+        XSec += all_splines[ts_it][c_it].Eval(E) * weight / centimeter2;
+
+        TargetSplines[ts_it].TotSpline.SetPoint(p_it, E, XSec);
+      }
+    }
+  }
+
+  // Sum all the correctly weighted per-target splines
+  TGraph MasterSpline(NKnots);
+
+  for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+    MasterSpline.SetPoint(p_it, EMin + p_it * step, 0);
+  }
+  for (size_t c_it = 0; c_it < TargetSplines.size(); ++c_it) {
+    for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+      double E, XSec;
+      MasterSpline.GetPoint(p_it, E, XSec);
+      XSec += TargetSplines[c_it].TotSpline.Eval(E) * WeightToPerNucleon;
+
+      MasterSpline.SetPoint(p_it, E, XSec);
+    }
+  }
+
+  fhicl::ParameterSet fluxps = xsecinfo.get<fhicl::ParameterSet>("flux");
+  // If MonoE
+  if (fluxps.has_key("energy_GeV")) {
+    double monoE = fluxps.get<double>("energy_GeV");
+
+    return MasterSpline.Eval(monoE);
+  } else {
+    // Use the master spline to get flux*xsec (which the events are thrown
+    // according to) and return the flux-averaged total xsec which is used for
+    // weighting
+    std::unique_ptr<TH1> Flux =
+        nuis::utility::GetHistogram<TH1>(fluxps.get<std::string>("histogram"));
+    bool per_width = fluxps.get<bool>("is_divided_by_bin_width", true);
+    double FluxIntegral = Flux->Integral(per_width ? "width" : "");
+
+    for (int bi_it = 0; bi_it < Flux->GetXaxis()->GetNbins(); ++bi_it) {
+      double bc = Flux->GetBinContent(bi_it + 1);
+      double low_e = Flux->GetXaxis()->GetBinLowEdge(bi_it + 1);
+      double up_e = Flux->GetXaxis()->GetBinUpEdge(bi_it + 1);
+
+      size_t NIntSteps = 100;
+      double step = (up_e - low_e) / double(NIntSteps);
+
+      double avg_xsec = 0;
+      for (size_t i = 0; i < NIntSteps; ++i) {
+        double e = low_e + (double(i) + 0.5) * step;
+        avg_xsec += MasterSpline.Eval(e);
+      }
+      avg_xsec /= double(NIntSteps);
+
+      Flux->SetBinContent(bi_it + 1, bc * avg_xsec);
+    }
+
+    double EvRateIntegral = Flux->Integral(per_width ? "width" : "");
+
+    return EvRateIntegral / FluxIntegral;
+  }
 }
 
 } // namespace genietools

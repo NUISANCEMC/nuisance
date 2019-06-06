@@ -57,6 +57,7 @@ public:
   TVector3 Dir() const { return P3().Unit(); }
   double M() const { return P4.M(); }
   double Theta() const { return P4.Vect().Theta(); }
+  double Theta_deg() const { return P4.Vect().Theta() * (180.0 / M_PI); }
   double CosTheta() const { return P4.Vect().CosTheta(); }
 };
 } // namespace event

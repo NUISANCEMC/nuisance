@@ -17,21 +17,16 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef UTILITY_FILESYSTEMUTILITY_HXX_SEEN
-#define UTILITY_FILESYSTEMUTILITY_HXX_SEEN
-
+#pragma once
 #include <string>
 #include <vector>
 
 namespace nuis {
 namespace utility {
 
-std::string EnsureTrailingSlash(std::string);
-
-std::vector<std::string> GetMatchingFiles(std::string, std::string const &);
+std::vector<std::string> GetMatchingFiles(std::string, std::string);
 
 std::string GetDataDir();
 
 } // namespace utility
 } // namespace nuis
-#endif

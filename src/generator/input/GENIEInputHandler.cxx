@@ -21,10 +21,12 @@ using namespace nuis::event;
 using namespace nuis::utility;
 using namespace nuis::genietools;
 
-GENIEInputHandler::GENIEInputHandler() : fInputTree(), fGenieNtpl(nullptr) {}
+GENIEInputHandler::GENIEInputHandler()
+    : fInputTree(), fGenieNtpl(nullptr), fFileWeight(1) {}
 GENIEInputHandler::GENIEInputHandler(GENIEInputHandler &&other)
     : fInputTree(std::move(other.fInputTree)),
-      fReaderEvent(std::move(other.fReaderEvent)), fGenieNtpl(nullptr) {}
+      fReaderEvent(std::move(other.fReaderEvent)), fGenieNtpl(nullptr),
+      fFileWeight(1) {}
 
 void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
@@ -34,6 +36,21 @@ void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
   fKeepNuclearParticles = ps.get<bool>("keep_nuclear_particles", false);
+
+  fhicl::ParameterSet XSecInfo = ps.get<fhicl::ParameterSet>("xsec_info", {});
+  if (XSecInfo.has_key("weight")) {
+    fFileWeight = XSecInfo.get<double>("weight");
+    std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
+              << std::endl;
+  } else if (XSecInfo.has_key("flux") || XSecInfo.has_key("target") ||
+             XSecInfo.has_key("spline_file")) {
+    std::cout
+        << "[INFO]: Attempting to build GENIE file weight with input splines."
+        << std::endl;
+    fFileWeight = genietools::GetFileWeight(XSecInfo) / double(GetNEvents());
+    std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
+              << std::endl;
+  }
 }
 
 MinimalEvent const &GENIEInputHandler::GetMinimalEvent(ev_index_t idx) const {
@@ -73,7 +90,7 @@ MinimalEvent const &GENIEInputHandler::GetMinimalEvent(ev_index_t idx) const {
     break;
   }
 
-  fReaderEvent.XSecWeight = 1;
+  fReaderEvent.XSecWeight = fFileWeight;
 
   if (fWeightCache.size() <= idx) {
     fWeightCache.push_back(fReaderEvent.XSecWeight);
@@ -104,7 +121,7 @@ FullEvent const &GENIEInputHandler::GetFullEvent(ev_index_t idx) const {
     // Get Status
     Particle::Status_t state = GetParticleStatus(*p, fReaderEvent.mode);
 
-    if (!fKeepIntermediates) {
+    if (!fKeepIntermediates && (state == Particle::Status_t::kIntermediate)) {
       continue;
     }
 
@@ -113,7 +130,6 @@ FullEvent const &GENIEInputHandler::GetFullEvent(ev_index_t idx) const {
     }
 
     Particle nuis_part;
-
     nuis_part.pdg = p->Pdg();
     nuis_part.P4 = TLorentzVector(p->Px(), p->Py(), p->Pz(), p->E()) * 1E3;
 

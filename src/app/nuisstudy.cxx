@@ -12,6 +12,8 @@
 
 #include "persistency/ROOTOutput.hxx"
 
+#include "utility/StringUtility.hxx"
+
 #include "fhiclcpp/make_ParameterSet.h"
 
 #include <string>
@@ -25,11 +27,14 @@ void SayUsage(char const *argv[]) {
                "configuration. \n"
                "\t-s <sample name>            : FHiCL key of a single sample "
                "to run from the -c argument. \n"
+               "\t-o <out.file[:mode]>        : Default output stream name "
+               "override, if unspecified mode will be 'CREATE'. \n"
             << std::endl;
 }
 
 std::string fhicl_file = "";
 std::string named_sample = "";
+std::string default_stream_override = "";
 
 void handleOpts(int argc, char const *argv[]) {
   int opt = 1;
@@ -42,6 +47,8 @@ void handleOpts(int argc, char const *argv[]) {
       fhicl_file = argv[++opt];
     } else if (std::string(argv[opt]) == "-s") {
       named_sample = argv[++opt];
+    } else if (std::string(argv[opt]) == "-o") {
+      default_stream_override = argv[++opt];
     } else {
       std::cout << "[ERROR]: Unknown option: " << argv[opt] << std::endl;
       SayUsage(argv);
@@ -63,6 +70,14 @@ int main(int argc, char const *argv[]) {
   }
 
   nuis::config::EnsureConfigurationRead(fhicl_file);
+
+  if (default_stream_override.size()) {
+    std::vector<std::string> split =
+        nuis::utility::split(default_stream_override, ":");
+    std::string open_mode = (split.size() > 1) ? split[1] : "CREATE";
+
+    nuis::persistency::NewStream("default", split[0], open_mode);
+  }
 
   size_t NMax = nuis::config::GetDocument().get<size_t>(
       "nmax", std::numeric_limits<size_t>::max());

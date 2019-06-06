@@ -2,6 +2,7 @@ set(samples_header_files
   IEventProcessor.hxx
   IDataComparison.hxx
   SimpleDataComparison.hxx
+  MultiDataComparison.hxx
   SimpleMCStudy.hxx)
 
 install(FILES ${samples_header_files} DESTINATION include/samples)

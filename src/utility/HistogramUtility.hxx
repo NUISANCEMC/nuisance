@@ -365,8 +365,12 @@ inline std::unique_ptr<HT>
 GetHistogramFromROOTFile(TFile_ptr &f, std::string const &hname,
                          bool ThrowIfMissing = true) {
 
-  f->Get(hname.c_str());
-  HT *h = dynamic_cast<HT *>(f->Get(hname.c_str()));
+  TObject *obj = f->Get(hname.c_str());
+  if(std::string(obj->ClassName()) == "TList"){
+    obj = static_cast<TList *>(obj)->At(0);
+  }
+
+  HT *h = dynamic_cast<HT *>(obj);
   if (!h) {
     if (ThrowIfMissing) {
       throw invalid_histogram_name()

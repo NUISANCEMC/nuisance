@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "event/types.hxx"
 #include "event/Particle.hxx"
+#include "event/types.hxx"
 
 #include <vector>
 
@@ -32,6 +32,7 @@ class FullEvent;
 
 namespace nuis {
 namespace utility {
+class IParticlePhaseSpaceRestriction;
 
 event::Particle GetHMParticle(std::vector<event::Particle>);
 
@@ -54,9 +55,11 @@ event::Particle GetHMParticle(event::FullEvent const &,
                               bool include_matching_pdg = true);
 
 event::Particle GetHMISParticle(event::FullEvent const &,
-                              std::vector<event::PDG_t> const &);
+                                std::vector<event::PDG_t> const &);
 event::Particle GetHMFSParticle(event::FullEvent const &,
-                              std::vector<event::PDG_t> const &);
+                                std::vector<event::PDG_t> const &);
+
+///***********Getters that include copies
 
 std::vector<event::Particle> GetFSChargedLeptons(event::FullEvent const &);
 std::vector<event::Particle> GetFSNeutralLeptons(event::FullEvent const &);
@@ -80,6 +83,42 @@ event::Particle GetHMFSProton(event::FullEvent const &);
 event::Particle GetHMFSNeutron(event::FullEvent const &);
 event::Particle GetHMFSNucleon(event::FullEvent const &);
 event::Particle GetHMFSOther(event::FullEvent const &);
+
+event::Particle
+GetHMParticleInPhaseSpace(event::FullEvent const &ev,
+                          std::vector<event::PDG_t> const &pdgs,
+                          IParticlePhaseSpaceRestriction const &ps,
+                          event::Particle::Status_t status =
+                              event::Particle::Status_t::kNuclearLeaving,
+                          bool include_matching_pdg = true);
+event::Particle
+GetHMFSProtonInPhaseSpace(event::FullEvent const &ev,
+                          IParticlePhaseSpaceRestriction const &ps);
+
+///***********Counters requiring no copies
+size_t GetNParticles(event::FullEvent const &ev,
+                     std::vector<event::PDG_t> const &pdgs,
+                     event::Particle::Status_t status =
+                         event::Particle::Status_t::kNuclearLeaving,
+                     bool include_matching_pdg = true);
+size_t GetNParticlesInPhaseSpace(event::FullEvent const &ev,
+                                 std::vector<event::PDG_t> const &pdgs,
+                                 IParticlePhaseSpaceRestriction const &ps,
+                                 event::Particle::Status_t status =
+                                     event::Particle::Status_t::kNuclearLeaving,
+                                 bool include_matching_pdg = true);
+
+size_t GetNFSChargedLeptons(event::FullEvent const &ev);
+size_t GetNFSNeutralLeptons(event::FullEvent const &ev);
+size_t GetNFSLeptons(event::FullEvent const &ev);
+size_t GetNISNeutralLeptons(event::FullEvent const &ev);
+size_t GetNFSChargedPions(event::FullEvent const &ev);
+size_t GetNFSNeutralPions(event::FullEvent const &ev);
+size_t GetNFSPions(event::FullEvent const &ev);
+size_t GetNFSProtons(event::FullEvent const &ev);
+size_t GetNFSNeutrons(event::FullEvent const &ev);
+size_t GetNFSNucleons(event::FullEvent const &ev);
+size_t GetNFSOthers(event::FullEvent const &ev);
 
 } // namespace utility
 } // namespace nuis

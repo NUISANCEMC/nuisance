@@ -108,11 +108,6 @@ inline Channel_t FromNEUTCode(int nc) {
 
 using PDG_t = long;
 
-inline bool Is2p2h(Channel_t chan) {
-  return ((chan == Channel_t::kCC2p2h) || (chan == Channel_t::kNC2p2h) ||
-          (chan == Channel_t::kCC2p2h_nub) || (chan == Channel_t::kNC2p2h_nub));
-}
-
 } // namespace event
 } // namespace nuis
 

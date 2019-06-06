@@ -41,7 +41,8 @@ public:
   std::unique_ptr<HistType> fPrediction_Uncorr;
 
   ANL_CCQE_Evt_1DQ2_nu()
-      : Pub(kPRD26), Pub_str(""), UseD2Corr(false), fD2CorrHist(nullptr) {
+      : SimpleDataComparison_1D("ANL_CCQE_Evt_1DQ2_nu"), Pub(kPRD26),
+        Pub_str(""), UseD2Corr(false), fD2CorrHist(nullptr) {
     ReadGlobalConfigDefaults();
   }
 
@@ -182,8 +183,6 @@ public:
           fPrediction_Uncorr, "Prediction_Uncorr", write_directory);
     }
   }
-
-  std::string Name() { return "ANL_CCQE_Evt_1DQ2_nu"; }
 };
 
 DECLARE_PLUGIN(IDataComparison, ANL_CCQE_Evt_1DQ2_nu);

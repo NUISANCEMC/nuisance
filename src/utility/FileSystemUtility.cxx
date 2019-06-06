@@ -1,4 +1,5 @@
 #include "utility/FileSystemUtility.hxx"
+#include "utility/StringUtility.hxx"
 
 #include "exception/exception.hxx"
 
@@ -8,25 +9,17 @@
 
 #include <dirent.h>
 
-#include <regex>
-
 namespace nuis {
 namespace utility {
 
-NEW_NUIS_EXCEPT(unexpected_empty_string);
+std::vector<std::string> GetMatchingFiles(std::string directory,
+                                          std::string pattern) {
 
-std::string EnsureTrailingSlash(std::string str) {
-  if (!str.size()) {
-    throw unexpected_empty_string();
-  }
-  if (str.back() != '/') {
-    return str + '/';
-  }
-  return str;
-}
-
-std::vector<std::string> GetMatchingFiles(std::string directory, std::string const &pattern) {
+  std::cout << "[INFO]: Looking for files matching: \"" << pattern
+            << "\" in directory: " << directory << std::endl;
   directory = EnsureTrailingSlash(directory);
+  pattern = DeGlobPattern(pattern);
+
   std::regex rpattern(pattern);
 
   std::vector<std::string> matches;

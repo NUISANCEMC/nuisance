@@ -19,170 +19,93 @@
 
 //********************************************************************
 
+#include "samples/MultiDataComparison.hxx"
 #include "samples/SimpleDataComparison.hxx"
 
 #include "utility/EventTopologyUtility.hxx"
 #include "utility/FullEventUtility.hxx"
 #include "utility/KinematicUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
+#include "utility/experimental/T2KUtility.hxx"
 
 using namespace nuis::event;
 using namespace nuis::utility;
 
-class T2K_CC0PiNProt_CH_xsec_STV_nu : public SimpleDataComparison_1D {
-
-  enum STVProjection { kDeltaPT, kDeltaPhiT, kDeltaAlphaT };
+class T2K_CC0PiNProt_CH_xsec_STV_nu : public MultiDataComparison {
 
 public:
-  T2K_CC0PiNProt_CH_xsec_STV_nu() { ReadGlobalConfigDefaults(); }
-
-  std::string GetDocumentation() {
-    return "Can specify \"projection: <PROJ>\", where <PROJ> is one of [ "
-           "DeltaPT, DeltaPhiT, DeltaAlphaT ] to clarify a projection for "
-           "comparison. Defaults to DeltaPT.\n";
-  }
-
-  fhicl::ParameterSet GetExampleConfiguration() {
-    fhicl::ParameterSet exps =
-        SimpleDataComparison_1D::GetExampleConfiguration();
-
-    exps.put<std::string>("projection", "DeltaPT");
-
-    return exps;
-  }
-
-  NEW_NUIS_EXCEPT(invalid_projection_specifier);
-
-  STVProjection GetProjection(std::string const &pstring) {
-    if ((pstring == "DeltaPT") || (pstring == "deltapt") ||
-        (pstring == "dpt")) {
-      return kDeltaPT;
-    } else if ((pstring == "DeltaPhiT") || (pstring == "deltaphit") ||
-               (pstring == "dphit")) {
-      return kDeltaPhiT;
-    } else if ((pstring == "DeltaAlphaT") || (pstring == "deltaalphat") ||
-               (pstring == "dat")) {
-      return kDeltaAlphaT;
-    }
-    throw invalid_projection_specifier()
-        << "Unknown projection " << std::quoted(pstring)
-        << " for comparison: " << std::quoted(Name());
+  T2K_CC0PiNProt_CH_xsec_STV_nu()
+      : MultiDataComparison("T2K_CC0PiNProt_CH_xsec_STV_nu") {
+    ReadGlobalConfigDefaults();
   }
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
 
-    //! Set the verbosity of the sample logging macros.
-    if (instance_sample_configuration.has_key("verbosity")) {
-      SetSampleVerbosity(
-          instance_sample_configuration.get<std::string>("verbosity"));
-    }
-
-    STVProjection proj =
-        GetProjection(instance_sample_configuration.get<std::string>(
-            "projection", "DeltaPT"));
-
-    //! This will automatically set the data histogram to be loaded.
-    SetData(instance_sample_configuration.get<std::string>("data_specifier"));
-
-    std::string projstr = "";
-    switch (proj) {
-    case kDeltaPT: {
-      projstr = "dpt";
-      break;
-    }
-    case kDeltaPhiT: {
-      projstr = "dphit";
-      break;
-    }
-    case kDeltaAlphaT: {
-      projstr = "dat";
-      break;
-    }
-    }
-
-    SetData(GetDataDir() + "nuA/Nuclear/T2K/CC0Pi/" + projstr +
-            "Results.root;Result");
-
     // Perform any per-sample configuration in the base class
-    SimpleDataComparison_1D::Initialize(instance_sample_configuration);
+    MultiDataComparison::Initialize(instance_sample_configuration);
+
+    std::unique_ptr<SimpleDataComparison_1D> DPT(
+        new SimpleDataComparison_1D("T2K_CC0PiNProt_CH_xsec_STV_nu:dpt"));
+    DPT->SetData(
+        GetDataDir() +
+        "nuA/Nuclear/T2K/CC0Pi/NProt_CH_xsec_STV_nu/dptResults.root;Result");
+    DPT->Initialize(
+        instance_sample_configuration.get<fhicl::ParameterSet>("dpt", {}));
+    DPT->CompProjFunc = [](FullEvent const &fev)
+        -> std::array<double, SimpleDataComparison_1D::NDim> {
+      return {GetDeltaPT_CC0PiN(fev).Mag() * 1E-3};
+    };
+
+    std::unique_ptr<SimpleDataComparison_1D> DAT(
+        new SimpleDataComparison_1D("T2K_CC0PiNProt_CH_xsec_STV_nu:dat"));
+    DAT->SetData(
+        GetDataDir() +
+        "nuA/Nuclear/T2K/CC0Pi/NProt_CH_xsec_STV_nu/datResults.root;Result");
+    DAT->Initialize(
+        instance_sample_configuration.get<fhicl::ParameterSet>("dat", {}));
+    DAT->CompProjFunc = [](FullEvent const &fev)
+        -> std::array<double, SimpleDataComparison_1D::NDim> {
+      return {GetDeltaAlphaT_CC0PiN(fev)};
+    };
+
+    std::unique_ptr<SimpleDataComparison_1D> DPhiT(
+        new SimpleDataComparison_1D("T2K_CC0PiNProt_CH_xsec_STV_nu:dphit"));
+    DPhiT->SetData(
+        GetDataDir() +
+        "nuA/Nuclear/T2K/CC0Pi/NProt_CH_xsec_STV_nu/dphitResults.root;Result");
+    DPhiT->Initialize(
+        instance_sample_configuration.get<fhicl::ParameterSet>("dphit", {}));
+    DPhiT->CompProjFunc = [](FullEvent const &fev)
+        -> std::array<double, SimpleDataComparison_1D::NDim> {
+      return {GetDeltaPhiT_CC0PiN(fev)};
+    };
+
+    std::string wd_stub = write_directory.size() ? write_directory + "/" : "";
+    DPT->write_directory = wd_stub + "dpt";
+    DAT->write_directory = wd_stub + "dat";
+    DPhiT->write_directory = wd_stub + "dphit";
+
+    Comparisons.emplace_back("dpt", std::move(DPT));
+    Comparisons.emplace_back("dat", std::move(DAT));
+    Comparisons.emplace_back("dphit", std::move(DPhiT));
 
     //! Define your event signal here.
     IsSigFunc = [](FullEvent const &fev) -> bool {
-      //! See src/utility/EventTopologyUtility.hxx for more pre-defined
-      //! topological signals.
-      if (!IsCC0Pi(fev)) {
+      // Is numuCC
+      if (GetNParticles(fev, {pdgcodes::kMu}) != 1) {
         return false;
       }
-
-      //! See src/event/FullEvent.hxx for the full event class definition.
-      //! See src/utility/FullEventUtility.hxx for more helper methods for
-      //! interacting with the event class.
-
-      //! Get the initial state muon neutrino
-      Particle ISNumu = GetHMISParticle(fev, {pdgcodes::kNuMu});
-      //! An nuis::event::Particle that return true for !part is invalid and
-      //! does not exist on the particle stack. i.e. here, the selection fails
-      //! if the event didn't have an initial state numubar.
-      if (!ISNumu) {
-        return false;
-      }
-
-      //! Get the final state muon
-      Particle FSMu = GetHMFSParticle(fev, {pdgcodes::kMu});
-      if (!FSMu) {
-        return false;
-      }
-
-      //! Get the highest momentum final state proton
-      Particle FSProton = GetHMFSParticle(fev, {pdgcodes::kProton});
-      if (!FSProton) {
-        return false;
-      }
-
-      //! Cut on kinematic properties of the true final state.
-
-      // Muon phase space
-      // Pmu > 250 MeV, cos(theta_mu) > -0.6 (Sweet phase space!)
-      if ((FSMu.P() < 250) || (cos(ISNumu.P3().Angle(FSMu.P3())) < -0.6)) {
-        return false;
-      }
-
-      // Proton phase space
-      // Pprot > 450 MeV, cos(theta_proton) > 0.4
-      if ((FSProton.P() < 450) || (FSProton.P() > 1E3) ||
-          (cos(ISNumu.P3().Angle(FSProton.P3())) < 0.4)) {
-        return false;
-      }
-
-      //! Select the event!
-      return true;
-    };
-
-    //! 1D Projection function
-    //! This function takes selected events and returns an array of size, the
-    //! dimensionality of the comparisons (SimpleDataComparison_1D::NDim)
-    CompProjFunc = [=](FullEvent const &fev)
-        -> std::array<double, SimpleDataComparison_1D::NDim> {
-      switch (proj) {
-      case kDeltaPT: {
-        return {GetDeltaPT_CC0PiN(fev).Mag() * 1E-3};
-      }
-      case kDeltaPhiT: {
-        return {GetDeltaPhiT_CC0PiN(fev)};
-      }
-      case kDeltaAlphaT: {
-        return {GetDeltaAlphaT_CC0PiN(fev)};
-      }
-      }
-      return {-std::numeric_limits<double>::max()};
+      return t2k::IsCC0Pi_STV(fev);
     };
   }
 
-  std::string Name() { return "T2K_CC0PiNProt_CH_xsec_STV_nu"; }
-
   //! Here you can write any custom histograms to TTrees that your sample has
   //! been handling.
-  void Write() { SimpleDataComparison_1D::Write(); }
+  void Write() {
+    for (auto &comp : Comparisons) {
+      comp.second->Write();
+    }
+  }
 };
 
 //! These declarations allow your class to be loaded dynamically by NUISANCE

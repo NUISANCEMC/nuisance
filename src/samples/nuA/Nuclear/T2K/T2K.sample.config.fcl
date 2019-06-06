@@ -1,1 +1,2 @@
 #include "T2K.CC0Pi.sample.config.fcl"
+#include "T2K.CC1Pi.sample.config.fcl"

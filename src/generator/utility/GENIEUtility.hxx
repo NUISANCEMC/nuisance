@@ -30,6 +30,10 @@ class GHepRecord;
 class GHepParticle;
 } // namespace genie
 
+namespace fhicl {
+  class ParameterSet;
+}
+
 namespace nuis {
 namespace genietools {
 
@@ -41,7 +45,9 @@ TGraph const &GetGENIESpline(std::string const &SplineFile,
 event::Channel_t GetEventChannel(genie::GHepRecord const &);
 
 event::Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
-                                              event::Channel_t chan);
+                                            event::Channel_t chan);
+
+double GetFileWeight(fhicl::ParameterSet const &xsecinfo);
 
 } // namespace genietools
 } // namespace nuis

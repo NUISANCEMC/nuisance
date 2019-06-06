@@ -1,0 +1,9 @@
+global.sample_configuration.MINERvA_CC0PiNProt_CH_xsec_STV_nu: {
+  journal_reference: ""
+  doi: ""
+  target_material: "CH"
+  flux_description: "MINERvA Medium Energy FHC muon neutrino"
+  signal_description: "CC0Pi + N protons"
+  shape_only: false
+  flux_unfolded: false
+}

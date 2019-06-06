@@ -21,6 +21,10 @@ NEW_NUIS_EXCEPT(WriteToOutputFile_nullptr);
 /// CREATE}
 std::unique_ptr<TFile> &GetOutputFile(std::string const &name = "default");
 
+void NewStream(std::string const &name = "default",
+               std::string file_name = "default.nuis.root",
+               std::string opts = "CREATE");
+
 template <typename T>
 inline void WriteToOutputFile(T *object, std::string const &object_name,
                               std::string dir_name = "",

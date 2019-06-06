@@ -1,5 +1,4 @@
 SET(DATA_INSTALL_DIR ${DATA_INSTALL_DIR}/CC0Pi)
 
-FILE(GLOB DATA_FILES *.root)
-
-install(FILES ${DATA_FILES} DESTINATION ${DATA_INSTALL_DIR})
+add_subdirectory(NProt_CH_xsec_STV_nu)
+add_subdirectory(H20_xsec_2Dpcthetamu_numubar)

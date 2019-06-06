@@ -33,11 +33,11 @@
 #include "Ntuple/NtpMCEventRecord.h"
 #endif
 
-#include <memory>
-
 namespace fhicl {
-class ParameterSet;
+  class ParameterSet;
 }
+
+#include <memory>
 
 class GENIEInputHandler : public IInputHandler {
   mutable nuis::utility::TreeFile fInputTree;
@@ -47,6 +47,8 @@ class GENIEInputHandler : public IInputHandler {
 
   bool fKeepIntermediates;
   bool fKeepNuclearParticles;
+
+  double fFileWeight;
 
 public:
   NEW_NUIS_EXCEPT(weight_cache_miss);

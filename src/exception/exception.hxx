@@ -1,5 +1,4 @@
-#ifndef EXCEPTION_EXCEPTION_SEEN
-#define EXCEPTION_EXCEPTION_SEEN
+#pragma once
 
 #include <sstream>
 #include <stdexcept>
@@ -36,5 +35,3 @@ struct nuis_except : public std::exception {
       return (*this);                                                          \
     }                                                                          \
   }
-
-#endif

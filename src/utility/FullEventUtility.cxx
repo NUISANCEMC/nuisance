@@ -3,6 +3,7 @@
 #include "event/FullEvent.hxx"
 
 #include "utility/PDGCodeUtility.hxx"
+#include "utility/PhaseSpaceRestriction.hxx"
 
 using namespace nuis::event;
 
@@ -165,6 +166,130 @@ Particle GetHMFSNucleon(FullEvent const &ev) {
 }
 Particle GetHMFSOther(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::CommonParticles,
+                       Particle::Status_t::kNuclearLeaving, false);
+}
+
+Particle GetHMParticleInPhaseSpace(FullEvent const &ev,
+                                   std::vector<PDG_t> const &pdgs,
+                                   IParticlePhaseSpaceRestriction const &ps,
+                                   Particle::Status_t status,
+                                   bool include_matching_pdg) {
+  Particle HMParticle;
+  for (auto const &parts : ev.ParticleStack) {
+    if (parts.status != status) {
+      continue;
+    }
+    for (Particle const &part : parts.particles) {
+      if (!ps.Inside(part)) {
+        continue;
+      }
+      bool matched_pdg = false;
+      for (PDG_t pdg : pdgs) {
+        matched_pdg = matched_pdg || (part.pdg == pdg);
+      }
+      bool keep = ((include_matching_pdg && matched_pdg) ||
+                   (!include_matching_pdg && !matched_pdg));
+      if (!keep) {
+        continue;
+      }
+      if (part.P() > HMParticle.P()) {
+        HMParticle = part;
+      }
+    }
+  }
+  return HMParticle;
+}
+
+Particle GetHMFSProtonInPhaseSpace(FullEvent const &ev,
+                                   IParticlePhaseSpaceRestriction const &ps) {
+  return GetHMParticleInPhaseSpace(ev, pdgcodes::Protons, ps);
+}
+
+size_t GetNParticles(FullEvent const &ev, std::vector<PDG_t> const &pdgs,
+                     Particle::Status_t status, bool include_matching_pdg) {
+  size_t N = 0;
+  for (auto const &parts : ev.ParticleStack) {
+    if (parts.status != status) {
+      continue;
+    }
+    for (Particle const &part : parts.particles) {
+      bool matched_pdg = false;
+      for (PDG_t pdg : pdgs) {
+        matched_pdg = matched_pdg || (part.pdg == pdg);
+      }
+      bool keep = ((include_matching_pdg && matched_pdg) ||
+                   (!include_matching_pdg && !matched_pdg));
+      if (!keep) {
+        continue;
+      }
+      N++;
+    }
+  }
+  return N;
+}
+
+size_t GetNParticlesInPhaseSpace(FullEvent const &ev,
+                                 std::vector<PDG_t> const &pdgs,
+                                 IParticlePhaseSpaceRestriction const &ps,
+                                 Particle::Status_t status,
+                                 bool include_matching_pdg) {
+  size_t N = 0;
+  for (auto const &parts : ev.ParticleStack) {
+    if (parts.status != status) {
+      continue;
+    }
+    for (Particle const &part : parts.particles) {
+      if (!ps.Inside(part)) {
+        continue;
+      }
+      bool matched_pdg = false;
+      for (PDG_t pdg : pdgs) {
+        matched_pdg = matched_pdg || (part.pdg == pdg);
+      }
+      bool keep = ((include_matching_pdg && matched_pdg) ||
+                   (!include_matching_pdg && !matched_pdg));
+      if (!keep) {
+        continue;
+      }
+      N++;
+    }
+  }
+  return N;
+}
+
+size_t GetNFSChargedLeptons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::ChargedLeptons);
+}
+size_t GetNFSNeutralLeptons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::NeutralLeptons);
+}
+size_t GetNFSLeptons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::Leptons);
+}
+size_t GetNISNeutralLeptons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::NeutralLeptons,
+                       Particle::Status_t::kPrimaryInitialState);
+}
+size_t GetNFSChargedPions(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::ChargedPions);
+}
+size_t GetNFSNeutralPions(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::NeutralPions);
+}
+size_t GetNFSPions(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::Pions);
+}
+size_t GetNFSProtons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::Protons);
+}
+size_t GetNFSNeutrons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::Neutron);
+}
+size_t GetNFSNucleons(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::Nucleons);
+}
+size_t GetNFSOthers(FullEvent const &ev) {
+  return GetNParticles(ev, pdgcodes::CommonParticles,
                        Particle::Status_t::kNuclearLeaving, false);
 }
 

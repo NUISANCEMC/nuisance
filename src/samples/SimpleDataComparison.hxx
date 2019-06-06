@@ -46,14 +46,17 @@ class SimpleDataComparison : public IDataComparison {
   NEW_NUIS_EXCEPT(invalid_SimpleDataComparison_initialization);
   NEW_NUIS_EXCEPT(SimpleDataComparison_already_finalized);
 
+public:
+  static size_t const NDim = nd;
+  std::string write_directory;
+
 protected:
   using HistType = HT;
   using TH_Help = typename nuis::utility::TH_Helper<HistType>;
-
-  static size_t const NDim = nd;
-
   nuis::input::InputManager::Input_id_t fIH_id;
-  std::string write_directory;
+
+  std::string fName;
+
   size_t NMaxSample_override;
   int fIsShapeOnly;
   int fIsFluxUnfolded;
@@ -61,6 +64,7 @@ protected:
   std::vector<bool> fSignalCache;
   std::vector<std::array<NumericT, NDim>> fProjectionCache;
   bool fUseCache;
+  bool fModeHists;
 
   std::string fDataInputDescriptor;
   std::unique_ptr<HistType> fData;
@@ -69,6 +73,7 @@ protected:
   std::string fCovarianceInputDescriptor;
   std::unique_ptr<TH2> fCovariance;
   std::unique_ptr<HistType> fPrediction;
+  std::map<nuis::event::Channel_t, std::unique_ptr<HistType>> fPrediction_modes;
   std::unique_ptr<HistType> fPrediction_xsec;
   std::unique_ptr<HistType> fPrediction_shape;
   std::unique_ptr<HistType> fPrediction_comparison;
@@ -81,11 +86,9 @@ protected:
   std::string fFluxDescription;
   std::string fSignalDescription;
 
-  nuis::utility::ENuRange energy_cut;
+  nuis::utility::KinematicRange energy_cut;
 
   std::function<bool(nuis::event::FullEvent const &)> IsSigFunc;
-  std::function<std::array<NumericT, NDim>(nuis::event::FullEvent const &)>
-      CompProjFunc;
 
   // If assigned by subclass will be called on for all events, bool signifies
   // whether the event was selected.
@@ -93,7 +96,11 @@ protected:
       ProcessExtraFunc;
 
 public:
-  SimpleDataComparison() {
+  std::function<std::array<NumericT, NDim>(nuis::event::FullEvent const &)>
+      CompProjFunc;
+
+  SimpleDataComparison(std::string name) {
+    fName = std::move(name);
     fIH_id = std::numeric_limits<nuis::input::InputManager::Input_id_t>::max();
     fUseCache = false;
     write_directory = "";
@@ -131,9 +138,11 @@ public:
     fIsShapeOnly = -1;
     fIsFluxUnfolded = -1;
 
-    energy_cut = nuis::utility::ENuRange{std::numeric_limits<double>::max(),
-                                         std::numeric_limits<double>::max()};
+    energy_cut = nuis::utility::KinematicRange{
+        std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};
   }
+
+  std::string Name() { return fName; }
 
   void SetUseCache(bool uc = true) {
     fUseCache = uc;
@@ -214,6 +223,26 @@ public:
                               NumericT event_weight) {
     TH_Help::Fill(fPrediction, proj, event_weight);
   }
+  virtual void FillModeProjection(std::array<NumericT, NDim> const &proj,
+                                  NumericT event_weight,
+                                  nuis::event::Channel_t mode) {
+    if (!fPrediction_modes.count(mode)) {
+      std::stringstream ss;
+      ss << "Prediction_" << mode;
+      fPrediction_modes[mode] =
+          nuis::utility::Clone(fPrediction, true, ss.str());
+    }
+    TH_Help::Fill(fPrediction_modes[mode], proj, event_weight);
+  }
+
+  virtual void ProcessSignalEvent(nuis::event::FullEvent const &fev,
+                                  double weight = 1) {
+    auto const &proj = CompProjFunc(fev);
+    FillProjection(proj, weight);
+    if (fModeHists) {
+      FillModeProjection(proj, weight, fev.mode);
+    }
+  }
 
   virtual void FinalizeComparison() {
     if (fComparisonFinalized) {
@@ -225,13 +254,16 @@ public:
     fPrediction_xsec =
         nuis::utility::Clone(fPrediction, false, "Prediction_xsec");
 
-    IInputHandler const &IH =
-        nuis::input::InputManager::Get().GetInputHandler(fIH_id);
-
     TH_Help::Scale(fPrediction_xsec, 1.0, "width");
-
+    if (fModeHists) {
+      for (auto &mh : fPrediction_modes) {
+        TH_Help::Scale(mh.second, 1.0, "width");
+      }
+    }
     // If we have a flux cut
     if (energy_cut.first != std::numeric_limits<double>::max()) {
+      IInputHandler const &IH =
+          nuis::input::InputManager::Get().GetInputHandler(fIH_id);
       TH_Help::Scale(fPrediction_xsec, IH.GetXSecScaleFactor(energy_cut));
     }
 
@@ -328,20 +360,20 @@ public:
       SetSampleVerbosity(fInstanceConfig.get<std::string>("verbosity"));
     }
 
+    fModeHists = fInstanceConfig.get<bool>("write_mode_hists", false);
+
     NMaxSample_override =
         fInstanceConfig.get<size_t>("nmax", std::numeric_limits<size_t>::max());
 
     write_directory =
         fInstanceConfig.get<std::string>("write_directory", Name());
-
-    fIH_id =
-        nuis::input::InputManager::Get().EnsureInputLoaded(fInstanceConfig);
   }
 
   void ProcessSample(size_t nmax = std::numeric_limits<size_t>::max()) {
     if (fIH_id ==
         std::numeric_limits<nuis::input::InputManager::Input_id_t>::max()) {
-      throw uninitialized_IEventProcessor();
+      fIH_id =
+          nuis::input::InputManager::Get().EnsureInputLoaded(fInstanceConfig);
     }
     IInputHandler const &IH =
         nuis::input::InputManager::Get().GetInputHandler(fIH_id);
@@ -381,6 +413,10 @@ public:
           ProcessExtraFunc(fev, is_sig,
                            IH.GetEventWeight(ev_idx) * nmax_scaling);
         }
+        if (fModeHists && is_sig) {
+          FillModeProjection(proj, IH.GetEventWeight(ev_idx) * nmax_scaling,
+                             fev.mode);
+        }
       } else {
         is_sig = fSignalCache[ev_idx];
         proj = fProjectionCache[cache_ctr++];
@@ -407,6 +443,12 @@ public:
 
     nuis::persistency::WriteToOutputFile<HistType>(
         fPrediction_comparison, "Prediction", write_directory);
+    if (fModeHists) {
+      for (auto &mh : fPrediction_modes) {
+        nuis::persistency::WriteToOutputFile<HistType>(
+            mh.second, mh.second->GetName(), write_directory);
+      }
+    }
     nuis::persistency::WriteToOutputFile<HistType>(
         fPrediction_xsec, "Prediction_xsec", write_directory);
 

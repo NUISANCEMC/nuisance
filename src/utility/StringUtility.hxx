@@ -17,18 +17,27 @@
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef UTILITY_STRINGUTILITY_HXX_SEEN
-#define UTILITY_STRINGUTILITY_HXX_SEEN
+#pragma once
 
 #include "utility/TerminalUtility.hxx"
 
 #include <string>
+#include <vector>
+#include <regex>
 
 namespace nuis {
 namespace utility {
-std::string indent_apply_width(std::string,
-                               size_t indent = 0, size_t width = GetWindowWidth());
-}
-} // namespace nuis
 
-#endif
+std::string EnsureTrailingSlash(std::string str);
+std::string parseCode(std::regex_constants::error_type etype);
+std::string DeGlobPattern(std::string const &pattern);
+
+std::string indent_apply_width(std::string, size_t indent = 0,
+                               size_t width = GetWindowWidth());
+
+std::vector<std::string> split(std::string const &str,
+                               std::string const &delim);
+std::vector<std::string> split(std::string const &str,
+                               std::vector<std::string> const &delims);
+} // namespace utility
+} // namespace nuis

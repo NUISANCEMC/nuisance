@@ -98,10 +98,21 @@ public:
   //
   // IEventProcessors are not required to implement processing events from
   // 'outside'.
-  virtual void ProcessEvent(nuis::event::FullEvent const &) {
+  virtual void ProcessEvent(nuis::event::FullEvent const &, double weight = 1) {
     throw unimplemented_IEventProcessor_optional_method()
         << "[ERROR]: IEventProcessor " << Name()
         << " does not implement ProcessEvent.";
+  }
+
+  // Interface for processing a pre-selected single, external event
+  //
+  // IEventProcessors are not required to implement processing events from
+  // 'outside'.
+  virtual void ProcessSignalEvent(nuis::event::FullEvent const &,
+                                  double weight = 1) {
+    throw unimplemented_IEventProcessor_optional_method()
+        << "[ERROR]: IEventProcessor " << Name()
+        << " does not implement ProcessSignalEvent.";
   }
 
   virtual void

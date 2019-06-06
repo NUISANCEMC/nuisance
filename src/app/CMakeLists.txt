@@ -2,7 +2,7 @@ SET(APPS nuissamples nuiscomp nuisevsum nuisstudy)
 
 foreach(a ${APPS})
   add_executable(${a} ${a}.cxx)
-  target_link_libraries(${a} -Wl,--no-as-needed nuis_event nuis_input nuis_utility nuis_config nuis_persistency nuis_plugins nuis_params nuis_variation)
+  target_link_libraries(${a} -Wl,--no-as-needed nuis_event nuis_input nuis_utility_experimental nuis_utility nuis_config nuis_persistency nuis_plugins nuis_params nuis_variation)
   target_link_libraries(${a} ${GENERATOR_DEPENDENT_TARGETS} -Wl,--as-needed)
   target_link_libraries(${a} ${NUISANCE_LINK_DIRS})
   target_link_libraries(${a} ${NUISANCE_DEPEND_LIBS})

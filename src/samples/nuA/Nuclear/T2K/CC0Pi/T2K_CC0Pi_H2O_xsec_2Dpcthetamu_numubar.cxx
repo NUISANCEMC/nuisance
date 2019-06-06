@@ -39,7 +39,10 @@ class T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar
   std::unique_ptr<HistType> fPrediction_unscale;
 
 public:
-  T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar() { ReadGlobalConfigDefaults(); }
+  T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar()
+      : SimpleDataComparison_2DPoly("T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar") {
+    ReadGlobalConfigDefaults();
+  }
 
   std::string GetDocumentation() { return ""; }
   fhicl::ParameterSet GetExampleConfiguration() {
@@ -129,8 +132,6 @@ public:
       TH_Helper<TH1>::Fill(fPrediction_ctheta, {FSMuPlus.CosTheta()}, weight);
     };
   }
-
-  std::string Name() { return "T2K_CC0Pi_H2O_xsec_2Dpcthetamu_numubar"; }
 
   void Write() {
     SimpleDataComparison_2DPoly::Write();
