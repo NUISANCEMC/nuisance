@@ -66,6 +66,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include(${CMAKE_SOURCE_DIR}/cmake/fhiclcppSetup.cmake)
 
 ################################## COMPILER ####################################
+include(${CMAKE_SOURCE_DIR}/cmake/gperfSetup.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/c++CompilerSetup.cmake)
 
 ################################################################################

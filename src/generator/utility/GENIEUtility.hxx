@@ -23,6 +23,8 @@
 
 #include "event/types.hxx"
 
+#include <set>
+
 class TGraph;
 
 namespace genie {
@@ -39,15 +41,13 @@ namespace genietools {
 
 NEW_NUIS_EXCEPT(invalid_GENIE_event);
 
-TGraph const &GetGENIESpline(std::string const &SplineFile,
-                             std::string const &SplineIdentifier);
-
 event::Channel_t GetEventChannel(genie::GHepRecord const &);
 
 event::Particle::Status_t GetParticleStatus(genie::GHepParticle const &p,
                                             event::Channel_t chan);
 
-double GetFileWeight(fhicl::ParameterSet const &xsecinfo);
+double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
+                     std::set<std::string> const &spline_list = {});
 
 } // namespace genietools
 } // namespace nuis

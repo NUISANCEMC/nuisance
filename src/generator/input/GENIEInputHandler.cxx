@@ -28,6 +28,39 @@ GENIEInputHandler::GENIEInputHandler(GENIEInputHandler &&other)
       fReaderEvent(std::move(other.fReaderEvent)), fGenieNtpl(nullptr),
       fFileWeight(1) {}
 
+std::set<std::string> GENIEInputHandler::GetSplineList() {
+  std::set<std::string> splinenames;
+  size_t NEvents = 1000; // GetNEvents();
+  size_t ShoutEvery = NEvents / 100;
+  std::cout << "[INFO]: Read " << 0 << "/" << NEvents << " GENIE events."
+            << std::flush;
+  for (size_t ev_it = 0; ev_it < NEvents; ++ev_it) {
+    if (fGenieNtpl) {
+      fGenieNtpl->Clear();
+    }
+    fInputTree.tree->GetEntry(ev_it);
+
+    if (ShoutEvery && !(ev_it % ShoutEvery)) {
+      std::cout << "\r[INFO]: Read " << ev_it << "/" << NEvents
+                << " GENIE events." << std::flush;
+    }
+
+    genie::GHepRecord *GHep =
+        static_cast<genie::GHepRecord *>(fGenieNtpl->event);
+    if (!GHep) {
+      throw invalid_GENIE_event() << "[ERROR]: GENIE event " << ev_it
+                                  << " failed to contain a GHepRecord";
+    }
+    splinenames.insert(GHep->Summary()->AsString());
+  }
+  std::cout << "[INFO]: Having read GENIE events, found " << splinenames.size()
+            << " splines: " << std::endl;
+  for (auto const &sn : splinenames) {
+    std::cout << "\t" << sn << std::endl;
+  }
+  return splinenames;
+}
+
 void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fInputTree = CheckGetTTree(ps.get<std::string>("file"), "gtree");
@@ -43,24 +76,41 @@ void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
     std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
               << std::endl;
   } else if (XSecInfo.has_key("flux") || XSecInfo.has_key("target") ||
-             XSecInfo.has_key("spline_file")) {
+             XSecInfo.has_key("spline_file") ||
+             XSecInfo.has_key("filter_splines_by_event_tree")) {
     std::cout
         << "[INFO]: Attempting to build GENIE file weight with input splines."
         << std::endl;
-    fFileWeight = genietools::GetFileWeight(XSecInfo) / double(GetNEvents());
+
+    if (XSecInfo.get<bool>("filter_splines_by_event_tree", false)) {
+      std::cout << "[INFO]: Ensuring we only read relevant splines... this "
+                   "will take a while."
+                << std::endl;
+      fFileWeight = genietools::GetFileWeight(XSecInfo, GetSplineList()) /
+                    double(GetNEvents());
+    } else {
+      fFileWeight = genietools::GetFileWeight(XSecInfo) / double(GetNEvents());
+    }
     std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
               << std::endl;
   }
 }
 
-MinimalEvent const &GENIEInputHandler::GetMinimalEvent(ev_index_t idx) const {
+void GENIEInputHandler::GetEntry(ev_index_t idx) const {
   if (idx >= GetNEvents()) {
     throw IInputHandler::invalid_entry()
         << "[ERROR]: Attempted to get entry " << idx
         << " from an InputHandler with only " << GetNEvents();
   }
 
+  if (fGenieNtpl) {
+    fGenieNtpl->Clear();
+  }
   fInputTree.tree->GetEntry(idx);
+}
+
+MinimalEvent const &GENIEInputHandler::GetMinimalEvent(ev_index_t idx) const {
+  GetEntry(idx);
 
   genie::GHepRecord *GHep = static_cast<genie::GHepRecord *>(fGenieNtpl->event);
   if (!GHep) {

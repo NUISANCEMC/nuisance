@@ -15,4 +15,5 @@ SET(INuADataComparisons_FHiCL ${INuADataComparisons_FHiCL} PARENT_SCOPE)
 
 SET(GENERATOR_DEPENDENT_TARGETS ${GENERATOR_DEPENDENT_TARGETS} PARENT_SCOPE)
 
+add_subdirectory(tests)
 add_subdirectory(app)

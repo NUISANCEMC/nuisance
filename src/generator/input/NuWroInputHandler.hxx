@@ -52,6 +52,7 @@ public:
   NuWroInputHandler(NuWroInputHandler &&);
 
   void Initialize(fhicl::ParameterSet const &);
+  void GetEntry(ev_index_t) const;
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
 

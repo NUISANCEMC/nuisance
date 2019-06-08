@@ -35,6 +35,7 @@ namespace utility {
 
 NEW_NUIS_EXCEPT(failed_to_open_TFile);
 NEW_NUIS_EXCEPT(failed_to_get_TTree);
+NEW_NUIS_EXCEPT(WriteToTFile_nullptr);
 
 inline void CloseTFile(TFile *f = nullptr) {
   if (f) {
@@ -157,6 +158,22 @@ inline TreeFile AddNewTTreeToFile(TFile *f, std::string const &tname,
 }
 
 inline std::string SanitizeROOTObjectName(std::string name) { return name; }
+
+inline void WriteToTFile(TFile_ptr &tf, TObject *object,
+                         std::string const &object_name) {
+  if (!object) {
+    throw WriteToTFile_nullptr();
+  }
+
+  TDirectory *ogdir = gDirectory;
+
+  tf->cd();
+  object->Write(object_name.c_str(), TObject::kOverwrite);
+
+  if (ogdir) {
+    ogdir->cd();
+  }
+}
 
 } // namespace utility
 } // namespace nuis

@@ -164,13 +164,17 @@ NeutVect *NEUTInputHandler::GetNeutEvent(ev_index_t idx) const {
   return fNeutVect;
 }
 
-MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
+void NEUTInputHandler::GetEntry(ev_index_t idx) const {
   if (idx >= GetNEvents()) {
     throw IInputHandler::invalid_entry()
         << "[ERROR]: Attempted to get entry " << idx
         << " from an InputHandler with only " << GetNEvents();
   }
   fInputTreeFile.tree->GetEntry(idx);
+}
+
+MinimalEvent const &NEUTInputHandler::GetMinimalEvent(ev_index_t idx) const {
+  GetEntry(idx);
 
   fReaderEvent.mode = IntToChannel(fNeutVect->Mode);
 

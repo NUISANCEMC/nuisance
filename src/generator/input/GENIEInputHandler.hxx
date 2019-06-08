@@ -38,6 +38,7 @@ namespace fhicl {
 }
 
 #include <memory>
+#include <set>
 
 class GENIEInputHandler : public IInputHandler {
   mutable nuis::utility::TreeFile fInputTree;
@@ -58,10 +59,12 @@ public:
   GENIEInputHandler(GENIEInputHandler &&);
 
   void Initialize(fhicl::ParameterSet const &);
+  void GetEntry(ev_index_t) const;
   nuis::event::MinimalEvent const &GetMinimalEvent(ev_index_t idx) const;
   nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const;
   double GetEventWeight(ev_index_t idx) const;
   size_t GetNEvents() const;
+  std::set<std::string> GetSplineList();
 
   double GetXSecScaleFactor(std::pair<double, double> const &EnuRange) const;
 

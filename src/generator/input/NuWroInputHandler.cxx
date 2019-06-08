@@ -27,12 +27,14 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 
-  if(GetNEvents()){
+  if (GetNEvents()) {
     fInputTree.tree->GetEntry(0);
-    std::cout << "[INFO]: Average NuWro XSec weight: " << (fTreeEvent->weight / double(GetNEvents())) << std::endl;
+    std::cout << "[INFO]: Average NuWro XSec weight: "
+              << (fTreeEvent->weight / double(GetNEvents())) << std::endl;
   }
 }
-MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
+
+void NuWroInputHandler::GetEntry(ev_index_t idx) const {
   if (idx >= GetNEvents()) {
     throw IInputHandler::invalid_entry()
         << "[ERROR]: Attempted to get entry " << idx
@@ -40,6 +42,9 @@ MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
   }
 
   fInputTree.tree->GetEntry(idx);
+}
+
+MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
 
   fReaderEvent.mode = NuWroEventChannel(*fTreeEvent);
   fReaderEvent.probe_E = fTreeEvent->in[0].E();

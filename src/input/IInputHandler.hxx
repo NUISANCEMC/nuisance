@@ -93,6 +93,7 @@ public:
   typedef size_t ev_index_t;
 
   virtual void Initialize(fhicl::ParameterSet const &) = 0;
+  virtual void GetEntry(ev_index_t) const = 0;
   virtual nuis::event::MinimalEvent const &
   GetMinimalEvent(ev_index_t idx) const = 0;
   virtual nuis::event::FullEvent const &GetFullEvent(ev_index_t idx) const = 0;

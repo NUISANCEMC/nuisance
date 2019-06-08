@@ -20,10 +20,10 @@
 #include "generator/utility/GENIEUtility.hxx"
 #include "generator/utility/GENIESplineReader.hxx"
 #include "utility/HistogramUtility.hxx"
-#include "utility/StringUtility.hxx"
-
 #include "utility/InteractionChannelUtility.hxx"
 #include "utility/PDGCodeUtility.hxx"
+#include "utility/ROOTUtility.hxx"
+#include "utility/StringUtility.hxx"
 
 #ifdef GENIE_V3_INTERFACE
 #include "Framework/GHEP/GHepParticle.h"
@@ -48,18 +48,6 @@ namespace nuis {
 using namespace event;
 
 namespace genietools {
-
-static std::map<std::string, TGraph> SplineCache;
-
-TGraph dum;
-
-TGraph const &GetGENIESpline(std::string const &SplineFile,
-                             std::string const &SplineIdentifier) {
-  if (SplineCache.find(SplineFile + SplineIdentifier) != SplineCache.end()) {
-    return SplineCache.find(SplineFile + SplineIdentifier)->second;
-  }
-  return dum;
-}
 
 struct NFSParticleCount {
   size_t NProton;
@@ -311,7 +299,8 @@ struct TargetSplineBlob {
 
 NEW_NUIS_EXCEPT(Invalid_target_specifier);
 
-double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
+double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
+                     std::set<std::string> const &spline_list) {
   double mec_scale = xsecinfo.get<double>("mec_scale", 1);
   double EMin = xsecinfo.get<double>("EMin", 0);
   double EMax = xsecinfo.get<double>("EMax", 10);
@@ -372,7 +361,7 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
 
     TargetSplines[ts_it].TotSpline = TGraph(NKnots);
 
-    for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+    for (size_t p_it = 0; p_it < NKnots; ++p_it) {
       TargetSplines[ts_it].TotSpline.SetPoint(p_it, EMin + p_it * step, 0);
     }
 
@@ -388,7 +377,7 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
           weight *= mec_scale;
         }
       }
-      for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+      for (size_t p_it = 0; p_it < NKnots; ++p_it) {
         double E, XSec;
         TargetSplines[ts_it].TotSpline.GetPoint(p_it, E, XSec);
 
@@ -409,17 +398,31 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
   // Sum all the correctly weighted per-target splines
   TGraph MasterSpline(NKnots);
 
-  for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+  for (size_t p_it = 0; p_it < NKnots; ++p_it) {
     MasterSpline.SetPoint(p_it, EMin + p_it * step, 0);
   }
   for (size_t c_it = 0; c_it < TargetSplines.size(); ++c_it) {
-    for (Int_t p_it = 0; p_it < NKnots; ++p_it) {
+    for (size_t p_it = 0; p_it < NKnots; ++p_it) {
       double E, XSec;
       MasterSpline.GetPoint(p_it, E, XSec);
       XSec += TargetSplines[c_it].TotSpline.Eval(E) * WeightToPerNucleon;
 
       MasterSpline.SetPoint(p_it, E, XSec);
     }
+  }
+
+  nuis::utility::TFile_ptr outfile(nullptr, [](TFile *) {});
+  if (xsecinfo.has_key("spline_output_file")) {
+    outfile = nuis::utility::CheckOpenTFile(
+        xsecinfo.get<std::string>("spline_output_file"), "RECREATE");
+
+    for (auto &sp : TargetSplines) {
+      std::string spname = nuis::utility::SanitizeROOTObjectName(
+          sp.search_term.substr(2, sp.search_term.length() - 4));
+      std::cout << "[INFO]: Dumping spline: " << spname << std::endl;
+      nuis::utility::WriteToTFile(outfile, &sp.TotSpline, spname.c_str());
+    }
+    nuis::utility::WriteToTFile(outfile, &MasterSpline, "TotalXSec");
   }
 
   fhicl::ParameterSet fluxps = xsecinfo.get<fhicl::ParameterSet>("flux");
@@ -434,6 +437,12 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
     // weighting
     std::unique_ptr<TH1> Flux =
         nuis::utility::GetHistogram<TH1>(fluxps.get<std::string>("histogram"));
+
+    if (outfile) {
+      std::unique_ptr<TH1> Fluxcp = nuis::utility::Clone<TH1>(Flux);
+      nuis::utility::WriteToTFile(outfile, Fluxcp.get(), "Flux");
+    }
+
     bool per_width = fluxps.get<bool>("is_divided_by_bin_width", true);
     double FluxIntegral = Flux->Integral(per_width ? "width" : "");
 
@@ -453,6 +462,11 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo) {
       avg_xsec /= double(NIntSteps);
 
       Flux->SetBinContent(bi_it + 1, bc * avg_xsec);
+    }
+
+    if (outfile) {
+      std::unique_ptr<TH1> Fluxcp = nuis::utility::Clone<TH1>(Flux);
+      nuis::utility::WriteToTFile(outfile, Fluxcp.get(), "EvRate");
     }
 
     double EvRateIntegral = Flux->Integral(per_width ? "width" : "");
