@@ -38,4 +38,6 @@ cmessage(STATUS "     Flags     : ${NUWRO_CXX_FLAGS}")
 cmessage(STATUS "     Includes  : ${NUWRO_INCLUDE_DIRS}")
 cmessage(STATUS "     SOs       : ${NUWRO_IMPORTED_TARGETS}")
 
-INSTALL(FILES ${NUWRO}/src/event1dict_rdict.pcm DESTINATION lib)
+if(USE_ROOT6)
+  INSTALL(FILES ${NUWRO}/src/event1dict_rdict.pcm DESTINATION lib)
+endif()

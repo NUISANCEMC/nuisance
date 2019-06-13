@@ -23,8 +23,6 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fInputTree = CheckGetTTree(ps.get<std::string>("file"), "treeout");
 
   fTreeEvent = nullptr;
-  fInputTree.tree->SetBranchStatus("*",false);
-  fInputTree.tree->SetBranchStatus("e",true);
   fInputTree.tree->SetBranchAddress("e", &fTreeEvent);
   fInputTree.tree->GetBranch("e")->SetAutoDelete(true);
 
@@ -49,6 +47,7 @@ void NuWroInputHandler::GetEntry(ev_index_t idx) const {
 }
 
 MinimalEvent const &NuWroInputHandler::GetMinimalEvent(ev_index_t idx) const {
+  GetEntry(idx);
 
   fReaderEvent.mode = NuWroEventChannel(*fTreeEvent);
   fReaderEvent.probe_E = fTreeEvent->in[0].E();
