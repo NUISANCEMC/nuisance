@@ -28,7 +28,10 @@ void NEUTInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fInputTreeFile = CheckGetTTree(ps.get<std::string>("file"), "neuttree");
 
   fNeutVect = nullptr;
+  fInputTreeFile.tree->SetBranchStatus("*",false);
+  fInputTreeFile.tree->SetBranchStatus("vectorbranch",true);
   fInputTreeFile.tree->SetBranchAddress("vectorbranch", &fNeutVect);
+  fInputTreeFile.tree->GetBranch("vectorbranch")->SetAutoDelete(true);
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 

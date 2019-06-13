@@ -23,7 +23,11 @@ void NuWroInputHandler::Initialize(fhicl::ParameterSet const &ps) {
   fInputTree = CheckGetTTree(ps.get<std::string>("file"), "treeout");
 
   fTreeEvent = nullptr;
+  fInputTree.tree->SetBranchStatus("*",false);
+  fInputTree.tree->SetBranchStatus("e",true);
   fInputTree.tree->SetBranchAddress("e", &fTreeEvent);
+  fInputTree.tree->GetBranch("e")->SetAutoDelete(true);
+
 
   fKeepIntermediates = ps.get<bool>("keep_intermediates", false);
 
