@@ -366,16 +366,25 @@ GetHistogramFromROOTFile(TFile_ptr &f, std::string const &hname,
                          bool ThrowIfMissing = true) {
 
   TObject *obj = f->Get(hname.c_str());
-  if(std::string(obj->ClassName()) == "TList"){
-    obj = static_cast<TList *>(obj)->At(0);
-  }
-
-  HT *h = dynamic_cast<HT *>(obj);
-  if (!h) {
+  if (!obj) {
     if (ThrowIfMissing) {
       throw invalid_histogram_name()
           << "[ERROR]: Failed to get " << TH_Helper<HT>::name() << " named "
           << std::quoted(hname) << " from input file "
+          << std::quoted(f->GetName());
+    } else {
+      return nullptr;
+    }
+  }
+  if (std::string(obj->ClassName()) == "TList") {
+    obj = static_cast<TList *>(obj)->At(0);
+  }
+  HT *h = dynamic_cast<HT *>(obj);
+  if (!h) {
+    if (ThrowIfMissing) {
+      throw invalid_histogram_name()
+          << "[ERROR]: Failed to cast " << std::quoted(hname) << " to "
+          << TH_Helper<HT>::name() << " from input file "
           << std::quoted(f->GetName());
     } else {
       return nullptr;

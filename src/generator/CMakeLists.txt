@@ -1,6 +1,9 @@
 add_subdirectory(input)
 add_subdirectory(utility)
-add_subdirectory(variation)
+
+if(DEFINED USE_GENERATOR_REWEIGHT AND USE_GENERATOR_REWEIGHT)
+  add_subdirectory(variation)
+endif()
 
 SET(input_implementation_files
   GeneratorManager.cxx)

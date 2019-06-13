@@ -51,14 +51,6 @@ LIST(APPEND NEUT_LINK_DIRS
   ${NEUT_LIB_DIR}
   ${CERN}/${CERN_LEVEL}/lib)
 
-if(USE_GENERATOR_REWEIGHT)
-  LIST(APPEND NEUT_INCLUDE_DIRS
-    ${NEUT_ROOT}/src/reweight)
-  LIST(APPEND NEUT_LINK_DIRS
-    ${NEUT_ROOT}/src/reweight)
-  LIST(APPEND NEUT_LIBS NReWeight)
-endif()
-
 
 if(${NEUT_VERSION} VERSION_GREATER 5.4.1.999)
   LIST(APPEND NEUT_LIBS
@@ -83,7 +75,6 @@ elseif(${NEUT_VERSION} VERSION_GREATER 5.3.999)
     N1p1h_5.4.0)
 else()
   LIST(APPEND NEUT_LIBS
-    NReWeight
     neutcore
     nuccorrspl
     nuceff
@@ -99,6 +90,14 @@ LIST(APPEND NEUT_LIBS
   packlib
   pawlib
   gfortran)
+
+if(USE_GENERATOR_REWEIGHT)
+  LIST(APPEND NEUT_INCLUDE_DIRS
+    ${NEUT_ROOT}/src/reweight)
+  LIST(APPEND NEUT_LINK_DIRS
+    ${NEUT_ROOT}/src/reweight)
+  LIST(APPEND NEUT_LIBS NReWeight)
+endif()
 
 set(NEUT_ROOT_SHAREDOBJS)
 
