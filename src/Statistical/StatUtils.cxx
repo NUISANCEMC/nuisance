@@ -1011,7 +1011,8 @@ void StatUtils::SetDataErrorFromCov(TH2D* data, TMatrixDSym* cov, TH2I* map, dou
     }
   }
   // Delete the map now that we don't need it
-  map->Delete();
+  // Woops, it's needed elsewhere there! (Grrrrr)
+  // map->Delete();
 }
 
 TMatrixDSym* StatUtils::ExtractShapeOnlyCovar(TMatrixDSym* full_covar,
@@ -1121,6 +1122,7 @@ TH1D* StatUtils::MapToTH1D(TH2D* hist, TH2I* map) {
 
   // Get N bins for 1D plot
   Int_t Nbins = map->GetMaximum();
+  
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
   // Make new 1D Hist
@@ -1130,7 +1132,6 @@ TH1D* StatUtils::MapToTH1D(TH2D* hist, TH2I* map) {
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
       if (map->GetBinContent(i + 1, j + 1) == 0) continue;
-
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
           hist->GetBinContent(i + 1, j + 1));
       newhist->SetBinError(map->GetBinContent(i + 1, j + 1),
