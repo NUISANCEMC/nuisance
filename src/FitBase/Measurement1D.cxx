@@ -1256,15 +1256,15 @@ void Measurement1D::Write(std::string drawOpt) {
 
   // Write Covariances
   if (drawOpt.find("COV") != std::string::npos && fFullCovar) {
-    PlotUtils::GetFullCovarPlot(fFullCovar, fSettings.GetName());
+    PlotUtils::GetFullCovarPlot(fFullCovar, fSettings.GetName())->Write();
   }
 
   if (drawOpt.find("INVCOV") != std::string::npos && covar) {
-    PlotUtils::GetInvCovarPlot(covar, fSettings.GetName());
+    PlotUtils::GetInvCovarPlot(covar, fSettings.GetName())->Write();
   }
 
   if (drawOpt.find("DECOMP") != std::string::npos && fDecomp) {
-    PlotUtils::GetDecompCovarPlot(fDecomp, fSettings.GetName());
+    PlotUtils::GetDecompCovarPlot(fDecomp, fSettings.GetName())->Write();
   }
 
   // // Likelihood residual plots
