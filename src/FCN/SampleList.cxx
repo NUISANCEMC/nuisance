@@ -253,14 +253,16 @@
 #include "T2K_CC0pinp_ifk_XSec_3Dinfip_nu.h"
 
 // T2K CC1pi+ on CH
-#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
-#include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dpmu_nu.h"
+#include "T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
+#include "T2K_CC1pip_CH_XSec_1DAdlerPhi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1DCosThAdler_nu.h"
+//#include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
+//#include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
+//#include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
 
 // T2K CC1pi+ on H2O
 #include "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h"
@@ -1231,29 +1233,36 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     // Comment these out for now because we don't have the proper data
 
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dpmu_nu")) {
-	return (new T2K_CC1pip_CH_XSec_1Dpmu_nu(samplekey));
+    } else if (!name.compare("T2K_CC1pip_CH_XSec_2Dpmucosmu_nu")) {
+	return (new T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(samplekey));
 
     } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dppi_nu")) {
 	return (new T2K_CC1pip_CH_XSec_1Dppi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1DQ2_nu(file, rw, type, fkdt));
-
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dq3_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
+    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
+    return (new T2K_CC1pip_CH_XSec_1Dthpi_nu(samplekey));
 
     } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthmupi_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1Dthmupi_nu(file, rw, type, fkdt));
+    return (new T2K_CC1pip_CH_XSec_1Dthmupi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1Dthpi_nu(file, rw, type, fkdt));
+    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
+    return (new T2K_CC1pip_CH_XSec_1DQ2_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthq3pi_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
+    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DAdlerPhi_nu")) {
+    return (new T2K_CC1pip_CH_XSec_1DAdlerPhi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DWrec_nu")) {
-    return (new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
+    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DCosThAdler_nu")) {
+    return (new T2K_CC1pip_CH_XSec_1DCosThAdler_nu(samplekey));
+
+    // Maybe something for the future: were in Raquel's thesis
+    //} else if (!name.compare("T2K_CC1pip_CH_XSec_1Dq3_nu")) {
+    //return (new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
+
+    //} else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthq3pi_nu")) {
+    //return (new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
+
+    //} else if (!name.compare("T2K_CC1pip_CH_XSec_1DWrec_nu")) {
+    //return (new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
 
     /*
       T2K CC1pi+ H2O samples

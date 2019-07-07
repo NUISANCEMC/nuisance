@@ -8,15 +8,8 @@ public:
   T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey);
   virtual ~T2K_CC1pip_CH_XSec_1Dppi_nu() {};
 
-  // Functions to deal with the input data and covariance
-  void SetDataValues(std::string fileLocation);
-  void SetCovarMatrix(std::string covarFile);
-
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
-
-  private:
-  bool useMichel;
 };
 
 #endif
