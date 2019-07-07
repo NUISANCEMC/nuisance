@@ -1,110 +1,83 @@
 #include <iomanip>
 
 #include "T2K_SignalDef.h"
-
 #include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
 
 // The constructor
-T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(std::string inputfile, FitWeight *rw, std::string  type, std::string fakeDataFile){
+T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(nuiskey samplekey) {
 
-  fName = "T2K_CC1pip_CH_XSec_1Dthpi_nu";
-  fPlotTitles = "; #theta_{#pi} (radians); d#sigma/d#theta_{#pi} (cm^{2}/nucleon)";
-  EnuMin = 0.;
-  EnuMax = 100.;
-  fIsDiag = false;
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
+  // Sample overview ---------------------------------------------------
+  std::string descrip = "T2K_CC1pip_CH_XSec_1Dthpi_nu sample. \n" \
+                        "Target: CH \n" \
+                        "Flux: T2K Forward Horn Current numu \n" \
+                        "Signal: Any event with 1 muon -, 1 pion +, any nucleons, and no other FS particles \n";
 
-  this->SetDataValues(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Thetapi.root");
-  this->SetCovarMatrix(GeneralUtils::GetTopLevelDir()+"/data/T2K/CC1pip/CH/Thetapi.root");
+  // Setup common settings
+  fSettings = LoadSampleSettings(samplekey);
+  fSettings.SetTitle("T2K_CC1pip_CH_XSec_1Dthpi_nu");
+  fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("#theta_{#pi} (radians)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#pi} (cm^{2}/radians/nucleon)");
+  fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
+  fSettings.SetEnuRange(0.0, 100.0);
+  fSettings.DefineAllowedTargets("C,H");
+  fSettings.DefineAllowedSpecies("numu");
+  FinaliseSampleSettings();
+
+  // Scaling Setup ---------------------------------------------------
+  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  fScaleFactor =  (GetEventHistogram()->Integral("width") * 1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+
+  // Plot Setup -------------------------------------------------------
+  SetDataFromRootFile(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/Thetapion.rootout.root", "Theta_pion");
+  SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/Thetapion.rootout.root", "Theta_pionCov");
+  
   SetShapeCovar();
-  this->SetupDefaultHist();
+  fDataHist->Scale(1E-38);
 
-  this->fScaleFactor = (GetEventHistogram()->Integral("width")*1E-38)/double(fNEvents)/TotalIntegratedFlux("width");
-};
-
-// Override this for now
-// Should really have Measurement1D do this properly though
-void T2K_CC1pip_CH_XSec_1Dthpi_nu::SetDataValues(std::string fileLocation) {
-  LOG(DEB) << "Reading: " << this->fName << "\nData: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
-
-  // Don't want the first and last bin of dataCopy
-  TH1D *dataCopy = (TH1D*)(dataFile->Get("hResult_sliced_0_1"))->Clone();
-
-  LOG(DEB) << "dataCopy->GetNbinsX() = " << dataCopy->GetNbinsX() << std::endl;
-  double *binEdges = new double[dataCopy->GetNbinsX()-4];
-  for (int i = 0; i < dataCopy->GetNbinsX()-4; i++) {
-    binEdges[i] = dataCopy->GetBinLowEdge(i+1);
-  }
-  binEdges[dataCopy->GetNbinsX()-4] = dataCopy->GetBinLowEdge(dataCopy->GetNbinsX()-3);
-
-  for (int i = 0; i < dataCopy->GetNbinsX(); i++) {
-    LOG(DEB) << "binEdges[" << i << "] = " << binEdges[i] << std::endl;
-  }
-
-  fDataHist = new TH1D((fName+"_data").c_str(), (fName+"_data"+fPlotTitles).c_str(), dataCopy->GetNbinsX()-4, binEdges);
-
-  for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-    fDataHist->SetBinContent(i+1, dataCopy->GetBinContent(i+1)*1E-38);
-    fDataHist->SetBinError(i+1, dataCopy->GetBinError(i+1)*1E-38);
-    LOG(DEB) << fDataHist->GetBinLowEdge(i+1) << " " << fDataHist->GetBinContent(i+1) << " " << fDataHist->GetBinError(i+1) << std::endl;
-  }
-
-  fDataHist->SetDirectory(0); //should disassociate fDataHist with dataFile
-
-  dataFile->Close();
-};
-
-// Override this for now
-// Should really have Measurement1D do this properly though
-void T2K_CC1pip_CH_XSec_1Dthpi_nu::SetCovarMatrix(std::string fileLocation) {
-  LOG(DEB) << "Covariance: " << fileLocation.c_str() << std::endl;
-  TFile *dataFile = new TFile(fileLocation.c_str()); //truly great .root file!
-
-  TH2D *covarMatrix = (TH2D*)(dataFile->Get("TMatrixDBase;1"))->Clone();
-
-  int nBinsX = covarMatrix->GetXaxis()->GetNbins();
-  int nBinsY = covarMatrix->GetYaxis()->GetNbins();
-
-  if ((nBinsX != nBinsY)) ERR(WRN) << "covariance matrix not square!" << std::endl;
-
-  this->fFullCovar = new TMatrixDSym(nBinsX-5);
-
-  for (int i = 2; i < nBinsX-3; i++) {
-    for (int j = 2; j < nBinsY-3; j++) {
-      (*this->fFullCovar)(i-2, j-2) = covarMatrix->GetBinContent(i, j); //adds syst+stat covariances
-      LOG(DEB) << "fFullCovar(" << i-2 << ", " << j-2 << ") = " << (*this->fFullCovar)(i-2,j-2) << std::endl;
-    }
-  } //should now have set covariance, I hope
-
-  this->fDecomp = StatUtils::GetDecomp(this->fFullCovar);
-  this->covar   = StatUtils::GetInvert(this->fFullCovar);
-  dataFile->Close();
+  FinaliseMeasurement();
 };
 
 
 void T2K_CC1pip_CH_XSec_1Dthpi_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(13) == 0 ||
-      event->NumFSParticle(211) == 0)
-    return;
+  if (event->NumFSParticle(211) == 0) return;
 
   TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   double thpi = FitUtils::th(Pnu, Ppip);
 
   fXVar = thpi;
-
-  return;
 };
 
 //********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dthpi_nu::isSignal(FitEvent *event) {
 //********************************************************************
-// This sample uses directional info on the pion so Michel e tag sample can not be included
-// i.e. we need reduce the pion variable phase space
-  return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
+// This distribution uses a somewhat different signal definition so might as well implement it separately here
+
+  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
+
+  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+
+  // If this event passes the criteria on particle counting, enforce the T2K
+  // ND280 phase space constraints
+  // Will be different if Michel tag sample is included or not
+  // Essentially, if there's a Michel tag we don't cut on the pion variables
+
+  double p_mu = FitUtils::p(Pmu) * 1000;
+  double p_pi = FitUtils::p(Ppip) * 1000;
+  double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
+  double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
+
+  if (p_mu <= 200 || cos_th_mu <= 0.2 || cos_th_pi <= 0.0 || p_pi <= 200) {
+    return false;
+  } else {
+    return true;
+  }
+
+  return false;
 }
 

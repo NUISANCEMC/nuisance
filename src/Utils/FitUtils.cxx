@@ -386,8 +386,7 @@ double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   double E_pi = ppi.E() / 1000.;
   TVector3 p_pi_vect = ppi.Vect() * (1. / 1000.);
 
-  double E_bind =
-      27. / 1000.;  // This should be roughly correct for CH; but not clear!
+  double E_bind = 25. / 1000.; 
   double m_p = PhysConst::mass_proton;
 
   // Makes life a little easier, gonna square this one
@@ -434,7 +433,6 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu,
       break;
     case 1:  // Extended MiniBooNE reconstructed, as defined by Raquel's CC1pi+
              // CH T2K analysis
-             // Definitely uses pion info :)
       rEnu = EnuCC1piprec_T2K_eMB(pnu, pmu, ppi);
       break;
     case 2:  // MiniBooNE reconstructed, as defined by MiniBooNE and Raquel's
