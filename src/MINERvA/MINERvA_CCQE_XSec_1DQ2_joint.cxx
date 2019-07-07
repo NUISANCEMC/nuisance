@@ -168,7 +168,7 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots() {
       MIN_anu = static_cast<MINERvA_CCQE_XSec_1DQ2_antinu*>(exp);
       TH1D* MIN_anu_mc = (TH1D*) MIN_anu->GetMCList().at(0);
       for (int i = 0; i < 8; i++) {
-        std::cout << "Adding MIN_anu_MC " << i + 1 << " : " << i + 1 << " " << MIN_anu_mc->GetBinContent(i + 1) << std::endl;
+        // std::cout << "Adding MIN_anu_MC " << i + 1 << " : " << i + 1 << " " << MIN_anu_mc->GetBinContent(i + 1) << std::endl;
         fMCHist->SetBinContent(i + 1, MIN_anu_mc->GetBinContent(i + 1));
         fMCHist->SetBinError(i + 1, MIN_anu_mc->GetBinError(i + 1));
       }
@@ -177,7 +177,7 @@ void MINERvA_CCQE_XSec_1DQ2_joint::MakePlots() {
       MIN_nu = static_cast<MINERvA_CCQE_XSec_1DQ2_nu*>(exp);
       TH1D* MIN_nu_mc = (TH1D*) MIN_nu->GetMCList().at(0);
       for (int i = 0; i < 8; i++) {
-        std::cout << "Adding MIN_nu_MC " << i + 1 + 8 << " : " << i + 1 << " " << MIN_nu_mc->GetBinContent(i + 1) << std::endl;
+        // std::cout << "Adding MIN_nu_MC " << i + 1 + 8 << " : " << i + 1 << " " << MIN_nu_mc->GetBinContent(i + 1) << std::endl;
         fMCHist->SetBinContent(i + 1 + 8, MIN_nu_mc->GetBinContent(i + 1));
         fMCHist  ->SetBinError(i + 1 + 8, MIN_nu_mc->GetBinError(i + 1));
       }
