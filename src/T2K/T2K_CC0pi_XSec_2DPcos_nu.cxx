@@ -110,6 +110,13 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
     fDataHist->SetDirectory(0);
     fDataHist->SetNameTitle((fName + "_data").c_str(),
         (fName + "_data" + fPlotTitles).c_str());
+    // For some reason the error on the data in the data release is 1E-20
+    // That is wrong, so set it to zero here
+    for (int i = 0; i < fDataHist->GetXaxis()->GetNbins()+1; ++i) {
+      for (int j = 0; j < fDataHist->GetYaxis()->GetNbins()+1; ++j) {
+        fDataHist->SetBinError(i+1, j+1, 0.0);
+      }
+    }
 
     // Get Map
     fMapHist = (TH2I*) rootfile->Get("analysis2_map");
