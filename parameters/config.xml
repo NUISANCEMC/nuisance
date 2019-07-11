@@ -187,7 +187,7 @@
 <!--
 <config GENIEWeightEngine_CCRESMode="kModeMa"/>
 -->
-<config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
+<config GENIEWeightEngine_CCQEMode="kModeMa"/>
 <!--
 <config GENIEWeightEngine_CCQEMode="kModeMa"/> Normal MAQE Llewelyn-Smith
 <config GENIEWeightEngine_CCQEMode="kModeNormAndMaShape"/> Taking shape into account (don't really use this...)
