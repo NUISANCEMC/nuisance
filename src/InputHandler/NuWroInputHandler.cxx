@@ -421,42 +421,48 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
-  // Sort Particles
   evt->fNParticles = 0;
   std::vector<particle>::iterator p_iter;
 
-  // Initial State
-  for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end();
-       p_iter++) {
-    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState);
+  // Get the Initial State
+  for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end(); p_iter++) {
+    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState, true);
   }
 
-  for (p_iter = fNuWroEvent->all.begin(); p_iter != fNuWroEvent->all.end(); p_iter++) {
-    std::cout << (*p_iter)->pdg << std::endl;
-    std::cout << (*p_iter)->ks << std::endl;
-    std::cout << (*p_iter)->orgig << std::endl;
-    std::cout << (*p_iter)->id << std::endl;
-    std::cout << (*p_iter)->mother << std::endl;
-    std::cout << (*p_iter)->endproc << std::endl;
-    std::cout << (*p_iter)->his_fermi << std::endl;
-    std::cout << (*p_iter)->primary << std::endl;
-    std::cout << (*p_iter)->E() << std::endl;
+  // Try to find the FSI state particles
+  // Loop over the primary vertex particles
+  // If they match the post-FSI they haven't undergone FSI.
+  // If they don't match post-FSI they have undergone FSI.
+  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end(); p_iter++) {
+    // Get the particle
+    particle p = (*p_iter);
+    // Check against all the post particles, match them
+    std::vector<particle>::iterator p2_iter;
+    bool match = false;
+    for (p2_iter = fNuWroEvent->post.begin(); p2_iter != fNuWroEvent->post.end(); p2_iter++) {
+      particle p2 = (*p2_iter);
+      // Check energy and pdg
+      // A very small cascade which changes the energy by 1E-5 MeV should be matched
+      match = (fabs(p2.E()-p.E()) < 1E-5 && p2.pdg == p.pdg);
+      // If we match p to p2 break the loop
+      if (match) break;
+    }
+    // If we've looped through the whole particle stack of post-FSI and haven't found a match it's a primary particle that has been FSIed
+    if (!match) AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState, true);
   }
 
-  // NuWro saves the incoming, pre-FSI and post-FSI particles
-  // So we fill the incoming and outgoing particles, but no the FSI particles
-  // This is because sometimes the pre-FSI particles are the same as the post-FSI particles, so we would double count our particle stack
-  /*
-  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
-       p_iter++) {
-    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState);
-  }
-  */
-
-  // Final State
-  for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end();
-       p_iter++) {
-    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFinalState);
+  // Loop over the final state particles
+  for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end(); p_iter++) {
+    particle p = (*p_iter);
+    // To find if it's primary or not we have to loop through the primary ones and match, just like above
+    bool match = false;
+    std::vector<particle>::iterator p2_iter;
+    for (p2_iter = fNuWroEvent->out.begin(); p2_iter != fNuWroEvent->out.end(); p2_iter++) {
+      particle p2 = (*p2_iter);
+      match = (fabs(p2.E()-p.E()) < 1E-5 && p2.pdg == p.pdg);
+      if (match) break;
+    }
+    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFinalState, match);
   }
 
   // Fill Generator Info
@@ -476,12 +482,16 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
 }
 
 void NuWroInputHandler::AddNuWroParticle(FitEvent* evt, particle& p,
-                                         int state) {
+                                         int state, bool primary = false) {
   // Add Mom
   evt->fParticleMom[evt->fNParticles][0] = static_cast<vect&>(p).x;
   evt->fParticleMom[evt->fNParticles][1] = static_cast<vect&>(p).y;
   evt->fParticleMom[evt->fNParticles][2] = static_cast<vect&>(p).z;
   evt->fParticleMom[evt->fNParticles][3] = static_cast<vect&>(p).t;
+
+  // For NuWro a particle that we've given a FSI state is a pre-FSI particle
+  // An initial state particle is also a primary vertex praticle
+  evt->fPrimaryVertex[evt->fNParticles] = primary;
 
   // Status/PDG
   evt->fParticleState[evt->fNParticles] = state;

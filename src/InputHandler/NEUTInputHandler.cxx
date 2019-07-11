@@ -320,6 +320,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     // State
     fNUISANCEEvent->fParticleState[curpart] = state;
 
+    // Is the paricle associated with the primary vertex?
+    fNUISANCEEvent->fPrimaryVertex[curpart] = fNeutVect->ParentIdx(i) == 0;
+    std::cout << fNeutVect->ParentIdx(i) << std::endl;
+
     // Mom
     fNUISANCEEvent->fParticleMom[curpart][0] = part->fP.X();
     fNUISANCEEvent->fParticleMom[curpart][1] = part->fP.Y();
