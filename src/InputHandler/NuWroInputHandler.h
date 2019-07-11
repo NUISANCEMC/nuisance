@@ -79,7 +79,7 @@ class NuWroInputHandler : public InputHandlerBase {
   int ConvertNuwroMode(event* e);
 
   /// Adds a new particle to NUISANCE stack for given NuWro particle
-  void AddNuWroParticle(FitEvent* evt, particle& p, int state);
+  void AddNuWroParticle(FitEvent* evt, particle& p, int state, bool primary);
 
   event* fNuWroEvent;  ///< Pointer to NuWro Format Events
 
