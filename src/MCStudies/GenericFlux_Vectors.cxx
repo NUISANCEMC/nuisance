@@ -39,6 +39,9 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
     EnuMax = Config::GetParD("EnuMax");
   }
 
+  SavePreFSI = Config::Get().GetParB("nuisflat_SavePreFSI");
+  LOG(SAM) << "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI << std::endl;
+
   // Set default fitter flags
   fIsDiag = true;
   fIsShape = false;
@@ -134,6 +137,9 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("pz", pz, "pz[nfsp]/F");
   eventVariables->Branch("E", E, "E[nfsp]/F");
   eventVariables->Branch("pdg", pdg, "pdg[nfsp]/I");
+  eventVariables->Branch("status", status, "status[nfsp]/I");
+  eventVariables->Branch("isalive", isalive, "isalive[nfsp]/O");
+  eventVariables->Branch("isprimary", isprimary, "isprimary[nfsp]/O");
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
@@ -208,7 +214,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
     bool part_alive = event->PartInfo(i)->fIsAlive &&
       event->PartInfo(i)->Status() == kFinalState;
-    if (!part_alive) continue;
+    if (!SavePreFSI) {
+      if (!part_alive) continue;
+    }
+    //std::cout << event->PartInfo(i)->Status() << std::endl;
 
     partList.push_back(event->PartInfo(i));
   }
@@ -222,6 +231,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pz[i] = partList[i]->fP.Z() / 1E3;
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
+    status[i] = partList[i]->Status();
+    isalive[i] = partList[i]->fIsAlive;
+    isprimary[i] = event->fPrimaryVertex[i];
   }
 
 #ifdef __GENIE_ENABLED__
@@ -268,6 +280,9 @@ void GenericFlux_Vectors::ResetVariables() {
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
     pdg[i] = 0;
+    status[i] = -999;
+    isalive[i] = false;
+    isprimary[i] = false;
   }
 
   Weight = InputWeight = RWWeight = 0.0;
