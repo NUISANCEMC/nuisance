@@ -431,10 +431,27 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
     AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState);
   }
 
-  // FSI State
-  // for (size_t i = 0; i < npart_in; i++ ) {
-  //  AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState);
-  // }
+  for (p_iter = fNuWroEvent->all.begin(); p_iter != fNuWroEvent->all.end(); p_iter++) {
+    std::cout << (*p_iter)->pdg << std::endl;
+    std::cout << (*p_iter)->ks << std::endl;
+    std::cout << (*p_iter)->orgig << std::endl;
+    std::cout << (*p_iter)->id << std::endl;
+    std::cout << (*p_iter)->mother << std::endl;
+    std::cout << (*p_iter)->endproc << std::endl;
+    std::cout << (*p_iter)->his_fermi << std::endl;
+    std::cout << (*p_iter)->primary << std::endl;
+    std::cout << (*p_iter)->E() << std::endl;
+  }
+
+  // NuWro saves the incoming, pre-FSI and post-FSI particles
+  // So we fill the incoming and outgoing particles, but no the FSI particles
+  // This is because sometimes the pre-FSI particles are the same as the post-FSI particles, so we would double count our particle stack
+  /*
+  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
+       p_iter++) {
+    AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState);
+  }
+  */
 
   // Final State
   for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end();
