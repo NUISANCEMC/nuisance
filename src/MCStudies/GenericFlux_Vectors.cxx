@@ -293,14 +293,10 @@ void GenericFlux_Vectors::ResetVariables() {
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
-<<<<<<< HEAD
     pdg[i] = pdg_rank[i] = 0;
-=======
-    pdg[i] = 0;
     status[i] = -999;
     isalive[i] = false;
     isprimary[i] = false;
->>>>>>> 8cb8d610b53c4930caea73bde1186b7dbb04981c
   }
 
   Weight = InputWeight = RWWeight = 0.0;
