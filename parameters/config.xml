@@ -189,10 +189,10 @@
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
 <!--
 <config GENIEWeightEngine_CCRESMode="kModeMa"/>
--->
-<config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
+--> 
+<!-- Normal MAQE Llewelyn-Smith -->
+<config GENIEWeightEngine_CCQEMode="kModeMa"/>
 <!--
-<config GENIEWeightEngine_CCQEMode="kModeMa"/> Normal MAQE Llewelyn-Smith
 <config GENIEWeightEngine_CCQEMode="kModeNormAndMaShape"/> Taking shape into account (don't really use this...)
 <config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
 -->
