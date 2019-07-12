@@ -39,6 +39,9 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
     EnuMax = Config::GetParD("EnuMax");
   }
 
+  SavePreFSI = Config::Get().GetParB("nuisflat_SavePreFSI");
+  LOG(SAM) << "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI << std::endl;
+
   // Set default fitter flags
   fIsDiag = true;
   fIsShape = false;
@@ -135,6 +138,9 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("E", E, "E[nfsp]/F");
   eventVariables->Branch("pdg", pdg, "pdg[nfsp]/I");
   eventVariables->Branch("pdg_rank", pdg_rank, "pdg_rank[nfsp]/I");
+  eventVariables->Branch("status", status, "status[nfsp]/I");
+  eventVariables->Branch("isalive", isalive, "isalive[nfsp]/O");
+  eventVariables->Branch("isprimary", isprimary, "isprimary[nfsp]/O");
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
@@ -209,7 +215,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
     bool part_alive = event->PartInfo(i)->fIsAlive &&
       event->PartInfo(i)->Status() == kFinalState;
-    if (!part_alive) continue;
+    if (!SavePreFSI) {
+      if (!part_alive) continue;
+    }
 
     partList.push_back(event->PartInfo(i));
   }
@@ -224,6 +232,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pz[i] = partList[i]->fP.Z() / 1E3;
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
+    status[i] = partList[i]->Status();
+    isalive[i] = partList[i]->fIsAlive;
+    isprimary[i] = event->fPrimaryVertex[i];
     pdgMap[pdg[i]].push_back(std::make_pair(partList[i]->fP.Vect().Mag(), i));
   }  
 
@@ -282,7 +293,14 @@ void GenericFlux_Vectors::ResetVariables() {
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
+<<<<<<< HEAD
     pdg[i] = pdg_rank[i] = 0;
+=======
+    pdg[i] = 0;
+    status[i] = -999;
+    isalive[i] = false;
+    isprimary[i] = false;
+>>>>>>> 8cb8d610b53c4930caea73bde1186b7dbb04981c
   }
 
   Weight = InputWeight = RWWeight = 0.0;

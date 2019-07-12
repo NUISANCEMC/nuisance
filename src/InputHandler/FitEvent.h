@@ -617,10 +617,12 @@ public:
   UInt_t* fParticleState;
   int* fParticlePDG;
   FitParticle** fParticleList;
+  bool *fPrimaryVertex;
 
   double** fOrigParticleMom;
   UInt_t* fOrigParticleState;
   int* fOrigParticlePDG;
+  bool* fOrigPrimaryVertex;
 
   double* fNEUT_ParticleStatusCode;
   double* fNEUT_ParticleAliveCode;

@@ -32,7 +32,7 @@ enum particle_state{
   kFSIState       = 1,
   kFinalState     = 2,
   kNuclearInitial = 3,
-  kNuclearRemnant = 4
+  kNuclearRemnant = 4,
 };
 
 /// Condensed FitParticle class which acts a common format between the generators
@@ -92,7 +92,7 @@ class FitParticle {
   int fNEUTStatusCode; ///< Particle Status (Incoming 1, FSI 2, Outgoing 0, Other 3)
   double fMass;        ///< Particle Mass
   int fStatus;         ///< State corresponding to particle_state enum
-
+  bool fIsPrimary;     ///< Primary target
 };
 
 inline std::ostream& operator<<(std::ostream& os, FitParticle const& p){
