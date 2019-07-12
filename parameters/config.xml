@@ -35,6 +35,7 @@
 <config Electron_ThetaWidth='1.0' />
 <config Electron_EnergyWidth='0.10' />
 
+<!-- Do we want to remove FSI, undefined and nuclear particles from the GENIE particle stack? -->
 <config RemoveFSIParticles='0' />
 <config RemoveUndefParticles='0' />
 <config RemoveNuclearParticles='0'/>
@@ -99,6 +100,8 @@
 <!-- #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP -->
 <!-- #config drawopts DATA/MC -->
 <config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INCOV/DECOMP/CANVPDG/CANVMC/SETTINGS/PROJ/CANVSLICEMC'/>
+
+<config nuisflat_SavePreFSI='true' />
 
 <config InterpolateSigmaQ0Histogram='1' />
 <config InterpolateSigmaQ0HistogramRes='100' />
@@ -186,10 +189,18 @@
 <config GENIEWeightEngine_CCRESMode="kModeMaMv"/>
 <!--
 <config GENIEWeightEngine_CCRESMode="kModeMa"/>
+<<<<<<< HEAD
 -->
 <config GENIEWeightEngine_CCQEMode="kModeMa"/>
+||||||| merged common ancestors
+-->
+<config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
+=======
+--> 
+<!-- Normal MAQE Llewelyn-Smith -->
+<config GENIEWeightEngine_CCQEMode="kModeMa"/>
+>>>>>>> feature_prefsi
 <!--
-<config GENIEWeightEngine_CCQEMode="kModeMa"/> Normal MAQE Llewelyn-Smith
 <config GENIEWeightEngine_CCQEMode="kModeNormAndMaShape"/> Taking shape into account (don't really use this...)
 <config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
 -->
