@@ -42,10 +42,12 @@ void FitEvent::AllocateParticleStack(int stacksize) {
   fParticleMom = new double*[kMaxParticles];
   fParticleState = new UInt_t[kMaxParticles];
   fParticlePDG = new int[kMaxParticles];
+  fPrimaryVertex = new bool[kMaxParticles];
 
   fOrigParticleMom = new double*[kMaxParticles];
   fOrigParticleState = new UInt_t[kMaxParticles];
   fOrigParticlePDG = new int[kMaxParticles];
+  fOrigPrimaryVertex = new bool[kMaxParticles];
 
   for (size_t i = 0; i < kMaxParticles; i++) {
     fParticleList[i] = NULL;
@@ -74,9 +76,11 @@ void FitEvent::DeallocateParticleStack() {
 
   delete fParticleState;
   delete fParticlePDG;
+  delete fPrimaryVertex;
 
   delete fOrigParticleState;
   delete fOrigParticlePDG;
+  delete fOrigPrimaryVertex;
 
   if (fGenInfo) fGenInfo->DeallocateParticleStack();
 
@@ -135,6 +139,7 @@ void FitEvent::ResetEvent() {
     fParticleMom[i][1] = 0.0;
     fParticleMom[i][2] = 0.0;
     fParticleMom[i][3] = 0.0;
+    fPrimaryVertex[i] = false;
 
     fOrigParticlePDG[i] = 0;
     fOrigParticleState[i] = kUndefinedState;
@@ -142,6 +147,7 @@ void FitEvent::ResetEvent() {
     fOrigParticleMom[i][1] = 0.0;
     fOrigParticleMom[i][2] = 0.0;
     fOrigParticleMom[i][3] = 0.0;
+    fOrigPrimaryVertex[i] = false;
   }
 }
 
@@ -156,6 +162,7 @@ void FitEvent::OrderStack() {
     fOrigParticleMom[i][1] = fParticleMom[i][1];
     fOrigParticleMom[i][2] = fParticleMom[i][2];
     fOrigParticleMom[i][3] = fParticleMom[i][3];
+    fOrigPrimaryVertex[i] = fPrimaryVertex[i];
   }
 
   // Now run loops for each particle
@@ -173,6 +180,7 @@ void FitEvent::OrderStack() {
       fParticleMom[fNParticles][1] = fOrigParticleMom[i][1];
       fParticleMom[fNParticles][2] = fOrigParticleMom[i][2];
       fParticleMom[fNParticles][3] = fOrigParticleMom[i][3];
+      fPrimaryVertex[fNParticles] = fOrigPrimaryVertex[i];
 
       fNParticles++;
     }

@@ -66,6 +66,8 @@ public:
   TTree* eventVariables;
   std::vector<FitParticle*> partList;
 
+  bool SavePreFSI;
+
   int Mode;
   bool cc;
   int PDGnu;
@@ -103,6 +105,9 @@ public:
   float pz[kMAX];
   float E[kMAX];
   int pdg[kMAX];
+  int status[kMAX];
+  bool isalive[kMAX];
+  bool isprimary[kMAX];
 
   // Basic event info
   float Weight;
