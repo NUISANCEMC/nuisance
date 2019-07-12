@@ -295,6 +295,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     throw;
   }
 
+  int nprimary = fNeutVect->Nprimary();
   // Fill Particle Stack
   for (size_t i = 0; i < npart; i++) {
     // Get Current Count
@@ -321,8 +322,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     fNUISANCEEvent->fParticleState[curpart] = state;
 
     // Is the paricle associated with the primary vertex?
-    fNUISANCEEvent->fPrimaryVertex[curpart] = fNeutVect->ParentIdx(i) == 0;
-    std::cout << fNeutVect->ParentIdx(i) << std::endl;
+    bool primary = false;
+    // NEUT events are just popped onto the stack as primary, then continues to be non-primary
+    if (i < nprimary) primary = true;
+    fNUISANCEEvent->fPrimaryVertex[curpart] = primary;
 
     // Mom
     fNUISANCEEvent->fParticleMom[curpart][0] = part->fP.X();
