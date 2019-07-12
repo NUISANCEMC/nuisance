@@ -157,7 +157,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     outputfile->cd();
 
     QLOG(FIT, "Cloning input vector to output file: " << gOutputFile);
-    TTree *cloneTree = tn->CloneTree();
+    TTree *cloneTree = tn->CloneTree(-1, "fast");
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
@@ -586,7 +586,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     outputfile->cd();
 
     QLOG(FIT, "Cloning input vector to output file: " << gOutputFile);
-    TTree *cloneTree = tn->CloneTree();
+    TTree *cloneTree = tn->CloneTree(-1, "fast");
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
@@ -596,7 +596,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     //  Also check for the nova_wgts tree from Jeremy
     TChain *nova_chain = new TChain("nova_wgts");
     nova_chain->AddFile(input.c_str());
-    TTree *nova_tree = nova_chain->CloneTree();
+    TTree *nova_tree = nova_chain->CloneTree(-1, "fast");
     if (!nova_tree) {
       QLOG(FIT, "Could not find nova_wgts tree in " << input);
     } else {
