@@ -192,14 +192,6 @@
 <<<<<<< HEAD
 -->
 <config GENIEWeightEngine_CCQEMode="kModeMa"/>
-||||||| merged common ancestors
--->
-<config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
-=======
---> 
-<!-- Normal MAQE Llewelyn-Smith -->
-<config GENIEWeightEngine_CCQEMode="kModeMa"/>
->>>>>>> feature_prefsi
 <!--
 <config GENIEWeightEngine_CCQEMode="kModeNormAndMaShape"/> Taking shape into account (don't really use this...)
 <config GENIEWeightEngine_CCQEMode="kModeZExp"/> Using z-expansion
