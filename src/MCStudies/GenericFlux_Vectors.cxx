@@ -217,7 +217,6 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     if (!SavePreFSI) {
       if (!part_alive) continue;
     }
-    //std::cout << event->PartInfo(i)->Status() << std::endl;
 
     partList.push_back(event->PartInfo(i));
   }

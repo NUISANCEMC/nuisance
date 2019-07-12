@@ -549,9 +549,6 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
     // Set if the particle was on the fundamental vertex
     fNUISANCEEvent->fPrimaryVertex[curpart] = (p->FirstMother() < 2);
-    //std::cout << curpart << " " << p->Pdg() << " " << p->FirstMother() << std::endl;
-    //std::cout << p->LastMother() << std::endl;
-    //std::cout << "**" << std::endl;
 
     // Add to N particle count
     fNUISANCEEvent->fNParticles++;
