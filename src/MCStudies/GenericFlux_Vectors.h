@@ -103,6 +103,7 @@ public:
   float pz[kMAX];
   float E[kMAX];
   int pdg[kMAX];
+  int pdg_rank[kMAX];
 
   // Basic event info
   float Weight;

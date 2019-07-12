@@ -134,6 +134,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("pz", pz, "pz[nfsp]/F");
   eventVariables->Branch("E", E, "E[nfsp]/F");
   eventVariables->Branch("pdg", pdg, "pdg[nfsp]/I");
+  eventVariables->Branch("pdg_rank", pdg_rank, "pdg_rank[nfsp]/I");
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
@@ -215,6 +216,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Save outgoing particle vectors
   nfsp = (int)partList.size();
+  std::map<int, std::vector<std::pair<double, int> > > pdgMap;
 
   for (int i = 0; i < nfsp; ++i) {
     px[i] = partList[i]->fP.X() / 1E3;
@@ -222,6 +224,19 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pz[i] = partList[i]->fP.Z() / 1E3;
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
+    pdgMap[pdg[i]].push_back(std::make_pair(partList[i]->fP.Vect().Mag(), i));
+  }  
+
+  for(std::map<int, std::vector<std::pair<double, int> > >::iterator iter = pdgMap.begin(); 
+      iter != pdgMap.end(); ++iter){
+    std::vector<std::pair<double, int> > thisVect = iter->second;
+    std::sort(thisVect.begin(), thisVect.end());
+
+    // Now save the order... a bit funky to avoid inverting
+    int nPart = (int)thisVect.size()-1;
+    for (int i=nPart; i >= 0; --i) {
+      pdg_rank[thisVect[i].second] = nPart-i;
+    }
   }
 
 #ifdef __GENIE_ENABLED__
@@ -267,7 +282,7 @@ void GenericFlux_Vectors::ResetVariables() {
   nfsp = 0;
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
-    pdg[i] = 0;
+    pdg[i] = pdg_rank[i] = 0;
   }
 
   Weight = InputWeight = RWWeight = 0.0;
