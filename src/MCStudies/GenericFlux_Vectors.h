@@ -65,6 +65,8 @@ public:
 
   TTree* eventVariables;
   std::vector<FitParticle*> partList;
+  std::vector<FitParticle*> initList;
+  std::vector<FitParticle*> vertList;
 
   bool SavePreFSI;
 
@@ -106,9 +108,22 @@ public:
   float E[kMAX];
   int pdg[kMAX];
   int pdg_rank[kMAX];
-  int status[kMAX];
-  bool isalive[kMAX];
-  bool isprimary[kMAX];
+
+  // Save incoming particle info
+  int ninitp;
+  float px_init[kMAX];
+  float py_init[kMAX];
+  float pz_init[kMAX];
+  float E_init[kMAX];
+  int pdg_init[kMAX];
+
+  // Save pre-FSI particle info
+  int nvertp;
+  float px_vert[kMAX];
+  float py_vert[kMAX];
+  float pz_vert[kMAX];
+  float E_vert[kMAX];
+  int pdg_vert[kMAX];
 
   // Basic event info
   float Weight;

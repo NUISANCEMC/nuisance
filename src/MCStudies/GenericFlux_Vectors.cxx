@@ -138,9 +138,22 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("E", E, "E[nfsp]/F");
   eventVariables->Branch("pdg", pdg, "pdg[nfsp]/I");
   eventVariables->Branch("pdg_rank", pdg_rank, "pdg_rank[nfsp]/I");
-  eventVariables->Branch("status", status, "status[nfsp]/I");
-  eventVariables->Branch("isalive", isalive, "isalive[nfsp]/O");
-  eventVariables->Branch("isprimary", isprimary, "isprimary[nfsp]/O");
+
+  // Save init particle vectors
+  eventVariables->Branch("ninitp", &ninitp, "ninitp/I");
+  eventVariables->Branch("px_init", px_init, "px_init[ninitp]/F");
+  eventVariables->Branch("py_init", py_init, "py_init[ninitp]/F");
+  eventVariables->Branch("pz_init", pz_init, "pz_init[ninitp]/F");
+  eventVariables->Branch("E_init", E_init, "E_init[ninitp]/F");
+  eventVariables->Branch("pdg_init", pdg_init, "pdg_init[ninitp]/I");
+
+  // Save pre-FSI vectors
+  eventVariables->Branch("nvertp", &nvertp, "nvertp/I");
+  eventVariables->Branch("px_vert", px_vert, "px_vert[nvertp]/F");
+  eventVariables->Branch("py_vert", py_vert, "py_vert[nvertp]/F");
+  eventVariables->Branch("pz_vert", pz_vert, "pz_vert[nvertp]/F");
+  eventVariables->Branch("E_vert", E_vert, "E_vert[nvertp]/F");
+  eventVariables->Branch("pdg_vert", pdg_vert, "pdg_vert[nvertp]/I");
 
   // Event Scaling Information
   eventVariables->Branch("Weight", &Weight, "Weight/F");
@@ -213,13 +226,15 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   // Loop over the particles and store all the final state particles in a vector
   for (UInt_t i = 0; i < event->Npart(); ++i) {
 
-    bool part_alive = event->PartInfo(i)->fIsAlive &&
-      event->PartInfo(i)->Status() == kFinalState;
-    if (!SavePreFSI) {
-      if (!part_alive) continue;
-    }
+    if (event->PartInfo(i)->fIsAlive &&
+	event->PartInfo(i)->Status() == kFinalState)
+      partList.push_back(event->PartInfo(i));
 
-    partList.push_back(event->PartInfo(i));
+    if (SavePreFSI && event->fPrimaryVertex[i])
+      vertList.push_back(event->PartInfo(i));
+
+    if (SavePreFSI && event->PartInfo(i)->IsInitialState())
+      initList.push_back(event->PartInfo(i));
   }
 
   // Save outgoing particle vectors
@@ -232,9 +247,6 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pz[i] = partList[i]->fP.Z() / 1E3;
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
-    status[i] = partList[i]->Status();
-    isalive[i] = partList[i]->fIsAlive;
-    isprimary[i] = event->fPrimaryVertex[i];
     pdgMap[pdg[i]].push_back(std::make_pair(partList[i]->fP.Vect().Mag(), i));
   }  
 
@@ -249,6 +261,27 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
       pdg_rank[thisVect[i].second] = nPart-i;
     }
   }
+
+  // Save pre-FSI particles
+  nvertp = (int)vertList.size();
+  for (int i = 0; i < nvertp; ++i) {
+    px_vert[i] = vertList[i]->fP.X() / 1E3;
+    py_vert[i] = vertList[i]->fP.Y() / 1E3;
+    pz_vert[i] = vertList[i]->fP.Z() / 1E3;
+    E_vert[i] = vertList[i]->fP.E() / 1E3;
+    pdg_vert[i] = vertList[i]->fPID;
+  }
+
+  // Save init particles
+  ninitp = (int)initList.size();
+  for (int i = 0; i < ninitp; ++i) {
+    px_init[i] = initList[i]->fP.X() / 1E3;
+    py_init[i] = initList[i]->fP.Y() / 1E3;
+    pz_init[i] = initList[i]->fP.Z() / 1E3;
+    E_init[i] = initList[i]->fP.E() / 1E3;
+    pdg_init[i] = initList[i]->fPID;
+  }
+
 
 #ifdef __GENIE_ENABLED__
   if (event->fType == kGENIE) {
@@ -290,13 +323,17 @@ void GenericFlux_Vectors::ResetVariables() {
   // MINERvA-like ones
   dalphat = dpt = dphit = pnreco_C = -999.99;
 
-  nfsp = 0;
+  nfsp = ninitp = nvertp = 0;
   for (int i = 0; i < kMAX; ++i){
     px[i] = py[i] = pz[i] = E[i] = -999;
     pdg[i] = pdg_rank[i] = 0;
-    status[i] = -999;
-    isalive[i] = false;
-    isprimary[i] = false;
+
+    px_init[i] = py_init[i] = pz_init[i] = E_init[i] = -999;
+    pdg_init[i] = 0;
+      
+    px_vert[i] = py_vert[i] = pz_vert[i] = E_vert[i] = -999;
+    pdg_vert[i] = 0;
+
   }
 
   Weight = InputWeight = RWWeight = 0.0;
@@ -305,6 +342,8 @@ void GenericFlux_Vectors::ResetVariables() {
   for (int i = 0; i < 6; ++i) CustomWeightArray[i] = 0.0;
 
   partList.clear();
+  initList.clear();
+  vertList.clear();
 
   flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL = flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim = flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
 }
