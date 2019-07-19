@@ -242,11 +242,10 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
 
-  FitParticle* ISNeutralLepton =
-      fNUISANCEEvent->GetHMISParticle(PhysConst::pdg_neutrinos);
-  if (ISNeutralLepton) {
-    fNUISANCEEvent->probe_E = ISNeutralLepton->E();
-    fNUISANCEEvent->probe_pdg = ISNeutralLepton->PDG();
+  FitParticle* ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
+  if (ISAnyLepton) {
+    fNUISANCEEvent->probe_E = ISAnyLepton->E();
+    fNUISANCEEvent->probe_pdg = ISAnyLepton->PDG();
   }
 
   return;
