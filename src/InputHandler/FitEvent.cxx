@@ -411,6 +411,10 @@ int FitEvent::GetBeamPionIndex(void) const {
   return GetHMISParticleIndex(PhysConst::pdg_pions);
 }
 
+int FitEvent::GetBeamPartIndex(void) const {
+  return GetHMISParticleIndex(this->probe_pdg);
+}
+
 int FitEvent::NumFSMesons() {
   int nMesons = 0;
 
