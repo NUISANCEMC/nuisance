@@ -624,7 +624,7 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
+    if (event->PartInfo(i)->Status() != kFinalState) continue;
 
     // Skip Lepton
     if (abs(event->PartInfo(i)->fPID) == 13) continue;
@@ -658,9 +658,9 @@ double FitUtils::Eavailable(FitEvent *event) {
   double Eav = 0.0;
 
   // Now take q0 and subtract Eav
-  double q0 = event->GetNeutrinoIn()->fP.E();
+  double q0 = event->GetBeamPart()->fP.E();
   // Get the pdg of incoming neutrino
-  int ISPDG = event->GetBeamNeutrinoPDG();
+  int ISPDG = event->GetBeamPartPDG();
 
   // For CC
   if (event->IsCC()) q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
@@ -669,7 +669,7 @@ double FitUtils::Eavailable(FitEvent *event) {
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
     if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
+    if (event->PartInfo(i)->Status() != kFinalState) continue;
     int PID = event->PartInfo(i)->fPID;
 
     // Neutrons
