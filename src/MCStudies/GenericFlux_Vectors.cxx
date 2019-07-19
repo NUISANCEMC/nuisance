@@ -179,10 +179,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Now fill the information
   Mode = event->Mode;
-  cc = (abs(event->Mode) < 30);
+  cc = event->IsCC();
 
   // Get the incoming neutrino and outgoing lepton
-  FitParticle *nu = event->GetNeutrinoIn();
+  FitParticle *nu = event->GetBeamPart();
   FitParticle *lep = event->GetHMFSAnyLepton();
 
   PDGnu = nu->fPID;
