@@ -73,9 +73,9 @@ public:
   inline int GetTotCrs  (void) const { return fTotCrs;  };
 
   /// Is Event Charged Current?
-  inline bool IsCC() const { return (abs(Mode) <= 30); };
+  inline bool IsCC() const { if (abs(this->probe_pdg) == 11) return false; return (abs(Mode) <= 30); };
   /// Is Event Neutral Current?
-  inline bool IsNC() const { return (abs(Mode) > 30);  };
+  inline bool IsNC() const { if (abs(this->probe_pdg) == 11) return true; return (abs(Mode) > 30);  };
 
   /// Return Particle 4-momentum for given index in particle stack
   TLorentzVector GetParticleP4    (int index) const;
@@ -584,17 +584,25 @@ public:
   inline double         GetBeamPionE       (void) const { return GetParticleE(GetBeamPionIndex()); };
   inline FitParticle*   GetBeamPion        (void) { return GetParticle(GetBeamPionIndex()); };
 
+  // ---- Generic beam incoming functions
+  // I'm not 100% sure why these can't replace the above (FitEvent knows the type)
+  int                   GetBeamPartIndex   (void) const;
+  inline TLorentzVector GetBeamPartP4      (void) const { return GetParticleP4(GetBeamPartIndex()); };
+  inline TVector3       GetBeamPartP3      (void) const { return GetParticleP3(GetBeamPartIndex()); };
+  inline double         GetBeamPartMom     (void) const { return GetParticleMom(GetBeamPartIndex()); };
+  inline double         GetBeamPartMom2    (void) const { return GetParticleMom2(GetBeamPartIndex()); };
+  inline double         GetBeamPartE       (void) const { return GetParticleE(GetBeamPartIndex()); };
+  inline int            GetBeamPartPDG     (void) const { return GetParticlePDG(GetBeamPartIndex()); };
+  inline int            GetPartInPos       (void) const { return GetBeamPartIndex(); };
+  inline FitParticle*   GetBeamPart        (void) { return GetParticle(GetBeamPartIndex()); };
+
   /// Legacy Functions
   inline FitParticle* PartInfo(uint i) { return GetParticle(i); };
   inline UInt_t Npart (void) const { return NPart(); };
   inline UInt_t NPart (void) const { return fNParticles; };
 
-
-
   // Other Functions
   int NumFSMesons();
-  inline int GetBeamPartPos(void) const { return 0; };
-  FitParticle* GetBeamPart(void);
 
   int GetLeptonOutPos(void) const;
   FitParticle* GetLeptonOut(void);
