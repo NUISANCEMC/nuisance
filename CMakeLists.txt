@@ -101,7 +101,6 @@ set(CORE
   Logger
   InputHandler
   Splines
-  Reweight
   Utils
   Statistical
   #Devel
@@ -154,6 +153,13 @@ LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
   ${CMAKE_SOURCE_DIR}/src/Splines
   ${CMAKE_SOURCE_DIR}/src/Utils
   ${CMAKE_SOURCE_DIR}/src/Genie)
+
+#Not yet capable of just building without the rwdirs.
+#if(USE_REWEIGHT)
+  LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
+    ${CMAKE_SOURCE_DIR}/src/Reweight)
+  LIST(APPEND CORE Reweight)
+#endif()
 
 cmessage(DEBUG "Base include directories: ${MINIMUM_INCLUDE_DIRECTORIES}")
 
