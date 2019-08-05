@@ -66,6 +66,7 @@ using namespace t2krew;
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "Ntuple/NtpMCEventRecord.h"
+#ifndef __NO_GENIE_REWEIGHT__
 #include "ReWeight/GReWeight.h"
 #include "ReWeight/GReWeightAGKY.h"
 #include "ReWeight/GReWeightDISNuclMod.h"
@@ -84,10 +85,13 @@ using namespace t2krew;
 #include "ReWeight/GReWeightResonanceDecay.h"
 #include "ReWeight/GSyst.h"
 #include "ReWeight/GSystUncertainty.h"
+#endif
 #else
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/GHEP/GHepRecord.h"
 #include "Framework/Ntuple/NtpMCEventRecord.h"
+using namespace genie;
+#ifndef __NO_GENIE_REWEIGHT__
 #include "RwCalculators/GReWeightAGKY.h"
 #include "RwCalculators/GReWeightDISNuclMod.h"
 #include "RwCalculators/GReWeightFGM.h"
@@ -106,9 +110,9 @@ using namespace t2krew;
 #include "RwFramework/GReWeight.h"
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GSystUncertainty.h"
-#endif
-using namespace genie;
 using namespace genie::rew;
+#endif
+#endif
 #endif
 
 #ifdef __NOVA_ENABLED__
@@ -381,7 +385,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // GENIE DIAL TYPE
   case kGENIE: {
-#ifdef __GENIE_ENABLED__
+#if defined(__GENIE_ENABLED__) && !defined(__NO_GENIE_REWEIGHT__)
     int genie_enum = (int)genie::rew::GSyst::FromString(name);
     if (genie_enum > 0) {
       this_enum = genie_enum + offset;
@@ -517,7 +521,7 @@ int Reweight::NUWROEnumFromName(std::string const &name) {
 }
 
 int Reweight::GENIEEnumFromName(std::string const &name) {
-#ifdef __GENIE_ENABLED__
+#ifdef defined(__GENIE_ENABLED__) && !defined(__NO_GENIE_REWEIGHT__)
   int genieenum = (int)genie::rew::GSyst::FromString(name);
   return (genieenum > 0) ? genieenum : Reweight::kNoDialFound;
 #else

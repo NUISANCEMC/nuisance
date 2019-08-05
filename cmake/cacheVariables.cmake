@@ -74,7 +74,9 @@ endif()
 
 CheckAndSetDefaultCache(EXTRA_SETUP_SCRIPT "" PATH "The path to an extra script to inject into the NUISANCE setup script. <>")
 
-CheckAndSetDefaultCache(USE_MINIMIZER TRUE INTERNAL "Whether we are using the ROOT minimization libraries. <TRUE>")
+CheckAndSetDefaultCache(USE_MINIMIZER TRUE BOOL "Whether we are using the ROOT minimization libraries. <TRUE>")
+
+CheckAndSetDefaultCache(USE_REWEIGHT TRUE BOOL "Whether we are expect to be able to build the reweighting libraries of enabled generators. <TRUE>")
 
 CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
 

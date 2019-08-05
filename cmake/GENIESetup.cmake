@@ -45,12 +45,6 @@ if(GENIE_EMPMEC_REWEIGHT)
   LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_EMP_MECRW_ENABLED)
 endif()
 
-# Extract GENIE VERSION
-if (GENIE_VERSION STREQUAL "AUTO")
-   execute_process (COMMAND ${CMAKE_SOURCE_DIR}/cmake/getgenieversion.sh ${GENIE}
-   OUTPUT_VARIABLE GENIE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-
 execute_process(COMMAND genie-config --version
 OUTPUT_VARIABLE GENIE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
 cmessage(STATUS "genie_ver: ${GENIE_VER}")
@@ -61,8 +55,8 @@ if(GENIE_VER VERSION_GREATER 3.0.0)
 endif()
 
 if(NOT GENIE_POST_R3)
-LIST(APPEND EXTRA_CXX_FLAGS -DGENIE_PRE_R3)
-cmessage(STATUS "setting genie_pre_r3 ${EXTRA_CXX_FLAGS}")
+  LIST(APPEND EXTRA_CXX_FLAGS -DGENIE_PRE_R3)
+  cmessage(STATUS "setting genie_pre_r3 ${EXTRA_CXX_FLAGS}")
 endif()
 
 execute_process (COMMAND genie-config
@@ -70,6 +64,7 @@ execute_process (COMMAND genie-config
 
 #Allows for external override in the case where genie-config lies.
 if(NOT DEFINED GENIE_LIB_DIR OR GENIE_LIB_DIR STREQUAL "")
+  #This looks like it should call libdir, but it strips the argument with -L from the response of --libs
   GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
 endif()
 GETLIBS(genie-config --libs GENIE_LIBS)
@@ -85,18 +80,32 @@ if(WASMATCHED AND GENIE_VERSION STREQUAL "210")
   cmessage(DEBUG "Fixed inconsistency in library naming: ${GENIE_LIBS}")
 endif()
 
-SET(FOUND_GENIE_RW -1)
-if(NOT GENIE_POST_R3)
+if(NOT USE_REWEIGHT)
+  SET(USING_GENIE_RW FALSE)
+elseif(NOT GENIE_POST_R3)
   LIST(FIND GENIE_LIBS GReWeight FOUND_GENIE_RW)
   if(FOUND_GENIE_RW EQUAL -1)
     cmessage(DEBUG "Did NOT find ReWeight library. Here are libs: ${GENIE_LIBS}")
+    SET(USING_GENIE_RW FALSE)
+  else()
+    SET(USING_GENIE_RW TRUE)
   endif()
-else()
+elseif(DEFINED GENIE_REWEIGHT AND NOT GENIE_REWEIGHT STREQUAL "")
   LIST(FIND GENIE_LIBS GRwFwk FOUND_GENIE_RW)
-  if(FOUND_GENIE_RW EQUAL "-1")
+  if(FOUND_GENIE_RW EQUAL -1)
     LIST(APPEND GENIE_LIBS GRwClc GRwFwk GRwIO)
     cmessage(DEBUG "Force added ReWeight library. Here are libs: ${GENIE_LIBS}")
+    SET(USING_GENIE_RW TRUE)
+  else()
+    SET(USING_GENIE_RW FALSE)
   endif()
+endif()
+
+if(USING_GENIE_RW)
+  cmessage(STATUS "Using GENIE ReWeight library.")
+else()
+  cmessage(STATUS "Building without GENIE ReWeight support.")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NO_GENIE_REWEIGHT__)
 endif()
 
 LIST(APPEND GENIE_LIBS -Wl,--end-group )
@@ -153,12 +162,6 @@ endif()
 # Set the compiler defines
 LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_ENABLED__ -D__GENIE_VERSION__=${GENIE_VERSION})
 
-# If we've compiled without reweight, look in the GENIE_LIBS list
-if(FOUND_GENIE_RW EQUAL -1)
-  cmessage(DEBUG "Didn't find GReWeight: defining -D__NO_GENIE_REWEIGHT__")
-  LIST(APPEND EXTRA_CXX_FLAGS -D__NO_GENIE_REWEIGHT__)
-endif()
-
 LIST(APPEND EXTRA_LIBS ${GENIE_LIBS})
 
 ###############################  GSL  ######################################
@@ -179,9 +182,10 @@ if(GENIE_POST_R3)
 
   GETLIBS(gsl-config --libs GSL_LIB_LIST)
 
-  if(GENIE_REWEIGHT STREQUAL "")
+  if(USING_GENIE_RW AND GENIE_REWEIGHT STREQUAL "")
     message(FATAL_ERROR "Variable GENIE_REWEIGHT is not defined. When using GENIE v3+, we require the reweight product to be built and accessible via the environment variable GENIE_REWEIGHT")
   endif()
+
 endif()
 ################################################################################
 
@@ -193,12 +197,15 @@ LIST(APPEND EXTRA_LINK_DIRS
   ${LOG4CPP_LIB})
 
 # Append only if we have found GENIE ReWeight
-if(NOT GENIE_POST_R3 AND FOUND_GENIE_RW GREATER -1)
+if(NOT GENIE_POST_R3)
   LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
     ${GENIE_INCLUDES_DIR}
     ${GENIE_INCLUDES_DIR}/GHEP
-    ${GENIE_INCLUDES_DIR}/Ntuple
-    ${GENIE_INCLUDES_DIR}/ReWeight
+    ${GENIE_INCLUDES_DIR}/Ntuple)
+  if(USING_GENIE_RW)
+    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${GENIE_INCLUDES_DIR}/ReWeight)
+  endif()
+  LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
     ${GENIE_INCLUDES_DIR}/Apps
     ${GENIE_INCLUDES_DIR}/FluxDrivers
     ${GENIE_INCLUDES_DIR}/EVGDrivers
@@ -207,26 +214,29 @@ if(NOT GENIE_POST_R3 AND FOUND_GENIE_RW GREATER -1)
     ${LOG4CPP_INC})
 else()
   LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
-    ${GENIE_INCLUDES_DIR}
-    ${GENIE_REWEIGHT}/src
-    ${GSL_INC}
+    ${GENIE_INCLUDES_DIR})
+
+    if(USING_GENIE_RW)
+      LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${GENIE_REWEIGHT}/src)
+    endif()
+
+    LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${GSL_INC}
     ${LHAPDF_INC}
     ${LIBXML2_INC}
     ${LOG4CPP_INC})
 
+    if(USING_GENIE_RW)
+      LIST(APPEND EXTRA_LINK_DIRS
+      ${GENIE_REWEIGHT}/lib)
+    endif()
+
     LIST(APPEND EXTRA_LINK_DIRS
-      ${GENIE_REWEIGHT}/lib
       ${GSL_LIB}
     )
 
     LIST(APPEND EXTRA_LIBS ${GSL_LIB_LIST})
 
 endif()
-
-cmessage(WARNING ${EXTRA_LINK_DIRS})
-cmessage(WARNING ${EXTRA_LIBS})
-
-SAYVARS()
 
 if(USE_PYTHIA8)
   set(NEED_PYTHIA8 TRUE)

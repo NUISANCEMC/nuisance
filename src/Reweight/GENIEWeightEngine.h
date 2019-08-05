@@ -9,9 +9,10 @@
 #include "Algorithm/AlgConfigPool.h"
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#ifndef __NO_GENIE_REWEIGHT__
 #include "ReWeight/GSyst.h"
 #include "ReWeight/GSystUncertainty.h"
-#include "Ntuple/NtpMCEventRecord.h"
 #include "ReWeight/GReWeight.h"
 #include "ReWeight/GReWeightAGKY.h"
 #include "ReWeight/GReWeightDISNuclMod.h"
@@ -28,6 +29,7 @@
 #include "ReWeight/GReWeightNuXSecNCEL.h"
 #include "ReWeight/GReWeightNuXSecNCRES.h"
 #include "ReWeight/GReWeightResonanceDecay.h"
+#endif
 #if __GENIE_VERSION__ >= 212
 #include "ReWeight/GReWeightNuXSecCCQEaxial.h"
 #endif
@@ -38,6 +40,10 @@
 #include "Framework/Ntuple/NtpMCEventRecord.h"
 #include "Framework/Utils/RunOpt.h"
 #include "Framework/Utils/AppInit.h"
+
+using namespace genie;
+
+#ifndef __NO_GENIE_REWEIGHT__
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GSystUncertainty.h"
 #include "RwFramework/GReWeight.h"
@@ -57,9 +63,9 @@
 #include "RwCalculators/GReWeightNuXSecNCRES.h"
 #include "RwCalculators/GReWeightResonanceDecay.h"
 #include "RwCalculators/GReWeightNuXSecCCQEaxial.h"
-#endif
-using namespace genie;
 using namespace genie::rew;
+#endif
+#endif
 #endif
 
 #include "GeneratorUtils.h"
