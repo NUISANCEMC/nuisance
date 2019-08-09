@@ -90,9 +90,10 @@ std::string NEUTWeightEngine::GetDocumentation() { return ""; }
 fhicl::ParameterSet NEUTWeightEngine::GetExampleConfiguration() {
   fhicl::ParameterSet ps;
 
-  ps.put<std::string>("weight_engine_name", GetName());
+  ps.put<std::string>("name", GetName());
+  ps.put<bool>("use_LMCPiBar_BgScl",false);
   fhicl::ParameterSet dial_maqe;
-  dial_maqe.put<std::string>("name", "MAQE");
+  dial_maqe.put<std::string>("name", "MaCCQE");
 
   dial_maqe.put<double>("start", 0);
   dial_maqe.put<double>("min", -3);
@@ -113,7 +114,7 @@ fhicl::ParameterSet NEUTWeightEngine::GetExampleConfiguration() {
   return ps;
 }
 
-GeneratorManager::Generator_id_t NEUTWeightEngine::GetGeneratorId(){
+GeneratorManager::Generator_id_t NEUTWeightEngine::GetGeneratorId() {
   return GeneratorManager::Get().EnsureGeneratorRegistered("NEUT");
 }
 

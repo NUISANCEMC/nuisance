@@ -10,6 +10,11 @@ foreach(fcl ${INuADataComparisons_FHiCL})
   SET(INuADataComparisons_FHiCL_Includes "${INuADataComparisons_FHiCL_Includes}#include \"${fcl}\"\n")
 endforeach()
 
+SET(IeADataComparisons_FHiCL_Includes)
+foreach(fcl ${IeADataComparisons_FHiCL})
+  SET(IeADataComparisons_FHiCL_Includes "${IeADataComparisons_FHiCL_Includes}#include \"${fcl}\"\n")
+endforeach()
+
 configure_file(nuis.datacomparisons.fcl.in
 "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/nuis.datacomparisons.fcl" @ONLY)
 

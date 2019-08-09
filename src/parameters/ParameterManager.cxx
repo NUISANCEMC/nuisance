@@ -60,7 +60,7 @@ ParameterManager::EnsureParameterRegistered(fhicl::ParameterSet const &ps) {
   np.value = np.start;
   np.min = ps.get<double>("min", kDefaultLimit);
   np.max = ps.get<double>("max", kDefaultLimit);
-  np.step = ps.get<double>("step");
+  np.step = ps.get<double>("step", 1);
 
   pid = Parameters.size();
   Parameters.emplace_back(std::move(np));

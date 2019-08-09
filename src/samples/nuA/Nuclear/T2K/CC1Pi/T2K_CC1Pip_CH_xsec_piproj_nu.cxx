@@ -66,8 +66,8 @@ public:
       return {GetHMFSParticle(fev,{pdgcodes::kPiPlus}).P() * 1E-3};
     };
 
-    std::string wd_stub = write_directory.size() ? write_directory + "/" : "";
-    MomentumPion->write_directory = wd_stub + "MomentumPion";
+    std::string wd_stub = fWrite_directory.size() ? fWrite_directory + "/" : "";
+    MomentumPion->fWrite_directory = wd_stub + "MomentumPion";
 
     Comparisons.emplace_back("MomentumPion", std::move(MomentumPion));
 

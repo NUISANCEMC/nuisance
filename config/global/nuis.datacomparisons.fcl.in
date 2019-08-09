@@ -1,8 +1,9 @@
 @INuADataComparisons_FHiCL_Includes@
+@IeADataComparisons_FHiCL_Includes@
 
 data_comparisons: {
   nuA: [@INuADataComparisons_List@]
-  eA: []
+  eA: [@IeADataComparisons_List@]
   piA: []
   NA: []
 }

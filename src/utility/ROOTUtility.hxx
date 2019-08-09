@@ -23,6 +23,8 @@
 #include "exception/exception.hxx"
 
 #include "TFile.h"
+#include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TTree.h"
 
 #include <iomanip>
@@ -36,6 +38,7 @@ namespace utility {
 NEW_NUIS_EXCEPT(failed_to_open_TFile);
 NEW_NUIS_EXCEPT(failed_to_get_TTree);
 NEW_NUIS_EXCEPT(WriteToTFile_nullptr);
+NEW_NUIS_EXCEPT(InvalidDataColumns);
 
 inline void CloseTFile(TFile *f = nullptr) {
   if (f) {
@@ -167,12 +170,29 @@ inline void WriteToTFile(TFile_ptr &tf, TObject *object,
 
   TDirectory *ogdir = gDirectory;
 
-  tf->cd();
-  object->Write(object_name.c_str(), TObject::kOverwrite);
+  tf->WriteTObject(object, SanitizeROOTObjectName(object_name).c_str(),
+                   "overwrite");
 
   if (ogdir) {
     ogdir->cd();
   }
+}
+
+template <typename T, size_t N>
+std::unique_ptr<TGraph> BuildTGraph(std::vector<std::array<T, N>> const &data) {
+  if (N < 1) {
+    throw InvalidDataColumns() << "Expected to be passed at least 1 column of "
+                                  "data to build TGraph out of.";
+  }
+  std::unique_ptr<TGraph> g((N > 2) ? static_cast<TGraph *>(new TGraphErrors())
+                                    : new TGraph());
+  for (size_t i = 0; i < data.size(); ++i) {
+    g->SetPoint(i, (N > 1) ? data[i][0] : i, (N > 1) ? data[i][1] : data[i][0]);
+    if (N > 2) {
+      static_cast<TGraphErrors *>(g.get())->SetPointError(i, 0, data[i][2]);
+    }
+  }
+  return g;
 }
 
 } // namespace utility

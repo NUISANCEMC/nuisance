@@ -21,6 +21,8 @@
 
 #include "event/Particle.hxx"
 
+#include <iostream>
+
 namespace nuis {
 namespace utility {
 bool SimpleParticlePhaseSpaceRestriction::Inside(

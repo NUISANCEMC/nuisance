@@ -43,7 +43,8 @@ std::string FullEvent::to_string() const {
     for (Particle const &part : status_stack.particles) {
       ss << "\t\t{ PDG: " << part.pdg << ", P3: [ " << part.P4[0] << ", "
          << part.P4[1] << ", " << part.P4[2] << "], E: " << part.P4[3]
-         << ", M: " << part.P4.M() << " }" << std::endl;
+         << ", ang: " << part.P4.Theta() << ", M: " << part.P4.M() << " }"
+         << std::endl;
     }
   }
   ss << std::endl;

@@ -1,11 +1,13 @@
 set(utility_experimental_implementation_files
   T2KUtility.cxx
   MINERvAUtility.cxx
+  VirginiaQEArchiveUtility.cxx
   )
 
 set(utility_experimental_header_files
   T2KUtility.hxx
   MINERvAUtility.hxx
+  VirginiaQEArchiveUtility.hxx
   )
 
 add_library(nuis_utility_experimental SHARED ${utility_experimental_implementation_files})

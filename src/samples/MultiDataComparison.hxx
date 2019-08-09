@@ -39,7 +39,7 @@
 #include <memory>
 #include <vector>
 
-///Wraps multiple projections of the same signal selection
+/// Wraps multiple projections of the same signal selection
 class MultiDataComparison : public IDataComparison {
 
   NEW_NUIS_EXCEPT(invalid_MultiDataComparison_initialization);
@@ -49,7 +49,7 @@ protected:
   std::string fName;
 
   nuis::input::InputManager::Input_id_t fIH_id;
-  std::string write_directory;
+  std::string fWrite_directory;
   size_t NMaxSample_override;
 
   std::string fJournalReference;
@@ -70,7 +70,7 @@ public:
   MultiDataComparison(std::string name) {
     fName = std::move(name);
     fIH_id = std::numeric_limits<nuis::input::InputManager::Input_id_t>::max();
-    write_directory = "";
+    fWrite_directory = "";
     NMaxSample_override = std::numeric_limits<size_t>::max();
 
     fJournalReference = "";
@@ -148,8 +148,10 @@ public:
     NMaxSample_override =
         fInstanceConfig.get<size_t>("nmax", std::numeric_limits<size_t>::max());
 
-    write_directory =
-        fInstanceConfig.get<std::string>("write_directory", Name());
+    if (!fWrite_directory.size()) {
+      fWrite_directory =
+          fInstanceConfig.get<std::string>("write_directory", Name());
+    }
   }
 
   void ProcessSample(size_t nmax = std::numeric_limits<size_t>::max()) {

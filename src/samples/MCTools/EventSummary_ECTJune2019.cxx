@@ -21,6 +21,8 @@
 
 #include "samples/SimpleMCStudy.hxx"
 
+#include "variation/WeightManager.hxx"
+
 #include "utility/EventTopologyUtility.hxx"
 #include "utility/FullEventUtility.hxx"
 #include "utility/InteractionChannelUtility.hxx"
@@ -35,6 +37,7 @@
 
 using namespace nuis::event;
 using namespace nuis::utility;
+using namespace nuis::variation;
 
 class EventSummary_ECTJune2019 : public SimpleMCStudy {
 
@@ -107,6 +110,7 @@ class EventSummary_ECTJune2019 : public SimpleMCStudy {
     bool isMINERvASTV;
 
     double xsweight;
+    double rwweight;
   };
 
   EvSum es;
@@ -183,6 +187,7 @@ public:
     EvSumTree->Branch("isMINERvASTV", &es.isMINERvASTV, "isMINERvASTV/O");
 
     EvSumTree->Branch("xsweight", &es.xsweight, "xsweight/D");
+    EvSumTree->Branch("rwweight", &es.rwweight, "rwweight/D");
   }
 
   void Initialize(fhicl::ParameterSet const &instance_sample_configuration) {
@@ -295,6 +300,7 @@ public:
       es.isMINERvASTV = mnv::IsCC0PiNp_STV(ev);
 
       es.xsweight = weight;
+      es.rwweight = WeightManager::Get().GetEventWeight(ev);
 
       EvSumTree->Fill();
     };

@@ -138,6 +138,17 @@ Instantiate(std::string const &classname) {
 
   static std::vector<PluginInstantiator<T>> LoadedPlugins;
 
+  for (PluginInstantiator<T> &plugin : LoadedPlugins) {
+    if ((plugin.Base_classname == plugin_traits<T>::interface_name()) &&
+        (plugin.Classname == classname)) {
+#ifdef DEBUG_INSTANTIATE
+      std::cout << "[INFO]: Using already loaded PluginInstantiator"
+                << std::endl;
+#endif
+      return plugin.Instantiate();
+    }
+  }
+
   fhicl::ParameterSet const &plugins =
       config::GetDocument().get<fhicl::ParameterSet>("plugins");
   fhicl::ParameterSet const &search_paths =
@@ -160,18 +171,6 @@ Instantiate(std::string const &classname) {
     path = utility::EnsureTrailingSlash(path);
     for (std::string const &so_name :
          utility::GetMatchingFiles(path, ".*\\.so")) {
-
-      for (PluginInstantiator<T> &plugin : LoadedPlugins) {
-        if (plugin.FQ_so_path == (path + so_name) &&
-            (plugin.Base_classname == plugin_traits<T>::interface_name()) &&
-            (plugin.Classname == classname)) {
-#ifdef DEBUG_INSTANTIATE
-          std::cout << "[INFO]: Using already loaded PluginInstantiator"
-                    << std::endl;
-#endif
-          return plugin.Instantiate();
-        }
-      }
 
       PluginInstantiator<T> plugin;
       plugin.FQ_so_path = path + so_name;

@@ -28,6 +28,8 @@ double GetPDGMass(PDG_t pdg) {
 }
 
 NEW_NUIS_EXCEPT(invalid_MatterType);
+NEW_NUIS_EXCEPT(invalid_neutral_lepton_pdg);
+NEW_NUIS_EXCEPT(invalid_charged_lepton_pdg);
 
 bool IsInPDGList(PDG_t pdg, std::vector<PDG_t> const &MatterList,
                  std::vector<PDG_t> const &AntiMatterList, MatterType type) {
@@ -52,6 +54,20 @@ bool IsNeutralLepton(PDG_t pdg, MatterType type) {
 bool IsChargedLepton(PDG_t pdg, MatterType type) {
   return IsInPDGList(pdg, ChargedLeptons_matter, ChargedLeptons_antimatter,
                      type);
+}
+PDG_t GetChargedLeptonPDG(PDG_t pdg) {
+  if (!IsNeutralLepton(pdg)) {
+    throw invalid_neutral_lepton_pdg()
+        << std::to_string(pdg) << " is not a neutral lepton PDG code.";
+  }
+  return pdg + (IsMatter(pdg) ? -1 : 1);
+}
+PDG_t GetNeutralLeptonPDG(PDG_t pdg) {
+  if (!IsNeutralLepton(pdg)) {
+    throw invalid_charged_lepton_pdg()
+        << std::to_string(pdg) << " is not a neutral lepton PDG code.";
+  }
+  return pdg + (IsMatter(pdg) ? 1 : -1);
 }
 bool IsProton(PDG_t pdg, MatterType type) {
   return IsInPDGList(pdg, Proton_matter, Proton_antimatter, type);
@@ -115,14 +131,14 @@ bool IsAntiMatter(PDG_t pdg) {
   return (pdg < 0);
 }
 
-bool IsNuclearPDG(event::PDG_t pdg) { return (pdg > 1000000000); }
+bool IsNuclearPDG(PDG_t pdg) { return (pdg > 1000000000); }
 
 PDG_t MakeNuclearPDG(size_t A, size_t Z) {
-  return 1000 * Z + 10 * A + 1000000000;
+  return (10000 * Z) + (10 * A) + 1000000000;
 }
 
 size_t GetA(PDG_t pdg) { return ((pdg / 10) % 1000); }
-size_t GetZ(PDG_t pdg) { return ((pdg / 1000) % 1000); }
+size_t GetZ(PDG_t pdg) { return ((pdg / 10000) % 1000); }
 
 } // namespace utility
 } // namespace nuis

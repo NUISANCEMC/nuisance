@@ -146,6 +146,14 @@ Particle GetHMISNeutralLepton(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::NeutralLeptons,
                        Particle::Status_t::kPrimaryInitialState);
 }
+Particle GetHMISChargedLepton(FullEvent const &ev) {
+  return GetHMParticle(ev, pdgcodes::ChargedLeptons,
+                       Particle::Status_t::kPrimaryInitialState);
+}
+Particle GetHMISLepton(event::FullEvent const &ev) {
+  return GetHMParticle(ev, pdgcodes::Leptons,
+                       Particle::Status_t::kPrimaryInitialState);
+}
 Particle GetHMFSChargedPion(FullEvent const &ev) {
   return GetHMParticle(ev, pdgcodes::ChargedPions);
 }
@@ -268,6 +276,13 @@ size_t GetNFSLeptons(FullEvent const &ev) {
 }
 size_t GetNISNeutralLeptons(FullEvent const &ev) {
   return GetNParticles(ev, pdgcodes::NeutralLeptons,
+                       Particle::Status_t::kPrimaryInitialState);
+}
+size_t GetNISElectrons(FullEvent const &ev) {
+  return GetNParticles(ev,
+                       {
+                           pdgcodes::kElectron,
+                       },
                        Particle::Status_t::kPrimaryInitialState);
 }
 size_t GetNFSChargedPions(FullEvent const &ev) {

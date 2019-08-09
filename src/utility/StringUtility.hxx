@@ -21,9 +21,9 @@
 
 #include "utility/TerminalUtility.hxx"
 
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
 
 namespace nuis {
 namespace utility {
@@ -39,5 +39,8 @@ std::vector<std::string> split(std::string const &str,
                                std::string const &delim);
 std::vector<std::string> split(std::string const &str,
                                std::vector<std::string> const &delims);
+
+std::string str_replace(std::string const &inp, std::string const &from,
+                        std::string const &to);
 } // namespace utility
 } // namespace nuis

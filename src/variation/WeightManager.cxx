@@ -29,7 +29,7 @@ WeightManager &WeightManager::Get() {
 
 WeightManager::WeightProv_id_t
 WeightManager::EnsureWeightProviderLoaded(fhicl::ParameterSet const &ps) {
-  std::string const &prov_name = ps.get<std::string>("weight_engine_name");
+  std::string const &prov_name = ps.get<std::string>("name");
   for (size_t i = 0; i < WeightEngines.size(); ++i) {
     if (WeightEngines[i].name == prov_name) {
       return i;
@@ -43,8 +43,18 @@ WeightManager::EnsureWeightProviderLoaded(fhicl::ParameterSet const &ps) {
 
   return wid;
 }
-double WeightManager::GetEventWeight(nuis::event::MinimalEvent const &) {
-  return 1;
+double WeightManager::GetEventWeight(nuis::event::MinimalEvent const & me) {
+  double w = 1;
+  for (auto &we : WeightEngines) {
+    w *= we.handler->GetEventWeight(me);
+  }
+  return w;
+}
+
+void WeightManager::ReconfigureWeightEngines() {
+  for (auto &we : WeightEngines) {
+    we.handler->Reconfigure();
+  }
 }
 } // namespace variation
 } // namespace nuis

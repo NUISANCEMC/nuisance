@@ -19,6 +19,12 @@ bool strict_name_regex = false;
 std::string target_search_term = ".*";
 bool strict_target_regex = false;
 
+std::string flux_search_term = ".*";
+bool strict_flux_regex = false;
+
+std::string signal_search_term = ".*";
+bool strict_signal_regex = false;
+
 std::string year_search_term = ".*";
 
 std::string config_out_filename = "";
@@ -26,19 +32,20 @@ std::string config_out_filename = "";
 bool NameOnly = false;
 
 void SayUsage(char const *argv[]) {
-  std::cout << "[USAGE]: " << argv[0]
-     << "\n"
-        "\t-n,-N,-t,-T,-y <search regex> : Filters known IDataComparisons by "
-        "the search term \n"
-        "\t                                (-n: Name, -t: Target, -y: Year). Capitalized versions \n"
-        "\t                                filter on exact match.\n"
-        "\t-o <output_file>              : Dump example sample configuration "
-        "file for matching \n"
-        "\t                                samples.\n"
-        "\t--name-only                   : Only write out matching sample "
-        "names. \n"
-        "\t                                (Still applies all search terms)\n" << std::endl;
-
+  std::cout
+      << "[USAGE]: " << argv[0]
+      << "\n"
+         "\t-n,-N,-t,-T,-y, -s, -S, -f, -F <search regex> : Filters known \n"
+         "\t           IDataComparisons by the search term \n"
+         "\t           (-n: Name, -t: Target, -y: Year, -s: Signal, -f Flux).\n"
+         "\t             Capitalized versions filter on exact match.\n"
+         "\t-o <output_file>              : Dump example sample configuration "
+         "file for matching \n"
+         "\t                                samples.\n"
+         "\t--name-only                   : Only write out matching sample "
+         "names. \n"
+         "\t                                (Still applies all search terms)\n"
+      << std::endl;
 }
 
 void handleOpts(int argc, char const *argv[]) {
@@ -58,6 +65,16 @@ void handleOpts(int argc, char const *argv[]) {
     } else if (std::string(argv[opt]) == "-T") {
       strict_target_regex = true;
       target_search_term = argv[++opt];
+    } else if (std::string(argv[opt]) == "-s") {
+      signal_search_term = argv[++opt];
+    } else if (std::string(argv[opt]) == "-S") {
+      strict_signal_regex = true;
+      signal_search_term = argv[++opt];
+    } else if (std::string(argv[opt]) == "-f") {
+      flux_search_term = argv[++opt];
+    } else if (std::string(argv[opt]) == "-F") {
+      strict_flux_regex = true;
+      flux_search_term = argv[++opt];
     } else if (std::string(argv[opt]) == "-y") {
       year_search_term = argv[++opt];
     } else if (std::string(argv[opt]) == "-o") {
@@ -87,6 +104,12 @@ int main(int argc, char const *argv[]) {
   std::regex rpattern_target(
       strict_target_regex ? target_search_term
                           : std::string(".*") + target_search_term + ".*");
+  std::regex rpattern_flux(strict_flux_regex
+                               ? flux_search_term
+                               : std::string(".*") + flux_search_term + ".*");
+  std::regex rpattern_signal(
+      strict_signal_regex ? signal_search_term
+                          : std::string(".*") + signal_search_term + ".*");
 
   std::regex rpattern_year(std::string(".*") + year_search_term + ".*");
 
@@ -104,40 +127,71 @@ int main(int argc, char const *argv[]) {
         continue;
       }
 
-      nuis::plugins::plugin_traits<IDataComparison>::unique_ptr_t sample =
-          nuis::plugins::Instantiate<IDataComparison>(sample_name);
+      fhicl::ParameterSet sample_global_config =
+          nuis::config::GetDocument().get<fhicl::ParameterSet>(
+              std::string("global.sample_configuration.") + sample_name,
+              fhicl::ParameterSet{});
 
-      if (!std::regex_match(sample->GetTargetMaterial(), rpattern_target)) {
-        continue;
+      std::vector<nuis::plugins::plugin_traits<IDataComparison>::unique_ptr_t>
+          samples;
+
+      // If a single sample can produce multiple comparisons this can be used to
+      // report them as separate samples in the nuissamples list
+      if (sample_global_config.has_key("sub_samples")) {
+        for (fhicl::ParameterSet const &ss_ps :
+             sample_global_config.get<std::vector<fhicl::ParameterSet>>(
+                 "sub_samples")) {
+          samples.push_back(
+              nuis::plugins::Instantiate<IDataComparison>(sample_name));
+          samples.back()->Initialize(ss_ps);
+        }
+      } else {
+        samples.push_back(
+            nuis::plugins::Instantiate<IDataComparison>(sample_name));
       }
 
-      if (!std::regex_match(sample->GetYear(), rpattern_year)) {
-        continue;
-      }
+      for (auto &sample : samples) {
+        if (!std::regex_match(sample->GetTargetMaterial(), rpattern_target)) {
+          continue;
+        }
 
-      std::cout << sample->Name() << std::endl;
-      if (!NameOnly) {
-        std::cout << "\tJournal: " << sample->GetJournalReference()
-                  << std::endl;
-        std::cout << "\tDOI: " << sample->GetDOI() << std::endl;
-        std::cout << "\tYear: " << sample->GetYear() << std::endl;
-        std::cout << "\tTarget: " << sample->GetTargetMaterial() << std::endl;
-        std::cout << "\tFlux: " << sample->GetFluxDescription() << std::endl;
-        std::cout << "\tSignal: " << sample->GetSignalDescription()
-                  << std::endl;
-        std::cout << "\tDocs: \n"
-                  << nuis::utility::indent_apply_width(
-                         sample->GetDocumentation(), 10)
-                  << std::endl;
-        std::cout << "\tExample_Config: {\n"
-                  << nuis::utility::indent_apply_width(
-                         sample->GetExampleConfiguration().to_indented_string(),
-                         12)
-                  << "\n\t}\n"
-                  << std::endl;
-      }
+        if (!std::regex_match(sample->GetFluxDescription(), rpattern_flux)) {
+          continue;
+        }
 
-      example_sample_configs.push_back(sample->GetExampleConfiguration());
+        if (!std::regex_match(sample->GetSignalDescription(),
+                              rpattern_signal)) {
+          continue;
+        }
+
+        if (!std::regex_match(sample->GetYear(), rpattern_year)) {
+          continue;
+        }
+
+        std::cout << sample->Name() << std::endl;
+        if (!NameOnly) {
+          std::cout << "\tJournal: " << sample->GetJournalReference()
+                    << std::endl;
+          std::cout << "\tDOI: " << sample->GetDOI() << std::endl;
+          std::cout << "\tYear: " << sample->GetYear() << std::endl;
+          std::cout << "\tTarget: " << sample->GetTargetMaterial() << std::endl;
+          std::cout << "\tFlux: " << sample->GetFluxDescription() << std::endl;
+          std::cout << "\tSignal: " << sample->GetSignalDescription()
+                    << std::endl;
+          std::cout << "\tDocs: \n"
+                    << nuis::utility::indent_apply_width(
+                           sample->GetDocumentation(), 10)
+                    << std::endl;
+          std::cout
+              << "\tExample_Config: {\n"
+              << nuis::utility::indent_apply_width(
+                     sample->GetExampleConfiguration().to_indented_string(), 12)
+              << "\n\t}\n"
+              << std::endl;
+        }
+
+        example_sample_configs.push_back(sample->GetExampleConfiguration());
+      }
     }
   }
 

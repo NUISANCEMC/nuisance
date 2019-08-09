@@ -20,7 +20,8 @@ set(utility_header_files
   TerminalUtility.hxx
   StatsUtility.hxx
   EventTopologyUtility.hxx
-  PhaseSpaceRestriction.cxx)
+  PhaseSpaceRestriction.hxx
+  UnitsUtility.hxx)
 
 add_library(nuis_utility SHARED ${utility_implementation_files})
 target_link_libraries(nuis_utility)

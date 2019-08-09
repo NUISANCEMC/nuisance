@@ -1,4 +1,4 @@
-SET(APPS nuissamples nuiscomp nuisevsum nuisstudy)
+SET(APPS nuissamples nuiscomp nuisevsum nuisstudy nuisflat)
 
 foreach(a ${APPS})
   add_executable(${a} ${a}.cxx)

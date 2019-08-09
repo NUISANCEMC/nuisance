@@ -136,14 +136,14 @@ public:
   void Write() {
     SimpleDataComparison_2DPoly::Write();
     nuis::persistency::WriteToOutputFile<TH2>(
-        fPrediction_fine, "Prediction_fine", write_directory);
+        fPrediction_fine, "Prediction_fine", fWrite_directory);
     nuis::persistency::WriteToOutputFile<TH1>(
-        fPrediction_pmu, "fPrediction_pmu", write_directory);
+        fPrediction_pmu, "fPrediction_pmu", fWrite_directory);
     nuis::persistency::WriteToOutputFile<TH1>(
-        fPrediction_ctheta, "fPrediction_ctheta", write_directory);
+        fPrediction_ctheta, "fPrediction_ctheta", fWrite_directory);
 
     nuis::persistency::WriteToOutputFile<HistType>(
-        fPrediction_unscale, "Prediction_unscale", write_directory);
+        fPrediction_unscale, "Prediction_unscale", fWrite_directory);
 
     static std::vector<std::vector<nuis::utility::PolyBinSpecifier>> const
         binning = {
@@ -170,11 +170,11 @@ public:
 
     for (auto &slice : GetTH2PolySlices(fData, binning)) {
       nuis::persistency::WriteToOutputFile<TH1>(slice, slice->GetName(),
-                                                write_directory);
+                                                fWrite_directory);
     }
     for (auto &slice : GetTH2PolySlices(fPrediction_xsec, binning)) {
       nuis::persistency::WriteToOutputFile<TH1>(slice, slice->GetName(),
-                                                write_directory);
+                                                fWrite_directory);
     }
   }
 };

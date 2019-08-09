@@ -444,11 +444,11 @@ std::vector<std::unique_ptr<TH1>> GetTH2PolySlices(
 
 template <typename HT>
 inline typename std::enable_if<HType_traits<HT>::NDim == 1,
-                               std::unique_ptr<TH1>>::type
+                               std::unique_ptr<HT>>::type
 BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
   std::array<double, 3> xaxis =
       ps.get<std::array<double, 3>>("xaxis_descriptor");
-  std::unique_ptr<TH1> rtn = std::make_unique<TH1D>(
+  std::unique_ptr<HT> rtn = std::make_unique<HT>(
       ps.get<std::string>("name", "").c_str(),
       ps.get<std::string>("title", "").c_str(), xaxis[0], xaxis[1], xaxis[2]);
   rtn->SetDirectory(nullptr);
@@ -457,16 +457,16 @@ BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
 
 template <typename HT>
 inline typename std::enable_if<HType_traits<HT>::NDim == 2,
-                               std::unique_ptr<TH2>>::type
+                               std::unique_ptr<HT>>::type
 BuildHistFromFHiCL(fhicl::ParameterSet const &ps) {
   std::array<double, 3> xaxis =
       ps.get<std::array<double, 3>>("xaxis_descriptor");
   std::array<double, 3> yaxis =
       ps.get<std::array<double, 3>>("yaxis_descriptor");
-  std::unique_ptr<TH2> rtn =
-      std::make_unique<TH2D>(ps.get<std::string>("name", "").c_str(),
-                             ps.get<std::string>("title", "").c_str(), xaxis[0],
-                             xaxis[1], xaxis[2], yaxis[0], yaxis[1], yaxis[2]);
+  std::unique_ptr<HT> rtn =
+      std::make_unique<HT>(ps.get<std::string>("name", "").c_str(),
+                           ps.get<std::string>("title", "").c_str(), xaxis[0],
+                           xaxis[1], xaxis[2], yaxis[0], yaxis[1], yaxis[2]);
   rtn->SetDirectory(nullptr);
   return rtn;
 }
@@ -475,6 +475,36 @@ static bool const kYSlice = true;
 static bool const kXSlice = false;
 void SliceNorm(std::unique_ptr<TH2> &hist, bool AlongY = kYSlice,
                char const *opt = "");
+
+template <typename TH>
+inline void PeakScale(std::unique_ptr<TH> &hist, double sf) {
+  Int_t mb = hist->GetMaximumBin();
+  double max = hist->GetBinContent(mb);
+  hist->Scale(sf / max);
+}
+
+template <> inline void PeakScale(std::unique_ptr<TGraph> &g, double sf) {
+  size_t n = g->GetN();
+  double max = -std::numeric_limits<double>::max();
+  for (size_t i = 0; i < n; ++i) {
+    double x, y;
+    g->GetPoint(i, x, y);
+    max = std::max(max, y);
+  }
+
+  for (size_t i = 0; i < n; ++i) {
+    double x, y;
+    g->GetPoint(i, x, y);
+    g->SetPoint(i, x, y * (sf / max));
+
+    TGraphErrors *ge = dynamic_cast<TGraphErrors *>(g.get());
+    if (ge) {
+      double ex = ge->GetErrorX(i);
+      double ey = ge->GetErrorY(i);
+      ge->SetPointError(i, ex, ey * (sf / max));
+    }
+  }
+}
 
 } // namespace utility
 } // namespace nuis

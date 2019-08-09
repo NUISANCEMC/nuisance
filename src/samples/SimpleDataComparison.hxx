@@ -48,7 +48,7 @@ class SimpleDataComparison : public IDataComparison {
 
 public:
   static size_t const NDim = nd;
-  std::string write_directory;
+  std::string fWrite_directory;
 
 protected:
   using HistType = HT;
@@ -103,7 +103,7 @@ public:
     fName = std::move(name);
     fIH_id = std::numeric_limits<nuis::input::InputManager::Input_id_t>::max();
     fUseCache = false;
-    write_directory = "";
+    fWrite_directory = "";
     NMaxSample_override = std::numeric_limits<size_t>::max();
     fDataInputDescriptor = "";
     fData = nullptr;
@@ -301,28 +301,30 @@ public:
 
     ReadGlobalConfigDefaults();
 
-    if (fInstanceConfig.has_key("fake_data")) {
-      fData = nuis::utility::GetHistogram<HistType>(
-          fInstanceConfig.get<std::string>("fake_data_histogram"));
-    } else if (!fGlobalConfig.get<bool>("has_data", true) ||
-               !fInstanceConfig.get<bool>("has_data", true)) {
-      // Explicitly not expecting data
-    } else {
-      if (!fDataInputDescriptor.length()) {
-        if (!fGlobalConfig.has_key("data_descriptor")) {
-          throw invalid_SimpleDataComparison_initialization()
-              << "[ERROR]: SimpleDataComparison::Initialize for "
-                 "IDataComparison: "
-              << std::quoted(Name())
-              << " failed as no input data was set by a call to "
-                 "SimpleDataComparison::SetData and no data_descriptor for "
-                 "this SimpleDataComparison could be found in the global "
-                 "configuration.";
+    if (!fData) { // If data hasn't been set externally.
+      if (fInstanceConfig.has_key("fake_data")) {
+        fData = nuis::utility::GetHistogram<HistType>(
+            fInstanceConfig.get<std::string>("fake_data_histogram"));
+      } else if (!fGlobalConfig.get<bool>("has_data", true) ||
+                 !fInstanceConfig.get<bool>("has_data", true)) {
+        // Explicitly not expecting data
+      } else {
+        if (!fDataInputDescriptor.length()) {
+          if (!fGlobalConfig.has_key("data_descriptor")) {
+            throw invalid_SimpleDataComparison_initialization()
+                << "[ERROR]: SimpleDataComparison::Initialize for "
+                   "IDataComparison: "
+                << std::quoted(Name())
+                << " failed as no input data was set by a call to "
+                   "SimpleDataComparison::SetData and no data_descriptor for "
+                   "this SimpleDataComparison could be found in the global "
+                   "configuration.";
+          }
+          fDataInputDescriptor =
+              fGlobalConfig.get<std::string>("data_descriptor");
         }
-        fDataInputDescriptor =
-            fGlobalConfig.get<std::string>("data_descriptor");
+        fData = nuis::utility::GetHistogram<HistType>(fDataInputDescriptor);
       }
-      fData = nuis::utility::GetHistogram<HistType>(fDataInputDescriptor);
     }
 
     if (!fPrediction) {
@@ -365,8 +367,10 @@ public:
     NMaxSample_override =
         fInstanceConfig.get<size_t>("nmax", std::numeric_limits<size_t>::max());
 
-    write_directory =
-        fInstanceConfig.get<std::string>("write_directory", Name());
+    if (!fWrite_directory.size()) { // Can be set by subclass
+      fWrite_directory =
+          fInstanceConfig.get<std::string>("write_directory", Name());
+    }
   }
 
   void ProcessSample(size_t nmax = std::numeric_limits<size_t>::max()) {
@@ -442,21 +446,21 @@ public:
     }
 
     nuis::persistency::WriteToOutputFile<HistType>(
-        fPrediction_comparison, "Prediction", write_directory);
+        fPrediction_comparison, "Prediction", fWrite_directory);
     if (fModeHists) {
       for (auto &mh : fPrediction_modes) {
         nuis::persistency::WriteToOutputFile<HistType>(
-            mh.second, mh.second->GetName(), write_directory);
+            mh.second, mh.second->GetName(), fWrite_directory);
       }
     }
     nuis::persistency::WriteToOutputFile<HistType>(
-        fPrediction_xsec, "Prediction_xsec", write_directory);
+        fPrediction_xsec, "Prediction_xsec", fWrite_directory);
 
     if (fData) {
       nuis::persistency::WriteToOutputFile<HistType>(fData, "Data",
-                                                     write_directory);
+                                                     fWrite_directory);
       nuis::persistency::WriteToOutputFile<HistType>(
-          fPrediction_shape, "Prediction_shape", write_directory);
+          fPrediction_shape, "Prediction_shape", fWrite_directory);
     }
   }
 

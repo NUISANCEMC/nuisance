@@ -147,15 +147,15 @@ public:
       return {mnv::GetNeutronMomentumReco_CC0PiN_mnv(fev)*1E-3};
     };
 
-    std::string wd_stub = write_directory.size() ? write_directory + "/" : "";
-    DPT->write_directory = wd_stub + "dpt";
-    DAT->write_directory = wd_stub + "dat";
-    DPhiT->write_directory = wd_stub + "dphit";
-    MuMom->write_directory = wd_stub + "muonmomentum";
-    MuTheta->write_directory = wd_stub + "muontheta";
-    ProtonMom->write_directory = wd_stub + "protonmomentum";
-    ProtonTheta->write_directory = wd_stub + "protontheta";
-    NeutronMomReco->write_directory = wd_stub + "neutronmomentum";
+    std::string wd_stub = fWrite_directory.size() ? fWrite_directory + "/" : "";
+    DPT->fWrite_directory = wd_stub + "dpt";
+    DAT->fWrite_directory = wd_stub + "dat";
+    DPhiT->fWrite_directory = wd_stub + "dphit";
+    MuMom->fWrite_directory = wd_stub + "muonmomentum";
+    MuTheta->fWrite_directory = wd_stub + "muontheta";
+    ProtonMom->fWrite_directory = wd_stub + "protonmomentum";
+    ProtonTheta->fWrite_directory = wd_stub + "protontheta";
+    NeutronMomReco->fWrite_directory = wd_stub + "neutronmomentum";
 
     Comparisons.emplace_back("dpt", std::move(DPT));
     Comparisons.emplace_back("dat", std::move(DAT));

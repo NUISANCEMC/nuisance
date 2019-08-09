@@ -1,0 +1,512 @@
+global.sample_configuration.VirginiaQEArchive: {
+  flux_unfolded: false
+  shape_only: false
+  # This is so that the base class doesn't panic at not having histograms.
+  has_data: false
+  sub_samples: [
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.16
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.161
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.2
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.2
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.24
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.24
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.28
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.32
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.32
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.361
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.4
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.401
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.44
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.48
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.48
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Whitney
+        EIn_GeV: 0.5
+        TargetZ: 6
+        Year: 1974
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.519
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.56
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.56
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 145
+        Author: Barreau
+        EIn_GeV: 0.56
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.62
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.62
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 36
+        Author: Barreau
+        EIn_GeV: 0.68
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 60
+        Author: Barreau
+        EIn_GeV: 0.68
+        TargetZ: 6
+        Year: 1983
+      },
+      {
+        Angle_Deg: 37.1
+        Author: "O'Connell"
+        EIn_GeV: 0.73
+        TargetZ: 6
+        Year: 1987
+      },
+      {
+        Angle_Deg: 37.5
+        Author: Sealock
+        EIn_GeV: 0.961
+        TargetZ: 6
+        Year: 1989
+      },
+      {
+        Angle_Deg: 37.5
+        Author: Sealock
+        EIn_GeV: 1.108
+        TargetZ: 6
+        Year: 1989
+      },
+      {
+        Angle_Deg: 37.5
+        Author: Sealock
+        EIn_GeV: 1.299
+        TargetZ: 6
+        Year: 1989
+      },
+      {
+        Angle_Deg: 11.95
+        Author: Baran
+        EIn_GeV: 1.3
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 13.54
+        Author: Baran
+        EIn_GeV: 1.3
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 11.95
+        Author: Baran
+        EIn_GeV: 1.5
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 13.54
+        Author: Baran
+        EIn_GeV: 1.5
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 37.5
+        Author: Sealock
+        EIn_GeV: 1.501
+        TargetZ: 6
+        Year: 1989
+      },
+      {
+        Angle_Deg: 11.95
+        Author: Baran
+        EIn_GeV: 1.65
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 13.54
+        Author: Baran
+        EIn_GeV: 1.65
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 16
+        Author: Bagdasaryan
+        EIn_GeV: 1.93
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 18
+        Author: Bagdasaryan
+        EIn_GeV: 1.93
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 15
+        Author: Zeller
+        EIn_GeV: 2
+        TargetZ: 6
+        Year: 1973
+      },
+      {
+        Angle_Deg: 35.51
+        Author: Arrington
+        EIn_GeV: 2.015
+        TargetZ: 6
+        Year: 1995
+      },
+      {
+        Angle_Deg: 15.022
+        Author: Day
+        EIn_GeV: 2.02
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 20.016
+        Author: Day
+        EIn_GeV: 2.02
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 16
+        Author: Bagdasaryan
+        EIn_GeV: 2.13
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 18
+        Author: Bagdasaryan
+        EIn_GeV: 2.13
+        TargetZ: 6
+        Year: 1988
+      },
+      {
+        Angle_Deg: 15
+        Author: Zeller
+        EIn_GeV: 2.5
+        TargetZ: 6
+        Year: 1973
+      },
+      {
+        Angle_Deg: 15
+        Author: Zeller
+        EIn_GeV: 2.7
+        TargetZ: 6
+        Year: 1973
+      },
+      {
+        Angle_Deg: 47.68
+        Author: Arrington
+        EIn_GeV: 3.188
+        TargetZ: 6
+        Year: 1995
+      },
+      {
+        Angle_Deg: 16.02
+        Author: Day
+        EIn_GeV: 3.595
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 20.016
+        Author: Day
+        EIn_GeV: 3.595
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 25.012
+        Author: Day
+        EIn_GeV: 3.595
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 30.01
+        Author: Day
+        EIn_GeV: 3.595
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 16.02
+        Author: Day
+        EIn_GeV: 3.605
+        TargetZ: 6
+        Year: 1993
+      },
+      {
+        Angle_Deg: 15
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 23
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 30
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 37
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 45
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 55
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 74
+        Author: Arrington
+        EIn_GeV: 4.045
+        TargetZ: 6
+        Year: 1998
+      },
+      {
+        Angle_Deg: 53.389
+        Author: Arrington
+        EIn_GeV: 4.212
+        TargetZ: 6
+        Year: 1995
+      },
+      {
+        Angle_Deg: 56.639
+        Author: Arrington
+        EIn_GeV: 5.12
+        TargetZ: 6
+        Year: 1995
+      },
+      {
+        Angle_Deg: 18
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 22
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 26
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 32
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 40
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 50
+        Author: Fomin
+        EIn_GeV: 5.766
+        TargetZ: 6
+        Year: 2010
+      },
+      {
+        Angle_Deg: 32
+        Author: Anghinolfi
+        EIn_GeV: 0.7
+        TargetZ: 8
+        Year: 1996
+      },
+      {
+        Angle_Deg: 37.1
+        Author: "O'Connell"
+        EIn_GeV: 0.737
+        TargetZ: 8
+        Year: 1987
+      },
+      {
+        Angle_Deg: 32
+        Author: Anghinolfi
+        EIn_GeV: 0.88
+        TargetZ: 8
+        Year: 1996
+      },
+      {
+        Angle_Deg: 32
+        Author: Anghinolfi
+        EIn_GeV: 1.08
+        TargetZ: 8
+        Year: 1996
+      },
+      {
+        Angle_Deg: 32
+        Author: Anghinolfi
+        EIn_GeV: 1.2
+        TargetZ: 8
+        Year: 1996
+      },
+      {
+        Angle_Deg: 32
+        Author: Anghinolfi
+        EIn_GeV: 1.5
+        TargetZ: 8
+        Year: 1996
+      }
+  ]
+}

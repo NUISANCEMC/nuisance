@@ -180,7 +180,7 @@ public:
     SimpleDataComparison_1D::Write();
     if (UseD2Corr) {
       nuis::persistency::WriteToOutputFile<HistType>(
-          fPrediction_Uncorr, "Prediction_Uncorr", write_directory);
+          fPrediction_Uncorr, "Prediction_Uncorr", fWrite_directory);
     }
   }
 };

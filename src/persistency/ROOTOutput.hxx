@@ -1,7 +1,8 @@
-#ifndef PERSITENCY_ROOTOUTPUT_HXX_SEEN
-#define PERSITENCY_ROOTOUTPUT_HXX_SEEN
+#pragma once
 
 #include "exception/exception.hxx"
+
+#include "utility/ROOTUtility.hxx"
 
 #include "TFile.h"
 
@@ -41,7 +42,8 @@ inline void WriteToOutputFile(T *object, std::string const &object_name,
   TDirectory *d = f.get();
   while (dir_name.length()) {
     size_t next_slash = dir_name.find_first_of('/');
-    std::string next_dir = dir_name.substr(0, next_slash);
+    std::string next_dir =
+        utility::SanitizeROOTObjectName(dir_name.substr(0, next_slash));
 
     if (next_slash != std::string::npos) {
       dir_name = dir_name.substr(next_slash + 1);
@@ -57,8 +59,8 @@ inline void WriteToOutputFile(T *object, std::string const &object_name,
     d = nd;
   }
 
-  d->cd();
-  object->Write(object_name.c_str(), TObject::kOverwrite);
+  d->WriteTObject(object, utility::SanitizeROOTObjectName(object_name).c_str(),
+                  "overwrite");
 
   if (ogdir) {
     ogdir->cd();
@@ -76,5 +78,3 @@ inline void WriteToOutputFile(std::unique_ptr<T> &object,
 void CloseOpenTFiles();
 } // namespace persistency
 } // namespace nuis
-
-#endif

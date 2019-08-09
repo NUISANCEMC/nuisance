@@ -12,6 +12,8 @@
 
 #include "persistency/ROOTOutput.hxx"
 
+#include "variation/WeightManager.hxx"
+
 #include "utility/StringUtility.hxx"
 
 #include "fhiclcpp/make_ParameterSet.h"
@@ -79,16 +81,24 @@ int main(int argc, char const *argv[]) {
     nuis::persistency::NewStream("default", split[0], open_mode);
   }
 
-  size_t NMax = nuis::config::GetDocument().get<size_t>(
-      "nmax", std::numeric_limits<size_t>::max());
+  fhicl::ParameterSet const &global_config = nuis::config::GetDocument();
+  size_t NMax =
+      global_config.get<size_t>("nmax", std::numeric_limits<size_t>::max());
 
   std::vector<fhicl::ParameterSet> samples;
   if (named_sample.size()) {
-    samples.push_back(
-        nuis::config::GetDocument().get<fhicl::ParameterSet>(named_sample));
+    samples.push_back(global_config.get<fhicl::ParameterSet>(named_sample));
   } else {
-    samples = nuis::config::GetDocument().get<std::vector<fhicl::ParameterSet>>(
-        "samples");
+    samples = global_config.get<std::vector<fhicl::ParameterSet>>("samples");
+  }
+
+  if (global_config.has_key("weight_engines")) {
+    for (fhicl::ParameterSet const &we_ps :
+         global_config.get<std::vector<fhicl::ParameterSet>>(
+             "weight_engines")) {
+      nuis::variation::WeightManager::Get().EnsureWeightProviderLoaded(we_ps);
+    }
+    nuis::variation::WeightManager::Get().ReconfigureWeightEngines();
   }
 
   for (fhicl::ParameterSet const &samp_config : samples) {

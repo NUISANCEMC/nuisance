@@ -126,6 +126,10 @@ bool IsNeutralLepton(event::PDG_t pdg,
                      pdgcodes::MatterType type = pdgcodes::kMatterAntimatter);
 bool IsChargedLepton(event::PDG_t pdg,
                      pdgcodes::MatterType type = pdgcodes::kMatterAntimatter);
+
+event::PDG_t GetChargedLeptonPDG(event::PDG_t pdg);
+event::PDG_t GetNeutralLeptonPDG(event::PDG_t pdg);
+
 bool IsProton(event::PDG_t pdg,
               pdgcodes::MatterType type = pdgcodes::kMatterAntimatter);
 
