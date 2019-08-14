@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NFortFns.h" // Contains all the NEUT common blocks
+#include "neutvect.h"
 
 namespace NEUTUtils {
 

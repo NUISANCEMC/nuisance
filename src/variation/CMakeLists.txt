@@ -12,3 +12,5 @@ target_link_libraries(nuis_variation nuis_event nuis_plugins)
 
 install(TARGETS nuis_variation DESTINATION lib)
 install(FILES ${variation_header_files} DESTINATION include/variation)
+
+add_subdirectory(engines)

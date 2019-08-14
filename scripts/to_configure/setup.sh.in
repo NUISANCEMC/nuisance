@@ -86,6 +86,19 @@ if [ "@USE_NEUT@" != "FALSE" ]; then
   add_to_LD_LIBRARY_PATH "${NEUT_LIB_DIR}" "${NEUT_ROOT}/src/reweight"
 fi
 
+if [ "@USE_T2K@" != "FALSE" ]; then
+  echo "[INFO]: Adding T2KReWeight library paths to the environment."
+  export T2KREWEIGHT=@T2KREWEIGHT@
+  add_to_LD_LIBRARY_PATH "${T2KREWEIGHT}/lib"
+
+  if [ "@USE_NIWG@" != "FALSE" ]; then
+    echo "[INFO]: Adding NIWGReWeight library paths to the environment."
+    export NIWG=@NIWG@
+    export NIWGREWEIGHT_INPUTS=@NIWG@/inputs
+    add_to_LD_LIBRARY_PATH "${NIWG}"
+  fi
+fi
+
 if [ "@USE_NUWRO@" != "FALSE" ]; then
   echo "[INFO]: Adding NuWro library paths to the environment."
   export NUWRO="@NUWRO@"

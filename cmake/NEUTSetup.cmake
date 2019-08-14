@@ -19,9 +19,11 @@
 
 find_program(neut-config NEUTCONFIGFOUND)
 
+LIST(APPEND EXTRA_CXX_FLAGS -DNEED_FILL_NEUT_COMMONS)
+
 SET(HAVENEUTCONFIG FALSE)
 # We are dealing with shiny NEUT
-if(NOT NEUTCONFIGFOUND STREQUAL NEUTCONFIGFOUND-NOTFOUND)
+if(NOT "${NEUTCONFIGFOUND} " STREQUAL " ")
   SET(HAVENEUTCONFIG TRUE)
 endif()
 
@@ -209,4 +211,4 @@ else() # Everything better be set up already
 
 endif()
 
-SET(USE_NEUT TRUE CACHE BOOL "Whether to enable GENIE support. Requires external libraries. <FALSE>" FORCE)
+SET(USE_NEUT TRUE CACHE BOOL "Whether to enable NEUT support. Requires external libraries. <FALSE>" FORCE)

@@ -93,6 +93,12 @@ CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory
 CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
 CheckAndSetDefaultEnv(CERN_LEVEL "" STRING "CERNLIB Library version. Overrides environment variable \$CERN_LEVEL <>" CERN_LEVEL)
 
+# T2K
+CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to T2K binary tree root directory. Overrides environment variable \$T2KREWEIGHT <>" T2KREWEIGHT)
+CheckAndSetDefaultCache(USE_NIWG FALSE INTERNAL "Whether we are using the T2K NIWGReWeight. <FALSE>")
+CheckAndSetDefaultEnv(NIWG "" PATH "Path to NIWGReWeight binary tree root directory. Overrides environment variable \$NIWG <>" NIWG)
+
 # GENIE
 CheckAndSetDefaultCache(USE_GENIE FALSE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")

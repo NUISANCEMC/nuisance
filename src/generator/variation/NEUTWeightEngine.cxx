@@ -1,5 +1,11 @@
 #include "generator/variation/NEUTWeightEngine.hxx"
+
+#ifdef NEED_FILL_NEUT_COMMONS
 #include "generator/variation/FillNEUTCommons.hxx"
+#include "neutvect.h"
+#else
+#include "neutread.h"
+#endif
 
 #include "fhiclcpp/ParameterSet.h"
 
@@ -17,8 +23,6 @@
 #include "NReWeightNuXSecNCRES.h"
 #include "NReWeightNuXSecRES.h"
 #include "NReWeightNuclPiless.h"
-
-#include "NSystUncertainty.h"
 
 #include <iomanip>
 
@@ -81,7 +85,11 @@ double NEUTWeightEngine::GetEventWeight(nuis::event::MinimalEvent const &ev) {
   if (!nv) {
     return 1.0;
   }
+#ifdef NEED_FILL_NEUT_COMMONS
   NEUTUtils::FillNeutCommons(nv);
+#else
+  neutread(nv);
+#endif
   return fNeutRW->CalcWeight();
 }
 
@@ -91,7 +99,6 @@ fhicl::ParameterSet NEUTWeightEngine::GetExampleConfiguration() {
   fhicl::ParameterSet ps;
 
   ps.put<std::string>("name", GetName());
-  ps.put<bool>("use_LMCPiBar_BgScl",false);
   fhicl::ParameterSet dial_maqe;
   dial_maqe.put<std::string>("name", "MaCCQE");
 
