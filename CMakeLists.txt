@@ -117,6 +117,7 @@ LIST(APPEND ALLEXPERIMENTS
   GGM
   K2K
   MINERvA
+  MicroBooNE
   MiniBooNE
   SciBooNE
   T2K)

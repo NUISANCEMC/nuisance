@@ -192,7 +192,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       throw;
     }
 
-    nuwrotree = inpTree->CloneTree();
+    nuwrotree = inpTree->CloneTree(-1, "fast");
     nuwrotree->SetDirectory(outRootFile);
     nuwrotree->Write(nuwrotree->GetName());
   } else {
@@ -210,7 +210,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
   }
 
   // Get Flux Histogram
-  event* evt = NULL;
+  event* evt = new event();
   nuwrotree->SetBranchAddress("e", &evt);
   nuwrotree->GetEntry(0);
 

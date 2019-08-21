@@ -159,6 +159,10 @@
 #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 #endif
 
+#ifndef __NO_MicroBooNE__
+#include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#endif
+
 #ifndef __NO_MINERvA__
 // MINERvA CCQE
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
@@ -971,13 +975,26 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
   } else if (!name.compare("MiniBooNE_NCEL_XSec_Treco_nu")) {
     return (new MiniBooNE_NCEL_XSec_Treco_nu(samplekey));
+  } else
+#endif
 
+#ifndef __NO_MicroBooNE__
+    /*
+    MicroBooNE Samples
+    */
+
+    /*
+      MicroBooNE CCinclusive
+    */
+         if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
+    return (new MicroBooNE_CCInc_XSec_2DPcos_nu(samplekey));
+  } else
+#endif
+
+#ifndef __NO_MINERvA__
     /*
     MINERvA Samples
     */
-  } else
-#endif
-#ifndef __NO_MINERvA__
       if (!name.compare("MINERvA_CCQE_XSec_1DQ2_nu") ||
           !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_20deg") ||
           !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_oldflux") ||
