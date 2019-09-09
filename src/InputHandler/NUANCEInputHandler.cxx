@@ -48,7 +48,7 @@ void NUANCEGeneratorInfo::Reset() {
 
 NUANCEInputHandler::NUANCEInputHandler(std::string const &handle,
                                        std::string const &rawinputs) {
-  QLOG(SAM, "Creating NUANCEInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating NUANCEInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -59,7 +59,7 @@ NUANCEInputHandler::NUANCEInputHandler(std::string const &handle,
   // Parse Inputs
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   if (inputs.size() > 1) {
-    QTHROW("NUANCE is not currently setup to handle joint inputs sorry!"
+    NUIS_ABORT("NUANCE is not currently setup to handle joint inputs sorry!"
            << std::endl
            << "If you know how to correctly normalise the events for this"
            << " please let us know!");
@@ -103,7 +103,7 @@ NUANCEInputHandler::NUANCEInputHandler(std::string const &handle,
 
   // Setup extra if needed
   if (fSaveExtra) {
-    QTHROW("NO SAVEExtra Implemented for NUANCE YET!");
+    NUIS_ABORT("NO SAVEExtra Implemented for NUANCE YET!");
     // fNuanceInfo = new NUANCEGeneratorInfo();
     // fNUISANCEEvent->AddGeneratorInfo(fNuanceInfo);
   }
@@ -176,8 +176,8 @@ void NUANCEInputHandler::CalcNUISANCEKinematics() {
   UInt_t npart = 2 + fNuanceEvent->n_leptons + fNuanceEvent->n_hadrons;
   UInt_t kmax = evt->kMaxParticles;
   if (npart > kmax) {
-    QERROR(FTL, "NUANCE has too many particles");
-    QERROR(FTL, "npart=" << npart << " kMax=" << kmax);
+    NUIS_ERR(FTL, "NUANCE has too many particles");
+    NUIS_ERR(FTL, "npart=" << npart << " kMax=" << kmax);
     throw;
   }
 
@@ -545,7 +545,7 @@ int NUANCEInputHandler::ConvertNuanceMode(NuanceEvent *evt) {
   case 99:
     return sg * 0;
   default:
-    QTHROW("Unknown Nuance Channel ID = " << ch);
+    NUIS_ABORT("Unknown Nuance Channel ID = " << ch);
     return 0;
   }
   return 0;

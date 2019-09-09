@@ -2,7 +2,7 @@
 
 SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(
     std::string const &handle, std::string const &rawinputs) {
-  QLOG(SAM, "Creating SigmaQ0HistogramInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating SigmaQ0HistogramInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -31,7 +31,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(
     std::vector<std::string> parsedspec =
         GeneralUtils::ParseToStr(parsedinputs[i], "=");
     if (parsedspec.size() < 2) {
-      QTHROW("NO VALUE GIVEN TO SPECIFIER : " << parsedinputs[0]);
+      NUIS_ABORT("NO VALUE GIVEN TO SPECIFIER : " << parsedinputs[0]);
     }
 
     std::string spec = parsedspec[0];
@@ -65,19 +65,19 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(
 
       // Throw
     } else {
-      QTHROW("Unknown argument given to SigmaQ0 InputHandler!");
+      NUIS_ABORT("Unknown argument given to SigmaQ0 InputHandler!");
     }
   }
 
   // Check we got everything
   if (fEnergy == -1 or fEnergy < 0) {
-    QTHROW("Energy for SigmaQ0 Handler either invalid or not given! Specify "
+    NUIS_ABORT("Energy for SigmaQ0 Handler either invalid or not given! Specify "
            "with ',E=ENERGY' in the input spec.");
   }
 
   // Default to Electron
   if (fBeamPDG == -1) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "No Beam PDG Given in SigmaQ0 Handler so assuming electron. "
                << "If input is not electron scattering please specify using : "
                   "PDG=PDGCODE");
@@ -85,7 +85,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(
 
   // Convert Theta
   fTheta = fTheta * M_PI / 180.0;
-  QLOG(FIT, "Set Theta to = " << fTheta);
+  NUIS_LOG(FIT, "Set Theta to = " << fTheta);
 
   // Have to create a dummy flux and event rate histogram :(
   fFluxHist = new TH1D("fluxhist", "fluxhist", 100.0, 0.0, 2.0 * fEnergy);
@@ -95,7 +95,7 @@ SigmaQ0HistogramInputHandler::SigmaQ0HistogramInputHandler(
   fEventHist->SetBinContent(fEventHist->FindBin(fEnergy), 1.0);
 
   fEnergy = fEnergy * 1.E3;
-  QLOG(FIT, "Set E energy");
+  NUIS_LOG(FIT, "Set E energy");
 
   // Now parse the lines in our input file.
   fApplyInterpolation = FitPar::Config().GetParB("InterpolateSigmaQ0Histogram");
@@ -229,7 +229,7 @@ void SigmaQ0HistogramInputHandler::FillNuisanceEvent(double q0, double sig) {
     // Get Momentum of Electron moving along Z
     fNUISANCEEvent->fParticleMom[0][0] = 0.0;
     fNUISANCEEvent->fParticleMom[0][1] = 0.0;
-    QLOG(FIT, "Setting Energy = " << fEnergy);
+    NUIS_LOG(FIT, "Setting Energy = " << fEnergy);
     fNUISANCEEvent->fParticleMom[0][2] = sqrt(fEnergy * fEnergy - mass * mass);
     fNUISANCEEvent->fParticleMom[0][3] = fEnergy;
 

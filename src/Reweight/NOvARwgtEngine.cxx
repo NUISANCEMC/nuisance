@@ -184,18 +184,18 @@ novarwgt::Tune const *TuneFactory(size_t e) {
 void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
   size_t we_e = GetWeightGeneratorIndex(name);
   if (we_e == kNoSuchWeightEngine) {
-    QTHROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
+    NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
   if (we_e < kTuneSeparator) {
     if (fWeightEngineEnums.find(we_e) != fWeightEngineEnums.end()) {
-      QTHROW("[ERROR]: NOvARwgt Engine name: " << name << " already included.");
+      NUIS_ABORT("[ERROR]: NOvARwgt Engine name: " << name << " already included.");
     }
     fWeightEngineEnums[we_e] = fWeightEngines.size();
     fWeightEngines.push_back(IWeightGeneratorFactory(we_e));
     fWeightEngineValues.push_back(startval);
   } else {
     if (fTuneEnums.find(we_e) != fTuneEnums.end()) {
-      QTHROW("[ERROR]: NOvARwgt Tune name: " << name << " already included.");
+      NUIS_ABORT("[ERROR]: NOvARwgt Tune name: " << name << " already included.");
     }
     fTuneEnums[we_e] = fTunes.size();
     fTunes.push_back(TuneFactory(we_e));
@@ -207,7 +207,7 @@ void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
   size_t we_indx = (nuisenum % 1000);
   if (we_indx < kTuneSeparator) {
     if (!fWeightEngineEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that engine hasn't been included yet.");
     }
     size_t engine_index = fWeightEngineEnums[we_indx];
@@ -215,7 +215,7 @@ void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
     fWeightEngineValues[engine_index] = val;
   } else {
     if (!fTuneEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that tune hasn't been included yet.");
     }
     size_t engine_index = fTuneEnums[we_indx];
@@ -227,11 +227,11 @@ void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
 void NOvARwgtEngine::SetDialValue(std::string name, double val) {
   size_t we_indx = GetWeightGeneratorIndex(name);
   if (we_indx == kNoSuchWeightEngine) {
-    QTHROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
+    NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
   if (we_indx < kTuneSeparator) {
     if (!fWeightEngineEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that engine hasn't been included yet.");
     }
     size_t engine_index = fWeightEngineEnums[we_indx];
@@ -239,7 +239,7 @@ void NOvARwgtEngine::SetDialValue(std::string name, double val) {
     fWeightEngineValues[engine_index] = val;
   } else {
     if (!fTuneEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that tune hasn't been included yet.");
     }
     size_t engine_index = fTuneEnums[we_indx];
@@ -251,7 +251,7 @@ void NOvARwgtEngine::SetDialValue(std::string name, double val) {
 bool NOvARwgtEngine::IsDialIncluded(std::string name) {
   size_t we_indx = GetWeightGeneratorIndex(name);
   if (we_indx == kNoSuchWeightEngine) {
-    QTHROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
+    NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
   if (we_indx < kTuneSeparator) {
     return fWeightEngineEnums.count(we_indx);
@@ -271,17 +271,17 @@ bool NOvARwgtEngine::IsDialIncluded(int nuisenum) {
 double NOvARwgtEngine::GetDialValue(std::string name) {
   size_t we_indx = GetWeightGeneratorIndex(name);
   if (we_indx == kNoSuchWeightEngine) {
-    QTHROW("[ERROR]: Invalid NOvARwgt Engine name: " << name);
+    NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
   if (we_indx < kTuneSeparator) {
     if (!fWeightEngineEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that engine hasn't been included yet.");
     }
     return fWeightEngineValues[fWeightEngineEnums[we_indx]];
   } else {
     if (!fTuneEnums.count(we_indx)) {
-      QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+      NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
             << we_indx << " but that tune hasn't been included yet.");
     }
     return fTuneValues[fTuneEnums[we_indx]];
@@ -290,7 +290,7 @@ double NOvARwgtEngine::GetDialValue(std::string name) {
 double NOvARwgtEngine::GetDialValue(int nuisenum) {
   size_t we_indx = (nuisenum % 1000);
   if (!fWeightEngineEnums.count(we_indx)) {
-    QTHROW("[ERROR]: SetDialValue for NOvARwgt dial: "
+    NUIS_ABORT("[ERROR]: SetDialValue for NOvARwgt dial: "
           << we_indx << " but that engine hasn't been included yet.");
   }
   if (we_indx < kTuneSeparator) {
@@ -305,7 +305,7 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
 
   // Make nom weight
   if (!evt) {
-    QTHROW("evt not found : " << evt);
+    NUIS_ABORT("evt not found : " << evt);
   }
 
   // Skip Non GENIE
@@ -313,11 +313,11 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
     return 1.0;
 
   if (!(evt->genie_event)) {
-    QTHROW("evt->genie_event not found!" << evt->genie_event);
+    NUIS_ABORT("evt->genie_event not found!" << evt->genie_event);
   }
 
   if (!(evt->genie_event->event)) {
-    QTHROW("evt->genie_event->event GHepRecord not found!"
+    NUIS_ABORT("evt->genie_event->event GHepRecord not found!"
           << (evt->genie_event->event));
   }
 

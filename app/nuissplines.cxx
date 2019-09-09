@@ -90,16 +90,16 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  QLOG(FIT, "Starting ExtFit_splines.exe");
+  NUIS_LOG(FIT, "Starting ExtFit_splines.exe");
 
   // Make minimizer class and run fit
   SplineRoutines *splRt = new SplineRoutines(argc, argv);
   splRt->Run();
 
   // Show Final Status
-  QLOG(FIT, "-------------------------------------");
-  QLOG(FIT, "Spline Generation/Validation Finished.");
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "Spline Generation/Validation Finished.");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return 0;
 }

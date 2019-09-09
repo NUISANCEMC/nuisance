@@ -40,7 +40,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   }
 
   SavePreFSI = Config::Get().GetParB("nuisflat_SavePreFSI");
-  QLOG(SAM,
+  NUIS_LOG(SAM,
        "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI);
 
   // Set default fitter flags
@@ -76,14 +76,14 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
       (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
       this->TotalIntegratedFlux("width");
 
-  QLOG(SAM, " Generic Flux Scaling Factor = "
+  NUIS_LOG(SAM, " Generic Flux Scaling Factor = "
                 << fScaleFactor
                 << " [= " << (GetEventHistogram()->Integral("width") * 1E-38)
                 << "/(" << (fNEvents + 0.) << "*"
                 << TotalIntegratedFlux("width") << ")]");
 
   if (fScaleFactor <= 0.0) {
-    QTHROW("SCALE FACTOR TOO LOW");
+    NUIS_ABORT("SCALE FACTOR TOO LOW");
   }
 
   // Setup our TTrees
@@ -99,7 +99,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding Event Variables");
+  NUIS_LOG(SAM, "Adding Event Variables");
 
   eventVariables->Branch("Mode", &Mode, "Mode/I");
   eventVariables->Branch("cc", &cc, "cc/B");
@@ -177,7 +177,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  QLOG(DEB, "Filling signal");
+  NUIS_LOG(DEB, "Filling signal");
 
   // Now fill the information
   Mode = event->Mode;
@@ -386,7 +386,7 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding signal flags");
+  NUIS_LOG(SAM, "Adding signal flags");
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");

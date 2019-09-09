@@ -178,7 +178,7 @@ SampleSettings JointMeas1D::LoadSampleSettings(nuiskey samplekey) {
       GeneralUtils::ParseToStr(s.GetS("input"), ";");
 
   if (entries.size() < 2) {
-    QTHROW("Joint measurement expected to recieve at least two semi-colon "
+    NUIS_ABORT("Joint measurement expected to recieve at least two semi-colon "
            "separated input files, but recieved: \""
            << s.GetS("input") << "\"");
   }
@@ -187,7 +187,7 @@ SampleSettings JointMeas1D::LoadSampleSettings(nuiskey samplekey) {
       GeneralUtils::ParseToStr(entries.front(), ":");
 
   if (first_file_descriptor.size() != 2) {
-    QTHROW("Found Joint measurement where the input file had no type: \""
+    NUIS_ABORT("Found Joint measurement where the input file had no type: \""
            << s.GetS("input")
            << "\", expected \"INPUTTYPE:File.root;File2.root\".");
   }
@@ -220,26 +220,26 @@ void JointMeas1D::FinaliseSampleSettings() {
   }
 
   // Setup all other options
-  QLOG(SAM, "Finalising Sample Settings: " << fName);
+  NUIS_LOG(SAM, "Finalising Sample Settings: " << fName);
 
   if ((fSettings.GetS("originalname").find("Evt") != std::string::npos)) {
     fIsRawEvents = true;
-    QLOG(SAM, "Found event rate measurement but using poisson likelihoods.");
+    NUIS_LOG(SAM, "Found event rate measurement but using poisson likelihoods.");
   }
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    QLOG(SAM, "::" << fName << "::");
-    QLOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
+    NUIS_LOG(SAM, "::" << fName << "::");
+    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
-    QLOG(SAM, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    NUIS_LOG(SAM, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
               "really correct?!");
-    QLOG(SAM,
+    NUIS_LOG(SAM,
          "Check experiment constructor for " << fName << " and correct this!");
-    QLOG(SAM, "I live in " << __FILE__ << ":" << __LINE__);
+    NUIS_LOG(SAM, "I live in " << __FILE__ << ":" << __LINE__);
     exit(-1);
   }
 
@@ -250,7 +250,7 @@ void JointMeas1D::FinaliseSampleSettings() {
       GeneralUtils::ParseToStr(fSettings.GetS("input"), ";");
 
   if (entries.size() < 2) {
-    QTHROW("Joint measurement expected to recieve at least two semi-colon "
+    NUIS_ABORT("Joint measurement expected to recieve at least two semi-colon "
            "separated input files, but recieved: \""
            << fSettings.GetS("input") << "\"");
   }
@@ -259,7 +259,7 @@ void JointMeas1D::FinaliseSampleSettings() {
       GeneralUtils::ParseToStr(entries.front(), ":");
 
   if (first_file_descriptor.size() != 2) {
-    QTHROW("Found Joint measurement where the input file had no type: \""
+    NUIS_ABORT("Found Joint measurement where the input file had no type: \""
            << fSettings.GetS("input")
            << "\", expected \"INPUTTYPE:File.root;File2.root\".");
   }
@@ -285,8 +285,8 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fAddNormPen) {
     if (fNormError <= 0.0) {
-      QERROR(FTL, "Norm error for class " << fName << " is 0.0!");
-      QERROR(FTL, "If you want to use it please add fNormError=VAL");
+      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
+      NUIS_ERR(FTL, "If you want to use it please add fNormError=VAL");
       throw;
     }
   }
@@ -294,14 +294,14 @@ void JointMeas1D::FinaliseSampleSettings() {
   if (!fRW)
     fRW = FitBase::GetRW();
 
-  QLOG(SAM, "Finalised Sample Settings");
+  NUIS_LOG(SAM, "Finalised Sample Settings");
 }
 
 //********************************************************************
 void JointMeas1D::SetDataFromTextFile(std::string datafile) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data from text file: " << datafile);
+  NUIS_LOG(SAM, "Reading data from text file: " << datafile);
   fDataHist = PlotUtils::GetTH1DFromFile(
       datafile, fSettings.GetName() + "_data", fSettings.GetFullTitles());
 }
@@ -311,7 +311,7 @@ void JointMeas1D::SetDataFromRootFile(std::string datafile,
                                       std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data from root file: " << datafile << ";" << histname);
+  NUIS_LOG(SAM, "Reading data from root file: " << datafile << ";" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile(datafile, histname);
   fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(),
                           (fSettings.GetFullTitles()).c_str());
@@ -324,8 +324,8 @@ void JointMeas1D::SetPoissonErrors() {
   //********************************************************************
 
   if (!fDataHist) {
-    QERROR(FTL, "Need a data hist to setup possion errors! ");
-    QTHROW("Setup Data First!");
+    NUIS_ERR(FTL, "Need a data hist to setup possion errors! ");
+    NUIS_ABORT("Setup Data First!");
   }
 
   for (int i = 0; i < fDataHist->GetNbinsX() + 1; i++) {
@@ -342,16 +342,16 @@ void JointMeas1D::SetCovarFromDiagonal(TH1D *data) {
   }
 
   if (data) {
-    QLOG(SAM, "Setting diagonal covariance for: " << data->GetName());
+    NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
-    QERROR(FTL, "No data input provided to set diagonal covar from!");
+    NUIS_ERR(FTL, "No data input provided to set diagonal covar from!");
   }
 
   if (!fIsDiag) {
-    QERROR(FTL, "SetCovarMatrixFromDiag called for measurement "
+    NUIS_ERR(FTL, "SetCovarMatrixFromDiag called for measurement "
                     << "that is not set as diagonal.");
     throw;
   }
@@ -361,7 +361,7 @@ void JointMeas1D::SetCovarFromDiagonal(TH1D *data) {
 void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
   //********************************************************************
 
-  QLOG(SAM, "Reading covariance from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
 
   covar = StatUtils::GetInvert(fFullCovar);
@@ -380,7 +380,7 @@ void JointMeas1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
 
   fFullCovar = new TMatrixDSym(dim);
   for (uint i = 0; i < covList.size(); ++i) {
-    QLOG(SAM, "Reading covariance from text file: " << covList[i]);
+    NUIS_LOG(SAM, "Reading covariance from text file: " << covList[i]);
     TMatrixDSym *temp_cov = StatUtils::GetCovarFromTextFile(covList[i], dim);
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
@@ -394,7 +394,7 @@ void JointMeas1D::SetCovarFromRootFile(std::string covfile,
                                        std::string histname) {
   //********************************************************************
 
-  QLOG(SAM,
+  NUIS_LOG(SAM,
        "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
   covar = StatUtils::GetInvert(fFullCovar);
@@ -405,7 +405,7 @@ void JointMeas1D::SetCovarFromRootFile(std::string covfile,
 void JointMeas1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
   //********************************************************************
 
-  QLOG(SAM, "Reading inverted covariance from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
   fFullCovar = StatUtils::GetInvert(covar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -416,7 +416,7 @@ void JointMeas1D::SetCovarInvertFromRootFile(std::string covfile,
                                              std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                            << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
   fFullCovar = StatUtils::GetInvert(covar);
@@ -429,12 +429,12 @@ void JointMeas1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   if (dim == -1)
     dim = fDataHist->GetNbinsX();
-  QLOG(SAM,
+  NUIS_LOG(SAM,
        "Reading data correlations from text file: " << covfile << ";" << dim);
   TMatrixDSym *correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
   if (!fDataHist) {
-    QTHROW("Trying to set correlations from text file but there is no "
+    NUIS_ABORT("Trying to set correlations from text file but there is no "
            "data to build it from. \n"
            << "In constructor make sure data is set before "
               "SetCorrelationFromTextFile is called. \n");
@@ -470,7 +470,7 @@ void JointMeas1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
 
   fFullCovar = new TMatrixDSym(dim);
   for (uint i = 0; i < corrList.size(); ++i) {
-    QLOG(SAM, "Reading covariance from text file: " << corrList[i]);
+    NUIS_LOG(SAM, "Reading covariance from text file: " << corrList[i]);
     TMatrixDSym *temp_cov = StatUtils::GetCovarFromTextFile(corrList[i], dim);
 
     for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
@@ -495,12 +495,12 @@ void JointMeas1D::SetCorrelationFromRootFile(std::string covfile,
                                              std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data correlations from text file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
                                                          << histname);
   TMatrixDSym *correlation = StatUtils::GetCovarFromRootFile(covfile, histname);
 
   if (!fDataHist) {
-    QTHROW("Trying to set correlations from text file but there is no "
+    NUIS_ABORT("Trying to set correlations from text file but there is no "
            "data to build it from. \n"
            << "In constructor make sure data is set before "
               "SetCorrelationFromTextFile is called. \n");
@@ -543,7 +543,7 @@ void JointMeas1D::SetShapeCovar() {
 void JointMeas1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
   //********************************************************************
 
-  QLOG(SAM, "Reading cholesky from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading cholesky from text file: " << covfile);
   TMatrixD *temp = StatUtils::GetMatrixFromTextFile(covfile, dim, dim);
 
   TMatrixD *trans = (TMatrixD *)temp->Clone();
@@ -563,7 +563,7 @@ void JointMeas1D::SetCholDecompFromRootFile(std::string covfile,
                                             std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
                                                        << histname);
   TMatrixD *temp = StatUtils::GetMatrixFromRootFile(covfile, histname);
 
@@ -600,7 +600,7 @@ void JointMeas1D::SetBinMask(std::string maskfile) {
   if (!fIsMask)
     return;
 
-  QLOG(SAM, "Reading bin mask from file: " << maskfile);
+  NUIS_LOG(SAM, "Reading bin mask from file: " << maskfile);
 
   // Create a mask histogram with dim of data
   int nbins = fDataHist->GetNbinsX();
@@ -611,7 +611,7 @@ void JointMeas1D::SetBinMask(std::string maskfile) {
   std::ifstream mask(maskfile.c_str(), std::ifstream::in);
 
   if (!mask.is_open()) {
-    QTHROW(" Cannot find mask file: " << maskfile);
+    NUIS_ABORT(" Cannot find mask file: " << maskfile);
   }
 
   while (std::getline(mask >> std::ws, line, '\n')) {
@@ -619,7 +619,7 @@ void JointMeas1D::SetBinMask(std::string maskfile) {
 
     // Skip lines with poorly formatted lines
     if (entries.size() < 2) {
-      QLOG(WRN, "JointMeas1D::SetBinMask(), couldn't parse line: " << line);
+      NUIS_LOG(WRN, "JointMeas1D::SetBinMask(), couldn't parse line: " << line);
       continue;
     }
 
@@ -641,11 +641,11 @@ void JointMeas1D::SetBinMask(std::string maskfile) {
 void JointMeas1D::FinaliseMeasurement() {
   //********************************************************************
 
-  QLOG(SAM, "Finalising Measurement: " << fName);
+  NUIS_LOG(SAM, "Finalising Measurement: " << fName);
 
   // Make sure data is setup
   if (!fDataHist) {
-    QTHROW("No data has been setup inside " << fName << " constructor!");
+    NUIS_ABORT("No data has been setup inside " << fName << " constructor!");
   }
 
   // Make sure covariances are setup
@@ -757,7 +757,7 @@ void JointMeas1D::SetFitOptions(std::string opt) {
         found_option = true;
 
       } else if (found_option and opt.find(av_opt) != std::string::npos) {
-        QTHROW("ERROR: Conflicting fit options provided: "
+        NUIS_ABORT("ERROR: Conflicting fit options provided: "
                << opt << std::endl
                << "Conflicting group = " << fit_option_section.at(i)
                << std::endl
@@ -771,12 +771,12 @@ void JointMeas1D::SetFitOptions(std::string opt) {
       GeneralUtils::ParseToStr(opt, "/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++) {
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos) {
-      QERROR(FTL, "ERROR: Fit Option '"
+      NUIS_ERR(FTL, "ERROR: Fit Option '"
                       << fit_options_input.at(i)
                       << "' Provided is not allowed for this measurement.");
-      QERROR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
                   "(e.g. FREE/DIAG/NORM)");
-      QERROR(FTL, "Available options for " << fName << " are '" << fAllowedTypes
+      NUIS_ERR(FTL, "Available options for " << fName << " are '" << fAllowedTypes
                                            << "'");
 
       throw;
@@ -811,8 +811,8 @@ void JointMeas1D::SetFitOptions(std::string opt) {
   if (opt.find("LOG") != std::string::npos) {
     fIsChi2 = false;
 
-    QERROR(FTL, "No other LIKELIHOODS properly supported!");
-    QERROR(FTL, "Try to use a chi2!");
+    NUIS_ERR(FTL, "No other LIKELIHOODS properly supported!");
+    NUIS_ERR(FTL, "Try to use a chi2!");
     throw;
 
   } else {
@@ -851,9 +851,9 @@ void JointMeas1D::SetSmearingMatrix(std::string smearfile, int truedim,
   fSmearMatrix = new TMatrixD(truedim, recodim);
 
   if (smear.is_open()) {
-    QLOG(SAM, "Reading smearing matrix from file: " << smearfile);
+    NUIS_LOG(SAM, "Reading smearing matrix from file: " << smearfile);
   } else {
-    QTHROW("Smearing matrix provided is incorrect: " << smearfile);
+    NUIS_ABORT("Smearing matrix provided is incorrect: " << smearfile);
   }
 
   while (std::getline(smear >> std::ws, line, '\n')) {
@@ -877,7 +877,7 @@ void JointMeas1D::ApplySmearingMatrix() {
   //********************************************************************
 
   if (!fSmearMatrix) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            fName << ": attempted to apply smearing matrix, but none was set");
     return;
   }
@@ -938,7 +938,7 @@ void JointMeas1D::FillHistograms() {
 void JointMeas1D::ScaleEvents() {
   //********************************************************************
 
-  QLOG(FIT, "Scaling JointMeas1D");
+  NUIS_LOG(FIT, "Scaling JointMeas1D");
 
   // Fill MCWeighted;
   for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
@@ -1121,7 +1121,7 @@ void JointMeas1D::SetFakeDataValues(std::string fakeOption) {
 
   // Setup Inputs
   fFakeDataInput = fakeOption;
-  QLOG(SAM, "Setting fake data from : " << fFakeDataInput);
+  NUIS_LOG(SAM, "Setting fake data from : " << fFakeDataInput);
 
   // From MC
   if (fFakeDataInput.compare("MC") == 0) {
@@ -1402,7 +1402,7 @@ void JointMeas1D::Write(std::string drawOpt) {
   }
 
   // Returning
-  QLOG(SAM, "Written Histograms: " << fName);
+  NUIS_LOG(SAM, "Written Histograms: " << fName);
   return;
 }
 
@@ -1512,8 +1512,8 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   // Parse this list and save it for later, and set up the types etc.
 
   if (FitPar::Config().GetParB("EventManager")) {
-    QERROR(FTL, "Event Manager does not yet work with JointMeas1D Samples");
-    QERROR(FTL, "If you want good predictions for "
+    NUIS_ERR(FTL, "Event Manager does not yet work with JointMeas1D Samples");
+    NUIS_ERR(FTL, "If you want good predictions for "
                     << fName
                     << " then run with it turned off! (-q EventManager=0)");
   }
@@ -1523,7 +1523,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
   std::vector<std::string> entries = GeneralUtils::ParseToStr(input, ";");
 
   if (entries.size() < 2) {
-    QTHROW("Joint measurement expected to recieve at least two semi-colon "
+    NUIS_ABORT("Joint measurement expected to recieve at least two semi-colon "
            "separated input files, but recieved: \""
            << input << "\"");
   }
@@ -1532,7 +1532,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
       GeneralUtils::ParseToStr(entries.front(), ":");
 
   if (first_file_descriptor.size() != 2) {
-    QTHROW("Found Joint measurement where the input file had no type: \""
+    NUIS_ABORT("Found Joint measurement where the input file had no type: \""
            << input << "\", expected \"INPUTTYPE:File.root;File2.root\".");
   }
   std::string inpType = first_file_descriptor[0];
@@ -1876,7 +1876,7 @@ TH1D *JointMeas1D::GetCombinedFlux() {
   }
 
   if (!newflux) {
-    QTHROW("No combined flux setup in JointMeas1D");
+    NUIS_ABORT("No combined flux setup in JointMeas1D");
   }
 
   return newflux;
@@ -1911,7 +1911,7 @@ TH1D *JointMeas1D::GetCombinedEventRate() {
   }
 
   if (!newflux) {
-    QTHROW("No combined event rate setup in JointMeas1D");
+    NUIS_ABORT("No combined event rate setup in JointMeas1D");
   }
 
   return newflux;
@@ -1938,7 +1938,7 @@ void JointMeas1D::SetDataValues(std::string dataFile) {
   //********************************************************************
 
   // Override this function if the input file isn't in a suitable format
-  QLOG(SAM, "Reading data from: " << dataFile.c_str());
+  NUIS_LOG(SAM, "Reading data from: " << dataFile.c_str());
   fDataHist =
       PlotUtils::GetTH1DFromFile(dataFile, (fName + "_data"), fPlotTitles);
   fDataTrue = (TH1D *)fDataHist->Clone();
@@ -1954,7 +1954,7 @@ void JointMeas1D::SetDataFromDatabase(std::string inhistfile,
                                       std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
+  NUIS_LOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile(
       (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
@@ -1967,7 +1967,7 @@ void JointMeas1D::SetDataFromFile(std::string inhistfile,
                                   std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
+  NUIS_LOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile((inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
@@ -2001,7 +2001,7 @@ void JointMeas1D::SetCovarMatrix(std::string covarFile) {
   else if (!covOption.compare("FULL"))
     fFullCovarPlot = (TH2D *)tempFile->Get("fullcov");
   else {
-    QERROR(WRN, "Incorrect thrown_covariance option in parameters.");
+    NUIS_ERR(WRN, "Incorrect thrown_covariance option in parameters.");
   }
 
   int dim = int(fDataHist->GetNbinsX()); //-this->masked->Integral());
@@ -2060,9 +2060,9 @@ void JointMeas1D::SetCovarMatrixFromText(std::string covarFile, int dim,
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
   if (covarread.is_open()) {
-    QLOG(SAM, "Reading covariance matrix from file: " << covarFile);
+    NUIS_LOG(SAM, "Reading covariance matrix from file: " << covarFile);
   } else {
-    QERROR(FTL, "Covariance matrix provided is incorrect: " << covarFile);
+    NUIS_ERR(FTL, "Covariance matrix provided is incorrect: " << covarFile);
   }
 
   // Loop over the lines in the file
@@ -2073,7 +2073,7 @@ void JointMeas1D::SetCovarMatrixFromText(std::string covarFile, int dim,
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
 
     if (entries.size() <= 1) {
-      QERROR(WRN, "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
+      NUIS_ERR(WRN, "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
                   "entries on this line: "
                       << row);
     }
@@ -2119,10 +2119,10 @@ void JointMeas1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
   this->covar = new TMatrixDSym(dim);
   this->fFullCovar = new TMatrixDSym(dim);
   if (corr.is_open()) {
-    QLOG(SAM,
+    NUIS_LOG(SAM,
          "Reading and converting correlation matrix from file: " << corrFile);
   } else {
-    QERROR(FTL, "Correlation matrix provided is incorrect: " << corrFile);
+    NUIS_ERR(FTL, "Correlation matrix provided is incorrect: " << corrFile);
     exit(-1);
   }
 
@@ -2138,7 +2138,7 @@ void JointMeas1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
       double val = (*iter) * this->fDataHist->GetBinError(row + 1) * 1E38 *
                    this->fDataHist->GetBinError(column + 1) * 1E38;
       if (val == 0) {
-        QERROR(FTL, "Found a zero value in the covariance matrix, assuming "
+        NUIS_ERR(FTL, "Found a zero value in the covariance matrix, assuming "
                     "this is an error!");
         exit(-1);
       }
@@ -2169,7 +2169,7 @@ void JointMeas1D::SetCovarFromDataFile(std::string covarFile,
                                        std::string covName, bool FullUnits) {
   //********************************************************************
 
-  QLOG(SAM, "Getting covariance from " << covarFile << "->" << covName);
+  NUIS_LOG(SAM, "Getting covariance from " << covarFile << "->" << covName);
 
   TFile *tempFile = new TFile(covarFile.c_str(), "READ");
   TH2D *covPlot = (TH2D *)tempFile->Get(covName.c_str());

@@ -86,7 +86,7 @@ void StackBase::Reset() {
 void StackBase::FillStack(int index, double x, double y, double z,
                           double weight) {
   if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
-    QERROR(WRN, "Returning Stack Fill Because Range = " << index << " "
+    NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
                                                         << fAllLabels.size());
     return;
   }
@@ -155,9 +155,9 @@ void StackBase::Add(TH1 *hist, double scale) {
 void StackBase::Add(StackBase *hist, double scale) {
 
   if (hist->GetType() != fType) {
-    QERROR(WRN, "Trying to add two StackBases of different types!");
-    QERROR(WRN, fType << " + " << hist->GetType() << " = Undefined.");
-    QERROR(WRN, "Doing nothing...");
+    NUIS_ERR(WRN, "Trying to add two StackBases of different types!");
+    NUIS_ERR(WRN, fType << " + " << hist->GetType() << " = Undefined.");
+    NUIS_ERR(WRN, "Doing nothing...");
     return;
   }
 

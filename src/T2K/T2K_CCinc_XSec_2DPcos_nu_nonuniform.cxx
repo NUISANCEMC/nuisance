@@ -50,10 +50,10 @@ T2K_CCinc_XSec_2DPcos_nu_nonuniform::T2K_CCinc_XSec_2DPcos_nu_nonuniform(
 
   // Tell user what's happening
   if (UnfoldWithGENIE) {
-    QLOG(SAM, fName << " is using GENIE unfolded data. Want NEUT? Specify "
+    NUIS_LOG(SAM, fName << " is using GENIE unfolded data. Want NEUT? Specify "
                        "type=\"NEUT\" in your config file");
   } else {
-    QLOG(SAM, fName << " is using NEUT unfolded data. Want GENIE? Specify "
+    NUIS_LOG(SAM, fName << " is using NEUT unfolded data. Want GENIE? Specify "
                        "type=\"GENIE\" in your config file");
   }
   // Setup Histograms

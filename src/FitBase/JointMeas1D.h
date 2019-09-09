@@ -563,7 +563,7 @@ public:
 
   virtual TH1D *GetEventHistogram() { return GetCombinedEventRate(); };
   virtual TH1D *GetXSecHistogram() {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "XSec histogram not properly implemented for joint measurements.");
     return MeasurementBase::GetXSecHistogram();
   };

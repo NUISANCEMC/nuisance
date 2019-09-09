@@ -35,7 +35,7 @@ TrackedMomentumMatrixSmearer::DependVar GetVarType(std::string const &axisvar) {
 TH1D const *TrackedMomentumMatrixSmearer::SmearMap::GetRecoSlice(double val) {
   if ((val < RecoSlices.front().first.first) ||
       (val > RecoSlices.back().first.second)) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
           "Kinematic property: " << val << ", not within smearable range: ["
                                  << RecoSlices.front().first.first << " -- "
                                  << RecoSlices.back().first.second << "].");
@@ -63,7 +63,7 @@ TH1D const *TrackedMomentumMatrixSmearer::SmearMap::GetRecoSlice(double val) {
         (val <= RecoSlices[m].first.second)) {
       return RecoSlices[m].second;
     }
-    QTHROW("Binary smearing search failed. Check logic.");
+    NUIS_ABORT("Binary smearing search failed. Check logic.");
   }
 }
 
@@ -71,14 +71,14 @@ TH1D *GetMapSlice(TH2D *mp, int SliceBin, bool AlongX) {
   int NBins = (AlongX ? mp->GetXaxis() : mp->GetYaxis())->GetNbins();
   int NOtherBins = (AlongX ? mp->GetYaxis() : mp->GetXaxis())->GetNbins();
   if (SliceBin >= NOtherBins) {
-    QTHROW("Asked for slice " << SliceBin << " but the " << (AlongX ? 'Y' : 'X')
+    NUIS_ABORT("Asked for slice " << SliceBin << " but the " << (AlongX ? 'Y' : 'X')
                              << " axis only has " << NOtherBins);
   }
 
   if ((AlongX ? mp->GetXaxis() : mp->GetYaxis())->IsVariableBinSize() &&
       ((NBins + 1) !=
        (AlongX ? mp->GetXaxis() : mp->GetYaxis())->GetXbins()->GetSize())) {
-    QTHROW(
+    NUIS_ABORT(
         "Attemping to take binning slice of variable binning, but NBins+1 != "
         "NBinEdges: "
         << (NBins + 1) << " != "
@@ -146,7 +146,7 @@ void TrackedMomentumMatrixSmearer::SmearMap::SetSlicesFromMap(TH2D *map,
 
     RecoSlices.push_back(std::make_pair(BinEdges, slice));
   }
-  QLOG(FIT, "\tAdded " << RecoSlices.size() << " reco slices.");
+  NUIS_LOG(FIT, "\tAdded " << RecoSlices.size() << " reco slices.");
 }
 
 /// Reads particle efficiency nodes
@@ -173,12 +173,12 @@ void TrackedMomentumMatrixSmearer::SpecifcSetup(nuiskey &nk) {
 
     TFile inputFile(inputFileName.c_str());
     if (!inputFile.IsOpen()) {
-      QTHROW("Couldn't open specified input root file: " << inputFileName);
+      NUIS_ABORT("Couldn't open specified input root file: " << inputFileName);
     }
 
     TH2D *inpHist = dynamic_cast<TH2D *>(inputFile.Get(HistName.c_str()));
     if (!inpHist) {
-      QTHROW("Couldn't get TH2D named: " << HistName << " from input root file: "
+      NUIS_ABORT("Couldn't get TH2D named: " << HistName << " from input root file: "
                                         << inputFileName);
     }
 
@@ -189,7 +189,7 @@ void TrackedMomentumMatrixSmearer::SpecifcSetup(nuiskey &nk) {
     std::vector<int> pdgs_i = GeneralUtils::ParseToInt(pdgs_s, ",");
     for (size_t pdg_it = 0; pdg_it < pdgs_i.size(); ++pdg_it) {
       if (ParticleMappings.count(pdgs_i[pdg_it])) {
-        QERROR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
+        NUIS_ERR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
                                   << " already has a smearing for PDG: "
                                   << pdgs_i[pdg_it]);
       }
@@ -201,7 +201,7 @@ void TrackedMomentumMatrixSmearer::SpecifcSetup(nuiskey &nk) {
 
       ParticleMappings[pdgs_i[pdg_it]] = sm;
 
-      QLOG(FIT, "Added smearing map for PDG: " << pdgs_i[pdg_it]);
+      NUIS_LOG(FIT, "Added smearing map for PDG: " << pdgs_i[pdg_it]);
     }
   }
   SlaveGS.Setup(nk);
@@ -252,7 +252,7 @@ RecoInfo *TrackedMomentumMatrixSmearer::Smearcept(FitEvent *fe) {
         kineProp = fp->E();
         break;
       }
-      default: { QTHROW("Trying to find particle value for a kNoAxis."); }
+      default: { NUIS_ABORT("Trying to find particle value for a kNoAxis."); }
     }
 
     TH1 const *recoDistrib = sm.GetRecoSlice(kineProp / sm.UnitsScale);
@@ -273,7 +273,7 @@ RecoInfo *TrackedMomentumMatrixSmearer::Smearcept(FitEvent *fe) {
     }
 
     if (recoDistrib->Integral() == 0) {
-      QERROR(WRN, "True slice has no reconstructed events. Not smearing.")
+      NUIS_ERR(WRN, "True slice has no reconstructed events. Not smearing.")
       continue;
     }
 
@@ -334,7 +334,7 @@ RecoInfo *TrackedMomentumMatrixSmearer::Smearcept(FitEvent *fe) {
               << "." << std::endl;
 #endif
     if (ri->RecObjMom.back().Mag() != ri->RecObjMom.back().Mag()) {
-      QERROR(WRN, "Invalid particle built.");
+      NUIS_ERR(WRN, "Invalid particle built.");
       ri->RecObjMom.pop_back();
 
 #include "TCanvas.h"
@@ -342,7 +342,7 @@ RecoInfo *TrackedMomentumMatrixSmearer::Smearcept(FitEvent *fe) {
       static_cast<TH1 *>(recoDistrib->Clone())->Draw();
       Test->SaveAs("Fail.png");
       delete Test;
-      QTHROW("ARGH");
+      NUIS_ABORT("ARGH");
     } else {
       ri->RecObjClass.push_back(fp->PDG());
     }
@@ -377,7 +377,7 @@ void TrackedMomentumMatrixSmearer::SmearRecoInfo(RecoInfo *ri) {
         kineProp = sqrt(ri->RecObjMom[p_it].Mag2() + mass * mass);
         break;
       }
-      default: { QTHROW("Trying to find particle value for a kNoAxis."); }
+      default: { NUIS_ABORT("Trying to find particle value for a kNoAxis."); }
     }
     TH1 const *recoDistrib = sm.GetRecoSlice(kineProp / sm.UnitsScale);
     if (!recoDistrib) {
@@ -385,7 +385,7 @@ void TrackedMomentumMatrixSmearer::SmearRecoInfo(RecoInfo *ri) {
     }
 
     if (recoDistrib->Integral() == 0) {
-      QERROR(WRN, "True slice has no reconstructed events. Not smearing.")
+      NUIS_ERR(WRN, "True slice has no reconstructed events. Not smearing.")
       continue;
     }
 

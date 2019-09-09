@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   ERR_VERB(FitPar::Config().GetParI("ERROR"));
 
   ParseOptions(argc, argv);
-  QLOG(FIT, "Running PrepareNEUT");
+  NUIS_LOG(FIT, "Running PrepareNEUT");
   if (fIsMonoEFlux) {
     AddMonoRateHistogram(fInputFiles, fMonoEEnergy, fOutputFile);
   } else {
@@ -49,19 +49,19 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   std::vector<std::string> inputs = GeneralUtils::ParseToStr(inputList, ",");
   for (std::vector<std::string>::iterator it = inputs.begin();
        it != inputs.end(); ++it) {
-    QLOG(FIT, "Adding " << *it << " to the output");
+    NUIS_LOG(FIT, "Adding " << *it << " to the output");
     tn->AddFile((*it).c_str());
   }
 
   if (inputs.size() > 1 && output.empty()) {
-    QTHROW("You must provide a new output file name if you want to have "
+    NUIS_ABORT("You must provide a new output file name if you want to have "
            "more than 1 input file!");
   }
 
   int nevts = tn->GetEntries();
 
   if (!nevts) {
-    QTHROW("Either the input file is not from NEUT, or it's empty...");
+    NUIS_ABORT("Either the input file is not from NEUT, or it's empty...");
   }
 
   NeutVect *fNeutVect = NULL;
@@ -93,11 +93,11 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     MeanE += E;
 
     if (i % (nevts / 20) == 0) {
-      QLOG(FIT, "Processed " << i << "/" << nevts << " NEUT events.");
+      NUIS_LOG(FIT, "Processed " << i << "/" << nevts << " NEUT events.");
     }
   }
   MeanE /= double(nevts);
-  QLOG(FIT, "Processed all events");
+  NUIS_LOG(FIT, "Processed all events");
 
   xsecHist->Divide(entryHist);
 
@@ -111,23 +111,23 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
   // this may be benign
   if (evtHist->Integral(0, -1) != evtHist->Integral() ||
       evtHist->Integral(0, -1) == 0) {
-    QERROR(WRN, "The input file("
+    NUIS_ERR(WRN, "The input file("
                     << evtHist->Integral(0, -1)
                     << ") and flux histogram provided do not match... ");
-    QERROR(WRN, "Are the units correct (MeanE = "
+    NUIS_ERR(WRN, "Are the units correct (MeanE = "
                     << MeanE << ", FluxHistoUpperLim: "
                     << fluxHist->GetXaxis()->GetBinUpEdge(1000)
                     << ")? Did you provide the correct flux file?");
-    QERROR(WRN, "Use output with caution...");
+    NUIS_ERR(WRN, "Use output with caution...");
   }
 
   // Pick where the output should go
   TFile *outFile = NULL;
   if (!output.empty()) {
-    QLOG(FIT, "Saving histograms in " << output);
+    NUIS_LOG(FIT, "Saving histograms in " << output);
     outFile = new TFile(output.c_str(), "RECREATE");
   } else {
-    QLOG(FIT, "Saving histograms in " << inputs[0]);
+    NUIS_LOG(FIT, "Saving histograms in " << inputs[0]);
     outFile = new TFile(inputs[0].c_str(), "UPDATE");
   }
   outFile->cd();
@@ -143,20 +143,20 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     std::string input_rate = PlotUtils::GetObjectWithName(outFile, "evtrt");
 
     if (!input_xsec.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_xsec);
+      NUIS_LOG(FIT, "Updating histogram: " << input_xsec);
       xsec_name = input_xsec;
     }
     if (!input_flux.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_flux);
+      NUIS_LOG(FIT, "Updating histogram: " << input_flux);
       flux_name = input_flux;
     }
     if (!input_rate.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_rate);
+      NUIS_LOG(FIT, "Updating histogram: " << input_rate);
       rate_name = input_rate;
     }
 
   } else {
-    QLOG(FIT, "Cloning neuttree into output file.");
+    NUIS_LOG(FIT, "Cloning neuttree into output file.");
     StopTalking();
     TTree *newtree = (TTree *)tn->CloneTree(-1, "fast");
     StartTalking();
@@ -181,19 +181,19 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   std::vector<std::string> inputs = GeneralUtils::ParseToStr(inputList, ",");
   for (std::vector<std::string>::iterator it = inputs.begin();
        it != inputs.end(); ++it) {
-    QLOG(FIT, "Adding " << *it << " to the output");
+    NUIS_LOG(FIT, "Adding " << *it << " to the output");
     tn->AddFile((*it).c_str());
   }
 
   if (inputs.size() > 1 && output.empty()) {
-    QTHROW("You must provide a new output file name if you want to have "
+    NUIS_ABORT("You must provide a new output file name if you want to have "
            "more than 1 input file!");
   }
 
   int nevts = tn->GetEntries();
 
   if (!nevts) {
-    QTHROW("Either the input file is not from NEUT, or it's empty...");
+    NUIS_ABORT("Either the input file is not from NEUT, or it's empty...");
   }
 
   NeutVect *fNeutVect = NULL;
@@ -207,14 +207,14 @@ void CreateRateHistogram(std::string inputList, std::string flux,
     fluxHist = (TH1D *)fluxfile->Get(fluxvect[1].c_str());
     fluxHist->SetDirectory(0);
   } else {
-    QTHROW("NO FLUX SPECIFIED");
+    NUIS_ABORT("NO FLUX SPECIFIED");
   }
 
   // Decide what type of flux was given
   if (fFluxInGeV) {
-    QLOG(FIT, "Assuming flux histogram is in GeV");
+    NUIS_LOG(FIT, "Assuming flux histogram is in GeV");
   } else {
-    QLOG(FIT, "Assuming flux histogram is in MeV");
+    NUIS_LOG(FIT, "Assuming flux histogram is in MeV");
   }
 
   // Make Event Hist
@@ -238,11 +238,11 @@ void CreateRateHistogram(std::string inputList, std::string flux,
     entryHist->Fill(E);
 
     if (i % (nevts / 20) == 0) {
-      QLOG(FIT, "Processed " << i << "/" << nevts << " NEUT events."
+      NUIS_LOG(FIT, "Processed " << i << "/" << nevts << " NEUT events."
                              << "(Enu = " << E << ", xsec = " << xsec << ") ");
     }
   }
-  QLOG(FIT, "Processed all events");
+  NUIS_LOG(FIT, "Processed all events");
 
   xsecHist->Divide(entryHist);
 
@@ -252,7 +252,7 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   // If the integral of xsecHist is 0 the input file used a really old version
   // of NEUT without Totcrs
   if (!xsecHist->Integral(0, -1)) {
-    QERROR(WRN, "Old NEUT input file: events will not be correctly normalized");
+    NUIS_ERR(WRN, "Old NEUT input file: events will not be correctly normalized");
     evtHist = (TH1D *)entryHist->Clone();
 
     if (evtHist->Integral() != 0)
@@ -268,21 +268,21 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   // this may be benign
   if (evtHist->Integral(0, -1) != evtHist->Integral() ||
       evtHist->Integral(0, -1) == 0) {
-    QERROR(WRN, "The input file("
+    NUIS_ERR(WRN, "The input file("
                     << evtHist->Integral(0, -1)
                     << ") and flux histogram provided do not match... ");
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "Are the units correct? Did you provide the correct flux file?");
-    QERROR(WRN, "Use output with caution...");
+    NUIS_ERR(WRN, "Use output with caution...");
   }
 
   // Pick where the output should go
   TFile *outFile = NULL;
   if (!output.empty()) {
-    QLOG(FIT, "Saving histograms in " << output);
+    NUIS_LOG(FIT, "Saving histograms in " << output);
     outFile = new TFile(output.c_str(), "RECREATE");
   } else {
-    QLOG(FIT, "Saving histograms in " << inputs[0]);
+    NUIS_LOG(FIT, "Saving histograms in " << inputs[0]);
     outFile = new TFile(inputs[0].c_str(), "UPDATE");
   }
   outFile->cd();
@@ -298,20 +298,20 @@ void CreateRateHistogram(std::string inputList, std::string flux,
     std::string input_rate = PlotUtils::GetObjectWithName(outFile, "evtrt");
 
     if (!input_xsec.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_xsec);
+      NUIS_LOG(FIT, "Updating histogram: " << input_xsec);
       xsec_name = input_xsec;
     }
     if (!input_flux.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_flux);
+      NUIS_LOG(FIT, "Updating histogram: " << input_flux);
       flux_name = input_flux;
     }
     if (!input_rate.empty()) {
-      QLOG(FIT, "Updating histogram: " << input_rate);
+      NUIS_LOG(FIT, "Updating histogram: " << input_rate);
       rate_name = input_rate;
     }
 
   } else {
-    QLOG(FIT, "Cloning neuttree into output file.");
+    NUIS_LOG(FIT, "Cloning neuttree into output file.");
     StopTalking();
     TTree *newtree = (TTree *)tn->CloneTree(-1, "fast");
     StartTalking();
@@ -390,7 +390,7 @@ void ParseOptions(int argc, char *argv[]) {
         fMonoEEnergy = GeneralUtils::StrToDbl(argv[i + 1]);
         ++i;
       } else {
-        QERROR(FTL, "ERROR: unknown command line option given! - '"
+        NUIS_ERR(FTL, "ERROR: unknown command line option given! - '"
                         << argv[i] << " " << argv[i + 1] << "'");
         PrintOptions();
         break;
@@ -398,12 +398,12 @@ void ParseOptions(int argc, char *argv[]) {
     }
   }
   if (fInputFiles == "" && !flagopt) {
-    QERROR(FTL, "No input file(s) specified!");
+    NUIS_ERR(FTL, "No input file(s) specified!");
     flagopt = true;
   }
 
   if (fFluxFile == "" && (!flagopt) && (!fIsMonoEFlux)) {
-    QERROR(FTL, "No flux input specified!");
+    NUIS_ERR(FTL, "No flux input specified!");
     flagopt = true;
   }
 

@@ -58,7 +58,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(
 
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "
@@ -81,7 +81,7 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(
   } else {
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "

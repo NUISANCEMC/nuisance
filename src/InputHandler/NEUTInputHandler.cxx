@@ -48,7 +48,7 @@ void NEUTGeneratorInfo::Reset() {
 
 NEUTInputHandler::NEUTInputHandler(std::string const &handle,
                                    std::string const &rawinputs) {
-  QLOG(SAM, "Creating NEUTInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating NEUTInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -65,7 +65,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
     // Open File for histogram access
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      QTHROW("NEUT File IsZombie() at : '"
+      NUIS_ABORT("NEUT File IsZombie() at : '"
              << inputs[inp_it] << "'" << std::endl
              << "Check that your file paths are correct and the file exists!"
              << std::endl
@@ -78,22 +78,22 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
     TH1D *eventhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "evt")).c_str());
     if (!fluxhist or !eventhist) {
-      QERROR(FTL, "Input File Contents: " << inputs[inp_it]);
+      NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
-      QTHROW("NEUT FILE doesn't contain flux/xsec info. You may have to "
+      NUIS_ABORT("NEUT FILE doesn't contain flux/xsec info. You may have to "
              "regenerate your MC!");
     }
 
     // Get N Events
     TTree *neuttree = (TTree *)inp_file->Get("neuttree");
     if (!neuttree) {
-      QERROR(FTL, "neuttree not located in NEUT file: " << inputs[inp_it]);
-      QTHROW("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ERR(FTL, "neuttree not located in NEUT file: " << inputs[inp_it]);
+      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = neuttree->GetEntries();
     if (nevents <= 0) {
-      QTHROW("Trying to a TTree with "
+      NUIS_ABORT("Trying to a TTree with "
              << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
@@ -258,12 +258,12 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
 
     // Warn if we still find alive particles without classifying them
   } else if (part->fIsAlive == true) {
-    QTHROW("Undefined NEUT state "
+    NUIS_ABORT("Undefined NEUT state "
            << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
            << " PDG: " << part->fPID);
     // Warn if we find dead particles that we haven't classified
   } else {
-    QTHROW("Undefined NEUT state "
+    NUIS_ABORT("Undefined NEUT state "
            << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
            << " PDG: " << part->fPID);
   }
@@ -294,7 +294,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   UInt_t npart = fNeutVect->Npart();
   UInt_t kmax = fNUISANCEEvent->kMaxParticles;
   if (npart > kmax) {
-    QERROR(WRN,"NEUT has too many particles. Expanding stack.");
+    NUIS_ERR(WRN,"NEUT has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 

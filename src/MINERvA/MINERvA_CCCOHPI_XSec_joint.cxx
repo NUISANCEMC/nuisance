@@ -76,7 +76,7 @@ void MINERvA_CCCOHPI_XSec_joint::SetupDataSettings() {
     break;
 
   default:
-    QTHROW("Unknown Analysis Distribution : " << fDist);
+    NUIS_ABORT("Unknown Analysis Distribution : " << fDist);
   }
 
   // Now setup each data distribution and description.
@@ -132,7 +132,7 @@ void MINERvA_CCCOHPI_XSec_joint::SetupSubMeasurements() {
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) {
-    QTHROW("MINERvA Joint requires input files in format: nu;antinu");
+    NUIS_ABORT("MINERvA Joint requires input files in format: nu;antinu");
   }
   std::string inFileNeutrino = fSubInFiles.at(0);
   std::string inFileAntineutrino = fSubInFiles.at(1);

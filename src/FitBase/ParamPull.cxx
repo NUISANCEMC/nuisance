@@ -47,8 +47,8 @@ void ParamPull::SetType(std::string type) {
   fType = type;
   // Assume Default if empty
   if (type.empty() || type == "DEFAULT") {
-    QERROR(WRN, "No type specified for ParmPull class " << fName);
-    QERROR(WRN, "Assuming GAUSTHROW/GAUSPULL");
+    NUIS_ERR(WRN, "No type specified for ParmPull class " << fName);
+    NUIS_ERR(WRN, "Assuming GAUSTHROW/GAUSPULL");
 
     type = "GAUSTHROW/GAUSPULL";
   }
@@ -118,13 +118,13 @@ void ParamPull::SetupHistograms(std::string input) {
   else if (!fFileType.compare("DIAL"))
     ReadDialInput(input);
   else {
-    QERROR(FTL, "Unknown ParamPull Type: " << input);
-    QTHROW("Need FIT, ROOT, VECT or DIAL");
+    NUIS_ERR(FTL, "Unknown ParamPull Type: " << input);
+    NUIS_ABORT("Need FIT, ROOT, VECT or DIAL");
   }
 
   // Check Dials are all good
   if (!CheckDialsValid()) {
-    QTHROW("DIALS NOT VALID");
+    NUIS_ABORT("DIALS NOT VALID");
   }
 
   // Setup MC Histogram
@@ -140,7 +140,7 @@ void ParamPull::SetupHistograms(std::string input) {
 
   // If no types or limits are provided give them a default option
   if (!fMinHist) {
-    QLOG(FIT, "No minimum histogram found for pull parameters, setting to be "
+    NUIS_LOG(FIT, "No minimum histogram found for pull parameters, setting to be "
               "content - 1E6...");
     fMinHist = (TH1D *)fDataHist->Clone();
     fMinHist->SetNameTitle((fName + "_min").c_str(),
@@ -153,7 +153,7 @@ void ParamPull::SetupHistograms(std::string input) {
   }
 
   if (!fMaxHist) {
-    QLOG(FIT, "No maximum histogram found for pull parameters, setting to be "
+    NUIS_LOG(FIT, "No maximum histogram found for pull parameters, setting to be "
               "content - 1E6...");
     fMaxHist = (TH1D *)fDataHist->Clone();
     fMaxHist->SetNameTitle((fName + "_min").c_str(),
@@ -309,8 +309,8 @@ void ParamPull::ReadFitFile(std::string input) {
   // Read Covar
   TH2D *tempcov = (TH2D *)tempfile->Get("covariance_free");
   if (!tempcov) {
-    QERROR(FTL, "Can't find TH2D covariance_free in " << fName);
-    QERROR(FTL, "File Entries:");
+    NUIS_ERR(FTL, "Can't find TH2D covariance_free in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     tempfile->ls();
 
     throw;
@@ -337,11 +337,11 @@ void ParamPull::ReadRootFile(std::string input) {
 
   // Check all given
   if (inputlist.size() < 2) {
-    QERROR(FTL, "Covar supplied in 'ROOT' format should have 3 semi-colon "
+    NUIS_ERR(FTL, "Covar supplied in 'ROOT' format should have 3 semi-colon "
                 "seperated entries!"
                     << std::endl
                     << "ROOT:filename;histname[;covarname]");
-    QTHROW("histname = TH1D, covarname = TH2D");
+    NUIS_ABORT("histname = TH1D, covarname = TH2D");
   }
 
   // Get Entries
@@ -351,20 +351,20 @@ void ParamPull::ReadRootFile(std::string input) {
   // Read File
   TFile *tempfile = new TFile(filename.c_str(), "READ");
   if (tempfile->IsZombie()) {
-    QLOG(FIT, "Looking for ParamPull input inside database");
+    NUIS_LOG(FIT, "Looking for ParamPull input inside database");
     filename = FitPar::GetDataBase() + "/" + filename;
     tempfile = new TFile(filename.c_str(), "READ");
   }
   if (tempfile->IsZombie()) {
-    QERROR(FTL, "Can't find file in " << fName);
-    QTHROW("location = " << filename);
+    NUIS_ERR(FTL, "Can't find file in " << fName);
+    NUIS_ABORT("location = " << filename);
   }
 
   // Read Hist
   fDataHist = (TH1D *)tempfile->Get(histname.c_str());
   if (!fDataHist) {
-    QERROR(FTL, "Can't find TH1D hist " << histname << " in " << fName);
-    QERROR(FTL, "File Entries:");
+    NUIS_ERR(FTL, "Can't find TH1D hist " << histname << " in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     tempfile->ls();
 
     throw;
@@ -373,16 +373,16 @@ void ParamPull::ReadRootFile(std::string input) {
   fDataHist->SetNameTitle((fName + "_data").c_str(),
                           (fName + " data" + fPlotTitles).c_str());
 
-  QLOG(DEB, "READING COVAR");
+  NUIS_LOG(DEB, "READING COVAR");
   // Read Covar
   if (inputlist.size() > 2) {
     std::string covarname = inputlist[2];
-    QLOG(DEB, "COVARNAME = " << covarname);
+    NUIS_LOG(DEB, "COVARNAME = " << covarname);
 
     TH2D *tempcov = (TH2D *)tempfile->Get(covarname.c_str());
     if (!tempcov) {
-      QERROR(FTL, "Can't find TH2D covar " << covarname << " in " << fName);
-      QERROR(FTL, "File Entries:");
+      NUIS_ERR(FTL, "Can't find TH2D covar " << covarname << " in " << fName);
+      NUIS_ERR(FTL, "File Entries:");
       tempfile->ls();
 
       throw;
@@ -400,7 +400,7 @@ void ParamPull::ReadRootFile(std::string input) {
 
     // Uncorrelated
   } else {
-    QLOG(SAM, "No Covar provided so using diagonal errors for " << fName);
+    NUIS_LOG(SAM, "No Covar provided so using diagonal errors for " << fName);
     fCovar = NULL;
   }
 }
@@ -411,16 +411,16 @@ void ParamPull::ReadVectFile(std::string input) {
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input, ";");
   if (inputlist.size() < 4) {
-    QERROR(FTL, "Need 3 inputs for vector input in " << fName);
-    QTHROW("Inputs: " << input);
+    NUIS_ERR(FTL, "Need 3 inputs for vector input in " << fName);
+    NUIS_ABORT("Inputs: " << input);
   }
 
   // Open File
   std::string rootname = inputlist[0];
   TFile *tempfile = new TFile(rootname.c_str(), "READ");
   if (tempfile->IsZombie()) {
-    QERROR(FTL, "Can't find file in " << fName);
-    QTHROW("location = " << rootname);
+    NUIS_ERR(FTL, "Can't find file in " << fName);
+    NUIS_ABORT("location = " << rootname);
   }
 
   // Get Name
@@ -434,14 +434,14 @@ void ParamPull::ReadVectFile(std::string input) {
   std::string valuename = inputlist[2];
   TVectorD *dialvals = (TVectorD *)tempfile->Get(valuename.c_str());
   if (!dialvals) {
-    QERROR(FTL, "Can't find dial values");
+    NUIS_ERR(FTL, "Can't find dial values");
   }
 
   // Get Matrix
   std::string matrixname = inputlist[3];
   TMatrixD *matrixvals = (TMatrixD *)tempfile->Get(matrixname.c_str());
   if (!matrixvals) {
-    QERROR(FTL, "Can't find matirx values");
+    NUIS_ERR(FTL, "Can't find matirx values");
   }
 
   // Get Types
@@ -466,8 +466,8 @@ void ParamPull::ReadDialInput(std::string input) {
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input, ";");
   if (inputlist.size() < 3) {
-    QERROR(FTL, "Need 3 inputs for dial input in " << fName);
-    QTHROW("Inputs: " << input);
+    NUIS_ERR(FTL, "Need 3 inputs for dial input in " << fName);
+    NUIS_ABORT("Inputs: " << input);
   }
 
   std::vector<double> inputvals = GeneralUtils::ParseToDbl(input, ";");
@@ -515,15 +515,15 @@ bool ParamPull::CheckDialsValid() {
 
     // If dial exists its all good
     if (FitBase::GetRW()->DialIncluded(name)) {
-      QLOG(DEB, "Found dial " << name << " in covariance " << fInput
+      NUIS_LOG(DEB, "Found dial " << name << " in covariance " << fInput
                               << " and matched to reweight engine ");
       continue;
     }
 
     // If it doesn't but its a sample norm also continue
     if (name.find("_norm") != std::string::npos) {
-      QERROR(WRN, "Norm dial included in covar but not set in FitWeight.");
-      QERROR(WRN, "Assuming its a sample norm and skipping...");
+      NUIS_ERR(WRN, "Norm dial included in covar but not set in FitWeight.");
+      NUIS_ERR(WRN, "Assuming its a sample norm and skipping...");
     }
 
     // Dial unknown so print a help statement
@@ -545,9 +545,9 @@ bool ParamPull::CheckDialsValid() {
   // Show statement before failing
   if (!helpstring.empty()) {
 
-    QERROR(FTL, "Dial(s) included in covar but not set in FitWeight.");
-    QERROR(FTL, "ParamPulls needs to know how you want it to be treated.");
-    QTHROW("Include the following lines into your card to throw UNCORRELATED:"
+    NUIS_ERR(FTL, "Dial(s) included in covar but not set in FitWeight.");
+    NUIS_ERR(FTL, "ParamPulls needs to know how you want it to be treated.");
+    NUIS_ABORT("Include the following lines into your card to throw UNCORRELATED:"
            << std::endl
            << helpstring);
   } else {
@@ -611,10 +611,10 @@ void ParamPull::ResetToy(void) {
   if (fDataHist)
     delete fDataHist;
 
-  QLOG(DEB, "Resetting toy");
-  QLOG(DEB, fDataTrue);
+  NUIS_LOG(DEB, "Resetting toy");
+  NUIS_LOG(DEB, fDataTrue);
   fDataHist = (TH1D *)fDataTrue->Clone();
-  QLOG(DEB, "Setting name");
+  NUIS_LOG(DEB, "Setting name");
   fDataHist->SetNameTitle((fName + "_data").c_str(),
                           (fName + " data" + fPlotTitles).c_str());
 }
@@ -645,8 +645,8 @@ void ParamPull::SetFakeData(std::string fakeinput) {
 
   } else {
 
-    QERROR(FTL, "Trying to set fake data for ParamPulls not from MC!");
-    QTHROW("Not currently implemented..");
+    NUIS_ERR(FTL, "Trying to set fake data for ParamPulls not from MC!");
+    NUIS_ABORT("Not currently implemented..");
   }
 }
 
@@ -685,7 +685,7 @@ double ParamPull::GetLikelihood() {
     break;
   }
 
-  QLOG(DEB, "Likelihood = " << like << " " << fCalcType);
+  NUIS_LOG(DEB, "Likelihood = " << like << " " << fCalcType);
   return like;
 };
 
@@ -708,7 +708,7 @@ void ParamPull::ThrowCovariance() {
 
   // Reset toy for throw
   ResetToy();
-  QLOG(FIT, "Creating new toy dataset");
+  NUIS_LOG(FIT, "Creating new toy dataset");
 
   // Generate random Gaussian throws
   std::vector<double> randthrows;
@@ -776,7 +776,7 @@ void ParamPull::ThrowCovariance() {
           fDataHist->GetBinContent(i + 1) <
               fLimitHist->GetBinContent(i + 1) -
                   fLimitHist->GetBinError(i + 1)) {
-        QLOG(FIT, "Threw outside allowed region, rethrowing...");
+        NUIS_LOG(FIT, "Threw outside allowed region, rethrowing...");
         ThrowCovariance();
       }
     }
@@ -858,8 +858,8 @@ void ParamPull::Write(std::string writeoptt) {
 
 void ParamPull::CheckHist(TH1D *hist) {
   if (!hist) {
-    QERROR(FTL, "Can't find TH1D hist fit_dials in " << fName);
-    QERROR(FTL, "File Entries:");
+    NUIS_ERR(FTL, "Can't find TH1D hist fit_dials in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     TFile *temp = new TFile(fInput.c_str(), "open");
     temp->ls();
     throw;

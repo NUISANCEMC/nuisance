@@ -38,7 +38,7 @@ int event1_nof(event *e, int pdg) {
 
 NuWroInputHandler::NuWroInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
-  QLOG(SAM, "Creating NuWroInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating NuWroInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -53,7 +53,7 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
     // Open File for histogram access
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      QTHROW("nuwro File IsZombie() at " << inputs[inp_it]);
+      NUIS_ABORT("nuwro File IsZombie() at " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
@@ -62,14 +62,14 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
     TH1D *eventhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "EvtHist")).c_str());
     if (!fluxhist or !eventhist) {
-      QERROR(FTL, "nuwro FILE doesn't contain flux/xsec info");
+      NUIS_ERR(FTL, "nuwro FILE doesn't contain flux/xsec info");
       if (FitPar::Config().GetParB("regennuwro")) {
-        QERROR(FTL,
+        NUIS_ERR(FTL,
                "Regen NuWro has not been added yet. Email the developers!");
         // ProcessNuWroInputFlux(inputs[inp_it]);
         throw;
       } else {
-        QTHROW("If you would like NUISANCE to generate these for you "
+        NUIS_ABORT("If you would like NUISANCE to generate these for you "
                << "please set parameter regennuwro=1 and re-run.");
       }
     }
@@ -77,7 +77,7 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
     // Get N Events
     TTree *nuwrotree = (TTree *)inp_file->Get("treeout");
     if (!nuwrotree) {
-      QTHROW("treeout not located in nuwro file! " << inputs[inp_it]);
+      NUIS_ABORT("treeout not located in nuwro file! " << inputs[inp_it]);
     }
     int nevents = nuwrotree->GetEntries();
 
@@ -418,7 +418,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   UInt_t kmax = evt->kMaxParticles;
 
   if (npart > kmax) {
-    QERROR(WRN, "NUWRO has too many particles. Expanding stack.");
+    NUIS_ERR(WRN, "NUWRO has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 

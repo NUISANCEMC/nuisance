@@ -177,7 +177,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetCovarMatrix(std::string covarFile,
   this->covar = new TMatrixDSym(dim);
 
   if (covar.is_open())
-    QLOG(DEB, "Reading covariance matrix from file: " << covarFile);
+    NUIS_LOG(DEB, "Reading covariance matrix from file: " << covarFile);
 
   while (std::getline(covar >> std::ws, line, '\n')) {
     std::istringstream stream(line);
@@ -212,7 +212,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetDataValues(std::string inputFile,
   std::ifstream input(inputFile.c_str(), std::ifstream::in);
 
   if (input.is_open()) {
-    QLOG(DEB, "Reading data from file: " << inputFile);
+    NUIS_LOG(DEB, "Reading data from file: " << inputFile);
   }
   this->fDataHist =
       new TH1D((this->fName + "_data").c_str(),
@@ -276,7 +276,7 @@ void MiniBooNE_NCEL_XSec_Treco_nu::SetResponseMatrix(std::string responseFile,
                                 0, 900, 51, arr_treco);
 
   if (response.is_open()) {
-    QLOG(DEB, "Reading in the response matrix from file: " << responseFile);
+    NUIS_LOG(DEB, "Reading in the response matrix from file: " << responseFile);
   }
   while (std::getline(response, line, '\n')) {
     std::istringstream stream(line);

@@ -122,7 +122,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
       double mcerr = calc_mc->GetBinError(i + 1) * sqrt(covar_scale);
       double oldval = (*newcov)(i, i);
 
-      QLOG(FIT,
+      NUIS_LOG(FIT,
            "Adding cov stat " << mcerr * mcerr << " to " << (*newcov)(i, i));
       (*newcov)(i, i) = oldval + mcerr * mcerr;
     }
@@ -140,37 +140,37 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
   (*calc_cov) *= covar_scale;
 
   // iterate over bins in X (i,j)
-  QLOG(DEB, "START Chi2 Calculation=================");
+  NUIS_LOG(DEB, "START Chi2 Calculation=================");
   for (int i = 0; i < calc_data->GetNbinsX(); i++) {
-    QLOG(DEB,
+    NUIS_LOG(DEB,
          "[CHI2] i = " << i << " ["
                        << calc_data->GetXaxis()->GetBinLowEdge(i + 1) << " -- "
                        << calc_data->GetXaxis()->GetBinUpEdge(i + 1) << "].");
     for (int j = 0; j < calc_data->GetNbinsX(); j++) {
-      QLOG(DEB, "[CHI2]\t j = "
+      NUIS_LOG(DEB, "[CHI2]\t j = "
                     << i << " [" << calc_data->GetXaxis()->GetBinLowEdge(j + 1)
                     << " -- " << calc_data->GetXaxis()->GetBinUpEdge(j + 1)
                     << "].");
       if ((calc_data->GetBinContent(i + 1) != 0 ||
            calc_mc->GetBinContent(i + 1) != 0) &&
           ((*calc_cov)(i, j) != 0)) {
-        QLOG(DEB,
+        NUIS_LOG(DEB,
              "[CHI2]\t\t Chi2 contribution (i,j) = (" << i << "," << j << ")");
-        QLOG(DEB, "[CHI2]\t\t Data - MC(i) = "
+        NUIS_LOG(DEB, "[CHI2]\t\t Data - MC(i) = "
                       << calc_data->GetBinContent(i + 1) << " - "
                       << calc_mc->GetBinContent(i + 1) << "  = "
                       << (calc_data->GetBinContent(i + 1) -
                           calc_mc->GetBinContent(i + 1)));
 
-        QLOG(DEB, "[CHI2]\t\t Data - MC(j) = "
+        NUIS_LOG(DEB, "[CHI2]\t\t Data - MC(j) = "
                       << calc_data->GetBinContent(j + 1) << " - "
                       << calc_mc->GetBinContent(j + 1) << "  = "
                       << (calc_data->GetBinContent(j + 1) -
                           calc_mc->GetBinContent(j + 1)));
 
-        QLOG(DEB, "[CHI2]\t\t Covar = " << (*calc_cov)(i, j));
+        NUIS_LOG(DEB, "[CHI2]\t\t Covar = " << (*calc_cov)(i, j));
 
-        QLOG(DEB,
+        NUIS_LOG(DEB,
              "[CHI2]\t\t Cont chi2 = " << ((calc_data->GetBinContent(i + 1) -
                                             calc_mc->GetBinContent(i + 1)) *
                                            (*calc_cov)(i, j) *
@@ -184,7 +184,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
              (calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1)));
 
       } else {
-        QLOG(DEB, "Skipping chi2 contribution (i,j) = ("
+        NUIS_LOG(DEB, "Skipping chi2 contribution (i,j) = ("
                       << i << "," << j
                       << "), Data = " << calc_data->GetBinContent(i + 1)
                       << ", MC = " << calc_mc->GetBinContent(i + 1)
@@ -677,7 +677,7 @@ TH1D *StatUtils::ApplyHistogramMasking(TH1D *hist, TH1I *mask) {
   int binindex = 0;
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     if (mask->GetBinContent(i + 1)) {
-      QLOG(REC, "Applying mask to bin " << i + 1 << " " << hist->GetName());
+      NUIS_LOG(REC, "Applying mask to bin " << i + 1 << " " << hist->GetName());
       continue;
     }
     calc_hist->SetBinContent(binindex + 1, hist->GetBinContent(i + 1));
@@ -952,11 +952,11 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
   // Check
   if (ErrorCheck) {
     if (cov->GetNrows() != DataHist->GetNbinsX()) {
-      QERROR(
+      NUIS_ERR(
           FTL,
           "Nrows in cov don't match nbins in DataHist for SetDataErrorFromCov");
-      QERROR(FTL, "Nrows = " << cov->GetNrows());
-      QTHROW("Nbins = " << DataHist->GetNbinsX());
+      NUIS_ERR(FTL, "Nrows = " << cov->GetNrows());
+      NUIS_ABORT("Nbins = " << DataHist->GetNbinsX());
     }
   }
 
@@ -977,12 +977,12 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
       double coverr = sqrt((*cov)(i, i)) * scale;
       // Check that the errors are within 1% of eachother
       if (fabs(DataHisterr - coverr) / DataHisterr > 0.01) {
-        QERROR(WRN, "Data error does not match covariance error for bin "
+        NUIS_ERR(WRN, "Data error does not match covariance error for bin "
                         << i + 1 << " ("
                         << DataHist->GetXaxis()->GetBinLowEdge(i + 1) << "-"
                         << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
-        QERROR(WRN, "Data error: " << DataHisterr);
-        QERROR(WRN, "Cov error:  " << coverr);
+        NUIS_ERR(WRN, "Data error: " << DataHisterr);
+        NUIS_ERR(WRN, "Cov error:  " << coverr);
       }
     }
     // Else blindly trust the covariance
@@ -1003,11 +1003,11 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
   // Check
   if (ErrorCheck) {
     if (cov->GetNrows() != data->GetNbinsX() * data->GetNbinsY()) {
-      QERROR(
+      NUIS_ERR(
           FTL,
-          "Nrows in cov don't match nbins in data for SetDataQERRORorFromCov");
-      QERROR(FTL, "Nrows = " << cov->GetNrows());
-      QTHROW("Nbins = " << data->GetNbinsX());
+          "Nrows in cov don't match nbins in data for SetDataNUIS_ERRorFromCov");
+      NUIS_ERR(FTL, "Nrows = " << cov->GetNrows());
+      NUIS_ABORT("Nbins = " << data->GetNbinsX());
     }
   }
 
@@ -1040,12 +1040,12 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
       // Check that the errors are within 1% of eachother
       if (ErrorsSet && ErrorCheck) {
         if (fabs(dataerr - coverr) / dataerr > 0.01) {
-          QERROR(WRN, "Data error does not match covariance error for bin "
+          NUIS_ERR(WRN, "Data error does not match covariance error for bin "
                           << i + 1 << " ("
                           << data->GetXaxis()->GetBinLowEdge(i + 1) << "-"
                           << data->GetXaxis()->GetBinLowEdge(i + 2) << ")");
-          QERROR(WRN, "Data error: " << dataerr);
-          QERROR(WRN, "Cov error:  " << coverr);
+          NUIS_ERR(WRN, "Data error: " << dataerr);
+          NUIS_ERR(WRN, "Cov error:  " << coverr);
         }
       } else {
         data->SetBinError(i + 1, j + 1, sqrt((*cov)(count, count)) * scale);
@@ -1065,15 +1065,15 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
 
   // Check nobody is being silly
   if (data_hist->GetNbinsX() != nbins) {
-    QERROR(WRN, "Inconsistent matrix and data histogram passed to "
+    NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
                 "StatUtils::ExtractShapeOnlyCovar!");
-    QERROR(WRN, "data_hist has " << data_hist->GetNbinsX() << " matrix has "
+    NUIS_ERR(WRN, "data_hist has " << data_hist->GetNbinsX() << " matrix has "
                                  << nbins);
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins)
       err_bins = nbins;
     for (int i = 0; i < err_bins; ++i) {
-      QERROR(WRN, "Matrix diag. = " << (*full_covar)(i, i) << " data = "
+      NUIS_ERR(WRN, "Matrix diag. = " << (*full_covar)(i, i) << " data = "
                                     << data_hist->GetBinContent(i + 1));
     }
     return NULL;
@@ -1091,12 +1091,12 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   }
 
   if (total_data == 0 || total_covar == 0) {
-    QERROR(WRN, "Stupid matrix or data histogram passed to "
+    NUIS_ERR(WRN, "Stupid matrix or data histogram passed to "
                 "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
     return NULL;
   }
 
-  QLOG(SAM, "Norm error = " << sqrt(total_covar) / total_data);
+  NUIS_LOG(SAM, "Norm error = " << sqrt(total_covar) / total_data);
 
   // Now loop over and calculate the shape-only matrix
   for (int i = 0; i < nbins; ++i) {
@@ -1247,7 +1247,7 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
       std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
 
       if (entries.size() <= 1) {
-        QERROR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
+        NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
                     "entries on this line: "
                         << row);
       }
@@ -1281,7 +1281,7 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     if (entries.size() <= 1) {
-      QERROR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
+      NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
                   "entries on this line: "
                       << row);
     }
@@ -1312,7 +1312,7 @@ TMatrixD *StatUtils::GetMatrixFromRootFile(std::string covfile,
   std::vector<std::string> splitfile = GeneralUtils::ParseToStr(inputfile, ";");
 
   if (splitfile.size() < 2) {
-    QTHROW("No object name given!");
+    NUIS_ABORT("No object name given!");
   }
 
   // Get file
@@ -1321,7 +1321,7 @@ TMatrixD *StatUtils::GetMatrixFromRootFile(std::string covfile,
   // Get Object
   TObject *obj = tempfile->Get(splitfile[1].c_str());
   if (!obj) {
-    QTHROW("Object " << splitfile[1] << " doesn't exist!");
+    NUIS_ABORT("Object " << splitfile[1] << " doesn't exist!");
   }
 
   // Try casting

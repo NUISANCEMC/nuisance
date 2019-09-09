@@ -4,7 +4,7 @@
 
 TH1 *HistoInputHandler::GetHistogram(int i) {
   if (size_t(i) >= fHistos.size()) {
-    QTHROW("Requested histogram, index " << i << ", but only specified "
+    NUIS_ABORT("Requested histogram, index " << i << ", but only specified "
                                         << fHistos.size() << " input histos.");
   }
   return fHistos[i];
@@ -13,7 +13,7 @@ std::vector<TH1 *> HistoInputHandler::GetHistograms(int i, int j) {
   size_t from = (i < 0) ? 0 : i;
   size_t to = (j < 0) ? fHistos.size() : j;
   if (j <= i) {
-    QTHROW("Lower bound of GetHistograms range is larger than or equal to the "
+    NUIS_ABORT("Lower bound of GetHistograms range is larger than or equal to the "
           "upper bound: ["
           << i << ", " << j << "].");
   }
@@ -27,7 +27,7 @@ std::vector<TH1 *> HistoInputHandler::GetHistograms(int i, int j) {
 
 HistoInputHandler::HistoInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
-  QLOG(SAM, "Creating HistoInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating HistoInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -43,12 +43,12 @@ HistoInputHandler::HistoInputHandler(std::string const &handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    QLOG(SAM, "Reading histograms from descriptor " << inputs[inp_it]);
+    NUIS_LOG(SAM, "Reading histograms from descriptor " << inputs[inp_it]);
 
     std::vector<TH1 *> histos = PlotUtils::GetTH1sFromRootFile(inputs[inp_it]);
 
     for (size_t h_it = 0; h_it < histos.size(); ++h_it) {
-      QLOG(SAM, "Read " << histos[h_it]->GetName());
+      NUIS_LOG(SAM, "Read " << histos[h_it]->GetName());
       fHistos.push_back(histos[h_it]);
     }
   }

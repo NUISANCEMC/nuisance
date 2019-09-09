@@ -61,15 +61,15 @@ SplineRoutines::SplineRoutines(int argc, char *argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    QTHROW("No input supplied!");
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    QERROR(WRN, "No output supplied so saving it to: " << fOutputFile);
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    QTHROW("No output file or cardfile supplied!");
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -175,12 +175,12 @@ void SplineRoutines::Run() {
   // Parse given routines
   fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
   if (fRoutines.empty()) {
-    QTHROW("Trying to run ComparisonRoutines with no routines given!");
+    NUIS_ABORT("Trying to run ComparisonRoutines with no routines given!");
   }
 
   for (size_t i = 0; i < fRoutines.size(); i++) {
 
-    QLOG(FIT, "Running Routine: " << fRoutines[i]);
+    NUIS_LOG(FIT, "Running Routine: " << fRoutines[i]);
     std::string rout = fRoutines[i];
     if (!rout.compare("SaveEvents"))
       SaveEvents();
@@ -233,13 +233,13 @@ void SplineRoutines::SaveEvents() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -251,7 +251,7 @@ void SplineRoutines::SaveEvents() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -286,7 +286,7 @@ void SplineRoutines::SaveEvents() {
 
       // Logging
       if (icount % countwidth == 0) {
-        QLOG(REC, "Saved " << icount << "/" << nevents
+        NUIS_LOG(REC, "Saved " << icount << "/" << nevents
                            << " nuisance events. [M, W] = [" << nuisevent->Mode
                            << ", " << nuisevent->RWWeight << "]");
       }
@@ -313,14 +313,14 @@ void SplineRoutines::SaveEvents() {
   eventkeys.clear();
 
   // Finished
-  QLOG(FIT, "Finished processing all nuisance events.");
+  NUIS_LOG(FIT, "Finished processing all nuisance events.");
 }
 
 //*************************************
 void SplineRoutines::TestEvents() {
   //*************************************
 
-  QLOG(FIT, "Testing events.");
+  NUIS_LOG(FIT, "Testing events.");
 
   // Create a new file for the test samples
   if (!fOutputRootFile) {
@@ -343,13 +343,13 @@ void SplineRoutines::TestEvents() {
     std::string eventsid = key.GetS("inputid");
     nuiskey eventskey = Config::QueryLastKey("events", "id=" + eventsid);
     std::string rawfile = eventskey.GetS("input");
-    QLOG(FIT, "Creating sample " << samplename);
+    NUIS_LOG(FIT, "Creating sample " << samplename);
     MeasurementBase *rawsample = SampleUtils::CreateSample(
         samplename, rawfile, "", "", FitBase::GetRW());
 
     // 2. Build Sample From Nuisance Events
     std::string eventsfile = eventskey.GetS("output");
-    QLOG(FIT, "Creating Fit Eevnt Sample " << samplename << " " << eventsfile);
+    NUIS_LOG(FIT, "Creating Fit Eevnt Sample " << samplename << " " << eventsfile);
     MeasurementBase *nuissample = SampleUtils::CreateSample(
         samplename, "FEVENT:" + eventsfile, "", "", FitBase::GetRW());
 
@@ -432,13 +432,13 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN,"No output give for set of output events! Saving to "
+      NUIS_ERR(WRN,"No output give for set of output events! Saving to "
                << outputfilename);
     }
     outputfilename += ".weights.root";
@@ -451,7 +451,7 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -501,7 +501,7 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
       if (procchunk != -1 and procchunk != ichunk)
         continue;
 
-      QLOG(FIT, "On Processing Chunk " << ichunk);
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
       int neventsinchunk = nevents / nchunks;
       int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
@@ -547,7 +547,7 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
                      << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-        QLOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
                                    << ichunk << "/" << nchunks << " "
                                    << timestring.str());
       }
@@ -614,13 +614,13 @@ void SplineRoutines::GenerateEventWeights() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
     outputfilename += ".weights.root";
@@ -633,7 +633,7 @@ void SplineRoutines::GenerateEventWeights() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -693,7 +693,7 @@ void SplineRoutines::GenerateEventWeights() {
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
         }
-        QLOG(REC, "Saved " << i << "/" << nevents
+        NUIS_LOG(REC, "Saved " << i << "/" << nevents
                            << " nuisance spline weights. " << timestring.str());
       }
 
@@ -776,13 +776,13 @@ void SplineRoutines::GenerateEventSplines() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -794,7 +794,7 @@ void SplineRoutines::GenerateEventSplines() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -883,7 +883,7 @@ void SplineRoutines::GenerateEventSplines() {
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
         }
-        QLOG(REC, "Saved " << i << "/" << nevents
+        NUIS_LOG(REC, "Saved " << i << "/" << nevents
                            << " nuisance spline weights. " << timestring.str());
       }
 
@@ -1086,13 +1086,13 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -1150,7 +1150,7 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
       if (procchunk != -1 and procchunk != ichunk)
         continue;
 
-      QLOG(FIT, "On Processing Chunk " << ichunk);
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
       int neventsinchunk = nevents / nchunks;
       int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
@@ -1275,13 +1275,13 @@ void SplineRoutines::MergeEventSplinesChunks() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -1418,7 +1418,7 @@ void SplineRoutines::MergeSplines() {
   std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(inputfilename, ":");
   if (file_descriptor.size() != 2) {
-    QTHROW("File descriptor had no filetype declaration: \""
+    NUIS_ABORT("File descriptor had no filetype declaration: \""
            << inputfilename << "\". expected \"FILETYPE:file.root\"");
   }
   InputUtils::InputType inptype =
@@ -1430,7 +1430,7 @@ void SplineRoutines::MergeSplines() {
   std::string outputfilename = key.GetS("output");
   if (outputfilename.empty()) {
     outputfilename = inputfilename + ".nuisance.root";
-    QERROR(WRN, "No output give for set of output events! Saving to "
+    NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                     << outputfilename);
   }
 
@@ -1482,7 +1482,7 @@ void SplineRoutines::MergeSplines() {
         float proj = (float(eventsleft) / float(speed)) / 60 / 60;
         timestring << proj << " hours remaining.";
       }
-      QLOG(REC, "Saved " << i << "/" << nevents << " nuisance spline events. "
+      NUIS_LOG(REC, "Saved " << i << "/" << nevents << " nuisance spline events. "
                          << timestring.str());
     }
 
@@ -1607,13 +1607,13 @@ void SplineRoutines::TestSplines_1DEventScan() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!")
+      NUIS_ABORT("No input given for set of input events!")
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -1621,7 +1621,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -1679,7 +1679,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
       // Skip to only do one processing chunk
       //      if (procchunk != -1 and procchunk != ichunk) continue;
 
-      QLOG(FIT, "On Processing Chunk " << ichunk);
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
       int neventsinchunk = nevents / nchunks;
       int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
@@ -1733,7 +1733,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
                      << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-        QLOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
                                    << ichunk << "/" << nchunks << " "
                                    << timestring.str());
       }
@@ -2036,13 +2036,13 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -2050,7 +2050,7 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -2108,7 +2108,7 @@ void SplineRoutines::TestSplines_NDEventThrow() {
       // Skip to only do one processing chunk
       //      if (procchunk != -1 and procchunk != ichunk) continue;
 
-      QLOG(FIT, "On Processing Chunk " << ichunk);
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
       int neventsinchunk = nevents / nchunks;
       int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
@@ -2162,7 +2162,7 @@ void SplineRoutines::TestSplines_NDEventThrow() {
                      << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-        QLOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
                                    << ichunk << "/" << nchunks << " "
                                    << timestring.str());
       }
@@ -2228,13 +2228,13 @@ void SplineRoutines::SaveSplinePlots() {
     // Get I/O
     std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      QTHROW("No input given for set of input events!");
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      QERROR(WRN, "No output give for set of output events! Saving to "
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
                       << outputfilename);
     }
 
@@ -2247,7 +2247,7 @@ void SplineRoutines::SaveSplinePlots() {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
@@ -2281,7 +2281,7 @@ void SplineRoutines::SaveSplinePlots() {
 
       // Logging
       if (i % countwidth == 0) {
-        QLOG(REC,
+        NUIS_LOG(REC,
              "Saved " << i << "/" << nevents << " nuisance spline plots. ");
       }
 
@@ -2430,7 +2430,7 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
     FitBase::SetRW(splweight);
     double spltotal = splfcn->DoEval(&scanparset_vals[j][0]);
 
-    QLOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
+    NUIS_LOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
                                   << spltotal - rawtotal);
   }
 
@@ -2577,7 +2577,7 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
     FitBase::SetRW(splweight);
     double spltotal = splfcn->DoEval(&scanparset_vals[j][0]);
 
-    QLOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
+    NUIS_LOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
                                   << spltotal - rawtotal);
   }
 

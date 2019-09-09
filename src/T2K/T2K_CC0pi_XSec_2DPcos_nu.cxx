@@ -146,7 +146,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
 
   if (!tempcov){
-    QTHROW("TEMPCOV NOT SET");
+    NUIS_ABORT("TEMPCOV NOT SET");
   }
 
   // Setup Covar

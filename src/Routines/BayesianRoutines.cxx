@@ -72,15 +72,15 @@ BayesianRoutines::BayesianRoutines(int argc, char *argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    QTHROW("No input supplied!");
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    QERROR(WRN, "No output supplied so saving it to: " << fOutputFile);
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    QTHROW("No output file or cardfile supplied!");
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -139,12 +139,12 @@ BayesianRoutines::BayesianRoutines(int argc, char *argv[]) {
 
 void BayesianRoutines::SetupSystematicsFromXML() {
 
-  QLOG(FIT, "Setting up nuismin");
+  NUIS_LOG(FIT, "Setting up nuismin");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    QLOG(FIT, "Number of parameters :  " << parkeys.size());
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -152,11 +152,11 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      QTHROW("No type given for parameter " << i);
+      NUIS_ABORT("No type given for parameter " << i);
     } else if (!key.Has("name")) {
-      QTHROW("No name given for parameter " << i);
+      NUIS_ABORT("No name given for parameter " << i);
     } else if (!key.Has("nominal")) {
-      QTHROW("No nominal given for parameter " << i);
+      NUIS_ABORT("No nominal given for parameter " << i);
     }
 
     // Get Inputs
@@ -180,11 +180,11 @@ void BayesianRoutines::SetupSystematicsFromXML() {
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parlow << " < p < " << parhigh << " : "
                         << parstate);
     } else {
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parstate);
     }
 
@@ -224,9 +224,9 @@ void BayesianRoutines::SetupSystematicsFromXML() {
   // Setup Samples ----------------------------------------------
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    QLOG(FIT, "Number of samples : " << samplekeys.size());
+    NUIS_LOG(FIT, "Number of samples : " << samplekeys.size());
   } else {
-    QERROR(WRN, "NO SAMPLES LOADED");
+    NUIS_ERR(WRN, "NO SAMPLES LOADED");
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -241,7 +241,7 @@ void BayesianRoutines::SetupSystematicsFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    QLOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
+    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
                                   << "\t\t input -> " << samplefile << std::endl
                                   << "\t\t state -> " << sampletype << std::endl
                                   << "\t\t norm  -> " << samplenorm);
@@ -280,7 +280,7 @@ void BayesianRoutines::SetupSystematicsFromXML() {
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    QLOG(FIT, "Number of fake parameters : " << fakekeys.size());
+    NUIS_LOG(FIT, "Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -288,10 +288,10 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      QTHROW("No name given for fakeparameter " << i);
+      NUIS_ABORT("No name given for fakeparameter " << i);
 
     } else if (!key.Has("nom")) {
-      QTHROW("No nominal given for fakeparameter " << i);
+      NUIS_ABORT("No nominal given for fakeparameter " << i);
     }
 
     // Get Inputs
@@ -323,7 +323,7 @@ void BayesianRoutines::SetupRWEngine() {
 void BayesianRoutines::SetupFCN() {
   //*************************************
 
-  QLOG(FIT, "Making the jointFCN");
+  NUIS_LOG(FIT, "Making the jointFCN");
   if (fSampleFCN)
     delete fSampleFCN;
   fSampleFCN = new JointFCN(fOutputRootFile);
@@ -404,12 +404,12 @@ void BayesianRoutines::Run() {
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
 
     std::string routine = fRoutines.at(i);
-    QLOG(FIT, "Running Routine: " << routine);
+    NUIS_LOG(FIT, "Running Routine: " << routine);
 
     if (!routine.compare("BayesianThrows"))
       GenerateThrows();
     else {
-      QTHROW("UNKNOWN ROUTINE " << routine);
+      NUIS_ABORT("UNKNOWN ROUTINE " << routine);
     }
   }
 
@@ -434,11 +434,11 @@ void BayesianRoutines::GenerateThrows() {
   Double_t seed = time(NULL) + int(getpid()) + (mytime.tv_sec * 1000.) +
                   (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
-  QLOG(FIT, "Using Seed : " << seed);
-  QLOG(FIT, "nthrows = " << nthrows);
+  NUIS_LOG(FIT, "Using Seed : " << seed);
+  NUIS_LOG(FIT, "nthrows = " << nthrows);
 
   // Run the Initial Reconfigure
-  QLOG(FIT, "Making nominal prediction ");
+  NUIS_LOG(FIT, "Making nominal prediction ");
   TDirectory *nominal = (TDirectory *)outfile->mkdir("nominal");
   nominal->cd();
   UpdateRWEngine(fStartVals);
@@ -480,7 +480,7 @@ void BayesianRoutines::GenerateThrows() {
     // Skip the start throw
     if (i == 0)
       continue;
-    QLOG(FIT, "Throw " << i << " ================================");
+    NUIS_LOG(FIT, "Throw " << i << " ================================");
 
     // Throw Parameters
     ThrowParameters();
@@ -505,7 +505,7 @@ void BayesianRoutines::GenerateThrows() {
 
     // Save the FCN
     // if (fSavePredictions){ SaveSamplePredictions(); }
-    QLOG(FIT, "END OF THROW ================================");
+    NUIS_LOG(FIT, "END OF THROW ================================");
   }
 
   // Finish up

@@ -5,7 +5,7 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  QLOG(FIT, "Setting up NuWro RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up NuWro RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -35,7 +35,7 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
   // allow cout again
   StartTalking();
 #else
-  QTHROW("NUWRO RW NOT ENABLED! ");
+  NUIS_ABORT("NUWRO RW NOT ENABLED! ");
 #endif
 };
 
@@ -63,7 +63,7 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
     fNUWROSysts.push_back(gensyst);
 
     // Initialise Dial
-    QLOG(FIT, "Adding NuWro Syst " << fNUWROSysts[index]);
+    NUIS_LOG(FIT, "Adding NuWro Syst " << fNUWROSysts[index]);
     fNuwroRW->Systematics().Add(fNUWROSysts[index]);
 
     if (fIsAbsTwk) {

@@ -121,7 +121,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
   else if (!zstring.compare("8") && !astring.compare("16"))
     target = "16O.dat";
   else {
-    QTHROW("Target not supported in electron scattering module!"
+    NUIS_ABORT("Target not supported in electron scattering module!"
     );
   }
 
@@ -132,7 +132,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
                      std::ifstream::in);
 
   if (!mask.good()) {
-    QTHROW("Failed to open e-scattering database file: "
+    NUIS_ABORT("Failed to open e-scattering database file: "
              << (FitPar::GetDataBase() + "/Electron/" + target));
   }
   int i = 0;
@@ -215,7 +215,7 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
   if (!pointx.size() || (pointx.size() != errorx.size()) || !pointy.size() ||
       (pointy.size() != errory.size())) {
-    QTHROW("Failed to find dataset: " << name << "{"
+    NUIS_ABORT("Failed to find dataset: " << name << "{"
              << "Z: " << zstring << ", A: " << astring << ", E: " << estring
              << ", CTheta: " << tstring << ", PubID: " << sstring
              << " } in file: "

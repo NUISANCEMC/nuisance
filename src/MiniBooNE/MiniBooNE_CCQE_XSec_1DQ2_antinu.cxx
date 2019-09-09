@@ -47,7 +47,7 @@ MiniBooNE_CCQE_XSec_1DQ2_antinu::MiniBooNE_CCQE_XSec_1DQ2_antinu(
   fSettings.FoundFill("name", "CTarg", fUseCorrectedCTarget, true);
 
   if (fCCQElike && fUseCorrectedCTarget) {
-    QTHROW("Sample: MiniBooNE_CCQE_XSec_1DQ2_antinu cannot run in both "
+    NUIS_ABORT("Sample: MiniBooNE_CCQE_XSec_1DQ2_antinu cannot run in both "
            "QELike and C-Target mode. You're welcome to add the data set.");
   }
 

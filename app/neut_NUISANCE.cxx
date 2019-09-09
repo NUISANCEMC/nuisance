@@ -33,7 +33,7 @@ void PrintSyntax(void);
 std::string GETCWD() {
   char cCurrentPath[FILENAME_MAX];
   if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
-    QTHROW("CANT FIND CURRENT DIRECTORY!");
+    NUIS_ABORT("CANT FIND CURRENT DIRECTORY!");
   }
   std::string curdir = std::string(cCurrentPath);
   return curdir;
@@ -44,7 +44,7 @@ std::string ExpandPath(std::string name) {
   // Get Current
   char cCurrentPath[FILENAME_MAX];
   if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
-    QTHROW("CANT FIND CURRENT DIRECTORY!");
+    NUIS_ABORT("CANT FIND CURRENT DIRECTORY!");
   }
   std::string curdir = std::string(cCurrentPath);
 
@@ -63,13 +63,13 @@ std::string GetBaseName(std::string name) {
   } else if (splitfile.size() > 1) {
     filename = splitfile[splitfile.size() - 1];
   } else {
-    QTHROW("Cannot split filename: " << name);
+    NUIS_ABORT("Cannot split filename: " << name);
   }
   return filename;
 }
 
 std::string GetDynamicModes(std::string list, bool neutrino) {
-  QLOG(FIT, "Using " << list << " to define interaction modes for Neutrino="
+  NUIS_LOG(FIT, "Using " << list << " to define interaction modes for Neutrino="
                      << neutrino);
 
   std::map<std::string, int> modes;
@@ -181,7 +181,7 @@ C  28:    2p2h            2p2h
     modes["crsmode_NCGAMMA"] = 1;
 
   } else {
-    QTHROW("Event generator list " << list << " not found!");
+    NUIS_ABORT("Event generator list " << list << " not found!");
   }
 
   // Now we actually have to make the conversion because NEUTS modes
@@ -274,11 +274,11 @@ C  26,27: NC 1 gamma      NC 1 gamma
 
 std::map<std::string, std::string> MakeNewFluxFile(std::string flux,
                                                    std::string out) {
-  QLOG(FIT, "Using " << flux << " to define NEUT beam.");
+  NUIS_LOG(FIT, "Using " << flux << " to define NEUT beam.");
 
   std::vector<std::string> fluxargs = GeneralUtils::ParseToStr(flux, ",");
   if (fluxargs.size() < 2) {
-    QTHROW("Expected flux in the format: file.root,hist_name1[pdg1],... : "
+    NUIS_ABORT("Expected flux in the format: file.root,hist_name1[pdg1],... : "
            "reveived : "
            << flux);
   }
@@ -346,7 +346,7 @@ std::map<std::string, std::string> MakeNewFluxFile(std::string flux,
 
     // Check Flux
     if (cuthist->Integral() <= 0.0) {
-      QTHROW("Flux histogram " << iter->second << " has integral <= 0.0");
+      NUIS_ABORT("Flux histogram " << iter->second << " has integral <= 0.0");
     }
 
     // Save
@@ -372,7 +372,7 @@ std::string GetFluxDefinition(std::string fluxfile, std::string fluxhist,
   } else if (splitfluxfile.size() > 1) {
     filename = splitfluxfile[splitfluxfile.size() - 1];
   } else {
-    QTHROW("NO FILENAME FOR FLUX DEFINITION FOUND!");
+    NUIS_ABORT("NO FILENAME FOR FLUX DEFINITION FOUND!");
   }
 
   // Build string
@@ -396,7 +396,7 @@ std::string GetFluxDefinition(std::string fluxfile, std::string fluxhist,
   else if (!fluxid.compare("nutaub"))
     fluxparams += "EVCT-IDPT  -16";
   else {
-    QTHROW("UNKNOWN FLUX ID GIVEN!");
+    NUIS_ABORT("UNKNOWN FLUX ID GIVEN!");
   }
 
   return fluxparams;
@@ -404,7 +404,7 @@ std::string GetFluxDefinition(std::string fluxfile, std::string fluxhist,
 
 std::string GetTargetDefinition(std::string target) {
 
-  QLOG(FIT, "Defining NEUT Target from : " << target);
+  NUIS_LOG(FIT, "Defining NEUT Target from : " << target);
 
   // Target is given as either a single PDG, or a combo with the total number of
   // nucleons
@@ -452,7 +452,7 @@ std::string GetTargetDefinition(std::string target) {
 
     // Can only have H as a secondary target!
     if (PDG1 != 1000010010 && PDG2 != 1000010010) {
-      QTHROW(
+      NUIS_ABORT(
           "NEUT Doesn't support composite targets apart fromn Target+H. E.g. "
           "CH");
     }
@@ -480,7 +480,7 @@ std::string GetTargetDefinition(std::string target) {
     targetstring += "NEUT-NUMATOM " + GeneralUtils::IntToStr(Z + N) + "\n";
 
   } else {
-    QTHROW("NEUT only supports single targets or ones with a secondary H!");
+    NUIS_ABORT("NEUT only supports single targets or ones with a secondary H!");
   }
 
   return targetstring;
@@ -491,7 +491,7 @@ std::string GetEventAndSeedDefinition(int nevents, int seed) {
   std::string eventdef = "";
   eventdef += "EVCT-NEVT " + GeneralUtils::IntToStr(nevents) + "\n";
 
-  QLOG(FIT, "Event Definition: ");
+  NUIS_LOG(FIT, "Event Definition: ");
   std::cout << " -> EVCT-NEVT  : " << nevents << std::endl;
 
   return eventdef;
@@ -499,7 +499,7 @@ std::string GetEventAndSeedDefinition(int nevents, int seed) {
 
 //____________________________________________________________________________
 int main(int argc, char **argv) {
-  QLOG(FIT, "==== RUNNING neut_nuisance Event Generator =====");
+  NUIS_LOG(FIT, "==== RUNNING neut_nuisance Event Generator =====");
   GetCommandLineArgs(argc, argv);
   std::string neutroot = std::string(getenv("NEUT_ROOT")) + "/src/neutsmpl/";
 
@@ -520,7 +520,7 @@ int main(int argc, char **argv) {
   newfluxdef = MakeNewFluxFile(gOptFluxDef, ss.str());
 
   // Copy this file to the NEUT working directory
-  QLOG(FIT, "Copying flux to NEUT working directory");
+  NUIS_LOG(FIT, "Copying flux to NEUT working directory");
   system(
       ("cp -v " + newfluxdef["beam_inputroot"] + " " + neutroot + "/").c_str());
   TFile *fluxrootfile = new TFile(newfluxdef["beam_inputroot"].c_str(), "READ");
@@ -545,7 +545,7 @@ int main(int argc, char **argv) {
       TH1D *fluxhist = (TH1D *)fluxrootfile->Get(
           newfluxdef["beam_inputroot_" + possiblefluxids[i]].c_str());
       if (!fluxhist) {
-        QTHROW("FLUX HIST : "
+        NUIS_ABORT("FLUX HIST : "
                << newfluxdef["beam_inputroot_" + possiblefluxids[i]]
                << " not found!");
       }
@@ -576,7 +576,7 @@ int main(int argc, char **argv) {
         newfluxdef["beam_inputroot"],
         newfluxdef["beam_inputroot_" + possiblefluxids[i]], possiblefluxids[i]);
 
-    QLOG(FIT,"==== Generating CardFiles NEUT! ===");
+    NUIS_LOG(FIT,"==== Generating CardFiles NEUT! ===");
     std::cout << dynparamsdef << std::endl;
     std::cout << targetparamsdef << std::endl;
     std::cout << eventparamsdef << std::endl;
@@ -596,7 +596,7 @@ int main(int argc, char **argv) {
         outcardfile << line << '\n';
       }
     } else {
-      QTHROW("Cannot find card file : " << gOptCrossSections);
+      NUIS_ABORT("Cannot find card file : " << gOptCrossSections);
     }
 
     // Now copy our strings
@@ -609,7 +609,7 @@ int main(int argc, char **argv) {
     outcardfile.close();
   }
 
-  QLOG(FIT, "GENERATING");
+  NUIS_LOG(FIT, "GENERATING");
   for (size_t i = 0; i < possiblefluxids.size(); i++) {
     if (fluxfractions[i] == 0.0)
       continue;
@@ -678,7 +678,7 @@ void GetCommandLineArgs(int argc, char **argv) {
   std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
   ParserUtils::ParseArgument(args, "-n", gOptNumberEvents, false);
   if (gOptNumberEvents == -1) {
-    QTHROW("No event count passed to neut_NUISANCE!");
+    NUIS_ABORT("No event count passed to neut_NUISANCE!");
   }
 
   // Flux/Energy Specs
@@ -687,15 +687,15 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "-f", gOptFluxDef, false);
   if (gOptFluxDef.empty() and gOptEnergyRange.size() < 1) {
-    QTHROW("No flux or energy range given to neut_nuisance!");
+    NUIS_ABORT("No flux or energy range given to neut_nuisance!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 1) {
     // Fixed energy, make sure -p is given
-    QTHROW("neut_NUISANCE cannot yet do fixed energy!");
+    NUIS_ABORT("neut_NUISANCE cannot yet do fixed energy!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 2) {
     // Uniform energy range
-    QTHROW("neut_NUISANCE cannot yet do a uniform energy range!");
+    NUIS_ABORT("neut_NUISANCE cannot yet do a uniform energy range!");
 
   } else if (!gOptFluxDef.empty()) {
     // Try to convert the flux definition if possible.
@@ -704,12 +704,12 @@ void GetCommandLineArgs(int argc, char **argv) {
       gOptFluxDef = convflux;
 
   } else {
-    QTHROW("Unknown flux energy range combination!");
+    NUIS_ABORT("Unknown flux energy range combination!");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptTargetDef, false);
   if (gOptTargetDef.empty()) {
-    QTHROW("No Target passed to neut_nuisance! use the '-t' argument.");
+    NUIS_ABORT("No Target passed to neut_nuisance! use the '-t' argument.");
   } else {
     std::string convtarget = TargetUtils::ConvertTargetIDs(gOptTargetDef);
     if (!convtarget.empty())
@@ -721,7 +721,7 @@ void GetCommandLineArgs(int argc, char **argv) {
   if (gOptOutputFile.empty()) {
     if (gOptRunNumber == -1)
       gOptRunNumber = 1;
-    QLOG(FIT, "No output file given! Saving file to : neutgen."
+    NUIS_LOG(FIT, "No output file given! Saving file to : neutgen."
                   << gOptRunNumber << ".neutvect.root");
     gOptOutputFile =
         "neutgen." + GeneralUtils::IntToStr(gOptRunNumber) + ".neutvect.root";
@@ -736,7 +736,7 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "--cross-section", gOptCrossSections, false);
   if (!gOptCrossSections.compare("Default")) {
-    QLOG(FIT, "No Parameters File passed. Using default neut one.");
+    NUIS_LOG(FIT, "No Parameters File passed. Using default neut one.");
     char *const var = getenv("NUISANCE");
     if (!var) {
       std::cout << "Cannot find top level directory! Set the NUISANCE "
@@ -757,7 +757,7 @@ void GetCommandLineArgs(int argc, char **argv) {
     ParserUtils::CheckBadArguments(args);
   }
 
-  QLOG(FIT, "Generating Neut Events with the following properties:"
+  NUIS_LOG(FIT, "Generating Neut Events with the following properties:"
                 << std::endl
                 << " -> Energy      : " << gOptEnergyDef << " ("
                 << gOptEnergyRange.size() << ")" << std::endl
@@ -773,7 +773,7 @@ void GetCommandLineArgs(int argc, char **argv) {
 //____________________________________________________________________________
 void PrintSyntax(void) {
 
-  QLOG(FIT, "\n\n"
+  NUIS_LOG(FIT, "\n\n"
                 << "Syntax:"
                 << "\n"
                 << "\n      neut_nuisance [-h]"
@@ -786,7 +786,7 @@ void PrintSyntax(void) {
                 << "\n              [ --event-generator-list mode_definition ]"
                 << "\n \n");
 
-  QLOG(
+  NUIS_LOG(
       FIT,
       "\n\n Arguments:"
           << "\n"
@@ -899,7 +899,7 @@ void PrintSyntax(void) {
   std::cout << "-----------------" << std::endl;
   BeamUtils::ListFluxIDs();
   std::cout << "-----------------" << std::endl;
-  QLOG(FIT) << "Allowed Mode Definitions:" << std::endl
+  NUIS_LOG(FIT) << "Allowed Mode Definitions:" << std::endl
            << " - Default : Default CC+NC modes, no MEC" << std::endl
            << " - Default+MEC : Default CC+NC modes + 2p2h MEC " << std::endl
            << " - DefaultFree : Default CC+NC modes, no Coherent or MEC ");

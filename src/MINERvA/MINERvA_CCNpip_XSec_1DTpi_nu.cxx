@@ -105,7 +105,7 @@ MINERvA_CCNpip_XSec_1DTpi_nu::MINERvA_CCNpip_XSec_1DTpi_nu(nuiskey samplekey) {
     // Only 2015 data released restricted muon phase space cross-section
     // unfortunately
     if (fUpdatedData) {
-      QTHROW(fName << " has no updated 2016 data for restricted phase space! "
+      NUIS_ABORT(fName << " has no updated 2016 data for restricted phase space! "
                       "Using 2015 data.");
     }
 

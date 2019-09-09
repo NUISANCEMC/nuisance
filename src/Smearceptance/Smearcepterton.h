@@ -97,13 +97,13 @@ class Smearcepterton {
 
   ISmearcepter &GetSmearcepter(std::string const &name) {
     if (!Smearcepters.count(name) || !Smearcepters[name]) {
-      QERROR(FTL, "Known smearcepters:");
+      NUIS_ERR(FTL, "Known smearcepters:");
       for (std::map<std::string, ISmearcepter *>::iterator sm_it =
                Smearcepters.begin();
            sm_it != Smearcepters.end(); ++sm_it) {
-        QERROR(FTL, "\t" << sm_it->first);
+        NUIS_ERR(FTL, "\t" << sm_it->first);
       }
-      QTHROW("No smearcepter named: \"" << name << "\" defined.");
+      NUIS_ABORT("No smearcepter named: \"" << name << "\" defined.");
     }
     return *Smearcepters[name];
   }

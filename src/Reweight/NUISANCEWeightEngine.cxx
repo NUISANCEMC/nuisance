@@ -10,7 +10,7 @@
 NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   // Setup the NUISANCE Reweight engine
   fCalcName = name;
-  QLOG(FIT, "Setting up NUISANCE Custom RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up NUISANCE Custom RW : " << fCalcName);
 
   // Load in all Weight Calculations
   GaussianModeCorr *GaussianMode = new GaussianModeCorr();
@@ -21,7 +21,7 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   } else if (Gaussian_Method == "Normal") {
     GaussianMode->SetMethod(false);
   } else {
-    QTHROW("I do not recognise method "
+    NUIS_ABORT("I do not recognise method "
            << Gaussian_Method
            << " for the Gaussian enhancement, so will die now...");
   }
@@ -64,7 +64,7 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
     fNUISANCEEnums.push_back(singleenum);
 
     // Initialize dial
-    QLOG(FIT, "Registering " << singlename << " from " << name);
+    NUIS_LOG(FIT, "Registering " << singlename << " from " << name);
 
     // Setup index
     fEnumIndex[nuisenum].push_back(index);

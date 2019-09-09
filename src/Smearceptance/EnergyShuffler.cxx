@@ -11,7 +11,7 @@ void EnergyShuffler::Setup(nuiskey &nk) {
   for (size_t t_it = 0; t_it < shuffleDescriptors.size(); ++t_it) {
     if (!shuffleDescriptors[t_it].Has("From") ||
         !shuffleDescriptors[t_it].Has("Fraction")) {
-      QTHROW(
+      NUIS_ABORT(
           "Shuffler element must have at least the From and Fraction "
           "attributes.");
     }
@@ -19,7 +19,7 @@ void EnergyShuffler::Setup(nuiskey &nk) {
     std::vector<int> from_pdgs_i = GeneralUtils::ParseToInt(from_pdgs_s, ",");
 
     if (!from_pdgs_i.size()) {
-      QTHROW("Shuffler element must have at least one From PDG specified.");
+      NUIS_ABORT("Shuffler element must have at least one From PDG specified.");
     }
 
     std::vector<int> to_pdgs_i;
@@ -35,7 +35,7 @@ void EnergyShuffler::Setup(nuiskey &nk) {
       sd.ToPDGs = to_pdgs_i;
       sd.EFraction = Fraction;
       ShufflersDescriptors.push_back(std::make_pair(from_pdgs_i[f_it], sd));
-      QLOG(FIT, "\tAdded EnergyShuffler from "
+      NUIS_LOG(FIT, "\tAdded EnergyShuffler from "
                     << from_pdgs_i[f_it] << " to " << to_pdgs_i.size()
                     << " particle species at " << sd.EFraction
                     << " KE fraction.")

@@ -94,7 +94,7 @@ extern std::ostream *__LOG_outstream;
 /// 4 REC - Output during each reconfigure. Percentage progress etc.
 /// 5 SIG - Output during every signal event that is found.
 /// 6 EVT - Output during every event.
-/// -1 DEB - Will print only debugging info wherever a QLOG(DEB) statement was
+/// -1 DEB - Will print only debugging info wherever a NUIS_LOG(DEB) statement was
 /// made
 enum __LOG_levels { QUIET = 0, FIT, MIN, SAM, REC, SIG, EVT, DEB };
 
@@ -108,7 +108,7 @@ std::ostream &__OUTLOG(int level, const char *filename, const char *funct,
                        int line);
 
 /// Global Logging Definitions
-#define QLOGN(level, stream)                                                   \
+#define NUIS_LOGN(level, stream)                                                   \
   {                                                                            \
     if (LOG_LEVEL(level)) {                   \
       __OUTLOG(level, __FILENAME__, __FUNCTION__, __LINE__) << stream;         \
@@ -116,7 +116,7 @@ std::ostream &__OUTLOG(int level, const char *filename, const char *funct,
   };
 
 /// Global Logging Definitions
-#define QLOG(level, stream) QLOGN(level, stream << std::endl)
+#define NUIS_LOG(level, stream) NUIS_LOGN(level, stream << std::endl)
 
 #define BREAK(level)                                                           \
   {                                                                            \
@@ -154,7 +154,7 @@ std::ostream &__OUTERR(int level, const char *filename, const char *funct,
                        int line);
 
 /// Error Logging Function
-#define QERROR(level, stream)                                                  \
+#define NUIS_ERR(level, stream)                                                  \
   {                                                                            \
     __OUTERR(level, __FILENAME__, __FUNCTION__, __LINE__)                      \
         << stream << std::endl;                                                \
@@ -162,7 +162,7 @@ std::ostream &__OUTERR(int level, const char *filename, const char *funct,
 
 // ----------- ERROR HANDLING ------------- //
 /// Exit the program with given error message stream
-#define QTHROW(stream)                                                         \
+#define NUIS_ABORT(stream)                                                         \
   {                                                                            \
     __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__)                        \
         << stream << std::endl;                                                \

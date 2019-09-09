@@ -9,8 +9,8 @@
 
 int main(int argc, char const *argv[]) {
   SETVERBOSITY(SAM);
-  QLOG(FIT, "*            Running InputUtils Tests");
-  QLOG(FIT, "***************************************************");
+  NUIS_LOG(FIT, "*            Running InputUtils Tests");
+  NUIS_LOG(FIT, "***************************************************");
 
   Config::SetPar("NEUT_DIR", "/var/test/NEUT");
   Config::SetPar("NUWRO_DIR", "/var/test/NUWRO");
@@ -43,57 +43,57 @@ int main(int argc, char const *argv[]) {
   std::string ExpandNEUTJoint_DoubleFSlash = InputUtils::ExpandInputDirectories(
       GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]);
 
-  QLOG(FIT, "    *        Test input type parse");
-  QLOG(FIT, "        *        Test parse 'NEUT'");
+  NUIS_LOG(FIT, "    *        Test input type parse");
+  NUIS_LOG(FIT, "        *        Test parse 'NEUT'");
   if (!(NEUTInpt == InputUtils::kNEUT_Input)) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[0] << " parsed as type: "
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[0] << " parsed as type: "
                                                           << NEUTInpt);
   }
   assert(NEUTInpt == InputUtils::kNEUT_Input);
-  QLOG(FIT, "    *        Test IsJoint check");
-  QLOG(FIT, "        *        Test IsJoint on non joint");
+  NUIS_LOG(FIT, "    *        Test IsJoint check");
+  NUIS_LOG(FIT, "        *        Test IsJoint on non joint");
   if (IsJointNEUT_not) {
-    QERROR(FTL,
+    NUIS_ERR(FTL,
            GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " parsed as Joint.");
   }
   assert(!IsJointNEUT_not);
-  QLOG(FIT, "        *        Test IsJoint on joint");
+  NUIS_LOG(FIT, "        *        Test IsJoint on joint");
   if (!IsJointNEUT) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
                     << " parsed as not Joint.");
   }
   assert(IsJointNEUT);
-  QLOG(FIT, "    *        Test directory expansion");
+  NUIS_LOG(FIT, "    *        Test directory expansion");
   if ("/var/test/NEUT/file.root" != ExpandNEUT) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " expanded to: "
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " expanded to: "
                                                           << ExpandNEUT);
   }
   assert("/var/test/NEUT/file.root" == ExpandNEUT);
-  QLOG(FIT, "        *        Test joint directory expansion");
+  NUIS_LOG(FIT, "        *        Test joint directory expansion");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
                     << " expanded to: " << ExpandNEUTJoint);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint);
-  QLOG(FIT, "        *        Test joint directory expansion missing slash");
+  NUIS_LOG(FIT, "        *        Test joint directory expansion missing slash");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint_MissFSlash) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]
                     << " expanded to: " << ExpandNEUTJoint_MissFSlash);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint_MissFSlash);
-  QLOG(FIT, "        *        Test joint directory expansion double slash");
+  NUIS_LOG(FIT, "        *        Test joint directory expansion double slash");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint_DoubleFSlash) {
-    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]
+    NUIS_ERR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]
                     << " expanded to: " << ExpandNEUTJoint_DoubleFSlash);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint_DoubleFSlash);
 
-  QLOG(FIT, "*            Passed InputUtils Tests");
-  QLOG(FIT, "***************************************************");
+  NUIS_LOG(FIT, "*            Passed InputUtils Tests");
+  NUIS_LOG(FIT, "***************************************************");
 }

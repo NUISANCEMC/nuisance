@@ -58,7 +58,7 @@ std::vector<int> BeamUtils::ParseSpeciesToIntVect(std::string spc) {
 void BeamUtils::ListFluxIDs() {
 
   // Keep in sync with ConvertTargetIDs
-  QLOG(
+  NUIS_LOG(
       FIT,
       "Possible Flux IDs: \n"
           << "\n MINERvA_fhc_numu  : "

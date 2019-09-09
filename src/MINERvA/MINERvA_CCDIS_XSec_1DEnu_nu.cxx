@@ -50,7 +50,7 @@ MINERvA_CCDIS_XSec_1DEnu_nu::MINERvA_CCDIS_XSec_1DEnu_nu(std::string name,
   if (name.find("DEN") != std::string::npos)
     target = "CH";
   if (target == "") {
-    QERROR(WRN, "target " << target << " was not found!");
+    NUIS_ERR(WRN, "target " << target << " was not found!");
   }
   FinaliseSampleSettings();
 

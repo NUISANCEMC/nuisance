@@ -60,7 +60,7 @@ class NuWroInputHandler : public InputHandlerBase {
   // Returns filled BaseFitEvent for a given entry;
   BaseFitEvt* GetBaseEvent(const UInt_t entry) {
     if (rwEvs.size() <= entry) {
-      QTHROW("Tried to get cached BaseFitEv[" << entry << "], but only have "
+      NUIS_ABORT("Tried to get cached BaseFitEv[" << entry << "], but only have "
                                              << rwEvs.size()
                                              << " in the cache.");
     }

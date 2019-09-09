@@ -72,14 +72,14 @@ FitSpline::FitSpline(std::string ident, std::string dist,
     if (!choose_type.compare("PNTS"))
       points_final = points_temp;
     else if (!choose_type.compare("SCAN")) {
-      QLOG(FIT, "RUNNING SCAN");
+      NUIS_LOG(FIT, "RUNNING SCAN");
       int npoints = int(points_temp[0]);
       double low = double(points_temp[1]);
 
       double high = double(points_temp[2]);
-      QLOG(FIT, "Npoints " << npoints << " " << low << " " << high);
+      NUIS_LOG(FIT, "Npoints " << npoints << " " << low << " " << high);
       for (int i = 0; i < npoints; i++) {
-        QLOG(FIT, "Pushing back "
+        NUIS_LOG(FIT, "Pushing back "
                       << low + (i + 0.) * (high - low) / (npoints - 1.0 + 0.));
         points_final.push_back(low +
                                (i + 0.) * (high - low) / (npoints - 1.0 + 0.));
@@ -195,7 +195,7 @@ void FitSpline::SetType(std::string type) {
   } else if (!type.compare("1DTSpline3")) {
     SetType(k1DTSpline3, x_vals[0].size() * 4, 1, false);
   } else {
-    QTHROW("Unkown dial value: " << type);
+    NUIS_ABORT("Unkown dial value: " << type);
   }
   return;
 }
@@ -227,7 +227,7 @@ double FitSpline::DoEval(const double *x, const double *par,
 
     // N Polynomial sets without constant
   case (k1DPol1): {
-    QLOG(DEB, "Calcing pol1 with " << y[0] << " " << par[0 + off]);
+    NUIS_LOG(DEB, "Calcing pol1 with " << y[0] << " " << par[0 + off]);
     return (1.0 + par[0 + off] * y[0]);
   }
 
@@ -253,16 +253,16 @@ double FitSpline::DoEval(const double *x, const double *par,
 
   case (k1DPol6): {
 
-    QLOG(DEB, "Calcing 1Dpol6 with " << y[0]);
-    QLOG(DEB, "Par 0 " << par[0 + off]);
-    QLOG(DEB, "Par 1 " << par[1 + off]);
-    QLOG(DEB, "Par 2 " << par[2 + off]);
+    NUIS_LOG(DEB, "Calcing 1Dpol6 with " << y[0]);
+    NUIS_LOG(DEB, "Par 0 " << par[0 + off]);
+    NUIS_LOG(DEB, "Par 1 " << par[1 + off]);
+    NUIS_LOG(DEB, "Par 2 " << par[2 + off]);
 
     double val =
         (1.0 + par[0 + off] * y[0] + par[1 + off] * y[0] * y[0] +
          par[2 + off] * y[0] * y[0] * y[0] + par[3 + off] * pow(y[0], 4) +
          par[4 + off] * pow(y[0], 5) + par[5 + off] * pow(y[0], 6));
-    QLOG(DEB, "VAL = " << val);
+    NUIS_LOG(DEB, "VAL = " << val);
     return val;
   }
 
@@ -350,7 +350,7 @@ double FitSpline::DoEval(const double *x, const double *par,
 
     // DEFAULT OPTION
   default:
-    QTHROW("Evaluating function enum not found!");
+    NUIS_ABORT("Evaluating function enum not found!");
   }
 };
 
@@ -399,12 +399,12 @@ std::vector<double> FitSpline::GetSplineCoeff(double *weights) {
 
   /// DEFAULT
   default:
-    QERROR(FTL, "DIAL HAS NO COEFFICIENT SET Implementation");
-    QTHROW("Dial Enum = " << this->spline);
+    NUIS_ERR(FTL, "DIAL HAS NO COEFFICIENT SET Implementation");
+    NUIS_ABORT("Dial Enum = " << this->spline);
   }
 
   if (coeff.empty()) {
-    QTHROW("Error no dial coefficients saved from GetDialCoeff()");
+    NUIS_ABORT("Error no dial coefficients saved from GetDialCoeff()");
   }
 
   return coeff;

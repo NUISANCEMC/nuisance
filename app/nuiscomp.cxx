@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  QLOG(FIT, "Starting nuiscomp.exe");
+  NUIS_LOG(FIT, "Starting nuiscomp.exe");
 
   // Make minimizer class and run fit
   ComparisonRoutines *comp = new ComparisonRoutines(argc, argv);
@@ -285,9 +285,9 @@ int main(int argc, char *argv[]) {
   delete comp;
 
   // Show Final Status
-  QLOG(FIT, "------------------------------------ -");
-  QLOG(FIT, "Comparison Complete.");
-  QLOG(FIT, "------------------------------------ -");
+  NUIS_LOG(FIT, "------------------------------------ -");
+  NUIS_LOG(FIT, "Comparison Complete.");
+  NUIS_LOG(FIT, "------------------------------------ -");
 
   return status;
 }

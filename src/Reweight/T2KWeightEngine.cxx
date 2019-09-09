@@ -5,7 +5,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  QLOG(FIT, "Setting up T2K RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up T2K RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -29,7 +29,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
 
 #else
-  QTHROW("T2K RW NOT ENABLED");
+  NUIS_ABORT("T2K RW NOT ENABLED");
 #endif
 };
 

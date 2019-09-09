@@ -45,14 +45,14 @@ void MetaSimpleSmearcepter::SpecifcSetup(nuiskey &nk) {
     }
 
     if (!factories.count(smearType)) {
-      QERROR(WRN, "No known smearer accepts elements named: \"" << smearType
+      NUIS_ERR(WRN, "No known smearer accepts elements named: \"" << smearType
                                                                << "\"");
       continue;
     }
 
     Smearcepters.push_back(factories[smearType](smearcepters[smear_it]));
 
-    QLOG(FIT, "MetaSimpleSmearcepter adopted child smearcepter: "
+    NUIS_LOG(FIT, "MetaSimpleSmearcepter adopted child smearcepter: "
                   << Smearcepters.back()->GetName()
                   << " of type: " << Smearcepters.back()->GetElementName());
   }

@@ -63,10 +63,10 @@ ANL_CC1npip_XSec_1DEnu_nu::ANL_CC1npip_XSec_1DEnu_nu(nuiskey samplekey) {
 
   // Flag for bad combo
   if (UseCorrectedData && wTrueCut == 1.6) {
-    QERROR(WRN, "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because "
+    NUIS_ERR(WRN, "Can not run ANL CC1pi+1n W < 1.6 GeV with CORRECTION, because "
                 "the data DOES NOT EXIST");
-    QERROR(WRN, "Correction exists for W < 1.4 GeV and no W cut data ONLY");
-    QERROR(WRN, "Reverting to using uncorrected data!");
+    NUIS_ERR(WRN, "Correction exists for W < 1.4 GeV and no W cut data ONLY");
+    NUIS_ERR(WRN, "Reverting to using uncorrected data!");
     UseCorrectedData = false;
   }
 

@@ -2,7 +2,7 @@
 
 SplineInputHandler::SplineInputHandler(std::string const &handle,
                                        std::string const &rawinputs) {
-  QLOG(SAM, "Creating SplineInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating SplineInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -15,20 +15,20 @@ SplineInputHandler::SplineInputHandler(std::string const &handle,
   // Open File for histogram access
   TFile *inp_file = new TFile(rawinputs.c_str(), "READ");
   if (!inp_file or inp_file->IsZombie()) {
-    QTHROW("FitEvent File IsZombie() at " << rawinputs);
+    NUIS_ABORT("FitEvent File IsZombie() at " << rawinputs);
   }
 
   // Get Flux/Event hist
   TH1D *fluxhist = (TH1D *)inp_file->Get("nuisance_fluxhist");
   TH1D *eventhist = (TH1D *)inp_file->Get("nuisance_eventhist");
   if (!fluxhist or !eventhist) {
-    QTHROW("FitEvent FILE doesn't contain flux/xsec info");
+    NUIS_ABORT("FitEvent FILE doesn't contain flux/xsec info");
   }
 
   // Get N Events
   TTree *eventtree = (TTree *)inp_file->Get("nuisance_events");
   if (!eventtree) {
-    QTHROW("nuisance_events not located in FitSpline file! " << rawinputs);
+    NUIS_ABORT("nuisance_events not located in FitSpline file! " << rawinputs);
   }
   int nevents = eventtree->GetEntries();
 
@@ -46,7 +46,7 @@ SplineInputHandler::SplineInputHandler(std::string const &handle,
   fNUISANCEEvent->SetBranchAddress(fFitEventTree);
 
   // Setup Spline Reader
-  QLOG(SAM, "Loading Spline Reader.");
+  NUIS_LOG(SAM, "Loading Spline Reader.");
 
   fSplRead = new SplineReader();
   fSplRead->Read((TTree *)inp_file->Get("spline_reader"));

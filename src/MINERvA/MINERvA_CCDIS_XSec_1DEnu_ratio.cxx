@@ -50,7 +50,7 @@ MINERvA_CCDIS_XSec_1DEnu_ratio::MINERvA_CCDIS_XSec_1DEnu_ratio(
   else if (fSettings.Found("name", "Pb208"))
     target = "Pb208";
   else {
-    QTHROW("target " << target << " was not found!");
+    NUIS_ABORT("target " << target << " was not found!");
   }
 
   fSettings.SetDataInput(GeneralUtils::GetTopLevelDir() +
@@ -64,7 +64,7 @@ MINERvA_CCDIS_XSec_1DEnu_ratio::MINERvA_CCDIS_XSec_1DEnu_ratio(
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) {
-    QTHROW("MINERvA CCDIS ratio requires input files in format: "
+    NUIS_ABORT("MINERvA CCDIS ratio requires input files in format: "
            "NUMERATOR;DENOMINATOR");
   }
   std::string inFileNUM = fSubInFiles.at(0);

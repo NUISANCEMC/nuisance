@@ -107,15 +107,15 @@ MinimizerRoutines::MinimizerRoutines(int argc, char *argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    QTHROW("No input supplied!");
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    QERROR(WRN, "No output supplied so saving it to: " << fOutputFile);
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    QTHROW("No output file or cardfile supplied!");
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -152,8 +152,8 @@ MinimizerRoutines::MinimizerRoutines(int argc, char *argv[]) {
   // Add Error Verbo Lines
   verbocount += Config::GetParI("VERBOSITY");
   errorcount += Config::GetParI("ERROR");
-  QLOG(FIT, "[ NUISANCE ]: Setting VERBOSITY=" << verbocount);
-  QLOG(FIT, "[ NUISANCE ]: Setting ERROR=" << errorcount);
+  NUIS_LOG(FIT, "[ NUISANCE ]: Setting VERBOSITY=" << verbocount);
+  NUIS_LOG(FIT, "[ NUISANCE ]: Setting ERROR=" << errorcount);
   // FitPar::log_verb = verbocount;
   SETVERBOSITY(verbocount);
   // ERR_VERB(errorcount);
@@ -173,12 +173,12 @@ MinimizerRoutines::MinimizerRoutines(int argc, char *argv[]) {
 void MinimizerRoutines::SetupMinimizerFromXML() {
   //*************************************
 
-  QLOG(FIT, "Setting up nuismin");
+  NUIS_LOG(FIT, "Setting up nuismin");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    QLOG(FIT, "Number of parameters :  " << parkeys.size());
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -186,11 +186,11 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      QTHROW("No type given for parameter " << i);
+      NUIS_ABORT("No type given for parameter " << i);
     } else if (!key.Has("name")) {
-      QTHROW("No name given for parameter " << i);
+      NUIS_ABORT("No name given for parameter " << i);
     } else if (!key.Has("nominal")) {
-      QTHROW("No nominal given for parameter " << i);
+      NUIS_ABORT("No nominal given for parameter " << i);
     }
 
     // Get Inputs
@@ -214,11 +214,11 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parlow << " < p < " << parhigh << " : "
                         << parstate);
     } else {
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parstate);
     }
 
@@ -231,7 +231,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
       parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
       parstep =
           FitBase::RWAbsToSigma(partype, parname, opnom + parstep) - parnom;
-      QLOG(FIT, "ParStep: " << parstep << " (" << oparstep << ").");
+      NUIS_LOG(FIT, "ParStep: " << parstep << " (" << oparstep << ").");
     } else if (parstate.find("FRAC") != std::string::npos) {
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
@@ -262,7 +262,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
   // Setup Samples ----------------------------------------------
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    QLOG(FIT, "Number of samples : " << samplekeys.size());
+    NUIS_LOG(FIT, "Number of samples : " << samplekeys.size());
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -277,7 +277,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    QLOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
+    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
                                   << "\t\t input -> " << samplefile << std::endl
                                   << "\t\t state -> " << sampletype << std::endl
                                   << "\t\t norm  -> " << samplenorm);
@@ -285,9 +285,9 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
-        QERROR(FTL, "You provided a sample normalisation but did not specify "
+        NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
                     "that the sample is free");
-        QTHROW("Change so sample contains type=\"FREE\" and re-run");
+        NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
     }
@@ -322,7 +322,7 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    QLOG(FIT, "Number of fake parameters : " << fakekeys.size());
+    NUIS_LOG(FIT, "Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -330,9 +330,9 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      QTHROW("No name given for fakeparameter " << i);
+      NUIS_ABORT("No name given for fakeparameter " << i);
     } else if (!key.Has("nom")) {
-      QTHROW("No nominal given for fakeparameter " << i);
+      NUIS_ABORT("No nominal given for fakeparameter " << i);
     }
 
     // Get Inputs
@@ -364,7 +364,7 @@ void MinimizerRoutines::SetupRWEngine() {
 void MinimizerRoutines::SetupFCN() {
   //*************************************
 
-  QLOG(FIT, "Making the jointFCN");
+  NUIS_LOG(FIT, "Making the jointFCN");
   if (fSampleFCN)
     delete fSampleFCN;
   // fSampleFCN = new JointFCN(fCardFile, fOutputRootFile);
@@ -480,10 +480,10 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
 
     if (fixed) {
       fMinimizer->FixVariable(ipar);
-      QLOG(FIT, "Fixed Param: " << syst);
+      NUIS_LOG(FIT, "Fixed Param: " << syst);
 
     } else {
-      QLOG(FIT, "Free  Param: " << syst << " Start:" << vstart
+      NUIS_LOG(FIT, "Free  Param: " << syst << " Start:" << vstart
                                 << " Range:" << vlow << " to " << vhigh
                                 << " Step:" << vstep);
     }
@@ -491,7 +491,7 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
     ipar++;
   }
 
-  QLOG(FIT, "Setup Minimizer: " << fMinimizer->NDim() << "(NDim) "
+  NUIS_LOG(FIT, "Setup Minimizer: " << fMinimizer->NDim() << "(NDim) "
                                 << fMinimizer->NFree() << "(NFree)");
 
   return;
@@ -511,7 +511,7 @@ void MinimizerRoutines::SetFakeData() {
   // "fake_parameter" in input card file
   // "fake_parameter" gets read in ReadCard function (reads to fFakeVals)
   if (fFakeDataInput.compare("MC") == 0) {
-    QLOG(FIT, "Setting fake data from MC starting prediction.");
+    NUIS_LOG(FIT, "Setting fake data from MC starting prediction.");
     // fFakeVals get read in in ReadCard
     UpdateRWEngine(fFakeVals);
 
@@ -527,7 +527,7 @@ void MinimizerRoutines::SetFakeData() {
     // to
     UpdateRWEngine(fCurVals);
 
-    QLOG(FIT, "Set all data to fake MC predictions.");
+    NUIS_LOG(FIT, "Set all data to fake MC predictions.");
   } else {
     fSampleFCN->SetFakeData(fFakeDataInput);
   }
@@ -559,7 +559,7 @@ void MinimizerRoutines::UpdateRWEngine(
 void MinimizerRoutines::Run() {
   //*************************************
 
-  QLOG(FIT, "Running MinimizerRoutines : " << fStrategy);
+  NUIS_LOG(FIT, "Running MinimizerRoutines : " << fStrategy);
   if (FitPar::Config().GetParB("save_nominal")) {
     SaveNominal();
   }
@@ -567,13 +567,13 @@ void MinimizerRoutines::Run() {
   // Parse given routines
   fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
   if (fRoutines.empty()) {
-    QTHROW("Trying to run MinimizerRoutines with no routines given!");
+    NUIS_ABORT("Trying to run MinimizerRoutines with no routines given!");
   }
 
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
     std::string routine = fRoutines.at(i);
     int fitstate = kFitUnfinished;
-    QLOG(FIT, "Running Routine: " << routine);
+    NUIS_LOG(FIT, "Running Routine: " << routine);
 
     // Try Routines
     if (routine.find("LowStat") != std::string::npos)
@@ -595,7 +595,7 @@ void MinimizerRoutines::Run() {
 
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange) {
-      QLOG(FIT, "Ending fit routines loop.");
+      NUIS_LOG(FIT, "Ending fit routines loop.");
       break;
     }
   }
@@ -621,7 +621,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine) {
       //    !routine.compare("GSLMulti") or
       !routine.compare("GSLSimAn") or !routine.compare("MCMC")) {
     if (fMinimizer->NFree() > 0) {
-      QLOG(FIT, fMinimizer->Minimize());
+      NUIS_LOG(FIT, fMinimizer->Minimize());
       GetMinimizerState();
     }
   }
@@ -637,7 +637,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine) {
 //*************************************
 void MinimizerRoutines::PrintState() {
   //*************************************
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, "------------");
 
   // Count max size
   int maxcount = 0;
@@ -646,7 +646,7 @@ void MinimizerRoutines::PrintState() {
   }
 
   // Header
-  QLOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
+  NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
                      << " = " << setw(10) << "Value"
                      << " +- " << setw(10) << "Error"
                      << " " << setw(8) << "(Units)"
@@ -688,20 +688,20 @@ void MinimizerRoutines::PrintState() {
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
 
-    QLOG(FIT, curparstring.str());
+    NUIS_LOG(FIT, curparstring.str());
   }
 
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  QLOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  NUIS_LOG(FIT, "------------");
 }
 
 //*************************************
 void MinimizerRoutines::GetMinimizerState() {
   //*************************************
 
-  QLOG(FIT, "Minimizer State: ");
+  NUIS_LOG(FIT, "Minimizer State: ");
   // Get X and Err
   const double *values = fMinimizer->X();
   const double *errors = fMinimizer->Errors();
@@ -720,7 +720,7 @@ void MinimizerRoutines::GetMinimizerState() {
   SetupCovariance();
   if (fMinimizer->CovMatrixStatus() > 0) {
     // Fill Full Covar
-    QLOG(FIT, "Filling covariance");
+    NUIS_LOG(FIT, "Filling covariance");
     for (int i = 0; i < fCovar->GetNbinsX(); i++) {
       for (int j = 0; j < fCovar->GetNbinsY(); j++) {
         fCovar->SetBinContent(i + 1, j + 1, fMinimizer->CovMatrix(i, j));
@@ -760,7 +760,7 @@ void MinimizerRoutines::GetMinimizerState() {
 void MinimizerRoutines::LowStatRoutine(std::string routine) {
   //*************************************
 
-  QLOG(FIT, "Running Low Statistics Routine: " << routine);
+  NUIS_LOG(FIT, "Running Low Statistics Routine: " << routine);
   int lowstatsevents = FitPar::Config().GetParI("LOWSTATEVENTS");
   int maxevents = FitPar::Config().GetParI("MAXEVENTS");
   int verbosity = FitPar::Config().GetParI("VERBOSITY");
@@ -796,7 +796,7 @@ void MinimizerRoutines::Create1DScans() {
     if (fFixVals[fParams[i]])
       continue;
 
-    QLOG(FIT, "Running 1D Scan for " << fParams[i]);
+    NUIS_LOG(FIT, "Running 1D Scan for " << fParams[i]);
     fSampleFCN->CreateIterationTree(fParams[i] + "_scan1D_iterations",
                                     FitBase::GetRW());
 
@@ -885,7 +885,7 @@ void MinimizerRoutines::Chi2Scan2D() {
           npoints_i, limlow_i, limhigh_i, npoints_j, limlow_j, limhigh_j);
 
       // Begin Scan
-      QLOG(FIT, "Running scan for " << fParams[i] << " " << fParams[j]);
+      NUIS_LOG(FIT, "Running scan for " << fParams[i] << " " << fParams[j]);
 
       // Fill bins
       for (int x = 0; x < contour->GetNbinsX(); x++) {
@@ -928,7 +928,7 @@ void MinimizerRoutines::CreateContours() {
   //*************************************
 
   // Use MINUIT for this if possible
-  QTHROW("Contours not yet implemented as it is really slow!");
+  NUIS_ABORT("Contours not yet implemented as it is really slow!");
 
   return;
 }
@@ -961,7 +961,7 @@ int MinimizerRoutines::FixAtLimit() {
   }
 
   if (!fixedparam) {
-    QLOG(FIT, "No dials needed fixing!");
+    NUIS_LOG(FIT, "No dials needed fixing!");
     return kNoChange;
   } else
     return kStateChange;
@@ -988,9 +988,9 @@ void MinimizerRoutines::SaveResults() {
 void MinimizerRoutines::SaveMinimizerState() {
   //*************************************
 
-  QLOG(FIT, "Saving Minimizer State");
+  NUIS_LOG(FIT, "Saving Minimizer State");
   if (!fMinimizer) {
-    QTHROW("Can't save minimizer state without min object");
+    NUIS_ABORT("Can't save minimizer state without min object");
   }
 
   // Save main fit tree
@@ -1166,7 +1166,7 @@ void MinimizerRoutines::SaveMinimizerState() {
 void MinimizerRoutines::SaveCurrentState(std::string subdir) {
   //*************************************
 
-  QLOG(FIT, "Saving current full FCN predictions");
+  NUIS_LOG(FIT, "Saving current full FCN predictions");
 
   // Setup DIRS
   TDirectory *curdir = gDirectory;
@@ -1191,7 +1191,7 @@ void MinimizerRoutines::SaveNominal() {
 
   fOutputRootFile->cd();
 
-  QLOG(FIT, "Saving Nominal Predictions (be cautious with this)");
+  NUIS_LOG(FIT, "Saving Nominal Predictions (be cautious with this)");
   FitBase::GetRW()->Reconfigure();
   SaveCurrentState("nominal");
 };
@@ -1202,7 +1202,7 @@ void MinimizerRoutines::SavePrefit() {
 
   fOutputRootFile->cd();
 
-  QLOG(FIT, "Saving Prefit Predictions");
+  NUIS_LOG(FIT, "Saving Prefit Predictions");
   UpdateRWEngine(fStartVals);
   SaveCurrentState("prefit");
   UpdateRWEngine(fCurVals);
@@ -1236,7 +1236,7 @@ void MinimizerRoutines::SetupCovariance() {
   if (fDecFree)
     delete fDecFree;
 
-  QLOG(FIT, "Building covariance matrix..");
+  NUIS_LOG(FIT, "Building covariance matrix..");
 
   int NFREE = 0;
   int NDIM = 0;
@@ -1248,7 +1248,7 @@ void MinimizerRoutines::SetupCovariance() {
   } else {
     NDIM = fParams.size();
     for (UInt_t i = 0; i < fParams.size(); i++) {
-      QLOG(FIT, "Getting Param " << fParams[i]);
+      NUIS_LOG(FIT, "Getting Param " << fParams[i]);
 
       if (!fFixVals[fParams[i]])
         NFREE++;
@@ -1257,7 +1257,7 @@ void MinimizerRoutines::SetupCovariance() {
 
   if (NDIM == 0)
     return;
-  QLOG(FIT, "NFREE == " << NFREE);
+  NUIS_LOG(FIT, "NFREE == " << NFREE);
   fCovar = new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
   if (NFREE > 0) {
     fCovFree = new TH2D("covariance_free", "covariance_free", NFREE, 0, NFREE,
@@ -1301,7 +1301,7 @@ void MinimizerRoutines::ThrowCovariance(bool uniformly) {
   std::vector<double> rands;
 
   if (!fDecFree) {
-    QERROR(WRN, "Trying to throw 0 free parameters");
+    NUIS_ERR(WRN, "Trying to throw 0 free parameters");
     return;
   }
 
@@ -1502,7 +1502,7 @@ void MinimizerRoutines::GenerateErrorBands() {
 };
 
 void MinimizerRoutines::ThrowDataToys() {
-  QLOG(FIT, "Generating Toy Data Throws");
+  NUIS_LOG(FIT, "Generating Toy Data Throws");
   int verb = Config::GetParI("VERBOSITY");
   SETVERBOSITY(FIT);
 
@@ -1529,7 +1529,7 @@ void MinimizerRoutines::ThrowDataToys() {
   }
 
   // Save to file
-  QLOG(FIT, "Writing toy data throws");
+  NUIS_LOG(FIT, "Writing toy data throws");
   fOutputRootFile->cd();
   likes->Write();
 }

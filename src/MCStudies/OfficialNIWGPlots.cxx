@@ -333,7 +333,7 @@ void OfficialNIWGPlots::FillEventVariables(FitEvent *event) {
 void OfficialNIWGPlots::Write(std::string drawOpt) {
 //********************************************************************
 
-	QLOG(FIT,"Writing OfficialNIWGPlots ");
+	NUIS_LOG(FIT,"Writing OfficialNIWGPlots ");
 
 	fHist_NuMu_Enu->Write();
 	fHist_NuMu_Enu_Modes->Write();

@@ -55,7 +55,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
 
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "
@@ -78,7 +78,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   } else {
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "

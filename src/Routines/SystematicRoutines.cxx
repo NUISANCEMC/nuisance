@@ -79,15 +79,15 @@ SystematicRoutines::SystematicRoutines(int argc, char *argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    QTHROW("No input supplied!");
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    QERROR(WRN, "No output supplied so saving it to: " << fOutputFile);
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    QTHROW("No output file or cardfile supplied!");
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -150,12 +150,12 @@ SystematicRoutines::SystematicRoutines(int argc, char *argv[]) {
 
 void SystematicRoutines::SetupSystematicsFromXML() {
 
-  QLOG(FIT, "Setting up nuismin");
+  NUIS_LOG(FIT, "Setting up nuismin");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    QLOG(FIT, "Number of parameters :  " << parkeys.size());
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -163,11 +163,11 @@ void SystematicRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      QTHROW("No type given for parameter " << i);
+      NUIS_ABORT("No type given for parameter " << i);
     } else if (!key.Has("name")) {
-      QTHROW("No name given for parameter " << i);
+      NUIS_ABORT("No name given for parameter " << i);
     } else if (!key.Has("nominal")) {
-      QTHROW("No nominal given for parameter " << i);
+      NUIS_ABORT("No nominal given for parameter " << i);
     }
 
     // Get Inputs
@@ -191,11 +191,11 @@ void SystematicRoutines::SetupSystematicsFromXML() {
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parlow << " < p < " << parhigh << " : "
                         << parstate);
     } else {
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parstate);
     }
 
@@ -235,7 +235,7 @@ void SystematicRoutines::SetupSystematicsFromXML() {
   // Setup Samples ----------------------------------------------
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    QLOG(FIT, "Number of samples : " << samplekeys.size());
+    NUIS_LOG(FIT, "Number of samples : " << samplekeys.size());
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -250,7 +250,7 @@ void SystematicRoutines::SetupSystematicsFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    QLOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
+    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
                                   << "\t\t input -> " << samplefile << std::endl
                                   << "\t\t state -> " << sampletype << std::endl
                                   << "\t\t norm  -> " << samplenorm);
@@ -289,7 +289,7 @@ void SystematicRoutines::SetupSystematicsFromXML() {
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    QLOG(FIT, "Number of fake parameters : " << fakekeys.size());
+    NUIS_LOG(FIT, "Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -297,9 +297,9 @@ void SystematicRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      QTHROW("No name given for fakeparameter " << i);
+      NUIS_ABORT("No name given for fakeparameter " << i);
     } else if (!key.Has("nom")) {
-      QTHROW("No nominal given for fakeparameter " << i);
+      NUIS_ABORT("No nominal given for fakeparameter " << i);
     }
 
     // Get Inputs
@@ -331,7 +331,7 @@ void SystematicRoutines::SetupRWEngine() {
 void SystematicRoutines::SetupFCN() {
   //*************************************
 
-  QLOG(FIT, "Making the jointFCN");
+  NUIS_LOG(FIT, "Making the jointFCN");
   if (fSampleFCN)
     delete fSampleFCN;
   fSampleFCN = new JointFCN(fOutputRootFile);
@@ -349,7 +349,7 @@ void SystematicRoutines::SetFakeData() {
 
   if (fFakeDataInput.compare("MC") == 0) {
 
-    QLOG(FIT, "Setting fake data from MC starting prediction.");
+    NUIS_LOG(FIT, "Setting fake data from MC starting prediction.");
     UpdateRWEngine(fFakeVals);
 
     FitBase::GetRW()->Reconfigure();
@@ -358,7 +358,7 @@ void SystematicRoutines::SetFakeData() {
 
     UpdateRWEngine(fCurVals);
 
-    QLOG(FIT, "Set all data to fake MC predictions.");
+    NUIS_LOG(FIT, "Set all data to fake MC predictions.");
   } else {
     fSampleFCN->SetFakeData(fFakeDataInput);
   }
@@ -370,7 +370,7 @@ void SystematicRoutines::SetFakeData() {
 // Setup the parameter covariances from the FCN
 void SystematicRoutines::GetCovarFromFCN() {
   //*****************************************
-  QLOG(FIT, "Loading ParamPull objects from FCN to build covariance...");
+  NUIS_LOG(FIT, "Loading ParamPull objects from FCN to build covariance...");
 
   // Make helperstring
   std::ostringstream helperstr;
@@ -389,7 +389,7 @@ void SystematicRoutines::GetCovarFromFCN() {
       fInputCovar.push_back(pull->GetFullCovarMatrix());
       fInputDials.push_back(pull->GetDataHist());
 
-      QLOG(FIT, "Read ParamPull: " << pull->GetName() << " " << pull->GetType());
+      NUIS_LOG(FIT, "Read ParamPull: " << pull->GetName() << " " << pull->GetType());
     }
 
     TH1D dialhist = pull->GetDataHist();
@@ -429,8 +429,8 @@ void SystematicRoutines::GetCovarFromFCN() {
   // Check if no throws given
   if (fInputThrows.empty()) {
 
-    QERROR(WRN, "No covariances given to nuissyst");
-    QERROR(WRN, "Pushing back an uncorrelated gaussian throw error for each "
+    NUIS_ERR(WRN, "No covariances given to nuissyst");
+    NUIS_ERR(WRN, "Pushing back an uncorrelated gaussian throw error for each "
                 "free parameter using step size");
 
     for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -454,7 +454,7 @@ void SystematicRoutines::GetCovarFromFCN() {
       fInputDials.push_back(pull->GetDataHist());
 
       // Print Whats added
-      QLOG(FIT, "Added ParamPull : " << name << " " << pullterm.str() << " "
+      NUIS_LOG(FIT, "Added ParamPull : " << name << " " << pullterm.str() << " "
                                      << type);
 
       // Add helper string for future fits
@@ -468,7 +468,7 @@ void SystematicRoutines::GetCovarFromFCN() {
 
   // Print Helper String
   if (!helperstr.str().empty()) {
-    QLOG(FIT, "To remove these statements in future studies, add the lines "
+    NUIS_LOG(FIT, "To remove these statements in future studies, add the lines "
               "below to your card:");
     // Can't use the logger properly because this can be multi-line. Use cout
     // and added spaces to look better!
@@ -480,10 +480,10 @@ void SystematicRoutines::GetCovarFromFCN() {
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string syst = fParams[i];
     if (dialthrowhandle.find(syst) != dialthrowhandle.end()) {
-      QLOG(FIT, "Dial " << i << ". " << setw(20) << syst << " = THROWing with "
+      NUIS_LOG(FIT, "Dial " << i << ". " << setw(20) << syst << " = THROWing with "
                         << dialthrowhandle[syst]);
     } else {
-      QLOG(FIT, "Dial " << i << ". " << setw(20) << syst << " = is FIXED");
+      NUIS_LOG(FIT, "Dial " << i << ". " << setw(20) << syst << " = is FIXED");
     }
   }
 }
@@ -509,7 +509,7 @@ void SystematicRoutines::UpdateRWEngine(
 //*************************************
 void SystematicRoutines::PrintState() {
   //*************************************
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, "------------");
 
   // Count max size
   int maxcount = 0;
@@ -518,7 +518,7 @@ void SystematicRoutines::PrintState() {
   }
 
   // Header
-  QLOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
+  NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
                      << " = " << setw(10) << "Value"
                      << " +- " << setw(10) << "Error"
                      << " " << setw(8) << "(Units)"
@@ -560,13 +560,13 @@ void SystematicRoutines::PrintState() {
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
 
-    QLOG(FIT, curparstring.str());
+    NUIS_LOG(FIT, curparstring.str());
   }
 
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  QLOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
-  QLOG(FIT, "------------");
+  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  NUIS_LOG(FIT, "------------");
 }
 
 /*
@@ -588,7 +588,7 @@ void SystematicRoutines::SaveResults() {
 void SystematicRoutines::SaveCurrentState(std::string subdir) {
   //*************************************
 
-  QLOG(FIT, "Saving current full FCN predictions");
+  NUIS_LOG(FIT, "Saving current full FCN predictions");
 
   // Setup DIRS
   TDirectory *curdir = gDirectory;
@@ -616,7 +616,7 @@ void SystematicRoutines::SaveNominal() {
 
   fOutputRootFile->cd();
 
-  QLOG(FIT, "Saving Nominal Predictions (be cautious with this)");
+  NUIS_LOG(FIT, "Saving Nominal Predictions (be cautious with this)");
   FitBase::GetRW()->Reconfigure();
   SaveCurrentState("nominal");
 };
@@ -630,7 +630,7 @@ void SystematicRoutines::SavePrefit() {
 
   fOutputRootFile->cd();
 
-  QLOG(FIT, "Saving Prefit Predictions");
+  NUIS_LOG(FIT, "Saving Prefit Predictions");
   UpdateRWEngine(fStartVals);
   SaveCurrentState("prefit");
   UpdateRWEngine(fCurVals);
@@ -855,7 +855,7 @@ void SystematicRoutines::Run() {
 
     std::string routine = fRoutines.at(i);
     int fitstate = kFitUnfinished;
-    QLOG(FIT, "Running Routine: " << routine);
+    NUIS_LOG(FIT, "Running Routine: " << routine);
 
     if (routine.compare("PlotLimits") == 0)
       PlotLimits();
@@ -868,12 +868,12 @@ void SystematicRoutines::Run() {
     else if (routine.compare("EigenErrors") == 0)
       EigenErrors();
     else {
-      QTHROW("Unknown ROUTINE : " << routine);
+      NUIS_ABORT("Unknown ROUTINE : " << routine);
     }
 
     // If ending early break here
     if (fitstate == kFitFinished || fitstate == kNoChange) {
-      QLOG(FIT, "Ending fit routines loop.");
+      NUIS_LOG(FIT, "Ending fit routines loop.");
       break;
     }
   }
@@ -914,23 +914,23 @@ void SystematicRoutines::GenerateThrows() {
 
   //  int seed = (gRandom->Uniform(0.0,1.0)*100000 + 100000000*(startthrows +
   //  endthrows) + time(NULL) + int(getpid()) ); gRandom->SetSeed(seed);
-  QLOG(FIT, "Using Seed : " << seed);
-  QLOG(FIT, "nthrows = " << nthrows);
-  QLOG(FIT, "startthrows = " << startthrows);
-  QLOG(FIT, "endthrows = " << endthrows);
+  NUIS_LOG(FIT, "Using Seed : " << seed);
+  NUIS_LOG(FIT, "nthrows = " << nthrows);
+  NUIS_LOG(FIT, "startthrows = " << startthrows);
+  NUIS_LOG(FIT, "endthrows = " << endthrows);
 
   UpdateRWEngine(fStartVals);
   fSampleFCN->ReconfigureAllEvents();
 
   // Make the nominal
   if (startthrows == 0) {
-    QLOG(FIT, "Making nominal ");
+    NUIS_LOG(FIT, "Making nominal ");
     TDirectory *nominal = (TDirectory *)tempfile->mkdir("nominal");
     nominal->cd();
     fSampleFCN->Write();
 
     // Make the postfit reading from the pull
-    QLOG(FIT, "Making postfit ");
+    NUIS_LOG(FIT, "Making postfit ");
     TDirectory *postfit = (TDirectory *)tempfile->mkdir("postfit");
     postfit->cd();
     UpdateRWEngine(fCurVals);
@@ -952,7 +952,7 @@ void SystematicRoutines::GenerateThrows() {
       continue;
     if (i == 0)
       continue;
-    QLOG(FIT, "Throw " << i << "/" << endthrows
+    NUIS_LOG(FIT, "Throw " << i << "/" << endthrows
                        << " ================================");
 
     TDirectory *throwfolder =
@@ -1026,7 +1026,7 @@ void SystematicRoutines::MergeThrows() {
     if (found) {
       fThrowList[i] = newfile;
 
-      QLOG(FIT, "Throws File :" << newfile);
+      NUIS_LOG(FIT, "Throws File :" << newfile);
 
       // Find input which contains nominal
       if (throwfile->Get("nominal")) {
@@ -1042,7 +1042,7 @@ void SystematicRoutines::MergeThrows() {
 
   // Make sure we have a nominal file
   if (!nominalfound or nominalfile.empty()) {
-    QTHROW("No nominal found when merging! Exiting!");
+    NUIS_ABORT("No nominal found when merging! Exiting!");
   }
 
   // Get the nominal throws file
@@ -1055,7 +1055,7 @@ void SystematicRoutines::MergeThrows() {
   int badfilecount = 0;
   for (uint i = 0; i < fThrowList.size(); i++) {
     if (!fThrowList[i].empty()) {
-      QLOG(FIT, "Loading Throws From File " << i << " : " << fThrowList[i]);
+      NUIS_LOG(FIT, "Loading Throws From File " << i << " : " << fThrowList[i]);
     } else {
       badfilecount++;
     }
@@ -1063,13 +1063,13 @@ void SystematicRoutines::MergeThrows() {
 
   // Check we have at least one good file
   if ((uint)badfilecount == fThrowList.size()) {
-    QTHROW("Found no good throw files for MergeThrows");
+    NUIS_ABORT("Found no good throw files for MergeThrows");
     throw;
   } else if (badfilecount > (fThrowList.size() * 0.25)) {
-    QERROR(
+    NUIS_ERR(
         WRN,
         "Over 25% of your throw files are dodgy. Please check this is okay!");
-    QERROR(WRN, "Will continue for the time being...");
+    NUIS_ERR(WRN, "Will continue for the time being...");
     sleep(5);
   }
 
@@ -1083,12 +1083,12 @@ void SystematicRoutines::MergeThrows() {
       continue;
     TH1 *baseplot = (TH1D *)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
-    QLOGN(FIT, "Creating error bands for " << plotname);
+    NUIS_LOGN(FIT, "Creating error bands for " << plotname);
     if (LOG_LEVEL(FIT)) {
       if (!uniformly) {
-        QLOG(FIT, " : Using COVARIANCE Throws! ");
+        NUIS_LOG(FIT, " : Using COVARIANCE Throws! ");
       } else {
-        QLOG(FIT, " : Using UNIFORM THROWS!!! ");
+        NUIS_LOG(FIT, " : Using UNIFORM THROWS!!! ");
       }
     }
 
@@ -1172,7 +1172,7 @@ void SystematicRoutines::MergeThrows() {
     errorDIR->cd();
 
     if (uniformly) {
-      QLOG(FIT, "Uniformly Calculating Plot Errors!");
+      NUIS_LOG(FIT, "Uniformly Calculating Plot Errors!");
     }
 
     TH1 *statplot = (TH1 *)baseplot->Clone();
@@ -1232,7 +1232,7 @@ void SystematicRoutines::EigenErrors() {
     // Check pull is actualyl Gaussian
     std::string pulltype = pull->GetType();
     if (pulltype.find("GAUSTHROW") == std::string::npos) {
-      QTHROW("Can only calculate EigenErrors for Gaussian pulls!");
+      NUIS_ABORT("Can only calculate EigenErrors for Gaussian pulls!");
     }
 
     // Get data and covariances
@@ -1310,10 +1310,10 @@ void SystematicRoutines::EigenErrors() {
     throwfolder->cd();
 
     // Get New Parameter Vector
-    QLOG(FIT, "Parameter Set " << count);
+    NUIS_LOG(FIT, "Parameter Set " << count);
     for (int j = 0; j < eigenVect.GetNrows(); j++) {
       std::string param = fParams[j];
-      QLOG(FIT, " " << j << ". " << param << " : "
+      NUIS_LOG(FIT, " " << j << ". " << param << " : "
                     << fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i]);
       fThrownVals[param] =
           fCurVals[param] + sqrt(eigenVals[i]) * eigenVect[j][i];
@@ -1331,10 +1331,10 @@ void SystematicRoutines::EigenErrors() {
     throwfolder->cd();
 
     // Get New Parameter Vector
-    QLOG(FIT, "Parameter Set " << count);
+    NUIS_LOG(FIT, "Parameter Set " << count);
     for (int j = 0; j < eigenVect.GetNrows(); j++) {
       std::string param = fParams[j];
-      QLOG(FIT, " " << j << ". " << param << " : "
+      NUIS_LOG(FIT, " " << j << ". " << param << " : "
                     << fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i]);
       fThrownVals[param] =
           fCurVals[param] - sqrt(eigenVals[i]) * eigenVect[j][i];
@@ -1367,7 +1367,7 @@ void SystematicRoutines::EigenErrors() {
     if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D"))
       continue;
 
-    QLOG(FIT, "Creating error bands for " << key->GetName());
+    NUIS_LOG(FIT, "Creating error bands for " << key->GetName());
     std::string plotname = std::string(key->GetName());
 
     if (plotname.find("_EVT") != std::string::npos)
@@ -1415,9 +1415,9 @@ void SystematicRoutines::EigenErrors() {
       TH1 *newplot =
           (TH1D *)throwsdir->Get(Form("throw_%i/%s", i, plotname.c_str()));
       if (!newplot) {
-        QERROR(WRN, "Cannot find new plot : " << Form("throw_%i/%s", i,
+        NUIS_ERR(WRN, "Cannot find new plot : " << Form("throw_%i/%s", i,
                                                       plotname.c_str()));
-        QERROR(WRN, "This plot will not have the correct errors!");
+        NUIS_ERR(WRN, "This plot will not have the correct errors!");
         continue;
       }
       newplot->SetDirectory(0);

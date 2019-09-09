@@ -72,10 +72,10 @@ ElectronFlux_FlatTree::ElectronFlux_FlatTree(std::string name, std::string input
       (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
       this->TotalIntegratedFlux();
 
-  QLOG(SAM," Generic Flux Scaling Factor = " << fScaleFactor);
+  NUIS_LOG(SAM," Generic Flux Scaling Factor = " << fScaleFactor);
 
   if (fScaleFactor <= 0.0) {
-    QERROR(WRN,"SCALE FACTOR TOO LOW ");
+    NUIS_ERR(WRN,"SCALE FACTOR TOO LOW ");
     sleep(20);
   }
 
@@ -92,7 +92,7 @@ void ElectronFlux_FlatTree::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding Event Variables");
+  NUIS_LOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
@@ -195,7 +195,7 @@ void ElectronFlux_FlatTree::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding Samples" );
+  NUIS_LOG(SAM, "Adding Samples" );
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
@@ -221,7 +221,7 @@ void ElectronFlux_FlatTree::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  QLOG(DEB, "Filling signal");
+  NUIS_LOG(DEB, "Filling signal");
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
   Nleptons = 0;
@@ -460,7 +460,7 @@ void ElectronFlux_FlatTree::FillEventVariables(FitEvent *event) {
   xsecScaling = fScaleFactor;
 
   if (fScaleFactor <= 0.0) {
-    QERROR(WRN, "SCALE FACTOR TOO LOW ");
+    NUIS_ERR(WRN, "SCALE FACTOR TOO LOW ");
     sleep(20);
   }
 

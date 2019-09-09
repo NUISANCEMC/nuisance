@@ -107,7 +107,7 @@ MINERvA_CCNpip_XSec_1Dth_nu::MINERvA_CCNpip_XSec_1Dth_nu(nuiskey samplekey) {
     // 2016 release data unfortunately not released in 20degree forward-going,
     // revert to 2015 data
     if (fUpdatedData) {
-      QTHROW(fName
+      NUIS_ABORT(fName
              << " has no updated 2016 data for restricted phase space! Using "
                 "2015 data.");
     }

@@ -77,9 +77,9 @@ void GetCommandLineArgs(int argc, char **argv) {
   // Parse input file
   ParserUtils::ParseArgument(args, "-i", gOptInputFile, false);
   if (gOptInputFile == "") {
-    QTHROW("Need to provide a valid input file to nuisflat using -i flag!");
+    NUIS_ABORT("Need to provide a valid input file to nuisflat using -i flag!");
   } else {
-    QLOG(FIT, "Reading Input File = " << gOptInputFile);
+    NUIS_LOG(FIT, "Reading Input File = " << gOptInputFile);
     gOptInputFile = InputUtils::PrependGuessedInputTypeToName(gOptInputFile);
   }
 
@@ -87,10 +87,10 @@ void GetCommandLineArgs(int argc, char **argv) {
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile == "") {
     gOptOutputFile = gOptInputFile + ".smear.root";
-    QLOG(FIT, "No output file given so saving nuisflat output to:"
+    NUIS_LOG(FIT, "No output file given so saving nuisflat output to:"
                   << gOptOutputFile);
   } else {
-    QLOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
+    NUIS_LOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
   }
 
   // Get N Events and Configs
@@ -109,13 +109,13 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
-    QLOG(FIT, "Reading cardfile: " << gOptCardInput);
+    NUIS_LOG(FIT, "Reading cardfile: " << gOptCardInput);
     configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
   if (gOptOptions != "") {
-    QLOG(FIT, "Read options: \"" << gOptOptions << "\'");
+    NUIS_LOG(FIT, "Read options: \"" << gOptOptions << "\'");
   }
   return;
 }
@@ -123,7 +123,7 @@ void GetCommandLineArgs(int argc, char **argv) {
 void SetupRW() {
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    QLOG(FIT, "Number of parameters :  " << parkeys.size());
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   std::vector<std::string> Params;
@@ -134,14 +134,14 @@ void SetupRW() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      QERROR(FTL, "No type given for parameter " << i);
-      QTHROW("type='PARAMETER_TYPE'");
+      NUIS_ERR(FTL, "No type given for parameter " << i);
+      NUIS_ABORT("type='PARAMETER_TYPE'");
     } else if (!key.Has("name")) {
-      QERROR(FTL, "No name given for parameter " << i);
-      QTHROW("name='SAMPLE_NAME'");
+      NUIS_ERR(FTL, "No name given for parameter " << i);
+      NUIS_ABORT("name='SAMPLE_NAME'");
     } else if (!key.Has("nominal")) {
-      QERROR(FTL, "No nominal given for parameter " << i);
-      QTHROW("nominal='NOMINAL_VALUE'");
+      NUIS_ERR(FTL, "No nominal given for parameter " << i);
+      NUIS_ABORT("nominal='NOMINAL_VALUE'");
     }
 
     // Get Inputs
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
   // Make output file
   TFile *f = new TFile(gOptOutputFile.c_str(), "RECREATE");
   if (f->IsZombie()) {
-    QTHROW("Cannot create output file!");
+    NUIS_ABORT("Cannot create output file!");
   }
   f->cd();
   Config::Get().out = f;
@@ -191,11 +191,11 @@ int main(int argc, char *argv[]) {
   samplekey.Set("type", gOptType);
 
   if (gOptOptions == "") {
-    QTHROW("Attempting to flatten with Smearceptor, but no Smearceptor given. "
+    NUIS_ABORT("Attempting to flatten with Smearceptor, but no Smearceptor given. "
            "Please supply a -t option.");
   }
   if (gOptCardInput == "") {
-    QTHROW("Attempting to flatten with Smearceptor, but no card passed with "
+    NUIS_ABORT("Attempting to flatten with Smearceptor, but no card passed with "
            "Smearceptors configured. Please supply a -c option.");
   }
 
@@ -210,9 +210,9 @@ int main(int argc, char *argv[]) {
   f->Close();
 
   // Show Final Status
-  QLOG(FIT, "-------------------------------------");
-  QLOG(FIT, "Flattree Generation Complete.");
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "Flattree Generation Complete.");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return 0;
 }

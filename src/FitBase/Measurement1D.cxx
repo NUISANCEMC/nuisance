@@ -120,26 +120,26 @@ void Measurement1D::FinaliseSampleSettings() {
   }
 
   // Setup all other options
-  QLOG(SAM, "Finalising Sample Settings: " << fName);
+  NUIS_LOG(SAM, "Finalising Sample Settings: " << fName);
 
   if ((fSettings.GetS("originalname").find("Evt") != std::string::npos)) {
     fIsRawEvents = true;
-    QLOG(SAM, "Found event rate measurement but using poisson likelihoods.");
+    NUIS_LOG(SAM, "Found event rate measurement but using poisson likelihoods.");
   }
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    QLOG(SAM, "::" << fName << "::");
-    QLOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
+    NUIS_LOG(SAM, "::" << fName << "::");
+    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
-    QERROR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    NUIS_ERR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
                 "really correct?!");
-    QERROR(FTL, "Check experiment constructor for " << fName
+    NUIS_ERR(FTL, "Check experiment constructor for " << fName
                                                     << " and correct this!");
-    QERROR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
+    NUIS_ERR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
     throw;
   }
 
@@ -157,8 +157,8 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if (fAddNormPen) {
     if (fNormError <= 0.0) {
-      QERROR(FTL, "Norm error for class " << fName << " is 0.0!");
-      QERROR(FTL, "If you want to use it please add fNormError=VAL");
+      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
+      NUIS_ERR(FTL, "If you want to use it please add fNormError=VAL");
       throw;
     }
   }
@@ -179,7 +179,7 @@ void Measurement1D::CreateDataHistogram(int dimx, double *binx) {
 void Measurement1D::SetDataFromTextFile(std::string datafile) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data from text file: " << datafile);
+  NUIS_LOG(SAM, "Reading data from text file: " << datafile);
   fDataHist = PlotUtils::GetTH1DFromFile(
       datafile, fSettings.GetName() + "_data", fSettings.GetFullTitles());
 }
@@ -189,7 +189,7 @@ void Measurement1D::SetDataFromRootFile(std::string datafile,
                                         std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data from root file: " << datafile << ";" << histname);
+  NUIS_LOG(SAM, "Reading data from root file: " << datafile << ";" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile(datafile, histname);
   fDataHist->SetNameTitle((fSettings.GetName() + "_data").c_str(),
                           (fSettings.GetFullTitles()).c_str());
@@ -209,8 +209,8 @@ void Measurement1D::SetPoissonErrors() {
   //********************************************************************
 
   if (!fDataHist) {
-    QERROR(FTL, "Need a data hist to setup possion errors! ");
-    QERROR(FTL, "Setup Data First!");
+    NUIS_ERR(FTL, "Need a data hist to setup possion errors! ");
+    NUIS_ERR(FTL, "Setup Data First!");
     throw;
   }
 
@@ -228,12 +228,12 @@ void Measurement1D::SetCovarFromDiagonal(TH1D *data) {
   }
 
   if (data) {
-    QLOG(SAM, "Setting diagonal covariance for: " << data->GetName());
+    NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
-    QTHROW("No data input provided to set diagonal covar from!");
+    NUIS_ABORT("No data input provided to set diagonal covar from!");
   }
 
   // if (!fIsDiag) {
@@ -251,7 +251,7 @@ void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
     dim = fDataHist->GetNbinsX();
   }
 
-  QLOG(SAM, "Reading covariance from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -270,7 +270,7 @@ void Measurement1D::SetCovarFromMultipleTextFiles(std::string covfiles,
 
   fFullCovar = new TMatrixDSym(dim);
   for (uint i = 0; i < covList.size(); ++i) {
-    QLOG(SAM, "Reading covariance from text file: " << covList[i]);
+    NUIS_LOG(SAM, "Reading covariance from text file: " << covList[i]);
     TMatrixDSym *temp_cov = StatUtils::GetCovarFromTextFile(covList[i], dim);
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
@@ -284,7 +284,7 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile,
                                          std::string histname) {
   //********************************************************************
 
-  QLOG(SAM,
+  NUIS_LOG(SAM,
        "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
   covar = StatUtils::GetInvert(fFullCovar);
@@ -299,7 +299,7 @@ void Measurement1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
     dim = fDataHist->GetNbinsX();
   }
 
-  QLOG(SAM, "Reading inverted covariance from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
   fFullCovar = StatUtils::GetInvert(covar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -310,7 +310,7 @@ void Measurement1D::SetCovarInvertFromRootFile(std::string covfile,
                                                std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                            << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
   fFullCovar = StatUtils::GetInvert(covar);
@@ -323,12 +323,12 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   if (dim == -1)
     dim = fDataHist->GetNbinsX();
-  QLOG(SAM,
+  NUIS_LOG(SAM,
        "Reading data correlations from text file: " << covfile << ";" << dim);
   TMatrixDSym *correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
   if (!fDataHist) {
-    QTHROW("Trying to set correlations from text file but there is no "
+    NUIS_ABORT("Trying to set correlations from text file but there is no "
            "data to build it from. \n"
            << "In constructor make sure data is set before "
               "SetCorrelationFromTextFile is called. \n");
@@ -364,7 +364,7 @@ void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
 
   fFullCovar = new TMatrixDSym(dim);
   for (uint i = 0; i < corrList.size(); ++i) {
-    QLOG(SAM, "Reading covariance from text file: " << corrList[i]);
+    NUIS_LOG(SAM, "Reading covariance from text file: " << corrList[i]);
     TMatrixDSym *temp_cov = StatUtils::GetCovarFromTextFile(corrList[i], dim);
 
     for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
@@ -386,12 +386,12 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile,
                                                std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading data correlations from text file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
                                                          << histname);
   TMatrixDSym *correlation = StatUtils::GetCovarFromRootFile(covfile, histname);
 
   if (!fDataHist) {
-    QTHROW("Trying to set correlations from text file but there is no "
+    NUIS_ABORT("Trying to set correlations from text file but there is no "
            "data to build it from. \n"
            << "In constructor make sure data is set before "
               "SetCorrelationFromTextFile is called. \n");
@@ -422,7 +422,7 @@ void Measurement1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
     dim = fDataHist->GetNbinsX();
   }
 
-  QLOG(SAM, "Reading cholesky from text file: " << covfile);
+  NUIS_LOG(SAM, "Reading cholesky from text file: " << covfile);
   TMatrixD *temp = StatUtils::GetMatrixFromTextFile(covfile, dim, dim);
 
   TMatrixD *trans = (TMatrixD *)temp->Clone();
@@ -442,7 +442,7 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile,
                                               std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
+  NUIS_LOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
                                                        << histname);
   TMatrixD *temp = StatUtils::GetMatrixFromRootFile(covfile, histname);
 
@@ -502,7 +502,7 @@ void Measurement1D::SetBinMask(std::string maskfile) {
 
   if (!fIsMask)
     return;
-  QLOG(SAM, "Reading bin mask from file: " << maskfile);
+  NUIS_LOG(SAM, "Reading bin mask from file: " << maskfile);
 
   // Create a mask histogram with dim of data
   int nbins = fDataHist->GetNbinsX();
@@ -513,7 +513,7 @@ void Measurement1D::SetBinMask(std::string maskfile) {
   std::ifstream mask(maskfile.c_str(), std::ifstream::in);
 
   if (!mask.is_open()) {
-    QTHROW("Cannot find mask file.");
+    NUIS_ABORT("Cannot find mask file.");
   }
 
   while (std::getline(mask >> std::ws, line, '\n')) {
@@ -521,7 +521,7 @@ void Measurement1D::SetBinMask(std::string maskfile) {
 
     // Skip lines with poorly formatted lines
     if (entries.size() < 2) {
-      QLOG(WRN, "Measurement1D::SetBinMask(), couldn't parse line: " << line);
+      NUIS_LOG(WRN, "Measurement1D::SetBinMask(), couldn't parse line: " << line);
       continue;
     }
 
@@ -543,7 +543,7 @@ void Measurement1D::SetBinMask(std::string maskfile) {
 void Measurement1D::FinaliseMeasurement() {
   //********************************************************************
 
-  QLOG(SAM, "Finalising Measurement: " << fName);
+  NUIS_LOG(SAM, "Finalising Measurement: " << fName);
 
   if (fSettings.GetB("onlymc")) {
     if (fDataHist)
@@ -553,7 +553,7 @@ void Measurement1D::FinaliseMeasurement() {
 
   // Make sure data is setup
   if (!fDataHist) {
-    QTHROW("No data has been setup inside " << fName << " constructor!");
+    NUIS_ABORT("No data has been setup inside " << fName << " constructor!");
   }
 
   // Make sure covariances are setup
@@ -633,10 +633,10 @@ void Measurement1D::FinaliseMeasurement() {
   }
 
   if (fScaleFactor < 0) {
-    QERROR(FTL, "I found a negative fScaleFactor in " << __FILE__ << ":"
+    NUIS_ERR(FTL, "I found a negative fScaleFactor in " << __FILE__ << ":"
                                                       << __LINE__);
-    QERROR(FTL, "fScaleFactor = " << fScaleFactor);
-    QERROR(FTL, "EXITING");
+    NUIS_ERR(FTL, "fScaleFactor = " << fScaleFactor);
+    NUIS_ERR(FTL, "EXITING");
     throw;
   }
 
@@ -675,7 +675,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
         found_option = true;
 
       } else if (found_option and opt.find(av_opt) != std::string::npos) {
-        QTHROW("ERROR: Conflicting fit options provided: "
+        NUIS_ABORT("ERROR: Conflicting fit options provided: "
                << opt << std::endl
                << "Conflicting group = " << fit_option_section.at(i)
                << std::endl
@@ -689,12 +689,12 @@ void Measurement1D::SetFitOptions(std::string opt) {
       GeneralUtils::ParseToStr(opt, "/");
   for (UInt_t i = 0; i < fit_options_input.size(); i++) {
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos) {
-      QERROR(WRN, "ERROR: Fit Option '"
+      NUIS_ERR(WRN, "ERROR: Fit Option '"
                       << fit_options_input.at(i)
                       << "' Provided is not allowed for this measurement.");
-      QERROR(WRN, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(WRN, "Fit Options should be provided as a '/' seperated list "
                   "(e.g. FREE/DIAG/NORM)");
-      QTHROW("Available options for " << fName << " are '" << fAllowedTypes
+      NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                       << "'");
     }
   }
@@ -727,8 +727,8 @@ void Measurement1D::SetFitOptions(std::string opt) {
   if (opt.find("LOG") != std::string::npos) {
     fIsChi2 = false;
 
-    QERROR(FTL, "No other LIKELIHOODS properly supported!");
-    QERROR(FTL, "Try to use a chi2!");
+    NUIS_ERR(FTL, "No other LIKELIHOODS properly supported!");
+    NUIS_ERR(FTL, "Try to use a chi2!");
     throw;
 
   } else {
@@ -769,9 +769,9 @@ void Measurement1D::SetSmearingMatrix(std::string smearfile, int truedim,
   fSmearMatrix = new TMatrixD(truedim, recodim);
 
   if (smear.is_open()) {
-    QLOG(SAM, "Reading smearing matrix from file: " << smearfile);
+    NUIS_LOG(SAM, "Reading smearing matrix from file: " << smearfile);
   } else {
-    QTHROW("Smearing matrix provided is incorrect: " << smearfile);
+    NUIS_ABORT("Smearing matrix provided is incorrect: " << smearfile);
   }
 
   while (std::getline(smear >> std::ws, line, '\n')) {
@@ -795,7 +795,7 @@ void Measurement1D::ApplySmearingMatrix() {
   //********************************************************************
 
   if (!fSmearMatrix) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            fName << ": attempted to apply smearing matrix, but none was set");
     return;
   }
@@ -842,7 +842,7 @@ void Measurement1D::FillHistograms() {
 
   if (Signal) {
 
-    QLOG(DEB, "Fill MCHist: " << fXVar << ", " << Weight);
+    NUIS_LOG(DEB, "Fill MCHist: " << fXVar << ", " << Weight);
 
     fMCHist->Fill(fXVar, Weight);
     fMCFine->Fill(fXVar, Weight);
@@ -1049,7 +1049,7 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
 
   // Setup Inputs
   fFakeDataInput = fakeOption;
-  QLOG(SAM, "Setting fake data from : " << fFakeDataInput);
+  NUIS_LOG(SAM, "Setting fake data from : " << fFakeDataInput);
 
   // From MC
   if (fFakeDataInput.compare("MC") == 0) {
@@ -1323,7 +1323,7 @@ void Measurement1D::Write(std::string drawOpt) {
   WriteExtraHistograms();
 
   // Returning
-  QLOG(SAM, "Written Histograms: " << fName);
+  NUIS_LOG(SAM, "Written Histograms: " << fName);
   return;
 }
 
@@ -1448,24 +1448,24 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   fIsRawEvents = false;
   if ((fName.find("Evt") != std::string::npos) && fIsRawEvents == false) {
     fIsRawEvents = true;
-    QLOG(SAM, "Found event rate measurement but fIsRawEvents == false!");
-    QLOG(SAM, "Overriding this and setting fIsRawEvents == true!");
+    NUIS_LOG(SAM, "Found event rate measurement but fIsRawEvents == false!");
+    NUIS_LOG(SAM, "Overriding this and setting fIsRawEvents == true!");
   }
 
   fIsEnu1D = false;
   if (fName.find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    QLOG(SAM, "::" << fName << "::");
-    QLOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
+    NUIS_LOG(SAM, "::" << fName << "::");
+    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
               "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
-    QERROR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
+    NUIS_ERR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
                 "really correct?!");
-    QERROR(FTL, "Check experiment constructor for " << fName
+    NUIS_ERR(FTL, "Check experiment constructor for " << fName
                                                     << " and correct this!");
-    QERROR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
+    NUIS_ERR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
     throw;
   }
 
@@ -1535,7 +1535,7 @@ void Measurement1D::SetDataValues(std::string dataFile) {
   //********************************************************************
 
   // Override this function if the input file isn't in a suitable format
-  QLOG(SAM, "Reading data from: " << dataFile.c_str());
+  NUIS_LOG(SAM, "Reading data from: " << dataFile.c_str());
   fDataHist =
       PlotUtils::GetTH1DFromFile(dataFile, (fName + "_data"), fPlotTitles);
   fDataTrue = (TH1D *)fDataHist->Clone();
@@ -1551,7 +1551,7 @@ void Measurement1D::SetDataFromDatabase(std::string inhistfile,
                                         std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
+  NUIS_LOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile(
       (GeneralUtils::GetTopLevelDir() + "/data/" + inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
@@ -1564,7 +1564,7 @@ void Measurement1D::SetDataFromFile(std::string inhistfile,
                                     std::string histname) {
   //********************************************************************
 
-  QLOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
+  NUIS_LOG(SAM, "Filling histogram from " << inhistfile << "->" << histname);
   fDataHist = PlotUtils::GetTH1DFromRootFile((inhistfile), histname);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
 
@@ -1598,7 +1598,7 @@ void Measurement1D::SetCovarMatrix(std::string covarFile) {
   else if (!covOption.compare("FULL"))
     fFullCovarPlot = (TH2D *)tempFile->Get("fullcov");
   else {
-    QERROR(WRN, "Incorrect thrown_covariance option in parameters.");
+    NUIS_ERR(WRN, "Incorrect thrown_covariance option in parameters.");
   }
 
   int dim = int(fDataHist->GetNbinsX()); //-this->masked->Integral());
@@ -1657,9 +1657,9 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim,
   this->covar = new TMatrixDSym(dim);
   fFullCovar = new TMatrixDSym(dim);
   if (covarread.is_open()) {
-    QLOG(SAM, "Reading covariance matrix from file: " << covarFile);
+    NUIS_LOG(SAM, "Reading covariance matrix from file: " << covarFile);
   } else {
-    QTHROW("Covariance matrix provided is incorrect: " << covarFile);
+    NUIS_ABORT("Covariance matrix provided is incorrect: " << covarFile);
   }
 
   // Loop over the lines in the file
@@ -1670,7 +1670,7 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim,
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
 
     if (entries.size() <= 1) {
-      QERROR(WRN, "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
+      NUIS_ERR(WRN, "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
                   "entries on this line: "
                       << row);
     }
@@ -1716,10 +1716,10 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
   this->covar = new TMatrixDSym(dim);
   this->fFullCovar = new TMatrixDSym(dim);
   if (corr.is_open()) {
-    QLOG(SAM,
+    NUIS_LOG(SAM,
          "Reading and converting correlation matrix from file: " << corrFile);
   } else {
-    QTHROW("Correlation matrix provided is incorrect: " << corrFile);
+    NUIS_ABORT("Correlation matrix provided is incorrect: " << corrFile);
   }
 
   while (std::getline(corr >> std::ws, line, '\n')) {
@@ -1734,7 +1734,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
       double val = (*iter) * this->fDataHist->GetBinError(row + 1) * 1E38 *
                    this->fDataHist->GetBinError(column + 1) * 1E38;
       if (val == 0) {
-        QTHROW("Found a zero value in the covariance matrix, assuming "
+        NUIS_ABORT("Found a zero value in the covariance matrix, assuming "
                "this is an error!");
       }
 
@@ -1764,7 +1764,7 @@ void Measurement1D::SetCovarFromDataFile(std::string covarFile,
                                          std::string covName, bool FullUnits) {
   //********************************************************************
 
-  QLOG(SAM, "Getting covariance from " << covarFile << "->" << covName);
+  NUIS_LOG(SAM, "Getting covariance from " << covarFile << "->" << covName);
 
   TFile *tempFile = new TFile(covarFile.c_str(), "READ");
   TH2D *covPlot = (TH2D *)tempFile->Get(covName.c_str());

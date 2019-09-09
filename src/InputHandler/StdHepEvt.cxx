@@ -34,26 +34,26 @@ bool StdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("StdHepN", &StdHepN);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN, "Failed to set branch address for \"StdHepN\": " << SBAStatus);
+    NUIS_ERR(WRN, "Failed to set branch address for \"StdHepN\": " << SBAStatus);
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepPdg", StdHepPdg);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "Failed to set branch address for \"StdHepPdg\": " << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("StdHepStatus", StdHepStatus);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "Failed to set branch address for \"StdHepStatus\": " << SBAStatus);
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepP4", StdHepP4);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN, "Failed to set branch address for \"StdHepP4\": " << SBAStatus);
+    NUIS_ERR(WRN, "Failed to set branch address for \"StdHepP4\": " << SBAStatus);
   }
   return ok;
 }
@@ -65,19 +65,19 @@ bool GiBUUStdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("GiBUU2NeutCode", &GiBUU2NeutCode);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN, "Failed to set branch address for \"GiBUU2NeutCode\": "
+    NUIS_ERR(WRN, "Failed to set branch address for \"GiBUU2NeutCode\": "
                     << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("GiBUUReactionCode", &GiBUUReactionCode);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN, "Failed to set branch address for \"GiBUUReactionCode\": "
+    NUIS_ERR(WRN, "Failed to set branch address for \"GiBUUReactionCode\": "
                     << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("EvtWght", &EvtWght);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    QERROR(WRN, "Failed to set branch address for \"EvtWght\": " << SBAStatus);
+    NUIS_ERR(WRN, "Failed to set branch address for \"EvtWght\": " << SBAStatus);
   }
   return ok;
 }

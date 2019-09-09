@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  QLOG(FIT, "Starting ExtFit_minimizer.exe");
+  NUIS_LOG(FIT, "Starting ExtFit_minimizer.exe");
 
   // Make minimizer class and run fit
   MinimizerRoutines *min = new MinimizerRoutines(argc, argv);
@@ -129,13 +129,13 @@ int main(int argc, char *argv[]) {
   status = min->GetStatus();
 
   // Show Final Status
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
   if (status == 0) {
-    QLOG(FIT, "Minimizer Complete.");
+    NUIS_LOG(FIT, "Minimizer Complete.");
   } else {
-    QERROR(WRN, "Minimizer Failed (error state = " << status << ")");
+    NUIS_ERR(WRN, "Minimizer Failed (error state = " << status << ")");
   }
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return status;
 }

@@ -48,7 +48,7 @@ void GIBUUGeneratorInfo::Reset() {
 
 GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
-  QLOG(SAM, "Creating GiBUUInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating GiBUUInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -59,10 +59,10 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    QLOG(SAM, "Opening event file " << inputs[inp_it]);
+    NUIS_LOG(SAM, "Opening event file " << inputs[inp_it]);
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if ((!inp_file) || (!inp_file->IsOpen())) {
-      QTHROW("GiBUU file !IsOpen() at : '"
+      NUIS_ABORT("GiBUU file !IsOpen() at : '"
             << inputs[inp_it] << "'" << std::endl
             << "Check that your file paths are correct and the file exists!");
     }
@@ -74,7 +74,7 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
                   bool(dynamic_cast<TH1D *>(inp_file->Get("e_flux")));
 
     if (NFluxes != 1) {
-      QTHROW("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
+      NUIS_ABORT("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
                      << ". The NUISANCE GiBUU interface expects to be "
                         "passed multiple species vectors as separate "
                         "input files like: "
@@ -86,23 +86,23 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
     TH1D *fluxhist = dynamic_cast<TH1D *>(inp_file->Get("flux"));
     TH1D *eventhist = dynamic_cast<TH1D *>(inp_file->Get("evt"));
     if (!fluxhist || !eventhist) {
-      QERROR(FTL, "Input File Contents: " << inputs[inp_it]);
+      NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
-      QTHROW("GiBUU FILE doesn't contain flux/xsec info. You may have to "
+      NUIS_ABORT("GiBUU FILE doesn't contain flux/xsec info. You may have to "
             "regenerate your MC!");
     }
 
     // Get N Events
     TTree *giRooTracker = dynamic_cast<TTree *>(inp_file->Get("giRooTracker"));
     if (!giRooTracker) {
-      QERROR(FTL,
+      NUIS_ERR(FTL,
             "giRooTracker Tree not located in NEUT file: " << inputs[inp_it]);
-      QTHROW("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = giRooTracker->GetEntries();
     if (nevents <= 0) {
-      QTHROW("Trying to a TTree with "
+      NUIS_ABORT("Trying to a TTree with "
             << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
@@ -210,7 +210,7 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
   int npart = fGiReader->StdHepN;
   int kmax = evt->kMaxParticles;
   if ((UInt_t)npart > (UInt_t)kmax) {
-    QERROR(WRN, "GiBUU has too many particles. Expanding Stack.");
+    NUIS_ERR(WRN, "GiBUU has too many particles. Expanding Stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
@@ -261,7 +261,7 @@ void GIBUUInputHandler::SetupJointInputs() {
   }
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
   if (fMaxEvents != -1 and jointeventinputs.size() > 1) {
-    QTHROW("Can only handle joint inputs when config MAXEVENTS = -1!");
+    NUIS_ABORT("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
 
   for (size_t i = 0; i < jointeventinputs.size(); i++) {

@@ -102,14 +102,14 @@ void SplineWriter::SetupSplineSet() {
   }
 
   // Print out the parameter set
-  QLOG(FIT, "Parset | Index | Pars --- ");
+  NUIS_LOG(FIT, "Parset | Index | Pars --- ");
   for (size_t i = 0; i < fSetIndex.size(); i++) {
-    QLOGN(FIT, " Set " << i << ". | " << fSetIndex[i] << " | ");
+    NUIS_LOGN(FIT, " Set " << i << ". | " << fSetIndex[i] << " | ");
     if (LOG_LEVEL(FIT)) {
       for (size_t j = 0; j < fParVect[i].size(); j++) {
-        QLOGN(FIT, " " << fParVect[i][j]);
+        NUIS_LOGN(FIT, " " << fParVect[i][j]);
       }
-      QLOG(FIT, "");
+      NUIS_LOG(FIT, "");
     }
   }
 }

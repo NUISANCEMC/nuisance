@@ -52,7 +52,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
     histname = "pt_pl_cross_section";
     break;
   default:
-    QTHROW("Unknown Analysis Distribution : " << name);
+    NUIS_ABORT("Unknown Analysis Distribution : " << name);
   }
 
   fSettings.SetTitle(GeneralUtils::ParseToStr(titles, ";")[0]);
@@ -122,12 +122,12 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
       if (fabs(data_error - cov_error) > 1E-5) {
         std::cerr << "Error on data is different to that of covariance"
                   << std::endl;
-        QERROR(FTL, "Data error: " << data_error);
-        QERROR(FTL, "Cov error: " << cov_error);
-        QERROR(FTL, "Data/Cov: " << data_error / cov_error);
-        QERROR(FTL, "Data-Cov: " << data_error - cov_error);
-        QERROR(FTL, "For x: " << xlo1 << "-" << xhi1);
-        QTHROW("For y: " << ylo1 << "-" << yhi1);
+        NUIS_ERR(FTL, "Data error: " << data_error);
+        NUIS_ERR(FTL, "Cov error: " << cov_error);
+        NUIS_ERR(FTL, "Data/Cov: " << data_error / cov_error);
+        NUIS_ERR(FTL, "Data-Cov: " << data_error - cov_error);
+        NUIS_ERR(FTL, "For x: " << xlo1 << "-" << xhi1);
+        NUIS_ABORT("For y: " << ylo1 << "-" << yhi1);
       }
     }
   }
@@ -174,7 +174,7 @@ void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
     break;
   }
   default:
-    QTHROW("DIST NOT FOUND : " << fDist);
+    NUIS_ABORT("DIST NOT FOUND : " << fDist);
     break;
   }
 };
@@ -229,7 +229,7 @@ double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
   if (fAddNormPen) {
     chi2 +=
         (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    QLOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
+    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
                                        (fNormError * fNormError));
   }
 

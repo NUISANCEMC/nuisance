@@ -362,7 +362,7 @@ double RikRPA::CalcWeight(BaseFitEvt *evt) {
     SetupRPACalculator(calcenum);
   weightRPA *rpacalc = fRPACalculators[calcenum];
   if (!rpacalc) {
-    QTHROW("Failed to grab the RPA Calculator : " << calcenum);
+    NUIS_ABORT("Failed to grab the RPA Calculator : " << calcenum);
   }
 
   // Extract Q0-Q3
@@ -566,28 +566,28 @@ void RikRPA::SetupRPACalculator(int calcenum) {
     break;
   }
 
-  QLOG(FIT, "Loading RPA CALC : " << fidir);
+  NUIS_LOG(FIT, "Loading RPA CALC : " << fidir);
   TDirectory *olddir = gDirectory;
 
-  QLOG(FIT, "***********************************************");
-  QLOG(FIT, "Loading a new weightRPA calculator");
-  QLOG(FIT, "Authors:  Rik Gran, Heidi Schellman");
-  QLOG(FIT, "Citation: arXiv:1705.02932 [hep-ex]");
-  QLOG(FIT, "***********************************************");
+  NUIS_LOG(FIT, "***********************************************");
+  NUIS_LOG(FIT, "Loading a new weightRPA calculator");
+  NUIS_LOG(FIT, "Authors:  Rik Gran, Heidi Schellman");
+  NUIS_LOG(FIT, "Citation: arXiv:1705.02932 [hep-ex]");
+  NUIS_LOG(FIT, "***********************************************");
 
   // Test the file exists
   std::ifstream infile((rwdir + fidir).c_str());
   if (!infile.good()) {
-    QERROR(FTL, "*** ERROR ***");
-    QERROR(FTL, "RikRPA file " << rwdir + fidir << " does not exist!");
-    QERROR(FTL,
+    NUIS_ERR(FTL, "*** ERROR ***");
+    NUIS_ERR(FTL, "RikRPA file " << rwdir + fidir << " does not exist!");
+    NUIS_ERR(FTL,
            "These can be found at https://nuisance.hepforge.org/files/RikRPA/");
-    QERROR(FTL,
+    NUIS_ERR(FTL,
            "Please run: wget -r -nH --cut-dirs=2 -np -e robots=off -R "
            "\"index.html*\" https://nuisance.hepforge.org/files/RikRPA/ -P "
                << rwdir);
-    QERROR(FTL, "And try again");
-    QTHROW("*************");
+    NUIS_ERR(FTL, "And try again");
+    NUIS_ABORT("*************");
   }
 
   fRPACalculators[calcenum] = new weightRPA(rwdir + fidir);
@@ -619,7 +619,7 @@ int RikRPA::GetRPACalcEnum(int bpdg, int tpdg) {
   else if (bpdg == -14 && tpdg == 1000280560)
     return kNuMuBarFe56;
   else {
-    // QERROR(WRN, "Unknown beam and target combination for RPA Calcs! "
+    // NUIS_ERR(WRN, "Unknown beam and target combination for RPA Calcs! "
     //<< bpdg << " " << tpdg);
   }
 

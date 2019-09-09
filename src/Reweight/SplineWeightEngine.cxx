@@ -6,7 +6,7 @@ SplineWeightEngine::SplineWeightEngine(std::string name) {
 
   // Setup the Reweight engien
   fCalcName = name;
-  QLOG(FIT, "Setting up Spline RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up Spline RW : " << fCalcName);
 
   // Set Abs Twk Config
   fIsAbsTwk = true;

@@ -69,15 +69,15 @@ Spline::Spline(std::string splname, std::string form, std::string points) {
   } else if (!fForm.compare("2DTSpline3")) {
     Setup(k2DTSpline3, 2, fXScan.size() * fYScan.size() * 8);
   } else {
-    QTHROW("Unknown spline form : " << fForm);
+    NUIS_ABORT("Unknown spline form : " << fForm);
   }
 
   // Run Checks
   if ((UInt_t)fNDim != fSplitNames.size()) {
-    QTHROW("Spline Dim:Names mismatch!");
+    NUIS_ABORT("Spline Dim:Names mismatch!");
   }
 
-  QLOG(SAM, "Setup Spline " << fForm << " = " << fType << " " << fNPar);
+  NUIS_LOG(SAM, "Setup Spline " << fForm << " = " << fType << " " << fNPar);
 };
 
 void Spline::Setup(int type, int ndim, int npar) {

@@ -156,7 +156,7 @@ double FitBase::RWAbsToSigma(std::string const &type, std::string const &name,
   if (fabs(conv_val) < 1E-10)
     conv_val = 0.0;
 
-  QLOG(FIT, "AbsToSigma(" << name << ") = " << val << " -> " << conv_val);
+  NUIS_LOG(FIT, "AbsToSigma(" << name << ") = " << val << " -> " << conv_val);
   return conv_val;
 }
 
@@ -269,7 +269,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   int offset = type * 1000;
   int this_enum = Reweight::kNoDialFound; // Not Found
 
-  QLOG(DEB, "Getting dial enum " << type << " " << name);
+  NUIS_LOG(DEB, "Getting dial enum " << type << " " << name);
   // Select Types
   switch (type) {
   // NEUT DIAL TYPE
@@ -379,9 +379,9 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     size_t us_pos = name.find_first_of('_');
     std::string numstr = name.substr(us_pos + 1);
     int mode_num = std::atoi(numstr.c_str());
-    QLOG(FTL, "Getting mode num " << mode_num);
+    NUIS_LOG(FTL, "Getting mode num " << mode_num);
     if (!mode_num) {
-      QTHROW("Attempting to parse dial name: \""
+      NUIS_ABORT("Attempting to parse dial name: \""
              << name << "\" as a mode norm dial but failed.");
     }
     this_enum = 60 + mode_num + offset;
@@ -391,13 +391,13 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // If Not Enabled
   if (this_enum == Reweight::kNoTypeFound) {
-    QERROR(FTL, "RW Engine not supported for " << FitBase::ConvDialType(type));
-    QTHROW("Check dial " << name);
+    NUIS_ERR(FTL, "RW Engine not supported for " << FitBase::ConvDialType(type));
+    NUIS_ABORT("Check dial " << name);
   }
 
   // If Not Found
   if (this_enum == Reweight::kNoDialFound) {
-    QTHROW("Dial " << name << " not found.");
+    NUIS_ABORT("Dial " << name << " not found.");
   }
 
   return this_enum;
@@ -550,19 +550,19 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
   if (exceptions) {
     // If Not Enabled
     if (genenum == Reweight::kGeneratorNotBuilt) {
-      QERROR(FTL,
+      NUIS_ERR(FTL,
              "RW Engine not supported for " << FitBase::ConvDialType(type));
-      QTHROW("Check dial " << name);
+      NUIS_ABORT("Check dial " << name);
     }
 
     // If no type enabled
     if (genenum == Reweight::kNoTypeFound) {
-      QTHROW("Type mismatch inside ConvDialEnum");
+      NUIS_ABORT("Type mismatch inside ConvDialEnum");
     }
 
     // If Not Found
     if (genenum == Reweight::kNoDialFound) {
-      QTHROW("Dial " << name << " not found.");
+      NUIS_ABORT("Dial " << name << " not found.");
     }
   }
 
@@ -587,6 +587,6 @@ std::string Reweight::ConvDial(int nuisenum) {
     }
   }
 
-  QLOG(FIT, "Cannot find dial with enum = " << nuisenum);
+  NUIS_LOG(FIT, "Cannot find dial with enum = " << nuisenum);
   return "";
 }

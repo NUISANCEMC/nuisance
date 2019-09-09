@@ -21,7 +21,7 @@
 
 FitEventInputHandler::FitEventInputHandler(std::string const &handle,
                                            std::string const &rawinputs) {
-  QLOG(SAM, "Creating FitEventInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating FitEventInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -33,20 +33,20 @@ FitEventInputHandler::FitEventInputHandler(std::string const &handle,
     // Open File for histogram access
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      QTHROW("FitEvent File IsZombie() at " << inputs[inp_it]);
+      NUIS_ABORT("FitEvent File IsZombie() at " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
     TH1D *fluxhist = (TH1D *)inp_file->Get("nuisance_fluxhist");
     TH1D *eventhist = (TH1D *)inp_file->Get("nuisance_eventhist");
     if (!fluxhist or !eventhist) {
-      QTHROW("FitEvent FILE doesn't contain flux/xsec info");
+      NUIS_ABORT("FitEvent FILE doesn't contain flux/xsec info");
     }
 
     // Get N Events
     TTree *eventtree = (TTree *)inp_file->Get("nuisance_events");
     if (!eventtree) {
-      QTHROW("nuisance_events not located in GENIE file! " << inputs[inp_it]);
+      NUIS_ABORT("nuisance_events not located in GENIE file! " << inputs[inp_it]);
     }
     int nevents = eventtree->GetEntries();
 

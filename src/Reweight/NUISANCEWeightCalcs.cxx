@@ -224,11 +224,11 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
 
   // Get Neutrino
   if (!fevt->Npart()) {
-    QTHROW("NO particles found in stack!");
+    NUIS_ABORT("NO particles found in stack!");
   }
   FitParticle *pnu = fevt->GetHMISAnyLeptons();
   if (!pnu) {
-    QTHROW("NO Starting particle found in stack!");
+    NUIS_ABORT("NO Starting particle found in stack!");
   }
   int pdgnu = pnu->fPID;
 
@@ -319,10 +319,10 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
 void GaussianModeCorr::SetMethod(bool method) {
   fMethod = method;
   if (fMethod == true) {
-    QLOG(FIT,
+    NUIS_LOG(FIT,
          " Using tilt-shift Gaussian parameters for Gaussian enhancement...");
   } else {
-    QLOG(FIT, " Using Normal Gaussian parameters for Gaussian enhancement...");
+    NUIS_LOG(FIT, " Using Normal Gaussian parameters for Gaussian enhancement...");
   }
 };
 

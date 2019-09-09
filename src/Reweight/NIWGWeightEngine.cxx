@@ -5,7 +5,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 #ifdef __NEUT_ENABLED__
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  QLOG(FIT, "Setting up NIWG RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up NIWG RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -54,10 +54,10 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
   // allow cout again
   StartTalking();
 #else
-  QTHROW("NIWG RW Enabled but NEUT RW is not!");
+  NUIS_ABORT("NIWG RW Enabled but NEUT RW is not!");
 #endif
 #else
-  QTHROW("NIWG RW NOT ENABLED!");
+  NUIS_ABORT("NIWG RW NOT ENABLED!");
 #endif
 };
 
@@ -86,7 +86,7 @@ void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
     fNIWGSysts.push_back(gensyst);
 
     // Initialize dial
-    QLOG(FIT, "Registering " << singlename << " from " << name);
+    NUIS_LOG(FIT, "Registering " << singlename << " from " << name);
     fNIWGRW->Systematics().Init(fNIWGSysts[index]);
 
     // If Absolute

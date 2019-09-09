@@ -43,7 +43,7 @@ int TargetUtils::GetTargetZFromPDG(int PDG) {
 void TargetUtils::ListTargetIDs() {
 
   // Keep in sync with ConvertTargetIDs
-  QLOG(FIT, "Possible Target IDs: \n"
+  NUIS_LOG(FIT, "Possible Target IDs: \n"
                 << "\n H  : " << TargetUtils::ConvertTargetIDs("H")
                 << "\n C  : " << TargetUtils::ConvertTargetIDs("C")
                 << "\n CH  : " << TargetUtils::ConvertTargetIDs("CH")

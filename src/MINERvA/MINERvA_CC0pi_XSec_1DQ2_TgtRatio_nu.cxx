@@ -54,7 +54,7 @@ MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu::MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(
   else if (fSettings.Found("name", "TgtRatioC"))
     target = "C";
   else {
-    QTHROW("target " << target << " was not found!");
+    NUIS_ABORT("target " << target << " was not found!");
   }
 
   std::string basedir = FitPar::GetDataBase() + "/MINERvA/CC0pi/";
@@ -64,7 +64,7 @@ MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu::MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) {
-    QTHROW("MINERvA CC0pi ratio requires input files in format: "
+    NUIS_ABORT("MINERvA CC0pi ratio requires input files in format: "
            "NUMERATOR;DENOMINATOR");
   }
   std::string inFileNUM = fSubInFiles.at(0);

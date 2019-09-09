@@ -49,7 +49,7 @@ void SplineReader::Read(TTree *tr) {
 
   // Loop through and add splines from read type.
   for (size_t i = 0; i < fSpline.size(); i++) {
-    QLOG(SAM, "Registering Input Spline " << fSpline[i] << " " << fForm[i]
+    NUIS_LOG(SAM, "Registering Input Spline " << fSpline[i] << " " << fForm[i]
                                           << " " << fPoints[i]);
     fAllSplines.push_back(Spline(fSpline[i], fForm[i], fPoints[i]));
   }

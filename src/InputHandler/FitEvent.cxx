@@ -34,7 +34,7 @@ void FitEvent::AddGeneratorInfo(GeneratorInfoBase *gen) {
 }
 
 void FitEvent::AllocateParticleStack(int stacksize) {
-  QLOG(DEB, "Allocating particle stack of size: " << stacksize);
+  NUIS_LOG(DEB, "Allocating particle stack of size: " << stacksize);
   kMaxParticles = stacksize;
 
   fParticleList = new FitParticle *[kMaxParticles];
@@ -195,9 +195,9 @@ void FitEvent::OrderStack() {
   }
 
   if (LOG_LEVEL(DEB)) {
-    QLOG(DEB, "Ordered stack");
+    NUIS_LOG(DEB, "Ordered stack");
     for (int i = 0; i < fNParticles; i++) {
-      QLOG(DEB, "Particle " << i << ". " << fParticlePDG[i] << " "
+      NUIS_LOG(DEB, "Particle " << i << ". " << fParticlePDG[i] << " "
                             << fParticleMom[i][0] << " " << fParticleMom[i][1]
                             << " " << fParticleMom[i][2] << " "
                             << fParticleMom[i][3] << " " << fParticleState[i]);
@@ -205,7 +205,7 @@ void FitEvent::OrderStack() {
   }
 
   if (fNParticles != npart) {
-    QTHROW("Dropped some particles when ordering the stack!");
+    NUIS_ABORT("Dropped some particles when ordering the stack!");
   }
 
   return;
@@ -213,12 +213,12 @@ void FitEvent::OrderStack() {
 
 void FitEvent::Print() {
   if (LOG_LEVEL(FIT)) {
-    QLOG(FIT, "FITEvent print");
-    QLOG(FIT, "Mode: " << Mode << ", Weight: " << InputWeight);
-    QLOG(FIT, "Particles: " << fNParticles);
-    QLOG(FIT, " -> Particle Stack ");
+    NUIS_LOG(FIT, "FITEvent print");
+    NUIS_LOG(FIT, "Mode: " << Mode << ", Weight: " << InputWeight);
+    NUIS_LOG(FIT, "Particles: " << fNParticles);
+    NUIS_LOG(FIT, " -> Particle Stack ");
     for (int i = 0; i < fNParticles; i++) {
-      QLOG(FIT, " -> -> " << i << ". " << fParticlePDG[i] << " "
+      NUIS_LOG(FIT, " -> -> " << i << ". " << fParticlePDG[i] << " "
                           << fParticleState[i] << " "
                           << "  Mom(" << fParticleMom[i][0] << ", "
                           << fParticleMom[i][1] << ", " << fParticleMom[i][2]
@@ -318,7 +318,7 @@ FitParticle *FitEvent::GetParticle(int const i) {
 
   // Check Valid
   if (i > fNParticles) {
-    QTHROW("Requesting particle beyond stack!"
+    NUIS_ABORT("Requesting particle beyond stack!"
            << std::endl
            << "i = " << i << " N = " << fNParticles << std::endl
            << "Mode = " << Mode);

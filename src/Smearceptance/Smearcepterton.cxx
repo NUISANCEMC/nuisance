@@ -40,7 +40,7 @@
 DynamicSmearceptorFactory::DynamicSmearceptorFactory()
     : NSmearceptors(0), NManifests(0) {
   LoadPlugins();
-  QLOG(FIT, "Loaded " << NSmearceptors << " from " << NManifests
+  NUIS_LOG(FIT, "Loaded " << NSmearceptors << " from " << NManifests
                       << " shared object libraries.");
 }
 DynamicSmearceptorFactory* DynamicSmearceptorFactory::glblDSF = NULL;
@@ -84,7 +84,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
   for (size_t sp_it = 0; sp_it < SearchDirectories.size(); ++sp_it) {
     std::string dirpath = EnsureTrailingSlash(SearchDirectories[sp_it]);
 
-    QLOG(FIT, "Searching for dynamic smearceptor manifests in: " << dirpath);
+    NUIS_LOG(FIT, "Searching for dynamic smearceptor manifests in: " << dirpath);
 
     Ssiz_t len = 0;
     DIR* dir;
@@ -94,7 +94,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
       TRegexp matchExp("*.so", true);
       while ((ent = readdir(dir)) != NULL) {
         if (matchExp.Index(TString(ent->d_name), &len) != Ssiz_t(-1)) {
-          QLOG(FIT, "\tFound shared object: "
+          NUIS_LOG(FIT, "\tFound shared object: "
                         << ent->d_name << " checking for relevant methods...");
 
           void* dlobj =
@@ -106,7 +106,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            QERROR(WRN, "\tDL Load Error: " << dlerr);
+            NUIS_ERR(WRN, "\tDL Load Error: " << dlerr);
             continue;
           }
 
@@ -124,7 +124,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            QERROR(WRN, "\tFailed to load symbol \"DSF_NSmearceptors\" from "
+            NUIS_ERR(WRN, "\tFailed to load symbol \"DSF_NSmearceptors\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -141,7 +141,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            QERROR(WRN,
+            NUIS_ERR(WRN,
                   "\tFailed to load symbol \"DSF_GetSmearceptorName\" from "
                       << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
@@ -159,7 +159,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            QERROR(WRN, "\tFailed to load symbol \"DSF_GetSmearceptor\" from "
+            NUIS_ERR(WRN, "\tFailed to load symbol \"DSF_GetSmearceptor\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -176,27 +176,27 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            QERROR(WRN, "Failed to load symbol \"DSF_DestroySmearceptor\" from "
+            NUIS_ERR(WRN, "Failed to load symbol \"DSF_DestroySmearceptor\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
           }
 
           plgManif.NSmearceptors = (*(plgManif.DSF_NSmearceptors))();
-          QLOG(FIT, "\tSuccessfully loaded dynamic smearceptor manifest: "
+          NUIS_LOG(FIT, "\tSuccessfully loaded dynamic smearceptor manifest: "
                         << plgManif.soloc << ". Contains "
                         << plgManif.NSmearceptors << " smearceptors.");
 
           for (size_t smp_it = 0; smp_it < plgManif.NSmearceptors; ++smp_it) {
             char const* smp_name = (*(plgManif.DSF_GetSmearceptorName))(smp_it);
             if (!smp_name) {
-              QTHROW("Could not load smearceptor "
+              NUIS_ABORT("Could not load smearceptor "
                     << smp_it << " / " << plgManif.NSmearceptors << " from "
                     << plgManif.soloc);
             }
 
             if (Smearceptors.count(smp_name)) {
-              QERROR(WRN, "Already loaded a smearceptor named: \""
+              NUIS_ERR(WRN, "Already loaded a smearceptor named: \""
                              << smp_name << "\". cannot load duplciates. This "
                                             "smearceptor will be skipped.");
               continue;
@@ -204,7 +204,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
 
             plgManif.SmearceptorsProvided.push_back(smp_name);
             Smearceptors[smp_name] = std::make_pair(plgManif.soloc, smp_it);
-            QLOG(FIT, "\t\t" << smp_name);
+            NUIS_LOG(FIT, "\t\t" << smp_name);
           }
 
           if (plgManif.SmearceptorsProvided.size()) {
@@ -219,7 +219,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
       }
       closedir(dir);
     } else {
-      QERROR(WRN, "Tried to open non-existant directory.");
+      NUIS_ERR(WRN, "Tried to open non-existant directory.");
     }
   }
 }
@@ -241,13 +241,13 @@ void DynamicSmearceptorFactory::Print() {
     ManifestSmearceptors[smp_it->second.first].push_back(smp_it->first);
   }
 
-  QLOG(FIT, "Dynamic smearceptor manifest: ");
+  NUIS_LOG(FIT, "Dynamic smearceptor manifest: ");
   for (std::map<std::string, std::vector<std::string> >::iterator m_it =
            ManifestSmearceptors.begin();
        m_it != ManifestSmearceptors.end(); ++m_it) {
-    QLOG(FIT, "\tLibrary " << m_it->first << " contains: ");
+    NUIS_LOG(FIT, "\tLibrary " << m_it->first << " contains: ");
     for (size_t s_it = 0; s_it < m_it->second.size(); ++s_it) {
-      QLOG(FIT, "\t\t" << m_it->second[s_it]);
+      NUIS_LOG(FIT, "\t\t" << m_it->second[s_it]);
     }
   }
 }
@@ -260,14 +260,14 @@ bool DynamicSmearceptorFactory::HasSmearceptor(nuiskey& smearceptorkey) {
 ISmearcepter* DynamicSmearceptorFactory::CreateSmearceptor(
     nuiskey& smearceptorkey) {
   if (!HasSmearceptor(smearceptorkey)) {
-    QERROR(WRN, "Asked to load unknown smearceptor: \""
+    NUIS_ERR(WRN, "Asked to load unknown smearceptor: \""
                    << smearceptorkey.GetElementName() << "\".");
     return NULL;
   }
 
   std::pair<std::string, int> smearceptor =
       Smearceptors[smearceptorkey.GetElementName()];
-  QLOG(SAM, "\tLoading smearceptor " << smearceptor.second << " from "
+  NUIS_LOG(SAM, "\tLoading smearceptor " << smearceptor.second << " from "
                                      << smearceptor.first);
 
   ISmearcepter* smear = (*(Manifests[smearceptor.first].DSF_GetSmearceptor))(
@@ -327,7 +327,7 @@ void Smearcepterton::InitialiserSmearcepters() {
 #endif
       {
         if (!factories.count(smearType)) {
-          QERROR(WRN, "No known smearer accepts elements named: \"" << smearType
+          NUIS_ERR(WRN, "No known smearer accepts elements named: \"" << smearType
                                                                    << "\"");
           continue;
         }
@@ -335,16 +335,16 @@ void Smearcepterton::InitialiserSmearcepters() {
       }
 
       if (!smearer) {
-        QTHROW("Failed to load smearceptor.");
+        NUIS_ABORT("Failed to load smearceptor.");
       }
       if (!smearer->GetName().length()) {
-        QTHROW("Smearcepter type " << smearer->GetElementName()
+        NUIS_ABORT("Smearcepter type " << smearer->GetElementName()
                                   << " had no instance name.");
       }
 
       Smearcepters[smearer->GetName()] = smearer;
 
-      QLOG(FIT, "Configured smearer named: " << smearer->GetName()
+      NUIS_LOG(FIT, "Configured smearer named: " << smearer->GetName()
                                              << " of type: "
                                              << smearer->GetElementName());
     }

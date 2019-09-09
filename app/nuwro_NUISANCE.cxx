@@ -22,7 +22,7 @@ void GetCommandLineArgs(int argc, char **argv);
 void PrintSyntax(void);
 
 std::string GetDynamicModes(std::string list) {
-  QLOG(FIT, "Using " << list << " to define interaction modes.");
+  NUIS_LOG(FIT, "Using " << list << " to define interaction modes.");
   std::map<std::string, int> modes;
 
   if (!list.compare("Default")) {
@@ -62,7 +62,7 @@ std::string GetDynamicModes(std::string list) {
     modes["dyn_mec_nc"] = 1; // Meson exchange neutral current
 
   } else {
-    QTHROW("Event generator list " << list << " not found!");
+    NUIS_ABORT("Event generator list " << list << " not found!");
   }
 
   std::string modestring = "";
@@ -76,12 +76,12 @@ std::string GetDynamicModes(std::string list) {
 }
 
 std::string GetFluxDefinition(std::string flux, std::string out) {
-  QLOG(FIT, "Using " << flux << " to define NuWro beam.");
+  NUIS_LOG(FIT, "Using " << flux << " to define NuWro beam.");
 
   // By default the flux is type 6 with a root file
   std::vector<std::string> fluxargs = GeneralUtils::ParseToStr(flux, ",");
   if (fluxargs.size() < 2) {
-    QTHROW("Expected flux in the format: file.root,hist_name1[pdg1],... : "
+    NUIS_ABORT("Expected flux in the format: file.root,hist_name1[pdg1],... : "
            "reveived : "
            << flux);
   }
@@ -149,7 +149,7 @@ std::string GetFluxDefinition(std::string flux, std::string out) {
 
     // Check Flux
     if (cuthist->Integral() <= 0.0) {
-      QTHROW("Flux histogram " << iter->second << " has integral <= 0.0");
+      NUIS_ABORT("Flux histogram " << iter->second << " has integral <= 0.0");
     }
 
     // Save
@@ -171,7 +171,7 @@ std::string GetFluxDefinition(std::string flux, std::string out) {
 }
 
 std::string GetTargetDefinition(std::string target) {
-  QLOG(FIT, "Defining NuWro Target from : " << target);
+  NUIS_LOG(FIT, "Defining NuWro Target from : " << target);
 
   // Target is given as either a single PDG, or a combo with the total number of
   // nucleons
@@ -227,7 +227,7 @@ std::string GetTargetDefinition(std::string target) {
 
     // No target given!
   } else {
-    QTHROW("No target given : " << target);
+    NUIS_ABORT("No target given : " << target);
   }
 
   std::cout << " -> " << targetstring << std::endl;
@@ -243,17 +243,17 @@ std::string GetEventAndSeedDefinition(int nevents, int ntestevents, int seed) {
       "\"";
   eventdef += " -p \"random_seed=" + GeneralUtils::IntToStr(seed) + "\"";
 
-  QLOG(FIT, "Event Definition: ");
-  QLOG(FIT, " -> number_of_events      : " << nevents);
-  QLOG(FIT, " -> number_of_test_events : " << ntestevents);
-  QLOG(FIT, " -> seed    : " << seed);
+  NUIS_LOG(FIT, "Event Definition: ");
+  NUIS_LOG(FIT, " -> number_of_events      : " << nevents);
+  NUIS_LOG(FIT, " -> number_of_test_events : " << ntestevents);
+  NUIS_LOG(FIT, " -> seed    : " << seed);
 
   return eventdef;
 }
 
 //____________________________________________________________________________
 int main(int argc, char **argv) {
-  QLOG(FIT, "==== RUNNING nuwro_nuisance Event Generator =====");
+  NUIS_LOG(FIT, "==== RUNNING nuwro_nuisance Event Generator =====");
   GetCommandLineArgs(argc, argv);
 
   // Calculate the dynamic modes definition
@@ -268,7 +268,7 @@ int main(int argc, char **argv) {
       gOptNumberEvents, gOptNumberTestEvents, gOptSeed);
 
   // Run NuWro Externally!
-  QLOG(FIT, "==== Actually running nuwro! ===");
+  NUIS_LOG(FIT, "==== Actually running nuwro! ===");
   std::string nuwrocommand = "nuwro";
   nuwrocommand += " -i " + gOptCrossSections;
   nuwrocommand += " -o " + gOptOutputFile;
@@ -295,7 +295,7 @@ void GetCommandLineArgs(int argc, char **argv) {
   std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
   ParserUtils::ParseArgument(args, "-n", gOptNumberEvents, false);
   if (gOptNumberEvents == -1) {
-    QTHROW("No event count passed to nuwro_NUISANCE!");
+    NUIS_ABORT("No event count passed to nuwro_NUISANCE!");
   }
 
   // Flux/Energy Specs
@@ -304,15 +304,15 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "-f", gOptFluxDef, false);
   if (gOptFluxDef.empty() and gOptEnergyRange.size() < 1) {
-    QTHROW("No flux or energy range given to nuwro_nuisance!");
+    NUIS_ABORT("No flux or energy range given to nuwro_nuisance!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 1) {
     // Fixed energy, make sure -p is given
-    QTHROW("nuwro_NUISANCE cannot yet do fixed energy!");
+    NUIS_ABORT("nuwro_NUISANCE cannot yet do fixed energy!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 2) {
     // Uniform energy range
-    QTHROW("nuwro_NUISANCE cannot yet do a uniform energy range!");
+    NUIS_ABORT("nuwro_NUISANCE cannot yet do a uniform energy range!");
 
   } else if (!gOptFluxDef.empty()) {
     // Try to convert the flux definition if possible.
@@ -321,12 +321,12 @@ void GetCommandLineArgs(int argc, char **argv) {
       gOptFluxDef = convflux;
 
   } else {
-    QTHROW("Unknown flux energy range combination!");
+    NUIS_ABORT("Unknown flux energy range combination!");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptTargetDef, false);
   if (gOptTargetDef.empty()) {
-    QTHROW("No Target passed to nuwro_nuisance! use the '-t' argument.");
+    NUIS_ABORT("No Target passed to nuwro_nuisance! use the '-t' argument.");
   } else {
     std::string convtarget = TargetUtils::ConvertTargetIDs(gOptTargetDef);
     if (!convtarget.empty())
@@ -338,7 +338,7 @@ void GetCommandLineArgs(int argc, char **argv) {
   if (gOptOutputFile.empty()) {
     if (gOptRunNumber == -1)
       gOptRunNumber = 1;
-    QLOG(FIT, "No output file given! Saving file to : nuwrogen."
+    NUIS_LOG(FIT, "No output file given! Saving file to : nuwrogen."
                   << gOptRunNumber << ".event.root");
     gOptOutputFile =
         "nuwrogen." + GeneralUtils::IntToStr(gOptRunNumber) + ".event.root";
@@ -353,7 +353,7 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "--cross-section", gOptCrossSections, false);
   if (!gOptCrossSections.compare("Default")) {
-    QLOG(FIT, "No Parameters File passed. Using default NuWro one.");
+    NUIS_LOG(FIT, "No Parameters File passed. Using default NuWro one.");
     char *const var = getenv("NUISANCE");
     if (!var) {
       std::cout << "Cannot find top level directory! Set the NUISANCE "
@@ -377,7 +377,7 @@ void GetCommandLineArgs(int argc, char **argv) {
     ParserUtils::CheckBadArguments(args);
   }
 
-  QLOG(FIT, "Generating NuWro Events with the following properties:"
+  NUIS_LOG(FIT, "Generating NuWro Events with the following properties:"
                 << std::endl
                 << " -> Energy      : " << gOptEnergyDef << " ("
                 << gOptEnergyRange.size() << ")" << std::endl
@@ -394,7 +394,7 @@ void GetCommandLineArgs(int argc, char **argv) {
 }
 //____________________________________________________________________________
 void PrintSyntax(void) {
-  QLOG(FIT, "\n\n"
+  NUIS_LOG(FIT, "\n\n"
                 << "Syntax:"
                 << "\n"
                 << "\n      nuwro_nuisance [-h]"
@@ -409,7 +409,7 @@ void PrintSyntax(void) {
                 << "\n              [ --test-events ntest ]"
                 << "\n \n");
 
-  QLOG(
+  NUIS_LOG(
       FIT,
       "\n\n Arguments:"
           << "\n"
@@ -520,7 +520,7 @@ void PrintSyntax(void) {
   std::cout << "-----------------" << std::endl;
   BeamUtils::ListFluxIDs();
   std::cout << "-----------------" << std::endl;
-  QLOG(FIT, "Allowed Mode Definitions:"
+  NUIS_LOG(FIT, "Allowed Mode Definitions:"
                 << std::endl
                 << " - Default : Default CC+NC modes, no MEC" << std::endl
                 << " - Default+MEC : Default CC+NC modes + 2p2h MEC "

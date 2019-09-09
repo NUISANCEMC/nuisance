@@ -127,9 +127,9 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
     fMax = 180.0;
     break;
   default:
-    QERROR(FTL,
+    NUIS_ERR(FTL,
            "Did not find your specified distribution implemented, exiting");
-    QTHROW("You gave " << fName);
+    NUIS_ABORT("You gave " << fName);
   }
 
   titles += "_nu";

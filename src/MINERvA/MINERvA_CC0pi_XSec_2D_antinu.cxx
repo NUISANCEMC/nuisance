@@ -85,7 +85,7 @@ void MINERvA_CC0pi_XSec_2D_antinu::SetupDataSettings() {
       fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents);
       break;
     default:
-      QTHROW("Unknown Analysis Distribution : " << name);
+      NUIS_ABORT("Unknown Analysis Distribution : " << name);
   }
 
   fSettings.SetTitle(  GeneralUtils::ParseToStr(titles,";")[0] );

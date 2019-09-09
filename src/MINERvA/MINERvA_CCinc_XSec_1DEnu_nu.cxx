@@ -55,7 +55,7 @@ MINERvA_CCinc_XSec_1DEnu_nu::MINERvA_CCinc_XSec_1DEnu_nu(std::string name,
   if (name.find("DEN") != std::string::npos)
     target = "CH";
   if (target == "") {
-    QTHROW("target " << target << " was not found!");
+    NUIS_ABORT("target " << target << " was not found!");
   }
   // fSettings.SetSmearingInput( FitPar::GetDataBase() +
   // "/MINERvA/CCinc/CCinc_"+target+"_x_smear.csv" );

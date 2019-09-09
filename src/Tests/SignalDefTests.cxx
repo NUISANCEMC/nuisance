@@ -8,8 +8,8 @@ int main(int argc, char const *argv[]) {
   bool FailOnFail = (argc > 1);
   SETVERBOSITY(SAM);
 
-  QLOG(FIT, "*            Running SignalDef Tests");
-  QLOG(FIT, "***************************************************");
+  NUIS_LOG(FIT, "*            Running SignalDef Tests");
+  NUIS_LOG(FIT, "***************************************************");
 
   int IS[] = {14};
   int FS_CC0pi_1[] = {13, 2112, 2212, 2112, 2212};
@@ -63,7 +63,7 @@ int main(int argc, char const *argv[]) {
   int FS_NCNpi_1[] = {14, 2212, 211};
   ConstructibleFitEvent fe_NCNpi_1 = MakePDGStackEvent(IS, FS_NCNpi_1, 32);
 
-  QLOG(FIT, "*            Testing: SignalDef::isCCINC");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCCINC");
 
   std::map<ConstructibleFitEvent *, bool> isCCINC_PassExpectations;
   isCCINC_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
@@ -90,11 +90,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isCCINC_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCINC(fe_it->first, 14);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCCINC unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -102,7 +102,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isNCINC");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isNCINC");
 
   std::map<ConstructibleFitEvent *, bool> isNCINC_PassExpectations;
   isNCINC_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
@@ -129,11 +129,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isNCINC_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isNCINC(fe_it->first, 14);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isNCINC unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -141,7 +141,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isCC0pi");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCC0pi");
 
   std::map<ConstructibleFitEvent *, bool> isCC0pi_PassExpectations;
   isCC0pi_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
@@ -168,12 +168,12 @@ int main(int argc, char const *argv[]) {
        fe_it != isCC0pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCC0pi(fe_it->first, 14);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n"
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n"
                              << fe_it->first->ToString() << " ");
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCC0pi unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -181,7 +181,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isCCQELike");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCCQELike");
 
   std::map<ConstructibleFitEvent *, bool> isCCQELike_PassExpectations;
   isCCQELike_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
@@ -208,11 +208,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isCCQELike_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCQELike(fe_it->first, 14);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCCQELike unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -220,7 +220,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isCCQE");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCCQE");
 
   std::map<ConstructibleFitEvent *, bool> isCCQE_PassExpectations;
   isCCQE_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
@@ -247,11 +247,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isCCQE_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCQE(fe_it->first, 14);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCCQE unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -259,7 +259,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isCCCOH");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCCCOH");
 
   std::map<ConstructibleFitEvent *, bool> isCCCOH_PassExpectations;
   isCCCOH_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
@@ -286,11 +286,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isCCCOH_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCCOH(fe_it->first, 14, 211);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCCCOH unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -298,7 +298,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isCC1pi");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isCC1pi");
 
   std::map<ConstructibleFitEvent *, bool> isCC1pi_PassExpectations;
   isCC1pi_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
@@ -325,11 +325,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isCC1pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCC1pi(fe_it->first, 14, 211);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isCC1pi unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {
@@ -337,7 +337,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  QLOG(FIT, "*            Testing: SignalDef::isNC1pi");
+  NUIS_LOG(FIT, "*            Testing: SignalDef::isNC1pi");
 
   std::map<ConstructibleFitEvent *, bool> isNC1pi_PassExpectations;
   isNC1pi_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
@@ -364,11 +364,11 @@ int main(int argc, char const *argv[]) {
        fe_it != isNC1pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isNC1pi(fe_it->first, 14, -211);
     if (res != fe_it->second) {
-      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
-      QERROR(FTL, (res ? "passed" : "failed")
+      NUIS_ERR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      NUIS_ERR(FTL, (res ? "passed" : "failed")
                       << " SignalDef::isNC1pi unexpectedly.");
     } else {
-      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+      NUIS_LOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
                            << " as expected.");
     }
     if (FailOnFail) {

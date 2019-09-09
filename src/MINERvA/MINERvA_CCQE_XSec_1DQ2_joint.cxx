@@ -61,7 +61,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "
@@ -90,7 +90,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
     if (isFluxFix) {
       if (fIsShape) {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
                "SHAPE likelihood comparison not available for MINERvA "
                    << "datasets with fixed flux information. NUISANCE will "
                       "scale MC to match "
@@ -125,7 +125,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
   // Get parsed input files
   if (fSubInFiles.size() != 2) {
-    QTHROW("MINERvA Joint requires input files in format: antinu;nu");
+    NUIS_ABORT("MINERvA Joint requires input files in format: antinu;nu");
   }
   std::string inFileAntineutrino = fSubInFiles.at(0);
   std::string inFileNeutrino = fSubInFiles.at(1);

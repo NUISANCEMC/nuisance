@@ -123,7 +123,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::SetupDataSettings(){
       break;
 
     default:
-      QTHROW("Unknown Analysis Distribution : " << fDist);
+      NUIS_ABORT("Unknown Analysis Distribution : " << fDist);
   }
 
   // Set the Wexp and proton kinetic energy cuts depending on sample
@@ -285,7 +285,7 @@ void MINERvA_CC1pi0_XSec_1D_nu::FillEventVariables(FitEvent *event) {
       break;
       }
     default:
-      QTHROW("DIST NOT FOUND : " << fDist);
+      NUIS_ABORT("DIST NOT FOUND : " << fDist);
       break;
   }
 

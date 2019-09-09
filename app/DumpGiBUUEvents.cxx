@@ -24,12 +24,12 @@
 
 int main(int argv, char const *argc[]) {
   if (argv != 2) {
-    QTHROW("[ERROR]: expected a single input GiBUU rootracker file.");
+    NUIS_ABORT("[ERROR]: expected a single input GiBUU rootracker file.");
   }
   std::string inpf(argc[1]);
 
   if (!inpf.length()) {
-    QTHROW("[ERROR]: expected an input GiBUU rootracker file.");
+    NUIS_ABORT("[ERROR]: expected an input GiBUU rootracker file.");
   }
 
   TChain tn("giRooTracker");
@@ -39,11 +39,11 @@ int main(int argv, char const *argc[]) {
   bool ok = giRead.SetBranchAddresses(&tn);
 
   if (!ok) {
-    QTHROW("[ERROR]: Could not correctly set branch address for input file.");
+    NUIS_ABORT("[ERROR]: Could not correctly set branch address for input file.");
   }
 
   for (Long64_t ievt = 0; ievt < tn.GetEntries(); ++ievt) {
     tn.GetEntry(ievt);
-    QLOG(EVT, WriteGiBUUEvent(giRead));
+    NUIS_LOG(EVT, WriteGiBUUEvent(giRead));
   }
 }

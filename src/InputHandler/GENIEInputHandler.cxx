@@ -83,7 +83,7 @@ void GENIEGeneratorInfo::Reset() {
 
 GENIEInputHandler::GENIEInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
-  QLOG(SAM, "Creating GENIEInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating GENIEInputHandler : " << handle);
 
   genie::Messenger::Instance()->SetPriorityLevel("GHepUtils", pFATAL);
 
@@ -113,7 +113,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     TFile *inp_file = new TFile(
         InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      QTHROW("GENIE File IsZombie() at : '"
+      NUIS_ABORT("GENIE File IsZombie() at : '"
              << inputs[inp_it] << "'" << std::endl
              << "Check that your file paths are correct and the file exists!"
              << std::endl
@@ -124,9 +124,9 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     TH1D *fluxhist = (TH1D *)inp_file->Get("nuisance_flux");
     TH1D *eventhist = (TH1D *)inp_file->Get("nuisance_events");
     if (!fluxhist or !eventhist) {
-      QERROR(FTL, "Input File Contents: " << inputs[inp_it]);
+      NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
-      QTHROW("GENIE FILE doesn't contain flux/xsec info."
+      NUIS_ABORT("GENIE FILE doesn't contain flux/xsec info."
              << std::endl
              << "Try running the app PrepareGENIE first on :" << inputs[inp_it]
              << std::endl
@@ -136,13 +136,13 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     // Get N Events
     TTree *genietree = (TTree *)inp_file->Get("gtree");
     if (!genietree) {
-      QERROR(FTL, "gtree not located in GENIE file: " << inputs[inp_it]);
-      QTHROW("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ERR(FTL, "gtree not located in GENIE file: " << inputs[inp_it]);
+      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
     }
 
     int nevents = genietree->GetEntries();
     if (nevents <= 0) {
-      QTHROW("Trying to a TTree with "
+      NUIS_ABORT("Trying to a TTree with "
              << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
@@ -150,10 +150,10 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     TTree *weighttree = (TTree *)inp_file->Get("nova_wgts");
     if (fNOvAWeights) {
       if (!weighttree) {
-        QTHROW("Did not find nova_wgts tree in file "
+        NUIS_ABORT("Did not find nova_wgts tree in file "
                << inputs[inp_it] << " but you specified it" << std::endl);
       } else {
-        QLOG(FIT, "Found nova_wgts tree in file " << inputs[inp_it]);
+        NUIS_LOG(FIT, "Found nova_wgts tree in file " << inputs[inp_it]);
       }
     }
 
@@ -358,7 +358,7 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
       else if (gheprec->Summary()->ProcInfo().IsDeepInelastic())
         return 26;
       else {
-        QERROR(WRN,
+        NUIS_ERR(WRN,
               "Unknown GENIE Electron Scattering Mode!"
                   << std::endl
                   << "ScatteringTypeId = "
@@ -445,7 +445,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
     GHepParticle *p = fGenieGHep->Particle(1);
     // Check that particle 1 actually exists
     if (!p) {
-      QTHROW("Can't find particle 1 for GHepRecord");
+      NUIS_ABORT("Can't find particle 1 for GHepRecord");
     }
     // If not an ion but is an initial state particle
     if (!pdg::IsIon(p->Pdg()) && p->Status() == kIStInitialState) {
@@ -457,10 +457,10 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
       // both
     } else {
       if (pdg::IsIon(p->Pdg())) {
-        QTHROW("Particle 1 in GHepRecord stack is an ion but isn't an initial "
+        NUIS_ABORT("Particle 1 in GHepRecord stack is an ion but isn't an initial "
                "state particle");
       } else {
-        QTHROW("Particle 1 in GHepRecord stack is not an ion but is an initial "
+        NUIS_ABORT("Particle 1 in GHepRecord stack is not an ion but is an initial "
                "state particle");
       }
     }
@@ -518,7 +518,7 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   unsigned int npart = fGenieGHep->GetEntries();
   unsigned int kmax = fNUISANCEEvent->kMaxParticles;
   if (npart > kmax) {
-    QERROR(WRN, "GENIE has too many particles, expanding stack.");
+    NUIS_ERR(WRN, "GENIE has too many particles, expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
@@ -568,8 +568,8 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
     // Extra Check incase GENIE fails.
     if ((UInt_t)fNUISANCEEvent->fNParticles == kmax) {
-      QERROR(WRN, "Number of GENIE Particles exceeds maximum!");
-      QERROR(WRN, "Extend kMax, or run without including FSI particles!");
+      NUIS_ERR(WRN, "Number of GENIE Particles exceeds maximum!");
+      NUIS_ERR(WRN, "Extend kMax, or run without including FSI particles!");
       break;
     }
   }

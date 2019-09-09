@@ -97,28 +97,28 @@ void GetCommandLineArgs(int argc, char **argv) {
   // Parse input file
   ParserUtils::ParseArgument(args, "-i", gOptInputFile, false);
   if (gOptInputFile == "") {
-    QTHROW("Need to provide a valid input file to nuisflat using -i flag!");
+    NUIS_ABORT("Need to provide a valid input file to nuisflat using -i flag!");
   } else {
-    QLOG(FIT, "Reading Input File = " << gOptInputFile);
+    NUIS_LOG(FIT, "Reading Input File = " << gOptInputFile);
   }
 
   // Get Output Format
   ParserUtils::ParseArgument(args, "-f", gOptFormat, false);
   if (gOptFormat == "") {
     gOptFormat = "GenericVectors";
-    QLOG(FIT, "Saving flattree in default format = " << gOptFormat);
+    NUIS_LOG(FIT, "Saving flattree in default format = " << gOptFormat);
   } else {
-    QLOG(FIT, "Saving flattree in format = " << gOptFormat);
+    NUIS_LOG(FIT, "Saving flattree in format = " << gOptFormat);
   }
 
   // Get Output File
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile == "") {
     gOptOutputFile = gOptInputFile + "." + gOptFormat + ".root";
-    QLOG(FIT, "No output file given so saving nuisflat output to:"
+    NUIS_LOG(FIT, "No output file given so saving nuisflat output to:"
                   << gOptOutputFile);
   } else {
-    QLOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
+    NUIS_LOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
   }
 
   // Get N Events and Configs
@@ -137,13 +137,13 @@ void GetCommandLineArgs(int argc, char **argv) {
 
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
-    QLOG(FIT, "Reading cardfile: " << gOptCardInput);
+    NUIS_LOG(FIT, "Reading cardfile: " << gOptCardInput);
     configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
   if (gOptOptions != "") {
-    QLOG(FIT, "Read options: \"" << gOptOptions << "\'");
+    NUIS_LOG(FIT, "Read options: \"" << gOptOptions << "\'");
   }
   return;
 }
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
   // Make output file
   TFile *f = new TFile(gOptOutputFile.c_str(), "RECREATE");
   if (f->IsZombie()) {
-    QTHROW("Cannot create output file!");
+    NUIS_ABORT("Cannot create output file!");
   }
   f->cd();
   FitPar::Config().out = f;
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
                                               FitBase::GetRW(), gOptType, "");
 
   } else {
-    QERROR(FTL, "Unknown FlatTree format!");
+    NUIS_ERR(FTL, "Unknown FlatTree format!");
   }
 
   // Make the FlatTree reconfigure
@@ -197,9 +197,9 @@ int main(int argc, char *argv[]) {
   f->Close();
 
   // Show Final Status
-  QLOG(FIT, "-------------------------------------");
-  QLOG(FIT, "Flattree Generation Complete.");
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "Flattree Generation Complete.");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return 0;
 }
@@ -207,12 +207,12 @@ int main(int argc, char *argv[]) {
 void SetupComparisonsFromXML() {
   //*************************************
 
-  QLOG(FIT, "Setting up nuiscomp");
+  NUIS_LOG(FIT, "Setting up nuiscomp");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    QLOG(FIT, "Number of parameters :  " << parkeys.size());
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -220,16 +220,16 @@ void SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      QERROR(FTL, "No type given for parameter " << i);
-      QERROR(FTL, "type='PARAMETER_TYPE'");
+      NUIS_ERR(FTL, "No type given for parameter " << i);
+      NUIS_ERR(FTL, "type='PARAMETER_TYPE'");
       throw;
     } else if (!key.Has("name")) {
-      QERROR(FTL, "No name given for parameter " << i);
-      QERROR(FTL, "name='SAMPLE_NAME'");
+      NUIS_ERR(FTL, "No name given for parameter " << i);
+      NUIS_ERR(FTL, "name='SAMPLE_NAME'");
       throw;
     } else if (!key.Has("nominal")) {
-      QERROR(FTL, "No nominal given for parameter " << i);
-      QERROR(FTL, "nominal='NOMINAL_VALUE'");
+      NUIS_ERR(FTL, "No nominal given for parameter " << i);
+      NUIS_ERR(FTL, "nominal='NOMINAL_VALUE'");
       throw;
     }
 
@@ -253,8 +253,8 @@ void SetupComparisonsFromXML() {
         ((int)key.Has("low") + (int)key.Has("high") + (int)key.Has("step"));
 
     if (limdef > 0 and limdef < 3) {
-      QERROR(FTL, "Incomplete limit set given for parameter : " << parname);
-      QERROR(
+      NUIS_ERR(FTL, "Incomplete limit set given for parameter : " << parname);
+      NUIS_ERR(
           FTL,
           "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' ");
       throw;
@@ -267,11 +267,11 @@ void SetupComparisonsFromXML() {
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parlow << " < p < " << parhigh << " : "
                         << parstate);
     } else {
-      QLOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
                         << " : " << parstate);
     }
 
@@ -300,7 +300,7 @@ void SetupComparisonsFromXML() {
   // Setup Samples ----------------------------------------------
   std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    QLOG(FIT,"Number of samples : " << samplekeys.size());
+    NUIS_LOG(FIT,"Number of samples : " << samplekeys.size());
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -315,7 +315,7 @@ void SetupComparisonsFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    QLOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
+    NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
              << sampletype << ") [Norm=" << samplenorm << "]" << std::endl
              << "                                -> input='" << samplefile
              << "'");
@@ -344,7 +344,7 @@ void SetupComparisonsFromXML() {
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    QLOG(FIT,"Number of fake parameters : " << fakekeys.size());
+    NUIS_LOG(FIT,"Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -352,10 +352,10 @@ void SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      QERROR(FTL, "No name given for fakeparameter " << i);
+      NUIS_ERR(FTL, "No name given for fakeparameter " << i);
       throw;
     } else if (!key.Has("nominal")) {
-      QERROR(FTL, "No nominal given for fakeparameter " << i);
+      NUIS_ERR(FTL, "No nominal given for fakeparameter " << i);
       throw;
     }
 
@@ -372,7 +372,7 @@ void SetupComparisonsFromXML() {
 void SetupRWEngine() {
   //*************************************
 
-  QLOG(FIT,"Setting up FitWeight Engine");
+  NUIS_LOG(FIT,"Setting up FitWeight Engine");
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
     FitBase::GetRW()->IncludeDial(name, fTypeVals.at(name));

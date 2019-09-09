@@ -34,7 +34,7 @@ ThresholdAccepter::KineVar GetKineType(nuiskey &nk) {
   } else if (nk.Has("RecoThresholdAbsCosTheta_Min")) {
     return ThresholdAccepter::kAbsCosTheta_Min;
   } else {
-    QTHROW("Cannot determine the threshold type for Smearcepter element.");
+    NUIS_ABORT("Cannot determine the threshold type for Smearcepter element.");
   }
   return ThresholdAccepter::kNoVar;
 }
@@ -142,7 +142,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
       ReconThresholds[pdgs_i[pdg_it]].push_back(t);
 
-      QLOG(FIT, "Added reconstruction threshold of type: "
+      NUIS_LOG(FIT, "Added reconstruction threshold of type: "
                     << ReconThresholds[pdgs_i[pdg_it]].back().ThresholdVal
                     << " "
                     << GetKineTypeName(
@@ -160,7 +160,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
     for (size_t pdg_it = 0; pdg_it < pdgs_i.size(); ++pdg_it) {
       if (VisThresholds.count(pdgs_i[pdg_it])) {
-        QERROR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
+        NUIS_ERR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
                                   << " already has a threshold for PDG: "
                                   << pdgs_i[pdg_it]);
       }
@@ -182,7 +182,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
             visThresholdDescriptors[t_it].GetD("VisThresholdMomentum_MeV");
         ;
       } else {
-        QERROR(WRN, "Smearceptor "
+        NUIS_ERR(WRN, "Smearceptor "
                        << ElementName << ":" << InstanceName
                        << " cannot find threshold information for PDG: "
                        << pdgs_i[pdg_it]);
@@ -191,7 +191,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
       VisThresholds[pdgs_i[pdg_it]] = vt;
 
-      QLOG(FIT,
+      NUIS_LOG(FIT,
            "Added visibility threshold of MeV "
                << VisThresholds[pdgs_i[pdg_it]].ThresholdVal << " "
                << GetKineTypeName(VisThresholds[pdgs_i[pdg_it]].ThresholdType)

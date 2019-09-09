@@ -71,7 +71,7 @@ TH1D *GetTH1DFromFile(std::string const &rootFile,
                       std::string const &histName) {
   TFile *inpFile = new TFile(rootFile.c_str(), "READ");
   if (!inpFile || !inpFile->IsOpen()) {
-    QTHROW("Cannot open input root file: " << rootFile
+    NUIS_ABORT("Cannot open input root file: " << rootFile
                                            << " to read input histo.");
   }
 
@@ -79,7 +79,7 @@ TH1D *GetTH1DFromFile(std::string const &rootFile,
   if (!histD) {
     TH1F *histF = dynamic_cast<TH1F *>(inpFile->Get(histName.c_str()));
     if (!histF) {
-      QTHROW("Cannot find TH1D/F: " << histName << " in root file: " << rootFile
+      NUIS_ABORT("Cannot find TH1D/F: " << histName << " in root file: " << rootFile
                                     << ".");
     }
     histD = F2D(histF);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
       if ((fluxInputDescriptor.size() != 2) &&
           (fluxInputDescriptor.size() != 3) &&
           (fluxInputDescriptor.size() != 4)) {
-        QTHROW("Received -F argument with option: \""
+        NUIS_ABORT("Received -F argument with option: \""
                << inpLine
                << "\", was expecting "
                   "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
 
       if (!FluxInputs.back().File.length() ||
           !FluxInputs.back().Hist.length()) {
-        QTHROW("Received -F argument with option: \""
+        NUIS_ABORT("Received -F argument with option: \""
                << inpLine
                << "\", was expecting "
                   "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
   CreateRateHistograms(inputfiles[0], force_output);
 
-  QLOG(FIT, "Finished NUWRO Prep.");
+  NUIS_LOG(FIT, "Finished NUWRO Prep.");
 };
 
 //*******************************
@@ -171,17 +171,17 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       outputNewFile) { // we need to make the new file and clone the tree.
     TFile *inpFile = new TFile(inputs.c_str(), "READ");
     if (!inpFile || !inpFile->IsOpen()) {
-      QTHROW("Cannot open input root file: " << inputs);
+      NUIS_ABORT("Cannot open input root file: " << inputs);
     }
     TTree *inpTree = dynamic_cast<TTree *>(inpFile->Get("treeout"));
     if (!inpTree) {
-      QTHROW("Cannot find TTree \"treeout\" in input root file: "
+      NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
              << inputs.c_str());
     }
 
     outRootFile = new TFile(ofile.c_str(), force_out ? "RECREATE" : "CREATE");
     if (!outRootFile || !outRootFile->IsOpen()) {
-      QTHROW("Couldn't open root file: "
+      NUIS_ABORT("Couldn't open root file: "
              << ofile << " for writing, does it already exist?");
     }
 
@@ -191,11 +191,11 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
   } else {
     outRootFile = new TFile(inputs.c_str(), "UPDATE");
     if (!outRootFile || !outRootFile->IsOpen()) {
-      QTHROW("Cannot open input root file: " << inputs);
+      NUIS_ABORT("Cannot open input root file: " << inputs);
     }
     nuwrotree = dynamic_cast<TTree *>(outRootFile->Get("treeout"));
     if (!nuwrotree) {
-      QTHROW("Cannot find TTree \"treeout\" in input root file: "
+      NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
              << inputs.c_str());
     }
   }
@@ -221,7 +221,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
 
   allpdg.push_back(0);
 
-  QLOG(FIT, "Nuwro fluxtype = " << fluxtype);
+  NUIS_LOG(FIT, "Nuwro fluxtype = " << fluxtype);
   if (haveFluxInputs) {
     double totalFraction = 0;
     for (size_t flux_it = 0; flux_it < FluxInputs.size(); ++flux_it) {
@@ -237,7 +237,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       double Ehigh = fluxHist->GetXaxis()->GetBinLowEdge(
           fluxHist->GetXaxis()->GetNbins() + 1);
 
-      QLOG(FIT, "Adding new nuwro flux "
+      NUIS_LOG(FIT, "Adding new nuwro flux "
                     << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
                     << " Ehigh: " << Ehigh);
 
@@ -273,7 +273,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       delete fluxHist;
     }
     if (fabs(totalFraction - 1) > 1E-5) {
-      QTHROW(FTL, "Total species fraction for input flux histos = "
+      NUIS_ABORT(FTL, "Total species fraction for input flux histos = "
                       << totalFraction << ", expected to sum to 1.");
     }
   } else if (fluxtype == 0) {
@@ -290,18 +290,18 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
 
     // For files produced with a flux distribution
     if (!isMono) {
-      QLOG(FIT, "Adding new nuwro flux "
+      NUIS_LOG(FIT, "Adding new nuwro flux "
                     << "pdg: " << pdg << " Elow: " << Elow
                     << " Ehigh: " << Ehigh);
 
       fluxplot =
           new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
       for (uint j = 2; j < fluxvals.size(); j++) {
-        QLOG(DEB, j << " " << fluxvals[j]);
+        NUIS_LOG(DEB, j << " " << fluxvals[j]);
         fluxplot->SetBinContent(j - 1, fluxvals[j]);
       }
     } else { // For monoenergetic fluxes
-      QLOG(FIT, "Adding mono-energetic nuwro flux "
+      NUIS_LOG(FIT, "Adding mono-energetic nuwro flux "
                     << "pdg: " << pdg << " E: " << Elow);
 
       fluxplot = new TH1D("fluxplot", "fluxplot", 100, 0, Elow * 2);
@@ -345,7 +345,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       double Elow = double(fluxvals[2]) / 1000.0;
       double Ehigh = double(fluxvals[3]) / 1000.0;
 
-      QLOG(FIT, "Adding new nuwro flux "
+      NUIS_LOG(FIT, "Adding new nuwro flux "
                     << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
                     << " Ehigh: " << Ehigh);
 
@@ -415,7 +415,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     intxseclist[pdg] += TotXSec;
 
     if (i % countwidth == 0) {
-      QLOG(FIT, "Processed " << i << " events "
+      NUIS_LOG(FIT, "Processed " << i << " events "
                              << " (" << int(i * 100.0 / nevents) << "%)"
                              << " : E, W, PDG = " << Enu << ", " << TotXSec
                              << ", " << pdg)
@@ -430,8 +430,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     int pdg = allpdg[i];
     double AvgXSec = intxseclist[0] * 1E38 / double(nevtlist[0]);
 
-    QLOG(FIT, pdg << " Avg XSec = " << AvgXSec);
-    QLOG(FIT, pdg << " nevents = " << double(nevtlist[pdg]));
+    NUIS_LOG(FIT, pdg << " Avg XSec = " << AvgXSec);
+    NUIS_LOG(FIT, pdg << " nevents = " << double(nevtlist[pdg]));
 
     if (!isMono) {
       // Convert events to PDF
@@ -479,7 +479,7 @@ void HaddNuwroFiles(std::vector<std::string> &inputs, bool force_out) {
   for (UInt_t i = 0; i < inputs.size(); i++) {
     cmd += inputs[i] + " ";
   }
-  QLOG(FIT, " Running HADD from PrepareNuwro: " << cmd);
+  NUIS_LOG(FIT, " Running HADD from PrepareNuwro: " << cmd);
 
   // Start HADD
   system(cmd.c_str());

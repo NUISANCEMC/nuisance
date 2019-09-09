@@ -4,7 +4,7 @@ void ParserUtils::CheckBadArguments(std::vector<std::string> args) {
 	// Any argument that has not already been erased is considered bad.
 	for (size_t i = 0; i < args.size(); i++) {
 		if (args[i][0] == '-') {
-		 QTHROW("Unknown command line option given : \'" << args[i] << "\'");
+		 NUIS_ABORT("Unknown command line option given : \'" << args[i] << "\'");
 		}
 	}
 }
@@ -21,7 +21,7 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 
 			// Found it
 			if (indexfound != -1 and !duplicates) {
-			 QTHROW("Duplicate arguments given with : " << opt << std::endl
+			 NUIS_ABORT("Duplicate arguments given with : " << opt << std::endl
 				      << "1 -> " << opt << " " << val << std::endl
 				      << "2 -> " << opt << " " << args[i + 1]);
 			}
@@ -34,7 +34,7 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 
 	// if not found
 	if (indexfound == -1 and required) {
-	 QTHROW("No flag " << opt << " found in commands."
+	 NUIS_ABORT("No flag " << opt << " found in commands."
 		      << "This is required!");
 	}
 
@@ -56,7 +56,7 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 
 			// Found it
 			if (indexfound != -1 and !duplicates) {
-			 QTHROW("Duplicate arguments given with : " << opt << std::endl
+			 NUIS_ABORT("Duplicate arguments given with : " << opt << std::endl
 				      << "1 -> " << opt << " " << val << std::endl
 				      << "2 -> " << opt << " " << args[i + 1]);
 			}
@@ -69,7 +69,7 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 
 	// if not found
 	if (indexfound == -1 and required) {
-	 QTHROW("No flag " << opt << " found in commands."
+	 NUIS_ABORT("No flag " << opt << " found in commands."
 		      << "This is required!");
 	}
 
@@ -90,7 +90,7 @@ void ParserUtils::ParseArgument(std::vector<std::string>& args, std::string opt,
 	}
 
 	if (required and val.empty()) {
-	 QTHROW("No flag " << opt << " found in commands."
+	 NUIS_ABORT("No flag " << opt << " found in commands."
 		      << "This is required!");
 	}
 }
@@ -147,7 +147,7 @@ void ParserUtils::ParseSplitArgument(std::vector<std::string>& args, std::string
 	}
 
 	if (required and val.empty()) {
-	 QTHROW( "No flag " << opt << " found in commands."
+	 NUIS_ABORT( "No flag " << opt << " found in commands."
 		       << "This is required!");
 		throw;
 	}

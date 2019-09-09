@@ -64,20 +64,20 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  QLOG(FIT, "Starting nuissyst");
+  NUIS_LOG(FIT, "Starting nuissyst");
 
   // Make systematic class and run fit
   SystematicRoutines *min = new SystematicRoutines(argc, argv);
   min->Run();
 
   // Show Final Status
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
   if (status == 0) {
-    QLOG(FIT, "Systematic Complete.");
+    NUIS_LOG(FIT, "Systematic Complete.");
   } else {
-    QERROR(FTL, "Systematic Failed (error state = " << status << ")");
+    NUIS_ERR(FTL, "Systematic Failed (error state = " << status << ")");
   }
-  QLOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return status;
 }

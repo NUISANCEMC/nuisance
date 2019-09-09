@@ -44,9 +44,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef __NEUT_ENABLED__
     input = new NEUTInputHandler(handle, newinputs);
 #else
-    QERROR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
+    NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
                                                      << " " << inputs);
-    QTHROW("NEUT is not enabled!");
+    NUIS_ABORT("NEUT is not enabled!");
 #endif
     break;
 
@@ -54,9 +54,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef __GENIE_ENABLED__
     input = new GENIEInputHandler(handle, newinputs);
 #else
-    QERROR(FTL, "Tried to create GENIEInputHandler : "
+    NUIS_ERR(FTL, "Tried to create GENIEInputHandler : "
                    << handle << " " << inpType << " " << inputs);
-    QTHROW("GENIE is not enabled!");
+    NUIS_ABORT("GENIE is not enabled!");
 #endif
     break;
 
@@ -64,9 +64,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef __NUWRO_ENABLED__
     input = new NuWroInputHandler(handle, newinputs);
 #else
-    QERROR(FTL, "Tried to create NuWroInputHandler : "
+    NUIS_ERR(FTL, "Tried to create NuWroInputHandler : "
                    << handle << " " << inpType << " " << inputs);
-    QTHROW("NuWro is not enabled!");
+    NUIS_ABORT("NuWro is not enabled!");
 #endif
     break;
 
@@ -74,9 +74,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef __GiBUU_ENABLED__
     input = new GIBUUInputHandler(handle, newinputs);
 #else
-    QERROR(FTL, "Tried to create GiBUUInputHandler : "
+    NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
                    << handle << " " << inpType << " " << inputs);
-    QTHROW("GiBUU is not enabled!");
+    NUIS_ABORT("GiBUU is not enabled!");
 #endif
     break;
 
@@ -84,9 +84,9 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #ifdef __NUANCE_ENABLED__
     input = new NUANCEInputHandler(handle, newinputs);
 #else
-    QERROR(FTL, "Tried to create NUANCEInputHandler : "
+    NUIS_ERR(FTL, "Tried to create NUANCEInputHandler : "
                    << handle << " " << inpType << " " << inputs);
-    QTHROW("NUANCE is not enabled!");
+    NUIS_ABORT("NUANCE is not enabled!");
 #endif
     break;
 
@@ -112,7 +112,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   /// Input failed
   if (!input) {
-    QTHROW("Input handler creation failed!" << std::endl
+    NUIS_ABORT("Input handler creation failed!" << std::endl
                                             << "Generator Type " << inpType
                                             << " not enabled!");
   }

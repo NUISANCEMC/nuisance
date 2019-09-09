@@ -135,7 +135,7 @@ std::vector<std::string> GeneralUtils::ParseFileToStr(std::string str,
   read.open(str.c_str());
 
   if (!read.is_open()) {
-    QERROR(FTL, "Cannot open file " << str << " in ParseFileToStr");
+    NUIS_ERR(FTL, "Cannot open file " << str << " in ParseFileToStr");
     throw;
   }
 
@@ -155,7 +155,7 @@ std::string GeneralUtils::GetTopLevelDir() {
   if (first) {
     char* const var = getenv("NUISANCE");
     if (!var) {
-      QERROR(FTL,
+      NUIS_ERR(FTL,
             "Cannot find top level directory! Set the NUISANCE environmental "
             "variable");
       throw;

@@ -232,11 +232,11 @@ void InputHandlerBase::SetupJointInputs() {
   }
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
   if (fMaxEvents != -1 and jointeventinputs.size() > 1) {
-    QTHROW("Can only handle joint inputs when config MAXEVENTS = -1!");
+    NUIS_ABORT("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
 
   if (jointeventinputs.size() > 1) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
           "GiBUU sample contains multiple inputs. This will only work for "
           "samples that expect multi-species inputs. If this sample does, you "
           "can ignore this warning.");

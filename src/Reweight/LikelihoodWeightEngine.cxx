@@ -6,7 +6,7 @@ LikelihoodWeightEngine::LikelihoodWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  QLOG(FIT, "Setting up Likelihood Weight RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up Likelihood Weight RW : " << fCalcName);
 
   // Set Abs Twk Config
   fIsAbsTwk = true;

@@ -341,11 +341,11 @@ void PlotUtils::FluxUnfoldedScaling(TH2D *fMCHist, TH1D *fhist, TH1D *ehist,
       xaxis.find("nu") != std::string::npos) {
     // First check that xaxis didn't also find Enu
     if (EnuOnXaxis) {
-      QERROR(FTL, fMCHist->GetTitle() << " error:");
-      QERROR(FTL, "Found Enu in xaxis title: " << xaxis);
-      QERROR(FTL, "AND");
-      QERROR(FTL, "Found Enu in yaxis title: " << yaxis);
-      QTHROW("Enu on x and Enu on y flux unfolded scaling isn't "
+      NUIS_ERR(FTL, fMCHist->GetTitle() << " error:");
+      NUIS_ERR(FTL, "Found Enu in xaxis title: " << xaxis);
+      NUIS_ERR(FTL, "AND");
+      NUIS_ERR(FTL, "Found Enu in yaxis title: " << yaxis);
+      NUIS_ABORT("Enu on x and Enu on y flux unfolded scaling isn't "
              "implemented, please modify "
              << __FILE__ << ":" << __LINE__);
     }
@@ -611,7 +611,7 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     // Make a TGraph Errors
     TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
     if (gr->IsZombie()) {
-      QTHROW(dataFile
+      NUIS_ABORT(dataFile
              << " is a zombie and could not be read. Are you sure it exists?"
              << std::endl);
     }
@@ -767,7 +767,7 @@ TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
   TFile *rootHistFile = new TFile(file.c_str(), "READ");
   TH1D *tempHist = (TH1D *)rootHistFile->Get(name.c_str())->Clone();
   if (tempHist == NULL) {
-    QTHROW("Could not find distribution " << name << " in file " << file);
+    NUIS_ABORT("Could not find distribution " << name << " in file " << file);
   }
   tempHist->SetDirectory(0);
 
@@ -802,11 +802,11 @@ TH1 *PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
 
   TFile *rootHistFile = new TFile(file.c_str(), "READ");
   if (!rootHistFile || rootHistFile->IsZombie()) {
-    QTHROW("Couldn't open root file: \"" << file << "\".");
+    NUIS_ABORT("Couldn't open root file: \"" << file << "\".");
   }
   TH1 *tempHist = dynamic_cast<TH1 *>(rootHistFile->Get(name.c_str())->Clone());
   if (!tempHist) {
-    QTHROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
+    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
                                    << "\".");
   }
   tempHist->SetDirectory(0);
@@ -828,14 +828,14 @@ TGraph *PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
 
   TFile *rootHistFile = new TFile(file.c_str(), "READ");
   if (!rootHistFile || rootHistFile->IsZombie()) {
-    QTHROW("Couldn't open root file: \"" << file << "\".");
+    NUIS_ABORT("Couldn't open root file: \"" << file << "\".");
   }
   TDirectory *newdir = gDirectory;
 
   TGraph *temp =
       dynamic_cast<TGraph *>(rootHistFile->Get(name.c_str())->Clone());
   if (!temp) {
-    QTHROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
+    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
                                    << "\".");
   }
   newdir->Remove(temp);
@@ -859,7 +859,7 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
 
     std::vector<std::string> fname = GeneralUtils::ParseToStr(d, "[");
     if (!fname.size() || !fname[0].length()) {
-      QTHROW("Couldn't find input file when attempting to parse : \""
+      NUIS_ABORT("Couldn't find input file when attempting to parse : \""
              << d << "\". Expected input.root[hist1|hist2|...].");
     }
 
@@ -869,7 +869,7 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
     std::vector<std::string> histnames =
         GeneralUtils::ParseToStr(fname[1], "|");
     if (!histnames.size()) {
-      QTHROW("Couldn't find any histogram name specifiers when attempting to "
+      NUIS_ABORT("Couldn't find any histogram name specifiers when attempting to "
              "parse "
              ": \""
              << fname[1] << "\". Expected hist1|hist2|...");
@@ -877,14 +877,14 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
 
     TFile *rootHistFile = new TFile(fname[0].c_str(), "READ");
     if (!rootHistFile || rootHistFile->IsZombie()) {
-      QTHROW("Couldn't open root file: \"" << fname[0] << "\".");
+      NUIS_ABORT("Couldn't open root file: \"" << fname[0] << "\".");
     }
 
     for (size_t i = 0; i < histnames.size(); ++i) {
       TH1 *tempHist =
           dynamic_cast<TH1 *>(rootHistFile->Get(histnames[i].c_str())->Clone());
       if (!tempHist) {
-        QTHROW("Couldn't retrieve: \""
+        NUIS_ABORT("Couldn't retrieve: \""
                << histnames[i] << "\" from root file: \"" << fname[0] << "\".");
       }
       tempHist->SetDirectory(0);
@@ -955,32 +955,32 @@ TH2D *PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx,
       DataPlot->SetBinError(nBinsX, nBinsY, 0.0);
     }
     if (oldBinsY > 0 && oldBinsY != nBinsY) {
-      QERROR(FTL, "Found non-uniform y-binning in " << data);
-      QERROR(FTL, "Previous slice: " << oldBinsY);
-      QERROR(FTL, "Current slice: " << nBinsY);
-      QTHROW("Non-uniform binning is not supported in "
+      NUIS_ERR(FTL, "Found non-uniform y-binning in " << data);
+      NUIS_ERR(FTL, "Previous slice: " << oldBinsY);
+      NUIS_ERR(FTL, "Current slice: " << nBinsY);
+      NUIS_ABORT("Non-uniform binning is not supported in "
              "PlotUtils::GetTH2DFromTextFile");
     }
   }
 
   // Check x bins
   if (size_t(nBinsX + 1) != xbins.size()) {
-    QERROR(FTL, "Number of x bins in data histogram does not match the binning "
+    NUIS_ERR(FTL, "Number of x bins in data histogram does not match the binning "
                 "histogram!");
-    QERROR(FTL,
+    NUIS_ERR(FTL,
            "Are they the wrong way around (i.e. xbinning should be ybinning)?");
-    QERROR(FTL, "Data: " << nBinsX);
-    QTHROW("From " << binx << " binning: " << xbins.size());
+    NUIS_ERR(FTL, "Data: " << nBinsX);
+    NUIS_ABORT("From " << binx << " binning: " << xbins.size());
   }
 
   // Check y bins
   if (size_t(nBinsY + 1) != ybins.size()) {
-    QERROR(FTL, "Number of y bins in data histogram does not match the binning "
+    NUIS_ERR(FTL, "Number of y bins in data histogram does not match the binning "
                 "histogram!");
-    QERROR(FTL,
+    NUIS_ERR(FTL,
            "Are they the wrong way around (i.e. xbinning should be ybinning)?");
-    QERROR(FTL, "Data: " << nBinsY);
-    QTHROW("From " << biny << " binning: " << ybins.size());
+    NUIS_ERR(FTL, "Data: " << nBinsY);
+    NUIS_ABORT("From " << biny << " binning: " << ybins.size());
   }
 
   return DataPlot;
@@ -1032,7 +1032,7 @@ void PlotUtils::MaskBins(TH1D *hist, TH1I *mask) {
     hist->SetBinContent(i + 1, 0.0);
     hist->SetBinError(i + 1, 0.0);
 
-    QLOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
+    NUIS_LOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
                                << " to 0.0 +- 0.0");
   }
 
@@ -1048,7 +1048,7 @@ void PlotUtils::MaskBins(TH2D *hist, TH2I *mask) {
       hist->SetBinContent(i + 1, j + 1, 0.0);
       hist->SetBinError(i + 1, j + 1, 0.0);
 
-      QLOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1 << " "
+      NUIS_LOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1 << " "
                                  << j + 1 << " to 0.0 +- 0.0");
     }
   }

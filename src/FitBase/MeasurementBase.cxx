@@ -99,7 +99,7 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
     std::vector<std::string> file_descriptor =
         GeneralUtils::ParseToStr(inputfile, ":");
     if (file_descriptor.size() != 2) {
-      QTHROW("File descriptor had no filetype declaration: \""
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
              << inputfile << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inpType =
@@ -114,7 +114,7 @@ void MeasurementBase::SetupInputs(std::string inputfile) {
   std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(inputfile, ":");
   if (file_descriptor.size() != 2) {
-    QTHROW("File descriptor had no filetype declaration: \""
+    NUIS_ABORT("File descriptor had no filetype declaration: \""
            << inputfile << "\". expected \"FILETYPE:file.root\"");
   }
   fInputType = InputUtils::ParseInputType(file_descriptor[0]);
@@ -143,7 +143,7 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
   fName = setting.GetS("name");
 
   // Used as an initial setup function incase we need to do anything here.
-  QLOG(SAM, "Loading Sample : " << setting.GetName());
+  NUIS_LOG(SAM, "Loading Sample : " << setting.GetName());
 
   fEvtRateScaleFactor = 0xdeadbeef;
 
@@ -170,17 +170,17 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
           fNPOT;
       fEvtRateScaleFactor = NNeutrinos * NNucleons;
 
-      QLOG(SAM, "\tEvent rate prediction : ");
-      QLOG(SAM, "\t\tTarget volume : " << fTargetVolume << " m^3");
-      QLOG(SAM, "\t\tTarget density : " << fTargetMaterialDensity << " kg/m^3");
-      QLOG(SAM, "\t\tTarget mass : " << TargetMass_kg << " kg");
-      QLOG(SAM, "\t\tNTarget Nucleons : " << NNucleons);
+      NUIS_LOG(SAM, "\tEvent rate prediction : ");
+      NUIS_LOG(SAM, "\t\tTarget volume : " << fTargetVolume << " m^3");
+      NUIS_LOG(SAM, "\t\tTarget density : " << fTargetMaterialDensity << " kg/m^3");
+      NUIS_LOG(SAM, "\t\tTarget mass : " << TargetMass_kg << " kg");
+      NUIS_LOG(SAM, "\t\tNTarget Nucleons : " << NNucleons);
       if ((fNPOT != 1)) {
-        QLOG(SAM, "\t\tTotal POT : " << fNPOT);
+        NUIS_LOG(SAM, "\t\tTotal POT : " << fNPOT);
       }
-      QLOG(SAM, "\t\tNNeutrinos : "
+      NUIS_LOG(SAM, "\t\tNNeutrinos : "
                     << NNeutrinos << ((fNPOT != 1) ? " /cm^2" : " /POT /cm^2"));
-      QLOG(SAM, "\t\tXSec -> EvtRate scale factor : " << fEvtRateScaleFactor);
+      NUIS_LOG(SAM, "\t\tXSec -> EvtRate scale factor : " << fEvtRateScaleFactor);
     }
   }
 
@@ -210,7 +210,7 @@ void MeasurementBase::FinaliseSampleSettings() {
 void MeasurementBase::Reconfigure() {
   //***********************************************
 
-  QLOG(REC, " Reconfiguring sample " << fName);
+  NUIS_LOG(REC, " Reconfiguring sample " << fName);
 
   // Reset Histograms
   ResetExtraHistograms();
@@ -267,7 +267,7 @@ void MeasurementBase::Reconfigure() {
          << std::setw(5) << fYVar << ", " << std::setw(5) << fYVar << ", "
          << std::setw(3) << (int)Mode << ", " << std::setw(5) << Weight << "] "
          << std::endl;
-      QLOG(SAM, ss.str());
+      NUIS_LOG(SAM, ss.str());
     }
 
     // iterate
@@ -275,11 +275,11 @@ void MeasurementBase::Reconfigure() {
     i++;
   }
 
-  QLOG(SAM, npassed << "/" << fNEvents << " passed selection ");
+  NUIS_LOG(SAM, npassed << "/" << fNEvents << " passed selection ");
   if (npassed == 0) {
-    QLOG(SAM, "WARNING: NO EVENTS PASSED SELECTION!");
+    NUIS_LOG(SAM, "WARNING: NO EVENTS PASSED SELECTION!");
   }
-  QLOG(REC,
+  NUIS_LOG(REC,
        std::setw(10) << std::right << NSignal << "/" << fNEvents
                      << " events passed selection + binning after reweight");
 
@@ -348,11 +348,11 @@ void MeasurementBase::ConvertEventRates() {
 
   double normval = fRW->GetSampleNorm(this->fName);
   if (normval < 0.01 or normval > 10.0) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "Norm Value inside MeasurementBase::ConvertEventRates() looks off!");
-    QERROR(WRN,
+    NUIS_ERR(WRN,
            "It could have become out of sync with the minimizer norm list.");
-    QERROR(WRN, "Setting it to 1.0");
+    NUIS_ERR(WRN, "Setting it to 1.0");
     normval = 1.0;
   }
   AutoNormExtraTH1(normval);
@@ -365,7 +365,7 @@ InputHandlerBase *MeasurementBase::GetInput() {
   //***********************************************
 
   if (!fInput) {
-    QTHROW("MeasurementBase::fInput not set. Please submit your command "
+    NUIS_ABORT("MeasurementBase::fInput not set. Please submit your command "
            "line options and input cardfile with a bug report to: "
            "nuisance@projects.hepforge.org");
   }
@@ -532,7 +532,7 @@ void MeasurementBase::SetAutoProcessTH1(StackBase *hist, int c1, int c2, int c3,
       break;
 
     case kCMD_Fill: {
-      QERROR(FTL, "Can't auto fill yet!");
+      NUIS_ERR(FTL, "Can't auto fill yet!");
       break;
     }
 
@@ -544,7 +544,7 @@ void MeasurementBase::SetAutoProcessTH1(StackBase *hist, int c1, int c2, int c3,
 }
 
 void MeasurementBase::AutoFillExtraTH1() {
-  QTHROW("Can't auto fill yet! it's too inefficent!");
+  NUIS_ABORT("Can't auto fill yet! it's too inefficent!");
   return;
 }
 

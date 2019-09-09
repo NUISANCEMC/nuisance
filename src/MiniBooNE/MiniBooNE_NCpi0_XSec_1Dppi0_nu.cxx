@@ -120,9 +120,9 @@ bool MiniBooNE_NCpi0_XSec_1Dppi0_nu::isSignal(FitEvent *event) {
 };
 
 void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetDataValues(std::string dataFile) {
-  QLOG(SAM, this->fName << "Setting data for " << this->fName);
-  QLOG(SAM, this->fName << "From: " << dataFile);
-  QLOG(SAM, this->fName << "Reading error from covariance");
+  NUIS_LOG(SAM, this->fName << "Setting data for " << this->fName);
+  NUIS_LOG(SAM, this->fName << "From: " << dataFile);
+  NUIS_LOG(SAM, this->fName << "Reading error from covariance");
 
   TGraph *gr = new TGraph(dataFile.c_str());
   this->fXBins = gr->GetX();
@@ -150,9 +150,9 @@ void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetDataValues(std::string dataFile) {
 
 void MiniBooNE_NCpi0_XSec_1Dppi0_nu::SetCovarMatrix(std::string covarFile,
                                                     int dim) {
-  QLOG(SAM, this->fName << "===============");
-  QLOG(SAM, this->fName << "Reading covariance: " << this->fName);
-  QLOG(SAM, this->fName << "From: " << covarFile);
+  NUIS_LOG(SAM, this->fName << "===============");
+  NUIS_LOG(SAM, this->fName << "Reading covariance: " << this->fName);
+  NUIS_LOG(SAM, this->fName << "From: " << covarFile);
   // tracks line number
   int row = 0;
 

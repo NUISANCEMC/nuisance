@@ -84,10 +84,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
       (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
       this->TotalIntegratedFlux();
   if (fScaleFactor <= 0.0) {
-    QTHROW("SCALE FACTOR TOO LOW ");
+    NUIS_ABORT("SCALE FACTOR TOO LOW ");
   }
 
-  QLOG(SAM, " Generic Flux Scaling Factor = "
+  NUIS_LOG(SAM, " Generic Flux Scaling Factor = "
                 << fScaleFactor
                 << " [= " << (GetEventHistogram()->Integral("width") * 1E-38)
                 << "/(" << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux()
@@ -106,7 +106,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding Event Variables");
+  NUIS_LOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
@@ -211,7 +211,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  QLOG(SAM, "Adding signal flags");
+  NUIS_LOG(SAM, "Adding signal flags");
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
@@ -280,7 +280,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  QLOG(DEB, "Filling signal");
+  NUIS_LOG(DEB, "Filling signal");
 
   // Reset the private variables (see header)
   ResetVariables();

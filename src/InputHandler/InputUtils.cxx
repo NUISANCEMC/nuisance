@@ -55,7 +55,7 @@ InputType ParseInputType(std::string const &inp) {
 bool IsJointInput(std::string const &inputs) {
   bool isJoint = (inputs[0] == '(');
   if (isJoint && (inputs[inputs.length() - 1] != ')')) {
-    QTHROW("Inputs specifier: \""
+    NUIS_ABORT("Inputs specifier: \""
            << inputs
            << "\" looks like a composite input specifier -- "
               "(filea.root,fileb.root), however, it did not end in a \')\', "
@@ -140,11 +140,11 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
 
   TFile *inpF = TFile::Open(inpFName.c_str(), "READ");
   if (!inpF || !inpF->IsOpen()) {
-    QTHROW("Couldn't open \"" << inpFName << "\" for reading.");
+    NUIS_ABORT("Couldn't open \"" << inpFName << "\" for reading.");
   }
   InputType iType = GuessInputTypeFromFile(inpF);
   if (iType == kInvalid_Input) {
-    QTHROW("Couldn't determine input type from file: " << inpFName << ".");
+    NUIS_ABORT("Couldn't determine input type from file: " << inpFName << ".");
   }
   inpF->Close();
   delete inpF;
@@ -163,7 +163,7 @@ std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
     return "GiBUU:" + inpFName;
   }
   default: {
-    QTHROW("Input type from file: " << inpFName << " was invalid.");
+    NUIS_ABORT("Input type from file: " << inpFName << " was invalid.");
     throw;
   }
   }

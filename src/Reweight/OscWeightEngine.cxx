@@ -46,7 +46,7 @@ nuTypes GetNuType(int pdg) {
       return kNumubarType;
     case -12:
       return kNuebarType;
-    default: { QTHROW("Attempting to convert \"neutrino pdg\": " << pdg); }
+    default: { NUIS_ABORT("Attempting to convert \"neutrino pdg\": " << pdg); }
   }
 }
 
@@ -71,7 +71,7 @@ void OscWeightEngine::Config() {
   std::vector<nuiskey> OscParam = Config::QueryKeys("OscParam");
 
   if (OscParam.size() < 1) {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
           "Oscillation parameters specified but no OscParam element "
           "configuring the experimental characteristics found.\nExpect at "
           "least <OscParam baseline_km=\"XXX\" />. Pausing for "
@@ -92,7 +92,7 @@ void OscWeightEngine::Config() {
     static const double deg2rad = asin(1) / 90.0;
     LengthParam = cos(OscParam[0].GetD("detection_zenith_deg") * deg2rad);
   } else {
-    QERROR(WRN,
+    NUIS_ERR(WRN,
           "It appeared that you wanted to set up an oscillation weight "
           "branch, but it was not correctly configured. You need to specify "
           "either: detection_zenith_deg or baseline_km attributes on the "
@@ -119,17 +119,17 @@ void OscWeightEngine::Config() {
                        ? GetNuType(OscParam[0].GetI("ForceFromNuPDG"))
                        : 0;
 
-  QLOG(FIT, "Configured oscillation weighter:");
+  NUIS_LOG(FIT, "Configured oscillation weighter:");
 
   if (LengthParamIsZenith) {
-    QLOG(FIT,
+    NUIS_LOG(FIT,
          "Earth density profile with detection cos(zenith) = " << LengthParam);
   } else {
     if (constant_density != 0xdeadbeef) {
-      QLOG(FIT,
+      NUIS_LOG(FIT,
            "Constant density with experimental baseline = " << LengthParam);
     } else {
-      QLOG(FIT,
+      NUIS_LOG(FIT,
            "Vacuum oscillations with experimental baseline = " << LengthParam);
     }
   }
@@ -141,17 +141,17 @@ void OscWeightEngine::Config() {
   params[4] = theta12;
   params[5] = dcp;
 
-  QLOG(FIT, "\tdm23   : " << params[0]);
-  QLOG(FIT, "\tsinsq_theta23: " << params[1]);
-  QLOG(FIT, "\tsinsq_theta13: " << params[2]);
-  QLOG(FIT, "\tdm12   : " << params[3]);
-  QLOG(FIT, "\tsinsq_theta12: " << params[4]);
-  QLOG(FIT, "\tdcp   : " << params[5]);
+  NUIS_LOG(FIT, "\tdm23   : " << params[0]);
+  NUIS_LOG(FIT, "\tsinsq_theta23: " << params[1]);
+  NUIS_LOG(FIT, "\tsinsq_theta13: " << params[2]);
+  NUIS_LOG(FIT, "\tdm12   : " << params[3]);
+  NUIS_LOG(FIT, "\tsinsq_theta12: " << params[4]);
+  NUIS_LOG(FIT, "\tdcp   : " << params[5]);
   if (TargetNuType) {
-    QLOG(FIT, "\tTargetNuType: " << TargetNuType);
+    NUIS_LOG(FIT, "\tTargetNuType: " << TargetNuType);
   }
   if (ForceFromNuPDG) {
-    QLOG(FIT, "\tForceFromNuPDG: " << ForceFromNuPDG);
+    NUIS_LOG(FIT, "\tForceFromNuPDG: " << ForceFromNuPDG);
   }
 
 #ifdef __PROB3PP_ENABLED__
@@ -160,7 +160,7 @@ void OscWeightEngine::Config() {
   bp.DefinePath(LengthParam, 0);
 
   if (LengthParamIsZenith) {
-    QLOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
+    NUIS_LOG(FIT, "\tBaseline   : " << (bp.GetBaseline() / 100.0) << " km.");
   }
 #endif
 }
@@ -171,7 +171,7 @@ void OscWeightEngine::IncludeDial(std::string name, double startval) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    QTHROW("OscWeightEngine passed dial: " << name
+    NUIS_ABORT("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
   params[dial - 1] = startval;
@@ -191,7 +191,7 @@ void OscWeightEngine::SetDialValue(std::string name, double val) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    QTHROW("OscWeightEngine passed dial: " << name
+    NUIS_ABORT("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
 
@@ -210,14 +210,14 @@ bool OscWeightEngine::IsDialIncluded(int nuisenum) {
 double OscWeightEngine::GetDialValue(std::string name) {
   int dial = SystEnumFromString(name);
   if (!dial) {
-    QTHROW("OscWeightEngine passed dial: " << name
+    NUIS_ABORT("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
   return params[dial - 1];
 }
 double OscWeightEngine::GetDialValue(int nuisenum) {
   if (!(nuisenum % 1000) || (nuisenum % 1000) > 6) {
-    QTHROW("OscWeightEngine passed dial enum: "
+    NUIS_ABORT("OscWeightEngine passed dial enum: "
           << (nuisenum % 1000)
           << " that it does not understand, expected [1,6].");
   }
@@ -237,7 +237,7 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
   static bool Warned = false;
   if (evt->probe_E == 0xdeadbeef) {
     if (!Warned) {
-      QERROR(WRN,
+      NUIS_ERR(WRN,
             "Oscillation weights asked for but using 'litemode' or "
             "unsupported generator input. Pasuing for 10...");
       sleep(10);
@@ -282,12 +282,12 @@ double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
   }
 #ifdef DEBUG_OSC_WE
   if (prob_weight != prob_weight) {
-    QTHROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
                                          << " -- " << NuType << " -> "
                                          << TargetPDGNu << ")");
   }
   if (prob_weight > 1) {
-    QTHROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+    NUIS_ABORT("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
                                          << " -- " << NuType << " -> "
                                          << TargetPDGNu << ")");
   }
