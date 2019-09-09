@@ -95,7 +95,7 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   QLOG(SAM, "Smearceptance Flux Scaling Factor = " << fScaleFactor);
 
   if (fScaleFactor <= 0.0) {
-    ERROR(WRN, "SCALE FACTOR TOO LOW ");
+    QERROR(WRN, "SCALE FACTOR TOO LOW ");
     sleep(20);
   }
 
@@ -126,7 +126,7 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
     TrueBinH = GeneralUtils::StrToDbl(args[2]);
   }
   SVDTruncation = 0;
-  if (Config::HasPar("smear.true.binning")) {
+  if (Config::HasPar("smear.SVD.truncation")) {
     SVDTruncation = Config::GetParI("smear.SVD.truncation");
     QLOG(SAM, "Applying SVD truncation of: " << SVDTruncation)
   }
@@ -170,7 +170,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
           new TTree((fName + "_VARS").c_str(), (fName + "_VARS").c_str());
     }
 
-    LOG(SAM) << "Adding Event Variables" << std::endl;
+    QLOG(SAM, "Adding Event Variables");
 
     eventVariables->Branch("Omega_true", &Omega_true, "Omega_true/F");
     eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");

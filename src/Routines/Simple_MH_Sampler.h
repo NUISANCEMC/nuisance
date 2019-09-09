@@ -103,7 +103,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool SetVariableValue(unsigned int ivar, double value) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to set uninitialised variable.");
+      QERROR(WRN, "Tried to set uninitialised variable.");
       return false;
     }
     start_params[ivar].Val = value;
@@ -111,7 +111,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool SetVariableStepSize(unsigned int ivar, double value) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to set uninitialised variable.");
+      QERROR(WRN, "Tried to set uninitialised variable.");
       return false;
     }
     start_params[ivar].StepWidth = value;
@@ -119,7 +119,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool SetVariableLowerLimit(unsigned int ivar, double lower) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to set uninitialised variable.");
+      QERROR(WRN, "Tried to set uninitialised variable.");
       return false;
     }
     start_params[ivar].LowLim = lower;
@@ -127,7 +127,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool SetVariableUpperLimit(unsigned int ivar, double upper) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to set uninitialised variable.");
+      QERROR(WRN, "Tried to set uninitialised variable.");
       return false;
     }
     start_params[ivar].UpLim = upper;
@@ -140,7 +140,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool FixVariable(unsigned int ivar) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to fix uninitialised variable.");
+      QERROR(WRN, "Tried to fix uninitialised variable.");
       return false;
     }
     start_params[ivar].IsFixed = true;
@@ -148,7 +148,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool ReleaseVariable(unsigned int ivar) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to fix uninitialised variable.");
+      QERROR(WRN, "Tried to fix uninitialised variable.");
       return false;
     }
     start_params[ivar].IsFixed = false;
@@ -156,7 +156,7 @@ class Simple_MH_Sampler : public Minimizer {
   }
   bool IsFixedVariable(unsigned int ivar) {
     if (start_params.size() <= ivar) {
-      ERROR(WRN, "Tried to fix uninitialised variable.");
+      QERROR(WRN, "Tried to fix uninitialised variable.");
       return false;
     }
     return start_params[ivar].IsFixed;
@@ -211,7 +211,7 @@ class Simple_MH_Sampler : public Minimizer {
         size_t attempts = 0;
         do {
           if (attempts > 1000) {
-            THROW("After 1000 attempts, failed to throw Gaus("
+            QTHROW("After 1000 attempts, failed to throw Gaus("
                   << start_params[p_it].Val << ", "
                   << start_params[p_it].StepWidth << ") inside limits: [ "
                   << start_params[p_it].LowLim << " -- "
@@ -267,7 +267,7 @@ class Simple_MH_Sampler : public Minimizer {
       curr_params = propose_params;
       curr_value = propose_value;
       PrintResults();
-      THROW("Proposed a NAN value.");
+      QTHROW("Proposed a NAN value.");
     }
 
     std::cout << "[" << step_i << "] proposed: " << propose_value
@@ -295,7 +295,7 @@ class Simple_MH_Sampler : public Minimizer {
 
   bool Minimize() {
     if (!start_params.size()) {
-      ERROR(FTL, "No Parameters passed to Simple_MH_Sampler.");
+      QERROR(FTL, "No Parameters passed to Simple_MH_Sampler.");
       return false;
     }
 

@@ -45,7 +45,7 @@ GaussianSmearer::DependVar GetKineType(std::string const &axisvar) {
   } else if (axisvar == "Theta") {
     return GaussianSmearer::kTheta;
   }
-  THROW("Failed to parse smear type from \"" << axisvar << "\"");
+  QTHROW("Failed to parse smear type from \"" << axisvar << "\"");
 }
 
 std::string GetKineTypeName(GaussianSmearer::DependVar dv) {
@@ -68,7 +68,7 @@ std::string GetKineTypeName(GaussianSmearer::DependVar dv) {
     case GaussianSmearer::kTheta: {
       return "Theta";
     }
-    default: { THROW("NO VAR!"); }
+    default: { QTHROW("NO VAR!"); }
   }
 }
 }
@@ -115,7 +115,7 @@ void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
         std::vector<std::string> funcP =
             GeneralUtils::ParseToStr(funcDescriptor, "$");
         if (funcP.size() != 3) {
-          THROW(
+          QTHROW(
               "Expected Function attribute to contain 3 comma separated "
               "entries. e.g. Function=\"1/{V}$<low lim>$<high lim>\". ");
         }
@@ -149,7 +149,7 @@ void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
                      GeneralUtils::StrToDbl(funcP[1]),
                      GeneralUtils::StrToDbl(funcP[2]));
       } else {
-        THROW(
+        QTHROW(
             "Expected Function attribute with 3 comma separated "
             "entries. e.g. Function=\"1/x,<low lim>,<high lim>\". ");
       }
@@ -157,7 +157,7 @@ void GaussianSmearer::SpecifcSetup(nuiskey &nk) {
 
     for (size_t pdg_it = 0; pdg_it < pdgs_i.size(); ++pdg_it) {
       if (IsVisSmear && VisGausSmears.count(pdgs_i[pdg_it])) {
-        ERROR(WRN,
+        QERROR(WRN,
               "Smearceptor "
                   << ElementName << ":" << InstanceName
                   << " already has a Visible Energy smearing function for PDG: "
@@ -244,7 +244,7 @@ void GaussianSmearer::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
           kineProp = fp->P3().Theta();
           break;
         }
-        default: { THROW("Trying to find particle value for a kNoVar."); }
+        default: { QTHROW("Trying to find particle value for a kNoVar."); }
       }
 
       double Smeared;
@@ -276,11 +276,11 @@ void GaussianSmearer::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
             break;
           }
 
-          default: { THROW("SHOULDN'T BE HERE."); }
+          default: { QTHROW("SHOULDN'T BE HERE."); }
         }
         attempt++;
         if (attempt > 1000) {
-          THROW("Didn't get a good smeared value after " << attempt
+          QTHROW("Didn't get a good smeared value after " << attempt
                                                          << " attempts.");
         }
       }
@@ -332,7 +332,7 @@ void GaussianSmearer::SmearceptOneParticle(RecoInfo *ri, FitParticle *fp
         kineProp = fp->E();
         break;
       }
-      default: { THROW("Trying to find particle value for a kNoVar."); }
+      default: { QTHROW("Trying to find particle value for a kNoVar."); }
     }
 
     double Smeared;
@@ -406,7 +406,7 @@ void GaussianSmearer::SmearceptOneParticle(TVector3 &RecObjMom,
         kineProp = OriginalKP.Theta();
         break;
       }
-      default: { THROW("Trying to find particle value for a kNoVar."); }
+      default: { QTHROW("Trying to find particle value for a kNoVar."); }
     }
 
     double Smeared;
@@ -444,11 +444,11 @@ void GaussianSmearer::SmearceptOneParticle(TVector3 &RecObjMom,
           ok = true;
           break;
         }
-        default: { THROW("SHOULDN'T BE HERE."); }
+        default: { QTHROW("SHOULDN'T BE HERE."); }
       }
       attempt++;
       if (attempt > 1000) {
-        THROW("Didn't get a good smeared value after " << attempt
+        QTHROW("Didn't get a good smeared value after " << attempt
                                                        << " attempts.");
       }
     }

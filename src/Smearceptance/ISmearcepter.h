@@ -68,7 +68,7 @@ class ISmearcepter {
   /// Helper method for using this class as a component in a more complex
   /// smearer
   virtual void SmearRecoInfo(RecoInfo *) {
-    THROW("Smearcepter: " << ElementName
+    QTHROW("Smearcepter: " << ElementName
                           << " doesn't implement SmearRecoInfo.");
     ;
   }

@@ -45,7 +45,7 @@ void MetaSimpleSmearcepter::SpecifcSetup(nuiskey &nk) {
     }
 
     if (!factories.count(smearType)) {
-      ERROR(WRN, "No known smearer accepts elements named: \"" << smearType
+      QERROR(WRN, "No known smearer accepts elements named: \"" << smearType
                                                                << "\"");
       continue;
     }

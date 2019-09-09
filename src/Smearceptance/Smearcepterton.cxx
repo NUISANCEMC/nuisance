@@ -106,7 +106,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tDL Load Error: " << dlerr);
+            QERROR(WRN, "\tDL Load Error: " << dlerr);
             continue;
           }
 
@@ -124,7 +124,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tFailed to load symbol \"DSF_NSmearceptors\" from "
+            QERROR(WRN, "\tFailed to load symbol \"DSF_NSmearceptors\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -141,7 +141,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN,
+            QERROR(WRN,
                   "\tFailed to load symbol \"DSF_GetSmearceptorName\" from "
                       << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
@@ -159,7 +159,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tFailed to load symbol \"DSF_GetSmearceptor\" from "
+            QERROR(WRN, "\tFailed to load symbol \"DSF_GetSmearceptor\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -176,7 +176,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "Failed to load symbol \"DSF_DestroySmearceptor\" from "
+            QERROR(WRN, "Failed to load symbol \"DSF_DestroySmearceptor\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -190,13 +190,13 @@ void DynamicSmearceptorFactory::LoadPlugins() {
           for (size_t smp_it = 0; smp_it < plgManif.NSmearceptors; ++smp_it) {
             char const* smp_name = (*(plgManif.DSF_GetSmearceptorName))(smp_it);
             if (!smp_name) {
-              THROW("Could not load smearceptor "
+              QTHROW("Could not load smearceptor "
                     << smp_it << " / " << plgManif.NSmearceptors << " from "
                     << plgManif.soloc);
             }
 
             if (Smearceptors.count(smp_name)) {
-              ERROR(WRN, "Already loaded a smearceptor named: \""
+              QERROR(WRN, "Already loaded a smearceptor named: \""
                              << smp_name << "\". cannot load duplciates. This "
                                             "smearceptor will be skipped.");
               continue;
@@ -219,7 +219,7 @@ void DynamicSmearceptorFactory::LoadPlugins() {
       }
       closedir(dir);
     } else {
-      ERROR(WRN, "Tried to open non-existant directory.");
+      QERROR(WRN, "Tried to open non-existant directory.");
     }
   }
 }
@@ -260,7 +260,7 @@ bool DynamicSmearceptorFactory::HasSmearceptor(nuiskey& smearceptorkey) {
 ISmearcepter* DynamicSmearceptorFactory::CreateSmearceptor(
     nuiskey& smearceptorkey) {
   if (!HasSmearceptor(smearceptorkey)) {
-    ERROR(WRN, "Asked to load unknown smearceptor: \""
+    QERROR(WRN, "Asked to load unknown smearceptor: \""
                    << smearceptorkey.GetElementName() << "\".");
     return NULL;
   }
@@ -327,7 +327,7 @@ void Smearcepterton::InitialiserSmearcepters() {
 #endif
       {
         if (!factories.count(smearType)) {
-          ERROR(WRN, "No known smearer accepts elements named: \"" << smearType
+          QERROR(WRN, "No known smearer accepts elements named: \"" << smearType
                                                                    << "\"");
           continue;
         }
@@ -335,10 +335,10 @@ void Smearcepterton::InitialiserSmearcepters() {
       }
 
       if (!smearer) {
-        THROW("Failed to load smearceptor.");
+        QTHROW("Failed to load smearceptor.");
       }
       if (!smearer->GetName().length()) {
-        THROW("Smearcepter type " << smearer->GetElementName()
+        QTHROW("Smearcepter type " << smearer->GetElementName()
                                   << " had no instance name.");
       }
 

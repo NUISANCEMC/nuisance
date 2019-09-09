@@ -1,22 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
-
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include "GeneralUtils.h"
 
@@ -39,8 +38,8 @@ std::vector<std::string> ParseInputFileList(std::string const &inpFile) {
 InputType ParseInputType(std::string const &inp) {
   // The hard-coded list of supported input generators
   const static std::string filetypes[] = {
-      "NEUT",   "NUWRO", "GENIE",  "GiBUU", "NUANCE",
-      "EVSPLN", "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO"};
+      "NEUT",  "NUWRO",  "GENIE", "GiBUU",       "NUANCE", "EVSPLN",
+      "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO"};
 
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
 
@@ -56,12 +55,12 @@ InputType ParseInputType(std::string const &inp) {
 bool IsJointInput(std::string const &inputs) {
   bool isJoint = (inputs[0] == '(');
   if (isJoint && (inputs[inputs.length() - 1] != ')')) {
-    ERR(FTL) << "Inputs specifier: \"" << inputs
-             << "\" looks like a composite input specifier -- "
-                "(filea.root,fileb.root), however, it did not end in a \')\', "
-                "it ended in a \'"
-             << inputs[inputs.length() - 1] << "\'" << std::endl;
-    throw;
+    QTHROW("Inputs specifier: \""
+           << inputs
+           << "\" looks like a composite input specifier -- "
+              "(filea.root,fileb.root), however, it did not end in a \')\', "
+              "it ended in a \'"
+           << inputs[inputs.length() - 1] << "\'");
   }
   return isJoint;
 }
@@ -134,40 +133,39 @@ InputType GuessInputTypeFromFile(TFile *inpF) {
 
 std::string PrependGuessedInputTypeToName(std::string const &inpFName) {
 
-  //If it already has a name.
-  if(inpFName.find(":") != std::string::npos){
+  // If it already has a name.
+  if (inpFName.find(":") != std::string::npos) {
     return inpFName;
   }
 
   TFile *inpF = TFile::Open(inpFName.c_str(), "READ");
   if (!inpF || !inpF->IsOpen()) {
-    THROW("Couldn't open \"" << inpFName << "\" for reading.");
+    QTHROW("Couldn't open \"" << inpFName << "\" for reading.");
   }
   InputType iType = GuessInputTypeFromFile(inpF);
   if (iType == kInvalid_Input) {
-    THROW("Couldn't determine input type from file: " << inpFName << ".");
+    QTHROW("Couldn't determine input type from file: " << inpFName << ".");
   }
   inpF->Close();
   delete inpF;
 
   switch (iType) {
-    case kNEUT_Input: {
-      return "NEUT:" + inpFName;
-    }
-    case kNUWRO_Input: {
-      return "NUWRO:" + inpFName;
-    }
-    case kGENIE_Input: {
-      return "GENIE:" + inpFName;
-    }
-    case kGiBUU_Input: {
-      return "GiBUU:" + inpFName;
-    }
-    default: {
-      ERR(FTL) << "Input type from file: " << inpFName << " was invalid."
-               << std::endl;
-      throw;
-    }
+  case kNEUT_Input: {
+    return "NEUT:" + inpFName;
+  }
+  case kNUWRO_Input: {
+    return "NUWRO:" + inpFName;
+  }
+  case kGENIE_Input: {
+    return "GENIE:" + inpFName;
+  }
+  case kGiBUU_Input: {
+    return "GiBUU:" + inpFName;
+  }
+  default: {
+    QTHROW("Input type from file: " << inpFName << " was invalid.");
+    throw;
+  }
   }
 }
-}
+} // namespace InputUtils

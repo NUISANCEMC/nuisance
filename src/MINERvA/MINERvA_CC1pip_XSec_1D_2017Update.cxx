@@ -76,7 +76,7 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
     break;
 
   default:
-    THROW("Unknown Analysis Distribution : " << fDist);
+    QTHROW("Unknown Analysis Distribution : " << fDist);
   }
 
   // Choose shape or rate covariance
@@ -155,7 +155,7 @@ void MINERvA_CC1pip_XSec_1D_2017Update::FillEventVariables(FitEvent *event) {
     case kthmu: fXVar = thmu; break;
     case kQ2:   fXVar = Q2;   break;
     case kEnu:  fXVar = Enu;  break;
-    default: THROW("DIST NOT FOUND : " << fDist);
+    default: QTHROW("DIST NOT FOUND : " << fDist);
   }
 
 };

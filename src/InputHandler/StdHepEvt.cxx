@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include <iomanip>
 #include <iostream>
@@ -34,28 +34,26 @@ bool StdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("StdHepN", &StdHepN);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"StdHepN\": " << SBAStatus
-             << std::endl;
+    QERROR(WRN, "Failed to set branch address for \"StdHepN\": " << SBAStatus);
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepPdg", StdHepPdg);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"StdHepPdg\": " << SBAStatus
-             << std::endl;
+    QERROR(WRN,
+           "Failed to set branch address for \"StdHepPdg\": " << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("StdHepStatus", StdHepStatus);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"StdHepStatus\": "
-             << SBAStatus << std::endl;
+    QERROR(WRN,
+           "Failed to set branch address for \"StdHepStatus\": " << SBAStatus);
   }
 
   SBAStatus = chain->SetBranchAddress("StdHepP4", StdHepP4);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"StdHepP4\": " << SBAStatus
-             << std::endl;
+    QERROR(WRN, "Failed to set branch address for \"StdHepP4\": " << SBAStatus);
   }
   return ok;
 }
@@ -67,20 +65,19 @@ bool GiBUUStdHepReader::SetBranchAddresses(TChain *chain) {
   SBAStatus = chain->SetBranchAddress("GiBUU2NeutCode", &GiBUU2NeutCode);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"GiBUU2NeutCode\": "
-             << SBAStatus << std::endl;
+    QERROR(WRN, "Failed to set branch address for \"GiBUU2NeutCode\": "
+                    << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("GiBUUReactionCode", &GiBUUReactionCode);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"GiBUUReactionCode\": "
-             << SBAStatus << std::endl;
+    QERROR(WRN, "Failed to set branch address for \"GiBUUReactionCode\": "
+                    << SBAStatus);
   }
   SBAStatus = chain->SetBranchAddress("EvtWght", &EvtWght);
   ok = ok && (SBAStatus || SBAStatus == 5);
   if (!(!SBAStatus || SBAStatus == 5)) {
-    ERR(WRN) << "Failed to set branch address for \"EvtWght\": " << SBAStatus
-             << std::endl;
+    QERROR(WRN, "Failed to set branch address for \"EvtWght\": " << SBAStatus);
   }
   return ok;
 }
@@ -105,9 +102,8 @@ std::string WriteGiBUUEvent(GiBUUStdHepReader const &gi) {
 
   ss << "[INFO]: contained " << gi.StdHepN
      << ", Event Weight: " << std::setprecision(3) << gi.EvtWght
-     << ", NeutConventionReactionCode: " << gi.GiBUU2NeutCode
-     << "\n\t[Lep In](" << std::setw(3)
-       << gi.StdHepPdg[0] << ")  "
+     << ", NeutConventionReactionCode: " << gi.GiBUU2NeutCode << "\n\t[Lep In]("
+     << std::setw(3) << gi.StdHepPdg[0] << ")  "
      << TLorentzVector(gi.StdHepP4[0][StdHepReader::kStdHepIdxPx],
                        gi.StdHepP4[0][StdHepReader::kStdHepIdxPy],
                        gi.StdHepP4[0][StdHepReader::kStdHepIdxPz],
@@ -130,8 +126,7 @@ std::string WriteGiBUUEvent(GiBUUStdHepReader const &gi) {
                          gi.StdHepP4[stdHepInd][StdHepReader::kStdHepIdxE])
        << std::endl;
   }
-  ss << "\t[Lep Out](" << std::setw(3)
-       << gi.StdHepPdg[2] << ") "
+  ss << "\t[Lep Out](" << std::setw(3) << gi.StdHepPdg[2] << ") "
      << TLorentzVector(gi.StdHepP4[2][StdHepReader::kStdHepIdxPx],
                        gi.StdHepP4[2][StdHepReader::kStdHepIdxPy],
                        gi.StdHepP4[2][StdHepReader::kStdHepIdxPz],

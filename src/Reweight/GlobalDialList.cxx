@@ -30,19 +30,20 @@ void GlobalDialList::RegisterDialEnum(std::string name, int type,
     return;
   }
 
-  LOG(FIT) << "Registered Dial Enum : " << name << " " << type << " "
-           << nuisenum << std::endl;
+  QLOG(FIT,
+       "Registered Dial Enum : " << name << " " << type << " " << nuisenum);
   fAllDialNames.push_back(name);
   fAllDialTypes.push_back(type);
   fAllDialEnums.push_back(nuisenum);
 }
 
 /// Singleton functions
-GlobalDialList& Reweight::DialList() { return GlobalDialList::Get(); }
+GlobalDialList &Reweight::DialList() { return GlobalDialList::Get(); }
 
-GlobalDialList* GlobalDialList::m_diallistInstance = NULL;
+GlobalDialList *GlobalDialList::m_diallistInstance = NULL;
 
-GlobalDialList& GlobalDialList::Get(void) {
-  if (!m_diallistInstance) m_diallistInstance = new GlobalDialList;
+GlobalDialList &GlobalDialList::Get(void) {
+  if (!m_diallistInstance)
+    m_diallistInstance = new GlobalDialList;
   return *m_diallistInstance;
 }

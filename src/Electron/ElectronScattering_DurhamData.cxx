@@ -121,9 +121,8 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
   else if (!zstring.compare("8") && !astring.compare("16"))
     target = "16O.dat";
   else {
-    ERR(FTL) << "Target not supported in electron scattering module!"
-             << std::endl;
-    throw;
+    QTHROW("Target not supported in electron scattering module!"
+    );
   }
 
   // Fill Data Points
@@ -133,9 +132,8 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
                      std::ifstream::in);
 
   if (!mask.good()) {
-    ERR(FTL) << "Failed to open e-scattering database file: "
-             << (FitPar::GetDataBase() + "/Electron/" + target) << std::endl;
-    throw;
+    QTHROW("Failed to open e-scattering database file: "
+             << (FitPar::GetDataBase() + "/Electron/" + target));
   }
   int i = 0;
 
@@ -217,12 +215,11 @@ void ElectronScattering_DurhamData::SetDataFromName(std::string name) {
 
   if (!pointx.size() || (pointx.size() != errorx.size()) || !pointy.size() ||
       (pointy.size() != errory.size())) {
-    ERR(FTL) << "Failed to find dataset: " << name << "{"
+    QTHROW("Failed to find dataset: " << name << "{"
              << "Z: " << zstring << ", A: " << astring << ", E: " << estring
              << ", CTheta: " << tstring << ", PubID: " << sstring
              << " } in file: "
-             << (FitPar::GetDataBase() + "/Electron/" + target) << std::endl;
-    throw;
+             << (FitPar::GetDataBase() + "/Electron/" + target));
   }
 
   // for (uint i  = 0; i < pointx.size(); i++) {

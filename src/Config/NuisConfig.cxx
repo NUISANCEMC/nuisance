@@ -69,7 +69,7 @@ nuisconfig::nuisconfig() {
   // Load in documents
   fXMLDocs.push_back(fXML->ParseFile(filename.c_str(), 1000000));
   if (!fXMLDocs[0]) {
-    THROW("Cannot Read Parameters File!");
+    QTHROW("Cannot Read Parameters File!");
   }
 
   // Setup Main XML Node to be the first file read
@@ -112,7 +112,7 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
   fXMLDocs.push_back(fXML->ParseFile(filename.c_str(), 1000000));
 
   if (!fXMLDocs.back()) {
-    THROW("Failed to read: " << filename);
+    QTHROW("Failed to read: " << filename);
   }
 
   // Loop over children and add
@@ -122,7 +122,7 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
   // // Here we manually load all the children from the card file into our root
   // node
   if (!child) {
-    THROW("CANNOT Find child inside settings file!");
+    QTHROW("CANNOT Find child inside settings file!");
   }
 
   while (child) {

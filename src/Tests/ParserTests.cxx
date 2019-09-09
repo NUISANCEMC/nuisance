@@ -3,20 +3,19 @@
 
 #include "FitLogger.h"
 #include "GeneralUtils.h"
+#include "InputUtils.h"
 #include "NuisConfig.h"
 #include "StatUtils.h"
-#include "InputUtils.h"
 
 int main(int argc, char const *argv[]) {
-  LOG_VERB(SAM);
-  LOG(FIT) << "*            Running InputUtils Tests" << std::endl;
-  LOG(FIT) << "***************************************************"
-           << std::endl;
+  SETVERBOSITY(SAM);
+  QLOG(FIT, "*            Running InputUtils Tests");
+  QLOG(FIT, "***************************************************");
 
-  Config::SetPar("NEUT_DIR","/var/test/NEUT");
-  Config::SetPar("NUWRO_DIR","/var/test/NUWRO");
-  Config::SetPar("GIBUU_DIR","/var/test/NIBUU");
-  Config::SetPar("GENIE_DIR","/var/test/GENIE");
+  Config::SetPar("NEUT_DIR", "/var/test/NEUT");
+  Config::SetPar("NUWRO_DIR", "/var/test/NUWRO");
+  Config::SetPar("GIBUU_DIR", "/var/test/NIBUU");
+  Config::SetPar("GENIE_DIR", "/var/test/GENIE");
 
   std::string NEUTInp = "NEUT:@NEUT_DIR/file.root";
   InputUtils::InputType NEUTInpt =
@@ -27,8 +26,8 @@ int main(int argc, char const *argv[]) {
       InputUtils::IsJointInput(GeneralUtils::ParseToStr(NEUTInp, ":")[1]);
 
   std::string NEUTJointInp = "NEUT:(@NEUT_DIR/file1.root,@NEUT_DIR/file2.root)";
-  bool IsJointNEUT = InputUtils::IsJointInput(
-      GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]);
+  bool IsJointNEUT =
+      InputUtils::IsJointInput(GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]);
   std::string ExpandNEUTJoint = InputUtils::ExpandInputDirectories(
       GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]);
 
@@ -37,67 +36,64 @@ int main(int argc, char const *argv[]) {
   std::string ExpandNEUTJoint_MissFSlash = InputUtils::ExpandInputDirectories(
       GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]);
 
-  Config::SetPar("NEUT_DIR","/var/test/NEUT/");
+  Config::SetPar("NEUT_DIR", "/var/test/NEUT/");
 
   std::string NEUTJointInp_DoubleFSlash =
       "NEUT:(@NEUT_DIR/file1.root,@NEUT_DIR/file2.root)";
   std::string ExpandNEUTJoint_DoubleFSlash = InputUtils::ExpandInputDirectories(
       GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]);
 
-  LOG(FIT) << "    *        Test input type parse" << std::endl;
-  LOG(FIT) << "        *        Test parse 'NEUT'" << std::endl;
+  QLOG(FIT, "    *        Test input type parse");
+  QLOG(FIT, "        *        Test parse 'NEUT'");
   if (!(NEUTInpt == InputUtils::kNEUT_Input)) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTInp, ":")[0]
-             << " parsed as type: " << NEUTInpt << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[0] << " parsed as type: "
+                                                          << NEUTInpt);
   }
   assert(NEUTInpt == InputUtils::kNEUT_Input);
-  LOG(FIT) << "    *        Test IsJoint check" << std::endl;
-  LOG(FIT) << "        *        Test IsJoint on non joint" << std::endl;
+  QLOG(FIT, "    *        Test IsJoint check");
+  QLOG(FIT, "        *        Test IsJoint on non joint");
   if (IsJointNEUT_not) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " parsed as Joint."
-             << std::endl;
+    QERROR(FTL,
+           GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " parsed as Joint.");
   }
   assert(!IsJointNEUT_not);
-  LOG(FIT) << "        *        Test IsJoint on joint" << std::endl;
+  QLOG(FIT, "        *        Test IsJoint on joint");
   if (!IsJointNEUT) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
-             << " parsed as not Joint." << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
+                    << " parsed as not Joint.");
   }
   assert(IsJointNEUT);
-  LOG(FIT) << "    *        Test directory expansion" << std::endl;
+  QLOG(FIT, "    *        Test directory expansion");
   if ("/var/test/NEUT/file.root" != ExpandNEUT) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTInp, ":")[1]
-             << " expanded to: " << ExpandNEUT << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTInp, ":")[1] << " expanded to: "
+                                                          << ExpandNEUT);
   }
   assert("/var/test/NEUT/file.root" == ExpandNEUT);
-  LOG(FIT) << "        *        Test joint directory expansion" << std::endl;
+  QLOG(FIT, "        *        Test joint directory expansion");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
-             << " expanded to: " << ExpandNEUTJoint << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp, ":")[1]
+                    << " expanded to: " << ExpandNEUTJoint);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint);
-  LOG(FIT) << "        *        Test joint directory expansion missing slash"
-           << std::endl;
+  QLOG(FIT, "        *        Test joint directory expansion missing slash");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint_MissFSlash) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]
-             << " expanded to: " << ExpandNEUTJoint_MissFSlash << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_MissFSlash, ":")[1]
+                    << " expanded to: " << ExpandNEUTJoint_MissFSlash);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint_MissFSlash);
-  LOG(FIT) << "        *        Test joint directory expansion double slash"
-           << std::endl;
+  QLOG(FIT, "        *        Test joint directory expansion double slash");
   if ("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" !=
       ExpandNEUTJoint_DoubleFSlash) {
-    ERR(FTL) << GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]
-             << " expanded to: " << ExpandNEUTJoint_DoubleFSlash << std::endl;
+    QERROR(FTL, GeneralUtils::ParseToStr(NEUTJointInp_DoubleFSlash, ":")[1]
+                    << " expanded to: " << ExpandNEUTJoint_DoubleFSlash);
   }
   assert("(/var/test/NEUT/file1.root,/var/test/NEUT/file2.root)" ==
          ExpandNEUTJoint_DoubleFSlash);
 
-  LOG(FIT) << "*            Passed InputUtils Tests" << std::endl;
-  LOG(FIT) << "***************************************************"
-           << std::endl;
+  QLOG(FIT, "*            Passed InputUtils Tests");
+  QLOG(FIT, "***************************************************");
 }

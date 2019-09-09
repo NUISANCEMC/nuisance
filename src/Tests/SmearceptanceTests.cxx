@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
 
   for (int i = 0; i < A.GetNrows(); ++i) {
     if (fabs(X[i] - ForwardSolve[i]) > numerTol) {
-      ERROR(FTL, "Element " << i << " was not multiplied as expected: " << X[i]
+      QERROR(FTL, "Element " << i << " was not multiplied as expected: " << X[i]
                             << " != " << ForwardSolve[i]
                             << " (Tol: " << fabs(X[i] - ForwardSolve[i])
                             << " > " << numerTol << ")");
@@ -61,7 +61,7 @@ int main(int argc, char const *argv[]) {
 
   for (int i = 0; i < A.GetNrows(); ++i) {
     if (fabs(A[i] - SVDSolve[i]) > numerTol) {
-      ERROR(FTL, "Element " << i << " was not solved as expected: " << A[i]
+      QERROR(FTL, "Element " << i << " was not solved as expected: " << A[i]
                             << " != " << SVDSolve[i]
                             << " (Tol: " << fabs(A[i] - SVDSolve[i]) << " > "
                             << numerTol << ")");

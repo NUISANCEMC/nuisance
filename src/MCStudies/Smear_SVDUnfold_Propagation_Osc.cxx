@@ -35,18 +35,18 @@ void Smear_SVDUnfold_Propagation_Osc::AddNDInputs(nuiskey &samplekey) {
                             // sample input
     InputHandlerBase *InputBase = GetInput();
     if (InputBase->GetType() != kHISTO) {
-      THROW(
+      QTHROW(
           "Smear_SVDUnfold_Propagation_Osc expects a Histogram input that "
           "contains the ND observed spectrum.");
     }
     HistoInputHandler *HInput = dynamic_cast<HistoInputHandler *>(InputBase);
     if (!HInput) {
-      THROW(
+      QTHROW(
           "Smear_SVDUnfold_Propagation_Osc expects a Histogram input that "
           "contains the ND observed spectrum.");
     }
     if (HInput->NHistograms() != 2) {
-      THROW(
+      QTHROW(
           "Input expected to contain 2 histograms. "
           "HISTO:input.root[NDObs_TH1D,NDSmear_TH2D]");
     }
@@ -55,17 +55,17 @@ void Smear_SVDUnfold_Propagation_Osc::AddNDInputs(nuiskey &samplekey) {
         dynamic_cast<TH2D *>(HInput->GetHistogram(1));
 
     if (!nds.NDDataHist) {
-      THROW("Expected a valid TH1D input for the ND observed spectrum.");
+      QTHROW("Expected a valid TH1D input for the ND observed spectrum.");
     }
 
     if (!nds.NDToSpectrumSmearingMatrix) {
-      THROW("Expected a valid TH2D input for the ND observed smearing.");
+      QTHROW("Expected a valid TH2D input for the ND observed smearing.");
     }
   } else {
     std::vector<TH1 *> NDObsInputs =
         PlotUtils::GetTH1sFromRootFile(samplekey.GetS("ObsInput"));
     if (NDObsInputs.size() < 2) {
-      THROW(
+      QTHROW(
           "Near detector sample must contain the observed ERec spectrum and "
           "the "
           "ND ETrue/ERec smearing matrix. e.g. "
@@ -74,11 +74,11 @@ void Smear_SVDUnfold_Propagation_Osc::AddNDInputs(nuiskey &samplekey) {
 
     nds.NDDataHist = dynamic_cast<TH1D *>(NDObsInputs[0]);
     if (!nds.NDDataHist) {
-      ERROR(FTL,
+      QERROR(FTL,
             "First histogram from ObsInput attribute was not a TH1D containing "
             "the near detector observed ERec spectrum ("
                 << samplekey.GetS("ObsInput") << ").");
-      THROW(
+      QTHROW(
           "Near detector sample must contain the observed ERec spectrum and "
           "the "
           "ND ETrue/ERec smearing matrix. e.g. "
@@ -87,12 +87,12 @@ void Smear_SVDUnfold_Propagation_Osc::AddNDInputs(nuiskey &samplekey) {
 
     nds.NDToSpectrumSmearingMatrix = dynamic_cast<TH2D *>(NDObsInputs[1]);
     if (!nds.NDToSpectrumSmearingMatrix) {
-      ERROR(
+      QERROR(
           FTL,
           "Second histogram from ObsInput attribute was not a TH2D containing "
           "the near detector ETrue/ERec smearing matrix ("
               << samplekey.GetS("ObsInput") << ").");
-      THROW(
+      QTHROW(
           "Near detector sample must contain the observed ERec spectrum and "
           "the "
           "ND ETrue/ERec smearing matrix. e.g. "
@@ -221,7 +221,7 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
                     << " -> " << fds.OscillateToPDG << " = "
                     << fnr.GetD("DivergenceFactor"));
     } else {
-      THROW(
+      QTHROW(
           "Far detector sample contained FDNDRatio element, but couldn't find "
           "both FromPDG and Factor attributes.");
     }
@@ -230,7 +230,7 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
   fds.FDNDMassRatio = 1;
   if (NDetectorInfo.first != 0xdeadbeef) {
     if ((!nk.Has("DetectorVolume")) || (!nk.Has("DetectorDensity"))) {
-      THROW(
+      QTHROW(
           "Near detector sample has specified volume but FD doesn't. This is "
           "needed to scale the predicted event rate by the mass ratio.");
     }
@@ -248,13 +248,13 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
   }
 
   if (!nk.Has("ObsInput")) {
-    THROW("Far detector sample must specify at least ObsInput.");
+    QTHROW("Far detector sample must specify at least ObsInput.");
   }
 
   std::vector<TH1 *> FDObsInputs =
       PlotUtils::GetTH1sFromRootFile(nk.GetS("ObsInput"));
   if (FDObsInputs.size() < 2) {
-    THROW(
+    QTHROW(
         "Far detector sample must contain the observed ERec spectrum and the "
         "FD ETrue/ERec smearing matrix. "
         "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
@@ -263,12 +263,12 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
   fds.FDDataHist = NULL;
   for (size_t hist_it = 0; hist_it < FDObsInputs.size() - 1; ++hist_it) {
     if (!dynamic_cast<TH1D *>(FDObsInputs[hist_it])) {
-      ERROR(FTL, "Input spectrum index "
+      QERROR(FTL, "Input spectrum index "
                      << hist_it
                      << " from ObsInput attribute was not a TH1D containing "
                         "a far detector observed ERec spectrum ("
                      << nk.GetS("ObsInput") << ").");
-      THROW(
+      QTHROW(
           "Far detector sample must contain the observed ERec spectrum and the "
           "FD ETrue/ERec smearing matrix. "
           "ObsInput=\"input.root[FDObs_species,(FDObs_species2),FDSmearing_"
@@ -288,11 +288,11 @@ void Smear_SVDUnfold_Propagation_Osc::AddFDTarget(nuiskey &nk) {
 
   fds.SpectrumToFDSmearingMatrix_TH2 = dynamic_cast<TH2D *>(FDObsInputs.back());
   if (!fds.SpectrumToFDSmearingMatrix_TH2) {
-    ERROR(FTL,
+    QERROR(FTL,
           "last histogram from ObsInput attribute was not a TH2D containing "
           "the far detector ETrue/ERec smearing matrix ("
               << nk.GetS("ObsInput") << ").");
-    THROW(
+    QTHROW(
         "Far detector sample must contain the observed ERec spectrum and the "
         "FD ETrue/ERec smearing matrix. "
         "ObsInput=\"input.root[FDObs_species,FDSmearing_species]\"");
@@ -370,7 +370,7 @@ void Smear_SVDUnfold_Propagation_Osc::FinaliseFDSamples() {
       NDSample &nds = NDSamples[nd_it];
 
       if (!fds.FDNDRatios.count(nds.NuPDG)) {
-        ERROR(WRN, "Have an ND sample that provides PDG:"
+        QERROR(WRN, "Have an ND sample that provides PDG:"
                        << nds.NuPDG
                        << " neutrinos but far detector sample index " << fds_it
                        << " doesn't have an NDFD ratio for this sample. "
@@ -383,7 +383,7 @@ void Smear_SVDUnfold_Propagation_Osc::FinaliseFDSamples() {
 
 Int_t Smear_SVDUnfold_Propagation_Osc::GetFDSampleNAnalysisBins(size_t fds_it) {
   if (fds_it >= FDSamples.size()) {
-    THROW("Requested FD sample index " << fds_it << " but only initialised "
+    QTHROW("Requested FD sample index " << fds_it << " but only initialised "
                                        << FDSamples.size());
   }
   FDSample &fds = FDSamples[fds_it];
@@ -619,7 +619,7 @@ void DumpUnfoldDebugInfo(Smear_SVDUnfold_Propagation_Osc::NDSample &nds,
 
 void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
   if (nd_it >= NDSamples.size()) {
-    THROW("Attempting to unfold ND sample index "
+    QTHROW("Attempting to unfold ND sample index "
           << nd_it << " but only have " << NDSamples.size() << " ND samples.");
   }
 
@@ -639,7 +639,7 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
     if (truncations >= nds.TruncateUpTo) {
       DumpUnfoldDebugInfo(nds, nd_it, truncations);
 
-      THROW("Unfolded enu spectrum had negative values even after "
+      QTHROW("Unfolded enu spectrum had negative values even after "
             << truncations << " SVD singular value truncations.");
     }
 
@@ -696,7 +696,7 @@ void Smear_SVDUnfold_Propagation_Osc::UnfoldToNDETrueSpectrum(size_t nd_it) {
 
 void Smear_SVDUnfold_Propagation_Osc::PropagateFDSample(size_t fds_it) {
   if (fds_it >= FDSamples.size()) {
-    THROW("Requested FD sample index " << fds_it << " but only initialised "
+    QTHROW("Requested FD sample index " << fds_it << " but only initialised "
                                        << FDSamples.size());
   }
   FDSample &fds = FDSamples[fds_it];
@@ -708,7 +708,7 @@ void Smear_SVDUnfold_Propagation_Osc::PropagateFDSample(size_t fds_it) {
       dynamic_cast<OscWeightEngine *>(fw->GetRWEngine(kOSCILLATION));
 
   if (!oscWE) {
-    THROW(
+    QTHROW(
         "Couldn't load oscillation weight engine for sample: "
         "Smear_SVDUnfold_Propagation_Osc.");
   }
@@ -797,7 +797,7 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
       dynamic_cast<OscWeightEngine *>(fw->GetRWEngine(kOSCILLATION));
 
   if (!oscWE) {
-    THROW(
+    QTHROW(
         "Couldn't load oscillation weight engine for sample: "
         "Smear_SVDUnfold_Propagation_Osc.");
   }
@@ -853,7 +853,7 @@ void Smear_SVDUnfold_Propagation_Osc::Write(std::string drawOpt) {
         dynamic_cast<OscWeightEngine *>(fw->GetRWEngine(kOSCILLATION));
 
     if (!oscWE) {
-      THROW(
+      QTHROW(
           "Couldn't load oscillation weight engine for sample: "
           "Smear_SVDUnfold_Propagation_Osc.");
     }

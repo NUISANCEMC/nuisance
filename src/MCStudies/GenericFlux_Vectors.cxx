@@ -29,7 +29,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
-  EnuMax = 1E10;  // Arbritrarily high energy limit
+  EnuMax = 1E10; // Arbritrarily high energy limit
 
   if (Config::HasPar("EnuMin")) {
     EnuMin = Config::GetParD("EnuMin");
@@ -40,7 +40,8 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   }
 
   SavePreFSI = Config::Get().GetParB("nuisflat_SavePreFSI");
-  LOG(SAM) << "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI << std::endl;
+  QLOG(SAM,
+       "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI);
 
   // Set default fitter flags
   fIsDiag = true;
@@ -75,14 +76,14 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
       (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
       this->TotalIntegratedFlux("width");
 
-  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
-           << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
-           << (fNEvents + 0.) << "*" << TotalIntegratedFlux("width") << ")]"
-           << std::endl;
+  QLOG(SAM, " Generic Flux Scaling Factor = "
+                << fScaleFactor
+                << " [= " << (GetEventHistogram()->Integral("width") * 1E-38)
+                << "/(" << (fNEvents + 0.) << "*"
+                << TotalIntegratedFlux("width") << ")]");
 
   if (fScaleFactor <= 0.0) {
-    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    throw;
+    QTHROW("SCALE FACTOR TOO LOW");
   }
 
   // Setup our TTrees
@@ -98,7 +99,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding Event Variables" << std::endl;
+  QLOG(SAM, "Adding Event Variables");
 
   eventVariables->Branch("Mode", &Mode, "Mode/I");
   eventVariables->Branch("cc", &cc, "cc/B");
@@ -164,7 +165,8 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
 
   // The customs
   eventVariables->Branch("CustomWeight", &CustomWeight, "CustomWeight/F");
-  eventVariables->Branch("CustomWeightArray", CustomWeightArray, "CustomWeightArray[6]/F");
+  eventVariables->Branch("CustomWeightArray", CustomWeightArray,
+                         "CustomWeightArray[6]/F");
 
   return;
 }
@@ -175,7 +177,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  LOG(DEB) << "Filling signal" << std::endl;
+  QLOG(DEB, "Filling signal");
 
   // Now fill the information
   Mode = event->Mode;
@@ -205,8 +207,8 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     Enu_QE = FitUtils::EnuQErec(lep->fP, CosLep, 34., true);
     Q2_QE = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
-    Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event)/1.E3;
-    EavAlt = FitUtils::Eavailable(event)/1.E3;
+    Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
+    EavAlt = FitUtils::Eavailable(event) / 1.E3;
 
     // Get W_true with assumption of initial state nucleon at rest
     float m_n = (float)PhysConst::mass_proton;
@@ -227,7 +229,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   for (UInt_t i = 0; i < event->Npart(); ++i) {
 
     if (event->PartInfo(i)->fIsAlive &&
-	event->PartInfo(i)->Status() == kFinalState)
+        event->PartInfo(i)->Status() == kFinalState)
       partList.push_back(event->PartInfo(i));
 
     if (SavePreFSI && event->fPrimaryVertex[i])
@@ -239,7 +241,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Save outgoing particle vectors
   nfsp = (int)partList.size();
-  std::map<int, std::vector<std::pair<double, int> > > pdgMap;
+  std::map<int, std::vector<std::pair<double, int>>> pdgMap;
 
   for (int i = 0; i < nfsp; ++i) {
     px[i] = partList[i]->fP.X() / 1E3;
@@ -248,17 +250,18 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     E[i] = partList[i]->fP.E() / 1E3;
     pdg[i] = partList[i]->fPID;
     pdgMap[pdg[i]].push_back(std::make_pair(partList[i]->fP.Vect().Mag(), i));
-  }  
+  }
 
-  for(std::map<int, std::vector<std::pair<double, int> > >::iterator iter = pdgMap.begin(); 
-      iter != pdgMap.end(); ++iter){
-    std::vector<std::pair<double, int> > thisVect = iter->second;
+  for (std::map<int, std::vector<std::pair<double, int>>>::iterator iter =
+           pdgMap.begin();
+       iter != pdgMap.end(); ++iter) {
+    std::vector<std::pair<double, int>> thisVect = iter->second;
     std::sort(thisVect.begin(), thisVect.end());
 
     // Now save the order... a bit funky to avoid inverting
-    int nPart = (int)thisVect.size()-1;
-    for (int i=nPart; i >= 0; --i) {
-      pdg_rank[thisVect[i].second] = nPart-i;
+    int nPart = (int)thisVect.size() - 1;
+    for (int i = nPart; i >= 0; --i) {
+      pdg_rank[thisVect[i].second] = nPart - i;
     }
   }
 
@@ -282,13 +285,12 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pdg_init[i] = initList[i]->fPID;
   }
 
-
 #ifdef __GENIE_ENABLED__
   if (event->fType == kGENIE) {
-    EventRecord *  gevent      = static_cast<EventRecord*>(event->genie_event->event);
-    const Interaction * interaction = gevent->Summary();
-    const Kinematics &   kine       = interaction->Kine();
-    double W_genie  = kine.W();
+    EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
+    const Interaction *interaction = gevent->Summary();
+    const Kinematics &kine = interaction->Kine();
+    double W_genie = kine.W();
   }
 #endif
 
@@ -316,7 +318,8 @@ void GenericFlux_Vectors::ResetVariables() {
   // Reset all Function used to extract any variables of interest to the event
   Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
-  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W = x = y = Eav = EavAlt = -999.9;
+  Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
+      x = y = Eav = EavAlt = -999.9;
 
   W_genie = -999;
   // Other fun variables
@@ -324,28 +327,30 @@ void GenericFlux_Vectors::ResetVariables() {
   dalphat = dpt = dphit = pnreco_C = -999.99;
 
   nfsp = ninitp = nvertp = 0;
-  for (int i = 0; i < kMAX; ++i){
+  for (int i = 0; i < kMAX; ++i) {
     px[i] = py[i] = pz[i] = E[i] = -999;
     pdg[i] = pdg_rank[i] = 0;
 
     px_init[i] = py_init[i] = pz_init[i] = E_init[i] = -999;
     pdg_init[i] = 0;
-      
+
     px_vert[i] = py_vert[i] = pz_vert[i] = E_vert[i] = -999;
     pdg_vert[i] = 0;
-
   }
 
   Weight = InputWeight = RWWeight = 0.0;
 
   CustomWeight = 0.0;
-  for (int i = 0; i < 6; ++i) CustomWeightArray[i] = 0.0;
+  for (int i = 0; i < 6; ++i)
+    CustomWeightArray[i] = 0.0;
 
   partList.clear();
   initList.clear();
   vertList.clear();
 
-  flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL = flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim = flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
+  flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL =
+      flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim =
+          flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
 }
 
 //********************************************************************
@@ -378,10 +383,10 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
   if (!eventVariables) {
     Config::Get().out->cd();
     eventVariables = new TTree((this->fName + "_VARS").c_str(),
-        (this->fName + "_VARS").c_str());
+                               (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding signal flags" << std::endl;
+  QLOG(SAM, "Adding signal flags");
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");

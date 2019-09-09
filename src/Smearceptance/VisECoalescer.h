@@ -31,7 +31,7 @@ class VisECoalescer : public ISmearcepter {
 
  public:
   RecoInfo *Smearcept(FitEvent *) {
-    THROW("VisECoalescer cannot act as an accepter");
+    QTHROW("VisECoalescer cannot act as an accepter");
   }
 
   /// Helper method for using this class as a component in a more complex

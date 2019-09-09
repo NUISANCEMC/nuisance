@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
   }
   
   // Read input arguments such as card file, parameter arguments, and fit routines
-  LOG(FIT)<<"Starting nuissyst"<<std::endl;
+  QLOG(FIT,"Starting nuissyst");
 
   // Make systematic class and run fit
   BayesianRoutines* min = new BayesianRoutines(argc, argv);
@@ -58,9 +58,9 @@ int main(int argc, char* argv[]){
   
   
   // Show Final Status
-  LOG(FIT)<<"-------------------------------------"<<std::endl;
-  LOG(FIT)<<"FINISHED" << std::endl;
-  LOG(FIT)<<"-------------------------------------"<<std::endl;
+  QLOG(FIT,"-------------------------------------");
+  QLOG(FIT,"FINISHED");
+  QLOG(FIT,"-------------------------------------");
   return status;
 }
 

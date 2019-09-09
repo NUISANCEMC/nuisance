@@ -46,7 +46,7 @@ nuTypes GetNuType(int pdg) {
       return kNumubarType;
     case -12:
       return kNuebarType;
-    default: { THROW("Attempting to convert \"neutrino pdg\": " << pdg); }
+    default: { QTHROW("Attempting to convert \"neutrino pdg\": " << pdg); }
   }
 }
 
@@ -71,7 +71,7 @@ void OscWeightEngine::Config() {
   std::vector<nuiskey> OscParam = Config::QueryKeys("OscParam");
 
   if (OscParam.size() < 1) {
-    ERROR(WRN,
+    QERROR(WRN,
           "Oscillation parameters specified but no OscParam element "
           "configuring the experimental characteristics found.\nExpect at "
           "least <OscParam baseline_km=\"XXX\" />. Pausing for "
@@ -92,7 +92,7 @@ void OscWeightEngine::Config() {
     static const double deg2rad = asin(1) / 90.0;
     LengthParam = cos(OscParam[0].GetD("detection_zenith_deg") * deg2rad);
   } else {
-    ERROR(WRN,
+    QERROR(WRN,
           "It appeared that you wanted to set up an oscillation weight "
           "branch, but it was not correctly configured. You need to specify "
           "either: detection_zenith_deg or baseline_km attributes on the "
@@ -171,7 +171,7 @@ void OscWeightEngine::IncludeDial(std::string name, double startval) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    THROW("OscWeightEngine passed dial: " << name
+    QTHROW("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
   params[dial - 1] = startval;
@@ -191,7 +191,7 @@ void OscWeightEngine::SetDialValue(std::string name, double val) {
 #endif
   int dial = SystEnumFromString(name);
   if (!dial) {
-    THROW("OscWeightEngine passed dial: " << name
+    QTHROW("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
 
@@ -210,14 +210,14 @@ bool OscWeightEngine::IsDialIncluded(int nuisenum) {
 double OscWeightEngine::GetDialValue(std::string name) {
   int dial = SystEnumFromString(name);
   if (!dial) {
-    THROW("OscWeightEngine passed dial: " << name
+    QTHROW("OscWeightEngine passed dial: " << name
                                           << " that it does not understand.");
   }
   return params[dial - 1];
 }
 double OscWeightEngine::GetDialValue(int nuisenum) {
   if (!(nuisenum % 1000) || (nuisenum % 1000) > 6) {
-    THROW("OscWeightEngine passed dial enum: "
+    QTHROW("OscWeightEngine passed dial enum: "
           << (nuisenum % 1000)
           << " that it does not understand, expected [1,6].");
   }
@@ -237,7 +237,7 @@ double OscWeightEngine::CalcWeight(BaseFitEvt* evt) {
   static bool Warned = false;
   if (evt->probe_E == 0xdeadbeef) {
     if (!Warned) {
-      ERROR(WRN,
+      QERROR(WRN,
             "Oscillation weights asked for but using 'litemode' or "
             "unsupported generator input. Pasuing for 10...");
       sleep(10);
@@ -282,12 +282,12 @@ double OscWeightEngine::CalcWeight(double ENu, int PDGNu, int TargetPDGNu) {
   }
 #ifdef DEBUG_OSC_WE
   if (prob_weight != prob_weight) {
-    THROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+    QTHROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
                                          << " -- " << NuType << " -> "
                                          << TargetPDGNu << ")");
   }
   if (prob_weight > 1) {
-    THROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
+    QTHROW("Calculated bad prob weight: " << prob_weight << "(Osc Type: " << pmt
                                          << " -- " << NuType << " -> "
                                          << TargetPDGNu << ")");
   }

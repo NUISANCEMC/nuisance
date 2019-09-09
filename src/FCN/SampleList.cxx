@@ -407,7 +407,7 @@ void DynamicSampleFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tDL Load Error: " << dlerr);
+            QERROR(WRN, "\tDL Load Error: " << dlerr);
             continue;
           }
 
@@ -425,7 +425,7 @@ void DynamicSampleFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tFailed to load symbol \"DSF_NSamples\" from "
+            QERROR(WRN, "\tFailed to load symbol \"DSF_NSamples\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -441,7 +441,7 @@ void DynamicSampleFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tFailed to load symbol \"DSF_GetSampleName\" from "
+            QERROR(WRN, "\tFailed to load symbol \"DSF_GetSampleName\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -457,7 +457,7 @@ void DynamicSampleFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "\tFailed to load symbol \"DSF_GetSample\" from "
+            QERROR(WRN, "\tFailed to load symbol \"DSF_GetSample\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -473,7 +473,7 @@ void DynamicSampleFactory::LoadPlugins() {
           }
 
           if (dlerr.length()) {
-            ERROR(WRN, "Failed to load symbol \"DSF_DestroySample\" from "
+            QERROR(WRN, "Failed to load symbol \"DSF_DestroySample\" from "
                            << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
@@ -487,13 +487,13 @@ void DynamicSampleFactory::LoadPlugins() {
           for (size_t smp_it = 0; smp_it < plgManif.NSamples; ++smp_it) {
             char const* smp_name = (*(plgManif.DSF_GetSampleName))(smp_it);
             if (!smp_name) {
-              THROW("Could not load sample " << smp_it << " / "
+              QTHROW("Could not load sample " << smp_it << " / "
                                              << plgManif.NSamples << " from "
                                              << plgManif.soloc);
             }
 
             if (Samples.count(smp_name)) {
-              ERROR(WRN, "Already loaded a sample named: \""
+              QERROR(WRN, "Already loaded a sample named: \""
                              << smp_name << "\". cannot load duplciates. This "
                                             "sample will be skipped.");
               continue;
@@ -516,7 +516,7 @@ void DynamicSampleFactory::LoadPlugins() {
       }
       closedir(dir);
     } else {
-      ERROR(WRN, "Tried to open non-existant directory.");
+      QERROR(WRN, "Tried to open non-existant directory.");
     }
   }
 }
@@ -556,7 +556,7 @@ bool DynamicSampleFactory::HasSample(nuiskey& samplekey) {
 }
 MeasurementBase* DynamicSampleFactory::CreateSample(nuiskey& samplekey) {
   if (!HasSample(samplekey)) {
-    ERROR(WRN, "Asked to load unknown sample: \"" << samplekey.GetS("name")
+    QERROR(WRN, "Asked to load unknown sample: \"" << samplekey.GetS("name")
                                                   << "\".");
     return NULL;
   }
@@ -597,7 +597,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
       QLOG(SAM, "Done.");
       return ds;
     }
-    THROW("Failed to instantiate dynamic sample.");
+    QTHROW("Failed to instantiate dynamic sample.");
   }
 #endif
 
@@ -1431,7 +1431,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
 
   } else {
-    THROW("Error: No such sample: " << name << std::endl);
+    QTHROW("Error: No such sample: " << name << std::endl);
   }
 
   // Return NULL if no sample loaded.

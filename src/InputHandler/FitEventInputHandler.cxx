@@ -1,27 +1,27 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "FitEventInputHandler.h"
 #include "InputUtils.h"
 
-FitEventInputHandler::FitEventInputHandler(std::string const& handle,
-                                           std::string const& rawinputs) {
-  LOG(SAM) << "Creating FitEventInputHandler : " << handle << std::endl;
+FitEventInputHandler::FitEventInputHandler(std::string const &handle,
+                                           std::string const &rawinputs) {
+  QLOG(SAM, "Creating FitEventInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -31,26 +31,22 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
+    TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      ERR(FTL) << "FitEvent File IsZombie() at " << inputs[inp_it] << std::endl;
-      throw;
+      QTHROW("FitEvent File IsZombie() at " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
-    TH1D* fluxhist = (TH1D*)inp_file->Get("nuisance_fluxhist");
-    TH1D* eventhist = (TH1D*)inp_file->Get("nuisance_eventhist");
+    TH1D *fluxhist = (TH1D *)inp_file->Get("nuisance_fluxhist");
+    TH1D *eventhist = (TH1D *)inp_file->Get("nuisance_eventhist");
     if (!fluxhist or !eventhist) {
-      ERR(FTL) << "FitEvent FILE doesn't contain flux/xsec info" << std::endl;
-      throw;
+      QTHROW("FitEvent FILE doesn't contain flux/xsec info");
     }
 
     // Get N Events
-    TTree* eventtree = (TTree*)inp_file->Get("nuisance_events");
+    TTree *eventtree = (TTree *)inp_file->Get("nuisance_events");
     if (!eventtree) {
-      ERR(FTL) << "nuisance_events not located in GENIE file! "
-               << inputs[inp_it] << std::endl;
-      throw;
+      QTHROW("nuisance_events not located in GENIE file! " << inputs[inp_it]);
     }
     int nevents = eventtree->GetEntries();
 
@@ -84,7 +80,8 @@ FitEventInputHandler::FitEventInputHandler(std::string const& handle,
 }
 
 FitEventInputHandler::~FitEventInputHandler() {
-  if (fFitEventTree) delete fFitEventTree;
+  if (fFitEventTree)
+    delete fFitEventTree;
 }
 
 void FitEventInputHandler::CreateCache() {
@@ -99,10 +96,11 @@ void FitEventInputHandler::RemoveCache() {
   //    fFitEventTree->SetCacheSize(0);
 }
 
-FitEvent* FitEventInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *FitEventInputHandler::GetNuisanceEvent(const UInt_t entry,
                                                  const bool lightweight) {
   // Return NULL if out of bounds
-  if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents)
+    return NULL;
 
   // Reset all variables before tree read
   fNUISANCEEvent->ResetEvent();

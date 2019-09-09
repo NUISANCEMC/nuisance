@@ -5,7 +5,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  LOG(FIT) << "Setting up T2K RW : " << fCalcName << std::endl;
+  QLOG(FIT, "Setting up T2K RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -29,21 +29,19 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
 
 #else
-  ERR(FTL) << "T2K RW NOT ENABLED" << std::endl;
-  throw;
+  QTHROW("T2K RW NOT ENABLED");
 #endif
 };
 
 void T2KWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __T2KREW_ENABLED__
 
-
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kT2K);
 
   // Setup Maps
-  fEnumIndex[nuisenum];// = std::vector<size_t>(0);
-  fNameIndex[name]; // = std::vector<size_t>(0);
+  fEnumIndex[nuisenum]; // = std::vector<size_t>(0);
+  fNameIndex[name];     // = std::vector<size_t>(0);
 
   // Split by commas
   std::vector<std::string> allnames = GeneralUtils::ParseToStr(name, ",");
@@ -70,7 +68,6 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
     // Setup index
     fEnumIndex[nuisenum].push_back(index);
     fNameIndex[name].push_back(index);
-
   }
 
   // Set Value if given
@@ -100,11 +97,11 @@ void T2KWeightEngine::SetDialValue(std::string name, double val) {
 #endif
 }
 
-
 void T2KWeightEngine::Reconfigure(bool silent) {
 #ifdef __T2KREW_ENABLED__
   // Hush now...
-  if (silent) StopTalking();
+  if (silent)
+    StopTalking();
 
   // Reconf
   StopTalking();
@@ -112,17 +109,18 @@ void T2KWeightEngine::Reconfigure(bool silent) {
   StartTalking();
 
   // Shout again
-  if (silent) StartTalking();
+  if (silent)
+    StartTalking();
 #endif
 }
 
-
-double T2KWeightEngine::CalcWeight(BaseFitEvt* evt) {
+double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __T2KREW_ENABLED__
   // Skip Non GENIE
-  if (evt->fType != kNEUT) return 1.0;
+  if (evt->fType != kNEUT)
+    return 1.0;
 
   // Hush now
   StopTalking();
@@ -137,4 +135,3 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt* evt) {
   // Return rw_weight
   return rw_weight;
 }
-

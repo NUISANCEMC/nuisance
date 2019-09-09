@@ -1,17 +1,15 @@
 #include <cassert>
 #include <sstream>
 
-#include "SignalDef.h"
 #include "ConstructibleFitEvent.h"
-
+#include "SignalDef.h"
 
 int main(int argc, char const *argv[]) {
   bool FailOnFail = (argc > 1);
-  LOG_VERB(SAM);
+  SETVERBOSITY(SAM);
 
-  LOG(FIT) << "*            Running SignalDef Tests" << std::endl;
-  LOG(FIT) << "***************************************************"
-           << std::endl;
+  QLOG(FIT, "*            Running SignalDef Tests");
+  QLOG(FIT, "***************************************************");
 
   int IS[] = {14};
   int FS_CC0pi_1[] = {13, 2112, 2212, 2112, 2212};
@@ -65,320 +63,313 @@ int main(int argc, char const *argv[]) {
   int FS_NCNpi_1[] = {14, 2212, 211};
   ConstructibleFitEvent fe_NCNpi_1 = MakePDGStackEvent(IS, FS_NCNpi_1, 32);
 
-  LOG(FIT) << "*            Testing: SignalDef::isCCINC" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCCINC");
 
   std::map<ConstructibleFitEvent *, bool> isCCINC_PassExpectations;
-  isCCINC_PassExpectations[&fe_CC0pi_1] = true;    // numu CC0pi
-  isCCINC_PassExpectations[&fe_CC0pi_2] = true;    // numu CC0pi (2p2h)
-  isCCINC_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCCINC_PassExpectations[&fe_CC0pi_4] = true;    // numu CC0pi (RES)
-  isCCINC_PassExpectations[&fe_CC1pip_1] = true;   // numu CC1pip (2p2h)
-  isCCINC_PassExpectations[&fe_CC1pim_1] = true;   // numu CC1pim
-  isCCINC_PassExpectations[&fe_CC1pi0_1] = true;   // numu CC1pi0
-  isCCINC_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCCINC_PassExpectations[&fe_CCNpi_1] = true;    // numu CC multi pi
-  isCCINC_PassExpectations[&fe_CCNpi_2] = true;    // numu CC multi pi
-  isCCINC_PassExpectations[&fe_CCNpi_3] = true;    // numu CC multi pi
-  isCCINC_PassExpectations[&fe_CCNpi_4] = true;    // numu CC multi pi
-  isCCINC_PassExpectations[&fe_CCCOH_1] = true;    // numu CC COH pi
-  isCCINC_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCCINC_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCCINC_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCCINC_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCCINC_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
+  isCCINC_PassExpectations[&fe_CC0pi_2] = true;   // numu CC0pi (2p2h)
+  isCCINC_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCCINC_PassExpectations[&fe_CC0pi_4] = true;   // numu CC0pi (RES)
+  isCCINC_PassExpectations[&fe_CC1pip_1] = true;  // numu CC1pip (2p2h)
+  isCCINC_PassExpectations[&fe_CC1pim_1] = true;  // numu CC1pim
+  isCCINC_PassExpectations[&fe_CC1pi0_1] = true;  // numu CC1pi0
+  isCCINC_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCCINC_PassExpectations[&fe_CCNpi_1] = true;   // numu CC multi pi
+  isCCINC_PassExpectations[&fe_CCNpi_2] = true;   // numu CC multi pi
+  isCCINC_PassExpectations[&fe_CCNpi_3] = true;   // numu CC multi pi
+  isCCINC_PassExpectations[&fe_CCNpi_4] = true;   // numu CC multi pi
+  isCCINC_PassExpectations[&fe_CCCOH_1] = true;   // numu CC COH pi
+  isCCINC_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCCINC_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCCINC_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCCINC_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   size_t ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCCINC_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCCINC_PassExpectations.begin();
        fe_it != isCCINC_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCINC(fe_it->first, 14);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCCINC unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCCINC unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isNCINC" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isNCINC");
 
   std::map<ConstructibleFitEvent *, bool> isNCINC_PassExpectations;
-  isNCINC_PassExpectations[&fe_CC0pi_1] = false;   // numu CC0pi
-  isNCINC_PassExpectations[&fe_CC0pi_2] = false;   // numu CC0pi (2p2h)
-  isNCINC_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isNCINC_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isNCINC_PassExpectations[&fe_CC1pip_1] = false;  // numu CC1pip (2p2h)
-  isNCINC_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isNCINC_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isNCINC_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isNCINC_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isNCINC_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isNCINC_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isNCINC_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isNCINC_PassExpectations[&fe_CCCOH_1] = false;   // numu CC COH pi
-  isNCINC_PassExpectations[&fe_NCel_1] = true;     // numu NCEl
-  isNCINC_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isNCINC_PassExpectations[&fe_NC1pi_1] = true;    // numu NC1pi
-  isNCINC_PassExpectations[&fe_NCNpi_1] = true;    // numu NC multi pi
+  isNCINC_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
+  isNCINC_PassExpectations[&fe_CC0pi_2] = false;  // numu CC0pi (2p2h)
+  isNCINC_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isNCINC_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isNCINC_PassExpectations[&fe_CC1pip_1] = false; // numu CC1pip (2p2h)
+  isNCINC_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isNCINC_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isNCINC_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isNCINC_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isNCINC_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isNCINC_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isNCINC_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isNCINC_PassExpectations[&fe_CCCOH_1] = false;  // numu CC COH pi
+  isNCINC_PassExpectations[&fe_NCel_1] = true;    // numu NCEl
+  isNCINC_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isNCINC_PassExpectations[&fe_NC1pi_1] = true;   // numu NC1pi
+  isNCINC_PassExpectations[&fe_NCNpi_1] = true;   // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isNCINC_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isNCINC_PassExpectations.begin();
        fe_it != isNCINC_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isNCINC(fe_it->first, 14);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isNCINC unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isNCINC unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isCC0pi" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCC0pi");
 
   std::map<ConstructibleFitEvent *, bool> isCC0pi_PassExpectations;
-  isCC0pi_PassExpectations[&fe_CC0pi_1] = true;    // numu CC0pi
-  isCC0pi_PassExpectations[&fe_CC0pi_2] = true;    // numu CC0pi (2p2h)
-  isCC0pi_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCC0pi_PassExpectations[&fe_CC0pi_4] = true;    // numu CC0pi (RES)
-  isCC0pi_PassExpectations[&fe_CC1pip_1] = false;  // numu CC1pip (2p2h)
-  isCC0pi_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isCC0pi_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isCC0pi_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCC0pi_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isCC0pi_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isCC0pi_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isCC0pi_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCC0pi_PassExpectations[&fe_CCCOH_1] = false;   // numu CC COH pi
-  isCC0pi_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCC0pi_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCC0pi_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCC0pi_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCC0pi_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
+  isCC0pi_PassExpectations[&fe_CC0pi_2] = true;   // numu CC0pi (2p2h)
+  isCC0pi_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCC0pi_PassExpectations[&fe_CC0pi_4] = true;   // numu CC0pi (RES)
+  isCC0pi_PassExpectations[&fe_CC1pip_1] = false; // numu CC1pip (2p2h)
+  isCC0pi_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isCC0pi_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isCC0pi_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCC0pi_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isCC0pi_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isCC0pi_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isCC0pi_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCC0pi_PassExpectations[&fe_CCCOH_1] = false;  // numu CC COH pi
+  isCC0pi_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCC0pi_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCC0pi_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCC0pi_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCC0pi_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCC0pi_PassExpectations.begin();
        fe_it != isCC0pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCC0pi(fe_it->first, 14);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << " " << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCC0pi unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n"
+                             << fe_it->first->ToString() << " ");
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCC0pi unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isCCQELike" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCCQELike");
 
   std::map<ConstructibleFitEvent *, bool> isCCQELike_PassExpectations;
-  isCCQELike_PassExpectations[&fe_CC0pi_1] = true;    // numu CC0pi
-  isCCQELike_PassExpectations[&fe_CC0pi_2] = true;    // numu CC0pi (2p2h)
-  isCCQELike_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCCQELike_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isCCQELike_PassExpectations[&fe_CC1pip_1] = true;   // numu CC1pip (2p2h)
-  isCCQELike_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isCCQELike_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isCCQELike_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCCQELike_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isCCQELike_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isCCQELike_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isCCQELike_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCCQELike_PassExpectations[&fe_CCCOH_1] = false;   // numu CC COH pi
-  isCCQELike_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCCQELike_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCCQELike_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCCQELike_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCCQELike_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
+  isCCQELike_PassExpectations[&fe_CC0pi_2] = true;   // numu CC0pi (2p2h)
+  isCCQELike_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCCQELike_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isCCQELike_PassExpectations[&fe_CC1pip_1] = true;  // numu CC1pip (2p2h)
+  isCCQELike_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isCCQELike_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isCCQELike_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCCQELike_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isCCQELike_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isCCQELike_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isCCQELike_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCCQELike_PassExpectations[&fe_CCCOH_1] = false;  // numu CC COH pi
+  isCCQELike_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCCQELike_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCCQELike_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCCQELike_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCCQELike_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCCQELike_PassExpectations.begin();
        fe_it != isCCQELike_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCQELike(fe_it->first, 14);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCCQELike unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCCQELike unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isCCQE" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCCQE");
 
   std::map<ConstructibleFitEvent *, bool> isCCQE_PassExpectations;
-  isCCQE_PassExpectations[&fe_CC0pi_1] = true;    // numu CC0pi
-  isCCQE_PassExpectations[&fe_CC0pi_2] = false;   // numu CC0pi (2p2h)
-  isCCQE_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCCQE_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isCCQE_PassExpectations[&fe_CC1pip_1] = false;  // numu CC1pip (2p2h)
-  isCCQE_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isCCQE_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isCCQE_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCCQE_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isCCQE_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isCCQE_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isCCQE_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCCQE_PassExpectations[&fe_CCCOH_1] = false;   // numu CC COH pi
-  isCCQE_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCCQE_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCCQE_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCCQE_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCCQE_PassExpectations[&fe_CC0pi_1] = true;   // numu CC0pi
+  isCCQE_PassExpectations[&fe_CC0pi_2] = false;  // numu CC0pi (2p2h)
+  isCCQE_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCCQE_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isCCQE_PassExpectations[&fe_CC1pip_1] = false; // numu CC1pip (2p2h)
+  isCCQE_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isCCQE_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isCCQE_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCCQE_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isCCQE_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isCCQE_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isCCQE_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCCQE_PassExpectations[&fe_CCCOH_1] = false;  // numu CC COH pi
+  isCCQE_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCCQE_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCCQE_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCCQE_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCCQE_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCCQE_PassExpectations.begin();
        fe_it != isCCQE_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCQE(fe_it->first, 14);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCCQE unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCCQE unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isCCCOH" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCCCOH");
 
   std::map<ConstructibleFitEvent *, bool> isCCCOH_PassExpectations;
-  isCCCOH_PassExpectations[&fe_CC0pi_1] = false;   // numu CC0pi
-  isCCCOH_PassExpectations[&fe_CC0pi_2] = false;   // numu CC0pi (2p2h)
-  isCCCOH_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCCCOH_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isCCCOH_PassExpectations[&fe_CC1pip_1] = false;  // numu CC1pip (2p2h)
-  isCCCOH_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isCCCOH_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isCCCOH_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCCCOH_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isCCCOH_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isCCCOH_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isCCCOH_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCCCOH_PassExpectations[&fe_CCCOH_1] = true;    // numu CC COH pi
-  isCCCOH_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCCCOH_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCCCOH_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCCCOH_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCCCOH_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
+  isCCCOH_PassExpectations[&fe_CC0pi_2] = false;  // numu CC0pi (2p2h)
+  isCCCOH_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCCCOH_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isCCCOH_PassExpectations[&fe_CC1pip_1] = false; // numu CC1pip (2p2h)
+  isCCCOH_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isCCCOH_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isCCCOH_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCCCOH_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isCCCOH_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isCCCOH_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isCCCOH_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCCCOH_PassExpectations[&fe_CCCOH_1] = true;   // numu CC COH pi
+  isCCCOH_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCCCOH_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCCCOH_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCCCOH_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCCCOH_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCCCOH_PassExpectations.begin();
        fe_it != isCCCOH_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCCCOH(fe_it->first, 14, 211);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCCCOH unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCCCOH unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isCC1pi" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isCC1pi");
 
   std::map<ConstructibleFitEvent *, bool> isCC1pi_PassExpectations;
-  isCC1pi_PassExpectations[&fe_CC0pi_1] = false;   // numu CC0pi
-  isCC1pi_PassExpectations[&fe_CC0pi_2] = false;   // numu CC0pi (2p2h)
-  isCC1pi_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCC1pi_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isCC1pi_PassExpectations[&fe_CC1pip_1] = true;   // numu CC1pip (2p2h)
-  isCC1pi_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isCC1pi_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isCC1pi_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isCC1pi_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isCC1pi_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isCC1pi_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isCC1pi_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCC1pi_PassExpectations[&fe_CCCOH_1] = true;    // numu CC COH pi
-  isCC1pi_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isCC1pi_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCC1pi_PassExpectations[&fe_NC1pi_1] = false;   // numu NC1pi
-  isCC1pi_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isCC1pi_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
+  isCC1pi_PassExpectations[&fe_CC0pi_2] = false;  // numu CC0pi (2p2h)
+  isCC1pi_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCC1pi_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isCC1pi_PassExpectations[&fe_CC1pip_1] = true;  // numu CC1pip (2p2h)
+  isCC1pi_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isCC1pi_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isCC1pi_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isCC1pi_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isCC1pi_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isCC1pi_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isCC1pi_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCC1pi_PassExpectations[&fe_CCCOH_1] = true;   // numu CC COH pi
+  isCC1pi_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isCC1pi_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCC1pi_PassExpectations[&fe_NC1pi_1] = false;  // numu NC1pi
+  isCC1pi_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isCC1pi_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isCC1pi_PassExpectations.begin();
        fe_it != isCC1pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isCC1pi(fe_it->first, 14, 211);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isCC1pi unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isCC1pi unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);
     }
   }
 
-  LOG(FIT) << "*            Testing: SignalDef::isNC1pi" << std::endl;
+  QLOG(FIT, "*            Testing: SignalDef::isNC1pi");
 
   std::map<ConstructibleFitEvent *, bool> isNC1pi_PassExpectations;
-  isNC1pi_PassExpectations[&fe_CC0pi_1] = false;   // numu CC0pi
-  isNC1pi_PassExpectations[&fe_CC0pi_2] = false;   // numu CC0pi (2p2h)
-  isNC1pi_PassExpectations[&fe_CC0pi_3] = false;   // numub CC0pi
-  isCCINC_PassExpectations[&fe_CC0pi_4] = false;   // numu CC0pi (RES)
-  isNC1pi_PassExpectations[&fe_CC1pip_1] = false;  // numu CC1pip (2p2h)
-  isNC1pi_PassExpectations[&fe_CC1pim_1] = false;  // numu CC1pim
-  isNC1pi_PassExpectations[&fe_CC1pi0_1] = false;  // numu CC1pi0
-  isNC1pi_PassExpectations[&fe_CC1pi0_2] = false;  // nue CC1pi0
-  isNC1pi_PassExpectations[&fe_CCNpi_1] = false;   // numu CC multi pi
-  isNC1pi_PassExpectations[&fe_CCNpi_2] = false;   // numu CC multi pi
-  isNC1pi_PassExpectations[&fe_CCNpi_3] = false;   // numu CC multi pi
-  isNC1pi_PassExpectations[&fe_CCNpi_4] = false;   // numu CC multi pi
-  isCCINC_PassExpectations[&fe_CCCOH_1] = false;   // numu CC COH pi
-  isNC1pi_PassExpectations[&fe_NCel_1] = false;    // numu NCEl
-  isNC1pi_PassExpectations[&fe_NCel_2] = false;    // nue NCEl
-  isCCINC_PassExpectations[&fe_NC1pi_1] = true;    // numu NC1pi
-  isCCINC_PassExpectations[&fe_NCNpi_1] = false;   // numu NC multi pi
+  isNC1pi_PassExpectations[&fe_CC0pi_1] = false;  // numu CC0pi
+  isNC1pi_PassExpectations[&fe_CC0pi_2] = false;  // numu CC0pi (2p2h)
+  isNC1pi_PassExpectations[&fe_CC0pi_3] = false;  // numub CC0pi
+  isCCINC_PassExpectations[&fe_CC0pi_4] = false;  // numu CC0pi (RES)
+  isNC1pi_PassExpectations[&fe_CC1pip_1] = false; // numu CC1pip (2p2h)
+  isNC1pi_PassExpectations[&fe_CC1pim_1] = false; // numu CC1pim
+  isNC1pi_PassExpectations[&fe_CC1pi0_1] = false; // numu CC1pi0
+  isNC1pi_PassExpectations[&fe_CC1pi0_2] = false; // nue CC1pi0
+  isNC1pi_PassExpectations[&fe_CCNpi_1] = false;  // numu CC multi pi
+  isNC1pi_PassExpectations[&fe_CCNpi_2] = false;  // numu CC multi pi
+  isNC1pi_PassExpectations[&fe_CCNpi_3] = false;  // numu CC multi pi
+  isNC1pi_PassExpectations[&fe_CCNpi_4] = false;  // numu CC multi pi
+  isCCINC_PassExpectations[&fe_CCCOH_1] = false;  // numu CC COH pi
+  isNC1pi_PassExpectations[&fe_NCel_1] = false;   // numu NCEl
+  isNC1pi_PassExpectations[&fe_NCel_2] = false;   // nue NCEl
+  isCCINC_PassExpectations[&fe_NC1pi_1] = true;   // numu NC1pi
+  isCCINC_PassExpectations[&fe_NCNpi_1] = false;  // numu NC multi pi
 
   ctr = 0;
-  for (std::map<ConstructibleFitEvent *, bool>::iterator
-           fe_it = isNC1pi_PassExpectations.begin();
+  for (std::map<ConstructibleFitEvent *, bool>::iterator fe_it =
+           isNC1pi_PassExpectations.begin();
        fe_it != isNC1pi_PassExpectations.end(); ++fe_it, ++ctr) {
     bool res = SignalDef::isNC1pi(fe_it->first, 14, -211);
     if (res != fe_it->second) {
-      ERR(FTL) << "Event: (" << ctr << ")\n"
-               << fe_it->first->ToString() << std::endl;
-      ERR(FTL) << (res ? "passed" : "failed")
-               << " SignalDef::isNC1pi unexpectedly." << std::endl;
+      QERROR(FTL, "Event: (" << ctr << ")\n" << fe_it->first->ToString());
+      QERROR(FTL, (res ? "passed" : "failed")
+                      << " SignalDef::isNC1pi unexpectedly.");
     } else {
-      LOG(SAM) << "Event: (" << ctr << ") " << (res ? "passed" : "failed")
-               << " as expected." << std::endl;
+      QLOG(SAM, "Event: (" << ctr << ") " << (res ? "passed" : "failed")
+                           << " as expected.");
     }
     if (FailOnFail) {
       assert(res == fe_it->second);

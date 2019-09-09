@@ -32,7 +32,7 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
-  EnuMax = 1E10;  // Arbritrarily high energy limit
+  EnuMax = 1E10; // Arbritrarily high energy limit
 
   // Set default fitter flags
   fIsDiag = true;
@@ -84,14 +84,14 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
       (this->PredictedEventRate("width", 0, 1000) / double(fNEvents)) /
       this->TotalIntegratedFlux();
   if (fScaleFactor <= 0.0) {
-    ERR(WRN) << "SCALE FACTOR TOO LOW " << std::endl;
-    throw;
+    QTHROW("SCALE FACTOR TOO LOW ");
   }
 
-  LOG(SAM) << " Generic Flux Scaling Factor = " << fScaleFactor
-           << " [= " << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
-           << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux() << ")]"
-           << std::endl;
+  QLOG(SAM, " Generic Flux Scaling Factor = "
+                << fScaleFactor
+                << " [= " << (GetEventHistogram()->Integral("width") * 1E-38)
+                << "/(" << (fNEvents + 0.) << "*" << this->TotalIntegratedFlux()
+                << ")]");
 
   // Setup our TTrees
   this->AddEventVariablesToTree();
@@ -106,7 +106,7 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding Event Variables" << std::endl;
+  QLOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
@@ -211,7 +211,7 @@ void GenericFlux_Tester::AddSignalFlagsToTree() {
                                (this->fName + "_VARS").c_str());
   }
 
-  LOG(SAM) << "Adding signal flags" << std::endl;
+  QLOG(SAM, "Adding signal flags");
 
   // Signal Definitions from SignalDef.cxx
   eventVariables->Branch("flagCCINC", &flagCCINC, "flagCCINC/O");
@@ -280,7 +280,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Fill Signal Variables
   FillSignalFlags(event);
-  LOG(DEB) << "Filling signal" << std::endl;
+  QLOG(DEB, "Filling signal");
 
   // Reset the private variables (see header)
   ResetVariables();
@@ -324,7 +324,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     // Skip particles that weren't in the final state
     bool part_alive = event->PartInfo(i)->fIsAlive and
                       event->PartInfo(i)->Status() == kFinalState;
-    if (!part_alive) continue;
+    if (!part_alive)
+      continue;
 
     // PDG Particle
     int PDGpart = event->PartInfo(i)->fPID;
@@ -494,7 +495,6 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   FluxWeight =
       GetFluxHistogram()->GetBinContent(GetFluxHistogram()->FindBin(Enu)) /
       GetFluxHistogram()->Integral();
-
 
   // Fill the eventVariables Tree
   eventVariables->Fill();

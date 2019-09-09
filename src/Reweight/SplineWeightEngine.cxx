@@ -6,13 +6,11 @@ SplineWeightEngine::SplineWeightEngine(std::string name) {
 
   // Setup the Reweight engien
   fCalcName = name;
-  LOG(FIT) << "Setting up Spline RW : " << fCalcName << std::endl;
+  QLOG(FIT, "Setting up Spline RW : " << fCalcName);
 
   // Set Abs Twk Config
   fIsAbsTwk = true;
-
 };
-
 
 void SplineWeightEngine::IncludeDial(std::string name, double startval) {
 
@@ -29,7 +27,7 @@ void SplineWeightEngine::IncludeDial(std::string name, double startval) {
     std::string singlename = allnames[i];
 
     // Get Single Enum For this dial
-    int singleenum =  Reweight::ConvDial(singlename, kCUSTOM);
+    int singleenum = Reweight::ConvDial(singlename, kCUSTOM);
 
     // Fill Maps
     int index = fValues.size();
@@ -48,7 +46,6 @@ void SplineWeightEngine::IncludeDial(std::string name, double startval) {
   }
 }
 
-
 void SplineWeightEngine::SetDialValue(int nuisenum, double val) {
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
@@ -56,41 +53,31 @@ void SplineWeightEngine::SetDialValue(int nuisenum, double val) {
   }
 }
 
-void SplineWeightEngine::SetDialValue(std::string name, double val){
+void SplineWeightEngine::SetDialValue(std::string name, double val) {
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
   }
 }
 
-
 void SplineWeightEngine::Reconfigure(bool silent) {
-  for (size_t i = 0; i < fSingleNames.size(); i++){
-    fSplineValueMap[ fSingleNames[i] ] = fValues[i];
+  for (size_t i = 0; i < fSingleNames.size(); i++) {
+    fSplineValueMap[fSingleNames[i]] = fValues[i];
   }
 }
 
+double SplineWeightEngine::CalcWeight(BaseFitEvt *evt) {
 
-double SplineWeightEngine::CalcWeight(BaseFitEvt* evt) {
-
-  if (!evt->fSplineRead) return 1.0;
+  if (!evt->fSplineRead)
+    return 1.0;
 
   if (evt->fSplineRead->NeedsReconfigure()) {
     evt->fSplineRead->Reconfigure(fSplineValueMap);
   }
 
-  double rw_weight = evt->fSplineRead->CalcWeight( evt->fSplineCoeff );
-  if (rw_weight < 0.0) rw_weight = 0.0;
+  double rw_weight = evt->fSplineRead->CalcWeight(evt->fSplineCoeff);
+  if (rw_weight < 0.0)
+    rw_weight = 0.0;
 
   return rw_weight;
 }
-
-
-
-
-
-
-
-
-
-

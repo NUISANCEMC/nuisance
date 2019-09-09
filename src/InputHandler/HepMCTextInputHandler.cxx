@@ -8,7 +8,7 @@ HepMCTextInputHandler::~HepMCTextInputHandler(){
 
 HepMCTextInputHandler::HepMCTextInputHandler(std::string const& handle, std::string const& rawinputs) {
 
-	LOG(SAM) << "Creating HepMCTextInputHandler : " << handle << std::endl;
+	QLOG(SAM, "Creating HepMCTextInputHandler : " << handle );
 
 	// Run a joint input handling
 	fName = handle;

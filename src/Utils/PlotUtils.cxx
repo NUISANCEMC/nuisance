@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include "PlotUtils.h"
 #include "FitEvent.h"
@@ -24,8 +24,8 @@
 // MOVE TO MB UTILS!
 // This function is intended to be modified to enforce a consistent masking for
 // all models.
-TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data) {
-  TH2D* fMaskHist = (TH2D*)data->Clone("fMaskHist");
+TH2D *PlotUtils::SetMaskHist(std::string type, TH2D *data) {
+  TH2D *fMaskHist = (TH2D *)data->Clone("fMaskHist");
 
   for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin) {
     for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin) {
@@ -54,60 +54,64 @@ TH2D* PlotUtils::SetMaskHist(std::string type, TH2D* data) {
 };
 
 // MOVE TO GENERAL UTILS?
-bool PlotUtils::CheckObjectWithName(TFile* inFile, std::string substring) {
+bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring) {
   TIter nextkey(inFile->GetListOfKeys());
-  TKey* key;
+  TKey *key;
 
-  while ((key = (TKey*)nextkey())) {
+  while ((key = (TKey *)nextkey())) {
     std::string test(key->GetName());
-    if (test.find(substring) != std::string::npos) return true;
+    if (test.find(substring) != std::string::npos)
+      return true;
   }
   return false;
 };
 
 // MOVE TO GENERAL UTILS?
-std::string PlotUtils::GetObjectWithName(TFile* inFile, std::string substring) {
+std::string PlotUtils::GetObjectWithName(TFile *inFile, std::string substring) {
   TIter nextkey(inFile->GetListOfKeys());
-  TKey* key;
+  TKey *key;
   std::string output = "";
 
-  while ((key = (TKey*)nextkey())) {
+  while ((key = (TKey *)nextkey())) {
     std::string test(key->GetName());
-    if (test.find(substring) != std::string::npos) output = test;
+    if (test.find(substring) != std::string::npos)
+      output = test;
   }
 
   return output;
 };
 
-void PlotUtils::CreateNeutModeArray(TH1* hist, TH1* neutarray[]) {
+void PlotUtils::CreateNeutModeArray(TH1 *hist, TH1 *neutarray[]) {
   for (int i = 0; i < 60; i++) {
-    neutarray[i] = (TH1*)hist->Clone(Form("%s_NMODE_%i", hist->GetName(), i));
+    neutarray[i] = (TH1 *)hist->Clone(Form("%s_NMODE_%i", hist->GetName(), i));
   }
   return;
 };
 
-void PlotUtils::DeleteNeutModeArray(TH1* neutarray[]) {
+void PlotUtils::DeleteNeutModeArray(TH1 *neutarray[]) {
   for (int i = 0; i < 60; i++) {
     delete neutarray[i];
   }
   return;
 };
 
-void PlotUtils::FillNeutModeArray(TH1D* hist[], int mode, double xval,
+void PlotUtils::FillNeutModeArray(TH1D *hist[], int mode, double xval,
                                   double weight) {
-  if (abs(mode) > 60) return;
+  if (abs(mode) > 60)
+    return;
   hist[abs(mode)]->Fill(xval, weight);
   return;
 };
 
-void PlotUtils::FillNeutModeArray(TH2D* hist[], int mode, double xval,
+void PlotUtils::FillNeutModeArray(TH2D *hist[], int mode, double xval,
                                   double yval, double weight) {
-  if (abs(mode) > 60) return;
+  if (abs(mode) > 60)
+    return;
   hist[abs(mode)]->Fill(xval, yval, weight);
   return;
 };
 
-THStack PlotUtils::GetNeutModeStack(std::string title, TH1* ModeStack[],
+THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
                                     int option) {
   (void)option;
   THStack allmodes = THStack(title.c_str(), title.c_str());
@@ -265,12 +269,12 @@ TLegend PlotUtils::GenerateStackLegend(THStack stack, int xlow, int ylow,
                                        int xhigh, int yhigh) {
   TLegend leg = TLegend(xlow, ylow, xhigh, yhigh);
 
-  TObjArray* histarray = stack.GetStack();
+  TObjArray *histarray = stack.GetStack();
 
   int nhist = histarray->GetEntries();
   for (int i = 0; i < nhist; i++) {
-    TH1* hist = (TH1*)(histarray->At(i));
-    leg.AddEntry((hist), ((TH1*)histarray->At(i))->GetTitle(), "fl");
+    TH1 *hist = (TH1 *)(histarray->At(i));
+    leg.AddEntry((hist), ((TH1 *)histarray->At(i))->GetTitle(), "fl");
   }
 
   leg.SetName(Form("%s_LEG", stack.GetName()));
@@ -278,18 +282,20 @@ TLegend PlotUtils::GenerateStackLegend(THStack stack, int xlow, int ylow,
   return leg;
 };
 
-void PlotUtils::ScaleNeutModeArray(TH1* hist[], double factor,
+void PlotUtils::ScaleNeutModeArray(TH1 *hist[], double factor,
                                    std::string option) {
   for (int i = 0; i < 60; i++) {
-    if (hist[i]) hist[i]->Scale(factor, option.c_str());
+    if (hist[i])
+      hist[i]->Scale(factor, option.c_str());
   }
 
   return;
 };
 
-void PlotUtils::ResetNeutModeArray(TH1* hist[]) {
+void PlotUtils::ResetNeutModeArray(TH1 *hist[]) {
   for (int i = 0; i < 60; i++) {
-    if (hist[i]) hist[i]->Reset();
+    if (hist[i])
+      hist[i]->Reset();
   }
 
   return;
@@ -298,13 +304,13 @@ void PlotUtils::ResetNeutModeArray(TH1* hist[]) {
 //********************************************************************
 // This assumes the Enu axis is the x axis, as is the case for MiniBooNE 2D
 // distributions
-void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
+void PlotUtils::FluxUnfoldedScaling(TH2D *fMCHist, TH1D *fhist, TH1D *ehist,
                                     double scalefactor) {
   //********************************************************************
 
   // Make clones to avoid changing stuff
-  TH1D* eventhist = (TH1D*)ehist->Clone();
-  TH1D* fFluxHist = (TH1D*)fhist->Clone();
+  TH1D *eventhist = (TH1D *)ehist->Clone();
+  TH1D *fFluxHist = (TH1D *)fhist->Clone();
 
   // Undo width integral in SF
   fMCHist->Scale(scalefactor /
@@ -327,34 +333,41 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
   // Find which axis is the Enu axis
   bool EnuOnXaxis = false;
   std::string xaxis = fMCHist->GetXaxis()->GetTitle();
-  if (xaxis.find("E") != std::string::npos && xaxis.find("nu") != std::string::npos) EnuOnXaxis = true;
+  if (xaxis.find("E") != std::string::npos &&
+      xaxis.find("nu") != std::string::npos)
+    EnuOnXaxis = true;
   std::string yaxis = fMCHist->GetYaxis()->GetTitle();
-  if (yaxis.find("E") != std::string::npos && xaxis.find("nu") != std::string::npos) {
+  if (yaxis.find("E") != std::string::npos &&
+      xaxis.find("nu") != std::string::npos) {
     // First check that xaxis didn't also find Enu
     if (EnuOnXaxis) {
-      ERR(FTL) << fMCHist->GetTitle() << " error:" << std::endl;
-      ERR(FTL) << "Found Enu in xaxis title: " << xaxis << std::endl;
-      ERR(FTL) << "AND" << std::endl;
-      ERR(FTL) << "Found Enu in yaxis title: " << yaxis << std::endl;
-      ERR(FTL) << "Enu on x and Enu on y flux unfolded scaling isn't implemented, please modify " << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      QERROR(FTL, fMCHist->GetTitle() << " error:");
+      QERROR(FTL, "Found Enu in xaxis title: " << xaxis);
+      QERROR(FTL, "AND");
+      QERROR(FTL, "Found Enu in yaxis title: " << yaxis);
+      QTHROW("Enu on x and Enu on y flux unfolded scaling isn't "
+             "implemented, please modify "
+             << __FILE__ << ":" << __LINE__);
     }
     EnuOnXaxis = false;
   }
 
   // Now Get a flux PDF assuming X axis is Enu
-  TH1D* pdfflux = NULL;
+  TH1D *pdfflux = NULL;
 
   // If xaxis is Enu
-  if (EnuOnXaxis) pdfflux = (TH1D*)fMCHist->ProjectionX()->Clone();
+  if (EnuOnXaxis)
+    pdfflux = (TH1D *)fMCHist->ProjectionX()->Clone();
   // If yaxis is Enu
-  else pdfflux = (TH1D*)fMCHist->ProjectionY()->Clone();
+  else
+    pdfflux = (TH1D *)fMCHist->ProjectionY()->Clone();
   //  pdfflux->Write( (std::string(fMCHist->GetName()) + "_PROJX").c_str());
   pdfflux->Reset();
 
   // Awful MiniBooNE Check for the time being
   // Needed because the flux is in GeV whereas the measurement is in MeV
-  bool ismb = std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
+  bool ismb =
+      std::string(fMCHist->GetName()).find("MiniBooNE") != std::string::npos;
 
   for (int i = 0; i < pdfflux->GetNbinsX(); i++) {
     double Ml = pdfflux->GetXaxis()->GetBinLowEdge(i + 1);
@@ -393,10 +406,11 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
     pdfflux->SetBinContent(i + 1, fluxint);
   }
 
-  // Then finally divide by the bin-width in 
+  // Then finally divide by the bin-width in
   for (int i = 0; i < fMCHist->GetNbinsX(); i++) {
     for (int j = 0; j < fMCHist->GetNbinsY(); j++) {
-      if (pdfflux->GetBinContent(i + 1) == 0.0) continue;
+      if (pdfflux->GetBinContent(i + 1) == 0.0)
+        continue;
 
       // Different scaling depending on if Enu is on x or y axis
       double scaling = 1.0;
@@ -404,24 +418,23 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
       // And to divide by the bin width of the jth bin
       if (EnuOnXaxis) {
         double binWidth = fMCHist->GetYaxis()->GetBinLowEdge(j + 2) -
-                   fMCHist->GetYaxis()->GetBinLowEdge(j + 1);
-        scaling = pdfflux->GetBinContent(i+1)*binWidth;
+                          fMCHist->GetYaxis()->GetBinLowEdge(j + 1);
+        scaling = pdfflux->GetBinContent(i + 1) * binWidth;
       } else {
         double binWidth = fMCHist->GetXaxis()->GetBinLowEdge(i + 2) -
-                   fMCHist->GetXaxis()->GetBinLowEdge(i + 1);
-        scaling = pdfflux->GetBinContent(j+1)*binWidth;
+                          fMCHist->GetXaxis()->GetBinLowEdge(i + 1);
+        scaling = pdfflux->GetBinContent(j + 1) * binWidth;
       }
-      //fMCHist->SetBinContent(i + 1, j + 1,
-                             //fMCHist->GetBinContent(i + 1, j + 1) /
-                                 //pdfflux->GetBinContent(i + 1) / binWidth);
-      //fMCHist->SetBinError(i + 1, j + 1, fMCHist->GetBinError(i + 1, j + 1) /
-                                             //pdfflux->GetBinContent(i + 1) /
-                                             //binWidth);
+      // fMCHist->SetBinContent(i + 1, j + 1,
+      // fMCHist->GetBinContent(i + 1, j + 1) /
+      // pdfflux->GetBinContent(i + 1) / binWidth);
+      // fMCHist->SetBinError(i + 1, j + 1, fMCHist->GetBinError(i + 1, j + 1) /
+      // pdfflux->GetBinContent(i + 1) /
+      // binWidth);
       fMCHist->SetBinContent(i + 1, j + 1,
-                             fMCHist->GetBinContent(i + 1, j + 1) /
-                                 scaling);
-      fMCHist->SetBinError(i + 1, j + 1, fMCHist->GetBinError(i + 1, j + 1) /
-                                         scaling);
+                             fMCHist->GetBinContent(i + 1, j + 1) / scaling);
+      fMCHist->SetBinError(i + 1, j + 1,
+                           fMCHist->GetBinError(i + 1, j + 1) / scaling);
     }
   }
 
@@ -429,39 +442,42 @@ void PlotUtils::FluxUnfoldedScaling(TH2D* fMCHist, TH1D* fhist, TH1D* ehist,
   delete fFluxHist;
 };
 
-TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res,
+TH1D *PlotUtils::InterpolateFineHistogram(TH1D *hist, int res,
                                           std::string opt) {
   int nbins = hist->GetNbinsX();
   double elow = hist->GetXaxis()->GetBinLowEdge(1);
   double ehigh = hist->GetXaxis()->GetBinLowEdge(nbins + 1);
-  bool width = true;  // opt.find("width") != std::string::npos;
+  bool width = true; // opt.find("width") != std::string::npos;
 
-  TH1D* fine = new TH1D("fine", "fine", nbins * res, elow, ehigh);
+  TH1D *fine = new TH1D("fine", "fine", nbins * res, elow, ehigh);
 
-  TGraph* temp = new TGraph();
+  TGraph *temp = new TGraph();
 
   for (int i = 0; i < nbins; i++) {
     double E = hist->GetXaxis()->GetBinCenter(i + 1);
     double C = hist->GetBinContent(i + 1);
     double W = hist->GetXaxis()->GetBinWidth(i + 1);
-    if (!width) W = 1.0;
+    if (!width)
+      W = 1.0;
 
-    if (W != 0.0) temp->SetPoint(temp->GetN(), E, C / W);
+    if (W != 0.0)
+      temp->SetPoint(temp->GetN(), E, C / W);
   }
 
   for (int i = 0; i < fine->GetNbinsX(); i++) {
     double E = fine->GetXaxis()->GetBinCenter(i + 1);
     double W = fine->GetBinWidth(i + 1);
-    if (!width) W = 1.0;
+    if (!width)
+      W = 1.0;
 
     fine->SetBinContent(i + 1, temp->Eval(E, 0, "S") * W);
   }
 
   fine->Scale(hist->Integral(1, hist->GetNbinsX() + 1) /
               fine->Integral(1, fine->GetNbinsX() + 1));
-  //std::cout << "Interpolation Difference = "
-            //<< fine->Integral(1, fine->GetNbinsX() + 1) << "/"
-            //<< hist->Integral(1, hist->GetNbinsX() + 1) << std::endl;
+  // std::cout << "Interpolation Difference = "
+  //<< fine->Integral(1, fine->GetNbinsX() + 1) << "/"
+  //<< hist->Integral(1, hist->GetNbinsX() + 1) << std::endl;
 
   return fine;
 }
@@ -469,12 +485,12 @@ TH1D* PlotUtils::InterpolateFineHistogram(TH1D* hist, int res,
 //********************************************************************
 // This interpolates the flux by a TGraph instead of requiring the flux and MC
 // flux to have the same binning
-void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
+void PlotUtils::FluxUnfoldedScaling(TH1D *mcHist, TH1D *fhist, TH1D *ehist,
                                     double scalefactor, int nevents) {
   //********************************************************************
 
-  TH1D* eventhist = (TH1D*)ehist->Clone();
-  TH1D* fFluxHist = (TH1D*)fhist->Clone();
+  TH1D *eventhist = (TH1D *)ehist->Clone();
+  TH1D *fFluxHist = (TH1D *)fhist->Clone();
 
   if (FitPar::Config().GetParB("save_flux_debug")) {
     std::string name = std::string(mcHist->GetName());
@@ -483,7 +499,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
     fFluxHist->Write((name + "_UNF_FLUX").c_str());
     eventhist->Write((name + "_UNF_EVT").c_str());
 
-    TH1D* scalehist = new TH1D("scalehist", "scalehist", 1, 0.0, 1.0);
+    TH1D *scalehist = new TH1D("scalehist", "scalehist", 1, 0.0, 1.0);
     scalehist->SetBinContent(1, scalefactor);
     scalehist->SetBinContent(2, nevents);
 
@@ -502,7 +518,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
   mcHist->Scale(eventhist->Integral(1, eventhist->GetNbinsX() + 1));
 
   // Now Get a flux PDF
-  TH1D* pdfflux = (TH1D*)mcHist->Clone();
+  TH1D *pdfflux = (TH1D *)mcHist->Clone();
   pdfflux->Reset();
 
   for (int i = 0; i < mcHist->GetNbinsX(); i++) {
@@ -538,12 +554,13 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
 
   // Scale MC hist by pdfflux
   for (int i = 0; i < mcHist->GetNbinsX(); i++) {
-    if (pdfflux->GetBinContent(i + 1) == 0.0) continue;
+    if (pdfflux->GetBinContent(i + 1) == 0.0)
+      continue;
 
-    mcHist->SetBinContent(
-        i + 1, mcHist->GetBinContent(i + 1) / pdfflux->GetBinContent(i + 1));
-    mcHist->SetBinError(
-        i + 1, mcHist->GetBinError(i + 1) / pdfflux->GetBinContent(i + 1));
+    mcHist->SetBinContent(i + 1, mcHist->GetBinContent(i + 1) /
+                                     pdfflux->GetBinContent(i + 1));
+    mcHist->SetBinError(i + 1, mcHist->GetBinError(i + 1) /
+                                   pdfflux->GetBinContent(i + 1));
   }
 
   delete eventhist;
@@ -552,7 +569,7 @@ void PlotUtils::FluxUnfoldedScaling(TH1D* mcHist, TH1D* fhist, TH1D* ehist,
 
 // MOVE TO GENERAL UTILS
 //********************************************************************
-void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
+void PlotUtils::Set2DHistFromText(std::string dataFile, TH2 *hist, double norm,
                                   bool skipbins) {
   //********************************************************************
 
@@ -575,15 +592,15 @@ void PlotUtils::Set2DHistFromText(std::string dataFile, TH2* hist, double norm,
 }
 
 // MOVE TO GENERAL UTILS
-TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
+TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
                                  std::string fPlotTitles,
                                  std::string alt_name) {
-  TH1D* tempPlot;
+  TH1D *tempPlot;
 
   // If format is a root file
   if (dataFile.find(".root") != std::string::npos) {
-    TFile* temp_infile = new TFile(dataFile.c_str(), "READ");
-    tempPlot = (TH1D*)temp_infile->Get(title.c_str());
+    TFile *temp_infile = new TFile(dataFile.c_str(), "READ");
+    tempPlot = (TH1D *)temp_infile->Get(title.c_str());
     tempPlot->SetDirectory(0);
 
     temp_infile->Close();
@@ -592,13 +609,15 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     // Else its a space seperated txt file
   } else {
     // Make a TGraph Errors
-    TGraphErrors* gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
+    TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
     if (gr->IsZombie()) {
-      THROW(dataFile << " is a zombie and could not be read. Are you sure it exists?" << std::endl);
+      QTHROW(dataFile
+             << " is a zombie and could not be read. Are you sure it exists?"
+             << std::endl);
     }
-    double* bins = gr->GetX();
-    double* values = gr->GetY();
-    double* errors = gr->GetEY();
+    double *bins = gr->GetX();
+    double *values = gr->GetY();
+    double *errors = gr->GetEY();
     int npoints = gr->GetN();
 
     // Fill the histogram from it
@@ -607,8 +626,9 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     for (int i = 0; i < npoints; ++i) {
       tempPlot->SetBinContent(i + 1, values[i]);
 
-      // If only two columns are present in the input file, use the sqrt(values) as the error
-      // equivalent to assuming that the error is statistical. Also check that we're looking at an event rate rather than a cross section
+      // If only two columns are present in the input file, use the sqrt(values)
+      // as the error equivalent to assuming that the error is statistical. Also
+      // check that we're looking at an event rate rather than a cross section
       if (!errors[i] && values[i] > 1E-30) {
         tempPlot->SetBinError(i + 1, sqrt(values[i]));
       } else {
@@ -634,9 +654,9 @@ TH1D* PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
   return tempPlot;
 };
 
-TH1D* PlotUtils::GetRatioPlot(TH1D* hist1, TH1D* hist2) {
+TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2) {
   // make copy of first hist
-  TH1D* new_hist = (TH1D*)hist1->Clone();
+  TH1D *new_hist = (TH1D *)hist1->Clone();
 
   // Do bins and errors ourselves as scales can go awkward
   for (int i = 0; i < new_hist->GetNbinsX(); i++) {
@@ -644,18 +664,18 @@ TH1D* PlotUtils::GetRatioPlot(TH1D* hist1, TH1D* hist2) {
       new_hist->SetBinContent(i + 1, 0.0);
     }
 
-    new_hist->SetBinContent(
-        i + 1, hist1->GetBinContent(i + 1) / hist2->GetBinContent(i + 1));
-    new_hist->SetBinError(
-        i + 1, hist1->GetBinError(i + 1) / hist2->GetBinContent(i + 1));
+    new_hist->SetBinContent(i + 1, hist1->GetBinContent(i + 1) /
+                                       hist2->GetBinContent(i + 1));
+    new_hist->SetBinError(i + 1, hist1->GetBinError(i + 1) /
+                                     hist2->GetBinContent(i + 1));
   }
 
   return new_hist;
 };
 
-TH1D* PlotUtils::GetRenormalisedPlot(TH1D* hist1, TH1D* hist2) {
+TH1D *PlotUtils::GetRenormalisedPlot(TH1D *hist1, TH1D *hist2) {
   // make copy of first hist
-  TH1D* new_hist = (TH1D*)hist1->Clone();
+  TH1D *new_hist = (TH1D *)hist1->Clone();
 
   if (hist1->Integral("width") == 0 or hist2->Integral("width") == 0) {
     new_hist->Reset();
@@ -668,9 +688,9 @@ TH1D* PlotUtils::GetRenormalisedPlot(TH1D* hist1, TH1D* hist2) {
   return new_hist;
 };
 
-TH1D* PlotUtils::GetShapePlot(TH1D* hist1) {
+TH1D *PlotUtils::GetShapePlot(TH1D *hist1) {
   // make copy of first hist
-  TH1D* new_hist = (TH1D*)hist1->Clone();
+  TH1D *new_hist = (TH1D *)hist1->Clone();
 
   if (hist1->Integral("width") == 0) {
     new_hist->Reset();
@@ -684,9 +704,9 @@ TH1D* PlotUtils::GetShapePlot(TH1D* hist1) {
   return new_hist;
 };
 
-TH1D* PlotUtils::GetShapeRatio(TH1D* hist1, TH1D* hist2) {
-  TH1D* new_hist1 = GetShapePlot(hist1);
-  TH1D* new_hist2 = GetShapePlot(hist2);
+TH1D *PlotUtils::GetShapeRatio(TH1D *hist1, TH1D *hist2) {
+  TH1D *new_hist1 = GetShapePlot(hist1);
+  TH1D *new_hist2 = GetShapePlot(hist2);
 
   // Do bins and errors ourselves as scales can go awkward
   for (int i = 0; i < new_hist1->GetNbinsX(); i++) {
@@ -696,8 +716,8 @@ TH1D* PlotUtils::GetShapeRatio(TH1D* hist1, TH1D* hist2) {
 
     new_hist1->SetBinContent(i + 1, new_hist1->GetBinContent(i + 1) /
                                         new_hist2->GetBinContent(i + 1));
-    new_hist1->SetBinError(
-        i + 1, new_hist1->GetBinError(i + 1) / new_hist2->GetBinContent(i + 1));
+    new_hist1->SetBinError(i + 1, new_hist1->GetBinError(i + 1) /
+                                      new_hist2->GetBinContent(i + 1));
   }
 
   delete new_hist2;
@@ -705,9 +725,9 @@ TH1D* PlotUtils::GetShapeRatio(TH1D* hist1, TH1D* hist2) {
   return new_hist1;
 };
 
-TH2D* PlotUtils::GetCovarPlot(TMatrixDSym* cov, std::string name,
+TH2D *PlotUtils::GetCovarPlot(TMatrixDSym *cov, std::string name,
                               std::string title) {
-  TH2D* CovarPlot;
+  TH2D *CovarPlot;
 
   if (cov)
     CovarPlot = new TH2D((*cov));
@@ -720,35 +740,34 @@ TH2D* PlotUtils::GetCovarPlot(TMatrixDSym* cov, std::string name,
   return CovarPlot;
 }
 
-TH2D* PlotUtils::GetFullCovarPlot(TMatrixDSym* cov, std::string name) {
+TH2D *PlotUtils::GetFullCovarPlot(TMatrixDSym *cov, std::string name) {
   return PlotUtils::GetCovarPlot(
       cov, name + "_COV", name + "_COV;Bins;Bins;Covariance (#times10^{-76})");
 }
 
-TH2D* PlotUtils::GetInvCovarPlot(TMatrixDSym* cov, std::string name) {
+TH2D *PlotUtils::GetInvCovarPlot(TMatrixDSym *cov, std::string name) {
   return PlotUtils::GetCovarPlot(
       cov, name + "_INVCOV",
       name + "_INVCOV;Bins;Bins;Inv. Covariance (#times10^{-76})");
 }
 
-TH2D* PlotUtils::GetDecompCovarPlot(TMatrixDSym* cov, std::string name) {
+TH2D *PlotUtils::GetDecompCovarPlot(TMatrixDSym *cov, std::string name) {
   return PlotUtils::GetCovarPlot(
       cov, name + "_DECCOV",
       name + "_DECCOV;Bins;Bins;Decomp Covariance (#times10^{-76})");
 }
 
-TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
+TH1D *PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
     file = tempfile[0];
     name = tempfile[1];
   }
 
-  TFile* rootHistFile = new TFile(file.c_str(), "READ");
-  TH1D* tempHist = (TH1D*)rootHistFile->Get(name.c_str())->Clone();
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
+  TH1D *tempHist = (TH1D *)rootHistFile->Get(name.c_str())->Clone();
   if (tempHist == NULL) {
-    ERR(FTL) << "Could not find distribution " << name << " in file " << file << std::endl;
-    throw;
+    QTHROW("Could not find distribution " << name << " in file " << file);
   }
   tempHist->SetDirectory(0);
 
@@ -757,15 +776,15 @@ TH1D* PlotUtils::GetTH1DFromRootFile(std::string file, std::string name) {
   return tempHist;
 }
 
-TH2D* PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
+TH2D *PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
     file = tempfile[0];
     name = tempfile[1];
   }
 
-  TFile* rootHistFile = new TFile(file.c_str(), "READ");
-  TH2D* tempHist = (TH2D*)rootHistFile->Get(name.c_str())->Clone();
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
+  TH2D *tempHist = (TH2D *)rootHistFile->Get(name.c_str())->Clone();
   tempHist->SetDirectory(0);
 
   rootHistFile->Close();
@@ -774,21 +793,21 @@ TH2D* PlotUtils::GetTH2DFromRootFile(std::string file, std::string name) {
   return tempHist;
 }
 
-TH1* PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
+TH1 *PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
     file = tempfile[0];
     name = tempfile[1];
   }
 
-  TFile* rootHistFile = new TFile(file.c_str(), "READ");
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
   if (!rootHistFile || rootHistFile->IsZombie()) {
-    THROW("Couldn't open root file: \"" << file << "\".");
+    QTHROW("Couldn't open root file: \"" << file << "\".");
   }
-  TH1* tempHist = dynamic_cast<TH1*>(rootHistFile->Get(name.c_str())->Clone());
+  TH1 *tempHist = dynamic_cast<TH1 *>(rootHistFile->Get(name.c_str())->Clone());
   if (!tempHist) {
-    THROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
-                                  << "\".");
+    QTHROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
+                                   << "\".");
   }
   tempHist->SetDirectory(0);
 
@@ -798,25 +817,26 @@ TH1* PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   return tempHist;
 }
 
-TGraph* PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
+TGraph *PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
   if (name.empty()) {
     std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
     file = tempfile[0];
     name = tempfile[1];
   }
 
-  TDirectory* olddir = gDirectory;
+  TDirectory *olddir = gDirectory;
 
-  TFile* rootHistFile = new TFile(file.c_str(), "READ");
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
   if (!rootHistFile || rootHistFile->IsZombie()) {
-    THROW("Couldn't open root file: \"" << file << "\".");
+    QTHROW("Couldn't open root file: \"" << file << "\".");
   }
-  TDirectory* newdir = gDirectory;
+  TDirectory *newdir = gDirectory;
 
-  TGraph* temp = dynamic_cast<TGraph*>(rootHistFile->Get(name.c_str())->Clone());
+  TGraph *temp =
+      dynamic_cast<TGraph *>(rootHistFile->Get(name.c_str())->Clone());
   if (!temp) {
-    THROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
-	  << "\".");
+    QTHROW("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
+                                   << "\".");
   }
   newdir->Remove(temp);
   olddir->Append(temp);
@@ -825,23 +845,22 @@ TGraph* PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
   return temp;
 }
 
-
 /// Returns a vector of named TH1*s found in a single input file.
 ///
 /// Expects a descriptor like: file.root[hist1|hist2|...]
-std::vector<TH1*> PlotUtils::GetTH1sFromRootFile(
-    std::string const& descriptor) {
+std::vector<TH1 *>
+PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
   std::vector<std::string> descriptors =
       GeneralUtils::ParseToStr(descriptor, ",");
 
-  std::vector<TH1*> hists;
+  std::vector<TH1 *> hists;
   for (size_t d_it = 0; d_it < descriptors.size(); ++d_it) {
-    std::string& d = descriptors[d_it];
+    std::string &d = descriptors[d_it];
 
     std::vector<std::string> fname = GeneralUtils::ParseToStr(d, "[");
     if (!fname.size() || !fname[0].length()) {
-      THROW("Couldn't find input file when attempting to parse : \""
-            << d << "\". Expected input.root[hist1|hist2|...].");
+      QTHROW("Couldn't find input file when attempting to parse : \""
+             << d << "\". Expected input.root[hist1|hist2|...].");
     }
 
     if (fname[1][fname[1].length() - 1] == ']') {
@@ -850,24 +869,23 @@ std::vector<TH1*> PlotUtils::GetTH1sFromRootFile(
     std::vector<std::string> histnames =
         GeneralUtils::ParseToStr(fname[1], "|");
     if (!histnames.size()) {
-      THROW(
-          "Couldn't find any histogram name specifiers when attempting to "
-          "parse "
-          ": \""
-          << fname[1] << "\". Expected hist1|hist2|...");
+      QTHROW("Couldn't find any histogram name specifiers when attempting to "
+             "parse "
+             ": \""
+             << fname[1] << "\". Expected hist1|hist2|...");
     }
 
-    TFile* rootHistFile = new TFile(fname[0].c_str(), "READ");
+    TFile *rootHistFile = new TFile(fname[0].c_str(), "READ");
     if (!rootHistFile || rootHistFile->IsZombie()) {
-      THROW("Couldn't open root file: \"" << fname[0] << "\".");
+      QTHROW("Couldn't open root file: \"" << fname[0] << "\".");
     }
 
     for (size_t i = 0; i < histnames.size(); ++i) {
-      TH1* tempHist =
-          dynamic_cast<TH1*>(rootHistFile->Get(histnames[i].c_str())->Clone());
+      TH1 *tempHist =
+          dynamic_cast<TH1 *>(rootHistFile->Get(histnames[i].c_str())->Clone());
       if (!tempHist) {
-        THROW("Couldn't retrieve: \"" << histnames[i] << "\" from root file: \""
-                                      << fname[0] << "\".");
+        QTHROW("Couldn't retrieve: \""
+               << histnames[i] << "\" from root file: \"" << fname[0] << "\".");
       }
       tempHist->SetDirectory(0);
       hists.push_back(tempHist);
@@ -890,9 +908,10 @@ std::vector<double> PlotUtils::GetArrayFromTextFile(std::string DataFile) {
 }
 
 // Get a 2D array from a text file
-std::vector<std::vector<double> > PlotUtils::Get2DArrayFromTextFile(std::string DataFile) {
+std::vector<std::vector<double>>
+PlotUtils::Get2DArrayFromTextFile(std::string DataFile) {
   std::string line;
-  std::vector<std::vector<double> > DataArray;
+  std::vector<std::vector<double>> DataArray;
   std::ifstream data(DataFile.c_str(), std::ifstream::in);
   while (std::getline(data >> std::ws, line, '\n')) {
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
@@ -901,7 +920,8 @@ std::vector<std::vector<double> > PlotUtils::Get2DArrayFromTextFile(std::string 
   return DataArray;
 }
 
-TH2D* PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx, std::string biny) {
+TH2D *PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx,
+                                     std::string biny) {
 
   // First read in the binning
   // Array of x binning
@@ -911,14 +931,15 @@ TH2D* PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx, std::st
   std::vector<double> ybins = GetArrayFromTextFile(biny);
 
   // Read in the data
-  std::vector<std::vector<double> > Data = Get2DArrayFromTextFile(data);
+  std::vector<std::vector<double>> Data = Get2DArrayFromTextFile(data);
 
   // And finally fill the data
-  TH2D* DataPlot = new TH2D("TempHist", "TempHist", xbins.size()-1, &xbins[0], ybins.size()-1, &ybins[0]);
+  TH2D *DataPlot = new TH2D("TempHist", "TempHist", xbins.size() - 1, &xbins[0],
+                            ybins.size() - 1, &ybins[0]);
   int nBinsX = 0;
   int nBinsY = 0;
-  for (std::vector<std::vector<double> >::iterator it = Data.begin(); 
-      it != Data.end(); ++it) {
+  for (std::vector<std::vector<double>>::iterator it = Data.begin();
+       it != Data.end(); ++it) {
     nBinsX++;
     // Get the inner vector
     std::vector<double> temp = *it;
@@ -927,106 +948,118 @@ TH2D* PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx, std::st
     int oldBinsY = nBinsY;
     // Reset the counter
     nBinsY = 0;
-    for (std::vector<double>::iterator jt = temp.begin(); 
-        jt != temp.end(); ++jt) {
+    for (std::vector<double>::iterator jt = temp.begin(); jt != temp.end();
+         ++jt) {
       nBinsY++;
       DataPlot->SetBinContent(nBinsX, nBinsY, *jt);
       DataPlot->SetBinError(nBinsX, nBinsY, 0.0);
     }
     if (oldBinsY > 0 && oldBinsY != nBinsY) {
-      ERR(FTL) << "Found non-uniform y-binning in " << data << std::endl;
-      ERR(FTL) << "Previous slice: " << oldBinsY << std::endl;
-      ERR(FTL) << "Current slice: " << nBinsY << std::endl;
-      ERR(FTL) << "Non-uniform binning is not supported in PlotUtils::GetTH2DFromTextFile" << std::endl;
-      throw;
+      QERROR(FTL, "Found non-uniform y-binning in " << data);
+      QERROR(FTL, "Previous slice: " << oldBinsY);
+      QERROR(FTL, "Current slice: " << nBinsY);
+      QTHROW("Non-uniform binning is not supported in "
+             "PlotUtils::GetTH2DFromTextFile");
     }
   }
 
   // Check x bins
-  if (size_t(nBinsX+1) != xbins.size()) {
-    ERR(FTL) << "Number of x bins in data histogram does not match the binning histogram!" << std::endl;
-    ERR(FTL) << "Are they the wrong way around (i.e. xbinning should be ybinning)?" << std::endl;
-    ERR(FTL) << "Data: " << nBinsX << std::endl;
-    ERR(FTL) << "From " << binx << " binning: " << xbins.size() << std::endl;
-    throw;
+  if (size_t(nBinsX + 1) != xbins.size()) {
+    QERROR(FTL, "Number of x bins in data histogram does not match the binning "
+                "histogram!");
+    QERROR(FTL,
+           "Are they the wrong way around (i.e. xbinning should be ybinning)?");
+    QERROR(FTL, "Data: " << nBinsX);
+    QTHROW("From " << binx << " binning: " << xbins.size());
   }
 
   // Check y bins
-  if (size_t(nBinsY+1) != ybins.size()) {
-    ERR(FTL) << "Number of y bins in data histogram does not match the binning histogram!" << std::endl;
-    ERR(FTL) << "Are they the wrong way around (i.e. xbinning should be ybinning)?" << std::endl;
-    ERR(FTL) << "Data: " << nBinsY << std::endl;
-    ERR(FTL) << "From " << biny << " binning: " << ybins.size() << std::endl;
-    throw;
+  if (size_t(nBinsY + 1) != ybins.size()) {
+    QERROR(FTL, "Number of y bins in data histogram does not match the binning "
+                "histogram!");
+    QERROR(FTL,
+           "Are they the wrong way around (i.e. xbinning should be ybinning)?");
+    QERROR(FTL, "Data: " << nBinsY);
+    QTHROW("From " << biny << " binning: " << ybins.size());
   }
 
   return DataPlot;
 }
 
-TH1D* PlotUtils::GetSliceY(TH2D *Hist, int SliceNo) {
-  TH1D *Slice = Hist->ProjectionX(Form("%s_SLICEY%i", Hist->GetName(), SliceNo), SliceNo, SliceNo, "e");
-  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetYaxis()->GetTitle(), Hist->GetYaxis()->GetBinLowEdge(SliceNo), Hist->GetYaxis()->GetBinLowEdge(SliceNo+1)));
+TH1D *PlotUtils::GetSliceY(TH2D *Hist, int SliceNo) {
+  TH1D *Slice = Hist->ProjectionX(Form("%s_SLICEY%i", Hist->GetName(), SliceNo),
+                                  SliceNo, SliceNo, "e");
+  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetYaxis()->GetTitle(),
+                       Hist->GetYaxis()->GetBinLowEdge(SliceNo),
+                       Hist->GetYaxis()->GetBinLowEdge(SliceNo + 1)));
   Slice->GetYaxis()->SetTitle(Hist->GetZaxis()->GetTitle());
   return Slice;
 }
 
-TH1D* PlotUtils::GetSliceX(TH2D *Hist, int SliceNo) {
-  TH1D *Slice = Hist->ProjectionY(Form("%s_SLICEX%i", Hist->GetName(), SliceNo), SliceNo, SliceNo, "e");
-  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetXaxis()->GetTitle(), Hist->GetXaxis()->GetBinLowEdge(SliceNo), Hist->GetXaxis()->GetBinLowEdge(SliceNo+1)));
+TH1D *PlotUtils::GetSliceX(TH2D *Hist, int SliceNo) {
+  TH1D *Slice = Hist->ProjectionY(Form("%s_SLICEX%i", Hist->GetName(), SliceNo),
+                                  SliceNo, SliceNo, "e");
+  Slice->SetTitle(Form("%s, %.2f-%.2f", Hist->GetXaxis()->GetTitle(),
+                       Hist->GetXaxis()->GetBinLowEdge(SliceNo),
+                       Hist->GetXaxis()->GetBinLowEdge(SliceNo + 1)));
   Slice->GetYaxis()->SetTitle(Hist->GetZaxis()->GetTitle());
   return Slice;
 }
 
-void PlotUtils::AddNeutModeArray(TH1D* hist1[], TH1D* hist2[], double scaling) {
+void PlotUtils::AddNeutModeArray(TH1D *hist1[], TH1D *hist2[], double scaling) {
   for (int i = 0; i < 60; i++) {
-    if (!hist2[i]) continue;
-    if (!hist1[i]) continue;
+    if (!hist2[i])
+      continue;
+    if (!hist1[i])
+      continue;
     hist1[i]->Add(hist2[i], scaling);
   }
   return;
 }
 
-void PlotUtils::ScaleToData(TH1D* data, TH1D* mc, TH1I* mask) {
+void PlotUtils::ScaleToData(TH1D *data, TH1D *mc, TH1I *mask) {
   double scaleF = GetDataMCRatio(data, mc, mask);
   mc->Scale(scaleF);
 
   return;
 }
 
-void PlotUtils::MaskBins(TH1D* hist, TH1I* mask) {
+void PlotUtils::MaskBins(TH1D *hist, TH1I *mask) {
   for (int i = 0; i < hist->GetNbinsX(); i++) {
-    if (mask->GetBinContent(i + 1) <= 0.5) continue;
+    if (mask->GetBinContent(i + 1) <= 0.5)
+      continue;
 
     hist->SetBinContent(i + 1, 0.0);
     hist->SetBinError(i + 1, 0.0);
 
-    LOG(REC) << "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
-             << " to 0.0 +- 0.0" << std::endl;
+    QLOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
+                               << " to 0.0 +- 0.0");
   }
 
   return;
 }
 
-void PlotUtils::MaskBins(TH2D* hist, TH2I* mask) {
+void PlotUtils::MaskBins(TH2D *hist, TH2I *mask) {
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     for (int j = 0; j < hist->GetNbinsY(); j++) {
-      if (mask->GetBinContent(i + 1, j + 1) <= 0.5) continue;
+      if (mask->GetBinContent(i + 1, j + 1) <= 0.5)
+        continue;
 
       hist->SetBinContent(i + 1, j + 1, 0.0);
       hist->SetBinError(i + 1, j + 1, 0.0);
 
-      LOG(REC) << "MaskBins: Set " << hist->GetName() << " Bin " << i + 1 << " "
-               << j + 1 << " to 0.0 +- 0.0" << std::endl;
+      QLOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1 << " "
+                                 << j + 1 << " to 0.0 +- 0.0");
     }
   }
   return;
 }
 
-double PlotUtils::GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask) {
+double PlotUtils::GetDataMCRatio(TH1D *data, TH1D *mc, TH1I *mask) {
   double rat = 1.0;
 
-  TH1D* newmc = (TH1D*)mc->Clone();
-  TH1D* newdt = (TH1D*)data->Clone();
+  TH1D *newmc = (TH1D *)mc->Clone();
+  TH1D *newdt = (TH1D *)data->Clone();
 
   if (mask) {
     MaskBins(newmc, mask);
@@ -1038,8 +1071,8 @@ double PlotUtils::GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask) {
   return rat;
 }
 
-TH2D* PlotUtils::GetCorrelationPlot(TH2D* cov, std::string name) {
-  TH2D* cor = (TH2D*)cov->Clone();
+TH2D *PlotUtils::GetCorrelationPlot(TH2D *cov, std::string name) {
+  TH2D *cor = (TH2D *)cov->Clone();
   cor->Reset();
 
   for (int i = 0; i < cov->GetNbinsX(); i++) {
@@ -1063,16 +1096,16 @@ TH2D* PlotUtils::GetCorrelationPlot(TH2D* cov, std::string name) {
   return cor;
 }
 
-TH2D* PlotUtils::GetDecompPlot(TH2D* cov, std::string name) {
-  TMatrixDSym* covarmat = new TMatrixDSym(cov->GetNbinsX());
+TH2D *PlotUtils::GetDecompPlot(TH2D *cov, std::string name) {
+  TMatrixDSym *covarmat = new TMatrixDSym(cov->GetNbinsX());
 
   for (int i = 0; i < cov->GetNbinsX(); i++)
     for (int j = 0; j < cov->GetNbinsY(); j++)
       (*covarmat)(i, j) = cov->GetBinContent(i + 1, j + 1);
 
-  TMatrixDSym* decompmat = StatUtils::GetDecomp(covarmat);
+  TMatrixDSym *decompmat = StatUtils::GetDecomp(covarmat);
 
-  TH2D* dec = (TH2D*)cov->Clone();
+  TH2D *dec = (TH2D *)cov->Clone();
   for (int i = 0; i < cov->GetNbinsX(); i++)
     for (int j = 0; j < cov->GetNbinsY(); j++)
       dec->SetBinContent(i + 1, j + 1, (*decompmat)(i, j));
@@ -1085,7 +1118,7 @@ TH2D* PlotUtils::GetDecompPlot(TH2D* cov, std::string name) {
   return dec;
 }
 
-TH2D* PlotUtils::MergeIntoTH2D(TH1D* xhist, TH1D* yhist, std::string zname) {
+TH2D *PlotUtils::MergeIntoTH2D(TH1D *xhist, TH1D *yhist, std::string zname) {
   std::vector<double> xedges, yedges;
   for (int i = 0; i < xhist->GetNbinsX() + 2; i++) {
     xedges.push_back(xhist->GetXaxis()->GetBinLowEdge(i + 1));
@@ -1102,14 +1135,14 @@ TH2D* PlotUtils::MergeIntoTH2D(TH1D* xhist, TH1D* yhist, std::string zname) {
   std::string titles = ";" + std::string(xhist->GetXaxis()->GetTitle()) + ";" +
                        std::string(yhist->GetXaxis()->GetTitle()) + ";" + zname;
 
-  TH2D* newplot = new TH2D(name.c_str(), (name + titles).c_str(), nbinsx,
+  TH2D *newplot = new TH2D(name.c_str(), (name + titles).c_str(), nbinsx,
                            &xedges[0], nbinsy, &yedges[0]);
 
   return newplot;
 }
 
 //***************************************************
-void PlotUtils::MatchEmptyBins(TH1D* data, TH1D* mc) {
+void PlotUtils::MatchEmptyBins(TH1D *data, TH1D *mc) {
   //**************************************************
 
   for (int i = 0; i < data->GetNbinsX(); i++) {
@@ -1121,7 +1154,7 @@ void PlotUtils::MatchEmptyBins(TH1D* data, TH1D* mc) {
 }
 
 //***************************************************
-void PlotUtils::MatchEmptyBins(TH2D* data, TH2D* mc) {
+void PlotUtils::MatchEmptyBins(TH2D *data, TH2D *mc) {
   //**************************************************
 
   for (int i = 0; i < data->GetNbinsX(); i++) {
@@ -1136,26 +1169,26 @@ void PlotUtils::MatchEmptyBins(TH2D* data, TH2D* mc) {
 }
 
 //***************************************************
-TH1D* PlotUtils::GetProjectionX(TH2D* hist, TH2I* mask) {
+TH1D *PlotUtils::GetProjectionX(TH2D *hist, TH2I *mask) {
   //***************************************************
 
-  TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
+  TH2D *maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_X = maskedhist->ProjectionX();
+  TH1D *hist_X = maskedhist->ProjectionX();
 
   delete maskedhist;
   return hist_X;
 }
 
 //***************************************************
-TH1D* PlotUtils::GetProjectionY(TH2D* hist, TH2I* mask) {
+TH1D *PlotUtils::GetProjectionY(TH2D *hist, TH2I *mask) {
   //***************************************************
 
-  TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
+  TH2D *maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_Y = maskedhist->ProjectionY();
+  TH1D *hist_Y = maskedhist->ProjectionY();
 
   delete maskedhist;
   return hist_Y;

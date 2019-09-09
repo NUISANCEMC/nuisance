@@ -13,103 +13,30 @@ using namespace t2krew;
 
 #ifdef __NIWG_ENABLED__
 #include "NIWGReWeight.h"
-#include "NIWGReWeight1piAngle.h"
-#include "NIWGReWeight2010a.h"
-#include "NIWGReWeight2012a.h"
-#include "NIWGReWeight2014a.h"
-#include "NIWGReWeightDeltaMass.h"
-#include "NIWGReWeightEffectiveRPA.h"
-#include "NIWGReWeightHadronMultSwitch.h"
-#include "NIWGReWeightMEC.h"
-#include "NIWGReWeightPiMult.h"
-#include "NIWGReWeightProtonFSIbug.h"
-#include "NIWGReWeightRPA.h"
-#include "NIWGReWeightSpectralFunc.h"
-#include "NIWGReWeightSplineEnu.h"
 #include "NIWGSyst.h"
-#include "NIWGSystUncertainty.h"
 #endif
 
 #ifdef __NEUT_ENABLED__
 #include "NReWeight.h"
-#include "NReWeightCasc.h"
-#include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecCCRES.h"
-#include "NReWeightNuXSecCOH.h"
-#include "NReWeightNuXSecDIS.h"
-#include "NReWeightNuXSecNC.h"
-#include "NReWeightNuXSecNCEL.h"
-#include "NReWeightNuXSecNCRES.h"
-#include "NReWeightNuXSecRES.h"
-#include "NReWeightNuclPiless.h"
 #include "NSyst.h"
-#include "NSystUncertainty.h"
-#include "neutpart.h"
-#include "neutvect.h"
-#endif
-
-#ifdef __NUWRO_ENABLED__
-#include "event1.h"
 #endif
 
 #ifdef __NUWRO_REWEIGHT_ENABLED__
 #include "NuwroReWeight.h"
-#include "NuwroReWeight_FlagNorm.h"
-#include "NuwroReWeight_QEL.h"
-#include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
-#include "NuwroSystUncertainty.h"
 #endif
 
 #ifdef __GENIE_ENABLED__
 #ifdef GENIE_PRE_R3
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepRecord.h"
-#include "Ntuple/NtpMCEventRecord.h"
 #ifndef __NO_GENIE_REWEIGHT__
 #include "ReWeight/GReWeight.h"
-#include "ReWeight/GReWeightAGKY.h"
-#include "ReWeight/GReWeightDISNuclMod.h"
-#include "ReWeight/GReWeightFGM.h"
-#include "ReWeight/GReWeightFZone.h"
-#include "ReWeight/GReWeightINuke.h"
-#include "ReWeight/GReWeightNonResonanceBkg.h"
-#include "ReWeight/GReWeightNuXSecCCQE.h"
-#include "ReWeight/GReWeightNuXSecCCQEvec.h"
-#include "ReWeight/GReWeightNuXSecCCRES.h"
-#include "ReWeight/GReWeightNuXSecCOH.h"
-#include "ReWeight/GReWeightNuXSecDIS.h"
-#include "ReWeight/GReWeightNuXSecNC.h"
-#include "ReWeight/GReWeightNuXSecNCEL.h"
-#include "ReWeight/GReWeightNuXSecNCRES.h"
-#include "ReWeight/GReWeightResonanceDecay.h"
 #include "ReWeight/GSyst.h"
-#include "ReWeight/GSystUncertainty.h"
 #endif
 #else
-#include "Framework/EventGen/EventRecord.h"
-#include "Framework/GHEP/GHepRecord.h"
-#include "Framework/Ntuple/NtpMCEventRecord.h"
 using namespace genie;
 #ifndef __NO_GENIE_REWEIGHT__
-#include "RwCalculators/GReWeightAGKY.h"
-#include "RwCalculators/GReWeightDISNuclMod.h"
-#include "RwCalculators/GReWeightFGM.h"
-#include "RwCalculators/GReWeightFZone.h"
-#include "RwCalculators/GReWeightINuke.h"
-#include "RwCalculators/GReWeightNonResonanceBkg.h"
-#include "RwCalculators/GReWeightNuXSecCCQE.h"
-#include "RwCalculators/GReWeightNuXSecCCQEvec.h"
-#include "RwCalculators/GReWeightNuXSecCCRES.h"
-#include "RwCalculators/GReWeightNuXSecCOH.h"
-#include "RwCalculators/GReWeightNuXSecDIS.h"
-#include "RwCalculators/GReWeightNuXSecNC.h"
-#include "RwCalculators/GReWeightNuXSecNCEL.h"
-#include "RwCalculators/GReWeightNuXSecNCRES.h"
-#include "RwCalculators/GReWeightResonanceDecay.h"
 #include "RwFramework/GReWeight.h"
 #include "RwFramework/GSyst.h"
-#include "RwFramework/GSystUncertainty.h"
 using namespace genie::rew;
 #endif
 #endif
@@ -452,11 +379,10 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     size_t us_pos = name.find_first_of('_');
     std::string numstr = name.substr(us_pos + 1);
     int mode_num = std::atoi(numstr.c_str());
-    LOG(FTL) << "Getting mode num " << mode_num << std::endl;
+    QLOG(FTL, "Getting mode num " << mode_num);
     if (!mode_num) {
-      ERR(FTL) << "Attempting to parse dial name: \"" << name
-               << "\" as a mode norm dial but failed." << std::endl;
-      throw;
+      QTHROW("Attempting to parse dial name: \""
+             << name << "\" as a mode norm dial but failed.");
     }
     this_enum = 60 + mode_num + offset;
     break;
@@ -465,14 +391,13 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // If Not Enabled
   if (this_enum == Reweight::kNoTypeFound) {
-    ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type)
-             << std::endl;
-    ERR(FTL) << "Check dial " << name << std::endl;
+    QERROR(FTL, "RW Engine not supported for " << FitBase::ConvDialType(type));
+    QTHROW("Check dial " << name);
   }
 
   // If Not Found
   if (this_enum == Reweight::kNoDialFound) {
-    ERR(FTL) << "Dial " << name << " not found." << std::endl;
+    QTHROW("Dial " << name << " not found.");
   }
 
   return this_enum;
@@ -625,22 +550,19 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
   if (exceptions) {
     // If Not Enabled
     if (genenum == Reweight::kGeneratorNotBuilt) {
-      ERR(FTL) << "RW Engine not supported for " << FitBase::ConvDialType(type)
-               << std::endl;
-      ERR(FTL) << "Check dial " << name << std::endl;
-      throw;
+      QERROR(FTL,
+             "RW Engine not supported for " << FitBase::ConvDialType(type));
+      QTHROW("Check dial " << name);
     }
 
     // If no type enabled
     if (genenum == Reweight::kNoTypeFound) {
-      ERR(FTL) << "Type mismatch inside ConvDialEnum" << std::endl;
-      throw;
+      QTHROW("Type mismatch inside ConvDialEnum");
     }
 
     // If Not Found
     if (genenum == Reweight::kNoDialFound) {
-      ERR(FTL) << "Dial " << name << " not found." << std::endl;
-      throw;
+      QTHROW("Dial " << name << " not found.");
     }
   }
 
@@ -665,6 +587,6 @@ std::string Reweight::ConvDial(int nuisenum) {
     }
   }
 
-  LOG(FIT) << "Cannot find dial with enum = " << nuisenum << std::endl;
+  QLOG(FIT, "Cannot find dial with enum = " << nuisenum);
   return "";
 }

@@ -155,7 +155,7 @@ void MCStudy_CCQEHistograms::Write(std::string drawOpt) {
 //********************************************************************
 //  Measurement1D::Write(drawOpt);
 
-  LOG(FIT) << "Writing MCStudy_CCQEHistograms " << std::endl;
+  QLOG(FIT, "Writing MCStudy_CCQEHistograms ");
   //  Config::Get().out->cd();
   hist_Enu->Write();
   hist_TLep->Write();

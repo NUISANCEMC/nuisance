@@ -2,10 +2,9 @@
 #include "NEUTInputHandler.h"
 #include "InputUtils.h"
 
-
 NEUTGeneratorInfo::~NEUTGeneratorInfo() { DeallocateParticleStack(); }
 
-void NEUTGeneratorInfo::AddBranchesToTree(TTree* tn) {
+void NEUTGeneratorInfo::AddBranchesToTree(TTree *tn) {
   tn->Branch("NEUTParticleN", fNEUTParticleN, "NEUTParticleN/I");
   tn->Branch("NEUTParticleStatusCode", fNEUTParticleStatusCode,
              "NEUTParticleStatusCode[NEUTParticleN]/I");
@@ -13,7 +12,7 @@ void NEUTGeneratorInfo::AddBranchesToTree(TTree* tn) {
              "NEUTParticleAliveCode[NEUTParticleN]/I");
 }
 
-void NEUTGeneratorInfo::SetBranchesFromTree(TTree* tn) {
+void NEUTGeneratorInfo::SetBranchesFromTree(TTree *tn) {
   tn->SetBranchAddress("NEUTParticleN", &fNEUTParticleN);
   tn->SetBranchAddress("NEUTParticleStatusCode", &fNEUTParticleStatusCode);
   tn->SetBranchAddress("NEUTParticleAliveCode", &fNEUTParticleAliveCode);
@@ -30,7 +29,7 @@ void NEUTGeneratorInfo::DeallocateParticleStack() {
   delete fNEUTParticleAliveCode;
 }
 
-void NEUTGeneratorInfo::FillGeneratorInfo(NeutVect* nevent) {
+void NEUTGeneratorInfo::FillGeneratorInfo(NeutVect *nevent) {
   Reset();
   for (int i = 0; i < nevent->Npart(); i++) {
     fNEUTParticleStatusCode[i] = nevent->PartInfo(i)->fStatus;
@@ -47,9 +46,9 @@ void NEUTGeneratorInfo::Reset() {
   fNEUTParticleN = 0;
 }
 
-NEUTInputHandler::NEUTInputHandler(std::string const& handle,
-                                   std::string const& rawinputs) {
-  LOG(SAM) << "Creating NEUTInputHandler : " << handle << std::endl;
+NEUTInputHandler::NEUTInputHandler(std::string const &handle,
+                                   std::string const &rawinputs) {
+  QLOG(SAM, "Creating NEUTInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -64,39 +63,38 @@ NEUTInputHandler::NEUTInputHandler(std::string const& handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
+    TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      THROW("NEUT File IsZombie() at : '"
-            << inputs[inp_it] << "'" << std::endl
-            << "Check that your file paths are correct and the file exists!"
-            << std::endl
-            << "$ ls -lh " << inputs[inp_it]);
+      QTHROW("NEUT File IsZombie() at : '"
+             << inputs[inp_it] << "'" << std::endl
+             << "Check that your file paths are correct and the file exists!"
+             << std::endl
+             << "$ ls -lh " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
-    TH1D* fluxhist = (TH1D*)inp_file->Get(
+    TH1D *fluxhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "flux")).c_str());
-    TH1D* eventhist = (TH1D*)inp_file->Get(
+    TH1D *eventhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "evt")).c_str());
     if (!fluxhist or !eventhist) {
-      ERROR(FTL, "Input File Contents: " << inputs[inp_it]);
+      QERROR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
-      THROW(
-          "NEUT FILE doesn't contain flux/xsec info. You may have to "
-          "regenerate your MC!");
+      QTHROW("NEUT FILE doesn't contain flux/xsec info. You may have to "
+             "regenerate your MC!");
     }
 
     // Get N Events
-    TTree* neuttree = (TTree*)inp_file->Get("neuttree");
+    TTree *neuttree = (TTree *)inp_file->Get("neuttree");
     if (!neuttree) {
-      ERROR(FTL, "neuttree not located in NEUT file: " << inputs[inp_it]);
-      THROW("Check your inputs, they may need to be completely regenerated!");
+      QERROR(FTL, "neuttree not located in NEUT file: " << inputs[inp_it]);
+      QTHROW("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = neuttree->GetEntries();
     if (nevents <= 0) {
-      THROW("Trying to a TTree with "
-            << nevents << " to TChain from : " << inputs[inp_it]);
+      QTHROW("Trying to a TTree with "
+             << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
     // Register input to form flux/event rate hists
@@ -147,10 +145,11 @@ void NEUTInputHandler::RemoveCache() {
   fNEUTTree->SetCacheSize(0);
 }
 
-FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
                                              const bool lightweight) {
   // Catch too large entries
-  if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents)
+    return NULL;
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fNEUTTree->GetEntry(entry);
@@ -164,7 +163,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
 
     UInt_t npart = fNeutVect->Npart();
     for (size_t i = 0; i < npart; i++) {
-      NeutPart* part = fNUISANCEEvent->fNeutVect->PartInfo(i);
+      NeutPart *part = fNUISANCEEvent->fNeutVect->PartInfo(i);
       if ((part->fIsAlive == false) && (part->fStatus == -1) &&
           std::count(PhysConst::pdg_neutrinos, PhysConst::pdg_neutrinos + 4,
                      part->fPID)) {
@@ -202,7 +201,7 @@ FitEvent* NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
 //                             7: Produced child particles
 //                             8: Inelastically scattered
 //
-int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
+int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
   // State
   int state = kUndefinedState;
 
@@ -210,7 +209,7 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
   if (part->fStatus == 5) {
     state = kFSIState;
 
-  // fStatus == -1 means initial  state
+    // fStatus == -1 means initial  state
   } else if (part->fIsAlive == false && part->fStatus == -1) {
     state = kInitialState;
 
@@ -225,7 +224,8 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
     // not alive. Remaining particles with status 2 are FSI particles that
     // reinteracted
     if (abs(fNeutVect->Mode) > 30 &&
-        (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+        (abs(part->fPID) == 16 || abs(part->fPID) == 14 ||
+         abs(part->fPID) == 12)) {
       state = kFinalState;
       // The usual CC case
     } else if (part->fIsAlive == true) {
@@ -233,36 +233,40 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart* part) {
     }
 
   } else if (part->fIsAlive == true && part->fStatus == 2 &&
-      (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
-        state = kFinalState;
+             (abs(part->fPID) == 16 || abs(part->fPID) == 14 ||
+              abs(part->fPID) == 12)) {
+    state = kFinalState;
 
   } else if (part->fIsAlive == true && part->fStatus == 0) {
     state = kFinalState;
 
-  } else if (!part->fIsAlive && (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4 || part->fStatus == 7 || part->fStatus == 8)) {
+  } else if (!part->fIsAlive &&
+             (part->fStatus == 1 || part->fStatus == 3 || part->fStatus == 4 ||
+              part->fStatus == 7 || part->fStatus == 8)) {
     state = kFSIState;
 
-    // There's one hyper weird case where fStatus = -3. This apparently corresponds to a nucleon being ejected via pion FSI when there is "data available"
+    // There's one hyper weird case where fStatus = -3. This apparently
+    // corresponds to a nucleon being ejected via pion FSI when there is "data
+    // available"
   } else if (!part->fIsAlive && (part->fStatus == -3)) {
     state = kUndefinedState;
     // NC neutrino outgoing
-  } else if (!part->fIsAlive && part->fStatus == 0 && (abs(part->fPID) == 16 || abs(part->fPID) == 14 || abs(part->fPID) == 12)) {
+  } else if (!part->fIsAlive && part->fStatus == 0 &&
+             (abs(part->fPID) == 16 || abs(part->fPID) == 14 ||
+              abs(part->fPID) == 12)) {
     state = kFinalState;
 
-  // Warn if we still find alive particles without classifying them
+    // Warn if we still find alive particles without classifying them
   } else if (part->fIsAlive == true) {
-    ERR(WRN) << "Undefined NEUT state "
-      << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-      << " PDG: " << part->fPID << std::endl;
-    throw;
+    QTHROW("Undefined NEUT state "
+           << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+           << " PDG: " << part->fPID);
     // Warn if we find dead particles that we haven't classified
   } else {
-    ERR(WRN) << "Undefined NEUT state "
-      << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-      << " PDG: " << part->fPID << std::endl;
-    throw;
+    QTHROW("Undefined NEUT state "
+           << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+           << " PDG: " << part->fPID);
   }
-
 
   return state;
 }
@@ -290,9 +294,8 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   UInt_t npart = fNeutVect->Npart();
   UInt_t kmax = fNUISANCEEvent->kMaxParticles;
   if (npart > kmax) {
-    ERR(FTL) << "NEUT has too many particles. Expanding stack." << std::endl;
+    QERROR(WRN,"NEUT has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
-    throw;
   }
 
   int nprimary = fNeutVect->Nprimary();
@@ -302,16 +305,18 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     int curpart = fNUISANCEEvent->fNParticles;
 
     // Get NEUT Particle
-    NeutPart* part = fNeutVect->PartInfo(i);
+    NeutPart *part = fNeutVect->PartInfo(i);
 
     // State
     int state = GetNeutParticleStatus(part);
 
     // Remove Undefined
-    if (kRemoveUndefParticles && state == kUndefinedState) continue;
+    if (kRemoveUndefParticles && state == kUndefinedState)
+      continue;
 
     // Remove FSI
-    if (kRemoveFSIParticles && state == kFSIState) continue;
+    if (kRemoveFSIParticles && state == kFSIState)
+      continue;
 
     // Remove Nuclear
     if (kRemoveNuclearParticles &&
@@ -323,8 +328,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
     // Is the paricle associated with the primary vertex?
     bool primary = false;
-    // NEUT events are just popped onto the stack as primary, then continues to be non-primary
-    if (i < nprimary) primary = true;
+    // NEUT events are just popped onto the stack as primary, then continues to
+    // be non-primary
+    if (i < nprimary)
+      primary = true;
     fNUISANCEEvent->fPrimaryVertex[curpart] = primary;
 
     // Mom
@@ -348,7 +355,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
 
-  FitParticle* ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
+  FitParticle *ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
   if (ISAnyLepton) {
     fNUISANCEEvent->probe_E = ISAnyLepton->E();
     fNUISANCEEvent->probe_pdg = ISAnyLepton->PDG();
@@ -357,7 +364,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   return;
 }
 
-void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
+void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   // WARNING: This has only been implemented for a neuttree and not GENIE
   // This should be kept in sync with T2KNIWGUtils::GetNIWGEvent(TTree)
 
@@ -443,11 +450,11 @@ void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
   for (int i = 0; i < nework_.numne; i++) {
     nework_.ipne[i] = nvect->PartInfo(i)->fPID;
     nework_.pne[i][0] =
-      (float)nvect->PartInfo(i)->fP.X() / 1000;  // VC(NE)WORK in M(G)eV
+        (float)nvect->PartInfo(i)->fP.X() / 1000; // VC(NE)WORK in M(G)eV
     nework_.pne[i][1] =
-      (float)nvect->PartInfo(i)->fP.Y() / 1000;  // VC(NE)WORK in M(G)eV
+        (float)nvect->PartInfo(i)->fP.Y() / 1000; // VC(NE)WORK in M(G)eV
     nework_.pne[i][2] =
-      (float)nvect->PartInfo(i)->fP.Z() / 1000;  // VC(NE)WORK in M(G)eV
+        (float)nvect->PartInfo(i)->fP.Z() / 1000; // VC(NE)WORK in M(G)eV
   }
   // fsihist.h
 
@@ -456,7 +463,7 @@ void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
   // reading the TTree, so check for it here
 
   if ((int)nvect->NfsiVert() ==
-      1) {  // An event with FSI must have at least two vertices
+      1) { // An event with FSI must have at least two vertices
     //    if (nvect->NfsiPart()!=1 || nvect->Fsiprob!=-1)
     //      ERR(WRN) << "T2KNeutUtils::fill_neut_commons(TTree) NfsiPart!=1 or
     //      Fsiprob!=-1 when NfsiVert==1" << std::endl;
@@ -464,7 +471,7 @@ void NEUTUtils::FillNeutCommons(NeutVect* nvect) {
     fsihist_.nvert = 0;
     fsihist_.nvcvert = 0;
     fsihist_.fsiprob = 1;
-  } else {  // Real FSI event
+  } else { // Real FSI event
     fsihist_.nvert = (int)nvect->NfsiVert();
     for (int ivert = 0; ivert < fsihist_.nvert; ivert++) {
       fsihist_.iflgvert[ivert] = nvect->FsiVertInfo(ivert)->fVertID;

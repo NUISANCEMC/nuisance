@@ -34,7 +34,7 @@ ThresholdAccepter::KineVar GetKineType(nuiskey &nk) {
   } else if (nk.Has("RecoThresholdAbsCosTheta_Min")) {
     return ThresholdAccepter::kAbsCosTheta_Min;
   } else {
-    THROW("Cannot determine the threshold type for Smearcepter element.");
+    QTHROW("Cannot determine the threshold type for Smearcepter element.");
   }
   return ThresholdAccepter::kNoVar;
 }
@@ -160,7 +160,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
 
     for (size_t pdg_it = 0; pdg_it < pdgs_i.size(); ++pdg_it) {
       if (VisThresholds.count(pdgs_i[pdg_it])) {
-        ERROR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
+        QERROR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
                                   << " already has a threshold for PDG: "
                                   << pdgs_i[pdg_it]);
       }
@@ -182,7 +182,7 @@ void ThresholdAccepter::SpecifcSetup(nuiskey &nk) {
             visThresholdDescriptors[t_it].GetD("VisThresholdMomentum_MeV");
         ;
       } else {
-        ERROR(WRN, "Smearceptor "
+        QERROR(WRN, "Smearceptor "
                        << ElementName << ":" << InstanceName
                        << " cannot find threshold information for PDG: "
                        << pdgs_i[pdg_it]);

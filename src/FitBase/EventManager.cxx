@@ -78,17 +78,15 @@ InputHandlerBase* EventManager::AddInput(std::string handle, std::string infile)
   std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(infile, ":");
   if (file_descriptor.size() != 2) {
-    ERR(FTL) << "File descriptor had no filetype declaration: \"" << infile
-             << "\". expected \"FILETYPE:file.root\"" << std::endl;
-    throw;
+    QTHROW("File descriptor had no filetype declaration: \"" << infile
+             << "\". expected \"FILETYPE:file.root\"");
   }
   InputUtils::InputType inpType =
       InputUtils::ParseInputType(file_descriptor[0]);
 
   int id = GetInputID(file_descriptor[1]);
   if ((uint)id != fid.size()) {
-    LOG(SAM) << "Event manager already contains " << file_descriptor[1] 
-             << std::endl;
+    QLOG(SAM,"Event manager already contains " << file_descriptor[1]);
     return finputs[id];
   } 
 
@@ -97,7 +95,7 @@ InputHandlerBase* EventManager::AddInput(std::string handle, std::string infile)
   frwneeded[id] = std::vector<bool>(finputs[id]->GetNEvents(), true);
   calc_rw[id] = std::vector<double>(finputs[id]->GetNEvents(), 0.0);
   
-  LOG(SAM) << "Registered " << handle << " with EventManager." << std::endl;
+  QLOG(SAM,"Registered " << handle << " with EventManager.");
 
   return finputs[id];
 }

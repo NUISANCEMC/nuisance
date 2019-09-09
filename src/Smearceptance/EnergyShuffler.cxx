@@ -11,7 +11,7 @@ void EnergyShuffler::Setup(nuiskey &nk) {
   for (size_t t_it = 0; t_it < shuffleDescriptors.size(); ++t_it) {
     if (!shuffleDescriptors[t_it].Has("From") ||
         !shuffleDescriptors[t_it].Has("Fraction")) {
-      THROW(
+      QTHROW(
           "Shuffler element must have at least the From and Fraction "
           "attributes.");
     }
@@ -19,7 +19,7 @@ void EnergyShuffler::Setup(nuiskey &nk) {
     std::vector<int> from_pdgs_i = GeneralUtils::ParseToInt(from_pdgs_s, ",");
 
     if (!from_pdgs_i.size()) {
-      THROW("Shuffler element must have at least one From PDG specified.");
+      QTHROW("Shuffler element must have at least one From PDG specified.");
     }
 
     std::vector<int> to_pdgs_i;

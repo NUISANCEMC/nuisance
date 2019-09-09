@@ -146,8 +146,7 @@ void T2K_CC0pi_XSec_2DPcos_nu::SetHistograms(){
 
 
   if (!tempcov){
-    ERR(FTL) << "TEMPCOV NOT SET" << std::endl;
-    throw;
+    QTHROW("TEMPCOV NOT SET");
   }
 
   // Setup Covar

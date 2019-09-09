@@ -4,11 +4,11 @@
 
 NuWroGeneratorInfo::~NuWroGeneratorInfo() { delete fNuWroParticlePDGs; }
 
-void NuWroGeneratorInfo::AddBranchesToTree(TTree* tn) {
+void NuWroGeneratorInfo::AddBranchesToTree(TTree *tn) {
   tn->Branch("NuWroParticlePDGs", &fNuWroParticlePDGs, "NuWroParticlePDGs/I");
 }
 
-void NuWroGeneratorInfo::SetBranchesFromTree(TTree* tn) {
+void NuWroGeneratorInfo::SetBranchesFromTree(TTree *tn) {
   tn->SetBranchAddress("NuWroParticlePDGs", &fNuWroParticlePDGs);
 }
 
@@ -20,7 +20,7 @@ void NuWroGeneratorInfo::DeallocateParticleStack() {
   delete fNuWroParticlePDGs;
 }
 
-void NuWroGeneratorInfo::FillGeneratorInfo(event* e) { Reset(); }
+void NuWroGeneratorInfo::FillGeneratorInfo(event *e) { Reset(); }
 
 void NuWroGeneratorInfo::Reset() {
   for (int i = 0; i < kMaxParticles; i++) {
@@ -28,21 +28,22 @@ void NuWroGeneratorInfo::Reset() {
   }
 }
 
-int event1_nof(event* e, int pdg) {
+int event1_nof(event *e, int pdg) {
   int c = 0;
   for (size_t i = 0; i < e->out.size(); i++)
-    if (e->out[i].pdg == pdg) c++;
+    if (e->out[i].pdg == pdg)
+      c++;
   return c;
 }
 
-NuWroInputHandler::NuWroInputHandler(std::string const& handle,
-                                     std::string const& rawinputs) {
-  LOG(SAM) << "Creating NuWroInputHandler : " << handle << std::endl;
+NuWroInputHandler::NuWroInputHandler(std::string const &handle,
+                                     std::string const &rawinputs) {
+  QLOG(SAM, "Creating NuWroInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
-  fSaveExtra = false;  // FitPar::Config().GetParB("NuWroSaveExtra");
+  fSaveExtra = false; // FitPar::Config().GetParB("NuWroSaveExtra");
   // Setup the TChain
   fNuWroTree = new TChain("treeout");
 
@@ -50,38 +51,33 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
+    TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      ERR(FTL) << "nuwro File IsZombie() at " << inputs[inp_it] << std::endl;
-      throw;
+      QTHROW("nuwro File IsZombie() at " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
-    TH1D* fluxhist = (TH1D*)inp_file->Get(
+    TH1D *fluxhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "FluxHist")).c_str());
-    TH1D* eventhist = (TH1D*)inp_file->Get(
+    TH1D *eventhist = (TH1D *)inp_file->Get(
         (PlotUtils::GetObjectWithName(inp_file, "EvtHist")).c_str());
     if (!fluxhist or !eventhist) {
-      ERR(FTL) << "nuwro FILE doesn't contain flux/xsec info" << std::endl;
+      QERROR(FTL, "nuwro FILE doesn't contain flux/xsec info");
       if (FitPar::Config().GetParB("regennuwro")) {
-        ERR(FTL) << "Regen NuWro has not been added yet. Email the developers!"
-                 << std::endl;
+        QERROR(FTL,
+               "Regen NuWro has not been added yet. Email the developers!");
         // ProcessNuWroInputFlux(inputs[inp_it]);
         throw;
       } else {
-        ERR(FTL) << "If you would like NUISANCE to generate these for you "
-                 << "please set parameter regennuwro=1 and re-run."
-                 << std::endl;
-        throw;
+        QTHROW("If you would like NUISANCE to generate these for you "
+               << "please set parameter regennuwro=1 and re-run.");
       }
     }
 
     // Get N Events
-    TTree* nuwrotree = (TTree*)inp_file->Get("treeout");
+    TTree *nuwrotree = (TTree *)inp_file->Get("treeout");
     if (!nuwrotree) {
-      ERR(FTL) << "treeout not located in nuwro file! " << inputs[inp_it]
-               << std::endl;
-      throw;
+      QTHROW("treeout not located in nuwro file! " << inputs[inp_it]);
     }
     int nevents = nuwrotree->GetEntries();
 
@@ -113,7 +109,8 @@ NuWroInputHandler::NuWroInputHandler(std::string const& handle,
 };
 
 NuWroInputHandler::~NuWroInputHandler() {
-  if (fNuWroTree) delete fNuWroTree;
+  if (fNuWroTree)
+    delete fNuWroTree;
 }
 
 void NuWroInputHandler::CreateCache() {
@@ -130,10 +127,11 @@ void NuWroInputHandler::RemoveCache() {
 
 void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {}
 
-FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
                                               const bool lightweight) {
   // Catch too large entries
-  if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents)
+    return NULL;
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fNuWroTree->GetEntry(entry);
@@ -180,7 +178,7 @@ FitEvent* NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
   return fNUISANCEEvent;
 }
 
-int NuWroInputHandler::ConvertNuwroMode(event* e) {
+int NuWroInputHandler::ConvertNuwroMode(event *e) {
   Int_t proton_pdg, neutron_pdg, pion_pdg, pion_plus_pdg, pion_minus_pdg,
       lambda_pdg, eta_pdg, kaon_pdg, kaon_plus_pdg;
   proton_pdg = 2212;
@@ -194,9 +192,9 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
   kaon_pdg = 311;
   kaon_plus_pdg = 321;
 
-  if (e->flag.qel)  // kwiazielastyczne oddziaływanie
+  if (e->flag.qel) // kwiazielastyczne oddziaływanie
   {
-    if (e->flag.anty)  // jeśli jest to oddziaływanie z antyneutrinem
+    if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
     {
       if (e->flag.cc)
         return -1;
@@ -204,9 +202,9 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
         if (event1_nof(e, proton_pdg))
           return -51;
         else if (event1_nof(e, neutron_pdg))
-          return -52;  // sprawdzam dodatkowo ?
+          return -52; // sprawdzam dodatkowo ?
       }
-    } else  // oddziaływanie z neutrinem
+    } else // oddziaływanie z neutrinem
     {
       if (e->flag.cc)
         return 1;
@@ -226,8 +224,8 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
       return 2;
   }
 
-  if (e->flag.res)  // rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon,
-                    // multipiony
+  if (e->flag.res) // rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon,
+                   // multipiony
   {
     Int_t liczba_pionow, liczba_kaonow;
 
@@ -235,7 +233,7 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
                     event1_nof(e, pion_minus_pdg);
     liczba_kaonow = event1_nof(e, kaon_pdg) + event1_nof(e, kaon_pdg);
 
-    if (liczba_pionow > 1 || liczba_pionow == 0)  // multipiony
+    if (liczba_pionow > 1 || liczba_pionow == 0) // multipiony
     {
       if (e->flag.anty) {
         if (e->flag.cc)
@@ -251,12 +249,13 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
     }
 
     if (liczba_pionow == 1) {
-      if (e->flag.anty)  // jeśli jest to oddziaływanie z antyneutrinem
+      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
       {
         if (e->flag.cc) {
           if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_minus_pdg))
             return -11;
-          if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_pdg)) return -12;
+          if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_pdg))
+            return -12;
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_minus_pdg))
             return -13;
         } else {
@@ -272,12 +271,13 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
               return -31;
           }
         }
-      } else  // oddziaływanie z neutrinem
+      } else // oddziaływanie z neutrinem
       {
         if (e->flag.cc) {
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_plus_pdg))
             return 11;
-          if (event1_nof(e, proton_pdg) && event1_nof(e, pion_pdg)) return 12;
+          if (event1_nof(e, proton_pdg) && event1_nof(e, pion_pdg))
+            return 12;
           if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_plus_pdg))
             return 13;
         } else {
@@ -296,9 +296,9 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
       }
     }
 
-    if (event1_nof(e, eta_pdg))  // produkcja rezonansowa ety
+    if (event1_nof(e, eta_pdg)) // produkcja rezonansowa ety
     {
-      if (e->flag.anty)  // jeśli jest to oddziaływanie z antyneutrinem
+      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
       {
         if (e->flag.cc)
           return -22;
@@ -306,9 +306,9 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
           if (event1_nof(e, neutron_pdg))
             return -42;
           else if (event1_nof(e, proton_pdg))
-            return -43;  // sprawdzam dodatkowo ?
+            return -43; // sprawdzam dodatkowo ?
         }
-      } else  // oddziaływanie z neutrinem
+      } else // oddziaływanie z neutrinem
       {
         if (e->flag.cc)
           return 22;
@@ -322,9 +322,9 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
     }
 
     if (event1_nof(e, lambda_pdg) == 1 &&
-        liczba_kaonow == 1)  // produkcja rezonansowa kaonu
+        liczba_kaonow == 1) // produkcja rezonansowa kaonu
     {
-      if (e->flag.anty)  // jeśli jest to oddziaływanie z antyneutrinem
+      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
       {
         if (e->flag.cc && event1_nof(e, kaon_pdg))
           return -23;
@@ -334,7 +334,7 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
           else if (event1_nof(e, kaon_plus_pdg))
             return -45;
         }
-      } else  // oddziaływanie z neutrinem
+      } else // oddziaływanie z neutrinem
       {
         if (e->flag.cc && event1_nof(e, kaon_plus_pdg))
           return 23;
@@ -348,19 +348,19 @@ int NuWroInputHandler::ConvertNuwroMode(event* e) {
     }
   }
 
-  if (e->flag.coh)  // koherentne  oddziaływanie tylko na O(16)
+  if (e->flag.coh) // koherentne  oddziaływanie tylko na O(16)
   {
     Int_t _target;
-    _target = e->par.nucleus_p + e->par.nucleus_n;  // liczba masowa  O(16)
+    _target = e->par.nucleus_p + e->par.nucleus_n; // liczba masowa  O(16)
 
     if (_target == 16) {
-      if (e->flag.anty)  // jeśli jest to oddziaływanie z antyneutrinem
+      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
       {
         if (e->flag.cc && event1_nof(e, pion_minus_pdg))
           return -16;
         else if (event1_nof(e, pion_pdg))
           return -36;
-      } else  // oddziaływanie z neutrinem
+      } else // oddziaływanie z neutrinem
       {
         if (e->flag.cc && event1_nof(e, pion_plus_pdg))
           return 16;
@@ -392,7 +392,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   // std::cout << "NuWro Event Address " << fNuWroEvent << std::endl;
   // Reset all variables
   fNUISANCEEvent->ResetEvent();
-  FitEvent* evt = fNUISANCEEvent;
+  FitEvent *evt = fNUISANCEEvent;
 
   // Sort Event Info
   evt->Mode = ConvertNuwroMode(fNuWroEvent);
@@ -405,7 +405,8 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   evt->fTotCrs = 0.0;
   evt->fTargetA = fNuWroEvent->par.nucleus_p + fNuWroEvent->par.nucleus_n;
   evt->fTargetZ = fNuWroEvent->par.nucleus_p;
-  evt->fTargetPDG = TargetUtils::GetTargetPDGFromZA(evt->fTargetZ, evt->fTargetA);
+  evt->fTargetPDG =
+      TargetUtils::GetTargetPDGFromZA(evt->fTargetZ, evt->fTargetA);
   evt->fTargetH = 0;
   evt->fBound = (evt->fTargetA != 1);
 
@@ -417,7 +418,7 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   UInt_t kmax = evt->kMaxParticles;
 
   if (npart > kmax) {
-    ERR(WRN) << "NUWRO has too many particles. Expanding stack." << std::endl;
+    QERROR(WRN, "NUWRO has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
@@ -425,7 +426,8 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   std::vector<particle>::iterator p_iter;
 
   // Get the Initial State
-  for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end(); p_iter++) {
+  for (p_iter = fNuWroEvent->in.begin(); p_iter != fNuWroEvent->in.end();
+       p_iter++) {
     AddNuWroParticle(fNUISANCEEvent, (*p_iter), kInitialState, true);
   }
 
@@ -433,45 +435,56 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   // Loop over the primary vertex particles
   // If they match the post-FSI they haven't undergone FSI.
   // If they don't match post-FSI they have undergone FSI.
-  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end(); p_iter++) {
+  for (p_iter = fNuWroEvent->out.begin(); p_iter != fNuWroEvent->out.end();
+       p_iter++) {
     // Get the particle
     particle p = (*p_iter);
     // Check against all the post particles, match them
     std::vector<particle>::iterator p2_iter;
     bool match = false;
-    for (p2_iter = fNuWroEvent->post.begin(); p2_iter != fNuWroEvent->post.end(); p2_iter++) {
+    for (p2_iter = fNuWroEvent->post.begin();
+         p2_iter != fNuWroEvent->post.end(); p2_iter++) {
       particle p2 = (*p2_iter);
       // Check energy and pdg
-      // A very small cascade which changes the energy by 1E-5 MeV should be matched
-      match = (fabs(p2.E()-p.E()) < 1E-5 && p2.pdg == p.pdg);
+      // A very small cascade which changes the energy by 1E-5 MeV should be
+      // matched
+      match = (fabs(p2.E() - p.E()) < 1E-5 && p2.pdg == p.pdg);
       // If we match p to p2 break the loop
-      if (match) break;
+      if (match)
+        break;
     }
-    // If we've looped through the whole particle stack of post-FSI and haven't found a match it's a primary particle that has been FSIed
-    if (!match) AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState, true);
+    // If we've looped through the whole particle stack of post-FSI and haven't
+    // found a match it's a primary particle that has been FSIed
+    if (!match)
+      AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFSIState, true);
   }
 
   // Loop over the final state particles
-  for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end(); p_iter++) {
+  for (p_iter = fNuWroEvent->post.begin(); p_iter != fNuWroEvent->post.end();
+       p_iter++) {
     particle p = (*p_iter);
-    // To find if it's primary or not we have to loop through the primary ones and match, just like above
+    // To find if it's primary or not we have to loop through the primary ones
+    // and match, just like above
     bool match = false;
     std::vector<particle>::iterator p2_iter;
-    for (p2_iter = fNuWroEvent->out.begin(); p2_iter != fNuWroEvent->out.end(); p2_iter++) {
+    for (p2_iter = fNuWroEvent->out.begin(); p2_iter != fNuWroEvent->out.end();
+         p2_iter++) {
       particle p2 = (*p2_iter);
-      match = (fabs(p2.E()-p.E()) < 1E-5 && p2.pdg == p.pdg);
-      if (match) break;
+      match = (fabs(p2.E() - p.E()) < 1E-5 && p2.pdg == p.pdg);
+      if (match)
+        break;
     }
     AddNuWroParticle(fNUISANCEEvent, (*p_iter), kFinalState, match);
   }
 
   // Fill Generator Info
-  if (fSaveExtra) fNuWroInfo->FillGeneratorInfo(fNuWroEvent);
+  if (fSaveExtra)
+    fNuWroInfo->FillGeneratorInfo(fNuWroEvent);
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
 
-  FitParticle* ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
+  FitParticle *ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
   if (ISAnyLepton) {
     fNUISANCEEvent->probe_E = ISAnyLepton->E();
     fNUISANCEEvent->probe_pdg = ISAnyLepton->PDG();
@@ -480,13 +493,13 @@ void NuWroInputHandler::CalcNUISANCEKinematics() {
   return;
 }
 
-void NuWroInputHandler::AddNuWroParticle(FitEvent* evt, particle& p,
-                                         int state, bool primary = false) {
+void NuWroInputHandler::AddNuWroParticle(FitEvent *evt, particle &p, int state,
+                                         bool primary = false) {
   // Add Mom
-  evt->fParticleMom[evt->fNParticles][0] = static_cast<vect&>(p).x;
-  evt->fParticleMom[evt->fNParticles][1] = static_cast<vect&>(p).y;
-  evt->fParticleMom[evt->fNParticles][2] = static_cast<vect&>(p).z;
-  evt->fParticleMom[evt->fNParticles][3] = static_cast<vect&>(p).t;
+  evt->fParticleMom[evt->fNParticles][0] = static_cast<vect &>(p).x;
+  evt->fParticleMom[evt->fNParticles][1] = static_cast<vect &>(p).y;
+  evt->fParticleMom[evt->fNParticles][2] = static_cast<vect &>(p).z;
+  evt->fParticleMom[evt->fNParticles][3] = static_cast<vect &>(p).t;
 
   // For NuWro a particle that we've given a FSI state is a pre-FSI particle
   // An initial state particle is also a primary vertex praticle
@@ -503,4 +516,3 @@ void NuWroInputHandler::AddNuWroParticle(FitEvent* evt, particle& p,
 void NuWroInputHandler::Print() {}
 
 #endif
-

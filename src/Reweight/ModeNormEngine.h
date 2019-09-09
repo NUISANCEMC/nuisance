@@ -6,7 +6,7 @@
 #include "WeightEngineBase.h"
 
 class ModeNormEngine : public WeightEngineBase {
- public:
+public:
   ModeNormEngine(std::string name = "ModeNormEngine") : fName(name){};
   ~ModeNormEngine(){};
 
@@ -14,7 +14,7 @@ class ModeNormEngine : public WeightEngineBase {
     int rwenum = Reweight::ConvDial(name, kMODENORM);
     int mode = Reweight::RemoveDialType(rwenum);
     if (fDialEnumIndex.count(mode)) {
-      THROW("Mode dial: " << mode
+      QTHROW("Mode dial: " << mode
                           << " already included. Cannot include twice.");
     }
     fDialEnumIndex[mode] = fDialValues.size();
@@ -24,7 +24,7 @@ class ModeNormEngine : public WeightEngineBase {
   void SetDialValue(int rwenum, double val) {
     int mode = Reweight::RemoveDialType(rwenum);
     if (!fDialEnumIndex.count(mode)) {
-      THROW("Mode dial: " << mode
+      QTHROW("Mode dial: " << mode
                           << " has not been included. Cannot set value.");
     }
     QLOG(DEB, "[INFO]: ModeNormEngine ObsMode: " << mode << " weight " << val
@@ -39,7 +39,7 @@ class ModeNormEngine : public WeightEngineBase {
 
   static int ModeToDial(int mode) { return 60 + mode; }
 
-  double CalcWeight(BaseFitEvt* evt) {
+  double CalcWeight(BaseFitEvt *evt) {
     int mode = ModeToDial(abs(evt->Mode));
     if (!fDialEnumIndex.count(mode)) {
       return 1;
@@ -61,19 +61,18 @@ class ModeNormEngine : public WeightEngineBase {
     }
   }
 
-  static int SystEnumFromString(std::string const& name) {
+  static int SystEnumFromString(std::string const &name) {
     std::vector<std::string> splits = GeneralUtils::ParseToStr(name, "_");
     if (splits.size() != 2) {
-      ERR(FTL) << "Attempting to parse dial name: \"" << name
-               << "\" as a mode norm dial but failed. Expect e.g. \"mode_2\"."
-               << std::endl;
+      QTHROW("Attempting to parse dial name: \""
+             << name
+             << "\" as a mode norm dial but failed. Expect e.g. \"mode_2\".");
     }
 
     int mode_num = GeneralUtils::StrToInt(splits[1]);
     if (!mode_num) {
-      ERR(FTL) << "Attempting to parse dial name: \"" << name
-               << "\" as a mode norm dial but failed." << std::endl;
-      throw;
+      QTHROW("Attempting to parse dial name: \""
+             << name << "\" as a mode norm dial but failed.");
     }
     return ModeToDial(mode_num);
   }

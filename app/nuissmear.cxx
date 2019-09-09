@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "ComparisonRoutines.h"
 #include "InputUtils.h"
 
@@ -62,7 +62,7 @@ void PrintSyntax() {
 };
 
 //____________________________________________________________________________
-void GetCommandLineArgs(int argc, char** argv) {
+void GetCommandLineArgs(int argc, char **argv) {
   // Check for -h flag.
   for (int i = 0; i < argc; i++) {
     if ((!std::string(argv[i]).compare("-h")) ||
@@ -77,9 +77,9 @@ void GetCommandLineArgs(int argc, char** argv) {
   // Parse input file
   ParserUtils::ParseArgument(args, "-i", gOptInputFile, false);
   if (gOptInputFile == "") {
-    THROW("Need to provide a valid input file to nuisflat using -i flag!");
+    QTHROW("Need to provide a valid input file to nuisflat using -i flag!");
   } else {
-    LOG(FIT) << "Reading Input File = " << gOptInputFile << std::endl;
+    QLOG(FIT, "Reading Input File = " << gOptInputFile);
     gOptInputFile = InputUtils::PrependGuessedInputTypeToName(gOptInputFile);
   }
 
@@ -87,10 +87,10 @@ void GetCommandLineArgs(int argc, char** argv) {
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile == "") {
     gOptOutputFile = gOptInputFile + ".smear.root";
-    LOG(FIT) << "No output file given so saving nuisflat output to:"
-             << gOptOutputFile << std::endl;
+    QLOG(FIT, "No output file given so saving nuisflat output to:"
+                  << gOptOutputFile);
   } else {
-    LOG(FIT) << "Saving nuisflat output to " << gOptOutputFile << std::endl;
+    QLOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
   }
 
   // Get N Events and Configs
@@ -123,7 +123,7 @@ void GetCommandLineArgs(int argc, char** argv) {
 void SetupRW() {
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+    QLOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   std::vector<std::string> Params;
@@ -134,17 +134,14 @@ void SetupRW() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      ERR(FTL) << "No type given for parameter " << i << std::endl;
-      ERR(FTL) << "type='PARAMETER_TYPE'" << std::endl;
-      throw;
+      QERROR(FTL, "No type given for parameter " << i);
+      QTHROW("type='PARAMETER_TYPE'");
     } else if (!key.Has("name")) {
-      ERR(FTL) << "No name given for parameter " << i << std::endl;
-      ERR(FTL) << "name='SAMPLE_NAME'" << std::endl;
-      throw;
+      QERROR(FTL, "No name given for parameter " << i);
+      QTHROW("name='SAMPLE_NAME'");
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
-      ERR(FTL) << "nominal='NOMINAL_VALUE'" << std::endl;
-      throw;
+      QERROR(FTL, "No nominal given for parameter " << i);
+      QTHROW("nominal='NOMINAL_VALUE'");
     }
 
     // Get Inputs
@@ -168,22 +165,22 @@ void SetupRW() {
 }
 
 //*******************************
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   //*******************************
 
   // Parse
   GetCommandLineArgs(argc, argv);
 
   // Make output file
-  TFile* f = new TFile(gOptOutputFile.c_str(), "RECREATE");
+  TFile *f = new TFile(gOptOutputFile.c_str(), "RECREATE");
   if (f->IsZombie()) {
-    THROW("Cannot create output file!");
+    QTHROW("Cannot create output file!");
   }
   f->cd();
   Config::Get().out = f;
 
   // Create a new measurementbase class depending on the Format
-  MeasurementBase* flattreecreator = NULL;
+  MeasurementBase *flattreecreator = NULL;
 
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
@@ -194,14 +191,12 @@ int main(int argc, char* argv[]) {
   samplekey.Set("type", gOptType);
 
   if (gOptOptions == "") {
-    THROW(
-        "Attempting to flatten with Smearceptor, but no Smearceptor given. "
-        "Please supply a -t option.");
+    QTHROW("Attempting to flatten with Smearceptor, but no Smearceptor given. "
+           "Please supply a -t option.");
   }
   if (gOptCardInput == "") {
-    THROW(
-        "Attempting to flatten with Smearceptor, but no card passed with "
-        "Smearceptors configured. Please supply a -c option.");
+    QTHROW("Attempting to flatten with Smearceptor, but no card passed with "
+           "Smearceptors configured. Please supply a -c option.");
   }
 
   SetupRW();
@@ -215,9 +210,9 @@ int main(int argc, char* argv[]) {
   f->Close();
 
   // Show Final Status
-  LOG(FIT) << "-------------------------------------" << std::endl;
-  LOG(FIT) << "Flattree Generation Complete." << std::endl;
-  LOG(FIT) << "-------------------------------------" << std::endl;
+  QLOG(FIT, "-------------------------------------");
+  QLOG(FIT, "Flattree Generation Complete.");
+  QLOG(FIT, "-------------------------------------");
 
   return 0;
 }

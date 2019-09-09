@@ -40,11 +40,6 @@ if (BUILD_GEVGEN)
   LIST(APPEND EXTRA_CXX_FLAGS -D__GEVGEN_ENABLED__)
 endif()
 
-if(GENIE_EMPMEC_REWEIGHT)
-  cmessage(STATUS "Enable EMPMEC dials")
-  LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_EMP_MECRW_ENABLED)
-endif()
-
 execute_process(COMMAND genie-config --version
 OUTPUT_VARIABLE GENIE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
 cmessage(STATUS "genie_ver: ${GENIE_VER}")
@@ -57,6 +52,13 @@ endif()
 if(NOT GENIE_POST_R3)
   LIST(APPEND EXTRA_CXX_FLAGS -DGENIE_PRE_R3)
   cmessage(STATUS "setting genie_pre_r3 ${EXTRA_CXX_FLAGS}")
+  if(GENIE_EMPMEC_REWEIGHT)
+    cmessage(STATUS "Enable EMPMEC dials")
+    LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_EMP_MECRW_ENABLED)
+  endif()
+else()
+  cmessage(STATUS "Enable EMPMEC dials")
+  LIST(APPEND EXTRA_CXX_FLAGS -D__GENIE_EMP_MECRW_ENABLED)
 endif()
 
 execute_process (COMMAND genie-config
