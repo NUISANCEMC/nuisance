@@ -107,6 +107,9 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   genie::RunOpt *grunopt = genie::RunOpt::Instance();
   grunopt->EnableBareXSecPreCalc(true);
   grunopt->SetEventGeneratorList(Config::GetParS("GENIEEventGeneratorList"));
+  if(!Config::HasPar("GENIETune")){
+    NUIS_ABORT("GENIE tune was not specified, this is required when reweighting GENIE V3+ events. Add a config parameter like: <config GENIETune=\"G18_10a_02_11a\" /> to your nuisance card.");
+  }
   grunopt->SetTuneName(Config::GetParS("GENIETune"));
   grunopt->BuildTune();
   std::string genv =
@@ -177,7 +180,6 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   if (xsec_nucqe)
     fGenieRW->AdoptWghtCalc("nuclear_qe", new genie::rew::GReWeightFGM);
 
-#if __GENIE_VERSION__ >= 212
   // Set the CCQE reweighting style
   GReWeightNuXSecCCQE *rwccqe =
       dynamic_cast<GReWeightNuXSecCCQE *>(fGenieRW->WghtCalc("xsec_ccqe"));
@@ -199,36 +201,45 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
     NUIS_ABORT("You provided: " << ccqetype << " in parameters/config.xml");
   }
 
+#if (__GENIE_VERSION__ >= 212) and                                             \
+    (__GENIE_VERSION__ <=                                                      \
+     300) // This doesn't currently work as is for GENIE v3, but the reweighting
+          // in v3 supposedly does similar checks anyway.
+
   // Check the UserPhysicsOptions too!
   AlgConfigPool *Pool = genie::AlgConfigPool::Instance();
   Registry *full = Pool->GlobalParameterList();
+
   std::string name_ax = full->GetAlg("AxialFormFactorModel").name;
   std::string config_ax = full->GetAlg("AxialFormFactorModel").config;
+
   if (name_ax == "genie::DipoleAxialFormFactorModel" &&
       ccqetype == "kModeZExp") {
-    NUIS_ERR(FTL,
-           "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
+    NUIS_ERR(
+        FTL,
+        "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
     NUIS_ERR(FTL, "Please check your "
-                    << std::getenv("GENIE")
-                    << "/config/UserPhysicsOptions.xml to match generated");
+                      << std::getenv("GENIE")
+                      << "/config/UserPhysicsOptions.xml to match generated");
     NUIS_ERR(FTL, "You're telling me " << name_ax << "/" << config_ax);
     NUIS_ABORT("Also check your "
-           << std::getenv("NUISANCE")
-           << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
-           << ccqetype);
+               << std::getenv("NUISANCE")
+               << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
+               << ccqetype);
   }
 
   if (name_ax == "genie::ZExpAxialFormFactorModel" && ccqetype != "kModeZExp") {
-    NUIS_ERR(FTL,
-           "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
+    NUIS_ERR(
+        FTL,
+        "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
     NUIS_ERR(FTL, "Please change your "
-                    << std::getenv("GENIE")
-                    << "/config/UserPhysicsOptions.xml to match generated");
+                      << std::getenv("GENIE")
+                      << "/config/UserPhysicsOptions.xml to match generated");
     NUIS_ERR(FTL, "You're telling me " << name_ax << "/" << config_ax);
     NUIS_ABORT("Also check your "
-           << std::getenv("NUISANCE")
-           << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
-           << ccqetype);
+               << std::getenv("NUISANCE")
+               << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
+               << ccqetype);
   }
 
   std::string name_qelcc =
@@ -236,29 +247,31 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   std::string config_qelcc =
       full->GetAlg("XSecModel@genie::EventGenerator/QEL-CC").config;
   if (config_qelcc == "Default" && ccqetype == "kModeZExp") {
-    NUIS_ERR(FTL,
-           "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
+    NUIS_ERR(
+        FTL,
+        "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
     NUIS_ERR(FTL, "Please change your "
-                    << std::getenv("GENIE")
-                    << "/config/UserPhysicsOptions.xml to match generated");
+                      << std::getenv("GENIE")
+                      << "/config/UserPhysicsOptions.xml to match generated");
     NUIS_ERR(FTL, "You're telling me " << name_qelcc << "/" << config_qelcc);
     NUIS_ABORT("Also check your "
-           << std::getenv("NUISANCE")
-           << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
-           << ccqetype);
+               << std::getenv("NUISANCE")
+               << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
+               << ccqetype);
   }
 
   if (config_qelcc == "ZExp" && ccqetype != "kModeZExp") {
-    NUIS_ERR(FTL,
-           "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
+    NUIS_ERR(
+        FTL,
+        "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
     NUIS_ERR(FTL, "Please change your "
-                    << std::getenv("GENIE")
-                    << "/config/UserPhysicsOptions.xml to match generated");
+                      << std::getenv("GENIE")
+                      << "/config/UserPhysicsOptions.xml to match generated");
     NUIS_ERR(FTL, "You're telling me " << name_qelcc << "/" << config_qelcc);
     NUIS_ABORT("Also check your "
-           << std::getenv("NUISANCE")
-           << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
-           << ccqetype);
+               << std::getenv("NUISANCE")
+               << "/parameters/config.xml GENIEWeightEngine_CCQEMode: "
+               << ccqetype);
   }
 #endif
 
@@ -301,8 +314,9 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   StartTalking();
 
 #else
-  NUIS_ERR(FTL, "GENIE ReWeight is __NOT ENABLED__ in GENIE and you're trying to "
-              "run NUISANCE with it enabled");
+  NUIS_ERR(FTL,
+           "GENIE ReWeight is __NOT ENABLED__ in GENIE and you're trying to "
+           "run NUISANCE with it enabled");
   NUIS_ERR(FTL, "Check your genie-config --libs for reweighting");
   NUIS_ERR(FTL, "If not present you need to recompile GENIE");
   NUIS_ABORT("If present you need to contact NUISANCE authors");
@@ -321,25 +335,25 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
   // Check ZExp sillyness in GENIE
   // If ZExpansion parameters are used we need to set a different mode in GENIE
   // ReWeight... GENIE doesn't have a setter either...
-#if __GENIE_VERSION__ >= 212
+#if (__GENIE_VERSION__ >= 212) and (__GENIE_VERSION__ <= 300)
   std::string ccqetype = FitPar::Config().GetParS("GENIEWeightEngine_CCQEMode");
   if (ccqetype != "kModeZExp" &&
       (name == "ZExpA1CCQE" || name == "ZExpA2CCQE" || name == "ZExpA3CCQE" ||
        name == "ZExpA4CCQE")) {
     NUIS_ERR(FTL, "Found a Z-expansion parameter in GENIE although the GENIE "
-                "ReWeighting engine is set to use Llewelyn-Smith and MaQE!");
+                  "ReWeighting engine is set to use Llewelyn-Smith and MaQE!");
     NUIS_ABORT("Change your GENIE UserPhysicsOptions.xml in "
-           << std::getenv("GENIE")
-           << "/config/UserPhysicsOptions.xml to match requirements");
+               << std::getenv("GENIE")
+               << "/config/UserPhysicsOptions.xml to match requirements");
   }
 
   if ((ccqetype != "kModeMa" && ccqetype != "kModeMaNormAndMaShape") &&
       (name == "MaCCQE")) {
     NUIS_ERR(FTL, "Found MaCCQE parameter in GENIE although the GENIE "
-                "ReWeighting engine is set to not use this!");
+                  "ReWeighting engine is set to not use this!");
     NUIS_ABORT("Change your GENIE UserPhysicsOptions.xml in "
-           << std::getenv("GENIE")
-           << "/config/UserPhysicsOptions.xml to match requirements");
+               << std::getenv("GENIE")
+               << "/config/UserPhysicsOptions.xml to match requirements");
   }
 #endif
 
@@ -380,7 +394,7 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
   }
 #endif
 #endif
-};
+}
 
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __GENIE_ENABLED__
@@ -444,7 +458,7 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
 
   if (!(evt->genie_event->event)) {
     NUIS_ABORT("evt->genie_event->event GHepRecord not found!"
-           << (evt->genie_event->event));
+               << (evt->genie_event->event));
   }
 
   if (!fGenieRW) {

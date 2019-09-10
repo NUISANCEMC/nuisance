@@ -446,7 +446,7 @@ int Reweight::NUWROEnumFromName(std::string const &name) {
 }
 
 int Reweight::GENIEEnumFromName(std::string const &name) {
-#ifdef defined(__GENIE_ENABLED__) && !defined(__NO_GENIE_REWEIGHT__)
+#if defined(__GENIE_ENABLED__) && !defined(__NO_GENIE_REWEIGHT__)
   int genieenum = (int)genie::rew::GSyst::FromString(name);
   return (genieenum > 0) ? genieenum : Reweight::kNoDialFound;
 #else
