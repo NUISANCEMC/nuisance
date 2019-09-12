@@ -27,8 +27,10 @@ Double_t StatUtils::GetChi2FromDiag(TH1D *data, TH1D *mc, TH1I *mask) {
   //*******************************************************************
 
   Double_t Chi2 = 0.0;
-  TH1D *calc_data = (TH1D *)data->Clone();
-  TH1D *calc_mc = (TH1D *)mc->Clone();
+  TH1D *calc_data = (TH1D *)data->Clone("calc_data");
+  calc_data->SetDirectory(NULL);
+  TH1D *calc_mc = (TH1D *)mc->Clone("calc_mc");
+  calc_mc->SetDirectory(NULL);
 
   // Add MC Error to data if required
   if (FitPar::Config().GetParB("addmcerror")) {
@@ -45,7 +47,9 @@ Double_t StatUtils::GetChi2FromDiag(TH1D *data, TH1D *mc, TH1I *mask) {
   // Apply masking if required
   if (mask) {
     calc_data = ApplyHistogramMasking(data, mask);
+    calc_data->SetDirectory(NULL);
     calc_mc = ApplyHistogramMasking(mc, mask);
+    calc_mc->SetDirectory(NULL);
   }
 
   // Iterate over bins in X
@@ -97,7 +101,7 @@ Double_t StatUtils::GetChi2FromDiag(TH2D *data, TH2D *mc, TH2I *map,
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                                    TH1I *mask, double data_scale,
-                                   double covar_scale) {
+                                   double covar_scale, TH1D *outchi2perbin) {
   //*******************************************************************
 
   Double_t Chi2 = 0.0;
@@ -142,6 +146,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
   // iterate over bins in X (i,j)
   NUIS_LOG(DEB, "START Chi2 Calculation=================");
   for (int i = 0; i < calc_data->GetNbinsX(); i++) {
+    double ibin_contrib = 0;
     NUIS_LOG(DEB,
          "[CHI2] i = " << i << " ["
                        << calc_data->GetXaxis()->GetBinLowEdge(i + 1) << " -- "
@@ -177,12 +182,13 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                                            (calc_data->GetBinContent(j + 1) -
                                             calc_mc->GetBinContent(j + 1)))
                                        << " " << Chi2);
-
-        Chi2 +=
+        double bin_cont =
             ((calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1)) *
              (*calc_cov)(i, j) *
              (calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1)));
 
+        Chi2 += bin_cont;
+        ibin_contrib += bin_cont;
       } else {
         NUIS_LOG(DEB, "Skipping chi2 contribution (i,j) = ("
                       << i << "," << j
@@ -191,6 +197,9 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                       << ", Cov = " << (*calc_cov)(i, j));
         Chi2 += 0.;
       }
+    }
+    if (outchi2perbin) {
+      outchi2perbin->SetBinContent(i + 1, ibin_contrib);
     }
   }
 
@@ -204,7 +213,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
-                                   TH2I *map, TH2I *mask) {
+                                   TH2I *map, TH2I *mask, TH2D *outchi2perbin) {
   //*******************************************************************
 
   // Generate a simple map
@@ -216,14 +225,47 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   TH1D *data_1D = MapToTH1D(data, map);
   TH1D *mc_1D = MapToTH1D(mc, map);
   TH1I *mask_1D = MapToMask(mask, map);
+  TH1D *outchi2perbin_1D = NULL;
+  TH1D *outchi2perbin_map_1D = NULL;
+
+  if (outchi2perbin) {
+    outchi2perbin_1D = MapToTH1D(outchi2perbin, map);
+    for (Int_t xbi_it = 0; xbi_it < outchi2perbin->GetXaxis()->GetNbins();
+         ++xbi_it) {
+      for (Int_t ybi_it = 0; ybi_it < outchi2perbin->GetYaxis()->GetNbins();
+           ++ybi_it) {
+        int gbin = outchi2perbin->GetBin(xbi_it + 1, ybi_it + 1);
+        // std::cout << " gbin " << gbin << " corresponds to "
+        //           << " x: " << (xbi_it + 1) << ", y: " << (ybi_it + 1)
+        //           << std::endl;
+        outchi2perbin->SetBinContent(xbi_it + 1, ybi_it + 1, gbin);
+      }
+    }
+    outchi2perbin_map_1D = MapToTH1D(outchi2perbin, map);
+  }
 
   // Calculate 1D chi2 from 1D Plots
-  Double_t Chi2 = StatUtils::GetChi2FromCov(data_1D, mc_1D, invcov, mask_1D);
+  Double_t Chi2 = StatUtils::GetChi2FromCov(data_1D, mc_1D, invcov, mask_1D, 1,
+                                            1E76, outchi2perbin_1D);
+  if (outchi2perbin) {
+    for (int xbi_it = 0; xbi_it < outchi2perbin_1D->GetXaxis()->GetNbins();
+         ++xbi_it) {
+      // std::cout << " adding chi2 "
+      //           << outchi2perbin_1D->GetBinContent(xbi_it + 1)
+      //           << " from 1d bin " << (xbi_it + 1) << " to gbin "
+      //           << outchi2perbin_map_1D->GetBinContent(xbi_it + 1) << std::endl;
+      outchi2perbin->SetBinContent(
+          outchi2perbin_map_1D->GetBinContent(xbi_it + 1),
+          outchi2perbin_1D->GetBinContent(xbi_it + 1));
+    }
+  }
 
   // CleanUp
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+  delete outchi2perbin_1D;
+  delete outchi2perbin_map_1D;
 
   return Chi2;
 }

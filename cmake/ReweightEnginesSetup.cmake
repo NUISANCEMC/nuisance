@@ -17,6 +17,10 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+if(NOT USE_REWEIGHT)
+  LIST(APPEND EXTRA_CXX_FLAGS -D__NO_REWEIGHT__)
+endif()
+
 ##################################  T2K   ######################################
 if(USE_T2K)
   include(${CMAKE_SOURCE_DIR}/cmake/T2KSetup.cmake)

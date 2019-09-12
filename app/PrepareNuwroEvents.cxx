@@ -72,15 +72,15 @@ TH1D *GetTH1DFromFile(std::string const &rootFile,
   TFile *inpFile = new TFile(rootFile.c_str(), "READ");
   if (!inpFile || !inpFile->IsOpen()) {
     NUIS_ABORT("Cannot open input root file: " << rootFile
-                                           << " to read input histo.");
+                                               << " to read input histo.");
   }
 
   TH1D *histD = dynamic_cast<TH1D *>(inpFile->Get(histName.c_str()));
   if (!histD) {
     TH1F *histF = dynamic_cast<TH1F *>(inpFile->Get(histName.c_str()));
     if (!histF) {
-      NUIS_ABORT("Cannot find TH1D/F: " << histName << " in root file: " << rootFile
-                                    << ".");
+      NUIS_ABORT("Cannot find TH1D/F: " << histName << " in root file: "
+                                        << rootFile << ".");
     }
     histD = F2D(histF);
   } else {
@@ -121,9 +121,9 @@ int main(int argc, char *argv[]) {
           (fluxInputDescriptor.size() != 3) &&
           (fluxInputDescriptor.size() != 4)) {
         NUIS_ABORT("Received -F argument with option: \""
-               << inpLine
-               << "\", was expecting "
-                  "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
+                   << inpLine
+                   << "\", was expecting "
+                      "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
       haveFluxInputs = true;
       FluxInputs.push_back(
@@ -138,9 +138,9 @@ int main(int argc, char *argv[]) {
       if (!FluxInputs.back().File.length() ||
           !FluxInputs.back().Hist.length()) {
         NUIS_ABORT("Received -F argument with option: \""
-               << inpLine
-               << "\", was expecting "
-                  "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
+                   << inpLine
+                   << "\", was expecting "
+                      "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
     } else {
       inputfiles.push_back(std::string(argv[i]));
@@ -176,13 +176,13 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     TTree *inpTree = dynamic_cast<TTree *>(inpFile->Get("treeout"));
     if (!inpTree) {
       NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
-             << inputs.c_str());
+                 << inputs.c_str());
     }
 
     outRootFile = new TFile(ofile.c_str(), force_out ? "RECREATE" : "CREATE");
     if (!outRootFile || !outRootFile->IsOpen()) {
       NUIS_ABORT("Couldn't open root file: "
-             << ofile << " for writing, does it already exist?");
+                 << ofile << " for writing, does it already exist?");
     }
 
     nuwrotree = inpTree->CloneTree(-1, "fast");
@@ -196,7 +196,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     nuwrotree = dynamic_cast<TTree *>(outRootFile->Get("treeout"));
     if (!nuwrotree) {
       NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
-             << inputs.c_str());
+                 << inputs.c_str());
     }
   }
 
@@ -238,8 +238,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
           fluxHist->GetXaxis()->GetNbins() + 1);
 
       NUIS_LOG(FIT, "Adding new nuwro flux "
-                    << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
-                    << " Ehigh: " << Ehigh);
+                        << "pdg: " << pdg << " pctg: " << pctg
+                        << " Elow: " << Elow << " Ehigh: " << Ehigh);
 
       // Sort total flux plot
       if (!fluxlist[0]) {
@@ -273,8 +273,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       delete fluxHist;
     }
     if (fabs(totalFraction - 1) > 1E-5) {
-      NUIS_ABORT(FTL, "Total species fraction for input flux histos = "
-                      << totalFraction << ", expected to sum to 1.");
+      NUIS_ABORT("Total species fraction for input flux histos = "
+                 << totalFraction << ", expected to sum to 1.");
     }
   } else if (fluxtype == 0) {
     std::string fluxstring = evt->par.beam_energy;
@@ -291,8 +291,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     // For files produced with a flux distribution
     if (!isMono) {
       NUIS_LOG(FIT, "Adding new nuwro flux "
-                    << "pdg: " << pdg << " Elow: " << Elow
-                    << " Ehigh: " << Ehigh);
+                        << "pdg: " << pdg << " Elow: " << Elow
+                        << " Ehigh: " << Ehigh);
 
       fluxplot =
           new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
@@ -302,7 +302,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       }
     } else { // For monoenergetic fluxes
       NUIS_LOG(FIT, "Adding mono-energetic nuwro flux "
-                    << "pdg: " << pdg << " E: " << Elow);
+                        << "pdg: " << pdg << " E: " << Elow);
 
       fluxplot = new TH1D("fluxplot", "fluxplot", 100, 0, Elow * 2);
       fluxplot->SetBinContent(fluxplot->FindBin(Elow), 1);
@@ -346,8 +346,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       double Ehigh = double(fluxvals[3]) / 1000.0;
 
       NUIS_LOG(FIT, "Adding new nuwro flux "
-                    << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
-                    << " Ehigh: " << Ehigh);
+                        << "pdg: " << pdg << " pctg: " << pctg
+                        << " Elow: " << Elow << " Ehigh: " << Ehigh);
 
       TH1D *fluxplot =
           new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
@@ -416,9 +416,9 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
 
     if (i % countwidth == 0) {
       NUIS_LOG(FIT, "Processed " << i << " events "
-                             << " (" << int(i * 100.0 / nevents) << "%)"
-                             << " : E, W, PDG = " << Enu << ", " << TotXSec
-                             << ", " << pdg)
+                                 << " (" << int(i * 100.0 / nevents) << "%)"
+                                 << " : E, W, PDG = " << Enu << ", " << TotXSec
+                                 << ", " << pdg)
     }
   }
 

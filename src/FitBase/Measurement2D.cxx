@@ -43,6 +43,8 @@ Measurement2D::Measurement2D(void) {
   fDataTrue = NULL;
   fMCWeighted = NULL;
 
+  fResidualHist = NULL;
+
   fDefaultTypes = "FIX/FULL/CHI2";
   fAllowedTypes =
       "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/FITPROJX/"
@@ -140,6 +142,8 @@ Measurement2D::~Measurement2D(void) {
     delete fInvert;
   if (fDecomp)
     delete fDecomp;
+
+  delete fResidualHist;
 }
 
 //********************************************************************
@@ -1010,7 +1014,24 @@ double Measurement2D::GetLikelihood() {
           StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMapHist, fMaskHist);
     } else {
       chi2 = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMapHist,
-                                       fMaskHist);
+                                       fMaskHist, fResidualHist);
+      if (fChi2LessBinHist) {
+        TH2I *binmask = new TH2I("mask", "", fDataHist->GetNbinsX(), 0,
+                                 fDataHist->GetNbinsX(), fDataHist->GetNbinsY(),
+                                 0, fDataHist->GetNbinsY());
+        binmask->SetDirectory(NULL);
+        for (int xi = 0; xi < fDataHist->GetNbinsX(); ++xi) {
+          for (int yi = 0; yi < fDataHist->GetNbinsY(); ++yi) {
+            binmask->Reset();
+            binmask->SetBinContent(xi + 1, yi + 1, 1);
+            fChi2LessBinHist->SetBinContent(
+                xi + 1, yi + 1,
+                StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMapHist,
+                                          binmask));
+          }
+        }
+        delete binmask;
+      }
     }
   }
 
@@ -1253,6 +1274,21 @@ void Measurement2D::Write(std::string drawOpt) {
     fSettings.Set("NDOF", this->GetNDOF());
     fSettings.Set("#chi^{2}/NDOF", fLikelihood / this->GetNDOF());
     fSettings.Write();
+  }
+
+  if (fIsChi2 && !fIsDiag) {
+    fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
+    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->Reset();
+
+    fChi2LessBinHist = (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
+    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->Reset();
+
+    (void)GetLikelihood();
+
+    fResidualHist->Write();
+    fChi2LessBinHist->Write();
   }
 
   // // Likelihood residual plots

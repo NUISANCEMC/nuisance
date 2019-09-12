@@ -4,6 +4,8 @@
 #include "FitLogger.h"
 
 #ifdef __NEUT_ENABLED__
+#ifndef __NO_REWEIGHT__
+#include "NEUTInputHandler.h"
 #include "NReWeight.h"
 #include "NReWeightCasc.h"
 #include "NReWeightNuXSecCCQE.h"
@@ -19,34 +21,34 @@
 #include "NSystUncertainty.h"
 #include "neutpart.h"
 #include "neutvect.h"
-#include "NEUTInputHandler.h"
+#endif
 #endif
 
-
+#include "FitWeight.h"
 #include "GeneratorUtils.h"
 #include "WeightEngineBase.h"
-#include "FitWeight.h"
 
 class NEUTWeightEngine : public WeightEngineBase {
 public:
-	NEUTWeightEngine(std::string name);
-	~NEUTWeightEngine() {};
+  NEUTWeightEngine(std::string name);
+  ~NEUTWeightEngine(){};
 
-	void IncludeDial(std::string name, double startval);
+  void IncludeDial(std::string name, double startval);
 
-	void SetDialValue(std::string name, double val);
-	void SetDialValue(int nuisenum, double val);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int nuisenum, double val);
 
-	void Reconfigure(bool silent = false);
+  void Reconfigure(bool silent = false);
 
-	double CalcWeight(BaseFitEvt* evt);
+  double CalcWeight(BaseFitEvt *evt);
 
-	inline bool NeedsEventReWeight() { return true; };
-
+  inline bool NeedsEventReWeight() { return true; };
 
 #ifdef __NEUT_ENABLED__
-	std::vector<neut::rew::NSyst_t> fNEUTSysts;
-	neut::rew::NReWeight* fNeutRW;
+#ifndef __NO_REWEIGHT__
+  std::vector<neut::rew::NSyst_t> fNEUTSysts;
+  neut::rew::NReWeight *fNeutRW;
+#endif
 #endif
 };
 

@@ -1,7 +1,7 @@
 #include "NEUTWeightEngine.h"
 
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
@@ -62,7 +62,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 };
 
 void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
 
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kNEUT);
@@ -102,40 +102,39 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
   if (startval != -999.9) {
     SetDialValue(nuisenum, startval);
   }
-
 #endif
 }
 
 void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
-    NUIS_LOG(FIT, "Setting Dial Value for " << nuisenum << " " << i << " "
-                                        << indices[i] << " "
-                                        << fValues[indices[i]]
-                                        << " Enum: " << fNEUTSysts[indices[i]]);
+    NUIS_LOG(FIT, "Setting Dial Value for "
+                      << nuisenum << " " << i << " " << indices[i] << " "
+                      << fValues[indices[i]]
+                      << " Enum: " << fNEUTSysts[indices[i]]);
     fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
   }
 #endif
 }
 
 void NEUTWeightEngine::SetDialValue(std::string name, double val) {
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
     NUIS_LOG(FIT, "Setting Dial Value for "
-                  << name << " = " << i << " " << indices[i] << " "
-                  << fValues[indices[i]]
-                  << "  Enum: " << fNEUTSysts[indices[i]]);
+                      << name << " = " << i << " " << indices[i] << " "
+                      << fValues[indices[i]]
+                      << "  Enum: " << fNEUTSysts[indices[i]]);
     fNeutRW->Systematics().Set(fNEUTSysts[indices[i]], val);
   }
 #endif
 }
 
 void NEUTWeightEngine::Reconfigure(bool silent) {
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
   // Hush now...
   if (silent)
     StopTalking();
@@ -156,7 +155,7 @@ void NEUTWeightEngine::Reconfigure(bool silent) {
 double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
   // Skip Non NEUT
   if (evt->fType != kNEUT)
     return 1.0;

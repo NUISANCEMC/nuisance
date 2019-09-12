@@ -209,19 +209,57 @@ double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
 
   // Loop over the covariance matrix bins
   for (int i = 0; i < Nbins; ++i) {
-    int xbin = i % nbinsx + 1;
-    int ybin = i / nbinsx + 1;
+    int xbin = (i % nbinsx) + 1;
+    int ybin = (i / nbinsx) + 1;
     double datax = fDataHist->GetBinContent(xbin, ybin);
     double mcx = fMCHist->GetBinContent(xbin, ybin);
+    double chi2_bin = 0;
     for (int j = 0; j < Nbins; ++j) {
-      int xbin2 = j % nbinsx + 1;
-      int ybin2 = j / nbinsx + 1;
+      int xbin2 = (j % nbinsx) + 1;
+      int ybin2 = (j / nbinsx) + 1;
 
       double datay = fDataHist->GetBinContent(xbin2, ybin2);
       double mcy = fMCHist->GetBinContent(xbin2, ybin2);
 
       double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
-      chi2 += chi2_xy;
+      chi2_bin += chi2_xy;
+    }
+    if (fResidualHist) {
+      fResidualHist->SetBinContent(xbin, ybin, chi2_bin);
+    }
+    chi2 += chi2_bin;
+  }
+
+  if (fChi2LessBinHist) {
+    for (int igbin = 0; igbin < Nbins; ++igbin) {
+      int igxbin = (igbin % nbinsx) + 1;
+      int igybin = (igbin / nbinsx) + 1;
+      double tchi2 = 0;
+      for (int i = 0; i < Nbins; ++i) {
+        int xbin = (i % nbinsx) + 1;
+        int ybin = (i / nbinsx) + 1;
+        if ((xbin == igxbin) && (ybin == igybin)) {
+          continue;
+        }
+        double datax = fDataHist->GetBinContent(xbin, ybin);
+        double mcx = fMCHist->GetBinContent(xbin, ybin);
+        double chi2_bin = 0;
+        for (int j = 0; j < Nbins; ++j) {
+          int xbin2 = (j % nbinsx) + 1;
+          int ybin2 = (j / nbinsx) + 1;
+          if ((xbin2 == igxbin) && (ybin2 == igybin)) {
+            continue;
+          }
+          double datay = fDataHist->GetBinContent(xbin2, ybin2);
+          double mcy = fMCHist->GetBinContent(xbin2, ybin2);
+
+          double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
+          chi2_bin += chi2_xy;
+        }
+        tchi2 += chi2_bin;
+      }
+
+      fChi2LessBinHist->SetBinContent(igxbin, igybin, tchi2);
     }
   }
 
@@ -229,8 +267,9 @@ double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
   if (fAddNormPen) {
     chi2 +=
         (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
-                                       (fNormError * fNormError));
+    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) *
+                                           (1 - (fCurrentNorm)) /
+                                           (fNormError * fNormError));
   }
 
   // Adjust the shape back to where it was.

@@ -3,12 +3,12 @@
 
 #ifdef __GENIE_ENABLED__
 #ifdef GENIE_PRE_R3
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 #include "ReWeight/GSyst.h"
 #include "ReWeight/GReWeight.h"
 #endif
 #else
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GReWeight.h"
 using namespace genie;
@@ -35,7 +35,7 @@ public:
 	inline bool NeedsEventReWeight() { return true; };
 
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 	std::vector<genie::rew::GSyst_t> fGENIESysts;
 	genie::rew::GReWeight* fGenieRW;  //!< Genie RW Object
 #endif

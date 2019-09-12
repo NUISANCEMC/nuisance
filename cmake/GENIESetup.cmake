@@ -107,7 +107,6 @@ if(USING_GENIE_RW)
   cmessage(STATUS "Using GENIE ReWeight library.")
 else()
   cmessage(STATUS "Building without GENIE ReWeight support.")
-  LIST(APPEND EXTRA_CXX_FLAGS -D__NO_GENIE_REWEIGHT__)
 endif()
 
 LIST(APPEND GENIE_LIBS -Wl,--end-group )

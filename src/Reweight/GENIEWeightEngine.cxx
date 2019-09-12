@@ -6,7 +6,7 @@
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "Ntuple/NtpMCEventRecord.h"
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 #include "ReWeight/GReWeightAGKY.h"
 #include "ReWeight/GReWeightDISNuclMod.h"
 #include "ReWeight/GReWeightFGM.h"
@@ -41,7 +41,7 @@
 
 using namespace genie;
 
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 #include "RwCalculators/GReWeightAGKY.h"
 #include "RwCalculators/GReWeightDISNuclMod.h"
 #include "RwCalculators/GReWeightFGM.h"
@@ -69,7 +69,7 @@ using namespace genie::rew;
 
 GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
   // Setup the NEUT Reweight engien
   fCalcName = name;
   NUIS_LOG(DEB, "Setting up GENIE RW : " << fCalcName);
@@ -327,7 +327,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 
 void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
 
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kGENIE);
@@ -398,7 +398,7 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
 
 void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
@@ -410,7 +410,7 @@ void GENIEWeightEngine::SetDialValue(int nuisenum, double val) {
 
 void GENIEWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
@@ -422,7 +422,7 @@ void GENIEWeightEngine::SetDialValue(std::string name, double val) {
 
 void GENIEWeightEngine::Reconfigure(bool silent) {
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
   // Hush now...
   if (silent)
     StopTalking();
@@ -442,7 +442,7 @@ double GENIEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __GENIE_ENABLED__
-#ifndef __NO_GENIE_REWEIGHT__
+#ifndef __NO_REWEIGHT__
   // Make nom weight
   if (!evt) {
     NUIS_ABORT("evt not found : " << evt);

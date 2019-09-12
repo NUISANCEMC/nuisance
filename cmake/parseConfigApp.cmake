@@ -1,7 +1,5 @@
 function(GETFIRSTMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG DIR_OUT FAILURE_IS_NOT_ERROR)
 
-  cmessage(DEBUG "CONFIGAPP: ${CONFIGAPP}, ARG: ${ARG} DIR_OUT: ${DIR_OUT}, FAILURE_IS_NOT_ERROR: ${FAILURE_IS_NOT_ERROR}")
-
   if(DELIM STREQUAL "")
     cmessage(FATAL_ERROR "GETFIRSTMATCHINGDELMIMMEDDIR Passed no delimiter. This is a build configuration bug in NUISANCE, please report to the developers.")
   endif()
@@ -85,8 +83,6 @@ function(GETALLMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG LIST_OUT)
     cmessage(FATAL_ERROR "GETALLMATCHINGDELMIMMEDDIR Passed no configuration application. This is a build configuration bug in NUISANCE, please report to the developers.")
   endif()
 
-  #cmessage(WARNING "DELIM: ${DELIM}, CONFIGAPP: ${CONFIGAPP}, ARG: ${ARG}, LIST_OUT: ${LIST_OUT}")
-
   SET(CONFIGAPP_LOCATION "CONFIGAPP_LOCATION-NOTFOUND")
   find_program(CONFIGAPP_LOCATION ${CONFIGAPP})
   if(NOT CONFIGAPP_LOCATION STREQUAL "CONFIGAPP_LOCATION-NOTFOUND")
@@ -94,8 +90,6 @@ function(GETALLMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG LIST_OUT)
     ${ARG} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     string(REPLACE " " ";" CONFIGAPP_RESPONSE_LIST "${CONFIGAPP_RESPONSE_RAW}")
-
-   # cmessage(WARNING "CONFIGAPP_RESPONSE_RAW: ${CONFIGAPP_RESPONSE_RAW}, CONFIGAPP_RESPONSE_LIST: ${CONFIGAPP_RESPONSE_LIST}")
 
     set(LIST_BUILD)
 
@@ -137,12 +131,55 @@ endfunction()
 
 #Uselike GETLIBS(gsl-config --libs GSL_LIB_DIR)
 function(GETLIBS CONFIGAPP ARG LIBLIST_OUT)
-  #cmessage(WARNING "LIBLIST_OUT: ${LIBLIST_OUT}")
   GETALLMATCHINGDELMIMMEDDIR(
     "-l"
     ${CONFIGAPP}
     ${ARG}
     MATCHING_ITEMS)
   set(${LIBLIST_OUT} ${MATCHING_ITEMS} PARENT_SCOPE)
-  #cmessage(WARNING "LIBLIST_OUT: ${LIBLIST_OUT}: ${${LIBLIST_OUT}}")
+endfunction()
+
+function(BuildFlagString OUTPUTLIST DELIMITER)
+  LIST(APPEND INPUT_LIST ${ARGN})
+  if(NOT DELIMITER STREQUAL "")
+    string(STRIP ${DELIMITER} DELIMITER)
+  endif()
+  if(NOT "${INPUT_LIST}" STREQUAL "")
+    string(REPLACE ";" " ${DELIMITER}" LIST_STR "${DELIMITER}${INPUT_LIST}")
+    string(STRIP "${LIST_STR}" LIST_STR)
+    set(${OUTPUTLIST} ${LIST_STR} PARENT_SCOPE)
+  else()
+      set(${OUTPUTLIST} PARENT_SCOPE)
+  endif()
+endfunction()
+
+#Here we want to look for linker flags in a list of libraries and escape them
+function(BuildLibraryFlagString OUTPUTLIST)
+  set(INPUT_LIST ${ARGN})
+  BuildFlagString(NEED_SCRUB_LINKOPTS "-l" ${INPUT_LIST})
+  string(REPLACE "-l-" "-" LIST_STR ${NEED_SCRUB_LINKOPTS})
+  set(${OUTPUTLIST} ${LIST_STR} PARENT_SCOPE)
+endfunction()
+
+function(CatStringsIfNotEmpty OUTPUT_STRING)
+  set(BUILD_STR)
+  foreach(I ${ARGN})
+    if(NOT I STREQUAL "")
+      set(BUILD_STR "${BUILD_STR} ${I}")
+    endif()
+  endforeach()
+  if(NOT BUILD_STR STREQUAL "")
+    string(STRIP "${BUILD_STR}" BUILD_STR)
+  endif()
+  set(${OUTPUT_STRING} ${BUILD_STR} PARENT_SCOPE)
+endfunction()
+
+function(PrefixList OUTPUT_LIST PREFIX)
+  set(${OUTPUT_LIST})
+  foreach(I ${ARGN})
+    if(NOT I STREQUAL "")
+      LIST(APPEND ${OUTPUT_LIST} "${PREFIX}${I}")
+    endif()
+  endforeach()
+  set(${OUTPUT_LIST} ${${OUTPUT_LIST}} PARENT_SCOPE)
 endfunction()

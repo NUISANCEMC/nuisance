@@ -244,7 +244,7 @@ public:
   /// \brief Read the map values from a text file
   ///
   /// \warning Requires DATA hist to be set beforehand.
-  /// Format should be a 2D array of mappings. 
+  /// Format should be a 2D array of mappings.
   /// -1 indicates empty bins. \n
   /// e.g.: \n
   ///  1  2  3  4  5 \n
@@ -422,10 +422,10 @@ public:
   /// Call ResetFakeData or ResetData to return to values before the throw.
   virtual void ThrowCovariance(void);
 
-  /// \brief Throw the data by its assigned errors and assign this to MC    
-  ///           
-  /// Used when creating data toys by assign the MC to this thrown data     
-  /// so that the likelihood is calculated between data and thrown data     
+  /// \brief Throw the data by its assigned errors and assign this to MC
+  ///
+  /// Used when creating data toys by assign the MC to this thrown data
+  /// so that the likelihood is calculated between data and thrown data
   virtual void ThrowDataToy(void);
 
 
@@ -578,6 +578,9 @@ protected:
 
   TH2I* fMaskHist;  //!< mask histogram for the data
   TH2I* fMapHist;   //!< map histogram used to convert 2D to 1D distributions
+
+  TH2D *fResidualHist;
+  TH2D *fChi2LessBinHist;
 
   bool fIsFakeData;          //!< is current data actually fake
   std::string fakeDataFile;  //!< MC fake data input file
