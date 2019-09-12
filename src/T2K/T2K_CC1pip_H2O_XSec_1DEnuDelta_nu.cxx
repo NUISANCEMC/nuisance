@@ -10,10 +10,12 @@ T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::T2K_CC1pip_H2O_XSec_1DEnuDelta_nu(nuiskey sam
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC1pip_H2O_XSec_1DEnuDelta_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: T2k Forward Horn Current nue + nuebar \n" \
-                        "Signal: Any event with 1 electron, any nucleons, and no other FS particles \n";
+  std::string descrip = "T2K_CC1pip_H2O_XSec_nu sample. \n"
+                        "Target: H20 \n"
+                        "Flux: T2K FHC numu \n"
+                        "Signal: CC1pi+, p_mu > 200 MeV, p_pi > 200 MeV\n"
+                        ", costheta_mu > 0.3, costheta_pi > 0.3\n"
+                        "https://doi.org/10.1103/PhysRevD.97.012001";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -71,5 +73,5 @@ void T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::FillEventVariables(FitEvent *event) {
 // Beware: The H2O analysis has different signal definition to the CH analysis!
 bool T2K_CC1pip_H2O_XSec_1DEnuDelta_nu::isSignal(FitEvent *event) {
 //********************************************************************
-  return SignalDef::isCC1pip_T2K_H2O(event, EnuMin, EnuMax);
+  return SignalDef::isCC1pip_T2K_PRD97_012001(event, EnuMin, EnuMax);
 }

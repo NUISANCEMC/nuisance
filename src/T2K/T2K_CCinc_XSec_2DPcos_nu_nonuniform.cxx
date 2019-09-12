@@ -18,7 +18,8 @@ T2K_CCinc_XSec_2DPcos_nu_nonuniform::T2K_CCinc_XSec_2DPcos_nu_nonuniform(
   std::string descrip = "T2K_CCinc_XSec_2DPcos_nu_nonuniform sample. \n"
                         "Target: CH \n"
                         "Flux: T2K FHC numu  \n"
-                        "Signal: CC-inclusive \n";
+                        "Signal: CC-inclusive \n"
+                        "https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.012004";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

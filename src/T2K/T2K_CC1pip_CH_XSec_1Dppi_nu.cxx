@@ -9,10 +9,12 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC1pip_CH_XSec_1Dppi_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: T2K Forward Horn Current numu \n" \
-                        "Signal: Any event with 1 muon -, 1 pion +, any nucleons, and no other FS particles \n";
+  std::string descrip = "T2K_CC1pip_CH_XSec_nu sample. \n"
+                        "Target: CH \n"
+                        "Flux: T2K FHC numu \n"
+                        "Signal: CC1pi+, p_mu > 200 MeV, p_pi > 200 MeV\n"
+                        ", costheta_mu > 0.2, costheta_pi > 0.2\n"
+                        "https://arxiv.org/abs/1909.03936";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -62,29 +64,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dppi_nu::isSignal(FitEvent *event) {
 //********************************************************************
-// This distribution uses a somewhat different signal definition so might as well implement it separately here
-
-  if (!SignalDef::isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
-
-  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-
-  // If this event passes the criteria on particle counting, enforce the T2K
-  // ND280 phase space constraints
-  // Will be different if Michel tag sample is included or not
-  // Essentially, if there's a Michel tag we don't cut on the pion variables
-
-  double p_mu = FitUtils::p(Pmu) * 1000;
-  double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
-  double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
-
-  if (p_mu <= 200 || cos_th_mu <= 0.2 || cos_th_pi <= 0.2) {
-    return false;
-  } else {
-    return true;
-  }
-
-  return false;
+  return SignalDef::isCC1pip_T2K_arxiv1909_03936(
+      event, EnuMin, EnuMax, SignalDef::kMuonHighEff | SignalDef::kPionFwdHighMom);
 }
 
