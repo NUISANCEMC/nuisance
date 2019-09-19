@@ -7,7 +7,6 @@
 // ANL CC1ppip
 #include "ANL_CC1ppip_Evt_1DQ2_nu.h"
 #include "ANL_CC1ppip_Evt_1DcosmuStar_nu.h"
-#include "ANL_CC1ppip_Evt_1DcosmuStar_nu.h"
 #include "ANL_CC1ppip_Evt_1DcosthAdler_nu.h"
 #include "ANL_CC1ppip_Evt_1Dphi_nu.h"
 #include "ANL_CC1ppip_Evt_1Dppi_nu.h"
@@ -50,14 +49,14 @@
 
 #ifndef __NO_ArgoNeuT__
 // ArgoNeuT CC1Pi
-#include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
-#include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu.h"
-#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu.h"
-#include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu.h"
-#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu.h"
+#include "ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu.h"
 // ArgoNeuT CC-inclusive
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CCInc_XSec_1Dpmu_nu.h"
@@ -70,7 +69,6 @@
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
 #include "BNL_CCQE_XSec_1DEnu_nu.h"
 // BNL CC1ppip
-#include "BNL_CC1ppip_Evt_1DQ2_nu.h"
 #include "BNL_CC1ppip_Evt_1DQ2_nu.h"
 #include "BNL_CC1ppip_Evt_1DcosthAdler_nu.h"
 #include "BNL_CC1ppip_Evt_1Dphi_nu.h"
@@ -125,7 +123,6 @@
 #include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
-#include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_nu.h"
 
 // MiniBooNE CC1pi+ 1D
@@ -179,8 +176,8 @@
 #include "MINERvA_CC0pinp_STV_XSec_1D_nu.h"
 
 // 2018 MINERvA CC0pi 2D
-#include "MINERvA_CC0pi_XSec_2D_nu.h"
 #include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
+#include "MINERvA_CC0pi_XSec_2D_nu.h"
 
 // 2018 MINERvA CC0pi 2D antinu
 #include "MINERvA_CC0pi_XSec_2D_antinu.h"
@@ -224,13 +221,11 @@
 
 // MINERvA CCCOH pion
 #include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
-#include "MINERvA_CCCOHPI_XSec_1DEnu_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DEpi_antinu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_antinu.h"
 
 #include "MINERvA_CCCOHPI_XSec_1DEpi_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1DQ2_nu.h"
-#include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 #include "MINERvA_CCCOHPI_XSec_1Dth_nu.h"
 
 #include "MINERvA_CCCOHPI_XSec_joint.h"
@@ -241,29 +236,29 @@
 
 #ifndef __NO_T2K__
 // T2K CC0pi 2016
-#include "T2K_CC0pi_XSec_2DPcos_nu.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_I.h"
+#include "T2K_CC0pi_XSec_2DPcos_nu_II.h"
 
 // T2K CC-inclusive with full acceptance 2018
 #include "T2K_CCinc_XSec_2DPcos_nu_nonuniform.h"
 
 // T2K STV CC0pi 2018
-#include "T2K_CC0pi_XSec_2DPcos_nu_nonuniform.h"
-#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
-#include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
-#include "T2K_CC0pinp_STV_XSec_1Ddat_nu.h"
 #include "T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h"
-#include "T2K_CC0pinp_ifk_XSec_3Dinfp_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddat_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
+#include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
 #include "T2K_CC0pinp_ifk_XSec_3Dinfa_nu.h"
 #include "T2K_CC0pinp_ifk_XSec_3Dinfip_nu.h"
+#include "T2K_CC0pinp_ifk_XSec_3Dinfp_nu.h"
 
 // T2K CC1pi+ on CH
-#include "T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
-#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DAdlerPhi_nu.h"
 #include "T2K_CC1pip_CH_XSec_1DCosThAdler_nu.h"
+#include "T2K_CC1pip_CH_XSec_1DQ2_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dthmupi_nu.h"
+#include "T2K_CC1pip_CH_XSec_1Dthpi_nu.h"
+#include "T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h"
 //#include "T2K_CC1pip_CH_XSec_1Dthq3pi_nu.h"
 //#include "T2K_CC1pip_CH_XSec_1DWrec_nu.h"
 //#include "T2K_CC1pip_CH_XSec_1Dq3_nu.h"
@@ -277,7 +272,6 @@
 #include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
 
-
 #endif
 
 #ifndef __NO_SciBooNE__
@@ -287,10 +281,10 @@
 #include "SciBooNE_CCCOH_1TRK_1Dpmu_nu.h"
 #include "SciBooNE_CCCOH_1TRK_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1DQ2_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu.h"
+#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h"
 #include "SciBooNE_CCCOH_MuPiNoVA_1Dthetapr_nu.h"
-#include "SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu.h"
-#include "SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1Dpmu_nu.h"
 #include "SciBooNE_CCCOH_MuPiVA_1Dthetamu_nu.h"
@@ -342,15 +336,15 @@
 DynamicSampleFactory::DynamicSampleFactory() : NSamples(0), NManifests(0) {
   LoadPlugins();
   NUIS_LOG(FIT, "Loaded " << NSamples << " from " << NManifests
-                      << " shared object libraries.");
+                          << " shared object libraries.");
 }
-DynamicSampleFactory* DynamicSampleFactory::glblDSF = NULL;
+DynamicSampleFactory *DynamicSampleFactory::glblDSF = NULL;
 DynamicSampleFactory::PluginManifest::~PluginManifest() {
   for (size_t i_it = 0; i_it < Instances.size(); ++i_it) {
     (*(DSF_DestroySample))(Instances[i_it]);
   }
 }
-std::string EnsureTrailingSlash(std::string const& inp) {
+std::string EnsureTrailingSlash(std::string const &inp) {
   if (!inp.length()) {
     return "/";
   }
@@ -367,7 +361,7 @@ void DynamicSampleFactory::LoadPlugins() {
         GeneralUtils::ParseToStr(Config::GetParS("dynamic_sample.path"), ":");
   }
 
-  char const* envPath = getenv("NUISANCE_DS_PATH");
+  char const *envPath = getenv("NUISANCE_DS_PATH");
   if (envPath) {
     std::vector<std::string> envPaths = GeneralUtils::ParseToStr(envPath, ":");
     for (size_t ep_it = 0; ep_it < envPaths.size(); ++ep_it) {
@@ -376,7 +370,7 @@ void DynamicSampleFactory::LoadPlugins() {
   }
 
   if (!SearchDirectories.size()) {
-    char const* pwdPath = getenv("PWD");
+    char const *pwdPath = getenv("PWD");
     if (pwdPath) {
       SearchDirectories.push_back(pwdPath);
     }
@@ -388,19 +382,20 @@ void DynamicSampleFactory::LoadPlugins() {
     NUIS_LOG(FIT, "Searching for dynamic sample manifests in: " << dirpath);
 
     Ssiz_t len = 0;
-    DIR* dir;
-    struct dirent* ent;
+    DIR *dir;
+    struct dirent *ent;
     dir = opendir(dirpath.c_str());
     if (dir != NULL) {
       TRegexp matchExp("*.so", true);
       while ((ent = readdir(dir)) != NULL) {
         if (matchExp.Index(TString(ent->d_name), &len) != Ssiz_t(-1)) {
           NUIS_LOG(FIT, "\tFound shared object: "
-                        << ent->d_name << " checking for relevant methods...");
+                            << ent->d_name
+                            << " checking for relevant methods...");
 
-          void* dlobj =
+          void *dlobj =
               dlopen((dirpath + ent->d_name).c_str(), RTLD_NOW | RTLD_GLOBAL);
-          char const* dlerr_cstr = dlerror();
+          char const *dlerr_cstr = dlerror();
           std::string dlerr;
           if (dlerr_cstr) {
             dlerr = dlerr_cstr;
@@ -426,7 +421,7 @@ void DynamicSampleFactory::LoadPlugins() {
 
           if (dlerr.length()) {
             NUIS_ERR(WRN, "\tFailed to load symbol \"DSF_NSamples\" from "
-                           << (dirpath + ent->d_name) << ": " << dlerr);
+                              << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
           }
@@ -442,7 +437,7 @@ void DynamicSampleFactory::LoadPlugins() {
 
           if (dlerr.length()) {
             NUIS_ERR(WRN, "\tFailed to load symbol \"DSF_GetSampleName\" from "
-                           << (dirpath + ent->d_name) << ": " << dlerr);
+                              << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
           }
@@ -458,7 +453,7 @@ void DynamicSampleFactory::LoadPlugins() {
 
           if (dlerr.length()) {
             NUIS_ERR(WRN, "\tFailed to load symbol \"DSF_GetSample\" from "
-                           << (dirpath + ent->d_name) << ": " << dlerr);
+                              << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
           }
@@ -474,28 +469,29 @@ void DynamicSampleFactory::LoadPlugins() {
 
           if (dlerr.length()) {
             NUIS_ERR(WRN, "Failed to load symbol \"DSF_DestroySample\" from "
-                           << (dirpath + ent->d_name) << ": " << dlerr);
+                              << (dirpath + ent->d_name) << ": " << dlerr);
             dlclose(dlobj);
             continue;
           }
 
           plgManif.NSamples = (*(plgManif.DSF_NSamples))();
           NUIS_LOG(FIT, "\tSuccessfully loaded dynamic sample manifest: "
-                        << plgManif.soloc << ". Contains " << plgManif.NSamples
-                        << " samples.");
+                            << plgManif.soloc << ". Contains "
+                            << plgManif.NSamples << " samples.");
 
           for (size_t smp_it = 0; smp_it < plgManif.NSamples; ++smp_it) {
-            char const* smp_name = (*(plgManif.DSF_GetSampleName))(smp_it);
+            char const *smp_name = (*(plgManif.DSF_GetSampleName))(smp_it);
             if (!smp_name) {
-              NUIS_ABORT("Could not load sample " << smp_it << " / "
-                                             << plgManif.NSamples << " from "
-                                             << plgManif.soloc);
+              NUIS_ABORT("Could not load sample "
+                         << smp_it << " / " << plgManif.NSamples << " from "
+                         << plgManif.soloc);
             }
 
             if (Samples.count(smp_name)) {
               NUIS_ERR(WRN, "Already loaded a sample named: \""
-                             << smp_name << "\". cannot load duplciates. This "
-                                            "sample will be skipped.");
+                                << smp_name
+                                << "\". cannot load duplciates. This "
+                                   "sample will be skipped.");
               continue;
             }
 
@@ -520,16 +516,16 @@ void DynamicSampleFactory::LoadPlugins() {
     }
   }
 }
-DynamicSampleFactory& DynamicSampleFactory::Get() {
+DynamicSampleFactory &DynamicSampleFactory::Get() {
   if (!glblDSF) {
     glblDSF = new DynamicSampleFactory();
   }
   return *glblDSF;
 }
 void DynamicSampleFactory::Print() {
-  std::map<std::string, std::vector<std::string> > ManifestSamples;
+  std::map<std::string, std::vector<std::string>> ManifestSamples;
 
-  for (std::map<std::string, std::pair<std::string, int> >::iterator smp_it =
+  for (std::map<std::string, std::pair<std::string, int>>::iterator smp_it =
            Samples.begin();
        smp_it != Samples.end(); ++smp_it) {
     if (!ManifestSamples.count(smp_it->second.first)) {
@@ -539,7 +535,7 @@ void DynamicSampleFactory::Print() {
   }
 
   NUIS_LOG(FIT, "Dynamic sample manifest: ");
-  for (std::map<std::string, std::vector<std::string> >::iterator m_it =
+  for (std::map<std::string, std::vector<std::string>>::iterator m_it =
            ManifestSamples.begin();
        m_it != ManifestSamples.end(); ++m_it) {
     NUIS_LOG(FIT, "\tLibrary " << m_it->first << " contains: ");
@@ -548,21 +544,22 @@ void DynamicSampleFactory::Print() {
     }
   }
 }
-bool DynamicSampleFactory::HasSample(std::string const& name) {
+bool DynamicSampleFactory::HasSample(std::string const &name) {
   return Samples.count(name);
 }
-bool DynamicSampleFactory::HasSample(nuiskey& samplekey) {
+bool DynamicSampleFactory::HasSample(nuiskey &samplekey) {
   return HasSample(samplekey.GetS("name"));
 }
-MeasurementBase* DynamicSampleFactory::CreateSample(nuiskey& samplekey) {
+MeasurementBase *DynamicSampleFactory::CreateSample(nuiskey &samplekey) {
   if (!HasSample(samplekey)) {
     NUIS_ERR(WRN, "Asked to load unknown sample: \"" << samplekey.GetS("name")
-                                                  << "\".");
+                                                     << "\".");
     return NULL;
   }
 
   std::pair<std::string, int> sample = Samples[samplekey.GetS("name")];
-  NUIS_LOG(SAM, "\tLoading sample " << sample.second << " from " << sample.first);
+  NUIS_LOG(SAM,
+           "\tLoading sample " << sample.second << " from " << sample.first);
 
   return (*(Manifests[sample.first].DSF_GetSample))(sample.second, &samplekey);
 }
@@ -576,9 +573,9 @@ namespace SampleUtils {
 
 //! Create a given sample given its name, file, type, fakdata(fkdt) file and the
 //! current rw engine and push it back into the list fChain.
-MeasurementBase* CreateSample(std::string name, std::string file,
+MeasurementBase *CreateSample(std::string name, std::string file,
                               std::string type, std::string fkdt,
-                              FitWeight* rw) {
+                              FitWeight *rw) {
   nuiskey samplekey = Config::CreateKey("sample");
   samplekey.Set("name", name);
   samplekey.Set("input", file);
@@ -587,12 +584,12 @@ MeasurementBase* CreateSample(std::string name, std::string file,
   return CreateSample(samplekey);
 }
 
-MeasurementBase* CreateSample(nuiskey samplekey) {
+MeasurementBase *CreateSample(nuiskey samplekey) {
 #ifdef __USE_DYNSAMPLES__
   if (DynamicSampleFactory::Get().HasSample(samplekey)) {
     NUIS_LOG(SAM, "Instantiating dynamic sample...");
 
-    MeasurementBase* ds = DynamicSampleFactory::Get().CreateSample(samplekey);
+    MeasurementBase *ds = DynamicSampleFactory::Get().CreateSample(samplekey);
     if (ds) {
       NUIS_LOG(SAM, "Done.");
       return ds;
@@ -601,15 +598,15 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   }
 #endif
 
-  FitWeight* rw = FitBase::GetRW();
+  FitWeight *rw = FitBase::GetRW();
   std::string name = samplekey.GetS("name");
   std::string file = samplekey.GetS("input");
   std::string type = samplekey.GetS("type");
   std::string fkdt = "";
 
-/*
-   ANL CCQE Samples
-*/
+  /*
+     ANL CCQE Samples
+  */
 
 #ifndef __NO_ANL__
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu") ||
@@ -730,7 +727,7 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else
 #endif
 #ifndef __NO_ArgoNeuT__
-  if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
+      if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(samplekey));
@@ -979,22 +976,22 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 #endif
 
 #ifndef __NO_MicroBooNE__
-    /*
-    MicroBooNE Samples
-    */
+      /*
+      MicroBooNE Samples
+      */
 
-    /*
-      MicroBooNE CCinclusive
-    */
-         if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
+      /*
+        MicroBooNE CCinclusive
+      */
+      if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
     return (new MicroBooNE_CCInc_XSec_2DPcos_nu(samplekey));
   } else
 #endif
 
 #ifndef __NO_MINERvA__
-    /*
-    MINERvA Samples
-    */
+      /*
+      MINERvA Samples
+      */
       if (!name.compare("MINERvA_CCQE_XSec_1DQ2_nu") ||
           !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_20deg") ||
           !name.compare("MINERvA_CCQE_XSec_1DQ2_nu_oldflux") ||
@@ -1023,15 +1020,14 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CC0pi_XSec_1DThetae_nue(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pinp_STV_XSec_1Dpmu_nu") ||
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu") || 
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpprot_nu") || 
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthprot_nu") || 
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu") || 
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu") || 
-             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu") || 
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthmu_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpprot_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dthprot_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Dpnreco_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddalphat_nu") ||
+             !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddpt_nu") ||
              !name.compare("MINERvA_CC0pinp_STV_XSec_1Ddphit_nu")) {
     return (new MINERvA_CC0pinp_STV_XSec_1D_nu(samplekey));
-
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1DQ2_nu_proton")) {
     return (new MINERvA_CC0pi_XSec_1DQ2_nu_proton(samplekey));
@@ -1048,20 +1044,19 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     return (new MINERvA_CC0pi_XSec_1DQ2_TgtRatio_nu(samplekey));
 
     // Dan Ruterbories measurements of late 2018
-  } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
     return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
-  } else if ( !name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
-              !name.compare("MINERvA_CC0pi_XSec_1Dpz_nu") ||
-              !name.compare("MINERvA_CC0pi_XSec_1DQ2QE_nu") ||
-              !name.compare("MINERvA_CC0pi_XSec_1DEnuQE_nu")) {
+  } else if (!name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1Dpz_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1DQ2QE_nu") ||
+             !name.compare("MINERvA_CC0pi_XSec_1DEnuQE_nu")) {
     return (new MINERvA_CC0pi_XSec_1D_2018_nu(samplekey));
 
-
     // C. Patrick's early 2018 measurements
-  } else if ( !name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu") ||
-              !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu") ||
-              !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
+  } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_antinu") ||
+             !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuQE_antinu") ||
+             !name.compare("MINERvA_CC0pi_XSec_2DQ2QEEnuTrue_antinu")) {
     return (new MINERvA_CC0pi_XSec_2D_antinu(samplekey));
 
     /*
@@ -1233,13 +1228,11 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   } else
 #endif
 #ifndef __NO_T2K__
-      if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu") ||
-          !name.compare("T2K_CC0pi_XSec_2DPcos_nu_I") ||
-          !name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
-    return (new T2K_CC0pi_XSec_2DPcos_nu(samplekey));
+      if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_I")) {
+    return (new T2K_CC0pi_XSec_2DPcos_nu_I(samplekey));
 
-  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_nonuniform")) {
-    return (new T2K_CC0pi_XSec_2DPcos_nu_nonuniform(samplekey));
+  } else if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_II")) {
+    return (new T2K_CC0pi_XSec_2DPcos_nu_II(samplekey));
 
   } else if (!name.compare("T2K_CCinc_XSec_2DPcos_nu_nonuniform")) {
     return (new T2K_CCinc_XSec_2DPcos_nu_nonuniform(samplekey));
@@ -1249,37 +1242,36 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
     */
     // Comment these out for now because we don't have the proper data
 
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_2Dpmucosmu_nu")) {
+    return (new T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_2Dpmucosmu_nu")) {
-	return (new T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(samplekey));
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dppi_nu")) {
+    return (new T2K_CC1pip_CH_XSec_1Dppi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dppi_nu")) {
-	return (new T2K_CC1pip_CH_XSec_1Dppi_nu(samplekey));
-
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthpi_nu")) {
     return (new T2K_CC1pip_CH_XSec_1Dthpi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthmupi_nu")) {
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthmupi_nu")) {
     return (new T2K_CC1pip_CH_XSec_1Dthmupi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1DQ2_nu")) {
     return (new T2K_CC1pip_CH_XSec_1DQ2_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DAdlerPhi_nu")) {
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1DAdlerPhi_nu")) {
     return (new T2K_CC1pip_CH_XSec_1DAdlerPhi_nu(samplekey));
 
-    } else if (!name.compare("T2K_CC1pip_CH_XSec_1DCosThAdler_nu")) {
+  } else if (!name.compare("T2K_CC1pip_CH_XSec_1DCosThAdler_nu")) {
     return (new T2K_CC1pip_CH_XSec_1DCosThAdler_nu(samplekey));
 
     // Maybe something for the future: were in Raquel's thesis
     //} else if (!name.compare("T2K_CC1pip_CH_XSec_1Dq3_nu")) {
-    //return (new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
+    // return (new T2K_CC1pip_CH_XSec_1Dq3_nu(file, rw, type, fkdt));
 
     //} else if (!name.compare("T2K_CC1pip_CH_XSec_1Dthq3pi_nu")) {
-    //return (new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
+    // return (new T2K_CC1pip_CH_XSec_1Dthq3pi_nu(file, rw, type, fkdt));
 
     //} else if (!name.compare("T2K_CC1pip_CH_XSec_1DWrec_nu")) {
-    //return (new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
+    // return (new T2K_CC1pip_CH_XSec_1DWrec_nu(file, rw, type, fkdt));
 
     /*
       T2K CC1pi+ H2O samples
@@ -1328,7 +1320,6 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfip_nu")) {
     return (new T2K_CC0pinp_ifk_XSec_3Dinfip_nu(samplekey));
-
 
     // SciBooNE COH studies
   } else
@@ -1437,4 +1428,4 @@ MeasurementBase* CreateSample(nuiskey samplekey) {
   // Return NULL if no sample loaded.
   return NULL;
 }
-}
+} // namespace SampleUtils

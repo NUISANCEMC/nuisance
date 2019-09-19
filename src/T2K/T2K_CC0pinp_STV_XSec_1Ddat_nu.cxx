@@ -27,13 +27,13 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC0pinp_STV_XSec_1Ddat_nu sample. \n"
+  std::string descrip = "T2K_CC0pinp_STV_XSec_1Ddpt_nu sample. \n"
                         "Target: CH \n"
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n"
-                        "Signal: CC0piNp (N>=1) with 450M eV < p_p < 1 GeV \n"
+                        "Signal: CC0piNp (N>=1) with 450 MeV < p_p < 1 GeV \n"
                         "                            p_mu > 250 MeV \n"
-                        "                            cth_p >  0.6 \n"
-                        "                            cth_mu > -0.4 \n"
+                        "                            cth_p >  0.4 \n"
+                        "                            cth_mu > -0.6 \n"
                         "https://doi.org/10.1103/PhysRevD.98.032003 \n";
 
   // Setup common settings

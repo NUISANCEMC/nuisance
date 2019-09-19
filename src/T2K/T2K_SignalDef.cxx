@@ -64,9 +64,8 @@ bool isCC1pip_T2K_PRD97_012001(FitEvent *event, double EnuMin, double EnuMax) {
 //                          No other particles in the final state
 //
 // https://arxiv.org/abs/1909.03936
-bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin,
-                                     double EnuMax,
-                                     int pscuts) {
+bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
+                                  int pscuts) {
   // ******************************************************
 
   if (!isCC1pi(event, 14, 211, EnuMin, EnuMax)) {
@@ -121,8 +120,7 @@ bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin,
   return false;
 };
 
-bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
-                 bool forwardgoing) {
+bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax, int ana) {
 
   // Require a numu CC0pi event
   if (!isCC0pi(event, 14, EnuMin, EnuMax))
@@ -136,9 +134,10 @@ bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
 
   // If we're doing a restricted phase space, Analysis II asks for:
   // Cos(theta_mu) > 0.0 and p_mu > 200 MeV
-  if (forwardgoing) {
-    if (CosThetaMu < 0.0 || p_mu < 200)
+  if (ana == kAnalysis_II) {
+    if ((CosThetaMu < 0.0) || (p_mu < 200)) {
       return false;
+    }
   }
 
   return true;

@@ -34,10 +34,16 @@ enum arxiv1909_03936_PScuts {
 };
 
 bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
-                                  int);
+                                  int cuts);
+
+enum PRD93112012_Ana {
+  kAnalysis_I,
+  kAnalysis_II,
+};
 
 bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
-                 bool forwardgoing);
+                 int analysis);
+                 
 bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax);
