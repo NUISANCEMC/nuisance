@@ -7,12 +7,13 @@ T2K_CC1pip_H2O_XSec_1Dppi_nu::T2K_CC1pip_H2O_XSec_1Dppi_nu(nuiskey samplekey) {
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC1pip_H2O_XSec_nu sample. \n"
-                        "Target: H20 \n"
-                        "Flux: T2K FHC numu \n"
-                        "Signal: CC1pi+, p_mu > 200 MeV, p_pi > 200 MeV\n"
-                        ", costheta_mu > 0.3, costheta_pi > 0.3\n"
-                        "https://doi.org/10.1103/PhysRevD.97.012001";
+  std::string descrip =
+      "T2K_CC1pip_H2O_XSec_nu sample. \n"
+      "Target: H20 \n"
+      "Flux: T2K FHC numu \n"
+      "Signal: CC1pi+, p_mu > 200 MeV, p_pi > 200 MeV\n"
+      ", costheta_mu > 0.3, costheta_pi > 0.3\n"
+      "https://journals.aps.org/prd/pdf/10.1103/PhysRevD.95.012010";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
