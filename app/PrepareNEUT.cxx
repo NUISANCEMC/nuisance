@@ -29,8 +29,8 @@ void CreateRateHistogram(std::string inputList, std::string flux,
 int main(int argc, char *argv[]) {
   //*******************************
 
-  LOG_VERB(FitPar::Config().GetParI("VERBOSITY"));
-  ERR_VERB(FitPar::Config().GetParI("ERROR"));
+  SETVERBOSITY(FitPar::Config().GetParI("VERBOSITY"));
+  SETERRVERBOSITY(FitPar::Config().GetParI("ERROR"));
 
   ParseOptions(argc, argv);
   NUIS_LOG(FIT, "Running PrepareNEUT");
