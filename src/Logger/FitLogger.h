@@ -137,6 +137,9 @@ void SETVERBOSITY(std::string verb);
 /// Set Trace Option
 void SETTRACE(bool val);
 
+void LOG_VERB(std::string verb);
+void ERR_VERB(std::string verb);
+
 // ----------- ERROR FUNCTIONS ---------- //
 
 /// Error Stream
