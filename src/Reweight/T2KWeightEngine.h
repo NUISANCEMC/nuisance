@@ -4,7 +4,6 @@
 #include "FitLogger.h"
 
 #ifdef __T2KREW_ENABLED__
-#include "T2KGenieReWeight.h"
 #include "T2KNIWGReWeight.h"
 #include "T2KNIWGUtils.h"
 #include "T2KNeutReWeight.h"
