@@ -31,7 +31,7 @@ function(GETFIRSTMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG DIR_OUT FAILURE_IS_NOT
           cmessage(DEBUG "Couldn't find ${DELIM} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
           set(${CMAKE_MATCH_1} "")
         else()
-          cmessage(FATAL_ERROR "Expected to be able to parse the result of ${CONFIGAPP} ${ARG} to a lib directory, but couldn't find a ${DELIM} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
+          cmessage(FATAL_ERROR "Expected to be able to parse the result of ${CONFIGAPP} ${ARG} to a directory, but couldn't find a ${DELIM} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
         endif()
       endif()
 
