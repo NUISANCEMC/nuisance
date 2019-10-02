@@ -246,6 +246,6 @@ else()
   set(NEED_PYTHIA6 TRUE)
   set(NEED_ROOTPYTHIA6 TRUE)
 endif()
-set(NEED_ROOTEVEGEN TRUE)
+set(NEED_ROOTEVEGEN FALSE)
 
 SET(USE_GENIE TRUE CACHE BOOL "Whether to enable GENIE (reweight) support. Requires external libraries. <FALSE>" FORCE)
