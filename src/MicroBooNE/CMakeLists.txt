@@ -26,6 +26,8 @@ MicroBooNE_CCInc_XSec_2DPcos_nu.h
 
 set(LIBNAME expMicroBooNE)
 
+add_compile_options(-std=c++0x)
+
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_library(${LIBNAME} STATIC ${IMPLFILES})
 else(CMAKE_BUILD_TYPE MATCHES RELEASE)
