@@ -105,9 +105,12 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
   //*******************************************************************
 
   Double_t Chi2 = 0.0;
-  TMatrixDSym *calc_cov = (TMatrixDSym *)invcov->Clone();
-  TH1D *calc_data = (TH1D *)data->Clone();
-  TH1D *calc_mc = (TH1D *)mc->Clone();
+  TMatrixDSym *calc_cov = (TMatrixDSym *)invcov->Clone("local_invcov");
+  TH1D *calc_data = (TH1D *)data->Clone("local_data");
+  TH1D *calc_mc = (TH1D *)mc->Clone("local_mc");
+
+  calc_data->SetDirectory(NULL);
+  calc_mc->SetDirectory(NULL);
 
   // If a mask if applied we need to apply it before the matrix is inverted
   if (mask) {
@@ -126,8 +129,8 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
       double mcerr = calc_mc->GetBinError(i + 1) * sqrt(covar_scale);
       double oldval = (*newcov)(i, i);
 
-      NUIS_LOG(FIT,
-           "Adding cov stat " << mcerr * mcerr << " to " << (*newcov)(i, i));
+      NUIS_LOG(FIT, "Adding cov stat " << mcerr * mcerr << " to "
+                                       << (*newcov)(i, i));
       (*newcov)(i, i) = oldval + mcerr * mcerr;
     }
 
@@ -147,41 +150,41 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
   NUIS_LOG(DEB, "START Chi2 Calculation=================");
   for (int i = 0; i < calc_data->GetNbinsX(); i++) {
     double ibin_contrib = 0;
-    NUIS_LOG(DEB,
-         "[CHI2] i = " << i << " ["
-                       << calc_data->GetXaxis()->GetBinLowEdge(i + 1) << " -- "
-                       << calc_data->GetXaxis()->GetBinUpEdge(i + 1) << "].");
+    NUIS_LOG(DEB, "[CHI2] i = "
+                      << i << " ["
+                      << calc_data->GetXaxis()->GetBinLowEdge(i + 1) << " -- "
+                      << calc_data->GetXaxis()->GetBinUpEdge(i + 1) << "].");
     for (int j = 0; j < calc_data->GetNbinsX(); j++) {
       NUIS_LOG(DEB, "[CHI2]\t j = "
-                    << i << " [" << calc_data->GetXaxis()->GetBinLowEdge(j + 1)
-                    << " -- " << calc_data->GetXaxis()->GetBinUpEdge(j + 1)
-                    << "].");
+                        << i << " ["
+                        << calc_data->GetXaxis()->GetBinLowEdge(j + 1) << " -- "
+                        << calc_data->GetXaxis()->GetBinUpEdge(j + 1) << "].");
       if ((calc_data->GetBinContent(i + 1) != 0 ||
            calc_mc->GetBinContent(i + 1) != 0) &&
           ((*calc_cov)(i, j) != 0)) {
-        NUIS_LOG(DEB,
-             "[CHI2]\t\t Chi2 contribution (i,j) = (" << i << "," << j << ")");
+        NUIS_LOG(DEB, "[CHI2]\t\t Chi2 contribution (i,j) = (" << i << "," << j
+                                                               << ")");
         NUIS_LOG(DEB, "[CHI2]\t\t Data - MC(i) = "
-                      << calc_data->GetBinContent(i + 1) << " - "
-                      << calc_mc->GetBinContent(i + 1) << "  = "
-                      << (calc_data->GetBinContent(i + 1) -
-                          calc_mc->GetBinContent(i + 1)));
+                          << calc_data->GetBinContent(i + 1) << " - "
+                          << calc_mc->GetBinContent(i + 1) << "  = "
+                          << (calc_data->GetBinContent(i + 1) -
+                              calc_mc->GetBinContent(i + 1)));
 
         NUIS_LOG(DEB, "[CHI2]\t\t Data - MC(j) = "
-                      << calc_data->GetBinContent(j + 1) << " - "
-                      << calc_mc->GetBinContent(j + 1) << "  = "
-                      << (calc_data->GetBinContent(j + 1) -
-                          calc_mc->GetBinContent(j + 1)));
+                          << calc_data->GetBinContent(j + 1) << " - "
+                          << calc_mc->GetBinContent(j + 1) << "  = "
+                          << (calc_data->GetBinContent(j + 1) -
+                              calc_mc->GetBinContent(j + 1)));
 
         NUIS_LOG(DEB, "[CHI2]\t\t Covar = " << (*calc_cov)(i, j));
 
-        NUIS_LOG(DEB,
-             "[CHI2]\t\t Cont chi2 = " << ((calc_data->GetBinContent(i + 1) -
-                                            calc_mc->GetBinContent(i + 1)) *
-                                           (*calc_cov)(i, j) *
-                                           (calc_data->GetBinContent(j + 1) -
-                                            calc_mc->GetBinContent(j + 1)))
-                                       << " " << Chi2);
+        NUIS_LOG(DEB, "[CHI2]\t\t Cont chi2 = "
+                          << ((calc_data->GetBinContent(i + 1) -
+                               calc_mc->GetBinContent(i + 1)) *
+                              (*calc_cov)(i, j) *
+                              (calc_data->GetBinContent(j + 1) -
+                               calc_mc->GetBinContent(j + 1)))
+                          << " " << Chi2);
         double bin_cont =
             ((calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1)) *
              (*calc_cov)(i, j) *
@@ -191,10 +194,10 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
         ibin_contrib += bin_cont;
       } else {
         NUIS_LOG(DEB, "Skipping chi2 contribution (i,j) = ("
-                      << i << "," << j
-                      << "), Data = " << calc_data->GetBinContent(i + 1)
-                      << ", MC = " << calc_mc->GetBinContent(i + 1)
-                      << ", Cov = " << (*calc_cov)(i, j));
+                          << i << "," << j
+                          << "), Data = " << calc_data->GetBinContent(i + 1)
+                          << ", MC = " << calc_mc->GetBinContent(i + 1)
+                          << ", Cov = " << (*calc_cov)(i, j));
         Chi2 += 0.;
       }
     }
@@ -253,7 +256,8 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
       // std::cout << " adding chi2 "
       //           << outchi2perbin_1D->GetBinContent(xbi_it + 1)
       //           << " from 1d bin " << (xbi_it + 1) << " to gbin "
-      //           << outchi2perbin_map_1D->GetBinContent(xbi_it + 1) << std::endl;
+      //           << outchi2perbin_map_1D->GetBinContent(xbi_it + 1) <<
+      //           std::endl;
       outchi2perbin->SetBinContent(
           outchi2perbin_map_1D->GetBinContent(xbi_it + 1),
           outchi2perbin_1D->GetBinContent(xbi_it + 1));
@@ -719,7 +723,7 @@ TH1D *StatUtils::ApplyHistogramMasking(TH1D *hist, TH1I *mask) {
   int binindex = 0;
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     if (mask->GetBinContent(i + 1)) {
-      NUIS_LOG(REC, "Applying mask to bin " << i + 1 << " " << hist->GetName());
+      NUIS_LOG(DEB, "Applying mask to bin " << i + 1 << " " << hist->GetName());
       continue;
     }
     calc_hist->SetBinContent(binindex + 1, hist->GetBinContent(i + 1));
@@ -1020,9 +1024,9 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
       // Check that the errors are within 1% of eachother
       if (fabs(DataHisterr - coverr) / DataHisterr > 0.01) {
         NUIS_ERR(WRN, "Data error does not match covariance error for bin "
-                        << i + 1 << " ("
-                        << DataHist->GetXaxis()->GetBinLowEdge(i + 1) << "-"
-                        << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
+                          << i + 1 << " ("
+                          << DataHist->GetXaxis()->GetBinLowEdge(i + 1) << "-"
+                          << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
         NUIS_ERR(WRN, "Data error: " << DataHisterr);
         NUIS_ERR(WRN, "Cov error:  " << coverr);
       }
@@ -1045,9 +1049,8 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
   // Check
   if (ErrorCheck) {
     if (cov->GetNrows() != data->GetNbinsX() * data->GetNbinsY()) {
-      NUIS_ERR(
-          FTL,
-          "Nrows in cov don't match nbins in data for SetDataNUIS_ERRorFromCov");
+      NUIS_ERR(FTL, "Nrows in cov don't match nbins in data for "
+                    "SetDataNUIS_ERRorFromCov");
       NUIS_ERR(FTL, "Nrows = " << cov->GetNrows());
       NUIS_ABORT("Nbins = " << data->GetNbinsX());
     }
@@ -1083,9 +1086,9 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
       if (ErrorsSet && ErrorCheck) {
         if (fabs(dataerr - coverr) / dataerr > 0.01) {
           NUIS_ERR(WRN, "Data error does not match covariance error for bin "
-                          << i + 1 << " ("
-                          << data->GetXaxis()->GetBinLowEdge(i + 1) << "-"
-                          << data->GetXaxis()->GetBinLowEdge(i + 2) << ")");
+                            << i + 1 << " ("
+                            << data->GetXaxis()->GetBinLowEdge(i + 1) << "-"
+                            << data->GetXaxis()->GetBinLowEdge(i + 2) << ")");
           NUIS_ERR(WRN, "Data error: " << dataerr);
           NUIS_ERR(WRN, "Cov error:  " << coverr);
         }
@@ -1108,15 +1111,15 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   // Check nobody is being silly
   if (data_hist->GetNbinsX() != nbins) {
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
-                "StatUtils::ExtractShapeOnlyCovar!");
+                  "StatUtils::ExtractShapeOnlyCovar!");
     NUIS_ERR(WRN, "data_hist has " << data_hist->GetNbinsX() << " matrix has "
-                                 << nbins);
+                                   << nbins);
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins)
       err_bins = nbins;
     for (int i = 0; i < err_bins; ++i) {
       NUIS_ERR(WRN, "Matrix diag. = " << (*full_covar)(i, i) << " data = "
-                                    << data_hist->GetBinContent(i + 1));
+                                      << data_hist->GetBinContent(i + 1));
     }
     return NULL;
   }
@@ -1134,7 +1137,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
 
   if (total_data == 0 || total_covar == 0) {
     NUIS_ERR(WRN, "Stupid matrix or data histogram passed to "
-                "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
+                  "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
     return NULL;
   }
 
@@ -1290,8 +1293,8 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
       if (entries.size() <= 1) {
         NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                    "entries on this line: "
-                        << row);
+                      "entries on this line: "
+                          << row);
       }
       for (std::vector<double>::iterator iter = entries.begin();
            iter != entries.end(); iter++) {
@@ -1324,8 +1327,8 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     if (entries.size() <= 1) {
       NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                  "entries on this line: "
-                      << row);
+                    "entries on this line: "
+                        << row);
     }
     for (std::vector<double>::iterator iter = entries.begin();
          iter != entries.end(); iter++) {

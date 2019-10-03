@@ -593,6 +593,9 @@ protected:
   TH1I* fMaskHist;   ///< Mask histogram for neglecting specific bins
   TMatrixD* fSmearMatrix;   ///< Smearing matrix (note, this is not symmetric)
 
+  TH1D *fResidualHist;
+  TH1D *fChi2LessBinHist;
+
   TrueModeStack* fMCHist_Modes; ///< Optional True Mode Stack
 
 

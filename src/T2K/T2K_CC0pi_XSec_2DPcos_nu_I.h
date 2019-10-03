@@ -49,6 +49,8 @@ public:
   /// Have to do a weird event scaling for analysis 1
   void ConvertEventRates();
 
+  void Write(std::string drawopt);
+
   /// \brief Create Q2 Box to save correction info
   inline MeasurementVariableBox* CreateBox(){ return new MeasurementVariableBox2D(); };
 
