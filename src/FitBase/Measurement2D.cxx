@@ -44,6 +44,7 @@ Measurement2D::Measurement2D(void) {
   fMCWeighted = NULL;
 
   fResidualHist = NULL;
+  fChi2LessBinHist = NULL;
 
   fDefaultTypes = "FIX/FULL/CHI2";
   fAllowedTypes =
@@ -144,6 +145,7 @@ Measurement2D::~Measurement2D(void) {
     delete fDecomp;
 
   delete fResidualHist;
+  delete fChi2LessBinHist;
 }
 
 //********************************************************************

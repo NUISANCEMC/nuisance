@@ -227,3 +227,44 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
 
   return;
 };
+
+void T2K_CC0pi_XSec_2DPcos_nu_I::Write(std::string drawopt) {
+  this->Measurement1D::Write(drawopt);
+
+  if (fResidualHist) {
+    std::vector<TH1D *> MCResidual_Slices;
+    size_t tb_it = 0;
+    for (size_t i = 0; i < fMCHist_Slices.size(); ++i) {
+      std::string name = Form("T2K_CC0pi_XSec_2DPcos_nu_I_RESIDUAL_Slice%i", i);
+      MCResidual_Slices.push_back(
+          static_cast<TH1D *>(fMCHist_Slices[i]->Clone(name.c_str())));
+      MCResidual_Slices.back()->Reset();
+
+      for (int j = 0; j < fMCHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
+        double bc = fResidualHist->GetBinContent(tb_it + 1);
+        MCResidual_Slices.back()->SetBinContent(j + 1, bc);
+        tb_it++;
+      }
+      MCResidual_Slices.back()->Write();
+    }
+  }
+
+  if (fChi2LessBinHist) {
+    std::vector<TH1D *> MCChi2LessBin_Slices;
+    size_t tb_it = 0;
+    for (size_t i = 0; i < fMCHist_Slices.size(); ++i) {
+      std::string name =
+          Form("T2K_CC0pi_XSec_2DPcos_nu_I_Chi2NMinusOne_Slice%i", i);
+      MCChi2LessBin_Slices.push_back(
+          static_cast<TH1D *>(fMCHist_Slices[i]->Clone(name.c_str())));
+      MCChi2LessBin_Slices.back()->Reset();
+
+      for (int j = 0; j < fMCHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
+        double bc = fChi2LessBinHist->GetBinContent(tb_it + 1);
+        MCChi2LessBin_Slices.back()->SetBinContent(j + 1, bc);
+        tb_it++;
+      }
+      MCChi2LessBin_Slices.back()->Write();
+    }
+  }
+}

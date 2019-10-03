@@ -45,6 +45,9 @@ Measurement1D::Measurement1D(void) {
   fInvert = NULL;
   fDecomp = NULL;
 
+  fResidualHist = NULL;
+  fChi2LessBinHist = NULL;
+
   // Fake Data
   fFakeDataInput = "";
   fFakeDataFile = NULL;
@@ -103,6 +106,9 @@ Measurement1D::~Measurement1D(void) {
     delete fInvert;
   if (fDecomp)
     delete fDecomp;
+
+  delete fResidualHist;
+  delete fChi2LessBinHist;
 }
 
 //********************************************************************
@@ -124,21 +130,23 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if ((fSettings.GetS("originalname").find("Evt") != std::string::npos)) {
     fIsRawEvents = true;
-    NUIS_LOG(SAM, "Found event rate measurement but using poisson likelihoods.");
+    NUIS_LOG(SAM,
+             "Found event rate measurement but using poisson likelihoods.");
   }
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
     NUIS_LOG(SAM, "::" << fName << "::");
-    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
-                  << "not flux averaged!");
+    NUIS_LOG(SAM,
+             "Found XSec Enu measurement, applying flux integrated scaling, "
+                 << "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
     NUIS_ERR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
-                "really correct?!");
+                  "really correct?!");
     NUIS_ERR(FTL, "Check experiment constructor for " << fName
-                                                    << " and correct this!");
+                                                      << " and correct this!");
     NUIS_ERR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
     throw;
   }
@@ -285,7 +293,7 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM,
-       "Reading covariance from text file: " << covfile << ";" << histname);
+           "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -311,7 +319,7 @@ void Measurement1D::SetCovarInvertFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
-                                                           << histname);
+                                                               << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
   fFullCovar = StatUtils::GetInvert(covar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -323,15 +331,15 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   if (dim == -1)
     dim = fDataHist->GetNbinsX();
-  NUIS_LOG(SAM,
-       "Reading data correlations from text file: " << covfile << ";" << dim);
+  NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
+                                                             << dim);
   TMatrixDSym *correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
   if (!fDataHist) {
     NUIS_ABORT("Trying to set correlations from text file but there is no "
-           "data to build it from. \n"
-           << "In constructor make sure data is set before "
-              "SetCorrelationFromTextFile is called. \n");
+               "data to build it from. \n"
+               << "In constructor make sure data is set before "
+                  "SetCorrelationFromTextFile is called. \n");
   }
 
   // Fill covar from data errors and correlations
@@ -387,14 +395,14 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
-                                                         << histname);
+                                                             << histname);
   TMatrixDSym *correlation = StatUtils::GetCovarFromRootFile(covfile, histname);
 
   if (!fDataHist) {
     NUIS_ABORT("Trying to set correlations from text file but there is no "
-           "data to build it from. \n"
-           << "In constructor make sure data is set before "
-              "SetCorrelationFromTextFile is called. \n");
+               "data to build it from. \n"
+               << "In constructor make sure data is set before "
+                  "SetCorrelationFromTextFile is called. \n");
   }
 
   // Fill covar from data errors and correlations
@@ -443,7 +451,7 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
-                                                       << histname);
+                                                           << histname);
   TMatrixD *temp = StatUtils::GetMatrixFromRootFile(covfile, histname);
 
   TMatrixD *trans = (TMatrixD *)temp->Clone();
@@ -521,7 +529,8 @@ void Measurement1D::SetBinMask(std::string maskfile) {
 
     // Skip lines with poorly formatted lines
     if (entries.size() < 2) {
-      NUIS_LOG(WRN, "Measurement1D::SetBinMask(), couldn't parse line: " << line);
+      NUIS_LOG(WRN,
+               "Measurement1D::SetBinMask(), couldn't parse line: " << line);
       continue;
     }
 
@@ -634,7 +643,7 @@ void Measurement1D::FinaliseMeasurement() {
 
   if (fScaleFactor < 0) {
     NUIS_ERR(FTL, "I found a negative fScaleFactor in " << __FILE__ << ":"
-                                                      << __LINE__);
+                                                        << __LINE__);
     NUIS_ERR(FTL, "fScaleFactor = " << fScaleFactor);
     NUIS_ERR(FTL, "EXITING");
     throw;
@@ -675,11 +684,11 @@ void Measurement1D::SetFitOptions(std::string opt) {
         found_option = true;
 
       } else if (found_option and opt.find(av_opt) != std::string::npos) {
-        NUIS_ABORT("ERROR: Conflicting fit options provided: "
-               << opt << std::endl
-               << "Conflicting group = " << fit_option_section.at(i)
-               << std::endl
-               << "You should only supply one of these options in card file.");
+        NUIS_ABORT(
+            "ERROR: Conflicting fit options provided: "
+            << opt << std::endl
+            << "Conflicting group = " << fit_option_section.at(i) << std::endl
+            << "You should only supply one of these options in card file.");
       }
     }
   }
@@ -690,12 +699,12 @@ void Measurement1D::SetFitOptions(std::string opt) {
   for (UInt_t i = 0; i < fit_options_input.size(); i++) {
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos) {
       NUIS_ERR(WRN, "ERROR: Fit Option '"
-                      << fit_options_input.at(i)
-                      << "' Provided is not allowed for this measurement.");
+                        << fit_options_input.at(i)
+                        << "' Provided is not allowed for this measurement.");
       NUIS_ERR(WRN, "Fit Options should be provided as a '/' seperated list "
-                  "(e.g. FREE/DIAG/NORM)");
+                    "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
-                                      << "'");
+                                          << "'");
     }
   }
 
@@ -796,7 +805,7 @@ void Measurement1D::ApplySmearingMatrix() {
 
   if (!fSmearMatrix) {
     NUIS_ERR(WRN,
-           fName << ": attempted to apply smearing matrix, but none was set");
+             fName << ": attempted to apply smearing matrix, but none was set");
     return;
   }
 
@@ -1004,6 +1013,22 @@ double Measurement1D::GetLikelihood() {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);
     } else if (!fIsDiag and !fIsRawEvents) {
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
+
+      stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist, 1,
+                                       1E76, fResidualHist);
+      if (fChi2LessBinHist) {
+        TH1I *binmask = new TH1I("mask", "", fDataHist->GetNbinsX(), 0,
+                                 fDataHist->GetNbinsX());
+        binmask->SetDirectory(NULL);
+        for (int xi = 0; xi < fDataHist->GetNbinsX(); ++xi) {
+          binmask->Reset();
+          binmask->SetBinContent(xi + 1, 1);
+          fChi2LessBinHist->SetBinContent(
+              xi + 1,
+              StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, binmask));
+        }
+        delete binmask;
+      }
     }
   }
 
@@ -1318,6 +1343,22 @@ void Measurement1D::Write(std::string drawOpt) {
   //   delete c2;
   // }
 
+  if (fIsChi2 && !fIsDiag) {
+    fResidualHist = (TH1D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
+    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->Reset();
+
+    fChi2LessBinHist =
+        (TH1D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
+    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->Reset();
+
+    (void)GetLikelihood();
+
+    fResidualHist->Write();
+    fChi2LessBinHist->Write();
+  }
+
   // Write Extra Histograms
   AutoWriteExtraTH1();
   WriteExtraHistograms();
@@ -1456,15 +1497,16 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   if (fName.find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
     NUIS_LOG(SAM, "::" << fName << "::");
-    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
-              "not flux averaged!");
+    NUIS_LOG(SAM,
+             "Found XSec Enu measurement, applying flux integrated scaling, "
+             "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
     NUIS_ERR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
-                "really correct?!");
+                  "really correct?!");
     NUIS_ERR(FTL, "Check experiment constructor for " << fName
-                                                    << " and correct this!");
+                                                      << " and correct this!");
     NUIS_ERR(FTL, "I live in " << __FILE__ << ":" << __LINE__);
     throw;
   }
@@ -1671,8 +1713,8 @@ void Measurement1D::SetCovarMatrixFromText(std::string covarFile, int dim,
 
     if (entries.size() <= 1) {
       NUIS_ERR(WRN, "SetCovarMatrixFromText -> Covariance matrix only has <= 1 "
-                  "entries on this line: "
-                      << row);
+                    "entries on this line: "
+                        << row);
     }
 
     for (std::vector<double>::iterator iter = entries.begin();
@@ -1716,8 +1758,8 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
   this->covar = new TMatrixDSym(dim);
   this->fFullCovar = new TMatrixDSym(dim);
   if (corr.is_open()) {
-    NUIS_LOG(SAM,
-         "Reading and converting correlation matrix from file: " << corrFile);
+    NUIS_LOG(SAM, "Reading and converting correlation matrix from file: "
+                      << corrFile);
   } else {
     NUIS_ABORT("Correlation matrix provided is incorrect: " << corrFile);
   }
@@ -1735,7 +1777,7 @@ void Measurement1D::SetCovarMatrixFromCorrText(std::string corrFile, int dim) {
                    this->fDataHist->GetBinError(column + 1) * 1E38;
       if (val == 0) {
         NUIS_ABORT("Found a zero value in the covariance matrix, assuming "
-               "this is an error!");
+                   "this is an error!");
       }
 
       (*this->covar)(row, column) = val;
