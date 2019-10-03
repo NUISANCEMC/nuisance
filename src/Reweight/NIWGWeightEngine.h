@@ -10,6 +10,7 @@
 #include "NIWGReWeight2014a.h"
 #include "NIWGReWeightDeltaMass.h"
 #include "NIWGReWeightEffectiveRPA.h"
+#include "NIWGReWeightEffectiveQELowQ2Suppression.h"
 #include "NIWGReWeightHadronMultSwitch.h"
 #include "NIWGReWeightMEC.h"
 #include "NIWGReWeightPiMult.h"
@@ -17,9 +18,12 @@
 #include "NIWGReWeightRPA.h"
 #include "NIWGReWeightSpectralFunc.h"
 #include "NIWGReWeightSplineEnu.h"
+
 #include "NIWGSyst.h"
 #include "NIWGSystUncertainty.h"
+
 #include "NReWeight.h"
+
 #include "NReWeightCasc.h"
 #include "NReWeightNuXSecCCQE.h"
 #include "NReWeightNuXSecCCRES.h"
@@ -32,6 +36,7 @@
 #include "NReWeightNuclPiless.h"
 #include "NSyst.h"
 #include "NSystUncertainty.h"
+
 #include "neutpart.h"
 #include "neutvect.h"
 #include "NEUTInputHandler.h"
