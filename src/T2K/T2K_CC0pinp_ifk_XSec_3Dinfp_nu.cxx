@@ -31,7 +31,8 @@ T2K_CC0pinp_ifk_XSec_3Dinfp_nu::T2K_CC0pinp_ifk_XSec_3Dinfp_nu(nuiskey samplekey
   std::string descrip = "T2K_CC0pinp_ifk_XSec_3Dinfp_nu sample. \n" \
                         "Target: CH \n" \
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n" \
-                        "Signal: CC0piNp (N>=1) with p_p>450MeV and cthp>0.4 \n";
+                        "Signal: CC0piNp (N>=1) with p_p>450MeV and cthp>0.4 \n"
+                        "https://doi.org/10.1103/PhysRevD.98.032003 \n";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);

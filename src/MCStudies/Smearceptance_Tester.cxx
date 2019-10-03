@@ -82,7 +82,7 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   //size_t firstUS = fName.find_first_of("_");
 
   std::string smearceptorName = samplekey.GetS("smearceptor");
-  QLOG(SAM, "Using smearceptor: " << smearceptorName
+  NUIS_LOG(SAM, "Using smearceptor: " << smearceptorName
                                   << " (parsed from: " << fName << ").");
 
   fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
@@ -92,10 +92,10 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
 
   eventVariables = NULL;
 
-  QLOG(SAM, "Smearceptance Flux Scaling Factor = " << fScaleFactor);
+  NUIS_LOG(SAM, "Smearceptance Flux Scaling Factor = " << fScaleFactor);
 
   if (fScaleFactor <= 0.0) {
-    ERROR(WRN, "SCALE FACTOR TOO LOW ");
+    NUIS_ERR(WRN, "SCALE FACTOR TOO LOW ");
     sleep(20);
   }
 
@@ -126,9 +126,9 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
     TrueBinH = GeneralUtils::StrToDbl(args[2]);
   }
   SVDTruncation = 0;
-  if (Config::HasPar("smear.true.binning")) {
+  if (Config::HasPar("smear.SVD.truncation")) {
     SVDTruncation = Config::GetParI("smear.SVD.truncation");
-    QLOG(SAM, "Applying SVD truncation of: " << SVDTruncation)
+    NUIS_LOG(SAM, "Applying SVD truncation of: " << SVDTruncation)
   }
 
   ETrueDistrib = NULL;
@@ -136,7 +136,7 @@ Smearceptance_Tester::Smearceptance_Tester(nuiskey samplekey) {
   ERecDistrib = NULL;
   RecoSmear = NULL;
   if (RecBinL != 0xdeadbeef) {
-    QLOG(SAM, "Using binning True: " << TrueNBins << ", [" << TrueBinL << " -- "
+    NUIS_LOG(SAM, "Using binning True: " << TrueNBins << ", [" << TrueBinL << " -- "
                                      << TrueBinH << "], Rec: " << RecNBins
                                      << ", [" << RecBinL << " -- " << RecBinH
                                      << "]");
@@ -170,7 +170,7 @@ void Smearceptance_Tester::AddEventVariablesToTree() {
           new TTree((fName + "_VARS").c_str(), (fName + "_VARS").c_str());
     }
 
-    LOG(SAM) << "Adding Event Variables" << std::endl;
+    NUIS_LOG(SAM, "Adding Event Variables");
 
     eventVariables->Branch("Omega_true", &Omega_true, "Omega_true/F");
     eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");

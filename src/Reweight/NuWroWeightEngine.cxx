@@ -5,7 +5,7 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  LOG(FIT) << "Setting up NuWro RW : " << fCalcName << std::endl;
+  NUIS_LOG(FIT, "Setting up NuWro RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -35,7 +35,7 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
   // allow cout again
   StartTalking();
 #else
-  ERR(FTL) << "NUWRO RW NOT ENABLED! " << std::endl;
+  NUIS_ABORT("NUWRO RW NOT ENABLED! ");
 #endif
 };
 
@@ -63,7 +63,7 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
     fNUWROSysts.push_back(gensyst);
 
     // Initialise Dial
-    LOG(FIT) << "Adding NuWro Syst " << fNUWROSysts[index] << std::endl;
+    NUIS_LOG(FIT, "Adding NuWro Syst " << fNUWROSysts[index]);
     fNuwroRW->Systematics().Add(fNUWROSysts[index]);
 
     if (fIsAbsTwk) {
@@ -106,22 +106,25 @@ void NuWroWeightEngine::SetDialValue(std::string name, double val) {
 void NuWroWeightEngine::Reconfigure(bool silent) {
 #ifdef __NUWRO_REWEIGHT_ENABLED__
   // Hush now...
-  if (silent) StopTalking();
+  if (silent)
+    StopTalking();
 
   // Reconf
   fNuwroRW->Reconfigure();
 
   // Shout again
-  if (silent) StartTalking();
+  if (silent)
+    StartTalking();
 #endif
 }
 
-double NuWroWeightEngine::CalcWeight(BaseFitEvt* evt) {
+double NuWroWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __NUWRO_REWEIGHT_ENABLED__
   // Skip Non GENIE
-  if (evt->fType != kNUWRO) return 1.0;
+  if (evt->fType != kNUWRO)
+    return 1.0;
 
 #ifdef __USE_NUWRO_SRW_EVENTS__
   rw_weight = fNuwroRW->CalcWeight(evt->fNuwroSRWEvent, *evt->fNuwroParams);

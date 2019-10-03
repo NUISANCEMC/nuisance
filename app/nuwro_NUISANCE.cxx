@@ -10,59 +10,59 @@ int gOptNumberEvents = -1;
 int gOptNumberTestEvents = 5E6;
 std::string gOptGeneratorList = "Default";
 std::string gOptCrossSections =
-    "Default";  // If default this will look in
-                // $NUISANCE/data/nuwro/default_params.txt
+    "Default"; // If default this will look in
+               // $NUISANCE/data/nuwro/default_params.txt
 int gOptSeed = time(NULL);
 std::string gOptTargetDef = "";
 std::string gOptFluxDef = "";
 std::string gOptOutputFile = "";
 int gOptRunNumber = -1;
 
-void GetCommandLineArgs(int argc, char** argv);
+void GetCommandLineArgs(int argc, char **argv);
 void PrintSyntax(void);
 
 std::string GetDynamicModes(std::string list) {
-  LOG(FIT) << "Using " << list << " to define interaction modes." << std::endl;
+  NUIS_LOG(FIT, "Using " << list << " to define interaction modes.");
   std::map<std::string, int> modes;
 
   if (!list.compare("Default")) {
-    modes["dyn_qel_cc"] = 1;  // Quasi elastic charged current
-    modes["dyn_qel_nc"] = 1;  // Quasi elastic neutral current
-    modes["dyn_res_cc"] = 1;  // Resonant charged current
-    modes["dyn_res_nc"] = 1;  // Resonant neutral current
-    modes["dyn_dis_cc"] = 1;  // Deep inelastic charged current
-    modes["dyn_dis_nc"] = 1;  // Deep inelastic neutral current
-    modes["dyn_coh_cc"] = 1;  // Coherent charged current
-    modes["dyn_coh_nc"] = 1;  // Coherent neutral current
-    modes["dyn_mec_cc"] = 0;  // Meson exchange charged current
-    modes["dyn_mec_nc"] = 0;  // Meson exchange neutral current
+    modes["dyn_qel_cc"] = 1; // Quasi elastic charged current
+    modes["dyn_qel_nc"] = 1; // Quasi elastic neutral current
+    modes["dyn_res_cc"] = 1; // Resonant charged current
+    modes["dyn_res_nc"] = 1; // Resonant neutral current
+    modes["dyn_dis_cc"] = 1; // Deep inelastic charged current
+    modes["dyn_dis_nc"] = 1; // Deep inelastic neutral current
+    modes["dyn_coh_cc"] = 1; // Coherent charged current
+    modes["dyn_coh_nc"] = 1; // Coherent neutral current
+    modes["dyn_mec_cc"] = 0; // Meson exchange charged current
+    modes["dyn_mec_nc"] = 0; // Meson exchange neutral current
 
   } else if (!list.compare("DefaultFree")) {
-    modes["dyn_qel_cc"] = 1;  // Quasi elastic charged current
-    modes["dyn_qel_nc"] = 1;  // Quasi elastic neutral current
-    modes["dyn_res_cc"] = 1;  // Resonant charged current
-    modes["dyn_res_nc"] = 1;  // Resonant neutral current
-    modes["dyn_dis_cc"] = 1;  // Deep inelastic charged current
-    modes["dyn_dis_nc"] = 1;  // Deep inelastic neutral current
-    modes["dyn_coh_cc"] = 0;  // Coherent charged current
-    modes["dyn_coh_nc"] = 0;  // Coherent neutral current
-    modes["dyn_mec_cc"] = 0;  // Meson exchange charged current
-    modes["dyn_mec_nc"] = 0;  // Meson exchange neutral current
+    modes["dyn_qel_cc"] = 1; // Quasi elastic charged current
+    modes["dyn_qel_nc"] = 1; // Quasi elastic neutral current
+    modes["dyn_res_cc"] = 1; // Resonant charged current
+    modes["dyn_res_nc"] = 1; // Resonant neutral current
+    modes["dyn_dis_cc"] = 1; // Deep inelastic charged current
+    modes["dyn_dis_nc"] = 1; // Deep inelastic neutral current
+    modes["dyn_coh_cc"] = 0; // Coherent charged current
+    modes["dyn_coh_nc"] = 0; // Coherent neutral current
+    modes["dyn_mec_cc"] = 0; // Meson exchange charged current
+    modes["dyn_mec_nc"] = 0; // Meson exchange neutral current
 
   } else if (!list.compare("Default+MEC")) {
-    modes["dyn_qel_cc"] = 1;  // Quasi elastic charged current
-    modes["dyn_qel_nc"] = 1;  // Quasi elastic neutral current
-    modes["dyn_res_cc"] = 1;  // Resonant charged current
-    modes["dyn_res_nc"] = 1;  // Resonant neutral current
-    modes["dyn_dis_cc"] = 1;  // Deep inelastic charged current
-    modes["dyn_dis_nc"] = 1;  // Deep inelastic neutral current
-    modes["dyn_coh_cc"] = 1;  // Coherent charged current
-    modes["dyn_coh_nc"] = 1;  // Coherent neutral current
-    modes["dyn_mec_cc"] = 1;  // Meson exchange charged current
-    modes["dyn_mec_nc"] = 1;  // Meson exchange neutral current
+    modes["dyn_qel_cc"] = 1; // Quasi elastic charged current
+    modes["dyn_qel_nc"] = 1; // Quasi elastic neutral current
+    modes["dyn_res_cc"] = 1; // Resonant charged current
+    modes["dyn_res_nc"] = 1; // Resonant neutral current
+    modes["dyn_dis_cc"] = 1; // Deep inelastic charged current
+    modes["dyn_dis_nc"] = 1; // Deep inelastic neutral current
+    modes["dyn_coh_cc"] = 1; // Coherent charged current
+    modes["dyn_coh_nc"] = 1; // Coherent neutral current
+    modes["dyn_mec_cc"] = 1; // Meson exchange charged current
+    modes["dyn_mec_nc"] = 1; // Meson exchange neutral current
 
   } else {
-    THROW("Event generator list " << list << " not found!");
+    NUIS_ABORT("Event generator list " << list << " not found!");
   }
 
   std::string modestring = "";
@@ -76,15 +76,14 @@ std::string GetDynamicModes(std::string list) {
 }
 
 std::string GetFluxDefinition(std::string flux, std::string out) {
-  LOG(FIT) << "Using " << flux << " to define NuWro beam." << std::endl;
+  NUIS_LOG(FIT, "Using " << flux << " to define NuWro beam.");
 
   // By default the flux is type 6 with a root file
   std::vector<std::string> fluxargs = GeneralUtils::ParseToStr(flux, ",");
   if (fluxargs.size() < 2) {
-    THROW(
-        "Expected flux in the format: file.root,hist_name1[pdg1],... : "
-        "reveived : "
-        << flux);
+    NUIS_ABORT("Expected flux in the format: file.root,hist_name1[pdg1],... : "
+           "reveived : "
+           << flux);
   }
 
   // Build Map
@@ -128,14 +127,15 @@ std::string GetFluxDefinition(std::string flux, std::string out) {
   std::cout << " -> Moving flux from '" + fluxmap["beam_inputroot"] +
                    "' to current directory to keep everything organised."
             << std::endl;
-  TFile* fluxread = new TFile(fluxmap["beam_inputroot"].c_str(), "READ");
-  TFile* fluxwrite = new TFile((out + ".flux.root").c_str(), "RECREATE");
+  TFile *fluxread = new TFile(fluxmap["beam_inputroot"].c_str(), "READ");
+  TFile *fluxwrite = new TFile((out + ".flux.root").c_str(), "RECREATE");
 
   for (std::map<std::string, std::string>::iterator iter = fluxmap.begin();
        iter != fluxmap.end(); iter++) {
-    TH1* temp = (TH1*)fluxread->Get(iter->second.c_str());
-    if (!temp) continue;
-    TH1D* cuthist = (TH1D*)temp->Clone();
+    TH1 *temp = (TH1 *)fluxread->Get(iter->second.c_str());
+    if (!temp)
+      continue;
+    TH1D *cuthist = (TH1D *)temp->Clone();
 
     // Restrict energy range if required
     if (gOptEnergyRange.size() == 2) {
@@ -149,7 +149,7 @@ std::string GetFluxDefinition(std::string flux, std::string out) {
 
     // Check Flux
     if (cuthist->Integral() <= 0.0) {
-      THROW("Flux histogram " << iter->second << " has integral <= 0.0");
+      NUIS_ABORT("Flux histogram " << iter->second << " has integral <= 0.0");
     }
 
     // Save
@@ -171,7 +171,7 @@ std::string GetFluxDefinition(std::string flux, std::string out) {
 }
 
 std::string GetTargetDefinition(std::string target) {
-  LOG(FIT) << "Defining NuWro Target from : " << target << std::endl;
+  NUIS_LOG(FIT, "Defining NuWro Target from : " << target);
 
   // Target is given as either a single PDG, or a combo with the total number of
   // nucleons
@@ -227,7 +227,7 @@ std::string GetTargetDefinition(std::string target) {
 
     // No target given!
   } else {
-    THROW("No target given : " << target);
+    NUIS_ABORT("No target given : " << target);
   }
 
   std::cout << " -> " << targetstring << std::endl;
@@ -238,21 +238,22 @@ std::string GetEventAndSeedDefinition(int nevents, int ntestevents, int seed) {
   std::string eventdef = "";
   eventdef +=
       " -p \"number_of_events=" + GeneralUtils::IntToStr(nevents) + "\"";
-  eventdef += " -p \"number_of_test_events=" +
-              GeneralUtils::IntToStr(ntestevents) + "\"";
+  eventdef +=
+      " -p \"number_of_test_events=" + GeneralUtils::IntToStr(ntestevents) +
+      "\"";
   eventdef += " -p \"random_seed=" + GeneralUtils::IntToStr(seed) + "\"";
 
-  LOG(FIT) << "Event Definition: " << std::endl;
-  std::cout << " -> number_of_events      : " << nevents << std::endl;
-  std::cout << " -> number_of_test_events : " << ntestevents << std::endl;
-  std::cout << " -> seed    : " << seed << std::endl;
+  NUIS_LOG(FIT, "Event Definition: ");
+  NUIS_LOG(FIT, " -> number_of_events      : " << nevents);
+  NUIS_LOG(FIT, " -> number_of_test_events : " << ntestevents);
+  NUIS_LOG(FIT, " -> seed    : " << seed);
 
   return eventdef;
 }
 
 //____________________________________________________________________________
-int main(int argc, char** argv) {
-  LOG(FIT) << "==== RUNNING nuwro_nuisance Event Generator =====" << std::endl;
+int main(int argc, char **argv) {
+  NUIS_LOG(FIT, "==== RUNNING nuwro_nuisance Event Generator =====");
   GetCommandLineArgs(argc, argv);
 
   // Calculate the dynamic modes definition
@@ -267,7 +268,7 @@ int main(int argc, char** argv) {
       gOptNumberEvents, gOptNumberTestEvents, gOptSeed);
 
   // Run NuWro Externally!
-  LOG(FIT) << "==== Actually running nuwro! ===" << std::endl;
+  NUIS_LOG(FIT, "==== Actually running nuwro! ===");
   std::string nuwrocommand = "nuwro";
   nuwrocommand += " -i " + gOptCrossSections;
   nuwrocommand += " -o " + gOptOutputFile;
@@ -283,17 +284,18 @@ int main(int argc, char** argv) {
 }
 
 //____________________________________________________________________________
-void GetCommandLineArgs(int argc, char** argv) {
+void GetCommandLineArgs(int argc, char **argv) {
   // Check for -h flag.
   for (int i = 0; i < argc; i++) {
-    if (!std::string(argv[i]).compare("-h")) PrintSyntax();
+    if (!std::string(argv[i]).compare("-h"))
+      PrintSyntax();
   }
 
   // Format is nuwro -r run_number -n n events
   std::vector<std::string> args = GeneralUtils::LoadCharToVectStr(argc, argv);
   ParserUtils::ParseArgument(args, "-n", gOptNumberEvents, false);
   if (gOptNumberEvents == -1) {
-    THROW("No event count passed to nuwro_NUISANCE!");
+    NUIS_ABORT("No event count passed to nuwro_NUISANCE!");
   }
 
   // Flux/Energy Specs
@@ -302,39 +304,42 @@ void GetCommandLineArgs(int argc, char** argv) {
 
   ParserUtils::ParseArgument(args, "-f", gOptFluxDef, false);
   if (gOptFluxDef.empty() and gOptEnergyRange.size() < 1) {
-    THROW("No flux or energy range given to nuwro_nuisance!");
+    NUIS_ABORT("No flux or energy range given to nuwro_nuisance!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 1) {
     // Fixed energy, make sure -p is given
-    THROW("nuwro_NUISANCE cannot yet do fixed energy!");
+    NUIS_ABORT("nuwro_NUISANCE cannot yet do fixed energy!");
 
   } else if (gOptFluxDef.empty() and gOptEnergyRange.size() == 2) {
     // Uniform energy range
-    THROW("nuwro_NUISANCE cannot yet do a uniform energy range!");
+    NUIS_ABORT("nuwro_NUISANCE cannot yet do a uniform energy range!");
 
   } else if (!gOptFluxDef.empty()) {
     // Try to convert the flux definition if possible.
     std::string convflux = BeamUtils::ConvertFluxIDs(gOptFluxDef);
-    if (!convflux.empty()) gOptFluxDef = convflux;
+    if (!convflux.empty())
+      gOptFluxDef = convflux;
 
   } else {
-    THROW("Unknown flux energy range combination!");
+    NUIS_ABORT("Unknown flux energy range combination!");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptTargetDef, false);
   if (gOptTargetDef.empty()) {
-    THROW("No Target passed to nuwro_nuisance! use the '-t' argument.");
+    NUIS_ABORT("No Target passed to nuwro_nuisance! use the '-t' argument.");
   } else {
     std::string convtarget = TargetUtils::ConvertTargetIDs(gOptTargetDef);
-    if (!convtarget.empty()) gOptTargetDef = convtarget;
+    if (!convtarget.empty())
+      gOptTargetDef = convtarget;
   }
 
   ParserUtils::ParseArgument(args, "-r", gOptRunNumber, false);
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile.empty()) {
-    if (gOptRunNumber == -1) gOptRunNumber = 1;
-    LOG(FIT) << "No output file given! Saving file to : nuwrogen."
-             << gOptRunNumber << ".event.root" << std::endl;
+    if (gOptRunNumber == -1)
+      gOptRunNumber = 1;
+    NUIS_LOG(FIT, "No output file given! Saving file to : nuwrogen."
+                  << gOptRunNumber << ".event.root");
     gOptOutputFile =
         "nuwrogen." + GeneralUtils::IntToStr(gOptRunNumber) + ".event.root";
   } else {
@@ -348,9 +353,8 @@ void GetCommandLineArgs(int argc, char** argv) {
 
   ParserUtils::ParseArgument(args, "--cross-section", gOptCrossSections, false);
   if (!gOptCrossSections.compare("Default")) {
-    LOG(FIT) << "No Parameters File passed. Using default NuWro one."
-             << std::endl;
-    char* const var = getenv("NUISANCE");
+    NUIS_LOG(FIT, "No Parameters File passed. Using default NuWro one.");
+    char *const var = getenv("NUISANCE");
     if (!var) {
       std::cout << "Cannot find top level directory! Set the NUISANCE "
                    "environmental variable"
@@ -373,138 +377,157 @@ void GetCommandLineArgs(int argc, char** argv) {
     ParserUtils::CheckBadArguments(args);
   }
 
-  LOG(FIT) << "Generating NuWro Events with the following properties:"
-           << std::endl
-           << " -> Energy      : " << gOptEnergyDef << " ("
-           << gOptEnergyRange.size() << ")" << std::endl
-           << " -> NEvents     : " << gOptNumberEvents << std::endl
-           << " -> NTestEvents : " << gOptNumberTestEvents << std::endl
-           << " -> Generators  : " << gOptGeneratorList << std::endl
-           << " -> XSecPars    : " << gOptCrossSections << std::endl
-           << " -> Seed        : " << gOptSeed << std::endl
-           << " -> Target      : " << gOptTargetDef << std::endl
-           << " -> Flux        : " << gOptFluxDef << std::endl
-           << " -> Output      : " << gOptOutputFile << std::endl
-           << " -> Run         : " << gOptRunNumber << std::endl;
+  NUIS_LOG(FIT, "Generating NuWro Events with the following properties:"
+                << std::endl
+                << " -> Energy      : " << gOptEnergyDef << " ("
+                << gOptEnergyRange.size() << ")" << std::endl
+                << " -> NEvents     : " << gOptNumberEvents << std::endl
+                << " -> NTestEvents : " << gOptNumberTestEvents << std::endl
+                << " -> Generators  : " << gOptGeneratorList << std::endl
+                << " -> XSecPars    : " << gOptCrossSections << std::endl
+                << " -> Seed        : " << gOptSeed << std::endl
+                << " -> Target      : " << gOptTargetDef << std::endl
+                << " -> Flux        : " << gOptFluxDef << std::endl
+                << " -> Output      : " << gOptOutputFile << std::endl
+                << " -> Run         : " << gOptRunNumber);
   return;
 }
 //____________________________________________________________________________
 void PrintSyntax(void) {
-  LOG(FIT) << "\n\n"
-           << "Syntax:"
-           << "\n"
-           << "\n      nuwro_nuisance [-h]"
-           << "\n               -n nev"
-           << "\n               -f flux_description"
-           << "\n               -t target_description"
-           << "\n              [ -r run_number ]"
-           << "\n              [ -o output_file ]"
-           << "\n              [ --cross-section /path/to/params.txt ]"
-           << "\n              [ --event-generator-list mode_definition ]"
-           << "\n              [ --seed seed_value ]"
-           << "\n              [ --test-events ntest ]"
-           << "\n \n";
+  NUIS_LOG(FIT, "\n\n"
+                << "Syntax:"
+                << "\n"
+                << "\n      nuwro_nuisance [-h]"
+                << "\n               -n nev"
+                << "\n               -f flux_description"
+                << "\n               -t target_description"
+                << "\n              [ -r run_number ]"
+                << "\n              [ -o output_file ]"
+                << "\n              [ --cross-section /path/to/params.txt ]"
+                << "\n              [ --event-generator-list mode_definition ]"
+                << "\n              [ --seed seed_value ]"
+                << "\n              [ --test-events ntest ]"
+                << "\n \n");
 
-  LOG(FIT)
-      << "\n\n Arguments:"
-      << "\n"
-      << "\n -n nev"
-      << "\n    -> Total number of events to generate (e.g. 2500000)"
-      << "\n"
-      << "\n -f flux_description"
-      << "\n    Definition of the flux to be read in from a ROOT file."
-      << "\n"
-      << "\n    Multiple histograms can be read in from the same file using"
-      << "\n    the format '-f file.root,hist1[pdg1],hist2[pdg2]"
-      << "\n    e.g. \'-f "
-         "./flux/myfluxfile.root,numu_flux[14],numubar_flux[-14]\'"
-      << "\n"
-      << "\n    When passing in multiple histograms, the nuwro_nuisance will"
-      << "\n    generate a single file containing both sets of events with the"
-      << "\n    correct ratios for each set."
-      << "\n"
-      << "\n    A flux can also be given according to any of the flux IDs shown"
-      << "\n    at the end of this help message."
-      << "\n    e.g. \' -f MINERvA_fhc_numu\' "
-      << "\n"
-      << "\n -t target_description"
-      << "\n    Definition of the target to be used. Multiple targets can be "
-         "given."
-      << "\n"
-      << "\n    To pass a single target just provide the target PDG"
-      << "\n    e.g. \' -t 1000060120 \'"
-      << "\n"
-      << "\n    To pass a combined target provide a list containing the "
-         "following"
-      << "\n    \' -t TotalNucleons,Target1[Weight1],Target2[Weight2],.. where "
-         "the "
-      << "\n    TotalNucleons is the total nucleons combined, Target1 is the "
-         "PDG "
-      << "\n    of the first target, and Weight1 is the fractional weight of "
-         "the "
-      << "\n    first target."
-      << "\n    e.g. \' -t 13,1000060120[0.9231],1000010010[0.0769] \'"
-      << "\n"
-      << "\n    Target can also be specified by the target IDs given at the "
-         "end of"
-      << "\n    this help message."
-      << "\n    e.g. \' -t CH2 \'"
-      << "\n"
-      << "\n -r run_number"
-      << "\n    run number ID that can be used when generating large samples "
-         "in small "
-      << "\n    jobs. Must be an integer. When given nuwro_nuisance will "
-         "update the "
-      << "\n    output file from 'output.root' to 'output.root.run_number.root'"
-      << "\n"
-      << "\n -o output_file"
-      << "\n    Path to the output_file you want to save events to."
-      << "\n"
-      << "\n    If this is not given but '-r' is then events will be saved to "
-      << "\n    the file 'nuwrogen.run_number.events.root'"
-      << "\n"
-      << "\n    If a run number is given alongside '-o' then events will be "
-         "saved "
-      << "\n    to 'output.root.run_number.root'"
-      << "\n"
-      << "\n --cross-section /path/to/params.txt"
-      << "\n    Path to the nuwro model definition. If this is not given, then "
-         "this "
-      << "\n    will default to $NUISANCE/data/nuwro/Default_params.txt"
-      << "\n"
-      << "\n    Look in $NUISANCE/data/nuwro/Default_params.txt for examples "
-         "when "
-      << "\n    writing your own card files."
-      << "\n"
-      << "\n --event-generator-list mode_definition"
-      << "\n    Name of modes to run. This sets the dynamic mode settings in "
-         "nuwro."
-      << "\n    e.g. --event-generator-list Default+MEC"
-      << "\n"
-      << "\n    Allowed mode_definitions are given at the end of this help "
-         "message."
-      << "\n"
-      << "\n --seed seed_value "
-      << "\n    Value to use as the seed. If seed isn't given, time(NULL) is "
-         "used."
-      << "\n"
-      << "\n --test-events ntest "
-      << "\n    Sets the number of test events for Nuwro to use. If this "
-         "option "
-      << "\n    isn't given then we assume 5E6 test events by default."
-      << "\n\n";
+  NUIS_LOG(
+      FIT,
+      "\n\n Arguments:"
+          << "\n"
+          << "\n -n nev"
+          << "\n    -> Total number of events to generate (e.g. 2500000)"
+          << "\n"
+          << "\n -f flux_description"
+          << "\n    Definition of the flux to be read in from a ROOT file."
+          << "\n"
+          << "\n    Multiple histograms can be read in from the same file using"
+          << "\n    the format '-f file.root,hist1[pdg1],hist2[pdg2]"
+          << "\n    e.g. \'-f "
+             "./flux/myfluxfile.root,numu_flux[14],numubar_flux[-14]\'"
+          << "\n"
+          << "\n    When passing in multiple histograms, the nuwro_nuisance "
+             "will"
+          << "\n    generate a single file containing both sets of events with "
+             "the"
+          << "\n    correct ratios for each set."
+          << "\n"
+          << "\n    A flux can also be given according to any of the flux IDs "
+             "shown"
+          << "\n    at the end of this help message."
+          << "\n    e.g. \' -f MINERvA_fhc_numu\' "
+          << "\n"
+          << "\n -t target_description"
+          << "\n    Definition of the target to be used. Multiple targets can "
+             "be "
+             "given."
+          << "\n"
+          << "\n    To pass a single target just provide the target PDG"
+          << "\n    e.g. \' -t 1000060120 \'"
+          << "\n"
+          << "\n    To pass a combined target provide a list containing the "
+             "following"
+          << "\n    \' -t TotalNucleons,Target1[Weight1],Target2[Weight2],.. "
+             "where "
+             "the "
+          << "\n    TotalNucleons is the total nucleons combined, Target1 is "
+             "the "
+             "PDG "
+          << "\n    of the first target, and Weight1 is the fractional weight "
+             "of "
+             "the "
+          << "\n    first target."
+          << "\n    e.g. \' -t 13,1000060120[0.9231],1000010010[0.0769] \'"
+          << "\n"
+          << "\n    Target can also be specified by the target IDs given at "
+             "the "
+             "end of"
+          << "\n    this help message."
+          << "\n    e.g. \' -t CH2 \'"
+          << "\n"
+          << "\n -r run_number"
+          << "\n    run number ID that can be used when generating large "
+             "samples "
+             "in small "
+          << "\n    jobs. Must be an integer. When given nuwro_nuisance will "
+             "update the "
+          << "\n    output file from 'output.root' to "
+             "'output.root.run_number.root'"
+          << "\n"
+          << "\n -o output_file"
+          << "\n    Path to the output_file you want to save events to."
+          << "\n"
+          << "\n    If this is not given but '-r' is then events will be saved "
+             "to "
+          << "\n    the file 'nuwrogen.run_number.events.root'"
+          << "\n"
+          << "\n    If a run number is given alongside '-o' then events will "
+             "be "
+             "saved "
+          << "\n    to 'output.root.run_number.root'"
+          << "\n"
+          << "\n --cross-section /path/to/params.txt"
+          << "\n    Path to the nuwro model definition. If this is not given, "
+             "then "
+             "this "
+          << "\n    will default to $NUISANCE/data/nuwro/Default_params.txt"
+          << "\n"
+          << "\n    Look in $NUISANCE/data/nuwro/Default_params.txt for "
+             "examples "
+             "when "
+          << "\n    writing your own card files."
+          << "\n"
+          << "\n --event-generator-list mode_definition"
+          << "\n    Name of modes to run. This sets the dynamic mode settings "
+             "in "
+             "nuwro."
+          << "\n    e.g. --event-generator-list Default+MEC"
+          << "\n"
+          << "\n    Allowed mode_definitions are given at the end of this help "
+             "message."
+          << "\n"
+          << "\n --seed seed_value "
+          << "\n    Value to use as the seed. If seed isn't given, time(NULL) "
+             "is "
+             "used."
+          << "\n"
+          << "\n --test-events ntest "
+          << "\n    Sets the number of test events for Nuwro to use. If this "
+             "option "
+          << "\n    isn't given then we assume 5E6 test events by default."
+          << "\n\n");
 
   std::cout << "-----------------" << std::endl;
   TargetUtils::ListTargetIDs();
   std::cout << "-----------------" << std::endl;
   BeamUtils::ListFluxIDs();
   std::cout << "-----------------" << std::endl;
-  LOG(FIT) << "Allowed Mode Definitions:" << std::endl
-           << " - Default : Default CC+NC modes, no MEC" << std::endl
-           << " - Default+MEC : Default CC+NC modes + 2p2h MEC " << std::endl
-           << " - DefaultFree : Default CC+NC modes, no Coherent or MEC "
-           << std::endl;
-  std::cout << "----------------" << std::endl;
+  NUIS_LOG(FIT, "Allowed Mode Definitions:"
+                << std::endl
+                << " - Default : Default CC+NC modes, no MEC" << std::endl
+                << " - Default+MEC : Default CC+NC modes + 2p2h MEC "
+                << std::endl
+                << " - DefaultFree : Default CC+NC modes, no Coherent or MEC "
+                << std::endl
+                << "----------------");
 
   exit(0);
 }

@@ -8,10 +8,12 @@
 T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(nuiskey samplekey) {
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC1pip_CH_XSec_1DQ2_nu sample. \n" \
-                        "Target: CH \n" \
-                        "Flux: T2K Forward Horn Current numu \n" \
-                        "Signal: Any event with 1 muon -, 1 pion +, any nucleons, and no other FS particles \n";
+  std::string descrip = "T2K_CC1pip_CH_XSec_nu sample. \n"
+                        "Target: CH \n"
+                        "Flux: T2K FHC numu \n"
+                        "Signal: CC1pi+, p_mu > 200 MeV, p_pi > 200 MeV\n"
+                        ", costheta_mu > 0.2, costheta_pi > 0.2\n"
+                        "https://arxiv.org/abs/1909.03936";
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
@@ -91,28 +93,7 @@ void T2K_CC1pip_CH_XSec_1DQ2_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 bool T2K_CC1pip_CH_XSec_1DQ2_nu::isSignal(FitEvent *event) {
 //********************************************************************
-// Warning: The CH analysis has different signal definition to the H2O analysis!
-//          Often to do with the Michel tag
-
-  //switch(fT2KSampleType) {
-    // Using MiniBooNE formula for Enu reconstruction on the Q2 variable
-    // Does have Michel e tag, set bool to true!
-    //case kMB:
-      //return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
-      //break;
-    // Using extended MiniBooNE formula for Enu reconstruction on the Q2 variable
-    // Does not have Michel e tag because we need directional information to reconstruct Q2
-    //case keMB:
-      return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, false);
-      //break;
-    // Using Delta resonance for Enu reconstruction on the Q2 variable
-    // Does have Michel e tag, bool to true
-    //case kDelta:
-      //return SignalDef::isCC1pip_T2K_CH(event, EnuMin, EnuMax, true);
-      //break;
-  //}
-
-  // Default to return false
-  //return false;
+  return SignalDef::isCC1pip_T2K_arxiv1909_03936(
+      event, EnuMin, EnuMax, SignalDef::kMuonHighEff | SignalDef::kPionHighEff);
 }
 

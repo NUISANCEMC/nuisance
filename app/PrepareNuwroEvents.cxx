@@ -1,6 +1,6 @@
+#include "event1.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "event1.h"
 // Hopefully we don't need these as they're included above.
 // #include "params_all.h"
 // #include "params.h"
@@ -10,7 +10,7 @@
 #include "TH1D.h"
 #include "TTree.h"
 
-void printInputCommands(char* argv[]) {
+void printInputCommands(char *argv[]) {
   std::cout << "[USAGE]: " << argv[0]
             << " [-h] [-f] [-F <FluxRootFile>,<FluxHistName>] [-o output.root] "
                "inputfile.root [file2.root ...]"
@@ -22,7 +22,7 @@ void printInputCommands(char* argv[]) {
             << std::endl;
 };
 void CreateRateHistograms(std::string inputs, bool force_out);
-void HaddNuwroFiles(std::vector<std::string>& inputs, bool force_out);
+void HaddNuwroFiles(std::vector<std::string> &inputs, bool force_out);
 
 bool outputNewFile = false;
 std::string ofile = "";
@@ -42,15 +42,15 @@ std::vector<FluxInputBlob> FluxInputs;
 
 bool haddedFiles = false;
 
-TH1D* F2D(TH1F* f) {
-  Double_t* bins = new Double_t[f->GetXaxis()->GetNbins() + 1];
+TH1D *F2D(TH1F *f) {
+  Double_t *bins = new Double_t[f->GetXaxis()->GetNbins() + 1];
   for (Int_t bi_it = 0; bi_it < f->GetXaxis()->GetNbins(); ++bi_it) {
     bins[bi_it] = f->GetXaxis()->GetBinLowEdge(bi_it + 1);
   }
   bins[f->GetXaxis()->GetNbins()] =
       f->GetXaxis()->GetBinUpEdge(f->GetXaxis()->GetNbins());
 
-  TH1D* d = new TH1D((std::string(f->GetName()) + "_f").c_str(), f->GetTitle(),
+  TH1D *d = new TH1D((std::string(f->GetName()) + "_f").c_str(), f->GetTitle(),
                      f->GetXaxis()->GetNbins(), bins);
   std::cout << "Converted TH1F with " << f->GetXaxis()->GetXbins()
             << " bins : " << std::endl;
@@ -67,26 +67,24 @@ TH1D* F2D(TH1F* f) {
   delete bins;
   return d;
 }
-TH1D* GetTH1DFromFile(std::string const& rootFile,
-                      std::string const& histName) {
-  TFile* inpFile = new TFile(rootFile.c_str(), "READ");
+TH1D *GetTH1DFromFile(std::string const &rootFile,
+                      std::string const &histName) {
+  TFile *inpFile = new TFile(rootFile.c_str(), "READ");
   if (!inpFile || !inpFile->IsOpen()) {
-    ERR(FTL) << "Cannot open input root file: " << rootFile
-             << " to read input histo." << std::endl;
-    throw;
+    NUIS_ABORT("Cannot open input root file: " << rootFile
+                                               << " to read input histo.");
   }
 
-  TH1D* histD = dynamic_cast<TH1D*>(inpFile->Get(histName.c_str()));
+  TH1D *histD = dynamic_cast<TH1D *>(inpFile->Get(histName.c_str()));
   if (!histD) {
-    TH1F* histF = dynamic_cast<TH1F*>(inpFile->Get(histName.c_str()));
+    TH1F *histF = dynamic_cast<TH1F *>(inpFile->Get(histName.c_str()));
     if (!histF) {
-      ERR(FTL) << "Cannot find TH1D/F: " << histName
-               << " in root file: " << rootFile << "." << std::endl;
-      throw;
+      NUIS_ABORT("Cannot find TH1D/F: " << histName << " in root file: "
+                                        << rootFile << ".");
     }
     histD = F2D(histF);
   } else {
-    histD = static_cast<TH1D*>(histD->Clone());
+    histD = static_cast<TH1D *>(histD->Clone());
   }
   histD->SetDirectory(NULL);
   inpFile->Close();
@@ -94,7 +92,7 @@ TH1D* GetTH1DFromFile(std::string const& rootFile,
 }
 
 //*******************************
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   //*******************************
 
   // If No Arguments print commands
@@ -122,11 +120,10 @@ int main(int argc, char* argv[]) {
       if ((fluxInputDescriptor.size() != 2) &&
           (fluxInputDescriptor.size() != 3) &&
           (fluxInputDescriptor.size() != 4)) {
-        ERR(FTL) << "Received -F argument with option: \"" << inpLine
-                 << "\", was expecting "
-                    "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]]."
-                 << std::endl;
-        return 1;
+        NUIS_ABORT("Received -F argument with option: \""
+                   << inpLine
+                   << "\", was expecting "
+                      "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
       haveFluxInputs = true;
       FluxInputs.push_back(
@@ -140,11 +137,10 @@ int main(int argc, char* argv[]) {
 
       if (!FluxInputs.back().File.length() ||
           !FluxInputs.back().Hist.length()) {
-        ERR(FTL) << "Received -F argument with option: \"" << inpLine
-                 << "\", was expecting "
-                    "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]]."
-                 << std::endl;
-        return 1;
+        NUIS_ABORT("Received -F argument with option: \""
+                   << inpLine
+                   << "\", was expecting "
+                      "<FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]].");
       }
     } else {
       inputfiles.push_back(std::string(argv[i]));
@@ -160,7 +156,7 @@ int main(int argc, char* argv[]) {
 
   CreateRateHistograms(inputfiles[0], force_output);
 
-  LOG(FIT) << "Finished NUWRO Prep." << std::endl;
+  NUIS_LOG(FIT, "Finished NUWRO Prep.");
 };
 
 //*******************************
@@ -168,28 +164,25 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
   //*******************************
 
   // Open root file
-  TFile* outRootFile = 0;
-  TTree* nuwrotree = 0;
+  TFile *outRootFile = 0;
+  TTree *nuwrotree = 0;
 
   if (!haddedFiles &&
-      outputNewFile) {  // we need to make the new file and clone the tree.
-    TFile* inpFile = new TFile(inputs.c_str(), "READ");
+      outputNewFile) { // we need to make the new file and clone the tree.
+    TFile *inpFile = new TFile(inputs.c_str(), "READ");
     if (!inpFile || !inpFile->IsOpen()) {
-      ERR(FTL) << "Cannot open input root file: " << inputs << std::endl;
-      throw;
+      NUIS_ABORT("Cannot open input root file: " << inputs);
     }
-    TTree* inpTree = dynamic_cast<TTree*>(inpFile->Get("treeout"));
+    TTree *inpTree = dynamic_cast<TTree *>(inpFile->Get("treeout"));
     if (!inpTree) {
-      ERR(FTL) << "Cannot find TTree \"treeout\" in input root file: "
-               << inputs.c_str() << std::endl;
-      throw;
+      NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
+                 << inputs.c_str());
     }
 
     outRootFile = new TFile(ofile.c_str(), force_out ? "RECREATE" : "CREATE");
     if (!outRootFile || !outRootFile->IsOpen()) {
-      ERR(FTL) << "Couldn't open root file: " << ofile
-               << " for writing, does it already exist?" << std::endl;
-      throw;
+      NUIS_ABORT("Couldn't open root file: "
+                 << ofile << " for writing, does it already exist?");
     }
 
     nuwrotree = inpTree->CloneTree(-1, "fast");
@@ -198,26 +191,24 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
   } else {
     outRootFile = new TFile(inputs.c_str(), "UPDATE");
     if (!outRootFile || !outRootFile->IsOpen()) {
-      ERR(FTL) << "Cannot open input root file: " << inputs << std::endl;
-      throw;
+      NUIS_ABORT("Cannot open input root file: " << inputs);
     }
-    nuwrotree = dynamic_cast<TTree*>(outRootFile->Get("treeout"));
+    nuwrotree = dynamic_cast<TTree *>(outRootFile->Get("treeout"));
     if (!nuwrotree) {
-      ERR(FTL) << "Cannot find TTree \"treeout\" in input root file: "
-               << inputs.c_str() << std::endl;
-      throw;
+      NUIS_ABORT("Cannot find TTree \"treeout\" in input root file: "
+                 << inputs.c_str());
     }
   }
 
   // Get Flux Histogram
-  event* evt = new event();
+  event *evt = new event();
   nuwrotree->SetBranchAddress("e", &evt);
   nuwrotree->GetEntry(0);
 
   int fluxtype = evt->par.beam_type;
 
-  std::map<int, TH1D*> fluxlist;
-  std::map<int, TH1D*> eventlist;
+  std::map<int, TH1D *> fluxlist;
+  std::map<int, TH1D *> eventlist;
   std::vector<int> allpdg;
   std::map<int, int> nevtlist;
   std::map<int, double> intxseclist;
@@ -230,15 +221,15 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
 
   allpdg.push_back(0);
 
-  LOG(FIT) << "Nuwro fluxtype = " << fluxtype << std::endl;
+  NUIS_LOG(FIT, "Nuwro fluxtype = " << fluxtype);
   if (haveFluxInputs) {
     double totalFraction = 0;
     for (size_t flux_it = 0; flux_it < FluxInputs.size(); ++flux_it) {
-      FluxInputBlob& fb = FluxInputs[flux_it];
+      FluxInputBlob &fb = FluxInputs[flux_it];
 
       int pdg = fb.PDG;
 
-      TH1D* fluxHist = GetTH1DFromFile(fb.File, fb.Hist);
+      TH1D *fluxHist = GetTH1DFromFile(fb.File, fb.Hist);
 
       double pctg = fb.Fraction;
       totalFraction += pctg;
@@ -246,18 +237,18 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       double Ehigh = fluxHist->GetXaxis()->GetBinLowEdge(
           fluxHist->GetXaxis()->GetNbins() + 1);
 
-      LOG(FIT) << "Adding new nuwro flux "
-               << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
-               << " Ehigh: " << Ehigh << std::endl;
+      NUIS_LOG(FIT, "Adding new nuwro flux "
+                        << "pdg: " << pdg << " pctg: " << pctg
+                        << " Elow: " << Elow << " Ehigh: " << Ehigh);
 
       // Sort total flux plot
       if (!fluxlist[0]) {
         // Setup total flux
-        fluxlist[0] = (TH1D*)fluxHist->Clone();
+        fluxlist[0] = (TH1D *)fluxHist->Clone();
         fluxlist[0]->SetNameTitle("FluxHist", "FluxHist");
 
         // Prep empty total events
-        eventlist[0] = (TH1D*)fluxHist->Clone();
+        eventlist[0] = (TH1D *)fluxHist->Clone();
         eventlist[0]->SetNameTitle("EvtHist", "EvtHist");
         eventlist[0]->Reset();
 
@@ -269,12 +260,12 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       fluxHist->SetNameTitle(Form("nuwro_pdg%i_pct%f_Flux", pdg, pctg),
                              Form("nuwro_pdg%i_pct%f_Flux", pdg, pctg));
 
-      TH1D* eventplot = (TH1D*)fluxHist->Clone();
+      TH1D *eventplot = (TH1D *)fluxHist->Clone();
       eventplot->SetNameTitle(Form("nuwro_pdg%i_pct%f_Evt", pdg, pctg),
                               Form("nuwro_pdg%i_pct%f_Evt", pdg, pctg));
       eventplot->Reset();
 
-      fluxlist[pdg] = (TH1D*)fluxHist->Clone();
+      fluxlist[pdg] = (TH1D *)fluxHist->Clone();
       eventlist[pdg] = eventplot;
       nevtlist[pdg] = 0;
       intxseclist[pdg] = 0.0;
@@ -282,9 +273,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       delete fluxHist;
     }
     if (fabs(totalFraction - 1) > 1E-5) {
-      ERR(FTL) << "Total species fraction for input flux histos = "
-               << totalFraction << ", expected to sum to 1." << std::endl;
-      throw;
+      NUIS_ABORT("Total species fraction for input flux histos = "
+                 << totalFraction << ", expected to sum to 1.");
     }
   } else if (fluxtype == 0) {
     std::string fluxstring = evt->par.beam_energy;
@@ -293,43 +283,44 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     int pdg = evt->par.beam_particle;
     double Elow = double(fluxvals[0]) / 1000.0;
     double Ehigh = double(fluxvals[1]) / 1000.0;
-    TH1D* fluxplot = NULL;
+    TH1D *fluxplot = NULL;
 
-    if (Elow > Ehigh) isMono = true;
+    if (Elow > Ehigh)
+      isMono = true;
 
     // For files produced with a flux distribution
     if (!isMono) {
-      LOG(FIT) << "Adding new nuwro flux "
-               << "pdg: " << pdg << " Elow: " << Elow << " Ehigh: " << Ehigh
-               << std::endl;
+      NUIS_LOG(FIT, "Adding new nuwro flux "
+                        << "pdg: " << pdg << " Elow: " << Elow
+                        << " Ehigh: " << Ehigh);
 
       fluxplot =
           new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
       for (uint j = 2; j < fluxvals.size(); j++) {
-        LOG(DEB) << j << " " << fluxvals[j] << endl;
+        NUIS_LOG(DEB, j << " " << fluxvals[j]);
         fluxplot->SetBinContent(j - 1, fluxvals[j]);
       }
-    } else {  // For monoenergetic fluxes
-      LOG(FIT) << "Adding mono-energetic nuwro flux "
-               << "pdg: " << pdg << " E: " << Elow << std::endl;
+    } else { // For monoenergetic fluxes
+      NUIS_LOG(FIT, "Adding mono-energetic nuwro flux "
+                        << "pdg: " << pdg << " E: " << Elow);
 
       fluxplot = new TH1D("fluxplot", "fluxplot", 100, 0, Elow * 2);
       fluxplot->SetBinContent(fluxplot->FindBin(Elow), 1);
     }
 
     // Setup total flux
-    fluxlist[0] = (TH1D*)fluxplot->Clone();
+    fluxlist[0] = (TH1D *)fluxplot->Clone();
     fluxlist[0]->SetNameTitle("FluxHist", "FluxHist");
 
     // Prep empty total events
-    eventlist[0] = (TH1D*)fluxplot->Clone();
+    eventlist[0] = (TH1D *)fluxplot->Clone();
     eventlist[0]->SetNameTitle("EvtHist", "EvtHist");
     eventlist[0]->Reset();
 
     fluxplot->SetNameTitle(Form("nuwro_pdg%i_Flux", pdg),
                            Form("nuwro_pdg%i_Flux", pdg));
 
-    TH1D* eventplot = (TH1D*)fluxplot->Clone();
+    TH1D *eventplot = (TH1D *)fluxplot->Clone();
     eventplot->SetNameTitle(Form("nuwro_pdg%i_Evt", pdg),
                             Form("nuwro_pdg%i_Evt", pdg));
     eventplot->Reset();
@@ -354,11 +345,11 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       double Elow = double(fluxvals[2]) / 1000.0;
       double Ehigh = double(fluxvals[3]) / 1000.0;
 
-      LOG(FIT) << "Adding new nuwro flux "
-               << "pdg: " << pdg << " pctg: " << pctg << " Elow: " << Elow
-               << " Ehigh: " << Ehigh << std::endl;
+      NUIS_LOG(FIT, "Adding new nuwro flux "
+                        << "pdg: " << pdg << " pctg: " << pctg
+                        << " Elow: " << Elow << " Ehigh: " << Ehigh);
 
-      TH1D* fluxplot =
+      TH1D *fluxplot =
           new TH1D("fluxplot", "fluxplot", fluxvals.size() - 4, Elow, Ehigh);
       for (uint j = 4; j < fluxvals.size(); j++) {
         fluxplot->SetBinContent(j + 1, fluxvals[j]);
@@ -367,11 +358,11 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       // Sort total flux plot
       if (!fluxlist[0]) {
         // Setup total flux
-        fluxlist[0] = (TH1D*)fluxplot->Clone();
+        fluxlist[0] = (TH1D *)fluxplot->Clone();
         fluxlist[0]->SetNameTitle("FluxHist", "FluxHist");
 
         // Prep empty total events
-        eventlist[0] = (TH1D*)fluxplot->Clone();
+        eventlist[0] = (TH1D *)fluxplot->Clone();
         eventlist[0]->SetNameTitle("EvtHist", "EvtHist");
         eventlist[0]->Reset();
 
@@ -383,7 +374,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
       fluxplot->SetNameTitle(Form("nuwro_pdg%i_pct%f_Flux", pdg, pctg),
                              Form("nuwro_pdg%i_pct%f_Flux", pdg, pctg));
 
-      TH1D* eventplot = (TH1D*)fluxplot->Clone();
+      TH1D *eventplot = (TH1D *)fluxplot->Clone();
       eventplot->SetNameTitle(Form("nuwro_pdg%i_pct%f_Evt", pdg, pctg),
                               Form("nuwro_pdg%i_pct%f_Evt", pdg, pctg));
       eventplot->Reset();
@@ -423,14 +414,15 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     intxseclist[0] += TotXSec;
     intxseclist[pdg] += TotXSec;
 
-    if (i % countwidth == 0)
-      LOG(FIT) << "Processed " << i << " events "
-               << " (" << int(i * 100.0 / nevents) << "%)"
-               << " : E, W, PDG = " << Enu << ", " << TotXSec << ", " << pdg
-               << std::endl;
+    if (i % countwidth == 0) {
+      NUIS_LOG(FIT, "Processed " << i << " events "
+                                 << " (" << int(i * 100.0 / nevents) << "%)"
+                                 << " : E, W, PDG = " << Enu << ", " << TotXSec
+                                 << ", " << pdg)
+    }
   }
 
-  TH1D* zeroevents = (TH1D*)eventlist[0]->Clone();
+  TH1D *zeroevents = (TH1D *)eventlist[0]->Clone();
 
   outRootFile->cd();
   // Loop over eventlist
@@ -438,8 +430,8 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     int pdg = allpdg[i];
     double AvgXSec = intxseclist[0] * 1E38 / double(nevtlist[0]);
 
-    LOG(FIT) << pdg << " Avg XSec = " << AvgXSec << endl;
-    LOG(FIT) << pdg << " nevents = " << double(nevtlist[pdg]) << endl;
+    NUIS_LOG(FIT, pdg << " Avg XSec = " << AvgXSec);
+    NUIS_LOG(FIT, pdg << " nevents = " << double(nevtlist[pdg]));
 
     if (!isMono) {
       // Convert events to PDF
@@ -470,7 +462,7 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
 }
 
 //*******************************
-void HaddNuwroFiles(std::vector<std::string>& inputs, bool force_out) {
+void HaddNuwroFiles(std::vector<std::string> &inputs, bool force_out) {
   //*******************************
 
   // Get output file name
@@ -487,7 +479,7 @@ void HaddNuwroFiles(std::vector<std::string>& inputs, bool force_out) {
   for (UInt_t i = 0; i < inputs.size(); i++) {
     cmd += inputs[i] + " ";
   }
-  LOG(FIT) << " Running HADD from PrepareNuwro: " << cmd << std::endl;
+  NUIS_LOG(FIT, " Running HADD from PrepareNuwro: " << cmd);
 
   // Start HADD
   system(cmd.c_str());

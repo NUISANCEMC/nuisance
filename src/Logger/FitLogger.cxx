@@ -179,6 +179,7 @@ std::ostream& __OUTLOG(int level, const char* filename, const char* funct,
 }
 
 void SETVERBOSITY(int level) { Logger::log_verb = level; }
+void SETERRVERBOSITY(int level) { Logger::err_verb = level; }
 
 void SETVERBOSITY(std::string verb) {
   if (!verb.compare("DEB"))
@@ -199,6 +200,23 @@ void SETVERBOSITY(std::string verb) {
     Logger::log_verb = 6;
   else
     Logger::log_verb = std::atoi(verb.c_str());
+}
+
+//******************************************
+void SETERRVERBOSITY(std::string verb) {
+  //******************************************
+  std::cout << "Setting ERROR VERB" << std::endl;
+
+  if (!verb.compare("ERRQUIET"))
+    Logger::err_verb = 0;
+  else if (!verb.compare("FTL"))
+    Logger::err_verb = 1;
+  else if (!verb.compare("WRN"))
+    Logger::err_verb = 2;
+  // else Logger::err_verb = GeneralUtils::StrToInt(verb);
+
+  std::cout << "Set error verbosity to : " << Logger::err_verb << std::endl;
+  return;
 }
 
 /// Set Trace Option
@@ -258,49 +276,6 @@ void StartTalking() {
   fflush(stderr);
   dup2(Logger::savedstdoutfd, fileno(stdout));
   dup2(Logger::savedstderrfd, fileno(stderr));
-}
-
-//******************************************
-void LOG_VERB(std::string verb) {
-  //******************************************
-
-  if (!verb.compare("DEB"))
-    Logger::log_verb = -1;
-  else if (!verb.compare("QUIET"))
-    Logger::log_verb = 0;
-  else if (!verb.compare("FIT"))
-    Logger::log_verb = 1;
-  else if (!verb.compare("MIN"))
-    Logger::log_verb = 2;
-  else if (!verb.compare("SAM"))
-    Logger::log_verb = 3;
-  else if (!verb.compare("REC"))
-    Logger::log_verb = 4;
-  else if (!verb.compare("SIG"))
-    Logger::log_verb = 5;
-  else if (!verb.compare("EVT"))
-    Logger::log_verb = 6;
-  // else Logger::log_verb = GeneralUtils::StrToInt(verb);
-
-  std::cout << "Set logging verbosity to : " << Logger::log_verb << std::endl;
-  return;
-}
-
-//******************************************
-void ERR_VERB(std::string verb) {
-  //******************************************
-  std::cout << "Setting ERROR VERB" << std::endl;
-
-  if (!verb.compare("ERRQUIET"))
-    Logger::err_verb = 0;
-  else if (!verb.compare("FTL"))
-    Logger::err_verb = 1;
-  else if (!verb.compare("WRN"))
-    Logger::err_verb = 2;
-  // else Logger::err_verb = GeneralUtils::StrToInt(verb);
-
-  std::cout << "Set error verbosity to : " << Logger::err_verb << std::endl;
-  return;
 }
 
 //******************************************

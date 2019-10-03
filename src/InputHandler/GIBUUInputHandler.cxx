@@ -2,10 +2,9 @@
 #include "GIBUUInputHandler.h"
 #include "InputUtils.h"
 
-
 GIBUUGeneratorInfo::~GIBUUGeneratorInfo() { DeallocateParticleStack(); }
 
-void GIBUUGeneratorInfo::AddBranchesToTree(TTree* tn) {
+void GIBUUGeneratorInfo::AddBranchesToTree(TTree *tn) {
   // tn->Branch("NEUTParticleN",          fNEUTParticleN, "NEUTParticleN/I");
   // tn->Branch("NEUTParticleStatusCode", fNEUTParticleStatusCode,
   // "NEUTParticleStatusCode[NEUTParticleN]/I");
@@ -13,7 +12,7 @@ void GIBUUGeneratorInfo::AddBranchesToTree(TTree* tn) {
   // "NEUTParticleAliveCode[NEUTParticleN]/I");
 }
 
-void GIBUUGeneratorInfo::SetBranchesFromTree(TTree* tn) {
+void GIBUUGeneratorInfo::SetBranchesFromTree(TTree *tn) {
   // tn->SetBranchAddress("NEUTParticleN",          &fNEUTParticleN );
   // tn->SetBranchAddress("NEUTParticleStatusCode", &fNEUTParticleStatusCode );
   // tn->SetBranchAddress("NEUTParticleAliveCode",  &fNEUTParticleAliveCode  );
@@ -30,7 +29,7 @@ void GIBUUGeneratorInfo::DeallocateParticleStack() {
   // delete fNEUTParticleAliveCode;
 }
 
-void GIBUUGeneratorInfo::FillGeneratorInfo(GiBUUStdHepReader* nevent) {
+void GIBUUGeneratorInfo::FillGeneratorInfo(GiBUUStdHepReader *nevent) {
   Reset();
   // for (int i = 0; i < nevent->Npart(); i++) {
   // fNEUTParticleStatusCode[i] = nevent->PartInfo(i)->fStatus;
@@ -47,9 +46,9 @@ void GIBUUGeneratorInfo::Reset() {
   // fNEUTParticleN = 0;
 }
 
-GIBUUInputHandler::GIBUUInputHandler(std::string const& handle,
-                                     std::string const& rawinputs) {
-  LOG(SAM) << "Creating GiBUUInputHandler : " << handle << std::endl;
+GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
+                                     std::string const &rawinputs) {
+  NUIS_LOG(SAM, "Creating GiBUUInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -60,22 +59,22 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
     // Open File for histogram access
-    LOG(SAM) << "Opening event file " << inputs[inp_it] << std::endl;
-    TFile* inp_file = new TFile(inputs[inp_it].c_str(), "READ");
+    NUIS_LOG(SAM, "Opening event file " << inputs[inp_it]);
+    TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if ((!inp_file) || (!inp_file->IsOpen())) {
-      THROW("GiBUU file !IsOpen() at : '"
+      NUIS_ABORT("GiBUU file !IsOpen() at : '"
             << inputs[inp_it] << "'" << std::endl
             << "Check that your file paths are correct and the file exists!");
     }
 
-    int NFluxes = bool(dynamic_cast<TH1D*>(inp_file->Get("numu_flux"))) +
-                  bool(dynamic_cast<TH1D*>(inp_file->Get("numub_flux"))) +
-                  bool(dynamic_cast<TH1D*>(inp_file->Get("nue_flux"))) +
-                  bool(dynamic_cast<TH1D*>(inp_file->Get("nueb_flux"))) +
-                  bool(dynamic_cast<TH1D*>(inp_file->Get("e_flux")));
+    int NFluxes = bool(dynamic_cast<TH1D *>(inp_file->Get("numu_flux"))) +
+                  bool(dynamic_cast<TH1D *>(inp_file->Get("numub_flux"))) +
+                  bool(dynamic_cast<TH1D *>(inp_file->Get("nue_flux"))) +
+                  bool(dynamic_cast<TH1D *>(inp_file->Get("nueb_flux"))) +
+                  bool(dynamic_cast<TH1D *>(inp_file->Get("e_flux")));
 
     if (NFluxes != 1) {
-      THROW("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
+      NUIS_ABORT("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
                      << ". The NUISANCE GiBUU interface expects to be "
                         "passed multiple species vectors as separate "
                         "input files like: "
@@ -84,27 +83,26 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle,
     }
 
     // Get Flux/Event hist
-    TH1D* fluxhist = dynamic_cast<TH1D*>(inp_file->Get("flux"));
-    TH1D* eventhist = dynamic_cast<TH1D*>(inp_file->Get("evt"));
+    TH1D *fluxhist = dynamic_cast<TH1D *>(inp_file->Get("flux"));
+    TH1D *eventhist = dynamic_cast<TH1D *>(inp_file->Get("evt"));
     if (!fluxhist || !eventhist) {
-      ERROR(FTL, "Input File Contents: " << inputs[inp_it]);
+      NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
-      THROW(
-          "GiBUU FILE doesn't contain flux/xsec info. You may have to "
-          "regenerate your MC!");
+      NUIS_ABORT("GiBUU FILE doesn't contain flux/xsec info. You may have to "
+            "regenerate your MC!");
     }
 
     // Get N Events
-    TTree* giRooTracker = dynamic_cast<TTree*>(inp_file->Get("giRooTracker"));
+    TTree *giRooTracker = dynamic_cast<TTree *>(inp_file->Get("giRooTracker"));
     if (!giRooTracker) {
-      ERROR(FTL,
+      NUIS_ERR(FTL,
             "giRooTracker Tree not located in NEUT file: " << inputs[inp_it]);
-      THROW("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = giRooTracker->GetEntries();
     if (nevents <= 0) {
-      THROW("Trying to a TTree with "
+      NUIS_ABORT("Trying to a TTree with "
             << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
@@ -127,10 +125,11 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const& handle,
   fNUISANCEEvent->HardReset();
 };
 
-FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
                                               const bool lightweight) {
   // Check out of bounds
-  if (entry >= (UInt_t)fNEvents) return NULL;
+  if (entry >= (UInt_t)fNEvents)
+    return NULL;
 
   // Read Entry from TTree to fill NEUT Vect in BaseFitEvt;
   fGIBUUTree->GetEntry(entry);
@@ -166,17 +165,17 @@ FitEvent* GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
 int GetGIBUUParticleStatus(int status, int pdg) {
   int state = kUndefinedState;
   switch (status) {
-    case 0:   // Incoming
-    case 11:  // Struck nucleon
-      state = kInitialState;
-      break;
+  case 0:  // Incoming
+  case 11: // Struck nucleon
+    state = kInitialState;
+    break;
 
-    case 1:  // Good Final State
-      state = kFinalState;
-      break;
+  case 1: // Good Final State
+    state = kFinalState;
+    break;
 
-    default:  // Other
-      break;
+  default: // Other
+    break;
   }
 
   // Set Nuclear States Flag
@@ -195,11 +194,11 @@ int GetGIBUUParticleStatus(int status, int pdg) {
 void GIBUUInputHandler::CalcNUISANCEKinematics() {
   // Reset all variables
   fNUISANCEEvent->ResetEvent();
-  FitEvent* evt = fNUISANCEEvent;
+  FitEvent *evt = fNUISANCEEvent;
   evt->Mode = fGiReader->GiBUU2NeutCode;
   evt->fEventNo = 0.0;
   evt->fTotCrs = 0;
-  evt->fTargetA = 0.0;  // Change to get these from nuclear remnant.
+  evt->fTargetA = 0.0; // Change to get these from nuclear remnant.
   evt->fTargetZ = 0.0;
   evt->fTargetH = 0;
   evt->fBound = 0.0;
@@ -211,7 +210,7 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
   int npart = fGiReader->StdHepN;
   int kmax = evt->kMaxParticles;
   if ((UInt_t)npart > (UInt_t)kmax) {
-    ERROR(WRN, "GiBUU has too many particles. Expanding Stack.");
+    NUIS_ERR(WRN, "GiBUU has too many particles. Expanding Stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
@@ -242,7 +241,7 @@ void GIBUUInputHandler::CalcNUISANCEKinematics() {
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
 
-  FitParticle* ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
+  FitParticle *ISAnyLepton = fNUISANCEEvent->GetHMISAnyLeptons();
   if (ISAnyLepton) {
     fNUISANCEEvent->probe_E = ISAnyLepton->E();
     fNUISANCEEvent->probe_pdg = ISAnyLepton->PDG();
@@ -262,7 +261,7 @@ void GIBUUInputHandler::SetupJointInputs() {
   }
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
   if (fMaxEvents != -1 and jointeventinputs.size() > 1) {
-    THROW("Can only handle joint inputs when config MAXEVENTS = -1!");
+    NUIS_ABORT("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
 
   for (size_t i = 0; i < jointeventinputs.size(); i++) {

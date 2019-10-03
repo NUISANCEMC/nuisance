@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #ifndef JOINTMEASUREMENT_1D_H_SEEN
 #define JOINTMEASUREMENT_1D_H_SEEN
@@ -24,17 +24,18 @@
  *  @{
  */
 
-#include <math.h>
-#include <stdlib.h>
 #include <deque>
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <math.h>
 #include <numeric>
 #include <sstream>
+#include <stdlib.h>
 #include <string>
 
 // ROOT includes
+#include "Measurement1D.h"
 #include <TArrayF.h>
 #include <TCanvas.h>
 #include <TCut.h>
@@ -47,7 +48,6 @@
 #include <TMatrixDSym.h>
 #include <TROOT.h>
 #include <TSystem.h>
-#include "Measurement1D.h"
 
 // External data fit includes
 #include "FitEvent.h"
@@ -57,11 +57,10 @@
 #include "PlotUtils.h"
 #include "StatUtils.h"
 
-
 //********************************************************************
 /// 1D Measurement base class. Histogram handling is done in this base layer.
 class JointMeas1D : public MeasurementBase {
-//********************************************************************
+  //********************************************************************
 
 public:
   /*
@@ -74,17 +73,14 @@ public:
     Setup Functions
   */
 
-
   SampleSettings LoadSampleSettings(nuiskey samplekey);
-
 
   /// \brief Setup all configs once initialised
   ///
-  /// Should be called after all configs have been setup inside fSettings container.
-  /// Handles the processing of inputs and setting up of types.
+  /// Should be called after all configs have been setup inside fSettings
+  /// container. Handles the processing of inputs and setting up of types.
   /// Replaces the old 'SetupMeasurement' function.
   void FinaliseSampleSettings();
-
 
   /// \brief Read 1D data inputs from a text file.
   ///
@@ -104,8 +100,8 @@ public:
   /// is automatically parsed with ';' so that: \n
   /// 'myhistfile.root;myhistname' \n
   /// will also work.
-  virtual void SetDataFromRootFile(std::string inhistfile, std::string histname = "");
-
+  virtual void SetDataFromRootFile(std::string inhistfile,
+                                   std::string histname = "");
 
   /// \brief Set data bin errors to sqrt(entries)
   ///
@@ -122,7 +118,7 @@ public:
   /// errors and setting up a diagonal covariance matrix.
   ///
   /// If no data is supplied, fDataHist is used if already set.
-  virtual void SetCovarFromDiagonal(TH1D* data = NULL);
+  virtual void SetCovarFromDiagonal(TH1D *data = NULL);
 
   /// \brief Read the data covariance from a text file.
   ///
@@ -135,12 +131,14 @@ public:
   /// entries in the first line of covfile.
   virtual void SetCovarFromTextFile(std::string covfile, int dim = -1);
 
-  virtual void SetCovarFromMultipleTextFiles(std::string covfiles, int dim = -1);
+  virtual void SetCovarFromMultipleTextFiles(std::string covfiles,
+                                             int dim = -1);
 
   /// \brief Read the data covariance from a ROOT file.
   ///
   /// - covfile specifies the full path to the file
-  /// - histname specifies the name of the covariance object. Both TMatrixDSym and TH2D are supported.
+  /// - histname specifies the name of the covariance object. Both TMatrixDSym
+  /// and TH2D are supported.
   ///
   /// If no histogram name is given the inhistfile value
   /// is automatically parsed with ; so that: \n
@@ -157,7 +155,6 @@ public:
   /// entries in the first line of covfile.
   virtual void SetCovarInvertFromTextFile(std::string covfile, int dim = -1);
 
-
   /// \brief Read the inverted data covariance from a ROOT file.
   ///
   /// Inputfile should have similar format to that shown
@@ -167,7 +164,8 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCovarInvertFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCovarInvertFromRootFile(std::string covfile,
+                                          std::string histname);
 
   /// \brief Read the data correlations from a text file.
   ///
@@ -189,7 +187,8 @@ public:
   ///
   /// If no dimensions are given, it is assumed from the number
   /// entries in the first line of first covfile.
-  virtual void SetCorrelationFromMultipleTextFiles(std::string corrfiles, int dim = -1);
+  virtual void SetCorrelationFromMultipleTextFiles(std::string corrfiles,
+                                                   int dim = -1);
 
   /// \brief Read the data correlations from a ROOT file.
   ///
@@ -202,12 +201,14 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCorrelationFromRootFile(std::string covfile, std::string histname);
+  virtual void SetCorrelationFromRootFile(std::string covfile,
+                                          std::string histname);
 
   /// \brief Try to extract a shape-only matrix from the existing covariance
   virtual void SetShapeCovar();
 
-  /// \brief Read the cholesky decomposed covariance from a text file and turn it into a covariance
+  /// \brief Read the cholesky decomposed covariance from a text file and turn
+  /// it into a covariance
   ///
   /// Inputfile should have similar format to that shown
   /// in SetCovarFromTextFile.
@@ -216,8 +217,8 @@ public:
   /// entries in the first line of covfile.
   virtual void SetCholDecompFromTextFile(std::string covfile, int dim = -1);
 
-
-  /// \brief Read the cholesky decomposed covariance from a ROOT file and turn it into a covariance
+  /// \brief Read the cholesky decomposed covariance from a ROOT file and turn
+  /// it into a covariance
   ///
   /// Inputfile should have similar format to that shown
   /// in SetCovarFromRootFile.
@@ -226,17 +227,14 @@ public:
   /// is automatically parsed with ; so that: \n
   /// mycovfile.root;myhistname \n
   /// will also work.
-  virtual void SetCholDecompFromRootFile(std::string covfile, std::string histname);
-
+  virtual void SetCholDecompFromRootFile(std::string covfile,
+                                         std::string histname);
 
   /// \brief Scale the data by some scale factor
   virtual void ScaleData(double scale);
 
-
   /// \brief Scale the covariaince and its invert/decomp by some scale factor.
   virtual void ScaleCovar(double scale);
-
-
 
   /// \brief Setup a bin masking histogram and apply masking to data
   ///
@@ -254,12 +252,12 @@ public:
   /// 4  1 \n\n
   /// Will mask only the 1st, 2nd, and 4th bins.
   ///
-  /// Masking can be turned on by specifiying the MASK option when creating a sample.
-  /// When this is passed NUISANCE will look in the following locations for the mask file:
+  /// Masking can be turned on by specifiying the MASK option when creating a
+  /// sample. When this is passed NUISANCE will look in the following locations
+  /// for the mask file:
   /// - FitPar::Config().GetParS(fName + ".mask")
   /// - "data/masks/" + fName + ".mask";
   virtual void SetBinMask(std::string maskfile);
-
 
   /// \brief Final constructor setup
   /// \warning Should be called right at the end of the constructor.
@@ -267,8 +265,6 @@ public:
   /// Contains a series of checks to ensure the data and inputs have been setup.
   /// Also creates the MC histograms needed for fitting.
   virtual void FinaliseMeasurement();
-
-
 
   /// \brief Set the current fit options from a string.
   ///
@@ -279,20 +275,20 @@ public:
   /// set correctly. These should be specified as a string listing options.
   ///
   /// To split up options so that NUISANCE can automatically detect ones that
-  /// are conflicting. Any options seperated with the '/' symbol are non conflicting
-  /// and can be given together, whereas any seperated with the ',' symbol cannot
-  /// be specified by the end user at the same time.
+  /// are conflicting. Any options seperated with the '/' symbol are non
+  /// conflicting and can be given together, whereas any seperated with the ','
+  /// symbol cannot be specified by the end user at the same time.
   ///
   /// Default Type Examples:
-  /// - DIAG/FIX = Default option will be a diagonal covariance, with FIXED norm.
+  /// - DIAG/FIX = Default option will be a diagonal covariance, with FIXED
+  /// norm.
   /// - MASK/SHAPE = Default option will be a masked hist, with SHAPE always on.
   ///
   /// Allowed Type examples:
   /// - 'FULL/DIAG/NORM/MASK' = Any of these options can be specified.
-  /// - 'FULL,FREE,SHAPE/MASK/NORM' = User can give either FULL, FREE, or SHAPE as on option.
-  /// MASK and NORM can also be included as options.
+  /// - 'FULL,FREE,SHAPE/MASK/NORM' = User can give either FULL, FREE, or SHAPE
+  /// as on option. MASK and NORM can also be included as options.
   virtual void SetFitOptions(std::string opt);
-
 
   /*
     Smearing
@@ -308,8 +304,6 @@ public:
   /// Apply smearing matrix to fMCHist using fSmearingMatrix
   virtual void ApplySmearingMatrix(void);
 
-
-
   /*
     Reconfigure Functions
   */
@@ -323,23 +317,25 @@ public:
   /// If for some reason a sample needs extra variables to be saved then
   /// it should override this function creating its own MeasurementVariableBox
   /// that contains the extra variables.
-  virtual MeasurementVariableBox* CreateBox() {return new MeasurementVariableBox1D();};
+  virtual MeasurementVariableBox *CreateBox() {
+    return new MeasurementVariableBox1D();
+  };
 
   /// \brief Reset all MC histograms
   ///
   /// Resets all standard histograms and those registered to auto
   /// process to zero.
   ///
-  /// If extra histograms are not included in auto processing, then they must be reset
-  /// by overriding this function and doing it manually if required.
+  /// If extra histograms are not included in auto processing, then they must be
+  /// reset by overriding this function and doing it manually if required.
   virtual void ResetAll(void);
 
   /// \brief Fill MC Histograms from XVar
   ///
   /// Fill standard histograms using fXVar, Weight read from the variable box.
   ///
-  /// WARNING : Any extra MC histograms need to be filled by overriding this function,
-  /// even if they have been set to auto process.
+  /// WARNING : Any extra MC histograms need to be filled by overriding this
+  /// function, even if they have been set to auto process.
   virtual void FillHistograms(void);
 
   // \brief Convert event rates to final histogram
@@ -348,16 +344,15 @@ public:
   /// raw events to xsec prediction.
   ///
   /// If any distributions have been set to auto process
-  /// that is done during this function call, and a differential xsec is assumed.
-  /// If that is not the case this function must be overriden.
+  /// that is done during this function call, and a differential xsec is
+  /// assumed. If that is not the case this function must be overriden.
   virtual void ScaleEvents(void);
 
   /// \brief Scale MC by a factor=1/norm
   ///
-  /// Apply a simple normalisation scaling if the option FREE or a norm_parameter
-  /// has been specified in the NUISANCE routine.
+  /// Apply a simple normalisation scaling if the option FREE or a
+  /// norm_parameter has been specified in the NUISANCE routine.
   virtual void ApplyNormScale(double norm);
-
 
   /*
     Statistical Functions
@@ -374,7 +369,6 @@ public:
   /// Returns the likelihood of the data given the current MC prediction.
   /// Diferent likelihoods definitions are used depending on the FitOptions.
   virtual double GetLikelihood(void);
-
 
   /*
     Fake Data
@@ -409,7 +403,6 @@ public:
   /// Call ResetFakeData or ResetData to return to values before the throw.
   virtual void ThrowCovariance(void);
 
-
   /// \brief Throw the data by its assigned errors and assign this to MC
   ///
   /// Used when creating data toys by assign the MC to this thrown data
@@ -432,7 +425,7 @@ public:
   /// So to have a sample line colored differently in the xml cardfile put: \n
   /// <sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="NEUT:input.root"
   /// linecolor="2" linestyle="7"  linewidth="2" />
-  virtual TH1D* GetMCHistogram(void);
+  virtual TH1D *GetMCHistogram(void);
 
   /// \brief Returns nicely formatted data Histogram
   ///
@@ -444,34 +437,31 @@ public:
   /// So to have a sample data colored differently in the xml cardfile put: \n
   /// <sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="NEUT:input.root"
   /// datacolor="2" datastyle="7"  datawidth="2" />
-  virtual TH1D* GetDataHistogram(void);
+  virtual TH1D *GetDataHistogram(void);
 
   /// \brief Returns a list of all MC histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  virtual std::vector<TH1*> GetMCList(void);
-
+  virtual std::vector<TH1 *> GetMCList(void);
 
   /// \brief Returns a list of all Data histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  virtual std::vector<TH1*> GetDataList(void);
-
+  virtual std::vector<TH1 *> GetDataList(void);
 
   /// \brief Returns a list of all Mask histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-  virtual std::vector<TH1*> GetMaskList(void);
-
+  virtual std::vector<TH1 *> GetMaskList(void);
 
   /// \brief Returns a list of all Fine histograms.
   ///
   /// Override this if you have extra histograms that need to be
   /// accessed outside of the Measurement1D class.
-virtual std::vector<TH1*> GetFineList(void);
+  virtual std::vector<TH1 *> GetFineList(void);
 
   /*
     Write Functions
@@ -503,19 +493,12 @@ virtual std::vector<TH1*> GetFineList(void);
   /// <config drawopts='FINE/COV/SHAPE/RATIO' />
   virtual void Write(std::string drawOpt);
 
-
-
   virtual void WriteRatioPlot();
-
-
-
 
   virtual void WriteShapePlot();
   virtual void WriteShapeRatioPlot();
 
-
-  double TotalIntegratedFlux(std::string intOpt, double low,
-                             double high);
+  double TotalIntegratedFlux(std::string intOpt, double low, double high);
 
   //*
   // OLD DEFUNCTIONS
@@ -523,7 +506,7 @@ virtual std::vector<TH1*> GetFineList(void);
 
   /// OLD FUNCTION
   virtual void SetupMeasurement(std::string input, std::string type,
-                                FitWeight* rw, std::string fkdt);
+                                FitWeight *rw, std::string fkdt);
 
   /// OLD FUNCTION
   virtual void SetupDefaultHist(void);
@@ -545,14 +528,9 @@ virtual std::vector<TH1*> GetFineList(void);
   /// OLD FUNCTION
   virtual void SetCovarMatrixFromCorrText(std::string covarFile, int dim);
 
-
   /// OLD FUNCTION
   virtual void SetCovarFromDataFile(std::string covarFile, std::string covName,
                                     bool FullUnits = false);
-
-
-
-
 
   ////// JOINT MEAS1D Functions //////
 
@@ -567,122 +545,106 @@ virtual std::vector<TH1*> GetFineList(void);
   /// reconfigure has been called
   virtual void MakePlots();
 
-
-  virtual std::vector<MeasurementBase*> GetSubSamples();
+  virtual std::vector<MeasurementBase *> GetSubSamples();
   virtual void ConvertEventRates();
 
   /*
     Access Functions
   */
-  virtual std::vector<TH1*> GetFluxList();
-  virtual std::vector<TH1*> GetEventRateList();
-  virtual std::vector<TH1*> GetXSecList();
+  virtual std::vector<TH1 *> GetFluxList();
+  virtual std::vector<TH1 *> GetEventRateList();
+  virtual std::vector<TH1 *> GetXSecList();
 
   //! Return a flux integrated across all sub samples
-  virtual TH1D* GetCombinedFlux();
+  virtual TH1D *GetCombinedFlux();
 
   //! Return an event rate integrated across all sub samples
-  virtual TH1D* GetCombinedEventRate();
+  virtual TH1D *GetCombinedEventRate();
 
-  virtual TH1D* GetEventHistogram() { return GetCombinedEventRate(); };
-  virtual TH1D* GetXSecHistogram() {
-    ERR(WRN)
-        << "XSec histogram not properly implemented for joint measurements.";
+  virtual TH1D *GetEventHistogram() { return GetCombinedEventRate(); };
+  virtual TH1D *GetXSecHistogram() {
+    NUIS_ERR(WRN,
+           "XSec histogram not properly implemented for joint measurements.");
     return MeasurementBase::GetXSecHistogram();
   };
-  virtual TH1D* GetFluxHistogram() { return GetCombinedFlux(); };
-
+  virtual TH1D *GetFluxHistogram() { return GetCombinedFlux(); };
 
 protected:
-
   // Data
-  TH1D* fDataHist;  ///< default data histogram
-  TH1D* fDataOrig;  ///< histogram to store original data before throws.
-  TH1D* fDataTrue;  ///< histogram to store true dataset
-  std::string fPlotTitles;  ///< Plot title x and y for the histograms
-
+  TH1D *fDataHist;         ///< default data histogram
+  TH1D *fDataOrig;         ///< histogram to store original data before throws.
+  TH1D *fDataTrue;         ///< histogram to store true dataset
+  std::string fPlotTitles; ///< Plot title x and y for the histograms
 
   // MC
-  TH1D* fMCHist;     ///< default MC Histogram used in the chi2 fits
-  TH1D* fMCFine;     ///< finely binned MC histogram
-  TH1D* fMCStat;     ///< histogram with unweighted events to properly calculate
-  TH1D* fMCWeighted; ///< Weighted histogram before xsec scaling
+  TH1D *fMCHist;     ///< default MC Histogram used in the chi2 fits
+  TH1D *fMCFine;     ///< finely binned MC histogram
+  TH1D *fMCStat;     ///< histogram with unweighted events to properly calculate
+  TH1D *fMCWeighted; ///< Weighted histogram before xsec scaling
 
-  TH1I* fMaskHist;   ///< Mask histogram for neglecting specific bins
-  TMatrixD* fSmearMatrix;   ///< Smearing matrix (note, this is not symmetric)
+  TH1I *fMaskHist;        ///< Mask histogram for neglecting specific bins
+  TMatrixD *fSmearMatrix; ///< Smearing matrix (note, this is not symmetric)
 
-  TrueModeStack* fMCHist_Modes; ///< Optional True Mode Stack
-
+  TrueModeStack *fMCHist_Modes; ///< Optional True Mode Stack
 
   // Statistical
-  TMatrixDSym* covar;       ///< Inverted Covariance
-  TMatrixDSym* fFullCovar;  ///< Full Covariance
-  TMatrixDSym* fDecomp;     ///< Decomposed Covariance
-  TMatrixDSym* fCorrel;     ///< Correlation Matrix
-  TMatrixDSym* fShapeCovar;  ///< Shape-only covariance
+  TMatrixDSym *covar;       ///< Inverted Covariance
+  TMatrixDSym *fFullCovar;  ///< Full Covariance
+  TMatrixDSym *fDecomp;     ///< Decomposed Covariance
+  TMatrixDSym *fCorrel;     ///< Correlation Matrix
+  TMatrixDSym *fShapeCovar; ///< Shape-only covariance
 
-  TMatrixDSym* fCovar;    ///< New FullCovar
-  TMatrixDSym* fInvert;   ///< New covar
+  TMatrixDSym *fCovar;  ///< New FullCovar
+  TMatrixDSym *fInvert; ///< New covar
 
-  double fNormError;        ///< Sample norm error
-
+  double fNormError; ///< Sample norm error
 
   // Fake Data
-  bool fIsFakeData;            ///< Flag: is the current data fake from MC
-  std::string fFakeDataInput;  ///< Input fake data file path
-  TFile* fFakeDataFile;        ///< Input fake data file
-
+  bool fIsFakeData;           ///< Flag: is the current data fake from MC
+  std::string fFakeDataInput; ///< Input fake data file path
+  TFile *fFakeDataFile;       ///< Input fake data file
 
   // Fit specific flags
-  std::string fFitType;       ///< Current fit type
-  std::string fAllowedTypes;  ///< Fit Types Possible
-  std::string fDefaultTypes;  ///< Starting Default Fit Types
+  std::string fFitType;      ///< Current fit type
+  std::string fAllowedTypes; ///< Fit Types Possible
+  std::string fDefaultTypes; ///< Starting Default Fit Types
 
-  bool fIsShape;      ///< Flag : Perform Shape-only fit
-  bool fIsFree;       ///< Flag : Perform normalisation free fit
-  bool fIsDiag;       ///< Flag : only include uncorrelated diagonal errors
-  bool fIsMask;       ///< Flag : Apply bin masking
-  bool fIsRawEvents;  ///< Flag : Are bin contents just event rates
-  bool fIsEnu1D;      ///< Flag : Perform Flux Unfolded Scaling
-  bool fIsChi2SVD;    ///< Flag : Use alternative Chi2 SVD Method (Do not use)
-  bool fAddNormPen;   ///< Flag : Add a normalisation penalty term to the chi2.
-  bool fIsFix;        ///< Flag : keeping norm fixed
-  bool fIsFull;       ///< Flag : using full covariaince
-  bool fIsDifXSec;    ///< Flag : creating a dif xsec
-  bool fIsChi2;       ///< Flag : using Chi2 over LL methods
-  bool fIsSmeared;    ///< Flag : Apply smearing?
-
-
-
+  bool fIsShape;     ///< Flag : Perform Shape-only fit
+  bool fIsFree;      ///< Flag : Perform normalisation free fit
+  bool fIsDiag;      ///< Flag : only include uncorrelated diagonal errors
+  bool fIsMask;      ///< Flag : Apply bin masking
+  bool fIsRawEvents; ///< Flag : Are bin contents just event rates
+  bool fIsEnu1D;     ///< Flag : Perform Flux Unfolded Scaling
+  bool fIsChi2SVD;   ///< Flag : Use alternative Chi2 SVD Method (Do not use)
+  bool fAddNormPen;  ///< Flag : Add a normalisation penalty term to the chi2.
+  bool fIsFix;       ///< Flag : keeping norm fixed
+  bool fIsFull;      ///< Flag : using full covariaince
+  bool fIsDifXSec;   ///< Flag : creating a dif xsec
+  bool fIsChi2;      ///< Flag : using Chi2 over LL methods
+  bool fIsSmeared;   ///< Flag : Apply smearing?
 
   /// OLD STUFF TO REMOVE
-  TH1D* fMCHist_PDG[61]; ///< REMOVE OLD MC PDG Plot
+  TH1D *fMCHist_PDG[61]; ///< REMOVE OLD MC PDG Plot
 
   // Arrays for data entries
-  Double_t* fXBins;       ///< REMOVE xBin edges
-  Double_t* fDataValues;  ///< REMOVE data bin contents
-  Double_t* fDataErrors;  ///< REMOVE data bin errors
-  Int_t fNDataPointsX;    ///< REMOVE number of data points
-
-
-
+  Double_t *fXBins;      ///< REMOVE xBin edges
+  Double_t *fDataValues; ///< REMOVE data bin contents
+  Double_t *fDataErrors; ///< REMOVE data bin errors
+  Int_t fNDataPointsX;   ///< REMOVE number of data points
 
   //// JOINT MEAS1D OBJECTS ////
-  std::vector<MeasurementBase*> fSubChain;  //!< Vector of experimental classes
+  std::vector<MeasurementBase *> fSubChain; //!< Vector of experimental classes
   //! that are the sub measurements
   std::vector<std::string>
-  fSubInFiles;  //!< vector of input files for each of the sub measurements.
+      fSubInFiles; //!< vector of input files for each of the sub measurements.
 
-  bool fIsRatio;      //!< Flag: is this sample a hist1/hist2 ratio sample
-  bool fIsSummed;     //!< Flag: is this sample a combination hist1 + hist2
-  bool fSaveSubMeas;  //!< Flag: Save each of the histograms from the sub
+  bool fIsRatio;     //!< Flag: is this sample a hist1/hist2 ratio sample
+  bool fIsSummed;    //!< Flag: is this sample a combination hist1 + hist2
+  bool fSaveSubMeas; //!< Flag: Save each of the histograms from the sub
   //! samples as well as this joint samples plots
 
-
-  double   fLikelihood;
+  double fLikelihood;
 };
-
-
 
 /*! @} */
 #endif

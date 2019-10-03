@@ -18,6 +18,13 @@
 ################################################################################
 
 if(NEED_PYTHIA6)
+
+  if(DEFINED ENV{PYTHIA6_LIBRARY} AND PYTHIA6 STREQUAL "")
+    SET(PYTHIA6 $ENV{PYTHIA6_LIBRARY} CACHE PATH 
+      "Path to directory containing libPythia6.so. Overrides environment variable \$PYTHIA6 <>" 
+      FORCE)
+  endif()
+
   if(PYTHIA6 STREQUAL "")
     cmessage(FATAL_ERROR "Variable PYTHIA6 is not defined. This must be set to point to a prebuilt PYTHIA6 instance, please set the \$PYTHIA6 environment variable or configure with -DPYTHIA6=/path/to/pythia6.")
   endif()

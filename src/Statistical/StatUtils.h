@@ -68,11 +68,11 @@ namespace StatUtils{
   Double_t GetChi2FromDiag(TH2D* data, TH2D* mc, TH2I* map=NULL, TH2I* mask=NULL);
 
   //! Get Chi2 using an inverted covariance for the data
-  Double_t GetChi2FromCov( TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask=NULL, double data_scale=1, double covar_scale=1E76);
+  Double_t GetChi2FromCov( TH1D* data, TH1D* mc, TMatrixDSym* invcov, TH1I* mask=NULL, double data_scale=1, double covar_scale=1E76, TH1D *outchi2perbin=NULL);
 
   //! Get Chi2 using an inverted covariance for the data
   //! Plots converted to 1D histograms before using 1D calculation.
-  Double_t GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map=NULL, TH2I* mask=NULL);
+  Double_t GetChi2FromCov( TH2D* data, TH2D* mc, TMatrixDSym* invcov, TH2I* map=NULL, TH2I* mask=NULL, TH2D *outchi2perbin=NULL);
 
   //! Get Chi2 using an SVD method on the covariance before calculation.
   //! Method suggested by Rex at MiniBooNE. Shown that it doesn't actually work.
@@ -236,7 +236,7 @@ namespace StatUtils{
   ///
   /// If no histogram name is given function assumes it has been appended
   /// covfile path as: \n
-  /// 'covfile.root;histname' 
+  /// 'covfile.root;histname'
   ///
   /// histname can point to a TMatrixD object, a TMatrixDSym object, or
   /// a TH2D object.

@@ -1,32 +1,33 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
-#include "FitUtils.h"
 #include "T2K_SignalDef.h"
+#include "FitUtils.h"
 
 namespace SignalDef {
 
 // T2K H2O signal definition
-bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
-                                 double EnuMax) {
+// https://doi.org/10.1103/PhysRevD.97.012001
+bool isCC1pip_T2K_PRD97_012001(FitEvent *event, double EnuMin, double EnuMax) {
 
-  if (!isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
+  if (!isCC1pi(event, 14, 211, EnuMin, EnuMax))
+    return false;
 
   TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
@@ -62,57 +63,68 @@ bool isCC1pip_T2K_H2O(FitEvent *event, double EnuMin,
 //                          Any number of nucleons
 //                          No other particles in the final state
 //
-// MOVE T2K
-bool isCC1pip_T2K_CH(FitEvent *event, double EnuMin, double EnuMax,
-                                bool MichelElectron) {
+// https://arxiv.org/abs/1909.03936
+bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
+                                  int pscuts) {
   // ******************************************************
 
-  if (!isCC1pi(event, 14, 211, EnuMin, EnuMax)) return false;
+  if (!isCC1pi(event, 14, 211, EnuMin, EnuMax)) {
+    return false;
+  }
 
   TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
 
-  // If this event passes the criteria on particle counting, enforce the T2K
-  // ND280 phase space constraints
-  // Will be different if Michel tag sample is included or not
-  // Essentially, if there's a Michel tag we don't cut on the pion variables
+  double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
+
+  if (pscuts == kMuonFwd) {
+    return (cos_th_mu > 0);
+  }
 
   double p_mu = FitUtils::p(Pmu) * 1000;
-  double p_pi = FitUtils::p(Ppip) * 1000;
-  double cos_th_mu = cos(FitUtils::th(Pnu, Pmu));
-  double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
 
-  // If we're using Michel e- requirement we only care about the muon restricted
-  // phase space and use full pion phase space
-  if (MichelElectron) {
-    // Make the cuts on the muon variables
-    if (p_mu <= 200 || cos_th_mu <= 0.2) {
+  if (pscuts & kMuonHighEff) {
+    if ((cos_th_mu <= 0.2) || (p_mu <= 200)) {
       return false;
-    } else {
-      return true;
-    }
-
-    // If we aren't using Michel e- (i.e. we use directional information from
-    // pion) we need to impose the phase space cuts on the muon AND the pion)
-  } else {
-    // Make the cuts on muon and pion variables
-    if (p_mu <= 200 || p_pi <= 200 || cos_th_mu <= 0.2 || cos_th_pi <= 0.2) {
-      return false;
-    } else {
-      return true;
     }
   }
 
-  // Default to false; should never fire
+  int npicuts = 0;
+  npicuts += bool(pscuts & kPionFwdHighMom);
+  npicuts += bool(pscuts & kPionHighMom);
+  npicuts += bool(pscuts & kPionHighEff);
+
+  if (npicuts != 1) {
+    NUIS_ABORT(
+        "isCC1pip_T2K_arxiv1909_03936 signal definition passed incompatible "
+        "pion phase space cuts. Should be either kMuonHighEff, or one of "
+        "kPionFwdHighMom,kPionHighMom, or kPionHighEff");
+  }
+
+  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
+  double p_pi = FitUtils::p(Ppip) * 1000;
+
+  if (pscuts & kPionFwdHighMom) {
+    return ((cos_th_pi > 0) && (p_pi > 200));
+  }
+
+  if (pscuts & kPionHighMom) {
+    return (p_pi > 200);
+  }
+
+  if (pscuts & kMuonHighEff) {
+    return ((cos_th_pi > 0.0) && (p_pi > 200));
+  }
+
   return false;
 };
 
-bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
-                            bool forwardgoing) {
+bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax, int ana) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
@@ -122,8 +134,10 @@ bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
 
   // If we're doing a restricted phase space, Analysis II asks for:
   // Cos(theta_mu) > 0.0 and p_mu > 200 MeV
-  if (forwardgoing) {
-    if (CosThetaMu < 0.0 || p_mu < 200) return false;
+  if (ana == kAnalysis_II) {
+    if ((CosThetaMu < 0.0) || (p_mu < 200)) {
+      return false;
+    }
   }
 
   return true;
@@ -132,81 +146,93 @@ bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
 bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
-
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Proton phase space
   if (pp.Vect().Mag() < 500) {
     return false;
   }
 
-  //Need exactly one proton with 500 MeV or more momentum
-  std::vector<FitParticle*> protons = event->GetAllFSProton();
-  int nProtonsAboveThresh=0;
-  for(size_t i=0; i<protons.size(); i++){
-    if(protons[i]->p()>500) nProtonsAboveThresh++;
+  // Need exactly one proton with 500 MeV or more momentum
+  std::vector<FitParticle *> protons = event->GetAllFSProton();
+  int nProtonsAboveThresh = 0;
+  for (size_t i = 0; i < protons.size(); i++) {
+    if (protons[i]->p() > 500)
+      nProtonsAboveThresh++;
   }
-  if(nProtonsAboveThresh!=1) return false;
+  if (nProtonsAboveThresh != 1)
+    return false;
 
   return true;
 }
 
-
-//CC0pi antinu in the P0D - TN328
+// CC0pi antinu in the P0D - TN328
 bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a anumu CC0pi event
-  if (!isCC0pi(event, -14, EnuMin, EnuMax)) return false;
-
+  if (!isCC0pi(event, -14, EnuMin, EnuMax))
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
   double Pmu = pmu.Vect().Mag();
   double CosThetaMu = cos(pnu.Vect().Angle(pmu.Vect()));
   // Muon phase space
-  if (Pmu < 400 || Pmu > 3410) return false;
-  if (Pmu < 530 && CosThetaMu<0.85) return false;
-  if (Pmu < 670 && CosThetaMu<0.88) return false;
-  if (Pmu < 800 && CosThetaMu<0.9) return false;
-  if (Pmu < 1000 && CosThetaMu<0.91) return false;
-  if (Pmu < 1380 && CosThetaMu<0.92) return false;
-  if (Pmu < 2010 && CosThetaMu<0.95) return false;
+  if (Pmu < 400 || Pmu > 3410)
+    return false;
+  if (Pmu < 530 && CosThetaMu < 0.85)
+    return false;
+  if (Pmu < 670 && CosThetaMu < 0.88)
+    return false;
+  if (Pmu < 800 && CosThetaMu < 0.9)
+    return false;
+  if (Pmu < 1000 && CosThetaMu < 0.91)
+    return false;
+  if (Pmu < 1380 && CosThetaMu < 0.92)
+    return false;
+  if (Pmu < 2010 && CosThetaMu < 0.95)
+    return false;
 
- 
   return true;
 }
 
 bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Proton phase space
   if (pp.Vect().Mag() < 500) {
     return false;
   }
 
-  //Need exactly one proton with 500 MeV or more momentum
-  std::vector<FitParticle*> protons = event->GetAllFSProton();
-  int nProtonsAboveThresh=0;
-  for(size_t i=0; i<protons.size(); i++){
-    if(protons[i]->p()>500) nProtonsAboveThresh++;
+  // Need exactly one proton with 500 MeV or more momentum
+  std::vector<FitParticle *> protons = event->GetAllFSProton();
+  int nProtonsAboveThresh = 0;
+  for (size_t i = 0; i < protons.size(); i++) {
+    if (protons[i]->p() > 500)
+      nProtonsAboveThresh++;
   }
-  if(nProtonsAboveThresh<2) return false;
+  if (nProtonsAboveThresh < 2)
+    return false;
 
   return true;
 }
@@ -214,15 +240,16 @@ bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
 bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
-
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Proton phase space
   if (pp.Vect().Mag() > 500) {
@@ -232,18 +259,19 @@ bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 }
 
-
 bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Muon phase space
   // Pmu > 250 MeV, cos(theta_mu) > -0.6 (Sweet phase space!)
@@ -264,14 +292,16 @@ bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax) {
 bool isT2K_CC0pi_ifk(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Proton phase space
   // Pprot > 450 MeV, cos(theta_proton) > 0.4
@@ -285,17 +315,19 @@ bool isT2K_CC0pi_ifk(FitEvent *event, double EnuMin, double EnuMax) {
 bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax)) return false;
+  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+    return false;
 
   // Require at least one FS proton
-  if (event->NumFSParticle(2212) == 0) return false;
+  if (event->NumFSParticle(2212) == 0)
+    return false;
 
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
-  TLorentzVector pp  = event->GetHMFSParticle(2212)->fP;
+  TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Muon phase space
-  //if ((pmu.Vect().Mag() < 250) || cos(pnu.Vect().Angle(pmu.Vect())) < -0.6) {
+  // if ((pmu.Vect().Mag() < 250) || cos(pnu.Vect().Angle(pmu.Vect())) < -0.6) {
   //  return false;
   //}
 
@@ -307,4 +339,4 @@ bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 }
 
-}
+} // namespace SignalDef

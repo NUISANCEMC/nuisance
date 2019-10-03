@@ -1,26 +1,26 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "ComparisonRoutines.h"
-#include "InputUtils.h"
-#include "MeasurementBase.h"
 #include "GenericFlux_Tester.h"
 #include "GenericFlux_Vectors.h"
+#include "InputUtils.h"
+#include "MeasurementBase.h"
 #include "Smearceptance_Tester.h"
 
 // Global Arguments
@@ -33,12 +33,12 @@ std::string gOptCardInput = "";
 std::string gOptOptions = "";
 
 // Input Dial Vals
-std::vector<std::string> fParams; ///< Vector of dial names.
+std::vector<std::string> fParams;              ///< Vector of dial names.
 std::map<std::string, std::string> fStateVals; ///< Map of dial states
-std::map<std::string, double>      fCurVals; ///< Map of dial values
-std::map<std::string, int>         fTypeVals; ///< Map of dial type enums.
+std::map<std::string, double> fCurVals;        ///< Map of dial values
+std::map<std::string, int> fTypeVals;          ///< Map of dial type enums.
 // Fake Dial Vals
-std::map<std::string,double> fFakeVals; ///< Map of fake data settings.
+std::map<std::string, double> fFakeVals; ///< Map of fake data settings.
 
 void SetupComparisonsFromXML();
 void SetupRWEngine();
@@ -57,11 +57,14 @@ void PrintSyntax() {
          "input file"
       << "\n\t              is given to NUISANCE. {e.g. NUWRO:eventsout.root}."
       << "\n\t"
-      << "\n\t -f format  : FlatTree format to output. If none given GenericVectors used."
+      << "\n\t -f format  : FlatTree format to output. If none given "
+         "GenericVectors used."
       << "\n\t\t GenericFlux   : Flat event summary format."
-      << "\n\t\t GenericVectors   : Standard event summary format with particle vectors."
+      << "\n\t\t GenericVectors   : Standard event summary format with "
+         "particle vectors."
       << "\n\t "
-      << "\n\t[-c crd.xml]: Input card file to override configs or set dial values."
+      << "\n\t[-c crd.xml]: Input card file to override configs or set dial "
+         "values."
       << "\n\t "
       << "\n\t[-o outfile]: Optional output file path. "
       << "\n\t "
@@ -79,7 +82,7 @@ void PrintSyntax() {
 };
 
 //____________________________________________________________________________
-void GetCommandLineArgs(int argc, char** argv) {
+void GetCommandLineArgs(int argc, char **argv) {
   // Check for -h flag.
   for (int i = 0; i < argc; i++) {
     if ((!std::string(argv[i]).compare("-h")) ||
@@ -94,28 +97,28 @@ void GetCommandLineArgs(int argc, char** argv) {
   // Parse input file
   ParserUtils::ParseArgument(args, "-i", gOptInputFile, false);
   if (gOptInputFile == "") {
-    THROW("Need to provide a valid input file to nuisflat using -i flag!");
+    NUIS_ABORT("Need to provide a valid input file to nuisflat using -i flag!");
   } else {
-    LOG(FIT) << "Reading Input File = " << gOptInputFile << std::endl;
+    NUIS_LOG(FIT, "Reading Input File = " << gOptInputFile);
   }
 
   // Get Output Format
   ParserUtils::ParseArgument(args, "-f", gOptFormat, false);
   if (gOptFormat == "") {
     gOptFormat = "GenericVectors";
-    LOG(FIT) << "Saving flattree in default format = " << gOptFormat << std::endl;
+    NUIS_LOG(FIT, "Saving flattree in default format = " << gOptFormat);
   } else {
-    LOG(FIT) << "Saving flattree in format = " << gOptFormat << std::endl;
+    NUIS_LOG(FIT, "Saving flattree in format = " << gOptFormat);
   }
 
   // Get Output File
   ParserUtils::ParseArgument(args, "-o", gOptOutputFile, false);
   if (gOptOutputFile == "") {
     gOptOutputFile = gOptInputFile + "." + gOptFormat + ".root";
-    LOG(FIT) << "No output file given so saving nuisflat output to:"
-             << gOptOutputFile << std::endl;
+    NUIS_LOG(FIT, "No output file given so saving nuisflat output to:"
+                  << gOptOutputFile);
   } else {
-    LOG(FIT) << "Saving nuisflat output to " << gOptOutputFile << std::endl;
+    NUIS_LOG(FIT, "Saving nuisflat output to " << gOptOutputFile);
   }
 
   // Get N Events and Configs
@@ -134,38 +137,38 @@ void GetCommandLineArgs(int argc, char** argv) {
 
   ParserUtils::ParseArgument(args, "-c", gOptCardInput, false);
   if (gOptCardInput != "") {
-    QLOG(FIT, "Reading cardfile: " << gOptCardInput);
+    NUIS_LOG(FIT, "Reading cardfile: " << gOptCardInput);
     configuration.LoadSettings(gOptCardInput, "");
   }
 
   ParserUtils::ParseArgument(args, "-t", gOptOptions, false);
   if (gOptOptions != "") {
-    QLOG(FIT, "Read options: \"" << gOptOptions << "\'");
+    NUIS_LOG(FIT, "Read options: \"" << gOptOptions << "\'");
   }
   return;
 }
 
 //*******************************
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   //*******************************
 
   // Parse
   GetCommandLineArgs(argc, argv);
 
   // Make output file
-  TFile* f = new TFile(gOptOutputFile.c_str(), "RECREATE");
+  TFile *f = new TFile(gOptOutputFile.c_str(), "RECREATE");
   if (f->IsZombie()) {
-    THROW("Cannot create output file!");
+    NUIS_ABORT("Cannot create output file!");
   }
   f->cd();
   FitPar::Config().out = f;
 
   // Create a new measurementbase class depending on the Format
-  MeasurementBase* flattreecreator = NULL;
+  MeasurementBase *flattreecreator = NULL;
 
   SetupComparisonsFromXML();
   SetupRWEngine();
-  //SetupFCN();
+  // SetupFCN();
 
   // Make a new sample key for the format of interest.
   nuiskey samplekey = Config::CreateKey("sample");
@@ -181,10 +184,10 @@ int main(int argc, char* argv[]) {
     samplekey.Set("input", gOptInputFile);
     samplekey.Set("type", gOptType);
     flattreecreator = new GenericFlux_Vectors("FlatTree", gOptInputFile,
-					      FitBase::GetRW(), gOptType, "");
+                                              FitBase::GetRW(), gOptType, "");
 
   } else {
-    ERR(FTL) << "Unknown FlatTree format!" << std::endl;
+    NUIS_ERR(FTL, "Unknown FlatTree format!");
   }
 
   // Make the FlatTree reconfigure
@@ -194,9 +197,9 @@ int main(int argc, char* argv[]) {
   f->Close();
 
   // Show Final Status
-  LOG(FIT) << "-------------------------------------" << std::endl;
-  LOG(FIT) << "Flattree Generation Complete." << std::endl;
-  LOG(FIT) << "-------------------------------------" << std::endl;
+  NUIS_LOG(FIT, "-------------------------------------");
+  NUIS_LOG(FIT, "Flattree Generation Complete.");
+  NUIS_LOG(FIT, "-------------------------------------");
 
   return 0;
 }
@@ -204,12 +207,12 @@ int main(int argc, char* argv[]) {
 void SetupComparisonsFromXML() {
   //*************************************
 
-  LOG(FIT) << "Setting up nuiscomp" << std::endl;
+  NUIS_LOG(FIT, "Setting up nuiscomp");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -217,90 +220,87 @@ void SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      ERR(FTL) << "No type given for parameter " << i << std::endl;
-      ERR(FTL) << "type='PARAMETER_TYPE'" << std::endl;
+      NUIS_ERR(FTL, "No type given for parameter " << i);
+      NUIS_ERR(FTL, "type='PARAMETER_TYPE'");
       throw;
     } else if (!key.Has("name")) {
-      ERR(FTL) << "No name given for parameter " << i << std::endl;
-      ERR(FTL) << "name='SAMPLE_NAME'" << std::endl;
+      NUIS_ERR(FTL, "No name given for parameter " << i);
+      NUIS_ERR(FTL, "name='SAMPLE_NAME'");
       throw;
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
-      ERR(FTL) << "nominal='NOMINAL_VALUE'" << std::endl;
+      NUIS_ERR(FTL, "No nominal given for parameter " << i);
+      NUIS_ERR(FTL, "nominal='NOMINAL_VALUE'");
       throw;
     }
 
     // Get Inputs
     std::string partype = key.GetS("type");
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nominal");
-    double parlow  = parnom - 1;
+    double parnom = key.GetD("nominal");
+    double parlow = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
 
     // override if state not given
-    if (!key.Has("state")){
-      key.SetS("state","FIX");
+    if (!key.Has("state")) {
+      key.SetS("state", "FIX");
     }
 
     std::string parstate = key.GetS("state");
 
     // Check for incomplete limtis
-    int limdef = ((int)key.Has("low")  +
-        (int)key.Has("high") +
-        (int)key.Has("step"));
+    int limdef =
+        ((int)key.Has("low") + (int)key.Has("high") + (int)key.Has("step"));
 
-    if (limdef > 0 and limdef < 3){
-      ERR(FTL) << "Incomplete limit set given for parameter : " << parname << std::endl;
-      ERR(FTL) << "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' " << std::endl;
+    if (limdef > 0 and limdef < 3) {
+      NUIS_ERR(FTL, "Incomplete limit set given for parameter : " << parname);
+      NUIS_ERR(
+          FTL,
+          "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' ");
       throw;
     }
 
     // Extra limits
     if (key.Has("low")) {
 
-      parlow  = key.GetD("low");
+      parlow = key.GetD("low");
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      LOG(FIT) << "Read " << partype << " : "
-        << parname << " = "
-        << parnom << " : "
-        << parlow << " < p < " << parhigh
-        << " : " << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parlow << " < p < " << parhigh << " : "
+                        << parstate);
     } else {
-      LOG(FIT) << "Read " << partype << " : "
-        << parname << " = "
-        << parnom << " : "
-        << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parstate);
     }
 
     // Convert if required
     if (parstate.find("ABS") != std::string::npos) {
-      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+      parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
+      parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
     } else if (parstate.find("FRAC") != std::string::npos) {
-      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+      parnom = FitBase::RWFracToSigma(partype, parname, parnom);
+      parlow = FitBase::RWFracToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWFracToSigma(partype, parname, parstep);
     }
 
     // Push into vectors
     fParams.push_back(parname);
 
-    fTypeVals[parname]  = FitBase::ConvDialType(partype);;
-    fCurVals[parname]   = parnom;
+    fTypeVals[parname] = FitBase::ConvDialType(partype);
+    ;
+    fCurVals[parname] = parnom;
     fStateVals[parname] = parstate;
-
   }
 
   // Setup Samples ----------------------------------------------
-  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
+    NUIS_LOG(FIT,"Number of samples : " << samplekeys.size());
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -310,16 +310,15 @@ void SetupComparisonsFromXML() {
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
 
-    std::string sampletype =
-      key.Has("type") ? key.GetS("type") : "DEFAULT";
+    std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
 
-    double samplenorm =
-      key.Has("norm") ? key.GetD("norm") : 1.0;
+    double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    LOG(FIT) << "Read Sample " << i << ". : "
-      << samplename << " (" << sampletype << ") [Norm=" << samplenorm<<"]"<< std::endl
-      << "                                -> input='" << samplefile  << "'" << std::endl;
+    NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
+             << sampletype << ") [Norm=" << samplenorm << "]" << std::endl
+             << "                                -> input='" << samplefile
+             << "'");
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
@@ -340,13 +339,12 @@ void SetupComparisonsFromXML() {
     fTypeVals[normname] = kNORM;
     fStateVals[normname] = sampletype;
     fCurVals[normname] = samplenorm;
-
   }
 
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    LOG(FIT) << "Number of fake parameters : " << fakekeys.size() << std::endl;
+    NUIS_LOG(FIT,"Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -354,16 +352,16 @@ void SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      ERR(FTL) << "No name given for fakeparameter " << i << std::endl;
+      NUIS_ERR(FTL, "No name given for fakeparameter " << i);
       throw;
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for fakeparameter " << i << std::endl;
+      NUIS_ERR(FTL, "No nominal given for fakeparameter " << i);
       throw;
     }
 
     // Get Inputs
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nominal");
+    double parnom = key.GetD("nominal");
 
     // Push into vectors
     fFakeVals[parname] = parnom;
@@ -374,7 +372,7 @@ void SetupComparisonsFromXML() {
 void SetupRWEngine() {
   //*************************************
 
-  LOG(FIT) << "Setting up FitWeight Engine" << std::endl;
+  NUIS_LOG(FIT,"Setting up FitWeight Engine");
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
     FitBase::GetRW()->IncludeDial(name, fTypeVals.at(name));
@@ -383,11 +381,11 @@ void SetupRWEngine() {
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
 
-    if (fCurVals.find(name) == fCurVals.end()) continue;
+    if (fCurVals.find(name) == fCurVals.end())
+      continue;
     FitBase::GetRW()->SetDialValue(name, fCurVals.at(name));
   }
 
   FitBase::GetRW()->Reconfigure();
   return;
-
 }

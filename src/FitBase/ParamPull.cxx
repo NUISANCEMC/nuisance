@@ -1,26 +1,27 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "ParamPull.h"
 
 //*******************************************************************************
-ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, std::string dials) {
-//*******************************************************************************
+ParamPull::ParamPull(std::string name, std::string inputfile, std::string type,
+                     std::string dials) {
+  //*******************************************************************************
 
   fMinHist = NULL;
   fMaxHist = NULL;
@@ -28,9 +29,9 @@ ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, 
   fDialSelection = dials;
   fLimitHist = NULL;
 
-  fName  = name;
+  fName = name;
   fInput = inputfile;
-  fType  = type;
+  fType = type;
 
   // Set the pull type
   SetType(fType);
@@ -41,13 +42,13 @@ ParamPull::ParamPull(std::string name, std::string inputfile, std::string type, 
 
 //*******************************************************************************
 void ParamPull::SetType(std::string type) {
-//*******************************************************************************
+  //*******************************************************************************
 
   fType = type;
   // Assume Default if empty
   if (type.empty() || type == "DEFAULT") {
-    ERR(WRN) << "No type specified for ParmPull class " << fName << std::endl;
-    ERR(WRN) << "Assuming GAUSTHROW/GAUSPULL" << std::endl;
+    NUIS_ERR(WRN, "No type specified for ParmPull class " << fName);
+    NUIS_ERR(WRN, "Assuming GAUSTHROW/GAUSPULL");
 
     type = "GAUSTHROW/GAUSPULL";
   }
@@ -56,7 +57,7 @@ void ParamPull::SetType(std::string type) {
   if (type.find("FRAC") != std::string::npos) {
 
     fDialOptions = "FRAC";
-    fPlotTitles  = ";; Fractional RW Value";
+    fPlotTitles = ";; Fractional RW Value";
 
   } else if (type.find("ABS") != std::string::npos) {
 
@@ -67,26 +68,31 @@ void ParamPull::SetType(std::string type) {
 
     fDialOptions = "";
     fPlotTitles = ";; RW Value";
-
   }
 
   // Parse throw types
-  if (type.find("GAUSPULL") != std::string::npos) fCalcType = kGausPull;
-  else fCalcType = kNoPull;
+  if (type.find("GAUSPULL") != std::string::npos)
+    fCalcType = kGausPull;
+  else
+    fCalcType = kNoPull;
 
-  if (type.find("GAUSTHROW") != std::string::npos) fThrowType = kGausThrow;
-  else if (type.find("FLATTHROW") != std::string::npos) fThrowType = kFlatThrow;
-  else fThrowType = kNoThrow;
+  if (type.find("GAUSTHROW") != std::string::npos)
+    fThrowType = kGausThrow;
+  else if (type.find("FLATTHROW") != std::string::npos)
+    fThrowType = kFlatThrow;
+  else
+    fThrowType = kNoThrow;
 
   // Extra check to see if throws or pulls are turned off
-  if (type.find("NOPULL") != std::string::npos)  fCalcType = kNoPull;
-  if (type.find("NOTHROW") != std::string::npos) fThrowType = kNoThrow;
-
+  if (type.find("NOPULL") != std::string::npos)
+    fCalcType = kNoPull;
+  if (type.find("NOTHROW") != std::string::npos)
+    fThrowType = kNoThrow;
 }
 
 //*******************************************************************************
 void ParamPull::SetupHistograms(std::string input) {
-//*******************************************************************************
+  //*******************************************************************************
 
   // Extract Types from Input
   fFileType = "";
@@ -103,27 +109,29 @@ void ParamPull::SetupHistograms(std::string input) {
   }
 
   // Read Files
-  if      (!fFileType.compare("FIT")) ReadFitFile(input);
-  else if (!fFileType.compare("ROOT")) ReadRootFile(input);
-  else if (!fFileType.compare("VECT")) ReadVectFile(input);
-  else if (!fFileType.compare("DIAL")) ReadDialInput(input);
+  if (!fFileType.compare("FIT"))
+    ReadFitFile(input);
+  else if (!fFileType.compare("ROOT"))
+    ReadRootFile(input);
+  else if (!fFileType.compare("VECT"))
+    ReadVectFile(input);
+  else if (!fFileType.compare("DIAL"))
+    ReadDialInput(input);
   else {
-    ERR(FTL) << "Unknown ParamPull Type: " << input << std::endl;
-    ERR(FTL) << "Need FIT, ROOT, VECT or DIAL" << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Unknown ParamPull Type: " << input);
+    NUIS_ABORT("Need FIT, ROOT, VECT or DIAL");
   }
 
   // Check Dials are all good
   if (!CheckDialsValid()) {
-    ERR(FTL) << "DIALS NOT VALID" << std::endl;
-    throw;
+    NUIS_ABORT("DIALS NOT VALID");
   }
 
   // Setup MC Histogram
-  fMCHist = (TH1D*) fDataHist->Clone();
+  fMCHist = (TH1D *)fDataHist->Clone();
   fMCHist->Reset();
-  fMCHist->SetNameTitle( (fName + "_MC").c_str(),
-                         (fName + " MC" + fPlotTitles).c_str() );
+  fMCHist->SetNameTitle((fName + "_MC").c_str(),
+                        (fName + " MC" + fPlotTitles).c_str());
 
   // If no Covar input make an uncorrelated one
   if (!fCovar) {
@@ -132,21 +140,24 @@ void ParamPull::SetupHistograms(std::string input) {
 
   // If no types or limits are provided give them a default option
   if (!fMinHist) {
-    LOG(FIT) << "No minimum histogram found for pull parameters, setting to be content - 1E6..." << std::endl;
-    fMinHist = (TH1D*) fDataHist->Clone();
-    fMinHist->SetNameTitle( (fName + "_min").c_str(),
-                            (fName + " min" + fPlotTitles).c_str() );
+    NUIS_LOG(FIT, "No minimum histogram found for pull parameters, setting to be "
+              "content - 1E6...");
+    fMinHist = (TH1D *)fDataHist->Clone();
+    fMinHist->SetNameTitle((fName + "_min").c_str(),
+                           (fName + " min" + fPlotTitles).c_str());
     for (int i = 0; i < fMinHist->GetNbinsX(); i++) {
-      // TODO (P.Stowell) Change this to a NULL system where limits are actually free!
+      // TODO (P.Stowell) Change this to a NULL system where limits are actually
+      // free!
       fMinHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) - 1E6);
     }
   }
 
   if (!fMaxHist) {
-    LOG(FIT) << "No maximum histogram found for pull parameters, setting to be content - 1E6..." << std::endl;
-    fMaxHist = (TH1D*) fDataHist->Clone();
-    fMaxHist->SetNameTitle( (fName + "_min").c_str(),
-                            (fName + " min" + fPlotTitles).c_str() );
+    NUIS_LOG(FIT, "No maximum histogram found for pull parameters, setting to be "
+              "content - 1E6...");
+    fMaxHist = (TH1D *)fDataHist->Clone();
+    fMaxHist->SetNameTitle((fName + "_min").c_str(),
+                           (fName + " min" + fPlotTitles).c_str());
     for (int i = 0; i < fMaxHist->GetNbinsX(); i++) {
       fMaxHist->SetBinContent(i + 1, fDataHist->GetBinContent(i + 1) - 1E6);
     }
@@ -156,46 +167,51 @@ void ParamPull::SetupHistograms(std::string input) {
   // Not really sure when or if this is ever used
   if (!fTypeHist) {
     int deftype = -1;
-    if (fType.find("T2K")        != std::string::npos) { deftype = kT2K;   }
-    else if (fType.find("NEUT")  != std::string::npos) { deftype = kNEUT;  }
-    else if (fType.find("NIWG")  != std::string::npos) { deftype = kNIWG;  }
-    else if (fType.find("GENIE") != std::string::npos) { deftype = kGENIE; }
-    else if (fType.find("NORM")  != std::string::npos) { deftype = kNORM;  }
-    else if (fType.find("NUWRO") != std::string::npos) { deftype = kNUWRO; }
+    if (fType.find("T2K") != std::string::npos) {
+      deftype = kT2K;
+    } else if (fType.find("NEUT") != std::string::npos) {
+      deftype = kNEUT;
+    } else if (fType.find("NIWG") != std::string::npos) {
+      deftype = kNIWG;
+    } else if (fType.find("GENIE") != std::string::npos) {
+      deftype = kGENIE;
+    } else if (fType.find("NORM") != std::string::npos) {
+      deftype = kNORM;
+    } else if (fType.find("NUWRO") != std::string::npos) {
+      deftype = kNUWRO;
+    }
 
-    fTypeHist = new TH1I( (fName + "_type").c_str(),
-                          (fName + " type" + fPlotTitles).c_str(),
-                          fDataHist->GetNbinsX(), 0, fDataHist->GetNbinsX() );
+    fTypeHist = new TH1I((fName + "_type").c_str(),
+                         (fName + " type" + fPlotTitles).c_str(),
+                         fDataHist->GetNbinsX(), 0, fDataHist->GetNbinsX());
 
     for (int i = 0; i < fTypeHist->GetNbinsX(); i++) {
-      fTypeHist->SetBinContent(i + 1, deftype );
+      fTypeHist->SetBinContent(i + 1, deftype);
     }
   }
 
-
   // Sort Covariances
   fInvCovar = StatUtils::GetInvert(fCovar);
-  fDecomp   = StatUtils::GetDecomp(fCovar);
+  fDecomp = StatUtils::GetDecomp(fCovar);
 
   // Create DataTrue for Throws
-  fDataTrue = (TH1D*) fDataHist->Clone();
-  fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
-                           (fName + " truedata" + fPlotTitles).c_str() );
+  fDataTrue = (TH1D *)fDataHist->Clone();
+  fDataTrue->SetNameTitle((fName + "_truedata").c_str(),
+                          (fName + " truedata" + fPlotTitles).c_str());
 
-  fDataOrig = (TH1D*) fDataHist->Clone();
-  fDataOrig->SetNameTitle( (fName + "_origdata").c_str(),
-                           (fName + " origdata" + fPlotTitles).c_str() );
+  fDataOrig = (TH1D *)fDataHist->Clone();
+  fDataOrig->SetNameTitle((fName + "_origdata").c_str(),
+                          (fName + " origdata" + fPlotTitles).c_str());
 
   // Select only dials we want
   if (!fDialSelection.empty()) {
     (*fDataHist) = RemoveBinsNotInString(*fDataHist, fDialSelection);
   }
-
 }
 
 //*******************************************************************************
 TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr) {
-//*******************************************************************************
+  //*******************************************************************************
 
   // Make list of allowed bins
   std::vector<std::string> allowedbins;
@@ -209,8 +225,8 @@ TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr) {
 
   // Make new histogram
   UInt_t nbins = allowedbins.size();
-  TH1D newhist = TH1D( hist.GetName(), hist.GetTitle(),
-                       (Int_t)nbins, 0.0, (Double_t)nbins);
+  TH1D newhist =
+      TH1D(hist.GetName(), hist.GetTitle(), (Int_t)nbins, 0.0, (Double_t)nbins);
 
   // Setup bins
   for (UInt_t i = 0; i < nbins; i++) {
@@ -220,8 +236,8 @@ TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr) {
     // Copy Values
     for (Int_t j = 0; j < hist.GetNbinsX(); j++) {
       if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j + 1))) {
-        newhist.SetBinContent(i + 1, hist.GetBinContent(j + 1) );
-        newhist.SetBinError(i + 1, hist.GetBinError(j + 1) );
+        newhist.SetBinContent(i + 1, hist.GetBinContent(j + 1));
+        newhist.SetBinError(i + 1, hist.GetBinError(j + 1));
       }
     }
   }
@@ -231,7 +247,7 @@ TH1D ParamPull::RemoveBinsNotInString(TH1D hist, std::string mystr) {
 
 //*******************************************************************************
 TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr) {
-//*******************************************************************************
+  //*******************************************************************************
 
   // Make list of allowed bins
   std::vector<std::string> allowedbins;
@@ -245,8 +261,8 @@ TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr) {
 
   // Make new histogram
   UInt_t nbins = allowedbins.size();
-  TH1I newhist = TH1I( hist.GetName(), hist.GetTitle(),
-                       (Int_t)nbins, 0.0, (Int_t)nbins);
+  TH1I newhist =
+      TH1I(hist.GetName(), hist.GetTitle(), (Int_t)nbins, 0.0, (Int_t)nbins);
 
   // Setup bins
   for (UInt_t i = 0; i < nbins; i++) {
@@ -256,8 +272,8 @@ TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr) {
     // Copy Values
     for (Int_t j = 0; j < hist.GetNbinsX(); j++) {
       if (!allowedbins[i].compare(hist.GetXaxis()->GetBinLabel(j + 1))) {
-        newhist.SetBinContent(i + 1, hist.GetBinContent(j + 1) );
-        newhist.SetBinError(i + 1, hist.GetBinError(j + 1) );
+        newhist.SetBinContent(i + 1, hist.GetBinContent(j + 1));
+        newhist.SetBinError(i + 1, hist.GetBinError(j + 1));
       }
     }
   }
@@ -267,34 +283,34 @@ TH1I ParamPull::RemoveBinsNotInString(TH1I hist, std::string mystr) {
 
 //*******************************************************************************
 void ParamPull::ReadFitFile(std::string input) {
-//*******************************************************************************
+  //*******************************************************************************
 
-  TFile* tempfile = new TFile(input.c_str(), "READ");
+  TFile *tempfile = new TFile(input.c_str(), "READ");
 
   // Read Data
-  fDataHist = (TH1D*) tempfile->Get("fit_dials_free");
+  fDataHist = (TH1D *)tempfile->Get("fit_dials_free");
   CheckHist(fDataHist);
   fDataHist->SetDirectory(0);
-  fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                           (fName + " data" + fPlotTitles).c_str() );
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+                          (fName + " data" + fPlotTitles).c_str());
 
-  fMinHist = (TH1D*)tempfile->Get("min_dials_free");
+  fMinHist = (TH1D *)tempfile->Get("min_dials_free");
   CheckHist(fMinHist);
   fMinHist->SetDirectory(0);
-  fMinHist->SetNameTitle( (fName + "_min").c_str(),
-                           (fName + " min" + fPlotTitles).c_str() );
+  fMinHist->SetNameTitle((fName + "_min").c_str(),
+                         (fName + " min" + fPlotTitles).c_str());
 
-  fMaxHist = (TH1D*)tempfile->Get("max_dials_free");
+  fMaxHist = (TH1D *)tempfile->Get("max_dials_free");
   CheckHist(fMaxHist);
   fMaxHist->SetDirectory(0);
-  fMaxHist->SetNameTitle( (fName + "_max").c_str(),
-                           (fName + " max" + fPlotTitles).c_str() );
+  fMaxHist->SetNameTitle((fName + "_max").c_str(),
+                         (fName + " max" + fPlotTitles).c_str());
 
   // Read Covar
-  TH2D* tempcov = (TH2D*) tempfile->Get("covariance_free");
+  TH2D *tempcov = (TH2D *)tempfile->Get("covariance_free");
   if (!tempcov) {
-    ERR(FTL) << "Can't find TH2D covariance_free in " << fName << std::endl;
-    ERR(FTL) << "File Entries:" << std::endl;
+    NUIS_ERR(FTL, "Can't find TH2D covariance_free in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     tempfile->ls();
 
     throw;
@@ -302,7 +318,7 @@ void ParamPull::ReadFitFile(std::string input) {
 
   // Setup Covar
   int nbins = fDataHist->GetNbinsX();
-  fCovar = new TMatrixDSym( nbins );
+  fCovar = new TMatrixDSym(nbins);
 
   for (int i = 0; i < nbins; i++) {
     for (int j = 0; j < nbins; j++) {
@@ -315,58 +331,58 @@ void ParamPull::ReadFitFile(std::string input) {
 
 //*******************************************************************************
 void ParamPull::ReadRootFile(std::string input) {
-//*******************************************************************************
+  //*******************************************************************************
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input, ";");
 
   // Check all given
   if (inputlist.size() < 2) {
-    ERR(FTL) << "Covar supplied in 'ROOT' format should have 3 semi-colon seperated entries!" << std::endl
-             << "ROOT:filename;histname[;covarname]" << std::endl;
-    ERR(FTL) << "histname = TH1D, covarname = TH2D" << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Covar supplied in 'ROOT' format should have 3 semi-colon "
+                "seperated entries!"
+                    << std::endl
+                    << "ROOT:filename;histname[;covarname]");
+    NUIS_ABORT("histname = TH1D, covarname = TH2D");
   }
 
   // Get Entries
-  std::string filename  = inputlist[0];
-  std::string histname  = inputlist[1];
+  std::string filename = inputlist[0];
+  std::string histname = inputlist[1];
 
   // Read File
-  TFile* tempfile = new TFile(filename.c_str(), "READ");
-  if (tempfile->IsZombie()){
-    LOG(FIT) << "Looking for ParamPull input inside database" << std::endl;
+  TFile *tempfile = new TFile(filename.c_str(), "READ");
+  if (tempfile->IsZombie()) {
+    NUIS_LOG(FIT, "Looking for ParamPull input inside database");
     filename = FitPar::GetDataBase() + "/" + filename;
     tempfile = new TFile(filename.c_str(), "READ");
   }
   if (tempfile->IsZombie()) {
-    ERR(FTL) << "Can't find file in " << fName << std::endl;
-    ERR(FTL) << "location = " << filename << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Can't find file in " << fName);
+    NUIS_ABORT("location = " << filename);
   }
 
   // Read Hist
-  fDataHist = (TH1D*) tempfile->Get(histname.c_str());
+  fDataHist = (TH1D *)tempfile->Get(histname.c_str());
   if (!fDataHist) {
-    ERR(FTL) << "Can't find TH1D hist " << histname << " in " << fName << std::endl;
-    ERR(FTL) << "File Entries:" << std::endl;
+    NUIS_ERR(FTL, "Can't find TH1D hist " << histname << " in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     tempfile->ls();
 
     throw;
   }
   fDataHist->SetDirectory(0);
-  fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                           (fName + " data" + fPlotTitles).c_str() );
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+                          (fName + " data" + fPlotTitles).c_str());
 
-  LOG(DEB) << "READING COVAR" << std::endl;
+  NUIS_LOG(DEB, "READING COVAR");
   // Read Covar
   if (inputlist.size() > 2) {
     std::string covarname = inputlist[2];
-    LOG(DEB) << "COVARNAME = " << covarname << std::endl;
+    NUIS_LOG(DEB, "COVARNAME = " << covarname);
 
-    TH2D* tempcov = (TH2D*) tempfile->Get(covarname.c_str());
+    TH2D *tempcov = (TH2D *)tempfile->Get(covarname.c_str());
     if (!tempcov) {
-      ERR(FTL) << "Can't find TH2D covar " << covarname << " in " << fName << std::endl;
-      ERR(FTL) << "File Entries:" << std::endl;
+      NUIS_ERR(FTL, "Can't find TH2D covar " << covarname << " in " << fName);
+      NUIS_ERR(FTL, "File Entries:");
       tempfile->ls();
 
       throw;
@@ -374,7 +390,7 @@ void ParamPull::ReadRootFile(std::string input) {
 
     // Setup Covar
     int nbins = fDataHist->GetNbinsX();
-    fCovar = new TMatrixDSym( nbins );
+    fCovar = new TMatrixDSym(nbins);
 
     for (int i = 0; i < nbins; i++) {
       for (int j = 0; j < nbins; j++) {
@@ -384,30 +400,27 @@ void ParamPull::ReadRootFile(std::string input) {
 
     // Uncorrelated
   } else {
-    LOG(SAM) << "No Covar provided so using diagonal errors for "
-             << fName << std::endl;
+    NUIS_LOG(SAM, "No Covar provided so using diagonal errors for " << fName);
     fCovar = NULL;
   }
 }
 
 //*******************************************************************************
 void ParamPull::ReadVectFile(std::string input) {
-//*******************************************************************************
+  //*******************************************************************************
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input, ";");
   if (inputlist.size() < 4) {
-    ERR(FTL) << "Need 3 inputs for vector input in " << fName << std::endl;
-    ERR(FTL) << "Inputs: " << input << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Need 3 inputs for vector input in " << fName);
+    NUIS_ABORT("Inputs: " << input);
   }
 
   // Open File
-  std::string rootname   = inputlist[0];
-  TFile* tempfile = new TFile(rootname.c_str(), "READ");
+  std::string rootname = inputlist[0];
+  TFile *tempfile = new TFile(rootname.c_str(), "READ");
   if (tempfile->IsZombie()) {
-    ERR(FTL) << "Can't find file in " << fName << std::endl;
-    ERR(FTL) << "location = " << rootname << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Can't find file in " << fName);
+    NUIS_ABORT("location = " << rootname);
   }
 
   // Get Name
@@ -418,22 +431,22 @@ void ParamPull::ReadVectFile(std::string input) {
   //  }
 
   // Get Values
-  std::string valuename  = inputlist[2];
-  TVectorD* dialvals = (TVectorD*)tempfile->Get(valuename.c_str());
+  std::string valuename = inputlist[2];
+  TVectorD *dialvals = (TVectorD *)tempfile->Get(valuename.c_str());
   if (!dialvals) {
-    ERR(FTL) << "Can't find dial values" << std::endl;
+    NUIS_ERR(FTL, "Can't find dial values");
   }
 
   // Get Matrix
   std::string matrixname = inputlist[3];
-  TMatrixD* matrixvals = (TMatrixD*)tempfile->Get(matrixname.c_str());
+  TMatrixD *matrixvals = (TMatrixD *)tempfile->Get(matrixname.c_str());
   if (!matrixvals) {
-    ERR(FTL) << "Can't find matirx values" << std::endl;
+    NUIS_ERR(FTL, "Can't find matirx values");
   }
 
   // Get Types
   if (inputlist.size() > 4) {
-    std::string typesname  = inputlist[3];
+    std::string typesname = inputlist[3];
   }
 
   // Get Minimum
@@ -445,18 +458,16 @@ void ParamPull::ReadVectFile(std::string input) {
   if (inputlist.size() > 6) {
     std::string maxname = inputlist[5];
   }
-
 }
 
 //*******************************************************************************
 void ParamPull::ReadDialInput(std::string input) {
-//*******************************************************************************
+  //*******************************************************************************
 
   std::vector<std::string> inputlist = GeneralUtils::ParseToStr(input, ";");
   if (inputlist.size() < 3) {
-    ERR(FTL) << "Need 3 inputs for dial input in " << fName << std::endl;
-    ERR(FTL) << "Inputs: " << input << std::endl;
-    throw;
+    NUIS_ERR(FTL, "Need 3 inputs for dial input in " << fName);
+    NUIS_ABORT("Inputs: " << input);
   }
 
   std::vector<double> inputvals = GeneralUtils::ParseToDbl(input, ";");
@@ -464,15 +475,14 @@ void ParamPull::ReadDialInput(std::string input) {
   double val = inputvals[1];
   double err = inputvals[2];
 
-  fDataHist = new TH1D( (fName + "_data").c_str(),
-                        (fName + "_data" + fPlotTitles).c_str(), 1, 0, 1);
+  fDataHist = new TH1D((fName + "_data").c_str(),
+                       (fName + "_data" + fPlotTitles).c_str(), 1, 0, 1);
   fDataHist->SetBinContent(1, val);
   fDataHist->SetBinError(1, err);
   fDataHist->GetXaxis()->SetBinLabel(1, dialname.c_str());
 
-
-  fLimitHist = new TH1D( (fName + "_limits").c_str(),
-                         (fName + "_limits" + fPlotTitles).c_str(), 1, 0, 1);
+  fLimitHist = new TH1D((fName + "_limits").c_str(),
+                        (fName + "_limits" + fPlotTitles).c_str(), 1, 0, 1);
   fLimitHist->Reset();
   if (inputvals.size() > 4) {
     fLimitHist->SetBinContent(1, (inputvals[3] + inputvals[4]) / 2.0);
@@ -484,7 +494,7 @@ void ParamPull::ReadDialInput(std::string input) {
 
 //*******************************************************************************
 std::map<std::string, int> ParamPull::GetAllDials() {
-//*******************************************************************************
+  //*******************************************************************************
   std::map<std::string, int> dialtypemap;
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
     std::string name = fDataHist->GetXaxis()->GetBinLabel(i + 1);
@@ -494,10 +504,9 @@ std::map<std::string, int> ParamPull::GetAllDials() {
   return dialtypemap;
 }
 
-
 //*******************************************************************************
 bool ParamPull::CheckDialsValid() {
-//*******************************************************************************
+  //*******************************************************************************
 
   std::string helpstring = "";
 
@@ -506,39 +515,41 @@ bool ParamPull::CheckDialsValid() {
 
     // If dial exists its all good
     if (FitBase::GetRW()->DialIncluded(name)) {
-      LOG(DEB) << "Found dial " << name << " in covariance " << fInput << " and matched to reweight engine " << std::endl;
+      NUIS_LOG(DEB, "Found dial " << name << " in covariance " << fInput
+                              << " and matched to reweight engine ");
       continue;
     }
 
     // If it doesn't but its a sample norm also continue
     if (name.find("_norm") != std::string::npos) {
-      ERR(WRN) << "Norm dial included in covar but not set in FitWeight." << std::endl;
-      ERR(WRN) << "Assuming its a sample norm and skipping..." << std::endl;
+      NUIS_ERR(WRN, "Norm dial included in covar but not set in FitWeight.");
+      NUIS_ERR(WRN, "Assuming its a sample norm and skipping...");
     }
 
     // Dial unknown so print a help statement
     std::ostringstream tempstr;
     tempstr << "unknown_parameter " << name << " "
             << fDataHist->GetBinContent(i + 1) << " "
-            << fDataHist->GetBinContent(i + 1) - fDataHist->GetBinError(i + 1) << " "
-            << fDataHist->GetBinContent(i + 1) + fDataHist->GetBinError(i + 1) << " "
-            << fDataHist->GetBinError(i + 1) << " ";
+            << fDataHist->GetBinContent(i + 1) - fDataHist->GetBinError(i + 1)
+            << " "
+            << fDataHist->GetBinContent(i + 1) + fDataHist->GetBinError(i + 1)
+            << " " << fDataHist->GetBinError(i + 1) << " ";
 
-    if (!fType.empty()) tempstr << fType << std::endl;
-    else tempstr << "FREE" << std::endl;
+    if (!fType.empty())
+      tempstr << fType << std::endl;
+    else
+      tempstr << "FREE" << std::endl;
     helpstring += tempstr.str();
   }
 
   // Show statement before failing
   if (!helpstring.empty()) {
 
-    ERR(FTL) << "Dial(s) included in covar but not set in FitWeight." << std::endl;
-    ERR(FTL) << "ParamPulls needs to know how you want it to be treated." << std::endl;
-    ERR(FTL) << "Include the following lines into your card to throw UNCORRELATED:" << std::endl
-
-    << helpstring << std::endl;
-    throw;
-    return false;
+    NUIS_ERR(FTL, "Dial(s) included in covar but not set in FitWeight.");
+    NUIS_ERR(FTL, "ParamPulls needs to know how you want it to be treated.");
+    NUIS_ABORT("Include the following lines into your card to throw UNCORRELATED:"
+           << std::endl
+           << helpstring);
   } else {
     return true;
   }
@@ -546,17 +557,15 @@ bool ParamPull::CheckDialsValid() {
   return false;
 }
 
-
-
 //*******************************************************************************
 void ParamPull::Reconfigure() {
-//*******************************************************************************
+  //*******************************************************************************
 
-  FitWeight* rw = FitBase::GetRW();
+  FitWeight *rw = FitBase::GetRW();
 
   // Get Dial Names that are valid
-  std::vector<std::string> namevec  = rw->GetDialNames();
-  std::vector<double>      valuevec = rw->GetDialValues();
+  std::vector<std::string> namevec = rw->GetDialNames();
+  std::vector<double> valuevec = rw->GetDialValues();
 
   // Set Bin Values from RW
   for (UInt_t i = 0; i < namevec.size(); i++) {
@@ -570,7 +579,8 @@ void ParamPull::Reconfigure() {
     for (int j = 0; j < fMCHist->GetNbinsX(); j++) {
 
       // Search for the name of this bin in the corrent dial
-      std::string binname = std::string(fMCHist->GetXaxis()->GetBinLabel(j + 1) );
+      std::string binname =
+          std::string(fMCHist->GetXaxis()->GetBinLabel(j + 1));
 
       // Check Full Name
       if (!syst.compare(binname.c_str())) {
@@ -578,8 +588,8 @@ void ParamPull::Reconfigure() {
         break;
       }
 
-
-      std::vector<std::string> splitbinname = GeneralUtils::ParseToStr(binname, ",");
+      std::vector<std::string> splitbinname =
+          GeneralUtils::ParseToStr(binname, ",");
       for (size_t l = 0; l < splitbinname.size(); l++) {
         std::string singlebinname = splitbinname[l];
         for (size_t k = 0; k < allsyst.size(); k++) {
@@ -589,9 +599,6 @@ void ParamPull::Reconfigure() {
         }
       }
     }
-
-
-
   }
 
   return;
@@ -599,71 +606,67 @@ void ParamPull::Reconfigure() {
 
 //*******************************************************************************
 void ParamPull::ResetToy(void) {
-//*******************************************************************************
+  //*******************************************************************************
 
-  if (fDataHist) delete fDataHist;
+  if (fDataHist)
+    delete fDataHist;
 
-  LOG(DEB) << "Resetting toy" << std::endl;
-  LOG(DEB) << fDataTrue << std::endl;
-  fDataHist = (TH1D*)fDataTrue->Clone();
-  LOG(DEB) << "Setting name" << std::endl;
-  fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                           (fName + " data" + fPlotTitles).c_str() );
-
+  NUIS_LOG(DEB, "Resetting toy");
+  NUIS_LOG(DEB, fDataTrue);
+  fDataHist = (TH1D *)fDataTrue->Clone();
+  NUIS_LOG(DEB, "Setting name");
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+                          (fName + " data" + fPlotTitles).c_str());
 }
-
-
 
 //*******************************************************************************
 void ParamPull::SetFakeData(std::string fakeinput) {
-//*******************************************************************************
+  //*******************************************************************************
 
   // Set from MC Setting
   if (!fakeinput.compare("MC")) {
 
     // Copy MC into data
-    if (fDataHist) delete fDataHist;
-    fDataHist = (TH1D*)fMCHist->Clone();
-    fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                             (fName + " fakedata" + fPlotTitles).c_str() );
+    if (fDataHist)
+      delete fDataHist;
+    fDataHist = (TH1D *)fMCHist->Clone();
+    fDataHist->SetNameTitle((fName + "_data").c_str(),
+                            (fName + " fakedata" + fPlotTitles).c_str());
 
     // Copy original data errors
     for (int i = 0; i < fDataOrig->GetNbinsX(); i++) {
-      fDataHist->SetBinError(i + 1, fDataOrig->GetBinError(i + 1) );
+      fDataHist->SetBinError(i + 1, fDataOrig->GetBinError(i + 1));
     }
 
     // Make True Toy Central Value Hist
-    fDataTrue = (TH1D*) fDataHist->Clone();
-    fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
-                             (fName + " truedata" + fPlotTitles).c_str() );
+    fDataTrue = (TH1D *)fDataHist->Clone();
+    fDataTrue->SetNameTitle((fName + "_truedata").c_str(),
+                            (fName + " truedata" + fPlotTitles).c_str());
 
   } else {
 
-    ERR(FTL) << "Trying to set fake data for ParamPulls not from MC!" << std::endl;
-    ERR(FTL) << "Not currently implemented.." << std::endl;
-    throw;
-
+    NUIS_ERR(FTL, "Trying to set fake data for ParamPulls not from MC!");
+    NUIS_ABORT("Not currently implemented..");
   }
 }
 
 //*******************************************************************************
 void ParamPull::RemoveFakeData() {
-//*******************************************************************************
+  //*******************************************************************************
 
   delete fDataHist;
-  fDataHist = (TH1D*)fDataOrig->Clone();
-  fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                           (fName + " data" + fPlotTitles).c_str() );
+  fDataHist = (TH1D *)fDataOrig->Clone();
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+                          (fName + " data" + fPlotTitles).c_str());
 
-  fDataTrue = (TH1D*) fDataHist->Clone();
-  fDataTrue->SetNameTitle( (fName + "_truedata").c_str(),
-                           (fName + " truedata" + fPlotTitles).c_str() );
-
+  fDataTrue = (TH1D *)fDataHist->Clone();
+  fDataTrue->SetNameTitle((fName + "_truedata").c_str(),
+                          (fName + " truedata" + fPlotTitles).c_str());
 }
 
 //*******************************************************************************
 double ParamPull::GetLikelihood() {
-//*******************************************************************************
+  //*******************************************************************************
 
   double like = 0.0;
 
@@ -682,15 +685,13 @@ double ParamPull::GetLikelihood() {
     break;
   }
 
-
-  LOG(DEB) << "Likelihood = " << like << " " << fCalcType << std::endl;
+  NUIS_LOG(DEB, "Likelihood = " << like << " " << fCalcType);
   return like;
-
 };
 
 //*******************************************************************************
 int ParamPull::GetNDOF() {
-//*******************************************************************************
+  //*******************************************************************************
 
   int ndof = 0;
 
@@ -701,14 +702,13 @@ int ParamPull::GetNDOF() {
   return ndof;
 };
 
-
 //*******************************************************************************
 void ParamPull::ThrowCovariance() {
-//*******************************************************************************
+  //*******************************************************************************
 
   // Reset toy for throw
   ResetToy();
-  LOG(FIT) << "Creating new toy dataset" << std::endl;
+  NUIS_LOG(FIT, "Creating new toy dataset");
 
   // Generate random Gaussian throws
   std::vector<double> randthrows;
@@ -726,7 +726,8 @@ void ParamPull::ThrowCovariance() {
     case kFlatThrow:
       randtemp = gRandom->Uniform(0.0, 1.0);
       if (fLimitHist) {
-        randtemp = fLimitHist->GetBinContent(i + 1) + fLimitHist->GetBinError(i + 1) * ( randtemp * 2 - 1 );
+        randtemp = fLimitHist->GetBinContent(i + 1) +
+                   fLimitHist->GetBinError(i + 1) * (randtemp * 2 - 1);
       }
       break;
 
@@ -743,7 +744,7 @@ void ParamPull::ThrowCovariance() {
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
 
     // Calc Bin Mod
-    double binmod  = 0.0;
+    double binmod = 0.0;
 
     if (fThrowType == kGausThrow) {
       for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
@@ -761,32 +762,38 @@ void ParamPull::ThrowCovariance() {
   }
 
   // Rename
-  fDataHist->SetNameTitle( (fName + "_data").c_str(),
-                           (fName + " toydata" + fPlotTitles).c_str() );
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+                          (fName + " toydata" + fPlotTitles).c_str());
 
   // Check Limits
   if (fLimitHist) {
     for (int i = 0; i < fLimitHist->GetNbinsX(); i++) {
-      if (fLimitHist->GetBinError(i + 1) == 0.0) continue;
-      if (fDataHist->GetBinContent(i + 1) > fLimitHist->GetBinContent(i + 1) + fLimitHist->GetBinError(i + 1) ||
-          fDataHist->GetBinContent(i + 1) < fLimitHist->GetBinContent(i + 1) - fLimitHist->GetBinError(i + 1)) {
-        LOG(FIT) << "Threw outside allowed region, rethrowing..." << std::endl;
+      if (fLimitHist->GetBinError(i + 1) == 0.0)
+        continue;
+      if (fDataHist->GetBinContent(i + 1) >
+              fLimitHist->GetBinContent(i + 1) +
+                  fLimitHist->GetBinError(i + 1) ||
+          fDataHist->GetBinContent(i + 1) <
+              fLimitHist->GetBinContent(i + 1) -
+                  fLimitHist->GetBinError(i + 1)) {
+        NUIS_LOG(FIT, "Threw outside allowed region, rethrowing...");
         ThrowCovariance();
       }
     }
   }
 };
 
-
 //*******************************************************************************
 TH2D ParamPull::GetCovar() {
-//*******************************************************************************
+  //*******************************************************************************
 
   TH2D tempCov = TH2D(*fInvCovar);
 
   for (int i = 0; i < tempCov.GetNbinsX(); i++) {
-    tempCov.GetXaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
-    tempCov.GetYaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetXaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetYaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
   }
 
   tempCov.SetNameTitle((fName + "_INVCOV").c_str(),
@@ -797,13 +804,15 @@ TH2D ParamPull::GetCovar() {
 
 //*******************************************************************************
 TH2D ParamPull::GetFullCovar() {
-//*******************************************************************************
+  //*******************************************************************************
 
   TH2D tempCov = TH2D(*fCovar);
 
   for (int i = 0; i < tempCov.GetNbinsX(); i++) {
-    tempCov.GetXaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
-    tempCov.GetYaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetXaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetYaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
   }
 
   tempCov.SetNameTitle((fName + "_COV").c_str(),
@@ -814,13 +823,15 @@ TH2D ParamPull::GetFullCovar() {
 
 //*******************************************************************************
 TH2D ParamPull::GetDecompCovar() {
-//*******************************************************************************
+  //*******************************************************************************
 
   TH2D tempCov = TH2D(*fDecomp);
 
   for (int i = 0; i < tempCov.GetNbinsX(); i++) {
-    tempCov.GetXaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
-    tempCov.GetYaxis()->SetBinLabel(i + 1, fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetXaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
+    tempCov.GetYaxis()->SetBinLabel(i + 1,
+                                    fDataHist->GetXaxis()->GetBinLabel(i + 1));
   }
 
   tempCov.SetNameTitle((fName + "_DEC").c_str(),
@@ -829,10 +840,9 @@ TH2D ParamPull::GetDecompCovar() {
   return tempCov;
 }
 
-
 //*******************************************************************************
 void ParamPull::Write(std::string writeoptt) {
-//*******************************************************************************
+  //*******************************************************************************
 
   fDataHist->Write();
   fMCHist->Write();
@@ -846,10 +856,10 @@ void ParamPull::Write(std::string writeoptt) {
   return;
 };
 
-void ParamPull::CheckHist(TH1D* hist) {
+void ParamPull::CheckHist(TH1D *hist) {
   if (!hist) {
-    ERR(FTL) << "Can't find TH1D hist fit_dials in " << fName << std::endl;
-    ERR(FTL) << "File Entries:" << std::endl;
+    NUIS_ERR(FTL, "Can't find TH1D hist fit_dials in " << fName);
+    NUIS_ERR(FTL, "File Entries:");
     TFile *temp = new TFile(fInput.c_str(), "open");
     temp->ls();
     throw;

@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include "FitEventInputHandler.h"
 #include "GENIEInputHandler.h"
@@ -33,90 +33,90 @@
 
 namespace InputUtils {
 
-InputHandlerBase* CreateInputHandler(std::string const& handle,
+InputHandlerBase *CreateInputHandler(std::string const &handle,
                                      InputUtils::InputType inpType,
-                                     std::string const& inputs) {
-  InputHandlerBase* input = NULL;
+                                     std::string const &inputs) {
+  InputHandlerBase *input = NULL;
   std::string newinputs = InputUtils::ExpandInputDirectories(inputs);
 
   switch (inpType) {
-    case (kNEUT_Input):
+  case (kNEUT_Input):
 #ifdef __NEUT_ENABLED__
-      input = new NEUTInputHandler(handle, newinputs);
+    input = new NEUTInputHandler(handle, newinputs);
 #else
-      ERROR(FTL, "Tried to create NEUTInputHandler : "
-                     << handle << " " << inpType << " " << inputs);
-      THROW("NEUT is not enabled!");
+    NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
+                                                     << " " << inputs);
+    NUIS_ABORT("NEUT is not enabled!");
 #endif
-      break;
+    break;
 
-    case (kGENIE_Input):
+  case (kGENIE_Input):
 #ifdef __GENIE_ENABLED__
-      input = new GENIEInputHandler(handle, newinputs);
+    input = new GENIEInputHandler(handle, newinputs);
 #else
-      ERROR(FTL, "Tried to create GENIEInputHandler : "
-                     << handle << " " << inpType << " " << inputs);
-      THROW("GENIE is not enabled!");
+    NUIS_ERR(FTL, "Tried to create GENIEInputHandler : "
+                   << handle << " " << inpType << " " << inputs);
+    NUIS_ABORT("GENIE is not enabled!");
 #endif
-      break;
+    break;
 
-    case (kNUWRO_Input):
+  case (kNUWRO_Input):
 #ifdef __NUWRO_ENABLED__
-      input = new NuWroInputHandler(handle, newinputs);
+    input = new NuWroInputHandler(handle, newinputs);
 #else
-      ERROR(FTL, "Tried to create NuWroInputHandler : "
-                     << handle << " " << inpType << " " << inputs);
-      THROW("NuWro is not enabled!");
+    NUIS_ERR(FTL, "Tried to create NuWroInputHandler : "
+                   << handle << " " << inpType << " " << inputs);
+    NUIS_ABORT("NuWro is not enabled!");
 #endif
-      break;
+    break;
 
-    case (kGiBUU_Input):
+  case (kGiBUU_Input):
 #ifdef __GiBUU_ENABLED__
-      input = new GIBUUInputHandler(handle, newinputs);
+    input = new GIBUUInputHandler(handle, newinputs);
 #else
-      ERROR(FTL, "Tried to create GiBUUInputHandler : "
-                     << handle << " " << inpType << " " << inputs);
-      THROW("GiBUU is not enabled!");
+    NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
+                   << handle << " " << inpType << " " << inputs);
+    NUIS_ABORT("GiBUU is not enabled!");
 #endif
-      break;
+    break;
 
-    case (kNUANCE_Input):
+  case (kNUANCE_Input):
 #ifdef __NUANCE_ENABLED__
-      input = new NUANCEInputHandler(handle, newinputs);
+    input = new NUANCEInputHandler(handle, newinputs);
 #else
-      ERROR(FTL, "Tried to create NUANCEInputHandler : "
-                     << handle << " " << inpType << " " << inputs);
-      THROW("NUANCE is not enabled!");
+    NUIS_ERR(FTL, "Tried to create NUANCEInputHandler : "
+                   << handle << " " << inpType << " " << inputs);
+    NUIS_ABORT("NUANCE is not enabled!");
 #endif
-      break;
+    break;
 
-    case (kFEVENT_Input):
-      input = new FitEventInputHandler(handle, newinputs);
-      break;
+  case (kFEVENT_Input):
+    input = new FitEventInputHandler(handle, newinputs);
+    break;
 
-    case (kEVSPLN_Input):
-      input = new SplineInputHandler(handle, newinputs);
-      break;
+  case (kEVSPLN_Input):
+    input = new SplineInputHandler(handle, newinputs);
+    break;
 
-    case (kSIGMAQ0HIST_Input):
-      input = new SigmaQ0HistogramInputHandler(handle, newinputs);
-      break;
+  case (kSIGMAQ0HIST_Input):
+    input = new SigmaQ0HistogramInputHandler(handle, newinputs);
+    break;
 
-    case (kHISTO_Input):
-      input = new HistoInputHandler(handle, newinputs);
-      break;
+  case (kHISTO_Input):
+    input = new HistoInputHandler(handle, newinputs);
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 
   /// Input failed
   if (!input) {
-    ERR(FTL) << "Input handler creation failed!" << std::endl;
-    std::cout << "Generator Type " << inpType << " not enabled!" << std::endl;
-    throw;
+    NUIS_ABORT("Input handler creation failed!" << std::endl
+                                            << "Generator Type " << inpType
+                                            << " not enabled!");
   }
 
   return input;
 };
-}
+} // namespace InputUtils

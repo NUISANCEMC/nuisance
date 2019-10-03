@@ -16,34 +16,34 @@
  *    You should have received a copy of the GNU General Public License
  *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+#ifndef T2K_CC0PI_2DPCOS_NU_H_SEEN
+#define T2K_CC0PI_2DPCOS_NU_H_SEEN
 
-#include <iostream>
+#include "Measurement2D.h"
 
-#include "FitLogger.h"
-#include "StdHepEvt.h"
+class T2K_CC0pi_XSec_2DPcos_nu_II : public Measurement2D {
+public:
+  /// Basic Constructor.
+  T2K_CC0pi_XSec_2DPcos_nu_II(nuiskey samplekey);
 
-int main(int argv, char const *argc[]) {
-  if (argv != 2) {
-    NUIS_ABORT("[ERROR]: expected a single input GiBUU rootracker file.");
-  }
-  std::string inpf(argc[1]);
+  /// Virtual Destructor
+  ~T2K_CC0pi_XSec_2DPcos_nu_II(){};
 
-  if (!inpf.length()) {
-    NUIS_ABORT("[ERROR]: expected an input GiBUU rootracker file.");
-  }
+  /// Numu CC0PI Signal Definition
+  ///
+  /// /item
+  bool isSignal(FitEvent *nvect);
 
-  TChain tn("giRooTracker");
-  tn.AddFile(inpf.c_str());
+  /// Read histograms in a special way because format is different.
+  /// Read from
+  /// FitPar::GetDataBase()+"/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root"
+  void SetHistograms();
 
-  GiBUUStdHepReader giRead;
-  bool ok = giRead.SetBranchAddresses(&tn);
+  /// Bin Tmu CosThetaMu
+  void FillEventVariables(FitEvent *customEvent);
 
-  if (!ok) {
-    NUIS_ABORT("[ERROR]: Could not correctly set branch address for input file.");
-  }
+private:
+  bool fIsSystCov, fIsStatCov, fIsNormCov;
+};
 
-  for (Long64_t ievt = 0; ievt < tn.GetEntries(); ++ievt) {
-    tn.GetEntry(ievt);
-    NUIS_LOG(EVT, WriteGiBUUEvent(giRead));
-  }
-}
+#endif

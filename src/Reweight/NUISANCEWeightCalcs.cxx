@@ -9,7 +9,7 @@ using namespace Reweight;
 
 ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
 
-double ModeNormCalc::CalcWeight(BaseFitEvt* evt) {
+double ModeNormCalc::CalcWeight(BaseFitEvt *evt) {
   int mode = abs(evt->Mode);
   double w = 1.0;
 
@@ -28,21 +28,25 @@ void ModeNormCalc::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
 
   // Check Handled
-  if (!IsHandled(curenum)) return;
-  if (curenum == kModeNorm_NormRES) fNormRES = val;
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kModeNorm_NormRES)
+    fNormRES = val;
 }
 
 bool ModeNormCalc::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kModeNorm_NormRES:
-      return true;
-    default:
-      return false;
+  case kModeNorm_NormRES:
+    return true;
+  default:
+    return false;
   }
 }
 
-BeRPACalc::BeRPACalc() : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_E(0.88), fBeRPA_U(1.2), nParams(0) { 
+BeRPACalc::BeRPACalc()
+    : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_E(0.88),
+      fBeRPA_U(1.2), nParams(0) {
   // A = 0.59 +/- 20%
   // B = 1.05 +/- 20%
   // D = 1.13 +/- 15%
@@ -50,8 +54,8 @@ BeRPACalc::BeRPACalc() : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_
   // U = 1.2
 }
 
-double BeRPACalc::CalcWeight(BaseFitEvt* evt) {
-  FitEvent* fevt = static_cast<FitEvent*>(evt);
+double BeRPACalc::CalcWeight(BaseFitEvt *evt) {
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
   int mode = abs(evt->Mode);
   double w = 1.0;
   if (nParams == 0) {
@@ -61,8 +65,10 @@ double BeRPACalc::CalcWeight(BaseFitEvt* evt) {
   // Get Q2
   // Get final state lepton
   if (mode == 1) {
-    double Q2 = -1.0*(fevt->GetHMFSAnyLeptons()->P4()-fevt->GetNeutrinoIn()->P4())*(fevt->GetHMFSAnyLeptons()->P4()-fevt->GetNeutrinoIn()->P4())/1.E6;
-  // Only CCQE events
+    double Q2 =
+        -1.0 * (fevt->GetHMFSAnyLeptons()->P4() - fevt->GetNeutrinoIn()->P4()) *
+        (fevt->GetHMFSAnyLeptons()->P4() - fevt->GetNeutrinoIn()->P4()) / 1.E6;
+    // Only CCQE events
     w *= calcRPA(Q2, fBeRPA_A, fBeRPA_B, fBeRPA_D, fBeRPA_E, fBeRPA_U);
   }
 
@@ -77,27 +83,33 @@ void BeRPACalc::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
 
   // Check Handled
-  if (!IsHandled(curenum)) return;
+  if (!IsHandled(curenum))
+    return;
   // Need 4 or 5 reconfigures
-  if      (curenum == kBeRPA_A) fBeRPA_A = val;
-  else if (curenum == kBeRPA_B) fBeRPA_B = val;
-  else if (curenum == kBeRPA_D) fBeRPA_D = val;
-  else if (curenum == kBeRPA_E) fBeRPA_E = val;
-  else if (curenum == kBeRPA_U) fBeRPA_U = val;
+  if (curenum == kBeRPA_A)
+    fBeRPA_A = val;
+  else if (curenum == kBeRPA_B)
+    fBeRPA_B = val;
+  else if (curenum == kBeRPA_D)
+    fBeRPA_D = val;
+  else if (curenum == kBeRPA_E)
+    fBeRPA_E = val;
+  else if (curenum == kBeRPA_U)
+    fBeRPA_U = val;
   nParams++;
 }
 
 bool BeRPACalc::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kBeRPA_A:
-    case kBeRPA_B:
-    case kBeRPA_D:
-    case kBeRPA_E:
-    case kBeRPA_U:
-      return true;
-    default:
-      return false;
+  case kBeRPA_A:
+  case kBeRPA_B:
+  case kBeRPA_D:
+  case kBeRPA_E:
+  case kBeRPA_U:
+    return true;
+  default:
+    return false;
   }
 }
 
@@ -107,10 +119,10 @@ SBLOscWeightCalc::SBLOscWeightCalc() {
   fSin2Theta = 0.0;
 }
 
-double SBLOscWeightCalc::CalcWeight(BaseFitEvt* evt) {
-  FitEvent* fevt = static_cast<FitEvent*>(evt);
+double SBLOscWeightCalc::CalcWeight(BaseFitEvt *evt) {
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
 
-  FitParticle* pnu = fevt->PartInfo(0);
+  FitParticle *pnu = fevt->PartInfo(0);
   double E = pnu->fP.E() / 1.E3;
 
   // Extract energy
@@ -123,28 +135,33 @@ void SBLOscWeightCalc::SetDialValue(std::string name, double val) {
 
 void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
-  if (!IsHandled(curenum)) return;
-  if (curenum == kSBLOsc_Distance) fDistance = val;
-  if (curenum == kSBLOsc_MassSplitting) fMassSplitting = val;
-  if (curenum == kSBLOsc_Sin2Theta) fSin2Theta = val;
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kSBLOsc_Distance)
+    fDistance = val;
+  if (curenum == kSBLOsc_MassSplitting)
+    fMassSplitting = val;
+  if (curenum == kSBLOsc_Sin2Theta)
+    fSin2Theta = val;
 }
 
 bool SBLOscWeightCalc::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kSBLOsc_Distance:
-      return true;
-    case kSBLOsc_MassSplitting:
-      return true;
-    case kSBLOsc_Sin2Theta:
-      return true;
-    default:
-      return false;
+  case kSBLOsc_Distance:
+    return true;
+  case kSBLOsc_MassSplitting:
+    return true;
+  case kSBLOsc_Sin2Theta:
+    return true;
+  default:
+    return false;
   }
 }
 
 double SBLOscWeightCalc::GetSBLOscWeight(double E) {
-  if (E <= 0.0) return 1.0 - 0.5 * fSin2Theta;
+  if (E <= 0.0)
+    return 1.0 - 0.5 * fSin2Theta;
   return 1.0 - fSin2Theta * pow(sin(1.267 * fMassSplitting * fDistance / E), 2);
 }
 
@@ -198,20 +215,20 @@ GaussianModeCorr::GaussianModeCorr() {
   fAllowSuppression = false;
 
   fDebugStatements = FitPar::Config().GetParB("GaussianModeCorr_DEBUG");
-  //fDebugStatements = true;
+  // fDebugStatements = true;
 }
 
-double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
-  FitEvent* fevt = static_cast<FitEvent*>(evt);
+double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
   double rw_weight = 1.0;
 
   // Get Neutrino
   if (!fevt->Npart()) {
-    THROW("NO particles found in stack!");
+    NUIS_ABORT("NO particles found in stack!");
   }
-  FitParticle* pnu = fevt->GetHMISAnyLeptons();
+  FitParticle *pnu = fevt->GetHMISAnyLeptons();
   if (!pnu) {
-    THROW("NO Starting particle found in stack!");
+    NUIS_ABORT("NO Starting particle found in stack!");
   }
   int pdgnu = pnu->fPID;
 
@@ -223,8 +240,9 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
     expect_fsleppdg = abs(pdgnu) - 1;
   }
 
-  FitParticle* plep = fevt->GetHMFSParticle(expect_fsleppdg);
-  if (!plep) return 1.0;
+  FitParticle *plep = fevt->GetHMFSParticle(expect_fsleppdg);
+  if (!plep)
+    return 1.0;
 
   TLorentzVector q = pnu->fP - plep->fP;
 
@@ -238,50 +256,60 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
     int nne = 0;
 
     for (UInt_t j = 0; j < fevt->Npart(); j++) {
-      if ((fevt->PartInfo(j))->fIsAlive) continue;
+      if ((fevt->PartInfo(j))->fIsAlive)
+        continue;
 
-      if (fevt->PartInfo(j)->fPID == 2212) 
+      if (fevt->PartInfo(j)->fPID == 2212)
         npr++;
-      else if (fevt->PartInfo(j)->fPID == 2112) 
+      else if (fevt->PartInfo(j)->fPID == 2112)
         nne++;
     }
 
     if (fevt->Mode == 2 && npr == 1 && nne == 1) {
       initialstate = 2;
 
-    } else if (fevt->Mode == 2 && ((npr == 0 && nne == 2) || (npr == 2 && nne == 0)))  {
+    } else if (fevt->Mode == 2 &&
+               ((npr == 0 && nne == 2) || (npr == 2 && nne == 0))) {
       initialstate = 1;
     }
   }
 
-
   // Apply weighting
   if (fApply_CCQE && abs(fevt->Mode) == 1) {
-    if (fDebugStatements) std::cout << "Getting CCQE Weight" << std::endl;
+    if (fDebugStatements)
+      std::cout << "Getting CCQE Weight" << std::endl;
     double g = GetGausWeight(q0, q3, fGausVal_CCQE);
-    if (g < 1.0) g = 1.0;
+    if (g < 1.0)
+      g = 1.0;
     rw_weight *= g;
   }
 
   if (fApply_2p2h && abs(fevt->Mode) == 2) {
-    if (fDebugStatements) std::cout << "Getting 2p2h Weight" << std::endl;
-    if (fDebugStatements) std::cout << "Got q0 q3 = " << q0 << " " << q3 << " mode = " << fevt->Mode << std::endl;
+    if (fDebugStatements)
+      std::cout << "Getting 2p2h Weight" << std::endl;
+    if (fDebugStatements)
+      std::cout << "Got q0 q3 = " << q0 << " " << q3 << " mode = " << fevt->Mode
+                << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h);
-    if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
+    if (fDebugStatements)
+      std::cout << "Returning Weight " << rw_weight << std::endl;
   }
 
   if (fApply_2p2h_PPandNN && abs(fevt->Mode) == 2 && initialstate == 1) {
-    if (fDebugStatements) std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
+    if (fDebugStatements)
+      std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_PPandNN);
   }
 
   if (fApply_2p2h_NP && abs(fevt->Mode) == 2 && initialstate == 2) {
-    if (fDebugStatements) std::cout << "Getting 2p2h NP Weight" << std::endl;
+    if (fDebugStatements)
+      std::cout << "Getting 2p2h NP Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_NP);
   }
 
   if (fApply_CC1pi && abs(fevt->Mode) >= 11 && abs(fevt->Mode) <= 13) {
-    if (fDebugStatements) std::cout << "Getting CC1pi Weight" << std::endl;
+    if (fDebugStatements)
+      std::cout << "Getting CC1pi Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_CC1pi);
   }
 
@@ -291,9 +319,10 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt* evt) {
 void GaussianModeCorr::SetMethod(bool method) {
   fMethod = method;
   if (fMethod == true) {
-    LOG(FIT) << " Using tilt-shift Gaussian parameters for Gaussian enhancement..." << std::endl;
+    NUIS_LOG(FIT,
+         " Using tilt-shift Gaussian parameters for Gaussian enhancement...");
   } else {
-    LOG(FIT) << " Using Normal Gaussian parameters for Gaussian enhancement..." << std::endl;
+    NUIS_LOG(FIT, " Using Normal Gaussian parameters for Gaussian enhancement...");
   }
 };
 
@@ -347,9 +376,11 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
     w *= exp(-c * (q3 - Pq3) * (q3 - Pq3));
 
     if (fDebugStatements) {
-      std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " " << sin(Tilt) << std::endl;
+      std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " "
+                << sin(Tilt) << std::endl;
       std::cout << "abc = " << a << " " << b << " " << c << std::endl;
-      std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " " << Pq3 << " " << Wq3 << " " << w << std::endl;
+      std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " "
+                << Pq3 << " " << Wq3 << " " << w << std::endl;
     }
 
     if (w != w || std::isnan(w) || w < 0.0) {
@@ -364,7 +395,8 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
   } else {
     /*
      * From MINERvA and Daniel Ruterbories:
-     * Old notes here: * http://cdcvs.fnal.gov/cgi-bin/public-cvs/cvsweb-public.cgi/AnalysisFramework/Ana/CCQENu/ana_common/data/?cvsroot=mnvsoft
+     * Old notes here: *
+     * http://cdcvs.fnal.gov/cgi-bin/public-cvs/cvsweb-public.cgi/AnalysisFramework/Ana/CCQENu/ana_common/data/?cvsroot=mnvsoft
      * These parameters are slightly altered
      *
      * FRESH:
@@ -386,12 +418,12 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
     double sigmaq3 = vals[kPosPq3];
     double corr = vals[kPosWq3];
 
-    double z = (q0 - meanq0)*(q0 - meanq0) /sigmaq0/sigmaq0
-      + (q3 - meanq3)*(q3 - meanq3) / sigmaq3/sigmaq3
-      - 2*corr*(q0-meanq0)*(q3-meanq3)/ (sigmaq0 * sigmaq3);
+    double z = (q0 - meanq0) * (q0 - meanq0) / sigmaq0 / sigmaq0 +
+               (q3 - meanq3) * (q3 - meanq3) / sigmaq3 / sigmaq3 -
+               2 * corr * (q0 - meanq0) * (q3 - meanq3) / (sigmaq0 * sigmaq3);
 
-    double ret = norm*exp( -0.5 * z / (1 - corr*corr) );
-    //Need to add 1 to the results
+    double ret = norm * exp(-0.5 * z / (1 - corr * corr));
+    // Need to add 1 to the results
     w = 1.0 + ret;
   }
 
@@ -406,7 +438,8 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
 
   // Check Handled
-  if (!IsHandled(curenum)) return;
+  if (!IsHandled(curenum))
+    return;
 
   // CCQE Setting
   for (int i = kGaussianCorr_CCQE_norm; i <= kGaussianCorr_CCQE_Wq3; i++) {
@@ -427,7 +460,8 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   }
 
   // 2p2h_PPandNN Setting
-  for (int i = kGaussianCorr_2p2h_PPandNN_norm; i <= kGaussianCorr_2p2h_PPandNN_Wq3; i++) {
+  for (int i = kGaussianCorr_2p2h_PPandNN_norm;
+       i <= kGaussianCorr_2p2h_PPandNN_Wq3; i++) {
     if (i == curenum) {
       int index = i - kGaussianCorr_2p2h_PPandNN_norm;
       fGausVal_2p2h_PPandNN[index] = val;
@@ -436,7 +470,8 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   }
 
   // 2p2h_NP Setting
-  for (int i = kGaussianCorr_2p2h_NP_norm; i <= kGaussianCorr_2p2h_NP_Wq3; i++) {
+  for (int i = kGaussianCorr_2p2h_NP_norm; i <= kGaussianCorr_2p2h_NP_Wq3;
+       i++) {
     if (i == curenum) {
       int index = i - kGaussianCorr_2p2h_NP_norm;
       fGausVal_2p2h_NP[index] = val;
@@ -461,43 +496,43 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
 bool GaussianModeCorr::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-    case kGaussianCorr_CCQE_norm:
-    case kGaussianCorr_CCQE_tilt:
-    case kGaussianCorr_CCQE_Pq0:
-    case kGaussianCorr_CCQE_Wq0:
-    case kGaussianCorr_CCQE_Pq3:
-    case kGaussianCorr_CCQE_Wq3:
+  case kGaussianCorr_CCQE_norm:
+  case kGaussianCorr_CCQE_tilt:
+  case kGaussianCorr_CCQE_Pq0:
+  case kGaussianCorr_CCQE_Wq0:
+  case kGaussianCorr_CCQE_Pq3:
+  case kGaussianCorr_CCQE_Wq3:
 
-    case kGaussianCorr_2p2h_norm:
-    case kGaussianCorr_2p2h_tilt:
-    case kGaussianCorr_2p2h_Pq0:
-    case kGaussianCorr_2p2h_Wq0:
-    case kGaussianCorr_2p2h_Pq3:
-    case kGaussianCorr_2p2h_Wq3:
+  case kGaussianCorr_2p2h_norm:
+  case kGaussianCorr_2p2h_tilt:
+  case kGaussianCorr_2p2h_Pq0:
+  case kGaussianCorr_2p2h_Wq0:
+  case kGaussianCorr_2p2h_Pq3:
+  case kGaussianCorr_2p2h_Wq3:
 
-    case kGaussianCorr_2p2h_PPandNN_norm:
-    case kGaussianCorr_2p2h_PPandNN_tilt:
-    case kGaussianCorr_2p2h_PPandNN_Pq0:
-    case kGaussianCorr_2p2h_PPandNN_Wq0:
-    case kGaussianCorr_2p2h_PPandNN_Pq3:
-    case kGaussianCorr_2p2h_PPandNN_Wq3:
+  case kGaussianCorr_2p2h_PPandNN_norm:
+  case kGaussianCorr_2p2h_PPandNN_tilt:
+  case kGaussianCorr_2p2h_PPandNN_Pq0:
+  case kGaussianCorr_2p2h_PPandNN_Wq0:
+  case kGaussianCorr_2p2h_PPandNN_Pq3:
+  case kGaussianCorr_2p2h_PPandNN_Wq3:
 
-    case kGaussianCorr_2p2h_NP_norm:
-    case kGaussianCorr_2p2h_NP_tilt:
-    case kGaussianCorr_2p2h_NP_Pq0:
-    case kGaussianCorr_2p2h_NP_Wq0:
-    case kGaussianCorr_2p2h_NP_Pq3:
-    case kGaussianCorr_2p2h_NP_Wq3:
+  case kGaussianCorr_2p2h_NP_norm:
+  case kGaussianCorr_2p2h_NP_tilt:
+  case kGaussianCorr_2p2h_NP_Pq0:
+  case kGaussianCorr_2p2h_NP_Wq0:
+  case kGaussianCorr_2p2h_NP_Pq3:
+  case kGaussianCorr_2p2h_NP_Wq3:
 
-    case kGaussianCorr_CC1pi_norm:
-    case kGaussianCorr_CC1pi_tilt:
-    case kGaussianCorr_CC1pi_Pq0:
-    case kGaussianCorr_CC1pi_Wq0:
-    case kGaussianCorr_CC1pi_Pq3:
-    case kGaussianCorr_CC1pi_Wq3:
-    case kGaussianCorr_AllowSuppression:
-      return true;
-    default:
-      return false;
+  case kGaussianCorr_CC1pi_norm:
+  case kGaussianCorr_CC1pi_tilt:
+  case kGaussianCorr_CC1pi_Pq0:
+  case kGaussianCorr_CC1pi_Wq0:
+  case kGaussianCorr_CC1pi_Pq3:
+  case kGaussianCorr_CC1pi_Wq3:
+  case kGaussianCorr_AllowSuppression:
+    return true;
+  default:
+    return false;
   }
 }

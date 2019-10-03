@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "BayesianRoutines.h"
 
 void BayesianRoutines::Init() {
@@ -34,16 +34,14 @@ void BayesianRoutines::Init() {
 
   fFakeDataInput = "";
 
-  fSampleFCN    = NULL;
+  fSampleFCN = NULL;
 
   fAllowedRoutines = ("f");
-
 };
 
-BayesianRoutines::~BayesianRoutines() {
-};
+BayesianRoutines::~BayesianRoutines(){};
 
-BayesianRoutines::BayesianRoutines(int argc, char* argv[]) {
+BayesianRoutines::BayesianRoutines(int argc, char *argv[]) {
 
   // Initialise Defaults
   Init();
@@ -74,17 +72,15 @@ BayesianRoutines::BayesianRoutines(int argc, char* argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    ERR(FTL) << "No input supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -96,12 +92,15 @@ BayesianRoutines::BayesianRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
-  if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
+  if (!fCardFile.empty())
+    fCompKey.Set("cardfile", fCardFile);
+  if (!fOutputFile.empty())
+    fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())
+    fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
+  configuration.LoadSettings(fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
@@ -124,10 +123,12 @@ BayesianRoutines::BayesianRoutines(int argc, char* argv[]) {
   // Proper Setup
   if (fStrategy.find("ErrorBands") != std::string::npos ||
       fStrategy.find("MergeErrors") != std::string::npos) {
-    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+    fOutputRootFile =
+        new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
   }
 
-  //  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+  //  fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(),
+  //  "RECREATE");
   SetupSystematicsFromXML();
 
   SetupRWEngine();
@@ -138,12 +139,12 @@ BayesianRoutines::BayesianRoutines(int argc, char* argv[]) {
 
 void BayesianRoutines::SetupSystematicsFromXML() {
 
-  LOG(FIT) << "Setting up nuismin" << std::endl;
+  NUIS_LOG(FIT, "Setting up nuismin");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -151,24 +152,20 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      ERR(FTL) << "No type given for parameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No type given for parameter " << i);
     } else if (!key.Has("name")) {
-      ERR(FTL) << "No name given for parameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No name given for parameter " << i);
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No nominal given for parameter " << i);
     }
 
     // Get Inputs
     std::string partype = key.GetS("type");
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nominal");
-    double parlow  = parnom - 1;
+    double parnom = key.GetD("nominal");
+    double parlow = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
-
 
     // Override if state not given
     if (!key.Has("state")) {
@@ -179,61 +176,57 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     // Extra limits
     if (key.Has("low")) {
-      parlow  = key.GetD("low");
+      parlow = key.GetD("low");
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      LOG(FIT) << "Read " << partype << " : "
-               << parname << " = "
-               << parnom << " : "
-               << parlow << " < p < " << parhigh
-               << " : " << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parlow << " < p < " << parhigh << " : "
+                        << parstate);
     } else {
-      LOG(FIT) << "Read " << partype << " : "
-               << parname << " = "
-               << parnom << " : "
-               << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parstate);
     }
 
     // Run Parameter Conversion if needed
     if (parstate.find("ABS") != std::string::npos) {
-      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+      parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
+      parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
     } else if (parstate.find("FRAC") != std::string::npos) {
-      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+      parnom = FitBase::RWFracToSigma(partype, parname, parnom);
+      parlow = FitBase::RWFracToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWFracToSigma(partype, parname, parstep);
     }
 
     // Push into vectors
     fParams.push_back(parname);
 
-    fTypeVals[parname]  = FitBase::ConvDialType(partype);;
+    fTypeVals[parname] = FitBase::ConvDialType(partype);
+    ;
     fStartVals[parname] = parnom;
-    fCurVals[parname]   = parnom;
+    fCurVals[parname] = parnom;
 
     fErrorVals[parname] = 0.0;
 
-    fStateVals[parname]    = parstate;
+    fStateVals[parname] = parstate;
     bool fixstate = parstate.find("FIX") != std::string::npos;
-    fFixVals[parname]      = fixstate;
+    fFixVals[parname] = fixstate;
     fStartFixVals[parname] = fFixVals[parname];
 
-    fMinVals[parname]  = parlow;
-    fMaxVals[parname]  = parhigh;
+    fMinVals[parname] = parlow;
+    fMaxVals[parname] = parhigh;
     fStepVals[parname] = parstep;
-
   }
 
   // Setup Samples ----------------------------------------------
-  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of samples : " << samplekeys.size());
   } else {
-    ERR(WRN) <<  "NO SAMPLES LOADED" << std::endl;
+    NUIS_ERR(WRN, "NO SAMPLES LOADED");
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -243,18 +236,15 @@ void BayesianRoutines::SetupSystematicsFromXML() {
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
 
-    std::string sampletype =
-      key.Has("type") ? key.GetS("type") : "DEFAULT";
+    std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
 
-    double samplenorm =
-      key.Has("norm") ? key.GetD("norm") : 1.0;
+    double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    LOG(FIT) << "Read sample info " << i << " : "
-             << samplename << std::endl
-             << "\t\t input -> " << samplefile  << std::endl
-             << "\t\t state -> " << sampletype << std::endl
-             << "\t\t norm  -> " << samplenorm << std::endl;
+    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
+                                  << "\t\t input -> " << samplefile << std::endl
+                                  << "\t\t state -> " << sampletype << std::endl
+                                  << "\t\t norm  -> " << samplenorm);
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
@@ -278,19 +268,19 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     fErrorVals[normname] = 0.0;
 
-    fMinVals[normname]  = 0.1;
-    fMaxVals[normname]  = 10.0;
+    fMinVals[normname] = 0.1;
+    fMaxVals[normname] = 10.0;
     fStepVals[normname] = 0.5;
 
     bool state = sampletype.find("FREE") == std::string::npos;
-    fFixVals[normname]      = state;
+    fFixVals[normname] = state;
     fStartFixVals[normname] = state;
   }
 
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    LOG(FIT) << "Number of fake parameters : " << fakekeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -298,16 +288,15 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      ERR(FTL) << "No name given for fakeparameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No name given for fakeparameter " << i);
+
     } else if (!key.Has("nom")) {
-      ERR(FTL) << "No nominal given for fakeparameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No nominal given for fakeparameter " << i);
     }
 
     // Get Inputs
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nom");
+    double parnom = key.GetD("nom");
 
     // Push into vectors
     fFakeVals[parname] = parnom;
@@ -319,11 +308,11 @@ void BayesianRoutines::SetupSystematicsFromXML() {
 */
 //*************************************
 void BayesianRoutines::SetupRWEngine() {
-//*************************************
+  //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
-    FitBase::GetRW() -> IncludeDial(name, fTypeVals.at(name) );
+    FitBase::GetRW()->IncludeDial(name, fTypeVals.at(name));
   }
   UpdateRWEngine(fStartVals);
 
@@ -332,10 +321,11 @@ void BayesianRoutines::SetupRWEngine() {
 
 //*************************************
 void BayesianRoutines::SetupFCN() {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Making the jointFCN" << std::endl;
-  if (fSampleFCN) delete fSampleFCN;
+  NUIS_LOG(FIT, "Making the jointFCN");
+  if (fSampleFCN)
+    delete fSampleFCN;
   fSampleFCN = new JointFCN(fOutputRootFile);
 
   fInputThrows = fSampleFCN->GetPullList();
@@ -347,13 +337,15 @@ void BayesianRoutines::SetupFCN() {
   Fitting Functions
 */
 //*************************************
-void BayesianRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals) {
-//*************************************
+void BayesianRoutines::UpdateRWEngine(
+    std::map<std::string, double> &updateVals) {
+  //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
 
-    if (updateVals.find(name) == updateVals.end()) continue;
+    if (updateVals.find(name) == updateVals.end())
+      continue;
     FitBase::GetRW()->SetDialValue(name, updateVals.at(name));
   }
 
@@ -363,7 +355,7 @@ void BayesianRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals)
 
 //*************************************
 void BayesianRoutines::ThrowParameters() {
-//*************************************
+  //*************************************
 
   // Set fThrownVals to all values in currentVals
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -373,7 +365,7 @@ void BayesianRoutines::ThrowParameters() {
 
   for (PullListConstIter iter = fInputThrows.begin();
        iter != fInputThrows.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
 
     pull->ThrowCovariance();
     TH1D dialhist = pull->GetDataHist();
@@ -387,7 +379,6 @@ void BayesianRoutines::ThrowParameters() {
 
     // Reset throw incase pulls are calculated.
     pull->ResetToy();
-
   }
 
   // Now update Parameters
@@ -396,7 +387,7 @@ void BayesianRoutines::ThrowParameters() {
   // Update Pulls
   for (PullListConstIter iter = fInputThrows.begin();
        iter != fInputThrows.end(); iter++) {
-    ParamPull* pull = *iter;
+    ParamPull *pull = *iter;
     pull->Reconfigure();
   }
 
@@ -405,7 +396,7 @@ void BayesianRoutines::ThrowParameters() {
 
 //*************************************
 void BayesianRoutines::Run() {
-//*************************************
+  //*************************************
 
   std::cout << "Running routines " << std::endl;
   fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
@@ -413,10 +404,13 @@ void BayesianRoutines::Run() {
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
 
     std::string routine = fRoutines.at(i);
-    LOG(FIT) << "Running Routine: " << routine << std::endl;
+    NUIS_LOG(FIT, "Running Routine: " << routine);
 
-    if (!routine.compare("BayesianThrows")) GenerateThrows();
-    else THROW("UNKNOWN ROUTINE " << routine);
+    if (!routine.compare("BayesianThrows"))
+      GenerateThrows();
+    else {
+      NUIS_ABORT("UNKNOWN ROUTINE " << routine);
+    }
   }
 
   return;
@@ -424,10 +418,11 @@ void BayesianRoutines::Run() {
 
 //*************************************
 void BayesianRoutines::GenerateThrows() {
-//*************************************
+  //*************************************
 
   // Create a new output file
-  TFile* outfile = new TFile((fOutputFile + ".throws.root").c_str(), "RECREATE");
+  TFile *outfile =
+      new TFile((fOutputFile + ".throws.root").c_str(), "RECREATE");
   outfile->cd();
 
   int nthrows = fNThrows;
@@ -436,14 +431,15 @@ void BayesianRoutines::GenerateThrows() {
   // Matteo Mazzanti's Fix
   struct timeval mytime;
   gettimeofday(&mytime, NULL);
-  Double_t seed = time(NULL) + int(getpid()) + (mytime.tv_sec * 1000.) + (mytime.tv_usec / 1000.);
+  Double_t seed = time(NULL) + int(getpid()) + (mytime.tv_sec * 1000.) +
+                  (mytime.tv_usec / 1000.);
   gRandom->SetSeed(seed);
-  LOG(FIT) << "Using Seed : " << seed << std::endl;
-  LOG(FIT) << "nthrows = " << nthrows << std::endl;
+  NUIS_LOG(FIT, "Using Seed : " << seed);
+  NUIS_LOG(FIT, "nthrows = " << nthrows);
 
   // Run the Initial Reconfigure
-  LOG(FIT) << "Making nominal prediction " << std::endl;
-  TDirectory* nominal = (TDirectory*) outfile->mkdir("nominal");
+  NUIS_LOG(FIT, "Making nominal prediction ");
+  TDirectory *nominal = (TDirectory *)outfile->mkdir("nominal");
   nominal->cd();
   UpdateRWEngine(fStartVals);
   fSampleFCN->ReconfigureUsingManager();
@@ -453,43 +449,45 @@ void BayesianRoutines::GenerateThrows() {
   fSampleFCN->CreateIterationTree("error_iterations", FitBase::GetRW());
 
   // Create a new iteration TTree
-  TTree* LIKETREE = new TTree("likelihood", "likelihood");
+  TTree *LIKETREE = new TTree("likelihood", "likelihood");
   std::vector<std::string> likenames = fSampleFCN->GetAllNames();
-  std::vector<double>      likevals  = fSampleFCN->GetAllLikelihoods();
-  std::vector<int>         likendof  = fSampleFCN->GetAllNDOF();
-  double* LIKEVALS = new double[likevals.size()];
-  int* LIKENDOF = new int[likendof.size()];
+  std::vector<double> likevals = fSampleFCN->GetAllLikelihoods();
+  std::vector<int> likendof = fSampleFCN->GetAllNDOF();
+  double *LIKEVALS = new double[likevals.size()];
+  int *LIKENDOF = new int[likendof.size()];
 
   for (size_t i = 0; i < likendof.size(); i++) {
-    LIKETREE->Branch( (likenames[i] + "_likelihood"  ).c_str(), &LIKEVALS[i], 
-                      (likenames[i] + "_likelihood/D").c_str() );
-    LIKETREE->Branch( (likenames[i] + "_ndof"  ).c_str(),       &LIKENDOF[i], 
-                      (likenames[i] + "_ndof/I").c_str()       );
+    LIKETREE->Branch((likenames[i] + "_likelihood").c_str(), &LIKEVALS[i],
+                     (likenames[i] + "_likelihood/D").c_str());
+    LIKETREE->Branch((likenames[i] + "_ndof").c_str(), &LIKENDOF[i],
+                     (likenames[i] + "_ndof/I").c_str());
     LIKENDOF[i] = likendof[i];
   }
 
-  likenames .clear();
-  likevals  .clear();
-  likendof  .clear();
+  likenames.clear();
+  likevals.clear();
+  likendof.clear();
 
-  double* PARAMVALS = new double[fParams.size()];
-  for (size_t i = 0; i < fParams.size(); i++){
-    LIKETREE->Branch( fParams[i].c_str(), &PARAMVALS[i], (fParams[i] + "/D").c_str() );
+  double *PARAMVALS = new double[fParams.size()];
+  for (size_t i = 0; i < fParams.size(); i++) {
+    LIKETREE->Branch(fParams[i].c_str(), &PARAMVALS[i],
+                     (fParams[i] + "/D").c_str());
   }
 
   // Run Throws and save
   for (Int_t i = 0; i < nthrows; i++) {
 
     // Skip the start throw
-    if (i == 0) continue;
-    LOG(FIT) << "Throw " << i << " ================================" << std::endl;
+    if (i == 0)
+      continue;
+    NUIS_LOG(FIT, "Throw " << i << " ================================");
 
     // Throw Parameters
     ThrowParameters();
     FitBase::GetRW()->Print();
 
     // Get Parameter Values
-    for (size_t i = 0; i < fParams.size(); i++){
+    for (size_t i = 0; i < fParams.size(); i++) {
       PARAMVALS[i] = fThrownVals[fParams[i]];
     }
 
@@ -507,8 +505,7 @@ void BayesianRoutines::GenerateThrows() {
 
     // Save the FCN
     // if (fSavePredictions){ SaveSamplePredictions(); }
-    LOG(FIT) << "END OF THROW ================================" << std::endl;
-
+    NUIS_LOG(FIT, "END OF THROW ================================");
   }
 
   // Finish up

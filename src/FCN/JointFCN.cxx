@@ -79,7 +79,7 @@ JointFCN::~JointFCN() {
 void JointFCN::CreateIterationTree(std::string name, FitWeight *rw) {
   //***************************************************
 
-  LOG(FIT) << " Creating new iteration container! " << std::endl;
+  NUIS_LOG(FIT, " Creating new iteration container! ");
   DestroyIterationTree();
   fIterationTreeName = name;
 
@@ -150,7 +150,7 @@ void JointFCN::DestroyIterationTree() {
 //***************************************************
 void JointFCN::WriteIterationTree() {
   //***************************************************
-  LOG(FIT) << "Writing iteration tree" << std::endl;
+  NUIS_LOG(FIT, "Writing iteration tree");
 
   // Make a new TTree
   TTree *itree =
@@ -232,11 +232,11 @@ double JointFCN::DoEval(const double *x) {
   fNDOF = GetNDOF();
 
   // PRINT PROGRESS
-  LOG(FIT) << "Current Stat (iter. " << this->fCurIter << ") = " << fLikelihood
-           << std::endl;
+  NUIS_LOG(FIT, "Current Stat (iter. " << this->fCurIter << ") = " << fLikelihood);
 
   // UPDATE TREE
-  if (fIterationTree) FillIterationTree(FitBase::GetRW());
+  if (fIterationTree)
+    FillIterationTree(FitBase::GetRW());
 
   return fLikelihood;
 }
@@ -290,9 +290,9 @@ int JointFCN::GetNDOF() {
 double JointFCN::GetLikelihood() {
   //***************************************************
 
-  LOG(MIN) << std::left << std::setw(43) << "Getting likelihoods..."
-           << " : "
-           << "-2logL" << std::endl;
+  NUIS_LOG(MIN, std::left << std::setw(43) << "Getting likelihoods..."
+                      << " : "
+                      << "-2logL");
 
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
@@ -307,8 +307,8 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : "
-             << newlike << "/" << ndof << std::endl;
+    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+                    << newlike << "/" << ndof);
 
     // Add Weight Scaling
     // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
@@ -343,7 +343,7 @@ double JointFCN::GetLikelihood() {
 };
 
 void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
-  LOG(MIN) << "Loading Samples : " << samplekeys.size() << std::endl;
+  NUIS_LOG(MIN, "Loading Samples : " << samplekeys.size());
   for (size_t i = 0; i < samplekeys.size(); i++) {
     nuiskey key = samplekeys[i];
 
@@ -353,15 +353,14 @@ void JointFCN::LoadSamples(std::vector<nuiskey> samplekeys) {
     std::string sampletype = key.GetS("type");
     std::string fakeData = "";
 
-    LOG(MIN) << "Loading Sample : " << samplename << std::endl;
+    NUIS_LOG(MIN, "Loading Sample : " << samplename);
 
     fOutputDir->cd();
     MeasurementBase *NewLoadedSample = SampleUtils::CreateSample(key);
 
     if (!NewLoadedSample) {
-      ERR(FTL) << "Could not load sample provided: " << samplename << std::endl;
-      ERR(FTL) << "Check spelling with that in src/FCN/SampleList.cxx"
-               << std::endl;
+      NUIS_ERR(FTL, "Could not load sample provided: " << samplename);
+      NUIS_ERR(FTL, "Check spelling with that in src/FCN/SampleList.cxx");
       throw;
     } else {
       fSamples.push_back(NewLoadedSample);
@@ -389,7 +388,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   //***************************************************
 
   int starttime = time(NULL);
-  LOG(REC) << "Starting Reconfigure iter. " << this->fCurIter << std::endl;
+  NUIS_LOG(REC, "Starting Reconfigure iter. " << this->fCurIter);
   // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled <<
   // std::endl;
   // Event Manager Reconf
@@ -426,8 +425,8 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   }
 
   fMCFilled = true;
-  LOG(MIN) << "Finished Reconfigure iter. " << fCurIter << " in "
-           << time(NULL) - starttime << "s" << std::endl;
+  NUIS_LOG(MIN, "Finished Reconfigure iter. " << fCurIter << " in "
+                                          << time(NULL) - starttime << "s");
 
   fCurIter++;
 }
@@ -491,7 +490,7 @@ void JointFCN::ReconfigureUsingManager() {
   //***************************************************
 
   // 'Slow' Event Manager Reconfigure
-  LOG(REC) << "Event Manager Reconfigure" << std::endl;
+  NUIS_LOG(REC, "Event Manager Reconfigure");
   int timestart = time(NULL);
 
   // Reset all samples
@@ -563,7 +562,7 @@ void JointFCN::ReconfigureUsingManager() {
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
-          QLOG(REC, curinput->GetName()
+          NUIS_LOG(REC, curinput->GetName()
                         << " : Processed " << i << " events. [M, W] = ["
                         << curevent->Mode << ", " << curevent->Weight << "]");
         }
@@ -691,26 +690,25 @@ void JointFCN::ReconfigureUsingManager() {
   }
 
   // Print out statements on approximate memory usage for profiling.
-  LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
+  NUIS_LOG(REC, "Filled " << fillcount << " signal events.");
   if (savesignal) {
     int mem = ( // sizeof(fSignalEventBoxes) +
                 // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
                   sizeof(MeasurementVariableBox1D) * fillcount) *
               1E-6;
-    LOG(REC) << " -> Saved " << fillcount
-             << " signal boxes for faster access. (~" << mem << " MB)"
-             << std::endl;
+    NUIS_LOG(REC, " -> Saved " << fillcount << " signal boxes for faster access. (~"
+                           << mem << " MB)");
     if (fIsAllSplines and !fSignalEventSplines.empty()) {
       int splmem = sizeof(float) * fSignalEventSplines.size() *
                    fSignalEventSplines[0].size() * 1E-6;
-      LOG(REC) << " -> Saved " << fillcount << " " << fSignalEventSplines.size()
-               << " spline sets into memory. (~" << splmem << " MB)"
-               << std::endl;
+      NUIS_LOG(REC, " -> Saved " << fillcount << " " << fSignalEventSplines.size()
+                             << " spline sets into memory. (~" << splmem
+                             << " MB)");
     }
   }
 
-  LOG(REC) << "Time taken ReconfigureUsingManager() : "
-           << time(NULL) - timestart << std::endl;
+  NUIS_LOG(REC,
+       "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart);
 
   // Check SignalReconfigures works for all samples
   if (savesignal) {
@@ -719,16 +717,15 @@ void JointFCN::ReconfigureUsingManager() {
     double likefast = GetLikelihood();
 
     if (fabs(likefull - likefast) > 0.0001) {
-      ERROR(FTL, "Fast and Full Likelihoods DIFFER! : " << likefull << " : "
-                                                        << likefast);
-      ERROR(FTL, "This means some samples you are using are not setup to use "
-                 "SignalReconfigures=1");
-      ERROR(FTL, "Please turn OFF signal reconfigures.");
+      NUIS_ERR(FTL, "Fast and Full Likelihoods DIFFER! : " << likefull << " : "
+                                                         << likefast);
+      NUIS_ERR(FTL, "This means some samples you are using are not setup to use "
+                  "SignalReconfigures=1");
+      NUIS_ERR(FTL, "Please turn OFF signal reconfigures.");
       throw;
     } else {
-      LOG(FIT)
-          << "Likelihoods for FULL and FAST match. Will use FAST next time."
-          << std::endl;
+      NUIS_LOG(FIT,
+           "Likelihoods for FULL and FAST match. Will use FAST next time.");
     }
   }
 };
@@ -737,7 +734,7 @@ void JointFCN::ReconfigureUsingManager() {
 void JointFCN::ReconfigureFastUsingManager() {
   //***************************************************
 
-  LOG(FIT) << " -> Doing FAST using manager" << std::endl;
+  NUIS_LOG(FIT, " -> Doing FAST using manager");
   // Get Start time for profilling
   int timestart = time(NULL);
 
@@ -750,7 +747,7 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Check for saved variables if not do a full reconfigure.
   if (fSignalEventFlags.empty()) {
-    ERR(WRN) << "Signal Flags Empty! Using normal manager." << std::endl;
+    NUIS_ERR(WRN, "Signal Flags Empty! Using normal manager.");
     ReconfigureUsingManager();
     return;
   }
@@ -760,18 +757,18 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Setup fast vector iterators.
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
-  std::vector<std::vector<MeasurementVariableBox *> >::iterator box_iter =
+  std::vector<std::vector<MeasurementVariableBox *>>::iterator box_iter =
       fSignalEventBoxes.begin();
-  std::vector<std::vector<float> >::iterator spline_iter =
+  std::vector<std::vector<float>>::iterator spline_iter =
       fSignalEventSplines.begin();
-  std::vector<std::vector<bool> >::iterator samsig_iter =
+  std::vector<std::vector<bool>>::iterator samsig_iter =
       fSampleSignalFlags.begin();
   int splinecount = 0;
 
   // Setup stuff for logging
   int fillcount = 0;
   // This is just the total number of events
-  //int nevents = fSignalEventFlags.size();
+  // int nevents = fSignalEventFlags.size();
   // This is the number of events that are signal
   int nevents = fSignalEventBoxes.size();
   int countwidth = nevents / 10;
@@ -779,7 +776,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   // If All Splines tell splines they need a reconfigure.
   std::vector<InputHandlerBase *>::iterator inp_iter = fInputList.begin();
   if (fIsAllSplines) {
-    LOG(REC) << "All Spline Inputs so using fast spline loop." << std::endl;
+    NUIS_LOG(REC, "All Spline Inputs so using fast spline loop.");
     for (; inp_iter != fInputList.end(); inp_iter++) {
       InputHandlerBase *curinput = (*inp_iter);
 
@@ -833,9 +830,9 @@ void JointFCN::ReconfigureFastUsingManager() {
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
-          QLOG(REC, curinput->GetName()
-                        << " : Processed " << i << " events. W = "
-                        << curevent->Weight << std::endl);
+          NUIS_LOG(REC, curinput->GetName()
+                        << " : Processed " << i
+                        << " events. W = " << curevent->Weight << std::endl);
         }
 
         // #pragma omp atomic
@@ -847,7 +844,7 @@ void JointFCN::ReconfigureFastUsingManager() {
     }
   }
 
-  LOG(SAM) << "Processed event weights." << std::endl;
+  NUIS_LOG(SAM, "Processed event weights.");
 
   // #pragma omp barrier
 
@@ -888,7 +885,7 @@ void JointFCN::ReconfigureFastUsingManager() {
     }
 
     if (ispline % countwidth == 0) {
-      LOG(REC) << "Filled " << ispline << " sample weights." << std::endl;
+      NUIS_LOG(REC, "Filled " << ispline << " sample weights.");
     }
 
     // Iterate over the main signal event containers.
@@ -899,7 +896,7 @@ void JointFCN::ReconfigureFastUsingManager() {
   }
   // End of Fast Event Loop ===================
 
-  LOG(SAM) << "Filled sample distributions." << std::endl;
+  NUIS_LOG(SAM, "Filled sample distributions.");
 
   // Now loop over all Measurements
   // Convert Binned events
@@ -913,9 +910,9 @@ void JointFCN::ReconfigureFastUsingManager() {
   delete coreeventweights;
 
   // Print some reconfigure profiling.
-  LOG(REC) << "Filled " << fillcount << " signal events." << std::endl;
-  LOG(REC) << "Time taken ReconfigureFastUsingManager() : "
-           << time(NULL) - timestart << std::endl;
+  NUIS_LOG(REC, "Filled " << fillcount << " signal events.");
+  NUIS_LOG(REC,
+       "Time taken ReconfigureFastUsingManager() : " << time(NULL) - timestart);
 }
 
 //***************************************************
@@ -923,7 +920,7 @@ void JointFCN::Write() {
   //***************************************************
 
   // Save a likelihood/ndof plot
-  LOG(MIN) << "Writing likelihood plot.." << std::endl;
+  NUIS_LOG(MIN, "Writing likelihood plot...");
   std::vector<double> likes;
   std::vector<double> ndofs;
   std::vector<std::string> names;
@@ -960,7 +957,7 @@ void JointFCN::Write() {
   }
 
   // Loop over individual experiments and call Write
-  LOG(MIN) << "Writing each of the data classes..." << std::endl;
+  NUIS_LOG(MIN, "Writing each of the data classes...");
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
     MeasurementBase *exp = *iter;
@@ -993,7 +990,7 @@ void JointFCN::Write() {
 void JointFCN::SetFakeData(std::string fakeinput) {
   //***************************************************
 
-  LOG(MIN) << "Setting fake data from " << fakeinput << std::endl;
+  NUIS_LOG(MIN, "Setting fake data from " << fakeinput);
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
        iter++) {
     MeasurementBase *exp = *iter;
@@ -1053,7 +1050,7 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
   // Vect of all likelihoods and total
   std::vector<double> likevect;
   double total_likelihood = 0.0;
-  LOG(MIN) << "Likelihoods : " << std::endl;
+  NUIS_LOG(MIN, "Likelihoods : ");
 
   // Loop over samples first
   for (MeasListConstIter iter = fSamples.begin(); iter != fSamples.end();
@@ -1066,8 +1063,8 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
     total_likelihood += singlelike;
 
     // Print Out
-    LOG(MIN) << "-> " << std::left << std::setw(40) << exp->GetName() << " : "
-             << singlelike << std::endl;
+    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+                    << singlelike);
   }
 
   // Loop over pulls second
@@ -1080,8 +1077,8 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
     total_likelihood += singlelike;
 
     // Print Out
-    LOG(MIN) << "-> " << std::left << std::setw(40) << pull->GetName() << " : "
-             << singlelike << std::endl;
+    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << pull->GetName() << " : "
+                    << singlelike);
   }
 
   // Finally add the total likelihood

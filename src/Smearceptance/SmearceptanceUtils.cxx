@@ -35,7 +35,7 @@ double Smear1DProp(TH2D *mapping, double TrueProp, TRandom3 *rnjesus) {
   if (myrand) {
     delete rnjesus;
   }
-  THROW("NIMPLEMENTED");
+  NUIS_ABORT("NIMPLEMENTED");
   return 0;
 }
 
@@ -45,7 +45,7 @@ TVectorD SVDInverseSolve(TVectorD *inp, TMatrixD *mapping) {
 
   TVectorD c_svd = svd.Solve(*inp, ok);
   if (!ok) {
-    THROW("Failed to solve SVD matrix equation.");
+    NUIS_ABORT("Failed to solve SVD matrix equation.");
   }
   return c_svd;
 }
@@ -71,7 +71,7 @@ TH2D *SVDGetInverse(TH2D *mapping, int NToTruncate) {
   TMatrixD mat = GetMatrix(mapping);
 
   if (mat.GetNcols() > mat.GetNrows()) {
-    THROW("Trying to invert a " << mat.GetNrows() << "x" << mat.GetNcols()
+    NUIS_ABORT("Trying to invert a " << mat.GetNrows() << "x" << mat.GetNcols()
                                 << " matrix.");
   }
 
@@ -87,7 +87,7 @@ TH2D *SVDGetInverse(TH2D *mapping, int NToTruncate) {
     TMatrixD U(svd.GetU());
     TMatrixD V(svd.GetV());
     if (svd.GetV().TestBit(TMatrixD::kTransposed)) {
-      THROW("ARGHH");
+      NUIS_ABORT("ARGHH");
     }
     TMatrixD V_T = V.Transpose(V);
 
@@ -111,7 +111,7 @@ TH2D *SVDGetInverse(TH2D *mapping, int NToTruncate) {
            mat[mapping->GetXaxis()->GetNbins() / 2]
               [mapping->GetXaxis()->GetNbins() / 2]) <
       std::numeric_limits<double>::epsilon()) {
-    THROW("Failed to SVD invert matrix.");
+    NUIS_ABORT("Failed to SVD invert matrix.");
   }
 
   for (Int_t xb_it = 0; xb_it < inverse->GetXaxis()->GetNbins(); ++xb_it) {
@@ -210,7 +210,7 @@ TVectorD ThrowVectFromHist(TH1D *inp, TRandom3 *rnjesus, bool allowNeg) {
     size_t attempt = 0;
     do {
       if (attempt > 1000) {
-        THROW("Looks like we aren't getting anywhere with this bin: "
+        NUIS_ABORT("Looks like we aren't getting anywhere with this bin: "
               << inp->GetBinContent(xb_it + 1) << " +- "
               << inp->GetBinError(xb_it + 1));
       }

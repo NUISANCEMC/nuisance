@@ -53,9 +53,8 @@ class MinimizerFCN{
   {
     
     if (!fFCN){
-      ERR(FTL) << "No FCN Found in MinimizerFCN!" << endl;
-      ERR(FTL) << "Exiting! " << endl;
-      throw;
+      NUIS_ERR(FTL,"No FCN Found in MinimizerFCN!");
+      NUIS_ABORT("Exiting!");
     }
     
     return fFCN->DoEval(x);

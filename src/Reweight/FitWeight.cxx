@@ -17,7 +17,7 @@
 #endif
 
 void FitWeight::AddRWEngine(int type) {
-  LOG(FIT) << "Adding reweight engine " << type << std::endl;
+  NUIS_LOG(FIT, "Adding reweight engine " << type);
   switch (type) {
   case kNEUT:
     fAllRW[type] = new NEUTWeightEngine("neutrw");
@@ -66,7 +66,7 @@ void FitWeight::AddRWEngine(int type) {
     break;
 #endif
   default:
-    THROW("CANNOT ADD RW Engine for unknown dial type: " << type);
+    NUIS_ABORT("CANNOT ADD RW Engine for unknown dial type: " << type);
     break;
   }
 }
@@ -75,7 +75,7 @@ WeightEngineBase *FitWeight::GetRWEngine(int type) {
   if (HasRWEngine(type)) {
     return fAllRW[type];
   }
-  THROW("CANNOT get RW Engine for dial type: " << type);
+  NUIS_ABORT("CANNOT get RW Engine for dial type: " << type);
 }
 
 bool FitWeight::HasRWEngine(int type) {
@@ -95,7 +95,7 @@ bool FitWeight::HasRWEngine(int type) {
     return fAllRW.count(type);
   }
 #endif
-  default: { THROW("CANNOT get RW Engine for dial type: " << type); }
+  default: { NUIS_ABORT("CANNOT get RW Engine for dial type: " << type); }
   }
 }
 
@@ -110,10 +110,10 @@ void FitWeight::IncludeDial(std::string name, int dialtype, double val) {
   int nuisenum = Reweight::ConvDial(name, dialtype);
 
   if (nuisenum == -1) {
-    ERR(FTL) << "Could not include dial " << name << std::endl;
-    ERR(FTL) << "With dialtype: " << dialtype << std::endl;
-    ERR(FTL) << "With value: " << val << std::endl;
-    THROW("With nuisenum: " << nuisenum);
+    NUIS_ERR(FTL, "Could not include dial " << name);
+    NUIS_ERR(FTL, "With dialtype: " << dialtype);
+    NUIS_ERR(FTL, "With value: " << val);
+    NUIS_ABORT("With nuisenum: " << nuisenum);
   }
 
   // Setup RW Engine Pointer
@@ -160,9 +160,10 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
   int dialtype = Reweight::GetDialType(nuisenum);
 
   if (fAllRW.find(dialtype) == fAllRW.end()) {
-    ERR(FTL) << "Can't find RW engine for parameter " << fNameList[dialtype] << std::endl;
-    ERR(FTL) << "With dialtype " << dialtype << ", " << Reweight::RemoveDialType(nuisenum) << std::endl;
-    THROW("Are you sure you enabled the right engines?");
+    NUIS_ERR(FTL, "Can't find RW engine for parameter " << fNameList[dialtype]);
+    NUIS_ERR(FTL, "With dialtype " << dialtype << ", "
+                                 << Reweight::RemoveDialType(nuisenum));
+    NUIS_ABORT("Are you sure you enabled the right engines?");
   }
 
   // Get RW Engine for this dial
@@ -204,9 +205,7 @@ int FitWeight::GetDialPos(int nuisenum) {
       return i;
     }
   }
-  ERR(FTL) << "No Dial Found! " << std::endl;
-  throw;
-  return -1;
+  NUIS_ABORT("No Dial Found! (enum = " << nuisenum << ") ");
 }
 
 bool FitWeight::DialIncluded(std::string name) {
@@ -284,9 +283,8 @@ double FitWeight::GetSampleNorm(std::string name) {
 }
 
 void FitWeight::Print() {
-  LOG(REC) << "Fit Weight State: " << std::endl;
+  NUIS_LOG(REC, "Fit Weight State: ");
   for (size_t i = 0; i < fNameList.size(); i++) {
-    LOG(REC) << " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i]
-             << std::endl;
+    NUIS_LOG(REC, " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i]);
   }
 }

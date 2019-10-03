@@ -16,24 +16,20 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef T2K_CC0PI_2DPCOS_NU_H_SEEN
-#define T2K_CC0PI_2DPCOS_NU_H_SEEN
+#ifndef T2K_CC0PI_2DPCOS_NU_NONUNIFORM_H_SEEN
+#define T2K_CC0PI_2DPCOS_NU_NONUNIFORM_H_SEEN
 
-#include "Measurement2D.h"
+#include "Measurement1D.h"
+#include "TH2Poly.h"
+#include "MeasurementVariableBox2D.h"
 
-class T2K_CC0pi_XSec_2DPcos_nu : public Measurement2D {
+class T2K_CC0pi_XSec_2DPcos_nu_I : public Measurement1D {
 public:
 
-  /// Basic Constructor.
-  /// /brief Parses two different measurements.
-  ///
-  /// T2K_CC0pi_XSec_2DPcos_nu    -> T2K CC0PI Analysis 2
-  /// T2K_CC0pi_XSec_2DPcos_nu_I  -> T2K CC0PI Analysis 1
-  /// T2K_CC0pi_XSec_2DPcos_nu_II -> T2K CC0PI Analysis 2
-  T2K_CC0pi_XSec_2DPcos_nu(nuiskey samplekey);
+  T2K_CC0pi_XSec_2DPcos_nu_I(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~T2K_CC0pi_XSec_2DPcos_nu() {};
+  ~T2K_CC0pi_XSec_2DPcos_nu_I() {};
 
   /// Numu CC0PI Signal Definition
   ///
@@ -47,20 +43,29 @@ public:
   /// Bin Tmu CosThetaMu
   void FillEventVariables(FitEvent* customEvent);
 
+  // Fill Histograms
+  void FillHistograms();
+
   /// Have to do a weird event scaling for analysis 1
-  //  void ConvertEventRates();
+  void ConvertEventRates();
+
+  /// \brief Create Q2 Box to save correction info
+  inline MeasurementVariableBox* CreateBox(){ return new MeasurementVariableBox2D(); };
 
  private:
 
-  bool forwardgoing;
-  bool only_allowed_particles;
-  bool numu_event;
-  double numu_energy;
-  int particle_pdg;
-  double pmu, CosThetaMu;
-  int fAnalysis;
-
   bool fIsSystCov, fIsStatCov, fIsNormCov;
+
+  TH2Poly* fDataPoly;
+  TH2Poly* fMCPoly;
+
+  TFile* fInputFile;
+  TH2D* fMCHist_Fine2D;
+
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
+
+  void FillMCSlice(double x, double y, double w);
   
 };
   

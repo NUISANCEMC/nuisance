@@ -63,10 +63,10 @@ TH1 *GetEffHist(TFile *inputFile, std::string const &HistName) {
       numer->SetDirectory(NULL);
       return numer;
     }
-    ERROR(FTL, "TEfficiency internal histograms were not TH1Ds.");
+    NUIS_ERR(FTL, "TEfficiency internal histograms were not TH1Ds.");
   }
 
-  THROW("Couldn't get appropriate efficiency object named "
+  NUIS_ABORT("Couldn't get appropriate efficiency object named "
         << HistName << " from input file " << inputFile->GetName());
 }
 
@@ -94,19 +94,19 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
 
     TFile inputFile(inputFileName.c_str());
     if (!inputFile.IsOpen()) {
-      THROW("Couldn't open specified input root file: " << inputFileName);
+      NUIS_ABORT("Couldn't open specified input root file: " << inputFileName);
     }
 
     TH1 *inpHist = GetEffHist(&inputFile, HistName);
     if (!inpHist) {
-      THROW("Couldn't get TH1D named: " << HistName << " from input root file: "
+      NUIS_ABORT("Couldn't get TH1D named: " << HistName << " from input root file: "
                                         << inputFileName);
     }
 
     int NDims = effDescriptors[t_it].GetI("NDims");
 
     if (NDims < 1 || NDims > 3) {
-      THROW("Read NDims attribute as: " << NDims << ", efficiency curve can "
+      NUIS_ABORT("Read NDims attribute as: " << NDims << ", efficiency curve can "
                                                     "currently have between 1 "
                                                     "and 3 dimensions.");
     }
@@ -139,7 +139,7 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
     std::vector<int> pdgs_i = GeneralUtils::ParseToInt(pdgs_s, ",");
     for (size_t pdg_it = 0; pdg_it < pdgs_i.size(); ++pdg_it) {
       if (Efficiencies.count(pdgs_i[pdg_it])) {
-        ERROR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
+        NUIS_ERR(WRN, "Smearceptor " << ElementName << ":" << InstanceName
                                   << " already has a efficiency for PDG: "
                                   << pdgs_i[pdg_it]);
       }
@@ -159,7 +159,7 @@ void EfficiencyApplicator::SpecifcSetup(nuiskey &nk) {
 
       Efficiencies[pdgs_i[pdg_it]] = em;
 
-      QLOG(FIT,
+      NUIS_LOG(FIT,
            "Added reconstruction efficiency curve for PDG: " << pdgs_i[pdg_it]);
     }
   }
@@ -221,7 +221,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           kineProps[dim_it] = fp->P3().Phi();
           break;
         }
-        default: { THROW("Trying to find particle value for a kNoAxis."); }
+        default: { NUIS_ABORT("Trying to find particle value for a kNoAxis."); }
       }
       kineProps[dim_it] /= em.AxisScales[dim_it];
     }
@@ -240,7 +240,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           Int_t xbin = hist->GetXaxis()->FindFixBin(kineProps[0]);
 
           if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
-            ERROR(WRN, "Tried to apply effiency but XBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but XBin: "
                            << xbin << " is outside range (/"
                            << hist->GetXaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["
@@ -269,7 +269,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           Int_t ybin = hist->GetYaxis()->FindFixBin(kineProps[1]);
 
           if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
-            ERROR(WRN, "Tried to apply effiency but XBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but XBin: "
                            << xbin << " is outside range (/"
                            << hist->GetXaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["
@@ -279,7 +279,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           }
 
           if (!ybin || ((hist->GetYaxis()->GetNbins() + 1) == ybin)) {
-            ERROR(WRN, "Tried to apply effiency but XBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but XBin: "
                            << ybin << " is outside range (/"
                            << hist->GetYaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["
@@ -317,7 +317,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           Int_t zbin = hist->GetZaxis()->FindFixBin(kineProps[2]);
 
           if (!xbin || ((hist->GetXaxis()->GetNbins() + 1) == xbin)) {
-            ERROR(WRN, "Tried to apply effiency but XBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but XBin: "
                            << xbin << " is outside range (/"
                            << hist->GetXaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["
@@ -327,7 +327,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           }
 
           if (!ybin || ((hist->GetYaxis()->GetNbins() + 1) == ybin)) {
-            ERROR(WRN, "Tried to apply effiency but XBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but XBin: "
                            << ybin << " is outside range (/"
                            << hist->GetYaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["
@@ -337,7 +337,7 @@ RecoInfo *EfficiencyApplicator::Smearcept(FitEvent *fe) {
           }
 
           if (!zbin || ((hist->GetZaxis()->GetNbins() + 1) == zbin)) {
-            ERROR(WRN, "Tried to apply effiency but ZBin: "
+            NUIS_ERR(WRN, "Tried to apply effiency but ZBin: "
                            << zbin << " is outside range (/"
                            << hist->GetZaxis()->GetNbins() << "): Prop "
                            << kineProps[0] << ", ["

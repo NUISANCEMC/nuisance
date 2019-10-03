@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "ComparisonRoutines.h"
 
 /*
@@ -23,7 +23,7 @@
 */
 //************************
 void ComparisonRoutines::Init() {
-//************************
+  //************************
 
   fOutputFile = "";
   fOutputRootFile = NULL;
@@ -39,23 +39,20 @@ void ComparisonRoutines::Init() {
   fSampleFCN = NULL;
 
   fAllowedRoutines = ("Compare");
-
 };
 
 //*************************************
 ComparisonRoutines::~ComparisonRoutines() {
-//*************************************
-delete fOutputRootFile;
+  //*************************************
+  delete fOutputRootFile;
 };
-
-
 
 /*
   Input Functions
 */
 //*************************************
-ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
-//*************************************
+ComparisonRoutines::ComparisonRoutines(int argc, char *argv[]) {
+  //*************************************
 
   // Initialise Defaults
   Init();
@@ -84,17 +81,15 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    ERR(FTL) << "No input supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -107,18 +102,21 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
-  if (!fOutputFile.empty()) fCompKey.Set("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
+  if (!fCardFile.empty())
+    fCompKey.Set("cardfile", fCardFile);
+  if (!fOutputFile.empty())
+    fCompKey.Set("outputfile", fOutputFile);
+  if (!fStrategy.empty())
+    fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
+  configuration.LoadSettings(fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
     configuration.OverrideConfig(configargs[i]);
   }
-  if (maxevents.compare("-1")){
+  if (maxevents.compare("-1")) {
     configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
 
@@ -148,14 +146,14 @@ ComparisonRoutines::ComparisonRoutines(int argc, char* argv[]) {
 
 //*************************************
 void ComparisonRoutines::SetupComparisonsFromXML() {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Setting up nuiscomp" << std::endl;
+  NUIS_LOG(FIT, "Setting up nuiscomp");
 
   // Setup Parameters ------------------------------------------
   std::vector<nuiskey> parkeys = Config::QueryKeys("parameter");
   if (!parkeys.empty()) {
-    LOG(FIT) << "Number of parameters :  " << parkeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of parameters :  " << parkeys.size());
   }
 
   for (size_t i = 0; i < parkeys.size(); i++) {
@@ -163,90 +161,81 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("type")) {
-      ERR(FTL) << "No type given for parameter " << i << std::endl;
-      ERR(FTL) << "type='PARAMETER_TYPE'" << std::endl;
-      throw;
+      NUIS_ERR(FTL, "No type given for parameter " << i);
+      NUIS_ABORT("type='PARAMETER_TYPE'");
     } else if (!key.Has("name")) {
-      ERR(FTL) << "No name given for parameter " << i << std::endl;
-      ERR(FTL) << "name='SAMPLE_NAME'" << std::endl;
-      throw;
+      NUIS_ERR(FTL, "No name given for parameter " << i);
+      NUIS_ABORT("name='SAMPLE_NAME'");
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for parameter " << i << std::endl;
-      ERR(FTL) << "nominal='NOMINAL_VALUE'" << std::endl;
-      throw;
+      NUIS_ERR(FTL, "No nominal given for parameter " << i);
+      NUIS_ABORT("nominal='NOMINAL_VALUE'");
     }
 
     // Get Inputs
     std::string partype = key.GetS("type");
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nominal");
-    double parlow  = parnom - 1;
+    double parnom = key.GetD("nominal");
+    double parlow = parnom - 1;
     double parhigh = parnom + 1;
     double parstep = 1;
 
     // override if state not given
-    if (!key.Has("state")){
-      key.SetS("state","FIX");
+    if (!key.Has("state")) {
+      key.SetS("state", "FIX");
     }
 
     std::string parstate = key.GetS("state");
 
     // Check for incomplete limtis
-    int limdef = ((int)key.Has("low")  +
-                  (int)key.Has("high") +
-                  (int)key.Has("step"));
+    int limdef =
+        ((int)key.Has("low") + (int)key.Has("high") + (int)key.Has("step"));
 
-    if (limdef > 0 and limdef < 3){
-      ERR(FTL) << "Incomplete limit set given for parameter : " << parname << std::endl;
-      ERR(FTL) << "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' " << std::endl;
-      throw;
+    if (limdef > 0 and limdef < 3) {
+      NUIS_ERR(FTL, "Incomplete limit set given for parameter : " << parname);
+      NUIS_ABORT(
+          "Requires: low='LOWER_LIMIT' high='UPPER_LIMIT' step='STEP_SIZE' ");
     }
 
     // Extra limits
     if (key.Has("low")) {
 
-      parlow  = key.GetD("low");
+      parlow = key.GetD("low");
       parhigh = key.GetD("high");
       parstep = key.GetD("step");
 
-      LOG(FIT) << "Read " << partype << " : "
-               << parname << " = "
-               << parnom << " : "
-               << parlow << " < p < " << parhigh
-               << " : " << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parlow << " < p < " << parhigh << " : "
+                        << parstate);
     } else {
-      LOG(FIT) << "Read " << partype << " : "
-               << parname << " = "
-               << parnom << " : "
-               << parstate << std::endl;
+      NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
+                        << " : " << parstate);
     }
 
     // Convert if required
     if (parstate.find("ABS") != std::string::npos) {
-      parnom  = FitBase::RWAbsToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWAbsToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWAbsToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWAbsToSigma( partype, parname, parstep );
+      parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
+      parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
     } else if (parstate.find("FRAC") != std::string::npos) {
-      parnom  = FitBase::RWFracToSigma( partype, parname, parnom  );
-      parlow  = FitBase::RWFracToSigma( partype, parname, parlow  );
-      parhigh = FitBase::RWFracToSigma( partype, parname, parhigh );
-      parstep = FitBase::RWFracToSigma( partype, parname, parstep );
+      parnom = FitBase::RWFracToSigma(partype, parname, parnom);
+      parlow = FitBase::RWFracToSigma(partype, parname, parlow);
+      parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
+      parstep = FitBase::RWFracToSigma(partype, parname, parstep);
     }
 
     // Push into vectors
     fParams.push_back(parname);
 
-    fTypeVals[parname]  = FitBase::ConvDialType(partype);
-    fCurVals[parname]   = parnom;
+    fTypeVals[parname] = FitBase::ConvDialType(partype);
+    fCurVals[parname] = parnom;
     fStateVals[parname] = parstate;
-
   }
 
   // Setup Samples ----------------------------------------------
-  std::vector<nuiskey> samplekeys =  Config::QueryKeys("sample");
+  std::vector<nuiskey> samplekeys = Config::QueryKeys("sample");
   if (!samplekeys.empty()) {
-    LOG(FIT) << "Number of samples : " << samplekeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of samples : " << samplekeys.size());
   }
 
   for (size_t i = 0; i < samplekeys.size(); i++) {
@@ -256,23 +245,22 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
 
-    std::string sampletype =
-      key.Has("type") ? key.GetS("type") : "DEFAULT";
+    std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
 
-    double samplenorm =
-      key.Has("norm") ? key.GetD("norm") : 1.0;
+    double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    LOG(FIT) << "Read Sample " << i << ". : "
-             << samplename << " (" << sampletype << ") [Norm=" << samplenorm<<"]"<< std::endl
-             << "                                -> input='" << samplefile  << "'" << std::endl;
+    NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " (" << sampletype
+                             << ") [Norm=" << samplenorm << "]" << std::endl
+                             << "                                -> input='"
+                             << samplefile << "'");
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
-        ERR(FTL) << "You provided a sample normalisation but did not specify that the sample is free" << std::endl;
-        ERR(FTL) << "Change so sample contains type=\"FREE\" and re-run" << std::endl;
-        throw;
+        NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
+                    "that the sample is free");
+        NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
     }
@@ -291,13 +279,12 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     fTypeVals[normname] = kNORM;
     fStateVals[normname] = sampletype;
     fCurVals[normname] = samplenorm;
-
   }
 
   // Setup Fake Parameters -----------------------------
   std::vector<nuiskey> fakekeys = Config::QueryKeys("fakeparameter");
   if (!fakekeys.empty()) {
-    LOG(FIT) << "Number of fake parameters : " << fakekeys.size() << std::endl;
+    NUIS_LOG(FIT, "Number of fake parameters : " << fakekeys.size());
   }
 
   for (size_t i = 0; i < fakekeys.size(); i++) {
@@ -305,16 +292,15 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
 
     // Check for type,name,nom
     if (!key.Has("name")) {
-      ERR(FTL) << "No name given for fakeparameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No name given for fakeparameter " << i);
+
     } else if (!key.Has("nominal")) {
-      ERR(FTL) << "No nominal given for fakeparameter " << i << std::endl;
-      throw;
+      NUIS_ABORT("No nominal given for fakeparameter " << i);
     }
 
     // Get Inputs
     std::string parname = key.GetS("name");
-    double parnom  = key.GetD("nominal");
+    double parnom = key.GetD("nominal");
 
     // Push into vectors
     fFakeVals[parname] = parnom;
@@ -323,9 +309,9 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
 
 //*************************************
 void ComparisonRoutines::SetupRWEngine() {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Setting up FitWeight Engine" << std::endl;
+  NUIS_LOG(FIT, "Setting up FitWeight Engine");
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
     FitBase::GetRW()->IncludeDial(name, fTypeVals.at(name));
@@ -338,8 +324,9 @@ void ComparisonRoutines::SetupRWEngine() {
 void ComparisonRoutines::SetupFCN() {
   //*************************************
 
-  LOG(FIT) << "Building the SampleFCN" << std::endl;
-  if (fSampleFCN) delete fSampleFCN;
+  NUIS_LOG(FIT, "Building the SampleFCN");
+  if (fSampleFCN)
+    delete fSampleFCN;
   Config::Get().out = fOutputRootFile;
   fOutputRootFile->cd();
   fSampleFCN = new JointFCN(fOutputRootFile);
@@ -350,12 +337,13 @@ void ComparisonRoutines::SetupFCN() {
 
 //*************************************
 void ComparisonRoutines::SetFakeData() {
-//*************************************
+  //*************************************
 
-  if (fFakeDataInput.empty()) return;
+  if (fFakeDataInput.empty())
+    return;
 
   if (fFakeDataInput.compare("MC") == 0) {
-    LOG(FIT) << "Setting fake data from MC starting prediction." << std::endl;
+    NUIS_LOG(FIT, "Setting fake data from MC starting prediction.");
     UpdateRWEngine(fFakeVals);
 
     FitBase::GetRW()->Reconfigure();
@@ -364,9 +352,9 @@ void ComparisonRoutines::SetFakeData() {
 
     UpdateRWEngine(fCurVals);
 
-    LOG(FIT) << "Set all data to fake MC predictions." << std::endl;
+    NUIS_LOG(FIT, "Set all data to fake MC predictions.");
   } else {
-    LOG(FIT) << "Setting fake data from: " << fFakeDataInput << std::endl;
+    NUIS_LOG(FIT, "Setting fake data from: " << fFakeDataInput);
     fSampleFCN->SetFakeData(fFakeDataInput);
   }
 
@@ -378,13 +366,14 @@ void ComparisonRoutines::SetFakeData() {
 */
 //*************************************
 void ComparisonRoutines::UpdateRWEngine(
-  std::map<std::string, double>& updateVals) {
+    std::map<std::string, double> &updateVals) {
   //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
 
-    if (updateVals.find(name) == updateVals.end()) continue;
+    if (updateVals.find(name) == updateVals.end())
+      continue;
     FitBase::GetRW()->SetDialValue(name, updateVals.at(name));
   }
 
@@ -394,9 +383,9 @@ void ComparisonRoutines::UpdateRWEngine(
 
 //*************************************
 void ComparisonRoutines::Run() {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Running ComparisonRoutines : " << fStrategy << std::endl;
+  NUIS_LOG(FIT, "Running ComparisonRoutines : " << fStrategy);
 
   if (FitPar::Config().GetParB("save_nominal")) {
     SaveNominal();
@@ -405,14 +394,13 @@ void ComparisonRoutines::Run() {
   // Parse given routines
   fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
   if (fRoutines.empty()) {
-    ERR(FTL) << "Trying to run ComparisonRoutines with no routines given!" << std::endl;
-    throw;
+    NUIS_ABORT("Trying to run ComparisonRoutines with no routines given!");
   }
 
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
     std::string routine = fRoutines.at(i);
 
-    LOG(FIT) << "Routine: " << routine << std::endl;
+    NUIS_LOG(FIT, "Routine: " << routine);
     if (!routine.compare("Compare")) {
       UpdateRWEngine(fCurVals);
       GenerateComparison();
@@ -421,25 +409,22 @@ void ComparisonRoutines::Run() {
     }
   }
 
-
-
   return;
 }
 
 //*************************************
 void ComparisonRoutines::GenerateComparison() {
   //*************************************
-  LOG(FIT) << "Generating Comparison." << std::endl;
+  NUIS_LOG(FIT, "Generating Comparison.");
   // Main Event Loop from event Manager
   fSampleFCN->ReconfigureAllEvents();
   return;
-
 }
 
 //*************************************
 void ComparisonRoutines::PrintState() {
   //*************************************
-  LOG(FIT) << "------------" << std::endl;
+  NUIS_LOG(FIT, "------------");
 
   // Count max size
   int maxcount = 0;
@@ -448,13 +433,13 @@ void ComparisonRoutines::PrintState() {
   }
 
   // Header
-  LOG(FIT) << " #    " << left << setw(maxcount) << "Parameter "
-           << " = " << setw(10) << "Value"
-           << " +- " << setw(10) << "Error"
-           << " " << setw(8) << "(Units)"
-           << " " << setw(10) << "Conv. Val"
-           << " +- " << setw(10) << "Conv. Err"
-           << " " << setw(8) << "(Units)" << std::endl;
+  NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
+                     << " = " << setw(10) << "Value"
+                     << " +- " << setw(10) << "Error"
+                     << " " << setw(8) << "(Units)"
+                     << " " << setw(10) << "Conv. Val"
+                     << " +- " << setw(10) << "Conv. Err"
+                     << " " << setw(8) << "(Units)");
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -490,13 +475,13 @@ void ComparisonRoutines::PrintState() {
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
 
-    LOG(FIT) << curparstring.str() << std::endl;
+    NUIS_LOG(FIT, curparstring.str());
   }
 
-  LOG(FIT) << "------------" << std::endl;
+  NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  LOG(FIT) << std::left << std::setw(46) << "Likelihood for JointFCN: " << like << std::endl;
-  LOG(FIT) << "------------" << std::endl;
+  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  NUIS_LOG(FIT, "------------");
 }
 
 /*
@@ -504,14 +489,14 @@ void ComparisonRoutines::PrintState() {
 */
 //*************************************
 void ComparisonRoutines::SaveCurrentState(std::string subdir) {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Saving current full FCN predictions" << std::endl;
+  NUIS_LOG(FIT, "Saving current full FCN predictions");
 
   // Setup DIRS
-  TDirectory* curdir = gDirectory;
+  TDirectory *curdir = gDirectory;
   if (!subdir.empty()) {
-    TDirectory* newdir = (TDirectory*)gDirectory->mkdir(subdir.c_str());
+    TDirectory *newdir = (TDirectory *)gDirectory->mkdir(subdir.c_str());
     newdir->cd();
   }
 
@@ -529,7 +514,7 @@ void ComparisonRoutines::SaveNominal() {
 
   fOutputRootFile->cd();
 
-  LOG(FIT) << "Saving Nominal Predictions (be cautious with this)" << std::endl;
+  NUIS_LOG(FIT, "Saving Nominal Predictions (be cautious with this)");
   FitBase::GetRW()->Reconfigure();
   GenerateComparison();
   SaveCurrentState("nominal");

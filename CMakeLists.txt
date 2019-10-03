@@ -188,6 +188,11 @@ endforeach()
 
 cmessage(DEBUG "Module targets: ${MODULETargets}")
 
+LIST(APPEND MODULETargets -Wl,--end-group)
+LIST(REVERSE MODULETargets)
+LIST(APPEND MODULETargets -Wl,--start-group)
+LIST(REVERSE MODULETargets)
+
 add_subdirectory(app)
 add_subdirectory(src/Tests)
 

@@ -66,8 +66,7 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
     fSettings.SetDataInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Pb_data.txt");
     fSettings.SetCovarInput(  FitPar::GetDataBase() + "/MINERvA/CC0pi/Q2_Tgt_Pb_covar.txt");
   } else {
-    ERR(FTL) << "Target not found in name! " << std::endl;
-    throw;
+    NUIS_ABORT("Target not found in name!");
   }
 
 

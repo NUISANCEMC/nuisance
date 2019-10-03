@@ -71,7 +71,7 @@ inline double GetMass(int pdg) {
     case 2212:
       return mass_proton;
     default: {
-      ERROR(WRN, "Attempted to get mass for PDG: "
+      NUIS_ERR(WRN, "Attempted to get mass for PDG: "
                      << pdg << ", but it is not catered for. Please add it to "
                                "src/Utils/PhysConst.h");
       return -1;

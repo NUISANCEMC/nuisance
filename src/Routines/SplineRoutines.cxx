@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "SplineRoutines.h"
 
 void SplineRoutines::Init() {
@@ -31,10 +31,9 @@ void SplineRoutines::Init() {
   fAllowedRoutines = ("SaveEvents,TestEvents,SaveSplineEvents");
 };
 
-SplineRoutines::~SplineRoutines() {
-};
+SplineRoutines::~SplineRoutines(){};
 
-SplineRoutines::SplineRoutines(int argc, char* argv[]) {
+SplineRoutines::SplineRoutines(int argc, char *argv[]) {
 
   // Initialise Defaults
   Init();
@@ -62,17 +61,15 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
 
   // Add extra defaults if none given
   if (fCardFile.empty() and xmlcmds.empty()) {
-    ERR(FTL) << "No input supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No input supplied!");
   }
 
   if (fOutputFile.empty() and !fCardFile.empty()) {
     fOutputFile = fCardFile + ".root";
-    ERR(WRN) << "No output supplied so saving it to: " << fOutputFile << std::endl;
+    NUIS_ERR(WRN, "No output supplied so saving it to: " << fOutputFile);
 
   } else if (fOutputFile.empty()) {
-    ERR(FTL) << "No output file or cardfile supplied!" << std::endl;
-    throw;
+    NUIS_ABORT("No output file or cardfile supplied!");
   }
 
   // Configuration Setup =============================
@@ -85,19 +82,22 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
     fCompKey = Config::Get().GetNodes("nuiscomp")[0];
   }
 
-  if (!fCardFile.empty())   fCompKey.Set("cardfile", fCardFile);
+  if (!fCardFile.empty())
+    fCompKey.Set("cardfile", fCardFile);
   fCompKey.Set("outputfile", fOutputFile);
-  if (!fStrategy.empty())   fCompKey.Set("strategy", fStrategy);
+  if (!fStrategy.empty())
+    fCompKey.Set("strategy", fStrategy);
 
   // Load XML Cardfile
-  configuration.LoadSettings( fCompKey.GetS("cardfile"), "");
+  configuration.LoadSettings(fCompKey.GetS("cardfile"), "");
 
   // Add Config Args
   for (size_t i = 0; i < configargs.size(); i++) {
     configuration.OverrideConfig(configargs[i]);
   }
   if (maxevents.compare("-1")) {
-    std::cout << "[ NUISANCE ] : Overriding " << "MAXEVENTS=" + maxevents << std::endl;
+    std::cout << "[ NUISANCE ] : Overriding "
+              << "MAXEVENTS=" + maxevents << std::endl;
     configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
 
@@ -120,13 +120,12 @@ SplineRoutines::SplineRoutines(int argc, char* argv[]) {
   return;
 };
 
-
 /*
   Setup Functions
 */
 //*************************************
 void SplineRoutines::SetupRWEngine() {
-//*************************************
+  //*************************************
 
   fRW = new FitWeight("splineweight");
   // std::vector<nuiskey> splinekeys    = Config::QueryKeys("spline");
@@ -140,28 +139,27 @@ void SplineRoutines::SetupRWEngine() {
     std::string partype = key.GetS("type");
     double nom = key.GetD("nominal");
 
-    fRW->IncludeDial( key.GetS("name"),
-                      FitBase::ConvDialType(key.GetS("type")), nom);
-    fRW->SetDialValue( key.GetS("name"), key.GetD("nominal") );
-
+    fRW->IncludeDial(key.GetS("name"), FitBase::ConvDialType(key.GetS("type")),
+                     nom);
+    fRW->SetDialValue(key.GetS("name"), key.GetD("nominal"));
   }
   fRW->Reconfigure();
 
   return;
 }
 
-
 /*
   Fitting Functions
 */
 //*************************************
-void SplineRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals) {
-//*************************************
+void SplineRoutines::UpdateRWEngine(std::map<std::string, double> &updateVals) {
+  //*************************************
 
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string name = fParams[i];
 
-    if (updateVals.find(name) == updateVals.end()) continue;
+    if (updateVals.find(name) == updateVals.end())
+      continue;
     fRW->SetDialValue(name, updateVals.at(name));
   }
 
@@ -171,31 +169,42 @@ void SplineRoutines::UpdateRWEngine(std::map<std::string, double>& updateVals) {
 
 //*************************************
 void SplineRoutines::Run() {
-//*************************************
+  //*************************************
   std::cout << "Running " << std::endl;
 
   // Parse given routines
   fRoutines = GeneralUtils::ParseToStr(fStrategy, ",");
   if (fRoutines.empty()) {
-    ERR(FTL) << "Trying to run ComparisonRoutines with no routines given!" << std::endl;
-    throw;
+    NUIS_ABORT("Trying to run ComparisonRoutines with no routines given!");
   }
 
   for (size_t i = 0; i < fRoutines.size(); i++) {
 
-    LOG(FIT) << "Running Routine: " << fRoutines[i] << std::endl;
+    NUIS_LOG(FIT, "Running Routine: " << fRoutines[i]);
     std::string rout = fRoutines[i];
-    if       (!rout.compare("SaveEvents")) SaveEvents();
-    else if  (!rout.compare("TestEvents")) TestEvents();
-    else if  (!rout.compare("GenerateEventSplines")) {  GenerateEventWeights(); BuildEventSplines(); }
-    else if  (!rout.compare("GenerateEventWeights")) { GenerateEventWeights(); }
-    else if  (!rout.compare("GenerateEventWeightChunks")){ GenerateEventWeightChunks(FitPar::Config().GetParI("spline_procchunk")); }
-    else if  (!rout.compare("BuildEventSplines"))    { BuildEventSplines(); }
-    else if  (!rout.compare("TestSplines_1DEventScan")) TestSplines_1DEventScan();
-    else if  (!rout.compare("TestSplines_NDEventThrow")) TestSplines_NDEventThrow();
-    else if  (!rout.compare("SaveSplinePlots")) SaveSplinePlots();
-    else if  (!rout.compare("TestSplines_1DLikelihoodScan")) TestSplines_1DLikelihoodScan();
-    else if  (!rout.compare("TestSplines_NDLikelihoodThrow")) TestSplines_NDLikelihoodThrow();
+    if (!rout.compare("SaveEvents"))
+      SaveEvents();
+    else if (!rout.compare("TestEvents"))
+      TestEvents();
+    else if (!rout.compare("GenerateEventSplines")) {
+      GenerateEventWeights();
+      BuildEventSplines();
+    } else if (!rout.compare("GenerateEventWeights")) {
+      GenerateEventWeights();
+    } else if (!rout.compare("GenerateEventWeightChunks")) {
+      GenerateEventWeightChunks(FitPar::Config().GetParI("spline_procchunk"));
+    } else if (!rout.compare("BuildEventSplines")) {
+      BuildEventSplines();
+    } else if (!rout.compare("TestSplines_1DEventScan"))
+      TestSplines_1DEventScan();
+    else if (!rout.compare("TestSplines_NDEventThrow"))
+      TestSplines_NDEventThrow();
+    else if (!rout.compare("SaveSplinePlots"))
+      SaveSplinePlots();
+    else if (!rout.compare("TestSplines_1DLikelihoodScan"))
+      TestSplines_1DLikelihoodScan();
+    else if (!rout.compare("TestSplines_NDLikelihoodThrow"))
+      TestSplines_NDLikelihoodThrow();
     else if (!rout.compare("BuildEventSplinesChunks")) {
       int chunk = FitPar::Config().GetParI("spline_procchunk");
       BuildEventSplines(chunk);
@@ -203,15 +212,14 @@ void SplineRoutines::Run() {
       MergeEventSplinesChunks();
     }
   }
-
-
 }
 
 //*************************************
 void SplineRoutines::SaveEvents() {
-//*************************************
+  //*************************************
 
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
   fRW->Reconfigure();
   fRW->Print();
@@ -223,44 +231,43 @@ void SplineRoutines::SaveEvents() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
-    InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "eventsaver", inptype, file_descriptor[1]);
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
     int countwidth = (nevents / 10);
-    FitEvent* nuisevent = input->FirstNuisanceEvent();
+    FitEvent *nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
     outputfile->cd();
-    TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+    TTree *eventtree = new TTree("nuisance_events", "nuisance_events");
     nuisevent->AddBranchesToTree(eventtree);
 
     // Loop over all events and fill the TTree
@@ -279,9 +286,9 @@ void SplineRoutines::SaveEvents() {
 
       // Logging
       if (icount % countwidth == 0) {
-        LOG(REC) << "Saved " << icount << "/" << nevents
-                 << " nuisance events. [M, W] = ["
-                 << nuisevent->Mode << ", " << nuisevent->RWWeight << "]" << std::endl;
+        NUIS_LOG(REC, "Saved " << icount << "/" << nevents
+                           << " nuisance events. [M, W] = [" << nuisevent->Mode
+                           << ", " << nuisevent->RWWeight << "]");
       }
 
       // iterate
@@ -306,18 +313,19 @@ void SplineRoutines::SaveEvents() {
   eventkeys.clear();
 
   // Finished
-  LOG(FIT) << "Finished processing all nuisance events." << std::endl;
+  NUIS_LOG(FIT, "Finished processing all nuisance events.");
 }
 
 //*************************************
 void SplineRoutines::TestEvents() {
-//*************************************
+  //*************************************
 
-  LOG(FIT) << "Testing events." << std::endl;
+  NUIS_LOG(FIT, "Testing events.");
 
   // Create a new file for the test samples
   if (!fOutputRootFile) {
-    fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
+    fOutputRootFile =
+        new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
   }
 
   // Loop over all tests
@@ -328,26 +336,29 @@ void SplineRoutines::TestEvents() {
     nuiskey key = (*iter);
 
     // 0. Create new measurement list
-    std::list<MeasurementBase*> samplelist;
+    std::list<MeasurementBase *> samplelist;
 
     // 1. Build Sample From Events
     std::string samplename = key.GetS("name");
     std::string eventsid = key.GetS("inputid");
     nuiskey eventskey = Config::QueryLastKey("events", "id=" + eventsid);
     std::string rawfile = eventskey.GetS("input");
-    LOG(FIT) << "Creating sample " << samplename << std::endl;
-    MeasurementBase* rawsample = SampleUtils::CreateSample(samplename, rawfile, "", "", FitBase::GetRW());
+    NUIS_LOG(FIT, "Creating sample " << samplename);
+    MeasurementBase *rawsample = SampleUtils::CreateSample(
+        samplename, rawfile, "", "", FitBase::GetRW());
 
     // 2. Build Sample From Nuisance Events
     std::string eventsfile = eventskey.GetS("output");
-    LOG(FIT) << "Creating Fit Eevnt Sample " << samplename << " " << eventsfile << std::endl;
-    MeasurementBase* nuissample = SampleUtils::CreateSample(samplename, "FEVENT:" + eventsfile, "", "", FitBase::GetRW());
+    NUIS_LOG(FIT, "Creating Fit Eevnt Sample " << samplename << " " << eventsfile);
+    MeasurementBase *nuissample = SampleUtils::CreateSample(
+        samplename, "FEVENT:" + eventsfile, "", "", FitBase::GetRW());
 
     // 3. Make some folders to save stuff
-    TDirectory* sampledir   = (TDirectory*) fOutputRootFile->mkdir(Form((samplename + "_test_%d").c_str(), count));
-    TDirectory* rawdir      = (TDirectory*) sampledir->mkdir("raw");
-    TDirectory* nuisancedir = (TDirectory*) sampledir->mkdir("nuisance");
-    TDirectory* difdir      = (TDirectory*) sampledir->mkdir("difference");
+    TDirectory *sampledir = (TDirectory *)fOutputRootFile->mkdir(
+        Form((samplename + "_test_%d").c_str(), count));
+    TDirectory *rawdir = (TDirectory *)sampledir->mkdir("raw");
+    TDirectory *nuisancedir = (TDirectory *)sampledir->mkdir("nuisance");
+    TDirectory *difdir = (TDirectory *)sampledir->mkdir("difference");
 
     // 4. Reconfigure both
     rawdir->cd();
@@ -363,15 +374,16 @@ void SplineRoutines::TestEvents() {
     // Loop over all keyse
     TIter next(rawdir->GetListOfKeys());
     TKey *dirkey;
-    while ((dirkey = (TKey*)next())) {
+    while ((dirkey = (TKey *)next())) {
 
       // If not a 1D/2D histogram skip
       TClass *cl = gROOT->GetClass(dirkey->GetClassName());
-      if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D")) continue;
+      if (!cl->InheritsFrom("TH1D") and !cl->InheritsFrom("TH2D"))
+        continue;
 
       // Get TH1* from both dir
-      TH1 *rawplot      = (TH1*)rawdir->Get(dirkey->GetName());
-      TH1 *nuisanceplot = (TH1*)nuisancedir->Get(dirkey->GetName());
+      TH1 *rawplot = (TH1 *)rawdir->Get(dirkey->GetName());
+      TH1 *nuisanceplot = (TH1 *)nuisancedir->Get(dirkey->GetName());
 
       // Take Difference
       nuisanceplot->Add(rawplot, -1.0);
@@ -390,11 +402,12 @@ void SplineRoutines::TestEvents() {
 }
 
 void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -417,45 +430,44 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN,"No output give for set of output events! Saving to "
+               << outputfilename);
     }
     outputfilename += ".weights.root";
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
-    InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "eventsaver", inptype, file_descriptor[1]);
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
     // int countwidth = (nevents / 1000);
-    FitEvent* nuisevent = input->FirstNuisanceEvent();
+    FitEvent *nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
     outputfile->cd();
-    TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+    TTree *eventtree = new TTree("nuisance_events", "nuisance_events");
 
     // Add a flag that allows just splines to be saved.
     nuisevent->AddBranchesToTree(eventtree);
@@ -464,7 +476,7 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
     splwrite->Write("spline_reader");
 
     // Setup the spline TTree
-    TTree* weighttree = new TTree("weight_tree", "weight_tree");
+    TTree *weighttree = new TTree("weight_tree", "weight_tree");
     splwrite->AddWeightsToTree(weighttree);
 
     // Make container for all weights
@@ -477,22 +489,25 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
     // Load N Chunks of the Weights into Memory
     // Split into N processing chunks
     int nchunks = FitPar::Config().GetParI("spline_chunks");
-    if (nchunks <= 0) nchunks = 1;
-    if (nchunks >= nevents / 2) nchunks = nevents / 2;
+    if (nchunks <= 0)
+      nchunks = 1;
+    if (nchunks >= nevents / 2)
+      nchunks = nevents / 2;
 
     std::cout << "Starting NChunks " << nchunks << std::endl;
     for (int ichunk = 0; ichunk < nchunks; ichunk++) {
 
       // Skip to only do one processing chunk
-      if (procchunk != -1 and procchunk != ichunk) continue;
+      if (procchunk != -1 and procchunk != ichunk)
+        continue;
 
-      LOG(FIT) << "On Processing Chunk " << ichunk << std::endl;
-      int neventsinchunk   = nevents / nchunks;
-      int loweventinchunk  = neventsinchunk * ichunk;
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
+      int neventsinchunk = nevents / nchunks;
+      int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
 
-      double** allweightcont = new double*[neventsinchunk];
-      for (int k = 0; k < neventsinchunk; k++){
+      double **allweightcont = new double *[neventsinchunk];
+      for (int k = 0; k < neventsinchunk; k++) {
         allweightcont[k] = new double[nweights];
       }
 
@@ -501,42 +516,44 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
 
         splwrite->ReconfigureSet(iset);
 
-        // Could reorder this to save the weightconts in order instead of reconfiguring per event.
-        // Loop over all events and fill the TTree
-        for (int i = 0; i < neventsinchunk; i++){
+        // Could reorder this to save the weightconts in order instead of
+        // reconfiguring per event. Loop over all events and fill the TTree
+        for (int i = 0; i < neventsinchunk; i++) {
 
-          nuisevent = input->GetNuisanceEvent(i+loweventinchunk);
+          nuisevent = input->GetNuisanceEvent(i + loweventinchunk);
           double w = splwrite->GetWeightForThisSet(nuisevent);
 
-	  if (iset == 0){
-	    allweightcont[i][0] = w;
-	  } else {
-	    allweightcont[i][iset] = w/allweightcont[i][0];
-	  }
+          if (iset == 0) {
+            allweightcont[i][0] = w;
+          } else {
+            allweightcont[i][iset] = w / allweightcont[i][0];
+          }
 
           // Save everything
           if (iset == 0) {
             eventtree->Fill();
-          } 
+          }
         }
-	
-	std::ostringstream timestring;
+
+        std::ostringstream timestring;
         int timeelapsed = time(NULL) - lasttime;
-        if  (timeelapsed) {
+        if (timeelapsed) {
           lasttime = time(NULL);
 
-          int setsleft = (nweights-iset-1) + (nweights * (nchunks - ichunk - 1));
-          float proj = (float(setsleft) *timeelapsed) / 60 / 60;
-          timestring << setsleft << " sets remaining. Last one took " << timeelapsed << ". " << proj << " hours remaining.";
-
+          int setsleft =
+              (nweights - iset - 1) + (nweights * (nchunks - ichunk - 1));
+          float proj = (float(setsleft) * timeelapsed) / 60 / 60;
+          timestring << setsleft << " sets remaining. Last one took "
+                     << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-	LOG(REC) << "Processed Set " << iset << "/" << nweights <<" in chunk " << ichunk << "/" << nchunks << " " << timestring.str() << std::endl;
-
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+                                   << ichunk << "/" << nchunks << " "
+                                   << timestring.str());
       }
 
       // Fill weights for this chunk into the TTree
-      for (int k = 0; k < neventsinchunk; k++){
+      for (int k = 0; k < neventsinchunk; k++) {
         splwrite->SetWeights(allweightcont[k]);
         weighttree->Fill();
       }
@@ -562,17 +579,17 @@ void SplineRoutines::GenerateEventWeightChunks(int procchunk) {
 
   // remove Keys
   eventkeys.clear();
-
 }
 
 //*************************************
 void SplineRoutines::GenerateEventWeights() {
-//*************************************
-  if (fRW) delete fRW;
+  //*************************************
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -595,45 +612,44 @@ void SplineRoutines::GenerateEventWeights() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
     outputfilename += ".weights.root";
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
-    InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "eventsaver", inptype, file_descriptor[1]);
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
     int countwidth = (nevents / 1000);
-    FitEvent* nuisevent = input->FirstNuisanceEvent();
+    FitEvent *nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
     outputfile->cd();
-    TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+    TTree *eventtree = new TTree("nuisance_events", "nuisance_events");
 
     // Add a flag that allows just splines to be saved.
     nuisevent->AddBranchesToTree(eventtree);
@@ -642,20 +658,19 @@ void SplineRoutines::GenerateEventWeights() {
     splwrite->Write("spline_reader");
 
     // Setup the spline TTree
-    TTree* weighttree = new TTree("weight_tree", "weight_tree");
+    TTree *weighttree = new TTree("weight_tree", "weight_tree");
     splwrite->AddWeightsToTree(weighttree);
 
     // Make container for all weights
     int nweights = splwrite->GetNWeights();
     // int npar = splwrite->GetNPars();
-    double* weightcont = new double[nweights];
+    double *weightcont = new double[nweights];
 
     int lasttime = time(NULL);
 
-    // Could reorder this to save the weightconts in order instead of reconfiguring per event.
-    // Loop over all events and fill the TTree
+    // Could reorder this to save the weightconts in order instead of
+    // reconfiguring per event. Loop over all events and fill the TTree
     while (nuisevent) {
-
 
       // Calculate the weights for each parameter set
       splwrite->GetWeightsForEvent(nuisevent, weightcont);
@@ -664,7 +679,6 @@ void SplineRoutines::GenerateEventWeights() {
 
       eventtree->Fill();
       weighttree->Fill();
-
 
       // Logging
       if (i % countwidth == 0) {
@@ -678,9 +692,9 @@ void SplineRoutines::GenerateEventWeights() {
           float speed = float(countwidth) / float(timeelapsed);
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
-
         }
-        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline weights. " << timestring.str() << std::endl;
+        NUIS_LOG(REC, "Saved " << i << "/" << nevents
+                           << " nuisance spline weights. " << timestring.str());
       }
 
       // Iterate
@@ -708,20 +722,17 @@ void SplineRoutines::GenerateEventWeights() {
 
   // remove Keys
   eventkeys.clear();
-
 }
-
-
-
 
 //*************************************
 void SplineRoutines::GenerateEventSplines() {
-//*************************************
-  if (fRW) delete fRW;
+  //*************************************
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -734,13 +745,12 @@ void SplineRoutines::GenerateEventSplines() {
   }
   splwrite->SetupSplineSet();
 
-
   // Make an ugly list for N cores
-  int ncores = FitPar::Config().GetParI("NCORES");//omp_get_max_threads();
-  std::vector<SplineWriter*> splwriterlist;
+  int ncores = FitPar::Config().GetParI("NCORES"); // omp_get_max_threads();
+  std::vector<SplineWriter *> splwriterlist;
 
   for (int i = 0; i < ncores; i++) {
-    SplineWriter* tmpwriter = new SplineWriter(fRW);
+    SplineWriter *tmpwriter = new SplineWriter(fRW);
 
     for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
          iter != splinekeys.end(); iter++) {
@@ -754,7 +764,6 @@ void SplineRoutines::GenerateEventSplines() {
     splwriterlist.push_back(tmpwriter);
   }
 
-
   // Event Loop
   // Loop over all events and calculate weights for each parameter set.
 
@@ -765,44 +774,43 @@ void SplineRoutines::GenerateEventSplines() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
-    InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "eventsaver", inptype, file_descriptor[1]);
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
     int countwidth = (nevents / 1000);
-    FitEvent* nuisevent = input->FirstNuisanceEvent();
+    FitEvent *nuisevent = input->FirstNuisanceEvent();
 
     // Setup a TTree to save the event
     outputfile->cd();
-    TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+    TTree *eventtree = new TTree("nuisance_events", "nuisance_events");
 
     // Add a flag that allows just splines to be saved.
     nuisevent->AddBranchesToTree(eventtree);
@@ -811,23 +819,22 @@ void SplineRoutines::GenerateEventSplines() {
     splwrite->Write("spline_reader");
 
     // Setup the spline TTree
-    TTree* weighttree = new TTree("weight_tree", "weight_tree");
+    TTree *weighttree = new TTree("weight_tree", "weight_tree");
     splwrite->AddWeightsToTree(weighttree);
 
     // Make container for all weights
     int nweights = splwrite->GetNWeights();
-    double** weightcont = new double*[nevents];
+    double **weightcont = new double *[nevents];
     for (int k = 0; k < nevents; k++) {
       weightcont[k] = new double[nweights];
     }
 
     int npar = splwrite->GetNPars();
 
-
     int lasttime = time(NULL);
 
-    // Could reorder this to save the weightconts in order instead of reconfiguring per event.
-    // Loop over all events and fill the TTree
+    // Could reorder this to save the weightconts in order instead of
+    // reconfiguring per event. Loop over all events and fill the TTree
     while (nuisevent) {
 
       // std::cout << "Fitting event " << i << std::endl;
@@ -838,14 +845,16 @@ void SplineRoutines::GenerateEventSplines() {
       for (int j = 0; j < nweights; j++) {
 
         if (weightcont[i][j] != 1.0) {
-          //    std::cout << "Non Zero Weight at " << i << " " << j << std::endl;
+          //    std::cout << "Non Zero Weight at " << i << " " << j <<
+          //    std::endl;
           hasresponse = true;
         } else {
           //    std::cout << "Empty Weight at " << i << " " << j << std::endl;
         }
       }
       if (!hasresponse) {
-        //  std::cout << "Deleting flat response " << nuisevent->Mode << std::endl;
+        //  std::cout << "Deleting flat response " << nuisevent->Mode <<
+        //  std::endl;
         delete weightcont[i];
         weightcont[i] = NULL;
       }
@@ -873,9 +882,9 @@ void SplineRoutines::GenerateEventSplines() {
           float speed = float(countwidth) / float(timeelapsed);
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
-
         }
-        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline weights. " << timestring.str() << std::endl;
+        NUIS_LOG(REC, "Saved " << i << "/" << nevents
+                           << " nuisance spline weights. " << timestring.str());
       }
 
       // Iterate
@@ -893,9 +902,8 @@ void SplineRoutines::GenerateEventSplines() {
     outputfile = new TFile(outputfilename.c_str(), "UPDATE");
     outputfile->cd();
 
-    weighttree = (TTree*) outputfile->Get("weight_tree");
-//    splwrite->ReadWeightsFromTree(weighttree);
-
+    weighttree = (TTree *)outputfile->Get("weight_tree");
+    //    splwrite->ReadWeightsFromTree(weighttree);
 
     // Divide weights container into Ncores.
     // Parrallelise this loop checking for what core we are on.
@@ -922,28 +930,29 @@ void SplineRoutines::GenerateEventSplines() {
     //       timestring << proj << " hours remaining.";
 
     //     }
-    //     LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+    //     LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline
+    //     events. " << timestring.str() << std::endl;
     //   }
     // }
 
     // Get Splines
-    float** allcoeff = new float*[nevents];
+    float **allcoeff = new float *[nevents];
     for (int k = 0; k < nevents; k++) {
       allcoeff[k] = new float[npar];
     }
-
-
 
     //    #pragma omp parallel for num_threads(ncores)
     for (int i = 0; i < nevents; i++) {
 
       //#pragma omp atomic
-      //      printf("Using Thread %d to build event %d \n", int(omp_get_thread_num()), (int)i );
-      //      std::cout<< " -> Writer = " << splwriterlist[ i / (nevents/ncores) ] << std::endl;
+      //      printf("Using Thread %d to build event %d \n",
+      //      int(omp_get_thread_num()), (int)i ); std::cout<< " -> Writer = "
+      //      << splwriterlist[ i / (nevents/ncores) ] << std::endl;
 
       //      #pragma omp atomic
       if (weightcont[i]) {
-        splwriterlist[ int(omp_get_thread_num()) ]->FitSplinesForEvent(weightcont[i], allcoeff[i]);
+        splwriterlist[int(omp_get_thread_num())]->FitSplinesForEvent(
+            weightcont[i], allcoeff[i]);
       } else {
         for (int j = 0; j < npar; j++) {
           allcoeff[i][j] = float(0.0);
@@ -952,11 +961,11 @@ void SplineRoutines::GenerateEventSplines() {
 
       //      splwrite->FitSplinesForEvent(weightcont[i], allcoeff[i]);
 
-
       if (i % 500 == 0) {
 
         if (LOG_LEVEL(REC)) {
-          printf("Using Thread %d to build event %d \n", int(omp_get_thread_num()), (int)i );
+          printf("Using Thread %d to build event %d \n",
+                 int(omp_get_thread_num()), (int)i);
         }
       }
       /*
@@ -970,18 +979,20 @@ void SplineRoutines::GenerateEventSplines() {
           float speed = float(countwidth) / float(timeelapsed);
           float proj = (float(eventsleft) / float(speed)) / 60 / 60;
           timestring << proj << " hours remaining.";
-      timestring << " Using Writer at " << i / (nevents/ncores) << " = " << splwriterlist[ i / (nevents/ncores) ] << std::endl;
+      timestring << " Using Writer at " << i / (nevents/ncores) << " = " <<
+      splwriterlist[ i / (nevents/ncores) ] << std::endl;
 
         }
-        LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+        LOG(REC) << "Built " << i << "/" << nevents << " nuisance spline events.
+      " << timestring.str() << std::endl;
       }
       */
     }
 
     // Save Splines into TTree
-    float* coeff = new float[npar];
+    float *coeff = new float[npar];
     outputfile->cd();
-    TTree* splinetree = new TTree("spline_tree", "spline_tree");
+    TTree *splinetree = new TTree("spline_tree", "spline_tree");
 
     splinetree->Branch("SplineCoeff", coeff, Form("SplineCoeff[%d]/F", npar));
 
@@ -990,7 +1001,8 @@ void SplineRoutines::GenerateEventSplines() {
       for (int l = 0; l < npar; l++) {
         coeff[l] = allcoeff[k][l];
       }
-      std::cout << "Coeff 0, 1, 2 = " << coeff[0] << " " << coeff[1] << " " << coeff[2] << std::endl;
+      std::cout << "Coeff 0, 1, 2 = " << coeff[0] << " " << coeff[1] << " "
+                << coeff[2] << std::endl;
       splinetree->Fill();
     }
 
@@ -1014,19 +1026,17 @@ void SplineRoutines::GenerateEventSplines() {
 
   // remove Keys
   eventkeys.clear();
-
 }
-
-
 
 //*************************************
 void SplineRoutines::BuildEventSplines(int procchunk) {
-//*************************************
-  if (fRW) delete fRW;
+  //*************************************
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -1039,16 +1049,18 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
   }
   splwrite->SetupSplineSet();
 
-
   // Make an ugly list for N cores
-  int ncores = FitPar::Config().GetParI("spline_cores");//omp_get_max_threads();
-  if (ncores > omp_get_max_threads()) ncores = omp_get_max_threads();
-  if (ncores <= 0) ncores = 1;
+  int ncores =
+      FitPar::Config().GetParI("spline_cores"); // omp_get_max_threads();
+  if (ncores > omp_get_max_threads())
+    ncores = omp_get_max_threads();
+  if (ncores <= 0)
+    ncores = 1;
 
-  std::vector<SplineWriter*> splwriterlist;
+  std::vector<SplineWriter *> splwriterlist;
 
   for (int i = 0; i < ncores; i++) {
-    SplineWriter* tmpwriter = new SplineWriter(fRW);
+    SplineWriter *tmpwriter = new SplineWriter(fRW);
 
     for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
          iter != splinekeys.end(); iter++) {
@@ -1062,7 +1074,6 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     splwriterlist.push_back(tmpwriter);
   }
 
-
   // Event Loop
   // Loop over all events and calculate weights for each parameter set.
 
@@ -1073,76 +1084,80 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make new outputfile
-    TFile* outputfile;
-    if (procchunk == -1) outputfile = new TFile(outputfilename.c_str(), "RECREATE");
-    else  outputfile = new TFile((outputfilename + std::string(Form(".coeffchunk_%d.root", procchunk))).c_str(), "RECREATE");
+    TFile *outputfile;
+    if (procchunk == -1)
+      outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    else
+      outputfile = new TFile(
+          (outputfilename + std::string(Form(".coeffchunk_%d.root", procchunk)))
+              .c_str(),
+          "RECREATE");
 
     outputfile->cd();
 
     // Get Weights File
-    TFile* weightsfile = new TFile((outputfilename + ".weights.root").c_str(), "READ");
-    TTree* weighttree = (TTree*) weightsfile->Get("weight_tree");
+    TFile *weightsfile =
+        new TFile((outputfilename + ".weights.root").c_str(), "READ");
+    TTree *weighttree = (TTree *)weightsfile->Get("weight_tree");
 
     // Get SPLWRite Info
-    //splwrite->ReadWeightsFromTree(weighttree);
+    // splwrite->ReadWeightsFromTree(weighttree);
     int nevents = weighttree->GetEntries();
     // int countwidth = (nevents / 1000);
     int nweights = splwrite->GetNWeights();
     int npar = splwrite->GetNPars();
 
     // Access Weights
-    double* eventweights = new double[nweights];
+    double *eventweights = new double[nweights];
     weighttree->SetBranchAddress("SplineWeights", eventweights);
-
 
     // Make counter
     // int lasttime = time(NULL);
 
-
     // Setup Splines To Be Saved into TTree
     outputfile->cd();
-    TTree* splinetree = new TTree("spline_tree", "spline_tree");
+    TTree *splinetree = new TTree("spline_tree", "spline_tree");
 
-    float* coeff = new float[npar];
+    float *coeff = new float[npar];
     splinetree->Branch("SplineCoeff", coeff, Form("SplineCoeff[%d]/F", npar));
-
 
     // Load N Chunks of the Weights into Memory
     // Split into N processing chunks
     int nchunks = FitPar::Config().GetParI("spline_chunks");
-    if (nchunks <= 0) nchunks = 1;
-    if (nchunks >= nevents / 2) nchunks = nevents / 2;
+    if (nchunks <= 0)
+      nchunks = 1;
+    if (nchunks >= nevents / 2)
+      nchunks = nevents / 2;
 
     std::cout << "Starting NChunks " << nchunks << std::endl;
     sleep(1);
     for (int ichunk = 0; ichunk < nchunks; ichunk++) {
 
       // Skip to only do one processing chunk
-      if (procchunk != -1 and procchunk != ichunk) continue;
+      if (procchunk != -1 and procchunk != ichunk)
+        continue;
 
-      LOG(FIT) << "On Processing Chunk " << ichunk << std::endl;
-      int neventsinchunk   = nevents / nchunks;
-      int loweventinchunk  = neventsinchunk * ichunk;
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
+      int neventsinchunk = nevents / nchunks;
+      int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
 
-
       // Build Chunk Containers for Event Weights
-      double** weightcont = new double*[nevents];
-      float** allcoeff = new float*[nevents];
+      double **weightcont = new double *[nevents];
+      float **allcoeff = new float *[nevents];
 
       // Load Chunks into Containers
       for (int k = 0; k < neventsinchunk; k++) {
@@ -1154,18 +1169,20 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
         bool hasresponse = false;
         for (int j = 0; j < nweights; j++) {
           weightcont[k][j] = eventweights[j];
-          if (eventweights[j] != 1.0) hasresponse = true;
+          if (eventweights[j] != 1.0)
+            hasresponse = true;
         }
-        if (!hasresponse) delete weightcont[k];
+        if (!hasresponse)
+          delete weightcont[k];
       }
-
 
       // Loop over ncores and process chunks
       //      #pragma omp parallel for num_threads(ncores)
       for (int k = 0; k < neventsinchunk; k++) {
 
         if (weightcont[k]) {
-          splwriterlist[ int(omp_get_thread_num()) ]->FitSplinesForEvent(weightcont[k], allcoeff[k]);
+          splwriterlist[int(omp_get_thread_num())]->FitSplinesForEvent(
+              weightcont[k], allcoeff[k]);
         } else {
           for (int j = 0; j < npar; j++) {
             allcoeff[k][j] = float(0.0);
@@ -1175,9 +1192,9 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
         if (k + loweventinchunk % 500 == 0) {
 
           if (LOG_LEVEL(REC)) {
-            printf("Using Thread %d to build event %d in chunk %d \n", int(omp_get_thread_num()), (int) loweventinchunk + k, ichunk );
+            printf("Using Thread %d to build event %d in chunk %d \n",
+                   int(omp_get_thread_num()), (int)loweventinchunk + k, ichunk);
           }
-
         }
       }
 
@@ -1187,14 +1204,17 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
         for (int l = 0; l < npar; l++) {
           coeff[l] = allcoeff[k][l];
         }
-        // std::cout << "Coeff 0, 1, 2 = " << coeff[0] << " " << coeff[1] << " " << coeff[2] << std::endl;
+        // std::cout << "Coeff 0, 1, 2 = " << coeff[0] << " " << coeff[1] << " "
+        // << coeff[2] << std::endl;
         splinetree->Fill();
       }
 
       // Delete the container.
       for (int k = 0; k < neventsinchunk; k++) {
-        if (weightcont[k]) delete weightcont[k];
-        if (allcoeff[k]) delete allcoeff[k];
+        if (weightcont[k])
+          delete weightcont[k];
+        if (allcoeff[k])
+          delete allcoeff[k];
       }
       delete allcoeff;
       delete weightcont;
@@ -1203,22 +1223,20 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     outputfile->cd();
     splinetree->Write();
 
-
     if (procchunk == -1 or procchunk == 0) {
       outputfile->cd();
       splwrite->Write("spline_reader");
 
-      TTree* nuisanceevents = (TTree*) weightsfile->Get("nuisance_events");
+      TTree *nuisanceevents = (TTree *)weightsfile->Get("nuisance_events");
       nuisanceevents->CloneTree()->Write();
       weighttree->CloneTree()->Write();
 
-      TH1D* nuisance_fluxhist = (TH1D*) weightsfile->Get("nuisance_fluxhist");
-      TH1D* nuisance_eventhist = (TH1D*) weightsfile->Get("nuisance_eventhist");
+      TH1D *nuisance_fluxhist = (TH1D *)weightsfile->Get("nuisance_fluxhist");
+      TH1D *nuisance_eventhist = (TH1D *)weightsfile->Get("nuisance_eventhist");
       nuisance_fluxhist->Write("nuisance_fluxhist");
       nuisance_eventhist->Write("nuisance_eventhist");
     }
     weightsfile->Close();
-
 
     // Add option to build seperate chunks
 
@@ -1228,16 +1246,16 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
 
   // remove Keys
   eventkeys.clear();
-
 }
 
 void SplineRoutines::MergeEventSplinesChunks() {
 
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -1255,29 +1273,29 @@ void SplineRoutines::MergeEventSplinesChunks() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make new outputfile
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Get Weights File
-    TFile* weightsfile = new TFile((outputfilename + ".weights.root").c_str(), "READ");
-    TTree* weighttree = (TTree*) weightsfile->Get("weight_tree");
+    TFile *weightsfile =
+        new TFile((outputfilename + ".weights.root").c_str(), "READ");
+    TTree *weighttree = (TTree *)weightsfile->Get("weight_tree");
 
     // Get SPLWRite Info
-    //splwrite->ReadWeightsFromTree(weighttree);
+    // splwrite->ReadWeightsFromTree(weighttree);
     int nevents = weighttree->GetEntries();
     // int countwidth = (nevents / 1000);
     // int nweights = splwrite->GetNWeights();
@@ -1286,33 +1304,34 @@ void SplineRoutines::MergeEventSplinesChunks() {
     // Make counter
     // int lasttime = time(NULL);
 
-
     // Setup Splines To Be Saved into TTree
     outputfile->cd();
-    TTree* splinetree = new TTree("spline_tree", "spline_tree");
+    TTree *splinetree = new TTree("spline_tree", "spline_tree");
 
-    float* coeff = new float[npar];
+    float *coeff = new float[npar];
     splinetree->Branch("SplineCoeff", coeff, Form("SplineCoeff[%d]/F", npar));
-
 
     // Load N Chunks of the Weights into Memory
     // Split into N processing chunks
     int nchunks = FitPar::Config().GetParI("spline_chunks");
-    if (nchunks <= 0) nchunks = 1;
-    if (nchunks >= nevents / 2) nchunks = nevents / 2;
-    int neventsinchunk   = nevents / nchunks;
-
+    if (nchunks <= 0)
+      nchunks = 1;
+    if (nchunks >= nevents / 2)
+      nchunks = nevents / 2;
+    int neventsinchunk = nevents / nchunks;
 
     for (int ichunk = 0; ichunk < nchunks; ichunk++) {
 
       // Get Output File
-      TFile* chunkfile = new TFile( (outputfilename + std::string(Form(".coeffchunk_%d.root", ichunk))).c_str() );
+      TFile *chunkfile = new TFile(
+          (outputfilename + std::string(Form(".coeffchunk_%d.root", ichunk)))
+              .c_str());
 
       // Get TTree for spline coeffchunk
-      TTree* splinetreechunk = (TTree*) chunkfile->Get("spline_tree");
+      TTree *splinetreechunk = (TTree *)chunkfile->Get("spline_tree");
 
       // Set Branch Address to coeffchunk
-      float* coeffchunk = new float[npar];
+      float *coeffchunk = new float[npar];
       splinetreechunk->SetBranchAddress("SplineCoeff", coeffchunk);
 
       // Loop over nevents in chunk
@@ -1329,7 +1348,6 @@ void SplineRoutines::MergeEventSplinesChunks() {
       delete coeffchunk;
 
       std::cout << "Merged chunk " << ichunk << std::endl;
-
     }
 
     // Save flux and close file
@@ -1339,17 +1357,16 @@ void SplineRoutines::MergeEventSplinesChunks() {
     outputfile->cd();
     splwrite->Write("spline_reader");
 
-    TTree* nuisanceevents = (TTree*) weightsfile->Get("nuisance_events");
+    TTree *nuisanceevents = (TTree *)weightsfile->Get("nuisance_events");
     nuisanceevents->CloneTree()->Write();
     weighttree->CloneTree()->Write();
 
-    TH1D* nuisance_fluxhist = (TH1D*) weightsfile->Get("nuisance_fluxhist");
-    TH1D* nuisance_eventhist = (TH1D*) weightsfile->Get("nuisance_eventhist");
+    TH1D *nuisance_fluxhist = (TH1D *)weightsfile->Get("nuisance_fluxhist");
+    TH1D *nuisance_eventhist = (TH1D *)weightsfile->Get("nuisance_eventhist");
     nuisance_fluxhist->Write("nuisance_fluxhist");
     nuisance_eventhist->Write("nuisance_eventhist");
 
     weightsfile->Close();
-
 
     // Add option to build seperate chunks
 
@@ -1359,7 +1376,6 @@ void SplineRoutines::MergeEventSplinesChunks() {
 
   // remove Keys
   eventkeys.clear();
-
 }
 
 // void SplineRoutines::BuildSplineChunk(){
@@ -1368,10 +1384,9 @@ void SplineRoutines::MergeEventSplinesChunks() {
 // void SplineRoutines::MergeSplineChunks(){
 //}
 
-
 //*************************************
 void SplineRoutines::MergeSplines() {
-//*************************************
+  //*************************************
   // Loop over all 'splinemerge' keys.
   // Add them to the Merger.
   // Call setup splines.
@@ -1382,15 +1397,14 @@ void SplineRoutines::MergeSplines() {
   // - FillEntry in merger.
   // - Fill NUISANCEEvent into a new TTree.
 
-  SplineMerger* splmerge = new SplineMerger();
+  SplineMerger *splmerge = new SplineMerger();
   std::vector<nuiskey> splinekeys = Config::QueryKeys("splinemerge");
   for (std::vector<nuiskey>::iterator iter = splinekeys.begin();
        iter != splinekeys.end(); iter++) {
     nuiskey splkey = (*iter);
 
-    TFile* infile = new TFile(splkey.GetS("input").c_str(), "READ");
+    TFile *infile = new TFile(splkey.GetS("input").c_str(), "READ");
     splmerge->AddSplineSetFromFile(infile);
-
   }
   splmerge->SetupSplineSet();
 
@@ -1398,41 +1412,40 @@ void SplineRoutines::MergeSplines() {
   std::vector<nuiskey> eventkeys = Config::QueryKeys("eventmerge");
   nuiskey key = eventkeys[0];
 
-  std::string inputfilename  = key.GetS("input");
+  std::string inputfilename = key.GetS("input");
 
   // Make a new input handler
   std::vector<std::string> file_descriptor =
-    GeneralUtils::ParseToStr(inputfilename, ":");
+      GeneralUtils::ParseToStr(inputfilename, ":");
   if (file_descriptor.size() != 2) {
-    ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-             << "\". expected \"FILETYPE:file.root\"" << std::endl;
-    throw;
+    NUIS_ABORT("File descriptor had no filetype declaration: \""
+           << inputfilename << "\". expected \"FILETYPE:file.root\"");
   }
   InputUtils::InputType inptype =
-    InputUtils::ParseInputType(file_descriptor[0]);
+      InputUtils::ParseInputType(file_descriptor[0]);
 
-  InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+  InputHandlerBase *input =
+      InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
 
   std::string outputfilename = key.GetS("output");
   if (outputfilename.empty()) {
     outputfilename = inputfilename + ".nuisance.root";
-    ERR(FTL) << "No output give for set of output events! Saving to "
-             << outputfilename << std::endl;
+    NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                    << outputfilename);
   }
 
   // Make new outputfile
-  TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+  TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
   outputfile->cd();
-
 
   // Get info from inputhandler
   int nevents = input->GetNEvents();
   int countwidth = (nevents / 1000);
-  FitEvent* nuisevent = input->FirstNuisanceEvent();
+  FitEvent *nuisevent = input->FirstNuisanceEvent();
 
   // Setup a TTree to save the event
   outputfile->cd();
-  TTree* eventtree = new TTree("nuisance_events", "nuisance_events");
+  TTree *eventtree = new TTree("nuisance_events", "nuisance_events");
 
   // Add a flag that allows just splines to be saved.
   nuisevent->AddBranchesToTree(eventtree);
@@ -1441,7 +1454,7 @@ void SplineRoutines::MergeSplines() {
   splmerge->Write("spline_reader");
 
   // Setup the spline TTree
-  TTree* splinetree = new TTree("spline_tree", "spline_tree");
+  TTree *splinetree = new TTree("spline_tree", "spline_tree");
   splmerge->AddCoefficientsToTree(splinetree);
 
   int lasttime = time(NULL);
@@ -1468,9 +1481,9 @@ void SplineRoutines::MergeSplines() {
         float speed = float(countwidth) / float(timeelapsed);
         float proj = (float(eventsleft) / float(speed)) / 60 / 60;
         timestring << proj << " hours remaining.";
-
       }
-      LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline events. " << timestring.str() << std::endl;
+      NUIS_LOG(REC, "Saved " << i << "/" << nevents << " nuisance spline events. "
+                         << timestring.str());
     }
 
     // Iterate
@@ -1493,20 +1506,21 @@ void SplineRoutines::MergeSplines() {
   delete input;
 }
 
-
 //*************************************
 void SplineRoutines::TestSplines_1DEventScan() {
-//*************************************
+  //*************************************
 
   // Setup RW Engine
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Make a spline RW Engine too.
-  FitWeight* splweight = new FitWeight("splinerwaweight");
+  FitWeight *splweight = new FitWeight("splinerwaweight");
   // std::vector<nuiskey> splinekeys    = Config::QueryKeys("spline");
   std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
-  TH1D* parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(), 0.0, float(parameterkeys.size()));
+  TH1D *parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(),
+                                   0.0, float(parameterkeys.size()));
 
   // Add Parameters
   for (size_t i = 0; i < parameterkeys.size(); i++) {
@@ -1519,10 +1533,8 @@ void SplineRoutines::TestSplines_1DEventScan() {
     parhisttemplate->SetBinContent(i + 1, nom);
     parhisttemplate->GetXaxis()->SetBinLabel(i + 1, parname.c_str());
 
-    splweight->IncludeDial( key.GetS("name"),
-                            kSPLINEPARAMETER, nom);
-    splweight->SetDialValue( key.GetS("name"), key.GetD("nominal") );
-
+    splweight->IncludeDial(key.GetS("name"), kSPLINEPARAMETER, nom);
+    splweight->SetDialValue(key.GetS("name"), key.GetD("nominal"));
   }
   splweight->Reconfigure();
 
@@ -1530,8 +1542,8 @@ void SplineRoutines::TestSplines_1DEventScan() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector< std::vector<double> > scanparset_vals;
-  std::vector< TH1D* > scanparset_hists;
+  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
   // Add Parameters
@@ -1546,7 +1558,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
     }
 
     // Push Back Scan
-    double low  = key.GetD("low");
+    double low = key.GetD("low");
     double high = key.GetD("high");
     double cur = low;
     double step = key.GetD("step");
@@ -1560,12 +1572,11 @@ void SplineRoutines::TestSplines_1DEventScan() {
       // Add to vects
       scanparset_vals.push_back(newvals);
 
-      TH1D* parhist = (TH1D*)parhisttemplate->Clone();
+      TH1D *parhist = (TH1D *)parhisttemplate->Clone();
       for (size_t j = 0; j < newvals.size(); j++) {
         parhist->SetBinContent(j + 1, newvals[j]);
       }
       scanparset_hists.push_back(parhist);
-
 
       // Move to next one
       cur += step;
@@ -1575,16 +1586,16 @@ void SplineRoutines::TestSplines_1DEventScan() {
   // Print out the parameter set to test
   for (uint i = 0; i < scanparset_vals.size(); i++) {
     std::cout << "Parset " << i;
-    for (uint j = 0 ; j < scanparset_vals[i].size(); j++) {
+    for (uint j = 0; j < scanparset_vals[i].size(); j++) {
       std::cout << " " << scanparset_vals[i][j];
     }
     std::cout << std::endl;
   }
-  
+
   // Weight holders
-  double* rawweights = new double[scanparset_vals.size()];
-  double* splweights = new double[scanparset_vals.size()];
-  double* difweights = new double[scanparset_vals.size()];
+  double *rawweights = new double[scanparset_vals.size()];
+  double *splweights = new double[scanparset_vals.size()];
+  double *difweights = new double[scanparset_vals.size()];
   int nweights = scanparset_vals.size();
   // int NParSets = scanparset_vals.size();
 
@@ -1594,43 +1605,41 @@ void SplineRoutines::TestSplines_1DEventScan() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!")
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
-
+        InputUtils::ParseInputType(file_descriptor[0]);
 
     // Make handlers for input and output
-    InputHandlerBase* input  = InputUtils::CreateInputHandler("rawevents", inptype, file_descriptor[1]);
-    InputHandlerBase* output =  InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input, outputfilename);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "rawevents", inptype, file_descriptor[1]);
+    InputHandlerBase *output = InputUtils::CreateInputHandler(
+        "splineevents", InputUtils::kEVSPLN_Input, outputfilename);
 
     // Get Base Events for each case.
-    FitEvent* rawevent = input->FirstNuisanceEvent();
-    FitEvent* splevent = output->FirstNuisanceEvent();
-
+    FitEvent *rawevent = input->FirstNuisanceEvent();
+    FitEvent *splevent = output->FirstNuisanceEvent();
 
     // Setup outputfile
     std::string outputtest = outputfilename + ".splinetest.1DEventScan.root";
-    TFile* outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
+    TFile *outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
     outputtestfile->cd();
 
     // Save Parameter Sets
@@ -1639,14 +1648,16 @@ void SplineRoutines::TestSplines_1DEventScan() {
     }
 
     // Save a TTree of weights and differences.
-    TTree* weighttree = new TTree("weightscan", "weightscan");
+    TTree *weighttree = new TTree("weightscan", "weightscan");
 
     // Make a branch for each weight set
     for (size_t i = 0; i < scanparset_hists.size(); i++) {
-      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i], Form("RawWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i], Form("SplineWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i], Form("DifWeights_Set_%i/D", (int)i) );
-
+      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i],
+                         Form("RawWeights_Set_%i/D", (int)i));
+      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i],
+                         Form("SplineWeights_Set_%i/D", (int)i));
+      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i],
+                         Form("DifWeights_Set_%i/D", (int)i));
     }
 
     // Count
@@ -1657,80 +1668,86 @@ void SplineRoutines::TestSplines_1DEventScan() {
     // Load N Chunks of the Weights into Memory
     // Split into N processing chunks
     int nchunks = FitPar::Config().GetParI("spline_chunks");
-    if (nchunks <= 0) nchunks = 1;
-    if (nchunks >= nevents / 2) nchunks = nevents / 2;
-    
+    if (nchunks <= 0)
+      nchunks = 1;
+    if (nchunks >= nevents / 2)
+      nchunks = nevents / 2;
+
     std::cout << "Starting NChunks " << nchunks << std::endl;
     for (int ichunk = 0; ichunk < nchunks; ichunk++) {
 
       // Skip to only do one processing chunk
       //      if (procchunk != -1 and procchunk != ichunk) continue;
 
-      LOG(FIT) << "On Processing Chunk " << ichunk << std::endl;
-      int neventsinchunk   = nevents / nchunks;
-      int loweventinchunk  = neventsinchunk * ichunk;
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
+      int neventsinchunk = nevents / nchunks;
+      int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
 
-      double** allrawweights = new double*[neventsinchunk];
-      double** allsplweights = new double*[neventsinchunk];
-      double** alldifweights = new double*[neventsinchunk];
-      for (int k = 0; k < neventsinchunk; k++){
+      double **allrawweights = new double *[neventsinchunk];
+      double **allsplweights = new double *[neventsinchunk];
+      double **alldifweights = new double *[neventsinchunk];
+      for (int k = 0; k < neventsinchunk; k++) {
         allrawweights[k] = new double[nweights];
-	allsplweights[k] = new double[nweights];
-	alldifweights[k] = new double[nweights];
+        allsplweights[k] = new double[nweights];
+        alldifweights[k] = new double[nweights];
       }
 
       // Start Set Processing Here.
       for (int iset = 0; iset < nweights; iset++) {
 
-	// Reconfigure
-        fRW->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        // Reconfigure
+        fRW->SetAllDials(&scanparset_vals[iset][0],
+                         scanparset_vals[iset].size());
         fRW->Reconfigure();
 
         // Reconfigure spline RW
-        splweight->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        splweight->SetAllDials(&scanparset_vals[iset][0],
+                               scanparset_vals[iset].size());
         splweight->Reconfigure();
 
         splevent->fSplineRead->SetNeedsReconfigure(true);
 
-        // Could reorder this to save the weightconts in order instead of reconfiguring per event.
-        // Loop over all events and fill the TTree
-        for (int i = 0; i < neventsinchunk; i++){
+        // Could reorder this to save the weightconts in order instead of
+        // reconfiguring per event. Loop over all events and fill the TTree
+        for (int i = 0; i < neventsinchunk; i++) {
 
-	  rawevent = input->GetNuisanceEvent(i+loweventinchunk);
-	  splevent = output->GetNuisanceEvent(i+loweventinchunk);
+          rawevent = input->GetNuisanceEvent(i + loweventinchunk);
+          splevent = output->GetNuisanceEvent(i + loweventinchunk);
 
-	  allrawweights[i][iset] = fRW->CalcWeight(rawevent);
-	  allsplweights[i][iset] = splweight->CalcWeight(splevent);
-	  alldifweights[i][iset] = allsplweights[i][iset] - allrawweights[i][iset];
+          allrawweights[i][iset] = fRW->CalcWeight(rawevent);
+          allsplweights[i][iset] = splweight->CalcWeight(splevent);
+          alldifweights[i][iset] =
+              allsplweights[i][iset] - allrawweights[i][iset];
         }
-	
-	std::ostringstream timestring;
+
+        std::ostringstream timestring;
         int timeelapsed = time(NULL) - lasttime;
-        if  (timeelapsed) {
+        if (timeelapsed) {
           lasttime = time(NULL);
 
-          int setsleft = (nweights-iset-1) + (nweights * (nchunks - ichunk - 1));
-          float proj = (float(setsleft) *timeelapsed) / 60 / 60;
-          timestring << setsleft << " sets remaining. Last one took " << timeelapsed << ". " << proj << " hours remaining.";
-
+          int setsleft =
+              (nweights - iset - 1) + (nweights * (nchunks - ichunk - 1));
+          float proj = (float(setsleft) * timeelapsed) / 60 / 60;
+          timestring << setsleft << " sets remaining. Last one took "
+                     << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-	LOG(REC) << "Processed Set " << iset << "/" << nweights <<" in chunk " << ichunk << "/" << nchunks << " " << timestring.str() << std::endl;
-
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+                                   << ichunk << "/" << nchunks << " "
+                                   << timestring.str());
       }
 
       // Fill weights for this chunk into the TTree
-      for (int k = 0; k < neventsinchunk; k++){
-	for (int l = 0; l < nweights; l++){
-	  rawweights[l] = allrawweights[k][l];
-	  splweights[l] = allsplweights[k][l];
-	  difweights[l] = alldifweights[k][l];
-	}
+      for (int k = 0; k < neventsinchunk; k++) {
+        for (int l = 0; l < nweights; l++) {
+          rawweights[l] = allrawweights[k][l];
+          splweights[l] = allsplweights[k][l];
+          difweights[l] = alldifweights[k][l];
+        }
         weighttree->Fill();
       }
     }
-
 
     // Loop over nchunks
 
@@ -1739,22 +1756,16 @@ void SplineRoutines::TestSplines_1DEventScan() {
 
     // Loop over events in chunk
     // Fill Chunkweightcontainers
-    
+
     // Once all dials are done, fill the weight tree
-    
+
     // Iterator to next chunk
-    
 
     outputtestfile->cd();
     weighttree->Write();
     outputtestfile->Close();
   }
 }
-
-  
-
-
-
 
 /*
   // Make a high resolution spline set.
@@ -1843,7 +1854,8 @@ void SplineRoutines::TestSplines_1DEventScan() {
     std::vector<std::string> file_descriptor =
       GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
+      ERR(FTL) << "File descriptor had no filetype declaration: \"" <<
+inputfilename
                << "\". expected \"FILETYPE:file.root\"" << std::endl;
       throw;
     }
@@ -1852,8 +1864,10 @@ void SplineRoutines::TestSplines_1DEventScan() {
 
 
     // Make handlers for input and output
-    InputHandlerBase* input  = InputUtils::CreateInputHandler("rawevents", inptype, file_descriptor[1]);
-    InputHandlerBase* output =  InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input, outputfilename);
+    InputHandlerBase* input  = InputUtils::CreateInputHandler("rawevents",
+inptype, file_descriptor[1]); InputHandlerBase* output =
+InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input,
+outputfilename);
 
     // Get Base Events for each case.
     FitEvent* rawevent = input->FirstNuisanceEvent();
@@ -1875,9 +1889,12 @@ void SplineRoutines::TestSplines_1DEventScan() {
 
     // Make a branch for each weight set
     for (size_t i = 0; i < scanparset_hists.size(); i++) {
-      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i], Form("RawWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i], Form("SplineWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i], Form("DifWeights_Set_%i/D", (int)i) );
+      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i],
+Form("RawWeights_Set_%i/D", (int)i) );
+      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i],
+Form("SplineWeights_Set_%i/D", (int)i) );
+      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i],
+Form("DifWeights_Set_%i/D", (int)i) );
 
     }
 
@@ -1894,8 +1911,8 @@ void SplineRoutines::TestSplines_1DEventScan() {
         fRW->Reconfigure();
 
         // Reconfigure spline RW
-        splweight->SetAllDials(&scanparset_vals[j][0], scanparset_vals[j].size());
-        splweight->Reconfigure();
+        splweight->SetAllDials(&scanparset_vals[j][0],
+scanparset_vals[j].size()); splweight->Reconfigure();
 
         splevent->fSplineRead->SetNeedsReconfigure(true);
 
@@ -1929,16 +1946,18 @@ void SplineRoutines::TestSplines_1DEventScan() {
 
 //*************************************
 void SplineRoutines::TestSplines_NDEventThrow() {
-//*************************************
+  //*************************************
 
   // Setup RW Engine
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Make a spline RW Engine too.
-  FitWeight* splweight = new FitWeight("splinerwaweight");
+  FitWeight *splweight = new FitWeight("splinerwaweight");
   std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
-  TH1D* parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(), 0.0, float(parameterkeys.size()));
+  TH1D *parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(),
+                                   0.0, float(parameterkeys.size()));
 
   // Add Parameters
   for (size_t i = 0; i < parameterkeys.size(); i++) {
@@ -1951,10 +1970,8 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     parhisttemplate->SetBinContent(i + 1, nom);
     parhisttemplate->GetXaxis()->SetBinLabel(i + 1, parname.c_str());
 
-    splweight->IncludeDial( key.GetS("name"),
-                            kSPLINEPARAMETER, nom);
-    splweight->SetDialValue( key.GetS("name"), key.GetD("nominal") );
-
+    splweight->IncludeDial(key.GetS("name"), kSPLINEPARAMETER, nom);
+    splweight->SetDialValue(key.GetS("name"), key.GetD("nominal"));
   }
   splweight->Reconfigure();
 
@@ -1962,9 +1979,9 @@ void SplineRoutines::TestSplines_NDEventThrow() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector< std::string > scanparset_names;
-  std::vector< std::vector<double> > scanparset_vals;
-  std::vector< TH1D* > scanparset_hists;
+  std::vector<std::string> scanparset_names;
+  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
   // Add Parameters
@@ -1981,15 +1998,14 @@ void SplineRoutines::TestSplines_NDEventThrow() {
       }
 
       // Push Back Scan
-      double low  = key.GetD("low");
+      double low = key.GetD("low");
       double high = key.GetD("high");
-      newvals[j] =  gRandom->Uniform(low, high);
-
+      newvals[j] = gRandom->Uniform(low, high);
     }
     // Add to vects
     scanparset_vals.push_back(newvals);
 
-    TH1D* parhist = (TH1D*)parhisttemplate->Clone();
+    TH1D *parhist = (TH1D *)parhisttemplate->Clone();
     for (size_t j = 0; j < newvals.size(); j++) {
       parhist->SetBinContent(j + 1, newvals[j]);
     }
@@ -1999,17 +2015,16 @@ void SplineRoutines::TestSplines_NDEventThrow() {
   // Print out the parameter set to test
   for (uint i = 0; i < scanparset_vals.size(); i++) {
     std::cout << "Parset " << i;
-    for (uint j = 0 ; j < scanparset_vals[i].size(); j++) {
+    for (uint j = 0; j < scanparset_vals[i].size(); j++) {
       std::cout << " " << scanparset_vals[i][j];
     }
     std::cout << std::endl;
   }
 
-
   // Weight holders
-  double* rawweights = new double[scanparset_vals.size()];
-  double* splweights = new double[scanparset_vals.size()];
-  double* difweights = new double[scanparset_vals.size()];
+  double *rawweights = new double[scanparset_vals.size()];
+  double *splweights = new double[scanparset_vals.size()];
+  double *difweights = new double[scanparset_vals.size()];
   int nweights = scanparset_vals.size();
   // int NParSets = scanparset_vals.size();
 
@@ -2019,43 +2034,41 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
-
+        InputUtils::ParseInputType(file_descriptor[0]);
 
     // Make handlers for input and output
-    InputHandlerBase* input  = InputUtils::CreateInputHandler("rawevents", inptype, file_descriptor[1]);
-    InputHandlerBase* output =  InputUtils::CreateInputHandler("splineevents", InputUtils::kEVSPLN_Input, outputfilename);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "rawevents", inptype, file_descriptor[1]);
+    InputHandlerBase *output = InputUtils::CreateInputHandler(
+        "splineevents", InputUtils::kEVSPLN_Input, outputfilename);
 
     // Get Base Events for each case.
-    FitEvent* rawevent = input->FirstNuisanceEvent();
-    FitEvent* splevent = output->FirstNuisanceEvent();
-
+    FitEvent *rawevent = input->FirstNuisanceEvent();
+    FitEvent *splevent = output->FirstNuisanceEvent();
 
     // Setup outputfile
     std::string outputtest = outputfilename + ".splinetest.NDEventThrow.root";
-    TFile* outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
+    TFile *outputtestfile = new TFile(outputtest.c_str(), "RECREATE");
     outputtestfile->cd();
 
     // Save Parameter Sets
@@ -2064,14 +2077,16 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     }
 
     // Save a TTree of weights and differences.
-    TTree* weighttree = new TTree("weightscan", "weightscan");
+    TTree *weighttree = new TTree("weightscan", "weightscan");
 
     // Make a branch for each weight set
     for (size_t i = 0; i < scanparset_hists.size(); i++) {
-      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i], Form("RawWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i], Form("SplineWeights_Set_%i/D", (int)i) );
-      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i], Form("DifWeights_Set_%i/D", (int)i) );
-
+      weighttree->Branch(Form("RawWeights_Set_%i", (int)i), &rawweights[i],
+                         Form("RawWeights_Set_%i/D", (int)i));
+      weighttree->Branch(Form("SplineWeights_Set_%i", (int)i), &splweights[i],
+                         Form("SplineWeights_Set_%i/D", (int)i));
+      weighttree->Branch(Form("DifWeights_Set_%i", (int)i), &difweights[i],
+                         Form("DifWeights_Set_%i/D", (int)i));
     }
 
     // Count
@@ -2082,80 +2097,86 @@ void SplineRoutines::TestSplines_NDEventThrow() {
     // Load N Chunks of the Weights into Memory
     // Split into N processing chunks
     int nchunks = FitPar::Config().GetParI("spline_chunks");
-    if (nchunks <= 0) nchunks = 1;
-    if (nchunks >= nevents / 2) nchunks = nevents / 2;
-    
+    if (nchunks <= 0)
+      nchunks = 1;
+    if (nchunks >= nevents / 2)
+      nchunks = nevents / 2;
+
     std::cout << "Starting NChunks " << nchunks << std::endl;
     for (int ichunk = 0; ichunk < nchunks; ichunk++) {
 
       // Skip to only do one processing chunk
       //      if (procchunk != -1 and procchunk != ichunk) continue;
 
-      LOG(FIT) << "On Processing Chunk " << ichunk << std::endl;
-      int neventsinchunk   = nevents / nchunks;
-      int loweventinchunk  = neventsinchunk * ichunk;
+      NUIS_LOG(FIT, "On Processing Chunk " << ichunk);
+      int neventsinchunk = nevents / nchunks;
+      int loweventinchunk = neventsinchunk * ichunk;
       // int higheventinchunk = neventsinchunk * (ichunk + 1);
 
-      double** allrawweights = new double*[neventsinchunk];
-      double** allsplweights = new double*[neventsinchunk];
-      double** alldifweights = new double*[neventsinchunk];
-      for (int k = 0; k < neventsinchunk; k++){
+      double **allrawweights = new double *[neventsinchunk];
+      double **allsplweights = new double *[neventsinchunk];
+      double **alldifweights = new double *[neventsinchunk];
+      for (int k = 0; k < neventsinchunk; k++) {
         allrawweights[k] = new double[nweights];
-	allsplweights[k] = new double[nweights];
-	alldifweights[k] = new double[nweights];
+        allsplweights[k] = new double[nweights];
+        alldifweights[k] = new double[nweights];
       }
 
       // Start Set Processing Here.
       for (int iset = 0; iset < nweights; iset++) {
 
-	// Reconfigure
-        fRW->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        // Reconfigure
+        fRW->SetAllDials(&scanparset_vals[iset][0],
+                         scanparset_vals[iset].size());
         fRW->Reconfigure();
 
         // Reconfigure spline RW
-        splweight->SetAllDials(&scanparset_vals[iset][0], scanparset_vals[iset].size());
+        splweight->SetAllDials(&scanparset_vals[iset][0],
+                               scanparset_vals[iset].size());
         splweight->Reconfigure();
 
         splevent->fSplineRead->SetNeedsReconfigure(true);
 
-        // Could reorder this to save the weightconts in order instead of reconfiguring per event.
-        // Loop over all events and fill the TTree
-        for (int i = 0; i < neventsinchunk; i++){
+        // Could reorder this to save the weightconts in order instead of
+        // reconfiguring per event. Loop over all events and fill the TTree
+        for (int i = 0; i < neventsinchunk; i++) {
 
-	  rawevent = input->GetNuisanceEvent(i+loweventinchunk);
-	  splevent = output->GetNuisanceEvent(i+loweventinchunk);
+          rawevent = input->GetNuisanceEvent(i + loweventinchunk);
+          splevent = output->GetNuisanceEvent(i + loweventinchunk);
 
-	  allrawweights[i][iset] = fRW->CalcWeight(rawevent);
-	  allsplweights[i][iset] = splweight->CalcWeight(splevent);
-	  alldifweights[i][iset] = allsplweights[i][iset] - allrawweights[i][iset];
+          allrawweights[i][iset] = fRW->CalcWeight(rawevent);
+          allsplweights[i][iset] = splweight->CalcWeight(splevent);
+          alldifweights[i][iset] =
+              allsplweights[i][iset] - allrawweights[i][iset];
         }
-	
-	std::ostringstream timestring;
+
+        std::ostringstream timestring;
         int timeelapsed = time(NULL) - lasttime;
-        if  (timeelapsed) {
+        if (timeelapsed) {
           lasttime = time(NULL);
 
-          int setsleft = (nweights-iset-1) + (nweights * (nchunks - ichunk - 1));
-          float proj = (float(setsleft) *timeelapsed) / 60 / 60;
-          timestring << setsleft << " sets remaining. Last one took " << timeelapsed << ". " << proj << " hours remaining.";
-
+          int setsleft =
+              (nweights - iset - 1) + (nweights * (nchunks - ichunk - 1));
+          float proj = (float(setsleft) * timeelapsed) / 60 / 60;
+          timestring << setsleft << " sets remaining. Last one took "
+                     << timeelapsed << ". " << proj << " hours remaining.";
         }
 
-	LOG(REC) << "Processed Set " << iset << "/" << nweights <<" in chunk " << ichunk << "/" << nchunks << " " << timestring.str() << std::endl;
-
+        NUIS_LOG(REC, "Processed Set " << iset << "/" << nweights << " in chunk "
+                                   << ichunk << "/" << nchunks << " "
+                                   << timestring.str());
       }
 
       // Fill weights for this chunk into the TTree
-      for (int k = 0; k < neventsinchunk; k++){
-	for (int l = 0; l < nweights; l++){
-	  rawweights[l] = allrawweights[k][l];
-	  splweights[l] = allsplweights[k][l];
-	  difweights[l] = alldifweights[k][l];
-	}
+      for (int k = 0; k < neventsinchunk; k++) {
+        for (int l = 0; l < nweights; l++) {
+          rawweights[l] = allrawweights[k][l];
+          splweights[l] = allsplweights[k][l];
+          difweights[l] = alldifweights[k][l];
+        }
         weighttree->Fill();
       }
     }
-
 
     // Loop over nchunks
 
@@ -2164,11 +2185,10 @@ void SplineRoutines::TestSplines_NDEventThrow() {
 
     // Loop over events in chunk
     // Fill Chunkweightcontainers
-    
+
     // Once all dials are done, fill the weight tree
-    
+
     // Iterator to next chunk
-    
 
     outputtestfile->cd();
     weighttree->Write();
@@ -2176,14 +2196,14 @@ void SplineRoutines::TestSplines_NDEventThrow() {
   }
 }
 
-
 void SplineRoutines::SaveSplinePlots() {
 
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup the spline reader
-  SplineWriter* splwrite = new SplineWriter(fRW);
+  SplineWriter *splwrite = new SplineWriter(fRW);
   std::vector<nuiskey> splinekeys = Config::QueryKeys("spline");
 
   // Add splines to splinewriter
@@ -2196,8 +2216,6 @@ void SplineRoutines::SaveSplinePlots() {
   }
   splwrite->SetupSplineSet();
 
-
-
   // Event Loop
   // Loop over all events and calculate weights for each parameter set.
 
@@ -2208,49 +2226,45 @@ void SplineRoutines::SaveSplinePlots() {
     nuiskey key = eventkeys.at(i);
 
     // Get I/O
-    std::string inputfilename  = key.GetS("input");
+    std::string inputfilename = key.GetS("input");
     if (inputfilename.empty()) {
-      ERR(FTL) << "No input given for set of input events!" << std::endl;
-      throw;
+      NUIS_ABORT("No input given for set of input events!");
     }
 
     std::string outputfilename = key.GetS("output");
     if (outputfilename.empty()) {
       outputfilename = inputfilename + ".nuisance.root";
-      ERR(FTL) << "No output give for set of output events! Saving to "
-               << outputfilename << std::endl;
+      NUIS_ERR(WRN, "No output give for set of output events! Saving to "
+                      << outputfilename);
     }
 
     // Make new outputfile
     outputfilename += ".SplinePlots.root";
-    TFile* outputfile = new TFile(outputfilename.c_str(), "RECREATE");
+    TFile *outputfile = new TFile(outputfilename.c_str(), "RECREATE");
     outputfile->cd();
 
     // Make a new input handler
     std::vector<std::string> file_descriptor =
-      GeneralUtils::ParseToStr(inputfilename, ":");
+        GeneralUtils::ParseToStr(inputfilename, ":");
     if (file_descriptor.size() != 2) {
-      ERR(FTL) << "File descriptor had no filetype declaration: \"" << inputfilename
-               << "\". expected \"FILETYPE:file.root\"" << std::endl;
-      throw;
+      NUIS_ABORT("File descriptor had no filetype declaration: \""
+             << inputfilename << "\". expected \"FILETYPE:file.root\"");
     }
     InputUtils::InputType inptype =
-      InputUtils::ParseInputType(file_descriptor[0]);
+        InputUtils::ParseInputType(file_descriptor[0]);
 
-    InputHandlerBase* input = InputUtils::CreateInputHandler("eventsaver", inptype, file_descriptor[1]);
+    InputHandlerBase *input = InputUtils::CreateInputHandler(
+        "eventsaver", inptype, file_descriptor[1]);
 
     // Get info from inputhandler
     int nevents = input->GetNEvents();
     int countwidth = (nevents / 1000);
-    FitEvent* nuisevent = input->FirstNuisanceEvent();
+    FitEvent *nuisevent = input->FirstNuisanceEvent();
 
     outputfile->cd();
 
     // int lasttime = time(NULL);
-    TCanvas* fitcanvas = NULL;
-
-
-
+    TCanvas *fitcanvas = NULL;
 
     // Loop over all events and fill the TTree
     while (nuisevent) {
@@ -2267,7 +2281,8 @@ void SplineRoutines::SaveSplinePlots() {
 
       // Logging
       if (i % countwidth == 0) {
-        LOG(REC) << "Saved " << i << "/" << nevents << " nuisance spline plots. " << std::endl;
+        NUIS_LOG(REC,
+             "Saved " << i << "/" << nevents << " nuisance spline plots. ");
       }
 
       // Iterate
@@ -2286,19 +2301,20 @@ void SplineRoutines::SaveSplinePlots() {
 
   // remove Keys
   eventkeys.clear();
-
 }
 
 void SplineRoutines::TestSplines_NDLikelihoodThrow() {
 
   // Setup RW Engine
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Make a spline RW Engine too.
-  FitWeight* splweight = new FitWeight("splinerwaweight");
+  FitWeight *splweight = new FitWeight("splinerwaweight");
   std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
-  TH1D* parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(), 0.0, float(parameterkeys.size()));
+  TH1D *parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(),
+                                   0.0, float(parameterkeys.size()));
 
   // Add Parameters
   for (size_t i = 0; i < parameterkeys.size(); i++) {
@@ -2311,10 +2327,8 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
     parhisttemplate->SetBinContent(i + 1, nom);
     parhisttemplate->GetXaxis()->SetBinLabel(i + 1, parname.c_str());
 
-    splweight->IncludeDial( key.GetS("name"),
-                            kSPLINEPARAMETER, nom);
-    splweight->SetDialValue( key.GetS("name"), key.GetD("nominal") );
-
+    splweight->IncludeDial(key.GetS("name"), kSPLINEPARAMETER, nom);
+    splweight->SetDialValue(key.GetS("name"), key.GetD("nominal"));
   }
   splweight->Reconfigure();
 
@@ -2322,9 +2336,9 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector< std::string > scanparset_names;
-  std::vector< std::vector<double> > scanparset_vals;
-  std::vector< TH1D* > scanparset_hists;
+  std::vector<std::string> scanparset_names;
+  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
   // Add Parameters
@@ -2341,15 +2355,14 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
       }
 
       // Push Back Scan
-      double low  = key.GetD("low");
+      double low = key.GetD("low");
       double high = key.GetD("high");
-      newvals[j] =  gRandom->Uniform(low, high);
-
+      newvals[j] = gRandom->Uniform(low, high);
     }
     // Add to vects
     scanparset_vals.push_back(newvals);
 
-    TH1D* parhist = (TH1D*)parhisttemplate->Clone();
+    TH1D *parhist = (TH1D *)parhisttemplate->Clone();
     for (size_t j = 0; j < newvals.size(); j++) {
       parhist->SetBinContent(j + 1, newvals[j]);
     }
@@ -2359,7 +2372,7 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
   // Print out the parameter set to test
   for (uint i = 0; i < scanparset_vals.size(); i++) {
     std::cout << "Parset " << i;
-    for (uint j = 0 ; j < scanparset_vals[i].size(); j++) {
+    for (uint j = 0; j < scanparset_vals[i].size(); j++) {
       std::cout << " " << scanparset_vals[i][j];
     }
     std::cout << std::endl;
@@ -2367,11 +2380,10 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
 
   // Make a new set of Raw/Spline Sample Keys
   std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
-  std::vector<nuiskey> testkeys  = Config::QueryKeys("sampletest");
+  std::vector<nuiskey> testkeys = Config::QueryKeys("sampletest");
 
   std::vector<nuiskey> rawkeys;
   std::vector<nuiskey> splkeys;
-
 
   for (std::vector<nuiskey>::iterator iter = testkeys.begin();
        iter != testkeys.end(); iter++) {
@@ -2395,13 +2407,14 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
     splkeys.push_back(splkeytemp);
   }
 
-  if (fOutputRootFile) delete fOutputRootFile;
+  if (fOutputRootFile)
+    delete fOutputRootFile;
   fOutputRootFile = new TFile(fOutputFile.c_str(), "RECREATE");
 
   fOutputRootFile->ls();
   // Make two new JointFCN
-  JointFCN* rawfcn = new JointFCN(rawkeys, fOutputRootFile);
-  JointFCN* splfcn = new JointFCN(splkeys, fOutputRootFile);
+  JointFCN *rawfcn = new JointFCN(rawkeys, fOutputRootFile);
+  JointFCN *splfcn = new JointFCN(splkeys, fOutputRootFile);
 
   // Create iteration tree in output file
   fOutputRootFile->cd();
@@ -2417,29 +2430,30 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
     FitBase::SetRW(splweight);
     double spltotal = splfcn->DoEval(&scanparset_vals[j][0]);
 
-    LOG(FIT) << "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " " << spltotal - rawtotal << std::endl;
+    NUIS_LOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
+                                  << spltotal - rawtotal);
   }
 
   fOutputRootFile->cd();
 
   rawfcn->WriteIterationTree();
   splfcn->WriteIterationTree();
-
 }
-
 
 void SplineRoutines::TestSplines_1DLikelihoodScan() {
 
   // Setup RW Engine.
-  if (fRW) delete fRW;
+  if (fRW)
+    delete fRW;
   SetupRWEngine();
 
   // Setup Parameter Set.
   // Make a spline RW Engine too.
-  FitWeight* splweight = new FitWeight("splinerwaweight");
+  FitWeight *splweight = new FitWeight("splinerwaweight");
   // std::vector<nuiskey> splinekeys    = Config::QueryKeys("spline");
   std::vector<nuiskey> parameterkeys = Config::QueryKeys("parameter");
-  TH1D* parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(), 0.0, float(parameterkeys.size()));
+  TH1D *parhisttemplate = new TH1D("parhist", "parhist", parameterkeys.size(),
+                                   0.0, float(parameterkeys.size()));
 
   // Add Parameters
   for (size_t i = 0; i < parameterkeys.size(); i++) {
@@ -2452,10 +2466,8 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
     parhisttemplate->SetBinContent(i + 1, nom);
     parhisttemplate->GetXaxis()->SetBinLabel(i + 1, parname.c_str());
 
-    splweight->IncludeDial( key.GetS("name"),
-                            kSPLINEPARAMETER, nom);
-    splweight->SetDialValue( key.GetS("name"), key.GetD("nominal") );
-
+    splweight->IncludeDial(key.GetS("name"), kSPLINEPARAMETER, nom);
+    splweight->SetDialValue(key.GetS("name"), key.GetD("nominal"));
   }
   splweight->Reconfigure();
 
@@ -2463,8 +2475,8 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector< std::vector<double> > scanparset_vals;
-  std::vector< TH1D* > scanparset_hists;
+  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
   // Add Parameters
@@ -2479,7 +2491,7 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
     }
 
     // Push Back Scan
-    double low  = key.GetD("low");
+    double low = key.GetD("low");
     double high = key.GetD("high");
     double cur = low;
     double step = key.GetD("step");
@@ -2493,12 +2505,11 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
       // Add to vects
       scanparset_vals.push_back(newvals);
 
-      TH1D* parhist = (TH1D*)parhisttemplate->Clone();
+      TH1D *parhist = (TH1D *)parhisttemplate->Clone();
       for (size_t j = 0; j < newvals.size(); j++) {
         parhist->SetBinContent(j + 1, newvals[j]);
       }
       scanparset_hists.push_back(parhist);
-
 
       // Move to next one
       cur += step;
@@ -2508,7 +2519,7 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
   // Print out the parameter set to test
   for (uint i = 0; i < scanparset_vals.size(); i++) {
     std::cout << "Parset " << i;
-    for (uint j = 0 ; j < scanparset_vals[i].size(); j++) {
+    for (uint j = 0; j < scanparset_vals[i].size(); j++) {
       std::cout << " " << scanparset_vals[i][j];
     }
     std::cout << std::endl;
@@ -2516,11 +2527,10 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
 
   // Make a new set of Raw/Spline Sample Keys
   std::vector<nuiskey> eventkeys = Config::QueryKeys("events");
-  std::vector<nuiskey> testkeys  = Config::QueryKeys("sampletest");
+  std::vector<nuiskey> testkeys = Config::QueryKeys("sampletest");
 
   std::vector<nuiskey> rawkeys;
   std::vector<nuiskey> splkeys;
-
 
   for (std::vector<nuiskey>::iterator iter = testkeys.begin();
        iter != testkeys.end(); iter++) {
@@ -2544,13 +2554,14 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
     splkeys.push_back(splkeytemp);
   }
 
-  if (fOutputRootFile) delete fOutputRootFile;
+  if (fOutputRootFile)
+    delete fOutputRootFile;
   fOutputRootFile = new TFile(fOutputFile.c_str(), "RECREATE");
 
   fOutputRootFile->ls();
   // Make two new JointFCN
-  JointFCN* rawfcn = new JointFCN(rawkeys, fOutputRootFile);
-  JointFCN* splfcn = new JointFCN(splkeys, fOutputRootFile);
+  JointFCN *rawfcn = new JointFCN(rawkeys, fOutputRootFile);
+  JointFCN *splfcn = new JointFCN(splkeys, fOutputRootFile);
 
   // Create iteration tree in output file
   fOutputRootFile->cd();
@@ -2566,16 +2577,15 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
     FitBase::SetRW(splweight);
     double spltotal = splfcn->DoEval(&scanparset_vals[j][0]);
 
-    LOG(FIT) << "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " " << spltotal - rawtotal << std::endl;
+    NUIS_LOG(FIT, "RAW SPLINE DIF = " << rawtotal << " " << spltotal << " "
+                                  << spltotal - rawtotal);
   }
 
   fOutputRootFile->cd();
 
   rawfcn->WriteIterationTree();
   splfcn->WriteIterationTree();
-
 }
-
 
 /*
   MISC Functions

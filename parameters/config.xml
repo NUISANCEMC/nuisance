@@ -208,9 +208,11 @@
 <!-- Use NOvA Weights or not -->
 <config NOvA_Weights="false" />
 
-<!-- Tune name, for GENIE v3+ -->
-<config GENIETune="G18_02a_00_000" />
+<!-- Tune name, for GENIE v3+ Must specify this or
+too ,any opportunities for mistakes.
+<config GENIETune="G18_02a_00_000" /> -->
 <config GENIEEventGeneratorList="Default" />
+
 
 <!--
 <config GENIEXSecModelCCRES="genie::ReinSehgalRESPXSec" />

@@ -17,8 +17,8 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 set(IMPLFILES
-T2K_CC0pi_XSec_2DPcos_nu.cxx
-T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
+T2K_CC0pi_XSec_2DPcos_nu_I.cxx
+T2K_CC0pi_XSec_2DPcos_nu_II.cxx
 T2K_CCinc_XSec_2DPcos_nu_nonuniform.cxx
 
 T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.cxx
@@ -48,9 +48,9 @@ T2K_SignalDef.cxx
 )
 
 set(HEADERFILES
-T2K_CC0pi_XSec_2DPcos_nu.h
-T2K_CC0pi_XSec_2DPcos_nu_nonuniform.cxx
-T2K_CCinc_XSec_2DPcos_nu_nonuniform.cxx
+T2K_CC0pi_XSec_2DPcos_nu_I.h
+T2K_CC0pi_XSec_2DPcos_nu_II.h
+T2K_CCinc_XSec_2DPcos_nu_nonuniform.h
 
 T2K_CC1pip_CH_XSec_2Dpmucosmu_nu.h
 T2K_CC1pip_CH_XSec_1Dppi_nu.h
