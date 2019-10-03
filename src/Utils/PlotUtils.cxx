@@ -1142,7 +1142,8 @@ TH1D* PlotUtils::GetProjectionX(TH2D* hist, TH2I* mask) {
   TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_X = maskedhist->ProjectionX();
+  TH1D* hist_X = maskedhist->ProjectionX("_px", 1, maskedhist->GetXaxis()->GetNbins());
+  hist_X->SetTitle(Form("%s x no under/overflow", hist_X->GetTitle()));
 
   delete maskedhist;
   return hist_X;
@@ -1155,7 +1156,8 @@ TH1D* PlotUtils::GetProjectionY(TH2D* hist, TH2I* mask) {
   TH2D* maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_Y = maskedhist->ProjectionY();
+  TH1D* hist_Y = maskedhist->ProjectionY("_py", 1, maskedhist->GetYaxis()->GetNbins());
+  hist_Y->SetTitle(Form("%s y no under/overflow", hist_Y->GetTitle()));
 
   delete maskedhist;
   return hist_Y;
