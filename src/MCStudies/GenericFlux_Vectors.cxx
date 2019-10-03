@@ -241,7 +241,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
   // Save outgoing particle vectors
   nfsp = (int)partList.size();
-  std::map<int, std::vector<std::pair<double, int>>> pdgMap;
+  std::map<int, std::vector<std::pair<double, int> > > pdgMap;
 
   for (int i = 0; i < nfsp; ++i) {
     px[i] = partList[i]->fP.X() / 1E3;
@@ -252,10 +252,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pdgMap[pdg[i]].push_back(std::make_pair(partList[i]->fP.Vect().Mag(), i));
   }
 
-  for (std::map<int, std::vector<std::pair<double, int>>>::iterator iter =
+  for (std::map<int, std::vector<std::pair<double, int> > >::iterator iter =
            pdgMap.begin();
        iter != pdgMap.end(); ++iter) {
-    std::vector<std::pair<double, int>> thisVect = iter->second;
+    std::vector<std::pair<double, int> > thisVect = iter->second;
     std::sort(thisVect.begin(), thisVect.end());
 
     // Now save the order... a bit funky to avoid inverting

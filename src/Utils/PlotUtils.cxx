@@ -908,10 +908,10 @@ std::vector<double> PlotUtils::GetArrayFromTextFile(std::string DataFile) {
 }
 
 // Get a 2D array from a text file
-std::vector<std::vector<double>>
+std::vector<std::vector<double> >
 PlotUtils::Get2DArrayFromTextFile(std::string DataFile) {
   std::string line;
-  std::vector<std::vector<double>> DataArray;
+  std::vector<std::vector<double> > DataArray;
   std::ifstream data(DataFile.c_str(), std::ifstream::in);
   while (std::getline(data >> std::ws, line, '\n')) {
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
@@ -931,14 +931,14 @@ TH2D *PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx,
   std::vector<double> ybins = GetArrayFromTextFile(biny);
 
   // Read in the data
-  std::vector<std::vector<double>> Data = Get2DArrayFromTextFile(data);
+  std::vector<std::vector<double> > Data = Get2DArrayFromTextFile(data);
 
   // And finally fill the data
   TH2D *DataPlot = new TH2D("TempHist", "TempHist", xbins.size() - 1, &xbins[0],
                             ybins.size() - 1, &ybins[0]);
   int nBinsX = 0;
   int nBinsY = 0;
-  for (std::vector<std::vector<double>>::iterator it = Data.begin();
+  for (std::vector<std::vector<double> >::iterator it = Data.begin();
        it != Data.end(); ++it) {
     nBinsX++;
     // Get the inner vector

@@ -549,7 +549,7 @@ void MeasurementBase::AutoFillExtraTH1() {
 }
 
 void MeasurementBase::AutoResetExtraTH1() {
-  for (std::map<StackBase *, std::vector<int>>::iterator iter =
+  for (std::map<StackBase *, std::vector<int> >::iterator iter =
            fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
     if (!((*iter).second)[kCMD_Reset])
@@ -559,7 +559,7 @@ void MeasurementBase::AutoResetExtraTH1() {
 };
 
 void MeasurementBase::AutoScaleExtraTH1() {
-  for (std::map<StackBase *, std::vector<int>>::iterator iter =
+  for (std::map<StackBase *, std::vector<int> >::iterator iter =
            fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
     if (!((*iter).second)[kCMD_Scale])
@@ -577,7 +577,7 @@ void MeasurementBase::AutoNormExtraTH1(double norm) {
   if (norm != 0.0)
     sfactor = 1.0 / norm;
 
-  for (std::map<StackBase *, std::vector<int>>::iterator iter =
+  for (std::map<StackBase *, std::vector<int> >::iterator iter =
            fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
     if (!((*iter).second)[kCMD_Norm])
@@ -587,7 +587,7 @@ void MeasurementBase::AutoNormExtraTH1(double norm) {
 };
 
 void MeasurementBase::AutoWriteExtraTH1() {
-  for (std::map<StackBase *, std::vector<int>>::iterator iter =
+  for (std::map<StackBase *, std::vector<int> >::iterator iter =
            fExtraTH1s.begin();
        iter != fExtraTH1s.end(); iter++) {
     if (!(((*iter).second)[kCMD_Write]))

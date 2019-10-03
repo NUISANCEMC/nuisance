@@ -1542,7 +1542,7 @@ void SplineRoutines::TestSplines_1DEventScan() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<std::vector<double> > scanparset_vals;
   std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
@@ -1980,7 +1980,7 @@ void SplineRoutines::TestSplines_NDEventThrow() {
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
   std::vector<std::string> scanparset_names;
-  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<std::vector<double> > scanparset_vals;
   std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
@@ -2337,7 +2337,7 @@ void SplineRoutines::TestSplines_NDLikelihoodThrow() {
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
   std::vector<std::string> scanparset_names;
-  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<std::vector<double> > scanparset_vals;
   std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params
@@ -2475,7 +2475,7 @@ void SplineRoutines::TestSplines_1DLikelihoodScan() {
   std::vector<double> nomvals = fRW->GetDialValues();
   // int testres = FitPar::Config().GetParI("spline_test_resolution");
 
-  std::vector<std::vector<double>> scanparset_vals;
+  std::vector<std::vector<double> > scanparset_vals;
   std::vector<TH1D *> scanparset_hists;
 
   // Loop over all params

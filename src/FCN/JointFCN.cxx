@@ -757,11 +757,11 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Setup fast vector iterators.
   std::vector<bool>::iterator inpsig_iter = fSignalEventFlags.begin();
-  std::vector<std::vector<MeasurementVariableBox *>>::iterator box_iter =
+  std::vector<std::vector<MeasurementVariableBox *> >::iterator box_iter =
       fSignalEventBoxes.begin();
-  std::vector<std::vector<float>>::iterator spline_iter =
+  std::vector<std::vector<float> >::iterator spline_iter =
       fSignalEventSplines.begin();
-  std::vector<std::vector<bool>>::iterator samsig_iter =
+  std::vector<std::vector<bool> >::iterator samsig_iter =
       fSampleSignalFlags.begin();
   int splinecount = 0;
 

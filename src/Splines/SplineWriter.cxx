@@ -81,7 +81,7 @@ void SplineWriter::SetupSplineSet() {
       pos.push_back(temppos);
     }
 
-    std::vector<std::vector<double>> vals =
+    std::vector<std::vector<double> > vals =
         SplineUtils::GetSplitDialPoints(fPoints[i]);
 
     for (size_t j = 0; j < vals.size(); j++) {
@@ -205,7 +205,7 @@ void SplineWriter::FitSplinesForEvent(double *inputweights, float *coeff) {
   for (int i = 0; i < n; i++) {
 
     // DialVals
-    std::vector<std::vector<double>> dialvals;
+    std::vector<std::vector<double> > dialvals;
     std::vector<double> weightvals;
     bool hasresponse = false;
 
@@ -259,7 +259,7 @@ void SplineWriter::FitSplinesForEvent(TCanvas *fitcanvas, bool saveplot) {
   for (int i = 0; i < n; i++) {
 
     // Store X/Y Vals
-    std::vector<std::vector<double>> dialvals;
+    std::vector<std::vector<double> > dialvals;
     std::vector<double> weightvals;
     bool hasresponse = false;
     int npar = (fAllSplines[i]).GetNPar();
@@ -372,7 +372,7 @@ void SplineWriter::FitSplinesForEvent(TCanvas *fitcanvas, bool saveplot) {
 
 // Fitting
 // ----------------------------------------------
-void SplineWriter::FitCoeff(Spline *spl, std::vector<std::vector<double>> &v,
+void SplineWriter::FitCoeff(Spline *spl, std::vector<std::vector<double> > &v,
                             std::vector<double> &w, float *coeff, bool draw) {
 
   std::vector<double> x;
@@ -655,7 +655,7 @@ void SplineWriter::FitCoeff2DGraph(Spline *spl, int n, double *x, double *y,
 }
 
 void SplineWriter::FitCoeffNDGraph(Spline *spl,
-                                   std::vector<std::vector<double>> &v,
+                                   std::vector<std::vector<double> > &v,
                                    std::vector<double> &w, float *coeff,
                                    bool draw) {
 #ifdef __MINUIT2_ENABLED__

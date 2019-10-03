@@ -13,7 +13,7 @@ Spline::Spline(std::string splname, std::string form, std::string points) {
 
   // Setup Min Max for each Parameter
   fSplitNames = GeneralUtils::ParseToStr(splname, ";");
-  std::vector<std::vector<double>> gridvals =
+  std::vector<std::vector<double> > gridvals =
       SplineUtils::GetSplitDialPoints(fPoints);
 
   for (size_t i = 0; i < fSplitNames.size(); i++) {

@@ -62,7 +62,7 @@ double SampleNormEngine::GetDialValue(std::string name) {
 
     // If not iterate and check entry in one of the keys
   } else {
-    for (std::map<std::string, std::vector<size_t>>::iterator iter =
+    for (std::map<std::string, std::vector<size_t> >::iterator iter =
              fNameIndex.begin();
          iter != fNameIndex.end(); iter++) {
       std::string keyname = iter->first;

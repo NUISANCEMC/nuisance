@@ -5,7 +5,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 #ifdef __NEUT_ENABLED__
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  LOG(FIT) << "Setting up NIWG RW : " << fCalcName << std::endl;
+  NUIS_LOG(FIT, "Setting up NIWG RW : " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();

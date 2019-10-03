@@ -523,9 +523,9 @@ DynamicSampleFactory &DynamicSampleFactory::Get() {
   return *glblDSF;
 }
 void DynamicSampleFactory::Print() {
-  std::map<std::string, std::vector<std::string>> ManifestSamples;
+  std::map<std::string, std::vector<std::string> > ManifestSamples;
 
-  for (std::map<std::string, std::pair<std::string, int>>::iterator smp_it =
+  for (std::map<std::string, std::pair<std::string, int> >::iterator smp_it =
            Samples.begin();
        smp_it != Samples.end(); ++smp_it) {
     if (!ManifestSamples.count(smp_it->second.first)) {
@@ -535,7 +535,7 @@ void DynamicSampleFactory::Print() {
   }
 
   NUIS_LOG(FIT, "Dynamic sample manifest: ");
-  for (std::map<std::string, std::vector<std::string>>::iterator m_it =
+  for (std::map<std::string, std::vector<std::string> >::iterator m_it =
            ManifestSamples.begin();
        m_it != ManifestSamples.end(); ++m_it) {
     NUIS_LOG(FIT, "\tLibrary " << m_it->first << " contains: ");
