@@ -12,18 +12,15 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 	fNIWGRW = new niwg::rew::NIWGReWeight();
 
 	// Get List of Veto Calcs (For Debugging)
-	std::string rw_engine_list =
-	    FitPar::Config().GetParS("FitWeight_fNIWGRW_veto");
+	std::string rw_engine_list = FitPar::Config().GetParS("FitWeight_fNIWGRW_veto");
 	bool niwg_2012a = rw_engine_list.find("niwg_2012a") == std::string::npos;
 	bool niwg_2014a = rw_engine_list.find("niwg_2014a") == std::string::npos;
 	bool niwg_pimult = rw_engine_list.find("niwg_pimult") == std::string::npos;
 	bool niwg_mec = rw_engine_list.find("niwg_mec") == std::string::npos;
 	bool niwg_rpa = rw_engine_list.find("niwg_rpa") == std::string::npos;
 	bool niwg_eff_rpa = rw_engine_list.find("niwg_eff_rpa") == std::string::npos;
-	bool niwg_proton =
-	    rw_engine_list.find("niwg_protonFSIbug") == std::string::npos;
-	bool niwg_hadron =
-	    rw_engine_list.find("niwg_HadronMultSwitch") == std::string::npos;
+	bool niwg_proton = rw_engine_list.find("niwg_protonFSIbug") == std::string::npos;
+	bool niwg_hadron = rw_engine_list.find("niwg_HadronMultSwitch") == std::string::npos;
 
 	// Add the RW Calcs
 	if (niwg_2012a)
@@ -45,6 +42,8 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 	if (niwg_hadron)
 		fNIWGRW->AdoptWghtCalc("niwg_HadronMultSwitch",
 		                       new niwg::rew::NIWGReWeightHadronMultSwitch);
+        // Add in Luke's low Q2 suppression
+        fNIWGRW->AdoptWghtCalc("niwg_QELowQ2", new niwg::rew::NIWGReWeightEffectiveQELowQ2Suppression);
 
 	fNIWGRW->Reconfigure();
 
