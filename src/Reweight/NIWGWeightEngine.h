@@ -10,7 +10,9 @@
 #include "NIWGReWeight2014a.h"
 #include "NIWGReWeightDeltaMass.h"
 #include "NIWGReWeightEffectiveRPA.h"
+#ifdef HAVE_NIWGRW_LOWQ2
 #include "NIWGReWeightEffectiveQELowQ2Suppression.h"
+#endif
 #include "NIWGReWeightHadronMultSwitch.h"
 #include "NIWGReWeightMEC.h"
 #include "NIWGReWeightPiMult.h"
