@@ -1,5 +1,5 @@
 # par Name Units Nominal FracErr ConvFunc
-neut_parameter MaCCQE GeV 1.21*(1.0+x*0.16)
+neut_parameter MaCCQE GeV 1.21*(1.0+x*0.165289256)
 neut_parameter MaNFFRES GeV 0.95*(1.0+x*0.157894737)
 neut_parameter CA5RES x 1.01*(1.0+x*0.247524752)
 neut_parameter BgSclRES x 1.30*(1.0+x*0.153846154)
