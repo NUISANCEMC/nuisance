@@ -61,6 +61,7 @@ LIST(APPEND ROOT_LIBS
   Geom
   GenVector)
 
+cmessage(STATUS "Checking ROOT version: ${ROOT_VERSION}")
 string(REGEX MATCH "^6.*" ROOTVERSIXMATCH ${ROOT_VERSION})
 if(ROOTVERSIXMATCH)
   cmessage(STATUS "Using ROOT6, We are essentially flying blind here.")
