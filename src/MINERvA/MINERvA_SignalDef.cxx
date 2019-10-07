@@ -419,7 +419,7 @@ namespace SignalDef {
       } else if( pdg == 22 && energy > 10.0 ) {
         genie_n_photons++;
         // Mesons
-      } else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || abs(pdg) == 111 || abs(pdg) == 130 || abs(pdg) == 310 || abs(pdg) == 311 || abs(pdg) == 313 ) {
+      } else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311 || pdg == 313  || abs(pdg) == 221 || abs(pdg) == 331 ) {
         genie_n_mesons++;
         // Heavy baryons and pi0s
       } else if( abs(pdg) == 3112 || abs(pdg) == 3122 || abs(pdg) == 3212 || abs(pdg) == 3222 || abs(pdg) == 4112 || 
