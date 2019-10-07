@@ -18,17 +18,15 @@
  *******************************************************************************/
 
 /*
-  Authors: Adrian Orea (v1 2017)
-           Clarence Wret (v2 2018)
+  Authors: Clarence Wret (v2 2018)
 */
 
-#include "MINERvA_CC0pi_XSec_2D_nu.h"
+#include "MINERvA_CC0pi_XSec_3DptpzTp_nu.h"
 #include "MINERvA_SignalDef.h"
 
 //********************************************************************
-void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
+void MINERvA_CC0pi_XSec_3DptpzTp_nu::SetupDataSettings() {
   //********************************************************************
-
   // Define what files to use from the dist
   std::string datafile = "";
   std::string corrfile = "";
@@ -36,11 +34,11 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   std::string distdescript = "";
   std::string histname = "";
 
-  datafile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
-  corrfile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
+  datafile = "MINERvA/CC0pi_3D/cov_ptpl_3DptpzTp_qelike.root";
+  corrfile = "MINERvA/CC0pi_3D/cov_ptpl_3DptpzTp_qelike.root";
   titles = "MINERvA CC0#pi #nu_{#mu} p_{t} p_{z};p_{z} (GeV);p_{t} "
     "(GeV);d^{2}#sigma/dP_{t}dP_{z} (cm^{2}/GeV^{2}/nucleon)";
-  distdescript = "MINERvA_CC0pi_XSec_2Dptpz_nu sample";
+  distdescript = "MINERvA_CC0pi_XSec_3DptpzTp_nu sample";
   histname = "pt_pl_cross_section";
 
   fSettings.SetTitle(GeneralUtils::ParseToStr(titles, ";")[0]);
@@ -56,15 +54,32 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   fSettings.SetDescription(descrip);
 
   // The input ROOT file
-  fSettings.SetDataInput(FitPar::GetDataBase() + datafile);
-  fSettings.SetCovarInput(FitPar::GetDataBase() + corrfile);
+  //fSettings.SetDataInput(FitPar::GetDataBase() + datafile);
+  //fSettings.SetCovarInput(FitPar::GetDataBase() + corrfile);
 
-  // Set the data file
-  SetDataValues(fSettings.GetDataInput(), histname);
+  nptbins = 7;
+  ptbins = {0, 0.15, 0.25, 0.4, 0.7, 1, 2.5}; // GeV
+  npzbins = 4;
+  pzbins = {1.5, 3.5, 8, 20}; // GeV
+  ntpbins = 15;
+  sumTpbins = {0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 600, 800, 1000, 10000}; // MeV
+
+  // Data is actually an array of 2D measurements
+  // Have the 2D in pt pz and then Tp to be the left over axis
+  //fDataHist = new TH2D("minerva_test", "minerva_test", nptbins, ptbins, npzbins, pzbins);
+
+  for (int i = 0; i < ntpbins; ++i) {
+    fDataHist_Slices.push_back(new TH2D(Form("minerva_data_test_%i", i), Form("minerva_data_test_%i", i), nptbins, ptbins, npzbins, pzbins);
+    fMCHist_Slices.push_back(new TH2D(Form("minerva_mc_test_%i", i), Form("minerva_mc_test_%i", i), nptbins, ptbins, npzbins, pzbins);
+  }
+
+  //fDataHist->SetName((fSettings.GetName() + "_data").c_str());
+  //fDataHist->SetTitle(fSettings.GetFullTitles().c_str());
+
 }
 
 //********************************************************************
-MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
+MINERvA_CC0pi_XSec_3DptpzTp_nu::MINERvA_CC0pi_XSec_3DptpzTp_nu(nuiskey samplekey) {
   //********************************************************************
 
   // Setup common settings
@@ -81,64 +96,15 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
     (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
     this->TotalIntegratedFlux();
 
-  TMatrixDSym *tempmat = StatUtils::GetCovarFromRootFile(
-      fSettings.GetCovarInput(), "TotalCovariance");
-  fFullCovar = tempmat;
-  // Decomposition is stable for entries that aren't E-xxx
-  double ScalingFactor = 1E38 * 1E38;
-  (*fFullCovar) *= ScalingFactor;
-
-  // Just check that the data error and covariance are the same
-  for (int i = 0; i < fFullCovar->GetNrows(); ++i) {
-    for (int j = 0; j < fFullCovar->GetNcols(); ++j) {
-      // Get the global bin
-      int xbin1, ybin1, zbin1;
-      fDataHist->GetBinXYZ(i, xbin1, ybin1, zbin1);
-      double xlo1 = fDataHist->GetXaxis()->GetBinLowEdge(xbin1);
-      double xhi1 = fDataHist->GetXaxis()->GetBinLowEdge(xbin1 + 1);
-      double ylo1 = fDataHist->GetYaxis()->GetBinLowEdge(ybin1);
-      double yhi1 = fDataHist->GetYaxis()->GetBinLowEdge(ybin1 + 1);
-      if (xlo1 < fDataHist->GetXaxis()->GetBinLowEdge(1) ||
-          ylo1 < fDataHist->GetYaxis()->GetBinLowEdge(1) ||
-          xhi1 > fDataHist->GetXaxis()->GetBinLowEdge(
-            fDataHist->GetXaxis()->GetNbins() + 1) ||
-          yhi1 > fDataHist->GetYaxis()->GetBinLowEdge(
-            fDataHist->GetYaxis()->GetNbins() + 1))
-        continue;
-      double data_error = fDataHist->GetBinError(xbin1, ybin1);
-      double cov_error = sqrt((*fFullCovar)(i, i) / ScalingFactor);
-      if (fabs(data_error - cov_error) > 1E-5) {
-        std::cerr << "Error on data is different to that of covariance"
-          << std::endl;
-        NUIS_ERR(FTL, "Data error: " << data_error);
-        NUIS_ERR(FTL, "Cov error: " << cov_error);
-        NUIS_ERR(FTL, "Data/Cov: " << data_error / cov_error);
-        NUIS_ERR(FTL, "Data-Cov: " << data_error - cov_error);
-        NUIS_ERR(FTL, "For x: " << xlo1 << "-" << xhi1);
-        NUIS_ABORT("For y: " << ylo1 << "-" << yhi1);
-      }
-    }
-  }
-
-  // Now can make the inverted covariance
-  covar = StatUtils::GetInvert(fFullCovar);
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
-
-  // Now scale back
-  (*fFullCovar) *= 1.0 / ScalingFactor;
-  (*covar) *= ScalingFactor;
-  (*fDecomp) *= ScalingFactor;
-
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 };
 
 //********************************************************************
-void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
+void MINERvA_CC0pi_XSec_3DptpzTp_nu::FillEventVariables(FitEvent *event) {
   //********************************************************************
   // Checking to see if there is a Muon
-  if (event->NumFSParticle(13) == 0)
-    return;
+  if (event->NumFSParticle(13) == 0) return;
 
   // Get the muon kinematics
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
@@ -156,17 +122,43 @@ void MINERvA_CC0pi_XSec_2D_nu::FillEventVariables(FitEvent *event) {
   Double_t pz = Pmu.Vect().Dot(Pnu.Vect() * (1.0 / Pnu.Vect().Mag())) / 1000.;
   // Set Hist Variables
   fXVar = pz;
+
+  // Sum up kinetic energy of protons
+  double sum = 0.0;
+  for (std::vector<FitParticle*>::iterator it = event->GetAllFSProton().begin(); 
+      it != event->GetAllFSProton().end(); ++it) {
+    sum += (*it)->KE();
+  }
+  fZVar = sum;
+
 };
 
+void MINERvA_CC0pi_XSec_3DptpzTp_nu::FillHistograms() {
+  Measurement2D::FillHistograms();
+  if (Signal) {
+    FillMCSlice(fXVar, fYVar, fZVar, Weight);
+  }
+}
+
+void MINERvA_CC0pi_XSec_3DptpzTp_nu::FillMCSlice(double x, double y, double z, double w) {
+  // Find the bin
+  for (int i = 0; i < ntpbins; ++i) {
+    if (z > sumTpbins[i] && z < sumTpbins[i+1]) fMCHist_Slices[i]->Fill(y, x, w);
+  }
+}
+
 //********************************************************************
-bool MINERvA_CC0pi_XSec_2D_nu::isSignal(FitEvent *event) {
+bool MINERvA_CC0pi_XSec_3DptpzTp_nu::isSignal(FitEvent *event) {
   //********************************************************************
   return SignalDef::isCC0pi_MINERvAPTPZ(event, 14, EnuMin, EnuMax);
+
+  // From Dan
+  // if not (2212 or 2112 or 22 and E<10) BAD BAD BAD
 };
 
 //********************************************************************
 // Custom likelihood calculator because binning of covariance matrix
-double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
+double MINERvA_CC0pi_XSec_3DptpzTp_nu::GetLikelihood() {
   //********************************************************************
 
   // The calculated chi2

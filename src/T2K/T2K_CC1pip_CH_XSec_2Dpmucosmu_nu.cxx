@@ -42,11 +42,19 @@ T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(
   // SetDataValues(  fSettings.GetDataInput() );
   // SetCovarMatrix( fSettings.GetCovarInput() );
   SetHistograms();
-  fFullCovar = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
-                                               "Covariance_pmu_thetamu");
+  //fFullCovar = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
+                                               //"Covariance_pmu_thetamu");
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
   SetShapeCovar();
+  /*
+  for (int i = 0; i < covar->GetNrows(); ++i) {
+    for (int j = 0; j < covar->GetNrows(); ++j) {
+      if (i == j) std::cout << i << " " << j << " = " << 1/sqrt((*covar)(i,j)) << std::endl;
+    }
+  }
+  throw;
+  */
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -74,14 +82,15 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
     SetAutoProcessTH1(fMCHist_Slices[i]);
     fMCHist_Slices[i]->Reset();
     fMCHist_Slices[i]->SetLineColor(kRed);
-    nbins += slice->GetXaxis()->GetNbins();
+    //nbins += slice->GetXaxis()->GetNbins();
+    nbins += slice->GetXaxis()->GetNbins()-1;
   }
 
   fDataHist = new TH1D(dataname.c_str(), dataname.c_str(), nbins, 0, nbins);
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
   int bincount = 1;
   for (int i = 0; i < nslices; ++i) {
-    for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
+    for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins()-1; ++j) {
       fDataHist->SetBinContent(bincount,
                                fDataHist_Slices[i]->GetBinContent(j + 1));
       fDataHist->SetBinError(bincount, fDataHist_Slices[i]->GetBinError(j + 1));
@@ -107,6 +116,38 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   }
   fDataHist->GetXaxis()->SetTitle(fSettings.GetS("xtitle").c_str());
   fDataHist->GetYaxis()->SetTitle(fSettings.GetS("ytitle").c_str());
+
+  // Get the covariance
+  TMatrixDSym *temp = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(), "Covariance_pmu_thetamu");
+  int ncovbins = temp->GetNrows();
+  fFullCovar = new TMatrixDSym(ncovbins-4);
+  if (ncovbins != fDataHist->GetXaxis()->GetNbins()) {
+    NUIS_ERR(FTL, "Number of bins in covariance matrix does not match data");
+  }
+
+  // Number of costhetamu slices is nslices
+  // Number of pmu slices is 
+  int count1 = 0;
+  for (int i = 0; i < ncovbins-4; ++i) {
+    int count2 = 0;
+    //if (i >0 && i % 5 == 0) continue;
+    for (int j = 0; j < ncovbins-4; ++j) {
+      //if (j > 0 && j % 5 == 0) continue;
+      //if (j % nslices == 0) {
+      //if (count1 == count2) {
+        //std::cout << count1 << ", " << count2 << " = " << sqrt((*temp)(i,j)*1E-38*1E-38) << std::endl;
+      //}
+
+      // 1E79 matched to diagonal error
+      (*fFullCovar)(count1, count2) = (*temp)(i, j);
+      count2++;
+    }
+    count1++;
+  }
+
+  // Now reorganise the rows
+
+  delete temp;
 };
 
 void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::FillEventVariables(FitEvent *event) {
@@ -150,7 +191,7 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::ConvertEventRates() {
   fMCHist->Reset();
   int bincount = 1;
   for (int i = 0; i < nslices; i++) {
-    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++) {
+    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX()-1; j++) {
       fMCHist->SetBinContent(bincount, fMCHist_Slices[i]->GetBinContent(j + 1));
       bincount++;
     }

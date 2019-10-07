@@ -17,22 +17,22 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef MINERVA_CC0PI_XSEC_2D_NU_H_SEEN
-#define MINERVA_CC0PI_XSEC_2D_NU_H_SEEN
+#ifndef MINERVA_CC0PI_XSEC_3DPTPZTP_NU_H_SEEN
+#define MINERVA_CC0PI_XSEC_3DPTPZTP_NU_H_SEEN
 
 #include "Measurement2D.h"
 
 //********************************************************************  
-class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
+class MINERvA_CC0pi_XSec_3DptpzTp_nu : public Measurement2D {
 //********************************************************************  
 
  public:
 
   // Constructor
-  MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey);
+  MINERvA_CC0pi_XSec_3DptpzTp_nu(nuiskey samplekey);
 
   // Destructor
-  virtual ~MINERvA_CC0pi_XSec_2D_nu() {};
+  virtual ~MINERvA_CC0pi_XSec_3DptpzTp_nu() {};
 
   // Required functions
   bool isSignal(FitEvent *nvect);
@@ -45,6 +45,15 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
   // Set up settings based on distribution
   void SetupDataSettings();
 
+  std::vector<TH2D*> fDataHist_Slices;
+  std::vector<TH2D*> fMCHist_Slices;
+
+  int nptbins;
+  double *ptbins;
+  int npzbins;
+  double *pzbins;
+  int ntpbins;
+  double *sumTpbins;
 };
   
 #endif
