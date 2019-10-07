@@ -345,7 +345,7 @@ namespace SignalDef {
         genie_n_muons++;
       } else if( pdg == 22 && energy > 10.0 ) {
         genie_n_photons++;
-      } else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311 || pdg == 313 ) {
+      } else if( abs(pdg) == 211 || abs(pdg) == 321 || abs(pdg) == 323 || pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311 || pdg == 313  || abs(pdg) == 221 || abs(pdg) == 331 ) {
         genie_n_mesons++;
       } else if( pdg == 3112 || pdg == 3122 || pdg == 3212 || pdg == 3222 || pdg == 4112 ||
           pdg == 4122 || pdg == 4212 || pdg == 4222 || pdg == 411  || pdg == 421  || pdg == 111 ) {
