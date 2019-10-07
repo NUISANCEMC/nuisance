@@ -52,7 +52,7 @@ private:
 
   TMatrixDSym *fSmearingMatrix;
 
-  std::map<int, std::pair<size_t, size_t>> fPolyBinMap;
+  std::map<int, std::pair<size_t, size_t> > fPolyBinMap;
 
   std::vector<TH1D *> fMCHist_Slices;
   std::vector<TH1D *> fDataHist_Slices;
