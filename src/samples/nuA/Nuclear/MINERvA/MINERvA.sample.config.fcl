@@ -1,1 +1,2 @@
 #include "MINERvA.CC0Pi.sample.config.fcl"
+# include "MINERvA.CCInclusive.sample.config.fcl"

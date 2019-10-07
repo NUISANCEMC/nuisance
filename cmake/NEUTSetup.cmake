@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-find_program(neut-config NEUTCONFIGFOUND)
+find_program(NEUTCONFIGFOUND NAMES neut-config)
 
 LIST(APPEND EXTRA_CXX_FLAGS -DNEED_FILL_NEUT_COMMONS)
 
@@ -25,6 +25,9 @@ SET(HAVENEUTCONFIG FALSE)
 # We are dealing with shiny NEUT
 if(NOT "${NEUTCONFIGFOUND} " STREQUAL " ")
   SET(HAVENEUTCONFIG TRUE)
+  cmessage(STATUS "Found neut-config, using it to determine configuration.")
+else()
+  cmessage(STATUS "Failed to find neut-config, assuming older NEUT build.")
 endif()
 
 if(HAVENEUTCONFIG)

@@ -20,6 +20,7 @@ NEW_NUIS_EXCEPT(invalid_cli_arguments);
 size_t NMax = std::numeric_limits<size_t>::max();
 std::string input_file;
 std::string input_type;
+bool show_intermediates = false;
 
 void SayUsage(char const *argv[]) {
   std::cout << "[USAGE]: " << argv[0]
@@ -30,6 +31,8 @@ void SayUsage(char const *argv[]) {
                "capable of reading NUISANCE events from the argument of -i.\n"
                "\t-n <NMax>                   : Maximum number of events to "
                "read. Will read entire input file by default.\n"
+               "\t--show-intermediates        : Show pre-FSI particles where"
+               " relevant.\n"
             << std::endl;
 }
 
@@ -46,6 +49,8 @@ void handleOpts(int argc, char const *argv[]) {
       input_type = argv[++opt];
     } else if (std::string(argv[opt]) == "-n") {
       NMax = fhicl::string_parsers::str2T<size_t>(argv[++opt]);
+    } else if (std::string(argv[opt]) == "--show-intermediates") {
+      show_intermediates = true;
     } else {
       std::cout << "[ERROR]: Unknown option: " << argv[opt] << std::endl;
       SayUsage(argv);
@@ -70,9 +75,13 @@ int main(int argc, char const *argv[]) {
 
   sample_config.put("input_type", input_type);
   sample_config.put("file", input_file);
+  if (show_intermediates) {
+    sample_config.put("keep_intermediates", true);
+  }
 
-  nuis::plugins::plugin_traits<IEventProcessor>::unique_ptr_t VerboseEventSummary =
-      nuis::plugins::Instantiate<IEventProcessor>("VerboseEventSummary");
+  nuis::plugins::plugin_traits<IEventProcessor>::unique_ptr_t
+      VerboseEventSummary =
+          nuis::plugins::Instantiate<IEventProcessor>("VerboseEventSummary");
 
   VerboseEventSummary->Initialize(sample_config);
   VerboseEventSummary->ProcessSample(NMax);

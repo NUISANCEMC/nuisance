@@ -54,6 +54,7 @@ void T2KReWeightEngine::Reconfigure() {
   for (T2KSystParam const &tsp : fT2KSysts) {
     double val = ParameterManager::Get().GetParameterValue(tsp.pid);
     fT2KRW->Systematics().SetTwkDial(tsp.t2ksyst, val);
+    std::cout << "Reconf: " << t2krew::T2KSyst::AsString(tsp.t2ksyst) << " -> " << val << std::endl;
   }
 
   fT2KRW->Reconfigure();

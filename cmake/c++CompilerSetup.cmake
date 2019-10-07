@@ -18,8 +18,9 @@
 ################################################################################
 
 set(CXX_WARNINGS -Wall -Wextra)
+set(CXX_IGNORE_WARNINGS -Wno-delete-non-virtual-dtor -Wno-unused -Wno-misleading-indentation)
 
-LIST(APPEND EXTRA_CXX_FLAGS ${CXX_WARNINGS} -Werror -Wno-delete-non-virtual-dtor -Wno-unused "-D__FILENAME__=\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"")
+LIST(APPEND EXTRA_CXX_FLAGS ${CXX_WARNINGS} -Werror ${CXX_IGNORE_WARNINGS}  "-D__FILENAME__=\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"")
 
 BuildFlagString(NUISANCE_LINK_DIRS "-L" ${EXTRA_LINK_DIRS})
 

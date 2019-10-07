@@ -307,6 +307,7 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
   size_t NKnots = xsecinfo.get<size_t>("NKnots", 100);
 
   std::vector<TargetSplineBlob> TargetSplines;
+  std::set<std::string> FoundSplines;
   int probe = xsecinfo.get<int>("nu_pdg");
 
   for (std::string const &target :
@@ -333,8 +334,7 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
 
     std::cout << "[INFO]:\tGetting splines that match: \"" << ss.str()
               << "\" with A = " << TargetSplines.back().NNucleons
-              << " and multiplied by "
-              << molwght / double(TargetSplines.back().NNucleons) << std::endl;
+              << " and multiplied by " << molwght << std::endl;
   }
 
   size_t NTotNucleons = 0;
@@ -365,10 +365,8 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
       TargetSplines[ts_it].TotSpline.SetPoint(p_it, EMin + p_it * step, 0);
     }
 
-    double target_weight = (TargetSplines[ts_it].MolecularWeight /
-                            double(TargetSplines[ts_it].NNucleons));
     for (size_t c_it = 0; c_it < all_splines[ts_it].size(); ++c_it) {
-      double weight = target_weight;
+      double weight = TargetSplines[ts_it].MolecularWeight;
       if (std::string(all_splines[ts_it][c_it].GetName()).find("MEC") !=
           std::string::npos) {
         if (mec_scale != 1) {
@@ -377,11 +375,12 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
           weight *= mec_scale;
         }
       }
+      FoundSplines.insert(all_splines[ts_it][c_it].GetName());
       for (size_t p_it = 0; p_it < NKnots; ++p_it) {
         double E, XSec;
         TargetSplines[ts_it].TotSpline.GetPoint(p_it, E, XSec);
 
-        // Copied from GENIE/Convents/Units.h
+        // Copied from GENIE/Conventions/Units.h
         static const double gigaelectronvolt = 1.;
         static const double GeV = gigaelectronvolt;
         static const double meter = 5.07e+15 / GeV;
@@ -395,8 +394,18 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
     }
   }
 
+  for (auto const &sn : spline_list) {
+    std::cout << "Want: " << sn << std::endl;
+    if (FoundSplines.count(sn)) {
+      std::cout << "\tFound!" << std::endl;
+    } else {
+      std::cout << "Didn't find." << std::endl;
+    }
+  }
+
   // Sum all the correctly weighted per-target splines
   TGraph MasterSpline(NKnots);
+  TGraph MasterSpline_pernuc(NKnots);
 
   for (size_t p_it = 0; p_it < NKnots; ++p_it) {
     MasterSpline.SetPoint(p_it, EMin + p_it * step, 0);
@@ -405,10 +414,15 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
     for (size_t p_it = 0; p_it < NKnots; ++p_it) {
       double E, XSec;
       MasterSpline.GetPoint(p_it, E, XSec);
-      XSec += TargetSplines[c_it].TotSpline.Eval(E) * WeightToPerNucleon;
-
+      XSec += TargetSplines[c_it].TotSpline.Eval(E);
       MasterSpline.SetPoint(p_it, E, XSec);
     }
+  }
+
+  for (size_t p_it = 0; p_it < NKnots; ++p_it) {
+    double E, XSec;
+    MasterSpline.GetPoint(p_it, E, XSec);
+    MasterSpline_pernuc.SetPoint(p_it, E, XSec * WeightToPerNucleon);
   }
 
   nuis::utility::TFile_ptr outfile(nullptr, [](TFile *) {});
@@ -423,6 +437,8 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
       nuis::utility::WriteToTFile(outfile, &sp.TotSpline, spname.c_str());
     }
     nuis::utility::WriteToTFile(outfile, &MasterSpline, "TotalXSec");
+    nuis::utility::WriteToTFile(outfile, &MasterSpline_pernuc,
+                                "TotalXSec_pernuc");
   }
 
   fhicl::ParameterSet fluxps = xsecinfo.get<fhicl::ParameterSet>("flux");
@@ -430,7 +446,7 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
   if (fluxps.has_key("energy_GeV")) {
     double monoE = fluxps.get<double>("energy_GeV");
 
-    return MasterSpline.Eval(monoE);
+    return MasterSpline_pernuc.Eval(monoE);
   } else {
     // Use the master spline to get flux*xsec (which the events are thrown
     // according to) and return the flux-averaged total xsec which is used for
@@ -457,7 +473,10 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
       double avg_xsec = 0;
       for (size_t i = 0; i < NIntSteps; ++i) {
         double e = low_e + (double(i) + 0.5) * step;
-        avg_xsec += MasterSpline.Eval(e);
+        if ((e < EMin) || (e > EMax)) {
+          continue;
+        }
+        avg_xsec += MasterSpline_pernuc.Eval(e);
       }
       avg_xsec /= double(NIntSteps);
 
@@ -473,6 +492,96 @@ double GetFileWeight(fhicl::ParameterSet const &xsecinfo,
 
     return EvRateIntegral / FluxIntegral;
   }
+}
+
+struct TargetXSecHistBlob {
+  double MolecularWeight;
+  size_t NNucleons;
+  std::string search_term;
+  TH1 *TotHist;
+};
+
+std::set<std::string> GENIEInputHandler::GetFileWeightFromReconstructedSplines(
+    fhicl::ParameterSet const &xsecinfo, TTree *GENIETree,
+    genie::NtpMCEventRecord *GenieNtpl) {
+
+
+
+  double EMin = xsecinfo.get<double>("EMin", 0);
+  double EMax = xsecinfo.get<double>("EMax", 10);
+  std::vector<TargetXSecHistBlob> TargetXSecHists;
+  for (std::string const &target :
+       xsecinfo.get<std::vector<std::string>>("target")) {
+    std::vector<std::string> splits = nuis::utility::split(target, ";");
+    if (splits.size() != 1 && splits.size() != 2) {
+      throw Invalid_target_specifier()
+          << "Expected to find 100ZZZAAA0;<MolecularWeight>, e.g. "
+             "1000060120;1, "
+             "but found: \""
+          << target << "\"";
+    }
+    std::stringstream ss;
+    ss << ".*nu:" << probe << ";tgt:" << splits[0] << ".*";
+
+    size_t nuc_pdg = fhicl::string_parsers::str2T<size_t>(splits[0]);
+
+    double molwght = splits.size() == 2
+                         ? fhicl::string_parsers::str2T<double>(splits[1])
+                         : 1;
+
+    TargetXSecHists.push_back(
+        {molwght, (nuc_pdg % 1000) / 10, ss.str(), TGraph()});
+
+    std::cout << "[INFO]:\tGetting splines that match: \"" << ss.str()
+              << "\" with A = " << TargetXSecHists.back().NNucleons
+              << " and multiplied by " << molwght << std::endl;
+  }
+
+  size_t NTotNucleons = 0;
+  std::vector<std::string> spline_patterns;
+  for (auto const &spb : TargetXSecHists) {
+    spline_patterns.push_back(spb.search_term);
+    NTotNucleons += spb.MolecularWeight * spb.NNucleons;
+  }
+  double WeightToPerNucleon = 1.0 / double(NTotNucleons);
+
+  std::map<std::string, TGraph> splines;
+  size_t NEvents = GetNEvents();
+  size_t ShoutEvery = NEvents / 100;
+  std::cout << "[INFO]: Rebuilding GENIE splines." << std::endl;
+  std::cout << "[INFO]: Read " << 0 << "/" << NEvents << " GENIE events."
+            << std::flush;
+  for (size_t ev_it = 0; ev_it < NEvents; ++ev_it) {
+    if (fGenieNtpl) {
+      fGenieNtpl->Clear();
+    }
+    fInputTree.tree->GetEntry(ev_it);
+
+    if (ShoutEvery && !(ev_it % ShoutEvery)) {
+      std::cout << "\r[INFO]: Read " << ev_it << "/" << NEvents
+                << " GENIE events." << std::flush;
+    }
+
+    genie::GHepRecord *GHep =
+        static_cast<genie::GHepRecord *>(fGenieNtpl->event);
+    if (!GHep) {
+      throw invalid_GENIE_event() << "[ERROR]: GENIE event " << ev_it
+                                  << " failed to contain a GHepRecord";
+    }
+    std::string const &spline_name = GHep->Summary()->AsString();
+    if (!splinenames.count(spline_name)) {
+      splinenames.emplace(spline_name, TGraph());
+    }
+    double E_GeV = GHep->Probe()->E();
+    double XSec = (genie_record.XSec() / (1E-38 * genie::units::cm2));
+    splinenames[spline_name].SetPoint(E_GeV, XSec);
+  }
+  std::cout << "[INFO]: Having read GENIE events, found " << splinenames.size()
+            << " splines: " << std::endl;
+  for (auto const &sn : splinenames) {
+    std::cout << "\t" << sn << std::endl;
+  }
+  return splinenames;
 }
 
 } // namespace genietools

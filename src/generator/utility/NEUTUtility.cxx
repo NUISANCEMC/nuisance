@@ -17,6 +17,8 @@ namespace nuis {
 namespace neuttools {
 NEW_NUIS_EXCEPT(unexpected_NEUT_particle_state);
 
+// #define DEBUG_NEUT_UTILITY
+
 Particle::Status_t GetNeutParticleStatus(NeutPart const &part, Channel_t mode) {
 
 #ifdef DEBUG_NEUT_UTILITY

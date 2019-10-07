@@ -5,10 +5,12 @@
 #include "utility/PDGCodeUtility.hxx"
 
 #ifdef GENIE_V3_INTERFACE
+#include "Framework/Conventions/Units.h"
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/GHEP/GHepParticle.h"
 #include "Framework/GHEP/GHepRecord.h"
 #else
+#include "Conventions/Units.h"
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepParticle.h"
 #include "GHEP/GHepRecord.h"
@@ -30,8 +32,10 @@ GENIEInputHandler::GENIEInputHandler(GENIEInputHandler &&other)
 
 std::set<std::string> GENIEInputHandler::GetSplineList() {
   std::set<std::string> splinenames;
-  size_t NEvents = 1000; // GetNEvents();
+  size_t NEvents = std::min(size_t(10000), GetNEvents());
   size_t ShoutEvery = NEvents / 100;
+  std::cout << "[INFO]: Determining list of required GENIE splines."
+            << std::endl;
   std::cout << "[INFO]: Read " << 0 << "/" << NEvents << " GENIE events."
             << std::flush;
   for (size_t ev_it = 0; ev_it < NEvents; ++ev_it) {
@@ -75,9 +79,7 @@ void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
     fFileWeight = XSecInfo.get<double>("weight");
     std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
               << std::endl;
-  } else if (XSecInfo.has_key("flux") || XSecInfo.has_key("target") ||
-             XSecInfo.has_key("spline_file") ||
-             XSecInfo.has_key("filter_splines_by_event_tree")) {
+  } else if (XSecInfo.has_key("spline_file")) {
     std::cout
         << "[INFO]: Attempting to build GENIE file weight with input splines."
         << std::endl;
@@ -93,6 +95,11 @@ void GENIEInputHandler::Initialize(fhicl::ParameterSet const &ps) {
     }
     std::cout << "[INFO]: Average GENIE XSecWeight = " << fFileWeight << ""
               << std::endl;
+  } else if (XSecInfo.has_key("flux")) {
+    fFileWeight = genietools::GetFileWeightFromReconstructedSplines(
+        XSecInfo, fGenieNtpl, fInputTree.tree);
+  } else {
+    fFileWeight = 1;
   }
 }
 
