@@ -178,6 +178,7 @@
 // 2018 MINERvA CC0pi 2D
 #include "MINERvA_CC0pi_XSec_1D_2018_nu.h"
 #include "MINERvA_CC0pi_XSec_2D_nu.h"
+#include "MINERvA_CC0pi_XSec_3DptpzTp_nu.h"
 
 // 2018 MINERvA CC0pi 2D antinu
 #include "MINERvA_CC0pi_XSec_2D_antinu.h"
@@ -1046,6 +1047,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     // Dan Ruterbories measurements of late 2018
   } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
     return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
+    return (new MINERvA_CC0pi_XSec_3DptpzTp_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
              !name.compare("MINERvA_CC0pi_XSec_1Dpz_nu") ||
