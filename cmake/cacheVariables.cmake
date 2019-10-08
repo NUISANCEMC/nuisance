@@ -115,8 +115,6 @@ CheckAndSetDefaultEnv(LOG4CPP_INC "" PATH "Path to installed LOG4CPP headers. Ov
 CheckAndSetDefaultEnv(GSL_LIB "" PATH "Path to pre-built gsl libraries. Overrides environment variable \$GSL_LIB. <>" GSL_LIB)
 CheckAndSetDefaultEnv(GSL_INC "" PATH "Path to installed gsl headers. Overrides environment variable \$GSL_INC. <>" GSL_INC)
 
-CheckAndSetDefaultCache(BUILD_GEVGEN FALSE BOOL "Whether to build nuisance_gevgen app.")
-
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
 
@@ -207,7 +205,6 @@ LIST(APPEND VARS
   PYTHIA6
   PYTHIA8
   USE_PYTHIA8
-  BUILD_GEVGEN
   USE_T2K
   T2KREWEIGHT
   USE_NIWG

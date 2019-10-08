@@ -35,11 +35,6 @@ if(GENIE STREQUAL "")
     " $ export GENIE=/path/to/GENIE")
 endif()
 
-if (BUILD_GEVGEN)
-  cmessage(STATUS "Building custom gevgen")
-  LIST(APPEND EXTRA_CXX_FLAGS -D__GEVGEN_ENABLED__)
-endif()
-
 execute_process(COMMAND genie-config --version
 OUTPUT_VARIABLE GENIE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
 cmessage(STATUS "genie_ver: ${GENIE_VER}")

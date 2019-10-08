@@ -95,7 +95,6 @@ set(MINCODE
 
 set(CORE
   MCStudies
-  Genie
   FitBase
   Config
   Logger
@@ -152,8 +151,7 @@ LIST(APPEND MINIMUM_INCLUDE_DIRECTORIES
   ${CMAKE_SOURCE_DIR}/src/Logger
   ${CMAKE_SOURCE_DIR}/src/Statistical
   ${CMAKE_SOURCE_DIR}/src/Splines
-  ${CMAKE_SOURCE_DIR}/src/Utils
-  ${CMAKE_SOURCE_DIR}/src/Genie)
+  ${CMAKE_SOURCE_DIR}/src/Utils)
 
 #Not yet capable of just building without the rwdirs.
 #if(USE_REWEIGHT)
