@@ -130,14 +130,7 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   int count1 = 0;
   for (int i = 0; i < ncovbins-4; ++i) {
     int count2 = 0;
-    //if (i >0 && i % 5 == 0) continue;
     for (int j = 0; j < ncovbins-4; ++j) {
-      //if (j > 0 && j % 5 == 0) continue;
-      //if (j % nslices == 0) {
-      //if (count1 == count2) {
-        //std::cout << count1 << ", " << count2 << " = " << sqrt((*temp)(i,j)*1E-38*1E-38) << std::endl;
-      //}
-
       // 1E79 matched to diagonal error
       (*fFullCovar)(count1, count2) = (*temp)(i, j);
       count2++;
