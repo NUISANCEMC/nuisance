@@ -47,6 +47,6 @@ endif()
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include/Config)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

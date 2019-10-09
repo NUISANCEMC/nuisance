@@ -105,8 +105,7 @@ ANL_CC2pi_1pip1pip_XSec_1DEnu_nu.h
 ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu.h
 ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu.h
 ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu.h
-ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h
-)
+ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu.h)
 
 set(LIBNAME expANL)
 
@@ -126,6 +125,6 @@ if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
 endif()
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include/ANL)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

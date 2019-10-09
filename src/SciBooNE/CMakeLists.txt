@@ -20,7 +20,7 @@ set(IMPLFILES
 SciBooNE_CCCOH_STOP_NTrks_nu.cxx
 SciBooNE_CCCOH_1TRK_1DQ2_nu.cxx
 SciBooNE_CCCOH_1TRK_1Dpmu_nu.cxx
-SciBooNE_CCCOH_1TRK_1Dthetamu_nu.cxx	
+SciBooNE_CCCOH_1TRK_1Dthetamu_nu.cxx
 SciBooNE_CCCOH_MuPr_1DQ2_nu.cxx
 SciBooNE_CCCOH_MuPr_1Dthetamu_nu.cxx
 SciBooNE_CCCOH_MuPr_1Dpmu_nu.cxx
@@ -72,6 +72,6 @@ set_target_properties(${LIBNAME} PROPERTIES VERSION
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-#install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include/SciBooNE)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)

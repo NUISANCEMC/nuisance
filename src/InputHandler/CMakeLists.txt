@@ -33,7 +33,6 @@ NuanceEvent.cxx
 FitEventInputHandler.cxx
 SplineInputHandler.cxx
 GeneratorInfoBase.h
-InputTypes.h
 HepMCTextInputHandler.cxx
 InputFactory.cxx
 SigmaQ0HistogramInputHandler.cxx
@@ -41,25 +40,25 @@ HistogramInputHandler.cxx
 )
 
 set(HEADERFILES
-NuanceEvent.h
 BaseFitEvt.h
-FitEvent.h
 FitParticle.h
+FitEvent.h
 GeneratorUtils.h
 StdHepEvt.h
 InputUtils.h
 NEUTInputHandler.h
-HepMCTextInputHandler.h
 GENIEInputHandler.h
 NuWroInputHandler.h
-InputHandler.h
 GIBUUInputHandler.h
 NUANCEInputHandler.h
+InputHandler.h
+NuanceEvent.h
 FitEventInputHandler.h
 SplineInputHandler.h
 GeneratorInfoBase.h
+InputTypes.h
+HepMCTextInputHandler.h
 InputFactory.h
-InteractionModes.h
 SigmaQ0HistogramInputHandler.h
 HistogramInputHandler.h
 )
@@ -88,6 +87,6 @@ endif()
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
 #Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include)
+install(FILES ${HEADERFILES} DESTINATION include/InputHandler)
 
 set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
