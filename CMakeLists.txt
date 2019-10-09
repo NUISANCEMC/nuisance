@@ -221,7 +221,8 @@ if(USE_DYNSAMPLES)
   cmessage(DEBUG ${CMAKE_DEPENDLIB_FLAGS})
 
   string(REPLACE ";" " -l" ALL_MODULETARGETS_STR "${MODULETargets}")
-  string(REPLACE "-l-Wl" "-Wl" ALL_MODULETARGETS_STR "${ALL_MODULETARGETS_STR}")
+  string(REPLACE "-l-" "-" ALL_MODULETARGETS_STR "${ALL_MODULETARGETS_STR}")
+  string(REPLACE "-l-" "-" ALL_MODULETARGETS_STR "${ALL_MODULETARGETS_STR}")
 
   configure_file(cmake/BuildDynamicSample.in
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BuildDynamicSample" @ONLY)
