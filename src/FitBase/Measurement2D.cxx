@@ -167,21 +167,23 @@ void Measurement2D::FinaliseSampleSettings() {
 
   if ((fSettings.GetS("originalname").find("Evt") != std::string::npos)) {
     fIsRawEvents = true;
-    NUIS_LOG(SAM, "Found event rate measurement but using poisson likelihoods.");
+    NUIS_LOG(SAM,
+             "Found event rate measurement but using poisson likelihoods.");
   }
 
   if (fSettings.GetS("originalname").find("Enu") != std::string::npos) {
     fIsEnu1D = true;
     NUIS_LOG(SAM, "::" << fName << "::");
-    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
-                  << "not flux averaged!");
+    NUIS_LOG(SAM,
+             "Found XSec Enu measurement, applying flux integrated scaling, "
+                 << "not flux averaged!");
   }
 
   if (fIsEnu1D && fIsRawEvents) {
     NUIS_ERR(FTL, "Found 2D Enu XSec distribution AND fIsRawEvents, is this "
-                "really correct?!");
+                  "really correct?!");
     NUIS_ERR(FTL, "Check experiment constructor for " << fName
-                                                    << " and correct this!");
+                                                      << " and correct this!");
     NUIS_ABORT("I live in " << __FILE__ << ":" << __LINE__);
   }
 
@@ -353,7 +355,7 @@ void Measurement2D::SetCovarFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM,
-       "Reading covariance from text file: " << covfile << ";" << histname);
+           "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -379,7 +381,7 @@ void Measurement2D::SetCovarInvertFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
-                                                           << histname);
+                                                               << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
   fFullCovar = StatUtils::GetInvert(covar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -391,15 +393,15 @@ void Measurement2D::SetCorrelationFromTextFile(std::string covfile, int dim) {
 
   if (dim == -1)
     dim = this->GetNDOF();
-  NUIS_LOG(SAM,
-       "Reading data correlations from text file: " << covfile << ";" << dim);
+  NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
+                                                             << dim);
   TMatrixDSym *correlation = StatUtils::GetCovarFromTextFile(covfile, dim);
 
   if (!fDataHist) {
     NUIS_ABORT("Trying to set correlations from text file but there is no "
-           "data to build it from. \n"
-           << "In constructor make sure data is set before "
-              "SetCorrelationFromTextFile is called. \n");
+               "data to build it from. \n"
+               << "In constructor make sure data is set before "
+                  "SetCorrelationFromTextFile is called. \n");
   }
 
   // Fill covar from data errors and correlations
@@ -425,14 +427,14 @@ void Measurement2D::SetCorrelationFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading data correlations from text file: " << covfile << ";"
-                                                         << histname);
+                                                             << histname);
   TMatrixDSym *correlation = StatUtils::GetCovarFromRootFile(covfile, histname);
 
   if (!fDataHist) {
     NUIS_ABORT("Trying to set correlations from text file but there is no "
-           "data to build it from. \n"
-           << "In constructor make sure data is set before "
-              "SetCorrelationFromTextFile is called. \n");
+               "data to build it from. \n"
+               << "In constructor make sure data is set before "
+                  "SetCorrelationFromTextFile is called. \n");
   }
 
   // Fill covar from data errors and correlations
@@ -481,7 +483,7 @@ void Measurement2D::SetCholDecompFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM, "Reading cholesky decomp from root file: " << covfile << ";"
-                                                       << histname);
+                                                           << histname);
   TMatrixD *temp = StatUtils::GetMatrixFromRootFile(covfile, histname);
 
   TMatrixD *trans = (TMatrixD *)temp->Clone();
@@ -548,7 +550,8 @@ void Measurement2D::SetBinMask(std::string maskfile) {
 
     // Skip lines with poorly formatted lines
     if (entries.size() < 2) {
-      NUIS_LOG(WRN, "Measurement2D::SetBinMask(), couldn't parse line: " << line);
+      NUIS_LOG(WRN,
+               "Measurement2D::SetBinMask(), couldn't parse line: " << line);
       continue;
     }
 
@@ -625,8 +628,14 @@ void Measurement2D::FinaliseMeasurement() {
     SetAutoProcessTH1(fMCHist_Modes);
   }
 
+  if (fSettings.Has("maskfile") && fSettings.Has("maskhist")) {
+    fMaskHist = PlotUtils::GetTH2FromRootFile<TH2I>(fSettings.GetS("maskfile"),
+                                                    fSettings.GetS("maskhist"));
+    fIsMask = true;
+  }
+
   // Setup bin masks using sample name
-  if (fIsMask) {
+  if (fIsMask && !fMaskHist) {
 
     std::string curname = fName;
     std::string origname = fSettings.GetS("originalname");
@@ -649,7 +658,7 @@ void Measurement2D::FinaliseMeasurement() {
 
   if (fScaleFactor < 0) {
     NUIS_ERR(FTL, "I found a negative fScaleFactor in " << __FILE__ << ":"
-                                                      << __LINE__);
+                                                        << __LINE__);
     NUIS_ERR(FTL, "fScaleFactor = " << fScaleFactor);
     NUIS_ABORT("EXITING");
   }
@@ -692,11 +701,11 @@ void Measurement2D::SetFitOptions(std::string opt) {
         found_option = true;
 
       } else if (found_option and opt.find(av_opt) != std::string::npos) {
-        NUIS_ABORT("ERROR: Conflicting fit options provided: "
-               << opt << std::endl
-               << "Conflicting group = " << fit_option_section.at(i)
-               << std::endl
-               << "You should only supply one of these options in card file.");
+        NUIS_ABORT(
+            "ERROR: Conflicting fit options provided: "
+            << opt << std::endl
+            << "Conflicting group = " << fit_option_section.at(i) << std::endl
+            << "You should only supply one of these options in card file.");
       }
     }
   }
@@ -707,12 +716,12 @@ void Measurement2D::SetFitOptions(std::string opt) {
   for (UInt_t i = 0; i < fit_options_input.size(); i++) {
     if (fAllowedTypes.find(fit_options_input.at(i)) == std::string::npos) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
-                      << fit_options_input.at(i)
-                      << "' Provided is not allowed for this measurement.");
+                        << fit_options_input.at(i)
+                        << "' Provided is not allowed for this measurement.");
       NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
-                  "(e.g. FREE/DIAG/NORM)");
+                    "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
-                                      << "'");
+                                          << "'");
     }
   }
 
@@ -1041,8 +1050,9 @@ double Measurement2D::GetLikelihood() {
   if (fAddNormPen) {
     chi2 +=
         (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
-                                       (fNormError * fNormError));
+    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) *
+                                           (1 - (fCurrentNorm)) /
+                                           (fNormError * fNormError));
   }
 
   // Adjust the shape back to where it was.
@@ -1283,7 +1293,8 @@ void Measurement2D::Write(std::string drawOpt) {
     fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
     fResidualHist->Reset();
 
-    fChi2LessBinHist = (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
+    fChi2LessBinHist =
+        (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
     fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
@@ -1673,12 +1684,13 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
       (fName.find("Enu") != std::string::npos)) {
     fIsEnu = true;
     NUIS_LOG(SAM, "::" << fName << "::");
-    NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
-              "not flux averaged!");
+    NUIS_LOG(SAM,
+             "Found XSec Enu measurement, applying flux integrated scaling, "
+             "not flux averaged!");
     if (FitPar::Config().GetParB("EventManager")) {
       NUIS_ERR(FTL, "Enu Measurements do not yet work with the Event Manager!");
       NUIS_ERR(FTL, "If you want decent flux unfolded results please run in "
-                  "series mode (-q EventManager=0)");
+                    "series mode (-q EventManager=0)");
       sleep(2);
       throw;
     }
@@ -1686,9 +1698,9 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
 
   if (fIsEnu && fIsRawEvents) {
     NUIS_ERR(FTL, "Found 1D Enu XSec distribution AND fIsRawEvents, is this "
-                "really correct?!");
+                  "really correct?!");
     NUIS_ERR(FTL, "Check experiment constructor for " << fName
-                                                    << " and correct this!");
+                                                      << " and correct this!");
     NUIS_ABORT("I live in " << __FILE__ << ":" << __LINE__);
   }
 
@@ -1751,7 +1763,7 @@ void Measurement2D::SetDataValues(std::string dataFile, std::string TH2Dname) {
   if (dataFile.find(".root") == std::string::npos) {
     NUIS_ERR(FTL, "Error! " << dataFile << " is not a .root file");
     NUIS_ERR(FTL, "Currently only .root file reading is supported (MiniBooNE "
-                "CC1pi+ 2D), but implementing .txt should be dirt easy");
+                  "CC1pi+ 2D), but implementing .txt should be dirt easy");
     NUIS_ABORT("See me at " << __FILE__ << ":" << __LINE__);
 
   } else {

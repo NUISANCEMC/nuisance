@@ -172,7 +172,33 @@ TH1D* GetTH1DFromRootFile(std::string file, std::string name);
 //! Grab a 2D Histrogram from a ROOT File
 TH2D* GetTH2DFromRootFile(std::string file, std::string name);
 
-//! Get a TGraph from a ROOT file 
+//! Grab a 2D Histrogram from a ROOT File
+
+template <typename TH>
+inline TH* GetTH2FromRootFile(std::string file, std::string name){
+  if (name.empty()) {
+    std::vector<std::string> tempfile = GeneralUtils::ParseToStr(file, ";");
+    file = tempfile[0];
+    name = tempfile[1];
+  }
+
+  TFile *rootHistFile = new TFile(file.c_str(), "READ");
+  TH *tempHist = dynamic_cast<TH *>(rootHistFile->Get(name.c_str())->Clone());
+
+  if(!tempHist){
+    NUIS_ABORT("Failed to read " << name << " from " << file);
+  }
+
+  tempHist->SetDirectory(nullptr);
+
+  rootHistFile->Close();
+  delete rootHistFile;
+
+  return tempHist;
+}
+
+
+//! Get a TGraph from a ROOT file
 TGraph* GetTGraphFromRootFile(std::string file, std::string name);
 
 //! Grab a 2D Histrogram from a ROOT File
