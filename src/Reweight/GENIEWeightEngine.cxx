@@ -57,6 +57,9 @@ using namespace genie;
 #include "RwCalculators/GReWeightNuXSecNC.h"
 #include "RwCalculators/GReWeightNuXSecNCEL.h"
 #include "RwCalculators/GReWeightNuXSecNCRES.h"
+#ifdef USE_GENIE_XSECMEC
+#include "RwCalculators/GReWeightXSecMEC.h"
+#endif
 #include "RwCalculators/GReWeightResonanceDecay.h"
 #include "RwCalculators/GReWeightXSecEmpiricalMEC.h"
 #include "RwFramework/GSystUncertainty.h"
@@ -102,13 +105,19 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 #ifdef __GENIE_EMP_MECRW_ENABLED
   bool xsec_empMEC = rw_engine_list.find("xsec_empMEC") == std::string::npos;
 #endif
+#ifdef USE_GENIE_XSECMEC
+  bool xsec_MEC = rw_engine_list.find("xsec_MEC") == std::string::npos;
+#endif
 
 #ifndef GENIE_PRE_R3
   genie::RunOpt *grunopt = genie::RunOpt::Instance();
   grunopt->EnableBareXSecPreCalc(true);
   grunopt->SetEventGeneratorList(Config::GetParS("GENIEEventGeneratorList"));
-  if(!Config::HasPar("GENIETune")){
-    NUIS_ABORT("GENIE tune was not specified, this is required when reweighting GENIE V3+ events. Add a config parameter like: <config GENIETune=\"G18_10a_02_11a\" /> to your nuisance card.");
+  if (!Config::HasPar("GENIETune")) {
+    NUIS_ABORT(
+        "GENIE tune was not specified, this is required when reweighting GENIE "
+        "V3+ events. Add a config parameter like: <config "
+        "GENIETune=\"G18_10a_02_11a\" /> to your nuisance card.");
   }
   grunopt->SetTuneName(Config::GetParS("GENIETune"));
   grunopt->BuildTune();
@@ -129,6 +138,11 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   if (xsec_empMEC) {
     fGenieRW->AdoptWghtCalc("xsec_empMEC",
                             new genie::rew::GReWeightXSecEmpiricalMEC);
+  }
+#endif
+#ifdef USE_GENIE_XSECMEC
+  if (xsec_MEC) {
+    fGenieRW->AdoptWghtCalc("xsec_MEC", new genie::rew::GReWeightXSecMEC);
   }
 #endif
   if (xsec_coh) {

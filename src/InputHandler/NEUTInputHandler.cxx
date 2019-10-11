@@ -55,6 +55,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
 
   // Setup the TChain
   fNEUTTree = new TChain("neuttree");
+
   fSaveExtra = FitPar::Config().GetParB("SaveExtraNEUT");
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
@@ -65,11 +66,12 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
     // Open File for histogram access
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      NUIS_ABORT("NEUT File IsZombie() at : '"
-             << inputs[inp_it] << "'" << std::endl
-             << "Check that your file paths are correct and the file exists!"
-             << std::endl
-             << "$ ls -lh " << inputs[inp_it]);
+      NUIS_ABORT(
+          "NEUT File IsZombie() at : '"
+          << inputs[inp_it] << "'" << std::endl
+          << "Check that your file paths are correct and the file exists!"
+          << std::endl
+          << "$ ls -lh " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
@@ -81,20 +83,21 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
       NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
       NUIS_ABORT("NEUT FILE doesn't contain flux/xsec info. You may have to "
-             "regenerate your MC!");
+                 "regenerate your MC!");
     }
 
     // Get N Events
     TTree *neuttree = (TTree *)inp_file->Get("neuttree");
     if (!neuttree) {
       NUIS_ERR(FTL, "neuttree not located in NEUT file: " << inputs[inp_it]);
-      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ABORT(
+          "Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = neuttree->GetEntries();
     if (nevents <= 0) {
       NUIS_ABORT("Trying to a TTree with "
-             << nevents << " to TChain from : " << inputs[inp_it]);
+                 << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
     // Register input to form flux/event rate hists
@@ -110,6 +113,11 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   // Assign to tree
   fEventType = kNEUT;
   fNeutVect = NULL;
+  fNEUTTree->SetBranchStatus("*", false);
+  fNEUTTree->SetBranchStatus("vectorbranch", true);
+  fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
+  fNEUTTree->GetBranch("vectorbranch")->SetAutoDelete(true);
+
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
   fNEUTTree->GetEntry(0);
 
@@ -259,13 +267,13 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
     // Warn if we still find alive particles without classifying them
   } else if (part->fIsAlive == true) {
     NUIS_ABORT("Undefined NEUT state "
-           << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-           << " PDG: " << part->fPID);
+               << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+               << " PDG: " << part->fPID);
     // Warn if we find dead particles that we haven't classified
   } else {
     NUIS_ABORT("Undefined NEUT state "
-           << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-           << " PDG: " << part->fPID);
+               << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+               << " PDG: " << part->fPID);
   }
 
   return state;
@@ -294,7 +302,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
   UInt_t npart = fNeutVect->Npart();
   UInt_t kmax = fNUISANCEEvent->kMaxParticles;
   if (npart > kmax) {
-    NUIS_ERR(WRN,"NEUT has too many particles. Expanding stack.");
+    NUIS_ERR(WRN, "NEUT has too many particles. Expanding stack.");
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
