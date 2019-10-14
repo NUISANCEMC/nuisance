@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "InputHandler.h"
 #include "InputUtils.h"
 
@@ -31,11 +31,17 @@ InputHandlerBase::InputHandlerBase() {
   kRemoveNuclearParticles = FitPar::Config().GetParB("RemoveNuclearParticles");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
   fTTreePerformance = NULL;
+  fSkip = 0;
+  if (FitPar::Config().HasConfig("NSKIPEVENTS")) {
+    fSkip = FitPar::Config().GetParI("NSKIPEVENTS");
+  }
 };
 
 InputHandlerBase::~InputHandlerBase() {
-  if (fFluxHist) delete fFluxHist;
-  if (fEventHist) delete fEventHist;
+  if (fFluxHist)
+    delete fFluxHist;
+  if (fEventHist)
+    delete fEventHist;
   //  if (fXSecHist) delete fXSecHist;
   //  if (fNUISANCEEvent) delete fNUISANCEEvent;
   jointfluxinputs.clear();
@@ -53,8 +59,8 @@ InputHandlerBase::~InputHandlerBase() {
 
 void InputHandlerBase::Print(){};
 
-TH1D* InputHandlerBase::GetXSecHistogram(void) {
-  fXSecHist = (TH1D*)fFluxHist->Clone();
+TH1D *InputHandlerBase::GetXSecHistogram(void) {
+  fXSecHist = (TH1D *)fFluxHist->Clone();
   fXSecHist->Divide(fEventHist);
   return fXSecHist;
 };
@@ -113,7 +119,7 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
 
   if ((fFluxHist->IsBinOverflow(maxBin) && (high != -9999.9))) {
     maxBin = fFluxHist->GetXaxis()->GetNbins();
-    high = fFluxHist->GetXaxis()->GetBinLowEdge(maxBin+1);
+    high = fFluxHist->GetXaxis()->GetBinLowEdge(maxBin + 1);
   }
 
   // If we are within a single bin
@@ -146,24 +152,24 @@ double InputHandlerBase::TotalIntegratedFlux(double low, double high,
   return lowBinfracIntegral + highBinfracIntegral + ContainedIntegral;
 }
 
-std::vector<TH1*> InputHandlerBase::GetFluxList(void) {
-  return std::vector<TH1*>(1, fFluxHist);
+std::vector<TH1 *> InputHandlerBase::GetFluxList(void) {
+  return std::vector<TH1 *>(1, fFluxHist);
 };
 
-std::vector<TH1*> InputHandlerBase::GetEventList(void) {
-  return std::vector<TH1*>(1, fEventHist);
+std::vector<TH1 *> InputHandlerBase::GetEventList(void) {
+  return std::vector<TH1 *>(1, fEventHist);
 };
 
-std::vector<TH1*> InputHandlerBase::GetXSecList(void) {
-  return std::vector<TH1*>(1, GetXSecHistogram());
+std::vector<TH1 *> InputHandlerBase::GetXSecList(void) {
+  return std::vector<TH1 *>(1, GetXSecHistogram());
 };
 
-FitEvent* InputHandlerBase::FirstNuisanceEvent() {
+FitEvent *InputHandlerBase::FirstNuisanceEvent() {
   fCurrentIndex = 0;
   return GetNuisanceEvent(fCurrentIndex);
 };
 
-FitEvent* InputHandlerBase::NextNuisanceEvent() {
+FitEvent *InputHandlerBase::NextNuisanceEvent() {
   fCurrentIndex++;
   if ((fMaxEvents != -1) && (fCurrentIndex > fMaxEvents)) {
     return NULL;
@@ -172,12 +178,12 @@ FitEvent* InputHandlerBase::NextNuisanceEvent() {
   return GetNuisanceEvent(fCurrentIndex);
 };
 
-BaseFitEvt* InputHandlerBase::FirstBaseEvent() {
+BaseFitEvt *InputHandlerBase::FirstBaseEvent() {
   fCurrentIndex = 0;
   return GetBaseEvent(fCurrentIndex);
 };
 
-BaseFitEvt* InputHandlerBase::NextBaseEvent() {
+BaseFitEvt *InputHandlerBase::NextBaseEvent() {
   fCurrentIndex++;
 
   if (jointinput and fMaxEvents != -1) {
@@ -200,27 +206,31 @@ BaseFitEvt* InputHandlerBase::NextBaseEvent() {
   return GetBaseEvent(fCurrentIndex);
 };
 
-void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D* f,
-                                          TH1D* e) {
+void InputHandlerBase::RegisterJointInput(std::string input, int n, TH1D *f,
+                                          TH1D *e) {
   if (jointfluxinputs.size() == 0) {
     jointindexswitch = 0;
     fNEvents = 0;
   }
 
   // Push into individual input vectors
-  jointfluxinputs.push_back((TH1D*)f->Clone());
-  jointeventinputs.push_back((TH1D*)e->Clone());
+  jointfluxinputs.push_back((TH1D *)f->Clone());
+  jointeventinputs.push_back((TH1D *)e->Clone());
 
   jointindexlow.push_back(fNEvents);
   jointindexhigh.push_back(fNEvents + n);
   fNEvents += n;
 
   // Add to the total flux/event hist
-  if (!fFluxHist) fFluxHist = (TH1D*)f->Clone();
-  else fFluxHist->Add(f);
+  if (!fFluxHist)
+    fFluxHist = (TH1D *)f->Clone();
+  else
+    fFluxHist->Add(f);
 
-  if (!fEventHist) fEventHist = (TH1D*)e->Clone();
-  else fEventHist->Add(e);
+  if (!fEventHist)
+    fEventHist = (TH1D *)e->Clone();
+  else
+    fEventHist->Add(e);
 }
 
 void InputHandlerBase::SetupJointInputs() {
@@ -236,10 +246,11 @@ void InputHandlerBase::SetupJointInputs() {
   }
 
   if (jointeventinputs.size() > 1) {
-    NUIS_ERR(WRN,
-          "GiBUU sample contains multiple inputs. This will only work for "
-          "samples that expect multi-species inputs. If this sample does, you "
-          "can ignore this warning.");
+    NUIS_ERR(
+        WRN,
+        "GiBUU sample contains multiple inputs. This will only work for "
+        "samples that expect multi-species inputs. If this sample does, you "
+        "can ignore this warning.");
   }
 
   for (size_t i = 0; i < jointeventinputs.size(); i++) {
@@ -276,13 +287,14 @@ void InputHandlerBase::SetupJointInputs() {
   }
 }
 
-BaseFitEvt* InputHandlerBase::GetBaseEvent(const UInt_t entry) {
+BaseFitEvt *InputHandlerBase::GetBaseEvent(const UInt_t entry) {
   // Do some light processing: don't calculate the kinematics
-  return static_cast<BaseFitEvt*>(GetNuisanceEvent(entry, true));
+  return static_cast<BaseFitEvt *>(GetNuisanceEvent(entry, true));
 }
 
 double InputHandlerBase::GetInputWeight(int entry) {
-  if (!jointinput) return 1.0;
+  if (!jointinput)
+    return 1.0;
 
   // Find Switch Scale
   while (entry < jointindexlow[jointindexswitch] ||

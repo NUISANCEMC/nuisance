@@ -62,9 +62,10 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
     NUIS_LOG(SAM, "Opening event file " << inputs[inp_it]);
     TFile *inp_file = new TFile(inputs[inp_it].c_str(), "READ");
     if ((!inp_file) || (!inp_file->IsOpen())) {
-      NUIS_ABORT("GiBUU file !IsOpen() at : '"
-            << inputs[inp_it] << "'" << std::endl
-            << "Check that your file paths are correct and the file exists!");
+      NUIS_ABORT(
+          "GiBUU file !IsOpen() at : '"
+          << inputs[inp_it] << "'" << std::endl
+          << "Check that your file paths are correct and the file exists!");
     }
 
     int NFluxes = bool(dynamic_cast<TH1D *>(inp_file->Get("numu_flux"))) +
@@ -75,11 +76,11 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
 
     if (NFluxes != 1) {
       NUIS_ABORT("Found " << NFluxes << " input fluxes in " << inputs[inp_it]
-                     << ". The NUISANCE GiBUU interface expects to be "
-                        "passed multiple species vectors as separate "
-                        "input files like: "
-                        "\"GiBUU:(MINERVA_FHC_numu_evts.root,MINERVA_FHC_"
-                        "numubar_evts.root,[...])\"");
+                          << ". The NUISANCE GiBUU interface expects to be "
+                             "passed multiple species vectors as separate "
+                             "input files like: "
+                             "\"GiBUU:(MINERVA_FHC_numu_evts.root,MINERVA_FHC_"
+                             "numubar_evts.root,[...])\"");
     }
 
     // Get Flux/Event hist
@@ -89,21 +90,22 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
       NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
       NUIS_ABORT("GiBUU FILE doesn't contain flux/xsec info. You may have to "
-            "regenerate your MC!");
+                 "regenerate your MC!");
     }
 
     // Get N Events
     TTree *giRooTracker = dynamic_cast<TTree *>(inp_file->Get("giRooTracker"));
     if (!giRooTracker) {
-      NUIS_ERR(FTL,
-            "giRooTracker Tree not located in NEUT file: " << inputs[inp_it]);
-      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ERR(FTL, "giRooTracker Tree not located in NEUT file: "
+                        << inputs[inp_it]);
+      NUIS_ABORT(
+          "Check your inputs, they may need to be completely regenerated!");
       throw;
     }
     int nevents = giRooTracker->GetEntries();
     if (nevents <= 0) {
       NUIS_ABORT("Trying to a TTree with "
-            << nevents << " to TChain from : " << inputs[inp_it]);
+                 << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
     // Register input to form flux/event rate hists
@@ -125,8 +127,9 @@ GIBUUInputHandler::GIBUUInputHandler(std::string const &handle,
   fNUISANCEEvent->HardReset();
 };
 
-FitEvent *GIBUUInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *GIBUUInputHandler::GetNuisanceEvent(const UInt_t ent,
                                               const bool lightweight) {
+  UInt_t entry = ent + fSkip;
   // Check out of bounds
   if (entry >= (UInt_t)fNEvents)
     return NULL;

@@ -153,8 +153,9 @@ void NEUTInputHandler::RemoveCache() {
   fNEUTTree->SetCacheSize(0);
 }
 
-FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t ent,
                                              const bool lightweight) {
+  UInt_t entry = ent + fSkip;
   // Catch too large entries
   if (entry >= (UInt_t)fNEvents)
     return NULL;

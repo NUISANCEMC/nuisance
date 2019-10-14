@@ -60,9 +60,9 @@ NUANCEInputHandler::NUANCEInputHandler(std::string const &handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   if (inputs.size() > 1) {
     NUIS_ABORT("NUANCE is not currently setup to handle joint inputs sorry!"
-           << std::endl
-           << "If you know how to correctly normalise the events for this"
-           << " please let us know!");
+               << std::endl
+               << "If you know how to correctly normalise the events for this"
+               << " please let us know!");
   }
 
   // Read in NUANCE Tree
@@ -131,8 +131,9 @@ void NUANCEInputHandler::RemoveCache() {
   fNUANCETree->SetCacheSize(0);
 }
 
-FitEvent *NUANCEInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *NUANCEInputHandler::GetNuisanceEvent(const UInt_t ent,
                                                const bool lightweight) {
+  UInt_t entry = ent + fSkip;
 
   // Check out of bounds
   if (entry >= (UInt_t)fNEvents)

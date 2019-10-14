@@ -65,12 +65,12 @@ NuWroInputHandler::NuWroInputHandler(std::string const &handle,
       NUIS_ERR(FTL, "nuwro FILE doesn't contain flux/xsec info");
       if (FitPar::Config().GetParB("regennuwro")) {
         NUIS_ERR(FTL,
-               "Regen NuWro has not been added yet. Email the developers!");
+                 "Regen NuWro has not been added yet. Email the developers!");
         // ProcessNuWroInputFlux(inputs[inp_it]);
         throw;
       } else {
         NUIS_ABORT("If you would like NUISANCE to generate these for you "
-               << "please set parameter regennuwro=1 and re-run.");
+                   << "please set parameter regennuwro=1 and re-run.");
       }
     }
 
@@ -127,8 +127,9 @@ void NuWroInputHandler::RemoveCache() {
 
 void NuWroInputHandler::ProcessNuWroInputFlux(const std::string file) {}
 
-FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *NuWroInputHandler::GetNuisanceEvent(const UInt_t ent,
                                               const bool lightweight) {
+  UInt_t entry = ent + fSkip;
   // Catch too large entries
   if (entry >= (UInt_t)fNEvents)
     return NULL;

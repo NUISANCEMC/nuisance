@@ -97,8 +97,9 @@ void SplineInputHandler::RemoveCache() {
   fSplTree->SetCacheSize(0);
 }
 
-FitEvent *SplineInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *SplineInputHandler::GetNuisanceEvent(const UInt_t ent,
                                                const bool lightweight) {
+  UInt_t entry = ent + fSkip;
 
   // Make sure events setup
   if (entry >= (UInt_t)fNEvents)

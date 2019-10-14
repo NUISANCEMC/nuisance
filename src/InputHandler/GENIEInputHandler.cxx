@@ -113,11 +113,12 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     TFile *inp_file = new TFile(
         InputUtils::ExpandInputDirectories(inputs[inp_it]).c_str(), "READ");
     if (!inp_file or inp_file->IsZombie()) {
-      NUIS_ABORT("GENIE File IsZombie() at : '"
-             << inputs[inp_it] << "'" << std::endl
-             << "Check that your file paths are correct and the file exists!"
-             << std::endl
-             << "$ ls -lh " << inputs[inp_it]);
+      NUIS_ABORT(
+          "GENIE File IsZombie() at : '"
+          << inputs[inp_it] << "'" << std::endl
+          << "Check that your file paths are correct and the file exists!"
+          << std::endl
+          << "$ ls -lh " << inputs[inp_it]);
     }
 
     // Get Flux/Event hist
@@ -127,23 +128,24 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
       NUIS_ERR(FTL, "Input File Contents: " << inputs[inp_it]);
       inp_file->ls();
       NUIS_ABORT("GENIE FILE doesn't contain flux/xsec info."
-             << std::endl
-             << "Try running the app PrepareGENIE first on :" << inputs[inp_it]
-             << std::endl
-             << "$ PrepareGENIE -h");
+                 << std::endl
+                 << "Try running the app PrepareGENIE first on :"
+                 << inputs[inp_it] << std::endl
+                 << "$ PrepareGENIE -h");
     }
 
     // Get N Events
     TTree *genietree = (TTree *)inp_file->Get("gtree");
     if (!genietree) {
       NUIS_ERR(FTL, "gtree not located in GENIE file: " << inputs[inp_it]);
-      NUIS_ABORT("Check your inputs, they may need to be completely regenerated!");
+      NUIS_ABORT(
+          "Check your inputs, they may need to be completely regenerated!");
     }
 
     int nevents = genietree->GetEntries();
     if (nevents <= 0) {
       NUIS_ABORT("Trying to a TTree with "
-             << nevents << " to TChain from : " << inputs[inp_it]);
+                 << nevents << " to TChain from : " << inputs[inp_it]);
     }
 
     // Check for precomputed weights
@@ -151,7 +153,7 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
     if (fNOvAWeights) {
       if (!weighttree) {
         NUIS_ABORT("Did not find nova_wgts tree in file "
-               << inputs[inp_it] << " but you specified it" << std::endl);
+                   << inputs[inp_it] << " but you specified it" << std::endl);
       } else {
         NUIS_LOG(FIT, "Found nova_wgts tree in file " << inputs[inp_it]);
       }
@@ -223,8 +225,9 @@ void GENIEInputHandler::RemoveCache() {
   fGENIETree->SetCacheSize(0);
 }
 
-FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t entry,
+FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
                                               const bool lightweight) {
+  UInt_t entry = ent + fSkip;
   if (entry >= (UInt_t)fNEvents)
     return NULL;
 
@@ -359,19 +362,19 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
         return 26;
       else {
         NUIS_ERR(WRN,
-              "Unknown GENIE Electron Scattering Mode!"
-                  << std::endl
-                  << "ScatteringTypeId = "
-                  << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
-                  << "InteractionTypeId = "
-                  << gheprec->Summary()->ProcInfo().InteractionTypeId()
-                  << std::endl
-                  << genie::ScatteringType::AsString(
-                         gheprec->Summary()->ProcInfo().ScatteringTypeId())
-                  << " "
-                  << genie::InteractionType::AsString(
-                         gheprec->Summary()->ProcInfo().InteractionTypeId())
-                  << " " << gheprec->Summary()->ProcInfo().IsMEC());
+                 "Unknown GENIE Electron Scattering Mode!"
+                     << std::endl
+                     << "ScatteringTypeId = "
+                     << gheprec->Summary()->ProcInfo().ScatteringTypeId() << " "
+                     << "InteractionTypeId = "
+                     << gheprec->Summary()->ProcInfo().InteractionTypeId()
+                     << std::endl
+                     << genie::ScatteringType::AsString(
+                            gheprec->Summary()->ProcInfo().ScatteringTypeId())
+                     << " "
+                     << genie::InteractionType::AsString(
+                            gheprec->Summary()->ProcInfo().InteractionTypeId())
+                     << " " << gheprec->Summary()->ProcInfo().IsMEC());
         return 0;
       }
     }
@@ -457,11 +460,13 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
       // both
     } else {
       if (pdg::IsIon(p->Pdg())) {
-        NUIS_ABORT("Particle 1 in GHepRecord stack is an ion but isn't an initial "
-               "state particle");
+        NUIS_ABORT(
+            "Particle 1 in GHepRecord stack is an ion but isn't an initial "
+            "state particle");
       } else {
-        NUIS_ABORT("Particle 1 in GHepRecord stack is not an ion but is an initial "
-               "state particle");
+        NUIS_ABORT(
+            "Particle 1 in GHepRecord stack is not an ion but is an initial "
+            "state particle");
       }
     }
   }
