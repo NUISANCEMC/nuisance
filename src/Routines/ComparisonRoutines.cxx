@@ -61,6 +61,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char *argv[]) {
   // Default containers
   std::string cardfile = "";
   std::string maxevents = "-1";
+  std::string skipevents = "0";
   int errorcount = 0;
   int verbocount = 0;
   std::vector<std::string> xmlcmds;
@@ -75,6 +76,7 @@ ComparisonRoutines::ComparisonRoutines(int argc, char *argv[]) {
   ParserUtils::ParseArgument(args, "-d", fFakeDataInput, false, false);
   ParserUtils::ParseArgument(args, "-i", xmlcmds);
   ParserUtils::ParseArgument(args, "-q", configargs);
+  ParserUtils::ParseArgument(args, "-s", skipevents);
   ParserUtils::ParseCounter(args, "e", errorcount);
   ParserUtils::ParseCounter(args, "v", verbocount);
   ParserUtils::CheckBadArguments(args);
@@ -117,8 +119,11 @@ ComparisonRoutines::ComparisonRoutines(int argc, char *argv[]) {
     configuration.OverrideConfig(configargs[i]);
   }
   if (maxevents.compare("-1")) {
-    configuration.OverrideConfig("MAXEVENTS=" + maxevents);
+    configuration.OverrideConfig(std::string("MAXEVENTS=\"") + maxevents +
+                                 "\"");
   }
+  configuration.OverrideConfig(std::string("NSKIPEVENTS=\"") + skipevents +
+                               "\"");
 
   // Finish configuration XML
   configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
@@ -204,11 +209,11 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
       parstep = key.GetD("step");
 
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parlow << " < p < " << parhigh << " : "
-                        << parstate);
+                            << " : " << parlow << " < p < " << parhigh << " : "
+                            << parstate);
     } else {
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parstate);
+                            << " : " << parstate);
     }
 
     // Convert if required
@@ -250,16 +255,17 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " (" << sampletype
-                             << ") [Norm=" << samplenorm << "]" << std::endl
-                             << "                                -> input='"
-                             << samplefile << "'");
+    NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
+                                 << sampletype << ") [Norm=" << samplenorm
+                                 << "]" << std::endl
+                                 << "                                -> input='"
+                                 << samplefile << "'");
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
         NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
-                    "that the sample is free");
+                      "that the sample is free");
         NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
@@ -434,12 +440,12 @@ void ComparisonRoutines::PrintState() {
 
   // Header
   NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
-                     << " = " << setw(10) << "Value"
-                     << " +- " << setw(10) << "Error"
-                     << " " << setw(8) << "(Units)"
-                     << " " << setw(10) << "Conv. Val"
-                     << " +- " << setw(10) << "Conv. Err"
-                     << " " << setw(8) << "(Units)");
+                         << " = " << setw(10) << "Value"
+                         << " +- " << setw(10) << "Error"
+                         << " " << setw(8) << "(Units)"
+                         << " " << setw(10) << "Conv. Val"
+                         << " +- " << setw(10) << "Conv. Err"
+                         << " " << setw(8) << "(Units)");
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -480,7 +486,8 @@ void ComparisonRoutines::PrintState() {
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  NUIS_LOG(FIT,
+           std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
   NUIS_LOG(FIT, "------------");
 }
 
