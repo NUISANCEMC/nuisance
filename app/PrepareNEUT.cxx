@@ -64,6 +64,9 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     NUIS_ABORT("Either the input file is not from NEUT, or it's empty...");
   }
 
+  //for mono-e all events have the same totcrs.
+  nevts = 1;
+
   NeutVect *fNeutVect = NULL;
   tn->SetBranchAddress("vectorbranch", &fNeutVect);
 
