@@ -113,11 +113,6 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   // Assign to tree
   fEventType = kNEUT;
   fNeutVect = NULL;
-  fNEUTTree->SetBranchStatus("*", false);
-  fNEUTTree->SetBranchStatus("vectorbranch", true);
-  fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
-  fNEUTTree->GetBranch("vectorbranch")->SetAutoDelete(true);
-
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
   fNEUTTree->GetEntry(0);
 
