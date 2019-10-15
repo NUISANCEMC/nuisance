@@ -350,7 +350,7 @@ void GenericFlux_Vectors::ResetVariables() {
 
   flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL =
       flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim =
-          flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
+          flagNC1pim = flagCC1pi0 = flagNC1pi0 = flagCC0piMINERvA = false;
 }
 
 //********************************************************************
@@ -377,6 +377,8 @@ void GenericFlux_Vectors::FillSignalFlags(FitEvent *event) {
   flagNC1pim = SignalDef::isNC1pi(event, nuPDG, -211);
   flagCC1pi0 = SignalDef::isCC1pi(event, nuPDG, 111);
   flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
+
+  flagCC0piMINERvA = SignalDef::isCC0pi_MINERvAPTPZ(event, 14);
 }
 
 void GenericFlux_Vectors::AddSignalFlagsToTree() {
@@ -404,6 +406,8 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
   eventVariables->Branch("flagNC1pim", &flagNC1pim, "flagNC1pim/O");
   eventVariables->Branch("flagCC1pi0", &flagCC1pi0, "flagCC1pi0/O");
   eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
+
+  eventVariables->Branch("flagCC0piMINERvA", &flagCC0piMINERvA, "flagCC0piMINERvA/O");
 };
 
 void GenericFlux_Vectors::Write(std::string drawOpt) {
