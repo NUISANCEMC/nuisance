@@ -1049,7 +1049,7 @@ double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVect
   // Get the "resonance" lorentz vector (pion proton system)
   TLorentzVector Pres = Pprot + Ppi;
   // Boost the particles into the resonance rest frame so we can define the x,y,z axis
-  Pnu.Boost(Pres.BoostVector());
+  Pnu.Boost(-Pres.BoostVector());
   Pmu.Boost(-Pres.BoostVector());
   Ppi.Boost(-Pres.BoostVector());
 
@@ -1065,11 +1065,10 @@ double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVect
 
 // Get phi with Adler angles, a bit more complicated...
 double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
-
   // Get the "resonance" lorentz vector (pion proton system)
   TLorentzVector Pres = Pprot + Ppi;
   // Boost the particles into the resonance rest frame so we can define the x,y,z axis
-  Pnu.Boost(Pres.BoostVector());
+  Pnu.Boost(-Pres.BoostVector());
   Pmu.Boost(-Pres.BoostVector());
   Ppi.Boost(-Pres.BoostVector());
 
@@ -1085,37 +1084,13 @@ double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector
   TVector3 xAxis = yAxis.Cross(zAxis);
   xAxis *= 1.0/double(xAxis.Mag());
 
+  // Project the pion on to x and y axes
   double x = Ppi.Vect().Dot(xAxis);
   double y = Ppi.Vect().Dot(yAxis);
-  //double z = Ppi.Vect().Dot(zAxis);
 
   double newphi = atan2(y, x)*(180./M_PI);
   // Convert negative angles to positive
   if (newphi < 0.0) newphi += 360.0;
-
-  // Old silly method before atan2
-  /*
-  // Then finally construct phi as the angle between pion projection and x axis
-  // Get the project of the pion momentum on to the zaxis
-  TVector3 PiVectZ = zAxis*Ppi.Vect().Dot(zAxis);
-  // The subtract the projection off the pion vector to get to get the plane
-  TVector3 PiPlane = Ppi.Vect() - PiVectZ;
-
-  double phi = -999.99;
-  if (PiPlane.Y() > 0) {
-    phi = (180./M_PI)*PiPlane.Angle(xAxis);
-  } else if (PiPlane.Y() < 0) {
-    phi = (180./M_PI)*(2*M_PI-PiPlane.Angle(xAxis));
-  } else if (PiPlane.Y() == 0) {
-    TRandom3 rand;
-    double randNo = rand.Rndm();
-    if (randNo > 0.5) {
-      phi = (180./M_PI)*PiPlane.Angle(xAxis);
-    } else {
-      phi = (180./M_PI)*(2*M_PI-PiPlane.Angle(xAxis));
-    }
-  }
-  */
 
   return newphi;
 }

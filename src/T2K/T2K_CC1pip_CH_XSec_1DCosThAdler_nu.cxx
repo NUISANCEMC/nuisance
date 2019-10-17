@@ -75,7 +75,7 @@ void T2K_CC1pip_CH_XSec_1DCosThAdler_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pres = PnuReco + Pinit - Pmu;
   // Boost the particles into the resonance rest frame so we can define the
   // x,y,z axis
-  PnuReco.Boost(Pres.BoostVector());
+  PnuReco.Boost(-Pres.BoostVector());
   Pmu.Boost(-Pres.BoostVector());
   Ppip.Boost(-Pres.BoostVector());
 
