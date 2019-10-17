@@ -640,8 +640,7 @@ protected:
   bool fIsDifXSec;    ///< Flag : creating a dif xsec
   bool fIsChi2;       ///< Flag : using Chi2 over LL methods
   bool fIsSmeared;    ///< Flag : Apply smearing?
-
-
+  bool fIsWriting;
 
 
   /// OLD STUFF TO REMOVE

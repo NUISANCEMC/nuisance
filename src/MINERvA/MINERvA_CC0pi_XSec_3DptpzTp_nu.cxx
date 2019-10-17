@@ -125,7 +125,7 @@ void MINERvA_CC0pi_XSec_3DptpzTp_nu::FillEventVariables(FitEvent *event) {
 
   // Sum up kinetic energy of protons
   double sum = 0.0;
-  for (std::vector<FitParticle*>::iterator it = event->GetAllFSProton().begin(); 
+  for (std::vector<FitParticle*>::iterator it = event->GetAllFSProton().begin();
       it != event->GetAllFSProton().end(); ++it) {
     sum += (*it)->KE();
   }

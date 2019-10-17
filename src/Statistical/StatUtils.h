@@ -206,6 +206,9 @@ namespace StatUtils{
   //! Apply a map to a 2D histogram converting it into a 1D histogram.
   TH1D* MapToTH1D(TH2D* hist, TH2I* map);
 
+  //! Apply a map to fill a TH2D from a TH1D;
+  void MapFromTH1D(TH2* fillhist, TH1* fromhist, TH2I* map);
+
   //! Apply a map to a 2D mask convering it into a 1D mask.
   TH1I* MapToMask(TH2I* hist, TH2I* map);
 

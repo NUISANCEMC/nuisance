@@ -228,40 +228,13 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   TH1D *data_1D = MapToTH1D(data, map);
   TH1D *mc_1D = MapToTH1D(mc, map);
   TH1I *mask_1D = MapToMask(mask, map);
-  TH1D *outchi2perbin_1D = NULL;
-  TH1D *outchi2perbin_map_1D = NULL;
-
-  if (outchi2perbin) {
-    outchi2perbin_1D = MapToTH1D(outchi2perbin, map);
-    for (Int_t xbi_it = 0; xbi_it < outchi2perbin->GetXaxis()->GetNbins();
-         ++xbi_it) {
-      for (Int_t ybi_it = 0; ybi_it < outchi2perbin->GetYaxis()->GetNbins();
-           ++ybi_it) {
-        int gbin = outchi2perbin->GetBin(xbi_it + 1, ybi_it + 1);
-        // std::cout << " gbin " << gbin << " corresponds to "
-        //           << " x: " << (xbi_it + 1) << ", y: " << (ybi_it + 1)
-        //           << std::endl;
-        outchi2perbin->SetBinContent(xbi_it + 1, ybi_it + 1, gbin);
-      }
-    }
-    outchi2perbin_map_1D = MapToTH1D(outchi2perbin, map);
-  }
+  TH1D *outchi2perbin_1D = outchi2perbin ? MapToTH1D(outchi2perbin, map) : NULL;
 
   // Calculate 1D chi2 from 1D Plots
   Double_t Chi2 = StatUtils::GetChi2FromCov(data_1D, mc_1D, invcov, mask_1D, 1,
                                             1E76, outchi2perbin_1D);
-  if (outchi2perbin) {
-    for (int xbi_it = 0; xbi_it < outchi2perbin_1D->GetXaxis()->GetNbins();
-         ++xbi_it) {
-      // std::cout << " adding chi2 "
-      //           << outchi2perbin_1D->GetBinContent(xbi_it + 1)
-      //           << " from 1d bin " << (xbi_it + 1) << " to gbin "
-      //           << outchi2perbin_map_1D->GetBinContent(xbi_it + 1) <<
-      //           std::endl;
-      outchi2perbin->SetBinContent(
-          outchi2perbin_map_1D->GetBinContent(xbi_it + 1),
-          outchi2perbin_1D->GetBinContent(xbi_it + 1));
-    }
+  if (outchi2perbin && outchi2perbin_1D) {
+    MapFromTH1D(outchi2perbin, outchi2perbin_1D, map);
   }
 
   // CleanUp
@@ -269,7 +242,6 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   delete mc_1D;
   delete mask_1D;
   delete outchi2perbin_1D;
-  delete outchi2perbin_map_1D;
 
   return Chi2;
 }
@@ -1229,6 +1201,20 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
 
   // return
   return newhist;
+}
+
+void StatUtils::MapFromTH1D(TH2 *fillhist, TH1 *fromhist, TH2I *map) {
+  fillhist->Clear();
+
+  for (int i = 0; i < map->GetNbinsX(); i++) {
+    for (int j = 0; j < map->GetNbinsY(); j++) {
+      if (map->GetBinContent(i + 1, j + 1) == 0)
+        continue;
+      int gb = map->GetBinContent(i + 1, j + 1);
+      fillhist->SetBinContent(i + 1, j + 1, fromhist->GetBinContent(gb));
+      fillhist->SetBinError(i + 1, j + 1, fromhist->GetBinError(gb));
+    }
+  }
 }
 
 //*******************************************************************

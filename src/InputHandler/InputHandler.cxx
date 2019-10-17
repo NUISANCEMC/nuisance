@@ -34,8 +34,6 @@ InputHandlerBase::InputHandlerBase() {
   fSkip = 0;
   if (FitPar::Config().HasConfig("NSKIPEVENTS")) {
     fSkip = FitPar::Config().GetParI("NSKIPEVENTS");
-    std::cout << "Skipping " << fSkip << " events when reading input trees."
-              << std::endl;
   }
 };
 

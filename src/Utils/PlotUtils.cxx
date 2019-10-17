@@ -346,8 +346,8 @@ void PlotUtils::FluxUnfoldedScaling(TH2D *fMCHist, TH1D *fhist, TH1D *ehist,
       NUIS_ERR(FTL, "AND");
       NUIS_ERR(FTL, "Found Enu in yaxis title: " << yaxis);
       NUIS_ABORT("Enu on x and Enu on y flux unfolded scaling isn't "
-             "implemented, please modify "
-             << __FILE__ << ":" << __LINE__);
+                 "implemented, please modify "
+                 << __FILE__ << ":" << __LINE__);
     }
     EnuOnXaxis = false;
   }
@@ -611,9 +611,10 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     // Make a TGraph Errors
     TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
     if (gr->IsZombie()) {
-      NUIS_ABORT(dataFile
-             << " is a zombie and could not be read. Are you sure it exists?"
-             << std::endl);
+      NUIS_ABORT(
+          dataFile
+          << " is a zombie and could not be read. Are you sure it exists?"
+          << std::endl);
     }
     double *bins = gr->GetX();
     double *values = gr->GetY();
@@ -806,8 +807,8 @@ TH1 *PlotUtils::GetTH1FromRootFile(std::string file, std::string name) {
   }
   TH1 *tempHist = dynamic_cast<TH1 *>(rootHistFile->Get(name.c_str())->Clone());
   if (!tempHist) {
-    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
-                                   << "\".");
+    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \""
+                                       << file << "\".");
   }
   tempHist->SetDirectory(0);
 
@@ -835,8 +836,8 @@ TGraph *PlotUtils::GetTGraphFromRootFile(std::string file, std::string name) {
   TGraph *temp =
       dynamic_cast<TGraph *>(rootHistFile->Get(name.c_str())->Clone());
   if (!temp) {
-    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \"" << file
-                                   << "\".");
+    NUIS_ABORT("Couldn't retrieve: \"" << name << "\" from root file: \""
+                                       << file << "\".");
   }
   newdir->Remove(temp);
   olddir->Append(temp);
@@ -860,7 +861,7 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
     std::vector<std::string> fname = GeneralUtils::ParseToStr(d, "[");
     if (!fname.size() || !fname[0].length()) {
       NUIS_ABORT("Couldn't find input file when attempting to parse : \""
-             << d << "\". Expected input.root[hist1|hist2|...].");
+                 << d << "\". Expected input.root[hist1|hist2|...].");
     }
 
     if (fname[1][fname[1].length() - 1] == ']') {
@@ -869,10 +870,11 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
     std::vector<std::string> histnames =
         GeneralUtils::ParseToStr(fname[1], "|");
     if (!histnames.size()) {
-      NUIS_ABORT("Couldn't find any histogram name specifiers when attempting to "
-             "parse "
-             ": \""
-             << fname[1] << "\". Expected hist1|hist2|...");
+      NUIS_ABORT(
+          "Couldn't find any histogram name specifiers when attempting to "
+          "parse "
+          ": \""
+          << fname[1] << "\". Expected hist1|hist2|...");
     }
 
     TFile *rootHistFile = new TFile(fname[0].c_str(), "READ");
@@ -885,7 +887,8 @@ PlotUtils::GetTH1sFromRootFile(std::string const &descriptor) {
           dynamic_cast<TH1 *>(rootHistFile->Get(histnames[i].c_str())->Clone());
       if (!tempHist) {
         NUIS_ABORT("Couldn't retrieve: \""
-               << histnames[i] << "\" from root file: \"" << fname[0] << "\".");
+                   << histnames[i] << "\" from root file: \"" << fname[0]
+                   << "\".");
       }
       tempHist->SetDirectory(0);
       hists.push_back(tempHist);
@@ -908,10 +911,10 @@ std::vector<double> PlotUtils::GetArrayFromTextFile(std::string DataFile) {
 }
 
 // Get a 2D array from a text file
-std::vector<std::vector<double> >
+std::vector<std::vector<double>>
 PlotUtils::Get2DArrayFromTextFile(std::string DataFile) {
   std::string line;
-  std::vector<std::vector<double> > DataArray;
+  std::vector<std::vector<double>> DataArray;
   std::ifstream data(DataFile.c_str(), std::ifstream::in);
   while (std::getline(data >> std::ws, line, '\n')) {
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
@@ -931,14 +934,14 @@ TH2D *PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx,
   std::vector<double> ybins = GetArrayFromTextFile(biny);
 
   // Read in the data
-  std::vector<std::vector<double> > Data = Get2DArrayFromTextFile(data);
+  std::vector<std::vector<double>> Data = Get2DArrayFromTextFile(data);
 
   // And finally fill the data
   TH2D *DataPlot = new TH2D("TempHist", "TempHist", xbins.size() - 1, &xbins[0],
                             ybins.size() - 1, &ybins[0]);
   int nBinsX = 0;
   int nBinsY = 0;
-  for (std::vector<std::vector<double> >::iterator it = Data.begin();
+  for (std::vector<std::vector<double>>::iterator it = Data.begin();
        it != Data.end(); ++it) {
     nBinsX++;
     // Get the inner vector
@@ -959,26 +962,30 @@ TH2D *PlotUtils::GetTH2DFromTextFile(std::string data, std::string binx,
       NUIS_ERR(FTL, "Previous slice: " << oldBinsY);
       NUIS_ERR(FTL, "Current slice: " << nBinsY);
       NUIS_ABORT("Non-uniform binning is not supported in "
-             "PlotUtils::GetTH2DFromTextFile");
+                 "PlotUtils::GetTH2DFromTextFile");
     }
   }
 
   // Check x bins
   if (size_t(nBinsX + 1) != xbins.size()) {
-    NUIS_ERR(FTL, "Number of x bins in data histogram does not match the binning "
-                "histogram!");
     NUIS_ERR(FTL,
-           "Are they the wrong way around (i.e. xbinning should be ybinning)?");
+             "Number of x bins in data histogram does not match the binning "
+             "histogram!");
+    NUIS_ERR(
+        FTL,
+        "Are they the wrong way around (i.e. xbinning should be ybinning)?");
     NUIS_ERR(FTL, "Data: " << nBinsX);
     NUIS_ABORT("From " << binx << " binning: " << xbins.size());
   }
 
   // Check y bins
   if (size_t(nBinsY + 1) != ybins.size()) {
-    NUIS_ERR(FTL, "Number of y bins in data histogram does not match the binning "
-                "histogram!");
     NUIS_ERR(FTL,
-           "Are they the wrong way around (i.e. xbinning should be ybinning)?");
+             "Number of y bins in data histogram does not match the binning "
+             "histogram!");
+    NUIS_ERR(
+        FTL,
+        "Are they the wrong way around (i.e. xbinning should be ybinning)?");
     NUIS_ERR(FTL, "Data: " << nBinsY);
     NUIS_ABORT("From " << biny << " binning: " << ybins.size());
   }
@@ -1032,8 +1039,8 @@ void PlotUtils::MaskBins(TH1D *hist, TH1I *mask) {
     hist->SetBinContent(i + 1, 0.0);
     hist->SetBinError(i + 1, 0.0);
 
-    NUIS_LOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
-                               << " to 0.0 +- 0.0");
+    NUIS_LOG(DEB, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
+                                   << " to 0.0 +- 0.0");
   }
 
   return;
@@ -1048,8 +1055,8 @@ void PlotUtils::MaskBins(TH2D *hist, TH2I *mask) {
       hist->SetBinContent(i + 1, j + 1, 0.0);
       hist->SetBinError(i + 1, j + 1, 0.0);
 
-      NUIS_LOG(REC, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1 << " "
-                                 << j + 1 << " to 0.0 +- 0.0");
+      NUIS_LOG(DEB, "MaskBins: Set " << hist->GetName() << " Bin " << i + 1
+                                     << " " << j + 1 << " to 0.0 +- 0.0");
     }
   }
   return;
@@ -1175,7 +1182,8 @@ TH1D *PlotUtils::GetProjectionX(TH2D *hist, TH2I *mask) {
   TH2D *maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_X = maskedhist->ProjectionX("_px", 1, maskedhist->GetXaxis()->GetNbins());
+  TH1D *hist_X =
+      maskedhist->ProjectionX("_px", 1, maskedhist->GetXaxis()->GetNbins());
   hist_X->SetTitle(Form("%s x no under/overflow", hist_X->GetTitle()));
 
   delete maskedhist;
@@ -1189,7 +1197,8 @@ TH1D *PlotUtils::GetProjectionY(TH2D *hist, TH2I *mask) {
   TH2D *maskedhist = StatUtils::ApplyHistogramMasking(hist, mask);
 
   // This includes the underflow/overflow
-  TH1D* hist_Y = maskedhist->ProjectionY("_py", 1, maskedhist->GetYaxis()->GetNbins());
+  TH1D *hist_Y =
+      maskedhist->ProjectionY("_py", 1, maskedhist->GetYaxis()->GetNbins());
   hist_Y->SetTitle(Form("%s y no under/overflow", hist_Y->GetTitle()));
 
   delete maskedhist;

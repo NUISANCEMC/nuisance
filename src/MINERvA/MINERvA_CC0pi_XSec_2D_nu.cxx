@@ -39,7 +39,7 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
   datafile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
   corrfile = "MINERvA/CC0pi_2D/cov_ptpl_2D_qelike.root";
   titles = "MINERvA CC0#pi #nu_{#mu} p_{t} p_{z};p_{z} (GeV);p_{t} "
-    "(GeV);d^{2}#sigma/dP_{t}dP_{z} (cm^{2}/GeV^{2}/nucleon)";
+           "(GeV);d^{2}#sigma/dP_{t}dP_{z} (cm^{2}/GeV^{2}/nucleon)";
   distdescript = "MINERvA_CC0pi_XSec_2Dptpz_nu sample";
   histname = "pt_pl_cross_section";
 
@@ -50,9 +50,9 @@ void MINERvA_CC0pi_XSec_2D_nu::SetupDataSettings() {
 
   // Sample overview ---------------------------------------------------
   std::string descrip = distdescript + "\n"
-    "Target: CH \n"
-    "Flux: MINERvA Low Energy FHC numu  \n"
-    "Signal: CC-0pi \n";
+                                       "Target: CH \n"
+                                       "Flux: MINERvA Low Energy FHC numu  \n"
+                                       "Signal: CC-0pi \n";
   fSettings.SetDescription(descrip);
 
   // The input ROOT file
@@ -78,8 +78,8 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
   FinaliseSampleSettings();
 
   fScaleFactor =
-    (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
-    this->TotalIntegratedFlux();
+      (GetEventHistogram()->Integral("width") * 1E-38 / (fNEvents + 0.)) /
+      this->TotalIntegratedFlux();
 
   TMatrixDSym *tempmat = StatUtils::GetCovarFromRootFile(
       fSettings.GetCovarInput(), "TotalCovariance");
@@ -101,15 +101,15 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
       if (xlo1 < fDataHist->GetXaxis()->GetBinLowEdge(1) ||
           ylo1 < fDataHist->GetYaxis()->GetBinLowEdge(1) ||
           xhi1 > fDataHist->GetXaxis()->GetBinLowEdge(
-            fDataHist->GetXaxis()->GetNbins() + 1) ||
+                     fDataHist->GetXaxis()->GetNbins() + 1) ||
           yhi1 > fDataHist->GetYaxis()->GetBinLowEdge(
-            fDataHist->GetYaxis()->GetNbins() + 1))
+                     fDataHist->GetYaxis()->GetNbins() + 1))
         continue;
       double data_error = fDataHist->GetBinError(xbin1, ybin1);
       double cov_error = sqrt((*fFullCovar)(i, i) / ScalingFactor);
       if (fabs(data_error - cov_error) > 1E-5) {
         std::cerr << "Error on data is different to that of covariance"
-          << std::endl;
+                  << std::endl;
         NUIS_ERR(FTL, "Data error: " << data_error);
         NUIS_ERR(FTL, "Cov error: " << cov_error);
         NUIS_ERR(FTL, "Data/Cov: " << data_error / cov_error);
@@ -126,8 +126,25 @@ MINERvA_CC0pi_XSec_2D_nu::MINERvA_CC0pi_XSec_2D_nu(nuiskey samplekey) {
 
   // Now scale back
   (*fFullCovar) *= 1.0 / ScalingFactor;
-  (*covar) *= ScalingFactor;
   (*fDecomp) *= ScalingFactor;
+  //Don't scale this back as GetLikelihood expects it to look like this
+  // (*covar) *= ScalingFactor;
+
+  fMapHist = new TH2I("MINERvA_CC0pi_XSec_2D_nu_maphist", "",
+                      fDataHist->GetNbinsX(), 0, fDataHist->GetNbinsX(),
+                      fDataHist->GetNbinsY(), 0, fDataHist->GetNbinsY());
+
+  int nbinsx = fDataHist->GetNbinsX();
+  int nbinsy = fDataHist->GetNbinsY();
+  Int_t Nbins = nbinsx * nbinsy;
+
+  // Loop over the covariance matrix bins
+  for (int i = 0; i < Nbins; ++i) {
+    int xbin = (i % nbinsx) + 1;
+    int ybin = (i / nbinsx) + 1;
+
+    fMapHist->SetBinContent(xbin, ybin, i+1);
+  }
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -164,100 +181,108 @@ bool MINERvA_CC0pi_XSec_2D_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC0pi_MINERvAPTPZ(event, 14, EnuMin, EnuMax);
 };
 
-//********************************************************************
-// Custom likelihood calculator because binning of covariance matrix
-double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
-  //********************************************************************
+// //********************************************************************
+// // Custom likelihood calculator because binning of covariance matrix
+// double MINERvA_CC0pi_XSec_2D_nu::GetLikelihood() {
+//   //********************************************************************
 
-  // The calculated chi2
-  double chi2 = 0.0;
+//   return Measurement2D::GetLikelihood();
 
-  // Support shape comparisons
-  double scaleF = fDataHist->Integral() / fMCHist->Integral();
-  if (fIsShape) {
-    fMCHist->Scale(scaleF);
-    fMCFine->Scale(scaleF);
-  }
+//   // The calculated chi2
+//   double chi2 = 0.0;
 
-  // Even though this chi2 calculation looks ugly it is _EXACTLY_ what MINERvA
-  // used for their measurement Can be prettified in due time but for now keep
+//   // Support shape comparisons
+//   double scaleF = fDataHist->Integral() / fMCHist->Integral();
+//   if (fIsShape) {
+//     fMCHist->Scale(scaleF);
+//     fMCFine->Scale(scaleF);
+//   }
 
-  int nbinsx = fMCHist->GetNbinsX();
-  int nbinsy = fMCHist->GetNbinsY();
-  Int_t Nbins = nbinsx * nbinsy;
+//   int nbinsx = fMCHist->GetNbinsX();
+//   int nbinsy = fMCHist->GetNbinsY();
+//   Int_t Nbins = nbinsx * nbinsy;
 
-  // Loop over the covariance matrix bins
-  for (int i = 0; i < Nbins; ++i) {
-    int xbin = (i % nbinsx) + 1;
-    int ybin = (i / nbinsx) + 1;
-    double datax = fDataHist->GetBinContent(xbin, ybin);
-    double mcx = fMCHist->GetBinContent(xbin, ybin);
-    double chi2_bin = 0;
-    for (int j = 0; j < Nbins; ++j) {
-      int xbin2 = (j % nbinsx) + 1;
-      int ybin2 = (j / nbinsx) + 1;
+//   // Even though this chi2 calculation looks ugly it is _EXACTLY_ what MINERvA
+//   // used for their measurement Can be prettified in due time but for now keep
 
-      double datay = fDataHist->GetBinContent(xbin2, ybin2);
-      double mcy = fMCHist->GetBinContent(xbin2, ybin2);
+//   // Loop over the covariance matrix bins
+//   for (int i = 0; i < Nbins; ++i) {
+//     int xbin = (i % nbinsx) + 1;
+//     int ybin = (i / nbinsx) + 1;
+//     double datax = fDataHist->GetBinContent(xbin, ybin);
+//     double mcx = fMCHist->GetBinContent(xbin, ybin);
 
-      double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
-      chi2_bin += chi2_xy;
-    }
-    if (fResidualHist) {
-      fResidualHist->SetBinContent(xbin, ybin, chi2_bin);
-    }
-    chi2 += chi2_bin;
-  }
+//     // std::cout << "CMap( " << xbin << ", " << ybin << ") = " << i
+//     //           << ", mc = " << mcx << ", mapped("
+//     //           << fMapHist->GetBinContent(xbin, ybin)
+//     //           << ") = " << Mapped_MC->GetBinContent(i) << std::endl;
 
-  if (fChi2LessBinHist) {
-    for (int igbin = 0; igbin < Nbins; ++igbin) {
-      int igxbin = (igbin % nbinsx) + 1;
-      int igybin = (igbin / nbinsx) + 1;
-      double tchi2 = 0;
-      for (int i = 0; i < Nbins; ++i) {
-        int xbin = (i % nbinsx) + 1;
-        int ybin = (i / nbinsx) + 1;
-        if ((xbin == igxbin) && (ybin == igybin)) {
-          continue;
-        }
-        double datax = fDataHist->GetBinContent(xbin, ybin);
-        double mcx = fMCHist->GetBinContent(xbin, ybin);
-        double chi2_bin = 0;
-        for (int j = 0; j < Nbins; ++j) {
-          int xbin2 = (j % nbinsx) + 1;
-          int ybin2 = (j / nbinsx) + 1;
-          if ((xbin2 == igxbin) && (ybin2 == igybin)) {
-            continue;
-          }
-          double datay = fDataHist->GetBinContent(xbin2, ybin2);
-          double mcy = fMCHist->GetBinContent(xbin2, ybin2);
+//     double chi2_bin = 0;
+//     for (int j = 0; j < Nbins; ++j) {
+//       int xbin2 = (j % nbinsx) + 1;
+//       int ybin2 = (j / nbinsx) + 1;
 
-          double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
-          chi2_bin += chi2_xy;
-        }
-        tchi2 += chi2_bin;
-      }
+//       double datay = fDataHist->GetBinContent(xbin2, ybin2);
+//       double mcy = fMCHist->GetBinContent(xbin2, ybin2);
 
-      fChi2LessBinHist->SetBinContent(igxbin, igybin, tchi2);
-    }
-  }
+//       double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
+//       chi2_bin += chi2_xy;
+//     }
+//     if (fResidualHist) {
+//       fResidualHist->SetBinContent(xbin, ybin, chi2_bin);
+//     }
+//     chi2 += chi2_bin;
+//   }
 
-  // Normalisation penalty term if included
-  if (fAddNormPen) {
-    chi2 +=
-      (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) *
-        (1 - (fCurrentNorm)) /
-        (fNormError * fNormError));
-  }
+//   if (fChi2LessBinHist) {
+//     for (int igbin = 0; igbin < Nbins; ++igbin) {
+//       int igxbin = (igbin % nbinsx) + 1;
+//       int igybin = (igbin / nbinsx) + 1;
+//       double tchi2 = 0;
+//       for (int i = 0; i < Nbins; ++i) {
+//         int xbin = (i % nbinsx) + 1;
+//         int ybin = (i / nbinsx) + 1;
+//         if ((xbin == igxbin) && (ybin == igybin)) {
+//           continue;
+//         }
+//         double datax = fDataHist->GetBinContent(xbin, ybin);
+//         double mcx = fMCHist->GetBinContent(xbin, ybin);
+//         double chi2_bin = 0;
+//         for (int j = 0; j < Nbins; ++j) {
+//           int xbin2 = (j % nbinsx) + 1;
+//           int ybin2 = (j / nbinsx) + 1;
+//           if ((xbin2 == igxbin) && (ybin2 == igybin)) {
+//             continue;
+//           }
+//           double datay = fDataHist->GetBinContent(xbin2, ybin2);
+//           double mcy = fMCHist->GetBinContent(xbin2, ybin2);
 
-  // Adjust the shape back to where it was.
-  if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")) {
-    fMCHist->Scale(1. / scaleF);
-    fMCFine->Scale(1. / scaleF);
-  }
+//           double chi2_xy = (datax - mcx) * (*covar)(i, j) * (datay - mcy);
+//           chi2_bin += chi2_xy;
+//         }
+//         tchi2 += chi2_bin;
+//       }
 
-  fLikelihood = chi2;
+//       fChi2LessBinHist->SetBinContent(igxbin, igybin, tchi2);
+//     }
+//   }
 
-  return chi2;
-};
+//   // Normalisation penalty term if included
+//   if (fAddNormPen) {
+//     chi2 +=
+//         (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
+//     NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) *
+//                                            (1 - (fCurrentNorm)) /
+//                                            (fNormError * fNormError));
+//   }
+
+//   // Adjust the shape back to where it was.
+//   if (fIsShape and !FitPar::Config().GetParB("saveshapescaling")) {
+//     fMCHist->Scale(1. / scaleF);
+//     fMCFine->Scale(1. / scaleF);
+//   }
+
+//   fLikelihood = chi2;
+
+//   return chi2;
+// }

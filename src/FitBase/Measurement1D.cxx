@@ -69,6 +69,7 @@ Measurement1D::Measurement1D(void) {
   fIsNoWidth = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fIsWriting = false;
 
   // Inputs
   fInput = NULL;
@@ -569,6 +570,22 @@ void Measurement1D::FinaliseMeasurement() {
   if (!fFullCovar) {
     fIsDiag = true;
     SetCovarFromDiagonal(fDataHist);
+  } else if (fIsDiag) { // Have covariance but also set Diag
+    NUIS_LOG(SAM, "Have full covariance for sample "
+                      << GetName()
+                      << " but only using diagonal elements for likelihood");
+    size_t nbins = fFullCovar->GetNcols();
+    for (int i = 0; i < nbins; ++i) {
+      for (int j = 0; j < nbins; ++j) {
+        if (i != j) {
+          (*fFullCovar)[i][j] = 0;
+        }
+      }
+    }
+    delete covar;
+    covar = NULL;
+    delete fDecomp;
+    fDecomp = NULL;
   }
 
   if (!covar) {
@@ -619,8 +636,14 @@ void Measurement1D::FinaliseMeasurement() {
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
-  // Setup bin masks using sample name
-  if (fIsMask) {
+  if (fSettings.Has("maskfile") && fSettings.Has("maskhist")) {
+    fMaskHist = dynamic_cast<TH1I *>(PlotUtils::GetTH1FromRootFile(
+        fSettings.GetS("maskfile"), fSettings.GetS("maskhist")));
+    fIsMask = bool(fMaskHist);
+    NUIS_LOG(SAM, "Loaded mask histogram: " << fSettings.GetS("maskhist")
+                                            << " from "
+                                            << fSettings.GetS("maskfile"));
+  } else if (fIsMask) { // Setup bin masks using sample name
 
     std::string curname = fName;
     std::string origname = fSettings.GetS("originalname");
@@ -1015,19 +1038,20 @@ double Measurement1D::GetLikelihood() {
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
 
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist, 1,
-                                       1E76, fResidualHist);
-      if (fChi2LessBinHist) {
-        TH1I *binmask = new TH1I("mask", "", fDataHist->GetNbinsX(), 0,
-                                 fDataHist->GetNbinsX());
-        binmask->SetDirectory(NULL);
+                                       1E76, fIsWriting ? fResidualHist : NULL);
+      if (fChi2LessBinHist && fIsWriting) {
         for (int xi = 0; xi < fDataHist->GetNbinsX(); ++xi) {
-          binmask->Reset();
+          TH1I *binmask = fMaskHist
+                              ? static_cast<TH1I *>(fMaskHist->Clone("mask"))
+                              : new TH1I("mask", "", fDataHist->GetNbinsX(), 0,
+                                         fDataHist->GetNbinsX());
+          binmask->SetDirectory(NULL);
           binmask->SetBinContent(xi + 1, 1);
           fChi2LessBinHist->SetBinContent(
               xi + 1,
               StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, binmask));
+          delete binmask;
         }
-        delete binmask;
       }
     }
   }
@@ -1353,10 +1377,12 @@ void Measurement1D::Write(std::string drawOpt) {
     fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
+    fIsWriting = true;
     (void)GetLikelihood();
+    fIsWriting = false;
 
-    fResidualHist->Write();
-    fChi2LessBinHist->Write();
+    fResidualHist->Write((fName + "_RESIDUAL").c_str());
+    fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
   }
 
   // Write Extra Histograms

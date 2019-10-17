@@ -15,20 +15,20 @@ public:
     int mode = Reweight::RemoveDialType(rwenum);
     if (fDialEnumIndex.count(mode)) {
       NUIS_ABORT("Mode dial: " << mode
-                          << " already included. Cannot include twice.");
+                               << " already included. Cannot include twice.");
     }
     fDialEnumIndex[mode] = fDialValues.size();
     fDialValues.push_back(startval);
-    NUIS_LOG(FIT, "Added mode dial for mode: " << mode);
+    NUIS_LOG(FIT, "Added mode dial for mode: " << DialToMode(mode));
   }
   void SetDialValue(int rwenum, double val) {
     int mode = Reweight::RemoveDialType(rwenum);
     if (!fDialEnumIndex.count(mode)) {
       NUIS_ABORT("Mode dial: " << mode
-                          << " has not been included. Cannot set value.");
+                               << " has not been included. Cannot set value.");
     }
-    NUIS_LOG(DEB, "[INFO]: ModeNormEngine ObsMode: " << mode << " weight " << val
-                                                 << ", rwenum = " << rwenum);
+    NUIS_LOG(DEB, "[INFO]: ModeNormEngine ObsMode: "
+                      << mode << " weight " << val << ", rwenum = " << rwenum);
     fDialValues[fDialEnumIndex[mode]] = val;
   }
   void SetDialValue(std::string name, double val) {
@@ -37,7 +37,8 @@ public:
 
   void Reconfigure(bool silent = false) { (void)silent; }
 
-  static int ModeToDial(int mode) { return 60 + mode; }
+  static int ModeToDial(int mode) { return 100 + mode; }
+  static int DialToMode(int dial) { return dial - 100; }
 
   double CalcWeight(BaseFitEvt *evt) {
     int mode = ModeToDial(abs(evt->Mode));
@@ -45,8 +46,8 @@ public:
       return 1;
     }
     NUIS_LOG(DEB, "[INFO]: Ev mode "
-                  << evt->Mode << ", ObsMode: " << mode
-                  << ", weight = " << fDialValues[fDialEnumIndex[mode]]);
+                      << evt->Mode << ", ObsMode: " << mode
+                      << ", weight = " << fDialValues[fDialEnumIndex[mode]]);
     return fDialValues[fDialEnumIndex[mode]];
   };
   bool NeedsEventReWeight() { return false; };
@@ -64,15 +65,16 @@ public:
   static int SystEnumFromString(std::string const &name) {
     std::vector<std::string> splits = GeneralUtils::ParseToStr(name, "_");
     if (splits.size() != 2) {
-      NUIS_ABORT("Attempting to parse dial name: \""
-             << name
-             << "\" as a mode norm dial but failed. Expect e.g. \"mode_2\".");
+      NUIS_ABORT(
+          "Attempting to parse dial name: \""
+          << name
+          << "\" as a mode norm dial but failed. Expect e.g. \"mode_2\".");
     }
 
     int mode_num = GeneralUtils::StrToInt(splits[1]);
     if (!mode_num) {
       NUIS_ABORT("Attempting to parse dial name: \""
-             << name << "\" as a mode norm dial but failed.");
+                 << name << "\" as a mode norm dial but failed.");
     }
     return ModeToDial(mode_num);
   }

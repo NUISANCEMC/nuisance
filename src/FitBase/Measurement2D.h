@@ -622,7 +622,7 @@ protected:
   bool fIsDifXSec;   //!< Flag: Differential XSec
   bool fIsEnu1D;     //!< Flag: Flux Unfolded XSec
   bool fIsChi2;      //!< Flag; Use Chi2 over LL
-
+  bool fIsWriting;
 
   TrueModeStack* fMCHist_Modes; ///< Optional True Mode Stack
 

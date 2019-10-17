@@ -108,6 +108,7 @@ Measurement2D::Measurement2D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fIsWriting = false;
 
   // Inputs
   fInput = NULL;
@@ -588,6 +589,22 @@ void Measurement2D::FinaliseMeasurement() {
   if (!fFullCovar) {
     fIsDiag = true;
     SetCovarFromDiagonal(fDataHist);
+  } else if (fIsDiag) { // Have covariance but also set Diag
+    NUIS_LOG(SAM, "Have full covariance for sample "
+                      << GetName()
+                      << " but only using diagonal elements for likelihood");
+    size_t nbins = fFullCovar->GetNcols();
+    for (int i = 0; i < nbins; ++i) {
+      for (int j = 0; j < nbins; ++j) {
+        if (i != j) {
+          (*fFullCovar)[i][j] = 0;
+        }
+      }
+    }
+    delete covar;
+    covar = NULL;
+    delete fDecomp;
+    fDecomp = NULL;
   }
 
   if (!covar) {
@@ -631,11 +648,11 @@ void Measurement2D::FinaliseMeasurement() {
   if (fSettings.Has("maskfile") && fSettings.Has("maskhist")) {
     fMaskHist = PlotUtils::GetTH2FromRootFile<TH2I>(fSettings.GetS("maskfile"),
                                                     fSettings.GetS("maskhist"));
-    fIsMask = true;
-  }
-
-  // Setup bin masks using sample name
-  if (fIsMask && !fMaskHist) {
+    fIsMask = bool(fMaskHist);
+    NUIS_LOG(SAM, "Loaded mask histogram: " << fSettings.GetS("maskhist")
+                                            << " from "
+                                            << fSettings.GetS("maskfile"));
+  } else if (fIsMask) { // Setup bin masks using sample name
 
     std::string curname = fName;
     std::string origname = fSettings.GetS("originalname");
@@ -1013,8 +1030,9 @@ double Measurement2D::GetLikelihood() {
     // PlotUtils::ScaleNeutModeArray((TH1**)fMCHist_PDG, scaleF);
   }
 
-  if (!fMapHist)
+  if (!fMapHist) {
     fMapHist = StatUtils::GenerateMap(fDataHist);
+  }
 
   // Get the chi2 from either covar or diagonals
   double chi2 = 0.0;
@@ -1025,23 +1043,28 @@ double Measurement2D::GetLikelihood() {
           StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMapHist, fMaskHist);
     } else {
       chi2 = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMapHist,
-                                       fMaskHist, fResidualHist);
-      if (fChi2LessBinHist) {
-        TH2I *binmask = new TH2I("mask", "", fDataHist->GetNbinsX(), 0,
-                                 fDataHist->GetNbinsX(), fDataHist->GetNbinsY(),
-                                 0, fDataHist->GetNbinsY());
-        binmask->SetDirectory(NULL);
+                                       fMaskHist,
+                                       fIsWriting ? fResidualHist : NULL);
+      if (fChi2LessBinHist && fIsWriting) {
+        NUIS_LOG(SAM, "Building n-1 chi2 contribution plot for " << GetName());
         for (int xi = 0; xi < fDataHist->GetNbinsX(); ++xi) {
           for (int yi = 0; yi < fDataHist->GetNbinsY(); ++yi) {
-            binmask->Reset();
+            TH2I *binmask =
+                fMaskHist
+                    ? static_cast<TH2I *>(fMaskHist->Clone("mask"))
+                    : new TH2I("mask", "", fDataHist->GetNbinsX(), 0,
+                               fDataHist->GetNbinsX(), fDataHist->GetNbinsY(),
+                               0, fDataHist->GetNbinsY());
+            binmask->SetDirectory(NULL);
+
             binmask->SetBinContent(xi + 1, yi + 1, 1);
             fChi2LessBinHist->SetBinContent(
                 xi + 1, yi + 1,
                 StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMapHist,
                                           binmask));
+            delete binmask;
           }
         }
-        delete binmask;
       }
     }
   }
@@ -1298,10 +1321,12 @@ void Measurement2D::Write(std::string drawOpt) {
     fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
+    fIsWriting = true;
     (void)GetLikelihood();
+    fIsWriting = false;
 
-    fResidualHist->Write();
-    fChi2LessBinHist->Write();
+    fResidualHist->Write((fName + "_RESIDUAL").c_str());
+    fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
   }
 
   // // Likelihood residual plots

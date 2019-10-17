@@ -22,9 +22,9 @@
 
 #include "Measurement2D.h"
 
-//********************************************************************  
+//********************************************************************
 class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
-//********************************************************************  
+//********************************************************************
 
  public:
 
@@ -37,14 +37,14 @@ class MINERvA_CC0pi_XSec_2D_nu : public Measurement2D {
   // Required functions
   bool isSignal(FitEvent *nvect);
   void FillEventVariables(FitEvent *event);
-  
+
  protected:
   // Converted covariance matrix to provide global binning method in GetLikelihood
-  double GetLikelihood();
+  // double GetLikelihood();
 
   // Set up settings based on distribution
   void SetupDataSettings();
 
 };
-  
+
 #endif
