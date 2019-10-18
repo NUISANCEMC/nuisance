@@ -33,7 +33,7 @@ public:
 
   /// Numu CC0PI Signal Definition
   ///
-  /// /item 
+  /// /item
   bool isSignal(FitEvent *nvect);
 
   /// Read histograms in a special way because format is different.
@@ -57,18 +57,16 @@ public:
  private:
 
   bool fIsSystCov, fIsStatCov, fIsNormCov;
+  bool fMaskMomOverflow;
 
-  TH2Poly* fDataPoly;
-  TH2Poly* fMCPoly;
-
-  TFile* fInputFile;
   TH2D* fMCHist_Fine2D;
 
   std::vector<TH1D*> fMCHist_Slices;
   std::vector<TH1D*> fDataHist_Slices;
 
   void FillMCSlice(double x, double y, double w);
-  
+  void MaskMomOverflow();
+
 };
-  
+
 #endif
