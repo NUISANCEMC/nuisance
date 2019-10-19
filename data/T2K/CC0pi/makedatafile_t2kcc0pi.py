@@ -1,5 +1,6 @@
 from ROOT import *
 from array import *
+from math import *
 
 def GetMiddle(mystr):
 
@@ -12,16 +13,16 @@ def GetLowEdge(mystr):
 
     lims = mystr.strip().split(" - ")
     val = (float(lims[0]) + 0.00001)
-    
+
     return val
 
 def GetHighEdge(mystr):
-    
+
     lims = mystr.strip().split(" - ")
     val = (float(lims[1]) - 0.00001)
-           
+
     return val
-           
+
 def GetIndex(mystr):
 
     lims = mystr.split("-")
@@ -38,10 +39,10 @@ yedge   =  [-1.0, 0.0, 0.6, 0.7, 0.8, 0.85, 0.9, 0.94, 0.98, 1.0]
 datahist = TH2D("analysis1_data","analysis1_data",
                 len(xedge)-1, array('f',xedge),
                 len(yedge)-1, array('f',yedge))
-           
+
 maphist = datahist.Clone("analysis1_map")
 maphist.SetTitle("analysis1_map")
-           
+
 counthist = datahist.Clone("analysis1_entrycount")
 
 datapoly = TH2Poly("datapoly","datapoly", 0.0,30.0, -1.0, 1.0)
@@ -57,18 +58,18 @@ with open("cross-section_analysisI.txt") as f:
     count = 0
     for line in f:
         count += 1
-        
+
         if (count < 4): continue
         data = line.strip().split("|")
         if (len(data) < 1): continue
 
         ibin = int(   data[0]  ) + 1
-        
+
         xval = round(float(GetLowEdge( data[2] )),4)
         yval = round(float(GetLowEdge( data[1] )),4)
         xhig = round(float(GetHighEdge( data[2] )),4)
         yhig = round(float(GetHighEdge( data[1] )),4)
-        
+
         xsec = float( data[3]  ) * 1E-38
 
         datapoly.AddBin( xval, yval, xhig, yhig )
@@ -76,7 +77,7 @@ with open("cross-section_analysisI.txt") as f:
 
         binedges.append( xval )
         xsecvals.append( xsec )
-        if ibin in binlimits: 
+        if ibin in binlimits:
             binedges.append( xhig )
             histedgeslist.append(binedges)
             histxseclist.append(xsecvals)
@@ -166,7 +167,7 @@ for i, obj in enumerate(histedgeslist):
     for j in range(hist.GetNbinsX()):
         hist.SetBinContent(j+1, histxseclist[i][j])
 
-    hist.GetXaxis().SetRangeUser(obj[0], obj[len(obj)-2])
+    hist.GetXaxis().SetRangeUser(obj[0], obj[len(obj)-1])
     hist.Draw("HIST")
     gPad.Update()
 
@@ -220,11 +221,11 @@ with open("rps_crossSection_analysis2.txt") as f:
 
         datahist.Fill(xval, yval, xsec)
         maphist.Fill(xval, yval, ibin)
-           
+
         counthist.Fill(xval, yval, 1.0)
 
      #   print ibin, "Map Value"
-        
+
 # Get N Bins
 nbins = int(maphist.GetMaximum())
 print "NBins I = ", nbins
@@ -239,7 +240,7 @@ with open("rps_statsCov_analysis2.txt") as f:
     count = 0
     for line in f:
         count += 1
-        
+
         if (count < 4): continue
         data = line.strip().split("|")
         if (len(data) < 1): continue
@@ -253,30 +254,30 @@ with open("rps_systCov_analysis2.txt") as f:
     count = 0
     for line in f:
         count += 1
-        
+
         if (count < 4): continue
         data = line.strip().split("|")
         if (len(data) < 1): continue
-        
+
         xi, yi = GetIndex(data[0])
         cov    = float(data[1])
-        
+
         systcov.SetBinContent(xi + 1, yi + 1, cov)
 
 with open("rps_fluxNormCov_analysis2.txt") as f:
     count = 0
     for line in f:
         count += 1
-        
+
         if (count < 4): continue
         data = line.strip().split("|")
         if (len(data) < 1): continue
-        
+
         xi, yi = GetIndex(data[0])
         cov    = float(data[1])
-        
+
         normcov.SetBinContent(xi + 1, yi + 1, cov)
-        
+
 totcov.Add(systcov)
 totcov.Add(statcov)
 totcov.Add(normcov)
@@ -287,8 +288,8 @@ maphist.Write()
 counthist.Write()
 statcov.Write()
 systcov.Write()
-totcov.Write()    
-normcov.Write()    
+totcov.Write()
+normcov.Write()
 
 
 
