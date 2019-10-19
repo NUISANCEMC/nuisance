@@ -85,7 +85,11 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
                                      std::string const &rawinputs) {
   NUIS_LOG(SAM, "Creating GENIEInputHandler : " << handle);
 
+  // Plz no shouting
+  StopTalking();
   genie::Messenger::Instance()->SetPriorityLevel("GHepUtils", pFATAL);
+  StartTalking();
+  // Shout all you want
 
   // Run a joint input handling
   fName = handle;
