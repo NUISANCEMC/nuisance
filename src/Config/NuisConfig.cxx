@@ -60,7 +60,7 @@ nuisconfig::nuisconfig() {
   // Load default Parameters
   std::string filename =
       (GeneralUtils::GetTopLevelDir() + "/parameters/config.xml");
-  std::cout << "[ NUISANCE ]: Loading DEFAULT settings from : " << filename;
+  std::cout << "[ NUISANCE ]: Loading DEFAULT settings from : " << filename << std::endl;
 
   // Create XML Engine
   fXML = new TXMLEngine;
@@ -76,7 +76,7 @@ nuisconfig::nuisconfig() {
   fMainNode = fXML->DocGetRootElement(fXMLDocs[0]);
 
   // Print result
-  std::cout << " -> DONE." << std::endl;
+  std::cout << "[ NUISANCE ]: Finished nuisconfig." << std::endl;
 }
 
 nuisconfig::~nuisconfig() {
@@ -171,12 +171,12 @@ void nuisconfig::LoadXMLSettings(std::string const &filename,
     // Get Next Child
     child = fXML->GetNext(child);
   }
-  std::cout << " -> DONE." << std::endl;
+  std::cout << "[ NUISANCE ]: Finished loading XML settings" << std::endl;
 }
 
 void nuisconfig::LoadCardSettings(std::string const &filename,
                                   std::string const &state) {
-  std::cout << "[ NUISANCE ]: Loading simple config from : " << filename;
+  std::cout << "[ NUISANCE ]: Loading simple config from : " << filename << std::endl;
 
   // Build XML Config from the card file by parsing each line
   std::vector<std::string> cardlines =
@@ -222,7 +222,7 @@ void nuisconfig::LoadCardSettings(std::string const &filename,
       CreateOldConfigNodeFromLine(line);
     }
   }
-  std::cout << " -> DONE." << std::endl;
+  std::cout << "[ NUISANCE ]: Finished loading simple config" << std::endl;
 }
 
 XMLNodePointer_t nuisconfig::CreateSampleNodeFromLine(std::string const &line) {
@@ -305,7 +305,7 @@ XMLNodePointer_t nuisconfig::CreateOldConfigNodeFromLine(
 }
 
 void nuisconfig::FinaliseSettings(std::string const &name) {
-  std::cout << "[ NUISANCE ]: Finalising run settings";
+  std::cout << "[ NUISANCE ]: Finalising run settings" << std::endl;
 
   WriteSettings(name);
 
@@ -313,7 +313,7 @@ void nuisconfig::FinaliseSettings(std::string const &name) {
   RemoveEmptyNodes();
   RemoveIdenticalNodes();
 
-  std::cout << " -> DONE." << std::endl;
+  std::cout << "[ NUISANCE ]: Finished finalising run settings" << std::endl;
 }
 
 void nuisconfig::WriteSettings(std::string const &outputname) {
