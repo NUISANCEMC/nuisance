@@ -60,6 +60,8 @@ T2K_nueCCinc_XSec_joint::T2K_nueCCinc_XSec_joint(nuiskey samplekey){
   fSubChain.push_back(RHC_nue);
   fSubChain.push_back(RHC_nuebar);
 
+  // This saves information from the sub-measurements
+  fSaveSubMeas = true;
   FinaliseMeasurement();
 };
 
@@ -162,4 +164,3 @@ void T2K_nueCCinc_XSec_joint::MakePlots() {
 
   return;
 }
-
