@@ -192,7 +192,7 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
     bincount = fFullCovar->GetNcols();
   }
 
-  std::vector<std::pair<double, double>> data_slice_bcbes;
+  std::vector<std::pair<double, double> > data_slice_bcbes;
   for (size_t i = 0; i < nangbins; i++) {
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++) {
       data_slice_bcbes.push_back(
