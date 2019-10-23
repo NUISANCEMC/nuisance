@@ -20,7 +20,6 @@
 #include "neutfsipart.h"
 #include "neutfsivert.h"
 #include "neutrootTreeSingleton.h"
-#include "NModeDefn.h"
 #include "NSyst.h"
 #include "NFortFns.h" // Contains all the NEUT common blocks
 
