@@ -22,8 +22,6 @@
 #include "Measurement1D.h"
 #include "FitEvent.h"
 
-#include "MINERvA_SignalDef.h"
-
 class GenericFlux_Vectors : public Measurement1D {
 
 public:
@@ -153,8 +151,9 @@ public:
   bool flagNC1pim;
   bool flagCC1pi0;
   bool flagNC1pi0;
-
+#ifndef __NO_MINERvA__
   bool flagCC0piMINERvA;
+#endif
 };
 
 #endif

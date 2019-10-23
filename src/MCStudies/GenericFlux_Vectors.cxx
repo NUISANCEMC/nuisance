@@ -19,6 +19,10 @@
 
 #include "GenericFlux_Vectors.h"
 
+#ifndef __NO_MINERvA__
+#include "MINERvA_SignalDef.h"
+#endif
+
 GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
                                          std::string inputfile, FitWeight *rw,
                                          std::string type,
@@ -40,8 +44,8 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   }
 
   SavePreFSI = Config::Get().GetParB("nuisflat_SavePreFSI");
-  NUIS_LOG(SAM,
-       "Running GenericFlux_Vectors saving pre-FSI particles? " << SavePreFSI);
+  NUIS_LOG(SAM, "Running GenericFlux_Vectors saving pre-FSI particles? "
+                    << SavePreFSI);
 
   // Set default fitter flags
   fIsDiag = true;
@@ -77,10 +81,10 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
       this->TotalIntegratedFlux("width");
 
   NUIS_LOG(SAM, " Generic Flux Scaling Factor = "
-                << fScaleFactor
-                << " [= " << (GetEventHistogram()->Integral("width") * 1E-38)
-                << "/(" << (fNEvents + 0.) << "*"
-                << TotalIntegratedFlux("width") << ")]");
+                    << fScaleFactor << " [= "
+                    << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
+                    << (fNEvents + 0.) << "*" << TotalIntegratedFlux("width")
+                    << ")]");
 
   if (fScaleFactor <= 0.0) {
     NUIS_ABORT("SCALE FACTOR TOO LOW");
@@ -350,7 +354,11 @@ void GenericFlux_Vectors::ResetVariables() {
 
   flagCCINC = flagNCINC = flagCCQE = flagCC0pi = flagCCQELike = flagNCEL =
       flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim =
-          flagNC1pim = flagCC1pi0 = flagNC1pi0 = flagCC0piMINERvA = false;
+          flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
+
+#ifndef __NO_MINERvA__
+  flagCC0piMINERvA = false;
+#endif
 }
 
 //********************************************************************
@@ -377,8 +385,9 @@ void GenericFlux_Vectors::FillSignalFlags(FitEvent *event) {
   flagNC1pim = SignalDef::isNC1pi(event, nuPDG, -211);
   flagCC1pi0 = SignalDef::isCC1pi(event, nuPDG, 111);
   flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
-
+#ifndef __NO_MINERvA__
   flagCC0piMINERvA = SignalDef::isCC0pi_MINERvAPTPZ(event, 14);
+#endif
 }
 
 void GenericFlux_Vectors::AddSignalFlagsToTree() {
@@ -406,8 +415,10 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
   eventVariables->Branch("flagNC1pim", &flagNC1pim, "flagNC1pim/O");
   eventVariables->Branch("flagCC1pi0", &flagCC1pi0, "flagCC1pi0/O");
   eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
-
-  eventVariables->Branch("flagCC0piMINERvA", &flagCC0piMINERvA, "flagCC0piMINERvA/O");
+#ifndef __NO_MINERvA__
+  eventVariables->Branch("flagCC0piMINERvA", &flagCC0piMINERvA,
+                         "flagCC0piMINERvA/O");
+#endif
 };
 
 void GenericFlux_Vectors::Write(std::string drawOpt) {
