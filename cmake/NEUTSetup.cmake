@@ -104,18 +104,26 @@ else() # Everything better be set up already
 
   LIST(APPEND EXTRA_CXX_FLAGS
     -I${NEUT_ROOT}/include
-    -I${NEUT_ROOT}/src/neutclass
-    -I${NEUT_ROOT}/src/reweight)
-
+    -I${NEUT_ROOT}/src/neutclass)
   LIST(APPEND EXTRA_LINK_DIRS
     ${NEUT_LIB_DIR}
-    ${CERN}/${CERN_LEVEL}/lib
-    ${NEUT_ROOT}/src/reweight)
+    ${CERN}/${CERN_LEVEL}/lib)
+
+  if(USE_REWEIGHT)
+    LIST(APPEND EXTRA_CXX_FLAGS
+      -I${NEUT_ROOT}/src/reweight)
+    LIST(APPEND EXTRA_LINK_DIRS
+      ${NEUT_ROOT}/src/reweight)
+  endif()
 
   if(${NEUT_VERSION} VERSION_EQUAL 5.4.2)
     LIST(APPEND EXTRA_LIBS
-      -Wl,--as-needed
-      NReWeight
+      -Wl,--as-needed)
+    if(USE_REWEIGHT)
+      LIST(APPEND EXTRA_LIBS
+        NReWeight)
+    endif()
+    LIST(APPEND EXTRA_LIBS
       -Wl,--start-group
       neutcore_5.4.2
       nuccorspl_5.4.2 #typo in NEUT, may hopefully disappear
@@ -135,8 +143,12 @@ else() # Everything better be set up already
     LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_COMMON_QEAV)
   elseif(${NEUT_VERSION} VERSION_EQUAL 5.4.0)
     LIST(APPEND EXTRA_LIBS
-      -Wl,--as-needed
-      NReWeight
+      -Wl,--as-needed)
+    if(USE_REWEIGHT)
+      LIST(APPEND EXTRA_LIBS
+        NReWeight)
+    endif()
+    LIST(APPEND EXTRA_LIBS
       -Wl,--start-group
       neutcore_5.4.0
       nuccorspl_5.4.0 #typo in NEUT, may hopefully disappear
@@ -157,8 +169,12 @@ else() # Everything better be set up already
       pawlib)
   else()
     LIST(APPEND EXTRA_LIBS
-      -Wl,--as-needed
-      NReWeight
+      -Wl,--as-needed)
+    if(USE_REWEIGHT)
+      LIST(APPEND EXTRA_LIBS
+        NReWeight)
+    endif()
+    LIST(APPEND EXTRA_LIBS
       -Wl,--start-group
       neutcore
       nuccorrspl
