@@ -463,6 +463,7 @@ public:
   inline bool HasFSLeptons      (void) const { return HasFSParticle(PhysConst::pdg_leptons);       };
   inline bool HasFSPions        (void) const { return HasFSParticle(PhysConst::pdg_pions);         };
   inline bool HasFSChargePions  (void) const { return HasFSParticle(PhysConst::pdg_charged_pions); };
+  inline bool HasFSNucleons     (void) const { return HasFSParticle(PhysConst::pdg_nucleons); };
 
   inline int NumFSNuElectron   (void) const { return NumFSParticle(12);   };
   inline int NumFSNuMuon       (void) const { return NumFSParticle(14);   };
@@ -479,6 +480,7 @@ public:
   int NumFSLeptons      (void) const; // { return NumFSParticle(PhysConst::pdg_leptons);       };
   inline int NumFSPions        (void) const { return NumFSParticle(PhysConst::pdg_pions);         };
   inline int NumFSChargePions  (void) const { return NumFSParticle(PhysConst::pdg_charged_pions); };
+  inline int NumFSNucleons  (void) const { return NumFSParticle(PhysConst::pdg_nucleons); };
 
   inline std::vector<int> GetAllFSNuElectronIndices (void) const { return GetAllFSParticleIndices(12);   };
   inline std::vector<int> GetAllFSNuMuonIndices     (void) const { return GetAllFSParticleIndices(14);   };
@@ -495,6 +497,7 @@ public:
   inline std::vector<int> GetAllFSLeptonsIndices    (void) const { return GetAllFSParticleIndices(PhysConst::pdg_leptons);       };
   inline std::vector<int> GetAllFSPionsIndices      (void) const { return GetAllFSParticleIndices(PhysConst::pdg_pions);         };
   inline std::vector<int> GetAllFSChargePionsIndices(void) const { return GetAllFSParticleIndices(PhysConst::pdg_charged_pions); };
+  inline std::vector<int> GetAllFSNucleonIndices(void) const { return GetAllFSParticleIndices(PhysConst::pdg_nucleons); };
 
   inline std::vector<FitParticle*> GetAllFSNuElectron (void) { return GetAllFSParticle(12);   };
   inline std::vector<FitParticle*> GetAllFSNuMuon     (void) { return GetAllFSParticle(14);   };
@@ -511,6 +514,7 @@ public:
   inline std::vector<FitParticle*> GetAllFSLeptons     (void) { return GetAllFSParticle(PhysConst::pdg_leptons);       };
   inline std::vector<FitParticle*> GetAllFSPions       (void) { return GetAllFSParticle(PhysConst::pdg_pions);         };
   inline std::vector<FitParticle*> GetAllFSChargePions (void) { return GetAllFSParticle(PhysConst::pdg_charged_pions); };
+  inline std::vector<FitParticle*> GetAllFSNucleons    (void) { return GetAllFSParticle(PhysConst::pdg_nucleons); };
 
   inline FitParticle* GetHMFSNuElectron (void) { return GetHMFSParticle(12);   };
   inline FitParticle* GetHMFSNuMuon     (void) { return GetHMFSParticle(14);   };
@@ -531,6 +535,7 @@ public:
 
   inline FitParticle* GetHMFSPions      (void) { return GetHMFSParticle(PhysConst::pdg_pions);         };
   inline FitParticle* GetHMFSChargePions(void) { return GetHMFSParticle(PhysConst::pdg_charged_pions); };
+  inline FitParticle* GetHMFSNucleons(void) { return GetHMFSParticle(PhysConst::pdg_nucleons); };
 
   inline int GetHMFSNuElectronIndex (void) const { return GetHMFSParticleIndex(12);   };
   inline int GetHMFSNuMuonIndex     (void) const { return GetHMFSParticleIndex(14);   };
@@ -550,6 +555,7 @@ public:
 
   inline int GetHMFSPionsIndex      (void) const { return GetHMFSParticleIndex(PhysConst::pdg_pions);         };
   inline int GetHMFSChargePionsIndex(void) const { return GetHMFSParticleIndex(PhysConst::pdg_charged_pions); };
+  inline int GetHMFSChargeNucleonIndex(void) const { return GetHMFSParticleIndex(PhysConst::pdg_nucleons); };
 
   // ---- NEUTRINO INCOMING Related Functions
   int                   GetBeamNeutrinoIndex   (void) const;

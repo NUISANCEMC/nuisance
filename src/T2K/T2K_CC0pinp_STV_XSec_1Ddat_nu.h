@@ -31,6 +31,10 @@ public:
   bool isSignal(FitEvent *event);
 
   private:
+  // Proton cuts
+  double ProtonMinCut;
+  double ProtonMaxCut;
+  double ProtonCosThetaCut;
 };
 
 #endif

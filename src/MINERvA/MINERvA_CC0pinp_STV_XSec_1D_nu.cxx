@@ -171,6 +171,12 @@ MINERvA_CC0pinp_STV_XSec_1D_nu::MINERvA_CC0pinp_STV_XSec_1D_nu(
   // Muon momentum, muon angle, proton momentum, proton angle, neutron momentum,
   // dalphat, dpt, dphit
 
+
+  // Hard-code the cuts
+  ProtonMinCut = 450; // MeV
+  ProtonMaxCut = 1200; // MeV
+  ProtonThetaCut = 70; // degrees
+
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
 
@@ -307,19 +313,7 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   // Find the highest momentum proton in the event between 450 and 1200 MeV with
   // theta_p < 70
-  int HMFSProton = 0;
-  double HighestMomentum = 0.0;
-  // Get the stack of protons
-  std::vector<FitParticle *> Protons = event->GetAllFSProton();
-  for (size_t i = 0; i < Protons.size(); ++i) {
-    if (Protons[i]->p() > 450 && Protons[i]->p() < 1200 &&
-        Protons[i]->P3().Angle(Pnu.Vect()) < (M_PI / 180.0) * 70.0 &&
-        Protons[i]->p() > HighestMomentum) {
-      HMFSProton = i;
-    }
-  }
-  // Now get the proton
-  TLorentzVector Pprot = Protons[HMFSProton]->fP;
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI));
 
   switch (fDist) {
   case (kMuonMom):
@@ -336,16 +330,16 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
     break;
     // Use Stephen's validated functions
   case (kNeMom):
-    fXVar = FitUtils::Get_pn_reco_C(event, 14, true);
+    fXVar = FitUtils::Get_pn_reco_C(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
     break;
   case (kDalphaT):
-    fXVar = FitUtils::Get_STV_dalphat(event, 14, true) * (180.0 / M_PI);
+    fXVar = FitUtils::Get_STV_dalphat(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   case (kDpT):
-    fXVar = FitUtils::Get_STV_dpt(event, 14, true) / 1000.0;
+    fXVar = FitUtils::Get_STV_dpt(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
     break;
   case (kDphiT):
-    fXVar = FitUtils::Get_STV_dphit(event, 14, true) * (180.0 / M_PI);
+    fXVar = FitUtils::Get_STV_dphit(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   }
   return;

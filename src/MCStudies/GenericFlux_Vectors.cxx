@@ -126,6 +126,9 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("Eav", &Eav, "Eav/F");
   eventVariables->Branch("EavAlt", &EavAlt, "EavAlt/F");
 
+  eventVariables->Branch("CosThetaAdler", &CosThetaAdler, "CosThetaAdler/F");
+  eventVariables->Branch("PhiAdler", &PhiAdler, "PhiAdler/F");
+
   eventVariables->Branch("dalphat", &dalphat, "dalphat/F");
   eventVariables->Branch("dpt", &dpt, "dpt/F");
   eventVariables->Branch("dphit", &dphit, "dphit/F");
@@ -209,6 +212,16 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
     Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
     EavAlt = FitUtils::Eavailable(event) / 1.E3;
+
+    // Check if this is a 1pi+ or 1pi0 event
+    if ((SignalDef::isCC1pi(event, PDGnu, 211) || SignalDef::isCC1pi(event, PDGnu, -211) || SignalDef::isCC1pi(event, PDGnu, 111)) && event->NumFSNucleons() == 1) {
+      TLorentzVector Pnu = nu->fP;
+      TLorentzVector Pmu = lep->fP;
+      TLorentzVector Ppi = event->GetHMFSPions()->fP;
+      TLorentzVector Pprot = event->GetHMFSNucleons()->fP;
+      CosThetaAdler = FitUtils::CosThAdler(Pnu, Pmu, Ppi, Pprot);
+      PhiAdler = FitUtils::PhiAdler(Pnu, Pmu, Ppi, Pprot);
+    }
 
     // Get W_true with assumption of initial state nucleon at rest
     float m_n = (float)PhysConst::mass_proton;
@@ -319,7 +332,7 @@ void GenericFlux_Vectors::ResetVariables() {
   Mode = PDGnu = tgt = tgta = tgtz = PDGLep = 0;
 
   Enu_true = ELep = CosLep = Q2 = q0 = q3 = Enu_QE = Q2_QE = W_nuc_rest = W =
-      x = y = Eav = EavAlt = -999.9;
+      x = y = Eav = EavAlt = CosThetaAdler = PhiAdler = -999.9;
 
   W_genie = -999;
   // Other fun variables

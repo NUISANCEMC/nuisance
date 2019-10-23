@@ -31,6 +31,11 @@ public:
   bool isSignal(FitEvent *event);
 
   private:
+
+  double ProtonMinCut;
+  double ProtonMaxCut;
+  double ProtonThetaCut;
+
   void SetupDataSettings();
 
   void SetDataFromRootFile(std::string);

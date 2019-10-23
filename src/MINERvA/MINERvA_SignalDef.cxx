@@ -464,13 +464,8 @@ namespace SignalDef {
       }
     }
 
-    // Proton momentum cuts
-    //if (pp.Vect().Mag() < 450 || pp.Vect().Mag() > 1200) return false;
-    // Proton angle cuts
-    //if (pp.Vect().Angle(pnu.Vect()) > (M_PI/180.0)*70) return false;
     if (nProtonsAboveThreshold == 0) return false;
-
     return true;
   };
 
-}
+} // end namespace

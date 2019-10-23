@@ -101,6 +101,9 @@ public:
   float dphit;
   float pnreco_C;
 
+  float CosThetaAdler;
+  float PhiAdler;
+
   // Save outgoing particle vectors
   int nfsp;
   static const int kMAX = 200;

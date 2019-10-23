@@ -97,6 +97,8 @@ const int pdg_strangemesons[] = {
     9000315, 9000325, 10315,   10325,   20315,   20325,   9010315,
     9010325, 9020315, 9020325, 317,     327,     9010317, 9010327};
 
+const int pdg_nucleons[] = {2112, 2212};
+
 // Just *-1 to cover possibility
 const int pdg_kplus = 321;
 const int pdg_antistrangemesons[] = {
