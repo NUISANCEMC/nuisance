@@ -12,7 +12,7 @@
 
 void printInputCommands(char *argv[]) {
   std::cout << "[USAGE]: " << argv[0]
-            << " [-h] [-f] [-F <FluxRootFile>,<FluxHistName>] [-o output.root] "
+            << " [-h] [-f] [-F <FluxRootFile>,<FluxHistName>[,PDG[,speciesFraction]] [-o output.root] "
                "inputfile.root [file2.root ...]"
             << std::endl
             << "\t-h : Print this message." << std::endl
