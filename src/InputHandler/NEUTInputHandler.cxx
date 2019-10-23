@@ -2,6 +2,30 @@
 #include "NEUTInputHandler.h"
 #include "InputUtils.h"
 
+#include "PlotUtils.h"
+#include "TTreePerfStats.h"
+#include "fsihistC.h"
+#include "necardC.h"
+#include "nefillverC.h"
+#include "neutcrsC.h"
+#include "neutfsipart.h"
+#include "neutfsivert.h"
+#include "neutmodelC.h"
+#include "neutparamsC.h"
+#include "neutpart.h"
+#include "neutrootTreeSingleton.h"
+#include "neutvect.h"
+#include "neworkC.h"
+#include "vcworkC.h"
+
+#include "posinnucC.h"
+
+#ifdef __NEUT_NUCFSI_ENABLED__
+#include "neutnucfsistep.h"
+#include "neutnucfsivert.h"
+#include "nucleonfsihistC.h"
+#endif
+
 NEUTGeneratorInfo::~NEUTGeneratorInfo() { DeallocateParticleStack(); }
 
 void NEUTGeneratorInfo::AddBranchesToTree(TTree *tn) {

@@ -4,30 +4,9 @@
 #ifdef __NEUT_ENABLED__
 #include "InputHandler.h"
 #include "TargetUtils.h"
-#include "neutpart.h"
-#include "neutvect.h"
-#include "PlotUtils.h"
-#include "TTreePerfStats.h"
-#include "nefillverC.h"
-#include "necardC.h"
-#include "neutmodelC.h"
-#include "neutparamsC.h"
-#include "neworkC.h"
-#include "fsihistC.h"
-#include "neutcrsC.h"
-#include "neutvect.h"
-#include "neutpart.h"
-#include "neutfsipart.h"
-#include "neutfsivert.h"
-#include "neutrootTreeSingleton.h"
-#include "NSyst.h"
-#include "NFortFns.h" // Contains all the NEUT common blocks
 
-#ifdef __NEUT_NUCFSI_ENABLED__
-#include "nucleonfsihistC.h"
-#include "neutnucfsivert.h"
-#include "neutnucfsistep.h"
-#endif
+#include "neutvect.h"
+
 
 /// NEUT Generator Container to save extra particle status codes.
 class NEUTGeneratorInfo : public GeneratorInfoBase {
