@@ -103,12 +103,6 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
   return kNoSuchWeightEngine;
 }
 
-MAQEWeight_2018
-RPAWeightCCQE_2017
-RPAWeightQ2_2017
-Nonres1PiWgt
-EmpiricalMECWgt2018RPAFix
-
 novarwgt::IWeightGenerator *IWeightGeneratorFactory(size_t e) {
   switch (e) {
   case kRPAWeightCCQESA: {
