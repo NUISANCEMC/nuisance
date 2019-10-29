@@ -41,6 +41,7 @@ static size_t const kMEC2018RPAFix_QElike_Wgt = 15;
 static size_t const kMEC2018RPAFix_RESlike_Wgt = 16;
 static size_t const kNonres1PiWgt = 17;
 static size_t const kHighWDISWgt_2018 = 18;
+static size_t const kRESRPAWeightQ2_2017 = 19;
 static size_t const kTuneSeparator = 100;
 static size_t const kTune2017 = kTuneSeparator + 1;
 static size_t const kTune2018 = kTuneSeparator + 2;
