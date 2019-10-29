@@ -56,6 +56,8 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
     return kRPAWeightCCQE_2017;
   } else if (strname == "RPAWeightQ2_2017") {
     return kRPAWeightQ2_2017;
+  } else if (strname == "RESRPAWeightQ2_2017") {
+    return kRESRPAWeightQ2_2017;
   } else if (strname == "MAQEWeight_2018") {
     return kMAQEWeight_2018;
   } else if (strname == "Tufts2p2hWgtSA") {
@@ -100,6 +102,12 @@ size_t NOvARwgtEngine::GetWeightGeneratorIndex(std::string const &strname) {
   return kNoSuchWeightEngine;
 }
 
+MAQEWeight_2018
+RPAWeightCCQE_2017
+RPAWeightQ2_2017
+Nonres1PiWgt
+EmpiricalMECWgt2018RPAFix
+
 novarwgt::IWeightGenerator *IWeightGeneratorFactory(size_t e) {
   switch (e) {
   case kRPAWeightCCQESA: {
@@ -110,6 +118,9 @@ novarwgt::IWeightGenerator *IWeightGeneratorFactory(size_t e) {
   }
   case kRPAWeightQ2_2017: {
     return new novarwgt::RPAWeightQ2_2017();
+  }
+  case kRESRPAWeightQ2_2017: {
+    return new novarwgt::RPAWeightQ2_2017(novarwgt::kRxnCC, novarwgt::kScResonant);
   }
   case kMAQEWeight_2018: {
     return new novarwgt::MAQEWeight_2018();
