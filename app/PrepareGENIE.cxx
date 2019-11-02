@@ -3,6 +3,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TTree.h"
+#include "TFolder.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,6 +33,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
                          std::string output);
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
                      std::string output);
+bool CheckConfig(std::string filename);
 
 int main(int argc, char *argv[]) {
   ParseOptions(argc, argv);
@@ -42,11 +44,46 @@ int main(int argc, char *argv[]) {
   }
 }
 
+// CWret October 2019
+// We have to scale the 2p2h cross-section when the 2p2h generator in GENIE is Nieves
+// When the 2p2h generator is Empirical no such scaling is needed
+// This is needed to match the output of PrepareGENIE to GENIE splines from gspl2root
+// Allow the user to override this for debugging
+// Search for what model the user ran with
+bool CheckConfig(std::string filename) {
+  TFile *f = new TFile(filename.c_str());
+  // Get the config
+  TFolder *first = (TFolder*)f->Get("gconfig");
+  // Find the GlobalParameterList
+  TFolder *folder = (TFolder*)first->FindObject("GlobalParameterList/Default");
+  TIter iter(folder->GetListOfFolders());
+  TKey *key;
+  // Should we scale this? Only if Nieves 2p2h
+  bool ShouldScale = false;
+  while ((key = (TKey*)iter.Next())) {
+    std::string name = key->GetName();
+    // Look for XSecModel (specifies the interaction model GENIE was run with)
+    // Look for MEC (specifies it's a MEC setting)
+    // Look for Nieves 2p2h from 2016
+    if (name.find("XSecModel") != std::string::npos && name.find("MEC-CC") != std::string::npos && name.find("NievesSimoVacasMECPXSec2016") != std::string::npos) {
+      ShouldScale = true;
+    }
+  }
+  f->Close();
+  if (!ShouldScale) {
+    NUIS_LOG(FIT, "Not scaling 2p2h CC events with Nieves..." << std::endl);
+  } else {
+    NUIS_LOG(FIT, "Scaling 2p2h CC events with Nieves..." << std::endl);
+  }
+
+  return ShouldScale;
+}
+
 void RunGENIEPrepareMono(std::string input, std::string target,
-                         std::string output) {
+    std::string output) {
 
   NUIS_LOG(FIT, "Running GENIE Prepare in mono energetic with E = " << MonoEnergy
-                                                                << " GeV");
+      << " GeV");
   // Setup TTree
   TChain *tn = new TChain("gtree");
   tn->AddFile(input.c_str());
@@ -60,7 +97,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   int nevt = tn->GetEntries();
   if (gNEvents != -999) {
     NUIS_LOG(FIT, "Overriding number of events by user from " << nevt << " to "
-                                                          << gNEvents);
+        << gNEvents);
     nevt = gNEvents;
   }
   NtpMCEventRecord *genientpl = NULL;
@@ -68,7 +105,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
   // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
   TH1D *fluxhist =
-      new TH1D("flux", "flux", 1000, MonoEnergy / 2., MonoEnergy * 2.);
+    new TH1D("flux", "flux", 1000, MonoEnergy / 2., MonoEnergy * 2.);
   fluxhist->Fill(MonoEnergy);
   fluxhist->Scale(1, "width");
 
@@ -139,8 +176,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     size_t freq = nevt / 20;
     if (freq && !(i % freq)) {
       NUIS_LOG(FIT, "Processed "
-                    << i << "/" << nevt << " GENIE events (E: " << neu->E()
-                    << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
+          << i << "/" << nevt << " GENIE events (E: " << neu->E()
+          << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
     }
   }
   NUIS_LOG(FIT, "Processed all events");
@@ -188,20 +225,19 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   std::map<std::string, TH1D *> modeavg;
 
   TDirectory *inddir = (TDirectory *)outputfile->Get("IndividualGENIESplines");
-  if (!inddir)
-    inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
-  inddir->cd();
+  if (!inddir) inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
 
   // Loop over GENIE ID's and get MEC count
   int MECcount = 0;
-  bool MECcorrect = FitPar::Config().GetParB("CorrectGENIEMECNorm");
+  // Count up the number of MEC splines
   for (UInt_t i = 0; i < genieids.size(); i++) {
-    if (genieids[i].find("MEC") != std::string::npos) {
+    if (genieids[i].find("MEC") != std::string::npos && genieids[i].find("[CC]") != std::string::npos) {
       MECcount++;
     }
   }
-  NUIS_LOG(FIT, "Found " << MECcount << " repeated MEC instances.");
 
+  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
+  inddir->cd();
   for (UInt_t i = 0; i < genieids.size(); i++) {
     std::string mode = genieids[i];
 
@@ -214,7 +250,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
         "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
     modeavg[mode]->Divide(modecount[mode]);
 
-    if (MECcorrect && (mode.find("MEC") != std::string::npos)) {
+    if (MECcorrect && mode.find("MEC") != std::string::npos && mode.find("[CC]") != std::string::npos) {
+      NUIS_LOG(FIT, "Scaling spline " << mode << " by 1/" << MECcount << " because there are " << MECcount << " repeated Nieves 2p2h instances.");
       modeavg[mode]->Scale(1.0 / double(MECcount));
     }
 
@@ -246,7 +283,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
         NUIS_LOG(FIT, "    Mode " << mode << " contains " << targ << " target");
         targetsplines[targ]->Add(modeavg[mode]);
         NUIS_LOG(FIT,
-             "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
+            "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
       }
     }
 
@@ -267,19 +304,16 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   // Chop up the target string which has format
   // TARGET1[fraction1],TARGET2[fraction2]
 
-  // std::cout << "Targets: " << std::endl;
   // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
   for (std::vector<std::string>::iterator it = targprs.begin();
-       it != targprs.end(); ++it) {
+      it != targprs.end(); ++it) {
     // Cut into "TARGET1" and "fraction1]"
     std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
-    // std::cout << "  " << *it << std::endl;
     // Cut into "TARGET1" and "fraction1"
     for (std::vector<std::string>::iterator jt = targind.begin();
-         jt != targind.end(); ++jt) {
+        jt != targind.end(); ++jt) {
       if ((*jt).find("]") != std::string::npos) {
         (*jt) = (*jt).substr(0, (*jt).find("]"));
-        //*jt = "hello";
         frac_list.push_back(*jt);
         // Won't find bracket for target
       } else {
@@ -293,8 +327,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   std::vector<double> targ_fractions;
   double minimum = 1.0;
   for (std::vector<std::string>::iterator it = frac_list.begin();
-       it != frac_list.end(); it++) {
-    // std::cout << "  " << *it << std::endl;
+      it != frac_list.end(); it++) {
     double frac = std::atof((*it).c_str());
     targ_fractions.push_back(frac);
     if (frac < minimum)
@@ -311,10 +344,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     // Gets the relative portions right
     *it = (*it) / minimum;
     // Scale relative the atomic mass
-    //(*it) *= (double(nucl)/(*it));
     double tempscaling = double(nucl) / (*it);
-    if (tempscaling > scaling)
-      scaling = tempscaling;
+    if (tempscaling > scaling) scaling = tempscaling;
   }
   it = targ_fractions.begin();
   for (; it != targ_fractions.end(); it++) {
@@ -327,7 +358,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
-           "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
+        "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
   }
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
 
@@ -336,7 +367,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
     for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-         iter != targetsplines.end(); iter++) {
+        iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D *xsec = iter->second;
 
@@ -344,25 +375,22 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
         NUIS_LOG(FIT, "Adding target spline "
-                      << targstr << " Integral = " << xsec->Integral("width"));
+            << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
-
-        // int nucl = atoi(targpdg.c_str());
-        // totalnucl += int((nucl % 10000) / 10);
       }
     }
 
     // Check that targets were all found
     if (!FoundTarget) {
       NUIS_ERR(WRN, "Didn't find target "
-                      << targpdg
-                      << " in the list of targets recorded by GENIE");
+          << targpdg
+          << " in the list of targets recorded by GENIE");
       NUIS_ERR(WRN, "  The list of targets you requested is: ");
       for (uint i = 0; i < targprs.size(); ++i)
         NUIS_ERR(WRN, "    " << targprs[i]);
       NUIS_ERR(WRN, "  The list of targets found in GENIE is: ");
       for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-           iter != targetsplines.end(); iter++)
+          iter != targetsplines.end(); iter++)
         NUIS_ERR(WRN, "    " << iter->first);
     }
   }
@@ -378,7 +406,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
                    "(cm^{2}/nucleon) #times ") +
        eventhist->GetYaxis()->GetTitle())
-          .c_str());
+      .c_str());
 
   NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
   eventhist->Scale(1.0 / double(totalnucl));
@@ -387,8 +415,8 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
 
   NUIS_LOG(FIT, "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") *
-                                                   1E-38 /
-                                                   fluxhist->Integral("width"));
+      1E-38 /
+      fluxhist->Integral("width"));
   NUIS_LOG(FIT, "XSec Hist Integral = " << totalxsec->Integral("width"));
 
   outputfile->Close();
@@ -397,7 +425,7 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 }
 
 void RunGENIEPrepare(std::string input, std::string flux, std::string target,
-                     std::string output) {
+    std::string output) {
   NUIS_LOG(FIT, "Running GENIE Prepare with flux...");
 
   // Get Flux Hist
@@ -412,11 +440,11 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     to = from + step * nstep;
 
     NUIS_LOG(FIT, "Generating flat flux histogram from "
-                  << from << " to " << to << " with bins " << step
-                  << " wide (NBins = " << nstep << ").");
+        << from << " to " << to << " with bins " << step
+        << " wide (NBins = " << nstep << ").");
 
     fluxhist =
-        new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
+      new TH1D("spectrum", ";E_{#nu} (GeV);Count (A.U.)", nstep, from, to);
 
     for (Int_t bi_it = 1; bi_it < fluxhist->GetXaxis()->GetNbins(); ++bi_it) {
       fluxhist->SetBinContent(bi_it, 1.0 / double(step * nstep));
@@ -428,7 +456,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       fluxhist = dynamic_cast<TH1 *>(fluxfile->Get(fluxvect[1].c_str()));
       if (!fluxhist) {
         NUIS_ERR(FTL, "Couldn't find histogram named: \""
-                        << fluxvect[1] << "\" in file: \"" << fluxvect[0]);
+            << fluxvect[1] << "\" in file: \"" << fluxvect[0]);
         throw;
       }
       fluxhist->SetDirectory(0);
@@ -471,13 +499,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   int nevt = tn->GetEntries();
   if (gNEvents != -999) {
     NUIS_LOG(FIT, "Overriding number of events by user from " << nevt << " to "
-                                                          << gNEvents);
+        << gNEvents);
     nevt = gNEvents;
   }
 
   if (!nevt) {
     NUIS_ABORT("Couldn't load any events from input specification: \""
-           << input.c_str() << "\"");
+        << input.c_str() << "\"");
   } else {
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
@@ -562,8 +590,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
     if (i % (nevt / 20) == 0) {
       NUIS_LOG(FIT, "Processed "
-                    << i << "/" << nevt << " GENIE events (E: " << neu->E()
-                    << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
+          << i << "/" << nevt << " GENIE events (E: " << neu->E()
+          << " GeV, xsec: " << xsec << " E-38 cm^2/nucleon)");
     }
 
     // Clear Event
@@ -611,20 +639,19 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::map<std::string, TH1D *> modeavg;
 
   TDirectory *inddir = (TDirectory *)outputfile->Get("IndividualGENIESplines");
-  if (!inddir)
-    inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
-  inddir->cd();
+  if (!inddir) inddir = (TDirectory *)outputfile->mkdir("IndividualGENIESplines");
 
   // Loop over GENIE ID's and get MEC count
   int MECcount = 0;
-  bool MECcorrect = FitPar::Config().GetParB("CorrectGENIEMECNorm");
   for (UInt_t i = 0; i < genieids.size(); i++) {
-    if (genieids[i].find("MEC") != std::string::npos) {
+    if (genieids[i].find("MEC") != std::string::npos && genieids[i].find("[CC]") != std::string::npos) {
       MECcount++;
     }
   }
-  NUIS_LOG(FIT, "Found " << MECcount << " repeated MEC instances.");
 
+  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
+
+  inddir->cd();
   for (UInt_t i = 0; i < genieids.size(); i++) {
     std::string mode = genieids[i];
 
@@ -637,7 +664,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
         "#sigma (E_{#nu}) #times 10^{-38} (cm^{2}/target)");
     modeavg[mode]->Divide(modecount[mode]);
 
-    if (MECcorrect && (mode.find("MEC") != std::string::npos)) {
+    if (MECcorrect && mode.find("MEC") != std::string::npos && mode.find("[CC]") != std::string::npos) {
+      NUIS_LOG(FIT, "Scaling spline " << mode << " by 1/" << MECcount << " because there are " << MECcount << " repeated Nieves 2p2h instances.");
       modeavg[mode]->Scale(1.0 / double(MECcount));
     }
 
@@ -669,7 +697,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
         NUIS_LOG(FIT, "    Mode " << mode << " contains " << targ << " target");
         targetsplines[targ]->Add(modeavg[mode]);
         NUIS_LOG(FIT,
-             "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
+            "Finished with Mode " << mode << " " << modeavg[mode]->Integral());
       }
     }
     NUIS_LOG(FIT, "Saving target spline: " << targ);
@@ -689,19 +717,16 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   // Chop up the target string which has format
   // TARGET1[fraction1],TARGET2[fraction2]
 
-  // std::cout << "Targets: " << std::endl;
   // Loop over the vector of strings "TARGET1[fraction1]" "TARGET2[fraction2]"
   for (std::vector<std::string>::iterator it = targprs.begin();
-       it != targprs.end(); ++it) {
+      it != targprs.end(); ++it) {
     // Cut into "TARGET1" and "fraction1]"
     std::vector<std::string> targind = GeneralUtils::ParseToStr(*it, "[");
-    // std::cout << "  " << *it << std::endl;
     // Cut into "TARGET1" and "fraction1"
     for (std::vector<std::string>::iterator jt = targind.begin();
-         jt != targind.end(); ++jt) {
+        jt != targind.end(); ++jt) {
       if ((*jt).find("]") != std::string::npos) {
         (*jt) = (*jt).substr(0, (*jt).find("]"));
-        //*jt = "hello";
         frac_list.push_back(*jt);
         // Won't find bracket for target
       } else {
@@ -715,8 +740,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   std::vector<double> targ_fractions;
   double minimum = 1.0;
   for (std::vector<std::string>::iterator it = frac_list.begin();
-       it != frac_list.end(); it++) {
-    // std::cout << "  " << *it << std::endl;
+      it != frac_list.end(); it++) {
     double frac = std::atof((*it).c_str());
     targ_fractions.push_back(frac);
     if (frac < minimum)
@@ -749,7 +773,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
-           "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
+        "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
   }
 
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
@@ -760,7 +784,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
     for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-         iter != targetsplines.end(); iter++) {
+        iter != targetsplines.end(); iter++) {
       std::string targstr = iter->first;
       TH1D *xsec = iter->second;
 
@@ -768,7 +792,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
         NUIS_LOG(FIT, "Adding target spline "
-                      << targstr << " Integral = " << xsec->Integral("width"));
+            << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
 
         // int nucl = atoi(targpdg.c_str());
@@ -779,14 +803,14 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     // Check that targets were all found
     if (!FoundTarget) {
       NUIS_ERR(WRN, "Didn't find target "
-                      << targpdg
-                      << " in the list of targets recorded by GENIE");
+          << targpdg
+          << " in the list of targets recorded by GENIE");
       NUIS_ERR(WRN, "  The list of targets you requested is: ");
       for (uint i = 0; i < targprs.size(); ++i)
         NUIS_ERR(WRN, "    " << targprs[i]);
       NUIS_ERR(WRN, "  The list of targets found in GENIE is: ");
       for (std::map<std::string, TH1D *>::iterator iter = targetsplines.begin();
-           iter != targetsplines.end(); iter++)
+          iter != targetsplines.end(); iter++)
         NUIS_ERR(WRN, "    " << iter->first);
     }
   }
@@ -802,7 +826,7 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       (std::string("Event rate (N = #sigma #times #Phi) #times 10^{-38} "
                    "(cm^{2}/nucleon) #times ") +
        eventhist->GetYaxis()->GetTitle())
-          .c_str());
+      .c_str());
 
   NUIS_LOG(FIT, "Dividing by Total Nucl = " << totalnucl);
   eventhist->Scale(1.0 / double(totalnucl));
@@ -811,8 +835,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   fluxhist->Write("nuisance_flux", TObject::kOverwrite);
 
   NUIS_LOG(FIT, "Inclusive XSec Per Nucleon = " << eventhist->Integral("width") *
-                                                   1E-38 /
-                                                   fluxhist->Integral("width"));
+      1E-38 /
+      fluxhist->Integral("width"));
   NUIS_LOG(FIT, "XSec Hist Integral = " << totalxsec->Integral());
 
   outputfile->Close();
@@ -821,47 +845,47 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
 };
 
 void PrintOptions() {
-  std::cout << "PrepareGENIEEvents NUISANCE app. " << std::endl
-            << "Takes GHep Outputs and prepares events for NUISANCE."
-            << std::endl
-            << std::endl
-            << "PrepareGENIE [-h,-help,--h,--help] [-i "
-               "inputfile1.root,inputfile2.root,inputfile3.root,...] "
-            << "[-f flux_root_file.root,flux_hist_name] [-t "
-               "target1[frac1],target2[frac2],...]"
-            << "[-n number_of_events (experimental)]" << std::endl
-            << std::endl;
+  std::cout << "PrepareGENIE events NUISANCE app. " << std::endl
+    << "Takes GHep Outputs and prepares events for NUISANCE."
+    << std::endl
+    << std::endl
+    << "PrepareGENIE [-h,-help,--h,--help] [-i "
+    "inputfile1.root,inputfile2.root,inputfile3.root,...] "
+    << "[-f flux_root_file.root,flux_hist_name] [-t "
+    "target1[frac1],target2[frac2],...]"
+    << "[-n number_of_events (experimental)]" << std::endl
+    << std::endl;
 
   std::cout << "Prepare Mode [Default] : Takes a single GHep file, "
-               "reconstructs the original GENIE splines, "
-            << " and creates a duplicate file that also contains the flux, "
-               "event rate, and xsec predictions that NUISANCE needs. "
-            << std::endl;
+    "reconstructs the original GENIE splines, "
+    << " and creates a duplicate file that also contains the flux, "
+    "event rate, and xsec predictions that NUISANCE needs. "
+    << std::endl;
   std::cout << "Following options are required for Prepare Mode:" << std::endl;
   std::cout << " [ -i inputfile.root  ] : Reads in a single GHep input file "
-               "that needs the xsec calculation ran on it. "
-            << std::endl;
+    "that needs the xsec calculation ran on it. "
+    << std::endl;
   std::cout << " [ -f flux_file.root,hist_name ] : Path to root file "
-               "containing the flux histogram the GHep records were generated "
-               "with."
-            << " A simple method is to point this to the flux histogram genie "
-               "generatrs '-f /path/to/events/input-flux.root,spectrum'. "
-            << std::endl;
+    "containing the flux histogram the GHep records were generated "
+    "with."
+    << " A simple method is to point this to the flux histogram genie "
+    "generatrs '-f /path/to/events/input-flux.root,spectrum'. "
+    << std::endl;
   std::cout << " [ -f elow,ehigh,estep ] : Energy range specification when no "
-               "flux file was used."
-            << std::endl;
+    "flux file was used."
+    << std::endl;
   std::cout << " [ -t target ] : Target that GHepRecords were generated with. "
-               "Comma seperated list with fractions. E.g. for CH2 "
-               "target=1000060120[0.923076],1000010010[0.076924]"
-            << std::endl;
+    "Comma seperated list with fractions. E.g. for CH2 "
+    "target=1000060120[0.923076],1000010010[0.076924]"
+    << std::endl;
   std::cout << " [ -o outputfile.root ] : File to write prepared input file to."
-            << std::endl;
+    << std::endl;
   std::cout << " [ -m Mono_E_nu_GeV ] : Run in mono-energetic mode with m GeV "
-               "neutrino energy."
-            << std::endl;
+    "neutrino energy."
+    << std::endl;
   std::cout << " [ -n number_of_evt ] : Run with a reduced number of events "
-               "for debugging purposes"
-            << std::endl;
+    "for debugging purposes"
+    << std::endl;
 }
 
 void ParseOptions(int argc, char *argv[]) {
@@ -899,7 +923,7 @@ void ParseOptions(int argc, char *argv[]) {
         ++i;
       } else {
         NUIS_ERR(FTL, "ERROR: unknown command line option given! - '"
-                        << argv[i] << " " << argv[i + 1] << "'");
+            << argv[i] << " " << argv[i + 1] << "'");
         PrintOptions();
         break;
       }
@@ -925,7 +949,7 @@ void ParseOptions(int argc, char *argv[]) {
       gTarget.find("]") == std::string::npos) {
     NUIS_ERR(FTL, "Didn't specify target ratios in Prepare Mode");
     NUIS_ERR(FTL, "Are you sure you gave it as -t "
-                "\"TARGET1[fraction1],TARGET2[fraction]\"?");
+        "\"TARGET1[fraction1],TARGET2[fraction]\"?");
     flagopt = true;
   }
 
