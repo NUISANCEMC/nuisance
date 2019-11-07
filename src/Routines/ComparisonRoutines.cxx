@@ -119,11 +119,9 @@ ComparisonRoutines::ComparisonRoutines(int argc, char *argv[]) {
     configuration.OverrideConfig(configargs[i]);
   }
   if (maxevents.compare("-1")) {
-    configuration.OverrideConfig(std::string("MAXEVENTS=\"") + maxevents +
-                                 "\"");
+    configuration.OverrideConfig("MAXEVENTS=" + maxevents);
   }
-  configuration.OverrideConfig(std::string("NSKIPEVENTS=\"") + skipevents +
-                               "\"");
+  configuration.OverrideConfig("NSKIPEVENTS=" + skipevents);
 
   // Finish configuration XML
   configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
