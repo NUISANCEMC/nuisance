@@ -332,6 +332,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
            "GENIE ReWeight is __NOT ENABLED__ in GENIE and you're trying to "
            "run NUISANCE with it enabled");
   NUIS_ERR(FTL, "Check your genie-config --libs for reweighting");
+  NUIS_ERR(FTL, "You might also have run with -DUSE_REWEIGHT=0 (false) in your cmake build?");
   NUIS_ERR(FTL, "If not present you need to recompile GENIE");
   NUIS_ABORT("If present you need to contact NUISANCE authors");
 
