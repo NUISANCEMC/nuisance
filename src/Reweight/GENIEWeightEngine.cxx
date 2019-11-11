@@ -206,10 +206,12 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   } else if (ccqetype == "kModeNormAndMaShape") {
     NUIS_LOG(DEB, "Setting GENIE ReWeight CCQE to kModeNormAndMaShape");
     rwccqe->SetMode(GReWeightNuXSecCCQE::kModeNormAndMaShape);
-    // For z-expansion reweighting
+    // For z-expansion reweighting, only available after 2.10
+#if __GENIE_VERSION__ >= 210 
   } else if (ccqetype == "kModeZExp") {
     NUIS_LOG(DEB, "Setting GENIE ReWeight CCQE to kModeZExp");
     rwccqe->SetMode(GReWeightNuXSecCCQE::kModeZExp);
+#endif
   } else {
     NUIS_ERR(FTL, "Did not find specified GENIE ReWeight CCQE mode");
     NUIS_ABORT("You provided: " << ccqetype << " in parameters/config.xml");
