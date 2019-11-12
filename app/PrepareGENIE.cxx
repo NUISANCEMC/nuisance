@@ -84,9 +84,26 @@ void RunGENIEPrepareMono(std::string input, std::string target,
 
   NUIS_LOG(FIT, "Running GENIE Prepare in mono energetic with E = " << MonoEnergy
       << " GeV");
+
   // Setup TTree
   TChain *tn = new TChain("gtree");
-  tn->AddFile(input.c_str());
+  std::string first_file = "";
+
+  if (input.find_first_of(',') != std::string::npos) {
+    std::vector<std::string> inputvect = GeneralUtils::ParseToStr(input, ",");
+
+    for (size_t iv_it = 0; iv_it < inputvect.size(); ++iv_it) {
+      tn->AddFile(inputvect[iv_it].c_str());
+      NUIS_LOG(FIT, "Added input file: " << inputvect[iv_it]);
+      if (!first_file.length()) {
+        first_file = inputvect[iv_it];
+      }
+    }
+  } else { // The Add form can accept wildcards.
+    tn->Add(input.c_str());
+    first_file = input;
+  }
+
   if (tn->GetFile() == NULL) {
     tn->Print();
     NUIS_ERR(FTL, "gtree not located in GENIE file: " << input);
@@ -100,6 +117,14 @@ void RunGENIEPrepareMono(std::string input, std::string target,
         << gNEvents);
     nevt = gNEvents;
   }
+
+  if (!nevt) {
+    NUIS_ABORT("Couldn't load any events from input specification: \""
+        << input.c_str() << "\"");
+  } else {
+    NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
+  }
+
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
 
@@ -182,13 +207,16 @@ void RunGENIEPrepareMono(std::string input, std::string target,
   }
   NUIS_LOG(FIT, "Processed all events");
 
+  // Check if we need to correct MEC events before possibly deleting the TChain below
+  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
+
   TFile *outputfile;
 
   // If no output is specified just append to the file
   if (!gOutputFile.length()) {
-    tn->GetEntry(0);
-    outputfile = tn->GetFile();
-    outputfile->cd();
+    // Shut the chain;
+    delete tn;
+    outputfile = new TFile(first_file.c_str(), "UPDATE");
   } else {
     outputfile = new TFile(gOutputFile.c_str(), "RECREATE");
     outputfile->cd();
@@ -236,7 +264,6 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     }
   }
 
-  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
   inddir->cd();
   for (UInt_t i = 0; i < genieids.size(); i++) {
     std::string mode = genieids[i];
@@ -599,8 +626,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   }
   NUIS_LOG(FIT, "Processed all events");
 
-  // Once event loop is done we can start saving stuff into the file
+  // Check if we need to correct MEC events before possibly deleting the TChain below
+  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
 
+  // Once event loop is done we can start saving stuff into the file
   TFile *outputfile;
 
   if (!gOutputFile.length()) {
@@ -648,8 +677,6 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       MECcount++;
     }
   }
-
-  bool MECcorrect = CheckConfig(std::string(tn->GetFile()->GetName()));
 
   inddir->cd();
   for (UInt_t i = 0; i < genieids.size(); i++) {
