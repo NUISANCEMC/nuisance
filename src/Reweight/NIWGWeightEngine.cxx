@@ -14,6 +14,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
   // Get List of Veto Calcs (For Debugging)
   std::string rw_engine_list =
       FitPar::Config().GetParS("FitWeight_fNIWGRW_veto");
+
   bool niwg_2012a = rw_engine_list.find("niwg_2012a") == std::string::npos;
   bool niwg_2014a = rw_engine_list.find("niwg_2014a") == std::string::npos;
   bool niwg_pimult = rw_engine_list.find("niwg_pimult") == std::string::npos;
@@ -25,6 +26,7 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
   bool niwg_hadron =
       rw_engine_list.find("niwg_HadronMultSwitch") == std::string::npos;
   bool niwg_qelowq2 = rw_engine_list.find("niwg_LowQEQ2") == std::string::npos;
+  bool niwg_2p2henu = rw_engine_list.find("niwg_2p2hEnu") == std::string::npos;
 
   // Add the RW Calcs
   if (niwg_2012a)
@@ -51,6 +53,13 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
   if (niwg_qelowq2)
     fNIWGRW->AdoptWghtCalc(
         "niwg_QELowQ2", new niwg::rew::NIWGReWeightEffectiveQELowQ2Suppression);
+#endif
+
+// Add in Kevin and Laura's 2p2h Enu dependent dial
+#ifdef HAVE_NIWGRW_2P2HENU
+  if (niwg_2p2henu)
+    fNIWGRW->AdoptWghtCalc(
+        "niwg_2p2enu", new niwg::rew::NIWGReWeight2p2hEdep);
 #endif
 
   fNIWGRW->Reconfigure();
