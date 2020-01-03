@@ -25,8 +25,8 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 
   // Sample overview ---------------------------------------------------
   std::string descrip = "MiniBooNE_CCQE_XSec_1DEnu_nu sample. \n"
-                        "Target: CH \n"
-                        "Flux: MiniBooNE Forward Horn Current nue + nuebar \n"
+                        "Target: CH2 \n"
+                        "Flux: MiniBooNE Forward Horn Current\n"
                         "Signal: Any event with 1 muon, any nucleons, and no "
                         "other FS particles \n";
 
@@ -34,7 +34,7 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/CH_{2})");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/Nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.5, 2.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -42,17 +42,15 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   // CCQELike plot information
   fSettings.SetTitle("MiniBooNE_CCQE_XSec_1DEnu_nu");
   fSettings.SetDataInput(FitPar::GetDataBase() +
-                         "MiniBooNE/CCQE/totalxsec_edit.txt");
-  fSettings.SetCovarInput(FitPar::GetDataBase() +
-                          "MiniBooNE/CCQE/totalxsec_covar.txt");
+                         "MiniBooNE/CCQE/asne_like.txt");
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // ScaleFactor automatically setup for DiffXSec/cm2
   fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) /
-                 double(fNEvents) * (14.08);
+                 double(fNEvents);
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());

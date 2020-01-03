@@ -200,6 +200,8 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   tgta = event->fTargetA;
   tgtz = event->fTargetZ;
 
+  TLorentzVector ISP4 = nu->fP;
+
   if (lep != NULL) {
     PDGLep = lep->fPID;
     ELep = lep->fP.E() / 1E3;
@@ -218,7 +220,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     EavAlt = FitUtils::Eavailable(event) / 1.E3;
 
     // Check if this is a 1pi+ or 1pi0 event
-    if ((SignalDef::isCC1pi(event, PDGnu, 211) || SignalDef::isCC1pi(event, PDGnu, -211) || SignalDef::isCC1pi(event, PDGnu, 111)) && event->NumFSNucleons() == 1) {
+    if ((SignalDef::isCC1pi(event, PDGnu, 211) ||
+         SignalDef::isCC1pi(event, PDGnu, -211) ||
+         SignalDef::isCC1pi(event, PDGnu, 111)) &&
+        event->NumFSNucleons() == 1) {
       TLorentzVector Pnu = nu->fP;
       TLorentzVector Pmu = lep->fP;
       TLorentzVector Ppi = event->GetHMFSPions()->fP;
@@ -232,7 +237,6 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     // Q2 assuming nucleon at rest
     W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
     // True Q2
-    W = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
 
@@ -254,6 +258,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
 
     if (SavePreFSI && event->PartInfo(i)->IsInitialState())
       initList.push_back(event->PartInfo(i));
+
+    if(event->PartInfo(i)->IsInitialState()){
+      ISP4 += event->PartInfo(i)->fP;
+    }
   }
 
   // Save outgoing particle vectors
@@ -307,9 +315,15 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();
     const Kinematics &kine = interaction->Kine();
-    double W_genie = kine.W();
+    W_genie = kine.W();
   }
 #endif
+
+  if (lep != NULL) {
+    W = (ISP4 - lep->fP).M();
+  } else {
+    W = 0;
+  }
 
   // Fill event weights
   Weight = event->RWWeight * event->InputWeight;

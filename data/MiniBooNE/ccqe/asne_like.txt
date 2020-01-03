@@ -1,3 +1,10 @@
+# CCQE-Like
+# Built from:
+#  https://www-boone.fnal.gov/for_physicists/data_release/ccqe/asne_bin.txt
+#  https://www-boone.fnal.gov/for_physicists/data_release/ccqe/asne_con.txt
+#  https://www-boone.fnal.gov/for_physicists/data_release/ccqe/asne_ter.txt
+#  https://www-boone.fnal.gov/for_physicists/data_release/ccqe/asne_bkd.txt
+# BinLowEdge XSec/nucleon ShapeErr TotErr
 0.4	9.716E-39	1.997E-39	1.997E-39
 0.45	1.0126E-38	1.455E-39	1.532E-39
 0.5	1.076E-38	1.169E-39	1.33E-39

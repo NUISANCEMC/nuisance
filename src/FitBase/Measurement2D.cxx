@@ -1311,24 +1311,6 @@ void Measurement2D::Write(std::string drawOpt) {
     fSettings.Write();
   }
 
-  if (fIsChi2 && !fIsDiag) {
-    fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
-    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
-    fResidualHist->Reset();
-
-    fChi2LessBinHist =
-        (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
-    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
-    fChi2LessBinHist->Reset();
-
-    fIsWriting = true;
-    (void)GetLikelihood();
-    fIsWriting = false;
-
-    fResidualHist->Write((fName + "_RESIDUAL").c_str());
-    fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
-  }
-
   // // Likelihood residual plots
   // if (drawOpt.find("RESIDUAL") != std::string::npos) {
   // WriteResidualPlots();
@@ -1402,6 +1384,32 @@ void Measurement2D::Write(std::string drawOpt) {
     mc_1D->SetLineColor(kRed);
     mc_1D->Write();
     delete mc_1D;
+  }
+
+  if (fIsChi2 && !fIsDiag) {
+    fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
+    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->Reset();
+
+    fChi2LessBinHist =
+        (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
+    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->Reset();
+
+    fIsWriting = true;
+    (void)GetLikelihood();
+    fIsWriting = false;
+
+    fResidualHist->Write((fName + "_RESIDUAL").c_str());
+    fChi2LessBinHist->Write((fName + "_Chi2NMinusOne").c_str());
+
+    if (fMapHist) {
+      TH1D *ResidualHist_1D = StatUtils::MapToTH1D(fResidualHist, fMapHist);
+      TH1D *Chi2LessBinHist_1D =
+          StatUtils::MapToTH1D(fChi2LessBinHist, fMapHist);
+      ResidualHist_1D->Write((fName + "_RESIDUAL_1D").c_str());
+      Chi2LessBinHist_1D->Write((fName + "_Chi2NMinusOne_1D").c_str());
+    }
   }
 
   // Write Weighted Histogram
