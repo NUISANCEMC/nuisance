@@ -33,6 +33,7 @@ SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.cxx
 SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu.cxx
 SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu.cxx
 SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.cxx
+SciBooNE_CCInc_XSec_1DEnu_nu.cxx
 SciBooNEUtils.cxx
 )
 
@@ -53,6 +54,7 @@ SciBooNE_CCCOH_MuPiNoVA_1Dthetapi_nu.h
 SciBooNE_CCCOH_MuPiNoVA_1Dthetamu_nu.h
 SciBooNE_CCCOH_MuPiNoVA_1Dpmu_nu.h
 SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h
+SciBooNE_CCInc_XSec_1DEnu_nu.h
 SciBooNEUtils.h
 )
 

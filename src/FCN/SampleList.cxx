@@ -299,6 +299,7 @@
 #include "SciBooNE_CCCOH_MuPr_1Dthetamu_nu.h"
 #include "SciBooNE_CCCOH_STOPFINAL_1DQ2_nu.h"
 #include "SciBooNE_CCCOH_STOP_NTrks_nu.h"
+#include "SciBooNE_CCInc_XSec_1DEnu_nu.h"
 #endif
 
 #ifndef __NO_K2K__
@@ -1382,6 +1383,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("SciBooNE_CCCOH_STOPFINAL_1DQ2_nu")) {
     return (new SciBooNE_CCCOH_STOPFINAL_1DQ2_nu(samplekey));
+  } else if (!name.compare("SciBooNE_CCInc_XSec_1DEnu_nu") ||
+             !name.compare("SciBooNE_CCInc_XSec_1DEnu_nu_NEUT") ||
+             !name.compare("SciBooNE_CCInc_XSec_1DEnu_nu_NUANCE")) {
+    return (new SciBooNE_CCInc_XSec_1DEnu_nu(samplekey));
 
     /*
     K2K Samples
@@ -1398,54 +1403,41 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     /*
     Fake Studies
     */
-
   } else
 #endif
       if (name.find("ExpMultDist_CCQE_XSec_1D") != std::string::npos &&
           name.find("_FakeStudy") != std::string::npos) {
     return (
         new ExpMultDist_CCQE_XSec_1DVar_FakeStudy(name, file, rw, type, fkdt));
-
   } else if (name.find("ExpMultDist_CCQE_XSec_2D") != std::string::npos &&
              name.find("_FakeStudy") != std::string::npos) {
     return (
         new ExpMultDist_CCQE_XSec_2DVar_FakeStudy(name, file, rw, type, fkdt));
-
   } else if (name.find("GenericFlux_") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
-
   } else if (name.find("GenericVectors_") != std::string::npos) {
     return (new GenericFlux_Vectors(name, file, rw, type, fkdt));
-
   } else if (!name.compare("T2K2017_FakeData")) {
     return (new T2K2017_FakeData(samplekey));
-
   } else if (!name.compare("MCStudy_CCQE")) {
     return (new MCStudy_CCQEHistograms(name, file, rw, type, fkdt));
-
   } else if (!name.compare("ElectronFlux_FlatTree")) {
     return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));
-
   } else if (name.find("ElectronData_") != std::string::npos) {
     return new ElectronScattering_DurhamData(samplekey);
-
   } else if (name.find("MuonValidation_") != std::string::npos) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
-
   } else if (!name.compare("NIWGOfficialPlots")) {
     return (new OfficialNIWGPlots(samplekey));
-
   } else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
-
   } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
-
   } else {
     NUIS_ABORT("Error: No such sample: " << name << std::endl);
   }
 
   // Return NULL if no sample loaded.
   return NULL;
-}
+} // namespace SampleUtils
 } // namespace SampleUtils

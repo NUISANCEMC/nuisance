@@ -1,0 +1,12 @@
+# Built from:
+#  https://www-sciboone.fnal.gov/data_release/ccinclusive/ccxsec_bins.txt
+#  https://www-sciboone.fnal.gov/data_release/ccinclusive/ccxsec_cv_neut.txt
+#  https://www-sciboone.fnal.gov/data_release/ccinclusive/ccxsec_err_neut.txt
+# BinLowEdge Xsec Error
+0.25 2.76e-39 7.47e-40
+0.50 5.80e-39 7.46e-40
+0.75 1.03e-38 9.99e-40
+1.00 1.38e-38 1.72e-39
+1.25 1.62e-38 2.89e-39
+1.75 1.74e-38 3.82e-39
+# 8.0
