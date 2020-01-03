@@ -22,6 +22,7 @@ MiniBooNE_CC1pip_XSec_2DTpiCospi_nu.cxx
 MiniBooNE_CC1pi0_XSec_1Dcospi0_nu.cxx
 MiniBooNE_CC1pip_XSec_2DTpiEnu_nu.cxx
 MiniBooNE_CC1pi0_XSec_1DEnu_nu.cxx
+MiniBooNE_CCQE_XSec_1DEnu_nu.cxx
 MiniBooNE_CC1pip_XSec_2DTuCosmu_nu.cxx
 MiniBooNE_CC1pi0_XSec_1Dppi0_nu.cxx
 MiniBooNE_CC1pip_XSec_2DTuEnu_nu.cxx
@@ -49,6 +50,7 @@ MiniBooNE_CC1pip_XSec_2DTpiCospi_nu.h
 MiniBooNE_CC1pi0_XSec_1Dcospi0_nu.h
 MiniBooNE_CC1pip_XSec_2DTpiEnu_nu.h
 MiniBooNE_CC1pi0_XSec_1DEnu_nu.h
+MiniBooNE_CCQE_XSec_1DEnu_nu.h
 MiniBooNE_CC1pip_XSec_2DTuCosmu_nu.h
 MiniBooNE_CC1pi0_XSec_1Dppi0_nu.h
 MiniBooNE_CC1pip_XSec_2DTuEnu_nu.h

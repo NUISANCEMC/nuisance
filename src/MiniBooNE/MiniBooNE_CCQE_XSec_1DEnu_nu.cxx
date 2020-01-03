@@ -38,19 +38,26 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.5, 2.0);
   fSettings.DefineAllowedTargets("C,H");
+  fSettings.FoundFill("name", "CCQELike", ccqelike, true);
 
   // CCQELike plot information
   fSettings.SetTitle("MiniBooNE_CCQE_XSec_1DEnu_nu");
-  fSettings.SetDataInput(FitPar::GetDataBase() +
-                         "MiniBooNE/CCQE/asne_like.txt");
+
+  if (ccqelike) {
+    fSettings.SetDataInput(FitPar::GetDataBase() +
+                           "MiniBooNE/CCQE/asne_like.txt");
+  } else {
+    fSettings.SetDataInput(FitPar::GetDataBase() +
+                           "MiniBooNE/CCQE/asne_con.txt");
+  }
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2
-  fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38) /
-                 double(fNEvents);
+  fScaleFactor =
+      GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents);
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());
@@ -62,13 +69,12 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 };
 
 void MiniBooNE_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
-
-  if (SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) {
+  if (isSignal(event)) {
     fXVar = event->GetNeutrinoIn()->fP.E();
   }
-
 };
 
 bool MiniBooNE_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-  return SignalDef::isCCQELike(event, 14, EnuMin, EnuMax);
+  return (ccqelike && SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) ||
+         (event->Mode == 1);
 }

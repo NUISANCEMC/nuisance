@@ -30,6 +30,9 @@ public:
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);
+
+    bool ccqelike; ///<! Flag for running in CCQELike mode
+
 };
 
 #endif

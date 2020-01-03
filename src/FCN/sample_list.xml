@@ -2,7 +2,7 @@
 
   <input eventcomment=' #### ' />
   <input eventcomment='Replace the following file paths to point to your MC files of interest.' />
-  <input eventcomment='If you dont care about a specific set, then just remove that 
+  <input eventcomment='If you dont care about a specific set, then just remove that
 input line, or leave the file path blank' />
   <input eventcomment='Replace TYPE: with your generator type, e.g. "GENIE:"" ' />
   <input eventcomment=' #### ' />
@@ -84,7 +84,7 @@ flux in muon neutrino mode on a deuterium target.' />
 
   <input action='SKIP' />
   <input comment='ArgoNeuT SAMPLES' check='ArgoNeuT'/>
-  
+
    <input eventcomment='ArgoNeuT_FHC_NUMU_AR : events generated with ArgoNeuT forward horn current
 flux in muon neutrino mode on Argon 40 target.' />
    <input eventcomment='ArgoNeuT_RHC_NUMUB_AR : events generated with ArgoNeuT reverse horn current
@@ -93,7 +93,7 @@ flux in muon antineutrino mode on Argon 40 target.' />
   <input comment='   ArgoNeuT Neutrino' check='ArgoNeuT+_nu' />
   <input sample="ArgoNeuT_CCInc_XSec_1Dpmu_nu"     type="TYPE:ArgoNeuT_FHC_NUMU_AR" />
   <input sample="ArgoNeuT_CCInc_XSec_1Dthetamu_nu" type="TYPE:ArgoNeuT_FHC_NUMU_AR" />
-  
+
   <input comment='   ArgoNeuT AntiNeutrino' check='ArgoNeuT+_antinu' />
   <input sample="ArgoNeuT_CCInc_XSec_1Dpmu_antinu"     type="TYPE:ArgoNeuT_RHC_NUMUB_AR" />
   <input sample="ArgoNeuT_CCInc_XSec_1Dthetamu_antinu" type="TYPE:ArgoNeuT_RHC_NUMUB_AR" />
@@ -104,11 +104,11 @@ flux in muon antineutrino mode on Argon 40 target.' />
 
     <input eventcomment='BNL_FHC_NUMU_D2 : events generated with BNL forward horn current
 flux in muon neutrino mode on a deuterium target.' />
-  
+
   <input comment='   BNL CCQE' check='BNL+_CCQE' />
   <input sample="BNL_CCQE_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CCQE_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
-  
+
   <input comment='   BNL CC1ppip' check='BNL+_CC1ppip' />
   <input sample="BNL_CC1ppip_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1ppip_XSec_1DEnu_nu_Uncorr" type="TYPE:BNL_FHC_NUMU_D2" />
@@ -118,12 +118,12 @@ flux in muon neutrino mode on a deuterium target.' />
   <input sample="BNL_CC1ppip_Evt_1DQ2_nu_W14Cut" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1ppip_Evt_1DcosthAdler_nu" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1ppip_Evt_1Dphi_nu" type="TYPE:BNL_FHC_NUMU_D2" />
-  
+
   <input comment='   BNL CC1npip' check='BNL+_CC1npip' />
   <input sample="BNL_CC1npip_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1npip_XSec_1DEnu_nu_Uncorr" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1npip_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
-  
+
   <input comment='   BNL CC1ppip' check='BNL+_CC1pi0' />
   <input sample="BNL_CC1pi0_XSec_1DEnu_nu" type="TYPE:BNL_FHC_NUMU_D2" />
   <input sample="BNL_CC1pi0_Evt_1DQ2_nu" type="TYPE:BNL_FHC_NUMU_D2" />
@@ -137,12 +137,12 @@ flux in muon neutrino mode on a deuterium target.' />
 
   <input comment='   FNAL CCQE' check='FNAL+_CCQE' />
   <input sample="FNAL_CCQE_Evt_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
-  
+
   <input comment='   FNAL CC1ppip' check='FNAL+_CC1ppip' />
   <input sample="FNAL_CC1ppip_XSec_1DEnu_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
   <input sample="FNAL_CC1ppip_XSec_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
   <input sample="FNAL_CC1ppip_Evt_1DQ2_nu" type="TYPE:FNAL_FHC_NUMU_D2" />
-  
+
   <input comment='   FNAL CC1ppim Antineutrino' check='FNAL+_CC1ppim+_antinu' />
   <input sample="FNAL_CC1ppim_XSec_1DEnu_antinu" type="TYPE:FNAL_RHC_NUMUB_D2" />
 
@@ -150,7 +150,7 @@ flux in muon neutrino mode on a deuterium target.' />
 
   <input action='SKIP' />
   <input comment='BEBC SAMPLES' check='BEBC'/>
-  
+
    <input eventcomment='BEBC_FHC_NUMU_D2 : events generated with BEBC forward horn current
 flux in muon neutrino mode on a deuterium target.' />
    <input eventcomment='BEBC_RHC_NUMUB_D2 : events generated with BEBC reverse horn current
@@ -158,19 +158,19 @@ flux in muon antineutrino mode on a deuterium target.' />
 
   <input comment='   BEBC CCQE' check='BEBC+_CCQE' />
   <input sample="BEBC_CCQE_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
-  
+
   <input comment='   BEBC CC1ppip' check='BEBC+_CC1ppip' />
   <input sample="BEBC_CC1ppip_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
   <input sample="BEBC_CC1ppip_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
-  
+
   <input comment='   BEBC CC1npip' check='BEBC+_CC1npip' />
   <input sample="BEBC_CC1npip_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
   <input sample="BEBC_CC1npip_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
-  
+
   <input comment='   BEBC CC1pi0' check='BEBC+_CC1pi0' />
   <input sample="BEBC_CC1pi0_XSec_1DEnu_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
   <input sample="BEBC_CC1pi0_XSec_1DQ2_nu" type="TYPE:BEBC_FHC_NUMU_D2" />
-  
+
   <input comment='   BEBC CC1npim Antineutrino' check='BEBC+_CC1npim+_antinu' />
   <input sample="BEBC_CC1npim_XSec_1DEnu_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
   <input sample="BEBC_CC1npim_XSec_1DQ2_antinu" type="TYPE:BEBC_RHC_NUMUB_D2" />
@@ -206,17 +206,18 @@ flux in muon neutrino mode on a CH2 target.' />
 
   <input eventcomment='MB_FHC_NUMUandNUMUBAR_CH2 : events generated with MiniBooNE forward horn current
 flux in muon neutrino mode AND muon antineutrino mode on a CH2 target. '/>
-  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like
 TYPE:(MB_FHC_NUMU_CH2,MB_FHC_NUMUB_CH2)' />
 
   <input eventcomment='MB_RHC_NUMUBARandNUMU_CH2 : events generated with MiniBooNE reverse horn current
 flux in muon antineutrino mode AND muon neutrino mode on a CH2 target. '/>
-  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like
 TYPE:(MB_RHC_NUMUB_CH2,MB_RHC_NUMU_CH2)' />
 
   <input comment='   MiniBooNE CCQELike NuMu' check='MiniBooNE+_CCQE' />
   <input sample="MiniBooNE_CCQE_XSec_1DQ2_nu" type="TYPE:MB_FHC_NUMU_CH2" />
   <input sample="MiniBooNE_CCQE_XSec_2DTcos_nu" type="TYPE:MB_FHC_NUMU_CH2" />
+  <input sample="MiniBooNE_CCQE_XSec_1DEnu_nu" type="TYPE:MB_FHC_NUMU_CH2" />
 
   <input comment='   MiniBooNE CC0PI NuMu' check='MiniBooNE+_CCQELike' />
   <input sample="MiniBooNE_CCQELike_XSec_2DTcos_nu" type="TYPE:MB_FHC_NUMUandNUMUBAR_CH2" />
@@ -287,7 +288,7 @@ flux in muon neutrino mode on a Pb target.' />
 flux in muon antineutrino mode on a CH target.' />
  <input eventcomment='MIN_FHC_NUEandNUEB_CH : events generated with MINERvA forward horn current
 flux in electorn neutrino mode AND electorn antineutrino mode on a CH target.' />
-  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like 
+  <input eventcomment='    Can be a single file with both in it or can be given as a joint file like
 TYPE:(MB_FHC_NUE_CH,MB_FHC_NUEB_CH)' />
 
  <input comment='   MINERvA CCQELike NUMU ' check='MINERvA+_CCQE+_nu' />

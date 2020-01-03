@@ -120,6 +120,7 @@
 
 #ifndef __NO_MiniBooNE__
 // MiniBooNE CCQE
+#include "MiniBooNE_CCQE_XSec_1DEnu_nu.h"
 #include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
 #include "MiniBooNE_CCQE_XSec_1DQ2_nu.h"
 #include "MiniBooNE_CCQE_XSec_2DTcos_antinu.h"
@@ -890,6 +891,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
           !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")) {
     return (new MiniBooNE_CCQE_XSec_1DQ2_nu(samplekey));
+  } else if (!name.compare("MiniBooNE_CCQE_XSec_1DEnu_nu") ||
+             !name.compare("MiniBooNE_CCQELike_XSec_1DEnu_nu")) {
+    return (new MiniBooNE_CCQE_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_antinu") ||
              !name.compare("MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu")) {
@@ -1052,7 +1056,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("MINERvA_CC0pi_XSec_2Dptpz_nu")) {
     return (new MINERvA_CC0pi_XSec_2D_nu(samplekey));
 
-  // } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
+    // } else if (!name.compare("MINERvA_CC0pi_XSec_3DptpzTp_nu")) {
     // return (new MINERvA_CC0pi_XSec_3DptpzTp_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CC0pi_XSec_1Dpt_nu") ||
@@ -1246,11 +1250,11 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new T2K_CCinc_XSec_2DPcos_nu_nonuniform(samplekey));
 
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_FHC") ||
-	     !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||
-	     !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
+             !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||
+             !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
     return (new T2K_nueCCinc_XSec_1Dpe(samplekey));
 
-  } else if (!name.compare("T2K_nueCCinc_XSec_joint")) { 
+  } else if (!name.compare("T2K_nueCCinc_XSec_joint")) {
     return (new T2K_nueCCinc_XSec_joint(samplekey));
 
     /*
