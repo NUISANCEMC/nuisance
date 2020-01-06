@@ -247,6 +247,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
+
 #ifdef __PROB3PP_ENABLED__
   else {
     // Check for GENIE Event
@@ -391,7 +392,13 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
         return 2;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return -2;
-
+#ifndef GENIE_PRE_R3
+    } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
+      if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
+        return 15;
+      else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
+        return -15;
+#endif
       // CC OTHER
     } else {
       return utils::ghep::NeutReactionCode(gheprec);
@@ -405,7 +412,13 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
         return 32;
       else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
         return -32;
-
+#ifndef GENIE_PRE_R3
+    } else if (gheprec->Summary()->ProcInfo().IsDiffractive()) {
+      if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg()))
+        return 35;
+      else if (pdg::IsAntiNeutrino(gheprec->Summary()->InitState().ProbePdg()))
+        return -35;
+#endif
       // NC OTHER
     } else {
       return utils::ghep::NeutReactionCode(gheprec);
@@ -432,6 +445,11 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
 
   // Convert GENIE Reaction Code
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
+
+  if (!fNUISANCEEvent->Mode) {
+    std::cout << "[WARN]: Failed to determine mode for GENIE event: "
+              << *fGenieGHep << std::endl;
+  }
 
   // Set Event Info
   fNUISANCEEvent->fEventNo = 0.0;

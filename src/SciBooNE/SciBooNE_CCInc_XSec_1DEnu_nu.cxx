@@ -73,7 +73,7 @@ SciBooNE_CCInc_XSec_1DEnu_nu::SciBooNE_CCInc_XSec_1DEnu_nu(nuiskey samplekey) {
 
 void SciBooNE_CCInc_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   if (isSignal(event)) {
-    fXVar = event->GetNeutrinoIn()->fP.E();
+    fXVar = event->GetNeutrinoIn()->fP.E()*1E-3;
   }
 };
 

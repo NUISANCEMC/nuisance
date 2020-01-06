@@ -492,8 +492,8 @@ void PlotUtils::FluxUnfoldedScaling(TH1D *mcHist, TH1D *fhist, TH1D *ehist,
   TH1D *eventhist = (TH1D *)ehist->Clone();
   TH1D *fFluxHist = (TH1D *)fhist->Clone();
 
+  std::string name = std::string(mcHist->GetName());
   if (FitPar::Config().GetParB("save_flux_debug")) {
-    std::string name = std::string(mcHist->GetName());
 
     mcHist->Write((name + "_UNF_MC").c_str());
     fFluxHist->Write((name + "_UNF_FLUX").c_str());
@@ -550,6 +550,10 @@ void PlotUtils::FluxUnfoldedScaling(TH1D *mcHist, TH1D *fhist, TH1D *ehist,
     }
 
     pdfflux->SetBinContent(i + 1, fluxint);
+  }
+
+  if (FitPar::Config().GetParB("save_flux_debug")) {
+    pdfflux->Write((name + "_UNF_SCALEHIST").c_str());
   }
 
   // Scale MC hist by pdfflux

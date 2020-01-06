@@ -34,9 +34,9 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/Nucleon)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/Neutron)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
-  fSettings.SetEnuRange(0.5, 2.0);
+  fSettings.SetEnuRange(0.4, 2.0);
   fSettings.DefineAllowedTargets("C,H");
   fSettings.FoundFill("name", "CCQELike", ccqelike, true);
 
@@ -45,10 +45,10 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 
   if (ccqelike) {
     fSettings.SetDataInput(FitPar::GetDataBase() +
-                           "MiniBooNE/CCQE/asne_like.txt");
+                           "MiniBooNE/ccqe/asne_like.txt");
   } else {
     fSettings.SetDataInput(FitPar::GetDataBase() +
-                           "MiniBooNE/CCQE/asne_con.txt");
+                           "MiniBooNE/ccqe/asne_con.txt");
   }
   fSettings.DefineAllowedSpecies("numu");
 
@@ -57,12 +57,10 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2
   fScaleFactor =
-      GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents);
+      GetEventHistogram()->Integral("width") * double(1E-38) / double(fNEvents) * (14.08/6.0);
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());
-  SetCorrelationFromTextFile(fSettings.GetCovarInput());
-  SetShapeCovar();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -70,11 +68,11 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
 
 void MiniBooNE_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
   if (isSignal(event)) {
-    fXVar = event->GetNeutrinoIn()->fP.E();
+    fXVar = event->GetNeutrinoIn()->fP.E() * 1E-3;
   }
 };
 
 bool MiniBooNE_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   return (ccqelike && SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) ||
-         (event->Mode == 1);
+         SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
 }
