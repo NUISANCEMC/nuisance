@@ -73,6 +73,15 @@ void MiniBooNE_CCQE_XSec_1DEnu_nu::FillEventVariables(FitEvent *event) {
 };
 
 bool MiniBooNE_CCQE_XSec_1DEnu_nu::isSignal(FitEvent *event) {
-  return (ccqelike && SignalDef::isCCQELike(event, 14, EnuMin, EnuMax)) ||
-         SignalDef::isCCQE(event, 14, EnuMin, EnuMax);
+  // If CC0pi, include both charges
+  if (ccqelike) {
+    if (SignalDef::isCC0pi(event, 14, EnuMin, EnuMax) ||
+        SignalDef::isCC0pi(event, -14, EnuMin, EnuMax))
+      return true;
+  } else {
+    if (SignalDef::isCCQELike(event, 14, EnuMin, EnuMax))
+      return true;
+  }
+
+  return false;
 }
