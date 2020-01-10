@@ -34,7 +34,7 @@ endif()
 
 if(HAVENEUTCONFIG)
   execute_process (COMMAND neut-config
-    --version OUTPUT_VARIABLE NEUT_VERSION
+    --version OUTPUT_VARIABLE NEUT_VER
              OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   execute_process (COMMAND neut-config
@@ -65,13 +65,15 @@ if(HAVENEUTCONFIG)
   LIST(APPEND NEUT_LIBS ${CERN_LIBS};gfortran)
   LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
 
+  string(REPLACE "." "" NEUT_VERSION ${NEUT_VER})
+
   PrefixList(NEUT_INCLUDE_DIRS "-I" ${NEUT_INCLUDE_DIRS})
-  LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__NEUT_ENABLED__ -DNEUT_VERSION=${NEUT_VERSION})
+  LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__NEUT_ENABLED__ -D__NEUT_VERSION__=${NEUT_VERSION})
 
   LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
 
   cmessage(STATUS "NEUT")
-  cmessage(STATUS "     Version   : ${NEUT_VERSION}")
+  cmessage(STATUS "     Version   : ${NEUT_VER}")
   cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
   cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
   cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")

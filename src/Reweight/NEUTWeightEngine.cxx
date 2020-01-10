@@ -3,6 +3,11 @@
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 #if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
 
+  // For newer NEUT we need to set up our defaults
+#if __NEUT_VERSION__ >= 541
+  neut::CommonBlockIFace::Initialize(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
+#endif
+
   // Setup the NEUT Reweight engien
   fCalcName = name;
   NUIS_LOG(FIT, "Setting up NEUT RW : " << fCalcName);
@@ -31,22 +36,26 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
     fNeutRW->AdoptWghtCalc("xsec_ccqe", new neut::rew::NReWeightNuXSecCCQE);
   if (xsec_res)
     fNeutRW->AdoptWghtCalc("xsec_res", new neut::rew::NReWeightNuXSecRES);
-  if (xsec_ccres)
-    fNeutRW->AdoptWghtCalc("xsec_ccres", new neut::rew::NReWeightNuXSecCCRES);
-  if (xsec_coh)
-    fNeutRW->AdoptWghtCalc("xsec_coh", new neut::rew::NReWeightNuXSecCOH);
-  if (xsec_dis)
-    fNeutRW->AdoptWghtCalc("xsec_dis", new neut::rew::NReWeightNuXSecDIS);
-  if (xsec_ncel)
-    fNeutRW->AdoptWghtCalc("xsec_ncel", new neut::rew::NReWeightNuXSecNCEL);
-  if (xsec_nc)
-    fNeutRW->AdoptWghtCalc("xsec_nc", new neut::rew::NReWeightNuXSecNC);
-  if (xsec_ncres)
-    fNeutRW->AdoptWghtCalc("xsec_ncres", new neut::rew::NReWeightNuXSecNCRES);
+
+  // Dials removed in NEUT 5.4.1
+#if __NEUT_VERSION__ < 541
   if (nucl_casc)
     fNeutRW->AdoptWghtCalc("nucl_casc", new neut::rew::NReWeightCasc);
+  if (xsec_coh)
+    fNeutRW->AdoptWghtCalc("xsec_coh", new neut::rew::NReWeightNuXSecCOH);
+  if (xsec_nc)
+    fNeutRW->AdoptWghtCalc("xsec_nc", new neut::rew::NReWeightNuXSecNC);
   if (nucl_piless)
     fNeutRW->AdoptWghtCalc("nucl_piless", new neut::rew::NReWeightNuclPiless);
+  if (xsec_ncres)
+    fNeutRW->AdoptWghtCalc("xsec_ncres", new neut::rew::NReWeightNuXSecNCRES);
+  if (xsec_ccres)
+    fNeutRW->AdoptWghtCalc("xsec_ccres", new neut::rew::NReWeightNuXSecCCRES);
+  if (xsec_ncel)
+    fNeutRW->AdoptWghtCalc("xsec_ncel", new neut::rew::NReWeightNuXSecNCEL);
+  if (xsec_dis)
+    fNeutRW->AdoptWghtCalc("xsec_dis", new neut::rew::NReWeightNuXSecDIS);
+#endif
   fNeutRW->Reconfigure();
   olddir->cd();
 
@@ -77,7 +86,11 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
     std::string singlename = allnames[i];
 
     // Get Syst
+#if __NEUT_VERSION__ < 541
     neut::rew::NSyst_t gensyst = NSyst::FromString(singlename);
+#else
+    neut::rew::NSyst_t gensyst = neut::rew::NSyst::FromString(singlename);
+#endif
 
     // Fill Maps
     int index = fValues.size();
@@ -90,7 +103,11 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
 
     // If Absolute
     if (fIsAbsTwk) {
+#if __NEUT_VERSION__ < 541
       NSystUncertainty::Instance()->SetUncertainty(fNEUTSysts[index], 1.0, 1.0);
+#else
+      neut::rew::NSystUncertainty::Instance()->SetUncertainty(fNEUTSysts[index], 1.0, 1.0);
+#endif
     }
 
     // Setup index
