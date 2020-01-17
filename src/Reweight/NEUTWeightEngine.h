@@ -7,16 +7,22 @@
 #ifndef __NO_REWEIGHT__
 #include "NEUTInputHandler.h"
 #include "NReWeight.h"
-#include "NReWeightCasc.h"
 #include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecCCRES.h"
-#include "NReWeightNuXSecCOH.h"
-#include "NReWeightNuXSecDIS.h"
-#include "NReWeightNuXSecNC.h"
-#include "NReWeightNuXSecNCEL.h"
-#include "NReWeightNuXSecNCRES.h"
 #include "NReWeightNuXSecRES.h"
+// Dials removed in NEUT 5.4.1
+#if __NEUT_VERSION__ < 541
+#include "NReWeightCasc.h"
 #include "NReWeightNuclPiless.h"
+#include "NReWeightNuXSecNCRES.h"
+#include "NReWeightNuXSecCCRES.h"
+#include "NReWeightNuXSecNC.h"
+#include "NReWeightNuXSecCOH.h"
+#include "NReWeightNuXSecNCEL.h"
+#include "NReWeightNuXSecDIS.h"
+#endif
+#if __NEUT_VERSION__ >= 541
+#include "CommonBlockIFace.h"
+#endif
 #include "NSyst.h"
 #include "NSystUncertainty.h"
 #include "neutpart.h"

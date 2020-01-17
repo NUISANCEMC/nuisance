@@ -29,10 +29,14 @@
 #include "NIWGSyst.h"
 #include "InputHandler.h"
 #include "TargetUtils.h"
+
+#include "TTreePerfStats.h"
+#include "PlotUtils.h"
+
+
+/*
 #include "neutpart.h"
 #include "neutvect.h"
-#include "PlotUtils.h"
-#include "TTreePerfStats.h"
 #include "nefillverC.h"
 #include "necardC.h"
 #include "neutmodelC.h"
@@ -53,6 +57,8 @@
 #include "neutnucfsivert.h"
 #include "neutnucfsistep.h"
 #endif
+*/
+#include "neutvect.h"
 
 #endif
 #endif
