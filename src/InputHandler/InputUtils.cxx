@@ -39,7 +39,7 @@ InputType ParseInputType(std::string const &inp) {
   // The hard-coded list of supported input generators
   const static std::string filetypes[] = {
       "NEUT",  "NUWRO",  "GENIE", "GiBUU",       "NUANCE", "EVSPLN",
-      "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO"};
+      "EMPTY", "FEVENT", "JOINT", "SIGMAQ0HIST", "HISTO",  "HEPMCNUEVT"};
 
   size_t nInputTypes = GeneralUtils::GetArraySize(filetypes);
 
@@ -55,12 +55,13 @@ InputType ParseInputType(std::string const &inp) {
 bool IsJointInput(std::string const &inputs) {
   bool isJoint = (inputs[0] == '(');
   if (isJoint && (inputs[inputs.length() - 1] != ')')) {
-    NUIS_ABORT("Inputs specifier: \""
-           << inputs
-           << "\" looks like a composite input specifier -- "
-              "(filea.root,fileb.root), however, it did not end in a \')\', "
-              "it ended in a \'"
-           << inputs[inputs.length() - 1] << "\'");
+    NUIS_ABORT(
+        "Inputs specifier: \""
+        << inputs
+        << "\" looks like a composite input specifier -- "
+           "(filea.root,fileb.root), however, it did not end in a \')\', "
+           "it ended in a \'"
+        << inputs[inputs.length() - 1] << "\'");
   }
   return isJoint;
 }

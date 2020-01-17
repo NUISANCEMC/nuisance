@@ -63,6 +63,10 @@ SigmaQ0HistogramInputHandler.h
 HistogramInputHandler.h
 )
 
+if(USE_HEPMCNUEVT)
+  LIST(APPEND IMPLFILES HepMCNuEvtInputHandler.cxx)
+endif()
+
 set(LIBNAME InputHandler)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)

@@ -41,6 +41,10 @@ if(USE_NOvARwgt)
   LIST(APPEND IMPLFILES NOvARwgtEngine.cxx)
 endif()
 
+if(USE_DUNERWT)
+  LIST(APPEND IMPLFILES nusystematicsWeightEngine.cxx)
+endif()
+
 set(HEADERFILES
 GlobalDialList.h
 FitWeight.h

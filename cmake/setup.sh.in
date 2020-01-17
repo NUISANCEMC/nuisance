@@ -162,4 +162,9 @@ if [ "@USE_NOvARwgt@" != "FALSE" ]; then
   add_to_LD_LIBRARY_PATH @NOVARWGT@/lib
 fi
 
+if [ "@USE_HEPMCNUEVT@" == "TRUE" ]; then
+  add_to_LD_LIBRARY_PATH @HEPMC_LIBDIR@
+  add_to_LD_LIBRARY_PATH @HEPMCNUEVTTOOLSROOT@/lib
+fi
+
 export NUISANCE="@CMAKE_SOURCE_DIR@"
