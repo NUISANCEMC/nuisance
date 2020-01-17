@@ -81,11 +81,14 @@ SigmaEnuHists::SigmaEnuHists(std::string name, std::string inputfile,
         ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
     TopologyHists[t]->Reset();
   }
+
+  NEUTModeHists[0] = static_cast<TH1D *>(fFluxHist->Clone("TotalXSec"));
+  NEUTModeHists[0]->SetTitle(
+      ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
+  NEUTModeHists[0]->Reset();
 }
 
 void SigmaEnuHists::FillEventVariables(FitEvent *event) {
-
-  double hw = 1; // fScaleFactor;
 
   // Now fill the information
   if (!NEUTModeHists.count(event->Mode)) {
@@ -100,7 +103,8 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
 
   FitParticle *nu = event->GetBeamPart();
 
-  NEUTModeHists[event->Mode]->Fill(nu->fP.E() * 1E-3, hw);
+  NEUTModeHists[event->Mode]->Fill(nu->fP.E() * 1E-3);
+  NEUTModeHists[0]->Fill(nu->fP.E() * 1E-3);
 
 #ifdef __GENIE_ENABLED__
   if (event->fType == kGENIE) {
@@ -120,7 +124,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
           ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
       GENIEModeHists[nuis_gmode]->Reset();
     }
-    GENIEModeHists[nuis_gmode]->Fill(nu->fP.E() * 1E-3, hw);
+    GENIEModeHists[nuis_gmode]->Fill(nu->fP.E() * 1E-3);
   }
 #endif
 
@@ -129,29 +133,29 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
   int NPim = event->GetAllFSPiMinusIndices().size();
 
   if (event->IsCC()) {
-    TopologyHists[kCC]->Fill(nu->fP.E() * 1E-3, hw);
+    TopologyHists[kCC]->Fill(nu->fP.E() * 1E-3);
     if (NPi == 0) {
-      TopologyHists[kCC0Pi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kCC0Pi]->Fill(nu->fP.E() * 1E-3);
     } else if (NPi == 1) {
-      TopologyHists[kCC1Pi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kCC1Pi]->Fill(nu->fP.E() * 1E-3);
       if (NPip == 1) {
-        TopologyHists[kCC1Pip]->Fill(nu->fP.E() * 1E-3, hw);
+        TopologyHists[kCC1Pip]->Fill(nu->fP.E() * 1E-3);
       } else if (NPim == 1) {
-        TopologyHists[kCC1Pim]->Fill(nu->fP.E() * 1E-3, hw);
+        TopologyHists[kCC1Pim]->Fill(nu->fP.E() * 1E-3);
       } else {
-        TopologyHists[kCC1Pi0]->Fill(nu->fP.E() * 1E-3, hw);
+        TopologyHists[kCC1Pi0]->Fill(nu->fP.E() * 1E-3);
       }
     } else {
-      TopologyHists[kCCNPi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kCCNPi]->Fill(nu->fP.E() * 1E-3);
     }
   } else {
-    TopologyHists[kNC]->Fill(nu->fP.E() * 1E-3, hw);
+    TopologyHists[kNC]->Fill(nu->fP.E() * 1E-3);
     if (NPi == 0) {
-      TopologyHists[kNC0Pi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kNC0Pi]->Fill(nu->fP.E() * 1E-3);
     } else if (NPi == 1) {
-      TopologyHists[kNC1Pi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kNC1Pi]->Fill(nu->fP.E() * 1E-3);
     } else {
-      TopologyHists[kNCNPi]->Fill(nu->fP.E() * 1E-3, hw);
+      TopologyHists[kNCNPi]->Fill(nu->fP.E() * 1E-3);
     }
   }
 };
