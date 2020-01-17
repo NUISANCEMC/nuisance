@@ -323,6 +323,8 @@
 #include "OfficialNIWGPlots.h"
 #include "T2K2017_FakeData.h"
 
+#include "SigmaEnuHists.h"
+
 #include "Simple_Osc.h"
 #include "Smear_SVDUnfold_Propagation_Osc.h"
 
@@ -1429,6 +1431,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
   } else if (!name.compare("NIWGOfficialPlots")) {
     return (new OfficialNIWGPlots(samplekey));
+  } else if (name.find("SigmaEnuHists") != std::string::npos) {
+    return (new SigmaEnuHists(name, file, rw, type, fkdt));
   } else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
   } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
