@@ -21,7 +21,10 @@
 #include <limits>
 #include <string>
 
-nusystematicsWeightEngine::nusystematicsWeightEngine() { Config(); }
+nusystematicsWeightEngine::nusystematicsWeightEngine() {
+  fUseCV = false;
+  Config();
+}
 
 void nusystematicsWeightEngine::Config() {
   std::vector<nuiskey> DuneRwtParam = Config::QueryKeys("DUNERwt");
@@ -37,7 +40,12 @@ void nusystematicsWeightEngine::Config() {
   DUNErwt.LoadConfiguration(fhicl_name);
 }
 
+systtools::paramId_t const kNuSystCVResponse = 999;
+
 int nusystematicsWeightEngine::ConvDial(std::string name) {
+  if (name == "NuSystCVResponse") {
+    return kNuSystCVResponse;
+  }
   if (!DUNErwt.HaveHeader(name)) {
     NUIS_ABORT("nusystematicsWeightEngine passed dial: "
                << name << " that it does not understand.");
@@ -46,12 +54,24 @@ int nusystematicsWeightEngine::ConvDial(std::string name) {
 }
 
 void nusystematicsWeightEngine::IncludeDial(std::string name, double startval) {
-  EnabledParams.push_back({systtools::paramId_t(ConvDial(name)), startval});
+
+  systtools::paramId_t DuneRwtEnum(ConvDial(name));
+
+  if (DuneRwtEnum == kNuSystCVResponse) {
+    fUseCV = true;
+  }
+
+  EnabledParams.push_back({DuneRwtEnum, startval});
 }
 
 void nusystematicsWeightEngine::SetDialValue(int nuisenum, double val) {
 
   systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+
+  if (DuneRwtEnum == kNuSystCVResponse) {
+    return;
+  }
+
   systtools::ParamValue &pval =
       GetParamElementFromContainer(EnabledParams, DuneRwtEnum);
   fHasChanged = (pval.val - val) > std::numeric_limits<double>::epsilon();
@@ -63,8 +83,14 @@ void nusystematicsWeightEngine::SetDialValue(std::string name, double val) {
                << name << " that is not enabled.");
   }
 
+  systtools::paramId_t DuneRwtEnum(ConvDial(name));
+
+  if (DuneRwtEnum == kNuSystCVResponse) {
+    return;
+  }
+
   systtools::ParamValue &pval =
-      GetParamElementFromContainer(EnabledParams, ConvDial(name));
+      GetParamElementFromContainer(EnabledParams, DuneRwtEnum);
   fHasChanged = (pval.val - val) > std::numeric_limits<double>::epsilon();
   pval.val = val;
 }
@@ -74,6 +100,9 @@ bool nusystematicsWeightEngine::IsDialIncluded(std::string name) {
 }
 bool nusystematicsWeightEngine::IsDialIncluded(int nuisenum) {
   systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+  if (DuneRwtEnum == kNuSystCVResponse) {
+    return fUseCV;
+  }
   return systtools::ContainterHasParam(EnabledParams, DuneRwtEnum);
 }
 
@@ -91,7 +120,13 @@ double nusystematicsWeightEngine::GetDialValue(int nuisenum) {
     NUIS_ABORT("nusystematicsWeightEngine passed dial: "
                << nuisenum << " that is not enabled.");
   }
+
   systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+
+  if (DuneRwtEnum == kNuSystCVResponse) {
+    return 1;
+  }
+
   systtools::ParamValue &pval =
       GetParamElementFromContainer(EnabledParams, DuneRwtEnum);
   return pval.val;
@@ -109,7 +144,28 @@ bool nusystematicsWeightEngine::NeedsEventReWeight() {
 }
 
 double nusystematicsWeightEngine::CalcWeight(BaseFitEvt *evt) {
-  return DUNErwt.GetEventWeightResponse(*evt->genie_event->event, EnabledParams);
+  systtools::event_unit_response_w_cv_t responses =
+      DUNErwt.GetEventVariationAndCVResponse(*evt->genie_event->event);
+
+  double weight = 1;
+  for (auto const &resp : responses) {
+    if (!DUNErwt.IsWeightResponse(resp.pid)) {
+      continue;
+    }
+    if (fUseCV) {
+      weight *= resp.CV_response;
+    } else { // This is very inefficient for fitting, as it recalculates the
+             // spline every time.
+      systtools::ParamValue const &pval =
+          GetParamElementFromContainer(EnabledParams, resp.pid);
+      weight *= (resp.CV_response *
+                 DUNErwt.GetParameterResponse(resp.pid, pval.val,
+                                              systtools::event_unit_response_t{
+                                                  {resp.pid, resp.responses}}));
+    }
+  }
+
+  return weight;
 }
 
 void nusystematicsWeightEngine::Print() {

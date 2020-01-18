@@ -59,6 +59,8 @@ private:
   };
   std::map<int, std::string> TopologyNames;
   std::map<int, TH1D *> TopologyHists;
+
+  bool PerE;
 };
 
 #endif

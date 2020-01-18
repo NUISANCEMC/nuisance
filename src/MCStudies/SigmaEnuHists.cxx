@@ -19,11 +19,28 @@
 
 #include "SigmaEnuHists.h"
 
+void PerEify(TH1 *h) {
+  for (int i = 0; i < h->GetXaxis()->GetNbins(); ++i) {
+    double cont = h->GetBinContent(i + 1);
+    double err = h->GetBinError(i + 1);
+    double e = h->GetXaxis()->GetBinCenter(i + 1);
+    if (!e) {
+      h->SetBinContent(i + 1, 0);
+      h->SetBinError(i + 1, 0);
+    } else {
+      h->SetBinContent(i + 1, cont / e);
+      h->SetBinError(i + 1, err / e);
+    }
+  }
+}
+
 SigmaEnuHists::SigmaEnuHists(std::string name, std::string inputfile,
                              FitWeight *rw, std::string type,
                              std::string fakeDataFile) {
   // Measurement Details
   fName = name;
+
+  PerE = (name.find("PerE") != std::string::npos);
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
@@ -103,8 +120,11 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
 
   FitParticle *nu = event->GetBeamPart();
 
-  NEUTModeHists[event->Mode]->Fill(nu->fP.E() * 1E-3);
-  NEUTModeHists[0]->Fill(nu->fP.E() * 1E-3);
+  double enu_gev = nu->fP.E() * 1E-3;
+  double w = event->Weight;
+
+  NEUTModeHists[event->Mode]->Fill(enu_gev, w);
+  NEUTModeHists[0]->Fill(enu_gev, w);
 
 #ifdef __GENIE_ENABLED__
   if (event->fType == kGENIE) {
@@ -124,7 +144,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
           ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
       GENIEModeHists[nuis_gmode]->Reset();
     }
-    GENIEModeHists[nuis_gmode]->Fill(nu->fP.E() * 1E-3);
+    GENIEModeHists[nuis_gmode]->Fill(enu_gev, w);
   }
 #endif
 
@@ -133,29 +153,29 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
   int NPim = event->GetAllFSPiMinusIndices().size();
 
   if (event->IsCC()) {
-    TopologyHists[kCC]->Fill(nu->fP.E() * 1E-3);
+    TopologyHists[kCC]->Fill(enu_gev, w);
     if (NPi == 0) {
-      TopologyHists[kCC0Pi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kCC0Pi]->Fill(enu_gev, w);
     } else if (NPi == 1) {
-      TopologyHists[kCC1Pi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kCC1Pi]->Fill(enu_gev, w);
       if (NPip == 1) {
-        TopologyHists[kCC1Pip]->Fill(nu->fP.E() * 1E-3);
+        TopologyHists[kCC1Pip]->Fill(enu_gev, w);
       } else if (NPim == 1) {
-        TopologyHists[kCC1Pim]->Fill(nu->fP.E() * 1E-3);
+        TopologyHists[kCC1Pim]->Fill(enu_gev, w);
       } else {
-        TopologyHists[kCC1Pi0]->Fill(nu->fP.E() * 1E-3);
+        TopologyHists[kCC1Pi0]->Fill(enu_gev, w);
       }
     } else {
-      TopologyHists[kCCNPi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kCCNPi]->Fill(enu_gev, w);
     }
   } else {
-    TopologyHists[kNC]->Fill(nu->fP.E() * 1E-3);
+    TopologyHists[kNC]->Fill(enu_gev, w);
     if (NPi == 0) {
-      TopologyHists[kNC0Pi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kNC0Pi]->Fill(enu_gev, w);
     } else if (NPi == 1) {
-      TopologyHists[kNC1Pi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kNC1Pi]->Fill(enu_gev, w);
     } else {
-      TopologyHists[kNCNPi]->Fill(nu->fP.E() * 1E-3);
+      TopologyHists[kNCNPi]->Fill(enu_gev, w);
     }
   }
 };
@@ -165,18 +185,27 @@ void SigmaEnuHists::Write(std::string drawOpt) {
        h != NEUTModeHists.end(); ++h) {
     PlotUtils::FluxUnfoldedScaling(h->second, GetFluxHistogram(),
                                    GetEventHistogram(), fScaleFactor, fNEvents);
+    if (PerE) {
+      PerEify(h->second);
+    }
     h->second->Write();
   }
   for (std::map<int, TH1D *>::iterator h = GENIEModeHists.begin();
        h != GENIEModeHists.end(); ++h) {
     PlotUtils::FluxUnfoldedScaling(h->second, GetFluxHistogram(),
                                    GetEventHistogram(), fScaleFactor, fNEvents);
+    if (PerE) {
+      PerEify(h->second);
+    }
     h->second->Write();
   }
   for (std::map<int, TH1D *>::iterator h = TopologyHists.begin();
        h != TopologyHists.end(); ++h) {
     PlotUtils::FluxUnfoldedScaling(h->second, GetFluxHistogram(),
                                    GetEventHistogram(), fScaleFactor, fNEvents);
+    if (PerE) {
+      PerEify(h->second);
+    }
     h->second->Write();
   }
 }

@@ -59,6 +59,8 @@ class nusystematicsWeightEngine : public WeightEngineBase {
   double CalcWeight(BaseFitEvt* evt);
 
   void Print();
+
+  bool fUseCV;
 };
 
 #endif

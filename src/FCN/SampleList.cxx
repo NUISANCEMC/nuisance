@@ -1431,7 +1431,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
   } else if (!name.compare("NIWGOfficialPlots")) {
     return (new OfficialNIWGPlots(samplekey));
-  } else if (name.find("SigmaEnuHists") != std::string::npos) {
+  } else if ((name.find("SigmaEnuHists") != std::string::npos) ||
+             (name.find("SigmaEnuPerEHists") != std::string::npos)) {
     return (new SigmaEnuHists(name, file, rw, type, fkdt));
   } else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
