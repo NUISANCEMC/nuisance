@@ -16,6 +16,10 @@
 #include "NOvARwgtEngine.h"
 #endif
 
+#ifdef __NUSYST_ENABLED__
+#include "nusystematicsWeightEngine.h"
+#endif
+
 void FitWeight::AddRWEngine(int type) {
   NUIS_LOG(FIT, "Adding reweight engine " << type);
   switch (type) {
@@ -65,6 +69,11 @@ void FitWeight::AddRWEngine(int type) {
     fAllRW[type] = new NOvARwgtEngine();
     break;
 #endif
+#ifdef __NUSYST_ENABLED__
+  case kNuSystematics:
+    fAllRW[type] = new nusystematicsWeightEngine();
+    break;
+#endif
   default:
     NUIS_ABORT("CANNOT ADD RW Engine for unknown dial type: " << type);
     break;
@@ -91,10 +100,15 @@ bool FitWeight::HasRWEngine(int type) {
   case kNIWG:
   case kOSCILLATION:
 #ifdef __NOVA_ENABLED__
-  case kNOvARWGT: {
+  case kNOvARWGT:
+#endif
+#ifdef __NUSYST_ENABLED__
+  case kNuSystematics:
+#endif
+
+  {
     return fAllRW.count(type);
   }
-#endif
   default: { NUIS_ABORT("CANNOT get RW Engine for dial type: " << type); }
   }
 }
@@ -162,7 +176,7 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
   if (fAllRW.find(dialtype) == fAllRW.end()) {
     NUIS_ERR(FTL, "Can't find RW engine for parameter " << fNameList[dialtype]);
     NUIS_ERR(FTL, "With dialtype " << dialtype << ", "
-                                 << Reweight::RemoveDialType(nuisenum));
+                                   << Reweight::RemoveDialType(nuisenum));
     NUIS_ABORT("Are you sure you enabled the right engines?");
   }
 
@@ -285,6 +299,7 @@ double FitWeight::GetSampleNorm(std::string name) {
 void FitWeight::Print() {
   NUIS_LOG(REC, "Fit Weight State: ");
   for (size_t i = 0; i < fNameList.size(); i++) {
-    NUIS_LOG(REC, " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i]);
+    NUIS_LOG(REC,
+             " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i]);
   }
 }

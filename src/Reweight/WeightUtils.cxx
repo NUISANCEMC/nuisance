@@ -47,6 +47,10 @@ using namespace genie::rew;
 #include "NOvARwgtEngine.h"
 #endif
 
+#ifdef __NUSYST_ENABLED__
+#include "nusystematicsWeightEngine.h"
+#endif
+
 #endif // end of no reweight
 
 #include "GlobalDialList.h"
@@ -217,6 +221,8 @@ int FitBase::ConvDialType(std::string const &type) {
     return kMODENORM;
   else if (!type.compare("nova_parameter"))
     return kNOvARWGT;
+  else if (!type.compare("nusyst_parameter"))
+    return kNuSystematics;
   else
     return kUNKNOWN;
 }
@@ -258,6 +264,9 @@ std::string FitBase::ConvDialType(int type) {
   }
   case kNOvARWGT: {
     return "nova_parameter";
+  }
+  case kNuSystematics: {
+    return "nusyst_parameter";
   }
   default:
     return "unknown_parameter";
@@ -385,7 +394,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     NUIS_LOG(FTL, "Getting mode num " << mode_num);
     if (!mode_num) {
       NUIS_ABORT("Attempting to parse dial name: \""
-             << name << "\" as a mode norm dial but failed.");
+                 << name << "\" as a mode norm dial but failed.");
     }
     this_enum = 60 + mode_num + offset;
     break;
@@ -394,7 +403,8 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // If Not Enabled
   if (this_enum == Reweight::kNoTypeFound) {
-    NUIS_ERR(FTL, "RW Engine not supported for " << FitBase::ConvDialType(type));
+    NUIS_ERR(FTL,
+             "RW Engine not supported for " << FitBase::ConvDialType(type));
     NUIS_ABORT("Check dial " << name);
   }
 
@@ -416,7 +426,7 @@ std::string Reweight::ConvDialType(int type) {
 
 int Reweight::GetDialType(int type) {
   int t = (type / 1000);
-  return t > kNOvARWGT ? Reweight::kNoDialFound : t;
+  return t > kNuSystematics ? Reweight::kNoDialFound : t;
 }
 
 int Reweight::RemoveDialType(int type) { return (type % 1000); }
@@ -544,6 +554,15 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
     break;
 #endif
 
+#ifdef __NUSYST_ENABLED__
+  case kNuSystematics: {
+    // Super inefficient...
+    nusystematicsWeightEngine we;
+    genenum = we.ConvDial(name);
+    break;
+  }
+#endif
+
   default:
     genenum = Reweight::kNoTypeFound;
     break;
@@ -554,7 +573,7 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
     // If Not Enabled
     if (genenum == Reweight::kGeneratorNotBuilt) {
       NUIS_ERR(FTL,
-             "RW Engine not supported for " << FitBase::ConvDialType(type));
+               "RW Engine not supported for " << FitBase::ConvDialType(type));
       NUIS_ABORT("Check dial " << name);
     }
 

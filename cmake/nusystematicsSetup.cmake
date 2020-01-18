@@ -17,19 +17,21 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-if(NUSYSTROOT STREQUAL "")
-  cmessage(FATAL_ERROR "Variable NUSYSTROOT is not defined. Either configure with -DNUSYSTROOT or \"\$ export NUSYSTROOT=/path/to/nusystematics\". This must be set to point to a prebuilt NuSystematics instance.")
+if(NUSYST_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable NUSYST_ROOT is not defined. Either configure with -DNUSYST_ROOT or \"\$ export NUSYST_ROOT=/path/to/nusystematics\". This must be set to point to a prebuilt NuSystematics instance.")
 endif()
 
-if(SYSTTOOLSROOT STREQUAL "")
-  cmessage(FATAL_ERROR "Variable SYSTTOOLSROOT is not defined. Either configure with -DSYSTTOOLSROOT or \"\$ export SYSTTOOLSROOT=/path/to/systematicstools\". This must be set to point to a prebuilt ART Systematics Tools instance.")
+if(SYSTTOOLS_ROOT STREQUAL "")
+  cmessage(FATAL_ERROR "Variable SYSTTOOLS_ROOT is not defined. Either configure with -DSYSTTOOLS_ROOT or \"\$ export SYSTTOOLS_ROOT=/path/to/systematicstools\". This must be set to point to a prebuilt ART Systematics Tools instance.")
 endif()
 
-LIST(APPEND EXTRA_CXX_FLAGS -D__DUNERWT_ENABLED__ -DNO_ART -std=c++1y -Wno-deprecated-declarations -Wno-deprecated)
+LIST(APPEND EXTRA_CXX_FLAGS -D__NUSYST_ENABLED__ -DNO_ART -std=c++1y -Wno-deprecated-declarations -Wno-deprecated)
 
-LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NUSYSTROOT}/include ${SYSTTOOLSROOT}/include)
+LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES
+  ${NUSYST_ROOT}/include
+  ${SYSTTOOLS_ROOT}/include)
 
-LIST(APPEND EXTRA_LINK_DIRS ${NUSYSTROOT}/lib ${SYSTTOOLSROOT}/lib)
+LIST(APPEND EXTRA_LINK_DIRS ${NUSYST_ROOT}/lib ${SYSTTOOLS_ROOT}/lib)
 LIST(APPEND EXTRA_LIBS  nusystematics_systproviders
                         systematicstools_interface
                         systematicstools_interpreters

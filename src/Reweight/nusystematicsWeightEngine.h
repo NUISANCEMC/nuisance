@@ -27,10 +27,10 @@
 
 #include <cmath>
 
-class nusystWeightEngine : public WeightEngineBase {
+class nusystematicsWeightEngine : public WeightEngineBase {
 
  public:
-  nusystWeightEngine();
+  nusystematicsWeightEngine();
 
   nusyst::response_helper DUNErwt;
 

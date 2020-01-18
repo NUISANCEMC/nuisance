@@ -82,7 +82,9 @@ CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 
 
 CheckAndSetDefaultCache(USE_HEPMCNUEVT FALSE BOOL "Whether to enable HepMC3 input support. <FALSE>")
 
-CheckAndSetDefaultCache(USE_DUNERWT FALSE BOOL "Whether to enable DUNE Reweight  support. <FALSE>")
+CheckAndSetDefaultCache(USE_NUSYST FALSE BOOL "Whether to enable DUNE Reweight  support. <FALSE>")
+CheckAndSetDefaultEnv(NUSYST_ROOT "" PATH "Path to nusystematics install directory <>" NUSYST_ROOT)
+CheckAndSetDefaultEnv(SYSTTOOLS_ROOT "" PATH "Path to systematicstools install directory <>" SYSTTOOLS_ROOT)
 
 CheckAndSetDefaultCache(USE_HEPMC FALSE BOOL "Whether to enable HepMC input support. <FALSE>")
 CheckAndSetDefaultEnv(HEPMC "" PATH "Path to HepMC source tree root directory. Overrides environment variable \$HEPMC <>" HEPMC)

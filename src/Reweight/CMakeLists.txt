@@ -41,7 +41,7 @@ if(USE_NOvARwgt)
   LIST(APPEND IMPLFILES NOvARwgtEngine.cxx)
 endif()
 
-if(USE_DUNERWT)
+if(USE_NUSYST)
   LIST(APPEND IMPLFILES nusystematicsWeightEngine.cxx)
 endif()
 

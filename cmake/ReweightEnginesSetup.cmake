@@ -67,10 +67,10 @@ if(USE_NOvARwgt)
 endif()
 
 ################################################################################
-if(USE_DUNERWT)
+if(USE_NUSYST)
   include(${CMAKE_SOURCE_DIR}/cmake/nusystematicsSetup.cmake)
   cmessage(STATUS "Using NOvARwgt Reweight engine.")
-  set(USE_DUNERWT TRUE CACHE BOOL "Whether to enable DUNERwt (reweight) support. Requires external libraries. <FALSE>" FORCE)
+  set(USE_NUSYST TRUE CACHE BOOL "Whether to enable DUNERwt (reweight) support. Requires external libraries. <FALSE>" FORCE)
 endif()
 ################################  Prob3++   ####################################
 include(${CMAKE_SOURCE_DIR}/cmake/Prob3++Setup.cmake)
