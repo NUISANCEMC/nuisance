@@ -131,7 +131,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();
     int gmode = interaction->ProcInfo().ScatteringTypeId();
-    int isNC = interaction->ProcInfo().IsWeakCC();
+    int isNC = !interaction->ProcInfo().IsWeakCC();
     int isnu = nu->fPID > 0;
     int nuis_gmode = (gmode + 30 * isNC) * (isnu ? 1 : -1);
     if (!GENIEModeHists.count(nuis_gmode)) {
