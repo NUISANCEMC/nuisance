@@ -1433,7 +1433,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new OfficialNIWGPlots(samplekey));
   } else if ((name.find("SigmaEnuHists") != std::string::npos) ||
              (name.find("SigmaEnuPerEHists") != std::string::npos)) {
-    return (new SigmaEnuHists(name, file, rw, type, fkdt));
+    return (new SigmaEnuHists(samplekey));
   } else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
   } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {

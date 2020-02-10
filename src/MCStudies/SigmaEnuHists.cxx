@@ -19,6 +19,8 @@
 
 #include "SigmaEnuHists.h"
 
+#include <cmath>
+
 void PerEify(TH1 *h) {
   for (int i = 0; i < h->GetXaxis()->GetNbins(); ++i) {
     double cont = h->GetBinContent(i + 1);
@@ -34,23 +36,15 @@ void PerEify(TH1 *h) {
   }
 }
 
-SigmaEnuHists::SigmaEnuHists(std::string name, std::string inputfile,
-                             FitWeight *rw, std::string type,
-                             std::string fakeDataFile) {
-  // Measurement Details
-  fName = name;
+SigmaEnuHists::SigmaEnuHists(nuiskey samplekey) {
 
-  PerE = (name.find("PerE") != std::string::npos);
+  fSettings = LoadSampleSettings(samplekey);
+
+  PerE = (fName.find("PerE") != std::string::npos);
 
   // Define our energy range for flux calcs
   EnuMin = 0.;
   EnuMax = 1E10; // Arbritrarily high energy limit
-
-  // This function will sort out the input files automatically and parse all the
-  // inputs,flags,etc.
-  // There may be complex cases where you have to do this by hand, but usually
-  // this will do.
-  Measurement1D::SetupMeasurement(inputfile, type, rw, fakeDataFile);
 
   // Setup fDataHist as a placeholder
   fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
@@ -79,6 +73,36 @@ SigmaEnuHists::SigmaEnuHists(std::string name, std::string inputfile,
     NUIS_ABORT("SCALE FACTOR TOO LOW");
   }
 
+  // If we have binning
+  if (samplekey.Has("NBins") && samplekey.Has("MinEnuGev") &&
+      samplekey.Has("MaxEnuGev")) {
+    int nbins = samplekey.GetI("NBins");
+    double low_gev = samplekey.GetD("MinEnuGev");
+    double up_gev = samplekey.GetD("MaxEnuGev");
+
+    std::vector<double> bins;
+    bool LogE = samplekey.Has("UseLogE") && samplekey.GetD("UseLogE");
+
+    double step = (LogE ? (std::log10(up_gev) - std::log10(low_gev)) : (up_gev - low_gev)) /
+                  double(nbins);
+
+    bins.push_back(low_gev);
+
+    for (int i = 0; i < nbins; ++i) {
+      if (LogE) {
+        bins.push_back(pow(10, std::log10(bins.back()) + step));
+      } else {
+        bins.push_back(bins.back() + step);
+      }
+    }
+
+    BinningHist = new TH1D("BinningHist", "", bins.size() - 1, bins.data());
+
+  } else { // use the flux hist
+    BinningHist = static_cast<TH1D *>(fFluxHist->Clone("BinningHist"));
+  }
+  BinningHist->SetDirectory(NULL);
+
   TopologyNames[kCC] = "CCInc";
   TopologyNames[kCC0Pi] = "CC0Pi";
   TopologyNames[kCC1Pi] = "CC1Pi";
@@ -93,13 +117,13 @@ SigmaEnuHists::SigmaEnuHists(std::string name, std::string inputfile,
 
   for (int t = kCC; t < kNTopologies; ++t) {
     TopologyHists[t] =
-        static_cast<TH1D *>(fFluxHist->Clone(TopologyNames[t].c_str()));
+        static_cast<TH1D *>(BinningHist->Clone(TopologyNames[t].c_str()));
     TopologyHists[t]->SetTitle(
         ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
     TopologyHists[t]->Reset();
   }
 
-  NEUTModeHists[0] = static_cast<TH1D *>(fFluxHist->Clone("TotalXSec"));
+  NEUTModeHists[0] = static_cast<TH1D *>(BinningHist->Clone("TotalXSec"));
   NEUTModeHists[0]->SetTitle(
       ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
   NEUTModeHists[0]->Reset();
@@ -112,7 +136,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
     std::stringstream ss;
     ss << "NeutMode_" << (event->Mode < 0 ? "m" : "") << abs(event->Mode);
     NEUTModeHists[event->Mode] =
-        static_cast<TH1D *>(fFluxHist->Clone(ss.str().c_str()));
+        static_cast<TH1D *>(BinningHist->Clone(ss.str().c_str()));
     NEUTModeHists[event->Mode]->SetTitle(
         ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
     NEUTModeHists[event->Mode]->Reset();
@@ -139,7 +163,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
       ss << "GENIEMode_" << (isNC ? "NC_" : "CC_") << (isnu ? "nu_" : "nubar_")
          << interaction->ProcInfo().ScatteringTypeAsString();
       GENIEModeHists[nuis_gmode] =
-          static_cast<TH1D *>(fFluxHist->Clone(ss.str().c_str()));
+          static_cast<TH1D *>(BinningHist->Clone(ss.str().c_str()));
       GENIEModeHists[nuis_gmode]->SetTitle(
           ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
       GENIEModeHists[nuis_gmode]->Reset();

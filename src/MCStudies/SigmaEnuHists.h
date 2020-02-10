@@ -25,8 +25,7 @@
 class SigmaEnuHists : public Measurement1D {
 
 public:
-  SigmaEnuHists(std::string name, std::string inputfile, FitWeight *rw,
-                std::string type, std::string fakeDataFile);
+  SigmaEnuHists(nuiskey samplekey);
   virtual ~SigmaEnuHists(){};
 
   //! Grab info from event
@@ -40,6 +39,7 @@ public:
   double GetLikelihood() { return 0; }
 
 private:
+  TH1D * BinningHist;
   std::map<int, TH1D *> NEUTModeHists;
   std::map<int, TH1D *> GENIEModeHists;
 
