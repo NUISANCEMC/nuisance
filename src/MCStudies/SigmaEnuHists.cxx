@@ -81,7 +81,7 @@ SigmaEnuHists::SigmaEnuHists(nuiskey samplekey) {
     double up_gev = samplekey.GetD("MaxEnuGev");
 
     std::vector<double> bins;
-    bool LogE = samplekey.Has("UseLogE") && samplekey.GetD("UseLogE");
+    bool LogE = samplekey.Has("UseLogE") && samplekey.GetB("UseLogE");
 
     double step = (LogE ? (std::log10(up_gev) - std::log10(low_gev)) : (up_gev - low_gev)) /
                   double(nbins);
