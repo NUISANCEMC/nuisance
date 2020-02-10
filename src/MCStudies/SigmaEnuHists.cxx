@@ -48,7 +48,8 @@ SigmaEnuHists::SigmaEnuHists(nuiskey samplekey) {
 
   // Setup fDataHist as a placeholder
   fDataHist = new TH1D(("empty_data"), ("empty-data"), 1, 0, 1);
-  SetupDefaultHist();
+
+  FinaliseSampleSettings();
 
   // 1. The generator is organised in SetupMeasurement so it gives the
   // cross-section in "per nucleon" units.
@@ -127,6 +128,11 @@ SigmaEnuHists::SigmaEnuHists(nuiskey samplekey) {
   NEUTModeHists[0]->SetTitle(
       ";#it{E}_{#nu} (GeV); #sigma(#it{E_{#nu}}) 10^{-38} cm^{2} /nucleon");
   NEUTModeHists[0]->Reset();
+
+  SetCovarFromDiagonal();
+
+  // Final setup  ---------------------------------------------------
+  FinaliseMeasurement();
 }
 
 void SigmaEnuHists::FillEventVariables(FitEvent *event) {
