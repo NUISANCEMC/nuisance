@@ -84,18 +84,28 @@ SigmaEnuHists::SigmaEnuHists(nuiskey samplekey) {
     std::vector<double> bins;
     bool LogE = samplekey.Has("UseLogE") && samplekey.GetB("UseLogE");
 
-    double step = (LogE ? (std::log10(up_gev) - std::log10(low_gev)) : (up_gev - low_gev)) /
+    std::cout << "[INFO]: Setting up binning: N = " << nbins
+              << " min = " << low_gev << " GeV, max = " << up_gev
+              << " max, LogE = " << (LogE ? "true" : "false") << std::endl;
+
+    double step = (LogE ? (std::log10(up_gev) - std::log10(low_gev))
+                        : (up_gev - low_gev)) /
                   double(nbins);
 
     bins.push_back(low_gev);
+    std::cout << "bin: " << bins.back() << std::endl;
 
     for (int i = 0; i < nbins; ++i) {
       if (LogE) {
         bins.push_back(pow(10, std::log10(bins.back()) + step));
+        std::cout << "bin: " << bins.back() << std::endl;
       } else {
         bins.push_back(bins.back() + step);
+        std::cout << "bin: " << bins.back() << std::endl;
       }
     }
+
+    std::cout << "nbin: " << bins.size() << std::endl;
 
     BinningHist = new TH1D("BinningHist", "", bins.size() - 1, bins.data());
 
