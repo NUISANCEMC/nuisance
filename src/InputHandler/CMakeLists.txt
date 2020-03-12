@@ -63,8 +63,8 @@ SigmaQ0HistogramInputHandler.h
 HistogramInputHandler.h
 )
 
-if(USE_HEPMCNUEVT)
-  LIST(APPEND IMPLFILES HepMCNuEvtInputHandler.cxx)
+if(USE_NUHEPMC)
+  LIST(APPEND IMPLFILES NuHepMCInputHandler.cxx)
 endif()
 
 set(LIBNAME InputHandler)

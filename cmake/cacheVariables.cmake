@@ -80,7 +80,7 @@ CheckAndSetDefaultCache(USE_REWEIGHT TRUE BOOL "Whether we are expect to be able
 
 CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
 
-CheckAndSetDefaultCache(USE_HEPMCNUEVT FALSE BOOL "Whether to enable HepMC3 input support. <FALSE>")
+CheckAndSetDefaultCache(USE_NUHEPMC FALSE BOOL "Whether to enable HepMC3 input support. <FALSE>")
 
 CheckAndSetDefaultCache(USE_NUSYST FALSE BOOL "Whether to enable DUNE Reweight  support. <FALSE>")
 CheckAndSetDefaultEnv(NUSYST_ROOT "" PATH "Path to nusystematics install directory <>" NUSYST_ROOT)

@@ -41,6 +41,7 @@ enum generator_event_type {
   kHEPMC = 15,
   kHISTO = 16,
   kSIGMAQ0HIST = 17,
+  kNuHepMC = 18,
   kLast_generator_event_type
 };
 
@@ -58,6 +59,7 @@ enum InputType {
   kJOINT_Input,
   kSIGMAQ0HIST_Input,
   kHISTO_Input,
+  kNuHepMC_Input,
   kInvalid_Input,
   kBNSPLN_Input,  // Not sure if this are currently used.
 };

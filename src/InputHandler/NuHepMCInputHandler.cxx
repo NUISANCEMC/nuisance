@@ -1,25 +1,26 @@
-#include "HepMCNuEvtInputHandler.h"
+#include "NuHepMCInputHandler.h"
 
 #include "FitEvent.h"
+#include "InputUtils.h"
 
-HepMCNuEvtInputHandler::~HepMCNuEvtInputHandler() {
+NuHepMCInputHandler::~NuHepMCInputHandler() {
   if (rdr) {
     rdr->close();
   }
   delete rdr;
 };
 
-void HepMCNuEvtInputHandler::Reset() {
+void NuHepMCInputHandler::Reset() {
   if (rdr) {
     rdr->close();
   }
   delete rdr;
 
-  rdr = new HepMC3Nu::ReaderRootTree(fInputFile);
+  rdr = new NuHepMC::ReaderRootTree(fInputFile);
   fNEvents = rdr->get_entries();
   fEntriesUsed = 0;
 
-  HepMC3Nu::genruninfo::GRIHelper grih(rdr->run_info());
+  NuHepMC::genruninfo::GRIHelper grih(rdr->run_info());
 
   fEventHist = new TH1D("eventhist", "eventhist", 1, 0.4, 1.4);
   fEventHist->SetBinContent(1, grih.GetFluxAverageTotalCrossSection() * 1E38);
@@ -27,12 +28,12 @@ void HepMCNuEvtInputHandler::Reset() {
   fFluxHist->SetBinContent(1, 1);
 }
 
-HepMCNuEvtInputHandler::HepMCNuEvtInputHandler(std::string const &handle,
-                                               std::string const &rawinputs)
+NuHepMCInputHandler::NuHepMCInputHandler(std::string const &handle,
+                                         std::string const &rawinputs)
     : rdr(0) {
   fEventHist = 0;
   fFluxHist = 0;
-  NUIS_LOG(SAM, "Creating HepMCNuEvtInputHandler : " << handle);
+  NUIS_LOG(SAM, "Creating NuHepMCInputHandler : " << handle);
 
   // Run a joint input handling
   fName = handle;
@@ -43,7 +44,7 @@ HepMCNuEvtInputHandler::HepMCNuEvtInputHandler(std::string const &handle,
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   if (inputs.size() != 1) {
     NUIS_ABORT(
-        "HEPMCNUEVT Input handler can only handler a single input at a time.");
+        "NuHepMC Input handler can only handler a single input at a time.");
   }
   fInputFile = inputs.front();
 
@@ -55,7 +56,8 @@ HepMCNuEvtInputHandler::HepMCNuEvtInputHandler(std::string const &handle,
   fBaseEvent = static_cast<BaseFitEvt *>(fNUISANCEEvent);
 };
 
-FitEvent *HepMCNuEvtInputHandler::GetNuisanceEvent(const UInt_t entry) {
+FitEvent *NuHepMCInputHandler::GetNuisanceEvent(const UInt_t entry,
+                                                const bool) {
 
   // Catch too large entries
   if (entry >= (UInt_t)fNEvents) {
@@ -76,13 +78,22 @@ FitEvent *HepMCNuEvtInputHandler::GetNuisanceEvent(const UInt_t entry) {
   HepMC3::GenEvent evt;
 
   rdr->read_event(evt);
+  fEntriesUsed++;
 
   fNUISANCEEvent->ResetEvent();
 
-  auto LabFrameVertex = HepMC3Nu::GetLabFrameVertex(evt);
+  auto LabFrameVertex = NuHepMC::GetLabFrameVertex(evt);
 
-  fNUISANCEEvent->Mode = 1; // fNeutVect->Mode;
+  fNUISANCEEvent->Mode = NuHepMC::genevent::GetHardScatterMode(evt);
   fNUISANCEEvent->fEventNo = evt.event_number();
+
+  int NuclTargPid = NuHepMC::genevent::GetTargetNucleusPDG(evt);
+  int NuclTargZ = TargetUtils::GetTargetZFromPDG(NuclTargPid);
+  int NuclTargA = TargetUtils::GetTargetAFromPDG(NuclTargPid);
+
+  fNUISANCEEvent->fBound = (NuclTargA == 1) && (NuclTargZ == 1);
+  fNUISANCEEvent->fTargetA = NuclTargA;
+  fNUISANCEEvent->fTargetZ = NuclTargZ;
 
   UInt_t npart = LabFrameVertex->particles_out().size();
   UInt_t kmax = fNUISANCEEvent->kMaxParticles;

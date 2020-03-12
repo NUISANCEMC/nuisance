@@ -19,6 +19,10 @@
 
 set(TARGETS_TO_BUILD)
 
+if(USE_NEUT)
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -no-pie -fno-pie -fno-PIE")
+endif()
+
 if(USE_MINIMIZER)
   add_executable(nuismin nuismin.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuismin)

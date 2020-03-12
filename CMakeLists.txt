@@ -55,8 +55,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
 
 #################################  HEPMC  ######################################
 include(${CMAKE_SOURCE_DIR}/cmake/HepMC.cmake)
-###############################  HepMCNuEvt  ###################################
-include(${CMAKE_SOURCE_DIR}/cmake/HepMCNuEvtSetup.cmake)
+###############################  NuHepMC  ###################################
+include(${CMAKE_SOURCE_DIR}/cmake/NuHepMCSetup.cmake)
 
 ############################  Reweight Engines  ################################
 include(${CMAKE_SOURCE_DIR}/cmake/ReweightEnginesSetup.cmake)
