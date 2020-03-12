@@ -82,7 +82,7 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(
 };
 
 void T2K_CC0pinp_STV_XSec_1Ddat_nu::FillEventVariables(FitEvent *event) {
-  fXVar = FitUtils::Get_STV_dalphat(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut, 14, true);
+  fXVar = FitUtils::Get_STV_dalphat_protonps(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut, 14, true);
   return;
 };
 

@@ -1,21 +1,21 @@
 // Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "FitUtils.h"
 
 /*
@@ -146,10 +146,10 @@ double FitUtils::WrecCC1pip_T2K_MB(TLorentzVector pnu, TLorentzVector pmu,
 double FitUtils::ProtonQ2QErec(double pE, double binding) {
   //********************************************************
 
-  const double V = binding / 1000.;           // binding potential
-  const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
-  const double mn_eff = mn - V;               // effective proton mass
+  const double V = binding / 1000.;          // binding potential
+  const double mn = PhysConst::mass_neutron; // neutron mass
+  const double mp = PhysConst::mass_proton;  // proton mass
+  const double mn_eff = mn - V;              // effective proton mass
   const double pki = (pE / 1000.0) - mp;
 
   double q2qe = mn_eff * mn_eff - mp * mp + 2 * mn_eff * (pki + mp - mn_eff);
@@ -163,9 +163,9 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   //********************************************************************
 
   // Convert all values to GeV
-  const double V = binding / 1000.;           // binding potential
-  const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
+  const double V = binding / 1000.;          // binding potential
+  const double mn = PhysConst::mass_neutron; // neutron mass
+  const double mp = PhysConst::mass_proton;  // proton mass
 
   double mN_eff = mn - V;
   double mN_oth = mp;
@@ -176,8 +176,8 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
   }
 
   double el = pmu.E() / 1000.;
-  double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
-  double ml = sqrt(el * el - pl * pl);     // lepton mass
+  double pl = (pmu.Vect().Mag()) / 1000.; // momentum of lepton
+  double ml = sqrt(el * el - pl * pl);    // lepton mass
 
   double rEnu =
       (2 * mN_eff * el - ml * ml + mN_oth * mN_oth - mN_eff * mN_eff) /
@@ -187,14 +187,16 @@ double FitUtils::EnuQErec(TLorentzVector pmu, double costh, double binding,
 };
 
 // Another good old helper function
-double FitUtils::EnuQErec(TLorentzVector pmu, TLorentzVector pnu, double binding, bool neutrino) {
+double FitUtils::EnuQErec(TLorentzVector pmu, TLorentzVector pnu,
+                          double binding, bool neutrino) {
   return EnuQErec(pmu, cos(pnu.Vect().Angle(pmu.Vect())), binding, neutrino);
 }
 
-double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool neutrino) {
+double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding,
+                         bool neutrino) {
   double el = pmu.E() / 1000.;
-  double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
-  double ml = sqrt(el * el - pl * pl);     // lepton mass
+  double pl = (pmu.Vect().Mag()) / 1000.; // momentum of lepton
+  double ml = sqrt(el * el - pl * pl);    // lepton mass
 
   double rEnu = EnuQErec(pmu, costh, binding, neutrino);
   double q2 = -ml * ml + 2. * rEnu * (el - pl * costh);
@@ -202,14 +204,17 @@ double FitUtils::Q2QErec(TLorentzVector pmu, double costh, double binding, bool 
   return q2;
 };
 
-double FitUtils::Q2QErec(TLorentzVector Pmu, TLorentzVector Pnu, double binding, bool neutrino) {
-  double q2qe = Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), binding, neutrino);
+double FitUtils::Q2QErec(TLorentzVector Pmu, TLorentzVector Pnu, double binding,
+                         bool neutrino) {
+  double q2qe =
+      Q2QErec(Pmu, cos(Pnu.Vect().Angle(Pmu.Vect())), binding, neutrino);
   return q2qe;
 }
 
 double FitUtils::EnuQErec(double pl, double costh, double binding,
                           bool neutrino) {
-  if (pl < 0) return 0.;  // Make sure nobody is silly
+  if (pl < 0)
+    return 0.; // Make sure nobody is silly
 
   double mN_eff = PhysConst::mass_neutron - binding / 1000.;
   double mN_oth = PhysConst::mass_proton;
@@ -230,7 +235,8 @@ double FitUtils::EnuQErec(double pl, double costh, double binding,
 
 double FitUtils::Q2QErec(double pl, double costh, double binding,
                          bool neutrino) {
-  if (pl < 0) return 0.;  // Make sure nobody is silly
+  if (pl < 0)
+    return 0.; // Make sure nobody is silly
 
   double ml = PhysConst::mass_muon;
   double el = sqrt(pl * pl + ml * ml);
@@ -258,8 +264,8 @@ double FitUtils::EnuCC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
   double m_pi0 = sqrt(E_pi0 * E_pi0 - p_pi0 * p_pi0);
   double th_nu_pi0 = pnu.Vect().Angle(ppi0.Vect());
 
-  const double m_n = PhysConst::mass_neutron;  // neutron mass
-  const double m_p = PhysConst::mass_proton;   // proton mass
+  const double m_n = PhysConst::mass_neutron; // neutron mass
+  const double m_p = PhysConst::mass_proton;  // proton mass
   double th_pi0_mu = ppi0.Vect().Angle(pmu.Vect());
 
   double rEnu = (m_mu * m_mu + m_pi0 * m_pi0 + m_n * m_n - m_p * m_p -
@@ -278,9 +284,9 @@ double FitUtils::Q2CC1pi0rec(TLorentzVector pnu, TLorentzVector pmu,
                              TLorentzVector ppi0) {
   //********************************************************************
 
-  double E_mu = pmu.E() / 1000.;                  // energy of lepton in GeV
-  double p_mu = pmu.Vect().Mag() / 1000.;         // momentum of lepton
-  double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu);  // lepton mass
+  double E_mu = pmu.E() / 1000.;                 // energy of lepton in GeV
+  double p_mu = pmu.Vect().Mag() / 1000.;        // momentum of lepton
+  double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu); // lepton mass
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
   // double rEnu = EnuCC1pi0rec(pnu, pmu, ppi0); //reconstructed neutrino energy
@@ -308,7 +314,7 @@ double FitUtils::EnuCC1piprec(TLorentzVector pnu, TLorentzVector pmu,
   double p_pi = ppi.Vect().Mag() / 1000.;
   double m_pi = sqrt(E_pi * E_pi - p_pi * p_pi);
 
-  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
+  const double m_n = PhysConst::mass_neutron; // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -351,8 +357,8 @@ double FitUtils::EnuCC1piprecDelta(TLorentzVector pnu, TLorentzVector pmu) {
   //********************************************************************
 
   const double m_Delta =
-      PhysConst::mass_delta;  // PDG value for Delta mass in GeV
-  const double m_n = PhysConst::mass_neutron;  // neutron/proton mass
+      PhysConst::mass_delta;                  // PDG value for Delta mass in GeV
+  const double m_n = PhysConst::mass_neutron; // neutron/proton mass
   // should really take proton mass for proton interaction, neutron for neutron
   // interaction. However, difference is pretty much negligable here!
 
@@ -386,7 +392,7 @@ double FitUtils::EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   double E_pi = ppi.E() / 1000.;
   TVector3 p_pi_vect = ppi.Vect() * (1. / 1000.);
 
-  double E_bind = 25. / 1000.; 
+  double E_bind = 25. / 1000.;
   double m_p = PhysConst::mass_proton;
 
   // Makes life a little easier, gonna square this one
@@ -417,9 +423,9 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu,
                              TLorentzVector ppi, int enuType, bool pionInfo) {
   //********************************************************************
 
-  double E_mu = pmu.E() / 1000.;                  // energy of lepton in GeV
-  double p_mu = pmu.Vect().Mag() / 1000.;         // momentum of lepton
-  double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu);  // lepton mass
+  double E_mu = pmu.E() / 1000.;                 // energy of lepton in GeV
+  double p_mu = pmu.Vect().Mag() / 1000.;        // momentum of lepton
+  double m_mu = sqrt(E_mu * E_mu - p_mu * p_mu); // lepton mass
   double th_nu_mu = pnu.Vect().Angle(pmu.Vect());
 
   // Different ways of reconstructing the neutrino energy; default is just to
@@ -427,26 +433,26 @@ double FitUtils::Q2CC1piprec(TLorentzVector pnu, TLorentzVector pmu,
   double rEnu = -999;
 
   switch (enuType) {
-    case 0:  // True neutrino energy, default; this is the case for when Q2
-             // defined as Q2 true (MiniBooNE, MINERvA)
-      rEnu = pnu.E() / 1000.;
-      break;
-    case 1:  // Extended MiniBooNE reconstructed, as defined by Raquel's CC1pi+
-             // CH T2K analysis
-      rEnu = EnuCC1piprec_T2K_eMB(pnu, pmu, ppi);
-      break;
-    case 2:  // MiniBooNE reconstructed, as defined by MiniBooNE and Raquel's
-             // CC1pi+ CH T2K analysis and Linda's CC1pi+ H2O
-      // Can have this with and without pion info, depending on if Michel tag
-      // used (Raquel)
-      rEnu = EnuCC1piprec(pnu, pmu, ppi, pionInfo);
-      break;
-    case 3:
-      rEnu = EnuCC1piprecDelta(pnu, pmu);
-      break;
+  case 0: // True neutrino energy, default; this is the case for when Q2
+          // defined as Q2 true (MiniBooNE, MINERvA)
+    rEnu = pnu.E() / 1000.;
+    break;
+  case 1: // Extended MiniBooNE reconstructed, as defined by Raquel's CC1pi+
+          // CH T2K analysis
+    rEnu = EnuCC1piprec_T2K_eMB(pnu, pmu, ppi);
+    break;
+  case 2: // MiniBooNE reconstructed, as defined by MiniBooNE and Raquel's
+          // CC1pi+ CH T2K analysis and Linda's CC1pi+ H2O
+    // Can have this with and without pion info, depending on if Michel tag
+    // used (Raquel)
+    rEnu = EnuCC1piprec(pnu, pmu, ppi, pionInfo);
+    break;
+  case 3:
+    rEnu = EnuCC1piprecDelta(pnu, pmu);
+    break;
 
-  }  // No need for default here since default value of enuType = 0, defined in
-     // header
+  } // No need for default here since default value of enuType = 0, defined in
+    // header
 
   double q2 = -m_mu * m_mu + 2. * rEnu * (E_mu - p_mu * cos(th_nu_mu));
 
@@ -568,8 +574,10 @@ double FitUtils::GetErecoil_TRUE(FitEvent *event) {
   double Erecoil = 0.0;
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
-    if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
+    if (!event->PartInfo(i)->fIsAlive)
+      continue;
+    if (event->PartInfo(i)->fNEUTStatusCode != 0)
+      continue;
 
     // Skip Lepton
     if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID) - 1)
@@ -592,8 +600,10 @@ double FitUtils::GetErecoil_CHARGED(FitEvent *event) {
   double Erecoil = 0.0;
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
-    if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->fNEUTStatusCode != 0) continue;
+    if (!event->PartInfo(i)->fIsAlive)
+      continue;
+    if (event->PartInfo(i)->fNEUTStatusCode != 0)
+      continue;
 
     // Skip Lepton
     if (abs(event->PartInfo(i)->fPID) == abs(event->PartInfo(0)->fPID) - 1)
@@ -623,14 +633,18 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
-    if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->Status() != kFinalState) continue;
+    if (!event->PartInfo(i)->fIsAlive)
+      continue;
+    if (event->PartInfo(i)->Status() != kFinalState)
+      continue;
 
     // Skip Lepton
-    if (abs(event->PartInfo(i)->fPID) == 13) continue;
+    if (abs(event->PartInfo(i)->fPID) == 13)
+      continue;
 
     // Skip Neutrons particles
-    if (event->PartInfo(i)->fPID == 2112) continue;
+    if (event->PartInfo(i)->fPID == 2112)
+      continue;
 
     int PID = event->PartInfo(i)->fPID;
 
@@ -652,8 +666,8 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 }
 
 // MOVE TO MINERVA Utils!
-// The alternative Eavailble definition takes true q0 and subtracts the kinetic energy of neutrons and pion masses
-// returns in MeV
+// The alternative Eavailble definition takes true q0 and subtracts the kinetic
+// energy of neutrons and pion masses returns in MeV
 double FitUtils::Eavailable(FitEvent *event) {
   double Eav = 0.0;
 
@@ -663,26 +677,30 @@ double FitUtils::Eavailable(FitEvent *event) {
   int ISPDG = event->GetBeamPartPDG();
 
   // For CC
-  if (event->IsCC()) q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
-  else q0 -= event->GetHMFSParticle(ISPDG)->fP.E();
+  if (event->IsCC())
+    q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
+  else
+    q0 -= event->GetHMFSParticle(ISPDG)->fP.E();
 
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
-    if (!event->PartInfo(i)->fIsAlive) continue;
-    if (event->PartInfo(i)->Status() != kFinalState) continue;
+    if (!event->PartInfo(i)->fIsAlive)
+      continue;
+    if (event->PartInfo(i)->Status() != kFinalState)
+      continue;
     int PID = event->PartInfo(i)->fPID;
 
     // Neutrons
     if (PID == 2112) {
       // Adding kinetic energy of neutron
-      Eav += FitUtils::T(event->PartInfo(i)->fP)*1000.;
+      Eav += FitUtils::T(event->PartInfo(i)->fP) * 1000.;
       // All pion masses
     } else if (abs(PID) == 211 || PID == 111) {
       Eav += event->PartInfo(i)->fP.M();
     }
   }
 
-  return q0-Eav;
+  return q0 - Eav;
 }
 
 TVector3 GetVectorInTPlane(const TVector3 &inp, const TVector3 &planarNormal) {
@@ -724,7 +742,10 @@ Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
   return GetDeltaPhiT(V_lepton, DeltaPT, Normal, PiMinus);
 }
 
-double FitUtils::Get_STV_dpt(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut, int ISPDG, bool Is0pi) {
+double FitUtils::Get_STV_dpt_protonps(FitEvent *event, double ProtonMinCut,
+                                      double ProtonMaxCut,
+                                      double ProtonCosThetaCut, int ISPDG,
+                                      bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
     return -9999;
@@ -739,8 +760,11 @@ double FitUtils::Get_STV_dpt(FitEvent *event, double ProtonMinCut, double Proton
   TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  // Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut and
+  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(
+      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+
   // Get highest momentum proton in allowed proton range
   TVector3 HadronP = Pprot.Vect();
 
@@ -756,7 +780,10 @@ double FitUtils::Get_STV_dpt(FitEvent *event, double ProtonMinCut, double Proton
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
 
-double FitUtils::Get_STV_dphit(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut, int ISPDG, bool Is0pi) {
+double FitUtils::Get_STV_dphit_protonps(FitEvent *event, double ProtonMinCut,
+                                        double ProtonMaxCut,
+                                        double ProtonCosThetaCut, int ISPDG,
+                                        bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
     return -9999;
@@ -772,8 +799,10 @@ double FitUtils::Get_STV_dphit(FitEvent *event, double ProtonMinCut, double Prot
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut and
+  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(
+      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
   TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
@@ -785,7 +814,10 @@ double FitUtils::Get_STV_dphit(FitEvent *event, double ProtonMinCut, double Prot
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
 }
 
-double FitUtils::Get_STV_dalphat(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut, int ISPDG, bool Is0pi) {
+double FitUtils::Get_STV_dalphat_protonps(FitEvent *event, double ProtonMinCut,
+                                          double ProtonMaxCut,
+                                          double ProtonCosThetaCut, int ISPDG,
+                                          bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
     return -9999;
@@ -801,8 +833,10 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, double ProtonMinCut, double Pr
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut and
+  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(
+      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
   TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
@@ -815,83 +849,15 @@ double FitUtils::Get_STV_dalphat(FitEvent *event, double ProtonMinCut, double Pr
 }
 
 // As defined in PhysRevC.95.065501
-// Using prescription from arXiv 1805.05486 
+// Using prescription from arXiv 1805.05486
 // Returns in GeV
-double FitUtils::Get_pn_reco_C(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut, int ISPDG, bool Is0pi) {
+double FitUtils::Get_pn_reco_C_protonps(FitEvent *event, double ProtonMinCut,
+                                        double ProtonMaxCut,
+                                        double ProtonCosThetaCut, int ISPDG,
+                                        bool Is0pi) {
 
-  const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
-
-  // Check that the neutrino exists
-  if (event->NumISParticle(ISPDG) == 0) {
-    return -9999;
-  }
-  // Return 0 if the proton or muon are missing
-  if (event->NumFSParticle(2212) == 0 ||
-      event->NumFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1)) == 0) {
-    return -9999;
-  }
-
-  // Now get the TVector3s for each particle
-  TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
-  TVector3 const &LeptonP =
-      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-
-  // Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) < ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
-  TVector3 HadronP = Pprot.Vect();
-
-  double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
-  double const eh = Pprot.E()/1000.;
-
-  if (!Is0pi) {
-    if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
-      return -9999;
-    }
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
-  }
-  TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
-  double dptMag = dpt.Mag()/1000.;
-
-  double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from PhysRevC.95.065501)
-  double map = ma - mn + 0.02713; // remnant mass
-
-  double pmul = LeptonP.Dot(NuP.Unit())/1000.;
-  double phl = HadronP.Dot(NuP.Unit())/1000.;
-
-  //double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
-  //double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
-
-  double R = ma + pmul + phl - el - eh;
-
-  double dpl = 0.5*R - (map*map + dptMag*dptMag)/(2*R);
-  //double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in PhysRevC.95.065501 - gives same result
-
-  double pn_reco = sqrt((dptMag*dptMag) + (dpl*dpl));
-
-  //std::cout << "Diagnostics: " << std::endl;
-  //std::cout << "mn: " << mn << std::endl;
-  //std::cout << "ma: " << ma << std::endl;
-  //std::cout << "map: " << map << std::endl;
-  //std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
-  //std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
-  //std::cout << "pmul: " << pmul << std::endl;
-  //std::cout << "phl: " << phl << std::endl;
-  //std::cout << "el: " << el << std::endl;
-  //std::cout << "eh: " << eh << std::endl;
-  //std::cout << "R: " << R << std::endl;
-  //std::cout << "dptMag: " << dptMag << std::endl;
-  //std::cout << "dpl: " << dpl << std::endl;
-  //std::cout << "pn_reco: " << pn_reco << std::endl;
-
-  return pn_reco;
-}
-
-double FitUtils::Get_pn_reco_Ar(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut, int ISPDG, bool Is0pi) {
-
-  const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
+  const double mn = PhysConst::mass_neutron; // neutron mass
+  const double mp = PhysConst::mass_proton;  // proton mass
 
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
@@ -908,12 +874,15 @@ double FitUtils::Get_pn_reco_Ar(FitEvent *event, double ProtonMinCut, double Pro
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut and
+  // ProtonMaxCut MeV with cos(theta_p) < ProtonCosThetaCut
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(
+      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
   TVector3 HadronP = Pprot.Vect();
 
-  double const el = event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E()/1000.;
-  double const eh = Pprot.E()/1000.;
+  double const el =
+      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E() / 1000.;
+  double const eh = Pprot.E() / 1000.;
 
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
@@ -923,55 +892,138 @@ double FitUtils::Get_pn_reco_Ar(FitEvent *event, double ProtonMinCut, double Pro
     HadronP += pp.Vect();
   }
   TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
-  double dptMag = dpt.Mag()/1000.;
+  double dptMag = dpt.Mag() / 1000.;
 
-  //double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from PhysRevC.95.065501)
-  //double map = ma - mn + 0.02713; // remnant mass
-  double ma = 6*mn + 6*mp - 0.34381; // target mass (E is from PhysRevC.95.065501)
+  double ma =
+      6 * mn + 6 * mp - 0.09216;  // target mass (E is from PhysRevC.95.065501)
   double map = ma - mn + 0.02713; // remnant mass
 
-  double pmul = LeptonP.Dot(NuP.Unit())/1000.;
-  double phl = HadronP.Dot(NuP.Unit())/1000.;
+  double pmul = LeptonP.Dot(NuP.Unit()) / 1000.;
+  double phl = HadronP.Dot(NuP.Unit()) / 1000.;
 
-  //double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
-  //double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
+  // double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
+  // double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
 
   double R = ma + pmul + phl - el - eh;
 
-  double dpl = 0.5*R - (map*map + dptMag*dptMag)/(2*R);
-  //double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in PhysRevC.95.065501 - gives same result
+  double dpl = 0.5 * R - (map * map + dptMag * dptMag) / (2 * R);
+  // double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in
+  // PhysRevC.95.065501 - gives same result
 
-  double pn_reco = sqrt((dptMag*dptMag) + (dpl*dpl));
+  double pn_reco = sqrt((dptMag * dptMag) + (dpl * dpl));
 
-  //std::cout << "Diagnostics: " << std::endl;
-  //std::cout << "mn: " << mn << std::endl;
-  //std::cout << "ma: " << ma << std::endl;
-  //std::cout << "map: " << map << std::endl;
-  //std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
-  //std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
-  //std::cout << "pmul: " << pmul << std::endl;
-  //std::cout << "phl: " << phl << std::endl;
-  //std::cout << "el: " << el << std::endl;
-  //std::cout << "eh: " << eh << std::endl;
-  //std::cout << "R: " << R << std::endl;
-  //std::cout << "dptMag: " << dptMag << std::endl;
-  //std::cout << "dpl: " << dpl << std::endl;
-  //std::cout << "pn_reco: " << pn_reco << std::endl;
+  // std::cout << "Diagnostics: " << std::endl;
+  // std::cout << "mn: " << mn << std::endl;
+  // std::cout << "ma: " << ma << std::endl;
+  // std::cout << "map: " << map << std::endl;
+  // std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
+  // std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
+  // std::cout << "pmul: " << pmul << std::endl;
+  // std::cout << "phl: " << phl << std::endl;
+  // std::cout << "el: " << el << std::endl;
+  // std::cout << "eh: " << eh << std::endl;
+  // std::cout << "R: " << R << std::endl;
+  // std::cout << "dptMag: " << dptMag << std::endl;
+  // std::cout << "dpl: " << dpl << std::endl;
+  // std::cout << "pn_reco: " << pn_reco << std::endl;
 
   return pn_reco;
 }
 
-// Find the highest momentum proton in the event between ProtonMinCut and ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-TLorentzVector FitUtils::GetProtonInRange(FitEvent *event, double ProtonMinCut, double ProtonMaxCut, double ProtonCosThetaCut) {
+double FitUtils::Get_pn_reco_Ar_protonps(FitEvent *event, double ProtonMinCut,
+                                         double ProtonMaxCut,
+                                         double ProtonCosThetaCut, int ISPDG,
+                                         bool Is0pi) {
+
+  const double mn = PhysConst::mass_neutron; // neutron mass
+  const double mp = PhysConst::mass_proton;  // proton mass
+
+  // Check that the neutrino exists
+  if (event->NumISParticle(ISPDG) == 0) {
+    return -9999;
+  }
+  // Return 0 if the proton or muon are missing
+  if (event->NumFSParticle(2212) == 0 ||
+      event->NumFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1)) == 0) {
+    return -9999;
+  }
+
+  // Now get the TVector3s for each particle
+  TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
+  TVector3 const &LeptonP =
+      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
+
+  // Find the highest momentum proton in the event between ProtonMinCut and
+  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = FitUtils::GetProtonInRange(
+      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  TVector3 HadronP = Pprot.Vect();
+
+  double const el =
+      event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->E() / 1000.;
+  double const eh = Pprot.E() / 1000.;
+
+  if (!Is0pi) {
+    if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
+      return -9999;
+    }
+    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += pp.Vect();
+  }
+  TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
+  double dptMag = dpt.Mag() / 1000.;
+
+  // double ma = 6*mn + 6*mp - 0.09216; // target mass (E is from
+  // PhysRevC.95.065501) double map = ma - mn + 0.02713; // remnant mass
+  double ma =
+      6 * mn + 6 * mp - 0.34381;  // target mass (E is from PhysRevC.95.065501)
+  double map = ma - mn + 0.02713; // remnant mass
+
+  double pmul = LeptonP.Dot(NuP.Unit()) / 1000.;
+  double phl = HadronP.Dot(NuP.Unit()) / 1000.;
+
+  // double pmul = GetVectorInTPlane(LeptonP, dpt).Mag()/1000.;
+  // double phl = GetVectorInTPlane(HadronP, dpt).Mag()/1000.;
+
+  double R = ma + pmul + phl - el - eh;
+
+  double dpl = 0.5 * R - (map * map + dptMag * dptMag) / (2 * R);
+  // double dpl = ((R*R)-(dptMag*dptMag)-(map*map))/(2*R); // as in in
+  // PhysRevC.95.065501 - gives same result
+
+  double pn_reco = sqrt((dptMag * dptMag) + (dpl * dpl));
+
+  // std::cout << "Diagnostics: " << std::endl;
+  // std::cout << "mn: " << mn << std::endl;
+  // std::cout << "ma: " << ma << std::endl;
+  // std::cout << "map: " << map << std::endl;
+  // std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
+  // std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
+  // std::cout << "pmul: " << pmul << std::endl;
+  // std::cout << "phl: " << phl << std::endl;
+  // std::cout << "el: " << el << std::endl;
+  // std::cout << "eh: " << eh << std::endl;
+  // std::cout << "R: " << R << std::endl;
+  // std::cout << "dptMag: " << dptMag << std::endl;
+  // std::cout << "dpl: " << dpl << std::endl;
+  // std::cout << "pn_reco: " << pn_reco << std::endl;
+
+  return pn_reco;
+}
+
+// Find the highest momentum proton in the event between ProtonMinCut and
+// ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
+TLorentzVector FitUtils::GetProtonInRange(FitEvent *event, double ProtonMinCut,
+                                          double ProtonMaxCut,
+                                          double ProtonCosThetaCut) {
   // Get the neutrino
-  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   int HMFSProton = 0;
   double HighestMomentum = 0.0;
   // Get the stack of protons
-  std::vector<FitParticle*> Protons = event->GetAllFSProton();
+  std::vector<FitParticle *> Protons = event->GetAllFSProton();
   for (size_t i = 0; i < Protons.size(); ++i) {
-    if (Protons[i]->p() > ProtonMinCut && 
-        Protons[i]->p() < ProtonMaxCut && 
+    if (Protons[i]->p() > ProtonMinCut && Protons[i]->p() < ProtonMaxCut &&
         cos(Protons[i]->P3().Angle(Pnu.Vect())) > ProtonCosThetaCut &&
         Protons[i]->p() > HighestMomentum) {
       HighestMomentum = Protons[i]->p();
@@ -984,68 +1036,76 @@ TLorentzVector FitUtils::GetProtonInRange(FitEvent *event, double ProtonMinCut, 
 }
 
 // Get Cos theta with Adler angles
-double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
+double FitUtils::CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu,
+                            TLorentzVector Ppi, TLorentzVector Pprot) {
   // Get the "resonance" lorentz vector (pion proton system)
   TLorentzVector Pres = Pprot + Ppi;
-  // Boost the particles into the resonance rest frame so we can define the x,y,z axis
+  // Boost the particles into the resonance rest frame so we can define the
+  // x,y,z axis
   Pnu.Boost(-Pres.BoostVector());
   Pmu.Boost(-Pres.BoostVector());
   Ppi.Boost(-Pres.BoostVector());
 
   // The z-axis is defined as the axis of three-momentum transfer, \vec{k}
   // Also unit normalise the axis
-  TVector3 zAxis = (Pnu.Vect()-Pmu.Vect())*(1.0/((Pnu.Vect()-Pmu.Vect()).Mag()));
+  TVector3 zAxis =
+      (Pnu.Vect() - Pmu.Vect()) * (1.0 / ((Pnu.Vect() - Pmu.Vect()).Mag()));
 
-  // Then the angle between the pion in the "resonance" rest-frame and the z-axis is the theta Adler angle
+  // Then the angle between the pion in the "resonance" rest-frame and the
+  // z-axis is the theta Adler angle
   double costhAdler = cos(Ppi.Vect().Angle(zAxis));
 
   return costhAdler;
 }
 
 // Get phi with Adler angles, a bit more complicated...
-double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot) {
+double FitUtils::PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu,
+                          TLorentzVector Ppi, TLorentzVector Pprot) {
   // Get the "resonance" lorentz vector (pion proton system)
   TLorentzVector Pres = Pprot + Ppi;
-  // Boost the particles into the resonance rest frame so we can define the x,y,z axis
+  // Boost the particles into the resonance rest frame so we can define the
+  // x,y,z axis
   Pnu.Boost(-Pres.BoostVector());
   Pmu.Boost(-Pres.BoostVector());
   Ppi.Boost(-Pres.BoostVector());
 
   // The z-axis is defined as the axis of three-momentum transfer, \vec{k}
   // Also unit normalise the axis
-  TVector3 zAxis = (Pnu.Vect()-Pmu.Vect())*(1.0/((Pnu.Vect()-Pmu.Vect()).Mag()));
+  TVector3 zAxis =
+      (Pnu.Vect() - Pmu.Vect()) * (1.0 / ((Pnu.Vect() - Pmu.Vect()).Mag()));
 
-  // The y-axis is then defined perpendicular to z and muon momentum in the resonance frame
+  // The y-axis is then defined perpendicular to z and muon momentum in the
+  // resonance frame
   TVector3 yAxis = Pnu.Vect().Cross(Pmu.Vect());
-  yAxis *= 1.0/double(yAxis.Mag());
+  yAxis *= 1.0 / double(yAxis.Mag());
 
   // And the x-axis is then simply perpendicular to z and x
   TVector3 xAxis = yAxis.Cross(zAxis);
-  xAxis *= 1.0/double(xAxis.Mag());
+  xAxis *= 1.0 / double(xAxis.Mag());
 
   // Project the pion on to x and y axes
   double x = Ppi.Vect().Dot(xAxis);
   double y = Ppi.Vect().Dot(yAxis);
 
-  double newphi = atan2(y, x)*(180./M_PI);
+  double newphi = atan2(y, x) * (180. / M_PI);
   // Convert negative angles to positive
-  if (newphi < 0.0) newphi += 360.0;
+  if (newphi < 0.0)
+    newphi += 360.0;
 
   return newphi;
 }
 
-
 //********************************************************************
 double FitUtils::ppInfK(TLorentzVector pmu, double costh, double binding,
-                          bool neutrino) {
+                        bool neutrino) {
   //********************************************************************
 
   // Convert all values to GeV
-  //const double V = binding / 1000.;           // binding potential
-  //const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
+  // const double V = binding / 1000.;           // binding potential
+  // const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton; // proton mass
   double el = pmu.E() / 1000.;
-  //double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
+  // double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
 
   double enu = EnuQErec(pmu, costh, binding, neutrino);
 
@@ -1057,20 +1117,20 @@ double FitUtils::ppInfK(TLorentzVector pmu, double costh, double binding,
 
 //********************************************************************
 TVector3 FitUtils::tppInfK(TLorentzVector pmu, double costh, double binding,
-                          bool neutrino) {
+                           bool neutrino) {
   //********************************************************************
 
   // Convert all values to GeV
-  //const double V = binding / 1000.;           // binding potential
-  //const double mn = PhysConst::mass_neutron;  // neutron mass
-  //const double mp = PhysConst::mass_proton;   // proton mass
+  // const double V = binding / 1000.;           // binding potential
+  // const double mn = PhysConst::mass_neutron;  // neutron mass
+  // const double mp = PhysConst::mass_proton;   // proton mass
   double pl_x = pmu.X() / 1000.;
   double pl_y = pmu.Y() / 1000.;
-  double pl_z= pmu.Z() / 1000.;
+  double pl_z = pmu.Z() / 1000.;
 
   double enu = EnuQErec(pmu, costh, binding, neutrino);
 
-  TVector3 tpp_inf(-pl_x, -pl_y, -pl_z+enu);
+  TVector3 tpp_inf(-pl_x, -pl_y, -pl_z + enu);
 
   return tpp_inf;
 };
@@ -1081,18 +1141,18 @@ double FitUtils::cthpInfK(TLorentzVector pmu, double costh, double binding,
   //********************************************************************
 
   // Convert all values to GeV
-  //const double V = binding / 1000.;           // binding potential
-  //const double mn = PhysConst::mass_neutron;  // neutron mass
-  const double mp = PhysConst::mass_proton;   // proton mass
+  // const double V = binding / 1000.;           // binding potential
+  // const double mn = PhysConst::mass_neutron;  // neutron mass
+  const double mp = PhysConst::mass_proton; // proton mass
   double el = pmu.E() / 1000.;
-  double pl = (pmu.Vect().Mag()) / 1000.;  // momentum of lepton
+  double pl = (pmu.Vect().Mag()) / 1000.; // momentum of lepton
 
   double enu = EnuQErec(pmu, costh, binding, neutrino);
 
   double ep_inf = enu - el + mp;
   double pp_inf = sqrt(ep_inf * ep_inf - mp * mp);
 
-  double cth_inf = (enu*enu + pp_inf*pp_inf - pl*pl)/(2*enu*pp_inf);
+  double cth_inf = (enu * enu + pp_inf * pp_inf - pl * pl) / (2 * enu * pp_inf);
 
   return cth_inf;
 };

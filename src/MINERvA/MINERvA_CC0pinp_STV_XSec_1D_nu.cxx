@@ -330,16 +330,16 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
     break;
     // Use Stephen's validated functions
   case (kNeMom):
-    fXVar = FitUtils::Get_pn_reco_C(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
+    fXVar = FitUtils::Get_pn_reco_C_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
     break;
   case (kDalphaT):
-    fXVar = FitUtils::Get_STV_dalphat(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+    fXVar = FitUtils::Get_STV_dalphat_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   case (kDpT):
-    fXVar = FitUtils::Get_STV_dpt(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
+    fXVar = FitUtils::Get_STV_dpt_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
     break;
   case (kDphiT):
-    fXVar = FitUtils::Get_STV_dphit(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+    fXVar = FitUtils::Get_STV_dphit_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   }
   return;
