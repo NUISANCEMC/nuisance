@@ -110,6 +110,18 @@ double Q2QErec(TLorentzVector Pmu, TLorentzVector Pnu, double binding,
 //! Function returns the reconstructed E_{nu} values
 double EnuQErec(double pl, double costh, double binding, bool neutrino = true);
 
+Double_t GetDeltaPhiT(TVector3 const &V_lepton, TVector3 const &V_other,
+                      TVector3 const &Normal, bool PiMinus = false);
+TVector3 GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
+                    TVector3 const &Normal);
+Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
+                        TVector3 const &Normal, bool PiMinus = false);
+double Get_STV_dpt_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
+double Get_STV_dphit_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
+double Get_STV_dalphat_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
+double Get_pn_reco_C_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
+double Get_pn_reco_Ar_HMProton(FitEvent *event, int ISPDG, bool Is0pi);
+
 /*
   CCQE1p MINERvA
 */
@@ -166,77 +178,6 @@ double EnuCC1piprec_T2K_eMB(TLorentzVector pnu, TLorentzVector pmu,
   nucleon single pion
 */
 double MpPi(TLorentzVector pp, TLorentzVector ppi);
-
-const double kDefaultSTV_ProtonMinCut = 0;
-const double kDefaultSTV_ProtonMaxCut = 100E3;
-const double kDefaultSTV_PProtonCosThetaCut = -1;
-
-/// Gets delta p T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double
-Get_STV_dpt_protonps(FitEvent *event,
-                     double ProtonMinCut = kDefaultSTV_ProtonMinCut,
-                     double ProtonMaxCut = kDefaultSTV_ProtonMaxCut,
-                     double ProtonCosThetaCut = kDefaultSTV_PProtonCosThetaCut,
-                     int ISPDG = 14, bool Is0pi = true);
-/// Gets delta phi T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double Get_STV_dphit_protonps(
-    FitEvent *event, double ProtonMinCut = kDefaultSTV_ProtonMinCut,
-    double ProtonMaxCut = kDefaultSTV_ProtonMaxCut,
-    double ProtonCosThetaCut = kDefaultSTV_PProtonCosThetaCut, int ISPDG = 14,
-    bool Is0pi = true);
-/// Gets delta alpha T as defined in Phys.Rev. C94 (2016) no.1, 015503
-double Get_STV_dalphat_protonps(
-    FitEvent *event, double ProtonMinCut = kDefaultSTV_ProtonMinCut,
-    double ProtonMaxCut = kDefaultSTV_ProtonMaxCut,
-    double ProtonCosThetaCut = kDefaultSTV_PProtonCosThetaCut, int ISPDG = 14,
-    bool Is0pi = true);
-
-inline double Get_STV_dpt(FitEvent *event, int ISPDG, bool Is0pi) {
-  return Get_STV_dpt_protonps(event, kDefaultSTV_ProtonMinCut,
-                              kDefaultSTV_ProtonMaxCut,
-                              kDefaultSTV_PProtonCosThetaCut, ISPDG, Is0pi);
-}
-inline double Get_STV_dphit(FitEvent *event, int ISPDG, bool Is0pi) {
-  return Get_STV_dphit_protonps(event, kDefaultSTV_ProtonMinCut,
-                                kDefaultSTV_ProtonMaxCut,
-                                kDefaultSTV_PProtonCosThetaCut, ISPDG, Is0pi);
-}
-inline double Get_STV_dalphat(FitEvent *event, int ISPDG, bool Is0pi) {
-  return Get_STV_dalphat_protonps(event, kDefaultSTV_ProtonMinCut,
-                                  kDefaultSTV_ProtonMaxCut,
-                                  kDefaultSTV_PProtonCosThetaCut, ISPDG, Is0pi);
-}
-
-// As defined in PhysRevC.95.065501
-// Using prescription from arXiv 1805.05486
-double Get_pn_reco_C_protonps(
-    FitEvent *event, double ProtonMinCut = kDefaultSTV_ProtonMinCut,
-    double ProtonMaxCut = kDefaultSTV_ProtonMaxCut,
-    double ProtonCosThetaCut = kDefaultSTV_PProtonCosThetaCut, int ISPDG = 14,
-    bool Is0pi = true);
-
-double Get_pn_reco_Ar_protonps(
-    FitEvent *event, double ProtonMinCut = kDefaultSTV_ProtonMinCut,
-    double ProtonMaxCut = kDefaultSTV_ProtonMaxCut,
-    double ProtonCosThetaCut = kDefaultSTV_PProtonCosThetaCut, int ISPDG = 14,
-    bool Is0pi = true);
-
-inline double Get_pn_reco_C(FitEvent *event, int ISPDG, bool Is0pi) {
-  return Get_pn_reco_C_protonps(event, kDefaultSTV_ProtonMinCut,
-                                  kDefaultSTV_ProtonMaxCut,
-                                  kDefaultSTV_PProtonCosThetaCut, ISPDG, Is0pi);
-}
-
-inline double Get_pn_reco_Ar(FitEvent *event, int ISPDG, bool Is0pi) {
-  return Get_pn_reco_Ar_protonps(event, kDefaultSTV_ProtonMinCut,
-                                 kDefaultSTV_ProtonMaxCut,
-                                 kDefaultSTV_PProtonCosThetaCut, ISPDG, Is0pi);
-}
-
-// Helper for STV; get a proton from an event within some cut range (different
-// for T2K and MINERvA)
-TLorentzVector GetProtonInRange(FitEvent *event, double ProtonMinCut,
-                                double ProtonMaxCut, double ProtonCosThetaCut);
 
 // For T2K inferred kinematics analyis - variables defined as on page 7 of T2K
 // TN287v11 (and now arXiv 1802.05078)

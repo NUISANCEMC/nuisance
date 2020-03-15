@@ -74,14 +74,11 @@ T2K_CC0pinp_STV_XSec_1Ddpt_nu::T2K_CC0pinp_STV_XSec_1Ddpt_nu(
   SetCorrelationFromRootFile(fSettings.GetCovarInput());
   // SetCovarianceFromRootFile(fSettings.GetCovarInput() );
 
-  ProtonMinCut = 450;
-  ProtonMaxCut = 1000;
-  ProtonCosThetaCut = 0.4;
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 };
 void T2K_CC0pinp_STV_XSec_1Ddpt_nu::FillEventVariables(FitEvent *event) {
-  fXVar = FitUtils::Get_STV_dpt_protonps(event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut, 14, true) / 1000.0;
+  fXVar = FitUtils::Get_STV_dpt_HMProton(event, 14, true)*1E-3;
   return;
 };
 

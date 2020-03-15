@@ -89,35 +89,24 @@ bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
     }
   }
 
-  int npicuts = 0;
-  npicuts += bool(pscuts & kPionFwdHighMom);
-  npicuts += bool(pscuts & kPionHighMom);
-  npicuts += bool(pscuts & kPionHighEff);
-
-  if (npicuts != 1) {
-    NUIS_ABORT(
-        "isCC1pip_T2K_arxiv1909_03936 signal definition passed incompatible "
-        "pion phase space cuts. Should be either kMuonHighEff, or one of "
-        "kPionFwdHighMom,kPionHighMom, or kPionHighEff");
-  }
-
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
   double cos_th_pi = cos(FitUtils::th(Pnu, Ppip));
   double p_pi = FitUtils::p(Ppip) * 1000;
 
-  if (pscuts & kPionFwdHighMom) {
-    return ((cos_th_pi > 0) && (p_pi > 200));
+
+  if ((pscuts & kPionFwd) && (cos_th_pi <= 0)) {
+    return false;
   }
 
-  if (pscuts & kPionHighMom) {
-    return (p_pi > 200);
+  if ((pscuts & kPionVFwd) && (cos_th_pi <= 0.2)) {
+    return false;
   }
 
-  if (pscuts & kMuonHighEff) {
-    return ((cos_th_pi > 0.0) && (p_pi > 200));
+  if ((pscuts & kPionHighMom) && (p_pi <= 200)) {
+    return false;
   }
 
-  return false;
+  return true;
 };
 
 bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax, int ana) {

@@ -26,11 +26,11 @@ namespace SignalDef {
 bool isCC1pip_T2K_PRD97_012001(FitEvent *event, double EnuMin, double EnuMax);
 
 enum arxiv1909_03936_PScuts {
-  kMuonFwd = (1 << 0),
-  kMuonHighEff = (1 << 1),
-  kPionFwdHighMom = (1 << 2),
-  kPionHighMom = (1 << 3),
-  kPionHighEff = (1 << 4)
+  kMuonFwd = (1 << 0), // cos(th_mu) > 0
+  kMuonHighEff = (1 << 1),  // cos(th_mu) > 0.2, pmu > 200
+  kPionFwd = (1 << 2), // cos(th_pi) > 0
+  kPionVFwd = (1 << 3), // cos(th_pi) > 0.2
+  kPionHighMom = (1 << 4) // ppi > 200
 };
 
 bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,

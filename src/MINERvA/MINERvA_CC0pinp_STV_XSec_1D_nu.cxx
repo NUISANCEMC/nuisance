@@ -26,6 +26,7 @@
 
 #include "MINERvA_CC0pinp_STV_XSec_1D_nu.h"
 #include "MINERvA_SignalDef.h"
+#include "MINERvAUtils.h"
 
 //********************************************************************
 void MINERvA_CC0pinp_STV_XSec_1D_nu::SetupDataSettings() {
@@ -313,7 +314,7 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
   // Find the highest momentum proton in the event between 450 and 1200 MeV with
   // theta_p < 70
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI));
+  TLorentzVector Pprot = MINERvAUtils::GetProtonInRange(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI));
 
   switch (fDist) {
   case (kMuonMom):
@@ -330,16 +331,16 @@ void MINERvA_CC0pinp_STV_XSec_1D_nu::FillEventVariables(FitEvent *event) {
     break;
     // Use Stephen's validated functions
   case (kNeMom):
-    fXVar = FitUtils::Get_pn_reco_C_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
+    fXVar = MINERvAUtils::Get_pn_reco_C_MINERvAPS(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
     break;
   case (kDalphaT):
-    fXVar = FitUtils::Get_STV_dalphat_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+    fXVar = MINERvAUtils::Get_STV_dalphat_MINERvAPS(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   case (kDpT):
-    fXVar = FitUtils::Get_STV_dpt_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
+    fXVar = MINERvAUtils::Get_STV_dpt_MINERvAPS(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
     break;
   case (kDphiT):
-    fXVar = FitUtils::Get_STV_dphit_protonps(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+    fXVar = MINERvAUtils::Get_STV_dphit_MINERvAPS(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
     break;
   }
   return;

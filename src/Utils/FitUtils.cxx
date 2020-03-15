@@ -716,8 +716,9 @@ TVector3 GetUnitVectorInTPlane(const TVector3 &inp,
   return GetVectorInTPlane(inp, planarNormal).Unit();
 }
 
-Double_t GetDeltaPhiT(TVector3 const &V_lepton, TVector3 const &V_other,
-                      TVector3 const &Normal, bool PiMinus = false) {
+Double_t FitUtils::GetDeltaPhiT(TVector3 const &V_lepton,
+                                TVector3 const &V_other, TVector3 const &Normal,
+                                bool PiMinus) {
   TVector3 V_lepton_T = GetUnitVectorInTPlane(V_lepton, Normal);
 
   TVector3 V_other_T = GetUnitVectorInTPlane(V_other, Normal);
@@ -726,8 +727,8 @@ Double_t GetDeltaPhiT(TVector3 const &V_lepton, TVector3 const &V_other,
                  : (M_PI - acos(V_lepton_T.Dot(V_other_T)));
 }
 
-TVector3 GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
-                    TVector3 const &Normal) {
+TVector3 FitUtils::GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
+                             TVector3 const &Normal) {
   TVector3 V_lepton_T = GetVectorInTPlane(V_lepton, Normal);
 
   TVector3 V_other_T = GetVectorInTPlane(V_other, Normal);
@@ -735,21 +736,20 @@ TVector3 GetDeltaPT(TVector3 const &V_lepton, TVector3 const &V_other,
   return V_lepton_T + V_other_T;
 }
 
-Double_t GetDeltaAlphaT(TVector3 const &V_lepton, TVector3 const &V_other,
-                        TVector3 const &Normal, bool PiMinus = false) {
+Double_t FitUtils::GetDeltaAlphaT(TVector3 const &V_lepton,
+                                  TVector3 const &V_other,
+                                  TVector3 const &Normal, bool PiMinus) {
   TVector3 DeltaPT = GetDeltaPT(V_lepton, V_other, Normal);
 
   return GetDeltaPhiT(V_lepton, DeltaPT, Normal, PiMinus);
 }
 
-double FitUtils::Get_STV_dpt_protonps(FitEvent *event, double ProtonMinCut,
-                                      double ProtonMaxCut,
-                                      double ProtonCosThetaCut, int ISPDG,
-                                      bool Is0pi) {
+double FitUtils::Get_STV_dpt_HMProton(FitEvent *event, int ISPDG, bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
     return -9999;
   }
+
   // Return 0 if the proton or muon are missing
   if (event->NumFSParticle(2212) == 0 ||
       event->NumFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1)) == 0) {
@@ -760,10 +760,9 @@ double FitUtils::Get_STV_dpt_protonps(FitEvent *event, double ProtonMinCut,
   TVector3 const &NuP = event->GetHMISParticle(ISPDG)->fP.Vect();
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
-  // Find the highest momentum proton in the event between ProtonMinCut and
-  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(
-      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut_MeV and
+  // ProtonMaxCut_MeV MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
 
   // Get highest momentum proton in allowed proton range
   TVector3 HadronP = Pprot.Vect();
@@ -774,15 +773,13 @@ double FitUtils::Get_STV_dpt_protonps(FitEvent *event, double ProtonMinCut,
       return -9999;
     }
     // Count up pion momentum
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
+    TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += ppi.Vect();
   }
   return GetDeltaPT(LeptonP, HadronP, NuP).Mag();
 }
 
-double FitUtils::Get_STV_dphit_protonps(FitEvent *event, double ProtonMinCut,
-                                        double ProtonMaxCut,
-                                        double ProtonCosThetaCut, int ISPDG,
+double FitUtils::Get_STV_dphit_HMProton(FitEvent *event, int ISPDG,
                                         bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
@@ -799,24 +796,21 @@ double FitUtils::Get_STV_dphit_protonps(FitEvent *event, double ProtonMinCut,
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and
-  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(
-      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut_MeV and
+  // ProtonMaxCut_MeV MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
   TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
+    TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += ppi.Vect();
   }
   return GetDeltaPhiT(LeptonP, HadronP, NuP);
 }
 
-double FitUtils::Get_STV_dalphat_protonps(FitEvent *event, double ProtonMinCut,
-                                          double ProtonMaxCut,
-                                          double ProtonCosThetaCut, int ISPDG,
+double FitUtils::Get_STV_dalphat_HMProton(FitEvent *event, int ISPDG,
                                           bool Is0pi) {
   // Check that the neutrino exists
   if (event->NumISParticle(ISPDG) == 0) {
@@ -833,17 +827,16 @@ double FitUtils::Get_STV_dalphat_protonps(FitEvent *event, double ProtonMinCut,
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and
-  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(
-      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  // Find the highest momentum proton in the event between ProtonMinCut_MeV and
+  // ProtonMaxCut_MeV MeV with cos(theta_p) > ProtonCosThetaCut
+  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
   TVector3 HadronP = Pprot.Vect();
   if (!Is0pi) {
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
+    TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += ppi.Vect();
   }
   return GetDeltaAlphaT(LeptonP, HadronP, NuP);
 }
@@ -851,9 +844,7 @@ double FitUtils::Get_STV_dalphat_protonps(FitEvent *event, double ProtonMinCut,
 // As defined in PhysRevC.95.065501
 // Using prescription from arXiv 1805.05486
 // Returns in GeV
-double FitUtils::Get_pn_reco_C_protonps(FitEvent *event, double ProtonMinCut,
-                                        double ProtonMaxCut,
-                                        double ProtonCosThetaCut, int ISPDG,
+double FitUtils::Get_pn_reco_C_HMProton(FitEvent *event, int ISPDG,
                                         bool Is0pi) {
 
   const double mn = PhysConst::mass_neutron; // neutron mass
@@ -874,10 +865,7 @@ double FitUtils::Get_pn_reco_C_protonps(FitEvent *event, double ProtonMinCut,
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and
-  // ProtonMaxCut MeV with cos(theta_p) < ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(
-      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
   TVector3 HadronP = Pprot.Vect();
 
   double const el =
@@ -888,8 +876,8 @@ double FitUtils::Get_pn_reco_C_protonps(FitEvent *event, double ProtonMinCut,
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
+    TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += ppi.Vect();
   }
   TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
   double dptMag = dpt.Mag() / 1000.;
@@ -930,9 +918,7 @@ double FitUtils::Get_pn_reco_C_protonps(FitEvent *event, double ProtonMinCut,
   return pn_reco;
 }
 
-double FitUtils::Get_pn_reco_Ar_protonps(FitEvent *event, double ProtonMinCut,
-                                         double ProtonMaxCut,
-                                         double ProtonCosThetaCut, int ISPDG,
+double FitUtils::Get_pn_reco_Ar_HMProton(FitEvent *event, int ISPDG,
                                          bool Is0pi) {
 
   const double mn = PhysConst::mass_neutron; // neutron mass
@@ -953,10 +939,7 @@ double FitUtils::Get_pn_reco_Ar_protonps(FitEvent *event, double ProtonMinCut,
   TVector3 const &LeptonP =
       event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.Vect();
 
-  // Find the highest momentum proton in the event between ProtonMinCut and
-  // ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-  TLorentzVector Pprot = FitUtils::GetProtonInRange(
-      event, ProtonMinCut, ProtonMaxCut, ProtonCosThetaCut);
+  TLorentzVector Pprot = event->GetHMFSParticle(2212)->fP;
   TVector3 HadronP = Pprot.Vect();
 
   double const el =
@@ -967,8 +950,8 @@ double FitUtils::Get_pn_reco_Ar_protonps(FitEvent *event, double ProtonMinCut,
     if (event->NumFSParticle(PhysConst::pdg_pions) == 0) {
       return -9999;
     }
-    TLorentzVector pp = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
-    HadronP += pp.Vect();
+    TLorentzVector ppi = event->GetHMFSParticle(PhysConst::pdg_pions)->fP;
+    HadronP += ppi.Vect();
   }
   TVector3 dpt = GetDeltaPT(LeptonP, HadronP, NuP);
   double dptMag = dpt.Mag() / 1000.;
@@ -993,46 +976,7 @@ double FitUtils::Get_pn_reco_Ar_protonps(FitEvent *event, double ProtonMinCut,
 
   double pn_reco = sqrt((dptMag * dptMag) + (dpl * dpl));
 
-  // std::cout << "Diagnostics: " << std::endl;
-  // std::cout << "mn: " << mn << std::endl;
-  // std::cout << "ma: " << ma << std::endl;
-  // std::cout << "map: " << map << std::endl;
-  // std::cout << "pmu: " << LeptonP.Mag()/1000. << std::endl;
-  // std::cout << "ph: " << HadronP.Mag()/1000. << std::endl;
-  // std::cout << "pmul: " << pmul << std::endl;
-  // std::cout << "phl: " << phl << std::endl;
-  // std::cout << "el: " << el << std::endl;
-  // std::cout << "eh: " << eh << std::endl;
-  // std::cout << "R: " << R << std::endl;
-  // std::cout << "dptMag: " << dptMag << std::endl;
-  // std::cout << "dpl: " << dpl << std::endl;
-  // std::cout << "pn_reco: " << pn_reco << std::endl;
-
   return pn_reco;
-}
-
-// Find the highest momentum proton in the event between ProtonMinCut and
-// ProtonMaxCut MeV with cos(theta_p) > ProtonCosThetaCut
-TLorentzVector FitUtils::GetProtonInRange(FitEvent *event, double ProtonMinCut,
-                                          double ProtonMaxCut,
-                                          double ProtonCosThetaCut) {
-  // Get the neutrino
-  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
-  int HMFSProton = 0;
-  double HighestMomentum = 0.0;
-  // Get the stack of protons
-  std::vector<FitParticle *> Protons = event->GetAllFSProton();
-  for (size_t i = 0; i < Protons.size(); ++i) {
-    if (Protons[i]->p() > ProtonMinCut && Protons[i]->p() < ProtonMaxCut &&
-        cos(Protons[i]->P3().Angle(Pnu.Vect())) > ProtonCosThetaCut &&
-        Protons[i]->p() > HighestMomentum) {
-      HighestMomentum = Protons[i]->p();
-      HMFSProton = i;
-    }
-  }
-  // Now get the proton
-  TLorentzVector Pprot = Protons[HMFSProton]->fP;
-  return Pprot;
 }
 
 // Get Cos theta with Adler angles

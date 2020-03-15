@@ -240,10 +240,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
 
-    dalphat = FitUtils::Get_STV_dalphat(event, PDGnu, true);
-    dpt = FitUtils::Get_STV_dpt(event, PDGnu, true);
-    dphit = FitUtils::Get_STV_dphit(event, PDGnu, true);
-    pnreco_C = FitUtils::Get_pn_reco_C(event, PDGnu, true);
+    dalphat = FitUtils::Get_STV_dalphat_HMProton(event, PDGnu, true);
+    dpt = FitUtils::Get_STV_dpt_HMProton(event, PDGnu, true);
+    dphit = FitUtils::Get_STV_dphit_HMProton(event, PDGnu, true);
+    pnreco_C = FitUtils::Get_pn_reco_C_HMProton(event, PDGnu, true);
   }
 
   // Loop over the particles and store all the final state particles in a vector
