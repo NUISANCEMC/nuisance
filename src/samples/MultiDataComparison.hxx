@@ -64,7 +64,7 @@ protected:
   std::vector<std::pair<std::string, std::unique_ptr<IDataComparison>>>
       Comparisons;
 
-  nuis::utility::KinematicRange energy_cut;
+  nuis::utility::KinematicRange fEnergyCut;
 
 public:
   MultiDataComparison(std::string name) {
@@ -80,7 +80,7 @@ public:
     fFluxDescription = "";
     fSignalDescription = "";
 
-    energy_cut = nuis::utility::KinematicRange{
+    fEnergyCut = nuis::utility::KinematicRange{
         std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};
   }
 
@@ -118,9 +118,9 @@ public:
                                                           "Unknown Signal");
     }
 
-    if ((energy_cut.first == std::numeric_limits<double>::max()) &&
+    if ((fEnergyCut.first == std::numeric_limits<double>::max()) &&
         (fGlobalConfig.has_key("enu_range"))) {
-      energy_cut = fGlobalConfig.get<std::pair<double, double>>("enu_range");
+      fEnergyCut = fGlobalConfig.get<std::pair<double, double>>("enu_range");
     }
   }
 
@@ -201,10 +201,10 @@ public:
   }
   void Write() {}
 
-  double GetGOF() {
+  double GetGOF(nuis::utility::GOFMethod GOFType) {
     double totGOF = 0;
     for (auto const &comp : Comparisons) {
-      double sGOF = comp.second->GetGOF();
+      double sGOF = comp.second->GetGOF(GOFType);
       if (sGOF != std::numeric_limits<double>::max()) {
         totGOF += sGOF;
       } else {

@@ -24,12 +24,15 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
+#include "utility/StatsUtility.hxx"
+
 #include <iomanip>
 #include <sstream>
 
 class IDataComparison : public IEventProcessor {
 public:
-  virtual double GetGOF() = 0;
+
+  virtual double GetGOF(nuis::utility::GOFMethod) = 0;
   virtual double GetNDOGuess() = 0;
 
   virtual std::string GetJournalReference() {

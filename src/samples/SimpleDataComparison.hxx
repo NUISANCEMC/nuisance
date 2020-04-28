@@ -59,19 +59,16 @@ protected:
 
   size_t NMaxSample_override;
   int fIsShapeOnly;
-  int fIsFluxUnfolded;
 
   std::vector<bool> fSignalCache;
   std::vector<std::array<NumericT, NDim>> fProjectionCache;
   bool fUseCache;
   bool fModeHists;
 
-  std::string fDataInputDescriptor;
   std::unique_ptr<HistType> fData;
-  std::string fMaskInputDescriptor;
   std::unique_ptr<HistType> fMask;
-  std::string fCovarianceInputDescriptor;
   std::unique_ptr<TH2> fCovariance;
+
   std::unique_ptr<HistType> fPrediction;
   std::map<nuis::event::Channel_t, std::unique_ptr<HistType>> fPrediction_modes;
   std::unique_ptr<HistType> fPrediction_xsec;
@@ -86,7 +83,7 @@ protected:
   std::string fFluxDescription;
   std::string fSignalDescription;
 
-  nuis::utility::KinematicRange energy_cut;
+  nuis::utility::KinematicRange fEnergyCut;
 
   std::function<bool(nuis::event::FullEvent const &)> IsSigFunc;
 
@@ -105,18 +102,17 @@ public:
     fUseCache = false;
     fWrite_directory = "";
     NMaxSample_override = std::numeric_limits<size_t>::max();
-    fDataInputDescriptor = "";
     fData = nullptr;
-    fMaskInputDescriptor = "";
     fMask = nullptr;
-    fCovarianceInputDescriptor = "";
     fCovariance = nullptr;
     fPrediction = nullptr;
     fPrediction_xsec = nullptr;
     fPrediction_shape = nullptr;
     fPrediction_comparison = nullptr;
     fComparisonFinalized = false;
+
     IsSigFunc = [](nuis::event::FullEvent const &) -> bool { return true; };
+
     CompProjFunc =
         [](nuis::event::FullEvent const &) -> std::array<NumericT, NDim> {
       std::array<NumericT, NDim> arr;
@@ -136,9 +132,8 @@ public:
     fFluxDescription = "";
     fSignalDescription = "";
     fIsShapeOnly = -1;
-    fIsFluxUnfolded = -1;
 
-    energy_cut = nuis::utility::KinematicRange{
+    fEnergyCut = nuis::utility::KinematicRange{
         std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};
   }
 
@@ -187,13 +182,10 @@ public:
     if (fIsShapeOnly == -1) {
       fIsShapeOnly = fGlobalConfig.get<bool>("shape_only", false);
     }
-    if (fIsFluxUnfolded == -1) {
-      fIsFluxUnfolded = fGlobalConfig.get<bool>("flux_unfolded", false);
-    }
 
-    if ((energy_cut.first == std::numeric_limits<double>::max()) &&
+    if ((fEnergyCut.first == std::numeric_limits<double>::max()) &&
         (fGlobalConfig.has_key("enu_range"))) {
-      energy_cut = fGlobalConfig.get<std::pair<double, double>>("enu_range");
+      fEnergyCut = fGlobalConfig.get<std::pair<double, double>>("enu_range");
     }
   }
 
@@ -205,19 +197,6 @@ public:
   virtual std::string GetSignalDescription() { return fSignalDescription; }
 
   void SetShapeOnly(bool iso) { fIsShapeOnly = iso; }
-  void SetFluxUnfolded(bool ifo) { fIsFluxUnfolded = ifo; }
-
-  void SetData(std::string const &data_descriptor) {
-    fDataInputDescriptor = data_descriptor;
-  }
-
-  void SetMask(std::string const &mask_descriptor) {
-    fMaskInputDescriptor = mask_descriptor;
-  }
-
-  void SetCovariance(std::string const &cov_descriptor) {
-    fCovarianceInputDescriptor = cov_descriptor;
-  }
 
   virtual void FillProjection(std::array<NumericT, NDim> const &proj,
                               NumericT event_weight) {
@@ -261,10 +240,10 @@ public:
       }
     }
     // If we have a flux cut
-    if (energy_cut.first != std::numeric_limits<double>::max()) {
+    if (fEnergyCut.first != std::numeric_limits<double>::max()) {
       IInputHandler const &IH =
           nuis::input::InputManager::Get().GetInputHandler(fIH_id);
-      TH_Help::Scale(fPrediction_xsec, IH.GetXSecScaleFactor(energy_cut));
+      TH_Help::Scale(fPrediction_xsec, IH.GetXSecScaleFactor(fEnergyCut));
     }
 
     fPrediction_shape =
@@ -279,9 +258,7 @@ public:
           "When Finalizing comparison, no Data histogram available.");
     }
 
-    if (fIsFluxUnfolded) {
-      // fPrediction_comparison
-    } else if (fIsShapeOnly) {
+    if (fIsShapeOnly) {
       fPrediction_comparison = nuis::utility::Clone(fPrediction_shape, false,
                                                     "Prediction_comparison");
     } else {
@@ -301,30 +278,15 @@ public:
 
     ReadGlobalConfigDefaults();
 
-    if (!fData) { // If data hasn't been set externally.
-      if (fInstanceConfig.has_key("fake_data")) {
-        fData = nuis::utility::GetHistogram<HistType>(
-            fInstanceConfig.get<std::string>("fake_data_histogram"));
-      } else if (!fGlobalConfig.get<bool>("has_data", true) ||
-                 !fInstanceConfig.get<bool>("has_data", true)) {
-        // Explicitly not expecting data
-      } else {
-        if (!fDataInputDescriptor.length()) {
-          if (!fGlobalConfig.has_key("data_descriptor")) {
-            throw invalid_SimpleDataComparison_initialization()
-                << "[ERROR]: SimpleDataComparison::Initialize for "
-                   "IDataComparison: "
-                << std::quoted(Name())
-                << " failed as no input data was set by a call to "
-                   "SimpleDataComparison::SetData and no data_descriptor for "
-                   "this SimpleDataComparison could be found in the global "
-                   "configuration.";
-          }
-          fDataInputDescriptor =
-              fGlobalConfig.get<std::string>("data_descriptor");
-        }
-        fData = nuis::utility::GetHistogram<HistType>(fDataInputDescriptor);
-      }
+    if (!fData && !(!fGlobalConfig.get<bool>("has_data", true) ||
+                    !fInstanceConfig.get<bool>("has_data", true))) {
+      throw invalid_SimpleDataComparison_initialization()
+          << "[ERROR]: SimpleDataComparison::Initialize for "
+             "IDataComparison: "
+          << std::quoted(Name())
+          << " failed as no input data histogram was set. If there is meant to "
+             "be no data please set \"has_data: false\" in the global or "
+             "instance sample configuration";
     }
 
     if (!fPrediction) {
@@ -338,24 +300,9 @@ public:
             << (!fGlobalConfig.get<bool>("has_data", true))
             << ", instance: " << !fInstanceConfig.get<bool>("has_data", true)
             << "), the instance constructor must supply the fPrediction "
-               "binning, and it wasn't.";
+               "binning, and it didn't.";
       }
       fPrediction = nuis::utility::Clone(fData, true, "Prediction");
-    }
-
-    if (fCovarianceInputDescriptor.length()) {
-      fCovariance =
-          nuis::utility::GetHistogram<TH2D>(fCovarianceInputDescriptor);
-    } else if (fGlobalConfig.has_key("covariance_descriptor")) {
-      fCovariance = nuis::utility::GetHistogram<TH2D>(
-          fGlobalConfig.get<std::string>("covariance_descriptor"));
-    }
-
-    if (fMaskInputDescriptor.length()) {
-      fMask = nuis::utility::GetHistogram<HistType>(fMaskInputDescriptor);
-    } else if (fGlobalConfig.has_key("mask_descriptor")) {
-      fMask = nuis::utility::GetHistogram<HistType>(
-          fGlobalConfig.get<std::string>("mask_descriptor"));
     }
 
     if (fInstanceConfig.has_key("verbosity")) {
@@ -464,15 +411,18 @@ public:
     }
   }
 
-  double GetGOF() {
+  double GetGOF(nuis::utility::GOFMethod GOFType) {
     if (!fComparisonFinalized) {
       FinalizeComparison();
     }
     if (fData && fPrediction_comparison) {
-      return nuis::utility::GetChi2(fData, fPrediction_comparison);
-    } else
+      return nuis::utility::GetGOF(GOFType, fData, fPrediction_comparison,
+                                   fCovariance);
+    } else {
       return std::numeric_limits<double>::max();
+    }
   }
+
   double GetNDOGuess() {
     if (fData) {
       return TH_Help::Nbins(fData);

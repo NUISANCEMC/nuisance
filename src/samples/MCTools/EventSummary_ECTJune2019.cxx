@@ -48,10 +48,16 @@ class EventSummary_ECTJune2019 : public SimpleMCStudy {
     int pdg_nu;
 
     double e_fslep;
+    double p_fslep;
     double costheta_fslep;
     int pdg_fslep;
 
+    double e_isnucleon;
+    double p_isnucleon;
+    int pdg_isnucleon;
+
     double e_hmfsproton;
+    double p_hmfsproton;
     double costheta_hmfsproton;
 
     double e_hmfspi;
@@ -59,6 +65,8 @@ class EventSummary_ECTJune2019 : public SimpleMCStudy {
     int pdg_hmfspi;
 
     double dpt;
+    double dptx;
+    double dpty;
     double dat;
     double dphit;
     double dpt_mnv;
@@ -71,6 +79,10 @@ class EventSummary_ECTJune2019 : public SimpleMCStudy {
     double EAvailProxy;
     double Q2;
     double W_rec;
+
+    double EMiss;
+    double TRecRemnant;
+    double PMiss;
 
     int mode;
 
@@ -123,10 +135,16 @@ public:
     EvSumTree->Branch("pdg_nu", &es.pdg_nu, "pdg_nu/I");
 
     EvSumTree->Branch("e_fslep", &es.e_fslep, "e_fslep/D");
+    EvSumTree->Branch("p_fslep", &es.p_fslep, "p_fslep/D");
     EvSumTree->Branch("costheta_fslep", &es.costheta_fslep, "costheta_fslep/D");
     EvSumTree->Branch("pdg_fslep", &es.pdg_fslep, "pdg_fslep/I");
 
+    EvSumTree->Branch("e_isnucleon", &es.e_isnucleon, "e_isnucleon/D");
+    EvSumTree->Branch("p_isnucleon", &es.p_isnucleon, "p_isnucleon/D");
+    EvSumTree->Branch("pdg_isnucleon", &es.pdg_isnucleon, "pdg_isnucleon/I");
+
     EvSumTree->Branch("e_hmfsproton", &es.e_hmfsproton, "e_hmfsproton/D");
+    EvSumTree->Branch("p_hmfsproton", &es.p_hmfsproton, "p_hmfsproton/D");
     EvSumTree->Branch("costheta_hmfsproton", &es.costheta_hmfsproton,
                       "costheta_hmfsproton/D");
 
@@ -136,6 +154,8 @@ public:
     EvSumTree->Branch("pdg_hmfspi", &es.pdg_hmfspi, "pdg_hmfspi/I");
 
     EvSumTree->Branch("dpt", &es.dpt, "dpt/D");
+    EvSumTree->Branch("dptx", &es.dptx, "dptx/D");
+    EvSumTree->Branch("dpty", &es.dpty, "dpty/D");
     EvSumTree->Branch("dat", &es.dat, "dat/D");
     EvSumTree->Branch("dphit", &es.dphit, "dphit/D");
     EvSumTree->Branch("dpt_mnv", &es.dpt_mnv, "dpt_mnv/D");
@@ -147,6 +167,10 @@ public:
     EvSumTree->Branch("EAvailProxy", &es.EAvailProxy, "EAvailProxy/D");
     EvSumTree->Branch("Q2", &es.Q2, "Q2/D");
     EvSumTree->Branch("W_rec", &es.W_rec, "W_rec/D");
+
+    EvSumTree->Branch("EMiss", &es.EMiss, "EMiss/D");
+    EvSumTree->Branch("TRecRemnant", &es.TRecRemnant, "TRecRemnant/D");
+    EvSumTree->Branch("PMiss", &es.PMiss, "PMiss/D");
 
     EvSumTree->Branch("mode", &es.mode, "mode/I");
 
@@ -236,25 +260,75 @@ public:
       Particle FSProton = GetHMFSProton(ev);
       if (!FSProton) {
         es.e_hmfsproton = 0;
+        es.p_hmfsproton = 0;
         es.costheta_hmfsproton = 0;
       } else {
         es.e_hmfsproton = FSProton.E();
+        es.p_hmfsproton = FSProton.P();
         es.costheta_hmfsproton = FSProton.CosTheta();
       }
 
-      es.dpt = GetDeltaPT_CC0PiN(ev, ISNu.pdg).Mag();
-      es.dat = GetDeltaPhiT_CC0PiN(ev, ISNu.pdg);
-      es.dphit = GetDeltaAlphaT_CC0PiN(ev, ISNu.pdg);
+      TLorentzVector EMTransfer_lep = GetEnergyMomentumTransfer(ev);
+
+      TVector3 qT = EMTransfer_lep.Vect();
+      qT[2] = 0;
+      qT = qT.Unit();
+
+      TVector3 qTPerp = TVector3(0, 0, 1).Cross(qT);
+
+      TVector3 dpt = GetDeltaPT_CC0PiN(ev, ISNu.pdg);
+
+      es.dpt = dpt.Mag();
+      es.dptx = dpt.Dot(qTPerp);
+      es.dpty = dpt.Dot(qT);
+      es.dat = GetDeltaAlphaT_CC0PiN(ev, ISNu.pdg);
+      es.dphit = GetDeltaPhiT_CC0PiN(ev, ISNu.pdg);
       es.dpt_mnv = mnv::GetDeltaPT_CC0PiN_mnv(ev).Mag();
       es.dat_mnv = mnv::GetDeltaAlphaT_CC0PiN_mnv(ev);
       es.dphit_mnv = mnv::GetDeltaPhiT_CC0PiN_mnv(ev);
       es.pn_mnv = mnv::GetNeutronMomentumReco_CC0PiN_mnv(ev);
       es.EAvailProxy = GetEAvailProxy(ev);
-      TLorentzVector EMTransfer_lep = GetEnergyMomentumTransfer(ev);
       es.Q2 = -EMTransfer_lep.Mag2();
       es.q0 = EMTransfer_lep.E();
       es.q3 = EMTransfer_lep.Vect().Mag();
       es.W_rec = GetNeutrinoWRec(ev);
+
+      Particle FSNuc = GetHMFSNucleon(ev);
+      if (!FSNuc) {
+        return;
+      }
+
+      Particle ISNuc = GetHMISParticle(ev, {2212, 2112});
+      if (!ISNuc) {
+        return;
+      }
+
+      es.pdg_isnucleon = ISNuc.pdg;
+      es.e_isnucleon = ISNuc.E();
+      es.p_isnucleon = ISNuc.P();
+
+      TVector3 pRemnant_rec = EMTransfer_lep.Vect() - FSNuc.P3();
+      TVector3 pRemnant_IA = -ISNuc.P3();
+      static double const MC12_MeV = 12.017 * 931.494;
+      double MAPrime;
+      TLorentzVector PRemnant_rec;
+      if (ISNu.pdg > 0) {
+        static double const MC11_MeV = 11.0114336 * 931.494;
+        MAPrime = MC11_MeV;
+        PRemnant_rec.SetXYZM(pRemnant_rec[0], pRemnant_rec[1], pRemnant_rec[2],
+                             MC11_MeV);
+
+      } else {
+        static double const MB11_MeV = 11.0093054 * 931.494;
+        MAPrime = MB11_MeV;
+        PRemnant_rec.SetXYZM(pRemnant_rec[0], pRemnant_rec[1], pRemnant_rec[2],
+                             MB11_MeV);
+      }
+      es.TRecRemnant = PRemnant_rec.E() - PRemnant_rec.M();
+
+      es.EMiss = EMTransfer_lep.E() + GetPDGMass(ISNuc.pdg) - FSNuc.E() -
+                 es.TRecRemnant;
+      es.PMiss = ((EMTransfer_lep - FSNuc.P4).Vect()).Mag();
 
       es.mode = ChannelToInt(ev.mode);
 

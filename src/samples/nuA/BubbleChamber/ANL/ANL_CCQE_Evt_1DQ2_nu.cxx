@@ -83,21 +83,21 @@ public:
     switch (Pub) {
     case kPRL31: {
       Pub_str = "PRL31_844";
-      energy_cut = std::pair<double, double>{0, 3E3};
+      fEnergyCut = std::pair<double, double>{0, 3E3};
       IEventProcessor_INFO(
           "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD16: {
       Pub_str = "PRD16_3103";
-      energy_cut = std::pair<double, double>{0, 6E3};
+      fEnergyCut = std::pair<double, double>{0, 6E3};
       IEventProcessor_INFO(
           "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
     }
     case kPRD26: {
       Pub_str = "PRD26_537";
-      energy_cut = std::pair<double, double>{0, 6E3};
+      fEnergyCut = std::pair<double, double>{0, 6E3};
       IEventProcessor_INFO(
           "Sample " << Name() << " specialized for publication: " << Pub_str);
       break;
@@ -141,7 +141,7 @@ public:
         return false;
       }
 
-      if (!energy_cut.IsInRange(ISNumu.P4.E())) {
+      if (!fEnergyCut.IsInRange(ISNumu.P4.E())) {
         return false;
       }
 
