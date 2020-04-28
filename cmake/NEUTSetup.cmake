@@ -19,8 +19,6 @@
 
 find_program(NEUTCONFIGFOUND NAMES neut-config)
 
-LIST(APPEND EXTRA_CXX_FLAGS -DNEED_FILL_NEUT_COMMONS)
-
 SET(HAVENEUTCONFIG FALSE)
 # We are dealing with shiny NEUT
 if(NOT "${NEUTCONFIGFOUND} " STREQUAL " ")
@@ -42,6 +40,9 @@ if(HAVENEUTCONFIG)
   execute_process (COMMAND neut-config
     --libdir OUTPUT_VARIABLE NEUT_LINK_DIRS
              OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  execute_process (COMMAND neut-config
+  --has-feature common-iface RESULT_VARIABLE NEUT_HAS_COMMONIFACE)
 
   GETLIBDIRS(neut-config --cernflags CERN_LIB_DIR)
   LIST(APPEND NEUT_LINK_DIRS ${CERN_LIB_DIR})
@@ -67,6 +68,12 @@ if(HAVENEUTCONFIG)
 
   LIST(APPEND NEUT_CXX_FLAGS -DUSE_NEUT -DNEUT_VERSION=${NEUT_VERSION})
 
+  if( "${NEUT_HAS_COMMONIFACE}" STREQUAL "0" )
+    LIST(APPEND NEUT_CXX_FLAGS -DNEUT_USE_COMMONIFACE)
+  else()
+    LIST(APPEND NEUT_CXX_FLAGS -DNEED_FILL_NEUT_COMMONS)
+  endif()
+
   cmessage(STATUS "NEUT")
   cmessage(STATUS "     Version   : ${NEUT_VERSION}")
   cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
@@ -76,6 +83,8 @@ if(HAVENEUTCONFIG)
 
 
 else() # Everything better be set up already
+  LIST(APPEND EXTRA_CXX_FLAGS -DNEED_FILL_NEUT_COMMONS)
+
   if(NEUT_ROOT STREQUAL "")
     cmessage(FATAL_ERROR "Variable NEUT_ROOT is not defined. Please export environment variable NEUT_ROOT or configure with -DNEUT_ROOT=/path/to/NEUT. This must be set to point to a prebuilt NEUT instance.")
   endif()
