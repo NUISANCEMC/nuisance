@@ -62,5 +62,6 @@ void T2K_CC1pip_CH_XSec_1Dthpi_nu::FillEventVariables(FitEvent *event) {
 bool T2K_CC1pip_CH_XSec_1Dthpi_nu::isSignal(FitEvent *event) {
   //********************************************************************
   return SignalDef::isCC1pip_T2K_arxiv1909_03936(
-      event, EnuMin, EnuMax, SignalDef::kMuonHighEff | SignalDef::kPionFwdHighMom);
+      event, EnuMin, EnuMax,
+      SignalDef::kMuonHighEff | SignalDef::kPionFwd | SignalDef::kPionHighMom);
 }

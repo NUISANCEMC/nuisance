@@ -1,12 +1,11 @@
 #include <iomanip>
 
-#include "T2K_SignalDef.h"
 #include "T2K_CC1pip_CH_XSec_1Dppi_nu.h"
-
+#include "T2K_SignalDef.h"
 
 //********************************************************************
 T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
-//********************************************************************
+  //********************************************************************
 
   // Sample overview ---------------------------------------------------
   std::string descrip = "T2K_CC1pip_CH_XSec_nu sample. \n"
@@ -30,29 +29,32 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor =  (GetEventHistogram()->Integral("width") * 1E-38) / double(fNEvents) / TotalIntegratedFlux("width");
+  fScaleFactor = (GetEventHistogram()->Integral("width") * 1E-38) /
+                 double(fNEvents) / TotalIntegratedFlux("width");
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromRootFile(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/MomentumPion.rootout.root", "Momentum_pion");
-  SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() + "/data/T2K/CC1pip/CH/MomentumPion.rootout.root", "Momentum_pionCov");
-  
+  SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
+                          "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                      "Momentum_pion");
+  SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
+                           "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                       "Momentum_pionCov");
+
   SetShapeCovar();
   fDataHist->Scale(1E-38);
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
-
 };
 
 void T2K_CC1pip_CH_XSec_1Dppi_nu::FillEventVariables(FitEvent *event) {
 
-  if (event->NumFSParticle(13) == 0 ||
-      event->NumFSParticle(211) == 0)
+  if (event->NumFSParticle(13) == 0 || event->NumFSParticle(211) == 0)
     return;
 
-  TLorentzVector Pnu  = event->GetNeutrinoIn()->fP;
+  TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
   TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
-  TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
   double ppip = FitUtils::p(Ppip);
 
@@ -63,8 +65,7 @@ void T2K_CC1pip_CH_XSec_1Dppi_nu::FillEventVariables(FitEvent *event) {
 
 //********************************************************************
 bool T2K_CC1pip_CH_XSec_1Dppi_nu::isSignal(FitEvent *event) {
-//********************************************************************
+  //********************************************************************
   return SignalDef::isCC1pip_T2K_arxiv1909_03936(
-      event, EnuMin, EnuMax, SignalDef::kMuonHighEff | SignalDef::kPionFwdHighMom);
+      event, EnuMin, EnuMax, SignalDef::kMuonHighEff | SignalDef::kPionVFwd);
 }
-

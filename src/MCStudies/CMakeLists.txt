@@ -30,6 +30,7 @@ OfficialNIWGPlots.cxx
 Smearceptance_Tester.cxx
 Simple_Osc.cxx
 Smear_SVDUnfold_Propagation_Osc.cxx
+SigmaEnuHists.cxx
 )
 
 set(HEADERFILES
@@ -46,6 +47,7 @@ OfficialNIWGPlots.h
 Smearceptance_Tester.h
 Simple_Osc.h
 Smear_SVDUnfold_Propagation_Osc.h
+SigmaEnuHists.h
 )
 
 set(LIBNAME MCStudies)

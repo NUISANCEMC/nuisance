@@ -2,7 +2,7 @@
 #include "HepMCTextInputHandler.h"
 
 HepMCTextInputHandler::~HepMCTextInputHandler(){
-                                                                                                                                                                         
+
 };
 
 
@@ -77,12 +77,12 @@ FitEvent* HepMCTextInputHandler::GetNuisanceEvent(const UInt_t entry) {
       fASCIIStream.seekg(0);
       fHepMCEvent.read(fASCIIStream);
     }
-    
+
     // Loop to event before if reading forwards
     while (fHepMCEvent.event_number() < entry - 1 and fASCIIStream){
       fHepMCEvent.read(fASCIIStream);
     }
-    
+
     fHepMCEvent.read(fASCIIStream);
   }
 
@@ -92,10 +92,10 @@ FitEvent* HepMCTextInputHandler::GetNuisanceEvent(const UInt_t entry) {
   } else {
     fNUISANCEEvent->InputWeight = 1.0;
   }
-  
+
   // Run NUISANCE Vector Filler
   CalcNUISANCEKinematics();
-  
+
   // Return event pointer
   return fNUISANCEEvent;
 }
@@ -126,20 +126,20 @@ void HepMCTextInputHandler::CalcNUISANCEKinematics() {
 	  int curpart = fNUISANCEEvent->fNParticles;
 	  fNUISANCEEvent->fParticleState[curpart] = state;
 
-	  // Mom                                                                                                                                                                                                                      
+	  // Mom
 	  //	  fNUISANCEEvent->fParticleMom[curpart][0] = vect.px();
 	  //	  fNUISANCEEvent->fParticleMom[curpart][1] = vect.py();
 	  //	  fNUISANCEEvent->fParticleMom[curpart][2] = vect.pz();
 	  //	  fNUISANCEEvent->fParticleMom[curpart][3] = vect.e();
 
-	  // PDG                                                                                                                                                                                                                      
+	  // PDG
 	  fNUISANCEEvent->fParticlePDG[curpart] = pdg;
 
-	  // Add up particle count                                                                                                                                                                                                    
+	  // Add up particle count
 	  fNUISANCEEvent->fNParticles++;
 
 	}
-	
+
 		// Run Initial, FSI, Final, Other ordering.
 	fNUISANCEEvent-> OrderStack();
 	return;

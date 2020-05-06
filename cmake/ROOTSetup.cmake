@@ -55,6 +55,7 @@ LIST(APPEND ROOT_LIBS
   Postscript
   Matrix
   Physics
+  MathMore
   MathCore
   Thread
   EG

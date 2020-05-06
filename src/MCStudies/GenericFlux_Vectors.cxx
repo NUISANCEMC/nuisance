@@ -23,6 +23,10 @@
 #include "MINERvA_SignalDef.h"
 #endif
 
+#ifndef __NO_T2K__
+#include "T2K_SignalDef.h"
+#endif
+
 GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
                                          std::string inputfile, FitWeight *rw,
                                          std::string type,
@@ -241,10 +245,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
 
-    dalphat = FitUtils::Get_STV_dalphat(event, PDGnu, true);
-    dpt = FitUtils::Get_STV_dpt(event, PDGnu, true);
-    dphit = FitUtils::Get_STV_dphit(event, PDGnu, true);
-    pnreco_C = FitUtils::Get_pn_reco_C(event, PDGnu, true);
+    dalphat = FitUtils::Get_STV_dalphat_HMProton(event, PDGnu, true);
+    dpt = FitUtils::Get_STV_dpt_HMProton(event, PDGnu, true);
+    dphit = FitUtils::Get_STV_dphit_HMProton(event, PDGnu, true);
+    pnreco_C = FitUtils::Get_pn_reco_C_HMProton(event, PDGnu, true);
   }
 
   // Loop over the particles and store all the final state particles in a vector
@@ -260,7 +264,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     if (SavePreFSI && event->PartInfo(i)->IsInitialState())
       initList.push_back(event->PartInfo(i));
 
-    if(event->PartInfo(i)->IsInitialState()){
+    if (event->PartInfo(i)->IsInitialState()) {
       ISP4 += event->PartInfo(i)->fP;
     }
   }
@@ -388,6 +392,10 @@ void GenericFlux_Vectors::ResetVariables() {
 #ifndef __NO_MINERvA__
   flagCC0piMINERvA = false;
 #endif
+#ifndef __NO_T2K__
+  flagCC0Pi_T2K_AnaI = false;
+  flagCC0Pi_T2K_AnaII = false;
+#endif
 }
 
 //********************************************************************
@@ -416,6 +424,12 @@ void GenericFlux_Vectors::FillSignalFlags(FitEvent *event) {
   flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
 #ifndef __NO_MINERvA__
   flagCC0piMINERvA = SignalDef::isCC0pi_MINERvAPTPZ(event, 14);
+#endif
+#ifndef __NO_T2K__
+  flagCC0Pi_T2K_AnaI =
+      SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, SignalDef::kAnalysis_I);
+  flagCC0Pi_T2K_AnaII =
+      SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, SignalDef::kAnalysis_II);
 #endif
 }
 
@@ -447,6 +461,12 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
 #ifndef __NO_MINERvA__
   eventVariables->Branch("flagCC0piMINERvA", &flagCC0piMINERvA,
                          "flagCC0piMINERvA/O");
+#endif
+#ifndef __NO_T2K__
+  eventVariables->Branch("flagCC0Pi_T2K_AnaI", &flagCC0Pi_T2K_AnaI,
+                         "flagCC0Pi_T2K_AnaI/O");
+  eventVariables->Branch("flagCC0Pi_T2K_AnaII", &flagCC0Pi_T2K_AnaII,
+                         "flagCC0Pi_T2K_AnaII/O");
 #endif
 };
 

@@ -80,6 +80,12 @@ CheckAndSetDefaultCache(USE_REWEIGHT TRUE BOOL "Whether we are expect to be able
 
 CheckAndSetDefaultCache(USE_ROOT6 FALSE INTERNAL "Whether we are using the ROOT 6. <FALSE>")
 
+CheckAndSetDefaultCache(USE_HEPMCNUEVT FALSE BOOL "Whether to enable HepMC3 input support. <FALSE>")
+
+CheckAndSetDefaultCache(USE_NUSYST FALSE BOOL "Whether to enable DUNE Reweight  support. <FALSE>")
+CheckAndSetDefaultEnv(NUSYST_ROOT "" PATH "Path to nusystematics install directory <>" NUSYST_ROOT)
+CheckAndSetDefaultEnv(SYSTTOOLS_ROOT "" PATH "Path to systematicstools install directory <>" SYSTTOOLS_ROOT)
+
 CheckAndSetDefaultCache(USE_HEPMC FALSE BOOL "Whether to enable HepMC input support. <FALSE>")
 CheckAndSetDefaultEnv(HEPMC "" PATH "Path to HepMC source tree root directory. Overrides environment variable \$HEPMC <>" HEPMC)
 CheckAndSetDefaultCache(HEPMC_MOMUNIT "GEV" STRING "HepMC momentum units [MEV|GEV]. <GEV>")
@@ -105,6 +111,7 @@ CheckAndSetDefaultCache(GENIE_VERSION "AUTO" STRING "GENIE Version <AUTO>")
 CheckAndSetDefaultEnv(GENIE "" PATH "Path to GENIE source tree root directory. Overrides environment variable \$GENIE <>" GENIE)
 CheckAndSetDefaultEnv(GENIE_REWEIGHT "" PATH "Path to GENIE ReWeight directory. Only relevant for GENIE v3+. Overrides environment variable \$GENIE_REWEIGHT <>" GENIE_REWEIGHT)
 CheckAndSetDefaultCache(GENIE_EMPMEC_REWEIGHT FALSE BOOL "Whether to use GENIE EMP MEC reweight (requires custom GENIE) <FALSE>")
+CheckAndSetDefaultCache(USE_GENIE_XSECMEC FALSE BOOL "Whether to use GENIE MEC reweight (requires custom GENIE) <FALSE>")
 CheckAndSetDefaultEnv(LHAPDF_LIB "" PATH "Path to pre-built LHAPDF libraries. Overrides environment variable \$LHAPDF_LIB. <>" LHAPDF_LIB)
 CheckAndSetDefaultEnv(LHAPDF_INC "" PATH "Path to installed LHAPDF headers. Overrides environment variable \$LHAPDF_INC. <>" LHAPDF_INC)
 CheckAndSetDefaultEnv(LHAPATH "" PATH "Path to LHA PDF inputs. Overrides environment variable \$LHAPATH. <>" LHAPATH)

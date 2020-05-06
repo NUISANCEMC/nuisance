@@ -3,7 +3,7 @@
 #include "WeightEngineBase.h"
 
 namespace novarwgt {
-class IWeightGenerator;
+class ISystKnob;
 class Tune;
 }
 
@@ -31,11 +31,11 @@ public:
   double CalcWeight(BaseFitEvt *evt);
   bool NeedsEventReWeight() { return true; }
 
-  std::map<size_t, size_t> fWeightEngineEnums;
-  std::vector<novarwgt::IWeightGenerator *> fWeightEngines;
-  std::vector<double> fWeightEngineValues;
-
   std::map<size_t, size_t> fTuneEnums;
   std::vector<novarwgt::Tune const *> fTunes;
   std::vector<double> fTuneValues;
+
+  std::map<size_t, size_t> fKnobEnums;
+  std::vector<novarwgt::ISystKnob const *> fKnobs;
+  std::vector<double> fKnobValues;
 };
