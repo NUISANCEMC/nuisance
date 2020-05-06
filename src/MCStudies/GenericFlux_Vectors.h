@@ -95,6 +95,7 @@ public:
   float EavAlt;
   float dalphat;
   float W_genie;
+  float Ws_genie;
   float dpt;
   float dphit;
   float pnreco_C;

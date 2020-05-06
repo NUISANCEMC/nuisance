@@ -125,6 +125,7 @@ void GenericFlux_Vectors::AddEventVariablesToTree() {
   eventVariables->Branch("W_nuc_rest", &W_nuc_rest, "W_nuc_rest/F");
   eventVariables->Branch("W", &W, "W/F");
   eventVariables->Branch("W_genie", &W_genie, "W_genie/F");
+  eventVariables->Branch("Ws_genie", &Ws_genie, "Ws_genie/F");
   eventVariables->Branch("x", &x, "x/F");
   eventVariables->Branch("y", &y, "y/F");
   eventVariables->Branch("Eav", &Eav, "Eav/F");
@@ -316,6 +317,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     const Interaction *interaction = gevent->Summary();
     const Kinematics &kine = interaction->Kine();
     W_genie = kine.W();
+    Ws_genie = kine.W(true);
   }
 #endif
 
