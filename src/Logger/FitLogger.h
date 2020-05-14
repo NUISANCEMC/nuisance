@@ -94,8 +94,8 @@ extern std::ostream *__LOG_outstream;
 /// 4 REC - Output during each reconfigure. Percentage progress etc.
 /// 5 SIG - Output during every signal event that is found.
 /// 6 EVT - Output during every event.
-/// -1 DEB - Will print only debugging info wherever a NUIS_LOG(DEB) statement was
-/// made
+/// 7 DEB - Will print only debugging info wherever a NUIS_LOG(DEB) statement
+/// was made
 enum __LOG_levels { QUIET = 0, FIT, MIN, SAM, REC, SIG, EVT, DEB };
 
 /// Returns log level for a given file/function
@@ -108,9 +108,9 @@ std::ostream &__OUTLOG(int level, const char *filename, const char *funct,
                        int line);
 
 /// Global Logging Definitions
-#define NUIS_LOGN(level, stream)                                                   \
+#define NUIS_LOGN(level, stream)                                               \
   {                                                                            \
-    if (LOG_LEVEL(level)) {                   \
+    if (LOG_LEVEL(level)) {                                                    \
       __OUTLOG(level, __FILENAME__, __FUNCTION__, __LINE__) << stream;         \
     }                                                                          \
   };
@@ -120,7 +120,7 @@ std::ostream &__OUTLOG(int level, const char *filename, const char *funct,
 
 #define BREAK(level)                                                           \
   {                                                                            \
-    \ if (LOG_LEVEL(level)) {                 \
+    \ if (LOG_LEVEL(level)) {                                                  \
       __OUTLOG(level, __FILENAME__, __FUNCTION__, __LINE__) << std::endl;      \
     }                                                                          \
   };
@@ -139,8 +139,6 @@ void SETERRVERBOSITY(int level);
 
 /// Set Global Verbosity from String
 void SETERRVERBOSITY(std::string verb);
-
-
 
 /// Set Trace Option
 void SETTRACE(bool val);
@@ -162,7 +160,7 @@ std::ostream &__OUTERR(int level, const char *filename, const char *funct,
                        int line);
 
 /// Error Logging Function
-#define NUIS_ERR(level, stream)                                                  \
+#define NUIS_ERR(level, stream)                                                \
   {                                                                            \
     __OUTERR(level, __FILENAME__, __FUNCTION__, __LINE__)                      \
         << stream << std::endl;                                                \
@@ -170,7 +168,7 @@ std::ostream &__OUTERR(int level, const char *filename, const char *funct,
 
 // ----------- ERROR HANDLING ------------- //
 /// Exit the program with given error message stream
-#define NUIS_ABORT(stream)                                                         \
+#define NUIS_ABORT(stream)                                                     \
   {                                                                            \
     __OUTERR(FTL, __FILENAME__, __FUNCTION__, __LINE__)                        \
         << stream << std::endl;                                                \

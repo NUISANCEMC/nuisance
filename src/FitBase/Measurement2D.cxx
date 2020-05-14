@@ -199,14 +199,6 @@ void Measurement2D::FinaliseSampleSettings() {
 
   EnuMin = GeneralUtils::StrToDbl(fSettings.GetS("enu_min"));
   EnuMax = GeneralUtils::StrToDbl(fSettings.GetS("enu_max"));
-
-  if (fAddNormPen) {
-    fNormError = fSettings.GetNormError();
-    if (fNormError <= 0.0) {
-      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
-      NUIS_ABORT("If you want to use it please add fNormError=VAL");
-    }
-  }
 }
 
 void Measurement2D::CreateDataHistogram(int dimx, double *binx, int dimy,
@@ -499,6 +491,23 @@ void Measurement2D::SetCholDecompFromRootFile(std::string covfile,
   delete trans;
 }
 
+void Measurement2D::SetShapeCovar() {
+
+  // Return if this is missing any pre-requisites
+  if (!fFullCovar)
+    return;
+  if (!fDataHist)
+    return;
+
+  // Also return if it's bloody stupid under the circumstances
+  if (fIsDiag)
+    return;
+
+  fShapeCovar =
+      StatUtils::ExtractShapeOnlyCovar(fFullCovar, fDataHist, fMapHist);
+  return;
+}
+
 //********************************************************************
 void Measurement2D::ScaleData(double scale) {
   //********************************************************************
@@ -615,6 +624,32 @@ void Measurement2D::FinaliseMeasurement() {
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   }
 
+  // If shape only, set covar and fDecomp using the shape-only matrix (if set)
+  if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
+    if (covar)
+      delete covar;
+    covar = StatUtils::GetInvert(fShapeCovar);
+    if (fDecomp)
+      delete fDecomp;
+    fDecomp = StatUtils::GetDecomp(fFullCovar);
+
+    fUseShapeNormDecomp = FitPar::Config().GetParB("UseShapeNormDecomp");
+    if (fUseShapeNormDecomp) {
+      fNormError = 0;
+
+      // From https://arxiv.org/pdf/2003.00088.pdf
+      for (int i = 0; i < fFullCovar->GetNcols(); ++i) {
+        for (int j = 0; j < fFullCovar->GetNcols(); ++j) {
+          fNormError += (*fFullCovar)[i][j];
+        }
+      }
+
+      NUIS_LOG(SAM, "Sample: " << fName
+                               << ", using shape/norm decomp with norm error: "
+                               << fNormError);
+    }
+  }
+
   // Setup fMCHist from data
   fMCHist = (TH2D *)fDataHist->Clone();
   fMCHist->SetNameTitle((fSettings.GetName() + "_MC").c_str(),
@@ -678,6 +713,16 @@ void Measurement2D::FinaliseMeasurement() {
                                                         << __LINE__);
     NUIS_ERR(FTL, "fScaleFactor = " << fScaleFactor);
     NUIS_ABORT("EXITING");
+  }
+
+  if (fAddNormPen) {
+    if (!fUseShapeNormDecomp) {
+      fNormError = fSettings.GetNormError();
+    }
+    if (fNormError <= 0.0) {
+      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
+      NUIS_ABORT("If you want to use it please add fNormError=VAL");
+    }
   }
 
   // Create and fill Weighted Histogram
@@ -1071,11 +1116,40 @@ double Measurement2D::GetLikelihood() {
 
   // Add a normal penalty term
   if (fAddNormPen) {
-    chi2 +=
-        (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) / (fNormError * fNormError);
-    NUIS_LOG(REC, "Norm penalty = " << (1 - (fCurrentNorm)) *
-                                           (1 - (fCurrentNorm)) /
-                                           (fNormError * fNormError));
+    if (fUseShapeNormDecomp) { // if shape norm, then add the norm penalty from
+                               // https://arxiv.org/pdf/2003.00088.pdf
+
+      TH2 *masked_data = StatUtils::ApplyHistogramMasking(fDataHist, fMaskHist);
+      TH2 *masked_mc = StatUtils::ApplyHistogramMasking(fMCHist, fMaskHist);
+      masked_mc->Scale(scaleF);
+
+      NUIS_LOG(REC, "ShapeNormDecomp: mcinteg: "
+                           << masked_mc->Integral() * 1E38
+                           << ", datainteg: " << masked_data->Integral() * 1E38
+                           << ", normerror: " << fNormError);
+
+      double normpen =
+          std::pow((masked_data->Integral() - masked_mc->Integral()) * 1E38,
+                   2) /
+          fNormError;
+
+      masked_data->SetDirectory(NULL);
+      delete masked_data;
+      masked_mc->SetDirectory(NULL);
+      delete masked_mc;
+
+      NUIS_LOG(REC, "Using Shape/Norm decomposition: Norm penalty "
+                        << normpen << " on shape penalty of " << chi2);
+      chi2 += normpen;
+
+    } else {
+
+      chi2 += (1 - (fCurrentNorm)) * (1 - (fCurrentNorm)) /
+              (fNormError * fNormError);
+      NUIS_LOG(SAM, "Norm penalty = " << (1 - (fCurrentNorm)) *
+                                             (1 - (fCurrentNorm)) /
+                                             (fNormError * fNormError));
+    }
   }
 
   // Adjust the shape back to where it was.

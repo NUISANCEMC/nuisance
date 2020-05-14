@@ -225,7 +225,10 @@ too ,any opportunities for mistakes.
 -->
 
 <config UseShapeCovar="0" />
+<config UseShapeNormDecomp="0" />
 <config CC0piNBINS="156" />
 
+<config UseSVDInverse="0" />
+<config UseMPPSeudoInverse="0" />
 
 </nuisance>

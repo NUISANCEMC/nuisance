@@ -628,6 +628,7 @@ protected:
   std::string fDefaultTypes;  ///< Starting Default Fit Types
 
   bool fIsShape;      ///< Flag : Perform Shape-only fit
+  bool fUseShapeNormDecomp;
   bool fIsFree;       ///< Flag : Perform normalisation free fit
   bool fIsDiag;       ///< Flag : only include uncorrelated diagonal errors
   bool fIsMask;       ///< Flag : Apply bin masking

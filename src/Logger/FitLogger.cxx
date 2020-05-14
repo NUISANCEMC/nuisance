@@ -254,7 +254,7 @@ void StopTalking() {
   if (!Logger::external_verb) return;
 
   // Only redirect if we're not debugging
-  if (Logger::log_verb == (unsigned int)DEB) return;
+  if (Logger::log_verb == (int)DEB) return;
 
   std::cout.rdbuf(Logger::redirect_stream.rdbuf());
   std::cerr.rdbuf(Logger::redirect_stream.rdbuf());
@@ -282,7 +282,7 @@ void StartTalking() {
 bool LOG_LEVEL(int level) {
   //******************************************
 
-  if (Logger::log_verb == (unsigned int)DEB) {
+  if (Logger::log_verb == (int)DEB) {
     return true;
   }
 

@@ -224,6 +224,8 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
     fDataHist->SetBinError(i + 1, data_slice_bcbes[i].second);
   }
 
+  SetShapeCovar();
+
   fMCHist = (TH1D *)fDataHist->Clone("T2K_CC0pi_XSec_2DPcos_nu_I_MC_1D");
   fMCHist->SetDirectory(NULL);
   return;

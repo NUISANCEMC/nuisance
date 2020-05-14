@@ -79,9 +79,11 @@ Double_t StatUtils::GetChi2FromDiag(TH2D *data, TH2D *mc, TH2I *map,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
     map = GenerateMap(data);
-
+    made_map = true;
+  }
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
   TH1D *mc_1D = MapToTH1D(mc, map);
@@ -95,6 +97,10 @@ Double_t StatUtils::GetChi2FromDiag(TH2D *data, TH2D *mc, TH2I *map,
   delete mc_1D;
   delete mask_1D;
 
+  if (made_map) {
+    delete map;
+  }
+
   return Chi2;
 };
 
@@ -103,6 +109,13 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                                    TH1I *mask, double data_scale,
                                    double covar_scale, TH1D *outchi2perbin) {
   //*******************************************************************
+
+  static bool first = true;
+  static bool UseSVDDecomp = false;
+  if (first) {
+    UseSVDDecomp = FitPar::Config().GetParB("UseSVDInverse");
+    first = false;
+  }
 
   Double_t Chi2 = 0.0;
   TMatrixDSym *calc_cov = (TMatrixDSym *)invcov->Clone("local_invcov");
@@ -117,6 +130,13 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
     calc_cov = ApplyInvertedMatrixMasking(invcov, mask);
     calc_data = ApplyHistogramMasking(data, mask);
     calc_mc = ApplyHistogramMasking(mc, mask);
+  }
+
+  if (data->GetNbinsX() != invcov->GetNcols()) {
+    NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
+                  "StatUtils::GetChi2FromCov!");
+    NUIS_ABORT("data_hist has " << data->GetNbinsX() << " matrix has "
+                                << invcov->GetNcols() << "bins");
   }
 
   // Add MC Error to data if required
@@ -159,9 +179,11 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
                         << i << " ["
                         << calc_data->GetXaxis()->GetBinLowEdge(j + 1) << " -- "
                         << calc_data->GetXaxis()->GetBinUpEdge(j + 1) << "].");
-      if ((calc_data->GetBinContent(i + 1) != 0 ||
-           calc_mc->GetBinContent(i + 1) != 0) &&
+
+      if (((calc_data->GetBinContent(i + 1) != 0) &&
+           (calc_mc->GetBinContent(i + 1) != 0)) &&
           ((*calc_cov)(i, j) != 0)) {
+
         NUIS_LOG(DEB, "[CHI2]\t\t Chi2 contribution (i,j) = (" << i << "," << j
                                                                << ")");
         NUIS_LOG(DEB, "[CHI2]\t\t Data - MC(i) = "
@@ -189,6 +211,15 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
             ((calc_data->GetBinContent(i + 1) - calc_mc->GetBinContent(i + 1)) *
              (*calc_cov)(i, j) *
              (calc_data->GetBinContent(j + 1) - calc_mc->GetBinContent(j + 1)));
+
+        if (!UseSVDDecomp && (i == j) && ((*calc_cov)(i, j) < 0)) {
+          NUIS_ABORT("Found negative diagonal covariance element: Covar("
+                     << i << ", " << j << ") = " << ((*calc_cov)[i][j])
+                     << ", data = " << calc_data->GetBinContent(i + 1)
+                     << ", mc = " << calc_mc->GetBinContent(i + 1)
+                     << " would contribute: " << bin_cont
+                     << " on top of: " << Chi2);
+        }
 
         Chi2 += bin_cont;
         ibin_contrib += bin_cont;
@@ -220,8 +251,10 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   //*******************************************************************
 
   // Generate a simple map
+  bool made_map = false;
   if (!map) {
     map = StatUtils::GenerateMap(data);
+    made_map = true;
   }
 
   // Convert to 1D Histograms
@@ -229,6 +262,12 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   TH1D *mc_1D = MapToTH1D(mc, map);
   TH1I *mask_1D = MapToMask(mask, map);
   TH1D *outchi2perbin_1D = outchi2perbin ? MapToTH1D(outchi2perbin, map) : NULL;
+
+  NUIS_LOG(SAM, "Calculating 2D covariance: got map ? "
+                    << (!made_map) << ", Ndata bins: "
+                    << (data->GetNbinsX() * data->GetNbinsY())
+                    << ", ncovbins: " << invcov->GetNcols()
+                    << ", mapped 1D hist NBins: " << data_1D->GetNbinsX());
 
   // Calculate 1D chi2 from 1D Plots
   Double_t Chi2 = StatUtils::GetChi2FromCov(data_1D, mc_1D, invcov, mask_1D, 1,
@@ -242,6 +281,9 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   delete mc_1D;
   delete mask_1D;
   delete outchi2perbin_1D;
+  if (made_map) {
+    delete map;
+  }
 
   return Chi2;
 }
@@ -302,8 +344,11 @@ Double_t StatUtils::GetChi2FromSVD(TH2D *data, TH2D *mc, TMatrixDSym *cov,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -317,6 +362,10 @@ Double_t StatUtils::GetChi2FromSVD(TH2D *data, TH2D *mc, TMatrixDSym *cov,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+
+  if (made_map) {
+    delete map;
+  }
 
   return Chi2;
 }
@@ -374,8 +423,11 @@ Double_t StatUtils::GetChi2FromEventRate(TH2D *data, TH2D *mc, TH2I *map,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -389,6 +441,9 @@ Double_t StatUtils::GetChi2FromEventRate(TH2D *data, TH2D *mc, TH2I *map,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+  if (made_map) {
+    delete map;
+  }
 
   return Chi2;
 }
@@ -409,8 +464,11 @@ Double_t StatUtils::GetLikelihoodFromDiag(TH2D *data, TH2D *mc, TH2I *map,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -424,6 +482,9 @@ Double_t StatUtils::GetLikelihoodFromDiag(TH2D *data, TH2D *mc, TH2I *map,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+  if (made_map) {
+    delete map;
+  }
 
   return MLE;
 };
@@ -448,8 +509,11 @@ Double_t StatUtils::GetLikelihoodFromCov(TH2D *data, TH2D *mc,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -464,7 +528,9 @@ Double_t StatUtils::GetLikelihoodFromCov(TH2D *data, TH2D *mc,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
-
+  if (made_map) {
+    delete map;
+  }
   return MLE;
 };
 
@@ -487,8 +553,11 @@ Double_t StatUtils::GetLikelihoodFromSVD(TH2D *data, TH2D *mc, TMatrixDSym *cov,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -502,6 +571,9 @@ Double_t StatUtils::GetLikelihoodFromSVD(TH2D *data, TH2D *mc, TMatrixDSym *cov,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+  if (made_map) {
+    delete map;
+  }
 
   return MLE;
 };
@@ -524,8 +596,11 @@ Double_t StatUtils::GetLikelihoodFromEventRate(TH2D *data, TH2D *mc, TH2I *map,
   //*******************************************************************
 
   // Generate a simple map
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Convert to 1D Histograms
   TH1D *data_1D = MapToTH1D(data, map);
@@ -539,6 +614,9 @@ Double_t StatUtils::GetLikelihoodFromEventRate(TH2D *data, TH2D *mc, TH2I *map,
   delete data_1D;
   delete mc_1D;
   delete mask_1D;
+  if (made_map) {
+    delete map;
+  }
 
   return MLE;
 };
@@ -571,8 +649,11 @@ Int_t StatUtils::GetNDOF(TH2D *hist, TH2I *map, TH2I *mask) {
   //*******************************************************************
 
   Int_t NDOF = 0;
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(hist);
+  }
 
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     for (int j = 0; j < hist->GetNbinsY(); j++) {
@@ -583,6 +664,9 @@ Int_t StatUtils::GetNDOF(TH2D *hist, TH2I *map, TH2I *mask) {
 
       NDOF++;
     }
+  }
+  if (made_map) {
+    delete map;
   }
 
   return NDOF;
@@ -774,12 +858,16 @@ TMatrixDSym *StatUtils::ApplyMatrixMasking(TMatrixDSym *mat, TH2D *data,
                                            TH2I *mask, TH2I *map) {
   //*******************************************************************
 
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
   TH1I *mask_1D = StatUtils::MapToMask(mask, map);
-
   TMatrixDSym *newmat = StatUtils::ApplyMatrixMasking(mat, mask_1D);
-
+  if (made_map) {
+    delete map;
+  }
   delete mask_1D;
   return newmat;
 }
@@ -805,12 +893,17 @@ TMatrixDSym *StatUtils::ApplyInvertedMatrixMasking(TMatrixDSym *mat, TH2D *data,
                                                    TH2I *mask, TH2I *map) {
   //*******************************************************************
 
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
   TH1I *mask_1D = StatUtils::MapToMask(mask, map);
 
   TMatrixDSym *newmat = ApplyInvertedMatrixMasking(mat, mask_1D);
-
+  if (made_map) {
+    delete map;
+  }
   delete mask_1D;
   return newmat;
 }
@@ -846,10 +939,36 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat) {
     return new_mat;
   }
 
-  // Invert full matrix
-  TDecompSVD LU = TDecompSVD((*new_mat));
-  new_mat =
-      new TMatrixDSym(new_mat->GetNrows(), LU.Invert().GetMatrixArray(), "");
+  static bool first = true;
+  static bool UseSVDDecomp = false;
+  if (first) {
+    UseSVDDecomp = FitPar::Config().GetParB("UseSVDInverse");
+    first = false;
+  }
+  if (UseSVDDecomp) {
+    // Invert full matrix
+    TDecompSVD mat_decomp(*new_mat);
+    if (!mat_decomp.Decompose()) {
+      NUIS_ABORT("Decomposition failed, matrix singular ?");
+    } else {
+      int nrows = new_mat->GetNrows();
+      delete new_mat;
+      new_mat =
+          new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+    }
+  } else {
+    // Invert full matrix
+    TDecompChol mat_decomp(*new_mat);
+    if (!mat_decomp.Decompose()) {
+      NUIS_ERR(FTL, "Decomposition failed, matrix singular ?");
+      NUIS_ABORT("If you want to use SVD decomposition set <config "
+                 "UseSVDInverse=\"1\" /> in your  card file.");    } else {
+      int nrows = new_mat->GetNrows();
+      delete new_mat;
+      new_mat =
+          new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+    }
+  }
 
   return new_mat;
 }
@@ -926,13 +1045,18 @@ void StatUtils::ForceNormIntoCovar(TMatrixDSym *mat, TH2D *data, double norm,
                                    TH2I *map) {
   //*******************************************************************
 
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
   TH1D *data_1D = MapToTH1D(data, map);
 
   StatUtils::ForceNormIntoCovar(mat, data_1D, norm);
   delete data_1D;
-
+  if (made_map) {
+    delete map;
+  }
   return;
 }
 
@@ -955,9 +1079,16 @@ TMatrixDSym *StatUtils::MakeDiagonalCovarMatrix(TH2D *data, TH2I *map,
                                                 double scaleF) {
   //*******************************************************************
 
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
   TH1D *data_1D = MapToTH1D(data, map);
+
+  if (made_map) {
+    delete map;
+  }
 
   return StatUtils::MakeDiagonalCovarMatrix(data_1D, scaleF);
 };
@@ -1041,8 +1172,11 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
   }
 
   // Create map if required
-  if (!map)
+  bool made_map = false;
+  if (!map) {
+    made_map = true;
     map = StatUtils::GenerateMap(data);
+  }
 
   // Set Bin Errors from cov diag
   int count = 0;
@@ -1069,13 +1203,14 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
       }
     }
   }
-  // Delete the map now that we don't need it
-  // Woops, it's needed elsewhere there! (Grrrrr)
-  // map->Delete();
+
+  if (made_map) {
+    delete map;
+  }
 }
 
 TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
-                                              TH1 *data_hist,
+                                              TH1D *data_hist,
                                               double data_scale) {
   int nbins = full_covar->GetNrows();
   TMatrixDSym *shape_covar = new TMatrixDSym(nbins);
@@ -1084,8 +1219,8 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   if (data_hist->GetNbinsX() != nbins) {
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
                   "StatUtils::ExtractShapeOnlyCovar!");
-    NUIS_ERR(WRN, "data_hist has " << data_hist->GetNbinsX() << " matrix has "
-                                   << nbins);
+    NUIS_ABORT("data_hist has " << data_hist->GetNbinsX() << " matrix has "
+                                << nbins << "bins");
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins)
       err_bins = nbins;
@@ -1144,6 +1279,31 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
     }
   }
   return shape_covar;
+}
+
+TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
+                                              TH2D *data_hist, TH2I *map,
+                                              double data_scale) {
+  // Generate a simple map
+  bool made_map = false;
+  if (!map) {
+    map = StatUtils::GenerateMap(data_hist);
+    made_map = true;
+  }
+
+  // Convert to 1D Histograms
+  TH1D *data_1D = MapToTH1D(data_hist, map);
+
+  // Calculate from 1D
+  TMatrixDSym *rtn =
+      StatUtils::ExtractShapeOnlyCovar(full_covar, data_1D, data_scale);
+
+  delete data_1D;
+  if (made_map) {
+    delete map;
+  }
+
+  return rtn;
 }
 
 //*******************************************************************
