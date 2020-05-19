@@ -36,7 +36,7 @@ class BaseFitEvt;
 namespace nuisance {
   namespace reweight {
 
-    // MEC Dials
+    // QE Dials
     class MINERvAReWeight_QE : public NUISANCEWeightCalc {
       public:
         MINERvAReWeight_QE();
@@ -89,6 +89,56 @@ namespace nuisance {
         double fDef_NormCCRES;
         bool fTweaked;
 
+    };
+
+    // MINOS pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+    class MINOSRPA : public NUISANCEWeightCalc {
+      public:
+        MINOSRPA();
+        ~MINOSRPA(){};
+
+        double CalcWeight(BaseFitEvt* evt);
+        void SetDialValue(std::string name, double val);
+        void SetDialValue(int rwenum, double val);
+        bool IsHandled(int rwenum);
+
+        double GetRPAWeight(double Q2, double A, double B);
+
+        bool fTweaked;
+
+        bool fApply_MINOSRPA;
+
+        double fTwk_MINOSRPA_A;
+        double fDef_MINOSRPA_A;
+        double fCur_MINOSRPA_A;
+
+        double fTwk_MINOSRPA_B;
+        double fDef_MINOSRPA_B;
+        double fCur_MINOSRPA_B;
+
+    };
+
+    // MINERvA pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+    class LagrangeRPA : public NUISANCEWeightCalc {
+      public:
+        LagrangeRPA();
+        ~LagrangeRPA(){};
+
+        double CalcWeight(BaseFitEvt* evt);
+        void SetDialValue(std::string name, double val);
+        void SetDialValue(int rwenum, double val);
+        bool IsHandled(int rwenum);
+
+        double GetRPAWeight(double Q2);
+
+        bool fTweaked;
+
+        bool fApplyRPA;
+
+        double fR1;
+        double fR2;
+        double fR1_Def;
+        double fR2_Def;
     };
 
     /// RPA Weight Calculator that applies RPA systematics
@@ -147,6 +197,57 @@ namespace nuisance {
           kNuMuBarFe56
         };
         weightRPA* fRPACalculators[kMaxCalculators];
+    };
+
+    // Custom coherent tune from MINERvA
+    class COHBrandon : public NUISANCEWeightCalc {
+      public:
+        COHBrandon();
+        ~COHBrandon();
+
+        double CalcWeight(BaseFitEvt* evt);
+        void SetDialValue(std::string name, double val);
+        void SetDialValue(int rwenum, double val);
+        bool IsHandled(int rwenum);
+
+        bool fApply_COHNorm;
+
+        double fDef_COHNorm;
+        double fCur_COHNorm;
+        double fTwk_COHNorm;
+
+        double fDef_COHCut;
+        double fCur_COHCut;
+        double fTwk_COHCut;
+
+        bool fTweaked;
+    };
+
+    class WEnhancement : public NUISANCEWeightCalc {
+      public:
+        WEnhancement();
+        ~WEnhancement();
+
+        double CalcWeight(BaseFitEvt* evt);
+        void SetDialValue(std::string name, double val);
+        void SetDialValue(int rwenum, double val);
+        bool IsHandled(int rwenum);
+
+        bool fTweaked;
+
+        bool fApply_Enhancement;
+
+        double fDef_WNorm;
+        double fCur_WNorm;
+        double fTwk_WNorm;
+
+        double fDef_WMean;
+        double fCur_WMean;
+        double fTwk_WMean;
+
+        double fDef_WSigma;
+        double fCur_WSigma;
+        double fTwk_WSigma;
     };
 
   };  // namespace reweight

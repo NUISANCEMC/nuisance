@@ -492,11 +492,10 @@ int Reweight::NUISANCEEnumFromName(std::string const &name, int type) {
 
 int Reweight::CustomEnumFromName(std::string const &name) {
   int custenum = Reweight::ConvertNUISANCEDial(name);
-  return custenum;
+  return (custenum != kUnknownNUISANCEDial ? custenum : kNoDialFound);
 }
 
-int Reweight::ConvDial(std::string const &name, std::string const &type,
-                       bool exceptions) {
+int Reweight::ConvDial(std::string const &name, std::string const &type, bool exceptions) {
   return Reweight::ConvDial(name, Reweight::ConvDialType(type), exceptions);
 }
 

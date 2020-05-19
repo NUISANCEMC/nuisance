@@ -32,9 +32,14 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
 
 #ifdef __MINERVA_RW_ENABLED__
 #ifdef __GENIE_ENABLED__
+  fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_QE());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_MEC());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_RES());
+  fWeightCalculators.push_back(new nuisance::reweight::MINOSRPA());
+  fWeightCalculators.push_back(new nuisance::reweight::LagrangeRPA());
   fWeightCalculators.push_back(new nuisance::reweight::RikRPA());
+  fWeightCalculators.push_back(new nuisance::reweight::COHBrandon());
+  fWeightCalculators.push_back(new nuisance::reweight::WEnhancement());
 #endif
 #endif
 

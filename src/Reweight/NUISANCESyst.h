@@ -6,7 +6,7 @@ namespace Reweight {
 
   enum NUISANCESyst {
 
-    kUnkownNUISANCEDial = 0,
+    kUnknownNUISANCEDial = 0,
 
     kGaussianCorr_CCQE_norm,
     kGaussianCorr_CCQE_tilt,
@@ -42,6 +42,14 @@ namespace Reweight {
     kGaussianCorr_CC1pi_Wq0,
     kGaussianCorr_CC1pi_Pq3,
     kGaussianCorr_CC1pi_Wq3,
+
+    kGaussianCorr_CCRES_norm,
+    kGaussianCorr_CCRES_tilt,
+    kGaussianCorr_CCRES_Pq0,
+    kGaussianCorr_CCRES_Wq0,
+    kGaussianCorr_CCRES_Pq3,
+    kGaussianCorr_CCRES_Wq3,
+
     kGaussianCorr_AllowSuppression,
 
     kBeRPA_A,
@@ -64,6 +72,23 @@ namespace Reweight {
     kMINERvARW_RikRESRPA_ApplyRPA,
     kMINERvARW_RikRESRPA_LowQ2,
     kMINERvARW_RikRESRPA_HighQ2,
+
+    kMINERvARW_MINOSRPA_Apply,
+    kMINERvARW_MINOSRPA_A,
+    kMINERvARW_MINOSRPA_B,
+
+    kMINERvARW_LagrangeRPA_Apply,
+    kMINERvARW_LagrangeRPA_R1,
+    kMINERvARW_LagrangeRPA_R2,
+
+    kMINERvARW_NormCOH,
+    kMINERvARW_CutCOH,
+    kMINERvARW_ApplyCOH,
+
+    kMINERvARW_ApplyWTune,
+    kMINERvARW_NormWTune,
+    kMINERvARW_MeanWTune,
+    kMINERvARW_SigmaWTune,
 
     kSBLOsc_Distance,
     kSBLOsc_MassSplitting,

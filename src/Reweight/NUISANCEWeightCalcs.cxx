@@ -28,9 +28,9 @@ void ModeNormCalc::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
 
   // Check Handled
-  if (!IsHandled(curenum))
+  if (!IsHandled(curenum)) 
     return;
-  if (curenum == kModeNorm_NormRES)
+  if (curenum == kModeNorm_NormRES) 
     fNormRES = val;
 }
 
@@ -241,7 +241,7 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
   }
 
   FitParticle *plep = fevt->GetHMFSParticle(expect_fsleppdg);
-  if (!plep)
+  if (!plep) 
     return 1.0;
 
   TLorentzVector q = pnu->fP - plep->fP;
@@ -259,17 +259,17 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
       if ((fevt->PartInfo(j))->fIsAlive)
         continue;
 
-      if (fevt->PartInfo(j)->fPID == 2212)
+      if (fevt->PartInfo(j)->fPID == 2212) 
         npr++;
-      else if (fevt->PartInfo(j)->fPID == 2112)
+      else if (fevt->PartInfo(j)->fPID == 2112) 
         nne++;
     }
 
     if (fevt->Mode == 2 && npr == 1 && nne == 1) {
       initialstate = 2;
 
-    } else if (fevt->Mode == 2 &&
-               ((npr == 0 && nne == 2) || (npr == 2 && nne == 0))) {
+    } else if (fevt->Mode == 2 && 
+        ((npr == 0 && nne == 2) || (npr == 2 && nne == 0))) {
       initialstate = 1;
     }
   }
@@ -279,31 +279,25 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
     if (fDebugStatements)
       std::cout << "Getting CCQE Weight" << std::endl;
     double g = GetGausWeight(q0, q3, fGausVal_CCQE);
-    if (g < 1.0)
+    if (g < 1.0) 
       g = 1.0;
     rw_weight *= g;
   }
 
   if (fApply_2p2h && abs(fevt->Mode) == 2) {
-    if (fDebugStatements)
-      std::cout << "Getting 2p2h Weight" << std::endl;
-    if (fDebugStatements)
-      std::cout << "Got q0 q3 = " << q0 << " " << q3 << " mode = " << fevt->Mode
-                << std::endl;
+    if (fDebugStatements) std::cout << "Getting 2p2h Weight" << std::endl;
+    if (fDebugStatements) std::cout << "Got q0 q3 = " << q0 << " " << q3 << " mode = " << fevt->Mode << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h);
-    if (fDebugStatements)
-      std::cout << "Returning Weight " << rw_weight << std::endl;
+    if (fDebugStatements) std::cout << "Returning Weight " << rw_weight << std::endl;
   }
 
   if (fApply_2p2h_PPandNN && abs(fevt->Mode) == 2 && initialstate == 1) {
-    if (fDebugStatements)
-      std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
+    if (fDebugStatements) std::cout << "Getting 2p2h PPandNN Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_PPandNN);
   }
 
   if (fApply_2p2h_NP && abs(fevt->Mode) == 2 && initialstate == 2) {
-    if (fDebugStatements)
-      std::cout << "Getting 2p2h NP Weight" << std::endl;
+    if (fDebugStatements) std::cout << "Getting 2p2h NP Weight" << std::endl;
     rw_weight *= GetGausWeight(q0, q3, fGausVal_2p2h_NP);
   }
 
@@ -391,6 +385,8 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
       w = 1.0;
     }
 
+    return w;
+
     // Use the MINERvA Gaussian method
   } else {
     /*
@@ -418,15 +414,29 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
     double sigmaq3 = vals[kPosPq3];
     double corr = vals[kPosWq3];
 
-    double z = (q0 - meanq0) * (q0 - meanq0) / sigmaq0 / sigmaq0 +
-               (q3 - meanq3) * (q3 - meanq3) / sigmaq3 / sigmaq3 -
-               2 * corr * (q0 - meanq0) * (q3 - meanq3) / (sigmaq0 * sigmaq3);
+    double z = (q0 - meanq0) * (q0 - meanq0) / (sigmaq0 * sigmaq0) +
+      (q3 - meanq3) * (q3 - meanq3) / (sigmaq3 * sigmaq3) -
+      2 * corr * (q0 - meanq0) * (q3 - meanq3) / (sigmaq0 * sigmaq3);
+    double ret = 1.0;
 
-    double ret = norm * exp(-0.5 * z / (1 - corr * corr));
+    if ( fabs(1 - corr*corr) < 1.E-5 ) {
+      return 1.0;
+    }
+
+    if ( (-0.5 * z / (1 - corr*corr)) > 200 or (-0.5 * z / (1 - corr*corr)) < -200 ) {
+      return 1.0;
+    } else {
+      ret = norm * exp( -0.5 * z / (1 - corr*corr) );
+    }
+
+    if (ret != ret or ret < 0.0 or isnan(ret)) {
+      return 1.0;
+    }
+
+    if (fAllowSuppression) return ret;
+    return ret + 1.0;
     // Need to add 1 to the results
-    w = 1.0 + ret;
   }
-
   return w;
 }
 
@@ -438,8 +448,7 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   int curenum = rwenum % 1000;
 
   // Check Handled
-  if (!IsHandled(curenum))
-    return;
+  if (!IsHandled(curenum)) return;
 
   // CCQE Setting
   for (int i = kGaussianCorr_CCQE_norm; i <= kGaussianCorr_CCQE_Wq3; i++) {
@@ -460,8 +469,7 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   }
 
   // 2p2h_PPandNN Setting
-  for (int i = kGaussianCorr_2p2h_PPandNN_norm;
-       i <= kGaussianCorr_2p2h_PPandNN_Wq3; i++) {
+  for (int i = kGaussianCorr_2p2h_PPandNN_norm; i <= kGaussianCorr_2p2h_PPandNN_Wq3; i++) {
     if (i == curenum) {
       int index = i - kGaussianCorr_2p2h_PPandNN_norm;
       fGausVal_2p2h_PPandNN[index] = val;
@@ -470,8 +478,7 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
   }
 
   // 2p2h_NP Setting
-  for (int i = kGaussianCorr_2p2h_NP_norm; i <= kGaussianCorr_2p2h_NP_Wq3;
-       i++) {
+  for (int i = kGaussianCorr_2p2h_NP_norm; i <= kGaussianCorr_2p2h_NP_Wq3; i++) {
     if (i == curenum) {
       int index = i - kGaussianCorr_2p2h_NP_norm;
       fGausVal_2p2h_NP[index] = val;
@@ -496,43 +503,43 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
 bool GaussianModeCorr::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-  case kGaussianCorr_CCQE_norm:
-  case kGaussianCorr_CCQE_tilt:
-  case kGaussianCorr_CCQE_Pq0:
-  case kGaussianCorr_CCQE_Wq0:
-  case kGaussianCorr_CCQE_Pq3:
-  case kGaussianCorr_CCQE_Wq3:
+    case kGaussianCorr_CCQE_norm:
+    case kGaussianCorr_CCQE_tilt:
+    case kGaussianCorr_CCQE_Pq0:
+    case kGaussianCorr_CCQE_Wq0:
+    case kGaussianCorr_CCQE_Pq3:
+    case kGaussianCorr_CCQE_Wq3:
 
-  case kGaussianCorr_2p2h_norm:
-  case kGaussianCorr_2p2h_tilt:
-  case kGaussianCorr_2p2h_Pq0:
-  case kGaussianCorr_2p2h_Wq0:
-  case kGaussianCorr_2p2h_Pq3:
-  case kGaussianCorr_2p2h_Wq3:
+    case kGaussianCorr_2p2h_norm:
+    case kGaussianCorr_2p2h_tilt:
+    case kGaussianCorr_2p2h_Pq0:
+    case kGaussianCorr_2p2h_Wq0:
+    case kGaussianCorr_2p2h_Pq3:
+    case kGaussianCorr_2p2h_Wq3:
 
-  case kGaussianCorr_2p2h_PPandNN_norm:
-  case kGaussianCorr_2p2h_PPandNN_tilt:
-  case kGaussianCorr_2p2h_PPandNN_Pq0:
-  case kGaussianCorr_2p2h_PPandNN_Wq0:
-  case kGaussianCorr_2p2h_PPandNN_Pq3:
-  case kGaussianCorr_2p2h_PPandNN_Wq3:
+    case kGaussianCorr_2p2h_PPandNN_norm:
+    case kGaussianCorr_2p2h_PPandNN_tilt:
+    case kGaussianCorr_2p2h_PPandNN_Pq0:
+    case kGaussianCorr_2p2h_PPandNN_Wq0:
+    case kGaussianCorr_2p2h_PPandNN_Pq3:
+    case kGaussianCorr_2p2h_PPandNN_Wq3:
 
-  case kGaussianCorr_2p2h_NP_norm:
-  case kGaussianCorr_2p2h_NP_tilt:
-  case kGaussianCorr_2p2h_NP_Pq0:
-  case kGaussianCorr_2p2h_NP_Wq0:
-  case kGaussianCorr_2p2h_NP_Pq3:
-  case kGaussianCorr_2p2h_NP_Wq3:
+    case kGaussianCorr_2p2h_NP_norm:
+    case kGaussianCorr_2p2h_NP_tilt:
+    case kGaussianCorr_2p2h_NP_Pq0:
+    case kGaussianCorr_2p2h_NP_Wq0:
+    case kGaussianCorr_2p2h_NP_Pq3:
+    case kGaussianCorr_2p2h_NP_Wq3:
 
-  case kGaussianCorr_CC1pi_norm:
-  case kGaussianCorr_CC1pi_tilt:
-  case kGaussianCorr_CC1pi_Pq0:
-  case kGaussianCorr_CC1pi_Wq0:
-  case kGaussianCorr_CC1pi_Pq3:
-  case kGaussianCorr_CC1pi_Wq3:
-  case kGaussianCorr_AllowSuppression:
-    return true;
-  default:
-    return false;
+    case kGaussianCorr_CC1pi_norm:
+    case kGaussianCorr_CC1pi_tilt:
+    case kGaussianCorr_CC1pi_Pq0:
+    case kGaussianCorr_CC1pi_Wq0:
+    case kGaussianCorr_CC1pi_Pq3:
+    case kGaussianCorr_CC1pi_Wq3:
+    case kGaussianCorr_AllowSuppression:
+      return true;
+    default:
+      return false;
   }
 }

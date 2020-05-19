@@ -2,12 +2,12 @@
 
 int Reweight::ConvertNUISANCEDial(std::string type) {
 
-  for (int i = kUnkownNUISANCEDial + 1; i < kNUISANCEDial_LAST; i++) {
+  for (int i = kUnknownNUISANCEDial + 1; i < kNUISANCEDial_LAST; i++) {
     if (!type.compare(ConvNUISANCEDial(i).c_str())) {
       return i;
     }
   }
-  return kUnkownNUISANCEDial;
+  return kUnknownNUISANCEDial;
 };
 
 std::string Reweight::ConvNUISANCEDial(int type) {
@@ -69,10 +69,26 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kMINERvARW_RikRESRPA_LowQ2:               { return "MINERvARW_RikRESRPA_LowQ2"; }
     case kMINERvARW_RikRESRPA_HighQ2:              { return "MINERvARW_RikRESRPA_HighQ2"; }
 
-
     case kSBLOsc_Distance: { return "SBLOsc_Distance"; }
     case kSBLOsc_MassSplitting: { return "SBLOsc_MassSplitting"; }
     case kSBLOsc_Sin2Theta: { return "SBLOsc_Sin2Theta"; }
+
+    case kMINERvARW_MINOSRPA_Apply: { return "MINERvARW_MINOSRPA_Apply"; }
+    case kMINERvARW_MINOSRPA_A:     { return "MINERvARW_MINOSRPA_A"; }
+    case kMINERvARW_MINOSRPA_B:     { return "MINERvARW_MINOSRPA_B"; }
+
+    case kMINERvARW_LagrangeRPA_Apply: { return "MINERvARW_LagrangeRPA_Apply"; }
+    case kMINERvARW_LagrangeRPA_R1: { return "MINERvARW_LagrangeRPA_R1"; }
+    case kMINERvARW_LagrangeRPA_R2: { return "MINERvARW_LagrangeRPA_R2"; }
+
+    case kMINERvARW_NormCOH: { return "MINERvARW_NormCOH"; }
+    case kMINERvARW_CutCOH: { return "MINERvARW_CutCOH"; }
+    case kMINERvARW_ApplyCOH: { return "MINERvARW_ApplyCOH"; }
+
+    case kMINERvARW_ApplyWTune: { return "MINERvARW_ApplyWTune"; }
+    case kMINERvARW_NormWTune: { return "MINERvARW_NormWTune"; }
+    case kMINERvARW_MeanWTune: { return "MINERvARW_MeanWTune"; }
+    case kMINERvARW_SigmaWTune: { return "MINERvARW_SigmaWTune"; }
 
     default: return "unknown_nuisance_dial";
   }
