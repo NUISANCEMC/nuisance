@@ -157,6 +157,9 @@ public:
 #ifndef __NO_MINERvA__
   bool flagCC0piMINERvA;
 #endif
+
+    bool flagCC0Pi_T2K_AnaI;
+    bool flagCC0Pi_T2K_AnaII;
 };
 
 #endif

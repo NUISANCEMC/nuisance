@@ -163,14 +163,6 @@ void Measurement1D::FinaliseSampleSettings() {
 
   EnuMin = GeneralUtils::StrToDbl(fSettings.GetS("enu_min"));
   EnuMax = GeneralUtils::StrToDbl(fSettings.GetS("enu_max"));
-
-  if (fAddNormPen) {
-    if (fNormError <= 0.0) {
-      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
-      NUIS_ERR(FTL, "If you want to use it please add fNormError=VAL");
-      throw;
-    }
-  }
 }
 
 //********************************************************************
@@ -608,6 +600,22 @@ void Measurement1D::FinaliseMeasurement() {
     if (fDecomp)
       delete fDecomp;
     fDecomp = StatUtils::GetDecomp(fFullCovar);
+
+    fUseShapeNormDecomp = FitPar::Config().GetParB("UseShapeNormDecomp");
+    if (fUseShapeNormDecomp) {
+      fNormError = 0;
+
+      // From https://arxiv.org/pdf/2003.00088.pdf
+      for (int i = 0; i < fFullCovar->GetNcols(); ++i) {
+        for (int j = 0; j < fFullCovar->GetNcols(); ++j) {
+          fNormError += (*fFullCovar)[i][j];
+        }
+      }
+
+      NUIS_LOG(SAM, "Sample: " << fName
+                               << ", using shape/norm decomp with norm error: "
+                               << fNormError);
+    }
   }
 
   // Setup fMCHist from data
@@ -670,6 +678,17 @@ void Measurement1D::FinaliseMeasurement() {
     NUIS_ERR(FTL, "fScaleFactor = " << fScaleFactor);
     NUIS_ERR(FTL, "EXITING");
     throw;
+  }
+
+  if (fAddNormPen) {
+    if (!fUseShapeNormDecomp) {
+      fNormError = fSettings.GetNormError();
+    }
+    if (fNormError <= 0.0) {
+      NUIS_ERR(FTL, "Norm error for class " << fName << " is 0.0!");
+      NUIS_ERR(FTL, "If you want to use it please add fNormError=VAL");
+      throw;
+    }
   }
 
   // Create and fill Weighted Histogram
@@ -1018,11 +1037,21 @@ double Measurement1D::GetLikelihood() {
   double scaleF = 0.0;
   // TODO Include !fIsRawEvents
   if (fIsShape) {
-    if (fMCHist->Integral(1, fMCHist->GetNbinsX(), "width")) {
-      scaleF = fDataHist->Integral(1, fDataHist->GetNbinsX(), "width") /
-               fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
-      fMCHist->Scale(scaleF);
-      fMCFine->Scale(scaleF);
+    // Don't renorm based on width if we are using ShapeNormDecomp
+    if (fUseShapeNormDecomp) {
+      if (fMCHist->Integral(1, fMCHist->GetNbinsX())) {
+        scaleF = fDataHist->Integral(1, fDataHist->GetNbinsX()) /
+                 fMCHist->Integral(1, fMCHist->GetNbinsX());
+        fMCHist->Scale(scaleF);
+        fMCFine->Scale(scaleF);
+      }
+    } else {
+      if (fMCHist->Integral(1, fMCHist->GetNbinsX(), "width")) {
+        scaleF = fDataHist->Integral(1, fDataHist->GetNbinsX(), "width") /
+                 fMCHist->Integral(1, fMCHist->GetNbinsX(), "width");
+        fMCHist->Scale(scaleF);
+        fMCFine->Scale(scaleF);
+      }
     }
   }
 
@@ -1035,8 +1064,6 @@ double Measurement1D::GetLikelihood() {
     } else if (fIsDiag) {
       stat = StatUtils::GetChi2FromDiag(fDataHist, fMCHist, fMaskHist);
     } else if (!fIsDiag and !fIsRawEvents) {
-      stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist);
-
       stat = StatUtils::GetChi2FromCov(fDataHist, fMCHist, covar, fMaskHist, 1,
                                        1E76, fIsWriting ? fResidualHist : NULL);
       if (fChi2LessBinHist && fIsWriting) {
@@ -1058,10 +1085,39 @@ double Measurement1D::GetLikelihood() {
 
   // Sort Penalty Terms
   if (fAddNormPen) {
-    double penalty =
-        (1. - fCurrentNorm) * (1. - fCurrentNorm) / (fNormError * fNormError);
 
-    stat += penalty;
+    if (fUseShapeNormDecomp) { // if shape norm, then add the norm penalty from
+                               // https://arxiv.org/pdf/2003.00088.pdf
+
+      TH1 *masked_data = StatUtils::ApplyHistogramMasking(fDataHist, fMaskHist);
+      TH1 *masked_mc = StatUtils::ApplyHistogramMasking(fMCHist, fMaskHist);
+      masked_mc->Scale(scaleF);
+
+      NUIS_LOG(REC, "Shape Norm Decomp mcinteg: "
+                        << masked_mc->Integral() * 1E38
+                        << ", datainteg: " << masked_data->Integral() * 1E38
+                        << ", normerror: " << fNormError);
+
+      double normpen =
+          std::pow((masked_data->Integral() - masked_mc->Integral()) * 1E38,
+                   2) /
+          fNormError;
+
+      masked_data->SetDirectory(NULL);
+      delete masked_data;
+      masked_mc->SetDirectory(NULL);
+      delete masked_mc;
+
+      NUIS_LOG(SAM, "Using Shape/Norm decomposition: Norm penalty "
+                        << normpen << " on shape penalty of " << stat);
+      stat += normpen;
+
+    } else {
+      double penalty =
+          (1. - fCurrentNorm) * (1. - fCurrentNorm) / (fNormError * fNormError);
+
+      stat += penalty;
+    }
   }
 
   // Return to normal scaling

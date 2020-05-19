@@ -110,12 +110,6 @@ void T2K_CC0pi_XSec_2DPcos_nu_II::SetHistograms() {
     }
   }
 
-  // Get Map
-  fMapHist = (TH2I *)rootfile->Get("analysis2_map");
-  fMapHist->SetDirectory(0);
-  fMapHist->SetNameTitle((fName + "_map").c_str(),
-                         (fName + "_map" + fPlotTitles).c_str());
-
   // Get Syst/Stat Covar
   TH2D *tempsyst = 0;
   rootfile->GetObject("analysis2_systcov", tempsyst);
@@ -142,23 +136,97 @@ void T2K_CC0pi_XSec_2DPcos_nu_II::SetHistograms() {
     tempcov->Add(tempnorm);
   }
 
+  // if nothing is set, add them all!
   if (!fIsSystCov && !fIsStatCov && !fIsNormCov) {
     tempcov->Add(tempsyst);
     tempcov->Add(tempstat);
     tempcov->Add(tempnorm);
   }
 
-  // Setup Covar
-  int nbins = tempcov->GetNbinsX();
+  // Get Map
+  TH2I *InputMap = (TH2I *)rootfile->Get("analysis2_map");
+
+  // This map doesn't skip over the 0 data/covar bins
+  fMapHist = (TH2I *)InputMap->Clone();
+  fMapHist->SetDirectory(NULL);
+  fMapHist->SetNameTitle((fName + "_map").c_str(),
+                         (fName + "_map" + fPlotTitles).c_str());
+
+  int binit = 1;
+  for (int j = 0; j < fDataHist->GetYaxis()->GetNbins(); ++j) {
+    for (int i = 0; i < fDataHist->GetXaxis()->GetNbins(); ++i) {
+      int covarhistbin = InputMap->GetBinContent(i + 1, j + 1);
+
+      std::cout << "i: " << i << ", j: " << j
+                << " -> covarhistbin: " << covarhistbin << " = "
+                << tempcov->GetBinContent(covarhistbin, covarhistbin)
+                << std::endl;
+      if (tempcov->GetBinContent(covarhistbin, covarhistbin) > 0) {
+        fMapHist->SetBinContent(i + 1, j + 1, binit++);
+      } else {
+        fMapHist->SetBinContent(i + 1, j + 1, 0);
+      }
+    }
+  }
+
+  int nbins = fMapHist->GetMaximum();
   fFullCovar = new TMatrixDSym(nbins);
+
+  for (int j_1 = 0; j_1 < fDataHist->GetYaxis()->GetNbins(); ++j_1) {
+    for (int i_1 = 0; i_1 < fDataHist->GetXaxis()->GetNbins(); ++i_1) {
+
+      for (int j_2 = 0; j_2 < fDataHist->GetYaxis()->GetNbins(); ++j_2) {
+        for (int i_2 = 0; i_2 < fDataHist->GetXaxis()->GetNbins(); ++i_2) {
+
+          int i = fMapHist->GetBinContent(i_1 + 1, j_1 + 1);
+          int j = fMapHist->GetBinContent(i_2 + 1, j_2 + 1);
+          if (i == 0 || j == 0) {
+            continue;
+          }
+
+          // get the relevant tempcov bin
+          int i_input = InputMap->GetBinContent(i_1 + 1, j_1 + 1);
+          int j_input = InputMap->GetBinContent(i_2 + 1, j_2 + 1);
+
+          std::cout << "i: " << i << ", j: " << j << "i_input: " << i_input
+                    << "j_input: " << j_input
+                    << ", covar = " << tempcov->GetBinContent(i_input, j_input)
+                    << std::endl;
+
+          // Correct for them being 1-offset;
+          i -= 1;
+          j -= 1;
+
+          (*fFullCovar)(i, j) = tempcov->GetBinContent(i_input, j_input);
+
+          if ((i == j) && ((*fFullCovar)(i, j) <= 0)) {
+            NUIS_ABORT("Input covariance had a 0/negative diagonal element: "
+                       << i << ", " << j << ", " << (*fFullCovar)(i, j));
+          }
+        }
+      }
+    }
+  }
+
+  TFile *fout= new TFile("mattest.root","RECREATE");
+  fout->WriteTObject(fFullCovar,"covar");
+  fout->Write();
+  fout->Close();
+  // Setup Covar
+
+  covar = StatUtils::GetInvert(fFullCovar);
 
   for (int i = 0; i < nbins; i++) {
     for (int j = 0; j < nbins; j++) {
-      (*fFullCovar)(i, j) = tempcov->GetBinContent(i + 1, j + 1);
+      if ((i == j) && ((*covar)(i, j) <= 0)) {
+        NUIS_ABORT("Inverse covariance had a 0/negative diagonal element: "
+                   << i << ", " << j << ", " << (*covar)(i, j));
+      }
     }
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+
   fDecomp = StatUtils::GetDecomp(covar);
+  SetShapeCovar();
 
   // Set Data Errors
   StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, fMapHist, 1E-38);
