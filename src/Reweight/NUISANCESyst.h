@@ -43,13 +43,6 @@ namespace Reweight {
     kGaussianCorr_CC1pi_Pq3,
     kGaussianCorr_CC1pi_Wq3,
 
-    kGaussianCorr_CCRES_norm,
-    kGaussianCorr_CCRES_tilt,
-    kGaussianCorr_CCRES_Pq0,
-    kGaussianCorr_CCRES_Wq0,
-    kGaussianCorr_CCRES_Pq3,
-    kGaussianCorr_CCRES_Wq3,
-
     kGaussianCorr_AllowSuppression,
 
     kBeRPA_A,
