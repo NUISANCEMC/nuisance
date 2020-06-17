@@ -4,6 +4,7 @@
 #include "JointMeas1D.h"
 #include "Measurement1D.h"
 #include "T2K_nueCCinc_XSec_1Dpe.h"
+#include "T2K_nueCCinc_XSec_1Dthe.h"
 
 class T2K_nueCCinc_XSec_joint : public JointMeas1D {
 public:
@@ -26,9 +27,13 @@ public:
 
  private:
   // The separate measurements that go into this
-  Measurement1D* FHC_nue;
-  Measurement1D* RHC_nue;
-  Measurement1D* RHC_nuebar;
+  Measurement1D* FHC_nue_pe;
+  Measurement1D* RHC_nue_pe;
+  Measurement1D* RHC_nuebar_pe;
+  Measurement1D* FHC_nue_the;
+  Measurement1D* RHC_nue_the;
+  Measurement1D* RHC_nuebar_the;
+
 };
 
 #endif

@@ -246,6 +246,9 @@
 
 // T2K nue CC-inclusive 2019
 #include "T2K_nueCCinc_XSec_1Dpe.h"
+#include "T2K_nueCCinc_XSec_1Dthe.h"
+#include "T2K_nueCCinc_XSec_1Dpe_joint.h"
+#include "T2K_nueCCinc_XSec_1Dthe_joint.h"
 #include "T2K_nueCCinc_XSec_joint.h"
 
 // T2K STV CC0pi 2018
@@ -1254,6 +1257,15 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
     return (new T2K_nueCCinc_XSec_1Dpe(samplekey));
 
+  } else if (!name.compare("T2K_nueCCinc_XSec_1Dthe_FHC") ||
+	     !name.compare("T2K_nueCCinc_XSec_1Dthe_RHC") ||
+	     !name.compare("T2K_nuebarCCinc_XSec_1Dthe_RHC")) {
+    return (new T2K_nueCCinc_XSec_1Dthe(samplekey));
+    
+  } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_joint")) {
+    return (new T2K_nueCCinc_XSec_1Dpe_joint(samplekey));
+  } else if (!name.compare("T2K_nueCCinc_XSec_1Dthe_joint")) {
+    return (new T2K_nueCCinc_XSec_1Dthe_joint(samplekey));
   } else if (!name.compare("T2K_nueCCinc_XSec_joint")) {
     return (new T2K_nueCCinc_XSec_joint(samplekey));
 

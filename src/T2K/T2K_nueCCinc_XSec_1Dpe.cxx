@@ -17,7 +17,7 @@ T2K_nueCCinc_XSec_1Dpe::T2K_nueCCinc_XSec_1Dpe(nuiskey samplekey) {
 
     fSettings.SetTitle("T2K FHC #nu_{e}-CC-inclusive p_{e}");
     fSettings.DefineAllowedSpecies("nue");
-    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/FHC_nue_unfold_with_neut.txt");
+    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/FHC_nue_pe.txt");
     nuPDG  = 12;
     lepPDG = 11;
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_RHC")){
@@ -28,7 +28,7 @@ T2K_nueCCinc_XSec_1Dpe::T2K_nueCCinc_XSec_1Dpe(nuiskey samplekey) {
 
     fSettings.SetTitle("T2K RHC #nu_{e}-CC-inclusive p_{e}");
     fSettings.DefineAllowedSpecies("nue");
-    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/RHC_nue_unfold_with_neut.txt");
+    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/RHC_nue_pe.txt");
     nuPDG  = 12;
     lepPDG = 11;
   } else if (!name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")){
@@ -39,7 +39,7 @@ T2K_nueCCinc_XSec_1Dpe::T2K_nueCCinc_XSec_1Dpe(nuiskey samplekey) {
 
     fSettings.SetTitle("T2K RHC #bar{#nu}_{e}-CC-inclusive p_{e}");
     fSettings.DefineAllowedSpecies("nueb");
-    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/RHC_nuebar_unfold_with_neut.txt");
+    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/RHC_nuebar_pe.txt");
     nuPDG  = -12;
     lepPDG = -11;
   }
