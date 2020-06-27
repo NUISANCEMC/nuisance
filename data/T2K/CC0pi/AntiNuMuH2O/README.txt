@@ -1,0 +1,1 @@
+This directory contains the cross section central values and relative covariance matrix for both the regularized and unregularized fits of the paper "First Measurement of the Charged Current antinumu Double Differential Cross Section on a Water Target without Pions in the final state" (https://arxiv.org/abs/1908.10249).
