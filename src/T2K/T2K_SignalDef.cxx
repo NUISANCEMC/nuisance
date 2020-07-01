@@ -122,12 +122,18 @@ bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
 
 bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax, int ana) {
 
-  // Require a numu CC0pi event
-  if (!isCC0pi(event, 14, EnuMin, EnuMax))
+  int NuPDG = event->PDGnu();
+  // Require a numu (or antinumu) CC0pi event
+  if (!isCC0pi(event, NuPDG, EnuMin, EnuMax))
     return false;
 
-  TLorentzVector Pnu = event->GetHMISParticle(14)->fP;
-  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
+  TLorentzVector Pnu = event->GetHMISParticle(NuPDG)->fP;
+  
+  int MuonPDG;
+  if(NuPDG==14) MuonPDG=13;
+  else  MuonPDG=-13;
+
+  TLorentzVector Pmu = event->GetHMFSParticle(MuonPDG)->fP;
 
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
   double p_mu = Pmu.Vect().Mag();
@@ -175,7 +181,7 @@ bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 }
 
-// CC0pi antinu in the P0D - TN328
+// CC0pi antinu in the P0D https://arxiv.org/abs/1908.10249
 bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax) {
 
   // Require a anumu CC0pi event

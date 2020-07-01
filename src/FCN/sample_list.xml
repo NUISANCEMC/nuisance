@@ -392,6 +392,9 @@ flux in muon neutrino mode on a H2O target.' />
   <input comment='   T2K CC0pi ' check='T2K+_CC0pi' />
   <input sample="T2K_CC0pi_XSec_2DPcos_nu_II" type="TYPE:T2K_FHC_NUMU_CH" />
   <input sample="T2K_CC0pi_XSec_2DPcos_nu_I" type="TYPE:T2K_FHC_NUMU_CH" />
+  
+  <input sample="T2K_NuMu_CC0pi_CH_XSec_2DPcos" type="TYPE:T2K_FHC_NUMU_CH" />
+  <input sample="T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos" type="TYPE:T2K_RHC_NUMU_CH" />
 
   <input comment='   T2K CC1pi H2O ' check='T2K+_CC1pip+H2O' />
   <input sample="T2K_CC1pip_H2O_XSec_1DEnuDelta_nu" type="TYPE:T2K_FHC_NUMU_H2O" />

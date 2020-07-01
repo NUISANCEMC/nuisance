@@ -48,23 +48,17 @@ public:
 
   void ConvertEventRates();
 
-  void Write(std::string drawopt);
-
-  /// \brief Create Q2 Box to save correction info
-  inline MeasurementVariableBox* CreateBox(){ return new MeasurementVariableBox2D(); };
 
  private:
 
-  bool fIsSystCov, fIsStatCov, fIsNormCov;
-  bool fMaskMomOverflow;
-
-  TH2D* fMCHist_Fine2D;
-
+  TFile* fInputFile;
   std::vector<TH1D*> fMCHist_Slices;
   std::vector<TH1D*> fDataHist_Slices;
 
-  void FillMCSlice(double x, double y, double w);
-  void MaskMomOverflow();
+  double pmu, CosThetaMu;
+  
+  void FillMCSlice(double x, double y, int z, double w);
+
 
 };
 
