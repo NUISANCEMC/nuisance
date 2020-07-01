@@ -151,7 +151,7 @@ void T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms() {
 
   for(int ibin=0; ibin<Nbins; ibin++){  
     for(int jbin=0; jbin<Nbins; jbin++){
-      (*fFullCovar)(ibin,jbin) = ( (*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins))*1E38*1E38;
+      (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins))*1E38*1E38;
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
