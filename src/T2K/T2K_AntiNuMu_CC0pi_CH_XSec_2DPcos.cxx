@@ -166,7 +166,7 @@ void T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms() {
     fDataHist_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%i",i),
       (Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%i",i)));
 
-      //Loop over nbins and set errors from covar
+    //Loop over nbins and set errors from covar
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fDataHist_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
       fDataHist->SetBinContent(bincount+1, fDataHist_Slices[i]->GetBinContent(j+1));
