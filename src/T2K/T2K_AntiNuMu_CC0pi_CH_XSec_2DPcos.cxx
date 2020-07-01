@@ -21,7 +21,7 @@
 
 #include "T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos.h"
 
-static int    nangbins = 9;
+static size_t nangbins = 9;
 static double angular_binning_costheta[] = {-1,    0.2, 0.6,  0.7,  0.8,
                                              0.85, 0.9, 0.94, 0.98, 1   };
 
