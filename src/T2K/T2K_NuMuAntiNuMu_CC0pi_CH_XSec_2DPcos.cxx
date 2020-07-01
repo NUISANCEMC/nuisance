@@ -82,7 +82,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
 
 bool T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::isSignal(FitEvent *event){
-  if (!SignalDef::isCC0pi(event, nuPDG, EnuMin, EnuMax)) return false;
+  if (!SignalDef::isCC0pi(event, NuPDG, EnuMin, EnuMax)) return false;
 };
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillEventVariables(FitEvent* event){
@@ -184,7 +184,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   for(int ibin=0; ibin<Nbins; ibin++){  
     for(int jbin=0; jbin<Nbins; jbin++){
       if(NuPDG==14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin,jbin) + (*tmpcovsyst)(ibin,jbin))*1E38*1E38;
-      else if(NuType==-14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins))*1E38*1E38;
+      else if(NuPDG==-14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins))*1E38*1E38;
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
