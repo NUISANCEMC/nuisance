@@ -154,7 +154,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
     if ((y >= angular_binning_costheta[i]) && (y < angular_binning_costheta[i + 1])) {
       if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
       else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
-      std::cout<< " w " << w <<endl;
+      std::cout<< " w " << w <<cout::endl;
     }
   }
 }
