@@ -126,13 +126,14 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
     else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
-  // Now Convert into 1D list
+  // Now Convert into 1D lists
   fMCHist->Reset();
   int bincount = 0;
   for (int i = 0; i < 9; i++){
     if(NuPDG==14){
       for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCNuMuHist_Slices[i]->GetBinContent(j+1));
+        cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<endl;
         bincount++;
       }
     }
