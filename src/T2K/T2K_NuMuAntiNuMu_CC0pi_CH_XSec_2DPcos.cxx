@@ -157,7 +157,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
   }
   int bincount=0;
   for (int i = 0; i < nangbins; i++){
-      for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
+      for (int j = 0; j < fMCNuMuHist_Slices[i]->GetNbinsX(); j++){
         std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
         bincount++;
       }
