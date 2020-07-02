@@ -133,7 +133,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
     if(NuPDG==14){
       for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCNuMuHist_Slices[i]->GetBinContent(j+1));
-        cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<endl;
+        std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
         bincount++;
       }
     }
