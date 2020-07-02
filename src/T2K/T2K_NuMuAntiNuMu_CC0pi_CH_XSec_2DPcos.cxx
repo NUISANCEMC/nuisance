@@ -122,8 +122,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]),  "width");
+    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
   // Now Convert into 1D lists
