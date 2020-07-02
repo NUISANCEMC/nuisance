@@ -114,7 +114,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   for (int i = 0; i < 9; i++){
     if(NuPDG==14) fMCNuMuHist_Slices[i]->GetSumw2();
-    else if(NuPDG==14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
   }
 
   // Do standard conversion.
@@ -136,7 +136,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
         bincount++;
       }
     }
-    else{
+    else if(NuPDG==-14){
       for (int j = 0; j < fMCAntiNuMuHist_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCAntiNuMuHist_Slices[i]->GetBinContent(j+1));
         bincount++;
