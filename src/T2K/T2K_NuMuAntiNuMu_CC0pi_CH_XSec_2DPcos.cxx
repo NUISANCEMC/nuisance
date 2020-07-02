@@ -112,18 +112,18 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
-  //for (int i = 0; i < 9; i++){
-  //  if(NuPDG==14) fMCNuMuHist_Slices[i]->GetSumw2();
-  //  else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
-  //}
+  for (int i = 0; i < 9; i++){
+    if(NuPDG==14) fMCNuMuHist_Slices[i]->GetSumw2();
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
+  }
 
   // Do standard conversion.
   Measurement1D::ConvertEventRates();
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
+    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
   // Now Convert into 1D list
