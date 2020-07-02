@@ -82,7 +82,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
 
 bool T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::isSignal(FitEvent *event){
-  if (!SignalDef::isCC0pi(event, NuPDG, EnuMin, EnuMax)) return false;
+  return SignalDef::isCC0pi(event, NuPDG, EnuMin, EnuMax);
 };
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillEventVariables(FitEvent* event){
@@ -105,14 +105,14 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
   Measurement1D::FillHistograms();
   if (Signal){
-    FillMCSlice( fXVar, fYVar, NuPDG, Weight );
+    FillMCSlice( fXVar, fYVar, Weight );
   }
 
 }
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
-  for (int i = 0; i < 9; i++){
+  for (int i = 0; i < nangbins; i++){
     if(NuPDG==14) fMCNuMuHist_Slices[i]->GetSumw2();
     else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
   }
@@ -122,8 +122,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]),  "width");
   }
 
   // Now Convert into 1D lists
@@ -147,12 +147,12 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
   return;
 }
 
-void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, int z, double w){
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, double w){
 
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y >= angular_binning_costheta[i]) && (y < angular_binning_costheta[i + 1])) {
-      if(z==14) fMCNuMuHist_Slices[i]->Fill(x, w);
-      else if(z==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
+      if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
+      else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
     }
   }
 }

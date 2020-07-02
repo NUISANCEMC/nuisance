@@ -63,7 +63,7 @@ public:
   int NuPDG;
   int LepPDG;
   
-  void FillMCSlice(double x, double y, int z, double w);
+  void FillMCSlice(double x, double y, double w);
 
   
 };
