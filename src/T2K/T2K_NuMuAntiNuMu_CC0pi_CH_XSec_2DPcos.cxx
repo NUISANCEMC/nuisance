@@ -105,7 +105,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
   Measurement1D::FillHistograms();
   if (Signal){
-    FillMCSlice( fXVar, fYVar, Weight );
+    FillMCSlice( fXVar, fYVar, NuPDG, Weight );
   }
 
 }
@@ -147,21 +147,14 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
   return;
 }
 
-void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, double w){
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, int z, double w){
 
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y >= angular_binning_costheta[i]) && (y < angular_binning_costheta[i + 1])) {
-      if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
-      else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
+      if(z==14) fMCNuMuHist_Slices[i]->Fill(x, w);
+      else if(z==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
     }
   }
-  int bincount=0;
-  for (int i = 0; i < nangbins; i++){
-      for (int j = 0; j < fMCNuMuHist_Slices[i]->GetNbinsX(); j++){
-        std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
-        bincount++;
-      }
-    }
 }
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
