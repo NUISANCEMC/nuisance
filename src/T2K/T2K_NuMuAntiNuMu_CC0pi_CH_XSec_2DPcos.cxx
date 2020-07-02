@@ -133,7 +133,6 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
     if(NuPDG==14){
       for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCNuMuHist_Slices[i]->GetBinContent(j+1));
-        std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
         bincount++;
       }
     }
@@ -154,9 +153,17 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
     if ((y >= angular_binning_costheta[i]) && (y < angular_binning_costheta[i + 1])) {
       if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
       else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
-      std::cout<< " w " << w <<std::endl;
     }
   }
+  int bincount=0;
+  for (int i = 0; i < nangbins; i++){
+      for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
+        std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
+        bincount++;
+      }
+    }
+
+
 }
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
