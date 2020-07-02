@@ -129,7 +129,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
   // Now Convert into 1D lists
   fMCHist->Reset();
   int bincount = 0;
-  for (int i = 0; i < 9; i++){
+  for (int i = 0; i < nangbins; i++){
     if(NuPDG==14){
       for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCNuMuHist_Slices[i]->GetBinContent(j+1));
@@ -156,6 +156,14 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
       else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
     }
   }
+
+  for (int i = 0; i < nangbins; i++){
+      for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
+        std::cout<< "fMCNuMuHist_Slices[i]->GetBinContent(j+1) " << fMCNuMuHist_Slices[i]->GetBinContent(j+1) <<std::endl;
+        bincount++;
+      }
+    }
+
 
 }
 
