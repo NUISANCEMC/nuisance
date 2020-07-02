@@ -47,8 +47,8 @@ T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfp_nu.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfa_nu.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfip_nu.cxx
-T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos.cxx
-T2K_NuMu_CC0pi_CH_XSec_2DPcos.cxx
+#T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos.cxx
+#T2K_NuMu_CC0pi_CH_XSec_2DPcos.cxx
 T2K_SignalDef.cxx
 )
 
@@ -83,8 +83,8 @@ T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h
 T2K_CC0pinp_ifk_XSec_3Dinfp_nu.h
 T2K_CC0pinp_ifk_XSec_3Dinfa_nu.h
 T2K_CC0pinp_ifk_XSec_3Dinfip_nu.h
-T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos.h
-T2K_NuMu_CC0pi_CH_XSec_2DPcos.h
+#T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos.h
+#T2K_NuMu_CC0pi_CH_XSec_2DPcos.h
 T2K_SignalDef.h
 )
 

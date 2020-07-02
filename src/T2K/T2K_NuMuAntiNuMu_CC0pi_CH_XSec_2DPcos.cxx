@@ -197,7 +197,6 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   for (int i = 0; i < nangbins; i++){
     if(NuPDG==14){
       // Get Data Histogram
-      //fInputFile->ls();
       fDataNuMuHist_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsecNuMuCC0piDataSlice_%i",i))->Clone());
       fDataNuMuHist_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%i",i)));
