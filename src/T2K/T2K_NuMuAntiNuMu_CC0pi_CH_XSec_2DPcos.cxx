@@ -64,7 +64,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   fSettings.SetYTitle("cos#theta_{#mu}");
   fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
-  fSettings.SetEnuRange(0.0, 30.0);
+  fSettings.SetEnuRangeFromFlux(fFluxHist);
   fSettings.DefineAllowedTargets("C,H");
   FinaliseSampleSettings();
 
@@ -122,8 +122,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]),  "width");
+    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]), "width");
+    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]),  "width");
   }
 
   // Now Convert into 1D lists
@@ -150,7 +150,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, double w){
 
   for (size_t i = 0; i < nangbins; ++i) {
-    if ((y >= angular_binning_costheta[i]) && (y < angular_binning_costheta[i + 1])) {
+    if ((y > angular_binning_costheta[i]) && (y <= angular_binning_costheta[i + 1])) {
       if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
       else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
     }
