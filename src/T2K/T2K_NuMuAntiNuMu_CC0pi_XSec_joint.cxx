@@ -18,8 +18,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
-  fSettings.SetCovarInput(FitPar::GetDataBase() +
-                          "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root;JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
+  //fSettings.SetCovarInput(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root;JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
   FinaliseSampleSettings();
 
 
@@ -61,7 +60,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   FinaliseMeasurement();
 };
 
-//********************************************************************
+/*//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::test(FitEvent *nvect) {
 //********************************************************************
 
@@ -77,7 +76,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::test(FitEvent *nvect) {
   AntiNuMuCC0pi->FillHistograms();
   AntiNuMuCC0pi->ConvertEventRates();
 
-}
+}*/
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
