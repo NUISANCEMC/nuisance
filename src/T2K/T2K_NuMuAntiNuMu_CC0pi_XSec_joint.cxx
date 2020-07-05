@@ -111,7 +111,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
   return;
 }
 
-/*//********************************************************************
+//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
 //********************************************************************
   NuMuCC0pi->SetHistograms();
@@ -129,8 +129,10 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
   NuMuCC0pi->ConvertEventRates();
+  TH1D* hNuMu = (TH1D*)fMCHist;
+  hNuMu->Print();
   AntiNuMuCC0pi->ConvertEventRates();
-}*/
+}
 
 
 
