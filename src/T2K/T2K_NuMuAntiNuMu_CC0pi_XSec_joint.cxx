@@ -62,6 +62,24 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
 };
 
 //********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::test() {
+//********************************************************************
+
+  NuMuCC0p->isSignal()
+  NuMuCC0pi->FillEventVariables();
+  NuMuCC0pi->SetHistograms();
+  NuMuCC0pi->FillHistograms();
+  NuMuCC0pi->ConvertEventRates();
+
+  AntiNuMuCC0p->isSignal()
+  AntiNuMuCC0pi->FillEventVariables();
+  AntiNuMuCC0pi->SetHistograms();
+  AntiNuMuCC0pi->FillHistograms();
+  AntiNuMuCC0pi->ConvertEventRates();
+
+}
+
+//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 //********************************************************************
 

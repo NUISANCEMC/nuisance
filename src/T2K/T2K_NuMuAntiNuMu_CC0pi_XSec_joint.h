@@ -15,12 +15,8 @@ public:
 
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
-  
-  bool isSignal(){return false;};
-  void FillEventVariables(){return;};
-  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms();
-  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms();
-  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
+  void test();
+
 
  private:
   // The separate measurements that go into this
