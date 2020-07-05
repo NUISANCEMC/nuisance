@@ -45,7 +45,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   this->CombineDataHists();
 
   // This is a fractional covariance. Need to account for that
-  SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root,JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
+  SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root","JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
   ScaleCovar(1E76);
   SetShapeCovar();
   
