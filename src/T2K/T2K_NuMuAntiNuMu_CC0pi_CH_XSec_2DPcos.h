@@ -37,16 +37,16 @@ public:
   bool isSignal(FitEvent *nvect);
 
   /// Read histograms
-  //void SetHistograms();
+  void SetHistograms();
 
   /// Bin Tmu CosThetaMu
   void FillEventVariables(FitEvent* customEvent);
 
   // Fill Histograms
-  //void FillHistograms();
+  void FillHistograms();
 
   /// Event scaling 
-  //void ConvertEventRates();
+  void ConvertEventRates();
 
  private:
 

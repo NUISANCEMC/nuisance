@@ -55,7 +55,6 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
     fSettings.SetTitle("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos");
     fSettings.DefineAllowedSpecies("numub");
-
     NuPDG  = -14;
     LepPDG = -13;
   }
@@ -66,7 +65,6 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRangeFromFlux(fFluxHist);
   fSettings.DefineAllowedTargets("C,H");
-  fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root"); 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
@@ -74,7 +72,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
 
   // Setup Histograms
-  //SetHistograms();
+  SetHistograms();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
@@ -101,7 +99,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillEventVariables(FitEvent* event){
   fYVar = CosThetaMu;
   return;
 };
-/*
+
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
   Measurement1D::FillHistograms();
@@ -249,6 +247,6 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
   return;
 
-};*/
+};
 
 
