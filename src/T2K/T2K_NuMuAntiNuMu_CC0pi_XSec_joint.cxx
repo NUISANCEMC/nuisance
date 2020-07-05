@@ -18,7 +18,6 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
-  //fSettings.SetCovarInput(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root;JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
   FinaliseSampleSettings();
 
 
@@ -46,9 +45,9 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   this->CombineDataHists();
 
   // This is a fractional covariance. Need to account for that
-  //SetFractCovarFromTextFile(fSettings.GetCovarInput());
-  //ScaleCovar(1E76);
-  //SetShapeCovar();
+  SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root,JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
+  ScaleCovar(1E76);
+  SetShapeCovar();
   
   // Add to chain for processing
   fSubChain.clear();
@@ -90,28 +89,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
-//********************************************************************
-
-  TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
-  std::cout<< " Do you enter HERE??? " <<std::endl;
-  int count = 0;
-  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
-    count++;
-  }
-  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
-    count++;
-  }
-
-  return;
-}
-
-//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
 //********************************************************************
   NuMuCC0pi->SetHistograms();
@@ -129,9 +106,27 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
   NuMuCC0pi->ConvertEventRates();
-  TH1D* hNuMu = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  hNuMu->Print();
   AntiNuMuCC0pi->ConvertEventRates();
+
+  TH1D* hNuMuMC = (TH1D*)NuMuCC0pi->GetMCHistogram();
+  hNuMuMC->Print();
+
+  TH1D* hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
+  hAntiNuMuMC->Print();
+  
+  int count = 0;
+  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+
+  return;  
 }
 
 

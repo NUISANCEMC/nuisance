@@ -9,9 +9,6 @@ public:
 
   T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey);
   virtual ~T2K_NuMuAntiNuMu_CC0pi_XSec_joint() {};
-  
-  // Makes a MC hist from all the smaller ones
-  void MakePlots();
 
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
