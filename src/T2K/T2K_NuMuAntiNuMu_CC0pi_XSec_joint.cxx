@@ -45,6 +45,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
 
   // Sort out the data hist
   this->CombineDataHists();
+  this->CombineMCHists();
 
   // This is a fractional covariance. Need to account for that
   //SetFractCovarFromTextFile(fSettings.GetCovarInput());
