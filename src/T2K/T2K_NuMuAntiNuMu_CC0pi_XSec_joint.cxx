@@ -44,6 +44,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   // Sort out the data hist
   this->CombineDataHists();
 
+  // Set the covariance
   SetCovariance();
   
   // Add to chain for processing
@@ -69,6 +70,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetCovariance(){
   (*fFullCovar)+=(*tmpcovsyst);
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
+  ScaleCovar(1E76);
 
   return;
 }
@@ -106,28 +108,32 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
 //********************************************************************
+
   NuMuCC0pi->SetHistograms();
   AntiNuMuCC0pi->SetHistograms();
+
+  return;
 }
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 //********************************************************************
+
   NuMuCC0pi->FillHistograms();
   AntiNuMuCC0pi->FillHistograms();
+
+  return;
 }
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
+  
   NuMuCC0pi->ConvertEventRates();
   AntiNuMuCC0pi->ConvertEventRates();
 
   TH1D* hNuMuMC = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  hNuMuMC->Print();
-
   TH1D* hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
-  hAntiNuMuMC->Print();
   
   int count = 0;
   for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {

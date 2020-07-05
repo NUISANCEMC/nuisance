@@ -213,8 +213,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
       // Make MC Clones
       fMCNuMuHist_Slices.push_back((TH1D*) fDataNuMuHist_Slices[i]->Clone());
-      fMCNuMuHist_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i),
-        (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i)));
+      fMCNuMuHist_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 
       SetAutoProcessTH1(fDataNuMuHist_Slices[i],kCMD_Write);
       SetAutoProcessTH1(fMCNuMuHist_Slices[i]);
@@ -236,8 +235,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
       //Make MC Clones
       fMCAntiNuMuHist_Slices.push_back((TH1D*) fDataAntiNuMuHist_Slices[i]->Clone());
-      fMCAntiNuMuHist_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i), 
-        (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i)));
+      fMCAntiNuMuHist_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 
       SetAutoProcessTH1(fDataAntiNuMuHist_Slices[i],kCMD_Write);
       SetAutoProcessTH1(fMCAntiNuMuHist_Slices[i]);

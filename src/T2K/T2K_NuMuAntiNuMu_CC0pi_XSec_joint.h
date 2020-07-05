@@ -13,18 +13,25 @@ public:
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
 
+  // Signal already defined in the single measurement class  
   bool isSignal(){return false;};
+
+  // Variables already defined in the single measurement class  
   void FillEventVariables(){return;};
+
+  // Read covariace
   void SetCovariance();
-  /// Read histograms
+
+  // Read histograms
   void SetHistograms();
+  
   // Fill Histograms
   void FillHistograms();
-  /// Event scaling 
+  
+  // Event scaling 
   void ConvertEventRates();
  
  private:
-  // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* AntiNuMuCC0pi;
   TFile* fInputFile;
