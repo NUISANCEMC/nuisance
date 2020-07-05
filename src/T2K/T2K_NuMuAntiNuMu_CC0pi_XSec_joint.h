@@ -17,7 +17,14 @@ public:
 
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
-  
+    
+
+  // Fill Histograms
+  void FillHistograms();
+
+  /// Event scaling 
+  void ConvertEventRates();
+ 
  private:
   // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;

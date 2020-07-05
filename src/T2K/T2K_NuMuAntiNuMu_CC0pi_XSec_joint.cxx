@@ -108,6 +108,20 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
+//********************************************************************
+  NuMuCC0pi->FillHistograms();
+  AntiNuMuCC0pi->FillHistograms();
+}
+
+//********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
+//********************************************************************
+  NuMuCC0pi->ConvertEventRates();
+  AntiNuMuCC0pi->ConvertEventRates();
+}
+
+//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 //********************************************************************
 
@@ -128,3 +142,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 
   return;
 }
+
+
+
+

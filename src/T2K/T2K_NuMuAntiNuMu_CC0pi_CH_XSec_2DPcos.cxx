@@ -141,7 +141,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
         bincount++;
       }
     }
-  }
+  } 
 
   return;
 }
