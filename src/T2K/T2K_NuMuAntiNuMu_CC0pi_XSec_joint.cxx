@@ -65,8 +65,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetCovariance(){
   TMatrixDSym* tmpcovstat = (TMatrixDSym*) fInputFile->Get("JointNuMuAntiNuMuCC0piXsecCovMatrixStat");
   TMatrixDSym* tmpcovsyst = (TMatrixDSym*) fInputFile->Get("JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
   
-  fFullCovar = new TMatrixDSym(tmpcovsyst);
-
   fFullCovar = new TMatrixDSym(*tmpcovstat);
   (*fFullCovar)+=(*tmpcovsyst);
   covar = StatUtils::GetInvert(fFullCovar);
