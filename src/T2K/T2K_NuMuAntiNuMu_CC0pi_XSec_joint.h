@@ -16,6 +16,7 @@ public:
   // Makes a MC hist from all the smaller ones
   void MakePlots();
   
+  void ScaleEvents(){return;};
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
   
