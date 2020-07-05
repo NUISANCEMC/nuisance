@@ -90,7 +90,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 
-//********************************************************************
+/*//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 //********************************************************************
 
@@ -110,27 +110,41 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
   }
 
   return;
-}
+}*/
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
 //********************************************************************
-  NuMuCC0pi->SetHistograms();
-  AntiNuMuCC0pi->SetHistograms();
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms();
 }
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 //********************************************************************
-  NuMuCC0pi->FillHistograms();
-  AntiNuMuCC0pi->FillHistograms();
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms();
 }
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
-  NuMuCC0pi->ConvertEventRates();
-  AntiNuMuCC0pi->ConvertEventRates();
+
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
+
+  std::cout<< " Do you enter HERE??? " <<std::endl;
+  int count = 0;
+  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+
+  return;
+
 }
 
 
