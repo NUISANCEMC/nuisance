@@ -16,16 +16,15 @@ public:
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
 
-  void ScaleEvents(){return;};
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
   
   /// Read histograms
-  void SetHistograms(){return;};
+  void SetHistograms();
   // Fill Histograms
-  void FillHistograms(){return;};
+  void FillHistograms();
   /// Event scaling 
-  void ConvertEventRates(){return;};
+  void ConvertEventRates();
  
  private:
   // The separate measurements that go into this
