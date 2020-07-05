@@ -17,8 +17,9 @@ public:
 
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
-    
-
+  
+  /// Read histograms
+  void SetHistograms();
   // Fill Histograms
   void FillHistograms();
 

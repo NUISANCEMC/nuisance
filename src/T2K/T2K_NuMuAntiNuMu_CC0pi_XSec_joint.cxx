@@ -108,6 +108,13 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
+//********************************************************************
+  NuMuCC0pi->SetHistograms();
+  AntiNuMuCC0pi->SetHistograms();
+}
+
+//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 //********************************************************************
   NuMuCC0pi->FillHistograms();
