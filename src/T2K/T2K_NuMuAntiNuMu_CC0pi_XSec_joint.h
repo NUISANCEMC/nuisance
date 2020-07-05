@@ -2,7 +2,6 @@
 #define T2K_NUMUANTINUMU_CC0PI_XSEC_JOINT_H_SEEN
 
 #include "JointMeas1D.h"
-#include "Measurement1D.h"
 #include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos.h"
 
 class T2K_NuMuAntiNuMu_CC0pi_XSec_joint : public JointMeas1D {
@@ -15,15 +14,10 @@ public:
 
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
-  //void test(FitEvent *nvect);
 
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
-  void SetHistograms(){return;};
-  void FillHistograms(){return;};
-  void ConvertEventRates(){return;};
-  void ScaleEvents(){return;};
-
+  
  private:
   // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
