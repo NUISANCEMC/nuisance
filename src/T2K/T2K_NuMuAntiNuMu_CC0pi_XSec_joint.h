@@ -18,6 +18,8 @@ public:
   
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
+  void ConvertEventRates(){return;};
+  void FillHistograms(){return;};
 
  private:
   // The separate measurements that go into this
