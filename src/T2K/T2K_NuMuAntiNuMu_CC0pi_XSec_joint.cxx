@@ -129,6 +129,10 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
 
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
+    
+  TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
+  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
+  fMCHist->Reset();
 
   std::cout<< " Do you enter HERE??? " <<std::endl;
   int count = 0;
