@@ -23,9 +23,9 @@ public:
 
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
-  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms();
-  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms();
-  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
+  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms();
+  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms();
+  void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
   //T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ScaleEvents();
 
 };
