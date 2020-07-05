@@ -11,10 +11,10 @@ public:
   T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey);
   virtual ~T2K_NuMuAntiNuMu_CC0pi_XSec_joint() {};
 
-  void CombineMCHists();
+  void MakePlots();
 
   // Makes a data hist from all the smaller ones
-  void MakePlots();
+  void CombineDataHists();
   
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
