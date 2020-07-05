@@ -129,7 +129,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
 //********************************************************************
   NuMuCC0pi->ConvertEventRates();
-  TH1D* hNuMu = (TH1D*)fMCHist;
+  TH1D* hNuMu = (TH1D*)NuMuCC0pi->GetMCHistogram();
   hNuMu->Print();
   AntiNuMuCC0pi->ConvertEventRates();
 }
