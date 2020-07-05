@@ -91,7 +91,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineMCHists() {
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 //********************************************************************
 
   TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();

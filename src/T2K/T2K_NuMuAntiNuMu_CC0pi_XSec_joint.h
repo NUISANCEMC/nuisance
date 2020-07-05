@@ -14,7 +14,10 @@ public:
   void CombineMCHists();
 
   // Makes a data hist from all the smaller ones
-  void CombineDataHists();
+  void MakePlots();
+  
+  bool isSignal(){return false;};
+  void FillEventVariables(){return;};
 
  private:
   // The separate measurements that go into this
