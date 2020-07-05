@@ -186,11 +186,10 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
   for(int ibin=0; ibin<Nbins; ibin++){  
     for(int jbin=0; jbin<Nbins; jbin++){
-      if(NuPDG==14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin,jbin) + (*tmpcovsyst)(ibin,jbin));
-      else if(NuPDG==-14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins));
+      if(NuPDG==14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin,jbin) + (*tmpcovsyst)(ibin,jbin))*1E76;
+      else if(NuPDG==-14) (*fFullCovar)(ibin,jbin) = ((*tmpcovstat)(ibin+Nbins,jbin+Nbins) + (*tmpcovsyst)(ibin+Nbins,jbin+Nbins))*1E76;
     }
   }
-  ScaleCovar(1E76);
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
   
