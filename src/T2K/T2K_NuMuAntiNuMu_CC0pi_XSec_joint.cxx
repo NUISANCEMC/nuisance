@@ -44,10 +44,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   // Sort out the data hist
   this->CombineDataHists();
 
-  // This is a fractional covariance. Need to account for that
-  SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root","JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
-  ScaleCovar(1E76);
-  SetShapeCovar();
+  SetCovariance();
   
   // Add to chain for processing
   fSubChain.clear();
@@ -58,6 +55,26 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSaveSubMeas = true;
   FinaliseMeasurement();
 };
+
+//********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetCovariance(){
+//********************************************************************
+
+  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root").c_str(),"READ");
+
+  TMatrixDSym* tmpcovstat = (TMatrixDSym*) fInputFile->Get("JointNuMuAntiNuMuCC0piXsecCovMatrixStat");
+  TMatrixDSym* tmpcovsyst = (TMatrixDSym*) fInputFile->Get("JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
+  
+  fFullCovar = new TMatrixDSym(tmpcovsyst);
+
+  fFullCovar = new TMatrixDSym(*tmpcovstat);
+  (*fFullCovar)+=(*tmpcovsyst);
+  covar = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
+
+  return;
+}
+
 
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
