@@ -60,7 +60,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   }
   // Setup common settings
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#mu};cos#theta_{#mu}");
+  fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
   fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRangeFromFlux(fFluxHist);

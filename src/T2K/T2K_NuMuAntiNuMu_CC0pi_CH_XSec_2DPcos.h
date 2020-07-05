@@ -34,12 +34,10 @@ public:
   /// Virtual Destructor
   ~T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos() {};
 
-  /// Numu CC0PI Signal Definition
-  ///
-  /// /item 
+  /// Signal definition 
   bool isSignal(FitEvent *nvect);
 
-  /// Read histograms in a special way because format is different.
+  /// Read histograms
   void SetHistograms();
 
   /// Bin Tmu CosThetaMu
@@ -48,7 +46,7 @@ public:
   // Fill Histograms
   void FillHistograms();
 
-  /// Have to do a weird event scaling for analysis 1
+  /// Event scaling 
   void ConvertEventRates();
 
  private:

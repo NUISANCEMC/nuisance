@@ -16,15 +16,17 @@ public:
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
   
-  bool isSignal(){return false;};
-  void FillEventVariables(){return;};
-  void ConvertEventRates(){return;};
-  void FillHistograms(){return;};
-
  private:
   // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* AntiNuMuCC0pi;
+
+  bool isSignal(){return false;};
+  void SetHistograms(){return;};
+  void FillEventVariables(){return;};
+  void FillHistograms(){return;};
+  void ConvertEventRates(){return;};
+  void ScaleEvents(){return;};
 
 };
 
