@@ -1,4 +1,4 @@
-#include "T2K_nueCCinc_XSec_joint.h"
+#include "T2K_NuMuAntiNuMu_CC0pi_XSec_joint.h"
 
 //********************************************************************
 T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey){
