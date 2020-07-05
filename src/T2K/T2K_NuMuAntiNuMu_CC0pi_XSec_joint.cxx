@@ -13,9 +13,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSettings.SetTitle("T2K_NuMuAntiNuMu_CC0pi_XSec_joint");
   fSettings.DefineAllowedSpecies("numu, numub");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("P_{#mu} (GeV)");
-  fSettings.SetYTitle("cos#theta_{#mu}");
-  fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -90,7 +88,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineMCHists() {
 //********************************************************************
 
   TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
