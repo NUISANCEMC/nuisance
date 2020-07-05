@@ -22,11 +22,11 @@ public:
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* AntiNuMuCC0pi;
 
   bool isSignal(){return false;};
-  void SetHistograms(){return;};
   void FillEventVariables(){return;};
-  void FillHistograms(){return;};
-  void ConvertEventRates(){return;};
-  void ScaleEvents(){return;};
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms();
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms();
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates();
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ScaleEvents();
 
 };
 
