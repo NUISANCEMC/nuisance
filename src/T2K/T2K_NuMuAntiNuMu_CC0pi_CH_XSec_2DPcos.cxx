@@ -72,7 +72,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
 
   // Setup Histograms
-  SetHistograms();
+  //SetHistograms();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
