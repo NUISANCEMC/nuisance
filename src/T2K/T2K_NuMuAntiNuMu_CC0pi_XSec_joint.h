@@ -17,6 +17,8 @@ public:
   void CombineDataHists();
   void test();
 
+  bool isSignal(){return false;};
+  void FillEventVariables(){return;};
 
  private:
   // The separate measurements that go into this
