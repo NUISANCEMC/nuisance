@@ -14,7 +14,7 @@ public:
   void CombineDataHists();
   
   // Makes a MC hist from all the smaller ones
-  void CombineMCHists();
+  void MakePlots();
   
   bool isSignal(){return false;};
   void FillEventVariables(){return;};
