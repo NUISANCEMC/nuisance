@@ -91,12 +91,12 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineMCHists() {
 //********************************************************************
 
   TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
   TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
-  std::cout<< " ENTRI QUI???? " <<std::endl;
+
   int count = 0;
   for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
     fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
