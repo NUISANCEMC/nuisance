@@ -59,6 +59,27 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSaveSubMeas = true;
   FinaliseMeasurement();
 };
+//********************************************************************
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
+//********************************************************************
+
+  TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
+  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
+  std::count<< " ENTRI QUI???? " <<std::endl;
+  int count = 0;
+  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
+    count++;
+  }
+
+  return;
+}
 
 /*//********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::test(FitEvent *nvect) {
@@ -128,27 +149,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
   AntiNuMuCC0pi->ConvertEventRates();
 }
 
-//********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
-//********************************************************************
-
-  TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
-
-  int count = 0;
-  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
-    count++;
-  }
-  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
-    count++;
-  }
-
-  return;
-}
 
 
 
