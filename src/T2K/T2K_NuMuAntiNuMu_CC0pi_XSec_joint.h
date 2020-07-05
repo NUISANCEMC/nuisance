@@ -10,9 +10,6 @@ public:
   T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey);
   virtual ~T2K_NuMuAntiNuMu_CC0pi_XSec_joint() {};
 
-  // Makes a MC hist from all the smaller ones
-  void MakePlots();
-
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
 
@@ -26,6 +23,8 @@ public:
   /// Event scaling 
   void ConvertEventRates();
  
+   // Makes a MC hist from all the smaller ones
+  void MakePlots();
  private:
   // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
