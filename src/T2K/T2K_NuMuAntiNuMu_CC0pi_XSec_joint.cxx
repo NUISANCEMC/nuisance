@@ -1,64 +1,59 @@
 #include "T2K_nueCCinc_XSec_joint.h"
 
 //********************************************************************
-T2K_nueCCinc_XSec_joint::T2K_nueCCinc_XSec_joint(nuiskey samplekey){
+T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey){
 //********************************************************************
 
   fSettings = LoadSampleSettings(samplekey);
-  std::string descrip = "T2K_nueCCinc_XSec_joint. \n"
-    "Target: CH \n"
-    "Flux: T2K FHC nue  \n"
-    "Signal: CC-inclusive \n";
-  fSettings.SetTitle("T2K #nu_{e}-CC-inclusive p_{e} joint");
-  fSettings.DefineAllowedSpecies("nue, nueb");
-  fSettings.SetCovarInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/fract_covar_unfold_with_neut.txt");
+  std::string descrip = "T2K_NuMuAntiNuMu_CC0pi_XSec_joint. \n"
+                        "Target: CH \n"
+                        "Flux: T2K 2.5 degree off-axis (ND280)  \n"
+                        "Signal: CC0pi\n"
+                        "arXiv:2002.09323";
+  fSettings.SetTitle("T2K_NuMuAntiNuMu_CC0pi_XSec_joint");
+  fSettings.DefineAllowedSpecies("numu, numub");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{e} (GeV)");
-  fSettings.SetYTitle("#frac{d#sigma}{dp_{e}} (cm^{2}/nucleon)");
-  fSettings.SetEnuRange(0.0, 30.0);
+  fSettings.SetXTitle("P_{#mu} (GeV)");
+  fSettings.SetYTitle("cos#theta_{#mu}");
+  fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
+  fSettings.SetEnuRangeFromFlux(fFluxHist);
   fSettings.DefineAllowedTargets("C,H");
   FinaliseSampleSettings();
 
-  if (fSubInFiles.size() != 3) {
-    NUIS_ABORT("T2K nue joint requires input files in format: FHC nue; RHC nue; RHC nuebar");
+
+  if (fSubInFiles.size() != 2) {
+    NUIS_ABORT("T2K NuMu-AntiNuMu joint requires input files in format: NuMu and AntiNuMu");
   }
 
-  std::string inFileFHCNue    = fSubInFiles.at(0);
-  std::string inFileRHCNue    = fSubInFiles.at(1);
-  std::string inFileRHCNuebar = fSubInFiles.at(2);
+  std::string inFileNuMu     = fSubInFiles.at(0);
+  std::string inFileAntiNuMu = fSubInFiles.at(1);
 
   // Create some config keys
-  nuiskey FHCNueKey = Config::CreateKey("sample");
-  FHCNueKey.SetS("input", inFileFHCNue);
-  FHCNueKey.SetS("type", fSettings.GetS("type"));
-  FHCNueKey.SetS("name", "T2K_nueCCinc_XSec_1Dpe_FHC");
-  FHC_nue = new T2K_nueCCinc_XSec_1Dpe(FHCNueKey);
+  nuiskey NuMuKey = Config::CreateKey("sample");
+  NuMuKey.SetS("input", inFileNuMu);
+  NuMuKey.SetS("type",  fSettings.GetS("type"));
+  NuMuKey.SetS("name", "T2K_NuMu_CC0pi_CH_XSec_2DPcos");
+  NuMuCC0pi = new T2K_NuMu_CC0pi_CH_XSec_2DPcos(NuMuKey);
 
-  nuiskey RHCNueKey = Config::CreateKey("sample");
-  RHCNueKey.SetS("input", inFileRHCNue);
-  RHCNueKey.SetS("type", fSettings.GetS("type"));
-  RHCNueKey.SetS("name", "T2K_nueCCinc_XSec_1Dpe_RHC");
-  RHC_nue = new T2K_nueCCinc_XSec_1Dpe(RHCNueKey);
-
-  nuiskey RHCNuebarKey = Config::CreateKey("sample");
-  RHCNuebarKey.SetS("input", inFileRHCNuebar);
-  RHCNuebarKey.SetS("type", fSettings.GetS("type"));
-  RHCNuebarKey.SetS("name", "T2K_nuebarCCinc_XSec_1Dpe_RHC");
-  RHC_nuebar = new T2K_nueCCinc_XSec_1Dpe(RHCNuebarKey);
+  nuiskey AntiNuMuKey = Config::CreateKey("sample");
+  AntiNuMuKey.SetS("input", inFileAntiNuMu);
+  AntiNuMuKey.SetS("type", fSettings.GetS("type"));
+  AntiNuMuKey.SetS("name", "T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos");
+  AntiNuMuCC0pi = new T2K_NuMu_CC0pi_CH_XSec_2DPcos(AntiNuMuKey);
 
   // Sort out the data hist
   this->CombineDataHists();
 
   // This is a fractional covariance. Need to account for that
-  SetFractCovarFromTextFile(fSettings.GetCovarInput());
-  ScaleCovar(1E76);
-  SetShapeCovar();
+  //SetFractCovarFromTextFile(fSettings.GetCovarInput());
+  //ScaleCovar(1E76);
+  //SetShapeCovar();
   
   // Add to chain for processing
   fSubChain.clear();
-  fSubChain.push_back(FHC_nue);
-  fSubChain.push_back(RHC_nue);
-  fSubChain.push_back(RHC_nuebar);
+  fSubChain.push_back(NuMuCC0pi);
+  fSubChain.push_back(AntiNuMuCC0pi);
 
   // This saves information from the sub-measurements
   fSaveSubMeas = true;
@@ -66,44 +61,13 @@ T2K_nueCCinc_XSec_joint::T2K_nueCCinc_XSec_joint(nuiskey samplekey){
 };
 
 //********************************************************************
-void T2K_nueCCinc_XSec_joint::SetFractCovarFromTextFile(std::string covfile){
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 //********************************************************************
 
-  if (!fDataHist){
-    NUIS_ERR(FTL, "fDataHist is required to call T2K_nueCCinc_XSec_joint::SetFractCovarFromTextFile");
-    throw;
-  }
+  TH1D *hNuMuData     = (TH1D*)NuMuCC0pi->GetDataHistogram();
+  TH1D *hAntiNuMuData = (TH1D*)AntiNuMuCC0pi->GetDataHistogram();
 
-  NUIS_LOG(SAM, "Reading fractional covariance from text file: " << covfile);
-
-  int dim = fDataHist->GetNbinsX();
-  TMatrixD *tempmat = StatUtils::GetMatrixFromTextFile(covfile, dim, dim);
-
-  // Make a symmetric covariance
-  fFullCovar = new TMatrixDSym(tempmat->GetNrows());
-  for (int i = 0; i < tempmat->GetNrows(); i++) {
-    for (int j = 0; j < tempmat->GetNrows(); j++) {
-      (*fFullCovar)(i, j) = fDataHist->GetBinContent(i+1)
-	*(*tempmat)(i, j)*fDataHist->GetBinContent(j+1);
-    }
-  }
-
-  covar = StatUtils::GetInvert(fFullCovar);
-  fDecomp = StatUtils::GetDecomp(fFullCovar);
-}
-
-
-//********************************************************************
-void T2K_nueCCinc_XSec_joint::CombineDataHists(){
-//********************************************************************
-
-  TH1D *FHC_nue_data = (TH1D*)FHC_nue->GetDataHistogram();
-  TH1D *RHC_nue_data = (TH1D*)RHC_nue->GetDataHistogram();
-  TH1D *RHC_nuebar_data = (TH1D*)RHC_nuebar->GetDataHistogram();
-
-  int nbins = FHC_nue_data->GetNbinsX() + 
-    RHC_nue_data->GetNbinsX() + 
-    RHC_nuebar_data->GetNbinsX();
+  int nbins = hNuMuData->GetNbinsX() + hAntiNuMuData->GetNbinsX();
 
   fDataHist = new TH1D((fSettings.GetName() + "_data").c_str(),
                        (fSettings.GetFullTitles()).c_str(), nbins, 0, nbins);
@@ -111,54 +75,36 @@ void T2K_nueCCinc_XSec_joint::CombineDataHists(){
   
   // Bit ugly, but...
   int count = 0;
-  for (int x=0; x<FHC_nue_data->GetNbinsX(); ++x){
-    fDataHist->SetBinContent(count+1, FHC_nue_data->GetBinContent(x+1));
-    fDataHist->SetBinError(count+1, FHC_nue_data->GetBinError(x+1));
-    fDataHist->GetXaxis()->SetBinLabel(count+1, Form("FHC #nu_{e} %.1f-%.1f",
-						     FHC_nue_data->GetXaxis()->GetBinLowEdge(x+1),
-						     FHC_nue_data->GetXaxis()->GetBinUpEdge(x+1)));
+  for (int x=0; x<hNuMuData->GetNbinsX(); ++x){
+    fDataHist->SetBinContent(count+1, hNuMuData->GetBinContent(x+1));
+    fDataHist->SetBinError(count+1,   hNuMuData->GetBinError(x+1));
+    fDataHist->GetXaxis()->SetBinLabel(count+1, Form("NuMu CC0pi %.1f-%.1f", hNuMuData->GetXaxis()->GetBinLowEdge(x+1), hNuMuData->GetXaxis()->GetBinUpEdge(x+1)));
     count++;
   }
-  for (int x=0; x<RHC_nue_data->GetNbinsX(); ++x){
-    fDataHist->SetBinContent(count+1, RHC_nue_data->GetBinContent(x+1));
-    fDataHist->SetBinError(count+1, RHC_nue_data->GetBinError(x+1));
-    fDataHist->GetXaxis()->SetBinLabel(count+1, Form("RHC #nu_{e} %.1f-%.1f",
-                                                     RHC_nue_data->GetXaxis()->GetBinLowEdge(x+1),
-                                                     RHC_nue_data->GetXaxis()->GetBinUpEdge(x+1)));
+  for (int x=0; x<hAntiNuMuData->GetNbinsX(); ++x){
+    fDataHist->SetBinContent(count+1, hAntiNuMuData->GetBinContent(x+1));
+    fDataHist->SetBinError(count+1,   hAntiNuMuData->GetBinError(x+1));
+    fDataHist->GetXaxis()->SetBinLabel(count+1, Form("AntiNuMu CC0pi %.1f-%.1f", hAntiNuMuData->GetXaxis()->GetBinLowEdge(x+1), hAntiNuMuData->GetXaxis()->GetBinUpEdge(x+1)));
     count++;
   }
-  for (int x=0; x<RHC_nuebar_data->GetNbinsX(); ++x){
-    fDataHist->SetBinContent(count+1, RHC_nuebar_data->GetBinContent(x+1));
-    fDataHist->SetBinError(count+1, RHC_nuebar_data->GetBinError(x+1));
-    fDataHist->GetXaxis()->SetBinLabel(count+1, Form("RHC #bar{#nu}_{e} %.1f-%.1f",
-                                                     RHC_nuebar_data->GetXaxis()->GetBinLowEdge(x+1),
-                                                     RHC_nuebar_data->GetXaxis()->GetBinUpEdge(x+1)));
-    count++;
-  } 
 }
 
 //********************************************************************
-void T2K_nueCCinc_XSec_joint::MakePlots() {
+void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 //********************************************************************
 
-  TH1D *FHC_nue_mc = (TH1D*)FHC_nue->GetMCHistogram();
-  TH1D *RHC_nue_mc = (TH1D*)RHC_nue->GetMCHistogram();
-  TH1D *RHC_nuebar_mc = (TH1D*)RHC_nuebar->GetMCHistogram();
+  TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
+  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
 
   int count = 0;
-  for (int i = 0; i < FHC_nue_mc->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, FHC_nue_mc->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, FHC_nue_mc->GetBinError(i + 1));
+  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
     count++;
   }
-  for (int i = 0; i < RHC_nue_mc->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, RHC_nue_mc->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, RHC_nue_mc->GetBinError(i + 1));
-    count++;
-  }
-  for (int i = 0; i < RHC_nuebar_mc->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, RHC_nuebar_mc->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, RHC_nuebar_mc->GetBinError(i + 1));
+  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
     count++;
   }
 
