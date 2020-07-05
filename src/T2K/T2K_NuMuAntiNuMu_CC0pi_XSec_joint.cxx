@@ -87,20 +87,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
     fDataHist->GetXaxis()->SetBinLabel(count+1, Form("AntiNuMu CC0pi %.1f-%.1f", hAntiNuMuData->GetXaxis()->GetBinLowEdge(x+1), hAntiNuMuData->GetXaxis()->GetBinUpEdge(x+1)));
     count++;
   }
-    TH1D *hNuMuMC     = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  TH1D *hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
-
-  int count1 = 0;
-  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
-    count1++;
-  }
-  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
-    count1++;
-  }
 }
 
 
