@@ -28,8 +28,8 @@ public:
  
  private:
   // The separate measurements that go into this
-  Measurement1D* NuMuCC0pi;
-  Measurement1D* AntiNuMuCC0pi;
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* AntiNuMuCC0pi;
 
 };
 
