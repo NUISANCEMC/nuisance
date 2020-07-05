@@ -99,7 +99,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillEventVariables(FitEvent* event){
   fYVar = CosThetaMu;
   return;
 };
-
+/*
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 
   Measurement1D::FillHistograms();
@@ -247,6 +247,6 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
   return;
 
-};
+};*/
 
 

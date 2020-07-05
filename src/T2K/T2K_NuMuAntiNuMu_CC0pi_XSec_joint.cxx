@@ -89,7 +89,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
   }
 }
 
-
 //********************************************************************
 void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::MakePlots() {
 //********************************************************************
