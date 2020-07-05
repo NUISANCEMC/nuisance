@@ -15,18 +15,12 @@ public:
 
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
-  void test();
-
-  bool isSignal(){return false;};
-  void FillEventVariables(){return;};
-
+  void test(FitEvent *nvect);
+  
  private:
   // The separate measurements that go into this
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* NuMuCC0pi;
   T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos* AntiNuMuCC0pi;
-
-
-  //T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ScaleEvents();
 
 };
 
