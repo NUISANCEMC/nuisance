@@ -43,6 +43,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
                     "arXiv:2002.09323";
     fSettings.SetTitle("T2K_NuMu_CC0pi_CH_XSec_2DPcos");
     fSettings.DefineAllowedSpecies("numu");
+    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root"); 
     NuPDG  = 14;
     LepPDG = 13;
   } 
@@ -55,6 +56,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
     fSettings.SetTitle("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos");
     fSettings.DefineAllowedSpecies("numub");
+    fSettings.SetDataInput(FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root"); 
     NuPDG  = -14;
     LepPDG = -13;
   }
