@@ -40,7 +40,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   AntiNuMuKey.SetS("input", inFileAntiNuMu);
   AntiNuMuKey.SetS("type", fSettings.GetS("type"));
   AntiNuMuKey.SetS("name", "T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos");
-  AntiNuMuCC0pi = new T2K_NuMu_CC0pi_CH_XSec_2DPcos(AntiNuMuKey);
+  AntiNuMuCC0pi = new T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos(AntiNuMuKey);
 
   // Sort out the data hist
   this->CombineDataHists();
