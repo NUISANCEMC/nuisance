@@ -17,7 +17,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSettings.SetYTitle("cos#theta_{#mu}");
   fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
-  fSettings.SetEnuRangeFromFlux(fFluxHist);
+  fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
   FinaliseSampleSettings();
 
