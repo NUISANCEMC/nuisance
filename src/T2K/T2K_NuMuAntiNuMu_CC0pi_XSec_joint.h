@@ -20,11 +20,11 @@ public:
   void FillEventVariables(){return;};
   
   /// Read histograms
-  void SetHistograms();
+  void SetHistograms(){return;};
   // Fill Histograms
-  void FillHistograms();
+  void FillHistograms(){return;};
   /// Event scaling 
-  void ConvertEventRates();
+  void ConvertEventRates(){return;};
  
 
  private:
