@@ -13,10 +13,13 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
   fSettings.SetTitle("T2K_NuMuAntiNuMu_CC0pi_XSec_joint");
   fSettings.DefineAllowedSpecies("numu, numub");
   fSettings.SetDescription(descrip);
+  fSettings.SetXTitle("p_{#mu};cos#theta_{#mu}");
   fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
+  fSettings.SetCovarInput(FitPar::GetDataBase() +
+                          "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root;JointNuMuAntiNuMuCC0piXsecCovMatrixStat+JointNuMuAntiNuMuCC0piXsecCovMatrixSyst");
   FinaliseSampleSettings();
 
 
