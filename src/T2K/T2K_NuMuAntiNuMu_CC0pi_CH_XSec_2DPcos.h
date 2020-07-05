@@ -21,7 +21,6 @@
 
 #include "Measurement1D.h"
 #include "TH2Poly.h"
-#include "MeasurementVariableBox2D.h"
 
 class T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos : public Measurement1D {
 public:
