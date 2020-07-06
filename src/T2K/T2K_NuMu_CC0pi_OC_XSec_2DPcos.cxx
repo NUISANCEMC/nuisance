@@ -220,6 +220,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
     fDataHist->Reset();
 
+    int bincount=0;
     for (int i = 0; i < nangbins; i++){
       //Get Data Histogram
       fDataHistNuMuC_Slices.push_back((TH1D*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
