@@ -64,7 +64,7 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos::T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey) 
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
+  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) / (TotalIntegratedFlux()));
 
   // Setup Histograms
   SetHistograms();
