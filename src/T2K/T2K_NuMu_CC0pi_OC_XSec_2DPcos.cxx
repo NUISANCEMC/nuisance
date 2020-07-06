@@ -153,9 +153,6 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::FillMCSlice(double x, double y, double w){
 
 void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
-  // Read in 1D Data Histograms
-  fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
-
   // Read covariance matrix
   fInputFileCov = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/covmatrix_noreg.root").c_str(),"READ");
 
@@ -163,6 +160,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
   int Nbins;
 
   if(Target=="O"){
+    // Read in 1D Data Histograms
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_O_nuisance.root").c_str(),"READ");
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
     
@@ -203,6 +201,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     }
   } 
   else if(Target=="C"){
+    
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
 
