@@ -182,10 +182,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       fDataHistNuMuO_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i)));
-
+      fDataHistNuMuO_Slices[i]->Scale(1E-38);
       // Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuO_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuO_Slices[i]->Scale(1E-38);
         fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
         fDataHist->SetBinContent(bincount+1, fDataHistNuMuO_Slices[i]->GetBinContent(j+1)*1E-38);
@@ -226,9 +225,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i)));
 
+      fDataHistNuMuC_Slices[i]->Scale(1E-38);
       //Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuC_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuC_Slices[i]->Scale(1E-38);
         fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
         fDataHist->SetBinContent(bincount+1, fDataHistNuMuC_Slices[i]->GetBinContent(j+1)*1E-38);
