@@ -160,42 +160,27 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
   fInputFileCov = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/covmatrix_noreg.root").c_str(),"READ");
 
   TH1D* hLinearResult;
-  std::string histoLinearTargetType;
+  int Nbins;
 
   if(Target=="O"){
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_O_nuisance.root").c_str(),"READ");
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
-    histoLinearTargetType = "Oxygen";
     
     fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixObin");
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
-  } 
-  else if(Target=="C"){
-    fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
-    hLinearResult = (TH1D*) fInputFile->Get("LinResult");
-    histoLinearTargetType = "Carbon";
 
-    fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
-    covar = StatUtils::GetInvert(fFullCovar);
-    fDecomp = StatUtils::GetDecomp(fFullCovar);
-  } 
 
-  int Nbins = hLinearResult->GetNbinsX();
-  
-  // Now Convert into 1D list
-  fDataHist = new TH1D(("LinarResult" + histoLinearTargetType).c_str(),("LinarResult" + histoLinearTargetType).c_str(),Nbins,0,Nbins);
-  for (int bin = 0; bin < Nbins; bin++){
-    fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
-  }
+    Nbins = hLinearResult->GetNbinsX();
+    // Now Convert into 1D list
+    fDataHist = new TH1D("LinarResultOxygen","LinarResultOxygen",Nbins,0,Nbins);
+    for (int bin = 0; bin < Nbins; bin++){
+      fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
+    }
 
-  
-  fDataHist->Reset();
-
-  // Read in 1D Data Slices and Make MC Slices NuMu CC0pi Xsec
-  int bincount = 0;
-  for (int i = 0; i < nangbins; i++){
-    if(Target=="O"){
+    fDataHist->Reset();
+    int bincount = 0;
+    for (int i = 0; i < nangbins; i++){
       // Get Data Histogram
       fDataHistNuMuO_Slices.push_back((TH1D*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i),
@@ -215,9 +200,27 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
       SetAutoProcessTH1(fDataHistNuMuO_Slices[i],kCMD_Write);
       SetAutoProcessTH1(fMCHistNuMuO_Slices[i]);
+    }
+  } 
+  else if(Target=="C"){
+    fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
+    hLinearResult = (TH1D*) fInputFile->Get("LinResult");
 
-    } 
-    else if(Target=="C") {
+    fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
+    covar = StatUtils::GetInvert(fFullCovar);
+    fDecomp = StatUtils::GetDecomp(fFullCovar);
+
+    Nbins = hLinearResult->GetNbinsX();
+
+    // Now Convert into 1D list
+    fDataHist = new TH1D("LinarResultCarbon","LinarResultCarbon",Nbins,0,Nbins);
+    for (int bin = 0; bin < Nbins; bin++){
+      fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
+    }
+
+    fDataHist->Reset();
+
+    for (int i = 0; i < nangbins; i++){
       //Get Data Histogram
       fDataHistNuMuC_Slices.push_back((TH1D*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i),
@@ -239,7 +242,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       SetAutoProcessTH1(fMCHistNuMuC_Slices[i]);
 
     }
-  }
+  } 
 
   return;
 
