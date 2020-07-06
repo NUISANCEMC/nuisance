@@ -598,7 +598,7 @@ void Measurement1D::FinaliseMeasurement() {
 
   // Push the diagonals of fFullCovar onto the data histogram
   // Comment this out until the covariance/data scaling is consistent!
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1);
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1E-38);
 
   // If shape only, set covar and fDecomp using the shape-only matrix (if set)
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {

@@ -64,7 +64,7 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos::T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey) 
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
-  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) / (TotalIntegratedFlux()));
+  fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 1E-38 / (TotalIntegratedFlux()));
 
   // Setup Histograms
   SetHistograms();
@@ -185,8 +185,8 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
       // Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuO_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount)));
-        fDataHist->SetBinContent(bincount+1, fDataHistNuMuO_Slices[i]->GetBinContent(j+1));
+        fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
+        fDataHist->SetBinContent(bincount+1, fDataHistNuMuO_Slices[i]->GetBinContent(j+1)*1E-38);
         fDataHist->SetBinError(bincount+1,   fDataHistNuMuO_Slices[i]->GetBinError(j+1));
         bincount++;
       }
@@ -226,8 +226,8 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
       //Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuC_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount)));
-        fDataHist->SetBinContent(bincount+1, fDataHistNuMuC_Slices[i]->GetBinContent(j+1));
+        fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
+        fDataHist->SetBinContent(bincount+1, fDataHistNuMuC_Slices[i]->GetBinContent(j+1)*1E-38);
         fDataHist->SetBinError(bincount+1,   fDataHistNuMuC_Slices[i]->GetBinError(j+1));
         bincount++;
       }
