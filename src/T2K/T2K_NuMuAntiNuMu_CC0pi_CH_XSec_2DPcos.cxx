@@ -112,8 +112,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   for (int i = 0; i < nangbins; i++){
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->GetSumw2();
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->GetSumw2();
+    if(NuPDG==14) fMCHistNuMu_Slices[i]->GetSumw2();
+    else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->GetSumw2();
   }
 
   // Do standard conversion.
@@ -121,8 +121,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
-    else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    if(NuPDG==14) fMCHistNuMu_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
   // Now Convert into 1D lists
@@ -131,13 +131,13 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
   for (int i = 0; i < nangbins; i++){
     if(NuPDG==14){
       for (int j = 0; j < fDataNuMuHist_Slices[i]->GetNbinsX(); j++){
-        fMCHist->SetBinContent(bincount+1, fMCNuMuHist_Slices[i]->GetBinContent(j+1));
+        fMCHist->SetBinContent(bincount+1, fMCHistNuMu_Slices[i]->GetBinContent(j+1));
         bincount++;
       }
     }
     else if(NuPDG==-14){
-      for (int j = 0; j < fMCAntiNuMuHist_Slices[i]->GetNbinsX(); j++){
-        fMCHist->SetBinContent(bincount+1, fMCAntiNuMuHist_Slices[i]->GetBinContent(j+1));
+      for (int j = 0; j < fMCHistAntiNuMu_Slices[i]->GetNbinsX(); j++){
+        fMCHist->SetBinContent(bincount+1, fMCHistAntiNuMu_Slices[i]->GetBinContent(j+1));
         bincount++;
       }
     }
@@ -150,8 +150,8 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
 
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y > angular_binning_costheta[i]) && (y <= angular_binning_costheta[i + 1])) {
-      if(NuPDG==14) fMCNuMuHist_Slices[i]->Fill(x, w);
-      else if(NuPDG==-14) fMCAntiNuMuHist_Slices[i]->Fill(x, w);
+      if(NuPDG==14) fMCHistNuMu_Slices[i]->Fill(x, w);
+      else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->Fill(x, w);
     }
   }
 }
@@ -194,7 +194,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   
   fDataHist->Reset();
 
-  // Read in 1D Data Slices and Make MC Slices NuMu CC0pi Xsec
+  // Read in 1D Data Slices and Make MC Slices 
   int bincount = 0;
   for (int i = 0; i < nangbins; i++){
     if(NuPDG==14){
@@ -212,11 +212,11 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
       }
 
       // Make MC Clones
-      fMCNuMuHist_Slices.push_back((TH1D*) fDataNuMuHist_Slices[i]->Clone());
-      fMCNuMuHist_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i)));
+      fMCHistNuMu_Slices.push_back((TH1D*) fDataNuMuHist_Slices[i]->Clone());
+      fMCHistNuMu_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 
       SetAutoProcessTH1(fDataNuMuHist_Slices[i],kCMD_Write);
-      SetAutoProcessTH1(fMCNuMuHist_Slices[i]);
+      SetAutoProcessTH1(fMCHistNuMu_Slices[i]);
 
     } 
     else if(NuPDG==-14) {
@@ -234,11 +234,11 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
       }
 
       //Make MC Clones
-      fMCAntiNuMuHist_Slices.push_back((TH1D*) fDataAntiNuMuHist_Slices[i]->Clone());
-      fMCAntiNuMuHist_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i)));
+      fMCHistAntiNuMu_Slices.push_back((TH1D*) fDataAntiNuMuHist_Slices[i]->Clone());
+      fMCHistAntiNuMu_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 
       SetAutoProcessTH1(fDataAntiNuMuHist_Slices[i],kCMD_Write);
-      SetAutoProcessTH1(fMCAntiNuMuHist_Slices[i]);
+      SetAutoProcessTH1(fMCHistAntiNuMu_Slices[i]);
 
     }
   }

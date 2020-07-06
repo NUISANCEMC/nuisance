@@ -16,22 +16,22 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef T2K_NUMUANTINUMU_CC0PI_CH_XSEC_2DPCOS_H_SEEN
-#define T2K_NUMUANTINUMU_CC0PI_CH_XSEC_2DPCOS_H_SEEN
+#ifndef T2K_NUMU_CC0PI_OC_XSEC_2DPCOS_H_SEEN
+#define T2K_NUMU_CC0PI_OC_XSEC_2DPCOS_H_SEEN
 
 #include "Measurement1D.h"
 #include "TH2Poly.h"
 
-class T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos : public Measurement1D {
+class T2K_NuMu_CC0pi_OC_XSec_2DPcos : public Measurement1D {
 public:
 
   /// Basic Constructor.
   /// /brief Parses two different measurements.
   ///
-  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nuiskey samplekey);
+  T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos() {};
+  ~T2K_NuMu_CC0pi_OC_XSec_2DPcos() {};
 
   /// Signal definition 
   bool isSignal(FitEvent *nvect);
@@ -51,14 +51,14 @@ public:
  private:
 
   TFile* fInputFile;
-  std::vector<TH1D*> fMCHistNuMu_Slices;
-  std::vector<TH1D*> fDataHistNuMu_Slices;
-  std::vector<TH1D*> fMCHistAntiNuMu_Slices;
-  std::vector<TH1D*> fDataHistAntiNuMu_Slices;
+  TFile* fInputFileCov;
+  std::vector<TH1D*> fMCHistNuMuO_Slices;
+  std::vector<TH1D*> fDataHistNuMuO_Slices;
+  std::vector<TH1D*> fMCHistNuMuC_Slices;
+  std::vector<TH1D*> fDataHistNuMuC_Slices;
 
   double pmu, CosThetaMu;
-  int NuPDG;
-  int LepPDG;
+  string Target;
   
   void FillMCSlice(double x, double y, double w);
 
