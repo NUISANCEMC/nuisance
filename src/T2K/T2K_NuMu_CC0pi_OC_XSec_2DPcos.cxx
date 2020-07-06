@@ -167,7 +167,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixObin");
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
-
+    ScaleCovar(1E76);
 
     Nbins = hLinearResult->GetNbinsX();
     // Now Convert into 1D list
@@ -208,9 +208,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
+    ScaleCovar(1E76);
 
     Nbins = hLinearResult->GetNbinsX();
-
     // Now Convert into 1D list
     fDataHist = new TH1D("LinarResultCarbon","LinarResultCarbon",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
