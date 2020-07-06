@@ -81,11 +81,11 @@ bool T2K_NuMu_CC0pi_OC_XSec_2DPcos::isSignal(FitEvent *event){
 
 void T2K_NuMu_CC0pi_OC_XSec_2DPcos::FillEventVariables(FitEvent* event){
 
-  if (event->NumFSParticle(LepPDG) == 0)
+  if (event->NumFSParticle(13) == 0)
     return;
   
   TLorentzVector Pnu = event->GetNeutrinoIn()->fP;
-  TLorentzVector Pmu = event->GetHMFSParticle(LepPDG)->fP;
+  TLorentzVector Pmu = event->GetHMFSParticle(13)->fP;
 
   double pmu = Pmu.Vect().Mag()/1000.;
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
@@ -232,7 +232,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       }
 
       //Save MC slices
-      fMCHistNuMuC_Slices.push_back((TH1D*) fDataAntiNuMuHist_Slices[i]->Clone());
+      fMCHistNuMuC_Slices.push_back((TH1D*) fDataHistNuMuC_Slices[i]->Clone());
       fMCHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%i",i)));
 
       SetAutoProcessTH1(fDataHistNuMuC_Slices[i],kCMD_Write);
