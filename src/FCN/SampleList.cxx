@@ -242,7 +242,7 @@
 #include "T2K_CC0pi_XSec_2DPcos_nu_II.h"
 
 // T2K CC0pi 2020 arXiv:1908.10249
-#include "T2K_NuMu_CC0pi_OC_XSec_2DPcos.h"
+#include "T2K_CC0pi_XSec_H2O_2DPcos_anu.h"
 
 // T2K CC0pi 2020 arXiv:2004.05434
 #include "T2K_NuMu_CC0pi_OC_XSec_2DPcos.h"

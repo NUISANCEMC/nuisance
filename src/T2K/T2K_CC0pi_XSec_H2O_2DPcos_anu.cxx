@@ -22,17 +22,17 @@
 #include "T2K_CC0pi_XSec_H2O_2DPcos_anu.h"
 
 
-static int nmombins = 8;
+static int nmombins = 7;
 static double mom_binning[] = { 400., 530., 670., 800., 1000., 1380., 2010., 3410. };
 
 static int    ncosbins[]    = { 2, 3, 3, 3, 3, 3, 3, 2 };
-static double costheta_binning[nmombins][ncosbins] = { { 0.84, 0.94, 1.       },  
-                                                       { 0.85, 0.92, 0.96, 1. },
-                                                       { 0.88, 0.93, 0.97, 1. },
-                                                       { 0.90, 0.94, 0.97, 1. },
-                                                       { 0.91, 0.95, 0.97, 1. },
-                                                       { 0.92, 0.96, 0.98, 1. },
-                                                       { 0.95, 0.98, 1.       }  };
+static double costheta_binning[][7] = { { 0.84, 0.94, 1.       },  
+                                        { 0.85, 0.92, 0.96, 1. },
+                                        { 0.88, 0.93, 0.97, 1. },
+                                        { 0.90, 0.94, 0.97, 1. },
+                                        { 0.91, 0.95, 0.97, 1. },
+                                        { 0.92, 0.96, 0.98, 1. },
+                                        { 0.95, 0.98, 1.       }  };
 
 //********************************************************************
 T2K_CC0pi_XSec_H2O_2DPcos_anu::T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey) {
