@@ -25,7 +25,7 @@
 static int nmombins = 7;
 static double mom_binning[] = { 400., 530., 670., 800., 1000., 1380., 2010., 3410. };
 
-static int    ncosbins[]    = { 2, 3, 3, 3, 3, 3, 3, 2 };
+static int    ncosbins[]    = { 2, 3, 3, 3, 3, 3, 2 };
 static double costheta_binning[][7] = { { 0.84, 0.94, 1.       },  
                                         { 0.85, 0.92, 0.96, 1. },
                                         { 0.88, 0.93, 0.97, 1. },
@@ -154,8 +154,8 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");
   // Read in 1D Data
   fFullCovar = new TMatrixDSym(Nbins);
-  for (int i = 0; i < fDataHist->GetNbinsX(); i++){
-    for (int j = 0; j < fDataHist->GetNbinsX(); j++){
+  for (int i = 0; i < Nbins; i++){
+    for (int j = 0; j < Nbins; j++){
       (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1);
     }
   }
