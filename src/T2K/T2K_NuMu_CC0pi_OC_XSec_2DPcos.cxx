@@ -145,7 +145,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::FillMCSlice(double x, double y, double w){
 
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y > angular_binning_costheta[i]) && (y <= angular_binning_costheta[i + 1])) {
-      if(Target=="O") fMCHistNuMuC_Slices[i]->Fill(x, w);
+      if(Target=="O") fMCHistNuMuO_Slices[i]->Fill(x, w);
       else if(Target=="C") fMCHistNuMuC_Slices[i]->Fill(x, w);
     }
   }
