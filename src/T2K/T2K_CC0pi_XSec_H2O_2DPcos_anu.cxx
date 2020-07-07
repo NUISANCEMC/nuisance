@@ -150,15 +150,15 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
 
   fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
   int Nbins = fDataHist->GetNbinsX();
-  /*TH2D* tempcorr = (TH2D*) fInputFile->Get("covDataRelease");
+  
+  TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");
   // Read in 1D Data
-  fFullCovar = new TMatrixDSym(fDataHist->GetNbinsX());
+  fFullCovar = new TMatrixDSym(Nbins);
   for (int i = 0; i < fDataHist->GetNbinsX(); i++){
     for (int j = 0; j < fDataHist->GetNbinsX(); j++){
-      (*fFullCovar)(i,j) = tempcorr->GetBinContent(i+1, j+1)*fDataHist->GetBinError(i+1)*1e38*fDataHist->GetBinError(j+1)*1e38;
+      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1);
     }
-  }*/
-  fFullCovar = (TMatrixDSym*) fInputFile->Get("covDataRelease");
+  }
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
