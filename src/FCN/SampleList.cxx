@@ -243,10 +243,11 @@
 
 // T2K CC0pi 2020 arXiv:2004.05434
 #include "T2K_NuMu_CC0pi_OC_XSec_2DPcos.h"
+#include "T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint.h"
 
 // T2K CC0pi 2020 arXiv:2002.09323
 #include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos.h"
-#include "T2K_NuMuAntiNuMu_CC0pi_XSec_joint.h"
+#include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint.h"
 
 // T2K CC-inclusive with full acceptance 2018
 #include "T2K_CCinc_XSec_2DPcos_nu_nonuniform.h"
@@ -1263,12 +1264,15 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("T2K_NuMu_CC0pi_C_XSec_2DPcos")) {
     return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos(samplekey));
 
+  } else if (!name.compare("T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint")) {
+    return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint(samplekey));
+    
   } else if (!name.compare("T2K_NuMu_CC0pi_CH_XSec_2DPcos") ||
              !name.compare("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos")) {
     return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(samplekey));
 
-  } else if (!name.compare("T2K_NuMuAntiNuMu_CC0pi_XSec_joint")) {
-    return (new T2K_NuMuAntiNuMu_CC0pi_XSec_joint(samplekey));
+  } else if (!name.compare("T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint")) {
+    return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(samplekey));
     
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_FHC") ||
              !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||

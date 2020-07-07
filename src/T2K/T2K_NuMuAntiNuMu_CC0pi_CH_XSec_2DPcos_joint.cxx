@@ -1,16 +1,16 @@
-#include "T2K_NuMuAntiNuMu_CC0pi_XSec_joint.h"
+#include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint.h"
 
 //********************************************************************
-T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey){
+T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(nuiskey samplekey){
 //********************************************************************
 
   fSettings = LoadSampleSettings(samplekey);
-  std::string descrip = "T2K_NuMuAntiNuMu_CC0pi_XSec_joint. \n"
+  std::string descrip = "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint. \n"
                         "Target: CH \n"
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                         "Signal: CC0pi\n"
                         "arXiv:2002.09323";
-  fSettings.SetTitle("T2K_NuMuAntiNuMu_CC0pi_XSec_joint");
+  fSettings.SetTitle("T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint");
   fSettings.DefineAllowedSpecies("numu, numub");
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
@@ -58,7 +58,7 @@ T2K_NuMuAntiNuMu_CC0pi_XSec_joint::T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey sam
 };
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetCovariance(){
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::SetCovariance(){
 //********************************************************************
 
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root").c_str(),"READ");
@@ -77,7 +77,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetCovariance(){
 
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::CombineDataHists(){
 //********************************************************************
 
   TH1D *hNuMuData     = (TH1D*)NuMuCC0pi->GetDataHistogram();
@@ -89,7 +89,6 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
                        (fSettings.GetFullTitles()).c_str(), nbins, 0, nbins);
   fDataHist->SetDirectory(0);
   
-  // Bit ugly, but...
   int count = 0;
   for (int x=0; x<hNuMuData->GetNbinsX(); ++x){
     fDataHist->SetBinContent(count+1, hNuMuData->GetBinContent(x+1));
@@ -106,7 +105,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::CombineDataHists(){
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::SetHistograms() {
 //********************************************************************
 
   NuMuCC0pi->SetHistograms();
@@ -116,7 +115,7 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::SetHistograms() {
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::FillHistograms() {
 //********************************************************************
 
   NuMuCC0pi->FillHistograms();
@@ -126,24 +125,24 @@ void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::FillHistograms() {
 }
 
 //********************************************************************
-void T2K_NuMuAntiNuMu_CC0pi_XSec_joint::ConvertEventRates() {
+void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::ConvertEventRates() {
 //********************************************************************
   
   NuMuCC0pi->ConvertEventRates();
   AntiNuMuCC0pi->ConvertEventRates();
 
-  TH1D* hNuMuMC = (TH1D*)NuMuCC0pi->GetMCHistogram();
-  TH1D* hAntiNuMuMC = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
+  TH1D* hNuMuCC0pi     = (TH1D*)NuMuCC0pi->GetMCHistogram();
+  TH1D* hAntiNuMuCC0pi = (TH1D*)AntiNuMuCC0pi->GetMCHistogram();
   
   int count = 0;
-  for (int i = 0; i < hNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hNuMuMC->GetBinError(i + 1));
+  for (int i = 0; i < hNuMuCC0pi->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hNuMuCC0pi->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hNuMuCC0pi->GetBinError(i + 1));
     count++;
   }
-  for (int i = 0; i < hAntiNuMuMC->GetNbinsX(); ++i) {
-    fMCHist->SetBinContent(count + 1, hAntiNuMuMC->GetBinContent(i + 1));
-    fMCHist->SetBinError(count + 1, hAntiNuMuMC->GetBinError(i + 1));
+  for (int i = 0; i < hAntiNuMuCC0pi->GetNbinsX(); ++i) {
+    fMCHist->SetBinContent(count + 1, hAntiNuMuCC0pi->GetBinContent(i + 1));
+    fMCHist->SetBinError(count + 1, hAntiNuMuCC0pi->GetBinError(i + 1));
     count++;
   }
 

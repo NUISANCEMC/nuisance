@@ -1,14 +1,14 @@
-#ifndef T2K_NUMUANTINUMU_CC0PI_XSEC_JOINT_H_SEEN
-#define T2K_NUMUANTINUMU_CC0PI_XSEC_JOINT_H_SEEN
+#ifndef T2K_NUMUANTINUMU_CC0PI_CH_XSEC_2DPCOS_JOINT_H_SEEN
+#define T2K_NUMUANTINUMU_CC0PI_CH_XSEC_2DPCOS_JOINT_H_SEEN
 
 #include "JointMeas1D.h"
 #include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos.h"
 
-class T2K_NuMuAntiNuMu_CC0pi_XSec_joint : public JointMeas1D {
+class T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint : public JointMeas1D {
 public:
 
-  T2K_NuMuAntiNuMu_CC0pi_XSec_joint(nuiskey samplekey);
-  virtual ~T2K_NuMuAntiNuMu_CC0pi_XSec_joint() {};
+  T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(nuiskey samplekey);
+  virtual ~T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint() {};
 
   // Makes a data hist from all the smaller ones
   void CombineDataHists();
