@@ -165,12 +165,10 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
 
   // Read in 2D Data Slices and Make MC Slices
   int bincount = 0;
-  for (int i = 0; i < nmombins; ++i)
-  {
+  for (int i = 0; i < nmombins; ++i) {
     // Get Data Histogram
     fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]));
-    for (int j = 0; j < ncosbins[i]; ++j)
-    {
+    for (int j = 0; j < ncosbins[i]; ++j) {
 
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
       fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-38);
