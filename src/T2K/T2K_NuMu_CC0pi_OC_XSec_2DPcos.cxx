@@ -195,7 +195,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       fDataHistNuMuO_Slices[i]->Scale(1E-39);
       // Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuO_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-39);
+        fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
         fDataHist->SetBinContent(bincount+1, fDataHistNuMuO_Slices[i]->GetBinContent(j+1));
         fDataHist->SetBinError(bincount+1,   fDataHistNuMuO_Slices[i]->GetBinError(j+1));

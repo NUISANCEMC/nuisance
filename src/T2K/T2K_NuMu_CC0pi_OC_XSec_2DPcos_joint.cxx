@@ -65,6 +65,8 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint::SetCovariance(){
   fInputFileCov = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/covmatrix_noreg.root").c_str(),"READ");
 
   TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixOeCbin");
+  
+  fFullCovar = new TMatrixDSym(tempcov->GetNrows());
 
   for(int ibin=0; ibin<tempcov->GetNrows(); ibin++) {  
     for(int jbin=0; jbin<tempcov->GetNrows(); jbin++) {
