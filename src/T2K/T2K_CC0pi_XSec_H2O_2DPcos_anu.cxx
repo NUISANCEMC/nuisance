@@ -154,7 +154,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   fFullCovar = new TMatrixDSym(Nbins);
   for (int i = 0; i < Nbins; i++){
     for (int j = 0; j < Nbins; j++){
-      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1)*1E-6;
+      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1)*1E-5;
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
