@@ -114,7 +114,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::ConvertEventRates(){
   Measurement1D::ConvertEventRates();
   
   for (size_t i = 0; i < nmombins; ++i) {
-    fMCHist_Slices[i]->Scale(fScaleFactor / (mom_binning[i + 1] - mom_binning[i]));
+    fMCHist_Slices[i]->Scale(1. / (mom_binning[i + 1] - mom_binning[i]));
   }
 
   // Now Convert into 1D list
@@ -134,8 +134,8 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::ConvertEventRates(){
 void T2K_CC0pi_XSec_H2O_2DPcos_anu::FillMCSlice(double x, double y, double w){
 
   for (size_t i = 0; i < nmombins; ++i) {
-    if ((y > mom_binning[i]) && (y <= mom_binning[i + 1])) {
-      fMCHist_Slices[i]->Fill(x, w);
+    if ((x > mom_binning[i]) && (x <= mom_binning[i + 1])) {
+      fMCHist_Slices[i]->Fill(y, w);
     }
   } 
 }
@@ -167,9 +167,9 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
     // Get Data Histogram
     fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]));
     for (int j = 0; j < ncosbins[i]; ++j) {
-      fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1e-38);
+      fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1E-38);
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
-      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-38);
+      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1E-38);
       bincount++;
 
     }
