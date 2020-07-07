@@ -171,6 +171,8 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
     for(int ibin=0; ibin<Nbins; ibin++) {  
       for(int jbin=0; jbin<Nbins; jbin++) {
+        // The factor 1E-2 needed since the covariance matrix in the 
+        // data release is divided by 1E-78
         (*fFullCovar)(ibin,jbin) = (*tempcov)(ibin,jbin)*1E-2;
       }
     }
