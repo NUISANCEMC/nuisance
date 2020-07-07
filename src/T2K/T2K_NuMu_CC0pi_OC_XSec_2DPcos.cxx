@@ -205,7 +205,13 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
 
-    fFullCovar = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
+    TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
+
+    for(int ibin=0; ibin<Nbins; ibin++) {  
+      for(int jbin=0; jbin<Nbins; jbin++) {
+        (*fFullCovar)(ibin,jbin) = (*tempcov)(ibin,jbin)*1E2;
+      }
+    }
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
@@ -228,7 +234,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
       fDataHistNuMuC_Slices[i]->Scale(1E-39);
       //Loop over nbins and set errors from covar
       for (int j = 0; j < fDataHistNuMuC_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-39);
+        fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
         fDataHist->SetBinContent(bincount+1, fDataHistNuMuC_Slices[i]->GetBinContent(j+1));
         fDataHist->SetBinError(bincount+1,   fDataHistNuMuC_Slices[i]->GetBinError(j+1));
