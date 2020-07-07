@@ -205,6 +205,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
 
+    Nbins = hLinearResult->GetNbinsX();
+    
+    fFullCovar = new TMatrixDSym(Nbins);
     TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
 
     for(int ibin=0; ibin<Nbins; ibin++) {  
@@ -215,7 +218,6 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
-    Nbins = hLinearResult->GetNbinsX();
     // Now Convert into 1D list
     fDataHist = new TH1D("LinarResultCarbon","LinarResultCarbon",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
