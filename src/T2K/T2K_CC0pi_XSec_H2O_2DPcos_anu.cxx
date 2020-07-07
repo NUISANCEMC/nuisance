@@ -22,7 +22,7 @@
 #include "T2K_CC0pi_XSec_H2O_2DPcos_anu.h"
 
 
-static size_t nmombins = 8;
+static int nmombins = 8;
 static double mom_binning[] = { 400., 530., 670., 800., 1000., 1380., 2010., 3410. };
 
 static int    ncosbins[]    = { 2, 3, 3, 3, 3, 3, 3, 2 };
