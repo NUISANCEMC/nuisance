@@ -33,13 +33,13 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint::T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint(nuiskey
   NuMuCC0piOKey.SetS("input", inFileNuMuO);
   NuMuCC0piOKey.SetS("type",  fSettings.GetS("type"));
   NuMuCC0piOKey.SetS("name", "T2K_NuMu_CC0pi_O_XSec_2DPcos");
-  NuMuCC0piO = new T2K_NuMu_CC0pi_O_XSec_2DPcos(NuMuCC0piOKey);
+  NuMuCC0piO = new T2K_NuMu_CC0pi_OC_XSec_2DPcos(NuMuCC0piOKey);
 
   nuiskey NuMuCC0piCKey = Config::CreateKey("sample");
   NuMuCC0piCKey.SetS("input", inFileNuMuC);
   NuMuCC0piCKey.SetS("type",  fSettings.GetS("type"));
   NuMuCC0piCKey.SetS("name", "T2K_NuMu_CC0pi_C_XSec_2DPcos");
-  NuMuCC0piC = new T2K_NuMu_CC0pi_C_XSec_2DPcos(NuMuCC0piCKey);
+  NuMuCC0piC = new T2K_NuMu_CC0pi_OC_XSec_2DPcos(NuMuCC0piCKey);
 
   // Sort out the data hist
   this->CombineDataHists();
@@ -66,8 +66,8 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint::SetCovariance(){
 
   TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixOeCbin");
 
-  for(int ibin=0; ibin<Nbins; ibin++) {  
-    for(int jbin=0; jbin<Nbins; jbin++) {
+  for(int ibin=0; ibin<tempcov->GetNrows(); ibin++) {  
+    for(int jbin=0; jbin<tempcov->GetNrows(); jbin++) {
       // The factor 1E-2 needed since the covariance matrix in the 
       // data release is divided by 1E-78
       (*fFullCovar)(ibin,jbin) = (*tempcov)(ibin,jbin)*1E-2;
