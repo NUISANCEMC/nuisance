@@ -106,22 +106,21 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::FillHistograms(){
 // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
 void T2K_CC0pi_XSec_H2O_2DPcos_anu::ConvertEventRates(){
 
-  for (int i = 0; i < 7; i++){
+  for (int i = 0; i < nmombins; i++){
     fMCHist_Slices[i]->GetSumw2();
   }
 
   // Do standard conversion.
   Measurement1D::ConvertEventRates();
   
-  // Do we need this?? Maybe already normalized in Thomas data results
   for (size_t i = 0; i < nmombins; ++i) {
-    fMCHist_Slices[i]->Scale(1. / (mom_binning[i + 1] - mom_binning[i]));
+    fMCHist_Slices[i]->Scale(fScaleFactor / (mom_binning[i + 1] - mom_binning[i]));
   }
 
   // Now Convert into 1D list
   fMCHist->Reset();
   int bincount = 0;
-  for (int i = 0; i < 7; i++){
+  for (int i = 0; i < nmombins; i++){
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fMCHist->SetBinContent(bincount+1, fMCHist_Slices[i]->GetBinContent(j+1));
       bincount++;
@@ -170,7 +169,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
     for (int j = 0; j < ncosbins[i]; ++j) {
       fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1e-41);
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
-      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-41);
+      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-38);
       bincount++;
 
     }

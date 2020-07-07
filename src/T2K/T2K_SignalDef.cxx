@@ -187,20 +187,14 @@ bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax) {
   double Pmu = pmu.Vect().Mag();
   double CosThetaMu = cos(pnu.Vect().Angle(pmu.Vect()));
   // Muon phase space
-  if (Pmu < 400 || Pmu > 3410)
-    return false;
-  if (Pmu < 530 && CosThetaMu < 0.85)
-    return false;
-  if (Pmu < 670 && CosThetaMu < 0.88)
-    return false;
-  if (Pmu < 800 && CosThetaMu < 0.9)
-    return false;
-  if (Pmu < 1000 && CosThetaMu < 0.91)
-    return false;
-  if (Pmu < 1380 && CosThetaMu < 0.92)
-    return false;
-  if (Pmu < 2010 && CosThetaMu < 0.95)
-    return false;
+  if (Pmu < 400 || Pmu > 3410) return false;
+  if (Pmu < 530 && Pmu>=400 && CosThetaMu<0.84) return false;
+  if (Pmu < 670 && Pmu>=530 && CosThetaMu<0.85) return false;
+  if (Pmu < 800 && Pmu>=670 && CosThetaMu<0.88) return false;
+  if (Pmu < 1000 &&Pmu>=800 && CosThetaMu<0.9) return false;
+  if (Pmu < 1380 && Pmu>=1000 && CosThetaMu<0.91) return false;
+  if (Pmu < 2010 && Pmu>=1380 && CosThetaMu<0.92) return false;
+  if (Pmu < 3410 && Pmu>=2010 && CosThetaMu<0.95) return false;
 
   return true;
 }
