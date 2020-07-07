@@ -168,7 +168,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   for (int i = 0; i < nmombins; ++i)
   {
     // Get Data Histogram
-    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]););
+    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]));
     for (int j = 0; j < ncosbins[i]; ++j)
     {
 
