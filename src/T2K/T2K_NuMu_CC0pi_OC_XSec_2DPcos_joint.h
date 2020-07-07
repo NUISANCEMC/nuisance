@@ -32,8 +32,8 @@ public:
   void ConvertEventRates();
  
  private:
-  T2K_NuMu_CC0pi_O_XSec_2DPcos* NuMuCC0piO;
-  T2K_NuMu_CC0pi_C_XSec_2DPcos* NuMuCC0piC;
+  T2K_NuMu_CC0pi_OC_XSec_2DPcos* NuMuCC0piO;
+  T2K_NuMu_CC0pi_OC_XSec_2DPcos* NuMuCC0piC;
   TFile* fInputFileCov;
 };
 
