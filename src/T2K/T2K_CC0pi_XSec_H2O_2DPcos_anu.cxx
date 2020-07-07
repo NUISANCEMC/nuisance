@@ -47,9 +47,8 @@ T2K_CC0pi_XSec_H2O_2DPcos_anu::T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey) 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#mu} (GeV)");
-  fSettings.SetYTitle("cos#theta_{#mu}");
-  fSettings.SetZTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetXTitle("cos#theta_{#mu}-p_{#mu}");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
   fSettings.DefineAllowedTargets("H,O");
@@ -61,7 +60,7 @@ T2K_CC0pi_XSec_H2O_2DPcos_anu::T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey) 
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // ScaleFactor automatically setup for DiffXSec/cm2/water molecule
   fScaleFactor = ((GetEventHistogram()->Integral("weight")/(fNEvents+0.)) * 18E-38 / (TotalIntegratedFlux("")));
 
   // Setup Histograms
@@ -156,7 +155,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   fFullCovar = new TMatrixDSym(Nbins);
   for (int i = 0; i < Nbins; i++){
     for (int j = 0; j < Nbins; j++){
-      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1);
+      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1)*1E-6;
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
@@ -171,7 +170,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
     for (int j = 0; j < ncosbins[i]; ++j) {
 
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
-      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-38);
+      fDataHist_Slices[i]->SetBinError(j+1,   sqrt((*fFullCovar)(bincount,bincount))*1e-41);
       bincount++;
     }
 
