@@ -178,6 +178,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
     fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
   }
   
+  // Make covariance matrix
   fFullCovar = new TMatrixDSym(Nbins);
 
   TMatrixDSym* tmpcovstat = (TMatrixDSym*) fInputFile->Get("JointNuMuAntiNuMuCC0piXsecCovMatrixStat");
@@ -194,11 +195,10 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   
   fDataHist->Reset();
 
-  // Read in 1D Data Slices and Make MC Slices 
   int bincount = 0;
   for (int i = 0; i < nangbins; i++){
     if(NuPDG==14){
-      // Get Data Histogram
+      // Make slices for data 
       fDataHistNuMu_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsecNuMuCC0piDataSlice_%i",i))->Clone());
       fDataHistNuMu_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%i",i)));
@@ -211,7 +211,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
         bincount++;
       }
 
-      // Make MC Clones
+      // Save MC slices
       fMCHistNuMu_Slices.push_back((TH1D*) fDataHistNuMu_Slices[i]->Clone());
       fMCHistNuMu_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 
@@ -220,7 +220,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
     } 
     else if(NuPDG==-14) {
-      //Get Data Histogram
+      // Make slices for data 
       fDataHistAntiNuMu_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsecAntiNuMuCC0piDataSlice_%i",i))->Clone());
       fDataHistAntiNuMu_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%i",i),
       (Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%i",i)));
@@ -233,7 +233,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
         bincount++;
       }
 
-      //Make MC Clones
+      // Save MC slices
       fMCHistAntiNuMu_Slices.push_back((TH1D*) fDataHistAntiNuMu_Slices[i]->Clone());
       fMCHistAntiNuMu_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i), (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%i",i)));
 

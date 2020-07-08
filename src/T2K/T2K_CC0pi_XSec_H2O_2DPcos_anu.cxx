@@ -147,7 +147,8 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/AntiNuMuH2O/AntiNuMuOnH2O_unreg.root").c_str(),"READ");
 
   // Read in 1D Data
-  fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
+  fDataHist = new TH1D("LinarResult","LinarResult",Nbins,0,Nbins);
+  fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease"); 
   int Nbins = fDataHist->GetNbinsX();
   
   // Read relative covariance matrix

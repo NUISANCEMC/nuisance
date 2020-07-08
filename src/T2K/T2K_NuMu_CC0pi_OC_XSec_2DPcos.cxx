@@ -31,7 +31,7 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos::T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey) 
   std::string name = fSettings.GetS("name");
   std::string descrip = "";
 
-  // This has to deal with NuMu FHC, and AntiNuMu RHC
+  // This has to deal with NuMu on O and on C
   if (!name.compare("T2K_NuMu_CC0pi_O_XSec_2DPcos")){
     descrip = name +". \n"
                     "Target: Oxygen \n"
@@ -114,13 +114,13 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::ConvertEventRates(){
   // Do standard conversion.
   Measurement1D::ConvertEventRates();
 
-  // Scale MC slices by their bin area
+  // Scale MC slices by their bin width
   for (size_t i = 0; i < nangbins; ++i) {
     if(Target=="O") fMCHistNuMuO_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
     else if(Target=="C") fMCHistNuMuC_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
-  // Now Convert into 1D lists
+  // Now Convert into 1D histogram
   fMCHist->Reset();
   int bincount = 0;
   for (int i = 0; i < nangbins; i++){
@@ -160,12 +160,13 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
   int Nbins;
 
   if(Target=="O"){
-    // Read in 1D Data Histograms
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_O_nuisance.root").c_str(),"READ");
+    // Read 1D data histogram
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
         
     Nbins = hLinearResult->GetNbinsX();
 
+    // Make covariance matrix
     fFullCovar = new TMatrixDSym(Nbins);
     TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixObin");
 
@@ -179,7 +180,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
-    // Now Convert into 1D list
+    // Store hLinearResult into fDataHist
     fDataHist = new TH1D("LinarResultOxygen","LinarResultOxygen",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
       fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
@@ -188,12 +189,12 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fDataHist->Reset();
     int bincount = 0;
     for (int i = 0; i < nangbins; i++){
-      // Get Data Histogram
+      // Make slices for data 
       fDataHistNuMuO_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i)));
       fDataHistNuMuO_Slices[i]->Scale(1E-39);
-      // Loop over nbins and set errors from covar
+      // Loop over nbins and set errors from covariance
       for (int j = 0; j < fDataHistNuMuO_Slices[i]->GetNbinsX(); j++){
         fDataHistNuMuO_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
@@ -202,7 +203,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
         bincount++;
       }
 
-      // Make MC Clones
+      // Save MC slices
       fMCHistNuMuO_Slices.push_back((TH1D*) fDataHistNuMuO_Slices[i]->Clone());
       fMCHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%i",i)));
 
@@ -213,10 +214,13 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
   else if(Target=="C"){
     
     fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointO-C/linear_unreg_results_C_nuisance.root").c_str(),"READ");
+    
+    // Read 1D data histogram
     hLinearResult = (TH1D*) fInputFile->Get("LinResult");
 
     Nbins = hLinearResult->GetNbinsX();
 
+    // Make the covariance matrix
     fFullCovar = new TMatrixDSym(Nbins);
     TMatrixDSym* tempcov = (TMatrixDSym*) fInputFileCov->Get("covmatrixCbin");
 
@@ -228,7 +232,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     covar = StatUtils::GetInvert(fFullCovar);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
-    // Now Convert into 1D list
+    // Now Convert into 1D histrogram
     fDataHist = new TH1D("LinarResultCarbon","LinarResultCarbon",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
       fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
@@ -238,13 +242,13 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
     int bincount=0;
     for (int i = 0; i < nangbins; i++){
-      //Get Data Histogram
+      // Make slices for data 
       fDataHistNuMuC_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i),
       (Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i)));
 
       fDataHistNuMuC_Slices[i]->Scale(1E-39);
-      //Loop over nbins and set errors from covar
+      //Loop over nbins and set errors from covariance
       for (int j = 0; j < fDataHistNuMuC_Slices[i]->GetNbinsX(); j++){
         fDataHistNuMuC_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
 
