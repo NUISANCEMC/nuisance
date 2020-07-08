@@ -146,13 +146,14 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   // Read in 1D Data Histograms
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/AntiNuMuH2O/AntiNuMuOnH2O_unreg.root").c_str(),"READ");
 
+  // Read in 1D Data
   fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
   int Nbins = fDataHist->GetNbinsX();
   
-  TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");// The matrix saved in the 
-                                                            // data release is the 
-                                                            // relative covariance matrix
-  // Read in 1D Data
+  // Read relative covariance matrix
+  TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");
+
+  // Make absolute covariance matrix
   fFullCovar = new TMatrixDSym(Nbins);
   for (int i = 0; i < Nbins; i++){
     for (int j = 0; j < Nbins; j++){
@@ -165,7 +166,6 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   // Read in 2D Data Slices and Make MC Slices
   int bincount = 0;
   for (int i = 0; i < nmombins; ++i) {
-    // Get Data Histogram
     fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]));
     for (int j = 0; j < ncosbins[i]; ++j) {
       fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1E-38);

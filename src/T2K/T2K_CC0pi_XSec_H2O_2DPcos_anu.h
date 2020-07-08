@@ -27,40 +27,33 @@
 class T2K_CC0pi_XSec_H2O_2DPcos_anu : public Measurement1D {
 public:
 
-  /// Basic Constructor.
-  ///
+  // Basic Constructor.
   T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey);
 
-  /// Virtual Destructor
+  // Virtual Destructor
   ~T2K_CC0pi_XSec_H2O_2DPcos_anu() {};
 
-  /// Signal Definition
+  // Signal Definition
   bool isSignal(FitEvent *nvect);
 
-  /// Read histograms in a special way because format is different.
+  // Read histograms 
   void SetHistograms();
 
-  /// Bin Tmu CosThetaMu
+  // Bin Pmu CosThetaMu
   void FillEventVariables(FitEvent* customEvent);
 
   // Fill Histograms
   void FillHistograms();
 
-  /// Have to do a weird event scaling for analysis 1
+  /// Event scaling 
   void ConvertEventRates();
 
  private:
 
-  double pmu, CosThetaMu;
-
-  TH2Poly* fDataPoly;
-  TH2Poly* fMCPoly;
-
   TFile* fInputFile;
-  TH2D* fMCHist_Fine2D;
-
   std::vector<TH1D*> fMCHist_Slices;
   std::vector<TH1D*> fDataHist_Slices;
+  double pmu, CosThetaMu;
 
   void FillMCSlice(double x, double y, double w);
   
