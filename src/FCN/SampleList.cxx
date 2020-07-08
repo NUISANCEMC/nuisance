@@ -241,6 +241,17 @@
 #include "T2K_CC0pi_XSec_2DPcos_nu_I.h"
 #include "T2K_CC0pi_XSec_2DPcos_nu_II.h"
 
+// T2K CC0pi 2020 arXiv:1908.10249
+#include "T2K_CC0pi_XSec_H2O_2DPcos_anu.h"
+
+// T2K CC0pi 2020 arXiv:2004.05434
+#include "T2K_NuMu_CC0pi_OC_XSec_2DPcos.h"
+#include "T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint.h"
+
+// T2K CC0pi 2020 arXiv:2002.09323
+#include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos.h"
+#include "T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint.h"
+
 // T2K CC-inclusive with full acceptance 2018
 #include "T2K_CCinc_XSec_2DPcos_nu_nonuniform.h"
 
@@ -1252,6 +1263,23 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("T2K_CCinc_XSec_2DPcos_nu_nonuniform")) {
     return (new T2K_CCinc_XSec_2DPcos_nu_nonuniform(samplekey));
 
+  } else if (!name.compare("T2K_CC0pi_XSec_H2O_2DPcos_anu")) {
+    return (new T2K_CC0pi_XSec_H2O_2DPcos_anu(samplekey));
+
+  } else if (!name.compare("T2K_NuMu_CC0pi_O_XSec_2DPcos") ||
+             !name.compare("T2K_NuMu_CC0pi_C_XSec_2DPcos")) {
+    return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos(samplekey));
+
+  } else if (!name.compare("T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint")) {
+    return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint(samplekey));
+    
+  } else if (!name.compare("T2K_NuMu_CC0pi_CH_XSec_2DPcos") ||
+             !name.compare("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos")) {
+    return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(samplekey));
+
+  } else if (!name.compare("T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint")) {
+    return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(samplekey));
+    
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_FHC") ||
              !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||
              !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
