@@ -17,8 +17,8 @@ T2K_CC1pip_H2O_XSec_1Dcospi_nu::T2K_CC1pip_H2O_XSec_1Dcospi_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_H2O_XSec_1Dcospi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos#theta_{#pi}");
-  fSettings.SetYTitle("d#sigma/dcos#theta_{#pi} (cm^{2}/nucleon)");
+  fSettings.SetXTitle("cos#theta_{#nu,#pi}");
+  fSettings.SetYTitle("d#sigma/dcos#theta_{#nu,#pi} (cm^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
