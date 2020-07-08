@@ -40,7 +40,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
                     "Target: CH \n"
                     "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                     "Signal: CC0pi\n"
-                    "arXiv:2002.09323";
+                    "DOI:10.1103/PhysRevD.101.112001";
     fSettings.SetTitle("T2K_NuMu_CC0pi_CH_XSec_2DPcos");
     fSettings.DefineAllowedSpecies("numu");
     NuPDG  = 14;
@@ -51,8 +51,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
                     "Target: CH \n"
                     "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                     "Signal: CC0pi\n"
-                    "arXiv:2002.09323";
-
+                    "DOI:10.1103/PhysRevD.101.112001";
     fSettings.SetTitle("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos");
     fSettings.DefineAllowedSpecies("numub");
     NuPDG  = -14;

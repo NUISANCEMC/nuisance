@@ -37,7 +37,7 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos::T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey) 
                     "Target: Oxygen \n"
                     "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                     "Signal: CC0pi\n"
-                    "arXiv:2004.05434";
+                    "DOI:10.1103/PhysRevD.101.112004";
     fSettings.SetTitle("T2K_NuMu_CC0pi_O_XSec_2DPcos");
     fSettings.DefineAllowedTargets("O");
     Target = "O";
@@ -47,7 +47,7 @@ T2K_NuMu_CC0pi_OC_XSec_2DPcos::T2K_NuMu_CC0pi_OC_XSec_2DPcos(nuiskey samplekey) 
                     "Target: Carbon \n"
                     "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                     "Signal: CC0pi\n"
-                    "arXiv:2004.05434";
+                    "DOI:10.1103/PhysRevD.101.112004";
     fSettings.SetTitle("T2K_NuMu_CC0pi_C_XSec_2DPcos");
     fSettings.DefineAllowedTargets("C");
     Target = "C";
