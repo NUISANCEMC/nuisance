@@ -149,17 +149,18 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
   int Nbins = fDataHist->GetNbinsX();
   
-  TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");
+  TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");// The matrix saved in the 
+                                                            // data release is the 
+                                                            // relative covariance matrix
   // Read in 1D Data
   fFullCovar = new TMatrixDSym(Nbins);
   for (int i = 0; i < Nbins; i++){
     for (int j = 0; j < Nbins; j++){
-      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1)*1E-5;
+      (*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1)*fDataHist->GetBinContent(i+1)*fDataHist->GetBinContent(j+1)*1E76;
     }
   }
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
-
 
   // Read in 2D Data Slices and Make MC Slices
   int bincount = 0;
