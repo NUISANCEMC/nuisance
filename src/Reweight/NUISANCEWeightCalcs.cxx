@@ -1,6 +1,7 @@
 #include "NUISANCEWeightCalcs.h"
 
 #include "FitEvent.h"
+#include "FitUtils.h"
 #include "GeneralUtils.h"
 #include "NUISANCESyst.h"
 #include "WeightUtils.h"
@@ -14,13 +15,17 @@ SFRW_pShellNormCalc::SFRW_pShellNormCalc() { std::cout << "Setting up pShellNorm
 
 double SFRW_pShellNormCalc::CalcWeight(BaseFitEvt *evt) {
   int mode = abs(evt->Mode);
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
   double w = 1.0;
 
   //std::cout << "Calculating pShellNorm weight" << std::endl;
 
   if (mode == 1 ) { // CCQE only
-    // Add condition that we're looking only at the p_shell, this should eventually be set depending on the target
-    w *= fNormPShell;
+    // Add condition that we're looking only at the p_shell, this should eventually be set depending on the target:
+    double Emiss = FitUtils::GetEmiss(fevt); // this function is not finished, it just returns 1 right now ... 
+    if(Emiss>0){ //placeholder values, these should be checked and changed
+      w *= fNormPShell;
+    }
     //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
   }
 

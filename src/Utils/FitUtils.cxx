@@ -1096,3 +1096,58 @@ double FitUtils::cthpInfK(TLorentzVector pmu, double costh, double binding,
 
   return cth_inf;
 };
+//********************************************************************
+double FitUtils::GetEmiss(FitEvent *event) {
+  //********************************************************************
+  // Get an SF-like Emiss (removal energy) using the pre-FSI particle stack
+  double Emiss = 1.0;
+
+  // Initalise what we need: 
+
+  TLorentzVector *nu_4mom = new TLorentzVector(0,0,0,0);
+  TLorentzVector *plep = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pprot = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pneut = new TLorentzVector(0,0,0,0);
+
+  double proton_highmom = 0.0;
+  double neutron_highmom = 0.0;
+
+  int PDGnu = event->PartInfo(0)->fPID;
+  (*nu_4mom) = event->PartInfo(0)->fP;
+
+  // Get the pre-FSI stack like in the GenericVectors tree:
+  // Start Particle Loop
+  UInt_t npart = event->Npart();
+  for (UInt_t i = 0; i < npart; i++) {
+    // Save particles that are just before the FSI cascade
+    bool isPreFSI = event->fPrimaryVertex[i];
+    if (!isPreFSI)
+      continue;
+
+    // PDG Particle
+    int PDGpart = event->PartInfo(i)->fPID;
+    TLorentzVector part_4mom = event->PartInfo(i)->fP;
+    if (abs(PDGpart) == abs(PDGnu) - 1) {
+      *plep = part_4mom;
+    } 
+    else if (PDGpart == 2212) {
+      if (part_4mom.Vect().Mag() > proton_highmom) {
+        proton_highmom = part_4mom.Vect().Mag();
+        (*pprot) = part_4mom;
+      }
+    } 
+    else if (PDGpart == 2112) {
+      if (part_4mom.Vect().Mag() > neutron_highmom) {
+        neutron_highmom = part_4mom.Vect().Mag();
+        (*pneut) = part_4mom;
+      }
+    }
+
+  } // End of particle loop
+
+  // Calculate Emiss from kinematics:
+  //....
+  //
+
+  return Emiss;
+}

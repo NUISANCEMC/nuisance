@@ -185,6 +185,9 @@ double ppInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
 TVector3 tppInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
 double cthpInfK(TLorentzVector pmu, double costh, double binding, bool neutrino);
 
+// SF helper funcitons:
+double GetEmiss(FitEvent *event);
+
 double CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
 double PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
 }
