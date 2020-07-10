@@ -69,6 +69,8 @@ namespace Reweight {
     kSBLOsc_MassSplitting,
     kSBLOsc_Sin2Theta,
 
+    kSFRW_pShellNorm_C,
+
     kNUISANCEDial_LAST
   };
 

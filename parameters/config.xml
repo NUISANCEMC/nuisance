@@ -118,6 +118,7 @@
 
 <!-- # For GenericFlux -->
 <config isLiteMode='0'/>
+<config isMinervaSTVPS='0'/>
 
 <!-- # Statistical Options -->
 <!-- # ###################################################### -->

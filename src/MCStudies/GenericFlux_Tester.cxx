@@ -45,7 +45,25 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
   ppim = new TLorentzVector(0, 0, 0, 0);
   ppi0 = new TLorentzVector(0, 0, 0, 0);
   pprot = new TLorentzVector(0, 0, 0, 0);
+  pprot_sec = new TLorentzVector(0, 0, 0, 0);
   pneut = new TLorentzVector(0, 0, 0, 0);
+  prem = new TLorentzVector(0, 0, 0, 0);
+  ptgtNuc = new TLorentzVector(0, 0, 0, 0);
+  infk_pprot = new TLorentzVector(0, 0, 0, 0);
+  pkp = new TLorentzVector(0, 0, 0, 0);
+  pkm = new TLorentzVector(0, 0, 0, 0);
+
+  ppip_vect = new TLorentzVector(0, 0, 0, 0);
+  ppim_vect = new TLorentzVector(0, 0, 0, 0);
+  ppi0_vect = new TLorentzVector(0, 0, 0, 0);
+  pprot_vect = new TLorentzVector(0, 0, 0, 0);
+  pprot_sec_vect = new TLorentzVector(0, 0, 0, 0);
+  pneut_vect = new TLorentzVector(0, 0, 0, 0);
+  prem_vect = new TLorentzVector(0, 0, 0, 0);
+  ptgtNuc_vect = new TLorentzVector(0, 0, 0, 0);
+  infk_pprot_vect = new TLorentzVector(0, 0, 0, 0);
+  pkp_vect = new TLorentzVector(0, 0, 0, 0);
+  pkm_vect = new TLorentzVector(0, 0, 0, 0);
 
   // This function will sort out the input files automatically and parse all the
   // inputs,flags,etc.
@@ -55,6 +73,10 @@ GenericFlux_Tester::GenericFlux_Tester(std::string name, std::string inputfile,
 
   eventVariables = NULL;
   liteMode = Config::Get().GetParB("isLiteMode");
+  minervaSTVPS = FitPar::Config().GetParB("isMinervaSTVPS");
+
+  NUIS_LOG(SAM, " Generic Flux Config. liteMode=" << liteMode << " minervaSTVPS= " << minervaSTVPS);
+
 
   if (Config::HasPar("EnuMin")) {
     EnuMin = Config::GetParD("EnuMin");
@@ -108,6 +130,9 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
 
   NUIS_LOG(SAM, "Adding Event Variables");
   eventVariables->Branch("Mode", &Mode, "Mode/I");
+
+  eventVariables->Branch("TgtA", &TgtA, "TgtA/I");
+  eventVariables->Branch("TgtZ", &TgtZ, "TgtZ/I");
 
   eventVariables->Branch("PDGnu", &PDGnu, "PDGnu/I");
   eventVariables->Branch("Enu_true", &Enu_true, "Enu_true/F");
@@ -165,11 +190,19 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("CosPi0Pprot", &CosPi0Pprot, "CosPi0Pprot/F");
   eventVariables->Branch("CosPi0Pneut", &CosPi0Pneut, "CosPi0Pneut/F");
 
+
+  eventVariables->Branch("Nkplus", &Nkplus, "Nkplus/I");
+  eventVariables->Branch("Nkneg", &Nkneg, "Nkneg/I");
   eventVariables->Branch("Nother", &Nother, "Nother/I");
 
   eventVariables->Branch("Q2_true", &Q2_true, "Q2_true/F");
   eventVariables->Branch("q0_true", &q0_true, "q0_true/F");
   eventVariables->Branch("q3_true", &q3_true, "q3_true/F");
+
+  eventVariables->Branch("stv_dpt", &stv_dpt, "stv_dpt/F");
+  eventVariables->Branch("stv_dphit", &stv_dphit, "stv_dphit/F");
+  eventVariables->Branch("stv_dat", &stv_dat, "stv_dat/F");
+  eventVariables->Branch("pn_rec", &pn_rec, "pn_rec/F");
 
   eventVariables->Branch("Enu_QE", &Enu_QE, "Enu_QE/F");
   eventVariables->Branch("Q2_QE", &Q2_QE, "Q2_QE/F");
@@ -184,6 +217,16 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("Erecoil_minerva", &Erecoil_minerva,
                          "Erecoil_minerva/F");
 
+  eventVariables->Branch("Nleptons_vect", &Nleptons_vect, "Nleptons_vect/I");
+  eventVariables->Branch("Nprotons_vect", &Nprotons_vect, "Nprotons_vect/I");
+  eventVariables->Branch("Nneutrons_vect", &Nneutrons_vect, "Nneutrons_vect/I");
+  eventVariables->Branch("Npiplus_vect", &Npiplus_vect, "Npiplus_vect/I");
+  eventVariables->Branch("Npineg_vect", &Npineg_vect, "Npineg_vect/I");
+  eventVariables->Branch("Npi0_vect", &Npi0_vect, "Npi0_vect/I");
+  eventVariables->Branch("Nkplus_vect", &Nkplus_vect, "Nkplus_vect/I");
+  eventVariables->Branch("Nkneg_vect", &Nkneg_vect, "Nkneg_vect/I");
+  eventVariables->Branch("Nother_vect", &Nother_vect, "Nother_vect/I");
+
   if (!liteMode) {
     eventVariables->Branch("nu_4mom", &nu_4mom);
     eventVariables->Branch("pmu_4mom", &pmu);
@@ -191,7 +234,25 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
     eventVariables->Branch("hm_ppim_4mom", &ppim);
     eventVariables->Branch("hm_ppi0_4mom", &ppi0);
     eventVariables->Branch("hm_pprot_4mom", &pprot);
+    eventVariables->Branch("shm_pprot_4mom", &pprot_sec);
     eventVariables->Branch("hm_pneut_4mom", &pneut);
+    eventVariables->Branch("prem_4mom", &prem);
+    eventVariables->Branch("hm_ISQE_nucl_4mom", &ptgtNuc);
+    eventVariables->Branch("infk_pprot_4mom", &infk_pprot);
+    eventVariables->Branch("hm_pkp_4mom", &ppip);
+    eventVariables->Branch("hm_pkm_4mom", &ppim);
+
+    eventVariables->Branch("hm_ppip_4mom_vect", &ppip_vect);
+    eventVariables->Branch("hm_ppim_4mom_vect", &ppim_vect);
+    eventVariables->Branch("hm_ppi0_4mom_vect", &ppi0_vect);
+    eventVariables->Branch("hm_pprot_4mom_vect", &pprot_vect);
+    eventVariables->Branch("shm_pprot_4mom_vect", &pprot_sec_vect);
+    eventVariables->Branch("hm_pneut_4mom_vect", &pneut_vect);
+    eventVariables->Branch("prem_4mom_vect", &prem_vect);
+    eventVariables->Branch("hm_ISQE_nucl_4mom_vect", &ptgtNuc_vect);
+    eventVariables->Branch("infk_pprot_4mom_vect", &infk_pprot_vect);
+    eventVariables->Branch("hm_pkp_4mom_vect", &ppip_vect);
+    eventVariables->Branch("hm_pkm_4mom_vect", &ppim_vect);
   }
 
   // Event Scaling Information
@@ -239,13 +300,19 @@ void GenericFlux_Tester::ResetVariables() {
   // Reset energies
   Enu_true = Enu_QE = __BAD_FLOAT__;
 
+  stv_dpt = stv_dphit = stv_dat = pn_rec = __BAD_FLOAT__;
+
+
   // Reset auxillaries
   Q2_true = Q2_QE = W_nuc_rest = bjorken_x = bjorken_y = q0_true = q3_true =
       Erecoil_true = Erecoil_charged = Erecoil_minerva = __BAD_FLOAT__;
 
   // Reset particle counters
   Nparticles = Nleptons = Nother = Nprotons = Nneutrons = Npiplus = Npineg =
-      Npi0 = 0;
+      Npi0 = Nkneg = Nkplus = 0;
+  Nparticles_vect = Nleptons_vect = Nother_vect = Nprotons_vect =
+      Nneutrons_vect = Npiplus_vect = Npineg_vect = Npi0_vect = Nkneg_vect = 
+      Nkplus_vect = 0;
 
   // Reset Lepton PDG
   PDGLep = 0;
@@ -288,12 +355,18 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   // Function used to extract any variables of interest to the event
   Mode = event->Mode;
 
+  // Get Tgt info: 
+  TgtA =  event->GetTargetA();
+  TgtZ =  event->GetTargetZ();
+
   // Reset the highest momentum variables
   float proton_highmom = __BAD_FLOAT__;
   float neutron_highmom = __BAD_FLOAT__;
   float piplus_highmom = __BAD_FLOAT__;
   float pineg_highmom = __BAD_FLOAT__;
   float pi0_highmom = __BAD_FLOAT__;
+  float kplus_highmom = __BAD_FLOAT__;
+  float kneg_highmom = __BAD_FLOAT__;
 
   (*nu_4mom) = event->PartInfo(0)->fP;
 
@@ -303,7 +376,25 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     (*ppim) = TLorentzVector(0, 0, 0, 0);
     (*ppi0) = TLorentzVector(0, 0, 0, 0);
     (*pprot) = TLorentzVector(0, 0, 0, 0);
+    (*pprot_sec) = TLorentzVector(0, 0, 0, 0);
     (*pneut) = TLorentzVector(0, 0, 0, 0);
+    (*prem) = TLorentzVector(0, 0, 0, 0);
+    (*ptgtNuc) = TLorentzVector(0, 0, 0, 0);
+    (*infk_pprot) = TLorentzVector(0, 0, 0, 0);
+    (*pkp) = TLorentzVector(0, 0, 0, 0);
+    (*pkm) = TLorentzVector(0, 0, 0, 0);
+
+    (*ppip_vect) = TLorentzVector(0, 0, 0, 0);
+    (*ppim_vect) = TLorentzVector(0, 0, 0, 0);
+    (*ppi0_vect) = TLorentzVector(0, 0, 0, 0);
+    (*pprot_vect) = TLorentzVector(0, 0, 0, 0);
+    (*pprot_sec_vect) = TLorentzVector(0, 0, 0, 0);
+    (*pneut_vect) = TLorentzVector(0, 0, 0, 0);
+    (*prem_vect) = TLorentzVector(0, 0, 0, 0);
+    (*ptgtNuc_vect) = TLorentzVector(0, 0, 0, 0);
+    (*infk_pprot_vect) = TLorentzVector(0, 0, 0, 0);
+    (*pkp_vect) = TLorentzVector(0, 0, 0, 0);
+    (*pkm_vect) = TLorentzVector(0, 0, 0, 0);
   }
 
   Enu_true = nu_4mom->E();
@@ -312,6 +403,13 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
   bool cc = (abs(event->Mode) < 30);
   (void)cc;
 
+  //Get initial state nucleon (for CCQE events)
+  if(PDGnu>0 && event->GetHMISNeutron()){
+    (*ptgtNuc) = event->GetHMISNeutron()->fP;
+  }
+  else if(event->GetHMISProton()){
+    (*ptgtNuc) = event->GetHMISProton()->fP;
+  }
   // Add all pion distributions for the event.
 
   // Add classifier for CC0pi or CC1pi or CCOther
@@ -364,6 +462,33 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       bjorken_x = Q2_true / (2 * m_n * (Enu_true - ELep));
       bjorken_y = 1 - ELep / Enu_true;
 
+      // STV and pn_rec - only really make sense for CC0pi
+
+      if (minervaSTVPS){
+        // Hard-code the cuts
+        double ProtonMinCut = 450; // MeV
+        double ProtonMaxCut = 1200; // MeV
+        double ProtonThetaCut = 70; // degrees
+        //restrict to MINERvA's STV anlaysis phase-space
+        pn_rec = FitUtils::Get_pn_reco_C(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true);
+        stv_dat = FitUtils::Get_STV_dalphat(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+        stv_dpt = FitUtils::Get_STV_dpt(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) / 1000.0;
+        stv_dphit = FitUtils::Get_STV_dphit(event, ProtonMinCut, ProtonMaxCut, cos(ProtonThetaCut/180.0*M_PI), 14, true) * (180.0 / M_PI);
+      }
+      else{
+        pn_rec = FitUtils::Get_pn_reco_C(event, 0.0, 999999.9, -1.0, 14, true);
+        stv_dat = FitUtils::Get_STV_dalphat(event, 0.0, 999999.9, -1.0, 14, true) * (180.0 / M_PI);
+        stv_dpt = FitUtils::Get_STV_dpt(event, 0.0, 999999.9, -1.0, 14, true) / 1000.0;
+        stv_dphit = FitUtils::Get_STV_dphit(event, 0.0, 999999.9, -1.0, 14, true) * (180.0 / M_PI);
+      }
+
+
+      TVector3 infk_pprot_3 = FitUtils::tppInfK(part_4mom, cos(ThetaLep), 34., true);
+      double infk_Eprot = sqrt(infk_pprot_3.Mag()*infk_pprot_3.Mag() + PhysConst::mass_proton*PhysConst::mass_proton);
+      TLorentzVector* infk_pprot_4 = new TLorentzVector(infk_pprot_3, infk_Eprot);
+      *infk_pprot = *infk_pprot_4;
+
+
       // Quasi-elastic ----------------------
       // ------------------------------------
 
@@ -377,6 +502,9 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
     } else if (PDGpart == 2212) {
       Nprotons++;
+      if (Nprotons>1 && part_4mom.Vect().Mag() > proton_highmom) {
+        (*pprot_sec) = (*pprot);
+      }
       if (part_4mom.Vect().Mag() > proton_highmom) {
         proton_highmom = part_4mom.Vect().Mag();
 
@@ -440,10 +568,98 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
         (*ppi0) = part_4mom;
       }
+    } else if (PDGpart == 321) {
+      Nkplus++;
+      if (part_4mom.Vect().Mag() > kplus_highmom) {
+        kplus_highmom = part_4mom.Vect().Mag();
+        (*pkp) = part_4mom;
+      }
+    } else if (PDGpart == -321) {
+      Nkneg++;
+      if (part_4mom.Vect().Mag() > kneg_highmom) {
+        kneg_highmom = part_4mom.Vect().Mag();
+        (*pkm) = part_4mom;
+      }
     } else {
       Nother++;
     }
-  }
+  } // end particle loop
+
+
+  // Rest highmoms for next loop
+  proton_highmom=0;
+  neutron_highmom=0;
+  piplus_highmom=0;
+  pineg_highmom=0;
+  pi0_highmom=0;
+  kplus_highmom=0;
+  kneg_highmom=0;
+
+  // Start Particle Loop for PRE FSI particles
+  for (UInt_t i = 0; i < npart; i++) {
+    // Save particles that are just before the FSI cascade
+    bool isPreFSI = event->fPrimaryVertex[i];
+    if (!isPreFSI)
+      continue;
+
+    // PDG Particle
+    int PDGpart = event->PartInfo(i)->fPID;
+    TLorentzVector part_4mom = event->PartInfo(i)->fP;
+    Nparticles_vect++;
+    
+    if (abs(PDGpart) == abs(PDGnu) - 1) {
+      Nleptons_vect++;
+    } else if (PDGpart == 2212) {
+      Nprotons_vect++;
+      if (Nprotons_vect>1 && part_4mom.Vect().Mag() > proton_highmom) {
+        (*pprot_sec_vect) = (*pprot_vect);
+      }
+      if (part_4mom.Vect().Mag() > proton_highmom) {
+        proton_highmom = part_4mom.Vect().Mag();
+        (*pprot_vect) = part_4mom;
+      }
+    } else if (PDGpart == 2112) {
+      Nneutrons_vect++;
+      if (part_4mom.Vect().Mag() > neutron_highmom) {
+        neutron_highmom = part_4mom.Vect().Mag();
+        (*pneut_vect) = part_4mom;
+      }
+    } else if (PDGpart == 211) {
+      Npiplus_vect++;
+      if (part_4mom.Vect().Mag() > piplus_highmom) {
+        piplus_highmom = part_4mom.Vect().Mag();
+        (*ppip_vect) = part_4mom;
+      }
+    } else if (PDGpart == -211) {
+      Npineg_vect++;
+      if (part_4mom.Vect().Mag() > pineg_highmom) {
+        pineg_highmom = part_4mom.Vect().Mag();
+        (*ppim_vect) = part_4mom;
+      }
+    } else if (PDGpart == 111) {
+      Npi0_vect++;
+      if (part_4mom.Vect().Mag() > pi0_highmom) {
+        pi0_highmom = part_4mom.Vect().Mag();
+        (*ppi0_vect) = part_4mom;
+      }
+    } else if (PDGpart == 321) {
+      Nkplus_vect++;
+      if (part_4mom.Vect().Mag() > kplus_highmom) {
+        kplus_highmom = part_4mom.Vect().Mag();
+        (*pkp_vect) = part_4mom;
+      }
+    } else if (PDGpart == -321) {
+      Nkneg_vect++;
+      if (part_4mom.Vect().Mag() > kneg_highmom) {
+        kneg_highmom = part_4mom.Vect().Mag();
+        (*pkm_vect) = part_4mom;
+      }
+    } else {
+      Nother_vect++;
+    }
+  } // end particle loop for PRE FSI particles
+
+
 
   // Get Recoil Definitions ------
   // -----------------------------

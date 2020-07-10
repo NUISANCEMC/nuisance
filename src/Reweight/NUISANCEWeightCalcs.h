@@ -23,6 +23,19 @@ class NUISANCEWeightCalc {
     std::string fName;
 };
 
+class SFRW_pShellNormCalc : public NUISANCEWeightCalc {
+  public:
+    SFRW_pShellNormCalc();
+    ~SFRW_pShellNormCalc(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+    double fNormPShell; 
+};
+
 class ModeNormCalc : public NUISANCEWeightCalc {
   public:
     ModeNormCalc();

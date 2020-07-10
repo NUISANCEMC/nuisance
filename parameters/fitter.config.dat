@@ -101,6 +101,7 @@ config linewidth 1
 
 # For GenericFlux
 config isLiteMode 0
+config isMinervaSTVPS 0
 
 # Statistical Options
 # ######################################################

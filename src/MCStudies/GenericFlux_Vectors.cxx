@@ -217,7 +217,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     Q2_QE = FitUtils::Q2QErec(lep->fP, CosLep, 34., true);
 
     Eav = FitUtils::GetErecoil_MINERvA_LowRecoil(event) / 1.E3;
-    EavAlt = FitUtils::Eavailable(event) / 1.E3;
+    //EavAlt = FitUtils::Eavailable(event) / 1.E3;
 
     // Check if this is a 1pi+ or 1pi0 event
     if ((SignalDef::isCC1pi(event, PDGnu, 211) ||
@@ -240,10 +240,10 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
 
-    dalphat = FitUtils::Get_STV_dalphat(event, PDGnu, true);
-    dpt = FitUtils::Get_STV_dpt(event, PDGnu, true);
-    dphit = FitUtils::Get_STV_dphit(event, PDGnu, true);
-    pnreco_C = FitUtils::Get_pn_reco_C(event, PDGnu, true);
+    pnreco_C = FitUtils::Get_pn_reco_C(event, 0.0, 999999.9, -1.0, 14, true);
+    dalphat = FitUtils::Get_STV_dalphat(event, 0.0, 999999.9, -1.0, 14, true) * (180.0 / M_PI);
+    dpt = FitUtils::Get_STV_dpt(event, 0.0, 999999.9, -1.0, 14, true) / 1000.0;
+    dphit = FitUtils::Get_STV_dphit(event, 0.0, 999999.9, -1.0, 14, true) * (180.0 / M_PI);
   }
 
   // Loop over the particles and store all the final state particles in a vector

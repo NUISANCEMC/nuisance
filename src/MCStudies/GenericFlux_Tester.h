@@ -71,6 +71,8 @@ public:
 
   // Lighter flat trees that don't include vectors
   bool liteMode;
+  // Restrict STV to MINERvA's kinematic phase space
+  bool minervaSTVPS;
 
   TTree* eventVariables;
 
@@ -80,7 +82,25 @@ public:
   TLorentzVector *ppim;
   TLorentzVector *ppi0;
   TLorentzVector *pprot;
+  TLorentzVector *pprot_sec;
   TLorentzVector *pneut;
+  TLorentzVector *prem;
+  TLorentzVector *ptgtNuc;
+  TLorentzVector *infk_pprot;
+  TLorentzVector *pkp;
+  TLorentzVector *pkm;
+
+  TLorentzVector *ppip_vect;
+  TLorentzVector *ppim_vect;
+  TLorentzVector *ppi0_vect;
+  TLorentzVector *pprot_vect;
+  TLorentzVector *pprot_sec_vect;
+  TLorentzVector *pneut_vect;
+  TLorentzVector *prem_vect;
+  TLorentzVector *ptgtNuc_vect;
+  TLorentzVector *infk_pprot_vect;
+  TLorentzVector *pkp_vect;
+  TLorentzVector *pkm_vect;
 
   // Saved Variables
   float Enu_true;
@@ -98,9 +118,17 @@ public:
   float Erecoil_true;
   float Erecoil_charged;
   float Erecoil_minerva;
+  float stv_dpt;
+  float stv_dphit;
+  float stv_dat;
+  float pn_rec;
 
   // Interaction mode
   int Mode;
+
+  //Tgt info
+  int TgtA;
+  int TgtZ;
 
   // Particle counters
   int Nparticles;
@@ -111,6 +139,19 @@ public:
   int Npiplus;
   int Npineg;
   int Npi0;
+  int Nkplus;
+  int Nkneg;
+
+  int Nparticles_vect;
+  int Nleptons_vect;
+  int Nother_vect;
+  int Nprotons_vect;
+  int Nneutrons_vect;
+  int Npiplus_vect;
+  int Npineg_vect;
+  int Npi0_vect;
+  int Nkplus_vect;
+  int Nkneg_vect;
 
   // Lepton variables
   int PDGLep;

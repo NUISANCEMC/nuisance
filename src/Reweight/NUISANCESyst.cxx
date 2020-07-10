@@ -69,6 +69,7 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kMINERvARW_RikRESRPA_LowQ2:               { return "MINERvARW_RikRESRPA_LowQ2"; }
     case kMINERvARW_RikRESRPA_HighQ2:              { return "MINERvARW_RikRESRPA_HighQ2"; }
 
+    case kSFRW_pShellNorm_C:              { return "SFRW_pShellNorm_C"; }
 
     case kSBLOsc_Distance: { return "SBLOsc_Distance"; }
     case kSBLOsc_MassSplitting: { return "SBLOsc_MassSplitting"; }

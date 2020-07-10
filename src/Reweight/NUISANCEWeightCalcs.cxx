@@ -7,6 +7,59 @@
 
 using namespace Reweight;
 
+
+// ------ New dials for SF RWing ------
+
+SFRW_pShellNormCalc::SFRW_pShellNormCalc() { std::cout << "Setting up pShellNorm Weight Engine" << std::endl; fNormPShell = 1.0; }
+
+double SFRW_pShellNormCalc::CalcWeight(BaseFitEvt *evt) {
+  int mode = abs(evt->Mode);
+  double w = 1.0;
+
+  //std::cout << "Calculating pShellNorm weight" << std::endl;
+
+  if (mode == 1 ) { // CCQE only
+    // Add condition that we're looking only at the p_shell, this should eventually be set depending on the target
+    w *= fNormPShell;
+    //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
+  }
+
+  return w;
+}
+
+void SFRW_pShellNormCalc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void SFRW_pShellNormCalc::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kSFRW_pShellNorm_C)
+    fNormPShell = val;
+}
+
+bool SFRW_pShellNormCalc::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+
+  //std::cout << "Checking if pShellNorm dial is handled" << std::endl;
+  //std::cout << "  curenum" << curenum << std::endl;
+  //std::cout << "  rwenum" << rwenum << std::endl;
+  //std::cout << "  rwenum % 1000" << rwenum % 1000 << std::endl;
+
+  switch (curenum) {
+  case kSFRW_pShellNorm_C:
+    return true;
+  default:
+    return false;
+  }
+}
+
+// ------ End of new SF dials ------
+
+
 ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
 
 double ModeNormCalc::CalcWeight(BaseFitEvt *evt) {
