@@ -14,7 +14,12 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   fT2KRW = new t2krew::T2KReWeight();
 
   //Set NEUT card file
-  t2krew::T2KNeutUtils::SetCardFile(FitPar::Config().GetParS("NEUT_CARD"));
+  std::string card = FitPar::Config().GetParS("NEUT_CARD");
+  if(card.length() > 0 ){
+	t2krew::T2KNeutUtils::SetCardFile(FitPar::Config().GetParS("NEUT_CARD"));
+  }else{
+    t2krew::T2KNeutUtils::SetCardFile(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
+  }
 
   // Setup Sub RW Engines (Only activated for neut and niwg)
   fT2KNeutRW = new t2krew::T2KNeutReWeight();
