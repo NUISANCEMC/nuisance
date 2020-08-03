@@ -13,6 +13,9 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   // Create Main RW Engine
   fT2KRW = new t2krew::T2KReWeight();
 
+  //Set NEUT card file
+  t2krew::T2KNeutUtils::SetCardFile(FitPar::Config().GetParS("NEUT_CARD"));
+
   // Setup Sub RW Engines (Only activated for neut and niwg)
   fT2KNeutRW = new t2krew::T2KNeutReWeight();
   fT2KNIWGRW = new t2krew::T2KNIWGReWeight();
