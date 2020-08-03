@@ -123,7 +123,7 @@ CheckAndSetDefaultEnv(GSL_LIB "" PATH "Path to pre-built gsl libraries. Override
 CheckAndSetDefaultEnv(GSL_INC "" PATH "Path to installed gsl headers. Overrides environment variable \$GSL_INC. <>" GSL_INC)
 
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
-CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
+CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
 
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)
