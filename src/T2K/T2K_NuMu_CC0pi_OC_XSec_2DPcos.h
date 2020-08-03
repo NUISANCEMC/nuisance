@@ -58,7 +58,7 @@ public:
   std::vector<TH1D*> fDataHistNuMuC_Slices;
 
   double pmu, CosThetaMu;
-  string Target;
+  std::string Target;
   
   void FillMCSlice(double x, double y, double w);
 
