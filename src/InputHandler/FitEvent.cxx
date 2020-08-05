@@ -463,3 +463,31 @@ int FitEvent::NumFSLeptons(void) const {
 
   return nLeptons;
 }
+
+// Get the outgoing lepton PDG depending on if it's a CC or NC event
+int FitEvent::GetLeptonOutPDG() {
+  // Make sure the outgoing lepton has the correct PDG
+  int pdgnu = PDGnu();
+  int PDGout;
+  if (IsCC()) {
+    if (pdgnu > 0) PDGout = pdgnu-1;
+    else PDGout = pdgnu+1;
+  } else {
+    PDGout = pdgnu;
+  }
+  return PDGout;
+}
+
+//********************************************************************
+// Returns the true Q2 of an event
+double FitEvent::GetQ2() {
+  FitParticle *neutrino = GetNeutrinoIn();
+  FitParticle *lepton = GetLeptonOut();
+  // Figure out why this happens
+  if (!neutrino || !lepton) return 0.0;
+  double Q2 =
+    -1.0 * (lepton->P4() - neutrino->P4()) *
+    (lepton->P4() - neutrino->P4()) / 1.E6;
+  return Q2;
+}
+//********************************************************************

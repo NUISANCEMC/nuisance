@@ -76,6 +76,8 @@ public:
   inline bool IsCC() const { if (abs(this->probe_pdg) == 11) return false; return (abs(Mode) <= 30); };
   /// Is Event Neutral Current?
   inline bool IsNC() const { if (abs(this->probe_pdg) == 11) return true; return (abs(Mode) > 30);  };
+  // Is Event resonant?
+  inline bool IsResonant() const { if (Mode != 11 && Mode != 12 && Mode != 13 && Mode != 31 && Mode != 32 && Mode != 33 && Mode != 34) return false; return true; };
 
   /// Return Particle 4-momentum for given index in particle stack
   TLorentzVector GetParticleP4    (int index) const;
@@ -610,8 +612,13 @@ public:
   // Other Functions
   int NumFSMesons();
 
-  int GetLeptonOutPos(void) const;
-  FitParticle* GetLeptonOut(void);
+  // Get outgoing lepton matching PDG of neutrino
+  int GetLeptonOutPDG();
+  FitParticle* GetLeptonOut() {return GetHMFSParticle(GetLeptonOutPDG()); };
+  // Get the outgoing lepton index
+  int GetLeptonIndex() { return GetHMFSParticleIndex(GetLeptonOutPDG()); };
+
+  double GetQ2();
 
 
   // Event Information

@@ -36,6 +36,56 @@ class ModeNormCalc : public NUISANCEWeightCalc {
     double fNormRES;
 };
 
+// MINOS pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+class MINOSRPA : public NUISANCEWeightCalc {
+  public:
+    MINOSRPA();
+    ~MINOSRPA(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+    double GetRPAWeight(double Q2);
+
+    bool fTweaked;
+
+    bool fApply_MINOSRPA;
+
+    double fTwk_MINOSRPA_A;
+    double fDef_MINOSRPA_A;
+    double fCur_MINOSRPA_A;
+
+    double fTwk_MINOSRPA_B;
+    double fDef_MINOSRPA_B;
+    double fCur_MINOSRPA_B;
+
+};
+
+// MINERvA pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+class LagrangeRPA : public NUISANCEWeightCalc {
+  public:
+    LagrangeRPA();
+    ~LagrangeRPA(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+    double GetRPAWeight(double Q2);
+
+    bool fTweaked;
+
+    bool fApplyRPA;
+
+    double fR1;
+    double fR2;
+    double fR1_Def;
+    double fR2_Def;
+};
+
 class BeRPACalc : public NUISANCEWeightCalc {
   public:
     BeRPACalc();

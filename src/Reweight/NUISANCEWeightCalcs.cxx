@@ -44,18 +44,278 @@ bool ModeNormCalc::IsHandled(int rwenum) {
   }
 }
 
+//*****************************************************************************
+MINOSRPA::MINOSRPA() {
+
+  fApply_MINOSRPA = false;
+
+  fDef_MINOSRPA_A = 1.010;
+  fTwk_MINOSRPA_A = 0.000;
+  fDef_MINOSRPA_B = 0.156;
+  fTwk_MINOSRPA_B = 0.000;
+
+}
+//
+double MINOSRPA::CalcWeight(BaseFitEvt* evt) {
+  if (!fTweaked || !fApply_MINOSRPA) return 1.0;
+
+  double w = 1.0;
+
+  // If GENIE is enabled, use old code
+#ifdef __GENIE_ENABLED__
+  // Extract the GENIE Record
+  GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
+  const Interaction* interaction = ghep->Summary();
+  const InitialState& init_state = interaction->InitState();
+  const ProcessInfo& proc_info = interaction->ProcInfo();
+  const Target& tgt = init_state.Tgt();
+
+  // If not QE return 1.0
+  if (!tgt.IsNucleus()) return 1.0;
+  if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
+
+  // Extract Beam and Target PDG
+  GHepParticle* neutrino = ghep->Probe();
+  //   int bpdg = neutrino->Pdg();
+
+  GHepParticle* target = ghep->Particle(1);
+  assert(target);
+  //    int tpdg = target->Pdg();
+
+  // Extract Q0-Q3
+  GHepParticle* fsl = ghep->FinalStatePrimaryLepton();
+  const TLorentzVector& k1 = *(neutrino->P4());
+  const TLorentzVector& k2 = *(fsl->P4());
+  //double q0 = fabs((k1 - k2).E());
+  //double q3 = fabs((k1 - k2).Vect().Mag());
+  double Q2 = fabs((k1 - k2).Mag2());
+
+  w *= GetRPAWeight(Q2);
+#else
+  // Get the Q2 from NUISANCE if not GENIE
+  FitEvent *fevt = static_cast<FitEvent*>(evt);
+  // Check the event is resonant
+  if (!fevt->IsResonant()) return 1.0;
+  int targeta = fevt->GetTargetA();
+  int targetz = fevt->GetTargetZ();
+  // Apply only to nuclear targets, ignore free protons
+  if (targeta == 1 || targetz == 1) return 1.0;
+  // Q2 in GeV2
+  double Q2 = fevt->GetQ2();
+  w *= GetRPAWeight(Q2);
+#endif
+
+  return w;
+}
+
+// Do the actual weight calculation
+double MINOSRPA::GetRPAWeight(double Q2) {
+  if (Q2 > 0.7) return 1.0;
+  double w = fCur_MINOSRPA_A / (1.0 + TMath::Exp(1.0 - TMath::Sqrt(Q2) / fCur_MINOSRPA_B));
+  return w;
+}
+
+bool MINOSRPA::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+  switch (curenum) {
+    case Reweight::kMINERvARW_MINOSRPA_Apply:
+    case Reweight::kMINERvARW_MINOSRPA_A:
+    case Reweight::kMINERvARW_MINOSRPA_B:
+      return true;
+    default:
+      return false;
+  }
+}
+//
+void MINOSRPA::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+//
+void MINOSRPA::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum)) return;
+  if (curenum == Reweight::kMINERvARW_MINOSRPA_Apply) fApply_MINOSRPA = (val > 0.5);
+  if (curenum == Reweight::kMINERvARW_MINOSRPA_A) fTwk_MINOSRPA_A = val;
+  if (curenum == Reweight::kMINERvARW_MINOSRPA_B) fTwk_MINOSRPA_B = val;
+
+  // Check for changes
+  fTweaked = (fApply_MINOSRPA ||
+      fabs(fTwk_MINOSRPA_A) > 0.0 ||
+      fabs(fTwk_MINOSRPA_B) > 0.0);
+
+  // Update Values
+  fCur_MINOSRPA_A = fDef_MINOSRPA_A * (1.0 + 0.1 * fTwk_MINOSRPA_A);
+  fCur_MINOSRPA_B = fDef_MINOSRPA_B * (1.0 + 0.1 * fTwk_MINOSRPA_B);
+}
+
+//
+//
+//*****************************************************************************
+LagrangeRPA::LagrangeRPA() {
+
+  fApplyRPA = false;
+
+  /*
+     fI1_Def = 4.18962e-01;
+     fI1     = fI1_Def;
+
+     fI2_Def = 7.39927e-01;
+     fI2     = fI2_Def;
+     */
+
+  // Table VIII https://arxiv.org/pdf/1903.01558.pdf
+  fR1_Def = 0.37;
+  fR1     = fR1_Def;
+
+  fR2_Def = 0.60;
+  fR2     = fR2_Def;
+
+}
+//
+double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
+
+  if (!fTweaked || !fApplyRPA) return 1.0;
+  double w = 1.0;
+
+  // If GENIE is enabled, use old code
+#ifdef __GENIE_ENABLED__
+  // Extract the GENIE Record
+  GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
+  const Interaction* interaction = ghep->Summary();
+  const InitialState& init_state = interaction->InitState();
+  const ProcessInfo& proc_info = interaction->ProcInfo();
+  const Target& tgt = init_state.Tgt();
+
+  // If not QE return 1.0
+  if (!tgt.IsNucleus()) return 1.0;
+  if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
+
+  // Extract Beam and Target PDG
+  GHepParticle* neutrino = ghep->Probe();
+  //   int bpdg = neutrino->Pdg();
+
+  GHepParticle* target = ghep->Particle(1);
+  assert(target);
+  //    int tpdg = target->Pdg();
+
+  // Extract Q0-Q3
+  GHepParticle* fsl = ghep->FinalStatePrimaryLepton();
+  const TLorentzVector& k1 = *(neutrino->P4());
+  const TLorentzVector& k2 = *(fsl->P4());
+  //double q0 = fabs((k1 - k2).E());
+  //double q3 = fabs((k1 - k2).Vect().Mag());
+  double Q2 = fabs((k1 - k2).Mag2());
+  w *= GetRPAWeight(Q2);
+#else
+  // Get the Q2 from NUISANCE if not GENIE
+  FitEvent *fevt = static_cast<FitEvent*>(evt);
+  // Check the event is resonant
+  if (!fevt->IsResonant()) return 1.0;
+  int targeta = fevt->GetTargetA();
+  int targetz = fevt->GetTargetZ();
+  // Apply only to nuclear targets, ignore free protons
+  if (targeta == 1 || targetz == 1) return 1.0;
+  // Q2 in GeV2
+  double Q2 = fevt->GetQ2();
+  w *= GetRPAWeight(Q2);
+#endif
+
+  return w;
+}
+//
+//
+double LagrangeRPA::GetRPAWeight(double Q2) {
+  //std::cout << "Getting RPA Weight : " << Q2 << std::endl;
+  if (Q2 > 0.7) return 1.0;
+
+  // Keep original Lagrange RPA for documentation
+  /*
+     double x1 = 0.00;
+     double x2 = 0.30;
+     double x3 = 0.70;
+
+     double y1 = 0.00;
+     double y2 = fI2;
+     double y3 = 1.00;
+
+     double xv = Q2;
+
+  // Automatically 0 because y1 choice
+  double W1 = y1 * (xv-x2)*(xv-x3)/((x1-x2)*(x1-x3));
+  double W2 = y2 * (xv-x1)*(xv-x3)/((x2-x1)*(x2-x3));
+  double W3 = y3 * (xv-x1)*(xv-x2)/((x3-x1)*(x3-x2));
+
+  double P = W1 + W2 + W3;
+  double A1 = (1.0 - sqrt(1.0 - fI1));
+  double R = P * (1.0 - A1) + A1;
+
+  return 1.0 - (1.0-R)*(1.0-R);
+  */
+
+  // Equation 7 https://arxiv.org/pdf/1903.01558.pdf
+  const double x1 = 0.00;
+  const double x2 = 0.35;
+  const double x3 = 0.70;
+
+  // Equation 6 https://arxiv.org/pdf/1903.01558.pdf
+  double RQ2 = fR2 *( (Q2-x1)*(Q2-x3)/((x2-x1)*(x2-x3)) )
+    + (Q2-x1)*(Q2-x2)/((x3-x1)*(x3-x2));
+  double weight = 1-(1-fR1)*(1-RQ2)*(1-RQ2);
+
+  // Check range of R1 and R2
+  // Commented out because this is implementation dependent: user may want strange double peaks
+  /*
+     if (fR1 > 1) return 1;
+     if (fR2 > 1 || fR2 < 0.5) return 1;
+     */
+
+  return weight;
+}
+//
+bool LagrangeRPA::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+  switch (curenum) {
+    case Reweight::kMINERvARW_LagrangeRPA_Apply:
+    case Reweight::kMINERvARW_LagrangeRPA_R1:
+    case Reweight::kMINERvARW_LagrangeRPA_R2:
+      return true;
+    default:
+      return false;
+  }
+}
+//
+void LagrangeRPA::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+//
+void LagrangeRPA::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum)) return;
+  if (curenum == Reweight::kMINERvARW_LagrangeRPA_Apply) fApplyRPA = (val > 0.5);
+  if (curenum == Reweight::kMINERvARW_LagrangeRPA_R1) fR1 = val;
+  if (curenum == Reweight::kMINERvARW_LagrangeRPA_R2) fR2 = val;
+
+  // Check for changes
+  fTweaked = (fApplyRPA);
+}
+//
+
+
 BeRPACalc::BeRPACalc()
-    : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_E(0.88),
-      fBeRPA_U(1.2), nParams(0) {
-  // A = 0.59 +/- 20%
-  // B = 1.05 +/- 20%
-  // D = 1.13 +/- 15%
-  // E = 0.88 +/- 40%
-  // U = 1.2
+  : fBeRPA_A(0.59), fBeRPA_B(1.05), fBeRPA_D(1.13), fBeRPA_E(0.88),
+  fBeRPA_U(1.2), nParams(0) {
+    // A = 0.59 +/- 20%
+    // B = 1.05 +/- 20%
+    // D = 1.13 +/- 15%
+    // E = 0.88 +/- 40%
+    // U = 1.2
 }
 
 double BeRPACalc::CalcWeight(BaseFitEvt *evt) {
-  FitEvent *fevt = static_cast<FitEvent *>(evt);
   int mode = abs(evt->Mode);
   double w = 1.0;
   if (nParams == 0) {
@@ -65,9 +325,8 @@ double BeRPACalc::CalcWeight(BaseFitEvt *evt) {
   // Get Q2
   // Get final state lepton
   if (mode == 1) {
-    double Q2 =
-        -1.0 * (fevt->GetHMFSAnyLeptons()->P4() - fevt->GetNeutrinoIn()->P4()) *
-        (fevt->GetHMFSAnyLeptons()->P4() - fevt->GetNeutrinoIn()->P4()) / 1.E6;
+    FitEvent *fevt = static_cast<FitEvent*>(evt);
+    double Q2 = fevt->GetQ2();
     // Only CCQE events
     w *= calcRPA(Q2, fBeRPA_A, fBeRPA_B, fBeRPA_D, fBeRPA_E, fBeRPA_U);
   }
@@ -102,14 +361,14 @@ void BeRPACalc::SetDialValue(int rwenum, double val) {
 bool BeRPACalc::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-  case kBeRPA_A:
-  case kBeRPA_B:
-  case kBeRPA_D:
-  case kBeRPA_E:
-  case kBeRPA_U:
-    return true;
-  default:
-    return false;
+    case kBeRPA_A:
+    case kBeRPA_B:
+    case kBeRPA_D:
+    case kBeRPA_E:
+    case kBeRPA_U:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -148,14 +407,14 @@ void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
 bool SBLOscWeightCalc::IsHandled(int rwenum) {
   int curenum = rwenum % 1000;
   switch (curenum) {
-  case kSBLOsc_Distance:
-    return true;
-  case kSBLOsc_MassSplitting:
-    return true;
-  case kSBLOsc_Sin2Theta:
-    return true;
-  default:
-    return false;
+    case kSBLOsc_Distance:
+      return true;
+    case kSBLOsc_MassSplitting:
+      return true;
+    case kSBLOsc_Sin2Theta:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -226,23 +485,13 @@ double GaussianModeCorr::CalcWeight(BaseFitEvt *evt) {
   if (!fevt->Npart()) {
     NUIS_ABORT("NO particles found in stack!");
   }
-  FitParticle *pnu = fevt->GetHMISAnyLeptons();
+  FitParticle *pnu = fevt->GetNeutrinoIn();
   if (!pnu) {
     NUIS_ABORT("NO Starting particle found in stack!");
   }
-  int pdgnu = pnu->fPID;
 
-  int expect_fsleppdg = 0;
-
-  if (pdgnu & 1) {
-    expect_fsleppdg = pdgnu;
-  } else {
-    expect_fsleppdg = abs(pdgnu) - 1;
-  }
-
-  FitParticle *plep = fevt->GetHMFSParticle(expect_fsleppdg);
-  if (!plep) 
-    return 1.0;
+  FitParticle *plep = fevt->GetLeptonOut();
+  if (!plep) return 1.0;
 
   TLorentzVector q = pnu->fP - plep->fP;
 
@@ -314,7 +563,7 @@ void GaussianModeCorr::SetMethod(bool method) {
   fMethod = method;
   if (fMethod == true) {
     NUIS_LOG(FIT,
-         " Using tilt-shift Gaussian parameters for Gaussian enhancement...");
+        " Using tilt-shift Gaussian parameters for Gaussian enhancement...");
   } else {
     NUIS_LOG(FIT, " Using Normal Gaussian parameters for Gaussian enhancement...");
   }
@@ -371,10 +620,10 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
 
     if (fDebugStatements) {
       std::cout << "Applied Tilt " << Tilt << " " << cos(Tilt) << " "
-                << sin(Tilt) << std::endl;
+        << sin(Tilt) << std::endl;
       std::cout << "abc = " << a << " " << b << " " << c << std::endl;
       std::cout << "Returning " << Norm << " " << Pq0 << " " << Wq0 << " "
-                << Pq3 << " " << Wq3 << " " << w << std::endl;
+        << Pq3 << " " << Wq3 << " " << w << std::endl;
     }
 
     if (w != w || std::isnan(w) || w < 0.0) {
