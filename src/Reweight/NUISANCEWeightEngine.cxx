@@ -98,6 +98,8 @@ void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
 
 void NUISANCEWeightEngine::Reconfigure(bool silent) {
   for (size_t i = 0; i < fNUISANCEEnums.size(); i++) {
+    // Is this parameter handled
+    bool IsHandledSomewhere = false;
     for (std::vector<NUISANCEWeightCalc *>::iterator calciter =
              fWeightCalculators.begin();
          calciter != fWeightCalculators.end(); calciter++) {
@@ -106,10 +108,17 @@ void NUISANCEWeightEngine::Reconfigure(bool silent) {
 
       if (nuiscalc->IsHandled(fNUISANCEEnums[i])) {
         nuiscalc->SetDialValue(fNUISANCEEnums[i], fValues[i]);
+        IsHandledSomewhere = true;
       }
     }
-  }
-}
+
+    // Check if this parameter is actually handled
+    if (!IsHandledSomewhere) {
+      std::string name = GetNameFromEnum(i);
+      NUIS_ABORT("NUISANCE parameter " << name << " (enum " << i << ") not enabled, can not continue!");
+    } // End check of it's handled
+  } // End loop over enums
+} // Return
 
 double NUISANCEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;

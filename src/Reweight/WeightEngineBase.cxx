@@ -21,3 +21,28 @@ double WeightEngineBase::GetDialValue(int nuisenum) {
   }
   return fValues[fEnumIndex[nuisenum][0]];
 }
+
+std::string WeightEngineBase::GetNameFromEnum(int nuisenum) {
+
+  // Find the name in the map; need to iterate through the map
+  for (std::map<std::string, std::vector<size_t> >::iterator it = fNameIndex.begin(); it!=fNameIndex.end(); ++it) {
+    std::string name = (*it).first;
+    std::vector<size_t> Enums = (*it).second;
+    bool found = false;
+    for (std::vector<size_t>::iterator EnumIt = Enums.begin(); EnumIt != Enums.end(); ++EnumIt) {
+      size_t Enum = (*EnumIt);
+      if (Enum == (size_t)nuisenum) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      return name;
+    }
+  } // Finish looping over the map
+
+  NUIS_ABORT("Could not find a matching name for parameter enum " << nuisenum);
+
+  return std::string("EMPTY");
+
+}
