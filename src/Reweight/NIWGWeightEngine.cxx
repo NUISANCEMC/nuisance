@@ -55,6 +55,12 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
         "niwg_QELowQ2", new niwg::rew::NIWGReWeightEffectiveQELowQ2Suppression);
 #endif
 
+#ifdef HAVE_NIWGRW_RESLOWQ2
+  // Add in the low Q2 correction through T2KReWeight
+  // N.B. this already exists in NUISANCE's MINERvA weights
+  fNIWGRW->AdoptWghtCalc("niwg_NIWGReWeightSPPLowQ2Suppression", new niwg::rew::NIWGReWeightSPPLowQ2Suppression);
+#endif
+
 // Add in Kevin and Laura's 2p2h Enu dependent dial
 #ifdef HAVE_NIWGRW_2P2HENU
   if (niwg_2p2henu)
@@ -117,7 +123,7 @@ void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
   }
 
   // Set Value if given
-  if (startval != -999.9) {
+  if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(nuisenum, startval);
   }
 #endif
@@ -130,8 +136,7 @@ void NIWGWeightEngine::SetDialValue(int nuisenum, double val) {
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
-    std::cout << "Setting NIWG Dial Value " << i << " " << indices[i] << " "
-              << fNIWGSysts[indices[i]] << std::endl;
+    NUIS_LOG(FIT, "Setting NIWG Dial number " << i << " to index " << indices[i] << " " << fNIWGSysts[indices[i]] << " to value " << val);
     fNIWGRW->Systematics().Set(fNIWGSysts[indices[i]], val);
   }
 #endif
@@ -143,6 +148,7 @@ void NIWGWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef __NEUT_ENABLED__
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
+    NUIS_LOG(FIT, "Setting NIWG Dial Name " << name << " with number " << i << " to index " << indices[i] << " " << fNIWGSysts[indices[i]] << " to value " << val);
     fValues[indices[i]] = val;
     fNIWGRW->Systematics().Set(fNIWGSysts[indices[i]], val);
   }

@@ -16,6 +16,9 @@
 #ifdef HAVE_NIWGRW_2P2HENU
 #include "NIWGReWeight2p2hEdep.h"
 #endif
+#ifdef HAVE_NIWGRW_RESLOWQ2
+#include "NIWGReWeightSPPLowQ2Suppression.h"
+#endif
 #include "NIWGReWeightHadronMultSwitch.h"
 #include "NIWGReWeightMEC.h"
 #include "NIWGReWeightPiMult.h"

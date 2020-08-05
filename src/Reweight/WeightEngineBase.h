@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#define _UNDEF_DIAL_VALUE_ -9999.9
+
 class WeightEngineBase {
  public:
   WeightEngineBase(){};
