@@ -3,6 +3,26 @@
 
 #include "BaseFitEvt.h"
 #include "BeRPA.h"
+#ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
+#include "Conventions/Units.h"
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepParticle.h"
+#include "GHEP/GHepRecord.h"
+#include "GHEP/GHepUtils.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#include "PDG/PDGUtils.h"
+#else
+#include "Framework/Conventions/Units.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "Framework/ParticleData/PDGUtils.h"
+using namespace genie;
+#endif // End GENIE pre v3
+#endif // End GENIE enabled
 
 class NUISANCEWeightCalc {
   public:

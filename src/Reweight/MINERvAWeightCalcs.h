@@ -21,6 +21,7 @@
 #include "Framework/GHEP/GHepUtils.h"
 #include "Framework/Ntuple/NtpMCEventRecord.h"
 #include "Framework/ParticleData/PDGUtils.h"
+using namespace genie;
 #endif
 
 #include "NUISANCEWeightCalcs.h"
@@ -29,7 +30,6 @@
 #include "FitEvent.h"
 #include "WeightUtils.h"
 #include "weightRPA.h"
-using namespace genie;
 class BaseFitEvt;
 
 

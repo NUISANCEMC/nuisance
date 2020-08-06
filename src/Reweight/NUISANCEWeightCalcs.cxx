@@ -70,9 +70,8 @@ double MINOSRPA::CalcWeight(BaseFitEvt* evt) {
   const ProcessInfo& proc_info = interaction->ProcInfo();
   const Target& tgt = init_state.Tgt();
 
-  // If not QE return 1.0
-  if (!tgt.IsNucleus()) return 1.0;
-  if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
+  // If not on nucleus, not resonant, or NC
+  if (!tgt.IsNucleus() || !proc_info.IsResonant() || proc_info.IsWeakNC()) return 1.0;
 
   // Extract Beam and Target PDG
   GHepParticle* neutrino = ghep->Probe();
@@ -95,7 +94,7 @@ double MINOSRPA::CalcWeight(BaseFitEvt* evt) {
   // Get the Q2 from NUISANCE if not GENIE
   FitEvent *fevt = static_cast<FitEvent*>(evt);
   // Check the event is resonant
-  if (!fevt->IsResonant()) return 1.0;
+  if (!fevt->IsResonant() || fevt->IsNC()) return 1.0;
   int targeta = fevt->GetTargetA();
   int targetz = fevt->GetTargetZ();
   // Apply only to nuclear targets, ignore free protons
@@ -188,9 +187,8 @@ double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
   const ProcessInfo& proc_info = interaction->ProcInfo();
   const Target& tgt = init_state.Tgt();
 
-  // If not QE return 1.0
-  if (!tgt.IsNucleus()) return 1.0;
-  if (!proc_info.IsQuasiElastic() && !proc_info.IsResonant()) return 1.0;
+  // If not on nucleus, not resonant, or NC
+  if (!tgt.IsNucleus() || !proc_info.IsResonant() || proc_info.IsWeakNC()) return 1.0;
 
   // Extract Beam and Target PDG
   GHepParticle* neutrino = ghep->Probe();
@@ -212,7 +210,7 @@ double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
   // Get the Q2 from NUISANCE if not GENIE
   FitEvent *fevt = static_cast<FitEvent*>(evt);
   // Check the event is resonant
-  if (!fevt->IsResonant()) return 1.0;
+  if (!fevt->IsResonant() || fevt->IsNC()) return 1.0;
   int targeta = fevt->GetTargetA();
   int targetz = fevt->GetTargetZ();
   // Apply only to nuclear targets, ignore free protons

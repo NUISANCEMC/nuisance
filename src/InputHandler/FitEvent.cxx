@@ -483,8 +483,15 @@ int FitEvent::GetLeptonOutPDG() {
 double FitEvent::GetQ2() {
   FitParticle *neutrino = GetNeutrinoIn();
   FitParticle *lepton = GetLeptonOut();
-  // Figure out why this happens
-  if (!neutrino || !lepton) return 0.0;
+  // Sometimes NEUT won't have an outgoing lepton because the event is Pauli blocked
+  if (!neutrino || !lepton) {
+    //if (!neutrino) std::cout << "no incoming neutrino!" << std::endl;
+    //if (!lepton) std::cout << "no outgoing lepton!" << std::endl;
+#ifdef __NEUT_ENABLED__
+    //fNeutVect->Dump();
+#endif
+    return -999;
+  }
   double Q2 =
     -1.0 * (lepton->P4() - neutrino->P4()) *
     (lepton->P4() - neutrino->P4()) / 1.E6;
