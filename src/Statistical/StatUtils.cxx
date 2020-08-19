@@ -142,7 +142,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
   // Add MC Error to data if required
   if (FitPar::Config().GetParB("statutils.addmcerror")) {
     // Make temp cov
-    TMatrixDSym *newcov = StatUtils::GetInvert(calc_cov);
+    TMatrixDSym *newcov = StatUtils::GetInvert(calc_cov, true);
 
     // Add MC err to diag
     for (int i = 0; i < calc_data->GetNbinsX(); i++) {
@@ -156,7 +156,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
 
     // Reset the calc_cov to new invert
     delete calc_cov;
-    calc_cov = GetInvert(newcov);
+    calc_cov = GetInvert(newcov, true);
 
     // Delete the tempcov
     delete newcov;
@@ -877,10 +877,12 @@ TMatrixDSym *StatUtils::ApplyInvertedMatrixMasking(TMatrixDSym *mat,
                                                    TH1I *mask) {
   //*******************************************************************
 
+  //TMatrixDSym *new_mat = GetInvert(mat, true);
+  // Don't rescale the inverted matrix which multiplies the mask!
   TMatrixDSym *new_mat = GetInvert(mat);
   TMatrixDSym *masked_mat = ApplyMatrixMasking(new_mat, mask);
 
-  TMatrixDSym *inverted_mat = GetInvert(masked_mat);
+  TMatrixDSym *inverted_mat = GetInvert(masked_mat, true);
 
   delete masked_mat;
   delete new_mat;
@@ -909,7 +911,8 @@ TMatrixDSym *StatUtils::ApplyInvertedMatrixMasking(TMatrixDSym *mat, TH2D *data,
 }
 
 //*******************************************************************
-TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat) {
+// bool rescale rescales the matrix when using Cholesky decomp to ensure good decomposition
+TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
   //*******************************************************************
 
   TMatrixDSym *new_mat = (TMatrixDSym *)mat->Clone();
@@ -956,17 +959,38 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat) {
       new_mat =
           new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
     }
+
+  // Use Cholesky decomp
   } else {
+    // Check the entries of the Matrix and scale it to be within range
+    double scaling = 1;
+    if (rescale) {
+      double smallest = 999;
+      for (int i = 0; i < new_mat->GetNrows(); ++i) {
+        for (int j = 0; j < new_mat->GetNcols(); ++j) {
+          if (fabs((*new_mat)(i,j)) < smallest) smallest = (*new_mat)(i,j);
+        }
+      }
+      // Now scale the matrix so the smallest entry is 1e-5
+      scaling = smallest;
+      (*new_mat) *= 1./scaling;
+    }
+
     // Invert full matrix
     TDecompChol mat_decomp(*new_mat);
     if (!mat_decomp.Decompose()) {
       NUIS_ERR(FTL, "Decomposition failed, matrix singular ?");
       NUIS_ABORT("If you want to use SVD decomposition set <config "
-                 "UseSVDInverse=\"1\" /> in your  card file.");    } else {
+          "UseSVDInverse=\"1\" /> in your  card file.");
+    } else {
       int nrows = new_mat->GetNrows();
       delete new_mat;
       new_mat =
-          new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+        new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+    }
+    // then scale the matrix back
+    if (rescale) {
+      (*new_mat) *= 1./scaling;
     }
   }
 
@@ -1042,7 +1066,7 @@ void StatUtils::ForceNormIntoCovar(TMatrixDSym *&mat, TH1D *hist, double norm) {
 
 //*******************************************************************
 void StatUtils::ForceNormIntoCovar(TMatrixDSym *mat, TH2D *data, double norm,
-                                   TH2I *map) {
+    TH2I *map) {
   //*******************************************************************
 
   bool made_map = false;
@@ -1068,7 +1092,7 @@ TMatrixDSym *StatUtils::MakeDiagonalCovarMatrix(TH1D *data, double scaleF) {
 
   for (int i = 0; i < data->GetNbinsX(); i++) {
     (*newmat)(i, i) =
-        data->GetBinError(i + 1) * data->GetBinError(i + 1) * scaleF * scaleF;
+      data->GetBinError(i + 1) * data->GetBinError(i + 1) * scaleF * scaleF;
   }
 
   return newmat;
@@ -1076,7 +1100,7 @@ TMatrixDSym *StatUtils::MakeDiagonalCovarMatrix(TH1D *data, double scaleF) {
 
 //*******************************************************************
 TMatrixDSym *StatUtils::MakeDiagonalCovarMatrix(TH2D *data, TH2I *map,
-                                                double scaleF) {
+    double scaleF) {
   //*******************************************************************
 
   bool made_map = false;
@@ -1095,7 +1119,7 @@ TMatrixDSym *StatUtils::MakeDiagonalCovarMatrix(TH2D *data, TH2I *map,
 
 //*******************************************************************
 void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
-                                    double scale, bool ErrorCheck) {
+    double scale, bool ErrorCheck) {
   //*******************************************************************
 
   // Check
@@ -1127,9 +1151,9 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
       // Check that the errors are within 1% of eachother
       if (fabs(DataHisterr - coverr) / DataHisterr > 0.01) {
         NUIS_ERR(WRN, "Data error does not match covariance error for bin "
-                          << i + 1 << " ("
-                          << DataHist->GetXaxis()->GetBinLowEdge(i + 1) << "-"
-                          << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
+            << i + 1 << " ("
+            << DataHist->GetXaxis()->GetBinLowEdge(i + 1) << "-"
+            << DataHist->GetXaxis()->GetBinLowEdge(i + 2) << ")");
         NUIS_ERR(WRN, "Data error: " << DataHisterr);
         NUIS_ERR(WRN, "Cov error:  " << coverr);
       }
@@ -1146,14 +1170,14 @@ void StatUtils::SetDataErrorFromCov(TH1D *DataHist, TMatrixDSym *cov,
 
 //*******************************************************************
 void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
-                                    double scale, bool ErrorCheck) {
+    double scale, bool ErrorCheck) {
   //*******************************************************************
 
   // Check
   if (ErrorCheck) {
     if (cov->GetNrows() != data->GetNbinsX() * data->GetNbinsY()) {
       NUIS_ERR(FTL, "Nrows in cov don't match nbins in data for "
-                    "SetDataNUIS_ERRorFromCov");
+          "SetDataNUIS_ERRorFromCov");
       NUIS_ERR(FTL, "Nrows = " << cov->GetNrows());
       NUIS_ABORT("Nbins = " << data->GetNbinsX());
     }
@@ -1192,9 +1216,9 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
       if (ErrorsSet && ErrorCheck) {
         if (fabs(dataerr - coverr) / dataerr > 0.01) {
           NUIS_ERR(WRN, "Data error does not match covariance error for bin "
-                            << i + 1 << " ("
-                            << data->GetXaxis()->GetBinLowEdge(i + 1) << "-"
-                            << data->GetXaxis()->GetBinLowEdge(i + 2) << ")");
+              << i + 1 << " ("
+              << data->GetXaxis()->GetBinLowEdge(i + 1) << "-"
+              << data->GetXaxis()->GetBinLowEdge(i + 2) << ")");
           NUIS_ERR(WRN, "Data error: " << dataerr);
           NUIS_ERR(WRN, "Cov error:  " << coverr);
         }
@@ -1210,23 +1234,23 @@ void StatUtils::SetDataErrorFromCov(TH2D *data, TMatrixDSym *cov, TH2I *map,
 }
 
 TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
-                                              TH1D *data_hist,
-                                              double data_scale) {
+    TH1D *data_hist,
+    double data_scale) {
   int nbins = full_covar->GetNrows();
   TMatrixDSym *shape_covar = new TMatrixDSym(nbins);
 
   // Check nobody is being silly
   if (data_hist->GetNbinsX() != nbins) {
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
-                  "StatUtils::ExtractShapeOnlyCovar!");
+        "StatUtils::ExtractShapeOnlyCovar!");
     NUIS_ABORT("data_hist has " << data_hist->GetNbinsX() << " matrix has "
-                                << nbins << "bins");
+        << nbins << "bins");
     int err_bins = data_hist->GetNbinsX();
     if (nbins > err_bins)
       err_bins = nbins;
     for (int i = 0; i < err_bins; ++i) {
       NUIS_ERR(WRN, "Matrix diag. = " << (*full_covar)(i, i) << " data = "
-                                      << data_hist->GetBinContent(i + 1));
+          << data_hist->GetBinContent(i + 1));
     }
     return NULL;
   }
@@ -1244,7 +1268,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
 
   if (total_data == 0 || total_covar == 0) {
     NUIS_ERR(WRN, "Stupid matrix or data histogram passed to "
-                  "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
+        "StatUtils::ExtractShapeOnlyCovar! Ignoring...");
     return NULL;
   }
 
@@ -1258,7 +1282,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
       double data_j = data_hist->GetBinContent(j + 1) * data_scale;
 
       double norm_term =
-          data_i * data_j * total_covar / total_data / total_data;
+        data_i * data_j * total_covar / total_data / total_data;
       double mix_sum1 = 0;
       double mix_sum2 = 0;
 
@@ -1268,22 +1292,22 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
       }
 
       double mix_term1 =
-          data_i * (mix_sum1 / total_data -
-                    total_covar * data_j / total_data / total_data);
+        data_i * (mix_sum1 / total_data -
+            total_covar * data_j / total_data / total_data);
       double mix_term2 =
-          data_j * (mix_sum2 / total_data -
-                    total_covar * data_i / total_data / total_data);
+        data_j * (mix_sum2 / total_data -
+            total_covar * data_i / total_data / total_data);
 
       (*shape_covar)(i, j) =
-          (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
+        (*full_covar)(i, j) - mix_term1 - mix_term2 - norm_term;
     }
   }
   return shape_covar;
 }
 
 TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
-                                              TH2D *data_hist, TH2I *map,
-                                              double data_scale) {
+    TH2D *data_hist, TH2I *map,
+    double data_scale) {
   // Generate a simple map
   bool made_map = false;
   if (!map) {
@@ -1296,7 +1320,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
 
   // Calculate from 1D
   TMatrixDSym *rtn =
-      StatUtils::ExtractShapeOnlyCovar(full_covar, data_1D, data_scale);
+    StatUtils::ExtractShapeOnlyCovar(full_covar, data_1D, data_scale);
 
   delete data_1D;
   if (made_map) {
@@ -1313,8 +1337,8 @@ TH2I *StatUtils::GenerateMap(TH2D *hist) {
   std::string maptitle = std::string(hist->GetName()) + "_MAP";
 
   TH2I *map =
-      new TH2I(maptitle.c_str(), maptitle.c_str(), hist->GetNbinsX(), 0,
-               hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
+    new TH2I(maptitle.c_str(), maptitle.c_str(), hist->GetNbinsX(), 0,
+        hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
 
   Int_t index = 1;
 
@@ -1353,9 +1377,9 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
       if (map->GetBinContent(i + 1, j + 1) == 0)
         continue;
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
-                             hist->GetBinContent(i + 1, j + 1));
+          hist->GetBinContent(i + 1, j + 1));
       newhist->SetBinError(map->GetBinContent(i + 1, j + 1),
-                           hist->GetBinError(i + 1, j + 1));
+          hist->GetBinError(i + 1, j + 1));
     }
   }
 
@@ -1399,7 +1423,7 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
         continue;
 
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
-                             hist->GetBinContent(i + 1, j + 1));
+          hist->GetBinContent(i + 1, j + 1));
     }
   }
 
@@ -1414,7 +1438,7 @@ TMatrixDSym *StatUtils::GetCovarFromCorrel(TMatrixDSym *correl, TH1D *data) {
   for (int i = 0; i < nbins; i++) {
     for (int j = 0; j < nbins; j++) {
       (*covar)(i, j) =
-          (*correl)(i, j) * data->GetBinError(i + 1) * data->GetBinError(j + 1);
+        (*correl)(i, j) * data->GetBinError(i + 1) * data->GetBinError(j + 1);
     }
   }
 
@@ -1423,7 +1447,7 @@ TMatrixDSym *StatUtils::GetCovarFromCorrel(TMatrixDSym *correl, TH1D *data) {
 
 //*******************************************************************
 TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
-                                           int dimy) {
+    int dimy) {
   //*******************************************************************
 
   // Determine dim
@@ -1439,11 +1463,11 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
       if (entries.size() <= 1) {
         NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                      "entries on this line: "
-                          << row);
+            "entries on this line: "
+            << row);
       }
       for (std::vector<double>::iterator iter = entries.begin();
-           iter != entries.end(); iter++) {
+          iter != entries.end(); iter++) {
         column++;
 
         if (column > dimx)
@@ -1473,11 +1497,11 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
     std::vector<double> entries = GeneralUtils::ParseToDbl(line, " ");
     if (entries.size() <= 1) {
       NUIS_ERR(WRN, "StatUtils::GetMatrixFromTextFile, matrix only has <= 1 "
-                    "entries on this line: "
-                        << row);
+          "entries on this line: "
+          << row);
     }
     for (std::vector<double>::iterator iter = entries.begin();
-         iter != entries.end(); iter++) {
+        iter != entries.end(); iter++) {
       // Check Rows
       // assert(row > mat->GetNrows() && " covar rows doesn't match matrix
       // rows.");
@@ -1496,7 +1520,7 @@ TMatrixD *StatUtils::GetMatrixFromTextFile(std::string covfile, int dimx,
 
 //*******************************************************************
 TMatrixD *StatUtils::GetMatrixFromRootFile(std::string covfile,
-                                           std::string histname) {
+    std::string histname) {
   //*******************************************************************
 
   std::string inputfile = covfile + ";" + histname;
@@ -1580,7 +1604,7 @@ TMatrixDSym *StatUtils::GetCovarFromTextFile(std::string covfile, int dim) {
 
 //*******************************************************************
 TMatrixDSym *StatUtils::GetCovarFromRootFile(std::string covfile,
-                                             std::string histname) {
+    std::string histname) {
   //*******************************************************************
 
   TMatrixD *tempmat = GetMatrixFromRootFile(covfile, histname);

@@ -231,7 +231,7 @@ void Measurement1D::SetCovarFromDiagonal(TH1D *data) {
   if (data) {
     NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar, true);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
     NUIS_ABORT("No data input provided to set diagonal covar from!");
@@ -254,7 +254,7 @@ void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -276,7 +276,7 @@ void Measurement1D::SetCovarFromMultipleTextFiles(std::string covfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -288,7 +288,7 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile,
   NUIS_LOG(SAM,
            "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -302,7 +302,7 @@ void Measurement1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -314,7 +314,7 @@ void Measurement1D::SetCovarInvertFromRootFile(std::string covfile,
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                                << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -346,7 +346,7 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -378,7 +378,7 @@ void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -409,7 +409,7 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile,
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -431,7 +431,7 @@ void Measurement1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -452,7 +452,7 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile,
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(temp->GetNrows(), trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -566,7 +566,7 @@ void Measurement1D::FinaliseMeasurement() {
     NUIS_LOG(SAM, "Have full covariance for sample "
                       << GetName()
                       << " but only using diagonal elements for likelihood");
-    size_t nbins = fFullCovar->GetNcols();
+    int nbins = fFullCovar->GetNcols();
     for (int i = 0; i < nbins; ++i) {
       for (int j = 0; j < nbins; ++j) {
         if (i != j) {
@@ -581,7 +581,7 @@ void Measurement1D::FinaliseMeasurement() {
   }
 
   if (!covar) {
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar, true);
   }
 
   if (!fDecomp) {
@@ -596,7 +596,7 @@ void Measurement1D::FinaliseMeasurement() {
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
     if (covar)
       delete covar;
-    covar = StatUtils::GetInvert(fShapeCovar);
+    covar = StatUtils::GetInvert(fShapeCovar, true);
     if (fDecomp)
       delete fDecomp;
     fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -1197,11 +1197,11 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
   // Setup Covariances
   if (covar)
     delete covar;
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
 
   if (fDecomp)
     delete fDecomp;
-  fDecomp = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar, true);
 
   delete tempdata;
 
@@ -1487,9 +1487,11 @@ void Measurement1D::WriteShapePlot() {
   TH1D *mcShape = (TH1D *)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
   TH1D *dataShape = (TH1D *)fDataHist->Clone((fName + "_data_SHAPE").c_str());
+  // Set the shape covariance to calculate the chi2
+  if (!fShapeCovar) SetShapeCovar();
+
   // Don't check error
-  if (fShapeCovar)
-    StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
+  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
 
   double shapeScale = 1.0;
   if (fIsRawEvents) {
@@ -1497,7 +1499,6 @@ void Measurement1D::WriteShapePlot() {
   } else {
     shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
   }
-
   mcShape->Scale(shapeScale);
 
   std::stringstream ss;

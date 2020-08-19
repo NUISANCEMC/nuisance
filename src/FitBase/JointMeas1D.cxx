@@ -344,7 +344,7 @@ void JointMeas1D::SetCovarFromDiagonal(TH1D *data) {
   if (data) {
     NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar,true);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
     NUIS_ERR(FTL, "No data input provided to set diagonal covar from!");
@@ -364,7 +364,7 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
   NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
 
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -385,7 +385,7 @@ void JointMeas1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -397,7 +397,7 @@ void JointMeas1D::SetCovarFromRootFile(std::string covfile,
   NUIS_LOG(SAM,
        "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -407,7 +407,7 @@ void JointMeas1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -419,7 +419,7 @@ void JointMeas1D::SetCovarInvertFromRootFile(std::string covfile,
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                            << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -451,7 +451,7 @@ void JointMeas1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -486,7 +486,7 @@ void JointMeas1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -517,7 +517,7 @@ void JointMeas1D::SetCorrelationFromRootFile(std::string covfile,
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -551,7 +551,7 @@ void JointMeas1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -572,7 +572,7 @@ void JointMeas1D::SetCholDecompFromRootFile(std::string covfile,
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(temp->GetNrows(), trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -655,7 +655,7 @@ void JointMeas1D::FinaliseMeasurement() {
   }
 
   if (!covar) {
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar,true);
   }
 
   if (!fDecomp) {
@@ -1164,11 +1164,11 @@ void JointMeas1D::SetFakeDataValues(std::string fakeOption) {
   // Setup Covariances
   if (covar)
     delete covar;
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
 
   if (fDecomp)
     delete fDecomp;
-  fDecomp = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete tempdata;
 

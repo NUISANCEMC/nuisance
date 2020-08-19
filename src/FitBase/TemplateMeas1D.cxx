@@ -99,7 +99,7 @@ TemplateMeas1D::TemplateMeas1D(std::string name, std::string inputfile,
   // for use in fake data study covariance throws.
   // If a covariance IS provided it should be setup here.
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
 
   // There will be cases where we want to save optional histograms
   // to help with validation/studies. They should be setup in the constructor.
