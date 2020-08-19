@@ -1201,7 +1201,7 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
 
   if (fDecomp)
     delete fDecomp;
-  fDecomp = StatUtils::GetDecomp(fFullCovar, true);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete tempdata;
 
