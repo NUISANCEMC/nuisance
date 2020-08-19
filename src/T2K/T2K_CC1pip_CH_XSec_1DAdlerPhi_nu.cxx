@@ -35,10 +35,10 @@ T2K_CC1pip_CH_XSec_1DAdlerPhi_nu::T2K_CC1pip_CH_XSec_1DAdlerPhi_nu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/phi_adler.rootout.root",
+                          "/data/T2K/CC1pip/CH/phi_adler.root",
                       "Phi_Adler");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/phi_adler.rootout.root",
+                           "/data/T2K/CC1pip/CH/phi_adler.root",
                        "Phi_AdlerCov");
 
   SetShapeCovar();

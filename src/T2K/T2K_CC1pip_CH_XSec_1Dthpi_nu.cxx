@@ -33,10 +33,10 @@ T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/Thetapion.rootout.root",
+                          "/data/T2K/CC1pip/CH/Thetapion.root",
                       "Theta_pion");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/Thetapion.rootout.root",
+                           "/data/T2K/CC1pip/CH/Thetapion.root",
                        "Theta_pionCov");
 
   SetShapeCovar();

@@ -34,10 +34,10 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                          "/data/T2K/CC1pip/CH/MomentumPion.root",
                       "Momentum_pion");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                           "/data/T2K/CC1pip/CH/MomentumPion.root",
                        "Momentum_pionCov");
 
   SetShapeCovar();

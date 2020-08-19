@@ -34,10 +34,10 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu::T2K_CC1pip_CH_XSec_1Dthmupi_nu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/Thetapimu.rootout.root",
+                          "/data/T2K/CC1pip/CH/Thetapimu.root",
                       "Theta(pi,mu)(rads)");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/Thetapimu.rootout.root",
+                           "/data/T2K/CC1pip/CH/Thetapimu.root",
                        "Theta(pi,mu)(rads)Cov");
 
   SetShapeCovar();

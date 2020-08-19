@@ -34,10 +34,10 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/Q2.rootout.root",
+                          "/data/T2K/CC1pip/CH/Q2.root",
                       "Q2");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/Q2.rootout.root",
+                           "/data/T2K/CC1pip/CH/Q2.root",
                        "Q2Cov");
 
   SetShapeCovar();

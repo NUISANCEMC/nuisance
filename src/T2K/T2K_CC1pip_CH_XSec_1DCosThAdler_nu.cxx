@@ -35,10 +35,10 @@ T2K_CC1pip_CH_XSec_1DCosThAdler_nu::T2K_CC1pip_CH_XSec_1DCosThAdler_nu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/theta_adler.rootout.root",
+                          "/data/T2K/CC1pip/CH/theta_adler.root",
                       "Theta_Adler");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/theta_adler.rootout.root",
+                           "/data/T2K/CC1pip/CH/theta_adler.root",
                        "Theta_AdlerCov");
 
   SetShapeCovar();
