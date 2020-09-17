@@ -496,7 +496,7 @@ void GenericFlux_Vectors::ApplyNormScale(float norm) {
 void GenericFlux_Vectors::FillHistograms() { return; }
 
 void GenericFlux_Vectors::ResetAll() {
-  eventVariables->Reset();
+  // eventVariables->Reset();
   return;
 }
 
