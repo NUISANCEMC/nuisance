@@ -7,8 +7,8 @@ int Reweight::ConvertNUISANCEDial(std::string type) {
       return i;
     }
   }
-  return kUnkownNUISANCEDial;
-};
+  return kUnkownNUISANCEDial;}
+;
 
 std::string Reweight::ConvNUISANCEDial(int type) {
 
@@ -68,8 +68,70 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kMINERvARW_RikRESRPA_ApplyRPA:            { return "MINERvARW_RikRESRPA_ApplyRPA"; }
     case kMINERvARW_RikRESRPA_LowQ2:               { return "MINERvARW_RikRESRPA_LowQ2"; }
     case kMINERvARW_RikRESRPA_HighQ2:              { return "MINERvARW_RikRESRPA_HighQ2"; }
+      
+    // SF modif 
+
+    // Constant RW per shell  
 
     case kSFRW_pShellNorm_C:              { return "SFRW_pShellNorm_C"; }
+    case kSFRW_sShellNorm_C:              { return "SFRW_sShellNorm_C"; }
+    case kSFRW_p12ShellNorm_O:            { return "SFRW_p12ShellNorm_O"; }
+    case kSFRW_p32ShellNorm_O:            { return "SFRW_p32ShellNorm_O"; }
+    case kSFRW_sShellNorm_O:              { return "SFRW_sShellNorm_O"; }
+
+    // end Constant RW per shell
+
+    // Gaussian RW per shell
+        
+    case kGaussian_pShell_C_norm:           { return "Gaussian_pShell_C_norm"; }
+    case kGaussian_pShell_C_p:              { return "Gaussian_pShell_C_p"; }
+    case kGaussian_pShell_C_w:              { return "Gaussian_pShell_C_w"; }
+            
+    case kGaussian_sShell_C_norm:           { return "Gaussian_sShell_C_norm"; }
+    case kGaussian_sShell_C_p:              { return "Gaussian_sShell_C_p"; }
+    case kGaussian_sShell_C_w:              { return "Gaussian_sShell_C_w"; }
+        
+        
+    case kGaussian_p12Shell_O_norm:         { return "Gaussian_p12Shell_O_norm"; }
+    case kGaussian_p12Shell_O_p:            { return "Gaussian_p12Shell_O_p"; }
+    case kGaussian_p12Shell_O_w:            { return "Gaussian_p12Shell_O_w"; }
+        
+    case kGaussian_p32Shell_O_norm:         { return "Gaussian_p32Shell_O_norm"; }
+    case kGaussian_p32Shell_O_p:            { return "Gaussian_p32Shell_O_p"; }
+    case kGaussian_p32Shell_O_w:            { return "Gaussian_p32Shell_O_w"; }
+        
+    case kGaussian_sShell_O_norm:         { return "Gaussian_sShell_O_norm"; }
+    case kGaussian_sShell_O_p:            { return "Gaussian_sShell_O_p"; }
+    case kGaussian_sShell_O_w:            { return "Gaussian_sShell_O_w"; }
+
+    case kSRC_strength:            { return "SRC_strength"; } // RW SRC part
+
+    
+    // end Gaussian RW per shell
+
+      // Pmiss RW
+    case kPmissRW_pC:              { return "PmissRW_pC"; }
+    case kPmissRW_sC:              { return "PmissRW_sC"; }
+    
+    case kPmissRW_p12O:            { return "PmissRW_p12O"; }
+    case kPmissRW_p32O:            { return "PmissRW_p32O"; }
+    case kPmissRW_sO:              { return "PmissRW_sO"; }
+    // end Pmiss RW
+
+
+    // end SF modif
+    
+    
+    // FSI RW modif
+    case kFSIRW_noFSI:             { return "FSIRW_noFSI"; }
+    case kFSIRW_elasticFSI:        { return "FSIRW_elasticFSI"; }
+    case kFSIRW_inelasticFSI:      { return "FSIRW_inelasticFSI"; }
+    case kFSIRW_pionProdFSI:       { return "FSIRW_pionProdFSI"; }
+    case kFSIRW_pionAbsFSI:        { return "FSIRW_pionAbsFSI"; }
+   // end FSI RW modif
+
+      // 2p2h normalization
+    case kRW2p2h_norm:             { return "RW2p2h_norm"; } 
 
     case kSBLOsc_Distance: { return "SBLOsc_Distance"; }
     case kSBLOsc_MassSplitting: { return "SBLOsc_MassSplitting"; }

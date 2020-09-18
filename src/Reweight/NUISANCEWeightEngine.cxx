@@ -26,7 +26,11 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
            << " for the Gaussian enhancement, so will die now...");
   }
   fWeightCalculators.push_back(GaussianMode);
-  fWeightCalculators.push_back(new SFRW_pShellNormCalc());
+  //  fWeightCalculators.push_back(new SFRW_ShellNormCalc());
+  fWeightCalculators.push_back(new SFGausRW_ShellCalc());
+  fWeightCalculators.push_back(new PmissRW_Calc());
+  fWeightCalculators.push_back(new FSIRW_Calc());
+  fWeightCalculators.push_back(new RW2p2h_Calc());
   fWeightCalculators.push_back(new ModeNormCalc());
   fWeightCalculators.push_back(new SBLOscWeightCalc());
   fWeightCalculators.push_back(new BeRPACalc());

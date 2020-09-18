@@ -23,18 +23,138 @@ class NUISANCEWeightCalc {
     std::string fName;
 };
 
-class SFRW_pShellNormCalc : public NUISANCEWeightCalc {
+// SF modif
+
+// Constant RW per shell
+
+class SFRW_ShellNormCalc : public NUISANCEWeightCalc {
   public:
-    SFRW_pShellNormCalc();
-    ~SFRW_pShellNormCalc(){};
+    SFRW_ShellNormCalc();
+    ~SFRW_ShellNormCalc(){};
 
     double CalcWeight(BaseFitEvt* evt);
     void SetDialValue(std::string name, double val);
     void SetDialValue(int rwenum, double val);
     bool IsHandled(int rwenum);
 
-    double fNormPShell; 
+    double fNormPShellC;
+    double fNormSShellC;
+
+    double fNormP12ShellO;
+    double fNormP32ShellO;
+    double fNormSShellO;
 };
+
+// end Constant RW per shell
+
+// Gaussian RW per shell
+
+class SFGausRW_ShellCalc : public NUISANCEWeightCalc {
+  public:
+    SFGausRW_ShellCalc();
+    ~SFGausRW_ShellCalc(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+    double GetGausWeight(double Emiss, double vals[]);
+
+    // 3 params to describe the Gaussian:
+    // 0 norm
+    // 1 mean (position)
+    // 2 sigma (width)
+    
+    static const int kPosNorm = 0;
+    static const int kPosP = 1;
+    static const int kPosW = 2;
+
+    double fGaus_pShell_C[3];
+    double fGaus_sShell_C[3];
+    
+    double fGaus_p12Shell_O[3];
+    double fGaus_p32Shell_O[3];
+    double fGaus_sShell_O[3];
+
+    double fSRC_strength; // RW SRC part
+    
+};
+
+// end Gaussian RW per shell
+
+// Pmiss RW
+
+class PmissRW_Calc : public NUISANCEWeightCalc {
+ public:
+  PmissRW_Calc();
+  ~PmissRW_Calc(){};
+    
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+    
+  double GetWeightCarbonP(double pmiss, double dial);
+  double GetWeightCarbonS(double pmiss, double dial);
+
+  double fPmissRW_pC; // p-shell, C
+  double fPmissRW_sC; // s-shell, C
+    
+  double fPmissRW_p12O; // p12-shell, O
+  double fPmissRW_p32O; // p32-shell, O
+  double fPmissRW_sO; // s-shell, O
+
+
+};
+
+
+// end Pmiss RW
+
+// end SF modif
+
+
+// FSI RW modif
+
+class FSIRW_Calc : public NUISANCEWeightCalc {
+ public:
+  FSIRW_Calc();
+  ~FSIRW_Calc(){};
+    
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+    
+  bool IsNoFSI(std::vector<int> PDGvert, std::vector<TLorentzVector> pvert, std::vector<int> PDGfs, std::vector<TLorentzVector> pfs, double eps);
+  bool SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> PDGfs);
+  int GetNpi(std::vector<int> PDG);
+
+  double fFSIRW_noFSI; // no FSI
+  double fFSIRW_elasticFSI; // elastic FSI (change in the kinematics of primary vertex particles only)
+  double fFSIRW_inelasticFSI; // extra-nucleons and same pion (if any)
+  double fFSIRW_pionProdFSI; // pion production
+  double fFSIRW_pionAbsFSI; // pion absorption
+};
+
+// end FSI RW modif
+
+// 2p2h normalization RW
+
+class RW2p2h_Calc : public NUISANCEWeightCalc {
+ public:
+  RW2p2h_Calc();
+  ~RW2p2h_Calc(){};
+    
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+   
+  double fRW2p2h_norm;
+};
+
+// end 2p2h normalization RW
+
 
 class ModeNormCalc : public NUISANCEWeightCalc {
   public:

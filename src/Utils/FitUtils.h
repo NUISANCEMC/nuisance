@@ -187,10 +187,19 @@ double cthpInfK(TLorentzVector pmu, double costh, double binding, bool neutrino)
 
 // SF helper funcitons:
 double GetEmiss(FitEvent *event);
-
+double GetPmiss(FitEvent *event);
 double CosThAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
 double PhiAdler(TLorentzVector Pnu, TLorentzVector Pmu, TLorentzVector Ppi, TLorentzVector Pprot);
-}
 
+
+// FSI RW modif
+
+std::vector<int> GetPDGvert(FitEvent *event);
+std::vector<TLorentzVector> GetPvert(FitEvent *event);
+std::vector<int> GetPDGfs(FitEvent *event);
+std::vector<TLorentzVector> GetPfs(FitEvent *event);
+
+// end FSI RW modif
+}
 /*! @} */
 #endif

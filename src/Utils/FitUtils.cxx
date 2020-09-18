@@ -1096,24 +1096,36 @@ double FitUtils::cthpInfK(TLorentzVector pmu, double costh, double binding,
 
   return cth_inf;
 };
-//********************************************************************
+
+
+
+//**********************************************************************
 double FitUtils::GetEmiss(FitEvent *event) {
   //********************************************************************
-  // Get an SF-like Emiss (removal energy) using the pre-FSI particle stack
-  double Emiss = 1.0;
+  // Get an SF-like Emiss (removal energy)
+  // using the pre-FSI particle stack
+  double Emiss = 0.0;
+  double pmiss = 0.0;
+  double Trem = 0.0;
 
-  // Initalise what we need: 
-
-  TLorentzVector *nu_4mom = new TLorentzVector(0,0,0,0);
-  TLorentzVector *plep = new TLorentzVector(0,0,0,0);
+  double mass_C11 = 10257.053; // MeV
+  double mass_O15 = 13975.270;
+  double massRemnant = 0.0;
+    
+    
+  // Initialise what we need:
+  /*
+  TLorentzVector *pnu = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pmu = new TLorentzVector(0,0,0,0);
   TLorentzVector *pprot = new TLorentzVector(0,0,0,0);
   TLorentzVector *pneut = new TLorentzVector(0,0,0,0);
-
-  double proton_highmom = 0.0;
-  double neutron_highmom = 0.0;
-
+  */
+  double hm_pprot = 0.0;
+  double hm_pneut = 0.0;
+    
   int PDGnu = event->PartInfo(0)->fPID;
-  (*nu_4mom) = event->PartInfo(0)->fP;
+  TLorentzVector pnu = event->PartInfo(0)->fP;
+  TLorentzVector pmu, pprot, pneut;
 
   // Get the pre-FSI stack like in the GenericVectors tree:
   // Start Particle Loop
@@ -1123,31 +1135,192 @@ double FitUtils::GetEmiss(FitEvent *event) {
     bool isPreFSI = event->fPrimaryVertex[i];
     if (!isPreFSI)
       continue;
-
+        
     // PDG Particle
     int PDGpart = event->PartInfo(i)->fPID;
     TLorentzVector part_4mom = event->PartInfo(i)->fP;
     if (abs(PDGpart) == abs(PDGnu) - 1) {
-      *plep = part_4mom;
-    } 
+      pmu = part_4mom;
+    }
     else if (PDGpart == 2212) {
-      if (part_4mom.Vect().Mag() > proton_highmom) {
-        proton_highmom = part_4mom.Vect().Mag();
-        (*pprot) = part_4mom;
-      }
-    } 
-    else if (PDGpart == 2112) {
-      if (part_4mom.Vect().Mag() > neutron_highmom) {
-        neutron_highmom = part_4mom.Vect().Mag();
-        (*pneut) = part_4mom;
+      if (part_4mom.Vect().Mag() > hm_pprot) {
+	hm_pprot = part_4mom.Vect().Mag();
+	pprot = part_4mom;
       }
     }
-
+    else if (PDGpart == 2112) {
+      if (part_4mom.Vect().Mag() > hm_pneut) {
+	hm_pneut = part_4mom.Vect().Mag();
+	pneut = part_4mom;
+      }
+    }
+        
   } // End of particle loop
+    
+    
+    // Calculate Emiss from kinematics:
+    
+  if (event->GetTargetA()==12 && event->GetTargetZ()==6){
+    massRemnant = mass_C11;
+	  }
+    
+  else if (event->GetTargetA()==16 && event->GetTargetZ()==8){
+    massRemnant = mass_O15;
+	  }
+    
+    
+  //pmiss = sqrt( (pnu->Px()-pmu->Px()-(pprot->Px()))*(pnu->Px()-pmu->Px()-(pprot->Px())) + (pnu->Py()-pmu->Py()-(pprot->Py()))*(pnu->Py()-pmu->Py()-(pprot->Py())) + (pnu->Pz()-pmu->Pz()-(pprot->Pz()))*(pnu->Pz()-pmu->Pz()-(pprot->Pz())) );
+    
+  pmiss = sqrt( (pnu.Px()-pmu.Px()-(pprot.Px()))*(pnu.Px()-pmu.Px()-(pprot.Px())) + (pnu.Py()-pmu.Py()-(pprot.Py()))*(pnu.Py()-pmu.Py()-(pprot.Py())) + (pnu.Pz()-pmu.Pz()-(pprot.Pz()))*(pnu.Pz()-pmu.Pz()-(pprot.Pz())) );
 
-  // Calculate Emiss from kinematics:
-  //....
-  //
-
+  Trem = sqrt(pmiss*pmiss + massRemnant*massRemnant) - massRemnant;
+  Emiss = pnu.E() + 939.565 - pmu.E() - pprot.E() - Trem;
+    
   return Emiss;
 }
+
+double FitUtils::GetPmiss(FitEvent *event) {
+  //********************************************************************
+  // Get an SF-like the 4 vector containing Emiss (removal energy) and
+  // pmiss (missing momentum) using the pre-FSI particle stack
+  double pmiss = 0.0;
+    
+  double mass_C11 = 10257.053; // MeV
+  double mass_O15 = 13975.270;
+  double massRemnant = 0.0;
+    
+    
+  // Initialise what we need:
+  /*
+  TLorentzVector *pnu = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pmu = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pprot = new TLorentzVector(0,0,0,0);
+  TLorentzVector *pneut = new TLorentzVector(0,0,0,0);
+  */
+  double hm_pprot = 0.0;
+  double hm_pneut = 0.0;
+    
+  int PDGnu = event->PartInfo(0)->fPID;
+  TLorentzVector pnu = event->PartInfo(0)->fP;
+  TLorentzVector pmu, pprot, pneut;
+
+  // Get the pre-FSI stack like in the GenericVectors tree:
+  // Start Particle Loop
+  UInt_t npart = event->Npart();
+  for (UInt_t i = 0; i < npart; i++) {
+    // Save particles that are just before the FSI cascade
+    bool isPreFSI = event->fPrimaryVertex[i];
+    if (!isPreFSI)
+      continue;
+        
+    // PDG Particle
+    int PDGpart = event->PartInfo(i)->fPID;
+    TLorentzVector part_4mom = event->PartInfo(i)->fP;
+    if (abs(PDGpart) == abs(PDGnu) - 1) {
+      pmu = part_4mom;;
+    }
+    else if (PDGpart == 2212) {
+      if (part_4mom.Vect().Mag() > hm_pprot) {
+	hm_pprot = part_4mom.Vect().Mag();
+	pprot = part_4mom;
+      }
+    }
+    else if (PDGpart == 2112) {
+      if (part_4mom.Vect().Mag() > hm_pneut) {
+	hm_pneut = part_4mom.Vect().Mag();
+	pneut = part_4mom;
+      }
+    }
+        
+  } // End of particle loop
+    
+    
+    // Calculate pmiss from kinematics
+    
+  //pmiss = sqrt( (pnu->Px()-pmu->Px()-(pprot->Px()))*(pnu->Px()-pmu->Px()-(pprot->Px())) + (pnu->Py()-pmu->Py()-(pprot->Py()))*(pnu->Py()-pmu->Py()-(pprot->Py())) + (pnu->Pz()-pmu->Pz()-(pprot->Pz()))*(pnu->Pz()-pmu->Pz()-(pprot->Pz())) );
+  pmiss = sqrt( (pnu.Px()-pmu.Px()-(pprot.Px()))*(pnu.Px()-pmu.Px()-(pprot.Px())) + (pnu.Py()-pmu.Py()-(pprot.Py()))*(pnu.Py()-pmu.Py()-(pprot.Py())) + (pnu.Pz()-pmu.Pz()-(pprot.Pz()))*(pnu.Pz()-pmu.Pz()-(pprot.Pz())) );
+  return pmiss;
+}
+
+
+
+// FSI RW modif
+
+std::vector<int> FitUtils::GetPDGvert(FitEvent *event)
+{
+  UInt_t npart = event->Npart();
+  std::vector<int> PDGvert;
+  //std::cout<<std::endl<<"Vert:"<<std::endl;
+  bool passed = false;
+  for (UInt_t ivertp = 0; ivertp < npart; ivertp++) // loop over primary vertex particles
+  {
+      bool isPreFSI = event->fPrimaryVertex[ivertp];
+      if (!isPreFSI) continue;
+      int pdg = event->PartInfo(ivertp)->fPID;
+      if (pdg != 13 && !passed) continue; 
+	//if (!isPreFSI ||event->PartInfo(ivertp)->fPID == 14 || event->PartInfo(ivertp)->fPID == 2112)
+	//continue;
+      passed = true;
+      PDGvert.push_back(pdg);
+      //std::cout<<(event->PartInfo(ivertp)->fPID)<<" - ";
+  }
+  return PDGvert;
+}
+
+std::vector<TLorentzVector> FitUtils::GetPvert(FitEvent *event)
+{
+  UInt_t npart = event->Npart();
+  std::vector<TLorentzVector> pvert;
+  //std::cout<<std::endl<<"Vert:"<<std::endl;
+  bool passed = false;
+  for (UInt_t ivertp = 0; ivertp < npart; ivertp++) // loop over primary vertex particles
+    {
+      bool isPreFSI = event->fPrimaryVertex[ivertp];
+      if (!isPreFSI) continue;
+      if (event->PartInfo(ivertp)->fPID != 13 && !passed) continue;
+      //      if (!isPreFSI || event->PartInfo(ivertp)->fPID == 14 || event->PartInfo(ivertp)->fPID == 2112)
+      //	continue;
+      passed = true;
+      pvert.push_back(event->PartInfo(ivertp)->fP);
+      //std::cout<<(event->PartInfo(ivertp)->fPID)<<" -- E ="<<(event->PartInfo(ivertp)->fP.E());
+    }
+  return pvert;
+}
+
+std::vector<int> FitUtils::GetPDGfs(FitEvent *event)
+{
+  UInt_t npart = event->Npart();
+  std::vector<int> PDGfs;
+  //std::cout<<std::endl<<"FS:"<<std::endl;
+  for (UInt_t ifsp = 0; ifsp < npart; ifsp++) // loop over FS particles
+    {
+      bool isFSI = (event->PartInfo(ifsp)->fIsAlive && event->PartInfo(ifsp)->Status() == kFinalState);
+      if (!isFSI)
+	{
+	  //std::cout<<"isPreFSI: "<<(event->PartInfo(ifsp)->fPID)<<" - ";
+	continue;
+	}
+      PDGfs.push_back(event->PartInfo(ifsp)->fPID);
+      //std::cout<<(event->PartInfo(ifsp)->fPID)<<" - ";
+    }
+  return PDGfs;
+}
+
+std::vector<TLorentzVector> FitUtils::GetPfs(FitEvent *event)
+{
+  UInt_t npart = event->Npart();
+  std::vector<TLorentzVector> pfs;
+  //std::cout<<std::endl<<"FS:"<<std::endl;
+  for (UInt_t ifsp = 0; ifsp < npart; ifsp++) // loop over FS particles
+    {
+      bool isFSI = (event->PartInfo(ifsp)->fIsAlive && event->PartInfo(ifsp)->Status() == kFinalState);
+      if (!isFSI)
+	continue;
+      pfs.push_back(event->PartInfo(ifsp)->fP);
+      //std::cout<<(event->PartInfo(ifsp)->fPID)<<" -- E ="<<(event->PartInfo(ifsp)->fP.E());
+    }
+  return pfs;
+}
+
+// end FSI RW modif
+
