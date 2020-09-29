@@ -62,9 +62,6 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile *outfile) {
   fDialVals = NULL;
   fNDials = 0;
 
-  //fTrackAvgWeights = true; // TODO: make this a parameter
-  //fNormAltRegPen = 25.0; // 25.0 gives a 1 sigma penalty for a 20% norm shift
-
   fTrackAvgWeights = FitPar::Config().GetParB("ApplyFsiSfNormPen"); 
   fNormAltRegPen = FitPar::Config().GetParD("FsiSfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
 
@@ -503,21 +500,6 @@ void JointFCN::ReconfigureSignal() {
 void JointFCN::FindRelevantAvgWeights() {
   //***************************************************
 
-  // Make sure we have a list of inputs
-  //if (fInputList.empty()) {
-  //  fInputList = GetInputList();
-  //  fSubSampleList = GetSubSampleList();
-  //}
-  //fInputsN = fInputList.size();
-
-  //if (fFsiFateDialAvg) delete fFsiFateDialAvg;
-  //if (fSfShellDialAvg) delete fSfShellDialAvg;
-
-  //fFsiFateDialAvg = new double[fInputsN];
-  //fSfShellDialAvg = new double[fInputsN];
-
-  // If all inputs are splines make sure the readers are told
-  // they need to be reconfigured.
   std::vector<InputHandlerBase *>::iterator inp_iter = fInputList.begin();
   int inputcount = 0;
   inp_iter = fInputList.begin();
@@ -686,20 +668,25 @@ void JointFCN::ReconfigureUsingManager() {
     while (curevent) {
       // If we're keeping track of the average weights for a penalty term, 
       // than we already determined all of these so no need to do it here.
-      if(!fTrackAvgWeights){
+      //if(!fTrackAvgWeights){
         // Get Event Weight
         // The reweighting weight
         curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
         // The Custom weight and reweight
         curevent->Weight =
             curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
-      }
+      //}
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
+          //NUIS_LOG(REC, curinput->GetName()
+          //              << " : Processed " << i << " events. [M, W] = ["
+          //              << curevent->Mode << ", " << curevent->Weight << "]");
           NUIS_LOG(REC, curinput->GetName()
-                        << " : Processed " << i << " events. [M, W] = ["
-                        << curevent->Mode << ", " << curevent->Weight << "]");
+                        << " : Processed " << i << " events. [M, W, RW, IW, CW] = ["
+                        << curevent->Mode << ", " << curevent->Weight  << ", "
+                        << curevent->RWWeight  << ", " << curevent->InputWeight  << ", "
+                        << curevent->CustomWeight << "]");
         }
       }
 
@@ -960,12 +947,12 @@ void JointFCN::ReconfigureFastUsingManager() {
 
         // If we're keeping track of the average weights for a penalty term, 
         // than we already determined all of these so no need to do it here.
-        if(!fTrackAvgWeights){
+        //if(!fTrackAvgWeights){
           curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
           curevent->Weight =
               curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
           rwweight = curevent->Weight;
-        }
+        //}
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
