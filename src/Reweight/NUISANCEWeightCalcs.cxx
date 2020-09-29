@@ -183,17 +183,17 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
       int Nprotons = 0;
       for (UInt_t i = 0; i < npart; i++)
         {
-	  bool isPreFSI = fevt->fPrimaryVertex[i];
-	  if (!isPreFSI)
-	    continue;
-	  int partPDG = fevt->fParticlePDG[i];
-	  if (partPDG==2212) Nprotons++;
+    bool isPreFSI = fevt->fPrimaryVertex[i];
+    if (!isPreFSI)
+      continue;
+    int partPDG = fevt->fParticlePDG[i];
+    if (partPDG==2212) Nprotons++;
         }
         
       // RW the SRC part
       if (Nprotons==2)
         {
-	  w *= fSRC_strength;
+    w *= fSRC_strength;
         }
         
 
@@ -201,12 +201,12 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
         
         if (Z==6 && A==12) // Carbon
         {
-	  //if(Emiss>10 && Emiss<25) // P-shell
+    //if(Emiss>10 && Emiss<25) // P-shell
             {
                 w *= GetGausWeight(Emiss, fGaus_pShell_C);
             }
             
-	  //if(Emiss>25 && Emiss<60) // S-shell
+    //if(Emiss>25 && Emiss<60) // S-shell
             {
                 w *= GetGausWeight(Emiss, fGaus_sShell_C);
             }
@@ -214,17 +214,17 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
         
         if (Z==8 && A==16) // Oxygen
         {
-	  //if(Emiss>8 && Emiss<15) // P1/2-shell
+    //if(Emiss>8 && Emiss<15) // P1/2-shell
             {
                 w *= GetGausWeight(Emiss, fGaus_p12Shell_O);
             }
             
-	  //if(Emiss>15 && Emiss<25) // P3/2-shell
+    //if(Emiss>15 && Emiss<25) // P3/2-shell
             {
                 w *= GetGausWeight(Emiss, fGaus_p32Shell_O);
             }
             
-	  //if(Emiss>25 && Emiss<70) // S-shell
+    //if(Emiss>25 && Emiss<70) // S-shell
             {
                 w *= GetGausWeight(Emiss, fGaus_sShell_O);
             }
@@ -233,6 +233,9 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
         //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
     }
     
+    // Store the weight specifically from SF shell modifications for later use. 
+    evt->SfShellWeight = w;
+
     return w;
 }
 
@@ -380,54 +383,54 @@ double PmissRW_Calc::CalcWeight(BaseFitEvt *evt) {
   //  if (fPmissRW_p12O<-1.0 || fPmissRW_p12O>1.0 || fPmissRW_p32O<-1.0 || fPmissRW_p32O>1.0 || fPmissRW_sO<-1.0 || fPmissRW_sO>1.0)
   //    return 1.0;
     
-	  if (mode == 1) // CCQE only
-	    {
-	      double Emiss=FitUtils::GetEmiss(fevt), pmiss = FitUtils::GetPmiss(fevt); // Compute Emiss & Pmiss
+    if (mode == 1) // CCQE only
+      {
+        double Emiss=FitUtils::GetEmiss(fevt), pmiss = FitUtils::GetPmiss(fevt); // Compute Emiss & Pmiss
         
-	      if (Z==6 && A==12) // Carbon
-		{
+        if (Z==6 && A==12) // Carbon
+    {
 
-		  if(Emiss>10 && Emiss<25) // P-shell
-		    {
-		      double pWeight = GetWeightCarbonP(pmiss, fPmissRW_pC);                
-		      if (pWeight<0) return 0.0;
-		      w *= pWeight;
-		    }
+      if(Emiss>10 && Emiss<25) // P-shell
+        {
+          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_pC);                
+          if (pWeight<0) return 0.0;
+          w *= pWeight;
+        }
             
-		  if(Emiss>25 && Emiss<60) // S-shell
-		    {
-		      double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sC);
-		      if (sWeight<0) return 0.0;
-		      w *= sWeight;
-		    }
-		}
+      if(Emiss>25 && Emiss<60) // S-shell
+        {
+          double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sC);
+          if (sWeight<0) return 0.0;
+          w *= sWeight;
+        }
+    }
         
-	      if (Z==8 && A==16) // Oxygen
-		{
-		  if(Emiss>8 && Emiss<15) // P1/2-shell
-		    {
-		      double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p12O);
+        if (Z==8 && A==16) // Oxygen
+    {
+      if(Emiss>8 && Emiss<15) // P1/2-shell
+        {
+          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p12O);
                       if (pWeight<0) return 0.0;
                       w *= pWeight;
-		    }
+        }
             
-		  if(Emiss>15 && Emiss<25) // P3/2-shell
-		    {
-		      double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p32O);
+      if(Emiss>15 && Emiss<25) // P3/2-shell
+        {
+          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p32O);
                       if (pWeight<0) return 0.0;
                       w *= pWeight;
-		    }
+        }
             
-		  if(Emiss>25 && Emiss<70) // S-shell
-		    {
-		      double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sO);
+      if(Emiss>25 && Emiss<70) // S-shell
+        {
+          double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sO);
                       if (sWeight<0) return 0.0;
                       w *= sWeight;
-		    }
-		}
+        }
+    }
         
-	      //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
-	    }
+        //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
+      }
     
   return w;
 }
@@ -504,37 +507,37 @@ double PmissRW_Calc::GetWeightCarbonP(double pmiss, double dial){
       double m_datamin, m_datamax, m_input;
       double c_datamin, c_datamax, c_input, pcenter;
       if (pmiss>limits[i] && pmiss<limits[i+1])
-	{
+  {
           m_datamin = (data_pmissPmin[i+1] - data_pmissPmin[i]) / 40.;
           m_datamax = (data_pmissPmax[i+1] - data_pmissPmax[i]) / 40.;
-	  m_input = (SFinput_pmissP[i+1] - SFinput_pmissP[i]) / 40.;
-	  pcenter = centers[i];
-	  c_datamin = data_pmissPmin[i];
-	  c_datamax = data_pmissPmax[i];
-	  c_input = SFinput_pmissP[i];
+    m_input = (SFinput_pmissP[i+1] - SFinput_pmissP[i]) / 40.;
+    pcenter = centers[i];
+    c_datamin = data_pmissPmin[i];
+    c_datamax = data_pmissPmax[i];
+    c_input = SFinput_pmissP[i];
 
-	  double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
-	  double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
-	  double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input; 
+    double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
+    double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
+    double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input; 
 
-	  return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-	}
+    return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
+  }
       /*
       else if(pmiss>0 && pmiss<centers[0])
-	{
-	  m_datamin = (data_pmissPmin[1] - data_pmissPmin[0]) / 40.;
+  {
+    m_datamin = (data_pmissPmin[1] - data_pmissPmin[0]) / 40.;
           m_datamax = (data_pmissPmax[1] - data_pmissPmax[0]) / 40.;
           m_input = (SFinput_pmissP[1] - SFinput_pmissP[0]) / 40.;
-	  pcenter = centers[0];
-	  c_datamin = data_pmissPmin[0];
+    pcenter = centers[0];
+    c_datamin = data_pmissPmin[0];
           c_datamax = data_pmissPmax[0];
           c_input = SFinput_pmissP[0];
-	  break;
-	}  
+    break;
+  }  
 
       else
-	{
-	  m_datamin = (data_pmissPmin[6] - data_pmissPmin[5]) / 40.;
+  {
+    m_datamin = (data_pmissPmin[6] - data_pmissPmin[5]) / 40.;
           m_datamax = (data_pmissPmax[6] - data_pmissPmax[5]) / 40.;
           m_input = (SFinput_pmissP[6] - SFinput_pmissP[5]) / 40.;
           pcenter= centers[5];
@@ -542,13 +545,13 @@ double PmissRW_Calc::GetWeightCarbonP(double pmiss, double dial){
           c_datamax = data_pmissPmax[5];
           c_input = SFinput_pmissP[5];
           break;
-	}
+  }
       double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
       double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
       double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input;
        
       return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-	}
+  }
       else if ()
       */
     }
@@ -577,8 +580,8 @@ double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
     {
       /*
       if (pmiss>edges[i] && pmiss<edges[i+1])
-	{
-	  // linear interpolation between the points                                                                                                                    
+  {
+    // linear interpolation between the points                                                                                                                    
 
           double m_datamin = (data_pmissSmin[i+1] - data_pmissSmin[i]) / 40.;
           double m_datamax = (data_pmissSmax[i+1] - data_pmissSmax[i]) / 40.;
@@ -588,8 +591,8 @@ double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
           double curr_pmiss_datamax = m_datamax * (pmiss - (edges[i]+20.)) + data_pmissSmax[i];
           double curr_pmiss_input = m_input * (pmiss - (edges[i]+20.)) + SFinput_pmissS[i];
 
-	  return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-	}
+    return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
+  }
       */
       
       // linear interpolation between the points
@@ -635,7 +638,7 @@ FSIRW_Calc::FSIRW_Calc() {
 }
 
 double FSIRW_Calc::CalcWeight(BaseFitEvt *evt) {
-  double eps = 0.0001;
+    double eps = 0.0001;
     
     int mode = abs(evt->Mode);
     FitEvent *fevt = static_cast<FitEvent *>(evt);
@@ -645,7 +648,7 @@ double FSIRW_Calc::CalcWeight(BaseFitEvt *evt) {
       {
         // First, get the PDG of particles at vert and fs
         
-	std::vector<int> PDGvert = FitUtils::GetPDGvert(fevt), PDGfs = FitUtils::GetPDGfs(fevt);
+        std::vector<int> PDGvert = FitUtils::GetPDGvert(fevt), PDGfs = FitUtils::GetPDGfs(fevt);
         
         // Now check the different FSI cases
         
@@ -654,47 +657,45 @@ double FSIRW_Calc::CalcWeight(BaseFitEvt *evt) {
         bool samePartVertFS = SameParticlesVertFS(PDGvert, PDGfs);
         
         if (samePartVertFS == true)
-	  {
+          {
             // Same particles => either no FSI or elastic FSI
             // Get the momenta and evaluate the variation
-	    //	    std::cout<<"no or elas FSI"<<std::endl;
-	    std::vector<TLorentzVector> pvert = FitUtils::GetPvert(fevt), pfs = FitUtils::GetPfs(fevt);
+            //std::cout<<"no or elas FSI"<<std::endl;
+            std::vector<TLorentzVector> pvert = FitUtils::GetPvert(fevt), pfs = FitUtils::GetPfs(fevt);
             
             bool noFSI = IsNoFSI(PDGvert, pvert, PDGfs, pfs, eps);
             
             if (noFSI == true)
-	      {
-	      w *= fFSIRW_noFSI; // no FSI
-	      //std::cout<<"noFSI"<<std::endl;
-	      }
+              {
+                w *= fFSIRW_noFSI; // no FSI
+                //std::cout<<"noFSI"<<std::endl;
+              }
             else
-	      {
-		w *= fFSIRW_elasticFSI; // elastic
-		//std::cout<<"elasFSI"<<std::endl;
-	      }
-	  }
-        
+              {
+                w *= fFSIRW_elasticFSI; // elastic
+                //std::cout<<"elasFSI"<<std::endl;
+              }
+            }
         else
-	  {
-	    //std::cout<<"inelasFSI"<<std::endl;
+          {
+            //std::cout<<"inelasFSI"<<std::endl;
             // The particles changed due to FSI
             // Inelactic: either no extra pions produced, exta pion production, or pion absorption
-            
-	    int Npifs = GetNpi(PDGfs);
-	    int Npivert = GetNpi(PDGvert);
+            int Npifs = GetNpi(PDGfs);
+            int Npivert = GetNpi(PDGvert);
 
-	    if (Npifs>Npivert) // Pion production
-	      w *= fFSIRW_pionProdFSI;
+            if (Npifs>Npivert) // Pion production
+              w *= fFSIRW_pionProdFSI;
 
             else if (Npifs<Npivert) // Pion absorption
-	      w *= fFSIRW_pionAbsFSI;
+              w *= fFSIRW_pionAbsFSI;
 
-	    else // Inelastic
-	      w *= fFSIRW_inelasticFSI;
-
-	  }
+            else // Inelastic
+              w *= fFSIRW_inelasticFSI;
+          }
       }
-    
+    // Store the weight specifically from FSI fate modifications for later use. 
+    evt->FsiFateWeight = w;
     return w;
 }
 
@@ -759,21 +760,21 @@ bool FSIRW_Calc::IsNoFSI(std::vector<int> PDGvert, std::vector<TLorentzVector> p
       int l = 0;
       for (l = 0; l<nvertp; l++)
         {
-	  if (PDGvert[k] == PDGfs[l] && visited[l] == false)
+    if (PDGvert[k] == PDGfs[l] && visited[l] == false)
             {
-	      TLorentzVector diff = pvert[k] - pfs[l];
-	      double dist = diff.Vect().Mag();
+        TLorentzVector diff = pvert[k] - pfs[l];
+        double dist = diff.Vect().Mag();
                 
-	      if (dist < eps * pvert[k].Vect().Mag())
+        if (dist < eps * pvert[k].Vect().Mag())
                 {
-		  visited[l] = true;
-		  break;
+      visited[l] = true;
+      break;
                 }
             }
         }
         
       if (l == nvertp)
-	return false;
+  return false;
     }
   return true;
     
@@ -794,7 +795,7 @@ bool FSIRW_Calc::SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> 
   for (int i = 0; i<nvertp; i++)
     {
       if (PDGvert_sorted[i] != PDGfs_sorted[i])
-	return false;
+  return false;
     }
   return true;
 }
@@ -806,7 +807,7 @@ int FSIRW_Calc::GetNpi(std::vector<int> PDG)
   for (int i = 0; i<PDG.size(); i++)
     {
       if (abs(PDG[i]) == 211 || abs(PDG[i]) == 111)
-	Npi++;
+  Npi++;
     }
   return Npi;
 }

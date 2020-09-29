@@ -94,6 +94,11 @@ class BaseFitEvt {
 
   double CustomWeightArray[6]; ///< For custom tuning using arrays, e.g. NOvA MINERvA WS
 
+  // Special weights stored to know the impact of particular classes of dials 
+  // N.B.: these weights are also included in RWWeight, but just factored our here
+  double FsiFateWeight;
+  double SfShellWeight;
+
   // Spline Info Coefficients and Readers
   float* fSplineCoeff; ///< ND Array of Spline Coefficients
   SplineReader* fSplineRead; ///< Spline Interpretter

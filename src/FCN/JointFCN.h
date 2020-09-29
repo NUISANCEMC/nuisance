@@ -96,6 +96,9 @@ public:
   //! Call reconfigure on only signal events (defaults to all events if CurIter=0)
   void ReconfigureSignal();
 
+  //! Optional function to find how much certain dials have alterted event total normalisations
+  void FindRelevantAvgWeights();
+
   //! Gets likelihood for all samples in FCN (assuming uncorrelated)
   double GetLikelihood();
 
@@ -170,6 +173,13 @@ private:
   std::vector< std::vector<double> > fIterationValues;
   int fSampleN;
   std::string fIterationTreeName;
+
+  // Variables to keep track of the impact of the FSI-fate and SF-shell weights
+  int fInputsN;
+  bool fTrackAvgWeights;
+  double fNormAltRegPen;
+  double* fFsiFateDialAvg;
+  double* fSfShellDialAvg;
 
 
 

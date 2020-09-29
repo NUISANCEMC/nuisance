@@ -23,8 +23,24 @@ JointFCN::JointFCN(TFile *outfile) {
   fDialVals = NULL;
   fNDials = 0;
 
+  fTrackAvgWeights = FitPar::Config().GetParB("ApplyFsiSfNormPen"); 
+  fNormAltRegPen = FitPar::Config().GetParD("FsiSfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
+
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
+
+  if(fTrackAvgWeights){
+    // Make sure we have a list of inputs
+    if (fInputList.empty()) {
+      fInputList = GetInputList();
+      fSubSampleList = GetSubSampleList();
+    }
+    fInputsN = fInputList.size();
+
+    fFsiFateDialAvg = new double[fInputsN];
+    fSfShellDialAvg = new double[fInputsN];
+  }
+
 }
 
 //***************************************************
@@ -46,8 +62,27 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile *outfile) {
   fDialVals = NULL;
   fNDials = 0;
 
+  //fTrackAvgWeights = true; // TODO: make this a parameter
+  //fNormAltRegPen = 25.0; // 25.0 gives a 1 sigma penalty for a 20% norm shift
+
+  fTrackAvgWeights = FitPar::Config().GetParB("ApplyFsiSfNormPen"); 
+  fNormAltRegPen = FitPar::Config().GetParD("FsiSfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
+
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
+
+  if(fTrackAvgWeights){
+    // Make sure we have a list of inputs
+    if (fInputList.empty()) {
+      fInputList = GetInputList();
+      fSubSampleList = GetSubSampleList();
+    }
+    fInputsN = fInputList.size();
+
+    fFsiFateDialAvg = new double[fInputsN];
+    fSfShellDialAvg = new double[fInputsN];
+  }
+
 }
 
 //***************************************************
@@ -73,6 +108,10 @@ JointFCN::~JointFCN() {
     delete fDialVals;
   if (fSampleLikes)
     delete fSampleLikes;
+  if (fFsiFateDialAvg)
+    delete fFsiFateDialAvg;
+  if (fSfShellDialAvg)
+    delete fSfShellDialAvg;
 };
 
 //***************************************************
@@ -333,6 +372,24 @@ double JointFCN::GetLikelihood() {
     count++;
   }
 
+  // Add additional likelihood terms
+
+  // Reg-like term to penalise norm alterations from dials that should not be 
+  // causing them. The strength of this term (fNormAltRegPen) is set by the user. 
+  // Loop over inputs:
+
+  if(fTrackAvgWeights){
+    for(int i=0; i<fInputsN; i++){
+      like+= fNormAltRegPen * (fFsiFateDialAvg[i]-1)*(fFsiFateDialAvg[i]-1);
+      like+= fNormAltRegPen * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1);
+      std::cout << "Applying reg-like penalty for FSI and SF weights: " << std::endl;
+      std::cout << "Reg strength is: " << fNormAltRegPen << std::endl;
+      std::cout << "Current likelihood is: " << like << std::endl;
+      std::cout << "FSI contribution is: " << fNormAltRegPen * (fFsiFateDialAvg[i]-1)*(fFsiFateDialAvg[i]-1) << std::endl;
+      std::cout << "SF contribution is: " << fNormAltRegPen * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1) << std::endl;
+    }
+  }
+
   // Set Data Variable
   fLikelihood = like;
   if (fIterationTree) {
@@ -391,6 +448,11 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   NUIS_LOG(REC, "Starting Reconfigure iter. " << this->fCurIter);
   // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled <<
   // std::endl;
+
+  // If we want to apply a penalty on the norm alteration of certain dials 
+  // we need to see the imapact of those dials. This is done here. 
+  if(fTrackAvgWeights) FindRelevantAvgWeights();
+
   // Event Manager Reconf
   if (fUsingEventManager) {
     if (!fullconfig && fMCFilled)
@@ -435,6 +497,75 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 void JointFCN::ReconfigureSignal() {
   //***************************************************
   ReconfigureSamples(false);
+}
+
+//***************************************************
+void JointFCN::FindRelevantAvgWeights() {
+  //***************************************************
+
+  // Make sure we have a list of inputs
+  //if (fInputList.empty()) {
+  //  fInputList = GetInputList();
+  //  fSubSampleList = GetSubSampleList();
+  //}
+  //fInputsN = fInputList.size();
+
+  //if (fFsiFateDialAvg) delete fFsiFateDialAvg;
+  //if (fSfShellDialAvg) delete fSfShellDialAvg;
+
+  //fFsiFateDialAvg = new double[fInputsN];
+  //fSfShellDialAvg = new double[fInputsN];
+
+  // If all inputs are splines make sure the readers are told
+  // they need to be reconfigured.
+  std::vector<InputHandlerBase *>::iterator inp_iter = fInputList.begin();
+  int inputcount = 0;
+  inp_iter = fInputList.begin();
+
+  double sumInputWeights;
+  double sumFsiFateWeights;
+  double sumSFShellWeights;
+
+  // Loop over each input in manager
+  for (; inp_iter != fInputList.end(); inp_iter++) {
+    InputHandlerBase *curinput = (*inp_iter);
+
+    // Get event information
+    FitEvent *curevent = curinput->FirstNuisanceEvent();
+    curinput->CreateCache();
+
+    // Reset for each sample
+    sumInputWeights = 0;
+    sumFsiFateWeights = 0;
+    sumSFShellWeights = 0;
+
+    // Start event loop iterating until we get a NULL pointer.
+    while (curevent) {
+      // Get Event Weight
+      // The reweighting weight
+      curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
+      // The Custom weight and reweight
+      curevent->Weight =
+          curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+
+      // Fill the weight trackers
+      sumInputWeights   += curevent->InputWeight;
+      sumFsiFateWeights += curevent->FsiFateWeight * curevent->InputWeight;
+      sumSFShellWeights += curevent->SfShellWeight * curevent->InputWeight;
+
+      // Iterate to the next event.
+      curevent = curinput->NextNuisanceEvent();
+    }
+
+    std::cout << "fFsiFateDialAvg is: " << sumFsiFateWeights/sumInputWeights << std::endl;
+    std::cout << "fSfShellDialAvg is: " << sumSFShellWeights/sumInputWeights << std::endl;
+
+    fFsiFateDialAvg[inputcount] = sumFsiFateWeights/sumInputWeights;
+    fSfShellDialAvg[inputcount] = sumSFShellWeights/sumInputWeights;
+
+    // Keep track of what input we are on.
+    inputcount++;
+  }
 }
 
 //***************************************************
@@ -553,12 +684,16 @@ void JointFCN::ReconfigureUsingManager() {
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
-      // Get Event Weight
-      // The reweighting weight
-      curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-      // The Custom weight and reweight
-      curevent->Weight =
-          curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+      // If we're keeping track of the average weights for a penalty term, 
+      // than we already determined all of these so no need to do it here.
+      if(!fTrackAvgWeights){
+        // Get Event Weight
+        // The reweighting weight
+        curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
+        // The Custom weight and reweight
+        curevent->Weight =
+            curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+      }
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
@@ -823,10 +958,14 @@ void JointFCN::ReconfigureFastUsingManager() {
           curevent->fSplineCoeff = &fSignalEventSplines[splinecount][0];
         }
 
-        curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
-        curevent->Weight =
-            curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
-        rwweight = curevent->Weight;
+        // If we're keeping track of the average weights for a penalty term, 
+        // than we already determined all of these so no need to do it here.
+        if(!fTrackAvgWeights){
+          curevent->RWWeight = FitBase::GetRW()->CalcWeight(curevent);
+          curevent->Weight =
+              curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
+          rwweight = curevent->Weight;
+        }
 
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {

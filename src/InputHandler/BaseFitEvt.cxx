@@ -34,6 +34,8 @@ BaseFitEvt::BaseFitEvt() {
   for (int i = 0; i < 6; ++i) {
     CustomWeightArray[i] = 1.0;
   }
+  FsiFateWeight = 1.0;
+  SfShellWeight = 1.0;
 
   fSplineCoeff = NULL;
   fSplineRead = NULL;
