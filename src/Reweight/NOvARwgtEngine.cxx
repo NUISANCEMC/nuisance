@@ -289,14 +289,15 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
     }
 
     double wght = fKnobTunes[k_it]->EventSystKnobWeight(
-        fKnobs[k_it]->Name(), fKnobValues[k_it], rcd, {}, false);
+        fKnobs[k_it]->Name(), fKnobValues[k_it], rcd, {},
+        fTuneInUse[fKnobTuneidx[k_it]] && fTuneValues[fKnobTuneidx[k_it]]);
 
-    // have to divide out the CV weight for this, ugly hack because the last
-    // parameter doesn't do what I want
-    if (fTuneInUse[fKnobTuneidx[k_it]] && fTuneValues[fKnobTuneidx[k_it]]) {
-      wght /= fKnobTunes[k_it]->EventSystKnobWeight(fKnobs[k_it]->Name(), 0,
-                                                    rcd, {}, false);
-    }
+    // // have to divide out the CV weight for this, ugly hack because the last
+    // // parameter doesn't do what I want
+    // if (fTuneInUse[fKnobTuneidx[k_it]] && fTuneValues[fKnobTuneidx[k_it]]) {
+    //   wght /= fKnobTunes[k_it]->EventSystKnobWeight(fKnobs[k_it]->Name(), 0,
+    //                                                 rcd, {}, false);
+    // }
 
     rw_weight *= wght;
   }
