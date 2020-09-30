@@ -138,6 +138,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fEventType = kNEUT;
   fNeutVect = NULL;
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
+  #ifdef ROOT6
+  fNEUTTree->SetAutoDelete(true);
+  #endif
   fNEUTTree->GetEntry(0);
 
   // Create Fit Event
