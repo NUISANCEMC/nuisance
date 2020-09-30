@@ -54,7 +54,6 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
 
   FinaliseSampleSettings();
 
-  std::cout << fName << std::endl;
   //Set useCC0pi0p, useCC0pi1p, and useCC0piNp
   if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np"){
     useCC0pi0p = true;
@@ -72,7 +71,6 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
     useCC0pi1p = true;
   }
 
-std::cout << "hi" << std::endl;
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
@@ -188,7 +186,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsA
 }
 
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
-std::cout << "Calling SetHistograms" << std::endl;
+
   // Read in 1D Data Histograms
   fInputFile = new TFile(
       (FitPar::GetDataBase() + "/T2K/CC0pi/STV/multidif_results.root")
@@ -210,11 +208,13 @@ std::cout << "Calling SetHistograms" << std::endl;
   if (useCC0pi0p) n_binskeep += 60;
   if (useCC0pi1p) n_binskeep += 32;
   if (useCC0piNp) n_binskeep += 1;
+  std::cout << n_binskeep << std::endl;
   fDataHist = new TH1D("DataHist", tempDataHist->GetTitle(),n_binskeep,0,n_binskeep);
   fFullCovar = new TMatrixDSym(n_binskeep);
 
   int i_binskeep = 1;
   for (int i_allbins=1; i_allbins<tempDataHist->GetNbinsX()+1; i_allbins++){
+    std::cout << i_binskeep << std::endl;
     if ((i_allbins >=1 && i_allbins <=60) && !useCC0pi0p) continue;
     if ((i_allbins >= 61 && i_allbins <=92) && !useCC0pi1p) continue;
     if ((i_allbins == 93) && !useCC0piNp) continue;
@@ -241,7 +241,7 @@ std::cout << "Calling SetHistograms" << std::endl;
   TH1D *linearResult = new TH1D(*fDataHist);
   linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
   SetAutoProcessTH1(linearResult, kCMD_Write);
-
+std::cout << "hi" << std::endl;
 
   // Fine histograms - don't implement for now (this is copied from T2K_CC0pi1p_XSec_3DPcoscos_nu)
   // fMCHist_Fine2D = new TH2D("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
