@@ -16,19 +16,19 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef T2K_CC0PIWITHPROTONS_2018_MULTIDIF_0P_1P_NP_H_SEEN
-#define T2K_CC0PIWITHPROTONS_2018_MULTIDIF_0P_1P_NP_H_SEEN
+#ifndef T2K_CC0PIWITHPROTONS_XSEC_2018_MULTIDIF_0P_1P_NP_H_SEEN
+#define T2K_CC0PIWITHPROTONS_XSEC_2018_MULTIDIF_0P_1P_NP_H_SEEN
 
 #include "Measurement1D.h"
 
-class T2K_CC0piWithProtons_2018_multidif_0p_1p_Np : public Measurement1D {
+class T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np : public Measurement1D {
 public:
 
   /// Basic Constructor.
-  T2K_CC0piWithProtons_2018_multidif_0p_1p_Np(nuiskey samplekey);
+  T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~T2K_CC0piWithProtons_2018_multidif_0p_1p_Np() {};
+  ~T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np() {};
 
   /// Numu CC0PI Signal Definition
   ///

@@ -1361,8 +1361,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddat_nu")) {
     return (new T2K_CC0pinp_STV_XSec_1Ddat_nu(samplekey));
 
-  } else if (!name.compare("T2K_CC0piWithProtons_2018_multidif_0p_1p_Np") || !name.compare("T2K_CC0piWithProtons_2018_multidif_0p_1p") || !name.compare("T2K_CC0piWithProtons_2018_multidif_0p") || !name.compare("T2K_CC0piWithProtons_2018_multidif_1p")) {
-    return (new T2K_CC0T2K_CC0piWithProtons_2018_multidif_0p_1p_Np(samplekey));
+  } else if (!name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_1p")) {
+    return (new T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np(samplekey));
 
   } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfp_nu")) {
     return (new T2K_CC0pinp_ifk_XSec_3Dinfp_nu(samplekey));

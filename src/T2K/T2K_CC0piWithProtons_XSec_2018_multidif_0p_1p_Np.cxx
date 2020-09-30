@@ -19,15 +19,15 @@
 
 #include "T2K_SignalDef.h"
 
-#include "T2K_CC0piWithProtons_2018_multidif_0p_1p_Np.h"
+#include "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np.h"
 
 //********************************************************************
-T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::
-    T2K_CC0piWithProtons_2018_multidif_0p_1p_Np(nuiskey samplekey) {
+T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
+    T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np(nuiskey samplekey) {
   //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "T2K_CC0piWithProtons_2018_multidif_0p_1p_Np sample. \n"
+  std::string descrip = "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np sample. \n"
                         "Target: CH \n"
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n"
                         "Signal: CC0piNp (N>=0) with p_p>500MeV \n"
@@ -55,19 +55,19 @@ T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::
   FinaliseSampleSettings();
 
   //TODO: set useCC0pi0p, useCC0pi1p, and useCC0piNp *before this point*
-  if (fName == "T2K_CC0piWithProtons_2018_multidif_0p_1p_Np"){
+  if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np"){
     useCC0pi0p = true;
     useCC0pi1p = true;
     useCC0piNp = true;
   }
-  else if (fName == "T2K_CC0piWithProtons_2018_multidif_0p_1p"){
+  else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p"){
     useCC0pi0p = true;
     useCC0pi1p = true;
   }
-  else if (fName == "T2K_CC0piWithProtons_2018_multidif_0p"){
+  else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p"){
     useCC0pi0p = true;
   }
-  else if (fName == "T2K_CC0piWithProtons_2018_multidif_1p"){
+  else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_1p"){
     useCC0pi1p = true;
   }
 
@@ -86,7 +86,7 @@ T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::
   FinaliseMeasurement();
 };
 
-bool T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::isSignal(FitEvent *event) {
+bool T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::isSignal(FitEvent *event) {
   // If looking at all subsamples, only requirement is that this is a CC0pi event
   if (useCC0pi0p && useCC0pi1p && useCC0piNp)
     return SignalDef::isCC0pi(event, 14, EnuMin, EnuMax);
@@ -103,7 +103,7 @@ bool T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::isSignal(FitEvent *event) {
   return false;
 };
 
-void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillEventVariables(
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillEventVariables(
     FitEvent *event) {
 
   if (event->NumFSParticle(13) == 0)
@@ -150,7 +150,7 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillEventVariables(
   return;
 };
 
-void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillHistograms() {
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 
   Measurement1D::FillHistograms();
   if (Signal) {
@@ -168,7 +168,7 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillHistograms() {
 // Don't implement this for now - copied from T2K_CC0pi1p_XSec_3DPcoscos_nu
 // // Modification is needed after the full reconfigure to move bins around
 // // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
-// void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::ConvertEventRates() {
+// void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates() {
 //
 //   for (int i = 0; i < 4; i++) {
 //     fMCHist_Slices[i]->GetSumw2();
@@ -198,7 +198,7 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillHistograms() {
 //   return;
 // }
 
-void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
   // If sliceno is valid (not negative), fill the relevant slice
@@ -218,7 +218,7 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveT
   }
 }
 
-void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::SetHistograms() {
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
 
   // Read in 1D Data Histograms
   fInputFile = new TFile(
@@ -270,13 +270,13 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::SetHistograms() {
 
   // Make 1D MC histogram
   TH1D *linearResult = new TH1D(*fDataHist);
-  linearResult->SetName("T2K_CC0piWithProtons_2018_multidif_0p_1p_Np_data");
+  linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
   SetAutoProcessTH1(linearResult, kCMD_Write);
 
 
   // Fine histograms - don't implement for now (this is copied from T2K_CC0pi1p_XSec_3DPcoscos_nu)
-  // fMCHist_Fine2D = new TH2D("T2K_CC0piWithProtons_2018_multidif_0p_1p_Np_Fine2D",
-  //                           "T2K_CC0piWithProtons_2018_multidif_0p_1p_Np_Fine2D",
+  // fMCHist_Fine2D = new TH2D("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
+  //                           "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
   //                           400, 0.0, 30.0, 100, -1.0, 1.0);
   // SetAutoProcessTH1(fMCHist_Fine2D);
 
@@ -369,7 +369,7 @@ void T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::SetHistograms() {
 
 // Yay hardcoding
 // Taken from multidif_binMap.txt in data release
-int T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP) {
+int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP) {
 
   int binnumber = -999;
 
@@ -554,7 +554,7 @@ int T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAboveThres
 
 // Yay hardcoding again!
 // Taken from multidif_binMap.txt in data release
-int T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nProtonsAboveThresh, double CosThetaMu) {
+int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nProtonsAboveThresh, double CosThetaMu) {
 
   int slicenumber = -999;
 
@@ -608,7 +608,7 @@ int T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nProtons
 
 // Hardcoding one more time
 // Taken from multidif_binMap.txt in data release
-int T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nProtonsAboveThresh, double CosThetaMu, double CosThetaP) {
+int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nProtonsAboveThresh, double CosThetaMu, double CosThetaP) {
 
   int slicenumber = -999;
 
