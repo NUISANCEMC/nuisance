@@ -900,6 +900,7 @@ void Measurement1D::FillHistograms() {
     fMCStat->Fill(fXVar, 1.0);
 
     if (fMCHist_Modes)
+      std::cout << "Mode in Measurement1D: " << Mode << std::endl;
       fMCHist_Modes->Fill(Mode, fXVar, Weight);
   }
 
