@@ -37,10 +37,8 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("P_{p} (GeV)");
-  fSettings.SetYTitle("cos#theta_{p}");
-  fSettings.SetZTitle("cos#theta_{#mu}");
-  // fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetXTitle("Bin number");
+  // fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
@@ -147,6 +145,9 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillEventVariables(
   fCosThetaMu = CosThetaMu;
   fNp = nProtonsAboveThresh;
 
+  // Also set mode so the mode histogram works
+  Mode = event->Mode;
+
   return;
 };
 
@@ -168,6 +169,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
+    std::cout << "nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << "< CosThetaMuSliceNo = " << CosThetaMuSliceNo << std::endl;
   // If sliceno is valid (not negative), fill the relevant slice
   if (CosThetaMuSliceNo < 0) return;
   // CC0pi0p slices: fill with pmu
@@ -227,7 +229,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
       if ((j_allbins >= 61 && j_allbins <=92) && !useCC0pi1p) continue;
       if ((j_allbins == 93) && !useCC0piNp) continue;
 
-      std::cout << i_allbins << ", " << j_allbins << " -- " << i_binskeep-1 << ", " << j_binskeep-1 << " -- " << tempcov->GetBinContent(i_allbins, j_allbins) << std::endl;
+      // std::cout << i_allbins << ", " << j_allbins << " -- " << i_binskeep-1 << ", " << j_binskeep-1 << " -- " << tempcov->GetBinContent(i_allbins, j_allbins) << std::endl;
 
       (*fFullCovar)(i_binskeep-1,j_binskeep-1) = tempcov->GetBinContent(i_allbins, j_allbins);
       j_binskeep++;
