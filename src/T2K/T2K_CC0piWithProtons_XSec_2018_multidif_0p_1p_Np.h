@@ -59,7 +59,7 @@ public:
   double numu_energy;
   int particle_pdg;
   int fAnalysis;
-  double fPP, fCosThetaP, fCosThetaMu;
+  double fPP, fCosThetaP, fPMu, fCosThetaMu, fNp;
 
   bool fIsSystCov, fIsStatCov, fIsNormCov;
 
