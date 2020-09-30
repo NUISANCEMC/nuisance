@@ -241,7 +241,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   if (useCC0pi0p) n_binskeep += 60;
   if (useCC0pi1p) n_binskeep += 32;
   if (useCC0piNp) n_binskeep += 1;
-  fDataHist = new TH1D("DataHist", tempDataHist->GetTitle().c_str(),n_binskeep,0,n_binskeep);
+  fDataHist = new TH1D("DataHist", tempDataHist->GetTitle(),n_binskeep,0,n_binskeep);
   fFullCovar = new TMatrixDSym(n_binskeep);
 
   int i_binskeep = 1;
