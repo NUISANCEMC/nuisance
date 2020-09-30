@@ -70,8 +70,8 @@ public:
   TH1D *fDataHist_CC0pi0pCosTheta;
   TH1D *fMCHist_CC0pi1pCosTheta;
   TH1D *fDataHist_CC0pi1pCosTheta;
-  std::vector<TH1D> fMCHist_Slices;
-  std::vector<TH1D> fDataHist_Slices;
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
 
   void FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w);
   int Get1DBin(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP);
