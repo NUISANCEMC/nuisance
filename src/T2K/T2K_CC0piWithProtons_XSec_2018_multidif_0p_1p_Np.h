@@ -66,10 +66,10 @@ public:
   TFile* fInputFile;
   TH2D* fMCHist_Fine2D;
 
-  TH1D fMCHist_CC0pi0pCosTheta;
-  TH1D fDataHist_CC0pi0pCosTheta;
-  TH1D fMCHist_CC0pi1pCosTheta;
-  TH1D fDataHist_CC0pi1pCosTheta;
+  TH1D *fMCHist_CC0pi0pCosTheta;
+  TH1D *fDataHist_CC0pi0pCosTheta;
+  TH1D *fMCHist_CC0pi1pCosTheta;
+  TH1D *fDataHist_CC0pi1pCosTheta;
   std::vector<TH1D> fMCHist_Slices;
   std::vector<TH1D> fDataHist_Slices;
 
