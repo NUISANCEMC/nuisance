@@ -1,5 +1,7 @@
 #include "T2KWeightEngine.h"
+#ifdef __T2KREW_ENABLED__
 #include "T2KNeutUtils.h"
+#endif
 
 T2KWeightEngine::T2KWeightEngine(std::string name) {
 #ifdef __T2KREW_ENABLED__
