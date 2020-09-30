@@ -54,6 +54,7 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
 
   FinaliseSampleSettings();
 
+  std::cout << fName << std::endl;
   //Set useCC0pi0p, useCC0pi1p, and useCC0piNp
   if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np"){
     useCC0pi0p = true;
@@ -71,6 +72,7 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
     useCC0pi1p = true;
   }
 
+std::cout << "hi" << std::endl;
 
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
@@ -186,7 +188,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsA
 }
 
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
-
+std::cout << "Calling SetHistograms" << std::endl;
   // Read in 1D Data Histograms
   fInputFile = new TFile(
       (FitPar::GetDataBase() + "/T2K/CC0pi/STV/multidif_results.root")

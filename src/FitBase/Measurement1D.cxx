@@ -163,8 +163,6 @@ void Measurement1D::FinaliseSampleSettings() {
 
   EnuMin = GeneralUtils::StrToDbl(fSettings.GetS("enu_min"));
   EnuMax = GeneralUtils::StrToDbl(fSettings.GetS("enu_max"));
-
-  NUIS_LOG(SAM, "Finished finalising Sample Settings: " << fName);
 }
 
 //********************************************************************
