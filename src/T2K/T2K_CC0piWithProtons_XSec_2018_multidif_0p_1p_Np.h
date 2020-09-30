@@ -45,9 +45,6 @@ public:
   // Fill Histograms
   void FillHistograms();
 
-  /// Have to do a weird event scaling for analysis 1
-  void ConvertEventRates();
-
  private:
 
   bool useCC0pi0p = false;

@@ -165,39 +165,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
   }
 }
 
-// Don't implement this for now - copied from T2K_CC0pi1p_XSec_3DPcoscos_nu
-// // Modification is needed after the full reconfigure to move bins around
-// // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
-// void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates() {
-//
-//   for (int i = 0; i < 4; i++) {
-//     fMCHist_Slices[i]->GetSumw2();
-//   }
-//
-//   // Do standard conversion.
-//   Measurement1D::ConvertEventRates();
-//
-//   // First scale MC slices also by their width in Y and Z
-//   // MCHist_Slices[0]->Scale(1.0 / 1.00);
-//   // MCHist_Slices[1]->Scale(1.0 / 0.60);
-//   // MCHist_Slices[2]->Scale(1.0 / 0.10);
-//   // MCHist_Slices[3]->Scale(1.0 / 0.10);
-//
-//   // Now Convert into 1D list
-//   fMCHist->Reset();
-//   int bincount = 0;
-//   for (int i = 0; i < 4; i++) {
-//     for (int j = 0; j < fDataHist_Slices[i]->GetNumberOfBins(); j++) {
-//       fMCHist->SetBinContent(bincount + 1,
-//                              fMCHist_Slices[i]->GetBinContent(j + 1));
-//       // fMCHist->SetBinError(bincount+1, fMCHist_Slices[i]->GetBinError(j+1));
-//       bincount++;
-//     }
-//   }
-//
-//   return;
-// }
-
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
