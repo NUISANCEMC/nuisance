@@ -208,13 +208,12 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   if (useCC0pi0p) n_binskeep += 60;
   if (useCC0pi1p) n_binskeep += 32;
   if (useCC0piNp) n_binskeep += 1;
-  std::cout << n_binskeep << std::endl;
+
   fDataHist = new TH1D("DataHist", tempDataHist->GetTitle(),n_binskeep,0,n_binskeep);
   fFullCovar = new TMatrixDSym(n_binskeep);
 
   int i_binskeep = 1;
   for (int i_allbins=1; i_allbins<tempDataHist->GetNbinsX()+1; i_allbins++){
-    std::cout << i_binskeep << std::endl;
     if ((i_allbins >=1 && i_allbins <=60) && !useCC0pi0p) continue;
     if ((i_allbins >= 61 && i_allbins <=92) && !useCC0pi1p) continue;
     if ((i_allbins == 93) && !useCC0piNp) continue;
@@ -241,7 +240,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   TH1D *linearResult = new TH1D(*fDataHist);
   linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
   SetAutoProcessTH1(linearResult, kCMD_Write);
-std::cout << "hi" << std::endl;
+
 
   // Fine histograms - don't implement for now (this is copied from T2K_CC0pi1p_XSec_3DPcoscos_nu)
   // fMCHist_Fine2D = new TH2D("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
@@ -297,7 +296,7 @@ std::cout << "hi" << std::endl;
       fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_2018_CC0pi0p_MC_Slice%i", i)));
     } // end loop over i
   }
-
+std::cout << "hi" << std::endl;
 
   // CC0pi1p slices
   if (useCC0pi1p){
@@ -325,6 +324,7 @@ std::cout << "hi" << std::endl;
     fDataHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_3_PCthSlice_0"));
     fMCHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_3_PCthSlice_0"));
   }
+std::cout << "hi" << std::endl;
 
 
   // Set all slice histograms to auto-process and reset MC histograms
@@ -333,6 +333,7 @@ std::cout << "hi" << std::endl;
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i], kCMD_Reset);
   }
+std::cout << "hi" << std::endl;
   return;
 };
 
