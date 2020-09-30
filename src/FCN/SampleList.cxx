@@ -263,7 +263,7 @@
 #include "T2K_nueCCinc_XSec_joint.h"
 
 // T2K STV CC0pi 2018
-#include "T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h"
+#include "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddat_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
@@ -288,6 +288,8 @@
 #include "T2K_CC1pip_H2O_XSec_1Dcospi_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
+
+// add header here
 
 #endif
 
@@ -1272,14 +1274,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint")) {
     return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint(samplekey));
-    
+
   } else if (!name.compare("T2K_NuMu_CC0pi_CH_XSec_2DPcos") ||
              !name.compare("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos")) {
     return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(samplekey));
 
   } else if (!name.compare("T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint")) {
     return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(samplekey));
-    
+
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_FHC") ||
              !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||
              !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
@@ -1289,7 +1291,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 	     !name.compare("T2K_nueCCinc_XSec_1Dthe_RHC") ||
 	     !name.compare("T2K_nuebarCCinc_XSec_1Dthe_RHC")) {
     return (new T2K_nueCCinc_XSec_1Dthe(samplekey));
-    
+
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_joint")) {
     return (new T2K_nueCCinc_XSec_1Dpe_joint(samplekey));
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dthe_joint")) {
@@ -1359,8 +1361,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddat_nu")) {
     return (new T2K_CC0pinp_STV_XSec_1Ddat_nu(samplekey));
 
-  } else if (!name.compare("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform")) {
-    return (new T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform(samplekey));
+  } else if (!name.compare("T2K_CC0piWithProtons_2018_multidif_0p_1p_Np") || !name.compare("T2K_CC0piWithProtons_2018_multidif_0p_1p") || !name.compare("T2K_CC0piWithProtons_2018_multidif_0p") || !name.compare("T2K_CC0piWithProtons_2018_multidif_1p")) {
+    return (new T2K_CC0T2K_CC0piWithProtons_2018_multidif_0p_1p_Np(samplekey));
 
   } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfp_nu")) {
     return (new T2K_CC0pinp_ifk_XSec_3Dinfp_nu(samplekey));

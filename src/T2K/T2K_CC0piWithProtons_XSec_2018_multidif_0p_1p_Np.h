@@ -16,24 +16,23 @@
 *    You should have received a copy of the GNU General Public License
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
-#ifndef T2K_CC0PI1P_3DPCOSCOS_NU_NONUNIFORM_H_SEEN
-#define T2K_CC0PI1P_3DPCOSCOS_NU_NONUNIFORM_H_SEEN
+#ifndef T2K_CC0PIWITHPROTONS_2018_MULTIDIF_0P_1P_NP_H_SEEN
+#define T2K_CC0PIWITHPROTONS_2018_MULTIDIF_0P_1P_NP_H_SEEN
 
 #include "Measurement1D.h"
-#include "TH2Poly.h"
 
-class T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform : public Measurement1D {
+class T2K_CC0piWithProtons_2018_multidif_0p_1p_Np : public Measurement1D {
 public:
 
   /// Basic Constructor.
-  T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform(nuiskey samplekey);
+  T2K_CC0piWithProtons_2018_multidif_0p_1p_Np(nuiskey samplekey);
 
   /// Virtual Destructor
-  ~T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform() {};
+  ~T2K_CC0piWithProtons_2018_multidif_0p_1p_Np() {};
 
   /// Numu CC0PI Signal Definition
   ///
-  /// /item 
+  /// /item
   bool isSignal(FitEvent *nvect);
 
   /// Read histograms in a special way because format is different.
@@ -51,26 +50,34 @@ public:
 
  private:
 
+  bool useCC0pi0p = false;
+  bool useCC0pi1p = false;
+  bool useCC0piNp = false;
+
   bool only_allowed_particles;
   bool numu_event;
   double numu_energy;
   int particle_pdg;
-  double pmu, CosThetaMu;
   int fAnalysis;
+  double fPP, fCosThetaP, fCosThetaMu;
 
   bool fIsSystCov, fIsStatCov, fIsNormCov;
-
-  std::vector<TH2Poly*> fDataPoly;
-  std::vector<TH2Poly*> fMCPoly;
 
   TFile* fInputFile;
   TH2D* fMCHist_Fine2D;
 
-  std::vector<TH2Poly*> fMCHist_Slices;
-  std::vector<TH2Poly*> fDataHist_Slices;
+  TH1D fMCHist_CC0pi0pCosTheta;
+  TH1D fDataHist_CC0pi0pCosTheta;
+  TH1D fMCHist_CC0pi1pCosTheta;
+  TH1D fDataHist_CC0pi1pCosTheta;
+  std::vector<TH1D> fMCHist_Slices;
+  std::vector<TH1D> fDataHist_Slices;
 
-  void FillMCSlice(double x, double y, double z, double w);
-  
+  void FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w);
+  int Get1DBin(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP);
+  int GetCosThetaMuSlice(int nProtonsAboveThresh, double CosThetaMu);
+  int GetCC0pi1p2DSlice(int nProtonsAboveThresh, double CosThetaMu, double CosThetaP);
+
 };
-  
+
 #endif

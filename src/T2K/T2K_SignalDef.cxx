@@ -164,31 +164,8 @@ bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax) {
   return true;
 }
 
-// CC0pi antinu in the P0D https://arxiv.org/abs/1908.10249
-bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax) {
-
-  // Require a anumu CC0pi event
-  if (!isCC0pi(event, -14, EnuMin, EnuMax))
-    return false;
-
-  TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
-  TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
-  double Pmu = pmu.Vect().Mag();
-  double CosThetaMu = cos(pnu.Vect().Angle(pmu.Vect()));
-  // Muon phase space
-  if (Pmu < 400 || Pmu > 3410) return false;
-  if (Pmu < 530 && Pmu>=400 && CosThetaMu<0.84) return false;
-  if (Pmu < 670 && Pmu>=530 && CosThetaMu<0.85) return false;
-  if (Pmu < 800 && Pmu>=670 && CosThetaMu<0.88) return false;
-  if (Pmu < 1000 &&Pmu>=800 && CosThetaMu<0.9) return false;
-  if (Pmu < 1380 && Pmu>=1000 && CosThetaMu<0.91) return false;
-  if (Pmu < 2010 && Pmu>=1380 && CosThetaMu<0.92) return false;
-  if (Pmu < 3410 && Pmu>=2010 && CosThetaMu<0.95) return false;
-
-  return true;
-}
-
 bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
+  // In this case, we specifically mean N>2, as defined in the T2K CC0pi 2018 paper
 
   // Require a numu CC0pi event
   if (!isCC0pi(event, 14, EnuMin, EnuMax))
@@ -214,7 +191,7 @@ bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax) {
     if (protons[i]->p() > 500)
       nProtonsAboveThresh++;
   }
-  if (nProtonsAboveThresh < 2)
+  if (nProtonsAboveThresh <= 1)
     return false;
 
   return true;
@@ -226,18 +203,44 @@ bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax) {
   if (!isCC0pi(event, 14, EnuMin, EnuMax))
     return false;
 
-  // Require at least one FS proton
+  // Return true if no FS proton
   if (event->NumFSParticle(2212) == 0)
-    return false;
+    return true;
 
+  // Otherwise, check momentum of highest-momentum proton, and require it is below threshold
   TLorentzVector pnu = event->GetHMISParticle(14)->fP;
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
   TLorentzVector pp = event->GetHMFSParticle(2212)->fP;
 
   // Proton phase space
-  if (pp.Vect().Mag() > 500) {
-    return false;
+  if (pp.Vect().Mag() < 500) {
+    return true;
   }
+
+  // If there are FS protons and the highest-momentum one is above threshold, return false
+  return false;
+}
+
+// CC0pi antinu in the P0D https://arxiv.org/abs/1908.10249
+bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax) {
+
+  // Require a anumu CC0pi event
+  if (!isCC0pi(event, -14, EnuMin, EnuMax))
+    return false;
+
+  TLorentzVector pnu = event->GetHMISParticle(-14)->fP;
+  TLorentzVector pmu = event->GetHMFSParticle(-13)->fP;
+  double Pmu = pmu.Vect().Mag();
+  double CosThetaMu = cos(pnu.Vect().Angle(pmu.Vect()));
+  // Muon phase space
+  if (Pmu < 400 || Pmu > 3410) return false;
+  if (Pmu < 530 && Pmu>=400 && CosThetaMu<0.84) return false;
+  if (Pmu < 670 && Pmu>=530 && CosThetaMu<0.85) return false;
+  if (Pmu < 800 && Pmu>=670 && CosThetaMu<0.88) return false;
+  if (Pmu < 1000 &&Pmu>=800 && CosThetaMu<0.9) return false;
+  if (Pmu < 1380 && Pmu>=1000 && CosThetaMu<0.91) return false;
+  if (Pmu < 2010 && Pmu>=1380 && CosThetaMu<0.92) return false;
+  if (Pmu < 3410 && Pmu>=2010 && CosThetaMu<0.95) return false;
 
   return true;
 }
