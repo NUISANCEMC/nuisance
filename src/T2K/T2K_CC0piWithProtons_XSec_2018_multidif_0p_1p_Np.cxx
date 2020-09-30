@@ -54,7 +54,7 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
 
   FinaliseSampleSettings();
 
-  //TODO: set useCC0pi0p, useCC0pi1p, and useCC0piNp *before this point*
+  //Set useCC0pi0p, useCC0pi1p, and useCC0piNp
   if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np"){
     useCC0pi0p = true;
     useCC0pi1p = true;
