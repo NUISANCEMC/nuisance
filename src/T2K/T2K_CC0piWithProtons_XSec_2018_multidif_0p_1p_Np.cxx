@@ -318,14 +318,14 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   // CC0pi0p slices
   if (useCC0pi0p){
     fDataHist_CC0pi0pCosTheta = (TH1D*)fInputFile->Get("NoProtonsAbove500MeV/ResultInMuonCosTheta")->Clone();
-    fMCHist_CC0pi0pCosTheta = fDataHist_CC0pi0pCosTheta->Clone("T2K_2018_CC0pi0p_ResultInMuonCosTheta");
+    fMCHist_CC0pi0pCosTheta = (TH1D*)fDataHist_CC0pi0pCosTheta->Clone("T2K_2018_CC0pi0p_ResultInMuonCosTheta");
     fMCHist_CC0pi0pCosTheta->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi0pCosTheta, kCMD_Write);
     SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Reset);
 
     for (int i=0; i<=9; i++){
       fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_2018_CC0pi0p_Data_Slice%i", i)));
-      fMCHist_Slices.push_back((TH1D*)fDataHist_Slices[i]->Clone(Form("T2K_2018_CC0pi0p_MC_Slice%i", i)));
+      fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_2018_CC0pi0p_MC_Slice%i", i)));
     } // end loop over i
   }
 
@@ -333,14 +333,14 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   // CC0pi1p slices
   if (useCC0pi1p){
     fDataHist_CC0pi1pCosTheta = (TH1D*)fInputFile->Get("OneProtonAbove500MeV/ResultInMuonCosTheta")->Clone();
-    fMCHist_CC0pi1pCosTheta = fDataHist_CC0pi1pCosTheta->Clone("T2K_2018_CC0pi1p_ResultInMuonCosTheta");
+    fMCHist_CC0pi1pCosTheta = (TH1D*)fDataHist_CC0pi1pCosTheta->Clone("T2K_2018_CC0pi1p_ResultInMuonCosTheta");
     fMCHist_CC0pi1pCosTheta->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi1pCosTheta, kCMD_Write);
     SetAutoProcessTH1(fMCHist_CC0pi1pCosTheta, kCMD_Reset);
 
     for (int i=0; i<=3; i++){
       fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone(Form("T2K_2018_CC0pi1p_Data_MuonCosTh1DSlice%i", i)));
-      fMCHist_Slices.push_back((TH1D*)fDataHist_Slices[i]->Clone(Form("T2K_2018_CC0pi1p_MC_MuonCosTh1DSlice%i", i)));
+      fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone(Form("T2K_2018_CC0pi1p_MC_MuonCosTh1DSlice%i", i)));
     }
     // Add in the muon costh-p costh slices (which aren't as nicely numbered)
     //         -> TH1D MuCThSlice_1_PCthSlice_0
@@ -359,8 +359,8 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
 
 
   // Set all slice histograms to auto-process and reset MC histograms
-  for (int i=0; i<fDataHist_Slices.size(); i++){
-    fMCHist_Slices[i]->ClearBinContents();
+  for (size_t i=0; i<fDataHist_Slices.size(); i++){
+    fMCHist_Slices[i]->Reset();
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i], kCMD_Reset);
   }
@@ -518,7 +518,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
          else if (pp > 0.9 && pp <= 1.1){binnumber = 90;}
          else if (pp > 1.1 && pp <= 30){binnumber = 91;}
        } // end if (CosThetaP > 0.3 && CosThetaP <= 0.8)
-      else if (CosThetaP > 0.8 && CosThetaP <= 1){binnumber = 92; break}
+      else if (CosThetaP > 0.8 && CosThetaP <= 1){binnumber = 92;}
     } // end if (CosThetaMu > 0.8 && CosThetaMu <= 1)
   } // end if (nProtonsAboveThresh == 1)
   else if (nProtonsAboveThresh > 1 && useCC0piNp){
@@ -545,7 +545,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
     binnumber =- 92;
   }
   // If CC0pi0p and CC0piNp samples are wanted, need to subtract off CC0pi1p bins from CC0piNp bin number
-  if (useCC0piNp && useCC0pi0p && !useCC0pi1p && binnumber = 93){
+  if (useCC0piNp && useCC0pi0p && !useCC0pi1p && binnumber == 93){
     binnumber = 61;
   }
 
@@ -594,7 +594,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nPr
   // slicenumber may be -999 if nProtonsAboveThresh > 1
   // otherwise, something has gone wrong
   if (slicenumber == -999 && nProtonsAboveThresh <= 1){
-    std::cout << "ERROR did not find correct 1D CosThetaMu slice for an event with nProtonsAboveThresh = " << nProtonsAboveThresh << ", pmu = " << pmu << ", CosThetaMu = " << CosThetaMu << std::endl;
+    std::cout << "ERROR did not find correct 1D CosThetaMu slice for an event with nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << std::endl;
     return -999;
   }
 
