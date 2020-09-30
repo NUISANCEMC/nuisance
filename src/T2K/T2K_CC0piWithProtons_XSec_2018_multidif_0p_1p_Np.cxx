@@ -230,6 +230,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
       std::cout << i_allbins << ", " << j_allbins << " -- " << i_binskeep-1 << ", " << j_binskeep-1 << " -- " << tempcov->GetBinContent(i_allbins, j_allbins) << std::endl;
 
       (*fFullCovar)(i_binskeep-1,j_binskeep-1) = tempcov->GetBinContent(i_allbins, j_allbins);
+      j_binskeep++;
     } // end loop over j_allbins
 
     i_binskeep++;
