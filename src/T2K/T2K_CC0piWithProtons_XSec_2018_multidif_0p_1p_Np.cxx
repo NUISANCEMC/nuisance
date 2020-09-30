@@ -49,7 +49,7 @@ T2K_CC0piWithProtons_2018_multidif_0p_1p_Np::
   fAnalysis = 1;
 
   // CCQELike plot information
-  fSettings.SetTitle("T2K_CC0piWithProtons_2018_multidif_0p_1p_Np");
+  fSettings.SetTitle(fName);
   fSettings.DefineAllowedSpecies("numu");
 
   FinaliseSampleSettings();
