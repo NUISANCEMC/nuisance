@@ -148,6 +148,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillEventVariables(
 
   // Also set mode so the mode histogram works
   Mode = event->Mode;
+  std::cout << "Mode = " << Mode << std::endl;
 
   return;
 };
@@ -232,7 +233,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
 
       // std::cout << i_allbins << ", " << j_allbins << " -- " << i_binskeep-1 << ", " << j_binskeep-1 << " -- " << tempcov->GetBinContent(i_allbins, j_allbins) << std::endl;
 
-      (*fFullCovar)(i_binskeep-1,j_binskeep-1) = tempcov->GetBinContent(i_allbins, j_allbins);
+      (*fFullCovar)(i_binskeep-1,j_binskeep-1) = tempcov->GetBinContent(i_allbins, j_allbins)*1e38;
       j_binskeep++;
     } // end loop over j_allbins
 
