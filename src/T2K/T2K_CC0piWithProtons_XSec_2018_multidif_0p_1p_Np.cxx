@@ -637,5 +637,5 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
     slicenumber =- 10;
   }
 
-  return binnumber;
+  return slicenumber;
 };
