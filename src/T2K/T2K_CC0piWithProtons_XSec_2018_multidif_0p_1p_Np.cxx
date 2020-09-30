@@ -296,7 +296,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
       fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_2018_CC0pi0p_MC_Slice%i", i)));
     } // end loop over i
   }
-std::cout << "hi" << std::endl;
 
   // CC0pi1p slices
   if (useCC0pi1p){
@@ -312,19 +311,18 @@ std::cout << "hi" << std::endl;
     }
     // Add in the muon costh-p costh slices (which aren't as nicely numbered)
     //         -> TH1D MuCThSlice_1_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_1_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_1_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_1_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_1_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_1_PCthSlice_0"));
+    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_1_PCthSlice_0"));
     //         -> TH1D MuCThSlice_2_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_2_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_2_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_2_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_2_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_2_PCthSlice_0"));
+    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_2_PCthSlice_0"));
     //         -> TH1D MuCThSlice_2_PCthSlice_1
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_2_PCthSlice_1")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_2_PCthSlice_1"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_2_PCthSlice_1")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_2_PCthSlice_1"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_2_PCthSlice_1"));
+    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_2_PCthSlice_1"));
     //         -> TH1D MuCThSlice_3_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_3_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_3_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_Data_MuCThSlice_3_PCthSlice_0"));
+    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone("T2K_2018_CC0pi1p_MC_MuCThSlice_3_PCthSlice_0"));
   }
-std::cout << "hi" << std::endl;
 
 
   // Set all slice histograms to auto-process and reset MC histograms
@@ -333,7 +331,7 @@ std::cout << "hi" << std::endl;
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i], kCMD_Reset);
   }
-std::cout << "hi" << std::endl;
+
   return;
 };
 
