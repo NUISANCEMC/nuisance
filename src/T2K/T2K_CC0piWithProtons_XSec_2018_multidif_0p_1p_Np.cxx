@@ -375,148 +375,148 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
 
   // Calculate bin number (check that we want to use this sample before looking for the correct bin to save computation)
   if (nProtonsAboveThresh == 0 && useCC0pi0p){ //CC0pi0p: 2D binning in CosThetaMu--pmu
-    if (CosThetaMu >= -1 && CosThetaMu <= -0.3) {binnumber = 1; break;}
+    if (CosThetaMu >= -1 && CosThetaMu <= -0.3) {binnumber = 1;}
     else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.3) {binnumber = 2; break;}
-      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 3; break;}
-      else if (pmu > 0.4 && pmu <= 30){binnumber = 4; break;}
+      if (pmu >= 0 && pmu <= 0.3) {binnumber = 2;}
+      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 3;}
+      else if (pmu > 0.4 && pmu <= 30){binnumber = 4;}
     } // end if (CosThetaMu > -0.3 && CosThetaMu <= 0.3)
     else if (CosThetaMu > 0.3 && CosThetaMu <= 0.6){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.3){binnumber = 5; break;}
-      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 6; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 7; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 8; break;}
-      else if (pmu > 0.6 && pmu <= 30){binnumber = 9; break;}
+      if (pmu >= 0 && pmu <= 0.3){binnumber = 5;}
+      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 6;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 7;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 8;}
+      else if (pmu > 0.6 && pmu <= 30){binnumber = 9;}
     } // end if (CosThetaMu > 0.3 && CosThetaMu <= 0.6)
     else if (CosThetaMu > 0.6 && CosThetaMu <= 0.7){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.3){binnumber = 10; break;}
-      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 11; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 12; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 13; break;}
-      else if (pmu > 0.6 && pmu <= 30){binnumber = 14; break;}
+      if (pmu >= 0 && pmu <= 0.3){binnumber = 10;}
+      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 11;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 12;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 13;}
+      else if (pmu > 0.6 && pmu <= 30){binnumber = 14;}
     } // end if (CosThetaMu > 0.6 && CosThetaMu <= 0.7)
     else if (CosThetaMu > 0.7 && CosThetaMu <= 0.8){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.3){binnumber = 15; break;}
-      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 16; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 17; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 18; break;}
-      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 19; break;}
-      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 20; break;}
-      else if (pmu > 0.8 && pmu <= 30){binnumber = 21; break;}
+      if (pmu >= 0 && pmu <= 0.3){binnumber = 15;}
+      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 16;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 17;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 18;}
+      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 19;}
+      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 20;}
+      else if (pmu > 0.8 && pmu <= 30){binnumber = 21;}
     } // end if (CosThetaMu > 0.7 && CosThetaMu <= 0.8)
     else if (CosThetaMu > 0.8 && CosThetaMu <= 0.85){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.4){binnumber = 22; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 23; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 24; break;}
-      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 25; break;}
-      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 26; break;}
-      else if (pmu > 0.8 && pmu <= 30){binnumber = 27; break;}
+      if (pmu >= 0 && pmu <= 0.4){binnumber = 22;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 23;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 24;}
+      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 25;}
+      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 26;}
+      else if (pmu > 0.8 && pmu <= 30){binnumber = 27;}
     } // end if (CosThetaMu > 0.8 && CosThetaMu <= 0.85)
     else if (CosThetaMu > 0.85 && CosThetaMu <= 0.9){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.3){binnumber = 28; break;}
-      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 29; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 30; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 31; break;}
-      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 32; break;}
-      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 33; break;}
-      else if (pmu > 0.8 && pmu <= 1){binnumber = 34; break;}
-      else if (pmu > 1 && pmu <= 30){binnumber = 35; break;}
+      if (pmu >= 0 && pmu <= 0.3){binnumber = 28;}
+      else if (pmu > 0.3 && pmu <= 0.4){binnumber = 29;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 30;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 31;}
+      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 32;}
+      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 33;}
+      else if (pmu > 0.8 && pmu <= 1){binnumber = 34;}
+      else if (pmu > 1 && pmu <= 30){binnumber = 35;}
     } // end if (CosThetaMu > 0.85 && CosThetaMu <= 0.9)
     else if (CosThetaMu > 0.9 && CosThetaMu <= 0.94){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.4){binnumber = 36; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 37; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 38; break;}
-      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 39; break;}
-      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 40; break;}
-      else if (pmu > 0.8 && pmu <= 1.25){binnumber = 41; break;}
-      else if (pmu > 1.25 && pmu <= 30){binnumber = 42; break;}
+      if (pmu >= 0 && pmu <= 0.4){binnumber = 36;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 37;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 38;}
+      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 39;}
+      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 40;}
+      else if (pmu > 0.8 && pmu <= 1.25){binnumber = 41;}
+      else if (pmu > 1.25 && pmu <= 30){binnumber = 42;}
     } // end if (CosThetaMu > 0.9 && CosThetaMu <= 0.94)
     else if (CosThetaMu > 0.94 && CosThetaMu <= 0.98){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.4){binnumber = 43; break;}
-      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 44; break;}
-      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 45; break;}
-      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 46; break;}
-      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 47; break;}
-      else if (pmu > 0.8 && pmu <= 1){binnumber = 48; break;}
-      else if (pmu > 1 && pmu <= 1.25){binnumber = 49; break;}
-      else if (pmu > 1.25 && pmu <= 1.5){binnumber = 50; break;}
-      else if (pmu > 1.5 && pmu <= 2){binnumber = 51; break;}
-      else if (pmu > 2 && pmu <= 30){binnumber = 52; break;}
+      if (pmu >= 0 && pmu <= 0.4){binnumber = 43;}
+      else if (pmu > 0.4 && pmu <= 0.5){binnumber = 44;}
+      else if (pmu > 0.5 && pmu <= 0.6){binnumber = 45;}
+      else if (pmu > 0.6 && pmu <= 0.7){binnumber = 46;}
+      else if (pmu > 0.7 && pmu <= 0.8){binnumber = 47;}
+      else if (pmu > 0.8 && pmu <= 1){binnumber = 48;}
+      else if (pmu > 1 && pmu <= 1.25){binnumber = 49;}
+      else if (pmu > 1.25 && pmu <= 1.5){binnumber = 50;}
+      else if (pmu > 1.5 && pmu <= 2){binnumber = 51;}
+      else if (pmu > 2 && pmu <= 30){binnumber = 52;}
     } // end if (CosThetaMu > 0.94 && CosThetaMu <= 0.98)
     else if (CosThetaMu > 0.98 && CosThetaMu <= 1){
       // Now find bin in pmu
-      if (pmu >= 0 && pmu <= 0.5){binnumber = 53; break;}
-      else if (pmu > 0.5 && pmu <= 0.65){binnumber = 54; break;}
-      else if (pmu > 0.65 && pmu <= 0.8){binnumber = 55; break;}
-      else if (pmu > 0.8 && pmu <= 1.25){binnumber = 56; break;}
-      else if (pmu > 1.25 && pmu <= 2){binnumber = 57; break;}
-      else if (pmu > 2 && pmu <= 3){binnumber = 58; break;}
-      else if (pmu > 3 && pmu <= 5){binnumber = 59; break;}
-      else if (pmu > 5 && pmu <= 30){binnumber = 60; break;}
+      if (pmu >= 0 && pmu <= 0.5){binnumber = 53;}
+      else if (pmu > 0.5 && pmu <= 0.65){binnumber = 54;}
+      else if (pmu > 0.65 && pmu <= 0.8){binnumber = 55;}
+      else if (pmu > 0.8 && pmu <= 1.25){binnumber = 56;}
+      else if (pmu > 1.25 && pmu <= 2){binnumber = 57;}
+      else if (pmu > 2 && pmu <= 3){binnumber = 58;}
+      else if (pmu > 3 && pmu <= 5){binnumber = 59;}
+      else if (pmu > 5 && pmu <= 30){binnumber = 60;}
     } // end if (CosThetaMu > 0.98 && CosThetaMu <= 1)
   } // end (nProtonsAboveThresh == 0)
   else if (nProtonsAboveThresh == 1 && useCC0pi1p){
     if (CosThetaMu >= -1 && CosThetaMu <= -0.3){
       // Find bin in CosThetaP
-      if (CosThetaP >= -1 && CosThetaP <= 0.87){binnumber = 61; break;}
-      else if (CosThetaP > 0.87 && CosThetaP <= 0.94){binnumber = 62; break;}
-      else if (CosThetaP > 0.94 && CosThetaP <= 0.97){binnumber = 63; break;}
-      else if (CosThetaP > 0.97 && CosThetaP <= 1){binnumber = 64; break;}
+      if (CosThetaP >= -1 && CosThetaP <= 0.87){binnumber = 61;}
+      else if (CosThetaP > 0.87 && CosThetaP <= 0.94){binnumber = 62;}
+      else if (CosThetaP > 0.94 && CosThetaP <= 0.97){binnumber = 63;}
+      else if (CosThetaP > 0.97 && CosThetaP <= 1){binnumber = 64;}
     } // end (CosThetaMu >= -1 && CosThetaMu <= -0.3)
     else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){
       // Find bin in CosThetaP
-      if (CosThetaP >= -1 && CosThetaP <= 0.75){binnumber = 65; break;}
-      else if (CosThetaP > 0.75 && CosThetaP <= 0.85){binnumber = 66; break;}
+      if (CosThetaP >= -1 && CosThetaP <= 0.75){binnumber = 65;}
+      else if (CosThetaP > 0.75 && CosThetaP <= 0.85){binnumber = 66;}
       else if (CosThetaP > 0.85 && CosThetaP <= 0.94){
          // Find bin in pp
-         if (pp >= 0.5 && pp <= 0.68){binnumber = 67; break;}
-         else if (pp > 0.68 && pp <= 0.78){binnumber = 68; break;}
-         else if (pp > 0.78 && pp <= 0.9){binnumber = 69; break;}
-         else if (pp > 0.9 && pp <= 30){binnumber = 70; break;}
+         if (pp >= 0.5 && pp <= 0.68){binnumber = 67;}
+         else if (pp > 0.68 && pp <= 0.78){binnumber = 68;}
+         else if (pp > 0.78 && pp <= 0.9){binnumber = 69;}
+         else if (pp > 0.9 && pp <= 30){binnumber = 70;}
       }  // end if (CosThetaP > 0.85 && CosThetaP <= 0.94)
-      else if (CosThetaP > 0.94 && CosThetaP <= 1){binnumber = 71; break;}
+      else if (CosThetaP > 0.94 && CosThetaP <= 1){binnumber = 71;}
     } // end if (CosThetaMu > -0.3 && CosThetaMu <= 0.3)
     else if (CosThetaMu > 0.3 && CosThetaMu <= 0.8){
       // Find bin in CosThetaP
-      if (CosThetaP >= -1 && CosThetaP <= 0.3){binnumber = 72; break;}
-      else if (CosThetaP > 0.3 && CosThetaP <= 0.5){binnumber = 73; break;}
+      if (CosThetaP >= -1 && CosThetaP <= 0.3){binnumber = 72;}
+      else if (CosThetaP > 0.3 && CosThetaP <= 0.5){binnumber = 73;}
       else if (CosThetaP > 0.5 && CosThetaP <= 0.8){
         // find bin in pp
-         if (pp >= 0.5 && pp <= 0.6){binnumber = 74; break;}
-         else if (pp > 0.6 && pp <= 0.7){binnumber = 75; break;}
-         else if (pp > 0.7 && pp <= 0.8){binnumber = 76; break;}
-         else if (pp > 0.8 && pp <= 0.9){binnumber = 77; break;}
-         else if (pp > 0.9 && pp <= 30){binnumber = 78; break;}
+         if (pp >= 0.5 && pp <= 0.6){binnumber = 74;}
+         else if (pp > 0.6 && pp <= 0.7){binnumber = 75;}
+         else if (pp > 0.7 && pp <= 0.8){binnumber = 76;}
+         else if (pp > 0.8 && pp <= 0.9){binnumber = 77;}
+         else if (pp > 0.9 && pp <= 30){binnumber = 78;}
       } // end if (CosThetaP > 0.5 && CosThetaP <= 0.8)
       else if (CosThetaP > 0.8 && CosThetaP <= 1){
         // find bin in pp
          if (pp >= 0.5 && pp <= 0.6){return 79;}
-         else if (pp > 0.6 && pp <= 0.7){binnumber = 80; break;}
-         else if (pp > 0.7 && pp <= 0.8){binnumber = 81; break;}
-         else if (pp > 0.8 && pp <= 1){binnumber = 82; break;}
-         else if (pp > 1 && pp <= 30){binnumber = 83; break;}
+         else if (pp > 0.6 && pp <= 0.7){binnumber = 80;}
+         else if (pp > 0.7 && pp <= 0.8){binnumber = 81;}
+         else if (pp > 0.8 && pp <= 1){binnumber = 82;}
+         else if (pp > 1 && pp <= 30){binnumber = 83;}
       } // end if (CosThetaP > 0.8 && CosThetaP <= 1)
     } // end if (CosThetaMu > 0.3 && CosThetaMu <= 0.8)
     else if (CosThetaMu > 0.8 && CosThetaMu <= 1){
       // Find bin in CosThetaP
-      if (CosThetaP >= -1 && CosThetaP <= 0){binnumber = 84; break;}
-      else if (CosThetaP > 0 && CosThetaP <= 0.3){binnumber = 85; break;}
+      if (CosThetaP >= -1 && CosThetaP <= 0){binnumber = 84;}
+      else if (CosThetaP > 0 && CosThetaP <= 0.3){binnumber = 85;}
       else if (CosThetaP > 0.3 && CosThetaP <= 0.8){
          // find bin in pp
-         if (pp >= 0.5 && pp <= 0.6){binnumber = 86; break;}
-         else if (pp > 0.6 && pp <= 0.7){binnumber = 87; break;}
-         else if (pp > 0.7 && pp <= 0.8){binnumber = 88; break;}
-         else if (pp > 0.8 && pp <= 0.9){binnumber = 89; break;}
-         else if (pp > 0.9 && pp <= 1.1){binnumber = 90; break;}
-         else if (pp > 1.1 && pp <= 30){binnumber = 91; break;}
+         if (pp >= 0.5 && pp <= 0.6){binnumber = 86;}
+         else if (pp > 0.6 && pp <= 0.7){binnumber = 87;}
+         else if (pp > 0.7 && pp <= 0.8){binnumber = 88;}
+         else if (pp > 0.8 && pp <= 0.9){binnumber = 89;}
+         else if (pp > 0.9 && pp <= 1.1){binnumber = 90;}
+         else if (pp > 1.1 && pp <= 30){binnumber = 91;}
        } // end if (CosThetaP > 0.3 && CosThetaP <= 0.8)
       else if (CosThetaP > 0.8 && CosThetaP <= 1){binnumber = 92; break}
     } // end if (CosThetaMu > 0.8 && CosThetaMu <= 1)
@@ -573,22 +573,22 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nPr
 
   // Calculate bin number (check that we want to use this sample before looking for the correct bin to save computation)
   if (nProtonsAboveThresh == 0 && useCC0pi0p){ //CC0pi0p: 10 slices in CosThetaMu
-    if (CosThetaMu >= -1 && CosThetaMu <= -0.3) {slicenumber = 0; break;}
-    else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){slicenumber = 1; break;}
-    else if (CosThetaMu > 0.3 && CosThetaMu <= 0.6){slicenumber = 2; break;}
-    else if (CosThetaMu > 0.6 && CosThetaMu <= 0.7){slicenumber = 3; break;}
-    else if (CosThetaMu > 0.7 && CosThetaMu <= 0.8){slicenumber = 4; break;}
-    else if (CosThetaMu > 0.8 && CosThetaMu <= 0.85){slicenumber = 5; break;}
-    else if (CosThetaMu > 0.85 && CosThetaMu <= 0.9){slicenumber = 6; break;}
-    else if (CosThetaMu > 0.9 && CosThetaMu <= 0.94){slicenumber = 7; break;}
-    else if (CosThetaMu > 0.94 && CosThetaMu <= 0.98){slicenumber = 8; break;}
-    else if (CosThetaMu > 0.98 && CosThetaMu <= 1){slicenumber = 9; break;}
+    if (CosThetaMu >= -1 && CosThetaMu <= -0.3) {slicenumber = 0;}
+    else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){slicenumber = 1;}
+    else if (CosThetaMu > 0.3 && CosThetaMu <= 0.6){slicenumber = 2;}
+    else if (CosThetaMu > 0.6 && CosThetaMu <= 0.7){slicenumber = 3;}
+    else if (CosThetaMu > 0.7 && CosThetaMu <= 0.8){slicenumber = 4;}
+    else if (CosThetaMu > 0.8 && CosThetaMu <= 0.85){slicenumber = 5;}
+    else if (CosThetaMu > 0.85 && CosThetaMu <= 0.9){slicenumber = 6;}
+    else if (CosThetaMu > 0.9 && CosThetaMu <= 0.94){slicenumber = 7;}
+    else if (CosThetaMu > 0.94 && CosThetaMu <= 0.98){slicenumber = 8;}
+    else if (CosThetaMu > 0.98 && CosThetaMu <= 1){slicenumber = 9;}
   } // end (nProtonsAboveThresh == 0)
   else if (nProtonsAboveThresh == 1 && useCC0pi1p){ // CC0pi1p: 8 slices, either in CosThetaMu or CosThetaMu-CosThetaP, depending on the slice
-    if (CosThetaMu >= -1 && CosThetaMu <= -0.3){slicenumber = 10; break;}
-    else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){slicenumber = 11; break;}
-    else if (CosThetaMu > 0.3 && CosThetaMu <= 0.8){slicenumber = 12; break;}
-    else if (CosThetaMu > 0.8 && CosThetaMu <= 1){slicenumber = 13; break;}
+    if (CosThetaMu >= -1 && CosThetaMu <= -0.3){slicenumber = 10;}
+    else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){slicenumber = 11;}
+    else if (CosThetaMu > 0.3 && CosThetaMu <= 0.8){slicenumber = 12;}
+    else if (CosThetaMu > 0.8 && CosThetaMu <= 1){slicenumber = 13;}
   } // end if (nProtonsAboveThresh == 1)
 
   // slicenumber may be -999 if nProtonsAboveThresh > 1
@@ -621,13 +621,13 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
   // If useCC0pi0p is true, these will be slices 14-17
   // If useCC0pi0p is false, these will be slices 4-7
   if (nProtonsAboveThresh == 1 && useCC0pi1p){
-    if (CosThetaMu > -0.3 && CosThetaMu <= 0.3 && CosThetaP > 0.85 && CosThetaP <= 0.94){slicenumber = 14; break;}
+    if (CosThetaMu > -0.3 && CosThetaMu <= 0.3 && CosThetaP > 0.85 && CosThetaP <= 0.94){slicenumber = 14;}
     else if (CosThetaMu > 0.3 && CosThetaMu <= 0.8){
       // Find bin in CosThetaP
-      if (CosThetaP > 0.5 && CosThetaP <= 0.8){slicenumber = 15; break;}
-      else if (CosThetaP > 0.8 && CosThetaP <= 1){slicenumber = 16; break;}
+      if (CosThetaP > 0.5 && CosThetaP <= 0.8){slicenumber = 15;}
+      else if (CosThetaP > 0.8 && CosThetaP <= 1){slicenumber = 16;}
     } // end if (CosThetaMu > 0.3 && CosThetaMu <= 0.8)
-    else if (CosThetaMu > 0.8 && CosThetaMu <= 1 && CosThetaP > 0.3 && CosThetaP <= 0.8){slicenumber = 17; break;}
+    else if (CosThetaMu > 0.8 && CosThetaMu <= 1 && CosThetaP > 0.3 && CosThetaP <= 0.8){slicenumber = 17;}
   } // end if (nProtonsAboveThresh == 1)
 
   // No check on binnumber = -999 here, because many events won't fall into one of these slices
