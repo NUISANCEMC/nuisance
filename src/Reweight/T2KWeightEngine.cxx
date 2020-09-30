@@ -1,7 +1,16 @@
 #include "T2KWeightEngine.h"
+#include "T2KNeutUtils.h"
 
 T2KWeightEngine::T2KWeightEngine(std::string name) {
 #ifdef __T2KREW_ENABLED__
+
+  std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+  if (!neut_card.size()) {
+    NUIS_ABORT(
+        "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
+  }
+
+  t2krew::T2KNeutUtils::SetCardFile(neut_card);
 
   // Setup the NEUT Reweight engien
   fCalcName = name;

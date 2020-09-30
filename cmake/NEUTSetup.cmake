@@ -72,12 +72,16 @@ if(HAVENEUTCONFIG)
 
   LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
 
+  LIST(APPEND EXTRA_EXE_FLAGS
+    -fno-pie -fno-PIE -no-pie)
+
   cmessage(STATUS "NEUT")
   cmessage(STATUS "     Version   : ${NEUT_VER}")
   cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
   cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
   cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
   cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
+  cmessage(STATUS "     Exe Flags : -fno-pie -fno-PIE -no-pie")
 
 
 else() # Everything better be set up already
@@ -107,6 +111,7 @@ else() # Everything better be set up already
   LIST(APPEND EXTRA_CXX_FLAGS
     -I${NEUT_ROOT}/include
     -I${NEUT_ROOT}/src/neutclass)
+
   LIST(APPEND EXTRA_LINK_DIRS
     ${NEUT_LIB_DIR}
     ${CERN}/${CERN_LEVEL}/lib)
