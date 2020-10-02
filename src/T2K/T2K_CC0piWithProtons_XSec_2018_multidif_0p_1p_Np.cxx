@@ -346,7 +346,12 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
 
   int binnumber = -999;
 
-  // Calculate bin number (check that we want to use this sample before looking for the correct bin to save computation)
+  // If you're looking at a sample you don't want to look at, return -999
+  if (nProtonsAboveThresh == 0 && !useCC0pi0p){return binnumber;}
+  if (nProtonsAboveThresh == 1 && !useCC0pi1p){return binnumber;}
+  if (nProtonsAboveThresh >= 2 && !useCC0piNp){return binnumber;}
+
+  // Calculate bin number (check that we want to use this sample before looking for the correct bin to save computation -- probably redundant because of the checks above but I like to be careful)
   if (nProtonsAboveThresh == 0 && useCC0pi0p){ //CC0pi0p: 2D binning in CosThetaMu--pmu
     if (CosThetaMu >= -1 && CosThetaMu <= -0.3) {binnumber = 1;}
     else if (CosThetaMu > -0.3 && CosThetaMu <= 0.3){
