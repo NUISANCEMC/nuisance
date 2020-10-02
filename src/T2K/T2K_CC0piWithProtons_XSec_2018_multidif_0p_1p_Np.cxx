@@ -178,12 +178,10 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsA
   }
   // CC0pi1p slices: fill with CosThetaP
   if (useCC0pi1p && nProtonsAboveThresh == 1){
-    std::cout << CosThetaMuSliceNo << std::endl;
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(CosThetaP, w);
 
     // If we're looking at CC0pi1p, also fill the CosThetaMu-CosThetaP slices with PP
     int CC0pi1p2DSliceNo = GetCC0pi1p2DSlice(nProtonsAboveThresh, CosThetaMu, CosThetaP);
-    std::cout << CC0pi1p2DSliceNo << std::endl;
     if (CC0pi1p2DSliceNo < 0) return;
     fMCHist_Slices[CC0pi1p2DSliceNo]->Fill(pp, w);
   }
@@ -626,6 +624,11 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
   } // end if (nProtonsAboveThresh == 1)
 
   // No check on binnumber = -999 here, because many events won't fall into one of these slices
+
+  // If useCC0pi0p is false, adjust slice numbers for CC0pi1p
+  if (useCC0pi1p && !useCC0pi0p){
+    slicenumber -= 10;
+  }
 
   return slicenumber;
 };
