@@ -241,9 +241,24 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
-  // Make 1D MC histogram
+  // Make 1D data histogram
   TH1D *linearResult = new TH1D(*fDataHist);
-  linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
+  // Set name based on what subsamples we are looking at
+  if (useCC0pi0p && useCC0pi1p && useCC0piNp){
+    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
+  }
+  else if (useCC0pi0p && useCC0pi1p && !useCC0piNp){
+    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_data");
+  }
+  else if (useCC0pi0p && !useCC0pi1p && !useCC0piNp){
+    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_data");
+  }
+  else if (!useCC0pi0p && useCC0pi1p && !useCC0piNp){
+    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_1p_data");
+  }
+  else{
+    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_data");
+  }
   SetAutoProcessTH1(linearResult, kCMD_Write);
 
 
