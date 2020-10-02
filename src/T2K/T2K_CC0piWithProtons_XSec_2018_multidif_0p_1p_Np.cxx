@@ -624,7 +624,15 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
 
   // Now scale slice histograms
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
+      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
       fMCHist_Slices[i]->Scale(1,"width");
+      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
     }
 };
 
