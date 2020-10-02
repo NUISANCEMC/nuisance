@@ -136,8 +136,8 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillEventVariables(
 
   // I'm hacking this to fit in the Measurement1D framework, but it's going to be super ugly - apologies...
   // The 1D histogram handled by NUISANCE is defined in terms of bin number, so that has to be fXVar
-  // Actually needs to be binnumber-1 because it's treating it as a variable
-  fXVar = binnumber-1;
+  // Actually needs to be binnumber-0.5 because it's treating it as a variable
+  fXVar = binnumber-0.5;
 
   // Then fill variables so I can use them to fill the slice histograms in FillHistograms()
   fPP = pp;
