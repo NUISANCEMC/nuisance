@@ -624,11 +624,19 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
 
   // Now scale slice histograms
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
+      std::cout << "Slice " << i << " ";
+      std::cout << "   Data: ";
+      for (size_t j=0; j<fDataHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fDataHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
+      std::cout << "   MC (pre-scale): ";
       for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
         std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
       }
       std::cout << std::endl;
       fMCHist_Slices[i]->Scale(1,"width");
+      std::cout << "   MC (post-scale): ";
       for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
         std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
       }
@@ -643,7 +651,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Write(std::string drawOpt
 
   // Now also set slice histogram titles to be equal to the overall chi2
   std::ostringstream chi2;
-  chi2 << std::setprecision(5) << this->GetLikelihood();
+  chi2 << std::setprecision(5) << fMCHist->GetLikelihood();
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
       fMCHist_Slices[i]->SetTitle(chi2.str().c_str());
     }
