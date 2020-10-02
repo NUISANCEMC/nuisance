@@ -593,7 +593,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nPr
 
   // If useCC0pi0p is false, adjust slice numbers for CC0pi1p
   if (useCC0pi1p && !useCC0pi0p){
-    slicenumber =- 10;
+    slicenumber -= 10;
   }
 
   return slicenumber;
@@ -624,11 +624,6 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
   } // end if (nProtonsAboveThresh == 1)
 
   // No check on binnumber = -999 here, because many events won't fall into one of these slices
-
-  // If useCC0pi0p is false, adjust slice numbers for CC0pi1p
-  if (useCC0pi1p && !useCC0pi0p){
-    slicenumber -= 10;
-  }
 
   return slicenumber;
 };
