@@ -894,7 +894,6 @@ void Measurement1D::FillHistograms() {
   if (Signal) {
 
     NUIS_LOG(DEB, "Fill MCHist: " << fXVar << ", " << Weight);
-    if (fXVar > 16 && fXVar < 20) std::cout << "Fill MCHist: " << fXVar << ", " << Weight << std::endl;
 
     fMCHist->Fill(fXVar, Weight);
     fMCFine->Fill(fXVar, Weight);

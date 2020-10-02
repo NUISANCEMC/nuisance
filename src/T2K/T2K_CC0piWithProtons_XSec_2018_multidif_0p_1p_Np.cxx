@@ -491,7 +491,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
       } // end if (CosThetaP > 0.5 && CosThetaP <= 0.8)
       else if (CosThetaP > 0.8 && CosThetaP <= 1){
         // find bin in pp
-         if (pp >= 0.5 && pp <= 0.6){return 79;}
+         if (pp >= 0.5 && pp <= 0.6){binnumber = 79;}
          else if (pp > 0.6 && pp <= 0.7){binnumber = 80;}
          else if (pp > 0.7 && pp <= 0.8){binnumber = 81;}
          else if (pp > 0.8 && pp <= 1){binnumber = 82;}
