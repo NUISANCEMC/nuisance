@@ -651,7 +651,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Write(std::string drawOpt
 
   // Now also set slice histogram titles to be equal to the overall chi2
   std::ostringstream chi2;
-  chi2 << std::setprecision(5) << fMCHist->GetLikelihood();
+  chi2 << std::setprecision(5) << GetLikelihood();
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
       fMCHist_Slices[i]->SetTitle(chi2.str().c_str());
     }
