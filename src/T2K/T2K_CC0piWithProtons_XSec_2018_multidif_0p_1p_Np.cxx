@@ -637,7 +637,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
         std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
       }
       std::cout << std::endl;
-      fMCHist_Slices[i]->Scale(1,"width");
+      // fMCHist_Slices[i]->Scale(1,"width");
       // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
       //   double oldbinc = fMCHist_Slices[i]->GetBinContent(j+1);
       //   double binwidth = fMCHist_Slices[i]->GetBinWidth(j+1);
