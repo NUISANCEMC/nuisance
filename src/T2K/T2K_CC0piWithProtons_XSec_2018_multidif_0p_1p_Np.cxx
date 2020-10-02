@@ -298,7 +298,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
     fMCHist_CC0pi0pCosTheta = (TH1D*)fDataHist_CC0pi0pCosTheta->Clone("T2K_CC0pi0p_XSec_2018_MuonCosTheta_MC");
     fMCHist_CC0pi0pCosTheta->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi0pCosTheta, kCMD_Write);
-    SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Reset, kCMD_Write);
+    SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Write);
 
     for (int i=0; i<=9; i++){
       fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_CC0pi0p_XSec_2018_Data_Slice%i", i)));
