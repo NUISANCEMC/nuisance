@@ -170,6 +170,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
+  std::cout << CosThetaMuSliceNo << std::endl;
   // If sliceno is valid (not negative), fill the relevant slice
   if (CosThetaMuSliceNo < 0) return;
   // CC0pi0p slices: fill with pmu
