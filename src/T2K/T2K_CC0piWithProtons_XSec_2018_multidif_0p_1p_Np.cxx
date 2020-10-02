@@ -148,7 +148,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillEventVariables(
 
   // Also set mode so the mode histogram works
   Mode = event->Mode;
-  std::cout << "Mode = " << Mode << std::endl;
 
   return;
 };
@@ -171,21 +170,24 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
-    std::cout << "nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << "< CosThetaMuSliceNo = " << CosThetaMuSliceNo << std::endl;
+    // std::cout << "nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << "< CosThetaMuSliceNo = " << CosThetaMuSliceNo << std::endl;
   // If sliceno is valid (not negative), fill the relevant slice
   if (CosThetaMuSliceNo < 0) return;
   // CC0pi0p slices: fill with pmu
   if (useCC0pi0p && nProtonsAboveThresh == 0 && CosThetaMuSliceNo < 10){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(pmu, w);
+    // std::cout << " -- filled 0p slice " << CosThetaMuSliceNo << "with pmu = " << pmu << ", weight = " << w << std::endl;
   }
   // CC0pi1p slices: fill with CosThetaP
   if (useCC0pi1p && nProtonsAboveThresh == 1){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(CosThetaP, w);
+    // std::cout << " -- filled 1p slice " << CosThetaMuSliceNo << "with CosThetaP = " << CosThetaP << ", weight = " << w << std::endl;
 
     // If we're looking at CC0pi1p, also fill the CosThetaMu-CosThetaP slices with PP
     int CC0pi1p2DSliceNo = GetCC0pi1p2DSlice(nProtonsAboveThresh, CosThetaMu, CosThetaP);
     if (CC0pi1p2DSliceNo < 0) return;
     fMCHist_Slices[CC0pi1p2DSliceNo]->Fill(pp, w);
+    // std::cout << " -- filled 1p slice " << CC0pi1p2DSliceNo << "with pp = " << pp << ", weight = " << w << std::endl;
   }
 }
 
@@ -613,4 +615,28 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
   }
 
   return slicenumber;
+};
+
+// Reimplementation of MeasurementBase::ConvertEventRates (calling the original) to bin-normalize the slice histograms
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
+  // call MeasurementBase::ConvertEventRates
+  MeasurementBase::ConvertEventRates();
+
+  // Now scale slice histograms
+  for (size_t i=0; i<fDataHist_Slices.size(); i++){
+      fMCHist_Slices[i]->Scale(1,"width");
+    }
+};
+
+// Reimplementation of Measurement1D::Write (calling the original) to also set the slice histograms to have the chi2 of the total 1D histogram -- makes plotting easier
+void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Write(std::string drawOpt){
+  // call Measurement1D::Write
+  Measurement1D::Write(drawOpt);
+
+  // Now also set slice histogram titles to be equal to the overall chi2
+  std::ostringstream chi2;
+  chi2 << std::setprecision(5) << this->GetLikelihood();
+  for (size_t i=0; i<fDataHist_Slices.size(); i++){
+      fMCHist_Slices[i]->SetTitle(chi2.str().c_str());
+    }
 };
