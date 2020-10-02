@@ -298,7 +298,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
     fMCHist_CC0pi0pCosTheta = (TH1D*)fDataHist_CC0pi0pCosTheta->Clone("T2K_CC0pi0p_XSec_2018_MuonCosTheta_MC");
     fMCHist_CC0pi0pCosTheta->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi0pCosTheta, kCMD_Write);
-    SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Write);
+    SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Reset, kCMD_Write);
 
     for (int i=0; i<=9; i++){
       fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_CC0pi0p_XSec_2018_Data_Slice%i", i)));
@@ -625,29 +625,29 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
   // Now scale slice histograms
   // I think we need to multiply the MC bin contents by the bin width, rather than divide it, to make it line up with the data
   // Not sure if that's actually right, but...
-  for (size_t i=0; i<fDataHist_Slices.size(); i++){
-      std::cout << "Slice " << i << " ";
-      std::cout << "   Data: ";
-      for (size_t j=0; j<fDataHist_Slices[i]->GetNbinsX(); j++){
-        std::cout << fDataHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      }
-      std::cout << std::endl;
-      std::cout << "   MC (pre-scale): ";
-      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
-        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      }
-      std::cout << std::endl;
-      //fMCHist_Slices[i]->Scale(1,"width");
-      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
-        double oldbinc = fMCHist_Slices[i]->GetBinContent(j+1);
-        double binwidth = fMCHist_Slices[i]->GetBinWidth(j+1);
-        fMCHist_Slices[i]->SetBinContent(j+1,oldbinc*binwidth);
-      }
-      std::cout << "   MC (post-scale): ";
-      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
-        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      }
-      std::cout << std::endl;
+  for (size_t i=0; i<fMCHist_Slices.size(); i++){
+      // std::cout << "Slice " << i << " ";
+      // std::cout << "   Data: ";
+      // for (size_t j=0; j<fDataHist_Slices[i]->GetNbinsX(); j++){
+      //   std::cout << fDataHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      // }
+      // std::cout << std::endl;
+      // std::cout << "   MC (pre-scale): ";
+      // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+      //   std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      // }
+      // std::cout << std::endl;
+      fMCHist_Slices[i]->Scale(1,"width");
+      // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+      //   double oldbinc = fMCHist_Slices[i]->GetBinContent(j+1);
+      //   double binwidth = fMCHist_Slices[i]->GetBinWidth(j+1);
+      //   fMCHist_Slices[i]->SetBinContent(j+1,oldbinc*binwidth);
+      // }
+      // std::cout << "   MC (post-scale): ";
+      // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+      //   std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      // }
+      // std::cout << std::endl;
     }
 };
 
