@@ -74,8 +74,7 @@ public:
   int Get1DBin(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP);
   int GetCosThetaMuSlice(int nProtonsAboveThresh, double CosThetaMu);
   int GetCC0pi1p2DSlice(int nProtonsAboveThresh, double CosThetaMu, double CosThetaP);
-  void Write(std::string drawOpt);
-  void ConvertEventRates();
+  // void Write(std::string drawOpt);
 
 };
 
