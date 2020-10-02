@@ -623,6 +623,8 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
   MeasurementBase::ConvertEventRates();
 
   // Now scale slice histograms
+  // I think we need to multiply the MC bin contents by the bin width, rather than divide it, to make it line up with the data
+  // Not sure if that's actually right, but...
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
       std::cout << "Slice " << i << " ";
       std::cout << "   Data: ";
@@ -635,7 +637,12 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
         std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
       }
       std::cout << std::endl;
-      fMCHist_Slices[i]->Scale(1,"width");
+      //fMCHist_Slices[i]->Scale(1,"width");
+      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+        double oldbinc = fMCHist_Slices[i]->GetBinContent(j+1);
+        double binwidth = fMCHist_Slices[i]->GetBinWidth(j+1);
+        fMCHist_Slices[i]->SetBinContent(j+1,oldbinc*binwidth);
+      }
       std::cout << "   MC (post-scale): ";
       for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
         std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
