@@ -593,7 +593,9 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCosThetaMuSlice(int nPr
 
   // If useCC0pi0p is false, adjust slice numbers for CC0pi1p
   if (useCC0pi1p && !useCC0pi0p){
+    std::cout << slicenumber << " -> ";
     slicenumber -= 10;
+    std::cout << slicenumber << std::endl;
   }
 
   return slicenumber;
