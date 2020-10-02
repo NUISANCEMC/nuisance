@@ -170,24 +170,24 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsAboveThresh, double pmu, double CosThetaMu, double pp, double CosThetaP, double w) {
 // Get slice number for 1D CosThetaMu slice
   int CosThetaMuSliceNo = GetCosThetaMuSlice(nProtonsAboveThresh, CosThetaMu);
-    // std::cout << "nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << "< CosThetaMuSliceNo = " << CosThetaMuSliceNo << std::endl;
+    std::cout << "nProtonsAboveThresh = " << nProtonsAboveThresh << ", CosThetaMu = " << CosThetaMu << "< CosThetaMuSliceNo = " << CosThetaMuSliceNo << std::endl;
   // If sliceno is valid (not negative), fill the relevant slice
   if (CosThetaMuSliceNo < 0) return;
   // CC0pi0p slices: fill with pmu
   if (useCC0pi0p && nProtonsAboveThresh == 0 && CosThetaMuSliceNo < 10){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(pmu, w);
-    // std::cout << " -- filled 0p slice " << CosThetaMuSliceNo << "with pmu = " << pmu << ", weight = " << w << std::endl;
+    std::cout << " -- filled 0p slice " << CosThetaMuSliceNo << "with pmu = " << pmu << ", weight = " << w << std::endl;
   }
   // CC0pi1p slices: fill with CosThetaP
   if (useCC0pi1p && nProtonsAboveThresh == 1){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(CosThetaP, w);
-    // std::cout << " -- filled 1p slice " << CosThetaMuSliceNo << "with CosThetaP = " << CosThetaP << ", weight = " << w << std::endl;
+    std::cout << " -- filled 1p slice " << CosThetaMuSliceNo << "with CosThetaP = " << CosThetaP << ", weight = " << w << std::endl;
 
     // If we're looking at CC0pi1p, also fill the CosThetaMu-CosThetaP slices with PP
     int CC0pi1p2DSliceNo = GetCC0pi1p2DSlice(nProtonsAboveThresh, CosThetaMu, CosThetaP);
     if (CC0pi1p2DSliceNo < 0) return;
     fMCHist_Slices[CC0pi1p2DSliceNo]->Fill(pp, w);
-    // std::cout << " -- filled 1p slice " << CC0pi1p2DSliceNo << "with pp = " << pp << ", weight = " << w << std::endl;
+    std::cout << " -- filled 1p slice " << CC0pi1p2DSliceNo << "with pp = " << pp << ", weight = " << w << std::endl;
   }
 }
 
@@ -626,28 +626,28 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::ConvertEventRates(){
   // I think we need to multiply the MC bin contents by the bin width, rather than divide it, to make it line up with the data
   // Not sure if that's actually right, but...
   for (size_t i=0; i<fMCHist_Slices.size(); i++){
-      // std::cout << "Slice " << i << " ";
-      // std::cout << "   Data: ";
-      // for (size_t j=0; j<fDataHist_Slices[i]->GetNbinsX(); j++){
-      //   std::cout << fDataHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      // }
-      // std::cout << std::endl;
-      // std::cout << "   MC (pre-scale): ";
-      // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
-      //   std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      // }
-      // std::cout << std::endl;
+      std::cout << "Slice " << i << " ";
+      std::cout << "   Data: ";
+      for (size_t j=0; j<fDataHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fDataHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
+      std::cout << "   MC (pre-scale): ";
+      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
       fMCHist_Slices[i]->Scale(1,"width");
       // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
       //   double oldbinc = fMCHist_Slices[i]->GetBinContent(j+1);
       //   double binwidth = fMCHist_Slices[i]->GetBinWidth(j+1);
       //   fMCHist_Slices[i]->SetBinContent(j+1,oldbinc*binwidth);
       // }
-      // std::cout << "   MC (post-scale): ";
-      // for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
-      //   std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
-      // }
-      // std::cout << std::endl;
+      std::cout << "   MC (post-scale): ";
+      for (size_t j=0; j<fMCHist_Slices[i]->GetNbinsX(); j++){
+        std::cout << fMCHist_Slices[i]->GetBinContent(j+1) << " -- ";
+      }
+      std::cout << std::endl;
     }
 };
 
