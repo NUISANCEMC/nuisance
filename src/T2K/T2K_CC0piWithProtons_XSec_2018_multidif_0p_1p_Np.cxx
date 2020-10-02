@@ -176,18 +176,18 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsA
   // CC0pi0p slices: fill with pmu
   if (useCC0pi0p && nProtonsAboveThresh == 0 && CosThetaMuSliceNo < 10){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(pmu, w);
-    std::cout << " -- filled 0p slice " << CosThetaMuSliceNo << "with pmu = " << pmu << ", weight = " << w << std::endl;
+    std::cout << " -- filled 0p slice " << CosThetaMuSliceNo << " with pmu = " << pmu << ", weight = " << w << std::endl;
   }
   // CC0pi1p slices: fill with CosThetaP
   if (useCC0pi1p && nProtonsAboveThresh == 1){
     fMCHist_Slices[CosThetaMuSliceNo]->Fill(CosThetaP, w);
-    std::cout << " -- filled 1p slice " << CosThetaMuSliceNo << "with CosThetaP = " << CosThetaP << ", weight = " << w << std::endl;
+    std::cout << " -- filled 1p slice " << CosThetaMuSliceNo << " with CosThetaP = " << CosThetaP << ", weight = " << w << std::endl;
 
     // If we're looking at CC0pi1p, also fill the CosThetaMu-CosThetaP slices with PP
     int CC0pi1p2DSliceNo = GetCC0pi1p2DSlice(nProtonsAboveThresh, CosThetaMu, CosThetaP);
     if (CC0pi1p2DSliceNo < 0) return;
     fMCHist_Slices[CC0pi1p2DSliceNo]->Fill(pp, w);
-    std::cout << " -- filled 1p slice " << CC0pi1p2DSliceNo << "with pp = " << pp << ", weight = " << w << std::endl;
+    std::cout << " -- filled 1p slice " << CC0pi1p2DSliceNo << " with pp = " << pp << ", weight = " << w << std::endl;
   }
 }
 
@@ -338,7 +338,7 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   for (size_t i=0; i<fDataHist_Slices.size(); i++){
     fMCHist_Slices[i]->Reset();
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
-    SetAutoProcessTH1(fMCHist_Slices[i], kCMD_Reset, kCMD_Write);
+    SetAutoProcessTH1(fMCHist_Slices[i], kCMD_Reset, kCMD_Scale, kCMD_Write);
   }
 
   return;
