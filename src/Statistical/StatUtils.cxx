@@ -948,6 +948,7 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
     UseSVDDecomp = FitPar::Config().GetParB("UseSVDInverse");
     first = false;
   }
+
   if (UseSVDDecomp) {
     // Invert full matrix
     TDecompSVD mat_decomp(*new_mat);
@@ -968,7 +969,7 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
       double smallest = 999;
       for (int i = 0; i < new_mat->GetNrows(); ++i) {
         for (int j = 0; j < new_mat->GetNcols(); ++j) {
-          if (fabs((*new_mat)(i,j)) < smallest) smallest = (*new_mat)(i,j);
+          if (fabs((*new_mat)(i,j)) < smallest) smallest = fabs((*new_mat)(i,j));
         }
       }
       // Now scale the matrix so the smallest entry is 1e-5
