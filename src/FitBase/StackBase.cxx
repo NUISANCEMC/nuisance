@@ -87,7 +87,7 @@ void StackBase::FillStack(int index, double x, double y, double z,
                           double weight) {
   if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
     NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
-                                                        << fAllLabels.size());
+                                                          << fAllLabels.size());
     return;
   }
 
@@ -101,6 +101,40 @@ void StackBase::FillStack(int index, double x, double y, double z,
 
   else if (fNDim == 3)
     ((TH3 *)fAllHists[index])->Fill(x, y, z, weight);
+}
+
+void StackBase::SetBinContentStack(int index, int binx, int biny, int binz,
+                              double content) {
+  if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
+    NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
+                                                          << fAllLabels.size());
+    return;
+  }
+
+  if (fNDim == 1) {
+    fAllHists[index]->SetBinContent(binx, content);
+  } else if (fNDim == 2) {
+    ((TH2 *)fAllHists[index])->SetBinContent(binx, biny, content);
+  } else if (fNDim == 3) {
+    ((TH3 *)fAllHists[index])->SetBinContent(binx, biny, binz, content);
+  }
+}
+
+void StackBase::SetBinErrorStack(int index, int binx, int biny, int binz,
+                            double error) {
+  if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
+    NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
+                                                          << fAllLabels.size());
+    return;
+  }
+
+  if (fNDim == 1) {
+    fAllHists[index]->SetBinError(binx, error);
+  } else if (fNDim == 2) {
+    ((TH2 *)fAllHists[index])->SetBinError(binx, biny, error);
+  } else if (fNDim == 3) {
+    ((TH3 *)fAllHists[index])->SetBinError(binx, biny, binz, error);
+  }
 }
 
 void StackBase::Write() {
