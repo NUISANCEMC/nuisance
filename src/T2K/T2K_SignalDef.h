@@ -43,7 +43,7 @@ enum PRD93112012_Ana {
 
 bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
                  int analysis);
-                 
+
 bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax);

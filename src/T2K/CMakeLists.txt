@@ -50,7 +50,7 @@ T2K_CC1pip_H2O_XSec_1Dppi_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddphit_nu.cxx
 T2K_CC0pinp_STV_XSec_1Ddat_nu.cxx
-T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.cxx
+T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfp_nu.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfa_nu.cxx
 T2K_CC0pinp_ifk_XSec_3Dinfip_nu.cxx
@@ -91,7 +91,7 @@ T2K_CC1pip_H2O_XSec_1Dppi_nu.h
 T2K_CC0pinp_STV_XSec_1Ddpt_nu.h
 T2K_CC0pinp_STV_XSec_1Ddphit_nu.h
 T2K_CC0pinp_STV_XSec_1Ddat_nu.h
-T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h
+T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np.h
 T2K_CC0pinp_ifk_XSec_3Dinfp_nu.h
 T2K_CC0pinp_ifk_XSec_3Dinfa_nu.h
 T2K_CC0pinp_ifk_XSec_3Dinfip_nu.h
