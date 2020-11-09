@@ -72,8 +72,22 @@ if(HAVENEUTCONFIG)
 
   LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
 
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG(-no-pie COMPILER_SUPPORTS_NO_PIE)
+  CHECK_CXX_COMPILER_FLAG(-fno-pie COMPILER_SUPPORTS_FNO_PIE)
+  CHECK_CXX_COMPILER_FLAG(-fno-PIE COMPILER_SUPPORTS_FNO_PIE_CAP)
+  if(COMPILER_SUPPORTS_NO_PIE)
+    set(PIE_FLAGS "-no-pie")
+  elseif(COMPILER_SUPPORTS_FNO_PIE)
+    set(PIE_FLAGS "-fno-pie")
+  elseif(COMPILER_SUPPOERTS_FNO_PIE_CAP)
+    set(PIE_FLAGS "-fno-PIE")
+  else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+  endif()
+
   LIST(APPEND EXTRA_EXE_FLAGS
-    -fno-pie -fno-PIE -no-pie)
+    ${PIE_FLAGS})
 
   cmessage(STATUS "NEUT")
   cmessage(STATUS "     Version   : ${NEUT_VER}")
@@ -81,7 +95,7 @@ if(HAVENEUTCONFIG)
   cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
   cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
   cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
-  cmessage(STATUS "     Exe Flags : -fno-pie -fno-PIE -no-pie")
+  cmessage(STATUS "     Exe Flags : ${EXTRA_EXE_FLAGS}")
 
 
 else() # Everything better be set up already
