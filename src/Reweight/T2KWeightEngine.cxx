@@ -6,13 +6,14 @@
 T2KWeightEngine::T2KWeightEngine(std::string name) {
 #ifdef __T2KREW_ENABLED__
 
+#if defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
   if (!neut_card.size()) {
     NUIS_ABORT(
         "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
   }
-
   t2krew::T2KNeutUtils::SetCardFile(neut_card);
+#endif
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
@@ -130,9 +131,10 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
 
 #ifdef __T2KREW_ENABLED__
   // Skip Non GENIE
-  if (evt->fType != kNEUT)
-    return 1.0;
-
+  if (evt->fType != kNEUT){
+      return 1.0;
+  }
+  
   // Hush now
   StopTalking();
 

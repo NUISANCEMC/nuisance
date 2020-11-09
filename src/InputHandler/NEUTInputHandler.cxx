@@ -138,7 +138,7 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fEventType = kNEUT;
   fNeutVect = NULL;
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
-  #ifdef ROOT6
+  #if defined(ROOT6) && defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
   fNEUTTree->SetAutoDelete(true);
   #endif
   fNEUTTree->GetEntry(0);
