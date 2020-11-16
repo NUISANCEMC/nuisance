@@ -106,7 +106,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::FillHistograms(){
 
 void T2K_NuMu_CC0pi_OC_XSec_2DPcos::ConvertEventRates(){
 
-  for (int i = 0; i < nangbins; i++){
+  for (size_t i = 0; i < nangbins; i++){
     if(Target=="O") fMCHistNuMuO_Slices[i]->GetSumw2();
     else if(Target=="C") fMCHistNuMuC_Slices[i]->GetSumw2();
   }
@@ -123,7 +123,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::ConvertEventRates(){
   // Now Convert into 1D histogram
   fMCHist->Reset();
   int bincount = 0;
-  for (int i = 0; i < nangbins; i++){
+  for (size_t i = 0; i < nangbins; i++){
     if(Target=="O"){
       for (int j = 0; j < fMCHistNuMuO_Slices[i]->GetNbinsX(); j++){
         fMCHist->SetBinContent(bincount+1, fMCHistNuMuO_Slices[i]->GetBinContent(j+1));
@@ -188,7 +188,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
     fDataHist->Reset();
     int bincount = 0;
-    for (int i = 0; i < nangbins; i++){
+    for (size_t i = 0; i < nangbins; i++){
       // Make slices for data 
       fDataHistNuMuO_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i),
@@ -241,7 +241,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fDataHist->Reset();
 
     int bincount=0;
-    for (int i = 0; i < nangbins; i++){
+    for (size_t i = 0; i < nangbins; i++){
       // Make slices for data 
       fDataHistNuMuC_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
       fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i),
