@@ -603,8 +603,8 @@ void Measurement2D::FinaliseMeasurement() {
                       << GetName()
                       << " but only using diagonal elements for likelihood");
     size_t nbins = fFullCovar->GetNcols();
-    for (int i = 0; i < nbins; ++i) {
-      for (int j = 0; j < nbins; ++j) {
+    for (size_t i = 0; i < nbins; ++i) {
+      for (size_t j = 0; j < nbins; ++j) {
         if (i != j) {
           (*fFullCovar)[i][j] = 0;
         }
