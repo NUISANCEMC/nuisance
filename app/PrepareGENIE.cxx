@@ -125,8 +125,10 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
   TH1D *fluxhist =
@@ -537,8 +539,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Make Event and xsec Hist
   TH1D *eventhist = (TH1D *)fluxhist->Clone();
