@@ -100,6 +100,17 @@ int main(int argc, char *argv[]) {
     printInputCommands(argv);
     return 0;
   }
+
+  int verbocount = 0;
+  int errorcount = 0;
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  SETVERBOSITY(verbocount);
+  SETTRACE(trace);
+
   std::vector<std::string> inputfiles;
   bool force_output = false;
 
