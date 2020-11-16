@@ -60,8 +60,10 @@ InputHandlerBase::~InputHandlerBase() {
 void InputHandlerBase::Print(){};
 
 TH1D *InputHandlerBase::GetXSecHistogram(void) {
-  fXSecHist = (TH1D *)fFluxHist->Clone();
-  fXSecHist->Divide(fEventHist);
+  fXSecHist = (TH1D *)fEventHist->Clone();
+  fXSecHist->SetNameTitle((fName + "_XSEC").c_str(), (fName + "_XSEC").c_str());
+  fXSecHist->GetYaxis()->SetTitle("#sigma #times 10^{-38} (cm^{2}/nucleon)");
+  fXSecHist->Divide(fFluxHist);
   return fXSecHist;
 };
 
