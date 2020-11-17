@@ -329,7 +329,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
-  int nprimary = fNeutVect->Nprimary();
+  UInt_t nprimary = fNeutVect->Nprimary();
   // Fill Particle Stack
   for (size_t i = 0; i < npart; i++) {
     // Get Current Count
