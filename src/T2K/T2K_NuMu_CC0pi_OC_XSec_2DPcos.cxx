@@ -190,9 +190,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     int bincount = 0;
     for (size_t i = 0; i < nangbins; i++){
       // Make slices for data 
-      fDataHistNuMuO_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
-      fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i),
-      (Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%i",i)));
+      fDataHistNuMuO_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%zu",i))->Clone());
+      fDataHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%zu",i),
+      (Form("T2K_NuMu_CC0pi_O_2DPcos_data_Slice%zu",i)));
       fDataHistNuMuO_Slices[i]->Scale(1E-39);
       // Loop over nbins and set errors from covariance
       for (int j = 0; j < fDataHistNuMuO_Slices[i]->GetNbinsX(); j++){
@@ -205,7 +205,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
       // Save MC slices
       fMCHistNuMuO_Slices.push_back((TH1D*) fDataHistNuMuO_Slices[i]->Clone());
-      fMCHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%i",i)));
+      fMCHistNuMuO_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%zu",i), (Form("T2K_NuMu_CC0pi_O_2DPcos_MC_Slice%zu",i)));
 
       SetAutoProcessTH1(fDataHistNuMuO_Slices[i],kCMD_Write);
       SetAutoProcessTH1(fMCHistNuMuO_Slices[i]);
@@ -243,9 +243,9 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     int bincount=0;
     for (size_t i = 0; i < nangbins; i++){
       // Make slices for data 
-      fDataHistNuMuC_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%i",i))->Clone());
-      fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i),
-      (Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%i",i)));
+      fDataHistNuMuC_Slices.push_back((TH1D*) fInputFile->Get(Form("dataslice_%zu",i))->Clone());
+      fDataHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%zu",i),
+      (Form("T2K_NuMu_CC0pi_C_2DPcos_data_Slice%zu",i)));
 
       fDataHistNuMuC_Slices[i]->Scale(1E-39);
       //Loop over nbins and set errors from covariance
@@ -259,7 +259,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
 
       //Save MC slices
       fMCHistNuMuC_Slices.push_back((TH1D*) fDataHistNuMuC_Slices[i]->Clone());
-      fMCHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%i",i), (Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%i",i)));
+      fMCHistNuMuC_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%zu",i), (Form("T2K_NuMu_CC0pi_C_2DPcos_MC_Slice%zu",i)));
 
       SetAutoProcessTH1(fDataHistNuMuC_Slices[i],kCMD_Write);
       SetAutoProcessTH1(fMCHistNuMuC_Slices[i]);
