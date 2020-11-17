@@ -236,7 +236,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
   for (size_t i = 0; i < NRows; i++) {
     for (size_t j = 0; j < NRowBins[i]; j++) {
       int id = PolyBinIDs[i][j];
-      fPolyBinMap[id] = {i, j};
+      fPolyBinMap[id] = std::make_pair(i, j);
     }
   }
 
