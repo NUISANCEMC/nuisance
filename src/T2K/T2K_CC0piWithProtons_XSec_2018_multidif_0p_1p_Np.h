@@ -47,9 +47,9 @@ public:
 
  private:
 
-  bool useCC0pi0p = false;
-  bool useCC0pi1p = false;
-  bool useCC0piNp = false;
+  bool useCC0pi0p;
+  bool useCC0pi1p;
+  bool useCC0piNp;
 
   bool only_allowed_particles;
   bool numu_event;
