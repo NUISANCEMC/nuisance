@@ -162,8 +162,9 @@ void StackBase::Write() {
 
     st->Add(fAllHists[i]);
   }
-  st->SetTitle(fTitle.c_str());
+  st->SetTitle((fTitle+";"+fXTitle+";"+fYTitle+";"+fZTitle).c_str());
   st->SetName(fName.c_str());
+
   st->Write();
   delete st;
 };
