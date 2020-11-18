@@ -784,7 +784,7 @@ void Measurement2D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");

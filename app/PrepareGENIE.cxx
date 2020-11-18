@@ -911,7 +911,7 @@ void PrintOptions() {
     "flux file was used."
     << std::endl;
   std::cout << " [ -t target ] : Target that GHepRecords were generated with. "
-    "Comma seperated list with fractions. E.g. for CH2 "
+    "Comma separated list with fractions. E.g. for CH2 "
     "target=1000060120[0.923076],1000010010[0.076924]"
     << std::endl;
   std::cout << " [ -o outputfile.root ] : File to write prepared input file to."

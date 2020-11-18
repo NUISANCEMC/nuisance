@@ -117,7 +117,7 @@ public:
   /// dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
 
-  /// Save starting predictions into a seperate folder
+  /// Save starting predictions into a separate folder
   void SaveNominal();
 
   /*

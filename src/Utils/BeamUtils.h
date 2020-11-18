@@ -31,7 +31,7 @@
 /// Namespace for any global util functions related to beam simulation
 namespace BeamUtils{
 
-  /// @brief Converts comma seperated string of beam ids into PDG vector
+  /// @brief Converts comma separated string of beam ids into PDG vector
   /// 
   /// e.g. 'numu,nue,numub,e,16' = <14,12,-14,11,16>
   std::vector<int> ParseSpeciesToIntVect(std::string spc);

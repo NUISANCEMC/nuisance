@@ -25,7 +25,7 @@
 /// Namespace for utils parsing target pdgs
 namespace TargetUtils {
 
-	/// Convert comma seperated string of targets to vector of PDG codes
+	/// Convert comma separated string of targets to vector of PDG codes
 	///
 	/// e.g. "C,H,10000100010" = "100000600120,10000100010,100000100010"
 	std::vector<int> ParseTargetsToIntVect(std::string targets);

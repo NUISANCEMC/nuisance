@@ -43,7 +43,7 @@ void printInputCommands(){
     previous  outFile as an inputFile if it exists so that the fit can be
     continued\n"; std::cout<<"                    use the flag 'config
     use_previous_output 1'. (A warning will be printed when doing this). \n";
-    std::cout<<"     -f fitStategy: Pass a comma seperated list of fit routines
+    std::cout<<"     -f fitStategy: Pass a comma separated list of fit routines
     to run in order. Default is Migrad,FixAtLim \n"; std::cout<<" Possible
     Options: \n"; std::cout<<"                      1. Migrad - Minuit2 Migrad
     Minimizer \n"; std::cout<<"                      2. Simplex - Simplex

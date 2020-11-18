@@ -254,7 +254,7 @@ int JointFCN::GetNDOF() {
     MeasurementBase *exp = *iter;
     int dof = exp->GetNDOF();
 
-    // Save Seperate DOF
+    // Save Separate DOF
     if (fIterationTree) {
       fSampleNDOF[count] = dof;
     }
@@ -269,7 +269,7 @@ int JointFCN::GetNDOF() {
     ParamPull *pull = *iter;
     double dof = pull->GetLikelihood();
 
-    // Save seperate DOF
+    // Save separate DOF
     if (fIterationTree) {
       fSampleNDOF[count] = dof;
     }
@@ -302,7 +302,7 @@ double JointFCN::GetLikelihood() {
     MeasurementBase *exp = *iter;
     double newlike = exp->GetLikelihood();
     int ndof = exp->GetNDOF();
-    // Save seperate likelihoods
+    // Save separate likelihoods
     if (fIterationTree) {
       fSampleLikes[count] = newlike;
     }
@@ -323,7 +323,7 @@ double JointFCN::GetLikelihood() {
     ParamPull *pull = *iter;
     double newlike = pull->GetLikelihood();
 
-    // Save seperate likelihoods
+    // Save separate likelihoods
     if (fIterationTree) {
       fSampleLikes[count] = newlike;
     }

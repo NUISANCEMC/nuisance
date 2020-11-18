@@ -610,7 +610,7 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     temp_infile->Close();
     delete temp_infile;
 
-    // Else its a space seperated txt file
+    // Else its a space separated txt file
   } else {
     // Make a TGraph Errors
     TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");

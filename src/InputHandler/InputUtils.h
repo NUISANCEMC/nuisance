@@ -29,7 +29,7 @@ namespace InputUtils {
 /// Extract Input Type from start of filename
 InputType ParseInputType(std::string const &inp);
 
-/// Check for comma seperated joint input files
+/// Check for comma separated joint input files
 bool IsJointInput(std::string const &inputs);
 
 /// Replace Input Event Diretory tags with Full Names from Config
