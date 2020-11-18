@@ -1366,7 +1366,6 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
     return NULL;
 
   // Get N bins for 1D plot
-  //Int_t Nbins = map->GetMaximum();
   Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
 
   std::string name1D = std::string(hist->GetName()) + "_1D";
@@ -1386,12 +1385,11 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
     }
   }
 
-  // return
   return newhist;
 }
 
 void StatUtils::MapFromTH1D(TH2 *fillhist, TH1 *fromhist, TH2I *map) {
-  fillhist->Clear();
+  fillhist->Reset();
 
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
@@ -1413,7 +1411,6 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
     return newhist;
 
   // Get N bins for 1D plot
-  //Int_t Nbins = map->GetMaximum();
   Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
@@ -1431,7 +1428,6 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
     }
   }
 
-  // return
   return newhist;
 }
 
