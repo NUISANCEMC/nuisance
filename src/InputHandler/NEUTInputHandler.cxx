@@ -291,12 +291,12 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
   } else if (part->fIsAlive == true) {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-               << " PDG: " << part->fPID);
+               << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
     // Warn if we find dead particles that we haven't classified
   } else {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-               << " PDG: " << part->fPID);
+               << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
   }
 
   return state;
