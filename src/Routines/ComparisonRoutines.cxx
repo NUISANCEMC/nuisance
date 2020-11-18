@@ -256,7 +256,7 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
                                  << sampletype << ") [Norm=" << samplenorm
                                  << "]" << std::endl
-                                 << "                                -> input='"
+                                 << "\t\t|-> input='"
                                  << samplefile << "'");
 
     // If FREE add to parameters otherwise continue
