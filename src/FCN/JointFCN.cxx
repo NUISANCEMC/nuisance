@@ -550,6 +550,7 @@ void JointFCN::ReconfigureUsingManager() {
     int i = 0;
     int nevents = curinput->GetNEvents();
     int countwidth = nevents / 10;
+    uint textwidth = strlen(Form("%i",nevents));
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
@@ -563,8 +564,9 @@ void JointFCN::ReconfigureUsingManager() {
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
           NUIS_LOG(REC, curinput->GetName()
-                        << " : Processed " << i << " events. [M, W] = ["
-                        << curevent->Mode << ", " << curevent->Weight << "]");
+		   << " : Processed " << std::setw(textwidth) << i << " events. [M, W] = ["
+		   << std::setw(3) << curevent->Mode << ", " 
+		   << std::setw(5) << Form("%.3lf", curevent->Weight) << "]");
         }
       }
 
