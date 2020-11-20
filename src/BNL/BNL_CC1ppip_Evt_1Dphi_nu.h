@@ -21,6 +21,16 @@
 #define BNL_CC1PPIP_EVT_1DPHI_NU_H_SEEN
 
 #include "Measurement1D.h"
+// T. Kitagaki et al. "Charged-current exclusive pion production in neutrino-deuterium interactions"
+// Physical Review D, Volume 34, Number 9, 1 Nov 1986
+// Figure 12 and related
+//
+// Also see 
+// N. J. Baker et al. "Study of the isospin structure of single-pion production in charged-current neutrino interactions"
+// Physical Review D, Volume 23, Number 11, 1 June 1981
+//
+// K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints.
+// KEK Preprint 2003-48, RCNS-03-01, September 2003
 
 class BNL_CC1ppip_Evt_1Dphi_nu : public Measurement1D {
 
