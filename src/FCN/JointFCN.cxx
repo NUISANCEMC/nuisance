@@ -937,11 +937,11 @@ void JointFCN::Write() {
     names.push_back(name);
   }
   if (likes.size()) {
-    TH1D likehist = TH1D("likelihood_hist", "likelihood_hist", likes.size(),
+    TH1D likehist = TH1D("likelihood_hist", "likelihood_hist;Sample;#chi^{2}", likes.size(),
                          0.0, double(likes.size()));
     TH1D ndofhist =
-        TH1D("ndof_hist", "ndof_hist", ndofs.size(), 0.0, double(ndofs.size()));
-    TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist", likes.size(),
+        TH1D("ndof_hist", "ndof_hist;Sample;NDOF", ndofs.size(), 0.0, double(ndofs.size()));
+    TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist;Sample;#chi^{2}/NDOF", likes.size(),
                         0.0, double(likes.size()));
     for (int i = 0; i < likehist.GetNbinsX(); i++) {
       likehist.SetBinContent(i + 1, likes[i]);
