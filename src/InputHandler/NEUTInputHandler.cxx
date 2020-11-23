@@ -292,6 +292,11 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
                << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
+  } else if (abs(fNeutVect->Mode) == 35){
+    NUIS_ERR(WRN, "Marking nonsensical CC difractive event as undefined "
+	     << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+	     << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
+    state = kUndefinedState;
     // Warn if we find dead particles that we haven't classified
   } else {
     NUIS_ABORT("Undefined NEUT state "
