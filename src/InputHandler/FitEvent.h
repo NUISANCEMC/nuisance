@@ -55,7 +55,6 @@ public:
   void SetBranchAddress(TChain* tn);
   void AddBranchesToTree(TTree* tn);
   void Print();
-  void PrintChris();
   void DeallocateParticleStack();
   void AllocateParticleStack(int stacksize);
   void ExpandParticleStack(int stacksize);
