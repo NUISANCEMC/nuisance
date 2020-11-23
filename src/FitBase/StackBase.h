@@ -38,9 +38,9 @@ public:
                              double content);
   virtual void SetBinErrorStack(int index, int binx, int biny, int binz,
                            double error);
-  virtual void SetTitleX(string title){fXTitle = title;};
-  virtual void SetTitleY(string title){fYTitle = title;};
-  virtual void SetTitleZ(string title){fZTitle = title;};
+  virtual void SetTitleX(std::string title){fXTitle = title;};
+  virtual void SetTitleY(std::string title){fYTitle = title;};
+  virtual void SetTitleZ(std::string title){fZTitle = title;};
 
   virtual void Write();
 
