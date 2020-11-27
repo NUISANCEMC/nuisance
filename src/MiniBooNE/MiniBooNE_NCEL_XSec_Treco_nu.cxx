@@ -158,8 +158,6 @@ bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(FitEvent *event) {
 void MiniBooNE_NCEL_XSec_Treco_nu::SetFluxHistogram(std::string dataFile) {
   this->newFluxHist = PlotUtils::GetTH1DFromFile(
       dataFile.c_str(), (this->fName + "Real Flux Hist"), "idgaf");
-
-  this->newFluxHist->Print();
   return;
 }
 // Read in the covariance matrix from the file specified in the constructor
