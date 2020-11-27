@@ -415,6 +415,10 @@ void CreateRateHistograms(std::string inputs, bool force_out) {
     Enu = evt->in[0].t / 1000.0;
     TotXSec = evt->weight;
     pdg = evt->in[0].pdg;
+    
+    if (std::find(allpdg.begin(), allpdg.end(), pdg) == allpdg.end()) {
+      NUIS_ABORT("Not set up to handle PDG: " << pdg << " check your inputs");
+    }
 
     eventlist[0]->Fill(Enu);
     eventlist[pdg]->Fill(Enu);
