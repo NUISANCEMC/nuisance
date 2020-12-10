@@ -677,10 +677,11 @@ double FitUtils::Eavailable(FitEvent *event) {
   int ISPDG = event->GetBeamPartPDG();
 
   // For CC
-  if (event->IsCC())
+  if (event->IsCC() && event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))){
     q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
-  else
+  } else {
     q0 -= event->GetHMFSParticle(ISPDG)->fP.E();
+  }
 
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state
