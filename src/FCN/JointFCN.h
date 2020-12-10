@@ -128,6 +128,17 @@ public:
   std::vector<double> GetAllLikelihoods();
   std::vector<int> GetAllNDOF();
 
+
+  void SetVariableMirrored(int ipar, double mirror_value, bool mirror_above){
+    mirror_param mir_par;
+    mir_par.mirror_value = mirror_value;
+    mir_par.mirror_above = mirror_above;
+    fMirroredParams[ipar] = mir_par;
+  }
+  void SetNParams(int npar){
+    fNPars = npar;
+  }
+
 private:
 
   //! Append the experiments to include in the fit to this list
@@ -172,8 +183,13 @@ private:
   std::string fIterationTreeName;
 
 
-
-
+  struct mirror_param {
+    double mirror_value;
+    bool mirror_above;
+  };
+  std::map<int, mirror_param> fMirroredParams;
+  //the number of pars added to the minimizer, should be the same as fNDials
+  int fNPars;
 };
 
 /*! @} */

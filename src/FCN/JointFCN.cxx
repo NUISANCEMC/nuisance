@@ -213,9 +213,33 @@ void JointFCN::FillIterationTree(FitWeight *rw) {
 double JointFCN::DoEval(const double *x) {
   //***************************************************
 
+  double *par_vals = new double[fNPars];
+
+  for (int i = 0; i < fNPars; ++i) {
+    if (fMirroredParams.count(i)) {
+      if (!fMirroredParams[i].mirror_above &&
+          (x[i] < fMirroredParams[i].mirror_value)) {
+        double xabove = fMirroredParams[i].mirror_value - x[i];
+        par_vals[i] = fMirroredParams[i].mirror_value + xabove;
+        std::cout << "\t--Parameter " << i << " mirrored from " << x[i]
+                  << " -> " << par_vals[i] << std::endl;
+      } else if (fMirroredParams[i].mirror_above &&
+                 (x[i] >= fMirroredParams[i].mirror_value)) {
+        double xabove = x[i] - fMirroredParams[i].mirror_value;
+        par_vals[i] = fMirroredParams[i].mirror_value - xabove;
+        std::cout << "\t--Parameter " << i << " mirrored from " << x[i]
+                  << " -> " << par_vals[i] << std::endl;
+      } else {
+        par_vals[i] = x[i];
+      }
+    } else {
+      par_vals[i] = x[i];
+    }
+  }
+
   // WEIGHT ENGINE
-  fDialChanged = FitBase::GetRW()->HasRWDialChanged(x);
-  FitBase::GetRW()->UpdateWeightEngine(x);
+  fDialChanged = FitBase::GetRW()->HasRWDialChanged(par_vals);
+  FitBase::GetRW()->UpdateWeightEngine(par_vals);
   if (fDialChanged) {
     FitBase::GetRW()->Reconfigure();
     FitBase::EvtManager().ResetWeightFlags();
@@ -232,11 +256,14 @@ double JointFCN::DoEval(const double *x) {
   fNDOF = GetNDOF();
 
   // PRINT PROGRESS
-  NUIS_LOG(FIT, "Current Stat (iter. " << this->fCurIter << ") = " << fLikelihood);
+  NUIS_LOG(FIT,
+           "Current Stat (iter. " << this->fCurIter << ") = " << fLikelihood);
 
   // UPDATE TREE
   if (fIterationTree)
     FillIterationTree(FitBase::GetRW());
+
+  delete[] par_vals;
 
   return fLikelihood;
 }
@@ -291,8 +318,8 @@ double JointFCN::GetLikelihood() {
   //***************************************************
 
   NUIS_LOG(MIN, std::left << std::setw(43) << "Getting likelihoods..."
-                      << " : "
-                      << "-2logL");
+                          << " : "
+                          << "-2logL");
 
   // Loop and add up likelihoods in an uncorrelated way
   double like = 0.0;
@@ -308,7 +335,7 @@ double JointFCN::GetLikelihood() {
     }
 
     NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
-                    << newlike << "/" << ndof);
+                        << newlike << "/" << ndof);
 
     // Add Weight Scaling
     // like *= FitBase::GetRW()->GetSampleLikelihoodWeight(exp->GetName());
@@ -389,9 +416,8 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   int starttime = time(NULL);
   NUIS_LOG(REC, "Starting Reconfigure iter. " << this->fCurIter);
-  // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled <<
-  // std::endl;
-  // Event Manager Reconf
+  // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled
+  // << std::endl; Event Manager Reconf
   if (fUsingEventManager) {
     if (!fullconfig && fMCFilled)
       ReconfigureFastUsingManager();
@@ -426,7 +452,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
 
   fMCFilled = true;
   NUIS_LOG(MIN, "Finished Reconfigure iter. " << fCurIter << " in "
-                                          << time(NULL) - starttime << "s");
+                                              << time(NULL) - starttime << "s");
 
   fCurIter++;
 }
@@ -525,7 +551,8 @@ void JointFCN::ReconfigureUsingManager() {
     for (; inp_iter != fInputList.end(); inp_iter++) {
       InputHandlerBase *curinput = (*inp_iter);
 
-      // Tell reader in each BaseEvent it needs a Reconfigure next weight calc.
+      // Tell reader in each BaseEvent it needs a Reconfigure next weight
+      // calc.
       BaseFitEvt *curevent = curinput->FirstBaseEvent();
       if (curevent->fSplineRead) {
         curevent->fSplineRead->SetNeedsReconfigure(true);
@@ -563,8 +590,9 @@ void JointFCN::ReconfigureUsingManager() {
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
           NUIS_LOG(REC, curinput->GetName()
-                        << " : Processed " << i << " events. [M, W] = ["
-                        << curevent->Mode << ", " << curevent->Weight << "]");
+                            << " : Processed " << i << " events. [M, W] = ["
+                            << curevent->Mode << ", " << curevent->Weight
+                            << "]");
         }
       }
 
@@ -656,7 +684,8 @@ void JointFCN::ReconfigureUsingManager() {
 
         // if (splinecount % 1000 == 0) {
         // std::cout << "Pushed Back Coeff " << splinecount << " : ";
-        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size(); l++)
+        // for (size_t l = 0; l < fSignalEventSplines[splinecount].size();
+        // l++)
         // {
         // std::cout << " " << fSignalEventSplines[splinecount][l];
         // }
@@ -696,19 +725,20 @@ void JointFCN::ReconfigureUsingManager() {
                 // fSignalEventBoxes.size() * sizeof(fSignalEventBoxes.at(0)) +
                   sizeof(MeasurementVariableBox1D) * fillcount) *
               1E-6;
-    NUIS_LOG(REC, " -> Saved " << fillcount << " signal boxes for faster access. (~"
-                           << mem << " MB)");
+    NUIS_LOG(REC, " -> Saved " << fillcount
+                               << " signal boxes for faster access. (~" << mem
+                               << " MB)");
     if (fIsAllSplines and !fSignalEventSplines.empty()) {
       int splmem = sizeof(float) * fSignalEventSplines.size() *
                    fSignalEventSplines[0].size() * 1E-6;
-      NUIS_LOG(REC, " -> Saved " << fillcount << " " << fSignalEventSplines.size()
-                             << " spline sets into memory. (~" << splmem
-                             << " MB)");
+      NUIS_LOG(REC, " -> Saved "
+                        << fillcount << " " << fSignalEventSplines.size()
+                        << " spline sets into memory. (~" << splmem << " MB)");
     }
   }
 
   NUIS_LOG(REC,
-       "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart);
+           "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart);
 
   // Check SignalReconfigures works for all samples
   if (savesignal) {
@@ -718,14 +748,15 @@ void JointFCN::ReconfigureUsingManager() {
 
     if (fabs(likefull - likefast) > 0.0001) {
       NUIS_ERR(FTL, "Fast and Full Likelihoods DIFFER! : " << likefull << " : "
-                                                         << likefast);
-      NUIS_ERR(FTL, "This means some samples you are using are not setup to use "
-                  "SignalReconfigures=1");
+                                                           << likefast);
+      NUIS_ERR(FTL,
+               "This means some samples you are using are not setup to use "
+               "SignalReconfigures=1");
       NUIS_ERR(FTL, "Please turn OFF signal reconfigures.");
       throw;
     } else {
       NUIS_LOG(FIT,
-           "Likelihoods for FULL and FAST match. Will use FAST next time.");
+               "Likelihoods for FULL and FAST match. Will use FAST next time.");
     }
   }
 };
@@ -831,8 +862,8 @@ void JointFCN::ReconfigureFastUsingManager() {
         coreeventweights[splinecount] = rwweight;
         if (countwidth && ((splinecount % countwidth) == 0)) {
           NUIS_LOG(REC, curinput->GetName()
-                        << " : Processed " << i
-                        << " events. W = " << curevent->Weight << std::endl);
+                            << " : Processed " << i << " events. W = "
+                            << curevent->Weight << std::endl);
         }
 
         // #pragma omp atomic
@@ -911,8 +942,8 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Print some reconfigure profiling.
   NUIS_LOG(REC, "Filled " << fillcount << " signal events.");
-  NUIS_LOG(REC,
-       "Time taken ReconfigureFastUsingManager() : " << time(NULL) - timestart);
+  NUIS_LOG(REC, "Time taken ReconfigureFastUsingManager() : " << time(NULL) -
+                                                                     timestart);
 }
 
 //***************************************************
@@ -1064,7 +1095,7 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
 
     // Print Out
     NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
-                    << singlelike);
+                        << singlelike);
   }
 
   // Loop over pulls second
@@ -1077,8 +1108,8 @@ std::vector<double> JointFCN::GetAllLikelihoods() {
     total_likelihood += singlelike;
 
     // Print Out
-    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << pull->GetName() << " : "
-                    << singlelike);
+    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << pull->GetName()
+                        << " : " << singlelike);
   }
 
   // Finally add the total likelihood

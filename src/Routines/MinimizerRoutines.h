@@ -256,6 +256,12 @@ protected:
   std::map<std::string, bool>        fFixVals;
   std::map<std::string, bool>        fStartFixVals;
 
+  struct mirror_param {
+    double mirror_value;
+    bool mirror_above;
+  };
+  std::map<std::string, mirror_param> fMirroredParams;
+
   //! Vector of fake parameter names
   std::map<std::string,double> fFakeVals;
 

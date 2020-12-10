@@ -215,15 +215,31 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
       parstep = key.GetD("step");
 
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parlow << " < p < " << parhigh << " : "
-                        << parstate);
+                            << " : " << parlow << " < p < " << parhigh << " : "
+                            << parstate);
     } else {
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parstate);
+                            << " : " << parstate);
+    }
+
+    bool ismirr = false;
+    if (key.Has("mirror_point")) {
+      ismirr=true;
+      mirror_param mir;
+      mir.mirror_value = key.GetD("mirror_point");
+      mir.mirror_above = key.GetB("mirror_above");
+      fMirroredParams[parname] = mir;
+      NUIS_LOG(FIT,
+               "\t\t" << parname << " is mirrored at " << mir.mirror_value
+                      << " "
+                      << (mir.mirror_above ? "from above" : "from below"));
     }
 
     // Run Parameter Conversion if needed
     if (parstate.find("ABS") != std::string::npos) {
+      if(ismirr){
+        NUIS_ABORT("Cannot mirror parameters with ABS state!");
+      }
       double opnom = parnom;
       double oparstep = parstep;
       parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
@@ -233,6 +249,9 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
           FitBase::RWAbsToSigma(partype, parname, opnom + parstep) - parnom;
       NUIS_LOG(FIT, "ParStep: " << parstep << " (" << oparstep << ").");
     } else if (parstate.find("FRAC") != std::string::npos) {
+      if(ismirr){
+        NUIS_ABORT("Cannot mirror parameters with FRAC state!");
+      }
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
       parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
@@ -277,16 +296,17 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
     // Print out
-    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
-                                  << "\t\t input -> " << samplefile << std::endl
-                                  << "\t\t state -> " << sampletype << std::endl
-                                  << "\t\t norm  -> " << samplenorm);
+    NUIS_LOG(FIT, "Read sample info "
+                      << i << " : " << samplename << std::endl
+                      << "\t\t input -> " << samplefile << std::endl
+                      << "\t\t state -> " << sampletype << std::endl
+                      << "\t\t norm  -> " << samplenorm);
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
         NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
-                    "that the sample is free");
+                      "that the sample is free");
         NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
@@ -477,6 +497,10 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
 
     fMinimizer->SetVariable(ipar, syst, vstart, vstep);
     fMinimizer->SetVariableLimits(ipar, vlow, vhigh);
+    if (fMirroredParams.count(syst)) {
+      fSampleFCN->SetVariableMirrored(ipar, fMirroredParams[syst].mirror_value,
+                                      fMirroredParams[syst].mirror_above);
+    }
 
     if (fixed) {
       fMinimizer->FixVariable(ipar);
@@ -484,15 +508,16 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
 
     } else {
       NUIS_LOG(FIT, "Free  Param: " << syst << " Start:" << vstart
-                                << " Range:" << vlow << " to " << vhigh
-                                << " Step:" << vstep);
+                                    << " Range:" << vlow << " to " << vhigh
+                                    << " Step:" << vstep);
     }
 
     ipar++;
   }
+  fSampleFCN->SetNParams(ipar);
 
   NUIS_LOG(FIT, "Setup Minimizer: " << fMinimizer->NDim() << "(NDim) "
-                                << fMinimizer->NFree() << "(NFree)");
+                                    << fMinimizer->NFree() << "(NFree)");
 
   return;
 }
@@ -647,12 +672,12 @@ void MinimizerRoutines::PrintState() {
 
   // Header
   NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
-                     << " = " << setw(10) << "Value"
-                     << " +- " << setw(10) << "Error"
-                     << " " << setw(8) << "(Units)"
-                     << " " << setw(10) << "Conv. Val"
-                     << " +- " << setw(10) << "Conv. Err"
-                     << " " << setw(8) << "(Units)");
+                         << " = " << setw(10) << "Value"
+                         << " +- " << setw(10) << "Error"
+                         << " " << setw(8) << "(Units)"
+                         << " " << setw(10) << "Conv. Val"
+                         << " +- " << setw(10) << "Conv. Err"
+                         << " " << setw(8) << "(Units)");
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -693,7 +718,8 @@ void MinimizerRoutines::PrintState() {
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  NUIS_LOG(FIT,
+           std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
   NUIS_LOG(FIT, "------------");
 }
 
