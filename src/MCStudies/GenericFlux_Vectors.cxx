@@ -51,6 +51,10 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
   NUIS_LOG(SAM, "Running GenericFlux_Vectors saving pre-FSI particles? "
                     << SavePreFSI);
 
+  SaveSignalFlags = Config::Get().GetParB("nuisflat_SaveSignalFlags");
+  NUIS_LOG(SAM, "Running GenericFlux_Vectors saving signal flags? "
+	   << SaveSignalFlags);
+
   // Set default fitter flags
   fIsDiag = true;
   fIsShape = false;
@@ -96,7 +100,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
 
   // Setup our TTrees
   this->AddEventVariablesToTree();
-  this->AddSignalFlagsToTree();
+  if (SaveSignalFlags) this->AddSignalFlagsToTree();
 }
 
 void GenericFlux_Vectors::AddEventVariablesToTree() {
@@ -187,7 +191,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
   ResetVariables();
 
   // Fill Signal Variables
-  FillSignalFlags(event);
+  if (SaveSignalFlags) FillSignalFlags(event);
   NUIS_LOG(DEB, "Filling signal");
 
   // Now fill the information
@@ -240,6 +244,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     float m_n = (float)PhysConst::mass_proton;
     // Q2 assuming nucleon at rest
     W_nuc_rest = sqrt(-Q2 + 2 * m_n * q0 + m_n * m_n);
+    W = W_nuc_rest; // For want of a better thing to do
     // True Q2
     x = Q2 / (2 * m_n * q0);
     y = 1 - ELep / Enu_true;
@@ -322,12 +327,6 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     W_genie = kine.W();
   }
 #endif
-
-  if (lep != NULL) {
-    W = (ISP4 - lep->fP).M();
-  } else {
-    W = 0;
-  }
 
   // Fill event weights
   Weight = event->RWWeight * event->InputWeight;

@@ -102,6 +102,7 @@
 <config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INVCOV/DECOMP/CANVPDG/CANVMC/SETTINGS/PROJ/CANVSLICEMC'/>
 
 <config nuisflat_SavePreFSI='true' />
+<config nuisflat_SaveSignalFlags='true' />
 
 <config InterpolateSigmaQ0Histogram='1' />
 <config InterpolateSigmaQ0HistogramRes='100' />
