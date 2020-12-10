@@ -263,7 +263,7 @@ Double_t StatUtils::GetChi2FromCov(TH2D *data, TH2D *mc, TMatrixDSym *invcov,
   TH1I *mask_1D = MapToMask(mask, map);
   TH1D *outchi2perbin_1D = outchi2perbin ? MapToTH1D(outchi2perbin, map) : NULL;
 
-  NUIS_LOG(SAM, "Calculating 2D covariance: got map ? "
+  NUIS_LOG(DEB, "Calculating 2D covariance: got map ? "
                     << (!made_map) << ", Ndata bins: "
                     << (data->GetNbinsX() * data->GetNbinsY())
                     << ", ncovbins: " << invcov->GetNcols()
@@ -969,7 +969,8 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
       double smallest = 999;
       for (int i = 0; i < new_mat->GetNrows(); ++i) {
         for (int j = 0; j < new_mat->GetNcols(); ++j) {
-          if (fabs((*new_mat)(i,j)) < smallest) smallest = fabs((*new_mat)(i,j));
+          if (fabs((*new_mat)(i,j)) < smallest &&
+              (*new_mat)(i,j) != 0) smallest = fabs((*new_mat)(i,j));
         }
       }
       // Now scale the matrix so the smallest entry is 1e-5
@@ -1365,7 +1366,7 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
     return NULL;
 
   // Get N bins for 1D plot
-  Int_t Nbins = map->GetMaximum();
+  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
 
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
@@ -1384,12 +1385,11 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
     }
   }
 
-  // return
   return newhist;
 }
 
 void StatUtils::MapFromTH1D(TH2 *fillhist, TH1 *fromhist, TH2I *map) {
-  fillhist->Clear();
+  fillhist->Reset();
 
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
@@ -1411,7 +1411,7 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
     return newhist;
 
   // Get N bins for 1D plot
-  Int_t Nbins = map->GetMaximum();
+  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
   // Make new 1D Hist
@@ -1428,7 +1428,6 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
     }
   }
 
-  // return
   return newhist;
 }
 

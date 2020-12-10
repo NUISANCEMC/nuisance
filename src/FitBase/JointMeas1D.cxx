@@ -774,7 +774,7 @@ void JointMeas1D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                       << fit_options_input.at(i)
                       << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                   "(e.g. FREE/DIAG/NORM)");
       NUIS_ERR(FTL, "Available options for " << fName << " are '" << fAllowedTypes
                                            << "'");
@@ -1508,7 +1508,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
                                    FitWeight *rw, std::string fkdt) {
   //********************************************************************
 
-  // For joint samples, input files are given as a semi-colon seperated list.
+  // For joint samples, input files are given as a semi-colon separated list.
   // Parse this list and save it for later, and set up the types etc.
 
   if (FitPar::Config().GetParB("EventManager")) {

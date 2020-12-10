@@ -42,9 +42,9 @@ static double const EdgesP[NRows][6] = {
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50}};
@@ -236,7 +236,7 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
   for (size_t i = 0; i < NRows; i++) {
     for (size_t j = 0; j < NRowBins[i]; j++) {
       int id = PolyBinIDs[i][j];
-      fPolyBinMap[id] = {i, j};
+      fPolyBinMap[id] = std::make_pair(i, j);
     }
   }
 

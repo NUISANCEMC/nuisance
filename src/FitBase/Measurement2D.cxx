@@ -603,8 +603,8 @@ void Measurement2D::FinaliseMeasurement() {
                       << GetName()
                       << " but only using diagonal elements for likelihood");
     size_t nbins = fFullCovar->GetNcols();
-    for (int i = 0; i < nbins; ++i) {
-      for (int j = 0; j < nbins; ++j) {
+    for (size_t i = 0; i < nbins; ++i) {
+      for (size_t j = 0; j < nbins; ++j) {
         if (i != j) {
           (*fFullCovar)[i][j] = 0;
         }
@@ -676,7 +676,11 @@ void Measurement2D::FinaliseMeasurement() {
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCHist);
+				      ("True Channels"), fMCHist);
+    fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleZ(fDataHist->GetZaxis()->GetTitle());
+
     SetAutoProcessTH1(fMCHist_Modes);
   }
 
@@ -780,7 +784,7 @@ void Measurement2D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");

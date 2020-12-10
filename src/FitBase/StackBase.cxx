@@ -141,7 +141,7 @@ void StackBase::Write() {
   THStack *st = new THStack();
 
   // Loop and add all histograms
-  bool saveseperate = FitPar::Config().GetParB("WriteSeperateStacks");
+  bool saveseparate = FitPar::Config().GetParB("WriteSeparateStacks");
   for (size_t i = 0; i < fAllLabels.size(); i++) {
 
     if (!IncludeInStack(fAllHists[i]))
@@ -157,13 +157,14 @@ void StackBase::Write() {
     fAllHists[i]->SetLineWidth(fAllStyles[i][1]);
     fAllHists[i]->SetFillStyle(fAllStyles[i][2]);
     fAllHists[i]->SetFillColor(fAllStyles[i][0]);
-    if (saveseperate)
+    if (saveseparate)
       fAllHists[i]->Write();
 
     st->Add(fAllHists[i]);
   }
-  st->SetTitle(fTitle.c_str());
+  st->SetTitle((fTitle+";"+fXTitle+";"+fYTitle+";"+fZTitle).c_str());
   st->SetName(fName.c_str());
+
   st->Write();
   delete st;
 };

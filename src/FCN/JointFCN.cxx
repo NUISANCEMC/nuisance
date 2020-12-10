@@ -254,7 +254,7 @@ int JointFCN::GetNDOF() {
     MeasurementBase *exp = *iter;
     int dof = exp->GetNDOF();
 
-    // Save Seperate DOF
+    // Save Separate DOF
     if (fIterationTree) {
       fSampleNDOF[count] = dof;
     }
@@ -269,7 +269,7 @@ int JointFCN::GetNDOF() {
     ParamPull *pull = *iter;
     double dof = pull->GetLikelihood();
 
-    // Save seperate DOF
+    // Save separate DOF
     if (fIterationTree) {
       fSampleNDOF[count] = dof;
     }
@@ -302,7 +302,7 @@ double JointFCN::GetLikelihood() {
     MeasurementBase *exp = *iter;
     double newlike = exp->GetLikelihood();
     int ndof = exp->GetNDOF();
-    // Save seperate likelihoods
+    // Save separate likelihoods
     if (fIterationTree) {
       fSampleLikes[count] = newlike;
     }
@@ -323,7 +323,7 @@ double JointFCN::GetLikelihood() {
     ParamPull *pull = *iter;
     double newlike = pull->GetLikelihood();
 
-    // Save seperate likelihoods
+    // Save separate likelihoods
     if (fIterationTree) {
       fSampleLikes[count] = newlike;
     }
@@ -550,6 +550,7 @@ void JointFCN::ReconfigureUsingManager() {
     int i = 0;
     int nevents = curinput->GetNEvents();
     int countwidth = nevents / 10;
+    uint textwidth = strlen(Form("%i",nevents));
 
     // Start event loop iterating until we get a NULL pointer.
     while (curevent) {
@@ -563,8 +564,9 @@ void JointFCN::ReconfigureUsingManager() {
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
           NUIS_LOG(REC, curinput->GetName()
-                        << " : Processed " << i << " events. [M, W] = ["
-                        << curevent->Mode << ", " << curevent->Weight << "]");
+		   << " : Processed " << std::setw(textwidth) << i << " events. [M, W] = ["
+		   << std::setw(3) << curevent->Mode << ", " 
+		   << std::setw(5) << Form("%.3lf", curevent->Weight) << "]");
         }
       }
 
@@ -935,11 +937,11 @@ void JointFCN::Write() {
     names.push_back(name);
   }
   if (likes.size()) {
-    TH1D likehist = TH1D("likelihood_hist", "likelihood_hist", likes.size(),
+    TH1D likehist = TH1D("likelihood_hist", "likelihood_hist;Sample;#chi^{2}", likes.size(),
                          0.0, double(likes.size()));
     TH1D ndofhist =
-        TH1D("ndof_hist", "ndof_hist", ndofs.size(), 0.0, double(ndofs.size()));
-    TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist", likes.size(),
+        TH1D("ndof_hist", "ndof_hist;Sample;NDOF", ndofs.size(), 0.0, double(ndofs.size()));
+    TH1D divhist = TH1D("likedivndof_hist", "likedivndof_hist;Sample;#chi^{2}/NDOF", likes.size(),
                         0.0, double(likes.size()));
     for (int i = 0; i < likehist.GetNbinsX(); i++) {
       likehist.SetBinContent(i + 1, likes[i]);

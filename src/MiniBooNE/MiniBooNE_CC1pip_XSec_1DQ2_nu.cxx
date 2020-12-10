@@ -70,7 +70,7 @@ void  MiniBooNE_CC1pip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   // No W cut on MiniBooNE CC1pi+
-  double q2 = -1*(Pnu-Pmu).Mag2();
+  double q2 = -1*(Pnu-Pmu).Mag2()/1e6;
 
   fXVar = q2;
 

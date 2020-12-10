@@ -22,7 +22,7 @@
 #include "T2K_CC0pi_XSec_H2O_2DPcos_anu.h"
 
 
-static int nmombins = 7;
+static size_t nmombins = 7;
 static double mom_binning[] = { 400., 530., 670., 800., 1000., 1380., 2010., 3410. };
 
 static int    ncosbins[]    = { 2, 3, 3, 3, 3, 3, 2 };
@@ -106,7 +106,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::FillHistograms(){
 // Otherwise this would need to be replaced by a TH2Poly which is too awkward.
 void T2K_CC0pi_XSec_H2O_2DPcos_anu::ConvertEventRates(){
 
-  for (int i = 0; i < nmombins; i++){
+  for (size_t i = 0; i < nmombins; i++){
     fMCHist_Slices[i]->GetSumw2();
   }
 
@@ -120,7 +120,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::ConvertEventRates(){
   // Now Convert into 1D list
   fMCHist->Reset();
   int bincount = 0;
-  for (int i = 0; i < nmombins; i++){
+  for (size_t i = 0; i < nmombins; i++){
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
       fMCHist->SetBinContent(bincount+1, fMCHist_Slices[i]->GetBinContent(j+1));
       bincount++;
@@ -147,13 +147,11 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/AntiNuMuH2O/AntiNuMuOnH2O_unreg.root").c_str(),"READ");
 
   // Read in 1D Data
-  TH1D* hLinearResult = (TH1D*) fInputFile->Get("xsecDataRelease"); 
-  int Nbins = hLinearResult->GetNbinsX();
+  fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
+  fDataHist->SetNameTitle((fName + "_data").c_str(),
+			  (fName + "_data" + fPlotTitles).c_str());
   
-  fDataHist = new TH1D("LinarResult","LinarResult",Nbins,0,Nbins);
-  for (int bin = 0; bin < Nbins; bin++) {
-    fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
-  }
+  int Nbins = fDataHist->GetNbinsX();
   
   // Read relative covariance matrix
   TH2D* tempcov = (TH2D*) fInputFile->Get("covDataRelease");
@@ -170,8 +168,8 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
 
   // Read in 2D Data Slices and Make MC Slices
   int bincount = 0;
-  for (int i = 0; i < nmombins; ++i) {
-    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%i",i),ncosbins[i],costheta_binning[i]));
+  for (uint i = 0; i < nmombins; ++i) {
+    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),ncosbins[i],costheta_binning[i]));
     for (int j = 0; j < ncosbins[i]; ++j) {
       fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1E-38);
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
@@ -181,8 +179,8 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
     }
 
     fMCHist_Slices.push_back((TH1D*) fDataHist_Slices[i]->Clone());
-    fMCHist_Slices[i]->SetNameTitle(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%i",i),
-                                      (Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%i",i)));
+    fMCHist_Slices[i]->SetNameTitle(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%u",i),
+                                      (Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%u",i)));
 
     SetAutoProcessTH1(fDataHist_Slices[i],kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);

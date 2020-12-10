@@ -449,8 +449,8 @@ void nuisconfig::RemoveIdenticalNodes() {
 }
 
 void nuisconfig::RemoveNode(XMLNodePointer_t node) {
-  std::cout << "[INFO]: Removing node: " << fXML->GetNodeName(node)
-            << std::endl;
+  std::cout << "[ CONFIG   ]: Removing node: ";
+  PrintNode(node);
   fXML->FreeAllAttr(node);
   fXML->CleanNode(node);
   fXML->FreeNode(node);
@@ -464,7 +464,7 @@ void nuisconfig::PrintNode(XMLNodePointer_t node) {
   // Loop and print all attributes
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
   while (attr != 0) {
-    std::cout << " -> " << fXML->GetAttrName(attr) << " : "
+    std::cout << "\t\t|-> " << fXML->GetAttrName(attr) << " : "
               << fXML->GetAttrValue(attr) << std::endl;
     attr = fXML->GetNextAttr(attr);
   }

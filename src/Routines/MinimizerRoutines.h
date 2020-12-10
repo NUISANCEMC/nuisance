@@ -194,10 +194,10 @@ void SetupMinimizerFromXML();
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
 
-  //! Save starting predictions into a seperate folder
+  //! Save starting predictions into a separate folder
   void SaveNominal();
 
-  //! Save predictions before the fit is ran into a seperate folder
+  //! Save predictions before the fit is ran into a separate folder
   void SavePrefit();
 
   void SaveResults();

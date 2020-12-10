@@ -169,7 +169,6 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
       if (nstrangemesons > 0){
 	std::cout << "New Event ----------------------------" << std::endl;
 	std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;
-	event->PrintChris();
 	event->fNeutVect->Dump();
       }
     }
