@@ -102,6 +102,7 @@
 <config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INVCOV/DECOMP/CANVPDG/CANVMC/SETTINGS/PROJ/CANVSLICEMC'/>
 
 <config nuisflat_SavePreFSI='true' />
+<config nuisflat_SaveSignalFlags='true' />
 
 <config InterpolateSigmaQ0Histogram='1' />
 <config InterpolateSigmaQ0HistogramRes='100' />
@@ -146,7 +147,7 @@
 <!-- # Are we throwing uniform or according to Gaussian? -->
 <!-- # Only use uniform if wanting to study the limits of a dial. -->
 <config error_uniform='0'/>
-<config WriteSeperateStacks='1'/>
+<config WriteSeparateStacks='1'/>
 
 <!-- # Other Individual Case Configs -->
 <!-- # ###################################################### -->

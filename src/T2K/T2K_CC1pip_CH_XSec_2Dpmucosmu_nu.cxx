@@ -70,6 +70,7 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
     fMCHist_Slices[i]->Reset();
     fMCHist_Slices[i]->SetLineColor(kRed);
     //nbins += slice->GetXaxis()->GetNbins();
+    // Skip the highest momentum bin because it's rubbish
     nbins += slice->GetXaxis()->GetNbins() - 1;
   }
 
@@ -77,6 +78,7 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
   int bincount = 1;
   for (int i = 0; i < nslices; ++i) {
+    // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins() - 1; ++j) {
     //for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
       fDataHist->SetBinContent(bincount,
@@ -109,18 +111,21 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   TMatrixDSym *temp = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
                                                       "Covariance_pmu_thetamu");
   int ncovbins = temp->GetNrows();
+    // Skip the highest momentum bin because it's rubbish
   fFullCovar = new TMatrixDSym(ncovbins - 4);
   //fFullCovar = new TMatrixDSym(ncovbins);
-  if (ncovbins != fDataHist->GetXaxis()->GetNbins()) {
+  if (fFullCovar->GetNrows() != fDataHist->GetXaxis()->GetNbins()*fDataHist->GetYaxis()->GetNbins()) {
     NUIS_ERR(FTL, "Number of bins in covariance matrix does not match data");
   }
 
   // Number of costhetamu slices is nslices
   // Number of pmu slices is
   int count1 = 0;
+    // Skip the highest momentum bin because it's rubbish
   for (int i = 0; i < ncovbins - 4; ++i) {
   //for (int i = 0; i < ncovbins; ++i) {
     int count2 = 0;
+    // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < ncovbins - 4; ++j) {
     //for (int j = 0; j < ncovbins; ++j) {
       // 1E79 matched to diagonal error

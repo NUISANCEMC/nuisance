@@ -22,14 +22,6 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
       FitPar::Config().GetParS("FitWeight_fNeutRW_veto");
   bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
   bool xsec_res = rw_engine_list.find("xsec_res") == std::string::npos;
-  bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
-  bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
-  bool xsec_dis = rw_engine_list.find("xsec_dis") == std::string::npos;
-  bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
-  bool xsec_nc = rw_engine_list.find("xsec_nc") == std::string::npos;
-  bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
-  bool nucl_casc = rw_engine_list.find("nucl_casc") == std::string::npos;
-  bool nucl_piless = rw_engine_list.find("nucl_piless") == std::string::npos;
 
   // Activate each calc engine
   if (xsec_ccqe)
@@ -39,6 +31,15 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
   // Dials removed in NEUT 5.4.1
 #if __NEUT_VERSION__ < 541
+  bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
+  bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
+  bool xsec_dis = rw_engine_list.find("xsec_dis") == std::string::npos;
+  bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
+  bool xsec_nc = rw_engine_list.find("xsec_nc") == std::string::npos;
+  bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
+  bool nucl_casc = rw_engine_list.find("nucl_casc") == std::string::npos;
+  bool nucl_piless = rw_engine_list.find("nucl_piless") == std::string::npos;
+
   if (nucl_casc)
     fNeutRW->AdoptWghtCalc("nucl_casc", new neut::rew::NReWeightCasc);
   if (xsec_coh)

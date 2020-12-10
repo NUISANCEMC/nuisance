@@ -640,7 +640,10 @@ void Measurement1D::FinaliseMeasurement() {
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCHist);
+				      ("True Channels"), fMCHist);
+    fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
@@ -743,7 +746,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
       NUIS_ERR(WRN, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(WRN, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(WRN, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");

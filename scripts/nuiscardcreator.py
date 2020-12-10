@@ -190,7 +190,7 @@ def GenerateCardXML(inputs, outputs):
       # Check valid
       if not samplename or not sampletype: continue
 
-      # Seperate into uids
+      # Separate into uids
       typesplit = sampletype.replace(",",";").split(";")
 
       # Make sure we can replace all uids

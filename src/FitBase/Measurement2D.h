@@ -298,8 +298,8 @@ public:
   /// set correctly. These should be specified as a string listing options.
   ///
   /// To split up options so that NUISANCE can automatically detect ones that
-  /// are conflicting. Any options seperated with the '/' symbol are non
-  /// conflicting and can be given together, whereas any seperated with the ','
+  /// are conflicting. Any options separated with the '/' symbol are non
+  /// conflicting and can be given together, whereas any separated with the ','
   /// symbol cannot be specified by the end user at the same time.
   ///
   /// Default Type Examples:

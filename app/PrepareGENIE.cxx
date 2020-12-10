@@ -26,6 +26,7 @@ std::string gTarget = "";
 double MonoEnergy;
 int gNEvents = -999;
 bool IsMonoE = false;
+bool useNOvAWeights = false;
 
 void PrintOptions();
 void ParseOptions(int argc, char *argv[]);
@@ -125,8 +126,10 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
   TH1D *fluxhist =
@@ -226,22 +229,24 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
-    NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
-    // ***********************************
-    // ***********************************
-    // FUDGE FOR NOVA MINERVA WORKSHOP
-    //  Also check for the nova_wgts tree from Jeremy
-    TChain *nova_chain = new TChain("nova_wgts");
-    nova_chain->AddFile(input.c_str());
-    TTree *nova_tree = nova_chain->GetTree();
-    if (!nova_tree) {
-      NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
-    } else {
-      NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
-    }
-    if (nova_tree) {
-      nova_tree->SetDirectory(outputfile);
-      nova_tree->Write();
+    if (useNOvAWeights){
+      NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+      // ***********************************
+      // ***********************************
+      // FUDGE FOR NOVA MINERVA WORKSHOP
+      //  Also check for the nova_wgts tree from Jeremy
+      TChain *nova_chain = new TChain("nova_wgts");
+      nova_chain->AddFile(input.c_str());
+      TTree *nova_tree = nova_chain->GetTree();
+      if (!nova_tree) {
+	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
+      } else {
+	NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
+      }
+      if (nova_tree) {
+	nova_tree->SetDirectory(outputfile);
+	nova_tree->Write();
+      }
     }
 
     NUIS_LOG(FIT, "Done cloning tree.");
@@ -537,8 +542,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Make Event and xsec Hist
   TH1D *eventhist = (TH1D *)fluxhist->Clone();
@@ -645,19 +652,21 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
-    // ********************************
-    // CLUDGE KLUDGE KLUDGE FOR NOVA
-    NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
-    //  Also check for the nova_wgts tree from Jeremy
-    TChain *nova_chain = new TChain("nova_wgts");
-    nova_chain->AddFile(input.c_str());
-    TTree *nova_tree = nova_chain->CloneTree(-1, "fast");
-    if (!nova_tree) {
-      NUIS_LOG(FIT, "Could not find nova_wgts tree in " << input);
-    } else {
-      NUIS_LOG(FIT, "Found nova_wgts tree in " << input);
-      nova_tree->SetDirectory(outputfile);
-      nova_tree->Write();
+    if (useNOvAWeights){
+      // ********************************
+      // CLUDGE KLUDGE KLUDGE FOR NOVA
+      NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+      //  Also check for the nova_wgts tree from Jeremy
+      TChain *nova_chain = new TChain("nova_wgts");
+      nova_chain->AddFile(input.c_str());
+      TTree *nova_tree = nova_chain->CloneTree(-1, "fast");
+      if (!nova_tree) {
+	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << input);
+      } else {
+	NUIS_LOG(FIT, "Found nova_wgts tree in " << input);
+	nova_tree->SetDirectory(outputfile);
+	nova_tree->Write();
+      }
     }
     NUIS_LOG(FIT, "Done cloning tree.");
   }
@@ -902,7 +911,7 @@ void PrintOptions() {
     "flux file was used."
     << std::endl;
   std::cout << " [ -t target ] : Target that GHepRecords were generated with. "
-    "Comma seperated list with fractions. E.g. for CH2 "
+    "Comma separated list with fractions. E.g. for CH2 "
     "target=1000060120[0.923076],1000010010[0.076924]"
     << std::endl;
   std::cout << " [ -o outputfile.root ] : File to write prepared input file to."
@@ -917,6 +926,17 @@ void PrintOptions() {
 
 void ParseOptions(int argc, char *argv[]) {
   bool flagopt = false;
+
+  int verbocount = 0;
+  int errorcount = 0;
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  SETVERBOSITY(verbocount);
+  SETTRACE(trace);
+
 
   // If No Arguments print commands
   for (int i = 1; i < argc; ++i) {

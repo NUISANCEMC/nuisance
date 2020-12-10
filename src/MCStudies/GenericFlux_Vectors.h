@@ -69,6 +69,7 @@ public:
   std::vector<FitParticle*> vertList;
 
   bool SavePreFSI;
+  bool SaveSignalFlags;
 
   int Mode;
   bool cc;

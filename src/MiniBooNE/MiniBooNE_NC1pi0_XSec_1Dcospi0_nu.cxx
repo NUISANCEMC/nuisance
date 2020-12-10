@@ -40,15 +40,15 @@ MiniBooNE_NC1pi0_XSec_1Dcospi0_nu::MiniBooNE_NC1pi0_XSec_1Dcospi0_nu(nuiskey sam
   fSettings.DefineAllowedTargets("C,H");
 
   fSettings.SetTitle("MiniBooNE_NC1pi0_XSec_1Dcospi0_nu");
-  nunubarmode = fSettings.Found("name", "combined");
+  nunubarmode = fSettings.Found("name", "fhc");
   if (!nunubarmode) {
     fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nucosthetapi0xsec_edit.txt" );
     fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nucosthetapi0xsecerrormatrix.txt" );
     fSettings.DefineAllowedSpecies("numu");
 
   } else {
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnubarmodecosthetapi0xsec_edit.txt");
-    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnubarmodecosthetapi0xsecerrormatrix.txt");
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsec_edit.txt");
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodecosthetapi0xsecerrormatrix.txt");
     fSettings.DefineAllowedSpecies("numu,numub");
 
   }

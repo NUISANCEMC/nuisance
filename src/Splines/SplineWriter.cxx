@@ -633,7 +633,9 @@ void SplineFCN::SaveAs(std::string name, const float *fx) {
 void SplineWriter::FitCoeff2DGraph(Spline *spl, int n, double *x, double *y,
                                    double *w, float *coeff, bool draw) {
 
+#ifdef __USE_OPENMP__
 #pragma omp critical
+#endif
   {
 
     TF2 *f2 = (TF2 *)spl->GetFunction();

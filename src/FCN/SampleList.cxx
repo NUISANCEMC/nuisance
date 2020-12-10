@@ -1444,9 +1444,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              name.find("_FakeStudy") != std::string::npos) {
     return (
         new ExpMultDist_CCQE_XSec_2DVar_FakeStudy(name, file, rw, type, fkdt));
-  } else if (name.find("GenericFlux_") != std::string::npos) {
+  } else if (name.find("GenericFlux") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
-  } else if (name.find("GenericVectors_") != std::string::npos) {
+  } else if (name.find("GenericVectors") != std::string::npos) {
     return (new GenericFlux_Vectors(name, file, rw, type, fkdt));
   } else if (!name.compare("T2K2017_FakeData")) {
     return (new T2K2017_FakeData(samplekey));

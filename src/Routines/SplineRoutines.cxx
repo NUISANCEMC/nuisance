@@ -1238,7 +1238,7 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     }
     weightsfile->Close();
 
-    // Add option to build seperate chunks
+    // Add option to build separate chunks
 
     // Close Output
     outputfile->Close();
@@ -1368,7 +1368,7 @@ void SplineRoutines::MergeEventSplinesChunks() {
 
     weightsfile->Close();
 
-    // Add option to build seperate chunks
+    // Add option to build separate chunks
 
     // Close Output
     outputfile->Close();
