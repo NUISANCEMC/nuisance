@@ -214,13 +214,32 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
                             << " : " << parstate);
     }
 
+    bool ismirr = false;
+    if (key.Has("mirror_point")) {
+      ismirr = true;
+      mirror_param mir;
+      mir.mirror_value = key.GetD("mirror_point");
+      mir.mirror_above = key.GetB("mirror_above");
+      fMirroredParams[parname] = mir;
+      NUIS_LOG(FIT,
+               "\t\t" << parname << " is mirrored at " << mir.mirror_value
+                      << " "
+                      << (mir.mirror_above ? "from above" : "from below"));
+    }
+
     // Convert if required
     if (parstate.find("ABS") != std::string::npos) {
+      if (ismirr) {
+        NUIS_ABORT("Cannot mirror parameters with ABS state!");
+      }
       parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
       parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
       parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
       parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
     } else if (parstate.find("FRAC") != std::string::npos) {
+      if (ismirr) {
+        NUIS_ABORT("Cannot mirror parameters with FRAC state!");
+      }
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
       parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
@@ -354,7 +373,33 @@ void ComparisonRoutines::SetFakeData() {
     fSampleFCN->ReconfigureAllEvents();
     fSampleFCN->SetFakeData("MC");
 
-    UpdateRWEngine(fCurVals);
+    std::map<std::string, double> CurVals_wmirr;
+    for (size_t i = 0; i < fParams.size(); ++i) {
+      std::string const &pname = fParams[i];
+      if (fMirroredParams.count(pname)) {
+        if (!fMirroredParams[pname].mirror_above &&
+            (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+          double xabove = fMirroredParams[pname].mirror_value - fCurVals[pname];
+          CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+          std::cout << "\t--Parameter " << pname << " mirrored from "
+                    << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                    << std::endl;
+        } else if (fMirroredParams[pname].mirror_above &&
+                   (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+          double xabove = fCurVals[pname] - fMirroredParams[pname].mirror_value;
+          CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+          std::cout << "\t--Parameter " << pname << " mirrored from "
+                    << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                    << std::endl;
+        } else {
+          CurVals_wmirr[pname] = fCurVals[pname];
+        }
+      } else {
+        CurVals_wmirr[pname] = fCurVals[pname];
+      }
+    }
+
+    UpdateRWEngine(CurVals_wmirr);
 
     NUIS_LOG(FIT, "Set all data to fake MC predictions.");
   } else {
@@ -406,7 +451,42 @@ void ComparisonRoutines::Run() {
 
     NUIS_LOG(FIT, "Routine: " << routine);
     if (!routine.compare("Compare")) {
-      UpdateRWEngine(fCurVals);
+
+      std::map<std::string, double> CurVals_wmirr;
+      for (size_t i = 0; i < fParams.size(); ++i) {
+        std::string const &pname = fParams[i];
+        if (fMirroredParams.count(pname)) {
+          std::cout << "MA? " << fMirroredParams[pname].mirror_above
+                    << ", OVal: " << fCurVals[pname]
+                    << ", MPoint: " << fMirroredParams[pname].mirror_value
+                    << std::endl;
+          if (!fMirroredParams[pname].mirror_above &&
+              (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+            double xabove =
+                fMirroredParams[pname].mirror_value - fCurVals[pname];
+            CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+            std::cout << "\t--Parameter " << pname << " mirrored from "
+                      << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                      << std::endl;
+          } else if (fMirroredParams[pname].mirror_above &&
+                     (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+            double xabove =
+                fCurVals[pname] - fMirroredParams[pname].mirror_value;
+            CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+            std::cout << "\t--Parameter " << pname << " mirrored from "
+                      << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                      << std::endl;
+          } else {
+            CurVals_wmirr[pname] = fCurVals[pname];
+          }
+        } else {
+          CurVals_wmirr[pname] = fCurVals[pname];
+        }
+        std::cout << "~~~~~~~" << pname << " : " << fCurVals[pname] << " -> "
+                  << CurVals_wmirr[pname] << std::endl;
+      }
+
+      UpdateRWEngine(CurVals_wmirr);
       GenerateComparison();
       PrintState();
       SaveCurrentState();
@@ -445,6 +525,32 @@ void ComparisonRoutines::PrintState() {
                          << " +- " << setw(10) << "Conv. Err"
                          << " " << setw(8) << "(Units)");
 
+  std::map<std::string, double> CurVals_wmirr;
+  for (size_t i = 0; i < fParams.size(); ++i) {
+    std::string const &pname = fParams[i];
+    if (fMirroredParams.count(pname)) {
+      if (!fMirroredParams[pname].mirror_above &&
+          (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+        double xabove = fMirroredParams[pname].mirror_value - fCurVals[pname];
+        CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+        std::cout << "\t--Parameter " << pname << " mirrored from "
+                  << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                  << std::endl;
+      } else if (fMirroredParams[pname].mirror_above &&
+                 (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+        double xabove = fCurVals[pname] - fMirroredParams[pname].mirror_value;
+        CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+        std::cout << "\t--Parameter " << pname << " mirrored from "
+                  << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+                  << std::endl;
+      } else {
+        CurVals_wmirr[pname] = fCurVals[pname];
+      }
+    } else {
+      CurVals_wmirr[pname] = fCurVals[pname];
+    }
+  }
+
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
     std::string syst = fParams.at(i);
@@ -478,8 +584,13 @@ void ComparisonRoutines::PrintState() {
                  << curerr << " " << setw(8) << curunits << " " << setw(10)
                  << convval << " +- " << setw(10) << converr << " " << setw(8)
                  << convunits;
-
     NUIS_LOG(FIT, curparstring.str());
+
+    if (fMirroredParams.count(syst)) {
+      NUIS_LOG(FIT, "\t\t--> Mirrored at " << fMirroredParams[syst].mirror_value
+                                           << " to effective value "
+                                           << CurVals_wmirr[syst]);
+    }
   }
 
   NUIS_LOG(FIT, "------------");

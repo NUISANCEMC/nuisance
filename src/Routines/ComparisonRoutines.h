@@ -156,6 +156,13 @@ protected:
   std::map<std::string, double>      fCurVals; ///< Map of dial values
   std::map<std::string, int>         fTypeVals; ///< Map of dial type enums.
 
+
+  struct mirror_param {
+    double mirror_value;
+    bool mirror_above;
+  };
+  std::map<std::string, mirror_param> fMirroredParams;
+
   // Fake Dial Vals
   std::map<std::string,double> fFakeVals; ///< Map of fake data settings.
 
