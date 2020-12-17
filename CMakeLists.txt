@@ -246,6 +246,8 @@ install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
   bin)
 
+add_subdirectory(event_gen)
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
                   ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
