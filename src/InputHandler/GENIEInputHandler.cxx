@@ -354,6 +354,20 @@ int GENIEInputHandler::GetGENIEParticleStatus(genie::GHepParticle *p,
 
 #ifdef __GENIE_ENABLED__
 int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
+
+  // I randomly picked 53 here because NEUT doesn't have an appropriate mode...
+  if (gheprec->Summary()->ProcInfo().IsNuElectronElastic()){
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 53;
+    else return -53;
+  }
+
+  // And the same story for 54
+  if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation()){
+    if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 54;
+    else return -54;
+  }
+
+
   // Electron Scattering
   if (gheprec->Summary()->ProcInfo().IsEM()) {
     if (gheprec->Summary()->InitState().ProbePdg() == 11) {
