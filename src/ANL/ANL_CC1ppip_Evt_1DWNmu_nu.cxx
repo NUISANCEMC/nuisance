@@ -68,9 +68,9 @@ void ANL_CC1ppip_Evt_1DWNmu_nu::FillEventVariables(FitEvent *event) {
     return;
 
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
-  TLorentzVector Ppip = event->GetHMFSParticle(211)->fP;
+  TLorentzVector Pp   = event->GetHMFSParticle(2212)->fP;
 
-  double hadMass = (Pmu+Ppip).Mag()/1000.;
+  double hadMass = (Pmu+Pp).Mag()/1000.;
 
   fXVar = hadMass;
 
