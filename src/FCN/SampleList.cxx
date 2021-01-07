@@ -13,15 +13,24 @@
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
 #include "ANL_CC1ppip_XSec_1DEnu_nu.h"
 #include "ANL_CC1ppip_XSec_1DQ2_nu.h"
+#include "ANL_CC1ppip_Evt_1DWNpi_nu.h"
+#include "ANL_CC1ppip_Evt_1DWNmu_nu.h"
+#include "ANL_CC1ppip_Evt_1DWmupi_nu.h"
 // ANL CC1npip
 #include "ANL_CC1npip_Evt_1DQ2_nu.h"
 #include "ANL_CC1npip_Evt_1DcosmuStar_nu.h"
 #include "ANL_CC1npip_Evt_1Dppi_nu.h"
 #include "ANL_CC1npip_XSec_1DEnu_nu.h"
+#include "ANL_CC1npip_Evt_1DWNpi_nu.h"
+#include "ANL_CC1npip_Evt_1DWNmu_nu.h"
+#include "ANL_CC1npip_Evt_1DWmupi_nu.h"
 // ANL CC1pi0
 #include "ANL_CC1pi0_Evt_1DQ2_nu.h"
 #include "ANL_CC1pi0_Evt_1DcosmuStar_nu.h"
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
+#include "ANL_CC1pi0_Evt_1DWNpi_nu.h"
+#include "ANL_CC1pi0_Evt_1DWNmu_nu.h"
+#include "ANL_CC1pi0_Evt_1DWmupi_nu.h"
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 // ANL NC1ppim (mm, exotic!)
@@ -665,6 +674,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_Evt_1Dphi_nu")) {
     return (new ANL_CC1ppip_Evt_1Dphi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWmupi_nu(samplekey));
     /*
       ANL CC1npip sample
     */
@@ -681,7 +696,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1npip_Evt_1Dppi_nu(samplekey));
   } else if (!name.compare("ANL_CC1npip_Evt_1DcosmuStar_nu")) {
     return (new ANL_CC1npip_Evt_1DcosmuStar_nu(samplekey));
-    /*
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1npip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1npip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1npip_Evt_1DWmupi_nu(samplekey));    /*
       ANL CC1pi0 sample
     */
   } else if (!name.compare("ANL_CC1pi0_XSec_1DEnu_nu") ||
@@ -695,6 +715,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1pi0_Evt_1DQ2_nu(samplekey));
   } else if (!name.compare("ANL_CC1pi0_Evt_1DcosmuStar_nu")) {
     return (new ANL_CC1pi0_Evt_1DcosmuStar_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWmupi_nu(samplekey));
     /*
       ANL NC1npip sample
     */

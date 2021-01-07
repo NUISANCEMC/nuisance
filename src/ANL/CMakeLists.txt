@@ -24,10 +24,16 @@ ANL_CC1npip_Evt_1DcosmuStar_nu.cxx
 ANL_CC1npip_Evt_1Dppi_nu.cxx
 ANL_CC1npip_Evt_1DQ2_nu.cxx
 ANL_CC1npip_XSec_1DEnu_nu.cxx
+ANL_CC1npip_Evt_1DWNpi_nu.cxx
+ANL_CC1npip_Evt_1DWNmu_nu.cxx
+ANL_CC1npip_Evt_1DWmupi_nu.cxx
 
 ANL_CC1pi0_Evt_1DcosmuStar_nu.cxx
 ANL_CC1pi0_Evt_1DQ2_nu.cxx
 ANL_CC1pi0_XSec_1DEnu_nu.cxx
+ANL_CC1pi0_Evt_1DWNpi_nu.cxx
+ANL_CC1pi0_Evt_1DWNmu_nu.cxx
+ANL_CC1pi0_Evt_1DWmupi_nu.cxx
 
 ANL_CC1ppip_Evt_1DcosmuStar_nu.cxx
 ANL_CC1ppip_Evt_1Dppi_nu.cxx
@@ -37,6 +43,9 @@ ANL_CC1ppip_XSec_1DEnu_nu.cxx
 ANL_CC1ppip_XSec_1DQ2_nu.cxx
 ANL_CC1ppip_Evt_1DcosthAdler_nu.cxx
 ANL_CC1ppip_Evt_1Dphi_nu.cxx
+ANL_CC1ppip_Evt_1DWNpi_nu.cxx
+ANL_CC1ppip_Evt_1DWNmu_nu.cxx
+ANL_CC1ppip_Evt_1DWmupi_nu.cxx
 
 ANL_NC1npip_Evt_1Dppi_nu.cxx
 
@@ -70,10 +79,16 @@ ANL_CC1npip_Evt_1DcosmuStar_nu.h
 ANL_CC1npip_Evt_1Dppi_nu.h
 ANL_CC1npip_Evt_1DQ2_nu.h
 ANL_CC1npip_XSec_1DEnu_nu.h
+ANL_CC1npip_Evt_1DWNpi_nu.h
+ANL_CC1npip_Evt_1DWNmu_nu.h
+ANL_CC1npip_Evt_1DWmupi_nu.h
 
 ANL_CC1pi0_Evt_1DcosmuStar_nu.h
 ANL_CC1pi0_Evt_1DQ2_nu.h
 ANL_CC1pi0_XSec_1DEnu_nu.h
+ANL_CC1pi0_Evt_1DWNpi_nu.h
+ANL_CC1pi0_Evt_1DWNmu_nu.h
+ANL_CC1pi0_Evt_1DWmupi_nu.h
 
 ANL_CC1ppip_Evt_1DcosmuStar_nu.h
 ANL_CC1ppip_Evt_1Dppi_nu.h
@@ -83,6 +98,10 @@ ANL_CC1ppip_XSec_1DEnu_nu.h
 ANL_CC1ppip_XSec_1DQ2_nu.h
 ANL_CC1ppip_Evt_1DcosthAdler_nu.h
 ANL_CC1ppip_Evt_1Dphi_nu.h
+ANL_CC1ppip_Evt_1DWNpi_nu.h
+ANL_CC1ppip_Evt_1DWNpi_nu.h
+ANL_CC1ppip_Evt_1DWNmu_nu.h
+ANL_CC1ppip_Evt_1DWmupi_nu.h
 
 ANL_NC1npip_Evt_1Dppi_nu.h
 
