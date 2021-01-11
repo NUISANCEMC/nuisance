@@ -54,6 +54,9 @@ if (USE_GiBUU)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};DumpGiBUUEvents)
 endif()
 
+add_executable(nuis_flat_tree_combiner nuis_flat_tree_combiner.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuis_flat_tree_combiner)
+
 add_executable(nuiscomp nuiscomp.cxx)
 set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuiscomp)
 

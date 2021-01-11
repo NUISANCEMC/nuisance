@@ -128,7 +128,9 @@ if [ -z {$FLUX_FILE} ] || [ -z {$FLUX_HIST} ]; then
 fi
 
 FLUX_FILE_NAME=${FLUX_FILE##*/}
-cp ${FLUX_FILE} ./
+if [ ! -e ./${FLUX_FILE} ]; then
+  cp ${FLUX_FILE} ./
+fi
 
 SEED=${RANDOM}
 

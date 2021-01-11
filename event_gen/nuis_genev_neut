@@ -93,7 +93,19 @@ while [[ ${#} -gt 0 ]]; do
       fi
 
       MDLQE="$2"
-      echo "[OPT]: Writing to file: ${MDLQE}"
+      echo "[OPT]: Using MDLQE = ${MDLQE}"
+      shift # past argument
+      ;;
+
+      --MAQE)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      MAQE="$2"
+      echo "[OPT]: Attempting to generate with MAQE = ${MAQE}"
       shift # past argument
       ;;
 
@@ -178,7 +190,9 @@ if [ -z {$FLUX_FILE} ] || [ -z {$FLUX_HIST} ]; then
 fi
 
 FLUX_FILE_NAME=${FLUX_FILE##*/}
-cp ${FLUX_FILE} ./
+if [ ! -e ./${FLUX_FILE} ]; then
+  cp ${FLUX_FILE} ./
+fi
 
 if [ -z ${NEVENTS} ] ; then
    echo "Please pass an integer number of events to run with the -n flag."
