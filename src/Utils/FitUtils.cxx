@@ -666,7 +666,7 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 }
 
 // MOVE TO MINERVA Utils!
-// The alternative Eavailble definition takes true q0 and subtracts the kinetic
+// The alternative Eavailable definition takes true q0 and subtracts the kinetic
 // energy of neutrons and pion masses returns in MeV
 double FitUtils::Eavailable(FitEvent *event) {
   double Eav = 0.0;
@@ -679,7 +679,7 @@ double FitUtils::Eavailable(FitEvent *event) {
   // For CC
   if (event->IsCC() && event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))){
     q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
-  } else {
+  } else if (event->GetHMFSParticle(ISPDG)) {
     q0 -= event->GetHMFSParticle(ISPDG)->fP.E();
   }
 
