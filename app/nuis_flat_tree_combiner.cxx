@@ -78,7 +78,7 @@ int main(int argc, char const *argv[]) {
               << " input trees." << std::endl;
 
     for (size_t ent_it = 0; ent_it < nents; ++ent_it) {
-      if (ent_it && !(ent_it % (ent_it/100))) {
+      if ((nents/100) && ent_it && !(ent_it % (nents/100))) {
         std::cout << "Processed " << ent_it << "/" << nents << std::endl;
       }
 
@@ -95,7 +95,7 @@ int main(int argc, char const *argv[]) {
               << " input trees." << std::endl;
 
     for (size_t ent_it = 0; ent_it < nents; ++ent_it) {
-      if (ent_it && !(ent_it % 10000)) {
+      if ((nents/100) && ent_it && !(ent_it % (nents/100))) {
         std::cout << "Processed " << ent_it << "/" << nents << std::endl;
       }
 
