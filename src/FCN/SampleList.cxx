@@ -101,6 +101,8 @@
 #include "BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx"
 #include "BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.cxx"
 #include "BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu.cxx"
+#include "BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.cxx"
 #endif
 
 #ifndef __NO_FNAL__
@@ -883,7 +885,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
      return (new BNL_CC3pi_1pim2pip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC4pi_2pim2pip_XSec_1DEnu_nu")) {
      return (new BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(samplekey));
-
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu")) {
+     return (new BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu(samplekey));
+  } else if(!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
+     return (new BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(samplekey));
     /*
       FNAL Samples
     */
