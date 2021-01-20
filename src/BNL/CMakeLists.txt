@@ -36,6 +36,9 @@ BNL_CCQE_Evt_1DQ2_nu.cxx
 BNL_CCQE_XSec_1DEnu_nu.cxx
 BNL_CC1ppip_Evt_1DcosthAdler_nu.cxx
 BNL_CC1ppip_Evt_1Dphi_nu.cxx
+BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
+BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.cxx
+BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.cxx
 )
 
 set(HEADERFILES
@@ -58,6 +61,9 @@ BNL_CCQE_Evt_1DQ2_nu.h
 BNL_CCQE_XSec_1DEnu_nu.h
 BNL_CC1ppip_Evt_1DcosthAdler_nu.h
 BNL_CC1ppip_Evt_1Dphi_nu.h
+BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.h
+BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.h
+BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.h
 )
 
 set(LIBNAME expBNL)

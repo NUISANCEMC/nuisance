@@ -97,6 +97,10 @@
 #include "BNL_CC1pi0_Evt_1DWNpi_nu.h"
 #include "BNL_CC1pi0_Evt_1DWNmu_nu.h"
 #include "BNL_CC1pi0_Evt_1DWmupi_nu.h"
+// BNL multipi
+#include "BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.cxx"
 #endif
 
 #ifndef __NO_FNAL__
@@ -870,6 +874,15 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new BNL_CC1pi0_Evt_1DWNmu_nu(samplekey));
   } else if (!name.compare("BNL_CC1pi0_Evt_1DWmupi_nu")) {
     return (new BNL_CC1pi0_Evt_1DWmupi_nu(samplekey));
+    /*
+      BNL multi-pi
+    */
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC2pi_1pim1pip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC3pi_1pim2pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC3pi_1pim2pip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC4pi_2pim2pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(samplekey));
 
     /*
       FNAL Samples
