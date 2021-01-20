@@ -17,16 +17,16 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#ifndef BNL_CC2PI_1PIM1PIP_1DWPIPPR_NU_H_SEEN
-#define BNL_CC2PI_1PIM1PIP_1DWPIPPR_NU_H_SEEN
+#ifndef BNL_CC2PI_1PIM1PIP_EVT_1DWPIPPR_NU_H_SEEN
+#define BNL_CC2PI_1PIM1PIP_EVT_1DWPIPPR_NU_H_SEEN
 
 #include "Measurement1D.h"
 
-class BNL_CC2pi_1pim1pip_1DWpippr_nu : public Measurement1D {
+class BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu : public Measurement1D {
 
 public:
-  BNL_CC2pi_1pim1pip_1DWpippr_nu(nuiskey samplekey);
-  virtual ~BNL_CC2pi_1pim1pip_1DWpippr_nu() {};
+  BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(nuiskey samplekey);
+  virtual ~BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu() {};
 
   void FillEventVariables(FitEvent *event);
   bool isSignal(FitEvent *event);

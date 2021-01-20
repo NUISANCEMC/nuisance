@@ -17,15 +17,15 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-#include "BNL_CC2pi_1pim1pip_1DWpippr_nu.h"
+#include "BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.h"
 
 
 //********************************************************************
-BNL_CC2pi_1pim1pip_1DWpippr_nu::BNL_CC2pi_1pim1pip_1DWpippr_nu(nuiskey samplekey) {
+BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu::BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(nuiskey samplekey) {
 //********************************************************************
 
   // Sample overview ---------------------------------------------------
-  std::string descrip = "BNL_CC2pi_1pim1pip_1DWpippr_nu sample. \n" \
+  std::string descrip = "BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu sample. \n" \
                         "Target: D2 \n" \
                         "Flux:  \n" \
                         "Signal:  \n";
@@ -61,7 +61,7 @@ BNL_CC2pi_1pim1pip_1DWpippr_nu::BNL_CC2pi_1pim1pip_1DWpippr_nu(nuiskey samplekey
 };
 
 
-void BNL_CC2pi_1pim1pip_1DWpippr_nu::FillEventVariables(FitEvent *event) {
+void BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu::FillEventVariables(FitEvent *event) {
 
   if (event->NumFSParticle(211) == 0 ||
       event->NumFSParticle(2212) == 0)
@@ -74,7 +74,7 @@ void BNL_CC2pi_1pim1pip_1DWpippr_nu::FillEventVariables(FitEvent *event) {
 }
 
 // Signal asks for 1pi-, 1pi+, 1mu-, 1p
-bool BNL_CC2pi_1pim1pip_1DWpippr_nu::isSignal(FitEvent *event) {
+bool BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu::isSignal(FitEvent *event) {
   int pdgs[] = {13, 211, -211, 2212};
   return SignalDef::isCCWithFS(event, 14, pdgs,
                                EnuMin, EnuMax);
