@@ -149,14 +149,14 @@ MinimizerRoutines::MinimizerRoutines(int argc, char *argv[]) {
   // Finish configuration XML
   configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
-  // Add Error Verbo Lines
+  // Sort out the printout
   verbocount += Config::GetParI("VERBOSITY");
   errorcount += Config::GetParI("ERROR");
-  NUIS_LOG(FIT, "[ NUISANCE ]: Setting VERBOSITY=" << verbocount);
-  NUIS_LOG(FIT, "[ NUISANCE ]: Setting ERROR=" << errorcount);
-  // FitPar::log_verb = verbocount;
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   SETVERBOSITY(verbocount);
-  // ERR_VERB(errorcount);
+  SETTRACE(trace);
 
   // Minimizer Setup ========================================
   fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
@@ -297,10 +297,10 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
 
     // Print out
     NUIS_LOG(FIT, "Read sample info "
-                      << i << " : " << samplename << std::endl
-                      << "\t\t input -> " << samplefile << std::endl
-                      << "\t\t state -> " << sampletype << std::endl
-                      << "\t\t norm  -> " << samplenorm);
+	     << i << " : " << samplename << std::endl
+	     << "\t\t|-> input -> " << samplefile << std::endl
+	     << "\t\t|-> state -> " << sampletype << std::endl
+	     << "\t\t|-> norm  -> " << samplenorm);
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
@@ -1262,7 +1262,7 @@ void MinimizerRoutines::SetupCovariance() {
   if (fDecFree)
     delete fDecFree;
 
-  NUIS_LOG(FIT, "Building covariance matrix..");
+  NUIS_LOG(FIT, "Building covariance matrix...");
 
   int NFREE = 0;
   int NDIM = 0;

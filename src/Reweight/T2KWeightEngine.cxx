@@ -12,7 +12,10 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
     NUIS_ABORT(
         "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
   }
+  // No need to vomit the contents of the card file all over my screen
+  StopTalking();
   t2krew::T2KNeutUtils::SetCardFile(neut_card);
+  StartTalking();
 #endif
 
   // Setup the NEUT Reweight engien

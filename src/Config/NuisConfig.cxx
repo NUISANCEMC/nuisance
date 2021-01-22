@@ -87,9 +87,9 @@ void nuisconfig::LoadSettings(std::string const &filename,
                               std::string const &state) {
   // Open file and see if its XML
   std::cout << "[ NUISANCE ]: Trying to parse file : " << filename;
-  StopTalking();
+  // StopTalking();
   XMLDocPointer_t readdoc = fXML->ParseFile(filename.c_str(), 1000000);
-  StartTalking();
+  // StartTalking();
 
   // If it is parse it as a nice XML config file
   if (readdoc) {
