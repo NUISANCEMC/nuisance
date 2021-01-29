@@ -241,13 +241,13 @@ void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D *hist) {
   valhist->Reset();
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0, true);
 
-  NUIS_LOG(SAM, " -> Filling values from read hist.");
+  NUIS_LOG(DEB, " -> Filling values from read hist.");
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinContent(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
@@ -262,14 +262,14 @@ void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0);
 
   // Fill Errors
-  NUIS_LOG(SAM, " -> Filling errors from read hist.");
+  NUIS_LOG(DEB, " -> Filling errors from read hist.");
 
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinError(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetMapValuesFromText(std::string dataFile) {
