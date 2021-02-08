@@ -133,7 +133,7 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __T2KREW_ENABLED__
-  // Skip Non GENIE
+  // Skip Non-NEUT
   if (evt->fType != kNEUT){
       return 1.0;
   }
@@ -147,6 +147,11 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 #endif
+
+  if (!std::isnormal(rw_weight)){
+    NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
+    rw_weight = 1;
+  }
 
   // Return rw_weight
   return rw_weight;
