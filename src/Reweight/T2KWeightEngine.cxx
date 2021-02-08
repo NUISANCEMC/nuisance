@@ -150,7 +150,7 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
 
   if (!std::isnormal(rw_weight)){
     NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
-    rw_weight = 1;
+    rw_weight = 0;
   }
 
   // Return rw_weight
