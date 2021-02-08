@@ -39,14 +39,14 @@ ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu::ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu(nuiskey sam
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos(#theta*)");
+  fSettings.SetXTitle("p_{pr} (GeV)");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.0, 6.0);
   fSettings.DefineAllowedTargets("D,H");
 
   // CCQELike plot information
-  fSettings.SetTitle("ANL #nu_mu CC1n#pi^{+}");
+  fSettings.SetTitle("ANL #nu_mu CC1#pi^{+}1#pi^{-}");
   fSettings.SetDataInput(  FitPar::GetDataBase() + "/ANL/CC2pi/1pim1pip/CC2pi_1pim1pip_pProt_weight.csv" );
   fSettings.DefineAllowedSpecies("numu");
 

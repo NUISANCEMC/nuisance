@@ -32,7 +32,7 @@ ANL_CC1pi0_Evt_1DQ2_nu::ANL_CC1pi0_Evt_1DQ2_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.0, 1.5);
@@ -95,27 +95,3 @@ void ANL_CC1pi0_Evt_1DQ2_nu::FillEventVariables(FitEvent *event) {
 bool ANL_CC1pi0_Evt_1DQ2_nu::isSignal(FitEvent *event) {
   return SignalDef::isCC1pi3Prong(event, 14, 111, 2212, EnuMin, EnuMax);
 }
-
-/*
-void ANL_CC1pi0_Evt_1DQ2_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void ANL_CC1pi0_Evt_1DQ2_nu::ScaleEvents() {
-
- // PlotUtils::FluxUnfoldedScaling(fMCHist, GetFluxHistogram());
-  //PlotUtils::FluxUnfoldedScaling(fMCFine, GetFluxHistogram());
-
-  fMCHist->Scale(fScaleFactor);
-  fMCFine->Scale(fScaleFactor);
-
-  return;
-}
-*/

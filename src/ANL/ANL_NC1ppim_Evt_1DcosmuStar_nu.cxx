@@ -36,7 +36,7 @@ ANL_NC1ppim_Evt_1DcosmuStar_nu::ANL_NC1ppim_Evt_1DcosmuStar_nu(nuiskey samplekey
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos*_{#mu}");
+  fSettings.SetXTitle("cos#theta*_{#mu}");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.3, 1.5);

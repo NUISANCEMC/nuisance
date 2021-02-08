@@ -38,7 +38,7 @@ ANL_CC2pi_1pim1pip_Evt_1Dppip_nu::ANL_CC2pi_1pim1pip_Evt_1Dppip_nu(nuiskey sampl
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#pi+} (GeV)");
+  fSettings.SetXTitle("p_{#pi^{+}} (GeV)");
   fSettings.SetYTitle("Number of events (area norm.)");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.0, 6.0);
