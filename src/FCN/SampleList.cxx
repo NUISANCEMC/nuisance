@@ -887,7 +887,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
      return (new BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu")) {
      return (new BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu(samplekey));
-  } else if(!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
      return (new BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(samplekey));
     /*
       FNAL Samples
