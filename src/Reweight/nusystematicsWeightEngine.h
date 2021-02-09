@@ -1,6 +1,6 @@
 #ifndef nusystWeightEngine_SEEN
 #define nusystWeightEngine_SEEN
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
