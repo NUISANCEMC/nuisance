@@ -590,7 +590,7 @@ void JointFCN::ReconfigureUsingManager() {
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
-          NUIS_LOG(REC, curinput->GetName()
+          NUIS_LOG(REC, std::left << std::setw(40) << curinput->GetName()
                             << " : Processed " << std::setw(textwidth) << i
                             << " events. [M, W] = [" << std::setw(3)
                             << curevent->Mode << ", " << std::setw(5)
