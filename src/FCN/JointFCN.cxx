@@ -317,7 +317,7 @@ int JointFCN::GetNDOF() {
 double JointFCN::GetLikelihood() {
   //***************************************************
 
-  NUIS_LOG(MIN, std::left << std::setw(43) << "Getting likelihoods..."
+  NUIS_LOG(MIN, std::left << std::setw(53) << "Getting likelihoods..."
                           << " : "
                           << "-2logL");
 
@@ -334,7 +334,7 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+    NUIS_LOG(MIN, "-> " << std::left << std::setw(50) << exp->GetName() << " : "
                         << newlike << "/" << ndof);
 
     // Add Weight Scaling

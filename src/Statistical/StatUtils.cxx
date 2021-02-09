@@ -136,7 +136,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
                   "StatUtils::GetChi2FromCov!");
     NUIS_ABORT("data_hist has " << data->GetNbinsX() << " matrix has "
-                                << invcov->GetNcols() << "bins");
+                                << invcov->GetNcols() << " bins");
   }
 
   // Add MC Error to data if required
