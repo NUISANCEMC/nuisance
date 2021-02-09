@@ -33,7 +33,7 @@ SciBooNE_CCInc_XSec_1DEnu_nu::SciBooNE_CCInc_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/Nucleon)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.25, 8.0);
   fSettings.DefineAllowedTargets("C,H");
