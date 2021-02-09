@@ -38,7 +38,7 @@ MINERvA_CC0pi_XSec_1DQ2_Tgt_nu::MINERvA_CC0pi_XSec_1DQ2_Tgt_nu(nuiskey samplekey
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
-  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2}_{QE} (cm^{2}/GeV^{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
