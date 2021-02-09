@@ -75,9 +75,9 @@ MINERvA_CCDIS_XSec_1Dx_ratio::MINERvA_CCDIS_XSec_1Dx_ratio(nuiskey samplekey) {
   SetDataFromTextFile(fSettings.GetDataInput());
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
 
-  // Need to overlay the sqrt covariance diagonals (*1E-38) onto the data
-  // histogram
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+  // Need to overlay the sqrt covariance diagonals (*1E-38) onto the data hist
+  // False stops it complaining that the data hist errors aren't set yet 
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1, false);
 
   // Need to scale the covariance by 1E-76... this cancels with the factor of
   // 1E76 introduced in StatUtils::GetChi2FromCov Who says two wrongs don't make
