@@ -36,7 +36,7 @@ MINERvA_CC1pi0_XSec_1Dth_antinu::MINERvA_CC1pi0_XSec_1Dth_antinu(nuiskey samplek
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("#theta_{#pi} (degrees)");
-  fSettings.SetYTitle("d#sigma/d#theta_{#pi}) (cm^{2}/nucleon/degree)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#pi} (cm^{2}/nucleon/degree)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(1.5, 10.0);
   fSettings.DefineAllowedTargets("C,H");
