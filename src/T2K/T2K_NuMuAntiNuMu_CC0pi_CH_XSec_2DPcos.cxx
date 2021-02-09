@@ -172,7 +172,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
   else if(NuPDG==-14) histoLinearNuType = "AntiNuMuCC0pi";
   
   // Now Convert into 1D list
-  fDataHist = new TH1D(("LinarResult" + histoLinearNuType).c_str(),("LinarResult" + histoLinearNuType).c_str(),Nbins,0,Nbins);
+  fDataHist = new TH1D(("LinearResult" + histoLinearNuType).c_str(),("LinearResult" + histoLinearNuType).c_str(),Nbins,0,Nbins);
   for (int bin = 0; bin < Nbins; bin++){
     fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
   }

@@ -181,7 +181,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
     // Store hLinearResult into fDataHist
-    fDataHist = new TH1D("LinarResultOxygen","LinarResultOxygen",Nbins,0,Nbins);
+    fDataHist = new TH1D("LinearResultOxygen","LinearResultOxygen",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
       fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
     }
@@ -233,7 +233,7 @@ void T2K_NuMu_CC0pi_OC_XSec_2DPcos::SetHistograms(){
     fDecomp = StatUtils::GetDecomp(fFullCovar);
 
     // Now Convert into 1D histrogram
-    fDataHist = new TH1D("LinarResultCarbon","LinarResultCarbon",Nbins,0,Nbins);
+    fDataHist = new TH1D("LinearResultCarbon","LinearResultCarbon",Nbins,0,Nbins);
     for (int bin = 0; bin < Nbins; bin++){
       fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
     }
