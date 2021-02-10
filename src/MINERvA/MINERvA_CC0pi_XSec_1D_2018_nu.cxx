@@ -52,7 +52,7 @@ void MINERvA_CC0pi_XSec_1D_2018_nu::SetupDataSettings() {
   case (kPt):
     datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_ptmu_qelike.root";
     corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_ptmu_qelike.root";
-    titles = "MINERvA CC0#pi #nu_{#mu} p_{t};p_{t} (GeV);d#sigma/dP_{t} "
+    titles = "MINERvA CC0#pi #nu_{#mu} p_{t};p_{t} (GeV);d#sigma/dp_{t} "
              "(cm^{2}/GeV/nucleon)";
     distdescript = "MINERvA_CC0pi_XSec_1Dpt_nu sample";
     histname = "ptmu_cross_section";
@@ -60,7 +60,7 @@ void MINERvA_CC0pi_XSec_1D_2018_nu::SetupDataSettings() {
   case (kPz):
     datafile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_pzmu_qelike.root";
     corrfile = "MINERvA/CC0pi_1D/FixedBinWidthPub/cov_pzmu_qelike.root";
-    titles = "MINERvA CC0#pi #nu_{#mu} p_{z};p_{z} (GeV);d#sigma/dP_{z} "
+    titles = "MINERvA CC0#pi #nu_{#mu} p_{z};p_{z} (GeV);d#sigma/dp_{z} "
              "(cm^{2}/GeV/nucleon)";
     distdescript = "MINERvA_CC0pi_XSec_1Dpz_nu sample";
     histname = "pzmu_cross_section";

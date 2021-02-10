@@ -40,7 +40,7 @@ MINERvA_CC0pi_XSec_1DQ2_nu_proton::MINERvA_CC0pi_XSec_1DQ2_nu_proton(nuiskey sam
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("Q^{2}_{QE} (GeV^{2})");
-  fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ^{2}_{QE} (cm^{2}/GeV^{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
