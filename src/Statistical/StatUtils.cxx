@@ -1031,6 +1031,31 @@ TMatrixDSym *StatUtils::GetDecomp(TMatrixDSym *mat) {
     return new_mat;
   }
 
+  // Test if we can decompose the matrix before trying
+  // (this method doesn't try to do any transforms that will fail...)
+  TDecompSVD test = TDecompSVD(*new_mat);
+  double d1, d2;
+  test.Det(d1, d2);
+  if (d1*TMath::Power(2.,d2) <= 0){
+    NUIS_ERR(WRN, "Cannot decompose the covariance matrix");
+
+    // This is dumb, but just flip the diagonals and remove everything else
+    for (int i = 0; i < nrows; ++i){
+      for(int j = 0; j <nrows; ++j){
+	if (i != j) { 
+	  (*new_mat)(i, j) = 0;
+	} else {
+	  if ((*new_mat)(i, j) > 0.0)
+	    (*new_mat)(i, j) = sqrt((*new_mat)(i, j));
+	  else
+	    (*new_mat)(i, j) = 0.0;
+	}
+      }
+    }
+    return new_mat;
+  }
+  
+  // Okay, try to decompose...
   TDecompChol LU = TDecompChol(*new_mat);
   LU.Decompose();
   delete new_mat;
