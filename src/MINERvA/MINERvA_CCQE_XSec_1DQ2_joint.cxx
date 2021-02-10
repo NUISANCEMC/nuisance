@@ -119,8 +119,6 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
   fSettings.SetCovarInput(basedir + covarfilename);
   fSettings.DefineAllowedSpecies("numu,numub");
 
-  std::cout << "Finalising sample settings for joint fit = " << fIsJoint
-            << std::endl;
   FinaliseSampleSettings();
 
   // Get parsed input files
