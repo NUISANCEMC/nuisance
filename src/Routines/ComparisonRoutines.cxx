@@ -596,7 +596,7 @@ void ComparisonRoutines::PrintState() {
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
   NUIS_LOG(FIT,
-           std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+           std::left << std::setw(56) << "Likelihood for JointFCN: " << like);
   NUIS_LOG(FIT, "------------");
 }
 
