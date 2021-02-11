@@ -151,6 +151,18 @@ std::string SampleSettings::GetErrorInput() {
   return GetS("error");
 };
 
+std::string SampleSettings::GetXTitle() {
+  return GetS("xtitle");
+}
+
+std::string SampleSettings::GetYTitle() {
+  return GetS("ytitle");
+}
+
+std::string SampleSettings::GetZTitle() {
+  return GetS("ztitle");
+}
+
 std::string SampleSettings::PlotTitles() {
   std::string returnstring = ";";
   if (!(GetS("xtitle").empty())) returnstring += GetS("xtitle")+";";
