@@ -145,10 +145,7 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
   if (isFluxFix) SetCovarFromTextFile(fSettings.GetCovarInput());
   else SetCorrelationFromTextFile(fSettings.GetCovarInput());
 
-  if (isFluxFix){
-    ScaleData(1E-38);
-    // ScaleCovar(1E-76);
-  }
+  if (isFluxFix) ScaleData(1E-38);
 
   // Setup Sub classes
   nuiskey antinukey = Config::CreateKey("sample");

@@ -117,11 +117,7 @@ MINERvA_CCQE_XSec_1DQ2_nu::MINERvA_CCQE_XSec_1DQ2_nu(nuiskey samplekey) {
   if (isFluxFix) SetCovarFromTextFile(fSettings.GetCovarInput());
   else SetCorrelationFromTextFile(fSettings.GetCovarInput());
 
-  if (isFluxFix){
-    ScaleData(1E-38);
-    // ScaleCovar(1E-76);
-  }
-
+  if (isFluxFix) ScaleData(1E-38);
 
   if (fSaveExtra) {
     fExtra_Eav =
