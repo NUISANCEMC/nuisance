@@ -38,6 +38,9 @@ static double costheta_binning[][7] = { { 0.84, 0.94, 1.       },
 T2K_CC0pi_XSec_H2O_2DPcos_anu::T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey) {
 //********************************************************************
 
+  // Don't use the FINE histogram
+  fSaveFine = false;
+
   // Sample overview ---------------------------------------------------
   std::string descrip = "T2K_CC0pi_XSec_H2O_2DPcos_anu. \n"
                         "Target: H2O \n"
@@ -47,7 +50,7 @@ T2K_CC0pi_XSec_H2O_2DPcos_anu::T2K_CC0pi_XSec_H2O_2DPcos_anu(nuiskey samplekey) 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos#theta_{#mu}-p_{#mu}");
+  fSettings.SetXTitle("cos#theta_{#mu}-p_{#mu} (GeV)");
   fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
@@ -145,6 +148,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
 
   // Read in 1D Data Histograms
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/AntiNuMuH2O/AntiNuMuOnH2O_unreg.root").c_str(),"READ");
+  fPlotTitles = fSettings.GetFullTitles();
 
   // Read in 1D Data
   fDataHist = (TH1D*) fInputFile->Get("xsecDataRelease");
@@ -169,7 +173,12 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
   // Read in 2D Data Slices and Make MC Slices
   int bincount = 0;
   for (uint i = 0; i < nmombins; ++i) {
-    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),ncosbins[i],costheta_binning[i]));
+    fDataHist_Slices.push_back(new TH1D(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),
+					Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_data_Slice%u",i),
+					ncosbins[i],costheta_binning[i]));
+    fDataHist_Slices[i]->GetXaxis()->SetTitle("cos#theta_{#mu}");
+    fDataHist_Slices[i]->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
+
     for (int j = 0; j < ncosbins[i]; ++j) {
       fDataHist->SetBinError(bincount+1,sqrt((*fFullCovar)(bincount,bincount))*1E-38);
       fDataHist_Slices[i]->SetBinContent(j+1, fDataHist->GetBinContent(bincount+1));
@@ -180,7 +189,7 @@ void T2K_CC0pi_XSec_H2O_2DPcos_anu::SetHistograms(){
 
     fMCHist_Slices.push_back((TH1D*) fDataHist_Slices[i]->Clone());
     fMCHist_Slices[i]->SetNameTitle(Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%u",i),
-                                      (Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%u",i)));
+				    (Form("T2K_CC0pi_XSec_H2O_2DPcos_anu_MC_Slice%u",i)));
 
     SetAutoProcessTH1(fDataHist_Slices[i],kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);
