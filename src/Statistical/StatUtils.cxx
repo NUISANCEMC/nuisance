@@ -1440,6 +1440,8 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
 
   // Make new 1D Hist
   TH1D *newhist = new TH1D(name1D.c_str(), name1D.c_str(), Nbins, 0, Nbins);
+  newhist->GetYaxis()->SetTitle(hist->GetZaxis()->GetTitle());
+  newhist->GetXaxis()->SetTitle(Form("%s-%s",hist->GetXaxis()->GetTitle(),hist->GetYaxis()->GetTitle()));
 
   // map bin contents
   for (int i = 0; i < map->GetNbinsX(); i++) {
