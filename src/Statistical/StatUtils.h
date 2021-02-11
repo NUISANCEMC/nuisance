@@ -190,6 +190,9 @@ TMatrixDSym *ApplyMatrixMasking(TMatrixDSym *mat, TH2D *data, TH2I *mask,
   Covariance Handling Functions
 */
 
+//! Check if a matrix can be inverted with cholesky method
+bool IsMatrixWellBehaved(TMatrixDSym* mat);
+
 //! Return inverted matrix of TMatrixDSym
 TMatrixDSym *GetInvert(TMatrixDSym *mat, bool rescale = false);
 
