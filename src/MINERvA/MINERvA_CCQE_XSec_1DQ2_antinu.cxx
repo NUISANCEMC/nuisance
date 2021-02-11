@@ -116,7 +116,15 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());
-  SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  // Ergh, the pain of supporting many slightly different versions of the same analysis
+  if (isFluxFix) SetCovarFromTextFile(fSettings.GetCovarInput());
+  else SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  if (isFluxFix){
+    ScaleData(1E-38);
+    // ScaleCovar(1E-76);
+  }
 
   if (fSaveExtra) {
     fExtra_Eav =

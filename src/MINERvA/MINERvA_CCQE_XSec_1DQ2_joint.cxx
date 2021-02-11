@@ -56,6 +56,12 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
   std::string neutrinoclass = "";
   std::string antineutrinoclass = "";
 
+  // Add some warnings
+  if (!isFluxFix) {
+    NUIS_ERR(WRN, "The 2013 CCQE results from MINERvA have been updated to account for a flux recalculation...");
+    NUIS_ERR(WRN, "Unless you're sure you want the old flux, be warned!");
+  }
+
   // Full Phase Space
   if (fullphasespace) {
 
@@ -81,8 +87,8 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
         datafilename = "Q2QE_joint_data.txt";
         covarfilename = "Q2QE_joint_covar.txt";
       }
-      neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu";
-      antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu";
+      neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_oldflux";
+      antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_oldflux";
     }
 
     // Restricted Phase Space
@@ -110,8 +116,8 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
         datafilename = "20deg_Q2QE_joint_data.txt";
         covarfilename = "20deg_Q2QE_joint_covar.txt";
       }
-      neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg";
-      antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_20deg";
+      neutrinoclass = "MINERvA_CCQE_XSec_1DQ2_nu_20deg_oldflux";
+      antineutrinoclass = "MINERvA_CCQE_XSec_1DQ2_antinu_20deg_oldflux";
     }
   }
 
@@ -134,10 +140,14 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());
-  if (fullphasespace and isFluxFix)
-    SetCovarFromTextFile(fSettings.GetCovarInput());
-  else {
-    SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  // Ergh, the pain of supporting many slightly different versions of the same analysis
+  if (isFluxFix) SetCovarFromTextFile(fSettings.GetCovarInput());
+  else SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  if (isFluxFix){
+    ScaleData(1E-38);
+    // ScaleCovar(1E-76);
   }
 
   // Setup Sub classes
@@ -155,8 +165,16 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
   // Add to chain for processing
   this->fSubChain.clear();
-  this->fSubChain.push_back(MIN_anu);
-  this->fSubChain.push_back(MIN_nu);
+
+  // Supremely confusingly, the original MINERvA results are given numubar--numu
+  // but the updates are numu--numubar. Because we support both, we need this hideousness
+  if (isFluxFix){
+    this->fSubChain.push_back(MIN_nu);
+    this->fSubChain.push_back(MIN_anu);
+  } else {
+    this->fSubChain.push_back(MIN_anu);
+    this->fSubChain.push_back(MIN_nu);
+  }
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
