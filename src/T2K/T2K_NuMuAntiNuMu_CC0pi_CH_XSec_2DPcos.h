@@ -51,10 +51,8 @@ public:
  private:
 
   TFile* fInputFile;
-  std::vector<TH1D*> fMCHistNuMu_Slices;
-  std::vector<TH1D*> fDataHistNuMu_Slices;
-  std::vector<TH1D*> fMCHistAntiNuMu_Slices;
-  std::vector<TH1D*> fDataHistAntiNuMu_Slices;
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
 
   double pmu, CosThetaMu;
   int NuPDG;
