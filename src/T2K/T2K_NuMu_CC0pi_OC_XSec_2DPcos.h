@@ -52,16 +52,13 @@ public:
 
   TFile* fInputFile;
   TFile* fInputFileCov;
-  std::vector<TH1D*> fMCHistNuMuO_Slices;
-  std::vector<TH1D*> fDataHistNuMuO_Slices;
-  std::vector<TH1D*> fMCHistNuMuC_Slices;
-  std::vector<TH1D*> fDataHistNuMuC_Slices;
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
 
   double pmu, CosThetaMu;
   std::string Target;
   
   void FillMCSlice(double x, double y, double w);
-
   
 };
   
