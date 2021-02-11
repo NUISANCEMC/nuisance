@@ -19,8 +19,8 @@ T2K_CC1pip_H2O_XSec_1Dppi_nu::T2K_CC1pip_H2O_XSec_1Dppi_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_H2O_XSec_1Dppi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#pi^{+}} (GeV/c)");
-  fSettings.SetYTitle("d#sigma/dp_{#pi^{+}} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetXTitle("p_{#pi^{+}} (GeV)");
+  fSettings.SetYTitle("d#sigma/dp_{#pi^{+}} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");

@@ -19,7 +19,7 @@ T2K_CC1pip_CH_XSec_1DQ2_nu::T2K_CC1pip_CH_XSec_1DQ2_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1DQ2_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2} (GeV/c)^{2}");
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);

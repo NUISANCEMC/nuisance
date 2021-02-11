@@ -16,9 +16,8 @@ T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle(" ");
-  fSettings.SetYTitle(
-      "d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -46,6 +45,7 @@ T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
@@ -58,13 +58,13 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   int nbins = 0;
   for (int i = 0; i < nslices; ++i) {
     TH1D *slice = (TH1D *)data->Get(Form("%s_%i", dataname.c_str(), i));
-    slice = (TH1D *)slice->Clone((fName + Form("_data_slice%i", i)).c_str());
+    slice = (TH1D *)slice->Clone((fName + Form("_data_Slice%i", i)).c_str());
     slice->Scale(1E-38);
-    slice->GetXaxis()->SetTitle(fSettings.GetS("xtitle").c_str());
-    slice->GetYaxis()->SetTitle(fSettings.GetS("ytitle").c_str());
+    slice->GetXaxis()->SetTitle("p_{#mu}");
+    slice->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
     fDataHist_Slices.push_back(slice);
     fMCHist_Slices.push_back(
-        (TH1D *)slice->Clone((fName + Form("_mc_slice%i", i)).c_str()));
+        (TH1D *)slice->Clone((fName + Form("_MC_Slice%i", i)).c_str()));
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);
     fMCHist_Slices[i]->Reset();
@@ -135,8 +135,6 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
     count1++;
   }
 
-  // Now reorganise the rows
-
   delete temp;
 };
 
@@ -182,7 +180,6 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::ConvertEventRates() {
   int bincount = 1;
   for (int i = 0; i < nslices; i++) {
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX() - 1; j++) {
-    //for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++) {
       fMCHist->SetBinContent(bincount, fMCHist_Slices[i]->GetBinContent(j + 1));
       bincount++;
     }
