@@ -1434,12 +1434,12 @@ void Measurement2D::Write(std::string drawOpt) {
 
   if (fIsChi2 && !fIsDiag) {
     fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
-    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->GetZaxis()->SetTitle("#Delta#chi^{2}");
     fResidualHist->Reset();
 
     fChi2LessBinHist =
         (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
-    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->GetZaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
     fIsWriting = true;
