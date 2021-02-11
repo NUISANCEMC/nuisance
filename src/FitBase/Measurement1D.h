@@ -642,7 +642,7 @@ protected:
   bool fIsChi2;       ///< Flag : using Chi2 over LL methods
   bool fIsSmeared;    ///< Flag : Apply smearing?
   bool fIsWriting;
-
+  bool fSaveFine;
 
   /// OLD STUFF TO REMOVE
   TH1D* fMCHist_PDG[61]; ///< REMOVE OLD MC PDG Plot

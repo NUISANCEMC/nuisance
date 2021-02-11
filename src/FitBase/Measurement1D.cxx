@@ -70,6 +70,7 @@ Measurement1D::Measurement1D(void) {
   fIsDifXSec = false;
   fIsEnu1D = false;
   fIsWriting = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -1359,7 +1360,7 @@ void Measurement1D::Write(std::string drawOpt) {
   }
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
