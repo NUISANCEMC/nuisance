@@ -165,11 +165,11 @@ std::string SampleSettings::GetZTitle() {
 
 std::string SampleSettings::PlotTitles() {
   std::string returnstring = ";";
-  if (!(GetS("xtitle").empty())) returnstring += GetS("xtitle")+";";
-  if (!(GetS("ytitle").empty())) returnstring += GetS("ytitle")+";";
-  if (!(GetS("ztitle").empty())) returnstring += GetS("ztitle")+";";
-  // Cut out the last ; symbol
-  returnstring = returnstring.substr(0, returnstring.find_last_of(";"));
+  if (!(GetS("xtitle").empty())) returnstring += GetS("xtitle");
+  returnstring+=";";
+  if (!(GetS("ytitle").empty())) returnstring += GetS("ytitle");
+  returnstring+=";";
+  if (!(GetS("ztitle").empty())) returnstring += GetS("ztitle");
   return returnstring;
 };
 
