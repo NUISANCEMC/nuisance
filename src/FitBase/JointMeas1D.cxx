@@ -64,6 +64,7 @@ JointMeas1D::JointMeas1D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -1320,7 +1321,7 @@ void JointMeas1D::Write(std::string drawOpt) {
   GetMCHistogram()->Write();
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
