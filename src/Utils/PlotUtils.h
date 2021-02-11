@@ -134,9 +134,6 @@ void DeleteNeutModeArray(TH1* neutarray[]);
   Handling Functions
 */
 
-//! Fill a mask histogram from a text file
-TH2D* SetMaskHist(std::string type, TH2D* data);
-
 //! Divide by the flux histogram for Enu Histograms
 void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
 

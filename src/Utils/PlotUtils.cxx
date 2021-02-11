@@ -21,38 +21,6 @@
 #include "FitEvent.h"
 #include "StatUtils.h"
 
-// MOVE TO MB UTILS!
-// This function is intended to be modified to enforce a consistent masking for
-// all models.
-TH2D *PlotUtils::SetMaskHist(std::string type, TH2D *data) {
-  TH2D *fMaskHist = (TH2D *)data->Clone("fMaskHist");
-
-  for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin) {
-    for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin) {
-      if (data->GetBinContent(xBin + 1, yBin + 1) == 0)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0);
-      else
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0.5);
-
-      if (!type.compare("MB_numu_2D")) {
-        if (yBin == 19 && xBin < 8)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      } else {
-        if (yBin == 19 && xBin < 11)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      }
-      if (yBin == 18 && xBin < 3)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 17 && xBin < 2)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 16 && xBin < 1)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-    }
-  }
-
-  return fMaskHist;
-};
-
 // MOVE TO GENERAL UTILS?
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring) {
   TIter nextkey(inFile->GetListOfKeys());
