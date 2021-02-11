@@ -25,6 +25,7 @@ Measurement2D::Measurement2D(void) {
   //********************************************************************
 
   covar = NULL;
+  fInvert = NULL;
   fDecomp = NULL;
   fFullCovar = NULL;
 
@@ -51,42 +52,9 @@ Measurement2D::Measurement2D(void) {
       "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/FITPROJX/"
       "FITPROJY";
 
-  fIsFix = false;
-  fIsShape = false;
-  fIsFree = false;
-
-  fIsDiag = false;
-  fIsFull = false;
-
-  fAddNormPen = false;
-  fIsMask = false;
-  fIsChi2SVD = false;
-
-  fIsRawEvents = false;
-  fIsDifXSec = false;
-  fIsEnu = false;
-
   // XSec Scalings
   fScaleFactor = -1.0;
   fCurrentNorm = 1.0;
-
-  // Histograms
-  fDataHist = NULL;
-  fDataTrue = NULL;
-
-  fMCHist = NULL;
-  fMCFine = NULL;
-  fMCWeighted = NULL;
-
-  fMaskHist = NULL;
-
-  // Covar
-  covar = NULL;
-  fFullCovar = NULL;
-
-  fCovar = NULL;
-  fInvert = NULL;
-  fDecomp = NULL;
 
   // Fake Data
   fFakeDataInput = "";
