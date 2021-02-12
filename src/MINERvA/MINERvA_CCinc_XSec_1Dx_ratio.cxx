@@ -96,6 +96,7 @@ MINERvA_CCinc_XSec_1Dx_ratio::MINERvA_CCinc_XSec_1Dx_ratio(nuiskey samplekey) {
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 //********************************************************************
@@ -120,24 +121,7 @@ void MINERvA_CCinc_XSec_1Dx_ratio::MakePlots() {
   // Now make the ratio histogram
   TH1D *NUM_MC = (TH1D *)this->NUM->GetMCList().at(0)->Clone();
   TH1D *DEN_MC = (TH1D *)this->DEN->GetMCList().at(0)->Clone();
-
-  for (int i = 0; i < nBins; ++i) {
-    double binVal = 0;
-    double binErr = 0;
-
-    if (DEN_MC->GetBinContent(i + 1) && NUM_MC->GetBinContent(i + 1)) {
-      binVal = NUM_MC->GetBinContent(i + 1) / DEN_MC->GetBinContent(i + 1);
-      double fractErrNUM =
-          NUM_MC->GetBinError(i + 1) / NUM_MC->GetBinContent(i + 1);
-      double fractErrDEN =
-          DEN_MC->GetBinError(i + 1) / DEN_MC->GetBinContent(i + 1);
-      binErr =
-          binVal * sqrt(fractErrNUM * fractErrNUM + fractErrDEN * fractErrDEN);
-    }
-
-    this->fMCHist->SetBinContent(i + 1, binVal);
-    this->fMCHist->SetBinError(i + 1, binErr);
-  }
+  this->fMCHist = PlotUtils::GetRatioPlot(NUM_MC, DEN_MC, fMCHist);
 
   return;
 }
