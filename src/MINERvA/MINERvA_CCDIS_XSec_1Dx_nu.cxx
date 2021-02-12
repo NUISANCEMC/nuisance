@@ -109,10 +109,3 @@ bool MINERvA_CCDIS_XSec_1Dx_nu::isSignal(FitEvent *event) {
 
   return true;
 };
-
-//********************************************************************
-void MINERvA_CCDIS_XSec_1Dx_nu::ScaleEvents() {
-  //********************************************************************
-
-  Measurement1D::ScaleEvents();
-}

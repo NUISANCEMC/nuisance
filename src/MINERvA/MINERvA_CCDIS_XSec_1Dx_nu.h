@@ -35,8 +35,6 @@ public:
 
   bool isSignal(FitEvent *event);
 
-  void ScaleEvents();
-
   double GetChi2(){return 0.0;};
 
  private:
