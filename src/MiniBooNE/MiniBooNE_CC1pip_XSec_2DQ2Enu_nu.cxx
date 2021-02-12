@@ -33,9 +33,9 @@ MiniBooNE_CC1pip_XSec_2DQ2Enu_nu::MiniBooNE_CC1pip_XSec_2DQ2Enu_nu(nuiskey sampl
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("E_{#nu} (MeV); Q^{2} (MeV^{2}/c^{4})");
-  fSettings.SetYTitle("Q^{2} (MeV^{2}/c^{4})");
-  fSettings.SetZTitle(" d#sigma(E_{#nu})/dQ^{2} (cm^{2}/(MeV^{2}/c^{4})/CH_{2})");
+  fSettings.SetXTitle("E_{#nu} (MeV)");
+  fSettings.SetYTitle("Q^{2} (MeV^{2})");
+  fSettings.SetZTitle("d#sigma(E_{#nu})/dQ^{2} (cm^{2}/MeV^{2}/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 3.0);
   fSettings.SetNormError(0.107);

@@ -28,48 +28,6 @@ MiniBooNE_NCpi0_XSec_1Dppi0_nu::MiniBooNE_NCpi0_XSec_1Dppi0_nu(
     isComb = true;
   isComb = false;
 
-  // Needs Updating
-
-  // // Set pointer to the reweighting engine
-  // rw_engine = rw;
-  // this->fBeamDistance = 0.541;
-
-  // // Define the energy region
-  // this->EnuMin = 0.;
-  // this->EnuMax = 4.;
-
-  // // In future read most of these from a card file
-  // this->inFile = inputfile;
-  // this->fName = "MB_NCpi0_XSec_numu_1Dppi0";
-  // this->fPlotTitles = "; p_{#pi^{0}} (GeV/c); d#sigma/dp_{#pi^{0}}
-  // (cm^{2}/(GeV/c)/nucleon)";
-  // this->SetCovarMatrix(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsecerrormatrix.txt",
-  // 11);
-  // this->SetDataValues(FitPar::GetDataBase()+"/MiniBooNE/nc1pi0/nuppi0xsec_edit.txt");
-  // this->fNormError=0.107;
-
-  // if (isComb) {
-  //   fName += "_comb";
-  //   this->fNDataPointsX = 11;
-  //   this->fXBins = anuBins;
-  // }
-
-  // this->fMCHist = new TH1D((this->fName+"_MC").c_str(),
-  // (this->fName+this->fPlotTitles).c_str(), this->fNDataPointsX-1,
-  // this->fXBins); this->fMCFine = new TH1D((this->fName+"_MC_FINE").c_str(),
-  // (this->fName+this->fPlotTitles).c_str(), (this->fNDataPointsX - 1)*10,
-  // this->fXBins[0], this->fXBins[this->fNDataPointsX -1]);
-
-  // this->ReadEventFile();
-
-  //  // Different generators require slightly different rescaling factors.
-  // if      (this->fEventType == 0) this->fScaleFactor =
-  // (GetEventHistogram()->Integral("width")*1E-38/(fNEvents+0.))*14.08/14.0/this->TotalIntegratedFlux();
-  // // NEUT else if (this->fEventType == 1) this->fScaleFactor =
-  // (GetEventHistogram()->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./GetFluxHistogram()->Integral();
-  // // NUWRO else if (this->fEventType == 5) this->fScaleFactor =
-  // (GetEventHistogram()->Integral()*1E-38/(fNEvents+0.))*14.08*6.0/14./GetFluxHistogram()->Integral();
-  // // GENIE
 };
 
 void MiniBooNE_NCpi0_XSec_1Dppi0_nu::FillEventVariables(FitEvent *event) {
