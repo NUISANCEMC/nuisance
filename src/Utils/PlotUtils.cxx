@@ -627,22 +627,27 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
   return tempPlot;
 };
 
-TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2) {
-  // make copy of first hist
-  TH1D *new_hist = (TH1D *)hist1->Clone();
+TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2, TH1D *new_hist) {
+
+  // If the hist to save into doesn't exist, make copy of first hist
+  if (!new_hist) new_hist = (TH1D *)hist1->Clone();
 
   // Do bins and errors ourselves as scales can go awkward
   for (int i = 0; i < new_hist->GetNbinsX(); i++) {
-    if (hist2->GetBinContent(i + 1) == 0.0) {
-      new_hist->SetBinContent(i + 1, 0.0);
+    
+    double binVal = 0;
+    double binErr = 0;
+    
+    if (hist2->GetBinContent(i+1) && hist1->GetBinContent(i+1)) {
+      binVal = hist1->GetBinContent(i+1)/hist2->GetBinContent(i+1);
+      double fractErr1 = hist1->GetBinError(i+1)/hist1->GetBinContent(i+1);
+      double fractErr2 = hist2->GetBinError(i+1)/hist2->GetBinContent(i+1);
+      binErr = binVal * sqrt(fractErr1*fractErr1 + fractErr2*fractErr2);
     }
 
-    new_hist->SetBinContent(i + 1, hist1->GetBinContent(i + 1) /
-                                       hist2->GetBinContent(i + 1));
-    new_hist->SetBinError(i + 1, hist1->GetBinError(i + 1) /
-                                     hist2->GetBinContent(i + 1));
+    new_hist->SetBinContent(i+1, binVal);
+    new_hist->SetBinError(i+1, binErr);
   }
-
   return new_hist;
 };
 

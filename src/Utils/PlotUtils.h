@@ -221,7 +221,7 @@ double GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask = NULL);
 */
 
 //! Create new ratio plot. hist3 = hist1/hist2
-TH1D* GetRatioPlot(TH1D* hist1, TH1D* hist2);
+TH1D* GetRatioPlot(TH1D* hist1, TH1D* hist2, TH1D* new_hist=NULL);
 
 //! Create new plot of hist2 normalised to hist1. hist2 = hist1 *
 //! (Integral(hist1)/Integral(hist2))
