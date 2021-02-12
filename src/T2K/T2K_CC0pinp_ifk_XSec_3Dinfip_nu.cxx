@@ -33,13 +33,14 @@ T2K_CC0pinp_ifk_XSec_3Dinfip_nu::T2K_CC0pinp_ifk_XSec_3Dinfip_nu(
                         "Signal: CC0piNp (N>=1) with p_p>450MeV and cthp>0.4 \n"
                         "https://doi.org/10.1103/PhysRevD.98.032003 \n";
 
+  // This sample corresponds to the |#Delta p| variable
+  // #Delta p = |p_{p}^{measured} - p_{p}^{inferred}|
+
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("|#Delta p|");
-  fSettings.SetYTitle("p_#mu");
-  fSettings.SetZTitle("cos#theta_{#mu}");
-  // fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetXTitle("|#Delta #vec{p}|-p_{#mu}-cos#theta_{#mu}");
+  fSettings.SetYTitle("d^{2}#sigma/d|#Delta #vec{p}|dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV^{2})");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
@@ -59,8 +60,6 @@ T2K_CC0pinp_ifk_XSec_3Dinfip_nu::T2K_CC0pinp_ifk_XSec_3Dinfip_nu(
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = ((GetEventHistogram()->Integral("width") / (fNEvents + 0.)) /
                   (TotalIntegratedFlux()));
-  // fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 10
-  // / (TotalIntegratedFlux()));
 
   fSettings.SetDataInput(FitPar::GetDataBase() +
                          "/T2K/CC0pi/STV/infkResults_origBin.root;result_tp");
@@ -69,14 +68,13 @@ T2K_CC0pinp_ifk_XSec_3Dinfip_nu::T2K_CC0pinp_ifk_XSec_3Dinfip_nu(
   fSettings.SetCovarInput(FitPar::GetDataBase() +
                           "/T2K/CC0pi/STV/infkResults_origBin.root;cor_tp");
   SetCorrelationFromRootFile(fSettings.GetCovarInput());
-  // SetCovarFromRootFile(FitPar::GetDataBase() +
-  // "/T2K/CC0pi/infkResults_origBin.root", "cov_tp" );
 
   // Setup Histograms
   SetHistograms();
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 bool T2K_CC0pinp_ifk_XSec_3Dinfip_nu::isSignal(FitEvent *event) {
@@ -93,19 +91,12 @@ void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::FillEventVariables(FitEvent *event) {
   TLorentzVector Pp = event->GetHMFSParticle(2212)->fP;
 
   double pmu = Pmu.Vect().Mag() / 1000.;
-  // double pp = Pp.Vect().Mag()/1000.;
   double CosThetaMu = cos(Pnu.Vect().Angle(Pmu.Vect()));
   TVector3 tp_inf = FitUtils::tppInfK(Pmu, CosThetaMu, 25, true);
 
   TVector3 Pp_mev(Pp.X() / 1000, Pp.Y() / 1000, Pp.Z() / 1000);
 
   TVector3 delta_tp = tp_inf - Pp_mev;
-
-  // std::cout << "Proton 3 mom is: " << std::endl;
-  //(Pp.Vect()).Print("all");
-  // std::cout << "Inferred Proton 3 mom is: " << std::endl;
-  // tp_inf.Print("all");
-  // std::cout << " " << std::endl;
 
   fXVar = delta_tp.Mag();
   fYVar = pmu;
@@ -181,33 +172,28 @@ void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::FillMCSlice(double x, double y, double z,
 
 void T2K_CC0pinp_ifk_XSec_3Dinfip_nu::SetHistograms() {
 
+  std::string name = fSettings.GetName();
+
   // Read in 1D Data Histograms
   fInputFile = new TFile(
       (FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root")
-          .c_str(),
-      "READ");
-  // fInputFile->ls();
-
-  // Read in 1D Data
-  fDataHist = (TH1D *)fInputFile->Get("result_tp");
-  fDataHist->SetNameTitle("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data",
-                          "T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data");
-  SetAutoProcessTH1(fDataHist, kCMD_Write);
+          .c_str(), "READ");
 
   // Read in 2D Data Slices and Make MC Slices
   for (int i = 0; i < 7; i++) { // both y and z slices
     // Get Data Histogram
-    // fInputFile->ls();
     fDataHist_Slices.push_back(
         (TH1D *)fInputFile->Get(Form("resultBin%i_tp", i))->Clone());
     fDataHist_Slices[i]->SetNameTitle(
-        Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data_Slice%i", i),
-        (Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_data_Slice%i", i)));
+	Form("%s_data_Slice%i", name.c_str(), i),
+        Form("%s_data_Slice%i;|#Delta #vec{p}| (GeV);%s", 
+	     name.c_str(), i, fSettings.GetYTitle().c_str()));
     // Make MC Clones
     fMCHist_Slices.push_back((TH1D *)fDataHist_Slices[i]->Clone());
     fMCHist_Slices[i]->SetNameTitle(
-        Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_MC_Slice%i", i),
-        (Form("T2K_CC0pinp_ifk_XSec_3Dinfip_nu_MC_Slice%i", i)));
+	Form("%s_MC_Slice%i", name.c_str(), i),
+        Form("%s_MC_Slice%i;|#Delta #vec{p}| (GeV);%s", 
+	     name.c_str(), i, fSettings.GetYTitle().c_str()));
 
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);
