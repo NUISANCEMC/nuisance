@@ -40,6 +40,9 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(
   fSettings.SetEnuRange(0.5, 2.0);
   fSettings.DefineAllowedTargets("C,H");
 
+  // Because this dataset seems to have a broken covariance, add a strong warning
+  NUIS_ERR(WRN, "Sample " << fSettings.GetName() << " is known to give nonsensical chi-square values!");
+
   // CCQELike plot information
   fSettings.SetTitle("MiniBooNE_CC1pi0_XSec_1DEnu_nu");
   fSettings.SetDataInput(FitPar::GetDataBase() +
