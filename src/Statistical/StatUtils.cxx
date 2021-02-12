@@ -1405,12 +1405,8 @@ TH2I *StatUtils::GenerateMap(TH2D *hist) {
 
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     for (int j = 0; j < hist->GetNbinsY(); j++) {
-      if (hist->GetBinContent(i + 1, j + 1) > 0) {
         map->SetBinContent(i + 1, j + 1, index);
         index++;
-      } else {
-        map->SetBinContent(i + 1, j + 1, 0);
-      }
     }
   }
 
