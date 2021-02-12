@@ -175,6 +175,8 @@ MINERvA_CCQE_XSec_1DQ2_joint::MINERvA_CCQE_XSec_1DQ2_joint(nuiskey samplekey) {
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+
+  fSaveFine = false;
 };
 
 //********************************************************************
