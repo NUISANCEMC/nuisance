@@ -27,7 +27,7 @@
 // ROOT includes
 #include <TLorentzVector.h>
 
-// ExtFit includes
+// NUISANCE includes
 #include "FitEvent.h"
 
 namespace SignalDef {

@@ -32,7 +32,7 @@
 void printInputCommands(){
     //*******************************
     /*
-    std::cout<<"ExtFit_splines.exe -c cardFile -f [spline_routines] [-q
+    std::cout<<"nuissplines -c cardFile -f [spline_routines] [-q
     config_name=config_val] \n"; std::cout<<std::endl;
     std::cout<<"Arguments:"<<std::endl;
     std::cout<<"     -c cardFile:   Path to card file that defines fit samples,
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  NUIS_LOG(FIT, "Starting ExtFit_splines.exe");
+  NUIS_LOG(FIT, "Starting nuissplines");
 
   // Make minimizer class and run fit
   SplineRoutines *splRt = new SplineRoutines(argc, argv);

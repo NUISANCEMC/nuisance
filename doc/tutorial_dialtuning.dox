@@ -92,7 +92,7 @@ Alternative parameter types can be supplied for each of the different generators
 Once you have written the fit card it should be as simple as running the minimizer again.
 
 \code
-ExtFit_minimizer.exe -c fittertutorial2.card -o fittertutorial2.root
+nuismin -c fittertutorial2.card -o fittertutorial2.root
 \endcode
 
 The finished fit should produce the following output table for each parameter involved.
