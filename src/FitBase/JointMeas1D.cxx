@@ -230,7 +230,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
@@ -294,8 +293,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (!fRW)
     fRW = FitBase::GetRW();
-
-  NUIS_LOG(SAM, "Finalised Sample Settings");
 }
 
 //********************************************************************
