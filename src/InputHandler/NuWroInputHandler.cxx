@@ -217,7 +217,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
 
     int npions = event1_nof(e, pion_pdg) + event1_nof(e, pion_plus_pdg) +
       event1_nof(e, pion_minus_pdg);
-    int nkaons= event1_nof(e, kaon_pdg) + event1_nof(e, kaon_pdg);
+    int nkaons= event1_nof(e, kaon_pdg) + event1_nof(e, kaon_plus_pdg);
 
     // Multipion?
     if (npions > 1 || npions == 0) {
@@ -438,7 +438,7 @@ void NuWroInputHandler::AddNuWroParticle(FitEvent *evt, particle &p, int state,
 }
 
 void NuWroInputHandler::Print(){
-  NUIS_LOG(EVT, "NuWro event information:" << std::endl
+  NUIS_LOG(SAM, "NuWro event information:" << std::endl
 	   << "\t\t|->      dyn = " << fNuWroEvent->dyn << std::endl
 	   << "\t\t|->       qel = " << fNuWroEvent->flag.qel << std::endl
 	   << "\t\t|->       res = " << fNuWroEvent->flag.res << std::endl
@@ -449,7 +449,17 @@ void NuWroInputHandler::Print(){
 	   << "\t\t|->        nc = " << fNuWroEvent->flag.nc << std::endl
 	   << "\t\t|->        cc = " << fNuWroEvent->flag.cc << std::endl
 	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
-	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta);
+	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta << std::endl
+	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
+	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
+           << "\t\t|->      npi- = " << event1_nof(fNuWroEvent, -211) << std::endl
+           << "\t\t|->      npi0 = " << event1_nof(fNuWroEvent, 111) << std::endl
+           << "\t\t|->      neta = " << event1_nof(fNuWroEvent, 221) << std::endl
+           << "\t\t|->       nK+ = " << event1_nof(fNuWroEvent, 321) << std::endl
+           << "\t\t|->       nK0 = " << event1_nof(fNuWroEvent, 311) << std::endl
+           << "\t\t|->    nlamda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+           << "\t\t|->   nproton = " << event1_nof(fNuWroEvent, 2212) << std::endl
+           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112));
 }
 
 #endif
