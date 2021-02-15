@@ -138,7 +138,6 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -1583,7 +1582,6 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   fIsEnu1D = false;
   if (fName.find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");

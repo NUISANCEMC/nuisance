@@ -142,7 +142,6 @@ void Measurement2D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("Enu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -1762,7 +1761,6 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
   if ((fName.find("XSec") != std::string::npos) &&
       (fName.find("Enu") != std::string::npos)) {
     fIsEnu = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");
