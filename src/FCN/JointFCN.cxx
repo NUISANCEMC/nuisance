@@ -526,7 +526,7 @@ void JointFCN::ReconfigureUsingManager() {
     exp->ResetAll();
   }
 
-  // If we are siving signal, reset all containers.
+  // If we are saving signal, reset all containers.
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
 
   if (savesignal) {
@@ -780,7 +780,7 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Check for saved variables if not do a full reconfigure.
   if (fSignalEventFlags.empty()) {
-    NUIS_ERR(WRN, "Signal Flags Empty! Using normal manager.");
+    NUIS_LOG(REC, "Signal Flags Empty! Using normal manager.");
     ReconfigureUsingManager();
     return;
   }
