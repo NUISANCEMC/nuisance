@@ -449,8 +449,8 @@ void nuisconfig::RemoveIdenticalNodes() {
 }
 
 void nuisconfig::RemoveNode(XMLNodePointer_t node) {
-  std::cout << "[ CONFIG   ]: Removing node: ";
-  PrintNode(node);
+  // std::cout << "[ CONFIG   ]: Removing node: ";
+  // PrintNode(node);
   fXML->FreeAllAttr(node);
   fXML->CleanNode(node);
   fXML->FreeNode(node);
