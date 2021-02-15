@@ -461,8 +461,8 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
 
   if (!fNUISANCEEvent->Mode) {
-    std::cout << "[WARN]: Failed to determine mode for GENIE event: "
-              << *fGenieGHep << std::endl;
+    NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
+    std::cout << *fGenieGHep << std::endl;
   }
 
   // Set Event Info

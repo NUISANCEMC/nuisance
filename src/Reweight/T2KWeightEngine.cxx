@@ -20,7 +20,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  NUIS_LOG(FIT, "Setting up T2K RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up T2K RW: " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -72,7 +72,7 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
     fT2KSysts.push_back(gensyst);
 
     // Initialize dial
-    std::cout << "Registering " << singlename << " from " << name << std::endl;
+    NUIS_LOG(REC, "Registering " << singlename << " from " << name);
     fT2KRW->Systematics().Include(gensyst);
 
     // If Absolute
