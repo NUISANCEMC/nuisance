@@ -220,7 +220,7 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
     int nkaons= event1_nof(e, kaon_pdg) + event1_nof(e, kaon_plus_pdg);
 
     // Multipion?
-    if (npions > 1 || npions == 0) {
+    if ((npions+nkaons) > 1 || npions == 0) {
       if (e->flag.cc)
 	return 21*nu_nubar;
       else
