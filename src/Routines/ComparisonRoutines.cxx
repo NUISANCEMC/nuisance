@@ -273,10 +273,8 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
 
     // Print out
     NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
-                                 << sampletype << ") [Norm=" << samplenorm
-                                 << "]" << std::endl
-                                 << "\t\t|-> input='"
-                                 << samplefile << "'");
+	     << sampletype << ") [Norm=" << samplenorm << "]");
+    NUIS_LOG(FIT, "  |-> Input="<< samplefile);
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
@@ -449,7 +447,10 @@ void ComparisonRoutines::Run() {
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
     std::string routine = fRoutines.at(i);
 
-    NUIS_LOG(FIT, "Routine: " << routine);
+    // Mostly this is unnecessary information, so don't always print
+    if (fRoutines.size() > 1){
+      NUIS_LOG(FIT, "Routine: " << routine);
+    }
     if (!routine.compare("Compare")) {
 
       std::map<std::string, double> CurVals_wmirr;
@@ -508,7 +509,6 @@ void ComparisonRoutines::GenerateComparison() {
 //*************************************
 void ComparisonRoutines::PrintState() {
   //*************************************
-  NUIS_LOG(FIT, "------------");
 
   // Count max size
   int maxcount = 0;
@@ -517,13 +517,16 @@ void ComparisonRoutines::PrintState() {
   }
 
   // Header
-  NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
-                         << " = " << setw(10) << "Value"
-                         << " +- " << setw(10) << "Error"
-                         << " " << setw(8) << "(Units)"
-                         << " " << setw(10) << "Conv. Val"
-                         << " +- " << setw(10) << "Conv. Err"
-                         << " " << setw(8) << "(Units)");
+  if (fParams.size()){
+    NUIS_LOG(FIT, "------------");
+    NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
+	     << " = " << setw(10) << "Value"
+	     << " +- " << setw(10) << "Error"
+	     << " " << setw(8) << "(Units)"
+	     << " " << setw(10) << "Conv. Val"
+	     << " +- " << setw(10) << "Conv. Err"
+	     << " " << setw(8) << "(Units)");
+  }
 
   std::map<std::string, double> CurVals_wmirr;
   for (size_t i = 0; i < fParams.size(); ++i) {
@@ -595,8 +598,9 @@ void ComparisonRoutines::PrintState() {
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
+  int ndof = fSampleFCN->GetNDOF();
   NUIS_LOG(FIT,
-           std::left << std::setw(56) << "Likelihood for JointFCN: " << like);
+           std::left << std::setw(55) << "Likelihood for JointFCN" << ": " << like << "/" << ndof);
   NUIS_LOG(FIT, "------------");
 }
 
