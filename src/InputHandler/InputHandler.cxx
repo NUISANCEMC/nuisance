@@ -260,25 +260,19 @@ void InputHandlerBase::SetupJointInputs() {
 
   // Setup Max Events
   if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
-    if (LOG_LEVEL(SAM)) {
-      std::cout << "\t\t|-> Read Max Entries : " << fMaxEvents << std::endl;
-    }
+    NUIS_LOG(SAM, "|-> Read max entries: " << fMaxEvents);
     fNEvents = fMaxEvents;
   }
 
   // Print out Status
-  if (LOG_LEVEL(SAM)) {
-    std::cout << "\t\t|-> Total Entries    : " << fNEvents << std::endl
-              << "\t\t|-> Event Integral   : "
-              << fEventHist->Integral("width") * 1.E-38 << " events/nucleon"
-              << std::endl
-              << "\t\t|-> Flux Integral    : " << fFluxHist->Integral("width")
-              << " /cm2" << std::endl
-              << "\t\t|-> Event/Flux       : "
-              << fEventHist->Integral("width") * 1.E-38 /
-                     fFluxHist->Integral("width")
-              << " cm2/nucleon" << std::endl;
-  }
+  NUIS_LOG(SAM, "|-> Total entries  : " << fNEvents);
+  NUIS_LOG(SAM, "|-> Event integral : " << fEventHist->Integral("width") * 1.E-38 
+	   << " events/nucleon");
+  NUIS_LOG(SAM, "|-> Flux Integral  : " << fFluxHist->Integral("width")                                                                                                 
+	   << " /cm2");
+  NUIS_LOG(SAM, "|-> Event/Flux     : " 
+	   << fEventHist->Integral("width") * 1.E-38/fFluxHist->Integral("width") 
+	   << " cm2/nucleon");
 }
 
 BaseFitEvt *InputHandlerBase::GetBaseEvent(const UInt_t entry) {

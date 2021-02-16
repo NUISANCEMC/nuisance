@@ -300,6 +300,6 @@ void FitWeight::Print() {
   NUIS_LOG(REC, "Fit Weight State: ");
   for (size_t i = 0; i < fNameList.size(); i++) {
     NUIS_LOG(REC,
-             " -> Par " << i << ". " << fNameList[i] << " " << fValueList[i]);
+             "|-> Par " << i << ". " << fNameList[i] << " " << fValueList[i]);
   }
 }
