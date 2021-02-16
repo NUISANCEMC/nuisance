@@ -1333,7 +1333,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
     return NULL;
   }
 
-  NUIS_LOG(SAM, "Norm error = " << sqrt(total_covar) / total_data);
+  NUIS_LOG(DEB, "Norm error = " << sqrt(total_covar) / total_data);
 
   // Now loop over and calculate the shape-only matrix
   for (int i = 0; i < nbins; ++i) {
