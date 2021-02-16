@@ -522,10 +522,10 @@ void ComparisonRoutines::PrintState() {
     NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
 	     << " = " << setw(10) << "Value"
 	     << " +- " << setw(10) << "Error"
-	     << " " << setw(8) << "(Units)"
-	     << " " << setw(10) << "Conv. Val"
-	     << " +- " << setw(10) << "Conv. Err"
 	     << " " << setw(8) << "(Units)");
+             // << " " << setw(10) << "Conv. Val"
+	     // << " +- " << setw(10) << "Conv. Err"
+	     // << " " << setw(8) << "(Units)");
   }
 
   std::map<std::string, double> CurVals_wmirr;
@@ -575,18 +575,19 @@ void ComparisonRoutines::PrintState() {
       curunits = "(Frac)";
     }
 
-    std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
-    double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
-    double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-                      FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+    // std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
+    // double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
+    // double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
+    //                   FitBase::RWSigmaToAbs(typestr, syst, 0.0));
 
     std::ostringstream curparstring;
 
-    curparstring << " " << setw(3) << left << i << ". " << setw(maxcount)
-                 << syst << " = " << setw(10) << curval << " +- " << setw(10)
-                 << curerr << " " << setw(8) << curunits << " " << setw(10)
-                 << convval << " +- " << setw(10) << converr << " " << setw(8)
-                 << convunits;
+    curparstring << " " << setw(3) << left << i << "  " << setw(maxcount)
+                 << syst << " = " << setw(10) << Form("%.7lf", curval) << " +- " << setw(10)
+                 << Form("%.7lf", curerr) << " " << setw(8) << curunits;
+                 // << " " << setw(10);
+                 // << convval << " +- " << setw(10) << converr << " " << setw(8)
+                 // << convunits;
     NUIS_LOG(FIT, curparstring.str());
 
     if (fMirroredParams.count(syst)) {
