@@ -266,15 +266,23 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     // Get Sample Options
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
-
     std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
-
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
+    // Handle the samplefile name
+    std::string mc_type = GeneralUtils::ParseToStr(samplefile, ":")[0];
+    std::string input_samples = GeneralUtils::ParseToStr(samplefile, ":")[1];
+    input_samples = GeneralUtils::ReplaceAll(input_samples, "(", "");
+    input_samples = GeneralUtils::ReplaceAll(input_samples, ")", "");
+    std::vector<std::string> sample_vect = GeneralUtils::ParseToStr(input_samples, ";");
+      
     // Print out
     NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
 	     << sampletype << ") [Norm=" << samplenorm << "]");
-    NUIS_LOG(FIT, "  |-> Input="<< samplefile);
+    NUIS_LOG(FIT, "  |-> Input MC type = "<< mc_type <<" with " << sample_vect.size() << " input files");
+    for (uint j = 0; j < sample_vect.size(); ++j){
+      NUIS_LOG(FIT, "  |-> Input file #" << j << " = " << sample_vect[j]);
+    }
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
