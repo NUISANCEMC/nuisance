@@ -517,7 +517,7 @@ void JointFCN::ReconfigureUsingManager() {
 
   // 'Slow' Event Manager Reconfigure
   NUIS_LOG(REC, "Event Manager Reconfigure");
-  int timestart = time(NULL);
+  // int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -590,11 +590,11 @@ void JointFCN::ReconfigureUsingManager() {
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
-          NUIS_LOG(REC, std::left << std::setw(40) << curinput->GetName()
-		   << " : Processed " << std::right << std::setw(textwidth) << i
-                            << " events. [M, W] = [" << std::setw(3)
-                            << curevent->Mode << ", " << std::setw(5)
-                            << Form("%.3lf", curevent->Weight) << "]");
+          NUIS_LOG(REC, std::left << std::setw(52) << curinput->GetName()
+		   << ": Processed " << std::right << std::setw(textwidth) << i
+		   << " events. [M, W] = [" << std::setw(3)
+		   << curevent->Mode << ", " << std::setw(5)
+		   << Form("%.3lf", curevent->Weight) << "]");
         }
       }
 
@@ -739,9 +739,6 @@ void JointFCN::ReconfigureUsingManager() {
     }
   }
 
-  NUIS_LOG(REC,
-           "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart);
-
   // Check SignalReconfigures works for all samples
   if (savesignal) {
     double likefull = GetLikelihood();
@@ -767,9 +764,9 @@ void JointFCN::ReconfigureUsingManager() {
 void JointFCN::ReconfigureFastUsingManager() {
   //***************************************************
 
-  NUIS_LOG(FIT, " -> Doing FAST using manager");
+  NUIS_LOG(FIT, "Reconfiguring FAST using manager");
   // Get Start time for profilling
-  int timestart = time(NULL);
+  // int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -944,8 +941,6 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Print some reconfigure profiling.
   NUIS_LOG(REC, "Filled " << fillcount << " signal events.");
-  NUIS_LOG(REC, "Time taken ReconfigureFastUsingManager() : " << time(NULL) -
-                                                                     timestart);
 }
 
 //***************************************************
