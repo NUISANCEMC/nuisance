@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -55,7 +55,6 @@ public:
   void SetBranchAddress(TChain* tn);
   void AddBranchesToTree(TTree* tn);
   void Print();
-  void PrintChris();
   void DeallocateParticleStack();
   void AllocateParticleStack(int stacksize);
   void ExpandParticleStack(int stacksize);

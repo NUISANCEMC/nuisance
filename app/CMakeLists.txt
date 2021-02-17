@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -53,6 +53,9 @@ if (USE_GiBUU)
   add_executable(DumpGiBUUEvents DumpGiBUUEvents.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};DumpGiBUUEvents)
 endif()
+
+add_executable(nuis_flat_tree_combiner nuis_flat_tree_combiner.cxx)
+set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuis_flat_tree_combiner)
 
 add_executable(nuiscomp nuiscomp.cxx)
 set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuiscomp)

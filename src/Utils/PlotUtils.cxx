@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -20,38 +20,6 @@
 #include "PlotUtils.h"
 #include "FitEvent.h"
 #include "StatUtils.h"
-
-// MOVE TO MB UTILS!
-// This function is intended to be modified to enforce a consistent masking for
-// all models.
-TH2D *PlotUtils::SetMaskHist(std::string type, TH2D *data) {
-  TH2D *fMaskHist = (TH2D *)data->Clone("fMaskHist");
-
-  for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin) {
-    for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin) {
-      if (data->GetBinContent(xBin + 1, yBin + 1) == 0)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0);
-      else
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0.5);
-
-      if (!type.compare("MB_numu_2D")) {
-        if (yBin == 19 && xBin < 8)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      } else {
-        if (yBin == 19 && xBin < 11)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      }
-      if (yBin == 18 && xBin < 3)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 17 && xBin < 2)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 16 && xBin < 1)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-    }
-  }
-
-  return fMaskHist;
-};
 
 // MOVE TO GENERAL UTILS?
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring) {
@@ -610,7 +578,7 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
     temp_infile->Close();
     delete temp_infile;
 
-    // Else its a space seperated txt file
+    // Else its a space separated txt file
   } else {
     // Make a TGraph Errors
     TGraphErrors *gr = new TGraphErrors(dataFile.c_str(), "%lg %lg %lg");
@@ -659,22 +627,27 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
   return tempPlot;
 };
 
-TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2) {
-  // make copy of first hist
-  TH1D *new_hist = (TH1D *)hist1->Clone();
+TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2, TH1D *new_hist) {
+
+  // If the hist to save into doesn't exist, make copy of first hist
+  if (!new_hist) new_hist = (TH1D *)hist1->Clone();
 
   // Do bins and errors ourselves as scales can go awkward
   for (int i = 0; i < new_hist->GetNbinsX(); i++) {
-    if (hist2->GetBinContent(i + 1) == 0.0) {
-      new_hist->SetBinContent(i + 1, 0.0);
+    
+    double binVal = 0;
+    double binErr = 0;
+    
+    if (hist2->GetBinContent(i+1) && hist1->GetBinContent(i+1)) {
+      binVal = hist1->GetBinContent(i+1)/hist2->GetBinContent(i+1);
+      double fractErr1 = hist1->GetBinError(i+1)/hist1->GetBinContent(i+1);
+      double fractErr2 = hist2->GetBinError(i+1)/hist2->GetBinContent(i+1);
+      binErr = binVal * sqrt(fractErr1*fractErr1 + fractErr2*fractErr2);
     }
 
-    new_hist->SetBinContent(i + 1, hist1->GetBinContent(i + 1) /
-                                       hist2->GetBinContent(i + 1));
-    new_hist->SetBinError(i + 1, hist1->GetBinError(i + 1) /
-                                     hist2->GetBinContent(i + 1));
+    new_hist->SetBinContent(i+1, binVal);
+    new_hist->SetBinError(i+1, binErr);
   }
-
   return new_hist;
 };
 

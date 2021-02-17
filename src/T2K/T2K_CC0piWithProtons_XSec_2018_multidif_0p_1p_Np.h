@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -47,9 +47,9 @@ public:
 
  private:
 
-  bool useCC0pi0p = false;
-  bool useCC0pi1p = false;
-  bool useCC0piNp = false;
+  bool useCC0pi0p;
+  bool useCC0pi1p;
+  bool useCC0piNp;
 
   bool only_allowed_particles;
   bool numu_event;

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This ile is part of NUISANCE.
@@ -70,6 +70,7 @@ Measurement1D::Measurement1D(void) {
   fIsDifXSec = false;
   fIsEnu1D = false;
   fIsWriting = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -137,7 +138,6 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -640,7 +640,10 @@ void Measurement1D::FinaliseMeasurement() {
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCHist);
+				      ("True Channels"), fMCHist);
+    fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
@@ -743,7 +746,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
       NUIS_ERR(WRN, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(WRN, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(WRN, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");
@@ -1356,7 +1359,7 @@ void Measurement1D::Write(std::string drawOpt) {
   }
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
@@ -1579,7 +1582,6 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   fIsEnu1D = false;
   if (fName.find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");

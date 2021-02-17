@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -37,7 +37,7 @@ int err_verb = 0;
 std::ostream* __ERR_outstream(&std::cerr);
 
 // Extra Variables
-bool external_verb = false;
+bool external_verb = true;
 
 bool super_rainbow_mode = true;  //!< For when fitting gets boring.
 unsigned int super_rainbow_mode_colour = 0;

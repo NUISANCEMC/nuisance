@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -169,7 +169,6 @@ void MCStudy_KaonPreSelection::FillEventVariables(FitEvent *event) {
       if (nstrangemesons > 0){
 	std::cout << "New Event ----------------------------" << std::endl;
 	std::cout << "N S Mesons vs NFS S Mesons : " << nstrangemesons << " : " << nstrangefsmesons << std::endl;
-	event->PrintChris();
 	event->fNeutVect->Dump();
       }
     }

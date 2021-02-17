@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -666,7 +666,7 @@ double FitUtils::GetErecoil_MINERvA_LowRecoil(FitEvent *event) {
 }
 
 // MOVE TO MINERVA Utils!
-// The alternative Eavailble definition takes true q0 and subtracts the kinetic
+// The alternative Eavailable definition takes true q0 and subtracts the kinetic
 // energy of neutrons and pion masses returns in MeV
 double FitUtils::Eavailable(FitEvent *event) {
   double Eav = 0.0;
@@ -677,10 +677,11 @@ double FitUtils::Eavailable(FitEvent *event) {
   int ISPDG = event->GetBeamPartPDG();
 
   // For CC
-  if (event->IsCC())
+  if (event->IsCC() && event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))){
     q0 -= event->GetHMFSParticle(ISPDG + ((ISPDG < 0) ? 1 : -1))->fP.E();
-  else
+  } else if (event->GetHMFSParticle(ISPDG)) {
     q0 -= event->GetHMFSParticle(ISPDG)->fP.E();
+  }
 
   for (unsigned int i = 2; i < event->Npart(); i++) {
     // Only final state

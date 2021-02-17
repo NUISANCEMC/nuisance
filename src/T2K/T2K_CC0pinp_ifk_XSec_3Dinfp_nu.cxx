@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -33,14 +33,15 @@ T2K_CC0pinp_ifk_XSec_3Dinfp_nu::T2K_CC0pinp_ifk_XSec_3Dinfp_nu(nuiskey samplekey
                         "Flux: T2K 2.5 degree off-axis (ND280)  \n" \
                         "Signal: CC0piNp (N>=1) with p_p>450MeV and cthp>0.4 \n"
                         "https://doi.org/10.1103/PhysRevD.98.032003 \n";
+  
+  // This sample corresponds to the #Delta p variable
+  // #Delta p = |p_{p}^{measured}| - |p_{p}^{inferred}|
 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#Delta p");
-  fSettings.SetYTitle("p_#mu");
-  fSettings.SetZTitle("cos#theta_{#mu}");
-  //fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetXTitle("#Delta p-p_{#mu}-cos#theta_{#mu}");
+  fSettings.SetYTitle("d^{2}#sigma/d#Delta pdp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV^{2})");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -58,14 +59,12 @@ T2K_CC0pinp_ifk_XSec_3Dinfp_nu::T2K_CC0pinp_ifk_XSec_3Dinfp_nu(nuiskey samplekey
   // Scaling Setup ---------------------------------------------------
   // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
   fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) / (TotalIntegratedFlux()));
-  //fScaleFactor = ((GetEventHistogram()->Integral("width")/(fNEvents+0.)) * 10 / (TotalIntegratedFlux()));
 
   fSettings.SetDataInput(  FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root;result_p" );
   SetDataFromRootFile( fSettings.GetDataInput() );
 
   fSettings.SetCovarInput( FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root;cor_p" );
   SetCorrelationFromRootFile(fSettings.GetCovarInput() );
-  //SetCovarFromRootFile(FitPar::GetDataBase() + "/T2K/CC0pi/infkResults_origBin.root", "cov_p" );              
 
   // Setup Histograms
   SetHistograms();
@@ -73,6 +72,7 @@ T2K_CC0pinp_ifk_XSec_3Dinfp_nu::T2K_CC0pinp_ifk_XSec_3Dinfp_nu(nuiskey samplekey
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
+  fSaveFine = false;
 };
 
 
@@ -161,24 +161,23 @@ void T2K_CC0pinp_ifk_XSec_3Dinfp_nu::FillMCSlice(double x, double y, double z, d
 
 void T2K_CC0pinp_ifk_XSec_3Dinfp_nu::SetHistograms(){
 
+  std::string name = fSettings.GetName();
+  
   // Read in 1D Data Histograms
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/STV/infkResults_origBin.root").c_str(),"READ");
-  //fInputFile->ls();
   
-  // Read in 1D Data
-  fDataHist = (TH1D*) fInputFile->Get("result_p");
-  fDataHist->SetNameTitle("T2K_CC0pinp_ifk_XSec_3Dinfp_nu_data", "T2K_CC0pinp_ifk_XSec_3Dinfp_nu_data");
-  SetAutoProcessTH1(fDataHist,kCMD_Write);
-
   // Read in 2D Data Slices and Make MC Slices
   for (int i = 0; i < 7; i++){ //both y and z slices  
     // Get Data Histogram
-    //fInputFile->ls();
     fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("resultBin%i_p",i))->Clone());
-    fDataHist_Slices[i]->SetNameTitle(Form("T2K_CC0pinp_ifk_XSec_3Dinfp_nu_data_Slice%i",i), (Form("T2K_CC0pinp_ifk_XSec_3Dinfp_nu_data_Slice%i",i)));
+    fDataHist_Slices[i]->SetNameTitle(Form("%s_data_Slice%i", name.c_str(), i), 
+				      Form("%s_data_Slice%i;#Delta p (GeV);%s", 
+					   name.c_str(), i, fSettings.GetYTitle().c_str()));
     // Make MC Clones
     fMCHist_Slices.push_back((TH1D*) fDataHist_Slices[i]->Clone());
-    fMCHist_Slices[i]->SetNameTitle(Form("T2K_CC0pinp_ifk_XSec_3Dinfp_nu_MC_Slice%i",i), (Form("T2K_CC0pinp_ifk_XSec_3Dinfp_nu_MC_Slice%i",i)));
+    fMCHist_Slices[i]->SetNameTitle(Form("%s_MC_Slice%i",name.c_str(), i), 
+				    Form("%s_MC_Slice%i;#Delta p (GeV);%s", 
+					 name.c_str(), i, fSettings.GetYTitle().c_str()));
 
     SetAutoProcessTH1(fDataHist_Slices[i],kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);

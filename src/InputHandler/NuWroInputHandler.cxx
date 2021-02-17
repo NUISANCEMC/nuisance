@@ -188,203 +188,126 @@ int NuWroInputHandler::ConvertNuwroMode(event *e) {
   pion_pdg = 111;
   pion_plus_pdg = 211;
   pion_minus_pdg = -211;
-  // O_16_pdg = 100069;   // oznacznie z Neuta
   lambda_pdg = 3122;
   kaon_pdg = 311;
   kaon_plus_pdg = 321;
 
-  if (e->flag.qel) // kwiazielastyczne oddziaływanie
-  {
-    if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
-    {
-      if (e->flag.cc)
-        return -1;
-      else {
-        if (event1_nof(e, proton_pdg))
-          return -51;
-        else if (event1_nof(e, neutron_pdg))
-          return -52; // sprawdzam dodatkowo ?
-      }
-    } else // oddziaływanie z neutrinem
-    {
-      if (e->flag.cc)
-        return 1;
-      else {
-        if (event1_nof(e, proton_pdg))
-          return 51;
-        else if (event1_nof(e, neutron_pdg))
-          return 52;
-      }
+  // Antineutrino modes are *-1
+  int nu_nubar = 1;
+  if (e->flag.anty) nu_nubar = -1;
+
+  // Quasielastic
+  if (e->flag.qel){
+    if (e->flag.cc)
+      return 1*nu_nubar;
+    else {
+      if (event1_nof(e, proton_pdg))
+	return 51*nu_nubar;
+      else if (event1_nof(e, neutron_pdg))
+	return 52*nu_nubar;
     }
   }
 
   if (e->flag.mec) {
-    if (e->flag.anty)
-      return -2;
-    else
-      return 2;
+    return 2*nu_nubar;
   }
 
-  if (e->flag.res) // rezonansowa produkcja: pojedynczy pion, pojed.eta, kaon,
-                   // multipiony
-  {
-    Int_t liczba_pionow, liczba_kaonow;
+  // Pion production
+  if (e->flag.res) {
 
-    liczba_pionow = event1_nof(e, pion_pdg) + event1_nof(e, pion_plus_pdg) +
-                    event1_nof(e, pion_minus_pdg);
-    liczba_kaonow = event1_nof(e, kaon_pdg) + event1_nof(e, kaon_pdg);
+    int npions = event1_nof(e, pion_pdg) + event1_nof(e, pion_plus_pdg) +
+      event1_nof(e, pion_minus_pdg);
+    int nkaons= event1_nof(e, kaon_pdg) + event1_nof(e, kaon_plus_pdg);
 
-    if (liczba_pionow > 1 || liczba_pionow == 0) // multipiony
-    {
-      if (e->flag.anty) {
-        if (e->flag.cc)
-          return -21;
-        else
-          return -41;
-      } else {
-        if (e->flag.cc)
-          return 21;
-        else
-          return 41;
-      }
+    // Multipion?
+    if ((npions+nkaons) > 1 || npions == 0) {
+      if (e->flag.cc)
+	return 21*nu_nubar;
+      else
+	return 41*nu_nubar;
     }
 
-    if (liczba_pionow == 1) {
-      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
-      {
-        if (e->flag.cc) {
-          if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_minus_pdg))
+    if (npions == 1) {
+      if (e->flag.cc) {
+	// CC
+	if (e->flag.anty){
+	  // Antineutrino
+	  if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_minus_pdg))
             return -11;
           if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_pdg))
             return -12;
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_minus_pdg))
             return -13;
-        } else {
-          if (event1_nof(e, proton_pdg)) {
-            if (event1_nof(e, pion_minus_pdg))
-              return -33;
-            else if (event1_nof(e, pion_pdg))
-              return -32;
-          } else if (event1_nof(e, neutron_pdg)) {
-            if (event1_nof(e, pion_plus_pdg))
-              return -34;
-            else if (event1_nof(e, pion_pdg))
-              return -31;
-          }
-        }
-      } else // oddziaływanie z neutrinem
-      {
-        if (e->flag.cc) {
+	} else {
+	  // Neutrino
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_plus_pdg))
             return 11;
           if (event1_nof(e, proton_pdg) && event1_nof(e, pion_pdg))
             return 12;
           if (event1_nof(e, neutron_pdg) && event1_nof(e, pion_plus_pdg))
-            return 13;
-        } else {
-          if (event1_nof(e, proton_pdg)) {
-            if (event1_nof(e, pion_minus_pdg))
-              return 33;
-            else if (event1_nof(e, pion_pdg))
-              return 32;
-          } else if (event1_nof(e, neutron_pdg)) {
-            if (event1_nof(e, pion_plus_pdg))
-              return 34;
-            else if (event1_nof(e, pion_pdg))
-              return 31;
-          }
-        }
+            return 13;	  
+	}
+      } else {
+	// Now NC
+	if (event1_nof(e, proton_pdg)) {
+	  if (event1_nof(e, pion_minus_pdg))
+	    return 33*nu_nubar;
+	  else if (event1_nof(e, pion_pdg))
+	    return 32*nu_nubar;
+	} else if (event1_nof(e, neutron_pdg)) {
+	  if (event1_nof(e, pion_plus_pdg))
+	    return 34*nu_nubar;
+	  else if (event1_nof(e, pion_pdg))
+	    return 31*nu_nubar;
+	}
+      }
+    }
+    
+    // Eta production
+    if (event1_nof(e, eta_pdg)) {
+      if (e->flag.cc)
+	return 22*nu_nubar;
+      else {
+	if (event1_nof(e, neutron_pdg))
+	  return 42*nu_nubar;
+	else if (event1_nof(e, proton_pdg))
+	  return 43*nu_nubar;
       }
     }
 
-    if (event1_nof(e, eta_pdg)) // produkcja rezonansowa ety
-    {
-      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
-      {
-        if (e->flag.cc)
-          return -22;
-        else {
-          if (event1_nof(e, neutron_pdg))
-            return -42;
-          else if (event1_nof(e, proton_pdg))
-            return -43; // sprawdzam dodatkowo ?
-        }
-      } else // oddziaływanie z neutrinem
-      {
-        if (e->flag.cc)
-          return 22;
-        else {
-          if (event1_nof(e, neutron_pdg))
-            return 42;
-          else if (event1_nof(e, proton_pdg))
-            return 43;
-        }
-      }
-    }
-
-    if (event1_nof(e, lambda_pdg) == 1 &&
-        liczba_kaonow == 1) // produkcja rezonansowa kaonu
-    {
-      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
-      {
-        if (e->flag.cc && event1_nof(e, kaon_pdg))
-          return -23;
-        else {
-          if (event1_nof(e, kaon_pdg))
-            return -44;
-          else if (event1_nof(e, kaon_plus_pdg))
-            return -45;
-        }
-      } else // oddziaływanie z neutrinem
-      {
-        if (e->flag.cc && event1_nof(e, kaon_plus_pdg))
-          return 23;
-        else {
-          if (event1_nof(e, kaon_pdg))
-            return 44;
-          else if (event1_nof(e, kaon_plus_pdg))
-            return 45;
-        }
+    // Resonant kaon production
+    if (event1_nof(e, lambda_pdg) == 1 && nkaons == 1) {
+      if (e->flag.cc && event1_nof(e, kaon_pdg))
+	return 23*nu_nubar;
+      else {
+	if (event1_nof(e, kaon_pdg))
+	  return 44*nu_nubar;
+	else if (event1_nof(e, kaon_plus_pdg))
+	  return 45*nu_nubar;
       }
     }
   }
 
-  if (e->flag.coh) // koherentne  oddziaływanie tylko na O(16)
-  {
-    Int_t _target;
-    _target = e->par.nucleus_p + e->par.nucleus_n; // liczba masowa  O(16)
-
-    if (_target == 16) {
-      if (e->flag.anty) // jeśli jest to oddziaływanie z antyneutrinem
-      {
-        if (e->flag.cc && event1_nof(e, pion_minus_pdg))
-          return -16;
-        else if (event1_nof(e, pion_pdg))
-          return -36;
-      } else // oddziaływanie z neutrinem
-      {
-        if (e->flag.cc && event1_nof(e, pion_plus_pdg))
-          return 16;
-        else if (event1_nof(e, pion_pdg))
-          return 36;
-      }
-    }
+  // Coherent
+  if (e->flag.coh) {
+    if (e->flag.cc && (event1_nof(e, pion_minus_pdg) + 
+		       event1_nof(e, pion_plus_pdg)))
+      return 16*nu_nubar;
+    else if (event1_nof(e, pion_pdg))
+      return 36*nu_nubar;
   }
 
-  // gleboko nieelastyczne rozpraszanie
+  // DIS
   if (e->flag.dis) {
-    if (e->flag.anty) {
-      if (e->flag.cc)
-        return -26;
-      else
-        return -46;
-    } else {
-      if (e->flag.cc)
-        return 26;
-      else
-        return 46;
-    }
-  }
+    if (e->flag.cc)
+      return 26*nu_nubar;
+    else
+      return 46*nu_nubar;
+  } 
+
+  // If we got here, something is wrong, see what happened...
+  NUIS_ERR(WRN, "Unable to interpret NUWRO event, dumping info...");
+  Print();
 
   return 9999;
 }
@@ -514,6 +437,29 @@ void NuWroInputHandler::AddNuWroParticle(FitEvent *evt, particle &p, int state,
   evt->fNParticles++;
 }
 
-void NuWroInputHandler::Print() {}
+void NuWroInputHandler::Print(){
+  NUIS_LOG(SAM, "NuWro event information:" << std::endl
+	   << "\t\t|->      dyn = " << fNuWroEvent->dyn << std::endl
+	   << "\t\t|->       qel = " << fNuWroEvent->flag.qel << std::endl
+	   << "\t\t|->       res = " << fNuWroEvent->flag.res << std::endl
+	   << "\t\t|->       dis = " << fNuWroEvent->flag.dis << std::endl
+	   << "\t\t|->       coh = " << fNuWroEvent->flag.coh << std::endl
+	   << "\t\t|->       mec = " << fNuWroEvent->flag.mec << std::endl
+	   << "\t\t|->       hip = " << fNuWroEvent->flag.hip << std::endl
+	   << "\t\t|->        nc = " << fNuWroEvent->flag.nc << std::endl
+	   << "\t\t|->        cc = " << fNuWroEvent->flag.cc << std::endl
+	   << "\t\t|->      anty = " << fNuWroEvent->flag.anty << std::endl
+	   << "\t\t|-> res_delta = " << fNuWroEvent->flag.res_delta << std::endl
+	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
+	   << "\t\t|->      npi+ = " << event1_nof(fNuWroEvent, 211) << std::endl
+           << "\t\t|->      npi- = " << event1_nof(fNuWroEvent, -211) << std::endl
+           << "\t\t|->      npi0 = " << event1_nof(fNuWroEvent, 111) << std::endl
+           << "\t\t|->      neta = " << event1_nof(fNuWroEvent, 221) << std::endl
+           << "\t\t|->       nK+ = " << event1_nof(fNuWroEvent, 321) << std::endl
+           << "\t\t|->       nK0 = " << event1_nof(fNuWroEvent, 311) << std::endl
+           << "\t\t|->    nlamda = " << event1_nof(fNuWroEvent, 3122) << std::endl
+           << "\t\t|->   nproton = " << event1_nof(fNuWroEvent, 2212) << std::endl
+           << "\t\t|->  nneutron = " << event1_nof(fNuWroEvent, 2112));
+}
 
 #endif

@@ -19,8 +19,8 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu::T2K_CC1pip_CH_XSec_1Dthmupi_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1Dthmupi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#theta_{#mu,#pi} (radians)");
-  fSettings.SetYTitle("d#sigma/d#theta_{#mu,#pi} (cm^{2}/radians/nucleon)");
+  fSettings.SetXTitle("#theta_{#mu,#pi} (rad.)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#mu,#pi} (cm^{2}/rad./nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");

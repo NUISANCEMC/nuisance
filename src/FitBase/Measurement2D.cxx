@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -25,6 +25,7 @@ Measurement2D::Measurement2D(void) {
   //********************************************************************
 
   covar = NULL;
+  fInvert = NULL;
   fDecomp = NULL;
   fFullCovar = NULL;
 
@@ -51,42 +52,9 @@ Measurement2D::Measurement2D(void) {
       "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/FITPROJX/"
       "FITPROJY";
 
-  fIsFix = false;
-  fIsShape = false;
-  fIsFree = false;
-
-  fIsDiag = false;
-  fIsFull = false;
-
-  fAddNormPen = false;
-  fIsMask = false;
-  fIsChi2SVD = false;
-
-  fIsRawEvents = false;
-  fIsDifXSec = false;
-  fIsEnu = false;
-
   // XSec Scalings
   fScaleFactor = -1.0;
   fCurrentNorm = 1.0;
-
-  // Histograms
-  fDataHist = NULL;
-  fDataTrue = NULL;
-
-  fMCHist = NULL;
-  fMCFine = NULL;
-  fMCWeighted = NULL;
-
-  fMaskHist = NULL;
-
-  // Covar
-  covar = NULL;
-  fFullCovar = NULL;
-
-  fCovar = NULL;
-  fInvert = NULL;
-  fDecomp = NULL;
 
   // Fake Data
   fFakeDataInput = "";
@@ -174,7 +142,6 @@ void Measurement2D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("Enu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -241,13 +208,13 @@ void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D *hist) {
   valhist->Reset();
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0, true);
 
-  NUIS_LOG(SAM, " -> Filling values from read hist.");
+  NUIS_LOG(DEB, " -> Filling values from read hist.");
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinContent(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
@@ -262,14 +229,14 @@ void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0);
 
   // Fill Errors
-  NUIS_LOG(SAM, " -> Filling errors from read hist.");
+  NUIS_LOG(DEB, " -> Filling errors from read hist.");
 
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinError(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetMapValuesFromText(std::string dataFile) {
@@ -603,8 +570,8 @@ void Measurement2D::FinaliseMeasurement() {
                       << GetName()
                       << " but only using diagonal elements for likelihood");
     size_t nbins = fFullCovar->GetNcols();
-    for (int i = 0; i < nbins; ++i) {
-      for (int j = 0; j < nbins; ++j) {
+    for (size_t i = 0; i < nbins; ++i) {
+      for (size_t j = 0; j < nbins; ++j) {
         if (i != j) {
           (*fFullCovar)[i][j] = 0;
         }
@@ -676,7 +643,11 @@ void Measurement2D::FinaliseMeasurement() {
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCHist);
+				      ("True Channels"), fMCHist);
+    fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleZ(fDataHist->GetZaxis()->GetTitle());
+
     SetAutoProcessTH1(fMCHist_Modes);
   }
 
@@ -780,7 +751,7 @@ void Measurement2D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");
@@ -1462,12 +1433,12 @@ void Measurement2D::Write(std::string drawOpt) {
 
   if (fIsChi2 && !fIsDiag) {
     fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
-    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->GetZaxis()->SetTitle("#Delta#chi^{2}");
     fResidualHist->Reset();
 
     fChi2LessBinHist =
         (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
-    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->GetZaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
     fIsWriting = true;
@@ -1790,7 +1761,6 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
   if ((fName.find("XSec") != std::string::npos) &&
       (fName.find("Enu") != std::string::npos)) {
     fIsEnu = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");

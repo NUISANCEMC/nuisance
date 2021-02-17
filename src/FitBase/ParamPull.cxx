@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -338,7 +338,7 @@ void ParamPull::ReadRootFile(std::string input) {
   // Check all given
   if (inputlist.size() < 2) {
     NUIS_ERR(FTL, "Covar supplied in 'ROOT' format should have 3 semi-colon "
-                "seperated entries!"
+                "separated entries!"
                     << std::endl
                     << "ROOT:filename;histname[;covarname]");
     NUIS_ABORT("histname = TH1D, covarname = TH2D");

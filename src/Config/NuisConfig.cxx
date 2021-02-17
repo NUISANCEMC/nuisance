@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -87,9 +87,9 @@ void nuisconfig::LoadSettings(std::string const &filename,
                               std::string const &state) {
   // Open file and see if its XML
   std::cout << "[ NUISANCE ]: Trying to parse file : " << filename;
-  StopTalking();
+  // StopTalking();
   XMLDocPointer_t readdoc = fXML->ParseFile(filename.c_str(), 1000000);
-  StartTalking();
+  // StartTalking();
 
   // If it is parse it as a nice XML config file
   if (readdoc) {
@@ -449,8 +449,8 @@ void nuisconfig::RemoveIdenticalNodes() {
 }
 
 void nuisconfig::RemoveNode(XMLNodePointer_t node) {
-  std::cout << "[INFO]: Removing node: " << fXML->GetNodeName(node)
-            << std::endl;
+  // std::cout << "[ CONFIG   ]: Removing node: ";
+  // PrintNode(node);
   fXML->FreeAllAttr(node);
   fXML->CleanNode(node);
   fXML->FreeNode(node);
@@ -464,7 +464,7 @@ void nuisconfig::PrintNode(XMLNodePointer_t node) {
   // Loop and print all attributes
   XMLAttrPointer_t attr = fXML->GetFirstAttr(node);
   while (attr != 0) {
-    std::cout << " -> " << fXML->GetAttrName(attr) << " : "
+    std::cout << "\t\t|-> " << fXML->GetAttrName(attr) << " : "
               << fXML->GetAttrValue(attr) << std::endl;
     attr = fXML->GetNextAttr(attr);
   }

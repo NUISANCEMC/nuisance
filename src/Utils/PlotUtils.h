@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -134,9 +134,6 @@ void DeleteNeutModeArray(TH1* neutarray[]);
   Handling Functions
 */
 
-//! Fill a mask histogram from a text file
-TH2D* SetMaskHist(std::string type, TH2D* data);
-
 //! Divide by the flux histogram for Enu Histograms
 void DivideByFlux(TH1D* fMCHist, TH1D* fFluxHist);
 
@@ -224,7 +221,7 @@ double GetDataMCRatio(TH1D* data, TH1D* mc, TH1I* mask = NULL);
 */
 
 //! Create new ratio plot. hist3 = hist1/hist2
-TH1D* GetRatioPlot(TH1D* hist1, TH1D* hist2);
+TH1D* GetRatioPlot(TH1D* hist1, TH1D* hist2, TH1D* new_hist=NULL);
 
 //! Create new plot of hist2 normalised to hist1. hist2 = hist1 *
 //! (Integral(hist1)/Integral(hist2))

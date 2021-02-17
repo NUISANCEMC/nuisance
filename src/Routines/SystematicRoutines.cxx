@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -1292,9 +1292,9 @@ void SystematicRoutines::EigenErrors() {
   TDirectory *outnominal = (TDirectory *)fOutputRootFile->mkdir("nominal");
   outnominal->cd();
 
-  double *valst = FitUtils::GetArrayFromMap(fParams, fCurVals);
+  // double *valst = FitUtils::GetArrayFromMap(fParams, fCurVals);
   // double chi2 = fSampleFCN->DoEval( valst );
-  delete valst;
+  // delete valst;
   fSampleFCN->Write();
 
   // Loop over all throws
@@ -1322,6 +1322,7 @@ void SystematicRoutines::EigenErrors() {
     // Run Eval
     double *vals = FitUtils::GetArrayFromMap(fParams, fThrownVals);
     double chi2 = fSampleFCN->DoEval(vals);
+    NUIS_LOG(DEB, "Chi2 = " << chi2);
     delete vals;
     count++;
 
@@ -1343,6 +1344,7 @@ void SystematicRoutines::EigenErrors() {
     // Run Eval
     double *vals2 = FitUtils::GetArrayFromMap(fParams, fThrownVals);
     chi2 = fSampleFCN->DoEval(vals2);
+    NUIS_LOG(DEB, "Chi2 = " << chi2);
     delete vals2;
     count++;
 

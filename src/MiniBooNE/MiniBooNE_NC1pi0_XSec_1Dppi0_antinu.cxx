@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -41,15 +41,15 @@ MiniBooNE_NC1pi0_XSec_1Dppi0_antinu::MiniBooNE_NC1pi0_XSec_1Dppi0_antinu(nuiskey
 
   fSettings.SetTitle("MiniBooNE_NC1pi0_XSec_1Dppi0_antinu");
 
-  nunubarmode = fSettings.Found("name", "combined");
+  nunubarmode = fSettings.Found("name", "rhc");
   if (!nunubarmode) {
     fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nubarppi0xsec_edit.txt" );
     fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/nubarppi0xsecerrormatrix.txt" );
     fSettings.DefineAllowedSpecies("numu");
 
   } else {
-    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodeppi0xsec_edit.txt");
-    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnumodeppi0xsecerrormatrix.txt");
+    fSettings.SetDataInput(  FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnubarmodeppi0xsec_edit.txt");
+    fSettings.SetCovarInput( FitPar::GetDataBase() + "MiniBooNE/NC1pi0/combinedsignnubarmodeppi0xsecerrormatrix.txt");
     fSettings.DefineAllowedSpecies("numu,numub");
 
   }

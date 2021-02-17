@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -44,7 +44,7 @@ BNL_CC1pi0_Evt_1DQ2_nu::BNL_CC1pi0_Evt_1DQ2_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.0, 6.0);

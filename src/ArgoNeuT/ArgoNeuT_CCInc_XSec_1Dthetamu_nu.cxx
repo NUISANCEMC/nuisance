@@ -15,7 +15,7 @@ ArgoNeuT_CCInc_XSec_1Dthetamu_nu::ArgoNeuT_CCInc_XSec_1Dthetamu_nu(nuiskey sampl
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("theta_{#mu} (degrees)");
+  fSettings.SetXTitle("#theta_{#mu} (degrees)");
   fSettings.SetYTitle("d#sigma/d#theta_{#mu} (cm^{2} Ar^{-1} degrees^{-1})");
   fSettings.SetAllowedTypes("FIX/DIAG", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 50.0);

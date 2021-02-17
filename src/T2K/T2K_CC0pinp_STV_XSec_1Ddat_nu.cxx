@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -39,9 +39,9 @@ T2K_CC0pinp_STV_XSec_1Ddat_nu::T2K_CC0pinp_STV_XSec_1Ddat_nu(
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#delta#it{#alpha}_{T} (GeV c^{-1})");
+  fSettings.SetXTitle("#delta#it{#alpha}_{T} (rad.)");
   fSettings.SetYTitle(
-      "#frac{d#sigma}{d#delta#it{#alpha}_{T}} (cm^{2} nucleon^{-1} rads^{-1})");
+      "#frac{d#sigma}{d#delta#it{#alpha}_{T}} (cm^{2} nucleon^{-1} rad.^{-1})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 50.0);
   fSettings.DefineAllowedTargets("C,H");

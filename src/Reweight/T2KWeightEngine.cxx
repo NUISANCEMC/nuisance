@@ -12,12 +12,15 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
     NUIS_ABORT(
         "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
   }
+  // No need to vomit the contents of the card file all over my screen
+  StopTalking();
   t2krew::T2KNeutUtils::SetCardFile(neut_card);
+  StartTalking();
 #endif
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
-  NUIS_LOG(FIT, "Setting up T2K RW : " << fCalcName);
+  NUIS_LOG(FIT, "Setting up T2K RW: " << fCalcName);
 
   // Create RW Engine suppressing cout
   StopTalking();
@@ -69,7 +72,7 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
     fT2KSysts.push_back(gensyst);
 
     // Initialize dial
-    std::cout << "Registering " << singlename << " from " << name << std::endl;
+    NUIS_LOG(REC, "Registering " << singlename << " from " << name);
     fT2KRW->Systematics().Include(gensyst);
 
     // If Absolute
@@ -130,7 +133,7 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
 #ifdef __T2KREW_ENABLED__
-  // Skip Non GENIE
+  // Skip Non-NEUT
   if (evt->fType != kNEUT){
       return 1.0;
   }
@@ -144,6 +147,11 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 #endif
+
+  if (!std::isnormal(rw_weight)){
+    NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
+    rw_weight = 0;
+  }
 
   // Return rw_weight
   return rw_weight;

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -143,8 +143,6 @@ SampleSettings MeasurementBase::LoadSampleSettings(nuiskey samplekey) {
   fName = setting.GetS("name");
 
   // Used as an initial setup function incase we need to do anything here.
-  NUIS_LOG(SAM, "Loading Sample : " << setting.GetName());
-
   fEvtRateScaleFactor = 0xdeadbeef;
 
   if (!fIsJoint) {

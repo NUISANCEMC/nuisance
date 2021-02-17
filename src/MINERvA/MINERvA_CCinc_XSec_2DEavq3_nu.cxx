@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -85,7 +85,7 @@ MINERvA_CCinc_XSec_2DEavq3_nu::MINERvA_CCinc_XSec_2DEavq3_nu(nuiskey samplekey) 
 void MINERvA_CCinc_XSec_2DEavq3_nu::FillEventVariables(FitEvent *event) {
 //********************************************************************
 
-  // Seperate MEC
+  // Separate MEC
   if (splitMEC_PN_NN) {
     int npr = 0;
     int nne = 0;

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -42,9 +42,9 @@ static double const EdgesP[NRows][6] = {
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
     {0.00, 0.18, 0.30, 0.45, 0.77, 2.50},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
-    {0.00, 0.30, 0.45, 0.77, 2.50, kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
+    {0.00, 0.30, 0.45, 0.77, 2.50, (double)kDUMMY},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50},
     {0.00, 0.30, 0.45, 0.77, 1.28, 2.50}};
@@ -64,10 +64,8 @@ MicroBooNE_CCInc_XSec_2DPcos_nu::MicroBooNE_CCInc_XSec_2DPcos_nu(
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("P_{#mu}^{reco} (GeV)");
-  fSettings.SetYTitle("cos#theta_{#mu}^{reco}");
-  fSettings.SetZTitle(
-      "d^{2}#sigma/dP_{#mu}^{reco}dcos#theta_{#mu}^{reco} (cm^{2}/GeV)");
+  fSettings.SetXTitle("p_{#mu}^{reco} (GeV)-cos#theta_{#mu}^{reco}");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}^{reco}dcos#theta_{#mu}^{reco} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
@@ -89,6 +87,8 @@ MicroBooNE_CCInc_XSec_2DPcos_nu::MicroBooNE_CCInc_XSec_2DPcos_nu(
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+
+  fSaveFine = false;
 };
 
 bool MicroBooNE_CCInc_XSec_2DPcos_nu::isSignal(FitEvent *event) {
@@ -196,6 +196,9 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::FillMCSlice(double x, double y,
 }
 
 void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
+
+  std::string sample_name = fSettings.GetName();
+
   // Read in 1D Data Histograms
   fInputFile = new TFile((FitPar::GetDataBase() +
                           "/MicroBooNE/CCinc/microboone_numu_cc_inclusive.root")
@@ -203,16 +206,19 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
 
   // Read in 1D Data
   fDataHist = (TH1D *)fInputFile->Get("xsec_data");
-  fDataHist->SetName("MicroBooNE_CCInc_XSec_2DPcos_nu_DATA");
+  fDataHist->SetNameTitle(Form("%s_data", sample_name.c_str()),
+			  Form("%s_data%s", sample_name.c_str(), 
+			       fSettings.GetFullTitles().c_str()));
   fDataHist->Scale(1e-38);
-
-  fMCHist_Fine2D = new TH2D("MicroBooNE_CCInc_XSec_2DPcos_nu_Fine2D",
-                            "MicroBooNE_CCInc_XSec_2DPcos_nu_Fine2D", 400, 0.0,
-                            2.5, 100, -1.0, 1.0);
+  
+  fMCHist_Fine2D = new TH2D(Form("%s_MC_FINE_2D", sample_name.c_str()),
+			    Form("%s_MC_FINE_2D; p_{#mu}^{reco} (GeV); cos#theta_{#mu}^{reco};%s", 
+				 sample_name.c_str(), fSettings.GetYTitle().c_str()), 
+			    400, 0.0, 2.5, 100, -1.0, 1.0);
   SetAutoProcessTH1(fMCHist_Fine2D);
 
   // Load covariance matrix
-  TH2D *tempcov = (TH2D *)fInputFile->Get("covariance_matrix");
+  TH2D *tempcov = (TH2D*)fInputFile->Get("covariance_matrix");
 
   fFullCovar = new TMatrixDSym(fDataHist->GetNbinsX());
   for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
@@ -236,14 +242,16 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
   for (size_t i = 0; i < NRows; i++) {
     for (size_t j = 0; j < NRowBins[i]; j++) {
       int id = PolyBinIDs[i][j];
-      fPolyBinMap[id] = {i, j};
+      fPolyBinMap[id] = std::make_pair(i, j);
     }
   }
 
   // Split 1D data into cos(theta) slices
   for (size_t i = 0; i < NRows; i++) {
-    TString name = Form("MicroBooNE_CCInc_XSec_2DPcos_nu_data_Slice%lu", i);
-    TH1D *h = new TH1D(name, name, NRowBins[i], EdgesP[i]);
+    TString name  = Form("%s_data_Slice%lu", sample_name.c_str(), i);
+    TString title = Form("%s_data_Slice%lu; p_{#mu}^{reco} (GeV);%s", 
+			 sample_name.c_str(), i, fSettings.GetYTitle().c_str()); 
+    TH1D *h = new TH1D(name, title, NRowBins[i], EdgesP[i]);
     h->Sumw2();
 
     fDataHist_Slices.push_back(h);
@@ -258,8 +266,10 @@ void MicroBooNE_CCInc_XSec_2DPcos_nu::SetHistograms() {
     }
 
     fMCHist_Slices.push_back((TH1D *)h->Clone());
-    name = Form("MicroBooNE_CCInc_XSec_2DPcos_nu_MC_Slice%lu", i);
-    fMCHist_Slices[i]->SetNameTitle(name, name);
+    name  = Form("%s_MC_Slice%lu", sample_name.c_str(), i);
+    title = Form("%s_MC_Slice%lu; p_{#mu}^{reco} (GeV);%s",
+		 sample_name.c_str(), i, fSettings.GetYTitle().c_str());
+    fMCHist_Slices[i]->SetNameTitle(name, title);
     fMCHist_Slices[i]->Reset();
 
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);

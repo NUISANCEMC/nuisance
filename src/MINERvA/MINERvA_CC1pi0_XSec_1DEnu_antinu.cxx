@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -36,7 +36,7 @@ MINERvA_CC1pi0_XSec_1DEnu_antinu::MINERvA_CC1pi0_XSec_1DEnu_antinu(nuiskey sampl
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("#sigma(E_{#nu} (cm^{2}/nucleon)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(1.5, 10.0);
   fSettings.DefineAllowedTargets("C,H");

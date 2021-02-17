@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This ile is part of NUISANCE.
@@ -64,6 +64,7 @@ JointMeas1D::JointMeas1D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -229,7 +230,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
@@ -293,8 +293,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (!fRW)
     fRW = FitBase::GetRW();
-
-  NUIS_LOG(SAM, "Finalised Sample Settings");
 }
 
 //********************************************************************
@@ -774,7 +772,7 @@ void JointMeas1D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                       << fit_options_input.at(i)
                       << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                   "(e.g. FREE/DIAG/NORM)");
       NUIS_ERR(FTL, "Available options for " << fName << " are '" << fAllowedTypes
                                            << "'");
@@ -1320,7 +1318,7 @@ void JointMeas1D::Write(std::string drawOpt) {
   GetMCHistogram()->Write();
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
@@ -1508,7 +1506,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
                                    FitWeight *rw, std::string fkdt) {
   //********************************************************************
 
-  // For joint samples, input files are given as a semi-colon seperated list.
+  // For joint samples, input files are given as a semi-colon separated list.
   // Parse this list and save it for later, and set up the types etc.
 
   if (FitPar::Config().GetParB("EventManager")) {

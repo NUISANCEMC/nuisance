@@ -13,7 +13,7 @@ T2K_nueCCinc_XSec_joint::T2K_nueCCinc_XSec_joint(nuiskey samplekey){
   fSettings.DefineAllowedSpecies("nue, nueb");
   fSettings.SetCovarInput(FitPar::GetDataBase() + "/T2K/CCinc/nue_2019/fract_covar_both.txt");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("");
+  fSettings.SetXTitle("p_{e}-cos#theta_{e}");
   fSettings.SetYTitle("#frac{d#sigma}{dx} (cm^{2}/nucleon)");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -83,6 +83,7 @@ T2K_nueCCinc_XSec_joint::T2K_nueCCinc_XSec_joint(nuiskey samplekey){
 
   // This saves information from the sub-measurements
   fSaveSubMeas = true;
+  fSaveFine = false;
   FinaliseMeasurement();
 };
 
