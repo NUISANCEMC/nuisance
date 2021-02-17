@@ -117,9 +117,9 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[13]->SetLineColor(kGreen);
 
   ModeStack[16]->SetTitle("CC coherent");
-  ModeStack[16]->SetFillColor(kBlue);
+  ModeStack[16]->SetFillColor(kBlue-6);
   // ModeStack[16]->SetFillStyle(3644);
-  ModeStack[16]->SetLineColor(kBlue);
+  ModeStack[16]->SetLineColor(kBlue-6);
 
   // ModeStack[17]->SetTitle("#it{#nu + n #rightarrow l^{-} + p + #gamma}");
   ModeStack[17]->SetTitle("CC1#gamma");
@@ -145,16 +145,16 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[23]->SetLineColor(kYellow - 6);
 
   ModeStack[26]->SetTitle("DIS (W > 2.0)");
-  ModeStack[26]->SetFillColor(kRed);
+  ModeStack[26]->SetFillColor(kRed-6);
   // ModeStack[26]->SetFillStyle(3006);
-  ModeStack[26]->SetLineColor(kRed);
+  ModeStack[26]->SetLineColor(kRed-6);
 
   // NC
   // ModeStack[31]->SetTitle("#it{#nu + n #rightarrow #nu + n + #pi^{0}}");
   ModeStack[31]->SetTitle("NC1#pi^{0} on n");
-  ModeStack[31]->SetFillColor(kBlue);
+  ModeStack[31]->SetFillColor(kBlue-4);
   // ModeStack[31]->SetFillStyle(3004);
-  ModeStack[31]->SetLineColor(kBlue);
+  ModeStack[31]->SetLineColor(kBlue-4);
   // ModeStack[32]->SetTitle("#it{#nu + p #rightarrow #nu + p + #pi^{0}}");
   ModeStack[32]->SetTitle("NC1#pi^{0} on p");
   ModeStack[32]->SetFillColor(kBlue + 3);
@@ -215,9 +215,9 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[45]->SetLineColor(kYellow - 10);
 
   ModeStack[46]->SetTitle("DIS (W > 2.0)");
-  ModeStack[46]->SetFillColor(kRed);
+  ModeStack[46]->SetFillColor(kRed-6);
   // ModeStack[46]->SetFillStyle(3006);
-  ModeStack[46]->SetLineColor(kRed);
+  ModeStack[46]->SetLineColor(kRed-6);
 
   // ModeStack[51]->SetTitle("#it{#nu + p #rightarrow #nu + p}");
   ModeStack[51]->SetTitle("NC on p");
