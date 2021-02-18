@@ -1356,33 +1356,11 @@ void Measurement2D::Write(std::string drawOpt) {
     fSettings.Write();
   }
 
-  // // Likelihood residual plots
-  // if (drawOpt.find("RESIDUAL") != std::string::npos) {
-  // WriteResidualPlots();
-  //}
-
-  // // RATIO
-  // if (drawOpt.find("CANVMC") != std::string::npos) {
-  //   TCanvas* c1 = WriteMCCanvas(fDataHist, fMCHist);
-  //   c1->Write();
-  //   delete c1;
-  // }
-
-  // // PDG
-  // if (drawOpt.find("CANVPDG") != std::string::npos && fMCHist_Modes) {
-  //   TCanvas* c2 = WritePDGCanvas(fDataHist, fMCHist, fMCHist_Modes);
-  //   c2->Write();
-  //   delete c2;
-  // }
-
-  /// 2D VERSION
   // If null pointer return
   if (!fMCHist and !fDataHist) {
     NUIS_LOG(SAM, fName << "Incomplete histogram set!");
     return;
   }
-
-  //  Config::Get().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
@@ -1578,6 +1556,8 @@ void Measurement2D::Write(std::string drawOpt) {
   if (drawShape) {
     // Create Shape Histogram
     TH2D *mcShape = (TH2D *)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
+    TH1D *mcShape_1D = StatUtils::MapToTH1D(mcShape, fMapHist);
+    mcShape_1D ->SetName((fName + "_MC_SHAPE_1D").c_str());
 
     double shapeScale = 1.0;
     if (fIsRawEvents) {
@@ -1586,12 +1566,14 @@ void Measurement2D::Write(std::string drawOpt) {
       shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
     }
 
-    mcShape->Scale(shapeScale);
+    mcShape->SetTitle(Form("%f", shapeScale));
+    mcShape_1D->SetTitle(Form("%f", shapeScale));
 
-    mcShape->SetLineWidth(3);
-    mcShape->SetLineStyle(7); // dashes
+    mcShape->Scale(shapeScale);
+    mcShape_1D->Scale(shapeScale);
 
     mcShape->Write();
+    mcShape_1D->Write();
 
     // Save shape ratios
     if (drawRatio) {
@@ -1608,10 +1590,6 @@ void Measurement2D::Write(std::string drawOpt) {
       mcShapeRatio->Divide(mcShape);
       dataShapeRatio->Divide(mcShape);
 
-      // Colour the shape ratio plots
-      mcShapeRatio->SetLineWidth(3);
-      mcShapeRatio->SetLineStyle(7); // dashes
-
       mcShapeRatio->Write();
       dataShapeRatio->Write();
 
@@ -1620,6 +1598,7 @@ void Measurement2D::Write(std::string drawOpt) {
     }
 
     delete mcShape;
+    delete mcShape_1D;
   }
 
   // Save residual calculations of what contributed to the chi2 values.
