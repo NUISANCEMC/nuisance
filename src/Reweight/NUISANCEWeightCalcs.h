@@ -78,6 +78,7 @@ class SFGausRW_ShellCalc : public NUISANCEWeightCalc {
 
     double fSRC_strength; // RW SRC part
     
+    double fCCQE_norm;
 };
 
 // end Gaussian RW per shell
@@ -113,6 +114,32 @@ class PmissRW_Calc : public NUISANCEWeightCalc {
 // end SF modif
 
 
+// PB
+
+class PBRW_Calc : public NUISANCEWeightCalc {
+ public:
+  PBRW_Calc();
+  ~PBRW_Calc(){};
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  void SetHistograms(TH2D* templ_up, TH2D* templ_low);
+
+  double GetWeightq0q3(double q0, double q3, double dial);
+
+  double fPB_q0q3;
+  TH2D* fTemplateUp;
+  TH2D* fTemplateLow;
+
+
+};
+
+// end PB
+
+
 // FSI RW modif
 
 class FSIRW_Calc : public NUISANCEWeightCalc {
@@ -135,6 +162,45 @@ class FSIRW_Calc : public NUISANCEWeightCalc {
   double fFSIRW_pionProdFSI; // pion production
   double fFSIRW_pionAbsFSI; // pion absorption
 };
+
+
+// Binary FSI
+
+class BinaryFSIRW_Calc : public NUISANCEWeightCalc {
+ public:
+  BinaryFSIRW_Calc();
+  ~BinaryFSIRW_Calc(){};
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  bool IsNoFSI(std::vector<int> PDGvert, std::vector<TLorentzVector> pvert, std::vector<int> PDGfs, std::vector<TLorentzVector> pfs, double eps);
+  bool SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> PDGfs);
+
+  double fBinaryFSIRW_noFSI; // no FSI
+  double fBinaryFSIRW_withFSI; // FSI
+};
+
+// end Binary FSI
+
+
+class FSIRWPiAbs_Calc : public NUISANCEWeightCalc {
+ public:
+  FSIRWPiAbs_Calc();
+  ~FSIRWPiAbs_Calc(){};
+
+  double CalcWeight(BaseFitEvt* evt);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int rwenum, double val);
+  bool IsHandled(int rwenum);
+
+  int GetNumberPi(std::vector<int> PDG);
+
+  double fFSIRWPiAbs;
+};
+
 
 // end FSI RW modif
 

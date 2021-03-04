@@ -100,6 +100,11 @@ GENIEInputHandler::GENIEInputHandler(std::string const &handle,
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
+  fDeactivateQE = FitPar::Config().GetParB("GENIEDeactivateQE"); // Flag to deactivate QE modes in electron scattering MC
+  if (fDeactivateQE){
+    NUIS_LOG(SAM, "*** WILL ASSIGN A ZERO WEIGHT TO QE EVENTS ***");
+  }
+
   // Are we running with NOvA weights
   fNOvAWeights = FitPar::Config().GetParB("NOvA_Weights");
   MAQEw = 1.0;
@@ -280,8 +285,18 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
   }
 #endif
 
+  // Deactivate QE events
+
+  double flagQE = 1.0;
+  int mode = abs(fNUISANCEEvent->GetMode);
+  if (fDeactivateQE){
+    if (mode == 1 || mode == 2)
+      flagQE = 0.0;
+  }
+
+
   // Setup Input scaling for joint inputs
-  fNUISANCEEvent->InputWeight = GetInputWeight(entry);
+  fNUISANCEEvent->InputWeight = GetInputWeight(entry) * flagQE;
 
   return fNUISANCEEvent;
 }

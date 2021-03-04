@@ -25,11 +25,29 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
            << Gaussian_Method
            << " for the Gaussian enhancement, so will die now...");
   }
+
+
+  // To read an external template for reweighting
+  PBRW_Calc* PBRW = new PBRW_Calc();
+  TString path_to_templates = FitPar::Config().GetParS("Path_PB_templates");
+  TFile* file = new TFile(path_to_templates);
+  TH2D* templ_low = (TH2D*) file->Get("ratioLow_fine");
+  TH2D* templ_up = (TH2D*) file->Get("ratioHigh_fine");
+  if (templ_up == 0 || templ_low == 0){
+    NUIS_ABORT("The specified PB file does not contain what I was expecting...");
+  }
+  else {
+    PBRW->SetHistograms(templ_up, templ_low);
+  }
+  
   fWeightCalculators.push_back(GaussianMode);
   //  fWeightCalculators.push_back(new SFRW_ShellNormCalc());
   fWeightCalculators.push_back(new SFGausRW_ShellCalc());
   fWeightCalculators.push_back(new PmissRW_Calc());
+  fWeightCalculators.push_back(PBRW);
   fWeightCalculators.push_back(new FSIRW_Calc());
+  fWeightCalculators.push_back(new BinaryFSIRW_Calc());
+  fWeightCalculators.push_back(new FSIRWPiAbs_Calc());
   fWeightCalculators.push_back(new RW2p2h_Calc());
   fWeightCalculators.push_back(new ModeNormCalc());
   fWeightCalculators.push_back(new SBLOscWeightCalc());

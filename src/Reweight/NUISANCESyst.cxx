@@ -106,8 +106,9 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 
     case kSRC_strength:            { return "SRC_strength"; } // RW SRC part
 
+    case kCCQE_norm: {return "CCQE_norm";} // Overall CCQE normalization
     
-    // end Gaussian RW per shell
+      // end Gaussian RW per shell
 
       // Pmiss RW
     case kPmissRW_pC:              { return "PmissRW_pC"; }
@@ -120,14 +121,25 @@ std::string Reweight::ConvNUISANCEDial(int type) {
 
 
     // end SF modif
+
+    case kPB_q0q3:                   { return "PB_q0q3RW"; }
     
     
     // FSI RW modif
+
     case kFSIRW_noFSI:             { return "FSIRW_noFSI"; }
     case kFSIRW_elasticFSI:        { return "FSIRW_elasticFSI"; }
     case kFSIRW_inelasticFSI:      { return "FSIRW_inelasticFSI"; }
     case kFSIRW_pionProdFSI:       { return "FSIRW_pionProdFSI"; }
     case kFSIRW_pionAbsFSI:        { return "FSIRW_pionAbsFSI"; }
+
+    // Binary FSI
+    case kBinaryFSIRW_noFSI:          { return "BinaryFSIRW_noFSI"; }
+    case kBinaryFSIRW_withFSI:        { return "BinaryFSIRW_withFSI"; }
+    // end Binary FSI
+
+    case kFSIRWPiAbs: {return "FSIRWPiAbs"; }
+
    // end FSI RW modif
 
       // 2p2h normalization

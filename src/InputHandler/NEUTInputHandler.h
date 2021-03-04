@@ -61,10 +61,15 @@ public:
 	/// eads fNeutVect and fills into fNUISANCEEvent.
 	void CalcNUISANCEKinematics();
 
+	double GetQ2(FitEvent* event); // Gets Q2 for Mott's rewegiht
+
 	bool fSaveExtra; ///< Save Extra NEUT information in to fNeutInfo
 	TChain* fNEUTTree; ///< TTree for reading neut vectors.
 	NeutVect* fNeutVect;  ///< Neut vector format event.
 	NEUTGeneratorInfo* fNeutInfo; ///< NEUT Generator Info container.
+
+	bool fReweightQ4; // Flag to apply the 1/Q2**2 in the case of electron scattering using Jordan's file
+
 };
 
 namespace NEUTUtils {

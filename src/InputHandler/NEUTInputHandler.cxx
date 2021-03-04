@@ -84,6 +84,11 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fCacheSize = FitPar::Config().GetParI("CacheSize");
   fMaxEvents = FitPar::Config().GetParI("MAXEVENTS");
 
+  fReweightQ4 = FitPar::Config().GetParB("NEUTJordanReweight");
+  if (fReweightQ4){
+    NUIS_LOG(SAM, "*** WILL APPLY 1/Q2^2 RW FOR ENEUT ***");
+  }
+
   // Loop over all inputs and grab flux, eventhist, and nevents
   std::vector<std::string> inputs = InputUtils::ParseInputFileList(rawinputs);
   for (size_t inp_it = 0; inp_it < inputs.size(); ++inp_it) {
@@ -205,8 +210,14 @@ FitEvent *NEUTInputHandler::GetNuisanceEvent(const UInt_t ent,
   }
 #endif
 
+  // 1/Q4 Mott reweight
+  double Q2 = 1.0;
+  if (fReweightQ4){
+    Q2 = NEUTInputHandler::GetQ2(fNUISANCEEvent);
+  }
+
   // Setup Input scaling for joint inputs
-  fNUISANCEEvent->InputWeight = GetInputWeight(entry);
+  fNUISANCEEvent->InputWeight = GetInputWeight(entry) / (Q2 * Q2);
 
   // Return event pointer
   return fNUISANCEEvent;
@@ -391,6 +402,77 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
   return;
 }
+
+double NEUTInputHandler::GetQ2(FitEvent* event){
+
+  TVector3 zAxis(0.0, 0.0, 1.0);
+
+  // Incoming lepton
+  double Elep_init;
+
+  // IS nucleon info
+  TLorentzVector initnucl_4mom;
+  TVector3 initnucl_velocity;
+
+  // Outgoing electron info
+  TLorentzVector lep_4mom;
+  double Elep;
+
+  // Angle of the outgoing lepton in the IS nucleon rest frame
+  double angle;
+
+  // Q2
+  double Q2;
+
+  int npart = event->Npart();
+  for (UInt_t ip = 0; ip < npart; ip++){ // loop over all particles
+    bool isIS = event->PartInfo(ip)->Status() == kInitialState;
+    bool isFS = (event->PartInfo(ip)->fIsAlive && event->PartInfo(ip)->Status() == kFinalState);
+
+    if (isIS){
+      // Access IS particles
+      int partPDG = event->PartInfo(ip)->fPID;
+      if (partPDG == 11 || partPDG == 12){
+	// Choosing the IS lepton
+	Elep_init = event->PartInfo(ip)->fP.E();
+      }
+      if (partPDG == 2212 || partPDG == 2112){
+	// Choosing the IS nucleon
+	initnucl_4mom = event->PartInfo(ip)->fP;
+	initnucl_velocity = initnucl_4mom.BoostVector();
+      }
+
+    }
+
+    if (isFS){
+      // Access FS particles
+      int partPDG = event->PartInfo(ip)->fPID;
+      if (partPDG == 11 || partPDG == 12){
+	// Choosing the outgoing lepton
+	lep_4mom = event->PartInfo(ip)->fP;
+	break;
+      }
+    }
+
+  }
+
+  
+
+  // Boost electron 4-momentum to the nucleon frame
+  lep_4mom.Boost(-initnucl_velocity);
+  
+  Elep = lep_4mom.E() ;
+  angle = lep_4mom.Vect().Angle(zAxis);
+
+  //TO COMMENT                                                                                                                                                                                                            
+  //lep_4mom.Print();
+  //std::cout << Elep << " -- " << angle << std::endl;
+  Q2 = 4 * Elep_init * Elep *  pow(cos(angle / 2), 2);
+
+  return 2.0;
+
+}
+
 
 void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   // WARNING: This has only been implemented for a neuttree and not GENIE

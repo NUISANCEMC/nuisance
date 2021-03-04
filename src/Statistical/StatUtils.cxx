@@ -21,6 +21,7 @@
 #include "GeneralUtils.h"
 #include "NuisConfig.h"
 #include "TH1D.h"
+#include "TVector.h"
 
 //*******************************************************************
 Double_t StatUtils::GetChi2FromDiag(TH1D *data, TH1D *mc, TH1I *mask) {
@@ -1145,6 +1146,143 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
   }
   return shape_covar;
 }
+
+
+
+
+// ***** NS covar modifications *****
+
+// "Norm-Shape" covariance
+TMatrixDSym *StatUtils::ExtractNSCovar(TMatrixDSym *full_covar,
+				       TH1 *data_hist,
+				       double shape_scale) {
+
+  int nbins = full_covar->GetNrows();
+  TMatrixDSym *NS_covar = new TMatrixDSym(nbins);
+
+  int replaced_bin_index = nbins-1; // w/ 0 the index of the 1st bin
+
+  // Check nobody is being silly
+  if (data_hist->GetNbinsX() != nbins)
+    {
+      NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
+	       "StatUtils::ExtractNSCovar!");
+      NUIS_ERR(WRN, "data_hist has " << data_hist->GetNbinsX() << " matrix has "
+	       << nbins);
+      int err_bins = data_hist->GetNbinsX();
+      if (nbins > err_bins)
+	err_bins = nbins;
+      for (int i = 0; i < err_bins; ++i) {
+	NUIS_ERR(WRN, "Matrix diag. = " << (*full_covar)(i, i) << " data = "
+		 << data_hist->GetBinContent(i + 1));
+      }
+      return NULL;
+    }
+
+  double total_data = 0;
+  double total_covar = 0;
+  std::vector<double> total_rows_covar;
+  double temp_sum = 0;
+
+  // Initial loop to calculate some constants
+  for (int i = 0; i < nbins; ++i) {
+    total_data += data_hist->GetBinContent(i + 1) ;
+    temp_sum = 0;
+    for (int j = 0; j < nbins; ++j) {
+      total_covar += (*full_covar)(i, j);
+      temp_sum += (*full_covar)(i, j);
+    }
+    total_rows_covar.push_back(temp_sum);
+  }
+
+  if (total_data == 0 || total_covar == 0 || nbins < 2) {
+    NUIS_ERR(WRN, "Stupid matrix or data histogram passed to "
+	     "StatUtils::ExtractNSCovar! Ignoring...");
+    return NULL;
+  }
+
+  NUIS_LOG(SAM, "Norm error = " << sqrt(total_covar) / total_data);
+
+
+  // Now loop over and calculate the NS covariance matrix
+  for (int i = 0; i < nbins; ++i) {
+
+    double data_i = data_hist->GetBinContent(i + 1);
+
+    for (int j = 0; j < nbins; ++j) {
+
+      double data_j = data_hist->GetBinContent(j + 1);
+
+      // check if we're on the row/column of the removed bin
+      if (i == replaced_bin_index || j == replaced_bin_index) {
+
+        if (i == replaced_bin_index && j == replaced_bin_index) {
+          (*NS_covar)(i, j) = total_covar;
+        }
+
+        else if (i == replaced_bin_index){
+          (*NS_covar)(i, j) = shape_scale * 
+	    (total_rows_covar[j] - data_j * total_covar / total_data) / total_data;
+        }
+
+        else { // j == replaced_bin_index
+          (*NS_covar)(i, j) = shape_scale * 
+	    (total_rows_covar[i] - data_i * total_covar/ total_data) / total_data;
+        }
+      }
+      else {
+	double term1 = (*full_covar)(i, j);
+	double term2 = - data_i * total_rows_covar[j] / total_data;
+	double term3 = - data_j * total_rows_covar[i] / total_data;
+	double term4 = data_i * data_j * total_covar / total_data / total_data;
+
+	(*NS_covar)(i, j) = shape_scale * shape_scale * 
+	  (term1 + term2 + term3 + term4) / total_data / total_data;
+      }
+    }
+  }
+
+  return NS_covar;
+}
+
+
+TH1D *StatUtils::InitToNS(TH1D *hist, double shape_scale) {
+
+  int nbins = hist->GetNbinsX();
+  int replaced_bin_index = nbins-1;
+
+  std::string name_hist = std::string(hist->GetName());
+
+  TH1D *NS_hist = (TH1D *) hist->Clone();
+  NS_hist->SetDirectory(NULL);
+
+  // First get the norm
+  Double_t norm = 0.0;
+  for (int i=0 ; i<nbins ; i++) {
+    norm += hist->GetBinContent(i + 1);
+  }
+
+  for (int i=0 ; i<nbins ; i++) {
+    // Replace one bin by the norm
+    if (i == replaced_bin_index) {
+      NS_hist->SetBinContent(i + 1, norm);
+      //  NS_hist->SetBinError(i + 1, sqrt((*NS_covar)(i, i)));
+    }
+    // Normalize the others
+    else {
+      NS_hist->SetBinContent(i + 1, hist->GetBinContent(i + 1) * shape_scale / norm);
+      //NS_hist->SetBinError(i + 1, sqrt((*NS_covar)(i, i)));
+    }
+  }
+
+  return NS_hist;
+}
+
+// ***** end NS covar modifications *****
+
+
+
+
 
 //*******************************************************************
 TH2I *StatUtils::GenerateMap(TH2D *hist) {

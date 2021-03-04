@@ -177,8 +177,10 @@ private:
   // Variables to keep track of the impact of the FSI-fate and SF-shell weights
   int fInputsN;
   bool fTrackAvgWeights;
-  double fNormAltRegPen;
-  double* fFsiFateDialAvg;
+  double fNormAltRegPenSF;
+  double fNormAltRegPenFSI;
+  double* fFsiCCQEFateDialAvg;
+  double* fFsiNonCCQEFateDialAvg;
   double* fSfShellDialAvg;
 
 

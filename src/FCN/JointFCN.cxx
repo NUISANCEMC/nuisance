@@ -24,7 +24,8 @@ JointFCN::JointFCN(TFile *outfile) {
   fNDials = 0;
 
   fTrackAvgWeights = FitPar::Config().GetParB("ApplyFsiSfNormPen"); 
-  fNormAltRegPen = FitPar::Config().GetParD("FsiSfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
+  fNormAltRegPenSF = FitPar::Config().GetParD("SfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
+  fNormAltRegPenFSI = FitPar::Config().GetParD("FsiNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift                                                                  
 
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
@@ -37,8 +38,10 @@ JointFCN::JointFCN(TFile *outfile) {
     }
     fInputsN = fInputList.size();
 
-    fFsiFateDialAvg = new double[fInputsN];
+    fFsiCCQEFateDialAvg = new double[fInputsN];
+    fFsiNonCCQEFateDialAvg = new double[fInputsN];
     fSfShellDialAvg = new double[fInputsN];
+    
   }
 
 }
@@ -63,8 +66,9 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile *outfile) {
   fNDials = 0;
 
   fTrackAvgWeights = FitPar::Config().GetParB("ApplyFsiSfNormPen"); 
-  fNormAltRegPen = FitPar::Config().GetParD("FsiSfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
-
+  fNormAltRegPenSF = FitPar::Config().GetParD("SfNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift  
+  fNormAltRegPenFSI = FitPar::Config().GetParD("FsiNormPenStrength"); // 25.0 gives a 1 sigma penalty for a 20% norm shift
+ 
   fUsingEventManager = FitPar::Config().GetParB("EventManager");
   fOutputDir->cd();
 
@@ -76,7 +80,8 @@ JointFCN::JointFCN(std::vector<nuiskey> samplekeys, TFile *outfile) {
     }
     fInputsN = fInputList.size();
 
-    fFsiFateDialAvg = new double[fInputsN];
+    fFsiCCQEFateDialAvg = new double[fInputsN];
+    fFsiNonCCQEFateDialAvg = new double[fInputsN];
     fSfShellDialAvg = new double[fInputsN];
   }
 
@@ -105,8 +110,10 @@ JointFCN::~JointFCN() {
     delete fDialVals;
   if (fSampleLikes)
     delete fSampleLikes;
-  if (fFsiFateDialAvg)
-    delete fFsiFateDialAvg;
+  if (fFsiCCQEFateDialAvg)
+    delete fFsiCCQEFateDialAvg;
+  if (fFsiNonCCQEFateDialAvg)
+    delete fFsiNonCCQEFateDialAvg;
   if (fSfShellDialAvg)
     delete fSfShellDialAvg;
 };
@@ -248,7 +255,7 @@ void JointFCN::FillIterationTree(FitWeight *rw) {
 //***************************************************
 double JointFCN::DoEval(const double *x) {
   //***************************************************
-
+  
   // WEIGHT ENGINE
   fDialChanged = FitBase::GetRW()->HasRWDialChanged(x);
   FitBase::GetRW()->UpdateWeightEngine(x);
@@ -377,13 +384,16 @@ double JointFCN::GetLikelihood() {
 
   if(fTrackAvgWeights){
     for(int i=0; i<fInputsN; i++){
-      like+= fNormAltRegPen * (fFsiFateDialAvg[i]-1)*(fFsiFateDialAvg[i]-1);
-      like+= fNormAltRegPen * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1);
+      like+= fNormAltRegPenFSI * (fFsiCCQEFateDialAvg[i]-1)*(fFsiCCQEFateDialAvg[i]-1);
+      like+= fNormAltRegPenFSI * (fFsiNonCCQEFateDialAvg[i]-1)*(fFsiNonCCQEFateDialAvg[i]-1);
+      like+= fNormAltRegPenSF * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1);
       std::cout << "Applying reg-like penalty for FSI and SF weights: " << std::endl;
-      std::cout << "Reg strength is: " << fNormAltRegPen << std::endl;
+      std::cout << "SF Reg strength is: " << fNormAltRegPenSF << std::endl;
+      std::cout << "FSI Reg strength is: " << fNormAltRegPenFSI << std::endl;
       std::cout << "Current likelihood is: " << like << std::endl;
-      std::cout << "FSI contribution is: " << fNormAltRegPen * (fFsiFateDialAvg[i]-1)*(fFsiFateDialAvg[i]-1) << std::endl;
-      std::cout << "SF contribution is: " << fNormAltRegPen * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1) << std::endl;
+      std::cout << "FSI CCQE contribution is: " << fNormAltRegPenFSI * (fFsiCCQEFateDialAvg[i]-1)*(fFsiCCQEFateDialAvg[i]-1) << std::endl;
+      std::cout << "FSI non-CCQE contribution is: " << fNormAltRegPenFSI * (fFsiNonCCQEFateDialAvg[i]-1)*(fFsiNonCCQEFateDialAvg[i]-1) << std::endl;
+      std::cout << "SF contribution is: " << fNormAltRegPenSF * (fSfShellDialAvg[i]-1)*(fSfShellDialAvg[i]-1) << std::endl;
     }
   }
 
@@ -504,8 +514,10 @@ void JointFCN::FindRelevantAvgWeights() {
   int inputcount = 0;
   inp_iter = fInputList.begin();
 
-  double sumInputWeights;
-  double sumFsiFateWeights;
+  double sumInputNonCCQEWeights;
+  double sumInputCCQEWeights;
+  double sumFsiFateCCQEWeights;
+  double sumFsiFateNonCCQEWeights;
   double sumSFShellWeights;
 
   // Loop over each input in manager
@@ -517,8 +529,10 @@ void JointFCN::FindRelevantAvgWeights() {
     curinput->CreateCache();
 
     // Reset for each sample
-    sumInputWeights = 0;
-    sumFsiFateWeights = 0;
+    sumInputNonCCQEWeights = 0;
+    sumInputCCQEWeights = 0;
+    sumFsiFateCCQEWeights = 0;
+    sumFsiFateNonCCQEWeights = 0;
     sumSFShellWeights = 0;
 
     // Start event loop iterating until we get a NULL pointer.
@@ -529,21 +543,37 @@ void JointFCN::FindRelevantAvgWeights() {
       // The Custom weight and reweight
       curevent->Weight =
           curevent->RWWeight * curevent->InputWeight * curevent->CustomWeight;
-
+      
       // Fill the weight trackers
-      sumInputWeights   += curevent->InputWeight;
-      sumFsiFateWeights += curevent->FsiFateWeight * curevent->InputWeight;
-      sumSFShellWeights += curevent->SfShellWeight * curevent->InputWeight;
+
+      
+      // SF penalty is applied on CCQE weights only
+      // FSI penalty needs to be applied to each interaction mode separately
+      
+      int mode = abs(curevent->Mode);
+      if (mode == 1) 
+	{
+	  sumSFShellWeights += curevent->SfShellWeight * curevent->InputWeight;
+	  sumFsiFateCCQEWeights += curevent->FsiFateWeight * curevent->InputWeight;
+	  sumInputCCQEWeights += curevent->InputWeight;
+	}
+      else
+	{
+	  sumInputNonCCQEWeights += curevent->InputWeight;
+	  sumFsiFateNonCCQEWeights += curevent->FsiFateWeight * curevent->InputWeight;
+	}
 
       // Iterate to the next event.
       curevent = curinput->NextNuisanceEvent();
     }
 
-    std::cout << "fFsiFateDialAvg is: " << sumFsiFateWeights/sumInputWeights << std::endl;
-    std::cout << "fSfShellDialAvg is: " << sumSFShellWeights/sumInputWeights << std::endl;
+    std::cout << "fFsiCCQEFateDialAvg is: " << sumFsiFateCCQEWeights/sumInputCCQEWeights << std::endl;
+    std::cout << "fFsiNonCCQEFateDialAvg is: " << sumFsiFateNonCCQEWeights/sumInputNonCCQEWeights << std::endl;
+    std::cout << "fSfShellDialAvg is: " << sumSFShellWeights/sumInputCCQEWeights << std::endl;
 
-    fFsiFateDialAvg[inputcount] = sumFsiFateWeights/sumInputWeights;
-    fSfShellDialAvg[inputcount] = sumSFShellWeights/sumInputWeights;
+    fFsiCCQEFateDialAvg[inputcount] = sumFsiFateCCQEWeights/sumInputCCQEWeights;
+    fFsiNonCCQEFateDialAvg[inputcount] = sumFsiFateNonCCQEWeights/sumInputNonCCQEWeights;
+    fSfShellDialAvg[inputcount] = sumSFShellWeights/sumInputCCQEWeights;
 
     // Keep track of what input we are on.
     inputcount++;

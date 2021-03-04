@@ -138,33 +138,35 @@ SFGausRW_ShellCalc::SFGausRW_ShellCalc()
     // C, p-shell
     fGaus_pShell_C[kPosNorm] = 0.0;
     fGaus_pShell_C[kPosP] = 15.0;
-    fGaus_pShell_C[kPosW] = 7.0;
+    fGaus_pShell_C[kPosW] = 4.0;
     
     // C, s-shell
     fGaus_sShell_C[kPosNorm] = 0.0;
-    fGaus_sShell_C[kPosP] = 35.0;
-    fGaus_sShell_C[kPosW] = 12.0;
+    fGaus_sShell_C[kPosP] = 40.0;
+    fGaus_sShell_C[kPosW] = 8.0;
     
     // O, p1/2-shell
     fGaus_p12Shell_O[kPosNorm] = 0.0;
-    fGaus_p12Shell_O[kPosP] = 0.0;
+    fGaus_p12Shell_O[kPosP] = 12.0;
     fGaus_p12Shell_O[kPosW] = 1.0;
     
     // O, p3/2-shell
     fGaus_p32Shell_O[kPosNorm] = 0.0;
-    fGaus_p32Shell_O[kPosP] = 0.0;
+    fGaus_p32Shell_O[kPosP] = 18.0;
     fGaus_p32Shell_O[kPosW] = 1.0;
     
     // O, s-shell
     fGaus_sShell_O[kPosNorm] = 0.0;
-    fGaus_sShell_O[kPosP] = 0.0;
+    fGaus_sShell_O[kPosP] = 40.0;
     fGaus_sShell_O[kPosW] = 1.0;
+
+    // Overall CCQE normalization
+    fCCQE_norm = 1.0;
 
     // SRC strength
     fSRC_strength = 1.0;
 }
 
- 
 
 double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
     int mode = abs(evt->Mode);
@@ -178,6 +180,10 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
     
     if (mode == 1) // CCQE only
     {
+      
+      // Overall CCQE normalization
+      w *= fCCQE_norm;
+      
       // Get the number of outgoing protons from the primary vertex
       UInt_t npart = fevt->Npart();
       int Nprotons = 0;
@@ -196,41 +202,31 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
     w *= fSRC_strength;
         }
         
+      else { // Nprotons == 1
 
-        double Emiss = FitUtils::GetEmiss(fevt); // Compute Emiss
+	double Emiss = FitUtils::GetEmiss(fevt); // Compute Emiss
         
         if (Z==6 && A==12) // Carbon
-        {
-    //if(Emiss>10 && Emiss<25) // P-shell
-            {
-                w *= GetGausWeight(Emiss, fGaus_pShell_C);
-            }
+	  {
+	    // P-shell
+	    w *= GetGausWeight(Emiss, fGaus_pShell_C);
             
-    //if(Emiss>25 && Emiss<60) // S-shell
-            {
-                w *= GetGausWeight(Emiss, fGaus_sShell_C);
-            }
-        }
+	    // S-shell
+	    w *= GetGausWeight(Emiss, fGaus_sShell_C);
+	  }
         
         if (Z==8 && A==16) // Oxygen
         {
-    //if(Emiss>8 && Emiss<15) // P1/2-shell
-            {
-                w *= GetGausWeight(Emiss, fGaus_p12Shell_O);
-            }
+	  // P1/2-shell
+	  w *= GetGausWeight(Emiss, fGaus_p12Shell_O);
             
-    //if(Emiss>15 && Emiss<25) // P3/2-shell
-            {
-                w *= GetGausWeight(Emiss, fGaus_p32Shell_O);
-            }
+	  // P3/2-shell
+	  w *= GetGausWeight(Emiss, fGaus_p32Shell_O);
             
-    //if(Emiss>25 && Emiss<70) // S-shell
-            {
-                w *= GetGausWeight(Emiss, fGaus_sShell_O);
-            }
-        }
-        
-        //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
+	  // S-shell
+	  w *= GetGausWeight(Emiss, fGaus_sShell_O);
+        } 
+      }
     }
     
     // Store the weight specifically from SF shell modifications for later use. 
@@ -311,6 +307,9 @@ void SFGausRW_ShellCalc::SetDialValue(int rwenum, double val) {
 
     if (kSRC_strength == curenum)
       fSRC_strength = val; // RW SRC part
+
+    if (kCCQE_norm == curenum)
+      fCCQE_norm = val;
 }
 
 bool SFGausRW_ShellCalc::IsHandled(int rwenum) {
@@ -325,6 +324,8 @@ bool SFGausRW_ShellCalc::IsHandled(int rwenum) {
     {
         // RW SRC    
         case kSRC_strength:
+	  
+        case kCCQE_norm:
 
         case kGaussian_pShell_C_norm:
         case kGaussian_pShell_C_p:
@@ -564,7 +565,7 @@ double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
   // (e,e'p) data
   // The data points were first normalized, then the values at each point...
     
-  double edges[8]={0., 40., 80., 120., 160., 200., 240., 280.}; // steps of 40.0 MeV
+  //double edges[8]={0., 40., 80., 120., 160., 200., 240., 280.}; // steps of 40.0 MeV
   double limits[7]={0., 60., 100., 140., 180., 220., 260};
   double centers[7]={20., 60., 100., 140., 180., 220., 260.};
     
@@ -625,6 +626,117 @@ double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
 
 // ------ End of new SF dials ------
 
+
+// PB
+
+PBRW_Calc::PBRW_Calc()
+{
+  fPB_q0q3 = 0.0;
+}
+
+
+double PBRW_Calc::CalcWeight(BaseFitEvt *evt) {
+  int mode = abs(evt->Mode);
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
+
+  double w = 1.0;
+
+  if (mode == 1){
+    double q3 = FitUtils::Getq3(fevt), q0 = FitUtils::Getq0(fevt);
+    double q0q3Weight = GetWeightq0q3(q0, q3, fPB_q0q3);
+ 
+    w *= q0q3Weight;
+
+  }
+
+  return w;
+
+}
+
+void PBRW_Calc::SetHistograms(TH2D* templ_up, TH2D* templ_low) {
+
+  NUIS_LOG(FIT,
+	   "Setting the ROOT histograms of q3:q0");
+
+  fTemplateUp = templ_up;
+  fTemplateLow = templ_low;
+}
+
+void PBRW_Calc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void PBRW_Calc::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kPB_q0q3)
+    fPB_q0q3 = val;
+}
+
+
+bool PBRW_Calc::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+
+  //std::cout << "Checking if pShellNorm dial is handled" << std::endl;
+  //std::cout << "  curenum" << curenum << std::endl;
+  //std::cout << "  rwenum" << rwenum << std::endl;
+  //std::cout << "  rwenum % 1000" << rwenum % 1000 << std::endl;
+
+  switch (curenum) {
+  case kPB_q0q3:
+    return true;
+  default:
+    return false;
+  }
+}
+
+double PBRW_Calc::GetWeightq0q3(double q0, double q3, double dial){
+  // q0 and q3 need to be in MeV
+
+  double q0_lim = 300, q3_lim = 600, q0_lim0 = 30, q3_lim0 = 20;
+
+  if (q3 > q3_lim || q0 > q0_lim || q3 < q3_lim0 || q0 < q0_lim0)
+    return 1.0;
+
+  //int binup = fTemplateUp->FindBin(q3, q0), binlow = fTemplateLow->FindBin(q3, q0);
+  double upper_bound = fTemplateUp->Interpolate(q3, q0), lower_bound = fTemplateLow->Interpolate(q3, q0);
+  //double upper_bound = fTemplateUp->GetBinContent(binup), lower_bound = fTemplateLow->GetBinContent(binlow); 
+  //std::cout << "a=" << dial << " -- q0=" << q0 << " -- q3=" << q3 << " -- bin=" << fTemplateUp->FindBin(q3, q0) << " -- w=" << 1.0 + dial * (upper_bound - 1.0) << std::endl;
+
+  if (dial>0){
+
+    if (upper_bound == 0){
+      upper_bound = 1.0;
+    }
+    return 1.0+dial*(upper_bound-1.0);
+  }
+
+  else {
+    if (lower_bound == 0){
+      lower_bound = 1.0;
+    }
+    return 1.0 + dial * (-lower_bound + 1.0);
+  }
+
+  return 1.0;
+  //return - (dial - 1) * (dial + 1) + (dial - 1) * dial * (fTemplateLow->Interpolate(q3) / 2) + dial * (dial + 1) * (fTemplateUp->Interpolate(q3) / 2);
+    //std::cout << fTemplateUp->GetNbinsX() << std::endl;
+    /*
+    for (size_t i = 0; i < 12; i++) {
+      if (q3 > edges[i] && q3 < edges[i+1]){
+        // 2nd order polynomial
+        return - (dial - 1) * (dial + 1) + (dial - 1) * dial * (lower_bound[i]/2) + dial * (dial + 1) * (upper_bound[i]/2);
+      }
+    }
+    */
+
+}
+
+
+// end PB
 
 // FSI RW modif 
 
@@ -695,7 +807,7 @@ double FSIRW_Calc::CalcWeight(BaseFitEvt *evt) {
           }
       }
     // Store the weight specifically from FSI fate modifications for later use. 
-    evt->FsiFateWeight = w;
+    //evt->FsiFateWeight = w;
     return w;
 }
 
@@ -784,7 +896,7 @@ bool FSIRW_Calc::SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> 
 {
   // Check if we have the same particles at vert and fs
     
-  int nvertp = PDGvert.size();
+  UInt_t nvertp = PDGvert.size();
   if (PDGfs.size() != nvertp)
     return false;
     
@@ -792,7 +904,7 @@ bool FSIRW_Calc::SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> 
   std::sort(PDGvert_sorted.begin(), PDGvert_sorted.end());
   std::sort(PDGfs_sorted.begin(), PDGfs_sorted.end());
     
-  for (int i = 0; i<nvertp; i++)
+  for (UInt_t i = 0; i<nvertp; i++)
     {
       if (PDGvert_sorted[i] != PDGfs_sorted[i])
   return false;
@@ -804,13 +916,233 @@ bool FSIRW_Calc::SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> 
 int FSIRW_Calc::GetNpi(std::vector<int> PDG)
 {
   int Npi = 0;
-  for (int i = 0; i<PDG.size(); i++)
+  for (UInt_t i = 0; i<PDG.size(); i++)
     {
       if (abs(PDG[i]) == 211 || abs(PDG[i]) == 111)
   Npi++;
     }
   return Npi;
 }
+
+// Binary FSI
+
+BinaryFSIRW_Calc::BinaryFSIRW_Calc() {
+
+  fBinaryFSIRW_noFSI = 1.0; // no FSI
+  fBinaryFSIRW_withFSI = 1.0; // elastic FSI (change in the kinematics of primary vertex particles only)
+
+}
+
+double BinaryFSIRW_Calc::CalcWeight(BaseFitEvt *evt) {
+  double eps = 0.0001;
+
+  int mode = abs(evt->Mode);
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
+  double w = 1.0;
+
+  if (mode<3) // CCQE and 2p2h
+    {
+      // First, get the PDG of particles at vert and fs
+
+      std::vector<int> PDGvert = FitUtils::GetPDGvert(fevt), PDGfs = FitUtils::GetPDGfs(fevt);
+
+      // Now check the different FSI cases
+
+      // Do we have the same particles in the vert and fsi?
+
+      bool samePartVertFS = SameParticlesVertFS(PDGvert, PDGfs);
+
+      if (samePartVertFS == true)
+	{
+	  // Same particles => either no FSI or elastic FSI
+	  // Get the momenta and evaluate the variation
+	  //std::cout<<"no or elas FSI"<<std::endl;
+	  std::vector<TLorentzVector> pvert = FitUtils::GetPvert(fevt), pfs = FitUtils::GetPfs(fevt);
+
+	  bool noFSI = IsNoFSI(PDGvert, pvert, PDGfs, pfs, eps);
+
+	  if (noFSI == true)
+	    {
+	      w *= fBinaryFSIRW_noFSI; // no FSI
+	      //std::cout<<"noFSI"<<std::endl;
+	    }
+	  else
+	    {
+	      w *= fBinaryFSIRW_withFSI; // FSI
+	    }
+	}
+      else // FSI
+	{
+	  w *= fBinaryFSIRW_withFSI; // FSI
+	}
+    }
+
+  // Store the weight specifically from FSI fate modifications for later use.
+  evt->FsiFateWeight = w;
+  return w;
+}
+
+void BinaryFSIRW_Calc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void BinaryFSIRW_Calc::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kBinaryFSIRW_noFSI)
+    fBinaryFSIRW_noFSI = val;
+  if (curenum == kBinaryFSIRW_withFSI)
+    fBinaryFSIRW_withFSI = val;
+}
+
+bool BinaryFSIRW_Calc::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+
+  switch (curenum) {
+  case kBinaryFSIRW_noFSI:
+  case kBinaryFSIRW_withFSI:
+    return true;
+  default:
+    return false;
+  }
+}
+
+bool BinaryFSIRW_Calc::IsNoFSI(std::vector<int> PDGvert, std::vector<TLorentzVector> pvert, std::vector<int> PDGfs, std::vector<TLorentzVector> pfs, double eps)
+{
+  // Check if we have the same particles at vert and fs
+
+  //bool samePartVertFS = SameParticlesVertFS(PDGvert, PDGfs);
+
+  //if (samePartVertFS == false)
+  //    return false;
+
+  // Now we know that we have the same particles in both vert and fs
+  // Let's check how much the momentum changes
+  int nvertp = PDGvert.size();
+  std::vector<bool> visited(nvertp, false);
+
+  for (int k = 0; k<nvertp; k++)
+    {
+      int l = 0;
+      for (l = 0; l<nvertp; l++)
+        {
+	  if (PDGvert[k] == PDGfs[l] && visited[l] == false)
+            {
+	      TLorentzVector diff = pvert[k] - pfs[l];
+	      double dist = diff.Vect().Mag();
+
+	      if (dist < eps * pvert[k].Vect().Mag())
+                {
+		  visited[l] = true;
+		  break;
+                }
+            }
+        }
+
+      if (l == nvertp)
+	return false;
+    }
+  return true;
+
+}
+
+bool BinaryFSIRW_Calc::SameParticlesVertFS(std::vector<int> PDGvert, std::vector<int> PDGfs)
+{
+  // Check if we have the same particles at vert and fs
+
+  UInt_t nvertp = PDGvert.size();
+  if (PDGfs.size() != nvertp)
+    return false;
+
+  std::vector<int> PDGvert_sorted(PDGvert), PDGfs_sorted(PDGfs);
+  std::sort(PDGvert_sorted.begin(), PDGvert_sorted.end());
+  std::sort(PDGfs_sorted.begin(), PDGfs_sorted.end());
+
+  for (UInt_t i = 0; i<nvertp; i++)
+    {
+      if (PDGvert_sorted[i] != PDGfs_sorted[i])
+	return false;
+    }
+  return true;
+}
+
+// end Binary FSI
+
+
+// Pion Absorption
+
+FSIRWPiAbs_Calc::FSIRWPiAbs_Calc(){
+  fFSIRWPiAbs = 1.0;
+}
+
+double FSIRWPiAbs_Calc::CalcWeight(BaseFitEvt *evt){
+
+  int mode = abs(evt->Mode);
+  FitEvent *fevt = static_cast<FitEvent *>(evt);
+
+  double w = 1.0;
+
+  std::vector<int> PDGvert = FitUtils::GetPDGvert(fevt), PDGfs = FitUtils::GetPDGfs(fevt);
+
+  int Npivert = GetNumberPi(PDGvert), Npifs = GetNumberPi(PDGfs);
+
+  if (mode < 30){
+    if (Npifs<Npivert)
+      w *= fFSIRWPiAbs;
+  }
+
+  return w;
+}
+
+
+
+int FSIRWPiAbs_Calc::GetNumberPi(std::vector<int> PDG)
+{
+  int Npi = 0;
+  for (UInt_t i = 0; i<PDG.size(); i++)
+    {
+      if (abs(PDG[i]) == 211 || abs(PDG[i]) == 111)
+	Npi++;
+    }
+  return Npi;
+}
+
+void FSIRWPiAbs_Calc::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+
+void FSIRWPiAbs_Calc::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % 1000;
+
+  // Check Handled                                                                                                                                                 \
+
+  if (!IsHandled(curenum))
+    return;
+  if (curenum == kFSIRWPiAbs)
+    fFSIRWPiAbs = val;
+}
+
+bool FSIRWPiAbs_Calc::IsHandled(int rwenum) {
+  int curenum = rwenum % 1000;
+
+  //std::cout << "Checking if pShellNorm dial is handled" << std::endl;   
+  //std::cout << "  curenum" << curenum << std::endl;                       
+  //std::cout << "  rwenum" << rwenum << std::endl;
+  //std::cout << "  rwenum % 1000" << rwenum % 1000 << std::endl;                      
+
+  switch (curenum) {
+  case kFSIRWPiAbs:
+    return true;
+  default:
+    return false;
+  }
+}
+
+
 
 // end FSI RW modif
 
@@ -822,7 +1154,7 @@ RW2p2h_Calc::RW2p2h_Calc() {
 
 double RW2p2h_Calc::CalcWeight(BaseFitEvt *evt) {
   int mode = abs(evt->Mode);
-  FitEvent *fevt = static_cast<FitEvent *>(evt);
+  
   double w = 1.0;
     
   if (mode == 2) // 2p2h
@@ -864,9 +1196,6 @@ bool RW2p2h_Calc::IsHandled(int rwenum) {
 }
 
 // end 2p2h normalization RW
-
-
-
 
 
 

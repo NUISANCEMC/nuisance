@@ -1324,3 +1324,21 @@ std::vector<TLorentzVector> FitUtils::GetPfs(FitEvent *event)
 
 // end FSI RW modif
 
+double FitUtils::Getq3(FitEvent *event){
+  // (nu->fP - lep->fP)
+  FitParticle *nu = event->GetBeamPart();
+  FitParticle *lep = event->GetHMFSAnyLepton();
+
+  return (nu->fP - lep->fP).Vect().Mag();
+
+}
+
+double FitUtils::Getq0(FitEvent *event){
+  // (nu->fP - lep->fP)
+ 
+  FitParticle *nu = event->GetBeamPart();
+  FitParticle *lep = event->GetHMFSAnyLepton();
+
+  return (nu->fP - lep->fP).E();
+
+}
