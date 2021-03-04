@@ -288,7 +288,7 @@ FitEvent *GENIEInputHandler::GetNuisanceEvent(const UInt_t ent,
   // Deactivate QE events
 
   double flagQE = 1.0;
-  int mode = abs(fNUISANCEEvent->GetMode);
+  int mode = abs(fNUISANCEEvent->GetMode());
   if (fDeactivateQE){
     if (mode == 1 || mode == 2)
       flagQE = 0.0;
