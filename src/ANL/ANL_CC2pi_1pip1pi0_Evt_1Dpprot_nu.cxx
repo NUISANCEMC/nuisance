@@ -85,28 +85,3 @@ bool ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::isSignal(FitEvent *event) {
   return SignalDef::isCCWithFS(event, 14, pdgs,
                                EnuMin, EnuMax);
 }
-
-
-/*
-void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::FillHistograms() {
-
-  if (makeHadronicMassHist) {
-    hadMassHist->Fill(hadMass);
-  }
-
-  Measurement1D::FillHistograms();
-
-}
-
-
-void ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu::ScaleEvents() {
-
-  PlotUtils::FluxUnfoldedScaling(mcHist, GetFluxHistogram());
-  PlotUtils::FluxUnfoldedScaling(mcFine, GetFluxHistogram());
-
-  mcHist->Scale(fScaleFactor);
-  mcFine->Scale(fScaleFactor);
-
-  return;
-}
-*/
