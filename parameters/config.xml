@@ -180,6 +180,7 @@
 <config NumRangeSteps='50'/>
 <config UseProton='true'/>
 <config UseZackEff='false'/>
+<config SciBooNEScale='0.99E20'/>
 
 <config MINERvADensity='1.04'/>
 <config MINERvARecoDist='10.0'/>
