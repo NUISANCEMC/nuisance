@@ -200,6 +200,12 @@ std::vector<int> GetPDGfs(FitEvent *event);
 std::vector<TLorentzVector> GetPfs(FitEvent *event);
 
 // end FSI RW modif
+
+double Getq3(FitEvent *event);
+
+double Getq0(FitEvent *event);
+
+
 }
 /*! @} */
 #endif

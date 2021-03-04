@@ -105,6 +105,8 @@ namespace Reweight {
 
     kSRC_strength, // RW SRC part
 
+    kCCQE_norm, // Overall CCQE normalization
+
     // end Gaussian RW per shell
 
     // Pmiss RW
@@ -117,15 +119,26 @@ namespace Reweight {
     
     // end Pmiss RW
 
-
     // end SF modif
 
+    kPB_q0q3, // PB
+
+
     // FSI RW modif
+
     kFSIRW_noFSI,
     kFSIRW_elasticFSI,
     kFSIRW_inelasticFSI,
     kFSIRW_pionProdFSI,
     kFSIRW_pionAbsFSI,
+
+    // Binary FSI
+    kBinaryFSIRW_noFSI,
+    kBinaryFSIRW_withFSI,
+    // end Binary FSI 
+
+    kFSIRWPiAbs,
+
     // end FSI RW modif
     
     kRW2p2h_norm, // 2p2h normalization

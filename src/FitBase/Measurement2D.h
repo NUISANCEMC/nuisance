@@ -638,6 +638,18 @@ protected:
   Double_t* fDataValues;  ///< REMOVE data bin contents
   Double_t* fDataErrors;  ///< REMOVE data bin errors
 
+  // ***** NS covar modifications *****
+
+  bool fIsNS;                   ///< Flag : Perform fit in the NS space
+  TH1D* fData1DHist;            ///< 1D data histogram, useful for the Norm/Shape computations
+  TH2I* fMapNS;                 ///< Map histogram used to convert 2D hist into 1D NS hist
+  TH1D* fDataNS1DHist;          ///< 1D Data histogram decomposed into shape and norm parts
+  TH1D* fMCNS1DHist;            ///< 1D MC histogram decomposed into shape and norm parts
+  TMatrixDSym* fNSCovar;        ///< NS covariance matrix
+  TMatrixDSym* fInvNormalCovar; ///< Inverse of the normal cov to get the usual chi2
+
+  // ***** end NS covar modifications *****
+
 };
 
 /*! @} */

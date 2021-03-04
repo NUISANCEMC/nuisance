@@ -251,6 +251,13 @@ namespace StatUtils{
   /// \brief Calls GetMatrixFromRootFile and turns it into a TMatrixDSym
   TMatrixDSym* GetCovarFromRootFile(std::string covfile, std::string histname);
 
+  // ***** NS covar modifications *****
+
+  // "Norm-Shape" covariance
+  TMatrixDSym* ExtractNSCovar(TMatrixDSym *full_covar, TH1 *data_hist, double data_scale);
+  TH1D* InitToNS(TH1D *hist, double data_scale);
+
+  // ***** end NS covar modifications *****
 
 };
 

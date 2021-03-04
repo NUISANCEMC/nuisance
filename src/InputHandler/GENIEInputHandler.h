@@ -114,6 +114,8 @@ public:
 	bool fSaveExtra;    ///< Flag to save Extra GENIE info into Nuisance Event
 	GENIEGeneratorInfo* fGenieInfo; ///< Extra GENIE Generator Info Writer
 
+	bool fDeactivateQE; // Flag to deactivate QE modes in electron scattering MC
+
         bool fNOvAWeights; ///< Flag to save nova weights or not
 
         // Extra weights from Jeremy for NOvA weights
