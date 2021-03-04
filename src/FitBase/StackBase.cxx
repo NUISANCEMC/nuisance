@@ -64,6 +64,11 @@ void StackBase::SetupStack(TH1 *hist) {
   // Determine template dim
   fNDim = fTemplate->GetDimension();
 
+  // Sort out titles
+  fXTitle = hist->GetXaxis()->GetTitle();
+  fYTitle = hist->GetYaxis()->GetTitle();
+  fZTitle = hist->GetZaxis()->GetTitle();
+
   for (size_t i = 0; i < fAllLabels.size(); i++) {
     fAllHists.push_back(
         (TH1 *)fTemplate->Clone((fName + "_" + fAllLabels[i]).c_str()));
