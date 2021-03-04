@@ -415,6 +415,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   //***************************************************
 
   int starttime = time(NULL);
+  NUIS_LOG(REC, "------------");
   NUIS_LOG(REC, "Starting Reconfigure iter. " << this->fCurIter);
   // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled
   // << std::endl; Event Manager Reconf
