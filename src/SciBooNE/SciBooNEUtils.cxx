@@ -377,11 +377,6 @@ double SciBooNEUtils::apply_smear(double central, double width){
   return output;
 }
 
-// double SciBooNEUtils::apply_double_gaus_smear(double central1, double width1, double central2, double width2){
-//   static TF1 *func = new TF1("double_gaus", "exp(-0.5*((x)/1.)**2) + 0.1*exp(-0.5*((x)/5.)**2", -20, 20);
-//   return func->GetRandom();  
-//}
-
 double SciBooNEUtils::smear_p(FitParticle* track, double smear){
   static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -0.8, 0.8);
   static bool set_pars = false;
