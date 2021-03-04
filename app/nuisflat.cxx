@@ -155,6 +155,16 @@ int main(int argc, char *argv[]) {
   // Parse
   GetCommandLineArgs(argc, argv);
 
+  int verbocount = 0;
+  int errorcount = 0;
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  SETVERBOSITY(verbocount);
+  SETTRACE(trace);
+
   // Make output file
   TFile *f = new TFile(gOptOutputFile.c_str(), "RECREATE");
   if (f->IsZombie()) {
