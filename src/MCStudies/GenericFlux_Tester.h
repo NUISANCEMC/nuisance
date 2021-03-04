@@ -122,6 +122,7 @@ public:
   float stv_dphit;
   float stv_dat;
   float pn_rec;
+  float infkModImbal;
 
   // Interaction mode
   int Mode;

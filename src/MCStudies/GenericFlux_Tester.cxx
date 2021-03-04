@@ -203,6 +203,9 @@ void GenericFlux_Tester::AddEventVariablesToTree() {
   eventVariables->Branch("stv_dphit", &stv_dphit, "stv_dphit/F");
   eventVariables->Branch("stv_dat", &stv_dat, "stv_dat/F");
   eventVariables->Branch("pn_rec", &pn_rec, "pn_rec/F");
+  eventVariables->Branch("infkModImbal", &infkModImbal, "infkModImbal/F");
+
+
 
   eventVariables->Branch("Enu_QE", &Enu_QE, "Enu_QE/F");
   eventVariables->Branch("Q2_QE", &Q2_QE, "Q2_QE/F");
@@ -300,7 +303,7 @@ void GenericFlux_Tester::ResetVariables() {
   // Reset energies
   Enu_true = Enu_QE = __BAD_FLOAT__;
 
-  stv_dpt = stv_dphit = stv_dat = pn_rec = __BAD_FLOAT__;
+  stv_dpt = stv_dphit = stv_dat = pn_rec = infkModImbal = __BAD_FLOAT__;
 
 
   // Reset auxillaries
@@ -431,8 +434,9 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
     Nparticles++;
 
-    // Get Charged Lepton
-    if (abs(PDGpart) == abs(PDGnu) - 1) {
+    // Get Charged Lepton for EM/CC and get the outgoing neutrino for NC
+    // (Sorry, I know it's dumb the filled variabels are still called "mu" sometimes)
+    if ( (abs(PDGpart) == abs(PDGnu) - 1) || (abs(PDGpart) == abs(PDGnu)) ){
       Nleptons++;
 
       PDGLep = PDGpart;
@@ -483,10 +487,12 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       }
 
 
-      TVector3 infk_pprot_3 = FitUtils::tppInfK(part_4mom, cos(ThetaLep), 34., true);
+      TVector3 infk_pprot_3 = FitUtils::tppInfK(part_4mom, cos(ThetaLep), 25., true);
       double infk_Eprot = sqrt(infk_pprot_3.Mag()*infk_pprot_3.Mag() + PhysConst::mass_proton*PhysConst::mass_proton);
       TLorentzVector* infk_pprot_4 = new TLorentzVector(infk_pprot_3, infk_Eprot);
       *infk_pprot = *infk_pprot_4;
+      if( (event->GetHMFSProton()) ) infkModImbal = ( infk_pprot_3*1000.0 - (event->GetHMFSProton())->P3() ).Mag();
+
 
 
       // Quasi-elastic ----------------------
@@ -494,8 +500,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
       // Q2 QE Assuming Carbon Input. Should change this to be dynamic soon.
       Q2_QE =
-          FitUtils::Q2QErec(part_4mom, cos(ThetaLep), 34., true) * 1000000.0;
-      Enu_QE = FitUtils::EnuQErec(part_4mom, cos(ThetaLep), 34., true) * 1000.0;
+          FitUtils::Q2QErec(part_4mom, cos(ThetaLep), 25., true) * 1000000.0;
+      Enu_QE = FitUtils::EnuQErec(part_4mom, cos(ThetaLep), 25., true) * 1000.0;
 
       // Pion Production ----------------------
       // --------------------------------------
@@ -584,6 +590,8 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       Nother++;
     }
   } // end particle loop
+
+
 
 
   // Rest highmoms for next loop
