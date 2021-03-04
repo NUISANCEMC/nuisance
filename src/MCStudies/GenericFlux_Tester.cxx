@@ -627,7 +627,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     } else if (PDGpart == 2212) {
       Nprotons_vect++;
       if (Nprotons_vect>1 && part_4mom.Vect().Mag() > proton_highmom) {
-        (*pprot_sec_vect) = (*pprot);
+        (*pprot_sec_vect) = (*pprot_vect);
         proton_secondhighmom =(*pprot_sec_vect).Vect().Mag();
       }
       else if (Nprotons_vect>1 && part_4mom.Vect().Mag() < proton_highmom && part_4mom.Vect().Mag() > proton_secondhighmom){
