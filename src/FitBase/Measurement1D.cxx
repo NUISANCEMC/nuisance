@@ -236,12 +236,6 @@ void Measurement1D::SetCovarFromDiagonal(TH1D *data) {
   } else {
     NUIS_ABORT("No data input provided to set diagonal covar from!");
   }
-
-  // if (!fIsDiag) {
-  //   ERR(FTL) << "SetCovarMatrixFromDiag called for measurement "
-  //            << "that is not set as diagonal." );
-  //   throw;
-  // }
 }
 
 //********************************************************************
