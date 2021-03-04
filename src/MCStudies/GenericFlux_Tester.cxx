@@ -364,6 +364,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
   // Reset the highest momentum variables
   float proton_highmom = __BAD_FLOAT__;
+  float proton_secondhighmom = __BAD_FLOAT__;
   float neutron_highmom = __BAD_FLOAT__;
   float piplus_highmom = __BAD_FLOAT__;
   float pineg_highmom = __BAD_FLOAT__;
@@ -510,6 +511,11 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
       Nprotons++;
       if (Nprotons>1 && part_4mom.Vect().Mag() > proton_highmom) {
         (*pprot_sec) = (*pprot);
+        proton_secondhighmom =(*pprot_sec).Vect().Mag();
+      }
+      else if (Nprotons>1 && part_4mom.Vect().Mag() < proton_highmom && part_4mom.Vect().Mag() > proton_secondhighmom){
+        (*pprot_sec) = part_4mom;
+        proton_secondhighmom =(*pprot_sec).Vect().Mag();
       }
       if (part_4mom.Vect().Mag() > proton_highmom) {
         proton_highmom = part_4mom.Vect().Mag();
@@ -595,6 +601,7 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
 
 
   // Rest highmoms for next loop
+  proton_secondhighmom=0;
   proton_highmom=0;
   neutron_highmom=0;
   piplus_highmom=0;
@@ -620,7 +627,12 @@ void GenericFlux_Tester::FillEventVariables(FitEvent *event) {
     } else if (PDGpart == 2212) {
       Nprotons_vect++;
       if (Nprotons_vect>1 && part_4mom.Vect().Mag() > proton_highmom) {
-        (*pprot_sec_vect) = (*pprot_vect);
+        (*pprot_sec_vect) = (*pprot);
+        proton_secondhighmom =(*pprot_sec_vect).Vect().Mag();
+      }
+      else if (Nprotons_vect>1 && part_4mom.Vect().Mag() < proton_highmom && part_4mom.Vect().Mag() > proton_secondhighmom){
+        (*pprot_sec_vect) = part_4mom;
+        proton_secondhighmom =(*pprot_sec_vect).Vect().Mag();
       }
       if (part_4mom.Vect().Mag() > proton_highmom) {
         proton_highmom = part_4mom.Vect().Mag();
