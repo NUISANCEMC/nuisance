@@ -159,10 +159,6 @@
 <config throw_corr_syst='0'/>
 <config throw_mc_stat='0'/>
 
-<!-- # Apply a shift to the muon momentum before calculation of Q2 -->
-<config muon_momentum_shift='0.0'/>
-<config muon_momentum_throw='0'/>
-
 <!-- # MINERvA Specific Configs -->
 <config MINERvA_CCinc_XSec_2DEavq3_nu_hadron_cut='0'/>
 <config MINERvA_CCinc_XSec_2DEavq3_nu_useq3true='0'/>
@@ -228,7 +224,6 @@ too ,any opportunities for mistakes.
 
 <config UseShapeCovar="0" />
 <config UseShapeNormDecomp="0" />
-<config CC0piNBINS="156" />
 
 <config UseSVDInverse="0" />
 <config UseMPPSeudoInverse="0" />
