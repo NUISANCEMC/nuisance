@@ -73,7 +73,6 @@ double SFRW_ShellNormCalc::CalcWeight(BaseFitEvt *evt) {
             }
         }
         
-        //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
     }
     
     return w;
@@ -176,8 +175,6 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
     
     double w = 1.0;
     
-    //std::cout << "Calculating pShellNorm weight" << std::endl;
-    
     if (mode == 1) // CCQE only
     {
       
@@ -189,17 +186,17 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
       int Nprotons = 0;
       for (UInt_t i = 0; i < npart; i++)
         {
-    bool isPreFSI = fevt->fPrimaryVertex[i];
-    if (!isPreFSI)
-      continue;
-    int partPDG = fevt->fParticlePDG[i];
-    if (partPDG==2212) Nprotons++;
+	  bool isPreFSI = fevt->fPrimaryVertex[i];
+	  if (!isPreFSI)
+	    continue;
+	  int partPDG = fevt->fParticlePDG[i];
+	  if (partPDG==2212) Nprotons++;
         }
         
       // RW the SRC part
       if (Nprotons==2)
         {
-    w *= fSRC_strength;
+	  w *= fSRC_strength;
         }
         
       else { // Nprotons == 1
@@ -377,63 +374,54 @@ double PmissRW_Calc::CalcWeight(BaseFitEvt *evt) {
     
   double w = 1.0;
     
-  //std::cout << "Calculating pShellNorm weight" << std::endl;
-  //  if (fPmissRW_pC<-1.0 || fPmissRW_pC>1.0 || fPmissRW_sC<-1.0 || fPmissRW_sC>1.0)
-  //  return 1.0;
-        
-  //  if (fPmissRW_p12O<-1.0 || fPmissRW_p12O>1.0 || fPmissRW_p32O<-1.0 || fPmissRW_p32O>1.0 || fPmissRW_sO<-1.0 || fPmissRW_sO>1.0)
-  //    return 1.0;
-    
     if (mode == 1) // CCQE only
       {
         double Emiss=FitUtils::GetEmiss(fevt), pmiss = FitUtils::GetPmiss(fevt); // Compute Emiss & Pmiss
         
         if (Z==6 && A==12) // Carbon
-    {
+	  {
 
-      if(Emiss>10 && Emiss<25) // P-shell
-        {
-          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_pC);                
-          if (pWeight<0) return 0.0;
-          w *= pWeight;
-        }
+	    if(Emiss>0 && Emiss<25) // P-shell
+	      {
+		double pWeight = GetWeightCarbonP(pmiss, fPmissRW_pC);                
+		if (pWeight<0) return 0.0;
+		w *= pWeight;
+	      }
             
-      if(Emiss>25 && Emiss<60) // S-shell
-        {
-          double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sC);
-          if (sWeight<0) return 0.0;
-          w *= sWeight;
-        }
-    }
+	    if(Emiss>25 && Emiss<100) // S-shell
+	      {
+		double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sC);
+		if (sWeight<0) return 0.0;
+		w *= sWeight;
+	      }
+	  }
         
         if (Z==8 && A==16) // Oxygen
-    {
-      if(Emiss>8 && Emiss<15) // P1/2-shell
-        {
-          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p12O);
-                      if (pWeight<0) return 0.0;
-                      w *= pWeight;
-        }
+	  {
+	    if(Emiss>8 && Emiss<15) // P1/2-shell
+	      {
+		double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p12O);
+		if (pWeight<0) return 0.0;
+		w *= pWeight;
+	      }
             
-      if(Emiss>15 && Emiss<25) // P3/2-shell
-        {
-          double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p32O);
-                      if (pWeight<0) return 0.0;
-                      w *= pWeight;
-        }
+	    if(Emiss>15 && Emiss<25) // P3/2-shell
+	      {
+		double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p32O);
+		if (pWeight<0) return 0.0;
+		w *= pWeight;
+	      }
             
-      if(Emiss>25 && Emiss<70) // S-shell
-        {
-          double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sO);
-                      if (sWeight<0) return 0.0;
-                      w *= sWeight;
-        }
-    }
-        
-        //std::cout << "Applying weight to CCQE event: " << fNormPShell << std::endl;
+	    if(Emiss>25 && Emiss<70) // S-shell
+	      {
+		double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sO);
+		if (sWeight<0) return 0.0;
+		w *= sWeight;
+	      }
+	  }
       }
     
-  return w;
+    return w;
 }
 
 void PmissRW_Calc::SetDialValue(std::string name, double val) {
@@ -487,74 +475,42 @@ bool PmissRW_Calc::IsHandled(int rwenum) {
 
 double PmissRW_Calc::GetWeightCarbonP(double pmiss, double dial){
     
-  // (e,e'p) data
-  // First the data is normalized, then the  data_pmissPmax and data_pmissPmin
-    
-  double edges[8]={0., 40., 80., 120., 160., 200., 240., 280.}; // steps of 40.0 MeV
-  double centers[7]={20., 60., 100., 140., 180., 220., 260.}; 
-  double limits[7]={0., 60., 100., 140., 180., 220., 260};
+  double centers[8]={20., 60., 100., 140., 180., 220., 260., 300.}; 
+  double limits[8]={0., 60., 100., 140., 180., 220., 260., 300.};
 
-  double data_pmissPmax[7]={2.532112E-03, 5.997095E-03, 6.735777E-03, 5.881405E-03, 3.130611E-03, 1.552484E-03, 6.109776E-04};
-  double data_pmissPmin[7]={1.827925E-03, 5.294416E-03, 6.456885E-03, 5.295974E-03, 2.979768E-03, 1.277565E-03, 4.270061E-04};
-  //
-  double SFinput_pmissP[7]={2.579599E-03, 5.336049E-03, 6.743242E-03, 5.392459E-03, 3.033925E-03, 1.390269E-03, 5.244574E-04};
-    
-  if (pmiss>edges[7])
+  // (e,e'p) data and SF input tables with pmiss^2 scaling
+  // Added a bin at the end for smoothening purposes
+  double data_pmissP1[8]={6.45867e-05, 0.0012154, 0.0041174, 0.00735084, 0.00646806, 0.00394301, 0.00184069, 1.};
+  double data_pmissP2[8]={4.49711e-05, 0.00132788, 0.00414289, 0.00638436, 0.00593804, 0.00462155, 0.00254031, 1.};
+  double SFinput_pmissP[8]={9.67141e-05, 0.00131487, 0.00433002, 0.00666781, 0.00616093, 0.00421504, 0.00221463, 1.};
+  
+  if (pmiss>limits[7])
     return 1.0;
 
-  for (int i=0; i<6; i++)
+  for (int i=0; i<7; i++)
     {
       // linear interpolation between the points 
-      double m_datamin, m_datamax, m_input;
-      double c_datamin, c_datamax, c_input, pcenter;
+      double m_data1, m_data2;
+      double c_data1, c_data2, pcenter;
       if (pmiss>limits[i] && pmiss<limits[i+1])
-  {
-          m_datamin = (data_pmissPmin[i+1] - data_pmissPmin[i]) / 40.;
-          m_datamax = (data_pmissPmax[i+1] - data_pmissPmax[i]) / 40.;
-    m_input = (SFinput_pmissP[i+1] - SFinput_pmissP[i]) / 40.;
-    pcenter = centers[i];
-    c_datamin = data_pmissPmin[i];
-    c_datamax = data_pmissPmax[i];
-    c_input = SFinput_pmissP[i];
+	{
+          m_data1 = (data_pmissP1[i+1]/SFinput_pmissP[i+1] - data_pmissP1[i]/SFinput_pmissP[i]) / 40.;
+          m_data2 = (data_pmissP2[i+1]/SFinput_pmissP[i+1] - data_pmissP2[i]/SFinput_pmissP[i]) / 40.;
+	  pcenter = centers[i];
+	  c_data1 = data_pmissP1[i]/SFinput_pmissP[i];
+	  c_data2 = data_pmissP2[i]/SFinput_pmissP[i];
 
-    double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
-    double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
-    double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input; 
+	  double curr_pmiss_data1 = m_data1 * (pmiss - pcenter) + c_data1;
+	  double curr_pmiss_data2 = m_data2 * (pmiss - pcenter) + c_data2;
 
-    return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-  }
-      /*
-      else if(pmiss>0 && pmiss<centers[0])
-  {
-    m_datamin = (data_pmissPmin[1] - data_pmissPmin[0]) / 40.;
-          m_datamax = (data_pmissPmax[1] - data_pmissPmax[0]) / 40.;
-          m_input = (SFinput_pmissP[1] - SFinput_pmissP[0]) / 40.;
-    pcenter = centers[0];
-    c_datamin = data_pmissPmin[0];
-          c_datamax = data_pmissPmax[0];
-          c_input = SFinput_pmissP[0];
-    break;
-  }  
+	  if (dial>0) return 1.0 + dial * (curr_pmiss_data1 - 1.0);
 
-      else
-  {
-    m_datamin = (data_pmissPmin[6] - data_pmissPmin[5]) / 40.;
-          m_datamax = (data_pmissPmax[6] - data_pmissPmax[5]) / 40.;
-          m_input = (SFinput_pmissP[6] - SFinput_pmissP[5]) / 40.;
-          pcenter= centers[5];
-          c_datamin = data_pmissPmin[5];
-          c_datamax = data_pmissPmax[5];
-          c_input = SFinput_pmissP[5];
-          break;
-  }
-      double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
-      double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
-      double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input;
-       
-      return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-  }
-      else if ()
-      */
+	  else {
+	    return 1.0 + dial * (-curr_pmiss_data2 + 1.0);
+	  }
+	  
+	}
+     
     }
     
   return 1.0;
@@ -562,59 +518,41 @@ double PmissRW_Calc::GetWeightCarbonP(double pmiss, double dial){
 
 double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
     
-  // (e,e'p) data
-  // The data points were first normalized, then the values at each point...
-    
-  //double edges[8]={0., 40., 80., 120., 160., 200., 240., 280.}; // steps of 40.0 MeV
-  double limits[7]={0., 60., 100., 140., 180., 220., 260};
-  double centers[7]={20., 60., 100., 140., 180., 220., 260.};
-    
-  double data_pmissSmax[7]={8.057835E-03, 7.299071E-03, 4.972835E-03, 3.089120E-03, 1.585566E-03, 8.720613E-04, 2.897758E-04};
-  double data_pmissSmin[7]={7.244396E-03, 6.975782E-03, 4.620011E-03, 2.808731E-03, 1.372134E-03, 5.525372E-04, 2.601529E-04};
-  //
-  double SFinput_pmissS[7]={8.212913E-03, 6.918538E-03, 4.856345E-03, 2.840391E-03, 1.396290E-03, 5.672131E-04, 2.083111E-04};
-    
-  if (pmiss>limits[6])
+  double limits[8]={0., 60., 100., 140., 180., 220., 260, 300.};
+  double centers[8]={20., 60., 100., 140., 180., 220., 260., 300.};
+  // (e,e'p) data and SF input tables with pmiss^2 scaling
+  // Added a bin at the end for smoothening purposes     
+  double data_pmissS1[8]={0.000290834, 0.00263726, 0.00463689, 0.00607679, 0.005156, 0.00423619, 0.00196604, 1.};
+  double data_pmissS2[8]={0.000363126, 0.00282927, 0.00560252, 0.0062022, 0.00500865, 0.00301291, 0.00198132, 1.};
+  double SFinput_pmissS[8]={0.000457283, 0.00284122, 0.00545083, 0.00622744, 0.00509573, 0.00319681, 0.00173069, 1.};
+
+  if (pmiss>limits[7])
     return 1.0;
 
-  for (int i=0; i<6; i++)
+  for (int i=0; i<7; i++)
     {
-      /*
-      if (pmiss>edges[i] && pmiss<edges[i+1])
-  {
-    // linear interpolation between the points                                                                                                                    
-
-          double m_datamin = (data_pmissSmin[i+1] - data_pmissSmin[i]) / 40.;
-          double m_datamax = (data_pmissSmax[i+1] - data_pmissSmax[i]) / 40.;
-          double m_input = (SFinput_pmissS[i+1] - SFinput_pmissS[i]) / 40.;
-
-          double curr_pmiss_datamin = m_datamin * (pmiss - (edges[i]+20.)) +data_pmissSmin[i];
-          double curr_pmiss_datamax = m_datamax * (pmiss - (edges[i]+20.)) + data_pmissSmax[i];
-          double curr_pmiss_input = m_input * (pmiss - (edges[i]+20.)) + SFinput_pmissS[i];
-
-    return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
-  }
-      */
       
       // linear interpolation between the points
-
-      double m_datamin, m_datamax, m_input;
-      double c_datamin, c_datamax, c_input, pcenter;
+      double m_data1, m_data2;
+      double c_data1, c_data2, pcenter;
       if (pmiss>limits[i] && pmiss<limits[i+1])
         {
-          m_datamin = (data_pmissSmin[i+1] - data_pmissSmin[i]) / 40.;
-          m_datamax = (data_pmissSmax[i+1] - data_pmissSmax[i]) / 40.;
-          m_input = (SFinput_pmissS[i+1] - SFinput_pmissS[i]) / 40.;
+          m_data1 = (data_pmissS1[i+1]/SFinput_pmissS[i+1] - data_pmissS1[i]/SFinput_pmissS[i]) / 40.;
+          m_data2 = (data_pmissS2[i+1]/SFinput_pmissS[i+1] - data_pmissS2[i]/SFinput_pmissS[i]) / 40.;
+         
           pcenter = centers[i];
-          c_datamin = data_pmissSmin[i];
-          c_datamax = data_pmissSmax[i];
-          c_input = SFinput_pmissS[i];
 
-          double curr_pmiss_datamin = m_datamin * (pmiss - pcenter) + c_datamin;
-          double curr_pmiss_datamax = m_datamax * (pmiss - pcenter) + c_datamax;
-          double curr_pmiss_input = m_input * (pmiss - pcenter) + c_input;
+          c_data1 = data_pmissS1[i]/SFinput_pmissS[i];
+          c_data2 = data_pmissS2[i]/SFinput_pmissS[i];
 
-          return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_datamin / (2 * curr_pmiss_input) + dial * (dial + 1) * curr_pmiss_datamax / (2 * curr_pmiss_input);
+          double curr_pmiss_data1 = m_data1 * (pmiss - pcenter) + c_data1;
+          double curr_pmiss_data2 = m_data2 * (pmiss - pcenter) + c_data2;
+
+	  if (dial>0) return 1.0 + dial * (curr_pmiss_data1 - 1.0);
+
+	  else {
+	    return 1.0 + dial * (-curr_pmiss_data2 + 1.0);
+	  }
         }
     }
     
@@ -697,41 +635,31 @@ double PBRW_Calc::GetWeightq0q3(double q0, double q3, double dial){
   // q0 and q3 need to be in MeV
 
   double q0_lim = 300, q3_lim = 600, q0_lim0 = 30, q3_lim0 = 20;
-
+  if (fTemplateUp == 0 || fTemplateLow == 0){
+    return 1.0;
+  }
   if (q3 > q3_lim || q0 > q0_lim || q3 < q3_lim0 || q0 < q0_lim0)
     return 1.0;
 
-  //int binup = fTemplateUp->FindBin(q3, q0), binlow = fTemplateLow->FindBin(q3, q0);
   double upper_bound = fTemplateUp->Interpolate(q3, q0), lower_bound = fTemplateLow->Interpolate(q3, q0);
-  //double upper_bound = fTemplateUp->GetBinContent(binup), lower_bound = fTemplateLow->GetBinContent(binlow); 
-  //std::cout << "a=" << dial << " -- q0=" << q0 << " -- q3=" << q3 << " -- bin=" << fTemplateUp->FindBin(q3, q0) << " -- w=" << 1.0 + dial * (upper_bound - 1.0) << std::endl;
+  double weight = 1.0;
 
   if (dial>0){
 
     if (upper_bound == 0){
       upper_bound = 1.0;
     }
-    return 1.0+dial*(upper_bound-1.0);
+    weight = 1.0+dial*(upper_bound-1.0);
   }
 
   else {
     if (lower_bound == 0){
       lower_bound = 1.0;
     }
-    return 1.0 + dial * (-lower_bound + 1.0);
+    weight = 1.0 + dial * (-lower_bound + 1.0);
   }
 
-  return 1.0;
-  //return - (dial - 1) * (dial + 1) + (dial - 1) * dial * (fTemplateLow->Interpolate(q3) / 2) + dial * (dial + 1) * (fTemplateUp->Interpolate(q3) / 2);
-    //std::cout << fTemplateUp->GetNbinsX() << std::endl;
-    /*
-    for (size_t i = 0; i < 12; i++) {
-      if (q3 > edges[i] && q3 < edges[i+1]){
-        // 2nd order polynomial
-        return - (dial - 1) * (dial + 1) + (dial - 1) * dial * (lower_bound[i]/2) + dial * (dial + 1) * (upper_bound[i]/2);
-      }
-    }
-    */
+  return (weight < 0) ? 0 : weight;
 
 }
 

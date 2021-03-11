@@ -34,7 +34,8 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
   TH2D* templ_low = (TH2D*) file->Get("ratioLow_fine");
   TH2D* templ_up = (TH2D*) file->Get("ratioHigh_fine");
   if (templ_up == 0 || templ_low == 0){
-    NUIS_ABORT("The specified PB file does not contain what I was expecting...");
+    NUIS_LOG(FIT, "No PB template specified or the file does not contain what I was expecting... ");
+    NUIS_ERR(WRN, "PB dial won't work");
   }
   else {
     PBRW->SetHistograms(templ_up, templ_low);
