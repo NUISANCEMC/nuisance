@@ -37,9 +37,9 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
     NUIS_LOG(FIT, "No PB template specified or the file does not contain what I was expecting... ");
     NUIS_ERR(WRN, "PB dial won't work");
   }
-  else {
-    PBRW->SetHistograms(templ_up, templ_low);
-  }
+  
+  PBRW->SetHistograms(templ_up, templ_low);
+ 
   
   fWeightCalculators.push_back(GaussianMode);
   //  fWeightCalculators.push_back(new SFRW_ShellNormCalc());

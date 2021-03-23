@@ -147,17 +147,17 @@ SFGausRW_ShellCalc::SFGausRW_ShellCalc()
     // O, p1/2-shell
     fGaus_p12Shell_O[kPosNorm] = 0.0;
     fGaus_p12Shell_O[kPosP] = 12.0;
-    fGaus_p12Shell_O[kPosW] = 1.0;
+    fGaus_p12Shell_O[kPosW] = 2.0;
     
     // O, p3/2-shell
     fGaus_p32Shell_O[kPosNorm] = 0.0;
     fGaus_p32Shell_O[kPosP] = 18.0;
-    fGaus_p32Shell_O[kPosW] = 1.0;
+    fGaus_p32Shell_O[kPosW] = 2.0;
     
     // O, s-shell
     fGaus_sShell_O[kPosNorm] = 0.0;
     fGaus_sShell_O[kPosP] = 40.0;
-    fGaus_sShell_O[kPosW] = 1.0;
+    fGaus_sShell_O[kPosW] = 8.0;
 
     // Overall CCQE normalization
     fCCQE_norm = 1.0;
@@ -227,6 +227,8 @@ double SFGausRW_ShellCalc::CalcWeight(BaseFitEvt *evt) {
     }
     
     // Store the weight specifically from SF shell modifications for later use. 
+    if (w < 0) w = 0.0;
+
     evt->SfShellWeight = w;
 
     return w;
@@ -376,6 +378,19 @@ double PmissRW_Calc::CalcWeight(BaseFitEvt *evt) {
     
     if (mode == 1) // CCQE only
       {
+	UInt_t npart = fevt->Npart();
+	int Nprotons = 0;
+	for (UInt_t i = 0; i < npart; i++)
+	  {
+	    bool isPreFSI = fevt->fPrimaryVertex[i];
+	    if (!isPreFSI)
+	      continue;
+	    int partPDG = fevt->fParticlePDG[i];
+	    if (partPDG==2212) Nprotons++;
+	  }
+	
+	if (Nprotons > 1) return 1.0;
+
         double Emiss=FitUtils::GetEmiss(fevt), pmiss = FitUtils::GetPmiss(fevt); // Compute Emiss & Pmiss
         
         if (Z==6 && A==12) // Carbon
@@ -398,7 +413,7 @@ double PmissRW_Calc::CalcWeight(BaseFitEvt *evt) {
         
         if (Z==8 && A==16) // Oxygen
 	  {
-	    if(Emiss>8 && Emiss<15) // P1/2-shell
+	    if(Emiss>0 && Emiss<15) // P1/2-shell
 	      {
 		double pWeight = GetWeightCarbonP(pmiss, fPmissRW_p12O);
 		if (pWeight<0) return 0.0;
@@ -412,7 +427,7 @@ double PmissRW_Calc::CalcWeight(BaseFitEvt *evt) {
 		w *= pWeight;
 	      }
             
-	    if(Emiss>25 && Emiss<70) // S-shell
+	    if(Emiss>25 && Emiss<100) // S-shell
 	      {
 		double sWeight = GetWeightCarbonS(pmiss, fPmissRW_sO);
 		if (sWeight<0) return 0.0;
@@ -502,12 +517,8 @@ double PmissRW_Calc::GetWeightCarbonP(double pmiss, double dial){
 
 	  double curr_pmiss_data1 = m_data1 * (pmiss - pcenter) + c_data1;
 	  double curr_pmiss_data2 = m_data2 * (pmiss - pcenter) + c_data2;
-
-	  if (dial>0) return 1.0 + dial * (curr_pmiss_data1 - 1.0);
-
-	  else {
-	    return 1.0 + dial * (-curr_pmiss_data2 + 1.0);
-	  }
+	  
+	  return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_data2 / (2.) + dial * (dial + 1) * curr_pmiss_data1 / (2.);
 	  
 	}
      
@@ -548,11 +559,7 @@ double PmissRW_Calc::GetWeightCarbonS(double pmiss, double dial){
           double curr_pmiss_data1 = m_data1 * (pmiss - pcenter) + c_data1;
           double curr_pmiss_data2 = m_data2 * (pmiss - pcenter) + c_data2;
 
-	  if (dial>0) return 1.0 + dial * (curr_pmiss_data1 - 1.0);
-
-	  else {
-	    return 1.0 + dial * (-curr_pmiss_data2 + 1.0);
-	  }
+	  return - (dial - 1) * (dial + 1) + (dial - 1) * dial * curr_pmiss_data2 / (2.) + dial * (dial + 1) * curr_pmiss_data1 / (2.);
         }
     }
     
