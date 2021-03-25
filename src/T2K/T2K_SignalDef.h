@@ -23,34 +23,34 @@
 #include "SignalDef.h"
 
 namespace SignalDef {
-bool isCC1pip_T2K_PRD97_012001(FitEvent *event, double EnuMin, double EnuMax);
+  bool isCC1pip_T2K_PRD97_012001(FitEvent *event, double EnuMin, double EnuMax);
 
-enum arxiv1909_03936_PScuts {
-  kMuonFwd = (1 << 0),
-  kMuonHighEff = (1 << 1),
-  kPionFwdHighMom = (1 << 2),
-  kPionHighMom = (1 << 3),
-  kPionHighEff = (1 << 4)
-};
+  enum arxiv1909_03936_PScuts {
+    kMuonFwd = (1 << 0),
+    kMuonHighEff = (1 << 1),
+    kPionFwdHighMom = (1 << 2),
+    kPionHighMom = (1 << 3),
+    kPionHighEff = (1 << 4)
+  };
 
-bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
-                                  int cuts);
+  bool isCC1pip_T2K_arxiv1909_03936(FitEvent *event, double EnuMin, double EnuMax,
+				    int cuts);
 
-enum PRD93112012_Ana {
-  kAnalysis_I,
-  kAnalysis_II,
-};
+  enum PRD93112012_Ana {
+    kAnalysis_I,
+    kAnalysis_II,
+  };
 
-bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
-                 int analysis);
+  bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
+		   int analysis);
                  
-bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0pi_ifk(FitEvent *event, double EnuMin, double EnuMax);
-bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax); // TN328
+  bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0pi_STV(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0pi_1bin(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0pi_ifk(FitEvent *event, double EnuMin, double EnuMax);
+  bool isT2K_CC0piAnuP0D(FitEvent *event, double EnuMin, double EnuMax); // TN328
 } // namespace SignalDef
 
 #endif
