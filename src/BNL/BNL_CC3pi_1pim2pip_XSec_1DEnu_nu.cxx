@@ -53,6 +53,8 @@ BNL_CC3pi_1pim2pip_XSec_1DEnu_nu::BNL_CC3pi_1pim2pip_XSec_1DEnu_nu(nuiskey sampl
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   ScaleData(1E-38);
+  this->fDataHist = PlotUtils::RestrictHistRange(this->fDataHist, 0, 6);
+
   SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------

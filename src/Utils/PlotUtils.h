@@ -268,6 +268,9 @@ TH1D* GetProjectionX(TH2D* hist, TH2I* mask);
 
 //! Return a projection of a 2D Histogram onto Y accounting for bin masking
 TH1D* GetProjectionY(TH2D* hist, TH2I* mask);
+
+//! Return a histogram with a restricted range
+TH1D* RestrictHistRange(TH1D* inHist, double minVal, double maxVal);
 }
 
 /*! @} */

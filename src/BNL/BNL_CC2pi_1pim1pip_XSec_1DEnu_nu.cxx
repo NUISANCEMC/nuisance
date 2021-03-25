@@ -52,7 +52,9 @@ BNL_CC2pi_1pim1pip_XSec_1DEnu_nu::BNL_CC2pi_1pim1pip_XSec_1DEnu_nu(nuiskey sampl
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
+  this->fDataHist = PlotUtils::RestrictHistRange(this->fDataHist, 0, 6);
   ScaleData(1E-38);
+  
   SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
@@ -74,5 +76,3 @@ bool BNL_CC2pi_1pim1pip_XSec_1DEnu_nu::isSignal(FitEvent *event) {
   return SignalDef::isCCWithFS(event, 14, pdgs,
                                EnuMin, EnuMax);
 }
-
-

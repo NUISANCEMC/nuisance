@@ -1181,3 +1181,51 @@ TH1D *PlotUtils::GetProjectionY(TH2D *hist, TH2I *mask) {
   delete maskedhist;
   return hist_Y;
 }
+
+
+// A slightly hacky way to restrict the range of a TH1D
+TH1D* PlotUtils::RestrictHistRange(TH1D* inHist, double minVal, double maxVal){
+
+  NUIS_LOG(SAM, "Restricting histogram range to " << minVal << " - " << maxVal);
+
+  std::string name  = inHist->GetName();
+  std::string title = inHist->GetTitle();
+
+  std::vector<double> bin_edges;
+  std::vector<double> bin_vals;
+  std::vector<double> bin_errs;
+
+  for (int i=0; i<inHist->GetNbinsX(); ++i){
+    
+    double low_edge = inHist->GetXaxis()->GetBinLowEdge(i+1);
+    double up_edge  = inHist->GetXaxis()->GetBinUpEdge(i+1);
+
+    if (low_edge < minVal) continue;
+
+    // Deal with the slightly special case of the first bin
+    if (bin_edges.size() == 0) bin_edges.push_back(low_edge);
+
+    // Deal with the rest
+    if (maxVal >= up_edge) {
+      bin_edges.push_back(up_edge);
+      bin_vals .push_back(inHist->GetBinContent(i+1));
+      bin_errs .push_back(inHist->GetBinError(i+1));
+    }
+  }
+
+  int nbins = bin_edges.size()-1;
+
+  // Sanity check
+  if (nbins < 1) return inHist;
+
+  // Now make a new histogram
+  TH1D *ret = new TH1D("temp", "temp", nbins, bin_edges.data());
+
+  for (int i=0; i<nbins; ++i){
+    ret->SetBinContent(i+1, bin_vals[i]);
+    ret->SetBinError(i+1, bin_errs[i]);
+  }
+  delete inHist;
+  ret->SetNameTitle(name.c_str(), title.c_str());
+  return ret;
+}
