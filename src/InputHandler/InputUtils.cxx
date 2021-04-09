@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -68,7 +68,7 @@ bool IsJointInput(std::string const &inputs) {
 
 std::string ExpandInputDirectories(std::string const &inputs) {
   // Parse the "environement" flags in the fitter config
-  // Can specify NEUT_DIR = "" and others in parameters/fitter.config.dat
+  // Can specify NEUT_DIR = "" and others in parameters/config.xml
   const static std::string filedir[] = {"NEUT_DIR",   "NUWRO_DIR",
                                         "GENIE_DIR",  "NUANCE_DIR",
                                         "EVSPLN_DIR", "GIBUU_DIR"};

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -72,7 +72,7 @@ void MINERvA_CC1pip_XSec_1D_2017Update::SetupDataSettings(){
   case (kEnu):
     datafile  = "cc1pip_updated_1DEnu";
     covarfile = "cc1pip_updated_1DEnu";
-    titles    ="CC1#pi Updated;E_{#nu} (GeV);#sigma(E_#nu) (cm^{2}/nucleon)";
+    titles    ="CC1#pi Updated;E_{#nu} (GeV);#sigma(E_{#nu}) (cm^{2}/nucleon)";
     break;
 
   default:

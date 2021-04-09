@@ -20,7 +20,7 @@ T2K_CC1pip_CH_XSec_1DCosThAdler_nu::T2K_CC1pip_CH_XSec_1DCosThAdler_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1DCosThAdler_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("cos#theta_{Adler} (radians)");
+  fSettings.SetXTitle("cos#theta_{Adler} (rad.)");
   fSettings.SetYTitle("d#sigma/dcos#theta_{Adler} (cm^{2}/1/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);

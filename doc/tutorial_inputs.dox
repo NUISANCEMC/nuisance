@@ -32,7 +32,7 @@ sample         MiniBooNE_CCQE_XSec_1DQ2_nu   FIX    /path/to/miniboone_ccqe_even
 Once we have a sample card produced it is possible to run a default Migrad fit by passing this fit card to the minimizer. 
 
 \code
-ExtFit_minimizer.exe -c fittertutorial1.card -o fittertutorial1_output.root
+nuismin -c fittertutorial1.card -o fittertutorial1_output.root
 \endcode
 
 Since we have not included any MC ReWeight dials to be minimized yet this should run relatively quickly, requiring only a single reconfigure.

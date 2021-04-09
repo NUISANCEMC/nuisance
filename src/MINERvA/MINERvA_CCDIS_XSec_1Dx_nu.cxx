@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -109,22 +109,3 @@ bool MINERvA_CCDIS_XSec_1Dx_nu::isSignal(FitEvent *event) {
 
   return true;
 };
-
-//********************************************************************
-void MINERvA_CCDIS_XSec_1Dx_nu::ScaleEvents() {
-  //********************************************************************
-
-  Measurement1D::ScaleEvents();
-  // this->fDataHist = (TH1D*)this->GetMCList().at(0)->Clone();
-
-  // this->fMCHist->Scale(this->fScaleFactor, "width");
-
-  // // Proper error scaling - ROOT Freaks out with xsec weights sometimes
-  // for(int i=0; i<this->fMCStat->GetNbinsX();i++) {
-
-  //   if (this->fMCStat->GetBinContent(i+1) != 0)
-  //     this->fMCHist->SetBinError(i+1, this->fMCHist->GetBinContent(i+1) *
-  //     this->fMCStat->GetBinError(i+1) / this->fMCStat->GetBinContent(i+1) );
-  //   else this->fMCHist->SetBinError(i+1, this->fMCHist->Integral());
-  // }
-}

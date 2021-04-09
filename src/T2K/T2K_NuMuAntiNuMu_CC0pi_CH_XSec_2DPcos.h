@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -51,10 +51,8 @@ public:
  private:
 
   TFile* fInputFile;
-  std::vector<TH1D*> fMCHistNuMu_Slices;
-  std::vector<TH1D*> fDataHistNuMu_Slices;
-  std::vector<TH1D*> fMCHistAntiNuMu_Slices;
-  std::vector<TH1D*> fDataHistAntiNuMu_Slices;
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
 
   double pmu, CosThetaMu;
   int NuPDG;

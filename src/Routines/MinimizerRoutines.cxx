@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -290,17 +290,23 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     // Get Sample Options
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
-
     std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
-
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
+    // Handle the samplefile name
+    std::string mc_type = GeneralUtils::ParseToStr(samplefile, ":")[0];
+    std::string input_samples = GeneralUtils::ParseToStr(samplefile, ":")[1];
+    input_samples = GeneralUtils::ReplaceAll(input_samples, "(", "");
+    input_samples = GeneralUtils::ReplaceAll(input_samples, ")", "");
+    std::vector<std::string> sample_vect = GeneralUtils::ParseToStr(input_samples, ";");
+
     // Print out
-    NUIS_LOG(FIT, "Read sample info "
-	     << i << " : " << samplename << std::endl
-	     << "\t\t|-> input -> " << samplefile << std::endl
-	     << "\t\t|-> state -> " << sampletype << std::endl
-	     << "\t\t|-> norm  -> " << samplenorm);
+    NUIS_LOG(FIT, "Read sample " << i << ". : " << samplename << " ("
+             << sampletype << ") [Norm=" << samplenorm << "]");
+    NUIS_LOG(FIT, "  |-> Input MC type = "<< mc_type <<" with " << sample_vect.size() << " input files");
+    for (uint j=0; j < sample_vect.size(); ++j){
+      NUIS_LOG(FIT, "  |-> Input file #" << j << " = " << sample_vect[j]);
+    }
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
@@ -646,7 +652,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine) {
       //    !routine.compare("GSLMulti") or
       !routine.compare("GSLSimAn") or !routine.compare("MCMC")) {
     if (fMinimizer->NFree() > 0) {
-      NUIS_LOG(FIT, fMinimizer->Minimize());
+      fMinimizer->Minimize();
       GetMinimizerState();
     }
   }
@@ -674,10 +680,10 @@ void MinimizerRoutines::PrintState() {
   NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
                          << " = " << setw(10) << "Value"
                          << " +- " << setw(10) << "Error"
-                         << " " << setw(8) << "(Units)"
-                         << " " << setw(10) << "Conv. Val"
-                         << " +- " << setw(10) << "Conv. Err"
-                         << " " << setw(8) << "(Units)");
+	                 << " " << setw(8) << "(Units)");
+  // << " " << setw(10) << "Conv. Val"
+  // << " +- " << setw(10) << "Conv. Err"
+  // << " " << setw(8) << "(Units)");
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -700,26 +706,28 @@ void MinimizerRoutines::PrintState() {
       curunits = "(Frac)";
     }
 
-    std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
-    double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
-    double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-                      FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+    // std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
+    // double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
+    // double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
+    //                   FitBase::RWSigmaToAbs(typestr, syst, 0.0));
 
     std::ostringstream curparstring;
 
-    curparstring << " " << setw(3) << left << i << ". " << setw(maxcount)
-                 << syst << " = " << setw(10) << curval << " +- " << setw(10)
-                 << curerr << " " << setw(8) << curunits << " " << setw(10)
-                 << convval << " +- " << setw(10) << converr << " " << setw(8)
-                 << convunits;
+    curparstring << " " << setw(3) << left << i << "  " << setw(maxcount)
+                 << syst << " = " << setw(10) << Form("%.7lf", curval) << " +- " << setw(10)
+                 << Form("%.7lf", curerr) << " " << setw(8) << curunits; 
+                 // << " " << setw(10)
+		 // << convval << " +- " << setw(10) << converr << " " << setw(8)
+		 // << convunits;
 
     NUIS_LOG(FIT, curparstring.str());
   }
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
+  int ndof = fSampleFCN->GetNDOF();
   NUIS_LOG(FIT,
-           std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+	   std::left << std::setw(55) << "Likelihood for JointFCN" << ": " << like << "/" << ndof)
   NUIS_LOG(FIT, "------------");
 }
 
@@ -727,7 +735,7 @@ void MinimizerRoutines::PrintState() {
 void MinimizerRoutines::GetMinimizerState() {
   //*************************************
 
-  NUIS_LOG(FIT, "Minimizer State: ");
+  NUIS_LOG(DEB, "Minimizer State: ");
   // Get X and Err
   const double *values = fMinimizer->X();
   const double *errors = fMinimizer->Errors();
@@ -1283,7 +1291,7 @@ void MinimizerRoutines::SetupCovariance() {
 
   if (NDIM == 0)
     return;
-  NUIS_LOG(FIT, "NFREE == " << NFREE);
+  NUIS_LOG(DEB, "NFREE == " << NFREE);
   fCovar = new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
   if (NFREE > 0) {
     fCovFree = new TH2D("covariance_free", "covariance_free", NFREE, 0, NFREE,

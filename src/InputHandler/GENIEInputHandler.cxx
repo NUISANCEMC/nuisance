@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -461,8 +461,8 @@ void GENIEInputHandler::CalcNUISANCEKinematics() {
   fNUISANCEEvent->Mode = ConvertGENIEReactionCode(fGenieGHep);
 
   if (!fNUISANCEEvent->Mode) {
-    std::cout << "[WARN]: Failed to determine mode for GENIE event: "
-              << *fGenieGHep << std::endl;
+    NUIS_ERR(WRN, "Failed to determine mode for GENIE event: ");
+    std::cout << *fGenieGHep << std::endl;
   }
 
   // Set Event Info

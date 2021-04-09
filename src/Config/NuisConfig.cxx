@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -449,8 +449,8 @@ void nuisconfig::RemoveIdenticalNodes() {
 }
 
 void nuisconfig::RemoveNode(XMLNodePointer_t node) {
-  std::cout << "[ CONFIG   ]: Removing node: ";
-  PrintNode(node);
+  // std::cout << "[ CONFIG   ]: Removing node: ";
+  // PrintNode(node);
   fXML->FreeAllAttr(node);
   fXML->CleanNode(node);
   fXML->FreeNode(node);

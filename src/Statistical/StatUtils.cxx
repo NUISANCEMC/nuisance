@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -136,7 +136,7 @@ Double_t StatUtils::GetChi2FromCov(TH1D *data, TH1D *mc, TMatrixDSym *invcov,
     NUIS_ERR(WRN, "Inconsistent matrix and data histogram passed to "
                   "StatUtils::GetChi2FromCov!");
     NUIS_ABORT("data_hist has " << data->GetNbinsX() << " matrix has "
-                                << invcov->GetNcols() << "bins");
+                                << invcov->GetNcols() << " bins");
   }
 
   // Add MC Error to data if required
@@ -910,6 +910,31 @@ TMatrixDSym *StatUtils::ApplyInvertedMatrixMasking(TMatrixDSym *mat, TH2D *data,
   return newmat;
 }
 
+// Check whether this matrix can be inverted
+bool StatUtils::IsMatrixWellBehaved(TMatrixDSym* mat) {
+
+  bool wellBehaved = true;
+  StopTalking();
+  TDecompChol mat_decomp(*mat);
+  
+  double d1, d2;
+  mat_decomp.Det(d1, d2);
+
+  // Check if the matrix is singular
+  if (d1*TMath::Power(2.,d2) < mat_decomp.GetTol()){
+    wellBehaved = false;
+  }
+  // Check if the matrix can be decomposed
+  // Oddly, there are fringe cases which pass one of these conditions
+  // But if either fail, the inversion won't work
+  if (!mat_decomp.Decompose()) {
+    wellBehaved = false;
+  }
+
+  StartTalking(); 
+  return wellBehaved;
+}
+
 //*******************************************************************
 // bool rescale rescales the matrix when using Cholesky decomp to ensure good decomposition
 TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
@@ -947,22 +972,16 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
   if (first) {
     UseSVDDecomp = FitPar::Config().GetParB("UseSVDInverse");
     first = false;
+    if (UseSVDDecomp){
+      NUIS_ERR(WRN, "Allowing SVD inverse if matrices are singular, use with extreme caution!");
+    }
   }
 
-  if (UseSVDDecomp) {
-    // Invert full matrix
-    TDecompSVD mat_decomp(*new_mat);
-    if (!mat_decomp.Decompose()) {
-      NUIS_ABORT("Decomposition failed, matrix singular ?");
-    } else {
-      int nrows = new_mat->GetNrows();
-      delete new_mat;
-      new_mat =
-          new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
-    }
+  // Check if this matrix is singular/positive-definite
+  bool isWellBehaved = StatUtils::IsMatrixWellBehaved(new_mat);
 
-  // Use Cholesky decomp
-  } else {
+  // If the matrix isn't singular, use Cholesky
+  if (isWellBehaved) {
     // Check the entries of the Matrix and scale it to be within range
     double scaling = 1;
     if (rescale) {
@@ -977,23 +996,40 @@ TMatrixDSym *StatUtils::GetInvert(TMatrixDSym *mat, bool rescale) {
       scaling = smallest;
       (*new_mat) *= 1./scaling;
     }
-
+    
     // Invert full matrix
-    TDecompChol mat_decomp(*new_mat);
-    if (!mat_decomp.Decompose()) {
-      NUIS_ERR(FTL, "Decomposition failed, matrix singular ?");
-      NUIS_ABORT("If you want to use SVD decomposition set <config "
-          "UseSVDInverse=\"1\" /> in your  card file.");
-    } else {
-      int nrows = new_mat->GetNrows();
-      delete new_mat;
-      new_mat =
-        new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+    if (!StatUtils::IsMatrixWellBehaved(new_mat)){
+      NUIS_ERR(WRN, "Problem with rescaled matrix");
     }
+    TDecompChol mat_decomp(*new_mat);
+    int nrows = new_mat->GetNrows();
+    delete new_mat;
+    new_mat =
+      new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
+
     // then scale the matrix back
     if (rescale) {
       (*new_mat) *= 1./scaling;
     }
+  } else {
+
+    // if Matrix singular, but UseSVDDecomp not set, abort
+    if (!UseSVDDecomp){
+      NUIS_ERR(FTL, "Cannot invert covariance, giving up");
+      NUIS_ABORT("If you want to force matters using SVD decomposition set <config "
+		 "UseSVDInverse=\"1\" /> in your card file.");
+    }
+
+    // Do the SVD decomp
+    TDecompSVD mat_decomp(*new_mat);
+    if (!mat_decomp.Decompose()) {
+      NUIS_ABORT("SVD decomposition failed, something strange has happened");
+    }
+
+    int nrows = new_mat->GetNrows();
+    delete new_mat;
+    new_mat =
+      new TMatrixDSym(nrows, mat_decomp.Invert().GetMatrixArray(), "");
   }
 
   return new_mat;
@@ -1031,6 +1067,29 @@ TMatrixDSym *StatUtils::GetDecomp(TMatrixDSym *mat) {
     return new_mat;
   }
 
+  // Test if we can decompose the matrix before trying
+  bool isWellBehaved = StatUtils::IsMatrixWellBehaved(new_mat);
+
+  if (!isWellBehaved) {
+    NUIS_ERR(WRN, "Cannot decompose the covariance matrix");
+
+    // This is dumb, but just flip the diagonals and remove everything else
+    for (int i = 0; i < nrows; ++i){
+      for(int j = 0; j <nrows; ++j){
+	if (i != j) { 
+	  (*new_mat)(i, j) = 0;
+	} else {
+	  if ((*new_mat)(i, j) > 0.0)
+	    (*new_mat)(i, j) = sqrt((*new_mat)(i, j));
+	  else
+	    (*new_mat)(i, j) = 0.0;
+	}
+      }
+    }
+    return new_mat;
+  }
+  
+  // Okay, try to decompose...
   TDecompChol LU = TDecompChol(*new_mat);
   LU.Decompose();
   delete new_mat;
@@ -1274,7 +1333,7 @@ TMatrixDSym *StatUtils::ExtractShapeOnlyCovar(TMatrixDSym *full_covar,
     return NULL;
   }
 
-  NUIS_LOG(SAM, "Norm error = " << sqrt(total_covar) / total_data);
+  NUIS_LOG(DEB, "Norm error = " << sqrt(total_covar) / total_data);
 
   // Now loop over and calculate the shape-only matrix
   for (int i = 0; i < nbins; ++i) {
@@ -1346,12 +1405,8 @@ TH2I *StatUtils::GenerateMap(TH2D *hist) {
 
   for (int i = 0; i < hist->GetNbinsX(); i++) {
     for (int j = 0; j < hist->GetNbinsY(); j++) {
-      if (hist->GetBinContent(i + 1, j + 1) > 0) {
         map->SetBinContent(i + 1, j + 1, index);
         index++;
-      } else {
-        map->SetBinContent(i + 1, j + 1, 0);
-      }
     }
   }
 
@@ -1365,18 +1420,29 @@ TH1D *StatUtils::MapToTH1D(TH2D *hist, TH2I *map) {
   if (!hist)
     return NULL;
 
+  // Check how many bins are omitted from the map
+  int nskip = 0;
+  for (int i = 0; i < map->GetNbinsX(); i++) {
+    for (int j = 0; j < map->GetNbinsY(); j++) {
+      if (map->GetBinContent(i + 1, j + 1) <= 0)
+	nskip++;
+    }
+  }
+
   // Get N bins for 1D plot
-  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
+  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins() - nskip;
 
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
   // Make new 1D Hist
   TH1D *newhist = new TH1D(name1D.c_str(), name1D.c_str(), Nbins, 0, Nbins);
+  newhist->GetYaxis()->SetTitle(hist->GetZaxis()->GetTitle());
+  newhist->GetXaxis()->SetTitle(Form("%s-%s",hist->GetXaxis()->GetTitle(),hist->GetYaxis()->GetTitle()));
 
   // map bin contents
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
-      if (map->GetBinContent(i + 1, j + 1) == 0)
+      if (map->GetBinContent(i + 1, j + 1) <= 0)
         continue;
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
           hist->GetBinContent(i + 1, j + 1));
@@ -1393,7 +1459,7 @@ void StatUtils::MapFromTH1D(TH2 *fillhist, TH1 *fromhist, TH2I *map) {
 
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
-      if (map->GetBinContent(i + 1, j + 1) == 0)
+      if (map->GetBinContent(i + 1, j + 1) <= 0)
         continue;
       int gb = map->GetBinContent(i + 1, j + 1);
       fillhist->SetBinContent(i + 1, j + 1, fromhist->GetBinContent(gb));
@@ -1410,8 +1476,17 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
   if (!hist)
     return newhist;
 
+  // Check how many bins are omitted from the map
+  int nskip = 0;
+  for (int i = 0; i < map->GetNbinsX(); i++) {
+    for (int j = 0; j < map->GetNbinsY(); j++) {
+      if (map->GetBinContent(i + 1, j + 1) <= 0)
+	nskip++;
+    }
+  }
+
   // Get N bins for 1D plot
-  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins();
+  Int_t Nbins = map->GetXaxis()->GetNbins()*map->GetYaxis()->GetNbins()-nskip;
   std::string name1D = std::string(hist->GetName()) + "_1D";
 
   // Make new 1D Hist
@@ -1420,7 +1495,7 @@ TH1I *StatUtils::MapToMask(TH2I *hist, TH2I *map) {
   // map bin contents
   for (int i = 0; i < map->GetNbinsX(); i++) {
     for (int j = 0; j < map->GetNbinsY(); j++) {
-      if (map->GetBinContent(i + 1, j + 1) == 0)
+      if (map->GetBinContent(i + 1, j + 1) <= 0)
         continue;
 
       newhist->SetBinContent(map->GetBinContent(i + 1, j + 1),
@@ -1534,7 +1609,9 @@ TMatrixD *StatUtils::GetMatrixFromRootFile(std::string covfile,
   TFile *tempfile = new TFile(splitfile[0].c_str(), "READ");
 
   // Get Object
+  StopTalking();
   TObject *obj = tempfile->Get(splitfile[1].c_str());
+  StartTalking();
   if (!obj) {
     NUIS_ABORT("Object " << splitfile[1] << " doesn't exist!");
   }

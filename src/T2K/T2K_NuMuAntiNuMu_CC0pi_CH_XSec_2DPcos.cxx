@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -31,7 +31,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
   // Samples overview ---------------------------------------------------
   fSettings = LoadSampleSettings(samplekey);
-  std::string name = fSettings.GetS("name");
+  std::string name = fSettings.GetName();
   std::string descrip = "";
 
   // This has to deal with NuMu FHC, and AntiNuMu RHC
@@ -60,7 +60,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
   // Setup common settings
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
-  fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRangeFromFlux(fFluxHist);
   fSettings.DefineAllowedTargets("C,H");
@@ -75,7 +75,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(nui
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
-
+  fSaveFine = false;
 };
 
 
@@ -111,8 +111,7 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillHistograms(){
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   for (size_t i = 0; i < nangbins; i++){
-    if(NuPDG==14) fMCHistNuMu_Slices[i]->GetSumw2();
-    else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->GetSumw2();
+    fMCHist_Slices[i]->GetSumw2();
   }
 
   // Do standard conversion.
@@ -120,27 +119,18 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::ConvertEventRates(){
 
   // Scale MC slices by their bin area
   for (size_t i = 0; i < nangbins; ++i) {
-    if(NuPDG==14) fMCHistNuMu_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
-    else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
+    fMCHist_Slices[i]->Scale(1. / (angular_binning_costheta[i + 1] - angular_binning_costheta[i]));
   }
 
   // Now Convert into 1D lists
   fMCHist->Reset();
   int bincount = 0;
   for (size_t i = 0; i < nangbins; i++){
-    if(NuPDG==14){
-      for (int j = 0; j < fDataHistNuMu_Slices[i]->GetNbinsX(); j++){
-        fMCHist->SetBinContent(bincount+1, fMCHistNuMu_Slices[i]->GetBinContent(j+1));
-        bincount++;
-      }
+    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
+      fMCHist->SetBinContent(bincount+1, fMCHist_Slices[i]->GetBinContent(j+1));
+      bincount++;
     }
-    else if(NuPDG==-14){
-      for (int j = 0; j < fMCHistAntiNuMu_Slices[i]->GetNbinsX(); j++){
-        fMCHist->SetBinContent(bincount+1, fMCHistAntiNuMu_Slices[i]->GetBinContent(j+1));
-        bincount++;
-      }
-    }
-  } 
+  }
 
   return;
 }
@@ -149,30 +139,30 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::FillMCSlice(double x, double y, doub
 
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y > angular_binning_costheta[i]) && (y <= angular_binning_costheta[i + 1])) {
-      if(NuPDG==14) fMCHistNuMu_Slices[i]->Fill(x, w);
-      else if(NuPDG==-14) fMCHistAntiNuMu_Slices[i]->Fill(x, w);
+      fMCHist_Slices[i]->Fill(x, w);
     }
   }
 }
 
 void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
+  std::string name = fSettings.GetName();
+  std::string titles = fSettings.GetFullTitles();
+
+  std::string nuType;
+  if (NuPDG==14) nuType = "NuMu";
+  else nuType = "AntiNuMu";
+
   // Read in 1D Data Histograms
   fInputFile = new TFile( (FitPar::GetDataBase() + "/T2K/CC0pi/JointNuMu-AntiNuMu/JointNuMuAntiNuMuCC0piXsecDataRelease.root").c_str(),"READ");
-
-  TH1D* hLinearResult;
-
-  if(NuPDG==14) hLinearResult = (TH1D*) fInputFile->Get("hNuMuCC0piXsecLinearResult");
-  else if(NuPDG==-14) hLinearResult = (TH1D*) fInputFile->Get("hAntiNuMuCC0piXsecLinearResult");
-
+  
+  TH1D* hLinearResult = (TH1D*) fInputFile->Get(Form("h%sCC0piXsecLinearResult", nuType.c_str()));
   int Nbins = hLinearResult->GetNbinsX();
   
-  std::string histoLinearNuType;
-  if(NuPDG==14) histoLinearNuType = "NuMuCC0pi";
-  else if(NuPDG==-14) histoLinearNuType = "AntiNuMuCC0pi";
-  
   // Now Convert into 1D list
-  fDataHist = new TH1D(("LinarResult" + histoLinearNuType).c_str(),("LinarResult" + histoLinearNuType).c_str(),Nbins,0,Nbins);
+  fDataHist = new TH1D(Form("%s_data", name.c_str()),
+		       Form("%s_data%s", name.c_str(), titles.c_str()),
+		       Nbins,0,Nbins);
   for (int bin = 0; bin < Nbins; bin++){
     fDataHist->SetBinContent(bin+1, hLinearResult->GetBinContent(bin+1));
   }
@@ -196,51 +186,28 @@ void T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos::SetHistograms(){
 
   int bincount = 0;
   for (size_t i = 0; i < nangbins; i++){
-    if(NuPDG==14){
-      // Make slices for data 
-      fDataHistNuMu_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsecNuMuCC0piDataSlice_%zu",i))->Clone());
-      fDataHistNuMu_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%zu",i),
-      (Form("T2K_NuMu_CC0pi_2DPcos_data_Slice%zu",i)));
 
-      // Loop over nbins and set errors from covar
-      for (int j = 0; j < fDataHistNuMu_Slices[i]->GetNbinsX(); j++){
-        fDataHistNuMu_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
-        fDataHist->SetBinContent(bincount+1, fDataHistNuMu_Slices[i]->GetBinContent(j+1));
-        fDataHist->SetBinError(bincount+1,   fDataHistNuMu_Slices[i]->GetBinError(j+1));
-        bincount++;
-      }
-
-      // Save MC slices
-      fMCHistNuMu_Slices.push_back((TH1D*) fDataHistNuMu_Slices[i]->Clone());
-      fMCHistNuMu_Slices[i]->SetNameTitle(Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%zu",i), (Form("T2K_NuMu_CC0pi_2DPcos_MC_Slice%zu",i)));
-
-      SetAutoProcessTH1(fDataHistNuMu_Slices[i],kCMD_Write);
-      SetAutoProcessTH1(fMCHistNuMu_Slices[i]);
-
-    } 
-    else if(NuPDG==-14) {
-      // Make slices for data 
-      fDataHistAntiNuMu_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsecAntiNuMuCC0piDataSlice_%zu",i))->Clone());
-      fDataHistAntiNuMu_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%zu",i),
-      (Form("T2K_AntiNuMu_CC0pi_2DPcos_data_Slice%zu",i)));
-
-      //Loop over nbins and set errors from covar
-      for (int j = 0; j < fDataHistAntiNuMu_Slices[i]->GetNbinsX(); j++){
-        fDataHistAntiNuMu_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
-        fDataHist->SetBinContent(bincount+1, fDataHistAntiNuMu_Slices[i]->GetBinContent(j+1));
-        fDataHist->SetBinError(bincount+1,   fDataHistAntiNuMu_Slices[i]->GetBinError(j+1));
-        bincount++;
-      }
-
-      // Save MC slices
-      fMCHistAntiNuMu_Slices.push_back((TH1D*) fDataHistAntiNuMu_Slices[i]->Clone());
-      fMCHistAntiNuMu_Slices[i]->SetNameTitle(Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%zu",i), (Form("T2K_AntiNuMu_CC0pi_2DPcos_MC_Slice%zu",i)));
-
-      SetAutoProcessTH1(fDataHistAntiNuMu_Slices[i],kCMD_Write);
-      SetAutoProcessTH1(fMCHistAntiNuMu_Slices[i]);
-
+    // Make slices for data
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("hXsec%sCC0piDataSlice_%zu",nuType.c_str(),i))->Clone());
+    fDataHist_Slices[i]->SetNameTitle(Form("%s_data_Slice%zu",name.c_str(), i),
+				      Form("%s_data_Slice%zu%s",name.c_str(), i, titles.c_str()));
+    
+    // Loop over nbins and set errors from covar
+    for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++){
+      fDataHist_Slices[i]->SetBinError(j+1, sqrt((*fFullCovar)(bincount,bincount))*1E-38);
+      fDataHist->SetBinContent(bincount+1, fDataHist_Slices[i]->GetBinContent(j+1));
+      fDataHist->SetBinError(bincount+1,   fDataHist_Slices[i]->GetBinError(j+1));
+      bincount++;
     }
-  }
+    
+    // Save MC slices
+    fMCHist_Slices.push_back((TH1D*) fDataHist_Slices[i]->Clone());
+    fMCHist_Slices[i]->SetNameTitle(Form("%s_MC_Slice%zu",name.c_str(), i), 
+				    Form("%s_MC_Slice%zu%s",name.c_str(),i,titles.c_str()));
+    
+    SetAutoProcessTH1(fDataHist_Slices[i],kCMD_Write);
+    SetAutoProcessTH1(fMCHist_Slices[i]);    
+  } 
 
   return;
 

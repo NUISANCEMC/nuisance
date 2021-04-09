@@ -887,7 +887,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
      return (new BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu")) {
      return (new BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu(samplekey));
-  } else if(!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
      return (new BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(samplekey));
     /*
       FNAL Samples
@@ -1199,8 +1199,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare(
-                 "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {

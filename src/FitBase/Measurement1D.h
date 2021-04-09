@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P towell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P towell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -642,7 +642,7 @@ protected:
   bool fIsChi2;       ///< Flag : using Chi2 over LL methods
   bool fIsSmeared;    ///< Flag : Apply smearing?
   bool fIsWriting;
-
+  bool fSaveFine;
 
   /// OLD STUFF TO REMOVE
   TH1D* fMCHist_PDG[61]; ///< REMOVE OLD MC PDG Plot

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -20,38 +20,6 @@
 #include "PlotUtils.h"
 #include "FitEvent.h"
 #include "StatUtils.h"
-
-// MOVE TO MB UTILS!
-// This function is intended to be modified to enforce a consistent masking for
-// all models.
-TH2D *PlotUtils::SetMaskHist(std::string type, TH2D *data) {
-  TH2D *fMaskHist = (TH2D *)data->Clone("fMaskHist");
-
-  for (int xBin = 0; xBin < fMaskHist->GetNbinsX(); ++xBin) {
-    for (int yBin = 0; yBin < fMaskHist->GetNbinsY(); ++yBin) {
-      if (data->GetBinContent(xBin + 1, yBin + 1) == 0)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0);
-      else
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 0.5);
-
-      if (!type.compare("MB_numu_2D")) {
-        if (yBin == 19 && xBin < 8)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      } else {
-        if (yBin == 19 && xBin < 11)
-          fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      }
-      if (yBin == 18 && xBin < 3)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 17 && xBin < 2)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-      if (yBin == 16 && xBin < 1)
-        fMaskHist->SetBinContent(xBin + 1, yBin + 1, 1.0);
-    }
-  }
-
-  return fMaskHist;
-};
 
 // MOVE TO GENERAL UTILS?
 bool PlotUtils::CheckObjectWithName(TFile *inFile, std::string substring) {
@@ -149,9 +117,9 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[13]->SetLineColor(kGreen);
 
   ModeStack[16]->SetTitle("CC coherent");
-  ModeStack[16]->SetFillColor(kBlue);
+  ModeStack[16]->SetFillColor(kBlue-6);
   // ModeStack[16]->SetFillStyle(3644);
-  ModeStack[16]->SetLineColor(kBlue);
+  ModeStack[16]->SetLineColor(kBlue-6);
 
   // ModeStack[17]->SetTitle("#it{#nu + n #rightarrow l^{-} + p + #gamma}");
   ModeStack[17]->SetTitle("CC1#gamma");
@@ -177,16 +145,16 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[23]->SetLineColor(kYellow - 6);
 
   ModeStack[26]->SetTitle("DIS (W > 2.0)");
-  ModeStack[26]->SetFillColor(kRed);
+  ModeStack[26]->SetFillColor(kRed-6);
   // ModeStack[26]->SetFillStyle(3006);
-  ModeStack[26]->SetLineColor(kRed);
+  ModeStack[26]->SetLineColor(kRed-6);
 
   // NC
   // ModeStack[31]->SetTitle("#it{#nu + n #rightarrow #nu + n + #pi^{0}}");
   ModeStack[31]->SetTitle("NC1#pi^{0} on n");
-  ModeStack[31]->SetFillColor(kBlue);
+  ModeStack[31]->SetFillColor(kBlue-4);
   // ModeStack[31]->SetFillStyle(3004);
-  ModeStack[31]->SetLineColor(kBlue);
+  ModeStack[31]->SetLineColor(kBlue-4);
   // ModeStack[32]->SetTitle("#it{#nu + p #rightarrow #nu + p + #pi^{0}}");
   ModeStack[32]->SetTitle("NC1#pi^{0} on p");
   ModeStack[32]->SetFillColor(kBlue + 3);
@@ -247,9 +215,9 @@ THStack PlotUtils::GetNeutModeStack(std::string title, TH1 *ModeStack[],
   ModeStack[45]->SetLineColor(kYellow - 10);
 
   ModeStack[46]->SetTitle("DIS (W > 2.0)");
-  ModeStack[46]->SetFillColor(kRed);
+  ModeStack[46]->SetFillColor(kRed-6);
   // ModeStack[46]->SetFillStyle(3006);
-  ModeStack[46]->SetLineColor(kRed);
+  ModeStack[46]->SetLineColor(kRed-6);
 
   // ModeStack[51]->SetTitle("#it{#nu + p #rightarrow #nu + p}");
   ModeStack[51]->SetTitle("NC on p");
@@ -659,22 +627,27 @@ TH1D *PlotUtils::GetTH1DFromFile(std::string dataFile, std::string title,
   return tempPlot;
 };
 
-TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2) {
-  // make copy of first hist
-  TH1D *new_hist = (TH1D *)hist1->Clone();
+TH1D *PlotUtils::GetRatioPlot(TH1D *hist1, TH1D *hist2, TH1D *new_hist) {
+
+  // If the hist to save into doesn't exist, make copy of first hist
+  if (!new_hist) new_hist = (TH1D *)hist1->Clone();
 
   // Do bins and errors ourselves as scales can go awkward
   for (int i = 0; i < new_hist->GetNbinsX(); i++) {
-    if (hist2->GetBinContent(i + 1) == 0.0) {
-      new_hist->SetBinContent(i + 1, 0.0);
+    
+    double binVal = 0;
+    double binErr = 0;
+    
+    if (hist2->GetBinContent(i+1) && hist1->GetBinContent(i+1)) {
+      binVal = hist1->GetBinContent(i+1)/hist2->GetBinContent(i+1);
+      double fractErr1 = hist1->GetBinError(i+1)/hist1->GetBinContent(i+1);
+      double fractErr2 = hist2->GetBinError(i+1)/hist2->GetBinContent(i+1);
+      binErr = binVal * sqrt(fractErr1*fractErr1 + fractErr2*fractErr2);
     }
 
-    new_hist->SetBinContent(i + 1, hist1->GetBinContent(i + 1) /
-                                       hist2->GetBinContent(i + 1));
-    new_hist->SetBinError(i + 1, hist1->GetBinError(i + 1) /
-                                     hist2->GetBinContent(i + 1));
+    new_hist->SetBinContent(i+1, binVal);
+    new_hist->SetBinError(i+1, binErr);
   }
-
   return new_hist;
 };
 
@@ -1207,4 +1180,52 @@ TH1D *PlotUtils::GetProjectionY(TH2D *hist, TH2I *mask) {
 
   delete maskedhist;
   return hist_Y;
+}
+
+
+// A slightly hacky way to restrict the range of a TH1D
+TH1D* PlotUtils::RestrictHistRange(TH1D* inHist, double minVal, double maxVal){
+
+  NUIS_LOG(SAM, "Restricting histogram range to " << minVal << " - " << maxVal);
+
+  std::string name  = inHist->GetName();
+  std::string title = inHist->GetTitle();
+
+  std::vector<double> bin_edges;
+  std::vector<double> bin_vals;
+  std::vector<double> bin_errs;
+
+  for (int i=0; i<inHist->GetNbinsX(); ++i){
+    
+    double low_edge = inHist->GetXaxis()->GetBinLowEdge(i+1);
+    double up_edge  = inHist->GetXaxis()->GetBinUpEdge(i+1);
+
+    if (low_edge < minVal) continue;
+
+    // Deal with the slightly special case of the first bin
+    if (bin_edges.size() == 0) bin_edges.push_back(low_edge);
+
+    // Deal with the rest
+    if (maxVal >= up_edge) {
+      bin_edges.push_back(up_edge);
+      bin_vals .push_back(inHist->GetBinContent(i+1));
+      bin_errs .push_back(inHist->GetBinError(i+1));
+    }
+  }
+
+  int nbins = bin_edges.size()-1;
+
+  // Sanity check
+  if (nbins < 1) return inHist;
+
+  // Now make a new histogram
+  TH1D *ret = new TH1D("temp", "temp", nbins, bin_edges.data());
+
+  for (int i=0; i<nbins; ++i){
+    ret->SetBinContent(i+1, bin_vals[i]);
+    ret->SetBinError(i+1, bin_errs[i]);
+  }
+  delete inHist;
+  ret->SetNameTitle(name.c_str(), title.c_str());
+  return ret;
 }

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -78,7 +78,8 @@ MINERvA_CCDIS_XSec_1DEnu_ratio::MINERvA_CCDIS_XSec_1DEnu_ratio(
   SetCovarFromMultipleTextFiles(fSettings.GetCovarInput());
 
   // Need to overlay the sqrt covariance diagonals onto the data histogram
-  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar);
+  // False stops it complaining that the data hist errors aren't set yet
+  StatUtils::SetDataErrorFromCov(fDataHist, fFullCovar, 1, false);
 
   // Need to scale the covariance by 1E-76... this cancels with the factor of
   // 1E76 introduced in StatUtils::GetChi2FromCov Who says two wrongs don't make
@@ -123,26 +124,16 @@ void MINERvA_CCDIS_XSec_1DEnu_ratio::MakePlots() {
   }
 
   // Now make the ratio histogram
-  TH1D *NUM_MC = (TH1D *)this->NUM->GetMCList().at(0)->Clone();
-  TH1D *DEN_MC = (TH1D *)this->DEN->GetMCList().at(0)->Clone();
+  TH1D *NUM_MC  = (TH1D *)this->NUM->GetMCList().at(0)->Clone();
+  TH1D *DEN_MC  = (TH1D *)this->DEN->GetMCList().at(0)->Clone();
+  this->fMCHist = PlotUtils::GetRatioPlot(NUM_MC, DEN_MC, this->fMCHist); 
 
-  for (int i = 0; i < nBins; ++i) {
-    double binVal = 0;
-    double binErr = 0;
-
-    if (DEN_MC->GetBinContent(i + 1) && NUM_MC->GetBinContent(i + 1)) {
-      binVal = NUM_MC->GetBinContent(i + 1) / DEN_MC->GetBinContent(i + 1);
-      double fractErrNUM =
-          NUM_MC->GetBinError(i + 1) / NUM_MC->GetBinContent(i + 1);
-      double fractErrDEN =
-          DEN_MC->GetBinError(i + 1) / DEN_MC->GetBinContent(i + 1);
-      binErr =
-          binVal * sqrt(fractErrNUM * fractErrNUM + fractErrDEN * fractErrDEN);
-    }
-
-    this->fMCHist->SetBinContent(i + 1, binVal);
-    this->fMCHist->SetBinError(i + 1, binErr);
-  }
+  TH1D *NUM_FINE = (TH1D *)this->NUM->GetFineList().at(0)->Clone();
+  TH1D *DEN_FINE = (TH1D *)this->DEN->GetFineList().at(0)->Clone();
+  this->fMCFine  = PlotUtils::GetRatioPlot(NUM_FINE, DEN_FINE);
+  this->fMCFine ->SetNameTitle(Form("%s_MC_FINE", fSettings.GetName().c_str()),
+                               Form("%s_MC_FINE%s", fSettings.GetName().c_str(),
+                                    fSettings.GetFullTitles().c_str()));
 
   return;
 }

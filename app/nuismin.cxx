@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -33,7 +33,7 @@ void printInputCommands() {
   //*******************************
 
   std::cout
-      << "ExtFit_minimizer.exe -c cardFile -o outFile [-f fitStategy] [-d "
+      << "nuismin -c cardFile -o outFile [-f fitStategy] [-d "
          "fakeDataFile] [-i inputFile] [-q config_name=config_val] \n";
   std::cout << std::endl;
   std::cout << "Arguments:" << std::endl;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  NUIS_LOG(FIT, "Starting ExtFit_minimizer.exe");
+  NUIS_LOG(FIT, "Starting nuismin");
 
   // Make minimizer class and run fit
   MinimizerRoutines *min = new MinimizerRoutines(argc, argv);

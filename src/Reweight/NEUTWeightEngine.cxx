@@ -3,9 +3,16 @@
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 #if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
 
-  // For newer NEUT we need to set up our defaults
-#if __NEUT_VERSION__ >= 541
-  neut::CommonBlockIFace::Initialize(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
+#if defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
+  std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+  if (!neut_card.size()) {
+    NUIS_ABORT(
+	       "[ERROR]: When using NEUTReWeight must set NEUT_CARD config option.");
+  }
+  // No need to vomit the contents of the card file all over my screen
+  StopTalking();                                                                                                                                                            
+  neut::CommonBlockIFace::Initialize(neut_card);
+  StartTalking();                                                                                                                                                           
 #endif
 
   // Setup the NEUT Reweight engien
@@ -190,6 +197,11 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 #endif
+
+  if (!std::isnormal(rw_weight)){
+    NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
+    rw_weight = 0;
+  }
 
   // Return rw_weight
   return rw_weight;

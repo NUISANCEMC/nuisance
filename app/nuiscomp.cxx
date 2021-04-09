@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
   // Read input arguments such as card file, parameter arguments, and fit
   // routines
-  NUIS_LOG(FIT, "Starting nuiscomp.exe");
+  std::cout << "[ NUISANCE ]: Starting nuiscomp.exe" << std::endl;
 
   // Make minimizer class and run fit
   ComparisonRoutines *comp = new ComparisonRoutines(argc, argv);

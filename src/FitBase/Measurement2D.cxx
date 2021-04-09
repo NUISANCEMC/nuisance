@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -25,6 +25,7 @@ Measurement2D::Measurement2D(void) {
   //********************************************************************
 
   covar = NULL;
+  fInvert = NULL;
   fDecomp = NULL;
   fFullCovar = NULL;
 
@@ -51,42 +52,9 @@ Measurement2D::Measurement2D(void) {
       "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/FITPROJX/"
       "FITPROJY";
 
-  fIsFix = false;
-  fIsShape = false;
-  fIsFree = false;
-
-  fIsDiag = false;
-  fIsFull = false;
-
-  fAddNormPen = false;
-  fIsMask = false;
-  fIsChi2SVD = false;
-
-  fIsRawEvents = false;
-  fIsDifXSec = false;
-  fIsEnu = false;
-
   // XSec Scalings
   fScaleFactor = -1.0;
   fCurrentNorm = 1.0;
-
-  // Histograms
-  fDataHist = NULL;
-  fDataTrue = NULL;
-
-  fMCHist = NULL;
-  fMCFine = NULL;
-  fMCWeighted = NULL;
-
-  fMaskHist = NULL;
-
-  // Covar
-  covar = NULL;
-  fFullCovar = NULL;
-
-  fCovar = NULL;
-  fInvert = NULL;
-  fDecomp = NULL;
 
   // Fake Data
   fFakeDataInput = "";
@@ -174,7 +142,6 @@ void Measurement2D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("Enu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -241,13 +208,13 @@ void Measurement2D::SetDataValuesFromTextFile(std::string datfile, TH2D *hist) {
   valhist->Reset();
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0, true);
 
-  NUIS_LOG(SAM, " -> Filling values from read hist.");
+  NUIS_LOG(DEB, " -> Filling values from read hist.");
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinContent(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
@@ -262,14 +229,14 @@ void Measurement2D::SetDataErrorsFromTextFile(std::string datfile, TH2D *hist) {
   PlotUtils::Set2DHistFromText(datfile, valhist, 1.0);
 
   // Fill Errors
-  NUIS_LOG(SAM, " -> Filling errors from read hist.");
+  NUIS_LOG(DEB, " -> Filling errors from read hist.");
 
   for (int i = 0; i < valhist->GetNbinsX(); i++) {
     for (int j = 0; j < valhist->GetNbinsY(); j++) {
       hist->SetBinError(i + 1, j + 1, valhist->GetBinContent(i + 1, j + 1));
     }
   }
-  NUIS_LOG(SAM, " --> Done");
+  NUIS_LOG(DEB, " --> Done");
 }
 
 void Measurement2D::SetMapValuesFromText(std::string dataFile) {
@@ -1389,33 +1356,11 @@ void Measurement2D::Write(std::string drawOpt) {
     fSettings.Write();
   }
 
-  // // Likelihood residual plots
-  // if (drawOpt.find("RESIDUAL") != std::string::npos) {
-  // WriteResidualPlots();
-  //}
-
-  // // RATIO
-  // if (drawOpt.find("CANVMC") != std::string::npos) {
-  //   TCanvas* c1 = WriteMCCanvas(fDataHist, fMCHist);
-  //   c1->Write();
-  //   delete c1;
-  // }
-
-  // // PDG
-  // if (drawOpt.find("CANVPDG") != std::string::npos && fMCHist_Modes) {
-  //   TCanvas* c2 = WritePDGCanvas(fDataHist, fMCHist, fMCHist_Modes);
-  //   c2->Write();
-  //   delete c2;
-  // }
-
-  /// 2D VERSION
   // If null pointer return
   if (!fMCHist and !fDataHist) {
     NUIS_LOG(SAM, fName << "Incomplete histogram set!");
     return;
   }
-
-  //  Config::Get().out->cd();
 
   // Get Draw Options
   drawOpt = FitPar::Config().GetParS("drawopts");
@@ -1466,12 +1411,12 @@ void Measurement2D::Write(std::string drawOpt) {
 
   if (fIsChi2 && !fIsDiag) {
     fResidualHist = (TH2D *)fMCHist->Clone((fName + "_RESIDUAL").c_str());
-    fResidualHist->GetYaxis()->SetTitle("#Delta#chi^{2}");
+    fResidualHist->GetZaxis()->SetTitle("#Delta#chi^{2}");
     fResidualHist->Reset();
 
     fChi2LessBinHist =
         (TH2D *)fMCHist->Clone((fName + "_Chi2NMinusOne").c_str());
-    fChi2LessBinHist->GetYaxis()->SetTitle("Total #chi^{2} without bin_{i}");
+    fChi2LessBinHist->GetZaxis()->SetTitle("Total #chi^{2} without bin_{i}");
     fChi2LessBinHist->Reset();
 
     fIsWriting = true;
@@ -1611,6 +1556,8 @@ void Measurement2D::Write(std::string drawOpt) {
   if (drawShape) {
     // Create Shape Histogram
     TH2D *mcShape = (TH2D *)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
+    TH1D *mcShape_1D = StatUtils::MapToTH1D(mcShape, fMapHist);
+    mcShape_1D ->SetName((fName + "_MC_SHAPE_1D").c_str());
 
     double shapeScale = 1.0;
     if (fIsRawEvents) {
@@ -1619,12 +1566,14 @@ void Measurement2D::Write(std::string drawOpt) {
       shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
     }
 
-    mcShape->Scale(shapeScale);
+    mcShape->SetTitle(Form("%f", shapeScale));
+    mcShape_1D->SetTitle(Form("%f", shapeScale));
 
-    mcShape->SetLineWidth(3);
-    mcShape->SetLineStyle(7); // dashes
+    mcShape->Scale(shapeScale);
+    mcShape_1D->Scale(shapeScale);
 
     mcShape->Write();
+    mcShape_1D->Write();
 
     // Save shape ratios
     if (drawRatio) {
@@ -1641,10 +1590,6 @@ void Measurement2D::Write(std::string drawOpt) {
       mcShapeRatio->Divide(mcShape);
       dataShapeRatio->Divide(mcShape);
 
-      // Colour the shape ratio plots
-      mcShapeRatio->SetLineWidth(3);
-      mcShapeRatio->SetLineStyle(7); // dashes
-
       mcShapeRatio->Write();
       dataShapeRatio->Write();
 
@@ -1653,6 +1598,7 @@ void Measurement2D::Write(std::string drawOpt) {
     }
 
     delete mcShape;
+    delete mcShape_1D;
   }
 
   // Save residual calculations of what contributed to the chi2 values.
@@ -1794,7 +1740,6 @@ void Measurement2D::SetupMeasurement(std::string inputfile, std::string type,
   if ((fName.find("XSec") != std::string::npos) &&
       (fName.find("Enu") != std::string::npos)) {
     fIsEnu = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");

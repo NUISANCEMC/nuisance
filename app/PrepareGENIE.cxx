@@ -72,9 +72,9 @@ bool CheckConfig(std::string filename) {
   }
   f->Close();
   if (!ShouldScale) {
-    NUIS_LOG(FIT, "Not scaling 2p2h CC events with Nieves..." << std::endl);
+    NUIS_LOG(FIT, "Not scaling 2p2h CC events with Nieves...");
   } else {
-    NUIS_LOG(FIT, "Scaling 2p2h CC events with Nieves..." << std::endl);
+    NUIS_LOG(FIT, "Scaling 2p2h CC events with Nieves...");
   }
 
   return ShouldScale;
@@ -388,13 +388,22 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     totalnucl += *it;
   }
 
+  // Report on what we've got
+  it = targ_fractions.begin();
+  jt = targ_list.begin();
+  for (; it != targ_fractions.end(); it++, jt++){
+    NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
+  }
+
+
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
         "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
   }
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
 
-  for (uint i = 0; i < targprs.size(); i++) {
+  it = targ_fractions.begin();
+  for (uint i = 0; i < targprs.size(); i++, it++) {
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
@@ -406,6 +415,13 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
+
+	int nucl = atoi(targpdg.c_str());
+        nucl = (nucl % 10000) / 10;
+
+	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
+        xsec->Scale(*it/double(nucl));
+
         NUIS_LOG(FIT, "Adding target spline "
             << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
@@ -807,6 +823,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     totalnucl += *it;
   }
 
+  // Report on what we've got
+  it = targ_fractions.begin();
+  jt = targ_list.begin();
+  for (; it != targ_fractions.end(); it++, jt++){
+    NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
+  }
+
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
         "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
@@ -815,7 +838,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
 
   // Loop over the specified targets by the user
-  for (uint i = 0; i < targprs.size(); i++) {
+  it = targ_fractions.begin();
+  for (uint i = 0; i < targprs.size(); i++, it++) {
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
@@ -827,12 +851,16 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
+
+	int nucl = atoi(targpdg.c_str());
+	nucl = (nucl % 10000) / 10;
+
+	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
+	xsec->Scale(*it/double(nucl));
+
         NUIS_LOG(FIT, "Adding target spline "
             << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
-
-        // int nucl = atoi(targpdg.c_str());
-        // totalnucl += int((nucl % 10000) / 10);
       }
     } // Looped over target splines
 

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This ile is part of NUISANCE.
@@ -64,6 +64,7 @@ JointMeas1D::JointMeas1D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -229,7 +230,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
@@ -293,8 +293,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (!fRW)
     fRW = FitBase::GetRW();
-
-  NUIS_LOG(SAM, "Finalised Sample Settings");
 }
 
 //********************************************************************
@@ -1320,7 +1318,7 @@ void JointMeas1D::Write(std::string drawOpt) {
   GetMCHistogram()->Write();
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram

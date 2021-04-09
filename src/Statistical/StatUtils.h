@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -189,6 +189,9 @@ TMatrixDSym *ApplyMatrixMasking(TMatrixDSym *mat, TH2D *data, TH2I *mask,
 /*
   Covariance Handling Functions
 */
+
+//! Check if a matrix can be inverted with cholesky method
+bool IsMatrixWellBehaved(TMatrixDSym* mat);
 
 //! Return inverted matrix of TMatrixDSym
 TMatrixDSym *GetInvert(TMatrixDSym *mat, bool rescale = false);

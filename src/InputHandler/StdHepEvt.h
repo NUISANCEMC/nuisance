@@ -1,6 +1,6 @@
 #ifndef __STDHEPEVT_SEEN__
 #define __STDHEPEVT_SEEN__
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.

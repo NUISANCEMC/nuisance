@@ -317,7 +317,7 @@ int JointFCN::GetNDOF() {
 double JointFCN::GetLikelihood() {
   //***************************************************
 
-  NUIS_LOG(MIN, std::left << std::setw(43) << "Getting likelihoods..."
+  NUIS_LOG(MIN, std::left << std::setw(53) << "Getting likelihoods..."
                           << " : "
                           << "-2logL");
 
@@ -334,7 +334,7 @@ double JointFCN::GetLikelihood() {
       fSampleLikes[count] = newlike;
     }
 
-    NUIS_LOG(MIN, "-> " << std::left << std::setw(40) << exp->GetName() << " : "
+    NUIS_LOG(MIN, "|-> " << std::left << std::setw(49) << exp->GetName() << " : "
                         << newlike << "/" << ndof);
 
     // Add Weight Scaling
@@ -415,6 +415,7 @@ void JointFCN::ReconfigureSamples(bool fullconfig) {
   //***************************************************
 
   int starttime = time(NULL);
+  NUIS_LOG(REC, "------------");
   NUIS_LOG(REC, "Starting Reconfigure iter. " << this->fCurIter);
   // std::cout << fUsingEventManager << " " << fullconfig << " " << fMCFilled
   // << std::endl; Event Manager Reconf
@@ -517,7 +518,7 @@ void JointFCN::ReconfigureUsingManager() {
 
   // 'Slow' Event Manager Reconfigure
   NUIS_LOG(REC, "Event Manager Reconfigure");
-  int timestart = time(NULL);
+  // int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -526,7 +527,7 @@ void JointFCN::ReconfigureUsingManager() {
     exp->ResetAll();
   }
 
-  // If we are siving signal, reset all containers.
+  // If we are saving signal, reset all containers.
   bool savesignal = (FitPar::Config().GetParB("SignalReconfigures"));
 
   if (savesignal) {
@@ -590,11 +591,11 @@ void JointFCN::ReconfigureUsingManager() {
 
       if (LOGGING(REC)) {
         if (countwidth && (i % countwidth == 0)) {
-          NUIS_LOG(REC, curinput->GetName()
-                            << " : Processed " << std::setw(textwidth) << i
-                            << " events. [M, W] = [" << std::setw(3)
-                            << curevent->Mode << ", " << std::setw(5)
-                            << Form("%.3lf", curevent->Weight) << "]");
+          NUIS_LOG(REC, std::left << std::setw(52) << curinput->GetName()
+		   << ": Processed " << std::right << std::setw(textwidth) << i
+		   << " events. [M, W] = [" << std::setw(3)
+		   << curevent->Mode << ", " << std::setw(5)
+		   << Form("%.3lf", curevent->Weight) << "]");
         }
       }
 
@@ -739,9 +740,6 @@ void JointFCN::ReconfigureUsingManager() {
     }
   }
 
-  NUIS_LOG(REC,
-           "Time taken ReconfigureUsingManager() : " << time(NULL) - timestart);
-
   // Check SignalReconfigures works for all samples
   if (savesignal) {
     double likefull = GetLikelihood();
@@ -767,9 +765,9 @@ void JointFCN::ReconfigureUsingManager() {
 void JointFCN::ReconfigureFastUsingManager() {
   //***************************************************
 
-  NUIS_LOG(FIT, " -> Doing FAST using manager");
+  NUIS_LOG(FIT, "Reconfiguring FAST using manager");
   // Get Start time for profilling
-  int timestart = time(NULL);
+  // int timestart = time(NULL);
 
   // Reset all samples
   MeasListConstIter iterSam = fSamples.begin();
@@ -780,7 +778,7 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Check for saved variables if not do a full reconfigure.
   if (fSignalEventFlags.empty()) {
-    NUIS_ERR(WRN, "Signal Flags Empty! Using normal manager.");
+    NUIS_LOG(REC, "Signal Flags Empty! Using normal manager.");
     ReconfigureUsingManager();
     return;
   }
@@ -944,8 +942,6 @@ void JointFCN::ReconfigureFastUsingManager() {
 
   // Print some reconfigure profiling.
   NUIS_LOG(REC, "Filled " << fillcount << " signal events.");
-  NUIS_LOG(REC, "Time taken ReconfigureFastUsingManager() : " << time(NULL) -
-                                                                     timestart);
 }
 
 //***************************************************

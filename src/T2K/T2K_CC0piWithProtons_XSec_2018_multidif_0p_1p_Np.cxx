@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -37,8 +37,7 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Bin number");
-  // fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetYTitle("d^{3}#sigma/dN_{pr}dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
   fSettings.SetEnuRange(0.0, 10.0);
@@ -61,16 +60,21 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
     useCC0pi0p = true;
     useCC0pi1p = true;
     useCC0piNp = true;
+    fSettings.SetXTitle("N_{pr}-p_{#mu}-cos#theta_{#mu}");
+
   }
   else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p"){
     useCC0pi0p = true;
     useCC0pi1p = true;
+    fSettings.SetXTitle("N_{pr}-p_{#mu}-cos#theta_{#mu}");
   }
   else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_0p"){
     useCC0pi0p = true;
+    fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
   }
   else if (fName == "T2K_CC0piWithProtons_XSec_2018_multidif_1p"){
     useCC0pi1p = true;
+    fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
   }
 
 
@@ -86,6 +90,7 @@ T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 bool T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::isSignal(FitEvent *event) {
@@ -160,7 +165,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillHistograms() {
 
   Measurement1D::FillHistograms();
   if (Signal) {
-    // fMCHist_Fine2D->Fill(fXVar, fYVar, Weight);
     if (useCC0pi0p && fNp == 0){
       fMCHist_CC0pi0pCosTheta->Fill(fCosThetaMu, Weight);
     }
@@ -193,18 +197,19 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::FillMCSlice(int nProtonsA
 
 void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
 
+  std::string name = fSettings.GetName();
+
   // Read in 1D Data Histograms
   fInputFile = new TFile(
       (FitPar::GetDataBase() + "/T2K/CC0pi/STV/multidif_results.root")
-          .c_str(),
-      "READ");
-  // fInputFile->ls();
+      .c_str(), "READ");
 
   // Read in 1D Data
-  TH1D *tempDataHist = (TH1D *)fInputFile->Get("Result");
+  TH1D *tempDataHist = (TH1D*)fInputFile->Get("Result");
+  // tempDataHist->Scale(1e-38);
 
   // Read in covariance matrix
-  TH2D *tempcov = (TH2D *)fInputFile->Get("CovarianceMatrix");
+  TH2D *tempcov = (TH2D*)fInputFile->Get("CovarianceMatrix");
 
   // The input data and covariance matrix include bins for CC0pi0p, CC0pi1p, and CC0piNp. We may not want them all if we only want to look at one or two of the sub-samples, so go through and only keep the bins we want
   // CC0pi0p: bins 1-60 -> 60 bins
@@ -215,7 +220,9 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   if (useCC0pi1p) n_binskeep += 32;
   if (useCC0piNp) n_binskeep += 1;
 
-  fDataHist = new TH1D("DataHist", tempDataHist->GetTitle(),n_binskeep,0,n_binskeep);
+  fDataHist = new TH1D(Form("%s_data", name.c_str()), 
+		       Form("%s_data%s", name.c_str(), fSettings.GetFullTitles().c_str()),
+		       n_binskeep,0,n_binskeep);
   fFullCovar = new TMatrixDSym(n_binskeep);
 
   int i_binskeep = 1;
@@ -233,8 +240,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
       if ((j_allbins >= 61 && j_allbins <=92) && !useCC0pi1p) continue;
       if ((j_allbins == 93) && !useCC0piNp) continue;
 
-      // std::cout << i_allbins << ", " << j_allbins << " -- " << i_binskeep-1 << ", " << j_binskeep-1 << " -- " << tempcov->GetBinContent(i_allbins, j_allbins) << std::endl;
-
       (*fFullCovar)(i_binskeep-1,j_binskeep-1) = tempcov->GetBinContent(i_allbins, j_allbins)*1e38*1e38;
       j_binskeep++;
     } // end loop over j_allbins
@@ -244,51 +249,6 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
 
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
-
-  // Make 1D data histogram
-  TH1D *linearResult = new TH1D(*fDataHist);
-  // Set name based on what subsamples we are looking at
-  if (useCC0pi0p && useCC0pi1p && useCC0piNp){
-    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_data");
-  }
-  else if (useCC0pi0p && useCC0pi1p && !useCC0piNp){
-    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_data");
-  }
-  else if (useCC0pi0p && !useCC0pi1p && !useCC0piNp){
-    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_0p_data");
-  }
-  else if (!useCC0pi0p && useCC0pi1p && !useCC0piNp){
-    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_1p_data");
-  }
-  else{
-    linearResult->SetName("T2K_CC0piWithProtons_XSec_2018_multidif_data");
-  }
-  SetAutoProcessTH1(linearResult, kCMD_Write);
-
-
-  // Fine histograms - don't implement for now (this is copied from T2K_CC0pi1p_XSec_3DPcoscos_nu)
-  // fMCHist_Fine2D = new TH2D("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
-  //                           "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np_Fine2D",
-  //                           400, 0.0, 30.0, 100, -1.0, 1.0);
-  // SetAutoProcessTH1(fMCHist_Fine2D);
-
-
-  // The code below converts a relative covariance matrix to an absolute one. I think the input is absolute so we don't need it, but come back to this if the results look weird
-  // for (int i = 0; i < fDataHist->GetNbinsX(); i++) {
-  //   for (int j = 0; j < fDataHist->GetNbinsX(); j++) {
-  //     //(*fFullCovar)(i,j) = tempcov->GetBinContent(i+1, j+1);
-  //     (*fFullCovar)(i, j) = tempcov->GetBinContent(i + 1, j + 1) *
-  //                           fDataHist->GetBinContent(i + 1) *
-  //                           fDataHist->GetBinContent(j + 1);
-  //     if (i == j)
-  //       fDataHist->SetBinError(i + 1, sqrt((*fFullCovar)(i, j)));
-  //     // if(i==j) std::cout << "For bin " << i+1 << ", relative covariance was "
-  //     // << tempcov->GetBinContent(i+1,j+1); if(i==j) std::cout << ". Absolute
-  //     // covariance is now " << (*fFullCovar)(i,j) << ", linear xsec is: " <<
-  //     // fDataHist->GetBinContent(i+1) << std::endl;
-  //   }
-  // }
-
 
   // Read in data slice histograms and make MC slices
   // Slices are stored in slightly different ways for 0p and 1p samples
@@ -305,47 +265,65 @@ void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::SetHistograms() {
   // We also have proton multiplicity, in folder ProtonMultiplicity
   //         -> TH1D Result
   //         -> TH2D CovarianceMatrix
-  // TODO add this as a separate sample? Don't implement here
 
   // CC0pi0p slices
   if (useCC0pi0p){
-    fDataHist_CC0pi0pCosTheta = (TH1D*)fInputFile->Get("NoProtonsAbove500MeV/ResultInMuonCosTheta")->Clone("T2K_CC0pi0p_XSec_2018_MuonCosTheta_data");
-    fMCHist_CC0pi0pCosTheta = (TH1D*)fDataHist_CC0pi0pCosTheta->Clone("T2K_CC0pi0p_XSec_2018_MuonCosTheta_MC");
-    fMCHist_CC0pi0pCosTheta->Reset();
+    std::string temp_name = "T2K_CC0piWithProtons_XSec_2018_multidif_0p";
+    fDataHist_CC0pi0pCosTheta = (TH1D*)fInputFile->Get("NoProtonsAbove500MeV/ResultInMuonCosTheta")->Clone();
+    fDataHist_CC0pi0pCosTheta ->SetName(Form("%s_MuonCosTheta_data", temp_name.c_str()));
+    
+    fMCHist_CC0pi0pCosTheta = (TH1D*)fDataHist_CC0pi0pCosTheta->Clone();
+    fMCHist_CC0pi0pCosTheta ->SetName(Form("%s_MuonCosTheta_MC", temp_name.c_str())),
+    fMCHist_CC0pi0pCosTheta ->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi0pCosTheta, kCMD_Write);
     SetAutoProcessTH1(fMCHist_CC0pi0pCosTheta, kCMD_Reset, kCMD_Scale, kCMD_Write);
 
     for (int i=0; i<=9; i++){
-      fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_CC0pi0p_XSec_2018_Data_Slice%i", i)));
-      fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone(Form("T2K_CC0pi0p_XSec_2018_MC_Slice%i", i)));
+      fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone());
+      fDataHist_Slices.back()->SetName(Form("%s_MuonCosTheta_data_Slice%i", temp_name.c_str(), i));
+      fMCHist_Slices  .push_back((TH1D*)fInputFile->Get(Form("NoProtonsAbove500MeV/MuonCosThetaSlice_%i", i))->Clone());
+      fMCHist_Slices  .back()->SetName(Form("%s_MuonCosTheta_MC_Slice%i", temp_name.c_str(), i));
     } // end loop over i
   }
 
   // CC0pi1p slices
   if (useCC0pi1p){
-    fDataHist_CC0pi1pCosTheta = (TH1D*)fInputFile->Get("OneProtonAbove500MeV/ResultInMuonCosTheta")->Clone("T2K_CC0pi1p_XSec_2018_MuonCosTheta_data");
-    fMCHist_CC0pi1pCosTheta = (TH1D*)fDataHist_CC0pi1pCosTheta->Clone("T2K_CC0pi1p_XSec_2018_MuonCosTheta_MC");
-    fMCHist_CC0pi1pCosTheta->Reset();
+    std::string temp_name = "T2K_CC0piWithProtons_XSec_2018_multidif_1p";
+    fDataHist_CC0pi1pCosTheta = (TH1D*)fInputFile->Get("OneProtonAbove500MeV/ResultInMuonCosTheta")->Clone();
+    fDataHist_CC0pi1pCosTheta ->SetName(Form("%s_MuonCosTheta_data", temp_name.c_str()));
+    fMCHist_CC0pi1pCosTheta = (TH1D*)fDataHist_CC0pi1pCosTheta->Clone();
+    fMCHist_CC0pi1pCosTheta ->SetName(Form("%s_MuonCosTheta_MC", temp_name.c_str()));
+    fMCHist_CC0pi1pCosTheta ->Reset();
     SetAutoProcessTH1(fDataHist_CC0pi1pCosTheta, kCMD_Write);
     SetAutoProcessTH1(fMCHist_CC0pi1pCosTheta, kCMD_Reset, kCMD_Scale, kCMD_Write);
 
     for (int i=0; i<=3; i++){
-      fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone(Form("T2K_CC0pi1p_XSec_2018_Data_MuonCosTh1DSlice%i", i)));
-      fMCHist_Slices.push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone(Form("T2K_CC0pi1p_XSec_2018_MC_MuonCosTh1DSlice%i", i)));
+      fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone());
+      fDataHist_Slices.back()->SetName(Form("%s_MuonCosTh_data_Slice%i", temp_name.c_str(), i));
+      fMCHist_Slices  .push_back((TH1D*)fInputFile->Get(Form("OneProtonAbove500MeV/MuonCosThetaSlice_1D_%i", i))->Clone());
+      fMCHist_Slices  .back()->SetName(Form("%s_MuonCosTh_MC_Slice%i", temp_name.c_str(), i));
     }
     // Add in the muon costh-p costh slices (which aren't as nicely numbered)
     //         -> TH1D MuCThSlice_1_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_Data_MuCThSlice_1_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_MC_MuCThSlice_1_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone());
+    fDataHist_Slices.back()->SetName(Form("%s_data_MuCThSlice_1_PCthSlice_0", temp_name.c_str()));
+    fMCHist_Slices  .push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_1_PCthSlice_0")->Clone());
+    fMCHist_Slices  .back()->SetName(Form("%s_MC_MuCThSlice_1_PCthSlice_0", temp_name.c_str()));
     //         -> TH1D MuCThSlice_2_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_Data_MuCThSlice_2_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_MC_MuCThSlice_2_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone());
+    fDataHist_Slices.back()->SetName(Form("%s_data_MuCThSlice_2_PCthSlice_0", temp_name.c_str()));
+    fMCHist_Slices  .push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_0")->Clone());
+    fMCHist_Slices  .back()->SetName(Form("%s_MC_MuCThSlice_2_PCthSlice_0", temp_name.c_str()));
     //         -> TH1D MuCThSlice_2_PCthSlice_1
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone("T2K_CC0pi1p_XSec_2018_Data_MuCThSlice_2_PCthSlice_1"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone("T2K_CC0pi1p_XSec_2018_MC_MuCThSlice_2_PCthSlice_1"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone());
+    fDataHist_Slices.back()->SetName(Form("%s_data_MuCThSlice_2_PCthSlice_1", temp_name.c_str()));
+    fMCHist_Slices  .push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_2_PCthSlice_1")->Clone());
+    fMCHist_Slices  .back()->SetName(Form("%s_MC_MuCThSlice_2_PCthSlice_1", temp_name.c_str()));
     //         -> TH1D MuCThSlice_3_PCthSlice_0
-    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_Data_MuCThSlice_3_PCthSlice_0"));
-    fMCHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone("T2K_CC0pi1p_XSec_2018_MC_MuCThSlice_3_PCthSlice_0"));
+    fDataHist_Slices.push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone());
+    fDataHist_Slices.back()->SetName(Form("%s_data_MuCThSlice_3_PCthSlice_0", temp_name.c_str()));
+    fMCHist_Slices  .push_back((TH1D*)fInputFile->Get("OneProtonAbove500MeV/MuCThSlice_3_PCthSlice_0")->Clone());
+    fMCHist_Slices  .back()->SetName(Form("%s_MC_MuCThSlice_3_PCthSlice_0", temp_name.c_str()));
   }
 
 
@@ -524,7 +502,7 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Get1DBin(int nProtonsAbove
 
   // If binnumber is still -999, something has gone wrong
   if (binnumber == -999){
-    std::cout << "ERROR did not find correct 1D bin for an event with nProtonsAboveThresh = " << nProtonsAboveThresh << ", pmu = " << pmu << ", CosThetaMu = " << CosThetaMu << ", pp = " << pp << ", CosThetaP = " << CosThetaP << std::endl;
+    NUIS_ERR(FTL, "Did not find correct 1D bin for an event with nProtonsAboveThresh = " << nProtonsAboveThresh << ", pmu = " << pmu << ", CosThetaMu = " << CosThetaMu << ", pp = " << pp << ", CosThetaP = " << CosThetaP);
     return -999;
   }
 
@@ -636,16 +614,3 @@ int T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::GetCC0pi1p2DSlice(int nPro
 
   return slicenumber;
 };
-
-// // Reimplementation of Measurement1D::Write (calling the original) to also set the slice histograms to have the chi2 of the total 1D histogram -- makes plotting easier
-// void T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np::Write(std::string drawOpt){
-//   // call Measurement1D::Write
-//   Measurement1D::Write(drawOpt);
-//
-//   // Now also set slice histogram titles to be equal to the overall chi2
-//   std::ostringstream chi2;
-//   chi2 << std::setprecision(5) << GetLikelihood();
-//   for (size_t i=0; i<fDataHist_Slices.size(); i++){
-//       fMCHist_Slices[i]->SetTitle(chi2.str().c_str());
-//     }
-// };

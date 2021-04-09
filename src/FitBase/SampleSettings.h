@@ -18,6 +18,9 @@ public:
 	void SetXTitle(std::string name);
 	void SetYTitle(std::string name);
 	void SetZTitle(std::string name);
+	std::string GetXTitle();
+        std::string GetYTitle();
+        std::string GetZTitle();
 	void SetNormError(double norm);
 	double GetNormError();
 

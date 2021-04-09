@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -116,7 +116,12 @@ MINERvA_CCQE_XSec_1DQ2_antinu::MINERvA_CCQE_XSec_1DQ2_antinu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile(fSettings.GetDataInput());
-  SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  // Ergh, the pain of supporting many slightly different versions of the same analysis
+  if (isFluxFix) SetCovarFromTextFile(fSettings.GetCovarInput());
+  else SetCorrelationFromTextFile(fSettings.GetCovarInput());
+
+  if (isFluxFix) ScaleData(1E-38);
 
   if (fSaveExtra) {
     fExtra_Eav =

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -88,7 +88,7 @@ GenericFlux_Vectors::GenericFlux_Vectors(std::string name,
       (this->PredictedEventRate("width", 0, EnuMax) / double(fNEvents)) /
       this->TotalIntegratedFlux("width");
 
-  NUIS_LOG(SAM, " Generic Flux Scaling Factor = "
+  NUIS_LOG(SAM, "Generic Flux Scaling Factor = "
                     << fScaleFactor << " [= "
                     << (GetEventHistogram()->Integral("width") * 1E-38) << "/("
                     << (fNEvents + 0.) << "*" << TotalIntegratedFlux("width")

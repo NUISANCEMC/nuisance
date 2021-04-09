@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -53,6 +53,8 @@ BNL_CC4pi_2pim2pip_XSec_1DEnu_nu::BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(nuiskey sampl
   // Plot Setup -------------------------------------------------------
   SetDataFromTextFile( fSettings.GetDataInput() );
   ScaleData(1E-38);
+  this->fDataHist = PlotUtils::RestrictHistRange(this->fDataHist, 0, 6);
+
   SetCovarFromDiagonal();
 
   // Final setup  ---------------------------------------------------
