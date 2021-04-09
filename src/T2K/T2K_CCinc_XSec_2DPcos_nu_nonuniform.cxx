@@ -96,7 +96,7 @@ void T2K_CCinc_XSec_2DPcos_nu_nonuniform::ConvertEventRates() {
   Measurement1D::ConvertEventRates();
 
   // First scale MC slices also by their width in Y
-  fMCHist_Slices[0]->Scale(1.0 / 0.25);
+  fMCHist_Slices[0]->Scale(1.0 / 0.75);
   fMCHist_Slices[1]->Scale(1.0 / 0.50);
   fMCHist_Slices[2]->Scale(1.0 / 0.20);
   fMCHist_Slices[3]->Scale(1.0 / 0.15);
