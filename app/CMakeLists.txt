@@ -77,7 +77,7 @@ if(USE_GENIE)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGENIE)
 endif()
 
-if(USE_NEUT)
+if(USE_NEUT OR USE_NEUT_EVENT)
   add_executable(PrepareNEUT PrepareNEUT.cxx)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNEUT)
 endif()

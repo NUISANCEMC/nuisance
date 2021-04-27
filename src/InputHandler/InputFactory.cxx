@@ -41,7 +41,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   switch (inpType) {
   case (kNEUT_Input):
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
     input = new NEUTInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
