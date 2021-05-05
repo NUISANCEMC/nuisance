@@ -96,6 +96,24 @@ if(DEFINED NEED_ROOTPYTHIA6 AND NEED_ROOTPYTHIA6)
   LIST(APPEND ROOT_LIBS EGPythia6 Pythia6)
 endif()
 
+#Check what ROOT thinks the standard is, set that project-wide
+# and then remove it from ROOT_CXX_FLAGS
+list (FIND ROOT_CXX_FLAGS "-std=c++11" CPP11_INDEX)
+list (FIND ROOT_CXX_FLAGS "-std=c++14" CPP14_INDEX)
+list (FIND ROOT_CXX_FLAGS "-std=c++17" CPP17_INDEX)
+if (${CPP11_INDEX} GREATER -1)
+  SET(CMAKE_CXX_STANDARD 11)
+elseif (${CPP14_INDEX} GREATER -1)
+  SET(CMAKE_CXX_STANDARD 14)
+elseif (${CPP17_INDEX} GREATER -1)
+  SET(CMAKE_CXX_STANDARD 17)
+elseif (${CPP11_INDEX} GREATER -1)
+  SET(CMAKE_CXX_STANDARD 11)
+endif()
+list(REMOVE_ITEM ROOT_CXX_FLAGS "-std=c++11")
+list(REMOVE_ITEM ROOT_CXX_FLAGS "-std=c++14")
+list(REMOVE_ITEM ROOT_CXX_FLAGS "-std=c++17")
+
 cmessage ( STATUS "[ROOT]: root-config --version: ${ROOT_VERSION} ")
 cmessage ( STATUS "[ROOT]: root-config --cflags : ${ROOT_CXX_FLAGS} ")
 cmessage ( STATUS "[ROOT]: root-config --libs   : ${ROOT_LD_FLAGS} ")
@@ -108,9 +126,6 @@ function(GenROOTDictionary OutputDictName Header LinkDef)
   get_directory_property(incdirs INCLUDE_DIRECTORIES)
   string(REPLACE ";" ";-I" LISTDIRINCLUDES "-I${incdirs}")
   string(REPLACE " " ";" LISTCPPFLAGS "${EXTRA_CXX_FLAGS}")
-
-  #ROOT5 CINT cannot handle it.
-  list(REMOVE_ITEM LISTCPPFLAGS "-std=c++11")
 
   message(STATUS "LISTCPPFLAGS: ${LISTCPPFLAGS}")
   message(STATUS "LISTINCLUDES: ${LISTDIRINCLUDES}")

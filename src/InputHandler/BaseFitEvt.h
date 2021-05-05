@@ -23,7 +23,7 @@
  *  @{
  */
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
 #include "neutpart.h"
 #include "neutvect.h"
 #endif
@@ -102,7 +102,7 @@ class BaseFitEvt {
   GeneratorInfoBase* fGenInfo; ///< Generator Variable Box
   UInt_t fType; ///< Generator Event Type
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
   /// Setup Event Reading from NEUT Event
   void SetNeutVect(NeutVect* v);
   NeutVect* fNeutVect;  ///< Pointer to Neut Vector

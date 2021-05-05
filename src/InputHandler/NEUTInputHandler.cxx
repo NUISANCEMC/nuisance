@@ -1,4 +1,4 @@
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
 #include "NEUTInputHandler.h"
 #include "InputUtils.h"
 
@@ -399,6 +399,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
   return;
 }
+
+#endif
+
+#ifdef NEED_FILL_NEUT_COMMONS
 
 void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   // WARNING: This has only been implemented for a neuttree and not GENIE

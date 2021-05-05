@@ -4,6 +4,9 @@
 #include "FitLogger.h"
 
 #ifdef __T2KREW_ENABLED__
+#ifdef T2KRW_OA2021_INTERFACE
+#include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
+#else
 #include "T2KNIWGReWeight.h"
 #include "T2KNIWGUtils.h"
 #include "T2KNeutReWeight.h"
@@ -11,32 +14,38 @@
 #include "T2KReWeight.h"
 using namespace t2krew;
 #endif
+#endif
 
+#include "FitWeight.h"
 #include "GeneratorUtils.h"
 #include "WeightEngineBase.h"
-#include "FitWeight.h"
 
 class T2KWeightEngine : public WeightEngineBase {
 public:
-	T2KWeightEngine(std::string name);
-	~T2KWeightEngine() {};
+  T2KWeightEngine(std::string name);
+  ~T2KWeightEngine(){};
 
-	void IncludeDial(std::string name, double startval);
+  void IncludeDial(std::string name, double startval);
 
-	void SetDialValue(std::string name, double val);
-	void SetDialValue(int nuisenum, double val);
+  void SetDialValue(std::string name, double val);
+  void SetDialValue(int nuisenum, double val);
 
-	void Reconfigure(bool silent = false);
+  void Reconfigure(bool silent = false);
 
-	double CalcWeight(BaseFitEvt* evt);
+  double CalcWeight(BaseFitEvt *evt);
 
-	inline bool NeedsEventReWeight() { return true; };
-	
+  inline bool NeedsEventReWeight() { return true; };
+
 #ifdef __T2KREW_ENABLED__
-	std::vector<t2krew::T2KSyst_t> fT2KSysts;
-	t2krew::T2KReWeight* fT2KRW;  //!< T2K RW Object
-	t2krew::T2KNeutReWeight* fT2KNeutRW;
-	t2krew::T2KNIWGReWeight* fT2KNIWGRW;
+#ifdef T2KRW_OA2021_INTERFACE
+  std::vector<int> fT2KSysts;
+  std::unique_ptr<t2krew::T2KReWeight> fT2KRW;
+#else
+  std::vector<t2krew::T2KSyst_t> fT2KSysts;
+  t2krew::T2KReWeight *fT2KRW; //!< T2K RW Object
+  t2krew::T2KNeutReWeight *fT2KNeutRW;
+  t2krew::T2KNIWGReWeight *fT2KNIWGRW;
+#endif
 #endif
 };
 
