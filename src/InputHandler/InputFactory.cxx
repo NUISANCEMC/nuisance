@@ -20,6 +20,7 @@
 #include "FitEventInputHandler.h"
 #include "GENIEInputHandler.h"
 #include "GIBUUInputHandler.h"
+#include "GiBUUNativeInputHandler.h"
 #include "HistogramInputHandler.h"
 #include "NEUTInputHandler.h"
 #include "NUANCEInputHandler.h"
@@ -72,7 +73,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   case (kGiBUU_Input):
 #ifdef __GiBUU_ENABLED__
-    input = new GIBUUInputHandler(handle, newinputs);
+    input = new GiBUUNativeInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
                    << handle << " " << inpType << " " << inputs);
