@@ -27,6 +27,7 @@ NEUTInputHandler.cxx
 GENIEInputHandler.cxx
 NuWroInputHandler.cxx
 GIBUUInputHandler.cxx
+GiBUUNativeInputHandler.cxx
 NUANCEInputHandler.cxx
 InputHandler.cxx
 NuanceEvent.cxx
@@ -50,6 +51,7 @@ NEUTInputHandler.h
 GENIEInputHandler.h
 NuWroInputHandler.h
 GIBUUInputHandler.h
+GiBUUNativeInputHandler.h
 NUANCEInputHandler.h
 InputHandler.h
 NuanceEvent.h
