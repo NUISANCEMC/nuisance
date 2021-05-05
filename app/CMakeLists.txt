@@ -82,6 +82,11 @@ if(USE_NEUT)
   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNEUT)
 endif()
 
+if(USE_GiBUU)
+  add_executable(PrepareGiBUU PrepareGiBUU.cxx)
+  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGiBUU)
+endif()
+
 # PREPARE NUWRO
 # Commented out for the time being until it is finished..
 if(USE_NuWro)
