@@ -28,7 +28,7 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
     NUIS_ABORT(
         "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
   }
-  NUIS_LOG(Fit, "Using NEUT card file: " << neut_card);
+  NUIS_LOG(FIT, "Using NEUT card file: " << neut_card);
   t2krew::T2KNeutUtils::SetCardFile(neut_card);
 #endif
   StartTalking();
