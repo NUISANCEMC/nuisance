@@ -216,6 +216,9 @@
 // 2017 data update
 #include "MINERvA_CC1pip_XSec_1D_2017Update.h"
 
+// MINERvA CC1pi-
+#include "MINERvA_CC1pim_XSec_1DTpi_antinu.h"
+
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
 #include "MINERvA_CCNpip_XSec_1DQ2_nu.h"
@@ -1183,6 +1186,11 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC1pip_XSec_1DQ2_nu_2017") ||
              !name.compare("MINERvA_CC1pip_XSec_1DEnu_nu_2017")) {
     return (new MINERvA_CC1pip_XSec_1D_2017Update(samplekey));
+    /*
+      CC1pi-
+    */
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DTpi_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DTpi_antinu(samplekey));
     /*
       CCNpi+
     */
