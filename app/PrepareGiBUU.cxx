@@ -58,7 +58,7 @@ TH1D* MakeFluxHistFromDatFile(std::string inputDatFile){
   // Check stride uniformity
   for (uint s = 0; s < bin_cent.size()-1; ++s){
     double this_stride = bin_cent[s+1] - bin_cent[s];
-    if (this_stride != bin_stride){
+    if (fabs(this_stride-bin_stride) > 1E-8){
       NUIS_ABORT(inputDatFile << " does not have regular binning!");
     }
   }
