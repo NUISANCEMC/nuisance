@@ -280,7 +280,7 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM,
-           "Reading covariance from text file: " << covfile << ";" << histname);
+           "Reading covariance from root file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
   covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
