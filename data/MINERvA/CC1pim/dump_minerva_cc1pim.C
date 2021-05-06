@@ -130,6 +130,7 @@ void make_histograms( const std::string& variable_name,
     for ( const double& correlation : entry_list ) {
       double y_err = data_hist->GetBinError( current_y_bin );
       double covariance = correlation * x_err * y_err;
+      covariance /= std::pow( 1e-38, 2 );
       cov_mat->SetBinContent( current_x_bin, current_y_bin, covariance );
 
       ++current_y_bin;
