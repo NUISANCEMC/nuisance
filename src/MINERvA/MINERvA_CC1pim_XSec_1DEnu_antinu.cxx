@@ -19,14 +19,14 @@
 
 #include "MINERvA_SignalDef.h"
 
-#include "MINERvA_CC1pim_XSec_1DTpi_antinu.h"
+#include "MINERvA_CC1pim_XSec_1DEnu_antinu.h"
 
 
-MINERvA_CC1pim_XSec_1DTpi_antinu::MINERvA_CC1pim_XSec_1DTpi_antinu(
+MINERvA_CC1pim_XSec_1DEnu_antinu::MINERvA_CC1pim_XSec_1DEnu_antinu(
   nuiskey samplekey )
 {
   // Sample overview ---------------------------------------------------
-  std::string descrip = "MINERvA_CC1pim_XSec_1DTpi_antinu sample. \n"
+  std::string descrip = "MINERvA_CC1pim_XSec_1DEnu_antinu sample. \n"
     "Target: CH \n"
     "Flux: MINERvA Reverse Horn Current numubar \n"
     "Signal: Any event with 1 positive muon, 1 negative pion, and no other"
@@ -35,14 +35,14 @@ MINERvA_CC1pim_XSec_1DTpi_antinu::MINERvA_CC1pim_XSec_1DTpi_antinu(
   // Setup common settings
   fSettings = LoadSampleSettings( samplekey );
   fSettings.SetDescription( descrip );
-  fSettings.SetXTitle( "T_{#pi} (GeV)" );
-  fSettings.SetYTitle( "d#sigma/dT_{#pi} (cm^{2}/GeV/nucleon)" );
+  fSettings.SetXTitle( "E_{#bar{#nu}} (GeV)" );
+  fSettings.SetYTitle( "#sigma(E_{#bar{#nu}}) (cm^{2}/nucleon)" );
   fSettings.SetAllowedTypes( "FIX,FREE/DIAG,FULL/NORM/MASK", "FIX/FULL" );
   fSettings.SetEnuRange( 1.5, 10.0 );
   fSettings.DefineAllowedTargets( "C,H" );
   fSettings.DefineAllowedSpecies( "numub" );
 
-  fSettings.SetTitle( "MINERvA_CC1pim_XSec_1DTpi_antinu" );
+  fSettings.SetTitle( "MINERvA_CC1pim_XSec_1DEnu_antinu" );
 
   fSettings.SetDataInput( GeneralUtils::GetTopLevelDir()
     + "/data/MINERvA/CC1pim/minerva_cc1pim_data.root" );
@@ -53,31 +53,33 @@ MINERvA_CC1pim_XSec_1DTpi_antinu::MINERvA_CC1pim_XSec_1DTpi_antinu(
   FinaliseSampleSettings();
 
   // Scaling Setup ---------------------------------------------------
-  // ScaleFactor automatically setup for DiffXSec/cm2/Nucleon
+  // ScaleFactor for energy-dependent (as opposed to flux-averaged)
+  // total cross section (cm^2 / nucleon)
   fScaleFactor = GetEventHistogram()->Integral("width") * double(1E-38)
-    / double(fNEvents) / TotalIntegratedFlux("width");
+    / double(fNEvents);
 
   // Plot Setup -------------------------------------------------------
-  SetDataFromRootFile( fSettings.GetDataInput(), "kinetic_data" );
-  SetCovarFromRootFile( fSettings.GetCovarInput(), "kinetic_covariance" );
+  SetDataFromRootFile( fSettings.GetDataInput(), "enu_data" );
+  SetCovarFromRootFile( fSettings.GetCovarInput(), "enu_covariance" );
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
 }
 
-void MINERvA_CC1pim_XSec_1DTpi_antinu::FillEventVariables( FitEvent* event ) {
+void MINERvA_CC1pim_XSec_1DEnu_antinu::FillEventVariables( FitEvent* event ) {
 
-  const int PI_MINUS = -211;
-  if ( event->NumFSParticle(PI_MINUS) <= 0 ) return;
+  const int ANTI_NUMU = -14;
+  if ( event->NumISParticle(ANTI_NUMU) <= 0 ) return;
+  TLorentzVector p4_numubar = event->GetHMISParticle( ANTI_NUMU )->fP;
 
-  TLorentzVector P_pi_m = event->GetHMFSParticle( PI_MINUS )->fP;
-  double Tpi = FitUtils::T( P_pi_m ); // Kinetic energy returned in GeV
+  // Convert the true energy from MeV to GeV
+  double Enubar = p4_numubar.E() / 1e3;
 
-  fXVar = Tpi;
+  fXVar = Enubar;
 
 }
 
-bool MINERvA_CC1pim_XSec_1DTpi_antinu::isSignal( FitEvent* event ) {
+bool MINERvA_CC1pim_XSec_1DEnu_antinu::isSignal( FitEvent* event ) {
   return SignalDef::isCC1pim_MINERvA( event, EnuMin, EnuMax );
 }

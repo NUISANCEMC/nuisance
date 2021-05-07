@@ -217,7 +217,12 @@
 #include "MINERvA_CC1pip_XSec_1D_2017Update.h"
 
 // MINERvA CC1pi-
+#include "MINERvA_CC1pim_XSec_1DEnu_antinu.h"
+#include "MINERvA_CC1pim_XSec_1DQ2_antinu.h"
 #include "MINERvA_CC1pim_XSec_1DTpi_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dpmu_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dth_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dthmu_antinu.h"
 
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
@@ -1189,8 +1194,23 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     /*
       CC1pi-
     */
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DEnu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DEnu_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DQ2_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DQ2_antinu(samplekey));
+
   } else if (!name.compare("MINERvA_CC1pim_XSec_1DTpi_antinu")) {
     return (new MINERvA_CC1pim_XSec_1DTpi_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dpmu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dpmu_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dth_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dth_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dthmu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dthmu_antinu(samplekey));
     /*
       CCNpi+
     */
