@@ -77,6 +77,29 @@ void make_histograms( const std::string& variable_name,
   TH1D* data_hist = new TH1D( data_hist_name.c_str(), data_hist_title.c_str(),
     num_bins, bin_edges.data() );
 
+  // The Enu distribution tabulated in the supplement is actually dsigma/dEnu
+  // instead of sigma(Ev) as in the body of the paper. The units given in the
+  // supplement are 10^{-40} cm^2 / 0.5 GeV / nucleon, so we need to correct
+  // for the bin width here in order to do the comparison in terms of
+  // sigma(Ev).
+  if ( variable_name == "enu" ) {
+    for ( int b = 1; b <= num_bins; ++b ) {
+      // ROOT histograms use one-based binning (to allow for underflow), while
+      // std::vector indexing is zero-based
+      size_t bin_index = b - 1;
+
+      double bin_width = data_hist->GetBinWidth( b );
+      // Note that the bins have widths in units of GeV
+      double correction_factor = bin_width / 0.5;
+
+      double& xsec = bin_xsecs.at( bin_index );
+      double& error = bin_errors.at( bin_index );
+
+      xsec *= correction_factor;
+      error *= correction_factor;
+    }
+  }
+
   for ( int b = 1; b <= num_bins; ++b ) {
     // ROOT histograms use one-based binning (to allow for underflow), while
     // std::vector indexing is zero-based
