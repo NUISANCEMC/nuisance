@@ -138,7 +138,8 @@ void CreateRateHistogram(std::string inputList, std::string flux,
   }
   NUIS_LOG(FIT, "Processed all events");
 
-  xsecHist->Divide(entryHist);
+  xsecHist->Scale(1, "width");
+  // xsecHist->Divide(entryHist);
 
   // This will be the evtrt histogram
   TH1D *evtHist = (TH1D*)xsecHist->Clone();
