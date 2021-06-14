@@ -183,6 +183,7 @@
 
 #ifndef __NO_MicroBooNE__
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #endif
 
 #ifndef __NO_MINERvA__
@@ -1076,12 +1077,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       /*
       MicroBooNE Samples
       */
-
-      /*
-        MicroBooNE CCinclusive
-      */
       if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
     return (new MicroBooNE_CCInc_XSec_2DPcos_nu(samplekey));
+  } else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1DPmu_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1DPp_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
+    return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
   } else
 #endif
 
