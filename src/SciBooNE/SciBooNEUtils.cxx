@@ -90,7 +90,6 @@ double SciBooNEUtils::GetFlatEfficiency(){
 }
 
 
-// Obtained from a simple fit to test beam data 1 < p < 2 GeV
 double SciBooNEUtils::ProtonMisIDProb(double mom){
   return 0.1;
   double prob = 0.10;
@@ -278,8 +277,7 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
       thisWeight = SciBooNEUtils::ProtonEfficiency(protonHist, nu, event->PartInfo(j));
       if (thisWeight == 0) continue;
 
-      if (runningWeight == 0) runningWeight = thisWeight;
-      else runningWeight += (1 - runningWeight)*thisWeight;
+      runningWeight += (1 - runningWeight)*thisWeight;
       
       if (thisWeight < highWeightPr) continue;      
       highWeightPr = thisWeight;
@@ -289,8 +287,7 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
       thisWeight = SciBooNEUtils::StoppedEfficiency(mupiHist, nu, event->PartInfo(j));
       if (thisWeight == 0) continue;
 
-      if (runningWeight == 0) runningWeight = thisWeight;
-      else runningWeight += (1 - runningWeight)*thisWeight;
+      runningWeight += (1 - runningWeight)*thisWeight;
 
       if (thisWeight < highWeight) continue;
 
