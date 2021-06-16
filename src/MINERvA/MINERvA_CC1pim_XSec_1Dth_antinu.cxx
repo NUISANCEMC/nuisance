@@ -36,8 +36,8 @@ MINERvA_CC1pim_XSec_1Dth_antinu::MINERvA_CC1pim_XSec_1Dth_antinu(
   // Setup common settings
   fSettings = LoadSampleSettings( samplekey );
   fSettings.SetDescription( descrip );
-  fSettings.SetXTitle( "#theta_{#pi} (degree)" );
-  fSettings.SetYTitle( "d#sigma/d#theta_{#pi} (cm^{2}/degree/nucleon)" );
+  fSettings.SetXTitle( "#theta_{#pi} (degrees)" );
+  fSettings.SetYTitle( "d#sigma/d#theta_{#pi} (cm^{2}/degrees/nucleon)" );
   fSettings.SetAllowedTypes( "FIX,FREE/DIAG,FULL/NORM/MASK", "FIX/FULL" );
   fSettings.SetEnuRange( 1.5, 10.0 );
   fSettings.DefineAllowedTargets( "C,H" );
