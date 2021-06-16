@@ -1,0 +1,15 @@
+MINERvA numubar CC 1pi- data added on 6 May 2021 by S. Gardiner
+
+The data files in this folder are taken from the supplementary materials
+included in Phys. Rev. D 100, 052008 (2019), https://arxiv.org/abs/1906.08300
+
+For ease of use with NUISANCE, the raw text files have been converted into
+a single ROOT file minerva_cc1pim_data.root (located in this folder) which
+contains data histograms (TH1D) and covariance matrices (TH2D) for each
+measurement in the paper. The ROOT file may be regenerated from the
+supplementary materials by running the provided macro dump_minerva_cc1pim.C
+from within this folder.
+
+Note that the Enubar measurement given in the supplemental materials does not
+appear to match the plot in the body of the paper. I will follow up with
+MINERvA collaborators about this.
