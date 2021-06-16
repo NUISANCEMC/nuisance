@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -34,7 +34,7 @@ MiniBooNE_CCQE_XSec_1DEnu_nu::MiniBooNE_CCQE_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
-  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/Neutron)");
+  fSettings.SetYTitle("#sigma(E_{#nu}) (cm^{2}/neutron)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.4, 2.0);
   fSettings.DefineAllowedTargets("C,H");

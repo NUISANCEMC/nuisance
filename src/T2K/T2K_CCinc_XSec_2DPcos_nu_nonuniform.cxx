@@ -12,6 +12,7 @@ T2K_CCinc_XSec_2DPcos_nu_nonuniform::T2K_CCinc_XSec_2DPcos_nu_nonuniform(
     nuiskey samplekey) {
   //********************************************************************
 
+  fSaveFine = false;
   fAllowedTypes += "/GENIE/NEUT";
 
   // Sample overview ---------------------------------------------------
@@ -24,11 +25,9 @@ T2K_CCinc_XSec_2DPcos_nu_nonuniform::T2K_CCinc_XSec_2DPcos_nu_nonuniform(
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("");
-  // fSettings.SetXTitle("p_{#mu} (GeV)");
-  // fSettings.SetYTitle("cos#theta_{#mu}");
+  fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
   fSettings.SetYTitle("#frac{d^{2}#sigma}{dp_{#mu}dcos#theta_{#mu}} "
-                      "[#frac{cm^{2}}{nucleon/GeV/c}]");
+                      "(cm^{2}/nucleon/GeV)");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
 
@@ -97,7 +96,7 @@ void T2K_CCinc_XSec_2DPcos_nu_nonuniform::ConvertEventRates() {
   Measurement1D::ConvertEventRates();
 
   // First scale MC slices also by their width in Y
-  fMCHist_Slices[0]->Scale(1.0 / 0.25);
+  fMCHist_Slices[0]->Scale(1.0 / 0.75);
   fMCHist_Slices[1]->Scale(1.0 / 0.50);
   fMCHist_Slices[2]->Scale(1.0 / 0.20);
   fMCHist_Slices[3]->Scale(1.0 / 0.15);
@@ -151,11 +150,9 @@ void T2K_CCinc_XSec_2DPcos_nu_nonuniform::FillMCSlice(double x, double y,
 void T2K_CCinc_XSec_2DPcos_nu_nonuniform::SetHistograms() {
 
   // Read in 1D Data Histograms
-  TFile *fInputFile =
-      new TFile((FitPar::GetDataBase() +
+  TFile *fInputFile = new TFile((FitPar::GetDataBase() +
                  "T2K/CCinc/nd280data-numu-cc-inc-xs-on-c-2018/histograms.root")
-                    .c_str(),
-                "OPEN");
+                    .c_str(), "OPEN");
 
   // Number of theta slices in the release
   nSlices = 11;
@@ -174,14 +171,14 @@ void T2K_CCinc_XSec_2DPcos_nu_nonuniform::SetHistograms() {
 
   for (int i = 0; i < nSlices; i++) {
     // Get Data Histogram
-    // fDataHist_Slices.push_back((TH1D*)fInputFile->Get(Form("dataslice_%i",i))->Clone());
     fDataHist_Slices.push_back(
         (TH1D *)fInputFile->Get(Form("%s%i", basename.c_str(), i))
             ->Clone(
-                Form("T2K_CCinc_XSec_2DPcos_nu_nonuniform_slice%i_data", i)));
+                Form("T2K_CCinc_XSec_2DPcos_nu_nonuniform_Slice%i_data", i)));
     fDataHist_Slices[i]->SetDirectory(0);
     fDataHist_Slices[i]->Scale(1E-39);
-    fDataHist_Slices[i]->GetYaxis()->SetTitle(fSettings.GetS("ytitle").c_str());
+    fDataHist_Slices[i]->GetXaxis()->SetTitle("p_{#mu} (GeV)");
+    fDataHist_Slices[i]->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
 
     // Count up the bins
     bincount += fDataHist_Slices.back()->GetNbinsX();
@@ -192,7 +189,7 @@ void T2K_CCinc_XSec_2DPcos_nu_nonuniform::SetHistograms() {
     fMCHist_Slices[i]->Reset();
     fMCHist_Slices[i]->SetDirectory(0);
     fMCHist_Slices[i]->SetLineColor(kRed);
-    fMCHist_Slices[i]->GetYaxis()->SetTitle(fSettings.GetS("ytitle").c_str());
+    fMCHist_Slices[i]->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
 
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);

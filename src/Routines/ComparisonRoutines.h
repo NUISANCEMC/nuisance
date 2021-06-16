@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -117,7 +117,7 @@ public:
   /// dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
 
-  /// Save starting predictions into a seperate folder
+  /// Save starting predictions into a separate folder
   void SaveNominal();
 
   /*
@@ -155,6 +155,13 @@ protected:
   std::map<std::string, std::string> fStateVals; ///< Map of dial states
   std::map<std::string, double>      fCurVals; ///< Map of dial values
   std::map<std::string, int>         fTypeVals; ///< Map of dial type enums.
+
+
+  struct mirror_param {
+    double mirror_value;
+    bool mirror_above;
+  };
+  std::map<std::string, mirror_param> fMirroredParams;
 
   // Fake Dial Vals
   std::map<std::string,double> fFakeVals; ///< Map of fake data settings.

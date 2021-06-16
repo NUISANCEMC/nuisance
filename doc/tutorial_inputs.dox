@@ -8,7 +8,7 @@ This tutorial details how to load a simple sample of events from each of the gen
 \section fitcards The Fit Card
 
 For this very simple case so all that is required in the fit card is a single line to read in which sample we want to plot. For a list of samples see \ref samplelist.
-We want a set of Monte Carlo events to make the data/MC comparison so first you will need to generate this in Neut and NuWro seperately. No explicit tutorial is given for this, but please see \ref generators for tips on what generator output format the events need to be in.
+We want a set of Monte Carlo events to make the data/MC comparison so first you will need to generate this in Neut and NuWro separately. No explicit tutorial is given for this, but please see \ref generators for tips on what generator output format the events need to be in.
 
 Once we have a set of events create a fit card "fittertutorial1.card" in the current directory and include the "MiniBooNE_CCQE_XSec_1DQ2_nu" sample as follows.
 
@@ -23,7 +23,7 @@ sample         MiniBooNE_CCQE_XSec_1DQ2_nu   FIX    /path/to/miniboone_ccqe_even
 
 - The sample Type is used to specify any other options required to describe how this sample is handled. Common examples are "FIX - fix this samples overall normalisation", "SHAPE - normalise MC to data before doing calculations", "DIAG - use only uncorrelated bin errors", "NORM - Add a normalisation penalty term to the fit". Some samples have extra possible fit types so it is worth checking the doxygen documentation for a sample before using it.
 
-- The events file name is just simply the directory to the MC events you want to use for this fit. In the case of joint datasets that require multiple input MC files, the path to each can be provided in this field by passing a semi-colon seperated list, e.g. "/path/to/miniboone_ccqe_events1.root;/path/to/miniboone_ccqe_events2.root".
+- The events file name is just simply the directory to the MC events you want to use for this fit. In the case of joint datasets that require multiple input MC files, the path to each can be provided in this field by passing a semi-colon separated list, e.g. "/path/to/miniboone_ccqe_events1.root;/path/to/miniboone_ccqe_events2.root".
 
 - The normalisation term is used to float the overall normalisation of this sample. The fitter will complain and scale the samples to 0.0 if you forget to include this!
 
@@ -32,7 +32,7 @@ sample         MiniBooNE_CCQE_XSec_1DQ2_nu   FIX    /path/to/miniboone_ccqe_even
 Once we have a sample card produced it is possible to run a default Migrad fit by passing this fit card to the minimizer. 
 
 \code
-ExtFit_minimizer.exe -c fittertutorial1.card -o fittertutorial1_output.root
+nuismin -c fittertutorial1.card -o fittertutorial1_output.root
 \endcode
 
 Since we have not included any MC ReWeight dials to be minimized yet this should run relatively quickly, requiring only a single reconfigure.

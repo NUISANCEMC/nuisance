@@ -16,9 +16,8 @@ T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle(" ");
-  fSettings.SetYTitle(
-      "d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -39,32 +38,19 @@ T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::T2K_CC1pip_CH_XSec_2Dpmucosmu_nu(
                  double(fNEvents) / TotalIntegratedFlux("width");
 
   // Plot Setup -------------------------------------------------------
-  // SetDataValues(  fSettings.GetDataInput() );
-  // SetCovarMatrix( fSettings.GetCovarInput() );
   SetHistograms();
-  // fFullCovar = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
-  //"Covariance_pmu_thetamu");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
   SetShapeCovar();
-  /*
-  for (int i = 0; i < covar->GetNrows(); ++i) {
-    for (int j = 0; j < covar->GetNrows(); ++j) {
-      if (i == j) std::cout << i << " " << j << " = " << 1/sqrt((*covar)(i,j))
-  << std::endl;
-    }
-  }
-  throw;
-  */
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
 
   TFile *data = new TFile(fSettings.GetDataInput().c_str(), "open");
-  // std::string dataname = fSettings.Get
   std::string dataname = "p_mu_theta_mu";
 
   // Number of slices we have
@@ -72,18 +58,19 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   int nbins = 0;
   for (int i = 0; i < nslices; ++i) {
     TH1D *slice = (TH1D *)data->Get(Form("%s_%i", dataname.c_str(), i));
-    slice = (TH1D *)slice->Clone((fName + Form("_data_slice%i", i)).c_str());
+    slice = (TH1D *)slice->Clone((fName + Form("_data_Slice%i", i)).c_str());
     slice->Scale(1E-38);
-    slice->GetXaxis()->SetTitle(fSettings.GetS("xtitle").c_str());
-    slice->GetYaxis()->SetTitle(fSettings.GetS("ytitle").c_str());
+    slice->GetXaxis()->SetTitle("p_{#mu}");
+    slice->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
     fDataHist_Slices.push_back(slice);
     fMCHist_Slices.push_back(
-        (TH1D *)slice->Clone((fName + Form("_mc_slice%i", i)).c_str()));
+        (TH1D *)slice->Clone((fName + Form("_MC_Slice%i", i)).c_str()));
     SetAutoProcessTH1(fDataHist_Slices[i], kCMD_Write);
     SetAutoProcessTH1(fMCHist_Slices[i]);
     fMCHist_Slices[i]->Reset();
     fMCHist_Slices[i]->SetLineColor(kRed);
-    // nbins += slice->GetXaxis()->GetNbins();
+    //nbins += slice->GetXaxis()->GetNbins();
+    // Skip the highest momentum bin because it's rubbish
     nbins += slice->GetXaxis()->GetNbins() - 1;
   }
 
@@ -91,7 +78,9 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   fDataHist->SetNameTitle((fName + "_data").c_str(), (fName + "_data").c_str());
   int bincount = 1;
   for (int i = 0; i < nslices; ++i) {
+    // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins() - 1; ++j) {
+    //for (int j = 0; j < fDataHist_Slices[i]->GetXaxis()->GetNbins(); ++j) {
       fDataHist->SetBinContent(bincount,
                                fDataHist_Slices[i]->GetBinContent(j + 1));
       fDataHist->SetBinError(bincount, fDataHist_Slices[i]->GetBinError(j + 1));
@@ -122,25 +111,29 @@ void T2K_CC1pip_CH_XSec_2Dpmucosmu_nu::SetHistograms() {
   TMatrixDSym *temp = StatUtils::GetCovarFromRootFile(fSettings.GetCovarInput(),
                                                       "Covariance_pmu_thetamu");
   int ncovbins = temp->GetNrows();
+    // Skip the highest momentum bin because it's rubbish
   fFullCovar = new TMatrixDSym(ncovbins - 4);
-  if (ncovbins != fDataHist->GetXaxis()->GetNbins()) {
+  //fFullCovar = new TMatrixDSym(ncovbins);
+  if (fFullCovar->GetNrows() != fDataHist->GetXaxis()->GetNbins()*fDataHist->GetYaxis()->GetNbins()) {
     NUIS_ERR(FTL, "Number of bins in covariance matrix does not match data");
   }
 
   // Number of costhetamu slices is nslices
   // Number of pmu slices is
   int count1 = 0;
+    // Skip the highest momentum bin because it's rubbish
   for (int i = 0; i < ncovbins - 4; ++i) {
+  //for (int i = 0; i < ncovbins; ++i) {
     int count2 = 0;
+    // Skip the highest momentum bin because it's rubbish
     for (int j = 0; j < ncovbins - 4; ++j) {
+    //for (int j = 0; j < ncovbins; ++j) {
       // 1E79 matched to diagonal error
       (*fFullCovar)(count1, count2) = (*temp)(i, j);
       count2++;
     }
     count1++;
   }
-
-  // Now reorganise the rows
 
   delete temp;
 };

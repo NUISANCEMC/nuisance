@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -90,7 +90,6 @@ double SciBooNEUtils::GetFlatEfficiency(){
 }
 
 
-// Obtained from a simple fit to test beam data 1 < p < 2 GeV
 double SciBooNEUtils::ProtonMisIDProb(double mom){
   return 0.1;
   double prob = 0.10;
@@ -278,8 +277,7 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
       thisWeight = SciBooNEUtils::ProtonEfficiency(protonHist, nu, event->PartInfo(j));
       if (thisWeight == 0) continue;
 
-      if (runningWeight == 0) runningWeight = thisWeight;
-      else runningWeight += (1 - runningWeight)*thisWeight;
+      runningWeight += (1 - runningWeight)*thisWeight;
       
       if (thisWeight < highWeightPr) continue;      
       highWeightPr = thisWeight;
@@ -289,8 +287,7 @@ int SciBooNEUtils::GetMainTrack(FitEvent *event, TH2D *mupiHist, TH2D *protonHis
       thisWeight = SciBooNEUtils::StoppedEfficiency(mupiHist, nu, event->PartInfo(j));
       if (thisWeight == 0) continue;
 
-      if (runningWeight == 0) runningWeight = thisWeight;
-      else runningWeight += (1 - runningWeight)*thisWeight;
+      runningWeight += (1 - runningWeight)*thisWeight;
 
       if (thisWeight < highWeight) continue;
 
@@ -376,11 +373,6 @@ double SciBooNEUtils::apply_smear(double central, double width){
   double output = rand->Gaus(central, width);
   return output;
 }
-
-// double SciBooNEUtils::apply_double_gaus_smear(double central1, double width1, double central2, double width2){
-//   static TF1 *func = new TF1("double_gaus", "exp(-0.5*((x)/1.)**2) + 0.1*exp(-0.5*((x)/5.)**2", -20, 20);
-//   return func->GetRandom();  
-//}
 
 double SciBooNEUtils::smear_p(FitParticle* track, double smear){
   static TF1 *f1 = new TF1("f1", "gaus(0)+gaus(3)", -0.8, 0.8);

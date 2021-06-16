@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -149,14 +149,14 @@ MinimizerRoutines::MinimizerRoutines(int argc, char *argv[]) {
   // Finish configuration XML
   configuration.FinaliseSettings(fCompKey.GetS("outputfile") + ".xml");
 
-  // Add Error Verbo Lines
+  // Sort out the printout
   verbocount += Config::GetParI("VERBOSITY");
   errorcount += Config::GetParI("ERROR");
-  NUIS_LOG(FIT, "[ NUISANCE ]: Setting VERBOSITY=" << verbocount);
-  NUIS_LOG(FIT, "[ NUISANCE ]: Setting ERROR=" << errorcount);
-  // FitPar::log_verb = verbocount;
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
   SETVERBOSITY(verbocount);
-  // ERR_VERB(errorcount);
+  SETTRACE(trace);
 
   // Minimizer Setup ========================================
   fOutputRootFile = new TFile(fCompKey.GetS("outputfile").c_str(), "RECREATE");
@@ -215,15 +215,31 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
       parstep = key.GetD("step");
 
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parlow << " < p < " << parhigh << " : "
-                        << parstate);
+                            << " : " << parlow << " < p < " << parhigh << " : "
+                            << parstate);
     } else {
       NUIS_LOG(FIT, "Read " << partype << " : " << parname << " = " << parnom
-                        << " : " << parstate);
+                            << " : " << parstate);
+    }
+
+    bool ismirr = false;
+    if (key.Has("mirror_point")) {
+      ismirr=true;
+      mirror_param mir;
+      mir.mirror_value = key.GetD("mirror_point");
+      mir.mirror_above = key.GetB("mirror_above");
+      fMirroredParams[parname] = mir;
+      NUIS_LOG(FIT,
+               "\t\t" << parname << " is mirrored at " << mir.mirror_value
+                      << " "
+                      << (mir.mirror_above ? "from above" : "from below"));
     }
 
     // Run Parameter Conversion if needed
     if (parstate.find("ABS") != std::string::npos) {
+      if(ismirr){
+        NUIS_ABORT("Cannot mirror parameters with ABS state!");
+      }
       double opnom = parnom;
       double oparstep = parstep;
       parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
@@ -233,6 +249,9 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
           FitBase::RWAbsToSigma(partype, parname, opnom + parstep) - parnom;
       NUIS_LOG(FIT, "ParStep: " << parstep << " (" << oparstep << ").");
     } else if (parstate.find("FRAC") != std::string::npos) {
+      if(ismirr){
+        NUIS_ABORT("Cannot mirror parameters with FRAC state!");
+      }
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
       parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
@@ -271,22 +290,29 @@ void MinimizerRoutines::SetupMinimizerFromXML() {
     // Get Sample Options
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
-
     std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
-
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
 
+    // Handle the samplefile name
+    std::string mc_type = GeneralUtils::ParseToStr(samplefile, ":")[0];
+    std::string input_samples = GeneralUtils::ParseToStr(samplefile, ":")[1];
+    input_samples = GeneralUtils::ReplaceAll(input_samples, "(", "");
+    input_samples = GeneralUtils::ReplaceAll(input_samples, ")", "");
+    std::vector<std::string> sample_vect = GeneralUtils::ParseToStr(input_samples, ";");
+
     // Print out
-    NUIS_LOG(FIT, "Read sample info " << i << " : " << samplename << std::endl
-                                  << "\t\t input -> " << samplefile << std::endl
-                                  << "\t\t state -> " << sampletype << std::endl
-                                  << "\t\t norm  -> " << samplenorm);
+    NUIS_LOG(FIT, "Read sample " << i << ". : " << samplename << " ("
+             << sampletype << ") [Norm=" << samplenorm << "]");
+    NUIS_LOG(FIT, "  |-> Input MC type = "<< mc_type <<" with " << sample_vect.size() << " input files");
+    for (uint j=0; j < sample_vect.size(); ++j){
+      NUIS_LOG(FIT, "  |-> Input file #" << j << " = " << sample_vect[j]);
+    }
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
         NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
-                    "that the sample is free");
+                      "that the sample is free");
         NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
@@ -477,6 +503,10 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
 
     fMinimizer->SetVariable(ipar, syst, vstart, vstep);
     fMinimizer->SetVariableLimits(ipar, vlow, vhigh);
+    if (fMirroredParams.count(syst)) {
+      fSampleFCN->SetVariableMirrored(ipar, fMirroredParams[syst].mirror_value,
+                                      fMirroredParams[syst].mirror_above);
+    }
 
     if (fixed) {
       fMinimizer->FixVariable(ipar);
@@ -484,15 +514,16 @@ void MinimizerRoutines::SetupFitter(std::string routine) {
 
     } else {
       NUIS_LOG(FIT, "Free  Param: " << syst << " Start:" << vstart
-                                << " Range:" << vlow << " to " << vhigh
-                                << " Step:" << vstep);
+                                    << " Range:" << vlow << " to " << vhigh
+                                    << " Step:" << vstep);
     }
 
     ipar++;
   }
+  fSampleFCN->SetNParams(ipar);
 
   NUIS_LOG(FIT, "Setup Minimizer: " << fMinimizer->NDim() << "(NDim) "
-                                << fMinimizer->NFree() << "(NFree)");
+                                    << fMinimizer->NFree() << "(NFree)");
 
   return;
 }
@@ -621,7 +652,7 @@ int MinimizerRoutines::RunFitRoutine(std::string routine) {
       //    !routine.compare("GSLMulti") or
       !routine.compare("GSLSimAn") or !routine.compare("MCMC")) {
     if (fMinimizer->NFree() > 0) {
-      NUIS_LOG(FIT, fMinimizer->Minimize());
+      fMinimizer->Minimize();
       GetMinimizerState();
     }
   }
@@ -647,12 +678,12 @@ void MinimizerRoutines::PrintState() {
 
   // Header
   NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
-                     << " = " << setw(10) << "Value"
-                     << " +- " << setw(10) << "Error"
-                     << " " << setw(8) << "(Units)"
-                     << " " << setw(10) << "Conv. Val"
-                     << " +- " << setw(10) << "Conv. Err"
-                     << " " << setw(8) << "(Units)");
+                         << " = " << setw(10) << "Value"
+                         << " +- " << setw(10) << "Error"
+	                 << " " << setw(8) << "(Units)");
+  // << " " << setw(10) << "Conv. Val"
+  // << " +- " << setw(10) << "Conv. Err"
+  // << " " << setw(8) << "(Units)");
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -675,25 +706,28 @@ void MinimizerRoutines::PrintState() {
       curunits = "(Frac)";
     }
 
-    std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
-    double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
-    double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-                      FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+    // std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
+    // double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
+    // double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
+    //                   FitBase::RWSigmaToAbs(typestr, syst, 0.0));
 
     std::ostringstream curparstring;
 
-    curparstring << " " << setw(3) << left << i << ". " << setw(maxcount)
-                 << syst << " = " << setw(10) << curval << " +- " << setw(10)
-                 << curerr << " " << setw(8) << curunits << " " << setw(10)
-                 << convval << " +- " << setw(10) << converr << " " << setw(8)
-                 << convunits;
+    curparstring << " " << setw(3) << left << i << "  " << setw(maxcount)
+                 << syst << " = " << setw(10) << Form("%.7lf", curval) << " +- " << setw(10)
+                 << Form("%.7lf", curerr) << " " << setw(8) << curunits; 
+                 // << " " << setw(10)
+		 // << convval << " +- " << setw(10) << converr << " " << setw(8)
+		 // << convunits;
 
     NUIS_LOG(FIT, curparstring.str());
   }
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
-  NUIS_LOG(FIT, std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+  int ndof = fSampleFCN->GetNDOF();
+  NUIS_LOG(FIT,
+	   std::left << std::setw(55) << "Likelihood for JointFCN" << ": " << like << "/" << ndof)
   NUIS_LOG(FIT, "------------");
 }
 
@@ -701,7 +735,7 @@ void MinimizerRoutines::PrintState() {
 void MinimizerRoutines::GetMinimizerState() {
   //*************************************
 
-  NUIS_LOG(FIT, "Minimizer State: ");
+  NUIS_LOG(DEB, "Minimizer State: ");
   // Get X and Err
   const double *values = fMinimizer->X();
   const double *errors = fMinimizer->Errors();
@@ -1236,7 +1270,7 @@ void MinimizerRoutines::SetupCovariance() {
   if (fDecFree)
     delete fDecFree;
 
-  NUIS_LOG(FIT, "Building covariance matrix..");
+  NUIS_LOG(FIT, "Building covariance matrix...");
 
   int NFREE = 0;
   int NDIM = 0;
@@ -1257,7 +1291,7 @@ void MinimizerRoutines::SetupCovariance() {
 
   if (NDIM == 0)
     return;
-  NUIS_LOG(FIT, "NFREE == " << NFREE);
+  NUIS_LOG(DEB, "NFREE == " << NFREE);
   fCovar = new TH2D("covariance", "covariance", NDIM, 0, NDIM, NDIM, 0, NDIM);
   if (NFREE > 0) {
     fCovFree = new TH2D("covariance_free", "covariance_free", NFREE, 0, NFREE,

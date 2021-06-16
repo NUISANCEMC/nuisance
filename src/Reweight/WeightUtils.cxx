@@ -3,6 +3,10 @@
 #include "FitLogger.h"
 #ifndef __NO_REWEIGHT__
 #ifdef __T2KREW_ENABLED__
+#ifdef T2KRW_OA2021_INTERFACE
+#include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
+#include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
+#else
 #include "T2KGenieReWeight.h"
 #include "T2KNIWGReWeight.h"
 #include "T2KNIWGUtils.h"
@@ -10,6 +14,7 @@
 #include "T2KNeutUtils.h"
 #include "T2KReWeight.h"
 using namespace t2krew;
+#endif
 #endif
 
 #ifdef __NIWG_ENABLED__
@@ -344,7 +349,21 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   // T2K DIAL TYPE
   case kT2K: {
 #if defined(__T2KREW_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef T2KRW_OA2021_INTERFACE
+    // This is possibly inefficient, this should probably not be called per fit
+    // step.
+    if (!t2krew::T2KNEUTUtils::CardIsSet()) {
+      std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+      if (neut_card.size()) {
+        t2krew::T2KNEUTUtils::SetCardFile(neut_card);
+      }
+    }
+
+    int t2k_enum = t2krew::T2KSystToInt(
+        t2krew::MakeT2KReWeightInstance()->DialFromString(name));
+#else
     int t2k_enum = (int)t2krew::T2KSyst::FromString(name);
+#endif
     if (t2k_enum > 0) {
       this_enum = t2k_enum + offset;
     }
@@ -469,7 +488,21 @@ int Reweight::GENIEEnumFromName(std::string const &name) {
 
 int Reweight::T2KEnumFromName(std::string const &name) {
 #if defined(__T2KREW_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef T2KRW_OA2021_INTERFACE
+  // This is possibly inefficient, this should probably not be called per fit
+  // step.
+  if (!t2krew::T2KNEUTUtils::CardIsSet()) {
+    std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+    if (neut_card.size()) {
+      t2krew::T2KNEUTUtils::SetCardFile(neut_card);
+    }
+  }
+
+  int t2kenum = t2krew::T2KSystToInt(
+      t2krew::MakeT2KReWeightInstance()->DialFromString(name));
+#else
   int t2kenum = (int)t2krew::T2KSyst::FromString(name);
+#endif
   return (t2kenum > 0) ? t2kenum : Reweight::kNoDialFound;
 #else
   return Reweight::kGeneratorNotBuilt;
@@ -495,7 +528,8 @@ int Reweight::CustomEnumFromName(std::string const &name) {
   return (custenum != kUnknownNUISANCEDial ? custenum : kNoDialFound);
 }
 
-int Reweight::ConvDial(std::string const &name, std::string const &type, bool exceptions) {
+int Reweight::ConvDial(std::string const &name, std::string const &type,
+                       bool exceptions) {
   return Reweight::ConvDial(name, Reweight::ConvDialType(type), exceptions);
 }
 

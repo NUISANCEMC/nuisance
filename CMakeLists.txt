@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -245,6 +245,8 @@ install(PROGRAMS
 install(PROGRAMS
   "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
   bin)
+
+add_subdirectory(event_gen)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
                   ${CMAKE_INSTALL_PREFIX})

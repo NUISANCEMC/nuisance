@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -60,8 +60,10 @@ InputHandlerBase::~InputHandlerBase() {
 void InputHandlerBase::Print(){};
 
 TH1D *InputHandlerBase::GetXSecHistogram(void) {
-  fXSecHist = (TH1D *)fFluxHist->Clone();
-  fXSecHist->Divide(fEventHist);
+  fXSecHist = (TH1D *)fEventHist->Clone();
+  fXSecHist->SetNameTitle((fName + "_XSEC").c_str(), (fName + "_XSEC").c_str());
+  fXSecHist->GetYaxis()->SetTitle("#sigma #times 10^{-38} (cm^{2}/nucleon)");
+  fXSecHist->Divide(fFluxHist);
   return fXSecHist;
 };
 
@@ -245,14 +247,6 @@ void InputHandlerBase::SetupJointInputs() {
     NUIS_ABORT("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
 
-  if (jointeventinputs.size() > 1) {
-    NUIS_ERR(
-        WRN,
-        "GiBUU sample contains multiple inputs. This will only work for "
-        "samples that expect multi-species inputs. If this sample does, you "
-        "can ignore this warning.");
-  }
-
   for (size_t i = 0; i < jointeventinputs.size(); i++) {
     double scale = double(fNEvents) / fEventHist->Integral("width");
     scale *= jointeventinputs.at(i)->Integral("width");
@@ -266,25 +260,19 @@ void InputHandlerBase::SetupJointInputs() {
 
   // Setup Max Events
   if (fMaxEvents > 1 && fMaxEvents < fNEvents) {
-    if (LOG_LEVEL(SAM)) {
-      std::cout << "\t\t|-> Read Max Entries : " << fMaxEvents << std::endl;
-    }
+    NUIS_LOG(SAM, "|-> Read max entries: " << fMaxEvents);
     fNEvents = fMaxEvents;
   }
 
   // Print out Status
-  if (LOG_LEVEL(SAM)) {
-    std::cout << "\t\t|-> Total Entries    : " << fNEvents << std::endl
-              << "\t\t|-> Event Integral   : "
-              << fEventHist->Integral("width") * 1.E-38 << " events/nucleon"
-              << std::endl
-              << "\t\t|-> Flux Integral    : " << fFluxHist->Integral("width")
-              << " /cm2" << std::endl
-              << "\t\t|-> Event/Flux       : "
-              << fEventHist->Integral("width") * 1.E-38 /
-                     fFluxHist->Integral("width")
-              << " cm2/nucleon" << std::endl;
-  }
+  NUIS_LOG(SAM, "|-> Total entries  : " << fNEvents);
+  NUIS_LOG(SAM, "|-> Event integral : " << fEventHist->Integral("width") * 1.E-38 
+	   << " events/nucleon");
+  NUIS_LOG(SAM, "|-> Flux Integral  : " << fFluxHist->Integral("width")                                                                                                 
+	   << " /cm2");
+  NUIS_LOG(SAM, "|-> Event/Flux     : " 
+	   << fEventHist->Integral("width") * 1.E-38/fFluxHist->Integral("width") 
+	   << " cm2/nucleon");
 }
 
 BaseFitEvt *InputHandlerBase::GetBaseEvent(const UInt_t entry) {

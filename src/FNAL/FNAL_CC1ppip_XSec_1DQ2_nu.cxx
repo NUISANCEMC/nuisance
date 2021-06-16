@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -32,7 +32,7 @@ FNAL_CC1ppip_XSec_1DQ2_nu::FNAL_CC1ppip_XSec_1DQ2_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{CC1#pi} (GeV^{2})");
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("d#sigma/dQ^{2} (cm^{2}/GeV^{2}/proton)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG", "FIX/DIAG");
   fSettings.SetEnuRange(10.0, 100.0);

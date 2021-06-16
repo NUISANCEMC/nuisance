@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This ile is part of NUISANCE.
@@ -64,6 +64,7 @@ JointMeas1D::JointMeas1D(void) {
   fIsRawEvents = false;
   fIsDifXSec = false;
   fIsEnu1D = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -229,7 +230,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM, "Found XSec Enu measurement, applying flux integrated scaling, "
                   << "not flux averaged!");
   }
@@ -293,8 +293,6 @@ void JointMeas1D::FinaliseSampleSettings() {
 
   if (!fRW)
     fRW = FitBase::GetRW();
-
-  NUIS_LOG(SAM, "Finalised Sample Settings");
 }
 
 //********************************************************************
@@ -344,7 +342,7 @@ void JointMeas1D::SetCovarFromDiagonal(TH1D *data) {
   if (data) {
     NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar,true);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
     NUIS_ERR(FTL, "No data input provided to set diagonal covar from!");
@@ -364,7 +362,7 @@ void JointMeas1D::SetCovarFromTextFile(std::string covfile, int dim) {
   NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
 
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -385,7 +383,7 @@ void JointMeas1D::SetCovarFromMultipleTextFiles(std::string covfiles, int dim) {
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -397,7 +395,7 @@ void JointMeas1D::SetCovarFromRootFile(std::string covfile,
   NUIS_LOG(SAM,
        "Reading covariance from text file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -407,7 +405,7 @@ void JointMeas1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -419,7 +417,7 @@ void JointMeas1D::SetCovarInvertFromRootFile(std::string covfile,
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                            << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -451,7 +449,7 @@ void JointMeas1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -486,7 +484,7 @@ void JointMeas1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -517,7 +515,7 @@ void JointMeas1D::SetCorrelationFromRootFile(std::string covfile,
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -551,7 +549,7 @@ void JointMeas1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -572,7 +570,7 @@ void JointMeas1D::SetCholDecompFromRootFile(std::string covfile,
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(temp->GetNrows(), trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -655,7 +653,7 @@ void JointMeas1D::FinaliseMeasurement() {
   }
 
   if (!covar) {
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar,true);
   }
 
   if (!fDecomp) {
@@ -774,7 +772,7 @@ void JointMeas1D::SetFitOptions(std::string opt) {
       NUIS_ERR(FTL, "ERROR: Fit Option '"
                       << fit_options_input.at(i)
                       << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(FTL, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(FTL, "Fit Options should be provided as a '/' separated list "
                   "(e.g. FREE/DIAG/NORM)");
       NUIS_ERR(FTL, "Available options for " << fName << " are '" << fAllowedTypes
                                            << "'");
@@ -1164,11 +1162,11 @@ void JointMeas1D::SetFakeDataValues(std::string fakeOption) {
   // Setup Covariances
   if (covar)
     delete covar;
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
 
   if (fDecomp)
     delete fDecomp;
-  fDecomp = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete tempdata;
 
@@ -1320,7 +1318,7 @@ void JointMeas1D::Write(std::string drawOpt) {
   GetMCHistogram()->Write();
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
@@ -1508,7 +1506,7 @@ void JointMeas1D::SetupMeasurement(std::string input, std::string type,
                                    FitWeight *rw, std::string fkdt) {
   //********************************************************************
 
-  // For joint samples, input files are given as a semi-colon seperated list.
+  // For joint samples, input files are given as a semi-colon separated list.
   // Parse this list and save it for later, and set up the types etc.
 
   if (FitPar::Config().GetParB("EventManager")) {

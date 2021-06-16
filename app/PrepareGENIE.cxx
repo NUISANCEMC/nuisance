@@ -26,6 +26,7 @@ std::string gTarget = "";
 double MonoEnergy;
 int gNEvents = -999;
 bool IsMonoE = false;
+bool useNOvAWeights = false;
 
 void PrintOptions();
 void ParseOptions(int argc, char *argv[]);
@@ -71,9 +72,9 @@ bool CheckConfig(std::string filename) {
   }
   f->Close();
   if (!ShouldScale) {
-    NUIS_LOG(FIT, "Not scaling 2p2h CC events with Nieves..." << std::endl);
+    NUIS_LOG(FIT, "Not scaling 2p2h CC events with Nieves...");
   } else {
-    NUIS_LOG(FIT, "Scaling 2p2h CC events with Nieves..." << std::endl);
+    NUIS_LOG(FIT, "Scaling 2p2h CC events with Nieves...");
   }
 
   return ShouldScale;
@@ -125,8 +126,10 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Have the TH1D go from MonoEnergy/2 to MonoEnergy/2
   TH1D *fluxhist =
@@ -226,22 +229,24 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
-    NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
-    // ***********************************
-    // ***********************************
-    // FUDGE FOR NOVA MINERVA WORKSHOP
-    //  Also check for the nova_wgts tree from Jeremy
-    TChain *nova_chain = new TChain("nova_wgts");
-    nova_chain->AddFile(input.c_str());
-    TTree *nova_tree = nova_chain->GetTree();
-    if (!nova_tree) {
-      NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
-    } else {
-      NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
-    }
-    if (nova_tree) {
-      nova_tree->SetDirectory(outputfile);
-      nova_tree->Write();
+    if (useNOvAWeights){
+      NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+      // ***********************************
+      // ***********************************
+      // FUDGE FOR NOVA MINERVA WORKSHOP
+      //  Also check for the nova_wgts tree from Jeremy
+      TChain *nova_chain = new TChain("nova_wgts");
+      nova_chain->AddFile(input.c_str());
+      TTree *nova_tree = nova_chain->GetTree();
+      if (!nova_tree) {
+	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << gOutputFile);
+      } else {
+	NUIS_LOG(FIT, "Found nova_wgts tree in " << gOutputFile);
+      }
+      if (nova_tree) {
+	nova_tree->SetDirectory(outputfile);
+	nova_tree->Write();
+      }
     }
 
     NUIS_LOG(FIT, "Done cloning tree.");
@@ -383,13 +388,22 @@ void RunGENIEPrepareMono(std::string input, std::string target,
     totalnucl += *it;
   }
 
+  // Report on what we've got
+  it = targ_fractions.begin();
+  jt = targ_list.begin();
+  for (; it != targ_fractions.end(); it++, jt++){
+    NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
+  }
+
+
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
         "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
   }
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
 
-  for (uint i = 0; i < targprs.size(); i++) {
+  it = targ_fractions.begin();
+  for (uint i = 0; i < targprs.size(); i++, it++) {
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
@@ -401,6 +415,13 @@ void RunGENIEPrepareMono(std::string input, std::string target,
       // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
+
+	int nucl = atoi(targpdg.c_str());
+        nucl = (nucl % 10000) / 10;
+
+	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
+        xsec->Scale(*it/double(nucl));
+
         NUIS_LOG(FIT, "Adding target spline "
             << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
@@ -537,8 +558,10 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     NUIS_LOG(FIT, "Found " << nevt << " input entries in " << input);
   }
 
+  StopTalking();
   NtpMCEventRecord *genientpl = NULL;
   tn->SetBranchAddress("gmcrec", &genientpl);
+  StartTalking();
 
   // Make Event and xsec Hist
   TH1D *eventhist = (TH1D *)fluxhist->Clone();
@@ -645,19 +668,21 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     cloneTree->SetDirectory(outputfile);
     cloneTree->Write();
 
-    // ********************************
-    // CLUDGE KLUDGE KLUDGE FOR NOVA
-    NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
-    //  Also check for the nova_wgts tree from Jeremy
-    TChain *nova_chain = new TChain("nova_wgts");
-    nova_chain->AddFile(input.c_str());
-    TTree *nova_tree = nova_chain->CloneTree(-1, "fast");
-    if (!nova_tree) {
-      NUIS_LOG(FIT, "Could not find nova_wgts tree in " << input);
-    } else {
-      NUIS_LOG(FIT, "Found nova_wgts tree in " << input);
-      nova_tree->SetDirectory(outputfile);
-      nova_tree->Write();
+    if (useNOvAWeights){
+      // ********************************
+      // CLUDGE KLUDGE KLUDGE FOR NOVA
+      NUIS_LOG(FIT, "Cloning input nova_wgts to output file: " << gOutputFile);
+      //  Also check for the nova_wgts tree from Jeremy
+      TChain *nova_chain = new TChain("nova_wgts");
+      nova_chain->AddFile(input.c_str());
+      TTree *nova_tree = nova_chain->CloneTree(-1, "fast");
+      if (!nova_tree) {
+	NUIS_LOG(FIT, "Could not find nova_wgts tree in " << input);
+      } else {
+	NUIS_LOG(FIT, "Found nova_wgts tree in " << input);
+	nova_tree->SetDirectory(outputfile);
+	nova_tree->Write();
+      }
     }
     NUIS_LOG(FIT, "Done cloning tree.");
   }
@@ -798,6 +823,13 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
     totalnucl += *it;
   }
 
+  // Report on what we've got
+  it = targ_fractions.begin();
+  jt = targ_list.begin();
+  for (; it != targ_fractions.end(); it++, jt++){
+    NUIS_LOG(FIT, "Found target " << *jt << " with weight " << *it);
+  }
+
   if (totalnucl == 0) {
     NUIS_ABORT("Didn't find any nucleons in input file. Did you really specify the "
         "target ratios?\ne.g. TARGET1[fraction1],TARGET2[fraction2]");
@@ -806,7 +838,8 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
   TH1D *totalxsec = (TH1D *)xsechist->Clone();
 
   // Loop over the specified targets by the user
-  for (uint i = 0; i < targprs.size(); i++) {
+  it = targ_fractions.begin();
+  for (uint i = 0; i < targprs.size(); i++, it++) {
     std::string targpdg = targprs[i];
     // Check that we found the user requested target in GENIE
     bool FoundTarget = false;
@@ -818,12 +851,16 @@ void RunGENIEPrepare(std::string input, std::string flux, std::string target,
       // Match the user targets to the targets found in GENIE
       if (targstr.find(targpdg) != std::string::npos) {
         FoundTarget = true;
+
+	int nucl = atoi(targpdg.c_str());
+	nucl = (nucl % 10000) / 10;
+
+	NUIS_LOG(FIT, "Scaling target " << targstr << " by " << *it << "/" << nucl);
+	xsec->Scale(*it/double(nucl));
+
         NUIS_LOG(FIT, "Adding target spline "
             << targstr << " Integral = " << xsec->Integral("width"));
         totalxsec->Add(xsec);
-
-        // int nucl = atoi(targpdg.c_str());
-        // totalnucl += int((nucl % 10000) / 10);
       }
     } // Looped over target splines
 
@@ -902,7 +939,7 @@ void PrintOptions() {
     "flux file was used."
     << std::endl;
   std::cout << " [ -t target ] : Target that GHepRecords were generated with. "
-    "Comma seperated list with fractions. E.g. for CH2 "
+    "Comma separated list with fractions. E.g. for CH2 "
     "target=1000060120[0.923076],1000010010[0.076924]"
     << std::endl;
   std::cout << " [ -o outputfile.root ] : File to write prepared input file to."
@@ -917,6 +954,17 @@ void PrintOptions() {
 
 void ParseOptions(int argc, char *argv[]) {
   bool flagopt = false;
+
+  int verbocount = 0;
+  int errorcount = 0;
+  verbocount += Config::GetParI("VERBOSITY");
+  errorcount += Config::GetParI("ERROR");
+  bool trace = Config::GetParB("TRACE");
+  std::cout << "[ NUISANCE ]: Setting VERBOSITY=" << verbocount << std::endl;
+  std::cout << "[ NUISANCE ]: Setting ERROR=" << errorcount << std::endl;
+  SETVERBOSITY(verbocount);
+  SETTRACE(trace);
+
 
   // If No Arguments print commands
   for (int i = 1; i < argc; ++i) {

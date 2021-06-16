@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -40,13 +40,13 @@ TemplateMeas1D::TemplateMeas1D(std::string name, std::string inputfile,
   // Setup allowed/default types
   // These give the starting possible options that can be specified when making
   // the class.
-  // Different discrete fields should be seperated by '/' and conflicting
+  // Different discrete fields should be separated by '/' and conflicting
   // options
-  // should be seperated by ','. e.g. FIX, FREE, and SHAPE are conflicting types
+  // should be separated by ','. e.g. FIX, FREE, and SHAPE are conflicting types
   // because
   // they all handle the normalisation. NORM is an extra option to add a penalty
   // term
-  // so should be kept seperate as below. We also want to force DIAG as there is
+  // so should be kept separate as below. We also want to force DIAG as there is
   // no
   // covariance so we put that as the starting default option so it will be set
   // even if
@@ -99,7 +99,7 @@ TemplateMeas1D::TemplateMeas1D(std::string name, std::string inputfile,
   // for use in fake data study covariance throws.
   // If a covariance IS provided it should be setup here.
   fFullCovar = StatUtils::MakeDiagonalCovarMatrix(fDataHist);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar,true);
 
   // There will be cases where we want to save optional histograms
   // to help with validation/studies. They should be setup in the constructor.

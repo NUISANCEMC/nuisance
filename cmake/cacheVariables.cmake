@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -93,6 +93,7 @@ CheckAndSetDefaultCache(HEPMC_LENUNIT "CM" STRING "HepMC momentum units [MM|CM].
 CheckAndSetDefaultCache(HEPMC_USED_EP FALSE INTERNAL "Whether we built HepMC or not. <FALSE>")
 
 CheckAndSetDefaultCache(USE_NEUT FALSE BOOL "Whether to enable NEUT (reweight) support. Requires external libraries. <FALSE>")
+CheckAndSetDefaultCache(USE_NEUT_EVENT FALSE BOOL "Whether to enable NEUT (event i/o) support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NEUT_VERSION FALSE STRING "NEUT version string, e.g. 5.4.0. <5.4.0>" NEUT_VERSION)
 CheckAndSetDefaultEnv(NEUT_ROOT "" PATH "Path to NEUT source tree root directory. Overrides environment variable \$NEUT_ROOT <>" NEUT_ROOT)
 CheckAndSetDefaultEnv(CERN "" PATH "Path to CERNLIB source tree root directory that NEUT was built against. Overrides environment variable \$CERN <>" CERN)
@@ -123,7 +124,7 @@ CheckAndSetDefaultEnv(GSL_LIB "" PATH "Path to pre-built gsl libraries. Override
 CheckAndSetDefaultEnv(GSL_INC "" PATH "Path to installed gsl headers. Overrides environment variable \$GSL_INC. <>" GSL_INC)
 
 CheckAndSetDefaultCache(USE_T2K FALSE BOOL "Whether to enable T2KReWeight support. Requires external libraries. <FALSE>")
-CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KREWEIGHTReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
+CheckAndSetDefaultEnv(T2KREWEIGHT "" PATH "Path to installed T2KReWeight. Overrides environment variable \$T2KREWEIGHT. <>" T2KREWEIGHT)
 
 CheckAndSetDefaultCache(USE_NIWG FALSE BOOL "Whether to enable (T2K) NIWG ReWeight support. Requires external libraries. <FALSE>")
 CheckAndSetDefaultEnv(NIWG_ROOT "" PATH "Path to installed NIWGReWeight. Overrides environment variable \$NIWG. <>" NIWG)

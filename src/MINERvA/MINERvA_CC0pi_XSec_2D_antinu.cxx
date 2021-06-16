@@ -2,7 +2,7 @@
 // I used the file MINERvA_CCinc_XSec_2DEavq3_nu.cxx as a template
 // Also, I am fully aware of the naming typo (should be ptpz), but Everything is already named the same way so...
 
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.

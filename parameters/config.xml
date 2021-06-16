@@ -99,9 +99,10 @@
 <!-- DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/WGHT/WEIGHTS/FLUX/XSEC/MASK/COV/INVCOV/DECOMP/CANVPDG/CANVMC/SETTINGS'/> -->
 <!-- #config drawopts DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/RESIDUAL/MATRIX/FLUX/MASK/MAP -->
 <!-- #config drawopts DATA/MC -->
-<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/COV/INVCOV/DECOMP/CANVPDG/CANVMC/SETTINGS/PROJ/CANVSLICEMC'/>
+<config drawopts='DATA/MC/EVT/FINE/RATIO/MODES/SHAPE/FLUX/XSEC/MASK/MAP/COV/INVCOV/DECOMP/CANVPDG/CANVMC/SETTINGS/PROJ/CANVSLICEMC'/>
 
 <config nuisflat_SavePreFSI='true' />
+<config nuisflat_SaveSignalFlags='true' />
 
 <config InterpolateSigmaQ0Histogram='1' />
 <config InterpolateSigmaQ0HistogramRes='100' />
@@ -146,7 +147,7 @@
 <!-- # Are we throwing uniform or according to Gaussian? -->
 <!-- # Only use uniform if wanting to study the limits of a dial. -->
 <config error_uniform='0'/>
-<config WriteSeperateStacks='1'/>
+<config WriteSeparateStacks='1'/>
 
 <!-- # Other Individual Case Configs -->
 <!-- # ###################################################### -->
@@ -157,10 +158,6 @@
 <config throw_diag_syst='0'/>
 <config throw_corr_syst='0'/>
 <config throw_mc_stat='0'/>
-
-<!-- # Apply a shift to the muon momentum before calculation of Q2 -->
-<config muon_momentum_shift='0.0'/>
-<config muon_momentum_throw='0'/>
 
 <!-- # MINERvA Specific Configs -->
 <config MINERvA_CCinc_XSec_2DEavq3_nu_hadron_cut='0'/>
@@ -179,6 +176,7 @@
 <config NumRangeSteps='50'/>
 <config UseProton='true'/>
 <config UseZackEff='false'/>
+<config SciBooNEScale='0.99E20'/>
 
 <config MINERvADensity='1.04'/>
 <config MINERvARecoDist='10.0'/>
@@ -226,7 +224,6 @@ too ,any opportunities for mistakes.
 
 <config UseShapeCovar="0" />
 <config UseShapeNormDecomp="0" />
-<config CC0piNBINS="156" />
 
 <config UseSVDInverse="0" />
 <config UseMPPSeudoInverse="0" />

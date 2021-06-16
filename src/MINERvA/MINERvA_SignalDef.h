@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -76,6 +76,31 @@ namespace SignalDef {
   /// Also writes number of pions (nPions) if studies on this want to be done...
   bool isCCNpip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
       bool isRestricted = false, bool isWtrue=false);
+
+  // *********************************
+  /// MINERvA numubar CC 1pi- signal definition
+  /// Used in 2019 analysis of LE data
+  /// (Phys. Rev. D 100, 052008, https://doi.org/10.1103/PhysRevD.100.052008)
+  /// Implemented 30 April 2021 by S. Gardiner
+  ///
+  /// ** Requirements on final-state particles **
+  /// (see Eq. (1) of the publication)
+  ///
+  /// Exactly one positive muon
+  /// Exactly one negative pion
+  /// Zero additional mesons
+  /// Any number of nucleons
+  ///
+  /// ** Kinematic limits **
+  /// (see Sec. V of the publication)
+  ///
+  /// Muon scattering angle (theta_mu) < 25 degrees
+  ///
+  /// 1.5 GeV < E_nubar < 10.0 GeV
+  /// (appears to be *true energy* due to unfolding)
+  ///
+  /// W_exp < 1.8 GeV (experimental estimator of true hadronic invariant mass)
+  bool isCC1pim_MINERvA(FitEvent *event, double EnuMin, double EnuMax);
 
   bool isCCQEnumu_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
       bool fullphasespace = true);

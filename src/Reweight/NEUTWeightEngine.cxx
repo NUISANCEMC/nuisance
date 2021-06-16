@@ -3,9 +3,16 @@
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 #if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
 
-  // For newer NEUT we need to set up our defaults
-#if __NEUT_VERSION__ >= 541
-  neut::CommonBlockIFace::Initialize(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
+#if defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
+  std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+  if (!neut_card.size()) {
+    NUIS_ABORT(
+	       "[ERROR]: When using NEUTReWeight must set NEUT_CARD config option.");
+  }
+  // No need to vomit the contents of the card file all over my screen
+  StopTalking();                                                                                                                                                            
+  neut::CommonBlockIFace::Initialize(neut_card);
+  StartTalking();                                                                                                                                                           
 #endif
 
   // Setup the NEUT Reweight engien
@@ -22,14 +29,6 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
       FitPar::Config().GetParS("FitWeight_fNeutRW_veto");
   bool xsec_ccqe = rw_engine_list.find("xsec_ccqe") == std::string::npos;
   bool xsec_res = rw_engine_list.find("xsec_res") == std::string::npos;
-  bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
-  bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
-  bool xsec_dis = rw_engine_list.find("xsec_dis") == std::string::npos;
-  bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
-  bool xsec_nc = rw_engine_list.find("xsec_nc") == std::string::npos;
-  bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
-  bool nucl_casc = rw_engine_list.find("nucl_casc") == std::string::npos;
-  bool nucl_piless = rw_engine_list.find("nucl_piless") == std::string::npos;
 
   // Activate each calc engine
   if (xsec_ccqe)
@@ -39,6 +38,15 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
   // Dials removed in NEUT 5.4.1
 #if __NEUT_VERSION__ < 541
+  bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
+  bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
+  bool xsec_dis = rw_engine_list.find("xsec_dis") == std::string::npos;
+  bool xsec_ncel = rw_engine_list.find("xsec_ncel") == std::string::npos;
+  bool xsec_nc = rw_engine_list.find("xsec_nc") == std::string::npos;
+  bool xsec_ncres = rw_engine_list.find("xsec_ncres") == std::string::npos;
+  bool nucl_casc = rw_engine_list.find("nucl_casc") == std::string::npos;
+  bool nucl_piless = rw_engine_list.find("nucl_piless") == std::string::npos;
+
   if (nucl_casc)
     fNeutRW->AdoptWghtCalc("nucl_casc", new neut::rew::NReWeightCasc);
   if (xsec_coh)
@@ -116,7 +124,7 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
   }
 
   // Set Value if given
-  if (startval != -999.9) {
+  if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(nuisenum, startval);
   }
 #endif
@@ -189,6 +197,11 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 #endif
+
+  if (!std::isnormal(rw_weight)){
+    NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
+    rw_weight = 0;
+  }
 
   // Return rw_weight
   return rw_weight;

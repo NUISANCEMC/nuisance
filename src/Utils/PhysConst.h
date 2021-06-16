@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -49,6 +49,20 @@ const double mass_cpi = 0.13957;              // charged pion mass in GeV
 const double mass_pi0 = 0.13498;              // neutral pion mass in GeV
 const double mass_cK = 0.493677;              // charged kaon mass in GeV
 const double mass_K0 = 0.497611;              // neutral kaon mass in GeV
+const double mass_411 = 1.86961;              // D+ meson mass in GeV                                                                                                       
+const double mass_421 = 1.86484;              // D0 meson mass in GeV
+const double mass_431 = 1.96830;              // D+_s meson mass in GeV
+const double mass_3112 = 1.197449;            // Sigma- baryon mass in GeV
+const double mass_3122 = 1.115683;            // Lambda0 baryon mass in GeV
+const double mass_3212 = 1.192642;            // Sigma0 baryon mass in GeV
+const double mass_3222 = 1.18937;             // Sigma+ baryon mass in GeV
+const double mass_3312 = 1.32171;             // Xi- baryon mass in GeV
+const double mass_3322 = 1.31486;             // Xi0 baryon mass in GeV
+// const double mass_ = ;                // mass in GeV                                                                                                                    
+const double mass_4112 = 2.45374;             // Sigma0_c baryon mass in GeV
+const double mass_4122 = 2.28626;             // Lambda_c^+ baryon mass in GeV
+const double mass_4222 = 2.45398;             // Sigma++_c baryon mass in GeV
+
 
 inline double GetMass(int pdg) {
   switch (abs(pdg)) {
@@ -70,6 +84,30 @@ inline double GetMass(int pdg) {
       return mass_neutron;
     case 2212:
       return mass_proton;
+    case 411:
+      return mass_411;
+    case 421:
+      return mass_421;
+    case 431:
+      return mass_431;
+    case 3112:
+      return mass_3112;
+    case 3122:
+      return mass_3122;
+    case 3212:
+      return mass_3212;
+    case 3222:
+      return mass_3222;
+    case 3312:
+      return mass_3312;
+    case 3322:
+      return mass_3322;
+    case 4112:
+      return mass_4112;
+    case 4122:
+      return mass_4122;
+    case 4222:
+      return mass_4222;
     default: {
       NUIS_ERR(WRN, "Attempted to get mass for PDG: "
                      << pdg << ", but it is not catered for. Please add it to "

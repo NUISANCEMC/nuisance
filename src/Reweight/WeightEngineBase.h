@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#define _UNDEF_DIAL_VALUE_ -9999.9
+
 class WeightEngineBase {
  public:
   WeightEngineBase(){};
@@ -38,6 +40,8 @@ class WeightEngineBase {
 
   virtual double CalcWeight(BaseFitEvt* evt) { return 1.0; };
   virtual bool NeedsEventReWeight() = 0;
+
+  std::string GetNameFromEnum(int nuisenum);
 
   bool fHasChanged;
   bool fIsAbsTwk;

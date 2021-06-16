@@ -14,7 +14,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPc
   fSettings.DefineAllowedSpecies("numu, numub");
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("p_{#mu}-cos#theta_{#mu}");
-  fSettings.SetYTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("DIAG,FULL/FREE,SHAPE,FIX/SYSTCOV/STATCOV","FIX");
   fSettings.SetEnuRange(0.0, 30.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -54,6 +54,7 @@ T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint::T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPc
 
   // This saves information from the sub-measurements
   fSaveSubMeas = true;
+  fSaveFine = false;
   FinaliseMeasurement();
 };
 

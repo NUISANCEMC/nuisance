@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -34,8 +34,6 @@ public:
   void FillEventVariables(FitEvent *event);
 
   bool isSignal(FitEvent *event);
-
-  void ScaleEvents();
 
   double GetChi2(){return 0.0;};
 

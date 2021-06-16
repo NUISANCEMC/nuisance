@@ -1,21 +1,21 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
-*    This file is part of NUISANCE.
-*
-*    NUISANCE is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    NUISANCE is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
-*******************************************************************************/
+ *    This file is part of NUISANCE.
+ *
+ *    NUISANCE is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    NUISANCE is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 #include "BaseFitEvt.h"
 
 #include "FitParticle.h"
@@ -41,7 +41,7 @@ BaseFitEvt::BaseFitEvt() {
   fGenInfo = NULL;
   fType = 9999;
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
   fNeutVect = NULL;
 #endif
 
@@ -66,30 +66,35 @@ BaseFitEvt::BaseFitEvt() {
 };
 
 BaseFitEvt::~BaseFitEvt() {
-#ifdef __NEUT_ENABLED__
-  if (fNeutVect) delete fNeutVect;
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
+  if (fNeutVect)
+    delete fNeutVect;
 #endif
 
 #ifdef __NUWRO_ENABLED__
 #ifndef __USE_NUWRO_SRW_EVENTS__
-  if (fNuwroEvent) delete fNuwroEvent;
+  if (fNuwroEvent)
+    delete fNuwroEvent;
 #endif
 #endif
 
 #ifdef __GENIE_ENABLED__
-  if (genie_event) delete genie_event;
+  if (genie_event)
+    delete genie_event;
 #endif
 
 #ifdef __NUANCE_ENABLED__
-  if (nuance_event) delete nuance_event;
+  if (nuance_event)
+    delete nuance_event;
 #endif
 
 #ifdef __GiBUU_ENABLED__
-  if (GiRead) delete GiRead;
+  if (GiRead)
+    delete GiRead;
 #endif
 };
 
-BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
+BaseFitEvt::BaseFitEvt(const BaseFitEvt *obj) {
   Mode = obj->Mode;
   probe_E = obj->probe_E;
   probe_pdg = obj->probe_pdg;
@@ -109,7 +114,7 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
   fGenInfo = obj->fGenInfo;
   fType = obj->fType;
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
   fNeutVect = obj->fNeutVect;
 #endif
 
@@ -130,7 +135,7 @@ BaseFitEvt::BaseFitEvt(const BaseFitEvt* obj) {
 #endif
 };
 
-BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
+BaseFitEvt::BaseFitEvt(BaseFitEvt const &other) {
   Mode = other.Mode;
   probe_E = other.probe_E;
   probe_pdg = other.probe_pdg;
@@ -144,21 +149,20 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
     CustomWeightArray[i] = other.CustomWeightArray[i];
   }
 
-
   fSplineCoeff = other.fSplineCoeff;
   fSplineRead = other.fSplineRead;
 
   fGenInfo = other.fGenInfo;
   fType = other.fType;
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
   fNeutVect = other.fNeutVect;
 #endif
 
 #ifdef __NUWRO_ENABLED__
   fNuwroEvent = other.fNuwroEvent;
 #ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
   fNuwroParams = other.fNuwroParams;
 #endif
 #endif
@@ -176,7 +180,7 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const& other) {
 #endif
 };
 
-BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
+BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const &other) {
   Mode = other.Mode;
   probe_E = other.probe_E;
   probe_pdg = other.probe_pdg;
@@ -196,14 +200,14 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
   fGenInfo = other.fGenInfo;
   fType = other.fType;
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
   fNeutVect = other.fNeutVect;
 #endif
 
 #ifdef __NUWRO_ENABLED__
   fNuwroEvent = other.fNuwroEvent;
 #ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent;  ///< Pointer to Nuwro event
+  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
   fNuwroParams = other.fNuwroParams;
 #endif
 #endif
@@ -222,8 +226,8 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const& other) {
   return *this;
 }
 
-void BaseFitEvt::ResetWeight() { 
-  InputWeight = 1.0; 
+void BaseFitEvt::ResetWeight() {
+  InputWeight = 1.0;
 #ifdef __GENIE_ENABLED__
   for (int i = 0; i < 6; ++i) {
     CustomWeightArray[i] = 1.0;
@@ -235,22 +239,22 @@ double BaseFitEvt::GetWeight() {
   return InputWeight * RWWeight * CustomWeight;
 };
 
-#ifdef __NEUT_ENABLED__
-void BaseFitEvt::SetNeutVect(NeutVect* v) {
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
+void BaseFitEvt::SetNeutVect(NeutVect *v) {
   fType = kNEUT;
   fNeutVect = v;
 }
 #endif
 
 #ifdef __GENIE_ENABLED__
-void BaseFitEvt::SetGenieEvent(NtpMCEventRecord* ntpl) {
+void BaseFitEvt::SetGenieEvent(NtpMCEventRecord *ntpl) {
   fType = kGENIE;
   genie_event = ntpl;
 }
 #endif
 
 #ifdef __NUANCE_ENABLED__
-void BaseFitEvt::SetNuanceEvent(NuanceEvent* e) {
+void BaseFitEvt::SetNuanceEvent(NuanceEvent *e) {
   fType = kNUANCE;
   nuance_event = e;
 }

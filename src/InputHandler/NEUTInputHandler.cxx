@@ -1,4 +1,4 @@
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
 #include "NEUTInputHandler.h"
 #include "InputUtils.h"
 
@@ -138,6 +138,9 @@ NEUTInputHandler::NEUTInputHandler(std::string const &handle,
   fEventType = kNEUT;
   fNeutVect = NULL;
   fNEUTTree->SetBranchAddress("vectorbranch", &fNeutVect);
+  #if defined(ROOT6) && defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
+  fNEUTTree->SetAutoDelete(true);
+  #endif
   fNEUTTree->GetEntry(0);
 
   // Create Fit Event
@@ -288,12 +291,17 @@ int NEUTInputHandler::GetNeutParticleStatus(NeutPart *part) {
   } else if (part->fIsAlive == true) {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-               << " PDG: " << part->fPID);
+               << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
+  } else if (abs(fNeutVect->Mode) == 35){
+    NUIS_ERR(WRN, "Marking nonsensical CC difractive event as undefined "
+	     << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
+	     << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
+    state = kUndefinedState;
     // Warn if we find dead particles that we haven't classified
   } else {
     NUIS_ABORT("Undefined NEUT state "
                << " Alive: " << part->fIsAlive << " Status: " << part->fStatus
-               << " PDG: " << part->fPID);
+               << " PDG: " << part->fPID << " Mode: " << fNeutVect->Mode);
   }
 
   return state;
@@ -326,7 +334,7 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
     fNUISANCEEvent->ExpandParticleStack(npart);
   }
 
-  int nprimary = fNeutVect->Nprimary();
+  UInt_t nprimary = fNeutVect->Nprimary();
   // Fill Particle Stack
   for (size_t i = 0; i < npart; i++) {
     // Get Current Count
@@ -391,6 +399,10 @@ void NEUTInputHandler::CalcNUISANCEKinematics() {
 
   return;
 }
+
+#endif
+
+#ifdef NEED_FILL_NEUT_COMMONS
 
 void NEUTUtils::FillNeutCommons(NeutVect *nvect) {
   // WARNING: This has only been implemented for a neuttree and not GENIE

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -43,7 +43,7 @@ enum PRD93112012_Ana {
 
 bool isT2K_CC0pi(FitEvent *event, double EnuMin, double EnuMax,
                  int analysis);
-                 
+
 bool isT2K_CC0piNp(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi1p(FitEvent *event, double EnuMin, double EnuMax);
 bool isT2K_CC0pi0p(FitEvent *event, double EnuMin, double EnuMax);

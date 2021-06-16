@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -24,7 +24,7 @@ MiniBooNE_CC1pi0_XSec_1Dppi0_nu::MiniBooNE_CC1pi0_XSec_1Dppi0_nu(nuiskey confkey
   // 1. Initalise sample Settings (all overrideable in cardfile) --------------
   fSettings = LoadSampleSettings(confkey); // Must go first
   fSettings.SetDescription("");
-  fSettings.SetXTitle("p_{#pi^{0}} (GeV/c)");
+  fSettings.SetXTitle("p_{#pi^{0}} (GeV)");
   fSettings.SetYTitle("d#sigma/dp_{#pi^{0}} (cm^{2}/GeV/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.5, 2.0);

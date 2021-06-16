@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -33,8 +33,8 @@ MiniBooNE_CC1pip_XSec_1DQ2_nu::MiniBooNE_CC1pip_XSec_1DQ2_nu(nuiskey samplekey) 
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
-  fSettings.SetYTitle("d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/MeV^{2}/CH_{2})");
+  fSettings.SetXTitle("Q^{2}_{CC#pi^{+}} (GeV^{2})");
+  fSettings.SetYTitle("d#sigma/dQ_{CC#pi^{+}}^{2} (cm^{2}/GeV^{2}/CH_{2})");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0); // No energy range given in v1r0
   fSettings.DefineAllowedTargets("C,H");
@@ -70,7 +70,7 @@ void  MiniBooNE_CC1pip_XSec_1DQ2_nu::FillEventVariables(FitEvent *event){
   TLorentzVector Pmu  = event->GetHMFSParticle(13)->fP;
 
   // No W cut on MiniBooNE CC1pi+
-  double q2 = -1*(Pnu-Pmu).Mag2();
+  double q2 = -1*(Pnu-Pmu).Mag2()/1e6;
 
   fXVar = q2;
 

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P. Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This ile is part of NUISANCE.
@@ -70,6 +70,7 @@ Measurement1D::Measurement1D(void) {
   fIsDifXSec = false;
   fIsEnu1D = false;
   fIsWriting = false;
+  fSaveFine = true;
 
   // Inputs
   fInput = NULL;
@@ -137,7 +138,6 @@ void Measurement1D::FinaliseSampleSettings() {
 
   if (fSettings.GetS("originalname").find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
                  << "not flux averaged!");
@@ -231,17 +231,11 @@ void Measurement1D::SetCovarFromDiagonal(TH1D *data) {
   if (data) {
     NUIS_LOG(SAM, "Setting diagonal covariance for: " << data->GetName());
     fFullCovar = StatUtils::MakeDiagonalCovarMatrix(data);
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar, true);
     fDecomp = StatUtils::GetDecomp(fFullCovar);
   } else {
     NUIS_ABORT("No data input provided to set diagonal covar from!");
   }
-
-  // if (!fIsDiag) {
-  //   ERR(FTL) << "SetCovarMatrixFromDiag called for measurement "
-  //            << "that is not set as diagonal." );
-  //   throw;
-  // }
 }
 
 //********************************************************************
@@ -254,7 +248,7 @@ void Measurement1D::SetCovarFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading covariance from text file: " << covfile);
   fFullCovar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -276,7 +270,7 @@ void Measurement1D::SetCovarFromMultipleTextFiles(std::string covfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -286,9 +280,9 @@ void Measurement1D::SetCovarFromRootFile(std::string covfile,
   //********************************************************************
 
   NUIS_LOG(SAM,
-           "Reading covariance from text file: " << covfile << ";" << histname);
+           "Reading covariance from root file: " << covfile << ";" << histname);
   fFullCovar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -302,7 +296,7 @@ void Measurement1D::SetCovarInvertFromTextFile(std::string covfile, int dim) {
 
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile);
   covar = StatUtils::GetCovarFromTextFile(covfile, dim);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -314,7 +308,7 @@ void Measurement1D::SetCovarInvertFromRootFile(std::string covfile,
   NUIS_LOG(SAM, "Reading inverted covariance from text file: " << covfile << ";"
                                                                << histname);
   covar = StatUtils::GetCovarFromRootFile(covfile, histname);
-  fFullCovar = StatUtils::GetInvert(covar);
+  fFullCovar = StatUtils::GetInvert(covar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -346,7 +340,7 @@ void Measurement1D::SetCorrelationFromTextFile(std::string covfile, int dim) {
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -378,7 +372,7 @@ void Measurement1D::SetCorrelationFromMultipleTextFiles(std::string corrfiles,
     (*fFullCovar) += (*temp_cov);
     delete temp_cov;
   }
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 }
 
@@ -409,7 +403,7 @@ void Measurement1D::SetCorrelationFromRootFile(std::string covfile,
   }
 
   // Fill other covars.
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete correlation;
@@ -431,7 +425,7 @@ void Measurement1D::SetCholDecompFromTextFile(std::string covfile, int dim) {
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(dim, trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -452,7 +446,7 @@ void Measurement1D::SetCholDecompFromRootFile(std::string covfile,
   (*trans) *= (*temp);
 
   fFullCovar = new TMatrixDSym(temp->GetNrows(), trans->GetMatrixArray(), "");
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete temp;
@@ -566,7 +560,7 @@ void Measurement1D::FinaliseMeasurement() {
     NUIS_LOG(SAM, "Have full covariance for sample "
                       << GetName()
                       << " but only using diagonal elements for likelihood");
-    size_t nbins = fFullCovar->GetNcols();
+    int nbins = fFullCovar->GetNcols();
     for (int i = 0; i < nbins; ++i) {
       for (int j = 0; j < nbins; ++j) {
         if (i != j) {
@@ -581,7 +575,7 @@ void Measurement1D::FinaliseMeasurement() {
   }
 
   if (!covar) {
-    covar = StatUtils::GetInvert(fFullCovar);
+    covar = StatUtils::GetInvert(fFullCovar, true);
   }
 
   if (!fDecomp) {
@@ -596,7 +590,7 @@ void Measurement1D::FinaliseMeasurement() {
   if (fIsShape && fShapeCovar && FitPar::Config().GetParB("UseShapeCovar")) {
     if (covar)
       delete covar;
-    covar = StatUtils::GetInvert(fShapeCovar);
+    covar = StatUtils::GetInvert(fShapeCovar, true);
     if (fDecomp)
       delete fDecomp;
     fDecomp = StatUtils::GetDecomp(fFullCovar);
@@ -640,7 +634,10 @@ void Measurement1D::FinaliseMeasurement() {
   std::string drawopts = FitPar::Config().GetParS("drawopts");
   if (drawopts.find("MODES") != std::string::npos) {
     fMCHist_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
-                                      ("True Channels"), fMCHist);
+				      ("True Channels"), fMCHist);
+    fMCHist_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
@@ -743,7 +740,7 @@ void Measurement1D::SetFitOptions(std::string opt) {
       NUIS_ERR(WRN, "ERROR: Fit Option '"
                         << fit_options_input.at(i)
                         << "' Provided is not allowed for this measurement.");
-      NUIS_ERR(WRN, "Fit Options should be provided as a '/' seperated list "
+      NUIS_ERR(WRN, "Fit Options should be provided as a '/' separated list "
                     "(e.g. FREE/DIAG/NORM)");
       NUIS_ABORT("Available options for " << fName << " are '" << fAllowedTypes
                                           << "'");
@@ -1197,11 +1194,11 @@ void Measurement1D::SetFakeDataValues(std::string fakeOption) {
   // Setup Covariances
   if (covar)
     delete covar;
-  covar = StatUtils::GetInvert(fFullCovar);
+  covar = StatUtils::GetInvert(fFullCovar, true);
 
   if (fDecomp)
     delete fDecomp;
-  fDecomp = StatUtils::GetInvert(fFullCovar);
+  fDecomp = StatUtils::GetDecomp(fFullCovar);
 
   delete tempdata;
 
@@ -1356,7 +1353,7 @@ void Measurement1D::Write(std::string drawOpt) {
   }
 
   // Write Fine Histogram
-  if (drawOpt.find("FINE") != std::string::npos)
+  if (fSaveFine && drawOpt.find("FINE") != std::string::npos)
     GetFineList().at(0)->Write();
 
   // Write Weighted Histogram
@@ -1487,9 +1484,11 @@ void Measurement1D::WriteShapePlot() {
   TH1D *mcShape = (TH1D *)fMCHist->Clone((fName + "_MC_SHAPE").c_str());
 
   TH1D *dataShape = (TH1D *)fDataHist->Clone((fName + "_data_SHAPE").c_str());
+  // Set the shape covariance to calculate the chi2
+  if (!fShapeCovar) SetShapeCovar();
+
   // Don't check error
-  if (fShapeCovar)
-    StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
+  if (fShapeCovar) StatUtils::SetDataErrorFromCov(dataShape, fShapeCovar, 1E-38, false);
 
   double shapeScale = 1.0;
   if (fIsRawEvents) {
@@ -1497,7 +1496,6 @@ void Measurement1D::WriteShapePlot() {
   } else {
     shapeScale = fDataHist->Integral("width") / fMCHist->Integral("width");
   }
-
   mcShape->Scale(shapeScale);
 
   std::stringstream ss;
@@ -1578,7 +1576,6 @@ void Measurement1D::SetupMeasurement(std::string inputfile, std::string type,
   fIsEnu1D = false;
   if (fName.find("XSec_1DEnu") != std::string::npos) {
     fIsEnu1D = true;
-    NUIS_LOG(SAM, "::" << fName << "::");
     NUIS_LOG(SAM,
              "Found XSec Enu measurement, applying flux integrated scaling, "
              "not flux averaged!");

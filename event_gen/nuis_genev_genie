@@ -1,0 +1,179 @@
+#!/bin/bash
+
+set -e
+
+if [ -z ${NUISANCE} ]; then
+  echo "[ERROR]: We need to be in a NUISANCE environment (\$NUISANCE should be set)."
+  exit 1
+fi
+
+PROBE="14"
+FLUX=""
+TARG=""
+NEVENTS=""
+OUPNAME=""
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+      -p|--probe)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      PROBE="$2"
+      echo "[OPT]: Using Probe PDG: ${PROBE}"
+      shift # past argument
+      ;;
+
+      -t|--target)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      TARG="$2"
+      echo "[OPT]: Using target declaration: ${TARG}"
+      shift # past argument
+      ;;
+
+      -f|--flux)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      FLUX="$2"
+      echo "[OPT]: Using flux declaration: ${FLUX}"
+      shift # past argument
+      ;;
+
+      -n|--nevents)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      NEVENTS="$2"
+      echo "[OPT]: Throwing ${NEVENTS} events."
+      shift # past argument
+      ;;
+
+      -o|--output-file)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${1} expected a value."
+        exit 1
+      fi
+
+      OUPNAME="$2"
+      echo "[OPT]: Writing to file: ${OUPNAME}"
+      shift # past argument
+      ;;
+
+    -?|--help)
+              # unknown option
+      echo "Arguments:"
+      echo -e "\tRequired:"
+      echo -e "\t  -t|--target <target declaration>   : e.g. \"CH\""
+      echo -e "\t  -f|--flux <file.root,histoname>    : hint: use nuis_get_flux_descriptor for a simple interface."
+      echo -e "\t  -n|--nevents <#num events>"
+      echo -e "\tOptional:"
+      echo -e "\t  -p|--probe <neutrino pdg>          : defaults to 14"
+      echo -e "\t  -o|--output-file <output.root>     : defaults to GENIE.<probepdg>.<flux_file>.<flux_hist>.<seed>.ghep.root"
+      echo -e ""
+      echo -e "\t  -?|--help"
+      exit 0
+      ;;
+
+
+      *)
+              # unknown option
+      echo "Unknown option $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+
+if [ -z ${FLUX} ]; then
+  echo "Please pass a flux declaration with the -f flag."
+  exit 2
+fi
+
+if [ -z ${NEVENTS} ]; then
+  echo "Please pass a number of events to generate with the -n flag."
+  exit 2
+fi
+
+OLDIFS=${IFS}
+IFS=","
+set -- ${FLUX}
+IFS=${OLDIFS}
+
+FLUX_FILE=${1}
+FLUX_HIST=${2}
+
+if [ -z {$FLUX_FILE} ] || [ -z {$FLUX_HIST} ]; then
+  echo -e "Please pass a flux declaration with the -f flag in the form \"-f file.root,histo_name\""
+  exit 2
+fi
+
+FLUX_FILE_NAME=${FLUX_FILE##*/}
+if [ ! -e ./${FLUX_FILE} ]; then
+  cp ${FLUX_FILE} ./
+fi
+
+SEED=${RANDOM}
+
+if [ -z ${OUPNAME} ]; then
+  OUPNAME=${GEN}.nu${PROBE}.${SEED}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.root
+fi
+
+if [ -e ${OUPNAME} ]; then
+   echo "Already have file: ${OUPNAME}, not overwriting."
+   exit 1
+fi
+
+TARG=$(nuis_get_GENIE_target_descriptor ${TARG})
+
+if [ -z ${GENIE_XSEC_FILE} ]; then
+  echo "Environment not set up correctly, GENIE_XSEC_FILE is empty"
+  exit 1
+fi
+if [ -z ${GENIE_XSEC_TUNE} ]; then
+  echo "Environment not set up correctly, GENIE_XSEC_TUNE is empty"
+  exit 1
+fi
+
+gevgen \
+ -p ${PROBE} -t ${TARG} \
+ -r ${SEED} -e 0.1,10 \
+ -f ${FLUX_FILE},${FLUX_HIST} \
+ -n ${NEVENTS} --seed ${SEED} \
+ --cross-sections ${GENIE_XSEC_FILE} \
+ --tune ${GENIE_XSEC_TUNE} \
+ --event-generator-list Default \
+ --message-thresholds Messenger_whisper.xml
+
+if [ -e gntp.${SEED}.ghep.root ]; then
+   rm -f input-flux.root
+   rm -f genie-mcjob-${SEED}.status
+
+   mv gntp.${SEED}.ghep.root ${OUPNAME}
+   PrepareGENIE -i ${OUPNAME} \
+               -f ${FLUX_FILE},${FLUX_HIST} \
+               -t ${TARG}
+else
+   echo "Failed to produce expected output file: gntp.${SEED}.ghep.root"
+   exit 1
+fi
+

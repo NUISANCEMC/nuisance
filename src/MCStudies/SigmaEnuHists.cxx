@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -228,7 +228,7 @@ void SigmaEnuHists::Write(std::string drawOpt) {
     if (PerE) {
       PerEify(h->second);
     }
-    h->second->Write();
+    h->second->Write((fName + "_" + h->second->GetName()).c_str());
   }
   for (std::map<int, TH1D *>::iterator h = GENIEModeHists.begin();
        h != GENIEModeHists.end(); ++h) {
@@ -237,7 +237,7 @@ void SigmaEnuHists::Write(std::string drawOpt) {
     if (PerE) {
       PerEify(h->second);
     }
-    h->second->Write();
+    h->second->Write((fName + "_" + h->second->GetName()).c_str());
   }
   for (std::map<int, TH1D *>::iterator h = TopologyHists.begin();
        h != TopologyHists.end(); ++h) {
@@ -246,7 +246,7 @@ void SigmaEnuHists::Write(std::string drawOpt) {
     if (PerE) {
       PerEify(h->second);
     }
-    h->second->Write();
+    h->second->Write((fName + "_" + h->second->GetName()).c_str());
   }
 }
 

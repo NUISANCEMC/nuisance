@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P towell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P towell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -285,8 +285,8 @@ public:
   /// set correctly. These should be specified as a string listing options.
   ///
   /// To split up options so that NUISANCE can automatically detect ones that
-  /// are conflicting. Any options seperated with the '/' symbol are non conflicting
-  /// and can be given together, whereas any seperated with the ',' symbol cannot
+  /// are conflicting. Any options separated with the '/' symbol are non conflicting
+  /// and can be given together, whereas any separated with the ',' symbol cannot
   /// be specified by the end user at the same time.
   ///
   /// Default Type Examples:
@@ -642,7 +642,7 @@ protected:
   bool fIsChi2;       ///< Flag : using Chi2 over LL methods
   bool fIsSmeared;    ///< Flag : Apply smearing?
   bool fIsWriting;
-
+  bool fSaveFine;
 
   /// OLD STUFF TO REMOVE
   TH1D* fMCHist_PDG[61]; ///< REMOVE OLD MC PDG Plot

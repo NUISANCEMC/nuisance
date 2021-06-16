@@ -19,8 +19,8 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1Dppi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("p_{#pi} (GeV/c)");
-  fSettings.SetYTitle("d#sigma/dp_{#pi} (cm^{2}/(GeV/c)/nucleon)");
+  fSettings.SetXTitle("p_{#pi} (GeV)");
+  fSettings.SetYTitle("d#sigma/dp_{#pi} (cm^{2}/GeV/nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -34,10 +34,10 @@ T2K_CC1pip_CH_XSec_1Dppi_nu::T2K_CC1pip_CH_XSec_1Dppi_nu(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                          "/data/T2K/CC1pip/CH/MomentumPion.root",
                       "Momentum_pion");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/MomentumPion.rootout.root",
+                           "/data/T2K/CC1pip/CH/MomentumPion.root",
                        "Momentum_pionCov");
 
   SetShapeCovar();

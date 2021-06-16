@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -78,6 +78,8 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(nuiskey samplekey) {
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
 
+  this->fPlotTitles = fSettings.GetFullTitles();
+
   // Usually the MCFine histogram is a finer binned version of MC Hist.
   // In this case we need to use it to save the true distribution before
   // smearing.
@@ -88,8 +90,8 @@ MiniBooNE_NCEL_XSec_Treco_nu::MiniBooNE_NCEL_XSec_Treco_nu(nuiskey samplekey) {
 };
 
 void MiniBooNE_NCEL_XSec_Treco_nu::Write(std::string arg) {
-  newFluxHist->Write("MB_NCEL_newFlux");
-  response_mat->Write("MB_NCEL_response matrix");
+  // newFluxHist->Write("MB_NCEL_newFlux");
+  response_mat->Write("MB_NCEL_response_matrix");
 
   Measurement1D::Write(arg);
   return;
@@ -158,8 +160,6 @@ bool MiniBooNE_NCEL_XSec_Treco_nu::isSignal(FitEvent *event) {
 void MiniBooNE_NCEL_XSec_Treco_nu::SetFluxHistogram(std::string dataFile) {
   this->newFluxHist = PlotUtils::GetTH1DFromFile(
       dataFile.c_str(), (this->fName + "Real Flux Hist"), "idgaf");
-
-  this->newFluxHist->Print();
   return;
 }
 // Read in the covariance matrix from the file specified in the constructor

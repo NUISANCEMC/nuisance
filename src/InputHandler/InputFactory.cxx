@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -20,6 +20,7 @@
 #include "FitEventInputHandler.h"
 #include "GENIEInputHandler.h"
 #include "GIBUUInputHandler.h"
+#include "GiBUUNativeInputHandler.h"
 #include "HistogramInputHandler.h"
 #include "NEUTInputHandler.h"
 #include "NUANCEInputHandler.h"
@@ -41,7 +42,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   switch (inpType) {
   case (kNEUT_Input):
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
     input = new NEUTInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
@@ -72,7 +73,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   case (kGiBUU_Input):
 #ifdef __GiBUU_ENABLED__
-    input = new GIBUUInputHandler(handle, newinputs);
+    input = new GiBUUNativeInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
                    << handle << " " << inpType << " " << inputs);

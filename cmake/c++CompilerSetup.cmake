@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -103,6 +103,7 @@ if(USE_OMP)
 endif()
 
 
+string(REPLACE ";" " " NUIS_EXE_FLAGS "${EXTRA_EXE_FLAGS}")
 
 string(STRIP ${CMAKE_CXX_FLAGS} CMAKE_CXX_FLAGS)
 string(STRIP ${CMAKE_CXX_FLAGS_RELEASE} CMAKE_CXX_FLAGS_RELEASE)

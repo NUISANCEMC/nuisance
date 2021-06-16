@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -214,13 +214,32 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
                             << " : " << parstate);
     }
 
+    bool ismirr = false;
+    if (key.Has("mirror_point")) {
+      ismirr = true;
+      mirror_param mir;
+      mir.mirror_value = key.GetD("mirror_point");
+      mir.mirror_above = key.GetB("mirror_above");
+      fMirroredParams[parname] = mir;
+      NUIS_LOG(FIT,
+               "\t\t" << parname << " is mirrored at " << mir.mirror_value
+                      << " "
+                      << (mir.mirror_above ? "from above" : "from below"));
+    }
+
     // Convert if required
     if (parstate.find("ABS") != std::string::npos) {
+      if (ismirr) {
+        NUIS_ABORT("Cannot mirror parameters with ABS state!");
+      }
       parnom = FitBase::RWAbsToSigma(partype, parname, parnom);
       parlow = FitBase::RWAbsToSigma(partype, parname, parlow);
       parhigh = FitBase::RWAbsToSigma(partype, parname, parhigh);
       parstep = FitBase::RWAbsToSigma(partype, parname, parstep);
     } else if (parstate.find("FRAC") != std::string::npos) {
+      if (ismirr) {
+        NUIS_ABORT("Cannot mirror parameters with FRAC state!");
+      }
       parnom = FitBase::RWFracToSigma(partype, parname, parnom);
       parlow = FitBase::RWFracToSigma(partype, parname, parlow);
       parhigh = FitBase::RWFracToSigma(partype, parname, parhigh);
@@ -247,23 +266,37 @@ void ComparisonRoutines::SetupComparisonsFromXML() {
     // Get Sample Options
     std::string samplename = key.GetS("name");
     std::string samplefile = key.GetS("input");
-
     std::string sampletype = key.Has("type") ? key.GetS("type") : "DEFAULT";
-
     double samplenorm = key.Has("norm") ? key.GetD("norm") : 1.0;
+
+    // Handle the samplefile name
+    std::string mc_type;
+    std::vector<std::string> sample_vect;
+    if (GeneralUtils::ParseToStr(samplefile, ":").size() > 1) {
+      mc_type = GeneralUtils::ParseToStr(samplefile, ":")[0];
+      std::string input_samples = GeneralUtils::ParseToStr(samplefile, ":")[1];
+      std::cout << "mc_type: " << mc_type << std::endl;
+      std::cout << "input_samples: " << input_samples << std::endl;
+      if (!input_samples.empty()) {
+        input_samples = GeneralUtils::ReplaceAll(input_samples, "(", "");
+        input_samples = GeneralUtils::ReplaceAll(input_samples, ")", "");
+      }
+      std::vector<std::string> sample_vect = GeneralUtils::ParseToStr(input_samples, ";");
+    }
 
     // Print out
     NUIS_LOG(FIT, "Read Sample " << i << ". : " << samplename << " ("
-                                 << sampletype << ") [Norm=" << samplenorm
-                                 << "]" << std::endl
-                                 << "                                -> input='"
-                                 << samplefile << "'");
+        << sampletype << ") [Norm=" << samplenorm << "]");
+    NUIS_LOG(FIT, "  |-> Input MC type = "<< mc_type <<" with " << sample_vect.size() << " input files");
+    for (uint j = 0; j < sample_vect.size(); ++j){
+      NUIS_LOG(FIT, "  |-> Input file #" << j << " = " << sample_vect[j]);
+    }
 
     // If FREE add to parameters otherwise continue
     if (sampletype.find("FREE") == std::string::npos) {
       if (samplenorm != 1.0) {
         NUIS_ERR(FTL, "You provided a sample normalisation but did not specify "
-                      "that the sample is free");
+            "that the sample is free");
         NUIS_ABORT("Change so sample contains type=\"FREE\" and re-run");
       }
       continue;
@@ -354,7 +387,33 @@ void ComparisonRoutines::SetFakeData() {
     fSampleFCN->ReconfigureAllEvents();
     fSampleFCN->SetFakeData("MC");
 
-    UpdateRWEngine(fCurVals);
+    std::map<std::string, double> CurVals_wmirr;
+    for (size_t i = 0; i < fParams.size(); ++i) {
+      std::string const &pname = fParams[i];
+      if (fMirroredParams.count(pname)) {
+        if (!fMirroredParams[pname].mirror_above &&
+            (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+          double xabove = fMirroredParams[pname].mirror_value - fCurVals[pname];
+          CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+          std::cout << "\t--Parameter " << pname << " mirrored from "
+            << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+            << std::endl;
+        } else if (fMirroredParams[pname].mirror_above &&
+            (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+          double xabove = fCurVals[pname] - fMirroredParams[pname].mirror_value;
+          CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+          std::cout << "\t--Parameter " << pname << " mirrored from "
+            << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+            << std::endl;
+        } else {
+          CurVals_wmirr[pname] = fCurVals[pname];
+        }
+      } else {
+        CurVals_wmirr[pname] = fCurVals[pname];
+      }
+    }
+
+    UpdateRWEngine(CurVals_wmirr);
 
     NUIS_LOG(FIT, "Set all data to fake MC predictions.");
   } else {
@@ -366,7 +425,7 @@ void ComparisonRoutines::SetFakeData() {
 }
 
 /*
-  Fitting Functions
+   Fitting Functions
 */
 //*************************************
 void ComparisonRoutines::UpdateRWEngine(
@@ -404,9 +463,47 @@ void ComparisonRoutines::Run() {
   for (UInt_t i = 0; i < fRoutines.size(); i++) {
     std::string routine = fRoutines.at(i);
 
-    NUIS_LOG(FIT, "Routine: " << routine);
+    // Mostly this is unnecessary information, so don't always print
+    if (fRoutines.size() > 1){
+      NUIS_LOG(FIT, "Routine: " << routine);
+    }
     if (!routine.compare("Compare")) {
-      UpdateRWEngine(fCurVals);
+
+      std::map<std::string, double> CurVals_wmirr;
+      for (size_t i = 0; i < fParams.size(); ++i) {
+        std::string const &pname = fParams[i];
+        if (fMirroredParams.count(pname)) {
+          std::cout << "MA? " << fMirroredParams[pname].mirror_above
+            << ", OVal: " << fCurVals[pname]
+            << ", MPoint: " << fMirroredParams[pname].mirror_value
+            << std::endl;
+          if (!fMirroredParams[pname].mirror_above &&
+              (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+            double xabove =
+              fMirroredParams[pname].mirror_value - fCurVals[pname];
+            CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+            std::cout << "\t--Parameter " << pname << " mirrored from "
+              << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+              << std::endl;
+          } else if (fMirroredParams[pname].mirror_above &&
+              (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+            double xabove =
+              fCurVals[pname] - fMirroredParams[pname].mirror_value;
+            CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+            std::cout << "\t--Parameter " << pname << " mirrored from "
+              << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+              << std::endl;
+          } else {
+            CurVals_wmirr[pname] = fCurVals[pname];
+          }
+        } else {
+          CurVals_wmirr[pname] = fCurVals[pname];
+        }
+        std::cout << "~~~~~~~" << pname << " : " << fCurVals[pname] << " -> "
+          << CurVals_wmirr[pname] << std::endl;
+      }
+
+      UpdateRWEngine(CurVals_wmirr);
       GenerateComparison();
       PrintState();
       SaveCurrentState();
@@ -428,7 +525,6 @@ void ComparisonRoutines::GenerateComparison() {
 //*************************************
 void ComparisonRoutines::PrintState() {
   //*************************************
-  NUIS_LOG(FIT, "------------");
 
   // Count max size
   int maxcount = 0;
@@ -437,13 +533,42 @@ void ComparisonRoutines::PrintState() {
   }
 
   // Header
-  NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
-                         << " = " << setw(10) << "Value"
-                         << " +- " << setw(10) << "Error"
-                         << " " << setw(8) << "(Units)"
-                         << " " << setw(10) << "Conv. Val"
-                         << " +- " << setw(10) << "Conv. Err"
-                         << " " << setw(8) << "(Units)");
+  if (fParams.size()){
+    NUIS_LOG(FIT, "------------");
+    NUIS_LOG(FIT, " #    " << left << setw(maxcount) << "Parameter "
+        << " = " << setw(10) << "Value"
+        << " +- " << setw(10) << "Error"
+        << " " << setw(8) << "(Units)");
+    // << " " << setw(10) << "Conv. Val"
+    // << " +- " << setw(10) << "Conv. Err"
+    // << " " << setw(8) << "(Units)");
+  }
+
+  std::map<std::string, double> CurVals_wmirr;
+  for (size_t i = 0; i < fParams.size(); ++i) {
+    std::string const &pname = fParams[i];
+    if (fMirroredParams.count(pname)) {
+      if (!fMirroredParams[pname].mirror_above &&
+          (fCurVals[pname] < fMirroredParams[pname].mirror_value)) {
+        double xabove = fMirroredParams[pname].mirror_value - fCurVals[pname];
+        CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value + xabove;
+        std::cout << "\t--Parameter " << pname << " mirrored from "
+          << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+          << std::endl;
+      } else if (fMirroredParams[pname].mirror_above &&
+          (fCurVals[pname] >= fMirroredParams[pname].mirror_value)) {
+        double xabove = fCurVals[pname] - fMirroredParams[pname].mirror_value;
+        CurVals_wmirr[pname] = fMirroredParams[pname].mirror_value - xabove;
+        std::cout << "\t--Parameter " << pname << " mirrored from "
+          << fCurVals[pname] << " -> " << CurVals_wmirr[pname]
+          << std::endl;
+      } else {
+        CurVals_wmirr[pname] = fCurVals[pname];
+      }
+    } else {
+      CurVals_wmirr[pname] = fCurVals[pname];
+    }
+  }
 
   // Parameters
   for (UInt_t i = 0; i < fParams.size(); i++) {
@@ -457,40 +582,47 @@ void ComparisonRoutines::PrintState() {
     if (fStateVals[syst].find("ABS") != std::string::npos) {
       curval = FitBase::RWSigmaToAbs(typestr, syst, curval);
       curerr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-                FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+          FitBase::RWSigmaToAbs(typestr, syst, 0.0));
       curunits = "(Abs.)";
     } else if (fStateVals[syst].find("FRAC") != std::string::npos) {
       curval = FitBase::RWSigmaToFrac(typestr, syst, curval);
       curerr = (FitBase::RWSigmaToFrac(typestr, syst, curerr) -
-                FitBase::RWSigmaToFrac(typestr, syst, 0.0));
+          FitBase::RWSigmaToFrac(typestr, syst, 0.0));
       curunits = "(Frac)";
     }
 
-    std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
-    double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
-    double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
-                      FitBase::RWSigmaToAbs(typestr, syst, 0.0));
+    // std::string convunits = "(" + FitBase::GetRWUnits(typestr, syst) + ")";
+    // double convval = FitBase::RWSigmaToAbs(typestr, syst, curval);
+    // double converr = (FitBase::RWSigmaToAbs(typestr, syst, curerr) -
+    //                   FitBase::RWSigmaToAbs(typestr, syst, 0.0));
 
     std::ostringstream curparstring;
 
-    curparstring << " " << setw(3) << left << i << ". " << setw(maxcount)
-                 << syst << " = " << setw(10) << curval << " +- " << setw(10)
-                 << curerr << " " << setw(8) << curunits << " " << setw(10)
-                 << convval << " +- " << setw(10) << converr << " " << setw(8)
-                 << convunits;
-
+    curparstring << " " << setw(3) << left << i << "  " << setw(maxcount)
+      << syst << " = " << setw(10) << Form("%.7lf", curval) << " +- " << setw(10)
+      << Form("%.7lf", curerr) << " " << setw(8) << curunits;
+    // << " " << setw(10);
+    // << convval << " +- " << setw(10) << converr << " " << setw(8)
+    // << convunits;
     NUIS_LOG(FIT, curparstring.str());
+
+    if (fMirroredParams.count(syst)) {
+      NUIS_LOG(FIT, "\t\t--> Mirrored at " << fMirroredParams[syst].mirror_value
+          << " to effective value "
+          << CurVals_wmirr[syst]);
+    }
   }
 
   NUIS_LOG(FIT, "------------");
   double like = fSampleFCN->GetLikelihood();
+  int ndof = fSampleFCN->GetNDOF();
   NUIS_LOG(FIT,
-           std::left << std::setw(46) << "Likelihood for JointFCN: " << like);
+      std::left << std::setw(55) << "Likelihood for JointFCN" << ": " << like << "/" << ndof);
   NUIS_LOG(FIT, "------------");
 }
 
 /*
-  Write Functions
+   Write Functions
 */
 //*************************************
 void ComparisonRoutines::SaveCurrentState(std::string subdir) {

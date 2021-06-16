@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -181,10 +181,10 @@ void SetupSystematicsFromXML();
   //! dir if not empty forces plots to be saved in a subdirectory of outputfile
   void SaveCurrentState(std::string subdir="");
 
-  //! Save starting predictions into a seperate folder
+  //! Save starting predictions into a separate folder
   void SaveNominal();
 
-  //! Save predictions before the main study is ran into a seperate folder
+  //! Save predictions before the main study is ran into a separate folder
   void SavePrefit();
 
   //! Save final outputs

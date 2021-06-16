@@ -406,7 +406,7 @@ void GENIEWeightEngine::IncludeDial(std::string name, double startval) {
   }
 
   // Set Value if given
-  if (startval != -999.9) {
+  if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(nuisenum, startval);
   }
 #endif

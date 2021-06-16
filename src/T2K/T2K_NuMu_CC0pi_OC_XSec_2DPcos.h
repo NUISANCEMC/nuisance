@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -52,16 +52,13 @@ public:
 
   TFile* fInputFile;
   TFile* fInputFileCov;
-  std::vector<TH1D*> fMCHistNuMuO_Slices;
-  std::vector<TH1D*> fDataHistNuMuO_Slices;
-  std::vector<TH1D*> fMCHistNuMuC_Slices;
-  std::vector<TH1D*> fDataHistNuMuC_Slices;
+  std::vector<TH1D*> fMCHist_Slices;
+  std::vector<TH1D*> fDataHist_Slices;
 
   double pmu, CosThetaMu;
-  string Target;
+  std::string Target;
   
   void FillMCSlice(double x, double y, double w);
-
   
 };
   

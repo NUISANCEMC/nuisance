@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -72,12 +72,36 @@ if(HAVENEUTCONFIG)
 
   LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
 
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG(-Wl,--allow-multiple-definition COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+
+  IF(COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
+    LIST(APPEND EXTRA_LINK_FLAGS -Wl,--allow-multiple-definition)
+  ENDIF()
+
+  CHECK_CXX_COMPILER_FLAG(-no-pie COMPILER_SUPPORTS_NO_PIE)
+  CHECK_CXX_COMPILER_FLAG(-fno-pie COMPILER_SUPPORTS_FNO_PIE)
+  CHECK_CXX_COMPILER_FLAG(-fno-PIE COMPILER_SUPPORTS_FNO_PIE_CAP)
+  if(COMPILER_SUPPORTS_NO_PIE)
+    set(PIE_FLAGS "-no-pie")
+  elseif(COMPILER_SUPPORTS_FNO_PIE)
+    set(PIE_FLAGS "-fno-pie")
+  elseif(COMPILER_SUPPOERTS_FNO_PIE_CAP)
+    set(PIE_FLAGS "-fno-PIE")
+  else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+  endif()
+
+  LIST(APPEND EXTRA_EXE_FLAGS
+    ${PIE_FLAGS})
+
   cmessage(STATUS "NEUT")
   cmessage(STATUS "     Version   : ${NEUT_VER}")
   cmessage(STATUS "     Flags     : ${NEUT_CXX_FLAGS}")
   cmessage(STATUS "     Includes  : ${NEUT_INCLUDE_DIRS}")
   cmessage(STATUS "     Link Dirs : ${NEUT_LINK_DIRS}")
   cmessage(STATUS "     Libs      : ${NEUT_LIBS}")
+  cmessage(STATUS "     Exe Flags : ${EXTRA_EXE_FLAGS}")
 
 
 else() # Everything better be set up already
@@ -107,6 +131,7 @@ else() # Everything better be set up already
   LIST(APPEND EXTRA_CXX_FLAGS
     -I${NEUT_ROOT}/include
     -I${NEUT_ROOT}/src/neutclass)
+
   LIST(APPEND EXTRA_LINK_DIRS
     ${NEUT_LIB_DIR}
     ${CERN}/${CERN_LEVEL}/lib)

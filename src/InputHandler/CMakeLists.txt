@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -27,6 +27,7 @@ NEUTInputHandler.cxx
 GENIEInputHandler.cxx
 NuWroInputHandler.cxx
 GIBUUInputHandler.cxx
+GiBUUNativeInputHandler.cxx
 NUANCEInputHandler.cxx
 InputHandler.cxx
 NuanceEvent.cxx
@@ -50,6 +51,7 @@ NEUTInputHandler.h
 GENIEInputHandler.h
 NuWroInputHandler.h
 GIBUUInputHandler.h
+GiBUUNativeInputHandler.h
 NUANCEInputHandler.h
 InputHandler.h
 NuanceEvent.h
@@ -78,7 +80,7 @@ endif()
 include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${ExtFit_VERSION_MAJOR}.${ExtFit_VERSION_MINOR}.${ExtFit_VERSION_REVISION}")
+  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
 #set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
 
 if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)

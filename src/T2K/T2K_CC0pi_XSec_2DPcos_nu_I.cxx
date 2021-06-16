@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -40,9 +40,8 @@ T2K_CC0pi_XSec_2DPcos_nu_I::T2K_CC0pi_XSec_2DPcos_nu_I(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("P_{#mu} (GeV)");
-  fSettings.SetYTitle("cos#theta_{#mu}");
-  fSettings.SetZTitle("d^{2}#sigma/dP_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
+  fSettings.SetXTitle("cos#theta_{#mu}-p_{#mu} (GeV)");
+  fSettings.SetYTitle("d^{2}#sigma/dp_{#mu}dcos#theta_{#mu} (cm^{2}/GeV)");
   fSettings.SetAllowedTypes("FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
                             "FIX/FULL");
   fSettings.DefineAllowedTargets("C,H");
@@ -71,6 +70,7 @@ T2K_CC0pi_XSec_2DPcos_nu_I::T2K_CC0pi_XSec_2DPcos_nu_I(nuiskey samplekey) {
 
   // Final setup  ---------------------------------------------------
   FinaliseMeasurement();
+  fSaveFine = false;
 };
 
 bool T2K_CC0pi_XSec_2DPcos_nu_I::isSignal(FitEvent *event) {
@@ -90,6 +90,8 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::FillEventVariables(FitEvent *event) {
 
   fXVar = pmu;
   fYVar = CosThetaMu;
+
+  fMode = event->Mode;
 
   return;
 };
@@ -124,7 +126,34 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::ConvertEventRates() {
       fMCHist->SetBinContent(bincount + 1,
                              fMCHist_Slices[i]->GetBinContent(j + 1));
       fMCHist->SetBinError(bincount + 1, fMCHist_Slices[i]->GetBinError(j + 1));
+
       bincount++;
+    }
+  }
+
+  if (fMCHist_Modes) {
+    fMCHist_Modes->Reset();
+
+    for (std::map<int, std::vector<TH1D *> >::iterator it =
+             fMCModeHists_Slices.begin();
+         it != fMCModeHists_Slices.end(); ++it) {
+
+      bincount = 0;
+      for (size_t i = 0; i < nangbins; i++) {
+        it->second[i]->Scale(fScaleFactor / (angular_binning_costheta[i + 1] -
+                                             angular_binning_costheta[i]),
+                             "width");
+
+        for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++) {
+          fMCHist_Modes->SetBinContent(it->first, bincount + 1, 0, 0,
+                                       it->second[i]->GetBinContent(j + 1));
+          fMCHist_Modes->SetBinError(it->first, bincount + 1, 0, 0,
+                                     it->second[i]->GetBinError(j + 1));
+
+                bincount++;
+
+        }
+      }
     }
   }
 
@@ -133,10 +162,24 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::ConvertEventRates() {
 
 void T2K_CC0pi_XSec_2DPcos_nu_I::FillMCSlice(double x, double y, double w) {
 
+  if (fMCHist_Modes && !fMCModeHists_Slices.count(fMode)) {
+    for (size_t i = 0; i < nangbins; ++i) {
+      std::stringstream ss("");
+      ss << "T2K_CC0pi_XSec_2DPcos_nu_I_MODE_ " << fMode << "_slice" << i
+         << std::endl;
+      fMCModeHists_Slices[fMode].push_back(
+          static_cast<TH1D *>(fMCHist_Slices[i]->Clone(ss.str().c_str())));
+      fMCModeHists_Slices[fMode].back()->Reset();
+    }
+  }
+
   for (size_t i = 0; i < nangbins; ++i) {
     if ((y >= angular_binning_costheta[i]) &&
         (y < angular_binning_costheta[i + 1])) {
       fMCHist_Slices[i]->Fill(x, w);
+      if (fMCHist_Modes) {
+        fMCModeHists_Slices[fMode][i]->Fill(x, w);
+      }
     }
   }
 }
@@ -146,11 +189,14 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
   // Read in 1D Data Histograms
   TFile input(
       (FitPar::GetDataBase() + "/T2K/CC0pi/T2K_CC0PI_2DPmuCosmu_Data.root")
-          .c_str(),
-      "READ");
+          .c_str(), "READ");
   fMCHist_Fine2D = new TH2D("T2K_CC0pi_XSec_2DPcos_nu_I_Fine2D",
-                            "T2K_CC0pi_XSec_2DPcos_nu_I_Fine2D", 400, 0.0, 30.0,
-                            100, -1.0, 1.0);
+                            "T2K_CC0pi_XSec_2DPcos_nu_I_Fine2D", 
+			    400, 0.0, 30.0, 100, -1.0, 1.0);
+  fMCHist_Fine2D->GetXaxis()->SetTitle("p_{#mu} (GeV)");
+  fMCHist_Fine2D->GetYaxis()->SetTitle("cos#theta_{#mu}");
+  fMCHist_Fine2D->GetZaxis()->SetTitle(fSettings.GetYTitle().c_str());
+
   fMCHist_Fine2D->SetDirectory(NULL);
   SetAutoProcessTH1(fMCHist_Fine2D);
 
@@ -176,6 +222,8 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
               i, angular_binning_costheta[i],
               angular_binning_costheta[i + 1])));
     fDataHist_Slices.back()->SetDirectory(NULL);
+    fDataHist_Slices.back()->GetXaxis()->SetTitle("p_{#mu} (GeV)");
+    fDataHist_Slices.back()->GetYaxis()->SetTitle(fSettings.GetYTitle().c_str());
 
     // Loop over nbins and set errors from covar
     for (int j = 0; j < fDataHist_Slices[i]->GetNbinsX(); j++) {
@@ -215,9 +263,9 @@ void T2K_CC0pi_XSec_2DPcos_nu_I::SetHistograms() {
   covar = StatUtils::GetInvert(fFullCovar);
   fDecomp = StatUtils::GetDecomp(fFullCovar);
 
-  fDataHist =
-      new TH1D("T2K_CC0pi_XSec_2DPcos_nu_I_DATA_1D",
-               "T2K_CC0pi_XSec_2DPcos_nu_I_DATA_1D", bincount, 0, bincount);
+  fDataHist = new TH1D("T2K_CC0pi_XSec_2DPcos_nu_I_data_1D",
+		       ("T2K_CC0pi_XSec_2DPcos_nu_I_data_1D"+fSettings.PlotTitles()).c_str(), 
+		       bincount, 0, bincount);
   fDataHist->SetDirectory(NULL);
   for (size_t i = 0; i < data_slice_bcbes.size(); ++i) {
     fDataHist->SetBinContent(i + 1, data_slice_bcbes[i].first);

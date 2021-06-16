@@ -25,18 +25,20 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
            << Gaussian_Method
            << " for the Gaussian enhancement, so will die now...");
   }
+  // The NUISANCE calculators
   fWeightCalculators.push_back(GaussianMode);
   fWeightCalculators.push_back(new ModeNormCalc());
   fWeightCalculators.push_back(new SBLOscWeightCalc());
   fWeightCalculators.push_back(new BeRPACalc());
+  fWeightCalculators.push_back(new MINOSRPA());
+  fWeightCalculators.push_back(new LagrangeRPA());
 
+  // The MINERvA calculators that rely on GENIE variables (so need GENIE support)
 #ifdef __MINERVA_RW_ENABLED__
 #ifdef __GENIE_ENABLED__
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_QE());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_MEC());
   fWeightCalculators.push_back(new nuisance::reweight::MINERvAReWeight_RES());
-  fWeightCalculators.push_back(new nuisance::reweight::MINOSRPA());
-  fWeightCalculators.push_back(new nuisance::reweight::LagrangeRPA());
   fWeightCalculators.push_back(new nuisance::reweight::RikRPA());
   fWeightCalculators.push_back(new nuisance::reweight::COHBrandon());
   fWeightCalculators.push_back(new nuisance::reweight::WEnhancement());
@@ -77,7 +79,7 @@ void NUISANCEWeightEngine::IncludeDial(std::string name, double startval) {
   }
 
   // Set Value if given
-  if (startval != -999.9) {
+  if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(nuisenum, startval);
   }
 };
@@ -98,6 +100,8 @@ void NUISANCEWeightEngine::SetDialValue(std::string name, double val) {
 
 void NUISANCEWeightEngine::Reconfigure(bool silent) {
   for (size_t i = 0; i < fNUISANCEEnums.size(); i++) {
+    // Is this parameter handled
+    bool IsHandledSomewhere = false;
     for (std::vector<NUISANCEWeightCalc *>::iterator calciter =
              fWeightCalculators.begin();
          calciter != fWeightCalculators.end(); calciter++) {
@@ -106,10 +110,17 @@ void NUISANCEWeightEngine::Reconfigure(bool silent) {
 
       if (nuiscalc->IsHandled(fNUISANCEEnums[i])) {
         nuiscalc->SetDialValue(fNUISANCEEnums[i], fValues[i]);
+        IsHandledSomewhere = true;
       }
     }
-  }
-}
+
+    // Check if this parameter is actually handled
+    if (!IsHandledSomewhere) {
+      std::string name = GetNameFromEnum(i);
+      NUIS_ABORT("NUISANCE parameter " << name << " (enum " << i << ") not enabled, can not continue!");
+    } // End check of it's handled
+  } // End loop over enums
+} // Return
 
 double NUISANCEWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;

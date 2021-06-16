@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -21,6 +21,17 @@
 #define BNL_CC1NPIP_EVT_1DQ2_NU_H_SEEN
 
 #include "Measurement1D.h"
+
+// T. Kitagaki et al. "Charged-current exclusive pion production in neutrino-deuterium interactions"
+// Physical Review D, Volume 34, Number 9, 1 Nov 1986
+// Figure 3
+//
+// Also see 
+// N. J. Baker et al. "Study of the isospin structure of single-pion production in charged-current neutrino interactions"
+// Physical Review D, Volume 23, Number 11, 1 June 1981
+//
+// K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints.
+// KEK Preprint 2003-48, RCNS-03-01, September 2003
 
 class BNL_CC1npip_Evt_1DQ2_nu : public Measurement1D {
 public:

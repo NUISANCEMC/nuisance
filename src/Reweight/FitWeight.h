@@ -4,6 +4,8 @@
 #include "WeightUtils.h"
 #include "WeightEngineBase.h"
 
+#define _UNDEF_DIAL_VALUE_ -9999.9
+
 #include <map>
 #include <vector>
 
@@ -17,8 +19,8 @@ public:
   bool HasRWEngine(int type);
 
   // Includes
-  void IncludeDial(std::string name, std::string type, double val = -9999.9);
-  void IncludeDial(std::string name, int type, double val = -9999.9);
+  void IncludeDial(std::string name, std::string type, double val = _UNDEF_DIAL_VALUE_);
+  void IncludeDial(std::string name, int type, double val = _UNDEF_DIAL_VALUE_);
 
   // Update RW Engines
   void Reconfigure(bool silent = false);

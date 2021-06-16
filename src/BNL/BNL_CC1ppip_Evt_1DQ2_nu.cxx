@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -17,15 +17,19 @@
 *    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-/**
- * Kitagaki et al. Phys Rev D, Volume 34, Number 9, 1 November 1986, p2254-2565
- * K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints.
- * KEK Preprint 2003-48, RCNS-03-01, September 2003
-*/
+// T. Kitagaki et al. "Charged-current exclusive pion production in neutrino-deuterium interactions"
+// Physical Review D, Volume 34, Number 9, 1 Nov 1986
+// Figure 3
+//
+// K. Furuno et al. NuInt02 proceedings, (supposedly published in Nucl. Phys. B but I never found it), Retreieved from KEK preprints.
+// KEK Preprint 2003-48, RCNS-03-01, September 2003
+// Figure 8
+//
+// Also see 
+// N. J. Baker et al. "Study of the isospin structure of single-pion production in charged-current neutrino interactions"
+// Physical Review D, Volume 23, Number 11, 1 June 1981
 
 #include "BNL_CC1ppip_Evt_1DQ2_nu.h"
-
-
 
 //********************************************************************
 BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
@@ -40,7 +44,7 @@ BNL_CC1ppip_Evt_1DQ2_nu::BNL_CC1ppip_Evt_1DQ2_nu(nuiskey samplekey) {
   // Setup common settings
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("Q^{2}_{CC#pi} (GeV^{2})");
+  fSettings.SetXTitle("Q^{2} (GeV^{2})");
   fSettings.SetYTitle("Number of events");
   fSettings.SetAllowedTypes("EVT/SHAPE/DIAG", "EVT/SHAPE/DIAG");
   fSettings.SetEnuRange(0.5, 6.0);

@@ -13,15 +13,24 @@
 #include "ANL_CC1ppip_Evt_1Dthpr_nu.h"
 #include "ANL_CC1ppip_XSec_1DEnu_nu.h"
 #include "ANL_CC1ppip_XSec_1DQ2_nu.h"
+#include "ANL_CC1ppip_Evt_1DWNpi_nu.h"
+#include "ANL_CC1ppip_Evt_1DWNmu_nu.h"
+#include "ANL_CC1ppip_Evt_1DWmupi_nu.h"
 // ANL CC1npip
 #include "ANL_CC1npip_Evt_1DQ2_nu.h"
 #include "ANL_CC1npip_Evt_1DcosmuStar_nu.h"
 #include "ANL_CC1npip_Evt_1Dppi_nu.h"
 #include "ANL_CC1npip_XSec_1DEnu_nu.h"
+#include "ANL_CC1npip_Evt_1DWNpi_nu.h"
+#include "ANL_CC1npip_Evt_1DWNmu_nu.h"
+#include "ANL_CC1npip_Evt_1DWmupi_nu.h"
 // ANL CC1pi0
 #include "ANL_CC1pi0_Evt_1DQ2_nu.h"
 #include "ANL_CC1pi0_Evt_1DcosmuStar_nu.h"
 #include "ANL_CC1pi0_XSec_1DEnu_nu.h"
+#include "ANL_CC1pi0_Evt_1DWNpi_nu.h"
+#include "ANL_CC1pi0_Evt_1DWNmu_nu.h"
+#include "ANL_CC1pi0_Evt_1DWmupi_nu.h"
 // ANL NC1npip (mm, exotic!)
 #include "ANL_NC1npip_Evt_1Dppi_nu.h"
 // ANL NC1ppim (mm, exotic!)
@@ -73,12 +82,27 @@
 #include "BNL_CC1ppip_Evt_1DcosthAdler_nu.h"
 #include "BNL_CC1ppip_Evt_1Dphi_nu.h"
 #include "BNL_CC1ppip_XSec_1DEnu_nu.h"
+#include "BNL_CC1ppip_Evt_1DWNpi_nu.h"
+#include "BNL_CC1ppip_Evt_1DWNmu_nu.h"
+#include "BNL_CC1ppip_Evt_1DWmupi_nu.h"
 // BNL CC1npip
 #include "BNL_CC1npip_Evt_1DQ2_nu.h"
 #include "BNL_CC1npip_XSec_1DEnu_nu.h"
+#include "BNL_CC1npip_Evt_1DWNpi_nu.h"
+#include "BNL_CC1npip_Evt_1DWNmu_nu.h"
+#include "BNL_CC1npip_Evt_1DWmupi_nu.h"
 // BNL CC1pi0
 #include "BNL_CC1pi0_Evt_1DQ2_nu.h"
 #include "BNL_CC1pi0_XSec_1DEnu_nu.h"
+#include "BNL_CC1pi0_Evt_1DWNpi_nu.h"
+#include "BNL_CC1pi0_Evt_1DWNmu_nu.h"
+#include "BNL_CC1pi0_Evt_1DWmupi_nu.h"
+// BNL multipi
+#include "BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.cxx"
+#include "BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu.cxx"
+#include "BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.cxx"
 #endif
 
 #ifndef __NO_FNAL__
@@ -159,6 +183,7 @@
 
 #ifndef __NO_MicroBooNE__
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
+#include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #endif
 
 #ifndef __NO_MINERvA__
@@ -191,6 +216,14 @@
 #include "MINERvA_CC1pip_XSec_1Dth_nu.h"
 // 2017 data update
 #include "MINERvA_CC1pip_XSec_1D_2017Update.h"
+
+// MINERvA CC1pi-
+#include "MINERvA_CC1pim_XSec_1DEnu_antinu.h"
+#include "MINERvA_CC1pim_XSec_1DQ2_antinu.h"
+#include "MINERvA_CC1pim_XSec_1DTpi_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dpmu_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dth_antinu.h"
+#include "MINERvA_CC1pim_XSec_1Dthmu_antinu.h"
 
 // MINERvA CCNpi+
 #include "MINERvA_CCNpip_XSec_1DEnu_nu.h"
@@ -263,7 +296,7 @@
 #include "T2K_nueCCinc_XSec_joint.h"
 
 // T2K STV CC0pi 2018
-#include "T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform.h"
+#include "T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddat_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddphit_nu.h"
 #include "T2K_CC0pinp_STV_XSec_1Ddpt_nu.h"
@@ -288,6 +321,8 @@
 #include "T2K_CC1pip_H2O_XSec_1Dcospi_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dpmu_nu.h"
 #include "T2K_CC1pip_H2O_XSec_1Dppi_nu.h"
+
+// add header here
 
 #endif
 
@@ -663,6 +698,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
   } else if (!name.compare("ANL_CC1ppip_Evt_1Dphi_nu")) {
     return (new ANL_CC1ppip_Evt_1Dphi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1ppip_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1ppip_Evt_1DWmupi_nu(samplekey));
     /*
       ANL CC1npip sample
     */
@@ -679,6 +720,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1npip_Evt_1Dppi_nu(samplekey));
   } else if (!name.compare("ANL_CC1npip_Evt_1DcosmuStar_nu")) {
     return (new ANL_CC1npip_Evt_1DcosmuStar_nu(samplekey));
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1npip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1npip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1npip_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1npip_Evt_1DWmupi_nu(samplekey));
     /*
       ANL CC1pi0 sample
     */
@@ -693,6 +740,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new ANL_CC1pi0_Evt_1DQ2_nu(samplekey));
   } else if (!name.compare("ANL_CC1pi0_Evt_1DcosmuStar_nu")) {
     return (new ANL_CC1pi0_Evt_1DcosmuStar_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWNpi_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWNmu_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("ANL_CC1pi0_Evt_1DWmupi_nu")) {
+    return (new ANL_CC1pi0_Evt_1DWmupi_nu(samplekey));
     /*
       ANL NC1npip sample
     */
@@ -747,10 +800,10 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else
 #endif
 #ifndef __NO_ArgoNeuT__
-      if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
-    return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
-  } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
-    return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(samplekey));
+    if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
+      return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
+    } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
+      return (new ArgoNeuT_CCInc_XSec_1Dpmu_nu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_antinu")) {
     return (new ArgoNeuT_CCInc_XSec_1Dthetamu_antinu(samplekey));
   } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dthetamu_nu")) {
@@ -798,6 +851,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new BNL_CC1ppip_Evt_1DcosthAdler_nu(samplekey));
   } else if (!name.compare("BNL_CC1ppip_Evt_1Dphi_nu")) {
     return (new BNL_CC1ppip_Evt_1Dphi_nu(samplekey));
+  } else if (!name.compare("BNL_CC1ppip_Evt_1DWNpi_nu")) {
+    return (new BNL_CC1ppip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("BNL_CC1ppip_Evt_1DWNmu_nu")) {
+    return (new BNL_CC1ppip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("BNL_CC1ppip_Evt_1DWmupi_nu")) {
+    return (new BNL_CC1ppip_Evt_1DWmupi_nu(samplekey));
 
     /*
       BNL CC1npip samples
@@ -807,6 +866,12 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new BNL_CC1npip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC1npip_Evt_1DQ2_nu")) {
     return (new BNL_CC1npip_Evt_1DQ2_nu(samplekey));
+  } else if (!name.compare("BNL_CC1npip_Evt_1DWNpi_nu")) {
+    return (new BNL_CC1npip_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("BNL_CC1npip_Evt_1DWNmu_nu")) {
+    return (new BNL_CC1npip_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("BNL_CC1npip_Evt_1DWmupi_nu")) {
+    return (new BNL_CC1npip_Evt_1DWmupi_nu(samplekey));
     /*
       BNL CC1pi0 samples
     */
@@ -814,7 +879,25 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new BNL_CC1pi0_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CC1pi0_Evt_1DQ2_nu")) {
     return (new BNL_CC1pi0_Evt_1DQ2_nu(samplekey));
-
+  } else if (!name.compare("BNL_CC1pi0_Evt_1DWNpi_nu")) {
+    return (new BNL_CC1pi0_Evt_1DWNpi_nu(samplekey));
+  } else if (!name.compare("BNL_CC1pi0_Evt_1DWNmu_nu")) {
+    return (new BNL_CC1pi0_Evt_1DWNmu_nu(samplekey));
+  } else if (!name.compare("BNL_CC1pi0_Evt_1DWmupi_nu")) {
+    return (new BNL_CC1pi0_Evt_1DWmupi_nu(samplekey));
+    /*
+      BNL multi-pi
+    */
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC2pi_1pim1pip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC3pi_1pim2pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC3pi_1pim2pip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC4pi_2pim2pip_XSec_1DEnu_nu")) {
+     return (new BNL_CC4pi_2pim2pip_XSec_1DEnu_nu(samplekey));
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu")) {
+     return (new BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu(samplekey));
+  } else if (!name.compare("BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu")) {
+     return (new BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu(samplekey));
     /*
       FNAL Samples
     */
@@ -1002,12 +1085,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
       /*
       MicroBooNE Samples
       */
-
-      /*
-        MicroBooNE CCinclusive
-      */
       if (!name.compare("MicroBooNE_CCInc_XSec_2DPcos_nu")) {
     return (new MicroBooNE_CCInc_XSec_2DPcos_nu(samplekey));
+  } else if (!name.compare("MicroBooNE_CC1MuNp_XSec_1DPmu_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosmu_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1DPp_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dcosp_nu") ||
+             !name.compare("MicroBooNE_CC1MuNp_XSec_1Dthetamup_nu")) {
+    return (new MicroBooNE_CC1MuNp_XSec_1D_nu(samplekey));
   } else
 #endif
 
@@ -1110,6 +1195,26 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CC1pip_XSec_1DEnu_nu_2017")) {
     return (new MINERvA_CC1pip_XSec_1D_2017Update(samplekey));
     /*
+      CC1pi-
+    */
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DEnu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DEnu_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DQ2_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DQ2_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1DTpi_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1DTpi_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dpmu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dpmu_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dth_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dth_antinu(samplekey));
+
+  } else if (!name.compare("MINERvA_CC1pim_XSec_1Dthmu_antinu")) {
+    return (new MINERvA_CC1pim_XSec_1Dthmu_antinu(samplekey));
+    /*
       CCNpi+
     */
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dth_nu") ||
@@ -1125,8 +1230,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2016") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg") ||
              !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_fluxcorr") ||
-             !name.compare(
-                 "MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
+             !name.compare("MINERvA_CCNpip_XSec_1DTpi_nu_2015_20deg_fluxcorr")) {
     return (new MINERvA_CCNpip_XSec_1DTpi_nu(samplekey));
 
   } else if (!name.compare("MINERvA_CCNpip_XSec_1Dthmu_nu")) {
@@ -1272,14 +1376,14 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
   } else if (!name.compare("T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint")) {
     return (new T2K_NuMu_CC0pi_OC_XSec_2DPcos_joint(samplekey));
-    
+
   } else if (!name.compare("T2K_NuMu_CC0pi_CH_XSec_2DPcos") ||
              !name.compare("T2K_AntiNuMu_CC0pi_CH_XSec_2DPcos")) {
     return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos(samplekey));
 
   } else if (!name.compare("T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint")) {
     return (new T2K_NuMuAntiNuMu_CC0pi_CH_XSec_2DPcos_joint(samplekey));
-    
+
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_FHC") ||
              !name.compare("T2K_nueCCinc_XSec_1Dpe_RHC") ||
              !name.compare("T2K_nuebarCCinc_XSec_1Dpe_RHC")) {
@@ -1289,7 +1393,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 	     !name.compare("T2K_nueCCinc_XSec_1Dthe_RHC") ||
 	     !name.compare("T2K_nuebarCCinc_XSec_1Dthe_RHC")) {
     return (new T2K_nueCCinc_XSec_1Dthe(samplekey));
-    
+
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dpe_joint")) {
     return (new T2K_nueCCinc_XSec_1Dpe_joint(samplekey));
   } else if (!name.compare("T2K_nueCCinc_XSec_1Dthe_joint")) {
@@ -1359,8 +1463,8 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else if (!name.compare("T2K_CC0pinp_STV_XSec_1Ddat_nu")) {
     return (new T2K_CC0pinp_STV_XSec_1Ddat_nu(samplekey));
 
-  } else if (!name.compare("T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform")) {
-    return (new T2K_CC0pi1p_XSec_3DPcoscos_nu_nonuniform(samplekey));
+  } else if (!name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_0p") || !name.compare("T2K_CC0piWithProtons_XSec_2018_multidif_1p")) {
+    return (new T2K_CC0piWithProtons_XSec_2018_multidif_0p_1p_Np(samplekey));
 
   } else if (!name.compare("T2K_CC0pinp_ifk_XSec_3Dinfp_nu")) {
     return (new T2K_CC0pinp_ifk_XSec_3Dinfp_nu(samplekey));
@@ -1442,9 +1546,9 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
              name.find("_FakeStudy") != std::string::npos) {
     return (
         new ExpMultDist_CCQE_XSec_2DVar_FakeStudy(name, file, rw, type, fkdt));
-  } else if (name.find("GenericFlux_") != std::string::npos) {
+  } else if (name.find("GenericFlux") != std::string::npos) {
     return (new GenericFlux_Tester(name, file, rw, type, fkdt));
-  } else if (name.find("GenericVectors_") != std::string::npos) {
+  } else if (name.find("GenericVectors") != std::string::npos) {
     return (new GenericFlux_Vectors(name, file, rw, type, fkdt));
   } else if (!name.compare("T2K2017_FakeData")) {
     return (new T2K2017_FakeData(samplekey));

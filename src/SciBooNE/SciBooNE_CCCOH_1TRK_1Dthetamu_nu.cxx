@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -54,12 +54,13 @@ SciBooNE_CCCOH_1TRK_1Dthetamu_nu::SciBooNE_CCCOH_1TRK_1Dthetamu_nu(nuiskey sampl
                                                  PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
   this->fPIDStack  = new SciBooNEUtils::MainPIDStack(fSettings.Name() + "_MainPID",
 						     "Main PID" + fSettings.PlotTitles(),
-						     PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()));
+						     PlotUtils::GetTH1DFromFile(fSettings.GetDataInput(), fSettings.GetName()+"_MainPID"));
   SetAutoProcessTH1(fMCStack);
   SetAutoProcessTH1(fPIDStack);
 
-  double nTargets = 10.6E6/13.*6.022E23;
-  this->fScaleFactor = GetEventHistogram()->Integral()*13.*1E-38/double(fNEvents)*nTargets;
+  double nTargets = 10.6E6/1.6749E-27*1E-3;
+  double pot = FitPar::Config().GetParD("SciBooNEScale");
+  this->fScaleFactor = GetEventHistogram()->Integral()*1E-38/double(fNEvents)*nTargets*pot;
 
   FinaliseMeasurement();
 

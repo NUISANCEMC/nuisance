@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -43,6 +43,13 @@ MINERvA_CC1pip_XSec_1DTpi_nu.cxx
 MINERvA_CC1pip_XSec_1Dth_20deg_nu.cxx
 MINERvA_CC1pip_XSec_1Dth_nu.cxx
 MINERvA_CC1pip_XSec_1D_2017Update.cxx
+
+MINERvA_CC1pim_XSec_1DEnu_antinu.cxx
+MINERvA_CC1pim_XSec_1DQ2_antinu.cxx
+MINERvA_CC1pim_XSec_1Dthmu_antinu.cxx
+MINERvA_CC1pim_XSec_1Dpmu_antinu.cxx
+MINERvA_CC1pim_XSec_1Dth_antinu.cxx
+MINERvA_CC1pim_XSec_1DTpi_antinu.cxx
 
 MINERvA_CCNpip_XSec_1DEnu_nu.cxx
 MINERvA_CCNpip_XSec_1DQ2_nu.cxx
@@ -110,6 +117,13 @@ MINERvA_CC1pip_XSec_1DTpi_20deg_nu.h
 MINERvA_CC1pip_XSec_1DTpi_nu.h
 MINERvA_CC1pip_XSec_1Dth_20deg_nu.h
 MINERvA_CC1pip_XSec_1Dth_nu.h
+
+MINERvA_CC1pim_XSec_1DEnu_antinu.h
+MINERvA_CC1pim_XSec_1DQ2_antinu.h
+MINERvA_CC1pim_XSec_1Dthmu_antinu.h
+MINERvA_CC1pim_XSec_1Dpmu_antinu.h
+MINERvA_CC1pim_XSec_1Dth_antinu.h
+MINERvA_CC1pim_XSec_1DTpi_antinu.h
 
 MINERvA_CCNpip_XSec_1DEnu_nu.h
 MINERvA_CCNpip_XSec_1DQ2_nu.h

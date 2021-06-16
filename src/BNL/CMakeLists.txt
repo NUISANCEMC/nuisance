@@ -1,4 +1,4 @@
-# Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+# Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 ################################################################################
 #    This file is part of NUISANCE.
@@ -19,27 +19,55 @@
 set(IMPLFILES
 BNL_CC1npip_Evt_1DQ2_nu.cxx
 BNL_CC1npip_XSec_1DEnu_nu.cxx
+BNL_CC1npip_Evt_1DWmupi_nu.cxx
+BNL_CC1npip_Evt_1DWNpi_nu.cxx
+BNL_CC1npip_Evt_1DWNmu_nu.cxx
 BNL_CC1pi0_Evt_1DQ2_nu.cxx
 BNL_CC1pi0_XSec_1DEnu_nu.cxx
+BNL_CC1pi0_Evt_1DWmupi_nu.cxx
+BNL_CC1pi0_Evt_1DWNpi_nu.cxx
+BNL_CC1pi0_Evt_1DWNmu_nu.cxx
 BNL_CC1ppip_Evt_1DQ2_nu.cxx
 BNL_CC1ppip_XSec_1DEnu_nu.cxx
+BNL_CC1ppip_Evt_1DWmupi_nu.cxx
+BNL_CC1ppip_Evt_1DWNpi_nu.cxx
+BNL_CC1ppip_Evt_1DWNmu_nu.cxx
 BNL_CCQE_Evt_1DQ2_nu.cxx
 BNL_CCQE_XSec_1DEnu_nu.cxx
 BNL_CC1ppip_Evt_1DcosthAdler_nu.cxx
 BNL_CC1ppip_Evt_1Dphi_nu.cxx
+BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.cxx
+BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.cxx
+BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.cxx
+BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu.cxx
+BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.cxx
 )
 
 set(HEADERFILES
 BNL_CC1npip_Evt_1DQ2_nu.h
 BNL_CC1npip_XSec_1DEnu_nu.h
+BNL_CC1npip_Evt_1DWmupi_nu.h
+BNL_CC1npip_Evt_1DWNpi_nu.h
+BNL_CC1npip_Evt_1DWNmu_nu.h
 BNL_CC1pi0_Evt_1DQ2_nu.h
 BNL_CC1pi0_XSec_1DEnu_nu.h
+BNL_CC1pi0_Evt_1DWmupi_nu.h
+BNL_CC1pi0_Evt_1DWNpi_nu.h
+BNL_CC1pi0_Evt_1DWNmu_nu.h
 BNL_CC1ppip_Evt_1DQ2_nu.h
 BNL_CC1ppip_XSec_1DEnu_nu.h
+BNL_CC1ppip_Evt_1DWmupi_nu.h
+BNL_CC1ppip_Evt_1DWNpi_nu.h
+BNL_CC1ppip_Evt_1DWNmu_nu.h
 BNL_CCQE_Evt_1DQ2_nu.h
 BNL_CCQE_XSec_1DEnu_nu.h
 BNL_CC1ppip_Evt_1DcosthAdler_nu.h
 BNL_CC1ppip_Evt_1Dphi_nu.h
+BNL_CC2pi_1pim1pip_XSec_1DEnu_nu.h
+BNL_CC3pi_1pim2pip_XSec_1DEnu_nu.h
+BNL_CC4pi_2pim2pip_XSec_1DEnu_nu.h
+BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu.h
+BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.h
 )
 
 set(LIBNAME expBNL)

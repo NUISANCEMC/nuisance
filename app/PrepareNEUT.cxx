@@ -95,9 +95,6 @@ void AddMonoRateHistogram(std::string inputList, double MonoE,
     entryHist->Fill(E);
     MeanE += E;
 
-    if (i % (nevts / 20) == 0) {
-      NUIS_LOG(FIT, "Processed " << i << "/" << nevts << " NEUT events.");
-    }
   }
   MeanE /= double(nevts);
   NUIS_LOG(FIT, "Processed all events");

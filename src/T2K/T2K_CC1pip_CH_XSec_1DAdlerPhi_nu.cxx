@@ -20,8 +20,8 @@ T2K_CC1pip_CH_XSec_1DAdlerPhi_nu::T2K_CC1pip_CH_XSec_1DAdlerPhi_nu(
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1DAdlerPhi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#phi_{Adler} (radians)");
-  fSettings.SetYTitle("d#sigma/d#phi_{Adler} (cm^{2}/rad/nucleon)");
+  fSettings.SetXTitle("#phi_{Adler} (rad.)");
+  fSettings.SetYTitle("d#sigma/d#phi_{Adler} (cm^{2}/rad./nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -35,10 +35,10 @@ T2K_CC1pip_CH_XSec_1DAdlerPhi_nu::T2K_CC1pip_CH_XSec_1DAdlerPhi_nu(
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/phi_adler.rootout.root",
+                          "/data/T2K/CC1pip/CH/phi_adler.root",
                       "Phi_Adler");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/phi_adler.rootout.root",
+                           "/data/T2K/CC1pip/CH/phi_adler.root",
                        "Phi_AdlerCov");
 
   SetShapeCovar();

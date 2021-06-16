@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is pddrt of NUISANCE.
@@ -463,3 +463,38 @@ int FitEvent::NumFSLeptons(void) const {
 
   return nLeptons;
 }
+
+// Get the outgoing lepton PDG depending on if it's a CC or NC event
+int FitEvent::GetLeptonOutPDG() {
+  // Make sure the outgoing lepton has the correct PDG
+  int pdgnu = PDGnu();
+  int PDGout;
+  if (IsCC()) {
+    if (pdgnu > 0) PDGout = pdgnu-1;
+    else PDGout = pdgnu+1;
+  } else {
+    PDGout = pdgnu;
+  }
+  return PDGout;
+}
+
+//********************************************************************
+// Returns the true Q2 of an event
+double FitEvent::GetQ2() {
+  FitParticle *neutrino = GetNeutrinoIn();
+  FitParticle *lepton = GetLeptonOut();
+  // Sometimes NEUT won't have an outgoing lepton because the event is Pauli blocked
+  if (!neutrino || !lepton) {
+    //if (!neutrino) std::cout << "no incoming neutrino!" << std::endl;
+    //if (!lepton) std::cout << "no outgoing lepton!" << std::endl;
+#ifdef __NEUT_ENABLED__
+    //fNeutVect->Dump();
+#endif
+    return -999;
+  }
+  double Q2 =
+    -1.0 * (lepton->P4() - neutrino->P4()) *
+    (lepton->P4() - neutrino->P4()) / 1.E6;
+  return Q2;
+}
+//********************************************************************

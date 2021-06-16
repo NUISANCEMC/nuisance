@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -1238,7 +1238,7 @@ void SplineRoutines::BuildEventSplines(int procchunk) {
     }
     weightsfile->Close();
 
-    // Add option to build seperate chunks
+    // Add option to build separate chunks
 
     // Close Output
     outputfile->Close();
@@ -1368,7 +1368,7 @@ void SplineRoutines::MergeEventSplinesChunks() {
 
     weightsfile->Close();
 
-    // Add option to build seperate chunks
+    // Add option to build separate chunks
 
     // Close Output
     outputfile->Close();

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -29,11 +29,6 @@ namespace SignalDef {
 // MINERvA CC1pi+/- signal definition (2015 release)
 // Note:  There is a 2016 release which is different to this (listed below), but
 // it is CCNpi+ and has a different W cut
-// Note2: The W cut is implemented in the class implementation in MINERvA/
-// rather than here so we can draw events that don't pass the W cut (W cut is
-// 1.4 GeV)
-//        Could possibly be changed for slight speed increase since less events
-//        would be used
 //
 // MINERvA signal is slightly different to MiniBooNE
 //
@@ -45,6 +40,7 @@ namespace SignalDef {
 // electron requirement, so look for + only here?
 // No restriction on neutral pions or other mesons
 // MINERvA has unfolded and not unfolded muon phase space for 2015
+// W_TRUE < 1.4 GeV
 //
 // Possible issues with the data:
 // 1) pi- is allowed in signal even when Michel cut included; most pi- is
@@ -91,8 +87,7 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
       return false;
   }
 
-  // Extract Hadronic Mass
-  double hadMass = FitUtils::Wrec(pnu, pmu);
+  double hadMass = 9999.99;
 
   // Actual cut is True GENIE Ws! Arg.! Use gNtpcConv definition.
 #ifdef __GENIE_ENABLED__
@@ -101,10 +96,22 @@ bool isCC1pip_MINERvA(FitEvent *event, double EnuMin, double EnuMax,
     const Interaction *interaction = gevent->Summary();
     const Kinematics &kine = interaction->Kine();
     double Ws = kine.W(true);
-    //    std::cout << "Ws versus WRec = " << Ws << " vs " << hadMass << " " <<
-    //    kine.W(false) << std::endl;
     hadMass = Ws * 1000.0;
   }
+#else
+  // Extract Hadronic Mass
+  // Cut is *INDEED* on Wtrue, not Wrec, so need to pass initial state nucleon too
+  // Either a proton or a nucleon
+  int nucPDG[] = {2212, 2112};
+  // This won't work perfectly for 2p2h though
+  FitParticle *part = event->GetHMISParticle(nucPDG);
+  // There may not be an initial state nucleon if it's a coherent event
+  if (part == NULL) {
+    return 9999.999;
+  }
+  TLorentzVector pnuc = part->P4();
+  hadMass = FitUtils::Wtrue(pnu, pmu, pnuc);
+
 #endif
   if (hadMass > 1400.0)
     return false;
@@ -139,6 +146,7 @@ bool isCC1pip_MINERvA_2017(FitEvent *event, double EnuMin, double EnuMax) {
   TLorentzVector pmu = event->GetHMFSParticle(13)->fP;
 
   // Extract Hadronic Mass
+  // This time it's Wrec, not Wtrue
   double hadMass = FitUtils::Wrec(pnu, pmu);
   // Cut on 2017 data is still 1.4 GeV
   if (hadMass > 1400.0)
@@ -390,6 +398,7 @@ bool isCC0pi_MINERvAPTPZ(FitEvent *event, int nuPDG, double emin, double emax) {
   if (genie_n_muons == 1 && genie_n_mesons == 0 &&
       genie_n_heavy_baryons_plus_pi0s == 0 && genie_n_photons == 0)
     return true;
+
   return false;
 }
 
@@ -507,6 +516,87 @@ bool isCC0piNp_MINERvA_STV(FitEvent *event, double EnuMin, double EnuMax) {
   if (MINERvAUtils::GetProtonInRange(event, 450, 1200, ctheta_cut).E() == 0)
     return false;
   return true;
-};
+}
+
+// Implemented 30 April 2021 by S. Gardiner
+// See header file for full description of signal definition
+bool isCC1pim_MINERvA(FitEvent* event, double EnuMin, double EnuMax)
+{
+  const int ANTI_NUMU = -14;
+  const int MU_PLUS = -13;
+
+  // A signal event must be numubar CC
+  if ( !isCCINC(event, ANTI_NUMU, EnuMin, EnuMax) ) return false;
+
+  // There should only be one final-state lepton (guaranteed to be mu+ by the
+  // previous check)
+  int nLeptons = event->NumFSLeptons();
+  if ( nLeptons != 1 ) return false;
+
+  // The event should contain exactly one negative pion
+  const int PI_MINUS = -211;
+  int nPiMinus = event->NumFSParticle( PI_MINUS );
+  if ( nPiMinus != 1 ) return false;
+
+  // No other mesons of any kind are allowed.
+  // TODO: reduce code duplication here (technique stolen from
+  // isCC0pi_anti_MINERvAPTPZ())
+  for ( unsigned int i = 0; i < event->NParticles(); ++i ) {
+
+    FitParticle* p = event->GetParticle( i );
+    if ( p->Status() != kFinalState ) continue;
+
+    int pdg = p->fPID;
+    int abs_pdg = std::abs( pdg );
+    if ( pdg == 211 || abs_pdg == 321 || abs_pdg == 323
+      || pdg == 111 || pdg == 130 || pdg == 310 || pdg == 311
+      || pdg == 313 || abs_pdg == 221 || abs_pdg == 331 )
+    {
+      // Go ahead and return immediately. We've failed the check if
+      // one or more of these mesons appears in the event.
+      return false;
+    }
+
+  } // particles in the event
+
+  // Any number of final-state nucleons is allowed, so we're done with
+  // the particle multiplicity requirements of the signal definition.
+  // Now we'll handle the kinematic limits.
+
+  // The signal is restricted to a muon scattering angle of less than 25
+  // degrees (for acceptance by MINOS).
+  TLorentzVector pnu = event->GetHMISParticle( ANTI_NUMU )->fP;
+  TLorentzVector pmu = event->GetHMFSParticle( MU_PLUS )->fP;
+
+  double th_nu_mu = FitUtils::th( pmu, pnu ) * 180. / M_PI;
+  if ( th_nu_mu >= 25. ) return false;
+
+  // The true antineutrino energy is restricted to lie on the interval
+  // (1.5, 10) GeV.
+  double Enubar = pnu.E() / 1e3; // Convert from MeV to GeV
+  if ( Enubar <= 1.5 || Enubar >= 10. ) return false;
+
+  // The experimental estimator W_exp for the hadronic invariant mass should be
+  // smaller than 1.8 GeV. See Eq. (6) of the publication.
+
+  // Negative square of the 4-momentum transfer (note that the masses in the
+  // PhysConst namespace are in GeV while the event 4-momenta are in MeV)
+  const double MeV2_to_GeV2 = 1e-6;
+  double Q2 = 2.*pnu.Dot( pmu )*MeV2_to_GeV2
+    - std::pow( PhysConst::mass_muon, 2 );
+
+  // Average (on-shell) nucleon mass (GeV)
+  double mN = ( PhysConst::mass_proton + PhysConst::mass_neutron ) / 2.;
+
+  // Muon total energy
+  double Emu = pmu.E() / 1e3; // Convert from MeV to GeV
+
+  double W_exp = std::sqrt( std::max(0., mN*mN + 2*mN*(Enubar - Emu) - Q2) );
+
+  if ( W_exp >= 1.8 ) return false;
+
+  // If we've made it this far, we've passed all the signal cuts
+  return true;
+}
 
 } // namespace SignalDef

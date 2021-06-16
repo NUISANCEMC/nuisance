@@ -18,8 +18,8 @@ T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(nuiskey samplekey) {
   fSettings = LoadSampleSettings(samplekey);
   fSettings.SetTitle("T2K_CC1pip_CH_XSec_1Dthpi_nu");
   fSettings.SetDescription(descrip);
-  fSettings.SetXTitle("#theta_{#pi} (radians)");
-  fSettings.SetYTitle("d#sigma/d#theta_{#pi} (cm^{2}/radians/nucleon)");
+  fSettings.SetXTitle("#theta_{#pi} (rad.)");
+  fSettings.SetYTitle("d#sigma/d#theta_{#pi} (cm^{2}/rad./nucleon)");
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C,H");
@@ -33,10 +33,10 @@ T2K_CC1pip_CH_XSec_1Dthpi_nu::T2K_CC1pip_CH_XSec_1Dthpi_nu(nuiskey samplekey) {
 
   // Plot Setup -------------------------------------------------------
   SetDataFromRootFile(GeneralUtils::GetTopLevelDir() +
-                          "/data/T2K/CC1pip/CH/Thetapion.rootout.root",
+                          "/data/T2K/CC1pip/CH/Thetapion.root",
                       "Theta_pion");
   SetCovarFromRootFile(GeneralUtils::GetTopLevelDir() +
-                           "/data/T2K/CC1pip/CH/Thetapion.rootout.root",
+                           "/data/T2K/CC1pip/CH/Thetapion.root",
                        "Theta_pionCov");
 
   SetShapeCovar();

@@ -64,6 +64,11 @@ void StackBase::SetupStack(TH1 *hist) {
   // Determine template dim
   fNDim = fTemplate->GetDimension();
 
+  // Sort out titles
+  fXTitle = hist->GetXaxis()->GetTitle();
+  fYTitle = hist->GetYaxis()->GetTitle();
+  fZTitle = hist->GetZaxis()->GetTitle();
+
   for (size_t i = 0; i < fAllLabels.size(); i++) {
     fAllHists.push_back(
         (TH1 *)fTemplate->Clone((fName + "_" + fAllLabels[i]).c_str()));
@@ -87,7 +92,7 @@ void StackBase::FillStack(int index, double x, double y, double z,
                           double weight) {
   if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
     NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
-                                                        << fAllLabels.size());
+                                                          << fAllLabels.size());
     return;
   }
 
@@ -103,11 +108,45 @@ void StackBase::FillStack(int index, double x, double y, double z,
     ((TH3 *)fAllHists[index])->Fill(x, y, z, weight);
 }
 
+void StackBase::SetBinContentStack(int index, int binx, int biny, int binz,
+                              double content) {
+  if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
+    NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
+                                                          << fAllLabels.size());
+    return;
+  }
+
+  if (fNDim == 1) {
+    fAllHists[index]->SetBinContent(binx, content);
+  } else if (fNDim == 2) {
+    ((TH2 *)fAllHists[index])->SetBinContent(binx, biny, content);
+  } else if (fNDim == 3) {
+    ((TH3 *)fAllHists[index])->SetBinContent(binx, biny, binz, content);
+  }
+}
+
+void StackBase::SetBinErrorStack(int index, int binx, int biny, int binz,
+                            double error) {
+  if (index < 0 or (UInt_t) index >= fAllLabels.size()) {
+    NUIS_ERR(WRN, "Returning Stack Fill Because Range = " << index << " "
+                                                          << fAllLabels.size());
+    return;
+  }
+
+  if (fNDim == 1) {
+    fAllHists[index]->SetBinError(binx, error);
+  } else if (fNDim == 2) {
+    ((TH2 *)fAllHists[index])->SetBinError(binx, biny, error);
+  } else if (fNDim == 3) {
+    ((TH3 *)fAllHists[index])->SetBinError(binx, biny, binz, error);
+  }
+}
+
 void StackBase::Write() {
   THStack *st = new THStack();
 
   // Loop and add all histograms
-  bool saveseperate = FitPar::Config().GetParB("WriteSeperateStacks");
+  bool saveseparate = FitPar::Config().GetParB("WriteSeparateStacks");
   for (size_t i = 0; i < fAllLabels.size(); i++) {
 
     if (!IncludeInStack(fAllHists[i]))
@@ -123,13 +162,14 @@ void StackBase::Write() {
     fAllHists[i]->SetLineWidth(fAllStyles[i][1]);
     fAllHists[i]->SetFillStyle(fAllStyles[i][2]);
     fAllHists[i]->SetFillColor(fAllStyles[i][0]);
-    if (saveseperate)
+    if (saveseparate)
       fAllHists[i]->Write();
 
     st->Add(fAllHists[i]);
   }
-  st->SetTitle(fTitle.c_str());
+  st->SetTitle((fTitle+";"+fXTitle+";"+fYTitle+";"+fZTitle).c_str());
   st->SetName(fName.c_str());
+
   st->Write();
   delete st;
 };

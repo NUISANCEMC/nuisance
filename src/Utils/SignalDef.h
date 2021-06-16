@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
 *    This file is part of NUISANCE.
@@ -27,7 +27,7 @@
 // ROOT includes
 #include <TLorentzVector.h>
 
-// ExtFit includes
+// NUISANCE includes
 #include "FitEvent.h"
 
 namespace SignalDef {

@@ -1,4 +1,4 @@
-// Copyright 2016 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
+// Copyright 2016-2021 L. Pickering, P Stowell, R. Terri, C. Wilkinson, C. Wret
 
 /*******************************************************************************
  *    This file is part of NUISANCE.
@@ -39,6 +39,9 @@ MiniBooNE_CC1pi0_XSec_1DEnu_nu::MiniBooNE_CC1pi0_XSec_1DEnu_nu(
   fSettings.SetAllowedTypes("FIX,FREE,SHAPE/FULL,DIAG/NORM/MASK", "FIX/FULL");
   fSettings.SetEnuRange(0.5, 2.0);
   fSettings.DefineAllowedTargets("C,H");
+
+  // Because this dataset seems to have a broken covariance, add a strong warning
+  NUIS_ERR(WRN, "Sample " << fSettings.GetName() << " is known to give nonsensical chi-square values!");
 
   // CCQELike plot information
   fSettings.SetTitle("MiniBooNE_CC1pi0_XSec_1DEnu_nu");

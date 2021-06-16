@@ -3,6 +3,26 @@
 
 #include "BaseFitEvt.h"
 #include "BeRPA.h"
+#ifdef __GENIE_ENABLED__
+#ifdef GENIE_PRE_R3
+#include "Conventions/Units.h"
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepParticle.h"
+#include "GHEP/GHepRecord.h"
+#include "GHEP/GHepUtils.h"
+#include "Ntuple/NtpMCEventRecord.h"
+#include "PDG/PDGUtils.h"
+#else
+#include "Framework/Conventions/Units.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/GHEP/GHepRecord.h"
+#include "Framework/GHEP/GHepUtils.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "Framework/ParticleData/PDGUtils.h"
+using namespace genie;
+#endif // End GENIE pre v3
+#endif // End GENIE enabled
 
 class NUISANCEWeightCalc {
   public:
@@ -34,6 +54,56 @@ class ModeNormCalc : public NUISANCEWeightCalc {
     bool IsHandled(int rwenum);
 
     double fNormRES;
+};
+
+// MINOS pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+class MINOSRPA : public NUISANCEWeightCalc {
+  public:
+    MINOSRPA();
+    ~MINOSRPA(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+    double GetRPAWeight(double Q2);
+
+    bool fTweaked;
+
+    bool fApply_MINOSRPA;
+
+    double fTwk_MINOSRPA_A;
+    double fDef_MINOSRPA_A;
+    double fCur_MINOSRPA_A;
+
+    double fTwk_MINOSRPA_B;
+    double fDef_MINOSRPA_B;
+    double fCur_MINOSRPA_B;
+
+};
+
+// MINERvA pion tuning, https://arxiv.org/pdf/1903.01558.pdf
+class LagrangeRPA : public NUISANCEWeightCalc {
+  public:
+    LagrangeRPA();
+    ~LagrangeRPA(){};
+
+    double CalcWeight(BaseFitEvt* evt);
+    void SetDialValue(std::string name, double val);
+    void SetDialValue(int rwenum, double val);
+    bool IsHandled(int rwenum);
+
+    double GetRPAWeight(double Q2);
+
+    bool fTweaked;
+
+    bool fApplyRPA;
+
+    double fR1;
+    double fR2;
+    double fR1_Def;
+    double fR2_Def;
 };
 
 class BeRPACalc : public NUISANCEWeightCalc {
