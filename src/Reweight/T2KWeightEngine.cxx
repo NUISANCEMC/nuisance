@@ -24,12 +24,15 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   }
 #else
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
-  if (!neut_card.size()) {
-    NUIS_ABORT(
-        "[ERROR]: When using T2KReWeight must set NEUT_CARD config option.");
+  if (neut_card.length() > 0 ){
+    t2krew::T2KNeutUtils::SetCardFile(neut_card);
+    StartTalking();
+    NUIS_LOG(FIT, "Using NEUT card file: " << neut_card);
+  } else {
+    t2krew::T2KNeutUtils::SetCardFile(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
+    StartTalking();
+    NUIS_LOG(FIT, "Using NEUT card file: " << std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
   }
-  NUIS_LOG(FIT, "Using NEUT card file: " << neut_card);
-  t2krew::T2KNeutUtils::SetCardFile(neut_card);
 #endif
   StartTalking();
 #endif
@@ -46,14 +49,6 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
 #else
   // Create Main RW Engine
   fT2KRW = new t2krew::T2KReWeight();
-
-  //Set NEUT card file
-  std::string card = FitPar::Config().GetParS("NEUT_CARD");
-  if(card.length() > 0 ){
-	t2krew::T2KNeutUtils::SetCardFile(FitPar::Config().GetParS("NEUT_CARD"));
-  }else{
-    t2krew::T2KNeutUtils::SetCardFile(std::string(std::getenv("NUISANCE"))+"/data/neut/neut_minimal_6t.card");
-  }
 
   // Setup Sub RW Engines (Only activated for neut and niwg)
   fT2KNeutRW = new t2krew::T2KNeutReWeight();
