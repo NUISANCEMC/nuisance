@@ -21,11 +21,20 @@ public:
   TBranch *b_Pz = 0;
   TBranch *b_E = 0;
 
+  // These are only if you build with the right options
+  TBranch *b_x = 0;
+  TBranch *b_y = 0;
+  TBranch *b_z = 0;
+
   std::vector<int> *pdg = 0;
   std::vector<double> *Px = 0;
   std::vector<double> *Py = 0;
   std::vector<double> *Pz = 0;
   std::vector<double> *E = 0;
+
+  std::vector<double> *x = 0;
+  std::vector<double> *y = 0;
+  std::vector<double> *z = 0;
 
   int mode;
   int process_ID;
@@ -58,7 +67,7 @@ int GetGiBUUNuPDG(int flavor_ID, int process_ID);
 
 int GetGiBUULepPDG(int flavor_ID, int process_ID);
 
-int CheckGiBUUParticleStatus(double E, double px, double py, double pz, int pdg);
+int CheckGiBUUParticleStatus(double E, int pdg, double dist);
 
 int ConvertModeGiBUUtoNEUT(int gibuu_mode, int process_ID, int struck_nucleon_pdg, int first_part_pdg);
 
