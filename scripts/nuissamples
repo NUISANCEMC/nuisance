@@ -18,8 +18,7 @@ for line in $(grep compare $NUISANCE/src/FCN/SampleList.cxx); do
   line=${line//\"/}
   line=${line//\{}
 
-  if [[ $line != *"$1"* ]];
-  then
+  if [[ $line != *$1* ]]; then
     continue
   fi
 
