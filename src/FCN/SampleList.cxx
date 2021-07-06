@@ -174,9 +174,6 @@
 #include "MiniBooNE_NC1pi0_XSec_1Dppi0_antinu.h"
 #include "MiniBooNE_NC1pi0_XSec_1Dppi0_nu.h"
 
-// MiniBooNE NC1pi0
-//#include "MiniBooNE_NCpi0_XSec_1Dppi0_nu.h"
-
 // MiniBooNE NCEL
 #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 #endif
