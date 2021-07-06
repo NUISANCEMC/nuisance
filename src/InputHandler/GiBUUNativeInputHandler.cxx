@@ -19,6 +19,10 @@ bool GiBUUEventReader::SetBranchAddresses(TChain* tn){
   tn->SetBranchAddress("Py", &Py, &b_Py);
   tn->SetBranchAddress("Pz", &Pz, &b_Pz);
   tn->SetBranchAddress("E", &E, &b_E);
+  
+  tn->SetBranchAddress("x", &x, &b_x);
+  tn->SetBranchAddress("y", &y, &b_y);
+  tn->SetBranchAddress("z", &z, &b_z);
 
   tn->SetBranchAddress("lepIn_Px", &lepIn_Px);
   tn->SetBranchAddress("lepIn_Py", &lepIn_Py);
@@ -161,24 +165,28 @@ int GetGiBUULepPDG(int flavor_ID, int process_ID){
 
 
 // Check whether the particle is on-shell or not
-int CheckGiBUUParticleStatus(double E, double px, double py, double pz, int pdg){
-  double mass = E*E - px*px - py*py - pz*pz;
-  if (mass > 0) mass = sqrt(mass);
+int CheckGiBUUParticleStatus(double E, int pdg, double dist){
+
   double onshell_mass = PhysConst::GetMass(pdg);
 
   // Hard code some other values used in GiBUU...
-  if (pdg == 2212 || pdg == 2112) onshell_mass = 0.938;  
+  if (pdg == 2212 || pdg == 2112) onshell_mass = 0.938;
   if (abs(pdg) == 211 || pdg == 111) onshell_mass = 0.138;
+
+  // If the particle is still within the nucleus, it's not final state
+  // Not that this depends on the nucleus, and too few time steps could cause an issue
+  // 6 fm is Ulrich's guess for Argon (and will be fine for smaller nuclei)
+  if (dist < 6) {
+    return kFSIState;
+  }
   
   // Check for unknown particles and default to on shell
   if (onshell_mass == -1) return kFinalState;
 
-  // Give 1% leeway...
-  if (fabs((onshell_mass - mass)/onshell_mass)  < 0.01){
-    return kFinalState;
-  }
-  
-  return kFSIState;
+  // Ulrich's second criteria
+  if (E < onshell_mass) return kFSIState;
+
+  return kFinalState;
 }
 
 
@@ -276,6 +284,9 @@ FitEvent *GiBUUNativeInputHandler::GetNuisanceEvent(const UInt_t ent,
   
   fGiBUUTree->GetEntry(entry);
 
+  fNUISANCEEvent->ResetEvent();
+  fNUISANCEEvent->fEventNo = entry;
+
   // Run NUISANCE Vector Filler
   if (!lightweight) {
     CalcNUISANCEKinematics();
@@ -294,12 +305,12 @@ FitEvent *GiBUUNativeInputHandler::GetNuisanceEvent(const UInt_t ent,
 
 void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
   // Reset all variables
-  fNUISANCEEvent->ResetEvent();
+  // fNUISANCEEvent->ResetEvent();
   FitEvent *evt = fNUISANCEEvent;
   evt->Mode = ConvertModeGiBUUtoNEUT(fGiReader->mode, fGiReader->process_ID, 
 				     (fGiReader->nuc_chrg) ? 2212 : 2112, 
 				     (*fGiReader->pdg)[0]);
-  evt->fEventNo = 0.0;
+  // evt->fEventNo = 0.0;
   evt->fTotCrs = 0;
   evt->fTargetA = fGiReader->nucleus_A;
   evt->fTargetZ = fGiReader->nucleus_Z;
@@ -342,14 +353,16 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
 
   // Create Stack
   evt->fNParticles = 3;
+
   for (uint i = 0; i < npart; i++) {
 
     int curpart = evt->fNParticles;
 
+    double dist = sqrt((*fGiReader->x)[i]*(*fGiReader->x)[i] + (*fGiReader->y)[i]*(*fGiReader->y)[i] + (*fGiReader->z)[i]*(*fGiReader->z)[i]);
+
     // Set State
-    evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->Px)[i], \
-							    (*fGiReader->Py)[i], (*fGiReader->Pz)[i], \
-							    (*fGiReader->pdg)[i]);    
+    evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->pdg)[i], dist);
+
     // Mom
     evt->fParticleMom[curpart][0] = (*fGiReader->Px)[i] * 1E3;
     evt->fParticleMom[curpart][1] = (*fGiReader->Py)[i] * 1E3;
@@ -362,7 +375,6 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
     // Add to total particles
     evt->fNParticles++;
   }
-  
 
   // Run Initial, FSI, Final, Other ordering.
   fNUISANCEEvent->OrderStack();
