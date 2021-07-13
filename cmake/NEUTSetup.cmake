@@ -49,12 +49,21 @@ if(HAVENEUTCONFIG)
   LIST(APPEND NEUT_LINK_DIRS ${CERN_LIB_DIR})
   GETLIBS(neut-config --cernflags CERN_LIBS)
 
-  if(USE_REWEIGHT)
+  if(NOT DEFINED USE_NEUT_REWEIGHT)
+    if(USE_REWEIGHT)
+      SET(USE_NEUT_REWEIGHT ON)
+    else()
+      SET(USE_NEUT_REWEIGHT OFF)
+    endif()
+  endif()
+
+  if(USE_REWEIGHT AND USE_NEUT_REWEIGHT)
     execute_process (COMMAND neut-config
       --rwlibflags OUTPUT_VARIABLE NEUT_RWLIBS
                OUTPUT_STRIP_TRAILING_WHITESPACE)
     GETLIBS(neut-config --rwlibflags NEUT_RWLIBS)
     LIST(APPEND NEUT_LIBS ${NEUT_RWLIBS})
+    LIST(APPEND EXTRA_CXX_FLAGS ${NEUT_INCLUDE_DIRS} -D__USE_NEUT_REWEIGHT__)
   else()
       GETLIBS(neut-config --libflags NEUT_GENLIBS)
       GETLIBS(neut-config --iolibflags NEUT_LIBS)

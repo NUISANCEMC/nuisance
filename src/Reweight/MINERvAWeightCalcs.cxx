@@ -55,7 +55,7 @@ void MINERvAReWeight_QE::SetDialValue(std::string name, double val) {
 void MINERvAReWeight_QE::SetDialValue(int rwenum, double val) {
   //*******************************************************
   // Check Handled
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum)) return;
 
   // Set Values
@@ -71,7 +71,7 @@ void MINERvAReWeight_QE::SetDialValue(int rwenum, double val) {
 //*******************************************************
 bool MINERvAReWeight_QE::IsHandled(int rwenum) {
   //*******************************************************
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   switch (curenum) {
   case Reweight::kMINERvARW_NormCCQE:
@@ -130,7 +130,7 @@ void MINERvAReWeight_MEC::SetDialValue(std::string name, double val) {
 void MINERvAReWeight_MEC::SetDialValue(int rwenum, double val) {
   //*******************************************************
   // Check Handled
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum))
     return;
 
@@ -147,7 +147,7 @@ void MINERvAReWeight_MEC::SetDialValue(int rwenum, double val) {
 //*******************************************************
 bool MINERvAReWeight_MEC::IsHandled(int rwenum) {
   //*******************************************************
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   switch (curenum) {
   case Reweight::kMINERvARW_NormCCMEC:
@@ -207,7 +207,7 @@ void MINERvAReWeight_RES::SetDialValue(std::string name, double val) {
 void MINERvAReWeight_RES::SetDialValue(int rwenum, double val) {
   //*******************************************************
   // Check Handled
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum)) return;
 
   // Set Values
@@ -223,7 +223,7 @@ void MINERvAReWeight_RES::SetDialValue(int rwenum, double val) {
 //*******************************************************
 bool MINERvAReWeight_RES::IsHandled(int rwenum) {
   //*******************************************************
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   switch (curenum) {
     case Reweight::kMINERvARW_NormCCRES:
@@ -460,7 +460,7 @@ void RikRPA::SetDialValue(std::string name, double val) {
 //*******************************************************
 void RikRPA::SetDialValue(int rwenum, double val) {
   //*******************************************************
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum))
@@ -490,7 +490,7 @@ void RikRPA::SetDialValue(int rwenum, double val) {
 //*******************************************************
 bool RikRPA::IsHandled(int rwenum) {
   //*******************************************************
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case Reweight::kMINERvARW_RikRESRPA_ApplyRPA:
       return true;
@@ -685,7 +685,7 @@ void COHBrandon::SetDialValue(std::string name, double val) {
 
 void COHBrandon::SetDialValue(int rwenum, double val) {
   // Check Handled
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum)) return;
 
   // Set Values
@@ -708,7 +708,7 @@ void COHBrandon::SetDialValue(int rwenum, double val) {
 }
 
 bool COHBrandon::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   switch (curenum) {
     case Reweight::kMINERvARW_NormCOH:
@@ -824,7 +824,7 @@ void WEnhancement::SetDialValue(std::string name, double val) {
 
 void WEnhancement::SetDialValue(int rwenum, double val) {
   // Check Handled
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum)) return;
 
   // Set Values
@@ -852,7 +852,7 @@ void WEnhancement::SetDialValue(int rwenum, double val) {
 }
 
 bool WEnhancement::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   switch (curenum) {
     case Reweight::kMINERvARW_ApplyWTune:

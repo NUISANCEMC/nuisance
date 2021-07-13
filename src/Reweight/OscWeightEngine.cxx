@@ -179,11 +179,11 @@ void OscWeightEngine::IncludeDial(std::string name, double startval) {
 
 void OscWeightEngine::SetDialValue(int nuisenum, double val) {
 #ifdef DEBUG_OSC_WE
-  std::cout << "SetDial: " << (nuisenum % 1000) << " at " << val << std::endl;
+  std::cout << "SetDial: " << (nuisenum % NUIS_DIAL_OFFSET) << " at " << val << std::endl;
 #endif
-  fHasChanged = (params[(nuisenum % 1000) - 1] - val) >
+  fHasChanged = (params[(nuisenum % NUIS_DIAL_OFFSET) - 1] - val) >
                 std::numeric_limits<double>::epsilon();
-  params[(nuisenum % 1000) - 1] = val;
+  params[(nuisenum % NUIS_DIAL_OFFSET) - 1] = val;
 }
 void OscWeightEngine::SetDialValue(std::string name, double val) {
 #ifdef DEBUG_OSC_WE
@@ -204,7 +204,7 @@ bool OscWeightEngine::IsDialIncluded(std::string name) {
   return SystEnumFromString(name);
 }
 bool OscWeightEngine::IsDialIncluded(int nuisenum) {
-  return ((nuisenum % 1000) > 0) && ((nuisenum % 1000) < 6);
+  return ((nuisenum % NUIS_DIAL_OFFSET) > 0) && ((nuisenum % NUIS_DIAL_OFFSET) < 6);
 }
 
 double OscWeightEngine::GetDialValue(std::string name) {
@@ -216,12 +216,12 @@ double OscWeightEngine::GetDialValue(std::string name) {
   return params[dial - 1];
 }
 double OscWeightEngine::GetDialValue(int nuisenum) {
-  if (!(nuisenum % 1000) || (nuisenum % 1000) > 6) {
+  if (!(nuisenum % NUIS_DIAL_OFFSET) || (nuisenum % NUIS_DIAL_OFFSET) > 6) {
     NUIS_ABORT("OscWeightEngine passed dial enum: "
-          << (nuisenum % 1000)
+          << (nuisenum % NUIS_DIAL_OFFSET)
           << " that it does not understand, expected [1,6].");
   }
-  return params[(nuisenum % 1000) - 1];
+  return params[(nuisenum % NUIS_DIAL_OFFSET) - 1];
 }
 
 void OscWeightEngine::Reconfigure(bool silent) { fHasChanged = false; };

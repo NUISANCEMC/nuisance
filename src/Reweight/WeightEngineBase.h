@@ -18,6 +18,7 @@
 #include <vector>
 
 #define _UNDEF_DIAL_VALUE_ -9999.9
+#define NUIS_DIAL_OFFSET 100000
 
 class WeightEngineBase {
  public:

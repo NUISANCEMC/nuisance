@@ -3,8 +3,7 @@
 
 #include "FitLogger.h"
 
-#ifdef __NEUT_ENABLED__
-#ifndef __NO_REWEIGHT__
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
 #include "NEUTInputHandler.h"
 #include "NReWeight.h"
 #include "NReWeightNuXSecCCQE.h"
@@ -28,7 +27,6 @@
 #include "neutpart.h"
 #include "neutvect.h"
 #endif
-#endif
 
 #include "FitWeight.h"
 #include "GeneratorUtils.h"
@@ -50,11 +48,9 @@ public:
 
   inline bool NeedsEventReWeight() { return true; };
 
-#ifdef __NEUT_ENABLED__
-#ifndef __NO_REWEIGHT__
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   std::vector<neut::rew::NSyst_t> fNEUTSysts;
   neut::rew::NReWeight *fNeutRW;
-#endif
 #endif
 };
 

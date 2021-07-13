@@ -4,6 +4,8 @@
 #ifndef __NO_REWEIGHT__
 #ifdef __T2KREW_ENABLED__
 #ifdef T2KRW_OA2021_INTERFACE
+#include "NReWeightEngineI.h"
+
 #include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
 #include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
 #else
@@ -283,7 +285,7 @@ int FitBase::GetDialEnum(std::string const &type, std::string const &name) {
 }
 
 int FitBase::GetDialEnum(int type, std::string const &name) {
-  int offset = type * 1000;
+  int offset = type * NUIS_DIAL_OFFSET;
   int this_enum = Reweight::kNoDialFound; // Not Found
 
   NUIS_LOG(DEB, "Getting dial enum " << type << " " << name);
@@ -291,7 +293,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   switch (type) {
   // NEUT DIAL TYPE
   case kNEUT: {
-#if defined(__NEUT_ENABLED__) && !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
     int neut_enum = (int)neut::rew::NSyst::FromString(name);
     if (neut_enum != 0) {
       this_enum = neut_enum + offset;
@@ -444,14 +446,14 @@ std::string Reweight::ConvDialType(int type) {
 }
 
 int Reweight::GetDialType(int type) {
-  int t = (type / 1000);
+  int t = (type / NUIS_DIAL_OFFSET);
   return t > kNuSystematics ? Reweight::kNoDialFound : t;
 }
 
-int Reweight::RemoveDialType(int type) { return (type % 1000); }
+int Reweight::RemoveDialType(int type) { return (type % NUIS_DIAL_OFFSET); }
 
 int Reweight::NEUTEnumFromName(std::string const &name) {
-#if defined(__NEUT_ENABLED__) && !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   int neutenum = (int)neut::rew::NSyst::FromString(name);
   return (neutenum > 0) ? neutenum : Reweight::kNoDialFound;
 #else
@@ -538,7 +540,7 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
       GeneralUtils::ParseToStr(fullname, ",")[0]; // Only use first dial given
 
   // Produce offset seperating each type.
-  int offset = type * 1000;
+  int offset = type * NUIS_DIAL_OFFSET;
   int genenum = Reweight::kNoDialFound;
 
   switch (type) {

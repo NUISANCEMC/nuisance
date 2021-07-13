@@ -66,7 +66,7 @@ void nusystematicsWeightEngine::IncludeDial(std::string name, double startval) {
 
 void nusystematicsWeightEngine::SetDialValue(int nuisenum, double val) {
 
-  systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+  systtools::paramId_t DuneRwtEnum = (nuisenum % NUIS_DIAL_OFFSET);
 
   if (DuneRwtEnum == kNuSystCVResponse) {
     return;
@@ -99,7 +99,7 @@ bool nusystematicsWeightEngine::IsDialIncluded(std::string name) {
   return IsDialIncluded(ConvDial(name));
 }
 bool nusystematicsWeightEngine::IsDialIncluded(int nuisenum) {
-  systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+  systtools::paramId_t DuneRwtEnum = (nuisenum % NUIS_DIAL_OFFSET);
   if (DuneRwtEnum == kNuSystCVResponse) {
     return fUseCV;
   }
@@ -121,7 +121,7 @@ double nusystematicsWeightEngine::GetDialValue(int nuisenum) {
                << nuisenum << " that is not enabled.");
   }
 
-  systtools::paramId_t DuneRwtEnum = (nuisenum % 1000);
+  systtools::paramId_t DuneRwtEnum = (nuisenum % NUIS_DIAL_OFFSET);
 
   if (DuneRwtEnum == kNuSystCVResponse) {
     return 1;
