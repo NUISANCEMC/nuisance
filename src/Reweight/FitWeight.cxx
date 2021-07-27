@@ -174,7 +174,16 @@ void FitWeight::SetDialValue(int nuisenum, double val) {
   int dialtype = Reweight::GetDialType(nuisenum);
 
   if (fAllRW.find(dialtype) == fAllRW.end()) {
-    NUIS_ERR(FTL, "Can't find RW engine for parameter " << fNameList[dialtype]);
+
+    std::string name = "<unknown>";
+    for(size_t i = 0; i < fEnumList.size(); ++i){
+      if(fEnumList[i] == nuisenum){
+        name = fNameList[i];
+        break;
+      }
+    }
+
+    NUIS_ERR(FTL, "Can't find RW engine for parameter " << name);
     NUIS_ERR(FTL, "With dialtype " << dialtype << ", "
                                    << Reweight::RemoveDialType(nuisenum));
     NUIS_ABORT("Are you sure you enabled the right engines?");
@@ -263,7 +272,7 @@ void FitWeight::GetAllDials(double *x, int n) {
 //   for (std::vector<int>::iterator iter = fEnumList.begin();
 //        iter != fEnumList.end(); iter++) {
 //     int nuisenum = (*iter);
-//     int type = (nuisenum / 1000) - (nuisenum % 1000);
+//     int type = (nuisenum / NUIS_DIAL_OFFSET) - (nuisenum % NUIS_DIAL_OFFSET);
 
 //     // Compare old to new
 //     double oldval = GetDialValue(nuisenum);

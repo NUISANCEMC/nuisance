@@ -1,7 +1,7 @@
 #include "NEUTWeightEngine.h"
 
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
 
 #if defined(__NEUT_VERSION__) && (__NEUT_VERSION__ >= 541)
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
@@ -79,7 +79,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 };
 
 void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
 
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kNEUT);
@@ -131,7 +131,7 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
 }
 
 void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
@@ -145,7 +145,7 @@ void NEUTWeightEngine::SetDialValue(int nuisenum, double val) {
 }
 
 void NEUTWeightEngine::SetDialValue(std::string name, double val) {
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
@@ -159,7 +159,7 @@ void NEUTWeightEngine::SetDialValue(std::string name, double val) {
 }
 
 void NEUTWeightEngine::Reconfigure(bool silent) {
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   // Hush now...
   if (silent)
     StopTalking();
@@ -180,7 +180,7 @@ void NEUTWeightEngine::Reconfigure(bool silent) {
 double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
-#if defined(__NEUT_ENABLED__) and !defined(__NO_REWEIGHT__)
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   // Skip Non NEUT
   if (evt->fType != kNEUT)
     return 1.0;

@@ -179,7 +179,7 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
   if (we_indx == kNoSuchKnob) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  bool IsTune = !(we_indx % 100);
+  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
     fTuneValues[tune_idx] = startval;
@@ -192,8 +192,8 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
 };
 
 void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
-  size_t we_indx = (nuisenum % 1000);
-  bool IsTune = !(we_indx % 100);
+  size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
+  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -220,8 +220,8 @@ bool NOvARwgtEngine::IsDialIncluded(std::string name) {
   return IsDialIncluded(GetWeightGeneratorIndex(name));
 }
 bool NOvARwgtEngine::IsDialIncluded(int nuisenum) {
-  size_t we_indx = (nuisenum % 1000);
-  bool IsTune = !(we_indx % 100);
+  size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
+  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -236,11 +236,11 @@ double NOvARwgtEngine::GetDialValue(std::string name) {
   return GetDialValue(GetWeightGeneratorIndex(name));
 }
 double NOvARwgtEngine::GetDialValue(int nuisenum) {
-  size_t we_indx = (nuisenum % 1000);
+  size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
   if (we_indx == kNoSuchKnob) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine enum: " << nuisenum);
   }
-  bool IsTune = !(we_indx % 100);
+  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];

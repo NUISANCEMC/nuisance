@@ -24,9 +24,9 @@ SET(HAVET2KRWCONFIG FALSE)
 # We are dealing with shiny NEUT
 if(NOT "${T2KRWCONFIG}" STREQUAL "T2KRWCONFIG-NOTFOUND")
   SET(HAVET2KRWCONFIG TRUE)
-  cmessage(STATUS "Found neut-config, using it to determine configuration.")
+  cmessage(STATUS "Found t2kreweight-config, using it to determine configuration.")
 else()
-  cmessage(STATUS "Failed to find neut-config, assuming older NEUT build.")
+  cmessage(STATUS "Failed to find t2kreweight-config, assuming older NEUT build.")
 endif()
 
 if(HAVET2KRWCONFIG)

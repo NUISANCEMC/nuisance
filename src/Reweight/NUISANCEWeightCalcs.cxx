@@ -5,6 +5,8 @@
 #include "NUISANCESyst.h"
 #include "WeightUtils.h"
 
+#include "WeightEngineBase.h"
+
 using namespace Reweight;
 
 ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
@@ -25,7 +27,7 @@ void ModeNormCalc::SetDialValue(std::string name, double val) {
 }
 
 void ModeNormCalc::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum)) 
@@ -35,7 +37,7 @@ void ModeNormCalc::SetDialValue(int rwenum, double val) {
 }
 
 bool ModeNormCalc::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
   case kModeNorm_NormRES:
     return true;
@@ -115,7 +117,7 @@ double MINOSRPA::GetRPAWeight(double Q2) {
 }
 
 bool MINOSRPA::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case Reweight::kMINERvARW_MINOSRPA_Apply:
     case Reweight::kMINERvARW_MINOSRPA_A:
@@ -131,7 +133,7 @@ void MINOSRPA::SetDialValue(std::string name, double val) {
 }
 //
 void MINOSRPA::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum)) return;
@@ -273,7 +275,7 @@ double LagrangeRPA::GetRPAWeight(double Q2) {
 }
 //
 bool LagrangeRPA::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case Reweight::kMINERvARW_LagrangeRPA_Apply:
     case Reweight::kMINERvARW_LagrangeRPA_R1:
@@ -289,7 +291,7 @@ void LagrangeRPA::SetDialValue(std::string name, double val) {
 }
 //
 void LagrangeRPA::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum)) return;
@@ -337,7 +339,7 @@ void BeRPACalc::SetDialValue(std::string name, double val) {
 }
 
 void BeRPACalc::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum))
@@ -357,7 +359,7 @@ void BeRPACalc::SetDialValue(int rwenum, double val) {
 }
 
 bool BeRPACalc::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case kBeRPA_A:
     case kBeRPA_B:
@@ -391,7 +393,7 @@ void SBLOscWeightCalc::SetDialValue(std::string name, double val) {
 }
 
 void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   if (!IsHandled(curenum))
     return;
   if (curenum == kSBLOsc_Distance)
@@ -403,7 +405,7 @@ void SBLOscWeightCalc::SetDialValue(int rwenum, double val) {
 }
 
 bool SBLOscWeightCalc::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case kSBLOsc_Distance:
       return true;
@@ -692,7 +694,7 @@ void GaussianModeCorr::SetDialValue(std::string name, double val) {
 }
 
 void GaussianModeCorr::SetDialValue(int rwenum, double val) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
 
   // Check Handled
   if (!IsHandled(curenum)) return;
@@ -748,7 +750,7 @@ void GaussianModeCorr::SetDialValue(int rwenum, double val) {
 }
 
 bool GaussianModeCorr::IsHandled(int rwenum) {
-  int curenum = rwenum % 1000;
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
   switch (curenum) {
     case kGaussianCorr_CCQE_norm:
     case kGaussianCorr_CCQE_tilt:
