@@ -1083,7 +1083,7 @@ void SystematicRoutines::MergeThrows() {
       continue;
     TH1 *baseplot = (TH1D *)key->ReadObj();
     std::string plotname = std::string(baseplot->GetName());
-    NUIS_LOGN(FIT, "Creating error bands for " << plotname);
+    NUIS_LOG(FIT, "Creating error bands for " << plotname);
     if (LOG_LEVEL(FIT)) {
       if (!uniformly) {
         NUIS_LOG(FIT, " : Using COVARIANCE Throws! ");
@@ -1214,6 +1214,8 @@ void SystematicRoutines::MergeThrows() {
     delete bintree;
     delete[] bincontents;
   }
+fOutputRootFile->Write();
+fOutputRootFile->Close();
 };
 
 void SystematicRoutines::EigenErrors() {
