@@ -380,11 +380,10 @@ int GENIEInputHandler::ConvertGENIEReactionCode(GHepRecord *gheprec) {
   }
 
   // And the same story for 54
-  if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation()){
+  if (gheprec->Summary()->ProcInfo().IsIMDAnnihilation() || gheprec->Summary()->ProcInfo().IsInverseMuDecay()){
     if (pdg::IsNeutrino(gheprec->Summary()->InitState().ProbePdg())) return 54;
     else return -54;
   }
-
 
   // Electron Scattering
   if (gheprec->Summary()->ProcInfo().IsEM()) {

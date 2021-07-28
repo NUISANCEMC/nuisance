@@ -179,10 +179,10 @@ int CheckGiBUUParticleStatus(double E, int pdg, double dist){
   if (dist < 6) {
     return kFSIState;
   }
-  
+
   // Check for unknown particles and default to on shell
   if (onshell_mass == -1) return kFinalState;
-
+  
   // Ulrich's second criteria
   if (E < onshell_mass) return kFSIState;
 
@@ -362,7 +362,6 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
 
     // Set State
     evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->pdg)[i], dist);
-
     // Mom
     evt->fParticleMom[curpart][0] = (*fGiReader->Px)[i] * 1E3;
     evt->fParticleMom[curpart][1] = (*fGiReader->Py)[i] * 1E3;
@@ -430,39 +429,57 @@ void GiBUUNativeInputHandler::SetupJointInputs() {
     NUIS_ABORT("Can only handle joint inputs when config MAXEVENTS = -1!");
   }
 
-  // Loop over the samples
-  for (size_t i = 0; i < jointeventinputs.size(); i++) {
+  // Need to know what the total number of nucleons is for correct normalization...
+  int total_unique_nucl = 0;
+  std::vector<int> unique_nucl;
+  std::vector<int> nsame_vect;
 
-    // Assume all of the fluxes are the same... is this safe?
+  for (size_t i = 0; i < jointeventinputs.size(); i++) {
+    
+    // Assume all of the fluxes are the same
     if (!fFluxHist) fFluxHist = (TH1D*)jointfluxinputs[i]->Clone();
 
-    // For this sample, we need to get the total event rate and number of requested events
+    // Get the list of unique nuclei nuclei
+    int this_nucl = jointtype[i]/1000;
+    if (std::find(unique_nucl.begin(), unique_nucl.end(), this_nucl) == unique_nucl.end()){
+      unique_nucl.push_back(this_nucl);
+      total_unique_nucl += this_nucl;
+    }
+
+    // Get the total event rate and number of requested events
     TH1D *this_evt_total = NULL;
-    int requested_total = 0;
     int nsame = 0;
 
+    // How many files were set up in the same way?
     for (size_t j = 0; j < jointeventinputs.size(); j++) {
-      // Only consider the same type
       if (jointtype[j] != jointtype[i]) continue;
-
       nsame++;
-
-      // Get the totals
-      requested_total += jointrequested[j];
-
+      
       if (!this_evt_total) this_evt_total = (TH1D*)jointeventinputs[j]->Clone();
       else this_evt_total->Add(jointeventinputs[j]);
     }
+    nsame_vect.push_back(nsame);
 
-    this_evt_total->Scale(1./double(nsame));
-    double scale = double(jointrequested[i]) / this_evt_total->Integral("width")/ double(requested_total);
-    scale *= jointfluxinputs.at(i)->Integral("width");
-    jointindexscale.push_back(scale);
-
-    // Keep track of the total event rate
+    // Need to average events with the same run config, and add others
+    this_evt_total->Scale(jointtype[i]/1000/double(nsame));
     if (!fEventHist) fEventHist = (TH1D*)this_evt_total->Clone();
     else fEventHist ->Add(this_evt_total);
     delete this_evt_total;
+  }
+
+  // Get the correct / nucleon event rate
+  fEventHist->Scale(1/double(total_unique_nucl));
+
+  // Loop over the samples to get the event scaling correct
+  for (size_t i = 0; i < jointeventinputs.size(); i++) {
+
+    // This simply reverses the usual scaling to get to a flux averaged XSEC used everywhere else in NUISANCE
+    double scale = fFluxHist->Integral("width")*fNEvents/fEventHist->Integral("width");
+
+    // Need to correctly weight by the number of nucleons to arrive at the /nucleon XSEC for a compound target
+    scale *= jointtype[i]/1000/double(total_unique_nucl)/nsame_vect[i];
+
+    jointindexscale.push_back(scale);
   }
 
   fEventHist->SetNameTitle((fName + "_EVT").c_str(), (fName + "_EVT").c_str());
