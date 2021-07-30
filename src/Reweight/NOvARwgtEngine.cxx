@@ -59,7 +59,7 @@ void NOvARwgtEngine::InitializeKnobs() {
   NUIS_LOG(FIT, "NOvARwgt kCVTune2017 sub-knobs:");
   size_t tune_ctr = 0;
   for (auto &k : novarwgt::kCVTune2017.SystKnobs()) {
-    NUIS_LOG(FIT, "\t" << k.first);
+    NUIS_LOG(FIT, "\t" << kCVTune2017 + 1 + tune_ctr << ": " << k.first);
     fKnobs.push_back(k.second);
     fKnobTunes.push_back(&novarwgt::kCVTune2017);
     fKnobTuneidx.push_back(0);
@@ -71,7 +71,7 @@ void NOvARwgtEngine::InitializeKnobs() {
   tune_ctr = 0;
   NUIS_LOG(FIT, "NOvARwgt kCVTune2018 sub-knobs:");
   for (auto &k : novarwgt::kCVTune2018.SystKnobs()) {
-    NUIS_LOG(FIT, "\t" << k.first);
+    NUIS_LOG(FIT, "\t" << kCVTune2018 + 1 + tune_ctr << ": " << k.first);
     fKnobs.push_back(k.second);
     fKnobTunes.push_back(&novarwgt::kCVTune2018);
     fKnobTuneidx.push_back(1);
@@ -83,7 +83,7 @@ void NOvARwgtEngine::InitializeKnobs() {
   tune_ctr = 0;
   NUIS_LOG(FIT, "NOvARwgt kCVTune2020 sub-knobs:");
   for (auto &k : novarwgt::kCVTune2020.SystKnobs()) {
-    NUIS_LOG(FIT, "\t" << k.first);
+    NUIS_LOG(FIT, "\t" << kCVTune2020 + 1 + tune_ctr << ": " << k.first);
     fKnobs.push_back(k.second);
     fKnobTunes.push_back(&novarwgt::kCVTune2020);
     fKnobTuneidx.push_back(2);
@@ -95,7 +95,7 @@ void NOvARwgtEngine::InitializeKnobs() {
   tune_ctr = 0;
   NUIS_LOG(FIT, "NOvARwgt kCVTuneSA sub-knobs:");
   for (auto &k : novarwgt::kCVTuneSA.SystKnobs()) {
-    NUIS_LOG(FIT, "\t" << k.first);
+    NUIS_LOG(FIT, "\t" << kCVTuneSA + 1 + tune_ctr << ": " << k.first);
     fKnobs.push_back(k.second);
     fKnobTunes.push_back(&novarwgt::kCVTuneSA);
     fKnobTuneidx.push_back(3);
@@ -179,7 +179,9 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
   if (we_indx == kNoSuchKnob) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine name: " << name);
   }
-  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
+  bool IsTune = !(we_indx % 100);
+  // NUIS_LOG(FIT, "Including dial: " << name << " -> " << we_indx << " is tune? "
+  //                                  << IsTune);
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
     fTuneValues[tune_idx] = startval;
@@ -193,7 +195,9 @@ void NOvARwgtEngine::IncludeDial(std::string name, double startval) {
 
 void NOvARwgtEngine::SetDialValue(int nuisenum, double val) {
   size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
-  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
+  bool IsTune = !(we_indx % 100);
+  // NUIS_LOG(FIT, "SetDialValue(" << val << "): " << nuisenum << " -> " << we_indx
+  //                               << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -221,7 +225,9 @@ bool NOvARwgtEngine::IsDialIncluded(std::string name) {
 }
 bool NOvARwgtEngine::IsDialIncluded(int nuisenum) {
   size_t we_indx = (nuisenum % NUIS_DIAL_OFFSET);
-  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
+  bool IsTune = !(we_indx % 100);
+  // NUIS_LOG(FIT, "IsDialIncluded: " << nuisenum << " -> " << we_indx
+  //                                  << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -240,7 +246,9 @@ double NOvARwgtEngine::GetDialValue(int nuisenum) {
   if (we_indx == kNoSuchKnob) {
     NUIS_ABORT("[ERROR]: Invalid NOvARwgt Engine enum: " << nuisenum);
   }
-  bool IsTune = !(we_indx % (NUIS_DIAL_OFFSET /10));
+  bool IsTune = !(we_indx % 100);
+  // NUIS_LOG(FIT, "GetDialValue: " << nuisenum << " -> " << we_indx
+  //                                << " is tune? " << IsTune);
 
   if (IsTune) {
     auto tune_idx = fTuneEnums[we_indx];
@@ -284,9 +292,13 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
       novarwgt::ConvertGenieEvent(evt->genie_event->event);
 
   for (size_t k_it = 0; k_it < fKnobs.size(); ++k_it) {
+    // NUIS_LOG(FIT, "-- knob: " << k_it << " = " << fKnobInUse[k_it]);
+
     if (!fKnobInUse[k_it]) {
       continue;
     }
+
+    // NUIS_LOG(FIT, "\t" << fKnobs[k_it]->Name() << " = " << fKnobValues[k_it]);
 
     double wght = fKnobTunes[k_it]->EventSystKnobWeight(
         fKnobs[k_it]->Name(), fKnobValues[k_it], rcd, {},
@@ -303,12 +315,16 @@ double NOvARwgtEngine::CalcWeight(BaseFitEvt *evt) {
   }
 
   for (size_t k_it = 0; k_it < fTunes.size(); ++k_it) {
+    // NUIS_LOG(FIT, "-- tune: " << k_it << " = " << fTuneInUse[k_it]);
+
     if (!fTuneInUse[k_it]) {
       continue;
     }
     if (!fTuneValues[k_it]) {
       continue;
     }
+    // NUIS_LOG(FIT, "\t" << fTuneValues[k_it]);
+
     double wght = fTunes[k_it]->EventWeight(rcd);
     rw_weight *= wght;
   }
