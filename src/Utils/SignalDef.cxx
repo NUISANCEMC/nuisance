@@ -224,7 +224,9 @@ bool SignalDef::isCCCOH(FitEvent *event, int nuPDG, int piPDG, double EnuMin, do
   int nFS     = event->NumFSParticle();
 
   if (nLepton != 1 || nPion != 1) return false;
-  if (nFS != 2) return false;
+  // if (nFS != 2) return false;
+  // GENIE v3 includes the nucleus in the final state, so modify the definition for now...
+  if (abs(event->Mode) != 16) return false;
   return true;
 }
 
