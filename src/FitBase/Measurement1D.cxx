@@ -55,13 +55,14 @@ Measurement1D::Measurement1D(void) {
   // Options
   fDefaultTypes = "FIX/FULL/CHI2";
   fAllowedTypes =
-      "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/MASK/NOWIDTH";
+      "FIX,FREE,SHAPE/FULL,DIAG/CHI2/NORM/ENUCORR/Q2CORR/ENU1D/MASK/NOWIDTH/SINGLEBIN";
 
   fIsFix = false;
   fIsShape = false;
   fIsFree = false;
   fIsDiag = false;
   fIsFull = false;
+  fIsSingleBin = false;
   fAddNormPen = false;
   fIsMask = false;
   fIsChi2SVD = false;
@@ -78,6 +79,7 @@ Measurement1D::Measurement1D(void) {
 
   // Extra Histograms
   fMCHist_Modes = NULL;
+  fMCFine_Modes = NULL;
 }
 
 //********************************************************************
@@ -618,12 +620,14 @@ void Measurement1D::FinaliseMeasurement() {
                         (fSettings.GetFullTitles()).c_str());
   fMCHist->Reset();
 
-  // Setup fMCFine
-  fMCFine = new TH1D("mcfine", "mcfine", fDataHist->GetNbinsX() * 8,
-                     fMCHist->GetBinLowEdge(1),
-                     fMCHist->GetBinLowEdge(fDataHist->GetNbinsX() + 1));
+  // Setup fMCFine, provide option to create it before in the sample constructor first
+  if (!fMCFine){
+    fMCFine = new TH1D("mcfine", "mcfine", fDataHist->GetNbinsX() * 8,
+		       fMCHist->GetBinLowEdge(1),
+		       fMCHist->GetBinLowEdge(fDataHist->GetNbinsX() + 1));
+  }
   fMCFine->SetNameTitle((fSettings.GetName() + "_MC_FINE").c_str(),
-                        (fSettings.GetFullTitles()).c_str());
+			(fSettings.GetFullTitles()).c_str());
   fMCFine->Reset();
 
   // Setup MC Stat
@@ -639,6 +643,13 @@ void Measurement1D::FinaliseMeasurement() {
     fMCHist_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
 
     SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
+
+    fMCFine_Modes = new TrueModeStack((fSettings.GetName() + "_MODES").c_str(),
+                                      ("True Channels"), fMCFine);
+    fMCFine_Modes ->SetTitleX(fDataHist->GetXaxis()->GetTitle());
+    fMCFine_Modes ->SetTitleY(fDataHist->GetYaxis()->GetTitle());
+
+    SetAutoProcessTH1(fMCFine_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
   }
 
   if (fSettings.Has("maskfile") && fSettings.Has("maskhist")) {
@@ -796,6 +807,11 @@ void Measurement1D::SetFitOptions(std::string opt) {
     fAddNormPen = true;
   if (opt.find("MASK") != std::string::npos)
     fIsMask = true;
+  if (opt.find("SINGLEBIN") != std::string::npos){
+    fIsSingleBin = true;
+    fIsNoWidth = false;
+    fIsEnu1D = false;
+  }
 
   return;
 };
@@ -892,12 +908,22 @@ void Measurement1D::FillHistograms() {
 
     NUIS_LOG(DEB, "Fill MCHist: " << fXVar << ", " << Weight);
 
-    fMCHist->Fill(fXVar, Weight);
+    // If it's single bin, whatever the limits on the plot are don't apply
+    if (fIsSingleBin){
+      fMCHist->Fill(fMCHist->GetBinCenter(1), Weight);
+      fMCStat->Fill(fMCStat->GetBinCenter(1), 1.0);
+      if (fMCHist_Modes)
+	fMCHist_Modes->Fill(Mode, fMCHist->GetBinCenter(1), Weight);
+    } else {
+      fMCHist->Fill(fXVar, Weight);
+      fMCStat->Fill(fXVar, 1.0);
+      if (fMCHist_Modes)
+	fMCHist_Modes->Fill(Mode, fXVar, Weight);
+    }
+    
     fMCFine->Fill(fXVar, Weight);
-    fMCStat->Fill(fXVar, 1.0);
-
-    if (fMCHist_Modes)
-      fMCHist_Modes->Fill(Mode, fXVar, Weight);
+    if (fMCFine_Modes)
+      fMCFine_Modes->Fill(Mode, fXVar, Weight);
   }
 
   return;
@@ -944,6 +970,9 @@ void Measurement1D::ScaleEvents() {
     if (fMCHist_Modes)
       fMCHist_Modes->Scale(datamcratio);
 
+    if (fMCFine_Modes)
+      fMCFine_Modes->Scale(datamcratio);
+
     // Scaling for XSec as function of Enu
   } else if (fIsEnu1D) {
 
@@ -956,9 +985,8 @@ void Measurement1D::ScaleEvents() {
       // Loop over the modes
       fMCHist_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(),
                                 fScaleFactor, fNEvents);
-      // PlotUtils::FluxUnfoldedScaling(fMCHist_Modes, GetFluxHistogram(),
-      // GetEventHistogram(), fScaleFactor,
-      // fNEvents);
+      fMCFine_Modes->FluxUnfold(GetFluxHistogram(), GetEventHistogram(),
+                                fScaleFactor, fNEvents);
     }
 
   } else if (fIsNoWidth) {
@@ -966,6 +994,16 @@ void Measurement1D::ScaleEvents() {
     fMCFine->Scale(fScaleFactor);
     if (fMCHist_Modes)
       fMCHist_Modes->Scale(fScaleFactor);
+    if (fMCFine_Modes)
+      fMCFine_Modes->Scale(fScaleFactor);
+  } else if (fIsSingleBin) {
+    fMCHist->Scale(fScaleFactor);
+    fMCFine->Scale(fScaleFactor, "width");
+    if (fMCHist_Modes)
+      fMCHist_Modes->Scale(fScaleFactor);
+    if (fMCFine_Modes)
+      fMCFine_Modes->Scale(fScaleFactor, "width");
+    
     // Any other differential scaling
   } else {
     fMCHist->Scale(fScaleFactor, "width");
@@ -973,6 +1011,8 @@ void Measurement1D::ScaleEvents() {
 
     if (fMCHist_Modes)
       fMCHist_Modes->Scale(fScaleFactor, "width");
+    if (fMCFine_Modes)
+      fMCFine_Modes->Scale(fScaleFactor, "width");
   }
 
   // Proper error scaling - ROOT Freaks out with xsec weights sometimes
@@ -1647,6 +1687,10 @@ void Measurement1D::SetupDefaultHist() {
   fMCHist_Modes =
       new TrueModeStack((fName + "_MODES").c_str(), ("True Channels"), fMCHist);
   SetAutoProcessTH1(fMCHist_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
+
+  fMCFine_Modes =
+    new TrueModeStack((fName + "_MODES").c_str(), ("True Channels"), fMCHist);
+  SetAutoProcessTH1(fMCFine_Modes, kCMD_Reset, kCMD_Norm, kCMD_Write);
 
   return;
 }
