@@ -67,7 +67,7 @@ int GetGiBUUNuPDG(int flavor_ID, int process_ID);
 
 int GetGiBUULepPDG(int flavor_ID, int process_ID);
 
-int CheckGiBUUParticleStatus(double E, int pdg, double dist);
+int CheckGiBUUParticleStatus(double E, int pdg, double dist, int targetA);
 
 int ConvertModeGiBUUtoNEUT(int gibuu_mode, int process_ID, int struck_nucleon_pdg, int first_part_pdg);
 

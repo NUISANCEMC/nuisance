@@ -165,7 +165,7 @@ int GetGiBUULepPDG(int flavor_ID, int process_ID){
 
 
 // Check whether the particle is on-shell or not
-int CheckGiBUUParticleStatus(double E, int pdg, double dist){
+int CheckGiBUUParticleStatus(double E, int pdg, double dist, int targetA){
 
   double onshell_mass = PhysConst::GetMass(pdg);
 
@@ -176,7 +176,8 @@ int CheckGiBUUParticleStatus(double E, int pdg, double dist){
   // If the particle is still within the nucleus, it's not final state
   // Not that this depends on the nucleus, and too few time steps could cause an issue
   // 6 fm is Ulrich's guess for Argon (and will be fine for smaller nuclei)
-  if (dist < 6) {
+  // Note that hydrogen is an exception because of how the timesteps work
+  if (dist < 6 && targetA > 1) {
     return kFSIState;
   }
 
@@ -361,7 +362,7 @@ void GiBUUNativeInputHandler::CalcNUISANCEKinematics() {
     double dist = sqrt((*fGiReader->x)[i]*(*fGiReader->x)[i] + (*fGiReader->y)[i]*(*fGiReader->y)[i] + (*fGiReader->z)[i]*(*fGiReader->z)[i]);
 
     // Set State
-    evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->pdg)[i], dist);
+    evt->fParticleState[curpart] = CheckGiBUUParticleStatus((*fGiReader->E)[i], (*fGiReader->pdg)[i], dist, evt->fTargetA);
     // Mom
     evt->fParticleMom[curpart][0] = (*fGiReader->Px)[i] * 1E3;
     evt->fParticleMom[curpart][1] = (*fGiReader->Py)[i] * 1E3;
