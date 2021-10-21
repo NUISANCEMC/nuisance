@@ -18,6 +18,7 @@
 *******************************************************************************/
 
 #include <fstream>
+#include <set>
 
 #include "MicroBooNE_CC1MuNp_XSec_2D_nu.h"
 #include "MicroBooNE_SignalDef.h"
@@ -183,4 +184,74 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
     fBinToDefinitionMap[ bin_idx ] = BinDef( xmin, xmax, ymin, ymax );
     ++bin_idx;
   }
+}
+
+
+void MicroBooNE_CC1MuNp_XSec_2D_nu::MakeSlices() {
+  // Populate the "slice edge map" with the lower bounds of each
+  // momentum bin and both edges of each angular bin
+  for ( const auto& bin_pair : fBinToDefinitionMap ) {
+    const BinDef& def = bin_pair.second;
+    // This command auto-creates an empty std::set if needed
+    auto& y_edge_set = fSliceEdgeMap[ def.fXMin ];
+    y_edge_set.insert( def.fYMin );
+    y_edge_set.insert( def.fYMax );
+  }
+
+  // We're ready now. Make the slices.
+  int slice_count = 0;
+  double old_xmin = DBL_MAX;
+  TH1D* current_slice_hist = nullptr;
+  for ( const auto& bin_pair : fBinToDefinitionMap ) {
+    // We add one here since ROOT TH1 bins have one-based indices
+    int root_bin_idx = bin_pair.first + 1;
+    const BinDef& def = bin_pair.second;
+
+    if ( def.fXMin != old_xmin ) {
+      old_xmin = def.fXMin;
+
+      // Build a temporary vector of bin edges that we can use to initialize
+      // the histogram for the current slice. Note that std::set will
+      // automatically sort the edges in ascending order. We need a vector,
+      // though, so that we can access the underlying C-style array.
+      std::vector< double > y_edge_vec;
+      const std::set<double>& y_edge_set = fSliceEdgeMap.at( def.fXMin );
+      for ( const auto& edge : y_edge_set ) y_edge_vec.push_back( edge );
+
+      int num_y_bins = y_edge_vec.size() - 1;
+
+      current_slice_hist = new TH1D( "slice", "slice",
+        num_y_bins, y_edge_vec.data() );
+      current_slice_hist->SetDirectory( nullptr );
+
+      std::stringstream temp_ss;
+      temp_ss << fSettings.GetS("name") << "_MC_Slice" << slice_count;
+
+      current_slice_hist->SetName( temp_ss.str().c_str() );
+
+      temp_ss << ", p_{p} [" << def.fXMin << "," << def.fXMax << "] GeV";
+      current_slice_hist->SetTitle( temp_ss.str().c_str() );
+
+      current_slice_hist->GetXaxis()->SetTitle( "cos#theta_{p}" );
+      current_slice_hist->GetYaxis()->SetTitle( fSettings.GetYTitle().c_str() );
+
+      fMCHist_Slices.push_back( current_slice_hist );
+      ++slice_count;
+    }
+
+    double xsec = fMCHist->GetBinContent( root_bin_idx );
+    double error = fMCHist->GetBinError( root_bin_idx );
+
+    int slice_root_bin_idx = current_slice_hist->FindBin( def.fYMin );
+    current_slice_hist->SetBinContent( slice_root_bin_idx, xsec );
+    current_slice_hist->SetBinError( slice_root_bin_idx, error );
+  }
+}
+
+void MicroBooNE_CC1MuNp_XSec_2D_nu::Write( std::string drawopt ) {
+  this->Measurement1D::Write( drawopt );
+  // Also create the slice MC histograms
+  // TODO: revisit, add data slices and possibly put this somewhere else
+  this->MakeSlices();
+  for ( auto* mc_slice_hist : fMCHist_Slices ) mc_slice_hist->Write();
 }

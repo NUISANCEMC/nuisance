@@ -39,6 +39,11 @@ public:
 
   void ConvertEventRates();
 
+  void MakeSlices();
+
+  // Enables writing the slice histograms to the output file
+  void Write( std::string drawopt );
+
 private:
   //TH2D* fSmearingMatrix;
   //enum Distribution { kPmu, kPp, kCosMu, kCosP, kThetaMuP };
@@ -59,6 +64,12 @@ private:
   };
   // Keys are bin numbers, values are definitions
   std::map< int, BinDef > fBinToDefinitionMap;
+
+  // Slice histograms
+  std::vector< TH1D* > fMCHist_Slices;
+
+  // Edges needed to define the slice histograms
+  std::map< double, std::set<double> > fSliceEdgeMap;
 };
 
 #endif
