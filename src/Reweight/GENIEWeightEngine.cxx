@@ -113,7 +113,9 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   genie::RunOpt *grunopt = genie::RunOpt::Instance();
   grunopt->EnableBareXSecPreCalc(true);
   grunopt->SetEventGeneratorList(Config::GetParS("GENIEEventGeneratorList"));
+  
   if (!Config::HasPar("GENIETune")) {
+    StartTalking();
     NUIS_ABORT(
         "GENIE tune was not specified, this is required when reweighting GENIE "
         "V3+ events. Add a config parameter like: <config "
@@ -231,6 +233,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
 
   if (name_ax == "genie::DipoleAxialFormFactorModel" &&
       ccqetype == "kModeZExp") {
+    StartTalking();
     NUIS_ERR(
         FTL,
         "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
@@ -245,6 +248,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   }
 
   if (name_ax == "genie::ZExpAxialFormFactorModel" && ccqetype != "kModeZExp") {
+    StartTalking();
     NUIS_ERR(
         FTL,
         "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
@@ -263,6 +267,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   std::string config_qelcc =
       full->GetAlg("XSecModel@genie::EventGenerator/QEL-CC").config;
   if (config_qelcc == "Default" && ccqetype == "kModeZExp") {
+    StartTalking();
     NUIS_ERR(
         FTL,
         "Trying to run Z Expansion reweighting with Llewelyn-Smith model.");
@@ -277,6 +282,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
   }
 
   if (config_qelcc == "ZExp" && ccqetype != "kModeZExp") {
+    StartTalking();
     NUIS_ERR(
         FTL,
         "Trying to run Llewelyn-Smith reweighting with Z Expansion model.");
@@ -304,6 +310,7 @@ GENIEWeightEngine::GENIEWeightEngine(std::string name) {
     } else if (!marestype.compare("kModeMaMv")) {
       rwccres->SetMode(GReWeightNuXSecCCRES::kModeMaMv);
     } else {
+      StartTalking();
       NUIS_ABORT("Unkown MARES Mode in GENIE Weight Engine : " << marestype);
     }
   }
