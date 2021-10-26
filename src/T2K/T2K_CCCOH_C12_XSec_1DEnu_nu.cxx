@@ -17,7 +17,6 @@ T2K_CCCOH_C12_XSec_1DEnu_nu::T2K_CCCOH_C12_XSec_1DEnu_nu(nuiskey samplekey) {
   fSettings.SetDescription(descrip);
   fSettings.SetXTitle("E_{#nu} (GeV)");
   fSettings.SetYTitle("d#sigma/dE_{#nu} (cm^{2}/^{12}C)");
-  // fSettings.SetAllowedTypes("FIX,FREE,SHAPE/DIAG,FULL/NORM/MASK/SINGLEBIN", "FIX/DIAG");
   fSettings.SetEnuRange(0.0, 100.0);
   fSettings.DefineAllowedTargets("C");
   fSettings.DefineAllowedSpecies("numu");
