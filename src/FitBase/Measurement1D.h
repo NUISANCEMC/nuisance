@@ -597,7 +597,7 @@ protected:
   TH1D *fChi2LessBinHist;
 
   TrueModeStack* fMCHist_Modes; ///< Optional True Mode Stack
-
+  TrueModeStack* fMCFine_Modes; ///< Optional True Mode Stack
 
   // Statistical
   TMatrixDSym* covar;       ///< Inverted Covariance
@@ -641,6 +641,7 @@ protected:
   bool fIsDifXSec;    ///< Flag : creating a dif xsec
   bool fIsChi2;       ///< Flag : using Chi2 over LL methods
   bool fIsSmeared;    ///< Flag : Apply smearing?
+  bool fIsSingleBin;  ///< Flag : Is the data and MC single bin?
   bool fIsWriting;
   bool fSaveFine;
 

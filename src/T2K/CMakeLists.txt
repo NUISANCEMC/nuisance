@@ -39,6 +39,8 @@ T2K_CC1pip_CH_XSec_1DQ2_nu.cxx
 T2K_CC1pip_CH_XSec_1DAdlerPhi_nu.cxx
 T2K_CC1pip_CH_XSec_1DCosThAdler_nu.cxx
 
+T2K_CCCOH_C12_XSec_1DEnu_nu.cxx
+
 T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.cxx
 T2K_CC1pip_H2O_XSec_1DEnuMB_nu.cxx
 T2K_CC1pip_H2O_XSec_1Dcosmu_nu.cxx
@@ -79,6 +81,8 @@ T2K_CC1pip_CH_XSec_1Dthmupi_nu.h
 T2K_CC1pip_CH_XSec_1DQ2_nu.h
 T2K_CC1pip_CH_XSec_1DAdlerPhi_nu.h
 T2K_CC1pip_CH_XSec_1DCosThAdler_nu.h
+
+T2K_CCCOH_C12_XSec_1DEnu_nu.h
 
 T2K_CC1pip_H2O_XSec_1DEnuDelta_nu.h
 T2K_CC1pip_H2O_XSec_1DEnuMB_nu.h

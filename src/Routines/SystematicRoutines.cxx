@@ -335,6 +335,7 @@ void SystematicRoutines::SetupFCN() {
   if (fSampleFCN)
     delete fSampleFCN;
   fSampleFCN = new JointFCN(fOutputRootFile);
+  fSampleFCN->SetNParams(int(fParams.size()));
   SetFakeData();
 
   return;
