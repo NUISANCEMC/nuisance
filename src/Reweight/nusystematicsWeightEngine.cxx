@@ -23,6 +23,13 @@
 
 nusystematicsWeightEngine::nusystematicsWeightEngine() {
   fUseCV = false;
+
+  // This is a bit hacky...
+  if (Config::HasPar("GENIETune")) {
+    setenv("GENIE_XSEC_TUNE", Config::GetParS("GENIETune").c_str(), true);
+    NUIS_LOG(DEB, "Set GENIE_XSEC_TUNE=" << Config::GetParS("GENIETune"));
+  }
+
   Config();
 }
 
