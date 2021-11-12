@@ -324,7 +324,9 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();
     const Kinematics &kine = interaction->Kine();
+    StopTalking();
     W_genie = kine.W();
+    StartTalking();
   }
 #endif
 
