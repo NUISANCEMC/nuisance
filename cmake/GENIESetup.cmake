@@ -65,9 +65,9 @@ execute_process (COMMAND genie-config
 #Allows for external override in the case where genie-config lies.
 if(NOT DEFINED GENIE_LIB_DIR OR GENIE_LIB_DIR STREQUAL "")
   #This looks like it should call libdir, but it strips the argument with -L from the response of --libs
-  GETLIBDIRS(genie-config --libs GENIE_LIB_DIR)
+  GetLibDirs(CONFIG_APP genie-config ARGS --libs OUTPUT_VARIABLE GENIE_LIB_DIR)
 endif()
-GETLIBS(genie-config --libs GENIE_LIBS)
+GetLibs(CONFIG_APP genie-config ARGS --libs OUTPUT_VARIABLE GENIE_LIBS)
 
 cmessage(STATUS "GENIE version : ${GENIE_VERSION}")
 cmessage(STATUS "GENIE libdir  : ${GENIE_LIB_DIR}")
@@ -129,14 +129,14 @@ endif()
 
 ################################  LIBXML  ######################################
 if(LIBXML2_LIB STREQUAL "")
-  GETLIBDIR(xml2-config --libs LIBXML2_LIB IGNORE_EMPTY_RESPONSE)
+  GetLibDir(CONFIG_APP xml2-config ARGS --libs OUTPUT_VARIABLE LIBXML2_LIB ALLOW_FAIL)
   if(LIBXML2_LIB STREQUAL "")
     message(WARNING "Variable LIBXML2_LIB is not defined, as xml2-config was found and didn't report a library include path, it is likely that libxml2.so can be found in the standard system location, lets hope so. Alternativly, a location can be forced by configering with -DLIBXML2_LIB=/path/to/LIBXML2_libraries or as an environment variable LIBXML2_LIB.")
   endif()
 endif()
 
 if(LIBXML2_INC STREQUAL "")
-  GETINCDIR(xml2-config --cflags LIBXML2_INC IGNORE_EMPTY_RESPONSE)
+  GetIncDir(xml2-config --cflags LIBXML2_INC ALLOW_FAIL)
   if(LIBXML2_INC STREQUAL "")
     message(WARNING "Variable LIBXML2_INC is not defined, as xml2-config was found and didn't report an include path, it is likely that libxml2.so can be found in the standard system location, lets hope so. Alternativly, a location can be forced by configering with -DLIBXML2_INC=/path/to/LIBXML2_includes or as an environment variable LIBXML2_INC.")
   endif()
@@ -144,14 +144,14 @@ endif()
 
 ###############################  log4cpp  ######################################
 if(LOG4CPP_LIB STREQUAL "")
-  GETLIBDIR(log4cpp-config --libs LOG4CPP_LIB IGNORE_EMPTY_RESPONSE)
+  GetLibDir(CONFIG_APP log4cpp-config ARGS --libs OUTPUT_VARIABLE LOG4CPP_LIB ALLOW_FAIL)
   if(LOG4CPP_LIB STREQUAL "")
     message(WARNING "Variable LOG4CPP_LIB is not defined, as xml2-config was found and didn't report a library include path, it is likely that liblog4cpp.so can be found in the standard system location, lets hope so. Alternativly, a location can be forced by configering with -DLOG4CPP_LIB=/path/to/LOG4CPP_libraries or as an environment variable LOG4CPP_LIB.")
   endif()
 endif()
 
 if(LOG4CPP_INC STREQUAL "")
-  GETINCDIR(log4cpp-config --cflags LOG4CPP_INC IGNORE_EMPTY_RESPONSE)
+  GetIncDir(CONFIG_APP log4cpp-config ARGS --cflags OUTPUT_VARIABLE LOG4CPP_INC ALLOW_FAIL)
   if(LOG4CPP_INC STREQUAL "")
     message(WARNING "Variable LOG4CPP_LIB is not defined, as xml2-config was found and didn't report an include path, it is likely that log4cpp headers can be found in the standard system location, lets hope so. Alternativly, a location can be forced by configering with -DLOG4CPP_INC=/path/to/LOG4CPP_includes or as an environment variable LOG4CPP_INC.")
   endif()
@@ -166,20 +166,20 @@ LIST(APPEND EXTRA_LIBS ${GENIE_LIBS})
 ###############################  GSL  ######################################
 if(GENIE_POST_R3)
   if(GSL_LIB STREQUAL "")
-    GETLIBDIR(gsl-config --libs GSL_LIB)
+    GetLibDir(CONFIG_APP gsl-config ARGS --libs OUTPUT_VARIABLE GSL_LIB)
     if(GSL_LIB STREQUAL "")
       message(FATAL_ERROR "Variable GSL_LIB is not defined and could not be found with gsl-config. The location of a pre-built gsl install must be defined either as $ cmake -DGSL_LIB=/path/to/GSL_libraries or as an environment variable $ export GSL_LIB=/path/to/GSL_libraries")
     endif()
   endif()
 
   if(GSL_INC STREQUAL "")
-    GETINCDIR(gsl-config --cflags GSL_INC)
+    GetIncDir(CONFIG_APP gsl-config ARGS --cflags OUTPUT_VARIABLE GSL_INC)
     if(GSL_INC STREQUAL "")
       message(FATAL_ERROR "Variable GSL_INC is not defined and could not be found with gsl-config. The location of a pre-built gsl install must be defined either as $ cmake -DGSL_INC=/path/to/GSL_includes or as an environment variable $ export GSL_INC=/path/to/GSL_includes")
     endif()
   endif()
 
-  GETLIBS(gsl-config --libs GSL_LIB_LIST)
+  GetLibs(CONFIG_APP gsl-config ARGS --libs OUTPUT_VARIABLE GSL_LIB_LIST)
 
   if(USING_GENIE_RW AND GENIE_REWEIGHT STREQUAL "")
     message(FATAL_ERROR "Variable GENIE_REWEIGHT is not defined. When using GENIE v3+, we require the reweight product to be built and accessible via the environment variable GENIE_REWEIGHT")

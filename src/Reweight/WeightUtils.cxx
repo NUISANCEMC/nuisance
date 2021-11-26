@@ -24,7 +24,7 @@ using namespace t2krew;
 #include "NIWGSyst.h"
 #endif
 
-#ifdef __NEUT_ENABLED__
+#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
 #include "NReWeight.h"
 #include "NSyst.h"
 #endif

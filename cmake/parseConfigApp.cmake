@@ -1,93 +1,89 @@
-function(GETFIRSTMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG DIR_OUT FAILURE_IS_NOT_ERROR)
+function(dump_cmake_variables)
+    get_cmake_property(_variableNames VARIABLES)
+    list (SORT _variableNames)
+    foreach (_variableName ${_variableNames})
+        if (ARGV0)
+            unset(MATCHED)
+            string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
+            if (NOT MATCHED)
+                continue()
+            endif()
+        endif()
+        cmessage(WARNING "${_variableName}=${${_variableName}}")
+    endforeach()
+endfunction()
 
-  if(DELIM STREQUAL "")
-    cmessage(FATAL_ERROR "GETFIRSTMATCHINGDELMIMMEDDIR Passed no delimiter. This is a build configuration bug in NUISANCE, please report to the developers.")
-  endif()
+function(GetFirstMatchingDelimitedArg)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs DELIMITER CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
 
-  if(CONFIGAPP STREQUAL "")
-    cmessage(FATAL_ERROR "GETFIRSTMATCHINGDELMIMMEDDIR Passed no configuration application. This is a build configuration bug in NUISANCE, please report to the developers.")
-  endif()
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE DELIMITER)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetFirstMatchingDelimitedArg called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
 
-  SET(CONFIGAPP_LOCATION "CONFIGAPP_LOCATION-NOTFOUND")
-  find_program(CONFIGAPP_LOCATION ${CONFIGAPP})
-  if(NOT CONFIGAPP_LOCATION STREQUAL "CONFIGAPP_LOCATION-NOTFOUND")
-    execute_process (COMMAND ${CONFIGAPP_LOCATION}
-    ${ARG} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
+  SET(CONFIG_APP_LOCATION "CONFIG_APP_LOCATION-NOTFOUND")
+  find_program(CONFIG_APP_LOCATION ${OPTS_CONFIG_APP})
+  if(NOT CONFIG_APP_LOCATION STREQUAL "CONFIG_APP_LOCATION-NOTFOUND")
+    execute_process (COMMAND ${CONFIG_APP_LOCATION}
+      ${OPTS_ARGS} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    cmessage(DEBUG "${CONFIGAPP_LOCATION} ${ARG} responded with: \"${CONFIGAPP_RESPONSE_RAW}\"")
+    cmessage(DEBUG "${CONFIG_APP_LOCATION} ${OPTS_ARGS} responded with: \"${CONFIGAPP_RESPONSE_RAW}\"")
 
     if(CONFIGAPP_RESPONSE_RAW STREQUAL "")
-      if(FAILURE_IS_NOT_ERROR)
-        cmessage(DEBUG "\"${CONFIGAPP_LOCATION} ${ARG}\" produced no output and was expected to.")
+      if(OPTS_ALLOW_FAIL)
+        cmessage(DEBUG "\"${CONFIG_APP_LOCATION} ${OPTS_ARGS}\" produced no output and was expected to.")
         set(${DIR_OUT} "" PARENT_SCOPE)
       else()
-        cmessage(FATAL_ERROR "\"${CONFIGAPP_LOCATION} ${ARG}\" produced no output and was required to.")
+        cmessage(FATAL_ERROR "\"${CONFIG_APP_LOCATION} ${OPTS_ARGS}\" produced no output and was required to.")
       endif()
     else()
-      string(REGEX MATCH "${DELIM}\([^ ]+\)" PARSE_CONFIGAPP_RESPONSE_MATCH ${CONFIGAPP_RESPONSE_RAW})
+      string(REGEX MATCH "${OPTS_DELIMITER}\([^ ]+\)" PARSE_CONFIGAPP_RESPONSE_MATCH ${CONFIGAPP_RESPONSE_RAW})
 
       if(NOT PARSE_CONFIGAPP_RESPONSE_MATCH)
-        if(FAILURE_IS_NOT_ERROR)
-          cmessage(DEBUG "Couldn't find ${DELIM} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
+        if(OPTS_ALLOW_FAIL)
+          cmessage(DEBUG "Couldn't find ${OPTS_DELIMITER} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
           set(${CMAKE_MATCH_1} "")
         else()
-          cmessage(FATAL_ERROR "Expected to be able to parse the result of ${CONFIGAPP} ${ARG} to a directory, but couldn't find a ${DELIM} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
+          cmessage(FATAL_ERROR "Expected to be able to parse the result of ${OPTS_CONFIG_APP} ${OPTS_ARGS} to a directory, but couldn't find a ${OPTS_DELIMITER} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
         endif()
       endif()
 
-      set(${DIR_OUT} ${CMAKE_MATCH_1} PARENT_SCOPE)
+      set(${OPTS_OUTPUT_VARIABLE} ${CMAKE_MATCH_1} PARENT_SCOPE)
     endif()
   else()
-    cmessage(FATAL_ERROR "[ERROR]: Failed to find dependency configuration application: \"${CONFIGAPP}\"")
+    cmessage(FATAL_ERROR "[ERROR]: Failed to find dependency configuration application: \"${OPTS_CONFIG_APP}\"")
   endif()
 endfunction()
 
-#Uselike GETLIBDIR(gsl-config --libs GSL_LIB_DIR)
-function(GETLIBDIR CONFIGAPP ARG LIBDIR_OUT)
-  if(ARGN)
-    set(FAILURE_IS_NOT_ERROR TRUE)
-  else()
-    set(FAILURE_IS_NOT_ERROR FALSE)
-  endif()
-  GETFIRSTMATCHINGDELMIMMEDDIR(
-    "-L"
-    ${CONFIGAPP}
-    ${ARG}
-    MATCHING_DIR
-    ${FAILURE_IS_NOT_ERROR})
-  set(${LIBDIR_OUT} ${MATCHING_DIR} PARENT_SCOPE)
-endfunction()
+function(GetAllMatchingDelimitedArg)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs DELIMITER CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
 
-#Uselike GETINCDIR(gsl-config --cflags GSL_INC_DIR)
-function(GETINCDIR CONFIGAPP ARG INCDIR_OUT)
-  if(ARGN)
-    set(FAILURE_IS_NOT_ERROR TRUE)
-  else()
-    set(FAILURE_IS_NOT_ERROR FALSE)
-  endif()
-  GETFIRSTMATCHINGDELMIMMEDDIR(
-    "-I"
-    ${CONFIGAPP}
-    ${ARG}
-    MATCHING_DIR
-    ${FAILURE_IS_NOT_ERROR})
-  set(${INCDIR_OUT} ${MATCHING_DIR} PARENT_SCOPE)
-endfunction()
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE DELIMITER)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetAllMatchingDelimitedArg called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
 
-function(GETALLMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG LIST_OUT)
-  if(DELIM STREQUAL "")
-    cmessage(FATAL_ERROR "GETALLMATCHINGDELMIMMEDDIR Passed no delimiter. This is a build configuration bug in NUISANCE, please report to the developers.")
-  endif()
-
-  if(CONFIGAPP STREQUAL "")
-    cmessage(FATAL_ERROR "GETALLMATCHINGDELMIMMEDDIR Passed no configuration application. This is a build configuration bug in NUISANCE, please report to the developers.")
-  endif()
-
-  SET(CONFIGAPP_LOCATION "CONFIGAPP_LOCATION-NOTFOUND")
-  find_program(CONFIGAPP_LOCATION ${CONFIGAPP})
-  if(NOT CONFIGAPP_LOCATION STREQUAL "CONFIGAPP_LOCATION-NOTFOUND")
-    execute_process (COMMAND ${CONFIGAPP_LOCATION}
-    ${ARG} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
+  SET(CONFIG_APP_LOCATION "CONFIG_APP_LOCATION-NOTFOUND")
+  find_program(CONFIG_APP_LOCATION ${OPTS_CONFIG_APP})
+  if(NOT CONFIG_APP_LOCATION STREQUAL "CONFIG_APP_LOCATION-NOTFOUND")
+    execute_process (COMMAND ${CONFIG_APP_LOCATION}
+      ${OPTS_ARGS} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     string(REPLACE " " ";" CONFIGAPP_RESPONSE_LIST "${CONFIGAPP_RESPONSE_RAW}")
 
@@ -95,91 +91,281 @@ function(GETALLMATCHINGDELMIMMEDDIR DELIM CONFIGAPP ARG LIST_OUT)
 
     foreach(I ${CONFIGAPP_RESPONSE_LIST})
       if(I)
-        string(REGEX MATCH "^${DELIM}" WASMATCHED ${I})
+        string(REGEX MATCH "^${OPTS_DELIMITER}" WASMATCHED ${I})
         if(WASMATCHED)
-          string(REPLACE "${DELIM}" "" I_STRIPPED "${I}")
+          string(REPLACE "${OPTS_DELIMITER}" "" I_STRIPPED "${I}")
           LIST(APPEND LIST_BUILD ${I_STRIPPED})
         endif()
       endif()
     endforeach()
 
-    set(${LIST_OUT} ${LIST_BUILD} PARENT_SCOPE)
+    set(${OPTS_OUTPUT_VARIABLE} ${LIST_BUILD} PARENT_SCOPE)
   else()
-    cmessage(FATAL_ERROR "[ERROR]: Failed to find dependency configuration application: \"${CONFIGAPP}\"")
+    cmessage(FATAL_ERROR "[ERROR]: Failed to find dependency configuration application: \"${OPTS_CONFIG_APP}\"")
   endif()
 endfunction()
 
-#Uselike GETLIBDIRS(gsl-config --libs GSL_LIB_DIR)
-function(GETLIBDIRS CONFIGAPP ARG LIBDIR_OUT)
-  GETALLMATCHINGDELMIMMEDDIR(
-    "-L"
-    ${CONFIGAPP}
-    ${ARG}
-    MATCHING_DIR)
-  set(${LIBDIR_OUT} ${MATCHING_DIR} PARENT_SCOPE)
-endfunction()
 
-#Uselike GETINCDIRS(gsl-config --cflags GSL_INC_DIR)
-function(GETINCDIRS CONFIGAPP ARG INCDIR_OUT)
-  GETALLMATCHINGDELMIMMEDDIR(
-    "-I"
-    ${CONFIGAPP}
-    ${ARG}
-    MATCHING_DIR)
-  set(${INCDIR_OUT} ${MATCHING_DIR} PARENT_SCOPE)
-endfunction()
+#Uselike GetLibDir(CONFIG_APP gsl-config ARGS --libs OUTPUT_VARIABLE GSL_LIB_DIR)
+function(GetLibDir)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
 
-#Uselike GETLIBS(gsl-config --libs GSL_LIB_DIR)
-function(GETLIBS CONFIGAPP ARG LIBLIST_OUT)
-  GETALLMATCHINGDELMIMMEDDIR(
-    "-l"
-    ${CONFIGAPP}
-    ${ARG}
-    MATCHING_ITEMS)
-  set(${LIBLIST_OUT} ${MATCHING_ITEMS} PARENT_SCOPE)
-endfunction()
+  foreach(ARG "CONFIG_APP;OUTPUT_VARIABLE")
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetLibDir called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
 
-function(BuildFlagString OUTPUTLIST DELIMITER)
-  LIST(APPEND INPUT_LIST ${ARGN})
-  if(NOT DELIMITER STREQUAL "")
-    string(STRIP ${DELIMITER} DELIMITER)
+  set(ALLOW_FAIL)
+  if(OPTS_ALLOW_FAIL)
+    set(ALLOW_FAIL "ALLOW_FAIL")
   endif()
+
+  GetFirstMatchingDelimitedArg(
+    DELIMITER "-L"
+    CONFIG_APP ${OPTS_CONFIG_APP}
+    ARGS ${OPTS_ARGS}
+    OUTPUT_VARIABLE MATCHING_DIR
+    ${ALLOW_FAIL})
+
+  set(${OPTS_OUTPUT_VARIABLE} ${MATCHING_DIR} PARENT_SCOPE)
+endfunction()
+
+#Uselike GetIncDir(CONFIG_APP gsl-config ARGS --incdir OUTPUT_VARIABLE GSL_INC_DIR)
+function(GetIncDir)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetIncDir called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  set(ALLOW_FAIL)
+  if(OPTS_ALLOW_FAIL)
+    set(ALLOW_FAIL "ALLOW_FAIL")
+  endif()
+
+  GetFirstMatchingDelimitedArg(
+    DELIMITER "-I"
+    CONFIG_APP ${OPTS_CONFIG_APP}
+    ARGS ${OPTS_ARGS}
+    OUTPUT_VARIABLE MATCHING_DIR
+    ${ALLOW_FAIL})
+
+  set(${OPTS_OUTPUT_VARIABLE} ${MATCHING_DIR} PARENT_SCOPE)
+endfunction()
+
+
+#Uselike GetLibDirs(CONFIG_APP gsl-config ARGS --libs OUTPUT_VARIABLE GSL_LIB_DIR)
+function(GetLibDirs)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetLibDirs called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  set(ALLOW_FAIL)
+  if(OPTS_ALLOW_FAIL)
+    set(ALLOW_FAIL "ALLOW_FAIL")
+  endif()
+
+  GetAllMatchingDelimitedArg(
+    DELIMITER "-L"
+    CONFIG_APP ${OPTS_CONFIG_APP}
+    ARGS ${OPTS_ARGS}
+    OUTPUT_VARIABLE MATCHING_DIR
+    ${ALLOW_FAIL})
+
+  set(${OPTS_OUTPUT_VARIABLE} ${MATCHING_DIR} PARENT_SCOPE)
+endfunction()
+
+#Uselike GetLibs(CONFIG_APP gsl-config ARGS --libs OUTPUT_VARIABLE GSL_LIB_DIR)
+function(GetLibs)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetLibDir called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  set(ALLOW_FAIL)
+  if(OPTS_ALLOW_FAIL)
+    set(ALLOW_FAIL "ALLOW_FAIL")
+  endif()
+
+  GetAllMatchingDelimitedArg(
+    DELIMITER "-l"
+    CONFIG_APP ${OPTS_CONFIG_APP}
+    ARGS ${OPTS_ARGS}
+    OUTPUT_VARIABLE MATCHING_DIR
+    ${ALLOW_FAIL})
+
+  set(${OPTS_OUTPUT_VARIABLE} ${MATCHING_DIR} PARENT_SCOPE)
+endfunction()
+
+#Uselike GetIncDirs(CONFIG_APP gsl-config ARGS --incdir OUTPUT_VARIABLE GSL_INC_DIR)
+function(GetIncDirs)
+  set(options ALLOW_FAIL)
+  set(oneValueArgs CONFIG_APP OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+
+  foreach(ARG CONFIG_APP OUTPUT_VARIABLE)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "GetIncDir called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  set(ALLOW_FAIL)
+  if(OPTS_ALLOW_FAIL)
+    set(ALLOW_FAIL "ALLOW_FAIL")
+  endif()
+
+  GetAllMatchingDelimitedArg(
+    DELIMITER "-I"
+    CONFIG_APP ${OPTS_CONFIG_APP}
+    ARGS ${OPTS_ARGS}
+    OUTPUT_VARIABLE MATCHING_DIR
+    ${ALLOW_FAIL})
+
+  set(${OPTS_OUTPUT_VARIABLE} ${MATCHING_DIR} PARENT_SCOPE)
+endfunction()
+
+function(BuildFlagString)
+  set(oneValueArgs DELIMITER OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG DELIMITER OUTPUT_VARIABLE ARGS)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "BuildFlagString called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  LIST(APPEND INPUT_LIST ${OPTS_ARGS})
   if(NOT "${INPUT_LIST}" STREQUAL "")
-    string(REPLACE ";" " ${DELIMITER}" LIST_STR "${DELIMITER}${INPUT_LIST}")
+    string(REPLACE ";" " ${OPTS_DELIMITER}" LIST_STR "${OPTS_DELIMITER}${INPUT_LIST}")
     string(STRIP "${LIST_STR}" LIST_STR)
-    set(${OUTPUTLIST} ${LIST_STR} PARENT_SCOPE)
+    set(${OPTS_OUTPUT_VARIABLE} ${LIST_STR} PARENT_SCOPE)
   else()
-      set(${OUTPUTLIST} PARENT_SCOPE)
+      set(${OPTS_OUTPUT_VARIABLE} PARENT_SCOPE)
   endif()
 endfunction()
 
 #Here we want to look for linker flags in a list of libraries and escape them
-function(BuildLibraryFlagString OUTPUTLIST)
-  set(INPUT_LIST ${ARGN})
-  BuildFlagString(NEED_SCRUB_LINKOPTS "-l" ${INPUT_LIST})
-  string(REPLACE "-l-" "-" LIST_STR ${NEED_SCRUB_LINKOPTS})
-  set(${OUTPUTLIST} ${LIST_STR} PARENT_SCOPE)
+function(BuildLibraryFlagString)
+  set(oneValueArgs OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG OUTPUT_VARIABLE ARGS)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "BuildLibraryFlagString called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
+  BuildFlagString(
+    OUTPUT_VARIABLE LINKOPTS 
+    DELIMITER "-l" 
+    ${OPTS_ARGS})
+
+  string(REPLACE "-l-" "-" LINKOPTS "${LINKOPTS}")
+  set(${OPTS_OUTPUT_VARIABLE} ${LINKOPTS} PARENT_SCOPE)
 endfunction()
 
-function(CatStringsIfNotEmpty OUTPUT_STRING)
+function(CatStringsIfNotEmpty)
+  set(oneValueArgs OUTPUT_VARIABLE)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG OUTPUT_VARIABLE ARGS)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "CatStringsIfNotEmpty called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
+    endif()
+  endforeach()
+
   set(BUILD_STR)
-  foreach(I ${ARGN})
-    if(NOT I STREQUAL "")
+  foreach(I ${OPTS_ARGS})
+    if(NOT "${I} " STREQUAL " ")
       set(BUILD_STR "${BUILD_STR} ${I}")
     endif()
   endforeach()
-  if(NOT BUILD_STR STREQUAL "")
+  if(NOT "${BUILD_STR} " STREQUAL " ")
     string(STRIP "${BUILD_STR}" BUILD_STR)
   endif()
-  set(${OUTPUT_STRING} ${BUILD_STR} PARENT_SCOPE)
+  set(${OPTS_OUTPUT_VARIABLE} ${BUILD_STR} PARENT_SCOPE)
 endfunction()
 
-function(PrefixList OUTPUT_LIST PREFIX)
-  set(${OUTPUT_LIST})
-  foreach(I ${ARGN})
-    if(NOT I STREQUAL "")
-      LIST(APPEND ${OUTPUT_LIST} "${PREFIX}${I}")
+function(PrefixList)
+  set(oneValueArgs OUTPUT_VARIABLE PREFIX)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(OPTS 
+                      "${options}" 
+                      "${oneValueArgs}"
+                      "${multiValueArgs}" ${ARGN})
+
+  foreach(ARG OUTPUT_VARIABLE PREFIX ARGS)
+    if(NOT DEFINED OPTS_${ARG})
+      dump_cmake_variables("OPTS_")
+      cmessage(FATAL_ERROR "PrefixList called without required argument ${ARG}\n\tARGN:\n\t\t${ARGN}")
     endif()
   endforeach()
-  set(${OUTPUT_LIST} ${${OUTPUT_LIST}} PARENT_SCOPE)
+
+  set(BUILD_LIST)
+  foreach(I ${ARGN})
+    if(NOT "${I} " STREQUAL " ")
+      LIST(APPEND BUILD_LIST "${PREFIX}${I}")
+    endif()
+  endforeach()
+  set(${OPTS_OUTPUT_VARIABLE} ${BUILD_LIST} PARENT_SCOPE)
 endfunction()

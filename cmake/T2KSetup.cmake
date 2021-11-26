@@ -30,108 +30,133 @@ else()
 endif()
 
 if(HAVET2KRWCONFIG)
-	if(NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-	  SET(CMAKE_CXX_STANDARD 11)
-	endif()
 
-	LIST(APPEND EXTRA_CXX_FLAGS -DT2KRW_OA2021_INTERFACE -D__T2KREW_ENABLED__)
+	  execute_process (COMMAND t2kreweight-config
+    --version OUTPUT_VARIABLE T2KRW_VER
+             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-	GETLIBDIRS(t2kreweight-config --linkflags T2KRW_LINK_DIRS)
-	GETINCDIRS(t2kreweight-config --cflags T2KRW_INC_DIRS)
-	GETLIBS(t2kreweight-config --linkflags T2KRW_LIBS)
+  if(T2KRW_VER VERSION_GREATER_EQUAL 21.11)
+  	GetLibDirs(CONFIG_APP t2kreweight-config ARGS --libs OUTPUT_VARIABLE T2KRW_LINK_DIRS)
+		GetIncDirs(CONFIG_APP t2kreweight-config ARGS --cflags OUTPUT_VARIABLE T2KRW_INC_DIRS)
+		GetLibs(CONFIG_APP t2kreweight-config ARGS --libs OUTPUT_VARIABLE T2KRW_LIBS)
 
-	cmessage(STATUS "T2KReWeight:")
-	cmessage(STATUS "       LINK DIRS: ${T2KRW_LINK_DIRS}")
-	cmessage(STATUS "        INC DIRS: ${T2KRW_INC_DIRS}")
-	cmessage(STATUS "            LIBS: ${T2KRW_LIBS}")
+    PrefixList(PREFIX "-I" ARGS ${T2KRW_INC_DIRS} OUTPUT_VARIABLE T2KRW_INC_DIRS)
 
-	LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KRW_INC_DIRS})
-	LIST(APPEND EXTRA_LINK_DIRS ${T2KRW_LINK_DIRS})
-	LIST(APPEND EXTRA_LIBS ${T2KRW_LIBS})
+		cmessage(STATUS "T2KReWeight:")
+		cmessage(STATUS "       LINK DIRS: ${T2KRW_LINK_DIRS}")
+		cmessage(STATUS "        INC DIRS: ${T2KRW_INC_DIRS}")
+		cmessage(STATUS "            LIBS: ${T2KRW_LIBS}")
 
+		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KRW_INC_DIRS})
+		LIST(APPEND EXTRA_LINK_DIRS ${T2KRW_LINK_DIRS})
+		LIST(APPEND EXTRA_LIBS ${T2KRW_LIBS})
 
-	execute_process (COMMAND t2kreweight-config
-	  --has-feature NIWG RESULT_VARIABLE T2KRW_HAS_NIWG)
+  else()
 
-	if("${T2KRW_HAS_NIWG} " STREQUAL "0 ")
+		if(NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
+		  SET(CMAKE_CXX_STANDARD 11)
+		endif()
 
-		GETLIBDIRS(t2kreweight-config --niwgflags NIWG_LINK_DIRS)
-		GETINCDIRS(t2kreweight-config --niwgflags NIWG_INC_DIRS)
-		GETLIBS(t2kreweight-config --niwgflags NIWG_LIBS)
+		LIST(APPEND EXTRA_CXX_FLAGS -DT2KRW_OA2021_INTERFACE -D__T2KREW_ENABLED__)
 
-		cmessage(STATUS "NIWG:")
-		cmessage(STATUS "       LINK DIRS: ${NIWG_LINK_DIRS}")
-		cmessage(STATUS "        INC DIRS: ${NIWG_INC_DIRS}")
-		cmessage(STATUS "            LIBS: ${NIWG_LIBS}")
+		GetLibDirs(CONFIG_APP t2kreweight-config ARGS --linkflags OUTPUT_VARIABLE T2KRW_LINK_DIRS)
+		GetIncDirs(CONFIG_APP t2kreweight-config ARGS --cflags OUTPUT_VARIABLE T2KRW_INC_DIRS)
+		GetLibs(CONFIG_APP t2kreweight-config ARGS --linkflags OUTPUT_VARIABLE T2KRW_LIBS)
 
-		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NIWG_INC_DIRS})
-		LIST(APPEND EXTRA_LINK_DIRS ${NIWG_LINK_DIRS})
-		LIST(APPEND EXTRA_LIBS ${NIWG_LIBS})
+		cmessage(STATUS "T2KReWeight:")
+		cmessage(STATUS "       LINK DIRS: ${T2KRW_LINK_DIRS}")
+		cmessage(STATUS "        INC DIRS: ${T2KRW_INC_DIRS}")
+		cmessage(STATUS "            LIBS: ${T2KRW_LIBS}")
 
-	endif()
-
-	execute_process (COMMAND t2kreweight-config
-	  --has-feature NEUT RESULT_VARIABLE T2KRW_HAS_NEUT)
-
-	if("${T2KRW_HAS_NEUT} " STREQUAL "0 ")
-
-		LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_EVENT_ENABLED)
-		set(USE_NEUT_EVENT TRUE)
-		set(USE_NEUT_EVENT TRUE CACHE BOOL "Whether to enable NEUT (event i/o) support. Requires external libraries. <FALSE>" FORCE)
+		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${T2KRW_INC_DIRS})
+		LIST(APPEND EXTRA_LINK_DIRS ${T2KRW_LINK_DIRS})
+		LIST(APPEND EXTRA_LIBS ${T2KRW_LIBS})
 
 
-		GETLIBDIRS(t2kreweight-config --neutflags NEUT_LINK_DIRS)
-		GETINCDIRS(t2kreweight-config --neutflags NEUT_INC_DIRS)
-		GETLIBS(t2kreweight-config --neutflags NEUT_LIBS)
+		execute_process (COMMAND t2kreweight-config
+		  --has-feature NIWG RESULT_VARIABLE T2KRW_HAS_NIWG)
 
-		cmessage(STATUS "NEUT:")
-		cmessage(STATUS "       LINK DIRS: ${NEUT_LINK_DIRS}")
-		cmessage(STATUS "        INC DIRS: ${NEUT_INC_DIRS}")
-		cmessage(STATUS "            LIBS: ${NEUT_LIBS}")
+		if("${T2KRW_HAS_NIWG} " STREQUAL "0 ")
 
-		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NEUT_INC_DIRS})
-		LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
-		LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
+			GetLibDirs(CONFIG_APP t2kreweight-config ARGS --niwgflags OUTPUT_VARIABLE NIWG_LINK_DIRS)
+			GetIncDirs(CONFIG_APP t2kreweight-config ARGS --niwgflags OUTPUT_VARIABLE NIWG_INC_DIRS)
+			GetLibs(CONFIG_APP t2kreweight-config ARGS --niwgflags OUTPUT_VARIABLE NIWG_LIBS)
 
-	endif()
+			cmessage(STATUS "NIWG:")
+			cmessage(STATUS "       LINK DIRS: ${NIWG_LINK_DIRS}")
+			cmessage(STATUS "        INC DIRS: ${NIWG_INC_DIRS}")
+			cmessage(STATUS "            LIBS: ${NIWG_LIBS}")
 
-	execute_process (COMMAND t2kreweight-config
-	  --has-feature GEANT RESULT_VARIABLE T2KRW_HAS_GEANT)
+			LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NIWG_INC_DIRS})
+			LIST(APPEND EXTRA_LINK_DIRS ${NIWG_LINK_DIRS})
+			LIST(APPEND EXTRA_LIBS ${NIWG_LIBS})
 
-	if("${T2KRW_HAS_GEANT} " STREQUAL "0 ")
+		endif()
 
-		GETLIBDIRS(t2kreweight-config --geantflags GEANT_LINK_DIRS)
-		GETINCDIRS(t2kreweight-config --geantflags GEANT_INC_DIRS)
-		GETLIBS(t2kreweight-config --geantflags GEANT_LIBS)
+		execute_process (COMMAND t2kreweight-config
+		  --has-feature NEUT RESULT_VARIABLE T2KRW_HAS_NEUT)
 
-		cmessage(STATUS "GEANT:")
-		cmessage(STATUS "       LINK DIRS: ${GEANT_LINK_DIRS}")
-		cmessage(STATUS "        INC DIRS: ${GEANT_INC_DIRS}")
-		cmessage(STATUS "            LIBS: ${GEANT_LIBS}")
+		if("${T2KRW_HAS_NEUT} " STREQUAL "0 ")
 
-		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${GEANT_INC_DIRS})
-		LIST(APPEND EXTRA_LINK_DIRS ${GEANT_LINK_DIRS})
-		LIST(APPEND EXTRA_LIBS ${GEANT_LIBS})
+			LIST(APPEND EXTRA_CXX_FLAGS -DNEUT_EVENT_ENABLED)
+			set(USE_NEUT_EVENT TRUE)
+			set(USE_NEUT_EVENT TRUE CACHE BOOL "Whether to enable NEUT (event i/o) support. Requires external libraries. <FALSE>" FORCE)
 
-	endif()
 
-	execute_process (COMMAND t2kreweight-config
-	  --has-feature ND280 RESULT_VARIABLE T2KRW_HAS_ND280)
+			GetLibDirs(CONFIG_APP t2kreweight-config ARGS --neutflags OUTPUT_VARIABLE NEUT_LINK_DIRS)
+			GetIncDirs(CONFIG_APP t2kreweight-config ARGS --neutflags OUTPUT_VARIABLE NEUT_INC_DIRS)
+			GetLibs(CONFIG_APP t2kreweight-config ARGS --neutflags OUTPUT_VARIABLE NEUT_LIBS)
 
-	if("${T2KRW_HAS_ND280} " STREQUAL "0 ")
+			cmessage(STATUS "NEUT:")
+			cmessage(STATUS "       LINK DIRS: ${NEUT_LINK_DIRS}")
+			cmessage(STATUS "        INC DIRS: ${NEUT_INC_DIRS}")
+			cmessage(STATUS "            LIBS: ${NEUT_LIBS}")
 
-		GETLIBDIRS(t2kreweight-config --nd280flags ND280_LINK_DIRS)
-		GETINCDIRS(t2kreweight-config --nd280flags ND280_INC_DIRS)
-		GETLIBS(t2kreweight-config --nd280flags ND280_LIBS)
+			LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${NEUT_INC_DIRS})
+			LIST(APPEND EXTRA_LINK_DIRS ${NEUT_LINK_DIRS})
+			LIST(APPEND EXTRA_LIBS ${NEUT_LIBS})
 
-		cmessage(STATUS "ND280:")
-		cmessage(STATUS "       LINK DIRS: ${ND280_LINK_DIRS}")
-		cmessage(STATUS "        INC DIRS: ${ND280_INC_DIRS}")
-		cmessage(STATUS "            LIBS: ${ND280_LIBS}")
+		endif()
 
-		LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${ND280_INC_DIRS})
-		LIST(APPEND EXTRA_LINK_DIRS ${ND280_LINK_DIRS})
-		LIST(APPEND EXTRA_LIBS ${ND280_LIBS})
+		execute_process (COMMAND t2kreweight-config
+		  --has-feature GEANT RESULT_VARIABLE T2KRW_HAS_GEANT)
+
+		if("${T2KRW_HAS_GEANT} " STREQUAL "0 ")
+
+			GetLibDirs(CONFIG_APP t2kreweight-config ARGS --geantflags OUTPUT_VARIABLE GEANT_LINK_DIRS)
+			GetIncDirs(CONFIG_APP t2kreweight-config ARGS --geantflags OUTPUT_VARIABLE GEANT_INC_DIRS)
+			GetLibs(CONFIG_APP t2kreweight-config ARGS --geantflags OUTPUT_VARIABLE GEANT_LIBS)
+
+			cmessage(STATUS "GEANT:")
+			cmessage(STATUS "       LINK DIRS: ${GEANT_LINK_DIRS}")
+			cmessage(STATUS "        INC DIRS: ${GEANT_INC_DIRS}")
+			cmessage(STATUS "            LIBS: ${GEANT_LIBS}")
+
+			LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${GEANT_INC_DIRS})
+			LIST(APPEND EXTRA_LINK_DIRS ${GEANT_LINK_DIRS})
+			LIST(APPEND EXTRA_LIBS ${GEANT_LIBS})
+
+		endif()
+
+		execute_process (COMMAND t2kreweight-config
+		  --has-feature ND280 RESULT_VARIABLE T2KRW_HAS_ND280)
+
+		if("${T2KRW_HAS_ND280} " STREQUAL "0 ")
+
+			GetLibDirs(CONFIG_APP t2kreweight-config ARGS --nd280flags OUTPUT_VARIABLE ND280_LINK_DIRS)
+			GetIncDirs(CONFIG_APP t2kreweight-config ARGS --nd280flags OUTPUT_VARIABLE ND280_INC_DIRS)
+			GetLibs(CONFIG_APP t2kreweight-config ARGS --nd280flags OUTPUT_VARIABLE ND280_LIBS)
+
+			cmessage(STATUS "ND280:")
+			cmessage(STATUS "       LINK DIRS: ${ND280_LINK_DIRS}")
+			cmessage(STATUS "        INC DIRS: ${ND280_INC_DIRS}")
+			cmessage(STATUS "            LIBS: ${ND280_LIBS}")
+
+			LIST(APPEND RWENGINE_INCLUDE_DIRECTORIES ${ND280_INC_DIRS})
+			LIST(APPEND EXTRA_LINK_DIRS ${ND280_LINK_DIRS})
+			LIST(APPEND EXTRA_LIBS ${ND280_LIBS})
+
+		endif()
 
 	endif()
 
