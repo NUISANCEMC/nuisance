@@ -34,12 +34,17 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
   fSettings = LoadSampleSettings(samplekey);
   std::string name = fSettings.GetS("name");
 
-  if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_nu") ) {
-    //fDist = kPmu;
-    //objSuffix = "mumom";
-    //fSettings.SetXTitle("cos#theta_{p}-p_{p} (GeV)");
-    fSettings.SetXTitle( "bin number" );
+  // The main histograms use the bin number on the x-axis
+  fSettings.SetXTitle( "bin number" );
+
+  if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_PpCosp_nu") ) {
+    fDist = kPpCosp;
     fSettings.SetYTitle( "d^{2}#sigma/dp_{p}dcos#theta_{p}"
+      " (cm^{2}/GeV/^{40}Ar)" );
+  }
+  else if ( !name.compare("MicroBooNE_CC1MuNp_XSec_2D_PmuCosmu_nu") ) {
+    fDist = kPmuCosmu;
+    fSettings.SetYTitle( "d^{2}#sigma/dp_{#mu}dcos#theta_{#mu}"
       " (cm^{2}/GeV/^{40}Ar)" );
   }
   else {
@@ -57,8 +62,8 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
   fSettings.SetAllowedTypes( "FULL,DIAG/FREE,SHAPE,FIX/SYSTCOV/STATCOV",
     "FIX/FULL" );
   fSettings.SetEnuRange( 0.0, 6.8 );
-  fSettings.DefineAllowedTargets("Ar");
-  fSettings.DefineAllowedSpecies("numu");
+  fSettings.DefineAllowedTargets( "Ar" );
+  fSettings.DefineAllowedSpecies( "numu" );
   FinaliseSampleSettings();
 
   // ScaleFactor for the flux-averaged total cross section (cm^2 / ^{40}Ar).
@@ -104,34 +109,30 @@ MicroBooNE_CC1MuNp_XSec_2D_nu::MicroBooNE_CC1MuNp_XSec_2D_nu(nuiskey samplekey) 
 
 bool MicroBooNE_CC1MuNp_XSec_2D_nu::isSignal( FitEvent* event ) {
   return SignalDef::MicroBooNE::isCC1MuNp( event, EnuMin, EnuMax );
-  //bool is_sig = SignalDef::MicroBooNE::isCC1MuNp( event, EnuMin, EnuMax );
-  //if ( !is_sig ) return false;
-
-  //const int PROTON = 2212;
-
-  //if ( event->NumFSParticle(PROTON) == 0 ) return false;
-  //double pp = event->GetHMFSParticle(PROTON)->fP.Vect().Mag() / 1000;
-  //double cosp = event->GetHMFSParticle(PROTON)->fP.Vect().CosTheta();
-  //const auto iter = fBinToDefinitionMap.cbegin();
-  //const auto& def = iter->second;
-  //return def.InBin( pp, cosp );
 };
 
 
 void MicroBooNE_CC1MuNp_XSec_2D_nu::FillEventVariables( FitEvent* event ) {
 
   const int PROTON = 2212;
+  const int MU_MINUS = 13;
 
-  if ( event->NumFSParticle(PROTON) == 0 ) return;
-  double pp = event->GetHMFSParticle(PROTON)->fP.Vect().Mag() / 1000;
-  double cosp = event->GetHMFSParticle(PROTON)->fP.Vect().CosTheta();
+  int pdg;
+  double p, cos;
+  if ( fDist == kPpCosp ) pdg = PROTON;
+  else if ( fDist == kPmuCosmu ) pdg = MU_MINUS;
+  else assert( false );
+
+  if ( event->NumFSParticle(pdg) == 0 ) return;
+  p = event->GetHMFSParticle(pdg)->fP.Vect().Mag() / 1000;
+  cos = event->GetHMFSParticle(pdg)->fP.Vect().CosTheta();
 
   // TODO: Consider revising. Makes a critical assumption that exactly
   // one bin will ever be filled per event.
   for ( const auto& bin_pair : fBinToDefinitionMap ) {
     int bin_idx = bin_pair.first;
     const BinDef& def = bin_pair.second;
-    if ( def.InBin(pp, cosp) ) {
+    if ( def.InBin(p, cos) ) {
       fXVar = bin_idx;
       return;
     }
@@ -174,8 +175,13 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::ConvertEventRates() {
 }
 
 void MicroBooNE_CC1MuNp_XSec_2D_nu::LoadBinDefinitions() {
-  const std::string binning_file_name = FitPar::GetDataBase()
-    + "/MicroBooNE/mybins2Dproton.txt";
+  std::string binning_file_name = FitPar::GetDataBase();
+  if ( fDist == kPpCosp ) {
+    binning_file_name += "/MicroBooNE/mybins2Dproton.txt";
+  }
+  else if ( fDist == kPmuCosmu ) {
+    binning_file_name += "/MicroBooNE/mybins2Dmuon.txt";
+  }
   std::ifstream bin_file( binning_file_name );
   int bin_idx = 0;
   double xmin, xmax, ymin, ymax;
@@ -229,10 +235,17 @@ void MicroBooNE_CC1MuNp_XSec_2D_nu::MakeSlices() {
 
       current_slice_hist->SetName( temp_ss.str().c_str() );
 
-      temp_ss << ", p_{p} [" << def.fXMin << "," << def.fXMax << "] GeV";
+      std::string particle_subscript;
+      if ( fDist == kPpCosp ) particle_subscript = "p";
+      else if ( fDist == kPmuCosmu ) particle_subscript = "#mu";
+      else assert( false );
+
+      temp_ss << ", p_{" << particle_subscript << "} [" << def.fXMin
+        << "," << def.fXMax << "] GeV";
       current_slice_hist->SetTitle( temp_ss.str().c_str() );
 
-      current_slice_hist->GetXaxis()->SetTitle( "cos#theta_{p}" );
+      current_slice_hist->GetXaxis()->SetTitle(
+        ("cos#theta_{" + particle_subscript + '}').c_str() );
       current_slice_hist->GetYaxis()->SetTitle( fSettings.GetYTitle().c_str() );
 
       fMCHist_Slices.push_back( current_slice_hist );

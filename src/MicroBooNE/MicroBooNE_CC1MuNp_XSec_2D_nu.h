@@ -45,9 +45,6 @@ public:
   void Write( std::string drawopt );
 
 private:
-  //TH2D* fSmearingMatrix;
-  //enum Distribution { kPmu, kPp, kCosMu, kCosP, kThetaMuP };
-  //Distribution fDist;
   void LoadBinDefinitions();
   struct BinDef {
     BinDef() {}
@@ -70,6 +67,10 @@ private:
 
   // Edges needed to define the slice histograms
   std::map< double, std::set<double> > fSliceEdgeMap;
+
+  // Determines which set of variables will be considered
+  enum Distribution { kPpCosp, kPmuCosmu };
+  Distribution fDist;
 };
 
 #endif
