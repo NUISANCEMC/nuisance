@@ -26,12 +26,20 @@ NUISANCEWeightEngine::NUISANCEWeightEngine(std::string name) {
            << " for the Gaussian enhancement, so will die now...");
   }
   // The NUISANCE calculators
+  // q0q3 2D Gaussian 2p2h enhancement
   fWeightCalculators.push_back(GaussianMode);
+  // Generic model normalisation
   fWeightCalculators.push_back(new ModeNormCalc());
+  // Generic short baseline oscillator
   fWeightCalculators.push_back(new SBLOscWeightCalc());
+  // CCQE Q2 modification a la T2K 2018
   fWeightCalculators.push_back(new BeRPACalc());
+  // CC1pi Q2 suppression from MINOS
   fWeightCalculators.push_back(new MINOSRPA());
+  // CC1pi Q2 suppression from MINERvA
   fWeightCalculators.push_back(new LagrangeRPA());
+  // Radcorr
+  fWeightCalculators.push_back(new RadCorrQ2());
 
   // The MINERvA calculators that rely on GENIE variables (so need GENIE support)
 #ifdef __MINERVA_RW_ENABLED__

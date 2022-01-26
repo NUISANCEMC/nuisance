@@ -51,6 +51,8 @@ namespace Reweight {
     kBeRPA_E,
     kBeRPA_U,
 
+    kRadCorrQ2,
+
     kModeNorm_NormRES,
 
     kMINERvARW_NormCCQE,

@@ -273,6 +273,7 @@ double LagrangeRPA::GetRPAWeight(double Q2) {
 
   return weight;
 }
+
 //
 bool LagrangeRPA::IsHandled(int rwenum) {
   int curenum = rwenum % NUIS_DIAL_OFFSET;
@@ -285,6 +286,7 @@ bool LagrangeRPA::IsHandled(int rwenum) {
       return false;
   }
 }
+
 //
 void LagrangeRPA::SetDialValue(std::string name, double val) {
   SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
@@ -790,5 +792,199 @@ bool GaussianModeCorr::IsHandled(int rwenum) {
       return true;
     default:
       return false;
+  }
+}
+
+// Radcorr weight calculator
+RadCorrQ2::RadCorrQ2() {
+  // Input files for the splines
+  TFile *fInputs[kNumuBar];
+
+  std::string fileloc = std::string(std::getenv("NUISANCE"));
+  fileloc += "/data/radcorr";
+  // Two files for numu and numubar
+  fInputs[kNumu] = new TFile((fileloc+"/Elspectrum_muon_neutrino_merge.root").c_str());
+  fInputs[kNumuBar] = new TFile((fileloc+"/Elspectrum_muon_antineutrino_merge.root").c_str());
+
+  //EnuRange[9] = {0.2, 0.3, 0.5, 1., 2., 3., 5., 10., 20.};
+  EnuRange[0] = 0.2;
+  EnuRange[1] = 0.3;
+  EnuRange[2] = 0.5;
+  EnuRange[3] = 1.0;
+  EnuRange[4] = 2.0;
+  EnuRange[5] = 3.0;
+  EnuRange[6] = 5.0;
+  EnuRange[7] = 10.;
+  EnuRange[8] = 20.;
+
+  nEnu = 9;
+  if (nEnu != sizeof(EnuRange)/sizeof(double)) {
+    std::cerr << "Something wrong with Enu range" << std::endl;
+    throw;
+  }
+
+  // The spline base names
+  std::string basename_numu = "Elspectrum_muon_neutrino_neutron";
+  std::string basename_numub = "Elspectrum_muon_antineutrino_proton";
+
+  Graphs = new TGraph**[kNumuBar+1];
+  for (int i = 0; i < kNumuBar+1; ++i) {
+    Graphs[i] = new TGraph*[nEnu];
+    std::string basename;
+    if (i == kNumu) basename = basename_numu;
+    else basename = basename_numub;
+    Graphs[i][0] = (TGraph*)fInputs[i]->Get((basename+"_02GeV").c_str())->Clone();
+    Graphs[i][1] = (TGraph*)fInputs[i]->Get((basename+"_03GeV").c_str())->Clone();
+    Graphs[i][2] = (TGraph*)fInputs[i]->Get((basename+"_05GeV").c_str())->Clone();
+    Graphs[i][3] = (TGraph*)fInputs[i]->Get((basename+"_1GeV").c_str())->Clone();
+    Graphs[i][4] = (TGraph*)fInputs[i]->Get((basename+"_2GeV").c_str())->Clone();
+    Graphs[i][5] = (TGraph*)fInputs[i]->Get((basename+"_3GeV").c_str())->Clone();
+    Graphs[i][6] = (TGraph*)fInputs[i]->Get((basename+"_5GeV").c_str())->Clone();
+    Graphs[i][7] = (TGraph*)fInputs[i]->Get((basename+"_10GeV").c_str())->Clone();
+    Graphs[i][8] = (TGraph*)fInputs[i]->Get((basename+"_20GeV").c_str())->Clone();
+  }
+
+  fInputs[0]->Close();
+  fInputs[1]->Close();
+}
+
+// Calculate the weight from the radiative correction in Q2
+// Function of Enu and Q2, using linear interpolation
+double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
+  if (!fUse) return 1.0;
+
+  // Check interaction mode is CCQE
+  if (abs(evt->Mode) != 1) return 1.0;
+
+
+  // Only apply to muon (anti)neutrinos
+  if (abs(evt->probe_pdg) != 14) return 1.0;
+
+  // Get the neutrino type
+  NuType nutype;
+  if (evt->Mode > 0) nutype = kNumu;
+  else nutype = kNumuBar;
+
+  // Get the event Q2 and Enu
+  FitEvent *fevt = static_cast<FitEvent*>(evt);
+  double Q2 = fevt->GetQ2(); // Get in GeV2
+  double Enu = fevt->GetNeutrinoIn()->E()/1.E3; // Convert to GeV
+
+  // Find the nearest point in Enu
+  // Get the true neutrino energy and interpolate between nearest points
+  // This is always the point below our actual point
+  int nearest = 0;
+  for (int j = 0; j < nEnu; ++j) {
+    if (Enu > EnuRange[j]) nearest = j;
+  }
+
+  // Then get the maximum Q2 for each of the Enu points 
+  // to make sure we're not extrapolating unphysically
+  double mumass = fevt->GetLeptonOut()->M()/1.E3; //convert to MeV
+  double Q2max_near = GetQ2max(EnuRange[nearest], mumass);
+
+  // The allowed Q2 is always going to be lower at the lower energy bin
+  // If this is the case, evaluate the spline just before the drop off instead
+  double low = 0;
+  // Sometimes the Q2 will be right on the edge of allowed
+  if (Q2-Q2max_near > -0.02) {
+    // Try to find the spot where we're no longer dropping abruptly
+    TGraph *g = Graphs[nutype][nearest];
+    double *y = g->GetY();
+    int npoints = g->GetN();
+    double prevy = y[0];
+    // Which point does the job occur at
+    int jump = 0;
+    // Find at what point the jump happens
+    for (int j = 0; j < npoints; ++j) {
+      // Look for jumps in the points
+      if (prevy-y[j] > 0.9) {
+        jump = j;
+        break;
+      }
+      prevy = y[j];
+    }
+    low = y[jump-1];
+  } else {
+    low = Graphs[nutype][nearest]->Eval(Q2, 0, "");
+  }
+
+  // This is the point above
+  int nextbin = nearest+1;
+
+  // The Enu might be beyond our last range
+  if (Enu > EnuRange[nEnu-1]) nextbin = nearest;
+
+  // Now also need to check the high Q2
+  double Q2max_far = GetQ2max(EnuRange[nextbin], mumass);
+  double high = 0;
+  // Sometimes the Q2 will be right on the edge of allowed
+  if (Q2max_far-Q2 < 0.02) {
+    // Try to find the spot where we're no longer dropping abruptly
+    TGraph *g = Graphs[nutype][nextbin];
+    double *y = g->GetY();
+    int npoints = g->GetN();
+    double prevy = y[0];
+    // Which point does the job occur at
+    int jump = 0;
+    // Find at what point the jump happens
+    for (int j = 0; j < npoints; ++j) {
+      // Look for jumps in the points
+      if (prevy-y[j] > 0.9) {
+        jump = j;
+        break;
+      }
+      prevy = y[j];
+    }
+    high = y[jump-1];
+  } else {
+    high = Graphs[nutype][nextbin]->Eval(Q2, 0, "");
+  }
+
+  // linear intepolation
+  double weight = (high-low)*(Enu-EnuRange[nearest])/(EnuRange[nearest+1]-EnuRange[nearest])+low;
+
+  // Put in a weight cap
+  if (weight > 10) weight = 10;
+  if (weight < 0) weight = 0;
+
+  return weight;
+}
+
+// Get the max Q2 for a given Enu to check interpolaton
+double RadCorrQ2::GetQ2max(double Enu, double lepmass) {
+  // Nucleon mass
+  const double Mn = 0.93956542052;
+  const double Mp = 0.93827208816;
+  const double M = (Mn+Mp)/2.;
+
+  double val = -(M+Enu)*lepmass*lepmass+2*M*Enu*Enu+Enu*sqrt(pow(2*M*Enu-lepmass*lepmass, 2)-4*lepmass*lepmass*M*M);
+  val /= (M+2*Enu);
+  return val;
+}
+
+bool RadCorrQ2::IsHandled(int rwenum) {
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
+  switch (curenum) {
+    case Reweight::kRadCorrQ2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+void RadCorrQ2::SetDialValue(std::string name, double val) {
+  SetDialValue(Reweight::ConvDial(name, kCUSTOM), val);
+}
+
+void RadCorrQ2::SetDialValue(int rwenum, double val) {
+  int curenum = rwenum % NUIS_DIAL_OFFSET;
+  // Check Handled
+  if (!IsHandled(curenum)) return;
+
+  // If greater than 0.5, use
+  if (curenum == kRadCorrQ2) {
+    if (val > 0.5) fUse = true;
+    else fUse = false;
   }
 }

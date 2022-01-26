@@ -55,6 +55,8 @@ std::string Reweight::ConvNUISANCEDial(int type) {
     case kBeRPA_E:             { return "BeRPA_E";   }
     case kBeRPA_U:             { return "BeRPA_U";   }
 
+    case kRadCorrQ2:           { return "RadCorrQ2";   }
+
     case kModeNorm_NormRES:                   { return "NormRES"; }
 
     case kMINERvARW_NormCCQE:                { return "MINERvARW_NormCCQE"; }
