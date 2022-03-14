@@ -16,81 +16,54 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-GlobalDialList.cxx
-FitWeight.cxx
-WeightEngineBase.cxx
-NEUTWeightEngine.cxx
-NuWroWeightEngine.cxx
-GENIEWeightEngine.cxx
-WeightUtils.cxx
-SampleNormEngine.cxx
-LikelihoodWeightEngine.cxx
-SplineWeightEngine.cxx
-NUISANCESyst.cxx
-T2KWeightEngine.cxx
-NUISANCEWeightEngine.cxx
-NUISANCEWeightCalcs.cxx
-NIWGWeightEngine.cxx
-OscWeightEngine.cxx
-MINERvAWeightCalcs.cxx
-weightRPA.h
+
+set(Reweight_Impl_Files
+  GlobalDialList.cxx
+  FitWeight.cxx
+  WeightEngineBase.cxx
+  WeightUtils.cxx
+  SampleNormEngine.cxx
+  LikelihoodWeightEngine.cxx
+  SplineWeightEngine.cxx
+  NUISANCESyst.cxx
+  NUISANCEWeightEngine.cxx
+  NUISANCEWeightCalcs.cxx
+  MINERvAWeightCalcs.cxx
+  weightRPA.h
 )
 
-if(USE_NOvARwgt)
-  LIST(APPEND IMPLFILES NOvARwgtEngine.cxx)
+if(GENIE_ENABLED)
+  LIST(APPEND Reweight_Impl_Files GENIEWeightEngine.cxx)
 endif()
 
-if(USE_NUSYST)
-  LIST(APPEND IMPLFILES nusystematicsWeightEngine.cxx)
+if(NEUT_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NEUTWeightEngine.cxx)
 endif()
 
-set(HEADERFILES
-GlobalDialList.h
-FitWeight.h
-WeightEngineBase.h
-NEUTWeightEngine.h
-NuWroWeightEngine.h
-GENIEWeightEngine.h
-WeightUtils.h
-SampleNormEngine.h
-LikelihoodWeightEngine.h
-SplineWeightEngine.h
-NUISANCESyst.h
-T2KWeightEngine.h
-NUISANCEWeightEngine.h
-NUISANCEWeightCalcs.h
-NIWGWeightEngine.h
-OscWeightEngine.h
-MINERvAWeightCalcs.h
-weightRPA.h
-BeRPA.h
-)
-
-if(USE_NOvARwgt)
-  LIST(APPEND HEADERFILES NOvARwgtEngine.h)
+if(NuWro_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NuWroWeightEngine.cxx)
 endif()
 
-set(LIBNAME Reweight)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
+if(T2KReWeight_ENABLED)
+  LIST(APPEND Reweight_Impl_Files T2KWeightEngine.cxx)
 endif()
 
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
+if(NIWG_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NIWGWeightEngine.cxx)
 endif()
 
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/Reweight)
+if(NOvARwgt_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NOvARwgtEngine.cxx)
+endif()
 
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+if(NuSystematics_ENABLED)
+  LIST(APPEND Reweight_Impl_Files nusystematicsWeightEngine.cxx)
+endif()
+
+if(Prob3plusplus_ENABLED)
+  LIST(APPEND Reweight_Impl_Files OscWeightEngine.cxx)
+endif()
+
+add_library(Reweight SHARED ${Reweight_Impl_Files})
+
+install(TARGETS Reweight DESTINATION lib)

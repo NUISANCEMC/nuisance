@@ -1,0 +1,27 @@
+include(ROOT)
+
+##########################  Optional Modules  ###############################
+
+if (NOT DEFINED NO_NEUT OR NOT NO_NEUT)
+  include(NEUT)
+  set(NO_NEUT OFF)
+else()
+  set(NO_NEUT ON)
+endif()
+if(NEUT_FOUND)
+  SET(NEUT_ENABLED 1)
+else()
+  SET(NEUT_ENABLED 0)
+endif()
+
+if (NOT DEFINED NO_GENIE OR NOT NO_GENIE)
+  include(GENIE)
+  set(NO_GENIE OFF)
+else()
+  set(NO_GENIE ON)
+endif()
+if(GENIE_FOUND)
+  SET(GENIE_ENABLED 1)
+else()
+  SET(GENIE_ENABLED 0)
+endif()

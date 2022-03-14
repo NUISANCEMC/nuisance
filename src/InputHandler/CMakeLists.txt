@@ -16,83 +16,45 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-BaseFitEvt.cxx
-FitParticle.cxx
-FitEvent.cxx
-GeneratorUtils.cxx
-StdHepEvt.cxx
-InputUtils.cxx
-NEUTInputHandler.cxx
-GENIEInputHandler.cxx
-NuWroInputHandler.cxx
-GIBUUInputHandler.cxx
-GiBUUNativeInputHandler.cxx
-NUANCEInputHandler.cxx
-InputHandler.cxx
-NuanceEvent.cxx
-FitEventInputHandler.cxx
-SplineInputHandler.cxx
-GeneratorInfoBase.h
-HepMCTextInputHandler.cxx
-InputFactory.cxx
-SigmaQ0HistogramInputHandler.cxx
-HistogramInputHandler.cxx
+
+set(InputHandler_Impl_Files
+  BaseFitEvt.cxx
+  FitParticle.cxx
+  FitEvent.cxx
+  GeneratorUtils.cxx
+  StdHepEvt.cxx
+  InputUtils.cxx
+  GIBUUInputHandler.cxx
+  GiBUUNativeInputHandler.cxx
+  NUANCEInputHandler.cxx
+  InputHandler.cxx
+  NuanceEvent.cxx
+  FitEventInputHandler.cxx
+  SplineInputHandler.cxx
+  GeneratorInfoBase.h
+  HepMCTextInputHandler.cxx
+  InputFactory.cxx
+  SigmaQ0HistogramInputHandler.cxx
+  HistogramInputHandler.cxx
 )
 
-set(HEADERFILES
-BaseFitEvt.h
-FitParticle.h
-FitEvent.h
-GeneratorUtils.h
-StdHepEvt.h
-InputUtils.h
-NEUTInputHandler.h
-GENIEInputHandler.h
-NuWroInputHandler.h
-GIBUUInputHandler.h
-GiBUUNativeInputHandler.h
-NUANCEInputHandler.h
-InputHandler.h
-NuanceEvent.h
-FitEventInputHandler.h
-SplineInputHandler.h
-GeneratorInfoBase.h
-InputTypes.h
-HepMCTextInputHandler.h
-InputFactory.h
-SigmaQ0HistogramInputHandler.h
-HistogramInputHandler.h
-)
-
-if(USE_HEPMCNUEVT)
-  LIST(APPEND IMPLFILES HepMCNuEvtInputHandler.cxx)
+if(HEPMCNuEvt_ENABLED)
+  LIST(APPEND InputHandler_Impl_Files HepMCNuEvtInputHandler.cxx)
 endif()
 
-set(LIBNAME InputHandler)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
+if(GENIE_ENABLED)
+  LIST(APPEND Reweight_Impl_Files GENIEInputHandler.cxx)
 endif()
 
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
+if(NEUT_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NEUTInputHandler.cxx)
 endif()
 
-if(HEPMC_USED_EP)
-  add_dependencies(${LIBNAME} HepMC)
+if(NuWro_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NuWroInputHandler.cxx)
 endif()
 
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/InputHandler)
+add_library(InputHandler SHARED ${InputHandler_Impl_Files})
 
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS InputHandler DESTINATION lib)
+

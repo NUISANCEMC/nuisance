@@ -16,41 +16,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(IMPLFILES
-SplineReader.cxx
-SplineWriter.cxx
-SplineMerger.cxx
-SplineUtils.cxx
-Spline.cxx
+set(Spline_Impl_Files
+  SplineReader.cxx
+  SplineWriter.cxx
+  SplineMerger.cxx
+  SplineUtils.cxx
+  Spline.cxx
 )
 
-set(HEADERFILES
-SplineReader.h
-SplineWriter.h
-SplineUtils.h
-SplineMerger.h
-Spline.h
-)
+add_library(Splines SHARED ${Spline_Impl_Files})
 
-set(LIBNAME Splines)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-#set_target_properties(${LIBNAME} PROPERTIES LINK_FLAGS ${ROOT_LD_FLAGS})
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/Splines)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS Splines DESTINATION lib)

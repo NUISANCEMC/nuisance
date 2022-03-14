@@ -16,55 +16,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(HEADERFILES
-ISmearcepter.h
-Smearcepterton.h
 
-EfficiencyApplicator.h
-ThresholdAccepter.h
-TrackedMomentumMatrixSmearer.h
-GaussianSmearer.h
+set(Smearceptance_Impl_Files
+  ISmearcepter.cxx
+  Smearcepterton.cxx
 
-EnergyShuffler.h
+  EfficiencyApplicator.cxx
+  ThresholdAccepter.cxx
+  TrackedMomentumMatrixSmearer.cxx
+  GaussianSmearer.cxx
 
-MetaSimpleSmearcepter.h
-SmearceptanceUtils.h
+  EnergyShuffler.cxx
+
+  MetaSimpleSmearcepter.cxx
+  SmearceptanceUtils.cxx
 )
 
-set(IMPLFILES
-ISmearcepter.cxx
-Smearcepterton.cxx
+add_library(Smearceptance SHARED ${Smearceptance_Impl_Files})
 
-EfficiencyApplicator.cxx
-ThresholdAccepter.cxx
-TrackedMomentumMatrixSmearer.cxx
-GaussianSmearer.cxx
-
-EnergyShuffler.cxx
-
-MetaSimpleSmearcepter.cxx
-SmearceptanceUtils.cxx
-)
-
-set(LIBNAME Smearceptance)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  add_library(${LIBNAME} STATIC ${IMPLFILES})
-else(CMAKE_BUILD_TYPE MATCHES RELEASE)
-  add_library(${LIBNAME} SHARED ${IMPLFILES})
-endif()
-
-include_directories(${MINIMUM_INCLUDE_DIRECTORIES})
-
-set_target_properties(${LIBNAME} PROPERTIES VERSION
-  "${NUISANCE_VERSION_MAJOR}.${NUISANCE_VERSION_MINOR}.${NUISANCE_VERSION_REVISION}")
-
-if(DEFINED PROJECTWIDE_EXTRA_DEPENDENCIES)
-  add_dependencies(${LIBNAME} ${PROJECTWIDE_EXTRA_DEPENDENCIES})
-endif()
-
-install(TARGETS ${LIBNAME} DESTINATION lib)
-#Can uncomment this to install the headers... but is it really neccessary?
-install(FILES ${HEADERFILES} DESTINATION include/Smearceptance)
-
-set(MODULETargets ${MODULETargets} ${LIBNAME} PARENT_SCOPE)
+install(TARGETS Smearceptance DESTINATION lib)

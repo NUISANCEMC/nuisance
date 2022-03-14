@@ -136,7 +136,7 @@ if(LIBXML2_LIB STREQUAL "")
 endif()
 
 if(LIBXML2_INC STREQUAL "")
-  GetIncDir(xml2-config --cflags LIBXML2_INC ALLOW_FAIL)
+  GetIncDir(CONFIG_APP xml2-config ARGS --cflags OUTPUT_VARIABLE LIBXML2_INC ALLOW_FAIL)
   if(LIBXML2_INC STREQUAL "")
     message(WARNING "Variable LIBXML2_INC is not defined, as xml2-config was found and didn't report an include path, it is likely that libxml2.so can be found in the standard system location, lets hope so. Alternativly, a location can be forced by configering with -DLIBXML2_INC=/path/to/LIBXML2_includes or as an environment variable LIBXML2_INC.")
   endif()
