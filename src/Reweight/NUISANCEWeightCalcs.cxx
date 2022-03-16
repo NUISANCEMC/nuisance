@@ -856,7 +856,6 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
   // Check interaction mode is CCQE
   if (abs(evt->Mode) != 1) return 1.0;
 
-
   // Only apply to muon (anti)neutrinos
   if (abs(evt->probe_pdg) != 14) return 1.0;
 
@@ -870,6 +869,22 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
   double Q2 = fevt->GetQ2(); // Get in GeV2
   double Enu = fevt->GetNeutrinoIn()->E()/1.E3; // Convert to GeV
 
+  // Since all happens on the nucleon, need to boost into nucleon frame and use Enu there
+  TLorentzVector initnu = fevt->GetBeamNeutrinoP4();
+  // Then get struck nucleon
+  const int pdg[] = {2112, 2212};
+  FitParticle* initialstate = fevt->GetHMISParticle(pdg);
+  TLorentzVector initnuc = initialstate->P4();
+
+  // Boost the neutrino
+  initnu.Boost(-1*initnuc.BoostVector());
+  //std::cout << Enu << " " << initnu.E()/1E3 << std::endl;
+  Enu = initnu.E()/1E3; // update to be enu in nucleon frame
+
+  // Pick some random Q2 and Enu
+  //double Q2 = 1;
+  //double Enu = 2;
+
   // Find the nearest point in Enu
   // Get the true neutrino energy and interpolate between nearest points
   // This is always the point below our actual point
@@ -880,7 +895,7 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
 
   // Then get the maximum Q2 for each of the Enu points 
   // to make sure we're not extrapolating unphysically
-  double mumass = fevt->GetLeptonOut()->M()/1.E3; //convert to MeV
+  double mumass = fevt->GetLeptonOut()->M()/1.E3; //convert to GeV
   double Q2max_near = GetQ2max(EnuRange[nearest], mumass);
 
   // The allowed Q2 is always going to be lower at the lower energy bin
@@ -943,6 +958,7 @@ double RadCorrQ2::CalcWeight(BaseFitEvt *evt) {
 
   // linear intepolation
   double weight = (high-low)*(Enu-EnuRange[nearest])/(EnuRange[nearest+1]-EnuRange[nearest])+low;
+  //std::cout << Q2 << " " << Enu << " " << weight << std::endl;
 
   // Put in a weight cap
   if (weight > 10) weight = 10;
