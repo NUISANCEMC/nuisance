@@ -1,12 +1,10 @@
-message(STATUS "--Before include(ROOT) CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
-
 include(ROOT)
-message(STATUS "--After include(ROOT) CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
 
 ##########################  Optional Modules  ###############################
 
 add_library(GeneratorCompileDependencies INTERFACE)
 add_library(GeneratorLinkDependencies INTERFACE)
+
 
 #Defines NEUT_ENABLED and NEUT_REQUIRED, 
 #if NEUT_ENABLED was passed explicitly 
@@ -26,7 +24,35 @@ if (GENIE_ENABLED)
   include(GENIE)
 endif()
 
-message(STATUS "--After Generators CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
+
+DefineEnabledRequiredSwitch(NuWroReWeight)
+if (NuWroReWeight_ENABLED)
+  # include(NuWroReWeight)
+  SET(NuWroReWeight_ENABLED FALSE)
+endif()
+
+DefineEnabledRequiredSwitch(NIWGLegacy)
+if (NIWGLegacy_ENABLED)
+  include(FindNIWGLegacy)
+endif()
+
+DefineEnabledRequiredSwitch(NOvARwgt)
+if (NOvARwgt_ENABLED)
+  # include(NOvARwgt)
+  SET(NOvARwgt_ENABLED FALSE)
+endif()
+
+DefineEnabledRequiredSwitch(NuSystematics)
+if (NuSystematics_ENABLED)
+  # include(NuSystematics)
+  SET(NuSystematics_ENABLED FALSE)
+endif()
+
+DefineEnabledRequiredSwitch(Prob3plusplus)
+if (Prob3plusplus_ENABLED)
+  # include(Prob3plusplus)
+  SET(Prob3plusplus_ENABLED FALSE)
+endif()
 
 string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "-Wl,--no-undefined" NOUNDEF_INDEX)
 if(NOUNDEF_INDEX GREATER -1)

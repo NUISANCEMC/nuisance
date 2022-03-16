@@ -67,8 +67,8 @@ if(T2KReWeight_ENABLED)
   endif()
 endif()
 
-if(NIWG_ENABLED)
-  LIST(APPEND Reweight_Impl_Files NIWGWeightEngine.cxx)
+if(NIWGLegacy_ENABLED)
+  LIST(APPEND Reweight_Impl_Files NIWGWeightEngine_legacy.cxx)
 endif()
 
 if(NOvARwgt_ENABLED)

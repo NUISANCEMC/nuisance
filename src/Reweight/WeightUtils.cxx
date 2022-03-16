@@ -17,7 +17,7 @@ using namespace t2krew;
 #endif
 #endif
 
-#ifdef NIWG_ENABLED
+#ifdef NIWGLegacy_ENABLED
 #include "NIWGReWeight.h"
 #include "NIWGSyst.h"
 #endif
@@ -301,7 +301,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // NIWG DIAL TYPE
   case kNIWG: {
-#ifdef NIWG_ENABLED
+#ifdef NIWGLegacy_ENABLED
     int niwg_enum = (int)niwg::rew::NIWGSyst::FromString(name);
     if (niwg_enum != 0) {
       this_enum = niwg_enum + offset;
@@ -457,7 +457,7 @@ int Reweight::NEUTEnumFromName(std::string const &name) {
 }
 
 int Reweight::NIWGEnumFromName(std::string const &name) {
-#ifdef NIWG_ENABLED
+#ifdef NIWGLegacy_ENABLED
   int niwgenum = (int)niwg::rew::NIWGSyst::FromString(name);
   return (niwgenum != 0) ? niwgenum : Reweight::kNoDialFound;
 #else

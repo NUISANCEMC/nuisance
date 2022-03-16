@@ -1,4 +1,4 @@
-#include "NIWGWeightEngine.h"
+#include "NIWGWeightEngine_legacy.h"
 
 NIWGWeightEngine::NIWGWeightEngine(std::string name) {
   // Setup the NEUT Reweight engien

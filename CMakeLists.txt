@@ -24,13 +24,23 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 project(NUISANCE)
 
-set(CMAKE_SKIP_RPATH TRUE)
-
-include(ExternalProject)
-
 enable_language(Fortran)
-
 set (NUISANCE_VERSION 2.9.9)
+
+#Changes default install path to be a subdirectory of the build dir.
+#Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
+if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
+  "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}")
+elseif(NOT DEFINED CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "")
+  set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+elseif(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
@@ -48,19 +58,19 @@ add_subdirectory(src)
 
 add_subdirectory(app)
 
-# configure_file(cmake/setup.sh.in
-#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
-# install(FILES
-#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
-#   ${CMAKE_INSTALL_PREFIX})
+configure_file(cmake/setup.sh.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
+  ${CMAKE_INSTALL_PREFIX})
 
-# install(PROGRAMS
-#   "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
-#   bin)
+install(PROGRAMS
+  "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
+  bin)
 
-# install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
-#                   ${CMAKE_INSTALL_PREFIX})
-# install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
-#                   ${CMAKE_INSTALL_PREFIX})
-# install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
-#                   ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
+                  ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
+                  ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
+                  ${CMAKE_INSTALL_PREFIX})

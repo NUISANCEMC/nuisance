@@ -10,8 +10,8 @@
 #include "NEUTWeightEngine.h"
 #endif
 
-#ifdef NIWGReWeight_ENABLED
-#include "NIWGWeightEngine.h"
+#ifdef NIWGLegacy_ENABLED
+#include "NIWGWeightEngine_legacy.h"
 #endif
 
 #ifdef T2KReWeight_ENABLED
