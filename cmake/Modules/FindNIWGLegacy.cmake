@@ -1,10 +1,13 @@
+SET(NIWGLegacy_FOUND FALSE)
+
 if(NOT TARGET NIWGLegacy::All)
 
 EnsureVarOrEnvSet(NIWG NIWG)
 
 if("${NIWG}" STREQUAL "NIWG-NOTFOUND")
   cmessage(STATUS "Environment variable: NIWG not set, assuming no NIWG (Legacy) support required.")
-  set(NIWGLegacy_FOUND FALSE)
+  SET(NIWGLegacy_FOUND FALSE)
+  SET(NIWGLegacy_ENABLED FALSE)
   return()
 endif()
 

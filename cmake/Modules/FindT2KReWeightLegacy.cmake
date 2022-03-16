@@ -5,6 +5,7 @@ EnsureVarOrEnvSet(T2KREWEIGHT T2KREWEIGHT)
 if("${T2KREWEIGHT}" STREQUAL "T2KREWEIGHT-NOTFOUND")
   cmessage(STATUS "Environment variable: T2KREWEIGHT not set, assuming no T2KReWeight (Legacy) support required.")
   set(T2KReWeight_FOUND FALSE)
+  set(T2KReWeight_ENABLED FALSE)
   return()
 endif()
 

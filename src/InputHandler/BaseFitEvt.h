@@ -41,8 +41,8 @@
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepRecord.h"
 #include "Ntuple/NtpMCEventRecord.h"
-using namespace genie;
 #endif
+using namespace genie;
 #endif
 
 #ifdef NUANCE_ENABLED
