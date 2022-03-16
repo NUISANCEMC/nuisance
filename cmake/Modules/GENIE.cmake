@@ -1,16 +1,18 @@
 find_program(GENIECONFIG NAMES genie-config)
 
-set(GENIE3_API_ENABLED FALSE)
 set(GENIEReWeight_ENABLED FALSE)
 
-# GENIE3_XSECMEC_ENABLED
-# GENIE2_XSECEMPMEC_ENABLED
+set(GENIE2_XSECEMPMEC_ENABLED FALSE)
+
+set(GENIE3_API_ENABLED FALSE)
+set(GENIE3_XSECMEC_ENABLED FALSE)
 
 include(CMessage)
 
 if("${GENIECONFIG}" STREQUAL "GENIECONFIG-NOTFOUND")
   cmessage(STATUS "Could not find genie-config, assuming no GENIE build")
   SET(GENIE_FOUND FALSE)
+  SET(GENIE_ENABLED FALSE)
   return()
 endif()
 
@@ -19,6 +21,7 @@ EnsureVarOrEnvSet(GENIE GENIE)
 if("${GENIE}" STREQUAL "GENIE-NOTFOUND")
   cmessage(STATUS "GENIE environment variable is not defined, assuming no GENIE build")
   SET(GENIE_FOUND FALSE)
+  SET(GENIE_ENABLED FALSE)
   return()
 endif()
 

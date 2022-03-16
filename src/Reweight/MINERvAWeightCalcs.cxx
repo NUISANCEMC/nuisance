@@ -19,6 +19,8 @@ using namespace genie;
 #include "PDG/PDGUtils.h"
 #endif
 
+#include "WeightEngineBase.h"
+
 #include "BaseFitEvt.h"
 
 namespace nuisance {

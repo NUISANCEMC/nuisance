@@ -10,11 +10,11 @@ endif()
 include(FindPackageHandleStandardArgs)
 
 find_path(GENIE_INC_DIR
-  NAMES EVGCore/EventRecord.h
+  NAMES Framework/GHEP/GHepRecord.h
   PATHS ${GENIE}/include/GENIE)
 
 find_path(GENIE_LIB_DIR
-  NAMES libGEVGCore.so
+  NAMES libGFwGHEP.so
   PATHS ${GENIE}/lib)
 
 find_path(LOG4CPP_INC_DIR
@@ -70,21 +70,28 @@ if(GENIE_FOUND)
         set(GENIEReWeight_ENABLED FALSE)
       endif()
     endforeach()
+  
+    if(EXISTS ${GENIE_INC_DIR}/RwCalculators/GReWeightXSecMEC.h)
+      SET(GENIE3_XSECMEC_ENABLED TRUE)
+    endif()
+
   endif()
 
   #duplicate because CMake gets its grubby mitts on repeated -Wl,--start-group options
   SET(GENIE_LIBS "-Wl,--no-as-needed;${GENIE_LIBS};${GENIE_LIBS};-Wl,--as-needed")
 
   cmessage(STATUS "GENIE 3 (Version: ${GENIE_VERSION})")
-  cmessage(STATUS "               GENIE: ${GENIE}")
-  cmessage(STATUS "GENIE_SINGLE_VERSION: ${GENIE_SINGLE_VERSION}")
-  cmessage(STATUS "       GENIE DEFINES: ${GENIE_DEFINES}")
-  cmessage(STATUS "      GENIE INC_DIRS: ${GENIE_INC_DIR}")
-  cmessage(STATUS "      GENIE LIB_DIRS: ${GENIE_LIB_DIR}")
-  cmessage(STATUS "          GENIE LIBS: ${GENIE_LIBS}")
-  cmessage(STATUS "       DEPS INC_DIRS: ${LOG4CPP_INC_DIR};${LIBXML2_INC_DIR}")
-  cmessage(STATUS "       DEPS LIB_DIRS: ${LOG4CPP_LIB_DIR};${LIBXML2_LIB_DIR};${PYTHIA6_LIB_DIR}")
-  cmessage(STATUS "           DEPS LIBS: pythia6;xml2;log4cpp")
+  cmessage(STATUS "                GENIE: ${GENIE}")
+  cmessage(STATUS "       GENIE_REWEIGHT: ${GENIE_REWEIGHT}")
+  cmessage(STATUS "              OPTIONS: GENIEReWeight: ${GENIEReWeight_ENABLED}, XSecMECReWeight: ${GENIE3_XSECMEC_ENABLED}")
+  cmessage(STATUS " GENIE_SINGLE_VERSION: ${GENIE_SINGLE_VERSION}")
+  cmessage(STATUS "        GENIE DEFINES: ${GENIE_DEFINES}")
+  cmessage(STATUS "       GENIE INC_DIRS: ${GENIE_INC_DIR}")
+  cmessage(STATUS "       GENIE LIB_DIRS: ${GENIE_LIB_DIR}")
+  cmessage(STATUS "           GENIE LIBS: ${GENIE_LIBS}")
+  cmessage(STATUS "        DEPS INC_DIRS: ${LOG4CPP_INC_DIR};${LIBXML2_INC_DIR}")
+  cmessage(STATUS "        DEPS LIB_DIRS: ${LOG4CPP_LIB_DIR};${LIBXML2_LIB_DIR};${PYTHIA6_LIB_DIR}")
+  cmessage(STATUS "            DEPS LIBS: pythia6;xml2;log4cpp")
 
   if(NOT TARGET GENIE::All)
     add_library(GENIE::All INTERFACE IMPORTED)

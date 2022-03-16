@@ -1,4 +1,7 @@
+message(STATUS "--Before include(ROOT) CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
+
 include(ROOT)
+message(STATUS "--After include(ROOT) CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
 
 ##########################  Optional Modules  ###############################
 
@@ -22,3 +25,5 @@ DefineEnabledRequiredSwitch(GENIE)
 if (GENIE_ENABLED)
   include(GENIE)
 endif()
+
+message(STATUS "--After Generators CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
