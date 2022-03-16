@@ -4,10 +4,10 @@ if(DEFINED ROOT_USE_FILE AND NOT "${ROOT_USE_FILE}x" STREQUAL "x")
   include(${ROOT_USE_FILE})
 endif()
 
-string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "--no-undefined" NOUNDEF_INDEX)
+string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "-Wl,--no-undefined" NOUNDEF_INDEX)
 if(NOUNDEF_INDEX GREATER -1)
-  string(REPLACE "--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-  cmessage(STATUS "Removed --no-undefined flag from CMAKE_SHARED_LINKER_FLAGS that ROOT tried to add.")
+  string(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+  cmessage(STATUS "Removed -Wl,--no-undefined flag from CMAKE_SHARED_LINKER_FLAGS that ROOT tried to add.")
 endif()
 
 if(NOT TARGET ROOT::ROOT)
