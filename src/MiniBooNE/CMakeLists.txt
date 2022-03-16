@@ -46,5 +46,6 @@ set(MiniBooNE_Impl_Files
 )
 
 add_library(MiniBooNE SHARED ${MiniBooNE_Impl_Files})
+target_link_libraries(MiniBooNE CoreIncludes)
 
 install(TARGETS MiniBooNE DESTINATION lib)

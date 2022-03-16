@@ -19,9 +19,6 @@
 
 #include "MCStudy_NCpi0PreSelection.h"
 
-#include "T2K_SignalDef.h"
-#include "MINERvA_SignalDef.h"
-
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 MCStudy_NCpi0PreSelection::MCStudy_NCpi0PreSelection(std::string name, std::string inputfile,

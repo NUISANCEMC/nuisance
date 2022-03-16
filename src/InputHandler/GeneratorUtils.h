@@ -23,8 +23,8 @@
  *  @{
  */
 
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
+#ifdef NIWG_ENABLED
+#ifdef NEUT_ENABLED
 #include "NIWGEvent.h"
 #include "NIWGSyst.h"
 #include "InputHandler.h"
@@ -52,7 +52,7 @@
 #include "NModeDefn.h"
 #include "NSyst.h"
 #include "NFortFns.h" // Contains all the NEUT common blocks                                                                                                                                                                                
-#ifdef __NEUT_NUCFSI_ENABLED__
+#ifdef NEUT_NUCFSI_ENABLED
 #include "nucleonfsihistC.h"
 #include "neutnucfsivert.h"
 #include "neutnucfsistep.h"
@@ -64,8 +64,8 @@
 #endif
 
 // namespace GeneratorUtils {
-// #ifdef __NIWG_ENABLED__
-// #ifdef __NEUT_ENABLED__
+// #ifdef NIWG_ENABLED
+// #ifdef NEUT_ENABLED
 //   niwg::rew::NIWGEvent* GetNIWGEventLocal(NeutVect* nvect);
 // #endif
 // #endif

@@ -25,19 +25,15 @@
 
 #include "WeightEngineBase.h"
 
-#ifdef __PROB3PP_ENABLED__
 #include "BargerPropagator.h"
-#endif
 
 #include <cmath>
 
-#ifdef __PROB3PP_ENABLED__
 class BG : public BargerPropagator {
  public:
   BG() : BargerPropagator(){};
   double GetBaseline() { return Earth->get_Pathlength(); }
 };
-#endif
 
 class OscWeightEngine : public WeightEngineBase {
   enum params {
@@ -51,9 +47,7 @@ class OscWeightEngine : public WeightEngineBase {
 
   };
 
-#ifdef __PROB3PP_ENABLED__
   BG bp;
-#endif
 
   //******************************* Osc params ******************************
   double theta12;

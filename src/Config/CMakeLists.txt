@@ -23,5 +23,6 @@ set(Config_Impl_Files
 )
 
 add_library(Config SHARED ${Config_Impl_Files})
+target_link_libraries(Config CoreIncludes ROOT::ROOT)
 
 install(TARGETS Config DESTINATION lib)

@@ -6,7 +6,6 @@
 #include "WeightEngineBase.h"
 #include "WeightUtils.h"
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__
 #include "NuwroReWeight.h"
 #include "event1.h"
 #include "NuwroReWeight_FlagNorm.h"
@@ -14,7 +13,6 @@
 #include "NuwroReWeight_SPP.h"
 #include "NuwroSyst.h"
 #include "NuwroSystUncertainty.h"
-#endif
 
 class NuWroWeightEngine : public WeightEngineBase {
 public:
@@ -31,10 +29,8 @@ public:
 
 	inline bool NeedsEventReWeight() { return true; };
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__
 	std::vector<nuwro::rew::NuwroSyst_t> fNUWROSysts;
 	nuwro::rew::NuwroReWeight* fNuwroRW;
-#endif
 };
 
 #endif

@@ -23,5 +23,6 @@ set(MicroBooNE_Impl_Files
 )
 
 add_library(MicroBooNE SHARED ${MicroBooNE_Impl_Files})
+target_link_libraries(MicroBooNE CoreIncludes)
 
 install(TARGETS MicroBooNE DESTINATION lib)

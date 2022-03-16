@@ -2,26 +2,23 @@ include(ROOT)
 
 ##########################  Optional Modules  ###############################
 
-if (NOT DEFINED NO_NEUT OR NOT NO_NEUT)
+add_library(GeneratorCompileDependencies INTERFACE)
+add_library(GeneratorLinkDependencies INTERFACE)
+
+#Defines NEUT_ENABLED and NEUT_REQUIRED, 
+#if NEUT_ENABLED was passed explicitly 
+#then NEUT_REQUIRED is ON, otherwise it is OFF
+DefineEnabledRequiredSwitch(NEUT)
+if (NEUT_ENABLED)
   include(NEUT)
-  set(NO_NEUT OFF)
-else()
-  set(NO_NEUT ON)
-endif()
-if(NEUT_FOUND)
-  SET(NEUT_ENABLED 1)
-else()
-  SET(NEUT_ENABLED 0)
 endif()
 
-if (NOT DEFINED NO_GENIE OR NOT NO_GENIE)
-  include(GENIE)
-  set(NO_GENIE OFF)
-else()
-  set(NO_GENIE ON)
+DefineEnabledRequiredSwitch(T2KReWeight)
+if (T2KReWeight_ENABLED)
+  include(T2KReWeight)
 endif()
-if(GENIE_FOUND)
-  SET(GENIE_ENABLED 1)
-else()
-  SET(GENIE_ENABLED 0)
+
+DefineEnabledRequiredSwitch(GENIE)
+if (GENIE_ENABLED)
+  include(GENIE)
 endif()

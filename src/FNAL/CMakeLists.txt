@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-set(FermilabBC_Impl_Files
+set(FNAL_Impl_Files
   FNAL_CC1ppip_Evt_1DQ2_nu.cxx
   FNAL_CC1ppip_XSec_1DEnu_nu.cxx
   FNAL_CC1ppip_XSec_1DQ2_nu.cxx
@@ -24,6 +24,7 @@ set(FermilabBC_Impl_Files
   FNAL_CC1ppim_XSec_1DEnu_antinu.cxx
 )
 
-add_library(FermilabBC SHARED ${FermilabBC_Impl_Files})
+add_library(FNAL SHARED ${FNAL_Impl_Files})
+target_link_libraries(FNAL CoreIncludes)
 
-install(TARGETS FermilabBC DESTINATION lib)
+install(TARGETS FNAL DESTINATION lib)

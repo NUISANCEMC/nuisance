@@ -64,7 +64,7 @@ double MINOSRPA::CalcWeight(BaseFitEvt* evt) {
   double w = 1.0;
 
   // If GENIE is enabled, use old code
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();
@@ -181,7 +181,7 @@ double LagrangeRPA::CalcWeight(BaseFitEvt* evt) {
   double w = 1.0;
 
   // If GENIE is enabled, use old code
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   // Extract the GENIE Record
   GHepRecord* ghep = static_cast<GHepRecord*>(evt->genie_event->event);
   const Interaction* interaction = ghep->Summary();

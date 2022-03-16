@@ -60,6 +60,7 @@ set(T2K_Impl_Files
 )
 
 add_library(T2K SHARED ${T2K_Impl_Files})
+target_link_libraries(T2K CoreIncludes)
 
 install(TARGETS T2K DESTINATION lib)
 

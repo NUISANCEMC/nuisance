@@ -1,19 +1,32 @@
+#include "T2KNIWGUtils.h"
+#include "T2KNeutUtils.h"
 #include "T2KWeightEngine.h"
 
-#include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
+using namespace t2krew;
+
+#include "T2KNeutUtils.h"
 
 T2KWeightEngine::T2KWeightEngine(std::string name) {
+#if NEUT_VERSION >= 541
   // No need to vomit the contents of the card file all over my screen
   StopTalking();
 
-  if (!t2krew::T2KNEUTUtils::CardIsSet()) {
-    std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
-    if (neut_card.size()) {
-      t2krew::T2KNEUTUtils::SetCardFile(neut_card);
-    }
+  std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
+  if (neut_card.length() > 0) {
+    t2krew::T2KNeutUtils::SetCardFile(neut_card);
+    StartTalking();
+    NUIS_LOG(FIT, "Using NEUT card file: " << neut_card);
+  } else {
+    t2krew::T2KNeutUtils::SetCardFile(std::string(std::getenv("NUISANCE")) +
+                                      "/data/neut/neut_minimal_6t.card");
+    StartTalking();
+    NUIS_LOG(FIT,
+             "Using NEUT card file: " << std::string(std::getenv("NUISANCE")) +
+                                             "/data/neut/neut_minimal_6t.card");
   }
 
   StartTalking();
+#endif
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
@@ -22,7 +35,23 @@ T2KWeightEngine::T2KWeightEngine(std::string name) {
   // Create RW Engine suppressing cout
   StopTalking();
 
-  fT2KRW = t2krew::MakeT2KReWeightInstance();
+  // Create Main RW Engine
+  fT2KRW = new t2krew::T2KReWeight();
+
+  // Setup Sub RW Engines (Only activated for neut and niwg)
+  fT2KNeutRW = new t2krew::T2KNeutReWeight();
+  fT2KNIWGRW = new t2krew::T2KNIWGReWeight();
+
+  fT2KRW->AdoptWghtEngine("fNeutRW", fT2KNeutRW);
+  fT2KRW->AdoptWghtEngine("fNIWGRW", fT2KNIWGRW);
+
+  fT2KRW->Reconfigure();
+
+  // allow cout again
+  StartTalking();
+
+  // Set Abs Twk Config
+  fIsAbsTwk = (FitPar::Config().GetParB("setabstwk"));
 };
 
 void T2KWeightEngine::IncludeDial(std::string name, double startval) {
@@ -39,7 +68,7 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
     std::string singlename = allnames[i];
 
     // Get RW
-    int gensyst = t2krew::T2KSystToInt(fT2KRW->DialFromString(name));
+    t2krew::T2KSyst_t gensyst = t2krew::T2KSyst::FromString(name);
 
     // Fill Maps
     int index = fValues.size();
@@ -48,6 +77,12 @@ void T2KWeightEngine::IncludeDial(std::string name, double startval) {
 
     // Initialize dial
     NUIS_LOG(REC, "Registering " << singlename << " from " << name);
+    fT2KRW->Systematics().Include(gensyst);
+
+    // If Absolute
+    if (fIsAbsTwk) {
+      fT2KRW->Systematics().SetAbsTwk(gensyst);
+    }
 
     // Setup index
     fEnumIndex[nuisenum].push_back(index);
@@ -64,7 +99,7 @@ void T2KWeightEngine::SetDialValue(int nuisenum, double val) {
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
-    fT2KRW->SetDial_To_Value(t2krew::IntToT2KSyst(fT2KSysts[indices[i]]), val);
+    fT2KRW->Systematics().SetTwkDial(fT2KSysts[indices[i]], val);
   }
 }
 
@@ -72,7 +107,7 @@ void T2KWeightEngine::SetDialValue(std::string name, double val) {
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
-    fT2KRW->SetDial_To_Value(t2krew::IntToT2KSyst(fT2KSysts[indices[i]]), val);
+    fT2KRW->Systematics().SetTwkDial(fT2KSysts[indices[i]], val);
   }
 }
 
@@ -100,7 +135,7 @@ double T2KWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Hush now
   StopTalking();
 
-  rw_weight = fT2KRW->CalcWeight(t2krew::Event::Make(evt->fNeutVect));
+  rw_weight = fT2KRW->CalcWeight(evt->fNeutVect);
   // Speak Now
   StartTalking();
 

@@ -61,11 +61,11 @@
 
 #include "TMultiDimFit.h"
 
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#include "Conventions/Units.h"
-#else
+#ifdef GENIE_ENABLED
+#ifdef GENIE3_API_ENABLED
 #include "Framework/Conventions/Units.h"
+#else
+#include "Conventions/Units.h"
 #endif
 #endif
 

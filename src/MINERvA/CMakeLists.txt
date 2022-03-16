@@ -95,5 +95,6 @@ set(MINERvA_Impl_Files
 )
 
 add_library(MINERvA SHARED ${MINERvA_Impl_Files})
+target_link_libraries(MINERvA CoreIncludes)
 
 install(TARGETS MINERvA DESTINATION lib)

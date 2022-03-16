@@ -23,7 +23,7 @@
  *  @{
  */
 
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
 #include "TTree.h"
 
 /// TTree Reader for Nuance TTree Events

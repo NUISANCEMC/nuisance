@@ -166,7 +166,7 @@ void SigmaEnuHists::FillEventVariables(FitEvent *event) {
   NEUTModeHists[event->Mode]->Fill(enu_gev, w);
   NEUTModeHists[0]->Fill(enu_gev, w);
 
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   if (event->fType == kGENIE) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();

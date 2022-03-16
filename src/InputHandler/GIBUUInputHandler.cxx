@@ -1,4 +1,4 @@
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
 #include "GIBUUInputHandler.h"
 #include "InputUtils.h"
 
@@ -141,7 +141,7 @@ FitEvent *GIBUUInputHandler::GetNuisanceEvent(const UInt_t ent,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   else {
     for (int i = 0; i < fGiReader->StdHepN; i++) {
       int state = GetGIBUUParticleStatus(fGiReader->StdHepStatus[i],

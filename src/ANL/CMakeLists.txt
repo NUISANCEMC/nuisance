@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(ArgonneBC_Impl_Files
+set(ANL_Impl_Files
   ANL_CCQE_Evt_1DQ2_nu.cxx
   ANL_CCQE_XSec_1DEnu_nu.cxx
 
@@ -73,6 +73,7 @@ set(ArgonneBC_Impl_Files
 )
 
 
-add_library(ArgonneBC SHARED ${ArgonneBC_Impl_Files})
+add_library(ANL SHARED ${ANL_Impl_Files})
+target_link_libraries(ANL CoreIncludes)
 
-install(TARGETS ArgonneBC DESTINATION lib)
+install(TARGETS ANL DESTINATION lib)

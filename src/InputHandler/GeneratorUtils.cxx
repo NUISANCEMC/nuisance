@@ -22,8 +22,8 @@
 #include "GeneratorUtils.h"
 #include "FitLogger.h"
 
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
+#ifdef NIWG_ENABLED
+#ifdef NEUT_ENABLED
 
 // niwg::rew::NIWGEvent * GeneratorUtils::GetNIWGEventLocal(NeutVect* nvect)
 // {

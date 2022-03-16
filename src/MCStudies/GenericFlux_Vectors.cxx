@@ -19,11 +19,11 @@
 
 #include "GenericFlux_Vectors.h"
 
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
 #include "MINERvA_SignalDef.h"
 #endif
 
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
 #include "T2K_SignalDef.h"
 #endif
 
@@ -319,7 +319,7 @@ void GenericFlux_Vectors::FillEventVariables(FitEvent *event) {
     pdg_init[i] = initList[i]->fPID;
   }
 
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
   if (event->fType == kGENIE) {
     EventRecord *gevent = static_cast<EventRecord *>(event->genie_event->event);
     const Interaction *interaction = gevent->Summary();
@@ -388,10 +388,10 @@ void GenericFlux_Vectors::ResetVariables() {
       flagNC0pi = flagCCcoh = flagNCcoh = flagCC1pip = flagNC1pip = flagCC1pim =
           flagNC1pim = flagCC1pi0 = flagNC1pi0 = false;
 
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
   flagCC0piMINERvA = false;
 #endif
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
   flagCC0Pi_T2K_AnaI = false;
   flagCC0Pi_T2K_AnaII = false;
 #endif
@@ -421,10 +421,10 @@ void GenericFlux_Vectors::FillSignalFlags(FitEvent *event) {
   flagNC1pim = SignalDef::isNC1pi(event, nuPDG, -211);
   flagCC1pi0 = SignalDef::isCC1pi(event, nuPDG, 111);
   flagNC1pi0 = SignalDef::isNC1pi(event, nuPDG, 111);
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
   flagCC0piMINERvA = SignalDef::isCC0pi_MINERvAPTPZ(event, 14);
 #endif
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
   flagCC0Pi_T2K_AnaI =
       SignalDef::isT2K_CC0pi(event, EnuMin, EnuMax, SignalDef::kAnalysis_I);
   flagCC0Pi_T2K_AnaII =
@@ -457,11 +457,11 @@ void GenericFlux_Vectors::AddSignalFlagsToTree() {
   eventVariables->Branch("flagNC1pim", &flagNC1pim, "flagNC1pim/O");
   eventVariables->Branch("flagCC1pi0", &flagCC1pi0, "flagCC1pi0/O");
   eventVariables->Branch("flagNC1pi0", &flagNC1pi0, "flagNC1pi0/O");
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
   eventVariables->Branch("flagCC0piMINERvA", &flagCC0piMINERvA,
                          "flagCC0piMINERvA/O");
 #endif
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
   eventVariables->Branch("flagCC0Pi_T2K_AnaI", &flagCC0Pi_T2K_AnaI,
                          "flagCC0Pi_T2K_AnaI/O");
   eventVariables->Branch("flagCC0Pi_T2K_AnaII", &flagCC0Pi_T2K_AnaII,

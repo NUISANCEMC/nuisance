@@ -149,7 +149,7 @@ double weightRPA::getWeightInternal(const double mc_q0, const double mc_q3,  dou
  
   // CWret after talking to Rik in Nov 2018 at MINERvA CM
   // 2.12.8 sets this to 27 because change of Q definition: need to offset GENIE and Nieves Eb even more
-#if __GENIE_VERSION__ >= 210
+#if GENIE_VERSION >= 210
   Int_t q0offsetValenciaGENIE = 27;
 #else 
   Int_t q0offsetValenciaGENIE = 10;

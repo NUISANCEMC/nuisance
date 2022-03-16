@@ -39,6 +39,7 @@ set(SciBooNE_Impl_Files
 )
 
 add_library(SciBooNE SHARED ${SciBooNE_Impl_Files})
+target_link_libraries(SciBooNE CoreIncludes)
 
 install(TARGETS SciBooNE DESTINATION lib)
 

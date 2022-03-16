@@ -17,11 +17,12 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(Gargamelle_Impl_Files
+set(GGM_Impl_Files
   GGM_CC1ppip_Evt_1DQ2_nu.cxx
   GGM_CC1ppip_XSec_1DEnu_nu.cxx
 )
 
-add_library(Gargamelle SHARED ${Gargamelle_Impl_Files})
+add_library(GGM SHARED ${GGM_Impl_Files})
+target_link_libraries(GGM CoreIncludes)
 
-install(TARGETS Gargamelle DESTINATION lib)
+install(TARGETS GGM DESTINATION lib)

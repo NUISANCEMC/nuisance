@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(BrookhavenBC_Impl_Files
+set(BNL_Impl_Files
   BNL_CC1npip_Evt_1DQ2_nu.cxx
   BNL_CC1npip_XSec_1DEnu_nu.cxx
   BNL_CC1npip_Evt_1DWmupi_nu.cxx
@@ -44,6 +44,7 @@ set(BrookhavenBC_Impl_Files
   BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.cxx
 )
 
-add_library(BrookhavenBC SHARED ${BrookhavenBC_Impl_Files})
+add_library(BNL SHARED ${BNL_Impl_Files})
+target_link_libraries(BNL CoreIncludes)
 
-install(TARGETS BrookhavenBC DESTINATION lib)
+install(TARGETS BNL DESTINATION lib)

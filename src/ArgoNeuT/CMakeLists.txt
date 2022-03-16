@@ -32,5 +32,6 @@ set(ArgoNeuT_Impl_Files
 )
 
 add_library(ArgoNeuT SHARED ${ArgoNeuT_Impl_Files})
+target_link_libraries(ArgoNeuT CoreIncludes)
 
 install(TARGETS ArgoNeuT DESTINATION lib)

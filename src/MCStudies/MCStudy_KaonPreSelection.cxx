@@ -19,9 +19,6 @@
 
 #include "MCStudy_KaonPreSelection.h"
 
-#include "T2K_SignalDef.h"
-#include "MINERvA_SignalDef.h"
-
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 MCStudy_KaonPreSelection::MCStudy_KaonPreSelection(std::string name, std::string inputfile,

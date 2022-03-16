@@ -28,24 +28,43 @@ set(Reweight_Impl_Files
   NUISANCESyst.cxx
   NUISANCEWeightEngine.cxx
   NUISANCEWeightCalcs.cxx
-  MINERvAWeightCalcs.cxx
   weightRPA.h
 )
 
-if(GENIE_ENABLED)
-  LIST(APPEND Reweight_Impl_Files GENIEWeightEngine.cxx)
+if(GENIEReWeight_ENABLED)
+  LIST(APPEND Reweight_Impl_Files 
+    MINERvAWeightCalcs.cxx)
+  if(GENIE3_API_ENABLED)
+    LIST(APPEND Reweight_Impl_Files 
+      GENIE3WeightEngine.cxx)
+  else()
+    LIST(APPEND Reweight_Impl_Files 
+      GENIE2WeightEngine.cxx)
+  endif()
 endif()
 
-if(NEUT_ENABLED)
-  LIST(APPEND Reweight_Impl_Files NEUTWeightEngine.cxx)
+if(NEUTReWeight_ENABLED)
+  if(NEUTReWeight_LEGACY_API_ENABLED)
+    LIST(APPEND Reweight_Impl_Files 
+      NEUTWeightEngine_legacy.cxx)
+  else()
+    LIST(APPEND Reweight_Impl_Files 
+      NEUTWeightEngine.cxx)
+  endif()
 endif()
 
-if(NuWro_ENABLED)
+if(NuWroReWeight_ENABLED)
   LIST(APPEND Reweight_Impl_Files NuWroWeightEngine.cxx)
 endif()
 
 if(T2KReWeight_ENABLED)
-  LIST(APPEND Reweight_Impl_Files T2KWeightEngine.cxx)
+  if(T2KReWeight_LEGACY_API_ENABLED)
+    LIST(APPEND Reweight_Impl_Files 
+      T2KWeightEngine_legacy.cxx)
+  else()
+    LIST(APPEND Reweight_Impl_Files 
+      T2KWeightEngine.cxx)
+  endif()
 endif()
 
 if(NIWG_ENABLED)
@@ -65,5 +84,6 @@ if(Prob3plusplus_ENABLED)
 endif()
 
 add_library(Reweight SHARED ${Reweight_Impl_Files})
+target_link_libraries(Reweight GeneratorCompileDependencies CoreIncludes ROOT::ROOT)
 
 install(TARGETS Reweight DESTINATION lib)

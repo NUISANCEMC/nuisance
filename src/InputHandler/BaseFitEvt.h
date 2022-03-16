@@ -23,33 +23,29 @@
  *  @{
  */
 
-#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
+#ifdef NEUT_ENABLED
 #include "neutpart.h"
 #include "neutvect.h"
 #endif
 
-#ifdef __NUWRO_ENABLED__
-#ifdef __USE_NUWRO_SRW_EVENTS__
-#include "NuwroReWeightSimpleEvent.h"
-#else
+#ifdef NuWro_ENABLED
 #include "event1.h"
 #endif
-#endif
 
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepRecord.h"
-#include "Ntuple/NtpMCEventRecord.h"
-#else
+#ifdef GENIE_ENABLED
+#ifdef GENIE3_API_ENABLED
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/GHEP/GHepRecord.h"
 #include "Framework/Ntuple/NtpMCEventRecord.h"
-#endif
+#else
+#include "EVGCore/EventRecord.h"
+#include "GHEP/GHepRecord.h"
+#include "Ntuple/NtpMCEventRecord.h"
 using namespace genie;
 #endif
+#endif
 
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
 #include "NuanceEvent.h"
 #endif
 
@@ -102,34 +98,30 @@ class BaseFitEvt {
   GeneratorInfoBase* fGenInfo; ///< Generator Variable Box
   UInt_t fType; ///< Generator Event Type
 
-#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
+#ifdef NEUT_ENABLED
   /// Setup Event Reading from NEUT Event
   void SetNeutVect(NeutVect* v);
   NeutVect* fNeutVect;  ///< Pointer to Neut Vector
 #endif
 
-#ifdef __NUWRO_ENABLED__
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  SRW::SRWEvent fNuwroSRWEvent;  ///< Pointer to Nuwro event
-  params * fNuwroParams;
-#endif
+#ifdef NuWro_ENABLED
   event* fNuwroEvent;  ///< Pointer to Nuwro event
 #endif
-
-#ifdef __GENIE_ENABLED__
+  
+#ifdef GENIE_ENABLED
   /// Setup Event Reading from GENIE Event
   void SetGenieEvent(NtpMCEventRecord* ntpl);
   NtpMCEventRecord* genie_event;  ///< Pointer to NTuple Genie Event
   GHepRecord* genie_record;  ///< Pointer to actually accessible Genie Record
 #endif
 
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
   /// Setup Event Reading from NUANCE Event
   void SetNuanceEvent(NuanceEvent* e);
   NuanceEvent* nuance_event; ///< Pointer to Nuance reader
 #endif
 
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
   GiBUUStdHepReader* GiRead; ///< Pointer to GiBUU reader
 #endif
 

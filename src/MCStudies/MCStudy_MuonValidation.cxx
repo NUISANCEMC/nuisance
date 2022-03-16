@@ -19,9 +19,6 @@
 
 #include "MCStudy_MuonValidation.h"
 
-#include "T2K_SignalDef.h"
-#include "MINERvA_SignalDef.h"
-
 //********************************************************************
 /// @brief Class to perform MC Studies on a custom measurement
 MCStudy_MuonValidation::MCStudy_MuonValidation(std::string name, std::string inputfile,

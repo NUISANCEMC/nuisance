@@ -25,5 +25,6 @@ set(Spline_Impl_Files
 )
 
 add_library(Splines SHARED ${Spline_Impl_Files})
+target_link_libraries(Splines CoreIncludes ROOT::ROOT)
 
 install(TARGETS Splines DESTINATION lib)

@@ -34,5 +34,6 @@ set(FitBase_Impl_Files
 )
 
 add_library(FitBase SHARED ${FitBase_Impl_Files})
+target_link_libraries(FitBase CoreIncludes ROOT::ROOT)
 
 install(TARGETS FitBase DESTINATION lib)

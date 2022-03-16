@@ -41,6 +41,13 @@ if(NOT TARGET ROOT::ROOT)
   #We should let CMake set this
   list(REMOVE_ITEM ROOT_CXX_FLAGS "-fPIC")
 
+  #Stops this being passed to gfortran which whinges
+  list (FIND ROOT_CXX_FLAGS "-fsigned-char" FSIGNEDCHAR_INDEX)
+  if(${FSIGNEDCHAR_INDEX} GREATER -1)
+    list(REMOVE_ITEM ROOT_CXX_FLAGS "-fsigned-char")
+    list(APPEND ROOT_CXX_FLAGS "$<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:-fsigned-char>")
+  endif()
+
   execute_process (COMMAND root-config
     --version OUTPUT_VARIABLE ROOT_CONFIG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -86,6 +93,9 @@ if(NOT TARGET ROOT::ROOT)
     cmessage(STATUS "ROOT built with MINUIT2 support")
     SET(MINIMIZER_ENABLED TRUE)
     LIST(APPEND ROOT_CXX_FLAGS -DMINUIT2_ENABLED)
+    if(ROOT_VERSION VERSION_GREATER 6.0.0)
+      LIST(APPEND ROOT_CXX_FLAGS -DROOT_FIT_FITTER_INTERFACE_ENABLED)
+    endif()
   else()
     SET(MINIMIZER_ENABLED FALSE)
   endif()

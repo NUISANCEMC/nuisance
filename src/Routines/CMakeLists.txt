@@ -29,5 +29,6 @@ if(MINIMIZER_ENABLED)
 endif()
 
 add_library(Routines SHARED ${Routines_Impl_Files})
+target_link_libraries(Routines CoreIncludes ROOT::ROOT)
 
 install(TARGETS Routines DESTINATION lib)

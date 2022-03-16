@@ -1,11 +1,9 @@
 #include "WeightUtils.h"
 
 #include "FitLogger.h"
-#ifndef __NO_REWEIGHT__
-#ifdef __T2KREW_ENABLED__
-#ifdef T2KRW_OA2021_INTERFACE
+#ifdef T2KReWeight_ENABLED
+#ifndef T2KReWeight_LEGACY_API_ENABLED
 #include "NReWeightEngineI.h"
-
 #include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
 #include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
 #else
@@ -19,51 +17,48 @@ using namespace t2krew;
 #endif
 #endif
 
-#ifdef __NIWG_ENABLED__
+#ifdef NIWG_ENABLED
 #include "NIWGReWeight.h"
 #include "NIWGSyst.h"
 #endif
 
-#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
+#ifdef NEUTReWeight_ENABLED
 #include "NReWeight.h"
 #include "NSyst.h"
 #endif
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__
+#ifdef NuWroReWeight_ENABLED
 #include "NuwroReWeight.h"
 #include "NuwroSyst.h"
 #endif
 
-#ifdef __GENIE_ENABLED__
-#ifdef GENIE_PRE_R3
-#ifndef __NO_GENIE_REWEIGHT__
-#include "ReWeight/GReWeight.h"
-#include "ReWeight/GSyst.h"
-#endif
-#else
+#ifdef GENIE_ENABLED
+#ifdef GENIE3_API_ENABLED
 using namespace genie;
-#ifndef __NO_GENIE_REWEIGHT__
 #include "RwFramework/GReWeight.h"
 #include "RwFramework/GSyst.h"
 using namespace genie::rew;
-#endif
+#else
+#include "ReWeight/GReWeight.h"
+#include "ReWeight/GSyst.h"
 #endif
 #endif
 
-#ifdef __NOVA_ENABLED__
+#ifdef NOvARwgt_ENABLED
 #include "NOvARwgtEngine.h"
 #endif
 
-#ifdef __NUSYST_ENABLED__
+#ifdef NuSystematics_ENABLED
 #include "nusystematicsWeightEngine.h"
 #endif
-
-#endif // end of no reweight
 
 #include "GlobalDialList.h"
 #include "ModeNormEngine.h"
 #include "NUISANCESyst.h"
+
+#ifdef Prob3plusplus_ENABLED
 #include "OscWeightEngine.h"
+#endif 
 
 //********************************************************************
 TF1 FitBase::GetRWConvFunction(std::string const &type,
@@ -293,7 +288,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   switch (type) {
   // NEUT DIAL TYPE
   case kNEUT: {
-#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
+#ifdef NEUTReWeight_ENABLED
     int neut_enum = (int)neut::rew::NSyst::FromString(name);
     if (neut_enum != 0) {
       this_enum = neut_enum + offset;
@@ -306,7 +301,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // NIWG DIAL TYPE
   case kNIWG: {
-#if defined(__NIWG_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef NIWG_ENABLED
     int niwg_enum = (int)niwg::rew::NIWGSyst::FromString(name);
     if (niwg_enum != 0) {
       this_enum = niwg_enum + offset;
@@ -319,7 +314,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // NUWRO DIAL TYPE
   case kNUWRO: {
-#if defined(__NUWRO_REWEIGHT_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef NuWroReWeight_ENABLED
     int nuwro_enum = (int)nuwro::rew::NuwroSyst::FromString(name);
     if (nuwro_enum > 0) {
       this_enum = nuwro_enum + offset;
@@ -331,7 +326,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // GENIE DIAL TYPE
   case kGENIE: {
-#if defined(__GENIE_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef GENIEReWeight_ENABLED
     int genie_enum = (int)genie::rew::GSyst::FromString(name);
     if (genie_enum > 0) {
       this_enum = genie_enum + offset;
@@ -350,8 +345,8 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
 
   // T2K DIAL TYPE
   case kT2K: {
-#if defined(__T2KREW_ENABLED__) && !defined(__NO_REWEIGHT__)
-#ifdef T2KRW_OA2021_INTERFACE
+#ifdef T2KReWeight_ENABLED
+#ifndef T2KReWeight_LEGACY_API_ENABLED
     // This is possibly inefficient, this should probably not be called per fit
     // step.
     if (!t2krew::T2KNEUTUtils::CardIsSet()) {
@@ -399,7 +394,7 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     break;
   }
   case kOSCILLATION: {
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
     int oscEnum = OscWeightEngine::SystEnumFromString(name);
     if (oscEnum != 0) {
       this_enum = oscEnum + offset;
@@ -453,7 +448,7 @@ int Reweight::GetDialType(int type) {
 int Reweight::RemoveDialType(int type) { return (type % NUIS_DIAL_OFFSET); }
 
 int Reweight::NEUTEnumFromName(std::string const &name) {
-#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
+#ifdef NEUTReWeight_ENABLED
   int neutenum = (int)neut::rew::NSyst::FromString(name);
   return (neutenum > 0) ? neutenum : Reweight::kNoDialFound;
 #else
@@ -462,7 +457,7 @@ int Reweight::NEUTEnumFromName(std::string const &name) {
 }
 
 int Reweight::NIWGEnumFromName(std::string const &name) {
-#if defined(__NIWG_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef NIWG_ENABLED
   int niwgenum = (int)niwg::rew::NIWGSyst::FromString(name);
   return (niwgenum != 0) ? niwgenum : Reweight::kNoDialFound;
 #else
@@ -471,7 +466,7 @@ int Reweight::NIWGEnumFromName(std::string const &name) {
 }
 
 int Reweight::NUWROEnumFromName(std::string const &name) {
-#if defined(__NUWRO_REWEIGHT_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef NuWroReWeight_ENABLED
   int nuwroenum = (int)nuwro::rew::NuwroSyst::FromString(name);
   return (nuwroenum > 0) ? nuwroenum : Reweight::kNoDialFound;
 #else
@@ -480,7 +475,7 @@ int Reweight::NUWROEnumFromName(std::string const &name) {
 }
 
 int Reweight::GENIEEnumFromName(std::string const &name) {
-#if defined(__GENIE_ENABLED__) && !defined(__NO_REWEIGHT__)
+#ifdef GENIEReWeight_ENABLED
   int genieenum = (int)genie::rew::GSyst::FromString(name);
   return (genieenum > 0) ? genieenum : Reweight::kNoDialFound;
 #else
@@ -489,8 +484,8 @@ int Reweight::GENIEEnumFromName(std::string const &name) {
 }
 
 int Reweight::T2KEnumFromName(std::string const &name) {
-#if defined(__T2KREW_ENABLED__) && !defined(__NO_REWEIGHT__)
-#ifdef T2KRW_OA2021_INTERFACE
+#ifdef T2KReWeight_ENABLED
+#ifndef T2KReWeight_LEGACY_API_ENABLED
   // This is possibly inefficient, this should probably not be called per fit
   // step.
   if (!t2krew::T2KNEUTUtils::CardIsSet()) {
@@ -512,7 +507,7 @@ int Reweight::T2KEnumFromName(std::string const &name) {
 }
 
 int Reweight::OscillationEnumFromName(std::string const &name) {
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   int oscEnum = OscWeightEngine::SystEnumFromString(name);
   return (oscEnum > 0) ? oscEnum : Reweight::kNoDialFound;
 #else
@@ -583,13 +578,13 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
     genenum = ModeNormEngine::SystEnumFromString(name);
     break;
 
-#ifdef __NOVA_ENABLED__
+#ifdef NOvARwgt_ENABLED
   case kNOvARWGT:
     genenum = NOvARwgtEngine::GetWeightGeneratorIndex(name);
     break;
 #endif
 
-#ifdef __NUSYST_ENABLED__
+#ifdef NuSystematics_ENABLED
   case kNuSystematics: {
     // Super inefficient...
     nusystematicsWeightEngine we;

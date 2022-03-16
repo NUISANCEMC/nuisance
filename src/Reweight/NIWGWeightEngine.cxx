@@ -1,8 +1,6 @@
 #include "NIWGWeightEngine.h"
 
 NIWGWeightEngine::NIWGWeightEngine(std::string name) {
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
   // Setup the NEUT Reweight engien
   fCalcName = name;
   NUIS_LOG(FIT, "Setting up NIWG RW : " << fCalcName);
@@ -49,20 +47,20 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
     fNIWGRW->AdoptWghtCalc("niwg_HadronMultSwitch",
                            new niwg::rew::NIWGReWeightHadronMultSwitch);
 // Add in Luke's low Q2 suppression
-#ifdef HAVE_NIWGRW_LOWQ2
+#ifdef NIWGRW_HAVE_LOWQ2
   if (niwg_qelowq2)
     fNIWGRW->AdoptWghtCalc(
         "niwg_QELowQ2", new niwg::rew::NIWGReWeightEffectiveQELowQ2Suppression);
 #endif
 
-#ifdef HAVE_NIWGRW_RESLOWQ2
+#ifdef NIWGRW_HAVE_RESLOWQ2
   // Add in the low Q2 correction through T2KReWeight
   // N.B. this already exists in NUISANCE's MINERvA weights
   fNIWGRW->AdoptWghtCalc("niwg_NIWGReWeightSPPLowQ2Suppression", new niwg::rew::NIWGReWeightSPPLowQ2Suppression);
 #endif
 
 // Add in Kevin and Laura's 2p2h Enu dependent dial
-#ifdef HAVE_NIWGRW_2P2HENU
+#ifdef NIWGRW_HAVE_2P2HENU
   if (niwg_2p2henu)
     fNIWGRW->AdoptWghtCalc(
         "niwg_2p2enu", new niwg::rew::NIWGReWeight2p2hEdep);
@@ -75,18 +73,9 @@ NIWGWeightEngine::NIWGWeightEngine(std::string name) {
 
   // allow cout again
   StartTalking();
-#else
-  NUIS_ABORT("NIWG RW Enabled but NEUT RW is not!");
-#endif
-#else
-  NUIS_ABORT("NIWG RW NOT ENABLED!");
-#endif
 };
 
 void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
-
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kNIWG);
 
@@ -126,39 +115,27 @@ void NIWGWeightEngine::IncludeDial(std::string name, double startval) {
   if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(nuisenum, startval);
   }
-#endif
-#endif
 }
 
 void NIWGWeightEngine::SetDialValue(int nuisenum, double val) {
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
     NUIS_LOG(FIT, "Setting NIWG Dial number " << i << " to index " << indices[i] << " " << fNIWGSysts[indices[i]] << " to value " << val);
     fNIWGRW->Systematics().Set(fNIWGSysts[indices[i]], val);
   }
-#endif
-#endif
 }
 
 void NIWGWeightEngine::SetDialValue(std::string name, double val) {
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     NUIS_LOG(FIT, "Setting NIWG Dial Name " << name << " with number " << i << " to index " << indices[i] << " " << fNIWGSysts[indices[i]] << " to value " << val);
     fValues[indices[i]] = val;
     fNIWGRW->Systematics().Set(fNIWGSysts[indices[i]], val);
   }
-#endif
-#endif
 }
 
 void NIWGWeightEngine::Reconfigure(bool silent) {
-#ifdef __NIWG_ENABLED__
-#ifdef __NEUT_ENABLED__
   // Hush now...
   if (silent)
     StopTalking();
@@ -169,15 +146,11 @@ void NIWGWeightEngine::Reconfigure(bool silent) {
   // Shout again
   if (silent)
     StartTalking();
-#endif
-#endif
 }
 
 double NIWGWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
-#ifdef __NEUT_ENABLED__
-#ifdef __NIWG_ENABLED__
 
   // Skip Non GENIE
   if (evt->fType != kNEUT)
@@ -194,15 +167,10 @@ double NIWGWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 
-#endif
-#endif
-
   // Return rw_weight
   return rw_weight;
 }
 
-#ifdef __NEUT_ENABLED__
-#ifdef __NIWG_ENABLED__
 niwg::rew::NIWGEvent *NIWGWeightEngine::GetNIWGEventLocal(NeutVect *nvect) {
   niwg::rew::NIWGEvent *fDummyNIWGEvent = NULL;
 
@@ -233,5 +201,3 @@ niwg::rew::NIWGEvent *NIWGWeightEngine::GetNIWGEventLocal(NeutVect *nvect) {
 
   return fDummyNIWGEvent;
 }
-#endif
-#endif

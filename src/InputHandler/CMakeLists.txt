@@ -43,18 +43,19 @@ if(HEPMCNuEvt_ENABLED)
 endif()
 
 if(GENIE_ENABLED)
-  LIST(APPEND Reweight_Impl_Files GENIEInputHandler.cxx)
+  LIST(APPEND InputHandler_Impl_Files GENIEInputHandler.cxx)
 endif()
 
 if(NEUT_ENABLED)
-  LIST(APPEND Reweight_Impl_Files NEUTInputHandler.cxx)
+  LIST(APPEND InputHandler_Impl_Files NEUTInputHandler.cxx)
 endif()
 
 if(NuWro_ENABLED)
-  LIST(APPEND Reweight_Impl_Files NuWroInputHandler.cxx)
+  LIST(APPEND InputHandler_Impl_Files NuWroInputHandler.cxx)
 endif()
 
 add_library(InputHandler SHARED ${InputHandler_Impl_Files})
+target_link_libraries(InputHandler GeneratorCompileDependencies Experiments CoreIncludes ROOT::ROOT)
 
 install(TARGETS InputHandler DESTINATION lib)
 

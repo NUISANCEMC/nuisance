@@ -17,92 +17,64 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(TARGETS_TO_BUILD)
-
-if(USE_MINIMIZER)
+if(MINIMIZER_ENABLED)
   add_executable(nuismin nuismin.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuismin)
+  target_link_libraries(nuismin CoreTargets GeneratorLinkDependencies)
 
-  add_executable(nuissplines nuissplines.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissplines)
-
+#   add_executable(nuissplines nuissplines.cxx)
+#   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissplines)
 endif()
 
-include_directories(${RWENGINE_INCLUDE_DIRECTORIES})
-include_directories(${CMAKE_SOURCE_DIR}/src/Routines)
-include_directories(${CMAKE_SOURCE_DIR}/src/InputHandler)
-include_directories(${CMAKE_SOURCE_DIR}/src/Genie)
-include_directories(${CMAKE_SOURCE_DIR}/src/FitBase)
-include_directories(${CMAKE_SOURCE_DIR}/src/Statistical)
-include_directories(${CMAKE_SOURCE_DIR}/src/Utils)
-include_directories(${CMAKE_SOURCE_DIR}/src/Config)
-include_directories(${CMAKE_SOURCE_DIR}/src/Logger)
-include_directories(${CMAKE_SOURCE_DIR}/src/Splines)
-include_directories(${CMAKE_SOURCE_DIR}/src/Reweight)
-include_directories(${CMAKE_SOURCE_DIR}/src/FCN)
-include_directories(${CMAKE_SOURCE_DIR}/src/MCStudies)
-include_directories(${CMAKE_SOURCE_DIR}/src/Smearceptance)
-include_directories(${EXP_INCLUDE_DIRECTORIES})
-
-if (USE_NuWro AND NOT NUWRO_BUILT_FROM_FILE)
-  add_executable(nuwro_nuisance nuwro_NUISANCE.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuwro_nuisance)
-endif()
-
-if (USE_GiBUU)
-  add_executable(DumpGiBUUEvents DumpGiBUUEvents.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};DumpGiBUUEvents)
-endif()
 
 add_executable(nuis_flat_tree_combiner nuis_flat_tree_combiner.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuis_flat_tree_combiner)
+target_link_libraries(nuis_flat_tree_combiner CoreTargets GeneratorLinkDependencies)
 
 add_executable(nuiscomp nuiscomp.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuiscomp)
+target_link_libraries(nuiscomp CoreTargets GeneratorLinkDependencies)
 
 add_executable(nuisflat nuisflat.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisflat)
+target_link_libraries(nuisflat CoreTargets GeneratorLinkDependencies)
 
-add_executable(nuissmear nuissmear.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissmear)
+# add_executable(nuissmear nuissmear.cxx)
+# set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissmear)
 
-add_executable(nuissyst nuissyst.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissyst)
+# add_executable(nuissyst nuissyst.cxx)
+# set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuissyst)
 
-add_executable(nuisbayes nuisbayes.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisbayes)
+# add_executable(nuisbayes nuisbayes.cxx)
+# set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisbayes)
 
-if(USE_GENIE)
+if(GENIE_ENABLED)
   add_executable(PrepareGENIE PrepareGENIE.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGENIE)
+	target_link_libraries(PrepareGENIE CoreTargets GeneratorLinkDependencies)
 endif()
 
-if(USE_NEUT OR USE_NEUT_EVENT)
+if(NEUT_ENABLED)
   add_executable(PrepareNEUT PrepareNEUT.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNEUT)
+	target_link_libraries(PrepareNEUT CoreTargets GeneratorLinkDependencies)
 endif()
 
-if(USE_GiBUU)
-  add_executable(PrepareGiBUU PrepareGiBUU.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGiBUU)
-endif()
+# if(USE_GiBUU)
+#   add_executable(PrepareGiBUU PrepareGiBUU.cxx)
+#   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareGiBUU)
+# endif()
 
-# PREPARE NUWRO
-# Commented out for the time being until it is finished..
-if(USE_NuWro)
-  add_executable(PrepareNuwro PrepareNuwroEvents.cxx)
-  set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNuwro)
-endif()
+# # PREPARE NUWRO
+# # Commented out for the time being until it is finished..
+# if(USE_NuWro)
+#   add_executable(PrepareNuwro PrepareNuwroEvents.cxx)
+#   set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};PrepareNuwro)
+# endif()
 
-add_executable(nuisbac nuisbac.cxx)
-set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisbac)
+# add_executable(nuisbac nuisbac.cxx)
+# set(TARGETS_TO_BUILD ${TARGETS_TO_BUILD};nuisbac)
 
-foreach(targ ${TARGETS_TO_BUILD})
-  if(NOT "${CMAKE_LINK_FLAGS} ${NUIS_EXE_FLAGS}" STREQUAL " ")
-    set_target_properties(${targ} PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${NUIS_EXE_FLAGS}")
-  endif()
-  target_link_libraries(${targ} ${MODULETargets})
-  target_link_libraries(${targ} ${CMAKE_DEPENDLIB_FLAGS})
-endforeach()
+# foreach(targ ${TARGETS_TO_BUILD})
+#   if(NOT "${CMAKE_LINK_FLAGS} ${NUIS_EXE_FLAGS}" STREQUAL " ")
+#     set_target_properties(${targ} PROPERTIES LINK_FLAGS "${CMAKE_LINK_FLAGS} ${NUIS_EXE_FLAGS}")
+#   endif()
+#   target_link_libraries(${targ} ${MODULETargets})
+#   target_link_libraries(${targ} ${CMAKE_DEPENDLIB_FLAGS})
+# endforeach()
 
-install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)
+# install(TARGETS ${TARGETS_TO_BUILD} DESTINATION bin)

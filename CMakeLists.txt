@@ -24,6 +24,8 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 project(NUISANCE)
 
+set(CMAKE_SKIP_RPATH TRUE)
+
 include(ExternalProject)
 
 enable_language(Fortran)
@@ -46,19 +48,19 @@ add_subdirectory(src)
 
 add_subdirectory(app)
 
-configure_file(cmake/setup.sh.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
-  ${CMAKE_INSTALL_PREFIX})
+# configure_file(cmake/setup.sh.in
+#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" @ONLY)
+# install(FILES
+#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.sh" DESTINATION
+#   ${CMAKE_INSTALL_PREFIX})
 
-install(PROGRAMS
-  "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
-  bin)
+# install(PROGRAMS
+#   "${PROJECT_SOURCE_DIR}/scripts/nuissamples" DESTINATION
+#   bin)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
-                  ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
-                  ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
-                  ${CMAKE_INSTALL_PREFIX})
+# install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION
+#                   ${CMAKE_INSTALL_PREFIX})
+# install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
+#                   ${CMAKE_INSTALL_PREFIX})
+# install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
+#                   ${CMAKE_INSTALL_PREFIX})

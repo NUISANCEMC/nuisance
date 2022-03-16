@@ -3,30 +3,7 @@
 
 #include "FitLogger.h"
 
-#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
-#include "NEUTInputHandler.h"
 #include "NReWeight.h"
-#include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecRES.h"
-// Dials removed in NEUT 5.4.1
-#if __NEUT_VERSION__ < 541
-#include "NReWeightCasc.h"
-#include "NReWeightNuclPiless.h"
-#include "NReWeightNuXSecNCRES.h"
-#include "NReWeightNuXSecCCRES.h"
-#include "NReWeightNuXSecNC.h"
-#include "NReWeightNuXSecCOH.h"
-#include "NReWeightNuXSecNCEL.h"
-#include "NReWeightNuXSecDIS.h"
-#endif
-#if __NEUT_VERSION__ >= 541
-#include "CommonBlockIFace.h"
-#endif
-#include "NSyst.h"
-#include "NSystUncertainty.h"
-#include "neutpart.h"
-#include "neutvect.h"
-#endif
 
 #include "FitWeight.h"
 #include "GeneratorUtils.h"
@@ -48,10 +25,8 @@ public:
 
   inline bool NeedsEventReWeight() { return true; };
 
-#if defined(__NEUT_ENABLED__) and defined(__USE_NEUT_REWEIGHT__)
   std::vector<neut::rew::NSyst_t> fNEUTSysts;
   neut::rew::NReWeight *fNeutRW;
-#endif
 };
 
 #endif

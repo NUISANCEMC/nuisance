@@ -71,9 +71,15 @@ if(NEUT_FOUND)
     LIST(APPEND NEUT_LINK_OPTIONS $<IF:$<STREQUAL:"$<TARGET_PROPERTY:TYPE>","EXECUTABLE">,${opt},>)
   endforeach()
 
-  LIST(APPEND NEUT_DEFINES -DNEUT_ENABLED -DNEUT_VERSION=${NEUT_VERSION})
+  string(REGEX REPLACE "\([0-9]\)\.\([0-9]\)\.\([0-9]\).*" "\\1\\2\\3" NEUT_SINGLE_VERSION ${NEUT_VERSION})
+  LIST(APPEND NEUT_DEFINES -DNEUT_ENABLED -DNEUT_VERSION=${NEUT_SINGLE_VERSION})
 
-  cmessage(STATUS "NEUT Found: ${NEUT_PREFIX} ")
+  if(EXISTS "${NEUT_ROOT}/src/neutclass/neutnucfsistep.so")
+    LIST(APPEND NEUT_DEFINES -DNEUT_NUCFSI_ENABLED)
+  endif()
+
+  cmessage(STATUS "NEUT Found (Version: ${NEUT_VERSION}): ${NEUT_ROOT}")
+  cmessage(STATUS "    NEUT_SINGLE_VERSION: ${NEUT_SINGLE_VERSION}")
   cmessage(STATUS "    NEUT_INCLUDE_DIR: ${NEUT_INCLUDE_DIR}")
   cmessage(STATUS "    NEUT_DEFINES: ${NEUT_DEFINES}")
   cmessage(STATUS "    NEUT_LIB_DIR: ${NEUT_LIB_DIR}")
@@ -103,9 +109,12 @@ if(NEUT_FOUND)
     if(NOT TARGET NEUT::ReWeight)
       add_library(NEUT::ReWeight INTERFACE IMPORTED)
       set_target_properties(NEUT::ReWeight PROPERTIES
-          INTERFACE_LINK_LIBRARIES "NReWeight;NEUT::Generator"
+          INTERFACE_LINK_LIBRARIES "NEUT::Generator"
       )
   endif()
+
+  set(NEUTReWeight_ENABLED TRUE)
+  set(NEUTReWeight_LEGACY_API_ENABLED TRUE)
 
 endif()
 

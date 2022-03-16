@@ -28,5 +28,6 @@ set(Utils_Impl_Files
 )
 
 add_library(Utils SHARED ${Utils_Impl_Files})
+target_link_libraries(Utils CoreIncludes ROOT::ROOT)
 
 install(TARGETS Utils DESTINATION lib)

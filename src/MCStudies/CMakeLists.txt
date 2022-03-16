@@ -29,13 +29,17 @@ set(MCStudies_Impl_Files
   MCStudy_CCQEHistograms.cxx
   OfficialNIWGPlots.cxx
   Smearceptance_Tester.cxx
-  Simple_Osc.cxx
-  Smear_SVDUnfold_Propagation_Osc.cxx
+  
   SigmaEnuHists.cxx
 )
 
-add_library(MCStudies SHARED ${MCStudies_Impl_Files})
+if(Prob3plusplus_ENABLED)
+  LIST(APPEND MCStudies_Impl_Files 
+    Simple_Osc.cxx
+    Smear_SVDUnfold_Propagation_Osc.cxx)
+endif()
 
-target_link_libraries(MCStudies T2K MINERvA Smearceptance)
+add_library(MCStudies SHARED ${MCStudies_Impl_Files})
+target_link_libraries(MCStudies Experiments CoreIncludes ROOT::ROOT)
 
 install(TARGETS MCStudies DESTINATION lib)

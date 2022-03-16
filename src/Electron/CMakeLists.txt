@@ -21,6 +21,7 @@ set(ElectronScatter_Impl_Files
   ElectronScattering_DurhamData.cxx
 )
 
-add_library(ElectronScattering SHARED ${ElectronScatter_Impl_Files})
+add_library(Electron SHARED ${ElectronScatter_Impl_Files})
+target_link_libraries(Electron CoreIncludes)
 
-install(TARGETS ElectronScattering DESTINATION lib)
+install(TARGETS Electron DESTINATION lib)

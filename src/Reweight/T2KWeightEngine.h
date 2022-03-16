@@ -3,17 +3,12 @@
 
 #include "FitLogger.h"
 
-#ifdef __T2KREW_ENABLED__
-#ifdef T2KRW_OA2021_INTERFACE
+#ifndef T2KReWeight_LEGACY_API_ENABLED
 #include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
 #else
 #include "T2KNIWGReWeight.h"
-#include "T2KNIWGUtils.h"
 #include "T2KNeutReWeight.h"
-#include "T2KNeutUtils.h"
 #include "T2KReWeight.h"
-using namespace t2krew;
-#endif
 #endif
 
 #include "FitWeight.h"
@@ -36,8 +31,7 @@ public:
 
   inline bool NeedsEventReWeight() { return true; };
 
-#ifdef __T2KREW_ENABLED__
-#ifdef T2KRW_OA2021_INTERFACE
+#ifndef T2KReWeight_LEGACY_API_ENABLED
   std::vector<int> fT2KSysts;
   std::unique_ptr<t2krew::T2KReWeight> fT2KRW;
 #else
@@ -45,7 +39,6 @@ public:
   t2krew::T2KReWeight *fT2KRW; //!< T2K RW Object
   t2krew::T2KNeutReWeight *fT2KNeutRW;
   t2krew::T2KNIWGReWeight *fT2KNIWGRW;
-#endif
 #endif
 };
 

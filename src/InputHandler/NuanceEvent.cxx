@@ -20,7 +20,7 @@
  *  \addtogroup FitBase
  *  @{
  */
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
 #include "NuanceEvent.h"
 
 void NuanceEvent::SetBranchAddresses(TTree* tn) {

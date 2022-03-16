@@ -1,6 +1,6 @@
 #include "SampleList.h"
 
-#ifndef __NO_ANL__
+#ifdef ANL_ENABLED
 #include "ANL_CCQE_Evt_1DQ2_nu.h"
 #include "ANL_CCQE_XSec_1DEnu_nu.h"
 
@@ -56,7 +56,7 @@
 #include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 #endif
 
-#ifndef __NO_ArgoNeuT__
+#ifdef ArgoNeut_ENABLED
 // ArgoNeuT CC1Pi
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
@@ -73,7 +73,7 @@
 #include "ArgoNeuT_CCInc_XSec_1Dthetamu_nu.h"
 #endif
 
-#ifndef __NO_BNL__
+#ifdef BNL_ENABLED
 // BNL CCQE
 #include "BNL_CCQE_Evt_1DQ2_nu.h"
 #include "BNL_CCQE_XSec_1DEnu_nu.h"
@@ -105,7 +105,7 @@
 #include "BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu.cxx"
 #endif
 
-#ifndef __NO_FNAL__
+#ifdef FNAL_ENABLED
 // FNAL CCQE
 #include "FNAL_CCQE_Evt_1DQ2_nu.h"
 // FNAL CC1ppip
@@ -116,7 +116,7 @@
 #include "FNAL_CC1ppim_XSec_1DEnu_antinu.h"
 #endif
 
-#ifndef __NO_BEBC__
+#ifdef BEBC_ENABLED
 // BEBC CCQE
 #include "BEBC_CCQE_XSec_1DQ2_nu.h"
 // BEBC CC1ppip
@@ -136,13 +136,13 @@
 #include "BEBC_CC1ppim_XSec_1DQ2_antinu.h"
 #endif
 
-#ifndef __NO_GGM__
+#ifdef GGM_ENABLED
 // GGM CC1ppip
 #include "GGM_CC1ppip_Evt_1DQ2_nu.h"
 #include "GGM_CC1ppip_XSec_1DEnu_nu.h"
 #endif
 
-#ifndef __NO_MiniBooNE__
+#ifdef MiniBooNE_ENABLED
 // MiniBooNE CCQE
 #include "MiniBooNE_CCQE_XSec_1DEnu_nu.h"
 #include "MiniBooNE_CCQE_XSec_1DQ2_antinu.h"
@@ -178,12 +178,12 @@
 #include "MiniBooNE_NCEL_XSec_Treco_nu.h"
 #endif
 
-#ifndef __NO_MicroBooNE__
+#ifdef MicroBooNE_ENABLED
 #include "MicroBooNE_CCInc_XSec_2DPcos_nu.h"
 #include "MicroBooNE_CC1MuNp_XSec_1D_nu.h"
 #endif
 
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
 // MINERvA CCQE
 #include "MINERvA_CCQE_XSec_1DQ2_antinu.h"
 #include "MINERvA_CCQE_XSec_1DQ2_joint.h"
@@ -266,7 +266,7 @@
 #include "MINERvA_CC0pi_XSec_1DQ2_Tgt_nu.h"
 #endif
 
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
 // T2K CC0pi 2016
 #include "T2K_CC0pi_XSec_2DPcos_nu_I.h"
 #include "T2K_CC0pi_XSec_2DPcos_nu_II.h"
@@ -326,7 +326,7 @@
 
 #endif
 
-#ifndef __NO_SciBooNE__
+#ifdef SciBooNE_ENABLED
 
 // SciBooNE COH studies
 #include "SciBooNE_CCCOH_1TRK_1DQ2_nu.h"
@@ -348,7 +348,7 @@
 #include "SciBooNE_CCInc_XSec_1DEnu_nu.h"
 #endif
 
-#ifndef __NO_K2K__
+#ifdef K2K_ENABLED
 // K2K NC1pi0
 #include "K2K_NC1pi0_Evt_1Dppi0_nu.h"
 #endif
@@ -362,7 +362,11 @@
 #include "GenericFlux_Vectors.h"
 
 #include "ElectronFlux_FlatTree.h"
+
+#ifdef Electron_ENABLED
 #include "ElectronScattering_DurhamData.h"
+#endif
+
 #include "MCStudy_KaonPreSelection.h"
 #include "MCStudy_MuonValidation.h"
 
@@ -371,8 +375,10 @@
 
 #include "SigmaEnuHists.h"
 
+#ifdef Prob3plusplus_ENABLED
 #include "Simple_Osc.h"
 #include "Smear_SVDUnfold_Propagation_Osc.h"
+#endif
 
 #include "FitWeight.h"
 
@@ -663,7 +669,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
      ANL CCQE Samples
   */
 
-#ifndef __NO_ANL__
+#ifdef ANL_ENABLED
   if (!name.compare("ANL_CCQE_XSec_1DEnu_nu") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRD26") ||
       !name.compare("ANL_CCQE_XSec_1DEnu_nu_PRL31") ||
@@ -799,7 +805,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_ArgoNeuT__
+#ifdef ArgoNeut_ENABLED
     if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
       return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
     } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {
@@ -830,7 +836,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_BNL__
+#ifdef BNL_ENABLED
       if (!name.compare("BNL_CCQE_XSec_1DEnu_nu")) {
     return (new BNL_CCQE_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("BNL_CCQE_Evt_1DQ2_nu")) {
@@ -903,7 +909,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_FNAL__
+#ifdef FNAL_ENABLED
       if (!name.compare("FNAL_CCQE_Evt_1DQ2_nu")) {
     return (new FNAL_CCQE_Evt_1DQ2_nu(samplekey));
     /*
@@ -926,7 +932,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_BEBC__
+#ifdef BEBC_ENABLED
       if (!name.compare("BEBC_CCQE_XSec_1DQ2_nu")) {
     return (new BEBC_CCQE_XSec_1DQ2_nu(samplekey));
     /*
@@ -970,7 +976,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_GGM__
+#ifdef GGM_ENABLED
       if (!name.compare("GGM_CC1ppip_XSec_1DEnu_nu")) {
     return (new GGM_CC1ppip_XSec_1DEnu_nu(samplekey));
   } else if (!name.compare("GGM_CC1ppip_Evt_1DQ2_nu")) {
@@ -984,7 +990,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_MiniBooNE__
+#ifdef MiniBooNE_ENABLED
       if (!name.compare("MiniBooNE_CCQE_XSec_1DQ2_nu") ||
           !name.compare("MiniBooNE_CCQELike_XSec_1DQ2_nu")) {
     return (new MiniBooNE_CCQE_XSec_1DQ2_nu(samplekey));
@@ -1081,7 +1087,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else
 #endif
 
-#ifndef __NO_MicroBooNE__
+#ifdef MicroBooNE_ENABLED
       /*
       MicroBooNE Samples
       */
@@ -1096,7 +1102,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
   } else
 #endif
 
-#ifndef __NO_MINERvA__
+#ifdef MINERvA_ENABLED
       /*
       MINERvA Samples
       */
@@ -1357,7 +1363,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
 
   } else
 #endif
-#ifndef __NO_T2K__
+#ifdef T2K_ENABLED
       if (!name.compare("T2K_CC0pi_XSec_2DPcos_nu_I")) {
     return (new T2K_CC0pi_XSec_2DPcos_nu_I(samplekey));
 
@@ -1481,7 +1487,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     // SciBooNE COH studies
   } else
 #endif
-#ifndef __NO_SciBooNE__
+#ifdef SciBooNE_ENABLED
       if (!name.compare("SciBooNE_CCCOH_STOP_NTrks_nu")) {
     return (new SciBooNE_CCCOH_STOP_NTrks_nu(samplekey));
 
@@ -1532,7 +1538,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifndef __NO_K2K__
+#ifdef K2K_ENABLED
       if (!name.compare("K2K_NC1pi0_Evt_1Dppi0_nu")) {
     return (new K2K_NC1pi0_Evt_1Dppi0_nu(samplekey));
 
@@ -1559,20 +1565,28 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     return (new MCStudy_CCQEHistograms(name, file, rw, type, fkdt));
   } else if (!name.compare("ElectronFlux_FlatTree")) {
     return (new ElectronFlux_FlatTree(name, file, rw, type, fkdt));
-  } else if (name.find("ElectronData_") != std::string::npos) {
+  } 
+#ifdef Electron_ENABLED
+  else if (name.find("ElectronData_") != std::string::npos) {
     return new ElectronScattering_DurhamData(samplekey);
-  } else if (name.find("MuonValidation_") != std::string::npos) {
+  } 
+#endif
+  else if (name.find("MuonValidation_") != std::string::npos) {
     return (new MCStudy_MuonValidation(name, file, rw, type, fkdt));
   } else if (!name.compare("NIWGOfficialPlots")) {
     return (new OfficialNIWGPlots(samplekey));
   } else if ((name.find("SigmaEnuHists") != std::string::npos) ||
              (name.find("SigmaEnuPerEHists") != std::string::npos)) {
     return (new SigmaEnuHists(samplekey));
-  } else if (!name.compare("Simple_Osc")) {
+  } 
+#ifdef Prob3plusplus_ENABLED
+  else if (!name.compare("Simple_Osc")) {
     return (new Simple_Osc(samplekey));
   } else if (!name.compare("Smear_SVDUnfold_Propagation_Osc")) {
     return (new Smear_SVDUnfold_Propagation_Osc(samplekey));
-  } else {
+  } 
+#endif
+  else {
     NUIS_ABORT("Error: No such sample: " << name << std::endl);
   }
 

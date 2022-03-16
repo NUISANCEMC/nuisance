@@ -18,7 +18,7 @@
 *******************************************************************************/
 #ifndef NUANCEINPUTHANDLER_H
 #define NUANCEINPUTHANDLER_H
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
 /*!
  *  \addtogroup InputHandler
  *  @{

@@ -22,6 +22,7 @@ set(Statistical_Impl_Files
 )
 
 add_library(Statistical SHARED ${Statistical_Impl_Files})
+target_link_libraries(Statistical CoreIncludes ROOT::ROOT)
 
 install(TARGETS Statistical DESTINATION lib)
 

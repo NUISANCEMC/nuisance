@@ -18,15 +18,24 @@
  *******************************************************************************/
 
 #include "FitEventInputHandler.h"
-#include "GENIEInputHandler.h"
 #include "GIBUUInputHandler.h"
 #include "GiBUUNativeInputHandler.h"
 #include "HistogramInputHandler.h"
-#include "NEUTInputHandler.h"
 #include "NUANCEInputHandler.h"
-#include "NuWroInputHandler.h"
 #include "SigmaQ0HistogramInputHandler.h"
 #include "SplineInputHandler.h"
+
+#ifdef GENIE_ENABLED
+#include "GENIEInputHandler.h"
+#endif
+
+#ifdef NEUT_ENABLED
+#include "NEUTInputHandler.h"
+#endif
+
+#ifdef NuWro_ENABLED
+#include "NuWroInputHandler.h"
+#endif
 
 #include "InputFactory.h"
 
@@ -42,7 +51,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 
   switch (inpType) {
   case (kNEUT_Input):
-#if defined(__NEUT_ENABLED__) || defined(NEUT_EVENT_ENABLED)
+#ifdef NEUT_ENABLED
     input = new NEUTInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NEUTInputHandler : " << handle << " " << inpType
@@ -52,7 +61,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     break;
 
   case (kGENIE_Input):
-#ifdef __GENIE_ENABLED__
+#ifdef GENIE_ENABLED
     input = new GENIEInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GENIEInputHandler : "
@@ -62,7 +71,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     break;
 
   case (kNUWRO_Input):
-#ifdef __NUWRO_ENABLED__
+#ifdef NuWro_ENABLED
     input = new NuWroInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NuWroInputHandler : "
@@ -72,7 +81,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     break;
 
   case (kGiBUU_Input):
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
     input = new GiBUUNativeInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create GiBUUInputHandler : "
@@ -82,7 +91,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
     break;
 
   case (kNUANCE_Input):
-#ifdef __NUANCE_ENABLED__
+#ifdef NUANCE_ENABLED
     input = new NUANCEInputHandler(handle, newinputs);
 #else
     NUIS_ERR(FTL, "Tried to create NUANCEInputHandler : "

@@ -1,4 +1,4 @@
-#ifdef __GiBUU_ENABLED__
+#ifdef GiBUU_ENABLED
 #include "GiBUUNativeInputHandler.h"
 #include "InputUtils.h"
 #include "PhysConst.h"
@@ -292,7 +292,7 @@ FitEvent *GiBUUNativeInputHandler::GetNuisanceEvent(const UInt_t ent,
   if (!lightweight) {
     CalcNUISANCEKinematics();
   }
-#ifdef __PROB3PP_ENABLED__
+#ifdef Prob3plusplus_ENABLED
   else {
     fNUISANCEEvent->probe_E = fGiReader->lepIn_E*1E3;
     fNUISANCEEvent->probe_pdg = GetGiBUUNuPDG(fGiReader->flavor_ID, fGiReader->process_ID);

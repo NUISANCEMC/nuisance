@@ -17,7 +17,7 @@
 #    along with NUISANCE.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-set(BigEuropeanBC_Impl_Files
+set(BEBC_Impl_Files
   BEBC_CC1npim_XSec_1DEnu_antinu.cxx
   BEBC_CC1npim_XSec_1DQ2_antinu.cxx
   BEBC_CC1npip_XSec_1DEnu_nu.cxx
@@ -31,6 +31,7 @@ set(BigEuropeanBC_Impl_Files
   BEBC_CCQE_XSec_1DQ2_nu.cxx
 )
 
-add_library(BigEuropeanBC SHARED ${BigEuropeanBC_Impl_Files})
+add_library(BEBC SHARED ${BEBC_Impl_Files})
+target_link_libraries(BEBC CoreIncludes)
 
-install(TARGETS BigEuropeanBC DESTINATION lib)
+install(TARGETS BEBC DESTINATION lib)

@@ -1,7 +1,6 @@
 #include "NuWroWeightEngine.h"
 
 NuWroWeightEngine::NuWroWeightEngine(std::string name) {
-#ifdef __NUWRO_REWEIGHT_ENABLED__
 
   // Setup the NEUT Reweight engien
   fCalcName = name;
@@ -34,14 +33,9 @@ NuWroWeightEngine::NuWroWeightEngine(std::string name) {
 
   // allow cout again
   StartTalking();
-#else
-  NUIS_ABORT("NUWRO RW NOT ENABLED! ");
-#endif
 };
 
 void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
-#ifdef __NUWRO_REWEIGHT_ENABLED__
-
   // Get RW Enum and name
   int nuisenum = Reweight::ConvDial(name, kNUWRO);
 
@@ -80,11 +74,10 @@ void NuWroWeightEngine::IncludeDial(std::string name, double startval) {
   if (startval != _UNDEF_DIAL_VALUE_) {
     SetDialValue(name, startval);
   }
-#endif
 };
 
 void NuWroWeightEngine::SetDialValue(int nuisenum, double val) {
-#ifdef __NUWRO_REWEIGHT_ENABLED__
+#ifdef NuWroReWeight_ENABLED
   std::vector<size_t> indices = fEnumIndex[nuisenum];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
@@ -94,17 +87,14 @@ void NuWroWeightEngine::SetDialValue(int nuisenum, double val) {
 }
 
 void NuWroWeightEngine::SetDialValue(std::string name, double val) {
-#ifdef __NUWRO_REWEIGHT_ENABLED__
   std::vector<size_t> indices = fNameIndex[name];
   for (uint i = 0; i < indices.size(); i++) {
     fValues[indices[i]] = val;
     fNuwroRW->Systematics().SetSystVal(fNUWROSysts[indices[i]], val);
   }
-#endif
 }
 
 void NuWroWeightEngine::Reconfigure(bool silent) {
-#ifdef __NUWRO_REWEIGHT_ENABLED__
   // Hush now...
   if (silent)
     StopTalking();
@@ -115,25 +105,15 @@ void NuWroWeightEngine::Reconfigure(bool silent) {
   // Shout again
   if (silent)
     StartTalking();
-#endif
 }
 
 double NuWroWeightEngine::CalcWeight(BaseFitEvt *evt) {
   double rw_weight = 1.0;
 
-#ifdef __NUWRO_REWEIGHT_ENABLED__
-  // Skip Non GENIE
+  // Skip Non NuWro
   if (evt->fType != kNUWRO)
     return 1.0;
 
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  rw_weight = fNuwroRW->CalcWeight(evt->fNuwroSRWEvent, *evt->fNuwroParams);
-#else
-  // Call Weight calculation
-  rw_weight = fNuwroRW->CalcWeight(evt->fNuwroEvent);
-#endif
-#endif
-
   // Return rw_weight
-  return rw_weight;
+  return fNuwroRW->CalcWeight(evt->fNuwroEvent);
 }

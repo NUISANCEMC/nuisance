@@ -33,5 +33,6 @@ set(Smearceptance_Impl_Files
 )
 
 add_library(Smearceptance SHARED ${Smearceptance_Impl_Files})
+target_link_libraries(Smearceptance CoreIncludes ROOT::ROOT)
 
 install(TARGETS Smearceptance DESTINATION lib)

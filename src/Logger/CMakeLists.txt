@@ -24,5 +24,6 @@ set(Logger_Impl_Files
 )
 
 add_library(Logger SHARED ${Logger_Impl_Files})
+target_link_libraries(Logger CoreIncludes ROOT::ROOT)
 
 install(TARGETS Logger DESTINATION lib)
