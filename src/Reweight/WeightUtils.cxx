@@ -27,11 +27,6 @@ using namespace t2krew;
 #include "NSyst.h"
 #endif
 
-#ifdef NuWroReWeight_ENABLED
-#include "NuwroReWeight.h"
-#include "NuwroSyst.h"
-#endif
-
 #ifdef GENIE_ENABLED
 #ifdef GENIE3_API_ENABLED
 using namespace genie;
@@ -203,8 +198,6 @@ int FitBase::ConvDialType(std::string const &type) {
     return kNEUT;
   else if (!type.compare("niwg_parameter"))
     return kNIWG;
-  else if (!type.compare("nuwro_parameter"))
-    return kNUWRO;
   else if (!type.compare("t2k_parameter"))
     return kT2K;
   else if (!type.compare("genie_parameter"))
@@ -236,9 +229,6 @@ std::string FitBase::ConvDialType(int type) {
   }
   case kNIWG: {
     return "niwg_parameter";
-  }
-  case kNUWRO: {
-    return "nuwro_parameter";
   }
   case kT2K: {
     return "t2k_parameter";
@@ -310,18 +300,6 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
     this_enum = Reweight::kNoTypeFound;
 #endif
     break;
-  }
-
-  // NUWRO DIAL TYPE
-  case kNUWRO: {
-#ifdef NuWroReWeight_ENABLED
-    int nuwro_enum = (int)nuwro::rew::NuwroSyst::FromString(name);
-    if (nuwro_enum > 0) {
-      this_enum = nuwro_enum + offset;
-    }
-#else
-    this_enum = Reweight::kNoTypeFound;
-#endif
   }
 
   // GENIE DIAL TYPE
@@ -465,14 +443,6 @@ int Reweight::NIWGEnumFromName(std::string const &name) {
 #endif
 }
 
-int Reweight::NUWROEnumFromName(std::string const &name) {
-#ifdef NuWroReWeight_ENABLED
-  int nuwroenum = (int)nuwro::rew::NuwroSyst::FromString(name);
-  return (nuwroenum > 0) ? nuwroenum : Reweight::kNoDialFound;
-#else
-  return Reweight::kGeneratorNotBuilt;
-#endif
-}
 
 int Reweight::GENIEEnumFromName(std::string const &name) {
 #ifdef GENIEReWeight_ENABLED
@@ -545,10 +515,6 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
 
   case kNIWG:
     genenum = NIWGEnumFromName(name);
-    break;
-
-  case kNUWRO:
-    genenum = NUWROEnumFromName(name);
     break;
 
   case kGENIE:

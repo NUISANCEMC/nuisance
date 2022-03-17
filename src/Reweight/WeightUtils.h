@@ -49,7 +49,6 @@ int RemoveDialType(int type);
 
 int NEUTEnumFromName(std::string const &name);
 int NIWGEnumFromName(std::string const &name);
-int NUWROEnumFromName(std::string const &name);
 int T2KEnumFromName(std::string const &name);
 int GENIEEnumFromName(std::string const &name);
 int CustomEnumFromName(std::string const &name);

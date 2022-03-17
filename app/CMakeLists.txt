@@ -29,7 +29,8 @@ LIST(APPEND TARGETS_TO_BUILD
   nuissmear
   nuissyst
   nuisbayes
-  nuisbac)
+  nuisbac
+  PrepareGiBUU)
 
 if(GENIE_ENABLED)
   LIST(APPEND TARGETS_TO_BUILD PrepareGENIE)
@@ -39,8 +40,8 @@ if(NEUT_ENABLED)
     LIST(APPEND TARGETS_TO_BUILD PrepareNEUT)
 endif()
 
-if(GiBUU_ENABLED)
-    LIST(APPEND TARGETS_TO_BUILD PrepareGiBUU)
+if(NuWro_ENABLED)
+    LIST(APPEND TARGETS_TO_BUILD PrepareNuWroEvents)
 endif()
 
 foreach(targ ${TARGETS_TO_BUILD})

@@ -53,10 +53,6 @@ if(NEUTReWeight_ENABLED)
   endif()
 endif()
 
-if(NuWroReWeight_ENABLED)
-  LIST(APPEND Reweight_Impl_Files NuWroWeightEngine.cxx)
-endif()
-
 if(T2KReWeight_ENABLED)
   if(T2KReWeight_LEGACY_API_ENABLED)
     LIST(APPEND Reweight_Impl_Files 

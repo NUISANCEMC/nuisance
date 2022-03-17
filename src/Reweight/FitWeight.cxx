@@ -18,10 +18,6 @@
 #include "T2KWeightEngine.h"
 #endif
 
-#ifdef NuWroReWeight_ENABLED
-#include "NuWroWeightEngine.h"
-#endif
-
 #ifdef GENIEReWeight_ENABLED
 #include "GENIEWeightEngine.h"
 #endif
@@ -44,12 +40,6 @@ void FitWeight::AddRWEngine(int type) {
 #ifdef NEUTReWeight_ENABLED    
     case kNEUT:
       fAllRW[type] = new NEUTWeightEngine("neutrw");
-      break;
-#endif
-
-#ifdef NuWroReWeight_ENABLED
-    case kNUWRO:
-      fAllRW[type] = new NuWroWeightEngine("nuwrorw");
       break;
 #endif
 
@@ -125,9 +115,6 @@ bool FitWeight::HasRWEngine(int type) {
   switch (type) {
 #ifdef NEUTReWeight_ENABLED
     case kNEUT:
-#endif
-#ifdef NuWroReWeight_ENABLED
-    case kNUWRO:
 #endif
 #ifdef GENIEReWeight_ENABLED
     case kGENIE:

@@ -7,6 +7,8 @@
 
 #include "WeightEngineBase.h"
 
+#include <cmath>
+
 using namespace Reweight;
 
 ModeNormCalc::ModeNormCalc() { fNormRES = 1.0; }
@@ -678,7 +680,7 @@ double GaussianModeCorr::GetGausWeight(double q0, double q3, double vals[]) {
       ret = norm * exp( -0.5 * z / (1 - corr*corr) );
     }
 
-    if (ret != ret or ret < 0.0 or isnan(ret)) {
+    if (ret != ret or ret < 0.0 or std::isnan(ret)) {
       return 1.0;
     }
 

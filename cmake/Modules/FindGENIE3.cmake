@@ -17,26 +17,6 @@ find_path(GENIE_LIB_DIR
   NAMES libGFwGHEP.so
   PATHS ${GENIE}/lib)
 
-find_path(LOG4CPP_INC_DIR
-  NAMES log4cpp/config.h
-  PATHS ${LOG4CPP_INC})
-
-find_path(LOG4CPP_LIB_DIR
-  NAMES liblog4cpp.so
-  PATHS ${LOG4CPP_LIB})
-
-find_path(LIBXML2_INC_DIR
-  NAMES libxml/parser.h
-  PATHS ${LIBXML2_INC} ${LIBXML2_INC}/libxml2)
-
-find_path(LIBXML2_LIB_DIR
-  NAMES libxml2.so
-  PATHS ${LIBXML2_LIB})
-
-find_path(PYTHIA6_LIB_DIR
-  NAMES libPythia6.so
-  PATHS ${PYTHIA6} ${PYTHIA6_LIB_DIR})
-
 find_package_handle_standard_args(GENIE
   REQUIRED_VARS 
     GENIE 
@@ -44,8 +24,6 @@ find_package_handle_standard_args(GENIE
     GENIE_LIB_DIR
     LOG4CPP_INC_DIR
     LOG4CPP_LIB_DIR
-    LIBXML2_INC_DIR
-    LIBXML2_LIB_DIR
     PYTHIA6_LIB_DIR
   VERSION_VAR GENIE_VERSION
 )
@@ -89,17 +67,17 @@ if(GENIE_FOUND)
   cmessage(STATUS "       GENIE INC_DIRS: ${GENIE_INC_DIR}")
   cmessage(STATUS "       GENIE LIB_DIRS: ${GENIE_LIB_DIR}")
   cmessage(STATUS "           GENIE LIBS: ${GENIE_LIBS}")
-  cmessage(STATUS "        DEPS INC_DIRS: ${LOG4CPP_INC_DIR};${LIBXML2_INC_DIR}")
-  cmessage(STATUS "        DEPS LIB_DIRS: ${LOG4CPP_LIB_DIR};${LIBXML2_LIB_DIR};${PYTHIA6_LIB_DIR}")
-  cmessage(STATUS "            DEPS LIBS: pythia6;xml2;log4cpp")
+  cmessage(STATUS "        DEPS INC_DIRS: ${LOG4CPP_INC_DIR}")
+  cmessage(STATUS "        DEPS LIB_DIRS: ${LOG4CPP_LIB_DIR};${PYTHIA6_LIB_DIR}")
+  cmessage(STATUS "            DEPS LIBS: Pythia6;log4cpp;LibXml2::LibXml2;GSL::gsl")
 
   if(NOT TARGET GENIE::All)
     add_library(GENIE::All INTERFACE IMPORTED)
     set_target_properties(GENIE::All PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${GENIE_INC_DIR};${LOG4CPP_INC_DIR};${LIBXML2_INC_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "${GENIE_INC_DIR};${LOG4CPP_INC_DIR}"
         INTERFACE_COMPILE_OPTIONS "${GENIE_DEFINES}"
-        INTERFACE_LINK_DIRECTORIES "${GENIE_LIB_DIR};${LOG4CPP_LIB_DIR};${LIBXML2_LIB_DIR};${PYTHIA6_LIB_DIR}"
-        INTERFACE_LINK_LIBRARIES "${GENIE_LIBS};EGPythia6;Pythia6;xml2;log4cpp"
+        INTERFACE_LINK_DIRECTORIES "${GENIE_LIB_DIR};${LOG4CPP_LIB_DIR};${PYTHIA6_LIB_DIR}"
+        INTERFACE_LINK_LIBRARIES "${GENIE_LIBS};EGPythia6;Pythia6;log4cpp;LibXml2::LibXml2;GSL::gsl"
     )
   endif()
 
