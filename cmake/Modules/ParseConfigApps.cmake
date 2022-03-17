@@ -38,11 +38,8 @@ function(GetFirstMatchingDelimitedArg)
     execute_process (COMMAND ${CONFIG_APP_LOCATION}
       ${OPTS_ARGS} OUTPUT_VARIABLE CONFIGAPP_RESPONSE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    cmessage(DEBUG "${CONFIG_APP_LOCATION} ${OPTS_ARGS} responded with: \"${CONFIGAPP_RESPONSE_RAW}\"")
-
     if(CONFIGAPP_RESPONSE_RAW STREQUAL "")
       if(OPTS_ALLOW_FAIL)
-        cmessage(DEBUG "\"${CONFIG_APP_LOCATION} ${OPTS_ARGS}\" produced no output and was expected to.")
         set(${DIR_OUT} "" PARENT_SCOPE)
       else()
         cmessage(FATAL_ERROR "\"${CONFIG_APP_LOCATION} ${OPTS_ARGS}\" produced no output and was required to.")
@@ -52,7 +49,6 @@ function(GetFirstMatchingDelimitedArg)
 
       if(NOT PARSE_CONFIGAPP_RESPONSE_MATCH)
         if(OPTS_ALLOW_FAIL)
-          cmessage(DEBUG "Couldn't find ${OPTS_DELIMITER} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")
           set(${CMAKE_MATCH_1} "")
         else()
           cmessage(FATAL_ERROR "Expected to be able to parse the result of ${OPTS_CONFIG_APP} ${OPTS_ARGS} to a directory, but couldn't find a ${OPTS_DELIMITER} flag, found: \"${CONFIGAPP_RESPONSE_RAW}\"")

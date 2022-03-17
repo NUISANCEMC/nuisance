@@ -6,6 +6,7 @@ set(GENIE3_API_ENABLED FALSE)
 set(GENIE3_XSECMEC_ENABLED FALSE)
 
 include(CMessage)
+include(ParseConfigApps)
 
 find_program(GENIECONFIG NAMES genie-config)
 if("${GENIECONFIG}" STREQUAL "GENIECONFIG-NOTFOUND")

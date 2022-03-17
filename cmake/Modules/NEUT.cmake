@@ -12,27 +12,27 @@ if(NOT "${NEUTCONFIG}x" STREQUAL "NEUTCONFIG-NOTFOUNDx")
     OUTPUT_VARIABLE NEUT_CONFIG_VERSION 
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    if(NEUT_CONFIG_VERSION VERSION_LESS 5.5.0)
-      include(FindNEUTConfigLegacy)
+  if(NEUT_CONFIG_VERSION VERSION_LESS 5.5.0)
+    include(FindNEUTConfigLegacy)
 
-      if(NEUT_FOUND)
-        target_link_libraries(GeneratorCompileDependencies INTERFACE NEUT::ReWeight)
-      endif()
-    else()
-      include(CMakeFindDependencyMacro)
-      find_package(NEUT)
-
-      if(NEUT_FOUND)
-        add_library(NUISANCENEUT INTERFACE)
-        #Any additional target options that we want to attach to the NEUT target can go here.
-        string(REPLACE "." "" NEUT_SINGLE_VERSION ${NEUT_VERSION})
-        set_target_properties(NUISANCENEUT PROPERTIES 
-          INTERFACE_COMPILE_OPTIONS "-DNEUT_ENABLED;-DNEUT_VERSION=${NEUT_SINGLE_VERSION}"
-          INTERFACE_LINK_LIBRARIES NEUT::ReWeight)
-
-        target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCENEUT)
-      endif()
+    if(NEUT_FOUND)
+      target_link_libraries(GeneratorCompileDependencies INTERFACE NEUT::ReWeight)
     endif()
+  else()
+    include(CMakeFindDependencyMacro)
+    find_package(NEUT)
+
+    if(NEUT_FOUND)
+      add_library(NUISANCENEUT INTERFACE)
+      #Any additional target options that we want to attach to the NEUT target can go here.
+      string(REPLACE "." "" NEUT_SINGLE_VERSION ${NEUT_VERSION})
+      set_target_properties(NUISANCENEUT PROPERTIES 
+        INTERFACE_COMPILE_OPTIONS "-DNEUT_ENABLED;-DNEUT_VERSION=${NEUT_SINGLE_VERSION}"
+        INTERFACE_LINK_LIBRARIES NEUT::ReWeight)
+
+      target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCENEUT)
+    endif()
+  endif()
 else()
 
   include(CMessage)
