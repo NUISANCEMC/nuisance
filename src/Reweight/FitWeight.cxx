@@ -30,7 +30,7 @@
 #include "NOvARwgtEngine.h"
 #endif
 
-#ifdef NuSystematics_ENABLED
+#ifdef nusystematics_ENABLED
 #include "nusystematicsWeightEngine.h"
 #endif
 
@@ -92,7 +92,7 @@ void FitWeight::AddRWEngine(int type) {
       break;
 #endif
 
-#ifdef NuSystematics_ENABLED
+#ifdef nusystematics_ENABLED
     case kNuSystematics:
       fAllRW[type] = new nusystematicsWeightEngine();
       break;
@@ -135,7 +135,7 @@ bool FitWeight::HasRWEngine(int type) {
 #ifdef NOvARwgt_ENABLED
     case kNOvARWGT:
 #endif
-#ifdef NuSystematics_ENABLED
+#ifdef nusystematics_ENABLED
     case kNuSystematics:
 #endif
 

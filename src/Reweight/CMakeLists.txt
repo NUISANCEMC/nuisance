@@ -71,7 +71,7 @@ if(NOvARwgt_ENABLED)
   LIST(APPEND Reweight_Impl_Files NOvARwgtEngine.cxx)
 endif()
 
-if(NuSystematics_ENABLED)
+if(nusystematics_ENABLED)
   LIST(APPEND Reweight_Impl_Files nusystematicsWeightEngine.cxx)
 endif()
 

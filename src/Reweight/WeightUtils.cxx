@@ -43,7 +43,7 @@ using namespace genie::rew;
 #include "NOvARwgtEngine.h"
 #endif
 
-#ifdef NuSystematics_ENABLED
+#ifdef nusystematics_ENABLED
 #include "nusystematicsWeightEngine.h"
 #endif
 
@@ -550,7 +550,7 @@ int Reweight::ConvDial(std::string const &fullname, int type, bool exceptions) {
     break;
 #endif
 
-#ifdef NuSystematics_ENABLED
+#ifdef nusystematics_ENABLED
   case kNuSystematics: {
     // Super inefficient...
     nusystematicsWeightEngine we;

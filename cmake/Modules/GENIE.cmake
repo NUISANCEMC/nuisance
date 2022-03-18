@@ -77,56 +77,7 @@ endif()
 
 ###### LibXml2
 find_package(LibXml2)
-if(NOT LibXml2_FOUND)
-  cmessage(STATUS "Attempting to use environment to find libxml2")
-  EnsureVarOrEnvSet(LIBXML2_INC LIBXML2_INC)
-  EnsureVarOrEnvSet(LIBXML2_LIB LIBXML2_LIB)
-
-  if("${LIBXML2_INC}" STREQUAL "LIBXML2_INC-NOTFOUND")
-    cmessage(STATUS "Variable LIBXML2_INC is not defined. Please export environment variable LIBXML2_INC or configure with -DLIBXML2_INC=/path/to/libxml2/includes.")
-    SET(GENIE_FOUND FALSE)
-    return()
-  endif()
-
-  if("${LIBXML2_LIB}" STREQUAL "LIBXML2_LIB-NOTFOUND")
-    cmessage(STATUS "Variable LIBXML2_LIB is not defined. Please export environment variable LIBXML2_LIB or configure with -DLIBXML2_LIB=/path/to/libxml2/lib.")
-    SET(GENIE_FOUND FALSE)
-    return()
-  endif()
-
-  find_path(LIBXML2_INC_DIR
-    NAMES libxml/parser.h
-    PATHS ${LIBXML2_INC})
-
-  if("${LIBXML2_INC_DIR}" STREQUAL "LIBXML2_INC_DIR-NOTFOUND")
-    cmessage(STATUS "When configuring GENIE with LIBXML2_INC=\"${LIBXML2_INC}\", failed find required file \"libxml/parser.h\".")
-    SET(GENIE_FOUND FALSE)
-    return()
-  endif()
-
-  find_path(LIBXML2_LIB_DIR
-    NAMES libxml2.so
-    PATHS ${LIBXML2_LIB})
-
-  if("${LIBXML2_LIB_DIR}" STREQUAL "LIBXML2_LIB_DIR-NOTFOUND")
-    cmessage(STATUS "When configuring GENIE with LIBXML2_LIB=\"${LIBXML2_LIB}\", failed find required file \"llibxml2.so\".")
-    SET(GENIE_FOUND FALSE)
-    return()
-  endif()
-
-  if(NOT TARGET LibXml2::LibXml2)
-    add_library(LibXml2::LibXml2 INTERFACE IMPORTED)
-    set_target_properties(LibXml2::LibXml2 PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES ${LIBXML2_INC}
-        INTERFACE_LINK_DIRECTORIES ${LIBXML2_LIB}
-        INTERFACE_LINK_LIBRARIES libxml2.so
-      )
-  endif()
-endif()
-
-###### LibXml2
-find_package(LibXml2)
-if(NOT LibXml2_FOUND)
+if(NOT TARGET LibXml2::LibXml2)
   cmessage(STATUS "Attempting to use environment to find libxml2")
   EnsureVarOrEnvSet(LIBXML2_INC LIBXML2_INC)
   EnsureVarOrEnvSet(LIBXML2_LIB LIBXML2_LIB)
@@ -163,18 +114,16 @@ if(NOT LibXml2_FOUND)
     return()
   endif()
 
-  if(NOT TARGET LibXml2::LibXml2)
-    add_library(LibXml2::LibXml2 INTERFACE IMPORTED)
-    set_target_properties(LibXml2::LibXml2 PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES ${LIBXML2_INC}
-        INTERFACE_LINK_DIRECTORIES ${LIBXML2_LIB}
-        INTERFACE_LINK_LIBRARIES libxml2.so
-      )
-  endif()
+  add_library(LibXml2::LibXml2 INTERFACE IMPORTED)
+  set_target_properties(LibXml2::LibXml2 PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES ${LIBXML2_INC}
+      INTERFACE_LINK_DIRECTORIES ${LIBXML2_LIB}
+      INTERFACE_LINK_LIBRARIES libxml2.so
+    )
 endif()
 
 find_package(GSL)
-if(NOT GSL_FOUND)
+if(NOT TARGET GSL::gsl)
   cmessage(STATUS "Attempting to use environment to find GSL")
   EnsureVarOrEnvSet(GSL_INC GSL_INC)
   EnsureVarOrEnvSet(GSL_LIB GSL_LIB)
@@ -211,33 +160,40 @@ if(NOT GSL_FOUND)
     return()
   endif()
 
-  if(NOT TARGET GSL::gsl)
-    add_library(GSL::gsl INTERFACE IMPORTED)
-    set_target_properties(GSL::gsl PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES ${GSL_INC}
-        INTERFACE_LINK_DIRECTORIES ${GSL_LIB}
-        INTERFACE_LINK_LIBRARIES "gsl;gslcblas;m"
-      )
+  add_library(GSL::gsl INTERFACE IMPORTED)
+  set_target_properties(GSL::gsl PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES ${GSL_INC}
+      INTERFACE_LINK_DIRECTORIES ${GSL_LIB}
+      INTERFACE_LINK_LIBRARIES "gsl;gslcblas;m"
+    )
+endif()
+
+if(NOT TARGET Pythia::6)
+
+  EnsureVarOrEnvSet(PYTHIA6 PYTHIA6)
+  EnsureVarOrEnvSet(PYTHIA6_LIB_DIR PYTHIA6_LIB_DIR)
+
+  if("${PYTHIA6}" STREQUAL "PYTHIA6-NOTFOUND" AND "${PYTHIA6_LIB_DIR}" STREQUAL "PYTHIA6_LIB_DIR-NOTFOUND")
+    cmessage(STATUS "Variable PYTHIA6 (or PYTHIA6_LIB_DIR) is not defined. Please export environment variable PYTHIA6 (or PYTHIA6_LIB_DIR) or configure with -DPYTHIA6=/path/to/log4cpp/includes.")
+    SET(GENIE_FOUND FALSE)
+    return()
   endif()
-endif()
 
-EnsureVarOrEnvSet(PYTHIA6 PYTHIA6)
-EnsureVarOrEnvSet(PYTHIA6_LIB_DIR PYTHIA6_LIB_DIR)
+  find_path(PYTHIA6_LIB_DIR
+  NAMES libPythia6.so
+  PATHS ${PYTHIA6} ${PYTHIA6_LIB_DIR})
 
-if("${PYTHIA6}" STREQUAL "PYTHIA6-NOTFOUND" AND "${PYTHIA6_LIB_DIR}" STREQUAL "PYTHIA6_LIB_DIR-NOTFOUND")
-  cmessage(STATUS "Variable PYTHIA6 (or PYTHIA6_LIB_DIR) is not defined. Please export environment variable PYTHIA6 (or PYTHIA6_LIB_DIR) or configure with -DPYTHIA6=/path/to/log4cpp/includes.")
-  SET(GENIE_FOUND FALSE)
-  return()
-endif()
+  if("${PYTHIA6_LIB_DIR}" STREQUAL "PYTHIA6_LIB_DIR-NOTFOUND")
+    cmessage(STATUS "When configuring GENIE failed find required file \"libPythia6.so\" (Search paths: PYTHIA6=\"${PYTHIA6}\", PYTHIA6_LIB_DIR=\"${PYTHIA6_LIB_DIR}\").")
+    SET(GENIE_FOUND FALSE)
+    return()
+  endif()
 
-find_path(PYTHIA6_LIB_DIR
-NAMES libPythia6.so
-PATHS ${PYTHIA6} ${PYTHIA6_LIB_DIR})
-
-if("${PYTHIA6_LIB_DIR}" STREQUAL "PYTHIA6_LIB_DIR-NOTFOUND")
-  cmessage(STATUS "When configuring GENIE failed find required file \"libPythia6.so\" (Search paths: PYTHIA6=\"${PYTHIA6}\", PYTHIA6_LIB_DIR=\"${PYTHIA6_LIB_DIR}\").")
-  SET(GENIE_FOUND FALSE)
-  return()
+  add_library(Pythia::6 INTERFACE IMPORTED)
+  set_target_properties(Pythia::6 PROPERTIES
+      INTERFACE_LINK_DIRECTORIES ${PYTHIA6_LIB_DIR}
+      INTERFACE_LINK_LIBRARIES "Pythia6"
+    )
 endif()
 
 execute_process (COMMAND cat ${GENIE}/VERSION OUTPUT_VARIABLE GENIE_VERSION

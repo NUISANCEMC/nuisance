@@ -38,6 +38,7 @@ find_package_handle_standard_args(NIWGLegacy
     if(NOT TARGET NIWGLegacy::All)
         add_library(NIWGLegacy::All INTERFACE IMPORTED)
         set_target_properties(NIWGLegacy::All PROPERTIES
+            INTERFACE_COMPILE_OPTIONS "-DNIWGLegacy_ENABLED"
             INTERFACE_INCLUDE_DIRECTORIES "${NIWGLegacy_INCLUDE_DIR}"
             INTERFACE_LINK_DIRECTORIES "${NIWGLegacy_LIB_DIR}"
             INTERFACE_LINK_LIBRARIES NIWGReWeight
@@ -46,11 +47,6 @@ find_package_handle_standard_args(NIWGLegacy
   endif()
 endif()
 
-if(NOT NIWGLegacy_FOUND)
-  if(NIWGLegacy_REQUIRED)
-    cmessage(FATAL_ERROR "NIWGLegacy was explicitly enabled but cannot be found.")
-  endif()
-  SET(NIWGLegacy_ENABLED FALSE)
-else()
+if(NIWGLegacy_FOUND)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NIWGLegacy::All)
 endif()
