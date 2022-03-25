@@ -198,7 +198,7 @@ class GaussianModeCorr : public NUISANCEWeightCalc {
 class RadCorrQ2 : public NUISANCEWeightCalc {
   public:
     RadCorrQ2(); // Constructor sets up files
-    ~RadCorrQ2() {};
+    ~RadCorrQ2();
 
     double CalcWeight(BaseFitEvt *evt);
 
@@ -206,7 +206,7 @@ class RadCorrQ2 : public NUISANCEWeightCalc {
     void SetDialValue(int rwenum, double val);
     bool IsHandled(int rwenum);
 
-    bool fUse;
+    int type;
 
   private:
     // Just a handy enum
@@ -215,7 +215,7 @@ class RadCorrQ2 : public NUISANCEWeightCalc {
     TGraph ***Graphs;
 
     // Enu Range that the inputs come in
-    double EnuRange[9];
+    double EnuRange[12];
     int nEnu;
 
     double GetQ2max(double, double);
