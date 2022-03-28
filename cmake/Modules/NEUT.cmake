@@ -27,8 +27,10 @@ if(NOT "${NEUTCONFIG}x" STREQUAL "NEUTCONFIG-NOTFOUNDx")
       #Any additional target options that we want to attach to the NEUT target can go here.
       string(REPLACE "." "" NEUT_SINGLE_VERSION ${NEUT_VERSION})
       set_target_properties(NUISANCENEUT PROPERTIES 
-        INTERFACE_COMPILE_OPTIONS "-DNEUT_ENABLED;-DNEUT_VERSION=${NEUT_SINGLE_VERSION}"
+        INTERFACE_COMPILE_OPTIONS "-DNEUT_ENABLED;-DNEUT_VERSION=${NEUT_SINGLE_VERSION};-DNEUTReWeight_ENABLED"
         INTERFACE_LINK_LIBRARIES NEUT::ReWeight)
+
+      set(NEUTReWeight_ENABLED TRUE)
 
       target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCENEUT)
     endif()

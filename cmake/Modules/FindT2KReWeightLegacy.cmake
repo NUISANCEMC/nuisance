@@ -37,6 +37,7 @@ find_package_handle_standard_args(T2KReWeight
         add_library(T2KReWeight::All INTERFACE IMPORTED)
         set_target_properties(T2KReWeight::All PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${T2KReWeight_INCLUDE_DIR}"
+            INTERFACE_COMPILE_OPTIONS -DT2KReWeight_LEGACY_API_ENABLED
             INTERFACE_LINK_DIRECTORIES "${T2KReWeight_LIB_DIR}"
             INTERFACE_LINK_LIBRARIES T2KReWeight
         )

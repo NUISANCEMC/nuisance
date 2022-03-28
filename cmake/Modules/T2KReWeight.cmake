@@ -13,6 +13,9 @@ if(NOT "${T2KRWCONFIG}x" STREQUAL "T2KRWCONFIG-NOTFOUNDx")
   SET(CMAKE_MODULE_PATH "${OLD_CMAKE_MODULE_PATH}")
 
   #If we are using the latest T2KReWeight, we don't want to link directly to NIWG
+  if(NIWGLegacy_REQUIRED)
+    cmessage(FATAL_ERROR "NIWGLegacy_ENABLED was set but we are building against current T2KReWeight, please use NIWGReWeight parameters via T2KReWeight rather than requesting direct linking.")
+  endif()
   SET(NIWGLegacy_ENABLED FALSE)
 
 else()

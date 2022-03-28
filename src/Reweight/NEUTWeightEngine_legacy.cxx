@@ -1,18 +1,17 @@
 #include "NEUTWeightEngine.h"
 
-#include "NReWeightNuXSecCCQE.h"
-#include "NReWeightNuXSecRES.h"
+#include "WeightUtils.h"
 
 // Dials removed in NEUT 5.4.1
 #if NEUT_VERSION < 541
 #include "NReWeightCasc.h"
-#include "NReWeightNuclPiless.h"
-#include "NReWeightNuXSecNCRES.h"
 #include "NReWeightNuXSecCCRES.h"
-#include "NReWeightNuXSecNC.h"
 #include "NReWeightNuXSecCOH.h"
-#include "NReWeightNuXSecNCEL.h"
 #include "NReWeightNuXSecDIS.h"
+#include "NReWeightNuXSecNC.h"
+#include "NReWeightNuXSecNCEL.h"
+#include "NReWeightNuXSecNCRES.h"
+#include "NReWeightNuclPiless.h"
 #endif
 
 #if NEUT_VERSION >= 541
@@ -28,18 +27,24 @@
 #include "neutpart.h"
 #include "neutvect.h"
 
+#include "NReWeightNuXSecCCQE.h"
+#include "NReWeightNuXSecRES.h"
+
+#include <algorithm>
+#include <memory>
+
 NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
 #if NEUT_VERSION >= 541
   std::string neut_card = FitPar::Config().GetParS("NEUT_CARD");
   if (!neut_card.size()) {
     NUIS_ABORT(
-	       "[ERROR]: When using NEUTReWeight must set NEUT_CARD config option.");
+        "[ERROR]: When using NEUTReWeight must set NEUT_CARD config option.");
   }
   // No need to vomit the contents of the card file all over my screen
-  StopTalking();                                                                                                                                                            
+  StopTalking();
   neut::CommonBlockIFace::Initialize(neut_card);
-  StartTalking();                                                                                                                                                           
+  StartTalking();
 #endif
 
   // Setup the NEUT Reweight engien
@@ -48,7 +53,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
 
   // Create RW Engine suppressing cout
   StopTalking();
-  fNeutRW = new neut::rew::NReWeight();
+  fNeutRW = std::unique_ptr<neut::rew::NReWeight>(new neut::rew::NReWeight());
   TDirectory *olddir = gDirectory;
 
   // get list of vetoed calc engines (just for debug really)
@@ -63,7 +68,7 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
   if (xsec_res)
     fNeutRW->AdoptWghtCalc("xsec_res", new neut::rew::NReWeightNuXSecRES);
 
-  // Dials removed in NEUT 5.4.1
+    // Dials removed in NEUT 5.4.1
 #if NEUT_VERSION < 541
   bool xsec_ccres = rw_engine_list.find("xsec_ccres") == std::string::npos;
   bool xsec_coh = rw_engine_list.find("xsec_coh") == std::string::npos;
@@ -102,6 +107,8 @@ NEUTWeightEngine::NEUTWeightEngine(std::string name) {
   StartTalking();
 };
 
+NEUTWeightEngine::~NEUTWeightEngine(){}
+
 void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
   // Get First enum
   int nuisenum = Reweight::ConvDial(name, kNEUT);
@@ -136,7 +143,8 @@ void NEUTWeightEngine::IncludeDial(std::string name, double startval) {
 #if NEUT_VERSION < 541
       NSystUncertainty::Instance()->SetUncertainty(fNEUTSysts[index], 1.0, 1.0);
 #else
-      neut::rew::NSystUncertainty::Instance()->SetUncertainty(fNEUTSysts[index], 1.0, 1.0);
+      neut::rew::NSystUncertainty::Instance()->SetUncertainty(fNEUTSysts[index],
+                                                              1.0, 1.0);
 #endif
     }
 
@@ -214,7 +222,7 @@ double NEUTWeightEngine::CalcWeight(BaseFitEvt *evt) {
   // Speak Now
   StartTalking();
 
-  if (!std::isnormal(rw_weight)){
+  if (!std::isnormal(rw_weight)) {
     NUIS_ERR(WRN, "NEUT returned weight: " << rw_weight);
     rw_weight = 0;
   }

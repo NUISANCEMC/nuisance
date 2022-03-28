@@ -1,18 +1,24 @@
-#ifndef WEIGHT_ENGINE_NEUT_H
-#define WEIGHT_ENGINE_NEUT_H
+#pragma once
 
-#include "FitLogger.h"
-
-#include "NReWeight.h"
-
-#include "FitWeight.h"
-#include "GeneratorUtils.h"
 #include "WeightEngineBase.h"
+
+#ifdef NEUTReWeight_LEGACY_API_ENABLED
+#include "NReWeight.h"
+#else
+namespace neut {
+namespace rew {
+class NReWeight;
+}
+} // namespace neut
+#endif
+
+#include <memory>
+#include <vector>
 
 class NEUTWeightEngine : public WeightEngineBase {
 public:
   NEUTWeightEngine(std::string name);
-  ~NEUTWeightEngine(){};
+  ~NEUTWeightEngine();
 
   void IncludeDial(std::string name, double startval);
 
@@ -25,8 +31,8 @@ public:
 
   inline bool NeedsEventReWeight() { return true; };
 
+#ifdef NEUTReWeight_LEGACY_API_ENABLED
   std::vector<neut::rew::NSyst_t> fNEUTSysts;
-  neut::rew::NReWeight *fNeutRW;
-};
-
 #endif
+  std::unique_ptr<neut::rew::NReWeight> fNeutRW;
+};

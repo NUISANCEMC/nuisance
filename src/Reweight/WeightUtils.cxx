@@ -4,8 +4,8 @@
 #ifdef T2KReWeight_ENABLED
 #ifndef T2KReWeight_LEGACY_API_ENABLED
 #include "NReWeightEngineI.h"
-#include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
 #include "T2KReWeight/WeightEngines/NEUT/T2KNEUTUtils.h"
+#include "T2KReWeight/WeightEngines/T2KReWeightFactory.h"
 #else
 #include "T2KGenieReWeight.h"
 #include "T2KNIWGReWeight.h"
@@ -23,7 +23,9 @@ using namespace t2krew;
 #endif
 
 #ifdef NEUTReWeight_ENABLED
+#ifdef NEUTReWeight_LEGACY_API_ENABLED
 #include "NReWeight.h"
+#endif
 #include "NSyst.h"
 #endif
 
@@ -53,7 +55,7 @@ using namespace genie::rew;
 
 #ifdef Prob3plusplus_ENABLED
 #include "OscWeightEngine.h"
-#endif 
+#endif
 
 //********************************************************************
 TF1 FitBase::GetRWConvFunction(std::string const &type,
@@ -279,7 +281,11 @@ int FitBase::GetDialEnum(int type, std::string const &name) {
   // NEUT DIAL TYPE
   case kNEUT: {
 #ifdef NEUTReWeight_ENABLED
+#if NEUTReWeight_LEGACY_API_ENABLED
     int neut_enum = (int)neut::rew::NSyst::FromString(name);
+#else
+    int neut_enum = (int)neut::NSyst::DialFromString(name);
+#endif
     if (neut_enum != 0) {
       this_enum = neut_enum + offset;
     }
@@ -427,8 +433,12 @@ int Reweight::RemoveDialType(int type) { return (type % NUIS_DIAL_OFFSET); }
 
 int Reweight::NEUTEnumFromName(std::string const &name) {
 #ifdef NEUTReWeight_ENABLED
+#ifdef NEUTReWeight_LEGACY_API_ENABLED
   int neutenum = (int)neut::rew::NSyst::FromString(name);
   return (neutenum > 0) ? neutenum : Reweight::kNoDialFound;
+#else
+  return neut::NSyst::DialFromString(name);
+#endif
 #else
   return Reweight::kGeneratorNotBuilt;
 #endif
@@ -442,7 +452,6 @@ int Reweight::NIWGEnumFromName(std::string const &name) {
   return Reweight::kGeneratorNotBuilt;
 #endif
 }
-
 
 int Reweight::GENIEEnumFromName(std::string const &name) {
 #ifdef GENIEReWeight_ENABLED

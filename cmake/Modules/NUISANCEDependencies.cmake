@@ -105,11 +105,33 @@ endif()
 
 if (NuWro_ENABLED)
   include(NuWro)
+
+  if(NOT NuWro_FOUND)
+    if(NuWro_REQUIRED)
+      cmessage(FATAL_ERROR "NuWro was explicitly enabled but cannot be found.")
+    endif()
+    SET(NuWro_ENABLED FALSE)
+  endif()
+
 endif()
 
 if (Prob3plusplus_ENABLED)
-  # include(Prob3plusplus)
-  SET(Prob3plusplus_ENABLED FALSE)
+  find_package(Prob3plusplus)
+
+  if(NOT Prob3plusplus_FOUND)
+    if(Prob3plusplus_REQUIRED)
+      cmessage(FATAL_ERROR "Prob3plusplus was explicitly enabled but cannot be found.")
+    endif()
+    SET(Prob3plusplus_ENABLED FALSE)
+  else()
+    add_library(NUISANCEProb3plusplus INTERFACE)
+    set_target_properties(NUISANCEProb3plusplus PROPERTIES 
+      INTERFACE_COMPILE_OPTIONS "-DProb3plusplus_ENABLED"
+      INTERFACE_LINK_LIBRARIES Prob3plusplus::all)
+
+    target_link_libraries(GeneratorCompileDependencies INTERFACE NUISANCEProb3plusplus)
+  endif()
+  
 endif()
 
 string(FIND "${CMAKE_SHARED_LINKER_FLAGS}" "-Wl,--no-undefined" NOUNDEF_INDEX)

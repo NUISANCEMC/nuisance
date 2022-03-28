@@ -50,11 +50,6 @@ endif()
 
 endif()
 
-if(NOT NuWro_FOUND)
-  if(NuWro_REQUIRED)
-    cmessage(FATAL_ERROR "NuWro was explicitly enabled but cannot be found.")
-  endif()
-  SET(NuWro_ENABLED FALSE)
-else()
+if(NuWro_FOUND)
   target_link_libraries(GeneratorCompileDependencies INTERFACE NuWro::All)
 endif()
