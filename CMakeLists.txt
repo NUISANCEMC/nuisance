@@ -74,3 +74,5 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/event_gen DESTINATION
                   ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
                   ${CMAKE_INSTALL_PREFIX})
+
+add_subdirectory(CLI)

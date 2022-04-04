@@ -1,0 +1,33 @@
+#!/bin/bash
+
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+NUIS_BREADCRUMBS=${COMMAND}
+
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+
+if [ -z ${NUISANCE} ]; then
+  echo "[ERROR]: We need to be in a NUISANCE environment (\$NUISANCE should be set)."
+  exit 1
+fi
+
+if [ "${#}" -lt 1 ]; then
+  echo -e "[ERROR]: Expected to be passed a sub-command verb like:"
+  echo -e "\t ${NUIS_BREADCRUMBS} <verb> <verb-specific options>"
+  echo -e "Implemented verbs:"
+  echo -e "\tgen         -- Event generation helper"
+  echo -e "\tflux        -- Experimental flux descriptor"
+  echo -e "\tconfig      -- Check NUISANCE build options"
+  echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
+  exit 1
+fi
+
+VERB=${1}
+shift
+
+if ! hash ${COMMAND}-${VERB}; then
+  echo "[ERROR]: Unknown verb: ${VERB}, could not find `${COMMAND}-${VERB}`."
+  exit 1
+fi
+
+NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}" ${COMMAND}-${VERB} ${@}
