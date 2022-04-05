@@ -45,6 +45,8 @@ find_package_handle_standard_args(NEUT
 
 if(NEUT_FOUND)
 
+  get_filename_component(NEUT_ROOT ${NEUT_INCLUDE_DIR} DIRECTORY)
+
   include(CheckCXXCompilerFlag)
   CHECK_CXX_COMPILER_FLAG(-Wl,--allow-multiple-definition 
     COMPILER_SUPPORTS_ALLOW_MULTIPLE_DEFINITION)
