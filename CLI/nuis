@@ -18,6 +18,7 @@ if [ "${#}" -lt 1 ]; then
   echo -e "\t ${NUIS_BREADCRUMBS} <verb> <verb-specific options>"
   echo -e "Implemented verbs:"
   echo -e "\tgen         -- Event generation helper"
+  echo -e "\tprep        -- Ensure input files contain neccessary information"
   echo -e "\tflux        -- Experimental flux descriptor"
   echo -e "\tconfig      -- Check NUISANCE build options"
   echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."

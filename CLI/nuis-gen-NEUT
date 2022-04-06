@@ -4,5 +4,567 @@ COMMAND_FQP=${0}
 COMMAND=$(basename ${COMMAND_FQP})
 
 if [ ! -z ${NUIS_CLID_DEBUG} ]; then
-	echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+function nuis_gen_neut_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} -t <T> [-f <FF,FH>|-e <E> [ -p <P> -m <M>]] -n <N> [options]"
+  echo -e "\tRequired:"
+  echo -e "\t-t|--target <T>                      : Set target descriptor, e.g. <T>=\"CH\""
+  echo -e "\t-n|--nevents <N>                     : Generate <N> events"
+  echo -e "\t-f|--flux <file.root,histoname>      : Use neutrino energy shape from described histogram"
+  echo -e "\t--flux-MeV                           : Interpret flux histogram as being in MeV"
+  echo -e "\tOR"
+  echo -e "\t-e|--experiment                      : Passed to \'nuis flux\' to specify known experimental flux"
+  echo -e "\t-m|--beam-mode <nu|nubar>            : Passed to \'nuis flux\' to specify known flux beam mode"
+  echo -e "\tOptional:"
+  echo -e "\t-p|--probe <numu|nue|numubar|nuebar> : Set probe particle. If -e is used, this is also passed to \'nuis flux\'."
+  echo -e "\t-o|--output-file <output.root>       : defaults to NEUT.<probepdg>.<flux_file>.<flux_hist>.<seed>.neutvect.root"
+  echo -e "\tModel options:"
+  echo -e "\t-x|--card-option <NEUT-OPT=abc>      : Add or override NEUT-OPT in the NEUT card file used for generation"
+  echo -e "\t--MDLQE <MDLQE>                      : If unspecified left up to NEUT default"
+  echo -e "\t--MAQE <value in GeV>                : If unspecified left up to NEUT default"
+  echo -e "\t--QE-only                            : Only generate QE events."
+  echo -e "\t--RES-only                           : Only generate RES 1pi events."
+  echo -e "\t--no-FSI                             : Disable hadronic FSI"
+  echo -e "\t--no-IS-nuceff                       : Disable initial state nuclear effects (Fermi motion, Removal energy, ...)"
+  echo -e "\t--no-FS-nuceff                       : Disable final state nuclear effects (Remnant de-excitation, O16 pion absorption, ...)"
+  echo -e ""
+  echo -e "\thelp                                 : Print this message"
+}
+
+PROBE="numu"
+TARGET_NAME=""
+
+NEVENTS=""
+OUTPUT_FILENAME=""
+
+EXPERIMENT=""
+BEAM_MODE="nu"
+
+FLUX_DESCRIPTOR=""
+
+NEUT_OPTIONS=""
+
+#default options
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-MPOS=1"
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-POS =0. 0. 0."
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-MDIR=1"
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-DIR=0. 0. 1."
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-MPV=3"
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-INMEV=0"
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MODE=0"
+   
+NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDLQE=402"
+NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDL2P2H=1"
+
+NEUT_EXTRA_OPTIONS=""
+
+FSI="on"
+IS_NUC_EFF="on"
+FS_NUC_EFF="on"
+FLUX_MeV="off"
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+
+    -p|--probe)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      PROBE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using Probe particle: ${PROBE}"
+      shift # past argument
+      ;;
+
+    -t|--target)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      TARGET_NAME="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using target: ${TARGET_NAME}"
+      shift # past argument
+      ;;
+
+    -f|--flux)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      FLUX_DESCRIPTOR="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using flux descriptor: ${FLUX_DESCRIPTOR}"
+      shift # past argument
+      ;;
+
+    --flux-MeV)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Assuming flux histogram is in MeV"
+      NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-INMEV=1"
+      FLUX_MeV="on"
+      ;;
+
+    -e|--experiment)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      EXPERIMENT="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for experiment: ${EXPERIMENT}"
+      shift # past argument
+      ;;
+
+    -m|--beam-mode)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      BEAM_MODE="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for beam mode: ${BEAM_MODE}"
+      shift # past argument
+      ;;
+
+    -n|--nevents)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      NEVENTS="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Throwing ${NEVENTS} events."
+      shift # past argument
+      ;;
+
+    -o|--output-file)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      OUTPUT_FILENAME="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Writing to file: ${OUTPUT_FILENAME}"
+      shift # past argument
+      ;;
+
+    -x|--card-option)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      EOPT="$2"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Adding ${EOPT} to card file"
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|${EOPT}"
+      shift # past argument
+      ;;
+
+    --MDLQE)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-MDLQE=${2}"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using MDLQE = ${2}"
+      shift # past argument
+      ;;
+
+    --MAQE)
+
+      if [[ ${#} -lt 2 ]]; then
+        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
+        exit 1
+      fi
+
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-MAQE=${2}"
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Attempting to generate with MAQE = ${2}"
+      shift # past argument
+      ;;
+
+    --QE-only)
+
+      #  nu                     nub
+      #  1:     CC Q.E.         CC Q.E.( Free )
+      #  2-4:   CC 1pi          CC 1pi
+      #  5:     CC DIS 1320     CC DIS 1.3 < W < 2.0
+      #  6-9:   NC 1pi          NC 1pi
+      #  10:    NC DIS 1320     NC DIS 1.3 < W < 2.0
+      #  11:    NC els          CC Q.E.( Bound )
+      #  12:    NC els          NC els
+      #  13:    NC els          NC els
+      #  14:    coherent        NC els
+      #  15:    coherent        coherent
+      #  16:    CC eta          coherent
+      #  17     NC eta          CC eta
+      #  18:    NC eta          NC eta
+      #  19:    CC K            NC eta
+      #  20     NC K            CC K
+      #  21:    NC K            NC K
+      #  22:    N/A             NC K
+      #  23:    CC DIS          CC DIS (W > 2.0)
+      #  24:    NC DIS          NC DIS (W > 2.0)
+      #  25:    CC 1 gamma      CC 1 gamma
+      #  26,27: NC 1 gamma      NC 1 gamma
+      #  28     CC 2p2h         CC 2p2h
+      #  29     CC Difract.     CC Difract
+      #  30     NC Difract.     NC Difract
+      #
+      #
+      # CRS  :  Multiplied factor to cross section on each mode. ( neu )
+      # CSRB :  Multiplied factor to cross section on each mode. ( neu-bar )
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Only generating true QE events."
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-MODE=-1"
+      #                                                   1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-CRS =1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0."
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-CRSB=1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0."
+      ;;
+
+    --RES-only)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Only generating true RES 1pi events."
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-MODE=-1"
+      #                                                   1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-CRS =0. 1. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0."
+      NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|NEUT-CRSB=0. 1. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0."
+      ;;
+
+    --no-FSI)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Disabling hadronic FSI."
+      FSI="off"
+      ;;
+
+    --no-IS-nuceff)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Disabling initial state nuclear effects."
+      IS_NUC_EFF="off"
+      ;;
+
+    --no-FS-nuceff)
+
+      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Disabling final state nuclear effects."
+      FS_NUC_EFF="off"
+      ;;
+
+    help)
+      nuis_gen_neut_help
+      exit 0
+      ;;
+
+
+    *) # unknown option
+      echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Unknown option $1"
+      nuis_gen_neut_help
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+ 
+if [ -z "${TARGET_NAME}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Please pass target materical descriptor, e.g. CH"
+  exit 1
+fi
+
+if [ "${TARGET_NAME}" = "H" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=1"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=1"
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDLQE=02"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MODE=-1"
+    #                                     1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRS =1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRSB=1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+
+elif [ "${TARGET_NAME}" = "D" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=1"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=1"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=2"
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDLQE=02"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MODE=-1"
+    #                                     1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRS =1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRSB=1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+
+elif [ "${TARGET_NAME}" = "C" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=12"
+elif [ "${TARGET_NAME}" = "CH" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=1"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=12"
+elif [ "${TARGET_NAME}" = "CH2" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=6"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=2"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=12"
+elif [ "${TARGET_NAME}" = "O" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=8"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=8"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=16"
+elif [ "${TARGET_NAME}" = "H2O" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=8"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=8"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=2"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=16"
+elif [ "${TARGET_NAME}" = "Cl" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=18"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=17"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=35"
+elif [ "${TARGET_NAME}" = "Ar" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=22"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=18"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=40"
+elif [ "${TARGET_NAME}" = "Fe" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=30"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=26"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=56"
+elif  [ "${TARGET_NAME}" = "Pb" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=126"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=82"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=208"
+else
+  echo "[ERROR]: Invalid target material: \"${TARGET_NAME}\" for NEUT." 
+fi
+
+if [ -z "${NEVENTS}" ]; then
+  echo "Please pass a number of events to generate with the -n flag."
+  exit 1
+fi
+
+if [ -z "${FLUX_DESCRIPTOR}" ] && [ ! -z "${EXPERIMENT}" ]; then
+  if ! nuis-flux ${EXPERIMENT} -m ${BEAM_MODE} -p ${PROBE} &> /dev/null; then
+    echo "[ERROR]: nuis flux could not find a flux descriptor for: Experiment: ${EXPERIMENT}, Probe: ${PROBE}, Beam Mode: ${BEAM_MODE}"
+    exit 1
+  fi
+  FLUX_DESCRIPTOR=$(NUIS_CLID_DEBUG= nuis-flux ${EXPERIMENT} -m ${BEAM_MODE} -p ${PROBE})
+fi
+
+if [ -z "${FLUX_DESCRIPTOR}" ]; then
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- No neutrino flux shape defined"
+  nuis_gen_neut_help
+  exit 1
+fi
+
+OLDIFS=${IFS}
+IFS=","
+set -- ${FLUX_DESCRIPTOR}
+IFS=${OLDIFS}
+
+FLUX_FILE=${1}
+FLUX_HIST=${2}
+FLUX_FILE_NAME=${FLUX_FILE##*/}
+
+if [ -z "${FLUX_FILE}" ] || [ -z "${FLUX_HIST}" ]; then
+  echo -e "[ERROR]: ${NUIS_BREADCRUMBS} -- Failed to parse flux descriptor: \"${FLUX_DESCRIPTOR}\" as \"<input_file.root>,<histogram name>\"."
+  exit 1
+fi
+
+SEED=${RANDOM}
+if [ -z "${OUTPUT_FILENAME}" ]; then
+  OUTPUT_FILENAME=neutvect.${PROBE}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.${SEED}.root
+fi
+
+if [ -e "${OUTPUT_FILENAME}" ]; then
+   echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Already have file: ${OUTPUT_FILENAME}, not overwriting."
+   exit 1
+fi
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-NEVT=${NEVENTS}"
+
+case ${PROBE} in
+  numu)
+    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=14"
+    ;;
+  numubar)
+    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=-14"
+    ;;
+  nue)
+    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=12"
+    ;;
+  nuebar)
+    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=-12"
+    ;;
+  *)
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid probe descriptor passed: ${PROBE}"
+    nuis_gen_neut_help
+    exit 1
+esac
+
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-FILENM='${FLUX_FILE_NAME}'"
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-HISTNM='${FLUX_HIST}'"
+
+
+if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDLQE=02"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MODE=-1"
+    #                                     1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRS =1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRSB=1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
+fi
+
+#disable initial nuclear effects if running on H/D
+if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ] || [ "${IS_NUC_EFF}" = "yes" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-PFSURF=0.000001"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-PFMAX=0.000001"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-VNUINI=0.000001"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-VNUFIN=0.000001"
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FERM=1"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-PAUL=1"
+
+fi
+
+#disable final nuclear effects if running on H/D
+if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ] || [ "${FS_NUC_EFF}" = "yes" ]; then
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUCDEXITE=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-IFORMLEN=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-IPILESSDCY=0"
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-ABSPIEMIT=0"
+fi
+
+if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ] || [ "${FSIOFF}" = "yes" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NUCRES-RESCAT=0"
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NUCRES-NEFF=1"
+
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFQE=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFQEH=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFINEL=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFABS=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCOH=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCX=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCXH=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFQEHF=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCXHF=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCOHF=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFCOUL=0."
+  NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-FEFALL=0."
+fi
+
+NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-RAND=1"
+
+function SetNeutParam () {
+  local CARD=${1}
+  local PNAME=${2}
+  local VAL=${3}
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} SetNeutParam ${CARD} ${PNAME} ${VAL}"
+  fi
+
+  if cat ${CARD} | grep "^${PNAME}" &> /dev/null; then
+    cat ${CARD} | sed "s:^${PNAME}.*$:${PNAME} ${VAL}:" > ${CARD}_
+    mv ${CARD}_ ${CARD}
+  else
+    echo "${PNAME} ${VAL}" >> ${CARD}
+  fi
+}
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} NEUT_OPTIONS: ${NEUT_OPTIONS}"
+fi
+
+CARDNAME=neutvect.${PROBE}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.${SEED}.card
+echo "" > ${CARDNAME}
+
+OLDIFS=${IFS}
+IFS="|"
+
+for opt in ${NEUT_OPTIONS}; do
+  {
+  LOLDIFS=${IFS}
+  IFS="="
+  set -- ${opt}
+  IFS=${LOLDIFS}
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Setting NEUT option: ${1} = ${2}"
+  fi
+
+  SetNeutParam ${CARDNAME} ${1} ${2}
+  }
+done
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} NEUT_EXTRA_OPTIONS: ${NEUT_EXTRA_OPTIONS}"
+fi
+
+for opt in ${NEUT_EXTRA_OPTIONS}; do
+  {
+  LOLDIFS=${IFS}
+  IFS="="
+  set -- ${opt}
+  IFS=${LOLDIFS}
+
+  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Setting NEUT option: ${1} = ${2}"
+  fi
+
+  SetNeutParam ${CARDNAME} ${1} ${2}
+  }
+done
+
+IFS=${OLDIFS}
+
+echo "[INFO]: ${NUIS_BREADCRUMBS} -- Running neutroot2 ${CARDNAME} ${OUTPUT_FILENAME} for ${NEVS} events."
+
+if [ ! -e ./${FLUX_FILE} ]; then
+  cp ${FLUX_FILE} ./
+fi
+
+neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.gen.root
+
+if [ -e ${OUTPUT_FILENAME%%.root}.gen.root ]; then
+   rm -f fort.77
+
+   mv ${OUTPUT_FILENAME%%.root}.gen.root ${OUTPUT_FILENAME}
+
+   UNIT_SCALE_FLAG="-G"
+   if [ "${FLUX_MeV}" = "on" ]; then
+    UNIT_SCALE_FLAG=
+  fi
+
+  NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} nuis-prep-NEUT" nuis-prep-NEUT -i ${OUTPUT_FILENAME} \
+                                                         ${UNIT_SCALE_FLAG} \
+                                                         -f ${FLUX_FILE},${FLUX_HIST}
+else
+   echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Failed to produce expected output file: ${OUTPUT_FILENAME}"
+   exit 1
 fi

@@ -12,17 +12,17 @@ if [ "${#}" -lt 1 ]; then
   echo -e "\t ${COMMAND} <verb> <verb-specific options>"
   echo -e "Implemented verbs:"
 
-  if nuis config GENIE_ENABLED; then
-    echo -e "\tGENIE       -- Event generation helper"
+  if nuis-config --has-feature GENIE; then
+    echo -e "\tGENIE"
   fi
-  if nuis config GENIE_ENABLED; then
-    echo -e "\tNEUT        -- Experimental flux descriptor"
+  if nuis-config --has-feature NEUT; then
+    echo -e "\tNEUT"
   fi
-  if nuis config NuWro_ENABLED; then
-    echo -e "\tNuWro       -- Experimental flux descriptor"
+  if nuis-config --has-feature NuWro; then
+    echo -e "\tNuWro"
   fi
   if hash GiBUU.x &> /dev/null; then
-    echo -e "\tGiBUU       -- Experimental flux descriptor"
+    echo -e "\tGiBUU"
   fi
 
   echo -e "Try ${COMMAND} <verb> help for further help for a specific verb."

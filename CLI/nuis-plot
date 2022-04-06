@@ -1,0 +1,19 @@
+COMMAND_FQP=${0}
+COMMAND=$(basename ${COMMAND_FQP})
+
+if [ ! -z ${NUIS_CLID_DEBUG} ]; then
+  echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+fi
+
+function nuis_comp_help {
+  echo "Run like: ${NUIS_BREADCRUMBS} [option]"
+  echo -e "\tOptions:"
+  echo -e "\t-i|--input <file.root>    : print the NUISANCE version string"
+  echo -e "\t-o|--output <file.root>   : print the NUISANCE version string"
+  echo -e "\t-s|--sample <sample name> : print the NUISANCE version string"
+}
+
+if [ "${#}" -lt 1 ]; then
+  nuis_comp_help
+  exit 1
+fi

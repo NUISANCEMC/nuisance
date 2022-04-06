@@ -42,23 +42,21 @@ if(GENIE_FOUND)
     
   LIST(APPEND GENIE_DEFINES -DGENIE_ENABLED -DGENIE3_API_ENABLED -DGENIE_VERSION=${GENIE_SINGLE_VERSION})
 
-  if(GENIEReWeight_FOUND)
-    set(GENIEReWeight_ENABLED TRUE)
-    foreach(RWLIBNAME GRwClc GRwFwk GRwIO)
-      LIST(REMOVE_ITEM GENIE_LIBS ${RWLIBNAME})
-      if(EXISTS ${GENIE_LIB_DIR}/lib${RWLIBNAME}.so)
-        LIST(APPEND GENIE_LIBS ${RWLIBNAME})
-      else()
-        cmessage(WARNING "Failed to find expected reweight library: ${GENIE_LIB_DIR}/lib${RWLIBNAME}.so disabling GENIE3 reweight.")
-        set(GENIEReWeight_ENABLED FALSE)
-      endif()
-    endforeach()
-  
-    if(EXISTS ${GENIE_INC_DIR}/RwCalculators/GReWeightXSecMEC.h)
-      SET(GENIE3_XSECMEC_ENABLED TRUE)
+  set(GENIEReWeight_ENABLED TRUE)
+  foreach(RWLIBNAME GRwClc GRwFwk GRwIO)
+    LIST(REMOVE_ITEM GENIE_LIBS ${RWLIBNAME})
+    if(EXISTS ${GENIE_LIB_DIR}/lib${RWLIBNAME}.so)
+      LIST(APPEND GENIE_LIBS ${RWLIBNAME})
+    else()
+      cmessage(WARNING "Failed to find expected reweight library: ${GENIE_LIB_DIR}/lib${RWLIBNAME}.so disabling GENIE3 reweight.")
+      set(GENIEReWeight_ENABLED FALSE)
     endif()
+  endforeach()
 
+  if(EXISTS ${GENIE_INC_DIR}/RwCalculators/GReWeightXSecMEC.h)
+    SET(GENIE3_XSECMEC_ENABLED TRUE)
   endif()
+
 
   #duplicate because CMake gets its grubby mitts on repeated -Wl,--start-group options
   SET(GENIE_LIBS "-Wl,--no-as-needed;${GENIE_LIBS};${GENIE_LIBS};-Wl,--as-needed")

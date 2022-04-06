@@ -830,7 +830,7 @@ double WEnhancement::CalcWeight(BaseFitEvt* evt) {
   }
 
   // Return Combined Weight
-  if (isnan(w) || w < 0.0 || w > 400.0) {
+  if (std::isnan(w) || w < 0.0 || w > 400.0) {
     w = 1.0;
   }
 
