@@ -30,6 +30,7 @@ LIST(APPEND TARGETS_TO_BUILD
   nuissyst
   nuisbayes
   nuisbac
+  nuisplot
   PrepareGiBUU)
 
 if(GENIE_ENABLED)

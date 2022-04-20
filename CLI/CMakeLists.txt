@@ -5,6 +5,7 @@ install(PROGRAMS
   nuis-flux
   nuis-gen
   nuis-prep
+  nuis-plot
   nuis-comp
   ${CMAKE_CURRENT_BINARY_DIR}/nuis-config
   DESTINATION bin)
