@@ -6,7 +6,7 @@ if [ ! -z ${NUIS_CLID_DEBUG} ]; then
 fi
 
 function nuis_comp_help {
-  echo "Run like: ${NUIS_BREADCRUMBS} <input_file.root> [option]"
+  echo "Run like: ${NUIS_BREADCRUMBS} <input_file.root> [input_file2.root ...] [option]"
   echo -e "\tOptions:"
   echo -e "\t-o|--output <file.root>   : Output file to write"
   echo -e "\t-t|--type <input type>    : Input file type, e.g. NEUT, GENIE, ..."
@@ -20,19 +20,46 @@ if [ "${#}" -lt 1 ]; then
   exit 1
 fi
 
-INPUT_FILE=${1}
-shift
+INPUT_FILES=""
 
-if [ ! -e ${INPUT_FILE} ]; then
-  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Input file \"${INPUT_FILE}\" does not appear to exist."
-  exit 1
-fi
-
-OUTPUT_FILE="${INPUT_FILE%%.root}.comp.root"
 FORCE="no"
 NUIS_SAMPLES=""
 INPUT_TYPE=""
 CONFIG_OPTIONS=""
+OUTPUT_FILE=""
+JOINT_SAMPLE="FALSE"
+
+while [[ ${#} -gt 0 ]]; do
+
+  INPUT_FILE=${1}
+  if [ ${INPUT_FILE::1} == "-" ]; then
+    # break if we find an option
+    break
+  fi
+
+  if [ ! -e ${INPUT_FILE} ]; then
+    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Input file \"${INPUT_FILE}\" does not appear to exist."
+    exit 1
+  fi
+
+  if [ -z "${INPUT_FILES}" ]; then
+    INPUT_FILES="${INPUT_FILES}"
+  else
+    INPUT_FILES="${INPUT_FILES};${INPUT_FILES}"
+    JOINT_SAMPLE=TRUE
+  fi
+
+  if [ -z "${OUTPUT_FILE}"]; then
+    OUTPUT_FILE="${INPUT_FILE%%.root}.comp.root"
+  fi
+
+
+  shift
+done
+
+if [ "${JOINT_SAMPLE}" == "TRUE" ]; then
+ INPUT_FILES="(${INPUT_FILES})"
+fi
 
 while [[ ${#} -gt 0 ]]; do
 
@@ -110,7 +137,7 @@ done
 
 
 if [ -e ${OUTPUT_FILE} ] && [ "${FORCE}" = "no" ]; then
-  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Output file \"${INPUT_FILE}\" exists and -f was not passed."
+  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Output file \"${OUTPUT_FILE}\" exists and -f was not passed."
   exit 1
 fi
 
@@ -124,11 +151,6 @@ SEED=${RANDOM}
 
 #build the nuisance card file
 echo "<nuisance>" > tmp.${SEED}.card
-
-
-
-OLDIFS=${IFS}
-IFS="|"
 
 OLDIFS=${IFS}
 IFS="|"
@@ -161,7 +183,7 @@ for SAMPLE in ${NUIS_SAMPLES}; do
     echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Adding sample: ${SAMPLE}"
   fi
 
-  echo -e "\t<sample name='${SAMPLE}' input='${INPUT_TYPE}:${INPUT_FILE}' />" >> tmp.${SEED}.card
+  echo -e "\t<sample name='${SAMPLE}' input='${INPUT_TYPE}:${INPUT_FILES}' />" >> tmp.${SEED}.card
 done
 
 IFS=${OLDIFS}

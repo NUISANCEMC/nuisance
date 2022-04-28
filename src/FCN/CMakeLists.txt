@@ -26,3 +26,5 @@ add_library(FCN SHARED ${LikelihoodFunction_Impl_Files})
 target_link_libraries(FCN Experiments CoreIncludes ROOT::ROOT)
 
 install(TARGETS FCN DESTINATION lib)
+
+install(FILES SampleList.cxx DESTINATION src/FCN)

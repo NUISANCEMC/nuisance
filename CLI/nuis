@@ -5,7 +5,7 @@ COMMAND=$(basename ${COMMAND_FQP})
 NUIS_BREADCRUMBS=${COMMAND}
 
 if [ ! -z ${NUIS_CLID_DEBUG} ]; then
-echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}): ${@}"
+echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} Arguments(${#}):" "${@}"
 fi
 
 if [ -z ${NUISANCE} ]; then
@@ -20,7 +20,9 @@ if [ "${#}" -lt 1 ]; then
   echo -e "\tgen         -- Event generation helper"
   echo -e "\tprep        -- Ensure input files contain neccessary information"
   echo -e "\tflux        -- Experimental flux descriptor"
+  echo -e "\tcomp        -- Make generator--data comparisons"
   echo -e "\tconfig      -- Check NUISANCE build options"
+  echo -e "\tplot        -- Plot the output of nuis comp"
   echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
   exit 1
 fi
@@ -33,4 +35,4 @@ if ! hash ${COMMAND}-${VERB}; then
   exit 1
 fi
 
-NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}" ${COMMAND}-${VERB} ${@}
+NUIS_BREADCRUMBS="${NUIS_BREADCRUMBS} ${VERB}" ${COMMAND}-${VERB} "${@}"

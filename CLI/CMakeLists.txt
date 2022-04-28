@@ -7,6 +7,7 @@ install(PROGRAMS
   nuis-prep
   nuis-plot
   nuis-comp
+  nuis-samples
   ${CMAKE_CURRENT_BINARY_DIR}/nuis-config
   DESTINATION bin)
 
