@@ -8,19 +8,7 @@ if [ ! -z ${NUIS_CLID_DEBUG} ]; then
 fi
 
 function nuis_gen_neut_help {
-  echo "Run like: ${NUIS_BREADCRUMBS} -t <T> [-f <FF,FH>|-e <E> [ -p <P> -m <M>]] -n <N> [options]"
-  echo -e "\tRequired:"
-  echo -e "\t-t|--target <T>                      : Set target descriptor, e.g. <T>=\"CH\""
-  echo -e "\t-n|--nevents <N>                     : Generate <N> events"
-  echo -e "\t-f|--flux <file.root,histoname>      : Use neutrino energy shape from described histogram"
-  echo -e "\t--flux-MeV                           : Interpret flux histogram as being in MeV"
-  echo -e "\tOR"
-  echo -e "\t-e|--experiment                      : Passed to \'nuis flux\' to specify known experimental flux"
-  echo -e "\t-m|--beam-mode <nu|nubar>            : Passed to \'nuis flux\' to specify known flux beam mode"
-  echo -e "\tOptional:"
-  echo -e "\t-p|--probe <numu|nue|numubar|nuebar> : Set probe particle. If -e is used, this is also passed to \'nuis flux\'."
-  echo -e "\t-o|--output-file <output.root>       : defaults to NEUT.<probepdg>.<flux_file>.<flux_hist>.<seed>.neutvect.root"
-  echo -e "\tModel options:"
+  echo -e "\tNEUT options:"
   echo -e "\t-x|--card-option <NEUT-OPT=abc>      : Add or override NEUT-OPT in the NEUT card file used for generation"
   echo -e "\t--MDLQE <MDLQE>                      : If unspecified left up to NEUT default"
   echo -e "\t--MAQE <value in GeV>                : If unspecified left up to NEUT default"
@@ -32,17 +20,6 @@ function nuis_gen_neut_help {
   echo -e ""
   echo -e "\thelp                                 : Print this message"
 }
-
-PROBE="numu"
-TARGET_NAME=""
-
-NEVENTS=""
-OUTPUT_FILENAME=""
-
-EXPERIMENT=""
-BEAM_MODE="nu"
-
-FLUX_DESCRIPTOR=""
 
 NEUT_OPTIONS=""
 
@@ -66,104 +43,11 @@ NEUT_EXTRA_OPTIONS=""
 FSI="on"
 IS_NUC_EFF="on"
 FS_NUC_EFF="on"
-FLUX_MeV="off"
 
 while [[ ${#} -gt 0 ]]; do
 
   key="$1"
   case $key in
-
-    -p|--probe)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      PROBE="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using Probe particle: ${PROBE}"
-      shift # past argument
-      ;;
-
-    -t|--target)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      TARGET_NAME="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using target: ${TARGET_NAME}"
-      shift # past argument
-      ;;
-
-    -f|--flux)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      FLUX_DESCRIPTOR="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Using flux descriptor: ${FLUX_DESCRIPTOR}"
-      shift # past argument
-      ;;
-
-    --flux-MeV)
-
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Assuming flux histogram is in MeV"
-      NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-INMEV=1"
-      FLUX_MeV="on"
-      ;;
-
-    -e|--experiment)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      EXPERIMENT="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for experiment: ${EXPERIMENT}"
-      shift # past argument
-      ;;
-
-    -m|--beam-mode)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      BEAM_MODE="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Building flux descriptor for beam mode: ${BEAM_MODE}"
-      shift # past argument
-      ;;
-
-    -n|--nevents)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      NEVENTS="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Throwing ${NEVENTS} events."
-      shift # past argument
-      ;;
-
-    -o|--output-file)
-
-      if [[ ${#} -lt 2 ]]; then
-        echo "[ERROR]: ${NUIS_BREADCRUMBS} -- ${1} expected a value."
-        exit 1
-      fi
-
-      OUTPUT_FILENAME="$2"
-      echo "[OPT]: ${NUIS_BREADCRUMBS} -- Writing to file: ${OUTPUT_FILENAME}"
-      shift # past argument
-      ;;
-
     -x|--card-option)
 
       if [[ ${#} -lt 2 ]]; then
@@ -282,12 +166,6 @@ while [[ ${#} -gt 0 ]]; do
   shift
 done
 
- 
-if [ -z "${TARGET_NAME}" ]; then
-  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Please pass target materical descriptor, e.g. CH"
-  exit 1
-fi
-
 if [ "${TARGET_NAME}" = "H" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=0"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=1"
@@ -361,40 +239,6 @@ else
   echo "[ERROR]: Invalid target material: \"${TARGET_NAME}\" for NEUT." 
 fi
 
-if [ -z "${NEVENTS}" ]; then
-  echo "Please pass a number of events to generate with the -n flag."
-  exit 1
-fi
-
-if [ -z "${FLUX_DESCRIPTOR}" ] && [ ! -z "${EXPERIMENT}" ]; then
-  if ! nuis-flux ${EXPERIMENT} -m ${BEAM_MODE} -p ${PROBE} &> /dev/null; then
-    echo "[ERROR]: nuis flux could not find a flux descriptor for: Experiment: ${EXPERIMENT}, Probe: ${PROBE}, Beam Mode: ${BEAM_MODE}"
-    exit 1
-  fi
-  FLUX_DESCRIPTOR=$(NUIS_CLID_DEBUG= nuis-flux ${EXPERIMENT} -m ${BEAM_MODE} -p ${PROBE})
-fi
-
-if [ -z "${FLUX_DESCRIPTOR}" ]; then
-  echo "[ERROR]: ${NUIS_BREADCRUMBS} -- No neutrino flux shape defined"
-  nuis_gen_neut_help
-  exit 1
-fi
-
-OLDIFS=${IFS}
-IFS=","
-set -- ${FLUX_DESCRIPTOR}
-IFS=${OLDIFS}
-
-FLUX_FILE=${1}
-FLUX_HIST=${2}
-FLUX_FILE_NAME=${FLUX_FILE##*/}
-
-if [ -z "${FLUX_FILE}" ] || [ -z "${FLUX_HIST}" ]; then
-  echo -e "[ERROR]: ${NUIS_BREADCRUMBS} -- Failed to parse flux descriptor: \"${FLUX_DESCRIPTOR}\" as \"<input_file.root>,<histogram name>\"."
-  exit 1
-fi
-
-SEED=${RANDOM}
 if [ -z "${OUTPUT_FILENAME}" ]; then
   OUTPUT_FILENAME=neutvect.${PROBE}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.${SEED}.root
 fi
@@ -429,6 +273,9 @@ esac
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-FILENM='${FLUX_FILE_NAME}'"
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-HISTNM='${FLUX_HIST}'"
 
+if [ "${FLUX_MeV}" = "on" ]; then
+  NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-INMEV=1"
+fi
 
 if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-MDLQE=02"
@@ -452,7 +299,6 @@ fi
 
 #disable final nuclear effects if running on H/D
 if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ] || [ "${FS_NUC_EFF}" = "yes" ]; then
-
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUCDEXITE=0"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-IFORMLEN=0"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-IPILESSDCY=0"

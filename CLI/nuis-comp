@@ -32,7 +32,7 @@ JOINT_SAMPLE="FALSE"
 while [[ ${#} -gt 0 ]]; do
 
   INPUT_FILE=${1}
-  if [ ${INPUT_FILE::1} == "-" ]; then
+  if [ "${INPUT_FILE::1}" == "-" ]; then
     # break if we find an option
     break
   fi
@@ -43,9 +43,9 @@ while [[ ${#} -gt 0 ]]; do
   fi
 
   if [ -z "${INPUT_FILES}" ]; then
-    INPUT_FILES="${INPUT_FILES}"
+    INPUT_FILES="${INPUT_FILE}"
   else
-    INPUT_FILES="${INPUT_FILES};${INPUT_FILES}"
+    INPUT_FILES="${INPUT_FILES};${INPUT_FILE}"
     JOINT_SAMPLE=TRUE
   fi
 
