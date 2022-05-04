@@ -18,7 +18,8 @@ endforeach()
 
 add_library(CoreIncludes INTERFACE)
 set_target_properties(CoreIncludes PROPERTIES
-	INTERFACE_INCLUDE_DIRECTORIES "${Core_Include_Dirs}")
+	INTERFACE_INCLUDE_DIRECTORIES "${Core_Include_Dirs}"
+	INTERFACE_LINK_LIBRARIES GeneratorCompileDependencies)
 
 SET(ExperimentDirs
 	ANL
