@@ -145,12 +145,12 @@ EOF
 
 for SAMPLE in ${SAMPLES[@]}; do
   SAMPLE_HYPHEN=$(echo ${SAMPLE} | sed 's:_:-:g')
-  echo "\\begin{figure}[htb]" >> ${OUTPUTFILE}
+  echo "\\begin{figure}" >> ${OUTPUTFILE}
   echo "\\centering" >> ${OUTPUTFILE}
   echo "\\includegraphics{${SAMPLE}}" >> ${OUTPUTFILE}
   echo "\\label{fig:${SAMPLE_HYPHEN}}" >> ${OUTPUTFILE}
-  echo "\\caption{bla}" >> ${OUTPUTFILE}
   echo "\\end{figure}" >> ${OUTPUTFILE}
+  echo "\\clearpage" >> ${OUTPUTFILE}
 done
 
 cat << EOF >> ${OUTPUTFILE}

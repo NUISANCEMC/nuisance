@@ -16,7 +16,7 @@ install(PROGRAMS
 # any internal nasty details can 
 # be kept in scripts in here, these 
 # will never form part of the public CLI
-FILE(COPY
+install(DIRECTORY
   internal
   DESTINATION var)
 

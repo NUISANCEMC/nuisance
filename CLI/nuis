@@ -14,7 +14,7 @@ if [ -z ${NUISANCE} ]; then
 fi
 
 function nuis_help {
-  echo -e "\t ${NUIS_BREADCRUMBS} <verb> <verb-specific options>"
+  echo -e "\t ${NUIS_BREADCRUMBS} [global options] <verb> <verb-specific options>"
   echo -e "\tImplemented verbs:"
   echo -e "\t  gen         : Event generation helper"
   echo -e "\t  prep        : Ensure input files contain neccessary information"
@@ -22,12 +22,20 @@ function nuis_help {
   echo -e "\t  comp        : Make generator--data comparisons"
   echo -e "\t  config      : Check NUISANCE build options"
   echo -e "\t  plot        : Plot the output of nuis comp"
+  echo -e "\tGlobal options:"
+  echo -e "\t  --debug     : Enable debugging options where implemented"  
   echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
 }
 
 if [ "${1}" == "help" ]; then
   nuis_help
   exit 0
+fi
+
+if [ "${1}" == "--debug" ]; then
+  echo "[INFO]: Enabling debugging"
+  export NUIS_DEBUG=ON
+  shift
 fi
 
 if [ "${#}" -lt 1 ]; then

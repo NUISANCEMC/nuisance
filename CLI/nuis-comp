@@ -192,5 +192,10 @@ IFS=${OLDIFS}
 
 echo "</nuisance>" >> tmp.${SEED}.card
 
-nuiscomp -c tmp.${SEED}.card -o ${OUTPUT_FILE}
+CMD=nuiscomp
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args nuiscomp"
+fi
+
+${CMD} -c tmp.${SEED}.card -o ${OUTPUT_FILE}
 
