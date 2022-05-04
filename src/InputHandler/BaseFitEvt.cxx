@@ -46,9 +46,7 @@ BaseFitEvt::BaseFitEvt() {
 #endif
 
 #ifdef NuWro_ENABLED
-#ifndef __USE_NUWRO_SRW_EVENTS__
   fNuwroEvent = NULL;
-#endif
 #endif
 
 #ifdef GENIE_ENABLED
@@ -72,10 +70,8 @@ BaseFitEvt::~BaseFitEvt() {
 #endif
 
 #ifdef NuWro_ENABLED
-#ifndef __USE_NUWRO_SRW_EVENTS__
   if (fNuwroEvent)
     delete fNuwroEvent;
-#endif
 #endif
 
 #ifdef GENIE_ENABLED
@@ -161,10 +157,6 @@ BaseFitEvt::BaseFitEvt(BaseFitEvt const &other) {
 
 #ifdef NuWro_ENABLED
   fNuwroEvent = other.fNuwroEvent;
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
-  fNuwroParams = other.fNuwroParams;
-#endif
 #endif
 
 #ifdef GENIE_ENABLED
@@ -206,10 +198,6 @@ BaseFitEvt BaseFitEvt::operator=(BaseFitEvt const &other) {
 
 #ifdef NuWro_ENABLED
   fNuwroEvent = other.fNuwroEvent;
-#ifdef __USE_NUWRO_SRW_EVENTS__
-  fNuwroSRWEvent = other.fNuwroSRWEvent; ///< Pointer to Nuwro event
-  fNuwroParams = other.fNuwroParams;
-#endif
 #endif
 
 #ifdef GENIE_ENABLED

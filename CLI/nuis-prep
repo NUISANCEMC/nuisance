@@ -13,10 +13,10 @@ if [ "${#}" -lt 1 ]; then
   echo -e "Implemented verbs:"
 
   if nuis-config --has-feature GENIE; then
-    echo -e "\tGENIE"
+    echo -e "\t  GENIE"
   fi
   if nuis-config --has-feature NEUT; then
-    echo -e "\tNEUT"
+    echo -e "\t  NEUT"
   fi
 
   echo -e "Try ${COMMAND} <verb> help for further help for a specific verb."

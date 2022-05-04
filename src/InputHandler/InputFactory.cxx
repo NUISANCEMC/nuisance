@@ -70,7 +70,7 @@ InputHandlerBase *CreateInputHandler(std::string const &handle,
 #endif
     break;
 
-  case (kNUWRO_Input):
+  case (kNuWro_Input):
 #ifdef NuWro_ENABLED
     input = new NuWroInputHandler(handle, newinputs);
 #else

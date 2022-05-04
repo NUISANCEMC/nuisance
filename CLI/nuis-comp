@@ -8,11 +8,11 @@ fi
 function nuis_comp_help {
   echo "Run like: ${NUIS_BREADCRUMBS} <input_file.root> [input_file2.root ...] [option]"
   echo -e "\tOptions:"
-  echo -e "\t-o|--output <file.root>   : Output file to write"
-  echo -e "\t-t|--type <input type>    : Input file type, e.g. NEUT, GENIE, ..."
-  echo -e "\t-s|--sample <sample name> : Sample to compare to, can be passed multiple times."
-  echo -e "\t-c|--config <opt=val>     : Add NUISANCE config option"
-  echo -e "\t-f|--force                : Continue even if output file already exists"
+  echo -e "\t  -o|--output <file.root>   : Output file to write"
+  echo -e "\t  -t|--type <input type>    : Input file type, e.g. NEUT, GENIE, ..."
+  echo -e "\t  -s|--sample <sample name> : Sample to compare to, can be passed multiple times."
+  echo -e "\t  -c|--config <opt=val>     : Add NUISANCE config option"
+  echo -e "\t  -f|--force                : Continue even if output file already exists"
 }
 
 if [ "${#}" -lt 1 ]; then
@@ -32,6 +32,12 @@ JOINT_SAMPLE="FALSE"
 while [[ ${#} -gt 0 ]]; do
 
   INPUT_FILE=${1}
+
+  if [ "${INPUT_FILE}" == "help" ]; then
+    nuis_comp_help
+    exit 0
+  fi
+
   if [ "${INPUT_FILE::1}" == "-" ]; then
     # break if we find an option
     break
@@ -119,11 +125,6 @@ while [[ ${#} -gt 0 ]]; do
     -f|--force)
       FORCE="yes"
       echo "[OPT]: ${NUIS_BREADCRUMBS} -- Force overwriting output file."
-      ;;
-
-    help)
-      nuis_comp_help
-      exit 0
       ;;
 
     *)

@@ -25,7 +25,7 @@ enum generator_event_type {
   kUNKNOWN = 999,
   kNEUT = 0,
   kNIWG = 1,
-  kNUWRO = 2,
+  kNuWro = 2,
   kT2K = 3,
   kCUSTOM = 4,
   kGENIE = 5,
@@ -48,7 +48,7 @@ namespace InputUtils {
 
 enum InputType {
   kNEUT_Input = 0,
-  kNUWRO_Input = 1,
+  kNuWro_Input = 1,
   kGENIE_Input = 2,
   kGiBUU_Input,
   kNUANCE_Input,
@@ -76,8 +76,8 @@ inline std::ostream& operator<<(std::ostream& os,
   case kNIWG: {
     return os << "kNIWG";
   }
-  case kNUWRO: {
-    return os << "kNUWRO";
+  case kNuWro: {
+    return os << "kNuWro";
   }
   case kT2K: {
     return os << "kT2K";
@@ -119,8 +119,8 @@ inline std::ostream &operator<<(std::ostream &os, InputUtils::InputType it) {
   case InputUtils::kNEUT_Input: {
     return os << "kNEUT_Input";
   }
-  case InputUtils::kNUWRO_Input: {
-    return os << "kNUWRO_Input";
+  case InputUtils::kNuWro_Input: {
+    return os << "kNuWro_Input";
   }
   case InputUtils::kGENIE_Input: {
     return os << "kGENIE_Input";

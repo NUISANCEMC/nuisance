@@ -76,3 +76,4 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/parameters DESTINATION
                   ${CMAKE_INSTALL_PREFIX})
 
 add_subdirectory(CLI)
+add_subdirectory(validation)

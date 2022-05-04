@@ -9,14 +9,14 @@ fi
 
 function nuis_gen_neut_help {
   echo -e "\tNEUT options:"
-  echo -e "\t-x|--card-option <NEUT-OPT=abc>      : Add or override NEUT-OPT in the NEUT card file used for generation"
-  echo -e "\t--MDLQE <MDLQE>                      : If unspecified left up to NEUT default"
-  echo -e "\t--MAQE <value in GeV>                : If unspecified left up to NEUT default"
-  echo -e "\t--QE-only                            : Only generate QE events."
-  echo -e "\t--RES-only                           : Only generate RES 1pi events."
-  echo -e "\t--no-FSI                             : Disable hadronic FSI"
-  echo -e "\t--no-IS-nuceff                       : Disable initial state nuclear effects (Fermi motion, Removal energy, ...)"
-  echo -e "\t--no-FS-nuceff                       : Disable final state nuclear effects (Remnant de-excitation, O16 pion absorption, ...)"
+  echo -e "\t  -x|--card-option <NEUT-OPT=abc>      : Add or override NEUT-OPT in the NEUT card file used for generation"
+  echo -e "\t  --MDLQE <MDLQE>                      : If unspecified left up to NEUT default"
+  echo -e "\t  --MAQE <value in GeV>                : If unspecified left up to NEUT default"
+  echo -e "\t  --QE-only                            : Only generate QE events."
+  echo -e "\t  --RES-only                           : Only generate RES 1pi events."
+  echo -e "\t  --no-FSI                             : Disable hadronic FSI"
+  echo -e "\t  --no-IS-nuceff                       : Disable initial state nuclear effects (Fermi motion, Removal energy, ...)"
+  echo -e "\t  --no-FS-nuceff                       : Disable final state nuclear effects (Remnant de-excitation, O16 pion absorption, ...)"
   echo -e ""
   echo -e "\thelp                                 : Print this message"
 }
@@ -178,7 +178,7 @@ if [ "${TARGET_NAME}" = "H" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRS =1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-CRSB=1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 1. 1." 
 
-elif [ "${TARGET_NAME}" = "D" ]; then
+elif [ "${TARGET_NAME}" = "D2" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDN=1"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMBNDP=1"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
@@ -236,40 +236,11 @@ elif  [ "${TARGET_NAME}" = "Pb" ]; then
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMFREP=0"
   NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-NUMATOM=208"
 else
-  echo "[ERROR]: Invalid target material: \"${TARGET_NAME}\" for NEUT." 
-fi
-
-if [ -z "${OUTPUT_FILENAME}" ]; then
-  OUTPUT_FILENAME=neutvect.${PROBE}.${FLUX_HIST}.${FLUX_FILE_NAME%%.root}.${SEED}.root
-fi
-
-if [ -e "${OUTPUT_FILENAME}" ]; then
-   echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Already have file: ${OUTPUT_FILENAME}, not overwriting."
-   exit 1
+  echo "ERROR]: ${NUIS_BREADCRUMBS} -- Invalid target material: \"${TARGET_NAME}\" for NEUT." 
 fi
 
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-NEVT=${NEVENTS}"
-
-case ${PROBE} in
-  numu)
-    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=14"
-    ;;
-  numubar)
-    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=-14"
-    ;;
-  nue)
-    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=12"
-    ;;
-  nuebar)
-    NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=-12"
-    ;;
-  *)
-    echo "[ERROR]: ${NUIS_BREADCRUMBS} -- Invalid probe descriptor passed: ${PROBE}"
-    nuis_gen_neut_help
-    exit 1
-esac
-
-
+NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-IDPT=${PROBE_PDG}"
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-FILENM='${FLUX_FILE_NAME}'"
 NEUT_OPTIONS="${NEUT_OPTIONS}|EVCT-HISTNM='${FLUX_HIST}'"
 
@@ -395,12 +366,20 @@ if [ ! -e ./${FLUX_FILE} ]; then
   cp ${FLUX_FILE} ./
 fi
 
-neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.gen.root
+if [ "${QUIET}" == "TRUE" ]; then
+  set -x
+  neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root &> /dev/null
+  set +x
+else
+  set -x
+  neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root
+  set +x
+fi
 
-if [ -e ${OUTPUT_FILENAME%%.root}.gen.root ]; then
+if [ -e ${OUTPUT_FILENAME%%.root}.neutvect.root ]; then
    rm -f fort.77
 
-   mv ${OUTPUT_FILENAME%%.root}.gen.root ${OUTPUT_FILENAME}
+   mv ${OUTPUT_FILENAME%%.root}.neutvect.root ${OUTPUT_FILENAME}
 
    UNIT_SCALE_FLAG="-G"
    if [ "${FLUX_MeV}" = "on" ]; then

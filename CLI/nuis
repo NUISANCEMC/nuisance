@@ -13,17 +13,26 @@ if [ -z ${NUISANCE} ]; then
   exit 1
 fi
 
+function nuis_help {
+  echo -e "\t ${NUIS_BREADCRUMBS} <verb> <verb-specific options>"
+  echo -e "\tImplemented verbs:"
+  echo -e "\t  gen         : Event generation helper"
+  echo -e "\t  prep        : Ensure input files contain neccessary information"
+  echo -e "\t  flux        : Experimental flux descriptor"
+  echo -e "\t  comp        : Make generator--data comparisons"
+  echo -e "\t  config      : Check NUISANCE build options"
+  echo -e "\t  plot        : Plot the output of nuis comp"
+  echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
+}
+
+if [ "${1}" == "help" ]; then
+  nuis_help
+  exit 0
+fi
+
 if [ "${#}" -lt 1 ]; then
   echo -e "[ERROR]: Expected to be passed a sub-command verb like:"
-  echo -e "\t ${NUIS_BREADCRUMBS} <verb> <verb-specific options>"
-  echo -e "Implemented verbs:"
-  echo -e "\tgen         -- Event generation helper"
-  echo -e "\tprep        -- Ensure input files contain neccessary information"
-  echo -e "\tflux        -- Experimental flux descriptor"
-  echo -e "\tcomp        -- Make generator--data comparisons"
-  echo -e "\tconfig      -- Check NUISANCE build options"
-  echo -e "\tplot        -- Plot the output of nuis comp"
-  echo -e "Try ${NUIS_BREADCRUMBS} <verb> help for further help for a specific verb."
+  nuis_help
   exit 1
 fi
 

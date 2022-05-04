@@ -12,11 +12,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 std::vector<std::string> inputfilenames;
 std::string outputfilename = "";
-std::string title = "", xtitle = "", ytitle = "", ztitle = "";
-bool titleset = false, xtitleset = false, ytitleset = false, ztitleset = false;
+std::vector<std::string> titles;
+std::string xtitle = "", ytitle = "", ztitle = "";
+bool xtitleset = false, ytitleset = false, ztitleset = false;
 std::vector<std::string> MCTags = {};
 
 std::string DataTag = "Data";
@@ -26,7 +28,7 @@ std::string samplename = "";
 std::string mchistname = "";
 std::string datahistname = "";
 
-std::vector<std::pair<std::string, std::string>> slicelist;
+std::vector<std::pair<std::string, std::string> > slicelist;
 
 std::vector<int> NXBinsToRemove;
 std::vector<int> NYBinsToRemove;
@@ -50,7 +52,7 @@ void SayUsage(char const *argv[]) {
       << "\t                                         always be read from the\n"
       << "\t                                         first file passed to \n"
       << "\t                                         --input.\n\n"
-      << "\t-t|--title <plot title>                : Plot title\n\n"
+      << "\t-t|--title <plot title> [<title> ...]  : Plot title(s)\n\n"
       << "\t-s|--sample <name[:mcname[:dataname]]> : Sample name with\n"
       << "\t                                         optional specifications \n"
       << "\t                                         for the MCand data\n"
@@ -102,9 +104,11 @@ void HandleOpts(int argc, char const *argv[]) {
       std::cout << "[OPT]: Writing plot to " << outputfilename << std::endl;
     } else if ((std::string(argv[opt]) == "-t") ||
                (std::string(argv[opt]) == "--title")) {
-      title = argv[++opt];
-      titleset = true;
-      std::cout << "[OPT]: Using " << title << " as plot title" << std::endl;
+      while (((opt + 1) != argc) && (argv[opt + 1][0] != '-')) {
+        titles.push_back(argv[++opt]);
+        std::cout << "[OPT]: Using " << titles.back() << " as plot title"
+                  << std::endl;
+      }
     } else if ((std::string(argv[opt]) == "-m") ||
                (std::string(argv[opt]) == "--mc-tag")) {
 
@@ -226,7 +230,7 @@ void HandleOpts(int argc, char const *argv[]) {
 
 std::vector<double> Chi2s;
 int NBins;
-std::vector<std::vector<TH1 *>> MCHists;
+std::vector<std::vector<TH1 *> > MCHists;
 std::vector<TH1 *> DataHists;
 double MaxBinValue;
 
@@ -361,8 +365,8 @@ void ReadHists() {
     }
 
     if (saychi2) {
-      std::cout << "MCTag: " << MCTags[ctr] << " Chi2: " << Chi2s.back()
-                << std::endl;
+      std::ofstream of((samplename + "_" + MCTags[ctr] + ".chi2").c_str());
+      of << Chi2s.back() << "/" << NBins << std::endl;
     }
     MaxBinValue = std::max(GetMaximumBinPlusError(MC), MaxBinValue);
 
@@ -427,7 +431,7 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
   Data->SetMarkerStyle(20);
 
   for (int i = 0; i < MCs.size(); ++i) {
-    MCs[i]->DrawClone(i ? "HIST" : "HISTSAME");
+    MCs[i]->DrawClone(!i ? "HIST" : "HISTSAME");
   }
   Data->DrawClone("SAME E1");
 
@@ -453,13 +457,14 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
   MCs[0]->GetYaxis()->SetLabelOffset(0.01);
 
   for (int i = 0; i < MCs.size(); ++i) {
-    MCs[i]->DrawClone(i ? "HIST" : "HISTSAME");
+    MCs[i]->DrawClone(!i ? "HIST" : "HISTSAME");
   }
 
   c1.cd();
 
   TLegend *leg = new TLegend(0.1, 0.8, 0.9, 1);
   leg->SetBorderSize(0);
+  leg->SetFillStyle(0);
   leg->SetTextSize(0.04);
   leg->AddEntry(Data, DataTag.c_str(), "lp");
 
@@ -483,8 +488,8 @@ void PlotSingleHist() {
   TH1 *MC = MCHists[0][0];
   TH1 *Data = DataHists[0];
 
-  if (titleset) {
-    MC->SetTitle(title.c_str());
+  if (titles.size()) {
+    MC->SetTitle(titles[0].c_str());
   } else {
     MC->SetTitle("");
   }
@@ -628,6 +633,11 @@ void PlotSlices() {
     MCHists[0][i]->GetXaxis()->SetNdivisions(505);
     MCHists[0][i]->GetYaxis()->SetNdivisions(505);
 
+    if (titles.size()) {
+      MCHists[0][i]->SetTitle(
+          ((i >= titles.size()) ? titles.back() : titles[i]).c_str());
+    }
+
     for (int si = 0; si < MCHists.size(); ++si) {
       MCHists[si][i]->SetLineColor(colorwheel[si % 6]);
       MCHists[si][i]->SetLineWidth(2);
@@ -642,7 +652,7 @@ void PlotSlices() {
     DataHists[i]->SetMarkerStyle(20);
 
     for (int si = 0; si < MCHists.size(); ++si) {
-      MCHists[si][i]->DrawClone(si ? "HIST" : "HISTSAME");
+      MCHists[si][i]->DrawClone(!si ? "HIST" : "HISTSAME");
     }
     DataHists[i]->DrawClone("SAME E1");
 
@@ -657,10 +667,11 @@ void PlotSlices() {
   } else { // Put the legend in the place of the last pane(s)
     leg = new TLegend((nslices % nx) * padxwidth, 1 - (ny * padywidth),
                       nx * padxwidth, 1 - ((ny - 1) * padywidth));
-    leg->SetTextSize(0.02 * float((nx*ny) - nslices));
+    leg->SetTextSize(0.02 * float((nx * ny) - nslices));
   }
 
   leg->SetBorderSize(0);
+  leg->SetFillStyle(0);
   leg->AddEntry(DataHists[0], DataTag.c_str(), "lp");
 
   for (int i = 0; i < MCHists.size(); ++i) {
@@ -694,10 +705,8 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  if (!saychi2 && !outputfilename.size()) {
-    std::cout << "[ERROR]: Must pass one of --output or --chi2." << std::endl;
-    SayUsage(argv);
-    return 1;
+  if (!outputfilename.size()) {
+    outputfilename = samplename + ".pdf";
   }
 
   while (MCTags.size() < inputfilenames.size()) {

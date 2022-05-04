@@ -12,9 +12,10 @@ function nuis_flux_help {
   echo -e "\tCommands:"
   echo -e "\t  help                                 : Display this message"
   echo -e "\t  list-experiments                     : List all implemented experiment names"
+  echo -e "\t  range <rootfile,histname>            : Say the X axis range of the passed histogram"
   echo -e "\tOptions:"
-  echo -e "\t  -p|--probe <numu|nue|numubar|nuebar> : Defaults to numu"
-  echo -e "\t  -m|--beam-mode <nu|nubar>            : Defaults to nu"
+  echo -e "\t  -P|--probe <numu|nue|numubar|nuebar> : Defaults to numu"
+  echo -e "\t  -M|--beam-mode <nu|nubar>            : Defaults to nu"
   echo -e "\nExample: ${NUIS_BREADCRUMBS} MINERvA -p numubar -m nubar\n"
 }
 
@@ -51,6 +52,27 @@ case $KEYARG in
     exit 0
     ;;
 
+  range)
+
+    if [[ ${#} -lt 1 ]]; then
+      echo "[ERROR]: ${KEYARG} expected a value."
+      exit 1
+    fi
+
+    RANGE_FLUX_DESCRIPTOR=${1}
+
+    OLDIFS=${IFS}
+    IFS=","
+    set -- ${RANGE_FLUX_DESCRIPTOR}
+    IFS=${OLDIFS}
+
+    RANGE_FLUX_FILE=${1}
+    RANGE_FLUX_HIST=${2}
+
+    nuishistrange ${RANGE_FLUX_FILE} ${RANGE_FLUX_HIST}
+    exit 0
+    ;;
+
   help)
     nuis_flux_help
     exit 0
@@ -70,7 +92,7 @@ while [[ ${#} -gt 0 ]]; do
   key="$1"
   case $key in
 
-  -p|--probe)
+  -P|--probe)
 
       if [[ ${#} -lt 2 ]]; then
         echo "[ERROR]: ${1} expected a value."
@@ -81,7 +103,7 @@ while [[ ${#} -gt 0 ]]; do
       shift # past argument
       ;;
 
-  -m|--beam-mode)
+  -M|--beam-mode)
 
       if [[ ${#} -lt 2 ]]; then
         echo "[ERROR]: ${1} expected a value."
@@ -96,7 +118,7 @@ while [[ ${#} -gt 0 ]]; do
 
       echo -e "Experimental Fluxes Available:"
       echo -e "    ANL_77 (ANL)"
-      echo -e "    ArgoNeut"
+      echo -e "    ArgoNeuT"
       echo -e "    BEBC"
       echo -e "    BNL_81"
       echo -e "    BNL_86"
@@ -149,7 +171,7 @@ case $EXPERIMENT in
       exit 0
     fi
     ;;
-  ArgoNeut)
+  ArgoNeuT)
     if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
       echo "${NUISANCE}/data/flux/ArgoNeut_numu_flux.root,numu"
       exit 0

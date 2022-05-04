@@ -8,7 +8,7 @@ fi
 function nuis_info_help {
   echo "Run like: ${NUIS_BREADCRUMBS} <input file> [option]"
   echo -e "\tOptions:"
-  echo -e "\t-t|--type : Print guessed input generator for input file"
+  echo -e "\t  -t|--type : Print guessed input generator for input file"
 }
 
 if [ "${#}" -lt 1 ]; then
