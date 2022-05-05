@@ -149,6 +149,7 @@ for SAMPLE in ${SAMPLES[@]}; do
   echo "\\centering" >> ${OUTPUTFILE}
   echo "\\includegraphics{${SAMPLE}}" >> ${OUTPUTFILE}
   echo "\\label{fig:${SAMPLE_HYPHEN}}" >> ${OUTPUTFILE}
+  echo "\\caption{${SAMPLE_HYPHEN}}" >> ${OUTPUTFILE}
   echo "\\end{figure}" >> ${OUTPUTFILE}
   echo "\\clearpage" >> ${OUTPUTFILE}
 done

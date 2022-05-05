@@ -419,6 +419,7 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
 
   for (int i = 0; i < MCs.size(); ++i) {
     MCs[i]->SetLineColor(colorwheel[i % 6]);
+    MCs[i]->SetFillColorAlpha(colorwheel[i % 6],0.5);
     MCs[i]->SetLineWidth(2);
     MCs[i]->SetLineStyle(1);
   }
@@ -431,6 +432,8 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
   Data->SetMarkerStyle(20);
 
   for (int i = 0; i < MCs.size(); ++i) {
+    MCs[i]->DrawClone(!i ? "E2" : "E2SAME");
+    MCs[i]->SetFillColorAlpha(colorwheel[i % 6],0);
     MCs[i]->DrawClone(!i ? "HIST" : "HISTSAME");
   }
   Data->DrawClone("SAME E1");
@@ -562,7 +565,7 @@ void PlotSlices() {
   }
 
   // don't get more than 3 wide
-  int nx = nslices > 9 ? 3 : std::floor(std::sqrt(double(nslices)));
+  int nx = nslices > 16 ? 4 : std::floor(std::sqrt(double(nslices)));
   int ny = std::ceil(double(nslices) / double(nx));
 
   std::cout << "[INFO]: Build " << nx << "x" << ny << " pads for " << nslices
@@ -640,6 +643,7 @@ void PlotSlices() {
 
     for (int si = 0; si < MCHists.size(); ++si) {
       MCHists[si][i]->SetLineColor(colorwheel[si % 6]);
+      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6],0.5);
       MCHists[si][i]->SetLineWidth(2);
       MCHists[si][i]->SetLineStyle(1);
     }
@@ -652,6 +656,8 @@ void PlotSlices() {
     DataHists[i]->SetMarkerStyle(20);
 
     for (int si = 0; si < MCHists.size(); ++si) {
+      MCHists[si][i]->DrawClone(!si ? "E2" : "E2SAME");
+      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6],0);
       MCHists[si][i]->DrawClone(!si ? "HIST" : "HISTSAME");
     }
     DataHists[i]->DrawClone("SAME E1");

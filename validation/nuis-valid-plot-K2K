@@ -18,5 +18,5 @@ done
 
 nuis plot collate \
     -s K2K_NC1pi0_Evt_1Dppi0_nu \
- -m ${GENTAGLIST[@]} -o GGM_validations.tex
+ -m ${GENTAGLIST[@]} -o K2K_validations.tex
 

@@ -8,20 +8,14 @@ nuis_valid_parse_argments ${@}
 EXP=MiniBooNE
 
 for SAMP in \
-            MiniBooNE_CCQELike_XSec_1DQ2_nu \
+            MiniBooNE_CCQE_XSec_1DQ2_nu \
+            MiniBooNE_CCQELike_XSec_1DQ2_nu:MiniBooNE_CCQELike_XSec_1DQ2_nu_MC:MiniBooNE_CCQELike_XSec_1DQ2_nu \
             MiniBooNE_CCQE_XSec_1DEnu_nu \
             MiniBooNE_CCQELike_XSec_1DEnu_nu \
-            MiniBooNE_CCQE_XSec_2DTcos_nu \
-            MiniBooNE_CCQELike_XSec_2DTcos_nu \
             MiniBooNE_CC1pip_XSec_1DEnu_nu \
             MiniBooNE_CC1pip_XSec_1DQ2_nu \
             MiniBooNE_CC1pip_XSec_1DTpi_nu \
             MiniBooNE_CC1pip_XSec_1DTu_nu \
-            MiniBooNE_CC1pip_XSec_2DQ2Enu_nu \
-            MiniBooNE_CC1pip_XSec_2DTpiCospi_nu \
-            MiniBooNE_CC1pip_XSec_2DTpiEnu_nu \
-            MiniBooNE_CC1pip_XSec_2DTuCosmu_nu \
-            MiniBooNE_CC1pip_XSec_2DTuEnu_nu \
             MiniBooNE_CC1pi0_XSec_1DEnu_nu \
             MiniBooNE_CC1pi0_XSec_1DQ2_nu \
             MiniBooNE_CC1pi0_XSec_1DTu_nu \
@@ -37,14 +31,36 @@ for SAMP in \
 
     nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
         -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
-
 done
+
+for SAMP in \
+    MiniBooNE_CC1pip_XSec_2DQ2Enu_nu \
+    MiniBooNE_CC1pip_XSec_2DTuEnu_nu \
+    MiniBooNE_CC1pip_XSec_2DTpiEnu_nu \
+    ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+        -s ${SAMP} --split2D X --mc-tag ${GENTAGLIST[@]}
+done
+
+for SAMP in \
+    MiniBooNE_CC1pip_XSec_2DTpiCospi_nu \
+    MiniBooNE_CC1pip_XSec_2DTuCosmu_nu \
+    ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+        -s ${SAMP} --split2D X --mc-tag ${GENTAGLIST[@]}
+done
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_nu --split2D X --bins-nodisplay X 9 --mc-tag ${GENTAGLIST[@]}
+
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.CH2.comp.root) \
+    -s MiniBooNE_CCQE_XSec_2DTcos_nu --split2D X --bins-nodisplay X 9 --mc-tag ${GENTAGLIST[@]}
 
 for SAMP in \
             MiniBooNE_CCQE_XSec_1DQ2_antinu \
             MiniBooNE_CCQELike_XSec_1DQ2_antinu \
-            MiniBooNE_CCQE_XSec_2DTcos_antinu \
-            MiniBooNE_CCQELike_XSec_2DTcos_antinu \
             MiniBooNE_NC1pi0_XSec_1Dcospi0_antinu \
             MiniBooNE_NC1pi0_XSec_1Dcospi0_rhc \
             MiniBooNE_NC1pi0_XSec_1Dppi0_antinu \
@@ -53,19 +69,19 @@ for SAMP in \
 
     nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
         -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
-
 done
 
-for SAMP in \
-            MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu \
-            ; do
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
+    -s MiniBooNE_CCQE_XSec_2DTcos_antinu --split2D Y --mc-tag ${GENTAGLIST[@]}
 
-    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.C.comp.root) \
-        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.CH2.comp.root) \
+    -s MiniBooNE_CCQELike_XSec_2DTcos_antinu --split2D Y --mc-tag ${GENTAGLIST[@]}
 
-done
+nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.C.comp.root) \
+    -s MiniBooNE_CCQE_CTarg_XSec_1DQ2_antinu --mc-tag ${GENTAGLIST[@]}
 
 nuis plot collate \
+    -s MiniBooNE_CCQE_XSec_1DQ2_nu \
     -s MiniBooNE_CCQELike_XSec_1DQ2_nu \
     -s MiniBooNE_CCQE_XSec_1DEnu_nu \
     -s MiniBooNE_CCQELike_XSec_1DEnu_nu \
