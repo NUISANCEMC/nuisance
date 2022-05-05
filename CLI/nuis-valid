@@ -53,6 +53,9 @@ case ${SUBCOMMAND} in
 
   list-experiments)
     echo -e "Experiments Available:"
+    echo -e "    ANL"
+    echo -e "    ArgoNeuT"
+    echo -e "    BNL"
     echo -e "    T2K"
     exit 0
     ;;

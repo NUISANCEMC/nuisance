@@ -88,6 +88,24 @@ nuis plot collate \
     -s ANL_CCQE_Evt_1DQ2_nu_PRL31 \
     -s ANL_CCQE_Evt_1DQ2_nu_PRD26 \
     -s ANL_CCQE_Evt_1DQ2_nu_PRD16 \
+    -s ANL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dppip_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dppim_nu \
+    -s ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu \
+    -s ANL_CC2pi_1pip1pip_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu \
+    -s ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu \
+    -s ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu \
+    -s ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu \
+ -m ${GENTAGLIST[@]} -o ANL_other_validations.tex
+
+ nuis plot collate \
     -s ANL_CC1ppip_XSec_1DEnu_nu \
     -s ANL_CC1ppip_XSec_1DEnu_nu_W14Cut \
     -s ANL_CC1ppip_XSec_1DEnu_nu_Uncorr \
@@ -130,19 +148,4 @@ nuis plot collate \
     -s ANL_NC1npip_Evt_1Dppi_nu \
     -s ANL_NC1ppim_XSec_1DEnu_nu \
     -s ANL_NC1ppim_Evt_1DcosmuStar_nu \
-    -s ANL_CC2pi_1pim1pip_XSec_1DEnu_nu \
-    -s ANL_CC2pi_1pim1pip_Evt_1Dpmu_nu \
-    -s ANL_CC2pi_1pim1pip_Evt_1Dppip_nu \
-    -s ANL_CC2pi_1pim1pip_Evt_1Dppim_nu \
-    -s ANL_CC2pi_1pim1pip_Evt_1Dpprot_nu \
-    -s ANL_CC2pi_1pip1pip_XSec_1DEnu_nu \
-    -s ANL_CC2pi_1pip1pip_Evt_1Dpmu_nu \
-    -s ANL_CC2pi_1pip1pip_Evt_1Dpneut_nu \
-    -s ANL_CC2pi_1pip1pip_Evt_1DppipHigh_nu \
-    -s ANL_CC2pi_1pip1pip_Evt_1DppipLow_nu \
-    -s ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu \
-    -s ANL_CC2pi_1pip1pi0_Evt_1Dpmu_nu \
-    -s ANL_CC2pi_1pip1pi0_Evt_1Dppip_nu \
-    -s ANL_CC2pi_1pip1pi0_Evt_1Dppi0_nu \
-    -s ANL_CC2pi_1pip1pi0_Evt_1Dpprot_nu \
- -m ${GENTAGLIST[@]} -o ANL_validations.tex
+ -m ${GENTAGLIST[@]} -o ANL_1pi_validations.tex

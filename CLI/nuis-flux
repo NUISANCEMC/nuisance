@@ -207,13 +207,23 @@ case $EXPERIMENT in
       exit 0
     fi
     ;;
+  FNAL)
+    if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_CCinc_1982_nu_MCadj.root,numu_flux"
+      exit 0
+    fi
+    if [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
+      echo "${NUISANCE}/data/flux/FNAL_coh_1993_anu.root,numu_flux"
+      exit 0
+    fi
+    ;;
   FNAL_82)
     if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
       echo "${NUISANCE}/data/flux/FNAL_CCinc_1982_nu_MCadj.root,numu_flux"
       exit 0
     fi
     ;;
-  FNAL|FNAL_93)
+  FNAL_93)
     if [ "${PROBE}" == "numubar" ] && [ "${BEAMMODE}" == "nubar" ]; then
       echo "${NUISANCE}/data/flux/FNAL_coh_1993_anu.root,numu_flux"
       exit 0
@@ -233,7 +243,7 @@ case $EXPERIMENT in
     ;;
   MicroBooNE)
     if [ "${PROBE}" == "numu" ] && [ "${BEAMMODE}" == "nu" ]; then
-      echo "${NUISANCE}/data/flux/MicroBooNE_CCInc2019_numode_numu_flux.root,flux_numu"
+      echo "${NUISANCE}/data/flux/MicroBooNE_FHC_numu_flux.root,numu_hist"
       exit 0
     fi
     ;;

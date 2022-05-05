@@ -21,6 +21,8 @@ function nuis_gen_neut_help {
   echo -e "\thelp                                 : Print this message"
 }
 
+source $(nuis internal NEUT.funcs)
+
 NEUT_OPTIONS=""
 
 #default options
@@ -57,6 +59,8 @@ while [[ ${#} -gt 0 ]]; do
 
       EOPT="$2"
       echo "[OPT]: ${NUIS_BREADCRUMBS} -- Adding ${EOPT} to card file"
+
+
       NEUT_EXTRA_OPTIONS="${NEUT_EXTRA_OPTIONS}|${EOPT}"
       shift # past argument
       ;;
@@ -296,23 +300,6 @@ if [ "${TARGET_NAME}" = "H" ] || [ "${TARGET_NAME}" = "D" ] || [ "${FSIOFF}" = "
 fi
 
 NEUT_OPTIONS="${NEUT_OPTIONS}|NEUT-RAND=1"
-
-function SetNeutParam () {
-  local CARD=${1}
-  local PNAME=${2}
-  local VAL=${3}
-
-  if [ ! -z ${NUIS_CLID_DEBUG} ]; then
-    echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} SetNeutParam ${CARD} ${PNAME} ${VAL}"
-  fi
-
-  if cat ${CARD} | grep "^${PNAME}" &> /dev/null; then
-    cat ${CARD} | sed "s:^${PNAME}.*$:${PNAME} ${VAL}:" > ${CARD}_
-    mv ${CARD}_ ${CARD}
-  else
-    echo "${PNAME} ${VAL}" >> ${CARD}
-  fi
-}
 
 if [ ! -z ${NUIS_CLID_DEBUG} ]; then
   echo "[CLI DEBUG](BrCr: ${NUIS_BREADCRUMBS}): ${COMMAND} NEUT_OPTIONS: ${NEUT_OPTIONS}"

@@ -56,7 +56,7 @@
 #include "ANL_CC2pi_1pip1pi0_XSec_1DEnu_nu.h"
 #endif
 
-#ifdef ArgoNeut_ENABLED
+#ifdef ArgoNeuT_ENABLED
 // ArgoNeuT CC1Pi
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu.h"
 #include "ArgoNeuT_CC1Pi_XSec_1Dpmu_nu.h"
@@ -805,7 +805,7 @@ MeasurementBase *CreateSample(nuiskey samplekey) {
     */
   } else
 #endif
-#ifdef ArgoNeut_ENABLED
+#ifdef ArgoNeuT_ENABLED
     if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_antinu")) {
       return (new ArgoNeuT_CCInc_XSec_1Dpmu_antinu(samplekey));
     } else if (!name.compare("ArgoNeuT_CCInc_XSec_1Dpmu_nu")) {

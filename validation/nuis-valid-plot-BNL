@@ -1,0 +1,78 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=BNL
+
+for SAMP in \
+    BNL_CCQE_XSec_1DEnu_nu \
+    BNL_CCQE_Evt_1DQ2_nu \
+    BNL_CC1ppip_XSec_1DEnu_nu \
+    BNL_CC1ppip_XSec_1DEnu_nu_Uncorr \
+    BNL_CC1ppip_XSec_1DEnu_nu_W14Cut \
+    BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr \
+    BNL_CC1ppip_Evt_1DQ2_nu \
+    BNL_CC1ppip_Evt_1DQ2_nu_W14Cut \
+    BNL_CC1ppip_Evt_1DcosthAdler_nu \
+    BNL_CC1ppip_Evt_1Dphi_nu \
+    BNL_CC1ppip_Evt_1DWNpi_nu \
+    BNL_CC1ppip_Evt_1DWNmu_nu \
+    BNL_CC1ppip_Evt_1DWmupi_nu \
+    BNL_CC1npip_XSec_1DEnu_nu \
+    BNL_CC1npip_XSec_1DEnu_nu_Uncorr \
+    BNL_CC1npip_Evt_1DQ2_nu \
+    BNL_CC1npip_Evt_1DWNpi_nu \
+    BNL_CC1npip_Evt_1DWNmu_nu \
+    BNL_CC1npip_Evt_1DWmupi_nu \
+    BNL_CC1pi0_XSec_1DEnu_nu \
+    BNL_CC1pi0_Evt_1DQ2_nu \
+    BNL_CC1pi0_Evt_1DWNpi_nu \
+    BNL_CC1pi0_Evt_1DWNmu_nu \
+    BNL_CC1pi0_Evt_1DWmupi_nu \
+    BNL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+    BNL_CC3pi_1pim2pip_XSec_1DEnu_nu \
+    BNL_CC4pi_2pim2pip_XSec_1DEnu_nu \
+    BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu \
+    BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.D2.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s BNL_CCQE_XSec_1DEnu_nu \
+    -s BNL_CCQE_Evt_1DQ2_nu \
+    -s BNL_CC1ppip_XSec_1DEnu_nu \
+    -s BNL_CC1ppip_XSec_1DEnu_nu_Uncorr \
+    -s BNL_CC1ppip_XSec_1DEnu_nu_W14Cut \
+    -s BNL_CC1ppip_XSec_1DEnu_nu_W14Cut_Uncorr \
+    -s BNL_CC1ppip_Evt_1DQ2_nu \
+    -s BNL_CC1ppip_Evt_1DQ2_nu_W14Cut \
+    -s BNL_CC1ppip_Evt_1DcosthAdler_nu \
+    -s BNL_CC1ppip_Evt_1Dphi_nu \
+    -s BNL_CC1ppip_Evt_1DWNpi_nu \
+    -s BNL_CC1ppip_Evt_1DWNmu_nu \
+    -s BNL_CC1ppip_Evt_1DWmupi_nu \
+    -s BNL_CC1npip_XSec_1DEnu_nu \
+    -s BNL_CC1npip_XSec_1DEnu_nu_Uncorr \
+    -s BNL_CC1npip_Evt_1DQ2_nu \
+    -s BNL_CC1npip_Evt_1DWNpi_nu \
+    -s BNL_CC1npip_Evt_1DWNmu_nu \
+    -s BNL_CC1npip_Evt_1DWmupi_nu \
+    -s BNL_CC1pi0_XSec_1DEnu_nu \
+    -s BNL_CC1pi0_Evt_1DQ2_nu \
+    -s BNL_CC1pi0_Evt_1DWNpi_nu \
+    -s BNL_CC1pi0_Evt_1DWNmu_nu \
+    -s BNL_CC1pi0_Evt_1DWmupi_nu \
+    -s BNL_CC2pi_1pim1pip_XSec_1DEnu_nu \
+    -s BNL_CC3pi_1pim2pip_XSec_1DEnu_nu \
+    -s BNL_CC4pi_2pim2pip_XSec_1DEnu_nu \
+    -s BNL_CC2pi_1pim1pip_Evt_1DWpippim_nu \
+    -s BNL_CC2pi_1pim1pip_Evt_1DWpippr_nu \
+ -m ${GENTAGLIST[@]} -o BNL_validations.tex
+

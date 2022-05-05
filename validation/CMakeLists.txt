@@ -1,5 +1,8 @@
 
-foreach(EXP T2K ANL)
+foreach(EXP 
+	ANL BNL FNAL GGM BEBC 
+	T2K MiniBooNE SciBooNE K2K
+	ArgoNeuT MicroBooNE)
 	install(PROGRAMS 
 		nuis-valid-gen-${EXP}
 		nuis-valid-comp-${EXP}

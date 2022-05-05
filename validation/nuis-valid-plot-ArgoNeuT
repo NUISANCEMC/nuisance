@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e
+
+source $(nuis internal valid.funcs)
+nuis_valid_parse_argments ${@}
+
+EXP=ArgoNeuT
+
+for SAMP in \
+    ArgoNeuT_CCInc_XSec_1Dpmu_nu \
+    ArgoNeuT_CCInc_XSec_1Dthetamu_nu \
+    ArgoNeuT_CC1Pi_XSec_1Dpmu_nu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nu.numu.Ar.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+for SAMP in \
+    ArgoNeuT_CCInc_XSec_1Dpmu_antinu \
+    ArgoNeuT_CCInc_XSec_1Dthetamu_antinu \
+    ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu \
+    ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu \
+            ; do
+
+    nuis plot --chi2 -i $(nuis_gen_tag_list ${EXP} nubar.numubar.Ar.comp.root) \
+        -s ${SAMP} --mc-tag ${GENTAGLIST[@]}
+
+done
+
+nuis plot collate \
+    -s ArgoNeuT_CCInc_XSec_1Dpmu_nu \
+    -s ArgoNeuT_CCInc_XSec_1Dthetamu_nu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dpmu_nu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetamu_nu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetapi_nu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetamupi_nu \
+    -s ArgoNeuT_CCInc_XSec_1Dpmu_antinu \
+    -s ArgoNeuT_CCInc_XSec_1Dthetamu_antinu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dpmu_antinu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetamu_antinu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetapi_antinu \
+    -s ArgoNeuT_CC1Pi_XSec_1Dthetamupi_antinu \
+ -m ${GENTAGLIST[@]} -o ArgoNeuT_validations.tex
+
