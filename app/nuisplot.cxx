@@ -9,10 +9,10 @@
 #include "TStyle.h"
 
 #include <cstdlib>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 std::vector<std::string> inputfilenames;
 std::string outputfilename = "";
@@ -28,7 +28,7 @@ std::string samplename = "";
 std::string mchistname = "";
 std::string datahistname = "";
 
-std::vector<std::pair<std::string, std::string> > slicelist;
+std::vector<std::pair<std::string, std::string>> slicelist;
 
 std::vector<int> NXBinsToRemove;
 std::vector<int> NYBinsToRemove;
@@ -230,7 +230,7 @@ void HandleOpts(int argc, char const *argv[]) {
 
 std::vector<double> Chi2s;
 int NBins;
-std::vector<std::vector<TH1 *> > MCHists;
+std::vector<std::vector<TH1 *>> MCHists;
 std::vector<TH1 *> DataHists;
 double MaxBinValue;
 
@@ -419,9 +419,12 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
 
   for (int i = 0; i < MCs.size(); ++i) {
     MCs[i]->SetLineColor(colorwheel[i % 6]);
-    MCs[i]->SetFillColorAlpha(colorwheel[i % 6],0.5);
+    MCs[i]->SetFillColorAlpha(colorwheel[i % 6], 0.5);
     MCs[i]->SetLineWidth(2);
     MCs[i]->SetLineStyle(1);
+    MCs[i]->SetMarkerSize(0);
+    MCs[i]->SetMarkerStyle(0);
+    MCs[i]->SetMarkerColorAlpha(colorwheel[i % 6], 0);
   }
 
   Data->SetLineColor(kBlack);
@@ -433,8 +436,8 @@ void Plot1D(std::vector<TH1 *> MCs, TH1 *Data) {
 
   for (int i = 0; i < MCs.size(); ++i) {
     MCs[i]->DrawClone(!i ? "E2" : "E2SAME");
-    MCs[i]->SetFillColorAlpha(colorwheel[i % 6],0);
-    MCs[i]->DrawClone(!i ? "HIST" : "HISTSAME");
+    MCs[i]->SetFillColorAlpha(colorwheel[i % 6], 0);
+    MCs[i]->DrawClone("HISTSAME");
   }
   Data->DrawClone("SAME E1");
 
@@ -643,9 +646,12 @@ void PlotSlices() {
 
     for (int si = 0; si < MCHists.size(); ++si) {
       MCHists[si][i]->SetLineColor(colorwheel[si % 6]);
-      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6],0.5);
+      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6], 0.5);
       MCHists[si][i]->SetLineWidth(2);
       MCHists[si][i]->SetLineStyle(1);
+      MCHists[si][i]->SetMarkerSize(0);
+      MCHists[si][i]->SetMarkerStyle(0);
+      MCHists[si][i]->SetMarkerColorAlpha(colorwheel[i % 6], 0);
     }
 
     DataHists[i]->SetLineColor(kBlack);
@@ -657,8 +663,8 @@ void PlotSlices() {
 
     for (int si = 0; si < MCHists.size(); ++si) {
       MCHists[si][i]->DrawClone(!si ? "E2" : "E2SAME");
-      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6],0);
-      MCHists[si][i]->DrawClone(!si ? "HIST" : "HISTSAME");
+      MCHists[si][i]->SetFillColorAlpha(colorwheel[si % 6], 0);
+      MCHists[si][i]->DrawClone("HISTSAME");
     }
     DataHists[i]->DrawClone("SAME E1");
 

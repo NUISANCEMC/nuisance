@@ -353,13 +353,18 @@ if [ ! -e ./${FLUX_FILE} ]; then
   cp ${FLUX_FILE} ./
 fi
 
+CMD=neutroot2
+if [ "${NUIS_DEBUG}" == "ON" ]; then
+  CMD="gdb --args neutroot2"
+fi
+
 if [ "${QUIET}" == "TRUE" ]; then
   set -x
-  neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root &> /dev/null
+  ${CMD} ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root &> /dev/null
   set +x
 else
   set -x
-  neutroot2 ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root
+  ${CMD} ${CARDNAME} ${OUTPUT_FILENAME%%.root}.neutvect.root
   set +x
 fi
 
